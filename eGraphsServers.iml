@@ -15,8 +15,8 @@
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/tmp/generated" isTestSource="false" />
     </content>
-    <content url="file://$USER_HOME$/lib/play-1.2.3/modules/scala-0.9.1">
-      <sourceFolder url="file://$USER_HOME$/lib/play-1.2.3/modules/scala-0.9.1/app" isTestSource="false" />
+    <content url="file://$PLAY_HOME$/modules/scala-0.9.1">
+      <sourceFolder url="file://$PLAY_HOME$/modules/scala-0.9.1/app" isTestSource="false" />
     </content>
     <orderEntry type="jdk" jdkName="1.6" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -25,40 +25,40 @@
       <library name="Project Libraries">
         <CLASSES>
           <root url="file://$MODULE_DIR$/lib" />
-          <root url="file://$USER_HOME$/lib/play-1.2.3/modules/scala-0.9.1/src" />
-          <root url="file://$USER_HOME$/lib/play-1.2.3/modules/scala-0.9.1/lib" />
+          <root url="file://$PLAY_HOME$/modules/scala-0.9.1/src" />
+          <root url="file://$PLAY_HOME$/modules/scala-0.9.1/lib" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
         <jarDirectory url="file://$MODULE_DIR$/lib" recursive="false" />
-        <jarDirectory url="file://$USER_HOME$/lib/play-1.2.3/modules/scala-0.9.1/lib" recursive="false" />
+        <jarDirectory url="file://$PLAY_HOME$/modules/scala-0.9.1/lib" recursive="false" />
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library name="PlayFramework Dependencies">
         <CLASSES>
-          <root url="file://$USER_HOME$/lib/play-1.2.3/framework/lib" />
+          <root url="file://$PLAY_HOME$/framework/lib" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
-        <jarDirectory url="file://$USER_HOME$/lib/play-1.2.3/framework/lib" recursive="false" />
+        <jarDirectory url="file://$PLAY_HOME$/framework/lib" recursive="false" />
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/lib/play-1.2.3/framework/play-1.2.3.jar!/" />
+          <root url="jar://$PLAY_HOME$/framework/play-1.2.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://$USER_HOME$/lib/play-1.2.3/framework/src" />
+          <root url="file://$PLAY_HOME$/framework/src" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library" scope="TEST">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/lib/scalatest-1.6.1/scalatest-1.6.1-tests.jar!/" />
+          <root url="jar://$SCALATEST_HOME$/scalatest-1.6.1-tests.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
