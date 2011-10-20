@@ -1,4 +1,6 @@
 package controllers
 
-// TODO(will): How to use CRUD annotation to call it Celebrities?
+import models.Celebrity
+
+//@CRUD.For(Celebrity.me.getClass.asInstanceOf[play.db.Model])
 class Celebritys extends CRUD

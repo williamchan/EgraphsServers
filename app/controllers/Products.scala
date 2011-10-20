@@ -1,6 +1,6 @@
 package controllers
 
-// TODO(will): How to use CRUD annotation?
+//@CRUD.For(models.Product.me)
 class Products extends CRUD {
 
 }

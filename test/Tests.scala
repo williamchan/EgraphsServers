@@ -19,8 +19,8 @@ class BasicTests extends UnitFlatSpec with ShouldMatchers with BeforeAndAfterEac
     var celebrity = buildCelebrity("Kevin Bacon", "kevin@bacon.com", "test1234", "Six degrees from me")
 
     celebrity = celebrity.refresh()
-//    celebrity.created should be(now) // figure out testing of Dates
-//    celebrity.updated should be(now)
+    //    celebrity.created should be(now) // figure out testing of Dates
+    //    celebrity.updated should be(now)
     celebrity.name should be("Kevin Bacon")
     celebrity.email should be("kevin@bacon.com")
     celebrity.password = "test1234"
@@ -30,7 +30,7 @@ class BasicTests extends UnitFlatSpec with ShouldMatchers with BeforeAndAfterEac
   it should "find created Celebrity" in {
     val celebrity = buildCelebrity("Kevin Bacon", "kevin@bacon.com", "test1234", "Six degrees from me")
 
-    var result = JPABase.em().find(Celebrity.me.getClass, celebrity.getId()).asInstanceOf[Celebrity]
+    var result = JPABase.em().find(classOf[Celebrity], celebrity.getId())
     //    result.created should be(now)
     //    result.updated should be(now)
     result.name should be("Kevin Bacon")
@@ -45,17 +45,17 @@ class BasicTests extends UnitFlatSpec with ShouldMatchers with BeforeAndAfterEac
     celebrity.name = "herp derp"
     celebrity.save()
 
-    var result = JPABase.em().find(Celebrity.me.getClass, celebrity.getId()).asInstanceOf[Celebrity]
+    var result = JPABase.em().find(classOf[Celebrity], celebrity.getId())
     result.name should be("herp derp")
   }
 
   it should "delete Celebrity" in {
     val celebrity = buildCelebrity("Kevin Bacon", "kevin@bacon.com", "test1234", "Six degrees from me")
 
-    var result = JPABase.em().find(Celebrity.me.getClass, celebrity.getId()).asInstanceOf[Celebrity]
+    var result = JPABase.em().find(classOf[Celebrity], celebrity.getId())
     result should not be (null)
     result.delete()
-    result = JPABase.em().find(Celebrity.me.getClass, celebrity.getId()).asInstanceOf[Celebrity]
+    result = JPABase.em().find(classOf[Celebrity], celebrity.getId())
     result should be(null)
   }
 
@@ -88,10 +88,10 @@ class BasicTests extends UnitFlatSpec with ShouldMatchers with BeforeAndAfterEac
     val celebrity = buildCelebrity("Kevin Bacon", "kevin@bacon.com", "test1234", "Six degrees from me")
     var product = buildProduct("autograph0", 20.00, celebrity)
 
-    var result = JPABase.em().find(Product.me.getClass, product.getId()).asInstanceOf[Product]
+    var result = JPABase.em().find(classOf[Product], product.getId())
     result should not be (null)
     result.delete()
-    result = JPABase.em().find(Product.me.getClass, product.getId()).asInstanceOf[Product]
+    result = JPABase.em().find(classOf[Product], product.getId())
     result should be(null)
   }
 
@@ -100,26 +100,24 @@ class BasicTests extends UnitFlatSpec with ShouldMatchers with BeforeAndAfterEac
     buildCelebrity("Kevin Bacon", "kevin@bacon.com1", "test1234", "Six degrees from me")
     buildCelebrity("Kevin Bacon", "kevin@bacon.com2", "test1234", "Six degrees from me")
 
-    //    JPABase.em().find(Celebrity.me.getClass, celebrity.getId()).asInstanceOf[Celebrity] // EntityManager.find is find by ID
-
     val query0: Query = JPABase.em().createQuery("SELECT c FROM Celebrity c WHERE name = 'Kevin Bacon'")
-    val resultList0: List[_] = query0.getResultList
+    val resultList0: List[Celebrity] = query0.getResultList.asInstanceOf[List[Celebrity]]
     resultList0.size() should be(3)
     val result0 = resultList0.get(0)
     //    query0.getFirstResult // Query.getFirstResult... see http://www.developer.com/java/ent/the-jpa-2-enhancements-every-java-developer-should-know.html
-    result0.asInstanceOf[Celebrity].name should be("Kevin Bacon")
+    result0.name should be("Kevin Bacon")
 
     val criteriaBuilder: CriteriaBuilder = JPABase.em().getCriteriaBuilder
     val criteriaQuery: CriteriaQuery[AnyRef] = criteriaBuilder.createQuery()
-    val queryRoot: Root[Celebrity] = criteriaQuery.from(Celebrity.me.getClass).asInstanceOf[Root[Celebrity]]
+    val queryRoot: Root[Celebrity] = criteriaQuery.from(classOf[Celebrity])
     criteriaQuery.select(queryRoot)
     val predicate0: Predicate = criteriaBuilder.equal(queryRoot.get("name"), "Kevin Bacon")
     val predicate1: Predicate = criteriaBuilder.equal(queryRoot.get("email"), "kevin@bacon.com")
     criteriaQuery.where(Seq(predicate0, predicate1): _*)
-    val resultList1: List[_] = JPABase.em().createQuery(criteriaQuery).getResultList
+    val resultList1: List[Celebrity] = JPABase.em().createQuery(criteriaQuery).getResultList.asInstanceOf[List[Celebrity]]
     resultList1.size() should be(1)
     val result1 = resultList1.get(0)
-    result1.asInstanceOf[Celebrity].name should be("Kevin Bacon")
+    result1.name should be("Kevin Bacon")
   }
 
   // --------------------------- PRIVATE

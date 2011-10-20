@@ -5,10 +5,6 @@ import javax.persistence.Entity
 import play.data.validation.Required
 import play.db.jpa.Model
 
-object Celebrity {
-  val me = new Celebrity
-}
-
 // TODO(will): Try to make a case class
 @Entity
 class Celebrity extends Model {
@@ -38,28 +34,6 @@ class Celebrity extends Model {
   override def toString = name
 }
 
-
-/* // Anorm
-import play.db.anorm._
-import play.db.anorm.defaults._
-
-case class Celebrity(celebrityId: Pk[Long] = NotAssigned,
-                     created: Date = new Date(),
-                     updated: Date = new Date(),
-                     udid: String = "",
-                     name: String,
-                     email: String,
-                     password: String,
-                     description: String = "",
-                     profilePic: String = "",
-                     settings: Int = 0,
-                     twitterHandle: String = "") {
+object Celebrity {
+  val me = new Celebrity()
 }
-
-object Celebrity extends Magic[Celebrity] {
-
-  def apply(name: String, email: String, password: String, description: String, profilePic: String): Celebrity = {
-    new Celebrity(name = name, email = email, password = password, description = description, profilePic = profilePic)
-  }
-}
-*/

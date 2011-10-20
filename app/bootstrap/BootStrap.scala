@@ -14,7 +14,7 @@ import java.util.Date
     ""
 
     // for JPA
-    var kevin = JPABase.em().find(Celebrity.me.getClass, 1L).asInstanceOf[Celebrity]
+    var kevin = JPABase.em().find(classOf[Celebrity], 1L)
     if (kevin == null) {
       println("Creating Kevin Bacon...")
       kevin = new Celebrity()
