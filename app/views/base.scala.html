@@ -1,0 +1,25 @@
+@(title:String    = "",
+  head:   => Html = Html.empty,
+  onLoad: => Html = Html.empty,
+  body:   => Html = Html.empty)
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>@title</title>
+    <link rel="stylesheet" media="screen" href="@asset("public/stylesheets/main.css")" >
+    <link rel="shortcut icon" type="image/png" href="@asset("public/images/favicon.png")" >
+    <script src="@asset("public/javascripts/jquery-1.5.2.min.js")" type="text/javascript"></script>
+    @head
+    <script type="text/javascript">
+      $(document).ready(function() {
+        @onLoad
+      });
+    </script>
+  </head>
+  <body>
+    <div id="base-content" >
+      @body
+    </div>
+  </body>
+</html>

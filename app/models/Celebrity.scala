@@ -5,7 +5,6 @@ import javax.persistence.Entity
 import play.data.validation.Required
 import play.db.jpa.Model
 
-// TODO(will): Try to make a case class
 @Entity
 class Celebrity extends Model {
 
