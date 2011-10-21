@@ -9,8 +9,11 @@ import play.test._
 
 import org.scalatest.matchers._
 
-class BasicTests extends UnitFlatSpec with ShouldMatchers with BeforeAndAfterEach {
-
+class BasicTests extends UnitFlatSpec
+  with ShouldMatchers
+  with BeforeAndAfterEach
+  with DateShouldMatchers
+{
   override def beforeEach() {
     Fixtures.deleteDatabase()
   }
@@ -19,8 +22,8 @@ class BasicTests extends UnitFlatSpec with ShouldMatchers with BeforeAndAfterEac
     var celebrity = buildCelebrity("Kevin Bacon", "kevin@bacon.com", "test1234", "Six degrees from me")
 
     celebrity = celebrity.refresh()
-    //    celebrity.created should be(now) // figure out testing of Dates
-    //    celebrity.updated should be(now)
+    celebrity.created should be(aboutNow)
+    celebrity.updated should be(aboutNow)
     celebrity.name should be("Kevin Bacon")
     celebrity.email should be("kevin@bacon.com")
     celebrity.password = "test1234"
@@ -31,8 +34,8 @@ class BasicTests extends UnitFlatSpec with ShouldMatchers with BeforeAndAfterEac
     val celebrity = buildCelebrity("Kevin Bacon", "kevin@bacon.com", "test1234", "Six degrees from me")
 
     var result = JPABase.em().find(classOf[Celebrity], celebrity.getId())
-    //    result.created should be(now)
-    //    result.updated should be(now)
+    result.created should be(aboutNow)
+    result.updated should be(aboutNow)
     result.name should be("Kevin Bacon")
     result.email should be("kevin@bacon.com")
     result.password = "test1234"

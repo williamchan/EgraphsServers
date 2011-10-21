@@ -5,15 +5,16 @@ import javax.persistence.Entity
 import play.data.validation.Required
 import play.db.jpa.Model
 
-@Entity
-class Celebrity extends Model {
-
+trait CreatedUpdated {
   @Required
   var created: Date = null
 
   @Required
   var updated: Date = null
+}
 
+@Entity
+class Celebrity extends Model with CreatedUpdated {
   @Required
   var name: String = null
 
