@@ -1,4 +1,4 @@
-package com.vocalect.client;
+package services.voice;
 
 import org.apache.commons.codec.binary.Base64;
 import org.w3c.dom.Document;

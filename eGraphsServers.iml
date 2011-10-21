@@ -14,6 +14,7 @@
       <sourceFolder url="file://$MODULE_DIR$/app" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/tmp/generated" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib" isTestSource="false" />
     </content>
     <content url="file://$PLAY_HOME$/modules/crud">
       <sourceFolder url="file://$PLAY_HOME$/modules/crud/app" isTestSource="false" />
@@ -30,9 +31,11 @@
           <root url="file://$MODULE_DIR$/lib" />
           <root url="file://$PLAY_HOME$/modules/scala-0.9.1/src" />
           <root url="file://$PLAY_HOME$/modules/scala-0.9.1/lib" />
+          <root url="file://$MODULE_DIR$/lib" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
+        <jarDirectory url="file://$MODULE_DIR$/lib" recursive="false" />
         <jarDirectory url="file://$MODULE_DIR$/lib" recursive="false" />
         <jarDirectory url="file://$PLAY_HOME$/modules/scala-0.9.1/lib" recursive="false" />
       </library>

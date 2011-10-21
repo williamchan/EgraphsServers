@@ -1,6 +1,7 @@
-package com.vocalect.client;
+package services.voice;
 
 import junit.framework.TestCase;
+import services.voice.VoiceBiometricsClient;
 
 public class VoiceBiometricsClientTest extends TestCase {
 
