@@ -98,6 +98,17 @@ class BasicTests extends UnitFlatSpec
     result should be(null)
   }
 
+  it should "QueryOn API" in {
+    
+    buildCelebrity("Kevin Bacon", "kevin@bacon.com", "test1234", "Six degrees from me")
+
+    Celebrity.count should be (1)
+    // val kevins = Celebrity.find("byName", "Kevin Bacon")
+    val kevins = Celebrity.find("name = :name", Map("name" -> "Kevin Bacon"))
+    kevins.first.get.name should be ("Kevin Bacon")
+  }
+
+
   it should "Learning JPA API" in {
     buildCelebrity("Kevin Bacon", "kevin@bacon.com", "test1234", "Six degrees from me")
     buildCelebrity("Kevin Bacon", "kevin@bacon.com1", "test1234", "Six degrees from me")
@@ -107,6 +118,7 @@ class BasicTests extends UnitFlatSpec
     val resultList0: List[Celebrity] = query0.getResultList.asInstanceOf[List[Celebrity]]
     resultList0.size() should be(3)
     val result0 = resultList0.get(0)
+
     //    query0.getFirstResult // Query.getFirstResult... see http://www.developer.com/java/ent/the-jpa-2-enhancements-every-java-developer-should-know.html
     result0.name should be("Kevin Bacon")
 

@@ -1,17 +1,8 @@
 package models
 
-import java.util.Date
 import javax.persistence.Entity
 import play.data.validation.Required
-import play.db.jpa.Model
-
-trait CreatedUpdated {
-  @Required
-  var created: Date = null
-
-  @Required
-  var updated: Date = null
-}
+import play.db.jpa.{QueryOn, Model}
 
 @Entity
 class Celebrity extends Model with CreatedUpdated {
@@ -34,6 +25,6 @@ class Celebrity extends Model with CreatedUpdated {
   override def toString = name
 }
 
-object Celebrity {
+object Celebrity extends QueryOn[Celebrity]{
   val me = new Celebrity()
 }
