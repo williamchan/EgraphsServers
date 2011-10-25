@@ -3,27 +3,40 @@ package models
 import play.db.jpa.Model
 import play.data.validation.Required
 import java.util.Date
+import javax.persistence.{PreUpdate, PrePersist, Temporal, TemporalType}
 
 /**
- * Provides mutable Created and Updated fields for any mixed in JPA model class.
+ * Provides mutable Created and Updated fields for any subclass of
+ * Model.
  *
- * Mix it in with any JPA Model and call <code>saveAndTimestamp</code> instead of
- * <code>save</code>.
+ * You don't have to do anything; just mix in the trait.
  */
 trait CreatedUpdated { this: Model =>
-
+  //
+  // Public API
+  //
   /** The moment of time at which the Model was created */
   @Required
+  @Temporal(TemporalType.TIMESTAMP)
   var created: Date = null
 
   /** The moment of time at which the Model was last updated. */
   @Required
+  @Temporal(TemporalType.TIMESTAMP)
   var updated: Date = null
 
-  def saveAndTimestamp: this.type = {
-    created = if (created == null) new Date else created
-    updated = new Date
+  
+  //
+  // Private
+  //
+  @PrePersist
+  protected def setCreated() {
+    created = new Date
+    updated = created
+  }
 
-    this.save()
+  @PreUpdate
+  protected def setUpdated() {
+    updated = new Date
   }
 }
