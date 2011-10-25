@@ -3,7 +3,8 @@ package controllers
 import models._
 import play.mvc._
 import play.db.jpa.JPABase
-import util.Random
+import com.stripe.model.Charge
+import com.stripe.Stripe
 
 object Application extends Controller {
 
@@ -11,6 +12,21 @@ object Application extends Controller {
 
   def index = {
     html.index()
+  }
+}
+
+object stripe extends Controller {
+  def stripe = {
+    views.html.stripe("")
+  }
+
+  def post(stripeToken: String) = {
+    val chargeWithTokenParams: Map[String, AnyRef] = Map(
+      "amount" -> new Integer(1000),
+      "currency" -> "usd",
+      "card" -> stripeToken
+    )
+    val charge: Charge = Charge.create(scala.collection.JavaConversions.asJavaMap(chargeWithTokenParams))
   }
 }
 
@@ -30,17 +46,5 @@ object test extends Controller {
       "kevin found"
     }
   }
-
-  /* // For Anorm
-  def celebrities = {
-    val allCelebrities: Seq[Celebrity] = Celebrity.find().list()
-    html.celebrities(allCelebrities)
-  }
-
-  def products = {
-    val allProducts: Seq[Product] = Product.find().list()
-    html.products(allProducts)
-  }*/
-
 
 }

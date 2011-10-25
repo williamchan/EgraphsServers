@@ -3,10 +3,13 @@ package bootstrap
 import play.db.jpa.JPABase
 import play.jobs._
 import java.util.Date
+import com.stripe.Stripe
 
 @OnApplicationStart class BootStrap extends Job {
 
   override def doJob(): Unit = {
+
+    Stripe.apiKey = "pvESi1GjhD9e8RFQQPfeH8mHZ2GIyqQV"
 
     import models._
     // Import initial data if the database is empty
@@ -43,19 +46,6 @@ import java.util.Date
       println("Done creating Kevin Bacon sample data")
 
     }
-
-
-    // for Anorm
-    /*if (Celebrity.count().first().get == 0L) {
-      println("Creating Kevin Bacon...")
-      val kevin = Celebrity.create(Celebrity("Kevin Bacon", "kevin@bacon.com", "test1234", "Six degrees from me", ""))
-      println("Creating Kevin Bacon products...")
-      Product.create(Product(kevin.get, "autograph0" /*, BigDecimal(5.00)*/))
-      Product.create(Product(kevin.get, "autograph1" /*, BigDecimal(10.00)*/))
-      println("Done creating Kevin Bacon sample data")
-    }*/
-
-
   }
 
 }

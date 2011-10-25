@@ -1,3 +1,4 @@
+lib
 modules
 out
 target
@@ -9,5 +10,8 @@ db/h2
 project
 
 *.class
+*.DS_Store
+*.ipr
+*.iws
 *.lock
 *.log
