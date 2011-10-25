@@ -7,6 +7,5 @@ class CustomerTests extends UnitFlatSpec
   with BeforeAndAfterEach
   with DateShouldMatchers
 {
-
   it should "(write tests here)" in (pending)
 }

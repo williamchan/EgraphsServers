@@ -46,7 +46,7 @@ trait DateShouldMatchers { this: ShouldMatchers =>
   }
 
   /**
-   *
+   * Enriches Int to give it time unit support.
    */
   implicit def convertIntToTimeUnitCount(value: Int): TimeUnitCount = {
     new TimeUnitCount(value)
