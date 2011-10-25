@@ -4,6 +4,7 @@ out
 target
 test-result
 tmp
+logs
 
 .idea
 db/h2
