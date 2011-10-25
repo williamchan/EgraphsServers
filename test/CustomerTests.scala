@@ -8,8 +8,5 @@ class CustomerTests extends UnitFlatSpec
   with DateShouldMatchers
 {
 
-  it should "herp and derp" in {
-    fail("derpity")
-  }
-
+  it should "(write tests here)" in (pending)
 }
