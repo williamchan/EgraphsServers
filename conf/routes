@@ -7,7 +7,8 @@ GET     /                                       Application.index
 
 GET     /admin                                  module:crud
 
-GET     /stripe                                 stripe
+GET     /stripe                                 stripe.stripe
+POST    /stripe                                 stripe.post
 
 # GET     /test/celebrities                       test.celebrities
 # GET     /test/products                          test.products
