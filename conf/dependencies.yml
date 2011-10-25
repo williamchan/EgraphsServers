@@ -4,4 +4,5 @@ require:
     - play
     - play -> crud
     - play -> scala 0.9.1
+    - play -> cobertura 2.1
     - com.stripe -> stripe-java 1.0.1
