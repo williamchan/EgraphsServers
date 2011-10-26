@@ -42,7 +42,7 @@ class CreatedUpdatedTests extends UnitFlatSpec
     assert(testEntity.created == testEntity.updated)
   }
 
-  it should "generate update the updated value if re-saved after a few milliseconds" in {
+  it should "update the updated field if re-saved after a few milliseconds" in {
     // Set up
     val testEntity = new TestCreatedUpdated
 
@@ -51,9 +51,9 @@ class CreatedUpdatedTests extends UnitFlatSpec
     val initialCreated = testEntity.created
     val initialUpdated = testEntity.updated
 
+    // Run test
     Thread.sleep(100)
 
-    // Run test
     // alter some data so it will actually update
     testEntity.name = "Derpy Jones"
     testEntity.save()
