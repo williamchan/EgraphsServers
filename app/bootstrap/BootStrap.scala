@@ -7,14 +7,11 @@ import com.stripe.Stripe
 
 @OnApplicationStart class BootStrap extends Job {
 
-  override def doJob(): Unit = {
-
+  override def doJob() {
     Stripe.apiKey = "pvESi1GjhD9e8RFQQPfeH8mHZ2GIyqQV"
-
-    import models._
+  }
+/*    import models._
     // Import initial data if the database is empty
-
-    ""
 
     // for JPA
     var kevin = JPABase.em().find(classOf[Celebrity], 1L)
@@ -46,6 +43,6 @@ import com.stripe.Stripe
       println("Done creating Kevin Bacon sample data")
 
     }
-  }
+  }*/
 
 }

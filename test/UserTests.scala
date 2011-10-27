@@ -9,6 +9,7 @@ class UserTests extends UnitFlatSpec
   with ShouldMatchers
   with BeforeAndAfterEach
 {
+
   // Test collaborators
   @Entity class TestUser extends User
   object TestUser extends QueryOn[User] with UserQueryOn[User]

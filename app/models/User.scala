@@ -1,8 +1,8 @@
 package models
 
-import javax.persistence.{InheritanceType, Inheritance, Entity}
 import play.db.jpa.{QueryOn, JPABase, Model}
 import play.data.validation.{Email, Required}
+import javax.persistence.{Column, InheritanceType, Inheritance, Entity}
 
 /**
  * Base class for all types of individuals identified by our system.
@@ -17,6 +17,7 @@ abstract class User extends Model with CreatedUpdated with PasswordProtected {
    */
   @Required
   @Email
+  @Column(unique=true, nullable=false)
   var email: String = null
 
   /**

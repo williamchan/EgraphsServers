@@ -1,30 +1,37 @@
 package models
 
-import javax.persistence.Entity
+import play.db.jpa.QueryOn
 import play.data.validation.Required
-import play.db.jpa.{QueryOn, Model}
+import javax.persistence.{OneToMany, Entity}
 
+/**
+ * Persistent entity representing the Celebrities who provide products on
+ * our service.
+ */
 @Entity
-class Celebrity extends Model with CreatedUpdated {
-  @Required
-  var name: String = null
+class Celebrity extends User {
+  /** Key used to secure the Celebrity's iPad */
+  var apiKey: String = ""
 
+  /** Textual description of the celebrity. */
   @Required
-  var email: String = null
+  var description: String = ""
 
-  // TODO(will): store salted and hashed passwords instead
-  @Required
-  var password: String = null
+  /** The celebrity's nickname. (e.g. "Shaq" for Shaquille O'Neal) */
+  var nickName: String = ""
 
-  var udid: String = null
-  var description: String = null
+  /** The celebrity's profile photograph */
   var profilePic: String = null
-  var settings: Int = 0
-  var twitterHandle: String = ""
 
-  override def toString = name
+  /** Products offered by the celebrity */
+  @OneToMany
+  var products: java.util.List[Product] = new java.util.ArrayList[Product]()
+
+  override def toString = {
+    "Celebrity(\"name\")"
+  }
 }
 
-object Celebrity extends QueryOn[Celebrity]{
+object Celebrity extends QueryOn[Celebrity] with UserQueryOn[Celebrity] {
   val me = new Celebrity()
 }
