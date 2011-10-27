@@ -109,41 +109,38 @@ trait PasswordProtected { this: Model =>
     hash(password + passwordSalt, times=timesToHash)
   }
 
-  object PasswordProtected {
+}
 
-    /**
-     * The number of times to perform the hash function before arriving at the
-     * final password. Should be an arbitrary number above 1000.
-     */
-    val timesToHash = 1183
+object PasswordProtected {
+  /**
+   * The number of times to perform the hash function before arriving at the
+   * final password. Should be an arbitrary number above 1000.
+   */
+  val timesToHash = 1183
 
-    /**
-     * Cryptographically secure random number generator. These are expensive to
-     * seed, so we keep one around for repeated use.
-     */
-    val random = SecureRandom.getInstance("SHA1PRNG")
+  /**
+   * Cryptographically secure random number generator. These are expensive to
+   * seed, so we keep one around for repeated use.
+   */
+  val random = SecureRandom.getInstance("SHA1PRNG")
 
-    /** Returns a new, random number sized against our hash function's cipher. */
-    def randomSaltNumber (): String = {
-      Codec.encodeBASE64(new BigInteger(256, random).toByteArray)
-    }
+  /** Returns a new, random number sized against our hash function's cipher. */
+  def randomSaltNumber (): String = {
+    Codec.encodeBASE64(new BigInteger(256, random).toByteArray)
+  }
 
-    /**
-     * Performs the SHA256 hash function n times against a String parameter.
-     *
-     * @param toHash the string to hash
-     * @param times the number of times to hash the string
-     *
-     * @return result of the hash function iterated n times
-     */
-    @tailrec
-    def hash (toHash: String, times: Int = 1): String = {
-      require(times > 0)
+  /**
+   * Performs the SHA256 hash function n times against a String parameter.
+   *
+   * @param toHash the string to hash
+   * @param times the number of times to hash the string
+   *
+   * @return result of the hash function iterated n times
+   */
+  def hash (toHash: String, times: Int = 1): String = {
+    import Crypto.passwordHash
+    import Crypto.HashType.SHA256
 
-      times match {
-        case 1 => Crypto.passwordHash(toHash, Crypto.HashType.SHA256)
-        case n => hash(toHash, times - 1)
-      }
-    }
+    (1 to times).foldLeft(toHash)((nthHash, _) => passwordHash(nthHash, SHA256))
   }
 }

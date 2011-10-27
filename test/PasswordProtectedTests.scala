@@ -119,6 +119,22 @@ class PasswordProtectedTests extends UnitFlatSpec
     Validation.errors should have length (0)
   }
 
+  "The n-times hashing function" should "hash n times" in {
+    // Set up
+    import PasswordProtected.hash
+    import libs.Crypto.passwordHash
+    import libs.Crypto.HashType.SHA256
+
+    val password = "herp"
+
+    // Run tests and check expectations
+    hash(password, times=0) should be (password)
+    hash(password, times=1) should be (passwordHash(password, SHA256))
+    hash(password, times=2) should be (
+      passwordHash(passwordHash(password, SHA256), SHA256)
+    )
+  }
+
   def entityWithPassword(password: String): TestPasswordProtected = {
     val entity = new TestPasswordProtected()
     entity.setPassword(password)
