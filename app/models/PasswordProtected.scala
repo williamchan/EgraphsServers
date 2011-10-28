@@ -2,14 +2,14 @@ package models
 
 import play.db.jpa.Model
 
-import libs.Crypto
 import java.security.SecureRandom
 import java.math.BigInteger
 import play.libs.Codec
-import annotation.tailrec
 import java.util.Date
 import play.data.validation.Validation
 import play.data.validation.Validation.ValidationResult
+
+import libs.Crypto
 
 /**
  * Password-protects a JPA Model with SHA256-hashed passwords.
@@ -20,68 +20,49 @@ import play.data.validation.Validation.ValidationResult
  * <a href="https://www.owasp.org/index.php/Hashing_Java">OWASP guidelines</a>
  */
 trait PasswordProtected { this: Model =>
-  import PasswordProtected._
-
   //
   // Instance variables
   //
   /**
    * Base64-encoded SHA256 hash of the password.
-   *
-   * Performing #saltAndHash on the true password should yield this value.
    */
-  var passwordHash: String = null
+  private var _passwordHash: String = null
 
   /**
    * Base64-encoded 256-bit salt used to secure against rainbow table attacks.
-   *
-   * Used by #saltAndHash to test attempted passwords.
    */
-  var passwordSalt: String = null
-
+  private var _passwordSalt: String = null
 
   //
   // Public API
   //
 
   /**
-   * Test whether the entity currently has a password set.
-   *
-   * @return true that a password is set
+   * Return the password, which may or may not have been set.
    */
-   def hasPassword = {
-     passwordHash != null
-   }
-
-  /**
-   * Test whether a provided password is the entity's true password.
-   *
-   * @param toTest the password to test
-   * @return true that the provided password is the entity's password.
-   */
-  def passwordIs (attempt: String): Boolean = {
-    saltAndHash(attempt) == passwordHash
+  def password: Option[Password] = {
+    (_passwordHash, _passwordSalt) match {
+      case (null, null) => None
+      case _ => Some(Password(_passwordHash, _passwordSalt))
+    }
   }
 
   /**
    * Sets a new password.
    *
-   * Also generates and sets a new salt onto the entity, not that you should
-   * have to care about that.
+   * The password must be at least 4 characters long.
    *
    * @param newPassword the new password to set
    */
   def setPassword (newPassword: String): ValidationResult = {
+    // Perform checks
     val existsCheck = Validation.required("password", newPassword)
     if (existsCheck.ok) {
       val lengthCheck = Validation.minSize("password", newPassword, 4)
       if (lengthCheck.ok) {
-        // Create new salt. Add timestamp to the random number to further ensure
-        // uniqueness in our user database.
-        passwordSalt = hash(randomSaltNumber() + this.getId + new Date().getTime)
-
-        // Generate hash
-        passwordHash = saltAndHash(newPassword)
+        val password = Password(newPassword, this.getId())
+        _passwordHash = password.hash
+        _passwordSalt = password.salt
       }
       lengthCheck
     }
@@ -89,29 +70,21 @@ trait PasswordProtected { this: Model =>
       existsCheck
     }
   }
-
-  //
-  // Private methods
-  //
-  /**
-   * Salts a provided string and hashes it {@link PasswordProtected#timesToHash}
-   * times. Only call this once the correct salt has already been set on
-   * this object.
-   *
-   * It seeds the hash loop with the concatenation of the password string
-   * and #passwordSalt.
-   *
-   * @param password the string to hash and salt
-   * @return the hashed and salted version of the string. This product would be
-   *     suitable to set into the {@link #passwordHash} field.
-   */
-  private def saltAndHash (password: String): String = {
-    hash(password + passwordSalt, times=timesToHash)
-  }
-
 }
 
-object PasswordProtected {
+case class Password(hash: String, salt: String) {
+  /**
+   * Test whether a provided password is the true password.
+   *
+   * @param toTest the password to test
+   * @return true that the provided password is the entity's password.
+   */
+  def is (attempt: String): Boolean = {
+    Password.hashPassword(attempt, salt) == this.hash
+  }
+}
+
+object Password {
   /**
    * The number of times to perform the hash function before arriving at the
    * final password. Should be an arbitrary number above 1000.
@@ -130,6 +103,20 @@ object PasswordProtected {
   }
 
   /**
+   * Create a Password with only a password and unique id for the entity being protected.
+   *
+   * @param password the desired password
+   * @param entityId unique id of the entity being protected.
+   *
+   * @return a Password object whose Password#is method returns true for the correct
+   *   password
+   */
+  def apply(password: String, entityId: Long): Password = {
+    val theSalt = hashNTimes("" + randomSaltNumber + entityId + new Date().getTime, times=1)
+    Password(hash=hashPassword(password, theSalt), salt=theSalt)
+  }
+
+  /**
    * Performs the SHA256 hash function n times against a String parameter.
    *
    * @param toHash the string to hash
@@ -137,10 +124,21 @@ object PasswordProtected {
    *
    * @return result of the hash function iterated n times
    */
-  def hash (toHash: String, times: Int = 1): String = {
+  def hashNTimes (toHash: String, times: Int = 1): String = {
     import Crypto.passwordHash
     import Crypto.HashType.SHA256
 
     (1 to times).foldLeft(toHash)((nthHash, _) => passwordHash(nthHash, SHA256))
   }
+
+  /**
+   * Hashes the password and salt together #timesToHash times.
+   */
+  def hashPassword(password: String, salt: String): String = {
+    hashNTimes(password + salt, times=timesToHash)
+  }
+}
+
+object PasswordProtected {
+
 }

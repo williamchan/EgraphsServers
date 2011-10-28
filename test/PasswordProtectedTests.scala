@@ -1,5 +1,5 @@
 import javax.persistence.Entity
-import models.PasswordProtected
+import models.{Password, PasswordProtected}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.data.validation.Validation
@@ -23,7 +23,7 @@ class PasswordProtectedTests extends UnitFlatSpec
   object TestPasswordProtected extends QueryOn[TestPasswordProtected]
 
   "A PasswordProtected entity" should "start unprotected" in {
-    new TestPasswordProtected().hasPassword should be (false)
+    new TestPasswordProtected().password should be (None)
   }
 
   it should "become protected once a password is set" in {
@@ -34,27 +34,30 @@ class PasswordProtectedTests extends UnitFlatSpec
     entity.setPassword("herp")
 
     // Check expectations
-    entity.hasPassword should be (true)
+    entity.password should not be (None)
   }
 
-  it should "recognize the correct password" in {
-    entityWithPassword("herp").passwordIs("herp") should be (true)
+  "A Password" should "recognize the correct password" in {
+    Password("herp", 0).is("herp") should be (true)
   }
 
   it should "reject the incorrect password" in {
-    entityWithPassword("herp").passwordIs("derp") should be (false)
+    Password("herp", 0).is("derp") should be (false)
   }
 
   it should "have different hashes and salts when the same password is set twice" in {
     val entity = entityWithPassword("herp")
 
-    val firstHash = entity.passwordHash
-    val firstSalt = entity.passwordSalt
+    val firstPassword = entity.password.get
 
     entity.setPassword("herp")
 
-    entity.passwordHash should not be (firstHash)
-    entity.passwordSalt should not be (firstSalt)
+    val password = entity.password.get
+
+    firstPassword.is("herp") should be (true)
+    password.is("herp") should be (true)
+    password.hash should not be (firstPassword.hash)
+    password.salt should not be (firstPassword.salt)
   }
 
   it should "respect the password regardless of how many different salts are used" in {
@@ -62,14 +65,14 @@ class PasswordProtectedTests extends UnitFlatSpec
 
     for (i <- 1 to 100) {
       entity.setPassword("herp")
-      entity.passwordIs("herp") should be (true)
+      entity.password.get.is("herp") should be (true)
     }
   }
 
   it should "always have 256-bit hashes and salt" in {
     for (i <- 1 to 100) {
-      val entity = entityWithPassword("herp")
-      List(entity.passwordHash, entity.passwordSalt).foreach { string =>
+      val password = Password("herp", 0)
+      List(password.hash, password.salt).foreach { string =>
         Codec.decodeBASE64(string).length should be (32)
       }
     }
@@ -78,7 +81,7 @@ class PasswordProtectedTests extends UnitFlatSpec
   it should "store and retrieve correctly" in {
     // Set up
     val stored = entityWithPassword("herp")
-
+    val storedPassword = stored.password.get
     // Run test
     stored.save()
     val maybeRecalled = TestPasswordProtected.findById(stored.getId())
@@ -87,11 +90,10 @@ class PasswordProtectedTests extends UnitFlatSpec
     maybeRecalled should not be (None)
 
     val recalled = maybeRecalled.get
+    val recalledPassword = recalled.password.get
     recalled.getId should be (stored.getId())
-    recalled.passwordHash should be (stored.passwordHash)
-    recalled.passwordSalt should be (stored.passwordSalt)
-    stored.passwordIs("herp") should be (true)
-    recalled.passwordIs("herp") should be (true)
+    recalledPassword should be (storedPassword)
+    recalledPassword.is("herp") should be (true)
   }
 
   it should "fail validation for password lengths shorter than 4 characters" in {
@@ -103,7 +105,7 @@ class PasswordProtectedTests extends UnitFlatSpec
     // Run with empty string and check expectations
     for (password <- List("", "123")) {
       entity.setPassword(password).ok should be (false)
-      entity.hasPassword should be (false)
+      entity.password should be (None)
 
       Validation.errors should have length (1)
       Validation.errors.head.getKey should be ("password")
@@ -121,16 +123,16 @@ class PasswordProtectedTests extends UnitFlatSpec
 
   "The n-times hashing function" should "hash n times" in {
     // Set up
-    import PasswordProtected.hash
+    import Password.hashNTimes
     import libs.Crypto.passwordHash
     import libs.Crypto.HashType.SHA256
 
     val password = "herp"
 
     // Run tests and check expectations
-    hash(password, times=0) should be (password)
-    hash(password, times=1) should be (passwordHash(password, SHA256))
-    hash(password, times=2) should be (
+    hashNTimes(password, times=0) should be (password)
+    hashNTimes(password, times=1) should be (passwordHash(password, SHA256))
+    hashNTimes(password, times=2) should be (
       passwordHash(passwordHash(password, SHA256), SHA256)
     )
   }
