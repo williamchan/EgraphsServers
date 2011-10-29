@@ -3,6 +3,7 @@ package models
 import play.db.jpa.{QueryOn, JPABase, Model}
 import play.data.validation.{Email, Required}
 import javax.persistence.{Column, InheritanceType, Inheritance, Entity}
+import libs.Utils.optional
 
 /**
  * Base class for all types of individuals identified by our system.
@@ -10,20 +11,21 @@ import javax.persistence.{Column, InheritanceType, Inheritance, Entity}
  */
 @Entity
 @Inheritance(strategy=InheritanceType.JOINED)
-abstract class User extends Model with CreatedUpdated with PasswordProtected {
-
+abstract class User extends Model with CreatedUpdated with PasswordProtected
+{
   /**
    * The user's email address, which we use to uniquely identify him/her.
    */
-  @Required
-  @Email
-  @Column(unique=true, nullable=false)
-  var email: String = null
-
+  @Required @Email @Column(unique=true, nullable=false)
+  var email: String = ""
+  
   /**
    * The user's real name.
    */
-  var name: String = ""
+  def name: Option[String] = optional(_name)
+  def name_= (newName: String) { _name = newName }
+  private var _name: String = ""
+  
 }
 
 /**

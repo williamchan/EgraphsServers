@@ -1,7 +1,7 @@
 import javax.persistence.Entity
 import models.{UserQueryOn, User}
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.{Spec, BeforeAndAfterEach}
+import org.scalatest.{BeforeAndAfterEach}
 import play.db.jpa.QueryOn
 import play.test.{Fixtures, UnitFlatSpec}
 
@@ -26,8 +26,8 @@ class UserTests extends UnitFlatSpec
   // Begin tests
   //
   "A User" should "instantiate with null e-mail and empty name by default" in {
-    new TestUser().name should be ("")
-    new TestUser().email should be (null)
+    new TestUser().name should be (None)
+    new TestUser().email should be ("")
   }
 
   it should "receive set properties correctly" in {
@@ -40,7 +40,7 @@ class UserTests extends UnitFlatSpec
 
     // Check expectations
     user.email should be (sampleEmail)
-    user.name should be (sampleName)
+    user.name should be (Some(sampleName))
   }
 
   it should "store and recall both e-mail and name" in {
@@ -56,7 +56,7 @@ class UserTests extends UnitFlatSpec
     val recalledUser = maybeRecalledUser.get
     recalledUser.getId should be (storedUser.getId())
     recalledUser.email should be (sampleEmail)
-    recalledUser.name should be (sampleName)
+    recalledUser.name should be (Some(sampleName))
   }
   
   it should "be discoverable by the correct e-mail address, not by the incorrect" in {
