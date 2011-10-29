@@ -1,9 +1,8 @@
 package models
 
 import play.db.jpa.QueryOn
-import play.data.validation.Required
-import javax.persistence.{OneToMany, Entity}
 import libs.Utils.optional
+import javax.persistence.{CascadeType, OneToMany, Entity}
 
 /**
  * Persistent entity representing the Celebrities who provide products on
@@ -32,8 +31,23 @@ class Celebrity extends User {
   private var _profilePic: String = ""
 
   /** Products offered by the celebrity */
-  @OneToMany
-  var products: java.util.List[Product] = new java.util.ArrayList[Product]()
+  def products:Iterable[Product] = {
+    import scala.collection.JavaConversions._
+    _products
+  }
+
+  @OneToMany(mappedBy="seller", cascade=Array(CascadeType.ALL))
+  private var _products: java.util.List[Product] = new java.util.ArrayList[Product]()
+
+  def addProduct (name: String, priceInCents: Int): Product = {
+    val product = new Product(name, priceInCents, this)
+    _products.add(product)
+    product
+  }
+
+  def removeProduct (product: Product) {
+    _products.remove(product)
+  }
 
   override def toString = {
     "Celebrity(\"name\")"

@@ -6,16 +6,10 @@ import javax.persistence.{ManyToOne, Entity}
 import play.db.jpa.{QueryOn, Model}
 
 @Entity
-class Product extends Model with CreatedUpdated {
-  @Required
-  var name: String = ""
-
-  @Required
-  var priceInCents: Int = 0
-
-  @ManyToOne
-  @Required
-  var seller: Celebrity = null
-}
+class Product(
+  @Required var name: String,
+  @Required var priceInCents: Int,
+  @Required @ManyToOne var seller: Celebrity
+) extends Model with CreatedUpdated
 
 object Product extends QueryOn[Product]

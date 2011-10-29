@@ -37,14 +37,6 @@ class PasswordProtectedTests extends UnitFlatSpec
     entity.password should not be (None)
   }
 
-  "A Password" should "recognize the correct password" in {
-    Password("herp", 0).is("herp") should be (true)
-  }
-
-  it should "reject the incorrect password" in {
-    Password("herp", 0).is("derp") should be (false)
-  }
-
   it should "have different hashes and salts when the same password is set twice" in {
     val entity = entityWithPassword("herp")
 
@@ -58,24 +50,6 @@ class PasswordProtectedTests extends UnitFlatSpec
     password.is("herp") should be (true)
     password.hash should not be (firstPassword.hash)
     password.salt should not be (firstPassword.salt)
-  }
-
-  it should "respect the password regardless of how many different salts are used" in {
-    val entity = new TestPasswordProtected()
-
-    for (i <- 1 to 100) {
-      entity.setPassword("herp")
-      entity.password.get.is("herp") should be (true)
-    }
-  }
-
-  it should "always have 256-bit hashes and salt" in {
-    for (i <- 1 to 100) {
-      val password = Password("herp", 0)
-      List(password.hash, password.salt).foreach { string =>
-        Codec.decodeBASE64(string).length should be (32)
-      }
-    }
   }
 
   it should "store and retrieve correctly" in {
@@ -119,6 +93,29 @@ class PasswordProtectedTests extends UnitFlatSpec
     entity.setPassword("herp").ok should be (true)
 
     Validation.errors should have length (0)
+  }
+
+  "A Password" should "recognize the correct password" in {
+    Password("herp", 0).is("herp") should be (true)
+  }
+
+  it should "reject the incorrect password" in {
+    Password("herp", 0).is("derp") should be (false)
+  }
+
+  it should "respect the password regardless of how many different salts are used" in {
+    for (i <- 1 to 100) {
+      Password("herp", 0).is("herp") should be (true)
+    }
+  }
+
+  it should "always have 256-bit hashes and salt" in {
+    for (i <- 1 to 100) {
+      val password = Password("herp", 0)
+      List(password.hash, password.salt).foreach { string =>
+        Codec.decodeBASE64(string).length should be (32)
+      }
+    }
   }
 
   "The n-times hashing function" should "hash n times" in {
