@@ -21,5 +21,11 @@ GET     /favicon.ico                            404
 # Map static resources from the /app/public folder to the /public path
 GET     /public/                                staticDir:public
 
+%{ if (play.id == "test") }%
+GET     /test/scenarios                          ScenarioController.list
+GET     /test/scenarios/clear                    ScenarioController.clear
+GET     /test/scenarios/{name}                   ScenarioController.scenario
+
+%{ if (true) }%
 # Catch all
 *       /{controller}/{action}                  {controller}.{action}
