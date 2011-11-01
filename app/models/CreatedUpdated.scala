@@ -4,7 +4,54 @@ import play.db.jpa.Model
 import play.data.validation.Required
 import java.util.Date
 import javax.persistence.{PreUpdate, PrePersist, Temporal, TemporalType}
+import org.squeryl.KeyedEntity
+import db.{Saves}
+import java.sql.Timestamp
 
+trait HasCreatedUpdated {
+  def created: Timestamp
+  def updated: Timestamp
+}
+
+/**
+ * Mix into an object that you want to handle saving of objects with created and updated fields
+ * (usually this will be the companion object of some case class)
+ *
+ * Example: {@link Credential}
+ */
+trait SavesCreatedUpdated[T <: KeyedEntity[Long] with HasCreatedUpdated] { this: Saves[T] =>
+
+  //
+  // Abstract members
+  //
+  /**
+   * Provides a new version of a provided model that has correct created and updated fields
+   */
+  protected def withCreatedUpdated(toUpdate: T, created: Timestamp, updated: Timestamp): T
+
+  //
+  // Private implementation
+  //
+  private def setCreatedAndUpdatedFields(toUpdate: T): T = {
+    val timestamp = now
+    withCreatedUpdated(toUpdate, timestamp, timestamp)
+  }
+
+  private def setUpdatedField(toUpdate: T): T = {
+    withCreatedUpdated(toUpdate, created=now, updated=toUpdate.updated)
+  }
+
+  private def now: Timestamp = {
+    new Timestamp(new Date().getTime)
+  }
+
+  // Saving lifecycle hooks
+  beforeInsert(setCreatedAndUpdatedFields)
+  beforeUpdate(setUpdatedField)
+}
+
+
+// Old JPA stuff
 /**
  * Provides mutable Created and Updated fields for any subclass of
  * Model.

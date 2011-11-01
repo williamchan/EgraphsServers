@@ -1,7 +1,7 @@
 import javax.persistence.Entity
-import models.{UserQueryOn, User}
+import models.{Credential, UserQueryOn, User}
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.{BeforeAndAfterEach}
+import org.scalatest.BeforeAndAfterEach
 import play.db.jpa.QueryOn
 import play.test.{Fixtures, UnitFlatSpec}
 
@@ -67,6 +67,25 @@ class UserTests extends UnitFlatSpec
     TestUser.findByEmail(sampleEmail) should not be (None)
     TestUser.findByEmail("wrong@email.com") should be (None)
   }
+
+  /*it should "testing credentials as sample squeryl entity" in {
+    import db.DB
+    import org.squeryl.PrimitiveTypeMode._
+    inTransaction {
+      val cred = Credential(email="a@b.com", passwordHash=Some("hash"), passwordSalt=Some("salt"))
+      val stored = Credential.save(cred)
+      println ("cred is --" + cred)
+      println("Stored is -- " + stored)
+      val recovered = DB.credentials.lookup(stored.id).get
+      println("Recovered is -- " + recovered)
+      val storedAgain = Credential.save(recovered.copy(email="herp@derp.com"))
+      val reRecovered = DB.credentials.lookup(storedAgain.id).get
+      
+      println("rerecovered is" + reRecovered)
+      println("time was "+reRecovered.updated.getTime)
+      println("stored time was"+stored.updated.getTime)
+    }
+  }*/
 
   def makeAndSaveUser(email: String, name: String): User = {
     val user = new TestUser

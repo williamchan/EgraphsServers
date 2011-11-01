@@ -1,50 +1,36 @@
 import javax.persistence.Entity
-import models.{Password, PasswordProtected}
+import models.{Credential, Password, PasswordProtected}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.data.validation.Validation
 import play.db.jpa.{QueryOn, Model}
 import play.test.UnitFlatSpec
+import scala.collection.JavaConversions._
 import play.libs.Codec
 
-class PasswordProtectedTests extends UnitFlatSpec
+class CredentialTest extends UnitFlatSpec
   with ShouldMatchers
   with BeforeAndAfterEach
 {
 
   override def afterEach() {
     Validation.clear()
+    db.DB.scrub
   }
 
-  // Test collaborators
-  @Entity class TestPasswordProtected(var name: String="Derpy") extends Model
-    with PasswordProtected
-
-  object TestPasswordProtected extends QueryOn[TestPasswordProtected]
-
-  "A PasswordProtected entity" should "start unprotected" in {
-    new TestPasswordProtected().password should be (None)
+  "A Credential" should "start unprotected" in {
+    Credential().password should be (None)
   }
 
   it should "become protected once a password is set" in {
-    // Set up
-    val entity = new TestPasswordProtected()
-
-    // Run test
-    entity.setPassword("herp")
-
-    // Check expectations
-    entity.password should not be (None)
+    credentialWithPassword("herp").password should not be (None)
   }
 
   it should "have different hashes and salts when the same password is set twice" in {
-    val entity = entityWithPassword("herp")
+    val credential = credentialWithPassword("herp")
+    val firstPassword = credential.password.get
 
-    val firstPassword = entity.password.get
-
-    entity.setPassword("herp")
-
-    val password = entity.password.get
+    val password = credential.withPassword("herp").right.get.password.get
 
     firstPassword.is("herp") should be (true)
     password.is("herp") should be (true)
@@ -54,51 +40,41 @@ class PasswordProtectedTests extends UnitFlatSpec
 
   it should "store and retrieve correctly" in {
     // Set up
-    val stored = entityWithPassword("herp")
+    val stored = credentialWithPassword("herp")
     val storedPassword = stored.password.get
+
     // Run test
-    stored.save()
-    val maybeRecalled = TestPasswordProtected.findById(stored.getId())
+    val saved = Credential.save(stored)
+    val maybeRecalled = Credential.byId(saved.id)
 
     // Check expectations
     maybeRecalled should not be (None)
 
     val recalled = maybeRecalled.get
     val recalledPassword = recalled.password.get
-    recalled.getId should be (stored.getId())
+    recalled.id should be (stored.id)
     recalledPassword should be (storedPassword)
     recalledPassword.is("herp") should be (true)
   }
 
   it should "fail validation for password lengths shorter than 4 characters" in {
-    // Set up
-    import scala.collection.JavaConversions._
-
-    val entity = new TestPasswordProtected()
-
-    // Run with empty string and check expectations
     for (password <- List("", "123")) {
-      entity.setPassword(password).ok should be (false)
-      entity.password should be (None)
+      val errorOrCredential = Credential().withPassword(password)
+      errorOrCredential.isLeft should be (true)
 
       Validation.errors should have length (1)
       Validation.errors.head.getKey should be ("password")
-
       Validation.clear()
     }
   }
 
   it should "pass validation for password lengths 4 characters and longer" in {
-    val entity = new TestPasswordProtected()
-    entity.setPassword("herp").ok should be (true)
+    Credential().withPassword("herp").isRight should be (true)
 
     Validation.errors should have length (0)
   }
 
-  def entityWithPassword(password: String): TestPasswordProtected = {
-    val entity = new TestPasswordProtected()
-    entity.setPassword(password)
-
-    entity
+  def credentialWithPassword(password: String): Credential = {
+    Credential.save(Credential().withPassword(password).right.get)
   }
 }

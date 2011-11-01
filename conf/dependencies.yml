@@ -6,6 +6,19 @@ require:
     - play -> scala 0.9.1
     - com.stripe -> stripe-java 1.0.1
     - org.apache.axis2 -> axis2 1.6.1
+    - org.squeryl -> squeryl_2.8.1 0.9.4:
+        exclude:
+            # Exclude scala library, which is included with play
+            - org.scala-lang -> scala-library 2.8.1
+            # Exclude DB-specific libs
+            - net.sourceforge.jtds -> *
+            - postgresql -> *
+            - org.apache.derby -> *
+            - com.h2database -> *
+            - mysql -> *
+            # Exclude testing libs
+            - junit -> *
+            - org.scalatest -> *
     - se.scalablesolutions.akka -> akka-typed-actor 1.0:
         exclude:
             # Exclude scala and actor because they're included with play-scala
@@ -26,3 +39,8 @@ repositories:
          root: "http://guiceyfruit.googlecode.com/svn/repo/releases/"
          contains:
              - org.guiceyfruit -> *
+    - scalatools:
+         type: iBiblio
+         root: "http://nexus.scala-tools.org/content/repositories/releases"
+         contains:
+             - org.squeryl -> *
