@@ -4,5 +4,24 @@ require:
     - play
     - play -> crud
     - play -> scala 0.9.1
-    - play -> cobertura 2.1
     - com.stripe -> stripe-java 1.0.1
+    - se.scalablesolutions.akka -> akka-typed-actor 1.0:
+        exclude:
+            # Exclude scala and actor because they're included with play-scala
+            - org.scala-lang -> scala-library 2.8.1
+            - se.scalablesolutions.akka -> akka-actor 1.0
+
+# Non-default repositories
+repositories:
+    - Akka:
+         type: iBiblio
+         root: "http://akka.io/repository"
+         contains:
+             - se.scalablesolutions.akka -> *
+             - org.codehaus.aspectwerkz -> *
+    # Provides otherwise unresolved dependency of Akka
+    - guiceyfruit:
+         type: iBiblio
+         root: "http://guiceyfruit.googlecode.com/svn/repo/releases/"
+         contains:
+             - org.guiceyfruit -> *
