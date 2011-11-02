@@ -1,18 +1,20 @@
+db/h2
 lib
 logs
 modules
 out
+project
 target
 test-result
 tmp
 
-.idea
-db/h2
-project
-
 *.class
 *.DS_Store
+.idea
 *.ipr
 *.iws
 *.lock
 *.log
+*.ser
+
+test/files
