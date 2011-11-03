@@ -4,7 +4,6 @@ import models._
 import play.mvc._
 import play.db.jpa.JPABase
 import com.stripe.model.Charge
-import com.stripe.Stripe
 
 object Application extends Controller {
 

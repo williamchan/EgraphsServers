@@ -1,33 +1,41 @@
 package models
 
-import javax.persistence.Entity
-import play.db.jpa.QueryOn
+import java.sql.Timestamp
+import libs.Time
 import org.squeryl.KeyedEntity
-
-/** Vestigial appendage from squeryl testing -- remove this */
-case class EgraphsCustomer(
-  id: Long = 0,
-  credentialId: Long = 0,
-  name: Option[String] = Some("")
-) extends KeyedEntity[Long]
-{
-  /*private def credentialQuery: ManyToOne[Credential] = {
-    DB.customerToCredential.right(this)
-  }*/
-
-  /*def credentials: Credential = {
-    DB.customers
-    credentialQuery.single
-  }*/
-}
-
-// Old JPA stuff
+import org.squeryl.PrimitiveTypeMode._
+import db.{Schema, Saves}
 
 /**
- * Persistent entity representing paying purchasers or recipients of the
- * products offered on our service.
+ * Persistent entity representing customers who buy products from our service.
  */
-@Entity
-class Customer extends User
+case class Customer(
+  id: Long = 0L,
+  accountId: Long = 0L,
+  name: Option[String] = Some(""),
+  created: Timestamp = Time.defaultTimestamp,
+  updated: Timestamp = Time.defaultTimestamp
+) extends KeyedEntity[Long] with HasCreatedUpdated
 
-object Customer extends QueryOn[Customer] with UserQueryOn[Customer]
+object Customer extends Saves[Customer] with SavesCreatedUpdated[Customer] {
+  //
+  // Saves[Customer] methods
+  //
+  override val table = Schema.customers
+
+  override def defineUpdate(theOld: Customer, theNew: Customer) = {
+    updateIs(
+      theOld.accountId := theNew.accountId,
+      theOld.name  := theNew.name,
+      theOld.created := theNew.created,
+      theOld.updated := theNew.updated
+    )
+  }
+
+  //
+  // SavesCreatedUpdated[Customer] methods
+  //
+  override def withCreatedUpdated(toUpdate: Customer, created: Timestamp, updated: Timestamp) = {
+    toUpdate.copy(created=created, updated=updated)
+  }
+}

@@ -1,33 +1,48 @@
-import javax.persistence.Entity
-import models.{Credential, Password, PasswordProtected}
+import models.Account
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.data.validation.Validation
-import play.db.jpa.{QueryOn, Model}
 import play.test.UnitFlatSpec
 import scala.collection.JavaConversions._
-import play.libs.Codec
 
-class CredentialTest extends UnitFlatSpec
+
+class AccountTests extends UnitFlatSpec
   with ShouldMatchers
   with BeforeAndAfterEach
+  with CreatedUpdatedEntityTests[Account]
 {
-
-  override def afterEach() {
-    Validation.clear()
-    db.DB.scrub
+  //
+  // CreatedUpdatedEntityTests[Account] methods
+  //
+  override def getCreatedUpdatedEntity = {
+    Account()
+  }
+  
+  override def saveCreatedUpdated(toSave: Account) = {
+    Account.save(toSave)
   }
 
-  "A Credential" should "start unprotected" in {
-    Credential().password should be (None)
+  //
+  // Fixtures
+  //
+  override def afterEach() {
+    Validation.clear()
+    db.Schema.scrub
+  }
+
+  //
+  // Test methods
+  //
+  "An Account" should "start unprotected" in {
+    Account().password should be (None)
   }
 
   it should "become protected once a password is set" in {
-    credentialWithPassword("herp").password should not be (None)
+    accountWithPassword("herp").password should not be (None)
   }
 
   it should "have different hashes and salts when the same password is set twice" in {
-    val credential = credentialWithPassword("herp")
+    val credential = accountWithPassword("herp")
     val firstPassword = credential.password.get
 
     val password = credential.withPassword("herp").right.get.password.get
@@ -40,12 +55,12 @@ class CredentialTest extends UnitFlatSpec
 
   it should "store and retrieve correctly" in {
     // Set up
-    val stored = credentialWithPassword("herp")
+    val stored = accountWithPassword("herp")
     val storedPassword = stored.password.get
 
     // Run test
-    val saved = Credential.save(stored)
-    val maybeRecalled = Credential.byId(saved.id)
+    val saved = Account.save(stored)
+    val maybeRecalled = Account.byId(saved.id)
 
     // Check expectations
     maybeRecalled should not be (None)
@@ -59,7 +74,7 @@ class CredentialTest extends UnitFlatSpec
 
   it should "fail validation for password lengths shorter than 4 characters" in {
     for (password <- List("", "123")) {
-      val errorOrCredential = Credential().withPassword(password)
+      val errorOrCredential = Account().withPassword(password)
       errorOrCredential.isLeft should be (true)
 
       Validation.errors should have length (1)
@@ -69,12 +84,12 @@ class CredentialTest extends UnitFlatSpec
   }
 
   it should "pass validation for password lengths 4 characters and longer" in {
-    Credential().withPassword("herp").isRight should be (true)
+    Account().withPassword("herp").isRight should be (true)
 
     Validation.errors should have length (0)
   }
 
-  def credentialWithPassword(password: String): Credential = {
-    Credential.save(Credential().withPassword(password).right.get)
+  def accountWithPassword(password: String): Account = {
+    Account.save(Account().withPassword(password).right.get)
   }
 }

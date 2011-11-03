@@ -17,7 +17,7 @@ trait HasCreatedUpdated {
  * Mix into an object that you want to handle saving of objects with created and updated fields
  * (usually this will be the companion object of some case class)
  *
- * Example: {@link Credential}
+ * Example: {@link Account}
  */
 trait SavesCreatedUpdated[T <: KeyedEntity[Long] with HasCreatedUpdated] { this: Saves[T] =>
 
@@ -38,7 +38,7 @@ trait SavesCreatedUpdated[T <: KeyedEntity[Long] with HasCreatedUpdated] { this:
   }
 
   private def setUpdatedField(toUpdate: T): T = {
-    withCreatedUpdated(toUpdate, created=now, updated=toUpdate.updated)
+    withCreatedUpdated(toUpdate, created=toUpdate.created, updated=now)
   }
 
   private def now: Timestamp = {

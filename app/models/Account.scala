@@ -4,19 +4,20 @@ import org.squeryl.KeyedEntity
 import org.squeryl.PrimitiveTypeMode._
 import play.data.validation.Validation.ValidationResult
 import play.data.validation.Validation
-import db.{Saves, DB}
+import db.{Saves, Schema}
 import java.sql.Timestamp
+import libs.Time
 
 /**
- * Authentication credentials for any user of the system.
+ * Basic account information for any user in the system
  */
-case class Credential(
+case class Account(
   id: Long = 0,
   email: String = "",
   passwordHash: Option[String] = Some(""),
   passwordSalt: Option[String] = Some(""),
-  created: Timestamp = new Timestamp(0L),
-  updated: Timestamp = new Timestamp(0L)
+  created: Timestamp = Time.defaultTimestamp,
+  updated: Timestamp = Time.defaultTimestamp
 ) extends KeyedEntity[Long] with HasCreatedUpdated
 {
   /** Returns the password, which may or may not have been set. */
@@ -37,7 +38,7 @@ case class Credential(
    * @return either a credential with the given password (right), or the erroneous validation
    *    result against the provided entity (left).
    */
-  def withPassword(newPassword: String): Either[ValidationResult, Credential] = {
+  def withPassword(newPassword: String): Either[ValidationResult, Account] = {
     // Perform checks
     val existsCheck = Validation.required("password", newPassword)
     val lengthCheck = Validation.minSize("password", newPassword, 4)
@@ -52,21 +53,21 @@ case class Credential(
   }
 }
 
-object Credential extends Saves[Credential] with SavesCreatedUpdated[Credential] {
+object Account extends Saves[Account] with SavesCreatedUpdated[Account] {
 
   /** Queries a credential by its ID */
-  def byId(id: Long): Option[Credential] = {
+  def byId(id: Long): Option[Account] = {
     inTransaction {
-      DB.credentials.lookup(id)
+      Schema.accounts.lookup(id)
     }
   }
 
   //
-  // Saves[Credential] methods
+  // Saves[Account] methods
   //
-  override val table = DB.credentials
+  override val table = Schema.accounts
 
-  override def defineUpdate(theOld: Credential, theNew: Credential) = {
+  override def defineUpdate(theOld: Account, theNew: Account) = {
     updateIs(
       theOld.email := theNew.email,
       theOld.passwordHash := theNew.passwordHash,
@@ -75,11 +76,11 @@ object Credential extends Saves[Credential] with SavesCreatedUpdated[Credential]
   }
   
   //
-  // SavesCreatedUpdated[Credential] methods
+  // SavesCreatedUpdated[Account] methods
   //
-  override protected def withCreatedUpdated(toUpdate: Credential,
+  override protected def withCreatedUpdated(toUpdate: Account,
                                             created: Timestamp,
-                                            updated: Timestamp): Credential =
+                                            updated: Timestamp): Account =
   {
     toUpdate.copy(created=created, updated=updated)
   }

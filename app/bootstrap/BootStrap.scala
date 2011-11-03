@@ -25,8 +25,8 @@ class BootStrap extends Job {
     if (Play.id == "test") {
       import org.squeryl.PrimitiveTypeMode._
       inTransaction {
-        db.DB.printDdl((ddl) => play.Logger.debug(ddl))
-        db.DB.scrub
+        db.Schema.printDdl((ddl) => play.Logger.debug(ddl))
+        db.Schema.scrub
       }
     }
   }

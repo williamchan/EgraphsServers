@@ -1,8 +1,7 @@
-import java.util.Date
 import javax.persistence.Entity
-import models.{CreatedUpdated}
+import models.CreatedUpdated
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.{BeforeAndAfterEach}
+import org.scalatest.BeforeAndAfterEach
 import play.db.jpa.Model
 import play.test.{Fixtures, UnitFlatSpec}
 

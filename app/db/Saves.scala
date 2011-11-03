@@ -53,7 +53,7 @@ trait Saves[T <: KeyedEntity[Long]] {
   //
   // Abstract members
   //
-  /** The table that manages this entity in db.DB  */
+  /** The table that manages this entity in db.Schema  */
   def table: Table[T]
 
   /**
@@ -69,6 +69,7 @@ trait Saves[T <: KeyedEntity[Long]] {
    *
    *   object Fruit extends Saves[Fruit] {
    *     override def defineUpdate(theOld: Fruit, theNew: Fruit) = {
+   *        import org.squeryl.PrimitiveTypeMode._
    *        updateIs(
    *          theOld.name := theNew.name
    *        )
@@ -83,7 +84,7 @@ trait Saves[T <: KeyedEntity[Long]] {
   // Protected API
   //
   /** Convenience for making a list out of update assignments. @see #defineUpdate */
-  protected def updateIs(assignments: UpdateAssignment*): List[UpdateAssignment] = {
+  protected final def updateIs(assignments: UpdateAssignment*): List[UpdateAssignment] = {
     assignments.toList
   }
 
@@ -95,7 +96,7 @@ trait Saves[T <: KeyedEntity[Long]] {
    *
    * Assumes that any object with id <= 0 has not yet been inserted.
    */
-  def save(toSave: T): T = {
+  final def save(toSave: T): T = {
     inTransaction {
       toSave.id match {
         case n if n <= 0 =>
@@ -108,12 +109,12 @@ trait Saves[T <: KeyedEntity[Long]] {
   }
 
   /** Hook to provide a transform to apply before inserting any new object. */
-  def beforeInsert(transform: (T) => T) = {
+  final def beforeInsert(transform: (T) => T) {
     preInsertTransforms = preInsertTransforms ++ Vector(transform)
   }
 
   /** Hook to provide a transform to apply before updating an object. */
-  def beforeUpdate(transform: (T) => T) = {
+  final def beforeUpdate(transform: (T) => T) {
     preUpdateTransforms = preUpdateTransforms ++ Vector(transform)
   }
 

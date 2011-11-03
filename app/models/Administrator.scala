@@ -1,12 +1,39 @@
 package models
 
-import play.db.jpa.QueryOn
-import javax.persistence.Entity
+import java.sql.Timestamp
+import libs.Time
+import org.squeryl.KeyedEntity
+import org.squeryl.PrimitiveTypeMode._
+import db.{Saves, Schema}
 
 /**
  * Persistent entity representing administrators of our service.
  */
-@Entity
-class Administrator extends User
+case class Administrator(
+  id: Long = 0L,
+  accountId: Long = 0L,
+  created: Timestamp = Time.defaultTimestamp,
+  updated: Timestamp = Time.defaultTimestamp
+) extends KeyedEntity[Long] with HasCreatedUpdated
 
-object Administrator extends QueryOn[Administrator] with UserQueryOn[Administrator]
+object Administrator extends Saves[Administrator] with SavesCreatedUpdated[Administrator] {
+  //
+  // Saves[Administrator] methods
+  //
+  override val table = Schema.administrators
+
+  override def defineUpdate(theOld: Administrator, theNew: Administrator) = {
+    updateIs(
+      theOld.accountId := theNew.accountId,
+      theOld.created := theNew.created,
+      theOld.updated := theNew.updated
+    )
+  }
+
+  //
+  // SavesCreatedUpdated[Administrator] methods
+  //
+  override def withCreatedUpdated(toUpdate: Administrator, created: Timestamp, updated: Timestamp) = {
+    toUpdate.copy(created=created, updated=updated)
+  }
+}

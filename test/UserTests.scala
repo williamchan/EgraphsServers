@@ -1,5 +1,5 @@
 import javax.persistence.Entity
-import models.{Credential, UserQueryOn, User}
+import models.{UserQueryOn, User}
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.BeforeAndAfterEach
 import play.db.jpa.QueryOn
@@ -69,17 +69,17 @@ class UserTests extends UnitFlatSpec
   }
 
   /*it should "testing credentials as sample squeryl entity" in {
-    import db.DB
+    import db.Schema
     import org.squeryl.PrimitiveTypeMode._
     inTransaction {
-      val cred = Credential(email="a@b.com", passwordHash=Some("hash"), passwordSalt=Some("salt"))
-      val stored = Credential.save(cred)
+      val cred = Account(email="a@b.com", passwordHash=Some("hash"), passwordSalt=Some("salt"))
+      val stored = Account.save(cred)
       println ("cred is --" + cred)
       println("Stored is -- " + stored)
-      val recovered = DB.credentials.lookup(stored.id).get
+      val recovered = Schema.credentials.lookup(stored.id).get
       println("Recovered is -- " + recovered)
-      val storedAgain = Credential.save(recovered.copy(email="herp@derp.com"))
-      val reRecovered = DB.credentials.lookup(storedAgain.id).get
+      val storedAgain = Account.save(recovered.copy(email="herp@derp.com"))
+      val reRecovered = Schema.credentials.lookup(storedAgain.id).get
       
       println("rerecovered is" + reRecovered)
       println("time was "+reRecovered.updated.getTime)
