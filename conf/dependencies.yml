@@ -18,6 +18,11 @@ require:
             # Exclude testing libs
             - junit -> *
             - org.scalatest -> *
+    - org.apache.axis2 -> axis2-transport-http 1.6.1
+    - org.apache.axis2 -> axis2-transport-local 1.6.1
+    - provided -> tritonus_share 0.3.6
+    - provided -> tritonus_remaining 0.3.6
+    - provided -> xyzmo 1.0
     - se.scalablesolutions.akka -> akka-typed-actor 1.0:
         exclude:
             # Exclude scala and actor because they're included with play-scala
@@ -43,3 +48,9 @@ repositories:
          root: "http://nexus.scala-tools.org/content/repositories/releases"
          contains:
              - org.squeryl -> *
+    - provided:
+          type:       local
+          descriptor: "${application.path}/../[module]/conf/dependencies.yml"
+          artifact:   "${application.path}/external/[module]-[revision].jar"
+          contains:
+             - provided -> *
