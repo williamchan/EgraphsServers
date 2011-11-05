@@ -10,7 +10,6 @@ import libs.Utils.optional
  * Any specific type (e.g. Administrator, Customer) should extend this class.
  */
 @Entity
-@Inheritance(strategy=InheritanceType.JOINED)
 abstract class User extends Model with CreatedUpdated with PasswordProtected
 {
   /**

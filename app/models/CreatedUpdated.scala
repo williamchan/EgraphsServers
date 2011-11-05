@@ -64,12 +64,10 @@ trait CreatedUpdated { this: Model =>
   //
   /** The moment of time at which the Model was created */
   @Required
-  @Temporal(TemporalType.TIMESTAMP)
   var created: Date = null
 
   /** The moment of time at which the Model was last updated. */
   @Required
-  @Temporal(TemporalType.TIMESTAMP)
   var updated: Date = null
 
   

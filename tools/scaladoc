@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+# Builds the project scaladocs.
+#
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DOC_BUILD_FILE=$SCRIPT_DIR/scaladoc.build.xml
+PROJ_BASE=$SCRIPT_DIR/..
+
+cd $SCRIPT_DIR/..
+
+ant -buildfile $DOC_BUILD_FILE -Dbasedir=$PROJ_BASE doc
+
+

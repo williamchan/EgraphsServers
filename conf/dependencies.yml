@@ -2,7 +2,6 @@
 
 require:
     - play
-    - play -> crud
     - play -> scala 0.9.1
     - com.stripe -> stripe-java 1.0.1
     - org.apache.axis2 -> axis2 1.6.1

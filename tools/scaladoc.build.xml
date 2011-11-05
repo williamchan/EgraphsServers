@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+
+<!-- Build file for generating project scaladocs -->
+<project default="doc" basedir="."> 
+  <!-- Import play classpaths -->
+  <property environment="env"/>
+  <property name="play.path" value="${env.PLAY_HOME}" />
+  <import file="${play.path}/resources/application-build.xml"/>
+  
+  <!-- Import scala classpaths -->
+  <property name="scala.home" value="${env.SCALA_HOME}" />
+  <taskdef name="scaladoc" classname="scala.tools.ant.Scaladoc">
+    <classpath> 
+      <pathelement location="${scala.home}/lib/scala-compiler.jar"/> 
+      <pathelement location="${scala.home}/lib/scala-library.jar"/> 
+    </classpath> 
+  </taskdef>
+
+  <!-- Sources to document -->
+  <property name="sources.dir" value="${basedir}/app;${basedir}/tmp"/> 
+  <property name="doc.dir" value="${basedir}/doc" />
+
+  <!-- Targets -->
+  <target name="doc">
+    <mkdir dir="${doc.dir}"/>
+	<playconfload applicationDir="${basedir}"  />
+	<property name="herp" refid="modules.classpath" />
+	<echo>${herp}</echo>
+    <scaladoc srcdir="${sources.dir}" destdir="${doc.dir}" 
+              deprecation="yes" unchecked="yes"> 
+      <include name="**/*.scala"/>
+      <include name="**/*.java" />
+	  <classpath>
+		<path refid="play.classpath" />
+		<path refid="modules.classpath" />
+		<pathelement location="${scala.home}/lib/scala-library.jar"/>		
+		<path refid="application.classpath" />
+
+		<!-- Play-scala. This should be provided by Play, but there's a bug -->
+		<fileset dir="${play.path}/modules/scala-0.9.1/lib">
+		  <include name="*.jar"/> 
+		</fileset>
+		
+	  </classpath>
+    </scaladoc> 
+  </target> 
+  <target name="clean"> 
+    <delete dir="${doc.dir}"/> 
+  </target>
+</project> 

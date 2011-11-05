@@ -21,7 +21,7 @@ object stripe extends Controller {
 
   def post(stripeToken: String) = {
     val chargeWithTokenParams: Map[String, AnyRef] = Map(
-      "amount" -> new Integer(1000),
+      "amount" -> new java.lang.Integer(1000),
       "currency" -> "usd",
       "card" -> stripeToken
     )
