@@ -2,9 +2,8 @@ package models
 
 import java.sql.Timestamp
 import libs.Time
-import org.squeryl.KeyedEntity
 import org.squeryl.PrimitiveTypeMode._
-import db.{Schema, Saves}
+import db.{KeyedCaseClass, Schema, Saves}
 
 /**
  * Persistent entity representing customers who buy products from our service.
@@ -15,7 +14,10 @@ case class Customer(
   name: Option[String] = Some(""),
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp
-) extends KeyedEntity[Long] with HasCreatedUpdated
+) extends KeyedCaseClass[Long] with HasCreatedUpdated
+{
+  override def unapplied = Customer.unapply(this)
+}
 
 object Customer extends Saves[Customer] with SavesCreatedUpdated[Customer] {
   //

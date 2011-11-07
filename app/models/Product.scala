@@ -1,15 +1,36 @@
 package models
 
-import java.util.Date
-import play.data.validation.Required
-import javax.persistence.{ManyToOne, Entity}
-import play.db.jpa.{QueryOn, Model}
+import libs.Time
+import java.sql.Timestamp
+import db.{Schema, Saves, KeyedCaseClass}
 
-@Entity
-class Product(
-  @Required var name: String,
-  @Required var priceInCents: Int,
-  @Required @ManyToOne var seller: Celebrity
-) extends Model with CreatedUpdated
+case class Product(
+  id: Long = 0L,
+  celebrityId: Int = 0,
+  priceInCents: Int = 0,
+  created: Timestamp = Time.defaultTimestamp,
+  updated: Timestamp = Time.defaultTimestamp
+) extends KeyedCaseClass[Long] with HasCreatedUpdated {
 
-object Product extends QueryOn[Product]
+  override def unapplied = Product.unapply(this)
+}
+
+object Product extends Saves[Product] with SavesCreatedUpdated[Product] {
+  def table = Schema.products
+  
+  override def withCreatedUpdated(toUpdate: Product, created: Timestamp, updated: Timestamp) = {
+    toUpdate.copy(created=created, updated=updated)
+  }
+
+  override def defineUpdate(theOld: Product, theNew: Product) = {
+    import org.squeryl.PrimitiveTypeMode._
+    
+    updateIs(
+      theOld.celebrityId := theNew.celebrityId,
+      theOld.priceInCents := theNew.priceInCents,
+      theOld.created := theNew.created,
+      theOld.updated := theNew.updated
+    )
+  }
+}
+

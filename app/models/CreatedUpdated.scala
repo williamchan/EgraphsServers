@@ -1,13 +1,16 @@
 package models
 
-import play.db.jpa.Model
-import play.data.validation.Required
 import java.util.Date
-import javax.persistence.{PreUpdate, PrePersist, Temporal, TemporalType}
-import org.squeryl.KeyedEntity
-import db.{Saves}
 import java.sql.Timestamp
+import db.{KeyedCaseClass, Saves}
 
+/**
+ * Mix in with any class that has a created or updated field if you wish its
+ * companion object to manage those fields behavior for you using the
+ * [[models.SavesCreatedUpdated]] trait.
+ *
+ * See [[models.Account]] for an example.
+ */
 trait HasCreatedUpdated {
   def created: Timestamp
   def updated: Timestamp
@@ -17,9 +20,9 @@ trait HasCreatedUpdated {
  * Mix into an object that you want to handle saving of objects with created and updated fields
  * (usually this will be the companion object of some case class)
  *
- * Example: {@link Account}
+ * See [[models.Account]] for an example.
  */
-trait SavesCreatedUpdated[T <: KeyedEntity[Long] with HasCreatedUpdated] { this: Saves[T] =>
+trait SavesCreatedUpdated[T <: KeyedCaseClass[Long] with HasCreatedUpdated] { this: Saves[T] =>
 
   //
   // Abstract members
@@ -48,40 +51,4 @@ trait SavesCreatedUpdated[T <: KeyedEntity[Long] with HasCreatedUpdated] { this:
   // Saving lifecycle hooks
   beforeInsert(setCreatedAndUpdatedFields)
   beforeUpdate(setUpdatedField)
-}
-
-
-// Old JPA stuff
-/**
- * Provides mutable Created and Updated fields for any subclass of
- * Model.
- *
- * You don't have to do anything; just mix in the trait.
- */
-trait CreatedUpdated { this: Model =>
-  //
-  // Public API
-  //
-  /** The moment of time at which the Model was created */
-  @Required
-  var created: Date = null
-
-  /** The moment of time at which the Model was last updated. */
-  @Required
-  var updated: Date = null
-
-  
-  //
-  // Private
-  //
-  @PrePersist
-  protected def setCreated() {
-    created = new Date
-    updated = created
-  }
-
-  @PreUpdate
-  protected def setUpdated() {
-    updated = new Date
-  }
 }

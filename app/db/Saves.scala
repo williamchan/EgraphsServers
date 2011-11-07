@@ -1,6 +1,6 @@
 package db
 
-import org.squeryl.{Table, KeyedEntity}
+import org.squeryl.Table
 import org.squeryl.dsl.ast.UpdateAssignment
 import org.squeryl.PrimitiveTypeMode._
 
@@ -9,11 +9,11 @@ import org.squeryl.PrimitiveTypeMode._
  * provides hooks to transform the entity before saving it.
  *
  * This trait assumes any entity with id of <= 0 is unset, and will attempt to insert it rather
- * than update, so make sure 0 is your sentinel value!
+ * than update, so make sure 0 or a negative number is your sentinel value!
  *
  * Usage:
- * <code>
- *    case class Person(id: Long = 0L, name: String = "") extends KeyedEntity[Long]
+ * {{{
+ *    case class Person(id: Long = 0L, name: String = "") extends Keyed[Long]
  *
  *    object Person extends Saves[Person] {
  *       override val table = MySquerylDb.people
@@ -28,10 +28,10 @@ import org.squeryl.PrimitiveTypeMode._
  *    // Later on in application code...
  *    Person.save(Person(name="Jonesy"))
  *
- * </code>
+ * }}}
  *
  * You can also modify the contents either just before an insert or just before an update:
- * <code>
+ * {{{
  *   case class Person(id: Long = 0L, name: String = "", created: Date = new Date(0L))
  *
  *   object Person extends Saves[Person] {
@@ -46,26 +46,24 @@ import org.squeryl.PrimitiveTypeMode._
  *       )
  *     }
  *   }
- * </code>
+ * }}}
  */
-trait Saves[T <: KeyedEntity[Long]] {
+trait Saves[T <: {def id: Long}] {
 
   //
   // Abstract members
   //
   /** The table that manages this entity in db.Schema  */
-  def table: Table[T]
+  protected def table: Table[T]
 
   /**
    * Defines how to update an old row in the database with the new one, using the syntax
    * that usually appears in a Squeryl set() clause. Usually this will be just a matter of taking
    * all the persisted properties and setting them.
    *
-   * @see <a href=http://squeryl.org/inserts-updates-delete.html>Squeryl query documentation</a>
-   *
    * For example:
-   * <code>
-   *   case class Fruit(id: Long, name: String) extends KeyedEntity[Long]
+   * {{{
+   *   case class Fruit(id: Long, name: String) Keyed[Long]
    *
    *   object Fruit extends Saves[Fruit] {
    *     override def defineUpdate(theOld: Fruit, theNew: Fruit) = {
@@ -75,15 +73,20 @@ trait Saves[T <: KeyedEntity[Long]] {
    *        )
    *     }
    *   }
+   * }}}
    *
-   * </code>
+   * @see <a href=http://squeryl.org/inserts-updates-delete.html>Squeryl query documentation</a>
    */
   def defineUpdate(theOld: T, theNew: T): List[UpdateAssignment]
 
   //
   // Protected API
-  //
-  /** Convenience for making a list out of update assignments. @see #defineUpdate */
+  //  
+  /**
+   * Convenience for making a list out of update assignments.
+   *
+   * @see #defineUpdate
+   */
   protected final def updateIs(assignments: UpdateAssignment*): List[UpdateAssignment] = {
     assignments.toList
   }
@@ -95,6 +98,10 @@ trait Saves[T <: KeyedEntity[Long]] {
    * Persist an object, either by inserting or updating it.
    *
    * Assumes that any object with id <= 0 has not yet been inserted.
+   *
+   * @param toSave the object to save
+   * 
+   * @return the final object that was saved, after all transforms
    */
   final def save(toSave: T): T = {
     inTransaction {
@@ -108,12 +115,34 @@ trait Saves[T <: KeyedEntity[Long]] {
     }
   }
 
-  /** Hook to provide a transform to apply before inserting any new object. */
+  /**
+   * Locates an object by its id.
+   *
+   * @param id the id of the object to locate
+   *
+   * @return the located object or None
+   */
+  final def findById(id: Long): Option[T] = {
+    inTransaction {
+      from(table)(row => where(row.id === id) select(row)).headOption
+    }
+  }
+
+  /**
+   * Hook to provide an entity transform that will be applied before inserting any
+   * new object.
+   *
+   * See class documentation for usage.
+   */
   final def beforeInsert(transform: (T) => T) {
     preInsertTransforms = preInsertTransforms ++ Vector(transform)
   }
 
-  /** Hook to provide a transform to apply before updating an object. */
+  /**
+   * Hook to provide a transform to apply before updating any new object.
+   *
+   * See class documentation for usage.
+   */
   final def beforeUpdate(transform: (T) => T) {
     preUpdateTransforms = preUpdateTransforms ++ Vector(transform)
   }

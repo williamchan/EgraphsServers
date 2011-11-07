@@ -1,5 +1,6 @@
 import models.HasCreatedUpdated
 import org.scalatest.matchers.ShouldMatchers
+import org.squeryl.KeyedEntity
 import play.test.UnitFlatSpec
 import libs.Time.{defaultTimestamp, now}
 
@@ -7,48 +8,49 @@ import libs.Time.{defaultTimestamp, now}
  * Mix this in with test cases for any entity that uses the HasCreatedUpdated
  * and SavesCreatedUpdated to ensure that the behavior is correct
  */
-trait CreatedUpdatedEntityTests[T <: HasCreatedUpdated] { this: UnitFlatSpec with ShouldMatchers =>
-
-  //
-  // Abstract members
-  //
-
-  /** Provide an instance of the entity type under test */
-  def getCreatedUpdatedEntity: T
-
-  /**
-   *  Persist an instance of the entity type under test and return the
-   *  persisted version.
-   */
-  def saveCreatedUpdated(entity: T): T
+trait CreatedUpdatedEntityTests[T <: HasCreatedUpdated with KeyedEntity[Long]] {
+  this: UnitFlatSpec with ShouldMatchers with SavingEntityTests[T] =>
 
   //
   // Test cases
   //
-  "Any created/updated entity" should "start out with default timestamp" in {
-    getCreatedUpdatedEntity.created should be (defaultTimestamp)
-    getCreatedUpdatedEntity.updated should be (defaultTimestamp)
+  "A new instance" should "start with default timestamp" in {
+    newEntity.created should be (defaultTimestamp)
+    newEntity.updated should be (defaultTimestamp)
   }
 
-  it should "update both timestamps on insert" in {
-    val saved = saveCreatedUpdated(getCreatedUpdatedEntity)
+  "An inserted instance" should "have both timestamps set" in {
+    val saved = saveEntity(newEntity)
+    val restored = restoreEntity(saved.id).get
 
     saved.created.getTime should be (now.getTime plusOrMinus 100)
     saved.created should be (saved.updated)
+
+    saved.created should be (restored.created)
+    saved.updated should be (restored.updated)
   }
 
-  it should "update only updated on update" in {
+  "An updated instance" should "have only the 'updated' field altered" in {
     // Set up
-    val insertedEntity = saveCreatedUpdated(getCreatedUpdatedEntity)
+    val inserted = saveEntity(newEntity)
     val sleepDuration = 20L
 
     Thread.sleep(sleepDuration)
-    
+
     // Run test
-    val updatedEntity = saveCreatedUpdated(insertedEntity)
+    val updated = saveEntity(inserted)
+    val restored = restoreEntity(updated.id).get
+
+    // def getTuple(entity: T) = (entity.created, entity.updated)
+
+    /*println("inserted" + getTuple(inserted))
+    println("updated " + getTuple(updated))
+    println("restored" + getTuple(restored))*/
 
     // Check expectations
-    updatedEntity.created should be (insertedEntity.created)
-    updatedEntity.updated.getTime should be >= (insertedEntity.updated.getTime + sleepDuration)
+    updated.created should be (inserted.created)
+    updated.updated.getTime should be >= (inserted.updated.getTime + sleepDuration)
+    restored.created should be (updated.created)
+    restored.updated should be (updated.updated)
   }
 }

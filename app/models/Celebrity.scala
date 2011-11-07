@@ -1,10 +1,9 @@
 package models
 
-import org.squeryl.KeyedEntity
 import org.squeryl.PrimitiveTypeMode._
-import db.{Schema, Saves}
 import libs.Time
 import java.sql.Timestamp
+import db.{KeyedCaseClass, Schema, Saves}
 
 
 /**
@@ -20,7 +19,10 @@ case class Celebrity(
   profilePhotoId: Option[String] = Some(""),
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp
-) extends KeyedEntity[Long] with HasCreatedUpdated
+) extends KeyedCaseClass[Long] with HasCreatedUpdated
+{
+  override def unapplied = Celebrity.unapply(this)
+}
 
 object Celebrity extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {
   //

@@ -2,9 +2,8 @@ package models
 
 import java.sql.Timestamp
 import libs.Time
-import org.squeryl.KeyedEntity
 import org.squeryl.PrimitiveTypeMode._
-import db.{Saves, Schema}
+import db.{KeyedCaseClass, Saves, Schema}
 
 /**
  * Persistent entity representing administrators of our service.
@@ -14,7 +13,9 @@ case class Administrator(
   accountId: Long = 0L,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp
-) extends KeyedEntity[Long] with HasCreatedUpdated
+) extends KeyedCaseClass[Long] with HasCreatedUpdated {
+  override def unapplied = Administrator.unapply(this)
+}
 
 object Administrator extends Saves[Administrator] with SavesCreatedUpdated[Administrator] {
   //

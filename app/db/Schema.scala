@@ -2,7 +2,7 @@ package db
 
 import org.squeryl.PrimitiveTypeMode._
 import org.squeryl.Table
-import models.{Administrator, Celebrity, Customer, Account}
+import models.{Administrator, Celebrity, Customer, Account, Product}
 
 /**
  * Egraphs Database schema
@@ -20,14 +20,14 @@ object Schema extends org.squeryl.Schema {
    * Does this by setting a unique index on the table's accountId field
    * then enforces a foreign key constraint against accounts.id.
    */
-  def oneToOneRelationOnAccount[T <: { def accountId: Long }]
+  private def oneToOneRelationOnAccount[T <: { def accountId: Long }]
       (table: Table[T]): OneToManyRelationImpl[Account, T] =
   {
     // Unique index on account ID
     on(table)(row => declare(row.accountId is(unique)))
 
     // Foreign key against account
-    val relation = oneToManyRelation(accounts, table)
+    val relation =  oneToManyRelation(accounts, table)
       .via((account, tableRow) => tableRow.accountId === account.id)
 
     // Deleting the account cascades to this table
@@ -53,6 +53,13 @@ object Schema extends org.squeryl.Schema {
   //
   val administrators = table[Administrator]
   val administratorsToAccounts = oneToOneRelationOnAccount(administrators)
+
+  //
+  // Products
+  //
+  val products = table[Product]
+  val celebrityToProduct = oneToManyRelation(celebrities, products).
+    via((celebrity, product)=> celebrity.id === product.celebrityId)
 
 
   //

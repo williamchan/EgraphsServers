@@ -1,12 +1,11 @@
 package models
 
-import org.squeryl.KeyedEntity
 import org.squeryl.PrimitiveTypeMode._
 import play.data.validation.Validation.ValidationResult
 import play.data.validation.Validation
-import db.{Saves, Schema}
 import java.sql.Timestamp
 import libs.Time
+import db.{KeyedCaseClass, Saves, Schema}
 
 /**
  * Basic account information for any user in the system
@@ -14,13 +13,14 @@ import libs.Time
 case class Account(
   id: Long = 0,
   email: String = "",
-  passwordHash: Option[String] = Some(""),
-  passwordSalt: Option[String] = Some(""),
+  passwordHash: Option[String] = None,
+  passwordSalt: Option[String] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp
-) extends KeyedEntity[Long] with HasCreatedUpdated
+) extends KeyedCaseClass[Long] with HasCreatedUpdated
 {
-  /** Returns the password, which may or may not have been set. */
+  override def unapplied = Account.unapply(this)
+  
   def password: Option[Password] = {
     (passwordHash, passwordSalt) match {
       case (Some(""), Some("")) => None
@@ -55,13 +55,6 @@ case class Account(
 
 object Account extends Saves[Account] with SavesCreatedUpdated[Account] {
 
-  /** Queries a credential by its ID */
-  def byId(id: Long): Option[Account] = {
-    inTransaction {
-      Schema.accounts.lookup(id)
-    }
-  }
-
   //
   // Saves[Account] methods
   //
@@ -71,7 +64,9 @@ object Account extends Saves[Account] with SavesCreatedUpdated[Account] {
     updateIs(
       theOld.email := theNew.email,
       theOld.passwordHash := theNew.passwordHash,
-      theOld.passwordSalt := theNew.passwordSalt
+      theOld.passwordSalt := theNew.passwordSalt,
+      theOld.created := theNew.created,
+      theOld.updated := theNew.updated
     )
   }
   

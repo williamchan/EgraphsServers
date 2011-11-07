@@ -9,17 +9,30 @@ import scala.collection.JavaConversions._
 class AccountTests extends UnitFlatSpec
   with ShouldMatchers
   with BeforeAndAfterEach
+  with SavingEntityTests[Account]
   with CreatedUpdatedEntityTests[Account]
 {
   //
-  // CreatedUpdatedEntityTests[Account] methods
+  // SavingEntityTests[Account] methods
   //
-  override def getCreatedUpdatedEntity = {
+  def newEntity = {
     Account()
   }
-  
-  override def saveCreatedUpdated(toSave: Account) = {
+
+  def saveEntity(toSave: Account) = {
     Account.save(toSave)
+  }
+
+  def restoreEntity(accountId: Long) = {
+    Account.findById(accountId)
+  }
+
+  override def transformEntity(toTransform: Account) = {
+    toTransform.copy(
+      email="herp",
+      passwordHash=Some("herp"),
+      passwordSalt=Some("derp")
+    )
   }
 
   //
@@ -27,7 +40,7 @@ class AccountTests extends UnitFlatSpec
   //
   override def afterEach() {
     Validation.clear()
-    db.Schema.scrub
+    db.Schema.scrub()
   }
 
   //
@@ -60,7 +73,7 @@ class AccountTests extends UnitFlatSpec
 
     // Run test
     val saved = Account.save(stored)
-    val maybeRecalled = Account.byId(saved.id)
+    val maybeRecalled = Account.findById(saved.id)
 
     // Check expectations
     maybeRecalled should not be (None)
