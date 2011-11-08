@@ -1,0 +1,38 @@
+import models.{Account, Customer}
+import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.BeforeAndAfterEach
+import play.test.UnitFlatSpec
+
+class CustomerTests extends UnitFlatSpec
+  with ShouldMatchers
+  with BeforeAndAfterEach
+  with SavingEntityTests[Customer]
+  with CreatedUpdatedEntityTests[Customer]
+  with ClearsDatabaseAndValidationAfter
+{
+  //
+  // SavingEntityTests[Account] methods
+  //
+  override def newEntity = {
+    Customer(accountId=Account.save(Account()).id)
+  }
+
+  override def saveEntity(toSave: Customer) = {
+    Customer.save(toSave)
+  }
+
+  override def restoreEntity(id: Long) = {
+    Customer.findById(id)
+  }
+
+  override def transformEntity(toTransform: Customer) = {
+    toTransform.copy(
+      name = Some("name")
+    )
+  }
+
+  //
+  // Test cases
+  //
+
+}

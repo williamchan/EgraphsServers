@@ -11,6 +11,11 @@ import db.{KeyedCaseClass, Saves, Schema}
 case class Administrator(
   id: Long = 0L,
   accountId: Long = 0L,
+
+  // This is currently a meaningless field that exists so that
+  // we can pass SavingEntityTests. Get rid of it once we have
+  // some Administrator-specific data.
+  role: Option[String] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated {
@@ -27,6 +32,7 @@ object Administrator extends Saves[Administrator] with SavesCreatedUpdated[Admin
     updateIs(
       theOld.accountId := theNew.accountId,
       theOld.created := theNew.created,
+      theOld.role := theNew.role,
       theOld.updated := theNew.updated
     )
   }

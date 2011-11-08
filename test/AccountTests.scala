@@ -11,6 +11,7 @@ class AccountTests extends UnitFlatSpec
   with BeforeAndAfterEach
   with SavingEntityTests[Account]
   with CreatedUpdatedEntityTests[Account]
+  with ClearsDatabaseAndValidationAfter
 {
   //
   // SavingEntityTests[Account] methods
@@ -33,14 +34,6 @@ class AccountTests extends UnitFlatSpec
       passwordHash=Some("herp"),
       passwordSalt=Some("derp")
     )
-  }
-
-  //
-  // Fixtures
-  //
-  override def afterEach() {
-    Validation.clear()
-    db.Schema.scrub()
   }
 
   //

@@ -15,8 +15,10 @@ trait CreatedUpdatedEntityTests[T <: HasCreatedUpdated with KeyedEntity[Long]] {
   // Test cases
   //
   "A new instance" should "start with default timestamp" in {
-    newEntity.created should be (defaultTimestamp)
-    newEntity.updated should be (defaultTimestamp)
+    val entity = newEntity
+    
+    entity.created should be (defaultTimestamp)
+    entity.updated should be (defaultTimestamp)
   }
 
   "An inserted instance" should "have both timestamps set" in {
