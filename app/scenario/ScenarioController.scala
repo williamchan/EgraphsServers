@@ -50,7 +50,7 @@ object ScenarioController extends Controller {
    * @return 200 (Ok) if successful.
    */
   def clear = withRegisteredScenarios {
-    Fixtures.deleteDatabase()
+    db.Schema.scrub()
 
     "All scenarios cleared."
    }
