@@ -1,9 +1,8 @@
 package controllers
 
-import models._
 import play.mvc._
-import play.db.jpa.JPABase
 import com.stripe.model.Charge
+import play.data.validation.Required
 
 object Application extends Controller {
 
@@ -29,6 +28,18 @@ object stripe extends Controller {
   }
 }
 
+object EGraphs extends Controller {
+  def post(orderId: String, @Required signature: String, @Required audio: String) = {
+    if (validation.hasErrors) {
+      "Errors: " + validation.errorsMap().toString + "\n"
+    }
+    else {
+      "received signature = " + params.get("signature") + " and audio = " + params.get("audio") +
+        " for orderId " + orderId + " by " + request.user + ":" + request.password + "\n"
+    }
+  }
+}
+
 object test extends Controller {
 
   def json = {
@@ -37,13 +48,6 @@ object test extends Controller {
 
   def script = {
     "Hello World"
-
-    var kevin = JPABase.em().find(classOf[Celebrity], 1L)
-    if (kevin == null) {
-      "kevin not found"
-    } else {
-      "kevin found"
-    }
   }
 
 }
