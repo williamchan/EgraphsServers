@@ -1,9 +1,12 @@
+package models
+
 import models._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.data.validation.Validation
 import play.test.UnitFlatSpec
 import scala.collection.JavaConversions._
+import utils.{SavingEntityTests, CreatedUpdatedEntityTests, ClearsDatabaseAndValidationAfter}
 
 class AccountTests extends UnitFlatSpec
   with ShouldMatchers

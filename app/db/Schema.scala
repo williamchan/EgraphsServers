@@ -1,8 +1,8 @@
 package db
 
 import org.squeryl.PrimitiveTypeMode._
-import models.{Administrator, Celebrity, Customer, Account, Product}
 import org.squeryl.{KeyedEntity, Table}
+import models._
 
 /**
  * Egraphs Database schema
@@ -38,9 +38,26 @@ object Schema extends org.squeryl.Schema {
   //
   val products = table[Product]
   val celebrityToProduct = oneToManyRelation(celebrities, products).
-    via((celebrity, product)=> celebrity.id === product.celebrityId)
+    via((celebrity, product) => celebrity.id === product.celebrityId)
 
+  //
+  // Orders
+  //
+  val orders = table[Order]("Orders")
 
+  val productToOrder = oneToManyRelation(products, orders)
+    .via((product, order) => product.id === order.productId)
+  productToOrder.foreignKeyDeclaration.constrainReference(onDelete setNull)
+
+  val buyingCustomerToOrder = oneToManyRelation(customers, orders)
+    .via((customer, order) => customer.id === order.buyerId)
+  buyingCustomerToOrder.foreignKeyDeclaration.constrainReference(onDelete setNull)
+
+  val recipientCustomerToOrder = oneToManyRelation(customers, orders)
+    .via((customer, order) => customer.id === order.recipientId)
+  recipientCustomerToOrder.foreignKeyDeclaration.constrainReference(onDelete setNull)
+
+  
   //
   // Public methods
   //
@@ -70,6 +87,7 @@ object Schema extends org.squeryl.Schema {
     val relation = oneToManyRelation(table, accounts)
       .via((row, account) => row.id === foreignKey(account))
 
+    on(accounts)(account => declare(foreignKey(account) is(unique)))
     relation.foreignKeyDeclaration.constrainReference(onDelete setNull)
 
     relation

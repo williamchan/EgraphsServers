@@ -1,8 +1,9 @@
-import models.{Account, Celebrity}
+package models
+
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
-import play.data.validation.Validation
 import play.test.UnitFlatSpec
+import utils.{ClearsDatabaseAndValidationAfter, CreatedUpdatedEntityTests, SavingEntityTests}
 
 class CelebrityTests extends UnitFlatSpec
   with ShouldMatchers
@@ -13,7 +14,7 @@ class CelebrityTests extends UnitFlatSpec
 {
 
   //
-  // SavingEntityTests[Account] methods
+  // SavingEntityTests[Celebrity] methods
   //
   override def newEntity = {
     Celebrity()

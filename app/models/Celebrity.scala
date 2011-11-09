@@ -25,7 +25,9 @@ case class Celebrity(
   // Public methods
   //
   /** Persists by conveniently delegating to companion object's save method. */
-  def save(): Celebrity = Celebrity.save(this)
+  def save(): Celebrity = {
+    Celebrity.save(this)
+  }
 
   /**
    * Renders the Celebrity as a Map, which will itself be rendered into whichever data format
@@ -41,6 +43,10 @@ case class Celebrity(
     Map("id" -> id) ++ Serialization.makeOptionalFieldMap(optionalFields)
   }
 
+  /** Creates a new Product associated with the celebrity. The product is not yet persisted. */
+  def newProduct: Product = {
+    Product(celebrityId=id)
+  }
   //
   // KeyedCaseClass[Long] methods
   //

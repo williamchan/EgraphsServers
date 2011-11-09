@@ -15,7 +15,23 @@ case class Customer(
   updated: Timestamp = Time.defaultTimestamp
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated
 {
-  override def unapplied = Customer.unapply(this)
+  //
+  // Public methods
+  //
+  def save(): Customer = {
+    Customer.save(this)
+  }
+
+  def order(product: Product, recipient: Customer = this): Order = {
+    Order(buyerId=id, recipientId=recipient.id, productId=product.id)
+  }
+
+  //
+  // KeyedCaseClass[Long] methods
+  //
+  override def unapplied = {
+    Customer.unapply(this)
+  }
 }
 
 object Customer extends Saves[Customer] with SavesCreatedUpdated[Customer] {

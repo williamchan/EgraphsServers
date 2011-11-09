@@ -1,4 +1,5 @@
-import models.Password
+package models
+
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.data.validation.Validation

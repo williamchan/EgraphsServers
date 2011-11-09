@@ -1,7 +1,9 @@
-import models.{Account, Administrator}
+package models
+
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
+import utils.{SavingEntityTests, CreatedUpdatedEntityTests, ClearsDatabaseAndValidationAfter}
 
 class AdministratorTests extends UnitFlatSpec
   with ShouldMatchers

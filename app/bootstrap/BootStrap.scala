@@ -4,8 +4,6 @@ import play.jobs._
 import com.stripe.Stripe
 import org.squeryl.{Session, SessionFactory}
 import play.Play
-import org.squeryl.internals.DatabaseAdapter
-import org.squeryl.adapters.{PostgreSqlAdapter, MySQLAdapter, H2Adapter}
 
 @OnApplicationStart
 class BootStrap extends Job {
@@ -25,7 +23,7 @@ class BootStrap extends Job {
     if (Play.id == "test") {
       import org.squeryl.PrimitiveTypeMode._
       inTransaction {
-        db.Schema.printDdl((ddl) => play.Logger.debug(ddl))
+        // db.Schema.printDdl((ddl) => println(ddl))
         db.Schema.scrub
       }
     }

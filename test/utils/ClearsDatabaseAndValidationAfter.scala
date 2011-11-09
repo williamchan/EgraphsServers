@@ -1,3 +1,5 @@
+package utils
+
 import org.scalatest.{Suite, BeforeAndAfterEach}
 import play.data.validation.Validation
 

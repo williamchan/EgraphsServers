@@ -1,3 +1,5 @@
+package utils
+
 import org.scalatest.{Suite, BeforeAndAfterEach}
 
 /**

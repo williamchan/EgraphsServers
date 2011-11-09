@@ -6,21 +6,32 @@ import db.{Schema, Saves, KeyedCaseClass}
 
 case class Product(
   id: Long = 0L,
-  celebrityId: Int = 0,
+  celebrityId: Long = 0L,
   priceInCents: Int = 0,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated {
 
-  override def unapplied = Product.unapply(this)
+  //
+  // Public methods
+  //
+  def save(): Product = {
+    Product.save(this)
+  }
+
+  //
+  // KeyedCaseClass[Long] methods
+  //
+  override def unapplied = {
+    Product.unapply(this)
+  }
 }
 
 object Product extends Saves[Product] with SavesCreatedUpdated[Product] {
+  //
+  // Saves[Product] methods
+  //
   def table = Schema.products
-  
-  override def withCreatedUpdated(toUpdate: Product, created: Timestamp, updated: Timestamp) = {
-    toUpdate.copy(created=created, updated=updated)
-  }
 
   override def defineUpdate(theOld: Product, theNew: Product) = {
     import org.squeryl.PrimitiveTypeMode._
@@ -32,5 +43,13 @@ object Product extends Saves[Product] with SavesCreatedUpdated[Product] {
       theOld.updated := theNew.updated
     )
   }
+
+  //
+  // SavesCreatedUpdated[Product] methods
+  //
+  override def withCreatedUpdated(toUpdate: Product, created: Timestamp, updated: Timestamp) = {
+    toUpdate.copy(created=created, updated=updated)
+  }
+
 }
 
