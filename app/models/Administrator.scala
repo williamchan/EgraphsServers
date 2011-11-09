@@ -10,8 +10,6 @@ import db.{KeyedCaseClass, Saves, Schema}
  */
 case class Administrator(
   id: Long = 0L,
-  accountId: Long = 0L,
-
   // This is currently a meaningless field that exists so that
   // we can pass SavingEntityTests. Get rid of it once we have
   // some Administrator-specific data.
@@ -30,7 +28,6 @@ object Administrator extends Saves[Administrator] with SavesCreatedUpdated[Admin
 
   override def defineUpdate(theOld: Administrator, theNew: Administrator) = {
     updateIs(
-      theOld.accountId := theNew.accountId,
       theOld.created := theNew.created,
       theOld.role := theNew.role,
       theOld.updated := theNew.updated

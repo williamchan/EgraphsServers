@@ -16,7 +16,7 @@ class CelebrityTests extends UnitFlatSpec
   // SavingEntityTests[Account] methods
   //
   override def newEntity = {
-    Celebrity(accountId=Account.save(Account()).id)
+    Celebrity()
   }
 
   override def saveEntity(toSave: Celebrity) = {

@@ -15,12 +15,15 @@ case class Account(
   email: String = "",
   passwordHash: Option[String] = None,
   passwordSalt: Option[String] = None,
+  customerId: Option[Long] = None,
+  celebrityId: Option[Long] = None,
+  administratorId: Option[Long] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated
 {
-  override def unapplied = Account.unapply(this)
-  
+  def save: Account = Account.save(this)
+
   def password: Option[Password] = {
     (passwordHash, passwordSalt) match {
       case (Some(""), Some("")) => None
@@ -51,9 +54,44 @@ case class Account(
         Right(copy(passwordHash=Some(password.hash), passwordSalt=Some(password.salt)))
     }
   }
+
+  //
+  // KeyedCaseClass methods
+  //
+  override def unapplied = Account.unapply(this)
 }
 
 object Account extends Saves[Account] with SavesCreatedUpdated[Account] {
+  def authenticate(email: String, passwordAttempt: String): Either[AccountAuthenticationError, Account] = {
+    findByEmail(email) match {
+      case None =>
+        Left(new AccountNotFoundError)
+
+      case Some(account) =>
+        account.password match {
+          case None =>
+            Left(new AccountPasswordNotSetError)
+
+          case Some(password) if password.is(passwordAttempt) =>
+            Right(account)
+
+          case _ =>
+            Left(new AccountCredentialsError)
+        }
+    }
+  }
+
+  //
+  // Public methods
+  //
+  def findByEmail(email: String): Option[Account] = {
+    inTransaction {
+      from(Schema.accounts)(account =>
+        where(account.email === email)
+        select(account)
+      ).headOption
+    }
+  }
 
   //
   // Saves[Account] methods
@@ -66,7 +104,10 @@ object Account extends Saves[Account] with SavesCreatedUpdated[Account] {
       theOld.passwordHash := theNew.passwordHash,
       theOld.passwordSalt := theNew.passwordSalt,
       theOld.created := theNew.created,
-      theOld.updated := theNew.updated
+      theOld.updated := theNew.updated,
+      theOld.celebrityId := theNew.celebrityId,
+      theOld.customerId := theNew.customerId,
+      theOld.administratorId := theNew.administratorId
     )
   }
   
@@ -80,3 +121,9 @@ object Account extends Saves[Account] with SavesCreatedUpdated[Account] {
     toUpdate.copy(created=created, updated=updated)
   }
 }
+
+// Errors
+sealed class AccountAuthenticationError
+class AccountCredentialsError extends AccountAuthenticationError
+class AccountPasswordNotSetError extends AccountAuthenticationError
+class AccountNotFoundError extends AccountAuthenticationError

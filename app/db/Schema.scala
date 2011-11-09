@@ -1,58 +1,37 @@
 package db
 
 import org.squeryl.PrimitiveTypeMode._
-import org.squeryl.Table
 import models.{Administrator, Celebrity, Customer, Account, Product}
+import org.squeryl.{KeyedEntity, Table}
 
 /**
  * Egraphs Database schema
  */
 object Schema extends org.squeryl.Schema {
   //
-  // Accounts
-  //
-  val accounts = table[Account]
-  on(accounts)(account => declare(account.email is (unique)))
-
-  /**
-   * Establishes and returns a one-to-one relationship against Account.
-   *
-   * Does this by setting a unique index on the table's accountId field
-   * then enforces a foreign key constraint against accounts.id.
-   */
-  private def oneToOneRelationOnAccount[T <: { def accountId: Long }]
-      (table: Table[T]): OneToManyRelationImpl[Account, T] =
-  {
-    // Unique index on account ID
-    on(table)(row => declare(row.accountId is(unique)))
-
-    // Foreign key against account
-    val relation =  oneToManyRelation(accounts, table)
-      .via((account, tableRow) => tableRow.accountId === account.id)
-
-    // Deleting the account cascades to this table
-    relation.foreignKeyDeclaration.constrainReference(onDelete cascade)
-
-    relation
-  }
-
-  //
   // Customers
   //
   val customers = table[Customer]
-  val customersToAccounts = oneToOneRelationOnAccount(customers)
-  
+
   //
   // Celebrities
   //
   val celebrities = table[Celebrity]
-  val celebritiesToAccounts = oneToOneRelationOnAccount(celebrities)
 
   //
   // Administrators
   //
   val administrators = table[Administrator]
-  val administratorsToAccounts = oneToOneRelationOnAccount(administrators)
+
+  //
+  // Accounts
+  //
+  val accounts = table[Account]
+  on(accounts)(account => declare(account.email is (unique)))
+
+  val accountToCustomer = oneAccountPerRowOn(customers, (account) => account.customerId)
+  val accountToAdministrator = oneAccountPerRowOn(administrators, (acct) => acct.administratorId)
+  val accountToCelebrity = oneAccountPerRowOn(celebrities, (account) => account.celebrityId)
 
   //
   // Products
@@ -71,5 +50,28 @@ object Schema extends org.squeryl.Schema {
       drop
       create
     }
+  }
+
+  //
+  // Private Methods
+  //
+  /**
+   * Declares a 1-to-1 relationship of accounts on another table using a combination
+   * by declaring a foreign key on the id field of that table.
+   *
+   * @param table the table upon which accounts depends
+   * @param foreignKey function that provides the field in accounts that maps to
+   *   the provided table's id field
+   *
+   */
+  def oneAccountPerRowOn[T <: KeyedEntity[Long]]
+    (table: Table[T], foreignKey: Account=>Option[Long]): OneToManyRelationImpl[T, Account] =
+  {
+    val relation = oneToManyRelation(table, accounts)
+      .via((row, account) => row.id === foreignKey(account))
+
+    relation.foreignKeyDeclaration.constrainReference(onDelete setNull)
+
+    relation
   }
 }

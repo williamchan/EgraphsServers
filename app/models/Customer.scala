@@ -10,7 +10,6 @@ import db.{KeyedCaseClass, Schema, Saves}
  */
 case class Customer(
   id: Long = 0L,
-  accountId: Long = 0L,
   name: Option[String] = Some(""),
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp
@@ -27,7 +26,6 @@ object Customer extends Saves[Customer] with SavesCreatedUpdated[Customer] {
 
   override def defineUpdate(theOld: Customer, theNew: Customer) = {
     updateIs(
-      theOld.accountId := theNew.accountId,
       theOld.name  := theNew.name,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated

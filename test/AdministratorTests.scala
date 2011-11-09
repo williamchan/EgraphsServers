@@ -15,7 +15,7 @@ class AdministratorTests extends UnitFlatSpec
   // SavingEntityTests[Account] methods
   //
   override def newEntity = {
-    Administrator(accountId=Account.save(Account()).id)
+    Administrator()
   }
 
   override def saveEntity(toSave: Administrator) = {

@@ -7,11 +7,10 @@
 # Home page
 GET     /                                       Application.index
 
-GET     /admin                                  module:crud
-
 GET     /stripe                                 stripe.stripe
 POST    /stripe                                 stripe.post
 
+GET     ${api}/celebrities/{celebrityId}        CelebrityApiControllers.getCelebrity
 POST    ${api}/celebrities/me/products/orders/{orderId}/egraphs     Egraphs.post
 
 # GET     /test/celebrities                       test.celebrities
