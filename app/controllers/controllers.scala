@@ -4,6 +4,7 @@ import play.mvc._
 import com.stripe.model.Charge
 import play.data.validation.Required
 import sun.misc.BASE64Decoder
+import play.libs.Codec
 
 object Application extends Controller {
 
@@ -44,8 +45,7 @@ object EGraphs extends Controller {
 object test extends Controller {
 
   def base64decode(str: String): String = {
-    val decoder = new BASE64Decoder()
-    new String(decoder.decodeBuffer(str)) + "\n"
+    new String(Codec.decodeBASE64(str)) + "\n"
   }
 
   def json = {
