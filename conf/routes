@@ -28,6 +28,7 @@ GET     /public/                                staticDir:public
 GET     /test/scenarios                          ScenarioController.list
 GET     /test/scenarios/clear                    ScenarioController.clear
 GET     /test/scenarios/{name}                   ScenarioController.scenario
+GET     /test/base64decode/{str}                 test.base64decode
 
 %{ if (true) }%
 # Catch all
