@@ -1,10 +1,9 @@
 package models
 
 import org.squeryl.PrimitiveTypeMode._
-import libs.Time
 import java.sql.Timestamp
 import db.{KeyedCaseClass, Schema, Saves}
-import sjson.json.{Format, DefaultProtocol}
+import libs.{Serialization, Time}
 
 /**
  * Persistent entity representing the Celebrities who provide products on
@@ -22,28 +21,31 @@ case class Celebrity(
   updated: Timestamp = Time.defaultTimestamp
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated
 {
+  //
+  // Public methods
+  //
+  /** Persists by conveniently delegating to companion object's save method. */
   def save(): Celebrity = Celebrity.save(this)
-  override def unapplied = Celebrity.unapply(this)
 
-  def addOptionalFields(map: Map[String, Any], fields: List[(String, Option[Any])]) = {
-    fields.foldLeft(map)((growingMap, nextField) =>
-      nextField._2 match {
-        case None => growingMap
-        case Some(value) => growingMap + (nextField._1 -> value)
-      }
-    )
-  }
-
+  /**
+   * Renders the Celebrity as a Map, which will itself be rendered into whichever data format
+   * by the API (e.g. JSON)
+   */
   def renderedForApi: Map[String, Any] = {
-    val map = Map("id" -> id)
     val optionalFields = List(
       ("firstName" -> firstName),
       ("lastName" -> lastName),
       ("popularName" -> popularName)
     )
 
-    addOptionalFields(map, optionalFields)
+    Map("id" -> id) ++ Serialization.makeOptionalFieldMap(optionalFields)
   }
+
+  //
+  // KeyedCaseClass[Long] methods
+  //
+  override def unapplied = Celebrity.unapply(this)
+
 }
 
 object Celebrity extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {

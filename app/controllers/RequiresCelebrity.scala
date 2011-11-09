@@ -3,16 +3,27 @@ package controllers
 import models.Celebrity
 import play.mvc.{Before, Controller}
 
+/**
+ * Provides a high-priority @Before interception that requires the request
+ * to have a celebrityId field that is valid and authorized.
+ *
+ * Mix in to any Controller that already RequiresAuthenticatedAccount
+ */
 trait RequiresCelebrity { this: Controller with RequiresAuthenticatedAccount =>
-
-  private val _celebrity = new ThreadLocal[Celebrity]
-
+  //
+  // Public methods
+  //
   def celebrity = {
     _celebrity.get
   }
 
+  //
+  // Private implementation
+  //
+  private val _celebrity = new ThreadLocal[Celebrity]
+
   @Before(priority=20)
-  def ensureRequestIsCelebrity = {
+  protected def ensureRequestIsCelebrity = {
     Option(params.get("celebrityId")) match {
       case None =>
         Error("Celebrity ID was required but not provided")
