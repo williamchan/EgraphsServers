@@ -22,7 +22,7 @@ case class Account(
   updated: Timestamp = Time.defaultTimestamp
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated
 {
-  def save: Account = Account.save(this)
+  def save(): Account = Account.save(this)
 
   def password: Option[Password] = {
     (passwordHash, passwordSalt) match {

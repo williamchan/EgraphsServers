@@ -66,6 +66,10 @@ object Schema extends org.squeryl.Schema {
     .via((order, egraph) => order.id === egraph.orderId)
   orderToEgraphs.foreignKeyDeclaration.constrainReference(onDelete setNull)
 
+  val verifiedEgraphToOrder = oneToManyRelation(egraphs, orders)
+    .via((egraph, order) => order.verifiedEgraphId === egraph.id)
+  verifiedEgraphToOrder.foreignKeyDeclaration.constrainReference(onDelete setNull)
+
   //
   // Public methods
   //

@@ -29,7 +29,7 @@ class CustomerTests extends UnitFlatSpec
 
   override def transformEntity(toTransform: Customer) = {
     toTransform.copy(
-      name = Some("name")
+      name = "name"
     )
   }
 

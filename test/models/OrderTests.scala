@@ -37,7 +37,8 @@ class OrderTests extends UnitFlatSpec
       productId = order.productId,
       buyerId = order.buyerId,
       recipientId = order.recipientId,
-      personalizedMessage = Some("Happy birthday, Erem!")
+      messageToCelebrity = Some("Wizzle you're the best!"),
+      requestedMessage = Some("Happy birthday, Erem!")
     )
   }
 
@@ -56,10 +57,77 @@ class OrderTests extends UnitFlatSpec
     eGraph.state should be (AwaitingVerification)
   }
 
+  it should "serialize the correct Map for the API" in {
+    val buyer  = Customer(name="Will Chan").save()
+    val recipient = Customer(name="Erem Boto").save()
+    val celebrity = Celebrity(firstName=Some("George"), lastName=Some("Martin")).save()
+    val product = celebrity.newProduct.save()
+    val order = buyer
+      .order(product, recipient)
+      .copy(
+        messageToCelebrity=Some("toCeleb"),
+        requestedMessage=Some("please write this"))
+
+    val rendered = order.renderedForApi
+
+    rendered("id") should be (order.id)
+    rendered("product.id") should be (product.id)
+    rendered("buyer.id") should be (buyer.id)
+    rendered("buyer.name") should be (buyer.name)
+    rendered("recipient.id") should be (recipient.id)
+    rendered("amountPaidInCents") should be (order.amountPaidInCents)
+    rendered("requestedMessage") should be (order.requestedMessage.get)
+    rendered("messageToCelebrity") should be (order.messageToCelebrity.get)
+  }
+
+  it should "herp" in {
+    import org.squeryl.PrimitiveTypeMode._
+    inTransaction {
+      Order.findByCelebrity(1L)
+    }
+  }
+
+  it should "find all of a Celebrity's orders" in {
+    import org.squeryl.PrimitiveTypeMode._
+    inTransaction {
+      val (will, _, celebrity, product) = newOrderStack
+      val (_, _ , otherCelebrity, otherCelebrityProduct) = newOrderStack
+
+      val otherProduct = celebrity.newProduct.save()
+      val orderToFulfill = will.order(product).save()
+      val egraph = orderToFulfill.newEgraph("herp".getBytes, "derp".getBytes).withState(Verified).save()
+
+      val fulfilledOrder = orderToFulfill.copy(verifiedEgraphId = Some(egraph.id)).save()
+      val productOrder = will.order(product).save()
+      val otherProductOrder = will.order(otherProduct).save()
+      val otherCelebrityProductOrder = will.order(otherCelebrityProduct).save()
+
+
+      // Orders of celebrity's products
+      val allCelebOrders = Order.findByCelebrity(celebrity.id, filterFulfilled=false)
+      allCelebOrders.toSeq should have length (3)
+      allCelebOrders.toSet should be (Set(fulfilledOrder, productOrder, otherProductOrder))
+
+      // Order of celebrity's unfulfilled products
+      val unfulfilledCelebOrders = Order.findByCelebrity(celebrity.id, filterFulfilled=true)
+      unfulfilledCelebOrders.toSeq should have length (2)
+      unfulfilledCelebOrders.toSet should be (Set(productOrder, otherProductOrder))
+    }
+  }
+
   //
   // Private methods
   //
   def newCustomerAndProduct: (Customer, Product) = {
     (Customer().save(), Celebrity().save().newProduct.save())
+  }
+
+  def newOrderStack = {
+    val buyer  = Customer(name="Will Chan").save()
+    val recipient = Customer(name="Erem Boto").save()
+    val celebrity = Celebrity(firstName=Some("George"), lastName=Some("Martin")).save()
+    val product = celebrity.newProduct.save()
+
+    (buyer, recipient, celebrity, product)
   }
 }

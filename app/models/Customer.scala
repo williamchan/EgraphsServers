@@ -10,7 +10,7 @@ import db.{KeyedCaseClass, Schema, Saves}
  */
 case class Customer(
   id: Long = 0L,
-  name: Option[String] = Some(""),
+  name: String = "",
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated
