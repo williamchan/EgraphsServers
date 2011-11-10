@@ -24,4 +24,16 @@ object Utils {
       case value => Some(value)
     }
   }
+
+  /**
+   * Turns any Iterable into a map keyed by a provided function.
+   *
+   * @param toMap the Iterable to turn into a map
+   * @param key function that produces a key for each instance in toMap
+   *
+   * @return the desired map
+   */
+  def toMap[K, V](toMap: Iterable[V], key: (V) => K): Map[K, V] = {
+    toMap.foldLeft(Map.empty[K, V])((growingMap, next) => growingMap + (key(next) -> next))
+  }
 }

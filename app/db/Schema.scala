@@ -45,19 +45,27 @@ object Schema extends org.squeryl.Schema {
   //
   val orders = table[Order]("Orders")
 
-  val productToOrder = oneToManyRelation(products, orders)
+  val productToOrders = oneToManyRelation(products, orders)
     .via((product, order) => product.id === order.productId)
-  productToOrder.foreignKeyDeclaration.constrainReference(onDelete setNull)
+  productToOrders.foreignKeyDeclaration.constrainReference(onDelete setNull)
 
-  val buyingCustomerToOrder = oneToManyRelation(customers, orders)
+  val buyingCustomerToOrders = oneToManyRelation(customers, orders)
     .via((customer, order) => customer.id === order.buyerId)
-  buyingCustomerToOrder.foreignKeyDeclaration.constrainReference(onDelete setNull)
+  buyingCustomerToOrders.foreignKeyDeclaration.constrainReference(onDelete setNull)
 
-  val recipientCustomerToOrder = oneToManyRelation(customers, orders)
+  val recipientCustomerToOrders = oneToManyRelation(customers, orders)
     .via((customer, order) => customer.id === order.recipientId)
-  recipientCustomerToOrder.foreignKeyDeclaration.constrainReference(onDelete setNull)
+  recipientCustomerToOrders.foreignKeyDeclaration.constrainReference(onDelete setNull)
 
-  
+  //
+  // Egraphs
+  //
+  val egraphs = table[Egraph]
+
+  val orderToEgraphs = oneToManyRelation(orders, egraphs)
+    .via((order, egraph) => order.id === egraph.orderId)
+  orderToEgraphs.foreignKeyDeclaration.constrainReference(onDelete setNull)
+
   //
   // Public methods
   //

@@ -19,12 +19,12 @@ class BootStrap extends Job {
       Some(() => Session.create(play.db.DB.getConnection, db.Adapter.current))
 
     // In test mode drop and re-create the database definition, logging the
-    // creation SQL on DEBUG.
+    // creation SQL.
     if (Play.id == "test") {
       import org.squeryl.PrimitiveTypeMode._
       inTransaction {
         // db.Schema.printDdl((ddl) => println(ddl))
-        db.Schema.scrub
+        db.Schema.scrub()
       }
     }
   }
