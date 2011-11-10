@@ -4,6 +4,10 @@ require:
     - play
     - play -> scala 0.9.1
     - com.stripe -> stripe-java 1.0.1
+    - net.debasishg -> sjson_2.8.1 0.12:
+        exclude:
+            # Exclude scala because its included with play-scala
+            - org.scala-lang -> scala-library 2.8.1
     - org.apache.axis2 -> axis2 1.6.1
     - org.apache.axis2 -> axis2-transport-http 1.6.1
     - org.apache.axis2 -> axis2-transport-local 1.6.1
@@ -30,10 +34,6 @@ require:
             # Exclude scala and actor because they're included with play-scala
             - org.scala-lang -> scala-library 2.8.1
             - se.scalablesolutions.akka -> akka-actor 1.0
-    - net.debasishg -> sjson_2.8.1 0.12:
-        exclude:
-            # Exclude scala because its included with play-scala
-            - org.scala-lang -> scala-library 2.8.1
 
 # Non-default repositories
 repositories:
