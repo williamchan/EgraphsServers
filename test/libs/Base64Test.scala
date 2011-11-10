@@ -1,3 +1,5 @@
+package libs
+
 import org.scalatest.matchers.ShouldMatchers
 import play.libs.Codec
 import play.test.UnitFlatSpec
