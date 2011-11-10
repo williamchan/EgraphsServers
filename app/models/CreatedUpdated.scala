@@ -3,6 +3,7 @@ package models
 import java.util.Date
 import java.sql.Timestamp
 import db.{KeyedCaseClass, Saves}
+import libs.Time
 
 /**
  * Mix in with any class that has a created or updated field if you wish its
@@ -14,6 +15,14 @@ import db.{KeyedCaseClass, Saves}
 trait HasCreatedUpdated {
   def created: Timestamp
   def updated: Timestamp
+
+  /** Renders the created and updated fields as a Map for use in the API */
+  def renderCreatedUpdatedForApi: Map[String, Any] = {
+    Map(
+      "created" -> Time.toApiFormat(created),
+      "updated" -> Time.toApiFormat(updated)
+    )
+  }
 }
 
 /**

@@ -4,6 +4,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 import utils.{ClearsDatabaseAndValidationAfter, CreatedUpdatedEntityTests, SavingEntityTests}
+import libs.Time
 
 class OrderTests extends UnitFlatSpec
   with ShouldMatchers
@@ -78,6 +79,8 @@ class OrderTests extends UnitFlatSpec
     rendered("amountPaidInCents") should be (order.amountPaidInCents)
     rendered("requestedMessage") should be (order.requestedMessage.get)
     rendered("messageToCelebrity") should be (order.messageToCelebrity.get)
+    rendered("created") should be (Time.toApiFormat(order.created))
+    rendered("updated") should be (Time.toApiFormat(order.updated))
   }
 
   it should "herp" in {

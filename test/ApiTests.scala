@@ -1,3 +1,4 @@
+import libs.Time
 import models.{Account, Celebrity, Customer}
 import org.junit.{Assert, After, Test}
 import play.mvc.Http.Request
@@ -29,13 +30,18 @@ class ApiTests extends FunctionalTest {
     // Test expectations
     assertIsOk(response)
 
-    val json = Serializer.SJSON.in[Map[String, Any]](getContent(response))
+    val json = Serializer.SJSON.in[Map[String, AnyRef]](getContent(response))
 
     assertEquals(BigDecimal(1), json("id"))
     assertEquals("Wizzle", json("popularName"))
     assertEquals("William", json("firstName"))
     assertEquals("Chan", json("lastName"))
-    assertEquals(4, json.size)
+
+    // These conversions will fail if they're not Longs
+    Time.fromApiFormat(json("created").toString)
+    Time.fromApiFormat(json("updated").toString)
+
+    assertEquals(6, json.size)
   }
 
   @Test
@@ -54,7 +60,7 @@ class ApiTests extends FunctionalTest {
   }
 
   @Test
-  def testHerpderp() {
+  def testGetCelebrityOrders() {
     // Set up the scenario
     val account = willChanAccount.save()
     val customer = Customer().save()
@@ -68,8 +74,16 @@ class ApiTests extends FunctionalTest {
 
     // Execute the request
     val response = GET(req, apiRoot+"/celebrities/me/orders?fulfilled=false")
+    assertIsOk(response)
 
-    println(getContent(response))
+    val json = Serializer.SJSON.in[List[Map[String, Any]]](getContent(response))
+
+    val firstOrderJson = json(0)
+    val secondOrderJson = json(1)
+
+    // Just check the ids -- the rest is covered by unit tests
+    assertEquals(BigDecimal(firstOrder.id), firstOrderJson("id"))
+    assertEquals(BigDecimal(secondOrder.id), secondOrderJson("id"))
   }
 
   def willChanAccount: Account = {

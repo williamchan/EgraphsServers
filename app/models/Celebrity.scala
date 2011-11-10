@@ -40,7 +40,9 @@ case class Celebrity(
       ("popularName" -> popularName)
     )
 
-    Map("id" -> id) ++ Serialization.makeOptionalFieldMap(optionalFields)
+    Map("id" -> id) ++
+      renderCreatedUpdatedForApi ++
+      Serialization.makeOptionalFieldMap(optionalFields)
   }
 
   /** Creates a new Product associated with the celebrity. The product is not yet persisted. */

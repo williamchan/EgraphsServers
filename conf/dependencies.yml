@@ -28,7 +28,10 @@ require:
             # Exclude scala and actor because they're included with play-scala
             - org.scala-lang -> scala-library 2.8.1
             - se.scalablesolutions.akka -> akka-actor 1.0
-    - net.debasishg -> sjson_2.8.1 0.12
+    - net.debasishg -> sjson_2.8.1 0.12:
+        exclude:
+            # Exclude scala because its included with play-scala
+            - org.scala-lang -> scala-library 2.8.1
 
 # Non-default repositories
 repositories:

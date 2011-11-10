@@ -45,12 +45,6 @@ trait CreatedUpdatedEntityTests[T <: HasCreatedUpdated with KeyedEntity[Long]] {
     val updated = saveEntity(inserted)
     val restored = restoreEntity(updated.id).get
 
-    // def getTuple(entity: T) = (entity.created, entity.updated)
-
-    /*println("inserted" + getTuple(inserted))
-    println("updated " + getTuple(updated))
-    println("restored" + getTuple(restored))*/
-
     // Check expectations
     updated.created should be (inserted.created)
     updated.updated.getTime should be >= (inserted.updated.getTime + sleepDuration)

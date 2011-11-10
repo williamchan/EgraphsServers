@@ -54,7 +54,7 @@ case class Order(
       )
     )
 
-    requiredFields ++ optionalFields
+    requiredFields ++ optionalFields ++ renderCreatedUpdatedForApi
   }
 
   /**
