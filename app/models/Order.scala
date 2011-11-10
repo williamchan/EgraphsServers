@@ -42,6 +42,13 @@ case class Order(
     requiredFields ++ optionalFields
   }
 
+  /**
+   * Produces a new Egraph associated with this order.
+   */
+  def newEgraph(signature: Array[Byte], audio: Array[Byte]): Egraph = {
+    Egraph(orderId=id, signature=signature, audio=audio).withState(AwaitingVerification)
+  }
+  
   //
   // KeyedCaseClass[Long] methods
   //

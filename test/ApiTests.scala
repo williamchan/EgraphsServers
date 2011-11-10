@@ -22,7 +22,7 @@ class ApiTests extends FunctionalTest {
     req.password = "herp"
 
     // Execute the request
-    val response = GET(req, "/api/1.0/celebrities/me")
+    val response = GET(req, apiRoot+"/celebrities/me")
 
     // Test expectations
     assertIsOk(response)
@@ -34,5 +34,24 @@ class ApiTests extends FunctionalTest {
     assertEquals("William", json("firstName"))
     assertEquals("Chan", json("lastName"))
     assertEquals(4, json.size)
+  }
+
+  @Test
+  def testGettingACelebrityWithIncorrectCredentialsFails() {
+    // Set up the scenario
+    GET("/test/scenarios/Will-chan-is-a-celebrity")
+
+    // Assemble the request
+    val req = newRequest()
+    req.user = "wchan83@gmail.com"
+    req.password = "wrongwrongwrong"
+
+    // Execute the request
+    val response = GET(req, apiRoot+"/celebrities/me")
+    assertEquals(403, response.status)
+  }
+
+  def apiRoot = {
+    "/api/1.0"
   }
 }

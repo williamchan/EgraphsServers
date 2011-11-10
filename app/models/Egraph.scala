@@ -34,6 +34,16 @@ case class Egraph(
     Egraph.save(this)
   }
 
+  /** Returns a transform of this object with the new, parameterized state */
+  def withState(state: EgraphState): Egraph = {
+    copy(stateValue = state.value)
+  }
+
+  /** The current state of the eGraph */
+  def state: EgraphState = {
+    Egraph.states(stateValue)
+  }
+
   //
   // KeyedCaseClass[Long] methods
   //

@@ -20,7 +20,7 @@ class CustomerTests extends UnitFlatSpec
   }
 
   override def saveEntity(toSave: Customer) = {
-    Customer.save(toSave)
+    toSave.save
   }
 
   override def restoreEntity(id: Long) = {
@@ -36,5 +36,22 @@ class CustomerTests extends UnitFlatSpec
   //
   // Test cases
   //
+  "A customer" should "produce Orders that are properly configured" in {
+    val buyer = Customer(id=1L)
+    val recipient = Customer(id=2L)
+    val product = Product(id=1L)
+
+    val order = buyer.order(product, recipient=recipient)
+
+    order.buyerId should be (buyer.id)
+    order.recipientId should be (recipient.id)
+    order.productId should be (product.id)
+  }
+
+  it should "make itself the recipient if no recipient is specified" in {
+    val buyer = Customer(id=1L)
+
+    buyer.order(Product()).recipientId should be (buyer.id)
+  }
 
 }

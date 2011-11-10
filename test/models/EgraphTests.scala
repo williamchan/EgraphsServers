@@ -42,6 +42,12 @@ class EgraphTests extends UnitFlatSpec
   //
   // Test cases
   //
+  "An Egraph" should "update its state when withState is called" in {
+    val egraph = Egraph().withState(RejectedVocals)
+
+    egraph.state should be (RejectedVocals)
+  }
+
   "Egraph statuses" should "be accessible via their values on the companion object" in {
     Egraph.states.foreach( stateTuple =>
       Egraph.states(stateTuple._2.value) should be (stateTuple._2)
