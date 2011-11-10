@@ -54,7 +54,7 @@ class EgraphTests extends UnitFlatSpec
     )
   }
 
-  "allStatuses" should "contain all the statuses" in {
+  "allStatuses" should "contain all the states" in {
     Egraph.states.size should be (5)
   }
 

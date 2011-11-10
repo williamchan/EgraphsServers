@@ -20,7 +20,7 @@ class CustomerTests extends UnitFlatSpec
   }
 
   override def saveEntity(toSave: Customer) = {
-    toSave.save
+    toSave.save()
   }
 
   override def restoreEntity(id: Long) = {
@@ -46,6 +46,7 @@ class CustomerTests extends UnitFlatSpec
     order.buyerId should be (buyer.id)
     order.recipientId should be (recipient.id)
     order.productId should be (product.id)
+    order.amountPaidInCents should be (product.priceInCents)
   }
 
   it should "make itself the recipient if no recipient is specified" in {

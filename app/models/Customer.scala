@@ -31,7 +31,12 @@ case class Customer(
    * @return an Order for the Product, purchased by this Customer for the recipient Customer.
    */
   def order(product: Product, recipient: Customer = this): Order = {
-    Order(buyerId=id, recipientId=recipient.id, productId=product.id)
+    Order(
+      buyerId=id,
+      recipientId=recipient.id,
+      productId=product.id,
+      amountPaidInCents=product.priceInCents
+    )
   }
 
   //

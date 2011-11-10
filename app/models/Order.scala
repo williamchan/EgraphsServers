@@ -13,6 +13,7 @@ case class Order(
   productId: Long = 0,
   buyerId: Long = 0,
   recipientId: Long = 0,
+  amountPaidInCents: Int = 0,
   personalizedMessage: Option[String] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp
@@ -69,6 +70,7 @@ object Order extends Saves[Order] with SavesCreatedUpdated[Order] {
     updateIs(
       theOld.productId := theNew.productId,
       theOld.buyerId := theNew.buyerId,
+      theOld.amountPaidInCents := theNew.amountPaidInCents,
       theOld.recipientId := theNew.recipientId,
       theOld.personalizedMessage := theNew.personalizedMessage,
       theOld.created := theNew.created,
