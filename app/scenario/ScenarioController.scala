@@ -55,20 +55,13 @@ object ScenarioController extends Controller {
     "All scenarios cleared."
    }
 
-
   /**
    * Returns a human-readable list of the available scenarios.
    *
    * @return 200 (Ok) and the list if successful.
    */
   def list = withRegisteredScenarios {
-    val scenarioNames = Scenario.allNames.toSeq
-    <html><body>
-      { scenarioNames.length } scenarios:
-      <ul>
-        { Scenario.allNames.map(name => <li><code>{ name }</code></li>) }
-      </ul>
-    </body></html>
+    views.Application.html.scenarios(Scenario.list.toSeq)
   }
 
   /**
@@ -80,7 +73,12 @@ object ScenarioController extends Controller {
     Scenario.named(name) match {
       case Some(existingScenario) => {
         existingScenario.play()
-        Html("Scenario <pre>" + name + "</pre> successfully replayed.")
+        Html(
+          "Scenario <pre>"
+            + name
+            + "</pre> successfully replayed.<br/><br/>"
+            + existingScenario.description
+        )
       }
       case _ => {
         NotFound(

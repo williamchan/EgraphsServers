@@ -7,33 +7,29 @@ package scenario
  * Usage:
  * <code>
  *   class Scenarios extends DeclaresScenarios {
- *     scenario named "Shaq is a celebrity" is {
- *       // Add a Celebrity object to the database for Shaquille O'Neal
- *     }
+ *     toScenarios add Scenario(
+ *       "Shaq is a celebrity",
  *
- *     scenario named "Shaq has 2 products" is {
- *       // Add 2 products to Shaq's database
- *     }
+ *       """
+ *       Creates a Celebrity with name Shaquille 'Shaq' O'Neal. His login/password are
+ *       shaq@herp.com/attack
+ *       """,
+ *
+ *       {() =>
+ *          // Implement the code that realizes the scenario.
+ *       }
+ *     )
  *   }
  * </code>
  */
 trait DeclaresScenarios {
   /** Entry point to the scenario declaration language */
-  val scenario = ScenarioDeclaration
+  val toScenarios = ScenarioDeclaration
 
   object ScenarioDeclaration {
-    def named (nameDeclaration: ScenarioNameDeclaration) = nameDeclaration
-  }
-
-  class ScenarioNameDeclaration(name: String) {
-    def is (function: => Unit) {
-      val scenario = Scenario(name, () => function)
+    def add (scenario: Scenario) {
       Scenario.add(scenario)
     }
-  }
-
-  implicit def convertStringToScenarioNameDeclaration(name: String): ScenarioNameDeclaration = {
-    new ScenarioNameDeclaration(name)
   }
 }
 

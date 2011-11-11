@@ -1,0 +1,21 @@
+@(scenarios: Seq[scenario.Scenario])
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Test Scenarios</title>
+  </head>
+  <body>
+    @scenarios.length scenarios:
+    <ul>
+      @scenarios.map { scenario =>
+        <li style="padding-bottom:7px">
+          <code><a href="/test/scenarios/@scenario.name">@scenario.name</a></code>
+          <div style="padding-left:17px; padding-top:3px; font-size:14px;">
+            @scenario.description
+          </div>
+        </li>
+      }
+    </ul>
+  </body>
+</html>

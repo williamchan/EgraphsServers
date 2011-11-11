@@ -8,6 +8,7 @@ case class Product(
   id: Long = 0L,
   celebrityId: Long = 0L,
   priceInCents: Int = 0,
+  description: Option[String] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated {
@@ -39,6 +40,7 @@ object Product extends Saves[Product] with SavesCreatedUpdated[Product] {
     updateIs(
       theOld.celebrityId := theNew.celebrityId,
       theOld.priceInCents := theNew.priceInCents,
+      theOld.description := theNew.description,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated
     )

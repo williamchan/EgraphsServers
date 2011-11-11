@@ -14,16 +14,16 @@ package scenario
  * For how to register scenarios, create a class named Scenarios in the
  * tests directory, and register scenarios in it {@link DeclaresScenarios}.
  */
-case class Scenario(name: String, function: () => Unit) {
-  /** Executes the scenario */
-  def play() {
-    function()
-  }
-}
+case class Scenario(name: String, description: String="", play: () => Any)
 
 object Scenario {
   /** All registered scenarios, indexed by name */
   var all: Map[String, Scenario] = Map[String, Scenario]()
+
+  /** List of all registered scenarios */
+  def list: Iterable[Scenario] = {
+    all.map {case (name, scenario) => scenario }
+  }
 
   /** Returns a scenario with the provided name */
   def named(name: String): Option[Scenario] = {
