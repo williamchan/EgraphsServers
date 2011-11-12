@@ -5,7 +5,8 @@ import play.mvc.{Before, Controller}
 
 /**
  * Provides a high-priority @Before interception that requires the request
- * to have a celebrityId field that is valid and authorized.
+ * to have a celebrityId field that is valid and authorized. Also provides a celebrity
+ * field to access the Celebrity object associated with that id.
  *
  * Mix in to any Controller that already RequiresAuthenticatedAccount
  */
@@ -13,7 +14,7 @@ trait RequiresCelebrity { this: Controller with RequiresAuthenticatedAccount =>
   //
   // Public methods
   //
-  def celebrity = {
+  protected def celebrity: Celebrity = {
     _celebrity.get
   }
 
@@ -29,15 +30,20 @@ trait RequiresCelebrity { this: Controller with RequiresAuthenticatedAccount =>
         Error("Celebrity ID was required but not provided")
 
       case Some(celebrityId) if celebrityId == "me" =>
-        for (celebrityId <- account.celebrityId;
-             celebrity <- Celebrity.findById(celebrityId)) _celebrity.set(celebrity)
-        Continue
+        println("account is --"+account)
+        account.celebrityId match {
+          case None =>
+            Error("This request requires a celebrity account.")
+
+          case Some(accountCelebrityId) =>
+            _celebrity.set(Celebrity.findById(accountCelebrityId).get)
+            Continue
+        }
 
       case celebrityId =>
-        new IllegalArgumentException(
+        Error(
           "Unexpected request for celebrityId \""+celebrityId+"\". Only \"me\" is currently supported."
         )
     }
-    Continue
   }
 }

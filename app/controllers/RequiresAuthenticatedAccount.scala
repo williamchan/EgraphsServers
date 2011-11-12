@@ -15,7 +15,7 @@ trait RequiresAuthenticatedAccount { this: Controller =>
   // Public methods
   //
   /** Retrieve the authenticated Account */
-  def account:Account = {
+  protected def account:Account = {
     _account.get
   }
 

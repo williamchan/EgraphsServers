@@ -17,15 +17,10 @@ class ApiTests extends FunctionalTest {
   @Test
   def testGettingACelebrityReturnsCorrectData() {
     // Set up the scenario
-    GET("/test/scenarios/Will-Chan-is-a-celebrity")
-
-    // Assemble the request
-    val req = newRequest()
-    req.user = "wchan83@gmail.com"
-    req.password = "herp"
+    runScenario("Will-Chan-is-a-celebrity")
 
     // Execute the request
-    val response = GET(req, apiRoot+"/celebrities/me")
+    val response = GET(willChanRequest, apiRoot+"/celebrities/me")
 
     // Test expectations
     assertIsOk(response)
@@ -47,7 +42,7 @@ class ApiTests extends FunctionalTest {
   @Test
   def testGettingACelebrityWithIncorrectCredentialsFails() {
     // Set up the scenario
-    GET("/test/scenarios/Will-chan-is-a-celebrity")
+    runScenario("Will-Chan-is-a-celebrity")
 
     // Assemble the request
     val req = newRequest()
@@ -65,6 +60,7 @@ class ApiTests extends FunctionalTest {
     val account = willChanAccount.save()
     val customer = Customer().save()
     val celebrity = Celebrity().save()
+    account.copy(celebrityId=Some(celebrity.id)).save()
     val product = celebrity.newProduct.save()
     val firstOrder = customer.order(product).save()
     val secondOrder = customer.order(product).save()
@@ -74,6 +70,7 @@ class ApiTests extends FunctionalTest {
 
     // Execute the request
     val response = GET(req, apiRoot+"/celebrities/me/orders?fulfilled=false")
+    println(getContent(response))
     assertIsOk(response)
 
     val json = Serializer.SJSON.in[List[Map[String, Any]]](getContent(response))
@@ -84,6 +81,46 @@ class ApiTests extends FunctionalTest {
     // Just check the ids -- the rest is covered by unit tests
     assertEquals(BigDecimal(firstOrder.id), firstOrderJson("id"))
     assertEquals(BigDecimal(secondOrder.id), secondOrderJson("id"))
+  }
+
+  @Test
+  def testSubmitEgraph() {
+    runScenarios(
+      "Will-Chan-is-a-celebrity",
+      "Will-has-two-products",
+      "Erem-is-a-customer",
+      "Erem-buys-Wills-two-products-twice-each"
+    )
+
+    val ordersResponse = GET(willChanRequest, apiRoot+"/celebrities/me/orders?fulfilled=false")
+    val ordersList = Serializer.SJSON.in[List[Map[String, Any]]](getContent(ordersResponse))
+
+    val firstOrderMap = ordersList.head
+    val orderId = firstOrderMap("id")
+
+    val response = POST(
+      willChanRequest,
+      apiRoot+"/celebrities/me/orders/"+orderId+"/egraphs",
+      APPLICATION_X_WWW_FORM_URLENCODED,
+      "signature=theSignature&audio=theAudio"
+    )
+    assertIsOk(response)
+
+    val json = Serializer.SJSON.in[Map[String, Any]](getContent(response))
+    assertEquals(BigDecimal(1), json("id"))
+  }
+
+  def runScenarios(name: String*) {
+    name.foreach { name =>
+      runScenario(name)
+    }
+  }
+
+  def runScenario(name: String) {
+    val response = GET("/test/scenarios/"+name)
+    if (response.status != 200) {
+      throw new IllegalArgumentException("Unknown scenario name "+name)
+    }
   }
 
   def willChanAccount: Account = {

@@ -4,6 +4,7 @@ import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
 import db.{KeyedCaseClass, Schema, Saves}
 import libs.{Serialization, Time}
+import org.squeryl.dsl.ast.{LogicalBoolean, PostfixOperatorNode, BinaryOperatorNodeLogicalBoolean, EqualityExpression}
 
 /**
  * Persistent entity representing the Orders made upon Products of our service
@@ -74,7 +75,27 @@ object Order extends Saves[Order] with SavesCreatedUpdated[Order] {
   //
   // Public Methods
   //
-  def findByCelebrity(celebrityId: Long, filterFulfilled:Boolean = false):Iterable[Order] = {
+  private def reduceFilters(
+    filters: Iterable[FindByCelebrityFilter],
+    celebrity: Celebrity,
+    product: Product,
+    order: Order): LogicalBoolean =
+  {
+    filters.headOption match {
+      // Just return the trivial comparison if there were no filters
+      case None =>
+        (1 === 1)
+
+      // Otherwise reduce the collection of filters against the first
+      case Some(firstFilter) =>
+        filters.tail.foldLeft(firstFilter.test(celebrity, product, order))(
+          (compositeFilter, nextFilter) =>
+            (nextFilter.test(celebrity, product, order) and compositeFilter)
+        )
+    }
+  }
+
+  def findByCelebrity(celebrityId: Long, filters: FindByCelebrityFilter*):Iterable[Order] = {
     import Schema.{celebrities, products, orders}
 
     from(celebrities, products, orders)((celebrity, product, order) =>
@@ -82,7 +103,7 @@ object Order extends Saves[Order] with SavesCreatedUpdated[Order] {
         celebrity.id === celebrityId and
         celebrity.id === product.celebrityId and
         product.id === order.productId and
-        (if (filterFulfilled) (order.verifiedEgraphId isNull) else (1 === 1))
+        reduceFilters(filters, celebrity, product, order)
       )
       select(order)
       orderBy(order.created asc)
@@ -113,5 +134,32 @@ object Order extends Saves[Order] with SavesCreatedUpdated[Order] {
   //
   override def withCreatedUpdated(toUpdate: Order, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)
+  }
+}
+
+/**
+ * Base definition of an object that can apply a Squeryl filter against the join
+ * between Schema.celebrities, Schema.products, Schema.orders that occurs in the
+ * Order.findByCelebrity function.
+ */
+trait FindByCelebrityFilter {
+  def test(celebrity: Celebrity, product: Product, order: Order): LogicalBoolean
+}
+
+/**
+ * Returns only orders that haven't been successfully fulfilled
+ */
+object UnfulfilledFilter extends FindByCelebrityFilter {
+  override def test(celebrity: Celebrity, product: Product, order: Order) = {
+    (order.verifiedEgraphId isNull)
+  }
+}
+
+/**
+ * Returns only orders with the given orderId.
+ */
+case class OrderIdFilter(id: Long) extends FindByCelebrityFilter {
+  override def test(celebrity: Celebrity, product: Product, order: Order) = {
+    (order.id === id)
   }
 }

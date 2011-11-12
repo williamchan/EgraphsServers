@@ -107,14 +107,23 @@ class OrderTests extends UnitFlatSpec
 
 
       // Orders of celebrity's products
-      val allCelebOrders = Order.findByCelebrity(celebrity.id, filterFulfilled=false)
+      val allCelebOrders = Order.findByCelebrity(celebrity.id)
       allCelebOrders.toSeq should have length (3)
       allCelebOrders.toSet should be (Set(fulfilledOrder, productOrder, otherProductOrder))
 
       // Order of celebrity's unfulfilled products
-      val unfulfilledCelebOrders = Order.findByCelebrity(celebrity.id, filterFulfilled=true)
+      val unfulfilledCelebOrders = Order.findByCelebrity(celebrity.id, UnfulfilledFilter)
       unfulfilledCelebOrders.toSeq should have length (2)
       unfulfilledCelebOrders.toSet should be (Set(productOrder, otherProductOrder))
+
+      // A particular orderId of a celebrity's
+      val firstProductOrder = Order.findByCelebrity(celebrity.id, OrderIdFilter(productOrder.id))
+      firstProductOrder.toSeq should have length(1)
+      firstProductOrder.toSeq.apply(0) should be (productOrder)
+
+      // Querying a celebrity's order for an orderId belonging to another celeb should return none
+      val orderOfOtherCelebrity = Order.findByCelebrity(otherCelebrity.id, OrderIdFilter(productOrder.id))
+      orderOfOtherCelebrity.toSeq should have length (0)
     }
   }
 

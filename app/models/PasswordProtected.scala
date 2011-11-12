@@ -2,14 +2,9 @@ package models
 
 import play.db.jpa.Model
 
-import java.security.SecureRandom
-import java.math.BigInteger
-import play.libs.Codec
-import java.util.Date
 import play.data.validation.Validation
 import play.data.validation.Validation.ValidationResult
 
-import libs.Crypto
 
 /**
  * Password-protects a JPA Model with SHA256-hashed passwords.

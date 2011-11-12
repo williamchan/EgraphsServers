@@ -12,6 +12,7 @@ POST    /stripe                                 stripe.post
 
 GET     ${api}/celebrities/{celebrityId}        CelebrityApiControllers.getCelebrity
 GET     ${api}/celebrities/{celebrityId}/orders CelebrityApiControllers.getOrders
+POST    ${api}/celebrities/{celebrityId}/orders/{orderId}/egraphs CelebrityOrderApiControllers.postEgraph
 
 POST    ${api}/celebrities/me/products/orders/{orderId}/egraphs     Egraphs.post
 
