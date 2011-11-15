@@ -85,12 +85,10 @@ object Account extends Saves[Account] with SavesCreatedUpdated[Account] {
   // Public methods
   //
   def findByEmail(email: String): Option[Account] = {
-    inTransaction {
-      from(Schema.accounts)(account =>
-        where(account.email === email)
+    from(Schema.accounts)(account =>
+      where(account.email === email)
         select(account)
-      ).headOption
-    }
+    ).headOption
   }
 
   //

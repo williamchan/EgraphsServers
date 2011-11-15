@@ -104,14 +104,12 @@ trait Saves[T <: {def id: Long}] {
    * @return the final object that was saved, after all transforms
    */
   final def save(toSave: T): T = {
-    inTransaction {
-      toSave.id match {
-        case n if n <= 0 =>
-          insert(toSave)
+    toSave.id match {
+      case n if n <= 0 =>
+        insert(toSave)
         
-        case _ =>
-          updateTable(toSave)
-      }
+      case _ =>
+        updateTable(toSave)
     }
   }
 
@@ -123,9 +121,7 @@ trait Saves[T <: {def id: Long}] {
    * @return the located object or None
    */
   final def findById(id: Long): Option[T] = {
-    inTransaction {
-      from(table)(row => where(row.id === id) select(row)).headOption
-    }
+    from(table)(row => where(row.id === id) select(row)).headOption
   }
 
   /**

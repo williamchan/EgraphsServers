@@ -3,7 +3,7 @@ package models
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
-import utils.{SavingEntityTests, CreatedUpdatedEntityTests, ClearsDatabaseAndValidationAfter}
+import utils.{DBTransactionPerTest, SavingEntityTests, CreatedUpdatedEntityTests, ClearsDatabaseAndValidationAfter}
 
 class AdministratorTests extends UnitFlatSpec
   with ShouldMatchers
@@ -11,6 +11,7 @@ class AdministratorTests extends UnitFlatSpec
   with SavingEntityTests[Administrator]
   with CreatedUpdatedEntityTests[Administrator]
   with ClearsDatabaseAndValidationAfter
+  with DBTransactionPerTest
 {
 
   //

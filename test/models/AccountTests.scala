@@ -6,7 +6,7 @@ import org.scalatest.matchers.ShouldMatchers
 import play.data.validation.Validation
 import play.test.UnitFlatSpec
 import scala.collection.JavaConversions._
-import utils.{SavingEntityTests, CreatedUpdatedEntityTests, ClearsDatabaseAndValidationAfter}
+import utils.{DBTransactionPerTest, SavingEntityTests, CreatedUpdatedEntityTests, ClearsDatabaseAndValidationAfter}
 
 class AccountTests extends UnitFlatSpec
   with ShouldMatchers
@@ -14,6 +14,7 @@ class AccountTests extends UnitFlatSpec
   with SavingEntityTests[Account]
   with CreatedUpdatedEntityTests[Account]
   with ClearsDatabaseAndValidationAfter
+  with DBTransactionPerTest
 {
   //
   // SavingEntityTests[Account] methods
@@ -123,7 +124,7 @@ class AccountTests extends UnitFlatSpec
   }
 
   it should "be recoverable by email" in {
-    val stored = Account(email="herp@derp.com").save
+    val stored = Account(email="herp@derp.com").save()
     Account.findByEmail(stored.email) should be (Some(stored))
   }
 
@@ -141,7 +142,7 @@ class AccountTests extends UnitFlatSpec
   }
 
   it should "fail to authenticate with an AccountPasswordNotSetError if the account wasn't protected" in {
-    Account(email="herp@derp.com").save
+    Account(email="herp@derp.com").save()
     Account.authenticate("herp@derp.com", "supersecret") match {
       case Left(correct: AccountPasswordNotSetError) => // phew
       case anythingElse => fail(anythingElse + " should have been an AccountPasswordNotSetError")
@@ -160,6 +161,6 @@ class AccountTests extends UnitFlatSpec
   }
 
   def savedAccountWithEmailAndPassword(email: String, password: String): Account = {
-    Account(email="herp@derp.com").withPassword("supersecret").right.get.save
+    Account(email="herp@derp.com").withPassword("supersecret").right.get.save()
   }
 }

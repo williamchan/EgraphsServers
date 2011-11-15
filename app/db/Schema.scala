@@ -76,10 +76,8 @@ object Schema extends org.squeryl.Schema {
   //
   /** Clears out the schema and recreates it. For God's sake don't do this in production. */
   def scrub() {
-    inTransaction {
-      drop
-      create
-    }
+    drop
+    create
   }
 
   //

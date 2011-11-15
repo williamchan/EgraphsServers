@@ -11,6 +11,7 @@ import models.Order.FindByCelebrity.Filters
 object CelebrityApiControllers extends Controller
   with RequiresAuthenticatedAccount
   with RequiresCelebrity
+  with DBTransaction
 {
 
   def getCelebrity = {
@@ -18,21 +19,16 @@ object CelebrityApiControllers extends Controller
   }
 
   def getOrders(signerActionable: Option[Boolean]) = {
-    import org.squeryl.PrimitiveTypeMode._
-
     signerActionable match {
       case Some(false) =>
         Error("signerActionable=false is not a supported filter")
 
       case _ =>
         val filters = Nil ++ (for (trueValue <- signerActionable) yield Filters.ActionableOnly)
+        val orders = Order.FindByCelebrity(celebrity.id, filters: _*)
+        val ordersAsMaps = orders.map(order => order.renderedForApi)
 
-        inTransaction {
-          val orders = Order.FindByCelebrity(celebrity.id, filters: _*)
-          val ordersAsApiMaps = orders.map(order => order.renderedForApi)
-
-          Serializer.SJSON.toJSON(ordersAsApiMaps)
-        }
+        Serializer.SJSON.toJSON(ordersAsMaps)
     }
   }
 }

@@ -56,14 +56,12 @@ class ApiTests extends FunctionalTest {
 
   @Test
   def testGetCelebrityOrders() {
-    // Set up the scenario
-    val account = willChanAccount.save()
-    val customer = Customer().save()
-    val celebrity = Celebrity().save()
-    account.copy(celebrityId=Some(celebrity.id)).save()
-    val product = celebrity.newProduct.save()
-    val firstOrder = customer.order(product).save()
-    val secondOrder = customer.order(product).save()
+    runScenarios(
+      "Will-Chan-is-a-celebrity",
+      "Will-has-two-products",
+      "Erem-is-a-customer",
+      "Erem-buys-Wills-two-products-twice-each"
+    )
 
     // Assemble the request
     val req = willChanRequest
@@ -78,8 +76,8 @@ class ApiTests extends FunctionalTest {
     val secondOrderJson = json(1)
 
     // Just check the ids -- the rest is covered by unit tests
-    assertEquals(BigDecimal(firstOrder.id), firstOrderJson("id"))
-    assertEquals(BigDecimal(secondOrder.id), secondOrderJson("id"))
+    assertEquals(BigDecimal(1L), firstOrderJson("id"))
+    assertEquals(BigDecimal(2L), secondOrderJson("id"))
   }
 
   @Test
@@ -107,6 +105,23 @@ class ApiTests extends FunctionalTest {
 
     val json = Serializer.SJSON.in[Map[String, Any]](getContent(response))
     assertEquals(BigDecimal(1), json("id"))
+  }
+
+  @Test
+  def testSucceedingRequestCommitsTransaction() {
+    assertIsOk(GET("/test/request-transaction/without-error"))
+    assertEquals("Yep", getContent(GET("/test/request-transaction/is-stored")))
+  }
+
+  @Test
+  def testFailingTransactionDoesntCommit() {
+    try {
+      GET("/test/request-transaction/with-error")
+    } catch {
+      case _ => 1 // This failure was expected
+    }
+
+    assertEquals("Nope", getContent(GET("/test/request-transaction/is-stored")))
   }
 
   def runScenarios(name: String*) {

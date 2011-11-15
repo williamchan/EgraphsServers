@@ -3,8 +3,8 @@ package models
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
-import utils.{ClearsDatabaseAndValidationAfter, CreatedUpdatedEntityTests, SavingEntityTests}
 import libs.Time
+import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationAfter, CreatedUpdatedEntityTests, SavingEntityTests}
 
 class CelebrityTests extends UnitFlatSpec
   with ShouldMatchers
@@ -12,6 +12,7 @@ class CelebrityTests extends UnitFlatSpec
   with SavingEntityTests[Celebrity]
   with CreatedUpdatedEntityTests[Celebrity]
   with ClearsDatabaseAndValidationAfter
+  with DBTransactionPerTest
 {
 
   //

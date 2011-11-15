@@ -31,16 +31,13 @@ trait RequiresCelebrityOrder { this: Controller with RequiresAuthenticatedAccoun
 
       case Some(orderIdString) if orderIdString.matches("\\d+") =>
         val orderId = orderIdString.toLong
-        inTransaction {
-          val orderIdFilter = Order.FindByCelebrity.Filters.OrderId
-          Order.FindByCelebrity(celebrity.id, Filters.OrderId(orderId)).headOption match {
-            case None =>
-              NotFound("The celebrity has no such order")
+        Order.FindByCelebrity(celebrity.id, Filters.OrderId(orderId)).headOption match {
+          case None =>
+            NotFound("The celebrity has no such order")
 
-            case Some(order) =>
-              _order.set(order)
-              Continue
-          }
+          case Some(order) =>
+            _order.set(order)
+            Continue
         }
 
       case _ =>

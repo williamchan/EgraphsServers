@@ -1,15 +1,12 @@
 package controllers
 
-import play.test.Fixtures
 import play.mvc.Controller
-import scenario.{Scenario}
-import play.mvc.results.{Result, ScalaAction}
-import play.Play
+import scenario.Scenario
 
 /**
  * Controller for all scenarios
  */
-object ScenarioController extends Controller {
+object ScenarioController extends Controller with DBTransaction {
   /**
    * Lazy evaluator for the Scenarios library, which should live with the test
    * code.
