@@ -5,6 +5,7 @@ import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 import utils.{ClearsDatabaseAndValidationAfter, CreatedUpdatedEntityTests, SavingEntityTests}
 import libs.Time
+import org.squeryl.PrimitiveTypeMode._
 
 class OrderTests extends UnitFlatSpec
   with ShouldMatchers
@@ -82,48 +83,83 @@ class OrderTests extends UnitFlatSpec
     rendered("created") should be (Time.toApiFormat(order.created))
     rendered("updated") should be (Time.toApiFormat(order.updated))
   }
+  
+  "FindByCelebrity" should "find all of a Celebrity's orders by default" in {
 
-  it should "herp" in {
-    import org.squeryl.PrimitiveTypeMode._
     inTransaction {
-      Order.findByCelebrity(1L)
-    }
-  }
+      val (will, recipient, celebrity, product) = newOrderStack
 
-  it should "find all of a Celebrity's orders" in {
-    import org.squeryl.PrimitiveTypeMode._
-    inTransaction {
-      val (will, _, celebrity, product) = newOrderStack
-      val (_, _ , otherCelebrity, otherCelebrityProduct) = newOrderStack
-
-      val otherProduct = celebrity.newProduct.save()
-      val orderToFulfill = will.order(product).save()
-      val egraph = orderToFulfill.newEgraph("herp".getBytes, "derp".getBytes).withState(Verified).save()
-
-      val fulfilledOrder = orderToFulfill.copy(verifiedEgraphId = Some(egraph.id)).save()
-      val productOrder = will.order(product).save()
-      val otherProductOrder = will.order(otherProduct).save()
-      val otherCelebrityProductOrder = will.order(otherCelebrityProduct).save()
-
+      val (firstOrder, secondOrder, thirdOrder) = (
+        will.order(product).save(),
+        will.order(product).save(),
+        will.order(product).save()
+      )
 
       // Orders of celebrity's products
       val allCelebOrders = Order.findByCelebrity(celebrity.id)
       allCelebOrders.toSeq should have length (3)
-      allCelebOrders.toSet should be (Set(fulfilledOrder, productOrder, otherProductOrder))
+      allCelebOrders.toSet should be (Set(firstOrder, secondOrder, thirdOrder))
+    }
+  }
 
-      // Order of celebrity's unfulfilled products
-      val unfulfilledCelebOrders = Order.findByCelebrity(celebrity.id, UnfulfilledFilter)
-      unfulfilledCelebOrders.toSeq should have length (2)
-      unfulfilledCelebOrders.toSet should be (Set(productOrder, otherProductOrder))
+  it should "not find any other Celebrity's orders" in {
+    inTransaction {
+      val (will, _, celebrity, product) = newOrderStack
+      val (_, _ , _, otherCelebrityProduct) = newOrderStack
 
-      // A particular orderId of a celebrity's
-      val firstProductOrder = Order.findByCelebrity(celebrity.id, OrderIdFilter(productOrder.id))
-      firstProductOrder.toSeq should have length(1)
-      firstProductOrder.toSeq.apply(0) should be (productOrder)
+      val celebOrder = will.order(product).save()
+      val otherCelebOrder = will.order(otherCelebrityProduct).save()
 
-      // Querying a celebrity's order for an orderId belonging to another celeb should return none
-      val orderOfOtherCelebrity = Order.findByCelebrity(otherCelebrity.id, OrderIdFilter(productOrder.id))
-      orderOfOtherCelebrity.toSeq should have length (0)
+      val celebOrders = Order.findByCelebrity(celebrity.id)
+
+      celebOrders.toSeq should have length(1)
+      celebOrders.head should be (celebOrder)
+    }
+  }
+
+  it should "only find a particular Order when composed with OrderIdFilter" in {
+    inTransaction {
+      val (will, _, celebrity, product) = newOrderStack
+
+      val firstOrder = will.order(product).save()
+      val secondOrder = will.order(product).save()
+
+      val found = Order.findByCelebrity(celebrity.id, OrderIdFilter(firstOrder.id))
+
+      found.toSeq.length should be (1)
+      found.head should be (firstOrder)
+    }
+  }
+
+  it should "exclude orders that are Verified or AwaitingVerification when composed with ActionableFilter" in {
+    inTransaction {
+      val (will, _, celebrity, product) = newOrderStack
+
+      // Make an order for each Egraph State, and save an Egraph in that state
+      val orders = Egraph.states.map { case (_, state) =>
+        val order = will.order(product).save()
+        val egraph = order
+          .newEgraph("herp".getBytes, "derp".getBytes)
+          .withState(state)
+          .save()
+
+        (state, order)
+      }
+
+      // Also order one without an eGraph
+      val orderWithoutEgraph = will.order(product).save()
+
+      // Perform the test
+      val found = Order.findByCelebrity(celebrity.id, ActionableFilter)
+
+      found.toSeq.length should be (4)
+      found.toSet should be (Set(
+        orderWithoutEgraph,
+        orders(RejectedVocals),
+        orders(RejectedHandwriting),
+        orders(RejectedPersonalAudit)
+      ))
+
     }
   }
 

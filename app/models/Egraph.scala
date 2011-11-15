@@ -63,11 +63,6 @@ case class Egraph(
 }
 
 object Egraph extends Saves[Egraph] with SavesCreatedUpdated[Egraph] {
-  /** All possible states an Egraph can enter */
-
-  def getKey(state: EgraphState): String = {
-    state.value
-  }
 
   /**
    * Map of Egraph state strings to the actual EgraphStates

@@ -69,8 +69,7 @@ class ApiTests extends FunctionalTest {
     val req = willChanRequest
 
     // Execute the request
-    val response = GET(req, apiRoot+"/celebrities/me/orders?fulfilled=false")
-    println(getContent(response))
+    val response = GET(req, apiRoot+"/celebrities/me/orders?signerActionable=true")
     assertIsOk(response)
 
     val json = Serializer.SJSON.in[List[Map[String, Any]]](getContent(response))
@@ -92,7 +91,7 @@ class ApiTests extends FunctionalTest {
       "Erem-buys-Wills-two-products-twice-each"
     )
 
-    val ordersResponse = GET(willChanRequest, apiRoot+"/celebrities/me/orders?fulfilled=false")
+    val ordersResponse = GET(willChanRequest, apiRoot+"/celebrities/me/orders?signerActionable=true")
     val ordersList = Serializer.SJSON.in[List[Map[String, Any]]](getContent(ordersResponse))
 
     val firstOrderMap = ordersList.head

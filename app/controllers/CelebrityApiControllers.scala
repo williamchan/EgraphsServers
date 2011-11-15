@@ -2,7 +2,7 @@ package controllers
 
 import play.mvc.Controller
 import sjson.json.Serializer
-import models.{FindByCelebrityFilter, UnfulfilledFilter, Order}
+import models.{ActionableFilter, Order}
 
 /**
  * Controllers that handle direct API requests for celebrity resources.
@@ -16,17 +16,22 @@ object CelebrityApiControllers extends Controller
     Serializer.SJSON.toJSON(celebrity.renderedForApi)
   }
 
-  def getOrders(fulfilled: Boolean = false) = {
+  def getOrders(signerActionable: Option[Boolean]) = {
     import org.squeryl.PrimitiveTypeMode._
 
-    val filters = List.empty[FindByCelebrityFilter] ++
-      (if (fulfilled) List.empty else List(UnfulfilledFilter))
+    signerActionable match {
+      case Some(false) =>
+        Error("signerActionable=false is not a supported filter")
 
-    inTransaction {
-      val orders = Order.findByCelebrity(celebrity.id, filters: _*)
-      val ordersAsApiMaps = orders.map(order => order.renderedForApi)
+      case _ =>
+        val filters = Nil ++ (for (trueValue <- signerActionable) yield ActionableFilter)
 
-      Serializer.SJSON.toJSON(ordersAsApiMaps)
+        inTransaction {
+          val orders = Order.findByCelebrity(celebrity.id, filters: _*)
+          val ordersAsApiMaps = orders.map(order => order.renderedForApi)
+
+          Serializer.SJSON.toJSON(ordersAsApiMaps)
+        }
     }
   }
 }

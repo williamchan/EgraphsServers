@@ -30,7 +30,6 @@ trait RequiresCelebrity { this: Controller with RequiresAuthenticatedAccount =>
         Error("Celebrity ID was required but not provided")
 
       case Some(celebrityId) if celebrityId == "me" =>
-        println("account is --"+account)
         account.celebrityId match {
           case None =>
             Error("This request requires a celebrity account.")
@@ -40,7 +39,7 @@ trait RequiresCelebrity { this: Controller with RequiresAuthenticatedAccount =>
             Continue
         }
 
-      case celebrityId =>
+      case Some(celebrityId) =>
         Error(
           "Unexpected request for celebrityId \""+celebrityId+"\". Only \"me\" is currently supported."
         )

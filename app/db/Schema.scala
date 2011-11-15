@@ -61,14 +61,15 @@ object Schema extends org.squeryl.Schema {
   // Egraphs
   //
   val egraphs = table[Egraph]
+  on(egraphs)(egraph =>
+    declare(
+      columns(egraph.orderId, egraph.stateValue) are (indexed)
+    )
+  )
 
   val orderToEgraphs = oneToManyRelation(orders, egraphs)
     .via((order, egraph) => order.id === egraph.orderId)
   orderToEgraphs.foreignKeyDeclaration.constrainReference(onDelete setNull)
-
-  val verifiedEgraphToOrder = oneToManyRelation(egraphs, orders)
-    .via((egraph, order) => order.verifiedEgraphId === egraph.id)
-  verifiedEgraphToOrder.foreignKeyDeclaration.constrainReference(onDelete setNull)
 
   //
   // Public methods

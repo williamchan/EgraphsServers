@@ -14,7 +14,6 @@ case class Order(
   productId: Long = 0,
   buyerId: Long = 0,
   recipientId: Long = 0,
-  verifiedEgraphId: Option[Long] = None,
   amountPaidInCents: Int = 0,
   messageToCelebrity: Option[String] = None,
   requestedMessage: Option[String] = None,
@@ -121,7 +120,6 @@ object Order extends Saves[Order] with SavesCreatedUpdated[Order] {
       theOld.buyerId := theNew.buyerId,
       theOld.amountPaidInCents := theNew.amountPaidInCents,
       theOld.recipientId := theNew.recipientId,
-      theOld.verifiedEgraphId := theNew.verifiedEgraphId,
       theOld.messageToCelebrity := theNew.messageToCelebrity,
       theOld.requestedMessage := theNew.requestedMessage,
       theOld.created := theNew.created,
@@ -143,15 +141,25 @@ object Order extends Saves[Order] with SavesCreatedUpdated[Order] {
  * Order.findByCelebrity function.
  */
 trait FindByCelebrityFilter {
+  /**
+   * Returns the logical filter to apply upon the join between Celebrity/Product/Order
+   */
   def test(celebrity: Celebrity, product: Product, order: Order): LogicalBoolean
 }
 
 /**
- * Returns only orders that haven't been successfully fulfilled
+ * Returns only orders that are actionable by the celebrity that owns them.
+ * In model terms, these are these are any Orders that don't have an Egraph that
+ * is either Verified or AwaitingVerification.
  */
-object UnfulfilledFilter extends FindByCelebrityFilter {
+object ActionableFilter extends FindByCelebrityFilter {
   override def test(celebrity: Celebrity, product: Product, order: Order) = {
-    (order.verifiedEgraphId isNull)
+    notExists(
+      from(Schema.egraphs)(egraph =>
+        where((egraph.orderId === order.id) and (egraph.stateValue in Seq(Verified.value, AwaitingVerification.value)))
+        select(egraph.id)
+      )
+    )
   }
 }
 

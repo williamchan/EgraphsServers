@@ -28,7 +28,7 @@ object Adapter {
     def itContains(test: String): Boolean = dbString.contains(test)
 
     dbString match {
-      case _ if itContains("mem") => h2
+      case _ if itContains("mem") || itContains("fs") => h2
       case _ if itContains("mysql") => mysql
       case _ if itContains("postgres") => postgres
       case _ => throw new IllegalArgumentException(dbString)
