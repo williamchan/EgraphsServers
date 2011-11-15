@@ -2,9 +2,9 @@ package models
 
 import java.security.SecureRandom
 import play.libs.Codec
-import libs.Crypto
 import java.math.BigInteger
 import java.util.Date
+import libs.Crypto
 
 case class Password (hash: String, salt: String) {
   /**

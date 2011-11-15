@@ -1,6 +1,5 @@
 package models
 
-import models._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.data.validation.Validation

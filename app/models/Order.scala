@@ -4,7 +4,7 @@ import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
 import db.{KeyedCaseClass, Schema, Saves}
 import libs.{Serialization, Time}
-import org.squeryl.dsl.ast.{LogicalBoolean, PostfixOperatorNode, BinaryOperatorNodeLogicalBoolean, EqualityExpression}
+import org.squeryl.dsl.ast.LogicalBoolean
 
 /**
  * Persistent entity representing the Orders made upon Products of our service

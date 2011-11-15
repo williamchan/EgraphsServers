@@ -1,7 +1,7 @@
 package controllers
 
 import play.mvc.Controller
-import models.{Account, Celebrity}
+import models.Account
 
 /**
  * Test controller used in ApiTests to verify that Play does, in fact,

@@ -1,7 +1,6 @@
 package controllers
 
 import play.mvc.Controller
-import org.squeryl.PrimitiveTypeMode._
 import play.libs.Codec
 import sjson.json.Serializer
 

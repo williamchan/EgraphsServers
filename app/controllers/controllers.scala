@@ -3,7 +3,6 @@ package controllers
 import play.mvc._
 import com.stripe.model.Charge
 import play.data.validation.Required
-import sun.misc.BASE64Decoder
 import play.libs.Codec
 
 object Application extends Controller {

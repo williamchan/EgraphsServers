@@ -22,6 +22,7 @@ class BootStrap extends Job {
     // creation SQL.
     if (Play.id == "test") {
       import org.squeryl.PrimitiveTypeMode._
+      SessionFactory.newSession.bindToCurrentThread
       inTransaction {
         // db.Schema.printDdl((ddl) => println(ddl))
         db.Schema.scrub()

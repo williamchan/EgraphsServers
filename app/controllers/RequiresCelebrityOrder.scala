@@ -3,7 +3,6 @@ package controllers
 import play.mvc.{Before, Controller}
 import models.Order
 import Order.FindByCelebrity.Filters
-import org.squeryl.PrimitiveTypeMode._
 
 /**
  * Provides a high-priority @Before interception that requires the request

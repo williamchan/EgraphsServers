@@ -1,7 +1,7 @@
 package controllers
 
-import org.squeryl.{Session, SessionFactory}
-import play.mvc.{Finally, Before}
+import org.squeryl.SessionFactory
+import play.mvc.Before
 
 /**
  * Ensures that a database transaction is available for use during any request.
