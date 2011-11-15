@@ -2,6 +2,7 @@ package utils
 
 import org.scalatest.{Suite, BeforeAndAfterEach}
 import org.squeryl.SessionFactory
+import db.DBSession
 
 /**
  * Mix in to a test suite class to ensure that a Squeryl database transaction
@@ -10,7 +11,12 @@ import org.squeryl.SessionFactory
 trait DBTransactionPerTest extends BeforeAndAfterEach { this: Suite =>
   override def beforeEach() {
     super.beforeEach()
-    SessionFactory.newSession.bindToCurrentThread
+    DBSession.init()
+  }
+
+  override def afterEach() {
+    DBSession.rollback()
+    super.afterEach()
   }
 
 }

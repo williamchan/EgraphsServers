@@ -4,6 +4,7 @@ import play.jobs._
 import com.stripe.Stripe
 import org.squeryl.{Session, SessionFactory}
 import play.Play
+import db.DBSession
 
 @OnApplicationStart
 class BootStrap extends Job {
@@ -22,7 +23,7 @@ class BootStrap extends Job {
     // creation SQL.
     if (Play.id == "test") {
       import org.squeryl.PrimitiveTypeMode._
-      SessionFactory.newSession.bindToCurrentThread
+      DBSession.init()
       inTransaction {
         // db.Schema.printDdl((ddl) => println(ddl))
         db.Schema.scrub()
