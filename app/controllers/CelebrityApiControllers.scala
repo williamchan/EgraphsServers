@@ -2,7 +2,8 @@ package controllers
 
 import play.mvc.Controller
 import sjson.json.Serializer
-import models.{ActionableFilter, Order}
+import models.Order
+import models.Order.FindByCelebrity.Filters
 
 /**
  * Controllers that handle direct API requests for celebrity resources.
@@ -24,10 +25,10 @@ object CelebrityApiControllers extends Controller
         Error("signerActionable=false is not a supported filter")
 
       case _ =>
-        val filters = Nil ++ (for (trueValue <- signerActionable) yield ActionableFilter)
+        val filters = Nil ++ (for (trueValue <- signerActionable) yield Filters.ActionableOnly)
 
         inTransaction {
-          val orders = Order.findByCelebrity(celebrity.id, filters: _*)
+          val orders = Order.FindByCelebrity(celebrity.id, filters: _*)
           val ordersAsApiMaps = orders.map(order => order.renderedForApi)
 
           Serializer.SJSON.toJSON(ordersAsApiMaps)

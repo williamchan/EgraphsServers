@@ -1,7 +1,8 @@
 package controllers
 
 import play.mvc.{Before, Controller}
-import models.{OrderIdFilter, Order}
+import models.Order
+import Order.FindByCelebrity.Filters
 import org.squeryl.PrimitiveTypeMode._
 
 /**
@@ -31,7 +32,8 @@ trait RequiresCelebrityOrder { this: Controller with RequiresAuthenticatedAccoun
       case Some(orderIdString) if orderIdString.matches("\\d+") =>
         val orderId = orderIdString.toLong
         inTransaction {
-          Order.findByCelebrity(celebrity.id, OrderIdFilter(orderId)).headOption match {
+          val orderIdFilter = Order.FindByCelebrity.Filters.OrderId
+          Order.FindByCelebrity(celebrity.id, Filters.OrderId(orderId)).headOption match {
             case None =>
               NotFound("The celebrity has no such order")
 

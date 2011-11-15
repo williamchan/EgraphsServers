@@ -6,6 +6,7 @@ import play.test.UnitFlatSpec
 import utils.{ClearsDatabaseAndValidationAfter, CreatedUpdatedEntityTests, SavingEntityTests}
 import libs.Time
 import org.squeryl.PrimitiveTypeMode._
+import Order.FindByCelebrity.Filters
 
 class OrderTests extends UnitFlatSpec
   with ShouldMatchers
@@ -96,7 +97,7 @@ class OrderTests extends UnitFlatSpec
       )
 
       // Orders of celebrity's products
-      val allCelebOrders = Order.findByCelebrity(celebrity.id)
+      val allCelebOrders = Order.FindByCelebrity(celebrity.id)
       allCelebOrders.toSeq should have length (3)
       allCelebOrders.toSet should be (Set(firstOrder, secondOrder, thirdOrder))
     }
@@ -110,7 +111,7 @@ class OrderTests extends UnitFlatSpec
       val celebOrder = will.order(product).save()
       val otherCelebOrder = will.order(otherCelebrityProduct).save()
 
-      val celebOrders = Order.findByCelebrity(celebrity.id)
+      val celebOrders = Order.FindByCelebrity(celebrity.id)
 
       celebOrders.toSeq should have length(1)
       celebOrders.head should be (celebOrder)
@@ -124,7 +125,7 @@ class OrderTests extends UnitFlatSpec
       val firstOrder = will.order(product).save()
       val secondOrder = will.order(product).save()
 
-      val found = Order.findByCelebrity(celebrity.id, OrderIdFilter(firstOrder.id))
+      val found = Order.FindByCelebrity(celebrity.id, Filters.OrderId(firstOrder.id))
 
       found.toSeq.length should be (1)
       found.head should be (firstOrder)
@@ -150,7 +151,7 @@ class OrderTests extends UnitFlatSpec
       val orderWithoutEgraph = will.order(product).save()
 
       // Perform the test
-      val found = Order.findByCelebrity(celebrity.id, ActionableFilter)
+      val found = Order.FindByCelebrity(celebrity.id, Filters.ActionableOnly)
 
       found.toSeq.length should be (4)
       found.toSet should be (Set(

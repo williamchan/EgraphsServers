@@ -74,39 +74,93 @@ object Order extends Saves[Order] with SavesCreatedUpdated[Order] {
   //
   // Public Methods
   //
-  private def reduceFilters(
-    filters: Iterable[FindByCelebrityFilter],
-    celebrity: Celebrity,
-    product: Product,
-    order: Order): LogicalBoolean =
-  {
-    filters.headOption match {
-      // Just return the trivial comparison if there were no filters
-      case None =>
-        (1 === 1)
+  /**
+   * Callable object that finds a list of Orders based on the id of the Celebrity
+   * who owns the Product that was purchased.
+   */
+  object FindByCelebrity {
+    def apply(celebrityId: Long, filters: Filter*):Iterable[Order] = {
+      import Schema.{celebrities, products, orders}
 
-      // Otherwise reduce the collection of filters against the first
-      case Some(firstFilter) =>
-        filters.tail.foldLeft(firstFilter.test(celebrity, product, order))(
-          (compositeFilter, nextFilter) =>
-            (nextFilter.test(celebrity, product, order) and compositeFilter)
+      from(celebrities, products, orders)((celebrity, product, order) =>
+        where(
+          celebrity.id === celebrityId and
+          celebrity.id === product.celebrityId and
+          product.id === order.productId and
+          reduceFilters(filters, celebrity, product, order)
         )
-    }
-  }
-
-  def findByCelebrity(celebrityId: Long, filters: FindByCelebrityFilter*):Iterable[Order] = {
-    import Schema.{celebrities, products, orders}
-
-    from(celebrities, products, orders)((celebrity, product, order) =>
-      where(
-        celebrity.id === celebrityId and
-        celebrity.id === product.celebrityId and
-        product.id === order.productId and
-        reduceFilters(filters, celebrity, product, order)
+        select(order)
+        orderBy(order.created asc)
       )
-      select(order)
-      orderBy(order.created asc)
-    )
+    }
+
+    /**
+     * Base definition of an object that can apply a Squeryl filter against the join
+     * between Schema.celebrities, Schema.products, Schema.orders that occurs in the
+     * Order.FindByCelebrity function.
+     */
+    sealed trait Filter {
+      /**
+       * Returns the logical filter to apply upon the join between Celebrity/Product/Order
+       */
+      def test(celebrity: Celebrity, product: Product, order: Order): LogicalBoolean
+    }
+
+    /**
+     * Set of Filters you can compose with your query to FindByCelebrity
+     */
+    object Filters {
+
+      /**
+       * Returns only orders that are actionable by the celebrity that owns them when
+       * composed with FindByCelebrity.
+       * 
+       * In model terms, these are these are any Orders that don't have an Egraph that
+       * is either Verified or AwaitingVerification.
+       */
+      object ActionableOnly extends Filter {
+        override def test(celebrity: Celebrity, product: Product, order: Order) = {
+          notExists(
+            from(Schema.egraphs)(egraph =>
+              where((egraph.orderId === order.id) and (egraph.stateValue in Seq(Verified.value, AwaitingVerification.value)))
+              select(egraph.id)
+            )
+          )
+        }
+      }
+
+      /**
+       * Returns only orders with the given orderId when composed with FindByCelebrity
+       */
+      case class OrderId(id: Long) extends Filter {
+        override def test(celebrity: Celebrity, product: Product, order: Order) = {
+          (order.id === id)
+        }
+      }
+    }
+
+    //
+    // Private methods (FindByCelebrity)
+    //
+    private def reduceFilters(
+      filters: Iterable[Filter],
+      celebrity: Celebrity,
+      product: Product,
+      order: Order): LogicalBoolean =
+    {
+      filters.headOption match {
+        // Just return the trivial comparison if there were no filters
+        case None =>
+          (1 === 1)
+
+        // Otherwise reduce the collection of filters against the first
+        case Some(firstFilter) =>
+          filters.tail.foldLeft(firstFilter.test(celebrity, product, order))(
+            (compositeFilter, nextFilter) =>
+              (nextFilter.test(celebrity, product, order) and compositeFilter)
+          )
+      }
+    }
   }
 
   //
@@ -132,42 +186,5 @@ object Order extends Saves[Order] with SavesCreatedUpdated[Order] {
   //
   override def withCreatedUpdated(toUpdate: Order, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)
-  }
-}
-
-/**
- * Base definition of an object that can apply a Squeryl filter against the join
- * between Schema.celebrities, Schema.products, Schema.orders that occurs in the
- * Order.findByCelebrity function.
- */
-trait FindByCelebrityFilter {
-  /**
-   * Returns the logical filter to apply upon the join between Celebrity/Product/Order
-   */
-  def test(celebrity: Celebrity, product: Product, order: Order): LogicalBoolean
-}
-
-/**
- * Returns only orders that are actionable by the celebrity that owns them.
- * In model terms, these are these are any Orders that don't have an Egraph that
- * is either Verified or AwaitingVerification.
- */
-object ActionableFilter extends FindByCelebrityFilter {
-  override def test(celebrity: Celebrity, product: Product, order: Order) = {
-    notExists(
-      from(Schema.egraphs)(egraph =>
-        where((egraph.orderId === order.id) and (egraph.stateValue in Seq(Verified.value, AwaitingVerification.value)))
-        select(egraph.id)
-      )
-    )
-  }
-}
-
-/**
- * Returns only orders with the given orderId.
- */
-case class OrderIdFilter(id: Long) extends FindByCelebrityFilter {
-  override def test(celebrity: Celebrity, product: Product, order: Order) = {
-    (order.id === id)
   }
 }
