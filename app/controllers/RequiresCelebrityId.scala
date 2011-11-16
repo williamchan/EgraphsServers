@@ -10,7 +10,7 @@ import play.mvc.{Before, Controller}
  *
  * Mix in to any Controller that already RequiresAuthenticatedAccount
  */
-trait RequiresCelebrity { this: Controller with RequiresAuthenticatedAccount =>
+trait RequiresCelebrityId { this: Controller with RequiresAuthenticatedAccount =>
   //
   // Public methods
   //

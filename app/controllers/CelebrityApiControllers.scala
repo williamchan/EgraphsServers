@@ -10,7 +10,7 @@ import models.Order.FindByCelebrity.Filters
  */
 object CelebrityApiControllers extends Controller
   with RequiresAuthenticatedAccount
-  with RequiresCelebrity
+  with RequiresCelebrityId
   with DBTransaction
 {
 

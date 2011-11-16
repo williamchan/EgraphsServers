@@ -10,7 +10,7 @@ import Order.FindByCelebrity.Filters
  *
  * Mix in to any Controller that already RequiresAuthenticatedAccount
  */
-trait RequiresCelebrityOrder { this: Controller with RequiresAuthenticatedAccount with RequiresCelebrity =>
+trait RequiresCelebrityOrderId { this: Controller with RequiresAuthenticatedAccount with RequiresCelebrityId =>
   //
   // Public methods
   //

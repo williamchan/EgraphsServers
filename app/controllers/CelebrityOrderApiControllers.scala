@@ -9,8 +9,8 @@ import sjson.json.Serializer
  */
 object CelebrityOrderApiControllers extends Controller
   with RequiresAuthenticatedAccount
-  with RequiresCelebrity
-  with RequiresCelebrityOrder
+  with RequiresCelebrityId
+  with RequiresCelebrityOrderId
   with DBTransaction
 {
   
