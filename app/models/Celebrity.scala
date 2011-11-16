@@ -60,6 +60,12 @@ object Celebrity extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {
   //
   // Public Methods
   //
+  def findByName(name: String): Option[Celebrity] = {
+    from(Schema.celebrities)(celebrity =>
+      where(celebrity.popularName === Some(name))
+      select(celebrity)
+    ).headOption
+  }
 
   //
   // Saves[Celebrity] methods

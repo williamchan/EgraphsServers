@@ -17,6 +17,11 @@ object Schema extends org.squeryl.Schema {
   // Celebrities
   //
   val celebrities = table[Celebrity]
+  on(celebrities)(celebrity =>
+    declare(
+      celebrity.popularName is (indexed)
+    )
+  )
 
   //
   // Administrators
@@ -63,7 +68,7 @@ object Schema extends org.squeryl.Schema {
   val egraphs = table[Egraph]
   on(egraphs)(egraph =>
     declare(
-      columns(egraph.orderId, egraph.stateValue) are (indexed)
+      columns(egraph.orderId, egraph.stateValue) are (unique)
     )
   )
 
