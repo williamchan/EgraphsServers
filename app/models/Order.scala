@@ -39,11 +39,11 @@ case class Order(
 
     val requiredFields = Map(
       "id" -> id,
-      "product.id" -> productId,
-      "buyer.id" -> buyer.id,
-      "buyer.name" -> buyer.name,
-      "recipient.id" -> recipient.id,
-      "recipient.name" -> recipient.name,
+      "productId" -> productId,
+      "buyerId" -> buyer.id,
+      "buyerName" -> buyer.name,
+      "recipientId" -> recipient.id,
+      "recipientName" -> recipient.name,
       "amountPaidInCents" -> amountPaidInCents
     )
 
