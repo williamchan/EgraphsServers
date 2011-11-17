@@ -27,6 +27,9 @@ class BootStrap extends Job {
 
 }
 
+/**
+ * Bootstrap code for when we're running in test mode
+ */
 private object TestModeBootstrap {
   def run() {
     createNewSchema()

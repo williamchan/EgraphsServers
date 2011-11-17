@@ -20,11 +20,11 @@ class BlobsTests extends UnitFlatSpec
     restored.get.toSeq should be (blob.toSeq)
   }
 
-  "Blobs" should "not find data that don't exist" in {
+  it should "not find data that don't exist" in {
     Blobs.get("herp") should be (None)
   }
 
-  "Blobs" should "have the most recent version of the blob" in {
+  it should "have the most recent version of the blob" in {
     val key = "myKey"
 
     Blobs.put(key, "herp".getBytes)
@@ -33,7 +33,7 @@ class BlobsTests extends UnitFlatSpec
     Blobs.get(key).get.toSeq should be ("derp".getBytes.toSeq)
   }
 
-  "Blobs" should "delete properly" in {
+  it should "delete properly" in {
     val key = "myKey"
 
     Blobs.put(key, "herp".getBytes)
