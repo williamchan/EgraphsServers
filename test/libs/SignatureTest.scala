@@ -117,4 +117,5 @@ with ShouldMatchers {
     g.drawImage(penTipImage, x, y, null)
     //    g.fillOval(x, y, pointSize, pointSize)
   }
+  
 }
