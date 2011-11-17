@@ -1,20 +1,59 @@
 package libs
 
-import play.Play
 import org.jclouds.blobstore.{BlobStoreContextFactory, BlobStoreContext, BlobStore}
 import java.util.Properties
 import org.jclouds.filesystem.reference.FilesystemConstants
-import Play.configuration
+import play.Play.configuration
 
 object Blobs {
-  
+  def get(key: String): Option[Array[Byte]] = {
+    blobStore.getBlob(blobstoreNamespace, key) match {
+      case null =>
+        None
 
-  def blobstore: BlobStore = {
+      case blob =>
+        val blobStream = blob.getPayload.getInput
+        val blobIntIterator = Iterator.continually(blobStream.read).takeWhile(nextByte => nextByte != -1)
+
+        Some(blobIntIterator.map(theInt => theInt.toByte).toArray)
+    }
+  }
+
+  def put(key: String, bytes: Array[Byte]) {
+    val blob = blobStore.blobBuilder(key).payload(bytes).build()
+    blobStore.putBlob(blobstoreNamespace, blob)
+  }
+
+  def delete(key: String) {
+    blobStore.removeBlob(blobstoreNamespace, key)
+  }
+
+  def scrub() {
+    configuration.get("blobstore.allowscrub") match {
+      case "yes" =>
+        blobStore.clearContainer(blobstoreNamespace)
+
+      case _ =>
+        throw new IllegalStateException(
+          """I'm not going to scrub the blobstore unless "blobstore.allowscrub"
+          is set to "yes" in application.conf"""
+        )
+    }
+  }
+
+  def blobStore: BlobStore = {
     context.getBlobStore
   }
 
-  def context: BlobStoreContext = {
+  def init() = {
     checkAvailable()
+
+    if (!blobStore.containerExists(blobstoreNamespace)) {
+      blobStore.createContainerInLocation(null, blobstoreNamespace)
+    }
+  }
+
+  def context: BlobStoreContext = {
 
     blobstoreType match {
       case "s3" =>
@@ -22,6 +61,11 @@ object Blobs {
 
       case "filesystem" =>
         fileSystemContext
+
+      case unknownType =>
+        throw new IllegalStateException(
+          "application.conf: \"blobstore\" value \"" + unknownType + "\" not supported."
+        )
     }
   }
 
@@ -63,7 +107,7 @@ object Blobs {
   }
 
   private val blobstoreType = configuration.getProperty("blobstore")
-  private val blobstoreNamespace = configuration.getProperty("blobstore.container")
+  private val blobstoreNamespace = configuration.getProperty("blobstore.namespace")
   private val s3id = configuration.getProperty("s3.id")
   private val s3secret = configuration.getProperty("s3.secret")
 
@@ -73,8 +117,10 @@ object Blobs {
 
   private def fileSystemContext: BlobStoreContext = {
     val properties = new Properties
-    properties.setProperty(FilesystemConstants.PROPERTY_BASEDIR, "./tmp/blobstore")
 
+    properties.setProperty(FilesystemConstants.PROPERTY_BASEDIR, "./public/blobstore")
+    properties.setProperty("jclouds.credential", "herp")
+    
     new BlobStoreContextFactory().createContext("filesystem", properties)
   }
 }

@@ -3,6 +3,8 @@ package db
 import org.squeryl.PrimitiveTypeMode._
 import org.squeryl.{KeyedEntity, Table}
 import models._
+import java.lang.IllegalStateException
+import play.Play
 
 /**
  * Egraphs Database schema
@@ -81,8 +83,17 @@ object Schema extends org.squeryl.Schema {
   //
   /** Clears out the schema and recreates it. For God's sake don't do this in production. */
   def scrub() {
-    drop
-    create
+    Play.configuration.get("db.allowscrub") match {
+      case "yes" =>
+        drop
+        create
+
+      case _ =>
+        throw new IllegalStateException(
+          """I'm just not going to scrub the DB unless "db.allowscrub" is
+          set to "yes" in application.conf. Sorry if you have a problem with that."""
+        )
+    }
   }
 
   //
