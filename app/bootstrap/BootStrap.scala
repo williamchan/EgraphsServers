@@ -5,6 +5,7 @@ import com.stripe.Stripe
 import org.squeryl.{Session, SessionFactory}
 import play.Play
 import db.DBSession
+import libs.Blobs
 
 @OnApplicationStart
 class BootStrap extends Job {
@@ -12,6 +13,7 @@ class BootStrap extends Job {
   override def doJob() {
     Stripe.apiKey = "pvESi1GjhD9e8RFQQPfeH8mHZ2GIyqQV"
     preparePersistence()
+    Blobs.checkAvailable()
   }
 
   /** Bootstraps project persistence using Squeryl. */

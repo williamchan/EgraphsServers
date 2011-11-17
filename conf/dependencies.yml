@@ -5,6 +5,7 @@ require:
     - play -> scala 0.9.1
     - play -> less 0.3
     - com.stripe -> stripe-java 1.0.1
+    - org.jclouds -> jclouds-allblobstore 1.2.1
     - net.debasishg -> sjson_2.8.1 0.12:
         exclude:
             # Exclude scala because its included with play-scala

@@ -1,7 +1,7 @@
-@(herp:models.Celebrity)
+@(celebrity:models.Celebrity)
 
 @body = {
-  herp!
+  The birthplace of @celebrity.firstName "@celebrity.popularName" @celebrity.lastName
 }
 
 @base(title="eGraphs: Real autographs from real ball players.", body=body)
