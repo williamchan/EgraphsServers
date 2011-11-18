@@ -5,7 +5,7 @@ require:
     - play -> scala 0.9.1
     - play -> less 0.3
     - com.stripe -> stripe-java 1.0.1
-    - org.jclouds -> jclouds-allblobstore 1.2.1
+    - net.java.dev.jogl -> jogl 1.1.1-rc6
     - net.debasishg -> sjson_2.8.1 0.12:
         exclude:
             # Exclude scala because its included with play-scala
@@ -15,6 +15,7 @@ require:
     - org.apache.axis2 -> axis2-transport-local 1.6.1
     - org.apache.xmlgraphics -> batik-codec 1.7
     - org.apache.xmlgraphics -> batik-rasterizer 1.7
+    - org.jclouds -> jclouds-allblobstore 1.2.1
     - org.squeryl -> squeryl_2.8.1 0.9.4:
         exclude:
             # Exclude scala library, which is included with play
