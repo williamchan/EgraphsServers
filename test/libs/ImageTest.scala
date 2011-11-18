@@ -33,114 +33,114 @@ with ShouldMatchers {
     }
   }
 
-  it should "calculate SVG curves through captured points" in {
-    val json: Option[Any] = JSON.parseFull(rawCapture)
-    val map: Map[String, Any] = json.get.asInstanceOf[Map[String, Any]]
-    val originalXsByStroke = map.get("originalX").get.asInstanceOf[List[List[Double]]]
-    val originalYsByStroke = map.get("originalY").get.asInstanceOf[List[List[Double]]]
+  //  it should "calculate SVG curves through captured points" in {
+  //    val json: Option[Any] = JSON.parseFull(rawCapture)
+  //    val map: Map[String, Any] = json.get.asInstanceOf[Map[String, Any]]
+  //    val originalXsByStroke = map.get("originalX").get.asInstanceOf[List[List[Double]]]
+  //    val originalYsByStroke = map.get("originalY").get.asInstanceOf[List[List[Double]]]
+  //
+  //    var paths: List[String] = Nil
+  //    for (i <- 0 until originalXsByStroke.size) {
+  //      val xs = originalXsByStroke(i).toArray
+  //      val ys = originalYsByStroke(i).toArray
+  //      paths = createSmoothedPathThruCapturedPoints(xs, ys) :: paths
+  //    }
+  //
+  //    val pathNodes: List[Elem] = for (path <- paths) yield createPathNode(path, defaultStyle)
+  //    val svg: scala.xml.Elem = createSVG(pathNodes)
+  //    val targetFilename = "test/files/test_thru_captured_points.png"
+  //    saveAsPNG(svg.mkString, targetFilename)
+  //  }
+  //
+  //  private def createSmoothedPathThruCapturedPoints(xs: Array[Double], ys: Array[Double]): String = {
+  //    val n = xs.size
+  //
+  //    val path = new StringBuilder()
+  //
+  //    appendM(path, xs(0), ys(0))
+  //
+  //    for (i <- 0 until n - 3) {
+  //      val bezier = BezierCubic(
+  //        xs(i), ys(i),
+  //        xs(i + 1), ys(i + 1),
+  //        xs(i + 2), ys(i + 2),
+  //        xs(i + 3), ys(i + 3))
+  //      val tNearC0: Double = bezier.calculateTClosestToC0()
+  //
+  //      val _1_thirds_tNearC0: Double = tNearC0 * 1d / 3d
+  //      val _2_thirds_tNearC0: Double = tNearC0 * 2d / 3d
+  //      val c0x = bezier.calcXCoord(_1_thirds_tNearC0)
+  //      val c0y = bezier.calcYCoord(_1_thirds_tNearC0)
+  //      val c1x = bezier.calcXCoord(_2_thirds_tNearC0)
+  //      val c1y = bezier.calcYCoord(_2_thirds_tNearC0)
+  //
+  //      // reflect c0x,c0y and c1x,c1y through P0-C0 using this Linear Algebra equation:
+  //      // http://en.wikipedia.org/wiki/Reflection_(mathematics)#Reflection_across_a_line_in_the_plane
+  //      val c0_reflected = reflectPointAcrossLine(c0x, c0y, xs(i), ys(i), xs(i + 1), ys(i + 1))
+  //      val c1_reflected = reflectPointAcrossLine(c1x, c1y, xs(i), ys(i), xs(i + 1), ys(i + 1))
+  //      val c0x_reflected = c0_reflected._1
+  //      val c0y_reflected = c0_reflected._2
+  //      val c1x_reflected = c1_reflected._1
+  //      val c1y_reflected = c1_reflected._2
+  //
+  //      appendC(path,
+  //        c0x_reflected, c0y_reflected,
+  //        c1x_reflected, c1y_reflected,
+  //        xs(i + 1), ys(i + 1))
+  //    }
+  //
+  //    path.mkString
+  //  }
 
-    var paths: List[String] = Nil
-    for (i <- 0 until originalXsByStroke.size) {
-      val xs = originalXsByStroke(i).toArray
-      val ys = originalYsByStroke(i).toArray
-      paths = createSmoothedPathThruCapturedPoints(xs, ys) :: paths
-    }
-
-    val pathNodes: List[Elem] = for (path <- paths) yield createPathNode(path, defaultStyle)
-    val svg: scala.xml.Elem = createSVG(pathNodes)
-    val targetFilename = "test/files/test_thru_captured_points.png"
-    saveAsPNG(svg.mkString, targetFilename)
-  }
-
-  private def createSmoothedPathThruCapturedPoints(xs: Array[Double], ys: Array[Double]): String = {
-    val n = xs.size
-
-    val path = new StringBuilder()
-
-    appendM(path, xs(0), ys(0))
-
-    for (i <- 0 until n - 3) {
-      val bezier = BezierCubic(
-        xs(i), ys(i),
-        xs(i + 1), ys(i + 1),
-        xs(i + 2), ys(i + 2),
-        xs(i + 3), ys(i + 3))
-      val tNearC0: Double = bezier.calculateTClosestToC0()
-
-      val _1_thirds_tNearC0: Double = tNearC0 * 1d / 3d
-      val _2_thirds_tNearC0: Double = tNearC0 * 2d / 3d
-      val c0x = bezier.calcXCoord(_1_thirds_tNearC0)
-      val c0y = bezier.calcYCoord(_1_thirds_tNearC0)
-      val c1x = bezier.calcXCoord(_2_thirds_tNearC0)
-      val c1y = bezier.calcYCoord(_2_thirds_tNearC0)
-
-      // reflect c0x,c0y and c1x,c1y through P0-C0 using this Linear Algebra equation:
-      // http://en.wikipedia.org/wiki/Reflection_(mathematics)#Reflection_across_a_line_in_the_plane
-      val c0_reflected = reflectPointAcrossLine(c0x, c0y, xs(i), ys(i), xs(i + 1), ys(i + 1))
-      val c1_reflected = reflectPointAcrossLine(c1x, c1y, xs(i), ys(i), xs(i + 1), ys(i + 1))
-      val c0x_reflected = c0_reflected._1
-      val c0y_reflected = c0_reflected._2
-      val c1x_reflected = c1_reflected._1
-      val c1y_reflected = c1_reflected._2
-
-      appendC(path,
-        c0x_reflected, c0y_reflected,
-        c1x_reflected, c1y_reflected,
-        xs(i + 1), ys(i + 1))
-    }
-
-    path.mkString
-  }
-
-  it should "calculate SVG curves smoothed C" in {
-    val json: Option[Any] = JSON.parseFull(rawCapture)
-    val map: Map[String, Any] = json.get.asInstanceOf[Map[String, Any]]
-    val originalXsByStroke = map.get("originalX").get.asInstanceOf[List[List[Double]]]
-    val originalYsByStroke = map.get("originalY").get.asInstanceOf[List[List[Double]]]
-
-    var paths: List[String] = Nil
-    for (i <- 0 until originalXsByStroke.size) {
-      val xs = originalXsByStroke(i).toArray
-      val ys = originalYsByStroke(i).toArray
-      paths = createSmoothedPathCStr(xs, ys) :: paths
-    }
-
-    val pathNodes: List[Elem] = for (path <- paths) yield createPathNode(path, defaultStyle)
-    val svg: scala.xml.Elem = createSVG(pathNodes)
-    val targetFilename = "test/files/test_smoothedC.png"
-    saveAsPNG(svg.mkString, targetFilename)
-    // verify something
-  }
-
-  private def createSmoothedPathCStr(xs: Array[Double], ys: Array[Double]): String = {
-    val n = xs.size
-    val smoothedXs = xs.clone()
-    val smoothedYs = ys.clone()
-
-    val path = new StringBuilder()
-
-    appendM(path, xs(0), ys(0))
-
-    for (i <- 0 until n - 3) {
-      val bezier = BezierCubic(
-        smoothedXs(i), smoothedYs(i),
-        xs(i + 1), ys(i + 1),
-        xs(i + 2), ys(i + 2),
-        xs(i + 3), ys(i + 3))
-      val tNearC0: Double = bezier.calculateTClosestToC0()
-      smoothedXs(i + 1) = bezier.calcXCoord(tNearC0)
-      smoothedYs(i + 1) = bezier.calcYCoord(tNearC0)
-
-      val _1_thirds_tNearC0: Double = tNearC0 * 1d / 3d
-      val _2_thirds_tNearC0: Double = tNearC0 * 2d / 3d
-      appendC(path,
-        bezier.calcXCoord(_1_thirds_tNearC0), bezier.calcYCoord(_1_thirds_tNearC0),
-        bezier.calcXCoord(_2_thirds_tNearC0), bezier.calcYCoord(_2_thirds_tNearC0),
-        smoothedXs(i + 1), smoothedYs(i + 1))
-    }
-
-    path.mkString
-  }
+  //  it should "calculate SVG curves smoothed C" in {
+  //    val json: Option[Any] = JSON.parseFull(rawCapture)
+  //    val map: Map[String, Any] = json.get.asInstanceOf[Map[String, Any]]
+  //    val originalXsByStroke = map.get("originalX").get.asInstanceOf[List[List[Double]]]
+  //    val originalYsByStroke = map.get("originalY").get.asInstanceOf[List[List[Double]]]
+  //
+  //    var paths: List[String] = Nil
+  //    for (i <- 0 until originalXsByStroke.size) {
+  //      val xs = originalXsByStroke(i).toArray
+  //      val ys = originalYsByStroke(i).toArray
+  //      paths = createSmoothedPathCStr(xs, ys) :: paths
+  //    }
+  //
+  //    val pathNodes: List[Elem] = for (path <- paths) yield createPathNode(path, defaultStyle)
+  //    val svg: scala.xml.Elem = createSVG(pathNodes)
+  //    val targetFilename = "test/files/test_smoothedC.png"
+  //    saveAsPNG(svg.mkString, targetFilename)
+  //    // verify something
+  //  }
+  //
+  //  private def createSmoothedPathCStr(xs: Array[Double], ys: Array[Double]): String = {
+  //    val n = xs.size
+  //    val smoothedXs = xs.clone()
+  //    val smoothedYs = ys.clone()
+  //
+  //    val path = new StringBuilder()
+  //
+  //    appendM(path, xs(0), ys(0))
+  //
+  //    for (i <- 0 until n - 3) {
+  //      val bezier = BezierCubic(
+  //        smoothedXs(i), smoothedYs(i),
+  //        xs(i + 1), ys(i + 1),
+  //        xs(i + 2), ys(i + 2),
+  //        xs(i + 3), ys(i + 3))
+  //      val tNearC0: Double = bezier.calculateTClosestToC0()
+  //      smoothedXs(i + 1) = bezier.calcXCoord(tNearC0)
+  //      smoothedYs(i + 1) = bezier.calcYCoord(tNearC0)
+  //
+  //      val _1_thirds_tNearC0: Double = tNearC0 * 1d / 3d
+  //      val _2_thirds_tNearC0: Double = tNearC0 * 2d / 3d
+  //      appendC(path,
+  //        bezier.calcXCoord(_1_thirds_tNearC0), bezier.calcYCoord(_1_thirds_tNearC0),
+  //        bezier.calcXCoord(_2_thirds_tNearC0), bezier.calcYCoord(_2_thirds_tNearC0),
+  //        smoothedXs(i + 1), smoothedYs(i + 1))
+  //    }
+  //
+  //    path.mkString
+  //  }
 
   //  it should "calculate SVG curves smoothed S" in {
   //    val json: Option[Any] = JSON.parseFull(rawCapture)
@@ -193,38 +193,6 @@ with ShouldMatchers {
   //  private def appendS(path: StringBuilder, cx: Double, cy: Double, x: Double, y: Double) {
   //    path.append("S " + cx + "," + (height - cy) + " " + x + "," + (height - y) + " ")
   //  }
-
-  it should "calculate SVG curves with asymptotes" in {
-    val json: Option[Any] = JSON.parseFull(rawCapture)
-    val map: Map[String, Any] = json.get.asInstanceOf[Map[String, Any]]
-    val originalXsByStroke = map.get("originalX").get.asInstanceOf[List[List[Double]]]
-    val originalYsByStroke = map.get("originalY").get.asInstanceOf[List[List[Double]]]
-
-    var paths: List[String] = Nil
-    for (i <- 0 until originalXsByStroke.size) {
-      val xs = originalXsByStroke(i).toArray
-      val ys = originalYsByStroke(i).toArray
-      paths = createPathStr(xs, ys) :: paths
-    }
-
-    val pathNodes: List[Elem] = for (path <- paths) yield createPathNode(path, defaultStyle)
-    val svg: scala.xml.Elem = createSVG(pathNodes)
-    val targetFilename = "test/files/test_with_asymptotes.png"
-    saveAsPNG(svg.mkString, targetFilename)
-    // verify something
-  }
-
-  private def createPathStr(xs: Array[Double], ys: Array[Double]): String = {
-    val n = xs.size
-    val z = n / 4
-    val path = new StringBuilder()
-    appendM(path, xs(0), ys(0))
-    for (i <- 0 until z) {
-      appendC(path, xs(4 * i + 1), ys(4 * i + 1), xs(4 * i + 2), ys(4 * i + 2), xs(4 * i + 3), ys(4 * i + 3))
-    }
-
-    path.mkString
-  }
 
   it should "generate PNG from SVG" in {
     val d0 = "M 24.776081,42.494911 C 11.290676,41.066828 0.95766702,36.020161 1.1577608,26.86514 C 1.622673,11.592479 16.772821,3.6020224 28.133588,3.2468193 C 33.574985,3.0932043 37.935855,5.6331159 38.321883,9.0356234 C 39.192007,16.705029 19.103053,24.665394 19.103053,24.665394 C 19.103053,24.665394 36.961514,18.095102 43.763359,26.86514 C 46.547914,30.455439 31.954198,37.516539 31.954198,37.516539 C 31.954198,37.516539 23.167218,40.872528 24.312977,37.284987 C 26.078562,31.756679 41.10299,27.183575 42.721374,26.980916 C 45.890571,26.584059 49.816762,26.572526 50.709924,27.096692 C 52.046532,27.881102 49.031171,31.235688 49.783715,31.959288 C 50.536259,32.682889 53.604326,29.412214 53.720102,29.991094 C 53.835878,30.569975 53.083333,32.625 54.298982,33.001272 C 55.514631,33.377544 56.614504,31.901399 58.582697,31.496183 C 60.550891,31.090967 60.406171,31.062023 62.171756,31.380407 C 63.937341,31.698791 64.284669,32.017176 65.645038,32.76972 C 67.005407,33.522264 66.513359,34.99841 67.613232,34.390585 C 68.713105,33.782761 69.031488,30.222646 70.044529,30.338422 C 71.057569,30.454198 70.073473,35.72201 71.665394,34.85369 C 73.257315,33.98537 76.412214,26.86514 76.412214,26.86514 C 76.412214,26.86514 75.584515,30.909972 76.412214,30.801527 C 79.540974,30.391596 84.51654,28.225508 90.884224,27.44402 C 97.251908,26.662532 99.548367,27.087063 101.88295,27.675573 C 103.80326,28.159651 104.5458,29.991094 104.5458,29.991094"

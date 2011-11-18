@@ -17,9 +17,6 @@
       <sourceFolder url="file://$MODULE_DIR$/tmp/generated" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/lib" isTestSource="false" />
     </content>
-    <content url="file://$PLAY_HOME$/modules/crud">
-      <sourceFolder url="file://$PLAY_HOME$/modules/crud/app" isTestSource="false" />
-    </content>
     <content url="file://$PLAY_HOME$/modules/scala-0.9.1">
       <sourceFolder url="file://$PLAY_HOME$/modules/scala-0.9.1/app" isTestSource="false" />
     </content>
