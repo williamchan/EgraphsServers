@@ -2,10 +2,10 @@ package libs
 
 import java.awt.image.BufferedImage
 import util.parsing.json.JSON
-import java.awt.{RenderingHints, Graphics2D}
 import java.awt.geom.Ellipse2D
 import javax.imageio.ImageIO
 import java.io.File
+import java.awt.{Graphics, RenderingHints, Graphics2D}
 
 object ImageUtil {
 
@@ -18,11 +18,23 @@ object ImageUtil {
   val penTip = "public/images/pen_tip_3_70.png"
   val penTipImage: BufferedImage = ImageIO.read(new File(penTip))
 
+  def createEgraphImage(signatureImage: BufferedImage, photoImage: BufferedImage, x: Int = 0, y: Int = 0): BufferedImage = {
+    val w: Int = scala.math.max(photoImage.getWidth, signatureImage.getWidth)
+    val h: Int = scala.math.max(photoImage.getHeight, signatureImage.getHeight)
+    val egraphImage: BufferedImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB)
+
+    // paint both images, preserving the alpha channels
+    val g: Graphics = egraphImage.getGraphics
+    g.drawImage(photoImage, 0, 0, null)
+    g.drawImage(signatureImage, x, y, null)
+
+    egraphImage
+  }
+
   def createSignatureImage(jsonStr: String): BufferedImage = {
-    val json: Option[Any] = JSON.parseFull(jsonStr)
-    val map: Map[String, Any] = json.get.asInstanceOf[Map[String, Any]]
-    val originalXsByStroke = map.get("originalX").get.asInstanceOf[List[List[Double]]]
-    val originalYsByStroke = map.get("originalY").get.asInstanceOf[List[List[Double]]]
+    val strokeData = ImageUtil.parseSignatureRawCaptureJSON(jsonStr)
+    val originalXsByStroke = strokeData._1
+    val originalYsByStroke = strokeData._2
 
     val image: BufferedImage = new BufferedImage((width * scaleFactor).intValue(), (height * scaleFactor).intValue(), BufferedImage.TYPE_INT_ARGB)
     val g: Graphics2D = image.getGraphics.asInstanceOf[Graphics2D]
@@ -37,6 +49,15 @@ object ImageUtil {
     }
 
     image
+  }
+
+  def parseSignatureRawCaptureJSON(jsonStr: String): (List[List[Double]], List[List[Double]], List[List[Double]]) = {
+    val json: Option[Any] = JSON.parseFull(jsonStr)
+    val map: Map[String, Any] = json.get.asInstanceOf[Map[String, Any]]
+    val originalXsByStroke = map.get("originalX").get.asInstanceOf[List[List[Double]]]
+    val originalYsByStroke = map.get("originalY").get.asInstanceOf[List[List[Double]]]
+    val tsByStroke = map.get("time").get.asInstanceOf[List[List[Double]]]
+    (originalXsByStroke, originalYsByStroke, tsByStroke)
   }
 
   private def drawPath(g: Graphics2D, xs: Array[Double], ys: Array[Double], ts: Array[Double] = null) {
