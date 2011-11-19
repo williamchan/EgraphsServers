@@ -6,26 +6,6 @@ case class BezierCubic(p0x: Double, p0y: Double,
                        c1x: Double, c1y: Double,
                        p1x: Double, p1y: Double) {
 
-  def calculateTClosestToC0(increments: Int = 1000): Double = {
-    var closestT: Double = 0d
-    var closestDistance: Double = Double.MaxValue
-
-    for (i <- 0 until increments) {
-      val currentT = int2double(i) / increments
-      val currentDistance = BezierCubic.distance(c0x, c0y, calcXCoord(currentT), calcYCoord(currentT))
-      if (currentDistance < closestDistance) {
-        closestDistance = currentDistance
-        closestT = currentT
-      }
-      else {
-        return closestT
-      }
-    }
-
-    // TODO(wchan): Should throw exception
-    closestT
-  }
-
   def calcXCoord(t: Double): Double = {
     ((math.pow(1d - t, 3) * p0x)
       + (3 * math.pow(1d - t, 2) * t * c0x)

@@ -5,7 +5,6 @@ require:
     - play -> scala 0.9.1
     - play -> less 0.3
     - com.stripe -> stripe-java 1.0.1
-    - net.java.dev.jogl -> jogl 1.1.1-rc6
     - net.debasishg -> sjson_2.8.1 0.12:
         exclude:
             # Exclude scala because its included with play-scala
@@ -29,6 +28,7 @@ require:
             # Exclude testing libs
             - junit -> *
             - org.scalatest -> *
+    - provided -> imgscalr-lib 4.0.0
     - provided -> tritonus_share 0.3.6
     - provided -> tritonus_remaining 0.3.6
     - provided -> xyzmo 1.0

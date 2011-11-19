@@ -38,16 +38,4 @@ with ShouldMatchers {
     bezier.calcYCoord(.75) should be(2.25)
     bezier.calcYCoord(1) should be(0)
   }
-
-  it should "calculateTClosestToC0" in {
-    val bezier = BezierCubic(
-      0d, 0d,
-      0d, 4d,
-      4d, 4d,
-      4d, 0d
-    )
-//    bezier.calculateTClosestToC0() should be(0.3333333333333333)
-//    bezier.calculateTClosestToC0() should be(0.33 plusOrMinus 0.1)
-  }
-
 }

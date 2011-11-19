@@ -2,7 +2,6 @@ package controllers
 
 import play.mvc._
 import com.stripe.model.Charge
-import play.data.validation.Required
 import play.libs.Codec
 
 object Application extends Controller {
@@ -26,18 +25,6 @@ object stripe extends Controller {
       "card" -> stripeToken
     )
     val charge: Charge = Charge.create(scala.collection.JavaConversions.asJavaMap(chargeWithTokenParams))
-  }
-}
-
-object EGraphs extends Controller {
-  def post(orderId: String, @Required signature: String, @Required audio: String) = {
-    if (validation.hasErrors) {
-      "Errors: " + validation.errorsMap().toString + "\n"
-    }
-    else {
-      "received signature = " + params.get("signature") + " and audio = " + params.get("audio") +
-        " for orderId " + orderId + " by " + request.user + ":" + request.password + "\n"
-    }
   }
 }
 

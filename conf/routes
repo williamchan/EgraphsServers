@@ -31,8 +31,6 @@ GET     ${api}/celebrities/{celebrityId}        CelebrityApiControllers.getCeleb
 GET     ${api}/celebrities/{celebrityId}/orders CelebrityApiControllers.getOrders
 POST    ${api}/celebrities/{celebrityId}/orders/{orderId}/egraphs CelebrityOrderApiControllers.postEgraph
 
-POST    ${api}/celebrities/me/products/orders/{orderId}/egraphs     Egraphs.post
-
 # GET     /test/celebrities                       test.celebrities
 # GET     /test/products                          test.products
 GET     /test/json                              test.json
