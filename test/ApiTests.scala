@@ -1,3 +1,4 @@
+import java.io.{FileInputStream, File}
 import libs.Time
 import models.{Account, Celebrity, Customer}
 import org.junit.{Assert, After, Test}
@@ -122,6 +123,18 @@ class ApiTests extends FunctionalTest {
     }
 
     assertEquals("Nope", getContent(GET("/test/request-transaction/is-stored")))
+  }
+
+  @Test
+  def testBlobIsAccessibleViaEgraphsLink() {
+    runScenario("A-public-image-is-on-the-blobstore")
+
+    val response = GET("/test/files/a/b/derp.jpg")
+    assertIsOk(response)
+
+    val actualFile = new File("./test/files/derp.jpg")
+
+    assertEquals(actualFile.length, response.out.toByteArray.length)
   }
 
   def runScenarios(name: String*) {

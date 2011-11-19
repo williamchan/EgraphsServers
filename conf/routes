@@ -42,9 +42,11 @@ GET     /test/scenarios/clear                    ScenarioController.clear
 GET     /test/scenarios/{name}                   ScenarioController.scenario
 GET     /test/base64decode/{str}                 test.base64decode
 
-GET     /test/request-transaction/without-error   TransactionTestController.makeAccount
-GET     /test/request-transaction/with-error      TransactionTestController.makeAccountAndThrowException
-GET     /test/request-transaction/is-stored       TransactionTestController.isStored
+GET     /test/request-transaction/without-error  TransactionTestController.makeAccount
+GET     /test/request-transaction/with-error     TransactionTestController.makeAccountAndThrowException
+GET     /test/request-transaction/is-stored      TransactionTestController.isStored
+
+GET     /test/files/{<.*>blobKey}                    BlobControllers.getBlob
 
 %{ if (true) }%
 # Catch all

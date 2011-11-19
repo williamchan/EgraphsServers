@@ -11,13 +11,12 @@ class BlobsTests extends UnitFlatSpec
   with ClearsDatabaseAndValidationAfter
   with DBTransactionPerTest
 {
+  import Blobs.Conversions._
+
   "Blobs" should "put and get data" in {
-    val blob = "I herp then I derp".getBytes
-    Blobs.put("myKey", blob)
+    Blobs.put("myKey", "I herp then I derp")
 
-    val restored = Blobs.get("myKey")
-
-    restored.get.toSeq should be (blob.toSeq)
+    Blobs.get("myKey").get.asString should be ("I herp then I derp")
   }
 
   it should "not find data that don't exist" in {
@@ -27,18 +26,37 @@ class BlobsTests extends UnitFlatSpec
   it should "have the most recent version of the blob" in {
     val key = "myKey"
 
-    Blobs.put(key, "herp".getBytes)
-    Blobs.put(key, "derp".getBytes)
+    Blobs.put(key, "herp")
+    Blobs.put(key, "derp")
 
-    Blobs.get(key).get.toSeq should be ("derp".getBytes.toSeq)
+    Blobs.get("myKey").get.asString should be ("derp")
   }
 
   it should "delete properly" in {
     val key = "myKey"
 
-    Blobs.put(key, "herp".getBytes)
+    Blobs.put(key, "herp")
     Blobs.delete(key)
 
-    Blobs.get(key) should be (None)
+    Blobs.get("myKey") should be (None)
+  }
+
+  "RichBlob" should "convert properly" in {
+    val data = Array('h', 'e', 'r', 'p').map(theChar => theChar.toByte)
+
+    Blobs.put("herp", data)
+
+    val restored = Blobs.get("herp").get
+
+    // String
+    Blobs.get("herp").get.asString should be ("herp")
+
+    // Int stream
+    Blobs.get("herp").get.asIntStream.toSeq should be (data.toSeq)
+
+    // Input stream
+    val arr = new Array[Byte](4)
+    Blobs.get("herp").get.asInputStream.read(arr)
+    arr.toSeq should be (data.toSeq)
   }
 }

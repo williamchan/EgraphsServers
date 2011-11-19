@@ -12,7 +12,7 @@ trait ClearsDatabaseAndValidationAfter extends BeforeAndAfterEach { this: Suite 
   override def afterEach {
     Validation.clear()
     db.Schema.scrub()
-    // Blobs.scrub()
+    Blobs.scrub()
 
     super.afterEach()
   }

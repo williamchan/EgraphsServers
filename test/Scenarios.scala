@@ -1,3 +1,5 @@
+import java.io.File
+import libs.Blobs
 import models.{Customer, Product, Account, Celebrity}
 import scenario.{Scenario, DeclaresScenarios}
 
@@ -34,7 +36,7 @@ class Scenarios extends DeclaresScenarios {
     Adds two products to Wizzle's product portfolio. The first costs $100 and
     is an image of him at the 2010 Starcraft 2 Championships. The second costs
     $200 and is an image of him at the 2011 King of Pweens Competition, where he
-    first established dominance in the arena of Pweendom.6
+    first established dominance in the arena of Pweendom.
     """,
 
     {() =>
@@ -81,6 +83,20 @@ class Scenarios extends DeclaresScenarios {
 
       erem.order(starcraftChampionship).save()
       erem.order(kingOfPweensCompetition).save()
+    }
+  )
+
+  toScenarios add Scenario(
+    "A-public-image-is-on-the-blobstore",
+
+    """
+    Adds an image with the key "a/b/derp.jpg" key to the blobstore. It
+    should be accessible via /test/files/a/b/derp.jpg
+    """,
+
+    {() =>
+      import Blobs.Conversions._
+      Blobs.put("a/b/derp.jpg", new File("./test/files/derp.jpg"))
     }
   )
 
