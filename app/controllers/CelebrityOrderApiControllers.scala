@@ -17,12 +17,12 @@ object CelebrityOrderApiControllers extends Controller
   def postEgraph(signature: Option[String], audio: Option[String]) = {
     (signature, audio) match {
       case (Some(signatureString), Some(audioString)) =>
-        val egraph = order.newEgraph(
-          signature=signatureString.getBytes("UTF-8"),
-          audio=Codec.decodeBASE64(audioString)
-        )
-        val id = egraph.save().id
-        Serializer.SJSON.toJSON(Map("id" -> id))
+        val egraphId = order
+          .newEgraph
+          .save(signatureString, Codec.decodeBASE64(audioString))
+          .id
+
+        Serializer.SJSON.toJSON(Map("id" -> egraphId))
         
       case _ =>
         Error("Valid \"signature\" and \"audio\" parameters were not provided.")

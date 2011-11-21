@@ -2,7 +2,7 @@ package models
 
 import java.sql.Timestamp
 import db.{KeyedCaseClass, Schema, Saves}
-import libs.{Utils, Time}
+import libs.{PrivateAccess, Blobs, Utils, Time}
 
 abstract sealed class EgraphState(val value: String)
 
@@ -20,17 +20,32 @@ case object RejectedPersonalAudit extends EgraphState("Rejected:Audit")
 case class Egraph(
   id: Long = 0L,
   orderId: Long = 0L,
-  signature: Array[Byte] = Array.empty,
-  audio: Array[Byte] = Array.empty,
   stateValue: String = AwaitingVerification.value,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated
 {
+  import Blobs.Conversions._
+
   //
   // Public methods
   //
-  def save(): Egraph = {
+  def save(signature: String, audio: Array[Byte]): Egraph = {
+    val saved = Egraph.save(this)
+
+    // Have to save assets after saving the entity so that they can be
+    // properly keyed
+    saved.assets.save(signature, audio)
+
+    saved
+  }
+
+  /**
+   * Saves the entity without updating the assets. IT IS AN ERROR to call this
+   * method on an Egraph that is being persisted for the first time. Only use
+   * it to update an Egraph's status.
+   */
+  def saveWithoutAssets(): Egraph = {
     Egraph.save(this)
   }
 
@@ -44,29 +59,70 @@ case class Egraph(
     Egraph.states(stateValue)
   }
 
+  /**
+   * Returns the file assets associated with this Egraph. Throws a runtime
+   * exception  if the entity couldn't possibly have assets given its default
+   * id.
+   */
+  def assets: EgraphAssets = {
+    require(id > 0L, "Can't access assets of an Egraph that lacks an ID.")
+
+    Assets
+  }
+
   //
   // KeyedCaseClass[Long] methods
   //
   override def unapplied = {
-    // Provide a special unapplication that turns our Array[Byte]s into Seqs,
-    // so equality check can be deep against the contents.
-    Egraph.unapply(this).get.productIterator.map((thisField) =>
-      thisField match {
-        case anArray: Array[_] =>
-          anArray: Seq[_]
+    Egraph.unapply(this)
+  }
 
-        case _ =>
-          thisField
-      }
-    ).toSeq
+  private object Assets extends EgraphAssets {
+    override def signature: String = {
+      Blobs.get(signatureJsonKey).get.asString
+    }
+
+    override def audio: Stream[Byte] = {
+      Blobs.get(audioKey).get.asByteStream
+    }
+
+    override def save(signature: String, audio: Array[Byte]) {
+      Blobs.put(signatureJsonKey, signature, access=PrivateAccess)
+      Blobs.put(audioKey, audio, access=PrivateAccess)
+    }
+
+    private lazy val blobKeyBase = "egraphs/" + id + "/"
+    private lazy val signatureKey = blobKeyBase + "signature"
+
+    lazy val audioKey = blobKeyBase + "audio.wav"
+    lazy val signatureJsonKey = signatureKey + ".json"
   }
 }
 
-object Egraph extends Saves[Egraph] with SavesCreatedUpdated[Egraph] {
+/**
+ * Visual and audio assets associated with the Egraph entity. These are stored in the blobstore
+ * rather than the relational database. Access this class via the assets method
+ */
+trait EgraphAssets {
+  /**
+   * Retrieves the signature json from the blobstore.
+   */
+  def signature: String
 
   /**
-   * Map of Egraph state strings to the actual EgraphStates
+   * Retrieves the bytes of audio from the blobstore.
    */
+  def audio: Stream[Byte]
+
+  /** Stores the assets in the blobstore */
+  def save(signature: String, audio: Array[Byte])
+}
+
+object Egraph extends Saves[Egraph] with SavesCreatedUpdated[Egraph] {
+  //
+  // Public Methods
+  //
+  /** Map of Egraph state strings to the actual EgraphStates */
   val states = Utils.toMap[String, EgraphState](Seq(
     AwaitingVerification,
     Verified,
@@ -74,10 +130,6 @@ object Egraph extends Saves[Egraph] with SavesCreatedUpdated[Egraph] {
     RejectedHandwriting,
     RejectedPersonalAudit
   ), key=(theState) => theState.value)
-
-  //
-  // Public Methods
-  //
 
   //
   // Saves[Egraph] methods
@@ -88,9 +140,7 @@ object Egraph extends Saves[Egraph] with SavesCreatedUpdated[Egraph] {
     import org.squeryl.PrimitiveTypeMode._
 
     updateIs(
-      theOld.signature := theNew.signature,
       theOld.orderId := theNew.orderId,
-      theOld.audio := theNew.audio,
       theOld.stateValue := theNew.stateValue,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated

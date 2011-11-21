@@ -52,11 +52,9 @@ class OrderTests extends UnitFlatSpec
     val signature = "herp".getBytes
     val audio = "derp".getBytes
 
-    val eGraph = Order(id=100L).newEgraph(signature, audio)
+    val eGraph = Order(id=100L).newEgraph
 
     eGraph.orderId should be (100L)
-    eGraph.signature.toSeq should be (signature.toSeq)
-    eGraph.audio.toSeq should be (audio.toSeq)
     eGraph.state should be (AwaitingVerification)
   }
 
@@ -132,10 +130,10 @@ class OrderTests extends UnitFlatSpec
     // Make an order for each Egraph State, and save an Egraph in that state
     val orders = Egraph.states.map { case (_, state) =>
       val order = will.order(product).save()
-      val egraph = order
-        .newEgraph("herp".getBytes, "derp".getBytes)
+      order
+        .newEgraph
         .withState(state)
-        .save()
+        .saveWithoutAssets()
 
       (state, order)
     }

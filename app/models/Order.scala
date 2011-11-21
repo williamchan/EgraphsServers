@@ -60,8 +60,8 @@ case class Order(
   /**
    * Produces a new Egraph associated with this order.
    */
-  def newEgraph(signature: Array[Byte], audio: Array[Byte]): Egraph = {
-    Egraph(orderId=id, signature=signature, audio=audio).withState(AwaitingVerification)
+  def newEgraph: Egraph = {
+    Egraph(orderId=id).withState(AwaitingVerification)
   }
   
   //

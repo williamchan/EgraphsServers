@@ -162,6 +162,10 @@ object Blobs {
         .takeWhile(theInt => theInt != -1)
     }
 
+    def asByteStream: Stream[Byte] = {
+      asIntStream.map(theInt => theInt.toByte)
+    }
+
     def asString: String = {
       asIntStream.map(theInt => theInt.toChar).mkString
     }
@@ -200,8 +204,8 @@ object Blobs {
 private trait BlobProvider {
   def context: BlobStoreContext
   def urlBase: String
-  def checkConfiguration(): Unit
-  def put(namespace: String, key: String, data: Array[Byte], access: AccessPolicy): Unit
+  def checkConfiguration()
+  def put(namespace: String, key: String, data: Array[Byte], access: AccessPolicy)
 }
 
 private object S3BlobProvider extends BlobProvider {
@@ -274,7 +278,7 @@ private object FileSystemBlobProvider extends BlobProvider {
     new BlobStoreContextFactory().createContext("filesystem", properties)
   }
 
-  override def put(namespace: String, key: String, bytes: Array[Byte], access: AccessPolicy) = {
+  override def put(namespace: String, key: String, bytes: Array[Byte], access: AccessPolicy) {
     val blobStore = context.getBlobStore
 
     blobStore.putBlob(
