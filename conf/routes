@@ -27,20 +27,16 @@ GET     /public/                                staticDir:public
 ##
 %{ api = '/api/1.0' }%
 
-GET     ${api}/celebrities/{celebrityId}        CelebrityApiControllers.getCelebrity
-GET     ${api}/celebrities/{celebrityId}/orders CelebrityApiControllers.getOrders
+GET     ${api}/celebrities/{celebrityId}                          CelebrityApiControllers.getCelebrity
+GET     ${api}/celebrities/{celebrityId}/orders                   CelebrityApiControllers.getOrders
 POST    ${api}/celebrities/{celebrityId}/orders/{orderId}/egraphs CelebrityOrderApiControllers.postEgraph
-
-# GET     /test/celebrities                       test.celebrities
-# GET     /test/products                          test.products
-GET     /test/json                              test.json
-GET     /test/script                            test.script
 
 %{ if (play.id == "test") }%
 GET     /test/scenarios                          ScenarioController.list
 GET     /test/scenarios/clear                    ScenarioController.clear
 GET     /test/scenarios/{name}                   ScenarioController.scenario
 GET     /test/base64decode/{str}                 test.base64decode
+GET     /test/script                             test.script
 
 GET     /test/request-transaction/without-error  TransactionTestController.makeAccount
 GET     /test/request-transaction/with-error     TransactionTestController.makeAccountAndThrowException

@@ -34,12 +34,8 @@ object test extends Controller {
     new String(Codec.decodeBASE64(str)) + "\n"
   }
 
-  def json = {
-    Json("[{'orderId': 1,'celebrityId': 1,'price': 100.00,'status': 'delivered'}]")
-  }
-
   def script = {
-    "Hello World"
+    "Hello world"
   }
 
 }

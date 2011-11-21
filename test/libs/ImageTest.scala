@@ -46,14 +46,14 @@ with ShouldMatchers {
     //    ImageIO.write(scaledImage, "PNG", scaledImageFile)
   }
 
-//  it should "overlay Andrew's signature on Price's photo" in {
-//    val photoImage: BufferedImage = ImageIO.read(new File("test/files/price.JPG"))
-//    val signatureImage: BufferedImage = ImageIO.read(new File("test/files/signature_cropped.png"))
-//    val egraphImage: BufferedImage = ImageUtil.createEgraphImage(signatureImage, photoImage, 1632, 0)
-//    val combined: File = new File("test/files/egraph.png")
-//    ImageIO.write(egraphImage, "PNG", combined)
-//    //    ImageIO.write(egraphImage, "JPG", new File("test/files/egraph.jpg"))
-//  }
+  it should "overlay Andrew's signature on Price's photo" in {
+    val photoImage: BufferedImage = ImageIO.read(new File("test/files/price.JPG"))
+    val signatureImage: BufferedImage = ImageIO.read(new File("test/files/signature_cropped.png"))
+    val egraphImage: BufferedImage = ImageUtil.createEgraphImage(signatureImage, photoImage, 1632, 0)
+    val combined: File = new File("test/files/egraph.png")
+    ImageIO.write(egraphImage, "PNG", combined)
+    //    ImageIO.write(egraphImage, "JPG", new File("test/files/egraph.jpg"))
+  }
 
   it should "overlay PNG images correctly" in {
     val image: BufferedImage = ImageIO.read(new File("test/files/image.png"))
