@@ -2,7 +2,8 @@ package models
 
 import java.sql.Timestamp
 import db.{KeyedCaseClass, Schema, Saves}
-import libs.{PrivateAccess, Blobs, Utils, Time}
+import libs.{Blobs, Utils, Time}
+import libs.Blobs.AccessPolicy
 
 abstract sealed class EgraphState(val value: String)
 
@@ -87,8 +88,8 @@ case class Egraph(
     }
 
     override def save(signature: String, audio: Array[Byte]) {
-      Blobs.put(signatureJsonKey, signature, access=PrivateAccess)
-      Blobs.put(audioKey, audio, access=PrivateAccess)
+      Blobs.put(signatureJsonKey, signature, access=AccessPolicy.Private)
+      Blobs.put(audioKey, audio, access=AccessPolicy.Private)
     }
 
     private lazy val blobKeyBase = "egraphs/" + id + "/"

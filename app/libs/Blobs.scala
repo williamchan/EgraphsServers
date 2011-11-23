@@ -20,9 +20,19 @@ import org.jclouds.s3.domain.CannedAccessPolicy
  * Also pimps out the jclouds Blob library to include some useful data transformations to/from
  * Blobs, Payloads, Array[Byte]s, Strings, Files, and Streams.
  *
- * To use , import Blobs.Conversions._ into whatever scope.
+ * To use, import Blobs.Conversions._ into whatever scope.
  */
 object Blobs {
+  /**
+   * Tests whether a blob with the provided key exists
+   *
+   * @param key the key to test
+   * @return true that a blob with the given key exists
+   */
+  def exists(key: String): Boolean = {
+    blobStore.blobExists(blobstoreNamespace, key)
+  }
+
   /**
    * Retrieve the Blob at a given key.
    */
@@ -37,6 +47,14 @@ object Blobs {
   }
 
   /**
+   * Returns the public URL for the Blob. The URL will only work if
+   * the blob was stored with Public.
+   */
+  def getUrl(key: String): String = {
+    blobProvider.urlBase + "/" + key
+  }
+  
+  /**
    * Puts data into a Blob object.
    *
    * @param key the key by which to store the data
@@ -44,7 +62,7 @@ object Blobs {
    * @param access the Blobstore access policy for this object. This will only be enforced
    *   against Amazon S3.
    */
-  def put(key: String, bytes: Array[Byte], access: AccessPolicy=PublicAccess) {
+  def put(key: String, bytes: Array[Byte], access: AccessPolicy=AccessPolicy.Private) {
     blobProvider.put(blobstoreNamespace, key, bytes, access)
   }
 
@@ -166,6 +184,10 @@ object Blobs {
       asIntStream.map(theInt => theInt.toByte)
     }
 
+    def asByteArray: Array[Byte] = {
+      asByteStream.toArray
+    }
+
     def asString: String = {
       asIntStream.map(theInt => theInt.toChar).mkString
     }
@@ -196,99 +218,108 @@ object Blobs {
     }
 
   }
-}
 
-/**
- * Interface for different BlobStore implementations.
- */
-private trait BlobProvider {
-  def context: BlobStoreContext
-  def urlBase: String
-  def checkConfiguration()
-  def put(namespace: String, key: String, data: Array[Byte], access: AccessPolicy)
-}
+  /**
+   * Constants that determine how Blobs can be accessed.
+   */
+  sealed trait AccessPolicy
 
-private object S3BlobProvider extends BlobProvider {
-  //
-  // BlobProvider members
-  //
-  override val urlBase = "http://s3.amazonaws.com"
-  override def context = {
-    new BlobStoreContextFactory().createContext("aws-s3", s3id, s3secret)
+  object AccessPolicy {
+    /** Accessible via a public URL */
+    case object Public extends AccessPolicy
+
+    /** Inaccessible via public URL */
+    case object Private extends AccessPolicy
+  }
+  
+  /**
+   * Interface for different BlobStore implementations.
+   */
+  private trait BlobProvider {
+    def context: BlobStoreContext
+    def urlBase: String
+    def checkConfiguration()
+    def put(namespace: String, key: String, data: Array[Byte], access: AccessPolicy)
   }
 
-  def put(namespace: String, key: String, data: Array[Byte], access: AccessPolicy) {
-    import org.jclouds.s3.options.PutObjectOptions.Builder.withAcl
-
-    val s3:AWSS3Client = context.getProviderSpecificContext.getApi
-
-    val s3Object = s3.newS3Object()
-
-    s3Object.getMetadata.setKey(key)
-    s3Object.setPayload(data)
-
-    s3.putObject(namespace, s3Object, withAcl(s3ConstantForAccessPolicy(access)))
-  }
-
-  private def s3ConstantForAccessPolicy(access: AccessPolicy): CannedAccessPolicy = {
-    access match {
-      case PublicAccess => CannedAccessPolicy.PUBLIC_READ
-      case PrivateAccess => CannedAccessPolicy.PRIVATE
+  private object S3BlobProvider extends BlobProvider {
+    //
+    // BlobProvider members
+    //
+    override val urlBase = "http://s3.amazonaws.com"
+    override def context = {
+      new BlobStoreContextFactory().createContext("aws-s3", s3id, s3secret)
     }
+
+    def put(namespace: String, key: String, data: Array[Byte], access: AccessPolicy) {
+      import org.jclouds.s3.options.PutObjectOptions.Builder.withAcl
+
+      val s3:AWSS3Client = context.getProviderSpecificContext.getApi
+
+      val s3Object = s3.newS3Object()
+
+      s3Object.getMetadata.setKey(key)
+      s3Object.setPayload(data)
+
+      s3.putObject(namespace, s3Object, withAcl(s3ConstantForAccessPolicy(access)))
+    }
+
+    private def s3ConstantForAccessPolicy(access: AccessPolicy): CannedAccessPolicy = {
+      access match {
+        case AccessPolicy.Public => CannedAccessPolicy.PUBLIC_READ
+        case AccessPolicy.Private => CannedAccessPolicy.PRIVATE
+      }
+    }
+
+    override def checkConfiguration() {
+      require(
+        s3id != null,
+        """
+        application.conf: An "s3.id" configuration must be provided.
+        """
+      )
+      require(
+        s3secret != null,
+        """
+        application.conf: An "s3.secret" configuration must be provided.
+        """
+      )
+    }
+
+    //
+    // Private members
+    //
+    /** Amazon S3 public id */
+    private val s3id = configuration.getProperty("s3.id")
+
+    /** Amazon S3 secret key */
+    private val s3secret = configuration.getProperty("s3.secret")
   }
 
-  override def checkConfiguration() {
-    require(
-      s3id != null,
-      """
-      application.conf: An "s3.id" configuration must be provided.
-      """
-    )
-    require(
-      s3secret != null,
-      """
-      application.conf: An "s3.secret" configuration must be provided.
-      """
-    )
+  private object FileSystemBlobProvider extends BlobProvider {
+    //
+    // BlobProvider members
+    //
+    override val urlBase = "/test/files"
+    override def context = {
+      val properties = new Properties
+
+      properties.setProperty(FilesystemConstants.PROPERTY_BASEDIR, "./tmp/blobstore")
+
+      // jclouds borks if we don't provde any "jclouds.credential" property.
+      properties.setProperty("jclouds.credential", "It doesn't matter what this value is.")
+
+      new BlobStoreContextFactory().createContext("filesystem", properties)
+    }
+
+    override def put(namespace: String, key: String, bytes: Array[Byte], access: AccessPolicy) {
+      val blobStore = context.getBlobStore
+
+      blobStore.putBlob(
+        namespace,
+        blobStore.blobBuilder(key).payload(bytes).build()
+      )
+    }
+    override def checkConfiguration() { }
   }
-
-  //
-  // Private members
-  //
-  /** Amazon S3 public id */
-  private val s3id = configuration.getProperty("s3.id")
-
-  /** Amazon S3 secret key */
-  private val s3secret = configuration.getProperty("s3.secret")
 }
-
-private object FileSystemBlobProvider extends BlobProvider {
-  //
-  // BlobProvider members
-  //
-  override val urlBase = "/test/files/"
-  override def context = {
-    val properties = new Properties
-
-    properties.setProperty(FilesystemConstants.PROPERTY_BASEDIR, "./tmp/blobstore")
-
-    // jclouds borks if we don't provde any "jclouds.credential" property.
-    properties.setProperty("jclouds.credential", "It doesn't matter what this value is.")
-
-    new BlobStoreContextFactory().createContext("filesystem", properties)
-  }
-
-  override def put(namespace: String, key: String, bytes: Array[Byte], access: AccessPolicy) {
-    val blobStore = context.getBlobStore
-
-    blobStore.putBlob(
-      namespace,
-      blobStore.blobBuilder(key).payload(bytes).build()
-    )
-  }
-  override def checkConfiguration() { }
-}
-
-sealed trait AccessPolicy
-case object PublicAccess extends AccessPolicy
-case object PrivateAccess extends AccessPolicy

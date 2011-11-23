@@ -2,6 +2,10 @@ package controllers
 
 import play.mvc.Controller
 import scenario.Scenario
+import play.Play
+import play.utils.Action
+import play.mvc.Router.ActionDefinition
+import play.mvc.results.{Result, ScalaAction}
 
 /**
  * Controller for all scenarios
@@ -47,8 +51,7 @@ object ScenarioController extends Controller with DBTransaction {
    * @return 200 (Ok) if successful.
    */
   def clear = withRegisteredScenarios {
-    db.Schema.scrub()
-
+    Scenario.clearAll()
     "All scenarios cleared."
    }
 
@@ -69,13 +72,17 @@ object ScenarioController extends Controller with DBTransaction {
   def scenario (name: String) = withRegisteredScenarios {
     Scenario.named(name) match {
       case Some(existingScenario) => {
-        existingScenario.play()
-        Html(
-          "Scenario <pre>"
-            + name
-            + "</pre> successfully replayed.<br/><br/>"
-            + existingScenario.description
-        )
+        existingScenario.play() match {
+          case aResult: Result =>
+            aResult
+          case _ =>
+            Html(
+              "Scenario <pre>"
+                + name
+                + "</pre> successfully replayed.<br/><br/>"
+                + existingScenario.description
+            )
+        }
       }
       case _ => {
         NotFound(

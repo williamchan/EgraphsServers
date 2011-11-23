@@ -45,15 +45,27 @@ case class Celebrity(
       Serialization.makeOptionalFieldMap(optionalFields)
   }
 
+  def saveProfilePhoto(imageData: Array[Byte]) {
+    ImageAsset(imageData, keyBase, "profile", ImageAsset.Jpeg).save()
+  }
+
+  def profilePhoto: Option[ImageAsset] = {
+    val image = ImageAsset(keyBase, "profile", ImageAsset.Jpeg)
+
+    if (image.isPersisted) Some(image) else None
+  }
+
   /** Creates a new Product associated with the celebrity. The product is not yet persisted. */
   def newProduct: Product = {
     Product(celebrityId=id)
   }
+  
   //
   // KeyedCaseClass[Long] methods
   //
   override def unapplied = Celebrity.unapply(this)
 
+  private lazy val keyBase = "celebrity/" + id
 }
 
 object Celebrity extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {

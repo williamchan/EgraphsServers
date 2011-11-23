@@ -1,7 +1,12 @@
+import controllers.{CelebrityController, Application}
 import java.io.File
 import libs.Blobs
 import models.{Customer, Product, Account, Celebrity}
+import play.mvc.results.{Redirect, Result, ScalaAction}
+import play.mvc.Router
+import play.mvc.Scope
 import scenario.{Scenario, DeclaresScenarios}
+import Blobs.Conversions._
 
 /**
  * All scenarios supported by the API.
@@ -12,9 +17,9 @@ class Scenarios extends DeclaresScenarios {
 
     """
     Creates a celebrity named William 'Wizzle' Chan. His login/password are
-    wchan83@gmail.com/herp.
+    wchan83@gmail.com/herp. He has a profile photo.
     """,
-  
+
    {() =>
       val celebrity = Celebrity(
         firstName=Some("William"),
@@ -25,6 +30,8 @@ class Scenarios extends DeclaresScenarios {
       Account(email="wchan83@gmail.com",
               celebrityId=Some(celebrity.id)
       ).withPassword("herp").right.get.save()
+
+     celebrity.saveProfilePhoto(new File("./test/files/will_chan_celebrity_profile.jpg"))
    }
   )
 
@@ -65,7 +72,7 @@ class Scenarios extends DeclaresScenarios {
     """,
 
     {() =>
-      Customer(name="Erem Boto").save() 
+      Customer(name="Erem Boto").save()
     }
   )
 
@@ -100,6 +107,23 @@ class Scenarios extends DeclaresScenarios {
     }
   )
 
+  toScenarios add Scenario(
+    "Celebrity-page-with-two-products",
+
+    """ Opens up Wizzle's celebrity page with two products """,
+
+    {() =>
+      Scenario.clearAll()
+      
+      Scenario.play(
+        "Will-Chan-is-a-celebrity",
+        "Will-has-two-products"
+      )
+
+      redirect("CelebrityController.index", Map("celebrityName" -> "Wizzle"))
+    }
+  )
+
   def getWillAccount: Account = {
     Account.findByEmail("wchan83@gmail.com").get
   }
@@ -115,4 +139,18 @@ class Scenarios extends DeclaresScenarios {
   def getEremCustomerAccount: Customer = {
     Customer.findById(1L).get
   }
+
+  def redirect(controller: String, params:Map[String, Object]=Map()) = {
+    import scala.collection.JavaConversions._
+    
+    val actionDef = Router.reverse(controller, params)
+
+    new Redirect(actionDef.url)
+  }
+  
+  def openPage(controller: => Any): Result =
+  {
+    new ScalaAction(controller)
+  }
 }
+

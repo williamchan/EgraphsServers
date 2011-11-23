@@ -1,5 +1,7 @@
 package scenario
 
+import libs.Blobs
+
 /**
  * An executable scenario.
  *
@@ -38,6 +40,23 @@ object Scenario {
   /** Adds a scenario to the list of registered scenarios */
   def add(scenario: Scenario) {
     all += (scenario.name -> scenario)
+  }
+
+  def clearAll() {
+    db.Schema.scrub()
+    Blobs.scrub()
+  }
+
+  def play(names: String*) {
+    for (name <- names) {
+      Scenario.named(name) match {
+        case None =>
+          throw new IllegalArgumentException("No scenario named \"" + name + "\" found.")
+
+        case Some(scenario) =>
+          scenario.play()
+      }
+    }
   }
 }
 

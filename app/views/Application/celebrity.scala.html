@@ -1,7 +1,11 @@
 @(celebrity:models.Celebrity)
 
 @body = {
-  The birthplace of @celebrity.firstName "@celebrity.popularName" @celebrity.lastName
+  <div class="hero-unit">
+    <img src="celebrity.profilePhoto.get.url(models.ImageAsset.MasterResolution)" />
+    The birthplace of @celebrity.firstName "@celebrity.popularName" @celebrity.lastName
+  </div>
+
 }
 
 @base(title="eGraphs: Real autographs from real ball players.", body=body)
