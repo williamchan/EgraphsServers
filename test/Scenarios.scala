@@ -31,7 +31,7 @@ class Scenarios extends DeclaresScenarios {
               celebrityId=Some(celebrity.id)
       ).withPassword("herp").right.get.save()
 
-     celebrity.saveProfilePhoto(new File("./test/files/will_chan_celebrity_profile.jpg"))
+     celebrity.saveWithProfilePhoto(new File("./test/files/will_chan_celebrity_profile.jpg"))
    }
   )
 

@@ -5,6 +5,8 @@ import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 import libs.Time
 import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationAfter, CreatedUpdatedEntityTests, SavingEntityTests}
+import java.util.Date
+import java.sql.Timestamp
 
 class CelebrityTests extends UnitFlatSpec
   with ShouldMatchers
@@ -35,10 +37,9 @@ class CelebrityTests extends UnitFlatSpec
       apiKey = Some("apiKey"),
       description = Some("desc"),
       popularName = Some("pname"),
-      profilePhotoId = Some("photoKey")
+      profilePhotoUpdated = Some(new Timestamp(new Date().getTime))
     )
   }
-
 
   //
   // Test cases

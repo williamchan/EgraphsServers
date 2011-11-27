@@ -4,6 +4,7 @@ import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
 import db.{KeyedCaseClass, Schema, Saves}
 import libs.{Serialization, Time}
+import libs.Blobs.AccessPolicy
 
 /**
  * Persistent entity representing the Celebrities who provide products on
@@ -16,7 +17,7 @@ case class Celebrity(
   firstName: Option[String]   = None,
   lastName: Option[String]    = None,
   popularName: Option[String] = None,
-  profilePhotoId: Option[String] = None,
+  profilePhotoUpdated: Option[Timestamp] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated
@@ -45,27 +46,50 @@ case class Celebrity(
       Serialization.makeOptionalFieldMap(optionalFields)
   }
 
-  def saveProfilePhoto(imageData: Array[Byte]) {
-    ImageAsset(imageData, keyBase, "profile", ImageAsset.Jpeg).save()
+  /**
+   * Saves the celebrity entity after first uploading the provided JPEG
+   * data as the master copy for the Celebrity's profile.
+   *
+   * @return the newly persisted celebrity with a valid profile photo.
+   */
+  def saveWithProfilePhoto(imageData: Array[Byte]): (Celebrity, ImageAsset) = {
+    val celebrityToSave = this.copy(profilePhotoUpdated = Some(Time.now))
+    val image = ImageAsset(imageData, keyBase, celebrityToSave.profilePhotoMasterNameOption.get, ImageAsset.Jpeg)
+
+    // Upload the image then save the entity, confident that the resulting entity
+    // will have a valid master image.
+    image.save(AccessPolicy.Public)
+
+    (celebrityToSave.save(), image)
   }
 
   def profilePhoto: Option[ImageAsset] = {
-    val image = ImageAsset(keyBase, "profile", ImageAsset.Jpeg)
-
-    if (image.isPersisted) Some(image) else None
+    for (profilePhotoMasterName <- profilePhotoMasterNameOption) yield {
+      ImageAsset(keyBase, profilePhotoMasterName, ImageAsset.Jpeg)
+    }
   }
 
   /** Creates a new Product associated with the celebrity. The product is not yet persisted. */
   def newProduct: Product = {
     Product(celebrityId=id)
   }
-  
+
   //
   // KeyedCaseClass[Long] methods
   //
   override def unapplied = Celebrity.unapply(this)
 
   private lazy val keyBase = "celebrity/" + id
+
+  //
+  // Private methods
+  //
+  private def profilePhotoMasterNameOption: Option[String] = {
+    for (photoUpdatedTimestamp <- profilePhotoUpdated) yield {
+      "profile_" + Time.toApiFormat(photoUpdatedTimestamp)
+    }
+  }
+
 }
 
 object Celebrity extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {
@@ -91,7 +115,7 @@ object Celebrity extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {
       theOld.firstName := theNew.firstName,
       theOld.lastName := theNew.lastName,
       theOld.popularName := theNew.popularName,
-      theOld.profilePhotoId := theNew.profilePhotoId,
+      theOld.profilePhotoUpdated := theNew.profilePhotoUpdated,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated
     )

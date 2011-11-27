@@ -149,8 +149,8 @@ object ImageUtil {
     img: BufferedImage,
     targetWidth: Int,
     targetHeight: Int,
-    hint: Object,
-    higherQuality: Boolean): BufferedImage = 
+    hint: Object = RenderingHints.VALUE_INTERPOLATION_BILINEAR,
+    higherQuality: Boolean = true): BufferedImage =
   {
     var imgType = if (img.getTransparency == Transparency.OPAQUE)
         BufferedImage.TYPE_INT_RGB else BufferedImage.TYPE_INT_ARGB
