@@ -17,6 +17,8 @@ package scenario
  *
  *       {() =>
  *          // Implement the code that realizes the scenario.
+ *          // You can return an action as if this were a Controller
+ *          // and running the scenario will perform the action (e.g. a Redirect)
  *       }
  *     )
  *   }

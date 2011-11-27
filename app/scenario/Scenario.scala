@@ -14,7 +14,9 @@ import libs.Blobs
  * "Shaq has a product" that adds a Product to his collection.
  *
  * For how to register scenarios, create a class named Scenarios in the
- * tests directory, and register scenarios in it {@link DeclaresScenarios}.
+ * tests directory, and register scenarios in it.
+ *
+ * For more, see [[scenarios.DeclaresScenarios]]
  */
 case class Scenario(name: String, description: String="", play: () => Any)
 
@@ -22,7 +24,7 @@ object Scenario {
   /** All registered scenarios, indexed by name */
   var all: Map[String, Scenario] = Map[String, Scenario]()
 
-  /** List of all registered scenarios */
+  /** List of all registered scenarios in no particular order */
   def list: Iterable[Scenario] = {
     all.map {case (name, scenario) => scenario }
   }
@@ -42,11 +44,18 @@ object Scenario {
     all += (scenario.name -> scenario)
   }
 
+  /**
+   * Clears all scenarios by scrubbing the database and blobstore. For god's sake don't
+   * call this in production.
+   */
   def clearAll() {
     db.Schema.scrub()
     Blobs.scrub()
   }
 
+  /**
+   * Play through one or more scenarios without processing their return values.
+   */
   def play(names: String*) {
     for (name <- names) {
       Scenario.named(name) match {

@@ -1,10 +1,8 @@
-import controllers.{CelebrityController, Application}
 import java.io.File
 import libs.Blobs
 import models.{Customer, Product, Account, Celebrity}
 import play.mvc.results.{Redirect, Result, ScalaAction}
 import play.mvc.Router
-import play.mvc.Scope
 import scenario.{Scenario, DeclaresScenarios}
 import Blobs.Conversions._
 

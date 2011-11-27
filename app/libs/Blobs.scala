@@ -236,12 +236,31 @@ object Blobs {
    * Interface for different BlobStore implementations.
    */
   private trait BlobProvider {
+    /** Instantiates a new configured BlobStoreContext */
     def context: BlobStoreContext
+
+    /** Returns the base URL for accessing [[libs.Blobs.AccessPolicy.Public]] resources */
     def urlBase: String
+
+    /**
+     * Checks that the blobstore implementation is correctly configured, and throws runtime
+     * exceptions if not.
+     */
     def checkConfiguration()
+
+    /**
+     * Puts an object into a key with a particular namespace.
+     *
+     * @param namespace the key namespace -- equivalent to an Amazon S3 bucket or a file-system folder.
+     *
+     * @param key the unique key name against which to store the object.
+     *
+     * @param data the object data to store.
+     */
     def put(namespace: String, key: String, data: Array[Byte], access: AccessPolicy)
   }
 
+  /** [[libs.Blobs.BlobProvider]] implementation backed by Amazon S3 */
   private object S3BlobProvider extends BlobProvider {
     //
     // BlobProvider members
@@ -251,7 +270,7 @@ object Blobs {
       new BlobStoreContextFactory().createContext("aws-s3", s3id, s3secret)
     }
 
-    def put(namespace: String, key: String, data: Array[Byte], access: AccessPolicy) {
+    override def put(namespace: String, key: String, data: Array[Byte], access: AccessPolicy) {
       import org.jclouds.s3.options.PutObjectOptions.Builder.withAcl
 
       val s3:AWSS3Client = context.getProviderSpecificContext.getApi
@@ -262,13 +281,6 @@ object Blobs {
       s3Object.setPayload(data)
 
       s3.putObject(namespace, s3Object, withAcl(s3ConstantForAccessPolicy(access)))
-    }
-
-    private def s3ConstantForAccessPolicy(access: AccessPolicy): CannedAccessPolicy = {
-      access match {
-        case AccessPolicy.Public => CannedAccessPolicy.PUBLIC_READ
-        case AccessPolicy.Private => CannedAccessPolicy.PRIVATE
-      }
     }
 
     override def checkConfiguration() {
@@ -294,8 +306,19 @@ object Blobs {
 
     /** Amazon S3 secret key */
     private val s3secret = configuration.getProperty("s3.secret")
+
+    private def s3ConstantForAccessPolicy(access: AccessPolicy): CannedAccessPolicy = {
+      access match {
+        case AccessPolicy.Public => CannedAccessPolicy.PUBLIC_READ
+        case AccessPolicy.Private => CannedAccessPolicy.PRIVATE
+      }
+    }
+
   }
 
+  /**
+   * [[libs.Blobs.BlobProvider]] implementation for the file system.
+   */
   private object FileSystemBlobProvider extends BlobProvider {
     //
     // BlobProvider members

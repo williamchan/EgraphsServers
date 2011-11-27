@@ -47,14 +47,16 @@ case class Celebrity(
   }
 
   /**
-   * Saves the celebrity entity after first uploading the provided JPEG
-   * data as the master copy for the Celebrity's profile.
+   * Saves the celebrity entity after first uploading the provided image
+   * data as the master copy for the Celebrity's profile. The data should be in
+   * `JPEG` or `PNG` format.
    *
    * @return the newly persisted celebrity with a valid profile photo.
    */
   def saveWithProfilePhoto(imageData: Array[Byte]): (Celebrity, ImageAsset) = {
     val celebrityToSave = this.copy(profilePhotoUpdated = Some(Time.now))
-    val image = ImageAsset(imageData, keyBase, celebrityToSave.profilePhotoMasterNameOption.get, ImageAsset.Jpeg)
+    val masterName = celebrityToSave.profilePhotoMasterNameOption.get
+    val image = ImageAsset(imageData, keyBase, masterName, ImageAsset.Jpeg)
 
     // Upload the image then save the entity, confident that the resulting entity
     // will have a valid master image.
@@ -63,6 +65,10 @@ case class Celebrity(
     (celebrityToSave.save(), image)
   }
 
+  /**
+   * Returns the profile photo image asset for this celebrity if one was ever stored using
+   * `saveWithProfilePhoto`.
+   */
   def profilePhoto: Option[ImageAsset] = {
     for (profilePhotoMasterName <- profilePhotoMasterNameOption) yield {
       ImageAsset(keyBase, profilePhotoMasterName, ImageAsset.Jpeg)
@@ -79,16 +85,21 @@ case class Celebrity(
   //
   override def unapplied = Celebrity.unapply(this)
 
-  private lazy val keyBase = "celebrity/" + id
-
   //
-  // Private methods
+  // Private members
   //
+  /** Blobstore folder name for stored profile photo data. */
   private def profilePhotoMasterNameOption: Option[String] = {
     for (photoUpdatedTimestamp <- profilePhotoUpdated) yield {
       "profile_" + Time.toApiFormat(photoUpdatedTimestamp)
     }
   }
+
+  /**
+   * The blobstore folder name upon which all resources relating to this celebrity should base
+   * their keys
+   */
+  private lazy val keyBase = "celebrity/" + id
 
 }
 
