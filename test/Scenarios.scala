@@ -22,7 +22,8 @@ class Scenarios extends DeclaresScenarios {
       val celebrity = Celebrity(
         firstName=Some("William"),
         lastName=Some("Chan"),
-        popularName=Some("Wizzle")
+        popularName=Some("Wizzle"),
+        description=Some("I sleep with one eye closed, the other fixed on my Vespene gas supply.")
       ).save()
 
       Account(email="wchan83@gmail.com",
@@ -49,12 +50,14 @@ class Scenarios extends DeclaresScenarios {
 
       will.newProduct.copy(
         priceInCents=10000,
-        description="Starcraft 2 Championships, 2010"
+        name="2010 Starcraft 2 Championships",
+        description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
       ).save()
 
       will.newProduct.copy(
         priceInCents=7000,
-        description="King of Pweens Competition, 2011"
+        name="2011 King of Pweens Competition",
+        description="In classic form, Wizzle dominated the competition and left mouths agape."
       ).save()
     }
   )

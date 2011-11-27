@@ -1,11 +1,32 @@
 @(celebrity:models.Celebrity)
 
-@body = {
-  <div class="hero-unit">
-    <img src="@celebrity.profilePhoto.get.url" />
-    The birthplace of @celebrity.firstName "@celebrity.popularName" @celebrity.lastName
-  </div>
-
+@head = {
+  <style>
+    body {
+      background-image:url("/public/images/BaseballBackground.jpg")
+    }
+    footer {
+      color:white;
+    }
+  </style>
 }
 
-@base(title="eGraphs: Real autographs from real ball players.", body=body)
+@body = {
+  <div class="celeb-content">
+    <div class="row personal-info">
+      <div class="span4 profile-photo" >
+        <img src="@celebrity.profilePhoto.get.url" />
+      </div>
+      <div class="span11 profile-info">
+        <h1>@celebrity.popularName</h1>
+        <h2>@celebrity.description</h2>
+      </div>
+    </div>
+    <div class="page-header"></div>
+    <div>
+      (Products go here)
+    </div>
+  </div>
+}
+
+@base(title="eGraphs: Real autographs from real ball players.", body=body, head=head)
