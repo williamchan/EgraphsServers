@@ -56,7 +56,7 @@ case class Celebrity(
   def saveWithProfilePhoto(imageData: Array[Byte]): (Celebrity, ImageAsset) = {
     val celebrityToSave = this.copy(profilePhotoUpdated = Some(Time.now))
     val masterName = celebrityToSave.profilePhotoMasterNameOption.get
-    val image = ImageAsset(imageData, keyBase, masterName, ImageAsset.Jpeg)
+    val image = ImageAsset(imageData, keyBase, masterName, ImageAsset.Png)
 
     // Upload the image then save the entity, confident that the resulting entity
     // will have a valid master image.
@@ -71,7 +71,7 @@ case class Celebrity(
    */
   def profilePhoto: Option[ImageAsset] = {
     for (profilePhotoMasterName <- profilePhotoMasterNameOption) yield {
-      ImageAsset(keyBase, profilePhotoMasterName, ImageAsset.Jpeg)
+      ImageAsset(keyBase, profilePhotoMasterName, ImageAsset.Png)
     }
   }
 
@@ -91,15 +91,19 @@ case class Celebrity(
   /** Blobstore folder name for stored profile photo data. */
   private def profilePhotoMasterNameOption: Option[String] = {
     for (photoUpdatedTimestamp <- profilePhotoUpdated) yield {
-      "profile_" + Time.toApiFormat(photoUpdatedTimestamp)
+      "profile_" + Time.toBlobstoreFormat(photoUpdatedTimestamp).replace(" ", "")
     }
   }
 
   /**
    * The blobstore folder name upon which all resources relating to this celebrity should base
-   * their keys
+   * their keys. This value can not be determined if the entity has not yet been saved.
    */
-  private lazy val keyBase = "celebrity/" + id
+  private def keyBase = {
+    require(id > 0, "Can not determine blobstore key when no id exists yet for this entity in the relational database")
+    
+    "celebrity/" + id
+  }
 
 }
 

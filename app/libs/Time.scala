@@ -8,6 +8,9 @@ import java.text.{DateFormat, SimpleDateFormat}
  * Convenience methods for dealing with time
  */
 object Time {
+  //
+  // Public members
+  //
   /** What should be the default timestamp for entities. Occurs at epoch 0 */
   def defaultTimestamp: Timestamp = {
     new Timestamp(0L)
@@ -37,11 +40,40 @@ object Time {
     new Timestamp(apiDateFormat.parse(dateString).getTime)
   }
 
+  /**
+   * Renders the provided date in the format used on the blobstore. That is
+   * YearMonthDayHourMinuteSecondMillisecond.
+   *
+   * For example: Erem's moment of birth on May 10, 1983, 10:45PM and 451 milliseconds
+   * would be rendered: 19830510204500451
+   */
+  def toBlobstoreFormat(date: Date) = {
+    blobstoreDateFormat.format(date)
+  }
+
+  /** General Mountain Time / UTC Time Zone. */
+  def GMT: TimeZone = {
+    TimeZone.getTimeZone("GMT")
+  }
+
+  //
+  // Private members
+  //
   /** Provides a DateFormat for working with API-formatted date Strings. */
   private def apiDateFormat: DateFormat = {
-    val format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
-    format.setTimeZone(TimeZone.getTimeZone("GMT"))
-
-    format
+    dateFormatInTimeZone("yyyy-MM-dd HH:mm:ss.SSS", GMT)
   }
+
+  /** Provides a DateFormat for working with date strings meant for use as keys in the blobstore */
+  private def blobstoreDateFormat: DateFormat = {
+    dateFormatInTimeZone("yyyyMMddHHmmssSSS", GMT)
+  }
+
+  private def dateFormatInTimeZone(format: String, timezone: TimeZone): DateFormat = {
+    val dateFormat = new SimpleDateFormat(format)
+    dateFormat.setTimeZone(timezone)
+
+    dateFormat
+  }
+
 }

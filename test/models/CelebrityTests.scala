@@ -3,10 +3,11 @@ package models
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
-import libs.Time
 import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationAfter, CreatedUpdatedEntityTests, SavingEntityTests}
-import java.util.Date
-import java.sql.Timestamp
+import java.io.File
+import javax.imageio.ImageIO
+import libs.{ImageUtil, Time}
+import ImageUtil.Conversions._
 
 class CelebrityTests extends UnitFlatSpec
   with ShouldMatchers
@@ -37,7 +38,7 @@ class CelebrityTests extends UnitFlatSpec
       apiKey = Some("apiKey"),
       description = Some("desc"),
       popularName = Some("pname"),
-      profilePhotoUpdated = Some(new Timestamp(new Date().getTime))
+      profilePhotoUpdated = Some(Time.now)
     )
   }
 
@@ -59,6 +60,36 @@ class CelebrityTests extends UnitFlatSpec
     apiMap("id") should be (celeb.id)
     apiMap("created") should be (Time.toApiFormat(celeb.created))
     apiMap("updated") should be (Time.toApiFormat(celeb.updated))
+  }
+
+  it should "start with no profile photo" in {
+    Celebrity().profilePhotoUpdated should be (None)
+    Celebrity().profilePhoto should be (None)
+  }
+
+  it should "throw an exception if you save profile photo when id is 0" in {
+    val celeb = makeCeleb
+    val image = ImageIO.read(new File("test/files/image.png"))
+
+    evaluating { celeb.saveWithProfilePhoto(image.asByteArray(ImageAsset.Png)) } should produce [IllegalArgumentException]
+  }
+
+  it should "store and retrieve the profile image asset" in {
+    val celeb = makeCeleb
+    val image = ImageIO.read(new File("test/files/image.png"))
+
+    val (savedCeleb, imageAsset) = celeb.save().saveWithProfilePhoto(image.asByteArray(ImageAsset.Png))
+
+    imageAsset.key should include ("celebrity/1")
+    savedCeleb.profilePhotoUpdated.get.getTime should be (Time.now.getTime plusOrMinus 1000)
+    savedCeleb.profilePhoto should not be (None)
+
+    val profilePhoto = savedCeleb.profilePhoto.get
+    profilePhoto.renderFromMaster.asByteArray(ImageAsset.Png).length should be (imageAsset.renderFromMaster.asByteArray(ImageAsset.Png).length)
+  }
+
+  def makeCeleb: Celebrity = {
+    Celebrity(firstName=Some("Will"), lastName=Some("Chan"), popularName=Some("Wizzle"))
   }
 
 }

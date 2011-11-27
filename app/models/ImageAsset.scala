@@ -28,10 +28,11 @@ import libs.Blobs.AccessPolicy
  *   permutation graph of an ImageAsset in memory. It is only called at the moment the bytes of data are
  *   needed.
  *
- * @param imageType the type of image: either ImageAsset.Png or ImageAsset.Jpeg
+ * @param imageType the type of image: either [[models.ImageAsset.Png]] or [[models.ImageAsset.Jpeg]].
+ *   It is highly recommended to make your master image a `png` as the format is lossless.
  *
  * @param resolution the resolution of this asset. This will either be MasterResolution, which can only be
- *   known by dereferencing masterData, or some CustomResolution(width, height).
+ *   known by dereferencing masterData, or a CustomResolution(width, height).
  */
 class ImageAsset(
   keyBase: String,
@@ -161,7 +162,6 @@ object ImageAsset {
       MasterResolution
     )
   }
-
 
   /**
    * Constructs a blobstore key for a [[models.ImageAsset]] out of the constituent parts.

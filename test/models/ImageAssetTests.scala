@@ -119,6 +119,20 @@ class ImageAssetTests extends UnitFlatSpec
     
     resized.fetchImage.get.asByteArray(ImageAsset.Png).toSeq should be (resizedBytes.toSeq)
   }
+
+  it should "return the correct url" in {
+    val asset = makeAsset(imageFromDisk.asByteArray(ImageAsset.Png))
+
+    asset.url should include (asset.key)
+  }
+
+  it should "only provide a urlOption if the data are available" in {
+    val asset = makeAsset(imageFromDisk.asByteArray(ImageAsset.Png))
+
+    asset.urlOption should be (None)
+
+    asset.save().urlOption should be (Some(asset.url))
+  }
     
   def imageFromDisk: BufferedImage = {
     ImageIO.read(new File("test/files/image.png"))
