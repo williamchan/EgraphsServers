@@ -17,13 +17,13 @@ class ImageAssetTests extends UnitFlatSpec
   import ImageUtil.Conversions._
 
   val keyBase = "egraph/1234"
-  val masterName = "profile"
+  val assetName = "profile"
 
   "An ImageAsset" should "have the correct master data" in {
     val image = imageFromDisk
     val imageBytes = image.asByteArray(ImageAsset.Png)
 
-    val asset = ImageAsset(imageBytes, keyBase, masterName, ImageAsset.Png)
+    val asset = ImageAsset(imageBytes, keyBase, assetName, ImageAsset.Png)
 
     new FileOutputStream(TempFile.named("img_orig.png")).write(imageBytes)
     ImageIO.write(asset.renderFromMaster, "png", TempFile.named("img_rendered.png"))
@@ -32,7 +32,7 @@ class ImageAssetTests extends UnitFlatSpec
   }
 
   it should "have the right key, both for master and permutations" in {
-    val asset = ImageAsset(Array.empty[Byte], keyBase, masterName, ImageAsset.Png)
+    val asset = ImageAsset(Array.empty[Byte], keyBase, assetName, ImageAsset.Png)
 
     asset.key should be ("egraph/1234/profile/master.png")
     asset.resized(100, 100).key should be ("egraph/1234/profile/100x100.png")
@@ -96,18 +96,18 @@ class ImageAssetTests extends UnitFlatSpec
     val storedBytes = storedAsset.renderFromMaster.asByteArray(ImageAsset.Png)
     storedAsset.save()
 
-    val restoredAsset = ImageAsset(keyBase, masterName, ImageAsset.Png)
+    val restoredAsset = ImageAsset(keyBase, assetName, ImageAsset.Png)
     val restoredBytes = restoredAsset.renderFromMaster.asByteArray(ImageAsset.Png)
 
     restoredBytes.toSeq should be (storedBytes.toSeq)
   }
 
   it should "throw an IllegalStateException when trying to source from a master blob that doesn't exist" in {
-    val restoredAsset = ImageAsset(keyBase, masterName, ImageAsset.Png)
+    val restoredAsset = ImageAsset(keyBase, assetName, ImageAsset.Png)
     evaluating { restoredAsset.renderFromMaster } should produce [IllegalStateException]
   }
 
-  it should "correctly store and fetch permutations as {masterName}/{width}x{height}" in {
+  it should "correctly store and fetch permutations as {name}/{width}x{height}" in {
     val asset = makeAsset(imageFromDisk.asByteArray(ImageAsset.Png))
 
     val resized = asset.resized(100, 100)
@@ -139,6 +139,6 @@ class ImageAssetTests extends UnitFlatSpec
   }
 
   def makeAsset(bytes: => Array[Byte]) = {
-    ImageAsset(bytes, keyBase, masterName, ImageAsset.Png)
+    ImageAsset(bytes, keyBase, assetName, ImageAsset.Png)
   }
 }

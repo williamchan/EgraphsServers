@@ -55,8 +55,8 @@ case class Celebrity(
    */
   def saveWithProfilePhoto(imageData: Array[Byte]): (Celebrity, ImageAsset) = {
     val celebrityToSave = this.copy(profilePhotoUpdated = Some(Time.now))
-    val masterName = celebrityToSave.profilePhotoMasterNameOption.get
-    val image = ImageAsset(imageData, keyBase, masterName, ImageAsset.Png)
+    val assetName = celebrityToSave.profilePhotoAssetNameOption.get
+    val image = ImageAsset(imageData, keyBase, assetName, ImageAsset.Png)
 
     // Upload the image then save the entity, confident that the resulting entity
     // will have a valid master image.
@@ -70,8 +70,8 @@ case class Celebrity(
    * `saveWithProfilePhoto`.
    */
   def profilePhoto: Option[ImageAsset] = {
-    for (profilePhotoMasterName <- profilePhotoMasterNameOption) yield {
-      ImageAsset(keyBase, profilePhotoMasterName, ImageAsset.Png)
+    for (profilePhotoAssetName <- profilePhotoAssetNameOption) yield {
+      ImageAsset(keyBase, profilePhotoAssetName, ImageAsset.Png)
     }
   }
 
@@ -89,7 +89,7 @@ case class Celebrity(
   // Private members
   //
   /** Blobstore folder name for stored profile photo data. */
-  private def profilePhotoMasterNameOption: Option[String] = {
+  private def profilePhotoAssetNameOption: Option[String] = {
     for (photoUpdatedTimestamp <- profilePhotoUpdated) yield {
       "profile_" + Time.toBlobstoreFormat(photoUpdatedTimestamp).replace(" ", "")
     }

@@ -138,24 +138,24 @@ object ImageAsset {
    */
   def apply(masterData: => Array[Byte],
             keyBase: String,
-            masterName: String,
+            name: String,
             imageType: ImageType): ImageAsset =
   {
-    new ImageAsset(keyBase, masterName, masterData, imageType, MasterResolution)
+    new ImageAsset(keyBase, name, masterData, imageType, MasterResolution)
   }
 
   /**
    * Creates new [[models.ImageAsset]] with [[models.ImageAsset.MasterResolution]] that sources its master
    * data from the blobstore.
    */
-  def apply(keyBase: String, masterName: String, imageType: ImageType): ImageAsset = {
-    val masterKey = makeKey(keyBase, masterName, imageType)
+  def apply(keyBase: String, name: String, imageType: ImageType): ImageAsset = {
+    val masterKey = makeKey(keyBase, name, imageType)
 
     new ImageAsset(
       keyBase,
-      masterName,
+      name,
       Blobs.get(masterKey) match {
-        case None => throw new IllegalStateException("Master data for image asset \""+masterKey+"\" unavailable in blobstore.")
+        case None => throw new IllegalStateException("Master data located at \""+masterKey+"\" unavailable in blobstore.")
         case Some(blob) => blob.asByteArray
       },
       imageType,
@@ -168,7 +168,7 @@ object ImageAsset {
    * See constructor for [[models.ImageAsset]] for detailed descriptions of these arguments.
    */
   def makeKey(keyBase: String,
-              masterName: String,
+              name: String,
               imageType: ImageType,
               resolution:Resolution=MasterResolution): String =
   {
@@ -180,7 +180,7 @@ object ImageAsset {
         width + "x" + height
     }
 
-    keyBase + "/" + masterName + "/" + resolutionPhrase + "." + imageType.extension
+    keyBase + "/" + name + "/" + resolutionPhrase + "." + imageType.extension
   }
 
   /** Represents the pixel resolution of an [[models.ImageAsset]]. */
