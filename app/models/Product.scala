@@ -4,11 +4,16 @@ import libs.Time
 import java.sql.Timestamp
 import db.{Schema, Saves, KeyedCaseClass}
 
+/**
+ * An item on sale by a Celebrity. In the case of the base Egraph, it represents a signature service
+ * against a particular photograph of the celebrity.
+ */
 case class Product(
   id: Long = 0L,
   celebrityId: Long = 0L,
   priceInCents: Int = 0,
-  description: Option[String] = None,
+  name: String = "",
+  description: String = "",
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated {
@@ -40,6 +45,7 @@ object Product extends Saves[Product] with SavesCreatedUpdated[Product] {
     updateIs(
       theOld.celebrityId := theNew.celebrityId,
       theOld.priceInCents := theNew.priceInCents,
+      theOld.name := theNew.name,
       theOld.description := theNew.description,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated

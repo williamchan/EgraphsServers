@@ -22,7 +22,7 @@ class OrderTests extends UnitFlatSpec
   override def newEntity = {
     val (customer, product) = newCustomerAndProduct
 
-    customer.order(product)
+    customer.buy(product)
   }
 
   override def saveEntity(toSave: Order) = {
@@ -35,7 +35,7 @@ class OrderTests extends UnitFlatSpec
 
   override def transformEntity(toTransform: Order) = {
     val (customer, product) = newCustomerAndProduct
-    val order = customer.order(product)
+    val order = customer.buy(product)
     toTransform.copy(
       productId = order.productId,
       buyerId = order.buyerId,
@@ -64,7 +64,7 @@ class OrderTests extends UnitFlatSpec
     val celebrity = Celebrity(firstName=Some("George"), lastName=Some("Martin")).save()
     val product = celebrity.newProduct.save()
     val order = buyer
-      .order(product, recipient)
+      .buy(product, recipient)
       .copy(
         messageToCelebrity=Some("toCeleb"),
         requestedMessage=Some("please write this"))
@@ -88,9 +88,9 @@ class OrderTests extends UnitFlatSpec
     val (will, recipient, celebrity, product) = newOrderStack
 
     val (firstOrder, secondOrder, thirdOrder) = (
-      will.order(product).save(),
-      will.order(product).save(),
-      will.order(product).save()
+      will.buy(product).save(),
+      will.buy(product).save(),
+      will.buy(product).save()
     )
 
     // Orders of celebrity's products
@@ -103,8 +103,8 @@ class OrderTests extends UnitFlatSpec
     val (will, _, celebrity, product) = newOrderStack
     val (_, _ , _, otherCelebrityProduct) = newOrderStack
 
-    val celebOrder = will.order(product).save()
-    val otherCelebOrder = will.order(otherCelebrityProduct).save()
+    val celebOrder = will.buy(product).save()
+    val otherCelebOrder = will.buy(otherCelebrityProduct).save()
 
     val celebOrders = Order.FindByCelebrity(celebrity.id)
 
@@ -115,8 +115,8 @@ class OrderTests extends UnitFlatSpec
   it should "only find a particular Order when composed with OrderIdFilter" in {
     val (will, _, celebrity, product) = newOrderStack
 
-    val firstOrder = will.order(product).save()
-    val secondOrder = will.order(product).save()
+    val firstOrder = will.buy(product).save()
+    val secondOrder = will.buy(product).save()
 
     val found = Order.FindByCelebrity(celebrity.id, Filters.OrderId(firstOrder.id))
 
@@ -127,9 +127,9 @@ class OrderTests extends UnitFlatSpec
   it should "exclude orders that are Verified or AwaitingVerification when composed with ActionableFilter" in {
     val (will, _, celebrity, product) = newOrderStack
 
-    // Make an order for each Egraph State, and save an Egraph in that state
+    // Make an buy for each Egraph State, and save an Egraph in that state
     val orders = Egraph.states.map { case (_, state) =>
-      val order = will.order(product).save()
+      val order = will.buy(product).save()
       order
         .newEgraph
         .withState(state)
@@ -138,8 +138,8 @@ class OrderTests extends UnitFlatSpec
       (state, order)
     }
 
-    // Also order one without an eGraph
-    val orderWithoutEgraph = will.order(product).save()
+    // Also buy one without an eGraph
+    val orderWithoutEgraph = will.buy(product).save()
 
     // Perform the test
     val found = Order.FindByCelebrity(celebrity.id, Filters.ActionableOnly)

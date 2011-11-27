@@ -31,7 +31,8 @@ class ProductTests extends UnitFlatSpec
   override def transformEntity(toTransform: Product) = {
     toTransform.copy(
       priceInCents = 1000,
-      description = Some("NBA Championships 2010")
+      name = "NBA Championships 2010",
+      description = "Shaq goes for the final dunk in the championship"
     )
   }
 

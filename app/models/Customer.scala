@@ -25,12 +25,12 @@ case class Customer(
   /**
    * Orders an Egraph product on behalf of a recipient.
    *
-   * @param product the Product to order
+   * @param product the Product to buy
    * @param recipient the Customer receiving the eGraph. Defaults to the purchasing Customer.
    *
    * @return an Order for the Product, purchased by this Customer for the recipient Customer.
    */
-  def order(product: Product, recipient: Customer = this): Order = {
+  def buy(product: Product, recipient: Customer = this): Order = {
     Order(
       buyerId=id,
       recipientId=recipient.id,

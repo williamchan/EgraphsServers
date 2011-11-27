@@ -49,12 +49,12 @@ class Scenarios extends DeclaresScenarios {
 
       will.newProduct.copy(
         priceInCents=10000,
-        description=Some("Starcraft 2 Championships, 2010")
+        description="Starcraft 2 Championships, 2010"
       ).save()
 
       will.newProduct.copy(
         priceInCents=7000,
-        description=Some("King of Pweens Competition, 2011")
+        description="King of Pweens Competition, 2011"
       ).save()
     }
   )
@@ -86,8 +86,8 @@ class Scenarios extends DeclaresScenarios {
       val erem = getEremCustomerAccount
       val (starcraftChampionship, kingOfPweensCompetition) = getWillsTwoProducts
 
-      erem.order(starcraftChampionship).save()
-      erem.order(kingOfPweensCompetition).save()
+      erem.buy(starcraftChampionship).save()
+      erem.buy(kingOfPweensCompetition).save()
     }
   )
 

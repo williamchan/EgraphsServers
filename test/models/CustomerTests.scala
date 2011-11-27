@@ -42,7 +42,7 @@ class CustomerTests extends UnitFlatSpec
     val recipient = Customer(id=2L)
     val product = Product(id=1L)
 
-    val order = buyer.order(product, recipient=recipient)
+    val order = buyer.buy(product, recipient=recipient)
 
     order.buyerId should be (buyer.id)
     order.recipientId should be (recipient.id)
@@ -53,7 +53,7 @@ class CustomerTests extends UnitFlatSpec
   it should "make itself the recipient if no recipient is specified" in {
     val buyer = Customer(id=1L)
 
-    buyer.order(Product()).recipientId should be (buyer.id)
+    buyer.buy(Product()).recipientId should be (buyer.id)
   }
 
 }
