@@ -29,7 +29,7 @@ class ApiTests extends FunctionalTest {
     val json = Serializer.SJSON.in[Map[String, AnyRef]](getContent(response))
 
     assertEquals(BigDecimal(1), json("id"))
-    assertEquals("Wizzle", json("popularName"))
+    assertEquals("Wizzle", json("publicName"))
     assertEquals("William", json("firstName"))
     assertEquals("Chan", json("lastName"))
 

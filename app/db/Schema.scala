@@ -22,7 +22,7 @@ object Schema extends org.squeryl.Schema {
   val celebrities = table[Celebrity]
   on(celebrities)(celebrity =>
     declare(
-      celebrity.popularName is (indexed)
+      celebrity.publicName is (unique)
     )
   )
 

@@ -37,7 +37,7 @@ class CelebrityTests extends UnitFlatSpec
     toTransform.copy(
       apiKey = Some("apiKey"),
       description = Some("desc"),
-      popularName = Some("pname"),
+      publicName = Some("pname"),
       profilePhotoUpdated = Some(Time.now)
     )
   }
@@ -49,14 +49,14 @@ class CelebrityTests extends UnitFlatSpec
     val celeb = Celebrity(
       firstName = Some("Will"),
       lastName = Some("Chan"),
-      popularName = Some("Wizzle")
+      publicName = Some("Wizzle")
     ).save()
 
     val apiMap = celeb.renderedForApi
 
     apiMap("firstName") should be ("Will")
     apiMap("lastName") should be ("Chan")
-    apiMap("popularName") should be ("Wizzle")
+    apiMap("publicName") should be ("Wizzle")
     apiMap("id") should be (celeb.id)
     apiMap("created") should be (Time.toApiFormat(celeb.created))
     apiMap("updated") should be (Time.toApiFormat(celeb.updated))
@@ -89,7 +89,7 @@ class CelebrityTests extends UnitFlatSpec
   }
 
   def makeCeleb: Celebrity = {
-    Celebrity(firstName=Some("Will"), lastName=Some("Chan"), popularName=Some("Wizzle"))
+    Celebrity(firstName=Some("Will"), lastName=Some("Chan"), publicName=Some("Wizzle"))
   }
 
 }

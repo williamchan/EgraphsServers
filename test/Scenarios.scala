@@ -22,7 +22,7 @@ class Scenarios extends DeclaresScenarios {
       val celebrity = Celebrity(
         firstName=Some("William"),
         lastName=Some("Chan"),
-        popularName=Some("Wizzle"),
+        publicName=Some("Wizzle"),
         description=Some("I sleep with one eye closed, the other fixed on my Vespene gas supply.")
       ).save()
 

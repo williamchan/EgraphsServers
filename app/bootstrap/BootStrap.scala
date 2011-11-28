@@ -5,9 +5,9 @@ import com.stripe.Stripe
 import org.squeryl.{Session, SessionFactory}
 import play.Play
 import db.DBSession
-import libs.{TempFile, Blobs}
 import io.Source
-import java.io.{File, FileOutputStream, PrintWriter}
+import java.io.{File, PrintWriter}
+import libs.{Utils, TempFile, Blobs}
 
 @OnApplicationStart
 class BootStrap extends Job {
@@ -67,12 +67,10 @@ private object TestModeBootstrap {
   /** Prints the database schema to the provided file. */
   private def printDdlToFile(file: File) {
     file.delete()
-    val ddlStream = new FileOutputStream(file)
-    val ddlWriter = new PrintWriter(ddlStream)
 
-    db.Schema.printDdl(ddlWriter)
-    ddlWriter.close()
-    ddlStream.close()
+    Utils.closing(new PrintWriter(file)) { writer =>
+      db.Schema.printDdl(writer)
+    }
   }
 
   /**

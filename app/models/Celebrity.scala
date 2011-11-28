@@ -16,7 +16,7 @@ case class Celebrity(
   description: Option[String] = None,
   firstName: Option[String]   = None,
   lastName: Option[String]    = None,
-  popularName: Option[String] = None,
+  publicName: Option[String] = None,
   profilePhotoUpdated: Option[Timestamp] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp
@@ -38,7 +38,7 @@ case class Celebrity(
     val optionalFields = List(
       ("firstName" -> firstName),
       ("lastName" -> lastName),
-      ("popularName" -> popularName)
+      ("publicName" -> publicName)
     )
 
     Map("id" -> id) ++
@@ -113,7 +113,7 @@ object Celebrity extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {
   //
   def findByName(name: String): Option[Celebrity] = {
     from(Schema.celebrities)(celebrity =>
-      where(celebrity.popularName === Some(name))
+      where(celebrity.publicName === Some(name))
       select(celebrity)
     ).headOption
   }
@@ -129,7 +129,7 @@ object Celebrity extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {
       theOld.description := theNew.description,
       theOld.firstName := theNew.firstName,
       theOld.lastName := theNew.lastName,
-      theOld.popularName := theNew.popularName,
+      theOld.publicName := theNew.publicName,
       theOld.profilePhotoUpdated := theNew.profilePhotoUpdated,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated

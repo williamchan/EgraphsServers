@@ -34,4 +34,30 @@ object Utils {
   def toMap[K, V](toMap: Iterable[V], key: (V) => K): Map[K, V] = {
     toMap.foldLeft(Map.empty[K, V])((growingMap, next) => growingMap + (key(next) -> next))
   }
+
+  /**
+   * Manages closing behavior for functions that use resources that require closing afterwards.
+   *
+   * Best to use with stateful objects like PrintWriters, InputStreams, Connections, etc.
+   * Example:
+   * {{{
+   * closing(new FileOutputStream(myFile)) { stream =>
+   *   // Do things with the stream here...don't bother closing it.
+   * }
+   * // The stream is closed at this point
+   * }}}
+   *
+   * @param resource the resource to close. It must have a no-args close method.
+   * @param usesResource function that performs actions using the resource.
+   *
+   * @return the result of usesResource, after closing the resource.
+   */
+  def closing [T <: { def close(): Any }, U](resource: T)(usesResource: T => U): U = {
+    try {
+      usesResource(resource)
+    }
+    finally {
+      resource.close()
+    }
+  }
 }
