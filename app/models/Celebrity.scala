@@ -5,6 +5,7 @@ import java.sql.Timestamp
 import db.{KeyedCaseClass, Schema, Saves}
 import libs.{Serialization, Time}
 import libs.Blobs.AccessPolicy
+import org.squeryl.Query
 
 /**
  * Persistent entity representing the Celebrities who provide products on
@@ -30,6 +31,11 @@ case class Celebrity(
     Celebrity.save(this)
   }
 
+  /** Returns all of the celebrity's Products */
+  def products: Query[Product] = {
+    Product.findByCelebrity(id)
+  }
+  
   /**
    * Renders the Celebrity as a Map, which will itself be rendered into whichever data format
    * by the API (e.g. JSON)

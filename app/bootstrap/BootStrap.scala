@@ -43,7 +43,7 @@ private object TestModeBootstrap {
     inTransaction {
       if ((!db.Schema.isInPlace) || schemaHasChanged) {
         play.Logger.info(
-          """Detected either lack of schema or change in database schema. Scrubbing DB and blobstore.
+          """Detected either lack of database schema or change thereof. Scrubbing DB and blobstore.
           (You can view the current schema at """ + schemaFile.getAbsolutePath + ")"
         )
         createNewSchema()
@@ -58,7 +58,7 @@ private object TestModeBootstrap {
    */
   private def createNewSchema() {
     // drop and re-create the database definition, logging the
-    // creation SQL in a temporary file.    
+    // creation SQL to a temporary file.
     printDdlToFile(schemaFile)
 
     db.Schema.scrub()

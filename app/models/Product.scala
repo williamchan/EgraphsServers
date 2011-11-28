@@ -3,6 +3,7 @@ package models
 import libs.Time
 import java.sql.Timestamp
 import db.{Schema, Saves, KeyedCaseClass}
+import org.squeryl.Query
 
 /**
  * An item on sale by a Celebrity. In the case of the base Egraph, it represents a signature service
@@ -34,14 +35,25 @@ case class Product(
 }
 
 object Product extends Saves[Product] with SavesCreatedUpdated[Product] {
+  import org.squeryl.PrimitiveTypeMode._
+
+  //
+  // Public members
+  //
+  /** Locates all of the products being sold by a particular celebrity */
+  def findByCelebrity(celebrityId: Long): Query[Product] = {
+    from(Schema.products)(product =>
+      where(product.celebrityId === celebrityId)
+      select(product)
+    )
+  }
+
   //
   // Saves[Product] methods
   //
   def table = Schema.products
 
   override def defineUpdate(theOld: Product, theNew: Product) = {
-    import org.squeryl.PrimitiveTypeMode._
-    
     updateIs(
       theOld.celebrityId := theNew.celebrityId,
       theOld.priceInCents := theNew.priceInCents,
@@ -58,6 +70,4 @@ object Product extends Saves[Product] with SavesCreatedUpdated[Product] {
   override def withCreatedUpdated(toUpdate: Product, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)
   }
-
 }
-

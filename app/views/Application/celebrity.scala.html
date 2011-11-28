@@ -1,9 +1,13 @@
-@(celebrity:models.Celebrity)
+@(celebrity:models.Celebrity, products: Iterable[models.Product])
+
+@base(title=celebrity.publicName.get + " - eGraphs", body=body, head=head)
 
 @head = {
   <style>
     body {
-      background-image:url("/public/images/BaseballBackground.jpg")
+      background-color:black;
+      background-image:url("/public/images/BaseballBackground.jpg");
+      background-repeat:no-repeat;
     }
     footer {
       color:white;
@@ -23,10 +27,31 @@
       </div>
     </div>
     <div class="page-header"></div>
-    <div>
-      (Products go here)
+    <div class="products">
+      @_products
     </div>
   </div>
 }
 
-@base(title="eGraphs: Real autographs from real ball players.", body=body, head=head)
+@_products = {
+  @(products.headOption match {
+    case None => _noProducts
+    case Some(product) => _someProducts
+  })
+}
+
+@_noProducts = {
+  @celebrity.publicName isn't signing eGraphs! Go badger him on Twitter.
+}
+
+@_someProducts = {
+  <div class="row">
+    @products.grouped(2).map { productPair =>
+      @productPair.map { product =>
+        <div class="span8 product">
+          <img src="http://placehold.it/330x230">
+        </div>
+      }
+    }.toList
+  </div>
+}

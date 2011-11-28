@@ -8,6 +8,6 @@ object CelebrityController extends Controller
 {
 
   def index = {
-    views.Application.html.celebrity(celebrity)
+    views.Application.html.celebrity(celebrity, celebrity.products)
   }
 }
