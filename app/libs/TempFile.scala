@@ -1,4 +1,4 @@
-package utils
+package libs
 
 import java.io.File
 
@@ -6,7 +6,8 @@ import java.io.File
  * Provides temporary files from the project's tmp/ directory.
  */
 object TempFile {
-  val dirPath = new File("tmp/test-files")
+  // Statically ensure that the path for temporary files exists.
+  val dirPath = new File("tmp/files")
   dirPath.mkdirs()
 
   /**

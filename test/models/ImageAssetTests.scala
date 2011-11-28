@@ -2,12 +2,11 @@ package models
 
 import play.test.UnitFlatSpec
 import org.scalatest.matchers.ShouldMatchers
-import libs.ImageUtil
-import utils.{TempFile, ClearsDatabaseAndValidationAfter, DBTransactionPerTest}
-import java.io.{FileOutputStream, ByteArrayOutputStream, FileInputStream, File}
+import utils.{ClearsDatabaseAndValidationAfter, DBTransactionPerTest}
+import java.io.{FileOutputStream, File}
 import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
-import models.ImageAsset.CustomResolution
+import libs.{ImageUtil, TempFile}
 
 class ImageAssetTests extends UnitFlatSpec
   with ShouldMatchers

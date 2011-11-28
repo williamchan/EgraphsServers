@@ -5,6 +5,7 @@ import org.squeryl.{KeyedEntity, Table}
 import models._
 import java.lang.IllegalStateException
 import play.Play
+import java.io.{ByteArrayOutputStream, PrintWriter}
 
 /**
  * Egraphs Database schema
@@ -94,6 +95,22 @@ object Schema extends org.squeryl.Schema {
           set to "yes" in application.conf. Sorry if you have a problem with that."""
         )
     }
+  }
+
+  /** Returns the SQL commands that define this schema as a String. */
+  def ddl: String = {
+    val outputStream = new ByteArrayOutputStream()
+    val printWriter = new PrintWriter(outputStream)
+    this.printDdl(printWriter)
+
+    printWriter.flush()
+
+    val ddlString = outputStream.toString("UTF-8")
+
+    printWriter.close()
+    outputStream.close()
+
+    ddlString
   }
 
   //
