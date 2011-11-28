@@ -41,10 +41,10 @@ private object TestModeBootstrap {
   private def bootstrapDatabase() {
     DBSession.init()
     inTransaction {
-      if (schemaHasChanged) {
+      if ((!db.Schema.isInPlace) || schemaHasChanged) {
         play.Logger.info(
-          "Detected change in database schema; scrubbing DB and blobstore. (You can view the current schema at " +
-           schemaFile.getAbsolutePath + ")"
+          """Detected either lack of schema or change in database schema. Scrubbing DB and blobstore.
+          (You can view the current schema at """ + schemaFile.getAbsolutePath + ")"
         )
         createNewSchema()
         Blobs.scrub()

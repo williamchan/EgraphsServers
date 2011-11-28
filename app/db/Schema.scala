@@ -113,6 +113,27 @@ object Schema extends org.squeryl.Schema {
     ddlString
   }
 
+  /**
+   * Returns true if it has reason to believe at least SOME egraphs schema already exists on the
+   * main Play connection. False otherwise.
+   */
+  def isInPlace: Boolean = {
+    // Basically just try to perform a query and if it throws up it doesn't exist.
+    try {
+      from(celebrities)(celeb =>
+        select(celeb)
+      ).headOption
+
+      true
+    } catch {
+      case e: RuntimeException if e.getMessage.toLowerCase.contains("celebrity") =>
+        false
+
+      case otherErrors =>
+        throw otherErrors
+    }
+  }
+
   //
   // Private Methods
   //
