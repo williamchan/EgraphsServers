@@ -11,7 +11,7 @@ import java.io.{ByteArrayInputStream, ByteArrayOutputStream, File}
 object ImageUtil {
 
   // TODO(wchan): Why does it run out of memory above 5?
-  val scaleFactor = 3.0
+  val scaleFactor = 2.5
   val height = 768
   val width = 1024
   val numIncrements = 1000
@@ -22,11 +22,10 @@ object ImageUtil {
   def createEgraphImage(signatureImage: BufferedImage, photoImage: BufferedImage, x: Int = 0, y: Int = 0): BufferedImage = {
     val w: Int = scala.math.max(photoImage.getWidth, signatureImage.getWidth)
     val h: Int = scala.math.max(photoImage.getHeight, signatureImage.getHeight)
-//    val egraphImage: BufferedImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB)
-    val egraphImage: BufferedImage = new BufferedImage(photoImage.getWidth, photoImage.getHeight, BufferedImage.TYPE_INT_RGB)
+    val egraphImage: BufferedImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB)
     val g: Graphics = egraphImage.getGraphics
     g.drawImage(photoImage, 0, 0, null)
-//    g.drawImage(signatureImage, x, y, null)
+    g.drawImage(signatureImage, x, y, null)
     egraphImage
   }
 

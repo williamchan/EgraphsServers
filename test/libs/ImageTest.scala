@@ -48,14 +48,11 @@ with ShouldMatchers {
 
   it should "overlay Andrew's signature on Kapler's JPG" in {
     val photoImage: BufferedImage = ImageIO.read(new File("test/files/kapler.JPG"))
-    println("orig h-w: " + photoImage.getWidth + " " + photoImage.getHeight)
     val signatureImage: BufferedImage = ImageUtil.createSignatureImage(rawCapture)
-    val egraphImage: BufferedImage = ImageUtil.createEgraphImage(signatureImage, photoImage, 100, 100)
+    val egraphImage: BufferedImage = ImageUtil.createEgraphImage(signatureImage, photoImage, 0, 0)
     val combinedImageFile = new File("test/files/egraph.jpg")
     ImageIO.write(egraphImage, "JPG", combinedImageFile)
-//    combinedImageFile.length should be(885357)
-    
-    println("new h-w: " + egraphImage.getWidth + " " + egraphImage.getHeight)
+    combinedImageFile.length should be(947830)
   }
 
   it should "overlay PNG images correctly" in {
@@ -64,7 +61,7 @@ with ShouldMatchers {
     val combinedImage = ImageUtil.createEgraphImage(overlay, image, 0, 0)
     val combinedImageFile: File = new File("test/files/combinedImage.png")
     ImageIO.write(combinedImage, "PNG", combinedImageFile)
-//    combinedImageFile.length should be(138807)
+    combinedImageFile.length should be(138807)
   }
 
   it should "resize PNG images correctly" in {
