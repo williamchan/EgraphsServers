@@ -22,13 +22,11 @@ object ImageUtil {
   def createEgraphImage(signatureImage: BufferedImage, photoImage: BufferedImage, x: Int = 0, y: Int = 0): BufferedImage = {
     val w: Int = scala.math.max(photoImage.getWidth, signatureImage.getWidth)
     val h: Int = scala.math.max(photoImage.getHeight, signatureImage.getHeight)
-    val egraphImage: BufferedImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB)
-
-    // paint both images, preserving the alpha channels
+//    val egraphImage: BufferedImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB)
+    val egraphImage: BufferedImage = new BufferedImage(photoImage.getWidth, photoImage.getHeight, BufferedImage.TYPE_INT_RGB)
     val g: Graphics = egraphImage.getGraphics
     g.drawImage(photoImage, 0, 0, null)
-    g.drawImage(signatureImage, x, y, null)
-
+//    g.drawImage(signatureImage, x, y, null)
     egraphImage
   }
 
@@ -42,16 +40,20 @@ object ImageUtil {
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
     g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
     g.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE)
+    g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC)
 
     for (i <- 0 until originalXsByStroke.size) {
       val xs = originalXsByStroke(i).toArray
       val ys = originalYsByStroke(i).toArray
-      drawPath(g, xs, ys)
+      drawStroke(g, xs, ys)
     }
 
     image
   }
 
+  /**
+   * @return 3-tuple of originalX data by stroke, originalY data by stroke, and time data by stroke
+   */
   def parseSignatureRawCaptureJSON(jsonStr: String): (List[List[Double]], List[List[Double]], List[List[Double]]) = {
     val json: Option[Any] = JSON.parseFull(jsonStr)
     val map: Map[String, Any] = json.get.asInstanceOf[Map[String, Any]]
@@ -61,10 +63,18 @@ object ImageUtil {
     (originalXsByStroke, originalYsByStroke, tsByStroke)
   }
 
-  private def drawPath(g: Graphics2D, xs: Array[Double], ys: Array[Double], ts: Array[Double] = null) {
-    val n = xs.size
+  /**
+   * Draws strokes as a series of partial cubic Bezier curves. Each cubic Bezier is treated as having three segments
+   * that defined by points approximately near the control points. drawFirstCubicBezierSegment is called to draw the
+   * first of these cubic Bezier segments, and drawSecondAndThirdCubicBezierSegments is called to draw the second and
+   * third segments of the last cubic Bezier curve that completes the stroke.
+   */
+  private def drawStroke(g: Graphics2D, xs: Array[Double], ys: Array[Double], ts: Array[Double] = null) {
+    // TODO(wchan): assert that sizes are the same
+    val n = math.min(xs.size, ys.size)
 
-    // TODO(wchan): handle case if arrays are shorter than length 4. Assert that they are of same length.
+    // TODO(wchan): handle these cases
+    if (n < 4) return
 
     for (i <- 0 until xs.length) {
       xs(i) = xs(i) * scaleFactor
@@ -100,7 +110,7 @@ object ImageUtil {
     for (j <- 0 until numIncrements) {
       val drawX = bezier.calcXCoord(tNearC0 * j / numIncrements)
       val drawY = bezier.calcYCoord(tNearC0 * j / numIncrements)
-      // TODO(wchan): calcPointSize based on ts
+      // issue#7: calcPointSize based on ts
       drawPoint(g, drawX, (height * scaleFactor).intValue() - drawY)
     }
   }
@@ -109,7 +119,7 @@ object ImageUtil {
     for (j <- 0 until numIncrements) {
       val drawX = bezier.calcXCoord(tNearC0 + (1d - tNearC0) * j / (2 * numIncrements))
       val drawY = bezier.calcYCoord(tNearC0 + (1d - tNearC0) * j / (2 * numIncrements))
-      // TODO(wchan): calcPointSize based on ts
+      // issue#7: calcPointSize based on ts
       drawPoint(g, drawX, (height * scaleFactor).intValue() - drawY)
     }
   }
