@@ -1,6 +1,10 @@
 @(celebrity:models.Celebrity, products: Iterable[models.Product])
 
-@base(title=celebrity.publicName.get + " - eGraphs", body=body, head=head)
+@import models.Product
+
+@base(title=celebrity.publicName.get + " - eGraphs", onLoad=onLoad, body=body, head=head)
+
+
 
 @head = {
   <style>
@@ -15,15 +19,30 @@
   </style>
 }
 
+@onLoad = {
+  $(function () {
+    $("a[rel=popover]")
+      .popover({
+        offset: 10
+      })
+      .click(function(e) {
+        e.preventDefault()
+      })
+  })
+}
+
 @body = {
   <div class="celeb-content">
     <div class="row personal-info">
       <div class="span4 profile-photo" >
         <img src="@celebrity.profilePhoto.get.url" />
       </div>
-      <div class="span11 profile-info">
-        <h1>@celebrity.publicName</h1>
-        <h2>@celebrity.description</h2>
+      <div class="span12 profile-info">
+        <h1>@celebrity.publicName <span class="label notice">Currently signing</span></h1>
+        <div class="quotemark">&ldquo;</div>
+        <div class="row">
+          <div class="span11 description">@celebrity.description</div>
+        </div>
       </div>
     </div>
     <div class="page-header"></div>
@@ -31,27 +50,49 @@
       @_products
     </div>
   </div>
-}
 
-@_products = {
-  @(products.headOption match {
-    case None => _noProducts
-    case Some(product) => _someProducts
-  })
-}
-
-@_noProducts = {
-  @celebrity.publicName isn't signing eGraphs! Go badger him on Twitter.
-}
-
-@_someProducts = {
-  <div class="row">
-    @products.grouped(2).map { productPair =>
-      @productPair.map { product =>
-        <div class="span8 product">
-          <img src="http://placehold.it/330x230">
+  @_products = {
+    @if(products.headOption == None) {
+      <h2>@celebrity.publicName isn't signing eGraphs! Go badger him on Twitter.</h2>
+    } else {
+      <h2>
+        You choose a photo,
+        <a href="#" rel='popover' title="It's between @celebrity.publicName and you" data-content="After you choose a photo and personal message to send him, we'll reserve time on @celebrity.publicName's schedule to read your message and hand-write you a response on top of the photo.">
+          @celebrity.publicName does the rest.
+        </a>
+      </h2>
+      @products.toList.grouped(2).map { productRow =>
+        <div class="row">
+          @productRow.map { product =>
+            @_product(product, productRow)
+          }
         </div>
+      }.toList
+    }
+
+    @_product(product: Product, productRow: List[Product]) = {
+      <div class="span6 offset1 @_offsetClass">
+        <div class="product">
+          <img src="http://placehold.it/330x230">
+          <div class="description">
+            @product.name
+          </div>
+          <a class="btn primary large success buy-button" href="#">Get it signed</a>
+        </div>
+      </div>
+
+      @_offsetClass = {
+        @((productRow.head, productRow.tail) match {
+          case (aProduct, List()) if aProduct == product =>
+            "offset5"
+
+          case (aProduct, _) if aProduct == product =>
+            "offset1"
+
+          case (_, List(aProduct)) if aProduct == product =>
+            "offset2"
+        })
       }
-    }.toList
-  </div>
+    }
+  }
 }

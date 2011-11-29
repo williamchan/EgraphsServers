@@ -22,7 +22,8 @@ object Schema extends org.squeryl.Schema {
   val celebrities = table[Celebrity]
   on(celebrities)(celebrity =>
     declare(
-      celebrity.publicName is (unique)
+      celebrity.publicName is (unique),
+      celebrity.description is (dbType("varchar(255)"))
     )
   )
 

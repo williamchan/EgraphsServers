@@ -5,7 +5,7 @@ import play.test.UnitFlatSpec
 import java.io._
 import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
-import utils.{TempFile}
+import libs.{TempFile}
 
 class ImageTest extends UnitFlatSpec
   with ShouldMatchers

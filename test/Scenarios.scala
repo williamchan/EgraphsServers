@@ -23,7 +23,7 @@ class Scenarios extends DeclaresScenarios {
         firstName=Some("William"),
         lastName=Some("Chan"),
         publicName=Some("Wizzle"),
-        description=Some("I sleep with one eye closed, the other fixed on my Vespene gas supply.")
+        description=Some("Love my fans from New York to Tokyo, from Seoul to the Sudetenland. And for all you haters out there -- don't mess around. I sleep with one eye closed, the other fixed on my Vespene gas supply.")
       ).save()
 
       Account(email="wchan83@gmail.com",
@@ -120,6 +120,72 @@ class Scenarios extends DeclaresScenarios {
         "Will-Chan-is-a-celebrity",
         "Will-has-two-products"
       )
+
+      redirect("CelebrityController.index", Map("celebrityName" -> "Wizzle"))
+    }
+  )
+
+  toScenarios add Scenario(
+    "Celebrity-page-with-one-product",
+
+    """ Opens up Wizzle's celebrity page with one product """,
+
+    {() =>
+      Scenario.clearAll()
+
+      Scenario.play("Will-Chan-is-a-celebrity")
+
+      val will = getWillCelebrityAccount
+      will.newProduct.copy(
+        priceInCents=10000,
+        name="2010 Starcraft 2 Championships",
+        description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
+      ).save()
+
+      redirect("CelebrityController.index", Map("celebrityName" -> "Wizzle"))
+    }
+  )
+
+  toScenarios add Scenario(
+    "Celebrity-page-with-five-products",
+
+    """ Opens up Wizzle's celebrity page with five products """,
+
+    {() =>
+      Scenario.clearAll()
+
+      Scenario.play("Will-Chan-is-a-celebrity")
+
+      val will = getWillCelebrityAccount
+      will.newProduct.copy(
+        priceInCents=10000,
+        name="2010 Starcraft 2 Championships",
+        description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
+      ).save()
+
+      will.newProduct.copy(
+        priceInCents=10000,
+        name="2012 Platinum League Victory",
+        description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
+      ).save()
+
+      will.newProduct.copy(
+        priceInCents=10000,
+        name="2001 Senior Yearbook Photo",
+        description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
+      ).save()
+
+      will.newProduct.copy(
+        priceInCents=10000,
+        name="Bi-Annual World Series of Magic: The Gathering",
+        description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
+      ).save()
+
+      will.newProduct.copy(
+        priceInCents=10000,
+        name="2200AD Undead League Starcraft II Championship",
+        description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
+      ).save()
 
       redirect("CelebrityController.index", Map("celebrityName" -> "Wizzle"))
     }
