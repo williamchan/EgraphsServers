@@ -1,12 +1,11 @@
-import java.io.{FileInputStream, File}
-import libs.Time
-import models.{Account, Celebrity, Customer}
-import org.junit.{Assert, After, Test}
+import java.io.File
+import libs.{Blobs, Time}
+import models.Account
+import org.junit.Assert._
+import org.junit.{After, Test}
 import play.mvc.Http.Request
 import play.test.FunctionalTest
 import sjson.json.Serializer
-import Assert._
-
 class ApiTests extends FunctionalTest {
   import FunctionalTest._
 
@@ -106,6 +105,10 @@ class ApiTests extends FunctionalTest {
 
     val json = Serializer.SJSON.in[Map[String, Any]](getContent(response))
     assertEquals(BigDecimal(1), json("id"))
+
+    // See CelebrityOrderApiControllers.postEgraph
+    import Blobs.Conversions._
+    assertEquals("theSignature", Blobs.get("egraphs/" + json("id") + "/signature.json").get.asString)
   }
 
   @Test
