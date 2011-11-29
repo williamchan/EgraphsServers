@@ -8,7 +8,7 @@ import play.Play
  * Provides various Squeryl database adapters based on what type of database we're
  * running against.
  */
-object Adapter {
+object DBAdapter {
   lazy val h2 = new H2Adapter
   lazy val mysql = new MySQLAdapter
   lazy val postgres = new PostgreSqlAdapter

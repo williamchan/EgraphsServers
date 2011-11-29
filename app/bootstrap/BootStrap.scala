@@ -17,7 +17,7 @@ class BootStrap extends Job {
 
     // Initialize Squeryl persistence
     SessionFactory.concreteFactory =
-      Some(() => Session.create(play.db.DB.getConnection, db.Adapter.current))
+      Some(() => Session.create(play.db.DB.getConnection, db.DBAdapter.current))
 
     // Initialize S3 or fs-based blobstore
     Blobs.init()
