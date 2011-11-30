@@ -28,6 +28,7 @@ require:
             # Exclude testing libs
             - junit -> *
             - org.scalatest -> *
+    - postgresql -> postgresql 9.1-901.jdbc4
     - provided -> imgscalr-lib 4.0.0
     - provided -> tritonus_share 0.3.6
     - provided -> tritonus_remaining 0.3.6
