@@ -2,8 +2,9 @@ package models
 
 import libs.Time
 import java.sql.Timestamp
-import db.{Schema, Saves, KeyedCaseClass}
 import org.squeryl.Query
+import db.{FilterOneTable, Schema, Saves, KeyedCaseClass}
+import play.templates.JavaExtensions
 
 /**
  * An item on sale by a Celebrity. In the case of the base Egraph, it represents a signature service
@@ -18,10 +19,13 @@ case class Product(
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated {
-
+  
   //
-  // Public methods
+  // Public members
   //
+  /** The slug used to access this product from the main site */
+  val urlSlug = JavaExtensions.slugify(name, false) // Slugify without lower-casing
+  
   def save(): Product = {
     Product.save(this)
   }
@@ -41,11 +45,24 @@ object Product extends Saves[Product] with SavesCreatedUpdated[Product] {
   // Public members
   //
   /** Locates all of the products being sold by a particular celebrity */
-  def findByCelebrity(celebrityId: Long): Query[Product] = {
-    from(Schema.products)(product =>
-      where(product.celebrityId === celebrityId)
-      select(product)
-    )
+  object FindByCelebrity {
+    def apply(celebrityId: Long, filters: FilterOneTable[Product] *): Query[Product] = {
+      from(Schema.products)(product =>
+        where(
+          product.celebrityId === celebrityId and
+          FilterOneTable.reduceFilters(filters, product)
+        )
+          select(product)
+      )
+    }
+
+    object Filters {
+      case class WithUrlSlug(slug: String) extends FilterOneTable[Product] {
+        override def test(product: Product) = {
+          product.urlSlug === slug
+        }
+      }
+    }
   }
 
   //
@@ -58,6 +75,7 @@ object Product extends Saves[Product] with SavesCreatedUpdated[Product] {
       theOld.celebrityId := theNew.celebrityId,
       theOld.priceInCents := theNew.priceInCents,
       theOld.name := theNew.name,
+      theOld.urlSlug := theNew.urlSlug,
       theOld.description := theNew.description,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated

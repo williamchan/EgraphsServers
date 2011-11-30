@@ -22,7 +22,7 @@ object Schema extends org.squeryl.Schema {
   val celebrities = table[Celebrity]
   on(celebrities)(celebrity =>
     declare(
-      celebrity.publicName is (unique),
+      celebrity.urlSlug is (unique),
       celebrity.description is (dbType("varchar(255)"))
     )
   )
@@ -46,6 +46,11 @@ object Schema extends org.squeryl.Schema {
   // Products
   //
   val products = table[Product]
+  on(products)(product=>
+    declare(
+      columns(product.celebrityId, product.urlSlug) are (unique)
+    )
+  )
   val celebrityToProduct = oneToManyRelation(celebrities, products).
     via((celebrity, product) => celebrity.id === product.celebrityId)
 

@@ -3,34 +3,8 @@
 # ~~~~
 
 ##
-## Website
+## Test routes
 ##
-
-# Home page
-GET     /                                       Application.index
-
-# Celebrity pages
-GET     /{celebrityName}                        CelebrityController.index
-
-GET     /stripe                                 stripe.stripe
-POST    /stripe                                 stripe.post
-
-# Ignore favicon requests
-GET     /favicon.ico                            404
-
-# Map static resources from the /app/public folder to the /public path
-GET     /public/                                staticDir:public
-
-
-##
-## API
-##
-%{ api = '/api/1.0' }%
-
-GET     ${api}/celebrities/{celebrityId}                          CelebrityApiControllers.getCelebrity
-GET     ${api}/celebrities/{celebrityId}/orders                   CelebrityApiControllers.getOrders
-POST    ${api}/celebrities/{celebrityId}/orders/{orderId}/egraphs CelebrityOrderApiControllers.postEgraph
-
 %{ if (play.id == "test") }%
 GET     /test/scenarios                          ScenarioController.list
 GET     /test/scenarios/clear                    ScenarioController.clear
@@ -44,6 +18,37 @@ GET     /test/request-transaction/is-stored      TransactionTestController.isSto
 
 GET     /test/files/{<.*>blobKey}                    BlobControllers.getBlob
 
+
+##
+## Production routes
+##
+
+##
+## Website
+##
 %{ if (true) }%
-# Catch all
-*       /{controller}/{action}                  {controller}.{action}
+# Home page
+GET     /                                       Application.index
+
+# Celebrity pages
+GET     /{celebrityUrlSlug}                     CelebrityController.index
+GET     /{celebrityUrlSlug}/{productUrlSlug}     CelebrityProductController.index
+
+GET     /stripe                                 stripe.stripe
+POST    /stripe                                 stripe.post
+
+# Ignore favicon requests
+GET     /favicon.ico                            404
+
+# Map static resources from the /app/public folder to the /public path
+GET     /public/                                staticDir:public
+
+##
+## API
+##
+%{ api = '/api/1.0' }%
+
+GET     ${api}/celebrities/{celebrityId}                          CelebrityApiControllers.getCelebrity
+GET     ${api}/celebrities/{celebrityId}/orders                   CelebrityApiControllers.getOrders
+POST    ${api}/celebrities/{celebrityId}/orders/{orderId}/egraphs CelebrityOrderApiControllers.postEgraph
+

@@ -34,7 +34,7 @@
 
       .description {
         font-style:italic;
-        padding-left:@gridGutterWidth;
+        padding-left:30px;
         line-height:@baseline + 3;
         color:#999;
         font-size: @basefont + 3;
@@ -59,8 +59,12 @@
 	    padding-top:20px;
 	  }
 	  .product {
+      display:block;
+      padding:4px;
+      position:relative;
+      text-decoration:none;
+      color:@grayDark;
 	    background:whitesmoke;
-	    padding:4px;
 	    border:1px solid #ddd;
 	    .border-radius(6px);
 	    .box-shadow(0 1px 1px rgba(0, 0, 0,.075));
@@ -69,6 +73,7 @@
         border-color:@linkColor;
         .box-shadow(0 1px 4px rgba(0, 105, 214,.25))
       }
+
       .description {
         padding-top:3px;
         text-align:center;

@@ -4,10 +4,8 @@
 
 @base(title=celebrity.publicName.get + " - eGraphs", onLoad=onLoad, body=body, head=head)
 
-
-
 @head = {
-  <style>
+  <style type="text/css">
     body {
       background-color:black;
       background-image:url("/public/images/BaseballBackground.jpg");
@@ -23,7 +21,8 @@
   $(function () {
     $("a[rel=popover]")
       .popover({
-        offset: 10
+        offset: 10,
+        placement: 'above'
       })
       .click(function(e) {
         e.preventDefault()
@@ -35,7 +34,7 @@
   <div class="celeb-content">
     <div class="row personal-info">
       <div class="span4 profile-photo" >
-        <img src="@celebrity.profilePhoto.get.url" />
+        <img src="@celebrity.profilePhoto.get.url" alt="@celebrity.publicName Profile Photo"/>
       </div>
       <div class="span12 profile-info">
         <h1>@celebrity.publicName <span class="label notice">Currently signing</span></h1>
@@ -47,52 +46,48 @@
     </div>
     <div class="page-header"></div>
     <div class="products">
-      @_products
+      @if(products.headOption == None) {
+        <h2>@celebrity.publicName isn't signing eGraphs! Go badger him on Twitter.</h2>
+      } else {
+        <h2>
+          You choose a photo and write a short note.
+          <a href="#" rel='popover' title="It's between @celebrity.publicName and you" data-content="When you buy an eGraph, a special slot of time on @celebrity.publicName's schedule gets reserved for him to hand-write a response to your note on top of the photo you select here.">
+            @celebrity.publicName does the rest.
+          </a>
+        </h2>
+        @products.toList.grouped(2).map { productRow =>
+          <div class="row">
+            @productRow.map { product =>
+              @_product(product, productRow)
+            }
+          </div>
+        }.toList
+      }
     </div>
   </div>
 
-  @_products = {
-    @if(products.headOption == None) {
-      <h2>@celebrity.publicName isn't signing eGraphs! Go badger him on Twitter.</h2>
-    } else {
-      <h2>
-        You choose a photo,
-        <a href="#" rel='popover' title="It's between @celebrity.publicName and you" data-content="After you choose a photo and personal message to send him, we'll reserve time on @celebrity.publicName's schedule to read your message and hand-write you a response on top of the photo.">
-          @celebrity.publicName does the rest.
-        </a>
-      </h2>
-      @products.toList.grouped(2).map { productRow =>
-        <div class="row">
-          @productRow.map { product =>
-            @_product(product, productRow)
-          }
+  @_product(product: Product, productRow: List[Product]) = {
+    <div class="span6 offset1 @_offsetClass">
+      <a class="product preview-link" href="/@celebrity.urlSlug/@product.urlSlug">
+        <img src="http://placehold.it/330x230" alt="@product.name Thumbnail">
+        <div class="description">
+          @product.name
         </div>
-      }.toList
-    }
+        <div class="btn primary large success buy-button" >Get it signed</div>
+      </a>
+    </div>
 
-    @_product(product: Product, productRow: List[Product]) = {
-      <div class="span6 offset1 @_offsetClass">
-        <div class="product">
-          <img src="http://placehold.it/330x230">
-          <div class="description">
-            @product.name
-          </div>
-          <a class="btn primary large success buy-button" href="#">Get it signed</a>
-        </div>
-      </div>
+    @_offsetClass = {
+      @((productRow.head, productRow.tail) match {
+        case (aProduct, List()) if aProduct == product =>
+          "offset5"
 
-      @_offsetClass = {
-        @((productRow.head, productRow.tail) match {
-          case (aProduct, List()) if aProduct == product =>
-            "offset5"
+        case (aProduct, _) if aProduct == product =>
+          "offset1"
 
-          case (aProduct, _) if aProduct == product =>
-            "offset1"
-
-          case (_, List(aProduct)) if aProduct == product =>
-            "offset2"
-        })
-      }
+        case (_, List(aProduct)) if aProduct == product =>
+          "offset2"
+      })
     }
   }
 }

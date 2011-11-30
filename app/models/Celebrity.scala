@@ -2,10 +2,11 @@ package models
 
 import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
-import db.{KeyedCaseClass, Schema, Saves}
 import libs.{Serialization, Time}
 import libs.Blobs.AccessPolicy
 import org.squeryl.Query
+import play.templates.JavaExtensions
+import db.{FilterOneTable, KeyedCaseClass, Schema, Saves}
 
 /**
  * Persistent entity representing the Celebrities who provide products on
@@ -24,7 +25,7 @@ case class Celebrity(
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated
 {
   //
-  // Public methods
+  // Public members
   //
   /** Persists by conveniently delegating to companion object's save method. */
   def save(): Celebrity = {
@@ -32,9 +33,12 @@ case class Celebrity(
   }
 
   /** Returns all of the celebrity's Products */
-  def products: Query[Product] = {
-    Product.findByCelebrity(id)
+  def products(filters: FilterOneTable[Product] *): Query[Product] = {
+    Product.FindByCelebrity(id, filters: _*)
   }
+
+  /** The slug used to access this Celebrity's page on the main site. */
+  val urlSlug = publicName.map(name => JavaExtensions.slugify(name, false)) // Slugify without lower-casing
   
   /**
    * Renders the Celebrity as a Map, which will itself be rendered into whichever data format
@@ -117,9 +121,9 @@ object Celebrity extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {
   //
   // Public Methods
   //
-  def findByName(name: String): Option[Celebrity] = {
+  def findByUrlSlug(slug: String): Option[Celebrity] = {
     from(Schema.celebrities)(celebrity =>
-      where(celebrity.publicName === Some(name))
+      where(celebrity.urlSlug === Some(slug))
       select(celebrity)
     ).headOption
   }
@@ -136,6 +140,7 @@ object Celebrity extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {
       theOld.firstName := theNew.firstName,
       theOld.lastName := theNew.lastName,
       theOld.publicName := theNew.publicName,
+      theOld.urlSlug := theNew.urlSlug,
       theOld.profilePhotoUpdated := theNew.profilePhotoUpdated,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated

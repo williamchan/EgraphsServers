@@ -1,0 +1,52 @@
+@(celebrity:models.Celebrity, product: models.Product)
+
+@import models.Product
+
+@base(title=celebrity.publicName.get + ": " + product.name + "- eGraphs", onLoad=onLoad, body=body, head=head)
+
+@head = {
+  <style type="text/css">
+    body {
+      background-color:black;
+      background-image:url("/public/images/BaseballBackground.jpg");
+      background-repeat:no-repeat;
+    }
+    footer {
+      color:white;
+    }
+  </style>
+}
+
+@onLoad = {
+  $(function () {
+    $("a[rel=popover]")
+      .popover({
+        offset: 10,
+        placement: 'above'
+      })
+      .click(function(e) {
+        e.preventDefault()
+      })
+  })
+}
+
+@body = {
+  <div class="celeb-content">
+    <div class="row personal-info">
+      <div class="span4 profile-photo" >
+        <img src="@celebrity.profilePhoto.get.url" alt="@celebrity.publicName Profile Photo" />
+      </div>
+      <div class="span12 profile-info">
+        <h1>@celebrity.publicName <span class="label notice">Currently signing</span></h1>
+        <div class="quotemark">&ldquo;</div>
+        <div class="row">
+          <div class="span11 description">@celebrity.description</div>
+        </div>
+      </div>
+    </div>
+    <div class="page-header"></div>
+    <div class="products">
+      <h2>Product is @product.name</h2>
+    </div>
+  </div>
+}

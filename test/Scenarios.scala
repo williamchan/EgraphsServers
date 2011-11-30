@@ -121,7 +121,7 @@ class Scenarios extends DeclaresScenarios {
         "Will-has-two-products"
       )
 
-      redirect("CelebrityController.index", Map("celebrityName" -> "Wizzle"))
+      redirectToWizzle
     }
   )
 
@@ -142,7 +142,7 @@ class Scenarios extends DeclaresScenarios {
         description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
       ).save()
 
-      redirect("CelebrityController.index", Map("celebrityName" -> "Wizzle"))
+      redirectToWizzle
     }
   )
 
@@ -187,7 +187,21 @@ class Scenarios extends DeclaresScenarios {
         description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
       ).save()
 
-      redirect("CelebrityController.index", Map("celebrityName" -> "Wizzle"))
+      redirectToWizzle
+    }
+  )
+
+  toScenarios add Scenario(
+    "Celebrity-page-with-no-products",
+
+    """ Opens up Wizzle's celebrity page with no products """,
+
+    {() =>
+      Scenario.clearAll()
+
+      Scenario.play("Will-Chan-is-a-celebrity")
+
+      redirectToWizzle
     }
   )
 
@@ -218,6 +232,10 @@ class Scenarios extends DeclaresScenarios {
   def openPage(controller: => Any): Result =
   {
     new ScalaAction(controller)
+  }
+
+  def redirectToWizzle = {
+    redirect("CelebrityController.index", Map("celebrityUrlSlug" -> "Wizzle"))
   }
 }
 

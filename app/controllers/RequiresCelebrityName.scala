@@ -3,10 +3,15 @@ package controllers
 import play.mvc.{Controller, Before}
 import models.Celebrity
 
+/**
+ * Ensures that any controllers that mix in this trait will only be processed if the requested
+ * URL has a valid celebrity url slug.
+ */
 trait RequiresCelebrityName { this: Controller =>
   //
   // Protected methods
   //
+  /** Access the located product (for use in controller methods only) */
   protected def celebrity: Celebrity = {
     _celebrity.get
   }
@@ -16,21 +21,21 @@ trait RequiresCelebrityName { this: Controller =>
   //
   private val _celebrity = new ThreadLocal[Celebrity]
 
-  @Before(priority=20)
+  @Before(priority=RequiresCelebrityName.interceptPriority)
   protected def ensureRequestHasCelebrity = {
-    Option(params.get("celebrityName")) match {
+    Option(params.get("celebrityUrlSlug")) match {
       case None =>
         throw new IllegalStateException(
           """
-          Investigate this. This should never have happened since our routes are supposed
-          to ensure that celebrityName is present.
+          celebrityUrlSlug parameter was not provided. This should never have happened since our routes are supposed
+          to ensure that it is present.
           """
         )
 
-      case Some(celebrityName) =>
-        Celebrity.findByName(celebrityName) match {
+      case Some(celebrityUrlSlug) =>
+        Celebrity.findByUrlSlug(celebrityUrlSlug) match {
           case None =>
-            NotFound("No celebrity named \"" + celebrityName + "\"")
+            NotFound("No celebrity with url \"" + celebrityUrlSlug + "\"")
 
           case Some(celebrity) =>
             _celebrity.set(celebrity)
@@ -38,4 +43,8 @@ trait RequiresCelebrityName { this: Controller =>
         }
     }
   }
+}
+
+object RequiresCelebrityName {
+  final val interceptPriority = 20
 }
