@@ -5,11 +5,11 @@ import org.squeryl.dsl.ast.UpdateAssignment
 import org.squeryl.PrimitiveTypeMode._
 
 /**
- * Gives an object the ability to save instances of the parameterized type. Also
- * provides hooks to transform the entity before saving it.
+ * Gives an object the ability to save instances of the associated type, eg Person.save(personInstance).
+ * Also, provides hooks to transform the entity before saving it.
  *
- * This trait assumes any entity with id of <= 0 is unset, and will attempt to insert it rather
- * than update, so make sure 0 or a negative number is your sentinel value!
+ * This trait assumes any entity with id of <= 0 does not exist in the database and will attempt to insert it rather
+ * than update, so make sure 0 or a negative number is your sentinel value! (IDs in databases typically start from 1.)
  *
  * Usage:
  * {{{
@@ -22,8 +22,8 @@ import org.squeryl.PrimitiveTypeMode._
  *         updateIs(
  *           theOld.name := theNew.name
  *         )
- *       }
- *    }
+ * }
+ * }
  *
  *    // Later on in application code...
  *    Person.save(Person(name="Jonesy"))
@@ -44,22 +44,24 @@ import org.squeryl.PrimitiveTypeMode._
  *         theOld.name := theNew.name
  *         theOld.version := theNew.version
  *       )
- *     }
- *   }
+ * }
+ * }
  * }}}
  */
-trait Saves[T <: {def id: Long}] {
+trait Saves[T <: {def id : Long}] {
 
   //
   // Abstract members
   //
-  /** The table that manages this entity in db.Schema  */
+  /**The table that manages this entity in db.Schema  */
   protected def table: Table[T]
 
   /**
    * Defines how to update an old row in the database with the new one, using the syntax
    * that usually appears in a Squeryl set() clause. Usually this will be just a matter of taking
    * all the persisted properties and setting them.
+   *
+   * Note: Every KeyedCaseClass will need to override defineUpdate until SQueryL manual mutation of KeyedEntity.
    *
    * For example:
    * {{{
@@ -71,8 +73,8 @@ trait Saves[T <: {def id: Long}] {
    *        updateIs(
    *          theOld.name := theNew.name
    *        )
-   *     }
-   *   }
+   * }
+   * }
    * }}}
    *
    * @see <a href=http://squeryl.org/inserts-updates-delete.html>Squeryl query documentation</a>
@@ -100,14 +102,14 @@ trait Saves[T <: {def id: Long}] {
    * Assumes that any object with id <= 0 has not yet been inserted.
    *
    * @param toSave the object to save
-   * 
+   *
    * @return the final object that was saved, after all transforms
    */
   final def save(toSave: T): T = {
     toSave.id match {
       case n if n <= 0 =>
         insert(toSave)
-        
+
       case _ =>
         updateTable(toSave)
     }
@@ -121,7 +123,7 @@ trait Saves[T <: {def id: Long}] {
    * @return the located object or None
    */
   final def findById(id: Long): Option[T] = {
-    from(table)(row => where(row.id === id) select(row)).headOption
+    from(table)(row => where(row.id === id) select (row)).headOption
   }
 
   /**
@@ -154,10 +156,10 @@ trait Saves[T <: {def id: Long}] {
   }
 
   private def updateTable(toUpdate: T): T = {
-    val finalEntity = performTransforms(preUpdateTransforms,  toUpdate)
+    val finalEntity = performTransforms(preUpdateTransforms, toUpdate)
     update(table)(row =>
-       where((row.id) === finalEntity.id)
-       set(defineUpdate(row, finalEntity):_*)
+      where((row.id) === finalEntity.id)
+        set (defineUpdate(row, finalEntity): _*)
     )
 
     finalEntity

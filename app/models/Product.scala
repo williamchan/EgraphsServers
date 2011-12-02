@@ -19,13 +19,16 @@ case class Product(
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated {
-  
+
   //
-  // Public members
+  // Additional DB columns
   //
   /** The slug used to access this product from the main site */
   val urlSlug = JavaExtensions.slugify(name, false) // Slugify without lower-casing
-  
+
+  //
+  // Public members
+  //
   def save(): Product = {
     Product.save(this)
   }

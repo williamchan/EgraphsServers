@@ -14,9 +14,10 @@ import libs.Time
  */
 trait HasCreatedUpdated {
   def created: Timestamp
+
   def updated: Timestamp
 
-  /** Renders the created and updated fields as a Map for use in the API */
+  /**Renders the created and updated fields as a Map for use in the API */
   def renderCreatedUpdatedForApi: Map[String, Any] = {
     Map(
       "created" -> Time.toApiFormat(created),
@@ -31,13 +32,16 @@ trait HasCreatedUpdated {
  *
  * See [[models.Account]] for an example.
  */
-trait SavesCreatedUpdated[T <: KeyedCaseClass[Long] with HasCreatedUpdated] { this: Saves[T] =>
+trait SavesCreatedUpdated[T <: KeyedCaseClass[Long] with HasCreatedUpdated] {
+  this: Saves[T] =>
 
   //
   // Abstract members
   //
   /**
    * Provides a new version of a provided model that has correct created and updated fields
+   *
+   * Note: Every KeyedCaseClass will need to override withCreatedUpdated until SQueryL manual mutation of KeyedEntity.
    */
   protected def withCreatedUpdated(toUpdate: T, created: Timestamp, updated: Timestamp): T
 
@@ -50,7 +54,7 @@ trait SavesCreatedUpdated[T <: KeyedCaseClass[Long] with HasCreatedUpdated] { th
   }
 
   private def setUpdatedField(toUpdate: T): T = {
-    withCreatedUpdated(toUpdate, created=toUpdate.created, updated=now)
+    withCreatedUpdated(toUpdate, created = toUpdate.created, updated = now)
   }
 
   private def now: Timestamp = {

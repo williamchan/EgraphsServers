@@ -9,6 +9,8 @@ import java.io.{ByteArrayOutputStream, PrintWriter}
 
 /**
  * Egraphs Database schema
+ *
+ * When inspecting the schema of a database table, inspect both this object and the KeyedCaseClass.
  */
 object Schema extends org.squeryl.Schema {
   //
@@ -46,7 +48,7 @@ object Schema extends org.squeryl.Schema {
   // Products
   //
   val products = table[Product]
-  on(products)(product=>
+  on(products)(product =>
     declare(
       columns(product.celebrityId, product.urlSlug) are (unique)
     )
@@ -88,7 +90,7 @@ object Schema extends org.squeryl.Schema {
   //
   // Public methods
   //
-  /** Clears out the schema and recreates it. For God's sake don't do this in production. */
+  /**Clears out the schema and recreates it. For God's sake don't do this in production. */
   def scrub() {
     Play.configuration.get("db.allowscrub") match {
       case "yes" =>
@@ -103,7 +105,7 @@ object Schema extends org.squeryl.Schema {
     }
   }
 
-  /** Returns the SQL commands that define this schema as a String. */
+  /**Returns the SQL commands that define this schema as a String. */
   def ddl: String = {
     val outputStream = new ByteArrayOutputStream()
     val printWriter = new PrintWriter(outputStream)
@@ -153,12 +155,11 @@ object Schema extends org.squeryl.Schema {
    *
    */
   def oneAccountPerRowOn[T <: KeyedEntity[Long]]
-    (table: Table[T], foreignKey: Account=>Option[Long]): OneToManyRelationImpl[T, Account] =
-  {
+  (table: Table[T], foreignKey: Account => Option[Long]): OneToManyRelationImpl[T, Account] = {
     val relation = oneToManyRelation(table, accounts)
       .via((row, account) => row.id === foreignKey(account))
 
-    on(accounts)(account => declare(foreignKey(account) is(unique)))
+    on(accounts)(account => declare(foreignKey(account) is (unique)))
     relation.foreignKeyDeclaration.constrainReference(onDelete setNull)
 
     relation

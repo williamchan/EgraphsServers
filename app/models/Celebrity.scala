@@ -25,6 +25,12 @@ case class Celebrity(
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated
 {
   //
+  // Additional DB columns
+  //
+  /** The slug used to access this Celebrity's page on the main site. */
+  val urlSlug = publicName.map(name => JavaExtensions.slugify(name, false)) // Slugify without lower-casing
+
+  //
   // Public members
   //
   /** Persists by conveniently delegating to companion object's save method. */
@@ -37,9 +43,7 @@ case class Celebrity(
     Product.FindByCelebrity(id, filters: _*)
   }
 
-  /** The slug used to access this Celebrity's page on the main site. */
-  val urlSlug = publicName.map(name => JavaExtensions.slugify(name, false)) // Slugify without lower-casing
-  
+
   /**
    * Renders the Celebrity as a Map, which will itself be rendered into whichever data format
    * by the API (e.g. JSON)

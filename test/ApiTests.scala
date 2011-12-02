@@ -6,7 +6,9 @@ import org.junit.{After, Test}
 import play.mvc.Http.Request
 import play.test.FunctionalTest
 import sjson.json.Serializer
+
 class ApiTests extends FunctionalTest {
+
   import FunctionalTest._
 
   @After
@@ -20,7 +22,7 @@ class ApiTests extends FunctionalTest {
     runScenario("Will-Chan-is-a-celebrity")
 
     // Execute the request
-    val response = GET(willChanRequest, apiRoot+"/celebrities/me")
+    val response = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me")
 
     // Test expectations
     assertIsOk(response)
@@ -50,7 +52,7 @@ class ApiTests extends FunctionalTest {
     req.password = "wrongwrongwrong"
 
     // Execute the request
-    val response = GET(req, apiRoot+"/celebrities/me")
+    val response = GET(req, TestConstants.ApiRoot + "/celebrities/me")
     assertEquals(403, response.status)
   }
 
@@ -67,7 +69,7 @@ class ApiTests extends FunctionalTest {
     val req = willChanRequest
 
     // Execute the request
-    val response = GET(req, apiRoot+"/celebrities/me/orders?signerActionable=true")
+    val response = GET(req, TestConstants.ApiRoot + "/celebrities/me/orders?signerActionable=true")
     assertIsOk(response)
 
     val json = Serializer.SJSON.in[List[Map[String, Any]]](getContent(response))
@@ -89,7 +91,7 @@ class ApiTests extends FunctionalTest {
       "Erem-buys-Wills-two-products-twice-each"
     )
 
-    val ordersResponse = GET(willChanRequest, apiRoot+"/celebrities/me/orders?signerActionable=true")
+    val ordersResponse = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/orders?signerActionable=true")
     val ordersList = Serializer.SJSON.in[List[Map[String, Any]]](getContent(ordersResponse))
 
     val firstOrderMap = ordersList.head
@@ -97,7 +99,7 @@ class ApiTests extends FunctionalTest {
 
     val response = POST(
       willChanRequest,
-      apiRoot+"/celebrities/me/orders/"+orderId+"/egraphs",
+      TestConstants.ApiRoot + "/celebrities/me/orders/" + orderId + "/egraphs",
       APPLICATION_X_WWW_FORM_URLENCODED,
       "signature=theSignature&audio=theAudio"
     )
@@ -141,20 +143,21 @@ class ApiTests extends FunctionalTest {
   }
 
   def runScenarios(name: String*) {
-    name.foreach { name =>
-      runScenario(name)
+    name.foreach {
+      name =>
+        runScenario(name)
     }
   }
 
   def runScenario(name: String) {
-    val response = GET("/test/scenarios/"+name)
+    val response = GET("/test/scenarios/" + name)
     if (response.status != 200) {
-      throw new IllegalArgumentException("Unknown scenario name "+name)
+      throw new IllegalArgumentException("Unknown scenario name " + name)
     }
   }
 
   def willChanAccount: Account = {
-    Account(email="wchan83@gmail.com").withPassword("herp").right.get
+    Account(email = "wchan83@gmail.com").withPassword("herp").right.get
   }
 
   def willChanRequest: Request = {
@@ -163,9 +166,5 @@ class ApiTests extends FunctionalTest {
     req.password = "herp"
 
     req
-  }
-  
-  def apiRoot = {
-    "/api/1.0"
   }
 }
