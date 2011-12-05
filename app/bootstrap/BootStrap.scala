@@ -4,6 +4,7 @@ import play.jobs._
 import com.stripe.Stripe
 import org.squeryl.{Session, SessionFactory}
 import play.Play
+import db.DBSession
 import io.Source
 import java.io.{File, PrintWriter}
 import libs.{Utils, TempFile, Blobs}
@@ -39,6 +40,7 @@ private object TestModeBootstrap {
   }
 
   private def bootstrapDatabase() {
+    DBSession.init()
     inTransaction {
       if ((!db.Schema.isInPlace) || schemaHasChanged) {
         play.Logger.info(
@@ -49,6 +51,7 @@ private object TestModeBootstrap {
         Blobs.scrub()
       }
     }
+    DBSession.commit()
   }
 
   /**
