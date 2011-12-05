@@ -9,7 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.rmi.RemoteException;
 
-public class BiometricServerServicesTest extends TestCase {
+public class BiometricServerServicesTests extends TestCase {
 
     private BiometricServerServices services = new BiometricServerServices();
 //    private WebServiceBiometricPartStub webServiceProxyBiometricPart = services.getWebServiceProxyBiometricPart();

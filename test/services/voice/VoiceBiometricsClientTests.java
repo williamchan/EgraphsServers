@@ -2,11 +2,11 @@ package services.voice;
 
 import junit.framework.TestCase;
 
-public class VoiceBiometricsClientTest extends TestCase {
+public class VoiceBiometricsClientTests extends TestCase {
 
     private static VoiceBiometricsClient client;
 
-    public VoiceBiometricsClientTest() {
+    public VoiceBiometricsClientTests() {
         super();
         try {
             client = new VoiceBiometricsClient();

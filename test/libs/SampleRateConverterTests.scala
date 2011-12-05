@@ -5,7 +5,7 @@ import org.scalatest.matchers.ShouldMatchers
 import java.io.File
 import javax.sound.sampled.{AudioSystem, AudioFormat}
 
-class SampleRateConverterTest extends UnitFlatSpec
+class SampleRateConverterTests extends UnitFlatSpec
 with ShouldMatchers {
 
   it should "downsample 44khz WAV to 4khz WAV" in {

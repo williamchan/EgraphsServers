@@ -2,25 +2,12 @@ package controllers
 
 import play.mvc.Controller
 import scenario.Scenario
-import play.Play
-import play.utils.Action
-import play.mvc.Router.ActionDefinition
-import play.mvc.results.{Result, ScalaAction}
+import play.mvc.results.Result
 
 /**
  * Controller for all scenarios
  */
 object ScenarioController extends Controller with DBTransaction {
-  /**
-   * Lazy evaluator for the Scenarios library, which should live with the test
-   * code.
-   *
-   * Doing it this way ensures that we don't waste any memory loading scenarios
-   * until the first scenario request comes in, which should only be in a test
-   * environment.
-   */
-  lazy val scenarios = Class.forName("Scenarios").newInstance()
-
   /**
    * Performs a code block only if the project's Scenarios library is available.
    *
@@ -29,7 +16,7 @@ object ScenarioController extends Controller with DBTransaction {
    */
   private def withRegisteredScenarios(task: => Any) = {
     try {
-      scenarios
+      Scenario.scenarios
 
       task
     } catch {

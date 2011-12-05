@@ -48,7 +48,7 @@ GET     /public/                                staticDir:public
 ##
 %{ api = '/api/1.0' }%
 
-GET     ${api}/celebrities/{celebrityId}                          CelebrityApiControllers.getCelebrity
-GET     ${api}/celebrities/{celebrityId}/orders                   CelebrityApiControllers.getOrders
-POST    ${api}/celebrities/{celebrityId}/orders/{orderId}/egraphs CelebrityOrderApiControllers.postEgraph
+GET     ${api}/celebrities/{celebrityId}                          api.CelebrityApiControllers.getCelebrity
+GET     ${api}/celebrities/{celebrityId}/orders                   api.CelebrityApiControllers.getOrders
+POST    ${api}/celebrities/{celebrityId}/orders/{orderId}/egraphs api.CelebrityOrderApiControllers.postEgraph
 

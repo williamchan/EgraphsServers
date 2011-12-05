@@ -1,9 +1,10 @@
-package controllers
+package controllers.api
 
 import play.mvc.Controller
 import sjson.json.Serializer
 import models.Order
 import models.Order.FindByCelebrity.Filters
+import controllers.{RequiresAuthenticatedAccount, RequiresCelebrityId, DBTransaction}
 
 /**
  * Controllers that handle direct API requests for celebrity resources.

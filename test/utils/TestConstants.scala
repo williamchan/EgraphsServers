@@ -1,3 +1,5 @@
+package utils
+
 object TestConstants {
 
   def ApiRoot = {

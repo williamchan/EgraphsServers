@@ -1,12 +1,10 @@
-package controllers
+package controllers.api
 
 import play.mvc.Controller
 import play.libs.Codec
 import sjson.json.Serializer
-import javax.imageio.ImageIO
-import libs.{Blobs, ImageUtil}
-import java.awt.image.BufferedImage
-import java.io.{ByteArrayOutputStream, File}
+import libs.Blobs
+import controllers.{DBTransaction, RequiresCelebrityOrderId, RequiresCelebrityId, RequiresAuthenticatedAccount}
 
 /**
  * Handles requests for queries against a celebrity for his orders.

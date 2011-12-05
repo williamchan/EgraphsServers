@@ -4,7 +4,7 @@ import org.scalatest.matchers.ShouldMatchers
 import play.libs.Codec
 import play.test.UnitFlatSpec
 
-class Base64Test extends UnitFlatSpec
+class Base64Tests extends UnitFlatSpec
 with ShouldMatchers {
 
   it should "encode and decode Base64" in {

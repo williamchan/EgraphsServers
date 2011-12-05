@@ -1,7 +1,8 @@
+package db
+
 import org.scalatest.matchers.ShouldMatchers
 import org.squeryl.adapters.{MySQLAdapter, PostgreSqlAdapter, H2Adapter}
 import play.test.UnitFlatSpec
-import db.DBAdapter
 
 class DBAdapterTests extends UnitFlatSpec with ShouldMatchers {
 

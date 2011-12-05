@@ -6,6 +6,12 @@ import org.squeryl.KeyedEntity
  * Custom trait for case classes that extend [[db.Schema]]. Provides case-class
  * equality rather than the broken KeyedEntity[_] equality test that depends on the
  * mutable _isPersisted variable.
+ *
+ * This class was unfortunately required for reasons explained by Erem on the Squeryl newsgroup:
+ * https://groups.google.com/forum/#!topic/squeryl/ouDS8maB9F0 explained by myself on the newsgroup.
+ *
+ * This conversation also has some good discussion of how a solution is being approached:
+ * https://groups.google.com/forum/#!searchin/squeryl/case$20class/squeryl/kzhb6aJm7cA/d26KEoNLzXAJ
  */
 trait KeyedCaseClass[T] extends KeyedEntity[T] {
   //

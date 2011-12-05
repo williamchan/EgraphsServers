@@ -4,7 +4,7 @@ import play.test.UnitFlatSpec
 import org.scalatest.matchers.ShouldMatchers
 
 
-class BezierCubicTest extends UnitFlatSpec
+class BezierCubicTests extends UnitFlatSpec
 with ShouldMatchers {
 
   it should "calculate distance" in {

@@ -21,6 +21,16 @@ import libs.Blobs
 case class Scenario(name: String, description: String="", play: () => Any)
 
 object Scenario {
+  /**
+   * Lazy evaluator for the Scenarios library, which should live with the test
+   * code.
+   *
+   * Doing it this way ensures that we don't waste any memory loading scenarios
+   * until the first scenario request comes in, which should only be in a test
+   * environment.
+   */
+  lazy val scenarios = Class.forName("Scenarios").newInstance()
+
   /** All registered scenarios, indexed by name */
   var all: Map[String, Scenario] = Map[String, Scenario]()
 
@@ -57,6 +67,8 @@ object Scenario {
    * Play through one or more scenarios without processing their return values.
    */
   def play(names: String*) {
+    scenarios
+
     for (name <- names) {
       Scenario.named(name) match {
         case None =>

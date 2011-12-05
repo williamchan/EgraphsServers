@@ -4,8 +4,8 @@ import play.mvc.Controller
 import models.Account
 
 /**
- * Test controller used in ApiTests to verify that Play does, in fact,
- * open a transaction and commit/rollback it correctly for each request.
+ * Test controller used in [[controllers.DBTransactionTests]] to verify that Play does, in fact,
+ * open a transaction and rollback/commit it correctly for each request.
  */
 object TransactionTestController extends Controller with DBTransaction {
 
