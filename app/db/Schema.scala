@@ -126,21 +126,33 @@ object Schema extends org.squeryl.Schema {
   /**
    * Returns true if it has reason to believe at least SOME egraphs schema already exists on the
    * main Play connection. False otherwise.
+   *
+   * In practice, we just try to perform a query and if the query barfs then our schema was not
+   * yet installed.
    */
   def isInPlace: Boolean = {
-    // Basically just try to perform a query and if it throws up it doesn't exist.
+    // Prepare a savepoint on the connection; we'll roll back to this point if the test query fails.
+    // This is necessary because postgres will throw a runtime exception on any
+    // query issued after a failed query until rollback() gets called.
+    val conn = play.db.DB.getConnection
+    val savepoint = conn.setSavepoint()
+
     try {
       from(celebrities)(celeb =>
         select(celeb)
       ).headOption
 
       true
-    } catch {
+    }
+    catch {
       case e: RuntimeException if e.getMessage.toLowerCase.contains("celebrity") =>
         false
 
       case otherErrors =>
         throw otherErrors
+    }
+    finally {
+      conn.rollback(savepoint)
     }
   }
 
