@@ -4,7 +4,7 @@
 @import controllers.CelebrityController
 @import libs.Blobs.AccessPolicy.Public
 
-@content_base(title=celebrity.publicName.get + ": " + product.name + "- eGraphs", onLoad=onLoad, body=body, head=head)
+@content_base(title=celebrity.publicName.get + ": " + product.name + "- eGraphs", body=body, head=head)
 
 @head = {
   <style type="text/css">
@@ -19,19 +19,6 @@
   </style>
 }
 
-@onLoad = {
-  $(function () {
-    $("a[rel=popover]")
-      .popover({
-        offset: 10,
-        placement: 'above'
-      })
-      .click(function(e) {
-        e.preventDefault()
-      })
-  })
-}
-
 @profilePhoto_100x100 = {
   @celebrity.profilePhoto.get.resized(100, 100).ensureSaved(Public).url
 }
@@ -40,7 +27,9 @@
   <div class="product-content">
     <div class="row product-header" >
       <div class="span2 profile-thumbnail" >
-        <img src="@profilePhoto_100x100" alt="@celebrity.publicName profile photo">
+        <a href="@CelebrityController.url(celebrity)" >
+          <img src="@profilePhoto_100x100" alt="@celebrity.publicName profile photo">
+        </a>
       </div>
       <div class="span14 product-header">
         <h2>
