@@ -4,7 +4,6 @@ import play.jobs._
 import com.stripe.Stripe
 import org.squeryl.{Session, SessionFactory}
 import play.Play
-import db.DBSession
 import io.Source
 import java.io.{File, PrintWriter}
 import libs.{Utils, TempFile, Blobs}
@@ -32,6 +31,7 @@ class BootStrap extends Job {
  * Bootstrap code for when we're running in test mode
  */
 private object TestModeBootstrap {
+
   import org.squeryl.PrimitiveTypeMode._
 
   def run() {
@@ -39,7 +39,6 @@ private object TestModeBootstrap {
   }
 
   private def bootstrapDatabase() {
-    DBSession.init()
     inTransaction {
       if ((!db.Schema.isInPlace) || schemaHasChanged) {
         play.Logger.info(
@@ -64,12 +63,13 @@ private object TestModeBootstrap {
     db.Schema.scrub()
   }
 
-  /** Prints the database schema to the provided file. */
+  /**Prints the database schema to the provided file. */
   private def printDdlToFile(file: File) {
     file.delete()
 
-    Utils.closing(new PrintWriter(file)) { writer =>
-      db.Schema.printDdl(writer)
+    Utils.closing(new PrintWriter(file)) {
+      writer =>
+        db.Schema.printDdl(writer)
     }
   }
 
@@ -81,7 +81,7 @@ private object TestModeBootstrap {
     if (schemaFile.exists()) {
       val prevDdl = Source.fromFile(schemaFile).mkString
 
-      prevDdl != db.Schema.ddl 
+      prevDdl != db.Schema.ddl
     }
     else {
       // No schema file existed, so the schema is different whatever it is.
@@ -89,6 +89,6 @@ private object TestModeBootstrap {
     }
   }
 
-  /** Location for log of the database schema SQL */
+  /**Location for log of the database schema SQL */
   def schemaFile = TempFile.named("schema.sql")
 }
