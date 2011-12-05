@@ -22,11 +22,11 @@ with DBTransaction {
     (signature, audio) match {
       case (Some(signatureString), Some(audioString)) =>
         play.Logger.info("Processing the request as if valid")
-        val egraphId = order
+        val egraph = order
           .newEgraph
           .save(signatureString, Codec.decodeBASE64(audioString))
-          .id
-
+        val egraphId = egraph.id
+        
         Blobs.put("egraphs/" + egraphId + "/signature.json", signatureString.getBytes)
 
         // demo code (refactor it later):
