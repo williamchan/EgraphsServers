@@ -25,7 +25,7 @@ class CelebrityApiControllersTests extends FunctionalTest with CleanDatabaseAfte
 
     val json = Serializer.SJSON.in[Map[String, AnyRef]](getContent(response))
 
-    assertEquals(BigDecimal(1), json("id"))
+    assertNotNull(json("id"))
     assertEquals("Wizzle", json("publicName"))
     assertEquals("William", json("firstName"))
     assertEquals("Chan", json("lastName"))

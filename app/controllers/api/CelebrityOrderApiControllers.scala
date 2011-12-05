@@ -24,8 +24,6 @@ with DBTransaction {
           .save(signatureString, Codec.decodeBASE64(audioString))
           .id
 
-        // TODO(wchan): Should this go here? Maybe it makes more sense to save to db, and then have a job handle
-        // everything else, including Blob store actions and eGraph generation.
         Blobs.put("egraphs/" + egraphId + "/signature.json", signatureString.getBytes)
 
         // demo code (refactor it later):

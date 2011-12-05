@@ -11,7 +11,7 @@ import db.DBSession
  **/
 trait DBTransaction {
 
-  @Before(priority=5)
+  @Before(priority = 5)
   def initSquerylTransaction() {
     DBSession.init()
   }

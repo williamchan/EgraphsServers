@@ -7,8 +7,7 @@ package libs
 object Utils {
 
   /**
-   * Creates an Option out of any nullable type. Used most frequently in our
-   * JPA models.
+   * Creates an Option out of any nullable type.
    *
    * @param toMakeOption the value to make an Option
    *
