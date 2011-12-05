@@ -1,6 +1,7 @@
 @(celebrity:models.Celebrity, product: models.Product)
 
 @import models.Product
+@import controllers.CelebrityController
 
 @base(title=celebrity.publicName.get + ": " + product.name + "- eGraphs", onLoad=onLoad, body=body, head=head)
 
@@ -37,7 +38,8 @@
         <img src="@celebrity.profilePhoto.get.url" alt="@celebrity.publicName Profile Photo" />
       </div>
       <div class="span12 profile-info">
-        <h1>@celebrity.publicName <span class="label notice">Currently signing</span></h1>
+        <h1><a href="@CelebrityController.url(celebrity)">@celebrity.publicName</a></h1>
+        <h2>@product.name</h2>
         <div class="quotemark">&ldquo;</div>
         <div class="row">
           <div class="span11 description">@celebrity.description</div>

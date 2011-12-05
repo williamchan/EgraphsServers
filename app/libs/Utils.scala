@@ -1,5 +1,7 @@
 package libs
 
+import play.mvc.Router
+
 
 /**
  * Helpful utilities with no other place to call home
@@ -58,5 +60,23 @@ object Utils {
     finally {
       resource.close()
     }
+  }
+
+  /**
+   * Returns up the ActionDefinition for a controller method with a parameter map.
+   *
+   * For example, to redirect to Shaq's celebrity page:
+   * {{{
+   *   val actionDef = Utils.lookupUrl(
+   *     "controllers.CelebrityController.index",
+   *     Map("celebrityUrlSlug" -> "Shaq")
+   *   )
+   *   redirect(actionDef.url)
+   * }}}
+   */
+  def lookupUrl(controllerMethod: String, params: Map[String, AnyRef]): Router.ActionDefinition = {
+    import scala.collection.JavaConversions._
+
+    Router.reverse(controllerMethod, params: Map[String, Object])
   }
 }
