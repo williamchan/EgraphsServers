@@ -2,20 +2,7 @@
 
 @import models.Product
 
-@base(title=celebrity.publicName.get + " - eGraphs", onLoad=onLoad, body=body, head=head)
-
-@head = {
-  <style type="text/css">
-    body {
-      background-color:black;
-      background-image:url("/public/images/BaseballBackground.jpg");
-      background-repeat:no-repeat;
-    }
-    footer {
-      color:white;
-    }
-  </style>
-}
+@content_base(title=celebrity.publicName.get + " - eGraphs", onLoad=onLoad, body=body)
 
 @onLoad = {
   $(function () {
@@ -51,7 +38,7 @@
       } else {
         <h2>
           You choose a photo and write a short note.
-          <a href="#" rel='popover' title="It's between @celebrity.publicName and you" data-content="When you buy an eGraph, a special slot of time on @celebrity.publicName's schedule gets reserved for him to hand-write a response to your note on top of the photo you select here.">
+          <a href="#" rel='popover' title="Just between @celebrity.publicName and you" data-content="When you buy an eGraph, a special slot of time on @celebrity.publicName's schedule gets reserved for him to hand-write a response to your note on top of the photo you select here.">
             @celebrity.publicName does the rest.
           </a>
         </h2>

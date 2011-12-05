@@ -6,6 +6,10 @@
 ## Test routes
 ##
 %{ if (play.id == "test") }%
+
+GET     /stripe                                 stripe.stripe
+POST    /stripe                                 stripe.post
+
 GET     /test/scenarios                          ScenarioController.list
 GET     /test/scenarios/clear                    ScenarioController.clear
 GET     /test/scenarios/{name}                   ScenarioController.scenario
@@ -17,6 +21,7 @@ GET     /test/request-transaction/with-error     TransactionTestController.makeA
 GET     /test/request-transaction/is-stored      TransactionTestController.isStored
 
 GET     /test/files/{<.*>blobKey}                    BlobControllers.getBlob
+
 
 
 ##
@@ -33,9 +38,6 @@ GET     /                                       Application.index
 # Celebrity pages
 GET     /{celebrityUrlSlug}                     CelebrityController.index
 GET     /{celebrityUrlSlug}/{productUrlSlug}     CelebrityProductController.index
-
-GET     /stripe                                 stripe.stripe
-POST    /stripe                                 stripe.post
 
 # Ignore favicon requests
 GET     /favicon.ico                            404

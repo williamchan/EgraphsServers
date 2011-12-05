@@ -1,0 +1,29 @@
+@(title:String    = "",
+  head:   => Html = Html.empty,
+  onLoad: => Html = Html.empty,
+  body:   => Html = Html.empty)
+
+@import models.Product
+@import controllers.CelebrityController
+
+@base(title=title, head=localHead, onLoad=onLoad, body=localBody)
+
+@localHead = {
+  <style type="text/css">
+    body {
+      background-color:black;
+      background-image:url("/public/images/BaseballBackground.jpg");
+      background-repeat:no-repeat;
+    }
+    footer {
+      color:white;
+    }
+  </style>
+  @head
+}
+
+@localBody = {
+  <div class="content-base">
+    @body
+  </div>
+}

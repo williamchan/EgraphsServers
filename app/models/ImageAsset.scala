@@ -56,6 +56,19 @@ class ImageAsset(
     this
   }
 
+  /**
+   * Ensures that configured ImageAsset is available on the blobstore by querying
+   * the blobstore and rendering/saving the data if it was not present.
+   */
+  def ensureSaved(access:AccessPolicy=AccessPolicy.Private): ImageAsset = {
+    if (!isPersisted) {
+      save(access)
+    }
+    else {
+      this
+    }
+  }
+
   /** Returns true that the image is accessible in the blobstore */
   def isPersisted: Boolean = {
     Blobs.exists(key)

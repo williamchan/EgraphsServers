@@ -2,8 +2,9 @@
 
 @import models.Product
 @import controllers.CelebrityController
+@import libs.Blobs.AccessPolicy.Public
 
-@base(title=celebrity.publicName.get + ": " + product.name + "- eGraphs", onLoad=onLoad, body=body, head=head)
+@content_base(title=celebrity.publicName.get + ": " + product.name + "- eGraphs", onLoad=onLoad, body=body, head=head)
 
 @head = {
   <style type="text/css">
@@ -31,24 +32,32 @@
   })
 }
 
+@profilePhoto_100x100 = {
+  @celebrity.profilePhoto.get.resized(100, 100).ensureSaved(Public).url
+}
+
 @body = {
-  <div class="celeb-content">
-    <div class="row personal-info">
-      <div class="span4 profile-photo" >
-        <img src="@celebrity.profilePhoto.get.url" alt="@celebrity.publicName Profile Photo" />
+  <div class="product-content">
+    <div class="row product-header" >
+      <div class="span2 profile-thumbnail" >
+        <img src="@profilePhoto_100x100" alt="@celebrity.publicName profile photo">
       </div>
-      <div class="span12 profile-info">
-        <h1><a href="@CelebrityController.url(celebrity)">@celebrity.publicName</a></h1>
-        <h2>@product.name</h2>
-        <div class="quotemark">&ldquo;</div>
-        <div class="row">
-          <div class="span11 description">@celebrity.description</div>
-        </div>
+      <div class="span14 product-header">
+        <h2>
+          <a href="@CelebrityController.url(celebrity)">
+            @celebrity.publicName
+          </a> in
+        </h2>
+        <h1> @product.name</h1>
       </div>
     </div>
     <div class="page-header"></div>
-    <div class="products">
-      <h2>Product is @product.name</h2>
+    <div class="">
+      <img src="http://placehold.it/940x500" alt="@product.name Thumbnail">
     </div>
   </div>
+
+
+
+
 }
