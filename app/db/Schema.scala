@@ -94,7 +94,9 @@ object Schema extends org.squeryl.Schema {
   def scrub() {
     Play.configuration.get("db.allowscrub") match {
       case "yes" =>
-        drop
+        if (db.Schema.isInPlace) {
+          drop
+        }
         create
 
       case _ =>
