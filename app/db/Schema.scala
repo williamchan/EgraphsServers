@@ -35,6 +35,14 @@ object Schema extends org.squeryl.Schema {
   val administrators = table[Administrator]
 
   //
+  // Cash transactions
+  //
+  val cashTransactions = table[CashTransaction]
+  on(cashTransactions)(cashTransaction =>
+    declare(cashTransaction.amountInCurrency is monetaryDbType)
+  )
+
+  //
   // Accounts
   //
   val accounts = table[Account]
@@ -43,6 +51,8 @@ object Schema extends org.squeryl.Schema {
   val accountToCustomer = oneAccountPerRowOn(customers, (account) => account.customerId)
   val accountToAdministrator = oneAccountPerRowOn(administrators, (acct) => acct.administratorId)
   val accountToCelebrity = oneAccountPerRowOn(celebrities, (account) => account.celebrityId)
+  val accountToTransaction = oneToManyRelation(accounts, cashTransactions).via(
+    (account, cashTransaction) => account.id === cashTransaction.accountId)
 
   //
   // Products
@@ -50,6 +60,7 @@ object Schema extends org.squeryl.Schema {
   val products = table[Product]
   on(products)(product =>
     declare(
+      product.priceInCurrency is monetaryDbType,
       columns(product.celebrityId, product.urlSlug) are (unique)
     )
   )
@@ -60,6 +71,9 @@ object Schema extends org.squeryl.Schema {
   // Orders
   //
   val orders = table[Order]("Orders")
+  on(orders)(order =>
+    declare(order.amountPaidInCurrency is monetaryDbType)
+  )
 
   val productToOrders = oneToManyRelation(products, orders)
     .via((product, order) => product.id === order.productId)
@@ -87,6 +101,7 @@ object Schema extends org.squeryl.Schema {
     .via((order, egraph) => order.id === egraph.orderId)
   orderToEgraphs.foreignKeyDeclaration.constrainReference(onDelete setNull)
 
+
   //
   // Public methods
   //
@@ -95,7 +110,7 @@ object Schema extends org.squeryl.Schema {
     Play.configuration.get("db.allowscrub") match {
       case "yes" =>
         if (db.Schema.isInPlace) {
-          drop
+          dropSchema()
         }
         create
 
@@ -104,6 +119,20 @@ object Schema extends org.squeryl.Schema {
           """I'm just not going to scrub the DB unless "db.allowscrub" is
           set to "yes" in application.conf. Sorry if you have a problem with that."""
         )
+    }
+  }
+
+  /** Drops the public schema of the database. This requires specific syntax for some providers. */
+  private def dropSchema() {
+    DBAdapter.current match {
+      case DBAdapter.postgres =>
+        // Postgres-specific syntax makes Squeryl's drop() method not bork.
+        val conn = play.db.DB.getConnection
+        conn.prepareStatement("DROP SCHEMA public CASCADE;").execute()
+        conn.prepareStatement("CREATE SCHEMA public AUTHORIZATION postgres").execute()
+
+      case _ =>
+        drop
     }
   }
 
@@ -168,7 +197,7 @@ object Schema extends org.squeryl.Schema {
    *   the provided table's id field
    *
    */
-  def oneAccountPerRowOn[T <: KeyedEntity[Long]]
+  private def oneAccountPerRowOn[T <: KeyedEntity[Long]]
   (table: Table[T], foreignKey: Account => Option[Long]): OneToManyRelationImpl[T, Account] = {
     val relation = oneToManyRelation(table, accounts)
       .via((row, account) => row.id === foreignKey(account))
@@ -178,4 +207,15 @@ object Schema extends org.squeryl.Schema {
 
     relation
   }
+
+  /**
+   * Defines a type for monetaryDbType fields.
+   *
+   * Decision based on conversation at:
+   * http://stackoverflow.com/questions/224462/storing-money-in-a-decimal-column-what-precision-and-scale
+   */
+  private def monetaryDbType = {
+    dbType("decimal(21, 6)")
+  }
+
 }

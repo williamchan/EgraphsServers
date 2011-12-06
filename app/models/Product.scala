@@ -5,6 +5,8 @@ import java.sql.Timestamp
 import org.squeryl.Query
 import db.{FilterOneTable, Schema, Saves, KeyedCaseClass}
 import play.templates.JavaExtensions
+import org.joda.money.{CurrencyUnit, Money}
+import libs.Finance.TypeConversions._
 
 /**
  * An item on sale by a Celebrity. In the case of the base Egraph, it represents a signature service
@@ -13,7 +15,7 @@ import play.templates.JavaExtensions
 case class Product(
   id: Long = 0L,
   celebrityId: Long = 0L,
-  priceInCents: Int = 0,
+  priceInCurrency: BigDecimal = 0,
   name: String = "",
   description: String = "",
   created: Timestamp = Time.defaultTimestamp,
@@ -31,6 +33,18 @@ case class Product(
   //
   def save(): Product = {
     Product.save(this)
+  }
+
+  def price: Money = {
+    priceInCurrency.toDollars
+  }
+
+  def withPrice(money: Money) = {
+    copy(priceInCurrency=BigDecimal(money.getAmount))
+  }
+
+  def withPrice(money: BigDecimal) = {
+    copy(priceInCurrency=money)
   }
 
   //
@@ -76,7 +90,7 @@ object Product extends Saves[Product] with SavesCreatedUpdated[Product] {
   override def defineUpdate(theOld: Product, theNew: Product) = {
     updateIs(
       theOld.celebrityId := theNew.celebrityId,
-      theOld.priceInCents := theNew.priceInCents,
+      theOld.priceInCurrency := theNew.priceInCurrency,
       theOld.name := theNew.name,
       theOld.urlSlug := theNew.urlSlug,
       theOld.description := theNew.description,

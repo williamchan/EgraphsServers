@@ -18,7 +18,17 @@ import libs.Blobs
  *
  * For more, see [[scenarios.DeclaresScenarios]]
  */
-case class Scenario(name: String, description: String="", play: () => Any)
+case class Scenario(name: String, description: String="", instructions: () => Any) {
+  def play() = {
+    try {
+      instructions()
+    }
+    catch {
+      case exc:Throwable =>
+        throw new RuntimeException("Error while executing scenario \"" + name + "\"", exc)
+    }
+  }
+}
 
 object Scenario {
   /**
@@ -80,5 +90,3 @@ object Scenario {
     }
   }
 }
-
-

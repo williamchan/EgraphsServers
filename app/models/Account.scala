@@ -87,7 +87,14 @@ object Account extends Saves[Account] with SavesCreatedUpdated[Account] {
   def findByEmail(email: String): Option[Account] = {
     from(Schema.accounts)(account =>
       where(account.email === email)
-        select(account)
+      select(account)
+    ).headOption
+  }
+
+  def findByCustomerId(customerId: Long): Option[Account] = {
+    from(Schema.accounts)(account =>
+      where(account.customerId === customerId)
+      select(account)
     ).headOption
   }
 

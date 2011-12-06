@@ -3,7 +3,7 @@ package models
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
-import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationAfter, CreatedUpdatedEntityTests, SavingEntityTests}
+import utils._
 
 class EgraphTests extends UnitFlatSpec
   with ShouldMatchers
@@ -76,12 +76,12 @@ class EgraphTests extends UnitFlatSpec
   //
   // Private methods
   //
-  def persistedOrder = {
-    val customer = Customer().save()
+  def persistedOrder: Order = {
+    val customer = TestData.newSavedCustomer()
     val celebrity = Celebrity().save()
     val product = celebrity.newProduct.save()
 
-    customer.buy(product).save()
+    customer.buy(product).save().order
   }
 
 }

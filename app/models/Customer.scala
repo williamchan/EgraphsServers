@@ -23,20 +23,38 @@ case class Customer(
   }
 
   /**
-   * Orders an Egraph product on behalf of a recipient.
+   * Orders an Egraph product on behalf of a recipient. The results must be persisted for the transaction
+   * to actually accomplish anything.
    *
    * @param product the Product to buy
    * @param recipient the Customer receiving the eGraph. Defaults to the purchasing Customer.
    *
-   * @return an Order for the Product, purchased by this Customer for the recipient Customer.
+   * @return a tuple of the Order for the Product purchased by this Customer for the recipient Customer
+   *   and the transaction that took place.
    */
-  def buy(product: Product, recipient: Customer = this): Order = {
-    Order(
-      buyerId=id,
-      recipientId=recipient.id,
-      productId=product.id,
-      amountPaidInCents=product.priceInCents
-    )
+  def buy(product: Product, recipient: Customer = this): ProductPurchase = {
+    Account.findByCustomerId(id) match {
+      case Some(account) =>
+        val order = Order(
+          buyerId=id,
+          recipientId=recipient.id,
+          productId=product.id,
+          amountPaidInCurrency=product.price.getAmountMinor.intValue
+        )
+
+        val transaction = CashTransaction(accountId=account.id)
+          .withMoney(product.price)
+          .withType(CashTransaction.EgraphPurchase)
+
+        ProductPurchase(order, transaction)
+
+      case None =>
+        throw new IllegalStateException(
+          "Customer " + id + " can't buy product " + product.id +
+          " because the he/she lacks an Account."
+        )
+    }
+
   }
 
   //

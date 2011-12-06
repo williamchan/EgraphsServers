@@ -5,6 +5,8 @@ import java.sql.Timestamp
 import db.{KeyedCaseClass, Schema, Saves}
 import libs.{Serialization, Time}
 import org.squeryl.dsl.ast.LogicalBoolean
+import org.joda.money.Money
+import libs.Finance.TypeConversions._
 
 /**
  * Persistent entity representing the Orders made upon Products of our service
@@ -14,7 +16,8 @@ case class Order(
   productId: Long = 0,
   buyerId: Long = 0,
   recipientId: Long = 0,
-  amountPaidInCents: Int = 0,
+  transactionId: Long = 0,
+  amountPaidInCurrency: BigDecimal = 0,
   messageToCelebrity: Option[String] = None,
   requestedMessage: Option[String] = None,
   created: Timestamp = Time.defaultTimestamp,
@@ -27,6 +30,10 @@ case class Order(
   /** Persists by conveniently delegating to companion object's save method. */
   def save(): Order = {
     Order.save(this)
+  }
+
+  def amountPaid: Money = {
+    amountPaidInCurrency.toDollars
   }
 
   /**
@@ -44,7 +51,7 @@ case class Order(
       "buyerName" -> buyer.name,
       "recipientId" -> recipient.id,
       "recipientName" -> recipient.name,
-      "amountPaidInCents" -> amountPaidInCents
+      "amountPaidInCents" -> amountPaid.getAmountMinor
     )
 
     val optionalFields = Serialization.makeOptionalFieldMap(
@@ -172,7 +179,8 @@ object Order extends Saves[Order] with SavesCreatedUpdated[Order] {
     updateIs(
       theOld.productId := theNew.productId,
       theOld.buyerId := theNew.buyerId,
-      theOld.amountPaidInCents := theNew.amountPaidInCents,
+      theOld.transactionId := theNew.transactionId,
+      theOld.amountPaidInCurrency := theNew.amountPaidInCurrency,
       theOld.recipientId := theNew.recipientId,
       theOld.messageToCelebrity := theNew.messageToCelebrity,
       theOld.requestedMessage := theNew.requestedMessage,

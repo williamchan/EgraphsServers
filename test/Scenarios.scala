@@ -5,6 +5,7 @@ import play.mvc.results.{Redirect, Result, ScalaAction}
 import play.mvc.Router
 import scenario.{Scenario, DeclaresScenarios}
 import Blobs.Conversions._
+import utils.TestData
 
 /**
  * All scenarios supported by the API.
@@ -49,13 +50,13 @@ class Scenarios extends DeclaresScenarios {
       val will = getWillCelebrityAccount
 
       will.newProduct.copy(
-        priceInCents=10000,
+        priceInCurrency=10,
         name="2010 Starcraft 2 Championships",
         description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
       ).save()
 
       will.newProduct.copy(
-        priceInCents=7000,
+        priceInCurrency=70,
         name="2011 King of Pweens Competition",
         description="In classic form, Wizzle dominated the competition and left mouths agape."
       ).save()
@@ -73,7 +74,7 @@ class Scenarios extends DeclaresScenarios {
     """,
 
     {() =>
-      Customer(name="Erem Boto").save()
+      TestData.newSavedCustomer().copy(name="Erem Boto").save()
     }
   )
 
@@ -137,7 +138,7 @@ class Scenarios extends DeclaresScenarios {
 
       val will = getWillCelebrityAccount
       will.newProduct.copy(
-        priceInCents=10000,
+        priceInCurrency=100,
         name="2010 Starcraft 2 Championships",
         description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
       ).save()
@@ -157,32 +158,33 @@ class Scenarios extends DeclaresScenarios {
       Scenario.play("Will-Chan-is-a-celebrity")
 
       val will = getWillCelebrityAccount
+
       will.newProduct.copy(
-        priceInCents=10000,
+        priceInCurrency=100,
         name="2010 Starcraft 2 Championships",
         description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
       ).save()
 
       will.newProduct.copy(
-        priceInCents=10000,
+        priceInCurrency=100,
         name="2012 Platinum League Victory",
         description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
       ).save()
 
       will.newProduct.copy(
-        priceInCents=10000,
+        priceInCurrency=100,
         name="2001 Senior Yearbook Photo",
         description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
       ).save()
 
       will.newProduct.copy(
-        priceInCents=10000,
+        priceInCurrency=100,
         name="Bi-Annual World Series of Magic: The Gathering",
         description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
       ).save()
 
       will.newProduct.copy(
-        priceInCents=10000,
+        priceInCurrency=100,
         name="2200AD Undead League Starcraft II Championship",
         description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
       ).save()
