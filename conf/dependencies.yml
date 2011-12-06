@@ -12,8 +12,6 @@ require:
     - org.apache.axis2 -> axis2 1.6.1
     - org.apache.axis2 -> axis2-transport-http 1.6.1
     - org.apache.axis2 -> axis2-transport-local 1.6.1
-    - org.apache.xmlgraphics -> batik-codec 1.7
-    - org.apache.xmlgraphics -> batik-rasterizer 1.7
     - org.jclouds -> jclouds-allblobstore 1.2.1
     - org.squeryl -> squeryl_2.8.1 0.9.4:
         exclude:
@@ -29,7 +27,6 @@ require:
             - junit -> *
             - org.scalatest -> *
     - postgresql -> postgresql 9.1-901.jdbc4
-    - provided -> imgscalr-lib 4.0.0
     - provided -> tritonus_share 0.3.6
     - provided -> tritonus_remaining 0.3.6
     - provided -> xyzmo 1.0
