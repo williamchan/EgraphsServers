@@ -2,9 +2,9 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-##
-## Test routes
-##
+###
+### Test routes
+###
 %{ if (play.id == "test") }%
 
 GET     /stripe                                 stripe.stripe
@@ -23,21 +23,16 @@ GET     /test/request-transaction/is-stored      TransactionTestController.isSto
 GET     /test/files/{<.*>blobKey}                    BlobControllers.getBlob
 
 
+###
+### Production routes
+###
 
 ##
-## Production routes
-##
-
-##
-## Website
+## Defaults
 ##
 %{ if (true) }%
 # Home page
 GET     /                                       Application.index
-
-# Celebrity pages
-GET     /{celebrityUrlSlug}                     CelebrityController.index
-GET     /{celebrityUrlSlug}/{productUrlSlug}     CelebrityProductController.index
 
 # Ignore favicon requests
 GET     /favicon.ico                            404
@@ -53,4 +48,13 @@ GET     /public/                                staticDir:public
 GET     ${api}/celebrities/{celebrityId}                          api.CelebrityApiControllers.getCelebrity
 GET     ${api}/celebrities/{celebrityId}/orders                   api.CelebrityApiControllers.getOrders
 POST    ${api}/celebrities/{celebrityId}/orders/{orderId}/egraphs api.CelebrityOrderApiControllers.postEgraph
+
+##
+## Website
+##
+
+# Celebrity pages
+GET     /{celebrityUrlSlug}                      CelebrityController.index
+GET     /{celebrityUrlSlug}/{productUrlSlug}     CelebrityProductController.index
+POST    /{celebrityUrlSlug}/{productUrlSlug}/buy CelebrityProductController.buy
 

@@ -75,12 +75,21 @@ object Utils {
    *   redirect(actionDef.url)
    * }}}
    */
-  def lookupUrl(controllerMethod: String, params: Map[String, AnyRef]): Router.ActionDefinition = {
+  def lookupUrl(controllerMethod: String, params: Map[String, AnyRef]=Map()): Router.ActionDefinition = {
     import scala.collection.JavaConversions._
 
-    Router.reverse(controllerMethod, params: Map[String, Object])
+    if (params == Map.empty) {
+      Router.reverse(controllerMethod)
+    } else {
+      Router.reverse(controllerMethod, params: Map[String, Object])
+    }
   }
 
+  /**
+   * Returns a configuration property that must exist in application.conf.
+   *
+   * Throws a runtime exception with a reasonable error message if it didn't exist.
+   */
   def requiredConfigurationProperty(property: String): String = {
     val theValue = Play.configuration.getProperty(property)
     require(

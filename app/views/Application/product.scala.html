@@ -3,28 +3,25 @@
 @import models.Product
 @import controllers.CelebrityController
 @import libs.Blobs.AccessPolicy.Public
+@import libs.Finance.TypeConversions._
+@import libs.Utils.lookupUrl
 
 @content_base(title=celebrity.publicName.get + ": " + product.name + "- eGraphs", body=body, head=head)
 
 @head = {
-  <style type="text/css">
-    body {
-      background-color:black;
-      background-image:url("/public/images/BaseballBackground.jpg");
-      background-repeat:no-repeat;
-    }
-    footer {
-      color:white;
-    }
-  </style>
-  <script data-main='@asset("public/javascripts/product-page.js")'
-          src='@asset("public/javascripts/require-1.0.2.js")'
-          type="text/javascript" ></script>
+<script src='@asset("public/twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript" ></script>
+  <script type="text/javascript" >
+    require(["product-page"], function(productPage) {
+       productPage.go("@libs.Payment.StripeKey.publishable", @product.price.getAmountMinor)
+    })
+  </script>
 }
 
 @profilePhoto_100x100 = {
   @celebrity.profilePhoto.get.resized(100, 100).ensureSaved(Public).url
 }
+
+@price = {@product.price.formatSimply}
 
 @body = {
   <div class="product-content">
@@ -40,12 +37,134 @@
             @celebrity.publicName
           </a> in
         </h2>
-        <h1> @product.name</h1>
+        <h1>@product.name</h1>
+        <h6><span class="label success">@price Signed</span></h6>
       </div>
     </div>
-    <div class="page-header"></div>
-    <div class="">
+    <div class="product-image">
       <img src="http://placehold.it/940x500" alt="@product.name Thumbnail">
+    </div>
+    <div class="form row">
+      <div class="span4 form-description-column">
+        <div id="your-time">
+          <h2>You and @celebrity.publicName</h2>
+          <p>
+            Your purchase reserves time for you on @celebrity.publicName's busy
+            schedule, so don't be shy about writing whatever you want in your short note --
+            @celebrity.publicName is <em>guaranteed</em> to read it.
+          </p>
+        </div>
+        <div id="grab-or-gift">
+          <h2>Grab it or gift it</h2>
+          <p>
+            @celebrity.publicName can either sign the eGraph for you or as a gift
+            for someone you care about. Just make sure the name and e-mail address
+            to the right match the intended recipient!
+          </p>
+        </div>
+        <div id="print-and-post">
+          <h2>Print it and post it</h2>
+          <p>
+            You can do anything with the eGraph @celebrity.publicName signs for you:
+            blow it up onto poster, shrink it down onto a coffee mug, share it on Facebook,
+            make it your background, and any number of other things that would be
+            impossible with a physical autograph.
+          </p>
+        </div>
+      </div>
+      <div class="span12 form-column">
+        <form id="payment-form" method="POST" action='/@celebrity.urlSlug/@product.urlSlug/buy'>
+          <fieldset>
+            <legend>Recipient info</legend>
+            <div class="clearfix">
+              <label for="recipientName" >Name</label>
+              <div class="input" >
+                <input class="span4" id="recipientName" name="recipientName" size="30" type="text" />
+              </div>
+            </div>
+            <div class="clearfix">
+              <label for="recipientEmail" >E-mail address</label>
+              <div class="input" >
+                <input class="span4" id="recipientEmail" name="recipientEmail" size="30" type="text" />
+              </div>
+            </div>
+            <div class="clearfix">
+              <label for="desiredText">Desired text</label>
+              <div class="input">
+                <textarea class="xxlarge" id="desiredText" name="desiredText" rows="3"></textarea>
+                <span class="help-block">
+                  e.g. <em>"Happy 13th birthday, David!"</em> If left blank, @celebrity.publicName will just
+                  sign his name over the photo.
+                </span>
+              </div>
+            </div>
+          </fieldset>
+          <div style="border-top:1px solid #ddd">
+            <fieldset>
+              <legend>Payment info <span class="help-inline">where different from above</span></legend>
+              <div class="clearfix">
+                <label for="buyerName">Full name</label>
+                <div class="input">
+                  <input class="span3" id="buyerName" name="buyerName" type="text" >
+                  <span class="help-block">As it appears on the card</span>
+                </div>
+              </div>
+              <div class="clearfix">
+                <label for="buyerEmail">E-mail address</label>
+                <div class="input">
+                  <input class="span3" id="buyerEmail" name="buyerEmail" type="text" >
+                </div>
+              </div>
+              <div class="clearfix">
+                <label for="cardNumber" >Card number</label>
+                <div class="input">
+                  <input class="span3" id="cardNumber" name="cardNumber" type="text" >
+                  <span class="help-block">It will be charged @price</span>
+                </div>
+              </div>
+              <div class="clearfix">
+                <label for="cardExpirationMonth">Expiration date</label>
+                <div class="input">
+                  <div class="inline-inputs">
+                    <input class="span1" id="cardExpirationMonth" type="text" >
+                    /
+                    <input class="span1" id="cardExpirationYear" type="text" >
+                  </div>
+                </div>
+              </div>
+              <div class="clearfix">
+                <label for="cardCvc">CVC</label>
+                <div class="input" >
+                  <input class="span1" id="cardCvc" type="text" >
+                </div>
+              </div>
+            </fieldset>
+          </div>
+          <div style="border-top:1px solid #ddd">
+            <fieldset>
+              <legend>Anything else you want @celebrity.publicName to know?</legend>
+              <div class="clearfix">
+                <label for="personalNote">Note to @celebrity.publicName</label>
+                <div class="input">
+                  <textarea class="xxlarge" id="personalNote" name="personalNote" rows="3"></textarea>
+                  <span class="help-block">
+                    e.g. <em>I'm your biggest fan!</em>
+                  </span>
+                </div>
+              </div>
+              <div class="actions">
+                <button type="submit" id="submit-button" class="btn large success fade in">Get @celebrity.publicName's Autograph Now</button>
+                <span class="help-block">
+                  This will charge @price to your credit card
+                </span>
+                <div id="form-errors" class="alert-message block-message error">
+                  Failed
+                </div>
+              </div>
+            </fieldset>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 

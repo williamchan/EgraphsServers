@@ -1,5 +1,6 @@
 @(celebrity:models.Celebrity, products: Iterable[models.Product])
 
+@import libs.Finance.TypeConversions._
 @import models.Product
 
 @content_base(title=celebrity.publicName.get + " - eGraphs", onLoad=onLoad, body=body)
@@ -60,7 +61,10 @@
         <div class="description">
           @product.name
         </div>
-        <div class="btn primary large success buy-button" >Get it signed</div>
+        <div class="btn primary large success buy-button" >
+          <div>Get it signed!</div>
+          <div>@product.price.formatSimply</div>
+        </div>
       </a>
     </div>
 

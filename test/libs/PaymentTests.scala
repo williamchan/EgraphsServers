@@ -11,9 +11,8 @@ class PaymentTests extends UnitFlatSpec
   with ClearsDatabaseAndValidationAfter
   with DBTransactionPerTest
 {
-  import Finance.TypeConversions._
+  import libs.Finance.TypeConversions._
 
   val amount: BigDecimal = 1000
 
-  
 }

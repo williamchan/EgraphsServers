@@ -166,25 +166,25 @@ class Scenarios extends DeclaresScenarios {
       ).save()
 
       will.newProduct.copy(
-        priceInCurrency=100,
+        priceInCurrency=90,
         name="2012 Platinum League Victory",
         description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
       ).save()
 
       will.newProduct.copy(
-        priceInCurrency=100,
+        priceInCurrency=89.99,
         name="2001 Senior Yearbook Photo",
         description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
       ).save()
 
       will.newProduct.copy(
-        priceInCurrency=100,
+        priceInCurrency=100.50,
         name="Bi-Annual World Series of Magic: The Gathering",
         description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
       ).save()
 
       will.newProduct.copy(
-        priceInCurrency=100,
+        priceInCurrency=120.00,
         name="2200AD Undead League Starcraft II Championship",
         description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
       ).save()
