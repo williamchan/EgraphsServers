@@ -1,6 +1,7 @@
 package libs
 
 import play.mvc.Router
+import play.Play
 
 
 /**
@@ -78,5 +79,15 @@ object Utils {
     import scala.collection.JavaConversions._
 
     Router.reverse(controllerMethod, params: Map[String, Object])
+  }
+
+  def requiredConfigurationProperty(property: String): String = {
+    val theValue = Play.configuration.getProperty(property)
+    require(
+      theValue != null,
+      "Property \"" + property + "\" in application.conf was required but not present."
+    )
+
+    theValue
   }
 }

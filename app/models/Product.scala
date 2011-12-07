@@ -36,7 +36,7 @@ case class Product(
   }
 
   def price: Money = {
-    priceInCurrency.toDollars
+    priceInCurrency.toMoney()
   }
 
   def withPrice(money: Money) = {

@@ -3,10 +3,11 @@ package models
 import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
 import db.{KeyedCaseClass, Schema, Saves}
-import libs.{Serialization, Time}
 import org.squeryl.dsl.ast.LogicalBoolean
 import org.joda.money.Money
 import libs.Finance.TypeConversions._
+import libs.{Payment, Utils, Serialization, Time}
+import models.CashTransaction.EgraphPurchase
 
 /**
  * Persistent entity representing the Orders made upon Products of our service
@@ -16,7 +17,9 @@ case class Order(
   productId: Long = 0,
   buyerId: Long = 0,
   recipientId: Long = 0,
-  transactionId: Long = 0,
+  paymentStateString: String = Order.PaymentState.NotCharged.stateValue,
+  transactionId: Option[Long] = None,
+  stripeCardToken: Option[String] = None,
   amountPaidInCurrency: BigDecimal = 0,
   messageToCelebrity: Option[String] = None,
   requestedMessage: Option[String] = None,
@@ -24,6 +27,8 @@ case class Order(
   updated: Timestamp = Time.defaultTimestamp
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated
 {
+  import Order._
+
   //
   // Public methods
   //
@@ -33,7 +38,27 @@ case class Order(
   }
 
   def amountPaid: Money = {
-    amountPaidInCurrency.toDollars
+    amountPaidInCurrency.toMoney()
+  }
+
+  def paymentState: PaymentState = {
+    PaymentState.all(paymentStateString)
+  }
+
+  def withPaymentState(paymentState: PaymentState) = {
+    copy(paymentStateString = paymentState.stateValue)
+  }
+
+  def charge(): OrderCharge = {
+    require(stripeCardToken != None, "Can not charge an order without a valid stripe card token")
+
+    val cashTransaction = CashTransaction(accountId=buyerId)
+      .withMoney(amountPaid)
+      .withType(EgraphPurchase)
+
+    OrderCharge(
+      this.withPaymentState(Order.PaymentState.Charged), stripeCardToken.get, cashTransaction
+    )
   }
 
   /**
@@ -170,6 +195,34 @@ object Order extends Saves[Order] with SavesCreatedUpdated[Order] {
     }
   }
 
+  case class OrderCharge(private[Order] val order: Order,
+                         private[Order] val stripeCardToken: String,
+                         private[Order] val transaction: CashTransaction) {
+    def saveAndIssue(): OrderCharge = {
+      val savedTransaction = transaction.save()
+      val savedOrder = order.copy(transactionId = Some(savedTransaction.id))
+
+      Payment.charge(
+        order.amountPaid,
+        stripeCardToken,
+        "Egraph Order #" + order.id
+      )
+
+      this.copy(order=savedOrder, transaction=savedTransaction)
+    }
+  }
+
+  sealed abstract class PaymentState(val stateValue: String)
+  object PaymentState {
+    case object NotCharged extends PaymentState("NotCharged")
+    case object Charged extends PaymentState("Charged")
+    case object Refunded extends PaymentState("Refunded")
+
+    val all = Utils.toMap[String, PaymentState](
+      Seq(NotCharged, Charged, Refunded), key=(state) => state.stateValue
+    )
+  }
+
   //
   // Saves[Order] methods
   //
@@ -180,6 +233,8 @@ object Order extends Saves[Order] with SavesCreatedUpdated[Order] {
       theOld.productId := theNew.productId,
       theOld.buyerId := theNew.buyerId,
       theOld.transactionId := theNew.transactionId,
+      theOld.paymentStateString := theNew.paymentStateString,
+      theOld.stripeCardToken := theNew.stripeCardToken,
       theOld.amountPaidInCurrency := theNew.amountPaidInCurrency,
       theOld.recipientId := theNew.recipientId,
       theOld.messageToCelebrity := theNew.messageToCelebrity,

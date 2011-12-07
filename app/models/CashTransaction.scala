@@ -9,6 +9,7 @@ case class CashTransaction(
   id: Long = 0,
   accountId: Long = 0,
   amountInCurrency: BigDecimal = 0,
+  currencyCode: String = CurrencyUnit.USD.getCode,
   typeString: String = "",
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp
@@ -28,7 +29,10 @@ case class CashTransaction(
   }
 
   def withMoney(newMoney: Money): CashTransaction = {
-    copy(amountInCurrency=BigDecimal(newMoney.getAmount))
+    copy(
+      amountInCurrency=BigDecimal(newMoney.getAmount),
+      currencyCode=newMoney.getCurrencyUnit.getCode
+    )
   }
 
   def transactionType: TransactionType = {
@@ -56,7 +60,8 @@ object CashTransaction extends Saves[CashTransaction] with SavesCreatedUpdated[C
   case object CelebrityDisbursement extends TransactionType("CelebrityDisbursement")
 
   val types = Utils.toMap[String, TransactionType](Seq(
-    EgraphPurchase
+    EgraphPurchase,
+    CelebrityDisbursement
   ), key=(theType) => theType.value)
   
   //
@@ -76,6 +81,7 @@ object CashTransaction extends Saves[CashTransaction] with SavesCreatedUpdated[C
 
     updateIs(
       theOld.accountId := theNew.accountId,
+      theOld.currencyCode := theNew.currencyCode,
       theOld.amountInCurrency := theNew.amountInCurrency,
       theOld.typeString := theNew.typeString,
       theOld.updated := theNew.updated

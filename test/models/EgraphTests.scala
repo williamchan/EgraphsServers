@@ -81,7 +81,7 @@ class EgraphTests extends UnitFlatSpec
     val celebrity = Celebrity().save()
     val product = celebrity.newProduct.save()
 
-    customer.buy(product).save().order
+    customer.buy(product).save()
   }
 
 }

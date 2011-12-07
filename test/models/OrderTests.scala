@@ -22,7 +22,7 @@ class OrderTests extends UnitFlatSpec
   override def newEntity = {
     val (customer, product) = newCustomerAndProduct
 
-    customer.buy(product).order
+    customer.buy(product)
   }
 
   override def saveEntity(toSave: Order) = {
@@ -35,14 +35,16 @@ class OrderTests extends UnitFlatSpec
 
   override def transformEntity(toTransform: Order) = {
     val (customer, product) = newCustomerAndProduct
-    val order = customer.buy(product).order
+    val order = customer.buy(product)
     toTransform.copy(
       productId = order.productId,
       buyerId = order.buyerId,
+      transactionId = Some(12345),
       recipientId = order.recipientId,
+      stripeCardToken = Some("12345"),
       messageToCelebrity = Some("Wizzle you're the best!"),
       requestedMessage = Some("Happy birthday, Erem!")
-    )
+    ).withPaymentState(Order.PaymentState.Charged)
   }
 
   //
@@ -65,7 +67,6 @@ class OrderTests extends UnitFlatSpec
     val product = celebrity.newProduct.save()
     val order = buyer
       .buy(product, recipient)
-      .order
       .copy(
         messageToCelebrity=Some("toCeleb"),
         requestedMessage=Some("please write this"))
@@ -89,9 +90,9 @@ class OrderTests extends UnitFlatSpec
     val (will, recipient, celebrity, product) = newOrderStack
 
     val (firstOrder, secondOrder, thirdOrder) = (
-      will.buy(product).save().order,
-      will.buy(product).save().order,
-      will.buy(product).save().order
+      will.buy(product).save(),
+      will.buy(product).save(),
+      will.buy(product).save()
     )
 
     // Orders of celebrity's products
@@ -104,7 +105,7 @@ class OrderTests extends UnitFlatSpec
     val (will, _, celebrity, product) = newOrderStack
     val (_, _ , _, otherCelebrityProduct) = newOrderStack
 
-    val celebOrder = will.buy(product).save().order
+    val celebOrder = will.buy(product).save()
     will.buy(otherCelebrityProduct).save()
 
     val celebOrders = Order.FindByCelebrity(celebrity.id)
@@ -116,8 +117,8 @@ class OrderTests extends UnitFlatSpec
   it should "only find a particular Order when composed with OrderIdFilter" in {
     val (will, _, celebrity, product) = newOrderStack
 
-    val firstOrder = will.buy(product).save().order
-    will.buy(product).save().order
+    val firstOrder = will.buy(product).save()
+    will.buy(product).save()
 
     val found = Order.FindByCelebrity(celebrity.id, Filters.OrderId(firstOrder.id))
 
@@ -130,7 +131,7 @@ class OrderTests extends UnitFlatSpec
 
     // Make an buy for each Egraph State, and save an Egraph in that state
     val orders = Egraph.states.map { case (_, state) =>
-      val order = will.buy(product).save().order
+      val order = will.buy(product).save()
       order
         .newEgraph
         .withState(state)
@@ -140,7 +141,7 @@ class OrderTests extends UnitFlatSpec
     }
 
     // Also buy one without an eGraph
-    val orderWithoutEgraph = will.buy(product).save().order
+    val orderWithoutEgraph = will.buy(product).save()
 
     // Perform the test
     val found = Order.FindByCelebrity(celebrity.id, Filters.ActionableOnly)

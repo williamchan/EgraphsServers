@@ -7,13 +7,14 @@ import play.Play
 import db.DBSession
 import io.Source
 import java.io.{File, PrintWriter}
-import libs.{Utils, TempFile, Blobs}
+import libs.{Payment, Utils, TempFile, Blobs}
 
 @OnApplicationStart
 class BootStrap extends Job {
 
   override def doJob() {
-    Stripe.apiKey = "pvESi1GjhD9e8RFQQPfeH8mHZ2GIyqQV"
+    // Initialize payment system
+    Stripe.apiKey = Payment.StripeKey.secret
 
     // Initialize Squeryl persistence
     SessionFactory.concreteFactory =
@@ -22,6 +23,7 @@ class BootStrap extends Job {
     // Initialize S3 or fs-based blobstore
     Blobs.init()
 
+    // Some additional test-mode setup
     if (Play.id == "test") {
       TestModeBootstrap.run()
     }
