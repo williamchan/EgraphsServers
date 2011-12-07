@@ -5,6 +5,11 @@ import java.sql.Timestamp
 import db.{Saves, KeyedCaseClass}
 import libs.{Utils, Time}
 
+/**
+ * Represents a single payment event relative to Egraphs. There should be a line here
+ * for every in-domain purchase and payment. Positive amounts add to our account,
+ * negative amounts decrease it.
+ */
 case class CashTransaction(
   id: Long = 0,
   accountId: Long = 0,
@@ -20,14 +25,17 @@ case class CashTransaction(
   //
   // Public members
   //
+  /** Persist the transaction */
   def save(): CashTransaction = {
     CashTransaction.save(this)
   }
-  
+
+  /** Return the [[org.joda.money.Money]] representation of the object. */
   def money: Money = {
     Money.of(CurrencyUnit.USD, amountInCurrency.bigDecimal)
   }
 
+  /** Returns the transaction with a new cash amount */
   def withMoney(newMoney: Money): CashTransaction = {
     copy(
       amountInCurrency=BigDecimal(newMoney.getAmount),
@@ -58,7 +66,7 @@ object CashTransaction extends Saves[CashTransaction] with SavesCreatedUpdated[C
   sealed abstract class TransactionType(val value: String)
   case object EgraphPurchase extends TransactionType("EgraphPurchase")
   case object CelebrityDisbursement extends TransactionType("CelebrityDisbursement")
-
+  
   val types = Utils.toMap[String, TransactionType](Seq(
     EgraphPurchase,
     CelebrityDisbursement
