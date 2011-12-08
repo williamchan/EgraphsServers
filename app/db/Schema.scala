@@ -13,6 +13,12 @@ import java.io.{ByteArrayOutputStream, PrintWriter}
  * When inspecting the schema of a database table, inspect both this object and the KeyedCaseClass.
  */
 object Schema extends org.squeryl.Schema {
+
+  val voiceEnrollmentAttempts = table[VoiceEnrollmentAttempt]
+  val voiceSamples = table[VoiceSample]
+  val signatureEnrollmentAttempts = table[SignatureEnrollmentAttempt]
+  val signatureSamples = table[SignatureSample]
+
   //
   // Customers
   //

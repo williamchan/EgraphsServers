@@ -1,6 +1,7 @@
-package models
+package controllers.api
 
 import play.mvc.Http.Request
+import models.{AccountAuthenticationError, Account}
 
 /**
  * Pimped {{play.mvc.Http.Request}} object. Provides access to the account
@@ -17,9 +18,11 @@ class ApiRequest(request: Request) {
 }
 
 object ApiRequest {
+
   object Conversions {
     implicit def requestToApiRequest(request: Request): ApiRequest = {
       new ApiRequest(request)
     }
   }
+
 }

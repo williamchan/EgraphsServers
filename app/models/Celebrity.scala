@@ -12,34 +12,34 @@ import db.{FilterOneTable, KeyedCaseClass, Schema, Saves}
  * Persistent entity representing the Celebrities who provide products on
  * our service.
  */
-case class Celebrity(
-  id: Long = 0,
-  apiKey: Option[String] = None,
-  description: Option[String] = None,
-  firstName: Option[String]   = None,
-  lastName: Option[String]    = None,
-  publicName: Option[String] = None,
-  profilePhotoUpdated: Option[Timestamp] = None,
-  created: Timestamp = Time.defaultTimestamp,
-  updated: Timestamp = Time.defaultTimestamp
-) extends KeyedCaseClass[Long] with HasCreatedUpdated
-{
+case class Celebrity(id: Long = 0,
+                     apiKey: Option[String] = None,
+                     description: Option[String] = None,
+                     firstName: Option[String] = None,
+                     lastName: Option[String] = None,
+                     publicName: Option[String] = None,
+                     profilePhotoUpdated: Option[Timestamp] = None,
+                     isVoiceEnrolled: Boolean = false,
+                     isSignatureEnrolled: Boolean = false,
+                     created: Timestamp = Time.defaultTimestamp,
+                     updated: Timestamp = Time.defaultTimestamp
+                      ) extends KeyedCaseClass[Long] with HasCreatedUpdated {
   //
   // Additional DB columns
   //
-  /** The slug used to access this Celebrity's page on the main site. */
+  /**The slug used to access this Celebrity's page on the main site. */
   val urlSlug = publicName.map(name => JavaExtensions.slugify(name, false)) // Slugify without lower-casing
 
   //
   // Public members
   //
-  /** Persists by conveniently delegating to companion object's save method. */
+  /**Persists by conveniently delegating to companion object's save method. */
   def save(): Celebrity = {
     Celebrity.save(this)
   }
 
-  /** Returns all of the celebrity's Products */
-  def products(filters: FilterOneTable[Product] *): Query[Product] = {
+  /**Returns all of the celebrity's Products */
+  def products(filters: FilterOneTable[Product]*): Query[Product] = {
     Product.FindByCelebrity(id, filters: _*)
   }
 
@@ -89,10 +89,22 @@ case class Celebrity(
     }
   }
 
-  /** Creates a new Product associated with the celebrity. The product is not yet persisted. */
+  /**Creates a new Product associated with the celebrity. The product is not yet persisted. */
   def newProduct: Product = {
-    Product(celebrityId=id)
+    Product(celebrityId = id)
   }
+
+    def attemptVoiceEnrollment(): VoiceEnrollmentAttempt = {
+//      val voiceEnrollmentAttempt = VoiceEnrollmentAttempt(celebrityId = id)
+//      voiceEnrollmentAttempt.attempt()
+      null
+    }
+
+    def attemptSignatureEnrollment(): SignatureEnrollmentAttempt = {
+//      val signatureEnrollmentAttempt = SignatureEnrollmentAttempt(celebrityId = id)
+//      signatureEnrollmentAttempt.attempt()
+      null
+    }
 
   //
   // KeyedCaseClass[Long] methods
@@ -102,7 +114,7 @@ case class Celebrity(
   //
   // Private members
   //
-  /** Blobstore folder name for stored profile photo data. */
+  /**Blobstore folder name for stored profile photo data. */
   private def profilePhotoAssetNameOption: Option[String] = {
     for (photoUpdatedTimestamp <- profilePhotoUpdated) yield {
       "profile_" + Time.toBlobstoreFormat(photoUpdatedTimestamp).replace(" ", "")
@@ -115,7 +127,7 @@ case class Celebrity(
    */
   private def keyBase = {
     require(id > 0, "Can not determine blobstore key when no id exists yet for this entity in the relational database")
-    
+
     "celebrity/" + id
   }
 
@@ -128,7 +140,7 @@ object Celebrity extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {
   def findByUrlSlug(slug: String): Option[Celebrity] = {
     from(Schema.celebrities)(celebrity =>
       where(celebrity.urlSlug === Some(slug))
-      select(celebrity)
+        select (celebrity)
     ).headOption
   }
 
@@ -146,6 +158,8 @@ object Celebrity extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {
       theOld.publicName := theNew.publicName,
       theOld.urlSlug := theNew.urlSlug,
       theOld.profilePhotoUpdated := theNew.profilePhotoUpdated,
+      theOld.isVoiceEnrolled := theNew.isVoiceEnrolled,
+      theOld.isSignatureEnrolled := theNew.isSignatureEnrolled,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated
     )
@@ -155,6 +169,6 @@ object Celebrity extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {
   // SavesCreatedUpdated[Celebrity] methods
   //
   override def withCreatedUpdated(toUpdate: Celebrity, created: Timestamp, updated: Timestamp) = {
-    toUpdate.copy(created=created, updated=updated)
+    toUpdate.copy(created = created, updated = updated)
   }
 }

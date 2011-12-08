@@ -26,7 +26,7 @@ trait RequiresAuthenticatedAccount { this: Controller =>
 
   @Before(priority=10)
   def ensureRequestAuthenticated = {
-    import models.ApiRequest.Conversions._
+    import controllers.api.ApiRequest.Conversions._
 
     request.authenticatedAccount match {
       case Right(theAccount) =>
