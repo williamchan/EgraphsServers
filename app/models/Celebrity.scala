@@ -2,11 +2,11 @@ package models
 
 import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
-import libs.{Serialization, Time}
 import libs.Blobs.AccessPolicy
 import org.squeryl.Query
 import play.templates.JavaExtensions
 import db.{FilterOneTable, KeyedCaseClass, Schema, Saves}
+import libs.{Serialization, Time}
 
 /**
  * Persistent entity representing the Celebrities who provide products on
@@ -19,11 +19,11 @@ case class Celebrity(id: Long = 0,
                      lastName: Option[String] = None,
                      publicName: Option[String] = None,
                      profilePhotoUpdated: Option[Timestamp] = None,
-                     isVoiceEnrolled: Boolean = false,
-                     isSignatureEnrolled: Boolean = false,
+                     enrollmentStatus: String = NotEnrolled.value, // TODO(wchan): make an enum {NotEnrolled, Enrolled, PendingEnrollment}
                      created: Timestamp = Time.defaultTimestamp,
-                     updated: Timestamp = Time.defaultTimestamp
-                      ) extends KeyedCaseClass[Long] with HasCreatedUpdated {
+                     updated: Timestamp = Time.defaultTimestamp)
+  extends KeyedCaseClass[Long]
+  with HasCreatedUpdated {
   //
   // Additional DB columns
   //
@@ -55,7 +55,8 @@ case class Celebrity(id: Long = 0,
       ("publicName" -> publicName)
     )
 
-    Map("id" -> id) ++
+    Map("id" -> id,
+      "enrollmentStatus" -> enrollmentStatus) ++
       renderCreatedUpdatedForApi ++
       Serialization.makeOptionalFieldMap(optionalFields)
   }
@@ -93,18 +94,6 @@ case class Celebrity(id: Long = 0,
   def newProduct: Product = {
     Product(celebrityId = id)
   }
-
-    def attemptVoiceEnrollment(): VoiceEnrollmentAttempt = {
-//      val voiceEnrollmentAttempt = VoiceEnrollmentAttempt(celebrityId = id)
-//      voiceEnrollmentAttempt.attempt()
-      null
-    }
-
-    def attemptSignatureEnrollment(): SignatureEnrollmentAttempt = {
-//      val signatureEnrollmentAttempt = SignatureEnrollmentAttempt(celebrityId = id)
-//      signatureEnrollmentAttempt.attempt()
-      null
-    }
 
   //
   // KeyedCaseClass[Long] methods
@@ -158,8 +147,7 @@ object Celebrity extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {
       theOld.publicName := theNew.publicName,
       theOld.urlSlug := theNew.urlSlug,
       theOld.profilePhotoUpdated := theNew.profilePhotoUpdated,
-      theOld.isVoiceEnrolled := theNew.isVoiceEnrolled,
-      theOld.isSignatureEnrolled := theNew.isSignatureEnrolled,
+      theOld.enrollmentStatus := theNew.enrollmentStatus,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated
     )
@@ -172,3 +160,11 @@ object Celebrity extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {
     toUpdate.copy(created = created, updated = updated)
   }
 }
+
+abstract sealed class EnrollmentStatus(val value: String)
+
+case object NotEnrolled extends EnrollmentStatus("NotEnrolled")
+
+case object AttemptingEnrollment extends EnrollmentStatus("AttemptingEnrollment")
+
+case object Enrolled extends EnrollmentStatus("Enrolled")
