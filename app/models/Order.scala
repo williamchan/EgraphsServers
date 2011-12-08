@@ -19,7 +19,8 @@ case class Order(
   recipientId: Long = 0,
   paymentStateString: String = Order.PaymentState.NotCharged.stateValue,
   transactionId: Option[Long] = None,
-  stripeCardToken: Option[String] = None,
+  stripeCardTokenId: Option[String] = None,
+  stripeChargeId: Option[String] = None,
   amountPaidInCurrency: BigDecimal = 0,
   messageToCelebrity: Option[String] = None,
   requestedMessage: Option[String] = None,
@@ -41,23 +42,26 @@ case class Order(
     amountPaidInCurrency.toMoney()
   }
 
+  /** Retrieves the current payment state */
   def paymentState: PaymentState = {
     PaymentState.all(paymentStateString)
   }
 
+  /** Returns an order configured with the provided payment state */
   def withPaymentState(paymentState: PaymentState) = {
     copy(paymentStateString = paymentState.stateValue)
   }
 
-  def charge(): OrderCharge = {
-    require(stripeCardToken != None, "Can not charge an order without a valid stripe card token")
+  /** Produces an OrderCharge whose use will charge the `stripeCardTokenId` for the order */
+  def charge: OrderCharge = {
+    require(stripeCardTokenId != None, "Can not charge an order without a valid stripe card token")
 
     val cashTransaction = CashTransaction(accountId=buyerId)
-      .withMoney(amountPaid)
+      .withCash(amountPaid)
       .withType(EgraphPurchase)
 
     OrderCharge(
-      this.withPaymentState(Order.PaymentState.Charged), stripeCardToken.get, cashTransaction
+      this.withPaymentState(Order.PaymentState.Charged), stripeCardTokenId.get, cashTransaction
     )
   }
 
@@ -195,27 +199,38 @@ object Order extends Saves[Order] with SavesCreatedUpdated[Order] {
     }
   }
 
-  case class OrderCharge(private[Order] val order: Order,
-                         private[Order] val stripeCardToken: String,
-                         private[Order] val transaction: CashTransaction) {
-    def saveAndIssue(): OrderCharge = {
-      val savedTransaction = transaction.save()
-      val savedOrder = order.copy(transactionId = Some(savedTransaction.id))
-
-      Payment.charge(
+  /** Encapsulates the act of charging for an order. */
+  case class OrderCharge private[Order] (order: Order,
+                                         stripeCardTokenId: String,
+                                         transaction: CashTransaction) {
+    def issueAndSave(): OrderCharge = {
+      val stripeCharge = Payment.charge(
         order.amountPaid,
-        stripeCardToken,
-        "Egraph Order #" + order.id
+        stripeCardTokenId,
+        "Egraph Order=" + order.id + ", CashTransaction=" + transaction.id
       )
+
+      val savedTransaction = transaction.save()
+      val savedOrder = order.copy(
+        transactionId=Some(savedTransaction.id),
+        stripeChargeId=Some(stripeCharge.getId)
+      ).save()
 
       this.copy(order=savedOrder, transaction=savedTransaction)
     }
   }
 
+  /** Specifies the Order's current status relative to payment */
   sealed abstract class PaymentState(val stateValue: String)
+
   object PaymentState {
+    /** We have not yet charged for the order */
     case object NotCharged extends PaymentState("NotCharged")
+
+    /** We have successfully charged the order */
     case object Charged extends PaymentState("Charged")
+
+    /** We have refunded the order */
     case object Refunded extends PaymentState("Refunded")
 
     val all = Utils.toMap[String, PaymentState](
@@ -234,7 +249,8 @@ object Order extends Saves[Order] with SavesCreatedUpdated[Order] {
       theOld.buyerId := theNew.buyerId,
       theOld.transactionId := theNew.transactionId,
       theOld.paymentStateString := theNew.paymentStateString,
-      theOld.stripeCardToken := theNew.stripeCardToken,
+      theOld.stripeCardTokenId := theNew.stripeCardTokenId,
+      theOld.stripeChargeId := theNew.stripeChargeId,
       theOld.amountPaidInCurrency := theNew.amountPaidInCurrency,
       theOld.recipientId := theNew.recipientId,
       theOld.messageToCelebrity := theNew.messageToCelebrity,

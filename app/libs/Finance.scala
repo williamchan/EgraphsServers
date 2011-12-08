@@ -4,7 +4,7 @@ import org.joda.money.{CurrencyUnit, Money}
 import java.math.RoundingMode
 
 /**
- * Utilities for working with [[org.joda.money.Money]].
+ * Utilities for working with [[org.joda.cash.Money]].
  *
  * Most of the utilities are best used implicitly by importing Finance.TypeConversions._
  *
@@ -16,9 +16,9 @@ import java.math.RoundingMode
  *   val amount = BigDecimal(100.50)
  *
  *   val dollars = amount.toMoney()
- *   val euros = amount.toMoney(org.joda.money.CurrencyUnit.EUR)
+ *   val euros = amount.toMoney(org.joda.cash.CurrencyUnit.EUR)
  *
- *   // Format the money
+ *   // Format the cash
  *   val forDisplay = dollars.formatSimply // -> $100.50
  *
  * }}}
@@ -26,18 +26,18 @@ import java.math.RoundingMode
 object Finance {
 
   /**
-   * Implicit conversions to make formatting and translating money between types
+   * Implicit conversions to make formatting and translating cash between types
    * more easy
    */
   object TypeConversions {
 
     /**
-     * Pimped version of [[org.joda.money.Money]].
+     * Pimped version of [[org.joda.cash.Money]].
      */
     case class RichMoney(money: Money) {
 
       /**
-       * Provides a sensible human formatting for money.
+       * Provides a sensible human formatting for cash.
        *
        * Money(100) -> "$100"
        * Money(100.5) -> "$100.50"
@@ -57,7 +57,7 @@ object Finance {
     }
 
     /**
-     * Provides explicit methods to translate `BigDecimals` into [[org.joda.money.Money]]
+     * Provides explicit methods to translate `BigDecimals` into [[org.joda.cash.Money]]
      */
     case class FinanceBigDecimal(bigDecimal: BigDecimal) {
       def toMoney(currency: CurrencyUnit = CurrencyUnit.USD): Money = {

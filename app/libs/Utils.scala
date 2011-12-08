@@ -10,22 +10,6 @@ import play.Play
 object Utils {
 
   /**
-   * Creates an Option out of any nullable type.
-   *
-   * @param toMakeOption the value to make an Option
-   *
-   * @return the Option of toMakeOption. This is None if toMakeOption was null,
-   *   or if it was an empty String. Otherwise it's Some(toMakeOption)
-   */
-  def optional[T <: AnyRef](toMakeOption: T): Option[T] = {
-    toMakeOption match {
-      case null => None
-      case aString: String if aString == "" => None
-      case value => Some(value)
-    }
-  }
-
-  /**
    * Turns any Iterable into a map keyed by a provided function.
    *
    * @param toMap the Iterable to turn into a map
@@ -88,7 +72,7 @@ object Utils {
   /**
    * Returns a configuration property that must exist in application.conf.
    *
-   * Throws a runtime exception with a reasonable error message if it didn't exist.
+   * Throws an IllegalArgumentException with a reasonable error message if it didn't exist.
    */
   def requiredConfigurationProperty(property: String): String = {
     val theValue = Play.configuration.getProperty(property)

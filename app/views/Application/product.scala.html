@@ -23,6 +23,14 @@
 
 @price = {@product.price.formatSimply}
 
+@urlSlugMap = @{
+  Map("celebrityUrlSlug" -> celebrity.urlSlug.get, "productUrlSlug" -> product.urlSlug)
+}
+
+@buyPage = @{
+  lookupUrl("CelebrityProductController.buy", urlSlugMap)
+}
+
 @body = {
   <div class="product-content">
     <div class="row product-header" >
@@ -73,7 +81,7 @@
         </div>
       </div>
       <div class="span12 form-column">
-        <form id="payment-form" method="POST" action='/@celebrity.urlSlug/@product.urlSlug/buy'>
+        <form id="payment-form" method="POST" action='@buyPage' >
           <fieldset>
             <legend>Recipient info</legend>
             <div class="clearfix">
@@ -130,6 +138,9 @@
                     /
                     <input class="span1" id="cardExpirationYear" type="text" >
                   </div>
+                  <span class="help-block">
+                    e.g. <em>05 / 2016</em>
+                  </span>
                 </div>
               </div>
               <div class="clearfix">

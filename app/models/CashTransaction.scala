@@ -6,9 +6,10 @@ import db.{Saves, KeyedCaseClass}
 import libs.{Utils, Time}
 
 /**
- * Represents a single payment event relative to Egraphs. There should be a line here
- * for every in-domain purchase and payment. Positive amounts add to our account,
- * negative amounts decrease it.
+ * Represents a single payment event relative to Egraphs. There should be a row in
+ * the corresponding table for every in-domain purchase and payment. Positive amounts
+ * add to our account (e.g. Egraph payments), negative amounts decrease it (e.g. Celebrity
+ * Disbursements).
  */
 case class CashTransaction(
   id: Long = 0,
@@ -31,15 +32,15 @@ case class CashTransaction(
   }
 
   /** Return the [[org.joda.money.Money]] representation of the object. */
-  def money: Money = {
+  def cash: Money = {
     Money.of(CurrencyUnit.USD, amountInCurrency.bigDecimal)
   }
 
   /** Returns the transaction with a new cash amount */
-  def withMoney(newMoney: Money): CashTransaction = {
+  def withCash(newCash: Money): CashTransaction = {
     copy(
-      amountInCurrency=BigDecimal(newMoney.getAmount),
-      currencyCode=newMoney.getCurrencyUnit.getCode
+      amountInCurrency=BigDecimal(newCash.getAmount),
+      currencyCode=newCash.getCurrencyUnit.getCode
     )
   }
 

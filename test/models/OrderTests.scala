@@ -41,7 +41,8 @@ class OrderTests extends UnitFlatSpec
       buyerId = order.buyerId,
       transactionId = Some(12345),
       recipientId = order.recipientId,
-      stripeCardToken = Some("12345"),
+      stripeCardTokenId = Some("12345"),
+      stripeChargeId = Some("12345"),
       messageToCelebrity = Some("Wizzle you're the best!"),
       requestedMessage = Some("Happy birthday, Erem!")
     ).withPaymentState(Order.PaymentState.Charged)
@@ -58,6 +59,14 @@ class OrderTests extends UnitFlatSpec
 
     eGraph.orderId should be (100L)
     eGraph.state should be (AwaitingVerification)
+  }
+
+  it should "start out not charged" in {
+    Order().paymentState should be (Order.PaymentState.NotCharged)
+  }
+
+  it should "update payment state correctly" in {
+    Order().withPaymentState(Order.PaymentState.Charged).paymentState should be (Order.PaymentState.Charged)
   }
 
   it should "serialize the correct Map for the API" in {
@@ -83,6 +92,38 @@ class OrderTests extends UnitFlatSpec
     rendered("messageToCelebrity") should be (order.messageToCelebrity.get)
     rendered("created") should be (Time.toApiFormat(order.created))
     rendered("updated") should be (Time.toApiFormat(order.updated))
+  }
+
+  "charge" should "fail to charge if stripe token is unavailable" in {
+    evaluating { Order(stripeCardTokenId=None).charge } should produce [IllegalArgumentException]
+  }
+
+  it should "create a properly configured OrderCharge" in {
+    val stripeToken = "mytoken"
+    val buyerId = 1L
+    val amount = BigDecimal(100.50)
+    val order = Order(stripeCardTokenId=Some(stripeToken), amountPaidInCurrency=amount, buyerId=buyerId)
+    val orderCharge = order.charge
+
+    orderCharge.order.paymentState should be (Order.PaymentState.Charged)
+    orderCharge.transaction.cash should be (order.amountPaid)
+    orderCharge.transaction.accountId should be (buyerId)
+    orderCharge.stripeCardTokenId should be (stripeToken)
+  }
+
+  "An OrderCharge" should "perform the correct charge" in {
+    val customer = TestData.newSavedCustomer()
+    val product  = TestData.newSavedProduct()
+    val token = TestData.newStripeToken();
+    val amount = BigDecimal(100.500000)
+
+    val order = customer.buy(product).copy(stripeCardTokenId=Some(token.getId),  amountPaidInCurrency=amount)
+    val charged = order.charge.issueAndSave()
+
+    Order.findById(charged.order.id) should not be (None)
+    CashTransaction.findById(charged.transaction.id) should not be (None)
+    charged.order.stripeChargeId should not be (None)
+    
   }
   
   "FindByCelebrity" should "find all of a Celebrity's orders by default" in {
@@ -154,6 +195,7 @@ class OrderTests extends UnitFlatSpec
       orders(RejectedPersonalAudit)
     ))
   }
+
 
   //
   // Private methods

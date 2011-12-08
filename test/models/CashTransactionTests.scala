@@ -40,12 +40,12 @@ class CashTransactionTests extends UnitFlatSpec
   //
   // Test cases
   //
-  "A CashTransaction" should "have the correct money value and currency type" in {
+  "A CashTransaction" should "have the correct cash value and currency type" in {
     val amount: BigDecimal = 20.19
     val transaction = CashTransaction(amountInCurrency=amount)
 
-    transaction.money.getAmount should be (amount.bigDecimal)
-    transaction.money.getCurrencyUnit should be (CurrencyUnit.USD)
+    transaction.cash.getAmount should be (amount.bigDecimal)
+    transaction.cash.getCurrencyUnit should be (CurrencyUnit.USD)
   }
 
 }
