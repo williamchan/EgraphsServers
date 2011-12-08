@@ -63,9 +63,9 @@ private object TestModeBootstrap {
   private def createNewSchema() {
     // drop and re-create the database definition, logging the
     // creation SQL to a temporary file.
-    printDdlToFile(schemaFile)
-
     db.Schema.scrub()
+
+    printDdlToFile(schemaFile)
   }
 
   /**Prints the database schema to the provided file. */

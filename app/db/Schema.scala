@@ -174,7 +174,7 @@ object Schema extends org.squeryl.Schema {
 
     try {
       from(celebrities)(celeb =>
-        select(celeb)
+        select(celeb.id)
       ).headOption
 
       true
