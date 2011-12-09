@@ -1,9 +1,12 @@
 package models
 
+import libs.Blobs
+import Blobs.Conversions._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
-import utils.{DBTransactionPerTest, SavingEntityTests, CreatedUpdatedEntityTests, ClearsDatabaseAndValidationAfter}
+import utils._
+
 
 class SignatureSampleTests extends UnitFlatSpec
 with ShouldMatchers
@@ -16,7 +19,7 @@ with DBTransactionPerTest {
   // SavingEntityTests[SignatureSample] methods
   //
   def newEntity = {
-    SignatureSample(s3Location = "", isForEnrollment = true)
+    SignatureSample(isForEnrollment = true)
   }
 
   def saveEntity(toSave: SignatureSample) = {
@@ -29,9 +32,13 @@ with DBTransactionPerTest {
 
   override def transformEntity(toTransform: SignatureSample) = {
     toTransform.copy(
-      s3Location = "help",
       isForEnrollment = false
     )
+  }
+
+  it should "save signatureStr to Blobstore" in {
+    val saved = SignatureSample(isForEnrollment = true).save(TestConstants.signatureStr)
+    Blobs.get("signaturesamples/" + saved.id).get.asString should be(TestConstants.signatureStr)
   }
 
 }

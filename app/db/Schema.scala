@@ -14,10 +14,12 @@ import java.io.{ByteArrayOutputStream, PrintWriter}
  */
 object Schema extends org.squeryl.Schema {
 
-  val voiceEnrollmentAttempts = table[VoiceEnrollmentAttempt]
-  val voiceSamples = table[VoiceSample]
-  val signatureEnrollmentAttempts = table[SignatureEnrollmentAttempt]
+//  val signatureEnrollmentAttempts = table[SignatureEnrollmentAttempt]
+//  val voiceEnrollmentAttempts = table[VoiceEnrollmentAttempt]
+  val enrollmentBatches = table[EnrollmentBatch]
+  val enrollmentSamples = table[EnrollmentSample]
   val signatureSamples = table[SignatureSample]
+  val voiceSamples = table[VoiceSample]
 
   //
   // Customers

@@ -88,6 +88,13 @@ class CelebrityTests extends UnitFlatSpec
     profilePhoto.renderFromMaster.asByteArray(ImageAsset.Png).length should be (imageAsset.renderFromMaster.asByteArray(ImageAsset.Png).length)
   }
 
+  it should "test getOpenEnrollmentBatch" in {
+    val celebrity = Celebrity().save()
+    val batch = EnrollmentBatch(celebrityId = celebrity.id).save()
+    val result = celebrity.getOpenEnrollmentBatch()
+    result.get should be (batch)
+  }
+
   def makeCeleb: Celebrity = {
     Celebrity(firstName=Some("Will"), lastName=Some("Chan"), publicName=Some("Wizzle"))
   }

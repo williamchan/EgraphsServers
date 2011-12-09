@@ -1,9 +1,11 @@
 package models
 
+import libs.Blobs
+import Blobs.Conversions._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
-import utils.{DBTransactionPerTest, SavingEntityTests, CreatedUpdatedEntityTests, ClearsDatabaseAndValidationAfter}
+import utils._
 
 class VoiceSampleTests extends UnitFlatSpec
 with ShouldMatchers
@@ -16,7 +18,7 @@ with DBTransactionPerTest {
   // SavingEntityTests[VoiceSample] methods
   //
   def newEntity = {
-    VoiceSample(s3Location = "", isForEnrollment = true)
+    VoiceSample(isForEnrollment = true)
   }
 
   def saveEntity(toSave: VoiceSample) = {
@@ -29,9 +31,13 @@ with DBTransactionPerTest {
 
   override def transformEntity(toTransform: VoiceSample) = {
     toTransform.copy(
-      s3Location = "help",
       isForEnrollment = false
     )
+  }
+
+  it should "save voiceStr to Blobstore" in {
+    val saved = VoiceSample(isForEnrollment = true).save(TestConstants.voiceStr)
+    Blobs.get("voicesamples/" + saved.id).get.asString should be(TestConstants.voiceStr)
   }
 
 }

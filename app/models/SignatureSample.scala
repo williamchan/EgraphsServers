@@ -2,11 +2,10 @@ package models
 
 import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
-import libs.Time
+import libs.{Blobs, Time}
 import db.{KeyedCaseClass, Schema, Saves}
 
 case class SignatureSample(id: Long = 0,
-                           s3Location: String,
                            isForEnrollment: Boolean,
                            egraphId: Option[Long] = None,
                            signatureEnrollmentAttemptId: Option[Long] = None,
@@ -23,8 +22,10 @@ case class SignatureSample(id: Long = 0,
   // Public members
   //
   /**Persists by conveniently delegating to companion object's save method. */
-  def save(): SignatureSample = {
-    SignatureSample.save(this)
+  def save(signatureStr: String): SignatureSample = {
+    val saved = SignatureSample.save(this)
+    Blobs.put("signaturesamples/" + saved.id, signatureStr.getBytes)
+    saved
   }
 
   //
@@ -43,7 +44,6 @@ object SignatureSample extends Saves[SignatureSample] with SavesCreatedUpdated[S
 
   override def defineUpdate(theOld: SignatureSample, theNew: SignatureSample) = {
     updateIs(
-      theOld.s3Location := theNew.s3Location,
       theOld.isForEnrollment := theNew.isForEnrollment,
       theOld.egraphId := theNew.egraphId,
       theOld.signatureEnrollmentAttemptId := theNew.signatureEnrollmentAttemptId,

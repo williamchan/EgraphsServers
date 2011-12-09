@@ -7,6 +7,7 @@ import play.test.FunctionalTest
 import sjson.json.Serializer
 import utils.TestConstants
 import utils.FunctionalTestUtils.{CleanDatabaseAfterEachTest, willChanRequest, runScenario, runScenarios}
+import models.EnrollmentBatch
 
 class CelebrityApiControllersTests extends FunctionalTest with CleanDatabaseAfterEachTest {
 
@@ -78,4 +79,40 @@ class CelebrityApiControllersTests extends FunctionalTest with CleanDatabaseAfte
     assertEquals(BigDecimal(1L), firstOrderJson("id"))
     assertEquals(BigDecimal(2L), secondOrderJson("id"))
   }
+
+  @Test
+  def testPostEnrollmentSample() {
+    runScenarios(
+      "Will-Chan-is-a-celebrity"
+    )
+
+    assertPostEnrollmentSample(TestConstants.signatureStr, TestConstants.voiceStr, false)
+  }
+
+  @Test
+  def testPostEnrollmentSampleCompletingBatch() {
+    runScenarios(
+      "Will-Chan-is-a-celebrity"
+    )
+
+    for (i <- 0 until EnrollmentBatch.batchSize - 1) {
+      assertPostEnrollmentSample(TestConstants.signatureStr, TestConstants.voiceStr, isBatchComplete = false)
+    }
+    assertPostEnrollmentSample(TestConstants.signatureStr, TestConstants.voiceStr, isBatchComplete = true)
+  }
+
+  private def assertPostEnrollmentSample(signatureStr: String, audioStr: String, isBatchComplete: Boolean) {
+    val response = POST(
+      willChanRequest,
+      TestConstants.ApiRoot + "/celebrities/me/enrollmentsamples",
+      APPLICATION_X_WWW_FORM_URLENCODED,
+      "signature=" + signatureStr + "&audio=" + audioStr
+    )
+    assertIsOk(response)
+    val json = Serializer.SJSON.in[Map[String, Any]](getContent(response))
+    assertNotNull(json("id"))
+    assertEquals(isBatchComplete, json("batch_complete"))
+  }
+
+
 }

@@ -95,6 +95,13 @@ case class Celebrity(id: Long = 0,
     Product(celebrityId = id)
   }
 
+  def getOpenEnrollmentBatch(): Option[EnrollmentBatch] = {
+    from(Schema.enrollmentBatches)(enrollmentBatch =>
+      where(enrollmentBatch.celebrityId === this.id and enrollmentBatch.isSuccessfullEnrollment.isNull)
+        select (enrollmentBatch)
+    ).headOption
+  }
+
   //
   // KeyedCaseClass[Long] methods
   //

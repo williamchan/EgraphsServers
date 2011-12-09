@@ -2,11 +2,10 @@ package models
 
 import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
-import libs.Time
+import libs.{Blobs, Time}
 import db.{KeyedCaseClass, Schema, Saves}
 
 case class VoiceSample(id: Long = 0,
-                       s3Location: String,
                        isForEnrollment: Boolean,
                        egraphId: Option[Long] = None,
                        voiceEnrollmentAttemptId: Option[Long] = None,
@@ -23,8 +22,10 @@ case class VoiceSample(id: Long = 0,
   // Public members
   //
   /**Persists by conveniently delegating to companion object's save method. */
-  def save(): VoiceSample = {
-    VoiceSample.save(this)
+  def save(voiceStr: String): VoiceSample = {
+    val saved = VoiceSample.save(this)
+    Blobs.put("voicesamples/" + saved.id, voiceStr.getBytes)
+    saved
   }
 
   //
@@ -43,7 +44,6 @@ object VoiceSample extends Saves[VoiceSample] with SavesCreatedUpdated[VoiceSamp
 
   override def defineUpdate(theOld: VoiceSample, theNew: VoiceSample) = {
     updateIs(
-      theOld.s3Location := theNew.s3Location,
       theOld.isForEnrollment := theNew.isForEnrollment,
       theOld.egraphId := theNew.egraphId,
       theOld.voiceEnrollmentAttemptId := theNew.voiceEnrollmentAttemptId,
