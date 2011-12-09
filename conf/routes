@@ -57,5 +57,5 @@ POST    ${api}/celebrities/{celebrityId}/orders/{orderId}/egraphs api.CelebrityO
 # Celebrity pages
 GET     /{celebrityUrlSlug}                      CelebrityController.index
 GET     /{celebrityUrlSlug}/{productUrlSlug}     CelebrityProductController.index
-POST    /{celebrityUrlSlug}/{productUrlSlug}/buy CelebrityProductController.buy
+GET    /{celebrityUrlSlug}/{productUrlSlug}/buy CelebrityProductController.buy
 

@@ -1,4 +1,4 @@
-@(celebrity:models.Celebrity, product: models.Product)
+@(celebrity:models.Celebrity, product: models.Product, errorFields: Option[List[String]])
 
 @import models.Product
 @import controllers.CelebrityController
@@ -22,6 +22,24 @@
 }
 
 @price = {@product.price.formatSimply}
+
+@alertMessageClass = @{
+  errorFields match {
+    case None => ""
+    case Some(_) => "alert-message-has-errors"
+  }
+}
+
+@errorMessage = {
+  @errorFields.map { realErrors =>
+    Required fields missing. Please fix and resubmit.
+    <ul>
+      @realErrors.map { theError =>
+        <li>@theError</li>
+      }
+    </ul>
+  }
+}
 
 @urlSlugMap = @{
   Map("celebrityUrlSlug" -> celebrity.urlSlug.get, "productUrlSlug" -> product.urlSlug)
@@ -126,7 +144,7 @@
               <div class="clearfix">
                 <label for="cardNumber" >Card number</label>
                 <div class="input">
-                  <input class="span3" id="cardNumber" name="cardNumber" type="text" >
+                  <input class="span3" id="cardNumber" type="text" >
                   <span class="help-block">It will be charged @price</span>
                 </div>
               </div>
@@ -168,8 +186,8 @@
                 <span class="help-block">
                   This will charge @price to your credit card
                 </span>
-                <div id="form-errors" class="alert-message block-message error">
-                  Failed
+                <div id="form-errors" class="alert-message block-message error @alertMessageClass">
+                  @errorMessage
                 </div>
               </div>
             </fieldset>
@@ -178,8 +196,4 @@
       </div>
     </div>
   </div>
-
-
-
-
 }

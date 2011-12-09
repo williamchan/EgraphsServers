@@ -1,31 +1,28 @@
 /* Scripting for the product page, e.g. /Wizzle/2010-Starcraft-Tournament */
 define(["stripe"], function(stripe) {
-  /**
-   * Handles submission of a create token request to Stripe.
-   */
+  /** Handles response to Stripe create token submission */
   var stripeResponseHandler = function(status, response)  {
     if (response.error) {
       console.log(response);
 
       // Show the errors on the form
-      displayMessageForError(response.error);
+      var errorMessage = displayMessageForError(response.error);
+      $("#form-errors").html(errorMessage).addClass("alert-message-has-errors");
 
-      // Enable re-submission
+	  // Enable re-submission
       enableSubmitButton(true);
     } else {
         var form$ = $("#payment-form");
         // token contains id, last4, and card type
         var token = response['id'];
-        // insert the token into the form so it gets submitted to the server
-        form$.append("<input type='hidden' name='stripeToken' value='" + token + "'/>");
+        // insert the token ID into the form so it gets submitted to the server
+        form$.append("<input type='hidden' name='stripeTokenId' value='" + token + "'/>");
         // and submit
         form$.get(0).submit();
     }
   };
 
-  /**
-   * Presents an error message on the page given a Stripe error.
-   */
+  /** Returns an appropriate error message given a Stripe error. */
   var displayMessageForError = function(error) {
     var message = null;
     var param = error.param;
@@ -52,12 +49,10 @@ define(["stripe"], function(stripe) {
       message = "There was an error processing your card. Please try again later.";
     }
 
-    $("#form-errors").html(message).css("display", "block");
+	return message;
   };
 
-  /**
-   * Enables and disables the submit button, to prevent double-submission.
-   */
+  /** Enables and disables the submit button, to prevent double-submission. */
   var enableSubmitButton= function(enable) {
     var button = $('#submit-button');
     if (enable) {
@@ -97,5 +92,5 @@ define(["stripe"], function(stripe) {
         });
       });
     }
-  }
+  };
 });
