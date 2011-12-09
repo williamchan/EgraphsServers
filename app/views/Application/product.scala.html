@@ -38,7 +38,7 @@
 
 @errorMessage = {
   @errorFields.map { realErrors =>
-    Required fields missing. Please fix and resubmit.
+    Required fields are either missing or invalid. Please fix and resubmit.
     <ul>
       @realErrors.map { theError =>
         <li>@theError</li>

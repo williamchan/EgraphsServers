@@ -57,10 +57,14 @@ object Customer extends Saves[Customer] with SavesCreatedUpdated[Customer] {
   /**
    * Either retrieves an existing Customer keyed by the provided e-mail address
    * or creates one, saves it to the database, then returns it.
+   *
+   * @param email the address of the Customer to look up or create
+   * @param name name the Customer should have if we have to create him from scratch.
+   *
+   * @return a persisted Customer with a valid ID.
    */
-  def findOrCreateByEmail(email: String): Customer = {
-    // TODO: Optimize this using a single outer-join query to get Customer
-    // and Account all at once
+  def findOrCreateByEmail(email: String, name: String): Customer = {
+    // TODO: Optimize this using a single outer-join query to get Customer + Account all at once
 
     // Get the Account and Customer face if both exist.
     val accountOption = Account.findByEmail(email)
@@ -70,24 +74,18 @@ object Customer extends Saves[Customer] with SavesCreatedUpdated[Customer] {
       }
     }
 
-    // Handle various cases of either the account or its Customer face not existing
-    (accountOption, customerOption) match {
-      // Both Account and its Customer face already existed
-      case (Some(account), Some(customer)) =>
+    customerOption match {
+      // Customer already existed
+      case Some(customer) =>
         customer
 
-      // Have an Account but no Customer face. Make a Customer face and save both.
-      case (Some(account), None) =>
-        val customer = Customer().save()
+      // Customer face didn't exist. Use existing or new Account to create
+      // the face and return it.
+      case None =>
+        val customer = Customer(name=name).save()
+        val account = accountOption.getOrElse(Account(email=email))
 
         account.copy(customerId=Some(customer.id)).save()
-
-        customer
-
-      // Have neither Account nor (by definition) Customer face. Make both.
-      case (None, _) =>
-        val customer = Customer().save()
-        Account(email=email, customerId=Some(customer.id)).save()
 
         customer
     }

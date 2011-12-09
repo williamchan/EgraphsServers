@@ -5,6 +5,8 @@ import libs.Utils
 
 import play.data.validation._
 import models.{Customer, Account, Celebrity, Product}
+import org.apache.commons.mail.SimpleEmail
+import play.libs.Mail
 
 /**
  * Serves pages relating to a particular product of a celebrity.
@@ -38,11 +40,11 @@ object CelebrityProductController extends Controller
           desiredText: Option[String],
           personalNote: Option[String]) =
   {
-    import Validation.required
+    import Validation.{required, email}
     required("Recipient name", recipientName)
-    required("Recipient E-mail address", recipientEmail)
+    email("Recipient E-mail address", recipientEmail)
     required("Buyer name", buyerName)
-    required("Buyer E-mail address", buyerEmail)
+    email("Buyer E-mail address", buyerEmail)
     required("stripeTokenId", stripeTokenId)
 
     if (validationErrors.isEmpty) {
@@ -59,6 +61,7 @@ object CelebrityProductController extends Controller
       ).execute()
     } else {
       import scala.collection.JavaConversions._
+      
       // Redirect back to the index page, providing field errors via the flash scope.
       val fieldNames = validationErrors.map { case (fieldName, _) => fieldName }
       val errorString = fieldNames.mkString(",")
@@ -100,11 +103,11 @@ object CelebrityProductController extends Controller
   {
     def execute() = {
       // Get buyer and recipient accounts and create customer face if necessary
-      val buyer = Customer.findOrCreateByEmail(buyerEmail)
+      val buyer = Customer.findOrCreateByEmail(buyerEmail, buyerName)
       val recipient = if (buyerEmail == recipientEmail) {
         buyer
       } else {
-        Customer.findOrCreateByEmail(recipientEmail)
+        Customer.findOrCreateByEmail(recipientEmail, recipientName)
       }
 
       // Buy the product, charge the card, persist the order.
@@ -117,7 +120,15 @@ object CelebrityProductController extends Controller
       val chargedOrder = order.charge.issueAndSave().order
 
       // Send the order email
-      
+      val email = new SimpleEmail();
+      email.setFrom("noreply@egraphs.com", "eGraphs")
+      email.addTo(Account.findByCustomerId(buyer.id).get.email)
+      email.setSubject("Order Confirmation")
+      email.setMsg(views.Application.html.order_confirmation_email(
+        buyer, recipient, celebrity, product, chargedOrder
+      ).toString().trim())
+
+      Mail.send(email)
 
       // Redirect to the order page
       "You did it! Order #" + chargedOrder.id
