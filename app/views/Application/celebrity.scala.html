@@ -38,9 +38,9 @@
         <h2>@celebrity.publicName isn't signing eGraphs! Go badger him on Twitter.</h2>
       } else {
         <h2>
-          You choose a photo and write a short note.
-          <a href="#" rel='popover' title="Just between @celebrity.publicName and you" data-content="When you buy an eGraph, a special slot of time on @celebrity.publicName's schedule gets reserved for him to hand-write a response to your note on top of the photo you select here.">
-            @celebrity.publicName does the rest.
+          You choose a photo, then
+          <a href="#" rel='popover' title="Just between the two of us" data-content="When you buy an eGraph, a special slot of time on @celebrity.publicName's schedule gets reserved for him to hand-write you a personalized message on top of the photo you select here. Try having him wish you a happy birthday!">
+            @celebrity.publicName signs it just for you.
           </a>
         </h2>
         @products.toList.grouped(2).map { productRow =>
@@ -59,11 +59,10 @@
       <a class="product preview-link" href="/@celebrity.urlSlug/@product.urlSlug">
         <img src="http://placehold.it/330x230" alt="@product.name Thumbnail">
         <div class="description">
-          @product.name
+          @product.name <span class="label success price-label">@product.price.formatSimply</span>
         </div>
         <div class="btn primary large success buy-button" >
-          <div>Get it signed!</div>
-          <div>@product.price.formatSimply</div>
+          Get @celebrity.publicName to sign it!
         </div>
       </a>
     </div>
