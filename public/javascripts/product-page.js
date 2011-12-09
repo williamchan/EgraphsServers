@@ -7,7 +7,7 @@ define(["stripe"], function(stripe) {
 
       // Show the errors on the form
       var errorMessage = displayMessageForError(response.error);
-      $("#form-errors").html(errorMessage).addClass("alert-message-has-errors");
+      $(".form-errors").html(errorMessage).addClass("alert-message-has-errors");
 
 	  // Enable re-submission
       enableSubmitButton(true);
@@ -34,7 +34,7 @@ define(["stripe"], function(stripe) {
 			         param === "exp_month" ||
                code === "invalid_expiry_month" || 
                code === "invalid_expiry_year") {
-	    message = "The expiration date was rejected.";
+	    message = "The expiration date was invalid.";
     } else if (param === "cvc" ||  code === "invalid_cvc" || code === "incorrect_cvc") {
       message = "The provided CVC security code was incorrect.";
     } else if (code === "expired_card") {
@@ -68,13 +68,18 @@ define(["stripe"], function(stripe) {
      *
      * @param stripeKey the Stripe publishable key for payments.
      * @param productPriceInCents the price in cents of the product being displayed.
+     * @param hasErrors true that the page was loaded with some previous form errors
      *
      * @return nada
      */
-    go: function (stripeKey, productPriceInCents) {
+    go: function (stripeKey, productPriceInCents, hasErrors) {
       stripe.setPublishableKey(stripeKey);
 
       $(document).ready(function() {
+		if (hasErrors) {          
+          $('html, body').scrollTop($("#submit-button").offset().top);
+		}
+
         $("#payment-form").submit(function(event) {
           // disable the submit button to prevent repeated clicks
           enableSubmitButton(false)

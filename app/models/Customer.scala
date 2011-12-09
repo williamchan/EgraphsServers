@@ -37,7 +37,7 @@ case class Customer(
       buyerId=id,
       recipientId=recipient.id,
       productId=product.id,
-      amountPaidInCurrency=product.price.getAmountMinor.intValue
+      amountPaidInCurrency=BigDecimal(product.price.getAmount)
     )
   }
 
@@ -50,6 +50,49 @@ case class Customer(
 }
 
 object Customer extends Saves[Customer] with SavesCreatedUpdated[Customer] {
+  //
+  // Public members
+  //
+
+  /**
+   * Either retrieves an existing Customer keyed by the provided e-mail address
+   * or creates one, saves it to the database, then returns it.
+   */
+  def findOrCreateByEmail(email: String): Customer = {
+    // TODO: Optimize this using a single outer-join query to get Customer
+    // and Account all at once
+
+    // Get the Account and Customer face if both exist.
+    val accountOption = Account.findByEmail(email)
+    val customerOption = accountOption.flatMap { account =>
+      account.customerId.flatMap { customerId =>
+        Customer.findById(customerId)
+      }
+    }
+
+    // Handle various cases of either the account or its Customer face not existing
+    (accountOption, customerOption) match {
+      // Both Account and its Customer face already existed
+      case (Some(account), Some(customer)) =>
+        customer
+
+      // Have an Account but no Customer face. Make a Customer face and save both.
+      case (Some(account), None) =>
+        val customer = Customer().save()
+
+        account.copy(customerId=Some(customer.id)).save()
+
+        customer
+
+      // Have neither Account nor (by definition) Customer face. Make both.
+      case (None, _) =>
+        val customer = Customer().save()
+        Account(email=email, customerId=Some(customer.id)).save()
+
+        customer
+    }
+  }
+
   //
   // Saves[Customer] methods
   //

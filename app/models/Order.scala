@@ -207,7 +207,7 @@ object Order extends Saves[Order] with SavesCreatedUpdated[Order] {
       val stripeCharge = Payment.charge(
         order.amountPaid,
         stripeCardTokenId,
-        "Egraph Order=" + order.id + ", CashTransaction=" + transaction.id
+        "Egraph Order=" + order.id
       )
 
       val savedTransaction = transaction.save()

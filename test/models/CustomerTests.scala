@@ -40,7 +40,7 @@ class CustomerTests extends UnitFlatSpec
   "A customer" should "produce Orders that are properly configured" in {
     val buyer = TestData.newSavedCustomer()
     val recipient = TestData.newSavedCustomer()
-    val product = Product(id=1L)
+    val product = Product(id=1L, priceInCurrency=89.99)
 
     val order = buyer.buy(product, recipient=recipient)
 
