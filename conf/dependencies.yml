@@ -9,7 +9,14 @@ require:
     - org.apache.axis2 -> axis2 1.6.1
     - org.apache.axis2 -> axis2-transport-http 1.6.1
     - org.apache.axis2 -> axis2-transport-local 1.6.1
-    - org.jclouds -> jclouds-allblobstore 1.2.1
+    - org.jclouds.api -> filesystem 1.2.1:
+        exclude:
+            - org.clojure -> *
+        
+    - org.jclouds.provider -> aws-s3 1.2.1:
+        exclude:
+            - org.clojure -> *
+    
     - org.joda -> joda-money 0.6
     - org.squeryl -> squeryl_2.8.1 0.9.4:
         exclude:
@@ -27,15 +34,9 @@ require:
     - play
     - play -> scala 0.9.1
     - play -> less 0.3.compatibility
-    - play -> coffee 1.0
     - provided -> tritonus_share 0.3.6
     - provided -> tritonus_remaining 0.3.6
     - provided -> xyzmo 1.0
-    - se.scalablesolutions.akka -> akka-typed-actor 1.0:
-        exclude:
-            # Exclude scala and actor because they're included with play-scala
-            - org.scala-lang -> scala-library 2.8.1
-            - se.scalablesolutions.akka -> akka-actor 1.0
 
 # Non-default repositories
 repositories:
