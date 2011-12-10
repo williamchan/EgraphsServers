@@ -81,6 +81,16 @@ class CelebrityApiControllersTests extends FunctionalTest with CleanDatabaseAfte
   }
 
   @Test
+  def testGetCelebrityOrdersRequiresSignerActionableParameter() {
+    runScenarios(
+      "Will-Chan-is-a-celebrity"
+    )
+
+    val response = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/orders")
+    assertStatus(500, response)
+  }
+
+  @Test
   def testPostEnrollmentSample() {
     runScenarios(
       "Will-Chan-is-a-celebrity"

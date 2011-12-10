@@ -46,6 +46,9 @@ with DBTransaction {
 
   def getOrders(signerActionable: Option[Boolean]) = {
     signerActionable match {
+      case None =>
+        Error("Please pass in signerActionable=true")
+
       case Some(false) =>
         Error("signerActionable=false is not a supported filter")
 
