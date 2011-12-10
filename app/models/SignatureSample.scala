@@ -24,7 +24,7 @@ case class SignatureSample(id: Long = 0,
   /**Persists by conveniently delegating to companion object's save method. */
   def save(signatureStr: String): SignatureSample = {
     val saved = SignatureSample.save(this)
-    Blobs.put("signaturesamples/" + saved.id, signatureStr.getBytes)
+    Blobs.put(SignatureSample.getJsonUrl(saved.id), signatureStr.getBytes)
     saved
   }
 
@@ -36,6 +36,14 @@ case class SignatureSample(id: Long = 0,
 }
 
 object SignatureSample extends Saves[SignatureSample] with SavesCreatedUpdated[SignatureSample] {
+
+  def getJsonUrl(id: Long): String = {
+    "signaturesamples/" + id + ".json"
+  }
+
+  def getXmlUrl(id: Long): String = {
+    "signaturesamples/" + id + ".xml"
+  }
 
   //
   // Saves[SignatureSample] methods

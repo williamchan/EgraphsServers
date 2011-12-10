@@ -37,7 +37,7 @@ with DBTransactionPerTest {
 
   it should "save voiceStr to Blobstore" in {
     val saved = VoiceSample(isForEnrollment = true).save(TestConstants.voiceStr)
-    Blobs.get("voicesamples/" + saved.id).get.asString should be(TestConstants.voiceStr)
+    Blobs.get(VoiceSample.getJsonUrl(saved.id)).get.asString should be(TestConstants.voiceStr)
   }
 
 }

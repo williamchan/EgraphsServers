@@ -38,7 +38,7 @@ with DBTransactionPerTest {
 
   it should "save signatureStr to Blobstore" in {
     val saved = SignatureSample(isForEnrollment = true).save(TestConstants.signatureStr)
-    Blobs.get("signaturesamples/" + saved.id).get.asString should be(TestConstants.signatureStr)
+    Blobs.get(SignatureSample.getJsonUrl(saved.id)).get.asString should be(TestConstants.signatureStr)
   }
 
 }

@@ -49,9 +49,8 @@ public class BiometricServerServicesTests extends TestCase {
 
 //        clearProfiles(userId);
 //        addUser(userId, userName);
-
-//        addProfile(userId, profileNameDyn1);
-//        enrollUser(userId, profileNameDyn1, signature1, signature2, signature3, signature4, signature5, signature6);
+//        addProfile(userId, profileName);
+//        enrollUser(userId, profileName, signature1, signature2, signature3, signature4, signature5, signature6);
 
         verifyUserBySignatureDynamicToDynamic_v1(userId, signature7);
     }
