@@ -2,8 +2,7 @@ package utils
 
 import models.{Order, Celebrity, Account, Customer, Product}
 import com.stripe.model.Token
-import com.stripe.Stripe
-import libs.{Payment, Time}
+import libs.Time
 
 /**
  * Renders saved copies of domain objects that satisfy all relational integrity
@@ -11,7 +10,7 @@ import libs.{Payment, Time}
  */
 object TestData {
   def newSavedCustomer(): Customer = {
-    val acct = Account(email=Time.now.toString).save()
+    val acct = Account(email="customer-"+ Time.toBlobstoreFormat(Time.now) + "@egraphs.com").save()
     val cust = Customer().save()
 
     acct.copy(customerId=Some(cust.id)).save()
@@ -20,7 +19,7 @@ object TestData {
   }
 
   def newSavedCelebrity(): Celebrity = {
-    val acct = Account(email="celebrity"+Time.now.toString).save()
+    val acct = Account(email="celebrity-"+Time.toBlobstoreFormat(Time.now)+"@egraphs.com").save()
     val celeb = Celebrity().save()
 
     acct.copy(celebrityId = Some(celeb.id)).save()

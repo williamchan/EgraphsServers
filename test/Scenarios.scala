@@ -44,7 +44,6 @@ class Scenarios extends DeclaresScenarios {
    }
   )
 
-
   toScenarios add Scenario(
     "Will has two products",
 

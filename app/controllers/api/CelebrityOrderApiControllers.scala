@@ -1,13 +1,15 @@
 package controllers.api
 
 import play.mvc.Controller
-import play.libs.Codec
 import sjson.json.Serializer
 import controllers.{DBTransaction, RequiresCelebrityOrderId, RequiresCelebrityId, RequiresAuthenticatedAccount}
 import java.awt.image.BufferedImage
 import libs.{ImageUtil, Blobs}
 import javax.imageio.ImageIO
 import java.io.{File, ByteArrayOutputStream}
+import org.apache.commons.mail.SimpleEmail
+import play.libs.{Mail, Codec}
+import models.Egraph
 
 /**
  * Handles requests for queries against a celebrity for his orders.
@@ -38,6 +40,11 @@ with DBTransaction {
         val bytes = byteOs.toByteArray
         Blobs.put("egraphs/" + egraphId + "/egraph.jpg", bytes)
 
+        // Send e-mail that the eGraph is complete. Move this to post-authentication
+        // when possible.
+        sendEgraphSignedMail(egraph)
+
+        // Serialize the egraph ID
         Serializer.SJSON.toJSON(Map("id" -> egraphId))
 
       case _ =>
@@ -45,4 +52,26 @@ with DBTransaction {
         Error("Valid \"signature\" and \"audio\" parameters were not provided.")
     }
   }
+
+  def sendEgraphSignedMail(egraph: Egraph) = {
+    val email = new SimpleEmail()
+    val recipient = order.recipient
+
+    email.setFrom(celebrity.urlSlug.get + "@egraphs.com", celebrity.publicName.get)
+    email.addTo(recipient.account.email, recipient.name)
+    email.addReplyTo("noreply@egraphs.com")
+    email.setSubject("I just finished signing your eGraph")
+    email.setMsg(
+      views.Application.html.egraph_signed_email(
+        recipient,
+        celebrity,
+        order.product,
+        order,
+        egraph
+      ).toString().trim()
+    )
+
+    Mail.send(email)
+  }
+
 }

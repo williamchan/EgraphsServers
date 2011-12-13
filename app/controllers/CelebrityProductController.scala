@@ -127,7 +127,7 @@ object CelebrityProductController extends Controller
       email.setMsg(views.Application.html.order_confirmation_email(
         buyer, recipient, celebrity, product, chargedOrder
       ).toString().trim())
-
+      
       Mail.send(email)
 
       // Redirect to the order page, with orderId in flash scope
