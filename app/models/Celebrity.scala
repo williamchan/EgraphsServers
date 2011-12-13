@@ -97,7 +97,7 @@ case class Celebrity(id: Long = 0,
 
   def getOpenEnrollmentBatch(): Option[EnrollmentBatch] = {
     from(Schema.enrollmentBatches)(enrollmentBatch =>
-      where(enrollmentBatch.celebrityId === this.id and enrollmentBatch.isSuccessfullEnrollment.isNull)
+      where(enrollmentBatch.celebrityId === this.id and enrollmentBatch.isSuccessfulEnrollment.isNull)
         select (enrollmentBatch)
     ).headOption
   }

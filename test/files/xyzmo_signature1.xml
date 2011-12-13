@@ -1,0 +1,15 @@
+<SignatureDataContainer version="1.0">
+  <DeviceInformation version="1.0">
+    <Device name="Wacom STU-500" deviceVersion="1.02" deviceId="1456602" />
+    <CapturingComponent name="xyzmo.Biometric.Signature.Device.Wacom.WacomControl" version="3.1.2.2" />
+    <PhysicalSizeInformation unit="points" width="294" height="222" />
+    <ActiveArea minX="0" minY="0" maxX="10175" maxY="7631" />
+    <zAxisInformation supported="false" minValue="0" maxValue="0" />
+    <Pressure supported="true" airmovesSupported="true" minPressure="0" maxPressure="511" />
+    <TimeInformation supported="true" timeSupportDuringAirmoves="true" fixedSamplingRate="false" samplingRatePointsPerSecond="0" />
+    <Azimuth supported="false" />
+    <Elevation supported="false" />
+    <PenRotation supported="false" />
+  </DeviceInformation>
+  <SignatureData version="1.0" packagingInfo="3" nrOfPackets="74">D6YQxADgD18PoRD4AXkPaQ99EQ8Bng9zDy0RCwG8D30OtRDiAdAPiA4ZEIwB3A+RDWgQCwHnD5wMuQ9pAfEPpQwbDrwB+g+wC6QOHAH/D7oLXg2ZAf8PxAtQDTsB/w/OC4IM/AH0D9gL7QzXAdsP4QyGDNMBpA/rDTQM8wEPD/YN3w00AHAP/w50DYcAABAJDuMN3QAAEBMPMA4rAAAQHg9aDmkAABAoD24OnAAAEDIPcg66AAAQPA9yDroA2BBGD2MOvgE4EFAPTA6eANEQWg9BDoUAUxBkD0IOegAAEG4PVw59AAAQeA+FDqIAABCCD8oO6gAAEIwQKQ9WAAAQlhCWD+QAABCgEQgQigAAEKoRcBE9AAAQtBHBEegAABC+EfwSeAAAEMgSJRLgAAAQ0hI+ExwAABDcEkYTKQCuEOYSUBMkAUgQ8BJHEvwBphD6EisSswG9EQQR9hJEAcoRDhGjEakB0BEYETEQ3AHTESIQow/dAdMRLA/+Dq4BzxE2D1ENZAHMEUAOtAwlAckRSg5BCyQBxhFUDgsKgQHDEV4OJQpIAb4RaA6JCnUBtxFyDyMK9QGxEXwP3wuvAawRhhCVDIQBqRGQETANSQGnEZoRqA3hAagRpBH7Dj4BqxGuEjYOZQGzEbgSZg5kAb0RwhKSDkUByRHMEsUOEwHVEdYTCg3hAd0R4BN6DcYB4hHqFB4N1wHkEfQU9g4YAeQR/xXyDnoB4hIIFvUO4gHcEhIX8w82Ac8SHBjlD2wBnBImGc4PgwD8EjAasg+CAF4SOw==</SignatureData>
+</SignatureDataContainer>

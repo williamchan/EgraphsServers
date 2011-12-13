@@ -18,7 +18,7 @@ import java.util.Hashtable;
 public class VoiceBiometricsClient {
     private String requesttype = "";
     private String responsetype = "";
-    private Hashtable<String, String> params = new Hashtable<String, String>();
+    private Hashtable<String, String> requestparams = new Hashtable<String, String>();
     private Hashtable<String, String> responsevalues = new Hashtable<String, String>();
 
     private URL url = new URL("https://service03.voicebiogroup.com/service/xmlapi");
@@ -123,7 +123,7 @@ public class VoiceBiometricsClient {
 
     public void clearParameters() {
         requesttype = "";
-        params.clear();
+        requestparams.clear();
     }
 
     public void clearResponse() {
@@ -133,7 +133,7 @@ public class VoiceBiometricsClient {
 
     public void setParameter(String paramname, String paramvalue) {
         if (paramname != null && paramvalue != null) {
-            params.put(paramname, paramvalue);
+            requestparams.put(paramname, paramvalue);
         }
     }
 
@@ -208,10 +208,10 @@ public class VoiceBiometricsClient {
             throw new Exception();
         }
         xml.append("<" + requesttype + ">\n");
-        Enumeration<String> fields = params.keys();
+        Enumeration<String> fields = requestparams.keys();
         while (fields.hasMoreElements()) {
             field = fields.nextElement();
-            xml.append("<" + field + ">" + params.get(field) + "</" + field + ">\n");
+            xml.append("<" + field + ">" + requestparams.get(field) + "</" + field + ">\n");
         }
         xml.append("</" + requesttype + ">\n");
         return xml.toString();

@@ -110,6 +110,7 @@
           <s:enumeration value="SigEngineValidationError" />
           <s:enumeration value="ProfileInconsistent" />
           <s:enumeration value="LowPressureLevelError" />
+          <s:enumeration value="EncryptedSignatureDataDecryptionFailed" />
         </s:restriction>
       </s:simpleType>
       <s:complexType name="EnrollResult">
@@ -281,8 +282,8 @@
       <s:complexType name="IdentifyResult">
         <s:sequence>
           <s:element minOccurs="1" maxOccurs="1" name="identifyResult" type="tns:IdentifyResultEnum" />
-          <s:element minOccurs="1" maxOccurs="1" name="qualityLevel" type="tns:QualityLevelEnum" />
           <s:element minOccurs="0" maxOccurs="1" name="infoIdentifyMatch" type="tns:IdentifyMatchInfo" />
+          <s:element minOccurs="1" maxOccurs="1" name="qualityLevel" type="tns:QualityLevelEnum" />
         </s:sequence>
       </s:complexType>
       <s:simpleType name="IdentifyResultEnum">
@@ -291,6 +292,14 @@
           <s:enumeration value="IdentifyNoMatch" />
         </s:restriction>
       </s:simpleType>
+      <s:complexType name="IdentifyMatchInfo">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="matchingExtUserId" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="matchingProfileId" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="matchingProfileName" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="score" type="s:int" />
+        </s:sequence>
+      </s:complexType>
       <s:simpleType name="QualityLevelEnum">
         <s:list>
           <s:simpleType>
@@ -307,14 +316,6 @@
           </s:simpleType>
         </s:list>
       </s:simpleType>
-      <s:complexType name="IdentifyMatchInfo">
-        <s:sequence>
-          <s:element minOccurs="1" maxOccurs="1" name="score" type="s:int" />
-          <s:element minOccurs="0" maxOccurs="1" name="matchingProfileId" type="s:string" />
-          <s:element minOccurs="0" maxOccurs="1" name="matchingProfileName" type="s:string" />
-          <s:element minOccurs="0" maxOccurs="1" name="matchingExtUserId" type="s:string" />
-        </s:sequence>
-      </s:complexType>
       <s:element name="IdentifyUserProfileBySignatureDynamicToDynamic_v1">
         <s:complexType>
           <s:sequence>
@@ -357,10 +358,17 @@
       </s:complexType>
       <s:complexType name="VerifyResult">
         <s:sequence>
-          <s:element minOccurs="1" maxOccurs="1" name="verifyResult" type="tns:VerifyResultEnum" />
-          <s:element minOccurs="1" maxOccurs="1" name="score" type="s:int" />
-          <s:element minOccurs="1" maxOccurs="1" name="qualityLevel" type="tns:QualityLevelEnum" />
           <s:element minOccurs="0" maxOccurs="1" name="infoVerifyMatch" type="tns:VerifyMatchInfo" />
+          <s:element minOccurs="1" maxOccurs="1" name="qualityLevel" type="tns:QualityLevelEnum" />
+          <s:element minOccurs="1" maxOccurs="1" name="score" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="verifyResult" type="tns:VerifyResultEnum" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="VerifyMatchInfo">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="matchingProfileId" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="matchingProfileName" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="signatureInProfileReplaced" type="s:boolean" />
         </s:sequence>
       </s:complexType>
       <s:simpleType name="VerifyResultEnum">
@@ -369,13 +377,6 @@
           <s:enumeration value="VerifyNoMatch" />
         </s:restriction>
       </s:simpleType>
-      <s:complexType name="VerifyMatchInfo">
-        <s:sequence>
-          <s:element minOccurs="0" maxOccurs="1" name="matchingProfileId" type="s:string" />
-          <s:element minOccurs="0" maxOccurs="1" name="matchingProfileName" type="s:string" />
-          <s:element minOccurs="1" maxOccurs="1" name="signatureInProfileReplaced" type="s:boolean" />
-        </s:sequence>
-      </s:complexType>
       <s:element name="VerifyUserProfileBySignatureStaticToStatic_v1">
         <s:complexType>
           <s:sequence>

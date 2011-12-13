@@ -9,7 +9,7 @@ import db.{KeyedCaseClass, Schema, Saves}
 case class EnrollmentBatch(id: Long = 0,
                            celebrityId: Long,
                            isBatchComplete: Boolean = false,
-                           isSuccessfullEnrollment: Option[Boolean] = None,
+                           isSuccessfulEnrollment: Option[Boolean] = None,
                            // TODO(wchan): Should also store vbg and xyzmo-related metadata
                            created: Timestamp = Time.defaultTimestamp,
                            updated: Timestamp = Time.defaultTimestamp)
@@ -76,7 +76,7 @@ object EnrollmentBatch extends Saves[EnrollmentBatch] with SavesCreatedUpdated[E
     updateIs(
       theOld.celebrityId := theNew.celebrityId,
       theOld.isBatchComplete := theNew.isBatchComplete,
-      theOld.isSuccessfullEnrollment := theNew.isSuccessfullEnrollment,
+      theOld.isSuccessfulEnrollment := theNew.isSuccessfulEnrollment,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated
     )
