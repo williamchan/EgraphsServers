@@ -10,7 +10,7 @@ import com.xyzmo.wwww.biometricserver.WebServiceBiometricPartStub._
 
 object XyzmoBiometricServices {
 
-  val log: Logger = Logger.getLogger(XyzmoBiometricServices.getClass)
+  private val log: Logger = Logger.getLogger(XyzmoBiometricServices.getClass)
   private val username: String = "usermanager"
   private val password: String = "%User%01"
   private val domain: String = "testlab"

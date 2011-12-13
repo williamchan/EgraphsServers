@@ -15,7 +15,7 @@ public class VoiceBiometricsClientTests extends TestCase {
     }
 
     public void testEnrollWill() throws Exception {
-        client.sendStartEnrollmentRequest("will", /*rebuildtemplate*/true);
+        client.sendStartEnrollmentRequest("will", /*rebuildTemplate*/true);
         String transactionId = client.getResponseValue(VoiceBiometricsClient.transactionid);
         assertEquals(VoiceBiometricsClient.StartEnrollment, client.getResponseType());
         assertEquals("0", client.getResponseValue(VoiceBiometricsClient.errorcode));
@@ -59,7 +59,7 @@ public class VoiceBiometricsClientTests extends TestCase {
     }
 
     public void testEnrollDave() throws Exception {
-        client.sendStartEnrollmentRequest("dave", /*rebuildtemplate*/true);
+        client.sendStartEnrollmentRequest("dave", /*rebuildTemplate*/true);
         String transactionId = client.getResponseValue(VoiceBiometricsClient.transactionid);
         assertEquals(VoiceBiometricsClient.StartEnrollment, client.getResponseType());
         assertEquals("0", client.getResponseValue(VoiceBiometricsClient.errorcode));

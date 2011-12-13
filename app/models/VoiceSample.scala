@@ -24,7 +24,7 @@ case class VoiceSample(id: Long = 0,
   /**Persists by conveniently delegating to companion object's save method. */
   def save(voiceStr: String): VoiceSample = {
     val saved = VoiceSample.save(this)
-    Blobs.put(VoiceSample.getJsonUrl(saved.id), voiceStr.getBytes)
+    Blobs.put(VoiceSample.getWavUrl(saved.id), voiceStr.getBytes)
     saved
   }
 
@@ -37,8 +37,8 @@ case class VoiceSample(id: Long = 0,
 
 object VoiceSample extends Saves[VoiceSample] with SavesCreatedUpdated[VoiceSample] {
 
-  def getJsonUrl(id: Long): String = {
-    "voicesamples/" + id + ".json"
+  def getWavUrl(id: Long): String = {
+    "voicesamples/" + id + ""
   }
 
   //
