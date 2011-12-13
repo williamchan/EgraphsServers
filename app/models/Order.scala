@@ -42,9 +42,24 @@ case class Order(
     amountPaidInCurrency.toMoney()
   }
 
-  /** Retrieves the current payment state */
+  /** Returns the current payment state */
   def paymentState: PaymentState = {
     PaymentState.all(paymentStateString)
+  }
+
+  /** Retrieves the purchasing Customer from the database. */
+  def buyer: Customer = {
+    Customer.get(buyerId)
+  }
+
+  /** Retrieves the receiving Customer from the database */
+  def recipient: Customer = {
+    Customer.get(recipientId)
+  }
+
+  /** Retrieves the purchased Product from the database */
+  def product: Product = {
+    Product.get(productId)
   }
 
   /** Returns an order configured with the provided payment state */

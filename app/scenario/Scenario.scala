@@ -1,6 +1,7 @@
 package scenario
 
 import libs.Blobs
+import play.templates.JavaExtensions
 
 /**
  * An executable scenario.
@@ -18,7 +19,12 @@ import libs.Blobs
  *
  * For more, see [[scenarios.DeclaresScenarios]]
  */
-case class Scenario(name: String, description: String="", instructions: () => Any) {
+case class Scenario(name: String, category: String = "Uncategorized", description: String="", instructions: () => Any) {
+  /** Slug used to identify the scenario in the URL */
+  def urlSlug: String = {
+    JavaExtensions.slugify(name, false)
+  }
+  
   def play() = {
     try {
       instructions()
@@ -42,16 +48,24 @@ object Scenario {
   lazy val scenarios = Class.forName("Scenarios").newInstance()
 
   /** All registered scenarios, indexed by name */
-  var all: Map[String, Scenario] = Map[String, Scenario]()
+  var all = Map[String, Scenario]()
+
+  /** All registered scenarios, indexed by category */
+  var allCategories = Map[String, List[Scenario]]()
 
   /** List of all registered scenarios in no particular order */
   def list: Iterable[Scenario] = {
-    all.map {case (name, scenario) => scenario }
+    all.map { case (name, scenario) => scenario }
+  }
+
+  /** Returns a map of all registered scenarios, indexed by category */
+  def categories: Map[String,  List[Scenario]] = {
+    allCategories
   }
 
   /** Returns a scenario with the provided name */
-  def named(name: String): Option[Scenario] = {
-    all.get(name)
+  def withSlug(urlSlug: String): Option[Scenario] = {
+    all.get(urlSlug)
   }
 
   /** All registered scenario names */
@@ -61,7 +75,9 @@ object Scenario {
 
   /** Adds a scenario to the list of registered scenarios */
   def add(scenario: Scenario) {
-    all += (scenario.name -> scenario)
+    all += (scenario.urlSlug -> scenario)
+    
+    allCategories += (scenario.category -> (scenario :: allCategories.get(scenario.category).getOrElse(List.empty[Scenario])))
   }
 
   /**
@@ -80,7 +96,7 @@ object Scenario {
     scenarios
 
     for (name <- names) {
-      Scenario.named(name) match {
+      Scenario.withSlug(name) match {
         case None =>
           throw new IllegalArgumentException("No scenario named \"" + name + "\" found.")
 

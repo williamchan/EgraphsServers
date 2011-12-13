@@ -127,6 +127,23 @@ trait Saves[T <: {def id : Long}] {
   }
 
   /**
+   * Gets an object by its id, throws an exception if not found.
+   *
+   * @param id the id of the object to locate
+   *
+   * @return the located object
+   *
+   * @throws a RuntimeException with ID information if it failed to find the entity.
+   */
+  final def get(id: Long)(implicit m: Manifest[T]): T = {
+    findById(id).getOrElse(
+      throw new RuntimeException(
+        "DB contained no instances of class " + m.erasure.getName + " with id="+id
+      )
+    )
+  }
+
+  /**
    * Hook to provide an entity transform that will be applied before inserting any
    * new object.
    *

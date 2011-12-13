@@ -47,6 +47,11 @@ case class Product(
     copy(priceInCurrency=money)
   }
 
+  /** Retrieves the celebrity from the database */
+  def celebrity: Celebrity = {
+    Celebrity.get(celebrityId)
+  }
+  
   //
   // KeyedCaseClass[Long] methods
   //

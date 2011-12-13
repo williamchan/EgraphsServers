@@ -12,7 +12,7 @@ POST    /stripe                                 stripe.post
 
 GET     /test/scenarios                          ScenarioController.list
 GET     /test/scenarios/clear                    ScenarioController.clear
-GET     /test/scenarios/{name}                   ScenarioController.scenario
+GET     /test/scenarios/{urlSlug}                ScenarioController.scenario
 GET     /test/base64decode/{str}                 test.base64decode
 GET     /test/script                             test.script
 
@@ -58,4 +58,4 @@ POST    ${api}/celebrities/{celebrityId}/orders/{orderId}/egraphs api.CelebrityO
 GET     /{celebrityUrlSlug}                      CelebrityController.index
 GET     /{celebrityUrlSlug}/{productUrlSlug}     CelebrityProductController.index
 POST    /{celebrityUrlSlug}/{productUrlSlug}/buy CelebrityProductController.buy
-
+GET     /orders/{orderId}/confirm                OrderConfirmationController.confirm

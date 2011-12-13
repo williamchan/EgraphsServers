@@ -22,6 +22,11 @@ case class Customer(
     Customer.save(this)
   }
 
+  /** Retrieves the Customer's Account from the database */
+  def account: Account = {
+    Account.findByCustomerId(id).get
+  }
+
   /**
    * Orders an Egraph product on behalf of a recipient. The results must be persisted for the transaction
    * to actually accomplish anything.

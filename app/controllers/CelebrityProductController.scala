@@ -130,8 +130,12 @@ object CelebrityProductController extends Controller
 
       Mail.send(email)
 
-      // Redirect to the order page
-      "You did it! Order #" + chargedOrder.id
+      // Redirect to the order page, with orderId in flash scope
+      flash.put("orderId", chargedOrder.id)
+      Redirect(Utils.lookupUrl(
+        "OrderConfirmationController.confirm",
+        Map("orderId" -> chargedOrder.id.toString)).url
+      )
     }
   }
 }

@@ -48,7 +48,10 @@ object ScenarioController extends Controller with DBTransaction {
    * @return 200 (Ok) and the list if successful.
    */
   def list = withRegisteredScenarios {
-    views.Application.html.scenarios(Scenario.list.toSeq)
+    val scenarios = Scenario.allCategories.toList.sortWith((a, b) => a._1 < b._1).map { case (category, catScenarios) =>
+      (category, catScenarios.toSeq.sortWith((a, b) => a.name < b.name))
+    }
+    views.Application.html.scenarios(scenarios)
   }
 
   /**
@@ -56,8 +59,8 @@ object ScenarioController extends Controller with DBTransaction {
    *
    * @return 200 (Ok) and a useful human-readable message if successful.
    */
-  def scenario (name: String) = withRegisteredScenarios {
-    Scenario.named(name) match {
+  def scenario (urlSlug: String) = withRegisteredScenarios {
+    Scenario.withSlug(urlSlug) match {
       case Some(existingScenario) => {
         existingScenario.play() match {
           case aResult: Result =>
@@ -65,15 +68,16 @@ object ScenarioController extends Controller with DBTransaction {
           case _ =>
             Html(
               "Scenario <pre>"
-                + name
+                + urlSlug
                 + "</pre> successfully replayed.<br/><br/>"
                 + existingScenario.description
             )
         }
       }
-      case _ => {
+
+      case None => {
         NotFound(
-          "No scenario was found with the name \"" + name + "\"."+
+          "No scenario was found with the name \"" + urlSlug + "\"."+
           "View available scenarios at " + reverse(this.list)
         )
       }
