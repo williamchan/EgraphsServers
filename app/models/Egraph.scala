@@ -2,8 +2,11 @@ package models
 
 import java.sql.Timestamp
 import db.{KeyedCaseClass, Schema, Saves}
-import libs.{Blobs, Utils, Time}
 import libs.Blobs.AccessPolicy
+import java.io.File
+import javax.imageio.ImageIO
+import libs.{ImageUtil, Blobs, Utils, Time}
+import java.awt.Image
 
 abstract sealed class EgraphState(val value: String)
 
@@ -40,6 +43,11 @@ case class Egraph(
     saved.assets.save(signature, audio)
 
     saved
+  }
+
+  /** Fetches the related order from the db */
+  def order: Order = {
+    Order.get(orderId)
   }
 
   /**
@@ -80,24 +88,55 @@ case class Egraph(
   }
 
   private object Assets extends EgraphAssets {
+    //
+    // EgraphAssets members
+    //
     override def signature: String = {
       Blobs.get(signatureJsonKey).get.asString
     }
-
+    
     override def audio: Stream[Byte] = {
       Blobs.get(audioKey).get.asByteStream
+    }
+
+    override def image: ImageAsset = {
+      ImageAsset(blobKeyBase, imageName, ImageAsset.Png)
     }
 
     override def save(signature: String, audio: Array[Byte]) {
       Blobs.put(signatureJsonKey, signature, access=AccessPolicy.Private)
       Blobs.put(audioKey, audio, access=AccessPolicy.Private)
+
+      // Before removing this line, realize that without the line we will all fail
+      ImageAsset(
+        createMasterImage(),
+        blobKeyBase,
+        imageName,
+        ImageAsset.Png
+      ).save(AccessPolicy.Public)
     }
 
-    private lazy val blobKeyBase = "egraphs/" + id + "/"
-    private lazy val signatureKey = blobKeyBase + "signature"
-
-    lazy val audioKey = blobKeyBase + "audio.wav"
+    lazy val audioKey = blobKeyBase + "/audio.wav"
     lazy val signatureJsonKey = signatureKey + ".json"
+
+    //
+    // Private members
+    //
+    private lazy val blobKeyBase = "egraphs/" + id
+    private lazy val signatureKey = blobKeyBase + "/signature"
+    private lazy val imageName = "image"
+
+    private def createMasterImage(sig: String = this.signature,
+                                  productImage: Image = ImageIO.read(new File("test/files/kapler.JPG"))):Array[Byte] =
+    {
+      import ImageUtil.Conversions._
+      
+      val photoImage = ImageIO.read(new File("test/files/kapler.JPG"))
+      val signatureImage = ImageUtil.createSignatureImage(sig)
+
+      ImageUtil.createEgraphImage(signatureImage, photoImage, 0, 0).asByteArray(ImageAsset.Png)
+    }
+
   }
 }
 
@@ -115,6 +154,8 @@ trait EgraphAssets {
    * Retrieves the bytes of audio from the blobstore.
    */
   def audio: Stream[Byte]
+
+  def image: ImageAsset
 
   /** Stores the assets in the blobstore */
   def save(signature: String, audio: Array[Byte])

@@ -6,9 +6,9 @@ import play.Play.configuration
 import org.jclouds.blobstore.{BlobStoreContextFactory, BlobStoreContext, BlobStore}
 import org.jclouds.blobstore.domain.Blob
 import org.jclouds.io.Payload
-import java.io.{FileInputStream, File, InputStream}
 import org.jclouds.aws.s3.AWSS3Client
 import org.jclouds.s3.domain.CannedAccessPolicy
+import java.io._
 
 /**
  * Convenience methods for storing and loading large binary data: images,
@@ -169,12 +169,14 @@ object Blobs {
    * Pimping of the jclouds Blob library to make content access easier.
    */
   class RichPayload(payload: Payload) {
-    def asInputStream: InputStream = {
-      payload.getInput
+
+    def asInputStream: BufferedInputStream = {
+      new BufferedInputStream(payload.getInput)
     }
 
     def asIntStream: Stream[Int] = {
       val stream = asInputStream
+
       Stream
         .continually(stream.read)
         .takeWhile(theInt => theInt != -1)
@@ -185,11 +187,22 @@ object Blobs {
     }
 
     def asByteArray: Array[Byte] = {
-      asByteStream.toArray
+      val bytesOut = new ByteArrayOutputStream()
+
+      val is = asInputStream
+      var nextByte = is.read()
+
+      while (nextByte != -1) {
+        bytesOut.write(nextByte)
+        nextByte = is.read()
+      }
+
+      is.close()
+      bytesOut.toByteArray
     }
 
     def asString: String = {
-      asIntStream.map(theInt => theInt.toChar).mkString
+      new String(asByteArray, "UTF-8")
     }
   }
 

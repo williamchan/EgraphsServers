@@ -121,10 +121,27 @@ case class Order(
   override def unapplied = Order.unapply(this)
 }
 
+case class FulfilledOrder(order: Order, egraph: Egraph)
+
 object Order extends Saves[Order] with SavesCreatedUpdated[Order] {
   //
   // Public Methods
   //
+  /**
+   * Returns a completed Order/Egraph combination with the given ID
+   */
+  def findFulfilledWithId(id: Long): Option[FulfilledOrder] = {
+    import Schema.{orders, egraphs}
+    from(orders, egraphs)((order, egraph) =>
+      where(
+        order.id === id and
+        egraph.orderId === order.id and
+        egraph.stateValue === Verified.value
+      )
+      select (FulfilledOrder(order, egraph))
+    ).headOption
+  }
+
   /**
    * Callable object that finds a list of Orders based on the id of the Celebrity
    * who owns the Product that was purchased.

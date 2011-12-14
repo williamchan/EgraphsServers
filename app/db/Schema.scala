@@ -101,7 +101,7 @@ object Schema extends org.squeryl.Schema {
   val egraphs = table[Egraph]
   on(egraphs)(egraph =>
     declare(
-      columns(egraph.orderId, egraph.stateValue) are (unique)
+      columns(egraph.orderId, egraph.stateValue) are (indexed)
     )
   )
 

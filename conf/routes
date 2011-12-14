@@ -54,8 +54,12 @@ POST    ${api}/celebrities/{celebrityId}/orders/{orderId}/egraphs api.CelebrityO
 ## Website
 ##
 
+# Order and Egraph pages
+GET     /orders/{<[0-9]+>orderId}/confirm                OrderConfirmationController.confirm
+GET     /egraph/{<[0-9]+>orderId}                        EgraphController.egraph
+
 # Celebrity pages
 GET     /{celebrityUrlSlug}                      CelebrityController.index
 GET     /{celebrityUrlSlug}/{productUrlSlug}     CelebrityProductController.index
 POST    /{celebrityUrlSlug}/{productUrlSlug}/buy CelebrityProductController.buy
-GET     /orders/{orderId}/confirm                OrderConfirmationController.confirm
+

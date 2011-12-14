@@ -24,7 +24,7 @@
 }
 
 @profilePhoto_100x100 = {
-  @celebrity.profilePhoto.get.resized(100, 100).ensureSaved(Public).url
+  @celebrity.profilePhoto.get.resized(100, 100).getSaved(Public).url
 }
 
 @price = {@product.price.formatSimply}

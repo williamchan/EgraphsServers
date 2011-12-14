@@ -49,9 +49,9 @@ class EgraphTests extends UnitFlatSpec
   it should "save and recover signature and audio data from the blobstore" in {
     val egraph = persistedOrder
       .newEgraph
-      .save("my signature json", "my audio".getBytes("UTF-8"))
+      .save(TestConstants.signatureStr, "my audio".getBytes("UTF-8"))
 
-    egraph.assets.signature should be ("my signature json")
+    egraph.assets.signature should be (TestConstants.signatureStr)
     egraph.assets.audio.toArray should be ("my audio".getBytes("UTF-8"))
   }
 

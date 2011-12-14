@@ -1,13 +1,15 @@
-import controllers.CelebrityController
+import controllers.api.CelebrityOrderApiControllers.EgraphFulfillmentHandler
 import controllers.CelebrityProductController.EgraphPurchaseHandler
+import db.Schema
 import java.io.File
 import libs.{Utils, Blobs}
-import models.{Customer, Product, Account, Celebrity}
-import play.mvc.results.{Redirect, Result, ScalaAction}
-import play.mvc.Router
+import models._
+import play.mvc.results.Redirect
 import scenario.{Scenario, DeclaresScenarios}
 import Blobs.Conversions._
-import utils.TestData
+import utils.{TestConstants, TestData}
+import org.squeryl.PrimitiveTypeMode._
+
 
 /**
  * All scenarios supported by the API.
@@ -17,6 +19,7 @@ class Scenarios extends DeclaresScenarios {
   val celebrityPageCategory = "Celebrity Page"
   val productPageCategory = "Product Page"
   val orderConfirmationPageCategory = "Order Confirmation Page"
+  val egraphPageCategory = "Egraph Page"
 
   toScenarios add Scenario(
     "Will Chan is a celebrity",
@@ -106,6 +109,34 @@ class Scenarios extends DeclaresScenarios {
 
       erem.buy(starcraftChampionship).save()
       erem.buy(kingOfPweensCompetition).save()
+    }
+  )
+
+  toScenarios add Scenario(
+    "Will fulfills one of Erem's product orders",
+
+    apiCategory,
+
+    """
+    Creates four unfulfilled orders, each ordered twice against Will's
+    two products.
+    """,
+
+    {() =>
+      val will = getWillCelebrityAccount
+      val (starcraftChampionship, kingOfPweensCompetition) = getWillsTwoProducts
+
+      val firstOrder = from(Schema.orders)(order =>
+        where(order.id in List(starcraftChampionship.id, kingOfPweensCompetition.id))
+        select (order)
+      ).headOption.get
+
+      EgraphFulfillmentHandler(
+        TestConstants.signatureStr,
+        TestConstants.voiceStr,
+        firstOrder,
+        will
+      ).execute()
     }
   )
 
@@ -274,6 +305,32 @@ class Scenarios extends DeclaresScenarios {
       ).execute()
     }
   )
+
+  toScenarios add Scenario(
+      "Valid, ordered eGraph",
+
+      egraphPageCategory,
+
+      """
+      Creates a signed eGraph and views its page
+      """,
+
+      {() =>
+        Scenario.clearAll()
+
+        Scenario.play(
+          "Will-Chan-is-a-celebrity",
+          "Will-has-two-products",
+          "Erem-is-a-customer",
+          "Erem-buys-Wills-two-products-twice-each",
+          "Will-fulfills-one-of-Erems-product-orders"
+        )
+
+        new Redirect(
+          Utils.lookupUrl("EgraphController.egraph", Map("orderId" -> "1")).url
+        )
+      }
+    )
 
 
   def getWillAccount: Account = {

@@ -32,7 +32,7 @@ import libs.Blobs.AccessPolicy
  *   It is highly recommended to make your master image a `png` as the format is lossless.
  *
  * @param resolution the resolution of this asset. This will either be MasterResolution, which can only be
- *   known by dereferencing masterData, or a CustomResolution(width, height).
+ *   known by dereferencing masterData, or a custom resolution.
  */
 class ImageAsset(
   keyBase: String,
@@ -59,8 +59,10 @@ class ImageAsset(
   /**
    * Ensures that configured ImageAsset is available on the blobstore by querying
    * the blobstore and rendering/saving the data if it was not present.
+   *
+   * @return the saved ImageAsset
    */
-  def ensureSaved(access:AccessPolicy=AccessPolicy.Private): ImageAsset = {
+  def getSaved(access:AccessPolicy=AccessPolicy.Private): ImageAsset = {
     if (!isPersisted) {
       save(access)
     }
@@ -74,9 +76,19 @@ class ImageAsset(
     Blobs.exists(key)
   }
 
-  /** Returns this ImageAsset transformed to the specified dimensions */
+  /** Returns this ImageAsset transformed to the specified resolution */
   def resized(width: Int, height: Int): ImageAsset = {
-    new ImageAsset(keyBase, name, lazyMasterData, imageType, CustomResolution(width, height))
+    withResolution(CustomResolution(width, height))
+  }
+
+  /** Proportionally resizes the width of the image */
+  def resizedWidth(width: Int): ImageAsset = {
+    withResolution(CustomWidthResolution(width))
+  }
+
+  /** Proportionally resizes the height of the image */
+  def resizedHeight(height: Int): ImageAsset = {
+    withResolution(CustomHeightResolution(height))
   }
 
   /** Attempts to fetch the asset from the blobstore. */
@@ -96,13 +108,15 @@ class ImageAsset(
         masterImage
 
       case CustomResolution(width, height) =>
-        ImageUtil.getScaledInstance(
-          masterImage,
-          width,
-          height,
-          RenderingHints.VALUE_INTERPOLATION_BILINEAR,
-          true // higher quality
-        )
+        resizedMasterImage(width, height)
+
+      case CustomWidthResolution(width) =>
+        val scaleFactor = width.toDouble / masterImage.getWidth.toDouble
+        resizedMasterImage(width, (masterImage.getHeight * scaleFactor).toInt)
+
+      case CustomHeightResolution(height) =>
+        val scaleFactor = height.toDouble / masterImage.getHeight.toDouble
+        resizedMasterImage((masterImage.getHeight * scaleFactor).toInt, height)
     }
   }
 
@@ -141,7 +155,18 @@ class ImageAsset(
    */
   private lazy val lazyMasterData: Array[Byte] = masterData
 
+  /** Renders the master data as an image */
   private lazy val masterImage: BufferedImage = lazyMasterData.asBufferedImage
+
+  /** Returns a copy of this ImageAsset with the new Resolution */
+  private def withResolution(newResolution: Resolution): ImageAsset = {
+    new ImageAsset(keyBase, name, lazyMasterData, imageType, newResolution)
+  }
+
+  /** Returns the master data scaled to the specified width and height */
+  private def resizedMasterImage(width: Int,  height: Int): BufferedImage = {
+    ImageUtil.getScaledInstance(masterImage, width, height, RenderingHints.VALUE_INTERPOLATION_BILINEAR)
+  }
 }
 
 object ImageAsset {
@@ -191,6 +216,12 @@ object ImageAsset {
 
       case CustomResolution(width, height) =>
         width + "x" + height
+
+      case CustomWidthResolution(width) =>
+        "w" + width
+
+      case CustomHeightResolution(height) =>
+        "h" + height
     }
 
     keyBase + "/" + name + "/" + resolutionPhrase + "." + imageType.extension
@@ -207,6 +238,18 @@ object ImageAsset {
 
   /** A resolution specified in pixels */
   case class CustomResolution(width: Int, height: Int) extends Resolution
+
+  /**
+   * A resolution with specified width. When the transform actually occurs the height is calculated
+   * against the master image to maintain the correct photo aspect ratio
+   */
+  case class CustomWidthResolution(width: Int) extends Resolution
+
+  /**
+   * A resolution with specified height. When the transform actually occurs the width is calculated
+   * against the master image to maintain the correct photo aspect ratio.
+   */
+  case class CustomHeightResolution(height: Int) extends Resolution
 
   /** Supported image formats for an [[models.ImageAsset]] */
   sealed abstract class ImageType(val extension: String)

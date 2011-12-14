@@ -5,7 +5,7 @@
   product: models.Product,
   order: models.Order)
 
-@content_base(title=celebrity.publicName.get + ": " + product.name + "- eGraphs", body=body, head=head)
+@content_base(title="Order #" + order.id +"- eGraphs", body=body, head=head)
 
 @import libs.Finance.TypeConversions._
 
