@@ -39,13 +39,13 @@ public class VoiceBiometricsClient {
     public static String clientname = "clientname";
     public static String errorcode = "errorcode";
     public static String prompt = "prompt";
-    public static String rebuildtemplate = "rebuildTemplate";
+    public static String rebuildtemplate = "rebuildtemplate";
     public static String score = "score";
     public static String success = "success";
     public static String transactionid = "transactionid";
     public static String voicesample = "voicesample";
     public static String usabletime = "usabletime";
-    public static String userid = "userId";
+    public static String userid = "userid";
 
     public VoiceBiometricsClient() throws Exception {
     }

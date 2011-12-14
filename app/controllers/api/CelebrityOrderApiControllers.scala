@@ -104,13 +104,14 @@ with DBTransaction {
       val transactionId = startVerificationRequest.getResponseValue(VBGBiometricServices._transactionId)
 
       val sendVerifySampleRequest = VBGBiometricServices.sendVerifySampleRequest(transactionId, blobLocation = "egraphs/" + egraph.id + "/audio.wav")
-      val verificationScore = sendVerifySampleRequest.getResponseValue(VoiceBiometricsClient.score)
+      val errorCode = sendVerifySampleRequest.getResponseValue(VoiceBiometricsClient.errorcode)
       val verificationResult = sendVerifySampleRequest.getResponseValue(VoiceBiometricsClient.success)
+      val verificationScore = sendVerifySampleRequest.getResponseValue(VoiceBiometricsClient.score)
 
-      // Why do we need to do this?
+      // Question for VBG: Why do we need to do this?
       VBGBiometricServices.sendFinishVerifyTransactionRequest(transactionId, verificationResult, verificationScore)
 
-      verificationResult == "true"
+      errorCode == "0" && verificationResult == "true"
     }
   }
 

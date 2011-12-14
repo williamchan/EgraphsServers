@@ -111,17 +111,19 @@ object VBGBiometricServices {
   //    private val _RenameUser: String = "RenameUser";
   //    private val _CheckUserStatus: String  = "CheckUserStatus";
   //    private val _SetUserStatus: String  = "SetUserStatus"; // {“active”, “inactive”, “locked”, “opted-out”, “deleted”}
+
+  // VBG requires that these Strings be lower-cased.
   private val _clientKey: String = "clientkey"
   private val _clientName: String = "clientname"
   private val _errorCode: String = "errorcode"
   private val _prompt: String = "prompt"
-  private val _rebuildTemplate: String = "rebuildTemplate"
+  private val _rebuildTemplate: String = "rebuildtemplate"
   private val _score: String = "score"
   val _success: String = "success"
   val _transactionId: String = "transactionid"
   private val _voiceSample: String = "voicesample"
   private val _usableTime: String = "usabletime"
-  private val _userId: String = "userId"
+  private val _userId: String = "userid"
 
   def sendStartEnrollmentRequest(userId: String, rebuildTemplate: Boolean): VBGRequest = {
     val request = new VBGRequest

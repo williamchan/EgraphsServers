@@ -69,7 +69,7 @@ object EnrollmentBatchJob {
 
     for (voiceSample <- voiceSamples) {
       VBGBiometricServices.sendAudioCheckRequest(transactionId, VoiceSample.getWavUrl(voiceSample.id))
-      // store metadata on VoiceSample
+      // store metadata on VoiceSample... ignoring errorcodes for now
     }
 
     val enrollUserRequest = VBGBiometricServices.sendEnrollUserRequest(transactionId)

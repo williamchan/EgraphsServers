@@ -1,6 +1,9 @@
 package services.voice;
 
 import junit.framework.TestCase;
+import play.libs.Codec;
+
+import java.io.*;
 
 public class VoiceBiometricsClientTests extends TestCase {
 
@@ -12,6 +15,52 @@ public class VoiceBiometricsClientTests extends TestCase {
             client = new VoiceBiometricsClient();
         } catch (Exception e) {
         }
+    }
+
+    public void testAndrewsAudioFile() throws Exception {
+        String base64String = getStringFromFile(new File("test/files/sample_audio_5.txt"));
+        String outputFileName = "test/files/sample_audio_5.wav";
+        base64ToWav(base64String, outputFileName);
+    }
+
+    public void testConvertToBase64AndBack() throws Exception {
+        String inputFileName = "test/files/sound.wav";
+        String base64String = wavToBase64(inputFileName);
+        System.out.println(base64String);
+
+        String outputFileName = "test/files/pls.wav";
+        base64ToWav(base64String, outputFileName);
+    }
+
+    private void base64ToWav(String base64String, String outputFileName) throws IOException {
+        byte[] bytes = Codec.decodeBASE64(base64String);
+        FileOutputStream out = new FileOutputStream(outputFileName);
+        out.write(bytes);
+        out.close();
+    }
+
+    private String wavToBase64(String inputFileName) throws IOException {
+        ByteArrayOutputStream bas = new ByteArrayOutputStream();
+        int fdata;
+        FileInputStream fs = new FileInputStream(inputFileName);
+        while (fs.available() > 0) {
+            fdata = fs.read();
+            bas.write(fdata);
+        }
+        fs.close();
+        return Codec.encodeBASE64(bas.toByteArray());
+    }
+
+    private String getStringFromFile(File file) throws Exception {
+        ByteArrayOutputStream bas = new ByteArrayOutputStream();
+        int fdata;
+        FileInputStream fs = new FileInputStream(file);
+        while (fs.available() > 0) {
+            fdata = fs.read();
+            bas.write(fdata);
+        }
+        fs.close();
+        return bas.toString();
     }
 
     public void testEnrollWill() throws Exception {
@@ -35,6 +84,10 @@ public class VoiceBiometricsClientTests extends TestCase {
 
         client.sendFinishEnrollTransactionRequest(transactionId, successValue);
         assertEquals("0", client.getResponseValue(VoiceBiometricsClient.errorcode));
+    }
+
+    public void testVerify_iPad() throws Exception {
+        verify("will", "sample_audio_5.wav", false);
     }
 
     public void testVerifyWill() throws Exception {
