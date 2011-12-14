@@ -41,6 +41,8 @@ case class EnrollmentBatch(id: Long = 0,
 
     if (getNumEnrollmentSamples() >= EnrollmentBatch.batchSize) {
       copy(isBatchComplete = true).save()
+      // Kick off "job" is EnrollmentBatch is complete
+      new jobs.EnrollmentBatchJob().now()
       (enrollmentSample, true)
 
     } else {

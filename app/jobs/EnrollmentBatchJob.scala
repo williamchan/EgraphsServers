@@ -9,7 +9,7 @@ import services.signature.XyzmoBiometricServices
 import db.Schema
 import services.voice.VBGBiometricServices
 
-@On("* * * * * ?") // cron expression: seconds minutes hours day-of-month month day-of-week (year optional)
+@On("0 0 0 * * ?") // cron expression: seconds minutes hours day-of-month month day-of-week (year optional)
 class EnrollmentBatchJob extends Job {
 
   //  Setup process to query for EnrollmentBatches that are {isBatchComplete = true and isSuccessfulEnrollment = null},
@@ -32,10 +32,9 @@ class EnrollmentBatchJob extends Job {
         val voiceSamples: List[VoiceSample] = EnrollmentBatchJob.getVoiceSamples(batch)
 
         val isSuccessfulSignatureEnrollment: Boolean = EnrollmentBatchJob.attemptSignatureEnrollment(celebrity, signatureSamples)
-        //      val isSuccessfulVoiceEnrollment: Boolean = EnrollmentBatchJob.attemptVoiceEnrollment(celebrity, voiceSamples)
-        val isSuccessfulEnrollment = isSuccessfulSignatureEnrollment
+        val isSuccessfulVoiceEnrollment: Boolean = EnrollmentBatchJob.attemptVoiceEnrollment(celebrity, voiceSamples)
 
-        //      val isSuccessfulEnrollment = isSuccessfulSignatureEnrollment && isSuccessfulVoiceEnrollment
+        val isSuccessfulEnrollment = isSuccessfulSignatureEnrollment && isSuccessfulVoiceEnrollment
         batch.copy(isSuccessfulEnrollment = Some(isSuccessfulEnrollment)).save()
         if (isSuccessfulEnrollment) {
           celebrity.copy(enrollmentStatus = models.Enrolled.value).save()
