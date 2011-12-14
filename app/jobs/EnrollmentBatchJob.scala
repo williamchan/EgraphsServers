@@ -6,7 +6,7 @@ import models.{Celebrity, VoiceSample, SignatureSample, EnrollmentBatch}
 import libs.Blobs
 import Blobs.Conversions._
 import services.signature.XyzmoBiometricServices
-import db.{DBSession, Schema}
+import db.Schema
 import services.voice.VBGBiometricServices
 
 @On("* * * * * ?") // cron expression: seconds minutes hours day-of-month month day-of-week (year optional)
@@ -22,27 +22,27 @@ class EnrollmentBatchJob extends Job {
   //  4. For VoiceSamples, call enroll method
   //  5. Update EnrollmentBatch and Celebrity
   override def doJob() {
-    DBSession.init()
     // TODO(wchan): Should inTransaction be used here?
 
-    for (batch <- EnrollmentBatchJob.findEnrollmentBatchesPending()) {
-      val celebrity = Celebrity.findById(batch.celebrityId).get
+    inTransaction {
+      for (batch <- EnrollmentBatchJob.findEnrollmentBatchesPending()) {
+        val celebrity = Celebrity.findById(batch.celebrityId).get
 
-      val signatureSamples: List[SignatureSample] = EnrollmentBatchJob.getSignatureSamples(batch)
-      val voiceSamples: List[VoiceSample] = EnrollmentBatchJob.getVoiceSamples(batch)
+        val signatureSamples: List[SignatureSample] = EnrollmentBatchJob.getSignatureSamples(batch)
+        val voiceSamples: List[VoiceSample] = EnrollmentBatchJob.getVoiceSamples(batch)
 
-      val isSuccessfulSignatureEnrollment: Boolean = EnrollmentBatchJob.attemptSignatureEnrollment(celebrity, signatureSamples)
-      //      val isSuccessfulVoiceEnrollment: Boolean = EnrollmentBatchJob.attemptVoiceEnrollment(celebrity, voiceSamples)
-      val isSuccessfulEnrollment = isSuccessfulSignatureEnrollment
+        val isSuccessfulSignatureEnrollment: Boolean = EnrollmentBatchJob.attemptSignatureEnrollment(celebrity, signatureSamples)
+        //      val isSuccessfulVoiceEnrollment: Boolean = EnrollmentBatchJob.attemptVoiceEnrollment(celebrity, voiceSamples)
+        val isSuccessfulEnrollment = isSuccessfulSignatureEnrollment
 
-      //      val isSuccessfulEnrollment = isSuccessfulSignatureEnrollment && isSuccessfulVoiceEnrollment
-      batch.copy(isSuccessfulEnrollment = Some(isSuccessfulEnrollment)).save()
-      if (isSuccessfulEnrollment) {
-        celebrity.copy(enrollmentStatus = models.Enrolled.value).save()
+        //      val isSuccessfulEnrollment = isSuccessfulSignatureEnrollment && isSuccessfulVoiceEnrollment
+        batch.copy(isSuccessfulEnrollment = Some(isSuccessfulEnrollment)).save()
+        if (isSuccessfulEnrollment) {
+          celebrity.copy(enrollmentStatus = models.Enrolled.value).save()
+        }
+
       }
-
     }
-    DBSession.commit()
   }
 
 }

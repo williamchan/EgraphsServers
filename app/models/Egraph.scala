@@ -9,8 +9,9 @@ abstract sealed class EgraphState(val value: String)
 
 case object AwaitingVerification extends EgraphState("AwaitingVerification")
 case object Verified extends EgraphState("Verified")
-case object RejectedVocals extends EgraphState("Rejected:Vocals")
-case object RejectedHandwriting extends EgraphState("Rejected:Handwriting")
+case object RejectedVoice extends EgraphState("Rejected:Voice")
+case object RejectedSignature extends EgraphState("Rejected:Signature")
+case object RejectedBoth extends EgraphState("Rejected:Both")
 case object RejectedPersonalAudit extends EgraphState("Rejected:Audit")
 
 /**
@@ -127,8 +128,9 @@ object Egraph extends Saves[Egraph] with SavesCreatedUpdated[Egraph] {
   val states = Utils.toMap[String, EgraphState](Seq(
     AwaitingVerification,
     Verified,
-    RejectedVocals,
-    RejectedHandwriting,
+    RejectedVoice,
+    RejectedSignature,
+    RejectedBoth,
     RejectedPersonalAudit
   ), key=(theState) => theState.value)
 

@@ -9,7 +9,10 @@ import javax.imageio.ImageIO
 import java.io.{File, ByteArrayOutputStream}
 import org.apache.commons.mail.SimpleEmail
 import play.libs.{Mail, Codec}
-import models.Egraph
+import models._
+import services.voice.{VoiceBiometricsClient, VBGBiometricServices}
+import services.signature.XyzmoBiometricServices
+import com.xyzmo.wwww.biometricserver.WebServiceBiometricPartStub
 
 /**
  * Handles requests for queries against a celebrity for his orders.
@@ -28,21 +31,16 @@ with DBTransaction {
           .newEgraph
           .save(signatureString, Codec.decodeBASE64(audioString))
         val egraphId = egraph.id
-        
-        Blobs.put("egraphs/" + egraphId + "/signature.json", signatureString.getBytes)
 
-        // demo code (refactor it later):
-        val photoImage: BufferedImage = ImageIO.read(new File("test/files/kapler.JPG"))
-        val signatureImage = ImageUtil.createSignatureImage(signatureString)
-        val egraphImage: BufferedImage = ImageUtil.createEgraphImage(signatureImage, photoImage, 0, 0)
-        val byteOs = new ByteArrayOutputStream()
-        ImageIO.write(egraphImage, "JPG", byteOs)
-        val bytes = byteOs.toByteArray
-        Blobs.put("egraphs/" + egraphId + "/egraph.jpg", bytes)
+        val passesBiometricVerification = verifyBiometrics(egraph)
+        if (passesBiometricVerification) {
+          // demo code (refactor it later):
+          createEgraphImage(egraphId, signatureString)
 
-        // Send e-mail that the eGraph is complete. Move this to post-authentication
-        // when possible.
-        sendEgraphSignedMail(egraph)
+          // Send e-mail that the eGraph is complete. Move this to post-authentication
+          // when possible.
+          sendEgraphSignedMail(egraph)
+        }
 
         // Serialize the egraph ID
         Serializer.SJSON.toJSON(Map("id" -> egraphId))
@@ -53,7 +51,52 @@ with DBTransaction {
     }
   }
 
-  def sendEgraphSignedMail(egraph: Egraph) = {
+  private def verifyBiometrics(egraph: Egraph): Boolean = {
+    val isVoiceVerified = verifyVoice(egraph)
+    val isSignatureVerified = verifySignature(egraph)
+
+    val egraphState = {
+      if (isSignatureVerified && isVoiceVerified) Verified
+      else if (!isSignatureVerified && isVoiceVerified) RejectedSignature
+      else if (isSignatureVerified && !isVoiceVerified) RejectedVoice
+      else RejectedBoth
+    }
+    egraph.withState(egraphState).saveWithoutAssets()
+
+    egraphState == Verified
+  }
+
+  private def verifySignature(egraph: Egraph): Boolean = {
+    val signatureToVerify: String = egraph.assets.signature
+    val verifyUserResponse = XyzmoBiometricServices.verifyUser(userId = celebrity.id.toString, signatureToVerify)
+    verifyUserResponse.getOkInfo.getVerifyResult == WebServiceBiometricPartStub.VerifyResultEnum.VerifyMatch
+  }
+
+  private def verifyVoice(egraph: Egraph): Boolean = {
+    val startVerificationRequest = VBGBiometricServices.sendStartVerificationRequest(celebrity.id.toString)
+    val transactionId = startVerificationRequest.getResponseValue(VBGBiometricServices._transactionId)
+
+    val sendVerifySampleRequest = VBGBiometricServices.sendVerifySampleRequest(transactionId, blobLocation = "egraphs/" + egraph.id + "/audio.wav")
+    val verificationScore = sendVerifySampleRequest.getResponseValue(VoiceBiometricsClient.score)
+    val verificationResult = sendVerifySampleRequest.getResponseValue(VoiceBiometricsClient.success)
+
+    // Why do we need to do this?
+    VBGBiometricServices.sendFinishVerifyTransactionRequest(transactionId, verificationResult, verificationScore)
+
+    verificationResult == "true"
+  }
+
+  private def createEgraphImage(egraphId: Long, signatureString: String) {
+    val photoImage: BufferedImage = ImageIO.read(new File("test/files/kapler.JPG"))
+    val signatureImage = ImageUtil.createSignatureImage(signatureString)
+    val egraphImage: BufferedImage = ImageUtil.createEgraphImage(signatureImage, photoImage, 0, 0)
+    val byteOs = new ByteArrayOutputStream()
+    ImageIO.write(egraphImage, "JPG", byteOs)
+    val bytes = byteOs.toByteArray
+    Blobs.put("egraphs/" + egraphId + "/egraph.jpg", bytes)
+  }
+
+  private def sendEgraphSignedMail(egraph: Egraph) = {
     val email = new SimpleEmail()
     val recipient = order.recipient
 
