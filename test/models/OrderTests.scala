@@ -187,11 +187,12 @@ class OrderTests extends UnitFlatSpec
     // Perform the test
     val found = Order.FindByCelebrity(celebrity.id, Filters.ActionableOnly)
 
-    found.toSeq.length should be (4)
+    found.toSeq.length should be (5)
     found.toSet should be (Set(
       orderWithoutEgraph,
-      orders(RejectedVocals),
-      orders(RejectedHandwriting),
+      orders(RejectedVoice),
+      orders(RejectedSignature),
+      orders(RejectedBoth),
       orders(RejectedPersonalAudit)
     ))
   }

@@ -41,9 +41,9 @@ class EgraphTests extends UnitFlatSpec
   // Test cases
   //
   "An Egraph" should "update its state when withState is called" in {
-    val egraph = Egraph().withState(RejectedVocals)
+    val egraph = Egraph().withState(RejectedVoice)
 
-    egraph.state should be (RejectedVocals)
+    egraph.state should be (RejectedVoice)
   }
 
   it should "save and recover signature and audio data from the blobstore" in {
@@ -66,7 +66,7 @@ class EgraphTests extends UnitFlatSpec
   }
 
   "allStatuses" should "contain all the states" in {
-    Egraph.states.size should be (5)
+    Egraph.states.size should be (6)
   }
 
   it should "throw an exception at an unrecognized string" in {

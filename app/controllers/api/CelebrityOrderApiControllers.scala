@@ -68,7 +68,10 @@ with DBTransaction {
 
   private def verifySignature(egraph: Egraph): Boolean = {
     val signatureToVerify: String = egraph.assets.signature
-    val verifyUserResponse = XyzmoBiometricServices.verifyUser(userId = celebrity.id.toString, signatureToVerify)
+    println("signatureToVerify: " + signatureToVerify)
+    val sdc = XyzmoBiometricServices.getSignatureDataContainerFromJSON(signatureToVerify).getGetSignatureDataContainerFromJSONResult
+    println("sdc: " + sdc)
+    val verifyUserResponse = XyzmoBiometricServices.verifyUser(userId = celebrity.id.toString, sdc)
     verifyUserResponse.getOkInfo.getVerifyResult == WebServiceBiometricPartStub.VerifyResultEnum.VerifyMatch
   }
 
