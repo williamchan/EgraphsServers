@@ -32,11 +32,10 @@ with DBTransaction {
   }
 
   case class EgraphFulfillmentHandler(
-    signature: String,
-    audio: String,
-    order: Order,
-    celebrity: Celebrity)
-  {
+                                       signature: String,
+                                       audio: String,
+                                       order: Order,
+                                       celebrity: Celebrity) {
     def execute() = {
       play.Logger.info("Processing eGraph submission for Order #" + order.id)
 
@@ -95,9 +94,7 @@ with DBTransaction {
 
     private def verifySignature(egraph: Egraph): Boolean = {
       val signatureToVerify: String = egraph.assets.signature
-      println("signatureToVerify: " + signatureToVerify)
       val sdc = XyzmoBiometricServices.getSignatureDataContainerFromJSON(signatureToVerify).getGetSignatureDataContainerFromJSONResult
-      println("sdc: " + sdc)
       val verifyUserResponse = XyzmoBiometricServices.verifyUser(userId = celebrity.id.toString, sdc)
       verifyUserResponse.getOkInfo.getVerifyResult == WebServiceBiometricPartStub.VerifyResultEnum.VerifyMatch
     }
@@ -116,4 +113,5 @@ with DBTransaction {
       verificationResult == "true"
     }
   }
+
 }

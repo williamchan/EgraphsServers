@@ -13,8 +13,6 @@ POST    /stripe                                 stripe.post
 GET     /test/scenarios                          ScenarioController.list
 GET     /test/scenarios/clear                    ScenarioController.clear
 GET     /test/scenarios/{urlSlug}                ScenarioController.scenario
-GET     /test/base64decode/{str}                 test.base64decode
-GET     /test/script                             test.script
 
 GET     /test/request-transaction/without-error  TransactionTestController.makeAccount
 GET     /test/request-transaction/with-error     TransactionTestController.makeAccountAndThrowException

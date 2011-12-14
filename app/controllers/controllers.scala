@@ -2,7 +2,6 @@ package controllers
 
 import play.mvc._
 import com.stripe.model.Charge
-import play.libs.Codec
 
 object Application extends Controller {
 
@@ -26,16 +25,4 @@ object stripe extends Controller {
     )
     val charge: Charge = Charge.create(scala.collection.JavaConversions.asJavaMap(chargeWithTokenParams))
   }
-}
-
-object test extends Controller {
-
-  def base64decode(str: String): String = {
-    new String(Codec.decodeBASE64(str)) + "\n"
-  }
-
-  def script = {
-    "Hello world"
-  }
-
 }
