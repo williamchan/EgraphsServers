@@ -21,7 +21,16 @@ object DBAdapter {
    * Returns a Squeryl DatabaseAdapter given current Play! database string
    */
   def current: DatabaseAdapter = {
-    getForDbString(Play.configuration.getProperty("db"))
+    try {
+      getForDbString(Play.configuration.getProperty("db.url"))
+    }
+    catch {
+      case e: IllegalArgumentException =>
+        play.Logger.debug(
+          "Found no property 'db' in application.conf while configuring Squeryl. Trying 'db.url'"
+        )
+        getForDbString(Play.configuration.getProperty("db"))
+    }
   }
 
   def getForDbString(dbString: String): DatabaseAdapter = {

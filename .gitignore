@@ -1,13 +1,15 @@
-doc
 db/h2
+doc
 lib
 logs
 modules
 out
+precompiled
 project
 target
 test-result
 tmp
+war
 
 *.class
 *.DS_Store

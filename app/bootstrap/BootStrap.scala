@@ -24,9 +24,10 @@ class BootStrap extends Job {
     Blobs.init()
 
     // Some additional test-mode setup
-    if (Play.id == "test") {
-      TestModeBootstrap.run()
-    }
+    // TODO: make this only happen in test mode once the alpha is over
+    // if (Play.id == "test") {
+    TestModeBootstrap.run()
+    // }
   }
 }
 

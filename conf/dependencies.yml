@@ -34,6 +34,7 @@ require:
     - play
     - play -> scala 0.9.1
     - play -> less 0.3.compatibility
+    - play -> cloudbees 0.2.2
     - provided -> tritonus_share 0.3.6
     - provided -> tritonus_remaining 0.3.6
     - provided -> xyzmo 1.0
