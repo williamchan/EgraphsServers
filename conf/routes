@@ -15,8 +15,7 @@ GET     /test/request-transaction/without-error  TransactionTestController.makeA
 GET     /test/request-transaction/with-error     TransactionTestController.makeAccountAndThrowException
 GET     /test/request-transaction/is-stored      TransactionTestController.isStored
 
-GET     /test/files/{<.*>blobKey}                BlobControllers.getBlob
-GET     /test/create-alpha-testers               test.createAlphaTesters
+# GET     /test/files/{<.*>blobKey}                BlobControllers.getBlob
 
 
 ###
@@ -29,6 +28,10 @@ GET     /test/create-alpha-testers               test.createAlphaTesters
 %{ if (true) }%
 # Home page
 GET     /                                       Application.index
+
+# For Alpha-phase prod mode:
+GET     /test/create-alpha-testers              test.createAlphaTesters
+GET     /test/files/{<.*>blobKey}               BlobControllers.getBlob
 
 # Ignore favicon requests
 GET     /favicon.ico                            404
