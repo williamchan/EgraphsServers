@@ -3,11 +3,13 @@ package bootstrap
 import play.jobs._
 import com.stripe.Stripe
 import org.squeryl.{Session, SessionFactory}
-import play.Play
 import db.DBSession
 import io.Source
 import java.io.{File, PrintWriter}
 import libs.{Payment, Utils, TempFile, Blobs}
+import libs.Blobs.Conversions._
+import models.{Account, Celebrity}
+import math.BigDecimal._
 
 @OnApplicationStart
 class BootStrap extends Job {
@@ -28,6 +30,50 @@ class BootStrap extends Job {
     // if (Play.id == "test") {
     TestModeBootstrap.run()
     // }
+
+    createAlphaTesters()
+  }
+
+  private def createAlphaTesters() {
+    createCelebrity("Erem", "Boto", "erem@egraphs.com")
+    createCelebrity("Andrew", "Smith", "andrew@egraphs.com")
+    createCelebrity("David", "Auld", "david@egraphs.com")
+    createCelebrity("Eric", "Feeny", "eric@egraphs.com")
+    createCelebrity("Will", "Chan", "will@egraphs.com")
+    createCelebrity("Zach Apter", "", "zachapter@gmail.com")
+    createCelebrity("Brian", "Auld", "bauld@raysbaseball.com")
+    createCelebrity("Michael", "Kalt", "mkalt@raysbaseball.com")
+    createCelebrity("Matt", "Silverman", "msilverman@raysbaseball.com")
+    createCelebrity("Gabe", "Kapler", "gabe@egraphs.com")
+  }
+
+  private def createCelebrity(firstName: String, lastName: String, email: String) {
+    println("Creating Celebrity " + email + " ...")
+    
+    val celebrity = Celebrity(
+      firstName = Some(firstName),
+      lastName = Some(lastName),
+      publicName = Some("Alpha " + firstName),
+      description = Some("Tyson 15")
+    ).save()
+
+    Account(email = email,
+      celebrityId = Some(celebrity.id)
+    ).withPassword("herp").right.get.save()
+    celebrity.saveWithProfilePhoto(new File("./test/files/E.jpg"))
+
+    celebrity.newProduct.copy(
+      priceInCurrency = 50,
+      name = firstName + "'s Alpha Product A",
+      description = "Today's Sriracha is tomorrow's salsa"
+    ).save()
+
+    celebrity.newProduct.copy(
+      priceInCurrency = 100,
+      name = firstName + "'s Alpha Product B",
+      description = "Help me... help YOU..."
+    ).save()
+
   }
 }
 
