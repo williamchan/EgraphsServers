@@ -16,9 +16,6 @@ object ImageUtil {
   val width = 1024
   val numIncrements = 1000
 
-  val penTip = "public/images/pen_tip_3_70.png"
-  val penTipImage: BufferedImage = ImageIO.read(new File(penTip))
-
   def createEgraphImage(signatureImage: BufferedImage, photoImage: BufferedImage, x: Int = 0, y: Int = 0): BufferedImage = {
     val w: Int = scala.math.max(photoImage.getWidth, signatureImage.getWidth)
     val h: Int = scala.math.max(photoImage.getHeight, signatureImage.getHeight)

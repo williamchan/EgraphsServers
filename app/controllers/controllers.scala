@@ -6,6 +6,7 @@ import libs.Blobs.Conversions._
 import math.BigDecimal._
 import models.{Account, Celebrity}
 import libs.Blobs
+import play.Play
 
 object Application extends Controller {
 
@@ -35,7 +36,7 @@ with DBTransaction {
     createCelebrity("Michael", "Kalt", "mkalt@raysbaseball.com")
     createCelebrity("Matt", "Silverman", "msilverman@raysbaseball.com")
     createCelebrity("Gabe", "Kapler", "gabe@egraphs.com")
-
+ 
     "Alpha Testers created!"
   }
 
@@ -52,7 +53,8 @@ with DBTransaction {
     Account(email = email,
       celebrityId = Some(celebrity.id)
     ).withPassword("herp").right.get.save()
-    celebrity.saveWithProfilePhoto(new File("./test/files/E.jpg"))
+
+    celebrity.saveWithProfilePhoto(Play.getFile("test/files/E.jpg"))
 
     celebrity.newProduct.copy(
       priceInCurrency = 50,

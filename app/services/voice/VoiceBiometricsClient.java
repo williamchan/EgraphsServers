@@ -5,6 +5,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+import play.Play;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -191,7 +192,7 @@ public class VoiceBiometricsClient {
     private static String getVoicesampleBase64Encoded(String filename) throws IOException {
         ByteArrayOutputStream bas = new ByteArrayOutputStream();
         int fdata;
-        FileInputStream fs = new FileInputStream(filename);
+        FileInputStream fs = new FileInputStream(Play.getFile(filename));
         while (fs.available() > 0) {
             fdata = fs.read();
             bas.write(fdata);

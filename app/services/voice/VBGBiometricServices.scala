@@ -9,6 +9,7 @@ import java.io._
 import play.libs.Codec
 import libs.{SampleRateConverter, Blobs}
 import Blobs.Conversions._
+import play.Play
 
 class VBGRequest {
   private var requestType: String = ""
@@ -208,7 +209,7 @@ object VBGBiometricServices {
   def getVoiceSampleBinary(filename: String): Array[Byte] = {
     val bas: ByteArrayOutputStream = new ByteArrayOutputStream
     var fData: Int = 0
-    val fs: FileInputStream = new FileInputStream(filename)
+    val fs: FileInputStream = new FileInputStream(Play.getFile(filename))
     while (fs.available > 0) {
       fData = fs.read
       bas.write(fData)
