@@ -30,7 +30,7 @@ GET     /test/request-transaction/is-stored      TransactionTestController.isSto
 GET     /                                       Application.index
 
 # For Alpha-phase prod mode:
-GET     /test/create-alpha-testers              test.createAlphaTesters
+GET     /admin/reset-alpha-state                test.resetAlphaState
 GET     /test/files/{<.*>blobKey}               BlobControllers.getBlob
 
 # Ignore favicon requests

@@ -5,6 +5,7 @@ import java.io.File
 import libs.Blobs.Conversions._
 import math.BigDecimal._
 import models.{Account, Celebrity}
+import libs.Blobs
 
 object Application extends Controller {
 
@@ -20,19 +21,20 @@ with DBTransaction {
 
   import org.squeryl.PrimitiveTypeMode._
 
-  def createAlphaTesters(): String = {
-//    inTransaction {
-      createCelebrity("Erem", "Boto", "erem@egraphs.com")
-      createCelebrity("Andrew", "Smith", "andrew@egraphs.com")
-      createCelebrity("David", "Auld", "david@egraphs.com")
-      createCelebrity("Eric", "Feeny", "eric@egraphs.com")
-      createCelebrity("Will", "Chan", "will@egraphs.com")
-      createCelebrity("Zach", "Apter", "zachapter@gmail.com")
-      createCelebrity("Brian", "Auld", "bauld@raysbaseball.com")
-      createCelebrity("Michael", "Kalt", "mkalt@raysbaseball.com")
-      createCelebrity("Matt", "Silverman", "msilverman@raysbaseball.com")
-      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com")
-//    }
+  def resetAlphaState(): String = {
+    db.Schema.scrub()
+    Blobs.scrub()
+
+    createCelebrity("Erem", "Boto", "erem@egraphs.com")
+    createCelebrity("Andrew", "Smith", "andrew@egraphs.com")
+    createCelebrity("David", "Auld", "david@egraphs.com")
+    createCelebrity("Eric", "Feeny", "eric@egraphs.com")
+    createCelebrity("Will", "Chan", "will@egraphs.com")
+    createCelebrity("Zach", "Apter", "zachapter@gmail.com")
+    createCelebrity("Brian", "Auld", "bauld@raysbaseball.com")
+    createCelebrity("Michael", "Kalt", "mkalt@raysbaseball.com")
+    createCelebrity("Matt", "Silverman", "msilverman@raysbaseball.com")
+    createCelebrity("Gabe", "Kapler", "gabe@egraphs.com")
 
     "Alpha Testers created!"
   }
