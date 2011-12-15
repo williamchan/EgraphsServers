@@ -61,6 +61,9 @@ object EnrollmentBatchJob {
     XyzmoBiometricServices.addProfile(userId = celebrity.id.toString, profileName = celebrity.id.toString)
     val signatureDataContainers = for (signatureSample <- signatureSamples) yield Blobs.get(SignatureSample.getXmlUrl(signatureSample.id)).get.asString
     val isSuccessfulSignatureEnrollment = XyzmoBiometricServices.enrollUser(userId = celebrity.id.toString, profileName = celebrity.id.toString, signatureDataContainers = signatureDataContainers)
+
+    println("Result of signature enrollment attempt for celebrity " + celebrity.id.toString + ": " + isSuccessfulSignatureEnrollment.toString)
+
     isSuccessfulSignatureEnrollment
   }
 
@@ -81,7 +84,9 @@ object EnrollmentBatchJob {
     VBGBiometricServices.sendFinishEnrollTransactionRequest(transactionId, enrollmentSuccessValue)
 
     val isSuccessfulVoiceEnrollment = enrollmentSuccessValue == "true"
-    //    val isSuccessfulVoiceEnrollment = true
+
+    println("Result of voice enrollment attempt for celebrity " + celebrity.id.toString + ": " + isSuccessfulVoiceEnrollment.toString)
+
     isSuccessfulVoiceEnrollment
   }
 

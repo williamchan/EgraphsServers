@@ -96,7 +96,9 @@ with DBTransaction {
       val signatureToVerify: String = egraph.assets.signature
       val sdc = XyzmoBiometricServices.getSignatureDataContainerFromJSON(signatureToVerify).getGetSignatureDataContainerFromJSONResult
       val verifyUserResponse = XyzmoBiometricServices.verifyUser(userId = celebrity.id.toString, sdc)
-      verifyUserResponse.getOkInfo.getVerifyResult == WebServiceBiometricPartStub.VerifyResultEnum.VerifyMatch
+      val verifyResult = verifyUserResponse.getOkInfo.getVerifyResult
+      println("Signature verification result for egraph " + egraph.id.toString + ": " + verifyResult.toString)
+      verifyResult == WebServiceBiometricPartStub.VerifyResultEnum.VerifyMatch
     }
 
     private def verifyVoice(egraph: Egraph): Boolean = {
@@ -110,6 +112,8 @@ with DBTransaction {
 
       // Question for VBG: Why do we need to do this?
       VBGBiometricServices.sendFinishVerifyTransactionRequest(transactionId, verificationResult, verificationScore)
+
+      println("Signature verification result for egraph " + egraph.id.toString + ": " + verificationResult + " (" + errorCode + " )")
 
       errorCode == "0" && verificationResult == "true"
     }
