@@ -1,6 +1,7 @@
 @(celebrity:models.Celebrity, products: Iterable[models.Product])
 
 @import libs.Finance.TypeConversions._
+@import libs.Blobs.AccessPolicy.Public
 @import models.Product
 
 @content_base(title=celebrity.publicName.get + " - eGraphs", onLoad=onLoad, body=body)
@@ -22,7 +23,7 @@
   <div class="celeb-content">
     <div class="row personal-info">
       <div class="span4 profile-photo" >
-        <img src="@celebrity.profilePhoto.get.url" alt="@celebrity.publicName Profile Photo"/>
+        <img src="@celebrity.profilePhoto.get.resized(200, 200).getSaved(Public).url" alt="@celebrity.publicName Profile Photo"/>
       </div>
       <div class="span12 profile-info">
         <h1>@celebrity.publicName <span class="label notice">Currently signing</span></h1>

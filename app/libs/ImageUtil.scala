@@ -161,6 +161,10 @@ object ImageUtil {
     hint: Object = RenderingHints.VALUE_INTERPOLATION_BILINEAR,
     higherQuality: Boolean = true): BufferedImage =
   {
+    require(
+      targetWidth <= img.getWidth && targetHeight <= img.getHeight,
+      "This method should only be used for down-scaling an image"
+    )
     var imgType = if (img.getTransparency == Transparency.OPAQUE)
         BufferedImage.TYPE_INT_RGB else BufferedImage.TYPE_INT_ARGB
     var ret: BufferedImage = img

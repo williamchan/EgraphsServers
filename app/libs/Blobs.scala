@@ -278,7 +278,7 @@ object Blobs {
     //
     // BlobProvider members
     //
-    override val urlBase = "http://s3.amazonaws.com"
+    override val urlBase = "http://s3.amazonaws.com" + "/" + blobstoreNamespace
     override def context = {
       new BlobStoreContextFactory().createContext("aws-s3", s3id, s3secret)
     }

@@ -38,7 +38,7 @@ class CelebrityTests extends UnitFlatSpec
       apiKey = Some("apiKey"),
       description = Some("desc"),
       publicName = Some("pname"),
-      profilePhotoUpdated = Some(Time.now)
+      profilePhotoUpdated = Some(Time.toBlobstoreFormat(Time.now))
     )
   }
 
@@ -81,7 +81,7 @@ class CelebrityTests extends UnitFlatSpec
     val (savedCeleb, imageAsset) = celeb.save().saveWithProfilePhoto(image.asByteArray(ImageAsset.Png))
 
     imageAsset.key should include ("celebrity/1")
-    savedCeleb.profilePhotoUpdated.get.getTime should be (Time.now.getTime plusOrMinus 1000)
+    savedCeleb.profilePhotoUpdated.get.toLong should be (Time.toBlobstoreFormat(Time.now).toLong plusOrMinus 10000)
     savedCeleb.profilePhoto should not be (None)
 
     val profilePhoto = savedCeleb.profilePhoto.get

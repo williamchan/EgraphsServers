@@ -18,7 +18,7 @@ case class Celebrity(id: Long = 0,
                      firstName: Option[String] = None,
                      lastName: Option[String] = None,
                      publicName: Option[String] = None,
-                     profilePhotoUpdated: Option[Timestamp] = None,
+                     profilePhotoUpdated: Option[String] = None,
                      enrollmentStatus: String = NotEnrolled.value, // TODO(wchan): make an enum {NotEnrolled, Enrolled, PendingEnrollment}
                      created: Timestamp = Time.defaultTimestamp,
                      updated: Timestamp = Time.defaultTimestamp)
@@ -69,7 +69,7 @@ case class Celebrity(id: Long = 0,
    * @return the newly persisted celebrity with a valid profile photo.
    */
   def saveWithProfilePhoto(imageData: Array[Byte]): (Celebrity, ImageAsset) = {
-    val celebrityToSave = this.copy(profilePhotoUpdated = Some(Time.now))
+    val celebrityToSave = this.copy(profilePhotoUpdated = Some(Time.toBlobstoreFormat(Time.now)))
     val assetName = celebrityToSave.profilePhotoAssetNameOption.get
     val image = ImageAsset(imageData, keyBase, assetName, ImageAsset.Png)
 
@@ -113,7 +113,7 @@ case class Celebrity(id: Long = 0,
   /**Blobstore folder name for stored profile photo data. */
   private def profilePhotoAssetNameOption: Option[String] = {
     for (photoUpdatedTimestamp <- profilePhotoUpdated) yield {
-      "profile_" + Time.toBlobstoreFormat(photoUpdatedTimestamp).replace(" ", "")
+      "profile_" + photoUpdatedTimestamp
     }
   }
 
