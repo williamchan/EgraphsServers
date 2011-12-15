@@ -15,7 +15,8 @@ GET     /test/request-transaction/without-error  TransactionTestController.makeA
 GET     /test/request-transaction/with-error     TransactionTestController.makeAccountAndThrowException
 GET     /test/request-transaction/is-stored      TransactionTestController.isStored
 
-GET     /test/files/{<.*>blobKey}                    BlobControllers.getBlob
+GET     /test/files/{<.*>blobKey}                BlobControllers.getBlob
+GET     /test/create-alpha-testers               test.createAlphaTesters
 
 
 ###
