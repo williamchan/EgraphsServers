@@ -26,12 +26,12 @@ with DBTransaction {
 
         if (openEnrollmentBatch.isEmpty) {
           val enrollmentBatch = EnrollmentBatch(celebrityId = celebrity.id).save()
-          val enrollmentSamplePair = enrollmentBatch.addEnrollmentSample(signatureString, audioString)
-          Serializer.SJSON.toJSON(Map("id" -> enrollmentSamplePair._1.id, "batch_complete" -> enrollmentSamplePair._2))
+          val addEnrollmentSampleResult = enrollmentBatch.addEnrollmentSample(signatureString, audioString)
+          jsonFromAddEnrollmentSampleResult(addEnrollmentSampleResult)
 
         } else if (!openEnrollmentBatch.get.isBatchComplete) {
-          val enrollmentSamplePair = openEnrollmentBatch.get.addEnrollmentSample(signatureString, audioString)
-          Serializer.SJSON.toJSON(Map("id" -> enrollmentSamplePair._1.id, "batch_complete" -> enrollmentSamplePair._2))
+          val addEnrollmentSampleResult = openEnrollmentBatch.get.addEnrollmentSample(signatureString, audioString)
+          jsonFromAddEnrollmentSampleResult(addEnrollmentSampleResult)
 
         } else {
           // TODO(wchan): Should we reject data if this situation ever arises?
@@ -42,6 +42,16 @@ with DBTransaction {
         play.Logger.info("Dismissing the invalid request")
         Error("Valid \"signature\" and \"audio\" parameters were not provided.")
     }
+  }
+
+  private def jsonFromAddEnrollmentSampleResult(addEnrollmentSampleResult: (EnrollmentSample, Boolean, Int, Int)): String = {
+    Serializer.SJSON.toJSON(
+      Map("id" -> addEnrollmentSampleResult._1.id,
+        "batch_complete" -> addEnrollmentSampleResult._2,
+        "numEnrollmentSamplesInBatch" -> addEnrollmentSampleResult._3,
+        "enrollmentBatchSize" -> addEnrollmentSampleResult._4,
+        "enrollmentBatchId" -> addEnrollmentSampleResult._1.enrollmentBatchId
+      ))
   }
 
   def getOrders(signerActionable: Option[Boolean]) = {

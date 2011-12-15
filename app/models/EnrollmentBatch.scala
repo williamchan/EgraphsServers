@@ -33,20 +33,21 @@ case class EnrollmentBatch(id: Long = 0,
    * Creates an associated EnrollmentSample. Also updates this.isBatchComplete if the new
    * EnrollmentSample completes this batch (see batchSize).
    */
-  def addEnrollmentSample(signatureStr: String, voiceStr: String): (EnrollmentSample, Boolean) = {
+  def addEnrollmentSample(signatureStr: String, voiceStr: String): (EnrollmentSample, Boolean, Int, Int) = {
     val enrollmentSample = EnrollmentSample(enrollmentBatchId = id,
       signatureSampleId = SignatureSample(isForEnrollment = true).save(signatureStr).id,
       voiceSampleId = VoiceSample(isForEnrollment = true).save(voiceStr).id)
       .save()
 
-    if (getNumEnrollmentSamples() >= EnrollmentBatch.batchSize) {
+    val numEnrollmentSamplesInBatch = getNumEnrollmentSamples()
+    if (numEnrollmentSamplesInBatch >= EnrollmentBatch.batchSize) {
       copy(isBatchComplete = true).save()
       // Kick off "job" is EnrollmentBatch is complete
       new jobs.EnrollmentBatchJob().now()
-      (enrollmentSample, true)
+      (enrollmentSample, true, numEnrollmentSamplesInBatch, EnrollmentBatch.batchSize)
 
     } else {
-      (enrollmentSample, false)
+      (enrollmentSample, false, numEnrollmentSamplesInBatch, EnrollmentBatch.batchSize)
     }
   }
 

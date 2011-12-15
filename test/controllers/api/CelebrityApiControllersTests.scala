@@ -96,7 +96,10 @@ class CelebrityApiControllersTests extends FunctionalTest with CleanDatabaseAfte
       "Will-Chan-is-a-celebrity"
     )
 
-    assertPostEnrollmentSample(signatureStr = TestConstants.signatureStr, voiceStr = TestConstants.voiceStr, false)
+    assertPostEnrollmentSample(signatureStr = TestConstants.signatureStr,
+      voiceStr = TestConstants.voiceStr,
+      isBatchComplete = false,
+      numEnrollmentSamplesInBatch = 1)
   }
 
   @Test
@@ -105,13 +108,30 @@ class CelebrityApiControllersTests extends FunctionalTest with CleanDatabaseAfte
       "Will-Chan-is-a-celebrity"
     )
 
-    for (i <- 0 until EnrollmentBatch.batchSize - 1) {
-      assertPostEnrollmentSample(signatureStr = TestConstants.signatureStr, voiceStr = TestConstants.voiceStr, isBatchComplete = false)
+    val x = assertPostEnrollmentSample(signatureStr = TestConstants.signatureStr,
+      voiceStr = TestConstants.voiceStr,
+      isBatchComplete = false,
+      numEnrollmentSamplesInBatch = 1)
+    for (i <- 1 until EnrollmentBatch.batchSize - 1) {
+      assertPostEnrollmentSample(signatureStr = TestConstants.signatureStr,
+        voiceStr = TestConstants.voiceStr,
+        isBatchComplete = false,
+        numEnrollmentSamplesInBatch = i + 1,
+        Some(x)
+      )
     }
-    assertPostEnrollmentSample(signatureStr = TestConstants.signatureStr, voiceStr = TestConstants.voiceStr, isBatchComplete = true)
+    assertPostEnrollmentSample(signatureStr = TestConstants.signatureStr,
+      voiceStr = TestConstants.voiceStr,
+      isBatchComplete = true,
+      numEnrollmentSamplesInBatch = 10,
+      Some(x))
   }
 
-  private def assertPostEnrollmentSample(signatureStr: String, voiceStr: String, isBatchComplete: Boolean) {
+  private def assertPostEnrollmentSample(signatureStr: String,
+                                         voiceStr: String,
+                                         isBatchComplete: Boolean,
+                                         numEnrollmentSamplesInBatch: Int,
+                                         enrollmentBatchId: Option[Long] = None): Long = {
     val response = POST(
       willChanRequest,
       TestConstants.ApiRoot + "/celebrities/me/enrollmentsamples",
@@ -122,6 +142,13 @@ class CelebrityApiControllersTests extends FunctionalTest with CleanDatabaseAfte
     val json = Serializer.SJSON.in[Map[String, Any]](getContent(response))
     assertNotNull(json("id"))
     assertEquals(isBatchComplete, json("batch_complete"))
+
+    assertEquals(numEnrollmentSamplesInBatch, json("numEnrollmentSamplesInBatch").asInstanceOf[BigDecimal].intValue())
+    assertEquals(EnrollmentBatch.batchSize, json("enrollmentBatchSize").asInstanceOf[BigDecimal].intValue())
+    if (enrollmentBatchId.isDefined) assertEquals(enrollmentBatchId.get, json("enrollmentBatchId").asInstanceOf[BigDecimal].longValue())
+    else assertNotNull(json("enrollmentBatchId"))
+
+    json("enrollmentBatchId").asInstanceOf[BigDecimal].longValue()
   }
 
 
