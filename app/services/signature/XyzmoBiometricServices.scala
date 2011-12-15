@@ -25,12 +25,27 @@ object XyzmoBiometricServices {
     response
   }
 
+  def deleteUser(userId: String) {
+    val user_Delete: User_Delete_v1 = new User_Delete_v1
+    user_Delete.setBioUserId(userId)
+    val userDeleteResponse: User_Delete_v1Response = getWebServiceProxyUserAndProfile.get.user_Delete_v1(user_Delete)
+    val user_delete_v1Result: WebServiceUserAndProfileStub.ResultBase = userDeleteResponse.getUser_Delete_v1Result
+    if (user_delete_v1Result.getBaseResult eq WebServiceUserAndProfileStub.BaseResultEnum.ok) {
+      //      XyzmoBiometricServices.log.info("User_Add_v1 succeeded: User " + userId + " has been created successfully.")
+    }
+    else {
+      //      XyzmoBiometricServices.log.error("Error during User_Add_v1: " + user_delete_v1Result.getErrorInfo.getErrorMsg)
+      if (user_delete_v1Result.getErrorInfo.getError eq WebServiceUserAndProfileStub.ErrorStatus.BioUserAlreadyExists) {
+      }
+    }
+  }
+
   def addUser(userId: String, userName: String) {
-    val user: User_Add_v1 = new User_Add_v1
-    user.setBioUserId(userId)
-    user.setDisplayName(userName)
-    user.setBioUserStatus(BioUserStatus.Active)
-    val userAddResponse: User_Add_v1Response = getWebServiceProxyUserAndProfile.get.user_Add_v1(user)
+    val user_Add: User_Add_v1 = new User_Add_v1
+    user_Add.setBioUserId(userId)
+    user_Add.setDisplayName(userName)
+    user_Add.setBioUserStatus(BioUserStatus.Active)
+    val userAddResponse: User_Add_v1Response = getWebServiceProxyUserAndProfile.get.user_Add_v1(user_Add)
     val user_add_v1Result: WebServiceUserAndProfileStub.ResultBase = userAddResponse.getUser_Add_v1Result
     if (user_add_v1Result.getBaseResult eq WebServiceUserAndProfileStub.BaseResultEnum.ok) {
       XyzmoBiometricServices.log.info("User_Add_v1 succeeded: User " + userId + " has been created successfully.")
@@ -43,11 +58,11 @@ object XyzmoBiometricServices {
   }
 
   def addProfile(userId: String, profileName: String) {
-    val profile: Profile_Add_v1 = new Profile_Add_v1
-    profile.setBioUserId(userId)
-    profile.setProfileName(profileName)
-    profile.setProfileType(ProfileType.Dynamic)
-    val profileAddResponse: Profile_Add_v1Response = getWebServiceProxyUserAndProfile.get.profile_Add_v1(profile)
+    val profile_Add: Profile_Add_v1 = new Profile_Add_v1
+    profile_Add.setBioUserId(userId)
+    profile_Add.setProfileName(profileName)
+    profile_Add.setProfileType(ProfileType.Dynamic)
+    val profileAddResponse: Profile_Add_v1Response = getWebServiceProxyUserAndProfile.get.profile_Add_v1(profile_Add)
     val profile_add_v1Result: ProfileInfoResult_v1 = profileAddResponse.getProfile_Add_v1Result
     if (profile_add_v1Result.getBaseResult eq WebServiceUserAndProfileStub.BaseResultEnum.ok) {
       XyzmoBiometricServices.log.info("Profile_Add_v1 succeeded: profile for " + userId + " has been created successfully.")
@@ -67,12 +82,12 @@ object XyzmoBiometricServices {
   def enrollUser(userId: String, profileName: String, signatureDataContainers: List[String]): Boolean = {
     val SignatureDataContainerXmlStrArr: WebServiceBiometricPartStub.ArrayOfString = new WebServiceBiometricPartStub.ArrayOfString
     for (sdc <- signatureDataContainers) SignatureDataContainerXmlStrArr.addString(sdc)
-    val enrollProfileInfo: EnrollDynamicProfile_v1 = new EnrollDynamicProfile_v1
-    enrollProfileInfo.setBioUserId(userId)
-    enrollProfileInfo.setProfileName(profileName)
-    enrollProfileInfo.setContinuous(false)
-    enrollProfileInfo.setSignatureDataContainerXmlStrArr(SignatureDataContainerXmlStrArr)
-    val enrollDynamicResponse1: EnrollDynamicProfile_v1Response = getWebServiceProxyBiometricPart.get.enrollDynamicProfile_v1(enrollProfileInfo)
+    val enrollDynamicProfile: EnrollDynamicProfile_v1 = new EnrollDynamicProfile_v1
+    enrollDynamicProfile.setBioUserId(userId)
+    enrollDynamicProfile.setProfileName(profileName)
+    enrollDynamicProfile.setContinuous(false)
+    enrollDynamicProfile.setSignatureDataContainerXmlStrArr(SignatureDataContainerXmlStrArr)
+    val enrollDynamicResponse1: EnrollDynamicProfile_v1Response = getWebServiceProxyBiometricPart.get.enrollDynamicProfile_v1(enrollDynamicProfile)
     val enrollResult1: EnrollResultInfo_v1 = enrollDynamicResponse1.getEnrollDynamicProfile_v1Result
     if (enrollResult1.getBaseResult eq WebServiceBiometricPartStub.BaseResultEnum.ok) {
       XyzmoBiometricServices.log.info("EnrollDynamicProfile_v1: EnrollResult is " + enrollResult1.getOkInfo.getEnrollResult.getValue)

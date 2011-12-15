@@ -103,7 +103,7 @@ with DBTransaction {
       val startVerificationRequest = VBGBiometricServices.sendStartVerificationRequest(celebrity.id.toString)
       val transactionId = startVerificationRequest.getResponseValue(VBGBiometricServices._transactionId)
 
-      val sendVerifySampleRequest = VBGBiometricServices.sendVerifySampleRequest(transactionId, blobLocation = "egraphs/" + egraph.id + "/audio.wav")
+      val sendVerifySampleRequest = VBGBiometricServices.sendVerifySampleRequest(transactionId, wavBinary = egraph.assets.audio.toArray)
       val errorCode = sendVerifySampleRequest.getResponseValue(VoiceBiometricsClient.errorcode)
       val verificationResult = sendVerifySampleRequest.getResponseValue(VoiceBiometricsClient.success)
       val verificationScore = sendVerifySampleRequest.getResponseValue(VoiceBiometricsClient.score)

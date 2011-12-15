@@ -6,6 +6,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 import utils._
+import play.libs.Codec
 
 class VoiceSampleTests extends UnitFlatSpec
 with ShouldMatchers
@@ -36,8 +37,9 @@ with DBTransactionPerTest {
   }
 
   it should "save voiceStr to Blobstore" in {
-    val saved = VoiceSample(isForEnrollment = true).save(TestConstants.voiceStr)
-    Blobs.get(VoiceSample.getWavUrl(saved.id)).get.asString should be(TestConstants.voiceStr)
+    val saved = VoiceSample(isForEnrollment = true).save(TestConstants.voiceStr())
+    Codec.encodeBASE64(Blobs.get(VoiceSample.getWavUrl(saved.id)).get.asByteArray) should be(TestConstants.voiceStr())
+//    Blobs.get(VoiceSample.getWavUrl(saved.id)).get.asString should be(TestConstants.voiceStr)
   }
 
 }

@@ -53,6 +53,10 @@ object EnrollmentBatchJob {
       // TODO(wchan): Do this lazily.
       signatureSample.putXyzmoSignatureDataContainerOnBlobstore
     }
+
+    // TODO(wchan): There has to be a better way to do this... contact Xyzmo about user management.
+    XyzmoBiometricServices.deleteUser(userId = celebrity.id.toString)
+
     XyzmoBiometricServices.addUser(userId = celebrity.id.toString, userName = celebrity.publicName.get)
     XyzmoBiometricServices.addProfile(userId = celebrity.id.toString, profileName = celebrity.id.toString)
     val signatureDataContainers = for (signatureSample <- signatureSamples) yield Blobs.get(SignatureSample.getXmlUrl(signatureSample.id)).get.asString

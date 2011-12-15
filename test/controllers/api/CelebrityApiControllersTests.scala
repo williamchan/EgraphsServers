@@ -97,7 +97,7 @@ class CelebrityApiControllersTests extends FunctionalTest with CleanDatabaseAfte
     )
 
     assertPostEnrollmentSample(signatureStr = TestConstants.signatureStr,
-      voiceStr = TestConstants.voiceStr,
+      voiceStr = TestConstants.voiceStrPercentEncoded(),
       isBatchComplete = false,
       numEnrollmentSamplesInBatch = 1)
   }
@@ -109,19 +109,19 @@ class CelebrityApiControllersTests extends FunctionalTest with CleanDatabaseAfte
     )
 
     val x = assertPostEnrollmentSample(signatureStr = TestConstants.signatureStr,
-      voiceStr = TestConstants.voiceStr,
+      voiceStr = TestConstants.voiceStrPercentEncoded(),
       isBatchComplete = false,
       numEnrollmentSamplesInBatch = 1)
     for (i <- 1 until EnrollmentBatch.batchSize - 1) {
       assertPostEnrollmentSample(signatureStr = TestConstants.signatureStr,
-        voiceStr = TestConstants.voiceStr,
+        voiceStr = TestConstants.voiceStrPercentEncoded(),
         isBatchComplete = false,
         numEnrollmentSamplesInBatch = i + 1,
         Some(x)
       )
     }
     assertPostEnrollmentSample(signatureStr = TestConstants.signatureStr,
-      voiceStr = TestConstants.voiceStr,
+      voiceStr = TestConstants.voiceStrPercentEncoded(),
       isBatchComplete = true,
       numEnrollmentSamplesInBatch = 10,
       Some(x))

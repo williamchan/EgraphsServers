@@ -4,6 +4,7 @@ import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
 import libs.{Blobs, Time}
 import db.{KeyedCaseClass, Schema, Saves}
+import play.libs.Codec
 
 case class VoiceSample(id: Long = 0,
                        isForEnrollment: Boolean,
@@ -24,7 +25,7 @@ case class VoiceSample(id: Long = 0,
   /**Persists by conveniently delegating to companion object's save method. */
   def save(voiceStr: String): VoiceSample = {
     val saved = VoiceSample.save(this)
-    Blobs.put(VoiceSample.getWavUrl(saved.id), voiceStr.getBytes)
+    Blobs.put(VoiceSample.getWavUrl(saved.id), Codec.decodeBASE64(voiceStr))
     saved
   }
 

@@ -133,7 +133,7 @@ class Scenarios extends DeclaresScenarios {
 
       EgraphFulfillmentHandler(
         TestConstants.signatureStr,
-        TestConstants.voiceStr,
+        TestConstants.voiceStrPercentEncoded,
         firstOrder,
         will
       ).execute()

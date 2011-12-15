@@ -31,7 +31,7 @@ class CelebrityOrderApiControllersTests extends FunctionalTest with CleanDatabas
       willChanRequest,
       TestConstants.ApiRoot + "/celebrities/me/orders/" + orderId + "/egraphs",
       APPLICATION_X_WWW_FORM_URLENCODED,
-      "signature=" + TestConstants.signatureStr + "&audio=" + TestConstants.voiceStr
+      "signature=" + TestConstants.signatureStr + "&audio=" + TestConstants.voiceStrPercentEncoded()
     )
     assertIsOk(response)
 
@@ -43,33 +43,33 @@ class CelebrityOrderApiControllersTests extends FunctionalTest with CleanDatabas
     assertEquals(TestConstants.signatureStr, Blobs.get("egraphs/" + json("id") + "/signature.json").get.asString)
   }
 
-  @Test
-  def testPostEgraphDrainsOrdersQueue() {
-//    TODO(wchan): Re-enable asap. Currently broken b/c this test case does not pass in a signature that passes verification.
-//    runScenarios(
-//      "Will-Chan-is-a-celebrity",
-//      "Will-has-two-products",
-//      "Erem-is-a-customer",
-//      "Erem-buys-Wills-two-products-twice-each"
-//    )
-//
-//    var numOrders = 2
-//    val ordersResponse = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/orders?signerActionable=true")
-//    val ordersList = Serializer.SJSON.in[List[Map[String, Any]]](getContent(ordersResponse))
-//    assertEquals(numOrders, ordersList.length)
-//
-//    for (order <- ordersList) {
-//      val response = POST(
-//        willChanRequest,
-//        TestConstants.ApiRoot + "/celebrities/me/orders/" + order("id") + "/egraphs",
-//        APPLICATION_X_WWW_FORM_URLENCODED,
-//        "signature=" + TestConstants.signatureStr + "&audio=" + TestConstants.voiceStr
-//      )
-//      assertIsOk(response)
-//      numOrders -= 1
-//      val ordersResponse1 = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/orders?signerActionable=true")
-//      val ordersList1 = Serializer.SJSON.in[List[Map[String, Any]]](getContent(ordersResponse1))
-//      assertEquals(numOrders, ordersList1.length)
-//    }
-  }
+  //  @Test
+  //  def testPostEgraphDrainsOrdersQueue() {
+  //    TODO(wchan): Re-enable asap. Currently broken b/c this test case does not pass in a signature that passes verification.
+  //    runScenarios(
+  //      "Will-Chan-is-a-celebrity",
+  //      "Will-has-two-products",
+  //      "Erem-is-a-customer",
+  //      "Erem-buys-Wills-two-products-twice-each"
+  //    )
+  //
+  //    var numOrders = 2
+  //    val ordersResponse = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/orders?signerActionable=true")
+  //    val ordersList = Serializer.SJSON.in[List[Map[String, Any]]](getContent(ordersResponse))
+  //    assertEquals(numOrders, ordersList.length)
+  //
+  //    for (order <- ordersList) {
+  //      val response = POST(
+  //        willChanRequest,
+  //        TestConstants.ApiRoot + "/celebrities/me/orders/" + order("id") + "/egraphs",
+  //        APPLICATION_X_WWW_FORM_URLENCODED,
+  //        "signature=" + TestConstants.signatureStr + "&audio=" + TestConstants.voiceStr
+  //      )
+  //      assertIsOk(response)
+  //      numOrders -= 1
+  //      val ordersResponse1 = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/orders?signerActionable=true")
+  //      val ordersList1 = Serializer.SJSON.in[List[Map[String, Any]]](getContent(ordersResponse1))
+  //      assertEquals(numOrders, ordersList1.length)
+  //    }
+  //  }
 }

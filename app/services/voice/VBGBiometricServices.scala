@@ -1,13 +1,13 @@
 package services.voice
 
-import org.apache.commons.codec.binary.Base64
 import javax.xml.parsers.{DocumentBuilder, DocumentBuilderFactory}
 import org.xml.sax.InputSource
 import org.w3c.dom.{Node, Document}
 import java.util.Hashtable
 import java.net.{HttpURLConnection, URLEncoder, URL}
 import java.io._
-import libs.Blobs
+import play.libs.Codec
+import libs.{SampleRateConverter, Blobs}
 import Blobs.Conversions._
 
 class VBGRequest {
@@ -137,13 +137,12 @@ object VBGBiometricServices {
 
   def sendAudioCheckRequest(transactionId: String, blobLocation: String): VBGRequest = {
     val request = new VBGRequest
-    val voiceSampleBase64: String = Blobs.get(blobLocation).get.asString
-//    val voiceSampleBase64: String = getVoiceSampleBase64Encoded(filename)
+    val voiceSampleBase64_downSampled: String = getDownSampledBase64(Blobs.get(blobLocation).get.asByteArray)
     request.setRequestType(_AudioCheck)
     request.setParameter(_clientName, _myClientName)
     request.setParameter(_clientKey, _myClientKey)
     request.setParameter(_transactionId, transactionId)
-    request.setParameter(_voiceSample, voiceSampleBase64)
+    request.setParameter(_voiceSample, voiceSampleBase64_downSampled)
     request.sendRequest()
   }
 
@@ -186,22 +185,27 @@ object VBGBiometricServices {
     request.sendRequest()
   }
 
-  def sendVerifySampleRequest(transactionId: String, blobLocation: String): VBGRequest = {
+  def sendVerifySampleRequest(transactionId: String, wavBinary: Array[Byte]): VBGRequest = {
+    val voiceSampleBase64_downSampled: String = getDownSampledBase64(wavBinary)
+
     val request = new VBGRequest
-    val voiceSampleBase64: String = Blobs.get(blobLocation).get.asString
-//    val voiceSampleBase64: String = getVoiceSampleBase64Encoded(filename)
     request.setRequestType(_VerifySample)
     request.setParameter(_clientName, _myClientName)
     request.setParameter(_clientKey, _myClientKey)
     request.setParameter(_transactionId, transactionId)
-    request.setParameter(_voiceSample, voiceSampleBase64)
+    request.setParameter(_voiceSample, voiceSampleBase64_downSampled)
     request.sendRequest()
   }
 
 
   // ========================== PRIVATE HELPERS
 
-  private def getVoiceSampleBase64Encoded(filename: String): String = {
+  def getDownSampledBase64(wavBinary: Array[Byte]): String = {
+    val wavBinary_downSampled: Array[Byte] = SampleRateConverter.convert(8000f, wavBinary)
+    Codec.encodeBASE64(wavBinary_downSampled)
+  }
+
+  def getVoiceSampleBinary(filename: String): Array[Byte] = {
     val bas: ByteArrayOutputStream = new ByteArrayOutputStream
     var fData: Int = 0
     val fs: FileInputStream = new FileInputStream(filename)
@@ -210,8 +214,10 @@ object VBGBiometricServices {
       bas.write(fData)
     }
     fs.close()
-    Base64.encodeBase64String(bas.toByteArray)
+    bas.toByteArray
   }
 
-
+  def getVoiceSampleBase64Encoded(filename: String): String = {
+    Codec.encodeBASE64(getVoiceSampleBinary(filename))
+  }
 }

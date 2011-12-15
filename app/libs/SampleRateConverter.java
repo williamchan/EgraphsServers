@@ -39,8 +39,7 @@ package libs;
 */
 
 import javax.sound.sampled.*;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 
 /**
@@ -132,18 +131,19 @@ public class SampleRateConverter {
         convert(fTargetSampleRate, sourceFile, targetFile);
     }
 
-    public static void convert(float fTargetSampleRate, File sourceFile, File targetFile) throws UnsupportedAudioFileException, IOException {
+    public static byte[] convert(float fTargetSampleRate, byte[] sourceBinary) throws UnsupportedAudioFileException, IOException {
         /* We try to use the same audio file type for the target
         file as the source file. So we first have to find
         out about the source file's properties.
         */
-        AudioFileFormat sourceFileFormat = AudioSystem.getAudioFileFormat(sourceFile);
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(sourceBinary);
+        AudioFileFormat sourceFileFormat = AudioSystem.getAudioFileFormat(inputStream);
         AudioFileFormat.Type targetFileType = sourceFileFormat.getType();
 
         /* Here, we are reading the source file.*/
-        AudioInputStream sourceStream = AudioSystem.getAudioInputStream(sourceFile);
+        AudioInputStream sourceStream = AudioSystem.getAudioInputStream(inputStream);
         if (sourceStream == null) {
-            out("cannot open source audio file: " + sourceFile);
+            out("cannot open source audio file");
             System.exit(1);
         }
         AudioFormat sourceFormat = sourceStream.getFormat();
@@ -196,11 +196,100 @@ public class SampleRateConverter {
         data to a new file.
         */
         int nWrittenBytes = 0;
-        nWrittenBytes = AudioSystem.write(targetStream, targetFileType, targetFile);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        nWrittenBytes = AudioSystem.write(targetStream, targetFileType, outputStream);
         if (DEBUG) {
             out("Written bytes: " + nWrittenBytes);
         }
+        return outputStream.toByteArray();
     }
+
+    // TODO(wchan): DELETE THIS. Move the test file opening logic to SampleRateConverterTest.
+    public static void convert(float fTargetSampleRate, File sourceFile, File targetFile) throws UnsupportedAudioFileException, IOException {
+        ByteArrayOutputStream bas = new ByteArrayOutputStream();
+        int fdata;
+        FileInputStream fs = new FileInputStream(sourceFile);
+        while (fs.available() > 0) {
+            fdata = fs.read();
+            bas.write(fdata);
+        }
+        fs.close();
+
+        byte[] output = convert(fTargetSampleRate, bas.toByteArray());
+        OutputStream out = new FileOutputStream(targetFile);
+        out.write(output);
+        out.close();
+    }
+
+//    public static void convert(float fTargetSampleRate, File sourceFile, File targetFile) throws UnsupportedAudioFileException, IOException {
+//        /* We try to use the same audio file type for the target
+//        file as the source file. So we first have to find
+//        out about the source file's properties.
+//        */
+//        AudioFileFormat sourceFileFormat = AudioSystem.getAudioFileFormat(sourceFile);
+//        AudioFileFormat.Type targetFileType = sourceFileFormat.getType();
+//
+//        /* Here, we are reading the source file.*/
+//        AudioInputStream sourceStream = AudioSystem.getAudioInputStream(sourceFile);
+//        if (sourceStream == null) {
+//            out("cannot open source audio file: " + sourceFile);
+//            System.exit(1);
+//        }
+//        AudioFormat sourceFormat = sourceStream.getFormat();
+//        if (DEBUG) {
+//            out("source format: " + sourceFormat);
+//        }
+//
+//        /* Currently, the only known and working sample rate
+//        converter for Java Sound requires that the encoding
+//        of the source stream is PCM (signed or unsigned).
+//        So as a measure of convenience, we check if this
+//        holds here.
+//        */
+//        AudioFormat.Encoding encoding = sourceFormat.getEncoding();
+//        if (!AudioCommon.isPcm(encoding)) {
+//            out("encoding of source audio data is not PCM; conversion not possible");
+//            System.exit(1);
+//        }
+//
+//        /* Since we now know that we are dealing with PCM, we know
+//        that the frame rate is the same as the sample rate.
+//        */
+//        float fTargetFrameRate = fTargetSampleRate;
+//
+//        /* Here, we are constructing the desired format of the
+//        audio data (as the result of the conversion should be).
+//        We take over all values besides the sample/frame rate.
+//        */
+//
+//        AudioFormat targetFormat = new AudioFormat(
+//                sourceFormat.getEncoding(),
+//                fTargetSampleRate,
+//                sourceFormat.getSampleSizeInBits(),
+//                sourceFormat.getChannels(),
+//                sourceFormat.getFrameSize(),
+//                fTargetFrameRate,
+//                sourceFormat.isBigEndian());
+//
+//        if (DEBUG) {
+//            out("desired target format: " + targetFormat);
+//        }
+//
+//        /* Now, the conversion takes place.*/
+//        AudioInputStream targetStream = AudioSystem.getAudioInputStream(targetFormat, sourceStream);
+//        if (DEBUG) {
+//            out("targetStream: " + targetStream);
+//        }
+//
+//        /* And finally, we are trying to write the converted audio
+//        data to a new file.
+//        */
+//        int nWrittenBytes = 0;
+//        nWrittenBytes = AudioSystem.write(targetStream, targetFileType, targetFile);
+//        if (DEBUG) {
+//            out("Written bytes: " + nWrittenBytes);
+//        }
+//    }
 
     private static void printUsageAndExit() {
         out("SampleRateConverter: usage:");
