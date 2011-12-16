@@ -95,14 +95,14 @@ case class Celebrity(id: Long = 0,
     Product(celebrityId = id)
   }
 
-  def getOpenEnrollmentBatch: Option[EnrollmentBatch] = {
+  def getOpenEnrollmentBatch(): Option[EnrollmentBatch] = {
     from(Schema.enrollmentBatches)(enrollmentBatch =>
       where(enrollmentBatch.celebrityId === this.id and enrollmentBatch.isSuccessfulEnrollment.isNull)
         select (enrollmentBatch)
     ).headOption
   }
 
-  def getXyzmoUID: String = {
+  def getXyzmoUID(): String = {
     "celeb" + id.toString + "." + created.toString
   }
 
