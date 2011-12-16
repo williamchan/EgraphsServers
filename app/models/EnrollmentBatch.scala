@@ -36,7 +36,10 @@ case class EnrollmentBatch(id: Long = 0,
 
     val numEnrollmentSamplesInBatch = getNumEnrollmentSamples()
     if (numEnrollmentSamplesInBatch >= EnrollmentBatch.batchSize) {
+
       copy(isBatchComplete = true).save()
+      Celebrity.get(celebrityId).copy(enrollmentStatus = AttemptingEnrollment.value).save()
+
       // Kick off "job" is EnrollmentBatch is complete
       new jobs.EnrollmentBatchJob().now()
       (enrollmentSample, true, numEnrollmentSamplesInBatch, EnrollmentBatch.batchSize)

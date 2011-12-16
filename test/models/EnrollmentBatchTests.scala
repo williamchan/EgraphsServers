@@ -46,7 +46,10 @@ with DBTransactionPerTest {
   }
 
   "addEnrollmentSample" should "add complete EnrollmentBatch when # of samples reaches batchSize" in {
-    var enrollmentBatch = EnrollmentBatch(celebrityId = Celebrity().save().id).save()
+    val celeb = Celebrity().save()
+    celeb.enrollmentStatus should be(NotEnrolled.value)
+
+    var enrollmentBatch = EnrollmentBatch(celebrityId = celeb.id).save()
     for (i <- 0 until EnrollmentBatch.batchSize - 1) {
       enrollmentBatch.addEnrollmentSample(signatureStr = TestConstants.signatureStr, voiceStr = TestConstants.voiceStr)
     }
@@ -57,6 +60,8 @@ with DBTransactionPerTest {
     enrollmentBatch = EnrollmentBatch.findById(enrollmentBatch.id).get
     enrollmentBatch.getNumEnrollmentSamples() should be(EnrollmentBatch.batchSize)
     enrollmentBatch.isBatchComplete should be(true)
+
+    Celebrity.findById(celeb.id).get.enrollmentStatus should be(AttemptingEnrollment.value)
   }
 
 }
