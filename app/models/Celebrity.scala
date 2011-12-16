@@ -187,3 +187,5 @@ case object NotEnrolled extends EnrollmentStatus("NotEnrolled")
 case object AttemptingEnrollment extends EnrollmentStatus("AttemptingEnrollment")
 
 case object Enrolled extends EnrollmentStatus("Enrolled")
+
+case object FailedEnrollment extends EnrollmentStatus("FailedEnrollment")

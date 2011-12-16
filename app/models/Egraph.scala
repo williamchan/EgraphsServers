@@ -107,7 +107,7 @@ case class Egraph(
       Blobs.put(signatureJsonKey, signature, access=AccessPolicy.Private)
       Blobs.put(audioKey, audio, access=AccessPolicy.Private)
 
-      // Before removing this line, realize that without the line we will all fail
+      // Before removing this line, realize that without the line the image method will fail
       ImageAsset(
         createMasterImage(),
         blobKeyBase,

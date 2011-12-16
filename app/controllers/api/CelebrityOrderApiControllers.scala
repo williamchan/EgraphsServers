@@ -20,10 +20,10 @@ with RequiresCelebrityId
 with RequiresCelebrityOrderId
 with DBTransaction {
 
-  def postEgraph(signature: Option[String], audio: Option[String]) = {
+  def postEgraph(signature: Option[String], audio: Option[String], skipBiometrics: Boolean = false) = {
     (signature, audio) match {
       case (Some(signatureString), Some(audioString)) =>
-        EgraphFulfillmentHandler(signatureString, audioString, order, celebrity).execute()
+        EgraphFulfillmentHandler(signatureString, audioString, order, celebrity, skipBiometrics).execute()
 
       case _ =>
         play.Logger.info("Dismissing the invalid request")
@@ -31,22 +31,21 @@ with DBTransaction {
     }
   }
 
-  case class EgraphFulfillmentHandler(
-                                       signature: String,
-                                       audio: String,
-                                       order: Order,
-                                       celebrity: Celebrity) {
+  case class EgraphFulfillmentHandler(signature: String,
+                                      audio: String,
+                                      order: Order,
+                                      celebrity: Celebrity,
+                                      skipBiometrics: Boolean = false) {
     def execute() = {
       play.Logger.info("Processing eGraph submission for Order #" + order.id)
 
       val egraph = order
         .newEgraph
-        .withState(Verified) //TODO remove this line when we don't want the eGraph to immediately be verified
         .save(signature, Codec.decodeBASE64(audio))
 
       val egraphId = egraph.id
 
-      if (verifyBiometrics(egraph)) {
+      if (skipBiometrics || verifyBiometrics(egraph)) {
         // Send e-mail that the eGraph is complete. Move this to post-authentication
         // when possible.
         sendEgraphSignedMail(egraph)
@@ -113,7 +112,7 @@ with DBTransaction {
       // Question for VBG: Why do we need to do this?
       VBGBiometricServices.sendFinishVerifyTransactionRequest(transactionId, verificationResult, verificationScore)
 
-      println("Signature verification result for egraph " + egraph.id.toString + ": " + verificationResult + " (" + errorCode + " )")
+      println("Voice verification result for egraph " + egraph.id.toString + ": " + verificationResult + " (" + errorCode + " )")
 
       errorCode == "0" && verificationResult == "true"
     }

@@ -38,8 +38,9 @@ class EnrollmentBatchJob extends Job {
         batch.copy(isSuccessfulEnrollment = Some(isSuccessfulEnrollment)).save()
         if (isSuccessfulEnrollment) {
           celebrity.copy(enrollmentStatus = models.Enrolled.value).save()
+        } else {
+          celebrity.copy(enrollmentStatus = models.FailedEnrollment.value).save()
         }
-
       }
     }
   }
@@ -82,12 +83,22 @@ object EnrollmentBatchJob {
   def attemptVoiceEnrollment(celebrity: Celebrity, voiceSamples: scala.List[VoiceSample]): Boolean = {
     val startEnrollmentRequest = sendStartEnrollmentRequest(celebrity)
     val transactionId = startEnrollmentRequest.getResponseValue(VBGBiometricServices._transactionId)
+    println("Attempting voice enrollment with transactionId " + transactionId)
     //    assertEquals("0", client.getResponseValue(VoiceBiometricsClient.errorcode))
     //    assertNotNull(transactionId)
 
+    var atLeastOneUsableSample = false
     for (voiceSample <- voiceSamples) {
-      VBGBiometricServices.sendAudioCheckRequest(transactionId, VoiceSample.getWavUrl(voiceSample.id))
+      val audioCheckRequest = VBGBiometricServices.sendAudioCheckRequest(transactionId, VoiceSample.getWavUrl(voiceSample.id))
+      val errorCode = audioCheckRequest.getResponseValue(VBGBiometricServices._errorCode)
+      if (errorCode == "0") atLeastOneUsableSample = true
+      val usableTime = audioCheckRequest.getResponseValue(VBGBiometricServices._usableTime)
+      println(errorCode + " " + usableTime)
       // store metadata on VoiceSample... ignoring errorcodes for now
+    }
+    if (!atLeastOneUsableSample) {
+      println("No usable voice samples... aborting enrollment attempt!")
+      return false
     }
 
     val enrollUserRequest = VBGBiometricServices.sendEnrollUserRequest(transactionId)
