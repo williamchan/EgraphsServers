@@ -31,6 +31,8 @@ object CelebrityProductController extends Controller
     views.Application.html.product(celebrity, product, errorFields, fieldDefaults)
   }
 
+  val alphaEmailMatcher = ".*@(egraphs|tampabayrays).com"
+
   def buy(recipientName: String,
           recipientEmail: String,
           buyerName: String,
@@ -45,6 +47,19 @@ object CelebrityProductController extends Controller
     required("Buyer name", buyerName)
     email("Buyer E-mail address", buyerEmail)
     required("stripeTokenId", stripeTokenId)
+
+    // Make sure these are valid email addresses for the alpha test
+    Validation.`match`(
+      "Recipient e-mail address at egraphs.com or tampabayrays.com",
+      recipientEmail.toLowerCase,
+      alphaEmailMatcher
+    )
+
+    Validation.`match`(
+      "Buyer e-mail address at egraphs.com or tampabayrays.com",
+      buyerEmail.toLowerCase,
+      alphaEmailMatcher
+    )
 
     if (validationErrors.isEmpty) {
       EgraphPurchaseHandler(

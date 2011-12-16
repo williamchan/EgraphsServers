@@ -134,7 +134,16 @@
             <legend>Recipient info</legend>
             @formField(id="recipientName", label="Name", inputType="text", width="span4")
 
-            @formField(id="recipientEmail", label="E-mail address", inputType="text", width="span4")
+            @formField(
+              id="recipientEmail",
+              label="E-mail address",
+              inputType="text",
+              width="span4",
+              help=Some(emailHelp))
+
+            @emailHelp = {
+              egraphs.com or tampabayrays.com only.
+            }
 
             <div class="clearfix">
               <label for="desiredText">Desired text</label>
@@ -159,7 +168,12 @@
                 As it appears on the card
               }
 
-              @formField(id="buyerEmail", label="E-mail address", inputType="text", width="span3")
+              @formField(
+                id="buyerEmail",
+                label="E-mail address",
+                inputType="text",
+                width="span3",
+                help=Some(emailHelp))
 
               @formField(id="cardNumber",
                          label="Card number",
