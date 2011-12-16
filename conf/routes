@@ -16,7 +16,7 @@ GET     /test/request-transaction/with-error     TransactionTestController.makeA
 GET     /test/request-transaction/is-stored      TransactionTestController.isStored
 
 # GET     /test/files/{<.*>blobKey}                BlobControllers.getBlob
-
+GET     /test/script                             test.script
 
 ###
 ### Production routes

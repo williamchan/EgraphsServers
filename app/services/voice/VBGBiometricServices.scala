@@ -202,8 +202,10 @@ object VBGBiometricServices {
   // ========================== PRIVATE HELPERS
 
   def getDownSampledBase64(wavBinary: Array[Byte]): String = {
-    val wavBinary_downSampled: Array[Byte] = SampleRateConverter.convert(8000f, wavBinary)
-    Codec.encodeBASE64(wavBinary_downSampled)
+//    val wavBinary_downSampled: Array[Byte] = SampleRateConverter.convert(8000f, wavBinary)
+//    Codec.encodeBASE64(wavBinary_downSampled)
+
+    Codec.encodeBASE64(wavBinary)
   }
 
   def getVoiceSampleBinary(filename: String): Array[Byte] = {

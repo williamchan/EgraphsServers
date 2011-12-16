@@ -4,9 +4,11 @@ import play.mvc._
 import java.io.File
 import libs.Blobs.Conversions._
 import math.BigDecimal._
-import models.{Account, Celebrity}
-import libs.Blobs
 import play.Play
+import models.{VoiceSample, Account, Celebrity}
+import libs.{SampleRateConverter, Blobs}
+import play.libs.Codec
+import services.signature.XyzmoBiometricServices
 
 object Application extends Controller {
 
@@ -20,7 +22,6 @@ object Application extends Controller {
 object test extends Controller
 with DBTransaction {
 
-  import org.squeryl.PrimitiveTypeMode._
 
   def resetAlphaState(): String = {
     db.Schema.scrub()
@@ -36,7 +37,7 @@ with DBTransaction {
     createCelebrity("Michael", "Kalt", "mkalt@raysbaseball.com")
     createCelebrity("Matt", "Silverman", "msilverman@raysbaseball.com")
     createCelebrity("Gabe", "Kapler", "gabe@egraphs.com")
- 
+
     "Alpha Testers created!"
   }
 
@@ -68,6 +69,27 @@ with DBTransaction {
       description = "Help me... help YOU..."
     ).save()
 
+  }
+
+  def script() {
+
+    ""
+
+    //    val path: File = new File("test/files")
+    //    val source: File = new File(path, "voice_from_ipad.wav")
+    //    val target: File = new File(path, "voice_from_ipad_8khz.wav")
+    //    SampleRateConverter.convert(8000f, source, target)
+
+
+    //    val voiceSample = VoiceSample.findById(1L).get
+    //    val blobLocation = VoiceSample.getWavUrl(voiceSample.id)
+    //    println("blobLocation = " + blobLocation)
+    //
+    //    val wavBinary = Blobs.get(blobLocation).get.asByteArray
+    //    println("mark 0")
+    //    val wavBinary_downSampled: Array[Byte] = SampleRateConverter.convert(8000f, wavBinary)
+    //    println("mark 1")
+    //    println(Codec.encodeBASE64(wavBinary_downSampled))
   }
 
 }

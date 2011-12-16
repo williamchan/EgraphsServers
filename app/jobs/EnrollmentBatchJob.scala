@@ -55,12 +55,12 @@ object EnrollmentBatchJob {
     }
 
     // TODO(wchan): There has to be a better way to do this... contact Xyzmo about user management.
-    XyzmoBiometricServices.deleteUser(userId = celebrity.id.toString)
-
-    XyzmoBiometricServices.addUser(userId = celebrity.id.toString, userName = celebrity.publicName.get)
-    XyzmoBiometricServices.addProfile(userId = celebrity.id.toString, profileName = celebrity.id.toString)
+    val xyzmoUID: String = celebrity.getXyzmoUID()
+//    XyzmoBiometricServices.deleteUser(userId = xyzmoUID)
+    XyzmoBiometricServices.addUser(userId = xyzmoUID, userName = celebrity.publicName.get)
+    XyzmoBiometricServices.addProfile(userId = xyzmoUID, profileName = xyzmoUID)
     val signatureDataContainers = for (signatureSample <- signatureSamples) yield Blobs.get(SignatureSample.getXmlUrl(signatureSample.id)).get.asString
-    val isSuccessfulSignatureEnrollment = XyzmoBiometricServices.enrollUser(userId = celebrity.id.toString, profileName = celebrity.id.toString, signatureDataContainers = signatureDataContainers)
+    val isSuccessfulSignatureEnrollment = XyzmoBiometricServices.enrollUser(userId = xyzmoUID, profileName = xyzmoUID, signatureDataContainers = signatureDataContainers)
 
     println("Result of signature enrollment attempt for celebrity " + celebrity.id.toString + ": " + isSuccessfulSignatureEnrollment.toString)
 

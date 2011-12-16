@@ -1,6 +1,7 @@
 package services.voice;
 
 import junit.framework.TestCase;
+import libs.SampleRateConverter;
 import play.libs.Codec;
 
 import java.io.*;
@@ -17,51 +18,58 @@ public class VoiceBiometricsClientTests extends TestCase {
         }
     }
 
-    public void testAndrewsAudioFile() throws Exception {
-        String base64String = getStringFromFile(new File("test/files/sample_audio_5.txt"));
-        String outputFileName = "test/files/sample_audio_5.wav";
-        base64ToWav(base64String, outputFileName);
-    }
+//    public void testConverter() throws Exception {
+//        File path = new File("test/files");
+//        File source = new File(path, "voice_from_ipad.wav");
+//        File target = new File(path, "voice_from_ipad_8khz.wav");
+//        SampleRateConverter.convert(8000f, source, target);
+//    }
 
-    public void testConvertToBase64AndBack() throws Exception {
-        String inputFileName = "test/files/sound.wav";
-        String base64String = wavToBase64(inputFileName);
-        System.out.println(base64String);
-
-        String outputFileName = "test/files/pls.wav";
-        base64ToWav(base64String, outputFileName);
-    }
-
-    private void base64ToWav(String base64String, String outputFileName) throws IOException {
-        byte[] bytes = Codec.decodeBASE64(base64String);
-        FileOutputStream out = new FileOutputStream(outputFileName);
-        out.write(bytes);
-        out.close();
-    }
-
-    private String wavToBase64(String inputFileName) throws IOException {
-        ByteArrayOutputStream bas = new ByteArrayOutputStream();
-        int fdata;
-        FileInputStream fs = new FileInputStream(inputFileName);
-        while (fs.available() > 0) {
-            fdata = fs.read();
-            bas.write(fdata);
-        }
-        fs.close();
-        return Codec.encodeBASE64(bas.toByteArray());
-    }
-
-    private String getStringFromFile(File file) throws Exception {
-        ByteArrayOutputStream bas = new ByteArrayOutputStream();
-        int fdata;
-        FileInputStream fs = new FileInputStream(file);
-        while (fs.available() > 0) {
-            fdata = fs.read();
-            bas.write(fdata);
-        }
-        fs.close();
-        return bas.toString();
-    }
+//    public void testAndrewsAudioFile() throws Exception {
+//        String base64String = getStringFromFile(new File("test/files/sample_audio_5.txt"));
+//        String outputFileName = "test/files/sample_audio_5.wav";
+//        base64ToWav(base64String, outputFileName);
+//    }
+//
+//    public void testConvertToBase64AndBack() throws Exception {
+//        String inputFileName = "test/files/sound.wav";
+//        String base64String = wavToBase64(inputFileName);
+//        System.out.println(base64String);
+//
+//        String outputFileName = "test/files/pls.wav";
+//        base64ToWav(base64String, outputFileName);
+//    }
+//
+//    private void base64ToWav(String base64String, String outputFileName) throws IOException {
+//        byte[] bytes = Codec.decodeBASE64(base64String);
+//        FileOutputStream out = new FileOutputStream(outputFileName);
+//        out.write(bytes);
+//        out.close();
+//    }
+//
+//    private String wavToBase64(String inputFileName) throws IOException {
+//        ByteArrayOutputStream bas = new ByteArrayOutputStream();
+//        int fdata;
+//        FileInputStream fs = new FileInputStream(inputFileName);
+//        while (fs.available() > 0) {
+//            fdata = fs.read();
+//            bas.write(fdata);
+//        }
+//        fs.close();
+//        return Codec.encodeBASE64(bas.toByteArray());
+//    }
+//
+//    private String getStringFromFile(File file) throws Exception {
+//        ByteArrayOutputStream bas = new ByteArrayOutputStream();
+//        int fdata;
+//        FileInputStream fs = new FileInputStream(file);
+//        while (fs.available() > 0) {
+//            fdata = fs.read();
+//            bas.write(fdata);
+//        }
+//        fs.close();
+//        return bas.toString();
+//    }
 
     public void testEnrollWill() throws Exception {
         client.sendStartEnrollmentRequest("will", /*rebuildTemplate*/true);
@@ -70,12 +78,12 @@ public class VoiceBiometricsClientTests extends TestCase {
         assertEquals("0", client.getResponseValue(VoiceBiometricsClient.errorcode));
         assertNotNull(transactionId);
 
-        sendAudioCheckRequest(transactionId, "ipad1d.wav");
-        sendAudioCheckRequest(transactionId, "ipad2d.wav");
-        sendAudioCheckRequest(transactionId, "ipad3d.wav");
-        sendAudioCheckRequest(transactionId, "ipad4d.wav");
-        sendAudioCheckRequest(transactionId, "ipad5d.wav");
-        sendAudioCheckRequest(transactionId, "ipad6d.wav");
+        sendAudioCheckRequest(transactionId, "test/files/ipad1d.wav");
+        sendAudioCheckRequest(transactionId, "test/files/ipad2d.wav");
+        sendAudioCheckRequest(transactionId, "test/files/ipad3d.wav");
+        sendAudioCheckRequest(transactionId, "test/files/ipad4d.wav");
+        sendAudioCheckRequest(transactionId, "test/files/ipad5d.wav");
+        sendAudioCheckRequest(transactionId, "test/files/ipad6d.wav");
 
         client.sendEnrollUserRequest(transactionId);
         assertEquals("0", client.getResponseValue(VoiceBiometricsClient.errorcode));
@@ -86,29 +94,40 @@ public class VoiceBiometricsClientTests extends TestCase {
         assertEquals("0", client.getResponseValue(VoiceBiometricsClient.errorcode));
     }
 
-    public void testVerify_iPad() throws Exception {
-        verify("will", "sample_audio_5.wav", false);
+    public void testAudioFormatCompatibility_iPad() throws Exception {
+        checkAudioFormatCompatibility("will", "tmp/blobstore/egraphs-test/voicesamples/1.wav");
+        checkAudioFormatCompatibility("will", "tmp/blobstore/egraphs-test/voicesamples/2.wav");
+        checkAudioFormatCompatibility("will", "tmp/blobstore/egraphs-test/voicesamples/3.wav");
+        checkAudioFormatCompatibility("will", "tmp/blobstore/egraphs-test/voicesamples/4.wav");
+        checkAudioFormatCompatibility("will", "tmp/blobstore/egraphs-test/voicesamples/5.wav");
+        checkAudioFormatCompatibility("will", "tmp/blobstore/egraphs-test/voicesamples/6.wav");
+        checkAudioFormatCompatibility("will", "tmp/blobstore/egraphs-test/voicesamples/7.wav");
+        checkAudioFormatCompatibility("will", "tmp/blobstore/egraphs-test/voicesamples/8.wav");
+        checkAudioFormatCompatibility("will", "tmp/blobstore/egraphs-test/voicesamples/9.wav");
+        checkAudioFormatCompatibility("will", "tmp/blobstore/egraphs-test/voicesamples/10.wav");
+
+//        verify("will", "test/files/sample_audio_5.wav", false);
     }
 
     public void testVerifyWill() throws Exception {
-        verify("will", "ipad7d.wav", true);  // speech
-//        verify("will", "ipad8d.wav", true);  // false. speech
-//        verify("will", "ipad9d.wav", true);  // false. speech
-        verify("will", "ipad10d.wav", true); // numbers
+        verify("will", "test/files/ipad7d.wav", true);  // speech
+//        verify("will", "test/files/ipad8d.wav", true);  // false. speech
+//        verify("will", "test/files/ipad9d.wav", true);  // false. speech
+        verify("will", "test/files/ipad10d.wav", true); // numbers
 
-//        verify("will", "dave1d.wav", false); // 90400
-        verify("will", "dave2d.wav", false);
-        verify("will", "dave3d.wav", false);
-        verify("will", "dave4d.wav", false);
-        verify("will", "dave5d.wav", false);
-        verify("will", "dave6d.wav", false);
-        verify("will", "dave7d.wav", false);
-        verify("will", "dave8d.wav", false);
-//        verify("will", "dave9d.wav", true);   // False positive
-//        verify("will", "dave10d.wav", false); // 90400
+//        verify("will", "test/files/dave1d.wav", false); // 90400
+        verify("will", "test/files/dave2d.wav", false);
+        verify("will", "test/files/dave3d.wav", false);
+        verify("will", "test/files/dave4d.wav", false);
+        verify("will", "test/files/dave5d.wav", false);
+        verify("will", "test/files/dave6d.wav", false);
+        verify("will", "test/files/dave7d.wav", false);
+        verify("will", "test/files/dave8d.wav", false);
+//        verify("will", "test/files/dave9d.wav", true);   // False positive
+//        verify("will", "test/files/dave10d.wav", false); // 90400
 
-        verify("will", "andrew_0_8khz.wav", false);
-//        verify("will", "andrew_1_8khz.wav", false); // 90400. Why!
+        verify("will", "test/files/andrew_0_8khz.wav", false);
+//        verify("will", "test/files/andrew_1_8khz.wav", false); // 90400. Why!
     }
 
     public void testEnrollDave() throws Exception {
@@ -118,11 +137,11 @@ public class VoiceBiometricsClientTests extends TestCase {
         assertEquals("0", client.getResponseValue(VoiceBiometricsClient.errorcode));
         assertNotNull(transactionId);
 
-        sendAudioCheckRequest(transactionId, "dave2d.wav");
-        sendAudioCheckRequest(transactionId, "dave3d.wav");
-        sendAudioCheckRequest(transactionId, "dave4d.wav");
-        sendAudioCheckRequest(transactionId, "dave5d.wav");
-        sendAudioCheckRequest(transactionId, "dave6d.wav");
+        sendAudioCheckRequest(transactionId, "test/files/dave2d.wav");
+        sendAudioCheckRequest(transactionId, "test/files/dave3d.wav");
+        sendAudioCheckRequest(transactionId, "test/files/dave4d.wav");
+        sendAudioCheckRequest(transactionId, "test/files/dave5d.wav");
+        sendAudioCheckRequest(transactionId, "test/files/dave6d.wav");
 
         client.sendEnrollUserRequest(transactionId);
         assertEquals("0", client.getResponseValue(VoiceBiometricsClient.errorcode));
@@ -135,23 +154,36 @@ public class VoiceBiometricsClientTests extends TestCase {
 
 
     public void testVerifyDave() throws Exception {
-//        verify("dave", "dave7d.wav", true); // Short. Why did this fail?
-//        verify("dave", "dave8d.wav", true); // two voices
-        verify("dave", "dave9d.wav", true);
-//        verify("dave", "dave10d.wav", true);  // 90400. Short, but we hear no noise.
+//        verify("dave", "test/files/dave7d.wav", true); // Short. Why did this fail?
+//        verify("dave", "test/files/dave8d.wav", true); // two voices
+        verify("dave", "test/files/dave9d.wav", true);
+//        verify("dave", "test/files/dave10d.wav", true);  // 90400. Short, but we hear no noise.
 
-        verify("dave", "ipad1d.wav", false);
-        verify("dave", "ipad2d.wav", false);
-        verify("dave", "ipad3d.wav", false);
-        verify("dave", "ipad4d.wav", false);
-        verify("dave", "ipad5d.wav", false);
-        verify("dave", "ipad6d.wav", false);
-        verify("dave", "ipad7d.wav", false);
-        verify("dave", "ipad8d.wav", false);
-        verify("dave", "ipad9d.wav", false);
-        verify("dave", "ipad10d.wav", false);
+        verify("dave", "test/files/ipad1d.wav", false);
+        verify("dave", "test/files/ipad2d.wav", false);
+        verify("dave", "test/files/ipad3d.wav", false);
+        verify("dave", "test/files/ipad4d.wav", false);
+        verify("dave", "test/files/ipad5d.wav", false);
+        verify("dave", "test/files/ipad6d.wav", false);
+        verify("dave", "test/files/ipad7d.wav", false);
+        verify("dave", "test/files/ipad8d.wav", false);
+        verify("dave", "test/files/ipad9d.wav", false);
+        verify("dave", "test/files/ipad10d.wav", false);
     }
 
+    private static void checkAudioFormatCompatibility(String name, String fileName) throws Exception {
+        client.sendStartVerificationRequest(name);
+        String transactionId = client.getResponseValue(VoiceBiometricsClient.transactionid);
+        assertEquals("0", client.getResponseValue(VoiceBiometricsClient.errorcode));
+        assertNotNull(transactionId);
+
+        client.sendVerifySampleRequest(transactionId, fileName);
+        String score = client.getResponseValue(VoiceBiometricsClient.score);
+        System.out.println(client.getResponseValue(VoiceBiometricsClient.errorcode));
+        String successValue = client.getResponseValue(VoiceBiometricsClient.success);
+
+        client.sendFinishVerifyTransactionRequest(transactionId, successValue, score);
+    }
 
     private static void verify(String name, String file, boolean expected) throws Exception {
         client.sendStartVerificationRequest(name);
@@ -161,14 +193,14 @@ public class VoiceBiometricsClientTests extends TestCase {
         sendVerifySampleRequest(transactionId, file, expected);
     }
 
-    private static void sendAudioCheckRequest(String transactionId, String file) throws Exception {
-        client.sendAudioCheckRequest(transactionId, "test/files/" + file);
+    private static void sendAudioCheckRequest(String transactionId, String fileName) throws Exception {
+        client.sendAudioCheckRequest(transactionId, fileName);
         assertEquals("0", client.getResponseValue(VoiceBiometricsClient.errorcode));
         System.out.println(client.getResponseValue(VoiceBiometricsClient.usabletime));
     }
 
-    private static void sendVerifySampleRequest(String transactionId, String file, boolean expected) throws Exception {
-        client.sendVerifySampleRequest(transactionId, "test/files/" + file);
+    private static void sendVerifySampleRequest(String transactionId, String fileName, boolean expected) throws Exception {
+        client.sendVerifySampleRequest(transactionId, fileName);
         String score = client.getResponseValue(VoiceBiometricsClient.score);
         System.out.println(score);
         String successValue = client.getResponseValue(VoiceBiometricsClient.success);

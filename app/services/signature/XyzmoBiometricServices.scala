@@ -38,6 +38,7 @@ object XyzmoBiometricServices {
       if (user_delete_v1Result.getErrorInfo.getError eq WebServiceUserAndProfileStub.ErrorStatus.BioUserAlreadyExists) {
       }
     }
+    println("User_Delete_v1: " + user_delete_v1Result.getBaseResult.getValue + "... " + user_delete_v1Result.getErrorInfo.getErrorMsg)
   }
 
   def addUser(userId: String, userName: String) {

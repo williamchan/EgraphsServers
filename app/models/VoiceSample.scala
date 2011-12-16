@@ -39,7 +39,7 @@ case class VoiceSample(id: Long = 0,
 object VoiceSample extends Saves[VoiceSample] with SavesCreatedUpdated[VoiceSample] {
 
   def getWavUrl(id: Long): String = {
-    "voicesamples/" + id + ""
+    "voicesamples/" + id + ".wav"
   }
 
   //
