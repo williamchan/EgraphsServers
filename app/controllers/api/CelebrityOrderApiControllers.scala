@@ -99,7 +99,7 @@ with DBTransaction {
       val sdc = XyzmoBiometricServices.getSignatureDataContainerFromJSON(signatureToVerify).getGetSignatureDataContainerFromJSONResult
       val verifyUserResponse = XyzmoBiometricServices.verifyUser(userId = celebrity.getXyzmoUID(), sdc)
       val verifyResult = verifyUserResponse.getOkInfo.getVerifyResult
-      println("Signature verification result for egraph " + egraph.id.toString + ": " + verifyResult.toString)
+      println("Signature verification result for egraph " + egraph.id.toString + ": " + verifyResult.toString + " " + verifyUserResponse.getOkInfo.getScore.toString + "%")
       verifyResult == WebServiceBiometricPartStub.VerifyResultEnum.VerifyMatch
     }
 
