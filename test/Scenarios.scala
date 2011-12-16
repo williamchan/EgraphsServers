@@ -3,7 +3,9 @@ import controllers.CelebrityProductController.EgraphPurchaseHandler
 import db.Schema
 import java.io.File
 import libs.{Utils, Blobs}
-import models._
+import models.{Customer, Product, Account, Celebrity}
+import org.apache.commons.mail.SimpleEmail
+import play.libs.Mail
 import play.mvc.results.Redirect
 import scenario.{Scenario, DeclaresScenarios}
 import Blobs.Conversions._
@@ -20,6 +22,27 @@ class Scenarios extends DeclaresScenarios {
   val productPageCategory = "Product Page"
   val orderConfirmationPageCategory = "Order Confirmation Page"
   val egraphPageCategory = "Egraph Page"
+
+  toScenarios add Scenario(
+    "Send an email to erem@egraphs.com",
+
+    apiCategory,
+
+    """Sends an email to erem@egraphs.com using the configured SMTP server""",
+
+    {() =>
+      val email = new SimpleEmail();
+
+      email.setMailSession(Mail.getSession)
+      email.setFrom("ehboto@gmail.com");
+      email.setSubject("Hi");
+      email.setMsg("This is a test mail ... :-)");
+      email.addTo("erem@egraphs.com", "Erem Boto");
+
+      libs.Mail.send(email)
+    }
+
+  )
 
   toScenarios add Scenario(
     "Will Chan is a celebrity",

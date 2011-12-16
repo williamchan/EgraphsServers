@@ -6,7 +6,6 @@ import libs.Utils
 import play.data.validation._
 import models.{Customer, Account, Celebrity, Product}
 import org.apache.commons.mail.SimpleEmail
-import play.libs.Mail
 
 /**
  * Serves pages relating to a particular product of a celebrity.
@@ -128,7 +127,7 @@ object CelebrityProductController extends Controller
         buyer, recipient, celebrity, product, chargedOrder
       ).toString().trim())
       
-      Mail.send(email)
+      libs.Mail.send(email)
 
       // Redirect to the order page, with orderId in flash scope
       flash.put("orderId", chargedOrder.id)

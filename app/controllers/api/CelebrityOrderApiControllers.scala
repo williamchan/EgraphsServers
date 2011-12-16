@@ -4,7 +4,7 @@ import play.mvc.Controller
 import sjson.json.Serializer
 import controllers.{DBTransaction, RequiresCelebrityOrderId, RequiresCelebrityId, RequiresAuthenticatedAccount}
 import org.apache.commons.mail.SimpleEmail
-import play.libs.{Mail, Codec}
+import play.libs.Codec
 import models._
 import services.voice.{VoiceBiometricsClient, VBGBiometricServices}
 import services.signature.XyzmoBiometricServices
@@ -74,7 +74,7 @@ with DBTransaction {
         ).toString().trim()
       )
 
-      Mail.send(email)
+      libs.Mail.send(email)
     }
 
     private def verifyBiometrics(egraph: Egraph): Boolean = {
