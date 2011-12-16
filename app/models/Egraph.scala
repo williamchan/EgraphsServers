@@ -7,6 +7,7 @@ import javax.imageio.ImageIO
 import libs.{ImageUtil, Blobs, Utils, Time}
 import java.awt.Image
 import play.Play
+import java.awt.image.BufferedImage
 
 abstract sealed class EgraphState(val value: String)
 
@@ -109,7 +110,7 @@ case class Egraph(
 
       // Before removing this line, realize that without the line the image method will fail
       ImageAsset(
-        createMasterImage(),
+        createMasterImage(signature, order.product.photo.renderFromMaster),
         blobKeyBase,
         imageName,
         ImageAsset.Png
@@ -127,14 +128,13 @@ case class Egraph(
     private lazy val imageName = "image"
 
     private def createMasterImage(sig: String = this.signature,
-                                  productImage: Image = ImageIO.read(Play.getFile("test/files/kapler.JPG"))):Array[Byte] =
+                                  productImage: BufferedImage):Array[Byte] =
     {
       import ImageUtil.Conversions._
-      
-      val photoImage = ImageIO.read(Play.getFile("test/files/kapler.JPG"))
+
       val signatureImage = ImageUtil.createSignatureImage(sig)
 
-      ImageUtil.createEgraphImage(signatureImage, photoImage, 0, 0).asByteArray(ImageAsset.Png)
+      ImageUtil.createEgraphImage(signatureImage, productImage, 0, 0).asByteArray(ImageAsset.Png)
     }
 
   }

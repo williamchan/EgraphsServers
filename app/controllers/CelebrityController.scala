@@ -16,11 +16,7 @@ object CelebrityController extends Controller
 {
   /** Controller for a celebrity's home page. */
   def index = {
-    val profilePhotoUrl = celebrity.profilePhoto
-     .get
-     .resized(200, 200)
-     .getSaved(AccessPolicy.Public)
-     .url
+    val profilePhotoUrl = celebrity.profilePhoto.resizedWidth(200).getSaved(AccessPolicy.Public).url
 
     views.Application.html.celebrity(celebrity, profilePhotoUrl, celebrity.products())
   }

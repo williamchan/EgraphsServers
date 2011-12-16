@@ -3,6 +3,8 @@ package utils
 import models.{Order, Celebrity, Account, Customer, Product}
 import com.stripe.model.Token
 import libs.Time
+import java.io.File
+import play.Play
 
 /**
  * Renders saved copies of domain objects that satisfy all relational integrity
@@ -62,5 +64,22 @@ object TestData {
     val token = Token.create(defaultChargeParams)
 
     token
+  }
+
+  object Longoria {
+    require(fileBase.exists(), "Evan Longoria test photos were not found at " + fileBase.getAbsoluteFile)
+
+    val profilePhoto = longoFile("profile.jpg")
+    val productPhotos = Array(longoFile("product-1.jpg"), longoFile("product-2.jpg"), longoFile("product-3.jpg"))
+
+    private val fileBase = Play.getFile("test/files/longoria")
+
+    private def longoFile(filename: String): File = {
+      new File(fileBase, filename)
+    }
+  }
+
+  object Kapler {
+    val productPhotos = Array(Play.getFile("test/files/kapler/product-1.jpg"))
   }
 }

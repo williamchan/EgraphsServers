@@ -24,7 +24,7 @@
 }
 
 @profilePhoto_100x100 = {
-  @celebrity.profilePhoto.get.resized(100, 100).getSaved(Public).url
+  @celebrity.profilePhoto.resizedWidth(100).getSaved(Public).url
 }
 
 @price = {@product.price.formatSimply}
@@ -98,7 +98,7 @@
       </div>
     </div>
     <div class="product-image">
-      <img src="http://placehold.it/940x500" alt="@product.name Thumbnail">
+      <img src="@product.photo.resizedWidth(940).getSaved(Public).url" alt="@product.name Thumbnail">
     </div>
     <div class="form row">
       <div class="span4 form-description-column">

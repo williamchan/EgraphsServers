@@ -7,11 +7,12 @@ import models.{Customer, Product, Account, Celebrity}
 import org.apache.commons.mail.SimpleEmail
 import play.libs.Mail
 import play.mvc.results.Redirect
+import play.Play
 import scenario.{Scenario, DeclaresScenarios}
 import Blobs.Conversions._
 import utils.{TestConstants, TestData}
 import org.squeryl.PrimitiveTypeMode._
-
+import TestData.Longoria
 
 /**
  * All scenarios supported by the API.

@@ -48,26 +48,24 @@ with DBTransaction {
       firstName = Some(firstName),
       lastName = Some(lastName),
       publicName = Some("Alpha " + firstName),
-      description = Some("Today's Sriracha is tomorrow's salsa")
+      description = Some("Today's Sriracha is tomorrow's salsa.")
     ).save()
 
     Account(email = email,
       celebrityId = Some(celebrity.id)
     ).withPassword("herp").right.get.save()
 
-    celebrity.saveWithProfilePhoto(Play.getFile("test/files/E.jpg"))
-
     celebrity.newProduct.copy(
       priceInCurrency = 50,
       name = firstName + "'s Alpha Product A",
       description = "Tyson 15"
-    ).save()
+    ).save().withPhoto(Play.getFile("test/files/longoria/product-2.jpg")).save()
 
     celebrity.newProduct.copy(
       priceInCurrency = 100,
       name = firstName + "'s Alpha Product B",
       description = "Help me... help YOU..."
-    ).save()
+    ).save().withPhoto(Play.getFile("test/files/kapler/product-1.jpg")).save()
 
   }
 

@@ -1,12 +1,16 @@
 package models
 
-import libs.Time
 import java.sql.Timestamp
 import org.squeryl.Query
 import db.{FilterOneTable, Schema, Saves, KeyedCaseClass}
 import play.templates.JavaExtensions
-import org.joda.money.{CurrencyUnit, Money}
+import org.joda.money.Money
 import libs.Finance.TypeConversions._
+import models.Product.ProductWithPhoto
+import libs.{Blobs, Time}
+import Blobs.Conversions._
+import play.Play
+import java.awt.image.BufferedImage
 
 /**
  * An item on sale by a Celebrity. In the case of the base Egraph, it represents a signature service
@@ -18,6 +22,7 @@ case class Product(
   priceInCurrency: BigDecimal = 0,
   name: String = "",
   description: String = "",
+  photoKey: Option[String] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated {
@@ -33,6 +38,29 @@ case class Product(
   //
   def save(): Product = {
     Product.save(this)
+  }
+
+  def withPhoto(imageData:Array[Byte]): ProductWithPhoto = {
+    val newPhotoKey = Time.toBlobstoreFormat(Time.now)
+
+    ProductWithPhoto(
+      product=this.copy(photoKey=Some(newPhotoKey)),
+      photo=ImageAsset(imageData, keyBase, newPhotoKey, ImageAsset.Png)
+    )
+  }
+
+  def photo: ImageAsset = {
+    photoKey.flatMap(theKey => Some(ImageAsset(keyBase, theKey, ImageAsset.Png))) match {
+      case Some(imageAsset) =>
+        imageAsset
+
+      case None =>
+        Product.defaultPhoto
+    }
+  }
+
+  def photoImage: BufferedImage = {
+    photo.renderFromMaster
   }
 
   def price: Money = {
@@ -58,10 +86,26 @@ case class Product(
   override def unapplied = {
     Product.unapply(this)
   }
+
+  //
+  // Private members
+  //
+  private def keyBase = {
+    require(id > 0, "Can not determine blobstore key when no id exists yet for this entity in the relational database")
+
+    "product/" + id
+  }
 }
 
 object Product extends Saves[Product] with SavesCreatedUpdated[Product] {
   import org.squeryl.PrimitiveTypeMode._
+
+  val defaultPhoto = ImageAsset(
+    Play.getFile("test/files/longoria/product-2.jpg"),
+    keyBase="defaults/product",
+    name="photo",
+    imageType=ImageAsset.Png
+  )
 
   //
   // Public members
@@ -87,6 +131,15 @@ object Product extends Saves[Product] with SavesCreatedUpdated[Product] {
     }
   }
 
+  case class ProductWithPhoto(product: Product, photo: ImageAsset) {
+    def save(): ProductWithPhoto = {
+      val savedPhoto = photo.save(Blobs.AccessPolicy.Public)
+      val savedProduct = product.save()
+
+      ProductWithPhoto(savedProduct, savedPhoto)
+    }
+  }
+
   //
   // Saves[Product] methods
   //
@@ -98,6 +151,7 @@ object Product extends Saves[Product] with SavesCreatedUpdated[Product] {
       theOld.priceInCurrency := theNew.priceInCurrency,
       theOld.name := theNew.name,
       theOld.urlSlug := theNew.urlSlug,
+      theOld.photoKey := theNew.photoKey,
       theOld.description := theNew.description,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated

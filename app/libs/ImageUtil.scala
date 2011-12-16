@@ -4,9 +4,10 @@ import java.awt.image.BufferedImage
 import util.parsing.json.JSON
 import java.awt.geom.Ellipse2D
 import javax.imageio.ImageIO
-import java.awt.{Transparency, Graphics, RenderingHints, Graphics2D}
 import models.ImageAsset
+
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, File}
+import java.awt.{Transparency, Graphics, RenderingHints, Graphics2D, Color}
 
 object ImageUtil {
 
@@ -38,13 +39,24 @@ object ImageUtil {
     g.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE)
     g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC)
 
+    // Draw the shadow
+    g.setColor(java.awt.Color.black)
+    for (i <- 0 until originalXsByStroke.size) {
+      val xs = originalXsByStroke(i).map( penX => penX + 2 ).toArray
+      val ys = originalYsByStroke(i).map( penY => penY - 3 ).toArray
+      drawStroke(g, xs, ys)
+    }
+
+    // Draw the pen
+    g.setColor(java.awt.Color.white)
     for (i <- 0 until originalXsByStroke.size) {
       val xs = originalXsByStroke(i).toArray
       val ys = originalYsByStroke(i).toArray
       drawStroke(g, xs, ys)
     }
 
-    image
+
+    getScaledInstance(image, (image.getWidth / 1.8).toInt, (image.getHeight / 1.8).toInt)
   }
 
   /**

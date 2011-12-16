@@ -5,6 +5,8 @@ import play.test.UnitFlatSpec
 import java.io._
 import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
+import utils.TestData
+import play.Play
 
 class ImageUtilTests extends UnitFlatSpec
 with ShouldMatchers {
@@ -25,7 +27,8 @@ with ShouldMatchers {
     }
   }
 
-  it should "test createSignatureImage from raw capture JSON" in {
+  // TODO: Erem commented out this test because it didn't seem to be testing anything. We should prob just delete it.
+  /*it should "test createSignatureImage from raw capture JSON" in {
     val image: BufferedImage = ImageUtil.createSignatureImage(rawCapture)
 
     val imageFile: File = new File("test/files/signature.png")
@@ -44,15 +47,15 @@ with ShouldMatchers {
     //    val scaledImage = Scalr.resize(image, width, height, Scalr.OP_ANTIALIAS)
     //    val scaledImageFile: File = new File("test/files/signature_scaled.png")
     //    ImageIO.write(scaledImage, "PNG", scaledImageFile)
-  }
+  }*/
 
-  it should "overlay Andrew's signature on Kapler's JPG" in {
-    val photoImage: BufferedImage = ImageIO.read(new File("test/files/kapler.JPG"))
+  it should "overlay Andrew's signature on a JPG" in {
+    val photoImage: BufferedImage = ImageIO.read(Play.getFile("test/files/longoria/product-2.jpg"))
     val signatureImage: BufferedImage = ImageUtil.createSignatureImage(rawCapture)
     val egraphImage: BufferedImage = ImageUtil.createEgraphImage(signatureImage, photoImage, 0, 0)
     val combinedImageFile = new File("test/files/egraph.jpg")
     ImageIO.write(egraphImage, "JPG", combinedImageFile)
-    combinedImageFile.length should be(947830)
+    combinedImageFile.length should be(432315)
   }
 
   it should "overlay PNG images correctly" in {

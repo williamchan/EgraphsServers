@@ -7,6 +7,7 @@ import org.squeryl.Query
 import play.templates.JavaExtensions
 import db.{FilterOneTable, KeyedCaseClass, Schema, Saves}
 import libs.{Serialization, Time}
+import libs.Blobs.Conversions._
 
 /**
  * Persistent entity representing the Celebrities who provide products on
@@ -84,10 +85,10 @@ case class Celebrity(id: Long = 0,
    * Returns the profile photo image asset for this celebrity if one was ever stored using
    * `saveWithProfilePhoto`.
    */
-  def profilePhoto: Option[ImageAsset] = {
-    for (profilePhotoAssetName <- profilePhotoAssetNameOption) yield {
-      ImageAsset(keyBase, profilePhotoAssetName, ImageAsset.Png)
-    }
+  def profilePhoto: ImageAsset = {
+    profilePhotoAssetNameOption
+      .flatMap( assetName => Some(ImageAsset(keyBase, assetName, ImageAsset.Png)) )
+      .getOrElse(Celebrity.defaultProfile)
   }
 
   /**Creates a new Product associated with the celebrity. The product is not yet persisted. */
@@ -142,6 +143,13 @@ case class Celebrity(id: Long = 0,
 }
 
 object Celebrity extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {
+  val defaultProfile = ImageAsset(
+    play.Play.getFile("test/files/longoria/profile.jpg"),
+    keyBase="defaults/celebrity",
+    name="profilePhoto",
+    imageType=ImageAsset.Png
+  )
+
   //
   // Public Methods
   //

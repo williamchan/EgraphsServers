@@ -60,7 +60,7 @@
   @_product(product: Product, productRow: List[Product]) = {
     <div class="span6 offset1 @_offsetClass">
       <a class="product preview-link" href="/@celebrity.urlSlug/@product.urlSlug">
-        <img src="http://placehold.it/330x230" alt="@product.name Thumbnail">
+        <img src="@product.photo.resizedWidth(330).getSaved(Public).url" alt="@product.name Thumbnail">
         <div class="description">
           @product.name <span class="label success price-label">@product.price.formatSimply</span>
         </div>

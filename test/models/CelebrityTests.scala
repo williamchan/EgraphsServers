@@ -62,9 +62,9 @@ class CelebrityTests extends UnitFlatSpec
     apiMap("updated") should be (Time.toApiFormat(celeb.updated))
   }
 
-  it should "start with no profile photo" in {
+  it should "start with the default profile photo" in {
     Celebrity().profilePhotoUpdated should be (None)
-    Celebrity().profilePhoto should be (None)
+    Celebrity().profilePhoto should be (Celebrity.defaultProfile)
   }
 
   it should "throw an exception if you save profile photo when id is 0" in {
@@ -84,7 +84,7 @@ class CelebrityTests extends UnitFlatSpec
     savedCeleb.profilePhotoUpdated.get.toLong should be (Time.toBlobstoreFormat(Time.now).toLong plusOrMinus 10000)
     savedCeleb.profilePhoto should not be (None)
 
-    val profilePhoto = savedCeleb.profilePhoto.get
+    val profilePhoto = savedCeleb.profilePhoto
     profilePhoto.renderFromMaster.asByteArray(ImageAsset.Png).length should be (imageAsset.renderFromMaster.asByteArray(ImageAsset.Png).length)
   }
 

@@ -4,6 +4,7 @@ import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.BeforeAndAfterEach
 import play.test.UnitFlatSpec
 import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationAfter, CreatedUpdatedEntityTests, SavingEntityTests}
+import libs.Time
 
 class ProductTests extends UnitFlatSpec
   with ShouldMatchers
@@ -32,6 +33,7 @@ class ProductTests extends UnitFlatSpec
     toTransform.copy(
       priceInCurrency = 1000,
       name = "NBA Championships 2010",
+      photoKey = Some(Time.toBlobstoreFormat(Time.now)),
       description = "Shaq goes for the final dunk in the championship"
     )
   }

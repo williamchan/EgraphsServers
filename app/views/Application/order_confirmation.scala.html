@@ -8,6 +8,7 @@
 @content_base(title="Order #" + order.id +"- eGraphs", body=body, head=head)
 
 @import libs.Finance.TypeConversions._
+@import libs.Blobs.AccessPolicy.Public
 
 @selfPurchase = @{ buyer == recipient }
 
@@ -81,7 +82,7 @@
           </tbody>
         </table>
       </div>
-      <img alt="@product.name" class="span7" src="http://placehold.it/700x600" />
+      <img alt="@product.name" class="span7 product" src="@product.photo.resizedWidth(700).getSaved(Public).url" />
     </div>
   </div>
 }

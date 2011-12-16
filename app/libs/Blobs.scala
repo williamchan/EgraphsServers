@@ -225,7 +225,7 @@ object Blobs {
 
     implicit def fileToByteArray(file: File): Array[Byte] = {
       val bytes = new Array[Byte](file.length.toInt)
-      new FileInputStream(file).read(bytes)
+      new BufferedInputStream(new FileInputStream(file)).read(bytes)
 
       bytes
     }
