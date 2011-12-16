@@ -25,8 +25,8 @@ class VBGRequest {
     var xml: String = buildXMLRequest
     // Make sure to encode the output stream for any weird characters
     xml = URLEncoder.encode(xml, "UTF-8")
-//    val httpConn: HttpURLConnection = VBGBiometricServices._url.openConnection.asInstanceOf[HttpURLConnection]
-    val httpConn: HttpsURLConnection = VBGHack.getVBGHack
+    val httpConn: HttpURLConnection = VBGBiometricServices._url.openConnection.asInstanceOf[HttpURLConnection]
+    //val httpConn: HttpsURLConnection = VBGHack.getVBGHack
     httpConn.setRequestMethod("POST")
     httpConn.setRequestProperty("Content-Length", String.valueOf(xml.length))
     httpConn.setDoInput(true)
@@ -102,7 +102,7 @@ class VBGRequest {
 
 
 object VBGBiometricServices {
-  val _url: URL = new URL("https://service03.voicebiogroup.com/service/xmlapi")
+  val _url: URL = new URL("http://service03.voicebiogroup.com/service/xmlapi")
   private val _myClientName: String = "celebritydev"
   private val _myClientKey: String = "62ed7855e0af30d0af534ce195845c7f"
   private val _StartEnrollment: String = "StartEnrollment"

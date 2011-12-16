@@ -70,7 +70,10 @@ with DBTransaction {
   }
 
   def script() {
+    import services.voice.VBGBiometricServices
 
+    val startEnrollmentRequest = VBGBiometricServices.sendStartEnrollmentRequest("pls", false)
+    println(startEnrollmentRequest.getResponseValue(VBGBiometricServices._errorCode))
     ""
 
     //    val path: File = new File("test/files")
