@@ -31,7 +31,7 @@ object CelebrityProductController extends Controller
     views.Application.html.product(celebrity, product, errorFields, fieldDefaults)
   }
 
-  val alphaEmailMatcher = ".*@(egraphs|tampabayrays).com"
+  val alphaEmailMatcher = ".*@(egraphs|tampabayrays).com|zachapter@gmail.com"
 
   def buy(recipientName: String,
           recipientEmail: String,
