@@ -10,13 +10,13 @@ import play.libs.Codec
 import libs.Blobs
 import Blobs.Conversions._
 import play.Play
+import javax.net.ssl._
 
 class VBGRequest {
   private var requestType: String = ""
   private var responseType: String = ""
   private val requestParams: Hashtable[String, String] = new Hashtable[String, String]
   private val responseValues: Hashtable[String, String] = new Hashtable[String, String]
-
 
   def sendRequest(): VBGRequest = {
     // Sends request using internal parameters and sets internal return values
@@ -25,7 +25,8 @@ class VBGRequest {
     var xml: String = buildXMLRequest
     // Make sure to encode the output stream for any weird characters
     xml = URLEncoder.encode(xml, "UTF-8")
-    val httpConn: HttpURLConnection = VBGBiometricServices._url.openConnection.asInstanceOf[HttpURLConnection]
+//    val httpConn: HttpURLConnection = VBGBiometricServices._url.openConnection.asInstanceOf[HttpURLConnection]
+    val httpConn: HttpsURLConnection = VBGHack.getVBGHack
     httpConn.setRequestMethod("POST")
     httpConn.setRequestProperty("Content-Length", String.valueOf(xml.length))
     httpConn.setDoInput(true)
@@ -46,6 +47,7 @@ class VBGRequest {
       sb.append(s + "\n")
     }
     parseXMLResponse(sb.toString())
+//    httpConn.disconnect()
     this
   }
 
