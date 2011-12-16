@@ -1,6 +1,7 @@
 @(order: models.Order, egraph: models.Egraph, imageUrl: String, product: models.Product, celebrity: models.Celebrity, recipient: models.Customer)
 
 @import libs.Time
+@import libs.Blobs.AccessPolicy.Public
 
 @content_base(title="Egraph #"+order.id+" - eGraphs", body=body, head=head)
 
@@ -11,7 +12,9 @@
 @body = {
   <div class="egraph-content">
     <div class="row">
-      <img src="@imageUrl" alt="Egraph #@order.id" class="span8">
+      <a href="@egraph.assets.image.getSaved(Public).url">
+        <img src="@imageUrl" alt="Egraph #@order.id" class="span8">
+      </a>
       <div class="span8">
         <h1>eGraph #@order.id<div class="help-block">Signed @Time.toApiFormat(egraph.updated)</div></h1>
         <h3>Personally autographed by @celebrity.publicName for @recipient.name</h3>

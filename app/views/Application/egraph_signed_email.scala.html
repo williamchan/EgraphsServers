@@ -2,16 +2,27 @@
   celebrity:models.Celebrity,
   product: models.Product,
   order: models.Order,
-  egraph: models.Egraph)
+  egraph: models.Egraph,
+  egraphLink: String)
 
-Dear @recipient.name,
+<html>
+  <body>
+    <h2>Dear @recipient.name,</h2>
+    <p>
+      Thanks for participating in my recent eGraphs signing! I just finished reading the
+      message you sent and signed you a copy of my photo "@product.name".
+    </p>
+    <p>
+      Hope you like it!
+    </p>
 
-Thanks for participating in my recent eGraphs signing! I just finished reading the
-message you sent and signed you a copy of my photo "@product.name".
+    <p>
+      Sincerely,
+    </p>
+    <p>
+    @celebrity.publicName
+    </p>
 
-Hope you like it!
-
-Sincerely,
-@celebrity.publicName
-
-<h2><a href="#">Click here for your eGraph</a></h2>
+    <h2><a href="@egraphLink">Click here for your eGraph</a></h2>
+  </body>
+</html>

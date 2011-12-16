@@ -1,8 +1,8 @@
 package controllers
 
 import play.mvc.Controller
-import models.{FulfilledOrder, Order}
-import libs.Blobs
+import models.{Egraph, FulfilledOrder, Order}
+import libs.{Utils, Blobs}
 
 
 object EgraphController extends Controller
@@ -29,5 +29,9 @@ object EgraphController extends Controller
       case None =>
         NotFound("No eGraph exists with the provided identifier.")
     }
+  }
+
+  def lookup(egraph: Egraph) = {
+    reverse(this.egraph(egraph.id.toString))
   }
 }

@@ -2,14 +2,14 @@ package controllers.api
 
 import play.mvc.Controller
 import sjson.json.Serializer
-import controllers.{DBTransaction, RequiresCelebrityOrderId, RequiresCelebrityId, RequiresAuthenticatedAccount}
-import org.apache.commons.mail.SimpleEmail
 import play.libs.Codec
 import models._
 import services.voice.{VoiceBiometricsClient, VBGBiometricServices}
 import services.signature.XyzmoBiometricServices
 import com.xyzmo.wwww.biometricserver.WebServiceBiometricPartStub
 import models.{Verified, Celebrity, Order, Egraph}
+import controllers._
+import org.apache.commons.mail.{HtmlEmail, SimpleEmail}
 
 /**
  * Handles requests for queries against a celebrity for his orders.
@@ -56,8 +56,10 @@ with DBTransaction {
     }
 
     private def sendEgraphSignedMail(egraph: Egraph) = {
-      val email = new SimpleEmail()
+      val email = new HtmlEmail()
       val recipient = order.recipient
+      val linkActionDefinition = EgraphController.lookup(egraph)
+      linkActionDefinition.absolute()
 
       email.setFrom(celebrity.urlSlug.get + "@egraphs.com", celebrity.publicName.get)
       email.addTo(recipient.account.email, recipient.name)
@@ -69,7 +71,8 @@ with DBTransaction {
           celebrity,
           order.product,
           order,
-          egraph
+          egraph,
+          linkActionDefinition.url
         ).toString().trim()
       )
 
