@@ -7,7 +7,7 @@ import libs.Blobs
 import Blobs.Conversions._
 import services.signature.XyzmoBiometricServices
 import db.Schema
-import services.voice.VBGBiometricServices
+import services.voice.{VBGRequest, VBGBiometricServices}
 
 @On("0 0 0 * * ?") // cron expression: seconds minutes hours day-of-month month day-of-week (year optional)
 class EnrollmentBatchJob extends Job {
@@ -56,7 +56,7 @@ object EnrollmentBatchJob {
 
     // TODO(wchan): There has to be a better way to do this... contact Xyzmo about user management.
     val xyzmoUID: String = celebrity.getXyzmoUID()
-//    XyzmoBiometricServices.deleteUser(userId = xyzmoUID)
+    //    XyzmoBiometricServices.deleteUser(userId = xyzmoUID)
     XyzmoBiometricServices.addUser(userId = xyzmoUID, userName = celebrity.publicName.get)
     XyzmoBiometricServices.addProfile(userId = xyzmoUID, profileName = xyzmoUID)
     val signatureDataContainers = for (signatureSample <- signatureSamples) yield Blobs.get(SignatureSample.getXmlUrl(signatureSample.id)).get.asString
@@ -67,8 +67,20 @@ object EnrollmentBatchJob {
     isSuccessfulSignatureEnrollment
   }
 
+  private def sendStartEnrollmentRequest(celebrity: Celebrity): VBGRequest = {
+    val startEnrollmentRequest = VBGBiometricServices.sendStartEnrollmentRequest(celebrity.id.toString, false)
+    if (startEnrollmentRequest.getResponseValue(VBGBiometricServices._errorCode) == "0") {
+      // First-time enrollment
+      startEnrollmentRequest
+    }
+    else {
+      // Re-enrollment
+      VBGBiometricServices.sendStartEnrollmentRequest(celebrity.id.toString, true)
+    }
+  }
+
   def attemptVoiceEnrollment(celebrity: Celebrity, voiceSamples: scala.List[VoiceSample]): Boolean = {
-    val startEnrollmentRequest = VBGBiometricServices.sendStartEnrollmentRequest(celebrity.id.toString, true)
+    val startEnrollmentRequest = sendStartEnrollmentRequest(celebrity)
     val transactionId = startEnrollmentRequest.getResponseValue(VBGBiometricServices._transactionId)
     //    assertEquals("0", client.getResponseValue(VoiceBiometricsClient.errorcode))
     //    assertNotNull(transactionId)

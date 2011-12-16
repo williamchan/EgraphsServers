@@ -24,11 +24,6 @@ case class EnrollmentBatch(id: Long = 0,
     EnrollmentBatch.save(this)
   }
 
-  def attemptEnrollment(): EnrollmentBatch = {
-    // if isBatchComplete, call both xyzmo and vbg
-    this
-  }
-
   /**
    * Creates an associated EnrollmentSample. Also updates this.isBatchComplete if the new
    * EnrollmentSample completes this batch (see batchSize).

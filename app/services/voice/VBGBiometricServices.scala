@@ -7,7 +7,7 @@ import java.util.Hashtable
 import java.net.{HttpURLConnection, URLEncoder, URL}
 import java.io._
 import play.libs.Codec
-import libs.{SampleRateConverter, Blobs}
+import libs.Blobs
 import Blobs.Conversions._
 import play.Play
 
@@ -55,8 +55,8 @@ class VBGRequest {
       throw new Exception
     }
     xml.append("<" + requestType + ">\n")
-    for (field <- List(requestParams.keySet())) {
-      xml.append("<" + field + ">" + requestParams.get(field) + "</" + field + ">\n")
+    for (field <- requestParams.keySet().toArray) {
+      xml.append("<" + field.toString + ">" + requestParams.get(field.toString) + "</" + field.toString + ">\n")
     }
     xml.append("</" + requestType + ">\n")
     xml.toString()
@@ -116,14 +116,14 @@ object VBGBiometricServices {
   // VBG requires that these Strings be lower-cased.
   private val _clientKey: String = "clientkey"
   private val _clientName: String = "clientname"
-  private val _errorCode: String = "errorcode"
+  val _errorCode: String = "errorcode"
   private val _prompt: String = "prompt"
   private val _rebuildTemplate: String = "rebuildtemplate"
-  private val _score: String = "score"
+  val _score: String = "score"
   val _success: String = "success"
   val _transactionId: String = "transactionid"
   private val _voiceSample: String = "voicesample"
-  private val _usableTime: String = "usabletime"
+  val _usableTime: String = "usabletime"
   private val _userId: String = "userid"
 
   def sendStartEnrollmentRequest(userId: String, rebuildTemplate: Boolean): VBGRequest = {
@@ -202,8 +202,8 @@ object VBGBiometricServices {
   // ========================== PRIVATE HELPERS
 
   def getDownSampledBase64(wavBinary: Array[Byte]): String = {
-//    val wavBinary_downSampled: Array[Byte] = SampleRateConverter.convert(8000f, wavBinary)
-//    Codec.encodeBASE64(wavBinary_downSampled)
+    //    val wavBinary_downSampled: Array[Byte] = SampleRateConverter.convert(8000f, wavBinary)
+    //    Codec.encodeBASE64(wavBinary_downSampled)
 
     Codec.encodeBASE64(wavBinary)
   }
