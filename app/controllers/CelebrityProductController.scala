@@ -31,7 +31,7 @@ object CelebrityProductController extends Controller
     views.Application.html.product(celebrity, product, errorFields, fieldDefaults)
   }
 
-  val alphaEmailMatcher = ".*@(egraphs|tampabayrays).com|zachapter@gmail.com"
+  val alphaEmailMatcher = ".*@(egraphs|raysbaseball).com|zachapter@gmail.com"
 
   def buy(recipientName: String,
           recipientEmail: String,
@@ -50,13 +50,13 @@ object CelebrityProductController extends Controller
 
     // Make sure these are valid email addresses for the alpha test
     Validation.`match`(
-      "Recipient e-mail address at egraphs.com or tampabayrays.com",
+      "Recipient e-mail address at egraphs.com or raysbaseball.com",
       recipientEmail.toLowerCase,
       alphaEmailMatcher
     )
 
     Validation.`match`(
-      "Buyer e-mail address at egraphs.com or tampabayrays.com",
+      "Buyer e-mail address at egraphs.com or raysbaseball.com",
       buyerEmail.toLowerCase,
       alphaEmailMatcher
     )
