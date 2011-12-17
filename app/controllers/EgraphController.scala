@@ -31,7 +31,7 @@ object EgraphController extends Controller
     }
   }
 
-  def lookup(egraph: Egraph) = {
-    reverse(this.egraph(egraph.id.toString))
+  def lookup(order: Order) = {
+    reverse(this.egraph(order.id.toString))
   }
 }

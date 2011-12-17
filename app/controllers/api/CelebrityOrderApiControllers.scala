@@ -58,7 +58,7 @@ with DBTransaction {
     private def sendEgraphSignedMail(egraph: Egraph) = {
       val email = new HtmlEmail()
       val recipient = order.recipient
-      val linkActionDefinition = EgraphController.lookup(egraph)
+      val linkActionDefinition = EgraphController.lookup(order)
       linkActionDefinition.absolute()
 
       email.setFrom(celebrity.urlSlug.get + "@egraphs.com", celebrity.publicName.get)
