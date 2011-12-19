@@ -45,7 +45,7 @@ with DBTransaction {
 
       val egraphId = egraph.id
 
-      if (skipBiometrics || verifyBiometrics(egraph)) {
+      if (verifyBiometrics(egraph, skipBiometrics)) {
         // Send e-mail that the eGraph is complete. Move this to post-authentication
         // when possible.
         sendEgraphSignedMail(egraph)
@@ -79,7 +79,12 @@ with DBTransaction {
       libs.Mail.send(email)
     }
 
-    private def verifyBiometrics(egraph: Egraph): Boolean = {
+    private def verifyBiometrics(egraph: Egraph, skipBiometrics: Boolean): Boolean = {
+      if (skipBiometrics) {
+        egraph.withState(Verified).saveWithoutAssets()
+        return true
+      }
+
       val isVoiceVerified = verifyVoice(egraph)
       val isSignatureVerified = verifySignature(egraph)
 

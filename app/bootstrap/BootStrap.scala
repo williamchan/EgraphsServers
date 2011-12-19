@@ -7,6 +7,7 @@ import db.DBSession
 import io.Source
 import java.io.{File, PrintWriter}
 import libs.{Payment, Utils, TempFile, Blobs}
+import play.Play
 
 @OnApplicationStart
 class BootStrap extends Job {
@@ -23,10 +24,9 @@ class BootStrap extends Job {
     Blobs.init()
 
     // Some additional test-mode setup
-    // TODO: make this only happen in test mode once the alpha is over
-    // if (Play.id == "test") {
-    TestModeBootstrap.run()
-    // }
+    if (Play.id == "test") {
+      TestModeBootstrap.run()
+    }
   }
 }
 
