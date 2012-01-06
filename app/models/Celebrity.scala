@@ -20,7 +20,7 @@ case class Celebrity(id: Long = 0,
                      lastName: Option[String] = None,
                      publicName: Option[String] = None,
                      profilePhotoUpdated: Option[String] = None,
-                     enrollmentStatus: String = NotEnrolled.value, // TODO(wchan): make an enum {NotEnrolled, Enrolled, PendingEnrollment}
+                     enrollmentStatus: String = NotEnrolled.value,
                      created: Timestamp = Time.defaultTimestamp,
                      updated: Timestamp = Time.defaultTimestamp)
   extends KeyedCaseClass[Long]

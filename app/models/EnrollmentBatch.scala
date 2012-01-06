@@ -49,8 +49,7 @@ case class EnrollmentBatch(id: Long = 0,
     }
   }
 
-  // TODO(wchan): How to restrict this to just this class and to EnrollmentBatchTests?
-  def getNumEnrollmentSamples(): Int = {
+  private[models] def getNumEnrollmentSamples(): Int = {
     from(Schema.enrollmentSamples)(enrollmentSample =>
       where(enrollmentSample.enrollmentBatchId === id)
         select (enrollmentSample)

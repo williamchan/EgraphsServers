@@ -78,8 +78,8 @@ object ImageUtil {
    * third segments of the last cubic Bezier curve that completes the stroke.
    */
   private def drawStroke(g: Graphics2D, xs: Array[Double], ys: Array[Double], ts: Array[Double] = null) {
-    // TODO(wchan): assert that sizes are the same
-    val n = math.min(xs.size, ys.size)
+    require(xs.size == ys.size, "Xs and Ys must be of same length")
+    val n = xs.size
 
     // TODO(wchan): handle these cases
     if (n < 4) return

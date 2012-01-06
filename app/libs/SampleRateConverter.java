@@ -39,7 +39,9 @@ package libs;
 */
 
 import javax.sound.sampled.*;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 
 /**
@@ -109,29 +111,33 @@ public class SampleRateConverter {
      * If true, some messages are dumped to the console
      * during operation.
      */
-    private static boolean DEBUG = true;
+//    private static boolean DEBUG = true;
 
-    public static void main(String[] args)
-            throws UnsupportedAudioFileException, IOException {
-        if (args.length == 1) {
-            if (args[0].equals("-h")) {
-                printUsageAndExit();
-            } else {
-                printUsageAndExit();
-            }
-        } else if (args.length != 3) {
-            printUsageAndExit();
-        }
-        float fTargetSampleRate = Float.parseFloat(args[0]);
-        if (DEBUG) {
-            out("target sample rate: " + fTargetSampleRate);
-        }
-        File sourceFile = new File(args[1]);
-        File targetFile = new File(args[2]);
-        convert(fTargetSampleRate, sourceFile, targetFile);
-    }
+//    public static void main(String[] args)
+//            throws UnsupportedAudioFileException, IOException {
+//        if (args.length == 1) {
+//            if (args[0].equals("-h")) {
+//                printUsageAndExit();
+//            } else {
+//                printUsageAndExit();
+//            }
+//        } else if (args.length != 3) {
+//            printUsageAndExit();
+//        }
+//        float fTargetSampleRate = Float.parseFloat(args[0]);
+//        if (DEBUG) {
+//            out("target sample rate: " + fTargetSampleRate);
+//        }
+//        File sourceFile = new File(args[1]);
+//        File targetFile = new File(args[2]);
+//        convert(fTargetSampleRate, sourceFile, targetFile);
+//    }
 
     public static byte[] convert(float fTargetSampleRate, byte[] sourceBinary) throws UnsupportedAudioFileException, IOException {
+        return convert(fTargetSampleRate, sourceBinary, false);
+    }
+
+    public static byte[] convert(float fTargetSampleRate, byte[] sourceBinary, boolean debug) throws UnsupportedAudioFileException, IOException {
         /* We try to use the same audio file type for the target
         file as the source file. So we first have to find
         out about the source file's properties.
@@ -147,7 +153,7 @@ public class SampleRateConverter {
             System.exit(1);
         }
         AudioFormat sourceFormat = sourceStream.getFormat();
-        if (DEBUG) {
+        if (debug) {
             out("source format: " + sourceFormat);
         }
 
@@ -182,46 +188,29 @@ public class SampleRateConverter {
                 fTargetFrameRate,
                 sourceFormat.isBigEndian());
 
-        if (DEBUG) {
+        if (debug) {
             out("desired target format: " + targetFormat);
         }
 
         /* Now, the conversion takes place.*/
         AudioInputStream targetStream = AudioSystem.getAudioInputStream(targetFormat, sourceStream);
-        if (DEBUG) {
+        if (debug) {
             out("targetStream: " + targetStream);
         }
 
         /* And finally, we are trying to write the converted audio
         data to a new file.
         */
-        int nWrittenBytes = 0;
+        int nWrittenBytes;
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         nWrittenBytes = AudioSystem.write(targetStream, targetFileType, outputStream);
-        if (DEBUG) {
+        if (debug) {
             out("Written bytes: " + nWrittenBytes);
         }
         return outputStream.toByteArray();
     }
 
-    // TODO(wchan): DELETE THIS. Move the test file opening logic to SampleRateConverterTest.
-    public static void convert(float fTargetSampleRate, File sourceFile, File targetFile) throws UnsupportedAudioFileException, IOException {
-        ByteArrayOutputStream bas = new ByteArrayOutputStream();
-        int fdata;
-        FileInputStream fs = new FileInputStream(sourceFile);
-        while (fs.available() > 0) {
-            fdata = fs.read();
-            bas.write(fdata);
-        }
-        fs.close();
-
-        byte[] output = convert(fTargetSampleRate, bas.toByteArray());
-        OutputStream out = new FileOutputStream(targetFile);
-        out.write(output);
-        out.close();
-    }
-
-//    public static void convert(float fTargetSampleRate, File sourceFile, File targetFile) throws UnsupportedAudioFileException, IOException {
+    //    public static void convert(float fTargetSampleRate, File sourceFile, File targetFile) throws UnsupportedAudioFileException, IOException {
 //        /* We try to use the same audio file type for the target
 //        file as the source file. So we first have to find
 //        out about the source file's properties.
@@ -290,15 +279,14 @@ public class SampleRateConverter {
 //            out("Written bytes: " + nWrittenBytes);
 //        }
 //    }
-
-    private static void printUsageAndExit() {
-        out("SampleRateConverter: usage:");
-        out("\tjava SampleRateConverter -h");
-        out("\tjava SampleRateConverter <targetsamplerate> <sourcefile> <targetfile>");
-        System.exit(1);
-    }
-
-
+//
+//    private static void printUsageAndExit() {
+//        out("SampleRateConverter: usage:");
+//        out("\tjava SampleRateConverter -h");
+//        out("\tjava SampleRateConverter <targetsamplerate> <sourcefile> <targetfile>");
+//        System.exit(1);
+//    }
+//
     private static void out(String strMessage) {
         System.out.println(strMessage);
     }
