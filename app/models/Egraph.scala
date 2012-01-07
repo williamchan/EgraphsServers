@@ -100,6 +100,10 @@ case class Egraph(
       Blobs.get(audioKey).get.asByteStream
     }
 
+    override def audioUrl = {
+      Blobs.getUrl(audioKey)
+    }
+
     override def image: ImageAsset = {
       ImageAsset(blobKeyBase, imageName, ImageAsset.Png)
     }
@@ -154,6 +158,11 @@ trait EgraphAssets {
    * Retrieves the bytes of audio from the blobstore.
    */
   def audio: Stream[Byte]
+
+  /**
+   * Retrieves the url of the audio in the blobstore.
+   */
+  def audioUrl: String
 
   def image: ImageAsset
 

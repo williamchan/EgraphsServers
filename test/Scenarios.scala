@@ -157,9 +157,10 @@ class Scenarios extends DeclaresScenarios {
 
       EgraphFulfillmentHandler(
         TestConstants.signatureStr,
-        TestConstants.voiceStrPercentEncoded,
+        TestConstants.voiceStr(),
         firstOrder,
-        will
+        will,
+        skipBiometrics=true
       ).execute()
     }
   )

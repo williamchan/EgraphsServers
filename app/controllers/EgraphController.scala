@@ -13,7 +13,7 @@ object EgraphController extends Controller
     // Get an order with provided ID
     Order.findFulfilledWithId(orderId.toLong) match {
       case Some(FulfilledOrder(order, egraph)) =>
-        val imageUrl = egraph.assets.image.resizedWidth(460).getSaved(Blobs.AccessPolicy.Public).url
+        val imageUrl = egraph.assets.image.resizedWidth(940).getSaved(Blobs.AccessPolicy.Public).url
         val product = order.product
         val celebrity = product.celebrity
         val recipient = order.recipient
