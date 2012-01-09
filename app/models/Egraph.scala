@@ -110,7 +110,7 @@ case class Egraph(
 
     override def save(signature: String, audio: Array[Byte]) {
       Blobs.put(signatureJsonKey, signature, access=AccessPolicy.Private)
-      Blobs.put(audioKey, audio, access=AccessPolicy.Private)
+      Blobs.put(audioKey, audio, access=AccessPolicy.Public)
 
       // Before removing this line, realize that without the line the image method will fail
       ImageAsset(
