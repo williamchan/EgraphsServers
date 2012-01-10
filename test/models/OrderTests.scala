@@ -82,8 +82,8 @@ class OrderTests extends UnitFlatSpec
 
     val rendered = order.renderedForApi
 
+    rendered("product") should be (product.renderedForApi)
     rendered("id") should be (order.id)
-    rendered("productId") should be (product.id)
     rendered("buyerId") should be (buyer.id)
     rendered("buyerName") should be (buyer.name)
     rendered("recipientId") should be (recipient.id)

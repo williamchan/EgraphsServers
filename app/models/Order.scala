@@ -90,7 +90,7 @@ case class Order(
 
     val requiredFields = Map(
       "id" -> id,
-      "productId" -> productId,
+      "product" -> product.renderedForApi,
       "buyerId" -> buyer.id,
       "buyerName" -> buyer.name,
       "recipientId" -> recipient.id,

@@ -9,6 +9,7 @@ import org.jclouds.io.Payload
 import org.jclouds.aws.s3.AWSS3Client
 import org.jclouds.s3.domain.CannedAccessPolicy
 import java.io._
+import play.mvc.Http.Request
 
 /**
  * Convenience methods for storing and loading large binary data: images,
@@ -336,7 +337,7 @@ object Blobs {
     //
     // BlobProvider members
     //
-    override val urlBase = "/test/files"
+    override val urlBase = Request.current().getBase + "/test/files"
     override def context = {
       val properties = new Properties
 

@@ -41,5 +41,14 @@ class ProductTests extends UnitFlatSpec
   //
   // Test cases
   //
+  "A product" should "serialize the correct Map for the API" in {
+    val product = Celebrity().save().newProduct.save()
+
+    val rendered = product.renderedForApi
+    rendered("id") should be (product.id)
+    rendered("photoUrl") should be (product.photo.url)
+    rendered.contains("created") should be (true)
+    rendered.contains("updated") should be (true)
+  }
 
 }

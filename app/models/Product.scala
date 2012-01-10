@@ -9,8 +9,8 @@ import libs.Finance.TypeConversions._
 import models.Product.ProductWithPhoto
 import libs.{Blobs, Time}
 import Blobs.Conversions._
-import play.Play
 import java.awt.image.BufferedImage
+import play.Play
 
 /**
  * An item on sale by a Celebrity. In the case of the base Egraph, it represents a signature service
@@ -73,6 +73,13 @@ case class Product(
 
   def withPrice(money: BigDecimal) = {
     copy(priceInCurrency=money)
+  }
+
+  def renderedForApi: Map[String, Any] = {
+    renderCreatedUpdatedForApi ++ Map(
+      "id" -> id,
+      "photoUrl" -> photo.url
+    )
   }
 
   /** Retrieves the celebrity from the database */
