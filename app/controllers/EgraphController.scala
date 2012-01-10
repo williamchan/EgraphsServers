@@ -16,15 +16,13 @@ object EgraphController extends Controller
         val imageUrl = egraph.assets.image.resizedWidth(940).getSaved(Blobs.AccessPolicy.Public).url
         val product = order.product
         val celebrity = product.celebrity
-        val recipient = order.recipient
 
         views.Application.html.egraph(
           order,
           egraph,
           imageUrl,
           product,
-          celebrity,
-          recipient)
+          celebrity)
 
       case None =>
         NotFound("No eGraph exists with the provided identifier.")

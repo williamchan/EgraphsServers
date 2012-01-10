@@ -41,6 +41,7 @@ class OrderTests extends UnitFlatSpec
       buyerId = order.buyerId,
       transactionId = Some(12345),
       recipientId = order.recipientId,
+      recipientName = "Derpy Jones",
       stripeCardTokenId = Some("12345"),
       stripeChargeId = Some("12345"),
       messageToCelebrity = Some("Wizzle you're the best!"),
@@ -72,13 +73,15 @@ class OrderTests extends UnitFlatSpec
   it should "serialize the correct Map for the API" in {
     val buyer  = TestData.newSavedCustomer().copy(name="Will Chan").save()
     val recipient = TestData.newSavedCustomer().copy(name="Erem Boto").save()
+    val recipientName = "Eremizzle"
     val celebrity = Celebrity(firstName=Some("George"), lastName=Some("Martin")).save()
     val product = celebrity.newProduct.save()
     val order = buyer
       .buy(product, recipient)
       .copy(
         messageToCelebrity=Some("toCeleb"),
-        requestedMessage=Some("please write this"))
+        requestedMessage=Some("please write this"),
+        recipientName=recipientName)
 
     val rendered = order.renderedForApi
 
@@ -87,6 +90,7 @@ class OrderTests extends UnitFlatSpec
     rendered("buyerId") should be (buyer.id)
     rendered("buyerName") should be (buyer.name)
     rendered("recipientId") should be (recipient.id)
+    rendered("recipientName") should be (recipientName)
     rendered("amountPaidInCents") should be (order.amountPaid.getAmountMinor)
     rendered("requestedMessage") should be (order.requestedMessage.get)
     rendered("messageToCelebrity") should be (order.messageToCelebrity.get)

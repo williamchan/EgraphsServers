@@ -62,12 +62,11 @@ with DBTransaction {
       linkActionDefinition.absolute()
 
       email.setFrom(celebrity.urlSlug.get + "@egraphs.com", celebrity.publicName.get)
-      email.addTo(recipient.account.email, recipient.name)
+      email.addTo(recipient.account.email, order.recipientName)
       email.addReplyTo("noreply@egraphs.com")
       email.setSubject("I just finished signing your eGraph")
       email.setMsg(
         views.Application.html.egraph_signed_email(
-          recipient,
           celebrity,
           order.product,
           order,

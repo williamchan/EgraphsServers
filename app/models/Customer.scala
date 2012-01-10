@@ -68,7 +68,7 @@ object Customer extends Saves[Customer] with SavesCreatedUpdated[Customer] {
    *
    * @return a persisted Customer with a valid ID.
    */
-  def findOrCreateByEmail(email: String, name: String): Customer = {
+  def findOrCreateByEmail(email: String, name: String=""): Customer = {
     // TODO: Optimize this using a single outer-join query to get Customer + Account all at once
 
     // Get the Account and Customer face if both exist.

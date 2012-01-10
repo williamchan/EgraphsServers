@@ -121,12 +121,13 @@ object CelebrityProductController extends Controller
       val recipient = if (buyerEmail == recipientEmail) {
         buyer
       } else {
-        Customer.findOrCreateByEmail(recipientEmail, recipientName)
+        Customer.findOrCreateByEmail(recipientEmail)
       }
 
       // Buy the product, charge the card, persist the order.
       val order = buyer.buy(product, recipient).copy(
         stripeCardTokenId=Some(stripeTokenId),
+        recipientName=recipientName,
         messageToCelebrity=personalNote,
         requestedMessage=desiredText
       ).save()
@@ -134,9 +135,9 @@ object CelebrityProductController extends Controller
       val chargedOrder = order.charge.issueAndSave().order
 
       // Send the order email
-      val email = new SimpleEmail();
+      val email = new SimpleEmail()
       email.setFrom("noreply@egraphs.com", "eGraphs")
-      email.addTo(Account.findByCustomerId(buyer.id).get.email)
+      email.addTo(Account.findByCustomerId(buyer.id).get.email, buyerName)
       email.setSubject("Order Confirmation")
       email.setMsg(views.Application.html.order_confirmation_email(
         buyer, recipient, celebrity, product, chargedOrder

@@ -1,4 +1,4 @@
-@(order: models.Order, egraph: models.Egraph, imageUrl: String, product: models.Product, celebrity: models.Celebrity, recipient: models.Customer)
+@(order: models.Order, egraph: models.Egraph, imageUrl: String, product: models.Product, celebrity: models.Celebrity)
 
 @import libs.Time
 @import libs.Blobs.AccessPolicy.Public
@@ -14,7 +14,7 @@
     <div class="row">
       <div class="span16">
         <h1>eGraph #@order.id<div class="help-block">Signed @Time.toApiFormat(egraph.updated)</div></h1>
-        <h3>Personally autographed by @celebrity.publicName for @recipient.name</h3>
+        <h3>Personally autographed by @celebrity.publicName for @order.recipientName</h3>
         <div class="divider"></div>
         <a href="@egraph.assets.image.getSaved(Public).url">
           <img src="@imageUrl" alt="Egraph #@order.id" class="span16">

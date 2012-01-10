@@ -1,5 +1,4 @@
-@(recipient: models.Customer,
-  celebrity:models.Celebrity,
+@(celebrity:models.Celebrity,
   product: models.Product,
   order: models.Order,
   egraph: models.Egraph,
@@ -7,7 +6,7 @@
 
 <html>
   <body>
-    <h2>Dear @recipient.name,</h2>
+    <h2>Dear @order.recipientName,</h2>
     <p>
       Thanks for participating in my recent eGraphs signing! I just finished reading the
       message you sent and signed you a copy of my photo "@product.name".

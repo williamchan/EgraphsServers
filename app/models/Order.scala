@@ -17,6 +17,7 @@ case class Order(
   productId: Long = 0,
   buyerId: Long = 0,
   recipientId: Long = 0,
+  recipientName: String = "",
   paymentStateString: String = Order.PaymentState.NotCharged.stateValue,
   transactionId: Option[Long] = None,
   stripeCardTokenId: Option[String] = None,
@@ -94,7 +95,7 @@ case class Order(
       "buyerId" -> buyer.id,
       "buyerName" -> buyer.name,
       "recipientId" -> recipient.id,
-      "recipientName" -> recipient.name,
+      "recipientName" -> recipientName,
       "amountPaidInCents" -> amountPaid.getAmountMinor
     )
 
@@ -285,6 +286,7 @@ object Order extends Saves[Order] with SavesCreatedUpdated[Order] {
       theOld.stripeChargeId := theNew.stripeChargeId,
       theOld.amountPaidInCurrency := theNew.amountPaidInCurrency,
       theOld.recipientId := theNew.recipientId,
+      theOld.recipientName := theNew.recipientName,
       theOld.messageToCelebrity := theNew.messageToCelebrity,
       theOld.requestedMessage := theNew.requestedMessage,
       theOld.created := theNew.created,
