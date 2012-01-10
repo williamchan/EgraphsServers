@@ -5,16 +5,16 @@ import org.junit.Assert._
 import org.junit.Test
 import play.test.FunctionalTest
 import sjson.json.Serializer
-import utils.TestConstants
 import utils.FunctionalTestUtils.{CleanDatabaseAfterEachTest, willChanRequest, runScenario, runScenarios}
-import models.EnrollmentBatch
+import models._
+import utils.TestConstants
 
 class CelebrityApiControllersTests extends FunctionalTest with CleanDatabaseAfterEachTest {
 
   import FunctionalTest._
 
   @Test
-  def testGettingACelebrityReturnsCorrectData() {
+  def testGettingACelebrity() {
     // Set up the scenario
     runScenario("Will-Chan-is-a-celebrity")
 

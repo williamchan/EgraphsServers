@@ -45,7 +45,7 @@ object Scenario {
    * until the first scenario request comes in, which should only be in a test
    * environment.
    */
-  lazy val scenarios = Class.forName("Scenarios").newInstance()
+  lazy val scenarios = Class.forName("scenario.Scenarios").newInstance()
 
   /** All registered scenarios, indexed by name */
   var all = Map[String, Scenario]()

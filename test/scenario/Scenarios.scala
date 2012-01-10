@@ -1,3 +1,5 @@
+package scenario
+
 import controllers.api.CelebrityOrderApiControllers.EgraphFulfillmentHandler
 import controllers.CelebrityProductController.EgraphPurchaseHandler
 import db.Schema
@@ -7,12 +9,9 @@ import models.{Customer, Product, Account, Celebrity}
 import org.apache.commons.mail.SimpleEmail
 import play.libs.Mail
 import play.mvc.results.Redirect
-import play.Play
-import scenario.{Scenario, DeclaresScenarios}
 import Blobs.Conversions._
 import utils.{TestConstants, TestData}
 import org.squeryl.PrimitiveTypeMode._
-import TestData.Longoria
 
 /**
  * All scenarios supported by the API.
@@ -84,7 +83,7 @@ class Scenarios extends DeclaresScenarios {
     """,
 
     {() =>
-      val will = getWillCelebrityAccount
+      val will = Scenarios.getWillCelebrityAccount
 
       will.newProduct.copy(
         priceInCurrency=10,
@@ -128,8 +127,8 @@ class Scenarios extends DeclaresScenarios {
     """,
 
     {() =>
-      val erem = getEremCustomerAccount
-      val (starcraftChampionship, kingOfPweensCompetition) = getWillsTwoProducts
+      val erem = Scenarios.getEremCustomerAccount
+      val (starcraftChampionship, kingOfPweensCompetition) = Scenarios.getWillsTwoProducts
 
       erem.buy(starcraftChampionship).save()
       erem.buy(kingOfPweensCompetition).save()
@@ -147,8 +146,8 @@ class Scenarios extends DeclaresScenarios {
     """,
 
     {() =>
-      val will = getWillCelebrityAccount
-      val (starcraftChampionship, kingOfPweensCompetition) = getWillsTwoProducts
+      val will = Scenarios.getWillCelebrityAccount
+      val (starcraftChampionship, kingOfPweensCompetition) = Scenarios.getWillsTwoProducts
 
       val firstOrder = from(Schema.orders)(order =>
         where(order.id in List(starcraftChampionship.id, kingOfPweensCompetition.id))
@@ -190,7 +189,7 @@ class Scenarios extends DeclaresScenarios {
 
     {() =>
       Scenario.clearAll()
-      
+
       Scenario.play(
         "Will-Chan-is-a-celebrity",
         "Will-has-two-products"
@@ -212,7 +211,7 @@ class Scenarios extends DeclaresScenarios {
 
       Scenario.play("Will-Chan-is-a-celebrity")
 
-      val will = getWillCelebrityAccount
+      val will = Scenarios.getWillCelebrityAccount
       will.newProduct.copy(
         priceInCurrency=100,
         name="2010 Starcraft 2 Championships",
@@ -235,7 +234,7 @@ class Scenarios extends DeclaresScenarios {
 
       Scenario.play("Will-Chan-is-a-celebrity")
 
-      val will = getWillCelebrityAccount
+      val will = Scenarios.getWillCelebrityAccount
 
       will.newProduct.copy(
         priceInCurrency=100,
@@ -315,7 +314,7 @@ class Scenarios extends DeclaresScenarios {
     {() =>
       Scenario.clearAll()
       val product = createAndSaveStarcraftProduct
-      val celebrity = getWillCelebrityAccount
+      val celebrity = Scenarios.getWillCelebrityAccount
 
       EgraphPurchaseHandler(
         recipientName = "Erem Boto",
@@ -357,7 +356,48 @@ class Scenarios extends DeclaresScenarios {
       }
     )
 
+  private[this] def redirectToWizzle = {
+    new Redirect(
+      Utils.lookupUrl("CelebrityController.index", Map("celebrityUrlSlug" -> "Wizzle")).url
+    )
+  }
 
+  //
+  // Product-related members
+  //
+  private[this] def createAndSaveStarcraftProduct: Product = {
+    Scenario.play("Will-Chan-is-a-celebrity")
+
+    val will = Scenarios.getWillCelebrityAccount
+    will.newProduct.copy(
+      priceInCurrency=100,
+      name="2010 Starcraft 2 Championships",
+      description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
+    ).save()
+  }
+
+  private[this] def redirectToStarcraftProduct = {
+    new Redirect(
+      Utils.lookupUrl("CelebrityProductController.index", starcraftProductSlugs).url
+    )
+  }
+
+  private[this] def redirectToOrderConfirmationPage(params: Map[String, String] = Map()) =
+  {
+    new Redirect(
+      Utils.lookupUrl("CelebrityProductController.buy", starcraftProductSlugs ++ params).url
+    )
+  }
+
+  private[this] def starcraftProductSlugs = {
+    Map(
+      "celebrityUrlSlug" -> "Wizzle",
+      "productUrlSlug" -> "2010-Starcraft-2-Championships"
+    )
+  }
+}
+
+object Scenarios {
   def getWillAccount: Account = {
     Account.findByEmail("wchan83@gmail.com").get
   }
@@ -372,46 +412,6 @@ class Scenarios extends DeclaresScenarios {
 
   def getEremCustomerAccount: Customer = {
     Customer.findById(1L).get
-  }
-
-  def redirectToWizzle = {
-    new Redirect(
-      Utils.lookupUrl("CelebrityController.index", Map("celebrityUrlSlug" -> "Wizzle")).url
-    )
-  }
-
-  //
-  // Product-related members
-  //
-  def createAndSaveStarcraftProduct: Product = {
-    Scenario.play("Will-Chan-is-a-celebrity")
-
-    val will = getWillCelebrityAccount
-    will.newProduct.copy(
-      priceInCurrency=100,
-      name="2010 Starcraft 2 Championships",
-      description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
-    ).save()
-  }
-
-  def redirectToStarcraftProduct = {
-    new Redirect(
-      Utils.lookupUrl("CelebrityProductController.index", starcraftProductSlugs).url
-    )
-  }
-
-  def redirectToOrderConfirmationPage(params: Map[String, String] = Map()) =
-  {
-    new Redirect(
-      Utils.lookupUrl("CelebrityProductController.buy", starcraftProductSlugs ++ params).url
-    )
-  }
-
-  def starcraftProductSlugs = {
-    Map(
-      "celebrityUrlSlug" -> "Wizzle",
-      "productUrlSlug" -> "2010-Starcraft-2-Championships"
-    )
   }
 }
 
