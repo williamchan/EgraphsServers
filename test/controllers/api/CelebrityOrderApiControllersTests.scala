@@ -43,6 +43,33 @@ class CelebrityOrderApiControllersTests extends FunctionalTest with CleanDatabas
     assertEquals(TestConstants.signatureStr, Blobs.get("egraphs/" + json("id") + "/signature.json").get.asString)
   }
 
+  @Test
+  def testPostEgraphRejectsEmptySignatureAndAudio() {
+    runScenarios(
+      "Will-Chan-is-a-celebrity",
+      "Will-has-two-products",
+      "Erem-is-a-customer",
+      "Erem-buys-Wills-two-products-twice-each"
+    )
+
+    val noSignatureResponse = POST(
+      willChanRequest,
+      TestConstants.ApiRoot + "/celebrities/me/orders/1/egraphs",
+      APPLICATION_X_WWW_FORM_URLENCODED,
+      "signature=&audio=" + TestConstants.voiceStrPercentEncoded() + "&skipBiometrics=1"
+    )
+
+    val noAudioResponse = POST(
+      willChanRequest,
+      TestConstants.ApiRoot + "/celebrities/me/orders/1/egraphs",
+      APPLICATION_X_WWW_FORM_URLENCODED,
+      "signature=&audio=" + TestConstants.voiceStrPercentEncoded() + "&skipBiometrics=1"
+    )
+
+    assertStatus(5000, noSignatureResponse)
+    assertStatus(5000, noAudioResponse)
+  }
+
     @Test
     def testPostEgraphDrainsOrdersQueue() {
       runScenarios(

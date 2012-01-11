@@ -17,7 +17,7 @@ object DBAdapter {
     Play.configuration.getProperty("db")
   }
 
-  /**162 comments
+  /**
    * Returns a Squeryl DatabaseAdapter given current Play! database string
    */
   def current: DatabaseAdapter = {

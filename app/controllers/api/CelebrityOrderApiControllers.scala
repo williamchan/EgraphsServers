@@ -9,6 +9,7 @@ import services.signature.XyzmoBiometricServices
 import com.xyzmo.wwww.biometricserver.WebServiceBiometricPartStub
 import models.{Verified, Celebrity, Order, Egraph}
 import controllers._
+import play.data.validation._
 import org.apache.commons.mail.{HtmlEmail, SimpleEmail}
 
 /**
@@ -20,14 +21,13 @@ with RequiresCelebrityId
 with RequiresCelebrityOrderId
 with DBTransaction {
 
-  def postEgraph(signature: Option[String], audio: Option[String], skipBiometrics: Boolean = false) = {
-    (signature, audio) match {
-      case (Some(signatureString), Some(audioString)) =>
-        EgraphFulfillmentHandler(signatureString, audioString, order, celebrity, skipBiometrics).execute()
-
-      case _ =>
-        play.Logger.info("Dismissing the invalid request")
-        Error("Valid \"signature\" and \"audio\" parameters were not provided.")
+  def postEgraph(@Required signature: String, @Required audio: String, skipBiometrics: Boolean = false) = {
+    if (validationErrors.isEmpty) {
+      EgraphFulfillmentHandler(signature, audio, order, celebrity, skipBiometrics).execute()
+    }
+    else {
+      play.Logger.info("Dismissing the invalid request")
+      Error(5000, "Valid \"signature\" and \"audio\" parameters were not provided.")
     }
   }
 
