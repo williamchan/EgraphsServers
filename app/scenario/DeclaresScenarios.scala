@@ -12,7 +12,7 @@ package scenario
  *
  *       """
  *       Creates a Celebrity with name Shaquille 'Shaq' O'Neal. His login/password are
- *       shaq@herp.com/attack
+ *       shaq@derp.com/attack
  *       """,
  *
  *       {() =>

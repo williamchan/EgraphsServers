@@ -53,7 +53,7 @@ with DBTransaction {
 
     Account(email = email,
       celebrityId = Some(celebrity.id)
-    ).withPassword("herp").right.get.save()
+    ).withPassword("derp").right.get.save()
 
     celebrity.newProduct.copy(
       priceInCurrency = 50,

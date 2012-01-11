@@ -11,10 +11,10 @@ import org.junit.After
  */
 object FunctionalTestUtils {
   /**
-   * Makes an account identified by wchan83@gmail.com/herp
+   * Makes an account identified by wchan83@gmail.com/derp
    */
   def willChanAccount: Account = {
-    Account(email = "wchan83@gmail.com").withPassword("herp").right.get
+    Account(email = "wchan83@gmail.com").withPassword("derp").right.get
   }
 
   /**
@@ -23,7 +23,7 @@ object FunctionalTestUtils {
   def willChanRequest: Request = {
     val req = FunctionalTest.newRequest()
     req.user = "wchan83@gmail.com"
-    req.password = "herp"
+    req.password = "derp"
 
     req
   }

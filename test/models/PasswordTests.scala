@@ -16,7 +16,7 @@ class PasswordTests extends UnitFlatSpec
   }
 
   "A Password" should "recognize the correct password" in {
-    Password("herp", 0).is("herp") should be (true)
+    Password("derp", 0).is("derp") should be (true)
   }
 
   it should "reject the incorrect password" in {
@@ -25,13 +25,13 @@ class PasswordTests extends UnitFlatSpec
 
   it should "respect the password regardless of how many different salts are used" in {
     for (i <- 1 to 100) {
-      Password("herp", 0).is("herp") should be (true)
+      Password("derp", 0).is("derp") should be (true)
     }
   }
 
   it should "always have 256-bit hashes and salt" in {
     for (i <- 1 to 100) {
-      val password = Password("herp", 0)
+      val password = Password("derp", 0)
       List(password.hash, password.salt).foreach { string =>
         Codec.decodeBASE64(string).length should be (32)
       }
@@ -44,7 +44,7 @@ class PasswordTests extends UnitFlatSpec
     import libs.Crypto.passwordHash
     import libs.Crypto.HashType.SHA256
 
-    val password = "herp"
+    val password = "derp"
 
     // Run tests and check expectations
     hashNTimes(password, times=0) should be (password)

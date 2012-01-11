@@ -53,7 +53,7 @@ class OrderTests extends UnitFlatSpec
   // Test cases
   //
   "An order" should "create eGraphs that are properly configured" in {
-    val signature = "herp".getBytes
+    val signature = "derp".getBytes
     val audio = "derp".getBytes
 
     val eGraph = Order(id=100L).newEgraph

@@ -32,7 +32,7 @@ class CashTransactionTests extends UnitFlatSpec
 
   override def transformEntity(toTransform: CashTransaction) = {
     toTransform.copy(
-      accountId = Account(email="herp").save().id,
+      accountId = Account(email="derp").save().id,
       amountInCurrency = 1
     ).withType(CashTransaction.EgraphPurchase)
   }

@@ -51,7 +51,7 @@ class Scenarios extends DeclaresScenarios {
 
     """
     Creates a celebrity named William 'Wizzle' Chan. His login/password are
-    wchan83@gmail.com/herp. He has a profile photo.
+    wchan83@gmail.com/derp. He has a profile photo.
     """,
 
    {() =>
@@ -64,7 +64,7 @@ class Scenarios extends DeclaresScenarios {
 
       Account(email="wchan83@gmail.com",
               celebrityId=Some(celebrity.id)
-      ).withPassword("herp").right.get.save()
+      ).withPassword("derp").right.get.save()
 
      celebrity.saveWithProfilePhoto(new File("./test/files/will_chan_celebrity_profile.jpg"))
    }

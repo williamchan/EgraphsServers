@@ -35,8 +35,8 @@ class AccountTests extends UnitFlatSpec
     Customer.save(Customer())
     Administrator.save(Administrator())
     toTransform.copy(
-      email="herp",
-      passwordHash=Some("herp"),
+      email="derp",
+      passwordHash=Some("derp"),
       passwordSalt=Some("derp"),
       celebrityId=Some(1L),
       customerId=Some(1L),
@@ -52,24 +52,24 @@ class AccountTests extends UnitFlatSpec
   }
 
   it should "become protected once a password is set" in {
-    accountWithPassword("herp").password should not be (None)
+    accountWithPassword("derp").password should not be (None)
   }
 
   it should "have different hashes and salts when the same password is set twice" in {
-    val credential = accountWithPassword("herp")
+    val credential = accountWithPassword("derp")
     val firstPassword = credential.password.get
 
-    val password = credential.withPassword("herp").right.get.password.get
+    val password = credential.withPassword("derp").right.get.password.get
 
-    firstPassword.is("herp") should be (true)
-    password.is("herp") should be (true)
+    firstPassword.is("derp") should be (true)
+    password.is("derp") should be (true)
     password.hash should not be (firstPassword.hash)
     password.salt should not be (firstPassword.salt)
   }
 
   it should "store and retrieve correctly" in {
     // Set up
-    val stored = accountWithPassword("herp")
+    val stored = accountWithPassword("derp")
     val storedPassword = stored.password.get
 
     // Run test
@@ -83,7 +83,7 @@ class AccountTests extends UnitFlatSpec
     val recalledPassword = recalled.password.get
     recalled.id should be (stored.id)
     recalledPassword should be (storedPassword)
-    recalledPassword.is("herp") should be (true)
+    recalledPassword.is("derp") should be (true)
   }
 
   it should "fail validation for password lengths shorter than 4 characters" in {
@@ -98,7 +98,7 @@ class AccountTests extends UnitFlatSpec
   }
 
   it should "pass validation for password lengths 4 characters and longer" in {
-    Account().withPassword("herp").isRight should be (true)
+    Account().withPassword("derp").isRight should be (true)
 
     Validation.errors should have length (0)
   }
@@ -123,33 +123,33 @@ class AccountTests extends UnitFlatSpec
   }
 
   it should "be recoverable by email" in {
-    val stored = Account(email="herp@derp.com").save()
+    val stored = Account(email="derp@derp.com").save()
     Account.findByEmail(stored.email) should be (Some(stored))
   }
 
   it should "authenticate the correct email and password in" in {
-    val stored = savedAccountWithEmailAndPassword("herp@derp.com", "supersecret")
-    Account.authenticate("herp@derp.com", "supersecret") should be (Right(stored))
+    val stored = savedAccountWithEmailAndPassword("derp@derp.com", "supersecret")
+    Account.authenticate("derp@derp.com", "supersecret") should be (Right(stored))
   }
 
   it should "fail to authenticate with an AccountCredentialsError if the password is wrong" in {
-    savedAccountWithEmailAndPassword("herp@derp.com", "supersecret")
-    Account.authenticate("herp@derp.com", "superWRONG") match {
+    savedAccountWithEmailAndPassword("derp@derp.com", "supersecret")
+    Account.authenticate("derp@derp.com", "superWRONG") match {
       case Left(correct: AccountCredentialsError) => // phew
       case anythingElse => fail(anythingElse + " should have been a credentials error")
     }
   }
 
   it should "fail to authenticate with an AccountPasswordNotSetError if the account wasn't protected" in {
-    Account(email="herp@derp.com").save()
-    Account.authenticate("herp@derp.com", "supersecret") match {
+    Account(email="derp@derp.com").save()
+    Account.authenticate("derp@derp.com", "supersecret") match {
       case Left(correct: AccountPasswordNotSetError) => // phew
       case anythingElse => fail(anythingElse + " should have been an AccountPasswordNotSetError")
     }
   }
 
   it should "fail to authenticate with an AccountNotFoundError if an account with the given email didnt exist" in {
-    Account.authenticate("herp@derp.com", "supersecret") match {
+    Account.authenticate("derp@derp.com", "supersecret") match {
       case Left(correct: AccountNotFoundError) => // phew
       case anythingElse => fail(anythingElse + " should have been an AccountNotFoundError")
     }
@@ -160,6 +160,6 @@ class AccountTests extends UnitFlatSpec
   }
 
   def savedAccountWithEmailAndPassword(email: String, password: String): Account = {
-    Account(email="herp@derp.com").withPassword("supersecret").right.get.save()
+    Account(email="derp@derp.com").withPassword("supersecret").right.get.save()
   }
 }
