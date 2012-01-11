@@ -18,7 +18,7 @@ with DBTransaction {
     Serializer.SJSON.toJSON(celebrity.renderedForApi)
   }
 
-  def postEnrollmentSample(signature: Option[String], audio: Option[String]) = {
+  def postEnrollmentSample(signature: Option[String], audio: Option[String], skipBiometrics: Boolean = false) = {
     (signature, audio) match {
       case (Some(signatureString), Some(audioString)) =>
         val openEnrollmentBatch: Option[EnrollmentBatch] = celebrity.getOpenEnrollmentBatch()
@@ -30,7 +30,7 @@ with DBTransaction {
           jsonFromAddEnrollmentSampleResult(addEnrollmentSampleResult)
 
         } else if (!openEnrollmentBatch.get.isBatchComplete) {
-          val addEnrollmentSampleResult = openEnrollmentBatch.get.addEnrollmentSample(signatureString, audioString)
+          val addEnrollmentSampleResult = openEnrollmentBatch.get.addEnrollmentSample(signatureString, audioString, skipBiometrics)
           jsonFromAddEnrollmentSampleResult(addEnrollmentSampleResult)
 
         } else {

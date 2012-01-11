@@ -108,7 +108,7 @@ class CelebrityApiControllersTests extends FunctionalTest with CleanDatabaseAfte
       "Will-Chan-is-a-celebrity"
     )
 
-    val x = assertPostEnrollmentSample(signatureStr = TestConstants.signatureStr,
+    val enrollmentBatchId = assertPostEnrollmentSample(signatureStr = TestConstants.signatureStr,
       voiceStr = TestConstants.voiceStrPercentEncoded(),
       isBatchComplete = false,
       numEnrollmentSamplesInBatch = 1)
@@ -117,14 +117,14 @@ class CelebrityApiControllersTests extends FunctionalTest with CleanDatabaseAfte
         voiceStr = TestConstants.voiceStrPercentEncoded(),
         isBatchComplete = false,
         numEnrollmentSamplesInBatch = i + 1,
-        Some(x)
+        Some(enrollmentBatchId)
       )
     }
     assertPostEnrollmentSample(signatureStr = TestConstants.signatureStr,
       voiceStr = TestConstants.voiceStrPercentEncoded(),
       isBatchComplete = true,
       numEnrollmentSamplesInBatch = 10,
-      Some(x))
+      Some(enrollmentBatchId))
   }
 
   private def assertPostEnrollmentSample(signatureStr: String,
@@ -136,7 +136,7 @@ class CelebrityApiControllersTests extends FunctionalTest with CleanDatabaseAfte
       willChanRequest,
       TestConstants.ApiRoot + "/celebrities/me/enrollmentsamples",
       APPLICATION_X_WWW_FORM_URLENCODED,
-      "signature=" + signatureStr + "&audio=" + voiceStr
+      "signature=" + signatureStr + "&audio=" + voiceStr + "&skipBiometrics=1"
     )
     assertIsOk(response)
     val json = Serializer.SJSON.in[Map[String, Any]](getContent(response))
