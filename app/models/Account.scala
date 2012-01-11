@@ -51,7 +51,7 @@ case class Account(
       case (_, false) => Left(lengthCheck)
       case (true, true) =>
         val password = Password(newPassword, id)
-        Right(copy(passwordHash=Some(password.hash), passwordSalt=Some(password.salt)))
+        Right(copy(passwordHash = Some(password.hash), passwordSalt = Some(password.salt)))
     }
   }
 
@@ -85,16 +85,17 @@ object Account extends Saves[Account] with SavesCreatedUpdated[Account] {
   // Public methods
   //
   def findByEmail(email: String): Option[Account] = {
+    val emailInLowerCase = email.trim().toLowerCase
     from(Schema.accounts)(account =>
-      where(account.email === email)
-      select(account)
+      where(account.email === emailInLowerCase)
+        select (account)
     ).headOption
   }
 
   def findByCustomerId(customerId: Long): Option[Account] = {
     from(Schema.accounts)(account =>
       where(account.customerId === customerId)
-      select(account)
+        select (account)
     ).headOption
   }
 
@@ -115,20 +116,29 @@ object Account extends Saves[Account] with SavesCreatedUpdated[Account] {
       theOld.administratorId := theNew.administratorId
     )
   }
-  
+
+  beforeInsert(withEmailInLowerCase)
+  beforeUpdate(withEmailInLowerCase)
+
+  private def withEmailInLowerCase(toUpdate: Account): Account = {
+    toUpdate.copy(email = toUpdate.email.trim().toLowerCase)
+  }
+
   //
   // SavesCreatedUpdated[Account] methods
   //
   override protected def withCreatedUpdated(toUpdate: Account,
                                             created: Timestamp,
-                                            updated: Timestamp): Account =
-  {
-    toUpdate.copy(created=created, updated=updated)
+                                            updated: Timestamp): Account = {
+    toUpdate.copy(created = created, updated = updated)
   }
 }
 
 // Errors
 sealed class AccountAuthenticationError
+
 class AccountCredentialsError extends AccountAuthenticationError
+
 class AccountPasswordNotSetError extends AccountAuthenticationError
+
 class AccountNotFoundError extends AccountAuthenticationError

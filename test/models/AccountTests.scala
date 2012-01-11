@@ -8,13 +8,12 @@ import scala.collection.JavaConversions._
 import utils.{DBTransactionPerTest, SavingEntityTests, CreatedUpdatedEntityTests, ClearsDatabaseAndValidationAfter}
 
 class AccountTests extends UnitFlatSpec
-  with ShouldMatchers
-  with BeforeAndAfterEach
-  with SavingEntityTests[Account]
-  with CreatedUpdatedEntityTests[Account]
-  with ClearsDatabaseAndValidationAfter
-  with DBTransactionPerTest
-{
+with ShouldMatchers
+with BeforeAndAfterEach
+with SavingEntityTests[Account]
+with CreatedUpdatedEntityTests[Account]
+with ClearsDatabaseAndValidationAfter
+with DBTransactionPerTest {
   //
   // SavingEntityTests[Account] methods
   //
@@ -35,12 +34,12 @@ class AccountTests extends UnitFlatSpec
     Customer.save(Customer())
     Administrator.save(Administrator())
     toTransform.copy(
-      email="derp",
-      passwordHash=Some("derp"),
-      passwordSalt=Some("derp"),
-      celebrityId=Some(1L),
-      customerId=Some(1L),
-      administratorId=Some(1L)
+      email = "derp",
+      passwordHash = Some("derp"),
+      passwordSalt = Some("derp"),
+      celebrityId = Some(1L),
+      customerId = Some(1L),
+      administratorId = Some(1L)
     )
   }
 
@@ -48,7 +47,7 @@ class AccountTests extends UnitFlatSpec
   // Test methods
   //
   "An Account" should "start unprotected" in {
-    Account().password should be (None)
+    Account().password should be(None)
   }
 
   it should "become protected once a password is set" in {
@@ -61,8 +60,8 @@ class AccountTests extends UnitFlatSpec
 
     val password = credential.withPassword("derp").right.get.password.get
 
-    firstPassword.is("derp") should be (true)
-    password.is("derp") should be (true)
+    firstPassword.is("derp") should be(true)
+    password.is("derp") should be(true)
     password.hash should not be (firstPassword.hash)
     password.salt should not be (firstPassword.salt)
   }
@@ -81,24 +80,24 @@ class AccountTests extends UnitFlatSpec
 
     val recalled = maybeRecalled.get
     val recalledPassword = recalled.password.get
-    recalled.id should be (stored.id)
-    recalledPassword should be (storedPassword)
-    recalledPassword.is("derp") should be (true)
+    recalled.id should be(stored.id)
+    recalledPassword should be(storedPassword)
+    recalledPassword.is("derp") should be(true)
   }
 
   it should "fail validation for password lengths shorter than 4 characters" in {
     for (password <- List("", "123")) {
       val errorOrCredential = Account().withPassword(password)
-      errorOrCredential.isLeft should be (true)
+      errorOrCredential.isLeft should be(true)
 
       Validation.errors should have length (1)
-      Validation.errors.head.getKey should be ("password")
+      Validation.errors.head.getKey should be("password")
       Validation.clear()
     }
   }
 
   it should "pass validation for password lengths 4 characters and longer" in {
-    Account().withPassword("derp").isRight should be (true)
+    Account().withPassword("derp").isRight should be(true)
 
     Validation.errors should have length (0)
   }
@@ -108,28 +107,34 @@ class AccountTests extends UnitFlatSpec
   }
 
   it should "fail to persist with non-null, non-existent celebrity ID" in {
-    val thrown = evaluating { Account.save(Account(celebrityId=Some(1L))) } should produce [RuntimeException]
-    thrown.getMessage.toUpperCase.contains("CELEBRITYID") should be (true)
+    val thrown = evaluating {
+      Account.save(Account(celebrityId = Some(1L)))
+    } should produce[RuntimeException]
+    thrown.getMessage.toUpperCase.contains("CELEBRITYID") should be(true)
   }
 
   it should "fail to persist with non-null, non-existent customer ID" in {
-    val thrown = evaluating { Account.save(Account(customerId=Some(1L))) } should produce [RuntimeException]
-    thrown.getMessage.toUpperCase.contains("CUSTOMERID") should be (true)
+    val thrown = evaluating {
+      Account.save(Account(customerId = Some(1L)))
+    } should produce[RuntimeException]
+    thrown.getMessage.toUpperCase.contains("CUSTOMERID") should be(true)
   }
 
   it should "fail to persist with non-null, non-existent administrator ID" in {
-    val thrown = evaluating { Account.save(Account(administratorId=Some(1L))) } should produce [RuntimeException]
-    thrown.getMessage.toUpperCase.contains("ADMINISTRATORID") should be (true)
+    val thrown = evaluating {
+      Account.save(Account(administratorId = Some(1L)))
+    } should produce[RuntimeException]
+    thrown.getMessage.toUpperCase.contains("ADMINISTRATORID") should be(true)
   }
 
   it should "be recoverable by email" in {
-    val stored = Account(email="derp@derp.com").save()
-    Account.findByEmail(stored.email) should be (Some(stored))
+    val stored = Account(email = "derp@derp.com").save()
+    Account.findByEmail(stored.email) should be(Some(stored))
   }
 
   it should "authenticate the correct email and password in" in {
     val stored = savedAccountWithEmailAndPassword("derp@derp.com", "supersecret")
-    Account.authenticate("derp@derp.com", "supersecret") should be (Right(stored))
+    Account.authenticate("derp@derp.com", "supersecret") should be(Right(stored))
   }
 
   it should "fail to authenticate with an AccountCredentialsError if the password is wrong" in {
@@ -141,7 +146,7 @@ class AccountTests extends UnitFlatSpec
   }
 
   it should "fail to authenticate with an AccountPasswordNotSetError if the account wasn't protected" in {
-    Account(email="derp@derp.com").save()
+    Account(email = "derp@derp.com").save()
     Account.authenticate("derp@derp.com", "supersecret") match {
       case Left(correct: AccountPasswordNotSetError) => // phew
       case anythingElse => fail(anythingElse + " should have been an AccountPasswordNotSetError")
@@ -155,11 +160,26 @@ class AccountTests extends UnitFlatSpec
     }
   }
 
+  it should "save email in lowercase" in {
+    val stored = Account(email = "DERP@DERP.COM").save()
+    Account.findByEmail("derp@derp.com") should be(Some(stored))
+  }
+
+  it should "save email trimmed" in {
+    val stored = Account(email = "                    derp@derp.com                    ").save()
+    Account.findByEmail("derp@derp.com") should be(Some(stored))
+  }
+
+  it should "find by email case-insensitively" in {
+    val stored = Account(email = "derp@derp.com").save()
+    Account.findByEmail("DERP@DERP.COM") should be(Some(stored))
+  }
+
   def accountWithPassword(password: String): Account = {
     Account.save(Account().withPassword(password).right.get)
   }
 
   def savedAccountWithEmailAndPassword(email: String, password: String): Account = {
-    Account(email="derp@derp.com").withPassword("supersecret").right.get.save()
+    Account(email = "derp@derp.com").withPassword("supersecret").right.get.save()
   }
 }
