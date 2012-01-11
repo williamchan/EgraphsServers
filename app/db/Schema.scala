@@ -85,15 +85,15 @@ object Schema extends org.squeryl.Schema {
 
   val productToOrders = oneToManyRelation(products, orders)
     .via((product, order) => product.id === order.productId)
-  productToOrders.foreignKeyDeclaration.constrainReference(onDelete setNull)
+  productToOrders.foreignKeyDeclaration.constrainReference(onDelete cascade)
 
   val buyingCustomerToOrders = oneToManyRelation(customers, orders)
     .via((customer, order) => customer.id === order.buyerId)
-  buyingCustomerToOrders.foreignKeyDeclaration.constrainReference(onDelete setNull)
+  buyingCustomerToOrders.foreignKeyDeclaration.constrainReference(onDelete cascade)
 
   val recipientCustomerToOrders = oneToManyRelation(customers, orders)
     .via((customer, order) => customer.id === order.recipientId)
-  recipientCustomerToOrders.foreignKeyDeclaration.constrainReference(onDelete setNull)
+  recipientCustomerToOrders.foreignKeyDeclaration.constrainReference(onDelete cascade)
 
   //
   // Egraphs
@@ -107,7 +107,7 @@ object Schema extends org.squeryl.Schema {
 
   val orderToEgraphs = oneToManyRelation(orders, egraphs)
     .via((order, egraph) => order.id === egraph.orderId)
-  orderToEgraphs.foreignKeyDeclaration.constrainReference(onDelete setNull)
+  orderToEgraphs.foreignKeyDeclaration.constrainReference(onDelete cascade)
 
 
   //

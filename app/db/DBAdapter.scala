@@ -1,8 +1,8 @@
 package db
 
-import org.squeryl.adapters.{PostgreSqlAdapter, MySQLAdapter, H2Adapter}
 import org.squeryl.internals.DatabaseAdapter
 import play.Play
+import org.squeryl.adapters.{MySQLInnoDBAdapter, PostgreSqlAdapter, H2Adapter}
 
 /**
  * Provides various Squeryl database adapters based on what type of database we're
@@ -10,14 +10,14 @@ import play.Play
  */
 object DBAdapter {
   lazy val h2 = new H2Adapter
-  lazy val mysql = new MySQLAdapter
+  lazy val mysql = new MySQLInnoDBAdapter
   lazy val postgres = new PostgreSqlAdapter
 
   def currentDbString = {
     Play.configuration.getProperty("db")
   }
 
-  /**
+  /**162 comments
    * Returns a Squeryl DatabaseAdapter given current Play! database string
    */
   def current: DatabaseAdapter = {
