@@ -47,9 +47,13 @@ object Blobs {
     }
   }
 
-  // TODO(wchan): Where to put this?
+  /**
+   * Retrieve the Blob at a given key from the static resources blobstore.
+   * Always attempts to access Amazon S3.
+   */
   def getStaticResource(key: String) : Option[Blob] = {
-    blobStore.getBlob(staticResourceBlobstoreNamespace, key) match {
+    val store: BlobStore = S3BlobProvider.context.getBlobStore
+    store.getBlob(staticResourceBlobstoreNamespace, key) match {
       case null =>
         None
 
