@@ -12,25 +12,34 @@ class DemoScenarios extends DeclaresDemoScenarios {
   val orderConfirmationPageCategory = "Order Confirmation Page"
   val egraphPageCategory = "Egraph Page"
 
+  //  toDemoScenarios add DemoScenario(
+  //  "Create all demo celebrities",
+  //  demoCategory,
+  //  "", {
+  //    () =>
+  //      DemoScenario.clearAll()
+  //      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
+  //      createCelebrity("Clayton", "Kershaw", "ckershaw@egraphs.com", "claytonkershaw", true)
+  //      createCelebrity("Don", "Mattingly", "dmattingly@egraphs.com", "donmattingly", true)
+  //      createCelebrity("David", "Ortiz", "dortiz@egraphs.com", "davidortiz")
+  //      createCelebrity("Dustin", "Pedroia", "dpedroia@egraphs.com", "dustinpedroia")
+  //      createCelebrity("Hanley", "Ramirez", "hramirez@egraphs.com", "hanleyramirez")
+  //      createCelebrity("Evan", "Longoria", "elongoria@egraphs.com", "evanlongoria")
+  //      createCelebrity("Prince", "Fielder", "pfielder@egraphs.com", "princefielder")
+  //      createCelebrity("Curtis", "Granderson", "cgranderson@egraphs.com", "curtisgranderson")
+  //      createCelebrity("Nick", "Swisher", "nswisher@egraphs.com", "nickswisher")
+  //      createCelebrity("Barry", "Bonds", "bbonds@egraphs.com", "barrybonds")
+  //      createCelebrity("Ryan", "Braun", "rbraun@egraphs.com", "ryanbraun")
+  //      createCelebrity("David", "Price", "dprice@egraphs.com", "davidprice")
+  //  }
+  //  )
+
   toDemoScenarios add DemoScenario(
-  "Create all demo celebrities",
+  "Create Gabe Kapler",
   demoCategory,
   "", {
     () =>
-      DemoScenario.clearAll()
       createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
-      createCelebrity("Clayton", "Kershaw", "ckershaw@egraphs.com", "claytonkershaw", true)
-      createCelebrity("Don", "Mattingly", "dmattingly@egraphs.com", "donmattingly", true)
-      createCelebrity("David", "Ortiz", "dortiz@egraphs.com", "davidortiz")
-      createCelebrity("Dustin", "Pedroia", "dpedroia@egraphs.com", "dustinpedroia")
-      createCelebrity("Hanley", "Ramirez", "hramirez@egraphs.com", "hanleyramirez")
-      createCelebrity("Evan", "Longoria", "elongoria@egraphs.com", "evanlongoria")
-      createCelebrity("Prince", "Fielder", "pfielder@egraphs.com", "princefielder")
-      createCelebrity("Curtis", "Granderson", "cgranderson@egraphs.com", "curtisgranderson")
-      createCelebrity("Nick", "Swisher", "nswisher@egraphs.com", "nickswisher")
-      createCelebrity("Barry", "Bonds", "bbonds@egraphs.com", "barrybonds")
-      createCelebrity("Ryan", "Braun", "rbraun@egraphs.com", "ryanbraun")
-      createCelebrity("David", "Price", "dprice@egraphs.com", "davidprice")
   }
   )
 
@@ -42,7 +51,6 @@ class DemoScenarios extends DeclaresDemoScenarios {
   Clayton Kershaw (ckershaw@egraphs.com/derp)
   """, {
     () =>
-      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
       createCelebrity("Clayton", "Kershaw", "ckershaw@egraphs.com", "claytonkershaw", true)
   }
   )
@@ -55,7 +63,6 @@ class DemoScenarios extends DeclaresDemoScenarios {
   Don Mattingly (dmattingly@egraphs.com/derp)
   """, {
     () =>
-      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
       createCelebrity("Don", "Mattingly", "dmattingly@egraphs.com", "donmattingly", true)
   }
   )
@@ -68,7 +75,6 @@ class DemoScenarios extends DeclaresDemoScenarios {
   David Ortiz (dortiz@egraphs.com/derp)
   """, {
     () =>
-      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
       createCelebrity("David", "Ortiz", "dortiz@egraphs.com", "davidortiz")
   }
   )
@@ -81,7 +87,6 @@ class DemoScenarios extends DeclaresDemoScenarios {
   Dustin Pedroia (dpedroia@egraphs.com/derp)
   """, {
     () =>
-      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
       createCelebrity("Dustin", "Pedroia", "dpedroia@egraphs.com", "dustinpedroia")
   }
   )
@@ -94,7 +99,6 @@ class DemoScenarios extends DeclaresDemoScenarios {
   Hanley Ramirez (hramirez@egraphs.com/derp)
   """, {
     () =>
-      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
       createCelebrity("Hanley", "Ramirez", "hramirez@egraphs.com", "hanleyramirez")
   }
   )
@@ -108,7 +112,6 @@ class DemoScenarios extends DeclaresDemoScenarios {
   Prince Fielder (pfielder@egraphs.com/derp)
   """, {
     () =>
-      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
       createCelebrity("Evan", "Longoria", "elongoria@egraphs.com", "evanlongoria")
       createCelebrity("Prince", "Fielder", "pfielder@egraphs.com", "princefielder")
   }
@@ -122,7 +125,6 @@ class DemoScenarios extends DeclaresDemoScenarios {
   Curtis Granderson (cgranderson@egraphs.com/derp)
   """, {
     () =>
-      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
       createCelebrity("Curtis", "Granderson", "cgranderson@egraphs.com", "curtisgranderson")
   }
   )
@@ -135,7 +137,6 @@ class DemoScenarios extends DeclaresDemoScenarios {
   Nick Swisher (nswisher@egraphs.com/derp)
   """, {
     () =>
-      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
       createCelebrity("Nick", "Swisher", "nswisher@egraphs.com", "nickswisher")
   }
   )
@@ -149,15 +150,12 @@ class DemoScenarios extends DeclaresDemoScenarios {
   Ryan Braun (rbraun@egraphs.com/derp)
   """, {
     () =>
-      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
       createCelebrity("Barry", "Bonds", "bbonds@egraphs.com", "barrybonds")
       createCelebrity("Ryan", "Braun", "rbraun@egraphs.com", "ryanbraun")
   }
   )
 
   private def createCelebrity(firstName: String, lastName: String, email: String, s3ResourceId: String, productAOnly: Boolean = false) {
-    if (s3ResourceId == "gabekapler") return
-
     println("Creating Celebrity " + email + " ...")
 
     val profile = "demo/" + s3ResourceId + "/" + s3ResourceId + "-profile.jpg"
