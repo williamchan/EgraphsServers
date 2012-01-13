@@ -47,6 +47,17 @@ object Blobs {
     }
   }
 
+  // TODO(wchan): Where to put this?
+  def getStaticResource(key: String) : Option[Blob] = {
+    blobStore.getBlob("egraphs-static-resources", key) match {
+      case null =>
+        None
+
+      case blob =>
+        Some(blob)
+    }
+  }
+
   /**
    * Returns the public URL for the Blob. The URL will only work if
    * the blob was stored with Public.

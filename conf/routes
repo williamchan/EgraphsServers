@@ -33,6 +33,11 @@ GET     /                                       Application.index
 GET     /admin/reset-alpha-state                test.resetAlphaState
 GET     /test/files/{<.*>blobKey}               BlobControllers.getBlob
 
+# For Demo setup prod mode:
+GET     /demo-setup/list                         DemoSetupController.list
+GET     /demo-setup/clear                        DemoSetupController.clear
+GET     /demo-setup/{urlSlug}                    DemoSetupController.demoScenario
+
 # Ignore favicon requests
 GET     /favicon.ico                            404
 
