@@ -49,7 +49,7 @@ object Blobs {
 
   // TODO(wchan): Where to put this?
   def getStaticResource(key: String) : Option[Blob] = {
-    blobStore.getBlob("egraphs-static-resources", key) match {
+    blobStore.getBlob(staticResourceBlobstoreNamespace, key) match {
       case null =>
         None
 
@@ -176,6 +176,9 @@ object Blobs {
 
   /** Namespace of blobstore; equivalent to S3's bucket */
   private val blobstoreNamespace = configuration.getProperty("blobstore.namespace")
+
+  /** Namespace of blobstore that holds static resources; equivalent to S3's bucket */
+  private val staticResourceBlobstoreNamespace = configuration.getProperty("staticresources.blobstore.namespace")
 
   /**
    * Pimping of the jclouds Blob library to make content access easier.
