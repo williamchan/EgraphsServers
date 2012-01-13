@@ -15,16 +15,17 @@ class DemoScenarios extends DeclaresDemoScenarios {
   toDemoScenarios add DemoScenario(
   "Create all demo celebrities",
   demoCategory,
-  """
-  """, {
+  "", {
     () =>
-    //      controllers.DemoSetupController.clear
+      DemoScenario.clearAll()
       createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
+      createCelebrity("Clayton", "Kershaw", "ckershaw@egraphs.com", "claytonkershaw", true)
+      createCelebrity("Don", "Mattingly", "dmattingly@egraphs.com", "donmattingly", true)
       createCelebrity("David", "Ortiz", "dortiz@egraphs.com", "davidortiz")
       createCelebrity("Dustin", "Pedroia", "dpedroia@egraphs.com", "dustinpedroia")
       createCelebrity("Hanley", "Ramirez", "hramirez@egraphs.com", "hanleyramirez")
       createCelebrity("Evan", "Longoria", "elongoria@egraphs.com", "evanlongoria")
-      createCelebrity("Cecil", "Fielder", "cfielder@egraphs.com", "cecilfielder")
+      createCelebrity("Prince", "Fielder", "pfielder@egraphs.com", "princefielder")
       createCelebrity("Curtis", "Granderson", "cgranderson@egraphs.com", "curtisgranderson")
       createCelebrity("Nick", "Swisher", "nswisher@egraphs.com", "nickswisher")
       createCelebrity("Barry", "Bonds", "bbonds@egraphs.com", "barrybonds")
@@ -33,31 +34,31 @@ class DemoScenarios extends DeclaresDemoScenarios {
   }
   )
 
-//  toDemoScenarios add DemoScenario(
-//  "Jan 16 2012 agent meetings",
-//  demoCategory,
-//  """
-//  Prepares data for Hendricks Sports Management meeting. Creates:
-//  Clayton Kershaw (ckershaw@egraphs.com/derp)
-//  """, {
-//    () =>
-//      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
-//      createCelebrity("Clayton", "Kershaw", "ckershaw@egraphs.com", "claytonkershaw")
-//  }
-//  )
-//
-//  toDemoScenarios add DemoScenario(
-//  "Jan 17 2012 agent meetings",
-//  demoCategory,
-//  """
-//  Prepares data for Ray Schulte meeting. Creates:
-//  Don Mattingly (dmattingly@egraphs.com/derp)
-//  """, {
-//    () =>
-//      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
-//      createCelebrity("Don", "Mattingly", "dmattingly@egraphs.com", "donmattingly")
-//  }
-//  )
+  toDemoScenarios add DemoScenario(
+  "Jan 16 2012 agent meetings",
+  demoCategory,
+  """
+  Prepares data for Hendricks Sports Management meeting. Creates:
+  Clayton Kershaw (ckershaw@egraphs.com/derp)
+  """, {
+    () =>
+      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
+      createCelebrity("Clayton", "Kershaw", "ckershaw@egraphs.com", "claytonkershaw", true)
+  }
+  )
+
+  toDemoScenarios add DemoScenario(
+  "Jan 17 2012 agent meetings",
+  demoCategory,
+  """
+  Prepares data for Ray Schulte meeting. Creates:
+  Don Mattingly (dmattingly@egraphs.com/derp)
+  """, {
+    () =>
+      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
+      createCelebrity("Don", "Mattingly", "dmattingly@egraphs.com", "donmattingly", true)
+  }
+  )
 
   toDemoScenarios add DemoScenario(
   "Jan 18 2012 agent meetings",
@@ -104,12 +105,12 @@ class DemoScenarios extends DeclaresDemoScenarios {
   """
   Prepares data for TWC Sports Management and Boras Corporation meetings. Creates:
   Evan Longoria (elongoria@egraphs.com/derp),
-  Cecil Fielder (cfielder@egraphs.com/derp)
+  Prince Fielder (pfielder@egraphs.com/derp)
   """, {
     () =>
       createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
       createCelebrity("Evan", "Longoria", "elongoria@egraphs.com", "evanlongoria")
-      createCelebrity("Cecil", "Fielder", "cfielder@egraphs.com", "cecilfielder")
+      createCelebrity("Prince", "Fielder", "pfielder@egraphs.com", "princefielder")
   }
   )
 
@@ -154,7 +155,7 @@ class DemoScenarios extends DeclaresDemoScenarios {
   }
   )
 
-  private def createCelebrity(firstName: String, lastName: String, email: String, s3ResourceId: String) {
+  private def createCelebrity(firstName: String, lastName: String, email: String, s3ResourceId: String, productAOnly: Boolean = false) {
     if (s3ResourceId == "gabekapler") return
 
     println("Creating Celebrity " + email + " ...")
@@ -170,7 +171,9 @@ class DemoScenarios extends DeclaresDemoScenarios {
       description = Some("Help me... help YOU...")
     ).save()
 
-    celebrity.saveWithProfilePhoto(Blobs.get/*getStaticResource*/(profile).get.asByteArray)
+    if (!productAOnly) {
+      celebrity.saveWithProfilePhoto(Blobs.getStaticResource(profile).get.asByteArray)
+    }
 
     Account(email = email,
       celebrityId = Some(celebrity.id)
@@ -180,47 +183,48 @@ class DemoScenarios extends DeclaresDemoScenarios {
       priceInCurrency = 50,
       name = firstName + "'s Product A",
       description = "Buy my eGraph A!"
-    ).save().withPhoto(Blobs.get/*getStaticResource*/(productA).get.asByteArray).save()
+    ).save().withPhoto(Blobs.getStaticResource(productA).get.asByteArray).save()
 
-    celebrity.newProduct.copy(
-      priceInCurrency = 100,
-      name = firstName + "'s Product B",
-      description = "Buy my eGraph B!"
-    ).save().withPhoto(Blobs.get/*getStaticResource*/(productB).get.asByteArray).save()
+    if (!productAOnly) {
+      celebrity.newProduct.copy(
+        priceInCurrency = 100,
+        name = firstName + "'s Product B",
+        description = "Buy my eGraph B!"
+      ).save().withPhoto(Blobs.getStaticResource(productB).get.asByteArray).save()
+    }
   }
 
-//  toDemoScenarios add DemoScenario(
-//  "Testing",
-//  demoCategory,
-//  """
-//  Testing
-//  """, {
-//    () =>
-//      println("egraph.jpg: " + Blobs.get/*getStaticResource*/("egraph.jpg").get.asByteArray)
-//      testBlobs("davidortiz")
-//      testBlobs("dustinpedroia")
-//      testBlobs("hanleyramirez")
-//      testBlobs("evanlongoria")
-//      testBlobs("cecilfielder")
-//      testBlobs("curtisgranderson")
-//      testBlobs("nickswisher")
-//      testBlobs("barrybonds")
-//      testBlobs("ryanbraun")
-//      testBlobs("gabekapler")
-//      testBlobs("davidprice")
-//
-//  }
-//  )
-//
-//  private def testBlobs(s3ResourceId: String) {
-//    println(s3ResourceId + "...")
-//    val profile = "demo/" + s3ResourceId + "/" + s3ResourceId + "-profile.jpg"
-//    val productA = "demo/" + s3ResourceId + "/" + s3ResourceId + "-product-a.jpg"
-//    val productB = "demo/" + s3ResourceId + "/" + s3ResourceId + "-product-b.jpg"
-//    println("profile: " + Blobs.get/*getStaticResource*/(profile))
-//    println("product-a: " + Blobs.get/*getStaticResource*/(productA))
-//    println("product-b: " + Blobs.get/*getStaticResource*/(productB))
-//    println()
-//  }
+  //  toDemoScenarios add DemoScenario(
+  //  "Testing",
+  //  demoCategory,
+  //  """
+  //  Testing
+  //  """, {
+  //    () =>
+  //      testBlobs("davidortiz")
+  //      testBlobs("dustinpedroia")
+  //      testBlobs("hanleyramirez")
+  //      testBlobs("evanlongoria")
+  //      testBlobs("princefielder")
+  //      testBlobs("curtisgranderson")
+  //      testBlobs("nickswisher")
+  //      testBlobs("barrybonds")
+  //      testBlobs("ryanbraun")
+  //      testBlobs("gabekapler")
+  //      testBlobs("davidprice")
+  //
+  //  }
+  //  )
+  //
+  //  private def testBlobs(s3ResourceId: String) {
+  //    println(s3ResourceId + "...")
+  //    val profile = "demo/" + s3ResourceId + "/" + s3ResourceId + "-profile.jpg"
+  //    val productA = "demo/" + s3ResourceId + "/" + s3ResourceId + "-product-a.jpg"
+  //    val productB = "demo/" + s3ResourceId + "/" + s3ResourceId + "-product-b.jpg"
+  //    println("profile: " + Blobs.getStaticResource(profile))
+  //    println("product-a: " + Blobs.getStaticResource(productA))
+  //    println("product-b: " + Blobs.getStaticResource(productB))
+  //    println()
+  //  }
 
 }
