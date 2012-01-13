@@ -38,7 +38,7 @@ case class EnrollmentBatch(id: Long = 0,
     if (numEnrollmentSamplesInBatch >= EnrollmentBatch.batchSize) {
 
       copy(isBatchComplete = true).save()
-      Celebrity.get(celebrityId).copy(enrollmentStatus = AttemptingEnrollment.value).save()
+      Celebrity.get(celebrityId).withEnrollmentStatus(AttemptingEnrollment).save()
 
       // Kick off "job" is EnrollmentBatch is complete
       if (!skipBiometrics) {

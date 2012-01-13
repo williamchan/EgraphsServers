@@ -5,13 +5,13 @@ import controllers.CelebrityProductController.EgraphPurchaseHandler
 import db.Schema
 import java.io.File
 import libs.{Utils, Blobs}
-import models.{Customer, Product, Account, Celebrity}
 import org.apache.commons.mail.SimpleEmail
 import play.libs.Mail
 import play.mvc.results.Redirect
 import Blobs.Conversions._
 import utils.{TestConstants, TestData}
 import org.squeryl.PrimitiveTypeMode._
+import models._
 
 /**
  * All scenarios supported by the API.
@@ -130,8 +130,16 @@ class Scenarios extends DeclaresScenarios {
       val erem = Scenarios.getEremCustomerAccount
       val (starcraftChampionship, kingOfPweensCompetition) = Scenarios.getWillsTwoProducts
 
-      erem.buy(starcraftChampionship).save()
-      erem.buy(kingOfPweensCompetition).save()
+      erem.buy(starcraftChampionship)
+        .copy(
+          requestedMessage=Some("Happy 13th birthday, Don!"),
+          messageToCelebrity=Some("My buddy Don is your biggest fan!"))
+        .save()
+      erem.buy(kingOfPweensCompetition)
+        .copy(
+          requestedMessage=Some("Happy Pweenday, Don!"),
+          messageToCelebrity=Some("Don loves everything you do!"))
+        .save()
     }
   )
 
@@ -161,6 +169,36 @@ class Scenarios extends DeclaresScenarios {
         will,
         skipBiometrics=true
       ).execute()
+    }
+  )
+
+  toScenarios add Scenario(
+    "Will is faux-enrolled in biometric services",
+
+     apiCategory,
+
+    """
+    Marks celebrity Will as enrolled in biometrics. Does not _actually_ create
+    biometric profiles for him on real services.
+    """,
+
+    {() =>
+      Scenarios.getWillCelebrityAccount.withEnrollmentStatus(Enrolled).save()
+    }
+  )
+
+  toScenarios add Scenario(
+    "Will failed faux-enrollment in biometric services",
+
+     apiCategory,
+
+    """
+    Marks celebrity Will as having failed enrollment in biometrics. Does not _actually_
+    attempt to make biometric profiles for him on real services.
+    """,
+
+    {() =>
+      Scenarios.getWillCelebrityAccount.withEnrollmentStatus(FailedEnrollment).save()
     }
   )
 

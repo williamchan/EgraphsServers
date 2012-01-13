@@ -6,8 +6,8 @@ import libs.Blobs.AccessPolicy
 import org.squeryl.Query
 import play.templates.JavaExtensions
 import db.{FilterOneTable, KeyedCaseClass, Schema, Saves}
-import libs.{Serialization, Time}
 import libs.Blobs.Conversions._
+import libs.{Utils, Serialization, Time}
 
 /**
  * Persistent entity representing the Celebrities who provide products on
@@ -20,7 +20,7 @@ case class Celebrity(id: Long = 0,
                      lastName: Option[String] = None,
                      publicName: Option[String] = None,
                      profilePhotoUpdated: Option[String] = None,
-                     enrollmentStatus: String = NotEnrolled.value,
+                     enrollmentStatusValue: String = NotEnrolled.value,
                      created: Timestamp = Time.defaultTimestamp,
                      updated: Timestamp = Time.defaultTimestamp)
   extends KeyedCaseClass[Long]
@@ -37,6 +37,16 @@ case class Celebrity(id: Long = 0,
   /**Persists by conveniently delegating to companion object's save method. */
   def save(): Celebrity = {
     Celebrity.save(this)
+  }
+
+  /** Makes a copy of the object with the new enrollment status applied. */
+  def withEnrollmentStatus(newStatus: EnrollmentStatus): Celebrity = {
+    copy(enrollmentStatusValue=newStatus.value)
+  }
+
+  /** The current Biometric services enrollment status. */
+  def enrollmentStatus: EnrollmentStatus = {
+    EnrollmentStatus(enrollmentStatusValue)
   }
 
   /**Returns all of the celebrity's Products */
@@ -57,7 +67,7 @@ case class Celebrity(id: Long = 0,
     )
 
     Map("id" -> id,
-      "enrollmentStatus" -> enrollmentStatus) ++
+      "enrollmentStatus" -> enrollmentStatusValue) ++
       renderCreatedUpdatedForApi ++
       Serialization.makeOptionalFieldMap(optionalFields)
   }
@@ -174,7 +184,7 @@ object Celebrity extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {
       theOld.publicName := theNew.publicName,
       theOld.urlSlug := theNew.urlSlug,
       theOld.profilePhotoUpdated := theNew.profilePhotoUpdated,
-      theOld.enrollmentStatus := theNew.enrollmentStatus,
+      theOld.enrollmentStatusValue := theNew.enrollmentStatusValue,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated
     )
@@ -189,6 +199,20 @@ object Celebrity extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {
 }
 
 abstract sealed class EnrollmentStatus(val value: String)
+
+object EnrollmentStatus {
+  private val states = Utils.toMap[String, EnrollmentStatus](Seq(
+    NotEnrolled,
+    AttemptingEnrollment,
+    Enrolled,
+    FailedEnrollment
+  ), key=(theState) => theState.value)
+
+  /** Provides the EnrollmentStatus object that maps to the provided string. */
+  def apply(value: String) = {
+     states(value)
+  }
+}
 
 case object NotEnrolled extends EnrollmentStatus("NotEnrolled")
 

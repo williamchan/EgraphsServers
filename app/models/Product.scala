@@ -114,6 +114,8 @@ object Product extends Saves[Product] with SavesCreatedUpdated[Product] {
     imageType=ImageAsset.Png
   )
 
+  defaultPhoto.getSaved(Blobs.AccessPolicy.Public)
+
   //
   // Public members
   //
