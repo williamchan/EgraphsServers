@@ -11,6 +11,7 @@ import libs.{Blobs, Time}
 import Blobs.Conversions._
 import java.awt.image.BufferedImage
 import play.Play
+import libs.Blobs.AccessPolicy
 
 /**
  * An item on sale by a Celebrity. In the case of the base Egraph, it represents a signature service
@@ -45,12 +46,12 @@ case class Product(
 
     ProductWithPhoto(
       product=this.copy(photoKey=Some(newPhotoKey)),
-      photo=ImageAsset(imageData, keyBase, newPhotoKey, ImageAsset.Png)
+      photo=ImageAsset(imageData, keyBase, newPhotoKey, ImageAsset.Jpeg)
     )
   }
 
   def photo: ImageAsset = {
-    photoKey.flatMap(theKey => Some(ImageAsset(keyBase, theKey, ImageAsset.Png))) match {
+    photoKey.flatMap(theKey => Some(ImageAsset(keyBase, theKey, ImageAsset.Jpeg))) match {
       case Some(imageAsset) =>
         imageAsset
 
@@ -111,7 +112,7 @@ object Product extends Saves[Product] with SavesCreatedUpdated[Product] {
     Play.getFile("test/files/longoria/product-2.jpg"),
     keyBase="defaults/product",
     name="photo",
-    imageType=ImageAsset.Png
+    imageType=ImageAsset.Jpeg
   )
 
   defaultPhoto.getSaved(Blobs.AccessPolicy.Public)

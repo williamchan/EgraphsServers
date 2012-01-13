@@ -81,6 +81,10 @@ class ImageAsset(
     withResolution(CustomResolution(width, height))
   }
 
+  def withImageType(newImageType: ImageType): ImageAsset = {
+    new ImageAsset(keyBase, name, lazyMasterData, newImageType, resolution)
+  }
+
   /** Proportionally resizes the width of the image */
   def resizedWidth(width: Int): ImageAsset = {
     withResolution(CustomWidthResolution(width))
