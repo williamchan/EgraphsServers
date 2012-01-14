@@ -1,8 +1,12 @@
 package demosetup
 
-import libs.Blobs
-import Blobs.Conversions._
+import libs.Blobs.Conversions._
 import models.{Enrolled, Account, Celebrity}
+import utils.TestConstants
+import libs.{ImageUtil, Blobs}
+import db.Schema
+import javax.imageio.ImageIO
+import java.io.File
 
 
 class DemoScenarios extends DeclaresDemoScenarios {
@@ -19,6 +23,47 @@ class DemoScenarios extends DeclaresDemoScenarios {
   )
 
   toDemoScenarios add DemoScenario(
+  "Create all celebrities",
+  demoCategory,
+  "", {
+    () =>
+      DemoScenario.clearAll()
+      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
+      createCelebrity("Clayton", "Kershaw", "ckershaw@egraphs.com", "claytonkershaw")
+      createCelebrity("Don", "Mattingly", "dmattingly@egraphs.com", "donmattingly")
+      createCelebrity("David", "Ortiz", "dortiz@egraphs.com", "davidortiz")
+      createCelebrity("Dustin", "Pedroia", "dpedroia@egraphs.com", "dustinpedroia")
+      createCelebrity("Hanley", "Ramirez", "hramirez@egraphs.com", "hanleyramirez")
+      createCelebrity("Evan", "Longoria", "elongoria@egraphs.com", "evanlongoria")
+      createCelebrity("Prince", "Fielder", "pfielder@egraphs.com", "princefielder")
+      createCelebrity("Curtis", "Granderson", "cgranderson@egraphs.com", "curtisgranderson")
+      createCelebrity("Nick", "Swisher", "nswisher@egraphs.com", "nickswisher")
+      createCelebrity("Barry", "Bonds", "bbonds@egraphs.com", "barrybonds")
+      createCelebrity("Ryan", "Braun", "rbraun@egraphs.com", "ryanbraun")
+  }
+  )
+
+  toDemoScenarios add DemoScenario(
+  "Generate all signatures",
+  demoCategory,
+  "", { () =>
+    import org.squeryl.PrimitiveTypeMode._
+    val sig = ImageUtil.createSignatureImage(TestConstants.boxSignatureStr)
+
+    val q = from(Schema.products)(prod => select(prod))
+
+    q.foreach { product =>
+      val fileName = product.celebrity.urlSlug.get + "_" + product.urlSlug +".png"
+      println("Writing " + fileName)
+      val image = ImageUtil.createEgraphImage(sig, product.photoImage, 0, 0)
+      ImageIO.write(image, "PNG", new File("tmp/files/"+fileName))
+    }
+
+    println("Wrote all sample egraphs")
+  }
+  )
+
+  toDemoScenarios add DemoScenario(
   "Jan 16 2012 agent meetings",
   demoCategory,
   """
@@ -28,7 +73,7 @@ class DemoScenarios extends DeclaresDemoScenarios {
     () =>
       DemoScenario.clearAll()
       createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
-      createCelebrity("Clayton", "Kershaw", "ckershaw@egraphs.com", "claytonkershaw", true)
+      createCelebrity("Clayton", "Kershaw", "ckershaw@egraphs.com", "claytonkershaw")
   }
   )
 
@@ -42,7 +87,7 @@ class DemoScenarios extends DeclaresDemoScenarios {
     () =>
       DemoScenario.clearAll()
       createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
-      createCelebrity("Don", "Mattingly", "dmattingly@egraphs.com", "donmattingly", true)
+      createCelebrity("Don", "Mattingly", "dmattingly@egraphs.com", "donmattingly")
   }
   )
 
@@ -148,7 +193,7 @@ class DemoScenarios extends DeclaresDemoScenarios {
   }
   )
 
-  private def createCelebrity(firstName: String, lastName: String, email: String, s3ResourceId: String, productAOnly: Boolean = false) {
+  private def createCelebrity(firstName: String, lastName: String, email: String, s3ResourceId: String) {
     println("Creating Celebrity " + email + " ...")
 
     val profile = "demo/" + s3ResourceId + "/" + s3ResourceId + "-profile.jpg"
@@ -163,26 +208,28 @@ class DemoScenarios extends DeclaresDemoScenarios {
       enrollmentStatusValue = Enrolled.value
     ).save()
 
-    if (!productAOnly) {
-      celebrity.saveWithProfilePhoto(Blobs.getStaticResource(profile).get.asByteArray)
+    Blobs.getStaticResource(profile) foreach { profilePhotoBlob =>
+      celebrity.saveWithProfilePhoto(profilePhotoBlob.asByteArray)
     }
 
     Account(email = email,
       celebrityId = Some(celebrity.id)
     ).withPassword("derp").right.get.save()
 
-    celebrity.newProduct.copy(
-      priceInCurrency = 50,
-      name = firstName + "'s Product A",
-      description = "Buy my eGraph A!"
-    ).save().withPhoto(Blobs.getStaticResource(productA).get.asByteArray).save()
+    Blobs.getStaticResource(productA) foreach { productAPhotoBlob =>
+      celebrity.newProduct.copy(
+        priceInCurrency = 50,
+        name = firstName + "'s Product A",
+        description = "Buy my eGraph A!"
+      ).save().withPhoto(productAPhotoBlob.asByteArray).save()
+    }
 
-    if (!productAOnly) {
+    Blobs.getStaticResource(productB) foreach { productBPhotoBlob =>
       celebrity.newProduct.copy(
         priceInCurrency = 100,
         name = firstName + "'s Product B",
         description = "Buy my eGraph B!"
-      ).save().withPhoto(Blobs.getStaticResource(productB).get.asByteArray).save()
+      ).save().withPhoto(productBPhotoBlob.asByteArray).save()
     }
   }
 
