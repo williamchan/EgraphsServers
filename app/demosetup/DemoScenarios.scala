@@ -2,7 +2,6 @@ package demosetup
 
 import libs.Blobs.Conversions._
 import models.{Enrolled, Account, Celebrity}
-import utils.TestConstants
 import libs.{ImageUtil, Blobs}
 import db.Schema
 import javax.imageio.ImageIO
