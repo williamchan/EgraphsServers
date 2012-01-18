@@ -142,27 +142,27 @@
               help=Some(emailHelp))
 
             @emailHelp = {
-              egraphs.com or raysbaseball.com only.
+              egraphs.com or raysbaseball.com.
             }
 
             <div class="clearfix">
               <label for="desiredText">Desired text</label>
               <div class="input">
-                <textarea class="xxlarge" id="desiredText" name="desiredText" rows="3" >@fields("desiredText")</textarea>
-                <span class="help-block">
+                <textarea class="span7" id="desiredText" name="desiredText" rows="3" >@fields("desiredText")</textarea>
+                <span class="help-block span7">
                   e.g. <em>"Happy 13th birthday, David!"</em> If left blank, @celebrity.publicName will just
                   sign his name over the photo.
                 </span>
               </div>
             </div>
           </fieldset>
-          <div style="border-top:1px solid #ddd">
+          <div style="border-top:1px solid #333">
             <fieldset>
               <legend>Payment info <span class="help-inline">where different from above</span></legend>
               @formField(id="buyerName",
                          label="Full name",
                          inputType="text",
-                         width="span3",
+                         width="span4",
                          help=Some(buyerNameHelp))
               @buyerNameHelp = {
                 As it appears on the card
@@ -172,13 +172,13 @@
                 id="buyerEmail",
                 label="E-mail address",
                 inputType="text",
-                width="span3",
+                width="span4",
                 help=Some(emailHelp))
 
               @formField(id="cardNumber",
                          label="Card number",
                          inputType="text",
-                         width="span3",
+                         width="span4",
                          hasInputName=false,
                          help=Some(cardHelp))
               @cardHelp = {
@@ -201,7 +201,7 @@
               @formField(id="cardCvc", label="CVC", inputType="text", width="span1")
             </fieldset>
           </div>
-          <div style="border-top:1px solid #ddd">
+          <div style="border-top:1px solid #333">
             <fieldset>
               <legend>Anything else you want @celebrity.publicName to know?</legend>
               <div class="clearfix">
@@ -214,7 +214,7 @@
                 </div>
               </div>
               <div class="actions">
-                <button type="submit" id="submit-button" class="btn large success fade in">Get @celebrity.publicName's Autograph Now</button>
+                <button type="submit" id="submit-button" class="btn large primary fade in">Get @celebrity.publicName's Autograph Now</button>
                 <span class="help-block">
                   This will charge @price to your credit card
                 </span>

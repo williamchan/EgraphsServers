@@ -2,6 +2,33 @@
 // Styles for the celebrity page (e.g. /Evan-Longoria)
 //
 
+body {
+  .popover.above {
+
+    .arrow {
+      border-left:5px solid transparent;
+      border-right:5px solid transparent;
+      border-top:5px solid white;
+    }
+
+    h3 {
+      font-family:'Terminal Dosis', sans-serif;
+      text-transform:uppercase;
+      background-color:#111;
+      color:white;
+      border-bottom:1px solid #333;
+    }
+
+    div {
+      background-color:#111;
+    }
+
+    .inner {
+      border:2px solid white;
+    }
+  }
+}
+
 .celeb-content {
 	.personal-info {
 	  padding-bottom:20px;
@@ -9,34 +36,47 @@
 	  .profile-photo {
 	    img {
 	      .border-radius(10px);
+	      border:1px solid #111;
 	    }
 	  }
 	  .profile-info {
 	    h1 {
+	      font-family:'Terminal Dosis', sans-serif;
+	      text-transform:uppercase;
+	      font-weight:bold;
 	      font-size:46px;
 	      padding-bottom:25px;
 	    }
 
 	    .quotemark {
+	      font-family:'Terminal Dosis', sans-serif;
         margin-bottom:-16px;
 	      font-family:serif;
 	      font-size:102px;
-	      color:@grayLighter;
+	      color:#555;
 	    }
 
       .description {
         font-style:italic;
-        padding-left:30px;
+        padding-left:45px;
         line-height:@baseline + 3;
-        color:#999;
+        color:#AAA;
+        margin-top:-30px;
         font-size: @basefont + 3;
         font-weight:normal;
       }
 	  }
 	}
 
-	.page-header {
+	.separator {
 	  margin-bottom:10px;
+	  border-bottom:1px solid #333;
+	  margin-bottom: 17px;
+/*margin-bottom: 17px;
+border-bottom: 1px solid #DDD;
+-webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+-moz-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);*/
 	}
 
 	.products {
@@ -46,6 +86,10 @@
         font-style:italic;
         font-weight:normal;
       }
+
+      a {
+        color:white;
+      }
 	  }
 	  .row {
 	    padding-top:20px;
@@ -53,11 +97,12 @@
 	  .product {
       display:block;
       padding:4px;
+      padding-bottom:10px;
       position:relative;
       text-decoration:none;
       color:@grayDark;
-	    background:whitesmoke;
-	    border:1px solid #ddd;
+	    background:#1F1F1F;
+	    border:1px solid #222;
 	    .border-radius(6px);
 	    .box-shadow(0 1px 1px rgba(0, 0, 0,.075));
 
@@ -68,7 +113,10 @@
 
       .description {
         padding-top:3px;
+        color:#BBB;
         text-align:center;
+        margin-top:8px;
+        margin-bottom:4px;
       }
 
       .price-label {
@@ -78,9 +126,12 @@
       .buy-button {
         .center-block();
 
+        font-family:'Terminal Dosis';
+        text-transform:uppercase;
         width:(@gridColumnWidth * 3) + (@gridGutterWidth * 1);
         text-align: center;
-        margin-top:2px;
+        padding:5px 10px;
+        margin-bottom:2px;
       }
       img {
    	    .center-block();

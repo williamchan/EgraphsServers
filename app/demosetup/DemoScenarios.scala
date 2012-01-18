@@ -205,7 +205,10 @@ class DemoScenarios extends DeclaresDemoScenarios {
       firstName = Some(firstName),
       lastName = Some(lastName),
       publicName = Some(firstName + " " + lastName),
-      description = Some("Help me... help YOU..."),
+      description = Some(
+        "Love all my fans out there from Seattle to Swaziland." +
+        " Your support makes the game worth playing."
+      ),
       enrollmentStatusValue = Enrolled.value
     ).save()
 

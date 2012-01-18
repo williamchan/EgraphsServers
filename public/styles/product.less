@@ -41,10 +41,12 @@
     .form-description-column {
       h2 {
         line-height:28px;
+        color:white;
       }
 
       p {
         padding-bottom:50px;
+        color:#999;
       }
 
       #your-time {
@@ -53,7 +55,7 @@
     }
     .form-column {
       padding-top:7px;
-      background-color:whitesmoke;
+      background-color:#222;
       .border-radius(6px);
     }
 
@@ -61,9 +63,28 @@
       padding-top:4px;
 
       legend {
+        font-family: 'Terminal Dosis', sans-serif;
+        font-weight: normal;
+        text-transform:uppercase;
+        color:white;
         padding-top:15px;
+
+        .help-inline {
+          text-transform:none;
+        }
       }
+
+      label {
+        color:#999;
+      }
+
+      .help-block {
+        padding-top:5px;
+      }
+
       .actions {
+        background-color:transparent;
+        border-top:1px solid #333;
         margin-bottom:0px;
         padding-bottom:0px;
 

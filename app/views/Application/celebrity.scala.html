@@ -28,21 +28,21 @@
         <img src="@profilePhotoUrl" alt="@celebrity.publicName Profile Photo"/>
       </div>
       <div class="span12 profile-info">
-        <h1>@celebrity.publicName <span class="label notice">Currently signing</span></h1>
+        <h1>@celebrity.publicName</h1>
         <div class="quotemark">&ldquo;</div>
         <div class="row">
-          <div class="span11 description">@celebrity.description</div>
+          <div class="span10 description">@celebrity.description</div>
         </div>
       </div>
     </div>
-    <div class="page-header"></div>
+    <div class="separator"></div>
     <div class="products">
       @if(products.headOption == None) {
         <h2>@celebrity.publicName isn't signing eGraphs! Go badger him on Twitter.</h2>
       } else {
         <h2>
           You choose a photo, then
-          <a href="#" rel='popover' title="Just between the two of us" data-content="When you buy an eGraph, a special slot of time on @celebrity.publicName's schedule gets reserved for him to hand-write you a personalized message on top of the photo you select here. Try having him wish you a happy birthday!">
+          <a href="#" rel='popover' title="Between the two of us" data-content="When you buy an eGraph, a special slot of time on @celebrity.publicName's schedule gets reserved for him to hand-write you a personalized message on top of the photo you select here. Try having him wish you a happy birthday!">
             @celebrity.publicName signs it just for you.
           </a>
         </h2>
@@ -65,7 +65,7 @@
           @product.name <span class="label success price-label">@product.price.formatSimply</span>
         </div>
         <div class="btn primary large success buy-button" >
-          Get @celebrity.publicName to sign it!
+          Get it autographed
         </div>
       </a>
     </div>
