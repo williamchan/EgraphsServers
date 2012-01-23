@@ -16,6 +16,8 @@ import java.net.URLEncoder;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+// This class is not used in production. It may still be somewhat convenient to local testing by William Chan. Will be deleted.
+// For production logic, see VBGBiometricServices.
 public class VoiceBiometricsClient {
     private String requesttype = "";
     private String responsetype = "";

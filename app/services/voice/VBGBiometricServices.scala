@@ -9,8 +9,6 @@ import java.io._
 import play.libs.Codec
 import libs.Blobs
 import Blobs.Conversions._
-import play.Play
-import javax.net.ssl._
 
 class VBGRequest {
   private var requestType: String = ""
@@ -200,29 +198,13 @@ object VBGBiometricServices {
     request.sendRequest()
   }
 
+  // ========================== HELPERS
 
-  // ========================== PRIVATE HELPERS
-
+  // Depends on iPad issue 49.
   def getDownSampledBase64(wavBinary: Array[Byte]): String = {
     //    val wavBinary_downSampled: Array[Byte] = SampleRateConverter.convert(8000f, wavBinary)
     //    Codec.encodeBASE64(wavBinary_downSampled)
 
     Codec.encodeBASE64(wavBinary)
-  }
-
-  def getVoiceSampleBinary(filename: String): Array[Byte] = {
-    val bas: ByteArrayOutputStream = new ByteArrayOutputStream
-    var fData: Int = 0
-    val fs: FileInputStream = new FileInputStream(Play.getFile(filename))
-    while (fs.available > 0) {
-      fData = fs.read
-      bas.write(fData)
-    }
-    fs.close()
-    bas.toByteArray
-  }
-
-  def getVoiceSampleBase64Encoded(filename: String): String = {
-    Codec.encodeBASE64(getVoiceSampleBinary(filename))
   }
 }
