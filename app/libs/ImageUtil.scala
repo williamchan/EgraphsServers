@@ -84,11 +84,13 @@ object ImageUtil {
     // TODO(wchan): handle these cases
     if (n < 4) return
 
+    // Scale xs and ys
     for (i <- 0 until xs.length) {
       xs(i) = xs(i) * scaleFactor
       ys(i) = ys(i) * scaleFactor
     }
 
+    // Initialize smoothedXs and smoothedYs
     val smoothedXs = xs.clone()
     val smoothedYs = ys.clone()
     for (i <- 0 until n - 3) {
@@ -97,14 +99,21 @@ object ImageUtil {
         xs(i + 1), ys(i + 1),
         xs(i + 2), ys(i + 2),
         xs(i + 3), ys(i + 3))
-      drawFirstCubicBezierSegment(g, bezier)
-
       // replace smoothed point
       val tNearC0: Double = 1d / 3d
       smoothedXs(i + 1) = bezier.calcXCoord(tNearC0)
       smoothedYs(i + 1) = bezier.calcYCoord(tNearC0)
     }
 
+    // Draw Bezier segments using a combination of raw points and smoothed points
+    for (i <- 0 until n - 3) {
+      val bezier = BezierCubic(
+        smoothedXs(i), smoothedYs(i),
+        xs(i + 1), ys(i + 1),
+        xs(i + 2), ys(i + 2),
+        xs(i + 3), ys(i + 3))
+      drawFirstCubicBezierSegment(g, bezier)
+    }
     val i = n - 4
     val bezier = BezierCubic(
       smoothedXs(i), smoothedYs(i),
