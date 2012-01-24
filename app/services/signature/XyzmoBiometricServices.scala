@@ -80,6 +80,7 @@ object XyzmoBiometricServices {
     enrollUser(userId, profileName, List[String](signature1, signature2, signature3, signature4, signature5, signature6))
   }
 
+  // TODO(wchan): What to do if preceding call to addProfile is done for profileName that already exists?
   def enrollUser(userId: String, profileName: String, signatureDataContainers: List[String]): Boolean = {
     val SignatureDataContainerXmlStrArr: WebServiceBiometricPartStub.ArrayOfString = new WebServiceBiometricPartStub.ArrayOfString
     for (sdc <- signatureDataContainers) SignatureDataContainerXmlStrArr.addString(sdc)
@@ -91,9 +92,30 @@ object XyzmoBiometricServices {
     val enrollDynamicResponse1: EnrollDynamicProfile_v1Response = getWebServiceProxyBiometricPart.get.enrollDynamicProfile_v1(enrollDynamicProfile)
     val enrollResult1: EnrollResultInfo_v1 = enrollDynamicResponse1.getEnrollDynamicProfile_v1Result
     if (enrollResult1.getBaseResult eq WebServiceBiometricPartStub.BaseResultEnum.ok) {
-      XyzmoBiometricServices.log.info("EnrollDynamicProfile_v1: EnrollResult is " + enrollResult1.getOkInfo.getEnrollResult.getValue)
-      XyzmoBiometricServices.log.info("EnrollDynamicProfile_v1: Profile " + enrollResult1.getOkInfo.getInfoEnrollOk.getProfileId + " created; contains " + enrollResult1.getOkInfo.getInfoEnrollOk.getNrEnrolled + " signatures.")
-      true
+      val enrollresult = enrollResult1.getOkInfo.getEnrollResult.getValue
+      XyzmoBiometricServices.log.info("EnrollDynamicProfile_v1: EnrollResult is " + enrollresult)
+      enrollresult match {
+        case "EnrollCompleted" => {
+          XyzmoBiometricServices.log.info("EnrollDynamicProfile_v1: Profile " + enrollResult1.getOkInfo.getInfoEnrollOk.getProfileId + " created; contains " + enrollResult1.getOkInfo.getInfoEnrollOk.getNrEnrolled + " signatures.")
+          true
+        }
+        case "EnrollRejected" => {
+          if (enrollResult1.getOkInfo.getRejectedSignatures != null) {
+            val rejectedSignatures: Array[RejectedSignature] = enrollResult1.getOkInfo.getRejectedSignatures.getRejectedSignature
+            XyzmoBiometricServices.log.info("EnrollDynamicProfile_v1: " + rejectedSignatures.length + " signatures rejected. Reasons follow:")
+            for (rejectedSignature <- rejectedSignatures) {
+              XyzmoBiometricServices.log.info("Rejection reason: " + rejectedSignature.getReason.toString)
+              // TODO(wchan): Ask Xyzmo for rejectable signatures. Are they in the same order as signatureDataContainers?
+              // Store this information.
+            }
+          }
+          false
+        }
+        case "EnrollContinued:" => {
+          // todo(wchan): Ask Xyzmo what continuous enrollment is for. We probably don't want to use this.
+          false
+        }
+      }
     }
     else {
       XyzmoBiometricServices.log.error("Error during EnrollDynamicProfile_v1: " + enrollResult1.getErrorInfo.getErrorMsg)
