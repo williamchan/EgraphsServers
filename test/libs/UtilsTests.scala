@@ -49,7 +49,7 @@ class UtilsTests extends UnitFlatSpec
 
   "lookupUrl" should "find controllers that exist" in {
     val params = Map("celebrityUrlSlug" -> "Wizzle", "productUrlSlug" -> "Herp")
-    Utils.lookupUrl("CelebrityProductController.buy", params).url should be ("/Wizzle/Herp/buy")
+    Utils.lookupUrl("WebsiteControllers.postBuyProduct", params).url should be ("/Wizzle/Herp/buy")
 
   }
 

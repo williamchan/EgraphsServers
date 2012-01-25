@@ -6,6 +6,14 @@ import play.data.validation.Validation
 import java.sql.Timestamp
 import libs.Time
 import db.{KeyedCaseClass, Saves, Schema}
+import com.google.inject.Inject
+import services.AppConfig
+
+
+/**
+ * Services used by each Account object
+ */
+case class AccountServices @Inject() (accountStore: AccountStore)
 
 /**
  * Basic account information for any user in the system
@@ -19,10 +27,13 @@ case class Account(
   celebrityId: Option[Long] = None,
   administratorId: Option[Long] = None,
   created: Timestamp = Time.defaultTimestamp,
-  updated: Timestamp = Time.defaultTimestamp
+  updated: Timestamp = Time.defaultTimestamp,
+  services: AccountServices = AppConfig.instance[AccountServices]
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated
 {
-  def save(): Account = Account.save(this)
+  def save(): Account = {
+    services.accountStore.save(this)
+  }
 
   def password: Option[Password] = {
     (passwordHash, passwordSalt) match {
@@ -61,7 +72,7 @@ case class Account(
   override def unapplied = Account.unapply(this)
 }
 
-object Account extends Saves[Account] with SavesCreatedUpdated[Account] {
+class AccountStore @Inject() (schema: db.Schema) extends Saves[Account] with SavesCreatedUpdated[Account] {
   def authenticate(email: String, passwordAttempt: String): Either[AccountAuthenticationError, Account] = {
     findByEmail(email) match {
       case None =>
@@ -86,14 +97,14 @@ object Account extends Saves[Account] with SavesCreatedUpdated[Account] {
   //
   def findByEmail(email: String): Option[Account] = {
     val emailInLowerCase = email.trim().toLowerCase
-    from(Schema.accounts)(account =>
+    from(schema.accounts)(account =>
       where(account.email === emailInLowerCase)
         select (account)
     ).headOption
   }
 
   def findByCustomerId(customerId: Long): Option[Account] = {
-    from(Schema.accounts)(account =>
+    from(schema.accounts)(account =>
       where(account.customerId === customerId)
         select (account)
     ).headOption
@@ -102,7 +113,7 @@ object Account extends Saves[Account] with SavesCreatedUpdated[Account] {
   //
   // Saves[Account] methods
   //
-  override val table = Schema.accounts
+  override val table = schema.accounts
 
   override def defineUpdate(theOld: Account, theNew: Account) = {
     updateIs(

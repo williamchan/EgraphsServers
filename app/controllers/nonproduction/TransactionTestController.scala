@@ -1,7 +1,9 @@
-package controllers
+package controllers.nonproduction
 
 import play.mvc.Controller
-import models.Account
+import models.{AccountStore, Account}
+import services.AppConfig
+import services.http.DBTransaction
 
 /**
  * Test controller used in [[controllers.DBTransactionTests]] to verify that Play does, in fact,
@@ -17,7 +19,7 @@ object TransactionTestController extends Controller with DBTransaction {
   }
 
   def isStored = {
-    Account.findByEmail("erem@egraphs.com").headOption match {
+    AppConfig.instance[AccountStore].findByEmail("erem@egraphs.com").headOption match {
       case None => "Nope"
       case _ => "Yep"
     }

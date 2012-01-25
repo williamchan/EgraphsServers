@@ -6,6 +6,7 @@ import play.data.validation.Validation
 import play.test.UnitFlatSpec
 import scala.collection.JavaConversions._
 import utils.{DBTransactionPerTest, SavingEntityTests, CreatedUpdatedEntityTests, ClearsDatabaseAndValidationAfter}
+import services.AppConfig
 
 class AccountTests extends UnitFlatSpec
 with ShouldMatchers
@@ -14,6 +15,13 @@ with SavingEntityTests[Account]
 with CreatedUpdatedEntityTests[Account]
 with ClearsDatabaseAndValidationAfter
 with DBTransactionPerTest {
+  import AppConfig.instance
+
+  val accountStore = instance[AccountStore]
+  val celebrityStore = instance[CelebrityStore]
+  val customerStore = instance[CustomerStore]
+  val administratorStore = instance[AdministratorStore]
+
   //
   // SavingEntityTests[Account] methods
   //
@@ -22,17 +30,17 @@ with DBTransactionPerTest {
   }
 
   def saveEntity(toSave: Account) = {
-    Account.save(toSave)
+    accountStore.save(toSave)
   }
 
   def restoreEntity(accountId: Long) = {
-    Account.findById(accountId)
+    accountStore.findById(accountId)
   }
 
   override def transformEntity(toTransform: Account) = {
-    Celebrity.save(Celebrity())
-    Customer.save(Customer())
-    Administrator.save(Administrator())
+    celebrityStore.save(Celebrity())
+    customerStore.save(Customer())
+    administratorStore.save(Administrator())
     toTransform.copy(
       email = "derp",
       passwordHash = Some("derp"),
@@ -72,8 +80,8 @@ with DBTransactionPerTest {
     val storedPassword = stored.password.get
 
     // Run test
-    val saved = Account.save(stored)
-    val maybeRecalled = Account.findById(saved.id)
+    val saved = accountStore.save(stored)
+    val maybeRecalled = accountStore.findById(saved.id)
 
     // Check expectations
     maybeRecalled should not be (None)
@@ -103,43 +111,43 @@ with DBTransactionPerTest {
   }
 
   it should "should persist fine with no celebrity/customer/admin IDs" in {
-    Account.save(Account()) // Doesn't throw any errors
+    accountStore.save(Account()) // Doesn't throw any errors
   }
 
   it should "fail to persist with non-null, non-existent celebrity ID" in {
     val thrown = evaluating {
-      Account.save(Account(celebrityId = Some(1L)))
+      accountStore.save(Account(celebrityId = Some(1L)))
     } should produce[RuntimeException]
     thrown.getMessage.toUpperCase.contains("CELEBRITYID") should be(true)
   }
 
   it should "fail to persist with non-null, non-existent customer ID" in {
     val thrown = evaluating {
-      Account.save(Account(customerId = Some(1L)))
+      accountStore.save(Account(customerId = Some(1L)))
     } should produce[RuntimeException]
     thrown.getMessage.toUpperCase.contains("CUSTOMERID") should be(true)
   }
 
   it should "fail to persist with non-null, non-existent administrator ID" in {
     val thrown = evaluating {
-      Account.save(Account(administratorId = Some(1L)))
+      accountStore.save(Account(administratorId = Some(1L)))
     } should produce[RuntimeException]
     thrown.getMessage.toUpperCase.contains("ADMINISTRATORID") should be(true)
   }
 
   it should "be recoverable by email" in {
     val stored = Account(email = "derp@derp.com").save()
-    Account.findByEmail(stored.email) should be(Some(stored))
+    accountStore.findByEmail(stored.email) should be(Some(stored))
   }
 
   it should "authenticate the correct email and password in" in {
     val stored = savedAccountWithEmailAndPassword("derp@derp.com", "supersecret")
-    Account.authenticate("derp@derp.com", "supersecret") should be(Right(stored))
+    accountStore.authenticate("derp@derp.com", "supersecret") should be(Right(stored))
   }
 
   it should "fail to authenticate with an AccountCredentialsError if the password is wrong" in {
     savedAccountWithEmailAndPassword("derp@derp.com", "supersecret")
-    Account.authenticate("derp@derp.com", "superWRONG") match {
+    accountStore.authenticate("derp@derp.com", "superWRONG") match {
       case Left(correct: AccountCredentialsError) => // phew
       case anythingElse => fail(anythingElse + " should have been a credentials error")
     }
@@ -147,14 +155,14 @@ with DBTransactionPerTest {
 
   it should "fail to authenticate with an AccountPasswordNotSetError if the account wasn't protected" in {
     Account(email = "derp@derp.com").save()
-    Account.authenticate("derp@derp.com", "supersecret") match {
+    accountStore.authenticate("derp@derp.com", "supersecret") match {
       case Left(correct: AccountPasswordNotSetError) => // phew
       case anythingElse => fail(anythingElse + " should have been an AccountPasswordNotSetError")
     }
   }
 
   it should "fail to authenticate with an AccountNotFoundError if an account with the given email didnt exist" in {
-    Account.authenticate("derp@derp.com", "supersecret") match {
+    accountStore.authenticate("derp@derp.com", "supersecret") match {
       case Left(correct: AccountNotFoundError) => // phew
       case anythingElse => fail(anythingElse + " should have been an AccountNotFoundError")
     }
@@ -162,21 +170,21 @@ with DBTransactionPerTest {
 
   it should "save email in lowercase" in {
     val stored = Account(email = "DERP@DERP.COM").save()
-    Account.findByEmail("derp@derp.com") should be(Some(stored))
+    accountStore.findByEmail("derp@derp.com") should be(Some(stored))
   }
 
   it should "save email trimmed" in {
     val stored = Account(email = "                    derp@derp.com                    ").save()
-    Account.findByEmail("derp@derp.com") should be(Some(stored))
+    accountStore.findByEmail("derp@derp.com") should be(Some(stored))
   }
 
   it should "find by email case-insensitively" in {
     val stored = Account(email = "derp@derp.com").save()
-    Account.findByEmail("DERP@DERP.COM") should be(Some(stored))
+    accountStore.findByEmail("DERP@DERP.COM") should be(Some(stored))
   }
 
   def accountWithPassword(password: String): Account = {
-    Account.save(Account().withPassword(password).right.get)
+    accountStore.save(Account().withPassword(password).right.get)
   }
 
   def savedAccountWithEmailAndPassword(email: String, password: String): Account = {

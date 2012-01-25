@@ -2,12 +2,21 @@ package models
 
 import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
-import db.{KeyedCaseClass, Schema, Saves}
 import org.squeryl.dsl.ast.LogicalBoolean
 import org.joda.money.Money
 import libs.Finance.TypeConversions._
 import libs.{Payment, Utils, Serialization, Time}
 import models.CashTransaction.EgraphPurchase
+import services.AppConfig
+import db.{FilterThreeTables, KeyedCaseClass, Schema, Saves}
+import com.google.inject.{Provider, Inject}
+
+case class OrderServices @Inject() (
+  store: OrderStore,
+  customerStore: CustomerStore,
+  productStore: ProductStore,
+  cashTransactionServices: Provider[CashTransactionServices],
+  egraphServices: Provider[EgraphServices])
 
 /**
  * Persistent entity representing the Orders made upon Products of our service
@@ -26,7 +35,8 @@ case class Order(
   messageToCelebrity: Option[String] = None,
   requestedMessage: Option[String] = None,
   created: Timestamp = Time.defaultTimestamp,
-  updated: Timestamp = Time.defaultTimestamp
+  updated: Timestamp = Time.defaultTimestamp,
+  services: OrderServices = AppConfig.instance[OrderServices]
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated
 {
   import Order._
@@ -36,7 +46,7 @@ case class Order(
   //
   /** Persists by conveniently delegating to companion object's save method. */
   def save(): Order = {
-    Order.save(this)
+    services.store.save(this)
   }
 
   def amountPaid: Money = {
@@ -50,17 +60,17 @@ case class Order(
 
   /** Retrieves the purchasing Customer from the database. */
   def buyer: Customer = {
-    Customer.get(buyerId)
+    services.customerStore.get(buyerId)
   }
 
   /** Retrieves the receiving Customer from the database */
   def recipient: Customer = {
-    Customer.get(recipientId)
+    services.customerStore.get(recipientId)
   }
 
   /** Retrieves the purchased Product from the database */
   def product: Product = {
-    Product.get(productId)
+    services.productStore.get(productId)
   }
 
   /** Returns an order configured with the provided payment state */
@@ -72,7 +82,7 @@ case class Order(
   def charge: OrderCharge = {
     require(stripeCardTokenId != None, "Can not charge an order without a valid stripe card token")
 
-    val cashTransaction = CashTransaction(accountId=buyerId)
+    val cashTransaction = CashTransaction(accountId=buyerId, services=services.cashTransactionServices.get)
       .withCash(amountPaid)
       .withType(EgraphPurchase)
 
@@ -86,8 +96,9 @@ case class Order(
    * by the API (e.g. JSON)
    */
   def renderedForApi: Map[String, Any] = {
-    val buyer = Customer.findById(buyerId).get
-    val recipient = if (buyerId != recipientId) Customer.findById(recipientId).get else buyer
+    val customerStore = services.customerStore
+    val buyer = customerStore.findById(buyerId).get
+    val recipient = if (buyerId != recipientId) customerStore.findById(recipientId).get else buyer
 
     val requiredFields = Map(
       "id" -> id,
@@ -113,7 +124,7 @@ case class Order(
    * Produces a new Egraph associated with this order.
    */
   def newEgraph: Egraph = {
-    Egraph(orderId=id).withState(AwaitingVerification)
+    Egraph(orderId=id, services=services.egraphServices.get).withState(AwaitingVerification)
   }
   
   //
@@ -124,22 +135,22 @@ case class Order(
 
 case class FulfilledOrder(order: Order, egraph: Egraph)
 
-object Order extends Saves[Order] with SavesCreatedUpdated[Order] {
+class OrderStore @Inject() (schema: db.Schema) extends Saves[Order] with SavesCreatedUpdated[Order] {
   //
-  // Public Methods
+  // Public methods
   //
   /**
    * Returns a completed Order/Egraph combination with the given ID
    */
   def findFulfilledWithId(id: Long): Option[FulfilledOrder] = {
-    import Schema.{orders, egraphs}
+    import schema.{orders, egraphs}
     from(orders, egraphs)((order, egraph) =>
       where(
         order.id === id and
-        egraph.orderId === order.id and
-        egraph.stateValue === Verified.value
+          egraph.orderId === order.id and
+          egraph.stateValue === Verified.value
       )
-      select (FulfilledOrder(order, egraph))
+        select (FulfilledOrder(order, egraph))
     ).headOption
   }
 
@@ -147,90 +158,123 @@ object Order extends Saves[Order] with SavesCreatedUpdated[Order] {
    * Callable object that finds a list of Orders based on the id of the Celebrity
    * who owns the Product that was purchased.
    */
-  object FindByCelebrity {
-    def apply(celebrityId: Long, filters: Filter*):Iterable[Order] = {
-      import Schema.{celebrities, products, orders}
 
-      from(celebrities, products, orders)((celebrity, product, order) =>
-        where(
-          celebrity.id === celebrityId and
+  def FindByCelebrity(celebrityId: Long, filters: FilterThreeTables[Celebrity, Product, Order]*):Iterable[Order] = {
+    import schema.{celebrities, products, orders}
+
+    from(celebrities, products, orders)((celebrity, product, order) =>
+      where(
+        celebrity.id === celebrityId and
           celebrity.id === product.celebrityId and
           product.id === order.productId and
-          reduceFilters(filters, celebrity, product, order)
-        )
+          FilterThreeTables.reduceFilters(filters, celebrity, product, order)
+      )
         select(order)
         orderBy(order.created asc)
-      )
-    }
+    )
+  }
+
+  /**
+   * Set of Filters you can compose with your query to FindByCelebrity
+   */
+  object Filters {
 
     /**
-     * Base definition of an object that can apply a Squeryl filter against the join
-     * between Schema.celebrities, Schema.products, Schema.orders that occurs in the
-     * Order.FindByCelebrity function.
+     * Returns only orders that are actionable by the celebrity that owns them when
+     * composed with FindByCelebrity.
+     *
+     * In model terms, these are these are any Orders that don't have an Egraph that
+     * is either Verified or AwaitingVerification.
      */
-    sealed trait Filter {
-      /**
-       * Returns the logical filter to apply upon the join between Celebrity/Product/Order
-       */
-      def test(celebrity: Celebrity, product: Product, order: Order): LogicalBoolean
-    }
-
-    /**
-     * Set of Filters you can compose with your query to FindByCelebrity
-     */
-    object Filters {
-
-      /**
-       * Returns only orders that are actionable by the celebrity that owns them when
-       * composed with FindByCelebrity.
-       * 
-       * In model terms, these are these are any Orders that don't have an Egraph that
-       * is either Verified or AwaitingVerification.
-       */
-      object ActionableOnly extends Filter {
-        override def test(celebrity: Celebrity, product: Product, order: Order) = {
-          notExists(
-            from(Schema.egraphs)(egraph =>
-              where((egraph.orderId === order.id) and (egraph.stateValue in Seq(Verified.value, AwaitingVerification.value)))
+    object ActionableOnly extends FilterThreeTables[Celebrity, Product, Order] {
+      override def test(celebrity: Celebrity, product: Product, order: Order) = {
+        notExists(
+          from(schema.egraphs)(egraph =>
+            where((egraph.orderId === order.id) and (egraph.stateValue in Seq(Verified.value, AwaitingVerification.value)))
               select(egraph.id)
-            )
           )
-        }
-      }
-
-      /**
-       * Returns only orders with the given orderId when composed with FindByCelebrity
-       */
-      case class OrderId(id: Long) extends Filter {
-        override def test(celebrity: Celebrity, product: Product, order: Order) = {
-          (order.id === id)
-        }
+        )
       }
     }
 
-    //
-    // Private methods (FindByCelebrity)
-    //
-    private def reduceFilters(
-      filters: Iterable[Filter],
-      celebrity: Celebrity,
-      product: Product,
-      order: Order): LogicalBoolean =
-    {
-      filters.headOption match {
-        // Just return the trivial comparison if there were no filters
-        case None =>
-          (1 === 1)
-
-        // Otherwise reduce the collection of filters against the first
-        case Some(firstFilter) =>
-          filters.tail.foldLeft(firstFilter.test(celebrity, product, order))(
-            (compositeFilter, nextFilter) =>
-              (nextFilter.test(celebrity, product, order) and compositeFilter)
-          )
+    /**
+     * Returns only orders with the given orderId when composed with FindByCelebrity
+     */
+    case class OrderId(id: Long) extends FilterThreeTables[Celebrity, Product, Order] {
+      override def test(celebrity: Celebrity, product: Product, order: Order) = {
+        (order.id === id)
       }
     }
   }
+
+  //
+  // Saves[Order] methods
+  //
+  override val table = schema.orders
+
+  override def defineUpdate(theOld: Order, theNew: Order) = {
+    updateIs(
+      theOld.productId := theNew.productId,
+      theOld.buyerId := theNew.buyerId,
+      theOld.transactionId := theNew.transactionId,
+      theOld.paymentStateString := theNew.paymentStateString,
+      theOld.stripeCardTokenId := theNew.stripeCardTokenId,
+      theOld.stripeChargeId := theNew.stripeChargeId,
+      theOld.amountPaidInCurrency := theNew.amountPaidInCurrency,
+      theOld.recipientId := theNew.recipientId,
+      theOld.recipientName := theNew.recipientName,
+      theOld.messageToCelebrity := theNew.messageToCelebrity,
+      theOld.requestedMessage := theNew.requestedMessage,
+      theOld.created := theNew.created,
+      theOld.updated := theNew.updated
+    )
+  }
+
+  //
+  // SavesCreatedUpdated[Order] methods
+  //
+  override def withCreatedUpdated(toUpdate: Order, created: Timestamp, updated: Timestamp) = {
+    toUpdate.copy(created=created, updated=updated)
+  }
+}
+
+object OrderStore {
+  object FindByCelebrity {
+    /**
+     * Returns only orders that are actionable by the celebrity that owns them when
+     * composed with FindByCelebrity.
+     *
+     * In model terms, these are these are any Orders that don't have an Egraph that
+     * is either Verified or AwaitingVerification.
+     */
+    class ActionableOnly @Inject() (schema: Schema) extends FilterThreeTables[Celebrity, Product, Order] {
+      override def test(celebrity: Celebrity, product: Product, order: Order) = {
+        notExists(
+          from(schema.egraphs)(egraph =>
+            where((egraph.orderId === order.id) and (egraph.stateValue in Seq(Verified.value, AwaitingVerification.value)))
+              select(egraph.id)
+          )
+        )
+      }
+    }
+
+    /**
+     * Returns only orders with the given orderId when composed with FindByCelebrity
+     */
+    case class OrderId(id: Long) extends FilterThreeTables[Celebrity, Product, Order] {
+      override def test(celebrity: Celebrity, product: Product, order: Order) = {
+        (order.id === id)
+      }
+    }
+  }
+
+}
+
+// TOOD(erem) remove all store functionality from the Order object
+object Order {
+  //
+  // Public Methods
+  //
 
   /** Encapsulates the act of charging for an order. */
   case class OrderCharge private[Order] (order: Order,
@@ -269,35 +313,5 @@ object Order extends Saves[Order] with SavesCreatedUpdated[Order] {
     val all = Utils.toMap[String, PaymentState](
       Seq(NotCharged, Charged, Refunded), key=(state) => state.stateValue
     )
-  }
-
-  //
-  // Saves[Order] methods
-  //
-  override val table = Schema.orders
-
-  override def defineUpdate(theOld: Order, theNew: Order) = {
-    updateIs(
-      theOld.productId := theNew.productId,
-      theOld.buyerId := theNew.buyerId,
-      theOld.transactionId := theNew.transactionId,
-      theOld.paymentStateString := theNew.paymentStateString,
-      theOld.stripeCardTokenId := theNew.stripeCardTokenId,
-      theOld.stripeChargeId := theNew.stripeChargeId,
-      theOld.amountPaidInCurrency := theNew.amountPaidInCurrency,
-      theOld.recipientId := theNew.recipientId,
-      theOld.recipientName := theNew.recipientName,
-      theOld.messageToCelebrity := theNew.messageToCelebrity,
-      theOld.requestedMessage := theNew.requestedMessage,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated
-    )
-  }
-
-  //
-  // SavesCreatedUpdated[Order] methods
-  //
-  override def withCreatedUpdated(toUpdate: Order, created: Timestamp, updated: Timestamp) = {
-    toUpdate.copy(created=created, updated=updated)
   }
 }

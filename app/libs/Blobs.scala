@@ -10,6 +10,7 @@ import org.jclouds.aws.s3.AWSS3Client
 import org.jclouds.s3.domain.CannedAccessPolicy
 import java.io._
 import play.mvc.Http.Request
+import com.google.inject.Inject
 
 /**
  * Convenience methods for storing and loading large binary data: images,
@@ -23,7 +24,9 @@ import play.mvc.Http.Request
  *
  * To use, import Blobs.Conversions._ into whatever scope.
  */
-object Blobs {
+@Inject() class Blobs {
+  import Blobs.AccessPolicy
+
   /**
    * Tests whether a blob with the provided key exists
    *
@@ -252,19 +255,6 @@ object Blobs {
   }
 
   /**
-   * Constants that determine how Blobs can be accessed.
-   */
-  sealed trait AccessPolicy
-
-  object AccessPolicy {
-    /** Accessible via a public URL */
-    case object Public extends AccessPolicy
-
-    /** Inaccessible via public URL */
-    case object Private extends AccessPolicy
-  }
-  
-  /**
    * Interface for different BlobStore implementations.
    */
   private trait BlobProvider {
@@ -377,4 +367,20 @@ object Blobs {
     }
     override def checkConfiguration() { }
   }
+}
+
+object Blobs extends Blobs {
+  /**
+   * Constants that determine how Blobs can be accessed.
+   */
+  sealed trait AccessPolicy
+
+  object AccessPolicy {
+    /** Accessible via a public URL */
+    case object Public extends AccessPolicy
+
+    /** Inaccessible via public URL */
+    case object Private extends AccessPolicy
+  }
+
 }

@@ -6,6 +6,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 import utils._
+import services.AppConfig
 
 
 class SignatureSampleTests extends UnitFlatSpec
@@ -18,16 +19,18 @@ with DBTransactionPerTest {
   //
   // SavingEntityTests[SignatureSample] methods
   //
+  val store = AppConfig.instance[SignatureSampleStore]
+
   def newEntity = {
     SignatureSample(isForEnrollment = true)
   }
 
   def saveEntity(toSave: SignatureSample) = {
-    SignatureSample.save(toSave)
+    store.save(toSave)
   }
 
   def restoreEntity(id: Long) = {
-    SignatureSample.findById(id)
+    store.findById(id)
   }
 
   override def transformEntity(toTransform: SignatureSample) = {

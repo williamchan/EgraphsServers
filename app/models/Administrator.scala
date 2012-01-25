@@ -4,6 +4,7 @@ import java.sql.Timestamp
 import libs.Time
 import org.squeryl.PrimitiveTypeMode._
 import db.{KeyedCaseClass, Saves, Schema}
+import com.google.inject.Inject
 
 /**
  * Persistent entity representing administrators of our service.
@@ -20,11 +21,11 @@ case class Administrator(
   override def unapplied = Administrator.unapply(this)
 }
 
-object Administrator extends Saves[Administrator] with SavesCreatedUpdated[Administrator] {
+class AdministratorStore @Inject() (schema: Schema) extends Saves[Administrator] with SavesCreatedUpdated[Administrator] {
   //
   // Saves[Administrator] methods
   //
-  override val table = Schema.administrators
+  override val table = schema.administrators
 
   override def defineUpdate(theOld: Administrator, theNew: Administrator) = {
     updateIs(

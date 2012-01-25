@@ -4,7 +4,7 @@
   fields: (String) => String)
 
 @import models.Product
-@import controllers.CelebrityController
+@import controllers.WebsiteControllers
 @import libs.Blobs.AccessPolicy.Public
 @import libs.Finance.TypeConversions._
 @import libs.Utils.lookupUrl
@@ -52,7 +52,7 @@
 }
 
 @buyPage = @{
-  lookupUrl("CelebrityProductController.buy", urlSlugMap)
+  lookupUrl("WebsiteControllers.getCelebrityProduct", urlSlugMap)
 }
 
 @formField(id: String,
@@ -83,13 +83,13 @@
   <div class="product-content">
     <div class="row product-header" >
       <div class="span2 profile-thumbnail" >
-        <a href="@CelebrityController.url(celebrity)" >
+        <a href="@WebsiteControllers.lookupGetCelebrity(celebrity.urlSlug.get)" >
           <img src="@profilePhoto_100x100" alt="@celebrity.publicName profile photo">
         </a>
       </div>
       <div class="span14 product-header">
         <h2>
-          <a href="@CelebrityController.url(celebrity)">
+          <a href="@WebsiteControllers.lookupGetCelebrity(celebrity.urlSlug.get)">
             @celebrity.publicName
           </a> in
         </h2>

@@ -2,12 +2,13 @@ package jobs
 
 import org.squeryl.PrimitiveTypeMode._
 import play.jobs._
-import models.{Celebrity, VoiceSample, SignatureSample, EnrollmentBatch}
 import libs.Blobs
 import Blobs.Conversions._
 import services.signature.XyzmoBiometricServices
 import db.Schema
 import services.voice.{VBGRequest, VBGBiometricServices}
+import models._
+import services.AppConfig
 
 @On("0 0 0 * * ?") // cron expression: seconds minutes hours day-of-month month day-of-week (year optional)
 class EnrollmentBatchJob extends Job {
@@ -25,8 +26,10 @@ class EnrollmentBatchJob extends Job {
     // TODO(wchan): Should inTransaction be used here?
 
     inTransaction {
+      val celebStore = AppConfig.instance[CelebrityStore]
+
       for (batch <- EnrollmentBatchJob.findEnrollmentBatchesPending()) {
-        val celebrity = Celebrity.findById(batch.celebrityId).get
+        val celebrity = celebStore.findById(batch.celebrityId).get
 
         val signatureSamples: List[SignatureSample] = EnrollmentBatchJob.getSignatureSamples(batch)
         val voiceSamples: List[VoiceSample] = EnrollmentBatchJob.getVoiceSamples(batch)

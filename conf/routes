@@ -7,15 +7,13 @@
 ###
 %{ if (play.id == "test") }%
 
-GET     /test/scenarios                          ScenarioController.list
-GET     /test/scenarios/clear                    ScenarioController.clear
-GET     /test/scenarios/{urlSlug}                ScenarioController.scenario
+GET     /test/scenarios                          nonproduction.ScenarioController.list
+GET     /test/scenarios/clear                    nonproduction.ScenarioController.clear
+GET     /test/scenarios/{urlSlug}                nonproduction.ScenarioController.scenario
 
-GET     /test/request-transaction/without-error  TransactionTestController.makeAccount
-GET     /test/request-transaction/with-error     TransactionTestController.makeAccountAndThrowException
-GET     /test/request-transaction/is-stored      TransactionTestController.isStored
-
-# GET     /test/files/{<.*>blobKey}                BlobControllers.getBlob
+GET     /test/request-transaction/without-error  nonproduction.TransactionTestController.makeAccount
+GET     /test/request-transaction/with-error     nonproduction.TransactionTestController.makeAccountAndThrowException
+GET     /test/request-transaction/is-stored      nonproduction.TransactionTestController.isStored
 
 ###
 ### Production routes
@@ -26,17 +24,18 @@ GET     /test/request-transaction/is-stored      TransactionTestController.isSto
 ##
 %{ if (true) }%
 # Home page
-GET     /                                       Application.index
+GET     /                                       WebsiteControllers.getRootEndpoint
 
 # For Alpha-phase prod mode:
-GET     /admin/reset-alpha-state                test.resetAlphaState
-GET     /test/script                            test.script
-GET     /test/files/{<.*>blobKey}               BlobControllers.getBlob
+
+GET     /test/script                            nonproduction.TestControllers.script
+GET     /admin/reset-alpha-state                nonproduction.AlphaControllers.resetAlphaState
+GET     /test/files/{<.*>blobKey}               WebsiteControllers.getBlob
 
 # For Demo setup prod mode:
-GET     /demo-setup/list                         DemoSetupController.list
-GET     /demo-setup/clear                        DemoSetupController.clear
-GET     /demo-setup/{urlSlug}                    DemoSetupController.demoScenario
+GET     /demo-setup/list                         nonproduction.DemoSetupController.list
+GET     /demo-setup/clear                        nonproduction.DemoSetupController.clear
+GET     /demo-setup/{urlSlug}                    nonproduction.DemoSetupController.demoScenario
 
 # Ignore favicon requests
 GET     /favicon.ico                            404
@@ -49,21 +48,21 @@ GET     /public/                                staticDir:public
 ##
 %{ api = '/api/1.0' }%
 
-GET     ${api}/celebrities/{celebrityId}                          api.CelebrityApiControllers.getCelebrity
-POST    ${api}/celebrities/{celebrityId}/enrollmentsamples        api.CelebrityApiControllers.postEnrollmentSample
-GET     ${api}/celebrities/{celebrityId}/orders                   api.CelebrityApiControllers.getOrders
-POST    ${api}/celebrities/{celebrityId}/orders/{orderId}/egraphs api.CelebrityOrderApiControllers.postEgraph
+GET     ${api}/celebrities/{celebrityId}                          ApiControllers.getCelebrity
+POST    ${api}/celebrities/{celebrityId}/enrollmentsamples        ApiControllers.postEnrollmentSample
+GET     ${api}/celebrities/{celebrityId}/orders                   ApiControllers.getCelebrityOrders
+POST    ${api}/celebrities/{celebrityId}/orders/{orderId}/egraphs ApiControllers.postEgraph
 
 ##
 ## Website
 ##
 
 # Order and Egraph pages
-GET     /orders/{<[0-9]+>orderId}/confirm                OrderConfirmationController.confirm
-GET     /egraph/{<[0-9]+>orderId}                        EgraphController.egraph
+GET     /orders/{<[0-9]+>orderId}/confirm                WebsiteControllers.getOrderConfirmation
+GET     /egraph/{<[0-9]+>orderId}                        WebsiteControllers.getEgraph
 
 # Celebrity pages
-GET     /{celebrityUrlSlug}                      CelebrityController.index
-GET     /{celebrityUrlSlug}/{productUrlSlug}     CelebrityProductController.index
-POST    /{celebrityUrlSlug}/{productUrlSlug}/buy CelebrityProductController.buy
+GET     /{celebrityUrlSlug}                      WebsiteControllers.getCelebrity
+GET     /{celebrityUrlSlug}/{productUrlSlug}     WebsiteControllers.getCelebrityProduct
+POST    /{celebrityUrlSlug}/{productUrlSlug}/buy WebsiteControllers.postBuyProduct
 

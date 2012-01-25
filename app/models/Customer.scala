@@ -4,6 +4,11 @@ import java.sql.Timestamp
 import libs.Time
 import org.squeryl.PrimitiveTypeMode._
 import db.{KeyedCaseClass, Schema, Saves}
+import services.AppConfig
+import com.google.inject.{Provider, Inject}
+
+/** Services used by each instance of Customer */
+case class CustomerServices @Inject() (accountStore: AccountStore, customerStore: CustomerStore)
 
 /**
  * Persistent entity representing customers who buy products from our service.
@@ -12,19 +17,20 @@ case class Customer(
   id: Long = 0L,
   name: String = "",
   created: Timestamp = Time.defaultTimestamp,
-  updated: Timestamp = Time.defaultTimestamp
+  updated: Timestamp = Time.defaultTimestamp,
+  services: CustomerServices = AppConfig.instance[CustomerServices]
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated
 {
   //
   // Public methods
   //
   def save(): Customer = {
-    Customer.save(this)
+    services.customerStore.save(this)
   }
 
   /** Retrieves the Customer's Account from the database */
   def account: Account = {
-    Account.findByCustomerId(id).get
+    services.accountStore.findByCustomerId(id).get
   }
 
   /**
@@ -54,7 +60,13 @@ case class Customer(
   }
 }
 
-object Customer extends Saves[Customer] with SavesCreatedUpdated[Customer] {
+class CustomerStore @Inject() (
+  schema: db.Schema,
+  accountStore: AccountStore,
+  customerServices: Provider[CustomerServices],
+  accountServices: Provider[AccountServices]
+) extends Saves[Customer] with SavesCreatedUpdated[Customer]
+{
   //
   // Public members
   //
@@ -72,10 +84,10 @@ object Customer extends Saves[Customer] with SavesCreatedUpdated[Customer] {
     // TODO: Optimize this using a single outer-join query to get Customer + Account all at once
 
     // Get the Account and Customer face if both exist.
-    val accountOption = Account.findByEmail(email)
+    val accountOption = accountStore.findByEmail(email)
     val customerOption = accountOption.flatMap { account =>
       account.customerId.flatMap { customerId =>
-        Customer.findById(customerId)
+        findById(customerId)
       }
     }
 
@@ -87,8 +99,8 @@ object Customer extends Saves[Customer] with SavesCreatedUpdated[Customer] {
       // Customer face didn't exist. Use existing or new Account to create
       // the face and return it.
       case None =>
-        val customer = Customer(name=name).save()
-        val account = accountOption.getOrElse(Account(email=email))
+        val customer = Customer(name=name, services=customerServices.get).save()
+        val account = accountOption.getOrElse(Account(email=email, services=accountServices.get))
 
         account.copy(customerId=Some(customer.id)).save()
 
@@ -99,7 +111,7 @@ object Customer extends Saves[Customer] with SavesCreatedUpdated[Customer] {
   //
   // Saves[Customer] methods
   //
-  override val table = Schema.customers
+  override val table = schema.customers
 
   override def defineUpdate(theOld: Customer, theNew: Customer) = {
     updateIs(

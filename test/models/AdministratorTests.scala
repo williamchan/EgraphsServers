@@ -4,6 +4,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 import utils.{DBTransactionPerTest, SavingEntityTests, CreatedUpdatedEntityTests, ClearsDatabaseAndValidationAfter}
+import services.AppConfig
 
 class AdministratorTests extends UnitFlatSpec
   with ShouldMatchers
@@ -13,6 +14,7 @@ class AdministratorTests extends UnitFlatSpec
   with ClearsDatabaseAndValidationAfter
   with DBTransactionPerTest
 {
+  val adminStore = AppConfig.instance[AdministratorStore]
 
   //
   // SavingEntityTests[Account] methods
@@ -22,11 +24,11 @@ class AdministratorTests extends UnitFlatSpec
   }
 
   override def saveEntity(toSave: Administrator) = {
-    Administrator.save(toSave)
+    adminStore.save(toSave)
   }
 
   override def restoreEntity(id: Long) = {
-    Administrator.findById(id)
+    adminStore.findById(id)
   }
 
   override def transformEntity(toTransform: Administrator) = {

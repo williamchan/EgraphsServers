@@ -7,12 +7,15 @@ import java.io.{FileOutputStream, File}
 import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
 import libs.{ImageUtil, TempFile}
+import services.AppConfig
 
 class ImageAssetTests extends UnitFlatSpec
   with ShouldMatchers
   with DBTransactionPerTest
   with ClearsDatabaseAndValidationAfter
 {
+  val assetServices = AppConfig.instance[ImageAssetServices]
+
   import ImageUtil.Conversions._
 
   val keyBase = "egraph/1234"
@@ -22,7 +25,7 @@ class ImageAssetTests extends UnitFlatSpec
     val image = imageFromDisk
     val imageBytes = image.asByteArray(ImageAsset.Png)
 
-    val asset = ImageAsset(imageBytes, keyBase, assetName, ImageAsset.Png)
+    val asset = ImageAsset(imageBytes, keyBase, assetName, ImageAsset.Png, assetServices)
 
     new FileOutputStream(TempFile.named("img_orig.png")).write(imageBytes)
     ImageIO.write(asset.renderFromMaster, "png", TempFile.named("img_rendered.png"))
@@ -31,7 +34,7 @@ class ImageAssetTests extends UnitFlatSpec
   }
 
   it should "have the right key, both for master and permutations" in {
-    val asset = ImageAsset(Array.empty[Byte], keyBase, assetName, ImageAsset.Png)
+    val asset = ImageAsset(Array.empty[Byte], keyBase, assetName, ImageAsset.Png, assetServices)
 
     asset.key should be ("egraph/1234/profile/master.png")
     asset.resized(100, 100).key should be ("egraph/1234/profile/100x100.png")
@@ -95,14 +98,14 @@ class ImageAssetTests extends UnitFlatSpec
     val storedBytes = storedAsset.renderFromMaster.asByteArray(ImageAsset.Png)
     storedAsset.save()
 
-    val restoredAsset = ImageAsset(keyBase, assetName, ImageAsset.Png)
+    val restoredAsset = ImageAsset(keyBase, assetName, ImageAsset.Png, assetServices)
     val restoredBytes = restoredAsset.renderFromMaster.asByteArray(ImageAsset.Png)
 
     restoredBytes.toSeq should be (storedBytes.toSeq)
   }
 
   it should "throw an IllegalStateException when trying to source from a master blob that doesn't exist" in {
-    val restoredAsset = ImageAsset(keyBase, assetName, ImageAsset.Png)
+    val restoredAsset = ImageAsset(keyBase, assetName, ImageAsset.Png, assetServices)
     evaluating { restoredAsset.renderFromMaster } should produce [IllegalStateException]
   }
 
@@ -138,6 +141,6 @@ class ImageAssetTests extends UnitFlatSpec
   }
 
   def makeAsset(bytes: => Array[Byte]) = {
-    ImageAsset(bytes, keyBase, assetName, ImageAsset.Png)
+    ImageAsset(bytes, keyBase, assetName, ImageAsset.Png, assetServices)
   }
 }

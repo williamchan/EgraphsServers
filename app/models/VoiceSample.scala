@@ -3,29 +3,38 @@ package models
 import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
 import libs.{Blobs, Time}
-import db.{KeyedCaseClass, Schema, Saves}
+import db.{KeyedCaseClass, Saves}
 import play.libs.Codec
+import com.google.inject.Inject
+import services.AppConfig
 
-case class VoiceSample(id: Long = 0,
-                       isForEnrollment: Boolean,
-                       egraphId: Option[Long] = None,
-                       voiceEnrollmentAttemptId: Option[Long] = None,
-                       vbgAudioCheckErrorCode: Option[String] = None,
-                       vbgUsableTime: Option[Int] = None,
-                       vbgVerifySampleErrorCode: Option[String] = None,
-                       vbgVerifySampleSuccess: Option[String] = None, // turn this into an enum
-                       created: Timestamp = Time.defaultTimestamp,
-                       updated: Timestamp = Time.defaultTimestamp)
-  extends KeyedCaseClass[Long]
-  with HasCreatedUpdated {
+/**
+ * Services used in all voice sample instances
+ */
+case class VoiceSampleServices @Inject() (store: VoiceSampleStore, blobs: libs.Blobs)
+
+case class VoiceSample(
+  id: Long = 0,
+  isForEnrollment: Boolean = false,
+  egraphId: Option[Long] = None,
+  voiceEnrollmentAttemptId: Option[Long] = None,
+  vbgAudioCheckErrorCode: Option[String] = None,
+  vbgUsableTime: Option[Int] = None,
+  vbgVerifySampleErrorCode: Option[String] = None,
+  vbgVerifySampleSuccess: Option[String] = None, // turn this into an enum
+  created: Timestamp = Time.defaultTimestamp,
+  updated: Timestamp = Time.defaultTimestamp,
+  services: VoiceSampleServices = AppConfig.instance[VoiceSampleServices]
+) extends KeyedCaseClass[Long] with HasCreatedUpdated
+{
 
   //
   // Public members
   //
   /**Persists by conveniently delegating to companion object's save method. */
   def save(voiceStr: String): VoiceSample = {
-    val saved = VoiceSample.save(this)
-    Blobs.put(VoiceSample.getWavUrl(saved.id), Codec.decodeBASE64(voiceStr))
+    val saved = services.store.save(this)
+    services.blobs.put(VoiceSample.getWavUrl(saved.id), Codec.decodeBASE64(voiceStr))
     saved
   }
 
@@ -36,16 +45,19 @@ case class VoiceSample(id: Long = 0,
 
 }
 
-object VoiceSample extends Saves[VoiceSample] with SavesCreatedUpdated[VoiceSample] {
+object VoiceSample {
 
   def getWavUrl(id: Long): String = {
     "voicesamples/" + id + ".wav"
   }
 
+}
+
+class VoiceSampleStore @Inject() (schema: db.Schema) extends Saves[VoiceSample] with SavesCreatedUpdated[VoiceSample] {
   //
   // Saves[VoiceSample] methods
   //
-  override val table = Schema.voiceSamples
+  override val table = schema.voiceSamples
 
   override def defineUpdate(theOld: VoiceSample, theNew: VoiceSample) = {
     updateIs(

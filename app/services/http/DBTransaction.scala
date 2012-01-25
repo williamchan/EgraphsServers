@@ -1,4 +1,4 @@
-package controllers
+package services.http
 
 import play.mvc.{Finally, Before}
 import db.DBSession

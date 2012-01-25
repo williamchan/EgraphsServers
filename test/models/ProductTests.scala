@@ -5,6 +5,7 @@ import org.scalatest.BeforeAndAfterEach
 import play.test.UnitFlatSpec
 import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationAfter, CreatedUpdatedEntityTests, SavingEntityTests}
 import libs.Time
+import services.AppConfig
 
 class ProductTests extends UnitFlatSpec
   with ShouldMatchers
@@ -14,6 +15,8 @@ class ProductTests extends UnitFlatSpec
   with ClearsDatabaseAndValidationAfter
   with DBTransactionPerTest
 {
+  val store = AppConfig.instance[ProductStore]
+
   //
   // SavingEntityTests[Product] methods
   //
@@ -26,7 +29,7 @@ class ProductTests extends UnitFlatSpec
   }
 
   override def restoreEntity(id: Long) = {
-    Product.findById(id)
+    store.findById(id)
   }
 
   override def transformEntity(toTransform: Product) = {

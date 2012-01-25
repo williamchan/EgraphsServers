@@ -2,8 +2,15 @@ package models
 
 import org.joda.money.{CurrencyUnit, Money}
 import java.sql.Timestamp
-import db.{Saves, KeyedCaseClass}
 import libs.{Utils, Time}
+import com.google.inject.Inject
+import services.AppConfig
+import db.{Schema, Saves, KeyedCaseClass}
+
+/**
+ * Services used by every instance of CashTransaction
+ */
+case class CashTransactionServices @Inject() (cashTransactionStore: CashTransactionStore)
 
 /**
  * Represents a single payment event relative to Egraphs. There should be a row in
@@ -18,7 +25,8 @@ case class CashTransaction(
   currencyCode: String = CurrencyUnit.USD.getCode,
   typeString: String = "",
   created: Timestamp = Time.defaultTimestamp,
-  updated: Timestamp = Time.defaultTimestamp
+  updated: Timestamp = Time.defaultTimestamp,
+  services: CashTransactionServices = AppConfig.instance[CashTransactionServices]
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated
 {
   import CashTransaction._
@@ -28,7 +36,7 @@ case class CashTransaction(
   //
   /** Persist the transaction */
   def save(): CashTransaction = {
-    CashTransaction.save(this)
+    services.cashTransactionStore.save(this)
   }
 
   /** Return the [[org.joda.money.Money]] representation of the object. */
@@ -60,19 +68,21 @@ case class CashTransaction(
   }
 }
 
-object CashTransaction extends Saves[CashTransaction] with SavesCreatedUpdated[CashTransaction] {
+object CashTransaction {
   //
   // Public members
   //
   sealed abstract class TransactionType(val value: String)
   case object EgraphPurchase extends TransactionType("EgraphPurchase")
   case object CelebrityDisbursement extends TransactionType("CelebrityDisbursement")
-  
+
   val types = Utils.toMap[String, TransactionType](Seq(
     EgraphPurchase,
     CelebrityDisbursement
   ), key=(theType) => theType.value)
-  
+}
+
+class CashTransactionStore @Inject() (schema: Schema) extends Saves[CashTransaction] with SavesCreatedUpdated[CashTransaction] {
   //
   // SavesCreatedUpdated[CashTransaction] members
   //
@@ -83,7 +93,7 @@ object CashTransaction extends Saves[CashTransaction] with SavesCreatedUpdated[C
   //
   // Saves[CashTransaction] members
   //
-  protected def table = db.Schema.cashTransactions
+  protected def table = schema.cashTransactions
 
   def defineUpdate(theOld: CashTransaction, theNew: CashTransaction) = {
     import org.squeryl.PrimitiveTypeMode._
@@ -96,5 +106,5 @@ object CashTransaction extends Saves[CashTransaction] with SavesCreatedUpdated[C
       theOld.updated := theNew.updated
     )
   }
-
 }
+

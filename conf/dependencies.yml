@@ -1,6 +1,8 @@
 # Application dependencies. Keep these in alphabetical order.
 
 require:
+    - org.scalamock -> scalamock-scalatest-support_2.8.1 2.2
+    - com.google.inject -> guice 2.0
     - com.stripe -> stripe-java 1.0.1
     - net.debasishg -> sjson_2.8.1 0.12:
         exclude:
@@ -18,7 +20,7 @@ require:
             - org.clojure -> *
     
     - org.joda -> joda-money 0.6
-    - org.squeryl -> squeryl_2.8.1 0.9.4:
+    - org.squeryl -> squeryl_2.8.1 0.9.5-RC1:
         exclude:
             # Exclude scala library, which is included with play
             - org.scala-lang -> scala-library 2.8.1
@@ -38,6 +40,7 @@ require:
     - provided -> tritonus_share 0.3.6
     - provided -> tritonus_remaining 0.3.6
     - provided -> xyzmo 1.0
+    - provided -> scala-guice_2.8.1 0.1
 
 # Non-default repositories
 repositories:
@@ -63,6 +66,7 @@ repositories:
          type: iBiblio
          root: "http://nexus.scala-tools.org/content/repositories/releases"
          contains:
+             - org.scalamock -> *
              - org.squeryl -> *
              - net.databinder -> *
              - net.debasishg -> *

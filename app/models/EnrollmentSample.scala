@@ -4,23 +4,31 @@ import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
 import libs.Time
 import db.{KeyedCaseClass, Schema, Saves}
+import com.google.inject.Inject
+import services.AppConfig
 
+/**
+ * Services used by each EnrollmentSample instance
+ */
+case class EnrollmentSampleServices @Inject() (store: EnrollmentSampleStore)
 
-case class EnrollmentSample(id: Long = 0,
-                            enrollmentBatchId: Long,
-                            voiceSampleId: Long,
-                            signatureSampleId: Long,
-                            created: Timestamp = Time.defaultTimestamp,
-                            updated: Timestamp = Time.defaultTimestamp)
-  extends KeyedCaseClass[Long]
-  with HasCreatedUpdated {
+case class EnrollmentSample(
+  id: Long = 0,
+  enrollmentBatchId: Long = 0,
+  voiceSampleId: Long = 0,
+  signatureSampleId: Long = 0,
+  created: Timestamp = Time.defaultTimestamp,
+  updated: Timestamp = Time.defaultTimestamp,
+  services: EnrollmentSampleServices = AppConfig.instance[EnrollmentSampleServices]
+) extends KeyedCaseClass[Long] with HasCreatedUpdated
+{
 
   //
   // Public members
   //
   /**Persists by conveniently delegating to companion object's save method. */
   def save(): EnrollmentSample = {
-    EnrollmentSample.save(this)
+    services.store.save(this)
   }
 
   //
@@ -30,12 +38,12 @@ case class EnrollmentSample(id: Long = 0,
 
 }
 
-object EnrollmentSample extends Saves[EnrollmentSample] with SavesCreatedUpdated[EnrollmentSample] {
+class EnrollmentSampleStore @Inject() (schema: db.Schema) extends Saves[EnrollmentSample] with SavesCreatedUpdated[EnrollmentSample] {
 
   //
   // Saves[SignatureEnrollmentAttempt] methods
   //
-  override val table = Schema.enrollmentSamples
+  override val table = schema.enrollmentSamples
 
   override def defineUpdate(theOld: EnrollmentSample, theNew: EnrollmentSample) = {
     updateIs(

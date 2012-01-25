@@ -11,26 +11,42 @@ import models.{Verified, Celebrity, Order, Egraph}
 import controllers._
 import play.data.validation._
 import org.apache.commons.mail.{HtmlEmail, SimpleEmail}
+import services.http.{OrderRequestFilters, CelebrityAccountRequestFilters}
 
 /**
  * Handles requests for queries against a celebrity for his orders.
  */
-object CelebrityOrderApiControllers extends Controller
-with RequiresAuthenticatedAccount
-with RequiresCelebrityId
-with RequiresCelebrityOrderId
-with DBTransaction {
+private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
+  import PostEgraphApiEndpoint.EgraphFulfillmentHandler
 
+  //
+  // Abstract members
+  //
+  protected def celebFilters: CelebrityAccountRequestFilters
+  protected def orderFilters: OrderRequestFilters
+
+  //
+  // Controller members
+  //
   def postEgraph(@Required signature: String, @Required audio: String, skipBiometrics: Boolean = false) = {
     if (validationErrors.isEmpty) {
-      EgraphFulfillmentHandler(signature, audio, order, celebrity, skipBiometrics).execute()
+      celebFilters.requireCelebrityAccount { (account, celebrity) =>
+        orderFilters.requireOrderIdOfCelebrity(celebrity.id) { order =>
+          EgraphFulfillmentHandler(signature, audio, order, celebrity, skipBiometrics).execute()
+        }
+      }
     }
     else {
       play.Logger.info("Dismissing the invalid request")
       Error(5000, "Valid \"signature\" and \"audio\" parameters were not provided.")
     }
   }
+}
 
+/**
+ * Handles requests for queries against a celebrity for his orders.
+ */
+object PostEgraphApiEndpoint {
   case class EgraphFulfillmentHandler(signature: String,
                                       audio: String,
                                       order: Order,
@@ -58,7 +74,7 @@ with DBTransaction {
     private def sendEgraphSignedMail(egraph: Egraph) = {
       val email = new HtmlEmail()
       val recipient = order.recipient
-      val linkActionDefinition = EgraphController.lookup(order)
+      val linkActionDefinition = WebsiteControllers.lookupGetEgraph(order.id)
       linkActionDefinition.absolute()
 
       email.setFrom(celebrity.urlSlug.get + "@egraphs.com", celebrity.publicName.get)
@@ -124,5 +140,4 @@ with DBTransaction {
       errorCode == "0" && verificationResult == "true"
     }
   }
-
 }

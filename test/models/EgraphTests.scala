@@ -4,6 +4,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 import utils._
+import services.AppConfig
 
 class EgraphTests extends UnitFlatSpec
   with ShouldMatchers
@@ -13,6 +14,8 @@ class EgraphTests extends UnitFlatSpec
   with ClearsDatabaseAndValidationAfter
   with DBTransactionPerTest
 {
+  val store = AppConfig.instance[EgraphStore]
+
   //
   // SavingEntityTests[Egraph] methods
   //
@@ -26,7 +29,7 @@ class EgraphTests extends UnitFlatSpec
   }
 
   override def restoreEntity(id: Long) = {
-    Egraph.findById(id)
+    store.findById(id)
   }
 
   override def transformEntity(toTransform: Egraph) = {

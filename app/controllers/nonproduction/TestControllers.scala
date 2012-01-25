@@ -1,4 +1,4 @@
-package controllers
+package controllers.nonproduction
 
 import play.mvc._
 import libs.Blobs.Conversions._
@@ -6,23 +6,20 @@ import math.BigDecimal._
 import play.Play
 import models.{Account, Celebrity}
 import libs.Blobs
+import models.{VoiceSample, Account, Celebrity}
+import libs.{SampleRateConverter, Blobs}
+import play.libs.Codec
+import services.signature.XyzmoBiometricServices
+import services.AppConfig
+import services.http.DBTransaction
 
-object Application extends Controller {
-
-  import views.Application._
-
-  def index = {
-    html.index()
-  }
-}
-
-object test extends Controller
+object TestControllers extends Controller
 with DBTransaction {
-
+  val blobs = AppConfig.instance[Blobs]
 
   def resetAlphaState(): String = {
     db.Schema.scrub()
-    Blobs.scrub()
+    blobs.scrub()
 
     createCelebrity("Erem", "Boto", "erem@egraphs.com")
     createCelebrity("Andrew", "Smith", "andrew@egraphs.com")
@@ -72,5 +69,4 @@ with DBTransaction {
     val startEnrollmentRequest = VBGBiometricServices.sendStartEnrollmentRequest("pls", false)
     println(startEnrollmentRequest.getResponseValue(VBGBiometricServices._errorCode))
   }
-
 }

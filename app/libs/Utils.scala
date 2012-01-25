@@ -53,7 +53,7 @@ object Utils {
    * For example, to redirect to Shaq's celebrity page:
    * {{{
    *   val actionDef = Utils.lookupUrl(
-   *     "controllers.CelebrityController.index",
+   *     "controllers.WebsiteControllers.getCelebrity",
    *     Map("celebrityUrlSlug" -> "Shaq")
    *   )
    *   redirect(actionDef.url)

@@ -4,8 +4,9 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 import libs.Time
-import Order.FindByCelebrity.Filters
 import utils._
+import services.AppConfig
+import models.OrderStore.FindByCelebrity.ActionableOnly
 
 class OrderTests extends UnitFlatSpec
   with ShouldMatchers
@@ -15,6 +16,8 @@ class OrderTests extends UnitFlatSpec
   with ClearsDatabaseAndValidationAfter
   with DBTransactionPerTest
 {
+  val orderStore = AppConfig.instance[OrderStore]
+  val actionableFilter = AppConfig.instance[ActionableOnly]
 
   //
   // SavingEntityTests[Order] methods
@@ -30,7 +33,7 @@ class OrderTests extends UnitFlatSpec
   }
 
   override def restoreEntity(id: Long) = {
-    Order.findById(id)
+    orderStore.findById(id)
   }
 
   override def transformEntity(toTransform: Order) = {
@@ -116,6 +119,7 @@ class OrderTests extends UnitFlatSpec
   }
 
   "An OrderCharge" should "perform the correct charge" in {
+    val cashTransactionStore = AppConfig.instance[CashTransactionStore]
     val customer = TestData.newSavedCustomer()
     val product  = TestData.newSavedProduct()
     val token = TestData.newStripeToken();
@@ -124,8 +128,8 @@ class OrderTests extends UnitFlatSpec
     val order = customer.buy(product).copy(stripeCardTokenId=Some(token.getId),  amountPaidInCurrency=amount)
     val charged = order.charge.issueAndSave()
 
-    Order.findById(charged.order.id) should not be (None)
-    CashTransaction.findById(charged.transaction.id) should not be (None)
+    orderStore.findById(charged.order.id) should not be (None)
+    cashTransactionStore.findById(charged.transaction.id) should not be (None)
     charged.order.stripeChargeId should not be (None)
     
   }
@@ -141,7 +145,7 @@ class OrderTests extends UnitFlatSpec
     )
 
     // Orders of celebrity's products
-    val allCelebOrders = Order.FindByCelebrity(celebrity.id)
+    val allCelebOrders = orderStore.FindByCelebrity(celebrity.id)
     allCelebOrders.toSeq should have length (3)
     allCelebOrders.toSet should be (Set(firstOrder, secondOrder, thirdOrder))
   }
@@ -153,7 +157,7 @@ class OrderTests extends UnitFlatSpec
     val celebOrder = will.buy(product).save()
     will.buy(otherCelebrityProduct).save()
 
-    val celebOrders = Order.FindByCelebrity(celebrity.id)
+    val celebOrders = orderStore.FindByCelebrity(celebrity.id)
 
     celebOrders.toSeq should have length(1)
     celebOrders.head should be (celebOrder)
@@ -165,7 +169,7 @@ class OrderTests extends UnitFlatSpec
     val firstOrder = will.buy(product).save()
     will.buy(product).save()
 
-    val found = Order.FindByCelebrity(celebrity.id, Filters.OrderId(firstOrder.id))
+    val found = orderStore.FindByCelebrity(celebrity.id, orderStore.Filters.OrderId(firstOrder.id))
 
     found.toSeq.length should be (1)
     found.head should be (firstOrder)
@@ -189,7 +193,7 @@ class OrderTests extends UnitFlatSpec
     val orderWithoutEgraph = will.buy(product).save()
 
     // Perform the test
-    val found = Order.FindByCelebrity(celebrity.id, Filters.ActionableOnly)
+    val found = orderStore.FindByCelebrity(celebrity.id, actionableFilter)
 
     found.toSeq.length should be (5)
     found.toSet should be (Set(

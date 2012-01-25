@@ -1,14 +1,17 @@
-package controllers
+package controllers.browser
 
 import libs.Blobs
 import play.mvc.Controller
 import play.mvc.results.RenderBinary
 import Blobs.Conversions._
+import services.AppConfig
 
 /**
  * Serves up all Blobs. Particularly useful when served through the file system
  */
-object BlobControllers extends Controller with DBTransaction {
+private[controllers] trait GetBlobEndpoint { this: Controller =>
+  protected def blobs: Blobs
+
   def getBlob(blobKey: String) = {
     Blobs.get(blobKey) match {
       case None =>
@@ -19,3 +22,4 @@ object BlobControllers extends Controller with DBTransaction {
     }
   }
 }
+

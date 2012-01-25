@@ -10,7 +10,7 @@ case class Password (hash: String, salt: String) {
   /**
    * Test whether a provided password is the true password.
    *
-   * @param toTest the password to test
+   * @param attempt the password to test
    * @return true that the provided password is the entity's password.
    */
   def is (attempt: String): Boolean = {

@@ -4,6 +4,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 import utils._
+import services.AppConfig
 
 class EnrollmentSampleTests extends UnitFlatSpec
 with ShouldMatchers
@@ -15,6 +16,9 @@ with DBTransactionPerTest {
   //
   // SavingEntityTests[EnrollmentSample] methods
   //
+
+  val store = AppConfig.instance[EnrollmentSampleStore]
+
   def newEntity = {
     val celebrity = Celebrity().save()
     val enrollmentBatch = EnrollmentBatch(celebrityId = celebrity.id).save()
@@ -26,11 +30,11 @@ with DBTransactionPerTest {
   }
 
   def saveEntity(toSave: EnrollmentSample) = {
-    EnrollmentSample.save(toSave)
+    store.save(toSave)
   }
 
   def restoreEntity(id: Long) = {
-    EnrollmentSample.findById(id)
+    store.findById(id)
   }
 
   override def transformEntity(toTransform: EnrollmentSample) = {

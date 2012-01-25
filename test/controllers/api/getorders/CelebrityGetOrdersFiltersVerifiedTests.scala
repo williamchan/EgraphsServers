@@ -10,11 +10,14 @@ import scenario.Scenarios
 import models._
 import utils.TestConstants
 import db.DBSession
+import services.AppConfig
 
 
 class CelebrityGetOrdersFiltersVerifiedTests extends FunctionalTest with CleanDatabaseAfterEachTest {
 
   import FunctionalTest._
+
+  val orderStore = AppConfig.instance[OrderStore]
 
   @Test
   def testGetOrdersFiltersOutOrdersWithEgraphWithVerifiedState() {
@@ -28,7 +31,7 @@ class CelebrityGetOrdersFiltersVerifiedTests extends FunctionalTest with CleanDa
 
     transaction {
       val celebrityId = Scenarios.getWillCelebrityAccount.id
-      val allCelebOrders = Order.FindByCelebrity(celebrityId)
+      val allCelebOrders = orderStore.FindByCelebrity(celebrityId)
       Egraph(orderId = allCelebOrders.toSeq.head.id).withState(Verified).saveWithoutAssets()
     }
 

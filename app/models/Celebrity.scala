@@ -8,6 +8,19 @@ import play.templates.JavaExtensions
 import db.{FilterOneTable, KeyedCaseClass, Schema, Saves}
 import libs.Blobs.Conversions._
 import libs.{Utils, Serialization, Time}
+import services.AppConfig
+import com.google.inject.{Provider, Inject}
+
+/**
+ * Services used by each celebrity instance
+ */
+case class CelebrityServices @Inject() (
+  store: CelebrityStore,
+  productStore: ProductStore,
+  productServices: Provider[ProductServices],
+  imageAssetServices: Provider[ImageAssetServices]
+)
+
 
 /**
  * Persistent entity representing the Celebrities who provide products on
@@ -22,9 +35,10 @@ case class Celebrity(id: Long = 0,
                      profilePhotoUpdated: Option[String] = None,
                      enrollmentStatusValue: String = NotEnrolled.value,
                      created: Timestamp = Time.defaultTimestamp,
-                     updated: Timestamp = Time.defaultTimestamp)
-  extends KeyedCaseClass[Long]
-  with HasCreatedUpdated {
+                     updated: Timestamp = Time.defaultTimestamp,
+                     services: CelebrityServices = AppConfig.instance[CelebrityServices]
+) extends KeyedCaseClass[Long] with HasCreatedUpdated
+{
   //
   // Additional DB columns
   //
@@ -36,7 +50,7 @@ case class Celebrity(id: Long = 0,
   //
   /**Persists by conveniently delegating to companion object's save method. */
   def save(): Celebrity = {
-    Celebrity.save(this)
+    services.store.save(this)
   }
 
   /** Makes a copy of the object with the new enrollment status applied. */
@@ -51,7 +65,7 @@ case class Celebrity(id: Long = 0,
 
   /**Returns all of the celebrity's Products */
   def products(filters: FilterOneTable[Product]*): Query[Product] = {
-    Product.FindByCelebrity(id, filters: _*)
+    services.productStore.findByCelebrity(id, filters: _*)
   }
 
 
@@ -82,7 +96,9 @@ case class Celebrity(id: Long = 0,
   def saveWithProfilePhoto(imageData: Array[Byte]): (Celebrity, ImageAsset) = {
     val celebrityToSave = this.copy(profilePhotoUpdated = Some(Time.toBlobstoreFormat(Time.now)))
     val assetName = celebrityToSave.profilePhotoAssetNameOption.get
-    val image = ImageAsset(imageData, keyBase, assetName, ImageAsset.Png)
+    val image = ImageAsset(
+      imageData, keyBase, assetName, ImageAsset.Png, services=services.imageAssetServices.get
+    )
 
     // Upload the image then save the entity, confident that the resulting entity
     // will have a valid master image.
@@ -97,13 +113,13 @@ case class Celebrity(id: Long = 0,
    */
   def profilePhoto: ImageAsset = {
     profilePhotoAssetNameOption
-      .flatMap( assetName => Some(ImageAsset(keyBase, assetName, ImageAsset.Png)) )
-      .getOrElse(Celebrity.defaultProfile)
+      .flatMap( assetName => Some(ImageAsset(keyBase, assetName, ImageAsset.Png, services=services.imageAssetServices.get)) )
+      .getOrElse(defaultProfile)
   }
 
   /**Creates a new Product associated with the celebrity. The product is not yet persisted. */
   def newProduct: Product = {
-    Product(celebrityId = id)
+    Product(celebrityId=id, services=services.productServices.get)
   }
 
   private def getMostRecentEnrollmentBatch(): Option[EnrollmentBatch] = {
@@ -133,7 +149,7 @@ case class Celebrity(id: Long = 0,
   //
   // Private members
   //
-  /**Blobstore folder name for stored profile photo data. */
+  /** Blobstore folder name for stored profile photo data. */
   private def profilePhotoAssetNameOption: Option[String] = {
     for (photoUpdatedTimestamp <- profilePhotoUpdated) yield {
       "profile_" + photoUpdatedTimestamp
@@ -150,21 +166,21 @@ case class Celebrity(id: Long = 0,
     "celebrity/" + id
   }
 
-}
-
-object Celebrity extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {
-  val defaultProfile = ImageAsset(
+  lazy val defaultProfile = ImageAsset(
     play.Play.getFile("test/files/longoria/profile.jpg"),
     keyBase="defaults/celebrity",
     name="profilePhoto",
-    imageType=ImageAsset.Png
+    imageType=ImageAsset.Png,
+    services=services.imageAssetServices.get
   )
+}
 
+class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {
   //
   // Public Methods
   //
   def findByUrlSlug(slug: String): Option[Celebrity] = {
-    from(Schema.celebrities)(celebrity =>
+    from(schema.celebrities)(celebrity =>
       where(celebrity.urlSlug === Some(slug))
         select (celebrity)
     ).headOption
@@ -173,7 +189,7 @@ object Celebrity extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {
   //
   // Saves[Celebrity] methods
   //
-  override val table = Schema.celebrities
+  override val table = schema.celebrities
 
   override def defineUpdate(theOld: Celebrity, theNew: Celebrity) = {
     updateIs(
@@ -196,6 +212,9 @@ object Celebrity extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {
   override def withCreatedUpdated(toUpdate: Celebrity, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)
   }
+}
+
+object Celebrity {
 }
 
 abstract sealed class EnrollmentStatus(val value: String)

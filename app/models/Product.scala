@@ -12,6 +12,14 @@ import Blobs.Conversions._
 import java.awt.image.BufferedImage
 import play.Play
 import libs.Blobs.AccessPolicy
+import services.AppConfig
+import com.google.inject.{Provider, Inject}
+
+case class ProductServices @Inject() (
+  store: ProductStore,
+  celebStore: CelebrityStore,
+  imageAssetServices: Provider[ImageAssetServices]
+)
 
 /**
  * An item on sale by a Celebrity. In the case of the base Egraph, it represents a signature service
@@ -25,7 +33,8 @@ case class Product(
   description: String = "",
   photoKey: Option[String] = None,
   created: Timestamp = Time.defaultTimestamp,
-  updated: Timestamp = Time.defaultTimestamp
+  updated: Timestamp = Time.defaultTimestamp,
+  services: ProductServices = AppConfig.instance[ProductServices]
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated {
 
   //
@@ -38,7 +47,7 @@ case class Product(
   // Public members
   //
   def save(): Product = {
-    Product.save(this)
+    services.store.save(this)
   }
 
   def withPhoto(imageData:Array[Byte]): ProductWithPhoto = {
@@ -46,17 +55,17 @@ case class Product(
 
     ProductWithPhoto(
       product=this.copy(photoKey=Some(newPhotoKey)),
-      photo=ImageAsset(imageData, keyBase, newPhotoKey, ImageAsset.Jpeg)
+      photo=ImageAsset(imageData, keyBase, newPhotoKey, ImageAsset.Jpeg, services.imageAssetServices.get)
     )
   }
 
   def photo: ImageAsset = {
-    photoKey.flatMap(theKey => Some(ImageAsset(keyBase, theKey, ImageAsset.Jpeg))) match {
+    photoKey.flatMap(theKey => Some(ImageAsset(keyBase, theKey, ImageAsset.Jpeg, services=services.imageAssetServices.get))) match {
       case Some(imageAsset) =>
         imageAsset
 
       case None =>
-        Product.defaultPhoto
+        defaultPhoto
     }
   }
 
@@ -85,7 +94,7 @@ case class Product(
 
   /** Retrieves the celebrity from the database */
   def celebrity: Celebrity = {
-    Celebrity.get(celebrityId)
+    services.celebStore.get(celebrityId)
   }
   
   //
@@ -103,43 +112,18 @@ case class Product(
 
     "product/" + id
   }
+
+  private lazy val defaultPhoto = ImageAsset(
+      Play.getFile("test/files/longoria/product-2.jpg"),
+      keyBase="defaults/product",
+      name="photo",
+      imageType=ImageAsset.Jpeg,
+      services=services.imageAssetServices.get
+  )
 }
 
-object Product extends Saves[Product] with SavesCreatedUpdated[Product] {
+object Product {
   import org.squeryl.PrimitiveTypeMode._
-
-  val defaultPhoto = ImageAsset(
-    Play.getFile("test/files/longoria/product-2.jpg"),
-    keyBase="defaults/product",
-    name="photo",
-    imageType=ImageAsset.Jpeg
-  )
-
-  defaultPhoto.getSaved(Blobs.AccessPolicy.Public)
-
-  //
-  // Public members
-  //
-  /** Locates all of the products being sold by a particular celebrity */
-  object FindByCelebrity {
-    def apply(celebrityId: Long, filters: FilterOneTable[Product] *): Query[Product] = {
-      from(Schema.products)(product =>
-        where(
-          product.celebrityId === celebrityId and
-          FilterOneTable.reduceFilters(filters, product)
-        )
-          select(product)
-      )
-    }
-
-    object Filters {
-      case class WithUrlSlug(slug: String) extends FilterOneTable[Product] {
-        override def test(product: Product) = {
-          product.urlSlug === slug
-        }
-      }
-    }
-  }
 
   case class ProductWithPhoto(product: Product, photo: ImageAsset) {
     def save(): ProductWithPhoto = {
@@ -149,11 +133,29 @@ object Product extends Saves[Product] with SavesCreatedUpdated[Product] {
       ProductWithPhoto(savedProduct, savedPhoto)
     }
   }
+}
+
+class ProductStore @Inject() (schema: db.Schema) extends Saves[Product] with SavesCreatedUpdated[Product] {
+  import org.squeryl.PrimitiveTypeMode._
+
+  //
+  // Public members
+  //
+  /** Locates all of the products being sold by a particular celebrity */
+  def findByCelebrity(celebrityId: Long, filters: FilterOneTable[Product] *): Query[Product] = {
+    from(schema.products)(product =>
+      where(
+        product.celebrityId === celebrityId and
+          FilterOneTable.reduceFilters(filters, product)
+      )
+      select(product)
+    )
+  }
 
   //
   // Saves[Product] methods
   //
-  def table = Schema.products
+  def table = schema.products
 
   override def defineUpdate(theOld: Product, theNew: Product) = {
     updateIs(
@@ -173,5 +175,17 @@ object Product extends Saves[Product] with SavesCreatedUpdated[Product] {
   //
   override def withCreatedUpdated(toUpdate: Product, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)
+  }
+}
+
+class ProductQueryFilters {
+  import org.squeryl.PrimitiveTypeMode._
+
+  def byUrlSlug(slug: String): FilterOneTable[Product] = {
+    new FilterOneTable[Product] {
+      override def test(product: Product) = {
+        product.urlSlug === slug
+      }
+    }
   }
 }

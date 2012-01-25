@@ -6,13 +6,16 @@ import models._
 import java.lang.IllegalStateException
 import play.Play
 import java.io.{ByteArrayOutputStream, PrintWriter}
+import services.AppConfig
+import com.google.inject.{Inject, Injector}
 
 /**
  * Egraphs Database schema
  *
  * When inspecting the schema of a database table, inspect both this object and the KeyedCaseClass.
  */
-object Schema extends org.squeryl.Schema {
+class Schema @Inject() (injector: Injector) extends org.squeryl.Schema {
+  import uk.me.lings.scalaguice.InjectorExtensions._
 
 //  val signatureEnrollmentAttempts = table[SignatureEnrollmentAttempt]
 //  val voiceEnrollmentAttempts = table[VoiceEnrollmentAttempt]
@@ -226,4 +229,21 @@ object Schema extends org.squeryl.Schema {
     dbType("decimal(21, 6)")
   }
 
+  override def callbacks = {
+    Seq(
+      factoryFor(accounts) is Account(services=injector.instance[AccountServices]),
+      factoryFor(customers) is Customer(services=injector.instance[CustomerServices]),
+      factoryFor(celebrities) is Celebrity(services=injector.instance[CelebrityServices]),
+      factoryFor(orders) is Order(services=injector.instance[OrderServices]),
+      factoryFor(cashTransactions) is CashTransaction(services=injector.instance[CashTransactionServices]),
+      factoryFor(products) is Product(services=injector.instance[ProductServices]),
+      factoryFor(egraphs) is Egraph(services=injector.instance[EgraphServices]),
+      factoryFor(enrollmentBatches) is EnrollmentBatch(services=injector.instance[EnrollmentBatchServices]),
+      factoryFor(enrollmentSamples) is EnrollmentSample(services=injector.instance[EnrollmentSampleServices]),
+      factoryFor(signatureSamples) is SignatureSample(services=injector.instance[SignatureSampleServices]),
+      factoryFor(voiceSamples) is VoiceSample(services=injector.instance[VoiceSampleServices])
+    )
+  }
 }
+
+object Schema extends Schema(AppConfig.injector)

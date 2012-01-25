@@ -1,7 +1,7 @@
 package scenario
 
-import controllers.api.CelebrityOrderApiControllers.EgraphFulfillmentHandler
-import controllers.CelebrityProductController.EgraphPurchaseHandler
+import controllers.api.PostEgraphApiEndpoint.EgraphFulfillmentHandler
+
 import db.Schema
 import java.io.File
 import libs.{Utils, Blobs}
@@ -11,7 +11,10 @@ import play.mvc.results.Redirect
 import Blobs.Conversions._
 import utils.{TestConstants, TestData}
 import org.squeryl.PrimitiveTypeMode._
+import services.AppConfig
 import models._
+import controllers.WebsiteControllers
+import controllers.browser.PostBuyProductEndpoint.EgraphPurchaseHandler
 
 /**
  * All scenarios supported by the API.
@@ -389,14 +392,14 @@ class Scenarios extends DeclaresScenarios {
         )
 
         new Redirect(
-          Utils.lookupUrl("EgraphController.egraph", Map("orderId" -> "1")).url
+          WebsiteControllers.lookupGetEgraph(1).url
         )
       }
     )
 
   private[this] def redirectToWizzle = {
     new Redirect(
-      Utils.lookupUrl("CelebrityController.index", Map("celebrityUrlSlug" -> "Wizzle")).url
+      WebsiteControllers.lookupGetCelebrity("Wizzle").url
     )
   }
 
@@ -416,14 +419,14 @@ class Scenarios extends DeclaresScenarios {
 
   private[this] def redirectToStarcraftProduct = {
     new Redirect(
-      Utils.lookupUrl("CelebrityProductController.index", starcraftProductSlugs).url
+      Utils.lookupUrl("WebsiteControllers.getCelebrityProduct", starcraftProductSlugs).url
     )
   }
 
   private[this] def redirectToOrderConfirmationPage(params: Map[String, String] = Map()) =
   {
     new Redirect(
-      Utils.lookupUrl("CelebrityProductController.buy", starcraftProductSlugs ++ params).url
+      Utils.lookupUrl("WebsiteControllers.getCelebrityProduct", starcraftProductSlugs ++ params).url
     )
   }
 
@@ -436,20 +439,27 @@ class Scenarios extends DeclaresScenarios {
 }
 
 object Scenarios {
+  import AppConfig.instance
+
+  val accountStore = instance[AccountStore]
+  val celebrityStore = instance[CelebrityStore]
+  val productStore = instance[ProductStore]
+  val customerStore = instance[CustomerStore]
+
   def getWillAccount: Account = {
-    Account.findByEmail("wchan83@gmail.com").get
+    accountStore.findByEmail("wchan83@gmail.com").get
   }
 
   def getWillCelebrityAccount: Celebrity = {
-    Celebrity.findById(getWillAccount.celebrityId.get).get
+    celebrityStore.findById(getWillAccount.celebrityId.get).get
   }
 
   def getWillsTwoProducts: (Product, Product) = {
-    (Product.findById(1L).get, Product.findById(2L).get)
+    (productStore.findById(1L).get, productStore.findById(2L).get)
   }
 
   def getEremCustomerAccount: Customer = {
-    Customer.findById(1L).get
+    customerStore.findById(1L).get
   }
 }
 

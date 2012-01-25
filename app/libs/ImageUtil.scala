@@ -5,11 +5,12 @@ import util.parsing.json.JSON
 import java.awt.geom.Ellipse2D
 import javax.imageio.ImageIO
 import models.ImageAsset
+import com.google.inject.Inject
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import java.awt.{Transparency, Graphics, RenderingHints, Graphics2D}
 
-object ImageUtil {
+@Inject() class ImageUtil {
 
   // TODO(wchan): Why does it run out of memory above 5?
   val scaleFactor = 2.5
@@ -320,5 +321,6 @@ object ImageUtil {
       new ImageEnrichedByteArray(bytes)
     }
   }
-
 }
+
+object ImageUtil extends ImageUtil

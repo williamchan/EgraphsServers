@@ -1,19 +1,21 @@
-package controllers
+package controllers.browser
 
 import play.mvc.Controller
 
 import models._
+import services.AppConfig
 
 /**
  * Serves the page confirming that an eGraph order was made
  */
-object OrderConfirmationController extends Controller with DBTransaction
-{
-  
-  def confirm = {
+
+private[controllers] trait GetOrderConfirmationEndpoint { this: Controller =>
+  protected def orderStore: OrderStore
+
+  def getOrderConfirmation = {
     // Get order ID from flash scope -- it's OK to just read it
     // because it can only have been provided by our own code (in this case
-    // probably CelebrityProductController.buy)
+    // probably PostBuyProductEndpoint)
     val orderIdOption = Option(flash.get("orderId"))
 
     orderIdOption match {
@@ -21,7 +23,7 @@ object OrderConfirmationController extends Controller with DBTransaction
         Forbidden("I'm sorry, Dave, I'm afraid I can't serve this page for you.")
 
       case Some(orderId) =>
-        Order.findById(orderId.toLong) match {
+        orderStore.findById(orderId.toLong) match {
           case None =>
             NotFound("No order with id " + orderId + " exists.")
 
@@ -41,3 +43,4 @@ object OrderConfirmationController extends Controller with DBTransaction
     }
   }
 }
+

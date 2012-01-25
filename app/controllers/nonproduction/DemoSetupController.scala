@@ -1,8 +1,9 @@
-package controllers
+package controllers.nonproduction
 
 import play.mvc.Controller
 import play.mvc.results.Result
 import demosetup.DemoScenario
+import services.http.DBTransaction
 
 /**
  * Controller for all scenarios
@@ -11,7 +12,7 @@ object DemoSetupController extends Controller with DBTransaction {
   /**
    * Performs a code block only if the project's Demo Scenarios library is available.
    *
-   * @returns the result of the code block if the project's Demo Scenarios library
+   * @return the result of the code block if the project's Demo Scenarios library
    *   is available. 500 (Internal Error) and an informative response if not
    */
   private def withRegisteredDemoScenarios(task: => Any) = {

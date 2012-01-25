@@ -1,13 +1,12 @@
 package models
 
 import java.sql.Timestamp
-import db.{KeyedCaseClass, Schema, Saves}
+import db.{KeyedCaseClass, Saves}
 import libs.Blobs.AccessPolicy
-import javax.imageio.ImageIO
 import libs.{ImageUtil, Blobs, Utils, Time}
-import java.awt.Image
-import play.Play
 import java.awt.image.BufferedImage
+import com.google.inject.Inject
+import services.AppConfig
 
 abstract sealed class EgraphState(val value: String)
 
@@ -17,6 +16,12 @@ case object RejectedVoice extends EgraphState("Rejected:Voice")
 case object RejectedSignature extends EgraphState("Rejected:Signature")
 case object RejectedBoth extends EgraphState("Rejected:Both")
 case object RejectedPersonalAudit extends EgraphState("Rejected:Audit")
+
+case class EgraphServices @Inject() (
+  store: EgraphStore,
+  orderStore: OrderStore,
+  imageAssetServices: ImageAssetServices
+)
 
 /**
  * Persistent entity representing a single eGraph.
@@ -28,7 +33,8 @@ case class Egraph(
   orderId: Long = 0L,
   stateValue: String = AwaitingVerification.value,
   created: Timestamp = Time.defaultTimestamp,
-  updated: Timestamp = Time.defaultTimestamp
+  updated: Timestamp = Time.defaultTimestamp,
+  services: EgraphServices = AppConfig.instance[EgraphServices]
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated
 {
   import Blobs.Conversions._
@@ -37,7 +43,7 @@ case class Egraph(
   // Public methods
   //
   def save(signature: String, audio: Array[Byte]): Egraph = {
-    val saved = Egraph.save(this)
+    val saved = services.store.save(this)
 
     // Have to save assets after saving the entity so that they can be
     // properly keyed
@@ -48,7 +54,7 @@ case class Egraph(
 
   /** Fetches the related order from the db */
   def order: Order = {
-    Order.get(orderId)
+    services.orderStore.get(orderId)
   }
 
   /**
@@ -57,7 +63,7 @@ case class Egraph(
    * it to update an Egraph's status.
    */
   def saveWithoutAssets(): Egraph = {
-    Egraph.save(this)
+    services.store.save(this)
   }
 
   /** Returns a transform of this object with the new, parameterized state */
@@ -105,7 +111,7 @@ case class Egraph(
     }
 
     override def image: ImageAsset = {
-      ImageAsset(blobKeyBase, imageName, ImageAsset.Png)
+      ImageAsset(blobKeyBase, imageName, ImageAsset.Png, services.imageAssetServices)
     }
 
     override def save(signature: String, audio: Array[Byte]) {
@@ -117,7 +123,8 @@ case class Egraph(
         createMasterImage(signature, order.product.photo.renderFromMaster),
         blobKeyBase,
         imageName,
-        ImageAsset.Png
+        ImageAsset.Png,
+        services.imageAssetServices
       ).save(AccessPolicy.Public)
     }
 
@@ -170,24 +177,11 @@ trait EgraphAssets {
   def save(signature: String, audio: Array[Byte])
 }
 
-object Egraph extends Saves[Egraph] with SavesCreatedUpdated[Egraph] {
-  //
-  // Public Methods
-  //
-  /** Map of Egraph state strings to the actual EgraphStates */
-  val states = Utils.toMap[String, EgraphState](Seq(
-    AwaitingVerification,
-    Verified,
-    RejectedVoice,
-    RejectedSignature,
-    RejectedBoth,
-    RejectedPersonalAudit
-  ), key=(theState) => theState.value)
-
+class EgraphStore @Inject() (schema: db.Schema) extends Saves[Egraph] with SavesCreatedUpdated[Egraph] {
   //
   // Saves[Egraph] methods
   //
-  override val table = Schema.egraphs
+  override val table = schema.egraphs
 
   override def defineUpdate(theOld: Egraph, theNew: Egraph) = {
     import org.squeryl.PrimitiveTypeMode._
@@ -206,4 +200,20 @@ object Egraph extends Saves[Egraph] with SavesCreatedUpdated[Egraph] {
   override def withCreatedUpdated(toUpdate: Egraph, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)
   }
+}
+
+object Egraph {
+  //
+  // Public Methods
+  //
+  /** Map of Egraph state strings to the actual EgraphStates */
+  val states = Utils.toMap[String, EgraphState](Seq(
+    AwaitingVerification,
+    Verified,
+    RejectedVoice,
+    RejectedSignature,
+    RejectedBoth,
+    RejectedPersonalAudit
+  ), key=(theState) => theState.value)
+
 }

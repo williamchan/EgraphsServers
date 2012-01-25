@@ -7,6 +7,7 @@ import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 import utils._
 import play.libs.Codec
+import services.AppConfig
 
 class VoiceSampleTests extends UnitFlatSpec
 with ShouldMatchers
@@ -18,16 +19,18 @@ with DBTransactionPerTest {
   //
   // SavingEntityTests[VoiceSample] methods
   //
+  val store = AppConfig.instance[VoiceSampleStore]
+
   def newEntity = {
     VoiceSample(isForEnrollment = true)
   }
 
   def saveEntity(toSave: VoiceSample) = {
-    VoiceSample.save(toSave)
+    store.save(toSave)
   }
 
   def restoreEntity(id: Long) = {
-    VoiceSample.findById(id)
+    store.findById(id)
   }
 
   override def transformEntity(toTransform: VoiceSample) = {

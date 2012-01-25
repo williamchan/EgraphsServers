@@ -8,6 +8,7 @@ import java.io.File
 import javax.imageio.ImageIO
 import libs.{ImageUtil, Time}
 import ImageUtil.Conversions._
+import services.AppConfig
 
 class CelebrityTests extends UnitFlatSpec
   with ShouldMatchers
@@ -17,6 +18,7 @@ class CelebrityTests extends UnitFlatSpec
   with ClearsDatabaseAndValidationAfter
   with DBTransactionPerTest
 {
+  val store = AppConfig.instance[CelebrityStore]
 
   //
   // SavingEntityTests[Celebrity] methods
@@ -26,11 +28,11 @@ class CelebrityTests extends UnitFlatSpec
   }
 
   override def saveEntity(toSave: Celebrity) = {
-    Celebrity.save(toSave)
+    store.save(toSave)
   }
 
   override def restoreEntity(id: Long) = {
-    Celebrity.findById(id)
+    store.findById(id)
   }
 
   override def transformEntity(toTransform: Celebrity) = {
@@ -63,8 +65,9 @@ class CelebrityTests extends UnitFlatSpec
   }
 
   it should "start with the default profile photo" in {
-    Celebrity().profilePhotoUpdated should be (None)
-    Celebrity().profilePhoto should be (Celebrity.defaultProfile)
+    val celebrity = Celebrity()
+    celebrity.profilePhotoUpdated should be (None)
+    celebrity.profilePhoto should be (celebrity.defaultProfile)
   }
 
   it should "throw an exception if you save profile photo when id is 0" in {

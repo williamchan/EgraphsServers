@@ -8,6 +8,10 @@ import java.awt.RenderingHints
 import Blobs.Conversions._
 import ImageUtil.Conversions._
 import libs.Blobs.AccessPolicy
+import com.google.inject.Inject
+import services.AppConfig
+
+case class ImageAssetServices @Inject() (blobs: Blobs, images: ImageUtil)
 
 /**
  * A resizable image that gets persisted in the blob store. All transforms are created by
@@ -39,7 +43,8 @@ class ImageAsset(
   name: String,
   masterData: => Array[Byte],
   imageType: ImageType,
-  resolution: Resolution)
+  resolution: Resolution,
+  services: ImageAssetServices)
 {
   import ImageAsset._
 
@@ -47,7 +52,7 @@ class ImageAsset(
    * Persist this image asset to the blobstore
    */
   def save(access:AccessPolicy=AccessPolicy.Private): ImageAsset = {
-    Blobs.put(
+    services.blobs.put(
       key,
       renderFromMaster.asByteArray(imageType),
       access=access
@@ -73,7 +78,7 @@ class ImageAsset(
 
   /** Returns true that the image is accessible in the blobstore */
   def isPersisted: Boolean = {
-    Blobs.exists(key)
+    services.blobs.exists(key)
   }
 
   /** Returns this ImageAsset transformed to the specified resolution */
@@ -82,7 +87,7 @@ class ImageAsset(
   }
 
   def withImageType(newImageType: ImageType): ImageAsset = {
-    new ImageAsset(keyBase, name, lazyMasterData, newImageType, resolution)
+    new ImageAsset(keyBase, name, lazyMasterData, newImageType, resolution, services)
   }
 
   /** Proportionally resizes the width of the image */
@@ -97,7 +102,7 @@ class ImageAsset(
 
   /** Attempts to fetch the asset from the blobstore. */
   def fetchImage: Option[BufferedImage] = {
-    Blobs.get(key).map(theBlob => ImageIO.read(theBlob.asInputStream))
+    services.blobs.get(key).map(theBlob => ImageIO.read(theBlob.asInputStream))
   }
 
   /**
@@ -129,7 +134,7 @@ class ImageAsset(
    * publicly available.
    */
   def url: String = {
-    Blobs.getUrl(key)
+    services.blobs.getUrl(key)
   }
 
   /**
@@ -164,12 +169,12 @@ class ImageAsset(
 
   /** Returns a copy of this ImageAsset with the new Resolution */
   private def withResolution(newResolution: Resolution): ImageAsset = {
-    new ImageAsset(keyBase, name, lazyMasterData, imageType, newResolution)
+    new ImageAsset(keyBase, name, lazyMasterData, imageType, newResolution, services)
   }
 
   /** Returns the master data scaled to the specified width and height */
   private def resizedMasterImage(width: Int,  height: Int): BufferedImage = {
-    ImageUtil.getScaledInstance(masterImage, width, height, RenderingHints.VALUE_INTERPOLATION_BILINEAR)
+    services.images.getScaledInstance(masterImage, width, height, RenderingHints.VALUE_INTERPOLATION_BILINEAR)
   }
 }
 
@@ -181,27 +186,29 @@ object ImageAsset {
   def apply(masterData: => Array[Byte],
             keyBase: String,
             name: String,
-            imageType: ImageType): ImageAsset =
+            imageType: ImageType,
+            services:ImageAssetServices): ImageAsset =
   {
-    new ImageAsset(keyBase, name, masterData, imageType, MasterResolution)
+    new ImageAsset(keyBase, name, masterData, imageType, MasterResolution, services=services)
   }
 
   /**
    * Creates new [[models.ImageAsset]] with [[models.ImageAsset.MasterResolution]] that sources its master
    * data from the blobstore.
    */
-  def apply(keyBase: String, name: String, imageType: ImageType): ImageAsset = {
+  def apply(keyBase: String, name: String, imageType: ImageType, services:ImageAssetServices): ImageAsset = {
     val masterKey = makeKey(keyBase, name, imageType)
 
     new ImageAsset(
       keyBase,
       name,
-      Blobs.get(masterKey) match {
+      services.blobs.get(masterKey) match {
         case None => throw new IllegalStateException("Master data located at \""+masterKey+"\" unavailable in blobstore.")
         case Some(blob) => blob.asByteArray
       },
       imageType,
-      MasterResolution
+      MasterResolution,
+      services=services
     )
   }
 

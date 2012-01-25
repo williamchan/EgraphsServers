@@ -4,6 +4,7 @@ import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.BeforeAndAfterEach
 import play.test.UnitFlatSpec
 import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationAfter, CreatedUpdatedEntityTests, SavingEntityTests, TestData}
+import services.AppConfig
 
 class CustomerTests extends UnitFlatSpec
   with ShouldMatchers
@@ -13,6 +14,8 @@ class CustomerTests extends UnitFlatSpec
   with ClearsDatabaseAndValidationAfter
   with DBTransactionPerTest
 {
+  val customerStore = AppConfig.instance[CustomerStore]
+
   //
   // SavingEntityTests[Account] methods
   //
@@ -25,7 +28,7 @@ class CustomerTests extends UnitFlatSpec
   }
 
   override def restoreEntity(id: Long) = {
-    Customer.findById(id)
+    customerStore.findById(id)
   }
 
   override def transformEntity(toTransform: Customer) = {

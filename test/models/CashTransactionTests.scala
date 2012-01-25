@@ -5,6 +5,7 @@ import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationAfter, CreatedUpdatedEntityTests, SavingEntityTests}
 import org.joda.money.CurrencyUnit
+import services.AppConfig
 
 class CashTransactionTests extends UnitFlatSpec
   with ShouldMatchers
@@ -14,6 +15,7 @@ class CashTransactionTests extends UnitFlatSpec
   with ClearsDatabaseAndValidationAfter
   with DBTransactionPerTest
 {
+  val store = AppConfig.instance[CashTransactionStore]
 
   //
   // SavingEntityTests[CashTransaction] methods
@@ -23,11 +25,11 @@ class CashTransactionTests extends UnitFlatSpec
   }
 
   override def saveEntity(toSave: CashTransaction) = {
-    CashTransaction.save(toSave)
+    store.save(toSave)
   }
 
   override def restoreEntity(id: Long) = {
-    CashTransaction.findById(id)
+    store.findById(id)
   }
 
   override def transformEntity(toTransform: CashTransaction) = {
