@@ -16,7 +16,6 @@ GET     /test/request-transaction/with-error     TransactionTestController.makeA
 GET     /test/request-transaction/is-stored      TransactionTestController.isStored
 
 # GET     /test/files/{<.*>blobKey}                BlobControllers.getBlob
-GET     /test/script                             test.script
 
 ###
 ### Production routes
@@ -31,6 +30,7 @@ GET     /                                       Application.index
 
 # For Alpha-phase prod mode:
 GET     /admin/reset-alpha-state                test.resetAlphaState
+GET     /test/script                            test.script
 GET     /test/files/{<.*>blobKey}               BlobControllers.getBlob
 
 # For Demo setup prod mode:

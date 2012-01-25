@@ -4,11 +4,12 @@ import javax.xml.parsers.{DocumentBuilder, DocumentBuilderFactory}
 import org.xml.sax.InputSource
 import org.w3c.dom.{Node, Document}
 import java.util.Hashtable
-import java.net.{HttpURLConnection, URLEncoder, URL}
+import java.net.{URLEncoder, URL}
 import java.io._
 import play.libs.Codec
 import libs.Blobs
 import Blobs.Conversions._
+import javax.net.ssl.HttpsURLConnection
 
 class VBGRequest {
   private var requestType: String = ""
@@ -23,8 +24,7 @@ class VBGRequest {
     var xml: String = buildXMLRequest
     // Make sure to encode the output stream for any weird characters
     xml = URLEncoder.encode(xml, "UTF-8")
-    val httpConn: HttpURLConnection = VBGBiometricServices._url.openConnection.asInstanceOf[HttpURLConnection]
-    //val httpConn: HttpsURLConnection = VBGHack.getVBGHack
+    val httpConn: HttpsURLConnection = VBGBiometricServices._url.openConnection.asInstanceOf[HttpsURLConnection]
     httpConn.setRequestMethod("POST")
     httpConn.setRequestProperty("Content-Length", String.valueOf(xml.length))
     httpConn.setDoInput(true)
@@ -100,7 +100,7 @@ class VBGRequest {
 
 
 object VBGBiometricServices {
-  val _url: URL = new URL("http://service03.voicebiogroup.com/service/xmlapi")
+  val _url: URL = new URL("https://service03.voicebiogroup.com/service/xmlapi")
   private val _myClientName: String = "celebritydev"
   private val _myClientKey: String = "62ed7855e0af30d0af534ce195845c7f"
   private val _StartEnrollment: String = "StartEnrollment"
