@@ -7,7 +7,7 @@ import java.util.Hashtable
 import java.net.{URLEncoder, URL}
 import java.io._
 import play.libs.Codec
-import libs.Blobs
+import libs.{Blobs, SampleRateConverter}
 import Blobs.Conversions._
 import javax.net.ssl.HttpsURLConnection
 
@@ -45,7 +45,7 @@ class VBGRequest {
       sb.append(s + "\n")
     }
     parseXMLResponse(sb.toString())
-//    httpConn.disconnect()
+    //    httpConn.disconnect()
     this
   }
 
@@ -138,7 +138,7 @@ object VBGBiometricServices {
 
   def sendAudioCheckRequest(transactionId: String, blobLocation: String): VBGRequest = {
     val request = new VBGRequest
-    val voiceSampleBase64_downSampled: String = getDownSampledBase64(Blobs.get(blobLocation).get.asByteArray)
+    val voiceSampleBase64_downSampled: String = convertWavTo8kHzBase64(Blobs.get(blobLocation).get.asByteArray)
     request.setRequestType(_AudioCheck)
     request.setParameter(_clientName, _myClientName)
     request.setParameter(_clientKey, _myClientKey)
@@ -187,7 +187,7 @@ object VBGBiometricServices {
   }
 
   def sendVerifySampleRequest(transactionId: String, wavBinary: Array[Byte]): VBGRequest = {
-    val voiceSampleBase64_downSampled: String = getDownSampledBase64(wavBinary)
+    val voiceSampleBase64_downSampled: String = convertWavTo8kHzBase64(wavBinary)
 
     val request = new VBGRequest
     request.setRequestType(_VerifySample)
@@ -201,10 +201,8 @@ object VBGBiometricServices {
   // ========================== HELPERS
 
   // Depends on iPad issue 49.
-  def getDownSampledBase64(wavBinary: Array[Byte]): String = {
-    //    val wavBinary_downSampled: Array[Byte] = SampleRateConverter.convert(8000f, wavBinary)
-    //    Codec.encodeBASE64(wavBinary_downSampled)
-
-    Codec.encodeBASE64(wavBinary)
+  def convertWavTo8kHzBase64(wavBinary: Array[Byte]): String = {
+    val wavBinary_8kHz: Array[Byte] = SampleRateConverter.convert(8000f, wavBinary)
+    Codec.encodeBASE64(wavBinary_8kHz)
   }
 }

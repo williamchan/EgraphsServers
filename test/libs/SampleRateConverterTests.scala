@@ -4,14 +4,14 @@ import play.test.UnitFlatSpec
 import org.scalatest.matchers.ShouldMatchers
 import javax.sound.sampled.{AudioSystem, AudioFormat}
 import java.io._
+import play.Play
 
 class SampleRateConverterTests extends UnitFlatSpec
 with ShouldMatchers {
 
-  it should "downsample 44khz WAV to 4khz WAV" in {
-    val path: File = new File("test/files")
-    val sourceFile: File = new File(path, "44khz.wav")
-    val targetFile: File = new File(path, "8khz.wav")
+  it should "downsample 44kHz WAV to 8kHz WAV" in {
+    val sourceFile: File = Play.getFile("test/files/44khz.wav")
+    val targetFile: File = new File("test/files/8khz.wav")
 
     val sourceFormat: AudioFormat = AudioSystem.getAudioInputStream(sourceFile).getFormat
     sourceFormat.getChannels should be(1)
@@ -21,7 +21,11 @@ with ShouldMatchers {
     sourceFormat.getFrameSize should be(2)
     sourceFormat.getSampleSizeInBits should be(16)
 
-    convertTestFile(8000f, sourceFile, targetFile)
+    val inputBytes: Array[Byte] = Blobs.Conversions.fileToByteArray(sourceFile)
+    val outputBytes = SampleRateConverter.convert(8000f, inputBytes, /*debug*/ true)
+    val out = new FileOutputStream(targetFile)
+    out.write(outputBytes)
+    out.close()
 
     val targetFormat: AudioFormat = AudioSystem.getAudioInputStream(targetFile).getFormat
     targetFormat.getChannels should be(1)
@@ -32,19 +36,19 @@ with ShouldMatchers {
     targetFormat.getSampleSizeInBits should be(16)
   }
 
-  private def convertTestFile(targetSampleRate: Float, sourceFile: File, targetFile: File) {
-    val bas: ByteArrayOutputStream = new ByteArrayOutputStream();
-    val fs: FileInputStream = new FileInputStream(sourceFile);
-    while (fs.available() > 0) {
-      val fdata = fs.read();
-      bas.write(fdata);
-    }
-    fs.close();
+  it should "not change 8kHz WAV when converting it to 8kHz WAV" in {
+    val sourceFile: File = Play.getFile("test/files/8khz.wav")
 
-    val output = SampleRateConverter.convert(targetSampleRate, bas.toByteArray, /*debug*/ true)
+    val sourceFormat: AudioFormat = AudioSystem.getAudioInputStream(sourceFile).getFormat
+    sourceFormat.getChannels should be(1)
+    sourceFormat.getEncoding should be(AudioFormat.Encoding.PCM_SIGNED)
+    sourceFormat.getFrameRate should be(8000f)
+    sourceFormat.getSampleRate should be(8000f)
+    sourceFormat.getFrameSize should be(2)
+    sourceFormat.getSampleSizeInBits should be(16)
 
-    val out = new FileOutputStream(targetFile);
-    out.write(output);
-    out.close();
+    val inputBytes: Array[Byte] = Blobs.Conversions.fileToByteArray(sourceFile)
+    val outputBytes = SampleRateConverter.convert(8000f, inputBytes, /*debug*/ true)
+    outputBytes should be(inputBytes)
   }
 }

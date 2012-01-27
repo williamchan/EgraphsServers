@@ -20,6 +20,11 @@ object TestConstants {
     Codec.encodeBASE64(wavBinary)
   }
 
+  def voiceStr_8khz(): String = {
+    val wavBinary = Blobs.Conversions.fileToByteArray(Play.getFile("test/files/8khz.wav"))
+    Codec.encodeBASE64(wavBinary)
+  }
+
   /**
    * Making an HTTP request, even to a localhost API, requires that special characters be escaped.
    */

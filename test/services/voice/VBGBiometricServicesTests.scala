@@ -1,22 +1,21 @@
 package services.voice
 
 import libs.Blobs
-import play.libs.Codec
 import play.Play
 import play.test.UnitFlatSpec
 import org.scalatest.matchers.ShouldMatchers
+import utils.TestConstants
 
 
 class VBGBiometricServicesTests extends UnitFlatSpec with ShouldMatchers {
 
-  // This unfinished test will become meaningful once VBGBiometricServices.getDownSampledBase64 actually does some down-sampling
-  "getDownSampledBase64" should "convert" in {
-    val voiceSampleBase64 = Codec.encodeBASE64(getVoiceSampleBinary("test/files/44khz.wav"))
-    val wavBinary: Array[Byte] = getVoiceSampleBinary("test/files/44khz.wav")
-    val voiceSampleBase64_downSampled: String = VBGBiometricServices.getDownSampledBase64(wavBinary)
+  "convertWavTo8kHzBase64" should "convert to 8khz encoded in base64" in {
+    val wavBinary_44kHz: Array[Byte] = getVoiceSampleBinary("test/files/44khz.wav")
+    val wav_8kHz_base64: String = VBGBiometricServices.convertWavTo8kHzBase64(wavBinary_44kHz)
+    wav_8kHz_base64 should be(TestConstants.voiceStr_8khz())
   }
 
-  private def getVoiceSampleBinary(filename : String): Array[Byte] = {
+  private def getVoiceSampleBinary(filename: String): Array[Byte] = {
     val file = Play.getFile(filename)
     Blobs.Conversions.fileToByteArray(file)
   }

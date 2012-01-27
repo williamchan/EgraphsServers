@@ -38,8 +38,8 @@ with DBTransactionPerTest {
 
   it should "save voiceStr to Blobstore" in {
     val saved = VoiceSample(isForEnrollment = true).save(TestConstants.voiceStr())
-    Codec.encodeBASE64(Blobs.get(VoiceSample.getWavUrl(saved.id)).get.asByteArray) should be(TestConstants.voiceStr())
-//    Blobs.get(VoiceSample.getWavUrl(saved.id)).get.asString should be(TestConstants.voiceStr)
+    val wavFromBlobstore: Array[Byte] = Blobs.get(VoiceSample.getWavUrl(saved.id)).get.asByteArray
+    Codec.encodeBASE64(wavFromBlobstore) should be(TestConstants.voiceStr())
   }
 
 }
