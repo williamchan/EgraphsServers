@@ -67,8 +67,8 @@ with DBTransaction {
   }
 
   def script() {
+    println("System getProperty javax.net.ssl.trustStore = " + System.getProperty("javax.net.ssl.trustStore"))
     import services.voice.VBGBiometricServices
-
     val startEnrollmentRequest = VBGBiometricServices.sendStartEnrollmentRequest("pls", false)
     println(startEnrollmentRequest.getResponseValue(VBGBiometricServices._errorCode))
   }

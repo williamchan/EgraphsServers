@@ -47,6 +47,9 @@ class VBGRequest {
     }
     parseXMLResponse(sb.toString())
     //    httpConn.disconnect()
+    
+    println("VBGBiometricServices httpConn = " + httpConn.toString)
+    
     this
   }
 
