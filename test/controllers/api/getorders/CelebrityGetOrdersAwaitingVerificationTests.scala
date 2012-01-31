@@ -31,7 +31,7 @@ class CelebrityGetOrdersAwaitingVerificationTests extends FunctionalTest with Cl
 
     transaction {
       val celebrityId = Scenarios.getWillCelebrityAccount.id
-      val allCelebOrders = orderStore.FindByCelebrity(celebrityId)
+      val allCelebOrders = orderStore.findByCelebrity(celebrityId)
       Egraph(orderId = allCelebOrders.toSeq.head.id).withState(RejectedVoice).saveWithoutAssets()
       Egraph(orderId = allCelebOrders.toSeq.head.id).withState(RejectedSignature).saveWithoutAssets()
       Egraph(orderId = allCelebOrders.toSeq.head.id).withState(RejectedBoth).saveWithoutAssets()

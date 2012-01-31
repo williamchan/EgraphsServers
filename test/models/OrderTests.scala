@@ -6,7 +6,6 @@ import play.test.UnitFlatSpec
 import services.Time
 import utils._
 import services.AppConfig
-import models.OrderStore.FindByCelebrity.ActionableOnly
 
 class OrderTests extends UnitFlatSpec
   with ShouldMatchers
@@ -17,7 +16,7 @@ class OrderTests extends UnitFlatSpec
   with DBTransactionPerTest
 {
   val orderStore = AppConfig.instance[OrderStore]
-  val actionableFilter = AppConfig.instance[ActionableOnly]
+  val orderQueryFilters = AppConfig.instance[OrderQueryFilters]
 
   //
   // SavingEntityTests[Order] methods
@@ -134,7 +133,7 @@ class OrderTests extends UnitFlatSpec
     
   }
   
-  "FindByCelebrity" should "find all of a Celebrity's orders by default" in {
+  "findByCelebrity" should "find all of a Celebrity's orders by default" in {
 
     val (will, recipient, celebrity, product) = newOrderStack
 
@@ -145,7 +144,7 @@ class OrderTests extends UnitFlatSpec
     )
 
     // Orders of celebrity's products
-    val allCelebOrders = orderStore.FindByCelebrity(celebrity.id)
+    val allCelebOrders = orderStore.findByCelebrity(celebrity.id)
     allCelebOrders.toSeq should have length (3)
     allCelebOrders.toSet should be (Set(firstOrder, secondOrder, thirdOrder))
   }
@@ -157,7 +156,7 @@ class OrderTests extends UnitFlatSpec
     val celebOrder = will.buy(product).save()
     will.buy(otherCelebrityProduct).save()
 
-    val celebOrders = orderStore.FindByCelebrity(celebrity.id)
+    val celebOrders = orderStore.findByCelebrity(celebrity.id)
 
     celebOrders.toSeq should have length(1)
     celebOrders.head should be (celebOrder)
@@ -169,7 +168,7 @@ class OrderTests extends UnitFlatSpec
     val firstOrder = will.buy(product).save()
     will.buy(product).save()
 
-    val found = orderStore.FindByCelebrity(celebrity.id, OrderStore.FindByCelebrity.OrderId(firstOrder.id))
+    val found = orderStore.findByCelebrity(celebrity.id, orderQueryFilters.orderId(firstOrder.id))
 
     found.toSeq.length should be (1)
     found.head should be (firstOrder)
@@ -178,7 +177,7 @@ class OrderTests extends UnitFlatSpec
   it should "exclude orders that are Verified or AwaitingVerification when composed with ActionableFilter" in {
     val (will, _, celebrity, product) = newOrderStack
 
-    // Make an buy for each Egraph State, and save an Egraph in that state
+    // Make an order for each Egraph State, and save an Egraph in that state
     val orders = Egraph.states.map { case (_, state) =>
       val order = will.buy(product).save()
       order
@@ -193,7 +192,7 @@ class OrderTests extends UnitFlatSpec
     val orderWithoutEgraph = will.buy(product).save()
 
     // Perform the test
-    val found = orderStore.FindByCelebrity(celebrity.id, actionableFilter)
+    val found = orderStore.findByCelebrity(celebrity.id, orderQueryFilters.actionableOnly)
 
     found.toSeq.length should be (5)
     found.toSet should be (Set(

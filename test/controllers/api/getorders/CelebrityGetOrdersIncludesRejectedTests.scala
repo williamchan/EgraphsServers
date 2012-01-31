@@ -31,7 +31,7 @@ class CelebrityGetOrdersIncludesRejectedTests extends FunctionalTest with CleanD
 
     transaction {
       val celebrityId = Scenarios.getWillCelebrityAccount.id
-      val allCelebOrders = orderStore.FindByCelebrity(celebrityId)
+      val allCelebOrders = orderStore.findByCelebrity(celebrityId)
       Egraph(orderId = allCelebOrders.toSeq.head.id).withState(AwaitingVerification).saveWithoutAssets()
     }
 

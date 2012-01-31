@@ -139,6 +139,52 @@ case class Order(
 
 case class FulfilledOrder(order: Order, egraph: Egraph)
 
+object Order {
+  //
+  // Public Methods
+  //
+
+  /** Encapsulates the act of charging for an order. */
+  case class OrderCharge private[Order] (order: Order,
+                                         stripeCardTokenId: String,
+                                         transaction: CashTransaction,
+                                         payment: Payment) {
+    def issueAndSave(): OrderCharge = {
+      val stripeCharge = payment.charge(
+        order.amountPaid,
+        stripeCardTokenId,
+        "Egraph Order=" + order.id
+      )
+
+      val savedTransaction = transaction.save()
+      val savedOrder = order.copy(
+        transactionId=Some(savedTransaction.id),
+        stripeChargeId=Some(stripeCharge.getId)
+      ).save()
+
+      this.copy(order=savedOrder, transaction=savedTransaction)
+    }
+  }
+
+  /** Specifies the Order's current status relative to payment */
+  sealed abstract class PaymentState(val stateValue: String)
+
+  object PaymentState {
+    /** We have not yet charged for the order */
+    case object NotCharged extends PaymentState("NotCharged")
+
+    /** We have successfully charged the order */
+    case object Charged extends PaymentState("Charged")
+
+    /** We have refunded the order */
+    case object Refunded extends PaymentState("Refunded")
+
+    val all = Utils.toMap[String, PaymentState](
+      Seq(NotCharged, Charged, Refunded), key=(state) => state.stateValue
+    )
+  }
+}
+
 class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreatedUpdated[Order] {
   //
   // Public methods
@@ -159,11 +205,10 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
   }
 
   /**
-   * Callable object that finds a list of Orders based on the id of the Celebrity
+   * Finds a list of Orders based on the id of the Celebrity
    * who owns the Product that was purchased.
    */
-
-  def FindByCelebrity(celebrityId: Long, filters: FilterThreeTables[Celebrity, Product, Order]*):Iterable[Order] = {
+  def findByCelebrity(celebrityId: Long, filters: FilterThreeTables[Celebrity, Product, Order]*):Iterable[Order] = {
     import schema.{celebrities, products, orders}
 
     from(celebrities, products, orders)((celebrity, product, order) =>
@@ -209,16 +254,9 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
   }
 }
 
-object OrderStore {
-  object FindByCelebrity {
-    /**
-     * Returns only orders that are actionable by the celebrity that owns them when
-     * composed with FindByCelebrity.
-     *
-     * In model terms, these are these are any Orders that don't have an Egraph that
-     * is either Verified or AwaitingVerification.
-     */
-    class ActionableOnly @Inject() (schema: Schema) extends FilterThreeTables[Celebrity, Product, Order] {
+class OrderQueryFilters @Inject() (schema: Schema) {
+  def actionableOnly: FilterThreeTables[Celebrity, Product, Order] = {
+    new FilterThreeTables[Celebrity, Product, Order] {
       override def test(celebrity: Celebrity, product: Product, order: Order) = {
         notExists(
           from(schema.egraphs)(egraph =>
@@ -228,62 +266,13 @@ object OrderStore {
         )
       }
     }
+  }
 
-    /**
-     * Returns only orders with the given orderId when composed with FindByCelebrity
-     */
-    case class OrderId(id: Long) extends FilterThreeTables[Celebrity, Product, Order] {
+  def orderId(id: Long) = {
+    new FilterThreeTables[Celebrity, Product, Order] {
       override def test(celebrity: Celebrity, product: Product, order: Order) = {
         (order.id === id)
       }
     }
-  }
-
-}
-
-// TOOD(erem) remove all store functionality from the Order object
-object Order {
-  //
-  // Public Methods
-  //
-
-  /** Encapsulates the act of charging for an order. */
-  case class OrderCharge private[Order] (order: Order,
-                                         stripeCardTokenId: String,
-                                         transaction: CashTransaction,
-                                         payment: Payment) {
-    def issueAndSave(): OrderCharge = {
-      val stripeCharge = payment.charge(
-        order.amountPaid,
-        stripeCardTokenId,
-        "Egraph Order=" + order.id
-      )
-
-      val savedTransaction = transaction.save()
-      val savedOrder = order.copy(
-        transactionId=Some(savedTransaction.id),
-        stripeChargeId=Some(stripeCharge.getId)
-      ).save()
-
-      this.copy(order=savedOrder, transaction=savedTransaction)
-    }
-  }
-
-  /** Specifies the Order's current status relative to payment */
-  sealed abstract class PaymentState(val stateValue: String)
-
-  object PaymentState {
-    /** We have not yet charged for the order */
-    case object NotCharged extends PaymentState("NotCharged")
-
-    /** We have successfully charged the order */
-    case object Charged extends PaymentState("Charged")
-
-    /** We have refunded the order */
-    case object Refunded extends PaymentState("Refunded")
-
-    val all = Utils.toMap[String, PaymentState](
-      Seq(NotCharged, Charged, Refunded), key=(state) => state.stateValue
-    )
   }
 }
