@@ -1,6 +1,6 @@
 package models
 
-import services.Blobs
+import services.blobs.Blobs
 import Blobs.Conversions._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
@@ -20,6 +20,7 @@ with DBTransactionPerTest {
   // SavingEntityTests[SignatureSample] methods
   //
   val store = AppConfig.instance[SignatureSampleStore]
+  val blobs = AppConfig.instance[Blobs]
 
   def newEntity = {
     SignatureSample(isForEnrollment = true)
@@ -41,7 +42,7 @@ with DBTransactionPerTest {
 
   it should "save signatureStr to Blobstore" in {
     val saved = SignatureSample(isForEnrollment = true).save(TestConstants.signatureStr)
-    Blobs.get(SignatureSample.getJsonUrl(saved.id)).get.asString should be(TestConstants.signatureStr)
+    blobs.get(SignatureSample.getJsonUrl(saved.id)).get.asString should be(TestConstants.signatureStr)
   }
 
 }

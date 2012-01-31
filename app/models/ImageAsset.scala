@@ -4,10 +4,11 @@ import models.ImageAsset.{Resolution, ImageType}
 import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
 import services._
+import blobs.Blobs
 import java.awt.RenderingHints
-import Blobs.Conversions._
+import services.blobs.Blobs.Conversions._
 import ImageUtil.Conversions._
-import services.Blobs.AccessPolicy
+import services.blobs.AccessPolicy
 import com.google.inject.Inject
 import services.AppConfig
 

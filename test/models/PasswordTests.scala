@@ -41,8 +41,8 @@ class PasswordTests extends UnitFlatSpec
   "The n-times hashing function" should "hash n times" in {
     // Set up
     import Password.hashNTimes
-    import services.Crypto.passwordHash
-    import services.Crypto.HashType.SHA256
+    import play.libs.Crypto.passwordHash
+    import play.libs.Crypto.HashType.SHA256
 
     val password = "derp"
 

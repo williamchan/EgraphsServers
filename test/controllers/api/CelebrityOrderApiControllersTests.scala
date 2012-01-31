@@ -1,16 +1,18 @@
 package controllers.api
 
-import services.Blobs
+import services.blobs.Blobs
 import org.junit.Assert._
 import org.junit.Test
 import play.test.FunctionalTest
 import sjson.json.Serializer
 import utils.TestConstants
 import utils.FunctionalTestUtils.{CleanDatabaseAfterEachTest, willChanRequest, runScenarios}
+import services.AppConfig
 
 class CelebrityOrderApiControllersTests extends FunctionalTest with CleanDatabaseAfterEachTest {
-
   import FunctionalTest._
+
+  val blobs = AppConfig.instance[Blobs]
 
   @Test
   def testPostEgraph() {
@@ -40,7 +42,7 @@ class CelebrityOrderApiControllersTests extends FunctionalTest with CleanDatabas
 
     // See CelebrityOrderApiControllers.postEgraph
     import Blobs.Conversions._
-    assertEquals(TestConstants.signatureStr, Blobs.get("egraphs/" + json("id") + "/signature.json").get.asString)
+    assertEquals(TestConstants.signatureStr, blobs.get("egraphs/" + json("id") + "/signature.json").get.asString)
   }
 
   @Test

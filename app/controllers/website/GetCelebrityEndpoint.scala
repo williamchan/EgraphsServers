@@ -3,7 +3,7 @@ package controllers.browser
 import play.mvc.Controller
 import services.Utils
 import play.mvc.Router.ActionDefinition
-import services.Blobs.AccessPolicy
+import services.blobs.AccessPolicy
 import services.http.CelebrityAccountRequestFilters
 
 /**

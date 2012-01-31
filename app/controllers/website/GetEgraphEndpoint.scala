@@ -1,8 +1,8 @@
 package controllers.browser
 
 import play.mvc.Controller
-import services.Blobs
 import models.{Order, OrderStore, FulfilledOrder}
+import services.blobs.{AccessPolicy, Blobs}
 
 private[controllers] trait GetEgraphEndpoint { this: Controller =>
   protected def orderStore: OrderStore
@@ -11,7 +11,7 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
     // Get an order with provided ID
     orderStore.findFulfilledWithId(orderId.toLong) match {
       case Some(FulfilledOrder(order, egraph)) =>
-        val imageUrl = egraph.assets.image.resizedWidth(940).getSaved(Blobs.AccessPolicy.Public).url
+        val imageUrl = egraph.assets.image.resizedWidth(940).getSaved(AccessPolicy.Public).url
         val product = order.product
         val celebrity = product.celebrity
 

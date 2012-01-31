@@ -1,15 +1,14 @@
 package controllers.browser
 
 import play.mvc.Controller
-import services.Utils
 
 import play.data.validation._
 import org.apache.commons.mail.SimpleEmail
 import models._
-import services.AppConfig
 import play.mvc.Scope.Flash
 import play.mvc.results.Redirect
 import services.http.CelebrityAccountRequestFilters
+import services.{Mail, Utils, AppConfig}
 
 /**
  * Serves pages relating to a particular product of a celebrity.
@@ -19,6 +18,9 @@ trait PostBuyProductEndpoint { this: Controller =>
   import PostBuyProductEndpoint.alphaEmailMatcher
 
   protected def celebFilters: CelebrityAccountRequestFilters
+  protected def mail: Mail
+  protected def customerStore: CustomerStore
+  protected def accountStore: AccountStore
 
   def postBuyProduct(recipientName: String,
           recipientEmail: String,
@@ -59,7 +61,10 @@ trait PostBuyProductEndpoint { this: Controller =>
           desiredText,
           personalNote,
           celebrity,
-          product
+          product,
+          mail=mail,
+          customerStore=customerStore,
+          accountStore=accountStore
         ).execute()
       } else {
         import scala.collection.JavaConversions._
@@ -97,6 +102,7 @@ object PostBuyProductEndpoint {
                                     celebrity: Celebrity,
                                     product: Product,
                                     flash: Flash = Flash.current(),
+                                    mail: Mail = AppConfig.instance[Mail],
                                     customerStore: CustomerStore = AppConfig.instance[CustomerStore],
                                     accountStore: AccountStore = AppConfig.instance[AccountStore])
   {
@@ -128,7 +134,7 @@ object PostBuyProductEndpoint {
         buyer, recipient, celebrity, product, chargedOrder
       ).toString().trim())
 
-      services.Mail.send(email)
+      mail.send(email)
 
       // Redirect to the order page, with orderId in flash scope
       flash.put("orderId", chargedOrder.id)

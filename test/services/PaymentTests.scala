@@ -13,12 +13,13 @@ class PaymentTests extends UnitFlatSpec
 {
   import services.Finance.TypeConversions._
 
+  val payment = AppConfig.instance[Payment]
   val amount: BigDecimal = 1000
 
   "charge" should "successfully charge a token" in {
     val token = TestData.newStripeToken()
 
-    val charge = Payment.charge(
+    val charge = payment.charge(
       amount.toMoney(),
       token.getId,
       "libs.PaymentTests, \"charge should successfully charge a token\". Looks like it worked."

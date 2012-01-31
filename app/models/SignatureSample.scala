@@ -2,7 +2,8 @@ package models
 
 import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
-import services.{Blobs, Time}
+import services.Time
+import services.blobs.Blobs
 import Blobs.Conversions._
 import db.{KeyedCaseClass, Schema, Saves}
 import services.signature.XyzmoBiometricServices
@@ -40,7 +41,7 @@ case class SignatureSample(
   }
 
   def putXyzmoSignatureDataContainerOnBlobstore = {
-    val jsonStr: String = Blobs.get(SignatureSample.getJsonUrl(id)).get.asString
+    val jsonStr: String = services.blobs.get(SignatureSample.getJsonUrl(id)).get.asString
     val sdc = XyzmoBiometricServices.getSignatureDataContainerFromJSON(jsonStr).getGetSignatureDataContainerFromJSONResult
     services.blobs.put(SignatureSample.getXmlUrl(id), sdc.getBytes)
     sdc

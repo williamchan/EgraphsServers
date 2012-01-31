@@ -4,7 +4,8 @@ import controllers.api.PostEgraphApiEndpoint.EgraphFulfillmentHandler
 
 import db.Schema
 import java.io.File
-import services.{Utils, Blobs}
+import services.{Utils}
+import services.blobs.Blobs
 import org.apache.commons.mail.SimpleEmail
 import play.libs.Mail
 import play.mvc.results.Redirect
@@ -20,11 +21,17 @@ import controllers.browser.PostBuyProductEndpoint.EgraphPurchaseHandler
  * All scenarios supported by the API.
  */
 class Scenarios extends DeclaresScenarios {
+  // Helpful services
+  val blobs = AppConfig.instance[Blobs]
+
+  // Categories of scenario
   val apiCategory = "API Helpers"
   val celebrityPageCategory = "Celebrity Page"
   val productPageCategory = "Product Page"
   val orderConfirmationPageCategory = "Order Confirmation Page"
   val egraphPageCategory = "Egraph Page"
+  
+  val mail = AppConfig.instance[services.Mail]
 
   toScenarios add Scenario(
     "Send an email to erem@egraphs.com",
@@ -42,7 +49,7 @@ class Scenarios extends DeclaresScenarios {
       email.setMsg("This is a test mail ... :-)");
       email.addTo("erem@egraphs.com", "Erem Boto");
 
-      services.Mail.send(email)
+      mail.send(email)
     }
 
   )
@@ -170,6 +177,7 @@ class Scenarios extends DeclaresScenarios {
         TestConstants.voiceStr(),
         firstOrder,
         will,
+        mail=mail,
         skipBiometrics=true
       ).execute()
     }
@@ -217,7 +225,7 @@ class Scenarios extends DeclaresScenarios {
 
     {() =>
       import Blobs.Conversions._
-      Blobs.put("a/b/derp.jpg", new File("./test/files/derp.jpg"))
+      blobs.put("a/b/derp.jpg", new File("./test/files/derp.jpg"))
     }
   )
 

@@ -2,7 +2,9 @@ package utils
 
 import org.scalatest.{Suite, BeforeAndAfterEach}
 import play.data.validation.Validation
-import services.Blobs
+import services.blobs.Blobs
+import services.AppConfig
+import db.Schema
 
 /**
  * Mix this trait in to your Suite class to make sure that Play Validation
@@ -11,8 +13,8 @@ import services.Blobs
 trait ClearsDatabaseAndValidationAfter extends BeforeAndAfterEach { this: Suite =>
   override def afterEach {
     Validation.clear()
-    db.Schema.scrub()
-    Blobs.scrub()
+    AppConfig.instance[Schema].scrub()
+    AppConfig.instance[Blobs].scrub()
 
     super.afterEach()
   }

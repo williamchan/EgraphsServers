@@ -2,7 +2,7 @@ package jobs
 
 import org.squeryl.PrimitiveTypeMode._
 import play.jobs._
-import services.Blobs
+import services.blobs.Blobs
 import Blobs.Conversions._
 import services.signature.XyzmoBiometricServices
 import db.Schema
@@ -51,6 +51,7 @@ class EnrollmentBatchJob extends Job {
 }
 
 object EnrollmentBatchJob {
+  val blobs = AppConfig.instance[Blobs]
 
   def attemptSignatureEnrollment(celebrity: Celebrity, signatureSamples: scala.List[SignatureSample]): Boolean = {
     for (signatureSample <- signatureSamples) {
@@ -63,7 +64,7 @@ object EnrollmentBatchJob {
     //    XyzmoBiometricServices.deleteUser(userId = xyzmoUID)
     XyzmoBiometricServices.addUser(userId = xyzmoUID, userName = celebrity.publicName.get)
     XyzmoBiometricServices.addProfile(userId = xyzmoUID, profileName = xyzmoUID)
-    val signatureDataContainers = for (signatureSample <- signatureSamples) yield Blobs.get(SignatureSample.getXmlUrl(signatureSample.id)).get.asString
+    val signatureDataContainers = for (signatureSample <- signatureSamples) yield blobs.get(SignatureSample.getXmlUrl(signatureSample.id)).get.asString
     val isSuccessfulSignatureEnrollment = XyzmoBiometricServices.enrollUser(userId = xyzmoUID, profileName = xyzmoUID, signatureDataContainers = signatureDataContainers)
 
     println("Result of signature enrollment attempt for celebrity " + celebrity.id.toString + ": " + isSuccessfulSignatureEnrollment.toString)

@@ -7,7 +7,7 @@ import java.text.{DateFormat, SimpleDateFormat}
 /**
  * Convenience methods for dealing with time
  */
-class Time {
+object Time {
   //
   // Public members
   //
@@ -77,5 +77,3 @@ class Time {
   }
 
 }
-
-object Time extends Time

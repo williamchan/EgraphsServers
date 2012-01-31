@@ -1,6 +1,6 @@
 package models
 
-import services.Blobs
+import services.blobs.Blobs
 import Blobs.Conversions._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
@@ -20,6 +20,7 @@ with DBTransactionPerTest {
   // SavingEntityTests[VoiceSample] methods
   //
   val store = AppConfig.instance[VoiceSampleStore]
+  val blobs = AppConfig.instance[Blobs]
 
   def newEntity = {
     VoiceSample(isForEnrollment = true)
@@ -41,7 +42,7 @@ with DBTransactionPerTest {
 
   it should "save voiceStr to Blobstore" in {
     val saved = VoiceSample(isForEnrollment = true).save(TestConstants.voiceStr())
-    val wavFromBlobstore: Array[Byte] = Blobs.get(VoiceSample.getWavUrl(saved.id)).get.asByteArray
+    val wavFromBlobstore: Array[Byte] = blobs.get(VoiceSample.getWavUrl(saved.id)).get.asByteArray
     Codec.encodeBASE64(wavFromBlobstore) should be(TestConstants.voiceStr())
   }
 

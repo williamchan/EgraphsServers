@@ -8,7 +8,7 @@
 @content_base(title="Order #" + order.id +"- eGraphs", body=body, head=head)
 
 @import services.Finance.TypeConversions._
-@import services.Blobs.AccessPolicy.Public
+@import services.blobs.AccessPolicy.Public
 
 @selfPurchase = @{ buyer == recipient }
 

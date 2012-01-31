@@ -1,6 +1,6 @@
 package controllers.browser
 
-import services.Blobs
+import services.blobs.Blobs
 import play.mvc.Controller
 import play.mvc.results.RenderBinary
 import Blobs.Conversions._
@@ -13,7 +13,7 @@ private[controllers] trait GetBlobEndpoint { this: Controller =>
   protected def blobs: Blobs
 
   def getBlob(blobKey: String) = {
-    Blobs.get(blobKey) match {
+    blobs.get(blobKey) match {
       case None =>
         NotFound("No such blob found")
 

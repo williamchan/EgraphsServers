@@ -2,12 +2,12 @@ package models
 
 import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
-import services.Blobs.AccessPolicy
+import services.blobs.AccessPolicy
 import org.squeryl.Query
 import play.templates.JavaExtensions
 import db.{FilterOneTable, KeyedCaseClass, Schema, Saves}
-import services.Blobs.Conversions._
-import services.{Utils, Serialization, Time}
+import services.blobs.Blobs.Conversions._
+import services.{Utils, Time}
 import services.AppConfig
 import com.google.inject.{Provider, Inject}
 
@@ -75,15 +75,15 @@ case class Celebrity(id: Long = 0,
    */
   def renderedForApi: Map[String, Any] = {
     val optionalFields = List(
-      ("firstName" -> firstName),
-      ("lastName" -> lastName),
-      ("publicName" -> publicName)
+      "firstName" -> firstName,
+      "lastName" -> lastName,
+      "publicName" -> publicName
     )
 
     Map("id" -> id,
       "enrollmentStatus" -> enrollmentStatusValue) ++
       renderCreatedUpdatedForApi ++
-      Serialization.makeOptionalFieldMap(optionalFields)
+      Utils.makeOptionalFieldMap(optionalFields)
   }
 
   /**

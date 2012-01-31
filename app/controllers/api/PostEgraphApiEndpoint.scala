@@ -12,6 +12,7 @@ import controllers._
 import play.data.validation._
 import org.apache.commons.mail.{HtmlEmail, SimpleEmail}
 import services.http.{OrderRequestFilters, CelebrityAccountRequestFilters}
+import services.Mail
 
 /**
  * Handles requests for queries against a celebrity for his orders.
@@ -24,6 +25,7 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
   //
   protected def celebFilters: CelebrityAccountRequestFilters
   protected def orderFilters: OrderRequestFilters
+  protected def mail: Mail
 
   //
   // Controller members
@@ -32,7 +34,7 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
     if (validationErrors.isEmpty) {
       celebFilters.requireCelebrityAccount { (account, celebrity) =>
         orderFilters.requireOrderIdOfCelebrity(celebrity.id) { order =>
-          EgraphFulfillmentHandler(signature, audio, order, celebrity, skipBiometrics).execute()
+          EgraphFulfillmentHandler(signature, audio, order, celebrity, mail, skipBiometrics).execute()
         }
       }
     }
@@ -51,6 +53,7 @@ object PostEgraphApiEndpoint {
                                       audio: String,
                                       order: Order,
                                       celebrity: Celebrity,
+                                      mail: Mail,
                                       skipBiometrics: Boolean = false) {
     def execute() = {
       play.Logger.info("Processing eGraph submission for Order #" + order.id)
@@ -91,7 +94,7 @@ object PostEgraphApiEndpoint {
         ).toString().trim()
       )
 
-      services.Mail.send(email)
+      mail.send(email)
     }
 
     private def verifyBiometrics(egraph: Egraph, skipBiometrics: Boolean): Boolean = {

@@ -29,7 +29,7 @@ import models.{BezierCubic, ImageAsset}
   }
 
   def createSignatureImage(jsonStr: String): BufferedImage = {
-    val strokeData = ImageUtil.parseSignatureRawCaptureJSON(jsonStr)
+    val strokeData = parseSignatureRawCaptureJSON(jsonStr)
     val originalXsByStroke = strokeData._1
     val originalYsByStroke = strokeData._2
 
@@ -296,9 +296,10 @@ import models.{BezierCubic, ImageAsset}
 
     ret
   }
+}
 
+object ImageUtil {
   object Conversions {
-
     class RichBufferedImage(img: BufferedImage) {
       def asByteArray(imageType: ImageAsset.ImageType) = {
         val bytesOut = new ByteArrayOutputStream()
@@ -322,5 +323,3 @@ import models.{BezierCubic, ImageAsset}
     }
   }
 }
-
-object ImageUtil extends ImageUtil

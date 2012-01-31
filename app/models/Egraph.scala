@@ -2,11 +2,12 @@ package models
 
 import java.sql.Timestamp
 import db.{KeyedCaseClass, Saves}
-import services.Blobs.AccessPolicy
-import services.{ImageUtil, Blobs, Utils, Time}
+import services.blobs.AccessPolicy
+import services.{ImageUtil, Utils, Time}
 import java.awt.image.BufferedImage
 import com.google.inject.Inject
 import services.AppConfig
+import services.blobs.Blobs
 
 abstract sealed class EgraphState(val value: String)
 
@@ -20,6 +21,8 @@ case object RejectedPersonalAudit extends EgraphState("Rejected:Audit")
 case class EgraphServices @Inject() (
   store: EgraphStore,
   orderStore: OrderStore,
+  images: ImageUtil,
+  blobs: Blobs,
   imageAssetServices: ImageAssetServices
 )
 
@@ -95,19 +98,21 @@ case class Egraph(
   }
 
   private object Assets extends EgraphAssets {
+    val blobs = services.blobs
+
     //
     // EgraphAssets members
     //
     override def signature: String = {
-      Blobs.get(signatureJsonKey).get.asString
+      blobs.get(signatureJsonKey).get.asString
     }
     
     override def audio: Stream[Byte] = {
-      Blobs.get(audioKey).get.asByteStream
+      blobs.get(audioKey).get.asByteStream
     }
 
     override def audioUrl = {
-      Blobs.getUrl(audioKey)
+      blobs.getUrl(audioKey)
     }
 
     override def image: ImageAsset = {
@@ -115,8 +120,8 @@ case class Egraph(
     }
 
     override def save(signature: String, audio: Array[Byte]) {
-      Blobs.put(signatureJsonKey, signature, access=AccessPolicy.Private)
-      Blobs.put(audioKey, audio, access=AccessPolicy.Public)
+      blobs.put(signatureJsonKey, signature, access=AccessPolicy.Private)
+      blobs.put(audioKey, audio, access=AccessPolicy.Public)
 
       // Before removing this line, realize that without the line the image method will fail
       ImageAsset(
@@ -143,9 +148,9 @@ case class Egraph(
     {
       import ImageUtil.Conversions._
 
-      val signatureImage = ImageUtil.createSignatureImage(sig)
+      val signatureImage = services.images.createSignatureImage(sig)
 
-      ImageUtil.createEgraphImage(signatureImage, productImage, 0, 0).asByteArray(ImageAsset.Png)
+      services.images.createEgraphImage(signatureImage, productImage, 0, 0).asByteArray(ImageAsset.Png)
     }
 
   }

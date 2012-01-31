@@ -5,28 +5,37 @@ import java.util.Properties
 import javax.mail.Session
 import play.Play
 import Utils.requiredConfigurationProperty
+import com.google.inject.Provider
+
+trait Mail {
+  def send(mail: Email): Any
+}
 
 object Mail {
-  def send(mail: Email) = {
-    mailLib.send(mail)
-  }
-
-  private def mailLib: MailLibrary = {
-    val useGmail = Play.configuration.getProperty("mail.smtp") != "mock" &&
-      host.toLowerCase == "smtp.gmail.com"
-
-    if (useGmail) GmailLib else PlayMailLib
-  }
-
   private lazy val host = requiredConfigurationProperty("mail.smtp.host")
   private lazy val user = requiredConfigurationProperty("mail.smtp.user")
   private lazy val password = requiredConfigurationProperty("mail.smtp.pass")
 
-  private trait MailLibrary {
-    def send(mail: Email): Any
+  /**
+   * Provides Guice with the correct Mail implementation for a given configuration
+   * in application.conf
+   */
+  object MailProvider extends Provider[Mail] {
+    def get(): Mail = {
+      val useGmail = Play.configuration.getProperty("mail.smtp") != "mock" &&
+        host.toLowerCase == "smtp.gmail.com"
+
+      if (useGmail) new Gmail(user, password) else new PlayMailLib
+    }
   }
 
-  private object GmailLib extends MailLibrary {
+  /**
+   * Implementation of the Mail library that always sends through Gmail, since as of
+   * 12/2011 Play can not successfully send mail through gmail.
+   */
+  private[Mail] class Gmail(user: String, password: String) extends Mail {
+    val host = "smtp.gmail.com"
+
     def send(mail: Email) {
       play.Logger.info("Gmail: sending to " + mail.getToAddresses)
       import scala.collection.JavaConversions._
@@ -54,10 +63,15 @@ object Mail {
     }
   }
 
-  private object PlayMailLib extends MailLibrary {
+  /**
+   * Implementation of the Mail library that delegates to Play's behavior as configured in application.conf.
+   * See http://www.playframework.org/documentation/1.2.4/configuration#mail for more info.
+   */
+  private[Mail] class PlayMailLib extends Mail {
     override def send(mail: Email) = {
       play.libs.Mail.send(mail)
     }
   }
 }
+
 

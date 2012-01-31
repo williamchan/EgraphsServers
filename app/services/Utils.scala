@@ -83,4 +83,23 @@ object Utils {
 
     theValue
   }
+
+  /**
+   * Turns a set of (String -> Option) tuples into a map containing only the fields
+   * whose Options contained some value. For example,
+   * {{{
+   * val sparseMap = Map("one" -> Some(1), "two" -> None)
+   *
+   * sparseMap == Map("one" -> Some(1)) // True
+   * }}}
+   */
+  def makeOptionalFieldMap(optionalFields: List[(String, Option[Any])]): Map[String, Any] = {
+    optionalFields.foldLeft(Map.empty[String, Any])((growingMap, nextField) =>
+      nextField._2 match {
+        case None => growingMap
+        case Some(value) => growingMap + (nextField._1 -> value)
+      }
+    )
+  }
+
 }

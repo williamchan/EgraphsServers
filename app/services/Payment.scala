@@ -7,9 +7,9 @@ import scala.collection.JavaConversions._
 /**
  * Helper for charging and sending cash in and out of the system.
  */
-object Payment {
+class Payment {
   /**
-   * Creates a skype charge equivalent tot he provided cash against the Stripe card token.
+   * Creates a Stripe charge equivalent tot he provided cash against the Stripe card token.
    *
    * @param amount the amount of cash to charge
    *
@@ -28,7 +28,9 @@ object Payment {
 
     Charge.create(chargeMap)
   }
+}
 
+object Payment {
   /** Keys for using Stripe either in test or production mode */
   object StripeKey {
     def secret: String = {

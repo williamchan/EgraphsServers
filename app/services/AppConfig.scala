@@ -1,5 +1,6 @@
 package services
 
+import blobs.{BlobModule, BlobVendor, Blobs}
 import uk.me.lings.scalaguice.{InjectorExtensions, ScalaModule}
 import db.Schema
 import com.google.inject.{Provider, Singleton, Guice, AbstractModule}
@@ -10,6 +11,10 @@ class AppConfig extends AbstractModule with ScalaModule {
     bind[Schema].toProvider(new Provider[Schema] {
       override def get() = db.Schema
     })
+
+    // Services
+    bind[Mail].toProvider(Mail.MailProvider)
+    install(BlobModule)
 
     // Model services
     bind[AccountServices].in[Singleton]

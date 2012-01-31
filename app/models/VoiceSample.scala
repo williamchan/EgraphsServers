@@ -2,16 +2,17 @@ package models
 
 import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
-import services.{Blobs, Time}
+import services.Time
 import db.{KeyedCaseClass, Saves}
 import play.libs.Codec
 import com.google.inject.Inject
 import services.AppConfig
+import services.blobs.Blobs
 
 /**
  * Services used in all voice sample instances
  */
-case class VoiceSampleServices @Inject() (store: VoiceSampleStore, blobs: services.Blobs)
+case class VoiceSampleServices @Inject() (store: VoiceSampleStore, blobs: Blobs)
 
 case class VoiceSample(
   id: Long = 0,

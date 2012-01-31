@@ -6,11 +6,13 @@ import org.squeryl.{Session, SessionFactory}
 import db.DBSession
 import io.Source
 import java.io.{File, PrintWriter}
-import services.{Payment, Utils, TempFile, Blobs}
 import play.Play
+import services.blobs.Blobs
+import services.{AppConfig, Payment, Utils, TempFile}
 
 @OnApplicationStart
 class BootStrap extends Job {
+  val blobs = AppConfig.instance[Blobs]
 
   override def doJob() {
     // Initialize payment system
@@ -21,7 +23,7 @@ class BootStrap extends Job {
       Some(() => Session.create(play.db.DB.getConnection, db.DBAdapter.current))
 
     // Initialize S3 or fs-based blobstore
-    Blobs.init()
+    blobs.init()
 
     // Some additional test-mode setup
     if (Play.id == "test") {
@@ -34,6 +36,7 @@ class BootStrap extends Job {
  * Bootstrap code for when we're running in test mode
  */
 private object TestModeBootstrap {
+  val blobs = AppConfig.instance[Blobs]
 
   import org.squeryl.PrimitiveTypeMode._
 
@@ -50,7 +53,7 @@ private object TestModeBootstrap {
           (You can view the current schema at """ + schemaFile.getAbsolutePath + ")"
         )
         createNewSchema()
-        Blobs.scrub()
+        blobs.scrub()
       }
     }
     DBSession.commit()

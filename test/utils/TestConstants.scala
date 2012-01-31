@@ -2,7 +2,7 @@ package utils
 
 import play.libs.Codec
 import java.net.URLEncoder
-import services.Blobs
+import services.blobs.Blobs
 import play.Play
 
 object TestConstants {

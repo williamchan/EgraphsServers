@@ -7,10 +7,10 @@ import java.util.Hashtable
 import java.net.{URLEncoder, URL}
 import java.io._
 import play.libs.Codec
-import services.SampleRateConverter
-import services.{Blobs, SampleRateConverter}
-import Blobs.Conversions._
+import services.blobs.Blobs.Conversions._
 import javax.net.ssl.HttpsURLConnection
+import services.blobs.Blobs
+import services.{AppConfig, SampleRateConverter}
 
 class VBGRequest {
   private var requestType: String = ""
@@ -126,6 +126,7 @@ object VBGBiometricServices {
   private val _voiceSample: String = "voicesample"
   val _usableTime: String = "usabletime"
   private val _userId: String = "userid"
+  private val blobs = AppConfig.instance[Blobs]
 
   def sendStartEnrollmentRequest(userId: String, rebuildTemplate: Boolean): VBGRequest = {
     val request = new VBGRequest
@@ -139,7 +140,7 @@ object VBGBiometricServices {
 
   def sendAudioCheckRequest(transactionId: String, blobLocation: String): VBGRequest = {
     val request = new VBGRequest
-    val voiceSampleBase64_downSampled: String = convertWavTo8kHzBase64(Blobs.get(blobLocation).get.asByteArray)
+    val voiceSampleBase64_downSampled: String = convertWavTo8kHzBase64(blobs.get(blobLocation).get.asByteArray)
     request.setRequestType(_AudioCheck)
     request.setParameter(_clientName, _myClientName)
     request.setParameter(_clientKey, _myClientKey)

@@ -4,7 +4,7 @@ import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
 import org.squeryl.dsl.ast.LogicalBoolean
 import org.joda.money.Money
-import services.{Payment, Utils, Serialization, Time}
+import services.{Payment, Utils, Time}
 import models.CashTransaction.EgraphPurchase
 import services.AppConfig
 import db.{FilterThreeTables, KeyedCaseClass, Schema, Saves}
@@ -15,6 +15,7 @@ case class OrderServices @Inject() (
   store: OrderStore,
   customerStore: CustomerStore,
   productStore: ProductStore,
+  payment: Payment,
   cashTransactionServices: Provider[CashTransactionServices],
   egraphServices: Provider[EgraphServices])
 
@@ -87,7 +88,10 @@ case class Order(
       .withType(EgraphPurchase)
 
     OrderCharge(
-      this.withPaymentState(Order.PaymentState.Charged), stripeCardTokenId.get, cashTransaction
+      this.withPaymentState(Order.PaymentState.Charged),
+      stripeCardTokenId.get,
+      cashTransaction,
+      services.payment
     )
   }
 
@@ -110,10 +114,10 @@ case class Order(
       "amountPaidInCents" -> amountPaid.getAmountMinor
     )
 
-    val optionalFields = Serialization.makeOptionalFieldMap(
+    val optionalFields = Utils.makeOptionalFieldMap(
       List(
-        ("requestedMessage" -> requestedMessage),
-        ("messageToCelebrity" -> messageToCelebrity)
+        "requestedMessage" -> requestedMessage,
+        "messageToCelebrity" -> messageToCelebrity
       )
     )
 
@@ -279,9 +283,10 @@ object Order {
   /** Encapsulates the act of charging for an order. */
   case class OrderCharge private[Order] (order: Order,
                                          stripeCardTokenId: String,
-                                         transaction: CashTransaction) {
+                                         transaction: CashTransaction,
+                                         payment: Payment) {
     def issueAndSave(): OrderCharge = {
-      val stripeCharge = Payment.charge(
+      val stripeCharge = payment.charge(
         order.amountPaid,
         stripeCardTokenId,
         "Egraph Order=" + order.id

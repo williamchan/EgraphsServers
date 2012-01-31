@@ -7,11 +7,11 @@ import play.templates.JavaExtensions
 import org.joda.money.Money
 import services.Finance.TypeConversions._
 import models.Product.ProductWithPhoto
-import services.{Blobs, Time}
-import Blobs.Conversions._
+import services.{Time}
+import services.blobs.Blobs.Conversions._
 import java.awt.image.BufferedImage
 import play.Play
-import services.Blobs.AccessPolicy
+import services.blobs.AccessPolicy
 import services.AppConfig
 import com.google.inject.{Provider, Inject}
 
@@ -127,7 +127,7 @@ object Product {
 
   case class ProductWithPhoto(product: Product, photo: ImageAsset) {
     def save(): ProductWithPhoto = {
-      val savedPhoto = photo.save(Blobs.AccessPolicy.Public)
+      val savedPhoto = photo.save(AccessPolicy.Public)
       val savedProduct = product.save()
 
       ProductWithPhoto(savedProduct, savedPhoto)
