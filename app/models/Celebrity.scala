@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import services.blobs.AccessPolicy
 import org.squeryl.Query
 import play.templates.JavaExtensions
-import db.{FilterOneTable, KeyedCaseClass, Schema, Saves}
+import services.db.{FilterOneTable, KeyedCaseClass, Schema, Saves}
 import services.blobs.Blobs.Conversions._
 import services.{Utils, Time}
 import services.AppConfig
@@ -17,6 +17,7 @@ import com.google.inject.{Provider, Inject}
 case class CelebrityServices @Inject() (
   store: CelebrityStore,
   productStore: ProductStore,
+  schema: Schema,
   productServices: Provider[ProductServices],
   imageAssetServices: Provider[ImageAssetServices]
 )
@@ -123,7 +124,7 @@ case class Celebrity(id: Long = 0,
   }
 
   private def getMostRecentEnrollmentBatch(): Option[EnrollmentBatch] = {
-    from(Schema.enrollmentBatches)(enrollmentBatch =>
+    from(services.schema.enrollmentBatches)(enrollmentBatch =>
       where(enrollmentBatch.celebrityId === this.id)
         select (enrollmentBatch)
         orderBy(enrollmentBatch.created desc)
@@ -131,7 +132,7 @@ case class Celebrity(id: Long = 0,
   }
 
   def getOpenEnrollmentBatch(): Option[EnrollmentBatch] = {
-    from(Schema.enrollmentBatches)(enrollmentBatch =>
+    from(services.schema.enrollmentBatches)(enrollmentBatch =>
       where(enrollmentBatch.celebrityId === this.id and enrollmentBatch.isSuccessfulEnrollment.isNull)
         select (enrollmentBatch)
     ).headOption

@@ -169,7 +169,7 @@ class OrderTests extends UnitFlatSpec
     val firstOrder = will.buy(product).save()
     will.buy(product).save()
 
-    val found = orderStore.FindByCelebrity(celebrity.id, orderStore.Filters.OrderId(firstOrder.id))
+    val found = orderStore.FindByCelebrity(celebrity.id, OrderStore.FindByCelebrity.OrderId(firstOrder.id))
 
     found.toSeq.length should be (1)
     found.head should be (firstOrder)

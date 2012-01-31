@@ -1,4 +1,4 @@
-package db
+package services.db
 
 import org.scalatest.matchers.ShouldMatchers
 import org.squeryl.adapters.{MySQLAdapter, PostgreSqlAdapter, H2Adapter}

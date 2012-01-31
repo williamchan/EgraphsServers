@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import services.{Utils, Time}
 import com.google.inject.Inject
 import services.AppConfig
-import db.{Schema, Saves, KeyedCaseClass}
+import services.db.{Schema, Saves, KeyedCaseClass}
 
 /**
  * Services used by every instance of CashTransaction

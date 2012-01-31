@@ -5,7 +5,7 @@ import play.data.validation.Validation.ValidationResult
 import play.data.validation.Validation
 import java.sql.Timestamp
 import services.Time
-import db.{KeyedCaseClass, Saves, Schema}
+import services.db.{KeyedCaseClass, Saves, Schema}
 import com.google.inject.Inject
 import services.AppConfig
 
@@ -72,7 +72,7 @@ case class Account(
   override def unapplied = Account.unapply(this)
 }
 
-class AccountStore @Inject() (schema: db.Schema) extends Saves[Account] with SavesCreatedUpdated[Account] {
+class AccountStore @Inject() (schema: Schema) extends Saves[Account] with SavesCreatedUpdated[Account] {
   def authenticate(email: String, passwordAttempt: String): Either[AccountAuthenticationError, Account] = {
     findByEmail(email) match {
       case None =>

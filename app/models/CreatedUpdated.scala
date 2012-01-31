@@ -2,7 +2,7 @@ package models
 
 import java.util.Date
 import java.sql.Timestamp
-import db.{KeyedCaseClass, Saves}
+import services.db.{KeyedCaseClass, Saves}
 import services.Time
 
 /**

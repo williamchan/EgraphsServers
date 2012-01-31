@@ -7,7 +7,7 @@ import org.joda.money.Money
 import services.{Payment, Utils, Time}
 import models.CashTransaction.EgraphPurchase
 import services.AppConfig
-import db.{FilterThreeTables, KeyedCaseClass, Schema, Saves}
+import services.db.{FilterThreeTables, KeyedCaseClass, Schema, Saves}
 import com.google.inject.{Provider, Inject}
 import services.Finance.TypeConversions._
 
@@ -139,7 +139,7 @@ case class Order(
 
 case class FulfilledOrder(order: Order, egraph: Egraph)
 
-class OrderStore @Inject() (schema: db.Schema) extends Saves[Order] with SavesCreatedUpdated[Order] {
+class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreatedUpdated[Order] {
   //
   // Public methods
   //
@@ -176,39 +176,6 @@ class OrderStore @Inject() (schema: db.Schema) extends Saves[Order] with SavesCr
         select(order)
         orderBy(order.created asc)
     )
-  }
-
-  /**
-   * Set of Filters you can compose with your query to FindByCelebrity
-   */
-  object Filters {
-
-    /**
-     * Returns only orders that are actionable by the celebrity that owns them when
-     * composed with FindByCelebrity.
-     *
-     * In model terms, these are these are any Orders that don't have an Egraph that
-     * is either Verified or AwaitingVerification.
-     */
-    object ActionableOnly extends FilterThreeTables[Celebrity, Product, Order] {
-      override def test(celebrity: Celebrity, product: Product, order: Order) = {
-        notExists(
-          from(schema.egraphs)(egraph =>
-            where((egraph.orderId === order.id) and (egraph.stateValue in Seq(Verified.value, AwaitingVerification.value)))
-              select(egraph.id)
-          )
-        )
-      }
-    }
-
-    /**
-     * Returns only orders with the given orderId when composed with FindByCelebrity
-     */
-    case class OrderId(id: Long) extends FilterThreeTables[Celebrity, Product, Order] {
-      override def test(celebrity: Celebrity, product: Product, order: Order) = {
-        (order.id === id)
-      }
-    }
   }
 
   //

@@ -2,7 +2,7 @@ package utils
 
 import org.scalatest.{Suite, BeforeAndAfterEach}
 import org.squeryl.SessionFactory
-import db.DBSession
+import services.db.DBSession
 
 /**
  * Mix in to a test suite class to ensure that a Squeryl database transaction

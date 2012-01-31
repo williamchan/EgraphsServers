@@ -4,7 +4,7 @@ import org.scalatest.{Suite, BeforeAndAfterEach}
 import play.data.validation.Validation
 import services.blobs.Blobs
 import services.AppConfig
-import db.Schema
+import services.db.Schema
 
 /**
  * Mix this trait in to your Suite class to make sure that Play Validation

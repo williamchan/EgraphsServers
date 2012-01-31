@@ -1,9 +1,9 @@
-package db
+package services.db
 
 import org.squeryl.KeyedEntity
 
 /**
- * Custom trait for case classes that extend [[db.Schema]]. Provides case-class
+ * Custom trait for case classes that extend [[services.db.Schema]]. Provides case-class
  * equality rather than the broken KeyedEntity[_] equality test that depends on the
  * mutable _isPersisted variable.
  *

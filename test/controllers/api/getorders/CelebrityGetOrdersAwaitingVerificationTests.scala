@@ -9,11 +9,11 @@ import org.squeryl.PrimitiveTypeMode._
 import scenario.Scenarios
 import models._
 import utils.TestConstants
-import db.DBSession
 import services.AppConfig
+import services.db.DBSession
 
 
-class CelebrityGetOrdersFiltersAwaitingVerificationTests extends FunctionalTest with CleanDatabaseAfterEachTest {
+class CelebrityGetOrdersAwaitingVerificationTests extends FunctionalTest with CleanDatabaseAfterEachTest {
 
   import FunctionalTest._
 

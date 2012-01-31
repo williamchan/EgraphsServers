@@ -1,4 +1,4 @@
-package db
+package services.db
 
 import org.squeryl.internals.DatabaseAdapter
 import play.Play

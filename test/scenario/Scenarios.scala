@@ -2,7 +2,7 @@ package scenario
 
 import controllers.api.PostEgraphApiEndpoint.EgraphFulfillmentHandler
 
-import db.Schema
+import services.db.Schema
 import java.io.File
 import services.{Utils}
 import services.blobs.Blobs
@@ -23,6 +23,7 @@ import controllers.browser.PostBuyProductEndpoint.EgraphPurchaseHandler
 class Scenarios extends DeclaresScenarios {
   // Helpful services
   val blobs = AppConfig.instance[Blobs]
+  val schema = AppConfig.instance[Schema]
 
   // Categories of scenario
   val apiCategory = "API Helpers"
@@ -167,7 +168,7 @@ class Scenarios extends DeclaresScenarios {
       val will = Scenarios.getWillCelebrityAccount
       val (starcraftChampionship, kingOfPweensCompetition) = Scenarios.getWillsTwoProducts
 
-      val firstOrder = from(Schema.orders)(order =>
+      val firstOrder = from(schema.orders)(order =>
         where(order.id in List(starcraftChampionship.id, kingOfPweensCompetition.id))
         select (order)
       ).headOption.get

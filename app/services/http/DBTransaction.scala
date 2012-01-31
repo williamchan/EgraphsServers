@@ -1,7 +1,7 @@
 package services.http
 
 import play.mvc.{Finally, Before}
-import db.DBSession
+import services.db.DBSession
 
 /**
  * Ensures that a database transaction is available for use during any request.

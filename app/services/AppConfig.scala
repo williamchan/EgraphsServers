@@ -2,15 +2,13 @@ package services
 
 import blobs.{BlobModule, BlobVendor, Blobs}
 import uk.me.lings.scalaguice.{InjectorExtensions, ScalaModule}
-import db.Schema
+import services.db.Schema
 import com.google.inject.{Provider, Singleton, Guice, AbstractModule}
 import models._
 
 class AppConfig extends AbstractModule with ScalaModule {
   override def configure() {
-    bind[Schema].toProvider(new Provider[Schema] {
-      override def get() = db.Schema
-    })
+    bind[Schema].in[Singleton]
 
     // Services
     bind[Mail].toProvider(Mail.MailProvider)

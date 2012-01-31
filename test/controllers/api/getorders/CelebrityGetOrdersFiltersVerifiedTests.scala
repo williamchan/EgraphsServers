@@ -9,7 +9,7 @@ import org.squeryl.PrimitiveTypeMode._
 import scenario.Scenarios
 import models._
 import utils.TestConstants
-import db.DBSession
+import services.db.DBSession
 import services.AppConfig
 
 

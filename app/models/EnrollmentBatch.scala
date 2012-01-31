@@ -3,7 +3,7 @@ package models
 import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
 import services.Time
-import db.{KeyedCaseClass, Schema, Saves}
+import services.db.{KeyedCaseClass, Schema, Saves}
 import services.AppConfig
 import com.google.inject.{Provider, Inject}
 
@@ -92,7 +92,7 @@ object EnrollmentBatch {
   val batchSize = 10
 }
 
-class EnrollmentBatchStore @Inject() (schema: db.Schema) extends Saves[EnrollmentBatch] with SavesCreatedUpdated[EnrollmentBatch] {
+class EnrollmentBatchStore @Inject() (schema: Schema) extends Saves[EnrollmentBatch] with SavesCreatedUpdated[EnrollmentBatch] {
   //
   // Public methods
   //

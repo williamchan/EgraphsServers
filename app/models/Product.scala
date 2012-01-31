@@ -2,7 +2,7 @@ package models
 
 import java.sql.Timestamp
 import org.squeryl.Query
-import db.{FilterOneTable, Schema, Saves, KeyedCaseClass}
+import services.db.{FilterOneTable, Schema, Saves, KeyedCaseClass}
 import play.templates.JavaExtensions
 import org.joda.money.Money
 import services.Finance.TypeConversions._
@@ -135,7 +135,7 @@ object Product {
   }
 }
 
-class ProductStore @Inject() (schema: db.Schema) extends Saves[Product] with SavesCreatedUpdated[Product] {
+class ProductStore @Inject() (schema: Schema) extends Saves[Product] with SavesCreatedUpdated[Product] {
   import org.squeryl.PrimitiveTypeMode._
 
   //

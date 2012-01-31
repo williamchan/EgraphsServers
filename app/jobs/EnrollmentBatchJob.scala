@@ -5,14 +5,13 @@ import play.jobs._
 import services.blobs.Blobs
 import Blobs.Conversions._
 import services.signature.XyzmoBiometricServices
-import db.Schema
+import services.db.Schema
 import services.voice.{VBGRequest, VBGBiometricServices}
 import models._
 import services.AppConfig
 
 @On("0 0 0 * * ?") // cron expression: seconds minutes hours day-of-month month day-of-week (year optional)
 class EnrollmentBatchJob extends Job {
-
   //  Setup process to query for EnrollmentBatches that are {isBatchComplete = true and isSuccessfulEnrollment = null},
   //  and attempt enrollment. Failed enrollment changes Celebrity.enrollmentStatus to "NotEnrolled",
   //  whereas successful enrollment changes Celebrity.enrollmentStatus to "Enrolled".
@@ -52,6 +51,7 @@ class EnrollmentBatchJob extends Job {
 
 object EnrollmentBatchJob {
   val blobs = AppConfig.instance[Blobs]
+  val schema = AppConfig.instance[Schema]
 
   def attemptSignatureEnrollment(celebrity: Celebrity, signatureSamples: scala.List[SignatureSample]): Boolean = {
     for (signatureSample <- signatureSamples) {
@@ -118,21 +118,21 @@ object EnrollmentBatchJob {
   }
 
   def findEnrollmentBatchesPending(): List[EnrollmentBatch] = {
-    from(Schema.enrollmentBatches)(enrollmentBatch =>
+    from(schema.enrollmentBatches)(enrollmentBatch =>
       where(enrollmentBatch.isBatchComplete === true and enrollmentBatch.isSuccessfulEnrollment.isNull)
         select (enrollmentBatch)
     ).toList
   }
 
   def getSignatureSamples(enrollmentBatch: EnrollmentBatch): List[SignatureSample] = {
-    from(Schema.signatureSamples, Schema.enrollmentSamples)((signatureSample, enrollmentSample) =>
+    from(schema.signatureSamples, schema.enrollmentSamples)((signatureSample, enrollmentSample) =>
       where(enrollmentSample.enrollmentBatchId === enrollmentBatch.id and enrollmentSample.signatureSampleId === signatureSample.id)
         select (signatureSample)
     ).toList
   }
 
   def getVoiceSamples(enrollmentBatch: EnrollmentBatch): List[VoiceSample] = {
-    from(Schema.voiceSamples, Schema.enrollmentSamples)((voiceSample, enrollmentSample) =>
+    from(schema.voiceSamples, schema.enrollmentSamples)((voiceSample, enrollmentSample) =>
       where(enrollmentSample.enrollmentBatchId === enrollmentBatch.id and enrollmentSample.voiceSampleId === voiceSample.id)
         select (voiceSample)
     ).toList

@@ -3,12 +3,12 @@ package bootstrap
 import play.jobs._
 import com.stripe.Stripe
 import org.squeryl.{Session, SessionFactory}
-import db.DBSession
 import io.Source
 import java.io.{File, PrintWriter}
 import play.Play
 import services.blobs.Blobs
 import services.{AppConfig, Payment, Utils, TempFile}
+import services.db.{Schema, DBSession}
 
 @OnApplicationStart
 class BootStrap extends Job {
@@ -20,7 +20,7 @@ class BootStrap extends Job {
 
     // Initialize Squeryl persistence
     SessionFactory.concreteFactory =
-      Some(() => Session.create(play.db.DB.getConnection, db.DBAdapter.current))
+      Some(() => Session.create(play.db.DB.getConnection, services.db.DBAdapter.current))
 
     // Initialize S3 or fs-based blobstore
     blobs.init()
@@ -37,6 +37,7 @@ class BootStrap extends Job {
  */
 private object TestModeBootstrap {
   val blobs = AppConfig.instance[Blobs]
+  val schema = AppConfig.instance[Schema]
 
   import org.squeryl.PrimitiveTypeMode._
 
@@ -47,7 +48,7 @@ private object TestModeBootstrap {
   private def bootstrapDatabase() {
     DBSession.init()
     inTransaction {
-      if ((!db.Schema.isInPlace) || schemaHasChanged) {
+      if ((!schema.isInPlace) || schemaHasChanged) {
         play.Logger.info(
           """Detected either lack of database schema or change thereof. Scrubbing DB and blobstore.
           (You can view the current schema at """ + schemaFile.getAbsolutePath + ")"
@@ -66,7 +67,7 @@ private object TestModeBootstrap {
   private def createNewSchema() {
     // drop and re-create the database definition, logging the
     // creation SQL to a temporary file.
-    db.Schema.scrub()
+    schema.scrub()
 
     printDdlToFile(schemaFile)
   }
@@ -77,7 +78,7 @@ private object TestModeBootstrap {
 
     Utils.closing(new PrintWriter(file)) {
       writer =>
-        db.Schema.printDdl(writer)
+        schema.printDdl(writer)
     }
   }
 
@@ -89,7 +90,7 @@ private object TestModeBootstrap {
     if (schemaFile.exists()) {
       val prevDdl = Source.fromFile(schemaFile).mkString
 
-      prevDdl != db.Schema.ddl
+      prevDdl != schema.ddl
     }
     else {
       // No schema file existed, so the schema is different whatever it is.

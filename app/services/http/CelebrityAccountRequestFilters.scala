@@ -2,8 +2,8 @@ package services.http
 
 import play.mvc.Http.Request
 import models._
-import play.mvc.results.NotFound
 import com.google.inject.Inject
+import play.mvc.results.{Forbidden, NotFound}
 
 // TODO(erem): test and comment this trait
 class CelebrityAccountRequestFilters @Inject() (celebStore: CelebrityStore, accountFilters: AccountRequestFilters, productFilters: ProductQueryFilters) {
@@ -13,7 +13,7 @@ class CelebrityAccountRequestFilters @Inject() (celebStore: CelebrityStore, acco
     accountFilters.requireAuthenticatedAccount { account =>
       request.params.getOption("celebrityId") match {
         case None =>
-          new Error("Celebrity ID was required but not provided")
+          new Forbidden("Celebrity ID was required but not provided")
 
         case Some(celebrityId) if celebrityId == "me" =>
           account.celebrityId match {
@@ -25,7 +25,7 @@ class CelebrityAccountRequestFilters @Inject() (celebStore: CelebrityStore, acco
           }
 
         case Some(celebrityId) =>
-          new Error(
+          new Forbidden(
             "Unexpected request for celebrityId \""+celebrityId+"\". Only \"me\" is currently supported."
           )
       }

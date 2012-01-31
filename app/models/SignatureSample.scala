@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import services.Time
 import services.blobs.Blobs
 import Blobs.Conversions._
-import db.{KeyedCaseClass, Schema, Saves}
+import services.db.{KeyedCaseClass, Schema, Saves}
 import services.signature.XyzmoBiometricServices
 import com.google.inject.Inject
 import services.AppConfig
@@ -64,7 +64,7 @@ object SignatureSample {
   }
 }
 
-class SignatureSampleStore @Inject() (schema: db.Schema) extends Saves[SignatureSample] with SavesCreatedUpdated[SignatureSample] {
+class SignatureSampleStore @Inject() (schema: Schema) extends Saves[SignatureSample] with SavesCreatedUpdated[SignatureSample] {
   //
   // Saves[SignatureSample] methods
   //

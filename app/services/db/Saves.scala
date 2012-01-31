@@ -1,4 +1,4 @@
-package db
+package services.db
 
 import org.squeryl.Table
 import org.squeryl.dsl.ast.UpdateAssignment
@@ -53,7 +53,7 @@ trait Saves[T <: {def id : Long}] {
   //
   // Abstract members
   //
-  /**The table that manages this entity in db.Schema  */
+  /**The table that manages this entity in services.db.Schema  */
   protected def table: Table[T]
 
   /**
@@ -83,7 +83,7 @@ trait Saves[T <: {def id : Long}] {
 
   //
   // Protected API
-  //  
+  //
   /**
    * Convenience for making a list out of update assignments.
    *

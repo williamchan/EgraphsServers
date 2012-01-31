@@ -3,7 +3,7 @@ package models
 import java.sql.Timestamp
 import services.Time
 import org.squeryl.PrimitiveTypeMode._
-import db.{KeyedCaseClass, Schema, Saves}
+import services.db.{KeyedCaseClass, Schema, Saves}
 import services.AppConfig
 import com.google.inject.{Provider, Inject}
 
@@ -61,7 +61,7 @@ case class Customer(
 }
 
 class CustomerStore @Inject() (
-  schema: db.Schema,
+  schema: Schema,
   accountStore: AccountStore,
   customerServices: Provider[CustomerServices],
   accountServices: Provider[AccountServices]

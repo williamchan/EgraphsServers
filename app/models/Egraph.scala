@@ -1,13 +1,13 @@
 package models
 
 import java.sql.Timestamp
-import db.{KeyedCaseClass, Saves}
 import services.blobs.AccessPolicy
 import services.{ImageUtil, Utils, Time}
 import java.awt.image.BufferedImage
 import com.google.inject.Inject
 import services.AppConfig
 import services.blobs.Blobs
+import services.db.{Schema, KeyedCaseClass, Saves}
 
 abstract sealed class EgraphState(val value: String)
 
@@ -182,7 +182,7 @@ trait EgraphAssets {
   def save(signature: String, audio: Array[Byte])
 }
 
-class EgraphStore @Inject() (schema: db.Schema) extends Saves[Egraph] with SavesCreatedUpdated[Egraph] {
+class EgraphStore @Inject() (schema: Schema) extends Saves[Egraph] with SavesCreatedUpdated[Egraph] {
   //
   // Saves[Egraph] methods
   //

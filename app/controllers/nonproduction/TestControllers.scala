@@ -13,13 +13,15 @@ import play.libs.Codec
 import services.signature.XyzmoBiometricServices
 import services.http.DBTransaction
 import services.blobs.Blobs
+import services.db.Schema
 
 object TestControllers extends Controller
 with DBTransaction {
   val blobs = AppConfig.instance[Blobs]
+  val schema = AppConfig.instance[Schema]
 
   def resetAlphaState(): String = {
-    db.Schema.scrub()
+    schema.scrub()
     blobs.scrub()
 
     createCelebrity("Erem", "Boto", "erem@egraphs.com")

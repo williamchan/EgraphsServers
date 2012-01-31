@@ -1,4 +1,4 @@
-package db
+package services.db
 
 import org.squeryl.PrimitiveTypeMode._
 import org.squeryl.{KeyedEntity, Table}
@@ -6,7 +6,6 @@ import models._
 import java.lang.IllegalStateException
 import play.Play
 import java.io.{ByteArrayOutputStream, PrintWriter}
-import services.AppConfig
 import com.google.inject.{Inject, Injector}
 
 /**
@@ -120,7 +119,7 @@ class Schema @Inject() (injector: Injector) extends org.squeryl.Schema {
   def scrub() {
     Play.configuration.get("db.allowscrub") match {
       case "yes" =>
-        if (db.Schema.isInPlace) {
+        if (isInPlace) {
           dropSchema()
         }
         create
@@ -245,5 +244,3 @@ class Schema @Inject() (injector: Injector) extends org.squeryl.Schema {
     )
   }
 }
-
-object Schema extends Schema(AppConfig.injector)

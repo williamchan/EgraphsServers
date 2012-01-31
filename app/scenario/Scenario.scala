@@ -3,6 +3,7 @@ package scenario
 import services.blobs.Blobs
 import play.templates.JavaExtensions
 import services.AppConfig
+import services.db.Schema
 
 /**
  * An executable scenario.
@@ -48,6 +49,7 @@ object Scenario {
    */
   lazy val scenarios = Class.forName("scenario.Scenarios").newInstance()
   lazy val blobs = AppConfig.instance[Blobs]
+  lazy val schema = AppConfig.instance[Schema]
 
   /** All registered scenarios, indexed by name */
   var all = Map[String, Scenario]()
@@ -87,7 +89,7 @@ object Scenario {
    * call this in production.
    */
   def clearAll() {
-    db.Schema.scrub()
+    schema.scrub()
     blobs.scrub()
   }
 

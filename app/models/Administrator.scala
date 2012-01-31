@@ -3,7 +3,7 @@ package models
 import java.sql.Timestamp
 import services.Time
 import org.squeryl.PrimitiveTypeMode._
-import db.{KeyedCaseClass, Saves, Schema}
+import services.db.{KeyedCaseClass, Saves, Schema}
 import com.google.inject.Inject
 
 /**

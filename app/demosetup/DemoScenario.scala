@@ -3,6 +3,7 @@ package demosetup
 import services.blobs.Blobs
 import play.templates.JavaExtensions
 import services.AppConfig
+import services.db.Schema
 
 case class DemoScenario(name: String, category: String = "Uncategorized", description: String="", instructions: () => Any) {
   /** Slug used to identify the demoScenario in the URL */
@@ -70,7 +71,7 @@ object DemoScenario {
    * call this in production.
    */
   def clearAll() {
-    db.Schema.scrub()
+    AppConfig.instance[Schema].scrub()
     AppConfig.instance[Blobs].scrub()
   }
 

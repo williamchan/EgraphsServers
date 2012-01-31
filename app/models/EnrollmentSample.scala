@@ -3,7 +3,7 @@ package models
 import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
 import services.Time
-import db.{KeyedCaseClass, Schema, Saves}
+import services.db.{KeyedCaseClass, Schema, Saves}
 import com.google.inject.Inject
 import services.AppConfig
 
@@ -38,7 +38,7 @@ case class EnrollmentSample(
 
 }
 
-class EnrollmentSampleStore @Inject() (schema: db.Schema) extends Saves[EnrollmentSample] with SavesCreatedUpdated[EnrollmentSample] {
+class EnrollmentSampleStore @Inject() (schema: Schema) extends Saves[EnrollmentSample] with SavesCreatedUpdated[EnrollmentSample] {
 
   //
   // Saves[SignatureEnrollmentAttempt] methods

@@ -3,11 +3,11 @@ package models
 import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
 import services.Time
-import db.{KeyedCaseClass, Saves}
 import play.libs.Codec
 import com.google.inject.Inject
 import services.AppConfig
 import services.blobs.Blobs
+import services.db.{Schema, KeyedCaseClass, Saves}
 
 /**
  * Services used in all voice sample instances
@@ -54,7 +54,7 @@ object VoiceSample {
 
 }
 
-class VoiceSampleStore @Inject() (schema: db.Schema) extends Saves[VoiceSample] with SavesCreatedUpdated[VoiceSample] {
+class VoiceSampleStore @Inject() (schema: Schema) extends Saves[VoiceSample] with SavesCreatedUpdated[VoiceSample] {
   //
   // Saves[VoiceSample] methods
   //
