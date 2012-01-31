@@ -4,7 +4,7 @@ import browser._
 import play.mvc.Controller
 import services.AppConfig
 import models.OrderStore
-import libs.Blobs
+import services.Blobs
 import services.http.{CelebrityAccountRequestFilters, DBTransaction}
 import website.GetRootEndpoint
 

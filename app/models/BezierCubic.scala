@@ -1,5 +1,4 @@
-package libs
-
+package models
 
 case class BezierCubic(p0x: Double, p0y: Double,
                        c0x: Double, c0y: Double,

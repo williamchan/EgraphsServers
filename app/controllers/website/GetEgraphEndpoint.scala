@@ -1,7 +1,7 @@
 package controllers.browser
 
 import play.mvc.Controller
-import libs.Blobs
+import services.Blobs
 import models.{Order, OrderStore, FulfilledOrder}
 
 private[controllers] trait GetEgraphEndpoint { this: Controller =>

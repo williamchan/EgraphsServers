@@ -2,7 +2,7 @@ package utils
 
 import models.{Order, Celebrity, Account, Customer, Product}
 import com.stripe.model.Token
-import libs.Time
+import services.Time
 import java.io.File
 import play.Play
 

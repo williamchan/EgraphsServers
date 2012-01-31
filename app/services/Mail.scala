@@ -1,10 +1,10 @@
-package libs
+package services
 
 import org.apache.commons.mail.Email
-import Utils.requiredConfigurationProperty
 import java.util.Properties
 import javax.mail.Session
 import play.Play
+import Utils.requiredConfigurationProperty
 
 object Mail {
   def send(mail: Email) = {

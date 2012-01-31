@@ -1,6 +1,6 @@
 package models
 
-import libs.Blobs
+import services.Blobs
 import Blobs.Conversions._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers

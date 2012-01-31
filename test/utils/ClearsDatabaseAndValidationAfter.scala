@@ -2,7 +2,7 @@ package utils
 
 import org.scalatest.{Suite, BeforeAndAfterEach}
 import play.data.validation.Validation
-import libs.Blobs
+import services.Blobs
 
 /**
  * Mix this trait in to your Suite class to make sure that Play Validation

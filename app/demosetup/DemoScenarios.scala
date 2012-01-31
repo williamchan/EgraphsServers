@@ -1,8 +1,8 @@
 package demosetup
 
-import libs.Blobs.Conversions._
+import services.Blobs.Conversions._
 import models.{Enrolled, Account, Celebrity}
-import libs.{ImageUtil, Blobs}
+import services.{ImageUtil, Blobs}
 import db.Schema
 import javax.imageio.ImageIO
 import java.io.File

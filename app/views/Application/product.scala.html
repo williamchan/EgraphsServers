@@ -5,9 +5,9 @@
 
 @import models.Product
 @import controllers.WebsiteControllers
-@import libs.Blobs.AccessPolicy.Public
-@import libs.Finance.TypeConversions._
-@import libs.Utils.lookupUrl
+@import services.Blobs.AccessPolicy.Public
+@import services.Finance.TypeConversions._
+@import services.Utils.lookupUrl
 
 @content_base(title=celebrity.publicName.get + ": " + product.name + "- eGraphs", body=body, head=head)
 
@@ -16,7 +16,7 @@
   <script type="text/javascript" >
     require(["product-page"], function(productPage) {
        productPage.go(
-         "@libs.Payment.StripeKey.publishable",
+         "@services.Payment.StripeKey.publishable",
          @product.price.getAmountMinor,
          !@errorFields.isEmpty);
     })

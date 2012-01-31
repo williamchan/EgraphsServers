@@ -1,6 +1,6 @@
 package controllers.api
 
-import libs.Time
+import services.Time
 import org.junit.Assert._
 import org.junit.Test
 import play.test.FunctionalTest

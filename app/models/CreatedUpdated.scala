@@ -3,7 +3,7 @@ package models
 import java.util.Date
 import java.sql.Timestamp
 import db.{KeyedCaseClass, Saves}
-import libs.Time
+import services.Time
 
 /**
  * Mix in with any class that has a created or updated field if you wish its

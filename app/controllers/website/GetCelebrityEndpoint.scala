@@ -1,9 +1,9 @@
 package controllers.browser
 
 import play.mvc.Controller
-import libs.Utils
+import services.Utils
 import play.mvc.Router.ActionDefinition
-import libs.Blobs.AccessPolicy
+import services.Blobs.AccessPolicy
 import services.http.CelebrityAccountRequestFilters
 
 /**

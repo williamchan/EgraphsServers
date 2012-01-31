@@ -1,4 +1,4 @@
-package libs
+package services
 
 import play.mvc.Router
 import play.Play

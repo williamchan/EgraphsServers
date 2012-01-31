@@ -1,4 +1,4 @@
-package libs
+package services
 
 import java.sql.Timestamp
 import java.util.{TimeZone, Date}
@@ -15,7 +15,7 @@ class Time {
   def defaultTimestamp: Timestamp = {
     new Timestamp(0L)
   }
-  
+
   /** The current time */
   def now:Timestamp = {
     new Timestamp(new Date().getTime)

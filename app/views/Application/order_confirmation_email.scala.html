@@ -4,7 +4,7 @@
   product: models.Product,
   order: models.Order)
 
-@import libs.Finance.TypeConversions._
+@import services.Finance.TypeConversions._
 
 @selfPurchase = @{ buyer == recipient }
 

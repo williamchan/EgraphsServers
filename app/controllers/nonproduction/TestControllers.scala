@@ -1,16 +1,16 @@
 package controllers.nonproduction
 
 import play.mvc._
-import libs.Blobs.Conversions._
+import services.Blobs.Conversions._
 import math.BigDecimal._
 import play.Play
 import models.{Account, Celebrity}
-import libs.Blobs
+import services.Blobs
 import models.{VoiceSample, Account, Celebrity}
-import libs.{SampleRateConverter, Blobs}
+import services.{SampleRateConverter, AppConfig}
+import services.{SampleRateConverter, Blobs}
 import play.libs.Codec
 import services.signature.XyzmoBiometricServices
-import services.AppConfig
 import services.http.DBTransaction
 
 object TestControllers extends Controller

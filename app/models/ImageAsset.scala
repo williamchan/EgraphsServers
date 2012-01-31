@@ -3,11 +3,11 @@ package models
 import models.ImageAsset.{Resolution, ImageType}
 import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
-import libs._
+import services._
 import java.awt.RenderingHints
 import Blobs.Conversions._
 import ImageUtil.Conversions._
-import libs.Blobs.AccessPolicy
+import services.Blobs.AccessPolicy
 import com.google.inject.Inject
 import services.AppConfig
 

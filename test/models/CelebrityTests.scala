@@ -6,7 +6,7 @@ import play.test.UnitFlatSpec
 import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationAfter, CreatedUpdatedEntityTests, SavingEntityTests}
 import java.io.File
 import javax.imageio.ImageIO
-import libs.{ImageUtil, Time}
+import services.{ImageUtil, Time}
 import ImageUtil.Conversions._
 import services.AppConfig
 

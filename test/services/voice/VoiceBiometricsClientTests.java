@@ -1,10 +1,6 @@
 package services.voice;
 
 import junit.framework.TestCase;
-import libs.SampleRateConverter;
-import play.libs.Codec;
-
-import java.io.*;
 
 public class VoiceBiometricsClientTests extends TestCase {
 

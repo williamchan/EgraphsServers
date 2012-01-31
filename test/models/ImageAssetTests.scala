@@ -6,7 +6,7 @@ import utils.{ClearsDatabaseAndValidationAfter, DBTransactionPerTest}
 import java.io.{FileOutputStream, File}
 import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
-import libs.{ImageUtil, TempFile}
+import services.{ImageUtil, TempFile}
 import services.AppConfig
 
 class ImageAssetTests extends UnitFlatSpec

@@ -91,7 +91,7 @@ object PostEgraphApiEndpoint {
         ).toString().trim()
       )
 
-      libs.Mail.send(email)
+      services.Mail.send(email)
     }
 
     private def verifyBiometrics(egraph: Egraph, skipBiometrics: Boolean): Boolean = {

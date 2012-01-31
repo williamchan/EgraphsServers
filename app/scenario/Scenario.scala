@@ -1,6 +1,6 @@
 package scenario
 
-import libs.Blobs
+import services.Blobs
 import play.templates.JavaExtensions
 
 /**

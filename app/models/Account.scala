@@ -4,7 +4,7 @@ import org.squeryl.PrimitiveTypeMode._
 import play.data.validation.Validation.ValidationResult
 import play.data.validation.Validation
 import java.sql.Timestamp
-import libs.Time
+import services.Time
 import db.{KeyedCaseClass, Saves, Schema}
 import com.google.inject.Inject
 import services.AppConfig

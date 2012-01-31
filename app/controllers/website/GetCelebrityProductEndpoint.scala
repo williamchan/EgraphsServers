@@ -1,7 +1,7 @@
 package controllers.browser
 
 import play.mvc.Controller
-import libs.Utils
+import services.Utils
 
 import models._
 import services.http.CelebrityAccountRequestFilters

@@ -1,7 +1,7 @@
 @(order: models.Order, egraph: models.Egraph, imageUrl: String, product: models.Product, celebrity: models.Celebrity)
 
-@import libs.Time
-@import libs.Blobs.AccessPolicy.Public
+@import services.Time
+@import services.Blobs.AccessPolicy.Public
 
 @content_base(title="Egraph #"+order.id+" - eGraphs", body=body, head=head)
 

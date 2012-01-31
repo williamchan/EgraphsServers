@@ -2,12 +2,12 @@ package models
 
 import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
-import libs.Blobs.AccessPolicy
+import services.Blobs.AccessPolicy
 import org.squeryl.Query
 import play.templates.JavaExtensions
 import db.{FilterOneTable, KeyedCaseClass, Schema, Saves}
-import libs.Blobs.Conversions._
-import libs.{Utils, Serialization, Time}
+import services.Blobs.Conversions._
+import services.{Utils, Serialization, Time}
 import services.AppConfig
 import com.google.inject.{Provider, Inject}
 

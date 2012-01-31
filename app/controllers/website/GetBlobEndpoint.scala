@@ -1,6 +1,6 @@
 package controllers.browser
 
-import libs.Blobs
+import services.Blobs
 import play.mvc.Controller
 import play.mvc.results.RenderBinary
 import Blobs.Conversions._

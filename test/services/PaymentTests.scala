@@ -1,4 +1,4 @@
-package libs
+package services
 
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
@@ -11,7 +11,7 @@ class PaymentTests extends UnitFlatSpec
   with ClearsDatabaseAndValidationAfter
   with DBTransactionPerTest
 {
-  import libs.Finance.TypeConversions._
+  import services.Finance.TypeConversions._
 
   val amount: BigDecimal = 1000
 

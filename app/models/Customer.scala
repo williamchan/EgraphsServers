@@ -1,7 +1,7 @@
 package models
 
 import java.sql.Timestamp
-import libs.Time
+import services.Time
 import org.squeryl.PrimitiveTypeMode._
 import db.{KeyedCaseClass, Schema, Saves}
 import services.AppConfig

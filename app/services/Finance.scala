@@ -1,4 +1,4 @@
-package libs
+package services
 
 import org.joda.money.{CurrencyUnit, Money}
 import java.math.RoundingMode
@@ -10,7 +10,7 @@ import java.math.RoundingMode
  *
  * Example:
  * {{{
- *   import libs.Finance.TypeConversions._
+ *   import services.Finance.TypeConversions._
  *
  *   // Make some Money objects from an amount
  *   val amount = BigDecimal(100.50)
@@ -45,7 +45,7 @@ object Finance {
        */
       def formatSimply = {
         val amount = money.getAmount
-        
+
         val amountFormatted = if (money.getMinorPart == 0) {
           "%d" format amount.toBigInteger
         } else {

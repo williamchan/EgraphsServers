@@ -4,7 +4,7 @@ import controllers.api.PostEgraphApiEndpoint.EgraphFulfillmentHandler
 
 import db.Schema
 import java.io.File
-import libs.{Utils, Blobs}
+import services.{Utils, Blobs}
 import org.apache.commons.mail.SimpleEmail
 import play.libs.Mail
 import play.mvc.results.Redirect
@@ -42,7 +42,7 @@ class Scenarios extends DeclaresScenarios {
       email.setMsg("This is a test mail ... :-)");
       email.addTo("erem@egraphs.com", "Erem Boto");
 
-      libs.Mail.send(email)
+      services.Mail.send(email)
     }
 
   )

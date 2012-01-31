@@ -1,6 +1,6 @@
 package services.voice
 
-import libs.Blobs
+import services.Blobs
 import play.Play
 import play.test.UnitFlatSpec
 import org.scalatest.matchers.ShouldMatchers

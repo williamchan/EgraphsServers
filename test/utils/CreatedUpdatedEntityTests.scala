@@ -4,7 +4,7 @@ import models.HasCreatedUpdated
 import org.scalatest.matchers.ShouldMatchers
 import org.squeryl.KeyedEntity
 import play.test.UnitFlatSpec
-import libs.Time.{defaultTimestamp, now}
+import services.Time.{defaultTimestamp, now}
 
 /**
  * Mix this in with test cases for any entity that uses the HasCreatedUpdated

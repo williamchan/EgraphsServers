@@ -1,6 +1,6 @@
 package demosetup
 
-import libs.Blobs
+import services.Blobs
 import play.templates.JavaExtensions
 
 case class DemoScenario(name: String, category: String = "Uncategorized", description: String="", instructions: () => Any) {

@@ -1,7 +1,8 @@
-package libs
+package services
 
 import play.test.UnitFlatSpec
 import org.scalatest.matchers.ShouldMatchers
+import models.BezierCubic
 
 
 class BezierCubicTests extends UnitFlatSpec

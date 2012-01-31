@@ -2,7 +2,7 @@
 //
 //import org.squeryl.PrimitiveTypeMode._
 //import java.sql.Timestamp
-//import libs.Time
+//import services.Time
 //import db.{KeyedCaseClass, Schema, Saves}
 //
 //case class VoiceEnrollmentAttempt(id: Long = 0,

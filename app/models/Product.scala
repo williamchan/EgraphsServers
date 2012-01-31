@@ -5,13 +5,13 @@ import org.squeryl.Query
 import db.{FilterOneTable, Schema, Saves, KeyedCaseClass}
 import play.templates.JavaExtensions
 import org.joda.money.Money
-import libs.Finance.TypeConversions._
+import services.Finance.TypeConversions._
 import models.Product.ProductWithPhoto
-import libs.{Blobs, Time}
+import services.{Blobs, Time}
 import Blobs.Conversions._
 import java.awt.image.BufferedImage
 import play.Play
-import libs.Blobs.AccessPolicy
+import services.Blobs.AccessPolicy
 import services.AppConfig
 import com.google.inject.{Provider, Inject}
 

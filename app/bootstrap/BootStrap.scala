@@ -6,7 +6,7 @@ import org.squeryl.{Session, SessionFactory}
 import db.DBSession
 import io.Source
 import java.io.{File, PrintWriter}
-import libs.{Payment, Utils, TempFile, Blobs}
+import services.{Payment, Utils, TempFile, Blobs}
 import play.Play
 
 @OnApplicationStart

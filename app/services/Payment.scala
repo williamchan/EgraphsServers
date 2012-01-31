@@ -1,4 +1,4 @@
-package libs
+package services
 
 import org.joda.money.Money
 import com.stripe.model.Charge

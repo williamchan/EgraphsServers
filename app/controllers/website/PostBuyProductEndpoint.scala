@@ -1,7 +1,7 @@
 package controllers.browser
 
 import play.mvc.Controller
-import libs.Utils
+import services.Utils
 
 import play.data.validation._
 import org.apache.commons.mail.SimpleEmail
@@ -128,7 +128,7 @@ object PostBuyProductEndpoint {
         buyer, recipient, celebrity, product, chargedOrder
       ).toString().trim())
 
-      libs.Mail.send(email)
+      services.Mail.send(email)
 
       // Redirect to the order page, with orderId in flash scope
       flash.put("orderId", chargedOrder.id)

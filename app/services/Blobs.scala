@@ -1,4 +1,4 @@
-package libs
+package services
 
 import java.util.Properties
 import org.jclouds.filesystem.reference.FilesystemConstants
@@ -72,7 +72,7 @@ import com.google.inject.Inject
   def getUrl(key: String): String = {
     blobProvider.urlBase + "/" + key
   }
-  
+
   /**
    * Puts data into a Blob object.
    *

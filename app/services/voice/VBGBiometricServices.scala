@@ -7,7 +7,8 @@ import java.util.Hashtable
 import java.net.{URLEncoder, URL}
 import java.io._
 import play.libs.Codec
-import libs.{Blobs, SampleRateConverter}
+import services.SampleRateConverter
+import services.{Blobs, SampleRateConverter}
 import Blobs.Conversions._
 import javax.net.ssl.HttpsURLConnection
 

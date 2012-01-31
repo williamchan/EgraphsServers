@@ -1,10 +1,11 @@
-package libs
+package services
 
 import play.test.UnitFlatSpec
 import org.scalatest.matchers.ShouldMatchers
 import javax.sound.sampled.{AudioSystem, AudioFormat}
 import java.io._
 import play.Play
+import services.SampleRateConverter
 
 class SampleRateConverterTests extends UnitFlatSpec
 with ShouldMatchers {

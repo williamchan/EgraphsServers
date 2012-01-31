@@ -1,10 +1,10 @@
-package libs
+package services
 
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 
 class SerializationTests extends UnitFlatSpec with ShouldMatchers {
-  import libs.Serialization.makeOptionalFieldMap
+  import services.Serialization.makeOptionalFieldMap
 
   "makeOptionalFieldMap" should "return an empty map if no options have a value" in {
     val map = makeOptionalFieldMap(

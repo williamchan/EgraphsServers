@@ -2,7 +2,7 @@ package jobs
 
 import org.squeryl.PrimitiveTypeMode._
 import play.jobs._
-import libs.Blobs
+import services.Blobs
 import Blobs.Conversions._
 import services.signature.XyzmoBiometricServices
 import db.Schema

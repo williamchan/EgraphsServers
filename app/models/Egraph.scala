@@ -2,8 +2,8 @@ package models
 
 import java.sql.Timestamp
 import db.{KeyedCaseClass, Saves}
-import libs.Blobs.AccessPolicy
-import libs.{ImageUtil, Blobs, Utils, Time}
+import services.Blobs.AccessPolicy
+import services.{ImageUtil, Blobs, Utils, Time}
 import java.awt.image.BufferedImage
 import com.google.inject.Inject
 import services.AppConfig

@@ -2,8 +2,8 @@
   profilePhotoUrl: String,
   products: Iterable[models.Product])
 
-@import libs.Finance.TypeConversions._
-@import libs.Blobs.AccessPolicy.Public
+@import services.Finance.TypeConversions._
+@import services.Blobs.AccessPolicy.Public
 @import models.Product
 
 @content_base(title=celebrity.publicName.get + " - eGraphs", onLoad=onLoad, body=body)

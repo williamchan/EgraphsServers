@@ -2,7 +2,7 @@ package models
 
 import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
-import libs.{Blobs, Time}
+import services.{Blobs, Time}
 import Blobs.Conversions._
 import db.{KeyedCaseClass, Schema, Saves}
 import services.signature.XyzmoBiometricServices

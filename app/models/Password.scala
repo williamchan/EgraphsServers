@@ -4,7 +4,7 @@ import java.security.SecureRandom
 import play.libs.Codec
 import java.math.BigInteger
 import java.util.Date
-import libs.Crypto
+import services.Crypto
 
 case class Password (hash: String, salt: String) {
   /**

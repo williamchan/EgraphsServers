@@ -2,7 +2,7 @@ package models
 
 import org.joda.money.{CurrencyUnit, Money}
 import java.sql.Timestamp
-import libs.{Utils, Time}
+import services.{Utils, Time}
 import com.google.inject.Inject
 import services.AppConfig
 import db.{Schema, Saves, KeyedCaseClass}

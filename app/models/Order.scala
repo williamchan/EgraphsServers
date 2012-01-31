@@ -4,12 +4,12 @@ import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
 import org.squeryl.dsl.ast.LogicalBoolean
 import org.joda.money.Money
-import libs.Finance.TypeConversions._
-import libs.{Payment, Utils, Serialization, Time}
+import services.{Payment, Utils, Serialization, Time}
 import models.CashTransaction.EgraphPurchase
 import services.AppConfig
 import db.{FilterThreeTables, KeyedCaseClass, Schema, Saves}
 import com.google.inject.{Provider, Inject}
+import services.Finance.TypeConversions._
 
 case class OrderServices @Inject() (
   store: OrderStore,

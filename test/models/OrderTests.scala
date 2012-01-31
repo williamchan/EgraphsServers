@@ -3,7 +3,7 @@ package models
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
-import libs.Time
+import services.Time
 import utils._
 import services.AppConfig
 import models.OrderStore.FindByCelebrity.ActionableOnly
