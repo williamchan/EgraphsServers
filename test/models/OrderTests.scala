@@ -61,7 +61,7 @@ class OrderTests extends UnitFlatSpec
     val eGraph = Order(id=100L).newEgraph
 
     eGraph.orderId should be (100L)
-    eGraph.state should be (AwaitingVerification)
+    eGraph.state should be (EgraphState.AwaitingVerification)
   }
 
   it should "start out not charged" in {
@@ -178,7 +178,7 @@ class OrderTests extends UnitFlatSpec
     val (will, _, celebrity, product) = newOrderStack
 
     // Make an order for each Egraph State, and save an Egraph in that state
-    val orders = Egraph.states.map { case (_, state) =>
+    val orders = EgraphState.named.map { case (_, state) =>
       val order = will.buy(product).save()
       order
         .newEgraph
@@ -197,10 +197,10 @@ class OrderTests extends UnitFlatSpec
     found.toSeq.length should be (5)
     found.toSet should be (Set(
       orderWithoutEgraph,
-      orders(RejectedVoice),
-      orders(RejectedSignature),
-      orders(RejectedBoth),
-      orders(RejectedPersonalAudit)
+      orders(EgraphState.RejectedVoice),
+      orders(EgraphState.RejectedSignature),
+      orders(EgraphState.RejectedBoth),
+      orders(EgraphState.RejectedPersonalAudit)
     ))
   }
 

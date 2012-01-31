@@ -32,7 +32,7 @@ class CelebrityGetOrdersFiltersVerifiedTests extends FunctionalTest with CleanDa
     transaction {
       val celebrityId = Scenarios.getWillCelebrityAccount.id
       val allCelebOrders = orderStore.findByCelebrity(celebrityId)
-      Egraph(orderId = allCelebOrders.toSeq.head.id).withState(Verified).saveWithoutAssets()
+      Egraph(orderId = allCelebOrders.toSeq.head.id).withState(EgraphState.Verified).saveWithoutAssets()
     }
 
     val response = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/orders?signerActionable=true")

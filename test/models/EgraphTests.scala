@@ -36,7 +36,7 @@ class EgraphTests extends UnitFlatSpec
     val order = persistedOrder
     toTransform.copy(
       orderId = order.id,
-      stateValue = Verified.value
+      stateValue = EgraphState.Verified.value
     )
   }
 
@@ -44,9 +44,9 @@ class EgraphTests extends UnitFlatSpec
   // Test cases
   //
   "An Egraph" should "update its state when withState is called" in {
-    val egraph = Egraph().withState(RejectedVoice)
+    val egraph = Egraph().withState(EgraphState.RejectedVoice)
 
-    egraph.state should be (RejectedVoice)
+    egraph.state should be (EgraphState.RejectedVoice)
   }
 
   it should "save and recover signature and audio data from the blobstore" in {
@@ -63,17 +63,17 @@ class EgraphTests extends UnitFlatSpec
   }
 
   "Egraph statuses" should "be accessible via their values on the companion object" in {
-    Egraph.states.foreach( stateTuple =>
-      Egraph.states(stateTuple._2.value) should be (stateTuple._2)
+    EgraphState.named.foreach( stateTuple =>
+      EgraphState.named(stateTuple._2.value) should be (stateTuple._2)
     )
   }
 
   "allStatuses" should "contain all the states" in {
-    Egraph.states.size should be (6)
+    EgraphState.named.size should be (6)
   }
 
   it should "throw an exception at an unrecognized string" in {
-    evaluating { Egraph.states("Herpyderp") } should produce [NoSuchElementException]
+    evaluating { EgraphState.named("Herpyderp") } should produce [NoSuchElementException]
   }
 
   //

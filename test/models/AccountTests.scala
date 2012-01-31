@@ -7,6 +7,7 @@ import play.test.UnitFlatSpec
 import scala.collection.JavaConversions._
 import utils.{DBTransactionPerTest, SavingEntityTests, CreatedUpdatedEntityTests, ClearsDatabaseAndValidationAfter}
 import services.AppConfig
+import AccountAuthenticationError._
 
 class AccountTests extends UnitFlatSpec
 with ShouldMatchers

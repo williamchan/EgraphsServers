@@ -9,14 +9,6 @@ import services.AppConfig
 import services.blobs.Blobs
 import services.db.{Schema, KeyedCaseClass, Saves}
 
-abstract sealed class EgraphState(val value: String)
-
-case object AwaitingVerification extends EgraphState("AwaitingVerification")
-case object Verified extends EgraphState("Verified")
-case object RejectedVoice extends EgraphState("Rejected:Voice")
-case object RejectedSignature extends EgraphState("Rejected:Signature")
-case object RejectedBoth extends EgraphState("Rejected:Both")
-case object RejectedPersonalAudit extends EgraphState("Rejected:Audit")
 
 case class EgraphServices @Inject() (
   store: EgraphStore,
@@ -34,7 +26,7 @@ case class EgraphServices @Inject() (
 case class Egraph(
   id: Long = 0L,
   orderId: Long = 0L,
-  stateValue: String = AwaitingVerification.value,
+  stateValue: String = EgraphState.AwaitingVerification.value,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: EgraphServices = AppConfig.instance[EgraphServices]
@@ -76,7 +68,7 @@ case class Egraph(
 
   /** The current state of the eGraph */
   def state: EgraphState = {
-    Egraph.states(stateValue)
+    EgraphState.named(stateValue)
   }
 
   /**
@@ -207,12 +199,18 @@ class EgraphStore @Inject() (schema: Schema) extends Saves[Egraph] with SavesCre
   }
 }
 
-object Egraph {
-  //
-  // Public Methods
-  //
+abstract sealed class EgraphState(val value: String)
+
+object EgraphState {
+  case object AwaitingVerification extends EgraphState("AwaitingVerification")
+  case object Verified extends EgraphState("Verified")
+  case object RejectedVoice extends EgraphState("Rejected:Voice")
+  case object RejectedSignature extends EgraphState("Rejected:Signature")
+  case object RejectedBoth extends EgraphState("Rejected:Both")
+  case object RejectedPersonalAudit extends EgraphState("Rejected:Audit")
+
   /** Map of Egraph state strings to the actual EgraphStates */
-  val states = Utils.toMap[String, EgraphState](Seq(
+  val named = Utils.toMap[String, EgraphState](Seq(
     AwaitingVerification,
     Verified,
     RejectedVoice,
@@ -220,5 +218,4 @@ object Egraph {
     RejectedBoth,
     RejectedPersonalAudit
   ), key=(theState) => theState.value)
-
 }

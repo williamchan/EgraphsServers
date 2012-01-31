@@ -39,9 +39,9 @@ class EnrollmentBatchJob extends Job {
         val isSuccessfulEnrollment = isSuccessfulSignatureEnrollment && isSuccessfulVoiceEnrollment
         batch.copy(isSuccessfulEnrollment = Some(isSuccessfulEnrollment)).save()
         if (isSuccessfulEnrollment) {
-          celebrity.withEnrollmentStatus(models.Enrolled).save()
+          celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
         } else {
-          celebrity.withEnrollmentStatus(models.FailedEnrollment).save()
+          celebrity.withEnrollmentStatus(EnrollmentStatus.FailedEnrollment).save()
         }
       }
     }

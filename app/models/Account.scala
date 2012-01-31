@@ -74,6 +74,8 @@ case class Account(
 
 class AccountStore @Inject() (schema: Schema) extends Saves[Account] with SavesCreatedUpdated[Account] {
   def authenticate(email: String, passwordAttempt: String): Either[AccountAuthenticationError, Account] = {
+    import AccountAuthenticationError._
+
     findByEmail(email) match {
       case None =>
         Left(new AccountNotFoundError)
@@ -148,8 +150,8 @@ class AccountStore @Inject() (schema: Schema) extends Saves[Account] with SavesC
 // Errors
 sealed class AccountAuthenticationError
 
-class AccountCredentialsError extends AccountAuthenticationError
-
-class AccountPasswordNotSetError extends AccountAuthenticationError
-
-class AccountNotFoundError extends AccountAuthenticationError
+object AccountAuthenticationError {
+  class AccountCredentialsError extends AccountAuthenticationError
+  class AccountPasswordNotSetError extends AccountAuthenticationError
+  class AccountNotFoundError extends AccountAuthenticationError
+}

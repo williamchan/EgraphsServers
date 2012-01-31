@@ -195,7 +195,7 @@ class Scenarios extends DeclaresScenarios {
     """,
 
     {() =>
-      Scenarios.getWillCelebrityAccount.withEnrollmentStatus(Enrolled).save()
+      Scenarios.getWillCelebrityAccount.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
     }
   )
 
@@ -210,7 +210,7 @@ class Scenarios extends DeclaresScenarios {
     """,
 
     {() =>
-      Scenarios.getWillCelebrityAccount.withEnrollmentStatus(FailedEnrollment).save()
+      Scenarios.getWillCelebrityAccount.withEnrollmentStatus(EnrollmentStatus.FailedEnrollment).save()
     }
   )
 

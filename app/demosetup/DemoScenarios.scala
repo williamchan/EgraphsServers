@@ -1,13 +1,13 @@
 package demosetup
 
 import services.blobs.Blobs.Conversions._
-import models.{Enrolled, Account, Celebrity}
 
 import javax.imageio.ImageIO
 import java.io.File
 import services.{AppConfig, ImageUtil}
 import services.blobs.Blobs
 import services.db.Schema
+import models.{EnrollmentStatus, Account, Celebrity}
 
 class DemoScenarios extends DeclaresDemoScenarios {
   val demoCategory = "Demo Preparation"
@@ -213,7 +213,7 @@ class DemoScenarios extends DeclaresDemoScenarios {
         "Love all my fans out there from Seattle to Swaziland." +
         " Your support makes the game worth playing."
       ),
-      enrollmentStatusValue = Enrolled.value
+      enrollmentStatusValue = EnrollmentStatus.Enrolled.value
     ).save()
 
     blobs.getStaticResource(profile) foreach { profilePhotoBlob =>

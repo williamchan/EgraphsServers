@@ -11,6 +11,7 @@ import services.{Utils, Time}
 import services.AppConfig
 import com.google.inject.{Provider, Inject}
 
+
 /**
  * Services used by each celebrity instance
  */
@@ -34,7 +35,7 @@ case class Celebrity(id: Long = 0,
                      lastName: Option[String] = None,
                      publicName: Option[String] = None,
                      profilePhotoUpdated: Option[String] = None,
-                     enrollmentStatusValue: String = NotEnrolled.value,
+                     enrollmentStatusValue: String = EnrollmentStatus.NotEnrolled.value,
                      created: Timestamp = Time.defaultTimestamp,
                      updated: Timestamp = Time.defaultTimestamp,
                      services: CelebrityServices = AppConfig.instance[CelebrityServices]
@@ -215,12 +216,14 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
   }
 }
 
-object Celebrity {
-}
-
 abstract sealed class EnrollmentStatus(val value: String)
 
 object EnrollmentStatus {
+  case object NotEnrolled extends EnrollmentStatus("NotEnrolled")
+  case object AttemptingEnrollment extends EnrollmentStatus("AttemptingEnrollment")
+  case object Enrolled extends EnrollmentStatus("Enrolled")
+  case object FailedEnrollment extends EnrollmentStatus("FailedEnrollment")
+
   private val states = Utils.toMap[String, EnrollmentStatus](Seq(
     NotEnrolled,
     AttemptingEnrollment,
@@ -233,11 +236,3 @@ object EnrollmentStatus {
      states(value)
   }
 }
-
-case object NotEnrolled extends EnrollmentStatus("NotEnrolled")
-
-case object AttemptingEnrollment extends EnrollmentStatus("AttemptingEnrollment")
-
-case object Enrolled extends EnrollmentStatus("Enrolled")
-
-case object FailedEnrollment extends EnrollmentStatus("FailedEnrollment")

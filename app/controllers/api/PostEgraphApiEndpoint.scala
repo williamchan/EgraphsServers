@@ -7,12 +7,13 @@ import models._
 import services.voice.{VoiceBiometricsClient, VBGBiometricServices}
 import services.signature.XyzmoBiometricServices
 import com.xyzmo.wwww.biometricserver.WebServiceBiometricPartStub
-import models.{Verified, Celebrity, Order, Egraph}
+import models.{Celebrity, Order, Egraph}
 import controllers._
 import play.data.validation._
 import org.apache.commons.mail.{HtmlEmail, SimpleEmail}
 import services.http.{OrderRequestFilters, CelebrityAccountRequestFilters}
 import services.Mail
+import EgraphState._
 
 /**
  * Handles requests for queries against a celebrity for his orders.

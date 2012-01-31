@@ -10,6 +10,7 @@ import services.AppConfig
 import services.db.{FilterThreeTables, KeyedCaseClass, Schema, Saves}
 import com.google.inject.{Provider, Inject}
 import services.Finance.TypeConversions._
+import EgraphState._
 
 case class OrderServices @Inject() (
   store: OrderStore,
