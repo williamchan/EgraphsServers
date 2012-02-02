@@ -1,7 +1,6 @@
 # Application dependencies. Keep these in alphabetical order.
 
 require:
-    - org.scalamock -> scalamock-scalatest-support_2.8.1 2.2
     - com.google.inject -> guice 2.0
     - com.stripe -> stripe-java 1.0.1
     - net.debasishg -> sjson_2.8.1 0.12:
@@ -20,6 +19,11 @@ require:
             - org.clojure -> *
     
     - org.joda -> joda-money 0.6
+    - org.specs2 -> specs2_2.8.1 1.5:
+        exclude:
+            - org.mockito -> *
+            - org.scala-lang -> scala-library 2.8.1
+
     - org.squeryl -> squeryl_2.8.1 0.9.5-RC1:
         exclude:
             # Exclude scala library, which is included with play
@@ -37,10 +41,12 @@ require:
     - play -> scala 0.9.1
     - play -> less 0.3.compatibility
     - play -> cloudbees 0.2.2
+    - play -> mockito 0.1
     - provided -> tritonus_share 0.3.6
     - provided -> tritonus_remaining 0.3.6
     - provided -> xyzmo 1.0
     - provided -> scala-guice_2.8.1 0.1
+    - provided -> mockito-all 1.9.1-SNAPSHOT
 
 # Non-default repositories
 repositories:
@@ -70,3 +76,10 @@ repositories:
              - org.squeryl -> *
              - net.databinder -> *
              - net.debasishg -> *
+             - org.specs2 -> specs2_2.8.1 1.5
+    - scalatools-snapshots:
+         type: iBiblio
+         root: "http://scala-tools.org/repo-snapshots"
+         contains:
+             - org.specs2 -> specs2-scalaz-core_2.8.1
+

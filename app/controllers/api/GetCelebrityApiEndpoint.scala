@@ -2,8 +2,12 @@ package controllers.api
 
 import play.mvc.Controller
 import sjson.json.Serializer
-import services.http.{DBTransaction, CelebrityAccountRequestFilters}
+import services.http.CelebrityAccountRequestFilters
 
+/**
+ * Provides a single Celebrity's JSON representation
+ * for consumption by the API.
+ */
 private[controllers] trait GetCelebrityApiEndpoint { this: Controller =>
   protected def celebFilters: CelebrityAccountRequestFilters
 
@@ -13,9 +17,3 @@ private[controllers] trait GetCelebrityApiEndpoint { this: Controller =>
     }
   }
 }
-
-
-/**
- * Controllers that handle direct API requests for celebrity resources.
- */
-
