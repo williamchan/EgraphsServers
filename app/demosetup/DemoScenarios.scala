@@ -73,7 +73,8 @@ class DemoScenarios extends DeclaresDemoScenarios {
   toDemoScenarios add DemoScenario(
   "Zach Apter",
   demoCategory,
-  "", { () =>
+  "Prepares data for Zach's ad-hoc meetings. Creates: Zach Apter (zach@egraphs.com/derp)",
+  { () =>
     DemoScenario.clearAll()
     createCelebrity("Zach", "Apter", "zach@egraphs.com", "zachapter")
   }
@@ -82,7 +83,8 @@ class DemoScenarios extends DeclaresDemoScenarios {
   toDemoScenarios add DemoScenario(
   "Bono",
   demoCategory,
-  "", { () =>
+  "Prepares data for ad-hoc meetings that necessitate non-sports stars. Creates: Bono (bono@egraphs.com/derp)",
+  { () =>
     DemoScenario.clearAll()
     createCelebrity("Bono", "Braun", "bono@egraphs.com", "paulhewson", publicName="Bono")
   }
