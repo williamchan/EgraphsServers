@@ -5,11 +5,31 @@ import models._
 import com.google.inject.Inject
 import play.mvc.results.{Forbidden, NotFound}
 
-// TODO(erem): test and comment this trait
-class CelebrityAccountRequestFilters @Inject() (celebStore: CelebrityStore, accountFilters: AccountRequestFilters, productFilters: ProductQueryFilters) {
+/**
+ * Functions that filter out whose callback parameters are only called when the egraphs
+ * database found Celebrity and Products that matched provided information in
+ * the request.
+ */
+class CelebrityAccountRequestFilters @Inject() (
+  celebStore: CelebrityStore,
+  accountFilters: AccountRequestFilters,
+  productFilters: ProductQueryFilters)
+{
   import OptionParams.Conversions._
 
-  def requireCelebrityAccount(onAllow: (Account, Celebrity) => Any)(implicit request: Request) = {
+  /**
+   * Filters out requests that didn't provide valid login/password credentials for an [[models.Account]]
+   * with a [[models.Celebrity]] face.
+   *
+   * Calls the `continue` callback parameter if the filter passed, parameterized with the corresponding
+   * Account and Celebrity.
+   *
+   * @param continue function to call if the request passed the filter
+   * @param request the request whose params should be checked by the filter
+   *
+   * @return the return value of `continue` if the filter passed, otherwise `403-Forbidden`.
+   */
+  def requireCelebrityAccount(continue: (Account, Celebrity) => Any)(implicit request: Request) = {
     accountFilters.requireAuthenticatedAccount { account =>
       request.params.getOption("celebrityId") match {
         case None =>
@@ -18,10 +38,10 @@ class CelebrityAccountRequestFilters @Inject() (celebStore: CelebrityStore, acco
         case Some(celebrityId) if celebrityId == "me" =>
           account.celebrityId match {
             case None =>
-              new Error("This request requires a celebrity account.")
+              new Forbidden("This request requires a celebrity account.")
 
             case Some(accountCelebrityId) =>
-              onAllow(account, celebStore.findById(accountCelebrityId).get)
+              continue(account, celebStore.get(accountCelebrityId))
           }
 
         case Some(celebrityId) =>
@@ -32,7 +52,18 @@ class CelebrityAccountRequestFilters @Inject() (celebStore: CelebrityStore, acco
     }
   }
 
-  def requireCelebrityUrlSlug(onAllow: Celebrity => Any)(implicit request:Request) = {
+  /**
+   * Filters out requests that didn't provide a valid `celebrityUrlSlug` parameter.
+   *
+   * Calls the `continue` callback parameter with the corresponding [[models.Celebrity]] if the filter
+   * passed.
+   *
+   * @param continue function to call if the request passed the filter
+   * @param request the request whose params should be checked by the filter
+   *
+   * @return the return value of continue if the filter passed, otherwise `403-Forbidden`
+   */
+  def requireCelebrityUrlSlug(continue: Celebrity => Any)(implicit request:Request) = {
     request.params.getOption("celebrityUrlSlug") match {
       case None =>
         throw new IllegalStateException(
@@ -48,12 +79,23 @@ class CelebrityAccountRequestFilters @Inject() (celebStore: CelebrityStore, acco
             new NotFound("No celebrity with url \"" + celebrityUrlSlug + "\"")
 
           case Some(celebrity) =>
-            onAllow(celebrity)
+            continue(celebrity)
         }
     }
   }
 
-  def requireCelebrityProductUrl(celebrity: Celebrity)(onAllow: Product => Any)(implicit request:Request) = {
+  /**
+   * Filters out requests that didn't provide a valid `productUrlSlug` parameter for the parameterized
+   * [[models.Celebrity]].
+   *
+   * Calls the `continue` callback parameter with the corresponding [[models.Product]] if the filter passed.
+   *
+   * @param continue function to call if the request passed the filter
+   * @param request the request whose params should be checked by the filter
+   *
+   * @return the return value of `continue` if the filter passed, otherwise `404-NotFound`.
+   */
+  def requireCelebrityProductUrl(celebrity: Celebrity)(continue: Product => Any)(implicit request:Request) = {
     request.params.getOption("productUrlSlug") match {
       case None =>
         throw new IllegalStateException(
@@ -69,15 +111,26 @@ class CelebrityAccountRequestFilters @Inject() (celebStore: CelebrityStore, acco
             new NotFound(celebrity.publicName.get + " doesn't have any product with url " + productUrlSlug)
 
           case Some(product) =>
-            onAllow(product)
+            continue(product)
         }
     }
   }
 
-  def requireCelebrityAndProductUrlSlugs(onAllow: (Celebrity, Product) => Any)(implicit request: Request) = {
+  /**
+   * Filters out requests that didn't provide valid [[models.Celebrity]]/[[models.Product]] url slug
+   * combinations.
+   *
+   * Calls the `continue` callback parameter only if the filter passed.
+   *
+   * @param continue function to call if the request passed the filter
+   * @param request the request whose params should be checked by the filter
+   *
+   * @return the return value of `continue` if the filter passed, otherwise `404-NotFound`
+   */
+  def requireCelebrityAndProductUrlSlugs(continue: (Celebrity, Product) => Any)(implicit request: Request) = {
     requireCelebrityUrlSlug { celebrity =>
       requireCelebrityProductUrl(celebrity) { product =>
-        onAllow(celebrity, product)
+        continue(celebrity, product)
       }
     }
   }

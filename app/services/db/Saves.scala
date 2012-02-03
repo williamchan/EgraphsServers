@@ -122,7 +122,7 @@ trait Saves[T <: {def id : Long}] {
    *
    * @return the located object or None
    */
-  final def findById(id: Long): Option[T] = {
+  def findById(id: Long): Option[T] = {
     from(table)(row => where(row.id === id) select (row)).headOption
   }
 
@@ -135,7 +135,7 @@ trait Saves[T <: {def id : Long}] {
    *
    * @throws a RuntimeException with ID information if it failed to find the entity.
    */
-  final def get(id: Long)(implicit m: Manifest[T]): T = {
+  def get(id: Long)(implicit m: Manifest[T]): T = {
     findById(id).getOrElse(
       throw new RuntimeException(
         "DB contained no instances of class " + m.erasure.getName + " with id="+id

@@ -66,7 +66,7 @@ case class Celebrity(id: Long = 0,
   }
 
   /**Returns all of the celebrity's Products */
-  def products(filters: FilterOneTable[Product]*): Query[Product] = {
+  def products(filters: FilterOneTable[Product]*): Iterable[Product] = {
     services.productStore.findByCelebrity(id, filters: _*)
   }
 

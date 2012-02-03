@@ -9,7 +9,7 @@ import play.mvc.Controller
 import org.scalatest.matchers.ShouldMatchers
 import play.mvc.results.Forbidden
 
-class GetCelebrityApiEndpointTest extends UnitFlatSpec with Mockito with ShouldMatchers
+class GetCelebrityApiEndpointTests extends UnitFlatSpec with Mockito with ShouldMatchers
 {
 
   private def testController(reqFilters: CelebrityAccountRequestFilters) = {
