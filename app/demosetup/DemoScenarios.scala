@@ -44,6 +44,8 @@ class DemoScenarios extends DeclaresDemoScenarios {
       createCelebrity("Nick", "Swisher", "nswisher@egraphs.com", "nickswisher")
       createCelebrity("Barry", "Bonds", "bbonds@egraphs.com", "barrybonds")
       createCelebrity("Ryan", "Braun", "rbraun@egraphs.com", "ryanbraun")
+      createCelebrity("Zach", "Apter", "zach@egraphs.com", "zachapter")
+      createCelebrity("Bono", "Braun", "bono@egraphs.com", "paulhewson", publicName="Bono")
   }
   )
 
@@ -65,6 +67,24 @@ class DemoScenarios extends DeclaresDemoScenarios {
     }
 
     println("Wrote all sample egraphs")
+  }
+  )
+
+  toDemoScenarios add DemoScenario(
+  "Zach Apter",
+  demoCategory,
+  "", { () =>
+    DemoScenario.clearAll()
+    createCelebrity("Zach", "Apter", "zach@egraphs.com", "zachapter")
+  }
+  )
+
+  toDemoScenarios add DemoScenario(
+  "Bono",
+  demoCategory,
+  "", { () =>
+    DemoScenario.clearAll()
+    createCelebrity("Bono", "Braun", "bono@egraphs.com", "paulhewson", publicName="Bono")
   }
   )
 
@@ -198,17 +218,18 @@ class DemoScenarios extends DeclaresDemoScenarios {
   }
   )
 
-  private def createCelebrity(firstName: String, lastName: String, email: String, s3ResourceId: String) {
+  private def createCelebrity(firstName: String, lastName: String, email: String, s3ResourceId: String, publicName: String=null) {
     println("Creating Celebrity " + email + " ...")
 
     val profile = "demo/" + s3ResourceId + "/" + s3ResourceId + "-profile.jpg"
     val productA = "demo/" + s3ResourceId + "/" + s3ResourceId + "-product-a.jpg"
     val productB = "demo/" + s3ResourceId + "/" + s3ResourceId + "-product-b.jpg"
+    val realPublicName = if (publicName == null) firstName + " " + lastName else publicName
 
     val celebrity = Celebrity(
       firstName = Some(firstName),
       lastName = Some(lastName),
-      publicName = Some(firstName + " " + lastName),
+      publicName = Some(realPublicName),
       description = Some(
         "Love all my fans out there from Seattle to Swaziland." +
         " Your support makes the game worth playing."
