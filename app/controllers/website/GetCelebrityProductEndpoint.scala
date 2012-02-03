@@ -39,7 +39,7 @@ object GetCelebrityProductEndpoint {
       "productUrlSlug" -> product.urlSlug
     )
 
-    Utils.lookupUrl("WebsiteControllers.getCelebrityProducts", params)
+    Utils.lookupUrl("WebsiteControllers.getCelebrityProduct", params)
   }
 }
 
