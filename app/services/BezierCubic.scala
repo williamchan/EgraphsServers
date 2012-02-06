@@ -1,4 +1,11 @@
-package models
+package services
+
+object BezierCubic {
+
+  def distance(x0: Double, y0: Double, x1: Double, y1: Double): Double = {
+    math.sqrt(math.pow(x1 - x0, 2) + math.pow(y1 - y0, 2))
+  }
+}
 
 case class BezierCubic(p0x: Double, p0y: Double,
                        c0x: Double, c0y: Double,
@@ -17,12 +24,5 @@ case class BezierCubic(p0x: Double, p0y: Double,
       + (3 * math.pow(1d - t, 2) * t * c0y)
       + (3 * (1d - t) * math.pow(t, 2) * c1y)
       + (math.pow(t, 3) * p1y))
-  }
-}
-
-object BezierCubic {
-
-  def distance(x0: Double, y0: Double, x1: Double, y1: Double): Double = {
-    math.sqrt(math.pow(x1 - x0, 2) + math.pow(y1 - y0, 2))
   }
 }

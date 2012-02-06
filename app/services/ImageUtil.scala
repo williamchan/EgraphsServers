@@ -8,7 +8,7 @@ import com.google.inject.Inject
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import java.awt.{Transparency, Graphics, RenderingHints, Graphics2D}
-import models.{BezierCubic, ImageAsset}
+import models.ImageAsset
 
 @Inject() class ImageUtil {
 
