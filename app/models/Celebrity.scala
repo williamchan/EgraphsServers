@@ -140,7 +140,7 @@ case class Celebrity(id: Long = 0,
   }
 
   def getXyzmoUID(): String = {
-    id.toString + "." + created.getTime.toString +"." + getMostRecentEnrollmentBatch().get.id
+    "egraphs." + id.toString + "." + Time.toBlobstoreFormat(created)
   }
 
   //
@@ -185,6 +185,20 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
     from(schema.celebrities)(celebrity =>
       where(celebrity.urlSlug === Some(slug))
         select (celebrity)
+    ).headOption
+  }
+
+  // TODO(erem): Test this one
+  def findByEgraphId(egraphId: Long): Option[Celebrity] = {
+    from(schema.celebrities, schema.products, schema.orders, schema.egraphs)(
+      (c, p, o, e) =>
+        where(
+          e.id === egraphId and
+          e.orderId === o.id and
+          o.productId === p.id and
+          p.celebrityId === c.id
+        )
+        select(c)
     ).headOption
   }
 

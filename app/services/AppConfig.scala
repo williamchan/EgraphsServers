@@ -1,10 +1,12 @@
 package services
 
 import blobs.{BlobModule, BlobVendor, Blobs}
+import signature.{SignatureBiometricService, XyzmoSignatureBiometricService}
 import uk.me.lings.scalaguice.{InjectorExtensions, ScalaModule}
 import services.db.Schema
 import com.google.inject.{Provider, Singleton, Guice, AbstractModule}
 import models._
+import voice.{VoiceBiometricService, VBGVoiceBiometricService}
 
 class AppConfig extends AbstractModule with ScalaModule {
   override def configure() {
@@ -12,6 +14,9 @@ class AppConfig extends AbstractModule with ScalaModule {
 
     // Services
     bind[Mail].toProvider(Mail.MailProvider)
+    bind[SignatureBiometricService].to[XyzmoSignatureBiometricService]
+    bind[VoiceBiometricService].to[VBGVoiceBiometricService]
+
     install(BlobModule)
 
     // Model services

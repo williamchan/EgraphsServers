@@ -8,13 +8,19 @@ import com.google.inject.Inject
 import services.AppConfig
 import services.blobs.Blobs
 import services.db.{Schema, KeyedCaseClass, Saves}
+import org.jclouds.blobstore.domain.Blob
+import services.signature.{NiceSignatureBiometricService, SignatureBiometricService}
+import services.voice.{NiceVoiceBiometricService, VoiceBiometricService, VoiceBiometricsCode}
 
 
 case class EgraphServices @Inject() (
   store: EgraphStore,
+  celebStore: CelebrityStore,
   orderStore: OrderStore,
   images: ImageUtil,
   blobs: Blobs,
+  voiceBiometrics: VoiceBiometricService,
+  signatureBiometrics: SignatureBiometricService,
   imageAssetServices: ImageAssetServices
 )
 
@@ -27,6 +33,12 @@ case class Egraph(
   id: Long = 0L,
   orderId: Long = 0L,
   stateValue: String = EgraphState.AwaitingVerification.value,
+  _voiceCode: Option[String] = None,
+  _voiceSuccess: Option[Boolean] = None,
+  _voiceScore: Option[Int] = None,
+  _signatureCode: Option[String] = None,
+  _signatureSuccess: Option[Boolean] = None,
+  _signatureScore: Option[Int] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: EgraphServices = AppConfig.instance[EgraphServices]
@@ -72,6 +84,73 @@ case class Egraph(
   }
 
   /**
+   * Returns a copy of this Egraph where the biometric services used by the Egraph
+   * is a version that always verifies all requests.
+   */
+  def withNiceBiometricServices: Egraph = {
+    val niceServices = services.copy(
+      voiceBiometrics = new NiceVoiceBiometricService,
+      signatureBiometrics = new NiceSignatureBiometricService
+    )
+
+    this.copy(services=niceServices)
+  }
+
+  def celebrity: Celebrity = {
+    services.celebStore.findByEgraphId(id).get
+  }
+
+  /**
+   * Verifies the celebrity against a voice profile
+   */
+  def verifyVoice: Egraph = {
+    val voiceResponse = services.voiceBiometrics.verify(assets.audio.asByteArray, celebrity.id.toString)
+    val (voiceCode, voiceSuccess, voiceScore) = voiceResponse.fold(
+      error =>
+        (Some(error.code), None,  None),
+
+      verification =>
+        (Some(VoiceBiometricsCode.Success.name), Some(verification.success), Some(verification.score))
+    )
+
+    val egraphWithVoiceMetadata = this.copy(
+      _voiceCode = voiceCode,
+      _voiceSuccess = voiceSuccess,
+      _voiceScore = voiceScore
+    )
+
+    egraphWithVoiceMetadata.withRecalculatedStatus
+  }
+
+  /**
+   * Verifies the celebrity against a signature profile. Returns the celebrity with the
+   * properly
+   */
+  def verifySignature: Egraph = {
+    val signatureResponse = services.signatureBiometrics.verify(assets.signature, celebrity.getXyzmoUID())
+    val (signatureCode, signatureSuccess, signatureScore) = signatureResponse.fold (
+      error =>
+        // TODO(erem): put the actual Xyzmo codes in here
+        (Some("Failure"), None, None),
+
+      verification =>
+        (Some("Success"), Some(verification.success), Some(verification.score))
+    )
+
+    val egraphWithSignatureMetadata = this.copy(
+      _signatureCode = signatureCode,
+      _signatureSuccess = signatureSuccess,
+      _signatureScore = signatureScore
+    )
+
+    egraphWithSignatureMetadata.withRecalculatedStatus
+  }
+
+  def verifyBiometrics: Egraph = {
+    verifyVoice.verifySignature
+  }
+
+  /**
    * Returns the file assets associated with this Egraph. Throws a runtime
    * exception  if the entity couldn't possibly have assets given its default
    * id.
@@ -80,6 +159,42 @@ case class Egraph(
     require(id > 0L, "Can't access assets of an Egraph that lacks an ID.")
 
     Assets
+  }
+
+  /**
+   * Recalculates the correct EgraphState for the egraph based on the dependent variables
+   * from its biometrics calculation.
+   */
+  private def withRecalculatedStatus: Egraph = {
+    import EgraphState._
+
+    val newState = (_signatureCode, _voiceCode) match {
+      // We're awaiting verification if we don't have any value yet for either of the two biometrics
+      case (None, _) | (_, None)=>
+        AwaitingVerification
+
+      // We have return codes from both services. Taking a look at them...
+      case (Some(signatureCode), Some(voiceCode)) =>
+        (signatureCode, voiceCode) match {
+          // Both service requests occurred without error. Looking at the algorithm results.
+          // TODO(erem): Replace "Success" here with the actual xyzmo value
+          case ("Success", VoiceBiometricsCode.Success.name) =>
+            (_signatureSuccess.get, _voiceSuccess.get) match {
+              case (true, true) => Verified
+              case (true, false) => RejectedVoice
+              case (false, true) => RejectedSignature
+              case (false, false) => RejectedBoth
+            }
+
+          // These three cases only ever happen if at least one service errored out
+          // rather than returning a value
+          case (_, VoiceBiometricsCode.Success.name) => RejectedSignature
+          case ("Success", _) => RejectedVoice
+          case (_, _) => RejectedBoth
+        }
+    }
+
+    this.withState(newState)
   }
 
   //
@@ -99,8 +214,8 @@ case class Egraph(
       blobs.get(signatureJsonKey).get.asString
     }
     
-    override def audio: Stream[Byte] = {
-      blobs.get(audioKey).get.asByteStream
+    override def audio: Blob = {
+      blobs.get(audioKey).get
     }
 
     override def audioUrl = {
@@ -144,7 +259,6 @@ case class Egraph(
 
       services.images.createEgraphImage(signatureImage, productImage, 0, 0).asByteArray(ImageAsset.Png)
     }
-
   }
 }
 
@@ -161,7 +275,7 @@ trait EgraphAssets {
   /**
    * Retrieves the bytes of audio from the blobstore.
    */
-  def audio: Stream[Byte]
+  def audio: Blob
 
   /**
    * Retrieves the url of the audio in the blobstore.
@@ -186,6 +300,12 @@ class EgraphStore @Inject() (schema: Schema) extends Saves[Egraph] with SavesCre
     updateIs(
       theOld.orderId := theNew.orderId,
       theOld.stateValue := theNew.stateValue,
+      theOld._voiceCode := theNew._voiceCode,
+      theOld._voiceSuccess := theNew._voiceSuccess,
+      theOld._voiceScore := theNew._voiceScore,
+      theOld._signatureCode := theNew._signatureCode,
+      theOld._signatureSuccess := theNew._signatureSuccess,
+      theOld._signatureScore := theNew._signatureScore,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated
     )

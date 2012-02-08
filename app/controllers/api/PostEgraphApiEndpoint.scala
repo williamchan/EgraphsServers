@@ -31,7 +31,12 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
   //
   // Controller members
   //
-  def postEgraph(@Required signature: String, @Required audio: String, skipBiometrics: Boolean = false) = {
+  def postEgraph(
+    @Required signature: String,
+    message: String,
+    @Required audio: String,
+    skipBiometrics: Boolean = false) =
+  {
     if (validationErrors.isEmpty) {
       celebFilters.requireCelebrityAccount { (account, celebrity) =>
         orderFilters.requireOrderIdOfCelebrity(celebrity.id) { order =>
@@ -59,20 +64,20 @@ object PostEgraphApiEndpoint {
     def execute() = {
       play.Logger.info("Processing eGraph submission for Order #" + order.id)
 
-      val egraph = order
+      val savedEgraph = order
         .newEgraph
         .save(signature, Codec.decodeBASE64(audio))
 
-      val egraphId = egraph.id
+      val egraphToVerify = if (skipBiometrics) savedEgraph.withNiceBiometricServices else savedEgraph
+      val testedEgraph = egraphToVerify.verifyBiometrics.saveWithoutAssets()
+      println("tested egraph is -- " + testedEgraph)
 
-      if (verifyBiometrics(egraph, skipBiometrics)) {
-        // Send e-mail that the eGraph is complete. Move this to post-authentication
-        // when possible.
-        sendEgraphSignedMail(egraph)
+      if (testedEgraph.state == Verified) {
+        sendEgraphSignedMail(testedEgraph)
       }
 
       // Serialize the egraph ID
-      Serializer.SJSON.toJSON(Map("id" -> egraphId))
+      Serializer.SJSON.toJSON(Map("id" -> testedEgraph.id))
     }
 
     private def sendEgraphSignedMail(egraph: Egraph) = {
@@ -128,10 +133,11 @@ object PostEgraphApiEndpoint {
     }
 
     private def verifyVoice(egraph: Egraph): Boolean = {
+      import services.blobs.Blobs.Conversions._
       val startVerificationRequest = VBGBiometricServices.sendStartVerificationRequest(celebrity.id.toString)
       val transactionId = startVerificationRequest.getResponseValue(VBGBiometricServices._transactionId)
 
-      val sendVerifySampleRequest = VBGBiometricServices.sendVerifySampleRequest(transactionId, wavBinary = egraph.assets.audio.toArray)
+      val sendVerifySampleRequest = VBGBiometricServices.sendVerifySampleRequest(transactionId, wavBinary = egraph.assets.audio.asByteArray)
       val errorCode = sendVerifySampleRequest.getResponseValue(VoiceBiometricsClient.errorcode)
       val verificationResult = sendVerifySampleRequest.getResponseValue(VoiceBiometricsClient.success)
       val verificationScore = sendVerifySampleRequest.getResponseValue(VoiceBiometricsClient.score)

@@ -4,6 +4,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 import utils._
+import services.blobs.Blobs.Conversions._
 import services.AppConfig
 
 class EgraphTests extends UnitFlatSpec
@@ -55,7 +56,7 @@ class EgraphTests extends UnitFlatSpec
       .save(TestConstants.signatureStr, "my audio".getBytes("UTF-8"))
 
     egraph.assets.signature should be (TestConstants.signatureStr)
-    egraph.assets.audio.toArray should be ("my audio".getBytes("UTF-8"))
+    egraph.assets.audio.asByteArray should be ("my audio".getBytes("UTF-8"))
   }
 
   it should "throw an exception if assets are accessed on an unsaved Egraph" in {
