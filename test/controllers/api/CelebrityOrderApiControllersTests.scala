@@ -16,12 +16,7 @@ class CelebrityOrderApiControllersTests extends FunctionalTest with CleanDatabas
 
   @Test
   def testPostEgraph() {
-    runScenarios(
-      "Will-Chan-is-a-celebrity",
-      "Will-has-two-products",
-      "Erem-is-a-customer",
-      "Erem-buys-Wills-two-products-twice-each"
-    )
+    runWillChanScenariosThroughOrder()
 
     val ordersResponse = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/orders?signerActionable=true")
     val ordersList = Serializer.SJSON.in[List[Map[String, Any]]](getContent(ordersResponse))
@@ -46,58 +41,117 @@ class CelebrityOrderApiControllersTests extends FunctionalTest with CleanDatabas
   }
 
   @Test
+  def testPostEgraphAcceptsMessage {
+    runWillChanScenariosThroughOrder()
+
+    val signatureStr = TestConstants.signatureStr
+    val audioStr = TestConstants.voiceStrPercentEncoded()
+    val message = TestConstants.messageStr
+    
+    val response = POST(
+      willChanRequest,
+      TestConstants.ApiRoot + "/celebrities/me/orders/1/egraphs",
+      APPLICATION_X_WWW_FORM_URLENCODED,
+      "message=" + message + "&signature=" + signatureStr + "&audio=" + audioStr + "&skipBiometrics=1"
+    )
+
+    assertIsOk(response)
+  }
+
+  @Test
+  def testPostEgraphAcceptsEmptyMessage {
+    runWillChanScenariosThroughOrder()
+
+    val signatureStr = TestConstants.signatureStr
+    val audioStr = TestConstants.voiceStrPercentEncoded()
+    val message = TestConstants.messageStr
+
+    val emptyMessageResponse = POST(
+      willChanRequest,
+      TestConstants.ApiRoot + "/celebrities/me/orders/1/egraphs",
+      APPLICATION_X_WWW_FORM_URLENCODED,
+      "message=&signature=" + signatureStr + "&audio=" + audioStr + "&skipBiometrics=1"
+    )
+
+    val noMessageParamResponse = POST(
+      willChanRequest,
+      TestConstants.ApiRoot + "/celebrities/me/orders/1/egraphs",
+      APPLICATION_X_WWW_FORM_URLENCODED,
+      "signature=" + signatureStr + "&audio=" + audioStr + "&skipBiometrics=1"
+    )
+
+    assertStatus(200, emptyMessageResponse)
+    assertStatus(200, noMessageParamResponse)
+  }
+
+  @Test
   def testPostEgraphRejectsEmptySignatureAndAudio() {
+    runWillChanScenariosThroughOrder()
+
+    val emptyStringSignatureResponse = POST(
+      willChanRequest,
+      TestConstants.ApiRoot + "/celebrities/me/orders/1/egraphs",
+      APPLICATION_X_WWW_FORM_URLENCODED,
+      "signature=&audio=" + TestConstants.voiceStrPercentEncoded() + "&skipBiometrics=1"
+    )
+    val noSignatureParameterResponse = POST(
+      willChanRequest,
+      TestConstants.ApiRoot + "/celebrities/me/orders/1/egraphs",
+      APPLICATION_X_WWW_FORM_URLENCODED,
+      "audio=" + TestConstants.voiceStrPercentEncoded() + "&skipBiometrics=1"
+    )
+
+    val emptyStringAudioResponse = POST(
+      willChanRequest,
+      TestConstants.ApiRoot + "/celebrities/me/orders/1/egraphs",
+      APPLICATION_X_WWW_FORM_URLENCODED,
+      "signature=" + TestConstants.signatureStr + "&audio=&skipBiometrics=1"
+    )
+
+    val noAudioParameterResponse = POST(
+      willChanRequest,
+      TestConstants.ApiRoot + "/celebrities/me/orders/1/egraphs",
+      APPLICATION_X_WWW_FORM_URLENCODED,
+      "signature=" + TestConstants.signatureStr + "&skipBiometrics=1"
+    )
+
+
+    assertStatus(5000, emptyStringSignatureResponse)
+    assertStatus(5000, noSignatureParameterResponse)
+    assertStatus(5000, emptyStringAudioResponse)
+    assertStatus(5000, noAudioParameterResponse)
+  }
+
+  @Test
+  def testPostEgraphDrainsOrdersQueue() {
+    runWillChanScenariosThroughOrder()
+
+    var numOrders = 2
+    val ordersResponse = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/orders?signerActionable=true")
+    val ordersList = Serializer.SJSON.in[List[Map[String, Any]]](getContent(ordersResponse))
+    assertEquals(numOrders, ordersList.length)
+
+    for (order <- ordersList) {
+      val response = POST(
+        willChanRequest,
+        TestConstants.ApiRoot + "/celebrities/me/orders/" + order("id") + "/egraphs",
+        APPLICATION_X_WWW_FORM_URLENCODED,
+        "signature=" + TestConstants.signatureStr + "&audio=" + TestConstants.voiceStr + "&skipBiometrics=1"
+      )
+      assertIsOk(response)
+      numOrders -= 1
+      val ordersResponse1 = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/orders?signerActionable=true")
+      val ordersList1 = Serializer.SJSON.in[List[Map[String, Any]]](getContent(ordersResponse1))
+      assertEquals(numOrders, ordersList1.length)
+    }
+  }
+
+  private def runWillChanScenariosThroughOrder() {
     runScenarios(
       "Will-Chan-is-a-celebrity",
       "Will-has-two-products",
       "Erem-is-a-customer",
       "Erem-buys-Wills-two-products-twice-each"
     )
-
-    val noSignatureResponse = POST(
-      willChanRequest,
-      TestConstants.ApiRoot + "/celebrities/me/orders/1/egraphs",
-      APPLICATION_X_WWW_FORM_URLENCODED,
-      "signature=&audio=" + TestConstants.voiceStrPercentEncoded() + "&skipBiometrics=1"
-    )
-
-    val noAudioResponse = POST(
-      willChanRequest,
-      TestConstants.ApiRoot + "/celebrities/me/orders/1/egraphs",
-      APPLICATION_X_WWW_FORM_URLENCODED,
-      "signature=&audio=" + TestConstants.voiceStrPercentEncoded() + "&skipBiometrics=1"
-    )
-
-    assertStatus(5000, noSignatureResponse)
-    assertStatus(5000, noAudioResponse)
   }
-
-    @Test
-    def testPostEgraphDrainsOrdersQueue() {
-      runScenarios(
-        "Will-Chan-is-a-celebrity",
-        "Will-has-two-products",
-        "Erem-is-a-customer",
-        "Erem-buys-Wills-two-products-twice-each"
-      )
-
-      var numOrders = 2
-      val ordersResponse = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/orders?signerActionable=true")
-      val ordersList = Serializer.SJSON.in[List[Map[String, Any]]](getContent(ordersResponse))
-      assertEquals(numOrders, ordersList.length)
-
-      for (order <- ordersList) {
-        val response = POST(
-          willChanRequest,
-          TestConstants.ApiRoot + "/celebrities/me/orders/" + order("id") + "/egraphs",
-          APPLICATION_X_WWW_FORM_URLENCODED,
-          "signature=" + TestConstants.signatureStr + "&audio=" + TestConstants.voiceStr + "&skipBiometrics=1"
-        )
-        assertIsOk(response)
-        numOrders -= 1
-        val ordersResponse1 = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/orders?signerActionable=true")
-        val ordersList1 = Serializer.SJSON.in[List[Map[String, Any]]](getContent(ordersResponse1))
-        assertEquals(numOrders, ordersList1.length)
-      }
-    }
 }

@@ -12,7 +12,6 @@ import org.jclouds.blobstore.domain.Blob
 import services.signature.{NiceSignatureBiometricService, SignatureBiometricService}
 import services.voice.{NiceVoiceBiometricService, VoiceBiometricService, VoiceBiometricsCode}
 
-
 case class EgraphServices @Inject() (
   store: EgraphStore,
   celebStore: CelebrityStore,
@@ -49,14 +48,12 @@ case class Egraph(
   //
   // Public methods
   //
-  def save(signature: String, audio: Array[Byte]): Egraph = {
-    val saved = services.store.save(this)
+  def save(): Egraph = {
+    services.store.save(this)
+  }
 
-    // Have to save assets after saving the entity so that they can be
-    // properly keyed
-    saved.assets.save(signature, audio)
-
-    saved
+  def withAssets(signature: String, message: Option[String] = None, audio: Array[Byte]): EgraphWithAssets = {
+    EgraphWithAssets(this, signature, message, audio)
   }
 
   /** Fetches the related order from the db */
@@ -218,6 +215,12 @@ case class Egraph(
       blobs.get(audioKey).get
     }
 
+    override def message: Option[String] = {
+      blobs.get(messageJsonKey).flatMap { messageBlob =>
+        Some(messageBlob.asString)
+      }
+    }
+
     override def audioUrl = {
       blobs.getUrl(audioKey)
     }
@@ -226,9 +229,14 @@ case class Egraph(
       ImageAsset(blobKeyBase, imageName, ImageAsset.Png, services.imageAssetServices)
     }
 
-    override def save(signature: String, audio: Array[Byte]) {
-      blobs.put(signatureJsonKey, signature, access=AccessPolicy.Private)
+    override def save(signature: String, message: Option[String], audio: Array[Byte]) {
+      blobs.put(signatureJsonKey, signature, access=AccessPolicy.Private)      
       blobs.put(audioKey, audio, access=AccessPolicy.Public)
+
+      // Put in the message if it was provided
+      message.foreach { messageString =>
+        blobs.put(messageJsonKey, messageString, access=AccessPolicy.Private)
+      }
 
       // Before removing this line, realize that without the line the image method will fail
       ImageAsset(
@@ -242,12 +250,14 @@ case class Egraph(
 
     lazy val audioKey = blobKeyBase + "/audio.wav"
     lazy val signatureJsonKey = signatureKey + ".json"
+    lazy val messageJsonKey = messageKey + ".json"
 
     //
     // Private members
     //
     private lazy val blobKeyBase = "egraphs/" + id
     private lazy val signatureKey = blobKeyBase + "/signature"
+    private lazy val messageKey = blobKeyBase + "/message"
     private lazy val imageName = "image"
 
     private def createMasterImage(sig: String = this.signature,
@@ -273,6 +283,12 @@ trait EgraphAssets {
   def signature: String
 
   /**
+   * Retrieves the message json from the blobstore -- this is the message written by the
+   * celebrity for the recipient in json vector format.
+   */
+  def message: Option[String]
+
+  /**
    * Retrieves the bytes of audio from the blobstore.
    */
   def audio: Blob
@@ -285,7 +301,7 @@ trait EgraphAssets {
   def image: ImageAsset
 
   /** Stores the assets in the blobstore */
-  def save(signature: String, audio: Array[Byte])
+  def save(signature: String, message: Option[String], audio: Array[Byte])
 }
 
 class EgraphStore @Inject() (schema: Schema) extends Saves[Egraph] with SavesCreatedUpdated[Egraph] {
@@ -316,6 +332,21 @@ class EgraphStore @Inject() (schema: Schema) extends Saves[Egraph] with SavesCre
   //
   override def withCreatedUpdated(toUpdate: Egraph, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)
+  }
+}
+
+case class EgraphWithAssets(
+  egraph: Egraph,
+  signature: String,
+  message: Option[String],
+  audio: Array[Byte])
+{
+  def save(): Egraph = {
+    val savedEgraph = egraph.save()
+
+    savedEgraph.assets.save(signature, message, audio)
+
+    savedEgraph
   }
 }
 

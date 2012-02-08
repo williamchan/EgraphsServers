@@ -14,6 +14,7 @@ import org.apache.commons.mail.{HtmlEmail, SimpleEmail}
 import services.http.{OrderRequestFilters, CelebrityAccountRequestFilters}
 import services.Mail
 import EgraphState._
+import services.http.OptionParams.Conversions._
 
 /**
  * Handles requests for queries against a celebrity for his orders.
@@ -33,14 +34,14 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
   //
   def postEgraph(
     @Required signature: String,
-    message: String,
     @Required audio: String,
     skipBiometrics: Boolean = false) =
   {
     if (validationErrors.isEmpty) {
+      val message = request.params.getOption("message")
       celebFilters.requireCelebrityAccount { (account, celebrity) =>
         orderFilters.requireOrderIdOfCelebrity(celebrity.id) { order =>
-          EgraphFulfillmentHandler(signature, audio, order, celebrity, mail, skipBiometrics).execute()
+          EgraphFulfillmentHandler(signature, audio, order, celebrity, mail, skipBiometrics, message).execute()
         }
       }
     }
@@ -55,22 +56,25 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
  * Handles requests for queries against a celebrity for his orders.
  */
 object PostEgraphApiEndpoint {
-  case class EgraphFulfillmentHandler(signature: String,
-                                      audio: String,
-                                      order: Order,
-                                      celebrity: Celebrity,
-                                      mail: Mail,
-                                      skipBiometrics: Boolean = false) {
+  case class EgraphFulfillmentHandler(
+    signature: String,
+    audio: String,
+    order: Order,
+    celebrity: Celebrity,
+    mail: Mail,
+    skipBiometrics: Boolean = false,
+    message: Option[String] = None)
+  {
     def execute() = {
       play.Logger.info("Processing eGraph submission for Order #" + order.id)
 
       val savedEgraph = order
         .newEgraph
-        .save(signature, Codec.decodeBASE64(audio))
+        .withAssets(signature, message, Codec.decodeBASE64(audio))
+        .save()
 
       val egraphToVerify = if (skipBiometrics) savedEgraph.withNiceBiometricServices else savedEgraph
       val testedEgraph = egraphToVerify.verifyBiometrics.saveWithoutAssets()
-      println("tested egraph is -- " + testedEgraph)
 
       if (testedEgraph.state == Verified) {
         sendEgraphSignedMail(testedEgraph)
@@ -101,53 +105,6 @@ object PostEgraphApiEndpoint {
       )
 
       mail.send(email)
-    }
-
-    private def verifyBiometrics(egraph: Egraph, skipBiometrics: Boolean): Boolean = {
-      if (skipBiometrics) {
-        egraph.withState(Verified).saveWithoutAssets()
-        return true
-      }
-
-      val isVoiceVerified = verifyVoice(egraph)
-      val isSignatureVerified = verifySignature(egraph)
-
-      val egraphState = {
-        if (isSignatureVerified && isVoiceVerified) Verified
-        else if (!isSignatureVerified && isVoiceVerified) RejectedSignature
-        else if (isSignatureVerified && !isVoiceVerified) RejectedVoice
-        else RejectedBoth
-      }
-      egraph.withState(egraphState).saveWithoutAssets()
-
-      egraphState == Verified
-    }
-
-    private def verifySignature(egraph: Egraph): Boolean = {
-      val signatureToVerify: String = egraph.assets.signature
-      val sdc = XyzmoBiometricServices.getSignatureDataContainerFromJSON(signatureToVerify).getGetSignatureDataContainerFromJSONResult
-      val verifyUserResponse = XyzmoBiometricServices.verifyUser(userId = celebrity.getXyzmoUID(), sdc)
-      val verifyResult = verifyUserResponse.getOkInfo.getVerifyResult
-      println("Signature verification result for egraph " + egraph.id.toString + ": " + verifyResult.toString + " " + verifyUserResponse.getOkInfo.getScore.toString + "%")
-      verifyResult == WebServiceBiometricPartStub.VerifyResultEnum.VerifyMatch
-    }
-
-    private def verifyVoice(egraph: Egraph): Boolean = {
-      import services.blobs.Blobs.Conversions._
-      val startVerificationRequest = VBGBiometricServices.sendStartVerificationRequest(celebrity.id.toString)
-      val transactionId = startVerificationRequest.getResponseValue(VBGBiometricServices._transactionId)
-
-      val sendVerifySampleRequest = VBGBiometricServices.sendVerifySampleRequest(transactionId, wavBinary = egraph.assets.audio.asByteArray)
-      val errorCode = sendVerifySampleRequest.getResponseValue(VoiceBiometricsClient.errorcode)
-      val verificationResult = sendVerifySampleRequest.getResponseValue(VoiceBiometricsClient.success)
-      val verificationScore = sendVerifySampleRequest.getResponseValue(VoiceBiometricsClient.score)
-
-      // Question for VBG: Why do we need to do this?
-      VBGBiometricServices.sendFinishVerifyTransactionRequest(transactionId, verificationResult, verificationScore)
-
-      println("Voice verification result for egraph " + egraph.id.toString + ": " + verificationResult + " (" + errorCode + " )")
-
-      errorCode == "0" && verificationResult == "true"
     }
   }
 }
