@@ -6,8 +6,8 @@ import play.test.UnitFlatSpec
 import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationAfter, CreatedUpdatedEntityTests, SavingEntityTests}
 import java.io.File
 import javax.imageio.ImageIO
-import services.{ImageUtil, Time}
-import ImageUtil.Conversions._
+import services.Time
+import services.ImageUtil.Conversions._
 import services.AppConfig
 
 class CelebrityTests extends UnitFlatSpec
@@ -59,6 +59,7 @@ class CelebrityTests extends UnitFlatSpec
     apiMap("firstName") should be ("Will")
     apiMap("lastName") should be ("Chan")
     apiMap("publicName") should be ("Wizzle")
+    Some(apiMap("isLeftHanded")) should be (Some(false))
     apiMap("id") should be (celeb.id)
     apiMap("created") should be (Time.toApiFormat(celeb.created))
     apiMap("updated") should be (Time.toApiFormat(celeb.updated))

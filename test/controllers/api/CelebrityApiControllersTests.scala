@@ -30,13 +30,14 @@ class CelebrityApiControllersTests extends FunctionalTest with CleanDatabaseAfte
     assertEquals("Wizzle", json("publicName"))
     assertEquals("William", json("firstName"))
     assertEquals("Chan", json("lastName"))
+    assertEquals(false, json("isLeftHanded"))
     assertEquals(EnrollmentStatus.NotEnrolled.value, json("enrollmentStatus"))
 
     // These conversions will fail if they're not Longs
     Time.fromApiFormat(json("created").toString)
     Time.fromApiFormat(json("updated").toString)
 
-    assertEquals(7, json.size)
+    assertEquals(8, json.size)
   }
 
   @Test

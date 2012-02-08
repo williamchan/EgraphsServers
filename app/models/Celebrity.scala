@@ -3,7 +3,6 @@ package models
 import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
 import services.blobs.AccessPolicy
-import org.squeryl.Query
 import play.templates.JavaExtensions
 import services.db.{FilterOneTable, KeyedCaseClass, Schema, Saves}
 import services.blobs.Blobs.Conversions._
@@ -36,6 +35,7 @@ case class Celebrity(id: Long = 0,
                      publicName: Option[String] = None,
                      profilePhotoUpdated: Option[String] = None,
                      enrollmentStatusValue: String = EnrollmentStatus.NotEnrolled.value,
+                     isLeftHanded: Boolean = false,
                      created: Timestamp = Time.defaultTimestamp,
                      updated: Timestamp = Time.defaultTimestamp,
                      services: CelebrityServices = AppConfig.instance[CelebrityServices]
@@ -79,11 +79,11 @@ case class Celebrity(id: Long = 0,
     val optionalFields = List(
       "firstName" -> firstName,
       "lastName" -> lastName,
-      "publicName" -> publicName
+      "publicName" -> publicName,
+      "isLeftHanded" -> Some(isLeftHanded)
     )
 
-    Map("id" -> id,
-      "enrollmentStatus" -> enrollmentStatusValue) ++
+    Map("id" -> id, "enrollmentStatus" -> enrollmentStatusValue) ++
       renderCreatedUpdatedForApi ++
       Utils.makeOptionalFieldMap(optionalFields)
   }
@@ -217,6 +217,7 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
       theOld.urlSlug := theNew.urlSlug,
       theOld.profilePhotoUpdated := theNew.profilePhotoUpdated,
       theOld.enrollmentStatusValue := theNew.enrollmentStatusValue,
+      theOld.isLeftHanded := theNew.isLeftHanded,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated
     )
