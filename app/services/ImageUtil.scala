@@ -30,8 +30,8 @@ import models.ImageAsset
 
   def createSignatureImage(jsonStr: String): BufferedImage = {
     val strokeData = parseSignatureRawCaptureJSON(jsonStr)
-    val originalXsByStroke = strokeData._1
-    val originalYsByStroke = strokeData._2
+    val xsByStroke = strokeData._1
+    val ysByStroke = strokeData._2
 
     val image: BufferedImage = new BufferedImage((width * scaleFactor).intValue(), (height * scaleFactor).intValue(), BufferedImage.TYPE_INT_ARGB)
     val g: Graphics2D = image.getGraphics.asInstanceOf[Graphics2D]
@@ -42,17 +42,17 @@ import models.ImageAsset
 
     // Draw the shadow
     g.setColor(java.awt.Color.black)
-    for (i <- 0 until originalXsByStroke.size) {
-      val xs = originalXsByStroke(i).map(penX => penX + 2).toArray
-      val ys = originalYsByStroke(i).map(penY => penY - 3).toArray
+    for (i <- 0 until xsByStroke.size) {
+      val xs = xsByStroke(i).map(penX => penX + 2).toArray
+      val ys = ysByStroke(i).map(penY => penY - 3).toArray
       drawStroke(g, xs, ys)
     }
 
     // Draw the pen
     g.setColor(java.awt.Color.white)
-    for (i <- 0 until originalXsByStroke.size) {
-      val xs = originalXsByStroke(i).toArray
-      val ys = originalYsByStroke(i).toArray
+    for (i <- 0 until xsByStroke.size) {
+      val xs = xsByStroke(i).toArray
+      val ys = ysByStroke(i).toArray
       drawStroke(g, xs, ys)
     }
 
@@ -61,15 +61,15 @@ import models.ImageAsset
   }
 
   /**
-   * @return 3-tuple of originalX data by stroke, originalY data by stroke, and time data by stroke
+   * @return 3-tuple of x data by stroke, y data by stroke, and time data by stroke
    */
   def parseSignatureRawCaptureJSON(jsonStr: String): (List[List[Double]], List[List[Double]], List[List[Double]]) = {
     val json: Option[Any] = JSON.parseFull(jsonStr)
     val map: Map[String, Any] = json.get.asInstanceOf[Map[String, Any]]
-    val originalXsByStroke = map.get("originalX").get.asInstanceOf[List[List[Double]]]
-    val originalYsByStroke = map.get("originalY").get.asInstanceOf[List[List[Double]]]
+    val xsByStroke = map.get("x").get.asInstanceOf[List[List[Double]]]
+    val ysByStroke = map.get("y").get.asInstanceOf[List[List[Double]]]
     val tsByStroke = map.get("time").get.asInstanceOf[List[List[Double]]]
-    (originalXsByStroke, originalYsByStroke, tsByStroke)
+    (xsByStroke, ysByStroke, tsByStroke)
   }
 
   /**
@@ -221,7 +221,7 @@ import models.ImageAsset
    * http://today.java.net/pub/a/today/2007/04/03/perils-of-image-getscaledinstance.html
    *
    * Convenience method that returns a scaled instance of the
-   * provided {@code BufferedImage}.
+   * provided [[java.awt.image.BufferedImage]].
    *
    * @param img the original image to be scaled
    * @param targetWidth the desired width of the scaled instance,
