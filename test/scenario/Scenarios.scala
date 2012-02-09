@@ -179,7 +179,8 @@ class Scenarios extends DeclaresScenarios {
         firstOrder,
         will,
         mail=mail,
-        skipBiometrics=true
+        skipBiometrics=true,
+        message=Some(TestConstants.messageStr)
       ).execute()
     }
   )

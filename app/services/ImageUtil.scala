@@ -28,10 +28,15 @@ import models.ImageAsset
     egraphImage
   }
 
-  def createSignatureImage(jsonStr: String): BufferedImage = {
-    val strokeData = parseSignatureRawCaptureJSON(jsonStr)
-    val xsByStroke = strokeData._1
-    val ysByStroke = strokeData._2
+  def createSignatureImage(jsonStr: String, messageOption: Option[String]): BufferedImage = {    
+    // Get either the message or an empty signature
+    val messageStr = messageOption.getOrElse("""{"x":[[]],"y":[[]],"t":[[]]}""")
+    val (messageStrokesX, messageStrokesY, _) = parseSignatureRawCaptureJSON(messageStr)
+
+    val (signatureStrokesX, signatureStrokesY, _) = parseSignatureRawCaptureJSON(jsonStr)
+
+    val xsByStroke = messageStrokesX ++ signatureStrokesX
+    val ysByStroke = messageStrokesY ++ signatureStrokesY
 
     val image: BufferedImage = new BufferedImage((width * scaleFactor).intValue(), (height * scaleFactor).intValue(), BufferedImage.TYPE_INT_ARGB)
     val g: Graphics2D = image.getGraphics.asInstanceOf[Graphics2D]
@@ -63,12 +68,12 @@ import models.ImageAsset
   /**
    * @return 3-tuple of x data by stroke, y data by stroke, and time data by stroke
    */
-  def parseSignatureRawCaptureJSON(jsonStr: String): (List[List[Double]], List[List[Double]], List[List[Double]]) = {
-    val json: Option[Any] = JSON.parseFull(jsonStr)
+  def parseSignatureRawCaptureJSON(signatureStr: String, messageStr: Option[String] = None): (List[List[Double]], List[List[Double]], List[List[Double]]) = {
+    val json: Option[Any] = JSON.parseFull(signatureStr)
     val map: Map[String, Any] = json.get.asInstanceOf[Map[String, Any]]
     val xsByStroke = map.get("x").get.asInstanceOf[List[List[Double]]]
     val ysByStroke = map.get("y").get.asInstanceOf[List[List[Double]]]
-    val tsByStroke = map.get("time").get.asInstanceOf[List[List[Double]]]
+    val tsByStroke = map.get("t").get.asInstanceOf[List[List[Double]]]
     (xsByStroke, ysByStroke, tsByStroke)
   }
 

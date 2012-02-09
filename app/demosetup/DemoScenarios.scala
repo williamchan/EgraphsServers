@@ -55,7 +55,7 @@ class DemoScenarios extends DeclaresDemoScenarios {
   "", { () =>
     import org.squeryl.PrimitiveTypeMode._
     val imageUtil = AppConfig.instance[ImageUtil]
-    val sig = imageUtil.createSignatureImage(boxSignatureStr)
+    val sig = imageUtil.createSignatureImage(boxSignatureStr, None)
 
     val q = from(schema.products)(prod => select(prod))
 

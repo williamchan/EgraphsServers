@@ -6,6 +6,7 @@ import java.io._
 import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
 import play.Play
+import utils.TestConstants
 
 class ImageUtilTests extends UnitFlatSpec
 with ShouldMatchers {
@@ -15,7 +16,7 @@ with ShouldMatchers {
 
   it should "test parseSignatureRawCaptureJSON" in {
 
-    val strokeData = imageUtil.parseSignatureRawCaptureJSON(rawCapture)
+    val strokeData = imageUtil.parseSignatureRawCaptureJSON(TestConstants.signatureStr)
     val xsByStroke = strokeData._1
     val ysByStroke = strokeData._2
     val timesByStroke = strokeData._3
@@ -30,32 +31,34 @@ with ShouldMatchers {
 
   it should "overlay Andrew's signature on a JPG" in {
     val photoImage: BufferedImage = ImageIO.read(Play.getFile("test/files/longoria/product-2.jpg"))
-    val signatureImage: BufferedImage = imageUtil.createSignatureImage(rawCapture)
+    val signatureImage: BufferedImage = imageUtil.createSignatureImage(
+      TestConstants.signatureStr, Some(TestConstants.messageStr)
+    )
     val egraphImage: BufferedImage = imageUtil.createEgraphImage(signatureImage, photoImage, 0, 0)
     val combinedImageFile = new File("test/files/egraph.jpg")
     ImageIO.write(egraphImage, "JPG", combinedImageFile)
-    combinedImageFile.length should be(432315)
+    combinedImageFile.length should not be(0)
   }
 
   "createSignatureImage" should "draw a single-point stroke" in {
-    val capture = "{\n   \"x\": [[67.000000]],\n   \"y\": [[198.000000]],\n   \"time\": [[13331445844472]]\n}"
-    val signatureImage: BufferedImage = imageUtil.createSignatureImage(capture)
+    val capture = "{\n   \"x\": [[67.000000]],\n   \"y\": [[198.000000]],\n   \"t\": [[13331445844472]]\n}"
+    val signatureImage: BufferedImage = imageUtil.createSignatureImage(capture, None)
     val imageFile = new File("test/files/single-point-stroke.jpg")
     ImageIO.write(signatureImage, "JPG", imageFile)
     imageFile.length should be(42622)
   }
 
   "createSignatureImage" should "draw a two-point stroke" in {
-    val capture = "{\n   \"x\": [[67.000000,95.148125]],\n   \"y\": [[198.000000,208.518494]],\n   \"time\": [[13331445844472,13331448640856]]\n}"
-    val signatureImage: BufferedImage = imageUtil.createSignatureImage(capture)
+    val capture = "{\n   \"x\": [[67.000000,95.148125]],\n   \"y\": [[198.000000,208.518494]],\n   \"t\": [[13331445844472,13331448640856]]\n}"
+    val signatureImage: BufferedImage = imageUtil.createSignatureImage(capture, None)
     val imageFile = new File("test/files/two-point-stroke.jpg")
     ImageIO.write(signatureImage, "JPG", imageFile)
     imageFile.length should be(43277)
   }
 
   "createSignatureImage" should "draw a three-point stroke" in {
-    val capture = "{\n   \"x\": [[67.000000,95.148125,121.414230]],\n   \"y\": [[198.000000,208.518494,226.561005]],\n   \"time\": [[13331445844472,13331448640856,13331448883353]]\n}"
-    val signatureImage: BufferedImage = imageUtil.createSignatureImage(capture)
+    val capture = "{\n   \"x\": [[67.000000,95.148125,121.414230]],\n   \"y\": [[198.000000,208.518494,226.561005]],\n   \"t\": [[13331445844472,13331448640856,13331448883353]]\n}"
+    val signatureImage: BufferedImage = imageUtil.createSignatureImage(capture, None)
     val imageFile = new File("test/files/three-point-stroke.jpg")
     ImageIO.write(signatureImage, "JPG", imageFile)
     imageFile.length should be(44028)

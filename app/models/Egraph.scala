@@ -240,7 +240,7 @@ case class Egraph(
 
       // Before removing this line, realize that without the line the image method will fail
       ImageAsset(
-        createMasterImage(signature, order.product.photo.renderFromMaster),
+        createMasterImage(signature, message, order.product.photo.renderFromMaster),
         blobKeyBase,
         imageName,
         ImageAsset.Png,
@@ -261,11 +261,12 @@ case class Egraph(
     private lazy val imageName = "image"
 
     private def createMasterImage(sig: String = this.signature,
+                                  message: Option[String] = this.message,
                                   productImage: BufferedImage):Array[Byte] =
     {
       import ImageUtil.Conversions._
 
-      val signatureImage = services.images.createSignatureImage(sig)
+      val signatureImage = services.images.createSignatureImage(sig, message)
 
       services.images.createEgraphImage(signatureImage, productImage, 0, 0).asByteArray(ImageAsset.Png)
     }
