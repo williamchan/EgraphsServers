@@ -1,22 +1,20 @@
 package services.signature
 
-import com.xyzmo.wwww.biometricserver.{SDCFromJSONStub, WebServiceUserAndProfileStub, WebServiceBiometricPartStub}
-import com.xyzmo.wwww.biometricserver.SDCFromJSONStub._
-import com.xyzmo.wwww.biometricserver.WebServiceBiometricPartStub._
-import com.xyzmo.wwww.biometricserver.WebServiceUserAndProfileStub._
-import java.util.ArrayList
 import org.apache.axis2.transport.http.{HTTPConstants, HttpTransportProperties}
 import org.apache.log4j.Logger
+import test.xyzmo.wwww.biometricserver.{SDCFromJSONStub, WebServiceUserAndProfileStub, WebServiceBiometricPartStub}
+import test.xyzmo.wwww.biometricserver.SDCFromJSONStub._
+import test.xyzmo.wwww.biometricserver.WebServiceBiometricPartStub._
+import test.xyzmo.wwww.biometricserver.WebServiceUserAndProfileStub._
 
+object TestXyzmoBiometricServices {
 
-object XyzmoBiometricServices {
-
-  private val log: Logger = Logger.getLogger(XyzmoBiometricServices.getClass)
+  private val log: Logger = Logger.getLogger(TestXyzmoBiometricServices.getClass)
   private val username: String = "usermanager"
   private val password: String = "%User%01"
-  private val domain: String = "ad"
+  private val domain: String = "testlab"
   private val port: Int = 50200
-  private val host: String = "23.21.194.63"
+  private val host: String = "testlab.xyzmo.com"
   private val webServiceBiometricPartUrl: String = "http://" + host + ":" + port + "/WebServices/WebServiceBiometricPart.asmx"
   private val webServiceUserAndProfileUrl: String = "http://" + host + ":" + port + "/WebServices/WebServiceUserAndProfile.asmx"
 
@@ -35,10 +33,10 @@ object XyzmoBiometricServices {
     val userDeleteResponse: User_Delete_v1Response = getWebServiceProxyUserAndProfile.get.user_Delete_v1(user_Delete)
     val user_delete_v1Result: WebServiceUserAndProfileStub.ResultBase = userDeleteResponse.getUser_Delete_v1Result
     if (user_delete_v1Result.getBaseResult eq WebServiceUserAndProfileStub.BaseResultEnum.ok) {
-      XyzmoBiometricServices.log.info("User_Add_v1 succeeded: User " + userId + " has been created successfully.")
+      TestXyzmoBiometricServices.log.info("User_Add_v1 succeeded: User " + userId + " has been created successfully.")
     }
     else {
-      XyzmoBiometricServices.log.error("Error during User_Add_v1: " + user_delete_v1Result.getErrorInfo.getErrorMsg)
+      TestXyzmoBiometricServices.log.error("Error during User_Add_v1: " + user_delete_v1Result.getErrorInfo.getErrorMsg)
       if (user_delete_v1Result.getErrorInfo.getError eq WebServiceUserAndProfileStub.ErrorStatus.BioUserAlreadyExists) {
       }
     }
@@ -54,10 +52,10 @@ object XyzmoBiometricServices {
     val userAddResponse: User_Add_v1Response = profile.get.user_Add_v1(user_Add)
     val user_add_v1Result: WebServiceUserAndProfileStub.ResultBase = userAddResponse.getUser_Add_v1Result
     if (user_add_v1Result.getBaseResult eq WebServiceUserAndProfileStub.BaseResultEnum.ok) {
-      XyzmoBiometricServices.log.info("User_Add_v1 succeeded: User " + userId + " has been created successfully.")
+      TestXyzmoBiometricServices.log.info("User_Add_v1 succeeded: User " + userId + " has been created successfully.")
     }
     else {
-      XyzmoBiometricServices.log.error("Error during User_Add_v1: " + user_add_v1Result.getErrorInfo.getErrorMsg)
+      TestXyzmoBiometricServices.log.error("Error during User_Add_v1: " + user_add_v1Result.getErrorInfo.getErrorMsg)
       if (user_add_v1Result.getErrorInfo.getError eq WebServiceUserAndProfileStub.ErrorStatus.BioUserAlreadyExists) {
       }
     }
@@ -71,18 +69,13 @@ object XyzmoBiometricServices {
     val profileAddResponse: Profile_Add_v1Response = getWebServiceProxyUserAndProfile.get.profile_Add_v1(profile_Add)
     val profile_add_v1Result: ProfileInfoResult_v1 = profileAddResponse.getProfile_Add_v1Result
     if (profile_add_v1Result.getBaseResult eq WebServiceUserAndProfileStub.BaseResultEnum.ok) {
-      XyzmoBiometricServices.log.info("Profile_Add_v1 succeeded: profile for " + userId + " has been created successfully.")
+      TestXyzmoBiometricServices.log.info("Profile_Add_v1 succeeded: profile for " + userId + " has been created successfully.")
     }
     else {
-      XyzmoBiometricServices.log.error("Error during Profile_Add_v1: " + profile_add_v1Result.getErrorInfo.getErrorMsg)
+      TestXyzmoBiometricServices.log.error("Error during Profile_Add_v1: " + profile_add_v1Result.getErrorInfo.getErrorMsg)
       if (profile_add_v1Result.getErrorInfo.getError eq WebServiceUserAndProfileStub.ErrorStatus.BioUserAlreadyExists) {
       }
     }
-  }
-
-  // Need to decide how to test addUser+addProfile+enrollUser, then delete this method
-  def javatest_EnrollUser(userId: String, profileName: String, signature1: String, signature2: String, signature3: String, signature4: String, signature5: String, signature6: String) {
-    enrollUser(userId, profileName, List[String](signature1, signature2, signature3, signature4, signature5, signature6))
   }
 
   // TODO(wchan): What to do if preceding call to addProfile is done for profileName that already exists?
@@ -97,19 +90,19 @@ object XyzmoBiometricServices {
     val enrollDynamicResponse1: EnrollDynamicProfile_v1Response = getWebServiceProxyBiometricPart.get.enrollDynamicProfile_v1(enrollDynamicProfile)
     val enrollResult1: EnrollResultInfo_v1 = enrollDynamicResponse1.getEnrollDynamicProfile_v1Result
     if (enrollResult1.getBaseResult eq WebServiceBiometricPartStub.BaseResultEnum.ok) {
-      val enrollresult = enrollResult1.getOkInfo.getEnrollResult.getValue
-      XyzmoBiometricServices.log.info("EnrollDynamicProfile_v1: EnrollResult is " + enrollresult)
-      enrollresult match {
+      val enrollResult = enrollResult1.getOkInfo.getEnrollResult.getValue
+      TestXyzmoBiometricServices.log.info("EnrollDynamicProfile_v1: EnrollResult is " + enrollResult)
+      enrollResult match {
         case "EnrollCompleted" => {
-          XyzmoBiometricServices.log.info("EnrollDynamicProfile_v1: Profile " + enrollResult1.getOkInfo.getInfoEnrollOk.getProfileId + " created; contains " + enrollResult1.getOkInfo.getInfoEnrollOk.getNrEnrolled + " signatures.")
+          TestXyzmoBiometricServices.log.info("EnrollDynamicProfile_v1: Profile " + enrollResult1.getOkInfo.getInfoEnrollOk.getProfileId + " created; contains " + enrollResult1.getOkInfo.getInfoEnrollOk.getNrEnrolled + " signatures.")
           true
         }
         case "EnrollRejected" => {
           if (enrollResult1.getOkInfo.getRejectedSignatures != null) {
             val rejectedSignatures: Array[RejectedSignature] = enrollResult1.getOkInfo.getRejectedSignatures.getRejectedSignature
-            XyzmoBiometricServices.log.info("EnrollDynamicProfile_v1: " + rejectedSignatures.length + " signatures rejected. Reasons follow:")
+            TestXyzmoBiometricServices.log.info("EnrollDynamicProfile_v1: " + rejectedSignatures.length + " signatures rejected. Reasons follow:")
             for (rejectedSignature <- rejectedSignatures) {
-              XyzmoBiometricServices.log.info("Rejection reason: " + rejectedSignature.getReason.toString)
+              TestXyzmoBiometricServices.log.info("Rejection reason: " + rejectedSignature.getReason.toString)
               // TODO(wchan): Ask Xyzmo for rejectable signatures. Are they in the same order as signatureDataContainers?
               // Store this information.
             }
@@ -123,7 +116,7 @@ object XyzmoBiometricServices {
       }
     }
     else {
-      XyzmoBiometricServices.log.error("Error during EnrollDynamicProfile_v1: " + enrollResult1.getErrorInfo.getErrorMsg)
+      TestXyzmoBiometricServices.log.error("Error during EnrollDynamicProfile_v1: " + enrollResult1.getErrorInfo.getErrorMsg)
       if (enrollResult1.getErrorInfo.getError eq WebServiceBiometricPartStub.ErrorStatus.ProfileAlreadyEnrolled) {
       }
       false
@@ -183,9 +176,6 @@ object XyzmoBiometricServices {
     authenticator.setUsername(username)
     authenticator.setPassword(password)
     authenticator.setPreemptiveAuthentication(true)
-    val authSchemes = new ArrayList[String]()
-    authSchemes.add(HttpTransportProperties.Authenticator.BASIC)
-    authenticator.setAuthSchemes(authSchemes)
     authenticator
   }
 }

@@ -5,7 +5,6 @@ import sjson.json.Serializer
 import models._
 import play.data.validation._
 import services.http.{OrderRequestFilters, CelebrityAccountRequestFilters}
-import services.Mail
 import services.http.OptionParams.Conversions._
 import play.libs.Codec
 

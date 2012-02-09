@@ -5,12 +5,7 @@ import services.blobs.Blobs.Conversions._
 import math.BigDecimal._
 import play.Play
 import models.{Account, Celebrity}
-import services.blobs.Blobs
-import models.{VoiceSample, Account, Celebrity}
-import services.{SampleRateConverter, AppConfig}
-import services.{SampleRateConverter}
-import play.libs.Codec
-import services.signature.XyzmoBiometricServices
+import services.AppConfig
 import services.http.DBTransaction
 import services.blobs.Blobs
 import services.db.Schema

@@ -1,7 +1,6 @@
 package services.signature
 
-import com.xyzmo.wwww.biometricserver.WebServiceBiometricPartStub
-import play.Play
+import test.xyzmo.wwww.biometricserver.WebServiceBiometricPartStub
 
 trait SignatureBiometricService {
   def verify(signatureJson: String, profileId: String): Either[SignatureBiometricsError, SignatureVerificationMetadata]
@@ -12,8 +11,8 @@ trait SignatureBiometricService {
  */
 class XyzmoSignatureBiometricService extends SignatureBiometricService {
   def verify(signatureJson: String, profileId: String): Either[SignatureBiometricsError, SignatureVerificationMetadata] = {
-    val sdc = XyzmoBiometricServices.getSignatureDataContainerFromJSON(signatureJson).getGetSignatureDataContainerFromJSONResult
-    val verifyUserResponse = XyzmoBiometricServices.verifyUser(userId = profileId.toString, sdc)
+    val sdc = TestXyzmoBiometricServices.getSignatureDataContainerFromJSON(signatureJson).getGetSignatureDataContainerFromJSONResult
+    val verifyUserResponse = TestXyzmoBiometricServices.verifyUser(userId = profileId.toString, sdc)
     val verifyResult = verifyUserResponse.getOkInfo.getVerifyResult
 
     Right(SignatureVerificationMetadata(

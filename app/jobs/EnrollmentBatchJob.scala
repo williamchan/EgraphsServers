@@ -4,7 +4,7 @@ import org.squeryl.PrimitiveTypeMode._
 import play.jobs._
 import services.blobs.Blobs
 import Blobs.Conversions._
-import services.signature.XyzmoBiometricServices
+import services.signature.TestXyzmoBiometricServices
 import services.db.Schema
 import services.voice.{VBGRequest, VBGBiometricServices}
 import models._
@@ -62,10 +62,10 @@ object EnrollmentBatchJob {
     // TODO(wchan): There has to be a better way to do this... contact Xyzmo about user management.
     val xyzmoUID: String = celebrity.getXyzmoUID()
     //    XyzmoBiometricServices.deleteUser(userId = xyzmoUID)
-    XyzmoBiometricServices.addUser(userId = xyzmoUID, userName = celebrity.publicName.get)
-    XyzmoBiometricServices.addProfile(userId = xyzmoUID, profileName = xyzmoUID)
+    TestXyzmoBiometricServices.addUser(userId = xyzmoUID, userName = celebrity.publicName.get)
+    TestXyzmoBiometricServices.addProfile(userId = xyzmoUID, profileName = xyzmoUID)
     val signatureDataContainers = for (signatureSample <- signatureSamples) yield blobs.get(SignatureSample.getXmlUrl(signatureSample.id)).get.asString
-    val isSuccessfulSignatureEnrollment = XyzmoBiometricServices.enrollUser(userId = xyzmoUID, profileName = xyzmoUID, signatureDataContainers = signatureDataContainers)
+    val isSuccessfulSignatureEnrollment = TestXyzmoBiometricServices.enrollUser(userId = xyzmoUID, profileName = xyzmoUID, signatureDataContainers = signatureDataContainers)
 
     println("Result of signature enrollment attempt for celebrity " + celebrity.id.toString + ": " + isSuccessfulSignatureEnrollment.toString)
 
