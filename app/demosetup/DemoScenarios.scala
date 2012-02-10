@@ -231,7 +231,7 @@ class DemoScenarios extends DeclaresDemoScenarios {
     () =>
       DemoScenario.clearAll()
       createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
-      createCelebrity("Ne", "Yo", "neyo@egraphs.com", "neyo")
+      createCelebrity("Ne-Yo", "", "neyo@egraphs.com", "neyo", "Ne-Yo")
   }
   )
 
