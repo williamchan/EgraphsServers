@@ -37,11 +37,9 @@ GET     /demo-setup/list                         nonproduction.DemoSetupControll
 GET     /demo-setup/clear                        nonproduction.DemoSetupController.clear
 GET     /demo-setup/{urlSlug}                    nonproduction.DemoSetupController.demoScenario
 
-# Ignore favicon requests
-GET     /favicon.ico                            404
-
 # Map static resources from the /app/public folder to the /public path
 GET     /public/                                staticDir:public
+GET     /favicon.ico                            staticFile:/public/images/favicon.ico
 
 ##
 ## API
