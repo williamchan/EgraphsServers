@@ -222,6 +222,19 @@ class DemoScenarios extends DeclaresDemoScenarios {
   }
   )
 
+  toDemoScenarios add DemoScenario(
+  "Feb 10 2012 agent meetings",
+  demoCategory,
+  """
+  Creates: Ne-Yo (neyo@egraphs.com/derp)
+  """, {
+    () =>
+      DemoScenario.clearAll()
+      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
+      createCelebrity("Ne", "Yo", "neyo@egraphs.com", "neyo")
+  }
+  )
+
   private def createCelebrity(firstName: String, lastName: String, email: String, s3ResourceId: String, publicName: String = null) {
     println("Creating Celebrity " + email + " ...")
 
