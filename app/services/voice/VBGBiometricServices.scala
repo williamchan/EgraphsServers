@@ -190,7 +190,7 @@ object VBGBiometricServices {
         "Failed to close VerifySample transaction " + transactionId + ", though that shouldn't" +
         " matter. Here's the stack trace anyways."
       )
-      new VoiceBiometricsError(code, request).printStackTrace()
+      VoiceBiometricsError(code, request).printStackTrace()
     }
   }
 
@@ -260,7 +260,7 @@ object VBGBiometricServices {
 
       // Nobody knows how to handle this error code. Throw up _everywhere_!
       case None =>
-        throw new VoiceBiometricsError(errorCodeString, request)
+        throw VoiceBiometricsError(errorCodeString, request)
     }
   }
 }

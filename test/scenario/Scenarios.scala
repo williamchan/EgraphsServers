@@ -1,13 +1,10 @@
 package scenario
 
-import controllers.api.PostEgraphApiEndpoint.EgraphFulfillmentHandler
-
 import services.db.Schema
 import java.io.File
 import services.{Utils}
 import services.blobs.Blobs
 import org.apache.commons.mail.SimpleEmail
-import play.libs.Mail
 import play.mvc.results.Redirect
 import Blobs.Conversions._
 import utils.{TestConstants, TestData}
@@ -16,6 +13,7 @@ import services.AppConfig
 import models._
 import controllers.WebsiteControllers
 import controllers.browser.PostBuyProductEndpoint.EgraphPurchaseHandler
+import play.libs.{Codec, Mail}
 
 /**
  * All scenarios supported by the API.
@@ -96,17 +94,22 @@ class Scenarios extends DeclaresScenarios {
     {() =>
       val will = Scenarios.getWillCelebrityAccount
 
-      will.newProduct.copy(
+      val product1 = will.newProduct.copy(
         priceInCurrency=10,
         name="2010 Starcraft 2 Championships",
         description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
-      ).save()
+      )
 
-      will.newProduct.copy(
+      val product2 = will.newProduct.copy(
         priceInCurrency=70,
         name="2011 King of Pweens Competition",
         description="In classic form, Wizzle dominated the competition and left mouths agape."
-      ).save()
+      )
+      
+      import services.ImageUtil.Conversions._
+      val imageBytes = product1.defaultPhoto.renderFromMaster.asByteArray(ImageAsset.Jpeg)
+      product1.save().withPhoto(imageBytes).save()
+      product2.save().withPhoto(imageBytes).save()
     }
   )
 
@@ -173,15 +176,13 @@ class Scenarios extends DeclaresScenarios {
         select (order)
       ).headOption.get
 
-      EgraphFulfillmentHandler(
-        TestConstants.signatureStr,
-        TestConstants.voiceStr(),
-        firstOrder,
-        will,
-        mail=mail,
-        skipBiometrics=true,
-        message=Some(TestConstants.messageStr)
-      ).execute()
+      firstOrder
+        .newEgraph
+        .withAssets(TestConstants.signatureStr, Some(TestConstants.messageStr), Codec.decodeBASE64(TestConstants.voiceStr()))
+        .save()
+        .withNiceBiometricServices
+        .verifyBiometrics
+        .save()
     }
   )
 

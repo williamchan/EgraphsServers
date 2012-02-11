@@ -29,7 +29,6 @@ class XyzmoSignatureBiometricService extends SignatureBiometricService {
  */
 class NiceSignatureBiometricService extends SignatureBiometricService {
   override def verify(signatureJson: String, profileId: String) = {
-    play.Logger.info("Making a nice signature")
     Right(SignatureVerificationMetadata(
       success=true,
       score=100

@@ -113,7 +113,7 @@ case class Product(
     "product/" + id
   }
 
-  private lazy val defaultPhoto = ImageAsset(
+  lazy val defaultPhoto = ImageAsset(
       Play.getFile("test/files/longoria/product-2.jpg"),
       keyBase="defaults/product",
       name="photo",

@@ -202,6 +202,18 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
     ).headOption
   }
 
+  def findByOrderId(orderId: Long): Option[Celebrity] = {
+    from(schema.celebrities, schema.products, schema.orders)(
+      (c, p, o) =>
+        where(
+          o.id === orderId and
+          o.productId === p.id and
+          p.celebrityId === c.id
+        )
+        select(c)
+    ).headOption
+  }
+
   //
   // Saves[Celebrity] methods
   //

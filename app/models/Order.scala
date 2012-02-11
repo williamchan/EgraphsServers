@@ -2,23 +2,26 @@ package models
 
 import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
-import org.squeryl.dsl.ast.LogicalBoolean
 import org.joda.money.Money
-import services.{Payment, Utils, Time}
 import models.CashTransaction.EgraphPurchase
-import services.AppConfig
 import services.db.{FilterThreeTables, KeyedCaseClass, Schema, Saves}
-import com.google.inject.{Provider, Inject}
 import services.Finance.TypeConversions._
 import EgraphState._
+import org.apache.commons.mail.HtmlEmail
+import controllers.WebsiteControllers
+import services._
+import com.google.inject._
 
 case class OrderServices @Inject() (
   store: OrderStore,
   customerStore: CustomerStore,
+  celebrityStore: CelebrityStore,
   productStore: ProductStore,
   payment: Payment,
+  mail: Mail,
   cashTransactionServices: Provider[CashTransactionServices],
-  egraphServices: Provider[EgraphServices])
+  egraphServices: Provider[EgraphServices]
+)
 
 /**
  * Persistent entity representing the Orders made upon Products of our service
@@ -96,6 +99,28 @@ case class Order(
     )
   }
 
+  def sendEgraphSignedMail() = {
+    val celebrity = services.celebrityStore.findByOrderId(id).get
+    val email = new HtmlEmail()
+    val linkActionDefinition = WebsiteControllers.lookupGetEgraph(id)
+    linkActionDefinition.absolute()
+
+    email.setFrom(celebrity.urlSlug.get + "@egraphs.com", celebrity.publicName.get)
+    email.addTo(recipient.account.email, recipientName)
+    email.addReplyTo("noreply@egraphs.com")
+    email.setSubject("I just finished signing your eGraph")
+    email.setMsg(
+      views.Application.html.egraph_signed_email(
+        celebrity,
+        product,
+        this,
+        linkActionDefinition.url
+      ).toString().trim()
+    )
+
+    services.mail.send(email)
+  }
+
   /**
    * Renders the Order as a Map, which will itself be rendered into whichever data format
    * by the API (e.g. JSON)
@@ -131,7 +156,7 @@ case class Order(
   def newEgraph: Egraph = {
     Egraph(orderId=id, services=services.egraphServices.get).withState(AwaitingVerification)
   }
-  
+
   //
   // KeyedCaseClass[Long] methods
   //
@@ -277,3 +302,4 @@ class OrderQueryFilters @Inject() (schema: Schema) {
     }
   }
 }
+
