@@ -38,7 +38,7 @@ class CelebrityApiControllersTests extends FunctionalTest with CleanDatabaseAfte
     Time.fromApiFormat(json("created").toString)
     Time.fromApiFormat(json("updated").toString)
 
-    assertEquals(8, json.size)
+    assertEquals(9, json.size)
   }
 
   @Test
