@@ -70,7 +70,7 @@ repositories:
              - provided -> *
     - scalatools:
          type: iBiblio
-         root: "http://nexus.scala-tools.org/content/repositories/releases"
+         root: "http://scala-tools.org/repo-releases"
          contains:
              - org.scalamock -> *
              - org.squeryl -> *
