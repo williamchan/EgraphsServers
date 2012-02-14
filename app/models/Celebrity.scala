@@ -80,6 +80,7 @@ case class Celebrity(id: Long = 0,
       "firstName" -> firstName,
       "lastName" -> lastName,
       "publicName" -> publicName,
+      "urlSlug" -> urlSlug,
       "isLeftHanded" -> Some(isLeftHanded)
     )
 

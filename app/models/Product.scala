@@ -88,7 +88,8 @@ case class Product(
   def renderedForApi: Map[String, Any] = {
     renderCreatedUpdatedForApi ++ Map(
       "id" -> id,
-      "photoUrl" -> photo.url
+      "photoUrl" -> photo.url,
+      "urlSlug" -> urlSlug
     )
   }
 

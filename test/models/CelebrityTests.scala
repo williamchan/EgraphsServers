@@ -51,14 +51,15 @@ class CelebrityTests extends UnitFlatSpec
     val celeb = Celebrity(
       firstName = Some("Will"),
       lastName = Some("Chan"),
-      publicName = Some("Wizzle")
+      publicName = Some("Wizzle Chan")
     ).save()
 
     val apiMap = celeb.renderedForApi
 
     apiMap("firstName") should be ("Will")
     apiMap("lastName") should be ("Chan")
-    apiMap("publicName") should be ("Wizzle")
+    apiMap("publicName") should be ("Wizzle Chan")
+    apiMap("urlSlug") should be ("Wizzle-Chan")
     Some(apiMap("isLeftHanded")) should be (Some(false))
     apiMap("id") should be (celeb.id)
     apiMap("created") should be (Time.toApiFormat(celeb.created))
