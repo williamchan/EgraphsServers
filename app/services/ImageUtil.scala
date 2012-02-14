@@ -14,7 +14,7 @@ import models.ImageAsset
 
   // TODO(wchan): Why does it run out of memory above 5?
   val scaleFactor = 2.5
-  val height = 768
+  val height = 950
   val width = 1024
   val numIncrements = 1000
 
@@ -49,7 +49,7 @@ import models.ImageAsset
     g.setColor(java.awt.Color.black)
     for (i <- 0 until xsByStroke.size) {
       val xs = xsByStroke(i).map(penX => penX + 2).toArray
-      val ys = ysByStroke(i).map(penY => penY - 3).toArray
+      val ys = ysByStroke(i).map(penY => penY + 3).toArray
       drawStroke(g, xs, ys)
     }
 
@@ -60,7 +60,6 @@ import models.ImageAsset
       val ys = ysByStroke(i).toArray
       drawStroke(g, xs, ys)
     }
-
 
     getScaledInstance(image, (image.getWidth / 1.8).toInt, (image.getHeight / 1.8).toInt)
   }
@@ -74,6 +73,7 @@ import models.ImageAsset
     val xsByStroke = map.get("x").get.asInstanceOf[List[List[Double]]]
     val ysByStroke = map.get("y").get.asInstanceOf[List[List[Double]]]
     val tsByStroke = map.get("t").get.asInstanceOf[List[List[Double]]]
+
     (xsByStroke, ysByStroke, tsByStroke)
   }
 
@@ -105,7 +105,7 @@ import models.ImageAsset
   private def drawStrokeWith1Point(g: Graphics2D, xs: Array[Double], ys: Array[Double]) {
     val drawX = xs.head
     val drawY = ys.head
-    drawPoint(g, drawX, invertY(drawY))
+    drawPoint(g, drawX, drawY)
   }
 
   /**
@@ -122,7 +122,7 @@ import models.ImageAsset
     for (j <- 0 to numIncrements) {
       val drawX = x1 + x_increment * j
       val drawY = y1 + slope * drawX
-      drawPoint(g, drawX, invertY(drawY))
+      drawPoint(g, drawX, drawY)
     }
   }
 
@@ -150,13 +150,13 @@ import models.ImageAsset
     for (j <- 0 until numIncrements) {
       val drawX = x1 + x1_to_x2_increment * j
       val drawY = (a * drawX * drawX) + (b * drawX) + c
-      drawPoint(g, drawX, invertY(drawY))
+      drawPoint(g, drawX, drawY)
     }
 
     for (j <- 1 to numIncrements) {
       val drawX = x2 + x2_to_x3_increment * j
       val drawY = (a * drawX * drawX) + (b * drawX) + c
-      drawPoint(g, drawX, invertY(drawY))
+      drawPoint(g, drawX, drawY)
     }
   }
 
@@ -198,7 +198,7 @@ import models.ImageAsset
     for (j <- 0 until numIncrements) {
       val drawX = bezier.calcXCoord(tNearC0 * j / numIncrements)
       val drawY = bezier.calcYCoord(tNearC0 * j / numIncrements)
-      drawPoint(g, drawX, invertY(drawY))
+      drawPoint(g, drawX, drawY)
     }
   }
 
@@ -206,7 +206,7 @@ import models.ImageAsset
     for (j <- 0 until numIncrements) {
       val drawX = bezier.calcXCoord(tNearC0 + (1d - tNearC0) * j / (2 * numIncrements))
       val drawY = bezier.calcYCoord(tNearC0 + (1d - tNearC0) * j / (2 * numIncrements))
-      drawPoint(g, drawX, invertY(drawY))
+      drawPoint(g, drawX, drawY)
     }
   }
 
@@ -215,10 +215,6 @@ import models.ImageAsset
     //    g.drawImage(penTipImage, x.intValue(), y.intValue(), null)
     val t = (pointSize * scaleFactor).intValue()
     g.draw(new Ellipse2D.Double(x, y, t, t))
-  }
-
-  private def invertY(y: Double): Double = {
-    (height * scaleFactor).intValue() - y
   }
 
   /**
@@ -246,12 +242,11 @@ import models.ImageAsset
    *    the { @code BILINEAR} hint is specified)
    * @return a scaled version of the original { @code BufferedImage}
    */
-  def getScaledInstance(
-                         img: BufferedImage,
-                         targetWidth: Int,
-                         targetHeight: Int,
-                         hint: Object = RenderingHints.VALUE_INTERPOLATION_BILINEAR,
-                         higherQuality: Boolean = true): BufferedImage = {
+  def getScaledInstance(img: BufferedImage,
+                        targetWidth: Int,
+                        targetHeight: Int,
+                        hint: Object = RenderingHints.VALUE_INTERPOLATION_BILINEAR,
+                        higherQuality: Boolean = true): BufferedImage = {
     require(
       targetWidth <= img.getWidth && targetHeight <= img.getHeight,
       "This method should only be used for down-scaling an image"
