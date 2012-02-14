@@ -1,16 +1,18 @@
 package controllers
 
 import browser._
+import nonproduction.PostBuyDemoProductEndpoint
 import play.mvc.Controller
 import services.http.{CelebrityAccountRequestFilters, DBTransaction}
 import website.GetRootEndpoint
-import services.{Mail, AppConfig}
 import models.{AccountStore, CustomerStore, OrderStore}
 import services.blobs.Blobs
+import services.{Payment, Mail, AppConfig}
 
 object WebsiteControllers extends Controller
   with GetRootEndpoint
   with PostBuyProductEndpoint
+  with PostBuyDemoProductEndpoint
   with GetCelebrityEndpoint
   with GetBlobEndpoint
   with GetEgraphEndpoint
@@ -20,10 +22,11 @@ object WebsiteControllers extends Controller
 {
   import AppConfig.instance
 
-  override protected def orderStore = instance[OrderStore]
-  override protected def celebFilters = instance[CelebrityAccountRequestFilters]
-  override protected def blobs = instance[Blobs]
-  override protected def mail = instance[Mail]
-  override protected def customerStore = instance[CustomerStore]
-  override protected def accountStore = instance[AccountStore]
+  override protected val payment = instance[Payment]
+  override protected val orderStore = instance[OrderStore]
+  override protected val celebFilters = instance[CelebrityAccountRequestFilters]
+  override protected val blobs = instance[Blobs]
+  override protected val mail = instance[Mail]
+  override protected val customerStore = instance[CustomerStore]
+  override protected val accountStore = instance[AccountStore]
 }

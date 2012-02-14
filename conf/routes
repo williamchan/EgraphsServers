@@ -63,4 +63,5 @@ GET     /egraph/{<[0-9]+>orderId}                        WebsiteControllers.getE
 GET     /{celebrityUrlSlug}                      WebsiteControllers.getCelebrity
 GET     /{celebrityUrlSlug}/{productUrlSlug}     WebsiteControllers.getCelebrityProduct
 POST    /{celebrityUrlSlug}/{productUrlSlug}/buy WebsiteControllers.postBuyProduct
+POST    /{celebrityUrlSlug}/{productUrlSlug}/buy-demo WebsiteControllers.postBuyDemoProduct
 

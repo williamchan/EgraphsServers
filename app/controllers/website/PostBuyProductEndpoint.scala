@@ -38,34 +38,36 @@ trait PostBuyProductEndpoint { this: Controller =>
       email("Buyer E-mail address", buyerEmail)
       required("stripeTokenId", stripeTokenId)
 
-      // Make sure these are valid email addresses for the alpha test
-      Validation.`match`(
-        "Recipient e-mail address at egraphs.com or raysbaseball.com",
-        recipientEmail.toLowerCase,
-        alphaEmailMatcher
-      )
-
-      Validation.`match`(
-        "Buyer e-mail address at egraphs.com or raysbaseball.com",
-        buyerEmail.toLowerCase,
-        alphaEmailMatcher
-      )
-
       if (validationErrors.isEmpty) {
-        EgraphPurchaseHandler(
-          recipientName,
-          recipientEmail,
-          buyerName,
-          buyerEmail,
-          stripeTokenId,
-          desiredText,
-          personalNote,
-          celebrity,
-          product,
-          mail=mail,
-          customerStore=customerStore,
-          accountStore=accountStore
-        ).execute()
+        // Make sure these are valid email addresses for the alpha test
+        Validation.`match`(
+          "Recipient e-mail address at egraphs.com or raysbaseball.com",
+          recipientEmail.toLowerCase,
+          alphaEmailMatcher
+        )
+
+        Validation.`match`(
+          "Buyer e-mail address at egraphs.com or raysbaseball.com",
+          buyerEmail.toLowerCase,
+          alphaEmailMatcher
+        )
+
+        if (validationErrors.isEmpty) {
+          EgraphPurchaseHandler(
+            recipientName,
+            recipientEmail,
+            buyerName,
+            buyerEmail,
+            stripeTokenId,
+            desiredText,
+            personalNote,
+            celebrity,
+            product,
+            mail=mail,
+            customerStore=customerStore,
+            accountStore=accountStore
+          ).execute()
+        }
       } else {
         import scala.collection.JavaConversions._
 
