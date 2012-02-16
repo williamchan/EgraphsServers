@@ -1,6 +1,6 @@
 package controllers
 
-import api.{PostEnrollmentSampleApiEndpoint, GetCelebrityApiEndpoint, GetCelebrityOrdersApiEndpoint, PostEgraphApiEndpoint}
+import api._
 import play.mvc.Controller
 import services.http.{OrderRequestFilters, CelebrityAccountRequestFilters, DBTransaction}
 import services.Mail
@@ -8,6 +8,7 @@ import models.{OrderQueryFilters, EnrollmentBatchServices, OrderStore}
 
 object ApiControllers extends Controller
   with GetCelebrityApiEndpoint
+  with GetCelebrityProductsApiEndpoint
   with GetCelebrityOrdersApiEndpoint
   with PostEgraphApiEndpoint
   with PostEnrollmentSampleApiEndpoint

@@ -1,13 +1,13 @@
 package controllers.api
 
 import org.specs2.mock.Mockito
-import play.test.UnitFlatSpec
 import play.mvc.Http.Request
 import services.http.CelebrityAccountRequestFilters
 import models.{Account, Celebrity}
 import play.mvc.Controller
 import org.scalatest.matchers.ShouldMatchers
 import play.mvc.results.Forbidden
+import play.test.{UnitFlatSpec}
 
 class GetCelebrityApiEndpointTests extends UnitFlatSpec with Mockito with ShouldMatchers
 {

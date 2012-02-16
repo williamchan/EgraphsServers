@@ -47,8 +47,9 @@ GET     /favicon.ico                            staticFile:/public/images/favico
 %{ api = '/api/1.0' }%
 
 GET     ${api}/celebrities/{celebrityId}                          ApiControllers.getCelebrity
-POST    ${api}/celebrities/{celebrityId}/enrollmentsamples        ApiControllers.postEnrollmentSample
+GET     ${api}/celebrities/{celebrityId}/products                 ApiControllers.getCelebrityProducts
 GET     ${api}/celebrities/{celebrityId}/orders                   ApiControllers.getCelebrityOrders
+POST    ${api}/celebrities/{celebrityId}/enrollmentsamples        ApiControllers.postEnrollmentSample
 POST    ${api}/celebrities/{celebrityId}/orders/{orderId}/egraphs ApiControllers.postEgraph
 
 ##
