@@ -12,7 +12,7 @@ private[blobs] object FileSystemBlobVendor extends BlobVendor {
   //
   // BlobVendor members
   //
-  override val urlBase = Request.current().getBase + "/test/files"
+  override def urlBase = Request.current().getBase + "/test/files"
   override def context = {
     val properties = new Properties
 

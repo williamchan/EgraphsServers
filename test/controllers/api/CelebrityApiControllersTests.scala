@@ -48,7 +48,7 @@ class CelebrityApiControllersTests extends FunctionalTest with CleanDatabaseAfte
 
     // Assemble the request
     val req = newRequest()
-    req.user = "wchan83@gmail.com"
+    req.user = "wchan83@egraphs.com"
     req.password = "wrongwrongwrong"
 
     // Execute the request

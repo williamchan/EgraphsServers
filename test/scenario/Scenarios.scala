@@ -60,7 +60,7 @@ class Scenarios extends DeclaresScenarios {
 
     """
     Creates a celebrity named William 'Wizzle' Chan. His login/password are
-    wchan83@gmail.com/derp. He has a profile photo.
+    wchan83@egraphs.com/derp. He has a profile photo.
     """,
 
    {() =>
@@ -71,7 +71,7 @@ class Scenarios extends DeclaresScenarios {
         description=Some("Love my fans from New York to Tokyo, from Seoul to the Sudetenland. And for all you haters out there -- don't mess around. I sleep with one eye closed, the other fixed on my Vespene gas supply.")
       ).save()
 
-      Account(email="wchan83@gmail.com",
+      Account(email="wchan83@egraphs.com",
               celebrityId=Some(celebrity.id)
       ).withPassword("derp").right.get.save()
 
@@ -458,7 +458,7 @@ object Scenarios {
   val customerStore = instance[CustomerStore]
 
   def getWillAccount: Account = {
-    accountStore.findByEmail("wchan83@gmail.com").get
+    accountStore.findByEmail("wchan83@egraphs.com").get
   }
 
   def getWillCelebrityAccount: Celebrity = {

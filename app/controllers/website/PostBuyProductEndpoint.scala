@@ -9,6 +9,7 @@ import play.mvc.Scope.Flash
 import play.mvc.results.Redirect
 import services.http.CelebrityAccountRequestFilters
 import services.{Mail, Utils, AppConfig}
+import play.Logger
 
 /**
  * Serves pages relating to a particular product of a celebrity.
@@ -30,7 +31,9 @@ trait PostBuyProductEndpoint { this: Controller =>
           desiredText: Option[String],
           personalNote: Option[String]) =
   {
+    Logger.info("Receiving purchase order")
     celebFilters.requireCelebrityAndProductUrlSlugs { (celebrity, product) =>
+      Logger.info("Purchase of product " + celebrity.publicName + "/" + product.name + " for " + recipientName)
       import Validation.{required, email}
       required("Recipient name", recipientName)
       email("Recipient E-mail address", recipientEmail)
@@ -39,6 +42,7 @@ trait PostBuyProductEndpoint { this: Controller =>
       required("stripeTokenId", stripeTokenId)
 
       if (validationErrors.isEmpty) {
+
         // Make sure these are valid email addresses for the alpha test
         Validation.`match`(
           "Recipient e-mail address at egraphs.com or raysbaseball.com",
@@ -53,6 +57,7 @@ trait PostBuyProductEndpoint { this: Controller =>
         )
 
         if (validationErrors.isEmpty) {
+          Logger.info("No validation errors")
           EgraphPurchaseHandler(
             recipientName,
             recipientEmail,
