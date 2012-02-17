@@ -1,4 +1,4 @@
-package controllers.browser
+package controllers.website
 
 import play.mvc.Controller
 import services.Utils

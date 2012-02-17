@@ -1,8 +1,7 @@
 package controllers.nonproduction
 
-
-import controllers.browser.PostBuyProductEndpoint
 import services.payment.Payment
+import controllers.website.PostBuyProductEndpoint
 
 /**
  * For demo purposes only automatically uses test stripe APIs to pay for

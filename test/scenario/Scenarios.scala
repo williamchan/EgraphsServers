@@ -12,7 +12,7 @@ import org.squeryl.PrimitiveTypeMode._
 import services.AppConfig
 import models._
 import controllers.WebsiteControllers
-import controllers.browser.PostBuyProductEndpoint.EgraphPurchaseHandler
+import controllers.website.PostBuyProductEndpoint.EgraphPurchaseHandler
 import play.libs.{Codec, Mail}
 import services.payment.Payment
 

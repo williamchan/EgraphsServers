@@ -1,6 +1,6 @@
 package controllers
 
-import browser._
+import website._
 import nonproduction.PostBuyDemoProductEndpoint
 import play.mvc.Controller
 import services.http.{CelebrityAccountRequestFilters, DBTransaction}
