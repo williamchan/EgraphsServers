@@ -49,7 +49,7 @@ object TestData {
     private val fileBase = Play.getFile("test/files/longoria")
 
     private def longoFile(filename: String): File = {
-      new File(fileBase, filename)
+      Play.getFile(fileBase + "/" + filename)
     }
   }
 

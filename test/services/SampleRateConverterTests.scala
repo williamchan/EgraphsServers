@@ -14,7 +14,7 @@ with ShouldMatchers {
 
   it should "downsample 44kHz WAV to 8kHz WAV" in {
     val sourceFile: File = Play.getFile("test/files/44khz.wav")
-    val targetFile: File = new File("test/files/8khz.wav")
+    val targetFile: File = Play.getFile("test/files/8khz.wav")
 
     val sourceFormat: AudioFormat = AudioSystem.getAudioInputStream(sourceFile).getFormat
     sourceFormat.getChannels should be(1)

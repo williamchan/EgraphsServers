@@ -5,6 +5,7 @@ import play.test.UnitFlatSpec
 import org.scalatest.matchers.ShouldMatchers
 import test.xyzmo.wwww.biometricserver.SDCFromJSONStub.GetSignatureDataContainerFromJSONResponse
 import test.xyzmo.wwww.biometricserver.WebServiceBiometricPartStub
+import play.Play
 
 class XyzmoBiometricServicesTests extends UnitFlatSpec with ShouldMatchers {
   "getSignatureDataContainerFromJSON" should "translate JSON signature to Xyzmo SignatureDataContainer" in {
@@ -13,19 +14,19 @@ class XyzmoBiometricServicesTests extends UnitFlatSpec with ShouldMatchers {
       " \"t\": [[13331445844472,13331448640856,13331448883353,13331449284887,13331449651436,13331450040379,13331450424036,13331450807652,13331451196301,13331451571027,13331452335120,13331452715422,13331453111580,13331453485879,13331453868402,13331454261722,13331454635498,13331455017782,13331455412529,13331455785207,13331456166898,13331456560894,13331456934011,13331457322500,13331457715549,13331458088385,13331458473840,13331458866709,13331459240098,13331459624481,13331460018091,13331460393174,13331460799934,13331461222643,13331461589850,13331461980530,13331462398425,13331462784410,13331463194394,13331463581897,13331463992719,13331464379978,13331464795079,13331465178617,13331465586223,13331465970468,13331466378919,13331466787303,13331467197008,13331467589763,13331467976468,13331468388426,13331468775448,13331469185619,13331469577402,13331469986701,13331470400979,13331470789692,13331471175473,13331471589816,13331471976246,13331472385216,13331472793954,13331473176490,13331473595481,13331473985074,13331474395116,13331474780376,13331475193705,13331475583284,13331475997763,13331476384461,13331476797005,13331477181443,13331477595114,13331477162456,13331477576030]]}"
 
     val response: GetSignatureDataContainerFromJSONResponse = TestXyzmoBiometricServices.getSignatureDataContainerFromJSON(signatureStr)
-    response.getGetSignatureDataContainerFromJSONResult should be(getStringFromFile(new File("test/files/xyzmo_signature_nomatch.xml")))
+    response.getGetSignatureDataContainerFromJSONResult should be(getStringFromFile(Play.getFile("test/files/xyzmo_signature_nomatch.xml")))
   }
 
   "verifyUser" should "return verify match" in {
     val userId: String = "william4"
-    val signatureToVerify: String = getStringFromFile(new File("test/files/xyzmo_signature7.xml"))
+    val signatureToVerify: String = getStringFromFile(Play.getFile("test/files/xyzmo_signature7.xml"))
     val response = TestXyzmoBiometricServices.verifyUser(userId, signatureToVerify)
     response.getOkInfo.getVerifyResult should be(WebServiceBiometricPartStub.VerifyResultEnum.VerifyMatch)
   }
 
   "verifyUser" should "return verify NO match" in {
     val userId: String = "william4"
-    val signatureToVerify: String = getStringFromFile(new File("test/files/xyzmo_signature_nomatch.xml"))
+    val signatureToVerify: String = getStringFromFile(Play.getFile("test/files/xyzmo_signature_nomatch.xml"))
     val response = TestXyzmoBiometricServices.verifyUser(userId, signatureToVerify)
     response.getOkInfo.getVerifyResult should be(WebServiceBiometricPartStub.VerifyResultEnum.VerifyNoMatch)
   }

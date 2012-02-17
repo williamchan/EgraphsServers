@@ -3,11 +3,11 @@ package models
 import play.test.UnitFlatSpec
 import org.scalatest.matchers.ShouldMatchers
 import utils.{ClearsDatabaseAndValidationAfter, DBTransactionPerTest}
-import java.io.{FileOutputStream, File}
+import java.io.FileOutputStream
 import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
-import services.{ImageUtil, TempFile}
-import services.AppConfig
+import play.Play
+import services.{ImageUtil, TempFile, AppConfig}
 
 class ImageAssetTests extends UnitFlatSpec
   with ShouldMatchers
@@ -137,7 +137,7 @@ class ImageAssetTests extends UnitFlatSpec
   }
     
   def imageFromDisk: BufferedImage = {
-    ImageIO.read(new File("test/files/image.png"))
+    ImageIO.read(Play.getFile("test/files/image.png"))
   }
 
   def makeAsset(bytes: => Array[Byte]) = {

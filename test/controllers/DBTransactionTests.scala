@@ -1,10 +1,10 @@
 package controllers
 
-import java.io.File
 import org.junit.Assert._
 import org.junit.Test
 import play.test.FunctionalTest
 import utils.FunctionalTestUtils.{CleanDatabaseAfterEachTest, runScenario}
+import play.Play
 
 
 class DBTransactionTests extends FunctionalTest with CleanDatabaseAfterEachTest {
@@ -35,7 +35,7 @@ class DBTransactionTests extends FunctionalTest with CleanDatabaseAfterEachTest 
     val response = GET("/test/files/a/b/derp.jpg")
     assertIsOk(response)
 
-    val actualFile = new File("./test/files/derp.jpg")
+    val actualFile = Play.getFile("./test/files/derp.jpg")
 
     assertEquals(actualFile.length, response.out.toByteArray.length)
   }

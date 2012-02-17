@@ -35,7 +35,7 @@ with ShouldMatchers {
       TestConstants.signatureStr, Some(TestConstants.messageStr)
     )
     val egraphImage: BufferedImage = imageUtil.createEgraphImage(signatureImage, photoImage, 0, 0)
-    val combinedImageFile = new File("test/files/egraph.jpg")
+    val combinedImageFile = Play.getFile("test/files/egraph.jpg")
     ImageIO.write(egraphImage, "JPG", combinedImageFile)
     combinedImageFile.length should not be(0)
   }
@@ -43,7 +43,7 @@ with ShouldMatchers {
   "createSignatureImage" should "draw a single-point stroke" in {
     val capture = "{\n   \"x\": [[67.000000]],\n   \"y\": [[198.000000]],\n   \"t\": [[13331445844472]]\n}"
     val signatureImage: BufferedImage = imageUtil.createSignatureImage(capture, None)
-    val imageFile = new File("test/files/single-point-stroke.jpg")
+    val imageFile = Play.getFile("test/files/single-point-stroke.jpg")
     ImageIO.write(signatureImage, "JPG", imageFile)
     imageFile.length should be(52574)
   }
@@ -51,7 +51,7 @@ with ShouldMatchers {
   "createSignatureImage" should "draw a two-point stroke" in {
     val capture = "{\n   \"x\": [[67.000000,95.148125]],\n   \"y\": [[198.000000,208.518494]],\n   \"t\": [[13331445844472,13331448640856]]\n}"
     val signatureImage: BufferedImage = imageUtil.createSignatureImage(capture, None)
-    val imageFile = new File("test/files/two-point-stroke.jpg")
+    val imageFile = Play.getFile("test/files/two-point-stroke.jpg")
     ImageIO.write(signatureImage, "JPG", imageFile)
     imageFile.length should be(53264)
   }
@@ -59,22 +59,22 @@ with ShouldMatchers {
   "createSignatureImage" should "draw a three-point stroke" in {
     val capture = "{\n   \"x\": [[67.000000,95.148125,121.414230]],\n   \"y\": [[198.000000,208.518494,226.561005]],\n   \"t\": [[13331445844472,13331448640856,13331448883353]]\n}"
     val signatureImage: BufferedImage = imageUtil.createSignatureImage(capture, None)
-    val imageFile = new File("test/files/three-point-stroke.jpg")
+    val imageFile = Play.getFile("test/files/three-point-stroke.jpg")
     ImageIO.write(signatureImage, "JPG", imageFile)
     imageFile.length should be(54005)
   }
 
   it should "overlay PNG images correctly" in {
-    val image: BufferedImage = ImageIO.read(new File("test/files/image.png"))
-    val overlay: BufferedImage = ImageIO.read(new File("test/files/overlay.png"))
+    val image: BufferedImage = ImageIO.read(Play.getFile("test/files/image.png"))
+    val overlay: BufferedImage = ImageIO.read(Play.getFile("test/files/overlay.png"))
     val combinedImage = imageUtil.createEgraphImage(overlay, image, 0, 0)
-    val combinedImageFile: File = new File("test/files/combinedImage.png")
+    val combinedImageFile: File = Play.getFile("test/files/combinedImage.png")
     ImageIO.write(combinedImage, "PNG", combinedImageFile)
     combinedImageFile.length should be(138807)
   }
 
   it should "resize PNG images correctly" in {
-    val image = ImageIO.read(new File("test/files/image.png"))
+    val image = ImageIO.read(Play.getFile("test/files/image.png"))
     val scaled = imageUtil.getScaledInstance(image, 100, 100)
     (scaled.getWidth, scaled.getHeight) should be((100, 100))
   }

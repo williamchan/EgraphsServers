@@ -4,11 +4,11 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationAfter, CreatedUpdatedEntityTests, SavingEntityTests}
-import java.io.File
 import javax.imageio.ImageIO
 import services.Time
 import services.ImageUtil.Conversions._
 import services.AppConfig
+import play.Play
 
 class CelebrityTests extends UnitFlatSpec
   with ShouldMatchers
@@ -74,14 +74,14 @@ class CelebrityTests extends UnitFlatSpec
 
   it should "throw an exception if you save profile photo when id is 0" in {
     val celeb = makeCeleb
-    val image = ImageIO.read(new File("test/files/image.png"))
+    val image = ImageIO.read(Play.getFile("test/files/image.png"))
 
     evaluating { celeb.saveWithProfilePhoto(image.asByteArray(ImageAsset.Png)) } should produce [IllegalArgumentException]
   }
 
   it should "store and retrieve the profile image asset" in {
     val celeb = makeCeleb
-    val image = ImageIO.read(new File("test/files/image.png"))
+    val image = ImageIO.read(Play.getFile("test/files/image.png"))
 
     val (savedCeleb, imageAsset) = celeb.save().saveWithProfilePhoto(image.asByteArray(ImageAsset.Png))
 

@@ -1,8 +1,7 @@
 package scenario
 
 import services.db.Schema
-import java.io.File
-import services.{Utils}
+import services.Utils
 import services.blobs.Blobs
 import org.apache.commons.mail.SimpleEmail
 import play.mvc.results.Redirect
@@ -15,6 +14,7 @@ import controllers.WebsiteControllers
 import controllers.website.PostBuyProductEndpoint.EgraphPurchaseHandler
 import play.libs.{Codec, Mail}
 import services.payment.Payment
+import play.Play
 
 /**
  * All scenarios supported by the API.
@@ -77,7 +77,7 @@ class Scenarios extends DeclaresScenarios {
               celebrityId=Some(celebrity.id)
       ).withPassword("derp").right.get.save()
 
-     celebrity.saveWithProfilePhoto(new File("./test/files/will_chan_celebrity_profile.jpg"))
+     celebrity.saveWithProfilePhoto(Play.getFile("./test/files/will_chan_celebrity_profile.jpg"))
    }
   )
 
@@ -230,7 +230,7 @@ class Scenarios extends DeclaresScenarios {
 
     {() =>
       import Blobs.Conversions._
-      blobs.put("a/b/derp.jpg", new File("./test/files/derp.jpg"))
+      blobs.put("a/b/derp.jpg", Play.getFile("./test/files/derp.jpg"))
     }
   )
 

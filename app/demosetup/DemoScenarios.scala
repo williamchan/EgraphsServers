@@ -3,11 +3,11 @@ package demosetup
 import services.blobs.Blobs.Conversions._
 
 import javax.imageio.ImageIO
-import java.io.File
 import services.{AppConfig, ImageUtil}
 import services.blobs.Blobs
 import services.db.Schema
 import models.{EnrollmentStatus, Account, Celebrity}
+import play.Play
 
 class DemoScenarios extends DeclaresDemoScenarios {
   val demoCategory = "Demo Preparation"
@@ -65,7 +65,7 @@ class DemoScenarios extends DeclaresDemoScenarios {
           val fileName = product.celebrity.urlSlug.get + "_" + product.urlSlug + ".png"
           println("Writing " + fileName)
           val image = imageUtil.createEgraphImage(sig, product.photoImage, 0, 0)
-          ImageIO.write(image, "PNG", new File("tmp/files/" + fileName))
+          ImageIO.write(image, "PNG", Play.getFile("tmp/files/" + fileName))
       }
 
       println("Wrote all sample egraphs")
