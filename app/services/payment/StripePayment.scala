@@ -1,68 +1,22 @@
-package services
+package services.payment
 
+import com.stripe
 import org.joda.money.Money
 import scala.collection.JavaConversions._
-import com.stripe
-
-trait Payment {
-  /**
-   * Creates a payment charge equivalent to the provided cash against the card token.
-   *
-   * @param amount the amount of cash to charge
-   *
-   * @param cardToken the ID of the token produced by the javascript payment API. For testing
-   *   you can also get one from [[services.Payment.testToken]]
-   *
-   * @param description description of the transaction for easy viewing on the Stripe console.
-   */
-  def charge(amount: Money,  cardToken: String, description: String): Charge
-
-  /**
-   * Creates a test version of a chargeable card token
-   */
-  def testToken: CardToken
-
-  /**
-   * Prepares the payment system for use at application start
-   */
-  def bootstrap()
-}
-
-trait Charge {
-  /** Unique ID of the charge */
-  def id: String
-}
-
-
-trait CardToken {
-  /** Globally unique ID of the card token */
-  def id: String
-}
-
-
-//
-// Stripe Implementation
-//
-case class StripeCharge (stripeCharge: stripe.model.Charge) extends Charge {
-  override val id = stripeCharge.getId
-}
-
-case class StripeToken (stripeToken: stripe.model.Token) extends CardToken {
-  override val id = stripeToken.getId
-}
+import services.Utils
 
 /**
- * Helper for charging and sending cash in and out of the system.
+ * Stripe-based implementation of [[services.Payment]] service
  */
 class StripePayment extends Payment {
   //
   // Payment Methods
   //
-  override def charge(amount: Money, cardToken: String, description: String=""): Charge = {
+  override def charge(amount: Money, cardTokenId: String, description: String=""): Charge = {
     val chargeMap = Map[String, AnyRef](
       "amount" -> amount.getAmountMinor,
       "currency" -> amount.getCurrencyUnit.getCode.toLowerCase,
-      "card" -> cardToken,
+      "card" -> cardTokenId,
       "description" -> description
     )
 
@@ -97,18 +51,17 @@ class StripePayment extends Payment {
 
     StripeToken(stripe.model.Token.create(defaultChargeParams))
   }
-  
-  override def bootstrap = {
+
+  override def bootstrap {
     stripe.Stripe.apiKey = Utils.requiredConfigurationProperty("stripe.key.secret")
   }
 }
 
-object Payment {
-  /** Keys for using Stripe either in test or production mode */
-  object StripeKey {
-    def publishable: String = {
-      Utils.requiredConfigurationProperty("stripe.key.publishable")
-    }
-  }
+case class StripeCharge (stripeCharge: stripe.model.Charge) extends Charge {
+  override val id = stripeCharge.getId
+}
+
+case class StripeToken (stripeToken: stripe.model.Token) extends CardToken {
+  override val id = stripeToken.getId
 }
 

@@ -16,7 +16,7 @@
   <script type="text/javascript" >
     require(["product-page"], function(productPage) {
        productPage.go(
-         "@services.Payment.StripeKey.publishable",
+         "@services.payment.Payment.StripeKey.publishable",
          @product.price.getAmountMinor,
          !@errorFields.isEmpty);
     })

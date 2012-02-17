@@ -1,14 +1,14 @@
 package bootstrap
 
 import play.jobs._
-import com.stripe.Stripe
 import org.squeryl.{Session, SessionFactory}
 import io.Source
 import java.io.{File, PrintWriter}
 import play.Play
 import services.blobs.Blobs
-import services.{AppConfig, Payment, Utils, TempFile}
+import services.{AppConfig, Utils, TempFile}
 import services.db.{Schema, DBSession}
+import services.payment.Payment
 
 @OnApplicationStart
 class BootStrap extends Job {

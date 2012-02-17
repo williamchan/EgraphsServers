@@ -1,11 +1,12 @@
-package services
+package services.payment
 
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 import org.scalatest.BeforeAndAfterEach
 import utils.{TestData, DBTransactionPerTest, ClearsDatabaseAndValidationAfter}
+import services.AppConfig
 
-class PaymentTests extends UnitFlatSpec
+class StripePaymentTests extends UnitFlatSpec
   with ShouldMatchers
   with BeforeAndAfterEach
   with ClearsDatabaseAndValidationAfter
@@ -22,7 +23,7 @@ class PaymentTests extends UnitFlatSpec
     val charge = payment.charge(
       amount.toMoney(),
       token.getId,
-      "libs.PaymentTests, \"charge should successfully charge a token\". Looks like it worked."
+      "services.payment..StripePaymentTests, \"charge should successfully charge a token\". Looks like it worked."
     )
 
     charge.id should not be (null)
