@@ -22,6 +22,7 @@ object WebsiteControllers extends Controller
 {
   import AppConfig.instance
 
+  // Provide endpoint dependencies
   override protected val payment = instance[Payment]
   override protected val orderStore = instance[OrderStore]
   override protected val celebFilters = instance[CelebrityAccountRequestFilters]

@@ -21,5 +21,4 @@ object ApiControllers extends Controller
   override protected def enrollmentBatchServices = instance[EnrollmentBatchServices]
   override protected def celebFilters = instance[CelebrityAccountRequestFilters]
   override protected def orderFilters = instance[OrderRequestFilters]
-  override protected def mail = instance[Mail]
 }

@@ -19,7 +19,6 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
   //
   protected def celebFilters: CelebrityAccountRequestFilters
   protected def orderFilters: OrderRequestFilters
-  protected def mail: Mail
 
   //
   // Controller members
@@ -44,7 +43,7 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
           
           val egraphToTest = if (skipBiometrics) savedEgraph.withNiceBiometricServices else savedEgraph
           
-          val testedEgraph = egraphToTest.verifyBiometrics
+          val testedEgraph = egraphToTest.verifyBiometrics.save()
           
           if (testedEgraph.state == EgraphState.Verified) {
             order.sendEgraphSignedMail()
