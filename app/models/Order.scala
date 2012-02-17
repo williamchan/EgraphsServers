@@ -176,7 +176,7 @@ object Order {
                                          transaction: CashTransaction,
                                          payment: Payment) {
     def issueAndSave(): OrderCharge = {
-      val stripeCharge = payment.charge(
+      val charge = payment.charge(
         order.amountPaid,
         stripeCardTokenId,
         "Egraph Order=" + order.id
@@ -185,7 +185,7 @@ object Order {
       val savedTransaction = transaction.save()
       val savedOrder = order.copy(
         transactionId=Some(savedTransaction.id),
-        stripeChargeId=Some(stripeCharge.getId)
+        stripeChargeId=Some(charge.id)
       ).save()
 
       this.copy(order=savedOrder, transaction=savedTransaction)

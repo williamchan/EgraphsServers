@@ -16,6 +16,7 @@ class AppConfig extends AbstractModule with ScalaModule {
     bind[Mail].toProvider(Mail.MailProvider)
     bind[SignatureBiometricService].to[XyzmoSignatureBiometricService]
     bind[VoiceBiometricService].to[VBGVoiceBiometricService]
+    bind[Payment].to[StripePayment]
 
     install(BlobModule)
 

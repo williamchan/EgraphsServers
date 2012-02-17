@@ -13,10 +13,11 @@ import services.db.{Schema, DBSession}
 @OnApplicationStart
 class BootStrap extends Job {
   val blobs = AppConfig.instance[Blobs]
+  val payment = AppConfig.instance[Payment]
 
   override def doJob() {
     // Initialize payment system
-    Stripe.apiKey = Payment.StripeKey.secret
+    payment.bootstrap()
 
     // Initialize Squeryl persistence
     SessionFactory.concreteFactory =

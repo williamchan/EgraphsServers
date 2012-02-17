@@ -22,7 +22,7 @@ trait PostBuyDemoProductEndpoint { this: PostBuyProductEndpoint =>
       recipientEmail,
       buyerName,
       buyerEmail,
-      payment.fakeStripeToken.getId,
+      payment.testToken.id,
       desiredText,
       personalNote
     )
