@@ -17,6 +17,7 @@ class StripePaymentTests extends UnitFlatSpec
   val payment = AppConfig.instance[StripePayment]
   val amount: BigDecimal = 1000
 
+  payment.bootstrap()
   "charge" should "successfully charge a token" in {
     val token = payment.testToken
 
