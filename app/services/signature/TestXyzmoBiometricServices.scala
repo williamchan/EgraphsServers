@@ -19,7 +19,7 @@ object TestXyzmoBiometricServices {
   private val webServiceUserAndProfileUrl: String = "http://" + host + ":" + port + "/WebServices/WebServiceUserAndProfile.asmx"
 
   def getSignatureDataContainerFromJSON(jsonStr: String): GetSignatureDataContainerFromJSONResponse = {
-    // TODO: remove this patch once we have fully functioning xyzmo code for our signature format.
+    // TODO: remove this patch once we have final endpoint to translate JSON signatures to Xyzmo's data format.
     val patchedJsonStr = jsonStr.replace("x", "originalX").replace("y", "originalY").replace("t", "time")
     val json: GetSignatureDataContainerFromJSON = new GetSignatureDataContainerFromJSON()
     json.setJsonData(patchedJsonStr)
