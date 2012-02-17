@@ -6,6 +6,7 @@ import play.test.UnitFlatSpec
 import services.Time
 import utils._
 import services.AppConfig
+import services.payment.Payment
 
 class OrderTests extends UnitFlatSpec
   with ShouldMatchers
@@ -16,6 +17,7 @@ class OrderTests extends UnitFlatSpec
   with DBTransactionPerTest
 {
   val orderStore = AppConfig.instance[OrderStore]
+  val payment = AppConfig.instance[Payment]
   val orderQueryFilters = AppConfig.instance[OrderQueryFilters]
 
   //
@@ -121,10 +123,10 @@ class OrderTests extends UnitFlatSpec
     val cashTransactionStore = AppConfig.instance[CashTransactionStore]
     val customer = TestData.newSavedCustomer()
     val product  = TestData.newSavedProduct()
-    val token = TestData.newStripeToken();
+    val token = payment.testToken
     val amount = BigDecimal(100.500000)
 
-    val order = customer.buy(product).copy(stripeCardTokenId=Some(token.getId),  amountPaidInCurrency=amount)
+    val order = customer.buy(product).copy(stripeCardTokenId=Some(token.id),  amountPaidInCurrency=amount)
     val charged = order.charge.issueAndSave()
 
     orderStore.findById(charged.order.id) should not be (None)

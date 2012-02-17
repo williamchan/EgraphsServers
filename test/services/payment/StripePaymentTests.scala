@@ -18,11 +18,11 @@ class StripePaymentTests extends UnitFlatSpec
   val amount: BigDecimal = 1000
 
   "charge" should "successfully charge a token" in {
-    val token = TestData.newStripeToken()
+    val token = payment.testToken
 
     val charge = payment.charge(
       amount.toMoney(),
-      token.getId,
+      token.id,
       "services.payment..StripePaymentTests, \"charge should successfully charge a token\". Looks like it worked."
     )
 

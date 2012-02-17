@@ -55,6 +55,14 @@ class StripePayment extends Payment {
   override def bootstrap {
     stripe.Stripe.apiKey = Utils.requiredConfigurationProperty("stripe.key.secret")
   }
+
+  override val browserModule: String = {
+    "stripe-payment.js"
+  }
+
+  override val publishableKey: String = {
+    Utils.requiredConfigurationProperty("stripe.key.publishable")
+  }
 }
 
 case class StripeCharge (stripeCharge: stripe.model.Charge) extends Charge {

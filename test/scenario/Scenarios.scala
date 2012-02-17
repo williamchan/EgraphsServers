@@ -14,6 +14,7 @@ import models._
 import controllers.WebsiteControllers
 import controllers.browser.PostBuyProductEndpoint.EgraphPurchaseHandler
 import play.libs.{Codec, Mail}
+import services.payment.Payment
 
 /**
  * All scenarios supported by the API.
@@ -21,6 +22,7 @@ import play.libs.{Codec, Mail}
 class Scenarios extends DeclaresScenarios {
   // Helpful services
   val blobs = AppConfig.instance[Blobs]
+  val payment = AppConfig.instance[Payment]
   val schema = AppConfig.instance[Schema]
 
   // Categories of scenario
@@ -373,7 +375,7 @@ class Scenarios extends DeclaresScenarios {
         recipientEmail = "ehboto@gmail.com",
         buyerName = "Rooster McGillycuddy",
         buyerEmail = "rooster@egraphs.com",
-        stripeTokenId = TestData.newStripeToken().getId,
+        stripeTokenId = payment.testToken.id,
         desiredText = Some("Happy 29th birthday, Erem!"),
         personalNote = Some("I'm your biggest fan!"),
         celebrity=celebrity,

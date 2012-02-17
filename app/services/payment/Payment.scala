@@ -28,6 +28,18 @@ trait Payment {
    * Prepares the payment system for use at application start
    */
   def bootstrap()
+
+  /**
+   * Provides the require.js specifier for the browser module that corresponds
+   * to this payment implementation
+   */
+  def browserModule: String
+
+  /**
+   * Public key for the browser module to generate tokens for consumption by the
+   * server.
+   */
+  def publishableKey: String
 }
 
 /**
@@ -46,11 +58,3 @@ trait CardToken {
   def id: String
 }
 
-object Payment {
-  /** Keys for using Stripe either in test or production mode */
-  object StripeKey {
-    def publishable: String = {
-      Utils.requiredConfigurationProperty("stripe.key.publishable")
-    }
-  }
-}

@@ -5,12 +5,14 @@ import services.Utils
 
 import models._
 import services.http.CelebrityAccountRequestFilters
+import services.payment.Payment
 
 /**
  * Serves pages relating to a particular product of a celebrity.
  */
 private[controllers] trait GetCelebrityProductEndpoint { this: Controller =>
   protected def celebFilters: CelebrityAccountRequestFilters
+  protected def payment: Payment
 
   def getCelebrityProduct = {
     celebFilters.requireCelebrityAndProductUrlSlugs { (celebrity, product) =>
@@ -24,7 +26,7 @@ private[controllers] trait GetCelebrityProductEndpoint { this: Controller =>
       }
 
       // Render the page
-      views.Application.html.product(celebrity, product, errorFields, fieldDefaults)
+      views.Application.html.product(celebrity, product, errorFields, fieldDefaults, payment)
     }
   }
 }

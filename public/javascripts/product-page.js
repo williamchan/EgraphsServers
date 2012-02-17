@@ -1,5 +1,5 @@
 /* Scripting for the product page, e.g. /Wizzle/2010-Starcraft-Tournament */
-define(["stripe"], function(stripe) {
+define(["stripe-payment"], function(stripe) {
   /** Handles response to Stripe create token submission */
   var stripeResponseHandler = function(status, response)  {
     if (response.error) {
@@ -66,36 +66,42 @@ define(["stripe"], function(stripe) {
     /**
      * Executes all the scripts for the product page.
      *
+	 * @param stripeModuleName name of the payment module that should be used. 
+	 *     This will correspond to which class on the server is implementing 
+	 *     services.payment.Payment.
      * @param stripeKey the Stripe publishable key for payments.
-     * @param productPriceInCents the price in cents of the product being displayed.
-     * @param hasErrors true that the page was loaded with some previous form errors
+     * @param productPriceInCents the price in cents of the product being 
+	 *     displayed.
+     * @param hasErrors true that the page was loaded with some previous form 
+	 *     errors
      *
      * @return nada
      */
-    go: function (stripeKey, productPriceInCents, hasErrors) {
-      stripe.setPublishableKey(stripeKey);
+    go: function (stripeModuleName, stripeKey, productPriceInCents, hasErrors) {
+	  require([stripeModuleName], function(stripe) {
+		stripe.setPublishableKey(stripeKey);
 
-      $(document).ready(function() {
-		if (hasErrors) {          
-          $('html, body').scrollTop($("#submit-button").offset().top);
-		}
+		$(document).ready(function() {
+		  if (hasErrors) {          
+			$('html, body').scrollTop($("#submit-button").offset().top);
+		  }
 
-        $("#payment-form").submit(function(event) {
-          // disable the submit button to prevent repeated clicks
-          enableSubmitButton(false)
+		  $("#payment-form").submit(function(event) {
+			// disable the submit button to prevent repeated clicks
+			enableSubmitButton(false);
 
-          var amount = productPriceInCents; //amount you want to charge in cents
-          Stripe.createToken({
-              number: $('#cardNumber').val(),
-              cvc: $('#cardCvc').val(),
-              exp_month: $('#cardExpirationMonth').val(),
-              exp_year: $('#cardExpirationYear').val()
-          }, amount, stripeResponseHandler);
+			stripe.createToken({
+				number: $('#cardNumber').val(),
+				cvc: $('#cardCvc').val(),
+				exp_month: $('#cardExpirationMonth').val(),
+				exp_year: $('#cardExpirationYear').val()
+			}, productPriceInCents, stripeResponseHandler);
 
-          // prevent the form from submitting with the default action
-          return false;
-        });
-      });
+			// prevent the form from submitting with the default action
+			return false;
+		  });
+		});
+	  });
     }
   };
 });

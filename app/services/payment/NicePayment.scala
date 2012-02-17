@@ -11,11 +11,19 @@ class NicePayment extends Payment {
     NiceCharge
   }
 
-  override def testToken: CardToken = {
+  override val testToken: CardToken = {
     NiceToken
   }
 
   override def bootstrap() { }
+
+  override val browserModule: String = {
+    "nice-payment"
+  }
+
+  override val publishableKey: String = {
+    "No publishable key -- anything is groovy for services.payment.NicePayment"
+  }
 }
 
 object NiceCharge extends Charge {

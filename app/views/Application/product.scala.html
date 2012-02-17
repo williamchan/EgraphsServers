@@ -1,7 +1,8 @@
 @(celebrity:models.Celebrity,
   product: models.Product,
   errorFields: Option[List[String]],
-  fields: (String) => String)
+  fields: (String) => String,
+  payment: services.payment.Payment)
 
 @import models.Product
 @import controllers.WebsiteControllers
@@ -16,7 +17,8 @@
   <script type="text/javascript" >
     require(["product-page"], function(productPage) {
        productPage.go(
-         "@services.payment.Payment.StripeKey.publishable",
+         "@payment.browserModule",
+         "@payment.publishableKey",
          @product.price.getAmountMinor,
          !@errorFields.isEmpty);
     })
