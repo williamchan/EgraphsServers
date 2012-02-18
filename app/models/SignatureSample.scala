@@ -42,7 +42,7 @@ case class SignatureSample(
 
   def putXyzmoSignatureDataContainerOnBlobstore = {
     val jsonStr: String = services.blobs.get(SignatureSample.getJsonUrl(id)).get.asString
-    val sdc = TestXyzmoBiometricServices.getSignatureDataContainerFromJSON(jsonStr).getGetSignatureDataContainerFromJSONResult
+    val sdc = TestXyzmoBiometricServices.getSignatureDataContainerFromJSON(jsonStr)
     services.blobs.put(SignatureSample.getXmlUrl(id), sdc.getBytes)
     sdc
   }

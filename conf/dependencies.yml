@@ -44,7 +44,6 @@ require:
     - provided -> tritonus_share 0.3.6
     - provided -> tritonus_remaining 0.3.6
     - provided -> xyzmo 1.0
-    - provided -> xyzmo-test 1.0
 
 # Non-default repositories
 repositories:
