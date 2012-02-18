@@ -1,5 +1,5 @@
 /* Scripting for the product page, e.g. /Wizzle/2010-Starcraft-Tournament */
-define(["stripe-payment"], function(stripe) {
+define([], function() {
   /** Handles response to Stripe create token submission */
   var stripeResponseHandler = function(status, response)  {
     if (response.error) {
