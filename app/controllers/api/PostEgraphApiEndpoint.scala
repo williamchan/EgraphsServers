@@ -8,20 +8,16 @@ import services.http.{OrderRequestFilters, CelebrityAccountRequestFilters}
 import services.http.OptionParams.Conversions._
 import play.libs.Codec
 
-/**
- * Handles requests for queries against a celebrity for his orders.
- */
 private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
-
-  //
-  // Abstract members
-  //
   protected def celebFilters: CelebrityAccountRequestFilters
   protected def orderFilters: OrderRequestFilters
 
-  //
-  // Controller members
-  //
+  /**
+   * Posts a signed egraph from a celebrity.
+   *
+   * See [[https://egraphs.jira.com/wiki/display/DEV/API+Endpoints the json spec]] for more info
+   * about the params.
+   */
   def postEgraph(
     @Required signature: String,
     @Required audio: String,

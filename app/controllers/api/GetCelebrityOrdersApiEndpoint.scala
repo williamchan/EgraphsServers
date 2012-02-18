@@ -10,6 +10,14 @@ private[controllers] trait GetCelebrityOrdersApiEndpoint { this: Controller =>
   protected def orderQueryFilters: OrderQueryFilters
   protected def celebFilters: CelebrityAccountRequestFilters
 
+  /**
+   * Provides a JSON array of a celebrity's Orders for consumption
+   * by the API. See the
+   * [[https://egraphs.jira.com/wiki/display/DEV/API+Endpoints#APIEndpoints-Orders%C2%A0Orders JSON specification]]
+   *
+   * @param signerActionable true if the only Orders that should
+   *   be returned are the ones that the celebrity needs to sign.
+   */
   def getCelebrityOrders(signerActionable: Option[Boolean]) = {
     celebFilters.requireCelebrityAccount { (account, celebrity) =>
       signerActionable match {
