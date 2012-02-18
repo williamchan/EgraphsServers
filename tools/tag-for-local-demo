@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+# Tags the current commit of the current branch as a new local demo git tag.
+#
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PROJ_BASE=$SCRIPT_DIR/..
+
+cd $PROJ_BASE
+
+date_portion=`date +%Y-%m-%d_%H-%M-%S`
+tag_name="local-demo_$date_portion"
+
+git tag -a "$tag_name" \
+  -m "This commit has been tagged for use in local demoing of the egraphs product."
+
+echo "Created annotated git tag named \"$tag_name\""
