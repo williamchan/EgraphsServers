@@ -57,7 +57,7 @@ class StripePayment extends Payment {
   }
 
   override val browserModule: String = {
-    "stripe-payment.js"
+    "stripe-payment"
   }
 
   override val publishableKey: String = {
