@@ -19,10 +19,16 @@ class DemoScenarios extends DeclaresDemoScenarios {
   toDemoScenarios add DemoScenario(
   "Create Gabe Kapler",
   demoCategory,
-  "", {
+  """
+  Creates the following logins: gabe@egraphs.com, gabe1@egraphs.com, gabe2@egraphs.com, gabe3@egraphs.com. 
+  Their URLs are, respectively: /Gabe-Kapler, /Gabe-Kapler-1, /Gabe-Kapler-2, /Gabe-Kapler-3
+  """, {
     () =>
       DemoScenario.clearAll()
       createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
+      createCelebrity("Gabe", "Kapler1", "gabe1@egraphs.com", "gabekapler", publicName = "Gabe Kapler 1")
+      createCelebrity("Gabe", "Kapler2", "gabe2@egraphs.com", "gabekapler", publicName = "Gabe Kapler 2")
+      createCelebrity("Gabe", "Kapler3", "gabe3@egraphs.com", "gabekapler", publicName = "Gabe Kapler 3")
   }
   )
 
@@ -46,6 +52,10 @@ class DemoScenarios extends DeclaresDemoScenarios {
       createCelebrity("Ryan", "Braun", "rbraun@egraphs.com", "ryanbraun")
       createCelebrity("Zach", "Apter", "zach@egraphs.com", "zachapter")
       createCelebrity("Bono", "Braun", "bono@egraphs.com", "paulhewson", publicName = "Bono")
+
+      createCelebrity("Gabe", "Kapler1", "gabe1@egraphs.com", "gabekapler", publicName = "Gabe Kapler 1")
+      createCelebrity("Gabe", "Kapler2", "gabe2@egraphs.com", "gabekapler", publicName = "Gabe Kapler 2")
+      createCelebrity("Gabe", "Kapler3", "gabe3@egraphs.com", "gabekapler", publicName = "Gabe Kapler 3")
   }
   )
 
