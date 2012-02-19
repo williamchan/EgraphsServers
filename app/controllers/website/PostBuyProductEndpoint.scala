@@ -11,9 +11,6 @@ import services.http.CelebrityAccountRequestFilters
 import services.{Mail, Utils, AppConfig}
 import play.Logger
 
-/**
- * Serves pages relating to a particular product of a celebrity.
- */
 trait PostBuyProductEndpoint { this: Controller =>
   import PostBuyProductEndpoint.EgraphPurchaseHandler
   import PostBuyProductEndpoint.alphaEmailMatcher
@@ -23,6 +20,12 @@ trait PostBuyProductEndpoint { this: Controller =>
   protected def customerStore: CustomerStore
   protected def accountStore: AccountStore
 
+  /**
+   * Posts a purchase order against a Celebrity's Product.
+   *
+   * @return a redirect either to the Product's page with form errors or to
+   *   the order confirmation page.
+   */
   def postBuyProduct(recipientName: String,
           recipientEmail: String,
           buyerName: String,

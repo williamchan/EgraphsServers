@@ -6,7 +6,7 @@ import demosetup.DemoScenario
 import services.http.DBTransaction
 
 /**
- * Controller for all scenarios
+ * Provides functionality for setting up demo data fixtures from the browser.
  */
 object DemoSetupController extends Controller with DBTransaction {
   /**

@@ -7,13 +7,14 @@ import models._
 import services.http.CelebrityAccountRequestFilters
 import services.payment.Payment
 
-/**
- * Serves pages relating to a particular product of a celebrity.
- */
 private[controllers] trait GetCelebrityProductEndpoint { this: Controller =>
+
   protected def celebFilters: CelebrityAccountRequestFilters
   protected def payment: Payment
 
+  /**
+   * Serves up the HTML of a single Celebrity Product page.
+   */
   def getCelebrityProduct = {
     celebFilters.requireCelebrityAndProductUrlSlugs { (celebrity, product) =>
       // Get errors and param values from previous unsuccessful buy

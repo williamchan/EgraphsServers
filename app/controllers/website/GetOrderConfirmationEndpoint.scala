@@ -3,7 +3,6 @@ package controllers.website
 import play.mvc.Controller
 
 import models._
-import services.AppConfig
 
 /**
  * Serves the page confirming that an eGraph order was made

@@ -6,14 +6,13 @@ import play.mvc.Router.ActionDefinition
 import services.blobs.AccessPolicy
 import services.http.CelebrityAccountRequestFilters
 
-/**
- * Serves the website's Celebrity root page.
- */
 private[controllers] trait GetCelebrityEndpoint { this: Controller =>
 
   protected def celebFilters: CelebrityAccountRequestFilters
 
-  /** Controller for a celebrity's home page. */
+  /**
+   * Serves the website's Celebrity root page.
+   */
   def getCelebrity = {
     celebFilters.requireCelebrityUrlSlug { celebrity =>
       val profilePhotoUrl = celebrity.profilePhoto.resizedWidth(200).getSaved(AccessPolicy.Public).url
@@ -23,7 +22,7 @@ private[controllers] trait GetCelebrityEndpoint { this: Controller =>
     }
   }
 
-  /** Returns the home page for the provided Celebrity. */
+  /** Returns the home page ActionDefinition for the provided Celebrity url slug. */
   def lookupGetCelebrity(celebrityUrlSlug: String): ActionDefinition = {
     Utils.lookupUrl(
       "WebsiteControllers.getCelebrity",

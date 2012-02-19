@@ -1,12 +1,17 @@
 package controllers.website
 
 import play.mvc.Controller
-import models.{Order, OrderStore, FulfilledOrder}
-import services.blobs.{AccessPolicy, Blobs}
+import models.{OrderStore, FulfilledOrder}
+import services.blobs.AccessPolicy
 
 private[controllers] trait GetEgraphEndpoint { this: Controller =>
   protected def orderStore: OrderStore
 
+  /**
+   * Serves up a single egraph HTML page. The egraph number is actually the number
+   * of the associated order, as several attempts to satisfy an egraph could have
+   * been made before a scuccessful one was signed.
+   */
   def getEgraph(orderId: String) = {
     // Get an order with provided ID
     orderStore.findFulfilledWithId(orderId.toLong) match {
