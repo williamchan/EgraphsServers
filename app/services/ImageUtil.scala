@@ -9,6 +9,7 @@ import com.google.inject.Inject
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import java.awt.{Transparency, Graphics, RenderingHints, Graphics2D}
 import models.ImageAsset
+import collection.immutable.List
 
 @Inject() class ImageUtil {
 
@@ -35,10 +36,25 @@ import models.ImageAsset
 
     val (signatureStrokesX, signatureStrokesY, _) = parseSignatureRawCaptureJSON(jsonStr)
 
-    val xsByStroke = messageStrokesX ++ signatureStrokesX
-    val ysByStroke = messageStrokesY ++ signatureStrokesY
+    val xsByStroke: List[List[Double]] = messageStrokesX ++ signatureStrokesX
+    val ysByStroke: List[List[Double]] = messageStrokesY ++ signatureStrokesY
 
-    val image: BufferedImage = new BufferedImage((width * scaleFactor).intValue(), (height * scaleFactor).intValue(), BufferedImage.TYPE_INT_ARGB)
+//    todo(wchan): ugh
+//    NPE if ys is None
+//    val list: List[Double] = for (ys <- ysByStroke) yield ys.max
+//    var yMax0: Double = list.max
+    var yMax0: Double = 0.0
+    for (ys <- ysByStroke) {
+      if (!ys.isEmpty) {
+        val z = ys.max
+        if (z > yMax0)
+          yMax0 = z
+      }
+    }
+    val yMax: Int = (yMax0 + 1).intValue()
+
+
+    val image: BufferedImage = new BufferedImage((width * scaleFactor).intValue(), (yMax * scaleFactor).intValue(), BufferedImage.TYPE_INT_ARGB)
     val g: Graphics2D = image.getGraphics.asInstanceOf[Graphics2D]
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
     g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
