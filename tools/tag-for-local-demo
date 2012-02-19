@@ -14,4 +14,4 @@ tag_name="local-demo_$date_portion"
 git tag -a "$tag_name" \
   -m "This commit has been tagged for use in local demoing of the egraphs product."
 
-echo "Created annotated git tag named \"$tag_name\""
+echo "Created annotated git tag named \"$tag_name\". Push it with 'git push --tags origin' when you're ready for demo machines to download and use it."
