@@ -15,8 +15,8 @@ import collection.immutable.List
 
   // TODO(wchan): Why does it run out of memory above 5?
   val scaleFactor = 2.5
-  val height = 950
-  val width = 1024
+  val defaultHeight = 950
+  val defaultWidth = 1024
   val numIncrements = 1000
 
   def createEgraphImage(signatureImage: BufferedImage, photoImage: BufferedImage, x: Int = 0, y: Int = 0): BufferedImage = {
@@ -29,7 +29,7 @@ import collection.immutable.List
     egraphImage
   }
 
-  def createSignatureImage(jsonStr: String, messageOption: Option[String]): BufferedImage = {    
+  def createSignatureImage(jsonStr: String, messageOption: Option[String]): BufferedImage = {
     // Get either the message or an empty signature
     val messageStr = messageOption.getOrElse("""{"x":[[]],"y":[[]],"t":[[]]}""")
     val (messageStrokesX, messageStrokesY, _) = parseSignatureRawCaptureJSON(messageStr)
@@ -39,22 +39,12 @@ import collection.immutable.List
     val xsByStroke: List[List[Double]] = messageStrokesX ++ signatureStrokesX
     val ysByStroke: List[List[Double]] = messageStrokesY ++ signatureStrokesY
 
-//    todo(wchan): ugh
-//    NPE if ys is None
-//    val list: List[Double] = for (ys <- ysByStroke) yield ys.max
-//    var yMax0: Double = list.max
-    var yMax0: Double = 0.0
-    for (ys <- ysByStroke) {
-      if (!ys.isEmpty) {
-        val z = ys.max
-        if (z > yMax0)
-          yMax0 = z
-      }
-    }
-    val yMax: Int = (yMax0 + 1).intValue()
+    val yMax0 = ImageUtil.getMaxDouble(ysByStroke)
+    val yMax = if (yMax0.isDefined) yMax0.get else defaultHeight
+    val bottomBorder: Int = 40 // 40 seems to work well to account for height of drawn point of signature plus shadow, scaled by scaleFactor
+    val height: Int = (yMax + bottomBorder).intValue()
 
-
-    val image: BufferedImage = new BufferedImage((width * scaleFactor).intValue(), (yMax * scaleFactor).intValue(), BufferedImage.TYPE_INT_ARGB)
+    val image: BufferedImage = new BufferedImage((defaultWidth * scaleFactor).intValue(), (height * scaleFactor).intValue(), BufferedImage.TYPE_INT_ARGB)
     val g: Graphics2D = image.getGraphics.asInstanceOf[Graphics2D]
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
     g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
@@ -315,7 +305,17 @@ import collection.immutable.List
 }
 
 object ImageUtil {
+
+  def getMaxDouble(listOfListOfDoubles: List[List[Double]]): Option[Double] = {
+    val maxYs: List[Double] = listOfListOfDoubles.map(ys =>
+      if (ys.isEmpty) 0
+      else ys.max
+    )
+    if (maxYs.isEmpty) None else Some(maxYs.max)
+  }
+
   object Conversions {
+
     class RichBufferedImage(img: BufferedImage) {
       def asByteArray(imageType: ImageAsset.ImageType) = {
         val bytesOut = new ByteArrayOutputStream()
@@ -338,4 +338,5 @@ object ImageUtil {
       new ImageEnrichedByteArray(bytes)
     }
   }
+
 }
