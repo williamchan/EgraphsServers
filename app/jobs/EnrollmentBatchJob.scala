@@ -65,7 +65,8 @@ object EnrollmentBatchJob {
     TestXyzmoBiometricServices.addUser(userId = xyzmoUID, userName = celebrity.publicName.get)
     TestXyzmoBiometricServices.addProfile(userId = xyzmoUID, profileName = xyzmoUID)
     val signatureDataContainers = for (signatureSample <- signatureSamples) yield blobs.get(SignatureSample.getXmlUrl(signatureSample.id)).get.asString
-    val isSuccessfulSignatureEnrollment = TestXyzmoBiometricServices.enrollUser(userId = xyzmoUID, profileName = xyzmoUID, signatureDataContainers = signatureDataContainers)
+    val xyzmoEnrollDynamicProfileResponse = TestXyzmoBiometricServices.enrollUser(userId = xyzmoUID, profileName = xyzmoUID, signatureDataContainers = signatureDataContainers)
+    val isSuccessfulSignatureEnrollment = xyzmoEnrollDynamicProfileResponse.isSuccessfulSignatureEnrollment
 
     println("Result of signature enrollment attempt for celebrity " + celebrity.id.toString + ": " + isSuccessfulSignatureEnrollment.toString)
 

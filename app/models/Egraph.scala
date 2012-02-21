@@ -131,7 +131,7 @@ case class Egraph(
         (Some("Failure"), None, None),
 
       verification =>
-        (Some("Success"), Some(verification.success), Some(verification.score))
+        (Some("Success"), Some(verification.success), verification.score)
     )
 
     val egraphWithSignatureMetadata = this.copy(

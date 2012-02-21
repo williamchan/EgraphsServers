@@ -14,8 +14,8 @@ class XyzmoSignatureBiometricService extends SignatureBiometricService {
     val verifyUserResponse = TestXyzmoBiometricServices.verifyUser(userId = profileId.toString, sdc)
 
     Right(SignatureVerificationMetadata(
-      success = (verifyUserResponse._2),
-      score = verifyUserResponse._3
+      success = verifyUserResponse.isMatch,
+      score = verifyUserResponse.getScore
     ))
   }
 }
@@ -28,11 +28,11 @@ class NiceSignatureBiometricService extends SignatureBiometricService {
   override def verify(signatureJson: String, profileId: String) = {
     Right(SignatureVerificationMetadata(
       success = true,
-      score = 100
+      score = Some(100)
     ))
   }
 }
 
 class SignatureBiometricsError extends RuntimeException
 
-case class SignatureVerificationMetadata(success: Boolean, score: Int)
+case class SignatureVerificationMetadata(success: Boolean, score: Option[Int])
