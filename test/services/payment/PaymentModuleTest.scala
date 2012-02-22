@@ -12,11 +12,11 @@ class PaymentModuleTest extends EgraphsUnitTest with ClosureProviders {
     underTest.get().isInstanceOf[StripePayment] should be (true)
   }
 
-  it should "return the nice implementation when 'nice' is set in application.conf" in {
+  it should "return the yes maam implementation when 'yesmaam' is set in application.conf" in {
     val (underTest, _, _, utils) = paymentProviderAndDeps
 
-    utils.requiredConfigurationProperty(any) returns "nice"
-    underTest.get().isInstanceOf[NicePayment] should be (true)
+    utils.requiredConfigurationProperty(any) returns "yesmaam"
+    underTest.get().isInstanceOf[YesMaamPayment] should be (true)
   }
 
   it should "throw an IllegalArgumentException when application.conf sets an unrecognizable setting" in {
@@ -33,7 +33,7 @@ class PaymentModuleTest extends EgraphsUnitTest with ClosureProviders {
 
   def paymentProviderAndDeps = {
     val stripeImpl = mock[StripePayment]
-    val yesMaamImpl = mock[NicePayment]
+    val yesMaamImpl = mock[YesMaamPayment]
     val utils = mock[Utils]
 
     (new PaymentProvider(stripeImpl, yesMaamImpl, utils),

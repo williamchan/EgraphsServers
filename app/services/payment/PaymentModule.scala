@@ -15,7 +15,7 @@ object PaymentModule extends AbstractModule with ScalaModule {
 
 private[payment] class PaymentProvider @Inject()(
   stripeImpl: Provider[StripePayment],
-  niceImpl: Provider[NicePayment],
+  niceImpl: Provider[YesMaamPayment],
   utils: Utils
 ) extends Provider[Payment]
 {

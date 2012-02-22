@@ -3,19 +3,19 @@ package services.payment
 import utils.EgraphsUnitTest
 import services.Finance
 
-class NicePaymentTests extends EgraphsUnitTest {
+class YesMaamPaymentTests extends EgraphsUnitTest {
   import Finance.TypeConversions._
 
-  val payment = new NicePayment
+  val payment = new YesMaamPayment
 
-  "NicePayment" should "produce a token and accept its charge" in {
+  "YesMaamPayment" should "produce a token and accept its charge" in {
     payment.bootstrap()
     val token = payment.testToken
 
     payment.charge(
       new BigDecimal(new java.math.BigDecimal(100)).toMoney(),
       token.id,
-      "This is the description, mr nice"
+      "This is the description, maam"
     )
 
     // If you're reading this I guess these commands failed to compile or threw an
