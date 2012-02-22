@@ -9,7 +9,7 @@ trait VoiceBiometricService {
  * VBG implementation of voice biometric services.
  */
 class VBGVoiceBiometricService extends VoiceBiometricService {
-  val vbg = VBGBiometricServices
+  val vbg = VBGDevRandomNumberBiometricServices
 
   def verify(audio: Array[Byte], userId: String): Either[VoiceBiometricsError, VoiceVerificationResult] = {
     // Begin the verification transaction
