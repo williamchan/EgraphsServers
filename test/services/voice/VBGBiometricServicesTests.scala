@@ -29,7 +29,7 @@ class VBGBiometricServicesTests extends UnitFlatSpec with ShouldMatchers {
   }
 
   "stitchWAVs" should "handle base cases" in {
-    VBGDevRandomNumberBiometricServices.stitchWAVs(List()) should be(None)
+    MockVBGBiometricServices.stitchWAVs(List()) should be(None)
 
     val filename = "test/files/44khz.wav"
     val result: AudioInputStream = MockVBGBiometricServices.stitchWAVs(List(getVoiceSampleBinary(filename))).get
