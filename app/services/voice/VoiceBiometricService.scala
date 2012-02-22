@@ -37,7 +37,7 @@ class VBGVoiceBiometricService extends VoiceBiometricService {
   }
 }
 
-class NiceVoiceBiometricService extends VoiceBiometricService {
+class YesMaamVoiceBiometricService extends VoiceBiometricService {
   def verify(audio: Array[Byte], userId: String) = {
     Right(new VoiceVerificationResult {
       val score = 100

@@ -10,7 +10,7 @@ import services.blobs.Blobs
 import services.db.{Schema, KeyedCaseClass, Saves}
 import org.jclouds.blobstore.domain.Blob
 import services.signature.{NiceSignatureBiometricService, SignatureBiometricService}
-import services.voice.{NiceVoiceBiometricService, VoiceBiometricService, VoiceBiometricsCode}
+import services.voice.{YesMaamVoiceBiometricService, VoiceBiometricService, VoiceBiometricsCode}
 
 case class EgraphServices @Inject() (
   store: EgraphStore,
@@ -86,7 +86,7 @@ case class Egraph(
    */
   def withNiceBiometricServices: Egraph = {
     val niceServices = services.copy(
-      voiceBiometrics = new NiceVoiceBiometricService,
+      voiceBiometrics = new YesMaamVoiceBiometricService,
       signatureBiometrics = new NiceSignatureBiometricService
     )
 

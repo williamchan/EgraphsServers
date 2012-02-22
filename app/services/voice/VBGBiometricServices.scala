@@ -1,16 +1,18 @@
 package services.voice
 
-import javax.xml.parsers.{DocumentBuilder, DocumentBuilderFactory}
-import org.xml.sax.InputSource
-import org.w3c.dom.{Node, Document}
-import java.util.Hashtable
-import java.net.{URLEncoder, URL}
 import java.io._
-import play.libs.Codec
-import services.blobs.Blobs.Conversions._
+import java.io.{ByteArrayInputStream, SequenceInputStream}
+import java.net.{URLEncoder, URL}
+import java.util.Hashtable
 import javax.net.ssl.HttpsURLConnection
-import services.blobs.Blobs
+import javax.sound.sampled.{AudioInputStream, AudioSystem}
+import javax.xml.parsers.{DocumentBuilder, DocumentBuilderFactory}
+import org.w3c.dom.{Node, Document}
+import org.xml.sax.InputSource
+import play.libs.Codec
 import services.{AppConfig, SampleRateConverter}
+import services.blobs.Blobs
+import services.blobs.Blobs.Conversions._
 
 class VBGRequest {
   private var requestType: String = ""
@@ -47,9 +49,9 @@ class VBGRequest {
     }
     parseXMLResponse(sb.toString())
     //    httpConn.disconnect()
-    
+
     println("VBGBiometricServices httpConn = " + httpConn.toString)
-    
+
     this
   }
 
@@ -202,7 +204,7 @@ object VBGBiometricServices {
     request.setParameter(_userId, userId)
     request.sendRequest()
   }
-  
+
   def requestStartVerification(userId: String): Either[VoiceBiometricsError, StartVerificationResponse] = {
     withSuccessfulRequest(sendStartVerificationRequest(userId)) { request =>
       new StartVerificationResponse(request)
@@ -235,9 +237,36 @@ object VBGBiometricServices {
     Codec.encodeBASE64(wavBinary_8kHz)
   }
 
+  // Referenced http://stackoverflow.com/questions/6381012/java-trouble-combining-more-than-2-wav-files
+  def stitchWAVs(listOfWavBinaries: List[Array[Byte]]): Option[AudioInputStream] = {
+    if (listOfWavBinaries.length > 1) {
+      val audio0: AudioInputStream = AudioSystem.getAudioInputStream(new ByteArrayInputStream(listOfWavBinaries.head))
+      val audio1: AudioInputStream = AudioSystem.getAudioInputStream(new ByteArrayInputStream(listOfWavBinaries.tail.head))
+      var audioBuilder: AudioInputStream = new AudioInputStream(
+        new SequenceInputStream(audio0, audio1),
+        audio0.getFormat,
+        audio0.getFrameLength + audio1.getFrameLength)
+
+      for (wavBinary <- listOfWavBinaries.tail.tail) {
+        val currAudio: AudioInputStream = AudioSystem.getAudioInputStream(new ByteArrayInputStream(wavBinary))
+        audioBuilder = new AudioInputStream(
+          new SequenceInputStream(audioBuilder, currAudio),
+          audioBuilder.getFormat,
+          audioBuilder.getFrameLength + currAudio.getFrameLength)
+      }
+      Some(audioBuilder)
+
+    } else if (listOfWavBinaries.length == 1) {
+      Some(AudioSystem.getAudioInputStream(new ByteArrayInputStream(listOfWavBinaries.head)))
+
+    } else {
+      None
+    }
+  }
+
   /**
    * Filters out unsuccessful VBG service requests.
-   * 
+   *
    * Returns the value of the `continue` on the Right if the `request`'s response code was
    * [[services.voice.VoiceBiometricsCode.Success]]. If the response wasn't successful but the code was found in
    * [[services.voice.VoiceBiometricsCode]], it means some code in our codebase knows how to handle the code and
