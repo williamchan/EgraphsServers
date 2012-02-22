@@ -1,14 +1,16 @@
 package services
 
+import http.PlayConfig
 import play.mvc.Router
 import play.Play
-
+import com.google.inject.Inject
+import java.util.Properties
 
 /**
  * Helpful utilities with no other place to call home
  */
-object Utils {
-
+class Utils @Inject()(@PlayConfig() playConfig: Properties)
+{
   /**
    * Turns any Iterable into a map keyed by a provided function.
    *
@@ -101,7 +103,9 @@ object Utils {
       }
     )
   }
+}
 
+object Utils extends Utils(Play.configuration) {
   /** DIY exhaustiveness-checking enum type. See https://gist.github.com/1057513 */
   trait Enum {
     import java.util.concurrent.atomic.AtomicReference //Concurrency paranoia

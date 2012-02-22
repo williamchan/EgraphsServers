@@ -1,7 +1,6 @@
 package services.payment
 
 import uk.me.lings.scalaguice.ScalaModule
-import services.inject.ClosureProviders
 import services.Utils
 import com.google.inject.{Inject, Provider, AbstractModule}
 
@@ -16,11 +15,12 @@ object PaymentModule extends AbstractModule with ScalaModule {
 
 private[payment] class PaymentProvider @Inject()(
   stripeImpl: Provider[StripePayment],
-  niceImpl: Provider[NicePayment]
+  niceImpl: Provider[NicePayment],
+  utils: Utils
 ) extends Provider[Payment]
 {
   override def get(): Payment = {
-    Utils.requiredConfigurationProperty("payment.vendor") match {
+    utils.requiredConfigurationProperty("payment.vendor") match {
       case "nice" =>
         niceImpl.get()
 

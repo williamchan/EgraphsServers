@@ -1,6 +1,7 @@
 package services
 
 import blobs.BlobModule
+import http.PlayConfig
 import payment.PaymentModule
 import signature.{SignatureBiometricService, XyzmoSignatureBiometricService}
 import uk.me.lings.scalaguice.{InjectorExtensions, ScalaModule}
@@ -8,10 +9,15 @@ import services.db.Schema
 import com.google.inject.{Singleton, Guice, AbstractModule}
 import models._
 import voice.{VoiceBiometricService, VBGVoiceBiometricService}
+import java.util.Properties
+import play.Play
 
 class AppConfig extends AbstractModule with ScalaModule {
   override def configure() {
     bind[Schema].in[Singleton]
+
+    // Play helpers
+    bind[Properties].annotatedWith[PlayConfig].toInstance(Play.configuration)
 
     // Services
     bind[Mail].toProvider(Mail.MailProvider)
