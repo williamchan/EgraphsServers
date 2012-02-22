@@ -116,8 +116,8 @@ trait SignatureBiometricServicesTrait {
     val json: GetSignatureDataContainerFromJSON = new GetSignatureDataContainerFromJSON()
     json.setJsonData(jsonStr)
     val sdcFromJSON: Option[SDCFromJSONStub] = getSDCFromJSON
-    val response: GetSignatureDataContainerFromJSONResponse = sdcFromJSON.get.getSignatureDataContainerFromJSON(json)
-    response.getGetSignatureDataContainerFromJSONResult
+    val getSignatureDataContainerFromJSONResponse: GetSignatureDataContainerFromJSONResponse = sdcFromJSON.get.getSignatureDataContainerFromJSON(json)
+    getSignatureDataContainerFromJSONResponse.getGetSignatureDataContainerFromJSONResult
   }
 
   // ====================================== Services
