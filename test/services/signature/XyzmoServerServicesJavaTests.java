@@ -1,7 +1,6 @@
 package services.signature;
 
 import junit.framework.TestCase;
-import scala.Tuple3;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,22 +21,13 @@ public class XyzmoServerServicesJavaTests extends TestCase {
         String signature4 = getSignatureString(new File(path, "xyzmo_signature4.xml"));
         String signature5 = getSignatureString(new File(path, "xyzmo_signature5.xml"));
         String signature6 = getSignatureString(new File(path, "xyzmo_signature6.xml"));
+        String signature7 = getSignatureString(new File(path, "xyzmo_signature7.xml"));
+        String signature_nomatch = getSignatureString(new File(path, "xyzmo_signature_nomatch.xml"));
 
-//        Tuple3<String,String,String> stringStringStringTuple3 = TestXyzmoBiometricServices.addUser(userId, userName);
-//        stringStringStringTuple3.getClass();
-
+//        XyzmoBiometricServices.addUser(userId, userName);
 //        XyzmoBiometricServices.addProfile(userId, profileName);
-
 //        XyzmoBiometricServices.javatest_EnrollUser(userId, profileName, signature1, signature2, signature3, signature4, signature5, signature6);
-
-//        WebServiceUserAndProfileStub.ResultBase resultBase = XyzmoBiometricServices.deleteUser("dzj");
-//        resultBase.getBaseResult();
-
-//        Tuple3<String, String, String> tuple3 = TestXyzmoBiometricServices.addUser(userId, userName);
-//        TestXyzmoBiometricServices.addProfile(userId, profileName);
-//        TestXyzmoBiometricServices.javatest_EnrollUser(userId, profileName, signature1, signature2, signature3, signature4, signature5, signature6);
-//        Object tuple31 = TestXyzmoBiometricServices.verifyUser(userId, signature6);
-//        tuple31.getClass();
+//        XyzmoBiometricServices.verifyUser(userId, signature7);
     }
 
     private static String getSignatureString(File file) throws Exception {

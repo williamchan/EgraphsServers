@@ -68,10 +68,6 @@ trait SignatureBiometricServicesTrait {
     xyzmoAddProfileResponse
   }
 
-  def javatest_EnrollUser(userId: String, profileName: String, signature1: String, signature2: String, signature3: String, signature4: String, signature5: String, signature6: String) {
-    enrollUser(userId, profileName, List[String](signature1, signature2, signature3, signature4, signature5, signature6))
-  }
-
   // TODO(wchan): What to do if preceding call to addProfile is done for profileName that already exists?
   def enrollUser(userId: String, profileName: String, signatureDataContainers: List[String]): XyzmoEnrollDynamicProfileResponse = {
     val SignatureDataContainerXmlStrArr: WebServiceBiometricPartStub.ArrayOfString = new WebServiceBiometricPartStub.ArrayOfString
@@ -102,6 +98,7 @@ trait SignatureBiometricServicesTrait {
     else {
       log.error("Error during EnrollDynamicProfile_v1: " + xyzmoEnrollDynamicProfileResponse.getErrorMsg.getOrElse(None))
     }
+    println("enrollDynamicProfile_v1Response " + enrollDynamicProfile_v1Response.getEnrollDynamicProfile_v1Result.getOkInfo)
     xyzmoEnrollDynamicProfileResponse
   }
 
@@ -207,6 +204,8 @@ abstract class XyzmoUserAndProfileResponse(val userAndProfileResultBase: WebServ
     val errorInfo = userAndProfileResultBase.getErrorInfo
     if (errorInfo != null) Some(errorInfo.getErrorMsg) else None
   }
+
+  override def toString = List("BaseResult: " + getBaseResult, "Error: " + getError, "ErrorMsg: " + getErrorMsg).mkString(", ")
 }
 
 class XyzmoAddUserResponse(val user_Add_v1Response: User_Add_v1Response)
@@ -217,11 +216,15 @@ class XyzmoDeleteUserResponse(val user_Delete_v1Response: User_Delete_v1Response
 
 class XyzmoAddProfileResponse(val profile_Add_v1Response: Profile_Add_v1Response)
   extends XyzmoUserAndProfileResponse(profile_Add_v1Response.getProfile_Add_v1Result) {
+
+
   def getProfileId: Option[String] = {
     val okInfo = profile_Add_v1Response.getProfile_Add_v1Result.getOkInfo
     val profileInfo = if (okInfo != null) Some(okInfo.getProfileInfo) else None
     if (profileInfo.isDefined) Some(profileInfo.get.getProfileId) else None
   }
+
+  override def toString = List(super.toString, "ProfileId: " + getProfileId).mkString(", ")
 }
 
 abstract class XyzmoBiometricPartResponse(val biometricPartResultBase: WebServiceBiometricPartStub.ResultBase) {
@@ -238,13 +241,19 @@ abstract class XyzmoBiometricPartResponse(val biometricPartResultBase: WebServic
     val errorInfo = biometricPartResultBase.getErrorInfo
     if (errorInfo != null) Some(errorInfo.getErrorMsg) else None
   }
+
+  override def toString = List("BaseResult: " + getBaseResult, "Error: " + getError, "ErrorMsg: " + getErrorMsg).mkString(", ")
 }
 
 class XyzmoEnrollDynamicProfileResponse(val enrollDynamicProfile_v1Response: EnrollDynamicProfile_v1Response)
   extends XyzmoBiometricPartResponse(enrollDynamicProfile_v1Response.getEnrollDynamicProfile_v1Result) {
 
   def isSuccessfulSignatureEnrollment: Boolean = {
-    getEnrollResult.getOrElse(None) == EnrollResultEnum.EnrollCompleted.getValue || getError.getOrElse(None) == WebServiceBiometricPartStub.ErrorStatus.ProfileAlreadyEnrolled.getValue
+    getEnrollResult.getOrElse(None) == EnrollResultEnum.EnrollCompleted.getValue
+  }
+
+  def isProfileAlreadyEnrolled: Boolean = {
+    getError.getOrElse(None) == WebServiceBiometricPartStub.ErrorStatus.ProfileAlreadyEnrolled.getValue
   }
 
   def getEnrollResult: Option[String] = {
@@ -268,16 +277,26 @@ class XyzmoEnrollDynamicProfileResponse(val enrollDynamicProfile_v1Response: Enr
     val okInfo = enrollDynamicProfile_v1Response.getEnrollDynamicProfile_v1Result.getOkInfo
     val rejectedSignaturesSOAPObject = if (okInfo != null) Some(okInfo.getRejectedSignatures) else None
     val rejectedSignatureArray = if (rejectedSignaturesSOAPObject.isDefined) Some(rejectedSignaturesSOAPObject.get.getRejectedSignature) else None
+
     if (rejectedSignatureArray.isDefined) {
-      var rejectedSignaturesSummary: String = rejectedSignatureArray.get + " signature rejected. Reasons: "
-      for (rejectedSignature <- rejectedSignatureArray.get) {
-        rejectedSignaturesSummary += rejectedSignature.getIndex + ") " + rejectedSignature.getReason.toString + ". "
+      if (rejectedSignatureArray.get != null && rejectedSignatureArray.get.size > 0) {
+        var rejectedSignaturesSummary: String = rejectedSignatureArray.get + " signature rejected. Reasons: "
+        for (rejectedSignature <- rejectedSignatureArray.get) {
+          val index: Int = rejectedSignature.getIndex
+          val reasonString: String = rejectedSignature.getReason.toString
+          rejectedSignaturesSummary += index + ") " + reasonString + ". "
+        }
+        // todo(wchan): Test this path in SignatureBiometricServicesTraitTests
+        return Some(rejectedSignaturesSummary)
       }
-      Some(rejectedSignaturesSummary)
-    } else {
-      None
     }
+
+    None
   }
+
+  override def toString = List(super.toString, "EnrollResult: " + getEnrollResult, "ProfileId: " + getProfileId, "NrEnrolled: " + getNrEnrolled,
+    "isSuccessfulSignatureEnrollment: " + isSuccessfulSignatureEnrollment, "isProfileAlreadyEnrolled: " + isProfileAlreadyEnrolled,
+    "getRejectedSignaturesSummary: " + getRejectedSignaturesSummary).mkString(", ")
 }
 
 class XyzmoVerifyUserResponse(val verifyUserBySignatureDynamicToDynamic_v1Response: VerifyUserBySignatureDynamicToDynamic_v1Response)
@@ -292,4 +311,6 @@ class XyzmoVerifyUserResponse(val verifyUserBySignatureDynamicToDynamic_v1Respon
     val okInfo = verifyUserBySignatureDynamicToDynamic_v1Response.getVerifyUserBySignatureDynamicToDynamic_v1Result.getOkInfo
     if (okInfo != null) Some(okInfo.getScore) else None
   }
+
+  override def toString = List(super.toString, "isMatch: " + isMatch, "Score: " + getScore).mkString(", ")
 }
