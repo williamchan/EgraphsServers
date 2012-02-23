@@ -6,7 +6,7 @@ import services.Time
 import services.blobs.Blobs
 import Blobs.Conversions._
 import services.db.{KeyedCaseClass, Schema, Saves}
-import services.signature.TestXyzmoBiometricServices
+import services.signature.XyzmoBiometricServices
 import com.google.inject.Inject
 import services.AppConfig
 
@@ -42,7 +42,7 @@ case class SignatureSample(
 
   def putXyzmoSignatureDataContainerOnBlobstore = {
     val jsonStr: String = services.blobs.get(SignatureSample.getJsonUrl(id)).get.asString
-    val sdc = TestXyzmoBiometricServices.getSignatureDataContainerFromJSON(jsonStr)
+    val sdc = XyzmoBiometricServices.getSignatureDataContainerFromJSON(jsonStr)
     services.blobs.put(SignatureSample.getXmlUrl(id), sdc.getBytes)
     sdc
   }

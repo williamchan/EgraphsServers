@@ -23,7 +23,7 @@ class VBGBiometricServicesTests extends UnitFlatSpec with ShouldMatchers {
     val targetFile = "test/files/stitched_3x.wav"
     val resultFile = Play.getFile(targetFile)
 
-    val appendedFiles = MockVBGBiometricServices.stitchWAVs(List(getVoiceSampleBinary(filename), getVoiceSampleBinary(filename), getVoiceSampleBinary(filename)))
+    val appendedFiles: Option[AudioInputStream] = MockVBGBiometricServices.stitchWAVs(List(getVoiceSampleBinary(filename), getVoiceSampleBinary(filename), getVoiceSampleBinary(filename)))
     AudioSystem.write(appendedFiles.get, AudioFileFormat.Type.WAVE, resultFile)
     Play.getFile(targetFile).length() should be(921166)
   }

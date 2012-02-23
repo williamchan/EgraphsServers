@@ -4,9 +4,9 @@ import org.squeryl.PrimitiveTypeMode._
 import play.jobs._
 import services.blobs.Blobs
 import Blobs.Conversions._
-import services.signature.TestXyzmoBiometricServices
+import services.signature.XyzmoBiometricServices
 import services.db.Schema
-import services.voice.{VBGRequest, VBGDevRandomNumberBiometricServices}
+import services.voice.{VBGRequest, VBGDevFreeSpeechBiometricServices}
 import models._
 import services.AppConfig
 
@@ -62,10 +62,10 @@ object EnrollmentBatchJob {
     // TODO(wchan): There has to be a better way to do this... contact Xyzmo about user management.
     val xyzmoUID: String = celebrity.getXyzmoUID()
     //    XyzmoBiometricServices.deleteUser(userId = xyzmoUID)
-    TestXyzmoBiometricServices.addUser(userId = xyzmoUID, userName = celebrity.publicName.get)
-    TestXyzmoBiometricServices.addProfile(userId = xyzmoUID, profileName = xyzmoUID)
+    XyzmoBiometricServices.addUser(userId = xyzmoUID, userName = celebrity.publicName.get)
+    XyzmoBiometricServices.addProfile(userId = xyzmoUID, profileName = xyzmoUID)
     val signatureDataContainers = for (signatureSample <- signatureSamples) yield blobs.get(SignatureSample.getXmlUrl(signatureSample.id)).get.asString
-    val xyzmoEnrollDynamicProfileResponse = TestXyzmoBiometricServices.enrollUser(userId = xyzmoUID, profileName = xyzmoUID, signatureDataContainers = signatureDataContainers)
+    val xyzmoEnrollDynamicProfileResponse = XyzmoBiometricServices.enrollUser(userId = xyzmoUID, profileName = xyzmoUID, signatureDataContainers = signatureDataContainers)
     val isSuccessfulSignatureEnrollment = xyzmoEnrollDynamicProfileResponse.isSuccessfulSignatureEnrollment || xyzmoEnrollDynamicProfileResponse.isProfileAlreadyEnrolled
 
     println("Result of signature enrollment attempt for celebrity " + celebrity.id.toString + ": " + isSuccessfulSignatureEnrollment.toString)
@@ -74,14 +74,14 @@ object EnrollmentBatchJob {
   }
 
   private def sendStartEnrollmentRequest(celebrity: Celebrity): VBGRequest = {
-    val startEnrollmentRequest = VBGDevRandomNumberBiometricServices.sendStartEnrollmentRequest(celebrity.id.toString, false)
+    val startEnrollmentRequest = VBGDevFreeSpeechBiometricServices.sendStartEnrollmentRequest(celebrity.id.toString, false)
     if (startEnrollmentRequest.getResponseValue(VBGRequest._errorCode) == "0") {
       // First-time enrollment
       startEnrollmentRequest
     }
     else {
       // Re-enrollment
-      VBGDevRandomNumberBiometricServices.sendStartEnrollmentRequest(celebrity.id.toString, true)
+      VBGDevFreeSpeechBiometricServices.sendStartEnrollmentRequest(celebrity.id.toString, true)
     }
   }
 
@@ -94,7 +94,7 @@ object EnrollmentBatchJob {
 
     var atLeastOneUsableSample = false
     for (voiceSample <- voiceSamples) {
-      val audioCheckRequest = VBGDevRandomNumberBiometricServices.sendAudioCheckRequest(transactionId, VoiceSample.getWavUrl(voiceSample.id))
+      val audioCheckRequest = VBGDevFreeSpeechBiometricServices.sendAudioCheckRequest(transactionId, VoiceSample.getWavUrl(voiceSample.id))
       val errorCode = audioCheckRequest.getResponseValue(VBGRequest._errorCode)
       if (errorCode == "0") atLeastOneUsableSample = true
       val usableTime = audioCheckRequest.getResponseValue(VBGRequest._usableTime)
@@ -106,10 +106,10 @@ object EnrollmentBatchJob {
       return false
     }
 
-    val enrollUserRequest = VBGDevRandomNumberBiometricServices.sendEnrollUserRequest(transactionId)
+    val enrollUserRequest = VBGDevFreeSpeechBiometricServices.sendEnrollUserRequest(transactionId)
     val enrollmentSuccessValue = enrollUserRequest.getResponseValue(VBGRequest._success)
 
-    VBGDevRandomNumberBiometricServices.sendFinishEnrollTransactionRequest(transactionId, enrollmentSuccessValue)
+    VBGDevFreeSpeechBiometricServices.sendFinishEnrollTransactionRequest(transactionId, enrollmentSuccessValue)
 
     val isSuccessfulVoiceEnrollment = enrollmentSuccessValue == "true"
 
