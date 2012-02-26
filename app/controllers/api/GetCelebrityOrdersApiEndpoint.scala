@@ -21,15 +21,11 @@ private[controllers] trait GetCelebrityOrdersApiEndpoint { this: Controller =>
   def getCelebrityOrders(signerActionable: Option[Boolean]) = {
     celebFilters.requireCelebrityAccount { (account, celebrity) =>
       signerActionable match {
-        case None =>
+        case None | Some(false) =>
           Error("Please pass in signerActionable=true")
 
-        case Some(false) =>
-          Error("signerActionable=false is not a supported filter")
-
         case _ =>
-          val filters = Nil ++ (for (trueValue <- signerActionable) yield orderQueryFilters.actionableOnly)
-          val orders = orderStore.findByCelebrity(celebrity.id, filters: _*)
+          val orders = orderStore.findByCelebrity(celebrity.id, orderQueryFilters.actionableOnly)
           val ordersAsMaps = orders.map(order => order.renderedForApi)
 
           Serializer.SJSON.toJSON(ordersAsMaps)
