@@ -3,10 +3,10 @@ package controllers
 import api._
 import play.mvc.Controller
 import services.http.{OrderRequestFilters, CelebrityAccountRequestFilters, DBTransaction}
-import services.Mail
 import models.{OrderQueryFilters, EnrollmentBatchServices, OrderStore}
 
 object ApiControllers extends Controller
+  with GetCelebrityEnrollmentTemplateApiEndpoint
   with GetCelebrityApiEndpoint
   with GetCelebrityProductsApiEndpoint
   with GetCelebrityOrdersApiEndpoint
