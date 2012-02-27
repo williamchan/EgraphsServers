@@ -4,11 +4,11 @@ import play.mvc._
 import services.blobs.Blobs.Conversions._
 import math.BigDecimal._
 import play.Play
-import models.{Account, Celebrity}
 import services.AppConfig
 import services.http.DBTransaction
 import services.blobs.Blobs
 import services.db.Schema
+import models.{EnrollmentStatus, Account, Celebrity}
 
 object TestControllers extends Controller
 with DBTransaction {
@@ -19,28 +19,29 @@ with DBTransaction {
     schema.scrub()
     blobs.scrub()
 
-    createCelebrity("Erem", "Boto", "erem@egraphs.com")
-    createCelebrity("Andrew", "Smith", "andrew@egraphs.com")
-    createCelebrity("David", "Auld", "david@egraphs.com")
-    createCelebrity("Eric", "Feeny", "eric@egraphs.com")
-    createCelebrity("Will", "Chan", "will@egraphs.com")
-    createCelebrity("Zach", "Apter", "zachapter@gmail.com")
-    createCelebrity("Brian", "Auld", "bauld@raysbaseball.com")
-    createCelebrity("Michael", "Kalt", "mkalt@raysbaseball.com")
-    createCelebrity("Matt", "Silverman", "msilverman@raysbaseball.com")
-    createCelebrity("Gabe", "Kapler", "gabe@egraphs.com")
+    createCelebrity("Erem", "Boto", "erem@egraphs.com", enrollmentStatus = EnrollmentStatus.Enrolled)
+    createCelebrity("Andrew", "Smith", "andrew@egraphs.com", enrollmentStatus = EnrollmentStatus.Enrolled)
+    createCelebrity("David", "Auld", "david@egraphs.com", enrollmentStatus = EnrollmentStatus.Enrolled)
+    createCelebrity("Eric", "Feeny", "eric@egraphs.com", enrollmentStatus = EnrollmentStatus.Enrolled)
+    createCelebrity("Will", "Chan", "will@egraphs.com", enrollmentStatus = EnrollmentStatus.Enrolled)
+    createCelebrity("Zach", "Apter", "zachapter@gmail.com", enrollmentStatus = EnrollmentStatus.Enrolled)
+    createCelebrity("Brian", "Auld", "bauld@raysbaseball.com", enrollmentStatus = EnrollmentStatus.Enrolled)
+    createCelebrity("Michael", "Kalt", "mkalt@raysbaseball.com", enrollmentStatus = EnrollmentStatus.Enrolled)
+    createCelebrity("Matt", "Silverman", "msilverman@raysbaseball.com", enrollmentStatus = EnrollmentStatus.Enrolled)
+    createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", enrollmentStatus = EnrollmentStatus.Enrolled)
 
     "Alpha Testers created!"
   }
 
-  private def createCelebrity(firstName: String, lastName: String, email: String) {
+  private def createCelebrity(firstName: String, lastName: String, email: String, enrollmentStatus: EnrollmentStatus = EnrollmentStatus.NotEnrolled) {
     println("Creating Celebrity " + email + " ...")
 
     val celebrity = Celebrity(
       firstName = Some(firstName),
       lastName = Some(lastName),
       publicName = Some("Alpha " + firstName),
-      description = Some("Today's Sriracha is tomorrow's salsa.")
+      description = Some("Today's Sriracha is tomorrow's salsa."),
+      enrollmentStatusValue = enrollmentStatus.value
     ).save()
 
     Account(email = email,
@@ -61,9 +62,10 @@ with DBTransaction {
 
   }
 
-  def script() {
-    println("System getProperty javax.net.ssl.trustStore = " + System.getProperty("javax.net.ssl.trustStore"))
-    val startEnrollmentRequest = services.voice.VBGDevRandomNumberBiometricServices.sendStartEnrollmentRequest("pls", false)
-    println(startEnrollmentRequest.getResponseValue("errorcode"))
+  def script = {
+//    println("System getProperty javax.net.ssl.trustStore = " + System.getProperty("javax.net.ssl.trustStore"))
+//    val startEnrollmentRequest = services.voice.VBGDevRandomNumberBiometricServices.sendStartEnrollmentRequest("pls", false)
+//    println(startEnrollmentRequest.getResponseValue("errorcode"))
+    sjson.json.Serializer.SJSON.toJSON(Map("bees.api.name" -> Play.configuration.getProperty("bees.api.name")))
   }
 }
