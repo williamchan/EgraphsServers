@@ -46,7 +46,7 @@ class XyzmoBiometricServicesTests extends UnitFlatSpec with ShouldMatchers {
     addProfileResponse.getBaseResult should be(WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue)
     addProfileResponse.getError should be(None)
     addProfileResponse.getErrorMsg should be(None)
-    val profileId = addProfileResponse.getProfileId.get
+    val profileId = addProfileResponse.getXyzmoProfileId.get
     (profileId.length() > 0) should be(true)
 
     val enrollUserResponse: XyzmoEnrollDynamicProfileResponse = XyzmoBiometricServices.enrollUser(userId, profileName, List(signature1, signature2, signature3, signature4, signature5, signature6))

@@ -30,7 +30,7 @@ class SignatureBiometricServicesTraitTests extends UnitFlatSpec with ShouldMatch
     addProfileResponse.getBaseResult should be(WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue)
     addProfileResponse.getError should be(None)
     addProfileResponse.getErrorMsg should be(None)
-    addProfileResponse.getProfileId.get should be("profile" + testuserid)
+    addProfileResponse.getXyzmoProfileId.get should be("profile" + testuserid)
   }
 
   it should "test XyzmoEnrollDynamicProfileResponse" in {

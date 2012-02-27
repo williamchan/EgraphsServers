@@ -11,13 +11,18 @@ import java.io.{File, ByteArrayOutputStream}
 class VBGDevFreeSpeechBiometricServicesTests extends UnitFlatSpec with ShouldMatchers {
 
 //    "vbg" should "generate two enrollment samples as WAVs" in {
-//      val will1AudioLocations = getAudioFileLocations("test/files/will1")
+////      val megawillAudioLocations: List[String] = getAudioFileLocations("test/files/megawill", numFiles = 2)
+////      val megawillAudioFiles = getAudioFilesFromFileLocations(megawillAudioLocations)
+////      val megawillAudioStitched : Option[AudioInputStream] = VBGDevFreeSpeechBiometricServices.stitchWAVs(megawillAudioFiles)
+////      val megastream: AudioInputStream = megawillAudioStitched.get
+////      AudioSystem.write(megastream, AudioFileFormat.Type.WAVE, new File("tmp/blobstore/egraphs-test/megasample.wav"))
+//
+//      val will1AudioLocations: List[String] = getAudioFileLocations("test/files/will1")
 //      val will1AudioFiles = getAudioFilesFromFileLocations(will1AudioLocations)
 //      val will1AudioStitched : Option[AudioInputStream] = VBGDevFreeSpeechBiometricServices.stitchWAVs(will1AudioFiles)
 //      val stream1: AudioInputStream = will1AudioStitched.get
 //      AudioSystem.write(stream1, AudioFileFormat.Type.WAVE, new File("tmp/blobstore/egraphs-test/sample1.wav"))
-//
-//      val will2AudioLocations = getAudioFileLocations("test/files/will2")
+//      val will2AudioLocations: List[String] = getAudioFileLocations("test/files/will2")
 //      val will2AudioFiles = getAudioFilesFromFileLocations(will2AudioLocations)
 //      val will2AudioStitched : Option[AudioInputStream] = VBGDevFreeSpeechBiometricServices.stitchWAVs(will2AudioFiles)
 //      val stream2: AudioInputStream = will2AudioStitched.get
@@ -29,22 +34,52 @@ class VBGDevFreeSpeechBiometricServicesTests extends UnitFlatSpec with ShouldMat
 //    val transactionId: String = startEnrollmentRequest.getResponseValue(VBGRequest._transactionId)
 //    println("enrollment transactionId " + transactionId)
 //
-//    var checkRequest1: VBGRequest = VBGDevFreeSpeechBiometricServices.sendAudioCheckRequest(transactionId, "sample1.wav")
-//    println(checkRequest1.getResponseValue(VBGRequest._errorCode))
-//    println(checkRequest1.getResponseValue(VBGRequest._usableTime))
+////  Enrollment with 1 sample:
+////    sendAudioCheckRequest(transactionId, "megasample.wav")
 //
-//    var checkRequest2: VBGRequest = VBGDevFreeSpeechBiometricServices.sendAudioCheckRequest(transactionId, "sample2.wav")
-//    println(checkRequest2.getResponseValue(VBGRequest._errorCode))
-//    println(checkRequest2.getResponseValue(VBGRequest._usableTime))
+////  Enrollment with 1 sample with Feeny mixed in... Successfully enrolls still!
+////    sendAudioCheckRequest(transactionId, "noisy_megasample.wav")
 //
-//    var enrollUserRequest: VBGRequest = VBGDevFreeSpeechBiometricServices.sendEnrollUserRequest(transactionId)
+////  Enrolling with 2 samples works
+////    sendAudioCheckRequest(transactionId, "sample1.wav")
+////    sendAudioCheckRequest(transactionId, "sample2.wav")
+//
+////    Trying to enroll with 20 separate samples:
+////    sendAudioCheckRequest(transactionId, "audio1.wav")
+////    sendAudioCheckRequest(transactionId, "audio2.wav")
+////    sendAudioCheckRequest(transactionId, "audio3.wav")
+////    sendAudioCheckRequest(transactionId, "audio4.wav")
+////    sendAudioCheckRequest(transactionId, "audio5.wav")
+////    sendAudioCheckRequest(transactionId, "audio6.wav")
+////    sendAudioCheckRequest(transactionId, "audio7.wav")
+////    sendAudioCheckRequest(transactionId, "audio8.wav")
+////    sendAudioCheckRequest(transactionId, "audio9.wav")
+////    sendAudioCheckRequest(transactionId, "audio10.wav")
+////    sendAudioCheckRequest(transactionId, "audio1 copy.wav")
+////    sendAudioCheckRequest(transactionId, "audio2 copy.wav")
+////    sendAudioCheckRequest(transactionId, "audio3 copy.wav")
+////    sendAudioCheckRequest(transactionId, "audio4 copy.wav")
+////    sendAudioCheckRequest(transactionId, "audio5 copy.wav")
+////    sendAudioCheckRequest(transactionId, "audio6 copy.wav")
+////    sendAudioCheckRequest(transactionId, "audio7 copy.wav")
+////    sendAudioCheckRequest(transactionId, "audio8 copy.wav")
+////    sendAudioCheckRequest(transactionId, "audio9 copy.wav")
+////    sendAudioCheckRequest(transactionId, "audio10 copy.wav")
+//
+//    val enrollUserRequest: VBGRequest = VBGDevFreeSpeechBiometricServices.sendEnrollUserRequest(transactionId)
 //    println(enrollUserRequest.getResponseValue(VBGRequest._errorCode))
 //    val successValue = enrollUserRequest.getResponseValue(VBGRequest._success)
 //    println(successValue)
 //
-//    var finishRequest: VBGRequest = VBGDevFreeSpeechBiometricServices.sendFinishEnrollTransactionRequest(transactionId, successValue)
+//    val finishRequest: VBGRequest = VBGDevFreeSpeechBiometricServices.sendFinishEnrollTransactionRequest(transactionId, successValue)
 //    println(finishRequest.getResponseValue(VBGRequest._errorCode))
 //  }
+
+  private def sendAudioCheckRequest(transactionId: String, sampleFilename: String) {
+    val checkRequest1: VBGRequest = VBGDevFreeSpeechBiometricServices.sendAudioCheckRequest(transactionId, sampleFilename)
+    println(checkRequest1.getResponseValue(VBGRequest._errorCode))
+    println(checkRequest1.getResponseValue(VBGRequest._usableTime))
+  }
 
 //  "vbg" should "verify" in {
 //    val wavBinary: Array[Byte] = getVoiceSampleBinary("test/verify1.wav")
@@ -81,7 +116,7 @@ class VBGDevFreeSpeechBiometricServicesTests extends UnitFlatSpec with ShouldMat
 //    val usableTime: String = verifySampleRequest.getResponseValue(VBGRequest._usableTime)
 //    println(List(successValue, score, usableTime).mkString(", "))
 //
-//    var finishRequest: VBGRequest = VBGDevFreeSpeechBiometricServices.sendFinishVerifyTransactionRequest(transactionId, successValue, score)
+//    val finishRequest: VBGRequest = VBGDevFreeSpeechBiometricServices.sendFinishVerifyTransactionRequest(transactionId, successValue, score)
 //    println("finishRequest errorcode " + finishRequest.getResponseValue(VBGRequest._errorCode))
 //  }
 
@@ -91,8 +126,8 @@ class VBGDevFreeSpeechBiometricServicesTests extends UnitFlatSpec with ShouldMat
     for (audioLocation <- will1AudioLocations) yield getVoiceSampleBinary(audioLocation)
   }
 
-  private def getAudioFileLocations(base: String): List[String] = {
-    val seq: IndexedSeq[String] = for (i <- 1 until 11) yield {
+  private def getAudioFileLocations(base: String, numFiles: Int = 10): List[String] = {
+    val seq: IndexedSeq[String] = for (i <- 1 until (numFiles+1)) yield {
       base + "/audio" + i + ".wav"
     }
     seq.toList

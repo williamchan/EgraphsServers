@@ -2,7 +2,7 @@ package services.signature
 
 import org.apache.log4j.Logger
 
-object TestXyzmoBiometricServices extends SignatureBiometricServicesTrait {
+object TestXyzmoBiometricServices extends XyzmoBiometricServicesBase {
 
   protected val log: Logger = Logger.getLogger(TestXyzmoBiometricServices.getClass)
   protected val isBasicAuth: Boolean = false

@@ -6,7 +6,7 @@ import com.xyzmo.wwww.biometricserver.WebServiceBiometricPartStub._
 import com.xyzmo.wwww.biometricserver.{WebServiceBiometricPartStub, WebServiceUserAndProfileStub}
 
 // todo(wchan): This is ready to use in place of skipBiometrics
-object MockXyzmoBiometricServices extends SignatureBiometricServicesTrait {
+object MockXyzmoBiometricServices extends XyzmoBiometricServicesBase {
 
   protected val log: Logger = Logger.getLogger(MockXyzmoBiometricServices.getClass)
   protected val isBasicAuth: Boolean = false

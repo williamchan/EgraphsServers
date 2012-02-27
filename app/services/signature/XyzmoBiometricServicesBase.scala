@@ -7,7 +7,7 @@ import com.xyzmo.wwww.biometricserver.WebServiceUserAndProfileStub._
 import org.apache.axis2.transport.http.{HTTPConstants, HttpTransportProperties}
 import org.apache.log4j.Logger
 
-trait SignatureBiometricServicesTrait {
+trait XyzmoBiometricServicesBase {
 
   protected val log: Logger
   protected val isBasicAuth: Boolean
@@ -217,14 +217,13 @@ class XyzmoDeleteUserResponse(val user_Delete_v1Response: User_Delete_v1Response
 class XyzmoAddProfileResponse(val profile_Add_v1Response: Profile_Add_v1Response)
   extends XyzmoUserAndProfileResponse(profile_Add_v1Response.getProfile_Add_v1Result) {
 
-
-  def getProfileId: Option[String] = {
+  def getXyzmoProfileId: Option[String] = {
     val okInfo = profile_Add_v1Response.getProfile_Add_v1Result.getOkInfo
     val profileInfo = if (okInfo != null) Some(okInfo.getProfileInfo) else None
     if (profileInfo.isDefined) Some(profileInfo.get.getProfileId) else None
   }
 
-  override def toString = List(super.toString, "ProfileId: " + getProfileId).mkString(", ")
+  override def toString = List(super.toString, "XyzmoProfileId: " + getXyzmoProfileId).mkString(", ")
 }
 
 abstract class XyzmoBiometricPartResponse(val biometricPartResultBase: WebServiceBiometricPartStub.ResultBase) {
