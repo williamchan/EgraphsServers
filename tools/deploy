@@ -8,4 +8,4 @@ PROJ_BASE=$SCRIPT_DIR/..
 
 cd $PROJ_BASE
 
-play bees:app:deploy --%prod
+play bees:app:deploy --%live
