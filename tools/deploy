@@ -2,10 +2,37 @@
 #
 # Deploys the application to our hosting...which is currently Cloudbees.
 #
+# $1 - The server to which to deploy. Options:
+#        'live' - the publicly-facing egraphs server.
+#        'demo' - the demo server, used for hard-wired.
+#        'staging' - the staging server.
+#
 
+
+# Parse the deployment target
+DEPLOY_TARGET=$1
+
+case "$DEPLOY_TARGET" in
+  'live'|'demo'|'staging')
+    # All these options are OK
+	;;
+  *)
+	# Error us out -- no valid deployment target
+    printf "\e[00;31mERROR: '$DEPLOY_TARGET' is not a valid deployment target. Please provide a valid deployment target.\e[00m\n"
+    echo ""
+    echo "Usage: "
+    echo "    tools/deploy [deployment target]"
+    echo "Valid deployment targets are 'live', 'demo', and 'staging'. (omit the single quotes)"
+    exit 1
+	;;  
+esac
+
+printf "\e[00;32mDeploying application to target '$DEPLOY_TARGET'.\e[00m\n\n"
+
+# OK everything's groovy...let's do the deploy from the project base folder
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PROJ_BASE=$SCRIPT_DIR/..
 
 cd $PROJ_BASE
 
-play bees:app:deploy --%live
+play bees:app:deploy --%$DEPLOY_TARGET
