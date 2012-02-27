@@ -1,21 +1,16 @@
 package controllers.api
 
-import org.scalatest.matchers.ShouldMatchers
 import org.junit.Assert._
-import org.specs2.mock.Mockito
 import play.mvc.Controller
 import services.http.CelebrityAccountRequestFilters
 import models.{Product, Celebrity, Account}
 import sjson.json.Serializer
-import play.test.{FunctionalTest, UnitFlatSpec}
+import play.test.FunctionalTest
 import utils.FunctionalTestUtils.CleanDatabaseAfterEachTest
 import org.junit.Test
-import utils.{TestConstants, FunctionalTestUtils}
+import utils.{EgraphsUnitTest, TestConstants, FunctionalTestUtils}
 
-class GetCelebrityProductsApiEndpointTests extends UnitFlatSpec
-  with ShouldMatchers
-  with Mockito
-{
+class GetCelebrityProductsApiEndpointTests extends EgraphsUnitTest {
   "GetCelebrityProductsApiEndpoint" should "return the serialized products" in {
     val mockFilters = mock[CelebrityAccountRequestFilters]
     
