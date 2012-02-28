@@ -64,29 +64,6 @@ trait VBGBiometricServicesBase {
     request.sendRequest(_url)
   }
 
-  def sendFinishVerifyTransactionRequest(transactionId: String, successValue: String, score: String): VBGRequest = {
-    val request = new VBGRequest
-    request.setRequestType(VBGRequest._FinishTransaction)
-    request.setParameter(VBGRequest._clientName, _myClientName)
-    request.setParameter(VBGRequest._clientKey, _myClientKey)
-    request.setParameter(VBGRequest._transactionId, transactionId)
-    request.setParameter(VBGRequest._success, successValue)
-    request.setParameter(VBGRequest._score, score)
-    request.sendRequest(_url)
-  }
-
-  def requestFinishVerifyTransaction(transactionId: String, successValue: String, score: String) {
-    val request = sendFinishVerifyTransactionRequest(transactionId, successValue, score)
-    val code = request.getResponseValue(VBGRequest._errorCode)
-    if (VoiceBiometricsCode.byCodeString(code) != VoiceBiometricsCode.Success) {
-      println(
-        "Failed to close VerifySample transaction " + transactionId + ", though that shouldn't" +
-          " matter. Here's the stack trace anyways."
-      )
-      VoiceBiometricsError(code, request).printStackTrace()
-    }
-  }
-
   def sendStartVerificationRequest(userId: String): VBGRequest = {
     val request = new VBGRequest
     request.setRequestType(VBGRequest._StartVerification)
@@ -108,7 +85,18 @@ trait VBGBiometricServicesBase {
     request.sendRequest(_url)
   }
 
-  // ========================== HELPERS
+  def sendFinishVerifyTransactionRequest(transactionId: String, successValue: String, score: String): VBGRequest = {
+    val request = new VBGRequest
+    request.setRequestType(VBGRequest._FinishTransaction)
+    request.setParameter(VBGRequest._clientName, _myClientName)
+    request.setParameter(VBGRequest._clientKey, _myClientKey)
+    request.setParameter(VBGRequest._transactionId, transactionId)
+    request.setParameter(VBGRequest._success, successValue)
+    request.setParameter(VBGRequest._score, score)
+    request.sendRequest(_url)
+  }
+
+  // ========================== "request" methods
 
   def requestStartVerification(userId: String): Either[VoiceBiometricsError, StartVerificationResponse] = {
     withSuccessfulRequest(sendStartVerificationRequest(userId)) {
@@ -118,11 +106,25 @@ trait VBGBiometricServicesBase {
   }
 
   def requestVerifySample(transactionId: String, wavBinary: Array[Byte]): Either[VoiceBiometricsError, VerifySampleResponse] = {
-    withSuccessfulRequest(sendStartVerificationRequest(transactionId)) {
+    withSuccessfulRequest(sendVerifySampleRequest(transactionId, wavBinary)) {
       request =>
         new VerifySampleResponse(request)
     }
   }
+
+  def requestFinishVerifyTransaction(transactionId: String, successValue: String, score: String) {
+    val request = sendFinishVerifyTransactionRequest(transactionId, successValue, score)
+    val code = request.getResponseValue(VBGRequest._errorCode)
+    if (VoiceBiometricsCode.byCodeString(code) != VoiceBiometricsCode.Success) {
+      println(
+        "Failed to close VerifySample transaction " + transactionId + ", though that shouldn't" +
+          " matter. Here's the stack trace anyways."
+      )
+      VoiceBiometricsError(code, request).printStackTrace()
+    }
+  }
+
+  // ========================== HELPERS
 
   // Depends on iPad issue 49.
   def convertWavTo8kHzBase64(wavBinary: Array[Byte]): String = {
@@ -198,7 +200,6 @@ object VBGRequest {
   //    private val _CheckUserStatus: String  = "CheckUserStatus";
   //    private val _SetUserStatus: String  = "SetUserStatus"; // {“active”, “inactive”, “locked”, “opted-out”, “deleted”}
 
-  // VBG requires that these Strings be lower-cased.
   val _clientKey = "clientkey"
   val _clientName = "clientname"
   val _errorCode = "errorcode"
