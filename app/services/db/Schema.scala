@@ -3,6 +3,8 @@ package services.db
 import org.squeryl.PrimitiveTypeMode._
 import org.squeryl.{KeyedEntity, Table}
 import models._
+import models.vbg._
+import models.xyzmo._
 import java.lang.IllegalStateException
 import play.Play
 import java.io.{ByteArrayOutputStream, PrintWriter}
@@ -15,13 +17,6 @@ import com.google.inject.{Inject, Injector}
  */
 class Schema @Inject() (injector: Injector) extends org.squeryl.Schema {
   import uk.me.lings.scalaguice.InjectorExtensions._
-
-//  val signatureEnrollmentAttempts = table[SignatureEnrollmentAttempt]
-//  val voiceEnrollmentAttempts = table[VoiceEnrollmentAttempt]
-  val enrollmentBatches = table[EnrollmentBatch]
-  val enrollmentSamples = table[EnrollmentSample]
-  val signatureSamples = table[SignatureSample]
-  val voiceSamples = table[VoiceSample]
 
   //
   // Customers
@@ -110,6 +105,34 @@ class Schema @Inject() (injector: Injector) extends org.squeryl.Schema {
   val orderToEgraphs = oneToManyRelation(orders, egraphs)
     .via((order, egraph) => order.id === egraph.orderId)
   orderToEgraphs.foreignKeyDeclaration.constrainReference(onDelete cascade)
+
+
+  //
+  // media
+  //
+  val signatureSamples = table[SignatureSample]
+  val voiceSamples = table[VoiceSample]
+
+
+  //
+  // biometrics
+  //
+  val enrollmentBatches = table[EnrollmentBatch]
+  val enrollmentSamples = table[EnrollmentSample]
+
+  //  val vbgStartEnrollmentResponses = table[VBGStartEnrollmentResponse]
+  //  val vbgAudioCheckResponses = table[VBGAudioCheckResponse]
+  //  val vbgEnrollUserResponses = table[VBGEnrollUserResponse]
+  //  val vbgFinishEnrollTransactionResponses = table[VBGFinishEnrollTransactionResponse]
+  //  val vbgStartVerificationResponses = table[VBGStartVerificationResponse]
+  //  val vbgVerifySampleResponses = table[VBGVerifySampleResponse]
+  //  val vbgFinishVerifyTransactionResponses = table[VBGFinishVerifyTransactionResponse]
+
+  val xyzmoAddUserResponses = table[XyzmoAddUserResponse]
+  val xyzmoDeleteUserResponses = table[XyzmoDeleteUserResponse]
+  val xyzmoAddProfileResponses = table[XyzmoAddProfileResponse]
+  val xyzmoEnrollDynamicProfileResponses = table[XyzmoEnrollDynamicProfileResponse]
+  val xyzmoVerifyUserResponses = table[XyzmoVerifyUserResponse]
 
 
   //
@@ -231,16 +254,30 @@ class Schema @Inject() (injector: Injector) extends org.squeryl.Schema {
   override def callbacks = {
     Seq(
       factoryFor(accounts) is Account(services=injector.instance[AccountServices]),
-      factoryFor(customers) is Customer(services=injector.instance[CustomerServices]),
-      factoryFor(celebrities) is Celebrity(services=injector.instance[CelebrityServices]),
-      factoryFor(orders) is Order(services=injector.instance[OrderServices]),
       factoryFor(cashTransactions) is CashTransaction(services=injector.instance[CashTransactionServices]),
-      factoryFor(products) is Product(services=injector.instance[ProductServices]),
+      factoryFor(celebrities) is Celebrity(services=injector.instance[CelebrityServices]),
+      factoryFor(customers) is Customer(services=injector.instance[CustomerServices]),
       factoryFor(egraphs) is Egraph(services=injector.instance[EgraphServices]),
       factoryFor(enrollmentBatches) is EnrollmentBatch(services=injector.instance[EnrollmentBatchServices]),
       factoryFor(enrollmentSamples) is EnrollmentSample(services=injector.instance[EnrollmentSampleServices]),
+      factoryFor(orders) is Order(services=injector.instance[OrderServices]),
+      factoryFor(products) is Product(services=injector.instance[ProductServices]),
       factoryFor(signatureSamples) is SignatureSample(services=injector.instance[SignatureSampleServices]),
-      factoryFor(voiceSamples) is VoiceSample(services=injector.instance[VoiceSampleServices])
+
+//      factoryFor(vbgAudioCheckResponses) is VBGAudioCheckResponse(services=injector.instance[VBGAudioCheckResponseServices]),
+//      factoryFor(vbgEnrollUserResponses) is VBGEnrollUserResponse(services=injector.instance[VBGEnrollUserResponseServices]),
+//      factoryFor(vbgFinishEnrollTransactionResponses) is VBGFinishEnrollTransactionResponse(services=injector.instance[VBGFinishEnrollTransactionResponseServices]),
+//      factoryFor(vbgFinishVerifyTransactionResponses) is VBGFinishVerifyTransactionResponse(services=injector.instance[VBGFinishVerifyTransactionResponseServices]),
+//      factoryFor(vbgStartEnrollmentResponses) is VBGStartEnrollmentResponse(services=injector.instance[VBGStartEnrollmentResponseServices]),
+//      factoryFor(vbgStartVerificationResponses) is VBGStartVerificationResponse(services=injector.instance[VBGStartVerificationResponseServices]),
+//      factoryFor(vbgVerifySampleResponses) is VBGVerifySampleResponse(services=injector.instance[VBGVerifySampleResponseServices]),
+
+      factoryFor(voiceSamples) is VoiceSample(services=injector.instance[VoiceSampleServices]),
+      factoryFor(xyzmoAddUserResponses) is XyzmoAddUserResponse(services=injector.instance[XyzmoAddUserResponseServices]),
+      factoryFor(xyzmoDeleteUserResponses) is XyzmoDeleteUserResponse(services=injector.instance[XyzmoDeleteUserResponseServices]),
+      factoryFor(xyzmoAddProfileResponses) is XyzmoAddProfileResponse(services=injector.instance[XyzmoAddProfileResponseServices]),
+      factoryFor(xyzmoEnrollDynamicProfileResponses) is XyzmoEnrollDynamicProfileResponse(services=injector.instance[XyzmoEnrollDynamicProfileResponseServices]),
+      factoryFor(xyzmoVerifyUserResponses) is XyzmoVerifyUserResponse(services=injector.instance[XyzmoVerifyUserResponseServices])
     )
   }
 }

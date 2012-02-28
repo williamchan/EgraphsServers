@@ -41,7 +41,7 @@ case class EnrollmentSample(
 class EnrollmentSampleStore @Inject() (schema: Schema) extends Saves[EnrollmentSample] with SavesCreatedUpdated[EnrollmentSample] {
 
   //
-  // Saves[SignatureEnrollmentAttempt] methods
+  // Saves[EnrollmentSample] methods
   //
   override val table = schema.enrollmentSamples
 

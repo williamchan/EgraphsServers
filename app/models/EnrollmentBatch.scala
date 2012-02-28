@@ -104,7 +104,7 @@ class EnrollmentBatchStore @Inject() (schema: Schema) extends Saves[EnrollmentBa
   }
 
   //
-  // Saves[SignatureEnrollmentAttempt] methods
+  // Saves[EnrollmentBatch] methods
   //
   override val table = schema.enrollmentBatches
 
