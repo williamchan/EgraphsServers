@@ -1,11 +1,11 @@
 package services.signature
 
-import org.apache.log4j.Logger
 import com.xyzmo.wwww.biometricserver.WebServiceUserAndProfileStub.{Profile_Add_v1Response, User_Delete_v1Response, User_Add_v1Response}
 import com.xyzmo.wwww.biometricserver.WebServiceBiometricPartStub._
 import com.xyzmo.wwww.biometricserver.{WebServiceBiometricPartStub, WebServiceUserAndProfileStub}
+import models.xyzmo._
+import org.apache.log4j.Logger
 
-// todo(wchan): This is ready to use in place of skipBiometrics
 object MockXyzmoBiometricServices extends XyzmoBiometricServicesBase {
 
   protected val log: Logger = Logger.getLogger(MockXyzmoBiometricServices.getClass)
@@ -19,7 +19,7 @@ object MockXyzmoBiometricServices extends XyzmoBiometricServicesBase {
 
     val user_Add_v1Response: User_Add_v1Response = new User_Add_v1Response
     user_Add_v1Response.setUser_Add_v1Result(resultBase)
-    new XyzmoAddUserResponse(user_Add_v1Response: User_Add_v1Response)
+    new XyzmoAddUserResponse().withResultBase(resultBase)
   }
 
   override def deleteUser(userId: String): XyzmoDeleteUserResponse = {
@@ -28,7 +28,7 @@ object MockXyzmoBiometricServices extends XyzmoBiometricServicesBase {
 
     val user_Delete_v1Response: User_Delete_v1Response = new User_Delete_v1Response
     user_Delete_v1Response.setUser_Delete_v1Result(resultBase)
-    new XyzmoDeleteUserResponse(user_Delete_v1Response: User_Delete_v1Response)
+    new XyzmoDeleteUserResponse().withResultBase(resultBase)
   }
 
   override def addProfile(userId: String, profileName: String): XyzmoAddProfileResponse = {
@@ -42,7 +42,7 @@ object MockXyzmoBiometricServices extends XyzmoBiometricServicesBase {
 
     val profile_Add_v1Response: Profile_Add_v1Response = new Profile_Add_v1Response
     profile_Add_v1Response.setProfile_Add_v1Result(profileInfoResult_v1)
-    new XyzmoAddProfileResponse(profile_Add_v1Response: Profile_Add_v1Response)
+    new XyzmoAddProfileResponse().withProfile_Add_v1Response(profile_Add_v1Response)
   }
 
   override def enrollUser(userId: String, profileName: String, signatureDataContainers: List[String]): XyzmoEnrollDynamicProfileResponse = {
@@ -60,7 +60,7 @@ object MockXyzmoBiometricServices extends XyzmoBiometricServicesBase {
 
     val enrollDynamicProfile_v1Response: EnrollDynamicProfile_v1Response = new EnrollDynamicProfile_v1Response
     enrollDynamicProfile_v1Response.setEnrollDynamicProfile_v1Result(enrollResultInfo_v1)
-    new XyzmoEnrollDynamicProfileResponse(enrollDynamicProfile_v1Response: EnrollDynamicProfile_v1Response)
+    new XyzmoEnrollDynamicProfileResponse().withEnrollDynamicProfile_v1Response(enrollDynamicProfile_v1Response)
   }
 
   override def verifyUser(userId: String, signatureDCToVerify: String): XyzmoVerifyUserResponse = {
@@ -75,7 +75,7 @@ object MockXyzmoBiometricServices extends XyzmoBiometricServicesBase {
 
     val verifyUserBySignatureDynamicToDynamic_v1Response: VerifyUserBySignatureDynamicToDynamic_v1Response = new VerifyUserBySignatureDynamicToDynamic_v1Response
     verifyUserBySignatureDynamicToDynamic_v1Response.setVerifyUserBySignatureDynamicToDynamic_v1Result(verifyResultInfo_v1)
-    new XyzmoVerifyUserResponse(verifyUserBySignatureDynamicToDynamic_v1Response: VerifyUserBySignatureDynamicToDynamic_v1Response)
+    new XyzmoVerifyUserResponse().withVerifyUserBySignatureDynamicToDynamic_v1Response(verifyUserBySignatureDynamicToDynamic_v1Response)
   }
 
   override def getSignatureDataContainerFromJSON(jsonStr: String): String = {

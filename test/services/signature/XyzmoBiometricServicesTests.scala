@@ -2,6 +2,7 @@ package services.signature
 
 import com.xyzmo.wwww.biometricserver.{WebServiceBiometricPartStub, WebServiceUserAndProfileStub}
 import java.io.{File, FileInputStream}
+import models.xyzmo._
 import org.scalatest.matchers.ShouldMatchers
 import play.Play
 import play.test.UnitFlatSpec
@@ -33,44 +34,44 @@ class XyzmoBiometricServicesTests extends UnitFlatSpec with ShouldMatchers {
     val signature_nomatch = XyzmoBiometricServicesTests.getStringFromFile(Play.getFile("test/files/xyzmo_signature_nomatch.xml"))
 
     val deleteUserResponse: XyzmoDeleteUserResponse = XyzmoBiometricServices.deleteUser(userId)
-    deleteUserResponse.getBaseResult should be(WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue)
-    deleteUserResponse.getError should be(None)
-    deleteUserResponse.getErrorMsg should be(None)
+    deleteUserResponse.baseResult should be(WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue)
+    deleteUserResponse.error should be(None)
+    deleteUserResponse.errorMsg should be(None)
 
     val addUserResponse: XyzmoAddUserResponse = XyzmoBiometricServices.addUser(userId, userName)
-    addUserResponse.getBaseResult should be(WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue)
-    addUserResponse.getError should be(None)
-    addUserResponse.getErrorMsg should be(None)
+    addUserResponse.baseResult should be(WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue)
+    addUserResponse.error should be(None)
+    addUserResponse.errorMsg should be(None)
 
     val addProfileResponse: XyzmoAddProfileResponse = XyzmoBiometricServices.addProfile(userId, profileName)
-    addProfileResponse.getBaseResult should be(WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue)
-    addProfileResponse.getError should be(None)
-    addProfileResponse.getErrorMsg should be(None)
-    val profileId = addProfileResponse.getXyzmoProfileId.get
+    addProfileResponse.baseResult should be(WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue)
+    addProfileResponse.error should be(None)
+    addProfileResponse.errorMsg should be(None)
+    val profileId = addProfileResponse.xyzmoProfileId.get
     (profileId.length() > 0) should be(true)
 
     val enrollUserResponse: XyzmoEnrollDynamicProfileResponse = XyzmoBiometricServices.enrollUser(userId, profileName, List(signature1, signature2, signature3, signature4, signature5, signature6))
-    enrollUserResponse.getBaseResult should be(WebServiceBiometricPartStub.BaseResultEnum.ok.getValue)
-    enrollUserResponse.getError should be(None)
-    enrollUserResponse.getErrorMsg should be(None)
-    enrollUserResponse.getEnrollResult.get should be(WebServiceBiometricPartStub.EnrollResultEnum.EnrollCompleted.getValue)
-    enrollUserResponse.getNrEnrolled.get should be(6)
-    (enrollUserResponse.getProfileId.get) should be(profileId)
-    enrollUserResponse.getRejectedSignaturesSummary should be(None)
+    enrollUserResponse.baseResult should be(WebServiceBiometricPartStub.BaseResultEnum.ok.getValue)
+    enrollUserResponse.error should be(None)
+    enrollUserResponse.errorMsg should be(None)
+    enrollUserResponse.enrollResult.get should be(WebServiceBiometricPartStub.EnrollResultEnum.EnrollCompleted.getValue)
+    enrollUserResponse.nrEnrolled.get should be(6)
+    (enrollUserResponse.xyzmoProfileId.get) should be(profileId)
+    enrollUserResponse.rejectedSignaturesSummary should be(None)
 
     val verifyUserResponse_Match: XyzmoVerifyUserResponse = XyzmoBiometricServices.verifyUser(userId, signature7)
-    verifyUserResponse_Match.getBaseResult should be(WebServiceBiometricPartStub.BaseResultEnum.ok.getValue)
-    verifyUserResponse_Match.getError should be(None)
-    verifyUserResponse_Match.getErrorMsg should be(None)
-    verifyUserResponse_Match.isMatch should be(true)
-    (verifyUserResponse_Match.getScore.get > 90) should be(true)
+    verifyUserResponse_Match.baseResult should be(WebServiceBiometricPartStub.BaseResultEnum.ok.getValue)
+    verifyUserResponse_Match.error should be(None)
+    verifyUserResponse_Match.errorMsg should be(None)
+    verifyUserResponse_Match.isMatch.get should be(true)
+    (verifyUserResponse_Match.score.get > 90) should be(true)
 
     val verifyUserResponse_NoMatch: XyzmoVerifyUserResponse = XyzmoBiometricServices.verifyUser(userId, signature_nomatch)
-    verifyUserResponse_NoMatch.getBaseResult should be(WebServiceBiometricPartStub.BaseResultEnum.ok.getValue)
-    verifyUserResponse_NoMatch.getError should be(None)
-    verifyUserResponse_NoMatch.getErrorMsg should be(None)
-    verifyUserResponse_NoMatch.isMatch should be(false)
-    verifyUserResponse_NoMatch.getScore.get should be(0)
+    verifyUserResponse_NoMatch.baseResult should be(WebServiceBiometricPartStub.BaseResultEnum.ok.getValue)
+    verifyUserResponse_NoMatch.error should be(None)
+    verifyUserResponse_NoMatch.errorMsg should be(None)
+    verifyUserResponse_NoMatch.isMatch.get should be(false)
+    verifyUserResponse_NoMatch.score.get should be(0)
   }
 }
 

@@ -14,8 +14,8 @@ class XyzmoSignatureBiometricService extends SignatureBiometricService {
     val verifyUserResponse = XyzmoBiometricServices.verifyUser(userId = profileId.toString, sdc)
 
     Right(SignatureVerificationMetadata(
-      success = verifyUserResponse.isMatch,
-      score = verifyUserResponse.getScore
+      success = verifyUserResponse.isMatch.getOrElse(false),
+      score = verifyUserResponse.score
     ))
   }
 }
