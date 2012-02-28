@@ -67,7 +67,7 @@ import collection.immutable.List
       drawStroke(g, xs, ys)
     }
 
-    getScaledInstance(image, (image.getWidth / 1.8).toInt, (image.getHeight / 1.8).toInt)
+    getScaledInstance(image, (image.getWidth / scaleFactor).toInt, (image.getHeight / scaleFactor).toInt)
   }
 
   /**

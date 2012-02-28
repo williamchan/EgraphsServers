@@ -45,7 +45,7 @@ with ShouldMatchers {
     val signatureImage: BufferedImage = imageUtil.createSignatureImage(capture, None)
     val imageFile = Play.getFile("test/files/single-point-stroke.jpg")
     ImageIO.write(signatureImage, "JPG", imageFile)
-    imageFile.length should be(13941)
+    imageFile.length should be(7477)
   }
 
   "createSignatureImage" should "draw a two-point stroke" in {
@@ -53,7 +53,7 @@ with ShouldMatchers {
     val signatureImage: BufferedImage = imageUtil.createSignatureImage(capture, None)
     val imageFile = Play.getFile("test/files/two-point-stroke.jpg")
     ImageIO.write(signatureImage, "JPG", imageFile)
-    imageFile.length should be(15227)
+    imageFile.length should be(8358)
   }
 
   "createSignatureImage" should "draw a three-point stroke" in {
@@ -61,7 +61,7 @@ with ShouldMatchers {
     val signatureImage: BufferedImage = imageUtil.createSignatureImage(capture, None)
     val imageFile = Play.getFile("test/files/three-point-stroke.jpg")
     ImageIO.write(signatureImage, "JPG", imageFile)
-    imageFile.length should be(17234)
+    imageFile.length should be(9239)
   }
 
   it should "overlay PNG images correctly" in {
