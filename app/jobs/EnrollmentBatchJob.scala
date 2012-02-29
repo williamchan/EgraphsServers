@@ -6,8 +6,9 @@ import services.blobs.Blobs
 import Blobs.Conversions._
 import services.signature.XyzmoBiometricServices
 import services.db.Schema
-import services.voice.{VBGRequest, VBGDevFreeSpeechBiometricServices}
+import services.voice.VBGDevFreeSpeechBiometricServices
 import models._
+import models.vbg._
 import services.AppConfig
 
 @On("0 0 0 * * ?") // cron expression: seconds minutes hours day-of-month month day-of-week (year optional)
@@ -73,11 +74,11 @@ object EnrollmentBatchJob {
     isSuccessfulSignatureEnrollment
   }
 
-  private def sendStartEnrollmentRequest(celebrity: Celebrity): VBGRequest = {
-    val startEnrollmentRequest = VBGDevFreeSpeechBiometricServices.sendStartEnrollmentRequest(celebrity.id.toString, false)
-    if (startEnrollmentRequest.getResponseValue(VBGRequest._errorCode) == "0") {
+  private def sendStartEnrollmentRequest(celebrity: Celebrity): VBGStartEnrollment = {
+    val vbgStartEnrollment = VBGDevFreeSpeechBiometricServices.sendStartEnrollmentRequest(celebrity.id.toString, false)
+    if (vbgStartEnrollment.errorCode == "0") {
       // First-time enrollment
-      startEnrollmentRequest
+      vbgStartEnrollment
     }
     else {
       // Re-enrollment
@@ -86,36 +87,25 @@ object EnrollmentBatchJob {
   }
 
   def attemptVoiceEnrollment(celebrity: Celebrity, voiceSamples: scala.List[VoiceSample]): Boolean = {
-    val startEnrollmentRequest = sendStartEnrollmentRequest(celebrity)
-    val transactionId = startEnrollmentRequest.getResponseValue(VBGRequest._transactionId)
+    val vbgStartEnrollment = sendStartEnrollmentRequest(celebrity)
+    // todo(wchan): if vbgStartEnrollment failed, then fail out
+    val transactionId = vbgStartEnrollment.vbgTransactionId.get
     println("Attempting voice enrollment with transactionId " + transactionId)
-    //    assertEquals("0", client.getResponseValue(VoiceBiometricsClient.errorcode))
-    //    assertNotNull(transactionId)
 
     var atLeastOneUsableSample = false
     for (voiceSample <- voiceSamples) {
-      val audioCheckRequest = VBGDevFreeSpeechBiometricServices.sendAudioCheckRequest(transactionId, VoiceSample.getWavUrl(voiceSample.id))
-      val errorCode = audioCheckRequest.getResponseValue(VBGRequest._errorCode)
-      if (errorCode == "0") atLeastOneUsableSample = true
-      val usableTime = audioCheckRequest.getResponseValue(VBGRequest._usableTime)
-      println(errorCode + " " + usableTime)
-      // store metadata on VoiceSample... ignoring errorcodes for now
+      val vbgAudioCheck = VBGDevFreeSpeechBiometricServices.sendAudioCheckRequest(transactionId.toLong, VoiceSample.getWavUrl(voiceSample.id))
+      if (vbgAudioCheck.errorCode == "0") atLeastOneUsableSample = true
     }
     if (!atLeastOneUsableSample) {
       println("No usable voice samples... aborting enrollment attempt!")
       return false
     }
 
-    val enrollUserRequest = VBGDevFreeSpeechBiometricServices.sendEnrollUserRequest(transactionId)
-    val enrollmentSuccessValue = enrollUserRequest.getResponseValue(VBGRequest._success)
-
-    VBGDevFreeSpeechBiometricServices.sendFinishEnrollTransactionRequest(transactionId, enrollmentSuccessValue)
-
-    val isSuccessfulVoiceEnrollment = enrollmentSuccessValue == "true"
-
-    println("Result of voice enrollment attempt for celebrity " + celebrity.id.toString + ": " + isSuccessfulVoiceEnrollment.toString)
-
-    isSuccessfulVoiceEnrollment
+    val vbgEnrollUser = VBGDevFreeSpeechBiometricServices.sendEnrollUserRequest(transactionId.toLong)
+    val enrollmentSuccessValue = vbgEnrollUser.success.getOrElse(false)
+    VBGDevFreeSpeechBiometricServices.sendFinishEnrollTransactionRequest(transactionId.toLong, enrollmentSuccessValue)
+    enrollmentSuccessValue
   }
 
   def findEnrollmentBatchesPending(): List[EnrollmentBatch] = {

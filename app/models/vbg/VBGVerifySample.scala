@@ -16,10 +16,10 @@ case class VBGVerifySampleServices @Inject()(store: VBGVerifySampleStore)
 case class VBGVerifySample(id: Long = 0,
                            enrollmentBatchId: Long = 0,
                            errorCode: String = "",
-                           vbgTransactionId: String = "",
+                           vbgTransactionId: Long = 0,
                            score: Option[Long] = None,
                            success: Option[Boolean] = None,
-                           usableTime: Option[String] = None,
+                           usableTime: Option[Double] = None,
                            created: Timestamp = Time.defaultTimestamp,
                            updated: Timestamp = Time.defaultTimestamp,
                            services: VBGVerifySampleServices = AppConfig.instance[VBGVerifySampleServices])

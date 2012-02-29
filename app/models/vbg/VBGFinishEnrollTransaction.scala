@@ -16,7 +16,7 @@ case class VBGFinishEnrollTransactionServices @Inject()(store: VBGFinishEnrollTr
 case class VBGFinishEnrollTransaction(id: Long = 0,
                                       enrollmentBatchId: Long = 0,
                                       errorCode: String = "",
-                                      vbgTransactionId: String = "",
+                                      vbgTransactionId: Long = 0,
                                       created: Timestamp = Time.defaultTimestamp,
                                       updated: Timestamp = Time.defaultTimestamp,
                                       services: VBGFinishEnrollTransactionServices = AppConfig.instance[VBGFinishEnrollTransactionServices])

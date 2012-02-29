@@ -16,7 +16,7 @@ case class VBGEnrollUserServices @Inject()(store: VBGEnrollUserStore)
 case class VBGEnrollUser(id: Long = 0,
                          enrollmentBatchId: Long = 0,
                          errorCode: String = "",
-                         vbgTransactionId: String = "",
+                         vbgTransactionId: Long = 0,
                          success: Option[Boolean] = None,
                          created: Timestamp = Time.defaultTimestamp,
                          updated: Timestamp = Time.defaultTimestamp,

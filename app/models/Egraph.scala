@@ -34,7 +34,7 @@ case class Egraph(
   stateValue: String = EgraphState.AwaitingVerification.value,
   _voiceCode: Option[String] = None,
   _voiceSuccess: Option[Boolean] = None,
-  _voiceScore: Option[Int] = None,
+  _voiceScore: Option[Long] = None,
   _signatureCode: Option[String] = None,
   _signatureSuccess: Option[Boolean] = None,
   _signatureScore: Option[Int] = None,

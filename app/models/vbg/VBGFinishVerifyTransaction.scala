@@ -16,7 +16,7 @@ case class VBGFinishVerifyTransactionServices @Inject()(store: VBGFinishVerifyTr
 case class VBGFinishVerifyTransaction(id: Long = 0,
                                       egraphId: Long = 0,
                                       errorCode: String = "",
-                                      vbgTransactionId: String = "",
+                                      vbgTransactionId: Long = 0,
                                       created: Timestamp = Time.defaultTimestamp,
                                       updated: Timestamp = Time.defaultTimestamp,
                                       services: VBGFinishVerifyTransactionServices = AppConfig.instance[VBGFinishVerifyTransactionServices])

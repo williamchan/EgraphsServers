@@ -16,8 +16,8 @@ case class VBGAudioCheckServices @Inject()(store: VBGAudioCheckStore)
 case class VBGAudioCheck(id: Long = 0,
                          enrollmentBatchId: Long = 0,
                          errorCode: String = "",
-                         vbgTransactionId: String = "",
-                         usableTime: Option[String] = None,
+                         vbgTransactionId: Long = 0,
+                         usableTime: Option[Double] = None,
                          created: Timestamp = Time.defaultTimestamp,
                          updated: Timestamp = Time.defaultTimestamp,
                          services: VBGAudioCheckServices = AppConfig.instance[VBGAudioCheckServices])

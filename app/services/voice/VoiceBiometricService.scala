@@ -18,7 +18,7 @@ class VBGVoiceBiometricService extends VoiceBiometricService {
 
       // Upload the sample and get the verification results
       var success = false
-      var score = 0
+      var score: Long = 0
       
       try {
         val errorOrVerification = vbg.requestVerifySample(transactionId, audio)
@@ -31,7 +31,7 @@ class VBGVoiceBiometricService extends VoiceBiometricService {
       }
       finally {
         // Close out the transaction regardless of outcome
-        vbg.requestFinishVerifyTransaction(transactionId, success.toString, score.toString)
+        vbg.requestFinishVerifyTransaction(transactionId, success, score)
       }
     }
   }
@@ -40,7 +40,7 @@ class VBGVoiceBiometricService extends VoiceBiometricService {
 class YesMaamVoiceBiometricService extends VoiceBiometricService {
   def verify(audio: Array[Byte], userId: String) = {
     Right(new VoiceVerificationResult {
-      val score = 100
+      val score: Long = 100
       val success = true
     })
   }

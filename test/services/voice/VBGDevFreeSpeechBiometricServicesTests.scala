@@ -75,11 +75,11 @@ class VBGDevFreeSpeechBiometricServicesTests extends UnitFlatSpec with ShouldMat
 //    println(finishRequest.getResponseValue(VBGRequest._errorCode))
 //  }
 
-  private def sendAudioCheckRequest(transactionId: String, sampleFilename: String) {
-    val checkRequest1: VBGRequest = VBGDevFreeSpeechBiometricServices.sendAudioCheckRequest(transactionId, sampleFilename)
-    println(checkRequest1.getResponseValue(VBGRequest._errorCode))
-    println(checkRequest1.getResponseValue(VBGRequest._usableTime))
-  }
+//  private def sendAudioCheckRequest(transactionId: String, sampleFilename: String) {
+//    val checkRequest1: VBGRequest = VBGDevFreeSpeechBiometricServices.sendAudioCheckRequest(transactionId.toLong, sampleFilename)
+//    println(checkRequest1.getResponseValue(VBGRequest._errorCode))
+//    println(checkRequest1.getResponseValue(VBGRequest._usableTime))
+//  }
 
 //  "vbg" should "verify" in {
 //    val wavBinary: Array[Byte] = getVoiceSampleBinary("test/verify1.wav")

@@ -16,7 +16,7 @@ case class VBGStartEnrollmentServices @Inject()(store: VBGStartEnrollmentStore)
 case class VBGStartEnrollment(id: Long = 0,
                               enrollmentBatchId: Long = 0,
                               errorCode: String = "",
-                              vbgTransactionId: Option[String] = None,
+                              vbgTransactionId: Option[Long] = None,
                               created: Timestamp = Time.defaultTimestamp,
                               updated: Timestamp = Time.defaultTimestamp,
                               services: VBGStartEnrollmentServices = AppConfig.instance[VBGStartEnrollmentServices])

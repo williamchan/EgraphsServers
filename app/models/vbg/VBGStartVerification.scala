@@ -16,7 +16,7 @@ case class VBGStartVerificationServices @Inject()(store: VBGStartVerificationSto
 case class VBGStartVerification(id: Long = 0,
                                 egraphId: Long = 0,
                                 errorCode: String = "",
-                                vbgTransactionId: Option[String] = None,
+                                vbgTransactionId: Option[Long] = None,
                                 created: Timestamp = Time.defaultTimestamp,
                                 updated: Timestamp = Time.defaultTimestamp,
                                 services: VBGStartVerificationServices = AppConfig.instance[VBGStartVerificationServices])
