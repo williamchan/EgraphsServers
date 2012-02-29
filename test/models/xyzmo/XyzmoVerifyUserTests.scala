@@ -7,18 +7,18 @@ import utils._
 import services.AppConfig
 import com.xyzmo.wwww.biometricserver.WebServiceBiometricPartStub
 
-class XyzmoVerifyUserResponseTests extends UnitFlatSpec
+class XyzmoVerifyUserTests extends UnitFlatSpec
 with ShouldMatchers
 with BeforeAndAfterEach
-with SavingEntityTests[XyzmoVerifyUserResponse]
-with CreatedUpdatedEntityTests[XyzmoVerifyUserResponse]
+with SavingEntityTests[XyzmoVerifyUser]
+with CreatedUpdatedEntityTests[XyzmoVerifyUser]
 with ClearsDatabaseAndValidationAfter
 with DBTransactionPerTest {
   //
-  // SavingEntityTests[XyzmoVerifyUserResponse] methods
+  // SavingEntityTests[XyzmoVerifyUser] methods
   //
 
-  val store = AppConfig.instance[XyzmoVerifyUserResponseStore]
+  val store = AppConfig.instance[XyzmoVerifyUserStore]
 
   "withVerifyUserBySignatureDynamicToDynamic_v1Response" should "populate base fields" in {
     val verifyUserBySignatureDynamicToDynamic_v1Response = new WebServiceBiometricPartStub.VerifyUserBySignatureDynamicToDynamic_v1Response
@@ -30,12 +30,12 @@ with DBTransactionPerTest {
     errorInfo.setErrorMsg("omg")
     verifyResultInfo_v1.setErrorInfo(errorInfo)
 
-    val xyzmoVerifyUserResponse: XyzmoVerifyUserResponse = newEntity.withVerifyUserBySignatureDynamicToDynamic_v1Response(verifyUserBySignatureDynamicToDynamic_v1Response)
-    xyzmoVerifyUserResponse.baseResult should be(WebServiceBiometricPartStub.BaseResultEnum.failed.getValue)
-    xyzmoVerifyUserResponse.error.get should be(WebServiceBiometricPartStub.ErrorStatus.ArgumentError.getValue)
-    xyzmoVerifyUserResponse.errorMsg.get should be("omg")
-    xyzmoVerifyUserResponse.isMatch should be(None)
-    xyzmoVerifyUserResponse.score should be(None)
+    val xyzmoVerifyUser: XyzmoVerifyUser = newEntity.withVerifyUserBySignatureDynamicToDynamic_v1Response(verifyUserBySignatureDynamicToDynamic_v1Response)
+    xyzmoVerifyUser.baseResult should be(WebServiceBiometricPartStub.BaseResultEnum.failed.getValue)
+    xyzmoVerifyUser.error.get should be(WebServiceBiometricPartStub.ErrorStatus.ArgumentError.getValue)
+    xyzmoVerifyUser.errorMsg.get should be("omg")
+    xyzmoVerifyUser.isMatch should be(None)
+    xyzmoVerifyUser.score should be(None)
   }
 
   "withVerifyUserBySignatureDynamicToDynamic_v1Response" should "populate isMatch and score" in {
@@ -51,19 +51,19 @@ with DBTransactionPerTest {
     verifyResult.setScore(100)
     verifyResultInfo_v1.setOkInfo(verifyResult)
 
-    val xyzmoVerifyUserResponse: XyzmoVerifyUserResponse = newEntity.withVerifyUserBySignatureDynamicToDynamic_v1Response(verifyUserBySignatureDynamicToDynamic_v1Response)
-    xyzmoVerifyUserResponse.baseResult should be(WebServiceBiometricPartStub.BaseResultEnum.ok.getValue)
-    xyzmoVerifyUserResponse.error should be(None)
-    xyzmoVerifyUserResponse.errorMsg should be(None)
-    xyzmoVerifyUserResponse.isMatch.get should be(true)
-    xyzmoVerifyUserResponse.score.get should be(100)
+    val xyzmoVerifyUser: XyzmoVerifyUser = newEntity.withVerifyUserBySignatureDynamicToDynamic_v1Response(verifyUserBySignatureDynamicToDynamic_v1Response)
+    xyzmoVerifyUser.baseResult should be(WebServiceBiometricPartStub.BaseResultEnum.ok.getValue)
+    xyzmoVerifyUser.error should be(None)
+    xyzmoVerifyUser.errorMsg should be(None)
+    xyzmoVerifyUser.isMatch.get should be(true)
+    xyzmoVerifyUser.score.get should be(100)
   }
 
   def newEntity = {
-    new XyzmoVerifyUserResponse()
+    new XyzmoVerifyUser()
   }
 
-  def saveEntity(toSave: XyzmoVerifyUserResponse) = {
+  def saveEntity(toSave: XyzmoVerifyUser) = {
     store.save(toSave)
   }
 
@@ -71,7 +71,7 @@ with DBTransactionPerTest {
     store.findById(id)
   }
 
-  override def transformEntity(toTransform: XyzmoVerifyUserResponse) = {
+  override def transformEntity(toTransform: XyzmoVerifyUser) = {
     toTransform.copy(
       baseResult = "failed"
     )

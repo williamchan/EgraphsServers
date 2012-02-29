@@ -11,11 +11,11 @@ trait SignatureBiometricService {
 class XyzmoSignatureBiometricService extends SignatureBiometricService {
   def verify(signatureJson: String, profileId: String): Either[SignatureBiometricsError, SignatureVerificationMetadata] = {
     val sdc = XyzmoBiometricServices.getSignatureDataContainerFromJSON(signatureJson)
-    val verifyUserResponse = XyzmoBiometricServices.verifyUser(userId = profileId.toString, sdc)
+    val verifyUser = XyzmoBiometricServices.verifyUser(userId = profileId.toString, sdc)
 
     Right(SignatureVerificationMetadata(
-      success = verifyUserResponse.isMatch.getOrElse(false),
-      score = verifyUserResponse.score
+      success = verifyUser.isMatch.getOrElse(false),
+      score = verifyUser.score
     ))
   }
 }

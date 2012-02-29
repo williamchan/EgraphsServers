@@ -8,18 +8,18 @@ import services.AppConfig
 import models.Celebrity
 import com.xyzmo.wwww.biometricserver.WebServiceUserAndProfileStub
 
-class XyzmoAddProfileResponseTests extends UnitFlatSpec
+class XyzmoAddProfileTests extends UnitFlatSpec
 with ShouldMatchers
 with BeforeAndAfterEach
-with SavingEntityTests[XyzmoAddProfileResponse]
-with CreatedUpdatedEntityTests[XyzmoAddProfileResponse]
+with SavingEntityTests[XyzmoAddProfile]
+with CreatedUpdatedEntityTests[XyzmoAddProfile]
 with ClearsDatabaseAndValidationAfter
 with DBTransactionPerTest {
   //
-  // SavingEntityTests[XyzmoAddProfileResponse] methods
+  // SavingEntityTests[XyzmoAddProfile] methods
   //
 
-  val store = AppConfig.instance[XyzmoAddProfileResponseStore]
+  val store = AppConfig.instance[XyzmoAddProfileStore]
 
   "withProfile_Add_v1Response" should "populate base fields" in {
     val profile_Add_v1Response = new WebServiceUserAndProfileStub.Profile_Add_v1Response
@@ -31,11 +31,11 @@ with DBTransactionPerTest {
     errorInfo.setErrorMsg("omg")
     profileInfoResult_v1.setErrorInfo(errorInfo)
 
-    val xyzmoAddProfileResponse: XyzmoAddProfileResponse = newEntity.withProfile_Add_v1Response(profile_Add_v1Response)
-    xyzmoAddProfileResponse.baseResult should be(WebServiceUserAndProfileStub.BaseResultEnum.failed.getValue)
-    xyzmoAddProfileResponse.error.get should be(WebServiceUserAndProfileStub.ErrorStatus.ArgumentError.getValue)
-    xyzmoAddProfileResponse.errorMsg.get should be("omg")
-    xyzmoAddProfileResponse.xyzmoProfileId should be(None)
+    val xyzmoAddProfile: XyzmoAddProfile = newEntity.withProfile_Add_v1Response(profile_Add_v1Response)
+    xyzmoAddProfile.baseResult should be(WebServiceUserAndProfileStub.BaseResultEnum.failed.getValue)
+    xyzmoAddProfile.error.get should be(WebServiceUserAndProfileStub.ErrorStatus.ArgumentError.getValue)
+    xyzmoAddProfile.errorMsg.get should be("omg")
+    xyzmoAddProfile.xyzmoProfileId should be(None)
   }
 
   "withProfile_Add_v1Response" should "populate xyzmoProfileId" in {
@@ -49,19 +49,19 @@ with DBTransactionPerTest {
     profileResult.setProfileInfo(profileInfo)
     profileInfoResult_v1.setOkInfo(profileResult)
 
-    val xyzmoAddProfileResponse: XyzmoAddProfileResponse = newEntity.withProfile_Add_v1Response(profile_Add_v1Response)
-    xyzmoAddProfileResponse.baseResult should be(WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue)
-    xyzmoAddProfileResponse.error should be(None)
-    xyzmoAddProfileResponse.errorMsg should be(None)
-    xyzmoAddProfileResponse.xyzmoProfileId.get should be("profile")
+    val xyzmoAddProfile: XyzmoAddProfile = newEntity.withProfile_Add_v1Response(profile_Add_v1Response)
+    xyzmoAddProfile.baseResult should be(WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue)
+    xyzmoAddProfile.error should be(None)
+    xyzmoAddProfile.errorMsg should be(None)
+    xyzmoAddProfile.xyzmoProfileId.get should be("profile")
   }
 
   def newEntity = {
     val celebrity = Celebrity().save()
-    new XyzmoAddProfileResponse(celebrityId = celebrity.id, baseResult = "ok")
+    new XyzmoAddProfile(celebrityId = celebrity.id, baseResult = "ok")
   }
 
-  def saveEntity(toSave: XyzmoAddProfileResponse) = {
+  def saveEntity(toSave: XyzmoAddProfile) = {
     store.save(toSave)
   }
 
@@ -69,7 +69,7 @@ with DBTransactionPerTest {
     store.findById(id)
   }
 
-  override def transformEntity(toTransform: XyzmoAddProfileResponse) = {
+  override def transformEntity(toTransform: XyzmoAddProfile) = {
     toTransform.copy(
       baseResult = "failed"
     )

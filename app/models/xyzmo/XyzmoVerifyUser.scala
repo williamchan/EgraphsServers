@@ -10,20 +10,20 @@ import services.Time
 import com.xyzmo.wwww.biometricserver.WebServiceBiometricPartStub
 
 /**
- * Services used by each XyzmoVerifyUserResponse instance
+ * Services used by each XyzmoVerifyUser instance
  */
-case class XyzmoVerifyUserResponseServices @Inject()(store: XyzmoVerifyUserResponseStore)
+case class XyzmoVerifyUserServices @Inject()(store: XyzmoVerifyUserStore)
 
-case class XyzmoVerifyUserResponse(id: Long = 0,
-                                   egraphId: Long = 0,
-                                   baseResult: String = "",
-                                   error: Option[String] = None,
-                                   errorMsg: Option[String] = None,
-                                   isMatch: Option[Boolean] = None,
-                                   score: Option[Int] = None,
-                                   created: Timestamp = Time.defaultTimestamp,
-                                   updated: Timestamp = Time.defaultTimestamp,
-                                   services: XyzmoVerifyUserResponseServices = AppConfig.instance[XyzmoVerifyUserResponseServices])
+case class XyzmoVerifyUser(id: Long = 0,
+                           egraphId: Long = 0,
+                           baseResult: String = "",
+                           error: Option[String] = None,
+                           errorMsg: Option[String] = None,
+                           isMatch: Option[Boolean] = None,
+                           score: Option[Int] = None,
+                           created: Timestamp = Time.defaultTimestamp,
+                           updated: Timestamp = Time.defaultTimestamp,
+                           services: XyzmoVerifyUserServices = AppConfig.instance[XyzmoVerifyUserServices])
   extends KeyedCaseClass[Long]
   with HasCreatedUpdated {
 
@@ -31,11 +31,11 @@ case class XyzmoVerifyUserResponse(id: Long = 0,
   // Public members
   //
   /**Persists by conveniently delegating to companion object's save method. */
-  def save(): XyzmoVerifyUserResponse = {
+  def save(): XyzmoVerifyUser = {
     services.store.save(this)
   }
 
-  def withVerifyUserBySignatureDynamicToDynamic_v1Response(verifyUserBySignatureDynamicToDynamic_v1Response: WebServiceBiometricPartStub.VerifyUserBySignatureDynamicToDynamic_v1Response): XyzmoVerifyUserResponse = {
+  def withVerifyUserBySignatureDynamicToDynamic_v1Response(verifyUserBySignatureDynamicToDynamic_v1Response: WebServiceBiometricPartStub.VerifyUserBySignatureDynamicToDynamic_v1Response): XyzmoVerifyUser = {
     val resultBase = verifyUserBySignatureDynamicToDynamic_v1Response.getVerifyUserBySignatureDynamicToDynamic_v1Result
     val errorInfo = resultBase.getErrorInfo
     val error = if (errorInfo != null) Some(errorInfo.getError.getValue) else None
@@ -55,18 +55,18 @@ case class XyzmoVerifyUserResponse(id: Long = 0,
   //
   // KeyedCaseClass[Long] methods
   //
-  override def unapplied = XyzmoVerifyUserResponse.unapply(this)
+  override def unapplied = XyzmoVerifyUser.unapply(this)
 
 }
 
-class XyzmoVerifyUserResponseStore @Inject()(schema: Schema) extends Saves[XyzmoVerifyUserResponse] with SavesCreatedUpdated[XyzmoVerifyUserResponse] {
+class XyzmoVerifyUserStore @Inject()(schema: Schema) extends Saves[XyzmoVerifyUser] with SavesCreatedUpdated[XyzmoVerifyUser] {
 
   //
-  // Saves[XyzmoVerifyUserResponse] methods
+  // Saves[XyzmoVerifyUser] methods
   //
-  override val table = schema.xyzmoVerifyUserResponses
+  override val table = schema.xyzmoVerifyUserTable
 
-  override def defineUpdate(theOld: XyzmoVerifyUserResponse, theNew: XyzmoVerifyUserResponse) = {
+  override def defineUpdate(theOld: XyzmoVerifyUser, theNew: XyzmoVerifyUser) = {
     updateIs(
       theOld.egraphId := theNew.egraphId,
       theOld.baseResult := theNew.baseResult,
@@ -80,9 +80,9 @@ class XyzmoVerifyUserResponseStore @Inject()(schema: Schema) extends Saves[Xyzmo
   }
 
   //
-  // SavesCreatedUpdated[XyzmoVerifyUserResponse] methods
+  // SavesCreatedUpdated[XyzmoVerifyUser] methods
   //
-  override def withCreatedUpdated(toUpdate: XyzmoVerifyUserResponse, created: Timestamp, updated: Timestamp) = {
+  override def withCreatedUpdated(toUpdate: XyzmoVerifyUser, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)
   }
 }

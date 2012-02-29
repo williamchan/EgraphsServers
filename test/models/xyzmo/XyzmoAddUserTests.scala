@@ -8,18 +8,18 @@ import services.AppConfig
 import models.Celebrity
 import com.xyzmo.wwww.biometricserver.WebServiceUserAndProfileStub
 
-class XyzmoDeleteUserResponseTests extends UnitFlatSpec
+class XyzmoAddUserTests extends UnitFlatSpec
 with ShouldMatchers
 with BeforeAndAfterEach
-with SavingEntityTests[XyzmoDeleteUserResponse]
-with CreatedUpdatedEntityTests[XyzmoDeleteUserResponse]
+with SavingEntityTests[XyzmoAddUser]
+with CreatedUpdatedEntityTests[XyzmoAddUser]
 with ClearsDatabaseAndValidationAfter
 with DBTransactionPerTest {
   //
-  // SavingEntityTests[XyzmoDeleteUserResponse] methods
+  // SavingEntityTests[XyzmoAddUser] methods
   //
 
-  val store = AppConfig.instance[XyzmoDeleteUserResponseStore]
+  val store = AppConfig.instance[XyzmoAddUserStore]
 
   "withResultBase" should "populate base fields" in {
     val resultBase = new WebServiceUserAndProfileStub.ResultBase
@@ -29,18 +29,18 @@ with DBTransactionPerTest {
     errorInfo.setErrorMsg("omg")
     resultBase.setErrorInfo(errorInfo)
 
-    val xyzmoDeleteUserResponse: XyzmoDeleteUserResponse = newEntity.withResultBase(resultBase)
-    xyzmoDeleteUserResponse.baseResult should be (WebServiceUserAndProfileStub.BaseResultEnum.failed.getValue)
-    xyzmoDeleteUserResponse.error.get should be (WebServiceUserAndProfileStub.ErrorStatus.ArgumentError.getValue)
-    xyzmoDeleteUserResponse.errorMsg.get should be ("omg")
+    val xyzmoAddUser: XyzmoAddUser = newEntity.withResultBase(resultBase)
+    xyzmoAddUser.baseResult should be (WebServiceUserAndProfileStub.BaseResultEnum.failed.getValue)
+    xyzmoAddUser.error.get should be (WebServiceUserAndProfileStub.ErrorStatus.ArgumentError.getValue)
+    xyzmoAddUser.errorMsg.get should be ("omg")
   }
 
   def newEntity = {
     val celebrity = Celebrity().save()
-    new XyzmoDeleteUserResponse(celebrityId = celebrity.id, baseResult = "ok")
+    new XyzmoAddUser(celebrityId = celebrity.id, baseResult = "ok")
   }
 
-  def saveEntity(toSave: XyzmoDeleteUserResponse) = {
+  def saveEntity(toSave: XyzmoAddUser) = {
     store.save(toSave)
   }
 
@@ -48,7 +48,7 @@ with DBTransactionPerTest {
     store.findById(id)
   }
 
-  override def transformEntity(toTransform: XyzmoDeleteUserResponse) = {
+  override def transformEntity(toTransform: XyzmoAddUser) = {
     toTransform.copy(
       baseResult = "failed"
     )

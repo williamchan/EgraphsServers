@@ -13,25 +13,25 @@ object MockXyzmoBiometricServices extends XyzmoBiometricServicesBase {
   protected val domain: String = ""
   protected val host: String = ""
 
-  override def addUser(userId: String, userName: String): XyzmoAddUserResponse = {
+  override def addUser(userId: String, userName: String): XyzmoAddUser = {
     val resultBase = new WebServiceUserAndProfileStub.ResultBase
     resultBase.setBaseResult(WebServiceUserAndProfileStub.BaseResultEnum.ok)
 
     val user_Add_v1Response: User_Add_v1Response = new User_Add_v1Response
     user_Add_v1Response.setUser_Add_v1Result(resultBase)
-    new XyzmoAddUserResponse().withResultBase(resultBase)
+    new XyzmoAddUser().withResultBase(resultBase)
   }
 
-  override def deleteUser(userId: String): XyzmoDeleteUserResponse = {
+  override def deleteUser(userId: String): XyzmoDeleteUser = {
     val resultBase = new WebServiceUserAndProfileStub.ResultBase
     resultBase.setBaseResult(WebServiceUserAndProfileStub.BaseResultEnum.ok)
 
     val user_Delete_v1Response: User_Delete_v1Response = new User_Delete_v1Response
     user_Delete_v1Response.setUser_Delete_v1Result(resultBase)
-    new XyzmoDeleteUserResponse().withResultBase(resultBase)
+    new XyzmoDeleteUser().withResultBase(resultBase)
   }
 
-  override def addProfile(userId: String, profileName: String): XyzmoAddProfileResponse = {
+  override def addProfile(userId: String, profileName: String): XyzmoAddProfile = {
     val profileInfoResult_v1 = new WebServiceUserAndProfileStub.ProfileInfoResult_v1
     profileInfoResult_v1.setBaseResult(WebServiceUserAndProfileStub.BaseResultEnum.ok)
     val profileResult = new WebServiceUserAndProfileStub.ProfileResult
@@ -42,10 +42,10 @@ object MockXyzmoBiometricServices extends XyzmoBiometricServicesBase {
 
     val profile_Add_v1Response: Profile_Add_v1Response = new Profile_Add_v1Response
     profile_Add_v1Response.setProfile_Add_v1Result(profileInfoResult_v1)
-    new XyzmoAddProfileResponse().withProfile_Add_v1Response(profile_Add_v1Response)
+    new XyzmoAddProfile().withProfile_Add_v1Response(profile_Add_v1Response)
   }
 
-  override def enrollUser(userId: String, profileName: String, signatureDataContainers: List[String]): XyzmoEnrollDynamicProfileResponse = {
+  override def enrollUser(userId: String, profileName: String, signatureDataContainers: List[String]): XyzmoEnrollDynamicProfile = {
     val enrollResultInfo_v1 = new EnrollResultInfo_v1
     enrollResultInfo_v1.setBaseResult(WebServiceBiometricPartStub.BaseResultEnum.ok)
     val enrollResult = new EnrollResult
@@ -60,10 +60,10 @@ object MockXyzmoBiometricServices extends XyzmoBiometricServicesBase {
 
     val enrollDynamicProfile_v1Response: EnrollDynamicProfile_v1Response = new EnrollDynamicProfile_v1Response
     enrollDynamicProfile_v1Response.setEnrollDynamicProfile_v1Result(enrollResultInfo_v1)
-    new XyzmoEnrollDynamicProfileResponse().withEnrollDynamicProfile_v1Response(enrollDynamicProfile_v1Response)
+    new XyzmoEnrollDynamicProfile().withEnrollDynamicProfile_v1Response(enrollDynamicProfile_v1Response)
   }
 
-  override def verifyUser(userId: String, signatureDCToVerify: String): XyzmoVerifyUserResponse = {
+  override def verifyUser(userId: String, signatureDCToVerify: String): XyzmoVerifyUser = {
     val verifyResultInfo_v1 = new VerifyResultInfo_v1
     verifyResultInfo_v1.setBaseResult(WebServiceBiometricPartStub.BaseResultEnum.ok)
     val verifyResult = new VerifyResult
@@ -75,7 +75,7 @@ object MockXyzmoBiometricServices extends XyzmoBiometricServicesBase {
 
     val verifyUserBySignatureDynamicToDynamic_v1Response: VerifyUserBySignatureDynamicToDynamic_v1Response = new VerifyUserBySignatureDynamicToDynamic_v1Response
     verifyUserBySignatureDynamicToDynamic_v1Response.setVerifyUserBySignatureDynamicToDynamic_v1Result(verifyResultInfo_v1)
-    new XyzmoVerifyUserResponse().withVerifyUserBySignatureDynamicToDynamic_v1Response(verifyUserBySignatureDynamicToDynamic_v1Response)
+    new XyzmoVerifyUser().withVerifyUserBySignatureDynamicToDynamic_v1Response(verifyUserBySignatureDynamicToDynamic_v1Response)
   }
 
   override def getSignatureDataContainerFromJSON(jsonStr: String): String = {

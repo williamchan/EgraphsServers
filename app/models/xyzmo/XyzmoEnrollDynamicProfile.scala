@@ -10,23 +10,23 @@ import services.Time
 import com.xyzmo.wwww.biometricserver.WebServiceBiometricPartStub
 
 /**
- * Services used by each XyzmoEnrollDynamicProfileResponse instance
+ * Services used by each XyzmoEnrollDynamicProfile instance
  */
-case class XyzmoEnrollDynamicProfileResponseServices @Inject()(store: XyzmoEnrollDynamicProfileResponseStore)
+case class XyzmoEnrollDynamicProfileServices @Inject()(store: XyzmoEnrollDynamicProfileStore)
 
-case class XyzmoEnrollDynamicProfileResponse(id: Long = 0,
-                                             enrollmentBatchId: Long = 0,
-                                             baseResult: String = "",
-                                             error: Option[String] = None,
-                                             errorMsg: Option[String] = None,
-                                             enrollResult: Option[String] = None,
-                                             xyzmoProfileId: Option[String] = None,
-                                             nrEnrolled: Option[Int] = None,
-                                             rejectedSignaturesSummary: Option[String] = None,
-                                             enrollmentSampleIds: Option[String] = None,
-                                             created: Timestamp = Time.defaultTimestamp,
-                                             updated: Timestamp = Time.defaultTimestamp,
-                                             services: XyzmoEnrollDynamicProfileResponseServices = AppConfig.instance[XyzmoEnrollDynamicProfileResponseServices])
+case class XyzmoEnrollDynamicProfile(id: Long = 0,
+                                     enrollmentBatchId: Long = 0,
+                                     baseResult: String = "",
+                                     error: Option[String] = None,
+                                     errorMsg: Option[String] = None,
+                                     enrollResult: Option[String] = None,
+                                     xyzmoProfileId: Option[String] = None,
+                                     nrEnrolled: Option[Int] = None,
+                                     rejectedSignaturesSummary: Option[String] = None,
+                                     enrollmentSampleIds: Option[String] = None,
+                                     created: Timestamp = Time.defaultTimestamp,
+                                     updated: Timestamp = Time.defaultTimestamp,
+                                     services: XyzmoEnrollDynamicProfileServices = AppConfig.instance[XyzmoEnrollDynamicProfileServices])
   extends KeyedCaseClass[Long]
   with HasCreatedUpdated {
 
@@ -34,11 +34,11 @@ case class XyzmoEnrollDynamicProfileResponse(id: Long = 0,
   // Public members
   //
   /**Persists by conveniently delegating to companion object's save method. */
-  def save(): XyzmoEnrollDynamicProfileResponse = {
+  def save(): XyzmoEnrollDynamicProfile = {
     services.store.save(this)
   }
 
-  def withEnrollDynamicProfile_v1Response(enrollDynamicProfile_v1Response: WebServiceBiometricPartStub.EnrollDynamicProfile_v1Response): XyzmoEnrollDynamicProfileResponse = {
+  def withEnrollDynamicProfile_v1Response(enrollDynamicProfile_v1Response: WebServiceBiometricPartStub.EnrollDynamicProfile_v1Response): XyzmoEnrollDynamicProfile = {
     val resultBase = enrollDynamicProfile_v1Response.getEnrollDynamicProfile_v1Result
     val errorInfo = resultBase.getErrorInfo
     val error = if (errorInfo != null) Some(errorInfo.getError.getValue) else None
@@ -97,18 +97,18 @@ case class XyzmoEnrollDynamicProfileResponse(id: Long = 0,
   //
   // KeyedCaseClass[Long] methods
   //
-  override def unapplied = XyzmoEnrollDynamicProfileResponse.unapply(this)
+  override def unapplied = XyzmoEnrollDynamicProfile.unapply(this)
 
 }
 
-class XyzmoEnrollDynamicProfileResponseStore @Inject()(schema: Schema) extends Saves[XyzmoEnrollDynamicProfileResponse] with SavesCreatedUpdated[XyzmoEnrollDynamicProfileResponse] {
+class XyzmoEnrollDynamicProfileStore @Inject()(schema: Schema) extends Saves[XyzmoEnrollDynamicProfile] with SavesCreatedUpdated[XyzmoEnrollDynamicProfile] {
 
   //
-  // Saves[XyzmoEnrollDynamicProfileResponse] methods
+  // Saves[XyzmoEnrollDynamicProfile] methods
   //
-  override val table = schema.xyzmoEnrollDynamicProfileResponses
+  override val table = schema.xyzmoEnrollDynamicProfileTable
 
-  override def defineUpdate(theOld: XyzmoEnrollDynamicProfileResponse, theNew: XyzmoEnrollDynamicProfileResponse) = {
+  override def defineUpdate(theOld: XyzmoEnrollDynamicProfile, theNew: XyzmoEnrollDynamicProfile) = {
     updateIs(
       theOld.enrollmentBatchId := theNew.enrollmentBatchId,
       theOld.baseResult := theNew.baseResult,
@@ -125,9 +125,9 @@ class XyzmoEnrollDynamicProfileResponseStore @Inject()(schema: Schema) extends S
   }
 
   //
-  // SavesCreatedUpdated[XyzmoEnrollDynamicProfileResponse] methods
+  // SavesCreatedUpdated[XyzmoEnrollDynamicProfile] methods
   //
-  override def withCreatedUpdated(toUpdate: XyzmoEnrollDynamicProfileResponse, created: Timestamp, updated: Timestamp) = {
+  override def withCreatedUpdated(toUpdate: XyzmoEnrollDynamicProfile, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)
   }
 }

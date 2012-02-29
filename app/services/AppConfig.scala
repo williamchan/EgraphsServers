@@ -4,7 +4,7 @@ import blobs.BlobModule
 import com.google.inject.{Singleton, Guice, AbstractModule}
 import http.PlayConfig
 import models._
-//import models.vbg._
+import models.vbg._
 import models.xyzmo._
 import payment.PaymentModule
 import services.db.Schema
@@ -41,28 +41,29 @@ class AppConfig extends AbstractModule with ScalaModule {
     bind[OrderServices].in[Singleton]
     bind[ProductServices].in[Singleton]
     bind[SignatureSampleServices].in[Singleton]
-    //    bind[VBGStartEnrollmentResponseServices].in[Singleton]
-    //    bind[VBGAudioCheckResponseServices].in[Singleton]
-    //    bind[VBGEnrollUserResponseServices].in[Singleton]
-    //    bind[VBGFinishEnrollTransactionResponseServices].in[Singleton]
-    //    bind[VBGStartVerificationResponseServices].in[Singleton]
-    //    bind[VBGVerifySampleResponseServices].in[Singleton]
-    //    bind[VBGFinishVerifyTransactionResponseServices].in[Singleton]
+    bind[VBGStartEnrollmentServices].in[Singleton]
+    bind[VBGAudioCheckServices].in[Singleton]
+    bind[VBGEnrollUserServices].in[Singleton]
+    bind[VBGFinishEnrollTransactionServices].in[Singleton]
+    bind[VBGStartVerificationServices].in[Singleton]
+    bind[VBGVerifySampleServices].in[Singleton]
+    bind[VBGFinishVerifyTransactionServices].in[Singleton]
     bind[VoiceSampleServices].in[Singleton]
-    bind[XyzmoAddUserResponseServices].in[Singleton]
-    bind[XyzmoDeleteUserResponseServices].in[Singleton]
-    bind[XyzmoAddProfileResponseServices].in[Singleton]
-    bind[XyzmoEnrollDynamicProfileResponseServices].in[Singleton]
-    bind[XyzmoVerifyUserResponseServices].in[Singleton]
+    bind[XyzmoAddUserServices].in[Singleton]
+    bind[XyzmoDeleteUserServices].in[Singleton]
+    bind[XyzmoAddProfileServices].in[Singleton]
+    bind[XyzmoEnrollDynamicProfileServices].in[Singleton]
+    bind[XyzmoVerifyUserServices].in[Singleton]
   }
 }
 
 object AppConfig {
+
   import InjectorExtensions._
 
   val injector = Guice.createInjector(new AppConfig)
 
-  def instance[T : Manifest] = {
+  def instance[T: Manifest] = {
     injector.instance[T]
   }
 }

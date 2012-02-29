@@ -1,0 +1,66 @@
+package models.vbg
+
+import com.google.inject.Inject
+import java.sql.Timestamp
+import models._
+import org.squeryl.PrimitiveTypeMode._
+import services.AppConfig
+import services.db.{KeyedCaseClass, Schema, Saves}
+import services.Time
+
+/**
+ * Services used by each VBGFinishVerifyTransaction instance
+ */
+case class VBGFinishVerifyTransactionServices @Inject()(store: VBGFinishVerifyTransactionStore)
+
+case class VBGFinishVerifyTransaction(id: Long = 0,
+                                      egraphId: Long = 0,
+                                      errorCode: String = "",
+                                      vbgTransactionId: String = "",
+                                      created: Timestamp = Time.defaultTimestamp,
+                                      updated: Timestamp = Time.defaultTimestamp,
+                                      services: VBGFinishVerifyTransactionServices = AppConfig.instance[VBGFinishVerifyTransactionServices])
+  extends KeyedCaseClass[Long]
+  with HasCreatedUpdated {
+
+  //
+  // Public members
+  //
+  /**Persists by conveniently delegating to companion object's save method. */
+  def save(): VBGFinishVerifyTransaction = {
+    services.store.save(this)
+  }
+
+  //
+  // KeyedCaseClass[Long] methods
+  //
+  override def unapplied = VBGFinishVerifyTransaction.unapply(this)
+
+}
+
+class VBGFinishVerifyTransactionStore @Inject()(schema: Schema) extends Saves[VBGFinishVerifyTransaction] with SavesCreatedUpdated[VBGFinishVerifyTransaction] {
+
+  //
+  // Saves[VBGFinishVerifyTransaction] methods
+  //
+  override val table = schema.vbgFinishVerifyTransactionTable
+
+  override def defineUpdate(theOld: VBGFinishVerifyTransaction, theNew: VBGFinishVerifyTransaction) = {
+    updateIs(
+      theOld.egraphId := theNew.egraphId,
+      theOld.errorCode := theNew.errorCode,
+      theOld.vbgTransactionId := theNew.vbgTransactionId,
+      theOld.created := theNew.created,
+      theOld.updated := theNew.updated
+    )
+  }
+
+  //
+  // SavesCreatedUpdated[VBGFinishVerifyTransaction] methods
+  //
+  override def withCreatedUpdated(toUpdate: VBGFinishVerifyTransaction, created: Timestamp, updated: Timestamp) = {
+    toUpdate.copy(created = created, updated = updated)
+  }
+}
+
+

@@ -7,18 +7,18 @@ import utils._
 import services.AppConfig
 import com.xyzmo.wwww.biometricserver.WebServiceBiometricPartStub
 
-class XyzmoEnrollDynamicProfileResponseTests extends UnitFlatSpec
+class XyzmoEnrollDynamicProfileTests extends UnitFlatSpec
 with ShouldMatchers
 with BeforeAndAfterEach
-with SavingEntityTests[XyzmoEnrollDynamicProfileResponse]
-with CreatedUpdatedEntityTests[XyzmoEnrollDynamicProfileResponse]
+with SavingEntityTests[XyzmoEnrollDynamicProfile]
+with CreatedUpdatedEntityTests[XyzmoEnrollDynamicProfile]
 with ClearsDatabaseAndValidationAfter
 with DBTransactionPerTest {
   //
-  // SavingEntityTests[XyzmoEnrollDynamicProfileResponse] methods
+  // SavingEntityTests[XyzmoEnrollDynamicProfile] methods
   //
 
-  val store = AppConfig.instance[XyzmoEnrollDynamicProfileResponseStore]
+  val store = AppConfig.instance[XyzmoEnrollDynamicProfileStore]
 
   "withVerifyUserBySignatureDynamicToDynamic_v1Response" should "populate base fields" in {
     val enrollDynamicProfile_v1Response = new WebServiceBiometricPartStub.EnrollDynamicProfile_v1Response
@@ -30,17 +30,17 @@ with DBTransactionPerTest {
     errorInfo.setErrorMsg("omg")
     enrollResultInfo_v1.setErrorInfo(errorInfo)
 
-    val xyzmoEnrollDynamicProfileResponse: XyzmoEnrollDynamicProfileResponse = newEntity.withEnrollDynamicProfile_v1Response(enrollDynamicProfile_v1Response)
-    xyzmoEnrollDynamicProfileResponse.baseResult should be(WebServiceBiometricPartStub.BaseResultEnum.failed.getValue)
-    xyzmoEnrollDynamicProfileResponse.error.get should be(WebServiceBiometricPartStub.ErrorStatus.ArgumentError.getValue)
-    xyzmoEnrollDynamicProfileResponse.errorMsg.get should be("omg")
-    xyzmoEnrollDynamicProfileResponse.enrollResult should be(None)
-    xyzmoEnrollDynamicProfileResponse.xyzmoProfileId should be(None)
-    xyzmoEnrollDynamicProfileResponse.nrEnrolled should be(None)
-    xyzmoEnrollDynamicProfileResponse.rejectedSignaturesSummary should be(None)
-    xyzmoEnrollDynamicProfileResponse.enrollmentSampleIds should be(None)
-    xyzmoEnrollDynamicProfileResponse.isSuccessfulSignatureEnrollment should be(false)
-    xyzmoEnrollDynamicProfileResponse.isProfileAlreadyEnrolled should be(false)
+    val xyzmoEnrollDynamicProfile: XyzmoEnrollDynamicProfile = newEntity.withEnrollDynamicProfile_v1Response(enrollDynamicProfile_v1Response)
+    xyzmoEnrollDynamicProfile.baseResult should be(WebServiceBiometricPartStub.BaseResultEnum.failed.getValue)
+    xyzmoEnrollDynamicProfile.error.get should be(WebServiceBiometricPartStub.ErrorStatus.ArgumentError.getValue)
+    xyzmoEnrollDynamicProfile.errorMsg.get should be("omg")
+    xyzmoEnrollDynamicProfile.enrollResult should be(None)
+    xyzmoEnrollDynamicProfile.xyzmoProfileId should be(None)
+    xyzmoEnrollDynamicProfile.nrEnrolled should be(None)
+    xyzmoEnrollDynamicProfile.rejectedSignaturesSummary should be(None)
+    xyzmoEnrollDynamicProfile.enrollmentSampleIds should be(None)
+    xyzmoEnrollDynamicProfile.isSuccessfulSignatureEnrollment should be(false)
+    xyzmoEnrollDynamicProfile.isProfileAlreadyEnrolled should be(false)
   }
 
   "withVerifyUserBySignatureDynamicToDynamic_v1Response" should "populate result fields" in {
@@ -58,17 +58,17 @@ with DBTransactionPerTest {
     enrollResult.setRejectedSignatures(arrayOfRejectedSignature)
     enrollResultInfo_v1.setOkInfo(enrollResult)
 
-    val xyzmoEnrollDynamicProfileResponse: XyzmoEnrollDynamicProfileResponse = newEntity.withEnrollDynamicProfile_v1Response(enrollDynamicProfile_v1Response)
-    xyzmoEnrollDynamicProfileResponse.baseResult should be(WebServiceBiometricPartStub.BaseResultEnum.ok.getValue)
-    xyzmoEnrollDynamicProfileResponse.error should be(None)
-    xyzmoEnrollDynamicProfileResponse.errorMsg should be(None)
-    xyzmoEnrollDynamicProfileResponse.enrollResult.get should be(WebServiceBiometricPartStub.EnrollResultEnum.EnrollCompleted.getValue)
-    xyzmoEnrollDynamicProfileResponse.xyzmoProfileId.get should be("profile")
-    xyzmoEnrollDynamicProfileResponse.nrEnrolled.get should be(6)
-    xyzmoEnrollDynamicProfileResponse.rejectedSignaturesSummary should be(None)
-    xyzmoEnrollDynamicProfileResponse.enrollmentSampleIds should be(None)
-    xyzmoEnrollDynamicProfileResponse.isSuccessfulSignatureEnrollment should be(true)
-    xyzmoEnrollDynamicProfileResponse.isProfileAlreadyEnrolled should be(false)
+    val xyzmoEnrollDynamicProfile: XyzmoEnrollDynamicProfile = newEntity.withEnrollDynamicProfile_v1Response(enrollDynamicProfile_v1Response)
+    xyzmoEnrollDynamicProfile.baseResult should be(WebServiceBiometricPartStub.BaseResultEnum.ok.getValue)
+    xyzmoEnrollDynamicProfile.error should be(None)
+    xyzmoEnrollDynamicProfile.errorMsg should be(None)
+    xyzmoEnrollDynamicProfile.enrollResult.get should be(WebServiceBiometricPartStub.EnrollResultEnum.EnrollCompleted.getValue)
+    xyzmoEnrollDynamicProfile.xyzmoProfileId.get should be("profile")
+    xyzmoEnrollDynamicProfile.nrEnrolled.get should be(6)
+    xyzmoEnrollDynamicProfile.rejectedSignaturesSummary should be(None)
+    xyzmoEnrollDynamicProfile.enrollmentSampleIds should be(None)
+    xyzmoEnrollDynamicProfile.isSuccessfulSignatureEnrollment should be(true)
+    xyzmoEnrollDynamicProfile.isProfileAlreadyEnrolled should be(false)
   }
 
   "withVerifyUserBySignatureDynamicToDynamic_v1Response" should "populate enrollmentSampleIds" in {
@@ -80,10 +80,10 @@ with DBTransactionPerTest {
   }
 
   def newEntity = {
-    new XyzmoEnrollDynamicProfileResponse()
+    new XyzmoEnrollDynamicProfile()
   }
 
-  def saveEntity(toSave: XyzmoEnrollDynamicProfileResponse) = {
+  def saveEntity(toSave: XyzmoEnrollDynamicProfile) = {
     store.save(toSave)
   }
 
@@ -91,7 +91,7 @@ with DBTransactionPerTest {
     store.findById(id)
   }
 
-  override def transformEntity(toTransform: XyzmoEnrollDynamicProfileResponse) = {
+  override def transformEntity(toTransform: XyzmoEnrollDynamicProfile) = {
     toTransform.copy(
       baseResult = "failed"
     )

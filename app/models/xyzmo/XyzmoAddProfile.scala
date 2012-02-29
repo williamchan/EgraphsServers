@@ -10,19 +10,19 @@ import services.Time
 import com.xyzmo.wwww.biometricserver.WebServiceUserAndProfileStub
 
 /**
- * Services used by each XyzmoAddProfileResponse instance
+ * Services used by each XyzmoAddProfile instance
  */
-case class XyzmoAddProfileResponseServices @Inject()(store: XyzmoAddProfileResponseStore)
+case class XyzmoAddProfileServices @Inject()(store: XyzmoAddProfileStore)
 
-case class XyzmoAddProfileResponse(id: Long = 0,
-                                   celebrityId: Long = 0,
-                                   baseResult: String = "",
-                                   error: Option[String] = None,
-                                   errorMsg: Option[String] = None,
-                                   xyzmoProfileId: Option[String] = None,
-                                   created: Timestamp = Time.defaultTimestamp,
-                                   updated: Timestamp = Time.defaultTimestamp,
-                                   services: XyzmoAddProfileResponseServices = AppConfig.instance[XyzmoAddProfileResponseServices])
+case class XyzmoAddProfile(id: Long = 0,
+                           celebrityId: Long = 0,
+                           baseResult: String = "",
+                           error: Option[String] = None,
+                           errorMsg: Option[String] = None,
+                           xyzmoProfileId: Option[String] = None,
+                           created: Timestamp = Time.defaultTimestamp,
+                           updated: Timestamp = Time.defaultTimestamp,
+                           services: XyzmoAddProfileServices = AppConfig.instance[XyzmoAddProfileServices])
   extends KeyedCaseClass[Long]
   with HasCreatedUpdated {
 
@@ -30,11 +30,11 @@ case class XyzmoAddProfileResponse(id: Long = 0,
   // Public members
   //
   /**Persists by conveniently delegating to companion object's save method. */
-  def save(): XyzmoAddProfileResponse = {
+  def save(): XyzmoAddProfile = {
     services.store.save(this)
   }
 
-  def withProfile_Add_v1Response(profile_Add_v1Response: WebServiceUserAndProfileStub.Profile_Add_v1Response): XyzmoAddProfileResponse = {
+  def withProfile_Add_v1Response(profile_Add_v1Response: WebServiceUserAndProfileStub.Profile_Add_v1Response): XyzmoAddProfile = {
     val resultBase = profile_Add_v1Response.getProfile_Add_v1Result
     val errorInfo = resultBase.getErrorInfo
     val error = if (errorInfo != null) Some(errorInfo.getError.getValue) else None
@@ -54,18 +54,18 @@ case class XyzmoAddProfileResponse(id: Long = 0,
   //
   // KeyedCaseClass[Long] methods
   //
-  override def unapplied = XyzmoAddProfileResponse.unapply(this)
+  override def unapplied = XyzmoAddProfile.unapply(this)
 
 }
 
-class XyzmoAddProfileResponseStore @Inject()(schema: Schema) extends Saves[XyzmoAddProfileResponse] with SavesCreatedUpdated[XyzmoAddProfileResponse] {
+class XyzmoAddProfileStore @Inject()(schema: Schema) extends Saves[XyzmoAddProfile] with SavesCreatedUpdated[XyzmoAddProfile] {
 
   //
-  // Saves[XyzmoAddProfileResponse] methods
+  // Saves[XyzmoAddProfile] methods
   //
-  override val table = schema.xyzmoAddProfileResponses
+  override val table = schema.xyzmoAddProfileTable
 
-  override def defineUpdate(theOld: XyzmoAddProfileResponse, theNew: XyzmoAddProfileResponse) = {
+  override def defineUpdate(theOld: XyzmoAddProfile, theNew: XyzmoAddProfile) = {
     updateIs(
       theOld.celebrityId := theNew.celebrityId,
       theOld.baseResult := theNew.baseResult,
@@ -78,9 +78,9 @@ class XyzmoAddProfileResponseStore @Inject()(schema: Schema) extends Saves[Xyzmo
   }
 
   //
-  // SavesCreatedUpdated[XyzmoAddProfileResponse] methods
+  // SavesCreatedUpdated[XyzmoAddProfile] methods
   //
-  override def withCreatedUpdated(toUpdate: XyzmoAddProfileResponse, created: Timestamp, updated: Timestamp) = {
+  override def withCreatedUpdated(toUpdate: XyzmoAddProfile, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)
   }
 }
