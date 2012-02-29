@@ -33,12 +33,12 @@ class CelebrityAccountRequestFilters @Inject() (
     accountFilters.requireAuthenticatedAccount { account =>
       request.params.getOption("celebrityId") match {
         case None =>
-          new Forbidden("Celebrity ID was required but not provided")
+          new Forbidden("Valid celebrity ID was required but not provided")
 
-        case Some(celebrityId) if celebrityId == "me" =>
+        case Some("me") =>
           account.celebrityId match {
             case None =>
-              new Forbidden("This request requires a celebrity account.")
+              new Forbidden("Valid celebrity ID was required but not provided.")
 
             case Some(accountCelebrityId) =>
               continue(account, celebStore.get(accountCelebrityId))

@@ -4,16 +4,9 @@ import org.squeryl.PrimitiveTypeMode._
 import play.data.validation.Validation.ValidationResult
 import play.data.validation.Validation
 import java.sql.Timestamp
-import services.Time
 import services.db.{KeyedCaseClass, Saves, Schema}
 import com.google.inject.Inject
-import services.AppConfig
-
-
-/**
- * Services used by each Account object
- */
-case class AccountServices @Inject() (accountStore: AccountStore)
+import services.{AppConfig, Time}
 
 /**
  * Basic account information for any user in the system
@@ -71,6 +64,11 @@ case class Account(
   //
   override def unapplied = Account.unapply(this)
 }
+
+/**
+ * Services used by each Account object
+ */
+case class AccountServices @Inject() (accountStore: AccountStore)
 
 class AccountStore @Inject() (schema: Schema) extends Saves[Account] with SavesCreatedUpdated[Account] {
   def authenticate(email: String, passwordAttempt: String): Either[AccountAuthenticationError, Account] = {

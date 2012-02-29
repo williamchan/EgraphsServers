@@ -258,6 +258,7 @@ class Schema @Inject()(injector: Injector) extends org.squeryl.Schema {
       factoryFor(cashTransactions) is CashTransaction(services = injector.instance[CashTransactionServices]),
       factoryFor(celebrities) is Celebrity(services = injector.instance[CelebrityServices]),
       factoryFor(customers) is Customer(services = injector.instance[CustomerServices]),
+      factoryFor(administrators) is Administrator(services=injector.instance[AdministratorServices]),
       factoryFor(egraphs) is Egraph(services = injector.instance[EgraphServices]),
       factoryFor(enrollmentBatches) is EnrollmentBatch(services = injector.instance[EnrollmentBatchServices]),
       factoryFor(enrollmentSamples) is EnrollmentSample(services = injector.instance[EnrollmentSampleServices]),

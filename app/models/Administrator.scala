@@ -1,10 +1,10 @@
 package models
 
 import java.sql.Timestamp
-import services.Time
 import org.squeryl.PrimitiveTypeMode._
 import services.db.{KeyedCaseClass, Saves, Schema}
 import com.google.inject.Inject
+import services.{AppConfig, Time}
 
 /**
  * Persistent entity representing administrators of our service.
@@ -16,10 +16,17 @@ case class Administrator(
   // some Administrator-specific data.
   role: Option[String] = None,
   created: Timestamp = Time.defaultTimestamp,
-  updated: Timestamp = Time.defaultTimestamp
+  updated: Timestamp = Time.defaultTimestamp,
+  services: AdministratorServices = AppConfig.instance[AdministratorServices]
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated {
   override def unapplied = Administrator.unapply(this)
+
+  def save(): Administrator = {
+    services.store.save(this)
+  }
 }
+
+case class AdministratorServices @Inject() (store: AdministratorStore)
 
 class AdministratorStore @Inject() (schema: Schema) extends Saves[Administrator] with SavesCreatedUpdated[Administrator] {
   //
@@ -42,3 +49,4 @@ class AdministratorStore @Inject() (schema: Schema) extends Saves[Administrator]
     toUpdate.copy(created=created, updated=updated)
   }
 }
+

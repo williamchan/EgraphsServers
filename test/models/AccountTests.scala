@@ -5,52 +5,20 @@ import org.scalatest.matchers.ShouldMatchers
 import play.data.validation.Validation
 import play.test.UnitFlatSpec
 import scala.collection.JavaConversions._
-import utils.{DBTransactionPerTest, SavingEntityTests, CreatedUpdatedEntityTests, ClearsDatabaseAndValidationAfter}
 import services.AppConfig
 import AccountAuthenticationError._
+import utils._
 
 class AccountTests extends UnitFlatSpec
-with ShouldMatchers
-with BeforeAndAfterEach
-with SavingEntityTests[Account]
-with CreatedUpdatedEntityTests[Account]
-with ClearsDatabaseAndValidationAfter
-with DBTransactionPerTest {
+  with ShouldMatchers
+  with BeforeAndAfterEach
+  with ClearsDatabaseAndValidationAfter
+  with DBTransactionPerTest
+  with AccountTestHelpers
+{
   import AppConfig.instance
 
   val accountStore = instance[AccountStore]
-  val celebrityStore = instance[CelebrityStore]
-  val customerStore = instance[CustomerStore]
-  val administratorStore = instance[AdministratorStore]
-
-  //
-  // SavingEntityTests[Account] methods
-  //
-  def newEntity = {
-    Account()
-  }
-
-  def saveEntity(toSave: Account) = {
-    accountStore.save(toSave)
-  }
-
-  def restoreEntity(accountId: Long) = {
-    accountStore.findById(accountId)
-  }
-
-  override def transformEntity(toTransform: Account) = {
-    celebrityStore.save(Celebrity())
-    customerStore.save(Customer())
-    administratorStore.save(Administrator())
-    toTransform.copy(
-      email = "derp",
-      passwordHash = Some("derp"),
-      passwordSalt = Some("derp"),
-      celebrityId = Some(1L),
-      customerId = Some(1L),
-      administratorId = Some(1L)
-    )
-  }
 
   //
   // Test methods
@@ -75,25 +43,6 @@ with DBTransactionPerTest {
     password.salt should not be (firstPassword.salt)
   }
 
-  it should "store and retrieve correctly" in {
-    // Set up
-    val stored = accountWithPassword("derp")
-    val storedPassword = stored.password.get
-
-    // Run test
-    val saved = accountStore.save(stored)
-    val maybeRecalled = accountStore.findById(saved.id)
-
-    // Check expectations
-    maybeRecalled should not be (None)
-
-    val recalled = maybeRecalled.get
-    val recalledPassword = recalled.password.get
-    recalled.id should be(stored.id)
-    recalledPassword should be(storedPassword)
-    recalledPassword.is("derp") should be(true)
-  }
-
   it should "fail validation for password lengths shorter than 4 characters" in {
     for (password <- List("", "123")) {
       val errorOrCredential = Account().withPassword(password)
@@ -109,41 +58,6 @@ with DBTransactionPerTest {
     Account().withPassword("derp").isRight should be(true)
 
     Validation.errors should have length (0)
-  }
-
-  it should "should persist fine with no celebrity/customer/admin IDs" in {
-    accountStore.save(Account()) // Doesn't throw any errors
-  }
-
-  it should "fail to persist with non-null, non-existent celebrity ID" in {
-    val thrown = evaluating {
-      accountStore.save(Account(celebrityId = Some(1L)))
-    } should produce[RuntimeException]
-    thrown.getMessage.toUpperCase.contains("CELEBRITYID") should be(true)
-  }
-
-  it should "fail to persist with non-null, non-existent customer ID" in {
-    val thrown = evaluating {
-      accountStore.save(Account(customerId = Some(1L)))
-    } should produce[RuntimeException]
-    thrown.getMessage.toUpperCase.contains("CUSTOMERID") should be(true)
-  }
-
-  it should "fail to persist with non-null, non-existent administrator ID" in {
-    val thrown = evaluating {
-      accountStore.save(Account(administratorId = Some(1L)))
-    } should produce[RuntimeException]
-    thrown.getMessage.toUpperCase.contains("ADMINISTRATORID") should be(true)
-  }
-
-  it should "be recoverable by email" in {
-    val stored = Account(email = "derp@derp.com").save()
-    accountStore.findByEmail(stored.email) should be(Some(stored))
-  }
-
-  it should "authenticate the correct email and password in" in {
-    val stored = savedAccountWithEmailAndPassword("derp@derp.com", "supersecret")
-    accountStore.authenticate("derp@derp.com", "supersecret") should be(Right(stored))
   }
 
   it should "fail to authenticate with an AccountCredentialsError if the password is wrong" in {
@@ -183,6 +97,119 @@ with DBTransactionPerTest {
     val stored = Account(email = "derp@derp.com").save()
     accountStore.findByEmail("DERP@DERP.COM") should be(Some(stored))
   }
+}
+
+class AccountStoreTests extends UnitFlatSpec
+  with ShouldMatchers
+  with BeforeAndAfterEach
+  with SavingEntityTests[Account]
+  with CreatedUpdatedEntityTests[Account]
+  with ClearsDatabaseAndValidationAfter
+  with DBTransactionPerTest
+  with AccountTestHelpers
+{
+  import AppConfig.instance
+
+  def celebrityStore = instance[CelebrityStore]
+  def customerStore = instance[CustomerStore]
+  def administratorStore = instance[AdministratorStore]
+
+  def accountStore = instance[AccountStore]
+
+  //
+  // SavingEntityTests[Account] methods
+  //
+  override def newEntity = {
+    Account()
+  }
+
+  override def saveEntity(toSave: Account) = {
+    accountStore.save(toSave)
+  }
+
+  override def restoreEntity(accountId: Long) = {
+    accountStore.findById(accountId)
+  }
+
+  override def transformEntity(toTransform: Account) = {
+    toTransform.copy(
+      email = "derp",
+      passwordHash = Some("derp"),
+      passwordSalt = Some("derp"),
+      celebrityId = Some(Celebrity().save().id),
+      customerId = Some(Customer().save().id),
+      administratorId = Some(Administrator().save().id)
+    )
+  }
+
+  it should "store and retrieve correctly" in {
+    // Set up
+    val stored = accountWithPassword("derp")
+    val storedPassword = stored.password.get
+
+    // Run test
+    val underTest = accountStore
+    val saved = underTest.save(stored)
+    val maybeRecalled = underTest.findById(saved.id)
+
+    // Check expectations
+    maybeRecalled should not be (None)
+
+    val recalled = maybeRecalled.get
+    val recalledPassword = recalled.password.get
+    recalled.id should be(stored.id)
+    recalledPassword should be(storedPassword)
+    recalledPassword.is("derp") should be(true)
+  }
+  
+  it should "find by customer ID correctly" in {
+    val customer = Customer().save()
+
+    val account = Account(customerId=Some(customer.id)).save()
+
+    accountStore.findByCustomerId(customer.id) should be (Some(account))
+    accountStore.findByCustomerId(customer.id + 1) should be (None)
+  }
+
+  it should "should persist fine with no celebrity/customer/admin IDs" in {
+    accountStore.save(Account()) // Doesn't throw any errors
+  }
+
+  it should "fail to persist with non-null, non-existent celebrity ID" in {
+    val thrown = evaluating {
+                              accountStore.save(Account(celebrityId = Some(1L)))
+                            } should produce[RuntimeException]
+    thrown.getMessage.toUpperCase.contains("CELEBRITYID") should be(true)
+  }
+
+  it should "fail to persist with non-null, non-existent customer ID" in {
+    val thrown = evaluating {
+                              accountStore.save(Account(customerId = Some(1L)))
+                            } should produce[RuntimeException]
+    thrown.getMessage.toUpperCase.contains("CUSTOMERID") should be(true)
+  }
+
+  it should "fail to persist with non-null, non-existent administrator ID" in {
+    val thrown = evaluating {
+                              accountStore.save(Account(administratorId = Some(1L)))
+                            } should produce[RuntimeException]
+    thrown.getMessage.toUpperCase.contains("ADMINISTRATORID") should be(true)
+  }
+
+  it should "be recoverable by email" in {
+    val stored = Account(email = "derp@derp.com").save()
+    accountStore.findByEmail(stored.email) should be(Some(stored))
+  }
+
+  it should "authenticate the correct email and password in" in {
+    val stored = savedAccountWithEmailAndPassword("derp@derp.com", "supersecret")
+    accountStore.authenticate("derp@derp.com", "supersecret") should be(Right(stored))
+  }
+
+}
+
+trait AccountTestHelpers {
+  def accountStore: AccountStore
 
   def accountWithPassword(password: String): Account = {
     accountStore.save(Account().withPassword(password).right.get)
