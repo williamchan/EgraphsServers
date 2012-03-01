@@ -1,7 +1,11 @@
 package services.voice
 
+import models.{VoiceSample, EnrollmentBatch, Egraph}
+
+
 trait VoiceBiometricService {
-  def verify(audio: Array[Byte], userId: String): Either[VoiceBiometricsError, VoiceVerificationResult]
+  def enroll(enrollmentBatch: EnrollmentBatch, voiceSamples: scala.List[VoiceSample]): Either[VoiceBiometricsError, Boolean]
+  def verify(audio: Array[Byte], egraph: Egraph): Either[VoiceBiometricsError, VoiceVerificationResult]
 }
 
 // TODO: Write an integration test against VBG service to ensure our code works.
@@ -11,34 +15,20 @@ trait VoiceBiometricService {
 class VBGVoiceBiometricService extends VoiceBiometricService {
   val vbg = VBGDevFreeSpeechBiometricServices
 
-  def verify(audio: Array[Byte], userId: String): Either[VoiceBiometricsError, VoiceVerificationResult] = {
-    // Begin the verification transaction
-    vbg.requestStartVerification(userId).right.flatMap { startVerificationResponse =>
-      val transactionId = startVerificationResponse.transactionId
+  def enroll(enrollmentBatch: EnrollmentBatch, voiceSamples: scala.List[VoiceSample]): Either[VoiceBiometricsError, Boolean] = {
+    vbg.enroll(enrollmentBatch, voiceSamples)
+  }
 
-      // Upload the sample and get the verification results
-      var success = false
-      var score: Long = 0
-      
-      try {
-        val errorOrVerification = vbg.requestVerifySample(transactionId, audio)
-        for (verification <- errorOrVerification.right) {
-          success = verification.success
-          score = verification.score
-        }
-
-        errorOrVerification
-      }
-      finally {
-        // Close out the transaction regardless of outcome
-        vbg.requestFinishVerifyTransaction(transactionId, success, score)
-      }
-    }
+  def verify(audio: Array[Byte], egraph: Egraph): Either[VoiceBiometricsError, VoiceVerificationResult] = {
+    vbg.verify(audio, egraph)
   }
 }
 
 class YesMaamVoiceBiometricService extends VoiceBiometricService {
-  def verify(audio: Array[Byte], userId: String) = {
+
+  def enroll(enrollmentBatch: EnrollmentBatch, voiceSamples: scala.List[VoiceSample]) = Right(true)
+
+  def verify(audio: Array[Byte], egraph: Egraph) = {
     Right(new VoiceVerificationResult {
       val score: Long = 100
       val success = true

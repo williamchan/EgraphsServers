@@ -45,7 +45,7 @@ class PostEnrollmentSampleApiEndpointTests extends FunctionalTest with CleanData
     assertPostEnrollmentSample(signatureStr = TestConstants.signatureStr,
       voiceStr = TestConstants.voiceStrPercentEncoded(),
       isBatchComplete = true,
-      numEnrollmentSamplesInBatch = 10,
+      numEnrollmentSamplesInBatch = 20,
       Some(enrollmentBatchId))
   }
 

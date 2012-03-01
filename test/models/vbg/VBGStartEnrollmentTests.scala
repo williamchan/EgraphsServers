@@ -19,6 +19,11 @@ with DBTransactionPerTest {
 
   val store = AppConfig.instance[VBGStartEnrollmentStore]
 
+  "getErrorCode" should "return errorCode" in {
+    val vbgBase = new VBGStartEnrollment(errorCode = "50500")
+    vbgBase.getErrorCode should be (vbgBase.errorCode)
+  }
+
   def newEntity = {
     new VBGStartEnrollment()
   }

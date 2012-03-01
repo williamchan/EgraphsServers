@@ -19,6 +19,11 @@ with DBTransactionPerTest {
 
   val store = AppConfig.instance[VBGAudioCheckStore]
 
+  "getErrorCode" should "return errorCode" in {
+    val vbgBase = new VBGAudioCheck(errorCode = "50500")
+    vbgBase.getErrorCode should be (vbgBase.errorCode)
+  }
+
   def newEntity = {
     new VBGAudioCheck()
   }

@@ -16,6 +16,8 @@ private[controllers] trait GetCelebrityEnrollmentTemplateApiEndpoint {
     celebFilters.requireCelebrityAccount {
       (account, celebrity) => {
 
+        // IMPORTANT: The total number of enrollment phrases must match EnrollmentBatch.batchSize
+
         val phonymsPhrases: List[String] = List(
           "Stop each car if it's little",
           "Play in the street up ahead",

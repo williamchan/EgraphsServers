@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import models._
 import org.squeryl.PrimitiveTypeMode._
 import services.AppConfig
-import services.db.{KeyedCaseClass, Schema, Saves}
+import services.db.{Schema, Saves}
 import services.Time
 
 /**
@@ -20,7 +20,8 @@ case class VBGFinishEnrollTransaction(id: Long = 0,
                                       created: Timestamp = Time.defaultTimestamp,
                                       updated: Timestamp = Time.defaultTimestamp,
                                       services: VBGFinishEnrollTransactionServices = AppConfig.instance[VBGFinishEnrollTransactionServices])
-  extends KeyedCaseClass[Long]
+  extends VBGBase
+  //  extends KeyedCaseClass[Long]
   with HasCreatedUpdated {
 
   //
@@ -30,6 +31,8 @@ case class VBGFinishEnrollTransaction(id: Long = 0,
   def save(): VBGFinishEnrollTransaction = {
     services.store.save(this)
   }
+
+  def getErrorCode: String = errorCode
 
   //
   // KeyedCaseClass[Long] methods

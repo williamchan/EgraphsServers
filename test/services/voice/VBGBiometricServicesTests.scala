@@ -7,7 +7,6 @@ import services.blobs.Blobs
 import utils.TestConstants
 import play.libs.Codec
 import javax.sound.sampled.{AudioInputStream, AudioFileFormat, AudioSystem}
-import java.io.ByteArrayOutputStream
 
 
 class VBGBiometricServicesTests extends UnitFlatSpec with ShouldMatchers {
@@ -16,6 +15,10 @@ class VBGBiometricServicesTests extends UnitFlatSpec with ShouldMatchers {
     val wavBinary_44kHz: Array[Byte] = getVoiceSampleBinary("test/files/44khz.wav")
     val wav_8kHz_base64: String = MockVBGBiometricServices.convertWavTo8kHzBase64(wavBinary_44kHz)
     wav_8kHz_base64 should be(TestConstants.voiceStr_8khz())
+  }
+
+  "convertWavTo8kHzBase64" should "handle zero case" in {
+    MockVBGBiometricServices.convertWavTo8kHzBase64(new Array[Byte](0)) should be("")
   }
 
   "stitchWAVs" should "stitch multiple WAVs together" in {
@@ -34,13 +37,7 @@ class VBGBiometricServicesTests extends UnitFlatSpec with ShouldMatchers {
     val filename = "test/files/44khz.wav"
     val result: AudioInputStream = MockVBGBiometricServices.stitchWAVs(List(getVoiceSampleBinary(filename))).get
     val audioISFromFile: AudioInputStream = AudioSystem.getAudioInputStream(Play.getFile(filename))
-    Codec.encodeBASE64(convertAudioInputStreamToByteArray(result)) should be(Codec.encodeBASE64(convertAudioInputStreamToByteArray(audioISFromFile)))
-  }
-
-  private def convertAudioInputStreamToByteArray(audioInputStream: AudioInputStream): Array[Byte] = {
-    val bas: ByteArrayOutputStream = new ByteArrayOutputStream()
-    AudioSystem.write(audioInputStream, javax.sound.sampled.AudioFileFormat.Type.WAVE, bas)
-    bas.toByteArray
+    Codec.encodeBASE64(MockVBGBiometricServices.convertAudioInputStreamToByteArray(result)) should be(Codec.encodeBASE64(MockVBGBiometricServices.convertAudioInputStreamToByteArray(audioISFromFile)))
   }
 
   private def getVoiceSampleBinary(filename: String): Array[Byte] = {

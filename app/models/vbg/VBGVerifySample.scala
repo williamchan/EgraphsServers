@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import models._
 import org.squeryl.PrimitiveTypeMode._
 import services.AppConfig
-import services.db.{KeyedCaseClass, Schema, Saves}
+import services.db.{Schema, Saves}
 import services.Time
 
 /**
@@ -14,7 +14,7 @@ import services.Time
 case class VBGVerifySampleServices @Inject()(store: VBGVerifySampleStore)
 
 case class VBGVerifySample(id: Long = 0,
-                           enrollmentBatchId: Long = 0,
+                           egraphId: Long = 0,
                            errorCode: String = "",
                            vbgTransactionId: Long = 0,
                            score: Option[Long] = None,
@@ -23,7 +23,8 @@ case class VBGVerifySample(id: Long = 0,
                            created: Timestamp = Time.defaultTimestamp,
                            updated: Timestamp = Time.defaultTimestamp,
                            services: VBGVerifySampleServices = AppConfig.instance[VBGVerifySampleServices])
-  extends KeyedCaseClass[Long]
+  extends VBGBase
+  //  extends KeyedCaseClass[Long]
   with HasCreatedUpdated {
 
   //
@@ -33,6 +34,8 @@ case class VBGVerifySample(id: Long = 0,
   def save(): VBGVerifySample = {
     services.store.save(this)
   }
+
+  def getErrorCode: String = errorCode
 
   //
   // KeyedCaseClass[Long] methods
@@ -50,7 +53,7 @@ class VBGVerifySampleStore @Inject()(schema: Schema) extends Saves[VBGVerifySamp
 
   override def defineUpdate(theOld: VBGVerifySample, theNew: VBGVerifySample) = {
     updateIs(
-      theOld.enrollmentBatchId := theNew.enrollmentBatchId,
+      theOld.egraphId := theNew.egraphId,
       theOld.errorCode := theNew.errorCode,
       theOld.vbgTransactionId := theNew.vbgTransactionId,
       theOld.score := theNew.score,

@@ -101,7 +101,7 @@ case class Egraph(
    * Verifies the celebrity against a voice profile
    */
   def verifyVoice: Egraph = {
-    val voiceResponse = services.voiceBiometrics.verify(assets.audio.asByteArray, celebrity.id.toString)
+    val voiceResponse = services.voiceBiometrics.verify(assets.audio.asByteArray, this)
     val (voiceCode, voiceSuccess, voiceScore) = voiceResponse.fold(
       error =>
         (Some(error.code), None,  None),
@@ -144,7 +144,8 @@ case class Egraph(
   }
 
   def verifyBiometrics: Egraph = {
-    verifyVoice.verifySignature
+    val thisWithVoiceVerified: Egraph = verifyVoice
+    thisWithVoiceVerified.verifySignature
   }
 
   /**

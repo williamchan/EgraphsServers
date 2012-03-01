@@ -14,6 +14,11 @@ object VoiceBiometricsCode extends Enum {
     final val desc = "Success"
   }
 
+  val UserIdAlreadyExists = new EnumVal{
+    final val name = "50500";
+    val desc = "Parameter value for <userid> already exists"
+  }
+
   val InvalidSampleSequenceNumber = new EnumVal{
     final val name = "51300";
     val desc = "Invalid sample sequence number"

@@ -19,6 +19,11 @@ with DBTransactionPerTest {
 
   val store = AppConfig.instance[VBGFinishVerifyTransactionStore]
 
+  "getErrorCode" should "return errorCode" in {
+    val vbgBase = new VBGFinishVerifyTransaction(errorCode = "50500")
+    vbgBase.getErrorCode should be (vbgBase.errorCode)
+  }
+
   def newEntity = {
     new VBGFinishVerifyTransaction()
   }

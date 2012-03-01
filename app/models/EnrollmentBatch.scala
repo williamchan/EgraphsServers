@@ -22,7 +22,6 @@ case class EnrollmentBatch(id: Long = 0,
                            celebrityId: Long = 0,
                            isBatchComplete: Boolean = false,
                            isSuccessfulEnrollment: Option[Boolean] = None,
-                           // TODO(wchan): Should also store vbg and xyzmo-related metadata
                            created: Timestamp = Time.defaultTimestamp,
                            updated: Timestamp = Time.defaultTimestamp,
                            services: EnrollmentBatchServices = AppConfig.instance[EnrollmentBatchServices])
@@ -89,7 +88,7 @@ case class EnrollmentBatch(id: Long = 0,
 }
 
 object EnrollmentBatch {
-  val batchSize = 10
+  val batchSize = 20 // This needs to match the number of enrollment phrases in GetCelebrityEnrollmentTemplateApiEndpoint
 }
 
 class EnrollmentBatchStore @Inject() (schema: Schema) extends Saves[EnrollmentBatch] with SavesCreatedUpdated[EnrollmentBatch] {

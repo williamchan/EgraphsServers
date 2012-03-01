@@ -21,7 +21,8 @@ case class VBGAudioCheck(id: Long = 0,
                          created: Timestamp = Time.defaultTimestamp,
                          updated: Timestamp = Time.defaultTimestamp,
                          services: VBGAudioCheckServices = AppConfig.instance[VBGAudioCheckServices])
-  extends KeyedCaseClass[Long]
+  extends VBGBase
+//  extends KeyedCaseClass[Long]
   with HasCreatedUpdated {
 
   //
@@ -31,6 +32,8 @@ case class VBGAudioCheck(id: Long = 0,
   def save(): VBGAudioCheck = {
     services.store.save(this)
   }
+
+  def getErrorCode: String = errorCode
 
   //
   // KeyedCaseClass[Long] methods

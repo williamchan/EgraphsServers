@@ -6,10 +6,9 @@ import services.blobs.Blobs
 import Blobs.Conversions._
 import services.signature.XyzmoBiometricServices
 import services.db.Schema
-import services.voice.VBGDevFreeSpeechBiometricServices
 import models._
-import models.vbg._
 import services.AppConfig
+import services.voice.VoiceBiometricsError
 
 @On("0 0 0 * * ?") // cron expression: seconds minutes hours day-of-month month day-of-week (year optional)
 class EnrollmentBatchJob extends Job {
@@ -34,8 +33,14 @@ class EnrollmentBatchJob extends Job {
         val signatureSamples: List[SignatureSample] = EnrollmentBatchJob.getSignatureSamples(batch)
         val voiceSamples: List[VoiceSample] = EnrollmentBatchJob.getVoiceSamples(batch)
 
-        val isSuccessfulSignatureEnrollment: Boolean = EnrollmentBatchJob.attemptSignatureEnrollment(celebrity, signatureSamples)
-        val isSuccessfulVoiceEnrollment: Boolean = EnrollmentBatchJob.attemptVoiceEnrollment(celebrity, voiceSamples)
+        val isSuccessfulSignatureEnrollment: Boolean = EnrollmentBatchJob.attemptSignatureEnrollment(batch, signatureSamples, celebrity)
+        val voiceEnrollmentResult: Either[VoiceBiometricsError, Boolean] = new services.voice.VBGVoiceBiometricService().enroll(batch, voiceSamples) // todo(wchan): get VoiceBiometricService via injection
+
+        val isSuccessfulVoiceEnrollment: Boolean = if (voiceEnrollmentResult.isRight) {
+          voiceEnrollmentResult.right.get
+        } else {
+          false
+        }
 
         val isSuccessfulEnrollment = isSuccessfulSignatureEnrollment && isSuccessfulVoiceEnrollment
         batch.copy(isSuccessfulEnrollment = Some(isSuccessfulEnrollment)).save()
@@ -47,14 +52,13 @@ class EnrollmentBatchJob extends Job {
       }
     }
   }
-
 }
 
 object EnrollmentBatchJob {
   val blobs = AppConfig.instance[Blobs]
   val schema = AppConfig.instance[Schema]
 
-  def attemptSignatureEnrollment(celebrity: Celebrity, signatureSamples: scala.List[SignatureSample]): Boolean = {
+  def attemptSignatureEnrollment(enrollmentBatch: EnrollmentBatch, signatureSamples: scala.List[SignatureSample], celebrity: Celebrity): Boolean = {
     for (signatureSample <- signatureSamples) {
       // TODO(wchan): Do this lazily.
       signatureSample.putXyzmoSignatureDataContainerOnBlobstore
@@ -72,40 +76,6 @@ object EnrollmentBatchJob {
     println("Result of signature enrollment attempt for celebrity " + celebrity.id.toString + ": " + isSuccessfulSignatureEnrollment.toString)
 
     isSuccessfulSignatureEnrollment
-  }
-
-  private def sendStartEnrollmentRequest(celebrity: Celebrity): VBGStartEnrollment = {
-    val vbgStartEnrollment = VBGDevFreeSpeechBiometricServices.sendStartEnrollmentRequest(celebrity.id.toString, false)
-    if (vbgStartEnrollment.errorCode == "0") {
-      // First-time enrollment
-      vbgStartEnrollment
-    }
-    else {
-      // Re-enrollment
-      VBGDevFreeSpeechBiometricServices.sendStartEnrollmentRequest(celebrity.id.toString, true)
-    }
-  }
-
-  def attemptVoiceEnrollment(celebrity: Celebrity, voiceSamples: scala.List[VoiceSample]): Boolean = {
-    val vbgStartEnrollment = sendStartEnrollmentRequest(celebrity)
-    // todo(wchan): if vbgStartEnrollment failed, then fail out
-    val transactionId = vbgStartEnrollment.vbgTransactionId.get
-    println("Attempting voice enrollment with transactionId " + transactionId)
-
-    var atLeastOneUsableSample = false
-    for (voiceSample <- voiceSamples) {
-      val vbgAudioCheck = VBGDevFreeSpeechBiometricServices.sendAudioCheckRequest(transactionId.toLong, VoiceSample.getWavUrl(voiceSample.id))
-      if (vbgAudioCheck.errorCode == "0") atLeastOneUsableSample = true
-    }
-    if (!atLeastOneUsableSample) {
-      println("No usable voice samples... aborting enrollment attempt!")
-      return false
-    }
-
-    val vbgEnrollUser = VBGDevFreeSpeechBiometricServices.sendEnrollUserRequest(transactionId.toLong)
-    val enrollmentSuccessValue = vbgEnrollUser.success.getOrElse(false)
-    VBGDevFreeSpeechBiometricServices.sendFinishEnrollTransactionRequest(transactionId.toLong, enrollmentSuccessValue)
-    enrollmentSuccessValue
   }
 
   def findEnrollmentBatchesPending(): List[EnrollmentBatch] = {

@@ -21,7 +21,8 @@ case class VBGEnrollUser(id: Long = 0,
                          created: Timestamp = Time.defaultTimestamp,
                          updated: Timestamp = Time.defaultTimestamp,
                          services: VBGEnrollUserServices = AppConfig.instance[VBGEnrollUserServices])
-  extends KeyedCaseClass[Long]
+  extends VBGBase
+  //  extends KeyedCaseClass[Long]
   with HasCreatedUpdated {
 
   //
@@ -31,6 +32,8 @@ case class VBGEnrollUser(id: Long = 0,
   def save(): VBGEnrollUser = {
     services.store.save(this)
   }
+
+  def getErrorCode: String = errorCode
 
   //
   // KeyedCaseClass[Long] methods
