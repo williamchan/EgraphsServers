@@ -32,10 +32,16 @@ private[controllers] trait GetCelebrityEnrollmentTemplateApiEndpoint {
         val _1_thru_5: List[String] = List("One, two, three, four, five")
         val _6_thru_10: List[String] = List("Six, seven, eight, nine, ten")
         val enrollmentPhrases: List[String] = myNameIs ::: _1_thru_5 ::: phonymsPhrases ::: phonymsPhrases ::: _6_thru_10 ::: myNameIs
+        val enrollmentPhrasesWithFieldIdentifiers: List[Map[String, String]] = for (enrollmentPhrase <- enrollmentPhrases) yield Map(GetCelebrityEnrollmentTemplateApiEndpoint._text -> enrollmentPhrase)
 
-        val enrollmentTemplate = Map("enrollmentPhrases" -> enrollmentPhrases)
+        val enrollmentTemplate = Map(GetCelebrityEnrollmentTemplateApiEndpoint._enrollmentPhrases -> enrollmentPhrasesWithFieldIdentifiers)
         Serializer.SJSON.toJSON(enrollmentTemplate)
       }
     }
   }
+}
+
+object GetCelebrityEnrollmentTemplateApiEndpoint {
+  val _enrollmentPhrases: String = "enrollmentPhrases"
+  val _text: String = "text"
 }
