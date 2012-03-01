@@ -109,13 +109,6 @@ class Schema @Inject()(injector: Injector) extends org.squeryl.Schema {
 
 
   //
-  // media
-  //
-  val signatureSamples = table[SignatureSample]
-  val voiceSamples = table[VoiceSample]
-
-
-  //
   // biometrics
   //
   val enrollmentBatches = table[EnrollmentBatch]
@@ -264,7 +257,6 @@ class Schema @Inject()(injector: Injector) extends org.squeryl.Schema {
       factoryFor(enrollmentSamples) is EnrollmentSample(services = injector.instance[EnrollmentSampleServices]),
       factoryFor(orders) is Order(services = injector.instance[OrderServices]),
       factoryFor(products) is Product(services = injector.instance[ProductServices]),
-      factoryFor(signatureSamples) is SignatureSample(services = injector.instance[SignatureSampleServices]),
       factoryFor(vbgAudioCheckTable) is VBGAudioCheck(services = injector.instance[VBGAudioCheckServices]),
       factoryFor(vbgEnrollUserTable) is VBGEnrollUser(services = injector.instance[VBGEnrollUserServices]),
       factoryFor(vbgFinishEnrollTransactionTable) is VBGFinishEnrollTransaction(services = injector.instance[VBGFinishEnrollTransactionServices]),
@@ -272,7 +264,6 @@ class Schema @Inject()(injector: Injector) extends org.squeryl.Schema {
       factoryFor(vbgStartEnrollmentTable) is VBGStartEnrollment(services = injector.instance[VBGStartEnrollmentServices]),
       factoryFor(vbgStartVerificationTable) is VBGStartVerification(services = injector.instance[VBGStartVerificationServices]),
       factoryFor(vbgVerifySampleTable) is VBGVerifySample(services = injector.instance[VBGVerifySampleServices]),
-      factoryFor(voiceSamples) is VoiceSample(services = injector.instance[VoiceSampleServices]),
       factoryFor(xyzmoAddUserTable) is XyzmoAddUser(services = injector.instance[XyzmoAddUserServices]),
       factoryFor(xyzmoDeleteUserTable) is XyzmoDeleteUser(services = injector.instance[XyzmoDeleteUserServices]),
       factoryFor(xyzmoAddProfileTable) is XyzmoAddProfile(services = injector.instance[XyzmoAddProfileServices]),

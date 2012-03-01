@@ -6,6 +6,7 @@ import services.Time
 import services.db.{KeyedCaseClass, Schema, Saves}
 import services.AppConfig
 import com.google.inject.{Provider, Inject}
+import org.squeryl.Query
 
 /**
  * Services used by each EnrollmentBatch instance.
@@ -13,9 +14,7 @@ import com.google.inject.{Provider, Inject}
 case class EnrollmentBatchServices @Inject() (
   store: EnrollmentBatchStore,
   celebStore: CelebrityStore,
-  enrollmentSampleServices: Provider[EnrollmentSampleServices],
-  signatureSampleServices: Provider[SignatureSampleServices],
-  voiceSampleServices: Provider[VoiceSampleServices]
+  enrollmentSampleServices: Provider[EnrollmentSampleServices]
 )
 
 case class EnrollmentBatch(id: Long = 0,
@@ -41,22 +40,10 @@ case class EnrollmentBatch(id: Long = 0,
    * EnrollmentSample completes this batch (see batchSize).
    */
   def addEnrollmentSample(signatureStr: String, voiceStr: String, skipBiometrics: Boolean = false): (EnrollmentSample, Boolean, Int, Int) = {
-    val signatureSample = SignatureSample(
-      isForEnrollment=true,
-      services=services.signatureSampleServices.get
-    ).save(signatureStr)
-
-    val voiceSample = VoiceSample(
-      isForEnrollment=true,
-      services=services.voiceSampleServices.get
-    ).save(voiceStr)
-
     val enrollmentSample = EnrollmentSample(
       enrollmentBatchId=id,
-      signatureSampleId=signatureSample.id,
-      voiceSampleId=voiceSample.id,
       services=services.enrollmentSampleServices.get
-    ).save()
+    ).save(signatureStr = signatureStr, voiceStr = voiceStr)
 
     val numEnrollmentSamplesInBatch = getNumEnrollmentSamples
     if (numEnrollmentSamplesInBatch >= EnrollmentBatch.batchSize) {
@@ -80,6 +67,10 @@ case class EnrollmentBatch(id: Long = 0,
     services.store.countEnrollmentSamples(id)
   }
 
+  def getEnrollmentSamples: List[EnrollmentSample] = {
+    services.store.getEnrollmentSamples(id)
+  }
+
   //
   // KeyedCaseClass[Long] methods
   //
@@ -92,14 +83,20 @@ object EnrollmentBatch {
 }
 
 class EnrollmentBatchStore @Inject() (schema: Schema) extends Saves[EnrollmentBatch] with SavesCreatedUpdated[EnrollmentBatch] {
-  //
-  // Public methods
-  //
+
+  def getEnrollmentSamples(batchId: Long): List[EnrollmentSample] = {
+    queryForEnrollmentSamples(batchId).toList
+  }
+
   def countEnrollmentSamples(batchId: Long): Int = {
+    queryForEnrollmentSamples(batchId).size
+  }
+
+  private def queryForEnrollmentSamples(batchId: Long): Query[EnrollmentSample] = {
     from(schema.enrollmentSamples)(enrollmentSample =>
       where(enrollmentSample.enrollmentBatchId === batchId)
         select (enrollmentSample)
-    ).size
+    )
   }
 
   //

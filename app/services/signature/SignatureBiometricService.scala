@@ -4,7 +4,7 @@ import models.{EnrollmentBatch, Egraph}
 
 
 trait SignatureBiometricService {
-  def enroll(enrollmentBatch: EnrollmentBatch, signatureDataContainers: List[String]): Either[SignatureBiometricsError, Boolean]
+  def enroll(enrollmentBatch: EnrollmentBatch): Either[SignatureBiometricsError, Boolean]
   def verify(signatureJson: String, egraph: Egraph): Either[SignatureBiometricsError, SignatureVerificationMetadata]
 }
 
@@ -14,8 +14,8 @@ trait SignatureBiometricService {
 class XyzmoSignatureBiometricService extends SignatureBiometricService {
   private val xyzmo = XyzmoBiometricServices
   
-  def enroll(enrollmentBatch: EnrollmentBatch, signatureDataContainers: List[String]): Either[SignatureBiometricsError, Boolean] = {
-    xyzmo.enroll(enrollmentBatch, signatureDataContainers)
+  def enroll(enrollmentBatch: EnrollmentBatch): Either[SignatureBiometricsError, Boolean] = {
+    xyzmo.enroll(enrollmentBatch)
   }
 
   def verify(signatureJson: String, egraph: Egraph): Either[SignatureBiometricsError, SignatureVerificationMetadata] = {
@@ -28,7 +28,7 @@ class XyzmoSignatureBiometricService extends SignatureBiometricService {
  * returns that the sample passed.
  */
 class NiceSignatureBiometricService extends SignatureBiometricService {
-  def enroll(enrollmentBatch: EnrollmentBatch, signatureDataContainers: List[String]): Either[SignatureBiometricsError, Boolean] = {
+  def enroll(enrollmentBatch: EnrollmentBatch): Either[SignatureBiometricsError, Boolean] = {
     Right(true)
   }
 

@@ -14,7 +14,6 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
       (signature, audio) match {
         case (Some(signatureString), Some(audioString)) =>
           val openEnrollmentBatch: Option[EnrollmentBatch] = celebrity.getOpenEnrollmentBatch()
-          // TODO: is there a nice way to use a match here instead of if-else?
 
           if (openEnrollmentBatch.isEmpty) {
             val enrollmentBatch = EnrollmentBatch(celebrityId = celebrity.id, services=enrollmentBatchServices).save()

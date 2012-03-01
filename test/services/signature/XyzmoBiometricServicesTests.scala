@@ -1,11 +1,11 @@
 package services.signature
 
 import com.xyzmo.wwww.biometricserver.{WebServiceBiometricPartStub, WebServiceUserAndProfileStub}
-import java.io.{File, FileInputStream}
 import models.xyzmo._
 import org.scalatest.matchers.ShouldMatchers
 import play.Play
 import play.test.UnitFlatSpec
+import utils.TestHelpers
 
 class XyzmoBiometricServicesTests extends UnitFlatSpec with ShouldMatchers {
 
@@ -15,27 +15,27 @@ class XyzmoBiometricServicesTests extends UnitFlatSpec with ShouldMatchers {
       " \"t\": [[13331445844472,13331448640856,13331448883353,13331449284887,13331449651436,13331450040379,13331450424036,13331450807652,13331451196301,13331451571027,13331452335120,13331452715422,13331453111580,13331453485879,13331453868402,13331454261722,13331454635498,13331455017782,13331455412529,13331455785207,13331456166898,13331456560894,13331456934011,13331457322500,13331457715549,13331458088385,13331458473840,13331458866709,13331459240098,13331459624481,13331460018091,13331460393174,13331460799934,13331461222643,13331461589850,13331461980530,13331462398425,13331462784410,13331463194394,13331463581897,13331463992719,13331464379978,13331464795079,13331465178617,13331465586223,13331465970468,13331466378919,13331466787303,13331467197008,13331467589763,13331467976468,13331468388426,13331468775448,13331469185619,13331469577402,13331469986701,13331470400979,13331470789692,13331471175473,13331471589816,13331471976246,13331472385216,13331472793954,13331473176490,13331473595481,13331473985074,13331474395116,13331474780376,13331475193705,13331475583284,13331475997763,13331476384461,13331476797005,13331477181443,13331477595114,13331477162456,13331477576030]]}"
 
     val sdc = XyzmoBiometricServices.getSignatureDataContainerFromJSON(signatureStr)
-    sdc should be(XyzmoBiometricServicesTests.getStringFromFile(Play.getFile("test/files/xyzmo_signature_nomatch.xml")))
+    sdc should be(TestHelpers.getStringFromFile(Play.getFile("test/files/xyzmo_signature_nomatch.xml")))
   }
 
   it should "test xyzmo end-to-end" in {
     val userId = "testuser"
 
-    val signature1 = XyzmoBiometricServicesTests.getStringFromFile(Play.getFile("test/files/xyzmo_signature1.xml"))
-    val signature2 = XyzmoBiometricServicesTests.getStringFromFile(Play.getFile("test/files/xyzmo_signature2.xml"))
-    val signature3 = XyzmoBiometricServicesTests.getStringFromFile(Play.getFile("test/files/xyzmo_signature3.xml"))
-    val signature4 = XyzmoBiometricServicesTests.getStringFromFile(Play.getFile("test/files/xyzmo_signature4.xml"))
-    val signature5 = XyzmoBiometricServicesTests.getStringFromFile(Play.getFile("test/files/xyzmo_signature5.xml"))
-    val signature6 = XyzmoBiometricServicesTests.getStringFromFile(Play.getFile("test/files/xyzmo_signature6.xml"))
-    val signature7 = XyzmoBiometricServicesTests.getStringFromFile(Play.getFile("test/files/xyzmo_signature7.xml"))
-    val signature_nomatch = XyzmoBiometricServicesTests.getStringFromFile(Play.getFile("test/files/xyzmo_signature_nomatch.xml"))
+    val signature1 = TestHelpers.getStringFromFile(Play.getFile("test/files/xyzmo_signature1.xml"))
+    val signature2 = TestHelpers.getStringFromFile(Play.getFile("test/files/xyzmo_signature2.xml"))
+    val signature3 = TestHelpers.getStringFromFile(Play.getFile("test/files/xyzmo_signature3.xml"))
+    val signature4 = TestHelpers.getStringFromFile(Play.getFile("test/files/xyzmo_signature4.xml"))
+    val signature5 = TestHelpers.getStringFromFile(Play.getFile("test/files/xyzmo_signature5.xml"))
+    val signature6 = TestHelpers.getStringFromFile(Play.getFile("test/files/xyzmo_signature6.xml"))
+    val signature7 = TestHelpers.getStringFromFile(Play.getFile("test/files/xyzmo_signature7.xml"))
+    val signature_nomatch = TestHelpers.getStringFromFile(Play.getFile("test/files/xyzmo_signature_nomatch.xml"))
 
     val xyzmoDeleteUser: XyzmoDeleteUser = XyzmoBiometricServices.deleteUser(celebrityId = 0, userId = userId)
     xyzmoDeleteUser.baseResult should be(WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue)
     xyzmoDeleteUser.error should be(None)
     xyzmoDeleteUser.errorMsg should be(None)
 
-    val xyzmoAddUser: XyzmoAddUser = XyzmoBiometricServices.addUser(celebrityId = 0, userId = userId, userName = userId)
+    val xyzmoAddUser: XyzmoAddUser = XyzmoBiometricServices.addUser(celebrityId = 0, userId = userId)
     xyzmoAddUser.baseResult should be(WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue)
     xyzmoAddUser.error should be(None)
     xyzmoAddUser.errorMsg should be(None)
@@ -69,14 +69,5 @@ class XyzmoBiometricServicesTests extends UnitFlatSpec with ShouldMatchers {
     xyzmoVerifyUser_NoMatch.errorMsg should be(None)
     xyzmoVerifyUser_NoMatch.isMatch.get should be(false)
     xyzmoVerifyUser_NoMatch.score.get should be(0)
-  }
-}
-
-object XyzmoBiometricServicesTests {
-  def getStringFromFile(file: File): String = {
-    val xmlIn: FileInputStream = new FileInputStream(file)
-    val xmlBytes: Array[Byte] = new Array[Byte](xmlIn.available)
-    xmlIn.read(xmlBytes)
-    new String(xmlBytes)
   }
 }

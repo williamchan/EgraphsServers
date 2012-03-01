@@ -2,8 +2,6 @@ package jobs
 
 import org.squeryl.PrimitiveTypeMode._
 import play.jobs._
-import services.blobs.Blobs
-import Blobs.Conversions._
 import services.db.Schema
 import models._
 import services.AppConfig
@@ -26,23 +24,18 @@ class EnrollmentBatchJob extends Job {
 
     inTransaction {
       val celebStore = AppConfig.instance[CelebrityStore]
-      val blobs = AppConfig.instance[Blobs]
 
       for (batch <- EnrollmentBatchJob.findEnrollmentBatchesPending()) {
         val celebrity = celebStore.findById(batch.celebrityId).get
 
-        val signatureSamples: List[SignatureSample] = EnrollmentBatchJob.getSignatureSamples(batch)
-        for (signatureSample <- signatureSamples) signatureSample.putXyzmoSignatureDataContainerOnBlobstore
-        val signatureDataContainers = for (signatureSample <- signatureSamples) yield blobs.get(SignatureSample.getXmlUrl(signatureSample.id)).get.asString
-        val signatureEnrollmentResult: Either[SignatureBiometricsError, Boolean] = new services.signature.XyzmoSignatureBiometricService().enroll(batch, signatureDataContainers)
+        val signatureEnrollmentResult: Either[SignatureBiometricsError, Boolean] = new services.signature.XyzmoSignatureBiometricService().enroll(batch)
         val isSuccessfulSignatureEnrollment: Boolean = if (signatureEnrollmentResult.isRight) {
           signatureEnrollmentResult.right.get
         } else {
           false
         }
 
-        val voiceSamples: List[VoiceSample] = EnrollmentBatchJob.getVoiceSamples(batch)
-        val voiceEnrollmentResult: Either[VoiceBiometricsError, Boolean] = new services.voice.VBGVoiceBiometricService().enroll(batch, voiceSamples) // todo(wchan): get VoiceBiometricService via injection
+        val voiceEnrollmentResult: Either[VoiceBiometricsError, Boolean] = new services.voice.VBGVoiceBiometricService().enroll(batch) // todo(wchan): get VoiceBiometricService via injection
         val isSuccessfulVoiceEnrollment: Boolean = if (voiceEnrollmentResult.isRight) {
           voiceEnrollmentResult.right.get
         } else {
@@ -70,19 +63,4 @@ object EnrollmentBatchJob {
         select (enrollmentBatch)
     ).toList
   }
-
-  def getSignatureSamples(enrollmentBatch: EnrollmentBatch): List[SignatureSample] = {
-    from(schema.signatureSamples, schema.enrollmentSamples)((signatureSample, enrollmentSample) =>
-      where(enrollmentSample.enrollmentBatchId === enrollmentBatch.id and enrollmentSample.signatureSampleId === signatureSample.id)
-        select (signatureSample)
-    ).toList
-  }
-
-  def getVoiceSamples(enrollmentBatch: EnrollmentBatch): List[VoiceSample] = {
-    from(schema.voiceSamples, schema.enrollmentSamples)((voiceSample, enrollmentSample) =>
-      where(enrollmentSample.enrollmentBatchId === enrollmentBatch.id and enrollmentSample.voiceSampleId === voiceSample.id)
-        select (voiceSample)
-    ).toList
-  }
-
 }

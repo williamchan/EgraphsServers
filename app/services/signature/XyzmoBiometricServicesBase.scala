@@ -7,7 +7,7 @@ import com.xyzmo.wwww.biometricserver.WebServiceUserAndProfileStub._
 import models.xyzmo._
 import org.apache.axis2.transport.http.{HTTPConstants, HttpTransportProperties}
 import org.apache.log4j.Logger
-import models.{Egraph, EnrollmentBatch}
+import models.{EnrollmentSample, Egraph, EnrollmentBatch}
 
 trait XyzmoBiometricServicesBase {
 
@@ -19,12 +19,11 @@ trait XyzmoBiometricServicesBase {
   protected val host: String
   protected val port: Int = 50200
 
-  //  private val celebStore = AppConfig.instance[CelebrityStore]
+  def enroll(enrollmentBatch: EnrollmentBatch): Either[SignatureBiometricsError, Boolean] = {
+    val enrollmentSamples: List[EnrollmentSample] = enrollmentBatch.getEnrollmentSamples
+    val signatureDataContainers: List[String] = for (enrollmentSample <- enrollmentSamples) yield getXyzmoSignatureDataContainer(enrollmentSample)
 
-  def enroll(enrollmentBatch: EnrollmentBatch, signatureDataContainers: List[String]): Either[SignatureBiometricsError, Boolean] = {
-    //    val celebrity = celebStore.findById(enrollmentBatch.celebrityId).get
     val celebrityId: Long = enrollmentBatch.celebrityId
-
     val xyzmoDeleteUser: XyzmoDeleteUser = XyzmoBiometricServices.deleteUser(celebrityId = celebrityId, userId = celebrityId.toString)
     xyzmoDeleteUser.save()
     val xyzmoAddUser: XyzmoAddUser = addUser(celebrityId = celebrityId, userId = celebrityId.toString)
@@ -51,10 +50,10 @@ trait XyzmoBiometricServicesBase {
     ))
   }
 
-  protected[signature] def addUser(celebrityId: Long, userId: String, userName: String = null): XyzmoAddUser = {
+  protected[signature] def addUser(celebrityId: Long, userId: String): XyzmoAddUser = {
     val user_Add: User_Add_v1 = new User_Add_v1
     user_Add.setBioUserId(userId)
-    if (userName != null) user_Add.setDisplayName(userName) else user_Add.setDisplayName(userId)
+    user_Add.setDisplayName(userId)
     user_Add.setBioUserStatus(BioUserStatus.Active)
     val webServiceUserAndProfile: Option[WebServiceUserAndProfileStub] = getWebServiceUserAndProfileStub
     val user_Add_v1Response: User_Add_v1Response = webServiceUserAndProfile.get.user_Add_v1(user_Add)
@@ -145,12 +144,19 @@ trait XyzmoBiometricServicesBase {
     xyzmoVerifyUser
   }
 
-  def getSignatureDataContainerFromJSON(jsonStr: String): String = {
+  protected[signature] def getSignatureDataContainerFromJSON(jsonStr: String): String = {
     val json: GetSignatureDataContainerFromJSON = new GetSignatureDataContainerFromJSON()
     json.setJsonData(jsonStr)
     val sdcFromJSON: Option[SDCFromJSONStub] = getSDCFromJSON
     val getSignatureDataContainerFromJSONResponse: GetSignatureDataContainerFromJSONResponse = sdcFromJSON.get.getSignatureDataContainerFromJSON(json)
     getSignatureDataContainerFromJSONResponse.getGetSignatureDataContainerFromJSONResult
+  }
+
+  private def getXyzmoSignatureDataContainer(enrollmentSample: EnrollmentSample): String = {
+    val jsonStr: String = enrollmentSample.getSignatureJson
+    val sdc = getSignatureDataContainerFromJSON(jsonStr)
+    enrollmentSample.putSignatureXml(sdc)
+    sdc
   }
 
   // ====================================== Services

@@ -1,10 +1,10 @@
 package services.voice
 
-import models.{VoiceSample, EnrollmentBatch, Egraph}
+import models.{EnrollmentBatch, Egraph}
 
 
 trait VoiceBiometricService {
-  def enroll(enrollmentBatch: EnrollmentBatch, voiceSamples: scala.List[VoiceSample]): Either[VoiceBiometricsError, Boolean]
+  def enroll(enrollmentBatch: EnrollmentBatch): Either[VoiceBiometricsError, Boolean]
   def verify(audio: Array[Byte], egraph: Egraph): Either[VoiceBiometricsError, VoiceVerificationResult]
 }
 
@@ -15,8 +15,8 @@ trait VoiceBiometricService {
 class VBGVoiceBiometricService extends VoiceBiometricService {
   private val vbg = VBGDevFreeSpeechBiometricServices
 
-  def enroll(enrollmentBatch: EnrollmentBatch, voiceSamples: scala.List[VoiceSample]): Either[VoiceBiometricsError, Boolean] = {
-    vbg.enroll(enrollmentBatch, voiceSamples)
+  def enroll(enrollmentBatch: EnrollmentBatch): Either[VoiceBiometricsError, Boolean] = {
+    vbg.enroll(enrollmentBatch)
   }
 
   def verify(audio: Array[Byte], egraph: Egraph): Either[VoiceBiometricsError, VoiceVerificationResult] = {
@@ -26,7 +26,7 @@ class VBGVoiceBiometricService extends VoiceBiometricService {
 
 class YesMaamVoiceBiometricService extends VoiceBiometricService {
 
-  def enroll(enrollmentBatch: EnrollmentBatch, voiceSamples: scala.List[VoiceSample]) = Right(true)
+  def enroll(enrollmentBatch: EnrollmentBatch) = Right(true)
 
   def verify(audio: Array[Byte], egraph: Egraph) = {
     Right(new VoiceVerificationResult {

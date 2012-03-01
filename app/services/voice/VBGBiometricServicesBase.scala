@@ -12,9 +12,7 @@ import models.vbg._
 import org.w3c.dom.{Node, Document}
 import org.xml.sax.InputSource
 import play.libs.Codec
-import services.{AppConfig, SampleRateConverter}
-import services.blobs.Blobs
-import services.blobs.Blobs.Conversions._
+import services.SampleRateConverter
 
 trait VBGBiometricServicesBase {
 
@@ -22,9 +20,7 @@ trait VBGBiometricServicesBase {
   protected val _myClientName: String
   protected val _myClientKey: String
 
-  private val blobs = AppConfig.instance[Blobs]
-
-  def enroll(enrollmentBatch: EnrollmentBatch, voiceSamples: List[VoiceSample]): Either[VoiceBiometricsError, Boolean] = {
+  def enroll(enrollmentBatch: EnrollmentBatch): Either[VoiceBiometricsError, Boolean] = {
     val vbgStartEnrollment: VBGStartEnrollment = sendStartEnrollmentRequest(enrollmentBatch)
     vbgStartEnrollment.save()
     val startEnrollmentError: Option[VoiceBiometricsError] = maybeGetVoiceBiometricsError(vbgStartEnrollment)
@@ -32,14 +28,15 @@ trait VBGBiometricServicesBase {
       return Left(startEnrollmentError.get)
     }
 
-    val transactionId = vbgStartEnrollment.vbgTransactionId.get
+    val enrollmentSamples: List[EnrollmentSample] = enrollmentBatch.getEnrollmentSamples
+    val wavs: List[Array[Byte]] = for (enrollmentSample <- enrollmentSamples) yield enrollmentSample.getWav
 
     // this part differs between RandomNumber and FreeSpeech...
     //    for (voiceSample <- voiceSamples) {
     //      val vbgAudioCheck = VBGDevFreeSpeechBiometricServices.sendAudioCheckRequest(enrollmentBatch, transactionId, VoiceSample.getWavUrl(voiceSample.id))
     //    }
 
-    val wavs: List[Array[Byte]] = for (voiceSample <- voiceSamples) yield blobs.get(VoiceSample.getWavUrl(voiceSample.id)).get.asByteArray
+    val transactionId = vbgStartEnrollment.vbgTransactionId.get
     val combinedWav: Option[AudioInputStream] = stitchWAVs(wavs)
     val combinedWavBinary: Array[Byte] = if (combinedWav.isDefined) convertAudioInputStreamToByteArray(combinedWav.get) else new Array[Byte](0)
     val vbgAudioCheck: VBGAudioCheck = VBGDevFreeSpeechBiometricServices.sendAudioCheckRequest(enrollmentBatch = enrollmentBatch, transactionId = transactionId, wavBinary = combinedWavBinary)

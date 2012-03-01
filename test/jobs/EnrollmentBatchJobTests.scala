@@ -3,7 +3,7 @@ package jobs
 import play.test.UnitFlatSpec
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.BeforeAndAfterEach
-import utils.{TestConstants, DBTransactionPerTest, ClearsDatabaseAndValidationAfter}
+import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationAfter}
 import models._
 
 
@@ -39,21 +39,4 @@ with DBTransactionPerTest {
     val pendingEnrollmentBatches = EnrollmentBatchJob.findEnrollmentBatchesPending()
     pendingEnrollmentBatches.length should be(EnrollmentBatch.batchSize)
   }
-
-  "getSignatureSamples" should "return SignatureSamples associated with EnrollmentBatch" in {
-    val enrollmentBatch = EnrollmentBatch(celebrityId = Celebrity().save().id, isBatchComplete = true).save()
-    enrollmentBatch.addEnrollmentSample(signatureStr = TestConstants.signatureStr, voiceStr = TestConstants.voiceStr)
-    enrollmentBatch.addEnrollmentSample(signatureStr = TestConstants.signatureStr, voiceStr = TestConstants.voiceStr)
-    val signatureSamples: List[SignatureSample] = EnrollmentBatchJob.getSignatureSamples(enrollmentBatch)
-    signatureSamples.length should be(2)
-  }
-
-  "getVoiceSamples" should "return VoiceSamples associated with EnrollmentBatch" in {
-    val enrollmentBatch = EnrollmentBatch(celebrityId = Celebrity().save().id, isBatchComplete = true).save()
-    enrollmentBatch.addEnrollmentSample(signatureStr = TestConstants.signatureStr, voiceStr = TestConstants.voiceStr)
-    enrollmentBatch.addEnrollmentSample(signatureStr = TestConstants.signatureStr, voiceStr = TestConstants.voiceStr)
-    val voiceSamples: List[VoiceSample] = EnrollmentBatchJob.getVoiceSamples(enrollmentBatch)
-    voiceSamples.length should be(2)
-  }
-
 }

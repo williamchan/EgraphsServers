@@ -32,6 +32,7 @@ case class Egraph(
   id: Long = 0L,
   orderId: Long = 0L,
   stateValue: String = EgraphState.AwaitingVerification.value,
+  // todo(wchan): Remove these now denormalized columns that exist on XyzmoVerifyUser and VBGVerifySample
   _voiceCode: Option[String] = None,
   _voiceSuccess: Option[Boolean] = None,
   _voiceScore: Option[Long] = None,
@@ -211,7 +212,7 @@ case class Egraph(
     override def signature: String = {
       blobs.get(signatureJsonKey).get.asString
     }
-    
+
     override def audio: Blob = {
       blobs.get(audioKey).get
     }
@@ -231,7 +232,7 @@ case class Egraph(
     }
 
     override def save(signature: String, message: Option[String], audio: Array[Byte]) {
-      blobs.put(signatureJsonKey, signature, access=AccessPolicy.Private)      
+      blobs.put(signatureJsonKey, signature, access=AccessPolicy.Private)
       blobs.put(audioKey, audio, access=AccessPolicy.Public)
 
       // Put in the message if it was provided

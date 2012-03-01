@@ -1,27 +1,28 @@
 package models
 
-import org.squeryl.PrimitiveTypeMode._
-import java.sql.Timestamp
-import services.Time
-import services.db.{KeyedCaseClass, Schema, Saves}
 import com.google.inject.Inject
+import java.sql.Timestamp
+import org.squeryl.PrimitiveTypeMode._
+import play.libs.Codec
 import services.AppConfig
+import services.blobs.Blobs
+import services.db.{KeyedCaseClass, Schema, Saves}
+import services.Time
+import org.jclouds.blobstore.domain.Blob
+import Blobs.Conversions._
 
 /**
  * Services used by each EnrollmentSample instance
  */
-case class EnrollmentSampleServices @Inject() (store: EnrollmentSampleStore)
+case class EnrollmentSampleServices @Inject()(store: EnrollmentSampleStore, blobs: Blobs)
 
-case class EnrollmentSample(
-  id: Long = 0,
-  enrollmentBatchId: Long = 0,
-  voiceSampleId: Long = 0,
-  signatureSampleId: Long = 0,
-  created: Timestamp = Time.defaultTimestamp,
-  updated: Timestamp = Time.defaultTimestamp,
-  services: EnrollmentSampleServices = AppConfig.instance[EnrollmentSampleServices]
-) extends KeyedCaseClass[Long] with HasCreatedUpdated
-{
+case class EnrollmentSample(id: Long = 0,
+                            enrollmentBatchId: Long = 0,
+                            created: Timestamp = Time.defaultTimestamp,
+                            updated: Timestamp = Time.defaultTimestamp,
+                            services: EnrollmentSampleServices = AppConfig.instance[EnrollmentSampleServices])
+  extends KeyedCaseClass[Long]
+  with HasCreatedUpdated {
 
   //
   // Public members
@@ -31,6 +32,35 @@ case class EnrollmentSample(
     services.store.save(this)
   }
 
+  def save(signatureStr: String, voiceStr: String): EnrollmentSample = {
+    val saved = services.store.save(this)
+    services.blobs.put(EnrollmentSample.getSignatureJsonUrl(saved.id), signatureStr.getBytes)
+    services.blobs.put(EnrollmentSample.getWavUrl(saved.id), Codec.decodeBASE64(voiceStr))
+    saved
+  }
+
+  def getWav: Array[Byte] = {
+    val blob: Option[Blob] = services.blobs.get(EnrollmentSample.getWavUrl(id))
+    if (blob.isDefined) {
+      blob.get.asByteArray
+    } else {
+      new Array[Byte](0)
+    }
+  }
+
+  def getSignatureJson: String = {
+    val blob: Option[Blob] = services.blobs.get(EnrollmentSample.getSignatureJsonUrl(id))
+    if (blob.isDefined) {
+      blob.get.asString
+    } else {
+      ""
+    }
+  }
+
+  def putSignatureXml(xyzmoSignatureDataContainer: String) {
+    services.blobs.put(EnrollmentSample.getSignatureXmlUrl(id), xyzmoSignatureDataContainer.getBytes)
+  }
+
   //
   // KeyedCaseClass[Long] methods
   //
@@ -38,7 +68,22 @@ case class EnrollmentSample(
 
 }
 
-class EnrollmentSampleStore @Inject() (schema: Schema) extends Saves[EnrollmentSample] with SavesCreatedUpdated[EnrollmentSample] {
+object EnrollmentSample {
+
+  def getSignatureJsonUrl(id: Long): String = {
+    "enrollmentsamples/" + id + "/signature.json"
+  }
+
+  def getSignatureXmlUrl(id: Long): String = {
+    "enrollmentsamples/" + id + "/signature.xml"
+  }
+
+  def getWavUrl(id: Long): String = {
+    "enrollmentsamples/" + id + "/audio.wav"
+  }
+}
+
+class EnrollmentSampleStore @Inject()(schema: Schema) extends Saves[EnrollmentSample] with SavesCreatedUpdated[EnrollmentSample] {
 
   //
   // Saves[EnrollmentSample] methods
@@ -48,8 +93,6 @@ class EnrollmentSampleStore @Inject() (schema: Schema) extends Saves[EnrollmentS
   override def defineUpdate(theOld: EnrollmentSample, theNew: EnrollmentSample) = {
     updateIs(
       theOld.enrollmentBatchId := theNew.enrollmentBatchId,
-      theOld.voiceSampleId := theNew.voiceSampleId,
-      theOld.signatureSampleId := theNew.signatureSampleId,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated
     )

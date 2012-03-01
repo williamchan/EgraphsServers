@@ -13,7 +13,7 @@ object MockXyzmoBiometricServices extends XyzmoBiometricServicesBase {
   protected val domain: String = ""
   protected val host: String = ""
 
-  override protected[signature] def addUser(celebrityId: Long, userId: String, userName: String = null): XyzmoAddUser = {
+  override protected[signature] def addUser(celebrityId: Long, userId: String): XyzmoAddUser = {
     val resultBase = new WebServiceUserAndProfileStub.ResultBase
     resultBase.setBaseResult(WebServiceUserAndProfileStub.BaseResultEnum.ok)
 
