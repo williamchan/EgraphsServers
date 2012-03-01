@@ -40,6 +40,7 @@ case class SignatureSample(
     saved
   }
 
+  // todo(wchan): This is important to keep
   def putXyzmoSignatureDataContainerOnBlobstore = {
     val jsonStr: String = services.blobs.get(SignatureSample.getJsonUrl(id)).get.asString
     val sdc = XyzmoBiometricServices.getSignatureDataContainerFromJSON(jsonStr)

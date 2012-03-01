@@ -13,7 +13,7 @@ object MockXyzmoBiometricServices extends XyzmoBiometricServicesBase {
   protected val domain: String = ""
   protected val host: String = ""
 
-  override def addUser(userId: String, userName: String): XyzmoAddUser = {
+  override protected[signature] def addUser(celebrityId: Long, userId: String, userName: String = null): XyzmoAddUser = {
     val resultBase = new WebServiceUserAndProfileStub.ResultBase
     resultBase.setBaseResult(WebServiceUserAndProfileStub.BaseResultEnum.ok)
 
@@ -22,7 +22,7 @@ object MockXyzmoBiometricServices extends XyzmoBiometricServicesBase {
     new XyzmoAddUser().withResultBase(resultBase)
   }
 
-  override def deleteUser(userId: String): XyzmoDeleteUser = {
+  override protected[signature] def deleteUser(celebrityId: Long, userId: String): XyzmoDeleteUser = {
     val resultBase = new WebServiceUserAndProfileStub.ResultBase
     resultBase.setBaseResult(WebServiceUserAndProfileStub.BaseResultEnum.ok)
 
@@ -31,12 +31,12 @@ object MockXyzmoBiometricServices extends XyzmoBiometricServicesBase {
     new XyzmoDeleteUser().withResultBase(resultBase)
   }
 
-  override def addProfile(userId: String, profileName: String): XyzmoAddProfile = {
+  override protected[signature] def addProfile(celebrityId: Long, userId: String): XyzmoAddProfile = {
     val profileInfoResult_v1 = new WebServiceUserAndProfileStub.ProfileInfoResult_v1
     profileInfoResult_v1.setBaseResult(WebServiceUserAndProfileStub.BaseResultEnum.ok)
     val profileResult = new WebServiceUserAndProfileStub.ProfileResult
     val profileInfo = new WebServiceUserAndProfileStub.ProfileInfo
-    profileInfo.setProfileId("profile" + userId)
+    profileInfo.setProfileId("profile" + celebrityId)
     profileResult.setProfileInfo(profileInfo)
     profileInfoResult_v1.setOkInfo(profileResult)
 
@@ -45,13 +45,13 @@ object MockXyzmoBiometricServices extends XyzmoBiometricServicesBase {
     new XyzmoAddProfile().withProfile_Add_v1Response(profile_Add_v1Response)
   }
 
-  override def enrollUser(userId: String, profileName: String, signatureDataContainers: List[String]): XyzmoEnrollDynamicProfile = {
+  override protected[signature] def enrollUser(enrollmentBatchId: Long, userId: String, signatureDataContainers: List[String]): XyzmoEnrollDynamicProfile = {
     val enrollResultInfo_v1 = new EnrollResultInfo_v1
     enrollResultInfo_v1.setBaseResult(WebServiceBiometricPartStub.BaseResultEnum.ok)
     val enrollResult = new EnrollResult
     enrollResult.setEnrollResult(EnrollResultEnum.EnrollCompleted)
     val enrollOkInfo = new EnrollOkInfo
-    enrollOkInfo.setProfileId("profile" + userId)
+    enrollOkInfo.setProfileId(userId)
     enrollOkInfo.setNrEnrolled(6)
     enrollResult.setInfoEnrollOk(enrollOkInfo)
     val arrayOfRejectedSignature = new ArrayOfRejectedSignature
@@ -63,7 +63,7 @@ object MockXyzmoBiometricServices extends XyzmoBiometricServicesBase {
     new XyzmoEnrollDynamicProfile().withEnrollDynamicProfile_v1Response(enrollDynamicProfile_v1Response)
   }
 
-  override def verifyUser(userId: String, signatureDCToVerify: String): XyzmoVerifyUser = {
+  override protected[signature] def verifyUser(egraphId: Long, userId: String, signatureDCToVerify: String): XyzmoVerifyUser = {
     val verifyResultInfo_v1 = new VerifyResultInfo_v1
     verifyResultInfo_v1.setBaseResult(WebServiceBiometricPartStub.BaseResultEnum.ok)
     val verifyResult = new VerifyResult

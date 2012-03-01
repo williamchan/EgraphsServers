@@ -1,22 +1,25 @@
 package services.signature
 
+import models.{EnrollmentBatch, Egraph}
+
 
 trait SignatureBiometricService {
-  def verify(signatureJson: String, profileId: String): Either[SignatureBiometricsError, SignatureVerificationMetadata]
+  def enroll(enrollmentBatch: EnrollmentBatch, signatureDataContainers: List[String]): Either[SignatureBiometricsError, Boolean]
+  def verify(signatureJson: String, egraph: Egraph): Either[SignatureBiometricsError, SignatureVerificationMetadata]
 }
 
 /**
  * SignatureBiometricService implementation that hits the configured Xyzmo signature biometric server.
  */
 class XyzmoSignatureBiometricService extends SignatureBiometricService {
-  def verify(signatureJson: String, profileId: String): Either[SignatureBiometricsError, SignatureVerificationMetadata] = {
-    val sdc = XyzmoBiometricServices.getSignatureDataContainerFromJSON(signatureJson)
-    val verifyUser = XyzmoBiometricServices.verifyUser(userId = profileId.toString, sdc)
+  private val xyzmo = XyzmoBiometricServices
+  
+  def enroll(enrollmentBatch: EnrollmentBatch, signatureDataContainers: List[String]): Either[SignatureBiometricsError, Boolean] = {
+    xyzmo.enroll(enrollmentBatch, signatureDataContainers)
+  }
 
-    Right(SignatureVerificationMetadata(
-      success = verifyUser.isMatch.getOrElse(false),
-      score = verifyUser.score
-    ))
+  def verify(signatureJson: String, egraph: Egraph): Either[SignatureBiometricsError, SignatureVerificationMetadata] = {
+    xyzmo.verify(egraph = egraph, signatureJson = signatureJson)
   }
 }
 
@@ -25,7 +28,11 @@ class XyzmoSignatureBiometricService extends SignatureBiometricService {
  * returns that the sample passed.
  */
 class NiceSignatureBiometricService extends SignatureBiometricService {
-  override def verify(signatureJson: String, profileId: String) = {
+  def enroll(enrollmentBatch: EnrollmentBatch, signatureDataContainers: List[String]): Either[SignatureBiometricsError, Boolean] = {
+    Right(true)
+  }
+
+  override def verify(signatureJson: String, egraph: Egraph) = {
     Right(SignatureVerificationMetadata(
       success = true,
       score = Some(100)

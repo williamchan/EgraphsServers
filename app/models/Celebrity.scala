@@ -140,10 +140,6 @@ case class Celebrity(id: Long = 0,
     ).headOption
   }
 
-  def getXyzmoUID(): String = {
-    "egraphs." + id.toString + "." + Time.toBlobstoreFormat(created)
-  }
-
   //
   // KeyedCaseClass[Long] methods
   //

@@ -19,10 +19,7 @@ class XyzmoBiometricServicesTests extends UnitFlatSpec with ShouldMatchers {
   }
 
   it should "test xyzmo end-to-end" in {
-    val s = "testuser"
-    val userId = s
-    val userName = s
-    val profileName = s
+    val userId = "testuser"
 
     val signature1 = XyzmoBiometricServicesTests.getStringFromFile(Play.getFile("test/files/xyzmo_signature1.xml"))
     val signature2 = XyzmoBiometricServicesTests.getStringFromFile(Play.getFile("test/files/xyzmo_signature2.xml"))
@@ -33,24 +30,24 @@ class XyzmoBiometricServicesTests extends UnitFlatSpec with ShouldMatchers {
     val signature7 = XyzmoBiometricServicesTests.getStringFromFile(Play.getFile("test/files/xyzmo_signature7.xml"))
     val signature_nomatch = XyzmoBiometricServicesTests.getStringFromFile(Play.getFile("test/files/xyzmo_signature_nomatch.xml"))
 
-    val xyzmoDeleteUser: XyzmoDeleteUser = XyzmoBiometricServices.deleteUser(userId)
+    val xyzmoDeleteUser: XyzmoDeleteUser = XyzmoBiometricServices.deleteUser(celebrityId = 0, userId = userId)
     xyzmoDeleteUser.baseResult should be(WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue)
     xyzmoDeleteUser.error should be(None)
     xyzmoDeleteUser.errorMsg should be(None)
 
-    val xyzmoAddUser: XyzmoAddUser = XyzmoBiometricServices.addUser(userId, userName)
+    val xyzmoAddUser: XyzmoAddUser = XyzmoBiometricServices.addUser(celebrityId = 0, userId = userId, userName = userId)
     xyzmoAddUser.baseResult should be(WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue)
     xyzmoAddUser.error should be(None)
     xyzmoAddUser.errorMsg should be(None)
 
-    val xyzmoAddProfile: XyzmoAddProfile = XyzmoBiometricServices.addProfile(userId, profileName)
+    val xyzmoAddProfile: XyzmoAddProfile = XyzmoBiometricServices.addProfile(celebrityId = 0, userId = userId)
     xyzmoAddProfile.baseResult should be(WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue)
     xyzmoAddProfile.error should be(None)
     xyzmoAddProfile.errorMsg should be(None)
     val profileId = xyzmoAddProfile.xyzmoProfileId.get
     (profileId.length() > 0) should be(true)
 
-    val xyzmoEnrollUser: XyzmoEnrollDynamicProfile = XyzmoBiometricServices.enrollUser(userId, profileName, List(signature1, signature2, signature3, signature4, signature5, signature6))
+    val xyzmoEnrollUser: XyzmoEnrollDynamicProfile = XyzmoBiometricServices.enrollUser(enrollmentBatchId = 0, userId = userId, List(signature1, signature2, signature3, signature4, signature5, signature6))
     xyzmoEnrollUser.baseResult should be(WebServiceBiometricPartStub.BaseResultEnum.ok.getValue)
     xyzmoEnrollUser.error should be(None)
     xyzmoEnrollUser.errorMsg should be(None)
@@ -59,14 +56,14 @@ class XyzmoBiometricServicesTests extends UnitFlatSpec with ShouldMatchers {
     (xyzmoEnrollUser.xyzmoProfileId.get) should be(profileId)
     xyzmoEnrollUser.rejectedSignaturesSummary should be(None)
 
-    val xyzmoVerifyUser_Match: XyzmoVerifyUser = XyzmoBiometricServices.verifyUser(userId, signature7)
+    val xyzmoVerifyUser_Match: XyzmoVerifyUser = XyzmoBiometricServices.verifyUser(egraphId = 0, userId = userId, signature7)
     xyzmoVerifyUser_Match.baseResult should be(WebServiceBiometricPartStub.BaseResultEnum.ok.getValue)
     xyzmoVerifyUser_Match.error should be(None)
     xyzmoVerifyUser_Match.errorMsg should be(None)
     xyzmoVerifyUser_Match.isMatch.get should be(true)
     (xyzmoVerifyUser_Match.score.get > 90) should be(true)
 
-    val xyzmoVerifyUser_NoMatch: XyzmoVerifyUser = XyzmoBiometricServices.verifyUser(userId, signature_nomatch)
+    val xyzmoVerifyUser_NoMatch: XyzmoVerifyUser = XyzmoBiometricServices.verifyUser(egraphId = 0, userId = userId, signature_nomatch)
     xyzmoVerifyUser_NoMatch.baseResult should be(WebServiceBiometricPartStub.BaseResultEnum.ok.getValue)
     xyzmoVerifyUser_NoMatch.error should be(None)
     xyzmoVerifyUser_NoMatch.errorMsg should be(None)

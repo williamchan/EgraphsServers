@@ -13,7 +13,7 @@ trait VoiceBiometricService {
  * VBG implementation of voice biometric services.
  */
 class VBGVoiceBiometricService extends VoiceBiometricService {
-  val vbg = VBGDevFreeSpeechBiometricServices
+  private val vbg = VBGDevFreeSpeechBiometricServices
 
   def enroll(enrollmentBatch: EnrollmentBatch, voiceSamples: scala.List[VoiceSample]): Either[VoiceBiometricsError, Boolean] = {
     vbg.enroll(enrollmentBatch, voiceSamples)

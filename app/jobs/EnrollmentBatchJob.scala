@@ -4,10 +4,10 @@ import org.squeryl.PrimitiveTypeMode._
 import play.jobs._
 import services.blobs.Blobs
 import Blobs.Conversions._
-import services.signature.XyzmoBiometricServices
 import services.db.Schema
 import models._
 import services.AppConfig
+import services.signature.SignatureBiometricsError
 import services.voice.VoiceBiometricsError
 
 @On("0 0 0 * * ?") // cron expression: seconds minutes hours day-of-month month day-of-week (year optional)
@@ -26,16 +26,23 @@ class EnrollmentBatchJob extends Job {
 
     inTransaction {
       val celebStore = AppConfig.instance[CelebrityStore]
+      val blobs = AppConfig.instance[Blobs]
 
       for (batch <- EnrollmentBatchJob.findEnrollmentBatchesPending()) {
         val celebrity = celebStore.findById(batch.celebrityId).get
 
         val signatureSamples: List[SignatureSample] = EnrollmentBatchJob.getSignatureSamples(batch)
+        for (signatureSample <- signatureSamples) signatureSample.putXyzmoSignatureDataContainerOnBlobstore
+        val signatureDataContainers = for (signatureSample <- signatureSamples) yield blobs.get(SignatureSample.getXmlUrl(signatureSample.id)).get.asString
+        val signatureEnrollmentResult: Either[SignatureBiometricsError, Boolean] = new services.signature.XyzmoSignatureBiometricService().enroll(batch, signatureDataContainers)
+        val isSuccessfulSignatureEnrollment: Boolean = if (signatureEnrollmentResult.isRight) {
+          signatureEnrollmentResult.right.get
+        } else {
+          false
+        }
+
         val voiceSamples: List[VoiceSample] = EnrollmentBatchJob.getVoiceSamples(batch)
-
-        val isSuccessfulSignatureEnrollment: Boolean = EnrollmentBatchJob.attemptSignatureEnrollment(batch, signatureSamples, celebrity)
         val voiceEnrollmentResult: Either[VoiceBiometricsError, Boolean] = new services.voice.VBGVoiceBiometricService().enroll(batch, voiceSamples) // todo(wchan): get VoiceBiometricService via injection
-
         val isSuccessfulVoiceEnrollment: Boolean = if (voiceEnrollmentResult.isRight) {
           voiceEnrollmentResult.right.get
         } else {
@@ -55,28 +62,7 @@ class EnrollmentBatchJob extends Job {
 }
 
 object EnrollmentBatchJob {
-  val blobs = AppConfig.instance[Blobs]
   val schema = AppConfig.instance[Schema]
-
-  def attemptSignatureEnrollment(enrollmentBatch: EnrollmentBatch, signatureSamples: scala.List[SignatureSample], celebrity: Celebrity): Boolean = {
-    for (signatureSample <- signatureSamples) {
-      // TODO(wchan): Do this lazily.
-      signatureSample.putXyzmoSignatureDataContainerOnBlobstore
-    }
-
-    // TODO(wchan): There has to be a better way to do this... contact Xyzmo about user management.
-    val xyzmoUID: String = celebrity.getXyzmoUID()
-    //    XyzmoBiometricServices.deleteUser(userId = xyzmoUID)
-    XyzmoBiometricServices.addUser(userId = xyzmoUID, userName = celebrity.publicName.get)
-    XyzmoBiometricServices.addProfile(userId = xyzmoUID, profileName = xyzmoUID)
-    val signatureDataContainers = for (signatureSample <- signatureSamples) yield blobs.get(SignatureSample.getXmlUrl(signatureSample.id)).get.asString
-    val xyzmoEnrollDynamicProfile = XyzmoBiometricServices.enrollUser(userId = xyzmoUID, profileName = xyzmoUID, signatureDataContainers = signatureDataContainers)
-    val isSuccessfulSignatureEnrollment = xyzmoEnrollDynamicProfile.isSuccessfulSignatureEnrollment || xyzmoEnrollDynamicProfile.isProfileAlreadyEnrolled
-
-    println("Result of signature enrollment attempt for celebrity " + celebrity.id.toString + ": " + isSuccessfulSignatureEnrollment.toString)
-
-    isSuccessfulSignatureEnrollment
-  }
 
   def findEnrollmentBatchesPending(): List[EnrollmentBatch] = {
     from(schema.enrollmentBatches)(enrollmentBatch =>

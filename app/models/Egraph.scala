@@ -124,7 +124,7 @@ case class Egraph(
    * properly
    */
   def verifySignature: Egraph = {
-    val signatureResponse = services.signatureBiometrics.verify(assets.signature, celebrity.getXyzmoUID())
+    val signatureResponse = services.signatureBiometrics.verify(assets.signature, this)
     val (signatureCode, signatureSuccess, signatureScore) = signatureResponse.fold (
       error =>
         // TODO(erem): put the actual Xyzmo codes in here
