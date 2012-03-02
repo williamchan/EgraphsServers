@@ -19,16 +19,18 @@ with DBTransaction {
     schema.scrub()
     blobs.scrub()
 
-    createCelebrity("Erem", "Boto", "erem@egraphs.com", enrollmentStatus = EnrollmentStatus.Enrolled)
-    createCelebrity("Andrew", "Smith", "andrew@egraphs.com", enrollmentStatus = EnrollmentStatus.Enrolled)
-    createCelebrity("David", "Auld", "david@egraphs.com", enrollmentStatus = EnrollmentStatus.Enrolled)
-    createCelebrity("Eric", "Feeny", "eric@egraphs.com", enrollmentStatus = EnrollmentStatus.Enrolled)
-    createCelebrity("Will", "Chan", "will@egraphs.com", enrollmentStatus = EnrollmentStatus.Enrolled)
-    createCelebrity("Zach", "Apter", "zachapter@gmail.com", enrollmentStatus = EnrollmentStatus.Enrolled)
-    createCelebrity("Brian", "Auld", "bauld@raysbaseball.com", enrollmentStatus = EnrollmentStatus.Enrolled)
-    createCelebrity("Michael", "Kalt", "mkalt@raysbaseball.com", enrollmentStatus = EnrollmentStatus.Enrolled)
-    createCelebrity("Matt", "Silverman", "msilverman@raysbaseball.com", enrollmentStatus = EnrollmentStatus.Enrolled)
-    createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", enrollmentStatus = EnrollmentStatus.Enrolled)
+    createCelebrity("Erem", "Boto", "erem@egraphs.com", enrollmentStatus = EnrollmentStatus.NotEnrolled)
+    createCelebrity("Andrew", "Smith", "andrew@egraphs.com", enrollmentStatus = EnrollmentStatus.NotEnrolled)
+    createCelebrity("David", "Auld", "david@egraphs.com", enrollmentStatus = EnrollmentStatus.NotEnrolled)
+    createCelebrity("Eric", "Feeny", "eric@egraphs.com", enrollmentStatus = EnrollmentStatus.NotEnrolled)
+    createCelebrity("Will", "Chan", "will@egraphs.com", enrollmentStatus = EnrollmentStatus.NotEnrolled)
+    createCelebrity("Zach", "Apter", "zachapter@gmail.com", enrollmentStatus = EnrollmentStatus.NotEnrolled)
+    createCelebrity("Brian", "Auld", "bauld@raysbaseball.com", enrollmentStatus = EnrollmentStatus.NotEnrolled)
+    createCelebrity("Michael", "Kalt", "mkalt@raysbaseball.com", enrollmentStatus = EnrollmentStatus.NotEnrolled)
+    createCelebrity("Matt", "Silverman", "msilverman@raysbaseball.com", enrollmentStatus = EnrollmentStatus.NotEnrolled)
+    createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", enrollmentStatus = EnrollmentStatus.NotEnrolled)
+    createCelebrity("Gunter", "Gebauhr", "gunter@egraphs.com", enrollmentStatus = EnrollmentStatus.NotEnrolled)
+    createCelebrity("J", "Cohn", "j@egraphs.com", enrollmentStatus = EnrollmentStatus.NotEnrolled)
 
     "Alpha Testers created!"
   }
