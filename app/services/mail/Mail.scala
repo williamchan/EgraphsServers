@@ -1,6 +1,5 @@
 package services.mail
 
-import services.http.PlayConfig
 import org.apache.commons.mail.Email
 import java.util.Properties
 import javax.mail.Session
@@ -8,9 +7,7 @@ import com.google.inject.{Inject, Provider}
 import services.Utils
 
 import services.http.PlayConfig
-import javax.mail.internet.InternetAddress
 import collection.mutable.ListBuffer
-import collection.JavaConversions
 
 /** Interface for sending e-mail. */
 trait Mail {
@@ -35,7 +32,7 @@ class MailProvider @Inject()(@PlayConfig playConfig: Properties, utils: Utils) e
 
       case (_, "smtp.gmail.com") =>
         Gmail(utils.requiredConfigurationProperty("mail.smtp.user"),
-              utils.requiredConfigurationProperty("mail.smtp.password"))
+              utils.requiredConfigurationProperty("mail.smtp.pass"))
 
       case _ =>
         new PlayMailLib

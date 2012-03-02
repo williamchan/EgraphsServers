@@ -1,8 +1,6 @@
 package services.mail
 
 import utils.EgraphsUnitTest
-import java.util.Properties
-import play.Play
 import services.{AppConfig, Utils}
 
 class MailTests extends EgraphsUnitTest
