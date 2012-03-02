@@ -6,6 +6,7 @@ import play.test.FunctionalTest
 import sjson.json.Serializer
 import utils.FunctionalTestUtils.{CleanDatabaseAfterEachTest, willChanRequest, runScenario}
 import utils.TestConstants
+import models.EnrollmentBatch
 
 class GetCelebrityEnrollmentTemplateApiEndpointTests extends FunctionalTest with CleanDatabaseAfterEachTest {
 
@@ -23,7 +24,7 @@ class GetCelebrityEnrollmentTemplateApiEndpointTests extends FunctionalTest with
     val json = Serializer.SJSON.in[Map[String, List[Map[String, String]]]](getContent(response))
     assertEquals(1, json.size)
     val enrollmentPhrases: List[Map[String, String]] = json(_enrollmentPhrases)
-    assertEquals(20, enrollmentPhrases.size)
+    assertEquals(EnrollmentBatch.batchSize, enrollmentPhrases.size)
     assertEquals("My name is Wizzle", enrollmentPhrases(0)(_text))
     assertEquals("One, two, three, four, five", enrollmentPhrases(1)(_text))
     assertEquals("Stop each car if it's little", enrollmentPhrases(2)(_text))

@@ -8,10 +8,10 @@ import models._
 import models.vbg._
 import models.xyzmo._
 import payment.PaymentModule
+import signature.SignatureBiometricsModule
+import voice.VoiceBiometricsModule
 import services.db.Schema
-import signature.{SignatureBiometricService, XyzmoSignatureBiometricService}
 import uk.me.lings.scalaguice.{InjectorExtensions, ScalaModule}
-import voice.{VoiceBiometricService, VBGVoiceBiometricService}
 import java.util.Properties
 import play.Play
 
@@ -24,11 +24,10 @@ class AppConfig extends AbstractModule with ScalaModule {
 
     // Services
     bind[Mail].toProvider[MailProvider]
-    bind[SignatureBiometricService].to[XyzmoSignatureBiometricService]
-    bind[VoiceBiometricService].to[VBGVoiceBiometricService]
-
-    install(PaymentModule)
     install(BlobModule)
+    install(PaymentModule)
+    install(SignatureBiometricsModule)
+    install(VoiceBiometricsModule)
 
     // Model services
     bind[AccountServices].in[Singleton]

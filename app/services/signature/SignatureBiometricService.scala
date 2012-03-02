@@ -24,10 +24,25 @@ class XyzmoSignatureBiometricService extends SignatureBiometricService {
 }
 
 /**
+ * SignatureBiometricService implementation that hits testlab.xyzmo.com.
+ */
+class TestlabXyzmoSignatureBiometricService extends SignatureBiometricService {
+  private val testlab = TestXyzmoBiometricServices
+
+  def enroll(enrollmentBatch: EnrollmentBatch): Either[SignatureBiometricsError, Boolean] = {
+    testlab.enroll(enrollmentBatch)
+  }
+
+  def verify(signatureJson: String, egraph: Egraph): Either[SignatureBiometricsError, SignatureVerificationMetadata] = {
+    testlab.verify(egraph = egraph, signatureJson = signatureJson)
+  }
+}
+
+/**
  * Implementation of [[services.signature.SignatureBiometricService]] that always
  * returns that the sample passed.
  */
-class NiceSignatureBiometricService extends SignatureBiometricService {
+class YesMaamSignatureBiometricService extends SignatureBiometricService {
   def enroll(enrollmentBatch: EnrollmentBatch): Either[SignatureBiometricsError, Boolean] = {
     Right(true)
   }

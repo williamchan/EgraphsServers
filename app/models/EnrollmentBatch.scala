@@ -5,6 +5,8 @@ import java.sql.Timestamp
 import services.Time
 import services.db.{KeyedCaseClass, Schema, Saves}
 import services.AppConfig
+import services.signature.{SignatureBiometricService, SignatureBiometricsError}
+import services.voice.{VoiceBiometricService, VoiceBiometricsError}
 import com.google.inject.{Provider, Inject}
 import org.squeryl.Query
 
@@ -14,7 +16,9 @@ import org.squeryl.Query
 case class EnrollmentBatchServices @Inject() (
   store: EnrollmentBatchStore,
   celebStore: CelebrityStore,
-  enrollmentSampleServices: Provider[EnrollmentSampleServices]
+  enrollmentSampleServices: Provider[EnrollmentSampleServices],
+  voiceBiometrics: VoiceBiometricService,
+  signatureBiometrics: SignatureBiometricService
 )
 
 case class EnrollmentBatch(id: Long = 0,
@@ -63,12 +67,20 @@ case class EnrollmentBatch(id: Long = 0,
     }
   }
 
-  private[models] def getNumEnrollmentSamples: Int = {
-    services.store.countEnrollmentSamples(id)
+  def enrollSignature: Either[SignatureBiometricsError, Boolean] = {
+    services.signatureBiometrics.enroll(this)
+  }
+
+  def enrollVoice: Either[VoiceBiometricsError, Boolean] = {
+    services.voiceBiometrics.enroll(this)
   }
 
   def getEnrollmentSamples: List[EnrollmentSample] = {
     services.store.getEnrollmentSamples(id)
+  }
+
+  private[models] def getNumEnrollmentSamples: Int = {
+    services.store.countEnrollmentSamples(id)
   }
 
   //

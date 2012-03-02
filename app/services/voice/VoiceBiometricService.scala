@@ -10,9 +10,9 @@ trait VoiceBiometricService {
 
 // TODO: Write an integration test against VBG service to ensure our code works.
 /**
- * VBG implementation of voice biometric services.
+ * Voice biometrics implementation that connects to dev account at VBG's Free Speech engine.
  */
-class VBGVoiceBiometricService extends VoiceBiometricService {
+class VBGDevFSVoiceBiometricService extends VoiceBiometricService {
   private val vbg = VBGDevFreeSpeechBiometricServices
 
   def enroll(enrollmentBatch: EnrollmentBatch): Either[VoiceBiometricsError, Boolean] = {

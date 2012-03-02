@@ -182,7 +182,7 @@ class Scenarios extends DeclaresScenarios {
         .newEgraph
         .withAssets(TestConstants.signatureStr, Some(TestConstants.messageStr), Codec.decodeBASE64(TestConstants.voiceStr()))
         .save()
-        .withNiceBiometricServices
+        .withYesMaamBiometricServices
         .verifyBiometrics
         .save()
     }

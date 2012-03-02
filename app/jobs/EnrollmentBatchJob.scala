@@ -28,14 +28,14 @@ class EnrollmentBatchJob extends Job {
       for (batch <- EnrollmentBatchJob.findEnrollmentBatchesPending()) {
         val celebrity = celebStore.findById(batch.celebrityId).get
 
-        val signatureEnrollmentResult: Either[SignatureBiometricsError, Boolean] = new services.signature.XyzmoSignatureBiometricService().enroll(batch)
+        val signatureEnrollmentResult: Either[SignatureBiometricsError, Boolean] = batch.enrollSignature
         val isSuccessfulSignatureEnrollment: Boolean = if (signatureEnrollmentResult.isRight) {
           signatureEnrollmentResult.right.get
         } else {
           false
         }
 
-        val voiceEnrollmentResult: Either[VoiceBiometricsError, Boolean] = new services.voice.VBGVoiceBiometricService().enroll(batch) // todo(wchan): get VoiceBiometricService via injection
+        val voiceEnrollmentResult: Either[VoiceBiometricsError, Boolean] = batch.enrollVoice
         val isSuccessfulVoiceEnrollment: Boolean = if (voiceEnrollmentResult.isRight) {
           voiceEnrollmentResult.right.get
         } else {

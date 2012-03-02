@@ -36,7 +36,7 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
             Codec.decodeBASE64(audio)
           ).save()
           
-          val egraphToTest = if (skipBiometrics) savedEgraph.withNiceBiometricServices else savedEgraph
+          val egraphToTest = if (skipBiometrics) savedEgraph.withYesMaamBiometricServices else savedEgraph
           
           val testedEgraph = egraphToTest.verifyBiometrics.save()
           
