@@ -7,7 +7,8 @@ import services.http.{CelebrityAccountRequestFilters, DBTransaction}
 import website.GetRootEndpoint
 import models.{AccountStore, CustomerStore, OrderStore}
 import services.blobs.Blobs
-import services.{Mail, AppConfig}
+import services.mail.Mail
+import services.AppConfig
 import services.payment.Payment
 
 object WebsiteControllers extends Controller

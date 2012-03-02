@@ -3,6 +3,7 @@ package services
 import blobs.BlobModule
 import com.google.inject.{Singleton, Guice, AbstractModule}
 import http.PlayConfig
+import mail.{MailProvider, Mail}
 import models._
 import models.vbg._
 import models.xyzmo._
@@ -22,7 +23,7 @@ class AppConfig extends AbstractModule with ScalaModule {
     bind[Properties].annotatedWith[PlayConfig].toInstance(Play.configuration)
 
     // Services
-    bind[Mail].toProvider(Mail.MailProvider)
+    bind[Mail].toProvider[MailProvider]
     bind[SignatureBiometricService].to[XyzmoSignatureBiometricService]
     bind[VoiceBiometricService].to[VBGVoiceBiometricService]
 

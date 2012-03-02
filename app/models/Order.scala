@@ -11,6 +11,7 @@ import org.apache.commons.mail.HtmlEmail
 import controllers.WebsiteControllers
 import services._
 import com.google.inject._
+import mail.Mail
 import payment.Payment
 
 case class OrderServices @Inject() (

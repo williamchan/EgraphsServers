@@ -32,7 +32,7 @@ class Scenarios extends DeclaresScenarios {
   val orderConfirmationPageCategory = "Order Confirmation Page"
   val egraphPageCategory = "Egraph Page"
   
-  val mail = AppConfig.instance[services.Mail]
+  val mail = AppConfig.instance[services.mail.Mail]
 
   toScenarios add Scenario(
     "Send an email to erem@egraphs.com",

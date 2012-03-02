@@ -8,7 +8,8 @@ import models._
 import play.mvc.Scope.Flash
 import play.mvc.results.Redirect
 import services.http.CelebrityAccountRequestFilters
-import services.{Mail, Utils, AppConfig}
+import services.mail.Mail
+import services.{Utils, AppConfig}
 import play.Logger
 
 trait PostBuyProductEndpoint { this: Controller =>
