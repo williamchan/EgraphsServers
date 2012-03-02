@@ -2,20 +2,22 @@ package services.mail
 
 import utils.EgraphsUnitTest
 import java.util.Properties
-import services.Utils
 import play.Play
+import services.{AppConfig, Utils}
 
 class MailTests extends EgraphsUnitTest
 {
+  val appUtils = AppConfig.instance[Utils]
+
   "MailProvider" should "provide the mock instance when mail.smtp value is 'mock'" in {
-    val mail = new MailProvider(Map("mail.smtp" -> "mock"), null).get()
+    val mail = new MailProvider(appUtils.properties("mail.smtp" -> "mock"), null).get()
 
     mail.isInstanceOf[MockMail] should be(true)
   }
 
   it should "provide the gmail instance when smtp value isn't mock and gmail host is provided" in {
     // Set up
-    val playConfig = Map(
+    val playConfig = appUtils.properties(
       "mail.smtp" -> "real",
       "mail.smtp.host" -> "smtp.gmail.com",
       "mail.smtp.user" -> "eboto",
@@ -31,17 +33,8 @@ class MailTests extends EgraphsUnitTest
   }
 
   it should "otherwise delegate to Play mail implementation" in {
-    val mail = new MailProvider(Map("mail.smtp" -> "herp"), null).get
+    val mail = new MailProvider(appUtils.properties("mail.smtp" -> "herp"), null).get()
 
     mail.isInstanceOf[PlayMailLib] should be (true)
-  }
-
-  implicit def mapToProperties(map: Map[String, String]): Properties = {
-    import scala.collection.JavaConversions._
-    val props = new Properties()
-
-    props.putAll(asJavaMap(map))
-
-    props
   }
 }

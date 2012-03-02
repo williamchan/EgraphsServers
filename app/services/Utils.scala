@@ -103,6 +103,14 @@ class Utils @Inject()(@PlayConfig() playConfig: Properties)
       }
     )
   }
+
+  implicit def properties(pairs: (AnyRef, AnyRef)*): Properties = {
+    val props = new Properties
+    
+    for (pair <- pairs) props.put(pair._1, pair._2)
+
+    props
+  }
 }
 
 object Utils extends Utils(Play.configuration) {

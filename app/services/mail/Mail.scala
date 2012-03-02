@@ -8,6 +8,9 @@ import com.google.inject.{Inject, Provider}
 import services.Utils
 
 import services.http.PlayConfig
+import javax.mail.internet.InternetAddress
+import collection.mutable.ListBuffer
+import collection.JavaConversions
 
 /** Interface for sending e-mail. */
 trait Mail {
@@ -28,7 +31,7 @@ class MailProvider @Inject()(@PlayConfig playConfig: Properties, utils: Utils) e
 
     (smtp, host) match {
       case ("mock", _) =>
-        new MockMail
+        new MockMail(utils)
 
       case (_, "smtp.gmail.com") =>
         Gmail(utils.requiredConfigurationProperty("mail.smtp.user"),
@@ -88,17 +91,49 @@ private[mail] class PlayMailLib extends Mail {
 
 
 /**
- * Implementation of the Mail library that delegates to Play's mock mail implementation
+ * Mock implementation of the Mail library. Heavily inspired by Play's implementation in Mail.Mock
  */
-private[mail] class MockMail extends Mail {
-  def send(mail: Email) {
-    MockPlayMail.sendMail(mail)
-  }
+private[mail] class MockMail @Inject() (utils: Utils) extends Mail {
 
-  /**Extends Play's built in MockMail to give us access to the send method */
-  private[MockMail] object MockPlayMail extends play.libs.Mail.Mock {
-    def sendMail(mail: Email) {
-      send(mail)
+  override def send(email: Email) {
+    import scala.collection.JavaConversions._
+
+    // Set up to generate email text
+    val session = Session.getInstance(utils.properties("mail.smtp.host" -> "myfakesmtpserver.com"))
+    email.setMailSession(session)
+    email.buildMimeMessage()
+
+    val message = email.getMimeMessage
+    message.saveChanges()
+
+    // Extract the content
+    def addressStringsFromList(addressList: java.util.List[_]): Iterable[String] = {
+      for (addresses <- Option(addressList).toSeq; address <- addresses) yield address.toString
     }
+    
+    val from = email.getFromAddress.getAddress
+    val replyTo = addressStringsFromList(email.getReplyToAddresses)
+    val toAddresses = addressStringsFromList(email.getToAddresses)
+    val ccs = addressStringsFromList(email.getCcAddresses)
+    val bccs = addressStringsFromList(email.getBccAddresses)        
+    val subject = email.getSubject
+    val body = play.libs.Mail.Mock.getContent(message)
+
+    // Print the content
+    var content = new ListBuffer[String]
+    
+    content += "New message sent via Mock Mailer"
+    content += "    From: " + from
+    content += "    ReplyTo: " + replyTo.mkString(",")
+    content += "    To: " + toAddresses.mkString(", ")
+    content += "    Cc: " + ccs.mkString(", ")
+    content += "    Bcc: " + bccs.mkString(", ")
+    content += "    Subject: " + subject
+    content += ""
+    content += body
+    
+    play.Logger.info(content.mkString("\n"))
   }
+  
+  
 }
