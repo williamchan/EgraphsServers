@@ -78,10 +78,16 @@ class Utils @Inject()(@PlayConfig() playConfig: Properties)
    */
   def requiredConfigurationProperty(property: String): String = {
     val theValue = playConfig.getProperty(property)
-    require(
-      theValue != null,
-      "Property \"" + property + "\" in application.conf was required but not present."
-    )
+    if (theValue == null) {
+      val errorMessage = "Property \"" + property +
+        "\" in application.conf was required but not present."
+
+      play.Logger.error(errorMessage)
+      throw new IllegalArgumentException(errorMessage)
+    }
+    else {
+      theValue
+    }
 
     theValue
   }
