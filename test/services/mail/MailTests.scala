@@ -19,7 +19,7 @@ class MailTests extends EgraphsUnitTest
       "mail.smtp" -> "real",
       "mail.smtp.host" -> "smtp.gmail.com",
       "mail.smtp.user" -> "eboto",
-      "mail.smtp.password" -> "herp"
+      "mail.smtp.pass" -> "herp"
     )
     val utils = new Utils(playConfig)
 
