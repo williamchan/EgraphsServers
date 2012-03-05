@@ -6,6 +6,7 @@ import play.test.UnitFlatSpec
 import utils._
 import services.AppConfig
 import com.xyzmo.wwww.biometricserver.WebServiceBiometricPartStub
+import models.{EnrollmentBatch, Celebrity}
 
 class XyzmoEnrollDynamicProfileTests extends UnitFlatSpec
 with ShouldMatchers
@@ -80,7 +81,8 @@ with DBTransactionPerTest {
   }
 
   def newEntity = {
-    new XyzmoEnrollDynamicProfile()
+    val enrollmentBatch = EnrollmentBatch(celebrityId = new Celebrity().save().id).save()
+    new XyzmoEnrollDynamicProfile(enrollmentBatchId = enrollmentBatch.id)
   }
 
   def saveEntity(toSave: XyzmoEnrollDynamicProfile) = {

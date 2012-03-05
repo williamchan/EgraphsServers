@@ -15,7 +15,7 @@ import com.xyzmo.wwww.biometricserver.WebServiceUserAndProfileStub
 case class XyzmoAddProfileServices @Inject()(store: XyzmoAddProfileStore)
 
 case class XyzmoAddProfile(id: Long = 0,
-                           celebrityId: Long = 0,
+                           enrollmentBatchId: Long = 0,
                            baseResult: String = "",
                            error: Option[String] = None,
                            errorMsg: Option[String] = None,
@@ -67,7 +67,7 @@ class XyzmoAddProfileStore @Inject()(schema: Schema) extends Saves[XyzmoAddProfi
 
   override def defineUpdate(theOld: XyzmoAddProfile, theNew: XyzmoAddProfile) = {
     updateIs(
-      theOld.celebrityId := theNew.celebrityId,
+      theOld.enrollmentBatchId := theNew.enrollmentBatchId,
       theOld.baseResult := theNew.baseResult,
       theOld.error := theNew.error,
       theOld.errorMsg := theNew.errorMsg,

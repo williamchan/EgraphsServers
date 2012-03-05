@@ -5,6 +5,7 @@ import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 import utils._
 import services.AppConfig
+import models.{Egraph, EgraphTests}
 
 class VBGFinishVerifyTransactionTests extends UnitFlatSpec
 with ShouldMatchers
@@ -21,11 +22,12 @@ with DBTransactionPerTest {
 
   "getErrorCode" should "return errorCode" in {
     val vbgBase = new VBGFinishVerifyTransaction(errorCode = "50500")
-    vbgBase.getErrorCode should be (vbgBase.errorCode)
+    vbgBase.getErrorCode should be(vbgBase.errorCode)
   }
 
   def newEntity = {
-    new VBGFinishVerifyTransaction()
+    val egraph = Egraph(orderId = EgraphTests.persistedOrder.id).save()
+    new VBGFinishVerifyTransaction(egraphId = egraph.id)
   }
 
   def saveEntity(toSave: VBGFinishVerifyTransaction) = {

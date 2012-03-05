@@ -30,17 +30,17 @@ class XyzmoBiometricServicesTests extends UnitFlatSpec with ShouldMatchers {
     val signature7 = TestHelpers.getStringFromFile(Play.getFile("test/files/xyzmo_signature7.xml"))
     val signature_nomatch = TestHelpers.getStringFromFile(Play.getFile("test/files/xyzmo_signature_nomatch.xml"))
 
-    val xyzmoDeleteUser: XyzmoDeleteUser = XyzmoBiometricServices.deleteUser(celebrityId = 0, userId = userId)
+    val xyzmoDeleteUser: XyzmoDeleteUser = XyzmoBiometricServices.deleteUser(enrollmentBatchId = 0, userId = userId)
     xyzmoDeleteUser.baseResult should be(WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue)
     xyzmoDeleteUser.error should be(None)
     xyzmoDeleteUser.errorMsg should be(None)
 
-    val xyzmoAddUser: XyzmoAddUser = XyzmoBiometricServices.addUser(celebrityId = 0, userId = userId)
+    val xyzmoAddUser: XyzmoAddUser = XyzmoBiometricServices.addUser(enrollmentBatchId = 0, userId = userId)
     xyzmoAddUser.baseResult should be(WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue)
     xyzmoAddUser.error should be(None)
     xyzmoAddUser.errorMsg should be(None)
 
-    val xyzmoAddProfile: XyzmoAddProfile = XyzmoBiometricServices.addProfile(celebrityId = 0, userId = userId)
+    val xyzmoAddProfile: XyzmoAddProfile = XyzmoBiometricServices.addProfile(enrollmentBatchId = 0, userId = userId)
     xyzmoAddProfile.baseResult should be(WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue)
     xyzmoAddProfile.error should be(None)
     xyzmoAddProfile.errorMsg should be(None)

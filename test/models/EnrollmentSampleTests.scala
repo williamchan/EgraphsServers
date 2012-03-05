@@ -24,7 +24,9 @@ with DBTransactionPerTest {
   val store = AppConfig.instance[EnrollmentSampleStore]
 
   def newEntity = {
-    EnrollmentSample()
+    val celebrity = Celebrity().save()
+    val enrollmentBatch = EnrollmentBatch(celebrityId = celebrity.id).save()
+    EnrollmentSample(enrollmentBatchId = enrollmentBatch.id)
   }
 
   def saveEntity(toSave: EnrollmentSample) = {
@@ -44,18 +46,16 @@ with DBTransactionPerTest {
   }
 
   "save" should "save signatureStr and voiceStr to Blobstore" in {
-    val enrollmentBatch = new EnrollmentBatch()
     val signatureStr = TestConstants.signatureStr
     val voiceStr = TestConstants.voiceStr()
-    val saved = EnrollmentSample(enrollmentBatchId = enrollmentBatch.id).save(signatureStr = signatureStr, voiceStr = voiceStr)
+    val saved = newEntity.save(signatureStr = signatureStr, voiceStr = voiceStr)
 
     saved.getSignatureJson should be(signatureStr)
     Codec.encodeBASE64(saved.getWav) should be (voiceStr)
   }
   
   "getSignatureJson and getWav" should "handle edge cases gracefully" in {
-    val enrollmentBatch = new EnrollmentBatch()
-    val saved = EnrollmentSample(enrollmentBatchId = enrollmentBatch.id).save()
+    val saved = newEntity.save()
     saved.getSignatureJson should be("")
     saved.getWav should be (new Array[Byte](0))
   }
@@ -63,8 +63,7 @@ with DBTransactionPerTest {
   "putSignatureXml" should "save to blobstore at SignatureXmlURL" in {
     val xyzmoSignatureDataContainer = TestHelpers.getStringFromFile(Play.getFile("test/files/xyzmo_signature1.xml"))
 
-    val enrollmentBatch = new EnrollmentBatch()
-    val saved = EnrollmentSample(enrollmentBatchId = enrollmentBatch.id).save()
+    val saved = newEntity.save()
     saved.putSignatureXml(xyzmoSignatureDataContainer = xyzmoSignatureDataContainer)
     saved.services.blobs.get(EnrollmentSample.getSignatureXmlUrl(saved.id)).get.asString should be (xyzmoSignatureDataContainer)
   }

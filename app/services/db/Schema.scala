@@ -109,24 +109,90 @@ class Schema @Inject()(injector: Injector) extends org.squeryl.Schema {
 
 
   //
-  // biometrics
+  // Biometrics
   //
   val enrollmentBatches = table[EnrollmentBatch]
+  val celebrityToEnrollmentBatches = oneToManyRelation(celebrities, enrollmentBatches)
+    .via((celebrity, enrollmentBatch) => celebrity.id === enrollmentBatch.celebrityId)
+  celebrityToEnrollmentBatches.foreignKeyDeclaration.constrainReference(onDelete cascade)
+  on(enrollmentBatches)(enrollmentBatch =>
+    declare(
+      columns(enrollmentBatch.celebrityId, enrollmentBatch.isBatchComplete, enrollmentBatch.isSuccessfulEnrollment) are (indexed)
+    )
+  )
+
   val enrollmentSamples = table[EnrollmentSample]
+  val enrollmentBatchToEnrollmentSamples = oneToManyRelation(enrollmentBatches, enrollmentSamples)
+    .via((enrollmentBatch, enrollmentSample) => enrollmentBatch.id === enrollmentSample.enrollmentBatchId)
+  enrollmentBatchToEnrollmentSamples.foreignKeyDeclaration.constrainReference(onDelete cascade)
+
 
   val vbgAudioCheckTable = table[VBGAudioCheck]
+  val enrollmentBatchToVBGAudioCheckTable = oneToManyRelation(enrollmentBatches, vbgAudioCheckTable)
+    .via((enrollmentBatch, vbgAudioCheck) => enrollmentBatch.id === vbgAudioCheck.enrollmentBatchId)
+  enrollmentBatchToVBGAudioCheckTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
+
   val vbgEnrollUserTable = table[VBGEnrollUser]
+  val enrollmentBatchToVBGEnrollUserTable = oneToManyRelation(enrollmentBatches, vbgEnrollUserTable)
+    .via((enrollmentBatch, vbgEnrollUser) => enrollmentBatch.id === vbgEnrollUser.enrollmentBatchId)
+  enrollmentBatchToVBGEnrollUserTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
+
   val vbgFinishEnrollTransactionTable = table[VBGFinishEnrollTransaction]
-  val vbgFinishVerifyTransactionTable = table[VBGFinishVerifyTransaction]
+  val enrollmentBatchToVBGFinishEnrollTransactionTable = oneToManyRelation(enrollmentBatches, vbgFinishEnrollTransactionTable)
+    .via((enrollmentBatch, vbgFinishEnrollTransaction) => enrollmentBatch.id === vbgFinishEnrollTransaction.enrollmentBatchId)
+  enrollmentBatchToVBGFinishEnrollTransactionTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
+
   val vbgStartEnrollmentTable = table[VBGStartEnrollment]
+  val enrollmentBatchToVBGStartEnrollmentTable = oneToManyRelation(enrollmentBatches, vbgStartEnrollmentTable)
+    .via((enrollmentBatch, vbgStartEnrollment) => enrollmentBatch.id === vbgStartEnrollment.enrollmentBatchId)
+  enrollmentBatchToVBGStartEnrollmentTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
+
+  val vbgFinishVerifyTransactionTable = table[VBGFinishVerifyTransaction]
+  val egraphToVBGFinishVerifyTransactionTable = oneToManyRelation(egraphs, vbgFinishVerifyTransactionTable)
+    .via((egraph, vbgFinishVerifyTransaction) => egraph.id === vbgFinishVerifyTransaction.egraphId)
+  egraphToVBGFinishVerifyTransactionTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
+
   val vbgStartVerificationTable = table[VBGStartVerification]
+  val egraphToVBGStartVerificationTable = oneToManyRelation(egraphs, vbgStartVerificationTable)
+    .via((egraph, vbgStartVerification) => egraph.id === vbgStartVerification.egraphId)
+  egraphToVBGStartVerificationTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
+
   val vbgVerifySampleTable = table[VBGVerifySample]
+  val egraphToVBGVerifySampleTable = oneToManyRelation(egraphs, vbgVerifySampleTable)
+    .via((egraph, vbgVerifySample) => egraph.id === vbgVerifySample.egraphId)
+  egraphToVBGVerifySampleTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
+
+
+  val xyzmoDeleteUserTable = table[XyzmoDeleteUser]
+  val enrollmentBatchToXyzmoDeleteUserTable = oneToManyRelation(enrollmentBatches, xyzmoDeleteUserTable)
+    .via((enrollmentBatch, xyzmoDeleteUser) => enrollmentBatch.id === xyzmoDeleteUser.enrollmentBatchId)
+  enrollmentBatchToXyzmoDeleteUserTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
 
   val xyzmoAddUserTable = table[XyzmoAddUser]
-  val xyzmoDeleteUserTable = table[XyzmoDeleteUser]
+  val enrollmentBatchToXyzmoAddUserTable = oneToManyRelation(enrollmentBatches, xyzmoAddUserTable)
+    .via((enrollmentBatch, xyzmoAddUser) => enrollmentBatch.id === xyzmoAddUser.enrollmentBatchId)
+  enrollmentBatchToXyzmoAddUserTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
+
   val xyzmoAddProfileTable = table[XyzmoAddProfile]
+  val enrollmentBatchToXyzmoAddProfileTable = oneToManyRelation(enrollmentBatches, xyzmoAddProfileTable)
+    .via((enrollmentBatch, xyzmoAddProfile) => enrollmentBatch.id === xyzmoAddProfile.enrollmentBatchId)
+  enrollmentBatchToXyzmoAddProfileTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
+
   val xyzmoEnrollDynamicProfileTable = table[XyzmoEnrollDynamicProfile]
+  val enrollmentBatchToXyzmoEnrollDynamicProfileTable = oneToManyRelation(enrollmentBatches, xyzmoEnrollDynamicProfileTable)
+    .via((enrollmentBatch, xyzmoEnrollDynamicProfile) => enrollmentBatch.id === xyzmoEnrollDynamicProfile.enrollmentBatchId)
+  enrollmentBatchToXyzmoEnrollDynamicProfileTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
+  on(xyzmoEnrollDynamicProfileTable)(xyzmoEnrollDynamicProfile =>
+    declare(
+      xyzmoEnrollDynamicProfile.rejectedSignaturesSummary is (dbType("varchar(255)"))
+    )
+  )
+
   val xyzmoVerifyUserTable = table[XyzmoVerifyUser]
+  val egraphToXyzmoVerifyUserTable = oneToManyRelation(egraphs, xyzmoVerifyUserTable)
+    .via((egraph, xyzmoVerifyUser) => egraph.id === xyzmoVerifyUser.egraphId)
+  egraphToXyzmoVerifyUserTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
+
 
 
   //
@@ -251,7 +317,7 @@ class Schema @Inject()(injector: Injector) extends org.squeryl.Schema {
       factoryFor(cashTransactions) is CashTransaction(services = injector.instance[CashTransactionServices]),
       factoryFor(celebrities) is Celebrity(services = injector.instance[CelebrityServices]),
       factoryFor(customers) is Customer(services = injector.instance[CustomerServices]),
-      factoryFor(administrators) is Administrator(services=injector.instance[AdministratorServices]),
+      factoryFor(administrators) is Administrator(services = injector.instance[AdministratorServices]),
       factoryFor(egraphs) is Egraph(services = injector.instance[EgraphServices]),
       factoryFor(enrollmentBatches) is EnrollmentBatch(services = injector.instance[EnrollmentBatchServices]),
       factoryFor(enrollmentSamples) is EnrollmentSample(services = injector.instance[EnrollmentSampleServices]),

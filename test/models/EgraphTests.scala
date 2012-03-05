@@ -21,7 +21,7 @@ class EgraphTests extends UnitFlatSpec
   // SavingEntityTests[Egraph] methods
   //
   override def newEntity = {
-    val order = persistedOrder
+    val order = EgraphTests.persistedOrder
     Egraph(orderId=order.id)
   }
 
@@ -34,7 +34,7 @@ class EgraphTests extends UnitFlatSpec
   }
 
   override def transformEntity(toTransform: Egraph) = {
-    val order = persistedOrder
+    val order = EgraphTests.persistedOrder
     toTransform.copy(
       orderId = order.id,
       stateValue = EgraphState.Verified.value
@@ -51,7 +51,7 @@ class EgraphTests extends UnitFlatSpec
   }
 
   it should "save and recover signature and audio data from the blobstore" in {
-    val egraph = persistedOrder
+    val egraph = EgraphTests.persistedOrder
       .newEgraph
       .withAssets(TestConstants.signatureStr, Some(TestConstants.messageStr), "my audio".getBytes("UTF-8"))
       .save()
@@ -61,7 +61,7 @@ class EgraphTests extends UnitFlatSpec
   }
 
   it should "throw an exception if assets are accessed on an unsaved Egraph" in {
-    evaluating { persistedOrder.newEgraph.assets } should produce [IllegalArgumentException]
+    evaluating { EgraphTests.persistedOrder.newEgraph.assets } should produce [IllegalArgumentException]
   }
 
   "Egraph statuses" should "be accessible via their values on the companion object" in {
@@ -77,10 +77,10 @@ class EgraphTests extends UnitFlatSpec
   it should "throw an exception at an unrecognized string" in {
     evaluating { EgraphState.named("Herpyderp") } should produce [NoSuchElementException]
   }
+}
 
-  //
-  // Private methods
-  //
+object EgraphTests {
+
   def persistedOrder: Order = {
     val customer = TestData.newSavedCustomer()
     val celebrity = Celebrity().save()
@@ -88,5 +88,5 @@ class EgraphTests extends UnitFlatSpec
 
     customer.buy(product).save()
   }
-
+  
 }

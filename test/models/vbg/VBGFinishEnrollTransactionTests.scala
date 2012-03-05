@@ -5,6 +5,7 @@ import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 import utils._
 import services.AppConfig
+import models.{EnrollmentBatch, Celebrity}
 
 class VBGFinishEnrollTransactionTests extends UnitFlatSpec
 with ShouldMatchers
@@ -25,7 +26,8 @@ with DBTransactionPerTest {
   }
 
   def newEntity = {
-    new VBGFinishEnrollTransaction()
+    val enrollmentBatch = EnrollmentBatch(celebrityId = new Celebrity().save().id).save()
+    new VBGFinishEnrollTransaction(enrollmentBatchId = enrollmentBatch.id)
   }
 
   def saveEntity(toSave: VBGFinishEnrollTransaction) = {

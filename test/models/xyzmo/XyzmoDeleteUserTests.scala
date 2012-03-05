@@ -5,8 +5,8 @@ import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 import utils._
 import services.AppConfig
-import models.Celebrity
 import com.xyzmo.wwww.biometricserver.WebServiceUserAndProfileStub
+import models.{EnrollmentBatch, Celebrity}
 
 class XyzmoDeleteUserTests extends UnitFlatSpec
 with ShouldMatchers
@@ -36,8 +36,8 @@ with DBTransactionPerTest {
   }
 
   def newEntity = {
-    val celebrity = Celebrity().save()
-    new XyzmoDeleteUser(celebrityId = celebrity.id, baseResult = "ok")
+    val enrollmentBatch = EnrollmentBatch(celebrityId = new Celebrity().save().id).save()
+    new XyzmoDeleteUser(enrollmentBatchId = enrollmentBatch.id, baseResult = "ok")
   }
 
   def saveEntity(toSave: XyzmoDeleteUser) = {

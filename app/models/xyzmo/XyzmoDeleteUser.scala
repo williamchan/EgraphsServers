@@ -14,7 +14,7 @@ import services.Time
 case class XyzmoDeleteUserServices @Inject()(store: XyzmoDeleteUserStore)
 
 case class XyzmoDeleteUser(id: Long = 0,
-                           celebrityId: Long = 0,
+                           enrollmentBatchId: Long = 0,
                            baseResult: String = "",
                            error: Option[String] = None,
                            errorMsg: Option[String] = None,
@@ -57,7 +57,7 @@ class XyzmoDeleteUserStore @Inject()(schema: Schema) extends Saves[XyzmoDeleteUs
 
   override def defineUpdate(theOld: XyzmoDeleteUser, theNew: XyzmoDeleteUser) = {
     updateIs(
-      theOld.celebrityId := theNew.celebrityId,
+      theOld.enrollmentBatchId := theNew.enrollmentBatchId,
       theOld.baseResult := theNew.baseResult,
       theOld.error := theNew.error,
       theOld.errorMsg := theNew.errorMsg,

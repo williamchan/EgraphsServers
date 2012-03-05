@@ -24,11 +24,11 @@ trait XyzmoBiometricServicesBase {
     val signatureDataContainers: List[String] = for (enrollmentSample <- enrollmentSamples) yield getXyzmoSignatureDataContainer(enrollmentSample)
 
     val celebrityId: Long = enrollmentBatch.celebrityId
-    val xyzmoDeleteUser: XyzmoDeleteUser = XyzmoBiometricServices.deleteUser(celebrityId = celebrityId, userId = celebrityId.toString)
+    val xyzmoDeleteUser: XyzmoDeleteUser = XyzmoBiometricServices.deleteUser(enrollmentBatchId = enrollmentBatch.id, userId = celebrityId.toString)
     xyzmoDeleteUser.save()
-    val xyzmoAddUser: XyzmoAddUser = addUser(celebrityId = celebrityId, userId = celebrityId.toString)
+    val xyzmoAddUser: XyzmoAddUser = addUser(enrollmentBatchId = enrollmentBatch.id, userId = celebrityId.toString)
     xyzmoAddUser.save()
-    val xyzmoAddProfile: XyzmoAddProfile = addProfile(celebrityId = celebrityId, userId = celebrityId.toString)
+    val xyzmoAddProfile: XyzmoAddProfile = addProfile(enrollmentBatchId = enrollmentBatch.id, userId = celebrityId.toString)
     xyzmoAddProfile.save()
     val xyzmoEnrollDynamicProfile: XyzmoEnrollDynamicProfile = enrollUser(enrollmentBatchId = enrollmentBatch.id, userId = celebrityId.toString, signatureDataContainers = signatureDataContainers)
     xyzmoEnrollDynamicProfile.save()
@@ -50,14 +50,14 @@ trait XyzmoBiometricServicesBase {
     ))
   }
 
-  protected[signature] def addUser(celebrityId: Long, userId: String): XyzmoAddUser = {
+  protected[signature] def addUser(enrollmentBatchId: Long, userId: String): XyzmoAddUser = {
     val user_Add: User_Add_v1 = new User_Add_v1
     user_Add.setBioUserId(userId)
     user_Add.setDisplayName(userId)
     user_Add.setBioUserStatus(BioUserStatus.Active)
     val webServiceUserAndProfile: Option[WebServiceUserAndProfileStub] = getWebServiceUserAndProfileStub
     val user_Add_v1Response: User_Add_v1Response = webServiceUserAndProfile.get.user_Add_v1(user_Add)
-    val xyzmoAddUser: XyzmoAddUser = new XyzmoAddUser(celebrityId = celebrityId).withResultBase(user_Add_v1Response.getUser_Add_v1Result)
+    val xyzmoAddUser: XyzmoAddUser = new XyzmoAddUser(enrollmentBatchId = enrollmentBatchId).withResultBase(user_Add_v1Response.getUser_Add_v1Result)
     if (xyzmoAddUser.baseResult eq WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue) {
       log.info("User_Add_v1 succeeded: User " + userId + " has been created successfully.")
     }
@@ -69,12 +69,12 @@ trait XyzmoBiometricServicesBase {
     xyzmoAddUser
   }
 
-  protected[signature] def deleteUser(celebrityId: Long, userId: String): XyzmoDeleteUser = {
+  protected[signature] def deleteUser(enrollmentBatchId: Long, userId: String): XyzmoDeleteUser = {
     val user_Delete: User_Delete_v1 = new User_Delete_v1
     user_Delete.setBioUserId(userId)
     val webServiceUserAndProfile: Option[WebServiceUserAndProfileStub] = getWebServiceUserAndProfileStub
     val user_Delete_v1Response: User_Delete_v1Response = webServiceUserAndProfile.get.user_Delete_v1(user_Delete)
-    val xyzmoDeleteUser: XyzmoDeleteUser = new XyzmoDeleteUser(celebrityId = celebrityId).withResultBase(user_Delete_v1Response.getUser_Delete_v1Result)
+    val xyzmoDeleteUser: XyzmoDeleteUser = new XyzmoDeleteUser(enrollmentBatchId = enrollmentBatchId).withResultBase(user_Delete_v1Response.getUser_Delete_v1Result)
     if (xyzmoDeleteUser.baseResult eq WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue) {
       log.info("User_Delete_v1 succeeded: User " + userId + " has been deleted successfully.")
     }
@@ -84,14 +84,14 @@ trait XyzmoBiometricServicesBase {
     xyzmoDeleteUser
   }
 
-  protected[signature] def addProfile(celebrityId: Long, userId: String): XyzmoAddProfile = {
+  protected[signature] def addProfile(enrollmentBatchId: Long, userId: String): XyzmoAddProfile = {
     val profile_Add: Profile_Add_v1 = new Profile_Add_v1
     profile_Add.setBioUserId(userId)
     profile_Add.setProfileName(userId)
     profile_Add.setProfileType(ProfileType.Dynamic)
     val webServiceUserAndProfile: Option[WebServiceUserAndProfileStub] = getWebServiceUserAndProfileStub
     val profile_Add_v1Response: Profile_Add_v1Response = webServiceUserAndProfile.get.profile_Add_v1(profile_Add)
-    val xyzmoAddProfile: XyzmoAddProfile = new XyzmoAddProfile(celebrityId = celebrityId).withProfile_Add_v1Response(profile_Add_v1Response)
+    val xyzmoAddProfile: XyzmoAddProfile = new XyzmoAddProfile(enrollmentBatchId = enrollmentBatchId).withProfile_Add_v1Response(profile_Add_v1Response)
     if (xyzmoAddProfile.baseResult eq WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue) {
       log.info("Profile_Add_v1 succeeded: profile for " + userId + " has been created successfully.")
     }
