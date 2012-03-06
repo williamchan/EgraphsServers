@@ -82,11 +82,15 @@ case class XyzmoEnrollDynamicProfile(id: Long = 0,
 
     if (rejectedSignatureArray.isDefined) {
       if (rejectedSignatureArray.get != null && rejectedSignatureArray.get.size > 0) {
-        var rejectedSignaturesSummary: String = rejectedSignatureArray.get + " signature rejected. Reasons: "
+        var rejectedSignaturesSummary: String = ""
         for (rejectedSignature <- rejectedSignatureArray.get) {
           val index: Int = rejectedSignature.getIndex
           val reasonString: String = rejectedSignature.getReason.toString
           rejectedSignaturesSummary += index + ") " + reasonString + ". "
+        }
+        // rejectedSignaturesSummary is a varchar(255), and longer strings shouldn't prevent this instance from being committed successfully
+        if (rejectedSignaturesSummary.length() > 255) {
+          return Some(rejectedSignaturesSummary.substring(0, 255))
         }
         return Some(rejectedSignaturesSummary)
       }

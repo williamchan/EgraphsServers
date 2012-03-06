@@ -8,34 +8,31 @@ import services.AppConfig
 import services.signature.SignatureBiometricsError
 import services.voice.VoiceBiometricsError
 
-@On("0 0 0 * * ?") // cron expression: seconds minutes hours day-of-month month day-of-week (year optional)
+@On("0 /5 * * * ?") // cron expression: seconds minutes hours day-of-month month day-of-week (year optional)
 class EnrollmentBatchJob extends Job {
   //  Setup process to query for EnrollmentBatches that are {isBatchComplete = true and isSuccessfulEnrollment = null},
   //  and attempt enrollment. Failed enrollment changes Celebrity.enrollmentStatus to "NotEnrolled",
   //  whereas successful enrollment changes Celebrity.enrollmentStatus to "Enrolled".
   //
   //  1. Query for EnrollmentBatches for which isBatchComplete==true and isSuccessfulEnrollment.isNull
-  //  2. For each, find all SignatureSamples and VoiceSamples via EnrollmentSamples
-  //  3. For SignatureSamples, translate each to SignatureDataContainer and store that on BlobStore… then call enroll method with all SignatureSamples
-  //  4. For VoiceSamples, call enroll method
-  //  5. Update EnrollmentBatch and Celebrity
+  //  2. For each EnrollmentBatch, call enrollSignature and enrollVoice
+  //  5. Update EnrollmentBatch and Celebrity with results
   override def doJob() {
-    // TODO(wchan): Should inTransaction be used here?
+    println("Executing enrollment batch job...")
 
     inTransaction {
       val celebStore = AppConfig.instance[CelebrityStore]
 
-      for (batch <- EnrollmentBatchJob.findEnrollmentBatchesPending()) {
-        val celebrity = celebStore.findById(batch.celebrityId).get
-
-        val signatureEnrollmentResult: Either[SignatureBiometricsError, Boolean] = batch.enrollSignature
+      val pendingEnrollmentBatches: List[EnrollmentBatch] = EnrollmentBatchJob.findEnrollmentBatchesPending()
+      for (enrollmentBatch <- pendingEnrollmentBatches) {
+        val signatureEnrollmentResult: Either[SignatureBiometricsError, Boolean] = enrollmentBatch.enrollSignature
         val isSuccessfulSignatureEnrollment: Boolean = if (signatureEnrollmentResult.isRight) {
           signatureEnrollmentResult.right.get
         } else {
           false
         }
 
-        val voiceEnrollmentResult: Either[VoiceBiometricsError, Boolean] = batch.enrollVoice
+        val voiceEnrollmentResult: Either[VoiceBiometricsError, Boolean] = enrollmentBatch.enrollVoice
         val isSuccessfulVoiceEnrollment: Boolean = if (voiceEnrollmentResult.isRight) {
           voiceEnrollmentResult.right.get
         } else {
@@ -43,7 +40,9 @@ class EnrollmentBatchJob extends Job {
         }
 
         val isSuccessfulEnrollment = isSuccessfulSignatureEnrollment && isSuccessfulVoiceEnrollment
-        batch.copy(isSuccessfulEnrollment = Some(isSuccessfulEnrollment)).save()
+        enrollmentBatch.copy(isSuccessfulEnrollment = Some(isSuccessfulEnrollment)).save()
+
+        val celebrity = celebStore.findById(enrollmentBatch.celebrityId).get
         if (isSuccessfulEnrollment) {
           celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
         } else {

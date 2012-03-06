@@ -184,7 +184,9 @@ class Schema @Inject()(injector: Injector) extends org.squeryl.Schema {
   enrollmentBatchToXyzmoEnrollDynamicProfileTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
   on(xyzmoEnrollDynamicProfileTable)(xyzmoEnrollDynamicProfile =>
     declare(
-      xyzmoEnrollDynamicProfile.rejectedSignaturesSummary is (dbType("varchar(255)"))
+      xyzmoEnrollDynamicProfile.rejectedSignaturesSummary is (dbType("varchar(255)")),
+      xyzmoEnrollDynamicProfile.enrollmentSampleIds is (dbType("varchar(255)"))
+
     )
   )
 

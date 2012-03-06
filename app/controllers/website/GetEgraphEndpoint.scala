@@ -10,7 +10,7 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
   /**
    * Serves up a single egraph HTML page. The egraph number is actually the number
    * of the associated order, as several attempts to satisfy an egraph could have
-   * been made before a scuccessful one was signed.
+   * been made before a successful one was signed.
    */
   def getEgraph(orderId: String) = {
     // Get an order with provided ID

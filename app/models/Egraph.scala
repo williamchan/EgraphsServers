@@ -174,6 +174,8 @@ case class Egraph(
 
       // We have return codes from both services. Taking a look at them...
       case (Some(signatureCode), Some(voiceCode)) =>
+        Verified // TODO: Remove for April 1 release
+        /*
         (signatureCode, voiceCode) match {
           // Both service requests occurred without error. Looking at the algorithm results.
           // TODO(erem): Replace "Success" here with the actual xyzmo value
@@ -191,6 +193,7 @@ case class Egraph(
           case ("Success", _) => RejectedVoice
           case (_, _) => RejectedBoth
         }
+         */
     }
 
     this.withState(newState)

@@ -68,6 +68,7 @@ with DBTransaction {
 //    println("System getProperty javax.net.ssl.trustStore = " + System.getProperty("javax.net.ssl.trustStore"))
 //    val startEnrollmentRequest = services.voice.VBGDevRandomNumberBiometricServices.sendStartEnrollmentRequest("pls", false)
 //    println(startEnrollmentRequest.getResponseValue("errorcode"))
-    sjson.json.Serializer.SJSON.toJSON(Map("bees.api.name" -> Play.configuration.getProperty("bees.api.name")))
+//    sjson.json.Serializer.SJSON.toJSON(Map("bees.api.name" -> Play.configuration.getProperty("bees.api.name")))
+    new jobs.EnrollmentBatchJob().now()
   }
 }
