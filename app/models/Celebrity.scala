@@ -125,7 +125,7 @@ case class Celebrity(id: Long = 0,
     Product(celebrityId=id, services=services.productServices.get)
   }
 
-  private def getMostRecentEnrollmentBatch(): Option[EnrollmentBatch] = {
+  def getMostRecentEnrollmentBatch(): Option[EnrollmentBatch] = {
     from(services.schema.enrollmentBatches)(enrollmentBatch =>
       where(enrollmentBatch.celebrityId === this.id)
         select (enrollmentBatch)

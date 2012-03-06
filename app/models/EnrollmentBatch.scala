@@ -9,6 +9,7 @@ import services.signature.{SignatureBiometricService, SignatureBiometricsError}
 import services.voice.{VoiceBiometricService, VoiceBiometricsError}
 import com.google.inject.{Provider, Inject}
 import org.squeryl.Query
+import services.blobs.Blobs
 
 /**
  * Services used by each EnrollmentBatch instance.
@@ -17,6 +18,7 @@ case class EnrollmentBatchServices @Inject() (
   store: EnrollmentBatchStore,
   celebStore: CelebrityStore,
   enrollmentSampleServices: Provider[EnrollmentSampleServices],
+  blobs: Blobs,
   voiceBiometrics: VoiceBiometricService,
   signatureBiometrics: SignatureBiometricService
 )
@@ -92,6 +94,10 @@ case class EnrollmentBatch(id: Long = 0,
 
 object EnrollmentBatch {
   val batchSize = 20 // This needs to match the number of enrollment phrases in GetCelebrityEnrollmentTemplateApiEndpoint
+
+  def getCombinedWavUrl(id: Long): String = {
+    "enrollmentbatches/" + id + "/combined.wav"
+  }
 }
 
 class EnrollmentBatchStore @Inject() (schema: Schema) extends Saves[EnrollmentBatch] with SavesCreatedUpdated[EnrollmentBatch] {

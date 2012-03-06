@@ -22,7 +22,15 @@ with DBTransactionPerTest {
 
   "getErrorCode" should "return errorCode" in {
     val vbgBase = new VBGEnrollUser(errorCode = "50500")
-    vbgBase.getErrorCode should be (vbgBase.errorCode)
+    vbgBase.getErrorCode should be(vbgBase.errorCode)
+  }
+
+  "findByEgraph" should "return VBGVerifySample" in {
+    val enrollmentBatch = EnrollmentBatch(celebrityId = new Celebrity().save().id).save()
+    store.findByEnrollmentBatch(enrollmentBatch) should be(None)
+
+    val vbgVerifySample = new VBGEnrollUser(enrollmentBatchId = enrollmentBatch.id).save()
+    store.findByEnrollmentBatch(enrollmentBatch).get should be(vbgVerifySample)
   }
 
   def newEntity = {

@@ -4,12 +4,27 @@ import play.Play
 import play.test.UnitFlatSpec
 import org.scalatest.matchers.ShouldMatchers
 import services.blobs.Blobs
-import utils.TestConstants
 import play.libs.Codec
 import javax.sound.sampled.{AudioInputStream, AudioFileFormat, AudioSystem}
+import models.{Celebrity, EnrollmentSample, EnrollmentBatch}
+import Blobs.Conversions._
+import org.scalatest.BeforeAndAfterEach
+import utils.{ClearsDatabaseAndValidationAfter, DBTransactionPerTest, TestConstants}
 
+class VBGBiometricServicesBaseTests extends UnitFlatSpec
+with ShouldMatchers
+with BeforeAndAfterEach
+with ClearsDatabaseAndValidationAfter
+with DBTransactionPerTest {
 
-class VBGBiometricServicesTests extends UnitFlatSpec with ShouldMatchers {
+  "enroll" should "call saveCombinedWavToBlobStore" in {
+    val celebrity = Celebrity().save()
+    val enrollmentBatch = EnrollmentBatch(celebrityId = celebrity.id).save()
+    val voiceStr = TestConstants.voiceStr()
+    new EnrollmentSample(enrollmentBatchId = enrollmentBatch.id).save("", voiceStr = voiceStr)
+    MockVBGBiometricServices.enroll(enrollmentBatch)
+    (enrollmentBatch.services.blobs.get(EnrollmentBatch.getCombinedWavUrl(enrollmentBatch.id)).get.asByteArray.length > 0) should be(true)
+  }
 
   "convertWavTo8kHzBase64" should "convert to 8khz encoded in base64" in {
     val wavBinary_44kHz: Array[Byte] = getVoiceSampleBinary("test/files/44khz.wav")

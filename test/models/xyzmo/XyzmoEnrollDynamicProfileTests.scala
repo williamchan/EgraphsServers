@@ -80,6 +80,14 @@ with DBTransactionPerTest {
     // todo(wchan): write this test
   }
 
+  "findByEgraph" should "return VBGVerifySample" in {
+    val enrollmentBatch = EnrollmentBatch(celebrityId = new Celebrity().save().id).save()
+    store.findByEnrollmentBatch(enrollmentBatch) should be(None)
+
+    val xyzmoEnrollDynamicProfile = new XyzmoEnrollDynamicProfile(enrollmentBatchId = enrollmentBatch.id).save()
+    store.findByEnrollmentBatch(enrollmentBatch).get should be(xyzmoEnrollDynamicProfile)
+  }
+
   def newEntity = {
     val enrollmentBatch = EnrollmentBatch(celebrityId = new Celebrity().save().id).save()
     new XyzmoEnrollDynamicProfile(enrollmentBatchId = enrollmentBatch.id)

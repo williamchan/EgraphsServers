@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import models._
 import org.squeryl.PrimitiveTypeMode._
 import services.AppConfig
-import services.db.{KeyedCaseClass, Schema, Saves}
+import services.db.{Schema, Saves}
 import services.Time
 
 /**
@@ -43,6 +43,13 @@ case class VBGEnrollUser(id: Long = 0,
 }
 
 class VBGEnrollUserStore @Inject()(schema: Schema) extends Saves[VBGEnrollUser] with SavesCreatedUpdated[VBGEnrollUser] {
+
+  def findByEnrollmentBatch(enrollmentBatch: EnrollmentBatch): Option[VBGEnrollUser] = {
+    from(schema.vbgEnrollUserTable)(vbgEnrollUser =>
+      where(vbgEnrollUser.enrollmentBatchId === enrollmentBatch.id)
+        select (vbgEnrollUser)
+    ).headOption
+  }
 
   //
   // Saves[VBGEnrollUser] methods

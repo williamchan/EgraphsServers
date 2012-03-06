@@ -33,14 +33,15 @@ trait VBGBiometricServicesBase {
 
     // this part differs between RandomNumber and FreeSpeech...
     //    for (voiceSample <- voiceSamples) {
-    //      val vbgAudioCheck = VBGDevFreeSpeechBiometricServices.sendAudioCheckRequest(enrollmentBatch, transactionId, VoiceSample.getWavUrl(voiceSample.id))
+    //      val vbgAudioCheck = sendAudioCheckRequest(enrollmentBatch, transactionId, VoiceSample.getWavUrl(voiceSample.id))
     //    }
 
     val transactionId = vbgStartEnrollment.vbgTransactionId.get
     val combinedWav: Option[AudioInputStream] = stitchWAVs(wavs)
     val combinedWavBinary: Array[Byte] = if (combinedWav.isDefined) convertAudioInputStreamToByteArray(combinedWav.get) else new Array[Byte](0)
-    val vbgAudioCheck: VBGAudioCheck = VBGDevFreeSpeechBiometricServices.sendAudioCheckRequest(enrollmentBatch = enrollmentBatch, transactionId = transactionId, wavBinary = combinedWavBinary)
+    val vbgAudioCheck: VBGAudioCheck = sendAudioCheckRequest(enrollmentBatch = enrollmentBatch, transactionId = transactionId, wavBinary = combinedWavBinary)
     vbgAudioCheck.save()
+    saveCombinedWavToBlobStore(enrollmentBatch, combinedWavBinary)
     val audioCheckError: Option[VoiceBiometricsError] = maybeGetVoiceBiometricsError(vbgAudioCheck)
     if (audioCheckError.isDefined) {
       return Left(audioCheckError.get)
@@ -321,6 +322,13 @@ trait VBGBiometricServicesBase {
   }
 
   /**
+   * Saving these combined WAvs to the blobstore is useful in case we want to listen to them when reviewing enrollments.
+   */
+  private def saveCombinedWavToBlobStore(enrollmentBatch: EnrollmentBatch, combinedWavBinary: Array[Byte]) {
+    enrollmentBatch.services.blobs.put(EnrollmentBatch.getCombinedWavUrl(enrollmentBatch.id), combinedWavBinary)
+  }
+
+  /**
    * Filters out unsuccessful VBG service requests.
    *
    * Returns the value of the `continue` on the Right if the `request`'s response code was
@@ -427,8 +435,6 @@ private class VBGRequest {
     }
     parseXMLResponse(sb.toString())
     //    httpConn.disconnect()
-
-    println(getClass + " httpConn = " + httpConn.toString)
 
     this
   }

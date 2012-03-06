@@ -35,7 +35,6 @@ trait XyzmoBiometricServicesBase {
 
     // todo(wchan): What situations should result in Left(SignatureBiometricsError)?
     val isSuccessfulSignatureEnrollment = xyzmoEnrollDynamicProfile.isSuccessfulSignatureEnrollment || xyzmoEnrollDynamicProfile.isProfileAlreadyEnrolled
-    println("Result of signature enrollment attempt for celebrity " + celebrityId.toString + ": " + isSuccessfulSignatureEnrollment.toString)
     Right(isSuccessfulSignatureEnrollment)
   }
 

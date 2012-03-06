@@ -107,6 +107,13 @@ case class XyzmoEnrollDynamicProfile(id: Long = 0,
 
 class XyzmoEnrollDynamicProfileStore @Inject()(schema: Schema) extends Saves[XyzmoEnrollDynamicProfile] with SavesCreatedUpdated[XyzmoEnrollDynamicProfile] {
 
+  def findByEnrollmentBatch(enrollmentBatch: EnrollmentBatch): Option[XyzmoEnrollDynamicProfile] = {
+    from(schema.xyzmoEnrollDynamicProfileTable)(xyzmoEnrollDynamicProfile =>
+      where(xyzmoEnrollDynamicProfile.enrollmentBatchId === enrollmentBatch.id)
+        select (xyzmoEnrollDynamicProfile)
+    ).headOption
+  }
+
   //
   // Saves[XyzmoEnrollDynamicProfile] methods
   //
