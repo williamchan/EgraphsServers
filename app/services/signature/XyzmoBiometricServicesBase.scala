@@ -39,15 +39,11 @@ trait XyzmoBiometricServicesBase {
     Right(isSuccessfulSignatureEnrollment)
   }
 
-  def verify(signatureJson: String, egraph: Egraph): Either[SignatureBiometricsError, SignatureVerificationMetadata] = {
+  def verify(signatureJson: String, egraph: Egraph): Either[SignatureBiometricsError, XyzmoVerifyUser] = {
     val sdc = XyzmoBiometricServices.getSignatureDataContainerFromJSON(signatureJson)
     val xyzmoVerifyUser: XyzmoVerifyUser = XyzmoBiometricServices.verifyUser(egraphId = egraph.id, userId = egraph.celebrity.id.toString, sdc)
     xyzmoVerifyUser.save()
-
-    Right(SignatureVerificationMetadata(
-      success = xyzmoVerifyUser.isMatch.getOrElse(false),
-      score = xyzmoVerifyUser.score
-    ))
+    Right(xyzmoVerifyUser)
   }
 
   protected[signature] def addUser(enrollmentBatchId: Long, userId: String): XyzmoAddUser = {

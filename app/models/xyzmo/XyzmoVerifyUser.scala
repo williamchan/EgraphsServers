@@ -61,6 +61,13 @@ case class XyzmoVerifyUser(id: Long = 0,
 
 class XyzmoVerifyUserStore @Inject()(schema: Schema) extends Saves[XyzmoVerifyUser] with SavesCreatedUpdated[XyzmoVerifyUser] {
 
+  def findByEgraph(egraph: Egraph): Option[XyzmoVerifyUser] = {
+    from(schema.xyzmoVerifyUserTable)(xyzmoVerifyUser =>
+      where(xyzmoVerifyUser.egraphId === egraph.id)
+        select (xyzmoVerifyUser)
+    ).headOption
+  }
+
   //
   // Saves[XyzmoVerifyUser] methods
   //

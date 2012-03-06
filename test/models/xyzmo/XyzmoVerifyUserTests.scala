@@ -60,6 +60,14 @@ with DBTransactionPerTest {
     xyzmoVerifyUser.score.get should be(100)
   }
 
+  "findByEgraph" should "return VBGVerifySample" in {
+    val egraph = Egraph(orderId = EgraphTests.persistedOrder.id).save()
+    store.findByEgraph(egraph) should be(None)
+
+    val xyzmoVerifyUser = new XyzmoVerifyUser(egraphId = egraph.id).save()
+    store.findByEgraph(egraph).get should be(xyzmoVerifyUser)
+  }
+
   def newEntity = {
     val egraph = Egraph(orderId = EgraphTests.persistedOrder.id).save()
     new XyzmoVerifyUser(egraphId = egraph.id)

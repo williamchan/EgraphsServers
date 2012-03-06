@@ -18,8 +18,6 @@ class EnrollmentBatchJob extends Job {
   //  2. For each EnrollmentBatch, call enrollSignature and enrollVoice
   //  5. Update EnrollmentBatch and Celebrity with results
   override def doJob() {
-    println("Executing enrollment batch job...")
-
     inTransaction {
       val celebStore = AppConfig.instance[CelebrityStore]
 

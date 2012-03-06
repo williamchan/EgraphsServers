@@ -9,8 +9,10 @@ import services.AppConfig
 import services.blobs.Blobs
 import services.db.{Schema, KeyedCaseClass, Saves}
 import org.jclouds.blobstore.domain.Blob
-import services.signature.{YesMaamSignatureBiometricService, SignatureBiometricService}
-import services.voice.{YesMaamVoiceBiometricService, VoiceBiometricService, VoiceBiometricsCode}
+import vbg.VBGVerifySample
+import services.voice.{VoiceBiometricsError, YesMaamVoiceBiometricService, VoiceBiometricService}
+import xyzmo.XyzmoVerifyUser
+import services.signature.{SignatureBiometricsError, YesMaamSignatureBiometricService, SignatureBiometricService}
 
 case class EgraphServices @Inject() (
   store: EgraphStore,
@@ -32,13 +34,6 @@ case class Egraph(
   id: Long = 0L,
   orderId: Long = 0L,
   stateValue: String = EgraphState.AwaitingVerification.value,
-  // todo(wchan): Remove these now denormalized columns that exist on XyzmoVerifyUser and VBGVerifySample
-  _voiceCode: Option[String] = None,
-  _voiceSuccess: Option[Boolean] = None,
-  _voiceScore: Option[Long] = None,
-  _signatureCode: Option[String] = None,
-  _signatureSuccess: Option[Boolean] = None,
-  _signatureScore: Option[Int] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: EgraphServices = AppConfig.instance[EgraphServices]
@@ -101,52 +96,29 @@ case class Egraph(
   /**
    * Verifies the celebrity against a voice profile
    */
-  def verifyVoice: Egraph = {
-    val voiceResponse = services.voiceBiometrics.verify(assets.audio.asByteArray, this)
-    val (voiceCode, voiceSuccess, voiceScore) = voiceResponse.fold(
-      error =>
-        (Some(error.code), None,  None),
-
-      verification =>
-        (Some(VoiceBiometricsCode.Success.name), Some(verification.success), Some(verification.score))
-    )
-
-    val egraphWithVoiceMetadata = this.copy(
-      _voiceCode = voiceCode,
-      _voiceSuccess = voiceSuccess,
-      _voiceScore = voiceScore
-    )
-
-    egraphWithVoiceMetadata.withRecalculatedStatus
+  def verifyVoice: Option[VBGVerifySample] = {
+    val voiceResponse: Either[VoiceBiometricsError, VBGVerifySample] = services.voiceBiometrics.verify(assets.audio.asByteArray, this)
+    if (voiceResponse.isRight)
+      Some(voiceResponse.right.get)
+    else
+      None
   }
 
   /**
-   * Verifies the celebrity against a signature profile. Returns the celebrity with the
-   * properly
+   * Verifies the celebrity against a signature profile
    */
-  def verifySignature: Egraph = {
-    val signatureResponse = services.signatureBiometrics.verify(assets.signature, this)
-    val (signatureCode, signatureSuccess, signatureScore) = signatureResponse.fold (
-      error =>
-        // TODO(erem): put the actual Xyzmo codes in here
-        (Some("Failure"), None, None),
-
-      verification =>
-        (Some("Success"), Some(verification.success), verification.score)
-    )
-
-    val egraphWithSignatureMetadata = this.copy(
-      _signatureCode = signatureCode,
-      _signatureSuccess = signatureSuccess,
-      _signatureScore = signatureScore
-    )
-
-    egraphWithSignatureMetadata.withRecalculatedStatus
+  def verifySignature: Option[XyzmoVerifyUser] = {
+    val signatureResponse: Either[SignatureBiometricsError, XyzmoVerifyUser] = services.signatureBiometrics.verify(assets.signature, this)
+    if (signatureResponse.isRight)
+      Some(signatureResponse.right.get)
+    else
+      None
   }
 
   def verifyBiometrics: Egraph = {
-    val thisWithVoiceVerified: Egraph = verifyVoice
-    thisWithVoiceVerified.verifySignature
+    val vbgVerifySample: Option[VBGVerifySample] = verifyVoice
+    val xyzmoVerifyUser: Option[XyzmoVerifyUser] = verifySignature
+    withRecalculatedStatus(vbgVerifySample = vbgVerifySample, xyzmoVerifyUser = xyzmoVerifyUser)
   }
 
   /**
@@ -164,36 +136,28 @@ case class Egraph(
    * Recalculates the correct EgraphState for the egraph based on the dependent variables
    * from its biometrics calculation.
    */
-  private def withRecalculatedStatus: Egraph = {
+  private def withRecalculatedStatus(vbgVerifySample: Option[VBGVerifySample], xyzmoVerifyUser: Option[XyzmoVerifyUser]): Egraph = {
     import EgraphState._
 
-    val newState = (_signatureCode, _voiceCode) match {
-      // We're awaiting verification if we don't have any value yet for either of the two biometrics
+    val newState = (xyzmoVerifyUser, vbgVerifySample) match {
+
+      // We're awaiting verification if we don't have any value yet for either of the two biometric services
       case (None, _) | (_, None)=>
         AwaitingVerification
 
       // We have return codes from both services. Taking a look at them...
-      case (Some(signatureCode), Some(voiceCode)) =>
-        Verified // TODO: Remove for April 1 release
+      case (Some(signatureResult), Some(voiceResult)) =>
+        Verified // TODO: Remove for April 1 release and write unit tests for the logic below
         /*
-        (signatureCode, voiceCode) match {
-          // Both service requests occurred without error. Looking at the algorithm results.
-          // TODO(erem): Replace "Success" here with the actual xyzmo value
-          case ("Success", VoiceBiometricsCode.Success.name) =>
-            (_signatureSuccess.get, _voiceSuccess.get) match {
-              case (true, true) => Verified
-              case (true, false) => RejectedVoice
-              case (false, true) => RejectedSignature
-              case (false, false) => RejectedBoth
-            }
-
-          // These three cases only ever happen if at least one service errored out
-          // rather than returning a value
-          case (_, VoiceBiometricsCode.Success.name) => RejectedSignature
-          case ("Success", _) => RejectedVoice
-          case (_, _) => RejectedBoth
+        val isSignatureMatch = signatureResult.isMatch.getOrElse(false)
+        val isVoiceMatch = voiceResult.success.getOrElse(false)
+        (isSignatureMatch, isVoiceMatch) match {
+          case (true, true) => Verified
+          case (true, false) => RejectedVoice
+          case (false, true) => RejectedSignature
+          case (false, false) => RejectedBoth
         }
-         */
+      */
     }
 
     this.withState(newState)
@@ -322,12 +286,6 @@ class EgraphStore @Inject() (schema: Schema) extends Saves[Egraph] with SavesCre
     updateIs(
       theOld.orderId := theNew.orderId,
       theOld.stateValue := theNew.stateValue,
-      theOld._voiceCode := theNew._voiceCode,
-      theOld._voiceSuccess := theNew._voiceSuccess,
-      theOld._voiceScore := theNew._voiceScore,
-      theOld._signatureCode := theNew._signatureCode,
-      theOld._signatureSuccess := theNew._signatureSuccess,
-      theOld._signatureScore := theNew._signatureScore,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated
     )

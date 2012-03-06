@@ -59,7 +59,7 @@ trait VBGBiometricServicesBase {
     Right(enrollmentSuccessValue)
   }
 
-  def verify(audio: Array[Byte], egraph: Egraph): Either[VoiceBiometricsError, VoiceVerificationResult] = {
+  def verify(audio: Array[Byte], egraph: Egraph): Either[VoiceBiometricsError, VBGVerifySample] = {
     val vbgStartVerification: VBGStartVerification = sendStartVerificationRequest(egraph)
     vbgStartVerification.save()
     val startVerificationError: Option[VoiceBiometricsError] = maybeGetVoiceBiometricsError(vbgStartVerification)
@@ -78,13 +78,12 @@ trait VBGBiometricServicesBase {
       vbgFinishVerityTransaction.save()
       Left(verifySampleError.get)
     } else {
-      val verifySampleResponse = new VerifySampleResponse(vbgVerifySample)
       // if either of these are ever undefined, then VBG's API is messed up and we should throw an error.
       success = vbgVerifySample.success.get
       score = vbgVerifySample.score.get
       val vbgFinishVerityTransaction: VBGFinishVerifyTransaction = sendFinishVerifyTransactionRequest(egraph, transactionId = transactionId, successValue = success, score = score)
       vbgFinishVerityTransaction.save()
-      Right(verifySampleResponse)
+      Right(vbgVerifySample)
     }
 
     //    // Begin the verification transaction
@@ -480,10 +479,4 @@ private class VBGRequest {
   def getResponseType: String = {
     responseType
   }
-}
-
-class VerifySampleResponse(request: VBGVerifySample) extends VoiceVerificationResult {
-  override lazy val score = request.score.get
-  override lazy val success = request.success.get
-  lazy val usableTime = request.usableTime.get
 }

@@ -46,6 +46,13 @@ case class VBGVerifySample(id: Long = 0,
 
 class VBGVerifySampleStore @Inject()(schema: Schema) extends Saves[VBGVerifySample] with SavesCreatedUpdated[VBGVerifySample] {
 
+  def findByEgraph(egraph: Egraph): Option[VBGVerifySample] = {
+    from(schema.vbgVerifySampleTable)(vbgVerifySample =>
+      where(vbgVerifySample.egraphId === egraph.id)
+        select (vbgVerifySample)
+    ).headOption
+  }
+
   //
   // Saves[VBGVerifySample] methods
   //
