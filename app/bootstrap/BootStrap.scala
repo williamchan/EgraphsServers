@@ -9,6 +9,7 @@ import services.blobs.Blobs
 import services.{AppConfig, Utils, TempFile}
 import services.db.{Schema, DBSession}
 import services.payment.Payment
+import java.sql.Connection
 
 @OnApplicationStart
 class BootStrap extends Job {
@@ -20,8 +21,11 @@ class BootStrap extends Job {
     payment.bootstrap()
 
     // Initialize Squeryl persistence
-    SessionFactory.concreteFactory =
-      Some(() => Session.create(play.db.DB.getConnection, services.db.DBAdapter.current))
+    SessionFactory.concreteFactory = Some(() => {
+      val connection = play.db.DB.getConnection
+      connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
+      Session.create(connection, services.db.DBAdapter.current)
+    })
 
     // Initialize S3 or fs-based blobstore
     blobs.init()
