@@ -23,7 +23,9 @@ class BootStrap extends Job {
     // Initialize Squeryl persistence
     SessionFactory.concreteFactory = Some(() => {
       val connection = play.db.DB.getConnection
-      connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
+      if (connection.getTransactionIsolation != Connection.TRANSACTION_SERIALIZABLE) {
+        connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
+      }
       Session.create(connection, services.db.DBAdapter.current)
     })
 
