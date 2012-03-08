@@ -4,9 +4,9 @@ import play.mvc.Controller
 import sjson.json.Serializer
 import models._
 import play.data.validation._
-import services.http.{OrderRequestFilters, CelebrityAccountRequestFilters}
 import services.http.OptionParams.Conversions._
 import play.libs.Codec
+import services.http.{HttpCodes, OrderRequestFilters, CelebrityAccountRequestFilters}
 
 private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
   protected def celebFilters: CelebrityAccountRequestFilters
@@ -50,7 +50,7 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
     }
     else {
       play.Logger.info("Dismissing the invalid request")
-      Error(5000, "Valid \"signature\" and \"audio\" parameters were not provided.")
+      Error(HttpCodes.MalformedEgraph, "")
     }
   }
 }

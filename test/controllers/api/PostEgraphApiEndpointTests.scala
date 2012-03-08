@@ -9,6 +9,7 @@ import utils.TestConstants
 import utils.{DBTransactionPerTest, EgraphsUnitTest}
 import utils.FunctionalTestUtils.{CleanDatabaseAfterEachTest, willChanRequest, runScenarios}
 import services.AppConfig
+import services.http.HttpCodes
 
 class PostEgraphApiEndpointTests extends EgraphsUnitTest with DBTransactionPerTest {
   "PostEgraphApiEndpoint" should "save an egraph with status Verified if it skips biometrics" in {
@@ -130,10 +131,10 @@ class PostEgraphApiEndpointFunctionalTests extends FunctionalTest with CleanData
     )
 
 
-    assertStatus(5000, emptyStringSignatureResponse)
-    assertStatus(5000, noSignatureParameterResponse)
-    assertStatus(5000, emptyStringAudioResponse)
-    assertStatus(5000, noAudioParameterResponse)
+    assertStatus(HttpCodes.MalformedEgraph, emptyStringSignatureResponse)
+    assertStatus(HttpCodes.MalformedEgraph, noSignatureParameterResponse)
+    assertStatus(HttpCodes.MalformedEgraph, emptyStringAudioResponse)
+    assertStatus(HttpCodes.MalformedEgraph, noAudioParameterResponse)
   }
 
   @Test
