@@ -6,7 +6,7 @@ import models.xyzmo.XyzmoVerifyUser
 
 trait SignatureBiometricService {
   def enroll(enrollmentBatch: EnrollmentBatch): Either[SignatureBiometricsError, Boolean]
-  def verify(signatureJson: String, egraph: Egraph): Either[SignatureBiometricsError, XyzmoVerifyUser]
+  def verify(egraph: Egraph): Either[SignatureBiometricsError, XyzmoVerifyUser]
 }
 
 /**
@@ -19,8 +19,8 @@ class XyzmoSignatureBiometricService extends SignatureBiometricService {
     xyzmo.enroll(enrollmentBatch)
   }
 
-  def verify(signatureJson: String, egraph: Egraph): Either[SignatureBiometricsError, XyzmoVerifyUser] = {
-    xyzmo.verify(egraph = egraph, signatureJson = signatureJson)
+  def verify(egraph: Egraph): Either[SignatureBiometricsError, XyzmoVerifyUser] = {
+    xyzmo.verify(egraph = egraph)
   }
 }
 
@@ -34,8 +34,8 @@ class TestlabXyzmoSignatureBiometricService extends SignatureBiometricService {
     testlab.enroll(enrollmentBatch)
   }
 
-  def verify(signatureJson: String, egraph: Egraph): Either[SignatureBiometricsError, XyzmoVerifyUser] = {
-    testlab.verify(egraph = egraph, signatureJson = signatureJson)
+  def verify(egraph: Egraph): Either[SignatureBiometricsError, XyzmoVerifyUser] = {
+    testlab.verify(egraph = egraph)
   }
 }
 
@@ -48,7 +48,7 @@ class YesMaamSignatureBiometricService extends SignatureBiometricService {
     Right(true)
   }
 
-  override def verify(signatureJson: String, egraph: Egraph) = {
+  override def verify(egraph: Egraph) = {
     val xyzmoVerifyUser = new XyzmoVerifyUser(
       egraphId = egraph.id,
       baseResult = "ok",

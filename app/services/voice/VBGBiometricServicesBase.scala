@@ -60,7 +60,7 @@ trait VBGBiometricServicesBase {
     Right(enrollmentSuccessValue)
   }
 
-  def verify(audio: Array[Byte], egraph: Egraph): Either[VoiceBiometricsError, VBGVerifySample] = {
+  def verify(egraph: Egraph): Either[VoiceBiometricsError, VBGVerifySample] = {
     val vbgStartVerification: VBGStartVerification = sendStartVerificationRequest(egraph)
     vbgStartVerification.save()
     val startVerificationError: Option[VoiceBiometricsError] = maybeGetVoiceBiometricsError(vbgStartVerification)
@@ -69,7 +69,7 @@ trait VBGBiometricServicesBase {
     }
 
     val transactionId: Long = vbgStartVerification.vbgTransactionId.get
-    val vbgVerifySample: VBGVerifySample = sendVerifySampleRequest(egraph, transactionId, audio)
+    val vbgVerifySample: VBGVerifySample = sendVerifySampleRequest(egraph, transactionId)
     vbgVerifySample.save()
     var success = false
     var score: Long = 0
@@ -214,7 +214,9 @@ trait VBGBiometricServicesBase {
     vbgStartVerification
   }
 
-  protected def sendVerifySampleRequest(egraph: Egraph, transactionId: Long, wavBinary: Array[Byte]): VBGVerifySample = {
+  protected def sendVerifySampleRequest(egraph: Egraph, transactionId: Long): VBGVerifySample = {
+    import services.blobs.Blobs.Conversions._
+    val wavBinary: Array[Byte] = egraph.assets.audio.asByteArray
     val voiceSampleBase64_downSampled: String = convertWavTo8kHzBase64(wavBinary)
 
     val request = new VBGRequest

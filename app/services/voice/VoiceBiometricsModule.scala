@@ -12,7 +12,7 @@ object VoiceBiometricsModule extends AbstractModule with ScalaModule {
 
 private[voice] class VoiceBiometricsProvider @Inject()(yesmaamImpl: Provider[YesMaamVoiceBiometricService],
                                                        fsdevImpl: Provider[VBGDevFSVoiceBiometricService],
-//                                                       fsprodImpl: Provider[VBGProdFSVoiceBiometricService],
+                                                       fsprodImpl: Provider[VBGProdFSVoiceBiometricService],
                                                        utils: Utils)
   extends Provider[VoiceBiometricService] {
 
@@ -24,8 +24,8 @@ private[voice] class VoiceBiometricsProvider @Inject()(yesmaamImpl: Provider[Yes
       case "fsdev" =>
         fsdevImpl.get()
 
-//      case "fsprod" =>
-//        fsprodImpl.get()
+      case "fsprod" =>
+        fsprodImpl.get()
 
       case erroneousValue =>
         throw new IllegalArgumentException(

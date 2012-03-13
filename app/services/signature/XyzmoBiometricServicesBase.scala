@@ -38,7 +38,9 @@ trait XyzmoBiometricServicesBase {
     Right(isSuccessfulSignatureEnrollment)
   }
 
-  def verify(signatureJson: String, egraph: Egraph): Either[SignatureBiometricsError, XyzmoVerifyUser] = {
+  def verify(egraph: Egraph): Either[SignatureBiometricsError, XyzmoVerifyUser] = {
+    val signatureJson: String = egraph.assets.signature
+
     val sdc = XyzmoBiometricServices.getSignatureDataContainerFromJSON(signatureJson)
     val xyzmoVerifyUser: XyzmoVerifyUser = XyzmoBiometricServices.verifyUser(egraphId = egraph.id, userId = egraph.celebrity.id.toString, sdc)
     xyzmoVerifyUser.save()

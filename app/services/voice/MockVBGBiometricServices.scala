@@ -34,7 +34,7 @@ object MockVBGBiometricServices extends VBGBiometricServicesBase {
     new VBGStartVerification(egraphId = egraph.id, errorCode = VoiceBiometricsCode.Success.name, vbgTransactionId = Some(0))
   }
 
-  override protected def sendVerifySampleRequest(egraph: Egraph, transactionId: Long, wavBinary: Array[Byte]): VBGVerifySample = {
+  override protected def sendVerifySampleRequest(egraph: Egraph, transactionId: Long): VBGVerifySample = {
     new VBGVerifySample(egraphId = egraph.id, vbgTransactionId = transactionId, errorCode = VoiceBiometricsCode.Success.name)
   }
 }

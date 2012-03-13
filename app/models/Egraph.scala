@@ -97,7 +97,7 @@ case class Egraph(
    * Verifies the celebrity against a voice profile
    */
   def verifyVoice: Option[VBGVerifySample] = {
-    val voiceResponse: Either[VoiceBiometricsError, VBGVerifySample] = services.voiceBiometrics.verify(assets.audio.asByteArray, this)
+    val voiceResponse: Either[VoiceBiometricsError, VBGVerifySample] = services.voiceBiometrics.verify(this)
     if (voiceResponse.isRight)
       Some(voiceResponse.right.get)
     else
@@ -108,7 +108,7 @@ case class Egraph(
    * Verifies the celebrity against a signature profile
    */
   def verifySignature: Option[XyzmoVerifyUser] = {
-    val signatureResponse: Either[SignatureBiometricsError, XyzmoVerifyUser] = services.signatureBiometrics.verify(assets.signature, this)
+    val signatureResponse: Either[SignatureBiometricsError, XyzmoVerifyUser] = services.signatureBiometrics.verify(this)
     if (signatureResponse.isRight)
       Some(signatureResponse.right.get)
     else
