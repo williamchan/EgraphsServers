@@ -67,3 +67,9 @@ GET     /{celebrityUrlSlug}/{productUrlSlug}     WebsiteControllers.getCelebrity
 POST    /{celebrityUrlSlug}/{productUrlSlug}/buy WebsiteControllers.postBuyProduct
 POST    /{celebrityUrlSlug}/{productUrlSlug}/buy-demo WebsiteControllers.postBuyDemoProduct
 
+##
+## Admin
+##
+GET     /admin/celebrities/create                WebsiteControllers.getCreateCelebrity
+POST    /admin/celebrities                       WebsiteControllers.postCelebrity
+

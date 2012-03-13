@@ -23,6 +23,12 @@ class UtilsTests extends UnitFlatSpec
     val map = Utils.toMap(List(1, 2), key=(theInt: Int) => theInt.toString)
     map should be (Map("1" -> 1, "2" -> 2))
   }
+  
+  "toOption" should "return Some for non-empty String and None for empty String" in {
+    Utils.toOption("") should be(None)
+    Utils.toOption(" ") should be(Some(" "))
+    Utils.toOption("a") should be(Some("a"))
+  }
 
   "closing" should "close a closeable resource on success" in {
     val closeable = new Closeable()

@@ -45,7 +45,7 @@ case class Celebrity(id: Long = 0,
   // Additional DB columns
   //
   /**The slug used to access this Celebrity's page on the main site. */
-  val urlSlug = publicName.map(name => JavaExtensions.slugify(name, false)) // Slugify without lower-casing
+  val urlSlug: Option[String] = publicName.map(name => JavaExtensions.slugify(name, false)) // Slugify without lower-casing
 
   //
   // Public members
@@ -179,6 +179,7 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
   // Public Methods
   //
   def findByUrlSlug(slug: String): Option[Celebrity] = {
+    // todo(wchan): Verify that slug is non-empty
     from(schema.celebrities)(celebrity =>
       where(celebrity.urlSlug === Some(slug))
         select (celebrity)

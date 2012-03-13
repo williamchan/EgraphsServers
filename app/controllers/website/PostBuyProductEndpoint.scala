@@ -11,6 +11,7 @@ import services.http.CelebrityAccountRequestFilters
 import services.mail.Mail
 import services.{Utils, AppConfig}
 import play.Logger
+import controllers.WebsiteControllers
 
 trait PostBuyProductEndpoint { this: Controller =>
   import PostBuyProductEndpoint.EgraphPurchaseHandler
@@ -40,8 +41,10 @@ trait PostBuyProductEndpoint { this: Controller =>
       Logger.info("Purchase of product " + celebrity.publicName + "/" + product.name + " for " + recipientName)
       import Validation.{required, email}
       required("Recipient name", recipientName)
+      required("Recipient E-mail address", recipientEmail)
       email("Recipient E-mail address", recipientEmail)
       required("Buyer name", buyerName)
+      required("Buyer E-mail address", buyerEmail)
       email("Buyer E-mail address", buyerEmail)
       required("stripeTokenId", stripeTokenId)
 
@@ -78,17 +81,7 @@ trait PostBuyProductEndpoint { this: Controller =>
           ).execute()
         }
       } else {
-        import scala.collection.JavaConversions._
-
-        // Redirect back to the index page, providing field errors via the flash scope.
-        val fieldNames = validationErrors.map { case (fieldName, _) => fieldName }
-        val errorString = fieldNames.mkString(",")
-
-        flash += ("errors" -> errorString)
-
-        params.allSimple().foreach { param => flash += param }
-
-        Redirect(GetCelebrityProductEndpoint.url(celebrity, product).url, false)
+        WebsiteControllers.redirectWithValidationErrors(GetCelebrityProductEndpoint.url(celebrity, product), Some(false))
       }
     }
   }

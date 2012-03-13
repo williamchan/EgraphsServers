@@ -23,6 +23,10 @@ class Utils @Inject()(@PlayConfig() playConfig: Properties)
     toMap.foldLeft(Map.empty[K, V])((growingMap, next) => growingMap + (key(next) -> next))
   }
 
+  def toOption(str: String): Option[String] = {
+    if (str.isEmpty) None else Some(str)
+  }
+
   /**
    * Manages closing behavior for functions that use resources that require closing afterwards.
    *
