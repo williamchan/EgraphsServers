@@ -20,8 +20,8 @@ trait VBGBiometricServicesBase {
   protected val _myClientName: String
   protected val _myClientKey: String
 
-  def enroll(enrollmentBatch: EnrollmentBatch): Either[VoiceBiometricsError, Boolean] = {
-    val vbgStartEnrollment: VBGStartEnrollment = sendStartEnrollmentRequest(enrollmentBatch)
+  def enroll(enrollmentBatch: EnrollmentBatch, userIdOverride: Option[String] = None): Either[VoiceBiometricsError, Boolean] = {
+    val vbgStartEnrollment: VBGStartEnrollment = startEnrollment(enrollmentBatch, userIdOverride)
     vbgStartEnrollment.save()
     val startEnrollmentError: Option[VoiceBiometricsError] = maybeGetVoiceBiometricsError(vbgStartEnrollment)
     if (startEnrollmentError.isDefined) {
@@ -60,8 +60,8 @@ trait VBGBiometricServicesBase {
     Right(enrollmentSuccessValue)
   }
 
-  def verify(egraph: Egraph): Either[VoiceBiometricsError, VBGVerifySample] = {
-    val vbgStartVerification: VBGStartVerification = sendStartVerificationRequest(egraph)
+  def verify(egraph: Egraph, userIdOverride: Option[String] = None): Either[VoiceBiometricsError, VBGVerifySample] = {
+    val vbgStartVerification: VBGStartVerification = sendStartVerificationRequest(egraph, userIdOverride)
     vbgStartVerification.save()
     val startVerificationError: Option[VoiceBiometricsError] = maybeGetVoiceBiometricsError(vbgStartVerification)
     if (startVerificationError.isDefined) {
@@ -115,20 +115,22 @@ trait VBGBiometricServicesBase {
 
   // ========================== make API calls
 
-  private def sendStartEnrollmentRequest(enrollmentBatch: EnrollmentBatch): VBGStartEnrollment = {
-    val vbgStartEnrollmentFirstAttempt = sendStartEnrollmentRequest(enrollmentBatch = enrollmentBatch, rebuildTemplate = false)
+  private def startEnrollment(enrollmentBatch: EnrollmentBatch, userIdOverride: Option[String]): VBGStartEnrollment = {
+    val vbgStartEnrollmentFirstAttempt = sendStartEnrollmentRequest(enrollmentBatch = enrollmentBatch, rebuildTemplate = false, userIdOverride)
     if (VoiceBiometricsCode.Success == VoiceBiometricsCode.byCodeString(vbgStartEnrollmentFirstAttempt.errorCode)) {
       // First-time enrollment
       vbgStartEnrollmentFirstAttempt
     } else {
       vbgStartEnrollmentFirstAttempt.save()
       // Re-enrollment
-      sendStartEnrollmentRequest(enrollmentBatch = enrollmentBatch, rebuildTemplate = true)
+      sendStartEnrollmentRequest(enrollmentBatch = enrollmentBatch, rebuildTemplate = true, userIdOverride)
     }
   }
 
-  protected def sendStartEnrollmentRequest(enrollmentBatch: EnrollmentBatch, rebuildTemplate: Boolean): VBGStartEnrollment = {
-    val userId = enrollmentBatch.celebrityId.toString
+  protected def sendStartEnrollmentRequest(enrollmentBatch: EnrollmentBatch,
+                                           rebuildTemplate: Boolean,
+                                           userIdOverride: Option[String]): VBGStartEnrollment = {
+    val userId = if (userIdOverride.isEmpty) enrollmentBatch.celebrityId.toString else userIdOverride.get
 
     val request = new VBGRequest
     request.setRequestType(VBGRequest._StartEnrollment)
@@ -196,8 +198,8 @@ trait VBGBiometricServicesBase {
     vbgFinishEnrollTransaction
   }
 
-  protected def sendStartVerificationRequest(egraph: Egraph): VBGStartVerification = {
-    val userId = egraph.celebrity.id.toString
+  protected def sendStartVerificationRequest(egraph: Egraph, userIdOverride: Option[String]): VBGStartVerification = {
+    val userId = if (userIdOverride.isEmpty) egraph.celebrity.id.toString else userIdOverride.get
 
     val request = new VBGRequest
     request.setRequestType(VBGRequest._StartVerification)

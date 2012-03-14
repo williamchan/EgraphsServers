@@ -26,11 +26,11 @@ object MockVBGBiometricServices extends VBGBiometricServicesBase {
     new VBGFinishVerifyTransaction(egraphId = egraph.id, vbgTransactionId = transactionId, errorCode = VoiceBiometricsCode.Success.name)
   }
 
-  override protected def sendStartEnrollmentRequest(enrollmentBatch: EnrollmentBatch, rebuildTemplate: Boolean): VBGStartEnrollment = {
+  override protected def sendStartEnrollmentRequest(enrollmentBatch: EnrollmentBatch, rebuildTemplate: Boolean, userIdOverride: Option[String] = None): VBGStartEnrollment = {
     new VBGStartEnrollment(enrollmentBatchId = enrollmentBatch.id, errorCode = VoiceBiometricsCode.Success.name, vbgTransactionId = Some(0))
   }
 
-  override protected def sendStartVerificationRequest(egraph: Egraph): VBGStartVerification = {
+  override protected def sendStartVerificationRequest(egraph: Egraph, userIdOverride: Option[String] = None): VBGStartVerification = {
     new VBGStartVerification(egraphId = egraph.id, errorCode = VoiceBiometricsCode.Success.name, vbgTransactionId = Some(0))
   }
 
