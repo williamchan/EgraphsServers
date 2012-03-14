@@ -11,6 +11,10 @@ import models._
 import utils.{TestData, TestConstants, ClearsDatabaseAndValidationAfter, DBTransactionPerTest}
 import play.libs.Codec
 
+/**
+ * IMPORTANT! -- Do not write tests for VBGProdFreeSpeechBiometricServices that will clobber actual accounts on VBG.
+ * We use Celebrity IDs as userIds on VBG.
+ */
 class VBGDevFreeSpeechBiometricServicesTests extends UnitFlatSpec
 with ShouldMatchers
 with BeforeAndAfterEach

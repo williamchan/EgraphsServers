@@ -11,10 +11,13 @@ trait SignatureBiometricService {
 
 /**
  * SignatureBiometricService implementation that hits the configured Xyzmo signature biometric server.
+ *
+ * IMPORTANT! -- Do not write tests for XyzmoSignatureBiometricService will clobber actual accounts on Xyzmo.
+ * We use Celebrity IDs as userIds on Xyzmo.
  */
 class XyzmoSignatureBiometricService extends SignatureBiometricService {
   private val xyzmo = XyzmoBiometricServices
-  
+
   def enroll(enrollmentBatch: EnrollmentBatch): Either[SignatureBiometricsError, Boolean] = {
     xyzmo.enroll(enrollmentBatch)
   }

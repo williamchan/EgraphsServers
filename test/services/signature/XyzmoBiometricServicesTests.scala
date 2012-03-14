@@ -7,6 +7,10 @@ import play.Play
 import play.test.UnitFlatSpec
 import utils.TestHelpers
 
+/**
+ * IMPORTANT! -- Do not write tests for XyzmoBiometricServices that will clobber actual accounts on Xyzmo.
+ * We use Celebrity IDs as userIds on Xyzmo.
+ */
 class XyzmoBiometricServicesTests extends UnitFlatSpec with ShouldMatchers {
 
   private val xyzmo = XyzmoBiometricServices

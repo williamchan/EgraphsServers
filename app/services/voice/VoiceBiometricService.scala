@@ -10,8 +10,11 @@ trait VoiceBiometricService {
 }
 
 /**
-* Voice biometrics implementation that connects to prod account at VBG's Free Speech engine.
-*/
+ * Voice biometrics implementation that connects to prod account at VBG's Free Speech engine.
+ *
+ * IMPORTANT! -- Do not write tests for VBGProdFSVoiceBiometricService that will clobber actual accounts on VBG.
+ * We use Celebrity IDs as userIds on VBG.
+ */
 class VBGProdFSVoiceBiometricService extends VoiceBiometricService {
   private val vbg = VBGProdFreeSpeechBiometricServices
 
