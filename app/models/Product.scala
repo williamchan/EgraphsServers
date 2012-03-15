@@ -124,6 +124,9 @@ case class Product(
 }
 
 object Product {
+
+  val defaultPrice = 50
+
   import org.squeryl.PrimitiveTypeMode._
 
   case class ProductWithPhoto(product: Product, photo: ImageAsset) {
@@ -151,6 +154,15 @@ class ProductStore @Inject() (schema: Schema) extends Saves[Product] with SavesC
       )
       select(product)
     )
+  }
+
+  def findByCelebrityAndUrlSlug(celebrityId: Long, slug: String): Option[Product] = {
+    if (slug.isEmpty) return None
+
+    from(schema.products)(product =>
+      where(product.celebrityId === celebrityId and product.urlSlug === slug)
+        select (product)
+    ).headOption
   }
 
   //

@@ -94,6 +94,8 @@ case class Celebrity(id: Long = 0,
    * data as the master copy for the Celebrity's profile. The data should be in
    * `JPEG` or `PNG` format.
    *
+   * The celebrity must have been previously persisted because an id is required.
+   *
    * @return the newly persisted celebrity with a valid profile photo.
    */
   def saveWithProfilePhoto(imageData: Array[Byte]): (Celebrity, ImageAsset) = {
@@ -179,7 +181,8 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
   // Public Methods
   //
   def findByUrlSlug(slug: String): Option[Celebrity] = {
-    // todo(wchan): Verify that slug is non-empty
+    if (slug.isEmpty) return None
+
     from(schema.celebrities)(celebrity =>
       where(celebrity.urlSlug === Some(slug))
         select (celebrity)

@@ -1,16 +1,16 @@
 package controllers
 
 import website._
-import admin.{PostCelebrityEndpoint, GetCreateCelebrityEndpoint}
+import admin.{GetCreateCelebrityProductEndpoint, PostCelebrityProductEndpoint, PostCelebrityEndpoint, GetCreateCelebrityEndpoint}
 import nonproduction.PostBuyDemoProductEndpoint
-import services.http.{CelebrityAccountRequestFilters, DBTransaction}
 import website.GetRootEndpoint
 import services.blobs.Blobs
 import services.mail.Mail
 import services.payment.Payment
-import models.{CelebrityStore, AccountStore, CustomerStore, OrderStore}
 import play.mvc.{Router, Controller}
 import play.mvc.results.Redirect
+import models._
+import services.http.{AdminRequestFilters, CelebrityAccountRequestFilters, DBTransaction}
 
 object WebsiteControllers extends Controller
   with GetRootEndpoint
@@ -23,19 +23,25 @@ object WebsiteControllers extends Controller
   with GetOrderConfirmationEndpoint
   with GetCreateCelebrityEndpoint
   with PostCelebrityEndpoint
-  with DBTransaction
-{
+  with GetCreateCelebrityProductEndpoint
+  with PostCelebrityProductEndpoint
+  with DBTransaction {
+
   import services.AppConfig.instance
 
   // Provide endpoint dependencies
-  override protected val payment = instance[Payment]
-  override protected val orderStore = instance[OrderStore]
+  override protected val adminFilters = instance[AdminRequestFilters]
   override protected val celebFilters = instance[CelebrityAccountRequestFilters]
+
   override protected val blobs = instance[Blobs]
   override protected val mail = instance[Mail]
+  override protected val payment = instance[Payment]
+
+  override protected val accountStore = instance[AccountStore]
   override protected val celebrityStore = instance[CelebrityStore]
   override protected val customerStore = instance[CustomerStore]
-  override protected val accountStore = instance[AccountStore]
+  override protected val orderStore = instance[OrderStore]
+  override protected val productStore = instance[ProductStore]
 
   def redirectWithValidationErrors(redirectUrl: Router.ActionDefinition, permanent: Option[Boolean] = None): Redirect = {
     // Redirect to redirectUrl, providing field errors via the flash scope.

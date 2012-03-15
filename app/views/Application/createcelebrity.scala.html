@@ -62,7 +62,7 @@ name="@id"
   </h2>
   <div class="form row">
     <div class="span12 form-column">
-      <form id="celebrity-form" method="POST" action='@postCelebrity'>
+      <form id="celebrity-form" method="POST" action='@postCelebrity' enctype="multipart/form-data">
         <fieldset>
           <legend>Celebrity info</legend>
 
@@ -78,6 +78,9 @@ name="@id"
           @publicNameHelp = { Celebrity's popular name, eg "A-Rod" for Alex Rodriguez. Default is "First Last" }
 
           @formField(id="description", label="Description", inputType="text", width="span4")
+
+          @formField(id="profileImage", label="Profile Photo", inputType="file", width="span8", help=Some(profileHelp))
+          @profileHelp = { 200x200 image }
 
           <!--@formField(id="isLeftHandled", label="Is Left-handed", inputType="checkbox", width="span4")-->
 

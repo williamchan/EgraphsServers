@@ -70,6 +70,7 @@ POST    /{celebrityUrlSlug}/{productUrlSlug}/buy-demo WebsiteControllers.postBuy
 ##
 ## Admin
 ##
-GET     /admin/celebrities/create                WebsiteControllers.getCreateCelebrity
-POST    /admin/celebrities                       WebsiteControllers.postCelebrity
-
+GET     /admin/celebrities/create                         WebsiteControllers.getCreateCelebrity
+POST    /admin/celebrities                                WebsiteControllers.postCelebrity
+GET     /admin/celebrities/{celebrityId}/products/create  WebsiteControllers.getCreateCelebrityProduct
+POST    /admin/celebrities/{celebrityId}/products         WebsiteControllers.postCelebrityProduct

@@ -79,6 +79,16 @@ with ShouldMatchers {
     (scaled.getWidth, scaled.getHeight) should be((100, 100))
   }
 
+  "getDimensions" should "return width and height of image" in {
+    val dimensions = ImageUtil.getDimensions(Play.getFile("test/files/image.png")).get
+    dimensions.width should be (307)
+    dimensions.height should be (299)
+
+    ImageUtil.getDimensions(null) should be (None)                                // null case
+    ImageUtil.getDimensions(Play.getFile("doesnotexist")) should be (None)        // empty file
+    ImageUtil.getDimensions(Play.getFile("test/files/8khz.wav")) should be (None) // Not an image file
+  }
+
   "getMaxDouble" should "get Max in list of list of Doubles" in {
     ImageUtil.getMaxDouble(List()) should be(None)
     ImageUtil.getMaxDouble(List(List(1.0, 2.0, 3.0))).get should be(3.0)

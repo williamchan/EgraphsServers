@@ -96,6 +96,8 @@ class AccountStore @Inject() (schema: Schema) extends Saves[Account] with SavesC
   // Public methods
   //
   def findByEmail(email: String): Option[Account] = {
+    if (email.isEmpty) return None
+
     val emailInLowerCase = email.trim().toLowerCase
     from(schema.accounts)(account =>
       where(account.email === emailInLowerCase)

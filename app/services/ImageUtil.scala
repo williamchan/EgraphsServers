@@ -3,13 +3,14 @@ package services
 import java.awt.image.BufferedImage
 import util.parsing.json.JSON
 import java.awt.geom.Ellipse2D
-import javax.imageio.ImageIO
 import com.google.inject.Inject
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import java.awt.{Transparency, Graphics, RenderingHints, Graphics2D}
 import models.ImageAsset
 import collection.immutable.List
+import java.io.{File, ByteArrayInputStream, ByteArrayOutputStream}
+import javax.imageio.stream.ImageInputStream
+import javax.imageio.{ImageReader, ImageIO}
 
 @Inject() class ImageUtil {
 
@@ -306,6 +307,24 @@ import collection.immutable.List
 
 object ImageUtil {
 
+  def getDimensions(imageFile: File): Option[Dimensions] = {
+    if (imageFile == null || imageFile.length() == 0) return None
+
+    val in: ImageInputStream = ImageIO.createImageInputStream(imageFile)
+    try {
+      val readers = ImageIO.getImageReaders(in)
+      if (readers.hasNext) {
+        val reader: ImageReader = readers.next().asInstanceOf[ImageReader]
+        reader.setInput(in)
+        Some(Dimensions(width = reader.getWidth(0), height = reader.getHeight(0)))
+      } else {
+        None
+      }
+    } finally {
+      if (in != null) in.close()
+    }
+  }
+
   def getMaxDouble(listOfListOfDoubles: List[List[Double]]): Option[Double] = {
     val maxYs: List[Double] = listOfListOfDoubles.map(ys =>
       if (ys.isEmpty) 0
@@ -338,5 +357,6 @@ object ImageUtil {
       new ImageEnrichedByteArray(bytes)
     }
   }
-
 }
+
+case class Dimensions(width: Int, height: Int)

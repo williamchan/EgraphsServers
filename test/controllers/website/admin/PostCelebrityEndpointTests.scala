@@ -7,14 +7,16 @@ import play.test.FunctionalTest
 import FunctionalTest._
 import utils.FunctionalTestUtils.CleanDatabaseAfterEachTest
 import java.net.URLDecoder
+import java.io.File
+import play.Play
 
 
 class PostCelebrityEndpointTests extends FunctionalTest with CleanDatabaseAfterEachTest {
 
   @Test
   def testPostCelebrityCreatesCelebrity() {
-    val postParams: Map[String, String] = getPostParams()
-    val response = POST("/admin/celebrities", postParams)
+    val postStrParams: Map[String, String] = getPostStrParams()
+    val response = POST("/admin/celebrities", postStrParams)
 
     assertStatus(302, response)
     assertHeaderEquals("Location", "/Muhammad-Ali", response)
@@ -22,8 +24,8 @@ class PostCelebrityEndpointTests extends FunctionalTest with CleanDatabaseAfterE
 
   @Test
   def testPostCelebrityCreatesCelebrityWithFullNameAsPublicName() {
-    val postParams: Map[String, String] = getPostParams(publicName = "")
-    val response = POST("/admin/celebrities", postParams)
+    val postStrParams: Map[String, String] = getPostStrParams(publicName = "")
+    val response = POST("/admin/celebrities", postStrParams)
 
     assertStatus(302, response)
     assertHeaderEquals("Location", "/Cassius-Clay", response)
@@ -31,21 +33,22 @@ class PostCelebrityEndpointTests extends FunctionalTest with CleanDatabaseAfterE
 
   @Test
   def testPostCelebrityValidatesFields() {
-    val postParams: Map[String, String] = getPostParams("", "", "", "", "", "")
-    val response = POST("/admin/celebrities", postParams)
+    val postStrParams: Map[String, String] = getPostStrParams("", "", "", "", "", "")
+    val response = POST("/admin/celebrities", postStrParams)
 
     assertStatus(302, response)
     assertHeaderEquals("Location", "/admin/celebrities/create", response)
     val decodedCookieValue: String = URLDecoder.decode(response.cookies.get("PLAY_FLASH").value, "US-ASCII")
-    assertTrue(decodedCookieValue.contains("errors:E-mail address,Password,Description"))
+    println("decodedCookieValue " + decodedCookieValue)
+    assertTrue(decodedCookieValue.contains("errors:Description,Password,E-mail address"))
   }
 
   @Test
   def testPostCelebrityValidatesEmail() {
-    val postParams: Map[String, String] = getPostParams(
+    val postStrParams: Map[String, String] = getPostStrParams(
       celebrityEmail = "not a valid email"
     )
-    val response = POST("/admin/celebrities", postParams)
+    val response = POST("/admin/celebrities", postStrParams)
 
     assertStatus(302, response)
     assertHeaderEquals("Location", "/admin/celebrities/create", response)
@@ -58,30 +61,30 @@ class PostCelebrityEndpointTests extends FunctionalTest with CleanDatabaseAfterE
     val errorString = "Must provide either Public Name or First and Last Name"
 
     val withFirstName: String = URLDecoder.decode(POST("/admin/celebrities",
-      getPostParams(firstName = "Cassius", lastName = "", publicName = "")).cookies.get("PLAY_FLASH").value, "US-ASCII")
+      getPostStrParams(firstName = "Cassius", lastName = "", publicName = "")).cookies.get("PLAY_FLASH").value, "US-ASCII")
     assertTrue(withFirstName.contains(errorString))
 
     val withLastName: String = URLDecoder.decode(POST("/admin/celebrities",
-      getPostParams(firstName = "", lastName = "Clay", publicName = "")).cookies.get("PLAY_FLASH").value, "US-ASCII")
+      getPostStrParams(firstName = "", lastName = "Clay", publicName = "")).cookies.get("PLAY_FLASH").value, "US-ASCII")
     assertTrue(withLastName.contains(errorString))
 
     val withFullName: String = URLDecoder.decode(POST("/admin/celebrities",
-      getPostParams(firstName = "Cassius", lastName = "Clay", publicName = "")).cookies.get("PLAY_FLASH").value, "US-ASCII")
+      getPostStrParams(firstName = "Cassius", lastName = "Clay", publicName = "")).cookies.get("PLAY_FLASH").value, "US-ASCII")
     assertTrue(!withFullName.contains(errorString))
 
     val withPublicName: String = URLDecoder.decode(POST("/admin/celebrities",
-      getPostParams(firstName = "", lastName = "", publicName = "Muhammad Ali")).cookies.get("PLAY_FLASH").value, "US-ASCII")
+      getPostStrParams(firstName = "", lastName = "", publicName = "Muhammad Ali")).cookies.get("PLAY_FLASH").value, "US-ASCII")
     assertTrue(!withPublicName.contains(errorString))
   }
 
   @Test
   def testPostCelebrityValidatesThatNoCelebrityWithSameEmailExists() {
-    assertHeaderEquals("Location", "/Muhammad-Ali", POST("/admin/celebrities", getPostParams()))
+    assertHeaderEquals("Location", "/Muhammad-Ali", POST("/admin/celebrities", getPostStrParams()))
 
-    val postParams: Map[String, String] = getPostParams(
+    val postStrParams: Map[String, String] = getPostStrParams(
       publicName = "Cassius Clay"
     )
-    val response = POST("/admin/celebrities", postParams)
+    val response = POST("/admin/celebrities", postStrParams)
 
     assertStatus(302, response)
     assertHeaderEquals("Location", "/admin/celebrities/create", response)
@@ -93,11 +96,11 @@ class PostCelebrityEndpointTests extends FunctionalTest with CleanDatabaseAfterE
 //  def testPostCelebrityChecksThatPasswordMatchesExistingPasswordOnAccount() {
 //    Account(email="wchan83@egraphs.com").withPassword("derp").right.get.save()
 //
-//    val postParams: Map[String, String] = getPostParams(
+//    val postStrParams: Map[String, String] = getPostParams(
 //      celebrityEmail = "wchan83@egraphs.com",
 //      celebrityPassword = "-"
 //    )
-//    val response = POST("/admin/celebrities", postParams)
+//    val response = POST("/admin/celebrities", postStrParams)
 //
 //    assertStatus(302, response)
 //    assertHeaderEquals("Location", "/admin/celebrities/create", response)
@@ -107,10 +110,10 @@ class PostCelebrityEndpointTests extends FunctionalTest with CleanDatabaseAfterE
 
   @Test
   def testPostCelebrityValidatesPassword() {
-    val postParams: Map[String, String] = getPostParams(
+    val postStrParams: Map[String, String] = getPostStrParams(
       celebrityPassword = "-"
     )
-    val response = POST("/admin/celebrities", postParams)
+    val response = POST("/admin/celebrities", postStrParams)
 
     assertStatus(302, response)
     assertHeaderEquals("Location", "/admin/celebrities/create", response)
@@ -120,12 +123,12 @@ class PostCelebrityEndpointTests extends FunctionalTest with CleanDatabaseAfterE
 
   @Test
   def testPostCelebrityValidatesCelebrityUrlSlugIsUnique() {
-    assertHeaderEquals("Location", "/Muhammad-Ali", POST("/admin/celebrities", getPostParams()))
+    assertHeaderEquals("Location", "/Muhammad-Ali", POST("/admin/celebrities", getPostStrParams()))
 
-    val postParams: Map[String, String] = getPostParams(
+    val postStrParams: Map[String, String] = getPostStrParams(
       celebrityEmail = "ali2@egraphs.com"
     )
-    val response = POST("/admin/celebrities", postParams)
+    val response = POST("/admin/celebrities", postStrParams)
 
     assertStatus(302, response)
     assertHeaderEquals("Location", "/admin/celebrities/create", response)
@@ -133,7 +136,7 @@ class PostCelebrityEndpointTests extends FunctionalTest with CleanDatabaseAfterE
     assertTrue(decodedCookieValue.contains("errors:Celebrity with same website name exists. Provide different public name"))
   }
 
-  private def getPostParams(celebrityEmail: String = "ali@egraphs.com",
+  private def getPostStrParams(celebrityEmail: String = "ali@egraphs.com",
                             celebrityPassword: String = "derp",
                             firstName: String = "Cassius",
                             lastName: String = "Clay",
@@ -147,5 +150,11 @@ class PostCelebrityEndpointTests extends FunctionalTest with CleanDatabaseAfterE
       "publicName" -> publicName,
       "description" -> description
     )
+  }
+  
+  private def getPostFileParams = {
+    Map[String, File]{
+      "profileImage" -> Play.getFile("test/files/will_chan_celebrity_profile.jpg")
+    }
   }
 }
