@@ -27,6 +27,7 @@ object WebsiteControllers extends Controller
   with GetCreateCelebrityEndpoint
   with PostCelebrityEndpoint
   with GetCreateCelebrityProductEndpoint
+  with GetCelebrityProductsEndpoint
   with PostCelebrityProductEndpoint
   with DBTransaction {
 
