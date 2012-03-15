@@ -3,12 +3,13 @@ package services.db
 import org.squeryl.internals.DatabaseAdapter
 import play.Play
 import org.squeryl.adapters.{MySQLInnoDBAdapter, PostgreSqlAdapter, H2Adapter}
+import services.Logging
 
 /**
  * Provides various Squeryl database adapters based on what type of database we're
  * running against.
  */
-object DBAdapter {
+object DBAdapter extends Logging {
   lazy val h2 = new H2Adapter
   lazy val mysql = new MySQLInnoDBAdapter
   lazy val postgres = new PostgreSqlAdapter
@@ -26,8 +27,8 @@ object DBAdapter {
     }
     catch {
       case e: IllegalArgumentException =>
-        play.Logger.debug(
-          "Found no property 'db' in application.conf while configuring Squeryl. Trying 'db.url'"
+        log(
+          "Found no property 'db.url' in application.conf while configuring Squeryl. Trying 'db'"
         )
         getForDbString(Play.configuration.getProperty("db"))
     }

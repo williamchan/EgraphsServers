@@ -9,13 +9,18 @@ import java.lang.IllegalStateException
 import play.Play
 import java.io.{ByteArrayOutputStream, PrintWriter}
 import com.google.inject.{Inject, Injector}
+import java.sql.Connection
 
 /**
  * Egraphs Database schema
  *
  * When inspecting the schema of a database table, inspect both this object and the KeyedCaseClass.
  */
-class Schema @Inject()(injector: Injector) extends org.squeryl.Schema {
+class Schema @Inject()(
+  injector: Injector,
+  @CurrentTransaction currentTxnConnectionFactory: () => Connection
+) extends org.squeryl.Schema
+{
 
   import uk.me.lings.scalaguice.InjectorExtensions._
 
@@ -222,7 +227,7 @@ class Schema @Inject()(injector: Injector) extends org.squeryl.Schema {
     DBAdapter.current match {
       case DBAdapter.postgres =>
         // Postgres-specific syntax makes Squeryl's drop() method not bork.
-        val conn = play.db.DB.getConnection
+        val conn = currentTxnConnectionFactory()
         conn.prepareStatement("DROP SCHEMA public CASCADE;").execute()
         conn.prepareStatement("CREATE SCHEMA public AUTHORIZATION postgres").execute()
 
@@ -258,7 +263,7 @@ class Schema @Inject()(injector: Injector) extends org.squeryl.Schema {
     // Prepare a savepoint on the connection; we'll roll back to this point if the test query fails.
     // This is necessary because postgres will throw a runtime exception on any
     // query issued after a failed query until rollback() gets called.
-    val conn = play.db.DB.getConnection
+    val conn = currentTxnConnectionFactory()
     val savepoint = conn.setSavepoint()
 
     try {
