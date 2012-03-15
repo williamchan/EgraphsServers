@@ -9,6 +9,7 @@ import services.blobs.Blobs.Conversions._
 import services.{Utils, Time}
 import services.AppConfig
 import com.google.inject.{Provider, Inject}
+import org.squeryl.Query
 
 
 /**
@@ -213,6 +214,15 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
         )
         select(c)
     ).headOption
+  }
+
+  def getCelebrityAccounts: Query[(Celebrity, Account)] = {
+    val celebrityAccounts: Query[(Celebrity, Account)] = from(schema.celebrities, schema.accounts)(
+      (c, a) =>
+        where (c.id === a.celebrityId)
+        select(c, a)
+    )
+    celebrityAccounts
   }
 
   //

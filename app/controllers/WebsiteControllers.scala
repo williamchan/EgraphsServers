@@ -1,7 +1,7 @@
 package controllers
 
 import website._
-import admin.{GetCreateCelebrityProductEndpoint, PostCelebrityProductEndpoint, PostCelebrityEndpoint, GetCreateCelebrityEndpoint}
+import admin._
 import nonproduction.PostBuyDemoProductEndpoint
 import website.GetRootEndpoint
 import services.blobs.Blobs
@@ -21,6 +21,9 @@ object WebsiteControllers extends Controller
   with GetEgraphEndpoint
   with GetCelebrityProductEndpoint
   with GetOrderConfirmationEndpoint
+
+  // admin endpoints
+  with GetCelebritiesEndpoint
   with GetCreateCelebrityEndpoint
   with PostCelebrityEndpoint
   with GetCreateCelebrityProductEndpoint

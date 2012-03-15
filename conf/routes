@@ -54,6 +54,15 @@ POST    ${api}/celebrities/{celebrityId}/enrollmentsamples        ApiControllers
 POST    ${api}/celebrities/{celebrityId}/orders/{orderId}/egraphs ApiControllers.postEgraph
 
 ##
+## Admin
+##
+GET     /admin/celebrities                                WebsiteControllers.getCelebrities
+POST    /admin/celebrities                                WebsiteControllers.postCelebrity
+GET     /admin/celebrities/create                         WebsiteControllers.getCreateCelebrity
+POST    /admin/celebrities/{celebrityId}/products         WebsiteControllers.postCelebrityProduct
+GET     /admin/celebrities/{celebrityId}/products/create  WebsiteControllers.getCreateCelebrityProduct
+
+##
 ## Website
 ##
 
@@ -66,11 +75,3 @@ GET     /{celebrityUrlSlug}                      WebsiteControllers.getCelebrity
 GET     /{celebrityUrlSlug}/{productUrlSlug}     WebsiteControllers.getCelebrityProduct
 POST    /{celebrityUrlSlug}/{productUrlSlug}/buy WebsiteControllers.postBuyProduct
 POST    /{celebrityUrlSlug}/{productUrlSlug}/buy-demo WebsiteControllers.postBuyDemoProduct
-
-##
-## Admin
-##
-GET     /admin/celebrities/create                         WebsiteControllers.getCreateCelebrity
-POST    /admin/celebrities                                WebsiteControllers.postCelebrity
-GET     /admin/celebrities/{celebrityId}/products/create  WebsiteControllers.getCreateCelebrityProduct
-POST    /admin/celebrities/{celebrityId}/products         WebsiteControllers.postCelebrityProduct
