@@ -45,7 +45,7 @@ case class EnrollmentBatch(id: Long = 0,
    * Creates an associated EnrollmentSample. Also updates this.isBatchComplete if the new
    * EnrollmentSample completes this batch (see batchSize).
    */
-  def addEnrollmentSample(signatureStr: String, voiceStr: String, skipBiometrics: Boolean = false): (EnrollmentSample, Boolean, Int, Int) = {
+  def addEnrollmentSample(signatureStr: String, voiceStr: String): (EnrollmentSample, Boolean, Int, Int) = {
     val enrollmentSample = EnrollmentSample(
       enrollmentBatchId=id,
       services=services.enrollmentSampleServices.get
@@ -58,9 +58,7 @@ case class EnrollmentBatch(id: Long = 0,
       services.celebStore.get(celebrityId).withEnrollmentStatus(EnrollmentStatus.AttemptingEnrollment).save()
 
       // Kick off "job" is EnrollmentBatch is complete
-      if (!skipBiometrics) {
-        new jobs.EnrollmentBatchJob().now()
-      }
+      new jobs.EnrollmentBatchJob().now()
 
       (enrollmentSample, true, numEnrollmentSamplesInBatch, EnrollmentBatch.batchSize)
 

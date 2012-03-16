@@ -58,7 +58,7 @@ class PostEnrollmentSampleApiEndpointTests extends FunctionalTest with CleanData
       willChanRequest,
       TestConstants.ApiRoot + "/celebrities/me/enrollmentsamples",
       APPLICATION_X_WWW_FORM_URLENCODED,
-      "signature=" + signatureStr + "&audio=" + voiceStr + "&skipBiometrics=1"
+      "signature=" + signatureStr + "&audio=" + voiceStr
     )
     assertIsOk(response)
     val json = Serializer.SJSON.in[Map[String, Any]](getContent(response))

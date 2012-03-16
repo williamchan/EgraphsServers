@@ -21,7 +21,7 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
             jsonFromAddEnrollmentSampleResult(addEnrollmentSampleResult)
 
           } else if (!openEnrollmentBatch.get.isBatchComplete) {
-            val addEnrollmentSampleResult = openEnrollmentBatch.get.addEnrollmentSample(signatureString, audioString, skipBiometrics)
+            val addEnrollmentSampleResult = openEnrollmentBatch.get.addEnrollmentSample(signatureString, audioString)
             jsonFromAddEnrollmentSampleResult(addEnrollmentSampleResult)
 
           } else {
