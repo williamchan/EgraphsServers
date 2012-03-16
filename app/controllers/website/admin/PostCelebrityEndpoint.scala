@@ -99,6 +99,6 @@ trait PostCelebrityEndpoint {
     email.setMsg(views.Application.html.celebrity_created_email(celebrity = savedCelebrity, email = celebrityEmail).toString().trim())
     mail.send(email)
 
-    new Redirect(Utils.lookupUrl("WebsiteControllers.getCelebrities").url)
+    new Redirect(WebsiteControllers.lookupGetCelebrity(celebrityUrlSlug.get).url)
   }
 }
