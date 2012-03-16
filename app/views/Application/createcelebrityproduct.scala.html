@@ -75,7 +75,7 @@ name="@id"
           @formField(id="productDescription", label="Product Description", inputType="text", width="span4")
 
           @formField(id="productImage", label="Product Photo", inputType="file", width="span8", help=Some(profileHelp))
-          @profileHelp = {  }
+          @profileHelp = { Must be JPG or PNG with minimum dimensions of 900x900. Will be cropped. }
 
           <div class="actions">
             <button type="submit" id="submit-button" class="btn large primary fade in">Create Product</button>

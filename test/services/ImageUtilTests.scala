@@ -89,6 +89,41 @@ with ShouldMatchers {
     ImageUtil.getDimensions(Play.getFile("test/files/8khz.wav")) should be (None) // Not an image file
   }
 
+  "getCropDimensions" should "crop to ideal dimensions when image is landscape (width > height)" in {
+    val noCrop = ImageUtil.getCropDimensions(Dimensions(width = 1400, height = 1000))
+    noCrop.width should be (1400)
+    noCrop.height should be (1000)
+
+    val cropWidthOff = ImageUtil.getCropDimensions(Dimensions(width = 2000, height = 1000))
+    cropWidthOff.width should be (1400)
+    cropWidthOff.height should be (1000)
+
+    val cropHeightOff = ImageUtil.getCropDimensions(Dimensions(width = 1400, height = 1200))
+    cropHeightOff.width should be (1400)
+    cropHeightOff.height should be (1000)
+  }
+
+  "getCropDimensions" should "crop to ideal dimensions when image is portrait (height > width)" in {
+    val noCrop = ImageUtil.getCropDimensions(Dimensions(width = 718, height = 1000))
+    noCrop.width should be (718)
+    noCrop.height should be (1000)
+
+    val cropHeightOff = ImageUtil.getCropDimensions(Dimensions(width = 900, height = 1000))
+    cropHeightOff.width should be (718)
+    cropHeightOff.height should be (1000)
+
+    val cropWidthOff = ImageUtil.getCropDimensions(Dimensions(width = 718, height = 1200))
+    cropWidthOff.width should be (718)
+    cropWidthOff.height should be (1000)
+  }
+
+  "crop" should "crop image to specified dimensions" in {
+    val originalImage: BufferedImage = ImageIO.read(Play.getFile("test/files/image.png"))
+    val croppedImage: BufferedImage = ImageUtil.crop(originalImage, Dimensions(200, 200))
+    croppedImage.getWidth should be (200)
+    croppedImage.getHeight should be (200)
+  }
+
   "getMaxDouble" should "get Max in list of list of Doubles" in {
     ImageUtil.getMaxDouble(List()) should be(None)
     ImageUtil.getMaxDouble(List(List(1.0, 2.0, 3.0))).get should be(3.0)

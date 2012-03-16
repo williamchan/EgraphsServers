@@ -325,6 +325,33 @@ object ImageUtil {
     }
   }
 
+  def getCropDimensions(dimensions: Dimensions): Dimensions = {
+    // TODO - revisit these numbers. See https://egraphs.jira.com/wiki/display/DEV/Egraph+Page#EgraphPage-ImageSpecifications
+    val idealLandscapeAR = 1.4
+    val idealPortraitAR = 0.718
+
+    val aspectRatio: Double = dimensions.width.doubleValue() / dimensions.height
+    val isLandscape = aspectRatio > 1.0
+    val idealAspectRatio = if (isLandscape) idealLandscapeAR else idealPortraitAR
+
+    if (aspectRatio < idealAspectRatio) {
+      // the original is too tall. Use all of width and limit height.
+      Dimensions(width = dimensions.width, height = (dimensions.width / idealAspectRatio).intValue())
+
+    } else {
+      // the original is too narrow. Use all of height and limit width.
+      Dimensions(width = (dimensions.height * idealAspectRatio).intValue(), height = dimensions.height)
+
+    }
+  }
+
+  def crop(originalImage: BufferedImage, cropDimensions: Dimensions): BufferedImage = {
+    val croppedImage: BufferedImage = new BufferedImage(cropDimensions.width, cropDimensions.height, BufferedImage.TYPE_INT_RGB)
+    val g: Graphics = croppedImage.getGraphics
+    g.drawImage(originalImage, 0, 0, null)
+    croppedImage
+  }
+
   def getMaxDouble(listOfListOfDoubles: List[List[Double]]): Option[Double] = {
     val maxYs: List[Double] = listOfListOfDoubles.map(ys =>
       if (ys.isEmpty) 0
@@ -357,6 +384,7 @@ object ImageUtil {
       new ImageEnrichedByteArray(bytes)
     }
   }
+
 }
 
 case class Dimensions(width: Int, height: Int)
