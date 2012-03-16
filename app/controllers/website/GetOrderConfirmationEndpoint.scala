@@ -5,7 +5,7 @@ import play.mvc.Controller
 import models._
 
 /**
- * Serves the page confirming that an eGraph order was made
+ * Serves the page confirming that an Egraph order was made
  */
 
 private[controllers] trait GetOrderConfirmationEndpoint { this: Controller =>

@@ -56,14 +56,14 @@ class OrderTests extends UnitFlatSpec
   //
   // Test cases
   //
-  "An order" should "create eGraphs that are properly configured" in {
+  "An order" should "create Egraphs that are properly configured" in {
     val signature = "derp".getBytes
     val audio = "derp".getBytes
 
-    val eGraph = Order(id=100L).newEgraph
+    val egraph = Order(id=100L).newEgraph
 
-    eGraph.orderId should be (100L)
-    eGraph.state should be (EgraphState.AwaitingVerification)
+    egraph.orderId should be (100L)
+    egraph.state should be (EgraphState.AwaitingVerification)
   }
 
   it should "start out not charged" in {
@@ -190,7 +190,7 @@ class OrderTests extends UnitFlatSpec
       (state, order)
     }
 
-    // Also buy one without an eGraph
+    // Also buy one without an Egraph
     val orderWithoutEgraph = will.buy(product).save()
 
     // Perform the test

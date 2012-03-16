@@ -38,7 +38,7 @@ case class Customer(
    * to actually accomplish anything.
    *
    * @param product the Product to buy
-   * @param recipient the Customer receiving the eGraph. Defaults to the purchasing Customer.
+   * @param recipient the Customer receiving the Egraph. Defaults to the purchasing Customer.
    *
    * @return a tuple of the Order for the Product purchased by this Customer for the recipient Customer
    *   and the transaction that took place.

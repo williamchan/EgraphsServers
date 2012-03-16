@@ -9,7 +9,7 @@ import services.db.Schema
  * An executable scenario.
  *
  * A scenario is a testing tool that associates a name with
- * the eGraphs Database being in a certain state. It should
+ * the Egraphs Database being in a certain state. It should
  * be exposed to the outside only when running in tests mode.
  *
  * For example, you may write a scenario named "Shaq is a celebrity" that

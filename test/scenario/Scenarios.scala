@@ -385,12 +385,12 @@ class Scenarios extends DeclaresScenarios {
   )
 
   toScenarios add Scenario(
-      "Valid, ordered eGraph",
+      "Valid, ordered Egraph",
 
       egraphPageCategory,
 
       """
-      Creates a signed eGraph and views its page
+      Creates a signed Egraph and views its page
       """,
 
       {() =>

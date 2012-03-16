@@ -278,7 +278,7 @@ class DemoScenarios extends DeclaresDemoScenarios {
         celebrity.newProduct.copy(
           priceInCurrency = 50,
           name = firstName + "'s Product A",
-          description = "Buy my eGraph A!"
+          description = "Buy my Egraph A!"
         ).save().withPhoto(productAPhotoBlob.asByteArray).save()
     }
 
@@ -287,7 +287,7 @@ class DemoScenarios extends DeclaresDemoScenarios {
         celebrity.newProduct.copy(
           priceInCurrency = 100,
           name = firstName + "'s Product B",
-          description = "Buy my eGraph B!"
+          description = "Buy my Egraph B!"
         ).save().withPhoto(productBPhotoBlob.asByteArray).save()
     }
   }

@@ -28,7 +28,7 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
 
       celebFilters.requireCelebrityAccount { (account, celebrity) =>
         orderFilters.requireOrderIdOfCelebrity(celebrity.id) { order =>
-          play.Logger.info("Processing eGraph submission for Order #" + order.id)
+          play.Logger.info("Processing Egraph submission for Order #" + order.id)
 
           val savedEgraph = order.newEgraph.withAssets(
             signature,

@@ -5,7 +5,7 @@
   product: models.Product,
   order: models.Order)
 
-@content_base(title="Order #" + order.id +"- eGraphs", body=body, head=head)
+@content_base(title="Order #" + order.id +"- Egraphs", body=body, head=head)
 
 @import services.Finance.TypeConversions._
 @import services.blobs.AccessPolicy.Public
@@ -34,7 +34,7 @@
 
 @body = {
   <div class="order-confirmation-content">
-    <h1>eGraph Order Complete</h1>
+    <h1>Egraph Order Complete</h1>
     <div class="row">
       <div class="span9">
         <p>
@@ -45,7 +45,7 @@
         </p>
         <p>
           For now just sit back and relax; @celebrity.publicName will send @recipientMoniker
-          an e-mail as soon as he's done signing the eGraph, so look forward to hearing from
+          an e-mail as soon as he's done signing the Egraph, so look forward to hearing from
           him!
         </p>
         <p>

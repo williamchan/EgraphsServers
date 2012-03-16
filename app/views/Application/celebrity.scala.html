@@ -6,7 +6,7 @@
 @import services.blobs.AccessPolicy.Public
 @import models.Product
 
-@content_base(title=celebrity.publicName.get + " - eGraphs", onLoad=onLoad, body=body)
+@content_base(title=celebrity.publicName.get + " - Egraphs", onLoad=onLoad, body=body)
 
 @onLoad = {
   $(function () {
@@ -38,11 +38,11 @@
     <div class="separator"></div>
     <div class="products">
       @if(products.headOption == None) {
-        <h2>@celebrity.publicName isn't signing eGraphs! Go badger him on Twitter.</h2>
+        <h2>@celebrity.publicName isn't signing Egraphs! Go badger him on Twitter.</h2>
       } else {
         <h2>
           You choose a photo, then
-          <a href="#" rel='popover' title="Between the two of us" data-content="When you buy an eGraph, a special slot of time on @celebrity.publicName's schedule gets reserved for him to hand-write you a personalized message on top of the photo you select here. Try having him wish you a happy birthday!">
+          <a href="#" rel='popover' title="Between the two of us" data-content="When you buy an Egraph, a special slot of time on @celebrity.publicName's schedule gets reserved for him to hand-write you a personalized message on top of the photo you select here. Try having him wish you a happy birthday!">
             @celebrity.publicName signs it just for you.
           </a>
         </h2>

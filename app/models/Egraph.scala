@@ -26,7 +26,7 @@ case class EgraphServices @Inject() (
 )
 
 /**
- * Persistent entity representing a single eGraph.
+ * Persistent entity representing a single Egraph.
  *
  * An Egraph is both the final delivered product and an attempt to fulfill an order.
  */
@@ -71,7 +71,7 @@ case class Egraph(
     copy(stateValue = state.value)
   }
 
-  /** The current state of the eGraph */
+  /** The current state of the Egraph */
   def state: EgraphState = {
     EgraphState.named(stateValue)
   }

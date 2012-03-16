@@ -11,6 +11,7 @@ import play.Logger
 import services.blobs.Blobs.Conversions._
 import java.io.File
 import services.{ImageUtil, Utils}
+import org.apache.commons.mail.SimpleEmail
 
 trait PostCelebrityEndpoint {
   this: Controller =>
@@ -32,8 +33,6 @@ trait PostCelebrityEndpoint {
                     publicName: String,
                     description: String,
                     profileImage: Option[File] = None): Redirect = {
-    import Validation.{required, email}
-
     val publicNameStr = if (publicName.isEmpty) firstName + " " + lastName else publicName
     val celebrity = new Celebrity(firstName = Utils.toOption(firstName),
       lastName = Utils.toOption(lastName),
@@ -41,9 +40,9 @@ trait PostCelebrityEndpoint {
       description = Utils.toOption(description))
 
     // Account validation, including email and password validations and extant account validations
-    required("E-mail address", celebrityEmail)
-    email("E-mail address", celebrityEmail)
-    required("Password", celebrityPassword)
+    Validation.required("E-mail address", celebrityEmail)
+    Validation.email("E-mail address", celebrityEmail)
+    Validation.required("Password", celebrityPassword)
     val preexistingAccount: Option[Account] = accountStore.findByEmail(celebrityEmail)
     if (preexistingAccount.isDefined) {
       val celebrityDoesNotAlreadyExist = preexistingAccount.get.celebrityId.isEmpty
@@ -61,7 +60,7 @@ trait PostCelebrityEndpoint {
       Validation.addError("Password", passwordValidationOrAccount.left.get.error.toString)
     }
 
-    required("Description", description)
+    Validation.required("Description", description)
 
     // Name validations
     val isNameRequirementSatisfied = !publicName.isEmpty || (!firstName.isEmpty && !lastName.isEmpty)
@@ -86,7 +85,6 @@ trait PostCelebrityEndpoint {
       return WebsiteControllers.redirectWithValidationErrors(GetCreateCelebrityEndpoint.url())
     }
 
-
     // Persist Celebrity
     Logger.info("Creating celebrity")
     val savedCelebrity = celebrity.save()
@@ -94,15 +92,13 @@ trait PostCelebrityEndpoint {
     passwordValidationOrAccount.right.get.copy(celebrityId = Some(savedCelebrity.id)).save()
 
     // Send the order email
-    //      val email = new SimpleEmail()
-    //      email.setFrom("noreply@egraphs.com", "eGraphs")
-    //      email.addTo(accountStore.findByCustomerId(buyer.id).get.email, buyerName)
-    //      email.setSubject("Order Confirmation")
-    //      email.setMsg(views.Application.html.order_confirmation_email(
-    //        buyer, recipient, celebrity, product, chargedOrder
-    //      ).toString().trim())
-    //      mail.send(email)
+    val email = new SimpleEmail()
+    email.setFrom("noreply@egraphs.com", "Egraphs")
+    email.addTo(celebrityEmail, publicNameStr)
+    email.setSubject("Egraphs Celebrity Account Created")
+    email.setMsg(views.Application.html.celebrity_created_email(celebrity = savedCelebrity, email = celebrityEmail).toString().trim())
+    mail.send(email)
 
-    new Redirect(WebsiteControllers.lookupGetCelebrity(celebrityUrlSlug.get).url)
+    new Redirect(Utils.lookupUrl("WebsiteControllers.getCelebrities").url)
   }
 }

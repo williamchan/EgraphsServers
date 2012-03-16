@@ -29,7 +29,7 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
         )
 
       case None =>
-        NotFound("No eGraph exists with the provided identifier.")
+        NotFound("No Egraph exists with the provided identifier.")
     }
   }
 

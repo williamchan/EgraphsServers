@@ -131,7 +131,7 @@ object PostBuyProductEndpoint {
 
       // Send the order email
       val email = new SimpleEmail()
-      email.setFrom("noreply@egraphs.com", "eGraphs")
+      email.setFrom("noreply@egraphs.com", "Egraphs")
       email.addTo(accountStore.findByCustomerId(buyer.id).get.email, buyerName)
       email.setSubject("Order Confirmation")
       email.setMsg(views.Application.html.order_confirmation_email(

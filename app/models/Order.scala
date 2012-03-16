@@ -110,7 +110,7 @@ case class Order(
     email.setFrom(celebrity.urlSlug.get + "@egraphs.com", celebrity.publicName.get)
     email.addTo(recipient.account.email, recipientName)
     email.addReplyTo("noreply@egraphs.com")
-    email.setSubject("I just finished signing your eGraph")
+    email.setSubject("I just finished signing your Egraph")
     email.setMsg(
       views.Application.html.egraph_signed_email(
         celebrity,
