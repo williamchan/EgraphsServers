@@ -15,7 +15,6 @@ import controllers.WebsiteControllers
 
 trait PostBuyProductEndpoint { this: Controller =>
   import PostBuyProductEndpoint.EgraphPurchaseHandler
-  import PostBuyProductEndpoint.alphaEmailMatcher
 
   protected def celebFilters: CelebrityAccountRequestFilters
   protected def mail: Mail
@@ -48,47 +47,36 @@ trait PostBuyProductEndpoint { this: Controller =>
       email("Buyer E-mail address", buyerEmail)
       required("stripeTokenId", stripeTokenId)
 
-      if (validationErrors.isEmpty) {
+      Validation.isTrue("Recipient e-mail address must be a Beta celebrity or a Beta tester",
+        accountStore.findByEmail(recipientEmail.toLowerCase).isDefined)
 
-        // Make sure these are valid email addresses for the alpha test
-        Validation.`match`(
-          "Recipient e-mail address at egraphs.com or raysbaseball.com",
-          recipientEmail.toLowerCase,
-          alphaEmailMatcher
-        )
+      Validation.isTrue("Buyer e-mail address must be a Beta celebrity or a Beta tester",
+        accountStore.findByEmail(buyerEmail.toLowerCase).isDefined)
 
-        Validation.`match`(
-          "Buyer e-mail address at egraphs.com or raysbaseball.com",
-          buyerEmail.toLowerCase,
-          alphaEmailMatcher
-        )
-
-        if (validationErrors.isEmpty) {
-          Logger.info("No validation errors")
-          EgraphPurchaseHandler(
-            recipientName,
-            recipientEmail,
-            buyerName,
-            buyerEmail,
-            stripeTokenId,
-            desiredText,
-            personalNote,
-            celebrity,
-            product,
-            mail=mail,
-            customerStore=customerStore,
-            accountStore=accountStore
-          ).execute()
-        }
-      } else {
+      if (!validationErrors.isEmpty) {
         WebsiteControllers.redirectWithValidationErrors(GetCelebrityProductEndpoint.url(celebrity, product), Some(false))
+      } else {
+        Logger.info("No validation errors")
+        EgraphPurchaseHandler(
+          recipientName,
+          recipientEmail,
+          buyerName,
+          buyerEmail,
+          stripeTokenId,
+          desiredText,
+          personalNote,
+          celebrity,
+          product,
+          mail=mail,
+          customerStore=customerStore,
+          accountStore=accountStore
+        ).execute()
       }
     }
   }
 }
 
 object PostBuyProductEndpoint {
-  private[PostBuyProductEndpoint] val alphaEmailMatcher = ".*@(egraphs|raysbaseball).com|zachapter@gmail.com"
 
   /**
    * Performs the meat of the purchase controller's interaction with domain
