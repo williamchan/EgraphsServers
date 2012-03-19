@@ -11,6 +11,10 @@ GET     /test/scenarios                          nonproduction.ScenarioControlle
 GET     /test/scenarios/clear                    nonproduction.ScenarioController.clear
 GET     /test/scenarios/{urlSlug}                nonproduction.ScenarioController.scenario
 
+GET     /demo-setup/list                         nonproduction.DemoSetupController.list
+GET     /demo-setup/clear                        nonproduction.DemoSetupController.clear
+GET     /demo-setup/{urlSlug}                    nonproduction.DemoSetupController.demoScenario
+
 GET     /test/request-transaction/without-error  nonproduction.TransactionTestController.makeAccount
 GET     /test/request-transaction/with-error     nonproduction.TransactionTestController.makeAccountAndThrowException
 GET     /test/request-transaction/is-stored      nonproduction.TransactionTestController.isStored
@@ -28,14 +32,8 @@ GET     /                                       WebsiteControllers.getRootEndpoi
 
 # For Alpha-phase prod mode:
 
-GET     /test/script                            nonproduction.TestControllers.script
 GET     /admin/reset-alpha-state                nonproduction.TestControllers.resetAlphaState
 GET     /test/files/{<.*>blobKey}               WebsiteControllers.getBlob
-
-# For Demo setup prod mode:
-GET     /demo-setup/list                         nonproduction.DemoSetupController.list
-GET     /demo-setup/clear                        nonproduction.DemoSetupController.clear
-GET     /demo-setup/{urlSlug}                    nonproduction.DemoSetupController.demoScenario
 
 # Map static resources from the /app/public folder to the /public path
 GET     /public/                                staticDir:public

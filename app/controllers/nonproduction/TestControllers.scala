@@ -41,7 +41,7 @@ with DBTransaction {
     val celebrity = Celebrity(
       firstName = Some(firstName),
       lastName = Some(lastName),
-      publicName = Some("Alpha " + firstName),
+      publicName = Some(firstName + " " + lastName),
       description = Some("Today's Sriracha is tomorrow's salsa."),
       enrollmentStatusValue = enrollmentStatus.value
     ).save()
@@ -52,23 +52,14 @@ with DBTransaction {
 
     celebrity.newProduct.copy(
       priceInCurrency = 50,
-      name = firstName + "'s Alpha Product A",
+      name = celebrity.publicName + "'s Product A",
       description = "Tyson 15"
     ).save().withPhoto(Play.getFile("test/files/longoria/product-2.jpg")).save()
 
     celebrity.newProduct.copy(
       priceInCurrency = 100,
-      name = firstName + "'s Alpha Product B",
+      name = celebrity.publicName + "'s Product B",
       description = "Help me... help YOU..."
     ).save().withPhoto(Play.getFile("test/files/kapler/product-1.jpg")).save()
-
-  }
-
-  def script = {
-//    println("System getProperty javax.net.ssl.trustStore = " + System.getProperty("javax.net.ssl.trustStore"))
-//    val startEnrollmentRequest = services.voice.VBGDevRandomNumberBiometricServices.sendStartEnrollmentRequest("pls", false)
-//    println(startEnrollmentRequest.getResponseValue("errorcode"))
-//    sjson.json.Serializer.SJSON.toJSON(Map("bees.api.name" -> Play.configuration.getProperty("bees.api.name")))
-    new jobs.EnrollmentBatchJob().now()
   }
 }
