@@ -61,5 +61,14 @@ with DBTransaction {
       name = celebrity.publicName + "'s Product B",
       description = "Help me... help YOU..."
     ).save().withPhoto(Play.getFile("test/files/kapler/product-1.jpg")).save()
+
+  }
+
+  def script = {
+//    println("System getProperty javax.net.ssl.trustStore = " + System.getProperty("javax.net.ssl.trustStore"))
+//    val startEnrollmentRequest = services.voice.VBGDevRandomNumberBiometricServices.sendStartEnrollmentRequest("pls", false)
+//    println(startEnrollmentRequest.getResponseValue("errorcode"))
+//    sjson.json.Serializer.SJSON.toJSON(Map("bees.api.name" -> Play.configuration.getProperty("bees.api.name")))
+    new jobs.EnrollmentBatchJob().now()
   }
 }

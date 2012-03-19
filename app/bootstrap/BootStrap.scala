@@ -55,9 +55,10 @@ private object TestModeBootstrap {
   private def bootstrapDatabase() {
     DBSession.init()
     inTransaction {
+      printDdlToFile(schemaFile)
       if ((!schema.isInPlace) || schemaHasChanged) {
         play.Logger.info(
-          """Detected either lack of database schema or change thereof. Scrubbing DB and blobstore.
+          """Detected either lack of database schema or change thereof.
           (You can view the current schema at """ + schemaFile.getAbsolutePath + ")"
         )
         createNewSchema()
@@ -66,6 +67,7 @@ private object TestModeBootstrap {
     }
     DBSession.commit()
   }
+
 
   /**
    * Drops and re-creates the database definition, logging the creation SQL

@@ -12,7 +12,7 @@ import services.Logging
 object DBAdapter extends Logging {
   lazy val h2 = new H2Adapter
   lazy val mysql = new MySQLInnoDBAdapter
-  lazy val postgres = new PostgreSqlAdapter
+  lazy val postgres = new PostgreSqlAdapter {override def quoteIdentifier(s: String) = s}
 
   def currentDbString = {
     Play.configuration.getProperty("db")
