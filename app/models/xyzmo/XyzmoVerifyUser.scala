@@ -39,7 +39,7 @@ case class XyzmoVerifyUser(id: Long = 0,
     val resultBase = verifyUserBySignatureDynamicToDynamic_v1Response.getVerifyUserBySignatureDynamicToDynamic_v1Result
     val errorInfo = resultBase.getErrorInfo
     val error = if (errorInfo != null) Some(errorInfo.getError.getValue) else None
-    val errorMsg = if (errorInfo != null) Some(errorInfo.getErrorMsg.take(128)) else None
+    val errorMsg = if (errorInfo != null) Some(errorInfo.getErrorMsg.take(255)) else None
 
     val okInfo = verifyUserBySignatureDynamicToDynamic_v1Response.getVerifyUserBySignatureDynamicToDynamic_v1Result.getOkInfo
     val isMatch = if (okInfo != null) Some(okInfo.getVerifyResult.getValue == WebServiceBiometricPartStub.VerifyResultEnum.VerifyMatch.getValue) else None

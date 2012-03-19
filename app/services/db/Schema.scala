@@ -172,16 +172,31 @@ class Schema @Inject()(
   val enrollmentBatchToXyzmoDeleteUserTable = oneToManyRelation(enrollmentBatches, xyzmoDeleteUserTable)
     .via((enrollmentBatch, xyzmoDeleteUser) => enrollmentBatch.id === xyzmoDeleteUser.enrollmentBatchId)
   enrollmentBatchToXyzmoDeleteUserTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
+  on(xyzmoDeleteUserTable)(xyzmoDeleteUser =>
+    declare(
+      xyzmoDeleteUser.errorMsg is (dbType("varchar(255)"))
+    )
+  )
 
   val xyzmoAddUserTable = table[XyzmoAddUser]
   val enrollmentBatchToXyzmoAddUserTable = oneToManyRelation(enrollmentBatches, xyzmoAddUserTable)
     .via((enrollmentBatch, xyzmoAddUser) => enrollmentBatch.id === xyzmoAddUser.enrollmentBatchId)
   enrollmentBatchToXyzmoAddUserTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
+  on(xyzmoAddUserTable)(xyzmoAddUser =>
+    declare(
+      xyzmoAddUser.errorMsg is (dbType("varchar(255)"))
+    )
+  )
 
   val xyzmoAddProfileTable = table[XyzmoAddProfile]
   val enrollmentBatchToXyzmoAddProfileTable = oneToManyRelation(enrollmentBatches, xyzmoAddProfileTable)
     .via((enrollmentBatch, xyzmoAddProfile) => enrollmentBatch.id === xyzmoAddProfile.enrollmentBatchId)
   enrollmentBatchToXyzmoAddProfileTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
+  on(xyzmoAddProfileTable)(xyzmoAddProfile =>
+    declare(
+      xyzmoAddProfile.errorMsg is (dbType("varchar(255)"))
+    )
+  )
 
   val xyzmoEnrollDynamicProfileTable = table[XyzmoEnrollDynamicProfile]
   val enrollmentBatchToXyzmoEnrollDynamicProfileTable = oneToManyRelation(enrollmentBatches, xyzmoEnrollDynamicProfileTable)
@@ -189,6 +204,7 @@ class Schema @Inject()(
   enrollmentBatchToXyzmoEnrollDynamicProfileTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
   on(xyzmoEnrollDynamicProfileTable)(xyzmoEnrollDynamicProfile =>
     declare(
+      xyzmoEnrollDynamicProfile.errorMsg is (dbType("varchar(255)")),
       xyzmoEnrollDynamicProfile.rejectedSignaturesSummary is (dbType("varchar(255)")),
       xyzmoEnrollDynamicProfile.enrollmentSampleIds is (dbType("varchar(255)"))
 
@@ -199,6 +215,11 @@ class Schema @Inject()(
   val egraphToXyzmoVerifyUserTable = oneToManyRelation(egraphs, xyzmoVerifyUserTable)
     .via((egraph, xyzmoVerifyUser) => egraph.id === xyzmoVerifyUser.egraphId)
   egraphToXyzmoVerifyUserTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
+  on(xyzmoVerifyUserTable)(xyzmoVerifyUser =>
+    declare(
+      xyzmoVerifyUser.errorMsg is (dbType("varchar(255)"))
+    )
+  )
 
 
 

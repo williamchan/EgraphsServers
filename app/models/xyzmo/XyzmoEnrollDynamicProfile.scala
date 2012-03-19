@@ -42,7 +42,7 @@ case class XyzmoEnrollDynamicProfile(id: Long = 0,
     val resultBase = enrollDynamicProfile_v1Response.getEnrollDynamicProfile_v1Result
     val errorInfo = resultBase.getErrorInfo
     val error = if (errorInfo != null) Some(errorInfo.getError.getValue) else None
-    val errorMsg = if (errorInfo != null) Some(errorInfo.getErrorMsg.take(128)) else None
+    val errorMsg = if (errorInfo != null) Some(errorInfo.getErrorMsg.take(255)) else None
 
     val okInfo = enrollDynamicProfile_v1Response.getEnrollDynamicProfile_v1Result.getOkInfo
     val infoEnrollOk = if (okInfo != null) Some(okInfo.getInfoEnrollOk) else None
