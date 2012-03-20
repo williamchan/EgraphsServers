@@ -16,6 +16,11 @@ with DBTransaction {
   val schema = AppConfig.instance[Schema]
 
   def resetAlphaState(): String = {
+    val applicationMode = play.Play.configuration.get("application.mode")
+    if (applicationMode != "dev") {
+      throw new IllegalStateException("Cannot reset-alpha-state unless in dev mode")
+    }
+
     schema.scrub()
     blobs.scrub()
 

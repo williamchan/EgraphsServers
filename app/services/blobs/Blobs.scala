@@ -95,6 +95,12 @@ class Blobs @Inject() (blobProvider: BlobVendor) {
    * set to "yes" in application.conf.
    */
   def scrub() {
+    val applicationMode = configuration.get("application.mode")
+    println("Checking application.mode before scrubbing blobstore. Must be in dev mode. Mode is: " + applicationMode)
+    if (applicationMode != "dev") {
+      throw new IllegalStateException("Cannot scrub blobstore unless in dev mode")
+    }
+
     configuration.get("blobstore.allowscrub") match {
       case "yes" =>
         blobStore.clearContainer(blobstoreNamespace)

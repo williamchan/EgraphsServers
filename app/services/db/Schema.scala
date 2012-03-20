@@ -6,10 +6,10 @@ import models._
 import models.vbg._
 import models.xyzmo._
 import java.lang.IllegalStateException
-import play.Play
 import java.io.{ByteArrayOutputStream, PrintWriter}
 import com.google.inject.{Inject, Injector}
 import java.sql.Connection
+import play.Play.configuration
 
 /**
  * Egraphs Database schema
@@ -228,7 +228,13 @@ class Schema @Inject()(
   //
   /**Clears out the schema and recreates it. For God's sake don't do this in production. */
   def scrub() {
-    Play.configuration.get("db.allowscrub") match {
+    val applicationMode = configuration.get("application.mode")
+    println("Checking application.mode before scrubbing database. Must be in dev mode. Mode is: " + applicationMode)
+    if (applicationMode != "dev") {
+      throw new IllegalStateException("Cannot scrub database unless in dev mode")
+    }
+
+    configuration.get("db.allowscrub") match {
       case "yes" =>
         if (isInPlace) {
           dropSchema()

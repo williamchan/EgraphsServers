@@ -106,4 +106,34 @@ with DBTransactionPerTest {
     Blobs.Conversions.fileToByteArray(file)
   }
 
+  private[this] def useMeToTestVBGProgress {
+    val vbg = VBGDevFreeSpeechBiometricServices
+
+    val enroll_11: Array[Byte] = getVoiceSampleBinary("tmp/enroll_11.wav")
+    val verify_19: Array[Byte] = getVoiceSampleBinary("tmp/verify_19.wav")
+    val verify_21: Array[Byte] = getVoiceSampleBinary("tmp/verify_21.wav")
+    val verify_30: Array[Byte] = getVoiceSampleBinary("tmp/verify_30.wav")
+
+    val celebrity = Celebrity().save()
+    val enrollmentBatch: EnrollmentBatch = EnrollmentBatch(celebrityId = celebrity.id).save()
+    EnrollmentSample(enrollmentBatchId = enrollmentBatch.id).save(signatureStr = TestConstants.signatureStr, voiceStr = Codec.encodeBASE64(enroll_11))
+    val enrollResult: Either[VoiceBiometricsError, Boolean] = vbg.enroll(enrollmentBatch)
+    println("enrollResult.right.get " + enrollResult.right.get)
+
+    val customer = TestData.newSavedCustomer()
+    val product = celebrity.newProduct.save()
+    val order = customer.buy(product).save()
+
+    val egraphVerify_19: Egraph = Egraph(orderId = order.id).withAssets(signature = TestConstants.signatureStr, message = None, audio = verify_19).save()
+    val verifyResult_19: Either[VoiceBiometricsError, VBGVerifySample] = vbg.verify(egraphVerify_19: Egraph)
+    println("verifyResult_19.right.get.errorCode = " + verifyResult_19.right.get.errorCode)
+
+    val egraphVerify_21: Egraph = Egraph(orderId = order.id).withAssets(signature = TestConstants.signatureStr, message = None, audio = verify_21).save()
+    val verifyResult_21: Either[VoiceBiometricsError, VBGVerifySample] = vbg.verify(egraphVerify_21: Egraph)
+    println("verifyResult_21.right.get.errorCode = " + verifyResult_21.right.get.errorCode)
+
+    val egraphVerify_30: Egraph = Egraph(orderId = order.id).withAssets(signature = TestConstants.signatureStr, message = None, audio = verify_30).save()
+    val verifyResult_30: Either[VoiceBiometricsError, VBGVerifySample] = vbg.verify(egraphVerify_30: Egraph)
+    println("verifyResult_30.right.get.errorCode = " + verifyResult_30.right.get.errorCode)
+  }
 }
