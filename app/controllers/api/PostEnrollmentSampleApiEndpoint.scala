@@ -30,7 +30,10 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
           }
 
         case _ =>
-          play.Logger.info("Dismissing the invalid request")
+          play.Logger.info("Dismissing the invalid postEnrollmentSample request")
+          play.Logger.info("Signature length was " + (if (signature.isDefined) signature.get.length() else "[signature missing]"))
+          play.Logger.info("Audio length was " + (if (audio.isDefined) audio.get.length() else "[audio missing]"))
+
           Error("Valid \"signature\" and \"audio\" parameters were not provided.")
       }
     }

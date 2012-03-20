@@ -49,7 +49,11 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
       }
     }
     else {
-      play.Logger.info("Dismissing the invalid request")
+      play.Logger.info("Dismissing the invalid postEgraph request")
+      play.Logger.info("Signature length was " + (if (signature != null) signature.length() else "[signature missing]"))
+      play.Logger.info("Audio length was " + (if (audio != null) audio.length() else "[audio missing]"))
+      play.Logger.info("ValidationErrors:" + validationErrors.map(pair => "" + pair._1 + " " + pair._2.message).mkString(". "))
+
       Error(HttpCodes.MalformedEgraph, "")
     }
   }
