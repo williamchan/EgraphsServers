@@ -35,4 +35,5 @@ PROJ_BASE=$SCRIPT_DIR/..
 
 cd $PROJ_BASE
 
+play evolutions:apply --%$DEPLOY_TARGET
 play bees:app:deploy --%$DEPLOY_TARGET
