@@ -57,9 +57,6 @@ case class EnrollmentBatch(id: Long = 0,
       copy(isBatchComplete = true).save()
       services.celebStore.get(celebrityId).withEnrollmentStatus(EnrollmentStatus.AttemptingEnrollment).save()
 
-      // Kick off "job" is EnrollmentBatch is complete
-      new jobs.EnrollmentBatchJob().now()
-
       (enrollmentSample, true, numEnrollmentSamplesInBatch, EnrollmentBatch.batchSize)
 
     } else {

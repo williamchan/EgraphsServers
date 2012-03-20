@@ -8,7 +8,7 @@ import services.AppConfig
 import services.signature.SignatureBiometricsError
 import services.voice.VoiceBiometricsError
 
-@On("0 0 0 * * ?") // cron expression: seconds minutes hours day-of-month month day-of-week (year optional)
+@On("0 /10 * * * ?") // cron expression: seconds minutes hours day-of-month month day-of-week (year optional)
 class EnrollmentBatchJob extends Job {
   //  Setup process to query for EnrollmentBatches that are {isBatchComplete = true and isSuccessfulEnrollment = null},
   //  and attempt enrollment. Failed enrollment changes Celebrity.enrollmentStatus to "NotEnrolled",
