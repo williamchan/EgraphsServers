@@ -39,13 +39,12 @@ trait PostCelebrityProductEndpoint {
       Validation.isTrue("Celebrity already has a product with name: " + productName, productStore.findByCelebrityAndUrlSlug(celebrityId = celebrityId, slug = product.urlSlug).isEmpty)
     }
 
-    required("Product Photo", productImage)
     val dimensions: Option[Dimensions] = ImageUtil.getDimensions(productImage)
     if (dimensions.isEmpty) {
-      Validation.addError("Product Image", "No image found for Product Image")
+      Validation.addError("Product Photo", "No image found for Product Image")
     } else {
-      val resolutionStr = dimensions.get.width + ":" + dimensions.get.height
-      Validation.isTrue("Product Image must be at least 900 in both width and height - resolution was " + resolutionStr, dimensions.get.width > 900 && dimensions.get.height > 900)
+      val resolutionStr = dimensions.get.width + "x" + dimensions.get.height
+      Validation.isTrue("Product Photo must be at least 940 in width and 900 in height - resolution was " + resolutionStr, dimensions.get.width >= 940 && dimensions.get.height >= 900)
     }
 
     if (!validationErrors.isEmpty) {

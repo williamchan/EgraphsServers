@@ -57,13 +57,13 @@ with DBTransaction {
 
     celebrity.newProduct.copy(
       priceInCurrency = 50,
-      name = celebrity.publicName + "'s Product A",
+      name = celebrity.publicName.get + "'s Product A",
       description = "Tyson 15"
     ).save().withPhoto(Play.getFile("test/files/longoria/product-2.jpg")).save()
 
     celebrity.newProduct.copy(
       priceInCurrency = 100,
-      name = celebrity.publicName + "'s Product B",
+      name = celebrity.publicName.get + "'s Product B",
       description = "Help me... help YOU..."
     ).save().withPhoto(Play.getFile("test/files/kapler/product-1.jpg")).save()
 
