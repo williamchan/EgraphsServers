@@ -7,6 +7,7 @@ require:
         exclude:
             # Exclude scala because its included with play-scala
             - org.scala-lang -> scala-library 2.8.1
+    - org.antlr -> stringtemplate 4.0.2
     - org.apache.axis2 -> axis2 1.6.1
     - org.apache.axis2 -> axis2-transport-http 1.6.1
     - org.apache.axis2 -> axis2-transport-local 1.6.1
