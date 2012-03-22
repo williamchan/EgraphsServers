@@ -38,6 +38,7 @@ class ProductTests extends UnitFlatSpec
       name = "NBA Championships 2010",
       photoKey = Some(Time.toBlobstoreFormat(Time.now)),
       description = "Shaq goes for the final dunk in the championship",
+      _defaultFrameName = PortraitEgraphFrame.name,
       storyTitle = "He herped then he derped.",
       storyText = "He derped then he herped."
     )
