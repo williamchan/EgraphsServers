@@ -31,6 +31,7 @@ case class Product(
   priceInCurrency: BigDecimal = 0,
   name: String = "",
   description: String = "",
+  _defaultFrameName: String = PortraitEgraphFrame.name,
   storyTitle: String = "",
   storyText: String = "",
   photoKey: Option[String] = None,
@@ -50,6 +51,28 @@ case class Product(
   //
   def save(): Product = {
     services.store.save(this)
+  }
+
+  /**
+   * Returns a copy of the Product with a different frame
+   *
+   * @param frame the EgraphFrame that will be used to frame this type of
+   *   egraph by default. This should be based on the dimensions of the
+   *   image.
+   */
+  def withDefaultFrame(frame: EgraphFrame): Product = {
+    copy(_defaultFrameName=frame.name)
+  }
+
+  /**
+   * Returns the default Frame for this Product. This is the frame that will
+   * be used to frame egraphs made on top of this product by default.
+   **/
+  def defaultFrame: EgraphFrame = {
+    _defaultFrameName match {
+      case PortraitEgraphFrame.name => PortraitEgraphFrame
+      case LandscapeEgraphFrame.name => LandscapeEgraphFrame
+    }
   }
 
   def withPhoto(imageData:Array[Byte]): ProductWithPhoto = {
@@ -180,6 +203,7 @@ class ProductStore @Inject() (schema: Schema) extends Saves[Product] with SavesC
       theOld.urlSlug := theNew.urlSlug,
       theOld.photoKey := theNew.photoKey,
       theOld.description := theNew.description,
+      theOld._defaultFrameName := theNew._defaultFrameName,
       theOld.storyTitle := theNew.storyTitle,
       theOld.storyText := theNew.storyText,
       theOld.created := theNew.created,

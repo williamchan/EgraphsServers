@@ -1,7 +1,6 @@
 package services
 
 import blobs.BlobModule
-import com.google.inject.{Singleton, Guice, AbstractModule}
 import db.DBModule
 import http.PlayConfig
 import mail.{MailProvider, Mail}
@@ -14,6 +13,7 @@ import voice.VoiceBiometricsModule
 import uk.me.lings.scalaguice.{InjectorExtensions, ScalaModule}
 import java.util.Properties
 import play.Play
+import com.google.inject.{Injector, Singleton, Guice, AbstractModule}
 
 class AppConfig extends AbstractModule with ScalaModule {
   override def configure() {
@@ -59,7 +59,19 @@ object AppConfig {
 
   import InjectorExtensions._
 
-  val injector = Guice.createInjector(new AppConfig)
+  val injector: Injector = {
+    // Put a try-catch on making injector and print the error because Guice
+    // exceptions get turned into UnexpectedExceptions by Play, making them
+    // almost impossible to catch.
+    try {
+      Guice.createInjector(new AppConfig)
+    }
+    catch {
+      case e: Exception =>
+        e.printStackTrace()
+        throw e
+    }
+  }
 
   def instance[T: Manifest] = {
     injector.instance[T]

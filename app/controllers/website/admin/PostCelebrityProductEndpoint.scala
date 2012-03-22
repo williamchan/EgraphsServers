@@ -12,8 +12,8 @@ import services.http.OptionParams.Conversions._
 import play.data.validation.Validation
 import javax.imageio.ImageIO
 import services.{Dimensions, ImageUtil}
-import java.awt.image.BufferedImage
-import models.{ImageAsset, ProductStore, CelebrityStore, Product}
+import models._
+import services.ImageUtil.Conversions._
 
 trait PostCelebrityProductEndpoint {
   this: Controller =>
@@ -39,12 +39,15 @@ trait PostCelebrityProductEndpoint {
       Validation.isTrue("Celebrity already has a product with name: " + productName, productStore.findByCelebrityAndUrlSlug(celebrityId = celebrityId, slug = product.urlSlug).isEmpty)
     }
 
-    val dimensions: Option[Dimensions] = ImageUtil.getDimensions(productImage)
-    if (dimensions.isEmpty) {
+    val dimensionsOption: Option[Dimensions] = ImageUtil.getDimensions(productImage)
+    if (dimensionsOption.isEmpty) {
       Validation.addError("Product Photo", "No image found for Product Image")
     } else {
-      val resolutionStr = dimensions.get.width + "x" + dimensions.get.height
-      Validation.isTrue("Product Photo must be at least 940 in width and 900 in height - resolution was " + resolutionStr, dimensions.get.width >= 940 && dimensions.get.height >= 900)
+      val resolutionStr = dimensionsOption.get.width + "x" + dimensionsOption.get.height
+      Validation.isTrue(
+        "Product Photo must be at least 940 in width and 900 in height - resolution was " + resolutionStr,
+         dimensionsOption.get.width >= 940 && dimensionsOption.get.height >= 900
+      )
     }
 
     if (!validationErrors.isEmpty) {
@@ -52,12 +55,18 @@ trait PostCelebrityProductEndpoint {
     }
 
     Logger.info("Creating product")
-    val savedProduct = product.save()
-    val cropDimensions = ImageUtil.getCropDimensions(dimensions.get)
-    val croppedImage: BufferedImage = ImageUtil.crop(ImageIO.read(productImage), cropDimensions)
+    val dimensions = dimensionsOption.get
+    val frame = EgraphFrame.suggestedFrame(dimensions)
+    val uploadedImage = ImageIO.read(productImage)
+    val imageCroppedToFrame = frame.cropToFit(uploadedImage)
     // todo(wchan): Jpeg or PNG
-    import services.ImageUtil.Conversions._
-    savedProduct.withPhoto(croppedImage.asByteArray(ImageAsset.Jpeg)).save()
+    val imageByteArray = imageCroppedToFrame.asByteArray(ImageAsset.Jpeg)
+    val savedProduct = product
+      .withDefaultFrame(frame)
+      .save()
+      .withPhoto(imageByteArray)
+      .save()
+      .product
 
     new Redirect(GetCelebrityProductEndpoint.url(celebrity, savedProduct).url)
   }

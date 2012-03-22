@@ -503,3 +503,92 @@ object EgraphState {
     RejectedPersonalAudit
   ), key=(theState) => theState.value)
 }
+
+/**
+ * Specifies the representation of an egraph on the egraph page as well
+ * as guidelines in the form of an aspect ratio on how to display the egraph
+ * in settings other than the egraph page.
+ **/
+sealed trait EgraphFrame {
+  //
+  // Abstract members
+  //
+  /** Name of the frame. This should be unique among all Frames */
+  def name: String
+
+  /**
+   * The class represented by this frame in egraph.less or any other
+   * included stylesheet.
+   **/
+  def cssClass: String
+
+  /** Width of the image in pixels as displayed on the egraph page */
+  def imageWidthPixels: Int
+
+  /** Height of the image in pixels as displayed on the egraph page */
+  def imageHeightPixels: Int
+
+  //
+  // Implemented members
+  //
+  def imageAspectRatio: Double = {
+    imageWidthPixels.toDouble / imageHeightPixels.toDouble
+  }
+
+  /**
+   * Returns a copy of an image of arbitrary dimensions, cropped so that it
+   * will fit in the frame once resized to imageWidthPixels by imageHeightPixels.
+   *
+   * Returns the cropped image.
+   *
+   * @param image
+   * @return a cropped copy of the image argument.
+   */
+  def cropToFit(image: BufferedImage): BufferedImage = {
+    val targetAspectRatio = this.imageAspectRatio
+    val originalWidth = image.getWidth.toDouble
+    val originalHeight = image.getHeight.toDouble
+    val originalAspectRatio = originalWidth / originalHeight
+    
+    val cropDimensions = if (originalAspectRatio < targetAspectRatio) {
+      // the original is too tall. Use all of width and limit height.
+      Dimensions(width=originalWidth.toInt, height=(originalHeight / targetAspectRatio).toInt)
+    } else {
+      // the original is too narrow. Use all of height and limit width.
+      Dimensions(width=(originalWidth * targetAspectRatio).toInt, height=originalHeight.toInt)
+    }
+
+    ImageUtil.crop(image, cropDimensions)
+  }
+}
+
+object EgraphFrame {
+  /**
+   * Returns the suggested frame for a given image. Decision is made based on frame
+   * dimensions
+   **/
+  private def suggestedFrameForDimensions(pixelWidth: Int, pixelHeight: Int): EgraphFrame = {
+    if (pixelWidth > pixelHeight) LandscapeEgraphFrame else PortraitEgraphFrame
+  }
+
+  /** See suggestedFrameForDimensions */
+  def suggestedFrame(dimensions: Dimensions): EgraphFrame = {
+    suggestedFrameForDimensions(dimensions.width, dimensions.height)
+  }
+}
+
+/** The default egraph portrait frame */
+object PortraitEgraphFrame extends EgraphFrame {
+  override val name: String = "Default Portrait"
+  override val cssClass  = "portrait"
+  override val imageWidthPixels = 377
+  override val imageHeightPixels = 526
+}
+
+/** The default egraph landscape photo frame */
+object LandscapeEgraphFrame extends EgraphFrame {
+  override val name = "Default Landscape"
+  override val cssClass  = "landscape"
+  override val imageWidthPixels = 595
+  override val imageHeightPixels = 377
+}
