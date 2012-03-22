@@ -53,7 +53,7 @@ with ShouldMatchers {
     val signatureImage: BufferedImage = imageUtil.createSignatureImage(capture, None)
     val imageFile = Play.getFile("test/files/two-point-stroke.jpg")
     ImageIO.write(signatureImage, "JPG", imageFile)
-    imageFile.length should be(8358)
+    imageFile.length should be(8367)
   }
 
   "createSignatureImage" should "draw a three-point stroke" in {

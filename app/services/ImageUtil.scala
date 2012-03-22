@@ -128,7 +128,7 @@ import javax.imageio.{ImageReader, ImageIO}
 
     for (j <- 0 to numIncrements) {
       val drawX = x1 + x_increment * j
-      val drawY = y1 + slope * drawX
+      val drawY = y1 + slope * (drawX - x1)
       drawPoint(g, drawX, drawY)
     }
   }
