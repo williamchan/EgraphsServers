@@ -6,6 +6,7 @@ import services.Utils
 import models._
 import services.http.CelebrityAccountRequestFilters
 import services.payment.Payment
+import play.mvc.Router.ActionDefinition
 
 private[controllers] trait GetCelebrityProductEndpoint { this: Controller =>
 
@@ -36,13 +37,17 @@ object GetCelebrityProductEndpoint {
   /**
    * Reverses the product index url for a particular celebrity and product
    */
-  def url(celebrity:Celebrity, product:Product) = {
+  def url(celebrity:Celebrity, product:Product): ActionDefinition = {
+    urlFromSlugs(celebrity.urlSlug.get, product.urlSlug)
+  }
+  
+  def urlFromSlugs(celebrityUrlSlug: String, productUrlSlug: String): ActionDefinition = {
     val params: Map[String, AnyRef] = Map(
-      "celebrityUrlSlug" -> celebrity.urlSlug.get,
-      "productUrlSlug" -> product.urlSlug
+      "celebrityUrlSlug" -> celebrityUrlSlug,
+      "productUrlSlug" -> productUrlSlug
     )
 
-    Utils.lookupUrl("WebsiteControllers.getCelebrityProduct", params)
+    Utils.lookupUrl("WebsiteControllers.getCelebrityProduct", params)    
   }
 }
 

@@ -11,6 +11,7 @@ import org.jclouds.s3.domain.CannedAccessPolicy
 import java.io._
 import play.mvc.Http.Request
 import com.google.inject.{Provider, Inject}
+import services.Logging
 
 /**
  * Convenience methods for storing and loading large binary data: images,
@@ -24,7 +25,7 @@ import com.google.inject.{Provider, Inject}
  *
  * To use, import Blobs.Conversions._ into whatever scope.
  */
-class Blobs @Inject() (blobProvider: BlobVendor) {
+class Blobs @Inject() (blobProvider: BlobVendor) extends Logging {
   import Blobs._
 
   /**
@@ -96,7 +97,7 @@ class Blobs @Inject() (blobProvider: BlobVendor) {
    */
   def scrub() {
     val applicationMode = configuration.get("application.mode")
-    println("Checking application.mode before scrubbing blobstore. Must be in dev mode. Mode is: " + applicationMode)
+    log("Checking application.mode before scrubbing blobstore. Must be in dev mode. Mode is: " + applicationMode)
     if (applicationMode != "dev") {
       throw new IllegalStateException("Cannot scrub blobstore unless in dev mode")
     }

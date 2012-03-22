@@ -37,7 +37,9 @@ class ProductTests extends UnitFlatSpec
       priceInCurrency = 1000,
       name = "NBA Championships 2010",
       photoKey = Some(Time.toBlobstoreFormat(Time.now)),
-      description = "Shaq goes for the final dunk in the championship"
+      description = "Shaq goes for the final dunk in the championship",
+      storyTitle = "He herped then he derped.",
+      storyText = "He derped then he herped."
     )
   }
 

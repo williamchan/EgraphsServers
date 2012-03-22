@@ -7,17 +7,17 @@ import play.templates.JavaExtensions
 import org.joda.money.Money
 import services.Finance.TypeConversions._
 import models.Product.ProductWithPhoto
-import services.{Time}
 import services.blobs.Blobs.Conversions._
 import java.awt.image.BufferedImage
 import play.Play
 import services.blobs.AccessPolicy
-import services.AppConfig
 import com.google.inject.{Provider, Inject}
+import services.{TemplateEngine, Time, AppConfig}
 
 case class ProductServices @Inject() (
   store: ProductStore,
   celebStore: CelebrityStore,
+  templateEngine: TemplateEngine,
   imageAssetServices: Provider[ImageAssetServices]
 )
 
@@ -31,6 +31,8 @@ case class Product(
   priceInCurrency: BigDecimal = 0,
   name: String = "",
   description: String = "",
+  storyTitle: String = "",
+  storyText: String = "",
   photoKey: Option[String] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
@@ -68,7 +70,7 @@ case class Product(
         defaultPhoto
     }
   }
-
+  
   def photoImage: BufferedImage = {
     photo.renderFromMaster
   }
@@ -178,6 +180,8 @@ class ProductStore @Inject() (schema: Schema) extends Saves[Product] with SavesC
       theOld.urlSlug := theNew.urlSlug,
       theOld.photoKey := theNew.photoKey,
       theOld.description := theNew.description,
+      theOld.storyTitle := theNew.storyTitle,
+      theOld.storyText := theNew.storyText,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated
     )

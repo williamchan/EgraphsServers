@@ -2,10 +2,7 @@ package models
 
 import java.sql.Timestamp
 import services.blobs.AccessPolicy
-import services.{ImageUtil, Utils, Time}
 import java.awt.image.BufferedImage
-import com.google.inject.Inject
-import services.AppConfig
 import services.blobs.Blobs
 import services.db.{Schema, KeyedCaseClass, Saves}
 import org.jclouds.blobstore.domain.Blob
@@ -13,6 +10,12 @@ import vbg.VBGVerifySample
 import services.voice.{VoiceBiometricsError, YesMaamVoiceBiometricService, VoiceBiometricService}
 import xyzmo.XyzmoVerifyUser
 import services.signature.{SignatureBiometricsError, YesMaamSignatureBiometricService, SignatureBiometricService}
+import services._
+import java.text.SimpleDateFormat
+import controllers.WebsiteControllers
+import controllers.website.GetCelebrityProductEndpoint
+import com.google.inject.{Provider, Inject}
+import play.utils.HTML
 
 case class EgraphServices @Inject() (
   store: EgraphStore,
@@ -22,7 +25,8 @@ case class EgraphServices @Inject() (
   blobs: Blobs,
   voiceBiometrics: VoiceBiometricService,
   signatureBiometrics: SignatureBiometricService,
-  imageAssetServices: ImageAssetServices
+  imageAssetServices: ImageAssetServices,
+  storyServicesProvider: Provider[EgraphStoryServices]
 )
 
 /**
@@ -44,10 +48,35 @@ case class Egraph(
   //
   // Public methods
   //
+  /**
+   * Returns the "story" for the egraph, which is publicly displayed on the egraph's page.
+   *
+   * @param signer the celebrity that signed the egraph
+   * @param product the photographic product signed by the celebrity
+   * @param order the order opened by the buying customer.
+   *
+   * @return an EgraphStory that can be used to safely render the story into an HTML page,
+   *   unescaped.
+   */
+  def story(signer: Celebrity, product: Product, order: Order): EgraphStory = {
+    EgraphStory(
+      titleTemplate=product.storyTitle,
+      bodyTemplate=product.storyText,
+      celebName=signer.publicName.get,
+      celebUrlSlug=signer.urlSlug.get,
+      recipientName=order.recipientName,
+      productName=product.name,
+      productUrlSlug=product.urlSlug,
+      orderTimestamp=order.created,
+      signingTimestamp=this.created,
+      services=services.storyServicesProvider.get()
+    )
+  }
+  
   def save(): Egraph = {
     services.store.save(this)
   }
-
+  
   def withAssets(signature: String, message: Option[String] = None, audio: Array[Byte]): EgraphWithAssets = {
     EgraphWithAssets(this, signature, message, audio)
   }
@@ -56,7 +85,7 @@ case class Egraph(
   def order: Order = {
     services.orderStore.get(orderId)
   }
-
+    
   /**
    * Saves the entity without updating the assets. IT IS AN ERROR to call this
    * method on an Egraph that is being persisted for the first time. Only use
@@ -241,6 +270,146 @@ case class Egraph(
     }
   }
 }
+
+/**
+ * Service interfaces used by the EgraphStory.
+ * 
+ * @param templateEngine the templating engine used to provide user-side templating.
+ */
+case class EgraphStoryServices @Inject() (templateEngine: TemplateEngine)
+
+/**
+ * The set of fields available for users to address when writing their stories nad
+ * story titles. This permits them to provide the following type of narratives for the
+ * story, which will get interpreted on the fly by the Egraph page.
+ *
+ * {{{
+ *  Everybody wants a piece of {start-celebrity-link}{signer-name}{end-link}'s fame.
+ *  But only {recipient-name} got it. Because of Egraphs.
+ * }}}
+ *
+ */
+object EgraphStoryField extends Utils.Enum {
+  sealed trait EnumVal extends Value
+
+  /** Public name of the celebrity */
+  val CelebrityName = new EnumVal { val name = "signer_name" }
+  
+  /**
+   * Begins a link to the celebrity's page. Must be closed by an
+   * [[models.EgraphStoryField.FinishLink]]
+   * */
+  val StartCelebrityLink = new EnumVal { val name = "start_celebrity_link"}
+  
+  /** Name of the person receiving the egraph */
+  val RecipientName = new EnumVal { val name = "recipient_name"}
+  
+  /** Name of the product being sold */
+  val ProductName = new EnumVal { val name = "product_name"}
+  
+  /**
+   * Begins a link to the photographic product. Must be closed by a
+   * [[models.EgraphStoryField.FinishLink]]
+   **/
+  val StartProductLink = new EnumVal { val name="start_product_link"}
+
+  /** Prints the date the Egraph was ordered. */
+  val DateOrdered = new EnumVal { val name = "date_ordered"}
+
+  /** Prints the date the Egraph was signed */
+  val DateSigned = new EnumVal { val name = "date_signed"}
+
+  /** Closes the last opened link */
+  val FinishLink = new EnumVal { val name="finish_link" }
+}
+
+/**
+ * Represents the story of an egraph, as presented on the egraph page.
+ * 
+ * @param titleTemplate title template as specified on the [[models.Product]]
+ * @param bodyTemplate title template as specified on the [[models.bodyTemplate]] 
+ * @param celebName the celebrity's public name
+ * @param celebUrlSlug see [[models.Celebrity.urlSlug]]
+ * @param recipientName name of the [[models.Customer]] receiving the egraph.
+ * @param productName name of the purchased [[models.Product]]
+ * @param productUrlSlug see [[models.Product.urlSlug]]
+ * @param orderTimestamp the moment the buying [[models.Customer]] ordered the [[models.Product]]
+ * @param signingTimestamp the moment the [[models.Celebrity]] fulfilled the [[models.Order]]
+ * @param services
+ */
+case class EgraphStory(
+  titleTemplate: String,
+  bodyTemplate: String,
+  celebName: String,
+  celebUrlSlug: String,
+  recipientName: String,
+  productName: String,
+  productUrlSlug: String,
+  orderTimestamp: Timestamp,
+  signingTimestamp: Timestamp,
+  services: EgraphStoryServices = AppConfig.instance[EgraphStoryServices]
+) {
+  import HTML.htmlEscape
+
+  //
+  // Public methods
+  //
+  /** Returns the story title */
+  def title: String = {
+    services.templateEngine.evaluate(htmlEscape(titleTemplate), templateParams)
+  }
+
+  /** Returns the body of the story */
+  def body: String = {
+    services.templateEngine.evaluate(htmlEscape(bodyTemplate), templateParams)
+  }
+  
+  //
+  // Private methods
+  //
+  private val templateParams: Map[String, String] = {
+    import EgraphStoryField._
+    val pairs = for (templateField <- EgraphStoryField.values) yield {
+      val paramValue = templateField match {
+        case CelebrityName => celebName
+        case StartCelebrityLink => startCelebPageLink
+        case RecipientName => recipientName
+        case ProductName => productName
+        case StartProductLink => startProductLink
+        case DateOrdered => formatTimestamp(orderTimestamp)
+        case DateSigned => formatTimestamp(signingTimestamp)
+        case FinishLink => "</a>"
+      }
+
+      (templateField.name, paramValue)
+    }
+
+    pairs.toMap
+  }
+
+  private def dateFormat = {
+    new SimpleDateFormat("MMMM dd, yyyy")
+  }
+
+  private def startCelebPageLink: String = {
+    htmlAnchorStart(href=WebsiteControllers.lookupGetCelebrity(celebUrlSlug).url)
+  }
+
+  private def startProductLink: String = {
+    htmlAnchorStart(
+      href=GetCelebrityProductEndpoint.urlFromSlugs(celebUrlSlug, productUrlSlug).url
+    )
+  }
+
+  private def htmlAnchorStart(href: String) = {
+    "<a href='" + href + "' >"
+  }
+
+  private def formatTimestamp(timestamp: Timestamp): String = {
+    dateFormat.format(timestamp)
+  }
+}
+
 
 /**
  * Visual and audio assets associated with the Egraph entity. These are stored in the blobstore

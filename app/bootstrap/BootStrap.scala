@@ -6,17 +6,18 @@ import io.Source
 import java.io.{File, PrintWriter}
 import play.Play
 import services.blobs.Blobs
-import services.{AppConfig, Utils, TempFile}
 import services.db.{Schema, DBSession}
 import services.payment.Payment
 import java.sql.Connection
+import services.{Logging, AppConfig, Utils, TempFile}
 
 @OnApplicationStart
-class BootStrap extends Job {
+class BootStrap extends Job with Logging {
   val blobs = AppConfig.instance[Blobs]
   val payment = AppConfig.instance[Payment]
 
   override def doJob() {
+    log("Bootstrapping application")
     // Initialize payment system
     payment.bootstrap()
 
@@ -36,28 +37,30 @@ class BootStrap extends Job {
     if (Play.id == "test") {
       TestModeBootstrap.run()
     }
+    log("Finished bootstrapping application")
   }
 }
 
 /**
  * Bootstrap code for when we're running in test mode
  */
-private object TestModeBootstrap {
+private object TestModeBootstrap extends Logging {
   val blobs = AppConfig.instance[Blobs]
   val schema = AppConfig.instance[Schema]
 
   import org.squeryl.PrimitiveTypeMode._
 
   def run() {
+    log("Performing test-mode bootstrap.")
     bootstrapDatabase()
+    log("Finished bootstrapping test-mode.")
   }
 
   private def bootstrapDatabase() {
     DBSession.init()
     inTransaction {
-      printDdlToFile(schemaFile)
       if ((!schema.isInPlace) || schemaHasChanged) {
-        play.Logger.info(
+        log(
           """Detected either lack of database schema or change thereof.
           (You can view the current schema at """ + schemaFile.getAbsolutePath + ")"
         )

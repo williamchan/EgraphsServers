@@ -10,6 +10,7 @@ import java.io.{ByteArrayOutputStream, PrintWriter}
 import com.google.inject.{Inject, Injector}
 import java.sql.Connection
 import play.Play.configuration
+import services.Logging
 
 /**
  * Egraphs Database schema
@@ -19,7 +20,7 @@ import play.Play.configuration
 class Schema @Inject()(
   injector: Injector,
   @CurrentTransaction currentTxnConnectionFactory: () => Connection
-) extends org.squeryl.Schema
+) extends org.squeryl.Schema with Logging
 {
 
   import uk.me.lings.scalaguice.InjectorExtensions._
@@ -72,6 +73,7 @@ class Schema @Inject()(
   on(products)(product =>
     declare(
       product.priceInCurrency is monetaryDbType,
+      product.storyText is dbType("text"),
       columns(product.celebrityId, product.urlSlug) are (unique)
     )
   )
@@ -221,15 +223,13 @@ class Schema @Inject()(
     )
   )
 
-
-
   //
   // Public methods
   //
   /**Clears out the schema and recreates it. For God's sake don't do this in production. */
   def scrub() {
     val applicationMode = configuration.get("application.mode")
-    println("Checking application.mode before scrubbing database. Must be in dev mode. Mode is: " + applicationMode)
+    log("Checking application.mode before scrubbing database. Must be in dev mode. Mode is: " + applicationMode)
     if (applicationMode != "dev") {
       throw new IllegalStateException("Cannot scrub database unless in dev mode")
     }
@@ -298,10 +298,12 @@ class Schema @Inject()(
         select(celeb.id)
       ).headOption
 
+      log("Existing egraphs schema was detected")
       true
     }
     catch {
       case e: RuntimeException if e.getMessage.toLowerCase.contains("celebrity") =>
+        log("No egraphs schema was detected")
         false
 
       case otherErrors =>

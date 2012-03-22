@@ -5,7 +5,7 @@ import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 import utils._
 import services.blobs.Blobs.Conversions._
-import services.AppConfig
+import services.{Time, AppConfig}
 
 class EgraphTests extends UnitFlatSpec
   with ShouldMatchers
@@ -76,6 +76,25 @@ class EgraphTests extends UnitFlatSpec
 
   it should "throw an exception at an unrecognized string" in {
     evaluating { EgraphState.named("Herpyderp") } should produce [NoSuchElementException]
+  }
+
+  "An Egraph Story" should "render all values correctly in the title" in {
+    val storyTemplate = EgraphStoryField.values.foldLeft("") { (accum, field) =>
+      accum + "{" + field.name + "}"
+    }
+    val story = EgraphStory(
+      titleTemplate = "{signer_name}",
+      bodyTemplate = storyTemplate,
+      celebName = "Herpy Derpson",
+      celebUrlSlug = "Herpy-Derpson",
+      recipientName = "Erem Recipient",
+      productName = "NBA Finals 2012",
+      productUrlSlug = "NBA-Finals-2012",
+      orderTimestamp = Time.fromApiFormat("2012-02-10 13:00:00.256"),
+      signingTimestamp = Time.fromApiFormat("2011-02-10 13:00:00.256")
+    )
+    story.title should be ("Herpy Derpson")
+    story.body should be ("Herpy Derpson<a href='/Herpy-Derpson' >Erem RecipientNBA Finals 2012<a href='/Herpy-Derpson/NBA-Finals-2012' >February 10, 2012February 10, 2011</a>")
   }
 }
 
