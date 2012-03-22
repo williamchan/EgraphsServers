@@ -8,12 +8,35 @@ import services.AppConfig
 import services.http.DBTransaction
 import services.blobs.Blobs
 import services.db.Schema
-import models.{EnrollmentStatus, Account, Celebrity}
+import models._
 
 object TestControllers extends Controller
 with DBTransaction {
   val blobs = AppConfig.instance[Blobs]
   val schema = AppConfig.instance[Schema]
+
+  def getHardwiredEgraphPage() = {
+    val testFrame = LandscapeEgraphFrame
+
+    views.Application.html.egraph_new(
+      signerName="Herp Derpson",
+      recipientName="Derp Herpson",
+      frameCssClass=testFrame.cssClass,
+      frameLayoutColumns=testFrame.cssFrameColumnClasses,
+      productIconUrl="/Herp-Derp",
+      storyTitle="The story",
+      storyLayoutColumns=testFrame.cssStoryColumnClasses,
+      storyBody="""
+         Once upon a time in a galaxy far far away <a href="/">STAR WARS</a>.
+         It was a fight to the finish between foes, mortal enemies that were
+         born of the same womb. I just...I just don't have anything more to say.
+         It's so late...
+         """,
+      audioUrl="http://freshly-ground.com/data/audio/sm2/Adrian%20Glynn%20-%20Blue%20Belle%20Lament.mp3",
+      signedImageUrl="/SomeImageSample",
+      signedOnDate="February 22, 2012"
+    )
+  }
 
   def resetAlphaState(): String = {
     val applicationMode = play.Play.configuration.get("application.mode")

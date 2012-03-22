@@ -522,6 +522,19 @@ sealed trait EgraphFrame {
    **/
   def cssClass: String
 
+  /**
+   * Twitter Bootstrap classes that specify the width of the egraph page
+   * portion occupied by the frame. e.g. "offset1 span5"
+   *
+   */
+  def cssFrameColumnClasses: String
+
+  /**
+   * Twitter Bootstrap classes that specify the width of the egraph page
+   * potion occupied by the story. e.g. "offset1 span5"
+   */
+  def cssStoryColumnClasses: String
+
   /** Width of the image in pixels as displayed on the egraph page */
   def imageWidthPixels: Int
 
@@ -580,7 +593,11 @@ object EgraphFrame {
 /** The default egraph portrait frame */
 object PortraitEgraphFrame extends EgraphFrame {
   override val name: String = "Default Portrait"
+
   override val cssClass  = "portrait"
+  override val cssFrameColumnClasses = "offset1 span6"
+  override val cssStoryColumnClasses = "span5"
+
   override val imageWidthPixels = 377
   override val imageHeightPixels = 526
 }
@@ -588,7 +605,11 @@ object PortraitEgraphFrame extends EgraphFrame {
 /** The default egraph landscape photo frame */
 object LandscapeEgraphFrame extends EgraphFrame {
   override val name = "Default Landscape"
+
   override val cssClass  = "landscape"
+  override val cssFrameColumnClasses = "span8"
+  override val cssStoryColumnClasses = "span3"
+
   override val imageWidthPixels = 595
   override val imageHeightPixels = 377
 }

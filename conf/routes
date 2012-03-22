@@ -10,6 +10,7 @@
 GET     /test/scenarios                          nonproduction.ScenarioController.list
 GET     /test/scenarios/clear                    nonproduction.ScenarioController.clear
 GET     /test/scenarios/{urlSlug}                nonproduction.ScenarioController.scenario
+GET     /test/pages/egraph                       nonproduction.TestControllers.getHardwiredEgraphPage
 
 GET     /demo-setup/list                         nonproduction.DemoSetupController.list
 GET     /demo-setup/clear                        nonproduction.DemoSetupController.clear
