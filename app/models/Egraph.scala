@@ -299,7 +299,7 @@ object EgraphStoryField extends Utils.Enum {
    * Begins a link to the celebrity's page. Must be closed by an
    * [[models.EgraphStoryField.FinishLink]]
    * */
-  val StartCelebrityLink = new EnumVal { val name = "start_celebrity_link"}
+  val StartCelebrityLink = new EnumVal { val name = "celebrity_link"}
   
   /** Name of the person receiving the egraph */
   val RecipientName = new EnumVal { val name = "recipient_name"}
@@ -311,7 +311,7 @@ object EgraphStoryField extends Utils.Enum {
    * Begins a link to the photographic product. Must be closed by a
    * [[models.EgraphStoryField.FinishLink]]
    **/
-  val StartProductLink = new EnumVal { val name="start_product_link"}
+  val StartProductLink = new EnumVal { val name="product_link"}
 
   /** Prints the date the Egraph was ordered. */
   val DateOrdered = new EnumVal { val name = "date_ordered"}
@@ -320,7 +320,7 @@ object EgraphStoryField extends Utils.Enum {
   val DateSigned = new EnumVal { val name = "date_signed"}
 
   /** Closes the last opened link */
-  val FinishLink = new EnumVal { val name="finish_link" }
+  val FinishLink = new EnumVal { val name="end_link" }
 }
 
 /**
@@ -338,16 +338,16 @@ object EgraphStoryField extends Utils.Enum {
  * @param services
  */
 case class EgraphStory(
-  titleTemplate: String,
-  bodyTemplate: String,
-  celebName: String,
-  celebUrlSlug: String,
-  recipientName: String,
-  productName: String,
-  productUrlSlug: String,
-  orderTimestamp: Timestamp,
-  signingTimestamp: Timestamp,
-  services: EgraphStoryServices = AppConfig.instance[EgraphStoryServices]
+  private val titleTemplate: String,
+  private val bodyTemplate: String,
+  private val celebName: String,
+  private val celebUrlSlug: String,
+  private val recipientName: String,
+  private val productName: String,
+  private val productUrlSlug: String,
+  private val orderTimestamp: Timestamp,
+  private val signingTimestamp: Timestamp,
+  private val services: EgraphStoryServices = AppConfig.instance[EgraphStoryServices]
 ) {
   import HTML.htmlEscape
 
@@ -508,6 +508,9 @@ object EgraphState {
  * Specifies the representation of an egraph on the egraph page as well
  * as guidelines in the form of an aspect ratio on how to display the egraph
  * in settings other than the egraph page.
+ *
+ * See https://egraphs.jira.com/wiki/display/DEV/Egraph+Page#EgraphPage-ImageSpecifications
+ * for more about egraph page image layout.
  **/
 sealed trait EgraphFrame {
   //
@@ -544,8 +547,15 @@ sealed trait EgraphFrame {
   //
   // Implemented members
   //
+  /**
+   * Returns the aspect ratio of the image: width / height. It is returned with specificity
+   * to the 1e-4th decimal place.
+   * @return
+   */
   def imageAspectRatio: Double = {
-    imageWidthPixels.toDouble / imageHeightPixels.toDouble
+    val rawRatio = imageWidthPixels.toDouble / imageHeightPixels.toDouble
+
+    (rawRatio * 10000).round / 10000.0
   }
 
   /**
@@ -557,7 +567,7 @@ sealed trait EgraphFrame {
    * @param image
    * @return a cropped copy of the image argument.
    */
-  def cropToFit(image: BufferedImage): BufferedImage = {
+  def cropImageForFrame(image: BufferedImage): BufferedImage = {
     val targetAspectRatio = this.imageAspectRatio
     val originalWidth = image.getWidth.toDouble
     val originalHeight = image.getHeight.toDouble
@@ -565,10 +575,10 @@ sealed trait EgraphFrame {
     
     val cropDimensions = if (originalAspectRatio < targetAspectRatio) {
       // the original is too tall. Use all of width and limit height.
-      Dimensions(width=originalWidth.toInt, height=(originalHeight / targetAspectRatio).toInt)
+      Dimensions(width=originalWidth.toInt, height=(originalWidth / targetAspectRatio).toInt)
     } else {
       // the original is too narrow. Use all of height and limit width.
-      Dimensions(width=(originalWidth * targetAspectRatio).toInt, height=originalHeight.toInt)
+      Dimensions(width=(originalHeight * targetAspectRatio).toInt, height=originalHeight.toInt)
     }
 
     ImageUtil.crop(image, cropDimensions)

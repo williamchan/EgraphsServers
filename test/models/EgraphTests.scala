@@ -5,7 +5,10 @@ import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 import utils._
 import services.blobs.Blobs.Conversions._
-import services.{Time, AppConfig}
+import play.Play
+import javax.imageio.ImageIO
+import services.{Dimensions, Time, AppConfig}
+import java.awt.image.BufferedImage
 
 class EgraphTests extends UnitFlatSpec
   with ShouldMatchers
@@ -96,6 +99,7 @@ class EgraphTests extends UnitFlatSpec
     story.title should be ("Herpy Derpson")
     story.body should be ("Herpy Derpson<a href='/Herpy-Derpson' >Erem RecipientNBA Finals 2012<a href='/Herpy-Derpson/NBA-Finals-2012' >February 10, 2012February 10, 2011</a>")
   }
+
 }
 
 object EgraphTests {
@@ -107,5 +111,45 @@ object EgraphTests {
 
     customer.buy(product).save()
   }
+}
+
+class EgraphFrameTests extends EgraphsUnitTest {
+  "An Egraph Frame" should "select the correct frame for landscape image dimensions" in {
+    EgraphFrame.suggestedFrame(Dimensions(501,500)) should be (LandscapeEgraphFrame)
+    EgraphFrame.suggestedFrame(Dimensions(500,501)) should be (PortraitEgraphFrame)
+    EgraphFrame.suggestedFrame(Dimensions(500,500)) should be (PortraitEgraphFrame)
+  }
+
+  it should "report the correct aspect ratio" in {
+    PortraitEgraphFrame.imageAspectRatio should be (.7167)
+    LandscapeEgraphFrame.imageAspectRatio should be (1.5782)
+  }
   
+  it should "not crop when dimensions are already ideal for landscape (width > height)" in {
+    val uncropped = new BufferedImage(1578, 1000, BufferedImage.TYPE_INT_ARGB)
+    val cropped = LandscapeEgraphFrame.cropImageForFrame(uncropped)
+
+    (cropped.getWidth, cropped.getHeight) should be ((uncropped.getWidth, uncropped.getHeight - 1))
+  }
+
+  it should "not crop when dimensions are already ideal for portrait" in {
+    val uncropped = new BufferedImage(717, 1000, BufferedImage.TYPE_INT_ARGB)
+    val cropped = PortraitEgraphFrame.cropImageForFrame(uncropped)
+
+    (cropped.getWidth, cropped.getHeight) should be ((uncropped.getWidth - 1, uncropped.getHeight))
+  }
+  
+  it should "crop to correct aspect ratio when too wide" in {
+    val uncropped = new BufferedImage(717, 2000, BufferedImage.TYPE_INT_ARGB)
+    val cropped = PortraitEgraphFrame.cropImageForFrame(uncropped)
+
+    (cropped.getWidth, cropped.getHeight) should be ((717, 1000))
+  }
+
+  it should "crop to correct aspect ratio when too tall" in {
+    val uncropped = new BufferedImage(377, 1000, BufferedImage.TYPE_INT_ARGB)
+    val cropped = PortraitEgraphFrame.cropImageForFrame(uncropped)
+
+    (cropped.getWidth, cropped.getHeight) should be ((377, 526))
+  }
 }

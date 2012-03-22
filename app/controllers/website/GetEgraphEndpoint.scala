@@ -3,6 +3,7 @@ package controllers.website
 import play.mvc.Controller
 import models.{OrderStore, FulfilledOrder}
 import services.blobs.AccessPolicy
+import java.text.SimpleDateFormat
 
 private[controllers] trait GetEgraphEndpoint { this: Controller =>
   protected def orderStore: OrderStore
@@ -16,16 +17,32 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
     // Get an order with provided ID
     orderStore.findFulfilledWithId(orderId.toLong) match {
       case Some(FulfilledOrder(order, egraph)) =>
-        val imageUrl = egraph.assets.image.resizedWidth(940).getSaved(AccessPolicy.Public).url
+        // Get related data model objects
         val product = order.product
         val celebrity = product.celebrity
 
+        // Prepare the framed image
+        val frame = product.frame
+        val rawSignedImage = egraph.assets.image
+        val frameFittedImage = rawSignedImage.resized(frame.imageWidthPixels, frame.imageHeightPixels)
+        val frameFittedImageUrl = frameFittedImage.getSaved(AccessPolicy.Public).url
+
+        // Prepare the story
+        val story = egraph.story(celebrity, product, order)
+
+        // Render
         views.Application.html.egraph(
-          order,
-          egraph,
-          imageUrl,
-          product,
-          celebrity
+          signerName=celebrity.publicName.getOrElse("Anony mouse"),
+          recipientName=order.recipientName,
+          frameCssClass=frame.cssClass,
+          frameLayoutColumns=frame.cssFrameColumnClasses,
+          productIconUrl=product.iconUrl,
+          storyLayoutColumns=frame.cssStoryColumnClasses,
+          storyTitle=story.title,
+          storyBody=story.body,
+          audioUrl=egraph.assets.audioUrl,
+          signedImageUrl=frameFittedImageUrl,
+          signedOnDate=new SimpleDateFormat("MMMM dd, yyyy").format(egraph.created)
         )
 
       case None =>

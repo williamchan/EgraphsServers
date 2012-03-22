@@ -1,20 +1,19 @@
 package scenario
 
 import services.db.Schema
-import services.Utils
 import services.blobs.Blobs
 import org.apache.commons.mail.SimpleEmail
 import play.mvc.results.Redirect
 import Blobs.Conversions._
 import utils.{TestConstants, TestData}
 import org.squeryl.PrimitiveTypeMode._
-import services.AppConfig
 import models._
 import controllers.WebsiteControllers
 import controllers.website.PostBuyProductEndpoint.EgraphPurchaseHandler
 import play.libs.{Codec, Mail}
 import services.payment.Payment
 import play.Play
+import services.{Dimensions, Utils, AppConfig}
 
 /**
  * All scenarios supported by the API.
@@ -99,19 +98,30 @@ class Scenarios extends DeclaresScenarios {
       val product1 = will.newProduct.copy(
         priceInCurrency=10,
         name="2010 Starcraft 2 Championships",
-        description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
+        description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one.",
+        storyTitle="The story and the glory",
+        storyText="{celebrity_link}{signer_name}{end_link} was born on top. He proved it to the world at the {product_link}{product_name}{end_link}. A few days afterwards he got a note from {recipient_name} on his iPad. This was his response."
       )
 
       val product2 = will.newProduct.copy(
         priceInCurrency=70,
         name="2011 King of Pweens Competition",
-        description="In classic form, Wizzle dominated the competition and left mouths agape."
+        description="In classic form, Wizzle dominated the competition and left mouths agape.",
+        storyTitle="The story and the glory",
+        storyText="""
+           {start_celebrity_link}{signer_name}{end_link} was born on top. On {date_signed}
+           he proved it to {recipient_name}.
+           """
       )
       
       import services.ImageUtil.Conversions._
-      val imageBytes = product1.defaultPhoto.renderFromMaster.asByteArray(ImageAsset.Jpeg)
-      product1.save().withPhoto(imageBytes).save()
-      product2.save().withPhoto(imageBytes).save()
+      val image = product1.defaultPhoto.renderFromMaster
+      val frame = EgraphFrame.suggestedFrame(Dimensions(image.getWidth, image.getHeight))
+      val croppedImage = frame.cropImageForFrame(image)
+      val croppedImageBytes = croppedImage.asByteArray(ImageAsset.Jpeg)
+
+      product1.save().withFrame(frame).withPhoto(croppedImageBytes).save()
+      product2.save().withFrame(frame).withPhoto(croppedImageBytes).save()
     }
   )
 
@@ -149,12 +159,15 @@ class Scenarios extends DeclaresScenarios {
       erem.buy(starcraftChampionship)
         .copy(
           requestedMessage=Some("Happy 13th birthday, Don!"),
-          messageToCelebrity=Some("My buddy Don is your biggest fan!"))
+          messageToCelebrity=Some("My buddy Don is your biggest fan!"),
+          recipientName="Erem Boto"
+        )
         .save()
       erem.buy(kingOfPweensCompetition)
         .copy(
           requestedMessage=Some("Happy Pweenday, Don!"),
-          messageToCelebrity=Some("Don loves everything you do!"))
+          messageToCelebrity=Some("Don loves everything you do!"),
+          recipientName="Erem Boto")
         .save()
     }
   )

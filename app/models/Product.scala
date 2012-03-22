@@ -32,8 +32,8 @@ case class Product(
   name: String = "",
   description: String = "",
   _defaultFrameName: String = PortraitEgraphFrame.name,
-  storyTitle: String = "",
-  storyText: String = "",
+  storyTitle: String = "The Story",
+  storyText: String = "(No story has been written for this product)",
   photoKey: Option[String] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
@@ -52,6 +52,11 @@ case class Product(
   def save(): Product = {
     services.store.save(this)
   }
+  
+  def iconUrl: String = {
+    // TODO(erem): fix this
+    "/Herp/Derp"
+  }
 
   /**
    * Returns a copy of the Product with a different frame
@@ -60,7 +65,7 @@ case class Product(
    *   egraph by default. This should be based on the dimensions of the
    *   image.
    */
-  def withDefaultFrame(frame: EgraphFrame): Product = {
+  def withFrame(frame: EgraphFrame): Product = {
     copy(_defaultFrameName=frame.name)
   }
 
@@ -68,7 +73,7 @@ case class Product(
    * Returns the default Frame for this Product. This is the frame that will
    * be used to frame egraphs made on top of this product by default.
    **/
-  def defaultFrame: EgraphFrame = {
+  def frame: EgraphFrame = {
     _defaultFrameName match {
       case PortraitEgraphFrame.name => PortraitEgraphFrame
       case LandscapeEgraphFrame.name => LandscapeEgraphFrame

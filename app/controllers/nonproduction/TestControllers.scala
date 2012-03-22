@@ -18,7 +18,7 @@ with DBTransaction {
   def getHardwiredEgraphPage() = {
     val testFrame = LandscapeEgraphFrame
 
-    views.Application.html.egraph_new(
+    views.Application.html.egraph(
       signerName="Herp Derpson",
       recipientName="Derp Herpson",
       frameCssClass=testFrame.cssClass,

@@ -11,11 +11,11 @@ import services.http.AdminRequestFilters
 import services.http.OptionParams.Conversions._
 import play.data.validation.Validation
 import javax.imageio.ImageIO
-import services.{Dimensions, ImageUtil}
 import models._
 import services.ImageUtil.Conversions._
+import services.{Logging, Dimensions, ImageUtil}
 
-trait PostCelebrityProductEndpoint {
+trait PostCelebrityProductEndpoint extends Logging {
   this: Controller =>
 
   protected def adminFilters: AdminRequestFilters
@@ -54,15 +54,15 @@ trait PostCelebrityProductEndpoint {
       return WebsiteControllers.redirectWithValidationErrors(GetCreateCelebrityProductEndpoint.url(celebrity))
     }
 
-    Logger.info("Creating product")
+    log("Creating product \"" + productName + "\" for celebrity \"" + celebrity.publicName + "\"");
     val dimensions = dimensionsOption.get
     val frame = EgraphFrame.suggestedFrame(dimensions)
     val uploadedImage = ImageIO.read(productImage)
-    val imageCroppedToFrame = frame.cropToFit(uploadedImage)
+    val imageCroppedToFrame = frame.cropImageForFrame(uploadedImage)
     // todo(wchan): Jpeg or PNG
     val imageByteArray = imageCroppedToFrame.asByteArray(ImageAsset.Jpeg)
     val savedProduct = product
-      .withDefaultFrame(frame)
+      .withFrame(frame)
       .save()
       .withPhoto(imageByteArray)
       .save()
