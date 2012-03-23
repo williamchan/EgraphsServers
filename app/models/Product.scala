@@ -35,6 +35,7 @@ case class Product(
   storyTitle: String = "The Story",
   storyText: String = "(No story has been written for this product)",
   photoKey: Option[String] = None,
+  _iconKey: Option[String] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: ProductServices = AppConfig.instance[ProductServices]
@@ -52,10 +53,9 @@ case class Product(
   def save(): Product = {
     services.store.save(this)
   }
-  
+
   def iconUrl: String = {
-    // TODO(erem): fix this
-    "/Herp/Derp"
+    icon.url
   }
 
   /**
@@ -78,6 +78,23 @@ case class Product(
       case PortraitEgraphFrame.name => PortraitEgraphFrame
       case LandscapeEgraphFrame.name => LandscapeEgraphFrame
     }
+  }
+
+  def icon: ImageAsset = {
+    val imageAssetOption = _iconKey.map { theKey =>
+      ImageAsset(keyBase, theKey, ImageAsset.Png, services=services.imageAssetServices.get())
+    }
+
+    imageAssetOption.getOrElse(defaultIcon)
+  }
+
+  def withIcon(iconImageData:Array[Byte]): ProductWithPhoto = {
+    val newIconKey = "icon_" + Time.toBlobstoreFormat(Time.now)
+
+    ProductWithPhoto(
+      product=this.copy(_iconKey=Some(newIconKey)),
+      photo=ImageAsset(iconImageData, keyBase, newIconKey, ImageAsset.Png, services.imageAssetServices.get)
+    )
   }
 
   def withPhoto(imageData:Array[Byte]): ProductWithPhoto = {
@@ -150,6 +167,14 @@ case class Product(
       name="photo",
       imageType=ImageAsset.Jpeg,
       services=services.imageAssetServices.get
+  )
+
+  lazy val defaultIcon = ImageAsset(
+    Play.getFile("public/images/egraph_default_plaque_icon.png"),
+    keyBase="defaults/product",
+    name="photo_icon",
+    imageType=ImageAsset.Png,
+    services=services.imageAssetServices.get
   )
 }
 

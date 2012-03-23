@@ -6,6 +6,8 @@ import play.test.UnitFlatSpec
 import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationAfter, CreatedUpdatedEntityTests, SavingEntityTests}
 import services.Time
 import services.AppConfig
+import play.Play
+import javax.imageio.ImageIO
 
 class ProductTests extends UnitFlatSpec
   with ShouldMatchers
@@ -66,6 +68,22 @@ class ProductTests extends UnitFlatSpec
     store.findByCelebrityAndUrlSlug(celebrityId = celebrity.id + 1, slug = product.urlSlug) should be(None)
     store.findByCelebrityAndUrlSlug(celebrityId = celebrity.id, slug = "Herp") should be(None)
 
+  }
+  
+  "A product's icon photo" should "start out as the default" in {
+    import services.ImageUtil.Conversions._
+    val product = newProduct
+    val icon = newProduct.icon
+    icon.url should be (newProduct.defaultIcon.url)
+
+    val newIconImage = ImageIO.read(Play.getFile("public/images/egraph_default_plaque_icon.png"))
+    val productWithIcon = product.withIcon(newIconImage.asByteArray(ImageAsset.Png)).save().product
+
+    productWithIcon.iconUrl should not be (newProduct.defaultIcon.url)
+  }
+  
+  def newProduct: Product = {
+    Celebrity().save().newProduct.copy(name = "Herp Derp").save()
   }
 
 }
