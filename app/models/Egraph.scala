@@ -299,7 +299,7 @@ object EgraphStoryField extends Utils.Enum {
    * Begins a link to the celebrity's page. Must be closed by an
    * [[models.EgraphStoryField.FinishLink]]
    * */
-  val StartCelebrityLink = new EnumVal { val name = "celebrity_link"}
+  val StartCelebrityLink = new EnumVal { val name = "signer_link"}
   
   /** Name of the person receiving the egraph */
   val RecipientName = new EnumVal { val name = "recipient_name"}

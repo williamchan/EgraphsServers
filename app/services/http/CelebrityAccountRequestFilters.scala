@@ -53,6 +53,28 @@ class CelebrityAccountRequestFilters @Inject() (
   }
 
   /**
+   * Requires that the request contain a "celebrityId" param that corresponds to
+   * a celebrity that actually exists.
+   * 
+   * @param request the request to be checked for existence of the celebrity ID
+   * @param continue the code to execute once the celebrity is found
+   * @tparam A the type returned by continue
+   * 
+   * @return either the result of continue or a new NotFound.
+   */
+  def requireCelebrityId(request: Request)(continue: Celebrity => Any) = {
+    val celebrityIdParamOption = request.params.getOption("celebrityId")
+    val celebrityOption = celebrityIdParamOption.flatMap { celebrityIdParam =>
+      celebStore.findById(celebrityIdParam.toLong)
+    }
+    
+    celebrityOption match {
+      case Some(celebrity) => continue(celebrity)
+      case None => new NotFound("No such celebrity")
+    }
+  }
+  
+  /**
    * Filters out requests that didn't provide a valid `celebrityUrlSlug` parameter.
    *
    * Calls the `continue` callback parameter with the corresponding [[models.Celebrity]] if the filter

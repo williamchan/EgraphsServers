@@ -100,7 +100,7 @@ class Scenarios extends DeclaresScenarios {
         name="2010 Starcraft 2 Championships",
         description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one.",
         storyTitle="The story and the glory",
-        storyText="{celebrity_link}{signer_name}{end_link} was born on top. He proved it to the world at the {product_link}{product_name}{end_link}. A few days afterwards he got a note from {recipient_name} on his iPad. This was his response."
+        storyText="{signer_link}{signer_name}{end_link} was born on top. He proved it to the world at the {product_link}{product_name}{end_link}. A few days afterwards he got a note from {recipient_name} on his iPad. This was his response."
       )
 
       val product2 = will.newProduct.copy(
@@ -109,7 +109,7 @@ class Scenarios extends DeclaresScenarios {
         description="In classic form, Wizzle dominated the competition and left mouths agape.",
         storyTitle="The story and the glory",
         storyText="""
-           {start_celebrity_link}{signer_name}{end_link} was born on top. On {date_signed}
+           {signer_link}{signer_name}{end_link} was born on top. On {date_signed}
            he proved it to {recipient_name}.
            """
       )

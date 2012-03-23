@@ -45,7 +45,7 @@ case class Product(
   // Additional DB columns
   //
   /** The slug used to access this product from the main site */
-  val urlSlug = JavaExtensions.slugify(name, false) // Slugify without lower-casing
+  val urlSlug = Product.slugify(name)
 
   //
   // Public members
@@ -182,7 +182,9 @@ object Product {
 
   val defaultPrice = 50
 
-  import org.squeryl.PrimitiveTypeMode._
+  def slugify(productName: String): String = {
+    JavaExtensions.slugify(productName, false) // Slugify without lower-casing
+  }
 
   case class ProductWithPhoto(product: Product, photo: ImageAsset) {
     def save(): ProductWithPhoto = {
@@ -234,6 +236,7 @@ class ProductStore @Inject() (schema: Schema) extends Saves[Product] with SavesC
       theOld.photoKey := theNew.photoKey,
       theOld.description := theNew.description,
       theOld._defaultFrameName := theNew._defaultFrameName,
+      theOld._iconKey := theNew._iconKey,
       theOld.storyTitle := theNew.storyTitle,
       theOld.storyText := theNew.storyText,
       theOld.created := theNew.created,

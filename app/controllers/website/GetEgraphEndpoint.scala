@@ -27,6 +27,10 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
         val frameFittedImage = rawSignedImage.resized(frame.imageWidthPixels, frame.imageHeightPixels)
         val frameFittedImageUrl = frameFittedImage.getSaved(AccessPolicy.Public).url
 
+        // Prepare the icon
+        val icon = product.icon
+        val frameFittedIconUrl = icon.resized(41, 41).getSaved(AccessPolicy.Public).url
+
         // Prepare the story
         val story = egraph.story(celebrity, product, order)
 
@@ -36,7 +40,7 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
           recipientName=order.recipientName,
           frameCssClass=frame.cssClass,
           frameLayoutColumns=frame.cssFrameColumnClasses,
-          productIconUrl=product.iconUrl,
+          productIconUrl=frameFittedIconUrl,
           storyLayoutColumns=frame.cssStoryColumnClasses,
           storyTitle=story.title,
           storyBody=story.body,

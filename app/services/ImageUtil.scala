@@ -306,7 +306,29 @@ import javax.imageio.{ImageReader, ImageIO}
 }
 
 object ImageUtil {
+  /**
+   * Crops the provided image into a square whose length on each side is
+   * the minimum of the provided image's width and height
+   **/
+  def cropToSquare(image: BufferedImage) = {
+    val minorDimension = scala.math.min(image.getWidth, image.getHeight)
+    crop(image, Dimensions(minorDimension, minorDimension))
+  }
 
+  /**
+   * Attempts to open the image located at File. Returns Some(the image) if successful
+   * otherwise returns None.
+   *
+   * @param imageFile
+   */
+  def parseImage(imageFile: File): Option[BufferedImage] = {
+    try {
+      Some(ImageIO.read(imageFile))
+    } catch {
+      case e: Exception =>
+        None
+    }
+  }
   def getDimensions(imageFile: File): Option[Dimensions] = {
     if (imageFile == null || imageFile.length() == 0) return None
 

@@ -6,10 +6,10 @@ import services.blobs.AccessPolicy
 import play.templates.JavaExtensions
 import services.db.{FilterOneTable, KeyedCaseClass, Schema, Saves}
 import services.blobs.Blobs.Conversions._
-import services.{Utils, Time}
-import services.AppConfig
 import com.google.inject.{Provider, Inject}
 import org.squeryl.Query
+import services._
+import java.awt.image.BufferedImage
 
 
 /**
@@ -126,6 +126,47 @@ case class Celebrity(id: Long = 0,
   /**Creates a new Product associated with the celebrity. The product is not yet persisted. */
   def newProduct: Product = {
     Product(celebrityId=id, services=services.productServices.get)
+  }
+
+  /**
+   * Adds the provided product to the Celebrity's collection of products.
+   * Returns the persisted product.
+   **/
+  def addProduct(name: String,
+                 description: String,
+                 image: BufferedImage,
+                 icon: BufferedImage,
+                 storyTitle: String,
+                 storyText: String): Product =
+  {
+    import ImageUtil.Conversions._
+
+    // Create the product without blobstore images, but don't save.
+    val product = Product(
+      celebrityId=id,
+      priceInCurrency=Product.defaultPrice,
+      name=name,
+      description=description,
+      storyTitle=storyTitle,
+      storyText=storyText,
+      services=services.productServices.get
+    )
+
+    // Prepare the product photo, cropped to the suggested frame
+    val frame = EgraphFrame.suggestedFrame(Dimensions(image.getWidth, image.getHeight))
+    val imageCroppedToFrame = frame.cropImageForFrame(image)
+    // todo(wchan): Jpeg or PNG
+    val imageByteArray = imageCroppedToFrame.asByteArray(ImageAsset.Jpeg)
+
+    // Prepare the product plaque icon, cropped to a square
+    val iconCroppedToSquare = ImageUtil.cropToSquare(icon)
+    val iconBytes = iconCroppedToSquare.asByteArray(ImageAsset.Jpeg)
+
+    // Save the product so it has an ID for blobstore to key on, then add blobstore values and save again
+    val savedWithFrame = product.withFrame(frame).save()
+    val savedWithPhoto = savedWithFrame.withPhoto(imageByteArray).save().product
+
+    savedWithPhoto.withIcon(iconBytes).save().product
   }
 
   def getMostRecentEnrollmentBatch(): Option[EnrollmentBatch] = {

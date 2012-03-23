@@ -35,28 +35,28 @@ Map("celebrityId" -> celebrity.id.toString)
 lookupUrl("WebsiteControllers.postCelebrityProduct", celebrityIdMap)
 }
 
-@formField(id: String,
-label: String,
-inputType: String,
-width: String,
-help: Option[Html] = None,
-hasInputName: Boolean=true) = {
-
-@nameAttribute = {
-@if(hasInputName) {
-name="@id"
-}
-}
-
-<div class="clearfix">
-  <label for="@id">@label</label>
-  <div class="input">
-    <input class="@width" id="@id" @nameAttribute type="@inputType" value="@fields(id)" >
-    @help.map { htmlString =>
-    <span class="help-block">@htmlString</span>
+@formField(
+  id: String,
+  label: String,
+  inputType: String,
+  width: String,
+  help: Option[Html] = None,
+  hasInputName: Boolean=true) = {
+  @nameAttribute = {
+    @if(hasInputName) {
+     name="@id"
     }
+  }
+
+  <div class="clearfix">
+    <label for="@id">@label</label>
+    <div class="input">
+      <input class="@width" id="@id" @nameAttribute type="@inputType" value="@fields(id)" >
+      @help.map { htmlString =>
+      <span class="help-block">@htmlString</span>
+      }
+    </div>
   </div>
-</div>
 }
 
 @body = {
@@ -70,12 +70,53 @@ name="@id"
         <fieldset>
           <legend>Product info</legend>
 
-          @formField(id="productName", label="Product Name", inputType="text", width="span4")
+          @formField(
+            id="productName",
+            label="Product Name",
+            inputType="text",
+            width="span4"
+          )
 
-          @formField(id="productDescription", label="Product Description", inputType="text", width="span4")
-
+          @formField(
+            id="productDescription",
+            label="Product Description",
+            inputType="text",
+            width="span4",
+            help=Some(Html("Will be displayed on the product's page."))
+          )
+        </fieldset>
+        <fieldset>
+          <legend>egraph presentation: media</legend>
           @formField(id="productImage", label="Product Photo", inputType="file", width="span8", help=Some(profileHelp))
           @profileHelp = { Must be JPG or PNG with minimum dimensions of 940x900. Will be cropped. }
+
+          @formField(
+            id="productIcon",
+            label="Product Plaque Icon",
+            inputType="file",
+            width="span8",
+            help=Some(Html("Must be transparent PNG with square dimensions. Will be cropped."))
+          )
+        </fieldset>
+        <fieldset>
+          <legend>egraph presentation: story <a class="customize" href="https://egraphs.jira.com/wiki/display/DEV/Egraph+Page#EgraphPage-HowtoCustomizeTheStory">(Customize)</a></legend>
+          @formField(
+            id="storyTitle",
+            label="Title",
+            inputType="text",
+            width="span4",
+            help=Some(Html("e.g. <em>The Story</em>"))
+          )
+
+          <div class="clearfix">
+            <label for="storyText">Body</label>
+            <div class="input">
+              <textarea class="xlarge" id="storyText" name="storyText" rows="3"></textarea>
+              <span class="help-block">
+                This text will be displayed alongside the egraph when it is viewed by the customer
+              </span>
+            </div>
+          </div>
 
           <div class="actions">
             <button type="submit" id="submit-button" class="btn large primary fade in">Create Product</button>
