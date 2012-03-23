@@ -10,35 +10,40 @@ trait SignatureBiometricService {
 }
 
 /**
- * SignatureBiometricService implementation that hits the configured Xyzmo signature biometric server.
+ * SignatureBiometricService implementation that hits our live Xyzmo server for real Celebrities.
  *
- * IMPORTANT! -- Do not write tests for XyzmoSignatureBiometricService will clobber actual accounts on Xyzmo.
- * We use Celebrity IDs as userIds on Xyzmo.
+ * IMPORTANT! -- Do not write tests for XyzmoProdBiometricServices or XyzmoBetaBiometricServices.
+ * They will clobber live data because we use Celebrity IDs as userIds on Xyzmo.
+ * Instead, XyzmoTestBiometricServices exists for automated tests of live Xyzmo server.
  */
-class XyzmoSignatureBiometricService extends SignatureBiometricService {
-  private val xyzmo = XyzmoBiometricServices
+class XyzmoProdSignatureBiometricService extends SignatureBiometricService {
+  private val prod = XyzmoProdBiometricServices
 
   def enroll(enrollmentBatch: EnrollmentBatch): Either[SignatureBiometricsError, Boolean] = {
-    xyzmo.enroll(enrollmentBatch)
+    prod.enroll(enrollmentBatch)
   }
 
   def verify(egraph: Egraph): Either[SignatureBiometricsError, XyzmoVerifyUser] = {
-    xyzmo.verify(egraph = egraph)
+    prod.verify(egraph = egraph)
   }
 }
 
 /**
- * SignatureBiometricService implementation that hits testlab.xyzmo.com.
+ * SignatureBiometricService implementation that hits our live Xyzmo server for test Celebrities.
+ *
+ * IMPORTANT! -- Do not write tests for XyzmoProdBiometricServices or XyzmoBetaBiometricServices.
+ * They will clobber live data because we use Celebrity IDs as userIds on Xyzmo.
+ * Instead, XyzmoTestBiometricServices exists for automated tests of live Xyzmo server.
  */
-class TestlabXyzmoSignatureBiometricService extends SignatureBiometricService {
-  private val testlab = TestXyzmoBiometricServices
+class XyzmoBetaSignatureBiometricService extends SignatureBiometricService {
+  private val beta = XyzmoBetaBiometricServices
 
   def enroll(enrollmentBatch: EnrollmentBatch): Either[SignatureBiometricsError, Boolean] = {
-    testlab.enroll(enrollmentBatch)
+    beta.enroll(enrollmentBatch)
   }
 
   def verify(egraph: Egraph): Either[SignatureBiometricsError, XyzmoVerifyUser] = {
-    testlab.verify(egraph = egraph)
+    beta.verify(egraph = egraph)
   }
 }
 

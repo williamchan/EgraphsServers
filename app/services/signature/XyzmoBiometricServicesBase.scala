@@ -18,19 +18,19 @@ trait XyzmoBiometricServicesBase {
   protected val domain: String
   protected val host: String
   protected val port: Int = 50200
+  protected val _userIdPrefix: String
 
   def enroll(enrollmentBatch: EnrollmentBatch): Either[SignatureBiometricsError, Boolean] = {
     val enrollmentSamples: List[EnrollmentSample] = enrollmentBatch.getEnrollmentSamples
     val signatureDataContainers: List[String] = for (enrollmentSample <- enrollmentSamples) yield getXyzmoSignatureDataContainer(enrollmentSample)
 
-    val celebrityId: Long = enrollmentBatch.celebrityId
-    val xyzmoDeleteUser: XyzmoDeleteUser = XyzmoBiometricServices.deleteUser(enrollmentBatchId = enrollmentBatch.id, userId = celebrityId.toString)
+    val xyzmoDeleteUser: XyzmoDeleteUser = deleteUser(enrollmentBatch = enrollmentBatch)
     xyzmoDeleteUser.save()
-    val xyzmoAddUser: XyzmoAddUser = addUser(enrollmentBatchId = enrollmentBatch.id, userId = celebrityId.toString)
+    val xyzmoAddUser: XyzmoAddUser = addUser(enrollmentBatch = enrollmentBatch)
     xyzmoAddUser.save()
-    val xyzmoAddProfile: XyzmoAddProfile = addProfile(enrollmentBatchId = enrollmentBatch.id, userId = celebrityId.toString)
+    val xyzmoAddProfile: XyzmoAddProfile = addProfile(enrollmentBatch = enrollmentBatch)
     xyzmoAddProfile.save()
-    val xyzmoEnrollDynamicProfile: XyzmoEnrollDynamicProfile = enrollUser(enrollmentBatchId = enrollmentBatch.id, userId = celebrityId.toString, signatureDataContainers = signatureDataContainers)
+    val xyzmoEnrollDynamicProfile: XyzmoEnrollDynamicProfile = enrollUser(enrollmentBatch = enrollmentBatch, signatureDataContainers = signatureDataContainers)
     xyzmoEnrollDynamicProfile.save()
 
     // todo(wchan): What situations should result in Left(SignatureBiometricsError)?
@@ -41,20 +41,22 @@ trait XyzmoBiometricServicesBase {
   def verify(egraph: Egraph): Either[SignatureBiometricsError, XyzmoVerifyUser] = {
     val signatureJson: String = egraph.assets.signature
 
-    val sdc = XyzmoBiometricServices.getSignatureDataContainerFromJSON(signatureJson)
-    val xyzmoVerifyUser: XyzmoVerifyUser = XyzmoBiometricServices.verifyUser(egraphId = egraph.id, userId = egraph.celebrity.id.toString, sdc)
+    val sdc = getSignatureDataContainerFromJSON(signatureJson)
+    val xyzmoVerifyUser: XyzmoVerifyUser = verifyUser(egraph = egraph, sdc)
     xyzmoVerifyUser.save()
     Right(xyzmoVerifyUser)
   }
 
-  protected[signature] def addUser(enrollmentBatchId: Long, userId: String): XyzmoAddUser = {
+  protected[signature] def addUser(enrollmentBatch: EnrollmentBatch): XyzmoAddUser = {
+    val userId = getUserId(celebrityId = enrollmentBatch.celebrityId)
+
     val user_Add: User_Add_v1 = new User_Add_v1
     user_Add.setBioUserId(userId)
     user_Add.setDisplayName(userId)
     user_Add.setBioUserStatus(BioUserStatus.Active)
     val webServiceUserAndProfile: Option[WebServiceUserAndProfileStub] = getWebServiceUserAndProfileStub
     val user_Add_v1Response: User_Add_v1Response = webServiceUserAndProfile.get.user_Add_v1(user_Add)
-    val xyzmoAddUser: XyzmoAddUser = new XyzmoAddUser(enrollmentBatchId = enrollmentBatchId).withResultBase(user_Add_v1Response.getUser_Add_v1Result)
+    val xyzmoAddUser: XyzmoAddUser = new XyzmoAddUser(enrollmentBatchId = enrollmentBatch.id).withResultBase(user_Add_v1Response.getUser_Add_v1Result)
     if (xyzmoAddUser.baseResult eq WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue) {
       log.info("User_Add_v1 succeeded: User " + userId + " has been created successfully.")
     }
@@ -66,12 +68,14 @@ trait XyzmoBiometricServicesBase {
     xyzmoAddUser
   }
 
-  protected[signature] def deleteUser(enrollmentBatchId: Long, userId: String): XyzmoDeleteUser = {
+  protected[signature] def deleteUser(enrollmentBatch: EnrollmentBatch): XyzmoDeleteUser = {
+    val userId = getUserId(celebrityId = enrollmentBatch.celebrityId)
+
     val user_Delete: User_Delete_v1 = new User_Delete_v1
     user_Delete.setBioUserId(userId)
     val webServiceUserAndProfile: Option[WebServiceUserAndProfileStub] = getWebServiceUserAndProfileStub
     val user_Delete_v1Response: User_Delete_v1Response = webServiceUserAndProfile.get.user_Delete_v1(user_Delete)
-    val xyzmoDeleteUser: XyzmoDeleteUser = new XyzmoDeleteUser(enrollmentBatchId = enrollmentBatchId).withResultBase(user_Delete_v1Response.getUser_Delete_v1Result)
+    val xyzmoDeleteUser: XyzmoDeleteUser = new XyzmoDeleteUser(enrollmentBatchId = enrollmentBatch.id).withResultBase(user_Delete_v1Response.getUser_Delete_v1Result)
     if (xyzmoDeleteUser.baseResult eq WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue) {
       log.info("User_Delete_v1 succeeded: User " + userId + " has been deleted successfully.")
     }
@@ -81,14 +85,16 @@ trait XyzmoBiometricServicesBase {
     xyzmoDeleteUser
   }
 
-  protected[signature] def addProfile(enrollmentBatchId: Long, userId: String): XyzmoAddProfile = {
+  protected[signature] def addProfile(enrollmentBatch: EnrollmentBatch): XyzmoAddProfile = {
+    val userId = getUserId(celebrityId = enrollmentBatch.celebrityId)
+
     val profile_Add: Profile_Add_v1 = new Profile_Add_v1
     profile_Add.setBioUserId(userId)
     profile_Add.setProfileName(userId)
     profile_Add.setProfileType(ProfileType.Dynamic)
     val webServiceUserAndProfile: Option[WebServiceUserAndProfileStub] = getWebServiceUserAndProfileStub
     val profile_Add_v1Response: Profile_Add_v1Response = webServiceUserAndProfile.get.profile_Add_v1(profile_Add)
-    val xyzmoAddProfile: XyzmoAddProfile = new XyzmoAddProfile(enrollmentBatchId = enrollmentBatchId).withProfile_Add_v1Response(profile_Add_v1Response)
+    val xyzmoAddProfile: XyzmoAddProfile = new XyzmoAddProfile(enrollmentBatchId = enrollmentBatch.id).withProfile_Add_v1Response(profile_Add_v1Response)
     if (xyzmoAddProfile.baseResult eq WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue) {
       log.info("Profile_Add_v1 succeeded: profile for " + userId + " has been created successfully.")
     }
@@ -99,7 +105,9 @@ trait XyzmoBiometricServicesBase {
   }
 
   // TODO(wchan): What to do if preceding call to addProfile is done for profileName that already exists?
-  protected[signature] def enrollUser(enrollmentBatchId: Long, userId: String, signatureDataContainers: List[String]): XyzmoEnrollDynamicProfile = {
+  protected[signature] def enrollUser(enrollmentBatch: EnrollmentBatch, signatureDataContainers: List[String]): XyzmoEnrollDynamicProfile = {
+    val userId = getUserId(celebrityId = enrollmentBatch.celebrityId)
+
     val SignatureDataContainerXmlStrArr: WebServiceBiometricPartStub.ArrayOfString = new WebServiceBiometricPartStub.ArrayOfString
     for (sdc <- signatureDataContainers) SignatureDataContainerXmlStrArr.addString(sdc)
     val enrollDynamicProfile: EnrollDynamicProfile_v1 = new EnrollDynamicProfile_v1
@@ -109,7 +117,7 @@ trait XyzmoBiometricServicesBase {
     enrollDynamicProfile.setSignatureDataContainerXmlStrArr(SignatureDataContainerXmlStrArr)
     val webServiceBiometricPart: Option[WebServiceBiometricPartStub] = getWebServiceBiometricPartStub
     val enrollDynamicProfile_v1Response: EnrollDynamicProfile_v1Response = webServiceBiometricPart.get.enrollDynamicProfile_v1(enrollDynamicProfile)
-    val xyzmoEnrollDynamicProfile: XyzmoEnrollDynamicProfile = new XyzmoEnrollDynamicProfile(enrollmentBatchId = enrollmentBatchId).withEnrollDynamicProfile_v1Response(enrollDynamicProfile_v1Response)
+    val xyzmoEnrollDynamicProfile: XyzmoEnrollDynamicProfile = new XyzmoEnrollDynamicProfile(enrollmentBatchId = enrollmentBatch.id).withEnrollDynamicProfile_v1Response(enrollDynamicProfile_v1Response)
     if (xyzmoEnrollDynamicProfile.baseResult eq WebServiceBiometricPartStub.BaseResultEnum.ok.getValue) {
       val enrollResult = xyzmoEnrollDynamicProfile.enrollResult
       log.info("EnrollDynamicProfile_v1: EnrollResult is " + enrollResult.getOrElse(None))
@@ -131,13 +139,15 @@ trait XyzmoBiometricServicesBase {
     xyzmoEnrollDynamicProfile
   }
 
-  protected[signature] def verifyUser(egraphId: Long, userId: String, signatureDCToVerify: String): XyzmoVerifyUser = {
+  protected[signature] def verifyUser(egraph: Egraph, signatureDCToVerify: String): XyzmoVerifyUser = {
+    val userId = getUserId(celebrityId = egraph.celebrity.id)
+
     val verifyUserBySignatureDynamicToDynamic_v1: VerifyUserBySignatureDynamicToDynamic_v1 = new VerifyUserBySignatureDynamicToDynamic_v1
     verifyUserBySignatureDynamicToDynamic_v1.setBioUserId(userId)
     verifyUserBySignatureDynamicToDynamic_v1.setSignatureDataContainerXmlStr(signatureDCToVerify)
     val webServiceBiometricPart: Option[WebServiceBiometricPartStub] = getWebServiceBiometricPartStub
     val verifyUserBySignatureDynamicToDynamic_v1Response: VerifyUserBySignatureDynamicToDynamic_v1Response = webServiceBiometricPart.get.verifyUserBySignatureDynamicToDynamic_v1(verifyUserBySignatureDynamicToDynamic_v1)
-    val xyzmoVerifyUser: XyzmoVerifyUser = new XyzmoVerifyUser(egraphId = egraphId).withVerifyUserBySignatureDynamicToDynamic_v1Response(verifyUserBySignatureDynamicToDynamic_v1Response)
+    val xyzmoVerifyUser: XyzmoVerifyUser = new XyzmoVerifyUser(egraphId = egraph.id).withVerifyUserBySignatureDynamicToDynamic_v1Response(verifyUserBySignatureDynamicToDynamic_v1Response)
     xyzmoVerifyUser
   }
 
@@ -147,6 +157,10 @@ trait XyzmoBiometricServicesBase {
     val sdcFromJSON: Option[SDCFromJSONStub] = getSDCFromJSON
     val getSignatureDataContainerFromJSONResponse: GetSignatureDataContainerFromJSONResponse = sdcFromJSON.get.getSignatureDataContainerFromJSON(json)
     getSignatureDataContainerFromJSONResponse.getGetSignatureDataContainerFromJSONResult
+  }
+
+  final protected[signature] def getUserId(celebrityId: Long): String = {
+    _userIdPrefix + celebrityId.toString
   }
 
   private def getXyzmoSignatureDataContainer(enrollmentSample: EnrollmentSample): String = {

@@ -11,8 +11,8 @@ object SignatureBiometricsModule extends AbstractModule with ScalaModule {
 }
 
 private[signature] class SignatureBiometricsProvider @Inject()(yesmaamImpl: Provider[YesMaamSignatureBiometricService],
-                                                               testlabImpl: Provider[TestlabXyzmoSignatureBiometricService],
-                                                               xyzmoprodImpl: Provider[XyzmoSignatureBiometricService],
+                                                               xyzmoprodImpl: Provider[XyzmoProdSignatureBiometricService],
+                                                               xyzmobetaImpl: Provider[XyzmoBetaSignatureBiometricService],
                                                                utils: Utils)
   extends Provider[SignatureBiometricService] {
 
@@ -21,11 +21,11 @@ private[signature] class SignatureBiometricsProvider @Inject()(yesmaamImpl: Prov
       case "yesmaam" =>
         yesmaamImpl.get()
 
-      case "testlab" =>
-        testlabImpl.get()
-
       case "xyzmoprod" =>
         xyzmoprodImpl.get()
+
+      case "xyzmobeta" =>
+        xyzmobetaImpl.get()
 
       case erroneousValue =>
         throw new IllegalArgumentException(

@@ -10,20 +10,40 @@ trait VoiceBiometricService {
 }
 
 /**
- * Voice biometrics implementation that connects to prod account at VBG's Free Speech engine.
+ * Voice biometrics implementation that connects to prod account at VBG's Free Speech engine for real Celebrities.
  *
- * IMPORTANT! -- Do not write tests for VBGProdFSVoiceBiometricService that will clobber actual accounts on VBG.
- * We use Celebrity IDs as userIds on VBG.
+ * IMPORTANT! -- Do not write tests for VBGProdFreeSpeechBiometricServices or VBGBetaFreeSpeechBiometricServices.
+ * They will clobber live data because we use Celebrity IDs as userIds on VBG.
+ * Instead, VBGTestFreeSpeechBiometricServices exists for automated tests of celebrity-fs-en account.
  */
 class VBGProdFSVoiceBiometricService extends VoiceBiometricService {
-  private val vbg = VBGProdFreeSpeechBiometricServices
+  private val prod = VBGProdFreeSpeechBiometricServices
 
   def enroll(enrollmentBatch: EnrollmentBatch): Either[VoiceBiometricsError, Boolean] = {
-    vbg.enroll(enrollmentBatch)
+    prod.enroll(enrollmentBatch)
   }
 
   def verify(egraph: Egraph): Either[VoiceBiometricsError, VBGVerifySample] = {
-    vbg.verify(egraph)
+    prod.verify(egraph)
+  }
+}
+
+/**
+ * Voice biometrics implementation that connects to prod account at VBG's Free Speech engine for test Celebrities.
+ *
+ * IMPORTANT! -- Do not write tests for VBGProdFreeSpeechBiometricServices or VBGBetaFreeSpeechBiometricServices.
+ * They will clobber live data because we use Celebrity IDs as userIds on VBG.
+ * Instead, VBGTestFreeSpeechBiometricServices exists for automated tests of celebrity-fs-en account.
+ */
+class VBGBetaFSVoiceBiometricService extends VoiceBiometricService {
+  private val beta = VBGBetaFreeSpeechBiometricServices
+
+  def enroll(enrollmentBatch: EnrollmentBatch): Either[VoiceBiometricsError, Boolean] = {
+    beta.enroll(enrollmentBatch)
+  }
+
+  def verify(egraph: Egraph): Either[VoiceBiometricsError, VBGVerifySample] = {
+    beta.verify(egraph)
   }
 }
 
@@ -31,14 +51,14 @@ class VBGProdFSVoiceBiometricService extends VoiceBiometricService {
  * Voice biometrics implementation that connects to dev account at VBG's Free Speech engine.
  */
 class VBGDevFSVoiceBiometricService extends VoiceBiometricService {
-  private val vbg = VBGDevFreeSpeechBiometricServices
+  private val dev = VBGDevFreeSpeechBiometricServices
 
   def enroll(enrollmentBatch: EnrollmentBatch): Either[VoiceBiometricsError, Boolean] = {
-    vbg.enroll(enrollmentBatch)
+    dev.enroll(enrollmentBatch)
   }
 
   def verify(egraph: Egraph): Either[VoiceBiometricsError, VBGVerifySample] = {
-    vbg.verify(egraph)
+    dev.verify(egraph)
   }
 }
 

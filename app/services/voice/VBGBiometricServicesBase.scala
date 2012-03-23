@@ -19,9 +19,10 @@ trait VBGBiometricServicesBase {
   protected val _url: URL
   protected val _myClientName: String
   protected val _myClientKey: String
+  protected val _userIdPrefix: String
 
-  def enroll(enrollmentBatch: EnrollmentBatch, userIdOverride: Option[String] = None): Either[VoiceBiometricsError, Boolean] = {
-    val vbgStartEnrollment: VBGStartEnrollment = startEnrollment(enrollmentBatch, userIdOverride)
+  def enroll(enrollmentBatch: EnrollmentBatch): Either[VoiceBiometricsError, Boolean] = {
+    val vbgStartEnrollment: VBGStartEnrollment = startEnrollment(enrollmentBatch)
     vbgStartEnrollment.save()
     val startEnrollmentError: Option[VoiceBiometricsError] = maybeGetVoiceBiometricsError(vbgStartEnrollment)
     if (startEnrollmentError.isDefined) {
@@ -60,8 +61,13 @@ trait VBGBiometricServicesBase {
     Right(enrollmentSuccessValue)
   }
 
-  def verify(egraph: Egraph, userIdOverride: Option[String] = None): Either[VoiceBiometricsError, VBGVerifySample] = {
-    val vbgStartVerification: VBGStartVerification = sendStartVerificationRequest(egraph, userIdOverride)
+  /**
+   *
+   * @param egraph Egraph to biometrically verify
+   * @return verification result
+   */
+  def verify(egraph: Egraph): Either[VoiceBiometricsError, VBGVerifySample] = {
+    val vbgStartVerification: VBGStartVerification = sendStartVerificationRequest(egraph)
     vbgStartVerification.save()
     val startVerificationError: Option[VoiceBiometricsError] = maybeGetVoiceBiometricsError(vbgStartVerification)
     if (startVerificationError.isDefined) {
@@ -86,51 +92,25 @@ trait VBGBiometricServicesBase {
       vbgFinishVerityTransaction.save()
       Right(vbgVerifySample)
     }
-
-    //    // Begin the verification transaction
-    //    vbg.requestStartVerification(userId).right.flatMap {
-    //      startVerificationResponse =>
-    //        val transactionId = startVerificationResponse.transactionId
-    //
-    //        // Upload the sample and get the verification results
-    //        var success = false
-    //        var score: Long = 0
-    //
-    //        try {
-    //          val errorOrVerification: Either[VoiceBiometricsError, VerifySampleResponse] = vbg.requestVerifySample(transactionId, audio)
-    //          for (verification <- errorOrVerification.right) {
-    //            success = verification.success
-    //            score = verification.score
-    //          }
-    //
-    //          errorOrVerification
-    //        }
-    //        finally {
-    //          // Close out the transaction regardless of outcome
-    //          vbg.requestFinishVerifyTransaction(transactionId, success, score)
-    //        }
-    //    }
   }
 
 
   // ========================== make API calls
 
-  private def startEnrollment(enrollmentBatch: EnrollmentBatch, userIdOverride: Option[String]): VBGStartEnrollment = {
-    val vbgStartEnrollmentFirstAttempt = sendStartEnrollmentRequest(enrollmentBatch = enrollmentBatch, rebuildTemplate = false, userIdOverride)
+  protected[voice] def startEnrollment(enrollmentBatch: EnrollmentBatch): VBGStartEnrollment = {
+    val vbgStartEnrollmentFirstAttempt = sendStartEnrollmentRequest(enrollmentBatch = enrollmentBatch, rebuildTemplate = false)
     if (VoiceBiometricsCode.Success == VoiceBiometricsCode.byCodeString(vbgStartEnrollmentFirstAttempt.errorCode)) {
       // First-time enrollment
       vbgStartEnrollmentFirstAttempt
     } else {
       vbgStartEnrollmentFirstAttempt.save()
       // Re-enrollment
-      sendStartEnrollmentRequest(enrollmentBatch = enrollmentBatch, rebuildTemplate = true, userIdOverride)
+      sendStartEnrollmentRequest(enrollmentBatch = enrollmentBatch, rebuildTemplate = true)
     }
   }
 
-  protected def sendStartEnrollmentRequest(enrollmentBatch: EnrollmentBatch,
-                                           rebuildTemplate: Boolean,
-                                           userIdOverride: Option[String]): VBGStartEnrollment = {
-    val userId = if (userIdOverride.isEmpty) enrollmentBatch.celebrityId.toString else userIdOverride.get
+  protected[voice] def sendStartEnrollmentRequest(enrollmentBatch: EnrollmentBatch, rebuildTemplate: Boolean): VBGStartEnrollment = {
+    val userId = getUserId(celebrityId = enrollmentBatch.celebrityId)
 
     val request = new VBGRequest
     request.setRequestType(VBGRequest._StartEnrollment)
@@ -148,7 +128,7 @@ trait VBGBiometricServicesBase {
     vbgStartEnrollment
   }
 
-  protected def sendAudioCheckRequest(enrollmentBatch: EnrollmentBatch, transactionId: Long, wavBinary: Array[Byte]): VBGAudioCheck = {
+  protected[voice] def sendAudioCheckRequest(enrollmentBatch: EnrollmentBatch, transactionId: Long, wavBinary: Array[Byte]): VBGAudioCheck = {
     val wav8kHzBase64: String = convertWavTo8kHzBase64(wavBinary)
 
     val request = new VBGRequest
@@ -167,7 +147,7 @@ trait VBGBiometricServicesBase {
     vbgAudioCheck
   }
 
-  protected def sendEnrollUserRequest(enrollmentBatch: EnrollmentBatch, transactionId: Long): VBGEnrollUser = {
+  protected[voice] def sendEnrollUserRequest(enrollmentBatch: EnrollmentBatch, transactionId: Long): VBGEnrollUser = {
     val request = new VBGRequest
     request.setRequestType(VBGRequest._EnrollUser)
     request.setParameter(VBGRequest._clientName, _myClientName)
@@ -183,7 +163,7 @@ trait VBGBiometricServicesBase {
     vbgEnrollUser
   }
 
-  protected def sendFinishEnrollTransactionRequest(enrollmentBatch: EnrollmentBatch, transactionId: Long, successValue: Boolean): VBGFinishEnrollTransaction = {
+  protected[voice] def sendFinishEnrollTransactionRequest(enrollmentBatch: EnrollmentBatch, transactionId: Long, successValue: Boolean): VBGFinishEnrollTransaction = {
     val request = new VBGRequest
     request.setRequestType(VBGRequest._FinishTransaction)
     request.setParameter(VBGRequest._clientName, _myClientName)
@@ -198,8 +178,8 @@ trait VBGBiometricServicesBase {
     vbgFinishEnrollTransaction
   }
 
-  protected def sendStartVerificationRequest(egraph: Egraph, userIdOverride: Option[String]): VBGStartVerification = {
-    val userId = if (userIdOverride.isEmpty) egraph.celebrity.id.toString else userIdOverride.get
+  protected[voice] def sendStartVerificationRequest(egraph: Egraph): VBGStartVerification = {
+    val userId = getUserId(celebrityId = egraph.celebrity.id)
 
     val request = new VBGRequest
     request.setRequestType(VBGRequest._StartVerification)
@@ -216,7 +196,7 @@ trait VBGBiometricServicesBase {
     vbgStartVerification
   }
 
-  protected def sendVerifySampleRequest(egraph: Egraph, transactionId: Long): VBGVerifySample = {
+  protected[voice] def sendVerifySampleRequest(egraph: Egraph, transactionId: Long): VBGVerifySample = {
     import services.blobs.Blobs.Conversions._
     val wavBinary: Array[Byte] = egraph.assets.audio.asByteArray
     val voiceSampleBase64_downSampled: String = convertWavTo8kHzBase64(wavBinary)
@@ -241,7 +221,7 @@ trait VBGBiometricServicesBase {
     vbgVerifySample
   }
 
-  protected def sendFinishVerifyTransactionRequest(egraph: Egraph, transactionId: Long, successValue: Boolean, score: Long): VBGFinishVerifyTransaction = {
+  protected[voice] def sendFinishVerifyTransactionRequest(egraph: Egraph, transactionId: Long, successValue: Boolean, score: Long): VBGFinishVerifyTransaction = {
     val request = new VBGRequest
     request.setRequestType(VBGRequest._FinishTransaction)
     request.setParameter(VBGRequest._clientName, _myClientName)
@@ -255,6 +235,10 @@ trait VBGBiometricServicesBase {
     val vbgFinishVerifyTransaction = new VBGFinishVerifyTransaction(egraphId = egraph.id, errorCode = errorCode, vbgTransactionId = transactionId)
 
     vbgFinishVerifyTransaction
+  }
+
+  final protected[voice] def getUserId(celebrityId: Long): String = {
+    _userIdPrefix + celebrityId.toString
   }
 
   //  def requestStartVerification(userId: String): Either[VoiceBiometricsError, StartVerificationResponse] = {
@@ -286,14 +270,14 @@ trait VBGBiometricServicesBase {
   // ========================== HELPERS
 
   // Depends on iPad issue 49.
-  protected[voice] def convertWavTo8kHzBase64(wavBinary: Array[Byte]): String = {
+  final protected[voice] def convertWavTo8kHzBase64(wavBinary: Array[Byte]): String = {
     if (wavBinary.length == 0) return ""
     val wavBinary_8kHz: Array[Byte] = SampleRateConverter.convert(8000f, wavBinary)
     Codec.encodeBASE64(wavBinary_8kHz)
   }
 
   // Referenced http://stackoverflow.com/questions/6381012/java-trouble-combining-more-than-2-wav-files
-  protected[voice] def stitchWAVs(listOfWavBinaries: List[Array[Byte]]): Option[AudioInputStream] = {
+  final protected[voice] def stitchWAVs(listOfWavBinaries: List[Array[Byte]]): Option[AudioInputStream] = {
     if (listOfWavBinaries.length > 1) {
       val audio0: AudioInputStream = AudioSystem.getAudioInputStream(new ByteArrayInputStream(listOfWavBinaries.head))
       val audio1: AudioInputStream = AudioSystem.getAudioInputStream(new ByteArrayInputStream(listOfWavBinaries.tail.head))
@@ -319,7 +303,7 @@ trait VBGBiometricServicesBase {
     }
   }
 
-  protected[voice] def convertAudioInputStreamToByteArray(audioInputStream: AudioInputStream): Array[Byte] = {
+  final protected[voice] def convertAudioInputStreamToByteArray(audioInputStream: AudioInputStream): Array[Byte] = {
     val bas: ByteArrayOutputStream = new ByteArrayOutputStream()
     AudioSystem.write(audioInputStream, javax.sound.sampled.AudioFileFormat.Type.WAVE, bas)
     bas.toByteArray

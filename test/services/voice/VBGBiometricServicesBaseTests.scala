@@ -15,8 +15,9 @@ import org.scalatest.BeforeAndAfterEach
 import utils.{ClearsDatabaseAndValidationAfter, DBTransactionPerTest, TestConstants}
 
 /**
- * IMPORTANT! -- Do not write tests for VBGProdFreeSpeechBiometricServices that will clobber actual accounts on VBG.
- * We use Celebrity IDs as userIds on VBG.
+ * IMPORTANT! -- Do not write tests for VBGProdFreeSpeechBiometricServices or VBGBetaFreeSpeechBiometricServices.
+ * They will clobber live data because we use Celebrity IDs as userIds on VBG.
+ * Instead, VBGTestFreeSpeechBiometricServices exists for automated tests of celebrity-fs-en account.
  */
 class VBGBiometricServicesBaseTests extends UnitFlatSpec
 with ShouldMatchers
@@ -64,6 +65,15 @@ with DBTransactionPerTest {
     Codec.encodeBASE64(MockVBGBiometricServices.convertAudioInputStreamToByteArray(result)) should be(Codec.encodeBASE64(MockVBGBiometricServices.convertAudioInputStreamToByteArray(audioISFromFile)))
   }
 
+  "getUserId" should "prepend _userIdPrefix" in {
+    MockVBGBiometricServices.getUserId(1L) should be("mock1")
+    VBGDevRandomNumberBiometricServices.getUserId(celebrityId = 1L) should be("dev1")
+    VBGDevFreeSpeechBiometricServices.getUserId(celebrityId = 1L) should be("dev1")
+    VBGProdFreeSpeechBiometricServices.getUserId(celebrityId = 1L) should be("prod1")
+    VBGBetaFreeSpeechBiometricServices.getUserId(celebrityId = 1L) should be("beta1")
+    VBGTestFreeSpeechBiometricServices.getUserId(celebrityId = 1L) should be("test1")
+  }
+
   "VBGDevFreeSpeechBiometricServices" should "test end-to-end" in {
     testVBGEnrollAndVerify(VBGDevFreeSpeechBiometricServices)
   }
@@ -71,11 +81,11 @@ with DBTransactionPerTest {
   /**
    * This test costs $0.40 per run.
    */
-  "VBGProdFreeSpeechBiometricServices" should "test end-to-end" in {
-    testVBGEnrollAndVerify(VBGProdFreeSpeechBiometricServices)
+  "VBGTestFreeSpeechBiometricServices" should "test end-to-end" in {
+    testVBGEnrollAndVerify(VBGTestFreeSpeechBiometricServices)
   }
 
-  private def testVBGEnrollAndVerify(vbg: VBGBiometricServicesBase, userIdOverride: Option[String] = Some("testuser")) {
+  private def testVBGEnrollAndVerify(vbg: VBGBiometricServicesBase) {
     val enroll1: Array[Byte] = blobs.getStaticResource("test-files/vbg/enroll1.wav").get.asByteArray
     val enroll2: Array[Byte] = blobs.getStaticResource("test-files/vbg/enroll2.wav").get.asByteArray
     val verifyTrue: Array[Byte] = blobs.getStaticResource("test-files/vbg/verify_true.wav").get.asByteArray
@@ -85,7 +95,7 @@ with DBTransactionPerTest {
     val enrollmentBatch: EnrollmentBatch = EnrollmentBatch(celebrityId = celebrity.id).save()
     EnrollmentSample(enrollmentBatchId = enrollmentBatch.id).save(signatureStr = TestConstants.signatureStr, voiceStr = Codec.encodeBASE64(enroll1))
     EnrollmentSample(enrollmentBatchId = enrollmentBatch.id).save(signatureStr = TestConstants.signatureStr, voiceStr = Codec.encodeBASE64(enroll2))
-    val enrollResult: Either[VoiceBiometricsError, Boolean] = vbg.enroll(enrollmentBatch, userIdOverride)
+    val enrollResult: Either[VoiceBiometricsError, Boolean] = vbg.enroll(enrollmentBatch)
     enrollResult.right.get should be(true)
 
     val customer = TestData.newSavedCustomer()
@@ -93,11 +103,11 @@ with DBTransactionPerTest {
     val order = customer.buy(product).save()
 
     val egraphVerifyTrue: Egraph = Egraph(orderId = order.id).withAssets(signature = TestConstants.signatureStr, message = None, audio = verifyTrue).save()
-    val verifyResultTrue: Either[VoiceBiometricsError, VBGVerifySample] = vbg.verify(egraphVerifyTrue, userIdOverride)
+    val verifyResultTrue: Either[VoiceBiometricsError, VBGVerifySample] = vbg.verify(egraphVerifyTrue)
     verifyResultTrue.right.get.success.get should be(true)
 
     val egraphVerifyFalse: Egraph = Egraph(orderId = order.id).withAssets(signature = TestConstants.signatureStr, message = None, audio = verifyFalse).save()
-    val verifyResultFalse: Either[VoiceBiometricsError, VBGVerifySample] = vbg.verify(egraphVerifyFalse, userIdOverride)
+    val verifyResultFalse: Either[VoiceBiometricsError, VBGVerifySample] = vbg.verify(egraphVerifyFalse)
     verifyResultFalse.right.get.success.get should be(false)
   }
 
