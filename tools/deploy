@@ -13,8 +13,23 @@
 DEPLOY_TARGET=$1
 
 case "$DEPLOY_TARGET" in
-  'live'|'demo'|'staging')
-    # All these options are OK
+  'live')
+    # Check to make super-d-duper sure they want to deploy to live.
+    echo ""
+    echo "YOU ARE ABOUT TO DEPLOY TO THE PRODUCTION SERVER."
+    printf "If this is what you wanted, type \e[00;32mYes\e[00m, press enter, and pray.\n"
+    read -e \
+         -p ">> " \
+         YES_DEPLOY
+
+    if [ "$YES_DEPLOY" != "Yes" ]; then
+        echo "Guess you didn't want to deploy to live after all."
+        exit 2
+    fi
+
+    ;;
+  'demo'|'staging')
+    # It's always ok to deploy to demo and staging.
 	;;
   *)
 	# Error us out -- no valid deployment target
