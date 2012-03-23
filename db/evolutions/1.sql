@@ -62,13 +62,17 @@ create unique index idx429d071a on Account (customerId);
 create unique index idx48fd076b on Account (celebrityId);
 create table Product (
     priceInCurrency decimal(21, 6) not null,
+    _iconKey varchar(128),
     name varchar(128) not null,
     urlSlug varchar(128) not null,
     description varchar(128) not null,
+    storyTitle varchar(128) not null,
     photoKey varchar(128),
     id bigint primary key not null,
     updated timestamp not null,
     celebrityId bigint not null,
+    storyText text not null,
+    _defaultFrameName varchar(128) not null,
     created timestamp not null
   );
 create sequence s_Product_id;
