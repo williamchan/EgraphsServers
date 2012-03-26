@@ -36,6 +36,7 @@ GET     /                                       WebsiteControllers.getRootEndpoi
 # For Alpha-phase prod mode:
 
 GET     /test/script                            nonproduction.TestControllers.script
+GET     /test/create-test-orders                nonproduction.TestControllers.createTestOrders
 GET     /test/files/{<.*>blobKey}               WebsiteControllers.getBlob
 
 # Map static resources from the /app/public folder to the /public path

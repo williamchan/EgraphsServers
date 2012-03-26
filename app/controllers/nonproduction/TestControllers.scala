@@ -14,6 +14,9 @@ object TestControllers extends Controller
 with DBTransaction {
   val blobs = AppConfig.instance[Blobs]
   val schema = AppConfig.instance[Schema]
+  val accountServices = AppConfig.instance[AccountServices]
+  val celebrityServices = AppConfig.instance[CelebrityServices]
+  val customerServices = AppConfig.instance[CustomerServices]
 
   def getHardwiredEgraphPage() = {
     val testFrame = LandscapeEgraphFrame
@@ -98,5 +101,52 @@ with DBTransaction {
 //    println(startEnrollmentRequest.getResponseValue("errorcode"))
 //    sjson.json.Serializer.SJSON.toJSON(Map("bees.api.name" -> Play.configuration.getProperty("bees.api.name")))
     new jobs.EnrollmentBatchJob().now()
+  }
+
+  def createTestOrders(msg: String) = {
+    var results = List.empty[String]
+
+    val celebrityEmails = List(
+      "erem@egraphs.com",
+      "andrew@egraphs.com",
+      "david@egraphs.com",
+      "eric@egraphs.com",
+      "will@egraphs.com",
+      "zachapter@gmail.com",
+      "bauld@raysbaseball.com",
+      "mkalt@raysbaseball.com",
+      "msilverman@raysbaseball.com",
+      "gabe@egraphs.com",
+      "gunter@egraphs.com",
+      "j@egraphs.com")
+
+    for (email <- celebrityEmails) {
+      val account = accountServices.accountStore.findByEmail(email)
+      if (account.isEmpty) {
+        results = ("\"Unable to find Account " + email + "\"") :: results
+      } else {
+        val celebrity = celebrityServices.store.findById(account.get.celebrityId.get)
+        results = (orderFromCelebrity(celebrity = celebrity.get, celebrityEmail = email, msg = msg, numOrders = 5)) :: results
+      }
+    }
+
+    Json("[" + results.mkString(",") + "]")
+  }
+
+  private def orderFromCelebrity(celebrity: Celebrity, celebrityEmail: String, msg: String, numOrders: Int): String = {
+    val product = celebrity.products().headOption
+    if (product.isEmpty) {
+      "\"No products found for celebrity " + celebrity.publicName + "\""
+    } else {
+      val buyer = customerServices.customerStore.findOrCreateByEmail(celebrityEmail)
+      for (i <- 0 until 5) {
+        buyer.buy(product.get, buyer).copy(
+          recipientName=celebrityEmail,
+          messageToCelebrity=Some(msg),
+          requestedMessage=Some(msg)
+        ).save()
+      }
+      "\"Created " + numOrders + " orders for celebrity " + celebrity.publicName.get + "\""
+    }
   }
 }
