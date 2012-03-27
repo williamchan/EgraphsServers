@@ -38,22 +38,34 @@
       <th>Last</th>
       <th>Enrollment Status</th>
       <th>Products</th>
+      <th>Orders</th>
+      <th>Egraphs</th>
     </tr>
-    @celebrityAccounts.map { (celebrityAccount) =>
+    @celebrityAccounts.map { case (celebrity, account) =>
     <tr>
-      <td>@celebrityAccount._1.id</td>
-      <td>@celebrityAccount._2.email</td>
+      <td>@celebrity.id</td>
+      <td>@account.email</td>
       <td>
-        <a class="preview-link" href="/@celebrityAccount._1.urlSlug">
-          @celebrityAccount._1.publicName
+        <a class="preview-link" href="/@celebrity.urlSlug">
+          @celebrity.publicName
         </a>
       </td>
-      <td>@celebrityAccount._1.firstName</td>
-      <td>@celebrityAccount._1.lastName</td>
-      <td>@celebrityAccount._1.enrollmentStatusValue</td>
+      <td>@celebrity.firstName</td>
+      <td>@celebrity.lastName</td>
+      <td>@celebrity.enrollmentStatusValue</td>
       <td>
-        <a class="preview-link" href="/admin/celebrities/@celebrityAccount._1.id/products">
-        View Products
+        <a class="preview-link" href="/admin/celebrities/@celebrity.id/products">
+        Products
+        </a>
+      </td>
+      <td>
+        <a class="preview-link" href="/admin/celebrities/@celebrity.id/orders">
+          Orders
+        </a>
+      </td>
+      <td>
+        <a class="preview-link" href="/admin/celebrities/@celebrity.id/egraphs">
+          Egraphs
         </a>
       </td>
     </tr>

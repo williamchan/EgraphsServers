@@ -263,6 +263,7 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
       (c, a) =>
         where (c.id === a.celebrityId)
         select(c, a)
+        orderBy(c.id asc)
     )
     celebrityAccounts
   }

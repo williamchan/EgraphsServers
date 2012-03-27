@@ -1,0 +1,52 @@
+@(celebrity: models.Celebrity, orders: Iterable[models.Order])
+
+@import controllers.WebsiteControllers
+@import services.Utils.lookupUrl
+
+@import services.Finance.TypeConversions._
+
+@content_base(title="Admin - Orders", body=body, head=head)
+
+@head = {
+<script src='@asset("public/twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
+}
+
+@body = {
+<div class="admin-content">
+  <h2>
+    @celebrity.publicName's Orders - @orders.size total
+  </h2>
+  <table>
+    <tr>
+      <th>Id</th>
+      <th>Product</th>
+      <th>Buyer</th>
+      <th>Recipient</th>
+      <th>Payment State</th>
+      <th>Txn Id</th>
+      <th>Price</th>
+      <th>Msg to Celebrity</th>
+      <th>Requested Msg</th>
+      <!--<th>Egraph</th>-->
+    </tr>
+    @orders.map { (order) =>
+    <tr>
+      <td>@order.id</td>
+      <td>@order.productId</td>
+      <td>@order.buyerId</td>
+      <td>@order.recipientName</td>
+      <td>@order.paymentStateString</td>
+      <td>@order.transactionId.getOrElse("")</td>
+      <td>@order.amountPaid.formatSimply</td>
+      <td>@order.messageToCelebrity.getOrElse("")</td>
+      <td>@order.requestedMessage.getOrElse("")</td>
+      <!--<td>-->
+        <!--<a class="preview-link" href="/egraph/@order.id">-->
+          <!--View Egraph-->
+        <!--</a>-->
+      <!--</td>-->
+    </tr>
+    }
+  </table>
+</div>
+}

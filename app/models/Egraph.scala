@@ -16,6 +16,8 @@ import controllers.WebsiteControllers
 import controllers.website.GetCelebrityProductEndpoint
 import com.google.inject.{Provider, Inject}
 import play.utils.HTML
+import org.squeryl.Query
+import org.squeryl.PrimitiveTypeMode._
 
 case class EgraphServices @Inject() (
   store: EgraphStore,
@@ -72,11 +74,11 @@ case class Egraph(
       services=services.storyServicesProvider.get()
     )
   }
-  
+
   def save(): Egraph = {
     services.store.save(this)
   }
-  
+
   def withAssets(signature: String, message: Option[String] = None, audio: Array[Byte]): EgraphWithAssets = {
     EgraphWithAssets(this, signature, message, audio)
   }
@@ -85,7 +87,7 @@ case class Egraph(
   def order: Order = {
     services.orderStore.get(orderId)
   }
-    
+
   /**
    * Saves the entity without updating the assets. IT IS AN ERROR to call this
    * method on an Egraph that is being persisted for the first time. Only use
@@ -273,7 +275,7 @@ case class Egraph(
 
 /**
  * Service interfaces used by the EgraphStory.
- * 
+ *
  * @param templateEngine the templating engine used to provide user-side templating.
  */
 case class EgraphStoryServices @Inject() (templateEngine: TemplateEngine)
@@ -294,19 +296,19 @@ object EgraphStoryField extends Utils.Enum {
 
   /** Public name of the celebrity */
   val CelebrityName = new EnumVal { val name = "signer_name" }
-  
+
   /**
    * Begins a link to the celebrity's page. Must be closed by an
    * [[models.EgraphStoryField.FinishLink]]
    * */
   val StartCelebrityLink = new EnumVal { val name = "signer_link"}
-  
+
   /** Name of the person receiving the egraph */
   val RecipientName = new EnumVal { val name = "recipient_name"}
-  
+
   /** Name of the product being sold */
   val ProductName = new EnumVal { val name = "product_name"}
-  
+
   /**
    * Begins a link to the photographic product. Must be closed by a
    * [[models.EgraphStoryField.FinishLink]]
@@ -325,9 +327,9 @@ object EgraphStoryField extends Utils.Enum {
 
 /**
  * Represents the story of an egraph, as presented on the egraph page.
- * 
+ *
  * @param titleTemplate title template as specified on the [[models.Product]]
- * @param bodyTemplate title template as specified on the [[models.bodyTemplate]] 
+ * @param bodyTemplate title template as specified on the [[models.bodyTemplate]]
  * @param celebName the celebrity's public name
  * @param celebUrlSlug see [[models.Celebrity.urlSlug]]
  * @param recipientName name of the [[models.Customer]] receiving the egraph.
@@ -363,7 +365,7 @@ case class EgraphStory(
   def body: String = {
     services.templateEngine.evaluate(htmlEscape(bodyTemplate), templateParams)
   }
-  
+
   //
   // Private methods
   //
@@ -444,14 +446,35 @@ trait EgraphAssets {
 }
 
 class EgraphStore @Inject() (schema: Schema) extends Saves[Egraph] with SavesCreatedUpdated[Egraph] {
+
+  def getEgraphsAndResults: Query[(Egraph, VBGVerifySample, XyzmoVerifyUser)] = {
+    val egraphsAndResults: Query[(Egraph, VBGVerifySample, XyzmoVerifyUser)] = from(schema.egraphs, schema.vbgVerifySampleTable, schema.xyzmoVerifyUserTable)(
+      (egraph, vbgVerifySample, xyzmoVerifyUser) =>
+        where (egraph.id === vbgVerifySample.egraphId and egraph.id === xyzmoVerifyUser.egraphId)
+          select(egraph, vbgVerifySample, xyzmoVerifyUser)
+          orderBy(egraph.id asc)
+    )
+    egraphsAndResults
+  }
+
+  def getCelebrityEgraphsAndResults(celebrity: Celebrity): Query[(Egraph, VBGVerifySample, XyzmoVerifyUser)] = {
+    val celebrityId = celebrity.id
+    val celebrityEgraphsAndResults: Query[(Egraph, VBGVerifySample, XyzmoVerifyUser)] = from(schema.egraphs, schema.vbgVerifySampleTable, schema.xyzmoVerifyUserTable, schema.orders, schema.products)(
+      (egraph, vbgVerifySample, xyzmoVerifyUser, order, product) =>
+        where (egraph.orderId === order.id and order.productId === product.id and product.celebrityId === celebrityId
+          and egraph.id === vbgVerifySample.egraphId and egraph.id === xyzmoVerifyUser.egraphId)
+          select(egraph, vbgVerifySample, xyzmoVerifyUser)
+          orderBy(egraph.id asc)
+    )
+    celebrityEgraphsAndResults
+  }
+
   //
   // Saves[Egraph] methods
   //
   override val table = schema.egraphs
 
   override def defineUpdate(theOld: Egraph, theNew: Egraph) = {
-    import org.squeryl.PrimitiveTypeMode._
-
     updateIs(
       theOld.orderId := theNew.orderId,
       theOld.stateValue := theNew.stateValue,
@@ -572,7 +595,7 @@ sealed trait EgraphFrame {
     val originalWidth = image.getWidth.toDouble
     val originalHeight = image.getHeight.toDouble
     val originalAspectRatio = originalWidth / originalHeight
-    
+
     val cropDimensions = if (originalAspectRatio < targetAspectRatio) {
       // the original is too tall. Use all of width and limit height.
       Dimensions(width=originalWidth.toInt, height=(originalWidth / targetAspectRatio).toInt)

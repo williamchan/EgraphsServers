@@ -29,6 +29,10 @@ object WebsiteControllers extends Controller
   with GetCreateCelebrityProductEndpoint
   with GetCelebrityProductsEndpoint
   with PostCelebrityProductEndpoint
+  with GetEgraphsEndpoint
+  with GetCelebrityEgraphsEndpoint
+  with GetCelebrityOrdersEndpoint
+
   with DBTransaction {
 
   import services.AppConfig.instance
@@ -44,6 +48,7 @@ object WebsiteControllers extends Controller
   override protected val accountStore = instance[AccountStore]
   override protected val celebrityStore = instance[CelebrityStore]
   override protected val customerStore = instance[CustomerStore]
+  override protected val egraphStore = instance[EgraphStore]
   override protected val orderStore = instance[OrderStore]
   override protected val productStore = instance[ProductStore]
 
