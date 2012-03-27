@@ -13,6 +13,7 @@ import javax.imageio.stream.ImageInputStream
 import javax.imageio.{ImageReader, ImageIO}
 
 @Inject() class ImageUtil {
+  import ImageUtil._
 
   // TODO(wchan): Why does it run out of memory above 5?
   val scaleFactor = 2.5
@@ -258,9 +259,7 @@ import javax.imageio.{ImageReader, ImageIO}
       targetWidth <= img.getWidth && targetHeight <= img.getHeight,
       "This method should only be used for down-scaling an image"
     )
-    val imgType = if (img.getTransparency == Transparency.OPAQUE)
-      BufferedImage.TYPE_INT_RGB
-    else BufferedImage.TYPE_INT_ARGB
+    val imgType = derivativeImageTypeFromSourceImage(img)
     var ret: BufferedImage = img
     var w: Int = 0
     var h: Int = 0
@@ -329,6 +328,7 @@ object ImageUtil {
         None
     }
   }
+
   def getDimensions(imageFile: File): Option[Dimensions] = {
     if (imageFile == null || imageFile.length() == 0) return None
 
@@ -368,7 +368,11 @@ object ImageUtil {
   }
 
   def crop(originalImage: BufferedImage, cropDimensions: Dimensions): BufferedImage = {
-    val croppedImage: BufferedImage = new BufferedImage(cropDimensions.width, cropDimensions.height, BufferedImage.TYPE_INT_RGB)
+    val croppedImage = new BufferedImage(
+      cropDimensions.width,
+      cropDimensions.height,
+      derivativeImageTypeFromSourceImage(originalImage)
+    )
     val g: Graphics = croppedImage.getGraphics
     g.drawImage(originalImage, 0, 0, null)
     croppedImage
@@ -380,6 +384,20 @@ object ImageUtil {
       else ys.max
     )
     if (maxYs.isEmpty) None else Some(maxYs.max)
+  }
+
+  /**
+   * Returns the BufferedImage.TYPE_ value that should be used when making a derivative image of some
+   * image that already exists (e.g., if resizing or cropping the image)
+   *
+   * @param image the source image from which some new image will be derived
+   * @return the type the new BufferedImage should use.
+   */
+  private def derivativeImageTypeFromSourceImage(image: BufferedImage): Int = {
+    image.getTransparency match {
+      case Transparency.OPAQUE => BufferedImage.TYPE_INT_RGB
+      case _ => BufferedImage.TYPE_INT_ARGB
+    }
   }
 
   object Conversions {

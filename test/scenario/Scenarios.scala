@@ -95,33 +95,31 @@ class Scenarios extends DeclaresScenarios {
     {() =>
       val will = Scenarios.getWillCelebrityAccount
 
-      val product1 = will.newProduct.copy(
-        priceInCurrency=10,
+      val photoImage = Product().defaultPhoto.renderFromMaster
+      val iconImage = Product().defaultIcon.renderFromMaster
+
+      will.addProduct(
         name="2010 Starcraft 2 Championships",
         description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one.",
+        priceInCurrency=10,
+        image=photoImage,
+        icon=iconImage,
         storyTitle="The story and the glory",
         storyText="{signer_link}{signer_name}{end_link} was born on top. He proved it to the world at the {product_link}{product_name}{end_link}. A few days afterwards he got a note from {recipient_name} on his iPad. This was his response."
       )
 
-      val product2 = will.newProduct.copy(
-        priceInCurrency=70,
+      will.addProduct(
         name="2011 King of Pweens Competition",
         description="In classic form, Wizzle dominated the competition and left mouths agape.",
+        priceInCurrency=70,
         storyTitle="The story and the glory",
+        image=photoImage,
+        icon=iconImage,
         storyText="""
            {signer_link}{signer_name}{end_link} was born on top. On {date_signed}
            he proved it to {recipient_name}.
            """
       )
-      
-      import services.ImageUtil.Conversions._
-      val image = product1.defaultPhoto.renderFromMaster
-      val frame = EgraphFrame.suggestedFrame(Dimensions(image.getWidth, image.getHeight))
-      val croppedImage = frame.cropImageForFrame(image)
-      val croppedImageBytes = croppedImage.asByteArray(ImageAsset.Jpeg)
-
-      product1.save().withFrame(frame).withPhoto(croppedImageBytes).save()
-      product2.save().withFrame(frame).withPhoto(croppedImageBytes).save()
     }
   )
 

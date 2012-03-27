@@ -123,6 +123,13 @@ with ShouldMatchers {
     croppedImage.getWidth should be (200)
     croppedImage.getHeight should be (200)
   }
+  
+  it should "retain an image's alpha layer" in {
+    val originalImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB)
+    val cropped = ImageUtil.crop(originalImage, Dimensions(50, 50))
+
+    cropped.getType should be (BufferedImage.TYPE_INT_ARGB)
+  }
 
   "getMaxDouble" should "get Max in list of list of Doubles" in {
     ImageUtil.getMaxDouble(List()) should be(None)

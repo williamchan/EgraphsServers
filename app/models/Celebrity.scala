@@ -134,6 +134,7 @@ case class Celebrity(id: Long = 0,
    **/
   def addProduct(name: String,
                  description: String,
+                 priceInCurrency: BigDecimal=Product.defaultPrice,
                  image: BufferedImage,
                  icon: BufferedImage,
                  storyTitle: String,
@@ -144,7 +145,7 @@ case class Celebrity(id: Long = 0,
     // Create the product without blobstore images, but don't save.
     val product = Product(
       celebrityId=id,
-      priceInCurrency=Product.defaultPrice,
+      priceInCurrency=priceInCurrency,
       name=name,
       description=description,
       storyTitle=storyTitle,
