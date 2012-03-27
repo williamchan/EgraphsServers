@@ -28,6 +28,13 @@ git pull
 # Checkout the latest demo tag
 tools/checkout-latest-local-demo-tag
 
-# Update dependencies by clearing old ones then updating new ones.
+# Update code dependencies by clearing old ones then updating new ones.
 play dependencies --sync
 play dependencies
+
+# Annihilate the old database -- the application will re-create it from scratch when it
+# rebuilds
+psql \
+    --command='DROP SCHEMA public CASCADE; CREATE SCHEMA public AUTHORIZATION postgres;' \
+    egraphs \
+    root
