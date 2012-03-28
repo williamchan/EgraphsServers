@@ -4,7 +4,7 @@ import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.BeforeAndAfterEach
 import play.test.UnitFlatSpec
 import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationAfter, CreatedUpdatedEntityTests, SavingEntityTests, TestData}
-import services.AppConfig
+import services.{Time, AppConfig}
 
 class CustomerTests extends UnitFlatSpec
   with ShouldMatchers
@@ -57,5 +57,15 @@ class CustomerTests extends UnitFlatSpec
     val buyer = TestData.newSavedCustomer()
 
     buyer.buy(Product()).recipientId should be (buyer.id)
+  }
+
+  "findOrCreateByEmail" should "find or create as appropriate" in {
+    val acct = Account(email = "customer-" + Time.toBlobstoreFormat(Time.now) + "@egraphs.com").save()
+    acct.customerId should be(None)
+    val customer = customerStore.findOrCreateByEmail(acct.email)
+
+    val updatedAcct = acct.services.accountStore.findById(acct.id).get
+    customer.id should be(updatedAcct.customerId.get)
+    customerStore.findOrCreateByEmail(acct.email) should be(customer)
   }
 }

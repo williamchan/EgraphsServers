@@ -57,9 +57,6 @@ class OrderTests extends UnitFlatSpec
   // Test cases
   //
   "An order" should "create Egraphs that are properly configured" in {
-    val signature = "derp".getBytes
-    val audio = "derp".getBytes
-
     val egraph = Order(id=100L).newEgraph
 
     egraph.orderId should be (100L)
@@ -137,7 +134,7 @@ class OrderTests extends UnitFlatSpec
   
   "findByCelebrity" should "find all of a Celebrity's orders by default" in {
 
-    val (will, recipient, celebrity, product) = newOrderStack
+    val (will, _, celebrity, product) = newOrderStack
 
     val (firstOrder, secondOrder, thirdOrder) = (
       will.buy(product).save(),

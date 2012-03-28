@@ -23,6 +23,8 @@ object WebsiteControllers extends Controller
   with GetOrderConfirmationEndpoint
 
   // admin endpoints
+  with GetAdminLoginEndpoint
+  with PostAdminLoginEndpoint
   with GetCelebritiesEndpoint
   with GetCreateCelebrityEndpoint
   with PostCelebrityEndpoint
@@ -46,6 +48,7 @@ object WebsiteControllers extends Controller
   override protected val payment = instance[Payment]
 
   override protected val accountStore = instance[AccountStore]
+  override protected val administratorStore = instance[AdministratorStore]
   override protected val celebrityStore = instance[CelebrityStore]
   override protected val customerStore = instance[CustomerStore]
   override protected val egraphStore = instance[EgraphStore]

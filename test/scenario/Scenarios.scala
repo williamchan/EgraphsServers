@@ -25,12 +25,13 @@ class Scenarios extends DeclaresScenarios {
   val schema = AppConfig.instance[Schema]
 
   // Categories of scenario
+  val adminCategory = "Admin Helpers"
   val apiCategory = "API Helpers"
   val celebrityPageCategory = "Celebrity Page"
   val productPageCategory = "Product Page"
   val orderConfirmationPageCategory = "Order Confirmation Page"
   val egraphPageCategory = "Egraph Page"
-  
+
   val mail = AppConfig.instance[services.mail.Mail]
 
   toScenarios add Scenario(
@@ -396,30 +397,45 @@ class Scenarios extends DeclaresScenarios {
   )
 
   toScenarios add Scenario(
-      "Valid, ordered Egraph",
+    "Valid, ordered Egraph",
 
-      egraphPageCategory,
+    egraphPageCategory,
 
-      """
-      Creates a signed Egraph and views its page
-      """,
+    """
+    Creates a signed Egraph and views its page
+    """,
 
-      {() =>
-        Scenario.clearAll()
+    {() =>
+      Scenario.clearAll()
 
-        Scenario.play(
-          "Will-Chan-is-a-celebrity",
-          "Will-has-two-products",
-          "Erem-is-a-customer",
-          "Erem-buys-Wills-two-products-twice-each",
-          "Will-fulfills-one-of-Erems-product-orders"
-        )
+      Scenario.play(
+        "Will-Chan-is-a-celebrity",
+        "Will-has-two-products",
+        "Erem-is-a-customer",
+        "Erem-buys-Wills-two-products-twice-each",
+        "Will-fulfills-one-of-Erems-product-orders"
+      )
 
-        new Redirect(
-          WebsiteControllers.lookupGetEgraph(1).url
-        )
-      }
-    )
+      new Redirect(
+        WebsiteControllers.lookupGetEgraph(1).url
+      )
+    }
+  )
+
+  toScenarios add Scenario(
+    "Create Admin",
+    adminCategory,
+    """
+    Creates an Administrator at admin@egraphs.com/password
+    """,
+
+    {() =>
+      Scenario.clearAll()
+
+      val administrator = Administrator().save()
+      Account(email="admin@egraphs.com", administratorId = Some(administrator.id)).withPassword("derp").right.get.save()
+    }
+  )
 
   private[this] def redirectToWizzle = {
     new Redirect(

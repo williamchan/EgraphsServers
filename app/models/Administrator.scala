@@ -4,17 +4,14 @@ import java.sql.Timestamp
 import org.squeryl.PrimitiveTypeMode._
 import services.db.{KeyedCaseClass, Saves, Schema}
 import com.google.inject.Inject
-import services.{AppConfig, Time}
+import services.{Utils, AppConfig, Time}
 
 /**
  * Persistent entity representing administrators of our service.
  */
 case class Administrator(
   id: Long = 0L,
-  // This is currently a meaningless field that exists so that
-  // we can pass SavingEntityTests. Get rid of it once we have
-  // some Administrator-specific data.
-  role: Option[String] = None,
+  role: Option[String] = Some(AdminRole.Superuser.value),
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: AdministratorServices = AppConfig.instance[AdministratorServices]
@@ -26,9 +23,34 @@ case class Administrator(
   }
 }
 
-case class AdministratorServices @Inject() (store: AdministratorStore)
+case class AdministratorServices @Inject()(store: AdministratorStore, accountStore: AccountStore)
 
-class AdministratorStore @Inject() (schema: Schema) extends Saves[Administrator] with SavesCreatedUpdated[Administrator] {
+class AdministratorStore @Inject()(schema: Schema, accountStore: AccountStore) extends Saves[Administrator] with SavesCreatedUpdated[Administrator] {
+
+  def authenticate(email: String, passwordAttempt: String): Option[Administrator] = {
+    val authenticationResult: Either[AccountAuthenticationError, Account] = accountStore.authenticate(email = email, passwordAttempt = passwordAttempt)
+
+    val administrator = if (authenticationResult.isRight) {
+      val account = authenticationResult.right.get
+      if (account.administratorId.isDefined) findById(account.administratorId.get) else None
+    } else {
+      None
+    }
+    administrator
+  }
+
+  def findByEmail(email: String): Option[Administrator] = {
+    val accountOption = accountStore.findByEmail(email)
+    val adminOption = accountOption.flatMap {
+      account =>
+        account.administratorId.flatMap {
+          administratorId =>
+            findById(administratorId)
+        }
+    }
+    adminOption
+  }
+
   //
   // Saves[Administrator] methods
   //
@@ -50,3 +72,18 @@ class AdministratorStore @Inject() (schema: Schema) extends Saves[Administrator]
   }
 }
 
+abstract sealed class AdminRole(val value: String)
+
+object AdminRole {
+  case object Superuser extends AdminRole("Superuser")
+  case object AdminDisabled extends AdminRole("AdminDisabled")
+
+  private val states = Utils.toMap[String, AdminRole](Seq(
+    Superuser,
+    AdminDisabled
+  ), key=(theState) => theState.value)
+
+  def apply(value: String) = {
+    states(value)
+  }
+}
