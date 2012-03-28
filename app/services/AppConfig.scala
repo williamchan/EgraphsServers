@@ -80,10 +80,3 @@ object AppConfig {
     injector.instance[T]
   }
 }
-
-/** Callable object shortcut to AppConfig.instance */
-object Instance {
-  def apply[T: Manifest]: T = {
-    AppConfig.instance[T]
-  }
-}

@@ -12,10 +12,12 @@ import services.blobs.Blobs.Conversions._
 import java.io.File
 import services.{ImageUtil, Utils}
 import org.apache.commons.mail.SimpleEmail
+import services.http.ControllerMethod
 
 trait PostCelebrityEndpoint {
   this: Controller =>
 
+  protected def controllerMethod: ControllerMethod
   protected def mail: Mail
   protected def celebrityStore: CelebrityStore
   protected def accountStore: AccountStore
@@ -32,7 +34,7 @@ trait PostCelebrityEndpoint {
                     lastName: String,
                     publicName: String,
                     description: String,
-                    profileImage: Option[File] = None): Redirect = {
+                    profileImage: Option[File] = None): Redirect = controllerMethod() {
     val publicNameStr = if (publicName.isEmpty) firstName + " " + lastName else publicName
     val celebrity = new Celebrity(firstName = Utils.toOption(firstName),
       lastName = Utils.toOption(lastName),

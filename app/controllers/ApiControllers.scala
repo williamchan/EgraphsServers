@@ -2,8 +2,8 @@ package controllers
 
 import api._
 import play.mvc.Controller
-import services.http.{OrderRequestFilters, CelebrityAccountRequestFilters, DBTransaction}
 import models.{OrderQueryFilters, EnrollmentBatchServices, OrderStore}
+import services.http.{ControllerMethod, OrderRequestFilters, CelebrityAccountRequestFilters}
 
 object ApiControllers extends Controller
   with GetCelebrityEnrollmentTemplateApiEndpoint
@@ -12,10 +12,10 @@ object ApiControllers extends Controller
   with GetCelebrityOrdersApiEndpoint
   with PostEgraphApiEndpoint
   with PostEnrollmentSampleApiEndpoint
-  with DBTransaction
 {
   import services.AppConfig.instance
 
+  override protected def controllerMethod = instance[ControllerMethod]
   override protected def orderStore = instance[OrderStore]
   override protected def orderQueryFilters = instance[OrderQueryFilters]
   override protected def enrollmentBatchServices = instance[EnrollmentBatchServices]

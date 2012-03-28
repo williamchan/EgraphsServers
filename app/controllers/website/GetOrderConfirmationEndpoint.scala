@@ -3,6 +3,7 @@ package controllers.website
 import play.mvc.Controller
 
 import models._
+import services.http.ControllerMethod
 
 /**
  * Serves the page confirming that an Egraph order was made
@@ -10,8 +11,9 @@ import models._
 
 private[controllers] trait GetOrderConfirmationEndpoint { this: Controller =>
   protected def orderStore: OrderStore
+  protected def controllerMethod: ControllerMethod
 
-  def getOrderConfirmation = {
+  def getOrderConfirmation = controllerMethod() {
     // Get order ID from flash scope -- it's OK to just read it
     // because it can only have been provided by our own code (in this case
     // probably PostBuyProductEndpoint)

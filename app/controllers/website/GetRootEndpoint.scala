@@ -1,20 +1,17 @@
 package controllers.website
 
 import play.mvc.Controller
-import services.AppConfig
-import services.logging.LoggingContext
+import services.http.ControllerMethod
 
 private[controllers] trait GetRootEndpoint { this: Controller =>
   import views.Application._
 
-  val logging = AppConfig.instance[LoggingContext]
+  protected def controllerMethod: ControllerMethod
 
   /**
    * Serves the application's landing page.
    */
-  def getRootEndpoint = {
-    logging.withContext(request) {
-      html.index()
-    }
+  def getRootEndpoint = controllerMethod() {
+    html.index()
   }
 }

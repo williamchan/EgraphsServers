@@ -3,13 +3,14 @@ package controllers.api
 import models._
 import play.mvc.Controller
 import sjson.json.Serializer
-import services.http.CelebrityAccountRequestFilters
+import services.http.{ControllerMethod, CelebrityAccountRequestFilters}
 
 private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
+  protected def controllerMethod: ControllerMethod
   protected def enrollmentBatchServices: EnrollmentBatchServices
   protected def celebFilters: CelebrityAccountRequestFilters
 
-  def postEnrollmentSample(signature: Option[String], audio: Option[String], skipBiometrics: Boolean = false) = {
+  def postEnrollmentSample(signature: Option[String], audio: Option[String], skipBiometrics: Boolean = false) = controllerMethod() {
     celebFilters.requireCelebrityAccount { (account, celebrity) =>
       (signature, audio) match {
         case (Some(signatureString), Some(audioString)) =>
@@ -49,9 +50,4 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
       ))
   }
 }
-
-
-/**
- * Controllers that handle direct API requests for celebrity resources.
- */
 

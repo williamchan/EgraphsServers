@@ -34,32 +34,57 @@ class LoggingContext {
     val requestInfo = new RequestInfo(request)
 
     // Log the request header
-    MDC.put(contextKey, "")
-    val requestHeader = new StringBuilder("==== ")
-      .append("Serving IP ")
-      .append(request.remoteAddress)
-      .append("(id=")
-      .append(requestInfo.clientId)
-      .append(", ")
-      .append("requestId=")
-      .append(requestInfo.requestId)
-      .append(") with ")
-      .append(request.actionMethod)
-      .append(" ====")
-
-    play.Logger.info(requestHeader.toString())
-
+    withContext("") {
+      logRequestHeader(request, requestInfo)
+    }
+  
     // Prepare the context for any logs that occur after this point
-    val requestContext = new StringBuilder("<")
-      .append(request.actionMethod)
-      .append("(")
-      .append(requestInfo.clientId)
-      .append(".")
-      .append(requestInfo.requestId)
-      .append(")")
-      .append(">")
+    val requestContext = createRequestContext(request, requestInfo)
 
     withContext(requestContext.toString())(operation)
+  }
+  
+  private def createRequestContext(request: Request, requestInfo: RequestInfo): String = {
+    try {
+      new StringBuilder("<")
+        .append(request.actionMethod)
+        .append("(")
+        .append(requestInfo.clientId)
+        .append(".")
+        .append(requestInfo.requestId)
+        .append(")")
+        .append(">")
+        .toString()
+    }
+    catch {
+      case e: Exception => 
+        play.Logger.error("[LoggingContext] Failed to generate request context string due to " + e.getClass.getName)
+        "<Unidentifiable request context>"
+    }
+  }
+  
+  private def logRequestHeader(request: Request, requestInfo: RequestInfo) {
+    try {
+      val requestHeader = new StringBuilder("=== ")
+        .append("Serving IP ")
+        .append(request.remoteAddress)
+        .append("(id=")
+        .append(requestInfo.clientId)
+        .append(", ")
+        .append("requestId=")
+        .append(requestInfo.requestId)
+        .append(") with ")
+        .append(request.controller)
+        .append(".")
+        .append(request.actionMethod)
+        .append(" ===")
+      
+      play.Logger.info(requestHeader.toString())
+    }
+    catch {
+      case e: Exception =>
+        play.Logger.error("[LoggingContext] Failed to generate request header due to " + e.getClass.getName)
+    }
   }
 
   /**
@@ -71,12 +96,14 @@ class LoggingContext {
    * @return the result of the operation
    */
   def withContext[A](context: String)(operation: => A): A = {
+    val oldContext = Option(MDC.get(contextKey)).getOrElse(defaultContext)
+
     MDC.put(contextKey, context)
     try {
       operation
     }
     finally {
-      MDC.put(contextKey, defaultContext)
+      MDC.put(contextKey, oldContext)
     }
   }
 }

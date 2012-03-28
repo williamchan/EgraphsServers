@@ -1,10 +1,11 @@
 package controllers.api
 
-import services.http.CelebrityAccountRequestFilters
 import sjson.json.Serializer
 import play.mvc.Controller
+import services.http.{ControllerMethod, CelebrityAccountRequestFilters}
 
 private[controllers] trait GetCelebrityProductsApiEndpoint { this: Controller =>
+  protected def controllerMethod: ControllerMethod
   protected def celebFilters: CelebrityAccountRequestFilters
 
   /**
@@ -12,7 +13,7 @@ private[controllers] trait GetCelebrityProductsApiEndpoint { this: Controller =>
    *
    * See the [[https://egraphs.jira.com/wiki/display/DEV/API+Endpoints#APIEndpoints-Products%C2%A0Products product json spec]]
    */
-  def getCelebrityProducts = {
+  def getCelebrityProducts = controllerMethod() {
     celebFilters.requireCelebrityAccount { (account, celebrity) =>
       val productMaps = celebrity.products().map(product => product.renderedForApi)
       Serializer.SJSON.toJSON(productMaps)

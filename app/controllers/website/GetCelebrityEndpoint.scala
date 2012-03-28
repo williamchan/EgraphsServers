@@ -4,16 +4,17 @@ import play.mvc.Controller
 import services.Utils
 import play.mvc.Router.ActionDefinition
 import services.blobs.AccessPolicy
-import services.http.CelebrityAccountRequestFilters
+import services.http.{ControllerMethod, CelebrityAccountRequestFilters}
 
 private[controllers] trait GetCelebrityEndpoint { this: Controller =>
 
+  protected def controllerMethod: ControllerMethod
   protected def celebFilters: CelebrityAccountRequestFilters
 
   /**
    * Serves the website's Celebrity root page.
    */
-  def getCelebrity = {
+  def getCelebrity = controllerMethod() {
     celebFilters.requireCelebrityUrlSlug { celebrity =>
       val profilePhotoUrl = celebrity.profilePhoto.resizedWidth(200).getSaved(AccessPolicy.Public).url
 

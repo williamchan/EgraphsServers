@@ -3,12 +3,15 @@ package controllers.nonproduction
 import play.mvc.Controller
 import play.mvc.results.Result
 import demosetup.DemoScenario
-import services.http.DBTransaction
+import services.http.ControllerMethod
+import services.AppConfig
 
 /**
  * Provides functionality for setting up demo data fixtures from the browser.
  */
-object DemoSetupController extends Controller with DBTransaction {
+object DemoSetupController extends Controller {
+  val controllerMethod = AppConfig.instance[ControllerMethod]
+
   /**
    * Performs a code block only if the project's Demo Scenarios library is available.
    *
@@ -38,9 +41,11 @@ object DemoSetupController extends Controller with DBTransaction {
    *
    * @return 200 (Ok) if successful.
    */
-  def clear = withRegisteredDemoScenarios {
-    DemoScenario.clearAll()
-    "All demo scenarios cleared."
+  def clear = controllerMethod() {
+    withRegisteredDemoScenarios {
+      DemoScenario.clearAll()
+      "All demo scenarios cleared."
+    }
   }
 
   /**
@@ -48,11 +53,13 @@ object DemoSetupController extends Controller with DBTransaction {
    *
    * @return 200 (Ok) and the list if successful.
    */
-  def list = withRegisteredDemoScenarios {
-    val demoScenarios = DemoScenario.allCategories.toList.sortWith((a, b) => a._1 < b._1).map { case (category, catScenarios) =>
-      (category, catScenarios.toSeq.sortWith((a, b) => a.name < b.name))
+  def list = controllerMethod() {
+    withRegisteredDemoScenarios {
+      val demoScenarios = DemoScenario.allCategories.toList.sortWith((a, b) => a._1 < b._1).map { case (category, catScenarios) =>
+        (category, catScenarios.toSeq.sortWith((a, b) => a.name < b.name))
+      }
+      views.Application.html.demoscenarios(demoScenarios)
     }
-    views.Application.html.demoscenarios(demoScenarios)
   }
 
   /**
@@ -60,27 +67,29 @@ object DemoSetupController extends Controller with DBTransaction {
    *
    * @return 200 (Ok) and a useful human-readable message if successful.
    */
-  def demoScenario (urlSlug: String) = withRegisteredDemoScenarios {
-    DemoScenario.withSlug(urlSlug) match {
-      case Some(existingDemoScenario) => {
-        existingDemoScenario.play() match {
-          case aResult: Result =>
-            aResult
-          case _ =>
-            Html(
-              "Demo Scenario <pre>"
-                + urlSlug
-                + "</pre> successfully replayed.<br/><br/>"
-                + existingDemoScenario.description
-            )
+  def demoScenario (urlSlug: String) = controllerMethod() {
+    withRegisteredDemoScenarios {
+      DemoScenario.withSlug(urlSlug) match {
+        case Some(existingDemoScenario) => {
+          existingDemoScenario.play() match {
+            case aResult: Result =>
+              aResult
+            case _ =>
+              Html(
+                "Demo Scenario <pre>"
+                  + urlSlug
+                  + "</pre> successfully replayed.<br/><br/>"
+                  + existingDemoScenario.description
+              )
+          }
         }
-      }
 
-      case None => {
-        NotFound(
-          "No demoScenario was found with the name \"" + urlSlug + "\"."+
-            "View available demo scenarios at " + reverse(this.list)
-        )
+        case None => {
+          NotFound(
+            "No demoScenario was found with the name \"" + urlSlug + "\"."+
+              "View available demo scenarios at " + reverse(this.list)
+          )
+        }
       }
     }
   }

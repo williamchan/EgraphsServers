@@ -31,7 +31,6 @@ class DBSession @Inject() (connectionFactory: () => Connection) extends Logging 
     val squerylSession = new Session(connection, DBAdapter.current)
 
     try {
-      log("Doing provided work with new connection")
       val result = using(squerylSession)(continue)
 
       log("Committing changes to the DB")
@@ -88,7 +87,7 @@ object DBSession {
 
   /**
    * Ensures that a Squeryl session is available for use in later calls. This
-   * should be called before any application code in Controllers or Tests. In general
+   * should be before any application code in Controllers or Tests. In general
    * you should not use this method where it is possible to use Squeryl's
    * `inTransaction` or `transaction` methods.
    *

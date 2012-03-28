@@ -7,11 +7,11 @@ import org.apache.commons.mail.SimpleEmail
 import models._
 import play.mvc.Scope.Flash
 import play.mvc.results.Redirect
-import services.http.CelebrityAccountRequestFilters
 import services.mail.Mail
 import services.{Utils, AppConfig}
 import play.Logger
 import controllers.WebsiteControllers
+import services.http.{ControllerMethod, CelebrityAccountRequestFilters}
 
 trait PostBuyProductEndpoint { this: Controller =>
   import PostBuyProductEndpoint.EgraphPurchaseHandler
@@ -21,6 +21,7 @@ trait PostBuyProductEndpoint { this: Controller =>
   protected def mail: Mail
   protected def customerStore: CustomerStore
   protected def accountStore: AccountStore
+  protected def controllerMethod: ControllerMethod
 
   /**
    * Posts a purchase order against a Celebrity's Product.
@@ -35,7 +36,7 @@ trait PostBuyProductEndpoint { this: Controller =>
           stripeTokenId: String,
           desiredText: Option[String],
           personalNote: Option[String]) =
-  {
+  controllerMethod() {
     Logger.info("Receiving purchase order")
     celebFilters.requireCelebrityAndProductUrlSlugs { (celebrity, product) =>
       Logger.info("Purchase of product " + celebrity.publicName + "/" + product.name + " for " + recipientName)

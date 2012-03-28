@@ -5,20 +5,20 @@ import services.blobs.Blobs.Conversions._
 import math.BigDecimal._
 import play.Play
 import services.AppConfig
-import services.http.DBTransaction
 import services.blobs.Blobs
 import services.db.Schema
 import models._
+import services.http.{ControllerMethod}
 
-object TestControllers extends Controller
-with DBTransaction {
+object TestControllers extends Controller {
+  val controllerMethod = AppConfig.instance[ControllerMethod]
   val blobs = AppConfig.instance[Blobs]
   val schema = AppConfig.instance[Schema]
   val accountServices = AppConfig.instance[AccountServices]
   val celebrityServices = AppConfig.instance[CelebrityServices]
   val customerServices = AppConfig.instance[CustomerServices]
 
-  def getHardwiredEgraphPage() = {
+  def getHardwiredEgraphPage() = controllerMethod() {
     val testFrame = LandscapeEgraphFrame
 
     views.Application.html.egraph(
@@ -41,7 +41,7 @@ with DBTransaction {
     )
   }
 
-  def resetAlphaState(): String = {
+  def resetAlphaState(): String = controllerMethod() {
     val applicationMode = play.Play.configuration.get("application.mode")
     if (applicationMode != "dev") {
       throw new IllegalStateException("Cannot reset-alpha-state unless in dev mode")
@@ -95,7 +95,7 @@ with DBTransaction {
 
   }
 
-  def script = {
+  def script = controllerMethod() {
 //    println("System getProperty javax.net.ssl.trustStore = " + System.getProperty("javax.net.ssl.trustStore"))
 //    val startEnrollmentRequest = services.voice.VBGDevRandomNumberBiometricServices.sendStartEnrollmentRequest("pls", false)
 //    println(startEnrollmentRequest.getResponseValue("errorcode"))
@@ -103,7 +103,7 @@ with DBTransaction {
     new jobs.EnrollmentBatchJob().now()
   }
 
-  def createTestOrders(msg: String) = {
+  def createTestOrders(msg: String) = controllerMethod() {
     var results = List.empty[String]
 
     val celebrityEmails = List(

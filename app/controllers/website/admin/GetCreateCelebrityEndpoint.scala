@@ -2,14 +2,16 @@ package controllers.website.admin
 
 import play.mvc.Controller
 import services.Utils
+import services.http.ControllerMethod
 
 private[controllers] trait GetCreateCelebrityEndpoint {
   this: Controller =>
 
+  protected def controllerMethod: ControllerMethod
   /**
    * Serves up the HTML for the Create Celebrity page.
    */
-  def getCreateCelebrity = {
+  def getCreateCelebrity = controllerMethod() {
     // Get errors and param values from previous unsuccessful buy
     val errorFields = Option(flash.get("errors")).map(errString => errString.split(',').toList)
     val fieldDefaults: (String => String) = {

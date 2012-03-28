@@ -4,6 +4,9 @@ import models.Account
 import play.mvc.Http.Request
 import play.test.FunctionalTest
 import org.junit.After
+import services.AppConfig
+import services.db.{TransactionSerializable, DBSession}
+import scenario.Scenario
 
 /**
  * Common functionality required when writing functional tests against

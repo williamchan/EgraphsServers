@@ -1,18 +1,19 @@
 package controllers.website.admin
 
 import play.mvc.Controller
-import services.http.AdminRequestFilters
 import models._
+import services.http.{ControllerMethod, AdminRequestFilters}
 
 private[controllers] trait GetCelebrityOrdersEndpoint {
   this: Controller =>
 
+  protected def controllerMethod: ControllerMethod
   protected def adminFilters: AdminRequestFilters
 
   protected def celebrityStore: CelebrityStore
   protected def orderStore: OrderStore
 
-  def getCelebrityOrders =  {
+  def getCelebrityOrders = controllerMethod() {
     adminFilters.requireCelebrity {
       (celebrity) =>
         val orders: Iterable[Order] = orderStore.findByCelebrity(celebrityId = celebrity.id)

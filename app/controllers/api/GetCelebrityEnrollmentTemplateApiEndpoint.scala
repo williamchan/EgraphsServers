@@ -2,17 +2,18 @@ package controllers.api
 
 import play.mvc.Controller
 import sjson.json.Serializer
-import services.http.CelebrityAccountRequestFilters
+import services.http.{ControllerMethod, CelebrityAccountRequestFilters}
 
-private[controllers] trait GetCelebrityEnrollmentTemplateApiEndpoint {
-  this: Controller =>
+private[controllers] trait GetCelebrityEnrollmentTemplateApiEndpoint { this: Controller =>
+
+  protected def controllerMethod: ControllerMethod
   protected def celebFilters: CelebrityAccountRequestFilters
 
   /**
    * Provides a single Celebrity's JSON representation for consumption by the API.
    *
    */
-  def getCelebrityEnrollmentTemplate = {
+  def getCelebrityEnrollmentTemplate = controllerMethod() {
     celebFilters.requireCelebrityAccount {
       (account, celebrity) => {
 

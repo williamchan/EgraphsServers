@@ -10,11 +10,12 @@ import play.data.validation.Validation
 import models._
 import services.logging.Logging
 import services.{ImageUtil}
-import services.http.{CelebrityAccountRequestFilters, AdminRequestFilters}
+import services.http.{ControllerMethod, CelebrityAccountRequestFilters, AdminRequestFilters}
 
 trait PostCelebrityProductEndpoint extends Logging {
   this: Controller =>
 
+  protected def controllerMethod: ControllerMethod
   protected def adminFilters: AdminRequestFilters
   protected def celebFilters: CelebrityAccountRequestFilters
   protected def celebrityStore: CelebrityStore
@@ -25,7 +26,7 @@ trait PostCelebrityProductEndpoint extends Logging {
                            productImage: File,
                            productIcon: File,
                            storyTitle: String,
-                           storyText: String) = {
+                           storyText: String) = controllerMethod() {
     celebFilters.requireCelebrityId(request) { celebrity =>
       // Validate text fields
       required("Product name", productName)

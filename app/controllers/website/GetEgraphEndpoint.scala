@@ -4,16 +4,18 @@ import play.mvc.Controller
 import models.{OrderStore, FulfilledOrder}
 import services.blobs.AccessPolicy
 import java.text.SimpleDateFormat
+import services.http.ControllerMethod
 
 private[controllers] trait GetEgraphEndpoint { this: Controller =>
   protected def orderStore: OrderStore
+  protected def controllerMethod: ControllerMethod
 
   /**
    * Serves up a single egraph HTML page. The egraph number is actually the number
    * of the associated order, as several attempts to satisfy an egraph could have
    * been made before a successful one was signed.
    */
-  def getEgraph(orderId: String) = {
+  def getEgraph(orderId: String) = controllerMethod() {
     // Get an order with provided ID
     orderStore.findFulfilledWithId(orderId.toLong) match {
       case Some(FulfilledOrder(order, egraph)) =>

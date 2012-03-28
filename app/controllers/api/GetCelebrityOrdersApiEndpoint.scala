@@ -3,9 +3,10 @@ package controllers.api
 import models._
 import play.mvc.Controller
 import sjson.json.Serializer
-import services.http.CelebrityAccountRequestFilters
+import services.http.{ControllerMethod, CelebrityAccountRequestFilters}
 
 private[controllers] trait GetCelebrityOrdersApiEndpoint { this: Controller =>
+  protected def controllerMethod: ControllerMethod
   protected def orderStore: OrderStore
   protected def orderQueryFilters: OrderQueryFilters
   protected def celebFilters: CelebrityAccountRequestFilters
@@ -18,7 +19,7 @@ private[controllers] trait GetCelebrityOrdersApiEndpoint { this: Controller =>
    * @param signerActionable true if the only Orders that should
    *   be returned are the ones that the celebrity needs to sign.
    */
-  def getCelebrityOrders(signerActionable: Option[Boolean]) = {
+  def getCelebrityOrders(signerActionable: Option[Boolean]) = controllerMethod() {
     celebFilters.requireCelebrityAccount { (account, celebrity) =>
       signerActionable match {
         case None | Some(false) =>

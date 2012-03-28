@@ -6,11 +6,11 @@ import io.Source
 import java.io.{File, PrintWriter}
 import play.Play
 import services.blobs.Blobs
-import services.db.{Schema, DBSession}
 import services.payment.Payment
 import java.sql.Connection
 import services.logging.{Logging, LoggingContext}
 import services.{AppConfig, Utils, TempFile}
+import services.db.{TransactionSerializable, Schema, DBSession}
 
 @OnApplicationStart
 class BootStrap extends Job with Logging {
@@ -50,8 +50,9 @@ class BootStrap extends Job with Logging {
  * Bootstrap code for when we're running in test mode
  */
 private object TestModeBootstrap extends Logging {
-  val blobs = AppConfig.instance[Blobs]
-  val schema = AppConfig.instance[Schema]
+  private val db = AppConfig.instance[DBSession]
+  private val blobs = AppConfig.instance[Blobs]
+  private val schema = AppConfig.instance[Schema]
 
   import org.squeryl.PrimitiveTypeMode._
 
@@ -62,8 +63,7 @@ private object TestModeBootstrap extends Logging {
   }
 
   private def bootstrapDatabase() {
-    DBSession.init()
-    inTransaction {
+    db.connected(TransactionSerializable) {
       if ((!schema.isInPlace) || schemaHasChanged) {
         log(
           """Detected either lack of database schema or change thereof.
@@ -73,7 +73,6 @@ private object TestModeBootstrap extends Logging {
         blobs.scrub()
       }
     }
-    DBSession.commit()
   }
 
 

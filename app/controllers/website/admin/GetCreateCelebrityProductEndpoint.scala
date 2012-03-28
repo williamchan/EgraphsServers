@@ -2,18 +2,19 @@ package controllers.website.admin
 
 import play.mvc.Controller
 import services.Utils
-import services.http.AdminRequestFilters
 import models.Celebrity
+import services.http.{ControllerMethod, AdminRequestFilters}
 
 private[controllers] trait GetCreateCelebrityProductEndpoint {
   this: Controller =>
 
+  protected def controllerMethod: ControllerMethod
   protected def adminFilters: AdminRequestFilters
 
   /**
    * Serves up the HTML for the Create Celebrity page.
    */
-  def getCreateCelebrityProduct = {
+  def getCreateCelebrityProduct = controllerMethod() {
 
     adminFilters.requireCelebrity { (celebrity) =>
     // Get errors and param values from previous unsuccessful buy

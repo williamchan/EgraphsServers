@@ -10,7 +10,7 @@ import services.payment.Payment
 import play.mvc.{Router, Controller}
 import play.mvc.results.Redirect
 import models._
-import services.http.{AdminRequestFilters, CelebrityAccountRequestFilters, DBTransaction}
+import services.http.{ControllerMethod, AdminRequestFilters, CelebrityAccountRequestFilters}
 
 object WebsiteControllers extends Controller
   with GetRootEndpoint
@@ -32,12 +32,12 @@ object WebsiteControllers extends Controller
   with GetEgraphsEndpoint
   with GetCelebrityEgraphsEndpoint
   with GetCelebrityOrdersEndpoint
-
-  with DBTransaction {
+{
 
   import services.AppConfig.instance
 
   // Provide endpoint dependencies
+  override protected val controllerMethod = instance[ControllerMethod]
   override protected val adminFilters = instance[AdminRequestFilters]
   override protected val celebFilters = instance[CelebrityAccountRequestFilters]
 

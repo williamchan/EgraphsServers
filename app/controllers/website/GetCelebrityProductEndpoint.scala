@@ -4,19 +4,20 @@ import play.mvc.Controller
 import services.Utils
 
 import models._
-import services.http.CelebrityAccountRequestFilters
 import services.payment.Payment
 import play.mvc.Router.ActionDefinition
+import services.http.{ControllerMethod, CelebrityAccountRequestFilters}
 
 private[controllers] trait GetCelebrityProductEndpoint { this: Controller =>
 
+  protected def controllerMethod: ControllerMethod
   protected def celebFilters: CelebrityAccountRequestFilters
   protected def payment: Payment
 
   /**
    * Serves up the HTML of a single Celebrity Product page.
    */
-  def getCelebrityProduct = {
+  def getCelebrityProduct = controllerMethod() {
     celebFilters.requireCelebrityAndProductUrlSlugs { (celebrity, product) =>
       // Get errors and param values from previous unsuccessful buy
       val errorFields = Option(flash.get("errors")).map(errString => errString.split(',').toList)

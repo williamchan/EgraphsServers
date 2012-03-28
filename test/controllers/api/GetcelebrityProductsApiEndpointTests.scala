@@ -2,13 +2,13 @@ package controllers.api
 
 import org.junit.Assert._
 import play.mvc.Controller
-import services.http.CelebrityAccountRequestFilters
 import models.{Product, Celebrity, Account}
 import sjson.json.Serializer
 import play.test.FunctionalTest
 import utils.FunctionalTestUtils.CleanDatabaseAfterEachTest
 import org.junit.Test
-import utils.{EgraphsUnitTest, TestConstants, FunctionalTestUtils}
+import services.http.{ControllerMethod, CelebrityAccountRequestFilters}
+import utils.{MockControllerMethod, EgraphsUnitTest, TestConstants, FunctionalTestUtils}
 
 class GetCelebrityProductsApiEndpointTests extends EgraphsUnitTest {
   "GetCelebrityProductsApiEndpoint" should "return the serialized products" in {
@@ -26,6 +26,7 @@ class GetCelebrityProductsApiEndpointTests extends EgraphsUnitTest {
     celeb.products() returns (List(product1, product2))
     
     val response = new Controller with GetCelebrityProductsApiEndpoint {
+      protected def controllerMethod: ControllerMethod = MockControllerMethod
       protected def celebFilters = mockFilters
     }.getCelebrityProducts
     
@@ -41,6 +42,7 @@ class GetCelebrityProductsApiEndpointTests extends EgraphsUnitTest {
     mockFilters.requireCelebrityAccount(any)(any) returns "Fail"
 
     val response = new Controller with GetCelebrityProductsApiEndpoint {
+      protected def controllerMethod: ControllerMethod = MockControllerMethod
       protected def celebFilters = mockFilters
     }.getCelebrityProducts
 

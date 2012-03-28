@@ -3,16 +3,19 @@ package controllers.nonproduction
 import play.mvc.Controller
 import scenario.Scenario
 import play.mvc.results.Result
-import services.http.DBTransaction
+import services.http.ControllerMethod
+import services.AppConfig
 
 /**
  * Controller for all scenarios
  */
-object ScenarioController extends Controller with DBTransaction {
+object ScenarioController extends Controller {
+  protected val controllerMethod = AppConfig.instance[ControllerMethod]
+
   /**
    * Performs a code block only if the project's Scenarios library is available.
    *
-   * @returns the result of the code block if the project's Scenarios library
+   * @return the result of the code block if the project's Scenarios library
    *   is available. 500 (Internal Error) and an informative response if not
    */
   private def withRegisteredScenarios(task: => Any) = {
@@ -38,21 +41,25 @@ object ScenarioController extends Controller with DBTransaction {
    *
    * @return 200 (Ok) if successful.
    */
-  def clear = withRegisteredScenarios {
-    Scenario.clearAll()
-    "All scenarios cleared."
-   }
+  def clear = controllerMethod() {
+    withRegisteredScenarios {
+      Scenario.clearAll()
+      "All scenarios cleared."
+    }
+  }
 
   /**
    * Returns a human-readable list of the available scenarios.
    *
    * @return 200 (Ok) and the list if successful.
    */
-  def list = withRegisteredScenarios {
-    val scenarios = Scenario.allCategories.toList.sortWith((a, b) => a._1 < b._1).map { case (category, catScenarios) =>
-      (category, catScenarios.toSeq.sortWith((a, b) => a.name < b.name))
+  def list = controllerMethod() {
+    withRegisteredScenarios {
+      val scenarios = Scenario.allCategories.toList.sortWith((a, b) => a._1 < b._1).map { case (category, catScenarios) =>
+        (category, catScenarios.toSeq.sortWith((a, b) => a.name < b.name))
+      }
+      views.Application.html.scenarios(scenarios)
     }
-    views.Application.html.scenarios(scenarios)
   }
 
   /**
@@ -60,27 +67,29 @@ object ScenarioController extends Controller with DBTransaction {
    *
    * @return 200 (Ok) and a useful human-readable message if successful.
    */
-  def scenario (urlSlug: String) = withRegisteredScenarios {
-    Scenario.withSlug(urlSlug) match {
-      case Some(existingScenario) => {
-        existingScenario.play() match {
-          case aResult: Result =>
-            aResult
-          case _ =>
-            Html(
-              "Scenario <pre>"
-                + urlSlug
-                + "</pre> successfully replayed.<br/><br/>"
-                + existingScenario.description
-            )
+  def scenario (urlSlug: String) = controllerMethod() {
+    withRegisteredScenarios {
+      Scenario.withSlug(urlSlug) match {
+        case Some(existingScenario) => {
+          existingScenario.play() match {
+            case aResult: Result =>
+              aResult
+            case _ =>
+              Html(
+                "Scenario <pre>"
+                  + urlSlug
+                  + "</pre> successfully replayed.<br/><br/>"
+                  + existingScenario.description
+              )
+          }
         }
-      }
 
-      case None => {
-        NotFound(
-          "No scenario was found with the name \"" + urlSlug + "\"."+
-          "View available scenarios at " + reverse(this.list)
-        )
+        case None => {
+          NotFound(
+            "No scenario was found with the name \"" + urlSlug + "\"."+
+              "View available scenarios at " + reverse(this.list)
+          )
+        }
       }
     }
   }

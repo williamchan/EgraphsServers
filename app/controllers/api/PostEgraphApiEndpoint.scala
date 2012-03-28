@@ -6,9 +6,10 @@ import models._
 import play.data.validation._
 import services.http.OptionParams.Conversions._
 import play.libs.Codec
-import services.http.{HttpCodes, OrderRequestFilters, CelebrityAccountRequestFilters}
+import services.http.{ControllerMethod, HttpCodes, OrderRequestFilters, CelebrityAccountRequestFilters}
 
 private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
+  protected def controllerMethod: ControllerMethod
   protected def celebFilters: CelebrityAccountRequestFilters
   protected def orderFilters: OrderRequestFilters
 
@@ -22,7 +23,7 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
     @Required signature: String,
     @Required audio: String,
     skipBiometrics: Boolean = false) =
-  {
+  controllerMethod() {
     if (validationErrors.isEmpty) {
       val message = request.params.getOption("message")
 
