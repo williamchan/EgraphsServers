@@ -39,7 +39,7 @@ object Logging {
   /**The maximum length a classname should occupy in the logs */
   val MAX_CLASSNAME_SIZE = 15
 
-  val colorizer = AnsiColorizer
+  val colorizer = BoringColorizer
 
   val colorize = colorizer.colorize _
 
