@@ -13,22 +13,15 @@ import play.test.FunctionalTest
 import sjson.json.Serializer
 import utils.FunctionalTestUtils.{CleanDatabaseAfterEachTest, willChanRequest, runScenario}
 import models._
-import utils.TestConstants
-import services.http.{ControllerMethod, CelebrityAccountRequestFilters}
-import services.db.TransactionIsolation
+import services.http.CelebrityAccountRequestFilters
+import utils.{MockControllerMethod, TestConstants}
 
 class GetCelebrityApiEndpointTests extends UnitFlatSpec with Mockito with ShouldMatchers
 {
 
   private def testController(reqFilters: CelebrityAccountRequestFilters): GetCelebrityApiEndpoint = {
-    val mockControllerMethod = new ControllerMethod(null, null) {
-      override def apply[A](dbIsolation: TransactionIsolation)(operation: => A)(implicit request: Request): A = {
-        operation
-      }
-    }
-
     new Controller with GetCelebrityApiEndpoint {
-      override def controllerMethod = mockControllerMethod
+      override def controllerMethod = MockControllerMethod
       override def celebFilters = reqFilters
     }
   }
