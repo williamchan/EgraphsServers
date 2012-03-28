@@ -10,34 +10,39 @@ import services.db.{Schema, DBSession}
 import services.payment.Payment
 import java.sql.Connection
 import services.{Logging, AppConfig, Utils, TempFile}
+import services.logging.LoggingContext
 
 @OnApplicationStart
 class BootStrap extends Job with Logging {
   val blobs = AppConfig.instance[Blobs]
   val payment = AppConfig.instance[Payment]
+  val logging = AppConfig.instance[LoggingContext]
 
   override def doJob() {
-    log("Bootstrapping application")
-    // Initialize payment system
-    payment.bootstrap()
+    logging.withContext("<Bootstrap>") {
+      log("Bootstrapping application")
+      // Initialize payment system
+      payment.bootstrap()
 
-    // Initialize Squeryl persistence
-    SessionFactory.concreteFactory = Some(() => {
-      val connection = play.db.DB.getConnection
-      if (connection.getTransactionIsolation != Connection.TRANSACTION_SERIALIZABLE) {
-        connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
+      // Initialize Squeryl persistence
+      SessionFactory.concreteFactory = Some(() => {
+        val connection = play.db.DB.getConnection
+        if (connection.getTransactionIsolation != Connection.TRANSACTION_SERIALIZABLE) {
+          connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
+        }
+        Session.create(connection, services.db.DBAdapter.current)
+      })
+
+      // Initialize S3 or fs-based blobstore
+      blobs.init()
+
+      // Some additional test-mode setup
+      if (Play.id == "test") {
+        TestModeBootstrap.run()
       }
-      Session.create(connection, services.db.DBAdapter.current)
-    })
 
-    // Initialize S3 or fs-based blobstore
-    blobs.init()
-
-    // Some additional test-mode setup
-    if (Play.id == "test") {
-      TestModeBootstrap.run()
+      log("Finished bootstrapping application")
     }
-    log("Finished bootstrapping application")
   }
 }
 
