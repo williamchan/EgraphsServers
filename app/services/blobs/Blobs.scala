@@ -1,17 +1,12 @@
 package services.blobs
 
-import java.util.Properties
-import org.jclouds.filesystem.reference.FilesystemConstants
 import play.Play.configuration
-import org.jclouds.blobstore.{BlobStoreContextFactory, BlobStoreContext, BlobStore}
+import org.jclouds.blobstore.{BlobStoreContext, BlobStore}
 import org.jclouds.blobstore.domain.Blob
 import org.jclouds.io.Payload
-import org.jclouds.aws.s3.AWSS3Client
-import org.jclouds.s3.domain.CannedAccessPolicy
 import java.io._
-import play.mvc.Http.Request
-import com.google.inject.{Provider, Inject}
-import services.Logging
+import com.google.inject.Inject
+import services.logging.Logging
 
 /**
  * Convenience methods for storing and loading large binary data: images,

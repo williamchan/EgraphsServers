@@ -1,9 +1,10 @@
-package services
+package services.logging
 
 /**
  * Provides any class that mixes it in with easy logging functionality.
  */
 trait Logging {
+
   import Logging._
 
   /**
@@ -20,7 +21,7 @@ trait Logging {
     }
   }
 
-  /** Logs a message to INFO by default */
+  /**Logs a message to INFO by default */
   def log(message: => String) {
     val sb = new StringBuilder
 
@@ -35,14 +36,14 @@ trait Logging {
 }
 
 object Logging {
-  /** The maximum length a classname should occupy in the logs */
+  /**The maximum length a classname should occupy in the logs */
   val MAX_CLASSNAME_SIZE = 15
 
   val colorizer = AnsiColorizer
-  
+
   val colorize = colorizer.colorize _
 
-  /** Describes classes that can colorize text and write the colorized text to a StringBuilder */
+  /**Describes classes that can colorize text and write the colorized text to a StringBuilder */
   trait Colorizer {
     def colorize(message: String, color: TerminalColor, sb: StringBuilder)
   }
@@ -68,7 +69,11 @@ object Logging {
   }
 
   private[Logging] abstract class TerminalColor(val ansiVal: String)
+
   case object TerminalColorDefault extends TerminalColor("\u001B[00m")
+
   case object TerminalColorDefaultBold extends TerminalColor("\u001B[1m")
+
   case object TerminalColorLightGray extends TerminalColor("\u001B[0;37m")
+
 }

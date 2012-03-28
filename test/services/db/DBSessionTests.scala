@@ -1,20 +1,16 @@
 package services.db
 
-import org.squeryl.PrimitiveTypeMode._
 import models.{AccountStore, Account}
 import utils.{ClearsDatabaseAndValidationAfter, EgraphsUnitTest}
 import org.squeryl.Session
 import akka.actor.Actor
-import akka.routing.Routing
-import akka.actor.Actor.actorOf
-import akka.dispatch.{Dispatchers, Future}
+import akka.dispatch.Dispatchers
 import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy
-import services.{Logging, AppConfig}
-import java.sql.{SQLException, Connection}
-
+import services.logging.Logging
+import services.AppConfig
+import java.sql.Connection
 
 class DBSessionTests extends EgraphsUnitTest with ClearsDatabaseAndValidationAfter with Logging {
-  import services.db.DBSessionTestActors._
   def underTest: (DBSession, Connection) = {
     val connection = mock[Connection]
     (new DBSession(() => connection), connection)

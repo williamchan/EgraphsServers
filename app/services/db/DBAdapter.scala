@@ -3,7 +3,7 @@ package services.db
 import org.squeryl.internals.DatabaseAdapter
 import play.Play
 import org.squeryl.adapters.{MySQLInnoDBAdapter, PostgreSqlAdapter, H2Adapter}
-import services.Logging
+import services.logging.Logging
 
 /**
  * Provides various Squeryl database adapters based on what type of database we're

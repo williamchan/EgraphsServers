@@ -8,7 +8,8 @@ import play.data.validation.Validation.required
 import controllers.website.GetCelebrityProductEndpoint
 import play.data.validation.Validation
 import models._
-import services.{Logging, ImageUtil}
+import services.logging.Logging
+import services.{ImageUtil}
 import services.http.{CelebrityAccountRequestFilters, AdminRequestFilters}
 
 trait PostCelebrityProductEndpoint extends Logging {

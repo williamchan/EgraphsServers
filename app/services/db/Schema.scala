@@ -10,7 +10,7 @@ import java.io.{ByteArrayOutputStream, PrintWriter}
 import com.google.inject.{Inject, Injector}
 import java.sql.Connection
 import play.Play.configuration
-import services.Logging
+import services.logging.Logging
 
 /**
  * Egraphs Database schema

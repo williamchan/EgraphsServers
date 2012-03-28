@@ -55,6 +55,9 @@ class AppConfig extends AbstractModule with ScalaModule {
   }
 }
 
+/**
+ * Accessor to the application's dependency injector.
+ */
 object AppConfig {
 
   import InjectorExtensions._
@@ -75,5 +78,12 @@ object AppConfig {
 
   def instance[T: Manifest] = {
     injector.instance[T]
+  }
+}
+
+/** Callable object shortcut to AppConfig.instance */
+object Instance {
+  def apply[T: Manifest]: T = {
+    AppConfig.instance[T]
   }
 }

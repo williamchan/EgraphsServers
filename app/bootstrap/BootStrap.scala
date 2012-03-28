@@ -9,8 +9,8 @@ import services.blobs.Blobs
 import services.db.{Schema, DBSession}
 import services.payment.Payment
 import java.sql.Connection
-import services.{Logging, AppConfig, Utils, TempFile}
-import services.logging.LoggingContext
+import services.logging.{Logging, LoggingContext}
+import services.{AppConfig, Utils, TempFile}
 
 @OnApplicationStart
 class BootStrap extends Job with Logging {

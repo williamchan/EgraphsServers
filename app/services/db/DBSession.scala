@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import java.sql.{SQLException, Connection}
 import play.exceptions.DatabaseException
 import org.squeryl.{Session, SessionFactory}
-import services.Logging
+import services.logging.Logging
 
 /**
  * Provides methods for performing calls against a database connection at a particular
