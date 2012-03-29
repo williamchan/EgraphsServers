@@ -15,7 +15,7 @@ import java.text.SimpleDateFormat
 import controllers.WebsiteControllers
 import controllers.website.GetCelebrityProductEndpoint
 import com.google.inject.{Provider, Inject}
-import play.utils.HTML
+import play.utils.HTML.htmlEscape
 import org.squeryl.Query
 import org.squeryl.PrimitiveTypeMode._
 
@@ -237,8 +237,15 @@ case class Egraph(
       message.foreach { messageString =>
         blobs.put(messageJsonKey, messageString, access=AccessPolicy.Private)
       }
+    }
 
-      // Before removing this line, realize that without the line the image method will fail
+    override def initMasterImage {
+      import Blobs.Conversions._
+      val signatureBlob = blobs.get(signatureJsonKey)
+      val signature = if (signatureBlob.isDefined) signatureBlob.get.asString else ""
+      val messageBlob = blobs.get(messageJsonKey)
+      val message = if (messageBlob.isDefined) Some(messageBlob.get.asString) else None
+
       ImageAsset(
         createMasterImage(signature, message, order.product.photo.renderFromMaster),
         blobKeyBase,
@@ -351,7 +358,6 @@ case class EgraphStory(
   private val signingTimestamp: Timestamp,
   private val services: EgraphStoryServices = AppConfig.instance[EgraphStoryServices]
 ) {
-  import HTML.htmlEscape
 
   //
   // Public methods
@@ -439,10 +445,14 @@ trait EgraphAssets {
    */
   def audioUrl: String
 
+  /** Must be called after initImageAsset. */
   def image: ImageAsset
 
   /** Stores the assets in the blobstore */
   def save(signature: String, message: Option[String], audio: Array[Byte])
+
+  /** Initializes the MasterImage. Must be called after save, which saves raw data for this Egraph. */
+  def initMasterImage()
 }
 
 class EgraphStore @Inject() (schema: Schema) extends Saves[Egraph] with SavesCreatedUpdated[Egraph] {
