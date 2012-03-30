@@ -8,11 +8,13 @@ import services.db.{FilterThreeTables, KeyedCaseClass, Schema, Saves}
 import services.Finance.TypeConversions._
 import EgraphState._
 import org.apache.commons.mail.HtmlEmail
-import controllers.WebsiteControllers
 import services._
 import com.google.inject._
 import mail.Mail
 import payment.Payment
+import play.mvc.Router.ActionDefinition
+import controllers.WebsiteControllers
+import play.mvc.Router
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -101,10 +103,10 @@ case class Order(
     )
   }
 
-  def sendEgraphSignedMail() = {
+  def sendEgraphSignedMail() {
     val celebrity = services.celebrityStore.findByOrderId(id).get
     val email = new HtmlEmail()
-    val linkActionDefinition = WebsiteControllers.lookupGetEgraph(id)
+    val linkActionDefinition: ActionDefinition = Utils.lookupUrl("WebsiteControllers.getEgraph", Map("orderId" -> id.toString))
     linkActionDefinition.absolute()
 
     email.setFrom(celebrity.urlSlug.get + "@egraphs.com", celebrity.publicName.get)

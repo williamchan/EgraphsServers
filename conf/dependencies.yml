@@ -50,7 +50,7 @@ require:
 repositories:
     - Akka:
          type: iBiblio
-         root: "http://akka.io/repository"
+         root: "http://repo.typesafe.com/typesafe/releases"
          contains:
              - se.scalablesolutions.akka -> *
              - org.codehaus.aspectwerkz -> *

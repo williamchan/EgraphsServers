@@ -1,7 +1,6 @@
 package utils
 
 import models.{Order, Celebrity, Account, Customer, Product}
-import com.stripe.model.Token
 import services.Time
 import java.io.File
 import play.Play
@@ -11,17 +10,22 @@ import play.Play
  * constraints.
  */
 object TestData {
+
+  def generateEmail(prefix: String = ""): String = {
+    prefix + Time.toBlobstoreFormat(Time.now) + "@egraphs.com"
+  }
+
   def newSavedCustomer(): Customer = {
-    val acct = Account(email="customer-"+ Time.toBlobstoreFormat(Time.now) + "@egraphs.com").save()
+    val acct = Account(email = generateEmail(prefix = "customer-")).save()
     val cust = Customer().save()
 
-    acct.copy(customerId=Some(cust.id)).save()
+    acct.copy(customerId = Some(cust.id)).save()
 
     cust
   }
 
   def newSavedCelebrity(): Celebrity = {
-    val acct = Account(email="celebrity-"+Time.toBlobstoreFormat(Time.now)+"@egraphs.com").save()
+    val acct = Account(email = generateEmail(prefix = "celebrity-")).save()
     val celeb = Celebrity().save()
 
     acct.copy(celebrityId = Some(celeb.id)).save()
@@ -56,4 +60,5 @@ object TestData {
   object Kapler {
     val productPhotos = Array(Play.getFile("test/files/kapler/product-1.jpg"))
   }
+
 }

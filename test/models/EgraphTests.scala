@@ -5,8 +5,6 @@ import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 import utils._
 import services.blobs.Blobs.Conversions._
-import play.Play
-import javax.imageio.ImageIO
 import services.{Dimensions, Time, AppConfig}
 import java.awt.image.BufferedImage
 
@@ -106,7 +104,7 @@ object EgraphTests {
 
   def persistedOrder: Order = {
     val customer = TestData.newSavedCustomer()
-    val celebrity = Celebrity().save()
+    val celebrity = Celebrity(publicName = Some("Celebrity " + Time.toBlobstoreFormat(Time.now))).save()
     val product = celebrity.newProduct.save()
 
     customer.buy(product).save()
@@ -124,7 +122,7 @@ class EgraphFrameTests extends EgraphsUnitTest {
     PortraitEgraphFrame.imageAspectRatio should be (.7167)
     LandscapeEgraphFrame.imageAspectRatio should be (1.5782)
   }
-  
+
   it should "not crop when dimensions are already ideal for landscape (width > height)" in {
     val uncropped = new BufferedImage(1578, 1000, BufferedImage.TYPE_INT_ARGB)
     val cropped = LandscapeEgraphFrame.cropImageForFrame(uncropped)
@@ -138,7 +136,7 @@ class EgraphFrameTests extends EgraphsUnitTest {
 
     (cropped.getWidth, cropped.getHeight) should be ((uncropped.getWidth - 1, uncropped.getHeight))
   }
-  
+
   it should "crop to correct aspect ratio when too wide" in {
     val uncropped = new BufferedImage(717, 2000, BufferedImage.TYPE_INT_ARGB)
     val cropped = PortraitEgraphFrame.cropImageForFrame(uncropped)

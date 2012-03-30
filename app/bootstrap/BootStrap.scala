@@ -41,6 +41,8 @@ class BootStrap extends Job with Logging {
         TestModeBootstrap.run()
       }
 
+      actors.EgraphActor.actor.start()
+
       log("Finished bootstrapping application")
     }
   }

@@ -2,11 +2,11 @@ package controllers.api
 
 import play.mvc.Controller
 import sjson.json.Serializer
-import models._
 import play.data.validation._
 import services.http.OptionParams.Conversions._
 import play.libs.Codec
 import services.http.{ControllerMethod, HttpCodes, OrderRequestFilters, CelebrityAccountRequestFilters}
+import actors.ProcessEgraphMessage
 
 private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
   protected def controllerMethod: ControllerMethod
@@ -29,7 +29,6 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
 
       celebFilters.requireCelebrityAccount { (account, celebrity) =>
         orderFilters.requireOrderIdOfCelebrity(celebrity.id) { order =>
-          play.Logger.info("Processing Egraph submission for Order #" + order.id)
 
           val savedEgraph = order.newEgraph.withAssets(
             signature,
@@ -37,17 +36,9 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
             Codec.decodeBASE64(audio)
           ).save()
 
-          savedEgraph.assets.initMasterImage()
-          
-          val egraphToTest = if (skipBiometrics) savedEgraph.withYesMaamBiometricServices else savedEgraph
-          
-          val testedEgraph = egraphToTest.verifyBiometrics.save()
-          
-          if (testedEgraph.state == EgraphState.Verified) {
-            order.sendEgraphSignedMail()
-          }
-          
-          Serializer.SJSON.toJSON(Map("id" -> testedEgraph.id))
+          actors.EgraphActor.actor ! ProcessEgraphMessage(id = savedEgraph.id, skipBiometrics = skipBiometrics)
+
+          Serializer.SJSON.toJSON(Map("id" -> savedEgraph.id))
         }
       }
     }
