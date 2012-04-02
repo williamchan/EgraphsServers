@@ -109,11 +109,25 @@ object TestControllers extends Controller with Logging {
   }
 
   def script = controllerMethod() {
-//    println("System getProperty javax.net.ssl.trustStore = " + System.getProperty("javax.net.ssl.trustStore"))
-//    val startEnrollmentRequest = services.voice.VBGDevRandomNumberBiometricServices.sendStartEnrollmentRequest("pls", false)
-//    println(startEnrollmentRequest.getResponseValue("errorcode"))
-//    sjson.json.Serializer.SJSON.toJSON(Map("bees.api.name" -> Play.configuration.getProperty("bees.api.name")))
-    new jobs.EnrollmentBatchJob().now()
+    //    println("System getProperty javax.net.ssl.trustStore = " + System.getProperty("javax.net.ssl.trustStore"))
+    //    val startEnrollmentRequest = services.voice.VBGDevRandomNumberBiometricServices.sendStartEnrollmentRequest("pls", false)
+    //    println(startEnrollmentRequest.getResponseValue("errorcode"))
+    //    sjson.json.Serializer.SJSON.toJSON(Map("bees.api.name" -> Play.configuration.getProperty("bees.api.name")))
+
+    //    new jobs.EnrollmentBatchJob().now()
+
+    // find all Egraphs that are AwaitingVerification and give them a kick...
+    import org.squeryl.Query
+    import org.squeryl.PrimitiveTypeMode._
+    val egraphsAwaitingVerification: Query[(Egraph)] = from(schema.egraphs)(
+      (e) =>
+        where(e.stateValue === EgraphState.AwaitingVerification.value)
+          select (e)
+    )
+    for (egraph <- egraphsAwaitingVerification) {
+      actors.EgraphActor.actor ! actors.ProcessEgraphMessage(id = egraph.id)
+    }
+    "I gave all Egraphs AwaitingVerification a kick."
   }
 
   def createTestOrders(msg: String) = controllerMethod() {
