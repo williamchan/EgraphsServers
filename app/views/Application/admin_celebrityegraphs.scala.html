@@ -19,11 +19,12 @@
       <th>Id</th>
       <th>State</th>
       <th>Order Id</th>
-      <th>VBG TxnId</th>
-      <th>VBG Result</th>
-      <th>VBG Score</th>
-      <th>Xyzmo Result</th>
-      <th>Xyzmo Score</th>
+      <th>vbg TxnId</th>
+      <th>vbg Error</th>
+      <th>vbg Result</th>
+      <th>vbg Score</th>
+      <th>xyzmo Result</th>
+      <th>xyzmo Score</th>
     </tr>
     @egraphAndResults.map { case (egraph, vbgVerifySample, xyzmoVerifyUser) =>
     <tr>
@@ -31,6 +32,7 @@
       <td>@egraph.stateValue</td>
       <td>@egraph.orderId</td>
       <td>@vbgVerifySample.vbgTransactionId</td>
+      <td>@vbgVerifySample.errorCode</td>
       <td>@vbgVerifySample.success</td>
       <td>@vbgVerifySample.score</td>
       <td>@xyzmoVerifyUser.isMatch</td>
