@@ -5,16 +5,18 @@ import org.junit.Test
 import play.test.FunctionalTest
 import sjson.json.Serializer
 import utils.FunctionalTestUtils.{CleanDatabaseAfterEachTest, willChanRequest, runScenarios}
-import org.squeryl.PrimitiveTypeMode._
 import scenario.Scenarios
 import models._
 import utils.TestConstants
-import services.db.DBSession
 import services.AppConfig
+import services.db.{TransactionSerializable, DBSession}
 
 class GetCelebrityOrdersApiEndpointTests extends FunctionalTest with CleanDatabaseAfterEachTest {
 
   import FunctionalTest._
+
+  private val db = AppConfig.instance[DBSession]
+  private val orderStore = AppConfig.instance[OrderStore]
 
   @Test
   def testGetCelebrityOrders() {
@@ -51,21 +53,9 @@ class GetCelebrityOrdersApiEndpointTests extends FunctionalTest with CleanDataba
     val response = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/orders")
     assertStatus(500, response)
   }
-}
-
-/**
- * This FunctionalTest is the only test in its class because multiple FunctionalTests don't play nicely with direct
- * database transactions. See issue #40.
- */
-class GetCelebrityOrdersFiltersAwaitingVerificationApiEndpointTests extends FunctionalTest with CleanDatabaseAfterEachTest {
-
-  import FunctionalTest._
-
-  val orderStore = AppConfig.instance[OrderStore]
 
   @Test
   def testGetOrdersFiltersOutOrdersWithEgraphWithAwaitingVerificationState() {
-    DBSession.init()
     runScenarios(
       "Will-Chan-is-a-celebrity",
       "Will-has-two-products",
@@ -73,7 +63,7 @@ class GetCelebrityOrdersFiltersAwaitingVerificationApiEndpointTests extends Func
       "Erem-buys-Wills-two-products-twice-each"
     )
 
-    transaction {
+    db.connected(TransactionSerializable) {
       val celebrityId = Scenarios.getWillCelebrityAccount.id
       val allCelebOrders = orderStore.findByCelebrity(celebrityId)
       Egraph(orderId = allCelebOrders.toSeq.head.id).withState(EgraphState.AwaitingVerification).saveWithoutAssets()
@@ -84,21 +74,9 @@ class GetCelebrityOrdersFiltersAwaitingVerificationApiEndpointTests extends Func
     val json = Serializer.SJSON.in[List[Map[String, Any]]](getContent(response))
     assertEquals(json.length, 1)
   }
-}
-
-/**
- * This FunctionalTest is the only test in its class because multiple FunctionalTests don't play nicely with direct
- * database transactions. See issue #40.
- */
-class GetCelebrityOrdersFiltersVerifiedApiEndpointTests extends FunctionalTest with CleanDatabaseAfterEachTest {
-
-  import FunctionalTest._
-
-  val orderStore = AppConfig.instance[OrderStore]
 
   @Test
   def testGetOrdersFiltersOutOrdersWithEgraphWithVerifiedState() {
-    DBSession.init()
     runScenarios(
       "Will-Chan-is-a-celebrity",
       "Will-has-two-products",
@@ -106,7 +84,7 @@ class GetCelebrityOrdersFiltersVerifiedApiEndpointTests extends FunctionalTest w
       "Erem-buys-Wills-two-products-twice-each"
     )
 
-    transaction {
+    db.connected(TransactionSerializable) {
       val celebrityId = Scenarios.getWillCelebrityAccount.id
       val allCelebOrders = orderStore.findByCelebrity(celebrityId)
       Egraph(orderId = allCelebOrders.toSeq.head.id).withState(EgraphState.Verified).saveWithoutAssets()
@@ -117,21 +95,9 @@ class GetCelebrityOrdersFiltersVerifiedApiEndpointTests extends FunctionalTest w
     val json = Serializer.SJSON.in[List[Map[String, Any]]](getContent(response))
     assertEquals(json.length, 1)
   }
-}
-
-/**
- * This FunctionalTest is the only test in its class because multiple FunctionalTests don't play nicely with direct
- * database transactions. See issue #40.
- */
-class GetCelebrityOrdersIncludesRejectedApiEndpointTests extends FunctionalTest with CleanDatabaseAfterEachTest {
-
-  import FunctionalTest._
-
-  val orderStore = AppConfig.instance[OrderStore]
 
   @Test
   def testGetOrdersIncludesOrdersWithRejectedEgraphs() {
-    DBSession.init()
     runScenarios(
       "Will-Chan-is-a-celebrity",
       "Will-has-two-products",
@@ -139,7 +105,7 @@ class GetCelebrityOrdersIncludesRejectedApiEndpointTests extends FunctionalTest 
       "Erem-buys-Wills-two-products-twice-each"
     )
 
-    transaction {
+    db.connected(TransactionSerializable) {
       import EgraphState._
 
       val celebrityId = Scenarios.getWillCelebrityAccount.id
