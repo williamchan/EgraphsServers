@@ -3,6 +3,8 @@ package services.logging
 import org.slf4j.MDC
 import play.mvc.Http.Request
 import services.http.RequestInfo
+import services.Time
+import java.io.{PrintWriter, StringWriter}
 
 /**
  * Allows functions to be performed within a logging "Context", where
@@ -33,27 +35,47 @@ class LoggingContext {
   def withContext[A](request: Request)(operation: => A): A = {
     val requestInfo = new RequestInfo(request)
 
-    // Log the request header
-    withContext("") {
-      logRequestHeader(request, requestInfo)
-    }
-  
     // Prepare the context for any logs that occur after this point
     val requestContext = createRequestContext(request, requestInfo)
 
-    withContext(requestContext.toString())(operation)
+    withContext(requestContext) {
+      logRequestHeader(request, requestInfo)
+      operation
+    }
+  }
+
+  /**
+   * Opens a logging context with a single, unique-ish ID that gets tagged onto the name.
+   * Use this for logging in Jobs or in bootstrap.
+   *
+   * @param name name of the logging context
+   * @param operation operation to execute within the context
+   * @tparam A return type of operation
+   *
+   * @return the return value of operation
+   */
+  def withTraceableContext[A](name: String)(operation: => A): A = {    
+    val idSeed = new StringBuilder(name)
+      .append(services.Random.string(10))
+      .append(Time.now)
+    
+    val id = play.libs.Crypto.passwordHash(idSeed.toString()).substring(0, 9)
+
+    val contextString = new StringBuilder(name).append("(").append(id).append(")").toString()
+
+    withContext(contextString) {
+      operation
+    }
   }
   
   private def createRequestContext(request: Request, requestInfo: RequestInfo): String = {
     try {
-      new StringBuilder("<")
-        .append(request.actionMethod)
+      new StringBuilder(request.actionMethod)
         .append("(")
         .append(requestInfo.clientId)
         .append(".")
         .append(requestInfo.requestId)
         .append(")")
-        .append(">")
         .toString()
     }
     catch {
@@ -65,8 +87,7 @@ class LoggingContext {
   
   private def logRequestHeader(request: Request, requestInfo: RequestInfo) {
     try {
-      val requestHeader = new StringBuilder("=== ")
-        .append("Serving IP ")
+      val requestHeader = new StringBuilder("Serving IP ")
         .append(request.remoteAddress)
         .append("(id=")
         .append(requestInfo.clientId)
@@ -77,7 +98,6 @@ class LoggingContext {
         .append(request.controller)
         .append(".")
         .append(request.actionMethod)
-        .append(" ===")
       
       play.Logger.info(requestHeader.toString())
     }
@@ -101,6 +121,15 @@ class LoggingContext {
     MDC.put(contextKey, context)
     try {
       operation
+    }
+    catch {
+      case e: Exception =>
+        val stringWriter = new StringWriter()        
+        e.printStackTrace(new PrintWriter(stringWriter))
+        play.Logger.error("Fatal error: " + e.getClass + ": " + e.getMessage)
+        stringWriter.toString.split("\n").foreach(line => play.Logger.info(line))
+
+        throw e
     }
     finally {
       MDC.put(contextKey, oldContext)

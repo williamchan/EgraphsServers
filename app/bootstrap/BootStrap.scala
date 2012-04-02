@@ -19,7 +19,7 @@ class BootStrap extends Job with Logging {
   val logging = AppConfig.instance[LoggingContext]
 
   override def doJob() {
-    logging.withContext("<Bootstrap>") {
+    logging.withTraceableContext("Bootstrap") {
       log("Bootstrapping application")
       // Initialize payment system
       payment.bootstrap()

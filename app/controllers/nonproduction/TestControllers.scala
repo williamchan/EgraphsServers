@@ -9,8 +9,9 @@ import services.blobs.Blobs
 import services.db.Schema
 import models._
 import services.http.{ControllerMethod}
+import services.logging.Logging
 
-object TestControllers extends Controller {
+object TestControllers extends Controller with Logging {
   val controllerMethod = AppConfig.instance[ControllerMethod]
   val blobs = AppConfig.instance[Blobs]
   val schema = AppConfig.instance[Schema]
@@ -93,6 +94,18 @@ object TestControllers extends Controller {
       description = "Help me... help YOU..."
     ).save().withPhoto(Play.getFile("test/files/kapler/product-1.jpg")).save()
 
+  }
+
+  def logStuffThenThrowException() = controllerMethod() {
+    log("I'm pretty happy to be alive")
+    log("Just chugging along with this method")
+    log("Can't wait to send a nice webpage down to the client...")
+    log("Wait, is that a bear???")
+    log("Oh no! It's a bear!")
+    log("Don't kill me please...I don't, I don't want to--")
+
+    val illegalE = new IllegalArgumentException("Bear")
+    throw new RuntimeException("Process was mauled by a bear", illegalE)
   }
 
   def script = controllerMethod() {

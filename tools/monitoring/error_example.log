@@ -1,0 +1,569 @@
+Listening for transport dt_socket at address: 8000
+03/30 15:57:57.232,INFO , ~~> Starting /Users/eboto/code/eGraphsServers
+03/30 15:57:57.238,INFO , ~~> Module cloudbees is available (/Users/eboto/code/eGraphsServers/modules/cloudbees-0.2.2)
+03/30 15:57:57.238,INFO , ~~> Module less is available (/Users/eboto/code/eGraphsServers/modules/less-0.3.compatibility)
+03/30 15:57:57.239,INFO , ~~> Module mockito is available (/Users/eboto/code/eGraphsServers/modules/mockito-0.1)
+03/30 15:57:57.239,INFO , ~~> Module scala is available (/Users/eboto/lib/play-1.2.4/modules/scala-0.9.1)
+03/30 15:57:58.849,INFO , ~~> Scala support is active
+03/30 15:57:58.905,WARN , ~~> Using implementation version: Rhino 1.6 release 7 2011 09 02
+03/30 15:57:59.253,WARN , ~~> You're running Play! in DEV mode
+~
+~ Go to http://localhost:9000/@tests to run the tests
+~
+03/30 15:57:59.328,INFO , ~~> Listening for HTTP on port 9000 (Waiting a first request to start) ...
+Compiling:
+	/Users/eboto/code/eGraphsServers/app/services/logging/LoggingContext.scala
+Traversing /Users/eboto/code/eGraphsServers/app/services/logging/LoggingContext.scala
+API phase took : 0.031 s
+03/30 15:58:35.675,INFO , ~~> Connected to jdbc:postgresql://localhost/egraphs
+03/30 15:58:35.722,INFO , ~~> Application 'eGraphsServers' is now started !
+03/30 15:58:36.329,INFO ,Bootstrap(wG7CDk72d) ~~> [BootStrap] Bootstrapping application
+03/30 15:58:37.796,INFO ,Bootstrap(wG7CDk72d) ~~> [TestModeBootstr…] Performing test-mode bootstrap.
+03/30 15:58:37.797,INFO ,Bootstrap(wG7CDk72d) ~~> [DBSession] Connecting to a DB Connection from the pool at isolation level: TransactionSerializable
+03/30 15:58:37.857,INFO ,Bootstrap(wG7CDk72d) ~~> [Schema] Existing egraphs schema was detected
+03/30 15:58:37.962,INFO ,Bootstrap(wG7CDk72d) ~~> [DBSession] Committing changes to the DB
+03/30 15:58:37.963,INFO ,Bootstrap(wG7CDk72d) ~~> [DBSession] Returning DB Connection to the pool
+03/30 15:58:37.963,INFO ,Bootstrap(wG7CDk72d) ~~> [TestModeBootstr…] Finished bootstrapping test-mode.
+03/30 15:58:37.963,INFO ,Bootstrap(wG7CDk72d) ~~> [BootStrap] Finished bootstrapping application
+03/30 15:58:38.033,INFO ,getRootEndpoint(XUkF6V.Sf52zG) ~~> Serving IP 0:0:0:0:0:0:0:1(id=XUkF6V, requestId=Sf52zG) with WebsiteControllers.getRootEndpoint
+03/30 15:58:38.033,INFO ,getRootEndpoint(XUkF6V.Sf52zG) ~~> [DBSession] Connecting to a DB Connection from the pool at isolation level: TransactionSerializable
+03/30 15:58:38.040,INFO ,getRootEndpoint(XUkF6V.Sf52zG) ~~> [DBSession] Committing changes to the DB
+03/30 15:58:38.040,INFO ,getRootEndpoint(XUkF6V.Sf52zG) ~~> [DBSession] Returning DB Connection to the pool
+03/30 15:58:42.034,INFO ,list(XUkF6V.Zru/Tp) ~~> Serving IP 0:0:0:0:0:0:0:1(id=XUkF6V, requestId=Zru/Tp) with nonproduction.ScenarioController.list
+03/30 15:58:42.034,INFO ,list(XUkF6V.Zru/Tp) ~~> [DBSession] Connecting to a DB Connection from the pool at isolation level: TransactionSerializable
+03/30 15:58:42.060,INFO ,list(XUkF6V.Zru/Tp) ~~> [DBSession] Committing changes to the DB
+03/30 15:58:42.060,INFO ,list(XUkF6V.Zru/Tp) ~~> [DBSession] Returning DB Connection to the pool
+03/30 15:58:46.018,INFO ,getCelebrities(XUkF6V.klruHo) ~~> Serving IP 0:0:0:0:0:0:0:1(id=XUkF6V, requestId=klruHo) with WebsiteControllers.getCelebrities
+03/30 15:58:46.019,INFO ,getCelebrities(XUkF6V.klruHo) ~~> [DBSession] Connecting to a DB Connection from the pool at isolation level: TransactionSerializable
+03/30 15:58:46.121,INFO ,getCelebrities(XUkF6V.klruHo) ~~> [DBSession] Committing changes to the DB
+03/30 15:58:46.121,INFO ,getCelebrities(XUkF6V.klruHo) ~~> [DBSession] Returning DB Connection to the pool
+03/30 15:58:48.533,INFO ,getCelebrityProducts(XUkF6V.PBoqqn) ~~> Serving IP 0:0:0:0:0:0:0:1(id=XUkF6V, requestId=PBoqqn) with WebsiteControllers.getCelebrityProducts
+03/30 15:58:48.533,INFO ,getCelebrityProducts(XUkF6V.PBoqqn) ~~> [DBSession] Connecting to a DB Connection from the pool at isolation level: TransactionSerializable
+03/30 15:58:48.671,INFO ,getCelebrityProducts(XUkF6V.PBoqqn) ~~> [DBSession] Committing changes to the DB
+03/30 15:58:48.671,INFO ,getCelebrityProducts(XUkF6V.PBoqqn) ~~> [DBSession] Returning DB Connection to the pool
+03/30 15:58:59.170,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> Serving IP 0:0:0:0:0:0:0:1(id=XUkF6V, requestId=WWz7lx) with nonproduction.TestControllers.logStuffThenThrowException
+03/30 15:58:59.170,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> [DBSession] Connecting to a DB Connection from the pool at isolation level: TransactionSerializable
+03/30 15:58:59.171,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> [TestControllers…] I'm pretty happy to be alive
+03/30 15:58:59.171,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> [TestControllers…] Just chugging along with this method
+03/30 15:58:59.171,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> [TestControllers…] Can't wait to send a nice webpage down to the client...
+03/30 15:58:59.171,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> [TestControllers…] Wait, is that a bear???
+03/30 15:58:59.171,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> [TestControllers…] Oh no! It's a bear!
+03/30 15:58:59.172,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> [TestControllers…] Don't kill me please...I don't, I don't want to--
+03/30 15:58:59.172,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> [DBSession] Rolling back changes to the DB due to a java.lang.RuntimeException
+03/30 15:58:59.172,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> [DBSession] Returning DB Connection to the pool
+03/30 15:58:59.173,ERROR,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> Fatal error: class java.lang.RuntimeException: Process was mauled by a bear
+03/30 15:58:59.173,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> java.lang.RuntimeException: Process was mauled by a bear
+03/30 15:58:59.173,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:108)
+03/30 15:58:59.173,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:99)
+03/30 15:58:59.173,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at org.squeryl.dsl.QueryDsl$class._using(QueryDsl.scala:46)
+03/30 15:58:59.173,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at org.squeryl.dsl.QueryDsl$class.using(QueryDsl.scala:38)
+03/30 15:58:59.173,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at org.squeryl.PrimitiveTypeMode$.using(PrimitiveTypeMode.scala:40)
+03/30 15:58:59.173,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at services.db.DBSession.connected(DBSession.scala:34)
+03/30 15:58:59.173,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at services.http.ControllerMethod$$anonfun$apply$1.apply(ControllerMethod.scala:36)
+03/30 15:58:59.173,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at services.logging.LoggingContext$$anonfun$withContext$1.apply(LoggingContext.scala:43)
+03/30 15:58:59.173,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at services.logging.LoggingContext.withContext(LoggingContext.scala:122)
+03/30 15:58:59.174,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at services.logging.LoggingContext.withContext(LoggingContext.scala:41)
+03/30 15:58:59.174,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at services.http.ControllerMethod.apply(ControllerMethod.scala:34)
+03/30 15:58:59.174,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at controllers.nonproduction.TestControllers$.logStuffThenThrowException(TestControllers.scala:99)
+03/30 15:58:59.174,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+03/30 15:58:59.174,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+03/30 15:58:59.174,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+03/30 15:58:59.174,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at java.lang.reflect.Method.invoke(Method.java:597)
+03/30 15:58:59.174,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:548)
+03/30 15:58:59.174,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:502)
+03/30 15:58:59.174,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:496)
+03/30 15:58:59.174,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:473)
+03/30 15:58:59.174,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+03/30 15:58:59.174,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at play.server.PlayHandler$NettyInvocation.execute(PlayHandler.java:257)
+03/30 15:58:59.174,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at play.Invoker$Invocation.run(Invoker.java:278)
+03/30 15:58:59.175,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at play.server.PlayHandler$NettyInvocation.run(PlayHandler.java:235)
+03/30 15:58:59.175,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:441)
+03/30 15:58:59.175,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at java.util.concurrent.FutureTask$Sync.innerRun(FutureTask.java:303)
+03/30 15:58:59.175,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at java.util.concurrent.FutureTask.run(FutureTask.java:138)
+03/30 15:58:59.175,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$301(ScheduledThreadPoolExecutor.java:98)
+03/30 15:58:59.175,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:206)
+03/30 15:58:59.175,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:886)
+03/30 15:58:59.175,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:908)
+03/30 15:58:59.175,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at java.lang.Thread.run(Thread.java:680)
+03/30 15:58:59.175,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> Caused by: java.lang.IllegalArgumentException: Bear
+03/30 15:58:59.175,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:107)
+03/30 15:58:59.175,INFO ,logStuffThenThrowException(XUkF6V.WWz7lx) ~~> 	... 31 more
+03/30 15:59:02.215,ERROR,<No context> ~~> 
+
+@69peml5k5
+Internal Server Error (500) for request GET /test/log-stuff-then-die
+
+Execution exception (In /app/controllers/nonproduction/TestControllers.scala around line 108)
+RuntimeException occured : Process was mauled by a bear
+
+play.exceptions.JavaExecutionException: Process was mauled by a bear
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:231)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.RuntimeException: Process was mauled by a bear
+	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:108)
+	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:99)
+	at org.squeryl.dsl.QueryDsl$class._using(QueryDsl.scala:46)
+	at org.squeryl.dsl.QueryDsl$class.using(QueryDsl.scala:38)
+	at org.squeryl.PrimitiveTypeMode$.using(PrimitiveTypeMode.scala:40)
+	at services.db.DBSession.connected(DBSession.scala:34)
+	at services.http.ControllerMethod$$anonfun$apply$1.apply(ControllerMethod.scala:36)
+	at services.logging.LoggingContext$$anonfun$withContext$1.apply(LoggingContext.scala:43)
+	at services.logging.LoggingContext.withContext(LoggingContext.scala:122)
+	at services.logging.LoggingContext.withContext(LoggingContext.scala:41)
+	at services.http.ControllerMethod.apply(ControllerMethod.scala:34)
+	at controllers.nonproduction.TestControllers$.logStuffThenThrowException(TestControllers.scala:99)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:548)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:502)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:496)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:473)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+Caused by: java.lang.IllegalArgumentException: Bear
+	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:107)
+	... 17 more
+03/30 15:59:18.954,INFO ,list(XUkF6V.CoEM5/) ~~> Serving IP 0:0:0:0:0:0:0:1(id=XUkF6V, requestId=CoEM5/) with nonproduction.ScenarioController.list
+03/30 15:59:18.954,INFO ,list(XUkF6V.CoEM5/) ~~> [DBSession] Connecting to a DB Connection from the pool at isolation level: TransactionSerializable
+03/30 15:59:18.958,INFO ,list(XUkF6V.CoEM5/) ~~> [DBSession] Committing changes to the DB
+03/30 15:59:18.958,INFO ,list(XUkF6V.CoEM5/) ~~> [DBSession] Returning DB Connection to the pool
+03/30 15:59:20.165,INFO ,list(XUkF6V.Xw+E11) ~~> Serving IP 0:0:0:0:0:0:0:1(id=XUkF6V, requestId=Xw+E11) with nonproduction.ScenarioController.list
+03/30 15:59:20.165,INFO ,list(XUkF6V.Xw+E11) ~~> [DBSession] Connecting to a DB Connection from the pool at isolation level: TransactionSerializable
+03/30 15:59:20.169,INFO ,list(XUkF6V.Xw+E11) ~~> [DBSession] Committing changes to the DB
+03/30 15:59:20.169,INFO ,list(XUkF6V.Xw+E11) ~~> [DBSession] Returning DB Connection to the pool
+03/30 15:59:21.755,INFO ,getRootEndpoint(XUkF6V.VuOo3E) ~~> Serving IP 0:0:0:0:0:0:0:1(id=XUkF6V, requestId=VuOo3E) with WebsiteControllers.getRootEndpoint
+03/30 15:59:21.755,INFO ,getRootEndpoint(XUkF6V.VuOo3E) ~~> [DBSession] Connecting to a DB Connection from the pool at isolation level: TransactionSerializable
+03/30 15:59:21.756,INFO ,getRootEndpoint(XUkF6V.VuOo3E) ~~> [DBSession] Committing changes to the DB
+03/30 15:59:21.757,INFO ,getRootEndpoint(XUkF6V.VuOo3E) ~~> [DBSession] Returning DB Connection to the pool
+03/30 15:59:22.493,INFO ,getRootEndpoint(XUkF6V.1+QPF4) ~~> Serving IP 0:0:0:0:0:0:0:1(id=XUkF6V, requestId=1+QPF4) with WebsiteControllers.getRootEndpoint
+03/30 15:59:22.494,INFO ,getRootEndpoint(XUkF6V.1+QPF4) ~~> [DBSession] Connecting to a DB Connection from the pool at isolation level: TransactionSerializable
+03/30 15:59:22.495,INFO ,getRootEndpoint(XUkF6V.1+QPF4) ~~> [DBSession] Committing changes to the DB
+03/30 15:59:22.495,INFO ,getRootEndpoint(XUkF6V.1+QPF4) ~~> [DBSession] Returning DB Connection to the pool
+03/30 15:59:22.985,INFO ,getRootEndpoint(XUkF6V.FmBZKG) ~~> Serving IP 0:0:0:0:0:0:0:1(id=XUkF6V, requestId=FmBZKG) with WebsiteControllers.getRootEndpoint
+03/30 15:59:22.986,INFO ,getRootEndpoint(XUkF6V.FmBZKG) ~~> [DBSession] Connecting to a DB Connection from the pool at isolation level: TransactionSerializable
+03/30 15:59:22.987,INFO ,getRootEndpoint(XUkF6V.FmBZKG) ~~> [DBSession] Committing changes to the DB
+03/30 15:59:22.987,INFO ,getRootEndpoint(XUkF6V.FmBZKG) ~~> [DBSession] Returning DB Connection to the pool
+03/30 15:59:23.880,INFO ,getRootEndpoint(XUkF6V.0W1cqx) ~~> Serving IP 0:0:0:0:0:0:0:1(id=XUkF6V, requestId=0W1cqx) with WebsiteControllers.getRootEndpoint
+03/30 15:59:23.880,INFO ,getRootEndpoint(XUkF6V.0W1cqx) ~~> [DBSession] Connecting to a DB Connection from the pool at isolation level: TransactionSerializable
+03/30 15:59:23.881,INFO ,getRootEndpoint(XUkF6V.0W1cqx) ~~> [DBSession] Committing changes to the DB
+03/30 15:59:23.881,INFO ,getRootEndpoint(XUkF6V.0W1cqx) ~~> [DBSession] Returning DB Connection to the pool
+03/30 15:59:24.643,INFO ,getRootEndpoint(XUkF6V.xpxYO+) ~~> Serving IP 0:0:0:0:0:0:0:1(id=XUkF6V, requestId=xpxYO+) with WebsiteControllers.getRootEndpoint
+03/30 15:59:24.643,INFO ,getRootEndpoint(XUkF6V.xpxYO+) ~~> [DBSession] Connecting to a DB Connection from the pool at isolation level: TransactionSerializable
+03/30 15:59:24.645,INFO ,getRootEndpoint(XUkF6V.xpxYO+) ~~> [DBSession] Committing changes to the DB
+03/30 15:59:24.645,INFO ,getRootEndpoint(XUkF6V.xpxYO+) ~~> [DBSession] Returning DB Connection to the pool
+03/30 15:59:41.713,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> Serving IP 0:0:0:0:0:0:0:1(id=XUkF6V, requestId=A5d9en) with nonproduction.TestControllers.logStuffThenThrowException
+03/30 15:59:41.714,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> [DBSession] Connecting to a DB Connection from the pool at isolation level: TransactionSerializable
+03/30 15:59:41.714,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> [TestControllers…] I'm pretty happy to be alive
+03/30 15:59:41.715,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> [TestControllers…] Just chugging along with this method
+03/30 15:59:41.715,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> [TestControllers…] Can't wait to send a nice webpage down to the client...
+03/30 15:59:41.715,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> [TestControllers…] Wait, is that a bear???
+03/30 15:59:41.715,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> [TestControllers…] Oh no! It's a bear!
+03/30 15:59:41.715,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> [TestControllers…] Don't kill me please...I don't, I don't want to--
+03/30 15:59:41.715,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> [DBSession] Rolling back changes to the DB due to a java.lang.RuntimeException
+03/30 15:59:41.715,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> [DBSession] Returning DB Connection to the pool
+03/30 15:59:41.715,ERROR,logStuffThenThrowException(XUkF6V.A5d9en) ~~> Fatal error: class java.lang.RuntimeException: Process was mauled by a bear
+03/30 15:59:41.716,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> java.lang.RuntimeException: Process was mauled by a bear
+03/30 15:59:41.716,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:108)
+03/30 15:59:41.716,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:99)
+03/30 15:59:41.716,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at org.squeryl.dsl.QueryDsl$class._using(QueryDsl.scala:46)
+03/30 15:59:41.716,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at org.squeryl.dsl.QueryDsl$class.using(QueryDsl.scala:38)
+03/30 15:59:41.716,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at org.squeryl.PrimitiveTypeMode$.using(PrimitiveTypeMode.scala:40)
+03/30 15:59:41.716,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at services.db.DBSession.connected(DBSession.scala:34)
+03/30 15:59:41.716,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at services.http.ControllerMethod$$anonfun$apply$1.apply(ControllerMethod.scala:36)
+03/30 15:59:41.716,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at services.logging.LoggingContext$$anonfun$withContext$1.apply(LoggingContext.scala:43)
+03/30 15:59:41.716,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at services.logging.LoggingContext.withContext(LoggingContext.scala:122)
+03/30 15:59:41.716,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at services.logging.LoggingContext.withContext(LoggingContext.scala:41)
+03/30 15:59:41.716,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at services.http.ControllerMethod.apply(ControllerMethod.scala:34)
+03/30 15:59:41.716,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at controllers.nonproduction.TestControllers$.logStuffThenThrowException(TestControllers.scala:99)
+03/30 15:59:41.716,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+03/30 15:59:41.716,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+03/30 15:59:41.716,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+03/30 15:59:41.716,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at java.lang.reflect.Method.invoke(Method.java:597)
+03/30 15:59:41.716,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:548)
+03/30 15:59:41.716,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:502)
+03/30 15:59:41.716,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:496)
+03/30 15:59:41.717,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:473)
+03/30 15:59:41.717,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+03/30 15:59:41.717,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at play.server.PlayHandler$NettyInvocation.execute(PlayHandler.java:257)
+03/30 15:59:41.717,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at play.Invoker$Invocation.run(Invoker.java:278)
+03/30 15:59:41.717,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at play.server.PlayHandler$NettyInvocation.run(PlayHandler.java:235)
+03/30 15:59:41.717,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:441)
+03/30 15:59:41.717,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at java.util.concurrent.FutureTask$Sync.innerRun(FutureTask.java:303)
+03/30 15:59:41.717,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at java.util.concurrent.FutureTask.run(FutureTask.java:138)
+03/30 15:59:41.717,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$301(ScheduledThreadPoolExecutor.java:98)
+03/30 15:59:41.717,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:206)
+03/30 15:59:41.717,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:886)
+03/30 15:59:41.717,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:908)
+03/30 15:59:41.717,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at java.lang.Thread.run(Thread.java:680)
+03/30 15:59:41.717,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> Caused by: java.lang.IllegalArgumentException: Bear
+03/30 15:59:41.717,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:107)
+03/30 15:59:41.717,INFO ,logStuffThenThrowException(XUkF6V.A5d9en) ~~> 	... 31 more
+03/30 15:59:41.741,ERROR,<No context> ~~> 
+
+@69peml5k6
+Internal Server Error (500) for request GET /test/log-stuff-then-die
+
+Execution exception (In /app/controllers/nonproduction/TestControllers.scala around line 108)
+RuntimeException occured : Process was mauled by a bear
+
+play.exceptions.JavaExecutionException: Process was mauled by a bear
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:231)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.RuntimeException: Process was mauled by a bear
+	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:108)
+	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:99)
+	at org.squeryl.dsl.QueryDsl$class._using(QueryDsl.scala:46)
+	at org.squeryl.dsl.QueryDsl$class.using(QueryDsl.scala:38)
+	at org.squeryl.PrimitiveTypeMode$.using(PrimitiveTypeMode.scala:40)
+	at services.db.DBSession.connected(DBSession.scala:34)
+	at services.http.ControllerMethod$$anonfun$apply$1.apply(ControllerMethod.scala:36)
+	at services.logging.LoggingContext$$anonfun$withContext$1.apply(LoggingContext.scala:43)
+	at services.logging.LoggingContext.withContext(LoggingContext.scala:122)
+	at services.logging.LoggingContext.withContext(LoggingContext.scala:41)
+	at services.http.ControllerMethod.apply(ControllerMethod.scala:34)
+	at controllers.nonproduction.TestControllers$.logStuffThenThrowException(TestControllers.scala:99)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:548)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:502)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:496)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:473)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+Caused by: java.lang.IllegalArgumentException: Bear
+	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:107)
+	... 17 more
+03/30 15:59:45.175,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> Serving IP 0:0:0:0:0:0:0:1(id=XUkF6V, requestId=xb4j6S) with nonproduction.TestControllers.logStuffThenThrowException
+03/30 15:59:45.175,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> [DBSession] Connecting to a DB Connection from the pool at isolation level: TransactionSerializable
+03/30 15:59:45.176,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> [TestControllers…] I'm pretty happy to be alive
+03/30 15:59:45.176,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> [TestControllers…] Just chugging along with this method
+03/30 15:59:45.176,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> [TestControllers…] Can't wait to send a nice webpage down to the client...
+03/30 15:59:45.176,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> [TestControllers…] Wait, is that a bear???
+03/30 15:59:45.176,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> [TestControllers…] Oh no! It's a bear!
+03/30 15:59:45.176,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> [TestControllers…] Don't kill me please...I don't, I don't want to--
+03/30 15:59:45.176,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> [DBSession] Rolling back changes to the DB due to a java.lang.RuntimeException
+03/30 15:59:45.176,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> [DBSession] Returning DB Connection to the pool
+03/30 15:59:45.177,ERROR,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> Fatal error: class java.lang.RuntimeException: Process was mauled by a bear
+03/30 15:59:45.177,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> java.lang.RuntimeException: Process was mauled by a bear
+03/30 15:59:45.177,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:108)
+03/30 15:59:45.177,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:99)
+03/30 15:59:45.177,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at org.squeryl.dsl.QueryDsl$class._using(QueryDsl.scala:46)
+03/30 15:59:45.177,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at org.squeryl.dsl.QueryDsl$class.using(QueryDsl.scala:38)
+03/30 15:59:45.177,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at org.squeryl.PrimitiveTypeMode$.using(PrimitiveTypeMode.scala:40)
+03/30 15:59:45.177,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at services.db.DBSession.connected(DBSession.scala:34)
+03/30 15:59:45.177,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at services.http.ControllerMethod$$anonfun$apply$1.apply(ControllerMethod.scala:36)
+03/30 15:59:45.178,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at services.logging.LoggingContext$$anonfun$withContext$1.apply(LoggingContext.scala:43)
+03/30 15:59:45.178,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at services.logging.LoggingContext.withContext(LoggingContext.scala:122)
+03/30 15:59:45.178,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at services.logging.LoggingContext.withContext(LoggingContext.scala:41)
+03/30 15:59:45.178,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at services.http.ControllerMethod.apply(ControllerMethod.scala:34)
+03/30 15:59:45.178,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at controllers.nonproduction.TestControllers$.logStuffThenThrowException(TestControllers.scala:99)
+03/30 15:59:45.178,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+03/30 15:59:45.178,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+03/30 15:59:45.178,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+03/30 15:59:45.178,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at java.lang.reflect.Method.invoke(Method.java:597)
+03/30 15:59:45.178,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:548)
+03/30 15:59:45.178,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:502)
+03/30 15:59:45.178,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:496)
+03/30 15:59:45.178,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:473)
+03/30 15:59:45.178,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+03/30 15:59:45.178,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at play.server.PlayHandler$NettyInvocation.execute(PlayHandler.java:257)
+03/30 15:59:45.178,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at play.Invoker$Invocation.run(Invoker.java:278)
+03/30 15:59:45.178,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at play.server.PlayHandler$NettyInvocation.run(PlayHandler.java:235)
+03/30 15:59:45.178,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:441)
+03/30 15:59:45.178,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at java.util.concurrent.FutureTask$Sync.innerRun(FutureTask.java:303)
+03/30 15:59:45.178,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at java.util.concurrent.FutureTask.run(FutureTask.java:138)
+03/30 15:59:45.178,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$301(ScheduledThreadPoolExecutor.java:98)
+03/30 15:59:45.178,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:206)
+03/30 15:59:45.179,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:886)
+03/30 15:59:45.179,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:908)
+03/30 15:59:45.179,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at java.lang.Thread.run(Thread.java:680)
+03/30 15:59:45.179,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> Caused by: java.lang.IllegalArgumentException: Bear
+03/30 15:59:45.179,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:107)
+03/30 15:59:45.179,INFO ,logStuffThenThrowException(XUkF6V.xb4j6S) ~~> 	... 31 more
+03/30 15:59:45.188,ERROR,<No context> ~~> 
+
+@69peml5k7
+Internal Server Error (500) for request GET /test/log-stuff-then-die
+
+Execution exception (In /app/controllers/nonproduction/TestControllers.scala around line 108)
+RuntimeException occured : Process was mauled by a bear
+
+play.exceptions.JavaExecutionException: Process was mauled by a bear
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:231)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.RuntimeException: Process was mauled by a bear
+	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:108)
+	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:99)
+	at org.squeryl.dsl.QueryDsl$class._using(QueryDsl.scala:46)
+	at org.squeryl.dsl.QueryDsl$class.using(QueryDsl.scala:38)
+	at org.squeryl.PrimitiveTypeMode$.using(PrimitiveTypeMode.scala:40)
+	at services.db.DBSession.connected(DBSession.scala:34)
+	at services.http.ControllerMethod$$anonfun$apply$1.apply(ControllerMethod.scala:36)
+	at services.logging.LoggingContext$$anonfun$withContext$1.apply(LoggingContext.scala:43)
+	at services.logging.LoggingContext.withContext(LoggingContext.scala:122)
+	at services.logging.LoggingContext.withContext(LoggingContext.scala:41)
+	at services.http.ControllerMethod.apply(ControllerMethod.scala:34)
+	at controllers.nonproduction.TestControllers$.logStuffThenThrowException(TestControllers.scala:99)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:548)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:502)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:496)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:473)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+Caused by: java.lang.IllegalArgumentException: Bear
+	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:107)
+	... 17 more
+03/30 15:59:48.663,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> Serving IP 0:0:0:0:0:0:0:1(id=XUkF6V, requestId=2YLsyF) with nonproduction.TestControllers.logStuffThenThrowException
+03/30 15:59:48.663,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> [DBSession] Connecting to a DB Connection from the pool at isolation level: TransactionSerializable
+03/30 15:59:48.664,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> [TestControllers…] I'm pretty happy to be alive
+03/30 15:59:48.664,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> [TestControllers…] Just chugging along with this method
+03/30 15:59:48.664,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> [TestControllers…] Can't wait to send a nice webpage down to the client...
+03/30 15:59:48.664,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> [TestControllers…] Wait, is that a bear???
+03/30 15:59:48.664,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> [TestControllers…] Oh no! It's a bear!
+03/30 15:59:48.664,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> [TestControllers…] Don't kill me please...I don't, I don't want to--
+03/30 15:59:48.664,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> [DBSession] Rolling back changes to the DB due to a java.lang.RuntimeException
+03/30 15:59:48.664,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> [DBSession] Returning DB Connection to the pool
+03/30 15:59:48.664,ERROR,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> Fatal error: class java.lang.RuntimeException: Process was mauled by a bear
+03/30 15:59:48.665,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> java.lang.RuntimeException: Process was mauled by a bear
+03/30 15:59:48.665,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:108)
+03/30 15:59:48.665,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:99)
+03/30 15:59:48.665,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at org.squeryl.dsl.QueryDsl$class._using(QueryDsl.scala:46)
+03/30 15:59:48.665,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at org.squeryl.dsl.QueryDsl$class.using(QueryDsl.scala:38)
+03/30 15:59:48.665,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at org.squeryl.PrimitiveTypeMode$.using(PrimitiveTypeMode.scala:40)
+03/30 15:59:48.665,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at services.db.DBSession.connected(DBSession.scala:34)
+03/30 15:59:48.665,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at services.http.ControllerMethod$$anonfun$apply$1.apply(ControllerMethod.scala:36)
+03/30 15:59:48.665,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at services.logging.LoggingContext$$anonfun$withContext$1.apply(LoggingContext.scala:43)
+03/30 15:59:48.665,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at services.logging.LoggingContext.withContext(LoggingContext.scala:122)
+03/30 15:59:48.665,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at services.logging.LoggingContext.withContext(LoggingContext.scala:41)
+03/30 15:59:48.665,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at services.http.ControllerMethod.apply(ControllerMethod.scala:34)
+03/30 15:59:48.665,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at controllers.nonproduction.TestControllers$.logStuffThenThrowException(TestControllers.scala:99)
+03/30 15:59:48.665,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+03/30 15:59:48.665,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+03/30 15:59:48.665,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+03/30 15:59:48.665,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at java.lang.reflect.Method.invoke(Method.java:597)
+03/30 15:59:48.665,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:548)
+03/30 15:59:48.665,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:502)
+03/30 15:59:48.665,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:496)
+03/30 15:59:48.666,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:473)
+03/30 15:59:48.666,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+03/30 15:59:48.666,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at play.server.PlayHandler$NettyInvocation.execute(PlayHandler.java:257)
+03/30 15:59:48.666,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at play.Invoker$Invocation.run(Invoker.java:278)
+03/30 15:59:48.666,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at play.server.PlayHandler$NettyInvocation.run(PlayHandler.java:235)
+03/30 15:59:48.666,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:441)
+03/30 15:59:48.666,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at java.util.concurrent.FutureTask$Sync.innerRun(FutureTask.java:303)
+03/30 15:59:48.666,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at java.util.concurrent.FutureTask.run(FutureTask.java:138)
+03/30 15:59:48.666,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$301(ScheduledThreadPoolExecutor.java:98)
+03/30 15:59:48.666,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:206)
+03/30 15:59:48.666,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:886)
+03/30 15:59:48.666,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:908)
+03/30 15:59:48.666,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at java.lang.Thread.run(Thread.java:680)
+03/30 15:59:48.666,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> Caused by: java.lang.IllegalArgumentException: Bear
+03/30 15:59:48.666,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:107)
+03/30 15:59:48.666,INFO ,logStuffThenThrowException(XUkF6V.2YLsyF) ~~> 	... 31 more
+03/30 15:59:48.676,ERROR,<No context> ~~> 
+
+@69peml5k8
+Internal Server Error (500) for request GET /test/log-stuff-then-die
+
+Execution exception (In /app/controllers/nonproduction/TestControllers.scala around line 108)
+RuntimeException occured : Process was mauled by a bear
+
+play.exceptions.JavaExecutionException: Process was mauled by a bear
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:231)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.RuntimeException: Process was mauled by a bear
+	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:108)
+	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:99)
+	at org.squeryl.dsl.QueryDsl$class._using(QueryDsl.scala:46)
+	at org.squeryl.dsl.QueryDsl$class.using(QueryDsl.scala:38)
+	at org.squeryl.PrimitiveTypeMode$.using(PrimitiveTypeMode.scala:40)
+	at services.db.DBSession.connected(DBSession.scala:34)
+	at services.http.ControllerMethod$$anonfun$apply$1.apply(ControllerMethod.scala:36)
+	at services.logging.LoggingContext$$anonfun$withContext$1.apply(LoggingContext.scala:43)
+	at services.logging.LoggingContext.withContext(LoggingContext.scala:122)
+	at services.logging.LoggingContext.withContext(LoggingContext.scala:41)
+	at services.http.ControllerMethod.apply(ControllerMethod.scala:34)
+	at controllers.nonproduction.TestControllers$.logStuffThenThrowException(TestControllers.scala:99)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:548)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:502)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:496)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:473)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+Caused by: java.lang.IllegalArgumentException: Bear
+	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:107)
+	... 17 more
+03/30 15:59:49.252,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> Serving IP 0:0:0:0:0:0:0:1(id=XUkF6V, requestId=Sxithq) with nonproduction.TestControllers.logStuffThenThrowException
+03/30 15:59:49.252,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> [DBSession] Connecting to a DB Connection from the pool at isolation level: TransactionSerializable
+03/30 15:59:49.253,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> [TestControllers…] I'm pretty happy to be alive
+03/30 15:59:49.253,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> [TestControllers…] Just chugging along with this method
+03/30 15:59:49.253,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> [TestControllers…] Can't wait to send a nice webpage down to the client...
+03/30 15:59:49.253,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> [TestControllers…] Wait, is that a bear???
+03/30 15:59:49.253,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> [TestControllers…] Oh no! It's a bear!
+03/30 15:59:49.253,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> [TestControllers…] Don't kill me please...I don't, I don't want to--
+03/30 15:59:49.253,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> [DBSession] Rolling back changes to the DB due to a java.lang.RuntimeException
+03/30 15:59:49.253,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> [DBSession] Returning DB Connection to the pool
+03/30 15:59:49.254,ERROR,logStuffThenThrowException(XUkF6V.Sxithq) ~~> Fatal error: class java.lang.RuntimeException: Process was mauled by a bear
+03/30 15:59:49.254,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> java.lang.RuntimeException: Process was mauled by a bear
+03/30 15:59:49.254,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:108)
+03/30 15:59:49.254,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:99)
+03/30 15:59:49.254,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at org.squeryl.dsl.QueryDsl$class._using(QueryDsl.scala:46)
+03/30 15:59:49.254,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at org.squeryl.dsl.QueryDsl$class.using(QueryDsl.scala:38)
+03/30 15:59:49.254,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at org.squeryl.PrimitiveTypeMode$.using(PrimitiveTypeMode.scala:40)
+03/30 15:59:49.254,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at services.db.DBSession.connected(DBSession.scala:34)
+03/30 15:59:49.254,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at services.http.ControllerMethod$$anonfun$apply$1.apply(ControllerMethod.scala:36)
+03/30 15:59:49.254,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at services.logging.LoggingContext$$anonfun$withContext$1.apply(LoggingContext.scala:43)
+03/30 15:59:49.254,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at services.logging.LoggingContext.withContext(LoggingContext.scala:122)
+03/30 15:59:49.254,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at services.logging.LoggingContext.withContext(LoggingContext.scala:41)
+03/30 15:59:49.255,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at services.http.ControllerMethod.apply(ControllerMethod.scala:34)
+03/30 15:59:49.255,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at controllers.nonproduction.TestControllers$.logStuffThenThrowException(TestControllers.scala:99)
+03/30 15:59:49.255,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+03/30 15:59:49.255,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+03/30 15:59:49.255,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+03/30 15:59:49.255,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at java.lang.reflect.Method.invoke(Method.java:597)
+03/30 15:59:49.255,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:548)
+03/30 15:59:49.255,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:502)
+03/30 15:59:49.255,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:496)
+03/30 15:59:49.255,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:473)
+03/30 15:59:49.255,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+03/30 15:59:49.255,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at play.server.PlayHandler$NettyInvocation.execute(PlayHandler.java:257)
+03/30 15:59:49.255,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at play.Invoker$Invocation.run(Invoker.java:278)
+03/30 15:59:49.255,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at play.server.PlayHandler$NettyInvocation.run(PlayHandler.java:235)
+03/30 15:59:49.255,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:441)
+03/30 15:59:49.255,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at java.util.concurrent.FutureTask$Sync.innerRun(FutureTask.java:303)
+03/30 15:59:49.255,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at java.util.concurrent.FutureTask.run(FutureTask.java:138)
+03/30 15:59:49.255,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$301(ScheduledThreadPoolExecutor.java:98)
+03/30 15:59:49.255,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:206)
+03/30 15:59:49.255,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:886)
+03/30 15:59:49.255,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:908)
+03/30 15:59:49.255,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at java.lang.Thread.run(Thread.java:680)
+03/30 15:59:49.256,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> Caused by: java.lang.IllegalArgumentException: Bear
+03/30 15:59:49.256,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:107)
+03/30 15:59:49.256,INFO ,logStuffThenThrowException(XUkF6V.Sxithq) ~~> 	... 31 more
+03/30 15:59:49.265,ERROR,<No context> ~~> 
+
+@69peml5k9
+Internal Server Error (500) for request GET /test/log-stuff-then-die
+
+Execution exception (In /app/controllers/nonproduction/TestControllers.scala around line 108)
+RuntimeException occured : Process was mauled by a bear
+
+play.exceptions.JavaExecutionException: Process was mauled by a bear
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:231)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.RuntimeException: Process was mauled by a bear
+	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:108)
+	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:99)
+	at org.squeryl.dsl.QueryDsl$class._using(QueryDsl.scala:46)
+	at org.squeryl.dsl.QueryDsl$class.using(QueryDsl.scala:38)
+	at org.squeryl.PrimitiveTypeMode$.using(PrimitiveTypeMode.scala:40)
+	at services.db.DBSession.connected(DBSession.scala:34)
+	at services.http.ControllerMethod$$anonfun$apply$1.apply(ControllerMethod.scala:36)
+	at services.logging.LoggingContext$$anonfun$withContext$1.apply(LoggingContext.scala:43)
+	at services.logging.LoggingContext.withContext(LoggingContext.scala:122)
+	at services.logging.LoggingContext.withContext(LoggingContext.scala:41)
+	at services.http.ControllerMethod.apply(ControllerMethod.scala:34)
+	at controllers.nonproduction.TestControllers$.logStuffThenThrowException(TestControllers.scala:99)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:548)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:502)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:496)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:473)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+Caused by: java.lang.IllegalArgumentException: Bear
+	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:107)
+	... 17 more
+03/30 15:59:51.249,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> Serving IP 0:0:0:0:0:0:0:1(id=XUkF6V, requestId=uHI6eX) with nonproduction.TestControllers.logStuffThenThrowException
+03/30 15:59:51.249,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> [DBSession] Connecting to a DB Connection from the pool at isolation level: TransactionSerializable
+03/30 15:59:51.250,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> [TestControllers…] I'm pretty happy to be alive
+03/30 15:59:51.250,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> [TestControllers…] Just chugging along with this method
+03/30 15:59:51.250,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> [TestControllers…] Can't wait to send a nice webpage down to the client...
+03/30 15:59:51.250,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> [TestControllers…] Wait, is that a bear???
+03/30 15:59:51.250,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> [TestControllers…] Oh no! It's a bear!
+03/30 15:59:51.250,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> [TestControllers…] Don't kill me please...I don't, I don't want to--
+03/30 15:59:51.250,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> [DBSession] Rolling back changes to the DB due to a java.lang.RuntimeException
+03/30 15:59:51.250,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> [DBSession] Returning DB Connection to the pool
+03/30 15:59:51.253,ERROR,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> Fatal error: class java.lang.RuntimeException: Process was mauled by a bear
+03/30 15:59:51.253,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> java.lang.RuntimeException: Process was mauled by a bear
+03/30 15:59:51.253,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:108)
+03/30 15:59:51.253,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:99)
+03/30 15:59:51.253,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at org.squeryl.dsl.QueryDsl$class._using(QueryDsl.scala:46)
+03/30 15:59:51.253,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at org.squeryl.dsl.QueryDsl$class.using(QueryDsl.scala:38)
+03/30 15:59:51.254,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at org.squeryl.PrimitiveTypeMode$.using(PrimitiveTypeMode.scala:40)
+03/30 15:59:51.254,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at services.db.DBSession.connected(DBSession.scala:34)
+03/30 15:59:51.254,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at services.http.ControllerMethod$$anonfun$apply$1.apply(ControllerMethod.scala:36)
+03/30 15:59:51.254,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at services.logging.LoggingContext$$anonfun$withContext$1.apply(LoggingContext.scala:43)
+03/30 15:59:51.254,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at services.logging.LoggingContext.withContext(LoggingContext.scala:122)
+03/30 15:59:51.254,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at services.logging.LoggingContext.withContext(LoggingContext.scala:41)
+03/30 15:59:51.254,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at services.http.ControllerMethod.apply(ControllerMethod.scala:34)
+03/30 15:59:51.254,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at controllers.nonproduction.TestControllers$.logStuffThenThrowException(TestControllers.scala:99)
+03/30 15:59:51.254,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+03/30 15:59:51.254,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+03/30 15:59:51.254,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+03/30 15:59:51.254,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at java.lang.reflect.Method.invoke(Method.java:597)
+03/30 15:59:51.254,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:548)
+03/30 15:59:51.254,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:502)
+03/30 15:59:51.254,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:496)
+03/30 15:59:51.254,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:473)
+03/30 15:59:51.254,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+03/30 15:59:51.254,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at play.server.PlayHandler$NettyInvocation.execute(PlayHandler.java:257)
+03/30 15:59:51.254,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at play.Invoker$Invocation.run(Invoker.java:278)
+03/30 15:59:51.254,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at play.server.PlayHandler$NettyInvocation.run(PlayHandler.java:235)
+03/30 15:59:51.255,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:441)
+03/30 15:59:51.255,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at java.util.concurrent.FutureTask$Sync.innerRun(FutureTask.java:303)
+03/30 15:59:51.255,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at java.util.concurrent.FutureTask.run(FutureTask.java:138)
+03/30 15:59:51.255,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$301(ScheduledThreadPoolExecutor.java:98)
+03/30 15:59:51.255,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:206)
+03/30 15:59:51.255,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:886)
+03/30 15:59:51.255,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:908)
+03/30 15:59:51.255,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at java.lang.Thread.run(Thread.java:680)
+03/30 15:59:51.255,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> Caused by: java.lang.IllegalArgumentException: Bear
+03/30 15:59:51.255,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:107)
+03/30 15:59:51.255,INFO ,logStuffThenThrowException(XUkF6V.uHI6eX) ~~> 	... 31 more
+03/30 15:59:51.278,ERROR,<No context> ~~> 
+
+@69peml5ka
+Internal Server Error (500) for request GET /test/log-stuff-then-die
+
+Execution exception (In /app/controllers/nonproduction/TestControllers.scala around line 108)
+RuntimeException occured : Process was mauled by a bear
+
+play.exceptions.JavaExecutionException: Process was mauled by a bear
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:231)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.RuntimeException: Process was mauled by a bear
+	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:108)
+	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:99)
+	at org.squeryl.dsl.QueryDsl$class._using(QueryDsl.scala:46)
+	at org.squeryl.dsl.QueryDsl$class.using(QueryDsl.scala:38)
+	at org.squeryl.PrimitiveTypeMode$.using(PrimitiveTypeMode.scala:40)
+	at services.db.DBSession.connected(DBSession.scala:34)
+	at services.http.ControllerMethod$$anonfun$apply$1.apply(ControllerMethod.scala:36)
+	at services.logging.LoggingContext$$anonfun$withContext$1.apply(LoggingContext.scala:43)
+	at services.logging.LoggingContext.withContext(LoggingContext.scala:122)
+	at services.logging.LoggingContext.withContext(LoggingContext.scala:41)
+	at services.http.ControllerMethod.apply(ControllerMethod.scala:34)
+	at controllers.nonproduction.TestControllers$.logStuffThenThrowException(TestControllers.scala:99)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:548)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:502)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:496)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:473)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+Caused by: java.lang.IllegalArgumentException: Bear
+	at controllers.nonproduction.TestControllers$$anonfun$logStuffThenThrowException$1.apply(TestControllers.scala:107)
+	... 17 more
+03/30 16:00:04.496,INFO ,getRootEndpoint(XUkF6V.aGtJMg) ~~> Serving IP 0:0:0:0:0:0:0:1(id=XUkF6V, requestId=aGtJMg) with WebsiteControllers.getRootEndpoint
+03/30 16:00:04.496,INFO ,getRootEndpoint(XUkF6V.aGtJMg) ~~> [DBSession] Connecting to a DB Connection from the pool at isolation level: TransactionSerializable
+03/30 16:00:04.497,INFO ,getRootEndpoint(XUkF6V.aGtJMg) ~~> [DBSession] Committing changes to the DB
+03/30 16:00:04.497,INFO ,getRootEndpoint(XUkF6V.aGtJMg) ~~> [DBSession] Returning DB Connection to the pool
+~        _            _ 
+~  _ __ | | __ _ _  _| |
+~ | '_ \| |/ _' | || |_|
+~ |  __/|_|\____|\__ (_)
+~ |_|            |__/   
+~
+~ play! 1.2.4, http://www.playframework.org
+~ framework ID is test
+~
+Args are: []
+~ Running in test mode
+~ Ctrl+C to stop
+~ 
+~ ...

@@ -19,5 +19,6 @@ tmp
 *.lock
 *.log
 *.ser
+*.pyc
 
 war/WEB-INF/cloudbees-web.xml
