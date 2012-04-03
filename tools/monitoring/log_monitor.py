@@ -12,6 +12,7 @@ import threading
 import smtplib
 import traceback
 import time
+import hashlib
 
 from email.mime.text import MIMEText
 
@@ -287,6 +288,7 @@ class LogMonitor (object):
     """
     def __init__(self,
                  service_name="<service name>",
+                 ignore_repeats=True,                 
                  parsers=[MetadataParser()],
                  mail_recipients=mail_recipients,
                  mailer=SMTPMailer()):
@@ -296,6 +298,8 @@ class LogMonitor (object):
         service_name -- name of the servie whose logs are being monitored. This is used for
             reporting via e-mail, in the case that this script is being used to monitor several
             servers concurrently.
+        ignore_repeats -- True that we should not monitor lines that have been repeated.
+            Repeats are identified using a set of md5 hashes of the log line content.
         parsers -- list of objects with a method read(LogLine) that returns a transformed copy
             of the LogLine. You probably don't need to touch this unless you're trying to glean
             more information from the syntax of the logs than that which is already analyzed by
@@ -308,11 +312,13 @@ class LogMonitor (object):
             those arguments.            
         """
         self._service_name = service_name
+        self._ignore_repeats = ignore_repeats
         self._parsers = parsers
         self._listeners = frozenset()
         self._mailer = mailer        
         self._mail_recipients = mail_recipients
-        self._line_cache = collections.deque(maxlen=1000)    
+        self._line_cache = collections.deque(maxlen=1000)
+        self._line_hashes = set()
 
     def service_name(self):
         """ Returns the service name. See __init__ method documentation. """
@@ -359,16 +365,21 @@ class LogMonitor (object):
         In contrast to read_with_error_recovery, this method will bubble up any exceptions
         that occur while processing the logs.
         """
-        useParser = lambda nextLine, parser: parser.read(nextLine)
+        content_hash = self._content_hash(line)
 
-        # Let our parsers grab metadata from the line data
-        logLine = reduce(useParser, self._parsers, LogLine(line))
+        # Only process the line if it hasn't been seen before
+        if (not self._ignore_repeats) or content_hash not in self._line_hashes:
+            useParser = lambda nextLine, parser: parser.read(nextLine)
 
-        # Alert our listeners about the new line
-        map(lambda listener: listener.line_was_read(logLine, self), self._listeners)
+            # Let our parsers grab metadata from the line data
+            logLine = reduce(useParser, self._parsers, LogLine(line))
 
-        # Append it to the cache
-        self._line_cache.append(logLine)    
+            # Alert our listeners about the new line
+            map(lambda listener: listener.line_was_read(logLine, self), self._listeners)
+
+            # Append it to the cache
+            self._line_cache.append(logLine)
+            self._ignore_repeats and self._line_hashes.add(content_hash)
 
     def wait_for_lines(self,
                        number_of_lines,
@@ -408,6 +419,11 @@ class LogMonitor (object):
         msg['Subject'] = "%s: Error in log monitoring system" % self._service_name
 
         self._mailer.send(from_addr, to_addrs, msg)
+
+    def _content_hash(self, line):
+        digest = hashlib.md5()
+        digest.update(line)
+        return digest.digest()
         
         
     

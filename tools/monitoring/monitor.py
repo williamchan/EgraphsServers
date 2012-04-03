@@ -16,7 +16,7 @@ else:
     monitor.add_listener(log_monitor.ErrorLogListener())
     monitor.add_listener(log_monitor.InactivityLogListener(service_name=service_name))
 
-    t = filetail.Tail(log_file, only_new=True)
+    t = filetail.Tail(log_file, only_new=True, ignore_repeats=True)
 
     print "Beginning to monitor service \"%s\" (%s)" % (service_name, log_file)
     for line in t:

@@ -197,9 +197,30 @@ assert testListener.lines_that_were_received[0].context == "Test"
 
 
 ##############################################
+print "\nLogMonitor.read: It should ignore repeated lines."
+testListener = TestListener()
+
+monitor = LogMonitor(parsers=[])
+monitor.add_listener(testListener)
+
+monitor.read("Herp")
+monitor.read("Herp")
+
+assert len(testListener.lines_that_were_received) == 1
+
+monitor.read("Derp")
+
+assert len(testListener.lines_that_were_received) == 2
+
+
+##############################################
 print "\nLogMonitor.wait_for_lines: Reading the requisite number of lines.",
 print "No timeout should occur."
+
 lines_observed = []
+
+monitor = LogMonitor(parsers=[testParser])
+monitor.add_listener(testListener)
 monitor.wait_for_lines(1, lambda lines: lines_observed.extend(lines), timeout_s=0.25)
 
 assert len(monitor._listeners) == 2
@@ -216,6 +237,9 @@ assert len(monitor._listeners) == 1
 print "\nLogMonitor.wait_for_lines: Read an insufficient number of lines before the timeout.",
 print "Timeout should occur and send the one line we got to the callback function."""
 lines_observed = []
+
+monitor = LogMonitor(parsers=[testParser])
+monitor.add_listener(testListener)
 monitor.wait_for_lines(2, lambda lines: lines_observed.extend(lines), timeout_s=0.25)
 monitor.read(line_without_metadata)
 
