@@ -15,6 +15,6 @@ private[controllers] trait GetEgraphsEndpoint {
 
   def getEgraphs = controllerMethod() {
     val egraphsAndResults: Query[(Egraph, VBGVerifySample, XyzmoVerifyUser)] = egraphStore.getEgraphsAndResults
-    views.Application.html.admin_egraphs(egraphsAndResults)
+    views.Application.admin.html.admin_egraphs(egraphsAndResults)
   }
 }

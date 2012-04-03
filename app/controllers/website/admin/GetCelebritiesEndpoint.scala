@@ -13,6 +13,6 @@ private[controllers] trait GetCelebritiesEndpoint {
 
   def getCelebrities = controllerMethod() {
     val celebrityAccounts: Query[(Celebrity, Account)] = celebrityStore.getCelebrityAccounts
-    views.Application.html.admin_celebrities(celebrityAccounts = celebrityAccounts)
+    views.Application.admin.html.admin_celebrities(celebrityAccounts = celebrityAccounts)
   }
 }

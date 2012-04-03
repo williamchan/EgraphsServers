@@ -27,7 +27,7 @@ private[controllers] trait GetCreateCelebrityProductEndpoint {
       }
 
       // Render the page
-      views.Application.html.createcelebrityproduct(celebrity = celebrity, errorFields = errorFields, fields = fieldDefaults)
+      views.Application.admin.html.createcelebrityproduct(celebrity = celebrity, errorFields = errorFields, fields = fieldDefaults)
     }
   }
 }

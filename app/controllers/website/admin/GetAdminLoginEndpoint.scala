@@ -13,7 +13,7 @@ private[controllers] trait GetAdminLoginEndpoint {
 
   def getAdminLogin = controllerMethod() {
     val errorFields = Option(flash.get("errors")).map(errString => errString.split(',').toList)
-    views.Application.html.admin_login(errorFields = errorFields)
+    views.Application.admin.html.admin_login(errorFields = errorFields)
   }
 
 }

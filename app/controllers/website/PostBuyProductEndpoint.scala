@@ -135,7 +135,7 @@ object PostBuyProductEndpoint {
       email.setFrom("noreply@egraphs.com", "Egraphs")
       email.addTo(accountStore.findByCustomerId(buyer.id).get.email, buyerName)
       email.setSubject("Order Confirmation")
-      email.setMsg(views.Application.html.order_confirmation_email(
+      email.setMsg(views.Application.email.html.order_confirmation_email(
         buyer, recipient, celebrity, product, chargedOrder
       ).toString().trim())
 

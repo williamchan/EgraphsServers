@@ -98,7 +98,7 @@ trait PostCelebrityEndpoint {
     email.setFrom("noreply@egraphs.com", "Egraphs")
     email.addTo(celebrityEmail, publicNameStr)
     email.setSubject("Egraphs Celebrity Account Created")
-    email.setMsg(views.Application.html.celebrity_created_email(celebrity = savedCelebrity, email = celebrityEmail).toString().trim())
+    email.setMsg(views.Application.email.html.celebrity_created_email(celebrity = savedCelebrity, email = celebrityEmail).toString().trim())
     mail.send(email)
 
     new Redirect(WebsiteControllers.lookupGetCelebrity(celebrityUrlSlug.get).url)

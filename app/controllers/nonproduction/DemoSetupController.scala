@@ -58,7 +58,7 @@ object DemoSetupController extends Controller {
       val demoScenarios = DemoScenario.allCategories.toList.sortWith((a, b) => a._1 < b._1).map { case (category, catScenarios) =>
         (category, catScenarios.toSeq.sortWith((a, b) => a.name < b.name))
       }
-      views.Application.html.demoscenarios(demoScenarios)
+      views.nonproduction.html.demoscenarios(demoScenarios)
     }
   }
 

@@ -22,7 +22,7 @@ private[controllers] trait GetCreateCelebrityEndpoint {
       }
     }
     // Render the page
-    views.Application.html.createcelebrity(errorFields = errorFields, fields = fieldDefaults)
+    views.Application.admin.html.createcelebrity(errorFields = errorFields, fields = fieldDefaults)
   }
 }
 

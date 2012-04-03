@@ -20,7 +20,7 @@ private[controllers] trait GetCelebrityEgraphsEndpoint {
     adminFilters.requireCelebrity {
       (celebrity) =>
         val egraphsAndResults: Query[(Egraph, VBGVerifySample, XyzmoVerifyUser)] = egraphStore.getCelebrityEgraphsAndResults(celebrity)
-        views.Application.html.admin_celebrityegraphs(celebrity, egraphsAndResults)
+        views.Application.admin.html.admin_celebrityegraphs(celebrity, egraphsAndResults)
     }
   }
 }

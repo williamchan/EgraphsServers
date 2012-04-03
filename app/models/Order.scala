@@ -114,7 +114,7 @@ case class Order(
     email.addReplyTo("noreply@egraphs.com")
     email.setSubject("I just finished signing your Egraph")
     email.setMsg(
-      views.Application.html.egraph_signed_email(
+      views.Application.email.html.egraph_signed_email(
         celebrity,
         product,
         this,

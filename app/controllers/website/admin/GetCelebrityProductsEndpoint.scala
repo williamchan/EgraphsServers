@@ -13,7 +13,7 @@ private[controllers] trait GetCelebrityProductsEndpoint {
   def getCelebrityProducts = controllerMethod() {
     adminFilters.requireCelebrity {
       (celebrity) =>
-        views.Application.html.admin_celebrityproducts(celebrity = celebrity, products = celebrity.products())
+        views.Application.admin.html.admin_celebrityproducts(celebrity = celebrity, products = celebrity.products())
     }
   }
 }
