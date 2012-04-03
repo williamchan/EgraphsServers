@@ -274,13 +274,13 @@ print "\n\nAll local tests are complete. Press enter to continue tests _only_ if
 a = raw_input("\033[00;32mContinue with server-only tests? (CTRL+C to end the tests): \033[00m")
 print "SMTPMailer: It should send an email."
 from_addr = 'monitoring@egraphs.com'
-to_addr = ['Erem Boto <erem@egraphs.com>']
+to_addrs = ['Erem Boto <erem@egraphs.com>', 'William Chan <will@egraphs.com>']
 msg = MIMEText("As you were; this is just the monitoring testcase running.")
 msg['Subject'] = "Monitoring testcase."
 msg['From'] = 'monitoring@egraphs.com'
-msg['To'] = to_addr
+msg['To'] = ','.join(to_addrs)
 
 # Send the email
 mailer = SMTPMailer()
-mailer.send(from_addr, to_addr, msg)
+mailer.send(from_addr, to_addrs, msg)
 

@@ -47,7 +47,7 @@ class SMTPMailer (object):
         mail -- the MIMEText to send
         """
         s = smtplib.SMTP('localhost')
-        s.sendmail(me, [you], msg.as_string())
+        s.sendmail(from_addr, to_addrs, msg.as_string())
         s.quit()
 
 #

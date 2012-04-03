@@ -1,5 +1,5 @@
 #
-# Begins logging a cloudbees app to file
+# Begins logging a cloudbees app to file in the background.
 #
 # Arguments:
 # $1 -- name of the cloudbees app (use bees app:list to find this out)
@@ -26,4 +26,4 @@ bees_app_name=$1
 log_file=$2
 
 # Run app tail sending stdout and stderr to file.
-bees app:tail $1 1>>$2
+nohup bees app:tail $1 1>>$2 &
