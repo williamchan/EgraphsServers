@@ -12,6 +12,7 @@ else:
     log_file = sys.argv[1]    
     monitor = log_monitor.LogMonitor(service_name=log_file)
     monitor.add_listener(log_monitor.ErrorLogListener())
+    monitor.add_listener(log_monitor.InactivityLogListener(service_name=log_file))
 
     t = filetail.Tail(log_file, only_new=True)
 
