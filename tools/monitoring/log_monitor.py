@@ -47,7 +47,7 @@ class SMTPMailer (object):
         mail -- the MIMEText to send
         """
         s = smtplib.SMTP('localhost')
-        s.sendmail(from_addr, to_addrs, msg.as_string())
+        s.sendmail(from_addr, to_addrs, mail.as_string())
         s.quit()
 
 #
@@ -102,7 +102,7 @@ class ErrorLogListener (object):
                 )
                 msg['Subject'] = "%s: Error during process \"%s\"" % (log_monitor.service_name(),
                                                                       context)
-                msg['From'] = 'monitoring@egraphs.com'
+                msg['From'] = system_email_address
                 msg['To'] = ",".join(to_addrs)
 
                 # Send the email
