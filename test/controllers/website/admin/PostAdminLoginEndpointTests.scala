@@ -4,9 +4,9 @@ import org.junit.Test
 import scala.collection.JavaConversions._
 import play.test.FunctionalTest
 import FunctionalTest._
-import utils.FunctionalTestUtils.{CleanDatabaseAfterEachTest, runScenarios}
+import utils.FunctionalTestUtils.CleanDatabaseAfterEachTest
 
-class PostAdminLoginEndpointTests extends FunctionalTest with CleanDatabaseAfterEachTest {
+class PostAdminLoginEndpointTests extends AdminFunctionalTest with CleanDatabaseAfterEachTest {
 
   @Test
   def testEmailAndPasswordValidation() {
@@ -17,28 +17,20 @@ class PostAdminLoginEndpointTests extends FunctionalTest with CleanDatabaseAfter
 
   @Test
   def testAuthenticationValidation() {
-    val response = POST("/admin/login", getPostStrParams())
+    val response = POST("/admin/login", getPostStrParams(email = "idontexist@egraphs.com", password = "herp"))
     assertStatus(302, response)
     assertHeaderEquals("Location", "/admin/login", response)
   }
 
   @Test
   def testSuccessfulLogin() {
-    runScenarios(
-      "Create-Admin"
-    )
-
-    val response = POST("/admin/login", getPostStrParams(email = "admin@egraphs.com", password = "derp"))
+    val response = createAndLoginAsAdmin()
     assertStatus(302, response)
     assertHeaderEquals("Location", "/admin/celebrities", response)
   }
 
-  private def getPostStrParams(email: String = "idontexist@egraphs.com",
-                               password: String = "derp"): Map[String, String] = {
-    Map[String, String](
-      "email" -> email,
-      "password" -> password
-    )
+  private def getPostStrParams(email: String, password: String): Map[String, String] = {
+    Map[String, String]("email" -> email, "password" -> password)
   }
 
 }

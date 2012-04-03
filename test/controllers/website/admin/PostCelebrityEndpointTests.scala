@@ -7,14 +7,13 @@ import play.test.FunctionalTest
 import FunctionalTest._
 import utils.FunctionalTestUtils.CleanDatabaseAfterEachTest
 import java.net.URLDecoder
-import java.io.File
-import play.Play
 
-
-class PostCelebrityEndpointTests extends FunctionalTest with CleanDatabaseAfterEachTest {
+class PostCelebrityEndpointTests extends AdminFunctionalTest with CleanDatabaseAfterEachTest {
 
   @Test
   def testPostCelebrityCreatesCelebrity() {
+    createAndLoginAsAdmin()
+
     val postStrParams: Map[String, String] = getPostStrParams()
     val response = POST("/admin/celebrities", postStrParams)
 
@@ -24,6 +23,8 @@ class PostCelebrityEndpointTests extends FunctionalTest with CleanDatabaseAfterE
 
   @Test
   def testPostCelebrityCreatesCelebrityWithFullNameAsPublicName() {
+    createAndLoginAsAdmin()
+
     val postStrParams: Map[String, String] = getPostStrParams(publicName = "")
     val response = POST("/admin/celebrities", postStrParams)
 
@@ -33,6 +34,8 @@ class PostCelebrityEndpointTests extends FunctionalTest with CleanDatabaseAfterE
 
   @Test
   def testPostCelebrityValidatesFields() {
+    createAndLoginAsAdmin()
+
     val postStrParams: Map[String, String] = getPostStrParams("", "", "", "", "", "")
     val response = POST("/admin/celebrities", postStrParams)
 
@@ -45,6 +48,8 @@ class PostCelebrityEndpointTests extends FunctionalTest with CleanDatabaseAfterE
 
   @Test
   def testPostCelebrityValidatesEmail() {
+    createAndLoginAsAdmin()
+
     val postStrParams: Map[String, String] = getPostStrParams(
       celebrityEmail = "not a valid email"
     )
@@ -58,6 +63,8 @@ class PostCelebrityEndpointTests extends FunctionalTest with CleanDatabaseAfterE
 
   @Test
   def testPostCelebrityRequiresEitherFullNameOrPublicName() {
+    createAndLoginAsAdmin()
+
     val errorString = "Must provide either Public Name or First and Last Name"
 
     val withFirstName: String = URLDecoder.decode(POST("/admin/celebrities",
@@ -79,6 +86,8 @@ class PostCelebrityEndpointTests extends FunctionalTest with CleanDatabaseAfterE
 
   @Test
   def testPostCelebrityValidatesThatNoCelebrityWithSameEmailExists() {
+    createAndLoginAsAdmin()
+
     assertHeaderEquals("Location", "/Muhammad-Ali", POST("/admin/celebrities", getPostStrParams()))
 
     val postStrParams: Map[String, String] = getPostStrParams(
@@ -110,6 +119,8 @@ class PostCelebrityEndpointTests extends FunctionalTest with CleanDatabaseAfterE
 
   @Test
   def testPostCelebrityValidatesPassword() {
+    createAndLoginAsAdmin()
+
     val postStrParams: Map[String, String] = getPostStrParams(
       celebrityPassword = "-"
     )
@@ -123,6 +134,8 @@ class PostCelebrityEndpointTests extends FunctionalTest with CleanDatabaseAfterE
 
   @Test
   def testPostCelebrityValidatesCelebrityUrlSlugIsUnique() {
+    createAndLoginAsAdmin()
+
     assertHeaderEquals("Location", "/Muhammad-Ali", POST("/admin/celebrities", getPostStrParams()))
 
     val postStrParams: Map[String, String] = getPostStrParams(
@@ -150,11 +163,5 @@ class PostCelebrityEndpointTests extends FunctionalTest with CleanDatabaseAfterE
       "publicName" -> publicName,
       "description" -> description
     )
-  }
-  
-  private def getPostFileParams = {
-    Map[String, File]{
-      "profileImage" -> Play.getFile("test/files/will_chan_celebrity_profile.jpg")
-    }
   }
 }

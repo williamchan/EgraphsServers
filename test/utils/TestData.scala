@@ -25,8 +25,9 @@ object TestData {
   }
 
   def newSavedCelebrity(): Celebrity = {
-    val acct = Account(email = generateEmail(prefix = "celebrity-")).save()
-    val celeb = Celebrity().save()
+    val email = generateEmail(prefix = "celebrity-")
+    val acct = Account(email = email).save()
+    val celeb = Celebrity(publicName = Some(email)).save()
 
     acct.copy(celebrityId = Some(celeb.id)).save()
 

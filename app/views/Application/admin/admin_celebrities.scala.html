@@ -18,12 +18,21 @@
   lookupUrl("WebsiteControllers.getCreateCelebrity")
 }
 
+@postAdminLogout = @{
+  lookupUrl("WebsiteControllers.postAdminLogout")
+}
+
 @head = {
 <script src='@asset("public/twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
 }
 
 @body = {
 <div class="admin-content">
+  <form id="logout" method="POST" action='@postAdminLogout' enctype="application/x-www-form-urlencoded">
+    <div>
+      <button type="submit" id="logout-button" class="btn fade in">Logout</button>
+    </div>
+  </form>
   <h2>
     All Celebrities - @celebrityAccounts.size total
   </h2>

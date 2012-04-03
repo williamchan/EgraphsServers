@@ -5,8 +5,8 @@ import play.mvc.results.Redirect
 import services.Utils
 import controllers.WebsiteControllers
 import play.data.validation.Validation
-import models.AdministratorStore
 import services.http.ControllerMethod
+import models.{Administrator, AdministratorStore}
 
 private[controllers] trait PostAdminLoginEndpoint {
   this: Controller =>
@@ -14,21 +14,24 @@ private[controllers] trait PostAdminLoginEndpoint {
   protected def controllerMethod: ControllerMethod
   protected def administratorStore: AdministratorStore
 
-  def postAdminLogin(email: String, password: String): Redirect = controllerMethod() {
+  def postAdminLogin(email: String, password: String) = controllerMethod() {
     Validation.required("Email", email)
     Validation.email("Email", email)
     Validation.required("Password", password)
-    if (!validationErrors.isEmpty) {
-      return WebsiteControllers.redirectWithValidationErrors(GetAdminLoginEndpoint.url())
+
+    var administrator: Option[Administrator] = None
+    if (validationErrors.isEmpty) {
+      administrator = administratorStore.authenticate(email = email, passwordAttempt = password)
+      Validation.isTrue("Buddy, are you an administrator?", administrator.isDefined)
     }
 
-    val administrator = administratorStore.authenticate(email = email, passwordAttempt = password)
-    Validation.isTrue("Damnit you're not an administrator. Damnit.", administrator.isDefined)
     if (!validationErrors.isEmpty) {
-      return WebsiteControllers.redirectWithValidationErrors(GetAdminLoginEndpoint.url())
-    }
+      WebsiteControllers.redirectWithValidationErrors(GetAdminLoginEndpoint.url())
 
-    new Redirect(Utils.lookupUrl("WebsiteControllers.getCelebrities").url)
+    } else {
+      session.put(WebsiteControllers.adminIdKey, administrator.get.id.toString)
+      new Redirect(Utils.lookupUrl("WebsiteControllers.getCelebrities").url)
+    }
   }
 
 }

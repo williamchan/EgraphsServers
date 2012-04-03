@@ -16,6 +16,7 @@ object TestControllers extends Controller with Logging {
   val blobs = AppConfig.instance[Blobs]
   val schema = AppConfig.instance[Schema]
   val accountServices = AppConfig.instance[AccountServices]
+  val administratorServices = AppConfig.instance[AdministratorServices]
   val celebrityServices = AppConfig.instance[CelebrityServices]
   val customerServices = AppConfig.instance[CustomerServices]
 
@@ -114,7 +115,7 @@ object TestControllers extends Controller with Logging {
     //    println(startEnrollmentRequest.getResponseValue("errorcode"))
     //    sjson.json.Serializer.SJSON.toJSON(Map("bees.api.name" -> Play.configuration.getProperty("bees.api.name")))
 
-    new jobs.EnrollmentBatchJob().now()
+//    new jobs.EnrollmentBatchJob().now()
 
     // find all Egraphs that are AwaitingVerification and give them a kick...
 //    import org.squeryl.Query
@@ -128,6 +129,18 @@ object TestControllers extends Controller with Logging {
 //      actors.EgraphActor.actor ! actors.ProcessEgraphMessage(id = egraph.id)
 //    }
 //    "I gave all Egraphs AwaitingVerification a kick."
+
+    val cofounders = List("will@egraphs.com", "eric@egraphs.com", "andrew@egraphs.com", "david@egraphs.com", "erem@egraphs.com")
+    for (cofounder <- cofounders) {
+      val admin = administratorServices.store.findByEmail(cofounder)
+      if (admin.isEmpty) {
+        val account = accountServices.accountStore.findByEmail(cofounder)
+        if (account.isDefined) {
+          val administrator = Administrator().save()
+          account.get.copy(administratorId = Some(administrator.id)).save()
+        }
+      }
+    }
   }
 
   def createTestOrders(msg: String) = controllerMethod() {

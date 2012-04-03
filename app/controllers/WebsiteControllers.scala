@@ -24,19 +24,22 @@ object WebsiteControllers extends Controller
 
   // admin endpoints
   with GetAdminLoginEndpoint
-  with PostAdminLoginEndpoint
   with GetCelebritiesEndpoint
-  with GetCreateCelebrityEndpoint
-  with PostCelebrityEndpoint
-  with GetCreateCelebrityProductEndpoint
-  with GetCelebrityProductsEndpoint
-  with PostCelebrityProductEndpoint
-  with GetEgraphsEndpoint
   with GetCelebrityEgraphsEndpoint
   with GetCelebrityOrdersEndpoint
+  with GetCelebrityProductsEndpoint
+  with GetCreateCelebrityEndpoint
+  with GetCreateCelebrityProductEndpoint
+  with GetEgraphsEndpoint
+  with PostAdminLoginEndpoint
+  with PostAdminLogoutEndpoint
+  with PostCelebrityEndpoint
+  with PostCelebrityProductEndpoint
 {
 
   import services.AppConfig.instance
+
+  val adminIdKey: String = "admin"
 
   // Provide endpoint dependencies
   override protected val controllerMethod = instance[ControllerMethod]
