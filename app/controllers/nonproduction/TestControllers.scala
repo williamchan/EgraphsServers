@@ -43,7 +43,7 @@ object TestControllers extends Controller with Logging {
     )
   }
 
-  def resetAlphaState(): String = controllerMethod() {
+  def resetAlphaState() = controllerMethod() {
     val applicationMode = play.Play.configuration.get("application.mode")
     if (applicationMode != "dev") {
       throw new IllegalStateException("Cannot reset-alpha-state unless in dev mode")

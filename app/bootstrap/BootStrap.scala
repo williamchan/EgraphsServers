@@ -11,6 +11,7 @@ import java.sql.Connection
 import services.logging.{Logging, LoggingContext}
 import services.{AppConfig, Utils, TempFile}
 import services.db.{TransactionSerializable, Schema, DBSession}
+import models.{AccountStore, Account, Administrator}
 
 @OnApplicationStart
 class BootStrap extends Job with Logging {
@@ -55,12 +56,12 @@ private object TestModeBootstrap extends Logging {
   private val db = AppConfig.instance[DBSession]
   private val blobs = AppConfig.instance[Blobs]
   private val schema = AppConfig.instance[Schema]
-
-  import org.squeryl.PrimitiveTypeMode._
+  private val accountStore = AppConfig.instance[AccountStore]
 
   def run() {
     log("Performing test-mode bootstrap.")
     bootstrapDatabase()
+    createTestAdmin()
     log("Finished bootstrapping test-mode.")
   }
 
@@ -77,6 +78,16 @@ private object TestModeBootstrap extends Logging {
     }
   }
 
+  private def createTestAdmin() {
+    val adminEmail = "admin@egraphs.com"
+    db.connected(TransactionSerializable) {
+      if (accountStore.findByEmail(adminEmail).isEmpty) {
+        val administrator = Administrator().save()
+        Account(email = adminEmail, administratorId = Some(administrator.id)).withPassword("derp").right.get.save()
+        log("Created Administrator with credentials admin@egraphs.com/derp")
+      }
+    }
+  }
 
   /**
    * Drops and re-creates the database definition, logging the creation SQL
