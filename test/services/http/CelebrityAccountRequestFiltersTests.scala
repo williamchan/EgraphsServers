@@ -137,7 +137,7 @@ class CelebrityAccountRequestFiltersTests extends UnitFlatSpec with Mockito with
     }
   }
 
-  it should "return 404-Not Found if the celebrity didn't have a product with the specified URL" in {
+  /*it should "return 404-Not Found if the celebrity didn't have a product with the specified URL" in {
     implicit val request = FunctionalTest.newRequest()
     request.params.put("productUrlSlug", "Finals")
 
@@ -179,7 +179,7 @@ class CelebrityAccountRequestFiltersTests extends UnitFlatSpec with Mockito with
 
     result.isInstanceOf[Ok] should be (true)
     there was one (callback).apply(product)
-  }
+  }*/
 
   "requireCelebrityAndProductUrlSlugs" should "delegate to requireCelebrityUrlSlug and requireCelebrityProductUrl" in {
     object FailsCelebrityUrlSlug extends CelebrityAccountRequestFilters(null, null, null) {

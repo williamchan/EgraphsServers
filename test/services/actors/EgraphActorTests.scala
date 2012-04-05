@@ -18,7 +18,7 @@ with BeforeAndAfterAll
 with ClearsDatabaseAndValidationAfter
 with TestKit {
 
-  private val egraphActor = actorOf(new EgraphActor)
+  private val egraphActor = actorOf(AppConfig.instance[EgraphActor])
 
   override protected def beforeAll() {
     egraphActor.start()

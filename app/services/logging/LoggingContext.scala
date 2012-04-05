@@ -5,6 +5,9 @@ import play.mvc.Http.Request
 import services.http.RequestInfo
 import services.Time
 import java.io.{PrintWriter, StringWriter}
+import play.Logger.info
+import play.Logger.error
+import play.mvc.Scope.{Flash, Session}
 
 /**
  * Allows functions to be performed within a logging "Context", where
@@ -15,6 +18,7 @@ import java.io.{PrintWriter, StringWriter}
  * to some sort of async approach we'll have to be pretty careful about depending on the values being correct.
  */
 class LoggingContext {
+
   /** Key into the MDC */
   private val contextKey = "context"
   private val defaultContext = "<No context>"
@@ -39,8 +43,16 @@ class LoggingContext {
     val requestContext = createRequestContext(request, requestInfo)
 
     withContext(requestContext) {
-      logRequestHeader(request, requestInfo)
-      operation
+      try {
+        logRequestHeader(request, requestInfo)
+        operation
+      }
+      catch {
+        case e: Exception =>
+          info("Exception raised during request. Request details follow. ")
+          logRequestDetails(request)
+          throw e
+      }
     }
   }
 
@@ -99,7 +111,7 @@ class LoggingContext {
         .append(".")
         .append(request.actionMethod)
       
-      play.Logger.info(requestHeader.toString())
+      info(requestHeader.toString())
     }
     catch {
       case e: Exception =>
@@ -124,15 +136,42 @@ class LoggingContext {
     }
     catch {
       case e: Exception =>
-        val stringWriter = new StringWriter()        
-        e.printStackTrace(new PrintWriter(stringWriter))
-        play.Logger.error("Fatal error: " + e.getClass + ": " + e.getMessage)
-        stringWriter.toString.split("\n").foreach(line => play.Logger.info(line))
-
+        logException(e)
         throw e
     }
     finally {
       MDC.put(contextKey, oldContext)
+    }
+  }
+
+  private def logException(e: Exception) {
+    val stringWriter = new StringWriter()
+    e.printStackTrace(new PrintWriter(stringWriter))
+    error("Fatal error: " + e.getClass + ": " + e.getMessage)
+    stringWriter.toString.split("\n").foreach(line => play.Logger.info(line))
+  }
+
+  private def logRequestDetails(req: Request) {
+    import scala.collection.JavaConversions._
+
+    info("  " + req.toString)
+
+    info("  Request parameters:")
+    for ((param, value) <- req.params.all() if !(List("password", "body").contains(param.toLowerCase))) {
+      info("    \"" + param + "\" -> " + value.mkString(", "))
+    }
+
+    info("  Session parameters:")
+    for ((param, value) <- Session.current().all()) {
+      info("    \"" + param + "\" -> " + value)
+    }
+
+    info("  Flash parameters:")
+    info("    " + Flash.current().toString)
+
+    info("  Headers:")
+    for ((_, header) <- req.headers if header.name.toLowerCase != "authorization") {
+      info("    \"" + header.name + "\" -> " + header.values.mkString(", "))
     }
   }
 }

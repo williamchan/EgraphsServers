@@ -5,44 +5,47 @@ import Actor._
 import services.db.{DBSession, TransactionSerializable}
 import services.AppConfig
 import models.{EgraphStore, EgraphState}
+import com.google.inject.Inject
+import services.logging.{Logging, LoggingContext}
 
 object EgraphActor {
+  val actor = actorOf(AppConfig.instance[EgraphActor])
+}
 
-  val actor = actorOf(new EgraphActor)
+class EgraphActor @Inject() (
+  db: DBSession,
+  egraphStore: EgraphStore,
+  logging: LoggingContext
+) extends Actor with Logging
+{
+  protected def receive = {
+    case ProcessEgraphMessage(id: Long, skipBiometrics: Boolean) => {
+      processEgraph(egraphId = id, skipBiometrics = skipBiometrics)
+    }
 
-  private val db = AppConfig.instance[DBSession]
-  private val egraphStore = AppConfig.instance[EgraphStore]
+    case _ =>
+  }
 
   def processEgraph(egraphId: Long, skipBiometrics: Boolean) {
-    play.Logger.info("EgraphActor: Processing Egraph " + egraphId)
-    db.connected(TransactionSerializable) {
-      val egraph = egraphStore.findById(egraphId)
-      if (egraph.isEmpty) {
-        throw new Exception("EgraphActor could not find Egraph " + egraphId.toString)
-      }
+    logging.withTraceableContext("processEgraph[" +egraphId +"," + skipBiometrics +"]") {
+      log("Processing Egraph " + egraphId)
+      db.connected(TransactionSerializable) {
+        val egraph = egraphStore.findById(egraphId)
+        if (egraph.isEmpty) {
+          throw new Exception("EgraphActor could not find Egraph " + egraphId.toString)
+        }
 
-      if (egraph.get.stateValue == EgraphState.AwaitingVerification.value) {
-        egraph.get.assets.initMasterImage()
-        val egraphToTest = if (skipBiometrics) egraph.get.withYesMaamBiometricServices else egraph.get
-        val testedEgraph = egraphToTest.verifyBiometrics.save()
-        if (testedEgraph.state == EgraphState.Verified) {
-          testedEgraph.order.sendEgraphSignedMail()
+        if (egraph.get.stateValue == EgraphState.AwaitingVerification.value) {
+          egraph.get.assets.initMasterImage()
+          val egraphToTest = if (skipBiometrics) egraph.get.withYesMaamBiometricServices else egraph.get
+          val testedEgraph = egraphToTest.verifyBiometrics.save()
+          if (testedEgraph.state == EgraphState.Verified) {
+            testedEgraph.order.sendEgraphSignedMail()
+          }
         }
       }
     }
   }
-}
-
-class EgraphActor extends Actor {
-
-  protected def receive = {
-    case ProcessEgraphMessage(id: Long, skipBiometrics: Boolean) => {
-      EgraphActor.processEgraph(egraphId = id, skipBiometrics = skipBiometrics)
-    }
-    case _ =>
-  }
-
-
 }
 
 // ====================
