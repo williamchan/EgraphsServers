@@ -1,6 +1,5 @@
 package controllers.website.admin
 
-import org.squeryl.Query
 import play.mvc.Controller
 import models._
 import vbg.VBGVerifySample
@@ -22,8 +21,8 @@ private[controllers] trait GetCelebrityEgraphsEndpoint {
   def getCelebrityEgraphs(page: Int = 1) = controllerMethod() {
     adminFilters.requireCelebrity {
       (celebrity) =>
-        var query: Query[(Egraph, VBGVerifySample, XyzmoVerifyUser)] = egraphStore.getCelebrityEgraphsAndResults(celebrity)
-        val pagedQuery: (Query[(Egraph, VBGVerifySample, XyzmoVerifyUser)], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
+        var query = egraphStore.getCelebrityEgraphsAndResults(celebrity)
+        val pagedQuery: (Iterable[(Egraph, VBGVerifySample, XyzmoVerifyUser)], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
         WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebrityEgraphsEndpoint.url(celebrity = celebrity))
         views.Application.admin.html.admin_celebrityegraphs(celebrity = celebrity, egraphsAndResults = pagedQuery._1)
     }

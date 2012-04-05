@@ -1,4 +1,4 @@
-@(celebrity: models.Celebrity, egraphsAndResults: org.squeryl.Query[(models.Egraph, models.vbg.VBGVerifySample, models.xyzmo.XyzmoVerifyUser)]
+@(celebrity: models.Celebrity, egraphsAndResults: Iterable[(models.Egraph, models.vbg.VBGVerifySample, models.xyzmo.XyzmoVerifyUser)]
 )(implicit flash:play.mvc.Scope.Flash)
 
 @import controllers.WebsiteControllers

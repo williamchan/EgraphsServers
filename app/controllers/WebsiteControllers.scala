@@ -12,7 +12,6 @@ import play.mvc.results.Redirect
 import models._
 import services.http.{ControllerMethod, AdminRequestFilters, CelebrityAccountRequestFilters}
 import services.Utils
-import org.squeryl.Query
 import play.mvc.Router.ActionDefinition
 
 object WebsiteControllers extends Controller
@@ -80,7 +79,7 @@ object WebsiteControllers extends Controller
     }
   }
 
-  def updateFlashScopeWithPagingData[A](pagedQuery: (Query[A], Int, Option[Int]), baseUrl: ActionDefinition) {
+  def updateFlashScopeWithPagingData[A](pagedQuery: (Iterable[A], Int, Option[Int]), baseUrl: ActionDefinition) {
     val curPage = pagedQuery._2
     val totalResults = pagedQuery._3
 

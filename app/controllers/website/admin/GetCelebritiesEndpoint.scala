@@ -1,7 +1,6 @@
 package controllers.website.admin
 
 import models.{Celebrity, Account, CelebrityStore}
-import org.squeryl.Query
 import play.mvc.Controller
 import services.http.{AdminRequestFilters, ControllerMethod}
 import services.Utils
@@ -17,8 +16,8 @@ private[controllers] trait GetCelebritiesEndpoint {
 
   def getCelebrities(page: Int = 1) = controllerMethod() {
     adminFilters.requireAdministratorLogin { adminId =>
-      var query: Query[(Celebrity, Account)] = celebrityStore.getCelebrityAccounts
-      val pagedQuery: (Query[(Celebrity, Account)], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
+      var query = celebrityStore.getCelebrityAccounts
+      val pagedQuery: (Iterable[(Celebrity, Account)], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
       WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebritiesEndpoint.url())
       views.Application.admin.html.admin_celebrities(celebrityAccounts = pagedQuery._1)
     }
