@@ -26,7 +26,7 @@ class PostAdminLoginEndpointTests extends AdminFunctionalTest with CleanDatabase
   def testSuccessfulLogin() {
     val response = createAndLoginAsAdmin()
     assertStatus(302, response)
-    assertHeaderEquals("Location", "/admin/celebrities", response)
+    assertHeaderEquals("Location", "/admin/celebrities?", response)
   }
 
   private def getPostStrParams(email: String, password: String): Map[String, String] = {

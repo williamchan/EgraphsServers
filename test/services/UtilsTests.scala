@@ -77,7 +77,7 @@ class UtilsTests extends UnitFlatSpec
 
     val pagedQuery0 = Utils.pagedQuery(select = celebStore.getCelebrityAccounts, page = 1, pageLength = 2, withTotal = true)
     pagedQuery0._1.size should be(2)
-    pagedQuery0._2 should be(2)
+    pagedQuery0._2 should be(1)
     pagedQuery0._3.get should be(3)
 
     val pagedQuery1 = Utils.pagedQuery(select = celebStore.getCelebrityAccounts, page = 2, pageLength = 2, withTotal = true)

@@ -20,7 +20,7 @@ trait AdminFunctionalTest extends FunctionalTest {
   def loginAsAdmin(): Response = {
     val response = POST("/admin/login", Map[String, String]("email" -> "admin@egraphs.com","password" -> "derp"))
     assertStatus(302, response)
-    assertHeaderEquals("Location", "/admin/celebrities", response)
+    assertHeaderEquals("Location", "/admin/celebrities?", response)
     response
   }
 

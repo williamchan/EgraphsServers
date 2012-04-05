@@ -24,7 +24,7 @@ class GetCelebrityProductsApiEndpointTests extends EgraphsUnitTest {
     }
 
     celeb.products().toList returns (List(product1, product2))
-    
+
     val response = new Controller with GetCelebrityProductsApiEndpoint {
       protected def controllerMethod: ControllerMethod = MockControllerMethod
       protected def celebFilters = mockFilters
