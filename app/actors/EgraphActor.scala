@@ -16,16 +16,18 @@ object EgraphActor {
   def processEgraph(egraphId: Long, skipBiometrics: Boolean) {
     play.Logger.info("EgraphActor: Processing Egraph " + egraphId)
     db.connected(TransactionSerializable) {
-      val savedEgraph = egraphStore.findById(egraphId)
-      if (savedEgraph.isEmpty) {
+      val egraph = egraphStore.findById(egraphId)
+      if (egraph.isEmpty) {
         throw new Exception("EgraphActor could not find Egraph " + egraphId.toString)
       }
 
-      savedEgraph.get.assets.initMasterImage()
-      val egraphToTest = if (skipBiometrics) savedEgraph.get.withYesMaamBiometricServices else savedEgraph.get
-      val testedEgraph = egraphToTest.verifyBiometrics.save()
-      if (testedEgraph.state == EgraphState.Verified) {
-        testedEgraph.order.sendEgraphSignedMail()
+      if (egraph.get.stateValue == EgraphState.AwaitingVerification.value) {
+        egraph.get.assets.initMasterImage()
+        val egraphToTest = if (skipBiometrics) egraph.get.withYesMaamBiometricServices else egraph.get
+        val testedEgraph = egraphToTest.verifyBiometrics.save()
+        if (testedEgraph.state == EgraphState.Verified) {
+          testedEgraph.order.sendEgraphSignedMail()
+        }
       }
     }
   }
