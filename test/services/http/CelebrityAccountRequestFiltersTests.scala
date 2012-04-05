@@ -148,7 +148,7 @@ class CelebrityAccountRequestFiltersTests extends UnitFlatSpec with Mockito with
     
     val celebrity = mock[Celebrity]
     celebrity.publicName returns (Some("Shaq"))
-    celebrity.products(mockQueryFilter) returns (List.empty[Product])
+    celebrity.products(mockQueryFilter).toList returns (List.empty[Product])
 
     val callback = mock[Function1[Product, Any]]
     val result = instance(productFilters=productFilters)
@@ -169,7 +169,7 @@ class CelebrityAccountRequestFiltersTests extends UnitFlatSpec with Mockito with
 
     val product = mock[Product]
     val celebrity = mock[Celebrity]
-    celebrity.products(mockQueryFilter) returns (List(product))
+    celebrity.products(mockQueryFilter).toList returns (List(product))
 
     val callback = mock[Function1[Product, Any]]
     callback.apply(any) returns (new Ok)

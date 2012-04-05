@@ -62,15 +62,15 @@ POST    ${api}/celebrities/{celebrityId}/orders/{orderId}/egraphs ApiControllers
 GET     /admin/login                                      WebsiteControllers.getAdminLogin
 POST    /admin/login                                      WebsiteControllers.postAdminLogin
 POST    /admin/logout                                     WebsiteControllers.postAdminLogout
-GET     /admin/celebrities                                WebsiteControllers.getCelebrities
+GET     /admin/celebrities?                               WebsiteControllers.getCelebrities
 POST    /admin/celebrities                                WebsiteControllers.postCelebrity
 GET     /admin/celebrities/create                         WebsiteControllers.getCreateCelebrity
-GET     /admin/celebrities/{celebrityId}/products         WebsiteControllers.getCelebrityProducts
+GET     /admin/celebrities/{celebrityId}/products?        WebsiteControllers.getCelebrityProducts
 POST    /admin/celebrities/{celebrityId}/products         WebsiteControllers.postCelebrityProduct
 GET     /admin/celebrities/{celebrityId}/products/create  WebsiteControllers.getCreateCelebrityProduct
-GET     /admin/egraphs                                    WebsiteControllers.getEgraphs
-GET     /admin/celebrities/{celebrityId}/egraphs          WebsiteControllers.getCelebrityEgraphs
-GET     /admin/celebrities/{celebrityId}/orders           WebsiteControllers.getCelebrityOrders
+GET     /admin/egraphs?                                   WebsiteControllers.getEgraphs
+GET     /admin/celebrities/{celebrityId}/egraphs?         WebsiteControllers.getCelebrityEgraphs
+GET     /admin/celebrities/{celebrityId}/orders?          WebsiteControllers.getCelebrityOrders
 
 ##
 ## Website

@@ -5,6 +5,7 @@ import play.mvc.Router
 import play.Play
 import com.google.inject.Inject
 import java.util.Properties
+import org.squeryl.Query
 
 /**
  * Helpful utilities with no other place to call home
@@ -151,5 +152,13 @@ object Utils extends Utils(Play.configuration) {
       override def equals(other: Any) = this eq other.asInstanceOf[AnyRef]
       override def hashCode = 31 * (this.getClass.## + name.## + ordinal)
     }
+  }
+
+  val defaultPageLength = 30
+
+  def pagedQuery[A](select: Query[A], page: Int = 1, pageLength: Int = defaultPageLength, withTotal: Boolean = true): (Query[A], Int, Option[Int]) = {
+    val total = if (withTotal) Some(select.count((a) => true)) else None
+    val results = select.page(offset = pageLength * (page - 1), pageLength = pageLength)
+    (results, page, total)
   }
 }

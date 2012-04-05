@@ -1,4 +1,5 @@
-@(celebrity: models.Celebrity, egraphAndResults: org.squeryl.Query[(models.Egraph, models.vbg.VBGVerifySample, models.xyzmo.XyzmoVerifyUser)])
+@(celebrity: models.Celebrity, egraphsAndResults: org.squeryl.Query[(models.Egraph, models.vbg.VBGVerifySample, models.xyzmo.XyzmoVerifyUser)]
+)(implicit flash:play.mvc.Scope.Flash)
 
 @import controllers.WebsiteControllers
 @import services.Utils.lookupUrl
@@ -13,7 +14,7 @@
 @body = {
 <div class="admin-content">
   <h2>
-    @celebrity.publicName's Egraphs - @egraphAndResults.size total
+    @celebrity.publicName's Egraphs @flash.get("TotalResultsStr")
   </h2>
   <table>
     <tr>
@@ -27,7 +28,7 @@
       <th>xyzmo Result</th>
       <th>xyzmo Score</th>
     </tr>
-    @egraphAndResults.map { case (egraph, vbgVerifySample, xyzmoVerifyUser) =>
+    @egraphsAndResults.map { case (egraph, vbgVerifySample, xyzmoVerifyUser) =>
     <tr>
       <td>@egraph.id</td>
       <td>@egraph.stateValue</td>
@@ -41,5 +42,15 @@
     </tr>
     }
   </table>
+  <div class="pagination">
+    @if( flash.get("ShowPaging").toBoolean) {
+    <ul>
+      <li @if( !flash.get("ShowFirst").toBoolean ) {class="disabled"}><a href="@flash.get("FirstUrl")">First</a></li>
+      <li @if( !flash.get("ShowPrev" ).toBoolean ) {class="disabled"}><a href="@flash.get("PrevUrl") ">Prev</a></li>
+      <li @if( !flash.get("ShowNext" ).toBoolean ) {class="disabled"}><a href="@flash.get("NextUrl") ">Next</a></li>
+      <li @if( !flash.get("ShowLast" ).toBoolean ) {class="disabled"}><a href="@flash.get("LastUrl") ">Last</a></li>
+    </ul>
+    }
+  </div>
 </div>
 }

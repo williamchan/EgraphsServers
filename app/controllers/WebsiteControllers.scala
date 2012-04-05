@@ -11,6 +11,9 @@ import play.mvc.{Router, Controller}
 import play.mvc.results.Redirect
 import models._
 import services.http.{ControllerMethod, AdminRequestFilters, CelebrityAccountRequestFilters}
+import services.Utils
+import org.squeryl.Query
+import play.mvc.Router.ActionDefinition
 
 object WebsiteControllers extends Controller
   with GetRootEndpoint
@@ -74,6 +77,49 @@ object WebsiteControllers extends Controller
       Redirect(redirectUrl.url, permanent.get)
     } else {
       Redirect(redirectUrl.url)
+    }
+  }
+
+  def updateFlashScopeWithPagingData[A](pagedQuery: (Query[A], Int, Option[Int]), baseUrl: ActionDefinition) {
+    val curPage = pagedQuery._2
+    val totalResults = pagedQuery._3
+
+    val showPaging = totalResults.isDefined && totalResults.get > Utils.defaultPageLength
+    flash.put("ShowPaging", showPaging)
+    val totalResultsStr = if (totalResults.isDefined) ("- " + totalResults.get + " results") else ""
+    flash.put("TotalResultsStr", totalResultsStr)
+
+    if (showPaging) {
+      val showFirst: Boolean = curPage > 2
+      flash.put("ShowFirst", showFirst)
+      if (showFirst) flash.put("FirstUrl", withPageQuery(baseUrl, 1)) else flash.remove("FirstUrl")
+
+      val showPrev: Boolean = curPage > 1
+      flash.put("ShowPrev", showPrev)
+      if (showPrev) flash.put("PrevUrl", withPageQuery(baseUrl, curPage - 1)) else flash.remove("PrevUrl")
+
+      val totalNumPages = if (totalResults.get % Utils.defaultPageLength > 0) {
+        totalResults.get / Utils.defaultPageLength + 1
+      } else {
+        totalResults.get / Utils.defaultPageLength
+      }
+
+      val showNext: Boolean = curPage < totalNumPages
+      flash.put("ShowNext", showNext)
+      if (showNext) flash.put("NextUrl", withPageQuery(baseUrl, curPage + 1)) else flash.remove("NextUrl")
+
+      val showLast: Boolean = curPage < totalNumPages
+      flash.put("ShowLast", showLast)
+      if (showLast) flash.put("LastUrl", withPageQuery(baseUrl, totalNumPages)) else flash.remove("LastUrl")
+    }
+  }
+
+  private def withPageQuery(url: ActionDefinition, page: Int): String = {
+    val urlStr = url.url
+    if (urlStr.contains('?')) {
+      urlStr + "page=" + page
+    } else {
+      urlStr + "?page=" + page
     }
   }
 }

@@ -4,6 +4,9 @@ import models.{Celebrity, Account, CelebrityStore}
 import org.squeryl.Query
 import play.mvc.Controller
 import services.http.{AdminRequestFilters, ControllerMethod}
+import services.Utils
+import play.mvc.Router.ActionDefinition
+import controllers.WebsiteControllers
 
 private[controllers] trait GetCelebritiesEndpoint {
   this: Controller =>
@@ -12,10 +15,19 @@ private[controllers] trait GetCelebritiesEndpoint {
   protected def celebrityStore: CelebrityStore
   protected def controllerMethod: ControllerMethod
 
-  def getCelebrities = controllerMethod() {
+  def getCelebrities(page: Int = 1) = controllerMethod() {
     adminFilters.requireAdministratorLogin { adminId =>
-      val celebrityAccounts: Query[(Celebrity, Account)] = celebrityStore.getCelebrityAccounts
-      views.Application.admin.html.admin_celebrities(celebrityAccounts = celebrityAccounts)
+      var query: Query[(Celebrity, Account)] = celebrityStore.getCelebrityAccounts
+      val pagedQuery: (Query[(Celebrity, Account)], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
+      WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebritiesEndpoint.url())
+      views.Application.admin.html.admin_celebrities(celebrityAccounts = pagedQuery._1)
     }
+  }
+}
+
+object GetCelebritiesEndpoint {
+
+  def url(): ActionDefinition = {
+    Utils.lookupUrl("WebsiteControllers.getCelebrities")
   }
 }

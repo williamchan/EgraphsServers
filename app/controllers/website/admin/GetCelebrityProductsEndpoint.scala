@@ -2,6 +2,11 @@ package controllers.website.admin
 
 import play.mvc.Controller
 import services.http.{ControllerMethod, AdminRequestFilters}
+import play.mvc.Router.ActionDefinition
+import services.Utils
+import org.squeryl.Query
+import controllers.WebsiteControllers
+import models.{Product, Celebrity}
 
 private[controllers] trait GetCelebrityProductsEndpoint {
 
@@ -10,10 +15,21 @@ private[controllers] trait GetCelebrityProductsEndpoint {
   protected def controllerMethod: ControllerMethod
   protected def adminFilters: AdminRequestFilters
 
-  def getCelebrityProducts = controllerMethod() {
+  def getCelebrityProducts(page: Int = 1) = controllerMethod() {
     adminFilters.requireCelebrity {
       (celebrity) =>
-        views.Application.admin.html.admin_celebrityproducts(celebrity = celebrity, products = celebrity.products())
+        var query: Query[Product] = celebrity.products()
+        val pagedQuery: (Query[Product], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
+        WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebrityProductsEndpoint.url(celebrity = celebrity))
+        views.Application.admin.html.admin_celebrityproducts(celebrity = celebrity, products = pagedQuery._1)
+
     }
+  }
+}
+
+object GetCelebrityProductsEndpoint {
+
+  def url(celebrity: Celebrity): ActionDefinition = {
+    Utils.lookupUrl("WebsiteControllers.getCelebrityProducts", Map("celebrityId" -> celebrity.id.toString))
   }
 }

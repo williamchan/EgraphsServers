@@ -1,4 +1,5 @@
-@(celebrityAccounts: org.squeryl.Query[(models.Celebrity, models.Account)])
+@(celebrityAccounts: org.squeryl.Query[(models.Celebrity, models.Account)]
+)(implicit flash:play.mvc.Scope.Flash)
 
 @import controllers.WebsiteControllers
 @import services.Utils.lookupUrl
@@ -7,14 +8,6 @@
 @content_base(title="Admin - Celebrities", body=body, head=head)
 
 @getCreateCelebrity = @{
-  lookupUrl("WebsiteControllers.getCreateCelebrity")
-}
-
-@getCelebrity = @{
-  lookupUrl("WebsiteControllers.getCreateCelebrity")
-}
-
-@getCelebrityProducts = @{
   lookupUrl("WebsiteControllers.getCreateCelebrity")
 }
 
@@ -34,7 +27,7 @@
     </div>
   </form>
   <h2>
-    All Celebrities - @celebrityAccounts.size total
+    All Celebrities @flash.get("TotalResultsStr")
   </h2>
   <form method="link" action="@getCreateCelebrity">
     <input class="btn primary fade in" type="submit" value="New Celebrity"/>
@@ -81,5 +74,15 @@
     </tr>
     }
   </table>
+  <div class="pagination">
+    @if( flash.get("ShowPaging").toBoolean) {
+    <ul>
+      <li @if( !flash.get("ShowFirst").toBoolean ) {class="disabled"}><a href="@flash.get("FirstUrl")">First</a></li>
+      <li @if( !flash.get("ShowPrev" ).toBoolean ) {class="disabled"}><a href="@flash.get("PrevUrl") ">Prev</a></li>
+      <li @if( !flash.get("ShowNext" ).toBoolean ) {class="disabled"}><a href="@flash.get("NextUrl") ">Next</a></li>
+      <li @if( !flash.get("ShowLast" ).toBoolean ) {class="disabled"}><a href="@flash.get("LastUrl") ">Last</a></li>
+    </ul>
+    }
+  </div>
 </div>
 }

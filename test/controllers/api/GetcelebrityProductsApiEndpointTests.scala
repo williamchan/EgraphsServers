@@ -23,7 +23,7 @@ class GetCelebrityProductsApiEndpointTests extends EgraphsUnitTest {
       callback(account, celeb)
     }
 
-    celeb.products() returns (List(product1, product2))
+    celeb.products().toList returns (List(product1, product2))
     
     val response = new Controller with GetCelebrityProductsApiEndpoint {
       protected def controllerMethod: ControllerMethod = MockControllerMethod

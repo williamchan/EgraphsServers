@@ -79,8 +79,11 @@ object TestControllers extends Controller with Logging {
       enrollmentStatusValue = enrollmentStatus.value
     ).save()
 
+    val administrator = Administrator().save()
+
     Account(email = email,
-      celebrityId = Some(celebrity.id)
+      celebrityId = Some(celebrity.id),
+      administratorId = Some(administrator.id)
     ).withPassword("derp").right.get.save()
 
     celebrity.newProduct.copy(

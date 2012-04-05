@@ -1,5 +1,6 @@
 @(celebrity:models.Celebrity,
-  products: Iterable[models.Product])
+  products: Iterable[models.Product]
+)(implicit flash:play.mvc.Scope.Flash)
 
 @import controllers.WebsiteControllers
 @import services.Finance.TypeConversions._
@@ -24,7 +25,7 @@ lookupUrl("WebsiteControllers.getCreateCelebrityProduct", celebrityIdMap)
 @body = {
 <div class="admin-content">
   <h2>
-    @celebrity.publicName's Products - @products.size total
+    @celebrity.publicName's Products @flash.get("TotalResultsStr")
   </h2>
   <form method="link" action="@getCreateCelebrityProduct">
     <input class="btn primary fade in" type="submit" value="New Product"/>
@@ -51,5 +52,15 @@ lookupUrl("WebsiteControllers.getCreateCelebrityProduct", celebrityIdMap)
     </tr>
     }
   </table>
+  <div class="pagination">
+    @if( flash.get("ShowPaging").toBoolean) {
+    <ul>
+      <li @if( !flash.get("ShowFirst").toBoolean ) {class="disabled"}><a href="@flash.get("FirstUrl")">First</a></li>
+      <li @if( !flash.get("ShowPrev" ).toBoolean ) {class="disabled"}><a href="@flash.get("PrevUrl") ">Prev</a></li>
+      <li @if( !flash.get("ShowNext" ).toBoolean ) {class="disabled"}><a href="@flash.get("NextUrl") ">Next</a></li>
+      <li @if( !flash.get("ShowLast" ).toBoolean ) {class="disabled"}><a href="@flash.get("LastUrl") ">Last</a></li>
+    </ul>
+    }
+  </div>
 </div>
 }

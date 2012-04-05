@@ -13,8 +13,7 @@ import com.google.inject._
 import mail.Mail
 import payment.Payment
 import play.mvc.Router.ActionDefinition
-import controllers.WebsiteControllers
-import play.mvc.Router
+import org.squeryl.Query
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -238,7 +237,7 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
    * Finds a list of Orders based on the id of the Celebrity
    * who owns the Product that was purchased.
    */
-  def findByCelebrity(celebrityId: Long, filters: FilterThreeTables[Celebrity, Product, Order]*):Iterable[Order] = {
+  def findByCelebrity(celebrityId: Long, filters: FilterThreeTables[Celebrity, Product, Order]*): Query[Order] = {
     import schema.{celebrities, products, orders}
 
     from(celebrities, products, orders)((celebrity, product, order) =>
@@ -248,8 +247,8 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
           product.id === order.productId and
           FilterThreeTables.reduceFilters(filters, celebrity, product, order)
       )
-        select(order)
-        orderBy(order.created asc)
+        select (order)
+        orderBy (order.created asc)
     )
   }
 

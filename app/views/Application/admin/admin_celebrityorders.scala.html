@@ -1,4 +1,5 @@
-@(celebrity: models.Celebrity, orders: Iterable[models.Order])
+@(celebrity: models.Celebrity, orders: Iterable[models.Order]
+)(implicit flash:play.mvc.Scope.Flash)
 
 @import controllers.WebsiteControllers
 @import services.Utils.lookupUrl
@@ -15,7 +16,7 @@
 @body = {
 <div class="admin-content">
   <h2>
-    @celebrity.publicName's Orders - @orders.size total
+    @celebrity.publicName's Orders @flash.get("TotalResultsStr")
   </h2>
   <table>
     <tr>
@@ -49,5 +50,15 @@
     </tr>
     }
   </table>
+  <div class="pagination">
+    @if( flash.get("ShowPaging").toBoolean) {
+    <ul>
+      <li @if( !flash.get("ShowFirst").toBoolean ) {class="disabled"}><a href="@flash.get("FirstUrl")">First</a></li>
+      <li @if( !flash.get("ShowPrev" ).toBoolean ) {class="disabled"}><a href="@flash.get("PrevUrl") ">Prev</a></li>
+      <li @if( !flash.get("ShowNext" ).toBoolean ) {class="disabled"}><a href="@flash.get("NextUrl") ">Next</a></li>
+      <li @if( !flash.get("ShowLast" ).toBoolean ) {class="disabled"}><a href="@flash.get("LastUrl") ">Last</a></li>
+    </ul>
+    }
+  </div>
 </div>
 }
