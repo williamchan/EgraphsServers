@@ -3,7 +3,7 @@
 
 @import controllers.WebsiteControllers
 @import services.Utils.lookupUrl
-
+@import views.Application.tags.html.pagination
 @import views.Application.html.content_base
 
 @content_base(title="Admin - All Egraphs", body=body, head=head)
@@ -49,15 +49,6 @@
     </tr>
     }
   </table>
-  <div class="pagination">
-    @if( flash.get("ShowPaging").toBoolean) {
-    <ul>
-      <li @if( !flash.get("ShowFirst").toBoolean ) {class="disabled"}><a href="@flash.get("FirstUrl")">First</a></li>
-      <li @if( !flash.get("ShowPrev" ).toBoolean ) {class="disabled"}><a href="@flash.get("PrevUrl") ">Prev</a></li>
-      <li @if( !flash.get("ShowNext" ).toBoolean ) {class="disabled"}><a href="@flash.get("NextUrl") ">Next</a></li>
-      <li @if( !flash.get("ShowLast" ).toBoolean ) {class="disabled"}><a href="@flash.get("LastUrl") ">Last</a></li>
-    </ul>
-    }
-  </div>
+  @pagination()
 </div>
 }

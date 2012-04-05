@@ -1,0 +1,12 @@
+@()(implicit flash:play.mvc.Scope.Flash)
+
+<div class="pagination">
+  @if( flash.get("ShowPaging").toBoolean) {
+  <ul>
+    <li @if( !flash.get("ShowFirst").toBoolean ) {class="disabled"}><a href="@flash.get("FirstUrl")">First</a></li>
+    <li @if( !flash.get("ShowPrev" ).toBoolean ) {class="disabled"}><a href="@flash.get("PrevUrl") ">Prev</a></li>
+    <li @if( !flash.get("ShowNext" ).toBoolean ) {class="disabled"}><a href="@flash.get("NextUrl") ">Next</a></li>
+    <li @if( !flash.get("ShowLast" ).toBoolean ) {class="disabled"}><a href="@flash.get("LastUrl") ">Last</a></li>
+  </ul>
+  }
+</div>
