@@ -9,6 +9,7 @@
 @import services.blobs.AccessPolicy.Public
 @import services.Finance.TypeConversions._
 @import services.Utils.lookupUrl
+@import views.Application.tags.html.errorMessage
 
 @content_base(title=celebrity.publicName.get + ": " + product.name + "- Egraphs", body=body, head=head)
 
@@ -30,24 +31,6 @@
 }
 
 @price = {@product.price.formatSimply}
-
-@alertMessageClass = @{
-  errorFields match {
-    case None => ""
-    case Some(_) => "alert-message-has-errors"
-  }
-}
-
-@errorMessage = {
-  @errorFields.map { realErrors =>
-    Required fields are either missing or invalid. Please fix and resubmit.
-    <ul>
-      @realErrors.map { theError =>
-        <li>@theError</li>
-      }
-    </ul>
-  }
-}
 
 @urlSlugMap = @{
   Map("celebrityUrlSlug" -> celebrity.urlSlug.get, "productUrlSlug" -> product.urlSlug)
@@ -220,9 +203,7 @@
                 <span class="help-block">
                   This will charge @price to your credit card
                 </span>
-                <div class="form-errors alert-message block-message error @alertMessageClass">
-                  @errorMessage
-                </div>
+                @errorMessage(errorFields)
               </div>
             </fieldset>
           </div>

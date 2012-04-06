@@ -2,31 +2,13 @@
 
 @import controllers.WebsiteControllers
 @import services.Utils.lookupUrl
-
+@import views.Application.tags.html.errorMessage
 @import views.Application.html.content_base
 
 @content_base(title="Admin - Create Celebrity", body=body, head=head)
 
 @head = {
 <script src='@asset("public/twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
-}
-
-@alertMessageClass = @{
-errorFields match {
-case None => ""
-case Some(_) => "alert-message-has-errors"
-}
-}
-
-@errorMessage = {
-@errorFields.map { realErrors =>
-Required fields are either missing or invalid. Please fix and resubmit.
-<ul>
-  @realErrors.map { theError =>
-  <li>@theError</li>
-  }
-</ul>
-}
 }
 
 @postCelebrity = @{
@@ -88,9 +70,7 @@ name="@id"
 
           <div class="actions">
             <button type="submit" id="submit-button" class="btn large primary fade in">Create Celebrity</button>
-            <div class="form-errors alert-message block-message error @alertMessageClass">
-              @errorMessage
-            </div>
+            @errorMessage(errorFields)
           </div>
         </fieldset>
       </form>
