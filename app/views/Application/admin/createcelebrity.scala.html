@@ -3,6 +3,7 @@
 @import controllers.WebsiteControllers
 @import services.Utils.lookupUrl
 @import views.Application.tags.html.errorMessage
+@import views.Application.tags.html.formField
 @import views.Application.html.content_base
 
 @content_base(title="Admin - Create Celebrity", body=body, head=head)
@@ -12,31 +13,7 @@
 }
 
 @postCelebrity = @{
-lookupUrl("WebsiteControllers.postCelebrity")
-}
-
-@formField(id: String,
-label: String,
-inputType: String,
-width: String,
-help: Option[Html] = None,
-hasInputName: Boolean=true) = {
-
-@nameAttribute = {
-@if(hasInputName) {
-name="@id"
-}
-}
-
-<div class="clearfix">
-  <label for="@id">@label</label>
-  <div class="input">
-    <input class="@width" id="@id" @nameAttribute type="@inputType" value="@fields(id)" >
-    @help.map { htmlString =>
-    <span class="help-block">@htmlString</span>
-    }
-  </div>
-</div>
+  lookupUrl("WebsiteControllers.postCelebrity")
 }
 
 @body = {
@@ -49,24 +26,21 @@ name="@id"
       <form id="celebrity-form" method="POST" action='@postCelebrity' enctype="multipart/form-data">
         <fieldset>
           <legend>Celebrity info</legend>
+          @formField(id="celebrityEmail", label="E-mail address", inputType="text", width="span4", fields=fields)
 
-          @formField(id="celebrityEmail", label="E-mail address", inputType="text", width="span4")
+          @formField(id="celebrityPassword", label="Password", inputType="text", width="span4", fields=fields)
 
-          @formField(id="celebrityPassword", label="Password", inputType="text", width="span4")
+          @formField(id="celebrity.firstName", label="First Name", inputType="text", width="span4", fields=fields)
 
-          @formField(id="firstName", label="First Name", inputType="text", width="span4")
+          @formField(id="celebrity.lastName", label="Last Name", inputType="text", width="span4", fields=fields)
 
-          @formField(id="lastName", label="Last Name", inputType="text", width="span4")
-
-          @formField(id="publicName", label="Public Name", inputType="text", width="span4", help=Some(publicNameHelp))
+          @formField(id="celebrity.publicName", label="Public Name", inputType="text", width="span4", help=Some(publicNameHelp), fields=fields)
           @publicNameHelp = { Celebrity's popular name, eg "A-Rod" for Alex Rodriguez. Default is "First Last" }
 
-          @formField(id="description", label="Description", inputType="text", width="span4")
+          @formField(id="celebrity.description", label="Description", inputType="text", width="span4", fields=fields)
 
-          @formField(id="profileImage", label="Profile Photo", inputType="file", width="span8", help=Some(profileHelp))
+          @formField(id="profileImage", label="Profile Photo", inputType="file", width="span8", help=Some(profileHelp), fields=fields)
           @profileHelp = { Must be a 200x200 JPG or PNG }
-
-          <!--@formField(id="isLeftHandled", label="Is Left-handed", inputType="checkbox", width="span4")-->
 
           <div class="actions">
             <button type="submit" id="submit-button" class="btn large primary fade in">Create Celebrity</button>
