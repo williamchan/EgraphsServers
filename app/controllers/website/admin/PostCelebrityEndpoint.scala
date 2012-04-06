@@ -7,7 +7,6 @@ import services.mail.Mail
 import controllers.WebsiteControllers
 import play.mvc.Controller
 import play.data.validation.Validation.ValidationResult
-import play.Logger
 import services.blobs.Blobs.Conversions._
 import java.io.File
 import services.{ImageUtil, Utils}
@@ -27,41 +26,47 @@ trait PostCelebrityEndpoint {
    * First validates inputs, and either redirects with error messages or creates a Celebrity.
    *
    * @return a redirect either to the Create Celebrity page with form errors or to
-   *   the created Celebrity's page.
+   *         the created Celebrity's page.
    */
-  def postCelebrity(celebrityEmail: String,
+  def postCelebrity(celebrityId: Long = 0,
+                    celebrityEmail: String,
                     celebrityPassword: String,
                     firstName: String,
                     lastName: String,
                     publicName: String,
                     description: String,
                     profileImage: Option[File] = None) = controllerMethod() {
-    adminFilters.requireAdministratorLogin { adminId =>
+    adminFilters.requireAdministratorLogin {adminId =>
+      val isCreate = (celebrityId == 0)
+      val tmp = if (isCreate) new Celebrity() else celebrityStore.findById(celebrityId).get
+
       val publicNameStr = if (publicName.isEmpty) firstName + " " + lastName else publicName
-      val celebrity = new Celebrity(firstName = Utils.toOption(firstName),
-        lastName = Utils.toOption(lastName),
-        publicName = Utils.toOption(publicNameStr),
-        description = Utils.toOption(description))
+      val celebrity = celebrityWithValues(tmp, firstName = firstName, lastName = lastName, publicNameStr = publicNameStr, description = description)
+      val celebrityUrlSlug = celebrity.urlSlug
 
       // Account validation, including email and password validations and extant account validations
-      Validation.required("E-mail address", celebrityEmail)
-      Validation.email("E-mail address", celebrityEmail)
-      Validation.required("Password", celebrityPassword)
-      val preexistingAccount: Option[Account] = accountStore.findByEmail(celebrityEmail)
-      if (preexistingAccount.isDefined) {
-        val celebrityDoesNotAlreadyExist = preexistingAccount.get.celebrityId.isEmpty
-        Validation.isTrue("Celebrity with e-mail address already exists", celebrityDoesNotAlreadyExist)
-        if (celebrityDoesNotAlreadyExist && preexistingAccount.get.password.isDefined) {
-          Validation.isTrue("A non-celebrity account with that e-mail already exists. Provide the correct password to turn this account into a celebrity account", preexistingAccount.get.password.get.is(celebrityPassword))
-        }
-      }
+      val preexistingAccount: Option[Account] = if (isCreate) accountStore.findByEmail(celebrityEmail) else accountStore.findByCelebrityId(celebrityId)
       val passwordValidationOrAccount: Either[ValidationResult, Account] = if (preexistingAccount.isDefined) {
         Right(preexistingAccount.get)
       } else {
         new Account(email = celebrityEmail).withPassword(celebrityPassword)
       }
-      if (passwordValidationOrAccount.isLeft) {
-        Validation.addError("Password", passwordValidationOrAccount.left.get.error.toString)
+
+      if (isCreate) {
+        Validation.required("E-mail address", celebrityEmail)
+        Validation.email("E-mail address", celebrityEmail)
+        Validation.required("Password", celebrityPassword)
+        if (preexistingAccount.isDefined) {
+          val isUniqueEmail = preexistingAccount.get.celebrityId.isEmpty
+          Validation.isTrue("Celebrity with e-mail address already exists", isUniqueEmail)
+          if (isUniqueEmail && preexistingAccount.get.password.isDefined) {
+            Validation.isTrue("A non-celebrity account with that e-mail already exists. Provide the correct password to turn this account into a celebrity account",
+              preexistingAccount.get.password.get.is(celebrityPassword))
+          }
+        }
+        if (passwordValidationOrAccount.isLeft) {
+          Validation.addError("Password", passwordValidationOrAccount.left.get.error.toString)
+        }
       }
 
       Validation.required("Description", description)
@@ -69,9 +74,14 @@ trait PostCelebrityEndpoint {
       // Name validations
       val isNameRequirementSatisfied = !publicName.isEmpty || (!firstName.isEmpty && !lastName.isEmpty)
       Validation.isTrue("Must provide either Public Name or First and Last Name", isNameRequirementSatisfied)
-      val celebrityUrlSlug = celebrity.urlSlug
       if (celebrityUrlSlug.isDefined) {
-        Validation.isTrue("Celebrity with same website name exists. Provide different public name", celebrityStore.findByUrlSlug(celebrityUrlSlug.get).isEmpty)
+        val celebrityByUrlSlug = celebrityStore.findByUrlSlug(celebrityUrlSlug.get)
+        val isUniqueUrlSlug = if (isCreate) {
+          celebrityByUrlSlug.isEmpty
+        } else {
+          celebrityByUrlSlug.isEmpty || (celebrityByUrlSlug.isDefined && celebrityByUrlSlug.get.id == celebrityId)
+        }
+        Validation.isTrue("Celebrity with same website name exists. Provide different public name", isUniqueUrlSlug)
       }
 
       // Profile image validations
@@ -86,25 +96,58 @@ trait PostCelebrityEndpoint {
       }
 
       if (!validationErrors.isEmpty) {
-        WebsiteControllers.redirectWithValidationErrors(GetCreateCelebrityEndpoint.url())
+        redirectWithValidationErrors(celebrityId, celebrityEmail, celebrityPassword, firstName, lastName, publicName, description)
 
       } else {
-        // Persist Celebrity
-        Logger.info("Creating celebrity")
-        val savedCelebrity = celebrity.save()
-        if (profileImage.isDefined) savedCelebrity.saveWithProfilePhoto(profileImage.get)
-        passwordValidationOrAccount.right.get.copy(celebrityId = Some(savedCelebrity.id)).save()
+        val savedCelebrity = if (profileImage.isDefined) celebrity.saveWithProfilePhoto(profileImage.get)._1 else celebrity.save()
 
-        // Send the order email
-        val email = new SimpleEmail()
-        email.setFrom("noreply@egraphs.com", "Egraphs")
-        email.addTo(celebrityEmail, publicNameStr)
-        email.setSubject("Egraphs Celebrity Account Created")
-        email.setMsg(views.Application.email.html.celebrity_created_email(celebrity = savedCelebrity, email = celebrityEmail).toString().trim())
-        mail.send(email)
+        if (isCreate) {
+
+          passwordValidationOrAccount.right.get.copy(celebrityId = Some(savedCelebrity.id)).save()
+
+          // Send the order email
+          val email = new SimpleEmail()
+          email.setFrom("noreply@egraphs.com", "Egraphs")
+          email.addTo(celebrityEmail, publicNameStr)
+          email.setSubject("Egraphs Celebrity Account Created")
+          email.setMsg(views.Application.email.html.celebrity_created_email(celebrity = savedCelebrity, email = celebrityEmail).toString().trim())
+          mail.send(email)
+        }
 
         new Redirect(WebsiteControllers.lookupGetCelebrity(celebrityUrlSlug.get).url)
       }
+    }
+  }
+
+  private def celebrityWithValues(celebrity: Celebrity,
+                                  firstName: String,
+                                  lastName: String,
+                                  publicNameStr: String,
+                                  description: String): Celebrity = {
+    celebrity.copy(firstName = Utils.toOption(firstName),
+      lastName = Utils.toOption(lastName),
+      publicName = Utils.toOption(publicNameStr),
+      description = Utils.toOption(description))
+  }
+
+  private def redirectWithValidationErrors(celebrityId: Long,
+                                           celebrityEmail: String,
+                                           celebrityPassword: String,
+                                           firstName: String,
+                                           lastName: String,
+                                           publicName: String,
+                                           description: String): Redirect = {
+    flash.put("celebrityId", celebrityId)
+    flash.put("celebrityEmail", celebrityEmail)
+    flash.put("celebrityPassword", celebrityPassword)
+    flash.put("firstName", firstName)
+    flash.put("lastName", lastName)
+    flash.put("publicName", publicName)
+    flash.put("description", description)
+    if (celebrityId == 0) {
+      WebsiteControllers.redirectWithValidationErrors(GetCreateCelebrityEndpoint.url())
+    } else {
+      WebsiteControllers.redirectWithValidationErrors(GetUpdateCelebrityEndpoint.url(celebrityId = celebrityId))
     }
   }
 }

@@ -4,6 +4,7 @@ inputType: String,
 width: String,
 help: Option[Html] = None,
 hasInputName: Boolean=true,
+editable: Boolean=true,
 fields: (String) => String)
 
 @nameAttribute = {
@@ -16,10 +17,18 @@ fields: (String) => String)
   value="@fields(id)"
 }
 
+@disabledAttribute = {
+  @if(editable) {} else {disabled="true"}
+}
+
+@typeAttribute = {
+  type="@inputType"
+}
+
 <div class="clearfix">
   <label for="@id">@label</label>
   <div class="input">
-    <input class="@width" id="@id" @nameAttribute @valueAttribute type="@inputType">
+    <input class="@width" id="@id" @nameAttribute @valueAttribute @typeAttribute @disabledAttribute>
     @help.map { htmlString =>
       <span class="help-block">@htmlString</span>
     }

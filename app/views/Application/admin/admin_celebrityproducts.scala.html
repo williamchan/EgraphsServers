@@ -32,14 +32,19 @@ lookupUrl("WebsiteControllers.getCreateCelebrityProduct", celebrityIdMap)
   </form>
   <table>
     <tr>
+      <th></th>
       <th>Id</th>
       <th>Name</th>
       <th>Price</th>
       <th>Description</th>
-      <th>Photo</th>
     </tr>
     @products.map { (product) =>
     <tr>
+      <td>
+        <a class="preview-link" href="/admin/celebrities/@celebrity.id/products/@product.id">
+          Details
+        </a>
+      </td>
       <td>@product.id</td>
       <td>
         <a class="preview-link" href="/@celebrity.urlSlug/@product.urlSlug">
@@ -48,7 +53,6 @@ lookupUrl("WebsiteControllers.getCreateCelebrityProduct", celebrityIdMap)
       </td>
       <td>@product.price.formatSimply</td>
       <td>@product.description</td>
-      <td>View Photo</td>
     </tr>
     }
   </table>

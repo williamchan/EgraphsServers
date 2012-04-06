@@ -15,19 +15,8 @@ private[controllers] trait GetCreateCelebrityProductEndpoint {
    * Serves up the HTML for the Create Celebrity page.
    */
   def getCreateCelebrityProduct = controllerMethod() {
-
     adminFilters.requireCelebrity { (celebrity) =>
-    // Get errors and param values from previous unsuccessful buy
-      val errorFields = Option(flash.get("errors")).map(errString => errString.split(',').toList)
-      val fieldDefaults: (String => String) = {
-        (paramName: String) => paramName match {
-          case _ =>
-            Option(flash.get(paramName)).getOrElse("")
-        }
-      }
-
-      // Render the page
-      views.Application.admin.html.createcelebrityproduct(celebrity = celebrity, errorFields = errorFields, fields = fieldDefaults)
+      GetProductDetail.getCelebrityProductDetail(celebrity = celebrity, isCreate = true)
     }
   }
 }

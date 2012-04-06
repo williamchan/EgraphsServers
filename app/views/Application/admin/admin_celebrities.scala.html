@@ -35,18 +35,24 @@
   </form>
   <table>
     <tr>
+      <th></th>
       <th>Id</th>
       <th>Email</th>
       <th>Public Name</th>
       <th>First</th>
       <th>Last</th>
-      <th>Enrollment Status</th>
+      <th>Enrolled?</th>
       <th>Products</th>
       <th>Orders</th>
       <th>Egraphs</th>
     </tr>
     @celebrityAccounts.map { case (celebrity, account) =>
     <tr>
+      <td>
+        <a class="preview-link" href="/admin/celebrities/@celebrity.id">
+          Details
+        </a>
+      </td>
       <td>@celebrity.id</td>
       <td>@account.email</td>
       <td>

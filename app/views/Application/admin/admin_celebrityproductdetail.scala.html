@@ -1,4 +1,4 @@
-@(celebrity: models.Celebrity, errorFields: Option[List[String]], fields: (String) => String)
+@(isCreate: Boolean, celebrity: models.Celebrity, errorFields: Option[List[String]], fields: (String) => String)
 
 @import controllers.WebsiteControllers
 @import services.Utils.lookupUrl
@@ -6,7 +6,7 @@
 @import views.Application.html.content_base
 @import views.Application.tags.html.formField
 
-@content_base(title="Admin - Create Product", body=body, head=head)
+@content_base(title="Admin - Product Details", body=body, head=head)
 
 @head = {
 <script src='@asset("public/twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
@@ -23,13 +23,15 @@
 @body = {
 <div class="admin-content">
   <h2>
-    Create Product for @celebrity.publicName.get
+    @celebrity.publicName.get - @{if(isCreate) "Create" else "Update"} Product
   </h2>
   <div class="form row">
     <div class="span12 form-column">
       <form id="product-form" method="POST" action='@postProduct' enctype="multipart/form-data">
         <fieldset>
-          <legend>Product info</legend>
+          <legend>Product Details</legend>
+
+          <input id="productId" name="productId" type="hidden" value="@fields("productId")">
 
           @formField(
             id="productName",
@@ -84,7 +86,7 @@
           </div>
 
           <div class="actions">
-            <button type="submit" id="submit-button" class="btn large primary fade in">Create Product</button>
+            <button type="submit" id="submit-button" class="btn large primary fade in">Save</button>
             @errorMessage(errorFields)
           </div>
         </fieldset>

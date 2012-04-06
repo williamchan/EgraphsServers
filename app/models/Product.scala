@@ -12,7 +12,7 @@ import java.awt.image.BufferedImage
 import play.Play
 import services.blobs.AccessPolicy
 import com.google.inject.{Provider, Inject}
-import services.{TemplateEngine, Time, AppConfig}
+import services._
 
 case class ProductServices @Inject() (
   store: ProductStore,
@@ -52,6 +52,26 @@ case class Product(
   //
   def save(): Product = {
     services.store.save(this)
+  }
+
+  def saveWithImageAssets(image: BufferedImage, icon: BufferedImage): Product = {
+    import ImageUtil.Conversions._
+
+    // Prepare the product photo, cropped to the suggested frame
+    val frame = EgraphFrame.suggestedFrame(Dimensions(image.getWidth, image.getHeight))
+    val imageCroppedToFrame = frame.cropImageForFrame(image)
+    // todo(wchan): Jpeg or PNG
+    val imageByteArray = imageCroppedToFrame.asByteArray(ImageAsset.Jpeg)
+
+    // Prepare the product plaque icon, cropped to a square
+    val iconCroppedToSquare = ImageUtil.cropToSquare(icon)
+    val iconBytes = iconCroppedToSquare.asByteArray(ImageAsset.Jpeg)
+
+    // Save the product so it has an ID for blobstore to key on, then add blobstore values and save again
+    val savedWithFrame = withFrame(frame).save()
+    val savedWithPhoto = savedWithFrame.withPhoto(imageByteArray).save().product
+
+    savedWithPhoto.withIcon(iconBytes).save().product
   }
 
   def iconUrl: String = {

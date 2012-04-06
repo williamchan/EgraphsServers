@@ -105,6 +105,20 @@ class AccountStore @Inject() (schema: Schema) extends Saves[Account] with SavesC
     ).headOption
   }
 
+  def findByAdministratorId(administratorId: Long): Option[Account] = {
+    from(schema.accounts)(account =>
+      where(account.administratorId === administratorId)
+        select (account)
+    ).headOption
+  }
+
+  def findByCelebrityId(celebrityId: Long): Option[Account] = {
+    from(schema.accounts)(account =>
+      where(account.celebrityId === celebrityId)
+        select (account)
+    ).headOption
+  }
+
   def findByCustomerId(customerId: Long): Option[Account] = {
     from(schema.accounts)(account =>
       where(account.customerId === customerId)

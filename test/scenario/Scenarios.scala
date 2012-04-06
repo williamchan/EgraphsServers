@@ -23,6 +23,7 @@ class Scenarios extends DeclaresScenarios {
   val blobs = AppConfig.instance[Blobs]
   val payment = AppConfig.instance[Payment]
   val schema = AppConfig.instance[Schema]
+  val accountStore = AppConfig.instance[AccountStore]
 
   // Categories of scenario
   val adminCategory = "Admin Helpers"
@@ -430,10 +431,11 @@ class Scenarios extends DeclaresScenarios {
     """,
 
     {() =>
-      Scenario.clearAll()
-
-      val administrator = Administrator().save()
-      Account(email="admin@egraphs.com", administratorId = Some(administrator.id)).withPassword("derp").right.get.save()
+      val adminEmail = "admin@egraphs.com"
+      if (accountStore.findByEmail(adminEmail).isEmpty) {
+        val administrator = Administrator().save()
+        Account(email = adminEmail, administratorId = Some(administrator.id)).withPassword("derp").right.get.save()
+      }
     }
   )
 

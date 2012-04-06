@@ -21,24 +21,30 @@ trait PostCelebrityProductEndpoint extends Logging {
   protected def celebrityStore: CelebrityStore
   protected def productStore: ProductStore
 
-  def postCelebrityProduct(productName: String,
+  def postCelebrityProduct(productId: Long = 0,
+                           productName: String,
                            productDescription: String,
                            productImage: File,
                            productIcon: File,
                            storyTitle: String,
                            storyText: String) = controllerMethod() {
     celebFilters.requireCelebrityId(request) { celebrity =>
+      val isCreate = (productId == 0)
+
       // Validate text fields
       required("Product name", productName)
       required("Product image", productImage)
       required("Product icon", productIcon)
       required("Story title", storyTitle)
       required("Story text", storyText)
-      Validation.isTrue(
-        "Celebrity already has a product with name: " + productName,
-        productStore.findByCelebrityAndUrlSlug(celebrity.id, Product.slugify(productName)).isEmpty
-      )
-      
+      val productByUrlSlg = productStore.findByCelebrityAndUrlSlug(celebrity.id, Product.slugify(productName))
+      val isUniqueUrlSlug = if (isCreate) {
+        productByUrlSlg.isEmpty
+      } else {
+        productByUrlSlg.isEmpty || (productByUrlSlg.isDefined && productByUrlSlg.get.id == productId)
+      }
+      Validation.isTrue("Celebrity already has a product with name: " + productName, isUniqueUrlSlug)
+
       // Validate product image
       val productImageOption = ImageUtil.parseImage(productImage)
       Validation.isTrue("Product photo must be a valid image", !productImageOption.isEmpty)
@@ -67,21 +73,49 @@ trait PostCelebrityProductEndpoint extends Logging {
       // we delegate creating the Product to the Celebrity.
       if (validationErrors.isEmpty) {
         log("Request to create product \"" + productName + "\" for celebrity " + celebrity.publicName + " passed all filters.")
-        val savedProduct = celebrity.addProduct(
-          name=productName,
-          description=productDescription,
-          image=productImageOption.get,
-          icon=productIconOption.get,
-          storyTitle=storyTitle,
-          storyText=storyText
-        )
+        val savedProduct = if (isCreate) {
+          celebrity.addProduct(
+            name=productName,
+            description=productDescription,
+            image=productImageOption.get,
+            icon=productIconOption.get,
+            storyTitle=storyTitle,
+            storyText=storyText
+          )
+        } else {
+          val product = productStore.findById(productId).get
+          product.copy(
+            name=productName,
+            description=productDescription,
+            storyTitle=storyTitle,
+            storyText=storyText
+          ).saveWithImageAssets(image = productImageOption.get, icon = productIconOption.get)
+        }
 
         new Redirect(GetCelebrityProductEndpoint.url(celebrity, savedProduct).url)
       }
       else {
         // There were validation errors
-        WebsiteControllers.redirectWithValidationErrors(GetCreateCelebrityProductEndpoint.url(celebrity))
+        redirectWithValidationErrors(celebrity, productId, productName, productDescription, storyTitle, storyText)
       }
+    }
+  }
+
+  private def redirectWithValidationErrors(celebrity: Celebrity,
+                                           productId: Long,
+                                           productName: String,
+                                           productDescription: String,
+                                           storyTitle: String,
+                                           storyText: String): Redirect = {
+    flash.put("productId", productId)
+    flash.put("productName", productName)
+    flash.put("productDescription", productDescription)
+    flash.put("storyTitle", storyTitle)
+    flash.put("storyText", storyText)
+    if (productId == 0) {
+      WebsiteControllers.redirectWithValidationErrors(GetCreateCelebrityProductEndpoint.url(celebrity = celebrity))
+    } else {
+      WebsiteControllers.redirectWithValidationErrors(GetUpdateCelebrityProductEndpoint.url(celebrity = celebrity, productId = productId))
     }
   }
 }
