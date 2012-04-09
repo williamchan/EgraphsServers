@@ -13,8 +13,11 @@ object GetProductDetail {
         case "productId" => flash.get("productId")
         case "productName" => flash.get("productName")
         case "productDescription" => flash.get("productDescription")
-        case "storyTitle" => flash.get("storyTitle")
-        case "storyText" => flash.get("storyText")
+        case "storyTitle" => if (isCreate) "The Story" else flash.get("storyTitle")
+        case "storyText" => {
+          if (isCreate) "{signer_link}{signer_name}{end_link} defeated Dark Lord Sauron in 2012. A few days afterwards he got a note from {recipient_name} on his iPad. This was his response."
+          else flash.get("storyText")
+        }
         case _ =>
           Option(flash.get(paramName)).getOrElse("")
       }
