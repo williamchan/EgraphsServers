@@ -462,7 +462,7 @@ class EgraphStore @Inject() (schema: Schema) extends Saves[Egraph] with SavesCre
       (egraph, vbgVerifySample, xyzmoVerifyUser) =>
         where (egraph.id === vbgVerifySample.egraphId and egraph.id === xyzmoVerifyUser.egraphId)
           select(egraph, vbgVerifySample, xyzmoVerifyUser)
-          orderBy(egraph.id asc)
+          orderBy(egraph.id desc)
     )
     egraphsAndResults
   }
@@ -474,7 +474,7 @@ class EgraphStore @Inject() (schema: Schema) extends Saves[Egraph] with SavesCre
         where (egraph.orderId === order.id and order.productId === product.id and product.celebrityId === celebrityId
           and egraph.id === vbgVerifySample.egraphId and egraph.id === xyzmoVerifyUser.egraphId)
           select(egraph, vbgVerifySample, xyzmoVerifyUser)
-          orderBy(egraph.id asc)
+          orderBy(egraph.id desc)
     )
     celebrityEgraphsAndResults
   }

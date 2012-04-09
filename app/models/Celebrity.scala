@@ -154,14 +154,6 @@ case class Celebrity(id: Long = 0,
     product.saveWithImageAssets(image, icon)
   }
 
-  def getMostRecentEnrollmentBatch(): Option[EnrollmentBatch] = {
-    from(services.schema.enrollmentBatches)(enrollmentBatch =>
-      where(enrollmentBatch.celebrityId === this.id)
-        select (enrollmentBatch)
-        orderBy(enrollmentBatch.created desc)
-    ).headOption
-  }
-
   def getOpenEnrollmentBatch(): Option[EnrollmentBatch] = {
     from(services.schema.enrollmentBatches)(enrollmentBatch =>
       where(enrollmentBatch.celebrityId === this.id and enrollmentBatch.isSuccessfulEnrollment.isNull)
@@ -247,7 +239,7 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
       (c, a) =>
         where (c.id === a.celebrityId)
         select(c, a)
-        orderBy(c.id asc)
+        orderBy(c.id desc)
     )
     celebrityAccounts
   }
