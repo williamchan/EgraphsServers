@@ -99,7 +99,9 @@ trait PostCelebrityEndpoint {
         redirectWithValidationErrors(celebrityId, celebrityEmail, celebrityPassword, firstName, lastName, publicName, description)
 
       } else {
-        val savedCelebrity = if (profileImage.isDefined) celebrity.saveWithProfilePhoto(profileImage.get)._1 else celebrity.save()
+        val savedCelebrity = celebrity.save()
+        // Celebrity must have been previously saved before saving with assets that live in blobstore
+        if (profileImage.isDefined) savedCelebrity.saveWithProfilePhoto(profileImage.get)
 
         if (isCreate) {
 
