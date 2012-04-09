@@ -5,7 +5,8 @@ import models._
 import com.google.inject.Inject
 import play.mvc.Scope.Session
 import controllers.WebsiteControllers
-import play.mvc.results.Forbidden
+import play.mvc.results.{Redirect, Forbidden}
+import controllers.website.admin.GetAdminLoginEndpoint
 
 class AdminRequestFilters @Inject()(adminStore: AdministratorStore,
                                     celebStore: CelebrityStore,
@@ -17,7 +18,7 @@ class AdminRequestFilters @Inject()(adminStore: AdministratorStore,
   def requireAdministratorLogin(continue: (Administrator) => Any)(implicit session: Session, request: Request) = {
     val adminId = session.get(WebsiteControllers.adminIdKey)
     if (adminId == null || adminId.isEmpty) {
-      new Forbidden("Out to the ball game")
+      new Redirect(GetAdminLoginEndpoint.url().url)
     } else {
       adminStore.findById(adminId.toLong) match {
         case None => new Forbidden("Out to the ball game")
