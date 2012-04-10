@@ -1,8 +1,9 @@
 @(celebrityAccounts: Iterable[(models.Celebrity, models.Account)]
-)(implicit flash:play.mvc.Scope.Flash)
+)(implicit flash:play.mvc.Scope.Flash, session: play.mvc.Scope.Session)
 
 @import controllers.WebsiteControllers
 @import services.Utils.lookupUrl
+@import views.Application.tags.html.authenticityToken
 @import views.Application.html.content_base
 @import views.Application.tags.html.pagination
 
@@ -23,6 +24,7 @@
 @body = {
 <div class="admin-content">
   <form id="logout" method="POST" action='@postAdminLogout' enctype="application/x-www-form-urlencoded">
+    @authenticityToken()
     <div>
       <button type="submit" id="logout-button" class="btn fade in">Logout</button>
     </div>

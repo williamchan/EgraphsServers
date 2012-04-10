@@ -1,11 +1,11 @@
 package controllers.website.admin
 
-import play.mvc.Scope.Flash
 import play.templates.Html
+import play.mvc.Scope.{Session, Flash}
 
 object GetCelebrityDetail {
 
-  def getCelebrityDetail(isCreate: Boolean)(implicit flash: Flash): Html = {
+  def getCelebrityDetail(isCreate: Boolean)(implicit flash: Flash, session: Session): Html = {
     val errorFields = Option(flash.get("errors")).map(errString => errString.split(',').toList)
 
     val fieldDefaults: (String => String) = {

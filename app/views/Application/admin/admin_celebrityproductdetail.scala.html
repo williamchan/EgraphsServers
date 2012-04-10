@@ -1,7 +1,9 @@
-@(isCreate: Boolean, celebrity: models.Celebrity, errorFields: Option[List[String]], fields: (String) => String)
+@(isCreate: Boolean, celebrity: models.Celebrity, errorFields: Option[List[String]], fields: (String) => String
+)(implicit session: play.mvc.Scope.Session)
 
 @import controllers.WebsiteControllers
 @import services.Utils.lookupUrl
+@import views.Application.tags.html.authenticityToken
 @import views.Application.tags.html.errorMessage
 @import views.Application.html.content_base
 @import views.Application.tags.html.formField
@@ -29,9 +31,9 @@
     <div class="span12 form-column">
       <form id="product-form" method="POST" action='@postProduct' enctype="multipart/form-data">
         <fieldset>
-          <legend>Product Details</legend>
-
+          @authenticityToken()
           <input id="productId" name="productId" type="hidden" value="@fields("productId")">
+          <legend>Product Details</legend>
 
           @formField(
             id="productName",

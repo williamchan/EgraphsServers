@@ -2,13 +2,15 @@
   product: models.Product,
   errorFields: Option[List[String]],
   fields: (String) => String,
-  payment: services.payment.Payment)
+  payment: services.payment.Payment
+)(implicit session: play.mvc.Scope.Session)
 
 @import models.Product
 @import controllers.WebsiteControllers
 @import services.blobs.AccessPolicy.Public
 @import services.Finance.TypeConversions._
 @import services.Utils.lookupUrl
+@import views.Application.tags.html.authenticityToken
 @import views.Application.tags.html.errorMessage
 @import views.Application.tags.html.formField
 
@@ -92,6 +94,7 @@
       </div>
       <div class="span12 form-column">
         <form id="payment-form" method="POST" action='@buyPage' >
+          @authenticityToken()
           <fieldset>
             <legend>Recipient info</legend>
             @formField(id="recipientName", label="Name", inputType="text", width="span4", fields=fields)

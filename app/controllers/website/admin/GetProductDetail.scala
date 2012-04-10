@@ -1,12 +1,12 @@
 package controllers.website.admin
 
-import play.mvc.Scope.Flash
 import play.templates.Html
 import models.Celebrity
+import play.mvc.Scope.{Session, Flash}
 
 object GetProductDetail {
 
-  def getCelebrityProductDetail(celebrity: Celebrity, isCreate: Boolean)(implicit flash: Flash): Html = {
+  def getCelebrityProductDetail(celebrity: Celebrity, isCreate: Boolean)(implicit flash: Flash, session: Session): Html = {
     val errorFields = Option(flash.get("errors")).map(errString => errString.split(',').toList)
     val fieldDefaults: (String => String) = {
       (paramName: String) => paramName match {

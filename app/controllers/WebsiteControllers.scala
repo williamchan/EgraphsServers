@@ -8,11 +8,11 @@ import services.blobs.Blobs
 import services.mail.Mail
 import services.payment.Payment
 import play.mvc.{Router, Controller}
-import play.mvc.results.Redirect
 import models._
-import services.http.{ControllerMethod, AdminRequestFilters, CelebrityAccountRequestFilters}
 import services.Utils
 import play.mvc.Router.ActionDefinition
+import play.mvc.results.Redirect
+import services.http.{SecurityRequestFilters, ControllerMethod, AdminRequestFilters, CelebrityAccountRequestFilters}
 
 object WebsiteControllers extends Controller
   with GetRootEndpoint
@@ -48,6 +48,7 @@ object WebsiteControllers extends Controller
   // Provide endpoint dependencies
   override protected val controllerMethod = instance[ControllerMethod]
   override protected val adminFilters = instance[AdminRequestFilters]
+  override protected val securityFilters = instance[SecurityRequestFilters]
   override protected val celebFilters = instance[CelebrityAccountRequestFilters]
 
   override protected val blobs = instance[Blobs]

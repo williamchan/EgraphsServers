@@ -1,7 +1,9 @@
-@(isCreate: Boolean, errorFields: Option[List[String]], fields: (String) => String)
+@(isCreate: Boolean, errorFields: Option[List[String]], fields: (String) => String
+)(implicit session: play.mvc.Scope.Session)
 
 @import controllers.WebsiteControllers
 @import services.Utils.lookupUrl
+@import views.Application.tags.html.authenticityToken
 @import views.Application.tags.html.errorMessage
 @import views.Application.tags.html.formField
 @import views.Application.html.content_base
@@ -25,9 +27,9 @@
     <div class="span12 form-column">
       <form id="celebrity-form" method="POST" action='@postCelebrity' enctype="multipart/form-data">
         <fieldset>
-          <legend>Celebrity Details</legend>
-
+          @authenticityToken()
           <input id="celebrityId" name="celebrityId" type="hidden" value="@fields("celebrityId")">
+          <legend>Celebrity Details</legend>
 
           @formField(id="celebrityEmail", label="E-mail address", inputType="text", editable=isCreate, width="span4", fields=fields)
 

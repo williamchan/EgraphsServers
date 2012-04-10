@@ -1,7 +1,9 @@
-@(errorFields: Option[List[String]])
+@(errorFields: Option[List[String]]
+)(implicit session: play.mvc.Scope.Session)
 
 @import controllers.WebsiteControllers
 @import services.Utils.lookupUrl
+@import views.Application.tags.html.authenticityToken
 @import views.Application.tags.html.errorMessage
 @import views.Application.html.content_base
 
@@ -21,6 +23,7 @@ lookupUrl("WebsiteControllers.postAdminLogin")
     <div class="span12 form-column">
       <form method="POST" action="@postAdminLogin">
         <fieldset>
+          @authenticityToken()
           <legend>Administrator Login</legend>
           <div class="clearfix">
             <label for="email">Email</label>

@@ -11,13 +11,14 @@ import services.mail.Mail
 import services.{Utils, AppConfig}
 import play.Logger
 import controllers.WebsiteControllers
-import services.http.{ControllerMethod, CelebrityAccountRequestFilters}
+import services.http.{SecurityRequestFilters, ControllerMethod, CelebrityAccountRequestFilters}
 
 trait PostBuyProductEndpoint { this: Controller =>
   import PostBuyProductEndpoint.EgraphPurchaseHandler
   import PostBuyProductEndpoint.alphaEmailMatcher
 
   protected def celebFilters: CelebrityAccountRequestFilters
+  protected def securityFilters: SecurityRequestFilters
   protected def mail: Mail
   protected def customerStore: CustomerStore
   protected def accountStore: AccountStore
@@ -35,55 +36,59 @@ trait PostBuyProductEndpoint { this: Controller =>
           buyerEmail: String,
           stripeTokenId: String,
           desiredText: Option[String],
-          personalNote: Option[String]) =
-  controllerMethod() {
-    Logger.info("Receiving purchase order")
-    celebFilters.requireCelebrityAndProductUrlSlugs { (celebrity, product) =>
-      Logger.info("Purchase of product " + celebrity.publicName + "/" + product.name + " for " + recipientName)
-      import Validation.{required, email}
-      required("Recipient name", recipientName)
-      required("Recipient E-mail address", recipientEmail)
-      email("Recipient E-mail address", recipientEmail)
-      required("Buyer name", buyerName)
-      required("Buyer E-mail address", buyerEmail)
-      email("Buyer E-mail address", buyerEmail)
-      required("stripeTokenId", stripeTokenId)
+          personalNote: Option[String]) = controllerMethod() {
 
-      if (recipientEmail != null && !recipientEmail.isEmpty && accountStore.findByEmail(recipientEmail.toLowerCase).isEmpty) {
-        Validation.`match`(
-          "Recipient e-mail address must be a Beta celebrity or a Beta tester",
-          recipientEmail.toLowerCase,
-          alphaEmailMatcher
-        )
+    securityFilters.checkAuthenticity {
 
-      }
-      if (buyerEmail != null && !buyerEmail.isEmpty && accountStore.findByEmail(buyerEmail.toLowerCase).isEmpty) {
-        Validation.`match`(
-          "Recipient e-mail address must be a Beta celebrity or a Beta tester",
-          buyerEmail.toLowerCase,
-          alphaEmailMatcher
-        )
-      }
+        Logger.info("Receiving purchase order")
+        celebFilters.requireCelebrityAndProductUrlSlugs {
+          (celebrity, product) =>
+            Logger.info("Purchase of product " + celebrity.publicName + "/" + product.name + " for " + recipientName)
+            import Validation.{required, email}
+            required("Recipient name", recipientName)
+            required("Recipient E-mail address", recipientEmail)
+            email("Recipient E-mail address", recipientEmail)
+            required("Buyer name", buyerName)
+            required("Buyer E-mail address", buyerEmail)
+            email("Buyer E-mail address", buyerEmail)
+            required("stripeTokenId", stripeTokenId)
 
-      if (!validationErrors.isEmpty) {
-        WebsiteControllers.redirectWithValidationErrors(GetCelebrityProductEndpoint.url(celebrity, product), Some(false))
-      } else {
-        Logger.info("No validation errors")
-        EgraphPurchaseHandler(
-          recipientName,
-          recipientEmail,
-          buyerName,
-          buyerEmail,
-          stripeTokenId,
-          desiredText,
-          personalNote,
-          celebrity,
-          product,
-          mail=mail,
-          customerStore=customerStore,
-          accountStore=accountStore
-        ).execute()
-      }
+            if (recipientEmail != null && !recipientEmail.isEmpty && accountStore.findByEmail(recipientEmail.toLowerCase).isEmpty) {
+              Validation.`match`(
+                "Recipient e-mail address must be a Beta celebrity or a Beta tester",
+                recipientEmail.toLowerCase,
+                alphaEmailMatcher
+              )
+
+            }
+            if (buyerEmail != null && !buyerEmail.isEmpty && accountStore.findByEmail(buyerEmail.toLowerCase).isEmpty) {
+              Validation.`match`(
+                "Recipient e-mail address must be a Beta celebrity or a Beta tester",
+                buyerEmail.toLowerCase,
+                alphaEmailMatcher
+              )
+            }
+
+            if (!validationErrors.isEmpty) {
+              WebsiteControllers.redirectWithValidationErrors(GetCelebrityProductEndpoint.url(celebrity, product), Some(false))
+            } else {
+              Logger.info("No validation errors")
+              EgraphPurchaseHandler(
+                recipientName,
+                recipientEmail,
+                buyerName,
+                buyerEmail,
+                stripeTokenId,
+                desiredText,
+                personalNote,
+                celebrity,
+                product,
+                mail = mail,
+                customerStore = customerStore,
+                accountStore = accountStore
+              ).execute()
+            }
+        }
     }
   }
 }
