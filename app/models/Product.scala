@@ -54,24 +54,29 @@ case class Product(
     services.store.save(this)
   }
 
-  def saveWithImageAssets(image: BufferedImage, icon: BufferedImage): Product = {
+  def saveWithImageAssets(image: Option[BufferedImage], icon: Option[BufferedImage]): Product = {
     import ImageUtil.Conversions._
 
     // Prepare the product photo, cropped to the suggested frame
-    val frame = EgraphFrame.suggestedFrame(Dimensions(image.getWidth, image.getHeight))
-    val imageCroppedToFrame = frame.cropImageForFrame(image)
-    // todo(wchan): Jpeg or PNG
-    val imageByteArray = imageCroppedToFrame.asByteArray(ImageAsset.Jpeg)
+    val product = if (image.isDefined) {
+      val frame = EgraphFrame.suggestedFrame(Dimensions(image.get.getWidth, image.get.getHeight))
+      val imageCroppedToFrame = frame.cropImageForFrame(image.get)
+      val imageByteArray = imageCroppedToFrame.asByteArray(ImageAsset.Jpeg)
+      // Product have previously been saved so that it has an ID for blobstore to key on
+      val savedWithFrame = withFrame(frame).save()
+      savedWithFrame.withPhoto(imageByteArray).save().product
+    } else {
+      this
+    }
 
     // Prepare the product plaque icon, cropped to a square
-    val iconCroppedToSquare = ImageUtil.cropToSquare(icon)
-    val iconBytes = iconCroppedToSquare.asByteArray(ImageAsset.Jpeg)
+    if (icon.isDefined) {
+      val iconCroppedToSquare = ImageUtil.cropToSquare(icon.get)
+      val iconBytes = iconCroppedToSquare.asByteArray(ImageAsset.Jpeg)
+      product.withIcon(iconBytes).save()
+    }
 
-    // Save the product so it has an ID for blobstore to key on, then add blobstore values and save again
-    val savedWithFrame = withFrame(frame).save()
-    val savedWithPhoto = savedWithFrame.withPhoto(imageByteArray).save().product
-
-    savedWithPhoto.withIcon(iconBytes).save().product
+    product
   }
 
   def iconUrl: String = {

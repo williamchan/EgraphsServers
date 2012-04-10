@@ -13,7 +13,7 @@ import controllers.website.PostBuyProductEndpoint.EgraphPurchaseHandler
 import play.libs.{Codec, Mail}
 import services.payment.Payment
 import play.Play
-import services.{Dimensions, Utils, AppConfig}
+import services.{Utils, AppConfig}
 
 /**
  * All scenarios supported by the API.
@@ -97,8 +97,8 @@ class Scenarios extends DeclaresScenarios {
     {() =>
       val will = Scenarios.getWillCelebrityAccount
 
-      val photoImage = Product().defaultPhoto.renderFromMaster
-      val iconImage = Product().defaultIcon.renderFromMaster
+      val photoImage = Some(Product().defaultPhoto.renderFromMaster)
+      val iconImage = Some(Product().defaultIcon.renderFromMaster)
 
       will.addProduct(
         name="2010 Starcraft 2 Championships",

@@ -36,8 +36,7 @@ trait PostCelebrityProductEndpoint extends Logging {
 
         // Validate text fields
         required("Product name", productName)
-        required("Product image", productImage)
-        required("Product icon", productIcon)
+        if (isCreate) required("Product image", productImage)
         required("Story title", storyTitle)
         required("Story text", storyText)
         val productByUrlSlg = productStore.findByCelebrityAndUrlSlug(celebrity.id, Product.slugify(productName))
@@ -50,12 +49,10 @@ trait PostCelebrityProductEndpoint extends Logging {
 
         // Validate product image
         val productImageOption = ImageUtil.parseImage(productImage)
-        Validation.isTrue("Product photo must be a valid image", !productImageOption.isEmpty)
+        Validation.isTrue("Product photo must be a valid image", !isCreate || !productImageOption.isEmpty)
         for (image <- productImageOption) {
           val (width, height) = (image.getWidth, image.getHeight)
-
           val resolutionStr = width + "x" + height
-
           Validation.isTrue(
             "Product Photo must be at least 940 in width and 900 in height - resolution was " + resolutionStr,
             width >= 940 && height >= 900
@@ -64,7 +61,6 @@ trait PostCelebrityProductEndpoint extends Logging {
 
         // Validate product icon
         val productIconOption = ImageUtil.parseImage(productIcon)
-        Validation.isTrue("Product icon must be a valid image", !productIconOption.isEmpty)
         for (image <- productIconOption) {
           Validation.isTrue(
             "Product icon must be at least 41px wide and 41px high",
@@ -80,8 +76,8 @@ trait PostCelebrityProductEndpoint extends Logging {
             celebrity.addProduct(
               name=productName,
               description=productDescription,
-              image=productImageOption.get,
-              icon=productIconOption.get,
+              image=productImageOption,
+              icon=productIconOption,
               storyTitle=storyTitle,
               storyText=storyText
             )
@@ -92,7 +88,7 @@ trait PostCelebrityProductEndpoint extends Logging {
               description=productDescription,
               storyTitle=storyTitle,
               storyText=storyText
-            ).saveWithImageAssets(image = productImageOption.get, icon = productIconOption.get)
+            ).saveWithImageAssets(image = productImageOption, icon = productIconOption)
           }
 
           new Redirect(GetCelebrityProductEndpoint.url(celebrity, savedProduct).url)

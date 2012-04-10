@@ -135,8 +135,8 @@ case class Celebrity(id: Long = 0,
   def addProduct(name: String,
                  description: String,
                  priceInCurrency: BigDecimal=Product.defaultPrice,
-                 image: BufferedImage,
-                 icon: BufferedImage,
+                 image: Option[BufferedImage],
+                 icon: Option[BufferedImage],
                  storyTitle: String,
                  storyText: String): Product =
   {
@@ -187,7 +187,7 @@ case class Celebrity(id: Long = 0,
   }
 
   lazy val defaultProfile = ImageAsset(
-    play.Play.getFile("test/files/longoria/profile.jpg"),
+    play.Play.getFile("public/images/default_profile.jpg"),
     keyBase="defaults/celebrity",
     name="profilePhoto",
     imageType=ImageAsset.Png,
