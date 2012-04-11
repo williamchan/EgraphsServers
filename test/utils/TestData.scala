@@ -11,8 +11,6 @@ import play.Play
  */
 object TestData {
 
-  var passAuthenticityCheck: Boolean = (Play.id == "test")
-
   def generateEmail(prefix: String = ""): String = {
     prefix + Time.toBlobstoreFormat(Time.now) + "@egraphs.com"
   }
