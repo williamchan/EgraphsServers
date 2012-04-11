@@ -3,11 +3,9 @@ package services.logging
 import org.slf4j.MDC
 import play.mvc.Http.Request
 import services.http.RequestInfo
-import services.Time
-import java.io.{PrintWriter, StringWriter}
 import play.Logger.info
-import play.Logger.error
 import play.mvc.Scope.{Flash, Session}
+import services.{Utils, Time}
 
 /**
  * Allows functions to be performed within a logging "Context", where
@@ -136,19 +134,12 @@ class LoggingContext {
     }
     catch {
       case e: Exception =>
-        logException(e)
+        Utils.logException(e)
         throw e
     }
     finally {
       MDC.put(contextKey, oldContext)
     }
-  }
-
-  private def logException(e: Exception) {
-    val stringWriter = new StringWriter()
-    e.printStackTrace(new PrintWriter(stringWriter))
-    error("Fatal error: " + e.getClass + ": " + e.getMessage)
-    stringWriter.toString.split("\n").foreach(line => play.Logger.info(line))
   }
 
   private def logRequestDetails(req: Request) {

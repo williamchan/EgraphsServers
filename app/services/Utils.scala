@@ -6,6 +6,7 @@ import play.Play
 import com.google.inject.Inject
 import java.util.Properties
 import org.squeryl.Query
+import java.io.{PrintWriter, StringWriter}
 
 /**
  * Helpful utilities with no other place to call home
@@ -160,5 +161,12 @@ object Utils extends Utils(Play.configuration) {
     val total = if (withTotal) Some(select.count((a) => true)) else None
     val results = select.page(offset = pageLength * (page - 1), pageLength = pageLength)
     (results, page, total)
+  }
+
+  def logException(e: Exception) {
+    val stringWriter = new StringWriter()
+    e.printStackTrace(new PrintWriter(stringWriter))
+    play.Logger.error("Fatal error: " + e.getClass + ": " + e.getMessage)
+    stringWriter.toString.split("\n").foreach(line => play.Logger.info(line))
   }
 }

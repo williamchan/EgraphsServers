@@ -49,7 +49,8 @@ trait PostCelebrityProductEndpoint extends Logging {
 
         // Validate product image
         val productImageOption = ImageUtil.parseImage(productImage)
-        Validation.isTrue("Product photo must be a valid image", !isCreate || !productImageOption.isEmpty)
+        val isProductImageValid = (isCreate && !productImageOption.isEmpty) || (!isCreate && (productImage == null || !productImageOption.isEmpty))
+        Validation.isTrue("Product photo must be a valid image", isProductImageValid)
         for (image <- productImageOption) {
           val (width, height) = (image.getWidth, image.getHeight)
           val resolutionStr = width + "x" + height
@@ -61,6 +62,8 @@ trait PostCelebrityProductEndpoint extends Logging {
 
         // Validate product icon
         val productIconOption = ImageUtil.parseImage(productIcon)
+        val isProductIconValid = (productIcon == null || !productIconOption.isEmpty)
+        Validation.isTrue("Product icon must be a valid image", isProductIconValid)
         for (image <- productIconOption) {
           Validation.isTrue(
             "Product icon must be at least 41px wide and 41px high",

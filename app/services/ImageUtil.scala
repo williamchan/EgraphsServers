@@ -324,8 +324,10 @@ object ImageUtil {
     try {
       Some(ImageIO.read(imageFile))
     } catch {
-      case e: Exception =>
+      case e: Exception => {
+        Utils.logException(e)
         None
+      }
     }
   }
 
