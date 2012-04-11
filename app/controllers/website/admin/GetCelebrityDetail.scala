@@ -2,10 +2,11 @@ package controllers.website.admin
 
 import play.templates.Html
 import play.mvc.Scope.{Session, Flash}
+import models.Celebrity
 
 object GetCelebrityDetail {
 
-  def getCelebrityDetail(isCreate: Boolean)(implicit flash: Flash, session: Session): Html = {
+  def getCelebrityDetail(isCreate: Boolean, celebrity: Option[Celebrity] = None)(implicit flash: Flash, session: Session): Html = {
     val errorFields = Option(flash.get("errors")).map(errString => errString.split(',').toList)
 
     val fieldDefaults: (String => String) = {
@@ -21,7 +22,7 @@ object GetCelebrityDetail {
       }
     }
     // Render the page
-    views.Application.admin.html.admin_celebritydetail(isCreate = isCreate, errorFields = errorFields, fields = fieldDefaults)
+    views.Application.admin.html.admin_celebritydetail(isCreate = isCreate, errorFields = errorFields, fields = fieldDefaults, celebrity = celebrity)
   }
 
 }

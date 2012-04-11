@@ -17,14 +17,15 @@ private[controllers] trait GetUpdateCelebrityProductEndpoint {
    */
   def getUpdateCelebrityProduct(productId: Long) = controllerMethod() {
     adminFilters.requireCelebrity { (celebrity) =>
-      val product = productStore.findById(productId).get
+      val productOption = productStore.findById(productId)
+      val product = productOption.get
       flash.put("productId", product.id)
       flash.put("productName", product.name)
       flash.put("productDescription", product.description)
       flash.put("storyTitle", product.storyTitle)
       flash.put("storyText", product.storyText)
 
-      GetProductDetail.getCelebrityProductDetail(celebrity = celebrity, isCreate = false)
+      GetProductDetail.getCelebrityProductDetail(celebrity = celebrity, isCreate = false, product = productOption)
     }
   }
 }

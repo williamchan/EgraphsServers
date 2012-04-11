@@ -1,4 +1,4 @@
-@(isCreate: Boolean, errorFields: Option[List[String]], fields: (String) => String
+@(isCreate: Boolean, errorFields: Option[List[String]], fields: (String) => String, celebrity: Option[models.Celebrity] = None
 )(implicit session: play.mvc.Scope.Session)
 
 @import controllers.WebsiteControllers
@@ -16,6 +16,10 @@
 
 @postCelebrity = @{
   lookupUrl("WebsiteControllers.postCelebrity")
+}
+
+@profilePhoto = {
+  @celebrity.map(c => c.profilePhoto.resizedWidth(200).getSaved(services.blobs.AccessPolicy.Public).url).getOrElse("")
 }
 
 @body = {
@@ -54,6 +58,10 @@
           </div>
         </fieldset>
       </form>
+      <div class="span2 profile-thumbnail" >
+        <legend>Current Profile</legend>
+        <img src="@profilePhoto">
+      </div>
     </div>
   </div>
 </div>

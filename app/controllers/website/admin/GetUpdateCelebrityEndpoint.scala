@@ -16,7 +16,8 @@ private[controllers] trait GetUpdateCelebrityEndpoint {
   def getUpdateCelebrity(celebrityId: Long) = controllerMethod() {
     adminFilters.requireAdministratorLogin { adminId =>
       val account = accountStore.findByCelebrityId(celebrityId).get
-      val celebrity = celebrityStore.findById(celebrityId).get
+      val celebrityOption = celebrityStore.findById(celebrityId)
+      val celebrity = celebrityOption.get
       flash.put("celebrityId", celebrity.id)
       flash.put("celebrityEmail", account.email)
       flash.put("firstName", celebrity.firstName.get)
@@ -24,7 +25,7 @@ private[controllers] trait GetUpdateCelebrityEndpoint {
       flash.put("publicName", celebrity.publicName.get)
       flash.put("description", celebrity.description.get)
 
-      GetCelebrityDetail.getCelebrityDetail(isCreate = false)
+      GetCelebrityDetail.getCelebrityDetail(isCreate = false, celebrity = celebrityOption)
     }
   }
 }

@@ -1,4 +1,4 @@
-@(isCreate: Boolean, celebrity: models.Celebrity, errorFields: Option[List[String]], fields: (String) => String
+@(isCreate: Boolean, celebrity: models.Celebrity, errorFields: Option[List[String]], fields: (String) => String, product: Option[models.Product] = None
 )(implicit session: play.mvc.Scope.Session)
 
 @import controllers.WebsiteControllers
@@ -20,6 +20,14 @@
 
 @postProduct = @{
   lookupUrl("WebsiteControllers.postCelebrityProduct", celebrityIdMap)
+}
+
+@productPhoto = {
+  @product.map(p => p.photo.resizedWidth(600).getSaved(services.blobs.AccessPolicy.Public).url).getOrElse("")
+}
+
+@productIcon = {
+  @product.map(p => p.icon.resizedWidth(100).getSaved(services.blobs.AccessPolicy.Public).url).getOrElse("")
 }
 
 @body = {
@@ -94,6 +102,12 @@
           </div>
         </fieldset>
       </form>
+      <div class="span2 profile-thumbnail" >
+        <legend>Current Photo</legend>
+        <img src="@productPhoto">
+        <legend>Current Icon</legend>
+        <img src="@productIcon">
+      </div>
     </div>
   </div>
 </div>
