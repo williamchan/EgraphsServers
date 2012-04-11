@@ -1,0 +1,47 @@
+@(isCreate: Boolean, errorFields: Option[List[String]], fields: (String) => String
+)(implicit session: play.mvc.Scope.Session)
+
+@import controllers.WebsiteControllers
+@import services.Utils.lookupUrl
+@import views.Application.tags.html.authenticityToken
+@import views.Application.tags.html.errorMessage
+@import views.Application.tags.html.formField
+@import views.Application.html.content_base
+
+@content_base(title="Admin - Account Details", body=body, head=head)
+
+@head = {
+<script src='@asset("public/twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
+}
+
+@postAccount = @{
+  lookupUrl("WebsiteControllers.postAccount")
+}
+
+@body = {
+<div class="admin-content">
+  <h2>
+    @{if(isCreate) "Create" else "Update"} Account
+  </h2>
+  <div class="form row">
+    <div class="span12 form-column">
+      <form id="account-form" method="POST" action='@postAccount' enctype="multipart/form-data">
+        <fieldset>
+          @authenticityToken()
+          <input id="accountId" name="accountId" type="hidden" value="@fields("accountId")">
+          <legend>Account Details</legend>
+
+          @formField(id="email", label="E-mail address", inputType="text", width="span4", fields=fields)
+
+          @formField(id="password", label="Password", inputType="password", width="span4", fields=fields)
+
+          <div class="actions">
+            <button type="submit" id="submit-button" class="btn large primary fade in">Save</button>
+            @errorMessage(errorFields)
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+</div>
+}

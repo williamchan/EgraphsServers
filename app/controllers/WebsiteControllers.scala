@@ -26,10 +26,13 @@ object WebsiteControllers extends Controller
 
   // admin endpoints
   with GetAdminLoginEndpoint
+  with GetAccountsEndpoint
+  with GetUpdateAccountEndpoint
   with GetCelebritiesEndpoint
   with GetCelebrityEgraphsEndpoint
   with GetCelebrityOrdersEndpoint
   with GetCelebrityProductsEndpoint
+  with GetCreateAccountEndpoint
   with GetCreateCelebrityEndpoint
   with GetUpdateCelebrityEndpoint
   with GetCreateCelebrityProductEndpoint
@@ -37,6 +40,7 @@ object WebsiteControllers extends Controller
   with GetEgraphsEndpoint
   with PostAdminLoginEndpoint
   with PostAdminLogoutEndpoint
+  with PostAccountEndpoint
   with PostCelebrityEndpoint
   with PostCelebrityProductEndpoint
 {
