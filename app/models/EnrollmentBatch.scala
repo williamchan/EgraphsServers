@@ -112,6 +112,13 @@ class EnrollmentBatchStore @Inject() (schema: Schema) extends Saves[EnrollmentBa
     )
   }
 
+  def getEnrollmentBatchesPending(): List[EnrollmentBatch] = {
+    from(schema.enrollmentBatches)(enrollmentBatch =>
+      where(enrollmentBatch.isBatchComplete === true and enrollmentBatch.isSuccessfulEnrollment.isNull)
+        select (enrollmentBatch)
+    ).toList
+  }
+
   //
   // Saves[EnrollmentBatch] methods
   //

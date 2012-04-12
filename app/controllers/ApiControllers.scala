@@ -17,8 +17,8 @@ object ApiControllers extends Controller
 {
   import services.AppConfig.instance
 
-
   override protected def egraphActor: ActorRef = actors.EgraphActor.actor
+  override protected def enrollmentBatchActor: ActorRef = actors.EnrollmentBatchActor.actor
   override protected def dbSession: DBSession = instance[DBSession]
   override protected def controllerMethod = instance[ControllerMethod]
   override protected def orderStore = instance[OrderStore]

@@ -43,6 +43,7 @@ class BootStrap extends Job with Logging {
       }
 
       actors.EgraphActor.actor.start()
+      actors.EnrollmentBatchActor.actor.start()
 
       log("Finished bootstrapping application")
     }

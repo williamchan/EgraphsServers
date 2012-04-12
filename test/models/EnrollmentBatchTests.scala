@@ -13,6 +13,7 @@ with SavingEntityTests[EnrollmentBatch]
 with CreatedUpdatedEntityTests[EnrollmentBatch]
 with ClearsDatabaseAndValidationAfter
 with DBTransactionPerTest {
+
   val store = AppConfig.instance[EnrollmentBatchStore]
   val celebStore = AppConfig.instance[CelebrityStore]
 
@@ -78,6 +79,18 @@ with DBTransactionPerTest {
       enrollmentBatch.addEnrollmentSample(signatureStr = TestConstants.signatureStr, voiceStr = TestConstants.voiceStr())
       enrollmentBatch.getEnrollmentSamples.size should be(i + 1)
     }
+  }
+
+  "getEnrollmentBatchesPending" should "return batches with true isBatchComplete and null isSuccessfulEnrollment" in {
+    val pendingBatch = EnrollmentBatch(celebrityId = Celebrity().save().id, isBatchComplete = true, isSuccessfulEnrollment = None).save()
+    EnrollmentBatch(celebrityId = Celebrity().save().id, isBatchComplete = true, isSuccessfulEnrollment = Some(false)).save()
+    EnrollmentBatch(celebrityId = Celebrity().save().id, isBatchComplete = true, isSuccessfulEnrollment = Some(true)).save()
+    EnrollmentBatch(celebrityId = Celebrity().save().id, isBatchComplete = false, isSuccessfulEnrollment = Some(false)).save()
+    EnrollmentBatch(celebrityId = Celebrity().save().id, isBatchComplete = false, isSuccessfulEnrollment = Some(true)).save()
+
+    val pendingEnrollmentBatches = store.getEnrollmentBatchesPending()
+    pendingEnrollmentBatches.length should be(1)
+    pendingEnrollmentBatches.head should be(pendingBatch)
   }
 
 }
