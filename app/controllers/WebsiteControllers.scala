@@ -25,6 +25,7 @@ object WebsiteControllers extends Controller
   with GetOrderConfirmationEndpoint
 
   // admin endpoints
+  with GetAdminRootEndpoint
   with GetAdminLoginEndpoint
   with GetAccountsEndpoint
   with GetUpdateAccountEndpoint

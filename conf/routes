@@ -59,6 +59,7 @@ POST    ${api}/celebrities/{celebrityId}/orders/{orderId}/egraphs ApiControllers
 ##
 ## Admin
 ##
+GET     /admin                                                     WebsiteControllers.getAdminRoot
 GET     /admin/login                                               WebsiteControllers.getAdminLogin
 POST    /admin/login                                               WebsiteControllers.postAdminLogin
 POST    /admin/logout                                              WebsiteControllers.postAdminLogout
