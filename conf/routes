@@ -75,7 +75,7 @@ GET     /admin/celebrities/{celebrityId}/products                  WebsiteContro
 POST    /admin/celebrities/{celebrityId}/products                  WebsiteControllers.postCelebrityProduct
 GET     /admin/celebrities/{celebrityId}/products/create           WebsiteControllers.getCreateCelebrityProduct
 GET     /admin/celebrities/{celebrityId}/products/{productId}      WebsiteControllers.getUpdateCelebrityProduct
-GET     /admin/egraphs?                                            WebsiteControllers.getEgraphs
+GET     /admin/egraphs                                             WebsiteControllers.getEgraphs
 GET     /admin/celebrities/{celebrityId}/egraphs                   WebsiteControllers.getCelebrityEgraphs
 GET     /admin/celebrities/{celebrityId}/orders                    WebsiteControllers.getCelebrityOrders
 
