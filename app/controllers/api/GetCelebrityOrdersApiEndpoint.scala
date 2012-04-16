@@ -26,7 +26,7 @@ private[controllers] trait GetCelebrityOrdersApiEndpoint { this: Controller =>
           Error("Please pass in signerActionable=true")
 
         case _ =>
-          val orders = orderStore.findByCelebrity(celebrity.id, orderQueryFilters.actionableOnly: _*)
+          val orders = orderStore.findByCelebrity(celebrity.id, orderQueryFilters.actionableOnly)
           val ordersAsMaps = orders.map(order => order.renderedForApi)
 
           Serializer.SJSON.toJSON(ordersAsMaps)

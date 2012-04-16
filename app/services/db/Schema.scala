@@ -85,10 +85,7 @@ class Schema @Inject()(
   //
   val orders = table[Order]("Orders")
   on(orders)(order =>
-    declare(
-      order.amountPaidInCurrency is monetaryDbType,
-      columns(order.reviewStatus) are (indexed)
-    )
+    declare(order.amountPaidInCurrency is monetaryDbType)
   )
 
   val productToOrders = oneToManyRelation(products, orders)
