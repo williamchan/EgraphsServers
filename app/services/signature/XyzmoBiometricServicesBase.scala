@@ -98,9 +98,6 @@ trait XyzmoBiometricServicesBase {
     if (xyzmoAddProfile.baseResult eq WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue) {
       log.info("Profile_Add_v1 succeeded: profile for " + userId + " has been created successfully.")
     }
-    else {
-      log.error("Error during Profile_Add_v1: " + xyzmoAddProfile.errorMsg.getOrElse(None))
-    }
     xyzmoAddProfile
   }
 
