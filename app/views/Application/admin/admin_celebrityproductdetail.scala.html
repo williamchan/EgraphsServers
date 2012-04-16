@@ -27,14 +27,14 @@
 }
 
 @productIcon = {
-  @product.map(p => p.icon.resizedWidth(100).getSaved(services.blobs.AccessPolicy.Public).url).getOrElse("")
+  @product.map(p => p.icon.getSaved(services.blobs.AccessPolicy.Public).url).getOrElse("")
 }
 
 @body = {
 <div class="admin-content">
-  <h2>
+  <h1>
     @celebrity.publicName.get - @{if(isCreate) "Create" else "Update"} Product
-  </h2>
+  </h1>
   <div class="form row">
     <div class="span12 form-column">
       <form id="product-form" method="POST" action='@postProduct' enctype="multipart/form-data">

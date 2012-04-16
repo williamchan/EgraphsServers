@@ -16,23 +16,21 @@ private[controllers] trait GetUpdateCelebrityProductEndpoint {
    * Serves up the HTML for the Create Celebrity page.
    */
   def getUpdateCelebrityProduct(productId: Long) = controllerMethod() {
-    adminFilters.requireCelebrity { (celebrity) =>
-      val productOption = productStore.findById(productId)
-      val product = productOption.get
-      flash.put("productId", product.id)
-      flash.put("productName", product.name)
-      flash.put("productDescription", product.description)
-      flash.put("storyTitle", product.storyTitle)
-      flash.put("storyText", product.storyText)
+    val productOption = productStore.findById(productId)
+    val product = productOption.get
+    flash.put("productId", product.id)
+    flash.put("productName", product.name)
+    flash.put("productDescription", product.description)
+    flash.put("storyTitle", product.storyTitle)
+    flash.put("storyText", product.storyText)
 
-      GetProductDetail.getCelebrityProductDetail(celebrity = celebrity, isCreate = false, product = productOption)
-    }
+    GetProductDetail.getCelebrityProductDetail(celebrity = product.celebrity, isCreate = false, product = productOption)
   }
 }
 
 object GetUpdateCelebrityProductEndpoint {
 
-  def url(celebrity: Celebrity, productId: Long) = {
+  def url(productId: Long, celebrity: Celebrity) = {
     Utils.lookupUrl("WebsiteControllers.getUpdateCelebrityProduct", Map("celebrityId" -> celebrity.id.toString, "productId" -> productId.toString))
   }
 }

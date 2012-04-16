@@ -14,7 +14,7 @@ private[controllers] trait GetCreateCelebrityEndpoint {
   protected def celebrityStore: CelebrityStore
 
   def getCreateCelebrity = controllerMethod() {
-    adminFilters.requireAdministratorLogin { adminId =>
+    adminFilters.requireAdministratorLogin { admin =>
       GetCelebrityDetail.getCelebrityDetail(isCreate = true)
     }
   }

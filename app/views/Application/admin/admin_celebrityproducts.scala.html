@@ -24,9 +24,9 @@ lookupUrl("WebsiteControllers.getCreateCelebrityProduct", celebrityIdMap)
 
 @body = {
 <div class="admin-content">
-  <h2>
+  <h1>
     @celebrity.publicName's Products @flash.get("TotalResultsStr")
-  </h2>
+  </h1>
   <form method="link" action="@getCreateCelebrityProduct">
     <input class="btn primary fade in" type="submit" value="New Product"/>
   </form>
@@ -41,7 +41,7 @@ lookupUrl("WebsiteControllers.getCreateCelebrityProduct", celebrityIdMap)
     @products.map { (product) =>
     <tr>
       <td>
-        <a class="preview-link" href="/admin/celebrities/@celebrity.id/products/@product.id">
+        <a class="preview-link" href="/admin/products/@product.id">
           Details
         </a>
       </td>

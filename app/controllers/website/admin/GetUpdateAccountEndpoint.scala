@@ -14,7 +14,7 @@ private[controllers] trait GetUpdateAccountEndpoint {
   protected def celebrityStore: CelebrityStore
 
   def getUpdateAccount(accountId: Long) = controllerMethod() {
-    adminFilters.requireAdministratorLogin { adminId =>
+    adminFilters.requireAdministratorLogin { admin =>
       val errorFields = Option(flash.get("errors")).map(errString => errString.split(',').toList)
 
       val account = accountStore.findById(accountId).get

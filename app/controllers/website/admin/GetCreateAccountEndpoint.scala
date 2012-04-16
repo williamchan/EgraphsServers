@@ -14,7 +14,7 @@ private[controllers] trait GetCreateAccountEndpoint {
   protected def celebrityStore: CelebrityStore
 
   def getCreateAccount() = controllerMethod() {
-    adminFilters.requireAdministratorLogin { adminId =>
+    adminFilters.requireAdministratorLogin { admin =>
       val errorFields = Option(flash.get("errors")).map(errString => errString.split(',').toList)
 
       val fieldDefaults: (String => String) = {

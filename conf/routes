@@ -73,10 +73,12 @@ GET     /admin/celebrities/{celebrityId}                           WebsiteContro
 GET     /admin/celebrities/{celebrityId}/products                  WebsiteControllers.getCelebrityProducts
 POST    /admin/celebrities/{celebrityId}/products                  WebsiteControllers.postCelebrityProduct
 GET     /admin/celebrities/{celebrityId}/products/create           WebsiteControllers.getCreateCelebrityProduct
-GET     /admin/celebrities/{celebrityId}/products/{productId}      WebsiteControllers.getUpdateCelebrityProduct
 GET     /admin/egraphs                                             WebsiteControllers.getEgraphs
 GET     /admin/celebrities/{celebrityId}/egraphs                   WebsiteControllers.getCelebrityEgraphs
 GET     /admin/celebrities/{celebrityId}/orders                    WebsiteControllers.getCelebrityOrders
+GET     /admin/orders/{orderId}                                    WebsiteControllers.getOrder
+POST    /admin/orders/{orderId}                                    WebsiteControllers.postOrder
+GET     /admin/products/{productId}                                WebsiteControllers.getUpdateCelebrityProduct
 GET     /admin/script                                              WebsiteControllers.script
 
 ##

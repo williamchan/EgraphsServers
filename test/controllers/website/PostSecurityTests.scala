@@ -16,7 +16,6 @@ class PostSecurityTests extends FunctionalTest {
     assertAuthenticityTokenIsRequired(POST(Utils.lookupUrl("WebsiteControllers.postCelebrity", Map[String, String]("authenticityCheck" -> "fail")).url))
     assertAuthenticityTokenIsRequired(POST(Utils.lookupUrl("WebsiteControllers.postCelebrityProduct", Map[String, String]("authenticityCheck" -> "fail", "celebrityId" -> "1")).url))
     assertAuthenticityTokenIsRequired(POST(Utils.lookupUrl("WebsiteControllers.postBuyProduct", Map[String, String]("authenticityCheck" -> "fail", "celebrityUrlSlug" -> "1", "productUrlSlug" -> "1")).url))
-    assertAuthenticityTokenIsRequired(POST(Utils.lookupUrl("WebsiteControllers.postBuyDemoProduct", Map[String, String]("authenticityCheck" -> "fail", "celebrityUrlSlug" -> "1", "productUrlSlug" -> "1")).url))
   }
 
   private def assertAuthenticityTokenIsRequired(response: Response) {

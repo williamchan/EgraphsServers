@@ -20,9 +20,9 @@
 
 @body = {
 <div class="admin-content">
-  <h2>
+  <h1>
     @{if(isCreate) "Create" else "Update"} Account
-  </h2>
+  </h1>
   <div class="form row">
     <div class="span12 form-column">
       <form id="account-form" method="POST" action='@postAccount' enctype="multipart/form-data">

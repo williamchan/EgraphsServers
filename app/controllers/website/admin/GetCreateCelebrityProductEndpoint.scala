@@ -15,7 +15,7 @@ private[controllers] trait GetCreateCelebrityProductEndpoint {
    * Serves up the HTML for the Create Celebrity page.
    */
   def getCreateCelebrityProduct = controllerMethod() {
-    adminFilters.requireCelebrity { (celebrity) =>
+    adminFilters.requireCelebrity { (celebrity, admin) =>
       GetProductDetail.getCelebrityProductDetail(celebrity = celebrity, isCreate = true)
     }
   }

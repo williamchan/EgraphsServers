@@ -183,7 +183,6 @@ class Scenarios extends DeclaresScenarios {
     """,
 
     {() =>
-      val will = Scenarios.getWillCelebrityAccount
       val (starcraftChampionship, kingOfPweensCompetition) = Scenarios.getWillsTwoProducts
 
       val firstOrder = from(schema.orders)(order =>
@@ -431,12 +430,19 @@ class Scenarios extends DeclaresScenarios {
     """,
 
     {() =>
-      val adminEmail = "admin@egraphs.com"
-      if (accountStore.findByEmail(adminEmail).isEmpty) {
-        val administrator = Administrator().save()
-        Account(email = adminEmail, administratorId = Some(administrator.id)).withPassword("derp").right.get.save()
-      }
+      demosetup.DemoScenarios.createAdmin()
     }
+  )
+
+  toScenarios add Scenario(
+  "Deliver All Orders to Celebrities",
+  adminCategory,
+  """
+  Changes All new Orders to ApprovedByAdmin, which makes them signable
+  """, {
+    () =>
+      demosetup.DemoScenarios.approveAllOrders()
+  }
   )
 
   private[this] def redirectToWizzle = {

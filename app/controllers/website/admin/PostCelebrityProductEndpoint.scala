@@ -9,7 +9,7 @@ import controllers.website.GetCelebrityProductEndpoint
 import play.data.validation.Validation
 import models._
 import services.logging.Logging
-import services.{ImageUtil}
+import services.ImageUtil
 import services.http.{SecurityRequestFilters, ControllerMethod, CelebrityAccountRequestFilters, AdminRequestFilters}
 
 trait PostCelebrityProductEndpoint extends Logging {
@@ -118,7 +118,7 @@ trait PostCelebrityProductEndpoint extends Logging {
     if (productId == 0) {
       WebsiteControllers.redirectWithValidationErrors(GetCreateCelebrityProductEndpoint.url(celebrity = celebrity))
     } else {
-      WebsiteControllers.redirectWithValidationErrors(GetUpdateCelebrityProductEndpoint.url(celebrity = celebrity, productId = productId))
+      WebsiteControllers.redirectWithValidationErrors(GetUpdateCelebrityProductEndpoint.url(productId = productId, celebrity = celebrity))
     }
   }
 }

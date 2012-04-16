@@ -14,7 +14,7 @@ private[controllers] trait GetUpdateCelebrityEndpoint {
   protected def celebrityStore: CelebrityStore
 
   def getUpdateCelebrity(celebrityId: Long) = controllerMethod() {
-    adminFilters.requireAdministratorLogin { adminId =>
+    adminFilters.requireAdministratorLogin { admin =>
       val account = accountStore.findByCelebrityId(celebrityId).get
       val celebrityOption = celebrityStore.findById(celebrityId)
       val celebrity = celebrityOption.get

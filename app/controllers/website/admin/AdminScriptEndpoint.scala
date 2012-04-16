@@ -23,7 +23,7 @@ private[controllers] trait AdminScriptEndpoint {
   protected def enrollmentBatchStore = AppConfig.instance[EnrollmentBatchStore]
 
   def script() = controllerMethod() {
-    adminFilters.requireAdministratorLogin {adminId =>
+    adminFilters.requireAdministratorLogin {admin =>
 
       val action = params.get("action")
       action match {

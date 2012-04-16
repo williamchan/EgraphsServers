@@ -36,6 +36,8 @@ case class Order(
   recipientId: Long = 0,
   recipientName: String = "",
   paymentStateString: String = Order.PaymentState.NotCharged.stateValue,
+  reviewStatus: String = Order.ReviewStatus.PendingAdminReview.stateValue,
+  rejectionReason: Option[String] = None,
   transactionId: Option[Long] = None,
   stripeCardTokenId: Option[String] = None,
   stripeChargeId: Option[String] = None,
@@ -100,6 +102,29 @@ case class Order(
       cashTransaction,
       services.payment
     )
+  }
+
+  def approveByAdmin(admin: Administrator): Order = {
+    require(admin != null, "Must be approved by an Administrator")
+    require(reviewStatus == Order.ReviewStatus.PendingAdminReview.stateValue, "Must be PendingAdminReview before approving by admin")
+    this.copy(reviewStatus = Order.ReviewStatus.ApprovedByAdmin.stateValue)
+  }
+
+  def rejectByAdmin(admin: Administrator, rejectionReason: Option[String] = None): Order = {
+    require(admin != null, "Must be rejected by an Administrator")
+    require(reviewStatus == Order.ReviewStatus.PendingAdminReview.stateValue, "Must be PendingAdminReview before rejecting by admin")
+    val order = this.copy(reviewStatus = Order.ReviewStatus.RejectedByAdmin.stateValue, rejectionReason = rejectionReason)
+    // refund charge?
+    order
+  }
+
+  def rejectByCelebrity(celebrity: Celebrity, rejectionReason: Option[String] = None): Order = {
+    require(celebrity != null, "Must be rejected by Celebrity associated with this Order")
+    require(celebrity.id == product.celebrityId, "Must be rejected by Celebrity associated with this Order")
+    require(reviewStatus == Order.ReviewStatus.PendingAdminReview.stateValue, "Must be ApprovedByAdmin before rejecting by celebrity")
+    val order = this.copy(reviewStatus = Order.ReviewStatus.RejectedByCelebrity.stateValue, rejectionReason = rejectionReason)
+    // refund charge?
+    order
   }
 
   def sendEgraphSignedMail() {
@@ -212,6 +237,26 @@ object Order {
       Seq(NotCharged, Charged, Refunded), key=(state) => state.stateValue
     )
   }
+
+  /** Specifies the Order's current status relative to content auditing */
+  sealed abstract class ReviewStatus(val stateValue: String)
+
+  object ReviewStatus {
+
+    case object PendingAdminReview extends ReviewStatus("PendingAdminReview")
+
+    /** Order is signerActionable */
+    case object ApprovedByAdmin extends ReviewStatus("ApprovedByAdmin")
+
+    case object RejectedByAdmin extends ReviewStatus("RejectedByAdmin")
+
+    case object RejectedByCelebrity extends ReviewStatus("RejectedByCelebrity")
+
+    val all = Utils.toMap[String, ReviewStatus](
+      Seq(PendingAdminReview, ApprovedByAdmin, RejectedByAdmin, RejectedByCelebrity), key = (state) => state.stateValue
+    )
+  }
+
 }
 
 class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreatedUpdated[Order] {
@@ -263,6 +308,8 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
       theOld.buyerId := theNew.buyerId,
       theOld.transactionId := theNew.transactionId,
       theOld.paymentStateString := theNew.paymentStateString,
+      theOld.reviewStatus := theNew.reviewStatus,
+      theOld.rejectionReason := theNew.rejectionReason,
       theOld.stripeCardTokenId := theNew.stripeCardTokenId,
       theOld.stripeChargeId := theNew.stripeChargeId,
       theOld.amountPaidInCurrency := theNew.amountPaidInCurrency,
@@ -284,7 +331,10 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
 }
 
 class OrderQueryFilters @Inject() (schema: Schema) {
-  def actionableOnly: FilterThreeTables[Celebrity, Product, Order] = {
+
+  def actionableOnly = List(actionableEgraphs, approvedByAdmin)
+
+  private def actionableEgraphs: FilterThreeTables[Celebrity, Product, Order] = {
     new FilterThreeTables[Celebrity, Product, Order] {
       override def test(celebrity: Celebrity, product: Product, order: Order) = {
         notExists(
@@ -297,7 +347,31 @@ class OrderQueryFilters @Inject() (schema: Schema) {
     }
   }
 
-  def orderId(id: Long) = {
+  private def approvedByAdmin: FilterThreeTables[Celebrity, Product, Order] = {
+    new FilterThreeTables[Celebrity, Product, Order] {
+      override def test(celebrity: Celebrity, product: Product, order: Order) = {
+        (order.reviewStatus === Order.ReviewStatus.ApprovedByAdmin.stateValue)
+      }
+    }
+  }
+
+  def pendingAdminReview: FilterThreeTables[Celebrity, Product, Order] = {
+    new FilterThreeTables[Celebrity, Product, Order] {
+      override def test(celebrity: Celebrity, product: Product, order: Order) = {
+        (order.reviewStatus === Order.ReviewStatus.PendingAdminReview.stateValue)
+      }
+    }
+  }
+
+  def rejected: FilterThreeTables[Celebrity, Product, Order] = {
+    new FilterThreeTables[Celebrity, Product, Order] {
+      override def test(celebrity: Celebrity, product: Product, order: Order) = {
+        (order.reviewStatus in Seq(Order.ReviewStatus.RejectedByAdmin.stateValue, Order.ReviewStatus.RejectedByCelebrity.stateValue))
+      }
+    }
+  }
+
+  def orderId(id: Long): FilterThreeTables[Celebrity, Product, Order] = {
     new FilterThreeTables[Celebrity, Product, Order] {
       override def test(celebrity: Celebrity, product: Product, order: Order) = {
         (order.id === id)

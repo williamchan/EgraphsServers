@@ -15,38 +15,40 @@
 
 @body = {
 <div class="admin-content">
-  <h2>
+  <h1>
     @celebrity.publicName's Orders @flash.get("TotalResultsStr")
-  </h2>
+  </h1>
   <table>
     <tr>
+      <th></th>
       <th>Id</th>
       <th>Product</th>
       <th>Buyer</th>
       <th>Recipient</th>
+      <th>Review Status</th>
       <th>Payment State</th>
       <th>Txn Id</th>
       <th>Price</th>
       <th>Msg to Celebrity</th>
       <th>Requested Msg</th>
-      <!--<th>Egraph</th>-->
     </tr>
     @orders.map { (order) =>
     <tr>
+      <td>
+        <a class="preview-link" href="/admin/orders/@order.id">
+          Details
+        </a>
+      </td>
       <td>@order.id</td>
       <td>@order.productId</td>
       <td>@order.buyerId</td>
       <td>@order.recipientName</td>
+      <td>@order.reviewStatus</td>
       <td>@order.paymentStateString</td>
       <td>@order.transactionId.getOrElse("")</td>
       <td>@order.amountPaid.formatSimply</td>
       <td>@order.messageToCelebrity.getOrElse("")</td>
       <td>@order.requestedMessage.getOrElse("")</td>
-      <!--<td>-->
-        <!--<a class="preview-link" href="/egraph/@order.id">-->
-          <!--View Egraph-->
-        <!--</a>-->
-      <!--</td>-->
     </tr>
     }
   </table>

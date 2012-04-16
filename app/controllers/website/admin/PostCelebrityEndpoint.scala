@@ -39,7 +39,7 @@ trait PostCelebrityEndpoint {
                     profileImage: Option[File] = None) = controllerMethod() {
 
     securityFilters.checkAuthenticity{
-        adminFilters.requireAdministratorLogin {adminId =>
+        adminFilters.requireAdministratorLogin {admin =>
           val isCreate = (celebrityId == 0)
           val tmp = if (isCreate) new Celebrity() else celebrityStore.findById(celebrityId).get
 

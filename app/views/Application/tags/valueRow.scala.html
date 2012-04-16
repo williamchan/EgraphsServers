@@ -1,0 +1,22 @@
+@(label: String,
+value: Any,
+href: String = "")
+
+@printValue = @{value match {
+  case Some(v) => v.toString
+  case None => ""
+  case _: Any => value.toString
+}}
+
+@valueElem = {
+  @if(href.isEmpty) {@printValue} else {<a href="@href">@printValue</a>}
+}
+
+<div class="row form">
+  <div class="span3">
+    @label
+  </div>
+  <div class="span13">
+    @valueElem
+  </div>
+</div>

@@ -16,7 +16,7 @@ private[controllers] trait GetCelebrityProductsEndpoint {
 
   def getCelebrityProducts(page: Int = 1) = controllerMethod() {
     adminFilters.requireCelebrity {
-      (celebrity) =>
+      (celebrity, admin) =>
         var query = celebrity.products()
         val pagedQuery: (Iterable[Product], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
         WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebrityProductsEndpoint.url(celebrity = celebrity))

@@ -24,9 +24,9 @@
 
 @body = {
 <div class="admin-content">
-  <h2>
+  <h1>
     @{if(isCreate) "Create" else "Update"} Celebrity
-  </h2>
+  </h1>
   <div class="form row">
     <div class="span12 form-column">
       <form id="celebrity-form" method="POST" action='@postCelebrity' enctype="multipart/form-data">

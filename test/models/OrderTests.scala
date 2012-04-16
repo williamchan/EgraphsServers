@@ -71,6 +71,39 @@ class OrderTests extends UnitFlatSpec
     Order().withPaymentState(Order.PaymentState.Charged).paymentState should be (Order.PaymentState.Charged)
   }
 
+  "approveByAdmin" should "change reviewStatus to ApprovedByAdmin" in {
+    val order = newEntity.save()
+    order.reviewStatus should be (Order.ReviewStatus.PendingAdminReview.stateValue)
+    intercept[IllegalArgumentException] {order.approveByAdmin(null)}
+    val admin = Administrator().save()
+    order.approveByAdmin(admin).save().reviewStatus should be (Order.ReviewStatus.ApprovedByAdmin.stateValue)
+  }
+
+  "rejectByAdmin" should "change reviewStatus to RejectedByAdmin" in {
+    val order = newEntity.save()
+    order.reviewStatus should be (Order.ReviewStatus.PendingAdminReview.stateValue)
+    order.rejectionReason should be (None)
+
+    intercept[IllegalArgumentException] {order.rejectByAdmin(null)}
+
+    val rejectedOrder = order.rejectByAdmin(Administrator().save(), Some("It made me cry")).save()
+    rejectedOrder.reviewStatus should be (Order.ReviewStatus.RejectedByAdmin.stateValue)
+    rejectedOrder.rejectionReason.get should be ("It made me cry")
+  }
+
+  "rejectByCelebrity" should "change reviewStatus to RejectedByCelebrity" in {
+    val order = newEntity.save()
+    order.reviewStatus should be (Order.ReviewStatus.PendingAdminReview.stateValue)
+    order.rejectionReason should be (None)
+
+    intercept[IllegalArgumentException] {order.rejectByCelebrity(null)}
+    intercept[IllegalArgumentException] {order.rejectByCelebrity(Celebrity())}
+
+    val rejectedOrder = order.rejectByCelebrity(order.product.celebrity, Some("It made me cry")).save()
+    rejectedOrder.reviewStatus should be (Order.ReviewStatus.RejectedByCelebrity.stateValue)
+    rejectedOrder.rejectionReason.get should be ("It made me cry")
+  }
+
   it should "serialize the correct Map for the API" in {
     val buyer  = TestData.newSavedCustomer().copy(name="Will Chan").save()
     val recipient = TestData.newSavedCustomer().copy(name="Erem Boto").save()
@@ -173,12 +206,25 @@ class OrderTests extends UnitFlatSpec
     found.head should be (firstOrder)
   }
 
-  it should "exclude orders that are Verified or AwaitingVerification when composed with ActionableFilter" in {
+  it should "exclude orders that have reviewStatus of PendingAdminReview, RejectedByAdmin, or RejectedByCelebrity when composed with ActionableFilter" in {
     val (will, _, celebrity, product) = newOrderStack
+    val actionableOrder = will.buy(product).copy(reviewStatus = Order.ReviewStatus.ApprovedByAdmin.stateValue).save()
+    will.buy(product).copy(reviewStatus = Order.ReviewStatus.PendingAdminReview.stateValue).save()
+    will.buy(product).copy(reviewStatus = Order.ReviewStatus.RejectedByAdmin.stateValue).save()
+    will.buy(product).copy(reviewStatus = Order.ReviewStatus.RejectedByCelebrity.stateValue).save()
+
+    val found = orderStore.findByCelebrity(celebrity.id, orderQueryFilters.actionableOnly: _*)
+    found.toSeq.length should be(1)
+    found.toSet should be(Set(actionableOrder))
+  }
+
+  it should "exclude orders that have Verified or AwaitingVerification Egraphs when composed with ActionableFilter" in {
+    val (will, _, celebrity, product) = newOrderStack
+    val admin = Administrator().save()
 
     // Make an order for each Egraph State, and save an Egraph in that state
     val orders = EgraphState.named.map { case (_, state) =>
-      val order = will.buy(product).save()
+      val order = will.buy(product).approveByAdmin(admin).save()
       order
         .newEgraph
         .withState(state)
@@ -188,10 +234,10 @@ class OrderTests extends UnitFlatSpec
     }
 
     // Also buy one without an Egraph
-    val orderWithoutEgraph = will.buy(product).save()
+    val orderWithoutEgraph = will.buy(product).approveByAdmin(admin).save()
 
     // Perform the test
-    val found = orderStore.findByCelebrity(celebrity.id, orderQueryFilters.actionableOnly)
+    val found = orderStore.findByCelebrity(celebrity.id, orderQueryFilters.actionableOnly: _*)
 
     found.toSeq.length should be (5)
     found.toSet should be (Set(
@@ -203,15 +249,38 @@ class OrderTests extends UnitFlatSpec
     ))
   }
 
+  it should "only include orders that are pendingAdminReview when composed with that filter" in {
+    val (will, _, celebrity, product) = newOrderStack
+    will.buy(product).copy(reviewStatus = Order.ReviewStatus.ApprovedByAdmin.stateValue).save()
+    val pendingOrder = will.buy(product).copy(reviewStatus = Order.ReviewStatus.PendingAdminReview.stateValue).save()
+    will.buy(product).copy(reviewStatus = Order.ReviewStatus.RejectedByAdmin.stateValue).save()
+    will.buy(product).copy(reviewStatus = Order.ReviewStatus.RejectedByCelebrity.stateValue).save()
+
+    val found = orderStore.findByCelebrity(celebrity.id, orderQueryFilters.pendingAdminReview)
+    found.toSeq.length should be(1)
+    found.toSet should be(Set(pendingOrder))
+  }
+
+  it should "only include orders that are rejected when composed with that filter" in {
+    val (will, _, celebrity, product) = newOrderStack
+    will.buy(product).copy(reviewStatus = Order.ReviewStatus.ApprovedByAdmin.stateValue).save()
+    will.buy(product).copy(reviewStatus = Order.ReviewStatus.PendingAdminReview.stateValue).save()
+    val rejectedOrder1 = will.buy(product).copy(reviewStatus = Order.ReviewStatus.RejectedByAdmin.stateValue).save()
+    val rejectedOrder2 = will.buy(product).copy(reviewStatus = Order.ReviewStatus.RejectedByCelebrity.stateValue).save()
+
+    val found = orderStore.findByCelebrity(celebrity.id, orderQueryFilters.rejected)
+    found.toSeq.length should be(2)
+    found.toSet should be(Set(rejectedOrder1, rejectedOrder2))
+  }
 
   //
   // Private methods
   //
-  def newCustomerAndProduct: (Customer, Product) = {
+  private def newCustomerAndProduct: (Customer, Product) = {
     (TestData.newSavedCustomer(), Celebrity().save().newProduct.save())
   }
 
-  def newOrderStack = {
+  private def newOrderStack = {
     val buyer  = TestData.newSavedCustomer().copy(name="Will Chan").save()
     val recipient = TestData.newSavedCustomer().copy(name="Erem Boto").save()
     val celebrity = Celebrity(firstName=Some("George"), lastName=Some("Martin")).save()

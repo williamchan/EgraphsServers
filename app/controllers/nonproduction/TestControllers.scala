@@ -150,6 +150,7 @@ object TestControllers extends Controller with Logging {
       val buyer = customerServices.customerStore.findOrCreateByEmail(celebrityEmail)
       for (i <- 0 until 5) {
         buyer.buy(product.get, buyer).copy(
+          reviewStatus = Order.ReviewStatus.ApprovedByAdmin.stateValue,
           recipientName=celebrityEmail,
           messageToCelebrity=Some(msg),
           requestedMessage=Some(msg)

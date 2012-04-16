@@ -39,11 +39,13 @@ object WebsiteControllers extends Controller
   with GetCreateCelebrityProductEndpoint
   with GetUpdateCelebrityProductEndpoint
   with GetEgraphsEndpoint
+  with GetOrderEndpoint
   with PostAdminLoginEndpoint
   with PostAdminLogoutEndpoint
   with PostAccountEndpoint
   with PostCelebrityEndpoint
   with PostCelebrityProductEndpoint
+  with PostOrderEndpoint
   with AdminScriptEndpoint
 {
 

@@ -18,7 +18,7 @@ private[controllers] trait GetEgraphsEndpoint {
   protected def egraphStore: EgraphStore
 
   def getEgraphs(page: Int = 1) = controllerMethod() {
-    adminFilters.requireAdministratorLogin { adminId =>
+    adminFilters.requireAdministratorLogin { admin =>
       var query = egraphStore.getEgraphsAndResults
       val pagedQuery: (Iterable[(Egraph, VBGVerifySample, XyzmoVerifyUser)], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
       WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetEgraphsEndpoint.url())

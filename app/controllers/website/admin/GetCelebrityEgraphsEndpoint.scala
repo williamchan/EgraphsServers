@@ -20,7 +20,7 @@ private[controllers] trait GetCelebrityEgraphsEndpoint {
 
   def getCelebrityEgraphs(page: Int = 1) = controllerMethod() {
     adminFilters.requireCelebrity {
-      (celebrity) =>
+      (celebrity, admin) =>
         var query = egraphStore.getCelebrityEgraphsAndResults(celebrity)
         val pagedQuery: (Iterable[(Egraph, VBGVerifySample, XyzmoVerifyUser)], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
         WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebrityEgraphsEndpoint.url(celebrity = celebrity))

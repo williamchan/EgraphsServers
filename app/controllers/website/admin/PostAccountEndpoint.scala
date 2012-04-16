@@ -24,7 +24,7 @@ trait PostAccountEndpoint {
                   password: String) = controllerMethod() {
 
     securityFilters.checkAuthenticity {
-      adminFilters.requireAdministratorLogin { adminId =>
+      adminFilters.requireAdministratorLogin { admin =>
         val isCreate = (accountId == 0)
         validate(isCreate = isCreate, accountId = accountId, email = email, password = password)
 

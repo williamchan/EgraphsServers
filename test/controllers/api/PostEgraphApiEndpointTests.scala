@@ -166,7 +166,8 @@ class PostEgraphApiEndpointFunctionalTests extends FunctionalTest with CleanData
       "Will-Chan-is-a-celebrity",
       "Will-has-two-products",
       "Erem-is-a-customer",
-      "Erem-buys-Wills-two-products-twice-each"
+      "Erem-buys-Wills-two-products-twice-each",
+      "Deliver-All-Orders-to-Celebrities"
     )
   }
 }

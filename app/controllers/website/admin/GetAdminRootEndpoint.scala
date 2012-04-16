@@ -12,7 +12,7 @@ private[controllers] trait GetAdminRootEndpoint {
   protected def adminFilters: AdminRequestFilters
 
   def getAdminRoot = controllerMethod() {
-    adminFilters.requireAdministratorLogin { adminId =>
+    adminFilters.requireAdministratorLogin { admin =>
       new Redirect(GetCelebritiesEndpoint.url().url)
     }
   }
