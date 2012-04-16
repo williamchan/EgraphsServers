@@ -8,7 +8,7 @@ import services.AppConfig
 import services.blobs.Blobs
 import services.db.Schema
 import models._
-import services.http.{ControllerMethod}
+import services.http.ControllerMethod
 import services.logging.Logging
 
 object TestControllers extends Controller with Logging {
@@ -110,40 +110,6 @@ object TestControllers extends Controller with Logging {
 
     val illegalE = new IllegalArgumentException("Bear")
     throw new RuntimeException("Process was mauled by a bear", illegalE)
-  }
-
-  def script = controllerMethod() {
-    //    println("System getProperty javax.net.ssl.trustStore = " + System.getProperty("javax.net.ssl.trustStore"))
-    //    val startEnrollmentRequest = services.voice.VBGDevRandomNumberBiometricServices.sendStartEnrollmentRequest("pls", false)
-    //    println(startEnrollmentRequest.getResponseValue("errorcode"))
-    //    sjson.json.Serializer.SJSON.toJSON(Map("bees.api.name" -> Play.configuration.getProperty("bees.api.name")))
-
-//    new jobs.EnrollmentBatchJob().now()
-
-    // find all Egraphs that are AwaitingVerification and give them a kick...
-//    import org.squeryl.Query
-//    import org.squeryl.PrimitiveTypeMode._
-//    val egraphsAwaitingVerification: Query[(Egraph)] = from(schema.egraphs)(
-//      (e) =>
-//        where(e.stateValue === EgraphState.AwaitingVerification.value)
-//          select (e)
-//    )
-//    for (egraph <- egraphsAwaitingVerification) {
-//      actors.EgraphActor.actor ! actors.ProcessEgraphMessage(id = egraph.id)
-//    }
-//    "I gave all Egraphs AwaitingVerification a kick."
-
-    val cofounders = List("will@egraphs.com", "eric@egraphs.com", "andrew@egraphs.com", "david@egraphs.com", "erem@egraphs.com")
-    for (cofounder <- cofounders) {
-      val admin = administratorServices.store.findByEmail(cofounder)
-      if (admin.isEmpty) {
-        val account = accountServices.accountStore.findByEmail(cofounder)
-        if (account.isDefined) {
-          val administrator = Administrator().save()
-          account.get.copy(administratorId = Some(administrator.id)).save()
-        }
-      }
-    }
   }
 
   def createTestOrders(msg: String) = controllerMethod() {

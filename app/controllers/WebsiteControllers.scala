@@ -44,6 +44,7 @@ object WebsiteControllers extends Controller
   with PostAccountEndpoint
   with PostCelebrityEndpoint
   with PostCelebrityProductEndpoint
+  with AdminScriptEndpoint
 {
 
   import services.AppConfig.instance
