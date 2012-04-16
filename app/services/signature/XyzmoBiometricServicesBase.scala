@@ -79,9 +79,6 @@ trait XyzmoBiometricServicesBase {
     if (xyzmoDeleteUser.baseResult eq WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue) {
       log.info("User_Delete_v1 succeeded: User " + userId + " has been deleted successfully.")
     }
-    else {
-      log.error("Error during User_Delete_v1: " + xyzmoDeleteUser.errorMsg.getOrElse(None))
-    }
     xyzmoDeleteUser
   }
 
@@ -97,6 +94,9 @@ trait XyzmoBiometricServicesBase {
     val xyzmoAddProfile: XyzmoAddProfile = new XyzmoAddProfile(enrollmentBatchId = enrollmentBatch.id).withProfile_Add_v1Response(profile_Add_v1Response)
     if (xyzmoAddProfile.baseResult eq WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue) {
       log.info("Profile_Add_v1 succeeded: profile for " + userId + " has been created successfully.")
+    }
+    else {
+      log.error("Error during Profile_Add_v1: " + xyzmoAddProfile.errorMsg.getOrElse(None))
     }
     xyzmoAddProfile
   }

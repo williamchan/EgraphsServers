@@ -62,7 +62,7 @@ object TestControllers extends Controller with Logging {
     createCelebrity("Michael", "Kalt", "mkalt@raysbaseball.com", enrollmentStatus = EnrollmentStatus.NotEnrolled)
     createCelebrity("Matt", "Silverman", "msilverman@raysbaseball.com", enrollmentStatus = EnrollmentStatus.NotEnrolled)
     createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", enrollmentStatus = EnrollmentStatus.NotEnrolled)
-    createCelebrity("Gunter", "Gebauhr", "gunter@egraphs.com", enrollmentStatus = EnrollmentStatus.NotEnrolled)
+    createCelebrity("Mike", "Ginal", "mike@egraphs.com", enrollmentStatus = EnrollmentStatus.NotEnrolled)
     createCelebrity("J", "Cohn", "j@egraphs.com", enrollmentStatus = EnrollmentStatus.NotEnrolled)
 
     "Alpha Testers created!"
@@ -126,7 +126,7 @@ object TestControllers extends Controller with Logging {
       "mkalt@raysbaseball.com",
       "msilverman@raysbaseball.com",
       "gabe@egraphs.com",
-      "gunter@egraphs.com",
+      "mike@egraphs.com",
       "j@egraphs.com")
 
     for (email <- celebrityEmails) {
