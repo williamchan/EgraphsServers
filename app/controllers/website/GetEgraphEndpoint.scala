@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat
 import services.http.ControllerMethod
 import models.{Order, Egraph, OrderStore, FulfilledOrder}
 import play.templates.Html
+import services.http.OptionParams.Conversions.paramsToOptionalParams
 
 private[controllers] trait GetEgraphEndpoint { this: Controller =>
   protected def orderStore: OrderStore
@@ -17,10 +18,22 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
    * been made before a successful one was signed.
    */
   def getEgraph(orderId: String) = controllerMethod() {
+    // TODO: disable pen-width and shadow re-setting once we find a good value.
+    val params = request.params
+    val penWidth = params.getOption("penWidth").getOrElse("5.0").toDouble
+    val shadowX = params.getOption("shadowX").getOrElse("3.0").toDouble
+    val shadowY = params.getOption("shadowY").getOrElse("3.0").toDouble
+
     // Get an order with provided ID
     orderStore.findFulfilledWithId(orderId.toLong) match {
       case Some(FulfilledOrder(order, egraph)) =>
-        GetEgraphEndpoint.html(egraph = egraph, order = order)
+        GetEgraphEndpoint.html(
+          egraph = egraph,
+          order = order,
+          penWidth = penWidth,
+          shadowX = shadowX,
+          shadowY = shadowY
+        )
 
       case None =>
         NotFound("No Egraph exists with the provided identifier.")
@@ -34,16 +47,27 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
 
 object GetEgraphEndpoint {
 
-  def html(egraph: Egraph, order: Order): Html = {
+  def html(
+    egraph: Egraph,
+    order: Order,
+    penWidth: Double=5.0,
+    shadowX: Double=3.0,
+    shadowY: Double=3.0
+  ): Html = {
     // Get related data model objects
     val product = order.product
     val celebrity = product.celebrity
 
     // Prepare the framed image
     val frame = product.frame
-    val rawSignedImage = egraph.assets.image
-    val frameFittedImage = rawSignedImage.resized(frame.imageWidthPixels, frame.imageHeightPixels)
-    val frameFittedImageUrl = frameFittedImage.getSaved(AccessPolicy.Public).url
+    val rawSignedImage = egraph.image(product.photoImage)
+    val frameFittedImage = rawSignedImage
+      .withPenWidth(penWidth)
+      .withPenShadowOffset(shadowX, shadowY)
+      .scaledToWidth(frame.imageWidthPixels)
+
+    // TODO: change this saveAndGetUrl to getSavedUrl when we're comfortable enough with image quality to cache them permanently.
+    val frameFittedImageUrl = frameFittedImage.saveAndGetUrl(AccessPolicy.Public)
 
     // Prepare the icon
     val icon = product.icon

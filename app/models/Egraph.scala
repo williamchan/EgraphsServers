@@ -10,6 +10,7 @@ import vbg.{VBGVerifySampleStore, VBGVerifySample}
 import services.signature.{SignatureBiometricsError, YesMaamSignatureBiometricService, SignatureBiometricService}
 import services._
 import db.{FilterOneTable, Schema, KeyedCaseClass, Saves}
+import graphics.{HandwritingPen, GraphicsSource}
 import java.text.SimpleDateFormat
 import controllers.WebsiteControllers
 import controllers.website.GetCelebrityProductEndpoint
@@ -17,26 +18,50 @@ import com.google.inject.{Provider, Inject}
 import play.utils.HTML.htmlEscape
 import org.squeryl.Query
 import models.Egraph.EgraphState
-import xyzmo.{XyzmoVerifyUserStore, XyzmoVerifyUser}
+import org.squeryl.PrimitiveTypeMode._
 
+import xyzmo.{XyzmoVerifyUserStore, XyzmoVerifyUser}
+import models.Egraph.EgraphState
+
+/**
+ * Vital services for an Egraph to perform its necessary functionality
+ *
+ * @param store Egraph object persistence
+ * @param celebStore Celebrity persistence
+ * @param orderStore Order persistence
+ * @param vbgVerifySampleStore Persistence for voice biometric scores
+ * @param xyzmoVerifyUserStore Persistence for handwriting biometric scodes
+ * @param blobs Persistence for handwriting JSON and audio binary
+ * @param graphicsSourceFactory Source for creating a canvas for drawing the egraph.
+ * @param voiceBiometrics Service for performing tests against our voice identification algorithm
+ * @param signatureBiometrics Service for performing tests against our signature identification algorithm
+ * @param storyServicesProvider Services needed to instantiate a fully functional EgraphStory
+ */
 case class EgraphServices @Inject() (
   store: EgraphStore,
   celebStore: CelebrityStore,
   orderStore: OrderStore,
   vbgVerifySampleStore: VBGVerifySampleStore,
   xyzmoVerifyUserStore: XyzmoVerifyUserStore,
-  images: ImageUtil,
   blobs: Blobs,
+  graphicsSourceFactory: () => GraphicsSource,
   voiceBiometrics: VoiceBiometricService,
   signatureBiometrics: SignatureBiometricService,
-  imageAssetServices: ImageAssetServices,
   storyServicesProvider: Provider[EgraphStoryServices]
 )
 
 /**
  * Persistent entity representing a single Egraph.
  *
- * An Egraph is both the final delivered product and an attempt to fulfill an order.
+ * An Egraph is an attempt to fulfill an order. When it is published it also becomes the
+ * final resource consumed by the recipient.
+ *
+ * @param id A unique ID for each attempt to fulfill an order
+ * @param orderId the order ID that this egraph fulfills
+ * @param stateValue String value of the egraph's current state
+ * @param created the moment this entity was first inserted into the database
+ * @param updated the last moment this entity was updated in the database
+ * @param services the functionality for the Egraph to meaningfully manipulate its data.
  */
 case class Egraph(
   id: Long = 0L,
@@ -50,6 +75,8 @@ case class Egraph(
   import Blobs.Conversions._
   import EgraphState._
 
+  private lazy val blobKeyBase = "egraphs/" + id
+
   //
   // Public methods
   //
@@ -60,8 +87,8 @@ case class Egraph(
    * @param product the photographic product signed by the celebrity
    * @param order the order opened by the buying customer.
    *
-   * @return an EgraphStory that can be used to safely render the story into an HTML page,
-   *   unescaped.
+   * @return an EgraphStory that can be used to safely render the story into an HTML page without
+   *   being further unescaped.
    */
   def story(signer: Celebrity, product: Product, order: Order): EgraphStory = {
     EgraphStory(
@@ -136,6 +163,43 @@ case class Egraph(
       Some(voiceResponse.right.get)
     else
       None
+  }
+
+  /**
+   * Returns the EgraphImage that can be used to access a visually rendered version of the
+   * Egraph at any dimension.
+   *
+   * @param productPhoto the photo upon which to sign. If this isn't provided, we will access the blobstore
+   *     to find it.
+   *
+   * @return the EgraphImage to manipulate, save, and render the Egraph.
+   */
+  def image(productPhoto: => BufferedImage=order.product.photoImage):EgraphImage = {
+    EgraphImage(
+      ingredientFactory=imageIngredientFactory(productPhoto),
+      graphicsSource=services.graphicsSourceFactory(),
+      blobPath=blobKeyBase + "/image"
+    )
+  }
+
+  /**
+   * Returns a function that retrieves all the necessary (expensive) data for drawing an Egraph.
+   * The function will only be evaluated if the required image doesn't already exist on the blobstore.
+   *
+   * @param productPhoto the photo that should be "signed" by the Egraph's stored vector handwriting.
+   *
+   */
+  private def imageIngredientFactory(productPhoto: => BufferedImage): () => EgraphImageIngredients = {
+    () => {
+      val myAssets = assets
+      EgraphImageIngredients(
+        signatureJson=myAssets.signature,
+        messageJsonOption=myAssets.message,
+        pen=HandwritingPen(width=5.0),
+        photo=productPhoto,
+        photoDimensionsWhenSigned=Dimensions(productPhoto.getWidth, productPhoto.getHeight)
+      )
+    }
   }
 
   /**
@@ -257,10 +321,6 @@ case class Egraph(
       blobs.getUrl(audioKey)
     }
 
-    override def image: ImageAsset = {
-      ImageAsset(blobKeyBase, imageName, ImageAsset.Png, services.imageAssetServices)
-    }
-
     override def save(signature: String, message: Option[String], audio: Array[Byte]) {
       blobs.put(signatureJsonKey, signature, access=AccessPolicy.Private)
       blobs.put(audioKey, audio, access=AccessPolicy.Public)
@@ -271,22 +331,6 @@ case class Egraph(
       }
     }
 
-    override def initMasterImage {
-      import Blobs.Conversions._
-      val signatureBlob = blobs.get(signatureJsonKey)
-      val signature = if (signatureBlob.isDefined) signatureBlob.get.asString else ""
-      val messageBlob = blobs.get(messageJsonKey)
-      val message = if (messageBlob.isDefined) Some(messageBlob.get.asString) else None
-
-      ImageAsset(
-        createMasterImage(signature, message, order.product.photo.renderFromMaster),
-        blobKeyBase,
-        imageName,
-        ImageAsset.Png,
-        services.imageAssetServices
-      ).save(AccessPolicy.Public)
-    }
-
     lazy val audioKey = blobKeyBase + "/audio.wav"
     lazy val signatureJsonKey = signatureKey + ".json"
     lazy val messageJsonKey = messageKey + ".json"
@@ -294,21 +338,10 @@ case class Egraph(
     //
     // Private members
     //
-    private lazy val blobKeyBase = "egraphs/" + id
     private lazy val signatureKey = blobKeyBase + "/signature"
     private lazy val messageKey = blobKeyBase + "/message"
     private lazy val imageName = "image"
 
-    private def createMasterImage(sig: String = this.signature,
-                                  message: Option[String] = this.message,
-                                  productImage: BufferedImage):Array[Byte] =
-    {
-      import ImageUtil.Conversions._
-
-      val signatureImage = services.images.createSignatureImage(sig, message)
-
-      services.images.createEgraphImage(signatureImage, productImage, 0, 0).asByteArray(ImageAsset.Png)
-    }
   }
 }
 
@@ -343,7 +376,7 @@ object Egraph {
 case class EgraphStoryServices @Inject() (templateEngine: TemplateEngine)
 
 /**
- * The set of fields available for users to address when writing their stories nad
+ * The set of fields available for users to address when writing their stories and
  * story titles. This permits them to provide the following type of narratives for the
  * story, which will get interpreted on the fly by the Egraph page.
  *
@@ -399,7 +432,7 @@ object EgraphStoryField extends Utils.Enum {
  * @param productUrlSlug see [[models.Product.urlSlug]]
  * @param orderTimestamp the moment the buying [[models.Customer]] ordered the [[models.Product]]
  * @param signingTimestamp the moment the [[models.Celebrity]] fulfilled the [[models.Order]]
- * @param services
+ * @param services Services needed for the EgraphStory to manipulate its data properly.
  */
 case class EgraphStory(
   private val titleTemplate: String,
@@ -500,14 +533,8 @@ trait EgraphAssets {
    */
   def audioUrl: String
 
-  /** Must be called after initImageAsset. */
-  def image: ImageAsset
-
   /** Stores the assets in the blobstore */
   def save(signature: String, message: Option[String], audio: Array[Byte])
-
-  /** Initializes the MasterImage. Must be called after save, which saves raw data for this Egraph. */
-  def initMasterImage()
 }
 
 class EgraphStore @Inject() (schema: Schema) extends Saves[Egraph] with SavesCreatedUpdated[Egraph] {
@@ -718,7 +745,7 @@ object EgraphFrame {
   /**
    * Returns the suggested frame for a given image. Decision is made based on frame
    * dimensions
-   **/
+   */
   private def suggestedFrameForDimensions(pixelWidth: Int, pixelHeight: Int): EgraphFrame = {
     if (pixelWidth > pixelHeight) LandscapeEgraphFrame else PortraitEgraphFrame
   }

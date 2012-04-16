@@ -8,6 +8,7 @@ import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
 import play.Play
 import services.{ImageUtil, TempFile, AppConfig}
+import services.blobs.AccessPolicy.Private
 
 class ImageAssetTests extends UnitFlatSpec
   with ShouldMatchers
@@ -124,7 +125,7 @@ class ImageAssetTests extends UnitFlatSpec
 
   it should "return the correct url" in {
     val asset = makeAsset(imageFromDisk.asByteArray(ImageAsset.Png))
-
+    asset.save(Private)
     asset.url should include (asset.key)
   }
 

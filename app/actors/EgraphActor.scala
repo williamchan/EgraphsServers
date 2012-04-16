@@ -9,10 +9,14 @@ import models.EgraphStore
 import com.google.inject.Inject
 import services.logging.{Logging, LoggingContext}
 
-object EgraphActor {
-  val actor = actorOf(AppConfig.instance[EgraphActor])
-}
-
+/**
+ * Actor that performs most of the work of creating an egraph and running it through our biometrics
+ * tests.
+ *
+ * @param db for access to a database connection
+ * @param egraphStore a store for accessing egraphs from persistence
+ * @param logging for generating useful logs.
+ */
 class EgraphActor @Inject() (
   db: DBSession,
   egraphStore: EgraphStore,
@@ -37,7 +41,6 @@ class EgraphActor @Inject() (
         }
 
         if (egraph.get.stateValue == EgraphState.AwaitingVerification.value) {
-          egraph.get.assets.initMasterImage()
           val egraphToTest = if (skipBiometrics) egraph.get.withYesMaamBiometricServices else egraph.get
           val testedEgraph = egraphToTest.verifyBiometrics.save()
           if (testedEgraph.state == EgraphState.Published) {
@@ -47,6 +50,13 @@ class EgraphActor @Inject() (
       }
     }
   }
+}
+
+
+object EgraphActor {
+  // Singleton instance of EgraphActor allows only one egraph to be fulfilled at a time.
+  // TODO: remove this singleton instance, make all access to this actor go through actorOf.
+  val actor = actorOf(AppConfig.instance[EgraphActor])
 }
 
 // ====================

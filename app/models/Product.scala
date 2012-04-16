@@ -209,7 +209,7 @@ case class Product(
       name="photo",
       imageType=ImageAsset.Jpeg,
       services=services.imageAssetServices.get
-  )
+  ).getSaved(AccessPolicy.Public)
 
   lazy val defaultIcon = ImageAsset(
     Play.getFile("public/images/egraph_default_plaque_icon.png"),
@@ -217,7 +217,7 @@ case class Product(
     name="photo_icon",
     imageType=ImageAsset.Png,
     services=services.imageAssetServices.get
-  )
+  ).getSaved(AccessPolicy.Public)
 }
 
 object Product {

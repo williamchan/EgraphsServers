@@ -1,6 +1,8 @@
 # Application dependencies. Keep these in alphabetical order.
 
 require:
+    - batik -> batik-rasterizer 1.6
+    - batik -> batik-svggen 1.6
     - com.google.inject -> guice 2.0
     - com.stripe -> stripe-java 1.0.1
     - net.debasishg -> sjson_2.8.1 0.12:
@@ -46,6 +48,8 @@ require:
     - provided -> tritonus_share 0.3.6
     - provided -> tritonus_remaining 0.3.6
     - provided -> xyzmo 1.0
+    - xml-apis -> xml-apis-ext 1.3.04
+    - xml-apis -> xml-apis 1.3.04
 
 # Non-default repositories
 repositories:

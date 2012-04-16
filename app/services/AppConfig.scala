@@ -2,6 +2,7 @@ package services
 
 import blobs.BlobModule
 import db.DBModule
+import graphics.GraphicsModule
 import http.PlayConfig
 import mail.{MailProvider, Mail}
 import models._
@@ -27,6 +28,7 @@ class AppConfig extends AbstractModule with ScalaModule {
     install(PaymentModule)
     install(SignatureBiometricsModule)
     install(VoiceBiometricsModule)
+    install(GraphicsModule)
 
     // Model services
     bind[AccountServices].in[Singleton]

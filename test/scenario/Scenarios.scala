@@ -204,8 +204,6 @@ class Scenarios extends DeclaresScenarios {
         .withYesMaamBiometricServices
         .verifyBiometrics
         .save()
-
-      egraph.assets.initMasterImage()
     }
   )
 
@@ -406,7 +404,7 @@ class Scenarios extends DeclaresScenarios {
   )
 
   toScenarios add Scenario(
-    "Valid, ordered Egraph",
+    "Valid, ordered landscape Egraph",
 
     egraphPageCategory,
 

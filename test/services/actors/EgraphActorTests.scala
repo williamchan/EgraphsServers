@@ -59,8 +59,6 @@ with TestKit {
       val egraphStore = AppConfig.instance[EgraphStore]
       egraphStore.findById(egraph1.id).get.stateValue should be(EgraphState.Published.value)
       egraphStore.findById(egraph2.id).get.stateValue should be(EgraphState.Published.value)
-//      egraphStore.findById(egraph1.id).get.stateValue should be(EgraphState.PassedBiometrics.value)
-//      egraphStore.findById(egraph2.id).get.stateValue should be(EgraphState.PassedBiometrics.value)
     }
   }
 

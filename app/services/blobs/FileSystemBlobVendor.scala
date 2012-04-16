@@ -12,7 +12,6 @@ private[blobs] object FileSystemBlobVendor extends BlobVendor {
   //
   // BlobVendor members
   //
-  override def urlBase = Request.current().getBase + "/test/files"
   override def context = {
     val properties = new Properties
 
@@ -22,6 +21,18 @@ private[blobs] object FileSystemBlobVendor extends BlobVendor {
     properties.setProperty("jclouds.credential", "It doesn't matter what this value is.")
 
     new BlobStoreContextFactory().createContext("filesystem", properties)
+  }
+
+
+  override def urlOption(namespace: String, key: String): Option[String] = {
+    val blobStore = context.getBlobStore
+
+    if (!blobStore.blobExists(namespace, key)) {
+      None
+    }
+    else {
+      Some(urlBase + "/" + key)
+    }
   }
 
   override def put(namespace: String, key: String, bytes: Array[Byte], access: AccessPolicy) {
@@ -34,5 +45,12 @@ private[blobs] object FileSystemBlobVendor extends BlobVendor {
   }
   override def checkConfiguration() {
     // No configuration necessary to use the file system as a blob store
+  }
+
+  //
+  // Private Members
+  //
+  private def urlBase = {
+    Request.current().getBase + "/test/files"
   }
 }

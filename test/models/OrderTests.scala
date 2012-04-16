@@ -3,12 +3,11 @@ package models
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
-import services.Time
 import utils._
-import services.AppConfig
 import services.payment.Payment
 import models.Egraph.EgraphState
 import models.Order.PaymentState
+import services.AppConfig
 
 class OrderTests extends UnitFlatSpec
   with ShouldMatchers
@@ -105,35 +104,6 @@ class OrderTests extends UnitFlatSpec
     val rejectedOrder = order.rejectByCelebrity(order.product.celebrity, Some("It made me cry")).save()
     rejectedOrder.reviewStatus should be (Order.ReviewStatus.RejectedByCelebrity.stateValue)
     rejectedOrder.rejectionReason.get should be ("It made me cry")
-  }
-
-  it should "serialize the correct Map for the API" in {
-    val buyer  = TestData.newSavedCustomer().copy(name="Will Chan").save()
-    val recipient = TestData.newSavedCustomer().copy(name="Erem Boto").save()
-    val recipientName = "Eremizzle"
-    val celebrity = Celebrity(firstName=Some("George"), lastName=Some("Martin")).save()
-    val product = TestData.newSavedProduct(celebrity = Some(celebrity))
-    val order = buyer
-      .buy(product, recipient)
-      .copy(
-        messageToCelebrity=Some("toCeleb"),
-        requestedMessage=Some("please write this"),
-        recipientName=recipientName)
-
-    val rendered = order.renderedForApi
-
-    rendered("product") should be (product.renderedForApi)
-    rendered("id") should be (order.id)
-    rendered("buyerId") should be (buyer.id)
-    rendered("buyerName") should be (buyer.name)
-    rendered("recipientId") should be (recipient.id)
-    rendered("recipientName") should be (recipientName)
-    rendered("amountPaidInCents") should be (order.amountPaid.getAmountMinor)
-    rendered("reviewStatus") should be (order.reviewStatus)
-    rendered("requestedMessage") should be (order.requestedMessage.get)
-    rendered("messageToCelebrity") should be (order.messageToCelebrity.get)
-    rendered("created") should be (Time.toApiFormat(order.created))
-    rendered("updated") should be (Time.toApiFormat(order.updated))
   }
 
   "charge" should "fail to charge if stripe token is unavailable" in {

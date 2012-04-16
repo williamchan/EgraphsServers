@@ -109,29 +109,6 @@ class DemoScenarios extends DeclaresDemoScenarios {
   )
 
   toDemoScenarios add DemoScenario(
-  "Generate all signatures",
-  meetingCategory,
-  "Finds all products currently in database and generates sample Egraphs to tmp/files. Run this after generating celebrities.", {
-    () =>
-      import org.squeryl.PrimitiveTypeMode._
-      val imageUtil = AppConfig.instance[ImageUtil]
-      val sig = imageUtil.createSignatureImage(boxSignatureStr, None)
-
-      val q = from(schema.products)(prod => select(prod))
-
-      q.foreach {
-        product =>
-          val fileName = product.celebrity.urlSlug.get + "_" + product.urlSlug + ".png"
-          println("Writing " + fileName)
-          val image = imageUtil.createEgraphImage(sig, product.photoImage, 0, 0)
-          ImageIO.write(image, "PNG", Play.getFile("tmp/files/" + fileName))
-      }
-
-      println("Wrote all sample egraphs")
-  }
-  )
-
-  toDemoScenarios add DemoScenario(
   "Zach Apter",
   meetingCategory,
   "Prepares data for Zach's ad-hoc meetings. Creates: Zach Apter (zach@egraphs.com/derp)", {

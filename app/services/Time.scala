@@ -61,6 +61,22 @@ object Time {
     TimeZone.getTimeZone("GMT")
   }
 
+  /**
+   * Times how long an operation takes to occur in seconds. Returns a tuple of the operation's
+   * result and the time it took to complete.
+   *
+   * @param operation the operation to execute and time
+   * @tparam A return type of the operation
+   * @return (operationReturnValue, durationInSeconds)
+   */
+  def stopwatch[A](operation: => A): (A, Double) = {
+    val start = System.currentTimeMillis()
+    val result = operation
+    val stop = System.currentTimeMillis()
+
+    (result, (stop - start).toDouble / 1000)
+  }
+
   //
   // Private members
   //

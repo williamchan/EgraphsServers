@@ -8,12 +8,16 @@ import java.awt.image.BufferedImage
 import play.Play
 import utils.TestConstants
 import collection.immutable.List
+import org.apache.batik.dom.GenericDOMImplementation
+import java.awt.geom.{Ellipse2D, Path2D}
+import java.awt.{RenderingHints, BasicStroke, Graphics2D}
+import services.graphics.BezierCubic
 
 class ImageUtilTests extends UnitFlatSpec
 with ShouldMatchers {
   def imageUtil = AppConfig.instance[ImageUtil]
 
-  it should "test parseSignatureRawCaptureJSON" in {
+/*  it should "test parseSignatureRawCaptureJSON" in {
     val strokeData = imageUtil.parseSignatureRawCaptureJSON(TestConstants.signatureStr)
     val xsByStroke = strokeData._1
     val ysByStroke = strokeData._2
@@ -133,5 +137,5 @@ with ShouldMatchers {
     ImageUtil.getMaxDouble(List()) should be(None)
     ImageUtil.getMaxDouble(List(List(1.0, 2.0, 3.0))).get should be(3.0)
     ImageUtil.getMaxDouble(List(List(1.0, 2.0, 3.0), List(), List(1.0, 20.0, 3.0))).get should be(20.0)
-  }
+  }*/
 }

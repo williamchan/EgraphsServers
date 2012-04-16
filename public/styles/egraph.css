@@ -4019,9 +4019,11 @@ body {
 .photo-column .egraph .image-aperture {
   position: relative;
 }
-.photo-column .egraph .image-aperture img.signed-photo {
+.photo-column .egraph .image-aperture .signed-photo {
   display: block;
-  visibility: none;
+  border: 0px;
+  padding: 0px;
+  margin: 0px;
   position: relative;
 }
 .photo-column .egraph .image-aperture .fx-mat-shadow {
@@ -4275,6 +4277,10 @@ body {
   width: 377px;
   height: 526px;
 }
+#egraph-page .portrait .photo-column .image-aperture iframe.signed-photo {
+  width: 377px;
+  height: 526px;
+}
 #egraph-page .portrait .photo-column .fx-glass-shine {
   top: 2px;
   width: 376px;
@@ -4326,6 +4332,10 @@ body {
 #egraph-page .landscape .photo-column .image-aperture {
   left: 56px;
   top: 44px;
+  width: 595px;
+  height: 377px;
+}
+#egraph-page .landscape .photo-column .image-aperture iframe.signed-photo {
   width: 595px;
   height: 377px;
 }

@@ -2,11 +2,11 @@ package services.blobs
 
 import play.Play.configuration
 import org.jclouds.blobstore.{BlobStoreContext, BlobStore}
-import org.jclouds.blobstore.domain.Blob
 import org.jclouds.io.Payload
 import java.io._
 import com.google.inject.Inject
 import services.logging.Logging
+import org.jclouds.blobstore.domain.{BlobMetadata, Blob}
 
 /**
  * Convenience methods for storing and loading large binary data: images,
@@ -62,11 +62,18 @@ class Blobs @Inject() (blobProvider: BlobVendor) extends Logging {
   }
 
   /**
-   * Returns the public URL for the Blob. The URL will only work if
-   * the blob was stored with Public.
+   * UNSAFE. Retrieves the URL for the provided key. Favor getUrlOption
    */
   def getUrl(key: String): String = {
-    blobProvider.urlBase + "/" + key
+    getUrlOption(key).get
+  }
+
+  /**
+   * Returns the public URL for the Blob. The URL will only work if
+   * the blob stored is publicly available.
+   */
+  def getUrlOption(key: String): Option[String] = {
+    blobProvider.urlOption(blobstoreNamespace, key)
   }
 
   /**

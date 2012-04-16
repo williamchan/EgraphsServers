@@ -21,4 +21,15 @@ class TimeTests extends UnitFlatSpec with ShouldMatchers {
 
     Time.toBlobstoreFormat(new Date(dateMillis)) should be (dateString)
   }
+
+  "stopwatch" should "report accurate times in seconds" in {
+    val (result, duration) = Time.stopwatch {
+      Thread.sleep(200)
+
+      1
+    }
+
+    result should be (1)
+    duration should be > (0.200)
+  }
 }

@@ -98,9 +98,11 @@ body {
     .image-aperture {
       position:relative;
       
-      img.signed-photo {
+      .signed-photo {
         display:block;
-        visibility:none;
+        border:0px;
+        padding:0px;
+        margin:0px;
         position:relative;
       }
       
@@ -427,6 +429,11 @@ body {
         top:@portraitImageTopMargin;
         width:@portraitImageWidth;
         height:@portraitImageHeight;
+
+        iframe.signed-photo {
+          width:@portraitImageWidth;
+          height:@portraitImageHeight;
+        }
       }
 
       .fx-glass-shine {
@@ -503,6 +510,11 @@ body {
         top:@landscapeImageTopMargin;
         width:@landscapeImageWidth;
         height:@landscapeImageHeight;
+
+        iframe.signed-photo {
+          width:@landscapeImageWidth;
+          height:@landscapeImageHeight;
+        }
       }
 
       .fx-glass-shine {
