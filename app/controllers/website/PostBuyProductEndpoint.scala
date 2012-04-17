@@ -36,58 +36,66 @@ trait PostBuyProductEndpoint { this: Controller =>
           buyerEmail: String,
           stripeTokenId: String,
           desiredText: Option[String],
-          personalNote: Option[String]) = controllerMethod() {
+          personalNote: Option[String],
+          isApiCall: Boolean = false) = controllerMethod() {
 
-    securityFilters.checkAuthenticity {
+    if (!isApiCall) {
+      securityFilters.checkAuthenticity {
+        post(recipientName, recipientEmail, buyerName, buyerEmail, stripeTokenId, desiredText, personalNote)
+      }
+    } else {
+      post(recipientName, recipientEmail, buyerName, buyerEmail, stripeTokenId, desiredText, personalNote)
+    }
+  }
 
-        Logger.info("Receiving purchase order")
-        celebFilters.requireCelebrityAndProductUrlSlugs {
-          (celebrity, product) =>
-            Logger.info("Purchase of product " + celebrity.publicName + "/" + product.name + " for " + recipientName)
-            import Validation.{required, email}
-            required("Recipient name", recipientName)
-            required("Recipient E-mail address", recipientEmail)
-            email("Recipient E-mail address", recipientEmail)
-            required("Buyer name", buyerName)
-            required("Buyer E-mail address", buyerEmail)
-            email("Buyer E-mail address", buyerEmail)
-            required("stripeTokenId", stripeTokenId)
+  def post(recipientName: String, recipientEmail: String, buyerName: String, buyerEmail: String, stripeTokenId: String, desiredText: Option[String], personalNote: Option[String]): Any = {
+    Logger.info("Receiving purchase order")
+    celebFilters.requireCelebrityAndProductUrlSlugs {
+      (celebrity, product) =>
+        Logger.info("Purchase of product " + celebrity.publicName + "/" + product.name + " for " + recipientName)
+        import Validation.{required, email}
+        required("Recipient name", recipientName)
+        required("Recipient E-mail address", recipientEmail)
+        email("Recipient E-mail address", recipientEmail)
+        required("Buyer name", buyerName)
+        required("Buyer E-mail address", buyerEmail)
+        email("Buyer E-mail address", buyerEmail)
+        required("stripeTokenId", stripeTokenId)
 
-            if (recipientEmail != null && !recipientEmail.isEmpty && accountStore.findByEmail(recipientEmail.toLowerCase).isEmpty) {
-              Validation.`match`(
-                "Recipient e-mail address must be a Beta celebrity or a Beta tester",
-                recipientEmail.toLowerCase,
-                alphaEmailMatcher
-              )
+        if (recipientEmail != null && !recipientEmail.isEmpty && accountStore.findByEmail(recipientEmail.toLowerCase).isEmpty) {
+          Validation.`match`(
+            "Recipient e-mail address must be a Beta celebrity or a Beta tester",
+            recipientEmail.toLowerCase,
+            alphaEmailMatcher
+          )
 
-            }
-            if (buyerEmail != null && !buyerEmail.isEmpty && accountStore.findByEmail(buyerEmail.toLowerCase).isEmpty) {
-              Validation.`match`(
-                "Recipient e-mail address must be a Beta celebrity or a Beta tester",
-                buyerEmail.toLowerCase,
-                alphaEmailMatcher
-              )
-            }
+        }
+        if (buyerEmail != null && !buyerEmail.isEmpty && accountStore.findByEmail(buyerEmail.toLowerCase).isEmpty) {
+          Validation.`match`(
+            "Recipient e-mail address must be a Beta celebrity or a Beta tester",
+            buyerEmail.toLowerCase,
+            alphaEmailMatcher
+          )
+        }
 
-            if (!validationErrors.isEmpty) {
-              WebsiteControllers.redirectWithValidationErrors(GetCelebrityProductEndpoint.url(celebrity, product), Some(false))
-            } else {
-              Logger.info("No validation errors")
-              EgraphPurchaseHandler(
-                recipientName,
-                recipientEmail,
-                buyerName,
-                buyerEmail,
-                stripeTokenId,
-                desiredText,
-                personalNote,
-                celebrity,
-                product,
-                mail = mail,
-                customerStore = customerStore,
-                accountStore = accountStore
-              ).execute()
-            }
+        if (!validationErrors.isEmpty) {
+          WebsiteControllers.redirectWithValidationErrors(GetCelebrityProductEndpoint.url(celebrity, product), Some(false))
+        } else {
+          Logger.info("No validation errors")
+          EgraphPurchaseHandler(
+            recipientName,
+            recipientEmail,
+            buyerName,
+            buyerEmail,
+            stripeTokenId,
+            desiredText,
+            personalNote,
+            celebrity,
+            product,
+            mail = mail,
+            customerStore = customerStore,
+            accountStore = accountStore
+          ).execute()
         }
     }
   }

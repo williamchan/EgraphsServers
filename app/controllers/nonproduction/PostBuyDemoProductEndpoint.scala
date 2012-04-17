@@ -23,7 +23,8 @@ trait PostBuyDemoProductEndpoint { this: PostBuyProductEndpoint =>
       buyerEmail,
       payment.testToken.id,
       desiredText,
-      personalNote
+      personalNote,
+      isApiCall = true
     )
   }
 }
