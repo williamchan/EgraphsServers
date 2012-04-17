@@ -43,16 +43,14 @@ trait PostAccountEndpoint {
               preexistingAccount.copy(email = email).save()
             }
           }
+          new Redirect(Utils.lookupUrl("WebsiteControllers.getAccounts", Map("email" -> email)).url)
         }
-
-        new Redirect(Utils.lookupUrl("WebsiteControllers.getAccounts", Map("email" -> email)).url
-        )
       }
     }
   }
 
   private def isUpdatingPassword(account: Account, password: String): Boolean = {
-    !(password.isEmpty || password == account.password.get.hash)
+    !(password.isEmpty || (account.password.isDefined && password == account.password.get.hash))
   }
 
   private def validate(isCreate: Boolean, accountId: Long, email: String, password: String) {
