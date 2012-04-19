@@ -8,22 +8,9 @@ import sjson.json.Serializer
 import utils.FunctionalTestUtils.{CleanDatabaseAfterEachTest, willChanRequest}
 import services.AppConfig
 import services.http.HttpCodes
-import utils.{FunctionalTestUtils, TestConstants, DBTransactionPerTest, EgraphsUnitTest}
+import utils.{FunctionalTestUtils, TestConstants}
 
-class PostEgraphApiEndpointTests extends EgraphsUnitTest with DBTransactionPerTest {
-  "PostEgraphApiEndpoint" should "save an egraph with status Verified if it skips biometrics" in {
-    /*
-    val response = new Controller with PostEgraphApiEndpoint {
-      override implicit def validationErrors = Map.empty
-
-      def celebFilters = friendlyFilters()
-      def orderFilters = mock[OrderRequestFilters]
-    }*/
-    // TODO(erem): write this test
-  }
-}
-
-class PostEgraphApiEndpointFunctionalTests extends FunctionalTest with CleanDatabaseAfterEachTest {
+class PostEgraphApiEndpointTests extends FunctionalTest with CleanDatabaseAfterEachTest {
 
   import FunctionalTest._
 

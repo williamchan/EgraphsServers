@@ -7,10 +7,11 @@ import akka.actor.Actor
 import Actor._
 import services.db.{DBSession, TransactionSerializable}
 import services.AppConfig
-import models.{Egraph, EgraphStore, EgraphState, EgraphTests}
+import models.{Egraph, EgraphStore, EgraphTests}
 import utils.{ClearsDatabaseAndValidationAfter, TestConstants}
 import akka.util.TestKit
 import org.scalatest.BeforeAndAfterAll
+import models.Egraph.EgraphState
 
 class EgraphActorTests extends UnitFlatSpec
 with ShouldMatchers
@@ -56,8 +57,10 @@ with TestKit {
     egraphActor !! ProcessEgraphMessage(egraph2.id)
     AppConfig.instance[DBSession].connected(TransactionSerializable) {
       val egraphStore = AppConfig.instance[EgraphStore]
-      egraphStore.findById(egraph1.id).get.stateValue should be(EgraphState.Verified.value)
-      egraphStore.findById(egraph2.id).get.stateValue should be(EgraphState.Verified.value)
+      egraphStore.findById(egraph1.id).get.stateValue should be(EgraphState.Published.value)
+      egraphStore.findById(egraph2.id).get.stateValue should be(EgraphState.Published.value)
+//      egraphStore.findById(egraph1.id).get.stateValue should be(EgraphState.PassedBiometrics.value)
+//      egraphStore.findById(egraph2.id).get.stateValue should be(EgraphState.PassedBiometrics.value)
     }
   }
 

@@ -1,0 +1,83 @@
+@(egraph: models.Egraph)(implicit session: play.mvc.Scope.Session)
+
+@import controllers.WebsiteControllers
+@import services.Utils.lookupUrl
+@import views.Application.tags.html.authenticityToken
+@import views.Application.tags.html.formField
+@import views.Application.tags.html.valueRow
+@import views.Application.html.content_base
+
+@content_base(title="Admin - Egraph", body=body, head=head)
+
+@head = {
+<script src='@asset("public/twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
+}
+
+@order = @{egraph.order}
+
+@postEgraph = @{
+lookupUrl("WebsiteControllers.postEgraphAdmin", Map("egraphId" -> egraph.id.toString))
+}
+
+@approveControls = {
+@if(egraph.isApprovable) {
+<div class="form">
+  <form id="approve-form" method="POST" action='@postEgraph' enctype="application/x-www-form-urlencoded">
+    @authenticityToken()
+    <input name="egraphId" type="hidden" value="@egraph.id">
+    <input name="egraphState" type="hidden" value="@models.Egraph.EgraphState.ApprovedByAdmin">
+    <div class="actions">
+      <h3>Mark verified for content and authenticity</h3>
+      <button type="submit" id="approve-button" class="btn primary fade in">Approve Egraph</button>
+    </div>
+  </form>
+  <form id="reject-form" method="POST" action='@postEgraph' enctype="application/x-www-form-urlencoded">
+    @authenticityToken()
+    <input name="egraphId" type="hidden" value="@egraph.id">
+    <input name="egraphState" type="hidden" value="@models.Egraph.EgraphState.RejectedByAdmin">
+    <div class="actions">
+      <h3>Reject due to questionable content or authenticity</h3>
+      <button type="submit" id="reject-button" class="btn primary fade in">Reject Egraph</button>
+    </div>
+  </form>
+</div>
+}
+}
+
+@publishControls = {
+@if(egraph.isPublishable) {
+<div class="form">
+  <form id="publish-form" method="POST" action='@postEgraph' enctype="application/x-www-form-urlencoded">
+    @authenticityToken()
+    <input name="egraphId" type="hidden" value="@egraph.id">
+    <input name="egraphState" type="hidden" value="@models.Egraph.EgraphState.Published">
+    <div class="actions">
+      <h3>Publish this Egraph. Also sends email to recipient.</h3>
+      <button type="submit" id="publish-button" class="btn primary fade in">Publish Egraph</button>
+    </div>
+  </form>
+</div>
+}
+}
+
+@body = {
+<div class="admin-content">
+  <h1>
+    Egraph Admin
+  </h1>
+  <h2>Admin Review</h2>
+  @valueRow(label="Egraph State",         value=egraph.stateValue)
+  @approveControls
+  @publishControls
+  <hr/>
+  <h2>Egraph Details</h2>
+  @valueRow(label="Id",                   value=egraph.id)
+  @valueRow(label="Created",              value=egraph.created)
+  @valueRow(label="Updated",              value=egraph.updated)
+  <hr/>
+  <h2>Order Details</h2>
+  @valueRow(label="RecipientName",        value=order.recipientName)
+  @valueRow(label="Message To Celebrity", value=order.messageToCelebrity)
+  @valueRow(label="Requested Message",    value=order.requestedMessage)
+</div>
+}

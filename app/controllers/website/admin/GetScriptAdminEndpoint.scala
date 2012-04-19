@@ -8,6 +8,7 @@ import services.db.Schema
 import models._
 import org.squeryl.Query
 import org.squeryl.PrimitiveTypeMode._
+import models.Egraph.EgraphState
 
 private[controllers] trait GetScriptAdminEndpoint {
   this: Controller =>

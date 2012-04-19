@@ -4,7 +4,8 @@ import akka.actor.Actor
 import Actor._
 import services.db.{DBSession, TransactionSerializable}
 import services.AppConfig
-import models.{EgraphStore, EgraphState}
+import models.Egraph.EgraphState
+import models.EgraphStore
 import com.google.inject.Inject
 import services.logging.{Logging, LoggingContext}
 
@@ -39,7 +40,7 @@ class EgraphActor @Inject() (
           egraph.get.assets.initMasterImage()
           val egraphToTest = if (skipBiometrics) egraph.get.withYesMaamBiometricServices else egraph.get
           val testedEgraph = egraphToTest.verifyBiometrics.save()
-          if (testedEgraph.state == EgraphState.Verified) {
+          if (testedEgraph.state == EgraphState.Published) {
             testedEgraph.order.sendEgraphSignedMail()
           }
         }

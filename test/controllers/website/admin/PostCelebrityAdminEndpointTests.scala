@@ -8,7 +8,7 @@ import FunctionalTest._
 import utils.FunctionalTestUtils.CleanDatabaseAfterEachTest
 import java.net.URLDecoder
 
-class PostCelebrityEndpointTests extends AdminFunctionalTest with CleanDatabaseAfterEachTest {
+class PostCelebrityAdminEndpointTests extends AdminFunctionalTest with CleanDatabaseAfterEachTest {
 
   @Test
   def testPostCelebrityCreatesCelebrity() {
@@ -150,11 +150,11 @@ class PostCelebrityEndpointTests extends AdminFunctionalTest with CleanDatabaseA
   }
 
   private def getPostStrParams(celebrityEmail: String = "ali@egraphs.com",
-                            celebrityPassword: String = "derp",
-                            firstName: String = "Cassius",
-                            lastName: String = "Clay",
-                            publicName: String = "Muhammad Ali",
-                            description: String = "I am the greatest!"): Map[String, String] = {
+                               celebrityPassword: String = "derp",
+                               firstName: String = "Cassius",
+                               lastName: String = "Clay",
+                               publicName: String = "Muhammad Ali",
+                               description: String = "I am the greatest!"): Map[String, String] = {
     Map[String, String](
       "celebrityEmail" -> celebrityEmail,
       "celebrityPassword" -> celebrityPassword,

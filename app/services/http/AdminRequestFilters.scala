@@ -10,6 +10,7 @@ import controllers.website.admin.GetLoginAdminEndpoint
 
 class AdminRequestFilters @Inject()(adminStore: AdministratorStore,
                                     celebStore: CelebrityStore,
+                                    egraphStore: EgraphStore,
                                     orderStore: OrderStore,
                                     accountFilters: AccountRequestFilters,
                                     productFilters: ProductQueryFilters) {
@@ -64,6 +65,26 @@ class AdminRequestFilters @Inject()(adminStore: AdministratorStore,
 
             case Some(order) => {
               continue(order, admin)
+            }
+          }
+        }
+      }
+    }
+  }
+
+  def requireEgraph(continue: (Egraph, Administrator) => Any)(implicit session: Session, request: Request) = {
+    requireAdministratorLogin { admin =>
+      request.params.getOption("egraphId") match {
+        case None =>
+          new Forbidden("Valid egraph ID was required but not provided")
+
+        case Some(egraphId) => {
+          egraphStore.findById(egraphId.toLong) match {
+            case None =>
+              new Forbidden("No egraph was found with ID " + egraphId)
+
+            case Some(egraph) => {
+              continue(egraph, admin)
             }
           }
         }

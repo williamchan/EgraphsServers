@@ -4,13 +4,13 @@ import java.sql.Timestamp
 import services.blobs.AccessPolicy
 import java.awt.image.BufferedImage
 import services.blobs.Blobs
-import services.db.{Schema, KeyedCaseClass, Saves}
 import org.jclouds.blobstore.domain.Blob
 import vbg.VBGVerifySample
 import services.voice.{VoiceBiometricsError, YesMaamVoiceBiometricService, VoiceBiometricService}
 import xyzmo.XyzmoVerifyUser
 import services.signature.{SignatureBiometricsError, YesMaamSignatureBiometricService, SignatureBiometricService}
 import services._
+import db.{FilterOneTable, Schema, KeyedCaseClass, Saves}
 import java.text.SimpleDateFormat
 import controllers.WebsiteControllers
 import controllers.website.GetCelebrityProductEndpoint
@@ -18,6 +18,7 @@ import com.google.inject.{Provider, Inject}
 import play.utils.HTML.htmlEscape
 import org.squeryl.Query
 import org.squeryl.PrimitiveTypeMode._
+import models.Egraph.EgraphState
 
 case class EgraphServices @Inject() (
   store: EgraphStore,
@@ -46,6 +47,7 @@ case class Egraph(
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated
 {
   import Blobs.Conversions._
+  import EgraphState._
 
   //
   // Public methods
@@ -104,7 +106,7 @@ case class Egraph(
 
   /** The current state of the Egraph */
   def state: EgraphState = {
-    EgraphState.named(stateValue)
+    EgraphState.all(stateValue)
   }
 
   /**
@@ -163,13 +165,37 @@ case class Egraph(
     Assets
   }
 
+  def isApprovable: Boolean = {
+    state == PassedBiometrics || state == FailedBiometrics
+  }
+
+  def approve(admin: Administrator): Egraph = {
+    require(admin != null, "Must be approved by an Administrator")
+    require(isApprovable, "Must have previously been checked by biometrics")
+    withState(ApprovedByAdmin)
+  }
+
+  def reject(admin: Administrator): Egraph = {
+    require(admin != null, "Must be rejected by an Administrator")
+    require(isApprovable, "Must have previously been checked by biometrics")
+    withState(RejectedByAdmin)
+  }
+
+  def isPublishable: Boolean = {
+    state == ApprovedByAdmin
+  }
+
+  def publish(admin: Administrator): Egraph = {
+    require(admin != null, "Must be rejected by an Administrator")
+    require(isPublishable, "Must have previously been approved by admin")
+    withState(Published)
+  }
+
   /**
    * Recalculates the correct EgraphState for the egraph based on the dependent variables
    * from its biometrics calculation.
    */
   private def withRecalculatedStatus(vbgVerifySample: Option[VBGVerifySample], xyzmoVerifyUser: Option[XyzmoVerifyUser]): Egraph = {
-    import EgraphState._
-
     val newState = (xyzmoVerifyUser, vbgVerifySample) match {
 
       // We're awaiting verification if we don't have any value yet for either of the two biometric services
@@ -178,15 +204,13 @@ case class Egraph(
 
       // We have return codes from both services. Taking a look at them...
       case (Some(signatureResult), Some(voiceResult)) =>
-        Verified // TODO: Remove for April 1 release and write unit tests for the logic below
+        Published // TODO: Remove for April 1 release and write unit tests for the logic below
         /*
         val isSignatureMatch = signatureResult.isMatch.getOrElse(false)
         val isVoiceMatch = voiceResult.success.getOrElse(false)
         (isSignatureMatch, isVoiceMatch) match {
-          case (true, true) => Verified
-          case (true, false) => RejectedVoice
-          case (false, true) => RejectedSignature
-          case (false, false) => RejectedBoth
+          case (true, true) => PassedBiometrics
+          case _ => FailedBiometrics
         }
       */
     }
@@ -277,6 +301,29 @@ case class Egraph(
 
       services.images.createEgraphImage(signatureImage, productImage, 0, 0).asByteArray(ImageAsset.Png)
     }
+  }
+}
+
+object Egraph {
+  abstract sealed class EgraphState(val value: String)
+
+  object EgraphState {
+    case object AwaitingVerification extends EgraphState("AwaitingVerification")
+    case object Published extends EgraphState("Published")
+    case object PassedBiometrics extends EgraphState("PassedBiometrics")
+    case object FailedBiometrics extends EgraphState("FailedBiometrics")
+    case object ApprovedByAdmin extends EgraphState("ApprovedByAdmin")
+    case object RejectedByAdmin extends EgraphState("RejectedByAdmin")
+
+    /** Map of Egraph state strings to the actual EgraphStates */
+    val all = Utils.toMap[String, EgraphState](Seq(
+      AwaitingVerification,
+      Published,
+      PassedBiometrics,
+      FailedBiometrics,
+      ApprovedByAdmin,
+      RejectedByAdmin
+    ), key=(theState) => theState.value)
   }
 }
 
@@ -457,22 +504,24 @@ trait EgraphAssets {
 
 class EgraphStore @Inject() (schema: Schema) extends Saves[Egraph] with SavesCreatedUpdated[Egraph] {
 
-  def getEgraphsAndResults: Query[(Egraph, VBGVerifySample, XyzmoVerifyUser)] = {
+  def getEgraphsAndResults(filters: FilterOneTable[Egraph]*): Query[(Egraph, VBGVerifySample, XyzmoVerifyUser)] = {
     val egraphsAndResults: Query[(Egraph, VBGVerifySample, XyzmoVerifyUser)] = from(schema.egraphs, schema.vbgVerifySampleTable, schema.xyzmoVerifyUserTable)(
       (egraph, vbgVerifySample, xyzmoVerifyUser) =>
-        where (egraph.id === vbgVerifySample.egraphId and egraph.id === xyzmoVerifyUser.egraphId)
+        where (egraph.id === vbgVerifySample.egraphId and egraph.id === xyzmoVerifyUser.egraphId
+          and FilterOneTable.reduceFilters(filters, egraph))
           select(egraph, vbgVerifySample, xyzmoVerifyUser)
           orderBy(egraph.id desc)
     )
     egraphsAndResults
   }
 
-  def getCelebrityEgraphsAndResults(celebrity: Celebrity): Query[(Egraph, VBGVerifySample, XyzmoVerifyUser)] = {
+  def getCelebrityEgraphsAndResults(celebrity: Celebrity, filters: FilterOneTable[Egraph]*): Query[(Egraph, VBGVerifySample, XyzmoVerifyUser)] = {
     val celebrityId = celebrity.id
     val celebrityEgraphsAndResults: Query[(Egraph, VBGVerifySample, XyzmoVerifyUser)] = from(schema.egraphs, schema.vbgVerifySampleTable, schema.xyzmoVerifyUserTable, schema.orders, schema.products)(
       (egraph, vbgVerifySample, xyzmoVerifyUser, order, product) =>
         where (egraph.orderId === order.id and order.productId === product.id and product.celebrityId === celebrityId
-          and egraph.id === vbgVerifySample.egraphId and egraph.id === xyzmoVerifyUser.egraphId)
+          and egraph.id === vbgVerifySample.egraphId and egraph.id === xyzmoVerifyUser.egraphId
+          and FilterOneTable.reduceFilters(filters, egraph))
           select(egraph, vbgVerifySample, xyzmoVerifyUser)
           orderBy(egraph.id desc)
     )
@@ -501,6 +550,61 @@ class EgraphStore @Inject() (schema: Schema) extends Saves[Egraph] with SavesCre
   }
 }
 
+class EgraphQueryFilters @Inject() (schema: Schema) {
+
+  import EgraphState._
+
+  def pendingAdminReview = List(passedBiometrics, failedBiometrics, approvedByAdmin)
+
+  def approvedByAdmin: FilterOneTable[Egraph] = {
+    new FilterOneTable[Egraph] {
+      override def test(egraph: Egraph) = {
+        (egraph.stateValue === ApprovedByAdmin.value)
+      }
+    }
+  }
+
+  def rejectedByAdmin: FilterOneTable[Egraph] = {
+    new FilterOneTable[Egraph] {
+      override def test(egraph: Egraph) = {
+        (egraph.stateValue === RejectedByAdmin.value)
+      }
+    }
+  }
+
+  def passedBiometrics: FilterOneTable[Egraph] = {
+    new FilterOneTable[Egraph] {
+      override def test(egraph: Egraph) = {
+        (egraph.stateValue === PassedBiometrics.value)
+      }
+    }
+  }
+
+  def failedBiometrics: FilterOneTable[Egraph] = {
+    new FilterOneTable[Egraph] {
+      override def test(egraph: Egraph) = {
+        (egraph.stateValue === FailedBiometrics.value)
+      }
+    }
+  }
+
+  def awaitingVerification: FilterOneTable[Egraph] = {
+    new FilterOneTable[Egraph] {
+      override def test(egraph: Egraph) = {
+        (egraph.stateValue === AwaitingVerification.value)
+      }
+    }
+  }
+
+  def published: FilterOneTable[Egraph] = {
+    new FilterOneTable[Egraph] {
+      override def test(egraph: Egraph) = {
+        (egraph.stateValue === Published.value)
+      }
+    }
+  }
+}
+
 case class EgraphWithAssets(
   egraph: Egraph,
   signature: String,
@@ -514,27 +618,6 @@ case class EgraphWithAssets(
 
     savedEgraph
   }
-}
-
-abstract sealed class EgraphState(val value: String)
-
-object EgraphState {
-  case object AwaitingVerification extends EgraphState("AwaitingVerification")
-  case object Verified extends EgraphState("Verified")
-  case object RejectedVoice extends EgraphState("Rejected:Voice")
-  case object RejectedSignature extends EgraphState("Rejected:Signature")
-  case object RejectedBoth extends EgraphState("Rejected:Both")
-  case object RejectedPersonalAudit extends EgraphState("Rejected:Audit")
-
-  /** Map of Egraph state strings to the actual EgraphStates */
-  val named = Utils.toMap[String, EgraphState](Seq(
-    AwaitingVerification,
-    Verified,
-    RejectedVoice,
-    RejectedSignature,
-    RejectedBoth,
-    RejectedPersonalAudit
-  ), key=(theState) => theState.value)
 }
 
 /**

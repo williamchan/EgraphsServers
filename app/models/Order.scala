@@ -6,7 +6,6 @@ import org.joda.money.Money
 import models.CashTransaction.EgraphPurchase
 import services.db.{FilterOneTable, KeyedCaseClass, Schema, Saves}
 import services.Finance.TypeConversions._
-import EgraphState._
 import org.apache.commons.mail.HtmlEmail
 import services._
 import com.google.inject._
@@ -14,6 +13,7 @@ import mail.Mail
 import payment.Payment
 import play.mvc.Router.ActionDefinition
 import org.squeryl.Query
+import models.Egraph.EgraphState._
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -273,7 +273,7 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
       where(
         order.id === id and
           egraph.orderId === order.id and
-          egraph.stateValue === Verified.value
+          egraph.stateValue === Published.value
       )
         select (FulfilledOrder(order, egraph))
     ).headOption
@@ -350,9 +350,13 @@ class OrderQueryFilters @Inject() (schema: Schema) {
   private def actionableEgraphs: FilterOneTable[Order] = {
     new FilterOneTable[Order] {
       override def test(order: Order) = {
+        val nonActionableStates = Seq(Published.value, ApprovedByAdmin.value,
+          AwaitingVerification.value, PassedBiometrics.value, FailedBiometrics.value)
+
         notExists(
           from(schema.egraphs)(egraph =>
-            where((egraph.orderId === order.id) and (egraph.stateValue in Seq(Verified.value, AwaitingVerification.value)))
+            where((egraph.orderId === order.id) and
+              (egraph.stateValue in nonActionableStates))
               select(egraph.id)
           )
         )

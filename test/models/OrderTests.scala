@@ -7,6 +7,7 @@ import services.Time
 import utils._
 import services.AppConfig
 import services.payment.Payment
+import models.Egraph.EgraphState
 
 class OrderTests extends UnitFlatSpec
   with ShouldMatchers
@@ -16,9 +17,9 @@ class OrderTests extends UnitFlatSpec
   with ClearsDatabaseAndValidationAfter
   with DBTransactionPerTest
 {
-  val orderStore = AppConfig.instance[OrderStore]
-  val payment = AppConfig.instance[Payment]
-  val orderQueryFilters = AppConfig.instance[OrderQueryFilters]
+  private val orderStore = AppConfig.instance[OrderStore]
+  private val payment = AppConfig.instance[Payment]
+  private val orderQueryFilters = AppConfig.instance[OrderQueryFilters]
 
   //
   // SavingEntityTests[Order] methods
@@ -220,19 +221,19 @@ class OrderTests extends UnitFlatSpec
     found.toSet should be(Set(actionableOrder))
   }
 
-  it should "exclude orders that have Verified or AwaitingVerification Egraphs when composed with ActionableFilter" in {
+  it should "exclude orders that have Published or reviewable Egraphs when composed with ActionableFilter" in {
     val (will, _, celebrity, product) = newOrderStack
     val admin = Administrator().save()
 
     // Make an order for each Egraph State, and save an Egraph in that state
-    val orders = EgraphState.named.map { case (_, state) =>
-      val order = will.buy(product).approveByAdmin(admin).save()
-      order
-        .newEgraph
-        .withState(state)
-        .saveWithoutAssets()
-
-      (state, order)
+    val orders = EgraphState.all.map {
+      case (_, state) =>
+        val order = will.buy(product).approveByAdmin(admin).save()
+        order
+          .newEgraph
+          .withState(state)
+          .saveWithoutAssets()
+        (state, order)
     }
 
     // Also buy one without an Egraph
@@ -241,13 +242,10 @@ class OrderTests extends UnitFlatSpec
     // Perform the test
     val found = orderStore.findByCelebrity(celebrity.id, orderQueryFilters.actionableOnly: _*)
 
-    found.toSeq.length should be (5)
+    found.toSeq.length should be (2)
     found.toSet should be (Set(
       orderWithoutEgraph,
-      orders(EgraphState.RejectedVoice),
-      orders(EgraphState.RejectedSignature),
-      orders(EgraphState.RejectedBoth),
-      orders(EgraphState.RejectedPersonalAudit)
+      orders(EgraphState.RejectedByAdmin)
     ))
   }
 

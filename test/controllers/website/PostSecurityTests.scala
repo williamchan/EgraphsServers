@@ -10,13 +10,16 @@ class PostSecurityTests extends FunctionalTest {
 
   @Test
   def testPostControllersRequireAuthenticityToken() {
+    // admin security
     assertAuthenticityTokenIsRequired(POST(Utils.lookupUrl("WebsiteControllers.postLoginAdmin", Map[String, String]("authenticityCheck" -> "fail")).url))
     assertAuthenticityTokenIsRequired(POST(Utils.lookupUrl("WebsiteControllers.postLogoutAdmin", Map[String, String]("authenticityCheck" -> "fail")).url))
     assertAuthenticityTokenIsRequired(POST(Utils.lookupUrl("WebsiteControllers.postAccountAdmin", Map[String, String]("authenticityCheck" -> "fail")).url))
     assertAuthenticityTokenIsRequired(POST(Utils.lookupUrl("WebsiteControllers.postCelebrityAdmin", Map[String, String]("authenticityCheck" -> "fail")).url))
     assertAuthenticityTokenIsRequired(POST(Utils.lookupUrl("WebsiteControllers.postCelebrityProductAdmin", Map[String, String]("authenticityCheck" -> "fail", "celebrityId" -> "1")).url))
     assertAuthenticityTokenIsRequired(POST(Utils.lookupUrl("WebsiteControllers.postOrderAdmin", Map[String, String]("authenticityCheck" -> "fail", "orderId" -> "1")).url))
+    assertAuthenticityTokenIsRequired(POST(Utils.lookupUrl("WebsiteControllers.postEgraphAdmin", Map[String, String]("authenticityCheck" -> "fail", "egraphId" -> "1")).url))
 
+    // website security
     assertAuthenticityTokenIsRequired(POST(Utils.lookupUrl("WebsiteControllers.postBuyProduct", Map[String, String]("authenticityCheck" -> "fail", "celebrityUrlSlug" -> "1", "productUrlSlug" -> "1")).url))
   }
 

@@ -10,6 +10,7 @@ import models._
 import services.AppConfig
 import services.db.{TransactionSerializable, DBSession}
 import utils.{FunctionalTestUtils, TestConstants}
+import models.Egraph.EgraphState
 
 class GetCelebrityOrdersApiEndpointTests extends FunctionalTest with CleanDatabaseAfterEachTest {
 
@@ -66,13 +67,13 @@ class GetCelebrityOrdersApiEndpointTests extends FunctionalTest with CleanDataba
   }
 
   @Test
-  def testGetOrdersFiltersOutOrdersWithEgraphWithVerifiedState() {
+  def testGetOrdersFiltersOutOrdersWithEgraphWithPublishedState() {
     FunctionalTestUtils.runWillChanScenariosThroughOrder()
 
     db.connected(TransactionSerializable) {
       val celebrityId = Scenarios.getWillCelebrityAccount.id
       val allCelebOrders = orderStore.findByCelebrity(celebrityId)
-      Egraph(orderId = allCelebOrders.toSeq.head.id).withState(EgraphState.Verified).saveWithoutAssets()
+      Egraph(orderId = allCelebOrders.toSeq.head.id).withState(EgraphState.Published).saveWithoutAssets()
     }
 
     val response = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/orders?signerActionable=true")
@@ -90,10 +91,7 @@ class GetCelebrityOrdersApiEndpointTests extends FunctionalTest with CleanDataba
 
       val celebrityId = Scenarios.getWillCelebrityAccount.id
       val allCelebOrders = orderStore.findByCelebrity(celebrityId)
-      Egraph(orderId = allCelebOrders.toSeq.head.id).withState(RejectedVoice).saveWithoutAssets()
-      Egraph(orderId = allCelebOrders.toSeq.head.id).withState(RejectedSignature).saveWithoutAssets()
-      Egraph(orderId = allCelebOrders.toSeq.head.id).withState(RejectedBoth).saveWithoutAssets()
-      Egraph(orderId = allCelebOrders.toSeq.head.id).withState(RejectedPersonalAudit).saveWithoutAssets()
+      Egraph(orderId = allCelebOrders.toSeq.head.id).withState(RejectedByAdmin).saveWithoutAssets()
     }
 
     val response = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/orders?signerActionable=true")

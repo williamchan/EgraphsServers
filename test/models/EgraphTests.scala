@@ -7,6 +7,7 @@ import utils._
 import services.blobs.Blobs.Conversions._
 import services.{Dimensions, Time, AppConfig}
 import java.awt.image.BufferedImage
+import models.Egraph.EgraphState
 
 class EgraphTests extends UnitFlatSpec
   with ShouldMatchers
@@ -16,7 +17,8 @@ class EgraphTests extends UnitFlatSpec
   with ClearsDatabaseAndValidationAfter
   with DBTransactionPerTest
 {
-  val store = AppConfig.instance[EgraphStore]
+  private val store = AppConfig.instance[EgraphStore]
+  private val egraphQueryFilters = AppConfig.instance[EgraphQueryFilters]
 
   //
   // SavingEntityTests[Egraph] methods
@@ -38,7 +40,7 @@ class EgraphTests extends UnitFlatSpec
     val order = EgraphTests.persistedOrder
     toTransform.copy(
       orderId = order.id,
-      stateValue = EgraphState.Verified.value
+      stateValue = EgraphState.Published.value
     )
   }
 
@@ -46,12 +48,42 @@ class EgraphTests extends UnitFlatSpec
   // Test cases
   //
   "An Egraph" should "update its state when withState is called" in {
-    val egraph = Egraph().withState(EgraphState.RejectedVoice)
+    val egraph = Egraph().withState(EgraphState.FailedBiometrics)
 
-    egraph.state should be (EgraphState.RejectedVoice)
+    egraph.state should be (EgraphState.FailedBiometrics)
   }
 
-  it should "save and recover signature and audio data from the blobstore" in {
+  "approve" should "change state to ApprovedByAdmin" in {
+    val admin = Administrator().save()
+    Egraph().withState(EgraphState.PassedBiometrics).approve(admin).state should be(EgraphState.ApprovedByAdmin)
+    Egraph().withState(EgraphState.FailedBiometrics).approve(admin).state should be(EgraphState.ApprovedByAdmin)
+    intercept[IllegalArgumentException] {Egraph().withState(EgraphState.PassedBiometrics).approve(null)}
+    intercept[IllegalArgumentException] {Egraph().withState(EgraphState.AwaitingVerification).approve(admin)}
+    intercept[IllegalArgumentException] {Egraph().withState(EgraphState.Published).approve(admin)}
+    intercept[IllegalArgumentException] {Egraph().withState(EgraphState.RejectedByAdmin).approve(admin)}
+  }
+
+  "reject" should "change state to RejectedByAdmin" in {
+    val admin = Administrator().save()
+    Egraph().withState(EgraphState.PassedBiometrics).reject(admin).state should be(EgraphState.RejectedByAdmin)
+    Egraph().withState(EgraphState.FailedBiometrics).reject(admin).state should be(EgraphState.RejectedByAdmin)
+    intercept[IllegalArgumentException] {Egraph().withState(EgraphState.PassedBiometrics).reject(null)}
+    intercept[IllegalArgumentException] {Egraph().withState(EgraphState.AwaitingVerification).reject(admin)}
+    intercept[IllegalArgumentException] {Egraph().withState(EgraphState.Published).reject(admin)}
+    intercept[IllegalArgumentException] {Egraph().withState(EgraphState.RejectedByAdmin).reject(admin)}
+  }
+
+  "publish" should "change state to Published" in {
+    val admin = Administrator().save()
+    Egraph().withState(EgraphState.ApprovedByAdmin).publish(admin).state should be(EgraphState.Published)
+    intercept[IllegalArgumentException] {Egraph().withState(EgraphState.PassedBiometrics).publish(null)}
+    intercept[IllegalArgumentException] {Egraph().withState(EgraphState.AwaitingVerification).publish(admin)}
+    intercept[IllegalArgumentException] {Egraph().withState(EgraphState.RejectedByAdmin).publish(admin)}
+    intercept[IllegalArgumentException] {Egraph().withState(EgraphState.PassedBiometrics).publish(admin)}
+    intercept[IllegalArgumentException] {Egraph().withState(EgraphState.PassedBiometrics).publish(admin)}
+  }
+
+  "An Egraph" should "save and recover signature and audio data from the blobstore" in {
     val egraph = EgraphTests.persistedOrder
       .newEgraph
       .withAssets(TestConstants.signatureStr, Some(TestConstants.messageStr), "my audio".getBytes("UTF-8"))
@@ -61,22 +93,22 @@ class EgraphTests extends UnitFlatSpec
     egraph.assets.audio.asByteArray should be ("my audio".getBytes("UTF-8"))
   }
 
-  it should "throw an exception if assets are accessed on an unsaved Egraph" in {
+  "An Egraph" should "throw an exception if assets are accessed on an unsaved Egraph" in {
     evaluating { EgraphTests.persistedOrder.newEgraph.assets } should produce [IllegalArgumentException]
   }
 
   "Egraph statuses" should "be accessible via their values on the companion object" in {
-    EgraphState.named.foreach( stateTuple =>
-      EgraphState.named(stateTuple._2.value) should be (stateTuple._2)
+    EgraphState.all.foreach( stateTuple =>
+      EgraphState.all(stateTuple._2.value) should be (stateTuple._2)
     )
   }
 
   "allStatuses" should "contain all the states" in {
-    EgraphState.named.size should be (6)
+    EgraphState.all.size should be (6)
   }
 
   it should "throw an exception at an unrecognized string" in {
-    evaluating { EgraphState.named("Herpyderp") } should produce [NoSuchElementException]
+    evaluating { EgraphState.all("Herpyderp") } should produce [NoSuchElementException]
   }
 
   "An Egraph Story" should "render all values correctly in the title" in {
@@ -97,6 +129,23 @@ class EgraphTests extends UnitFlatSpec
     story.title should be ("Herpy Derpson")
     story.body should be ("Herpy Derpson<a href='/Herpy-Derpson' >Erem RecipientNBA Finals 2012<a href='/Herpy-Derpson/NBA-Finals-2012' >February 10, 2012February 10, 2011</a>")
   }
+
+//  "EgraphQueryFilters" should "filter queries" in {
+//    val passedBiometrics = EgraphTests.persistedOrder.newEgraph.withState(EgraphState.PassedBiometrics).saveWithoutAssets()
+//    val failedBiometrics = EgraphTests.persistedOrder.newEgraph.withState(EgraphState.FailedBiometrics).saveWithoutAssets()
+//    val approvedByAdmin = EgraphTests.persistedOrder.newEgraph.withState(EgraphState.ApprovedByAdmin).saveWithoutAssets()
+//    val rejectedByAdmin = EgraphTests.persistedOrder.newEgraph.withState(EgraphState.RejectedByAdmin).saveWithoutAssets()
+//    val awaitingVerification = EgraphTests.persistedOrder.newEgraph.withState(EgraphState.AwaitingVerification).saveWithoutAssets()
+//    val published = EgraphTests.persistedOrder.newEgraph.withState(EgraphState.Published).saveWithoutAssets()
+//
+//    store.getEgraphsAndResults(egraphQueryFilters.pendingAdminReview: _*).toSeq.map(e => e._1).toSet should be(Set(passedBiometrics, failedBiometrics, approvedByAdmin))
+//    store.getEgraphsAndResults(egraphQueryFilters.passedBiometrics).toSeq.map(e => e._1).toSet should be(Set(passedBiometrics))
+//    store.getEgraphsAndResults(egraphQueryFilters.failedBiometrics).toSeq.map(e => e._1).toSet should be(Set(failedBiometrics))
+//    store.getEgraphsAndResults(egraphQueryFilters.approvedByAdmin).toSeq.map(e => e._1).toSet should be(Set(approvedByAdmin))
+//    store.getEgraphsAndResults(egraphQueryFilters.rejectedByAdmin).toSeq.map(e => e._1).toSet should be(Set(rejectedByAdmin))
+//    store.getEgraphsAndResults(egraphQueryFilters.awaitingVerification).toSeq.map(e => e._1).toSet should be(Set(awaitingVerification))
+//    store.getEgraphsAndResults(egraphQueryFilters.published).toSeq.map(e => e._1).toSet should be(Set(published))
+//  }
 
 }
 

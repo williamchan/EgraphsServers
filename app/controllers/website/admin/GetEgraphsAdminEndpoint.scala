@@ -16,10 +16,20 @@ private[controllers] trait GetEgraphsAdminEndpoint {
   protected def adminFilters: AdminRequestFilters
 
   protected def egraphStore: EgraphStore
+  protected def egraphQueryFilters: EgraphQueryFilters
 
-  def getEgraphsAdmin(page: Int = 1) = controllerMethod() {
+  def getEgraphsAdmin(filter: String = "pendingAdminReview", page: Int = 1) = controllerMethod() {
     adminFilters.requireAdministratorLogin { admin =>
-      var query = egraphStore.getEgraphsAndResults
+      var query = filter match {
+        case "passedBiometrics" => egraphStore.getEgraphsAndResults(egraphQueryFilters.passedBiometrics)
+        case "failedBiometrics" => egraphStore.getEgraphsAndResults(egraphQueryFilters.failedBiometrics)
+        case "approvedByAdmin" => egraphStore.getEgraphsAndResults(egraphQueryFilters.approvedByAdmin)
+        case "rejectedByAdmin" => egraphStore.getEgraphsAndResults(egraphQueryFilters.rejectedByAdmin)
+        case "published" => egraphStore.getEgraphsAndResults(egraphQueryFilters.published)
+        case "awaitingVerification" => egraphStore.getEgraphsAndResults(egraphQueryFilters.awaitingVerification)
+        case "all" => egraphStore.getEgraphsAndResults()
+        case _ => egraphStore.getEgraphsAndResults(egraphQueryFilters.pendingAdminReview: _*)
+      }
       val pagedQuery: (Iterable[(Egraph, VBGVerifySample, XyzmoVerifyUser)], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
       WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetEgraphsAdminEndpoint.url())
       views.Application.admin.html.admin_egraphs(egraphAndResults = pagedQuery._1)

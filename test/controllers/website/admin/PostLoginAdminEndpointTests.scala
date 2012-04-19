@@ -6,7 +6,7 @@ import play.test.FunctionalTest
 import FunctionalTest._
 import utils.FunctionalTestUtils.CleanDatabaseAfterEachTest
 
-class PostAdminLoginEndpointTests extends AdminFunctionalTest with CleanDatabaseAfterEachTest {
+class PostLoginAdminEndpointTests extends AdminFunctionalTest with CleanDatabaseAfterEachTest {
 
   @Test
   def testEmailAndPasswordValidation() {

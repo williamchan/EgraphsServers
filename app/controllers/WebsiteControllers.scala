@@ -38,6 +38,8 @@ object WebsiteControllers extends Controller
   with GetUpdateCelebrityAdminEndpoint
   with GetCreateCelebrityProductAdminEndpoint
   with GetUpdateCelebrityProductAdminEndpoint
+  with GetEgraphAdminEndpoint
+  with PostEgraphAdminEndpoint
   with GetEgraphsAdminEndpoint
   with GetOrderAdminEndpoint
   with GetOrdersAdminEndpoint
@@ -59,6 +61,7 @@ object WebsiteControllers extends Controller
   override protected val adminFilters = instance[AdminRequestFilters]
   override protected val securityFilters = instance[SecurityRequestFilters]
   override protected val celebFilters = instance[CelebrityAccountRequestFilters]
+  override protected val egraphQueryFilters = instance[EgraphQueryFilters]
   override protected val orderQueryFilters = instance[OrderQueryFilters]
 
   override protected val blobs = instance[Blobs]
