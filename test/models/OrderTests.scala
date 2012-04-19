@@ -92,10 +92,11 @@ class OrderTests extends UnitFlatSpec
   }
 
   "rejectByCelebrity" should "change reviewStatus to RejectedByCelebrity" in {
-    val order = newEntity.save()
-    order.reviewStatus should be (Order.ReviewStatus.PendingAdminReview.stateValue)
+    val order = newEntity.copy(reviewStatus = Order.ReviewStatus.ApprovedByAdmin.stateValue).save()
+    order.reviewStatus should be (Order.ReviewStatus.ApprovedByAdmin.stateValue)
     order.rejectionReason should be (None)
 
+    intercept[IllegalArgumentException] {newEntity.save().rejectByCelebrity(null)}
     intercept[IllegalArgumentException] {order.rejectByCelebrity(null)}
     intercept[IllegalArgumentException] {order.rejectByCelebrity(Celebrity())}
 
@@ -272,6 +273,17 @@ class OrderTests extends UnitFlatSpec
     val found = orderStore.findByCelebrity(celebrity.id, orderQueryFilters.rejected)
     found.toSeq.length should be(2)
     found.toSet should be(Set(rejectedOrder1, rejectedOrder2))
+  }
+
+  "findByFilter" should "restrict by filter but not by celebrity" in {
+    val (customer0, product0) = newCustomerAndProduct
+    val order0 = customer0.buy(product0).save()
+    val (customer1, product1) = newCustomerAndProduct
+    val order1 = customer1.buy(product1).save()
+
+    val found = orderStore.findByFilter()
+    found.toSeq.length should be(2)
+    found.toSet should be(Set(order0, order1))
   }
 
   //

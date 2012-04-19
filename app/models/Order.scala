@@ -298,6 +298,18 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
     )
   }
 
+  def findByFilter(filters: FilterThreeTables[Celebrity, Product, Order]*): Query[Order] = {
+    import schema.{celebrities, products, orders}
+
+    from(celebrities, products, orders)((celebrity, product, order) =>
+      where(
+        FilterThreeTables.reduceFilters(filters, celebrity, product, order)
+      )
+        select (order)
+        orderBy (order.created asc)
+    )
+  }
+
   //
   // Saves[Order] methods
   //

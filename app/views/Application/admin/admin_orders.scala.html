@@ -1,9 +1,8 @@
-@(celebrity: models.Celebrity, orders: Iterable[models.Order]
+@(orders: Iterable[models.Order], celebrity: Option[models.Celebrity] = None
 )(implicit flash:play.mvc.Scope.Flash)
 
 @import controllers.WebsiteControllers
 @import services.Utils.lookupUrl
-@import services.Finance.TypeConversions._
 @import views.Application.tags.html.pagination
 @import views.Application.html.content_base
 
@@ -13,22 +12,32 @@
 <script src='@asset("public/twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
 }
 
+@headline = {
+  @if(celebrity.isDefined) {@celebrity.get.publicName's Orders} else {Orders}
+}
+
 @body = {
 <div class="admin-content">
   <h1>
-    @celebrity.publicName's Orders @flash.get("TotalResultsStr")
+    @headline @flash.get("TotalResultsStr")
   </h1>
+  <div>
+    <h2>Filters:</h2>
+    <ul class="span16">
+      <li><a href="?filter=pendingAdminReview">Pending Admin Review</a></li>
+      <li><a href="?filter=rejected">Rejected</a></li>
+      <li><a href="?filter=signerActionable">Signer Actionable</a></li>
+      <li><a href="?filter=all">All</a></li>
+    </ul>
+  </div>
   <table>
     <tr>
       <th></th>
       <th>Id</th>
       <th>Product</th>
-      <th>Buyer</th>
       <th>Recipient</th>
       <th>Review Status</th>
       <th>Payment State</th>
-      <th>Txn Id</th>
-      <th>Price</th>
       <th>Msg to Celebrity</th>
       <th>Requested Msg</th>
     </tr>
@@ -41,12 +50,9 @@
       </td>
       <td>@order.id</td>
       <td>@order.productId</td>
-      <td>@order.buyerId</td>
       <td>@order.recipientName</td>
       <td>@order.reviewStatus</td>
       <td>@order.paymentStateString</td>
-      <td>@order.transactionId.getOrElse("")</td>
-      <td>@order.amountPaid.formatSimply</td>
       <td>@order.messageToCelebrity.getOrElse("")</td>
       <td>@order.requestedMessage.getOrElse("")</td>
     </tr>
