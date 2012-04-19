@@ -8,14 +8,14 @@ import play.data.validation.Validation
 import models.{Administrator, AdministratorStore}
 import services.http.{SecurityRequestFilters, ControllerMethod}
 
-private[controllers] trait PostAdminLoginEndpoint {
+private[controllers] trait PostLoginAdminEndpoint {
   this: Controller =>
 
   protected def controllerMethod: ControllerMethod
   protected def securityFilters: SecurityRequestFilters
   protected def administratorStore: AdministratorStore
 
-  def postAdminLogin(email: String, password: String) = controllerMethod() {
+  def postLoginAdmin(email: String, password: String) = controllerMethod() {
 
     securityFilters.checkAuthenticity {
 
@@ -30,11 +30,11 @@ private[controllers] trait PostAdminLoginEndpoint {
       }
 
       if (!validationErrors.isEmpty) {
-        WebsiteControllers.redirectWithValidationErrors(GetAdminLoginEndpoint.url())
+        WebsiteControllers.redirectWithValidationErrors(GetLoginAdminEndpoint.url())
 
       } else {
         session.put(WebsiteControllers.adminIdKey, administrator.get.id.toString)
-        new Redirect(Utils.lookupUrl("WebsiteControllers.getCelebrities").url)
+        new Redirect(Utils.lookupUrl("WebsiteControllers.getCelebritiesAdmin").url)
       }
     }
   }

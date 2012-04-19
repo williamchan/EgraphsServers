@@ -7,26 +7,26 @@ import services.Utils
 import play.mvc.Router.ActionDefinition
 import controllers.WebsiteControllers
 
-private[controllers] trait GetCelebritiesEndpoint {
+private[controllers] trait GetCelebritiesAdminEndpoint {
   this: Controller =>
 
   protected def adminFilters: AdminRequestFilters
   protected def celebrityStore: CelebrityStore
   protected def controllerMethod: ControllerMethod
 
-  def getCelebrities(page: Int = 1) = controllerMethod() {
+  def getCelebritiesAdmin(page: Int = 1) = controllerMethod() {
     adminFilters.requireAdministratorLogin { admin =>
       var query = celebrityStore.getCelebrityAccounts
       val pagedQuery: (Iterable[(Celebrity, Account)], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
-      WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebritiesEndpoint.url())
+      WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebritiesAdminEndpoint.url())
       views.Application.admin.html.admin_celebrities(celebrityAccounts = pagedQuery._1)
     }
   }
 }
 
-object GetCelebritiesEndpoint {
+object GetCelebritiesAdminEndpoint {
 
   def url(): ActionDefinition = {
-    Utils.lookupUrl("WebsiteControllers.getCelebrities")
+    Utils.lookupUrl("WebsiteControllers.getCelebritiesAdmin")
   }
 }

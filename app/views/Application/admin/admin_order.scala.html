@@ -15,11 +15,11 @@
 }
 
 @postOrder = @{
-  lookupUrl("WebsiteControllers.postOrder", Map("orderId" -> order.id.toString))
+  lookupUrl("WebsiteControllers.postOrderAdmin", Map("orderId" -> order.id.toString))
 }
 
 @productUrl() = @{
-  lookupUrl("WebsiteControllers.getUpdateCelebrityProduct", Map("productId" -> order.productId.toString))
+  lookupUrl("WebsiteControllers.getUpdateCelebrityProductAdmin", Map("productId" -> order.productId.toString))
 }
 
 @reviewControls = {

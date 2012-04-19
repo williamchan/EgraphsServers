@@ -9,7 +9,7 @@ import models._
 import org.squeryl.Query
 import org.squeryl.PrimitiveTypeMode._
 
-private[controllers] trait AdminScriptEndpoint {
+private[controllers] trait GetScriptAdminEndpoint {
   this: Controller =>
 
   protected def controllerMethod: ControllerMethod
@@ -22,7 +22,7 @@ private[controllers] trait AdminScriptEndpoint {
   protected def customerStore = AppConfig.instance[CustomerStore]
   protected def enrollmentBatchStore = AppConfig.instance[EnrollmentBatchStore]
 
-  def script() = controllerMethod() {
+  def getScriptAdmin = controllerMethod() {
     adminFilters.requireAdministratorLogin {admin =>
 
       val action = params.get("action")

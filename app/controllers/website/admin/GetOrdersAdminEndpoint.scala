@@ -7,7 +7,7 @@ import play.mvc.Router.ActionDefinition
 import controllers.WebsiteControllers
 import services.Utils
 
-private[controllers] trait GetOrdersEndpoint {
+private[controllers] trait GetOrdersAdminEndpoint {
   this: Controller =>
 
   protected def controllerMethod: ControllerMethod
@@ -16,7 +16,7 @@ private[controllers] trait GetOrdersEndpoint {
   protected def orderStore: OrderStore
   protected def orderQueryFilters: OrderQueryFilters
 
-  def getOrders(filter: String = "pendingAdminReview", page: Int = 1) = controllerMethod() {
+  def getOrdersAdmin(filter: String = "pendingAdminReview", page: Int = 1) = controllerMethod() {
     adminFilters.requireAdministratorLogin {
       admin =>
         var query = filter match {
@@ -26,15 +26,15 @@ private[controllers] trait GetOrdersEndpoint {
           case _ => orderStore.findByFilter(orderQueryFilters.pendingAdminReview)
         }
         val pagedQuery: (Iterable[Order], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
-        WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetOrdersEndpoint.url())
+        WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetOrdersAdminEndpoint.url())
         views.Application.admin.html.admin_orders(orders = pagedQuery._1)
     }
   }
 }
 
-object GetOrdersEndpoint {
+object GetOrdersAdminEndpoint {
 
   def url(): ActionDefinition = {
-    Utils.lookupUrl("WebsiteControllers.getOrders")
+    Utils.lookupUrl("WebsiteControllers.getOrdersAdmin")
   }
 }

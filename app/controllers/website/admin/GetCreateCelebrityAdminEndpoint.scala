@@ -5,7 +5,7 @@ import services.Utils
 import services.http.{AdminRequestFilters, ControllerMethod}
 import models.{AccountStore, CelebrityStore}
 
-private[controllers] trait GetCreateCelebrityEndpoint {
+private[controllers] trait GetCreateCelebrityAdminEndpoint {
   this: Controller =>
 
   protected def controllerMethod: ControllerMethod
@@ -13,16 +13,16 @@ private[controllers] trait GetCreateCelebrityEndpoint {
   protected def accountStore: AccountStore
   protected def celebrityStore: CelebrityStore
 
-  def getCreateCelebrity = controllerMethod() {
+  def getCreateCelebrityAdmin = controllerMethod() {
     adminFilters.requireAdministratorLogin { admin =>
       GetCelebrityDetail.getCelebrityDetail(isCreate = true)
     }
   }
 }
 
-object GetCreateCelebrityEndpoint {
+object GetCreateCelebrityAdminEndpoint {
 
   def url() = {
-    Utils.lookupUrl("WebsiteControllers.getCreateCelebrity")
+    Utils.lookupUrl("WebsiteControllers.getCreateCelebrityAdmin")
   }
 }

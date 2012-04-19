@@ -5,7 +5,7 @@ import services.Utils
 import services.http.{AdminRequestFilters, ControllerMethod}
 import models.OrderStore
 
-private[controllers] trait GetOrderEndpoint { this: Controller =>
+private[controllers] trait GetOrderAdminEndpoint { this: Controller =>
 
   protected def adminFilters: AdminRequestFilters
   protected def orderStore: OrderStore
@@ -14,7 +14,7 @@ private[controllers] trait GetOrderEndpoint { this: Controller =>
   /**
    * Serves the website's Celebrity root page.
    */
-  def getOrder(orderId: Long) = controllerMethod() {
+  def getOrderAdmin(orderId: Long) = controllerMethod() {
     adminFilters.requireAdministratorLogin { admin =>
       orderStore.findById(orderId) match {
         case Some(order) => views.Application.admin.html.admin_order(order = order)
@@ -24,9 +24,9 @@ private[controllers] trait GetOrderEndpoint { this: Controller =>
   }
 }
 
-object GetOrderEndpoint {
+object GetOrderAdminEndpoint {
 
   def url(orderId: Long) = {
-    Utils.lookupUrl("WebsiteControllers.getOrder", Map("orderId" -> orderId.toString))
+    Utils.lookupUrl("WebsiteControllers.getOrderAdmin", Map("orderId" -> orderId.toString))
   }
 }

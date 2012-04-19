@@ -9,7 +9,7 @@ import play.mvc.Router.ActionDefinition
 import services.Utils
 import controllers.WebsiteControllers
 
-private[controllers] trait GetEgraphsEndpoint {
+private[controllers] trait GetEgraphsAdminEndpoint {
   this: Controller =>
 
   protected def controllerMethod: ControllerMethod
@@ -17,19 +17,19 @@ private[controllers] trait GetEgraphsEndpoint {
 
   protected def egraphStore: EgraphStore
 
-  def getEgraphs(page: Int = 1) = controllerMethod() {
+  def getEgraphsAdmin(page: Int = 1) = controllerMethod() {
     adminFilters.requireAdministratorLogin { admin =>
       var query = egraphStore.getEgraphsAndResults
       val pagedQuery: (Iterable[(Egraph, VBGVerifySample, XyzmoVerifyUser)], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
-      WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetEgraphsEndpoint.url())
+      WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetEgraphsAdminEndpoint.url())
       views.Application.admin.html.admin_egraphs(egraphAndResults = pagedQuery._1)
     }
   }
 }
 
-object GetEgraphsEndpoint {
+object GetEgraphsAdminEndpoint {
 
   def url(): ActionDefinition = {
-    Utils.lookupUrl("WebsiteControllers.getEgraphs")
+    Utils.lookupUrl("WebsiteControllers.getEgraphsAdmin")
   }
 }

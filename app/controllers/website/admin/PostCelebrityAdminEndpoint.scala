@@ -13,7 +13,7 @@ import services.{ImageUtil, Utils}
 import org.apache.commons.mail.SimpleEmail
 import services.http.{SecurityRequestFilters, AdminRequestFilters, ControllerMethod}
 
-trait PostCelebrityEndpoint {
+trait PostCelebrityAdminEndpoint {
   this: Controller =>
 
   protected def controllerMethod: ControllerMethod
@@ -29,14 +29,14 @@ trait PostCelebrityEndpoint {
    * @return a redirect either to the Create Celebrity page with form errors or to
    *         the created Celebrity's page.
    */
-  def postCelebrity(celebrityId: Long = 0,
-                    celebrityEmail: String,
-                    celebrityPassword: String,
-                    firstName: String,
-                    lastName: String,
-                    publicName: String,
-                    description: String,
-                    profileImage: Option[File] = None) = controllerMethod() {
+  def postCelebrityAdmin(celebrityId: Long = 0,
+                         celebrityEmail: String,
+                         celebrityPassword: String,
+                         firstName: String,
+                         lastName: String,
+                         publicName: String,
+                         description: String,
+                         profileImage: Option[File] = None) = controllerMethod() {
 
     securityFilters.checkAuthenticity{
         adminFilters.requireAdministratorLogin {admin =>
@@ -151,9 +151,9 @@ trait PostCelebrityEndpoint {
     flash.put("publicName", publicName)
     flash.put("description", description)
     if (celebrityId == 0) {
-      WebsiteControllers.redirectWithValidationErrors(GetCreateCelebrityEndpoint.url())
+      WebsiteControllers.redirectWithValidationErrors(GetCreateCelebrityAdminEndpoint.url())
     } else {
-      WebsiteControllers.redirectWithValidationErrors(GetUpdateCelebrityEndpoint.url(celebrityId = celebrityId))
+      WebsiteControllers.redirectWithValidationErrors(GetUpdateCelebrityAdminEndpoint.url(celebrityId = celebrityId))
     }
   }
 }

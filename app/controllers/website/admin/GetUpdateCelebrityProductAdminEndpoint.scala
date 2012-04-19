@@ -5,7 +5,7 @@ import services.Utils
 import services.http.{ControllerMethod, AdminRequestFilters}
 import models.{ProductStore, Celebrity}
 
-private[controllers] trait GetUpdateCelebrityProductEndpoint {
+private[controllers] trait GetUpdateCelebrityProductAdminEndpoint {
   this: Controller =>
 
   protected def controllerMethod: ControllerMethod
@@ -15,7 +15,7 @@ private[controllers] trait GetUpdateCelebrityProductEndpoint {
   /**
    * Serves up the HTML for the Create Celebrity page.
    */
-  def getUpdateCelebrityProduct(productId: Long) = controllerMethod() {
+  def getUpdateCelebrityProductAdmin(productId: Long) = controllerMethod() {
     val productOption = productStore.findById(productId)
     val product = productOption.get
     flash.put("productId", product.id)
@@ -28,9 +28,9 @@ private[controllers] trait GetUpdateCelebrityProductEndpoint {
   }
 }
 
-object GetUpdateCelebrityProductEndpoint {
+object GetUpdateCelebrityProductAdminEndpoint {
 
   def url(productId: Long, celebrity: Celebrity) = {
-    Utils.lookupUrl("WebsiteControllers.getUpdateCelebrityProduct", Map("celebrityId" -> celebrity.id.toString, "productId" -> productId.toString))
+    Utils.lookupUrl("WebsiteControllers.getUpdateCelebrityProductAdmin", Map("celebrityId" -> celebrity.id.toString, "productId" -> productId.toString))
   }
 }

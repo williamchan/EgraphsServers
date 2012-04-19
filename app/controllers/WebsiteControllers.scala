@@ -25,29 +25,29 @@ object WebsiteControllers extends Controller
   with GetOrderConfirmationEndpoint
 
   // admin endpoints
-  with GetAdminRootEndpoint
-  with GetAdminLoginEndpoint
-  with GetAccountsEndpoint
-  with GetUpdateAccountEndpoint
-  with GetCelebritiesEndpoint
-  with GetCelebrityEgraphsEndpoint
-  with GetCelebrityOrdersEndpoint
-  with GetCelebrityProductsEndpoint
-  with GetCreateAccountEndpoint
-  with GetCreateCelebrityEndpoint
-  with GetUpdateCelebrityEndpoint
-  with GetCreateCelebrityProductEndpoint
-  with GetUpdateCelebrityProductEndpoint
-  with GetEgraphsEndpoint
-  with GetOrderEndpoint
-  with GetOrdersEndpoint
-  with PostAdminLoginEndpoint
-  with PostAdminLogoutEndpoint
-  with PostAccountEndpoint
-  with PostCelebrityEndpoint
-  with PostCelebrityProductEndpoint
-  with PostOrderEndpoint
-  with AdminScriptEndpoint
+  with GetRootAdminEndpoint
+  with GetLoginAdminEndpoint
+  with GetAccountsAdminEndpoint
+  with GetUpdateAccountAdminEndpoint
+  with GetCelebritiesAdminEndpoint
+  with GetCelebrityEgraphsAdminEndpoint
+  with GetCelebrityOrdersAdminEndpoint
+  with GetCelebrityProductsAdminEndpoint
+  with GetCreateAccountAdminEndpoint
+  with GetCreateCelebrityAdminEndpoint
+  with GetUpdateCelebrityAdminEndpoint
+  with GetCreateCelebrityProductAdminEndpoint
+  with GetUpdateCelebrityProductAdminEndpoint
+  with GetEgraphsAdminEndpoint
+  with GetOrderAdminEndpoint
+  with GetOrdersAdminEndpoint
+  with PostLoginAdminEndpoint
+  with PostLogoutAdminEndpoint
+  with PostAccountAdminEndpoint
+  with PostCelebrityAdminEndpoint
+  with PostCelebrityProductAdminEndpoint
+  with PostOrderAdminEndpoint
+  with GetScriptAdminEndpoint
 {
 
   import services.AppConfig.instance

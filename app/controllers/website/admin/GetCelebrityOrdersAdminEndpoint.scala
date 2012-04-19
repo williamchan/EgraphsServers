@@ -7,7 +7,7 @@ import play.mvc.Router.ActionDefinition
 import controllers.WebsiteControllers
 import services.Utils
 
-private[controllers] trait GetCelebrityOrdersEndpoint {
+private[controllers] trait GetCelebrityOrdersAdminEndpoint {
   this: Controller =>
 
   protected def controllerMethod: ControllerMethod
@@ -17,7 +17,7 @@ private[controllers] trait GetCelebrityOrdersEndpoint {
   protected def orderStore: OrderStore
   protected def orderQueryFilters: OrderQueryFilters
 
-  def getCelebrityOrders(filter: String = "pendingAdminReview", page: Int = 1) = controllerMethod() {
+  def getCelebrityOrdersAdmin(filter: String = "pendingAdminReview", page: Int = 1) = controllerMethod() {
     adminFilters.requireCelebrity {
       (celebrity, admin) =>
         var query = filter match {
@@ -27,15 +27,15 @@ private[controllers] trait GetCelebrityOrdersEndpoint {
           case _ => orderStore.findByCelebrity(celebrityId = celebrity.id, orderQueryFilters.pendingAdminReview)
         }
         val pagedQuery: (Iterable[Order], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
-        WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebrityOrdersEndpoint.url(celebrity = celebrity))
+        WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebrityOrdersAdminEndpoint.url(celebrity = celebrity))
         views.Application.admin.html.admin_orders(orders = pagedQuery._1, celebrity = Some(celebrity))
     }
   }
 }
 
-object GetCelebrityOrdersEndpoint {
+object GetCelebrityOrdersAdminEndpoint {
 
   def url(celebrity: Celebrity): ActionDefinition = {
-    Utils.lookupUrl("WebsiteControllers.getCelebrityOrders", Map("celebrityId" -> celebrity.id.toString))
+    Utils.lookupUrl("WebsiteControllers.getCelebrityOrdersAdmin", Map("celebrityId" -> celebrity.id.toString))
   }
 }

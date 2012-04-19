@@ -5,22 +5,22 @@ import services.Utils
 import play.mvc.results.Redirect
 import services.http.{AdminRequestFilters, ControllerMethod}
 
-private[controllers] trait GetAdminRootEndpoint {
+private[controllers] trait GetRootAdminEndpoint {
   this: Controller =>
 
   protected def controllerMethod: ControllerMethod
   protected def adminFilters: AdminRequestFilters
 
-  def getAdminRoot = controllerMethod() {
+  def getRootAdmin = controllerMethod() {
     adminFilters.requireAdministratorLogin { admin =>
-      new Redirect(GetCelebritiesEndpoint.url().url)
+      new Redirect(GetCelebritiesAdminEndpoint.url().url)
     }
   }
 }
 
-object GetAdminRootEndpoint {
+object GetRootAdminEndpoint {
 
   def url() = {
-    Utils.lookupUrl("WebsiteControllers.getAdminRoot")
+    Utils.lookupUrl("WebsiteControllers.getRootAdmin")
   }
 }

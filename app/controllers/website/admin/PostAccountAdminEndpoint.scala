@@ -8,7 +8,7 @@ import play.data.validation._
 import services.http.{SecurityRequestFilters, AdminRequestFilters, ControllerMethod}
 import services.Utils
 
-trait PostAccountEndpoint {
+trait PostAccountAdminEndpoint {
   this: Controller =>
 
   protected def controllerMethod: ControllerMethod
@@ -19,9 +19,9 @@ trait PostAccountEndpoint {
   /**
    * For updating an existing Account.
    */
-  def postAccount(accountId: Long = 0,
-                  email: String,
-                  password: String) = controllerMethod() {
+  def postAccountAdmin(accountId: Long = 0,
+                       email: String,
+                       password: String) = controllerMethod() {
 
     securityFilters.checkAuthenticity {
       adminFilters.requireAdministratorLogin { admin =>
@@ -43,7 +43,7 @@ trait PostAccountEndpoint {
               preexistingAccount.copy(email = email).save()
             }
           }
-          new Redirect(Utils.lookupUrl("WebsiteControllers.getAccounts", Map("email" -> email)).url)
+          new Redirect(Utils.lookupUrl("WebsiteControllers.getAccountsAdmin", Map("email" -> email)).url)
         }
       }
     }
@@ -86,9 +86,9 @@ trait PostAccountEndpoint {
     flash.put("email", email)
     flash.put("password", "")
     if (accountId == 0) {
-      WebsiteControllers.redirectWithValidationErrors(GetCreateAccountEndpoint.url())
+      WebsiteControllers.redirectWithValidationErrors(GetCreateAccountAdminEndpoint.url())
     } else {
-      WebsiteControllers.redirectWithValidationErrors(GetUpdateAccountEndpoint.url(accountId = accountId))
+      WebsiteControllers.redirectWithValidationErrors(GetUpdateAccountAdminEndpoint.url(accountId = accountId))
     }
   }
 }

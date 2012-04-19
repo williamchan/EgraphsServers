@@ -12,7 +12,7 @@ import services.logging.Logging
 import services.ImageUtil
 import services.http.{SecurityRequestFilters, ControllerMethod, CelebrityAccountRequestFilters, AdminRequestFilters}
 
-trait PostCelebrityProductEndpoint extends Logging {
+trait PostCelebrityProductAdminEndpoint extends Logging {
   this: Controller =>
 
   protected def controllerMethod: ControllerMethod
@@ -22,13 +22,13 @@ trait PostCelebrityProductEndpoint extends Logging {
   protected def celebrityStore: CelebrityStore
   protected def productStore: ProductStore
 
-  def postCelebrityProduct(productId: Long = 0,
-                           productName: String,
-                           productDescription: String,
-                           productImage: File,
-                           productIcon: File,
-                           storyTitle: String,
-                           storyText: String) = controllerMethod() {
+  def postCelebrityProductAdmin(productId: Long = 0,
+                                productName: String,
+                                productDescription: String,
+                                productImage: File,
+                                productIcon: File,
+                                storyTitle: String,
+                                storyText: String) = controllerMethod() {
 
     securityFilters.checkAuthenticity{
       celebFilters.requireCelebrityId(request) { celebrity =>
@@ -116,9 +116,9 @@ trait PostCelebrityProductEndpoint extends Logging {
     flash.put("storyTitle", storyTitle)
     flash.put("storyText", storyText)
     if (productId == 0) {
-      WebsiteControllers.redirectWithValidationErrors(GetCreateCelebrityProductEndpoint.url(celebrity = celebrity))
+      WebsiteControllers.redirectWithValidationErrors(GetCreateCelebrityProductAdminEndpoint.url(celebrity = celebrity))
     } else {
-      WebsiteControllers.redirectWithValidationErrors(GetUpdateCelebrityProductEndpoint.url(productId = productId, celebrity = celebrity))
+      WebsiteControllers.redirectWithValidationErrors(GetUpdateCelebrityProductAdminEndpoint.url(productId = productId, celebrity = celebrity))
     }
   }
 }

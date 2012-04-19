@@ -59,29 +59,31 @@ POST    ${api}/celebrities/{celebrityId}/orders/{orderId}/egraphs ApiControllers
 ##
 ## Admin
 ##
-GET     /admin                                                     WebsiteControllers.getAdminRoot
-GET     /admin/login                                               WebsiteControllers.getAdminLogin
-POST    /admin/login                                               WebsiteControllers.postAdminLogin
-POST    /admin/logout                                              WebsiteControllers.postAdminLogout
-GET     /admin/accounts                                            WebsiteControllers.getAccounts
-POST    /admin/accounts                                            WebsiteControllers.postAccount
-GET     /admin/accounts/create                                     WebsiteControllers.getCreateAccount
-GET     /admin/accounts/{accountId}                                WebsiteControllers.getUpdateAccount
-GET     /admin/celebrities                                         WebsiteControllers.getCelebrities
-POST    /admin/celebrities                                         WebsiteControllers.postCelebrity
-GET     /admin/celebrities/create                                  WebsiteControllers.getCreateCelebrity
-GET     /admin/celebrities/{celebrityId}                           WebsiteControllers.getUpdateCelebrity
-GET     /admin/celebrities/{celebrityId}/products                  WebsiteControllers.getCelebrityProducts
-POST    /admin/celebrities/{celebrityId}/products                  WebsiteControllers.postCelebrityProduct
-GET     /admin/celebrities/{celebrityId}/products/create           WebsiteControllers.getCreateCelebrityProduct
-GET     /admin/egraphs                                             WebsiteControllers.getEgraphs
-GET     /admin/celebrities/{celebrityId}/egraphs                   WebsiteControllers.getCelebrityEgraphs
-GET     /admin/celebrities/{celebrityId}/orders                    WebsiteControllers.getCelebrityOrders
-GET     /admin/orders                                              WebsiteControllers.getOrders
-GET     /admin/orders/{orderId}                                    WebsiteControllers.getOrder
-POST    /admin/orders/{orderId}                                    WebsiteControllers.postOrder
-GET     /admin/products/{productId}                                WebsiteControllers.getUpdateCelebrityProduct
-GET     /admin/script                                              WebsiteControllers.script
+GET     /admin                                                     WebsiteControllers.getRootAdmin
+GET     /admin/login                                               WebsiteControllers.getLoginAdmin
+POST    /admin/login                                               WebsiteControllers.postLoginAdmin
+POST    /admin/logout                                              WebsiteControllers.postLogoutAdmin
+GET     /admin/accounts                                            WebsiteControllers.getAccountsAdmin
+POST    /admin/accounts                                            WebsiteControllers.postAccountAdmin
+GET     /admin/accounts/create                                     WebsiteControllers.getCreateAccountAdmin
+GET     /admin/accounts/{accountId}                                WebsiteControllers.getUpdateAccountAdmin
+GET     /admin/celebrities                                         WebsiteControllers.getCelebritiesAdmin
+POST    /admin/celebrities                                         WebsiteControllers.postCelebrityAdmin
+GET     /admin/celebrities/create                                  WebsiteControllers.getCreateCelebrityAdmin
+GET     /admin/celebrities/{celebrityId}                           WebsiteControllers.getUpdateCelebrityAdmin
+GET     /admin/celebrities/{celebrityId}/products                  WebsiteControllers.getCelebrityProductsAdmin
+POST    /admin/celebrities/{celebrityId}/products                  WebsiteControllers.postCelebrityProductAdmin
+GET     /admin/celebrities/{celebrityId}/products/create           WebsiteControllers.getCreateCelebrityProductAdmin
+GET     /admin/egraphs                                             WebsiteControllers.getEgraphsAdmin
+GET     /admin/egraphs/{egraphId}                                  WebsiteControllers.getEgraphAdmin
+POST    /admin/egraphs/{egraphId}                                  WebsiteControllers.postEgraphAdmin
+GET     /admin/celebrities/{celebrityId}/egraphs                   WebsiteControllers.getCelebrityEgraphsAdmin
+GET     /admin/celebrities/{celebrityId}/orders                    WebsiteControllers.getCelebrityOrdersAdmin
+GET     /admin/orders                                              WebsiteControllers.getOrdersAdmin
+GET     /admin/orders/{orderId}                                    WebsiteControllers.getOrderAdmin
+POST    /admin/orders/{orderId}                                    WebsiteControllers.postOrderAdmin
+GET     /admin/products/{productId}                                WebsiteControllers.getUpdateCelebrityProductAdmin
+GET     /admin/script                                              WebsiteControllers.getScriptAdmin
 
 ##
 ## Website

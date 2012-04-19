@@ -5,7 +5,7 @@ import services.Utils
 import services.http.{AdminRequestFilters, ControllerMethod}
 import models.{AccountStore, CelebrityStore}
 
-private[controllers] trait GetUpdateCelebrityEndpoint {
+private[controllers] trait GetUpdateCelebrityAdminEndpoint {
   this: Controller =>
 
   protected def controllerMethod: ControllerMethod
@@ -13,7 +13,7 @@ private[controllers] trait GetUpdateCelebrityEndpoint {
   protected def accountStore: AccountStore
   protected def celebrityStore: CelebrityStore
 
-  def getUpdateCelebrity(celebrityId: Long) = controllerMethod() {
+  def getUpdateCelebrityAdmin(celebrityId: Long) = controllerMethod() {
     adminFilters.requireAdministratorLogin { admin =>
       val account = accountStore.findByCelebrityId(celebrityId).get
       val celebrityOption = celebrityStore.findById(celebrityId)
@@ -30,9 +30,9 @@ private[controllers] trait GetUpdateCelebrityEndpoint {
   }
 }
 
-object GetUpdateCelebrityEndpoint {
+object GetUpdateCelebrityAdminEndpoint {
 
   def url(celebrityId: Long) = {
-    Utils.lookupUrl("WebsiteControllers.getUpdateCelebrity", Map("celebrityId" -> celebrityId.toString))
+    Utils.lookupUrl("WebsiteControllers.getUpdateCelebrityAdmin", Map("celebrityId" -> celebrityId.toString))
   }
 }

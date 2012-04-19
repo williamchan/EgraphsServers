@@ -9,7 +9,7 @@ import play.mvc.Router.ActionDefinition
 import services.Utils
 import controllers.WebsiteControllers
 
-private[controllers] trait GetCelebrityEgraphsEndpoint {
+private[controllers] trait GetCelebrityEgraphsAdminEndpoint {
   this: Controller =>
 
   protected def adminFilters: AdminRequestFilters
@@ -18,20 +18,20 @@ private[controllers] trait GetCelebrityEgraphsEndpoint {
   protected def celebrityStore: CelebrityStore
   protected def egraphStore: EgraphStore
 
-  def getCelebrityEgraphs(page: Int = 1) = controllerMethod() {
+  def getCelebrityEgraphsAdmin(page: Int = 1) = controllerMethod() {
     adminFilters.requireCelebrity {
       (celebrity, admin) =>
         var query = egraphStore.getCelebrityEgraphsAndResults(celebrity)
         val pagedQuery: (Iterable[(Egraph, VBGVerifySample, XyzmoVerifyUser)], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
-        WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebrityEgraphsEndpoint.url(celebrity = celebrity))
+        WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebrityEgraphsAdminEndpoint.url(celebrity = celebrity))
         views.Application.admin.html.admin_celebrityegraphs(celebrity = celebrity, egraphsAndResults = pagedQuery._1)
     }
   }
 }
 
-object GetCelebrityEgraphsEndpoint {
+object GetCelebrityEgraphsAdminEndpoint {
 
   def url(celebrity: Celebrity): ActionDefinition = {
-    Utils.lookupUrl("WebsiteControllers.getCelebrityEgraphs", Map("celebrityId" -> celebrity.id.toString))
+    Utils.lookupUrl("WebsiteControllers.getCelebrityEgraphsAdmin", Map("celebrityId" -> celebrity.id.toString))
   }
 }
