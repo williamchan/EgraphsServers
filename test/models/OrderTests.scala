@@ -164,9 +164,9 @@ class OrderTests extends UnitFlatSpec
     orderStore.findById(charged.order.id) should not be (None)
     cashTransactionStore.findById(charged.transaction.id) should not be (None)
     charged.order.stripeChargeId should not be (None)
-    
+
   }
-  
+
   "findByCelebrity" should "find all of a Celebrity's orders by default" in {
 
     val (will, _, celebrity, product) = newOrderStack

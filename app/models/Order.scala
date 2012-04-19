@@ -4,7 +4,7 @@ import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
 import org.joda.money.Money
 import models.CashTransaction.EgraphPurchase
-import services.db.{FilterThreeTables, KeyedCaseClass, Schema, Saves}
+import services.db.{FilterOneTable, KeyedCaseClass, Schema, Saves}
 import services.Finance.TypeConversions._
 import EgraphState._
 import org.apache.commons.mail.HtmlEmail
@@ -283,7 +283,7 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
    * Finds a list of Orders based on the id of the Celebrity
    * who owns the Product that was purchased.
    */
-  def findByCelebrity(celebrityId: Long, filters: FilterThreeTables[Celebrity, Product, Order]*): Query[Order] = {
+  def findByCelebrity(celebrityId: Long, filters: FilterOneTable[Order]*): Query[Order] = {
     import schema.{celebrities, products, orders}
 
     from(celebrities, products, orders)((celebrity, product, order) =>
@@ -291,19 +291,19 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
         celebrity.id === celebrityId and
           celebrity.id === product.celebrityId and
           product.id === order.productId and
-          FilterThreeTables.reduceFilters(filters, celebrity, product, order)
+          FilterOneTable.reduceFilters(filters, order)
       )
         select (order)
         orderBy (order.created asc)
     )
   }
 
-  def findByFilter(filters: FilterThreeTables[Celebrity, Product, Order]*): Query[Order] = {
-    import schema.{celebrities, products, orders}
+  def findByFilter(filters: FilterOneTable[Order]*): Query[Order] = {
+    import schema.orders
 
-    from(celebrities, products, orders)((celebrity, product, order) =>
+    from(orders)((order) =>
       where(
-        FilterThreeTables.reduceFilters(filters, celebrity, product, order)
+        FilterOneTable.reduceFilters(filters, order)
       )
         select (order)
         orderBy (order.created asc)
@@ -347,9 +347,9 @@ class OrderQueryFilters @Inject() (schema: Schema) {
 
   def actionableOnly = List(actionableEgraphs, approvedByAdmin)
 
-  private def actionableEgraphs: FilterThreeTables[Celebrity, Product, Order] = {
-    new FilterThreeTables[Celebrity, Product, Order] {
-      override def test(celebrity: Celebrity, product: Product, order: Order) = {
+  private def actionableEgraphs: FilterOneTable[Order] = {
+    new FilterOneTable[Order] {
+      override def test(order: Order) = {
         notExists(
           from(schema.egraphs)(egraph =>
             where((egraph.orderId === order.id) and (egraph.stateValue in Seq(Verified.value, AwaitingVerification.value)))
@@ -360,33 +360,33 @@ class OrderQueryFilters @Inject() (schema: Schema) {
     }
   }
 
-  private def approvedByAdmin: FilterThreeTables[Celebrity, Product, Order] = {
-    new FilterThreeTables[Celebrity, Product, Order] {
-      override def test(celebrity: Celebrity, product: Product, order: Order) = {
+  private def approvedByAdmin: FilterOneTable[Order] = {
+    new FilterOneTable[Order] {
+      override def test(order: Order) = {
         (order.reviewStatus === Order.ReviewStatus.ApprovedByAdmin.stateValue)
       }
     }
   }
 
-  def pendingAdminReview: FilterThreeTables[Celebrity, Product, Order] = {
-    new FilterThreeTables[Celebrity, Product, Order] {
-      override def test(celebrity: Celebrity, product: Product, order: Order) = {
+  def pendingAdminReview: FilterOneTable[Order] = {
+    new FilterOneTable[Order] {
+      override def test(order: Order) = {
         (order.reviewStatus === Order.ReviewStatus.PendingAdminReview.stateValue)
       }
     }
   }
 
-  def rejected: FilterThreeTables[Celebrity, Product, Order] = {
-    new FilterThreeTables[Celebrity, Product, Order] {
-      override def test(celebrity: Celebrity, product: Product, order: Order) = {
+  def rejected: FilterOneTable[Order] = {
+    new FilterOneTable[Order] {
+      override def test(order: Order) = {
         (order.reviewStatus in Seq(Order.ReviewStatus.RejectedByAdmin.stateValue, Order.ReviewStatus.RejectedByCelebrity.stateValue))
       }
     }
   }
 
-  def orderId(id: Long): FilterThreeTables[Celebrity, Product, Order] = {
-    new FilterThreeTables[Celebrity, Product, Order] {
-      override def test(celebrity: Celebrity, product: Product, order: Order) = {
+  def orderId(id: Long): FilterOneTable[Order] = {
+    new FilterOneTable[Order] {
+      override def test(order: Order) = {
         (order.id === id)
       }
     }
