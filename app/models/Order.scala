@@ -121,7 +121,7 @@ case class Order(
   def rejectByCelebrity(celebrity: Celebrity, rejectionReason: Option[String] = None): Order = {
     require(celebrity != null, "Must be rejected by Celebrity associated with this Order")
     require(celebrity.id == product.celebrityId, "Must be rejected by Celebrity associated with this Order")
-    require(reviewStatus == Order.ReviewStatus.PendingAdminReview.stateValue, "Must be ApprovedByAdmin before rejecting by celebrity")
+    require(reviewStatus == Order.ReviewStatus.ApprovedByAdmin.stateValue, "Must be ApprovedByAdmin before rejecting by celebrity")
     val order = this.copy(reviewStatus = Order.ReviewStatus.RejectedByCelebrity.stateValue, rejectionReason = rejectionReason)
     // refund charge?
     order
@@ -165,7 +165,8 @@ case class Order(
       "buyerName" -> buyer.name,
       "recipientId" -> recipient.id,
       "recipientName" -> recipientName,
-      "amountPaidInCents" -> amountPaid.getAmountMinor
+      "amountPaidInCents" -> amountPaid.getAmountMinor,
+      "reviewStatus" -> reviewStatus
     )
 
     val optionalFields = Utils.makeOptionalFieldMap(

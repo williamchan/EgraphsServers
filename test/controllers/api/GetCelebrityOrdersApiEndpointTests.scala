@@ -7,9 +7,9 @@ import sjson.json.Serializer
 import utils.FunctionalTestUtils.{CleanDatabaseAfterEachTest, willChanRequest, runScenarios}
 import scenario.Scenarios
 import models._
-import utils.TestConstants
 import services.AppConfig
 import services.db.{TransactionSerializable, DBSession}
+import utils.{FunctionalTestUtils, TestConstants}
 
 class GetCelebrityOrdersApiEndpointTests extends FunctionalTest with CleanDatabaseAfterEachTest {
 
@@ -20,7 +20,7 @@ class GetCelebrityOrdersApiEndpointTests extends FunctionalTest with CleanDataba
 
   @Test
   def testGetCelebrityOrders() {
-    runWillChanScenariosThroughOrder()
+    FunctionalTestUtils.runWillChanScenariosThroughOrder()
 
     // Assemble the request
     val req = willChanRequest
@@ -51,7 +51,7 @@ class GetCelebrityOrdersApiEndpointTests extends FunctionalTest with CleanDataba
 
   @Test
   def testGetOrdersFiltersOutOrdersWithEgraphWithAwaitingVerificationState() {
-    runWillChanScenariosThroughOrder()
+    FunctionalTestUtils.runWillChanScenariosThroughOrder()
 
     db.connected(TransactionSerializable) {
       val celebrityId = Scenarios.getWillCelebrityAccount.id
@@ -67,7 +67,7 @@ class GetCelebrityOrdersApiEndpointTests extends FunctionalTest with CleanDataba
 
   @Test
   def testGetOrdersFiltersOutOrdersWithEgraphWithVerifiedState() {
-    runWillChanScenariosThroughOrder()
+    FunctionalTestUtils.runWillChanScenariosThroughOrder()
 
     db.connected(TransactionSerializable) {
       val celebrityId = Scenarios.getWillCelebrityAccount.id
@@ -83,7 +83,7 @@ class GetCelebrityOrdersApiEndpointTests extends FunctionalTest with CleanDataba
 
   @Test
   def testGetOrdersIncludesOrdersWithRejectedEgraphs() {
-    runWillChanScenariosThroughOrder()
+    FunctionalTestUtils.runWillChanScenariosThroughOrder()
 
     db.connected(TransactionSerializable) {
       import EgraphState._
@@ -100,15 +100,5 @@ class GetCelebrityOrdersApiEndpointTests extends FunctionalTest with CleanDataba
     assertIsOk(response)
     val json = Serializer.SJSON.in[List[Map[String, Any]]](getContent(response))
     assertEquals(json.length, 2)
-  }
-
-  private def runWillChanScenariosThroughOrder() {
-    runScenarios(
-      "Will-Chan-is-a-celebrity",
-      "Will-has-two-products",
-      "Erem-is-a-customer",
-      "Erem-buys-Wills-two-products-twice-each",
-      "Deliver-All-Orders-to-Celebrities"
-    )
   }
 }

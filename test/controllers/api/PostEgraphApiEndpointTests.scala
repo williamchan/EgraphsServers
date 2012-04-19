@@ -5,11 +5,10 @@ import org.junit.Assert._
 import org.junit.Test
 import play.test.FunctionalTest
 import sjson.json.Serializer
-import utils.TestConstants
-import utils.{DBTransactionPerTest, EgraphsUnitTest}
-import utils.FunctionalTestUtils.{CleanDatabaseAfterEachTest, willChanRequest, runScenarios}
+import utils.FunctionalTestUtils.{CleanDatabaseAfterEachTest, willChanRequest}
 import services.AppConfig
 import services.http.HttpCodes
+import utils.{FunctionalTestUtils, TestConstants, DBTransactionPerTest, EgraphsUnitTest}
 
 class PostEgraphApiEndpointTests extends EgraphsUnitTest with DBTransactionPerTest {
   "PostEgraphApiEndpoint" should "save an egraph with status Verified if it skips biometrics" in {
@@ -32,7 +31,7 @@ class PostEgraphApiEndpointFunctionalTests extends FunctionalTest with CleanData
 
   @Test
   def testPostEgraph() {
-    runWillChanScenariosThroughOrder()
+    FunctionalTestUtils.runWillChanScenariosThroughOrder()
 
     val ordersResponse = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/orders?signerActionable=true")
     val ordersList = Serializer.SJSON.in[List[Map[String, Any]]](getContent(ordersResponse))
@@ -56,8 +55,8 @@ class PostEgraphApiEndpointFunctionalTests extends FunctionalTest with CleanData
   }
 
   @Test
-  def testPostEgraphAcceptsMessage {
-    runWillChanScenariosThroughOrder()
+  def testPostEgraphAcceptsMessage() {
+    FunctionalTestUtils.runWillChanScenariosThroughOrder()
 
     val signatureStr = TestConstants.signatureStr
     val audioStr = TestConstants.voiceStrPercentEncoded()
@@ -74,12 +73,11 @@ class PostEgraphApiEndpointFunctionalTests extends FunctionalTest with CleanData
   }
 
   @Test
-  def testPostEgraphAcceptsEmptyMessage {
-    runWillChanScenariosThroughOrder()
+  def testPostEgraphAcceptsEmptyMessage() {
+    FunctionalTestUtils.runWillChanScenariosThroughOrder()
 
     val signatureStr = TestConstants.signatureStr
     val audioStr = TestConstants.voiceStrPercentEncoded()
-    val message = TestConstants.messageStr
 
     val emptyMessageResponse = POST(
       willChanRequest,
@@ -101,7 +99,7 @@ class PostEgraphApiEndpointFunctionalTests extends FunctionalTest with CleanData
 
   @Test
   def testPostEgraphRejectsEmptySignatureAndAudio() {
-    runWillChanScenariosThroughOrder()
+    FunctionalTestUtils.runWillChanScenariosThroughOrder()
 
     val emptyStringSignatureResponse = POST(
       willChanRequest,
@@ -139,7 +137,7 @@ class PostEgraphApiEndpointFunctionalTests extends FunctionalTest with CleanData
 
   @Test
   def testPostEgraphDrainsOrdersQueue() {
-    runWillChanScenariosThroughOrder()
+    FunctionalTestUtils.runWillChanScenariosThroughOrder()
 
     var numOrders = 2
     val ordersResponse = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/orders?signerActionable=true")
@@ -159,15 +157,5 @@ class PostEgraphApiEndpointFunctionalTests extends FunctionalTest with CleanData
       val ordersList1 = Serializer.SJSON.in[List[Map[String, Any]]](getContent(ordersResponse1))
       assertEquals(numOrders, ordersList1.length)
     }
-  }
-
-  private def runWillChanScenariosThroughOrder() {
-    runScenarios(
-      "Will-Chan-is-a-celebrity",
-      "Will-has-two-products",
-      "Erem-is-a-customer",
-      "Erem-buys-Wills-two-products-twice-each",
-      "Deliver-All-Orders-to-Celebrities"
-    )
   }
 }

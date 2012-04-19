@@ -12,6 +12,7 @@ object ApiControllers extends Controller
   with GetCelebrityApiEndpoint
   with GetCelebrityProductsApiEndpoint
   with GetCelebrityOrdersApiEndpoint
+  with PostCelebrityOrderApiEndpoint
   with PostEgraphApiEndpoint
   with PostEnrollmentSampleApiEndpoint
 {

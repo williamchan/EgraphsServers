@@ -4,9 +4,6 @@ import models.Account
 import play.mvc.Http.Request
 import play.test.FunctionalTest
 import org.junit.After
-import services.AppConfig
-import services.db.{TransactionSerializable, DBSession}
-import scenario.Scenario
 
 /**
  * Common functionality required when writing functional tests against
@@ -43,6 +40,16 @@ object FunctionalTestUtils {
     if (response.status != 200) {
       throw new IllegalArgumentException("Unknown scenario name " + name)
     }
+  }
+
+  def runWillChanScenariosThroughOrder() {
+    runScenarios(
+      "Will-Chan-is-a-celebrity",
+      "Will-has-two-products",
+      "Erem-is-a-customer",
+      "Erem-buys-Wills-two-products-twice-each",
+      "Deliver-All-Orders-to-Celebrities"
+    )
   }
 
   trait CleanDatabaseAfterEachTest { this: FunctionalTest =>

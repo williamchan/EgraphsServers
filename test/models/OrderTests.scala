@@ -126,6 +126,7 @@ class OrderTests extends UnitFlatSpec
     rendered("recipientId") should be (recipient.id)
     rendered("recipientName") should be (recipientName)
     rendered("amountPaidInCents") should be (order.amountPaid.getAmountMinor)
+    rendered("reviewStatus") should be (order.reviewStatus)
     rendered("requestedMessage") should be (order.requestedMessage.get)
     rendered("messageToCelebrity") should be (order.messageToCelebrity.get)
     rendered("created") should be (Time.toApiFormat(order.created))
