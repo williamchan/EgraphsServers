@@ -35,12 +35,8 @@
 
 @price = {@product.price.formatSimply}
 
-@urlSlugMap = @{
-  Map("celebrityUrlSlug" -> celebrity.urlSlug.get, "productUrlSlug" -> product.urlSlug)
-}
-
 @buyPage = @{
-  lookupUrl("WebsiteControllers.postBuyProduct", urlSlugMap)
+  lookupUrl("WebsiteControllers.postBuyProduct", Map("celebrityUrlSlug" -> celebrity.urlSlug.get, "productUrlSlug" -> product.urlSlug))
 }
 
 @body = {

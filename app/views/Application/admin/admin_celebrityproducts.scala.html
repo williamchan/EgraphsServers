@@ -10,12 +10,8 @@
 
 @content_base(title="Admin - Products", body=body, head=head)
 
-@celebrityIdMap = @{
-Map("celebrityId" -> celebrity.id.toString)
-}
-
 @getCreateCelebrityProduct = @{
-lookupUrl("WebsiteControllers.getCreateCelebrityProduct", celebrityIdMap)
+  lookupUrl("WebsiteControllers.getCreateCelebrityProduct", Map("celebrityId" -> celebrity.id.toString))
 }
 
 @head = {
