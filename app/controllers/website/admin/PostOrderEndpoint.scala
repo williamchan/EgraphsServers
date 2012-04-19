@@ -25,7 +25,8 @@ trait PostOrderEndpoint {
             new Redirect(GetOrderEndpoint.url(orderId).url)
           }
           case Some(Order.ReviewStatus.RejectedByAdmin) => {
-            order.rejectByAdmin(admin).save()
+            val rejectionReason = params.get("rejectionReason")
+            order.rejectByAdmin(admin, rejectionReason = Some(rejectionReason)).save()
             new Redirect(GetOrderEndpoint.url(orderId).url)
           }
           case _ => Forbidden("Unsupported operation")

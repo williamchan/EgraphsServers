@@ -40,6 +40,10 @@
         <input name="reviewStatus" type="hidden" value="@models.Order.ReviewStatus.RejectedByAdmin">
         <div class="actions">
           <h3>Reject so that Celebrity will not see this order</h3>
+          <label>Rejection Reason</label>
+          <div class="input">
+            <input name="rejectionReason" type="text" maxlength="128"/>
+          </div>
           <button type="submit" id="reject-button" class="btn primary fade in">Reject</button>
         </div>
       </form>
@@ -54,6 +58,9 @@
   </h1>
   <h2>Admin Review</h2>
   @valueRow(label="Review Status",        value=order.reviewStatus)
+  @valueRow(label="RecipientName",        value=order.recipientName)
+  @valueRow(label="Message To Celebrity", value=order.messageToCelebrity)
+  @valueRow(label="Requested Message",    value=order.requestedMessage)
   @reviewControls
   <hr/>
   <h2>Order Details</h2>
@@ -61,9 +68,6 @@
   @valueRow(label="Product",              value=order.productId, href=productUrl().url)
   @valueRow(label="Buyer",                value=order.buyerId)
   @valueRow(label="RecipientId",          value=order.recipientId)
-  @valueRow(label="RecipientName",        value=order.recipientName)
-  @valueRow(label="Message To Celebrity", value=order.messageToCelebrity)
-  @valueRow(label="Requested Message",    value=order.requestedMessage)
   @valueRow(label="Created",              value=order.created)
   @valueRow(label="Updated",              value=order.updated)
   <hr/>
