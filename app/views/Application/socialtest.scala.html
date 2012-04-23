@@ -1,4 +1,8 @@
 @()
+
+@tweetText = @{"Check our my Egraph!"}
+@tweetLink = @{"http://www.google.com"}
+
 <!doctype html>
 <html>
 <head>
@@ -13,6 +17,8 @@
 <script src='http://connect.facebook.net/en_US/all.js'></script>
 <p><a onclick='postToFeed(); return false;'>Post to Facebook Feed</a></p>
 <p id='msg'></p>
+
+<a href="https://twitter.com/share" class="twitter-share-button" data-text="@tweetText" data-url="@tweetLink" data-count="none">Tweet</a>
 
 <script>
   FB.init({appId: "156115741184892", status: true, cookie: true});
@@ -36,6 +42,16 @@
     FB.ui(obj, callback);
   }
 </script>
-
+<script>
+  !function (d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (!d.getElementById(id)) {
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "//platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+    }
+  }(document, "script", "twitter-wjs");
+</script>
 </body>
 </html>
