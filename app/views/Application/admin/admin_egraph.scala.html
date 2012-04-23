@@ -1,4 +1,5 @@
-@(egraph: models.Egraph)(implicit session: play.mvc.Scope.Session)
+@(egraph: models.Egraph, voiceResult: Option[models.vbg.VBGVerifySample], signatureResult: Option[models.xyzmo.XyzmoVerifyUser]
+)(implicit session: play.mvc.Scope.Session)
 
 @import controllers.WebsiteControllers
 @import services.Utils.lookupUrl
@@ -79,5 +80,12 @@ lookupUrl("WebsiteControllers.postEgraphAdmin", Map("egraphId" -> egraph.id.toSt
   @valueRow(label="RecipientName",        value=order.recipientName)
   @valueRow(label="Message To Celebrity", value=order.messageToCelebrity)
   @valueRow(label="Requested Message",    value=order.requestedMessage)
+  @valueRow(label="Order",                value=egraph.orderId)
+  <hr/>
+  <h2>Biometric Results</h2>
+  @valueRow(label="Signature Result",     value=signatureResult.map(s => s.resultStr).headOption)
+  @valueRow(label="Voice Result",         value=voiceResult.map(v => v.resultStr).headOption)
+  @valueRow(label="Voice TxnId",          value=voiceResult.map(v => v.vbgTransactionId).headOption)
+  @valueRow(label="Voice Code",           value=voiceResult.map(v => v.errorCode).headOption)
 </div>
 }

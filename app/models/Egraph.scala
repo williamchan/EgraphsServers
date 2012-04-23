@@ -5,9 +5,8 @@ import services.blobs.AccessPolicy
 import java.awt.image.BufferedImage
 import services.blobs.Blobs
 import org.jclouds.blobstore.domain.Blob
-import vbg.VBGVerifySample
 import services.voice.{VoiceBiometricsError, YesMaamVoiceBiometricService, VoiceBiometricService}
-import xyzmo.XyzmoVerifyUser
+import vbg.{VBGVerifySampleStore, VBGVerifySample}
 import services.signature.{SignatureBiometricsError, YesMaamSignatureBiometricService, SignatureBiometricService}
 import services._
 import db.{FilterOneTable, Schema, KeyedCaseClass, Saves}
@@ -19,11 +18,14 @@ import play.utils.HTML.htmlEscape
 import org.squeryl.Query
 import org.squeryl.PrimitiveTypeMode._
 import models.Egraph.EgraphState
+import xyzmo.{XyzmoVerifyUserStore, XyzmoVerifyUser}
 
 case class EgraphServices @Inject() (
   store: EgraphStore,
   celebStore: CelebrityStore,
   orderStore: OrderStore,
+  vbgVerifySampleStore: VBGVerifySampleStore,
+  xyzmoVerifyUserStore: XyzmoVerifyUserStore,
   images: ImageUtil,
   blobs: Blobs,
   voiceBiometrics: VoiceBiometricService,
@@ -152,6 +154,14 @@ case class Egraph(
     val vbgVerifySample: Option[VBGVerifySample] = verifyVoice
     val xyzmoVerifyUser: Option[XyzmoVerifyUser] = verifySignature
     withRecalculatedStatus(vbgVerifySample = vbgVerifySample, xyzmoVerifyUser = xyzmoVerifyUser)
+  }
+
+  def signatureResult: Option[XyzmoVerifyUser] = {
+    services.xyzmoVerifyUserStore.findByEgraph(this)
+  }
+
+  def voiceResult: Option[VBGVerifySample] = {
+    services.vbgVerifySampleStore.findByEgraph(this)
   }
 
   /**

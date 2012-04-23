@@ -37,6 +37,10 @@ case class VBGVerifySample(id: Long = 0,
 
   def getErrorCode: String = errorCode
 
+  def resultStr: String = {
+    success.getOrElse("") + " (" + score.getOrElse("") + ")"
+  }
+
   //
   // KeyedCaseClass[Long] methods
   //

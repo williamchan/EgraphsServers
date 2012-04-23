@@ -52,6 +52,10 @@ case class XyzmoVerifyUser(id: Long = 0,
       score = score)
   }
 
+  def resultStr: String = {
+    isMatch.getOrElse("") + " (" + score.getOrElse("") + ")"
+  }
+
   //
   // KeyedCaseClass[Long] methods
   //
