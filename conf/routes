@@ -89,6 +89,9 @@ GET     /admin/script                                              WebsiteContro
 ## Website
 ##
 
+# social media exploratory work
+GET     /socialtest                                      WebsiteControllers.getSocialTest
+
 # Order and Egraph pages
 GET     /orders/{<[0-9]+>orderId}/confirm                WebsiteControllers.getOrderConfirmation
 GET     /egraph/{<[0-9]+>orderId}                        WebsiteControllers.getEgraph

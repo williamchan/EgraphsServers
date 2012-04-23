@@ -1,0 +1,41 @@
+@()
+<!doctype html>
+<html>
+<head>
+  <title>Egraphs social media test page</title>
+  <link href='@asset("public/styles/egraph.css")' rel="stylesheet" type="text/css" >
+</head>
+<body>
+<div class="container" id="egraph-page">
+</div>
+
+<div id='fb-root'></div>
+<script src='http://connect.facebook.net/en_US/all.js'></script>
+<p><a onclick='postToFeed(); return false;'>Post to Facebook Feed</a></p>
+<p id='msg'></p>
+
+<script>
+  FB.init({appId: "156115741184892", status: true, cookie: true});
+
+  function postToFeed() {
+
+    // calling the API ...
+    var obj = {
+      method: 'feed',
+      link: 'www.egraphs.com',
+      picture: 'http://fbrell.com/f8.jpg',
+      name: 'Post Name',
+      caption: 'Post Caption',
+      description: 'Post Description.'
+    };
+
+    function callback(response) {
+      document.getElementById('msg').innerHTML = "Post ID: " + response['post_id'];
+    }
+
+    FB.ui(obj, callback);
+  }
+</script>
+
+</body>
+</html>

@@ -50,6 +50,9 @@ object WebsiteControllers extends Controller
   with PostCelebrityProductAdminEndpoint
   with PostOrderAdminEndpoint
   with GetScriptAdminEndpoint
+
+  // social media exploratory work
+  with GetSocialTestEndpoint
 {
 
   import services.AppConfig.instance
