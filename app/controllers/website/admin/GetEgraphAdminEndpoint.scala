@@ -4,6 +4,7 @@ import play.mvc.Controller
 import services.Utils
 import services.http.{AdminRequestFilters, ControllerMethod}
 import models.EgraphStore
+import controllers.website.GetEgraphEndpoint
 
 private[controllers] trait GetEgraphAdminEndpoint { this: Controller =>
 
@@ -11,14 +12,17 @@ private[controllers] trait GetEgraphAdminEndpoint { this: Controller =>
   protected def egraphStore: EgraphStore
   protected def controllerMethod: ControllerMethod
 
-  def getEgraphAdmin(egraphId: Long) = controllerMethod() {
-    adminFilters.requireAdministratorLogin { admin =>
-      egraphStore.findById(egraphId) match {
-        case Some(egraph) => {
-          views.Application.admin.html.admin_egraph(egraph = egraph, signatureResult = egraph.signatureResult, voiceResult = egraph.voiceResult)
+  def getEgraphAdmin(egraphId: Long, action: Option[String] = None) = controllerMethod() {
+    action match {
+      case Some("preview") => {
+        adminFilters.requireEgraph { (egraph, admin) =>
+          GetEgraphEndpoint.html(egraph = egraph, order = egraph.order)
         }
-        case None => {
-          NotFound("Egraph with id " + egraphId.toString + " not found")
+      }
+
+      case _ => {
+        adminFilters.requireEgraph { (egraph, admin) =>
+          views.Application.admin.html.admin_egraph(egraph = egraph, signatureResult = egraph.signatureResult, voiceResult = egraph.voiceResult)
         }
       }
     }

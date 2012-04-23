@@ -17,7 +17,7 @@
 @order = @{egraph.order}
 
 @postEgraph = @{
-lookupUrl("WebsiteControllers.postEgraphAdmin", Map("egraphId" -> egraph.id.toString))
+  lookupUrl("WebsiteControllers.postEgraphAdmin", Map("egraphId" -> egraph.id.toString))
 }
 
 @approveControls = {
@@ -68,13 +68,15 @@ lookupUrl("WebsiteControllers.postEgraphAdmin", Map("egraphId" -> egraph.id.toSt
   </h1>
   <h2>Admin Review</h2>
   @valueRow(label="Egraph State",         value=egraph.stateValue)
+  <a href="?action=preview" target="Admin - Preview Egraph">Preview Egraph</a>
   @approveControls
   @publishControls
   <hr/>
-  <h2>Egraph Details</h2>
-  @valueRow(label="Id",                   value=egraph.id)
-  @valueRow(label="Created",              value=egraph.created)
-  @valueRow(label="Updated",              value=egraph.updated)
+  <h2>Biometric Results</h2>
+  @valueRow(label="Signature Result",     value=signatureResult.map(s => s.resultStr).headOption)
+  @valueRow(label="Voice Result",         value=voiceResult.map(v => v.resultStr).headOption)
+  @valueRow(label="Voice TxnId",          value=voiceResult.map(v => v.vbgTransactionId).headOption)
+  @valueRow(label="Voice Code",           value=voiceResult.map(v => v.errorCode).headOption)
   <hr/>
   <h2>Order Details</h2>
   @valueRow(label="RecipientName",        value=order.recipientName)
@@ -82,10 +84,9 @@ lookupUrl("WebsiteControllers.postEgraphAdmin", Map("egraphId" -> egraph.id.toSt
   @valueRow(label="Requested Message",    value=order.requestedMessage)
   @valueRow(label="Order",                value=egraph.orderId)
   <hr/>
-  <h2>Biometric Results</h2>
-  @valueRow(label="Signature Result",     value=signatureResult.map(s => s.resultStr).headOption)
-  @valueRow(label="Voice Result",         value=voiceResult.map(v => v.resultStr).headOption)
-  @valueRow(label="Voice TxnId",          value=voiceResult.map(v => v.vbgTransactionId).headOption)
-  @valueRow(label="Voice Code",           value=voiceResult.map(v => v.errorCode).headOption)
+  <h2>Egraph Details</h2>
+  @valueRow(label="Id",                   value=egraph.id)
+  @valueRow(label="Created",              value=egraph.created)
+  @valueRow(label="Updated",              value=egraph.updated)
 </div>
 }

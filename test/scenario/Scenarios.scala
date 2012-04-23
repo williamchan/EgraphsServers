@@ -20,20 +20,19 @@ import services.{Utils, AppConfig}
  */
 class Scenarios extends DeclaresScenarios {
   // Helpful services
-  val blobs = AppConfig.instance[Blobs]
-  val payment = AppConfig.instance[Payment]
-  val schema = AppConfig.instance[Schema]
-  val accountStore = AppConfig.instance[AccountStore]
+  private val blobs = AppConfig.instance[Blobs]
+  private val payment = AppConfig.instance[Payment]
+  private val schema = AppConfig.instance[Schema]
 
   // Categories of scenario
-  val adminCategory = "Admin Helpers"
-  val apiCategory = "API Helpers"
-  val celebrityPageCategory = "Celebrity Page"
-  val productPageCategory = "Product Page"
-  val orderConfirmationPageCategory = "Order Confirmation Page"
-  val egraphPageCategory = "Egraph Page"
+  private val adminCategory = "Admin Helpers"
+  private val apiCategory = "API Helpers"
+  private val celebrityPageCategory = "Celebrity Page"
+  private val productPageCategory = "Product Page"
+  private val orderConfirmationPageCategory = "Order Confirmation Page"
+  private val egraphPageCategory = "Egraph Page"
 
-  val mail = AppConfig.instance[services.mail.Mail]
+  private val mail = AppConfig.instance[services.mail.Mail]
 
   toScenarios add Scenario(
     "Send an email to erem@egraphs.com",
@@ -148,7 +147,7 @@ class Scenarios extends DeclaresScenarios {
     apiCategory,
 
     """
-    Creates four unfulfilled orders, each ordered twice against Will's
+    Creates two unfulfilled orders, one each ordered against Will's
     two products.
     """,
 
@@ -174,12 +173,9 @@ class Scenarios extends DeclaresScenarios {
 
   toScenarios add Scenario(
     "Will fulfills one of Erem's product orders",
-
     apiCategory,
-
     """
-    Creates four unfulfilled orders, each ordered twice against Will's
-    two products.
+    Will fulfills one of Erem's product orders
     """,
 
     {() =>
@@ -190,13 +186,15 @@ class Scenarios extends DeclaresScenarios {
         select (order)
       ).headOption.get
 
-      firstOrder
+      val egraph = firstOrder
         .newEgraph
         .withAssets(TestConstants.signatureStr, Some(TestConstants.messageStr), Codec.decodeBASE64(TestConstants.voiceStr()))
         .save()
         .withYesMaamBiometricServices
         .verifyBiometrics
         .save()
+
+      egraph.assets.initMasterImage()
     }
   )
 
@@ -413,11 +411,12 @@ class Scenarios extends DeclaresScenarios {
         "Will-has-two-products",
         "Erem-is-a-customer",
         "Erem-buys-Wills-two-products-twice-each",
+        "Deliver-All-Orders-to-Celebrities",
         "Will-fulfills-one-of-Erems-product-orders"
       )
 
       new Redirect(
-        WebsiteControllers.lookupGetEgraph(1).url
+        WebsiteControllers.lookupGetEgraph(2).url
       )
     }
   )
