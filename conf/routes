@@ -90,7 +90,9 @@ GET     /admin/script                                              WebsiteContro
 ##
 
 # social media exploratory work
-GET     /socialtest                                      WebsiteControllers.getSocialTest
+GET     /socialpost                                      WebsiteControllers.getSocialPost
+GET     /facebooklogin                                   WebsiteControllers.getFacebookLogin
+POST    /facebooklogin/callback                          WebsiteControllers.postFacebookLoginCallback
 
 # Order and Egraph pages
 GET     /orders/{<[0-9]+>orderId}/confirm                WebsiteControllers.getOrderConfirmation

@@ -2,6 +2,7 @@ package controllers
 
 import website._
 import admin._
+import example.{PostFacebookLoginCallbackEndpoint, GetFacebookLoginEndpoint, GetSocialPostEndpoint}
 import nonproduction.PostBuyDemoProductEndpoint
 import website.GetRootEndpoint
 import services.blobs.Blobs
@@ -52,7 +53,9 @@ object WebsiteControllers extends Controller
   with GetScriptAdminEndpoint
 
   // social media exploratory work
-  with GetSocialTestEndpoint
+  with GetSocialPostEndpoint
+  with GetFacebookLoginEndpoint
+  with PostFacebookLoginCallbackEndpoint
 {
 
   import services.AppConfig.instance
