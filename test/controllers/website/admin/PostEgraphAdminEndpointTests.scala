@@ -22,7 +22,7 @@ class PostEgraphAdminEndpointTests extends AdminFunctionalTest with CleanDatabas
     var egraph1: Egraph = null
     var egraph2: Egraph = null
     db.connected(TransactionSerializable) {
-      val order = EgraphTests.persistedOrder
+      val order = EgraphTests.persistedOrder()
       egraph1 = Egraph(orderId = order.id).withState(PassedBiometrics).saveWithoutAssets()
       egraph2 = Egraph(orderId = order.id).withState(FailedBiometrics).saveWithoutAssets()
     }
@@ -44,7 +44,7 @@ class PostEgraphAdminEndpointTests extends AdminFunctionalTest with CleanDatabas
     var egraph1: Egraph = null
     var egraph2: Egraph = null
     db.connected(TransactionSerializable) {
-      val order = EgraphTests.persistedOrder
+      val order = EgraphTests.persistedOrder()
       egraph1 = Egraph(orderId = order.id).withState(PassedBiometrics).saveWithoutAssets()
       egraph2 = Egraph(orderId = order.id).withState(FailedBiometrics).saveWithoutAssets()
     }
@@ -64,7 +64,7 @@ class PostEgraphAdminEndpointTests extends AdminFunctionalTest with CleanDatabas
   def testPublishEgraph() {
     createAndLoginAsAdmin()
     var egraph = db.connected(TransactionSerializable) {
-      val order = EgraphTests.persistedOrder
+      val order = EgraphTests.persistedOrder()
       Egraph(orderId = order.id).withState(ApprovedByAdmin).saveWithoutAssets()
     }
 

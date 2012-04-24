@@ -26,7 +26,7 @@ with DBTransactionPerTest {
   }
 
   def newEntity = {
-    val egraph = Egraph(orderId = EgraphTests.persistedOrder.id).save()
+    val egraph = Egraph(orderId = EgraphTests.persistedOrder().id).save()
     new VBGFinishVerifyTransaction(egraphId = egraph.id)
   }
 

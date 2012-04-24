@@ -24,7 +24,7 @@ class EgraphTests extends UnitFlatSpec
   // SavingEntityTests[Egraph] methods
   //
   override def newEntity = {
-    val order = EgraphTests.persistedOrder
+    val order = EgraphTests.persistedOrder()
     Egraph(orderId=order.id)
   }
 
@@ -37,7 +37,7 @@ class EgraphTests extends UnitFlatSpec
   }
 
   override def transformEntity(toTransform: Egraph) = {
-    val order = EgraphTests.persistedOrder
+    val order = EgraphTests.persistedOrder()
     toTransform.copy(
       orderId = order.id,
       stateValue = EgraphState.Published.value
@@ -84,7 +84,7 @@ class EgraphTests extends UnitFlatSpec
   }
 
   "An Egraph" should "save and recover signature and audio data from the blobstore" in {
-    val egraph = EgraphTests.persistedOrder
+    val egraph = EgraphTests.persistedOrder()
       .newEgraph
       .withAssets(TestConstants.signatureStr, Some(TestConstants.messageStr), "my audio".getBytes("UTF-8"))
       .save()
@@ -94,7 +94,7 @@ class EgraphTests extends UnitFlatSpec
   }
 
   "An Egraph" should "throw an exception if assets are accessed on an unsaved Egraph" in {
-    evaluating { EgraphTests.persistedOrder.newEgraph.assets } should produce [IllegalArgumentException]
+    evaluating { EgraphTests.persistedOrder().newEgraph.assets } should produce [IllegalArgumentException]
   }
 
   "Egraph statuses" should "be accessible via their values on the companion object" in {
@@ -130,13 +130,13 @@ class EgraphTests extends UnitFlatSpec
     story.body should be ("Herpy Derpson<a href='/Herpy-Derpson' >Erem RecipientNBA Finals 2012<a href='/Herpy-Derpson/NBA-Finals-2012' >February 10, 2012February 10, 2011</a>")
   }
 
-  "EgraphQueryFilters" should "filter queries" in {
-    val passedBiometrics = EgraphTests.persistedOrder.newEgraph.withState(EgraphState.PassedBiometrics).saveWithoutAssets()
-    val failedBiometrics = EgraphTests.persistedOrder.newEgraph.withState(EgraphState.FailedBiometrics).saveWithoutAssets()
-    val approvedByAdmin = EgraphTests.persistedOrder.newEgraph.withState(EgraphState.ApprovedByAdmin).saveWithoutAssets()
-    val rejectedByAdmin = EgraphTests.persistedOrder.newEgraph.withState(EgraphState.RejectedByAdmin).saveWithoutAssets()
-    val awaitingVerification = EgraphTests.persistedOrder.newEgraph.withState(EgraphState.AwaitingVerification).saveWithoutAssets()
-    val published = EgraphTests.persistedOrder.newEgraph.withState(EgraphState.Published).saveWithoutAssets()
+  "getEgraphsAndResults" should "filter queries based on EgraphQueryFilters" in {
+    val passedBiometrics = EgraphTests.persistedOrder().newEgraph.withState(EgraphState.PassedBiometrics).saveWithoutAssets()
+    val failedBiometrics = EgraphTests.persistedOrder().newEgraph.withState(EgraphState.FailedBiometrics).saveWithoutAssets()
+    val approvedByAdmin = EgraphTests.persistedOrder().newEgraph.withState(EgraphState.ApprovedByAdmin).saveWithoutAssets()
+    val rejectedByAdmin = EgraphTests.persistedOrder().newEgraph.withState(EgraphState.RejectedByAdmin).saveWithoutAssets()
+    val awaitingVerification = EgraphTests.persistedOrder().newEgraph.withState(EgraphState.AwaitingVerification).saveWithoutAssets()
+    val published = EgraphTests.persistedOrder().newEgraph.withState(EgraphState.Published).saveWithoutAssets()
 
     store.getEgraphsAndResults(egraphQueryFilters.passedBiometrics).toSeq.map(e => e._1).toSet should be(Set(passedBiometrics))
     store.getEgraphsAndResults(egraphQueryFilters.failedBiometrics).toSeq.map(e => e._1).toSet should be(Set(failedBiometrics))
@@ -147,16 +147,45 @@ class EgraphTests extends UnitFlatSpec
     store.getEgraphsAndResults(egraphQueryFilters.pendingAdminReview).toSeq.map(e => e._1).toSet should be(Set(passedBiometrics, failedBiometrics, approvedByAdmin))
   }
 
+  "getCelebrityEgraphsAndResults" should "filter queries based on EgraphQueryFilters" in {
+    val celebrity = Some(Celebrity(publicName = Some("Celebrity " + Time.toBlobstoreFormat(Time.now))).save())
+    val product = Some(celebrity.get.newProduct.save())
+
+    val passedBiometrics = EgraphTests.persistedOrder(celebrity, product).newEgraph.withState(EgraphState.PassedBiometrics).saveWithoutAssets()
+    val failedBiometrics = EgraphTests.persistedOrder(celebrity, product).newEgraph.withState(EgraphState.FailedBiometrics).saveWithoutAssets()
+    val approvedByAdmin = EgraphTests.persistedOrder(celebrity, product).newEgraph.withState(EgraphState.ApprovedByAdmin).saveWithoutAssets()
+    val rejectedByAdmin = EgraphTests.persistedOrder(celebrity, product).newEgraph.withState(EgraphState.RejectedByAdmin).saveWithoutAssets()
+    val awaitingVerification = EgraphTests.persistedOrder(celebrity, product).newEgraph.withState(EgraphState.AwaitingVerification).saveWithoutAssets()
+    val published = EgraphTests.persistedOrder(celebrity, product).newEgraph.withState(EgraphState.Published).saveWithoutAssets()
+
+    store.getCelebrityEgraphsAndResults(celebrity.get, egraphQueryFilters.passedBiometrics).toSeq.map(e => e._1).toSet should be(Set(passedBiometrics))
+    store.getCelebrityEgraphsAndResults(celebrity.get, egraphQueryFilters.failedBiometrics).toSeq.map(e => e._1).toSet should be(Set(failedBiometrics))
+    store.getCelebrityEgraphsAndResults(celebrity.get, egraphQueryFilters.approvedByAdmin).toSeq.map(e => e._1).toSet should be(Set(approvedByAdmin))
+    store.getCelebrityEgraphsAndResults(celebrity.get, egraphQueryFilters.rejectedByAdmin).toSeq.map(e => e._1).toSet should be(Set(rejectedByAdmin))
+    store.getCelebrityEgraphsAndResults(celebrity.get, egraphQueryFilters.awaitingVerification).toSeq.map(e => e._1).toSet should be(Set(awaitingVerification))
+    store.getCelebrityEgraphsAndResults(celebrity.get, egraphQueryFilters.published).toSeq.map(e => e._1).toSet should be(Set(published))
+    store.getCelebrityEgraphsAndResults(celebrity.get, egraphQueryFilters.pendingAdminReview).toSeq.map(e => e._1).toSet should be(Set(passedBiometrics, failedBiometrics, approvedByAdmin))
+  }
 }
 
 object EgraphTests {
 
-  def persistedOrder: Order = {
+  def persistedOrder(celebrity: Option[Celebrity] = None, product: Option[Product] = None): Order = {
     val customer = TestData.newSavedCustomer()
-    val celebrity = Celebrity(publicName = Some("Celebrity " + Time.toBlobstoreFormat(Time.now))).save()
-    val product = celebrity.newProduct.save()
-
-    customer.buy(product).save()
+    (celebrity, product) match {
+      case (_, Some(p)) => {
+        customer.buy(p).save()
+      }
+      case (Some(c), None) => {
+        val p = c.newProduct.save()
+        customer.buy(p).save()
+      }
+      case (None, None) => {
+        val c = Celebrity(publicName = Some("Celebrity " + Time.toBlobstoreFormat(Time.now))).save()
+        val p = c.newProduct.save()
+        customer.buy(p).save()
+      }
+    }
   }
 }
 

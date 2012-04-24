@@ -39,13 +39,13 @@ with TestKit {
     var egraph1: Egraph = null
     var egraph2: Egraph = null
     AppConfig.instance[DBSession].connected(TransactionSerializable) {
-      egraph1 = EgraphTests.persistedOrder
+      egraph1 = EgraphTests.persistedOrder()
         .newEgraph
         .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.voiceStr().getBytes("UTF-8"))
         .save()
     }
     AppConfig.instance[DBSession].connected(TransactionSerializable) {
-      egraph2 = EgraphTests.persistedOrder
+      egraph2 = EgraphTests.persistedOrder()
         .newEgraph
         .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.voiceStr().getBytes("UTF-8"))
         .save()

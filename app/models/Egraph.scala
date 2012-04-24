@@ -524,18 +524,15 @@ class EgraphStore @Inject() (schema: Schema) extends Saves[Egraph] with SavesCre
     )
   }
 
-  // TODO(wchan): How to make this a left-outer-join? Posting question to Squeryl group. Delete admin_celebrityegraphs.scala.html once this is figured out.
-  def getCelebrityEgraphsAndResults(celebrity: Celebrity, filters: FilterOneTable[Egraph]*): Query[(Egraph, VBGVerifySample, XyzmoVerifyUser)] = {
+  def getCelebrityEgraphsAndResults(celebrity: Celebrity, filters: FilterOneTable[Egraph]*): Query[(Egraph, Option[VBGVerifySample], Option[XyzmoVerifyUser])] = {
     val celebrityId = celebrity.id
-    val celebrityEgraphsAndResults: Query[(Egraph, VBGVerifySample, XyzmoVerifyUser)] = from(schema.egraphs, schema.vbgVerifySampleTable, schema.xyzmoVerifyUserTable, schema.orders, schema.products)(
+    join(schema.egraphs, schema.vbgVerifySampleTable.leftOuter, schema.xyzmoVerifyUserTable.leftOuter, schema.orders, schema.products)(
       (egraph, vbgVerifySample, xyzmoVerifyUser, order, product) =>
-        where(egraph.orderId === order.id and order.productId === product.id and product.celebrityId === celebrityId
-          and egraph.id === vbgVerifySample.egraphId and egraph.id === xyzmoVerifyUser.egraphId
-          and FilterOneTable.reduceFilters(filters, egraph))
+        where(FilterOneTable.reduceFilters(filters, egraph) and product.celebrityId === celebrityId)
           select(egraph, vbgVerifySample, xyzmoVerifyUser)
           orderBy (egraph.id desc)
+          on(egraph.id === vbgVerifySample.map(_.egraphId), egraph.id === xyzmoVerifyUser.map(_.egraphId), egraph.orderId === order.id, order.productId === product.id)
     )
-    celebrityEgraphsAndResults
   }
 
   //
