@@ -514,26 +514,26 @@ trait EgraphAssets {
 
 class EgraphStore @Inject() (schema: Schema) extends Saves[Egraph] with SavesCreatedUpdated[Egraph] {
 
-  def getEgraphsAndResults(filters: FilterOneTable[Egraph]*): Query[(Egraph, VBGVerifySample, XyzmoVerifyUser)] = {
-    val egraphsAndResults: Query[(Egraph, VBGVerifySample, XyzmoVerifyUser)] = from(schema.egraphs, schema.vbgVerifySampleTable, schema.xyzmoVerifyUserTable)(
+  def getEgraphsAndResults(filters: FilterOneTable[Egraph]*): Query[(Egraph, Option[VBGVerifySample], Option[XyzmoVerifyUser])] = {
+    join(schema.egraphs, schema.vbgVerifySampleTable.leftOuter, schema.xyzmoVerifyUserTable.leftOuter)(
       (egraph, vbgVerifySample, xyzmoVerifyUser) =>
-        where (egraph.id === vbgVerifySample.egraphId and egraph.id === xyzmoVerifyUser.egraphId
-          and FilterOneTable.reduceFilters(filters, egraph))
+        where(FilterOneTable.reduceFilters(filters, egraph))
           select(egraph, vbgVerifySample, xyzmoVerifyUser)
-          orderBy(egraph.id desc)
+          orderBy (egraph.id desc)
+          on(egraph.id === vbgVerifySample.map(_.egraphId), egraph.id === xyzmoVerifyUser.map(_.egraphId))
     )
-    egraphsAndResults
   }
 
+  // TODO(wchan): How to make this a left-outer-join? Posting question to Squeryl group. Delete admin_celebrityegraphs.scala.html once this is figured out.
   def getCelebrityEgraphsAndResults(celebrity: Celebrity, filters: FilterOneTable[Egraph]*): Query[(Egraph, VBGVerifySample, XyzmoVerifyUser)] = {
     val celebrityId = celebrity.id
     val celebrityEgraphsAndResults: Query[(Egraph, VBGVerifySample, XyzmoVerifyUser)] = from(schema.egraphs, schema.vbgVerifySampleTable, schema.xyzmoVerifyUserTable, schema.orders, schema.products)(
       (egraph, vbgVerifySample, xyzmoVerifyUser, order, product) =>
-        where (egraph.orderId === order.id and order.productId === product.id and product.celebrityId === celebrityId
+        where(egraph.orderId === order.id and order.productId === product.id and product.celebrityId === celebrityId
           and egraph.id === vbgVerifySample.egraphId and egraph.id === xyzmoVerifyUser.egraphId
           and FilterOneTable.reduceFilters(filters, egraph))
           select(egraph, vbgVerifySample, xyzmoVerifyUser)
-          orderBy(egraph.id desc)
+          orderBy (egraph.id desc)
     )
     celebrityEgraphsAndResults
   }
@@ -564,7 +564,13 @@ class EgraphQueryFilters @Inject() (schema: Schema) {
 
   import EgraphState._
 
-  def pendingAdminReview = List(passedBiometrics, failedBiometrics, approvedByAdmin)
+  def pendingAdminReview: FilterOneTable[Egraph] = {
+    new FilterOneTable[Egraph] {
+      override def test(egraph: Egraph) = {
+        (egraph.stateValue in Seq(PassedBiometrics.value, FailedBiometrics.value, ApprovedByAdmin.value))
+      }
+    }
+  }
 
   def approvedByAdmin: FilterOneTable[Egraph] = {
     new FilterOneTable[Egraph] {

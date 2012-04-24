@@ -28,13 +28,13 @@ private[controllers] trait GetCelebrityEgraphsAdminEndpoint {
           case "approvedByAdmin" => egraphStore.getCelebrityEgraphsAndResults(celebrity, egraphQueryFilters.approvedByAdmin)
           case "rejectedByAdmin" => egraphStore.getCelebrityEgraphsAndResults(celebrity, egraphQueryFilters.rejectedByAdmin)
           case "published" => egraphStore.getCelebrityEgraphsAndResults(celebrity, egraphQueryFilters.published)
-          case "awaitingVerification" => egraphStore.getCelebrityEgraphsAndResults(celebrity, egraphQueryFilters.awaitingVerification)
+//          case "awaitingVerification" => egraphStore.getCelebrityEgraphsAndResults(celebrity, egraphQueryFilters.awaitingVerification)
           case "all" => egraphStore.getCelebrityEgraphsAndResults(celebrity)
-          case _ => egraphStore.getCelebrityEgraphsAndResults(celebrity, egraphQueryFilters.pendingAdminReview: _*)
+          case _ => egraphStore.getCelebrityEgraphsAndResults(celebrity, egraphQueryFilters.pendingAdminReview)
         }
         val pagedQuery: (Iterable[(Egraph, VBGVerifySample, XyzmoVerifyUser)], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
         WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebrityEgraphsAdminEndpoint.url(celebrity = celebrity))
-        views.Application.admin.html.admin_egraphs(egraphAndResults = pagedQuery._1, celebrity = Some(celebrity))
+        views.Application.admin.html.admin_celebrityegraphs(egraphAndResults = pagedQuery._1, celebrity = Some(celebrity))
     }
   }
 }

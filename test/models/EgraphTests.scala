@@ -130,22 +130,22 @@ class EgraphTests extends UnitFlatSpec
     story.body should be ("Herpy Derpson<a href='/Herpy-Derpson' >Erem RecipientNBA Finals 2012<a href='/Herpy-Derpson/NBA-Finals-2012' >February 10, 2012February 10, 2011</a>")
   }
 
-//  "EgraphQueryFilters" should "filter queries" in {
-//    val passedBiometrics = EgraphTests.persistedOrder.newEgraph.withState(EgraphState.PassedBiometrics).saveWithoutAssets()
-//    val failedBiometrics = EgraphTests.persistedOrder.newEgraph.withState(EgraphState.FailedBiometrics).saveWithoutAssets()
-//    val approvedByAdmin = EgraphTests.persistedOrder.newEgraph.withState(EgraphState.ApprovedByAdmin).saveWithoutAssets()
-//    val rejectedByAdmin = EgraphTests.persistedOrder.newEgraph.withState(EgraphState.RejectedByAdmin).saveWithoutAssets()
-//    val awaitingVerification = EgraphTests.persistedOrder.newEgraph.withState(EgraphState.AwaitingVerification).saveWithoutAssets()
-//    val published = EgraphTests.persistedOrder.newEgraph.withState(EgraphState.Published).saveWithoutAssets()
-//
-//    store.getEgraphsAndResults(egraphQueryFilters.pendingAdminReview: _*).toSeq.map(e => e._1).toSet should be(Set(passedBiometrics, failedBiometrics, approvedByAdmin))
-//    store.getEgraphsAndResults(egraphQueryFilters.passedBiometrics).toSeq.map(e => e._1).toSet should be(Set(passedBiometrics))
-//    store.getEgraphsAndResults(egraphQueryFilters.failedBiometrics).toSeq.map(e => e._1).toSet should be(Set(failedBiometrics))
-//    store.getEgraphsAndResults(egraphQueryFilters.approvedByAdmin).toSeq.map(e => e._1).toSet should be(Set(approvedByAdmin))
-//    store.getEgraphsAndResults(egraphQueryFilters.rejectedByAdmin).toSeq.map(e => e._1).toSet should be(Set(rejectedByAdmin))
-//    store.getEgraphsAndResults(egraphQueryFilters.awaitingVerification).toSeq.map(e => e._1).toSet should be(Set(awaitingVerification))
-//    store.getEgraphsAndResults(egraphQueryFilters.published).toSeq.map(e => e._1).toSet should be(Set(published))
-//  }
+  "EgraphQueryFilters" should "filter queries" in {
+    val passedBiometrics = EgraphTests.persistedOrder.newEgraph.withState(EgraphState.PassedBiometrics).saveWithoutAssets()
+    val failedBiometrics = EgraphTests.persistedOrder.newEgraph.withState(EgraphState.FailedBiometrics).saveWithoutAssets()
+    val approvedByAdmin = EgraphTests.persistedOrder.newEgraph.withState(EgraphState.ApprovedByAdmin).saveWithoutAssets()
+    val rejectedByAdmin = EgraphTests.persistedOrder.newEgraph.withState(EgraphState.RejectedByAdmin).saveWithoutAssets()
+    val awaitingVerification = EgraphTests.persistedOrder.newEgraph.withState(EgraphState.AwaitingVerification).saveWithoutAssets()
+    val published = EgraphTests.persistedOrder.newEgraph.withState(EgraphState.Published).saveWithoutAssets()
+
+    store.getEgraphsAndResults(egraphQueryFilters.passedBiometrics).toSeq.map(e => e._1).toSet should be(Set(passedBiometrics))
+    store.getEgraphsAndResults(egraphQueryFilters.failedBiometrics).toSeq.map(e => e._1).toSet should be(Set(failedBiometrics))
+    store.getEgraphsAndResults(egraphQueryFilters.approvedByAdmin).toSeq.map(e => e._1).toSet should be(Set(approvedByAdmin))
+    store.getEgraphsAndResults(egraphQueryFilters.rejectedByAdmin).toSeq.map(e => e._1).toSet should be(Set(rejectedByAdmin))
+    store.getEgraphsAndResults(egraphQueryFilters.awaitingVerification).toSeq.map(e => e._1).toSet should be(Set(awaitingVerification))
+    store.getEgraphsAndResults(egraphQueryFilters.published).toSeq.map(e => e._1).toSet should be(Set(published))
+    store.getEgraphsAndResults(egraphQueryFilters.pendingAdminReview).toSeq.map(e => e._1).toSet should be(Set(passedBiometrics, failedBiometrics, approvedByAdmin))
+  }
 
 }
 

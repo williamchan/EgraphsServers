@@ -1,4 +1,4 @@
-@(egraphAndResults: Iterable[(models.Egraph, Option[models.vbg.VBGVerifySample], Option[models.xyzmo.XyzmoVerifyUser])], celebrity: Option[models.Celebrity] = None
+@(egraphAndResults: Iterable[(models.Egraph, models.vbg.VBGVerifySample, models.xyzmo.XyzmoVerifyUser)], celebrity: Option[models.Celebrity] = None
 )(implicit flash:play.mvc.Scope.Flash)
 
 @import controllers.WebsiteControllers
@@ -13,7 +13,7 @@
 }
 
 @headline = {
-  @if(celebrity.isDefined) {@celebrity.get.publicName's Egraphs} else {Egraphs}
+@if(celebrity.isDefined) {@celebrity.get.publicName's Egraphs} else {Egraphs}
 }
 
 @body = {
@@ -29,7 +29,6 @@
       <li><a href="?filter=failedBiometrics">Failed Biometrics</a></li>
       <li><a href="?filter=approvedByAdmin">Approved by Admin</a></li>
       <li><a href="?filter=rejectedByAdmin">Rejected by Admin</a></li>
-      <li><a href="?filter=awaitingVerification">Awaiting Verification</a></li>
       <li><a href="?filter=published">Published</a></li>
       <li><a href="?filter=all">All</a></li>
     </ul>
@@ -55,10 +54,10 @@
       <td>@egraph.id</td>
       <td>@egraph.stateValue</td>
       <td>@egraph.orderId</td>
-      <td>@if(xyzmoVerifyUser.isDefined) {@xyzmoVerifyUser.get.resultStr} else {}</td>
-      <td>@if(vbgVerifySample.isDefined) {@vbgVerifySample.get.resultStr} else {}</td>
-      <td>@if(vbgVerifySample.isDefined) {@vbgVerifySample.get.errorCode} else {}</td>
-      <td>@if(vbgVerifySample.isDefined) {@vbgVerifySample.get.vbgTransactionId} else {}</td>
+      <td>@xyzmoVerifyUser.resultStr</td>
+      <td>@vbgVerifySample.resultStr</td>
+      <td>@vbgVerifySample.errorCode</td>
+      <td>@vbgVerifySample.vbgTransactionId</td>
     </tr>
     }
   </table>

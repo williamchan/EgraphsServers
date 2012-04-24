@@ -28,9 +28,9 @@ private[controllers] trait GetEgraphsAdminEndpoint {
         case "published" => egraphStore.getEgraphsAndResults(egraphQueryFilters.published)
         case "awaitingVerification" => egraphStore.getEgraphsAndResults(egraphQueryFilters.awaitingVerification)
         case "all" => egraphStore.getEgraphsAndResults()
-        case _ => egraphStore.getEgraphsAndResults(egraphQueryFilters.pendingAdminReview: _*)
+        case _ => egraphStore.getEgraphsAndResults(egraphQueryFilters.pendingAdminReview)
       }
-      val pagedQuery: (Iterable[(Egraph, VBGVerifySample, XyzmoVerifyUser)], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
+      val pagedQuery: (Iterable[(Egraph, Option[VBGVerifySample], Option[XyzmoVerifyUser])], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
       WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetEgraphsAdminEndpoint.url())
       views.Application.admin.html.admin_egraphs(egraphAndResults = pagedQuery._1)
     }

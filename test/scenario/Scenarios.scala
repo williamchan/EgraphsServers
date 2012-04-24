@@ -66,6 +66,8 @@ class Scenarios extends DeclaresScenarios {
     """,
 
    {() =>
+     demosetup.DemoScenarios.createAdmin()
+
       val celebrity = Celebrity(
         firstName=Some("William"),
         lastName=Some("Chan"),
