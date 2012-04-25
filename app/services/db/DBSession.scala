@@ -15,6 +15,9 @@ import services.logging.Logging
 class DBSession @Inject() (connectionFactory: () => Connection) extends Logging {
   import org.squeryl.PrimitiveTypeMode._
 
+  // Reference: http://www.postgresql.org/docs/9.1/static/transaction-iso.html
+  private val errorStr40001 = "ERROR: could not serialize access due to read/write dependencies among transactions"
+
   /**
    * Executes `continue` within a database transaction at the specified isolation level. Closes the transaction
    * and returns the connection to the pool (by closing it) before returning.
@@ -25,29 +28,62 @@ class DBSession @Inject() (connectionFactory: () => Connection) extends Logging 
    * @return the return value of `continue`, after having closed the transaction and returned the connection
    *   to the pool.
    */
-  def connected[T](isolation: TransactionIsolation)(continue: => T): T = {
+  def connected[T](isolation: TransactionIsolation, numTries: Int = 25)(continue: => T): T = {
     log("Connecting to a DB Connection from the pool at isolation level: " + isolation)
     val connection = connect(isolation)
     val squerylSession = new Session(connection, DBAdapter.current)
 
     try {
-      val result = using(squerylSession)(continue)
+      for (i <- 1 until numTries) {
+        try {
+          return attemptTransaction(squerylSession, continue, connection)
+        }
+        catch {
+          // This is rarely the case because Squeryl wraps PSQLExceptions into RuntimeExceptions!
+          // case e: PSQLException if e.getSQLState == sqlState_SerializableConcurrentException => {
+          //   println("retrying due to sqlState " + sqlState_SerializableConcurrentException)
+          // }
+          case e: Exception if (e.getCause != null && e.getCause.getMessage.startsWith(errorStr40001)) => {
+            // rollback transaction and allowing subsequent retries to execute
+            rollbackAndContinue(connection)
+          }
+          case e: Exception =>
+            // rollback transaction and throwing exception again to exit method
+            rollbackAndThrow(e, connection)
+        }
+      }
 
-      log("Committing changes to the DB")
-      connection.commit()
+      // final try
+      try {
+        attemptTransaction(squerylSession, continue, connection)
+      }
+      catch {
+        case e: Exception =>
+          rollbackAndThrow(e, connection)
+      }
 
-      result
-    }
-    catch {
-      case e: Exception =>
-        log("Rolling back changes to the DB due to a " + e.getClass.getName)
-        connection.rollback()
-        throw e
-    }
-    finally {
+    } finally {
       log("Returning DB Connection to the pool")
       connection.close()
     }
+  }
+
+  private def attemptTransaction[T](squerylSession: Session, continue: => T, connection: Connection): T = {
+    val result = using(squerylSession)(continue)
+    log("Committing changes to the DB")
+    connection.commit()
+    result
+  }
+
+  private def rollbackAndThrow[T](e: scala.Exception, connection: Connection): Nothing = {
+    log("Rolling back changes to the DB due to a " + e.getClass.getName)
+    connection.rollback()
+    throw e
+  }
+
+  private def rollbackAndContinue[T](connection: Connection) {
+    log("Rolling back changes to the DB and retrying")
+    connection.rollback()
   }
 
   /**
