@@ -36,6 +36,7 @@ GET     /                                       WebsiteControllers.getRootEndpoi
 
 # For Alpha-phase prod mode:
 
+GET     /test/memcached                         nonproduction.TestControllers.memcached
 GET     /test/create-test-orders                nonproduction.TestControllers.createTestOrders
 GET     /test/files/{<.*>blobKey}               WebsiteControllers.getBlob
 
@@ -66,11 +67,11 @@ POST    /admin/logout                                              WebsiteContro
 GET     /admin/accounts                                            WebsiteControllers.getAccountsAdmin
 POST    /admin/accounts                                            WebsiteControllers.postAccountAdmin
 GET     /admin/accounts/create                                     WebsiteControllers.getCreateAccountAdmin
-GET     /admin/accounts/{accountId}                                WebsiteControllers.getUpdateAccountAdmin
+GET     /admin/accounts/{accountId}                                WebsiteControllers.getAccountAdmin
 GET     /admin/celebrities                                         WebsiteControllers.getCelebritiesAdmin
 POST    /admin/celebrities                                         WebsiteControllers.postCelebrityAdmin
 GET     /admin/celebrities/create                                  WebsiteControllers.getCreateCelebrityAdmin
-GET     /admin/celebrities/{celebrityId}                           WebsiteControllers.getUpdateCelebrityAdmin
+GET     /admin/celebrities/{celebrityId}                           WebsiteControllers.getCelebrityAdmin
 GET     /admin/celebrities/{celebrityId}/products                  WebsiteControllers.getCelebrityProductsAdmin
 POST    /admin/celebrities/{celebrityId}/products                  WebsiteControllers.postCelebrityProductAdmin
 GET     /admin/celebrities/{celebrityId}/products/create           WebsiteControllers.getCreateCelebrityProductAdmin
@@ -82,7 +83,7 @@ GET     /admin/celebrities/{celebrityId}/orders                    WebsiteContro
 GET     /admin/orders                                              WebsiteControllers.getOrdersAdmin
 GET     /admin/orders/{orderId}                                    WebsiteControllers.getOrderAdmin
 POST    /admin/orders/{orderId}                                    WebsiteControllers.postOrderAdmin
-GET     /admin/products/{productId}                                WebsiteControllers.getUpdateCelebrityProductAdmin
+GET     /admin/products/{productId}                                WebsiteControllers.getProductAdmin
 GET     /admin/script                                              WebsiteControllers.getScriptAdmin
 
 ##

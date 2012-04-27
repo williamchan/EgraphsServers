@@ -19,7 +19,7 @@
 }
 
 @productUrl() = @{
-  lookupUrl("WebsiteControllers.getUpdateCelebrityProductAdmin", Map("productId" -> order.productId.toString))
+  lookupUrl("WebsiteControllers.getProductAdmin", Map("productId" -> order.productId.toString))
 }
 
 @reviewControls = {

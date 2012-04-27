@@ -25,8 +25,8 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
   def postCelebrityProductAdmin(productId: Long = 0,
                                 productName: String,
                                 productDescription: String,
-                                productImage: File,
-                                productIcon: File,
+                                productImage: Option[File],
+                                productIcon: Option[File],
                                 storyTitle: String,
                                 storyText: String) = controllerMethod() {
 
@@ -36,7 +36,7 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
 
         // Validate text fields
         required("Product name", productName)
-        if (isCreate) required("Product image", productImage)
+        if (isCreate) Validation.isTrue("Product image is required", productImage.isDefined)
         required("Story title", storyTitle)
         required("Story text", storyText)
         val productByUrlSlg = productStore.findByCelebrityAndUrlSlug(celebrity.id, Product.slugify(productName))
@@ -48,8 +48,8 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
         Validation.isTrue("Celebrity already has a product with name: " + productName, isUniqueUrlSlug)
 
         // Validate product image
-        val productImageOption = ImageUtil.parseImage(productImage)
-        val isProductImageValid = (isCreate && !productImageOption.isEmpty) || (!isCreate && (productImage == null || !productImageOption.isEmpty))
+        val productImageOption = if (productImage.isDefined) ImageUtil.parseImage(productImage.get) else None
+        val isProductImageValid = (isCreate && !productImageOption.isEmpty) || (!isCreate && (productImage.isEmpty || !productImageOption.isEmpty))
         Validation.isTrue("Product photo must be a valid image", isProductImageValid)
         for (image <- productImageOption) {
           val (width, height) = (image.getWidth, image.getHeight)
@@ -61,8 +61,8 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
         }
 
         // Validate product icon
-        val productIconOption = ImageUtil.parseImage(productIcon)
-        val isProductIconValid = (productIcon == null || !productIconOption.isEmpty)
+        val productIconOption = if (productIcon.isDefined) ImageUtil.parseImage(productIcon.get) else None
+        val isProductIconValid = (productIcon.isEmpty || !productIconOption.isEmpty)
         Validation.isTrue("Product icon must be a valid image", isProductIconValid)
         for (image <- productIconOption) {
           Validation.isTrue(
@@ -94,7 +94,7 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
             ).saveWithImageAssets(image = productImageOption, icon = productIconOption)
           }
 
-          new Redirect(GetCelebrityProductEndpoint.url(celebrity, savedProduct).url)
+          new Redirect(GetProductAdminEndpoint.url(productId = savedProduct.id).url + "?action=preview")
         }
         else {
           // There were validation errors
@@ -118,7 +118,7 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
     if (productId == 0) {
       WebsiteControllers.redirectWithValidationErrors(GetCreateCelebrityProductAdminEndpoint.url(celebrity = celebrity))
     } else {
-      WebsiteControllers.redirectWithValidationErrors(GetUpdateCelebrityProductAdminEndpoint.url(productId = productId, celebrity = celebrity))
+      WebsiteControllers.redirectWithValidationErrors(GetProductAdminEndpoint.url(productId = productId))
     }
   }
 }

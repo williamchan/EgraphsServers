@@ -119,7 +119,7 @@ trait PostCelebrityAdminEndpoint {
               mail.send(email)
             }
 
-            new Redirect(WebsiteControllers.lookupGetCelebrity(celebrityUrlSlug.get).url)
+            new Redirect(GetCelebrityAdminEndpoint.url(celebrityId = savedCelebrity.id).url + "?action=preview")
           }
         }
     }
@@ -153,7 +153,7 @@ trait PostCelebrityAdminEndpoint {
     if (celebrityId == 0) {
       WebsiteControllers.redirectWithValidationErrors(GetCreateCelebrityAdminEndpoint.url())
     } else {
-      WebsiteControllers.redirectWithValidationErrors(GetUpdateCelebrityAdminEndpoint.url(celebrityId = celebrityId))
+      WebsiteControllers.redirectWithValidationErrors(GetCelebrityAdminEndpoint.url(celebrityId = celebrityId))
     }
   }
 }

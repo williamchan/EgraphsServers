@@ -13,18 +13,17 @@ private[controllers] trait GetEgraphAdminEndpoint { this: Controller =>
   protected def controllerMethod: ControllerMethod
 
   def getEgraphAdmin(egraphId: Long, action: Option[String] = None) = controllerMethod() {
-    action match {
-      case Some("preview") => {
-        adminFilters.requireEgraph { (egraph, admin) =>
-          GetEgraphEndpoint.html(egraph = egraph, order = egraph.order)
-        }
-      }
+    adminFilters.requireEgraph {
+      (egraph, admin) =>
+        action match {
+          case Some("preview") => {
+            GetEgraphEndpoint.html(egraph = egraph, order = egraph.order)
+          }
 
-      case _ => {
-        adminFilters.requireEgraph { (egraph, admin) =>
-          views.Application.admin.html.admin_egraph(egraph = egraph, signatureResult = egraph.signatureResult, voiceResult = egraph.voiceResult)
+          case _ => {
+            views.Application.admin.html.admin_egraph(egraph = egraph, signatureResult = egraph.signatureResult, voiceResult = egraph.voiceResult)
+          }
         }
-      }
     }
   }
 }

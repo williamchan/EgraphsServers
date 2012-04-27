@@ -34,8 +34,11 @@ object TestData {
     celeb
   }
 
-  def newSavedProduct(): Product = {
-    newSavedCelebrity().newProduct.save()
+  def newSavedProduct(celebrity: Option[Celebrity] = None): Product = {
+    celebrity match {
+      case None => newSavedCelebrity().newProduct.save()
+      case Some(c) => c.newProduct.save()
+    }
   }
 
   def newSavedOrder(): Order = {

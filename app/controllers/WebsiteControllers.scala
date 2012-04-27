@@ -29,16 +29,16 @@ object WebsiteControllers extends Controller
   with GetRootAdminEndpoint
   with GetLoginAdminEndpoint
   with GetAccountsAdminEndpoint
-  with GetUpdateAccountAdminEndpoint
+  with GetAccountAdminEndpoint
   with GetCelebritiesAdminEndpoint
   with GetCelebrityEgraphsAdminEndpoint
   with GetCelebrityOrdersAdminEndpoint
   with GetCelebrityProductsAdminEndpoint
   with GetCreateAccountAdminEndpoint
   with GetCreateCelebrityAdminEndpoint
-  with GetUpdateCelebrityAdminEndpoint
+  with GetCelebrityAdminEndpoint
   with GetCreateCelebrityProductAdminEndpoint
-  with GetUpdateCelebrityProductAdminEndpoint
+  with GetProductAdminEndpoint
   with GetEgraphAdminEndpoint
   with PostEgraphAdminEndpoint
   with GetEgraphsAdminEndpoint

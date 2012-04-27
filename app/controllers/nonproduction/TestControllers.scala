@@ -20,6 +20,19 @@ object TestControllers extends Controller with Logging {
   val celebrityServices = AppConfig.instance[CelebrityServices]
   val customerServices = AppConfig.instance[CustomerServices]
 
+  def memcached() = controllerMethod() {
+    import play.cache.Cache
+
+    Cache.set("reservation", "asdf", "1s")
+//    Thread.sleep(990)
+    val x: Option[String] = Cache.get[String]("reservation")
+    println("x " + x)
+
+//    Cache.safeDelete("reservation")
+//    val y: Option[String] = Cache.get[String]("reservation")
+//    println("y " + y)
+  }
+
   def getHardwiredEgraphPage() = controllerMethod() {
     val testFrame = LandscapeEgraphFrame
 

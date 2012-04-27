@@ -15,7 +15,7 @@ private[controllers] trait GetAccountsAdminEndpoint {
 
   def getAccountsAdmin(email: String = "") = controllerMethod() {
     adminFilters.requireAdministratorLogin { admin =>
-      var account = if (!email.isEmpty) accountStore.findByEmail(email) else None
+      val account = if (!email.isEmpty) accountStore.findByEmail(email) else None
       views.Application.admin.html.admin_accounts(account = account)
     }
   }

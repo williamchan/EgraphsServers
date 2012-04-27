@@ -7,6 +7,8 @@ import models._
 import services.payment.Payment
 import play.mvc.Router.ActionDefinition
 import services.http.{ControllerMethod, CelebrityAccountRequestFilters}
+import play.templates.Html
+import play.mvc.Scope.{Session, Flash}
 
 private[controllers] trait GetCelebrityProductEndpoint { this: Controller =>
 
@@ -19,22 +21,26 @@ private[controllers] trait GetCelebrityProductEndpoint { this: Controller =>
    */
   def getCelebrityProduct = controllerMethod() {
     celebFilters.requireCelebrityAndProductUrlSlugs { (celebrity, product) =>
-      // Get errors and param values from previous unsuccessful buy
-      val errorFields = Option(flash.get("errors")).map(errString => errString.split(',').toList)
-      val fieldDefaults = (paramName: String) => paramName match {
-        case "cardNumber" => "4242424242424242"
-        case "cardCvc" => "333"
-        case _ =>
-          Option(flash.get(paramName)).getOrElse("")
-      }
-
-      // Render the page
-      views.Application.html.product(celebrity, product, errorFields, fieldDefaults, payment)
+      GetCelebrityProductEndpoint.html(celebrity, product, payment)
     }
   }
 }
 
 object GetCelebrityProductEndpoint {
+  def html(celebrity: Celebrity, product: Product, payment: Payment)(implicit flash: Flash, session: Session): Html = {
+    // Get errors and param values from previous unsuccessful buy
+    val errorFields = Option(flash.get("errors")).map(errString => errString.split(',').toList)
+    val fieldDefaults = (paramName: String) => paramName match {
+      case "cardNumber" => "4242424242424242"
+      case "cardCvc" => "333"
+      case _ =>
+        Option(flash.get(paramName)).getOrElse("")
+    }
+
+    // Render the page
+    views.Application.html.product(celebrity, product, errorFields, fieldDefaults, payment)
+  }
+
   /**
    * Reverses the product index url for a particular celebrity and product
    */

@@ -66,7 +66,7 @@ case class Product(
       val savedWithFrame = withFrame(frame).save()
       savedWithFrame.withPhoto(imageByteArray).save().product
     } else {
-      this
+      save()
     }
 
     // Prepare the product plaque icon, cropped to a square

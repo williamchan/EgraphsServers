@@ -88,7 +88,7 @@ trait PostAccountAdminEndpoint {
     if (accountId == 0) {
       WebsiteControllers.redirectWithValidationErrors(GetCreateAccountAdminEndpoint.url())
     } else {
-      WebsiteControllers.redirectWithValidationErrors(GetUpdateAccountAdminEndpoint.url(accountId = accountId))
+      WebsiteControllers.redirectWithValidationErrors(GetAccountAdminEndpoint.url(accountId = accountId))
     }
   }
 }
