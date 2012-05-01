@@ -24,7 +24,7 @@ trait PostBuyDemoProductEndpoint { this: PostBuyProductEndpoint =>
       payment.testToken.id,
       desiredText,
       personalNote,
-      isApiCall = true
+      isDemo = true
     )
   }
 }

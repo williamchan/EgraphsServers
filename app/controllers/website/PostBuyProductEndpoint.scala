@@ -37,18 +37,26 @@ trait PostBuyProductEndpoint { this: Controller =>
           stripeTokenId: String,
           desiredText: Option[String],
           personalNote: Option[String],
-          isApiCall: Boolean = false) = controllerMethod() {
+          isDemo: Boolean = false) = controllerMethod() {
 
-    if (!isApiCall) {
+    if (!isDemo) {
       securityFilters.checkAuthenticity {
-        post(recipientName, recipientEmail, buyerName, buyerEmail, stripeTokenId, desiredText, personalNote)
+        post(recipientName, recipientEmail, buyerName, buyerEmail, stripeTokenId, desiredText, personalNote, isDemo)
       }
     } else {
-      post(recipientName, recipientEmail, buyerName, buyerEmail, stripeTokenId, desiredText, personalNote)
+      post(recipientName, recipientEmail, buyerName, buyerEmail, stripeTokenId, desiredText, personalNote, isDemo)
     }
   }
 
-  def post(recipientName: String, recipientEmail: String, buyerName: String, buyerEmail: String, stripeTokenId: String, desiredText: Option[String], personalNote: Option[String]): Any = {
+  private def post(recipientName: String,
+           recipientEmail: String,
+           buyerName: String,
+           buyerEmail: String,
+           stripeTokenId: String,
+           desiredText: Option[String],
+           personalNote: Option[String],
+           isDemo: Boolean = false) {
+
     Logger.info("Receiving purchase order")
     celebFilters.requireCelebrityAndProductUrlSlugs {
       (celebrity, product) =>
@@ -94,7 +102,8 @@ trait PostBuyProductEndpoint { this: Controller =>
             product,
             mail = mail,
             customerStore = customerStore,
-            accountStore = accountStore
+            accountStore = accountStore,
+            isDemo = isDemo
           ).execute()
         }
     }
@@ -122,7 +131,8 @@ object PostBuyProductEndpoint {
                                     flash: Flash = Flash.current(),
                                     mail: Mail = AppConfig.instance[Mail],
                                     customerStore: CustomerStore = AppConfig.instance[CustomerStore],
-                                    accountStore: AccountStore = AppConfig.instance[AccountStore])
+                                    accountStore: AccountStore = AppConfig.instance[AccountStore],
+                                    isDemo: Boolean = false)
   {
     def execute() = {
       // Get buyer and recipient accounts and create customer face if necessary
@@ -134,12 +144,15 @@ object PostBuyProductEndpoint {
       }
 
       // Buy the product, charge the card, persist the order.
-      val order = buyer.buy(product, recipient).copy(
+      var order = buyer.buy(product, recipient).copy(
         stripeCardTokenId=Some(stripeTokenId),
         recipientName=recipientName,
         messageToCelebrity=personalNote,
         requestedMessage=desiredText
       ).save()
+      if (isDemo) {
+        order = order.copy(reviewStatus = Order.ReviewStatus.ApprovedByAdmin.stateValue).save()
+      }
 
       val chargedOrder = order.charge.issueAndSave().order
 
