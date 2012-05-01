@@ -2,13 +2,12 @@ package models
 
 import java.sql.Timestamp
 import services.Time
-import org.squeryl.PrimitiveTypeMode._
 import services.db.{KeyedCaseClass, Schema, Saves}
 import services.AppConfig
 import com.google.inject.{Provider, Inject}
 
 /** Services used by each instance of Customer */
-case class CustomerServices @Inject() (accountStore: AccountStore, customerStore: CustomerStore)
+case class CustomerServices @Inject() (accountStore: AccountStore, customerStore: CustomerStore, inventoryBatchStore: InventoryBatchStore)
 
 /**
  * Persistent entity representing customers who buy products from our service.
@@ -44,11 +43,21 @@ case class Customer(
    *   and the transaction that took place.
    */
   def buy(product: Product, recipient: Customer = this): Order = {
+    val (remainingInventory, activeInventoryBatches) = product.getRemainingInventoryAndActiveInventoryBatches()
+    require(remainingInventory > 0 && activeInventoryBatches.headOption.isDefined, "Must have available inventory to purchase product " + product.id)
+
+    val batchToOrderAgainst = services.inventoryBatchStore.selectAvailableInventoryBatch(activeInventoryBatches)
+    val inventoryBatchId = batchToOrderAgainst match {
+      case Some(b) => b.id
+      case _ => 0L // todo(wchan): Do we want to permit the order to go through?
+    }
+
     Order(
       buyerId=id,
       recipientId=recipient.id,
       productId=product.id,
-      amountPaidInCurrency=BigDecimal(product.price.getAmount)
+      amountPaidInCurrency=BigDecimal(product.price.getAmount),
+      inventoryBatchId = Some(inventoryBatchId)
     )
   }
 
@@ -67,6 +76,8 @@ class CustomerStore @Inject() (
   accountServices: Provider[AccountServices]
 ) extends Saves[Customer] with SavesCreatedUpdated[Customer]
 {
+  import org.squeryl.PrimitiveTypeMode._
+
   //
   // Public members
   //

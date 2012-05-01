@@ -3,6 +3,7 @@ package controllers.website.admin
 import play.templates.Html
 import models.Celebrity
 import play.mvc.Scope.{Session, Flash}
+import play.Play
 
 object GetProductDetail {
 
@@ -29,6 +30,7 @@ object GetProductDetail {
       celebrity = celebrity,
       errorFields = errorFields,
       fields = fieldDefaults,
-      product = product)
+      product = product,
+      isTestMode = (Play.id == "test"))
   }
 }

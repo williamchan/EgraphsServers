@@ -8,6 +8,8 @@ import services.blobs.Blobs
 import services.db.Schema
 import play.Play
 import models._
+import java.text.SimpleDateFormat
+import org.joda.time.DateTime
 
 class DemoScenarios extends DeclaresDemoScenarios {
   val meetingCategory = "Meetings"
@@ -18,6 +20,10 @@ class DemoScenarios extends DeclaresDemoScenarios {
   val schema = AppConfig.instance[Schema]
   val accountStore = AppConfig.instance[AccountStore]
   val celebrityStore = AppConfig.instance[CelebrityStore]
+
+  private lazy val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
+  private lazy val today = DateTime.now().toLocalDate.toDate
+  private lazy val future = dateFormat.parse("2020-01-01")
 
   toDemoScenarios add DemoScenario(
   "Create Admin",
@@ -316,26 +322,30 @@ class DemoScenarios extends DeclaresDemoScenarios {
       celebrityId = Some(celebrity.id)
     ).withPassword("derp").right.get.save()
 
+    val inventoryBatch = InventoryBatch(celebrityId = celebrity.id, numInventory = 100, startDate = today, endDate = future).save()
+
     blobs.getStaticResource(productA) foreach {
       productAPhotoBlob =>
-        celebrity.newProduct.copy(
+        val productWithPhotoA = celebrity.newProduct.copy(
           priceInCurrency = 50,
           name = firstName + "'s Product A",
           description = "Buy my Egraph A!",
           storyTitle = "The Story",
           storyText = "{signer_link}{signer_name}{end_link} was born on top. He proved it to the world every single day throughout the 2011 season. A few days afterwards he got a note from {recipient_name} on his iPad. This was his response."
         ).save().withPhoto(productAPhotoBlob.asByteArray).save()
+        inventoryBatch.products.associate(productWithPhotoA.product)
     }
 
     blobs.getStaticResource(productB) foreach {
       productBPhotoBlob =>
-        celebrity.newProduct.copy(
+        val productWithPhotoB = celebrity.newProduct.copy(
           priceInCurrency = 100,
           name = firstName + "'s Product B",
           description = "Buy my Egraph B!",
           storyTitle = "The Story",
           storyText = "{signer_link}{signer_name}{end_link} was born on top. He proved it to the world every single day throughout the 2011 season. A few days afterwards he got a note from {recipient_name} on his iPad. This was his response."
         ).save().withPhoto(productBPhotoBlob.asByteArray).save()
+        inventoryBatch.products.associate(productWithPhotoB.product)
     }
   }
 }

@@ -34,6 +34,6 @@ private[controllers] trait GetCelebrityEndpoint { this: Controller =>
 object GetCelebrityEndpoint {
   def html(celebrity: Celebrity): Html = {
     val profilePhotoUrl = celebrity.profilePhoto.resizedWidth(200).getSaved(AccessPolicy.Public).url
-    views.Application.html.celebrity(celebrity, profilePhotoUrl, celebrity.products())
+    views.Application.html.celebrity(celebrity, profilePhotoUrl, celebrity.productsInActiveInventoryBatches())
   }
 }

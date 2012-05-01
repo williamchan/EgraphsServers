@@ -10,6 +10,8 @@ import services.db.Schema
 import models._
 import services.http.ControllerMethod
 import services.logging.Logging
+import java.text.SimpleDateFormat
+import org.joda.time.DateTime
 
 object TestControllers extends Controller with Logging {
   val controllerMethod = AppConfig.instance[ControllerMethod]
@@ -19,6 +21,10 @@ object TestControllers extends Controller with Logging {
   val administratorServices = AppConfig.instance[AdministratorServices]
   val celebrityServices = AppConfig.instance[CelebrityServices]
   val customerServices = AppConfig.instance[CustomerServices]
+
+  private lazy val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
+  private lazy val today = DateTime.now().toLocalDate.toDate
+  private lazy val future = dateFormat.parse("2020-01-01")
 
   def memcached() = controllerMethod() {
     import play.cache.Cache
@@ -99,18 +105,21 @@ object TestControllers extends Controller with Logging {
       administratorId = Some(administrator.id)
     ).withPassword("derp").right.get.save()
 
-    celebrity.newProduct.copy(
+    val product1 = celebrity.newProduct.copy(
       priceInCurrency = 50,
       name = celebrity.publicName.get + "'s Product A",
       description = "Tyson 15"
     ).save().withPhoto(Play.getFile("test/files/longoria/product-2.jpg")).save()
 
-    celebrity.newProduct.copy(
+    val product2 = celebrity.newProduct.copy(
       priceInCurrency = 100,
       name = celebrity.publicName.get + "'s Product B",
       description = "Help me... help YOU..."
     ).save().withPhoto(Play.getFile("test/files/kapler/product-1.jpg")).save()
 
+    val inventoryBatch = InventoryBatch(celebrityId = celebrity.id, numInventory = 100, startDate = today, endDate = future).save()
+    inventoryBatch.products.associate(product1.product)
+    inventoryBatch.products.associate(product2.product)
   }
 
   def logStuffThenThrowException() = controllerMethod() {
@@ -157,7 +166,7 @@ object TestControllers extends Controller with Logging {
   }
 
   private def orderFromCelebrity(celebrity: Celebrity, celebrityEmail: String, msg: String, numOrders: Int): String = {
-    val product = celebrity.products().headOption
+    val product = celebrity.productsInActiveInventoryBatches().headOption
     if (product.isEmpty) {
       "\"No products found for celebrity " + celebrity.publicName + "\""
     } else {

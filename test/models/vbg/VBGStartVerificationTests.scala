@@ -5,7 +5,7 @@ import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 import utils._
 import services.AppConfig
-import models.{Egraph, EgraphTests}
+import models.Egraph
 
 class VBGStartVerificationTests extends UnitFlatSpec
 with ShouldMatchers
@@ -26,7 +26,7 @@ with DBTransactionPerTest {
   }
 
   def newEntity = {
-    val egraph = Egraph(orderId = EgraphTests.persistedOrder().id).save()
+    val egraph = Egraph(orderId = TestData.newSavedOrder().id).save()
     new VBGStartVerification(egraphId = egraph.id)
   }
 

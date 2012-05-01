@@ -20,7 +20,7 @@ private[controllers] trait GetCelebrityOrdersAdminEndpoint {
   def getCelebrityOrdersAdmin(filter: String = "pendingAdminReview", page: Int = 1) = controllerMethod() {
     adminFilters.requireCelebrity {
       (celebrity, admin) =>
-        var query = filter match {
+        val query = filter match {
           case "rejected" => orderStore.findByCelebrity(celebrityId = celebrity.id, orderQueryFilters.rejected)
           case "signerActionable" => orderStore.findByCelebrity(celebrityId = celebrity.id, orderQueryFilters.actionableOnly: _*)
           case "all" => orderStore.findByCelebrity(celebrityId = celebrity.id)

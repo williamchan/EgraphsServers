@@ -1,7 +1,6 @@
 package models
 
 import java.sql.Timestamp
-import org.squeryl.PrimitiveTypeMode._
 import services.db.{KeyedCaseClass, Saves, Schema}
 import com.google.inject.Inject
 import services.{Utils, AppConfig, Time}
@@ -26,6 +25,7 @@ case class Administrator(
 case class AdministratorServices @Inject()(store: AdministratorStore, accountStore: AccountStore)
 
 class AdministratorStore @Inject()(schema: Schema, accountStore: AccountStore) extends Saves[Administrator] with SavesCreatedUpdated[Administrator] {
+  import org.squeryl.PrimitiveTypeMode._
 
   def authenticate(email: String, passwordAttempt: String): Option[Administrator] = {
     val authenticationResult: Either[AccountAuthenticationError, Account] = accountStore.authenticate(email = email, passwordAttempt = passwordAttempt)

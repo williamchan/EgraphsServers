@@ -1,6 +1,5 @@
 package models
 
-import org.squeryl.PrimitiveTypeMode._
 import play.data.validation.Validation.ValidationResult
 import play.data.validation.Validation
 import java.sql.Timestamp
@@ -71,6 +70,8 @@ case class Account(
 case class AccountServices @Inject() (accountStore: AccountStore)
 
 class AccountStore @Inject() (schema: Schema) extends Saves[Account] with SavesCreatedUpdated[Account] {
+  import org.squeryl.PrimitiveTypeMode._
+
   def authenticate(email: String, passwordAttempt: String): Either[AccountAuthenticationError, Account] = {
     import AccountAuthenticationError._
 

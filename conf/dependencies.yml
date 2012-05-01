@@ -18,6 +18,7 @@ require:
         exclude:
             - org.clojure -> *
     - org.joda -> joda-money 0.6
+    - joda-time -> joda-time 2.1
     - org.specs2 -> specs2_2.8.1 1.5:
         exclude:
             - org.mockito -> *

@@ -16,7 +16,6 @@ import controllers.website.GetCelebrityProductEndpoint
 import com.google.inject.{Provider, Inject}
 import play.utils.HTML.htmlEscape
 import org.squeryl.Query
-import org.squeryl.PrimitiveTypeMode._
 import models.Egraph.EgraphState
 import xyzmo.{XyzmoVerifyUserStore, XyzmoVerifyUser}
 
@@ -513,6 +512,7 @@ trait EgraphAssets {
 }
 
 class EgraphStore @Inject() (schema: Schema) extends Saves[Egraph] with SavesCreatedUpdated[Egraph] {
+  import org.squeryl.PrimitiveTypeMode._
 
   def getEgraphsAndResults(filters: FilterOneTable[Egraph]*): Query[(Egraph, Option[VBGVerifySample], Option[XyzmoVerifyUser])] = {
     join(schema.egraphs, schema.vbgVerifySampleTable.leftOuter, schema.xyzmoVerifyUserTable.leftOuter)(
@@ -558,6 +558,7 @@ class EgraphStore @Inject() (schema: Schema) extends Saves[Egraph] with SavesCre
 }
 
 class EgraphQueryFilters @Inject() (schema: Schema) {
+  import org.squeryl.PrimitiveTypeMode._
 
   import EgraphState._
 

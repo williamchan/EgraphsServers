@@ -5,12 +5,13 @@ import controllers.WebsiteControllers
 import play.mvc.Controller
 import java.io.File
 import play.data.validation.Validation.required
-import controllers.website.GetCelebrityProductEndpoint
 import play.data.validation.Validation
 import models._
 import services.logging.Logging
 import services.ImageUtil
 import services.http.{SecurityRequestFilters, ControllerMethod, CelebrityAccountRequestFilters, AdminRequestFilters}
+import play.Play
+import java.text.SimpleDateFormat
 
 trait PostCelebrityProductAdminEndpoint extends Logging {
   this: Controller =>
@@ -94,6 +95,8 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
             ).saveWithImageAssets(image = productImageOption, icon = productIconOption)
           }
 
+          maybeCreateInventoryBatchForDemoMode(savedProduct, isCreate, params.get("createWithoutInventory"))
+
           new Redirect(GetProductAdminEndpoint.url(productId = savedProduct.id).url + "?action=preview")
         }
         else {
@@ -101,6 +104,19 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
           redirectWithValidationErrors(celebrity, productId, productName, productDescription, storyTitle, storyText)
         }
       }
+    }
+  }
+
+  /**
+   * This is here so that demo'ers don't need to worry about setting up an InventoryBatch for demo Products before making orders.
+   */
+  private def maybeCreateInventoryBatchForDemoMode(product: Product, isCreate: Boolean, createWithoutInventory: String) {
+    if (isCreate && (createWithoutInventory == null) && (Play.id == "test")) {
+      val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
+      val jan_01_2012 = dateFormat.parse("2012-01-01")
+      val future = dateFormat.parse("2020-01-01")
+      val inventoryBatch = InventoryBatch(celebrityId = product.celebrityId, numInventory = 100, startDate = jan_01_2012, endDate = future).save()
+      inventoryBatch.products.associate(product)
     }
   }
 

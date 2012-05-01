@@ -6,7 +6,7 @@ import play.test.UnitFlatSpec
 import utils._
 import services.AppConfig
 import com.xyzmo.wwww.biometricserver.WebServiceBiometricPartStub
-import models.{Egraph, EgraphTests}
+import models.Egraph
 
 class XyzmoVerifyUserTests extends UnitFlatSpec
 with ShouldMatchers
@@ -61,7 +61,7 @@ with DBTransactionPerTest {
   }
 
   "findByEgraph" should "return VBGVerifySample" in {
-    val egraph = Egraph(orderId = EgraphTests.persistedOrder().id).save()
+    val egraph = Egraph(orderId = TestData.newSavedOrder().id).save()
     store.findByEgraph(egraph) should be(None)
 
     val xyzmoVerifyUser = new XyzmoVerifyUser(egraphId = egraph.id).save()
@@ -69,7 +69,7 @@ with DBTransactionPerTest {
   }
 
   def newEntity = {
-    val egraph = Egraph(orderId = EgraphTests.persistedOrder().id).save()
+    val egraph = Egraph(orderId = TestData.newSavedOrder().id).save()
     new XyzmoVerifyUser(egraphId = egraph.id)
   }
 

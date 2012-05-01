@@ -48,7 +48,11 @@ with DBTransactionPerTest {
     val signature_match = TestHelpers.getStringFromFile(Play.getFile("test/files/xyzmo_signature7.xml"))
     val signature_nomatch = TestHelpers.getStringFromFile(Play.getFile("test/files/xyzmo_signature_nomatch.xml"))
 
-    val celebrity = Celebrity().save()
+    val celebrity = TestData.newSavedCelebrity()
+    val customer = TestData.newSavedCustomer()
+    val product = TestData.newSavedProduct(celebrity = Some(celebrity))
+    val order = customer.buy(product).save()
+
     val enrollmentBatch: EnrollmentBatch = EnrollmentBatch(celebrityId = celebrity.id).save()
     //    EnrollmentSample(enrollmentBatchId = enrollmentBatch.id).save(signatureStr = signature1, voiceStr = TestConstants.voiceStr())
     //    EnrollmentSample(enrollmentBatchId = enrollmentBatch.id).save(signatureStr = signature2, voiceStr = TestConstants.voiceStr())
@@ -84,10 +88,6 @@ with DBTransactionPerTest {
     xyzmoEnrollUser.nrEnrolled.get should be(6)
     (xyzmoEnrollUser.xyzmoProfileId.get) should be(profileId)
     xyzmoEnrollUser.rejectedSignaturesSummary should be(None)
-
-    val customer = TestData.newSavedCustomer()
-    val product = celebrity.newProduct.save()
-    val order = customer.buy(product).save()
 
     val egraphVerifyTrue: Egraph = Egraph(orderId = order.id).save()
     val xyzmoVerifyUser_Match: XyzmoVerifyUser = XyzmoTestBiometricServices.verifyUser(egraph = egraphVerifyTrue, signature_match)

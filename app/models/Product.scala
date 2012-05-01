@@ -1,7 +1,6 @@
 package models
 
 import java.sql.Timestamp
-import org.squeryl.Query
 import services.db.{FilterOneTable, Schema, Saves, KeyedCaseClass}
 import play.templates.JavaExtensions
 import org.joda.money.Money
@@ -13,10 +12,15 @@ import play.Play
 import services.blobs.AccessPolicy
 import com.google.inject.{Provider, Inject}
 import services._
+import scala.Predef._
+import org.squeryl.Query
+import org.squeryl.dsl.ManyToMany
 
 case class ProductServices @Inject() (
   store: ProductStore,
   celebStore: CelebrityStore,
+  orderStore: OrderStore,
+  inventoryBatchStore: InventoryBatchStore,
   templateEngine: TemplateEngine,
   imageAssetServices: Provider[ImageAssetServices]
 )
@@ -40,6 +44,8 @@ case class Product(
   updated: Timestamp = Time.defaultTimestamp,
   services: ProductServices = AppConfig.instance[ProductServices]
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated {
+
+  lazy val inventoryBatches = services.inventoryBatchStore.inventoryBatches(this)
 
   //
   // Additional DB columns
@@ -169,7 +175,18 @@ case class Product(
   def celebrity: Celebrity = {
     services.celebStore.get(celebrityId)
   }
-  
+
+  def getRemainingInventoryAndActiveInventoryBatches(): (Int, Seq[InventoryBatch]) = {
+    val activeInventoryBatches = services.inventoryBatchStore.getActiveInventoryBatches(this).toSeq
+    val accumulatedInventoryCountAndBatchId = (0, List.empty[Long])
+    val (totalInventory, inventoryBatchIds) = activeInventoryBatches.foldLeft(accumulatedInventoryCountAndBatchId) { (accum, inventoryBatch) =>
+      val (currentInventoryCount, currentBatchIdList) = accum
+      (currentInventoryCount + inventoryBatch.numInventory, inventoryBatch.id :: currentBatchIdList)
+    }
+    val numOrders = services.orderStore.countOrders(inventoryBatchIds)
+    (totalInventory - numOrders, activeInventoryBatches)
+  }
+
   //
   // KeyedCaseClass[Long] methods
   //
@@ -221,12 +238,25 @@ object Product {
   }
 }
 
-class ProductStore @Inject() (schema: Schema) extends Saves[Product] with SavesCreatedUpdated[Product] {
+class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: InventoryBatchQueryFilters) extends Saves[Product] with SavesCreatedUpdated[Product] {
   import org.squeryl.PrimitiveTypeMode._
 
   //
   // Public members
   //
+
+  def findActiveProductsByCelebrity(celebrityId: Long): Query[Product] = {
+    from(schema.products, schema.inventoryBatchProducts, schema.inventoryBatches)((product, association, inventoryBatch) =>
+      where(
+        product.celebrityId === celebrityId
+          and association.productId === product.id
+          and association.inventoryBatchId === inventoryBatch.id
+          and (Time.today between(inventoryBatch.startDate, inventoryBatch.endDate))
+      )
+        select (product)
+    )
+  }
+
   /** Locates all of the products being sold by a particular celebrity */
   def findByCelebrity(celebrityId: Long, filters: FilterOneTable[Product] *): Query[Product] = {
     from(schema.products)(product =>
@@ -245,6 +275,10 @@ class ProductStore @Inject() (schema: Schema) extends Saves[Product] with SavesC
       where(product.celebrityId === celebrityId and product.urlSlug === slug)
         select (product)
     ).headOption
+  }
+
+  def products(inventoryBatch: InventoryBatch): Query[Product] with ManyToMany[Product, InventoryBatchProduct] = {
+    schema.inventoryBatchProducts.left(inventoryBatch)
   }
 
   //

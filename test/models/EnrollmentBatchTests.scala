@@ -93,4 +93,11 @@ with DBTransactionPerTest {
     pendingEnrollmentBatches.head should be(pendingBatch)
   }
 
+  "getOpenEnrollmentBatch" should "return the open EnrollmentBatch" in {
+    val celebrity = Celebrity().save()
+    val batch = EnrollmentBatch(celebrityId = celebrity.id).save()
+    val result = store.getOpenEnrollmentBatch(celebrity)
+    result.get should be (batch)
+  }
+
 }

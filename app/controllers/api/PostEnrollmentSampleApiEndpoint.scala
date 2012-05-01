@@ -14,6 +14,7 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
   protected def controllerMethod: ControllerMethod
   protected def enrollmentBatchServices: EnrollmentBatchServices
   protected def celebFilters: CelebrityAccountRequestFilters
+  protected def enrollmentBatchStore: EnrollmentBatchStore
 
   def postEnrollmentSample(signature: Option[String], audio: Option[String], skipBiometrics: Boolean = false) =
 
@@ -23,7 +24,7 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
         celebFilters.requireCelebrityAccount { (account, celebrity) =>
           (signature, audio) match {
             case (Some(signatureString), Some(audioString)) =>
-              val openEnrollmentBatch: Option[EnrollmentBatch] = celebrity.getOpenEnrollmentBatch()
+              val openEnrollmentBatch: Option[EnrollmentBatch] = enrollmentBatchStore.getOpenEnrollmentBatch(celebrity)
 
               if (openEnrollmentBatch.isEmpty) {
                 val enrollmentBatch = EnrollmentBatch(celebrityId = celebrity.id, services = enrollmentBatchServices).save()

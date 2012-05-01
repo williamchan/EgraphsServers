@@ -14,6 +14,8 @@ import play.libs.{Codec, Mail}
 import services.payment.Payment
 import play.Play
 import services.{Utils, AppConfig}
+import org.joda.time.DateTime
+import java.text.SimpleDateFormat
 
 /**
  * All scenarios supported by the API.
@@ -33,6 +35,10 @@ class Scenarios extends DeclaresScenarios {
   private val egraphPageCategory = "Egraph Page"
 
   private val mail = AppConfig.instance[services.mail.Mail]
+
+  private lazy val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
+  private lazy val today = DateTime.now().toLocalDate.toDate
+  private lazy val future = dateFormat.parse("2020-01-01")
 
   toScenarios add Scenario(
     "Send an email to erem@egraphs.com",
@@ -101,7 +107,7 @@ class Scenarios extends DeclaresScenarios {
       val photoImage = Some(Product().defaultPhoto.renderFromMaster)
       val iconImage = Some(Product().defaultIcon.renderFromMaster)
 
-      will.addProduct(
+      val product1 = will.addProduct(
         name="2010 Starcraft 2 Championships",
         description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one.",
         priceInCurrency=10,
@@ -111,7 +117,7 @@ class Scenarios extends DeclaresScenarios {
         storyText="{signer_link}{signer_name}{end_link} was born on top. He proved it to the world at the {product_link}{product_name}{end_link}. A few days afterwards he got a note from {recipient_name} on his iPad. This was his response."
       )
 
-      will.addProduct(
+      val product2 = will.addProduct(
         name="2011 King of Pweens Competition",
         description="In classic form, Wizzle dominated the competition and left mouths agape.",
         priceInCurrency=70,
@@ -123,6 +129,9 @@ class Scenarios extends DeclaresScenarios {
            he proved it to {recipient_name}.
            """
       )
+      val inventoryBatch = InventoryBatch(celebrityId = will.id, numInventory = 100, startDate = today, endDate = future).save()
+      inventoryBatch.products.associate(product1)
+      inventoryBatch.products.associate(product2)
     }
   )
 
@@ -278,11 +287,11 @@ class Scenarios extends DeclaresScenarios {
       Scenario.play("Will-Chan-is-a-celebrity")
 
       val will = Scenarios.getWillCelebrityAccount
-      will.newProduct.copy(
+      createProduct(celebrity = will,
         priceInCurrency=100,
         name="2010 Starcraft 2 Championships",
         description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
-      ).save()
+      )
 
       redirectToWizzle
     }
@@ -302,35 +311,35 @@ class Scenarios extends DeclaresScenarios {
 
       val will = Scenarios.getWillCelebrityAccount
 
-      will.newProduct.copy(
+      createProduct(celebrity = will,
         priceInCurrency=100,
         name="2010 Starcraft 2 Championships",
         description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
-      ).save()
+      )
 
-      will.newProduct.copy(
+      createProduct(celebrity = will,
         priceInCurrency=90,
         name="2012 Platinum League Victory",
         description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
-      ).save()
+      )
 
-      will.newProduct.copy(
+      createProduct(celebrity = will,
         priceInCurrency=89.99,
         name="2001 Senior Yearbook Photo",
         description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
-      ).save()
+      )
 
-      will.newProduct.copy(
+      createProduct(celebrity = will,
         priceInCurrency=100.50,
         name="Bi-Annual World Series of Magic: The Gathering",
         description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
-      ).save()
+      )
 
-      will.newProduct.copy(
+      createProduct(celebrity = will,
         priceInCurrency=120.00,
         name="2200AD Undead League Starcraft II Championship",
         description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
-      ).save()
+      )
 
       redirectToWizzle
     }
@@ -459,11 +468,18 @@ class Scenarios extends DeclaresScenarios {
     Scenario.play("Will-Chan-is-a-celebrity")
 
     val will = Scenarios.getWillCelebrityAccount
-    will.newProduct.copy(
+    createProduct(celebrity = will,
       priceInCurrency=100,
       name="2010 Starcraft 2 Championships",
       description="Before this classic performance nobody had dreamed they would ever see a resonance cascade, let alone create one."
-    ).save()
+    )
+  }
+
+  private[this] def createProduct(celebrity: Celebrity, priceInCurrency: BigDecimal, name: String, description: String): Product = {
+    val product = celebrity.newProduct.copy(priceInCurrency = priceInCurrency, name = name, description = description).save()
+    val inventoryBatch = InventoryBatch(celebrityId = celebrity.id, numInventory = 100, startDate = today, endDate = future).save()
+    inventoryBatch.products.associate(product)
+    product
   }
 
   private[this] def redirectToStarcraftProduct = {

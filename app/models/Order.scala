@@ -1,6 +1,5 @@
 package models
 
-import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
 import org.joda.money.Money
 import models.CashTransaction.EgraphPurchase
@@ -32,6 +31,7 @@ case class OrderServices @Inject() (
 case class Order(
   id: Long = 0,
   productId: Long = 0,
+  inventoryBatchId: Option[Long] = None, // todo(wchan): Would like to make this non-nullable
   buyerId: Long = 0,
   recipientId: Long = 0,
   recipientName: String = "",
@@ -261,6 +261,7 @@ object Order {
 }
 
 class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreatedUpdated[Order] {
+  import org.squeryl.PrimitiveTypeMode._
   //
   // Public methods
   //
@@ -310,6 +311,13 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
     )
   }
 
+  def countOrders(inventoryBatchIds: Seq[Long]): Int = {
+    from(schema.orders)(order =>
+      where(order.inventoryBatchId in inventoryBatchIds.map(id => Some(id)))
+        compute (count)
+    ).toInt
+  }
+
   //
   // Saves[Order] methods
   //
@@ -318,6 +326,7 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
   override def defineUpdate(theOld: Order, theNew: Order) = {
     updateIs(
       theOld.productId := theNew.productId,
+      theOld.inventoryBatchId := theNew.inventoryBatchId,
       theOld.buyerId := theNew.buyerId,
       theOld.transactionId := theNew.transactionId,
       theOld.paymentStateString := theNew.paymentStateString,
@@ -344,6 +353,7 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
 }
 
 class OrderQueryFilters @Inject() (schema: Schema) {
+  import org.squeryl.PrimitiveTypeMode._
 
   def actionableOnly = List(actionableEgraphs, approvedByAdmin)
 

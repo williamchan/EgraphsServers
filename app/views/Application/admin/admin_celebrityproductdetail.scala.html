@@ -1,4 +1,4 @@
-@(isCreate: Boolean, celebrity: models.Celebrity, errorFields: Option[List[String]], fields: (String) => String, product: Option[models.Product] = None
+@(isCreate: Boolean, celebrity: models.Celebrity, errorFields: Option[List[String]], fields: (String) => String, product: Option[models.Product] = None, isTestMode: Boolean = false
 )(implicit session: play.mvc.Scope.Session)
 
 @import controllers.WebsiteControllers
@@ -55,6 +55,18 @@
             help=Some(Html("Will be displayed on the product's page.")),
             fields=fields
           )
+
+          @if(isCreate && isTestMode) {
+            @formField(
+              id="createWithoutInventory",
+              label="Override inventory?",
+              inputType="checkbox",
+              width="checkbox",
+              help=Some(Html("Demo'ers should leave this unchecked")),
+              fields=fields
+            )
+          }
+
         </fieldset>
         <fieldset>
           <legend>egraph presentation: media</legend>

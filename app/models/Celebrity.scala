@@ -1,6 +1,5 @@
 package models
 
-import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
 import services.blobs.AccessPolicy
 import play.templates.JavaExtensions
@@ -18,6 +17,7 @@ import java.awt.image.BufferedImage
 case class CelebrityServices @Inject() (
   store: CelebrityStore,
   productStore: ProductStore,
+  inventoryBatchStore: InventoryBatchStore,
   schema: Schema,
   productServices: Provider[ProductServices],
   imageAssetServices: Provider[ImageAssetServices]
@@ -71,6 +71,9 @@ case class Celebrity(id: Long = 0,
     services.productStore.findByCelebrity(id, filters: _*)
   }
 
+  def productsInActiveInventoryBatches(): Seq[Product] = {
+    services.productStore.findActiveProductsByCelebrity(id).toSeq
+  }
 
   /**
    * Renders the Celebrity as a Map, which will itself be rendered into whichever data format
@@ -154,13 +157,6 @@ case class Celebrity(id: Long = 0,
     product.saveWithImageAssets(image, icon)
   }
 
-  def getOpenEnrollmentBatch(): Option[EnrollmentBatch] = {
-    from(services.schema.enrollmentBatches)(enrollmentBatch =>
-      where(enrollmentBatch.celebrityId === this.id and enrollmentBatch.isSuccessfulEnrollment.isNull)
-        select (enrollmentBatch)
-    ).headOption
-  }
-
   //
   // KeyedCaseClass[Long] methods
   //
@@ -196,6 +192,8 @@ case class Celebrity(id: Long = 0,
 }
 
 class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {
+  import org.squeryl.PrimitiveTypeMode._
+
   //
   // Public Methods
   //

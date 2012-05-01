@@ -43,7 +43,7 @@ class CustomerTests extends UnitFlatSpec
   "A customer" should "produce Orders that are properly configured" in {
     val buyer = TestData.newSavedCustomer()
     val recipient = TestData.newSavedCustomer()
-    val product = Product(id=1L, priceInCurrency=89.99)
+    val product = TestData.newSavedProduct()
 
     val order = buyer.buy(product, recipient=recipient)
 
@@ -55,8 +55,17 @@ class CustomerTests extends UnitFlatSpec
 
   it should "make itself the recipient if no recipient is specified" in {
     val buyer = TestData.newSavedCustomer()
+    val product = TestData.newSavedProduct()
 
-    buyer.buy(Product()).recipientId should be (buyer.id)
+    buyer.buy(product).recipientId should be (buyer.id)
+  }
+
+  "buy" should "set inventoryBatchId on the Order" in {
+    val buyer = TestData.newSavedCustomer()
+    val recipient = TestData.newSavedCustomer()
+    val product = TestData.newSavedProduct()
+    val order = buyer.buy(product, recipient = recipient).save()
+    order.inventoryBatchId should be(Some(product.inventoryBatches.head.id))
   }
 
   "findOrCreateByEmail" should "find or create as appropriate" in {

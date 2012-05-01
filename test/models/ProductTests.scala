@@ -3,11 +3,11 @@ package models
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.BeforeAndAfterEach
 import play.test.UnitFlatSpec
-import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationAfter, CreatedUpdatedEntityTests, SavingEntityTests}
 import services.Time
 import services.AppConfig
 import play.Play
 import javax.imageio.ImageIO
+import utils._
 
 class ProductTests extends UnitFlatSpec
   with ShouldMatchers
@@ -23,7 +23,7 @@ class ProductTests extends UnitFlatSpec
   // SavingEntityTests[Product] methods
   //
   override def newEntity = {
-    Celebrity().save().newProduct
+    TestData.newSavedCelebrity().newProduct
   }
 
   override def saveEntity(toSave: Product) = {
@@ -50,7 +50,7 @@ class ProductTests extends UnitFlatSpec
   // Test cases
   //
   "A product" should "serialize the correct Map for the API" in {
-    val product = Celebrity().save().newProduct.copy(name = "Herp Derp").save()
+    val product = TestData.newSavedProduct().copy(name = "Herp Derp").save()
 
     val rendered = product.renderedForApi
     rendered("id") should be(product.id)
@@ -62,28 +62,42 @@ class ProductTests extends UnitFlatSpec
 
   "findByCelebrityAndUrlSlug" should "return Product with matching name and celebrityId" in {
     val celebrity = Celebrity().save()
-    val product = celebrity.newProduct.copy(name = "Herp Derp").save()
+    val product = TestData.newSavedProduct(celebrity = Some(celebrity)).copy(name = "Herp Derp").save()
 
     store.findByCelebrityAndUrlSlug(celebrityId = celebrity.id, slug = product.urlSlug) should not be (None)
     store.findByCelebrityAndUrlSlug(celebrityId = celebrity.id + 1, slug = product.urlSlug) should be(None)
     store.findByCelebrityAndUrlSlug(celebrityId = celebrity.id, slug = "Herp") should be(None)
-
   }
-  
+
   "A product's icon photo" should "start out as the default" in {
     import services.ImageUtil.Conversions._
-    val product = newProduct
-    val icon = newProduct.icon
-    icon.url should be (newProduct.defaultIcon.url)
+    val product = TestData.newSavedProduct()
+    val icon = TestData.newSavedProduct().icon
+    icon.url should be (TestData.newSavedProduct().defaultIcon.url)
 
     val newIconImage = ImageIO.read(Play.getFile("public/images/egraph_default_plaque_icon.png"))
     val productWithIcon = product.withIcon(newIconImage.asByteArray(ImageAsset.Png)).save().product
 
-    productWithIcon.iconUrl should not be (newProduct.defaultIcon.url)
-  }
-  
-  def newProduct: Product = {
-    Celebrity().save().newProduct.copy(name = "Herp Derp").save()
+    productWithIcon.iconUrl should not be (TestData.newSavedProduct().defaultIcon.url)
   }
 
+  "getRemainingInventoryAndActiveInventoryBatches" should "return total inventory in active InventoryBatches minus the number of relevant Orders" in {
+    val celebrity = TestData.newSavedCelebrity()
+    val customer = TestData.newSavedCustomer()
+    val product1 = TestData.newSavedProductWithoutInventoryBatch(celebrity = celebrity)
+    val product2 = TestData.newSavedProductWithoutInventoryBatch(celebrity = celebrity)
+    product1.getRemainingInventoryAndActiveInventoryBatches() should be ((0, List.empty[InventoryBatch]))
+    product2.getRemainingInventoryAndActiveInventoryBatches() should be ((0, List.empty[InventoryBatch]))
+
+    val inventoryBatch1 = TestData.newSavedInventoryBatch(celebrity = celebrity)
+    val inventoryBatch2 = TestData.newSavedInventoryBatch(celebrity = celebrity)
+    inventoryBatch1.products.associate(product1)
+    inventoryBatch1.products.associate(product2)
+    inventoryBatch2.products.associate(product2)
+    customer.buy(product1).copy(inventoryBatchId = Some(inventoryBatch1.id)).save()
+    customer.buy(product2).copy(inventoryBatchId = Some(inventoryBatch1.id)).save()
+    customer.buy(product2).copy(inventoryBatchId = Some(inventoryBatch2.id)).save()
+    product1.getRemainingInventoryAndActiveInventoryBatches() should be ((48, List(inventoryBatch1)))                  // product1 is in inventoryBatch1, which has 2 purchases
+    product2.getRemainingInventoryAndActiveInventoryBatches() should be ((97, List(inventoryBatch1, inventoryBatch2))) // product1 is in both inventoryBatch1 and inventoryBatch1, which have 3 purchases total
+  }
 }

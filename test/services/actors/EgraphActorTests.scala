@@ -7,11 +7,11 @@ import akka.actor.Actor
 import Actor._
 import services.db.{DBSession, TransactionSerializable}
 import services.AppConfig
-import models.{Egraph, EgraphStore, EgraphTests}
-import utils.{ClearsDatabaseAndValidationAfter, TestConstants}
+import models.{Egraph, EgraphStore}
 import akka.util.TestKit
 import org.scalatest.BeforeAndAfterAll
 import models.Egraph.EgraphState
+import utils.{TestData, ClearsDatabaseAndValidationAfter, TestConstants}
 
 class EgraphActorTests extends UnitFlatSpec
 with ShouldMatchers
@@ -39,13 +39,13 @@ with TestKit {
     var egraph1: Egraph = null
     var egraph2: Egraph = null
     AppConfig.instance[DBSession].connected(TransactionSerializable) {
-      egraph1 = EgraphTests.persistedOrder()
+      egraph1 = TestData.newSavedOrder()
         .newEgraph
         .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.voiceStr().getBytes("UTF-8"))
         .save()
     }
     AppConfig.instance[DBSession].connected(TransactionSerializable) {
-      egraph2 = EgraphTests.persistedOrder()
+      egraph2 = TestData.newSavedOrder()
         .newEgraph
         .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.voiceStr().getBytes("UTF-8"))
         .save()

@@ -3,6 +3,7 @@ package services
 import java.sql.Timestamp
 import java.util.{TimeZone, Date}
 import java.text.{DateFormat, SimpleDateFormat}
+import org.joda.time.DateTime
 
 /**
  * Convenience methods for dealing with time
@@ -19,6 +20,10 @@ object Time {
   /** The current time */
   def now:Timestamp = {
     new Timestamp(new Date().getTime)
+  }
+
+  def today:Date = {
+    DateTime.now().toDate
   }
 
   /**

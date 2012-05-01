@@ -1,6 +1,5 @@
 package models
 
-import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
 import services.Time
 import services.db.{KeyedCaseClass, Schema, Saves}
@@ -96,6 +95,14 @@ object EnrollmentBatch {
 }
 
 class EnrollmentBatchStore @Inject() (schema: Schema) extends Saves[EnrollmentBatch] with SavesCreatedUpdated[EnrollmentBatch] {
+  import org.squeryl.PrimitiveTypeMode._
+
+  def getOpenEnrollmentBatch(celebrity: Celebrity): Option[EnrollmentBatch] = {
+    from(schema.enrollmentBatches)(enrollmentBatch =>
+      where(enrollmentBatch.celebrityId === celebrity.id and enrollmentBatch.isSuccessfulEnrollment.isNull)
+        select (enrollmentBatch)
+    ).headOption
+  }
 
   def getEnrollmentSamples(batchId: Long): List[EnrollmentSample] = {
     queryForEnrollmentSamples(batchId).toList

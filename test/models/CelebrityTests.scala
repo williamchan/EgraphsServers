@@ -3,12 +3,12 @@ package models
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
-import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationAfter, CreatedUpdatedEntityTests, SavingEntityTests}
 import javax.imageio.ImageIO
 import services.Time
 import services.ImageUtil.Conversions._
 import services.AppConfig
 import play.Play
+import utils._
 
 class CelebrityTests extends UnitFlatSpec
   with ShouldMatchers
@@ -73,14 +73,14 @@ class CelebrityTests extends UnitFlatSpec
   }
 
   it should "throw an exception if you save profile photo when id is 0" in {
-    val celeb = makeCeleb
+    val celeb = newEntity
     val image = ImageIO.read(Play.getFile("test/files/image.png"))
 
     evaluating { celeb.saveWithProfilePhoto(image.asByteArray(ImageAsset.Png)) } should produce [IllegalArgumentException]
   }
 
   it should "store and retrieve the profile image asset" in {
-    val celeb = makeCeleb
+    val celeb = TestData.newSavedCelebrity()
     val image = ImageIO.read(Play.getFile("test/files/image.png"))
 
     val (savedCeleb, imageAsset) = celeb.save().saveWithProfilePhoto(image.asByteArray(ImageAsset.Png))
@@ -93,15 +93,18 @@ class CelebrityTests extends UnitFlatSpec
     profilePhoto.renderFromMaster.asByteArray(ImageAsset.Png).length should be (imageAsset.renderFromMaster.asByteArray(ImageAsset.Png).length)
   }
 
-  it should "test getOpenEnrollmentBatch" in {
-    val celebrity = Celebrity().save()
-    val batch = EnrollmentBatch(celebrityId = celebrity.id).save()
-    val result = celebrity.getOpenEnrollmentBatch()
-    result.get should be (batch)
-  }
+  "getActiveProducts" should "return Products associated with active InventoryBatches" in {
+    val celebrity = TestData.newSavedCelebrity()
+    celebrity.productsInActiveInventoryBatches().length should be(0)
 
-  def makeCeleb: Celebrity = {
-    Celebrity(firstName=Some("Will"), lastName=Some("Chan"), publicName=Some("Wizzle"))
+    val product1 = TestData.newSavedProductWithoutInventoryBatch(celebrity = celebrity)
+    val product2 = TestData.newSavedProductWithoutInventoryBatch(celebrity = celebrity)
+    TestData.newSavedProductWithoutInventoryBatch(celebrity = celebrity) // not used
+    val inventoryBatch1 = TestData.newSavedInventoryBatch(celebrity = celebrity)
+    val inventoryBatch2 = TestData.newSavedInventoryBatch(celebrity = celebrity)
+    inventoryBatch1.products.associate(product1)
+    inventoryBatch2.products.associate(product1)
+    inventoryBatch2.products.associate(product2)
+    celebrity.productsInActiveInventoryBatches().toSet should be(Set(product1, product2))
   }
-
 }

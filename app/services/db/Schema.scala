@@ -103,6 +103,10 @@ class Schema @Inject()(
     .via((customer, order) => customer.id === order.recipientId)
   recipientCustomerToOrders.foreignKeyDeclaration.constrainReference(onDelete cascade)
 
+  // todo(wchan): wtf... anyway, this will work when order.inventoryBatchId is non-nullable
+//  val inventoryBatchToOrders = oneToManyRelation(inventoryBatches, orders)
+//    .via((inventoryBatch, order) => inventoryBatch.id === order.inventoryBatchId)
+
   //
   // Egraphs
   //
@@ -117,6 +121,26 @@ class Schema @Inject()(
     .via((order, egraph) => order.id === egraph.orderId)
   orderToEgraphs.foreignKeyDeclaration.constrainReference(onDelete cascade)
 
+  //
+  // InventoryBatch
+  //
+  val inventoryBatches = table[InventoryBatch]
+  val celebrityToInventoryBatches = oneToManyRelation(celebrities, inventoryBatches).
+    via((celebrity, inventoryBatch) => celebrity.id === inventoryBatch.celebrityId)
+  on(inventoryBatches)(inventoryBatch =>
+    declare(
+      columns(inventoryBatch.startDate, inventoryBatch.endDate) are (indexed),
+      columns(inventoryBatch.celebrityId, inventoryBatch.startDate, inventoryBatch.endDate) are (indexed)
+    )
+  )
+
+  val inventoryBatchProducts = manyToManyRelation(inventoryBatches, products)
+    .via[InventoryBatchProduct]((inventoryBatch, product, join) => (join.inventoryBatchId === inventoryBatch.id, join.productId === product.id))
+  on(inventoryBatchProducts)(inventoryBatchProduct =>
+    declare(
+      columns(inventoryBatchProduct.inventoryBatchId, inventoryBatchProduct.productId) are (unique)
+    )
+  )
 
   //
   // Biometrics
@@ -329,8 +353,7 @@ class Schema @Inject()(
    *   the provided table's id field
    *
    */
-  private def oneAccountPerRowOn[T <: KeyedEntity[Long]]
-  (table: Table[T], foreignKey: Account => Option[Long]): OneToManyRelationImpl[T, Account] = {
+  private def oneAccountPerRowOn[T <: KeyedEntity[Long]] (table: Table[T], foreignKey: Account => Option[Long]): OneToManyRelationImpl[T, Account] = {
     val relation = oneToManyRelation(table, accounts)
       .via((row, account) => row.id === foreignKey(account))
 
@@ -360,6 +383,8 @@ class Schema @Inject()(
       factoryFor(egraphs) is Egraph(services = injector.instance[EgraphServices]),
       factoryFor(enrollmentBatches) is EnrollmentBatch(services = injector.instance[EnrollmentBatchServices]),
       factoryFor(enrollmentSamples) is EnrollmentSample(services = injector.instance[EnrollmentSampleServices]),
+      factoryFor(inventoryBatches) is InventoryBatch(services = injector.instance[InventoryBatchServices]),
+      factoryFor(inventoryBatchProducts) is InventoryBatchProduct(services = injector.instance[InventoryBatchProductServices]),
       factoryFor(orders) is Order(services = injector.instance[OrderServices]),
       factoryFor(products) is Product(services = injector.instance[ProductServices]),
       factoryFor(vbgAudioCheckTable) is VBGAudioCheck(services = injector.instance[VBGAudioCheckServices]),

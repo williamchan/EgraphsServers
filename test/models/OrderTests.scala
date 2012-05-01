@@ -111,7 +111,7 @@ class OrderTests extends UnitFlatSpec
     val recipient = TestData.newSavedCustomer().copy(name="Erem Boto").save()
     val recipientName = "Eremizzle"
     val celebrity = Celebrity(firstName=Some("George"), lastName=Some("Martin")).save()
-    val product = celebrity.newProduct.save()
+    val product = TestData.newSavedProduct(celebrity = Some(celebrity))
     val order = buyer
       .buy(product, recipient)
       .copy(
@@ -284,19 +284,35 @@ class OrderTests extends UnitFlatSpec
     found.toSet should be(Set(order0, order1))
   }
 
+  "countOrders" should "return count of orders made against InventoryBatches" in {
+    val celebrity = TestData.newSavedCelebrity()
+    val customer = TestData.newSavedCustomer()
+    val product1 = TestData.newSavedProductWithoutInventoryBatch(celebrity = celebrity)
+    val product2 = TestData.newSavedProductWithoutInventoryBatch(celebrity = celebrity)
+    val inventoryBatch1 = TestData.newSavedInventoryBatch(celebrity = celebrity)
+    val inventoryBatch2 = TestData.newSavedInventoryBatch(celebrity = celebrity)
+    inventoryBatch1.products.associate(product1)
+    inventoryBatch2.products.associate(product2)
+    customer.buy(product1).save()
+    customer.buy(product2).save()
+    customer.buy(product2).save()
+
+    val inventoryBatchIds = Seq(inventoryBatch1.id, inventoryBatch2.id)
+    orderStore.countOrders(inventoryBatchIds) should be(3)
+  }
+
   //
   // Private methods
   //
   private def newCustomerAndProduct: (Customer, Product) = {
-    (TestData.newSavedCustomer(), Celebrity().save().newProduct.save())
+    (TestData.newSavedCustomer(), TestData.newSavedProduct())
   }
 
   private def newOrderStack = {
     val buyer  = TestData.newSavedCustomer().copy(name="Will Chan").save()
     val recipient = TestData.newSavedCustomer().copy(name="Erem Boto").save()
     val celebrity = Celebrity(firstName=Some("George"), lastName=Some("Martin")).save()
-    val product = celebrity.newProduct.save()
-
+    val product = TestData.newSavedProduct(celebrity = Some(celebrity))
     (buyer, recipient, celebrity, product)
   }
 }

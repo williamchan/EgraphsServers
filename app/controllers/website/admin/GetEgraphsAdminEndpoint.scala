@@ -20,7 +20,7 @@ private[controllers] trait GetEgraphsAdminEndpoint {
 
   def getEgraphsAdmin(filter: String = "pendingAdminReview", page: Int = 1) = controllerMethod() {
     adminFilters.requireAdministratorLogin { admin =>
-      var query = filter match {
+      val query = filter match {
         case "passedBiometrics" => egraphStore.getEgraphsAndResults(egraphQueryFilters.passedBiometrics)
         case "failedBiometrics" => egraphStore.getEgraphsAndResults(egraphQueryFilters.failedBiometrics)
         case "approvedByAdmin" => egraphStore.getEgraphsAndResults(egraphQueryFilters.approvedByAdmin)

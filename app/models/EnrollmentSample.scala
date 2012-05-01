@@ -2,7 +2,6 @@ package models
 
 import com.google.inject.Inject
 import java.sql.Timestamp
-import org.squeryl.PrimitiveTypeMode._
 import play.libs.Codec
 import services.AppConfig
 import services.blobs.Blobs
@@ -84,6 +83,7 @@ object EnrollmentSample {
 }
 
 class EnrollmentSampleStore @Inject()(schema: Schema) extends Saves[EnrollmentSample] with SavesCreatedUpdated[EnrollmentSample] {
+  import org.squeryl.PrimitiveTypeMode._
 
   //
   // Saves[EnrollmentSample] methods

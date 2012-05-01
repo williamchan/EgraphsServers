@@ -2,10 +2,10 @@ package controllers
 
 import api._
 import play.mvc.Controller
-import models.{OrderQueryFilters, EnrollmentBatchServices, OrderStore}
 import services.http.{ControllerMethod, OrderRequestFilters, CelebrityAccountRequestFilters}
 import services.db.DBSession
 import akka.actor.ActorRef
+import models.{EnrollmentBatchStore, OrderQueryFilters, EnrollmentBatchServices, OrderStore}
 
 object ApiControllers extends Controller
   with GetCelebrityEnrollmentTemplateApiEndpoint
@@ -22,6 +22,7 @@ object ApiControllers extends Controller
   override protected def enrollmentBatchActor: ActorRef = actors.EnrollmentBatchActor.actor
   override protected def dbSession: DBSession = instance[DBSession]
   override protected def controllerMethod = instance[ControllerMethod]
+  override protected def enrollmentBatchStore = instance[EnrollmentBatchStore]
   override protected def orderStore = instance[OrderStore]
   override protected def orderQueryFilters = instance[OrderQueryFilters]
   override protected def enrollmentBatchServices = instance[EnrollmentBatchServices]

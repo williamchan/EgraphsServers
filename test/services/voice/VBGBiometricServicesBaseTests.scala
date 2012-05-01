@@ -91,16 +91,16 @@ with DBTransactionPerTest {
     val verifyTrue: Array[Byte] = blobs.getStaticResource("test-files/vbg/verify_true.wav").get.asByteArray
     val verifyFalse: Array[Byte] = blobs.getStaticResource("test-files/vbg/verify_false.wav").get.asByteArray
 
-    val celebrity = Celebrity().save()
+    val celebrity = TestData.newSavedCelebrity()
+    val customer = TestData.newSavedCustomer()
+    val product = TestData.newSavedProduct(celebrity = Some(celebrity))
+    val order = customer.buy(product).save()
+
     val enrollmentBatch: EnrollmentBatch = EnrollmentBatch(celebrityId = celebrity.id).save()
     EnrollmentSample(enrollmentBatchId = enrollmentBatch.id).save(signatureStr = TestConstants.signatureStr, voiceStr = Codec.encodeBASE64(enroll1))
     EnrollmentSample(enrollmentBatchId = enrollmentBatch.id).save(signatureStr = TestConstants.signatureStr, voiceStr = Codec.encodeBASE64(enroll2))
     val enrollResult: Either[VoiceBiometricsError, Boolean] = vbg.enroll(enrollmentBatch)
     enrollResult.right.get should be(true)
-
-    val customer = TestData.newSavedCustomer()
-    val product = celebrity.newProduct.save()
-    val order = customer.buy(product).save()
 
     val egraphVerifyTrue: Egraph = Egraph(orderId = order.id).withAssets(signature = TestConstants.signatureStr, message = None, audio = verifyTrue).save()
     val verifyResultTrue: Either[VoiceBiometricsError, VBGVerifySample] = vbg.verify(egraphVerifyTrue)
@@ -124,15 +124,15 @@ with DBTransactionPerTest {
     val verify_21: Array[Byte] = getVoiceSampleBinary("tmp/verify_21.wav")
     val verify_30: Array[Byte] = getVoiceSampleBinary("tmp/verify_30.wav")
 
-    val celebrity = Celebrity().save()
+    val celebrity = TestData.newSavedCelebrity()
+    val customer = TestData.newSavedCustomer()
+    val product = TestData.newSavedProduct(celebrity = Some(celebrity))
+    val order = customer.buy(product).save()
+
     val enrollmentBatch: EnrollmentBatch = EnrollmentBatch(celebrityId = celebrity.id).save()
     EnrollmentSample(enrollmentBatchId = enrollmentBatch.id).save(signatureStr = TestConstants.signatureStr, voiceStr = Codec.encodeBASE64(enroll_11))
     val enrollResult: Either[VoiceBiometricsError, Boolean] = vbg.enroll(enrollmentBatch)
     println("enrollResult.right.get " + enrollResult.right.get)
-
-    val customer = TestData.newSavedCustomer()
-    val product = celebrity.newProduct.save()
-    val order = customer.buy(product).save()
 
     val egraphVerify_19: Egraph = Egraph(orderId = order.id).withAssets(signature = TestConstants.signatureStr, message = None, audio = verify_19).save()
     val verifyResult_19: Either[VoiceBiometricsError, VBGVerifySample] = vbg.verify(egraphVerify_19: Egraph)

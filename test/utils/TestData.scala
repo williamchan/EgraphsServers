@@ -1,15 +1,29 @@
 package utils
 
-import models.{Order, Celebrity, Account, Customer, Product}
 import services.Time
 import java.io.File
 import play.Play
+import util.Random
+import java.text.SimpleDateFormat
+import org.joda.time.DateTime
+import models._
 
 /**
  * Renders saved copies of domain objects that satisfy all relational integrity
  * constraints.
  */
 object TestData {
+
+  val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
+  lazy val jan_01_2012 = dateFormat.parse("2012-01-01")
+  lazy val feb_01_2012 = dateFormat.parse("2012-02-01")
+  lazy val today = DateTime.now().toLocalDate.toDate
+  lazy val tomorrow = new DateTime().plusDays(1).toLocalDate.toDate
+  lazy val twoDaysHence = new DateTime().plusDays(2).toLocalDate.toDate
+  lazy val threeDaysHence = new DateTime().plusDays(3).toLocalDate.toDate
+  lazy val sevenDaysHence = new DateTime().plusDays(7).toLocalDate.toDate
+
+  val random = new Random
 
   def generateEmail(prefix: String = ""): String = {
     prefix + Time.toBlobstoreFormat(Time.now) + "@egraphs.com"
@@ -35,18 +49,36 @@ object TestData {
   }
 
   def newSavedProduct(celebrity: Option[Celebrity] = None): Product = {
-    celebrity match {
+    val product = celebrity match {
       case None => newSavedCelebrity().newProduct.save()
-      case Some(c) => c.newProduct.save()
+      case Some(c) => c.newProduct.copy(name = "prod" + random.nextLong()).save()
+    }
+    val inventoryBatch = newSavedInventoryBatch(product.celebrity)
+    inventoryBatch.products.associate(product)
+    product
+  }
+
+  def newSavedProductWithoutInventoryBatch(celebrity: Celebrity): Product = {
+    celebrity.newProduct.copy(name = "prod" + random.nextLong()).save()
+  }
+
+  def newSavedInventoryBatch(celebrity: Celebrity) : InventoryBatch = {
+    InventoryBatch(celebrityId = celebrity.id, numInventory = 50, startDate = TestData.today, endDate = TestData.sevenDaysHence).save()
+  }
+
+  def newSavedOrder(product: Option[Product] = None): Order = {
+    val customer = TestData.newSavedCustomer()
+    product match {
+      case Some(p) => {
+        customer.buy(p).save()
+      }
+      case None => {
+        val p = TestData.newSavedProduct()
+        customer.buy(p).save()
+      }
     }
   }
 
-  def newSavedOrder(): Order = {
-    val customer = newSavedCustomer()
-    val product = newSavedProduct()
-
-    customer.buy(product).save()
-  }
 
   object Longoria {
     require(fileBase.exists(), "Evan Longoria test photos were not found at " + fileBase.getAbsoluteFile)
