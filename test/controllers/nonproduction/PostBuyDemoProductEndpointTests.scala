@@ -2,13 +2,19 @@ package controllers.nonproduction
 
 import play.test.FunctionalTest
 import org.junit.Test
-import utils.{ClearsDatabaseAndValidationAfter, FunctionalTestUtils}
+import utils.FunctionalTestUtils
 import utils.FunctionalTestUtils.CleanDatabaseAfterEachTest
-
+import services.AppConfig
+import scala.collection.JavaConversions._
+import FunctionalTest._
+import services.db.{TransactionSerializable, DBSession}
+import scenario.Scenarios
+import models.OrderStore
+import org.junit.Assert._
 
 class PostBuyDemoProductEndpointTests extends FunctionalTest with CleanDatabaseAfterEachTest  {
-  import scala.collection.JavaConversions._
-  import FunctionalTest._
+  private val db = AppConfig.instance[DBSession]
+  private val orderStore = AppConfig.instance[OrderStore]
 
   @Test
   def testBuyEgraphFail() {
@@ -17,12 +23,15 @@ class PostBuyDemoProductEndpointTests extends FunctionalTest with CleanDatabaseA
       "Will-has-two-products"
     )
 
-    val response = POST("/Wizzle/2010-Starcraft-2-Championships/buy-demo",
+    POST("/Wizzle/2010-Starcraft-2-Championships/buy-demo",
       Map("herp" -> "derp")
     )
 
-    assertStatus(302, response)
-    assertHeaderEquals("Location", "/Wizzle/2010-Starcraft-2-Championships", response)
+    db.connected(TransactionSerializable) {
+      val celebrityId = Scenarios.getWillCelebrityAccount.id
+      val allCelebOrders = orderStore.findByCelebrity(celebrityId)
+      assertEquals(0, allCelebOrders.toList.length)
+    }
   }
 
   @Test
@@ -32,7 +41,7 @@ class PostBuyDemoProductEndpointTests extends FunctionalTest with CleanDatabaseA
       "Will-has-two-products"
     )
 
-    val response = POST("/Wizzle/2010-Starcraft-2-Championships/buy-demo",
+    POST("/Wizzle/2010-Starcraft-2-Championships/buy-demo",
       Map(
         "recipientName" -> "Erem Recipient",
         "recipientEmail" -> "erem@egraphs.com",
@@ -41,8 +50,11 @@ class PostBuyDemoProductEndpointTests extends FunctionalTest with CleanDatabaseA
       )
     )
 
-    assertStatus(302, response)
-    assertHeaderEquals("Location", "/orders/1/confirm", response)
+    db.connected(TransactionSerializable) {
+      val celebrityId = Scenarios.getWillCelebrityAccount.id
+      val allCelebOrders = orderStore.findByCelebrity(celebrityId)
+      assertEquals(1, allCelebOrders.toList.length)
+    }
   }
 
 }

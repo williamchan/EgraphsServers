@@ -140,7 +140,8 @@ object TestControllers extends Controller with Logging {
       "msilverman@raysbaseball.com",
       "gabe@egraphs.com",
       "mike@egraphs.com",
-      "j@egraphs.com")
+      "j@egraphs.com",
+      "kate@egraphs.com")
 
     for (email <- celebrityEmails) {
       val account = accountServices.accountStore.findByEmail(email)
