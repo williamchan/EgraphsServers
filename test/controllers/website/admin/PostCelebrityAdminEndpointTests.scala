@@ -18,7 +18,7 @@ class PostCelebrityAdminEndpointTests extends AdminFunctionalTest with CleanData
     val response = POST("/admin/celebrities", postStrParams)
 
     assertStatus(302, response)
-    assertHeaderEquals("Location", "/Muhammad-Ali", response)
+    assertHeaderEquals("Location", "/admin/celebrities/1?action=preview", response)
   }
 
   @Test
@@ -29,7 +29,7 @@ class PostCelebrityAdminEndpointTests extends AdminFunctionalTest with CleanData
     val response = POST("/admin/celebrities", postStrParams)
 
     assertStatus(302, response)
-    assertHeaderEquals("Location", "/Cassius-Clay", response)
+    assertHeaderEquals("Location", "/admin/celebrities/1?action=preview", response)
   }
 
   @Test
@@ -88,7 +88,7 @@ class PostCelebrityAdminEndpointTests extends AdminFunctionalTest with CleanData
   def testPostCelebrityValidatesThatNoCelebrityWithSameEmailExists() {
     createAndLoginAsAdmin()
 
-    assertHeaderEquals("Location", "/Muhammad-Ali", POST("/admin/celebrities", getPostStrParams()))
+    assertHeaderEquals("Location", "/admin/celebrities/1?action=preview", POST("/admin/celebrities", getPostStrParams()))
 
     val postStrParams: Map[String, String] = getPostStrParams(
       publicName = "Cassius Clay"
@@ -136,7 +136,7 @@ class PostCelebrityAdminEndpointTests extends AdminFunctionalTest with CleanData
   def testPostCelebrityValidatesCelebrityUrlSlugIsUnique() {
     createAndLoginAsAdmin()
 
-    assertHeaderEquals("Location", "/Muhammad-Ali", POST("/admin/celebrities", getPostStrParams()))
+    assertHeaderEquals("Location", "/admin/celebrities/1?action=preview", POST("/admin/celebrities", getPostStrParams()))
 
     val postStrParams: Map[String, String] = getPostStrParams(
       celebrityEmail = "ali2@egraphs.com"
