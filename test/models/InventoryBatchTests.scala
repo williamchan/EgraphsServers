@@ -121,7 +121,7 @@ with DBTransactionPerTest {
     val ib4 = TestData.newSavedInventoryBatch(celebrity).copy(numInventory = 1, endDate = TestData.sevenDaysHence).save()
     val product = TestData.newSavedProductWithoutInventoryBatch(celebrity)
     ib2.products.associate(product)
-    TestData.newSavedOrder(Some(product)).copy(inventoryBatchId = Some(ib2.id)).save()
+    TestData.newSavedOrder(Some(product)).copy(inventoryBatchId = ib2.id).save()
 
     // zero case
     inventoryBatchStore.selectAvailableInventoryBatch(List.empty[InventoryBatch]) should be(None)

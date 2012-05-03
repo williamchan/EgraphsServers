@@ -94,9 +94,9 @@ class ProductTests extends UnitFlatSpec
     inventoryBatch1.products.associate(product1)
     inventoryBatch1.products.associate(product2)
     inventoryBatch2.products.associate(product2)
-    customer.buy(product1).copy(inventoryBatchId = Some(inventoryBatch1.id)).save()
-    customer.buy(product2).copy(inventoryBatchId = Some(inventoryBatch1.id)).save()
-    customer.buy(product2).copy(inventoryBatchId = Some(inventoryBatch2.id)).save()
+    customer.buy(product1).copy(inventoryBatchId = inventoryBatch1.id).save()
+    customer.buy(product2).copy(inventoryBatchId = inventoryBatch1.id).save()
+    customer.buy(product2).copy(inventoryBatchId = inventoryBatch2.id).save()
     product1.getRemainingInventoryAndActiveInventoryBatches() should be ((48, List(inventoryBatch1)))                  // product1 is in inventoryBatch1, which has 2 purchases
     product2.getRemainingInventoryAndActiveInventoryBatches() should be ((97, List(inventoryBatch1, inventoryBatch2))) // product1 is in both inventoryBatch1 and inventoryBatch1, which have 3 purchases total
   }

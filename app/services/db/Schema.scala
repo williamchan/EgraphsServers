@@ -16,6 +16,8 @@ import services.logging.Logging
  * Egraphs Database schema
  *
  * When inspecting the schema of a database table, inspect both this object and the KeyedCaseClass.
+ *
+ * NOTE: The order of declaration matters. Cannot reference tables before they have been declared.
  */
 class Schema @Inject()(
   injector: Injector,
@@ -103,10 +105,6 @@ class Schema @Inject()(
     .via((customer, order) => customer.id === order.recipientId)
   recipientCustomerToOrders.foreignKeyDeclaration.constrainReference(onDelete cascade)
 
-  // todo(wchan): wtf... anyway, this will work when order.inventoryBatchId is non-nullable
-//  val inventoryBatchToOrders = oneToManyRelation(inventoryBatches, orders)
-//    .via((inventoryBatch, order) => inventoryBatch.id === order.inventoryBatchId)
-
   //
   // Egraphs
   //
@@ -141,6 +139,9 @@ class Schema @Inject()(
       columns(inventoryBatchProduct.inventoryBatchId, inventoryBatchProduct.productId) are (unique)
     )
   )
+
+  val inventoryBatchToOrders = oneToManyRelation(inventoryBatches, orders)
+    .via((inventoryBatch, order) => inventoryBatch.id === order.inventoryBatchId)
 
   //
   // Biometrics

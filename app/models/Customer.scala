@@ -57,7 +57,7 @@ case class Customer(
       recipientId=recipient.id,
       productId=product.id,
       amountPaidInCurrency=BigDecimal(product.price.getAmount),
-      inventoryBatchId = Some(inventoryBatchId)
+      inventoryBatchId = inventoryBatchId
     )
   }
 

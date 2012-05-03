@@ -9,7 +9,6 @@ import models._
 import org.squeryl.Query
 import org.squeryl.PrimitiveTypeMode._
 import models.Egraph.EgraphState
-import java.text.SimpleDateFormat
 
 private[controllers] trait GetScriptAdminEndpoint {
   this: Controller =>
@@ -23,6 +22,8 @@ private[controllers] trait GetScriptAdminEndpoint {
   protected def celebrityStore = AppConfig.instance[CelebrityStore]
   protected def customerStore = AppConfig.instance[CustomerStore]
   protected def enrollmentBatchStore = AppConfig.instance[EnrollmentBatchStore]
+  protected def inventoryBatchStore = AppConfig.instance[InventoryBatchStore]
+  protected def orderStore = AppConfig.instance[OrderStore]
 
   def getScriptAdmin = controllerMethod() {
     adminFilters.requireAdministratorLogin {admin =>
@@ -61,21 +62,6 @@ private[controllers] trait GetScriptAdminEndpoint {
             actors.EnrollmentBatchActor.actor ! actors.ProcessEnrollmentBatchMessage(id = enrollmentBatch.get.id)
           }
           "I gave that EnrollmentBatch a kick"
-        }
-
-        case "inventoryBatch" => {
-          val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
-          val jan_01_2012 = dateFormat.parse("2012-01-01")
-          val jan_01_2013 = dateFormat.parse("2013-01-01")
-          for ((celebrity, _) <- celebrityStore.getCelebrityAccounts) {
-            val inventoryBatch = InventoryBatch(celebrityId = celebrity.id, numInventory = 1000, startDate = jan_01_2012, endDate = jan_01_2013).save()
-            for (product <- celebrity.products()) {
-              if (product.inventoryBatches.toList.isEmpty) {
-                product.inventoryBatches.associate(inventoryBatch)
-              }
-            }
-          }
-          "InventoryBatches created for all Celebrities"
         }
 
         case _ => "Not a valid action"

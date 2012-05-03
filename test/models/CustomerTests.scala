@@ -65,7 +65,7 @@ class CustomerTests extends UnitFlatSpec
     val recipient = TestData.newSavedCustomer()
     val product = TestData.newSavedProduct()
     val order = buyer.buy(product, recipient = recipient).save()
-    order.inventoryBatchId should be(Some(product.inventoryBatches.head.id))
+    order.inventoryBatchId should be(product.inventoryBatches.head.id)
   }
 
   "findOrCreateByEmail" should "find or create as appropriate" in {

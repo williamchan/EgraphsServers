@@ -31,7 +31,7 @@ case class OrderServices @Inject() (
 case class Order(
   id: Long = 0,
   productId: Long = 0,
-  inventoryBatchId: Option[Long] = None, // todo(wchan): Would like to make this non-nullable
+  inventoryBatchId: Long = 0,
   buyerId: Long = 0,
   recipientId: Long = 0,
   recipientName: String = "",
@@ -313,7 +313,7 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
 
   def countOrders(inventoryBatchIds: Seq[Long]): Int = {
     from(schema.orders)(order =>
-      where(order.inventoryBatchId in inventoryBatchIds.map(id => Some(id)))
+      where(order.inventoryBatchId in inventoryBatchIds)
         compute (count)
     ).toInt
   }
