@@ -17,40 +17,44 @@ import services.http.{SecurityRequestFilters, ControllerMethod, AdminRequestFilt
 
 object WebsiteControllers extends Controller
   with GetRootEndpoint
-  with PostBuyProductEndpoint
-  with PostBuyDemoProductEndpoint
-  with GetCelebrityEndpoint
   with GetBlobEndpoint
-  with GetEgraphEndpoint
+  with GetCelebrityEndpoint
   with GetCelebrityProductEndpoint
+  with GetEgraphEndpoint
   with GetOrderConfirmationEndpoint
+  with PostBuyDemoProductEndpoint
+  with PostBuyProductEndpoint
 
   // admin endpoints
   with GetRootAdminEndpoint
-  with GetLoginAdminEndpoint
-  with GetAccountsAdminEndpoint
   with GetAccountAdminEndpoint
+  with GetAccountsAdminEndpoint
   with GetCelebritiesAdminEndpoint
+  with GetCelebrityAdminEndpoint
   with GetCelebrityEgraphsAdminEndpoint
+  with GetCelebrityInventoryBatchesAdminEndpoint
   with GetCelebrityOrdersAdminEndpoint
   with GetCelebrityProductsAdminEndpoint
   with GetCreateAccountAdminEndpoint
   with GetCreateCelebrityAdminEndpoint
-  with GetCelebrityAdminEndpoint
+  with GetCreateCelebrityInventoryBatchAdminEndpoint
   with GetCreateCelebrityProductAdminEndpoint
-  with GetProductAdminEndpoint
   with GetEgraphAdminEndpoint
-  with PostEgraphAdminEndpoint
   with GetEgraphsAdminEndpoint
+  with GetInventoryBatchAdminEndpoint
+  with GetLoginAdminEndpoint
   with GetOrderAdminEndpoint
   with GetOrdersAdminEndpoint
-  with PostLoginAdminEndpoint
-  with PostLogoutAdminEndpoint
+  with GetProductAdminEndpoint
+  with GetScriptAdminEndpoint
   with PostAccountAdminEndpoint
   with PostCelebrityAdminEndpoint
+  with PostCelebrityInventoryBatchAdminEndpoint
   with PostCelebrityProductAdminEndpoint
+  with PostEgraphAdminEndpoint
+  with PostLoginAdminEndpoint
+  with PostLogoutAdminEndpoint
   with PostOrderAdminEndpoint
-  with GetScriptAdminEndpoint
 
   // social media exploratory work
   with GetSocialPostEndpoint
@@ -68,6 +72,7 @@ object WebsiteControllers extends Controller
   override protected val securityFilters = instance[SecurityRequestFilters]
   override protected val celebFilters = instance[CelebrityAccountRequestFilters]
   override protected val egraphQueryFilters = instance[EgraphQueryFilters]
+  override protected val inventoryBatchQueryFilters = instance[InventoryBatchQueryFilters]
   override protected val orderQueryFilters = instance[OrderQueryFilters]
 
   override protected val blobs = instance[Blobs]
@@ -79,6 +84,7 @@ object WebsiteControllers extends Controller
   override protected val celebrityStore = instance[CelebrityStore]
   override protected val customerStore = instance[CustomerStore]
   override protected val egraphStore = instance[EgraphStore]
+  override protected val inventoryBatchStore = instance[InventoryBatchStore]
   override protected val orderStore = instance[OrderStore]
   override protected val productStore = instance[ProductStore]
 

@@ -15,9 +15,6 @@ private[controllers] trait GetProductAdminEndpoint {
   protected def productStore: ProductStore
   protected def payment: Payment
 
-  /**
-   * Serves up the HTML for the Create Celebrity page.
-   */
   def getProductAdmin(productId: Long, action: Option[String] = None) = controllerMethod() {
     adminFilters.requireAdministratorLogin { admin =>
       val productOption = productStore.findById(productId)

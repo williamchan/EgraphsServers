@@ -19,7 +19,7 @@ private[controllers] trait GetOrdersAdminEndpoint {
   def getOrdersAdmin(filter: String = "pendingAdminReview", page: Int = 1) = controllerMethod() {
     adminFilters.requireAdministratorLogin {
       admin =>
-        var query = filter match {
+        val query = filter match {
           case "rejected" => orderStore.findByFilter(orderQueryFilters.rejected)
           case "signerActionable" => orderStore.findByFilter(orderQueryFilters.actionableOnly: _*)
           case "all" => orderStore.findByFilter()

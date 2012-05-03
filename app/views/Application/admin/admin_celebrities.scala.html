@@ -47,6 +47,7 @@
       <th>Products</th>
       <th>Orders</th>
       <th>Egraphs</th>
+      <th>Inventory</th>
     </tr>
     @celebrityAccounts.map { case (celebrity, account) =>
     <tr>
@@ -78,6 +79,11 @@
       <td>
         <a class="preview-link" href="/admin/celebrities/@celebrity.id/egraphs">
           Egraphs
+        </a>
+      </td>
+      <td>
+        <a class="preview-link" href="/admin/celebrities/@celebrity.id/inventorybatches">
+          Inventory
         </a>
       </td>
     </tr>
