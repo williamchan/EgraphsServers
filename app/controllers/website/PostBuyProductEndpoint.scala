@@ -55,7 +55,7 @@ trait PostBuyProductEndpoint { this: Controller =>
            stripeTokenId: String,
            desiredText: Option[String],
            personalNote: Option[String],
-           isDemo: Boolean = false) {
+           isDemo: Boolean = false): Any = {
 
     Logger.info("Receiving purchase order")
     celebFilters.requireCelebrityAndProductUrlSlugs {
@@ -169,10 +169,8 @@ object PostBuyProductEndpoint {
 
       // Redirect to the order page, with orderId in flash scope
       flash.put("orderId", chargedOrder.id)
-      new Redirect(Utils.lookupUrl(
-        "WebsiteControllers.getOrderConfirmation",
-        Map("orderId" -> chargedOrder.id.toString)).url
-      )
+      println("redirecting to getOrderConfirmation with orderId " + chargedOrder.id.toString + " and url " + Utils.lookupUrl("WebsiteControllers.getOrderConfirmation", Map("orderId" -> chargedOrder.id.toString)).url)
+      new Redirect(Utils.lookupUrl("WebsiteControllers.getOrderConfirmation", Map("orderId" -> chargedOrder.id.toString)).url)
     }
   }
 }

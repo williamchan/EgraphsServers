@@ -23,10 +23,12 @@ class PostBuyDemoProductEndpointTests extends FunctionalTest with CleanDatabaseA
       "Will-has-two-products"
     )
 
-    POST("/Wizzle/2010-Starcraft-2-Championships/buy-demo",
+    val response = POST("/Wizzle/2010-Starcraft-2-Championships/buy-demo",
       Map("herp" -> "derp")
     )
 
+    assertStatus(302, response)
+    assertHeaderEquals("Location", "/Wizzle/2010-Starcraft-2-Championships", response)
     db.connected(TransactionSerializable) {
       val celebrityId = Scenarios.getWillCelebrityAccount.id
       val allCelebOrders = orderStore.findByCelebrity(celebrityId)
@@ -41,7 +43,7 @@ class PostBuyDemoProductEndpointTests extends FunctionalTest with CleanDatabaseA
       "Will-has-two-products"
     )
 
-    POST("/Wizzle/2010-Starcraft-2-Championships/buy-demo",
+    val response = POST("/Wizzle/2010-Starcraft-2-Championships/buy-demo",
       Map(
         "recipientName" -> "Erem Recipient",
         "recipientEmail" -> "erem@egraphs.com",
@@ -50,6 +52,8 @@ class PostBuyDemoProductEndpointTests extends FunctionalTest with CleanDatabaseA
       )
     )
 
+    assertStatus(302, response)
+    assertHeaderEquals("Location", "/orders/1/confirm", response)
     db.connected(TransactionSerializable) {
       val celebrityId = Scenarios.getWillCelebrityAccount.id
       val allCelebOrders = orderStore.findByCelebrity(celebrityId)
