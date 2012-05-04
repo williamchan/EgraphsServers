@@ -21,6 +21,7 @@ private[controllers] trait GetScriptAdminEndpoint {
   protected def administratorStore = AppConfig.instance[AdministratorStore]
   protected def celebrityStore = AppConfig.instance[CelebrityStore]
   protected def customerStore = AppConfig.instance[CustomerStore]
+  protected def egraphStore = AppConfig.instance[EgraphStore]
   protected def enrollmentBatchStore = AppConfig.instance[EnrollmentBatchStore]
   protected def inventoryBatchStore = AppConfig.instance[InventoryBatchStore]
   protected def orderStore = AppConfig.instance[OrderStore]
@@ -39,6 +40,15 @@ private[controllers] trait GetScriptAdminEndpoint {
             actors.EgraphActor.actor ! actors.ProcessEgraphMessage(id = egraph.id)
           }
           "I gave all Egraphs AwaitingVerification a kick."
+        }
+
+        case "kick-egraph" => {
+          val egraphId = params.get("egraphId")
+          val egraph = egraphStore.findById(id = egraphId.toLong)
+          if (egraph.isDefined && egraph.get.state == EgraphState.AwaitingVerification) {
+            actors.EgraphActor.actor ! actors.ProcessEgraphMessage(id = egraph.get.id)
+          }
+          "I gave that Egraph a kick."
         }
 
         case "create-admin" => {

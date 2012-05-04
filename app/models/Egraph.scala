@@ -207,9 +207,8 @@ case class Egraph(
   private def withRecalculatedStatus(vbgVerifySample: Option[VBGVerifySample], xyzmoVerifyUser: Option[XyzmoVerifyUser]): Egraph = {
     val newState = (xyzmoVerifyUser, vbgVerifySample) match {
 
-      // We're awaiting verification if we don't have any value yet for either of the two biometric services
       case (None, _) | (_, None)=>
-        AwaitingVerification
+        FailedBiometrics
 
       // We have return codes from both services. Taking a look at them...
       case (Some(signatureResult), Some(voiceResult)) =>
