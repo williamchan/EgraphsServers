@@ -31,32 +31,35 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
     controllerMethod(openDatabase=false) {
       // Get result of DB transaction that processes the request
       val transactionResult = dbSession.connected(TransactionSerializable) {
-        if (validationErrors.isEmpty) {
-          val message = request.params.getOption("message")
 
-          celebFilters.requireCelebrityAccount { (account, celebrity) =>
-            orderFilters.requireOrderIdOfCelebrity(celebrity.id) { order =>
+        celebFilters.requireCelebrityAccount {
+          (account, celebrity) =>
+            orderFilters.requireOrderIdOfCelebrity(celebrity.id) {
+              order =>
 
-              val savedEgraph = order.newEgraph.withAssets(
-                signature,
-                message,
-                Codec.decodeBASE64(audio)
-              ).save()
+                // validate signature for issue #104
 
-              val actorMessage = ProcessEgraphMessage(id=savedEgraph.id, skipBiometrics=skipBiometrics)
-              val responseJson = Serializer.SJSON.toJSON(Map("id" -> savedEgraph.id))
+                if (validationErrors.isEmpty) {
+                  val message = request.params.getOption("message")
 
-              (actorMessage, responseJson)
+                  val savedEgraph = order.newEgraph.withAssets(
+                    signature,
+                    message,
+                    Codec.decodeBASE64(audio)
+                  ).save()
+                  val actorMessage = ProcessEgraphMessage(id = savedEgraph.id, skipBiometrics = skipBiometrics)
+                  val responseJson = Serializer.SJSON.toJSON(Map("id" -> savedEgraph.id))
+                  (actorMessage, responseJson)
+
+                }
+                else {
+                  play.Logger.info("Dismissing the invalid postEgraph request")
+                  play.Logger.info("Signature length was " + (if (signature != null) signature.length() else "[signature missing]"))
+                  play.Logger.info("Audio length was " + (if (audio != null) audio.length() else "[audio missing]"))
+                  play.Logger.info("ValidationErrors:" + validationErrors.map(pair => "" + pair._1 + " " + pair._2.message).mkString(". "))
+                  Error(HttpCodes.MalformedEgraph, "")
+                }
             }
-          }
-        }
-        else {
-          play.Logger.info("Dismissing the invalid postEgraph request")
-          play.Logger.info("Signature length was " + (if (signature != null) signature.length() else "[signature missing]"))
-          play.Logger.info("Audio length was " + (if (audio != null) audio.length() else "[audio missing]"))
-          play.Logger.info("ValidationErrors:" + validationErrors.map(pair => "" + pair._1 + " " + pair._2.message).mkString(". "))
-
-          Error(HttpCodes.MalformedEgraph, "")
         }
       }
 

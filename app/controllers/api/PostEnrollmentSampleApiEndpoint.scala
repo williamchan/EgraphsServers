@@ -3,10 +3,11 @@ package controllers.api
 import models._
 import play.mvc.Controller
 import sjson.json.Serializer
-import services.http.{ControllerMethod, CelebrityAccountRequestFilters}
 import actors.ProcessEnrollmentBatchMessage
 import akka.actor.ActorRef
 import services.db.{DBSession, TransactionSerializable}
+import play.data.validation.Required
+import services.http.{HttpCodes, ControllerMethod, CelebrityAccountRequestFilters}
 
 private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
   protected def enrollmentBatchActor: ActorRef
@@ -16,23 +17,29 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
   protected def celebFilters: CelebrityAccountRequestFilters
   protected def enrollmentBatchStore: EnrollmentBatchStore
 
-  def postEnrollmentSample(signature: Option[String], audio: Option[String], skipBiometrics: Boolean = false) =
+  def postEnrollmentSample(@Required signature: String,
+                           @Required audio: String,
+                           skipBiometrics: Boolean = false) =
 
-    controllerMethod(openDatabase=false) {
+    controllerMethod(openDatabase = false) {
       // Get result of DB transaction that processes the request
       val transactionResult = dbSession.connected(TransactionSerializable) {
-        celebFilters.requireCelebrityAccount { (account, celebrity) =>
-          (signature, audio) match {
-            case (Some(signatureString), Some(audioString)) =>
+
+        celebFilters.requireCelebrityAccount {
+          (account, celebrity) =>
+
+            // validate signature for issue #104
+
+            if (validationErrors.isEmpty) {
               val openEnrollmentBatch: Option[EnrollmentBatch] = enrollmentBatchStore.getOpenEnrollmentBatch(celebrity)
 
               if (openEnrollmentBatch.isEmpty) {
                 val enrollmentBatch = EnrollmentBatch(celebrityId = celebrity.id, services = enrollmentBatchServices).save()
-                val addEnrollmentSampleResult = enrollmentBatch.addEnrollmentSample(signatureString, audioString)
+                val addEnrollmentSampleResult = enrollmentBatch.addEnrollmentSample(signature, audio)
                 msgsFromAddEnrollmentSampleResult(addEnrollmentSampleResult)
 
               } else if (!openEnrollmentBatch.get.isBatchComplete) {
-                val addEnrollmentSampleResult = openEnrollmentBatch.get.addEnrollmentSample(signatureString, audioString)
+                val addEnrollmentSampleResult = openEnrollmentBatch.get.addEnrollmentSample(signature, audio)
                 msgsFromAddEnrollmentSampleResult(addEnrollmentSampleResult)
 
               } else {
@@ -40,13 +47,12 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
                 Error("Open enrollment batch already exists and is awaiting enrollment attempt. No further enrollment samples required now.")
               }
 
-            case _ =>
+            } else {
               play.Logger.info("Dismissing the invalid postEnrollmentSample request")
-              play.Logger.info("Signature length was " + (if (signature.isDefined) signature.get.length() else "[signature missing]"))
-              play.Logger.info("Audio length was " + (if (audio.isDefined) audio.get.length() else "[audio missing]"))
-
-              Error("Valid \"signature\" and \"audio\" parameters were not provided.")
-          }
+              play.Logger.info("Signature length was " + (if (signature != null) signature.length() else "[signature missing]"))
+              play.Logger.info("Audio length was " + (if (audio != null) audio.length() else "[audio missing]"))
+              Error(HttpCodes.MalformedEgraph, "")
+            }
         }
       }
       transactionResult match {
@@ -57,7 +63,7 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
         case otherResult =>
           otherResult
       }
-  }
+    }
 
   private def msgsFromAddEnrollmentSampleResult(addEnrollmentSampleResult: (EnrollmentSample, Boolean, Int, Int)):
   (Option[ProcessEnrollmentBatchMessage], String) = {
