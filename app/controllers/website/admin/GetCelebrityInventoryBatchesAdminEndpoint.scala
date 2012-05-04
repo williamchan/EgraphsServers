@@ -25,7 +25,7 @@ private[controllers] trait GetCelebrityInventoryBatchesAdminEndpoint {
           case _ => inventoryBatchStore.findByCelebrity(celebrity.id)
         }
         val pagedQuery: (Iterable[InventoryBatch], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
-        WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebrityInventoryBatchesAdminEndpoint.url(celebrity))
+        WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebrityInventoryBatchesAdminEndpoint.url(celebrity), filter = Some(filter))
         views.Application.admin.html.admin_inventorybatches(inventoryBatches = pagedQuery._1, celebrity = celebrity)
     }
   }

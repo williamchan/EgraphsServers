@@ -16,7 +16,7 @@ private[controllers] trait GetCelebritiesAdminEndpoint {
 
   def getCelebritiesAdmin(page: Int = 1) = controllerMethod() {
     adminFilters.requireAdministratorLogin { admin =>
-      var query = celebrityStore.getCelebrityAccounts
+      val query = celebrityStore.getCelebrityAccounts
       val pagedQuery: (Iterable[(Celebrity, Account)], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
       WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebritiesAdminEndpoint.url())
       views.Application.admin.html.admin_celebrities(celebrityAccounts = pagedQuery._1)

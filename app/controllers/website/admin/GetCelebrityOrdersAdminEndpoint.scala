@@ -27,7 +27,7 @@ private[controllers] trait GetCelebrityOrdersAdminEndpoint {
           case _ => orderStore.findByCelebrity(celebrityId = celebrity.id, orderQueryFilters.pendingAdminReview)
         }
         val pagedQuery: (Iterable[Order], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
-        WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebrityOrdersAdminEndpoint.url(celebrity = celebrity))
+        WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebrityOrdersAdminEndpoint.url(celebrity = celebrity), filter = Some(filter))
         views.Application.admin.html.admin_orders(orders = pagedQuery._1, celebrity = Some(celebrity))
     }
   }

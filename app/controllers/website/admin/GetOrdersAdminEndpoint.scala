@@ -26,7 +26,7 @@ private[controllers] trait GetOrdersAdminEndpoint {
           case _ => orderStore.findByFilter(orderQueryFilters.pendingAdminReview)
         }
         val pagedQuery: (Iterable[Order], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
-        WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetOrdersAdminEndpoint.url())
+        WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetOrdersAdminEndpoint.url(), filter = Some(filter))
         views.Application.admin.html.admin_orders(orders = pagedQuery._1)
     }
   }

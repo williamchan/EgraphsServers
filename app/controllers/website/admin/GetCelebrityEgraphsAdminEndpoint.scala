@@ -22,7 +22,7 @@ private[controllers] trait GetCelebrityEgraphsAdminEndpoint {
   def getCelebrityEgraphsAdmin(filter: String = "pendingAdminReview", page: Int = 1) = controllerMethod() {
     adminFilters.requireCelebrity {
       (celebrity, admin) =>
-        var query = filter match {
+        val query = filter match {
           case "passedBiometrics" => egraphStore.getCelebrityEgraphsAndResults(celebrity, egraphQueryFilters.passedBiometrics)
           case "failedBiometrics" => egraphStore.getCelebrityEgraphsAndResults(celebrity, egraphQueryFilters.failedBiometrics)
           case "approvedByAdmin" => egraphStore.getCelebrityEgraphsAndResults(celebrity, egraphQueryFilters.approvedByAdmin)
@@ -33,7 +33,7 @@ private[controllers] trait GetCelebrityEgraphsAdminEndpoint {
           case _ => egraphStore.getCelebrityEgraphsAndResults(celebrity, egraphQueryFilters.pendingAdminReview)
         }
         val pagedQuery: (Iterable[(Egraph, Option[VBGVerifySample], Option[XyzmoVerifyUser])], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
-        WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebrityEgraphsAdminEndpoint.url(celebrity = celebrity))
+        WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebrityEgraphsAdminEndpoint.url(celebrity = celebrity), filter = Some(filter))
         views.Application.admin.html.admin_egraphs(egraphAndResults = pagedQuery._1, celebrity = Some(celebrity))
     }
   }

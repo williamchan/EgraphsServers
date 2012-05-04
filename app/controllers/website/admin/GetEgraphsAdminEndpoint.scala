@@ -31,7 +31,7 @@ private[controllers] trait GetEgraphsAdminEndpoint {
         case _ => egraphStore.getEgraphsAndResults(egraphQueryFilters.pendingAdminReview)
       }
       val pagedQuery: (Iterable[(Egraph, Option[VBGVerifySample], Option[XyzmoVerifyUser])], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
-      WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetEgraphsAdminEndpoint.url())
+      WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetEgraphsAdminEndpoint.url(), filter = Some(filter))
       views.Application.admin.html.admin_egraphs(egraphAndResults = pagedQuery._1)
     }
   }

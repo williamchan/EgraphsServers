@@ -107,7 +107,9 @@ object WebsiteControllers extends Controller
     }
   }
 
-  def updateFlashScopeWithPagingData[A](pagedQuery: (Iterable[A], Int, Option[Int]), baseUrl: ActionDefinition) {
+  def updateFlashScopeWithPagingData[A](pagedQuery: (Iterable[A], Int, Option[Int]),
+                                        baseUrl: ActionDefinition,
+                                        filter: Option[String] = None) {
     val curPage = pagedQuery._2
     val totalResults = pagedQuery._3
 
@@ -119,11 +121,11 @@ object WebsiteControllers extends Controller
     if (showPaging) {
       val showFirst: Boolean = curPage > 2
       flash.put("ShowFirst", showFirst)
-      if (showFirst) flash.put("FirstUrl", withPageQuery(baseUrl, 1)) else flash.remove("FirstUrl")
+      if (showFirst) flash.put("FirstUrl", withPageQuery(baseUrl, 1, filter)) else flash.remove("FirstUrl")
 
       val showPrev: Boolean = curPage > 1
       flash.put("ShowPrev", showPrev)
-      if (showPrev) flash.put("PrevUrl", withPageQuery(baseUrl, curPage - 1)) else flash.remove("PrevUrl")
+      if (showPrev) flash.put("PrevUrl", withPageQuery(baseUrl, curPage - 1, filter)) else flash.remove("PrevUrl")
 
       val totalNumPages = if (totalResults.get % Utils.defaultPageLength > 0) {
         totalResults.get / Utils.defaultPageLength + 1
@@ -133,20 +135,28 @@ object WebsiteControllers extends Controller
 
       val showNext: Boolean = curPage < totalNumPages
       flash.put("ShowNext", showNext)
-      if (showNext) flash.put("NextUrl", withPageQuery(baseUrl, curPage + 1)) else flash.remove("NextUrl")
+      if (showNext) flash.put("NextUrl", withPageQuery(baseUrl, curPage + 1, filter)) else flash.remove("NextUrl")
 
       val showLast: Boolean = curPage < totalNumPages
       flash.put("ShowLast", showLast)
-      if (showLast) flash.put("LastUrl", withPageQuery(baseUrl, totalNumPages)) else flash.remove("LastUrl")
+      if (showLast) flash.put("LastUrl", withPageQuery(baseUrl, totalNumPages, filter)) else flash.remove("LastUrl")
     }
   }
 
-  private def withPageQuery(url: ActionDefinition, page: Int): String = {
+  private def withPageQuery(url: ActionDefinition,
+                            page: Int,
+                            filter: Option[String]): String = {
     val urlStr = url.url
+
+    val filterStr = filter match {
+      case Some(f) => "&filter=" + filter
+      case None => ""
+    }
+
     if (urlStr.contains('?')) {
-      urlStr + "page=" + page
+      urlStr + "page=" + page + filterStr
     } else {
-      urlStr + "?page=" + page
+      urlStr + "?page=" + page + filterStr
     }
   }
 }
