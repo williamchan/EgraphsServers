@@ -11,7 +11,11 @@ class YesMaamPayment extends Payment {
     NiceCharge
   }
 
-  override val testToken: CardToken = {
+  def refund(chargeId: String) = {
+    NiceRefundedCharge
+  }
+
+  override def testToken(): CardToken = {
     NiceToken
   }
 
@@ -30,6 +34,12 @@ object NiceCharge extends Charge {
   override val id = {
     "This was a test charge against services.payment.YesMaamPayment. Have a great day!"
   }
+  override val refunded = false
+}
+
+object NiceRefundedCharge extends Charge {
+  override val id = {"This was a test charge against services.payment.YesMaamPayment. Have a great day!"}
+  override val refunded = true
 }
 
 object NiceToken extends CardToken {

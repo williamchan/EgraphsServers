@@ -8,6 +8,7 @@ import utils._
 import services.AppConfig
 import services.payment.Payment
 import models.Egraph.EgraphState
+import models.Order.PaymentState
 
 class OrderTests extends UnitFlatSpec
   with ShouldMatchers
@@ -156,7 +157,7 @@ class OrderTests extends UnitFlatSpec
     val cashTransactionStore = AppConfig.instance[CashTransactionStore]
     val customer = TestData.newSavedCustomer()
     val product  = TestData.newSavedProduct()
-    val token = payment.testToken
+    val token = payment.testToken()
     val amount = BigDecimal(100.500000)
 
     val order = customer.buy(product).copy(stripeCardTokenId=Some(token.id),  amountPaidInCurrency=amount)
@@ -165,8 +166,23 @@ class OrderTests extends UnitFlatSpec
     orderStore.findById(charged.order.id) should not be (None)
     cashTransactionStore.findById(charged.transaction.id) should not be (None)
     charged.order.stripeChargeId should not be (None)
-
   }
+
+//  "refund" should "refund the Stripe charge and change the PaymentState to Refunded" in {
+//    val cashTransactionStore = AppConfig.instance[CashTransactionStore]
+//    val customer = TestData.newSavedCustomer()
+//    val product  = TestData.newSavedProduct()
+//    val token = payment.testToken()
+//    val amount = BigDecimal(100.500000)
+//
+//    val order = customer.buy(product).copy(stripeCardTokenId=Some(token.id),  amountPaidInCurrency=amount)
+//    val charged = order.charge.issueAndSave()
+//    charged.order.stripeChargeId should not be (None)
+//
+//    // todo(wchan): order.refund
+//    payment.refund(charged.order.stripeChargeId.get)
+//    orderStore.findById(order.id).get.paymentState should be(PaymentState.Refunded)
+//  }
 
   "findByCelebrity" should "find all of a Celebrity's orders by default" in {
 

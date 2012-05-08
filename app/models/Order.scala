@@ -114,7 +114,6 @@ case class Order(
     require(admin != null, "Must be rejected by an Administrator")
     require(reviewStatus == Order.ReviewStatus.PendingAdminReview.stateValue, "Must be PendingAdminReview before rejecting by admin")
     val order = this.copy(reviewStatus = Order.ReviewStatus.RejectedByAdmin.stateValue, rejectionReason = rejectionReason)
-    // refund charge?
     order
   }
 
@@ -123,7 +122,6 @@ case class Order(
     require(celebrity.id == product.celebrityId, "Must be rejected by Celebrity associated with this Order")
     require(reviewStatus == Order.ReviewStatus.ApprovedByAdmin.stateValue, "Must be ApprovedByAdmin before rejecting by celebrity")
     val order = this.copy(reviewStatus = Order.ReviewStatus.RejectedByCelebrity.stateValue, rejectionReason = rejectionReason)
-    // refund charge?
     order
   }
 

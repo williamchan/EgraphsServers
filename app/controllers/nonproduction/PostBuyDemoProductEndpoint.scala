@@ -21,7 +21,7 @@ trait PostBuyDemoProductEndpoint { this: PostBuyProductEndpoint =>
       recipientEmail,
       buyerName,
       buyerEmail,
-      payment.testToken.id,
+      payment.testToken().id,
       desiredText,
       personalNote,
       isDemo = true

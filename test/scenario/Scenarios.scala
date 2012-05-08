@@ -396,7 +396,7 @@ class Scenarios extends DeclaresScenarios {
         recipientEmail = "ehboto@gmail.com",
         buyerName = "Rooster McGillycuddy",
         buyerEmail = "rooster@egraphs.com",
-        stripeTokenId = payment.testToken.id,
+        stripeTokenId = payment.testToken().id,
         desiredText = Some("Happy 29th birthday, Erem!"),
         personalNote = Some("I'm your biggest fan!"),
         celebrity=celebrity,

@@ -23,10 +23,15 @@ class StripePayment extends Payment {
     StripeCharge(stripe.model.Charge.create(chargeMap))
   }
 
+  override def refund(chargeId: String): Charge = {
+    val chargeToRefund = stripe.model.Charge.retrieve(chargeId)
+    StripeCharge(chargeToRefund.refund())
+  }
+
   /**
    * Returns a fake stripe token
    */
-  override def testToken: CardToken = {
+  override def testToken(): CardToken = {
     // TODO: Delete this method and any referencing code before launch. This is purely
     // for spring training demonstrations.
     import java.lang.Integer
@@ -67,6 +72,7 @@ class StripePayment extends Payment {
 
 case class StripeCharge (stripeCharge: stripe.model.Charge) extends Charge {
   override val id = stripeCharge.getId
+  override val refunded = stripeCharge.getRefunded.booleanValue()
 }
 
 case class StripeToken (stripeToken: stripe.model.Token) extends CardToken {

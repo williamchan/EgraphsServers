@@ -10,7 +10,7 @@ class YesMaamPaymentTests extends EgraphsUnitTest {
 
   "YesMaamPayment" should "produce a token and accept its charge" in {
     payment.bootstrap()
-    val token = payment.testToken
+    val token = payment.testToken()
 
     payment.charge(
       new BigDecimal(new java.math.BigDecimal(100)).toMoney(),
