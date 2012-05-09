@@ -149,7 +149,7 @@ object WebsiteControllers extends Controller
     val urlStr = url.url
 
     val filterStr = filter match {
-      case Some(f) => "&filter=" + filter
+      case Some(f) => "&filter=" + f
       case None => ""
     }
 
