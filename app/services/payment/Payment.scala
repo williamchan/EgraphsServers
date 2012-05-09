@@ -12,7 +12,7 @@ trait Payment {
    * @param amount the amount of cash to charge
    * @param cardTokenId the ID of the token produced by the javascript payment API. For testing
    *   you can also get one from [[services.Payment.testToken]]. Once a cardTokenId exists, then no
-   *   instances of com.stripe.exception.CardException have been thrown.
+   *   instances of com.stripe.exception.CardException have been thrown. That means that the card should be valid.
    * @param description description of the transaction for easy viewing on the Stripe console.
    * @throws com.stripe.exception.InvalidRequestException if multiple attempts to charge a cardTokenId occur
    */

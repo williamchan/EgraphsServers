@@ -5,6 +5,7 @@ import org.scalatest.BeforeAndAfterEach
 import play.test.UnitFlatSpec
 import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationAfter, CreatedUpdatedEntityTests, SavingEntityTests, TestData}
 import services.{Time, AppConfig}
+import exception.InsufficientInventoryException
 
 class CustomerTests extends UnitFlatSpec
   with ShouldMatchers
@@ -68,7 +69,7 @@ class CustomerTests extends UnitFlatSpec
     order.inventoryBatchId should be(product.inventoryBatches.head.id)
   }
 
-  "buy" should "fail if no inventory is available" in {
+  "buy" should "throw InsufficientInventoryException if no inventory is available" in {
     val buyer = TestData.newSavedCustomer()
     val recipient = TestData.newSavedCustomer()
     val product = TestData.newSavedProduct()
@@ -78,14 +79,14 @@ class CustomerTests extends UnitFlatSpec
     buyer.buy(product, recipient = recipient).save()
 
     // should fail due to lack of inventory
-    val exception0 = intercept[RuntimeException] {
+    val exception0 = intercept[InsufficientInventoryException] {
       buyer.buy(product, recipient = recipient).save()
     }
     exception0.getLocalizedMessage.contains("Must have available inventory to purchase product") should be(true)
 
     // should fail due to lack of active InventoryBatch
     inventoryBatch.copy(numInventory = 10, startDate = TestData.jan_01_2012, endDate = TestData.jan_01_2012).save()
-    val exception1 = intercept[RuntimeException] {
+    val exception1 = intercept[InsufficientInventoryException] {
       buyer.buy(product, recipient = recipient).save()
     }
     exception1.getLocalizedMessage.contains("Must have available inventory to purchase product") should be(true)

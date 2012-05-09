@@ -9,7 +9,7 @@ import org.apache.commons.mail.HtmlEmail
 import services._
 import com.google.inject._
 import mail.Mail
-import payment.Payment
+import payment.{Charge, Payment}
 import play.mvc.Router.ActionDefinition
 import org.squeryl.Query
 import models.Egraph.EgraphState._
@@ -88,20 +88,17 @@ case class Order(
     copy(paymentStateString = paymentState.stateValue)
   }
 
-  /** Produces an OrderCharge whose use will charge the `stripeCardTokenId` for the order */
-  def charge: OrderCharge = {
-    require(stripeCardTokenId != None, "Can not charge an order without a valid stripe card token")
-
+  /** Call this to associate a Stripe Charge with this Order */
+  def withChargeInfo(stripeCardTokenId: String, stripeCharge: Charge): Order = {
     val cashTransaction = CashTransaction(accountId=buyerId, services=services.cashTransactionServices.get)
       .withCash(amountPaid)
       .withType(EgraphPurchase)
+      .save()
 
-    OrderCharge(
-      this.withPaymentState(Order.PaymentState.Charged),
-      stripeCardTokenId.get,
-      cashTransaction,
-      services.payment
-    )
+    this.copy(stripeCardTokenId = Some(stripeCardTokenId),
+      stripeChargeId = Some(stripeCharge.id),
+      transactionId = Some(cashTransaction.id))
+    .withPaymentState(PaymentState.Charged)
   }
 
   def approveByAdmin(admin: Administrator): Order = {
@@ -196,28 +193,6 @@ object Order {
   //
   // Public Methods
   //
-
-  /** Encapsulates the act of charging for an order. */
-  case class OrderCharge private[Order] (order: Order,
-                                         stripeCardTokenId: String,
-                                         transaction: CashTransaction,
-                                         payment: Payment) {
-    def issueAndSave(): OrderCharge = {
-      val charge = payment.charge(
-        order.amountPaid,
-        stripeCardTokenId,
-        "Egraph Order=" + order.id
-      )
-
-      val savedTransaction = transaction.save()
-      val savedOrder = order.copy(
-        transactionId=Some(savedTransaction.id),
-        stripeChargeId=Some(charge.id)
-      ).save()
-
-      this.copy(order=savedOrder, transaction=savedTransaction)
-    }
-  }
 
   /** Specifies the Order's current status relative to payment */
   sealed abstract class PaymentState(val stateValue: String)

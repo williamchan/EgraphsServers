@@ -4,10 +4,9 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 import utils._
-import services.payment.Payment
 import models.Egraph.EgraphState
-import models.Order.PaymentState
 import services.AppConfig
+import services.payment.{NiceCharge, Payment}
 
 class OrderTests extends UnitFlatSpec
   with ShouldMatchers
@@ -106,36 +105,14 @@ class OrderTests extends UnitFlatSpec
     rejectedOrder.rejectionReason.get should be ("It made me cry")
   }
 
-  "charge" should "fail to charge if stripe token is unavailable" in {
-    evaluating { Order(stripeCardTokenId=None).charge } should produce [IllegalArgumentException]
-  }
+  "withChargeInfo" should "set the PaymentState, store stripe info, and create an associated CashTransaction" in {
+    val (will, _, _, product) = newOrderStack
+    val order = will.buy(product).withChargeInfo(stripeCardTokenId = "mytoken", stripeCharge = NiceCharge).save()
 
-  it should "create a properly configured OrderCharge" in {
-    val stripeToken = "mytoken"
-    val buyerId = 1L
-    val amount = BigDecimal(100.50)
-    val order = Order(stripeCardTokenId=Some(stripeToken), amountPaidInCurrency=amount, buyerId=buyerId)
-    val orderCharge = order.charge
-
-    orderCharge.order.paymentState should be (Order.PaymentState.Charged)
-    orderCharge.transaction.cash should be (order.amountPaid)
-    orderCharge.transaction.accountId should be (buyerId)
-    orderCharge.stripeCardTokenId should be (stripeToken)
-  }
-
-  "An OrderCharge" should "perform the correct charge" in {
-    val cashTransactionStore = AppConfig.instance[CashTransactionStore]
-    val customer = TestData.newSavedCustomer()
-    val product  = TestData.newSavedProduct()
-    val token = payment.testToken()
-    val amount = BigDecimal(100.500000)
-
-    val order = customer.buy(product).copy(stripeCardTokenId=Some(token.id),  amountPaidInCurrency=amount)
-    val charged = order.charge.issueAndSave()
-
-    orderStore.findById(charged.order.id) should not be (None)
-    cashTransactionStore.findById(charged.transaction.id) should not be (None)
-    charged.order.stripeChargeId should not be (None)
+    order.paymentState should be(Order.PaymentState.Charged)
+    order.transactionId.get should be(1)
+    order.stripeCardTokenId.get should be("mytoken")
+    order.stripeChargeId.get.contains("test charge against services.payment.YesMaamPayment") should be(true)
   }
 
 //  "refund" should "refund the Stripe charge and change the PaymentState to Refunded" in {

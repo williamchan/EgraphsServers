@@ -5,6 +5,7 @@ import services.Time
 import services.db.{KeyedCaseClass, Schema, Saves}
 import services.AppConfig
 import com.google.inject.{Provider, Inject}
+import exception.InsufficientInventoryException
 
 /** Services used by each instance of Customer */
 case class CustomerServices @Inject() (accountStore: AccountStore, customerStore: CustomerStore, inventoryBatchStore: InventoryBatchStore)
@@ -42,9 +43,14 @@ case class Customer(
    * @return a tuple of the Order for the Product purchased by this Customer for the recipient Customer
    *   and the transaction that took place.
    */
-  def buy(product: Product, recipient: Customer = this): Order = {
+  def buy(product: Product,
+          recipient: Customer = this,
+          recipientName: String = this.name,
+          messageToCelebrity: Option[String] = None,
+          requestedMessage: Option[String] = None): Order = {
+
     val (remainingInventory, activeInventoryBatches) = product.getRemainingInventoryAndActiveInventoryBatches()
-    require(remainingInventory > 0 && activeInventoryBatches.headOption.isDefined, "Must have available inventory to purchase product " + product.id)
+    if (remainingInventory <= 0 || activeInventoryBatches.headOption.isEmpty) throw new InsufficientInventoryException("Must have available inventory to purchase product " + product.id)
 
     val batchToOrderAgainst = services.inventoryBatchStore.selectAvailableInventoryBatch(activeInventoryBatches)
     val inventoryBatchId = batchToOrderAgainst match {
@@ -57,6 +63,9 @@ case class Customer(
       recipientId=recipient.id,
       productId=product.id,
       amountPaidInCurrency=BigDecimal(product.price.getAmount),
+      recipientName = recipientName,
+      messageToCelebrity = messageToCelebrity,
+      requestedMessage = requestedMessage,
       inventoryBatchId = inventoryBatchId
     )
   }

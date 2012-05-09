@@ -14,6 +14,7 @@ import services.Utils
 import play.mvc.Router.ActionDefinition
 import play.mvc.results.Redirect
 import services.http.{SecurityRequestFilters, ControllerMethod, AdminRequestFilters, CelebrityAccountRequestFilters}
+import services.db.DBSession
 
 object WebsiteControllers extends Controller
   with GetRootEndpoint
@@ -67,6 +68,7 @@ object WebsiteControllers extends Controller
   val adminIdKey: String = "admin"
 
   // Provide endpoint dependencies
+  override protected val dbSession = instance[DBSession]
   override protected val controllerMethod = instance[ControllerMethod]
   override protected val adminFilters = instance[AdminRequestFilters]
   override protected val securityFilters = instance[SecurityRequestFilters]
@@ -88,6 +90,13 @@ object WebsiteControllers extends Controller
   override protected val orderStore = instance[OrderStore]
   override protected val productStore = instance[ProductStore]
 
+  /**
+   * Redirects with validation errors populated to flash scope.
+   *
+   * @param redirectUrl target URL
+   * @param permanent See http://www.playframework.org/documentation/api/1.2.4/play/mvc/Controller.html#redirect(java.lang.String, boolean)
+   * @return a redirect
+   */
   def redirectWithValidationErrors(redirectUrl: Router.ActionDefinition, permanent: Option[Boolean] = None): Redirect = {
     // Redirect to redirectUrl, providing field errors via the flash scope.
     import scala.collection.JavaConversions._
@@ -107,6 +116,9 @@ object WebsiteControllers extends Controller
     }
   }
 
+  /**
+   * Updates the flash scope with pagination data used by pagination.scala.html
+   */
   def updateFlashScopeWithPagingData[A](pagedQuery: (Iterable[A], Int, Option[Int]),
                                         baseUrl: ActionDefinition,
                                         filter: Option[String] = None) {
@@ -143,6 +155,14 @@ object WebsiteControllers extends Controller
     }
   }
 
+  /**
+   * Appends URL with query parameters
+   *
+   * @param url the URL to which to append query parameters
+   * @param page the page index (as in pagination)
+   * @param filter the "filter" parameter
+   * @return url with query parameters appended
+   */
   private def withPageQuery(url: ActionDefinition,
                             page: Int,
                             filter: Option[String]): String = {

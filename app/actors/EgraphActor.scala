@@ -33,7 +33,6 @@ class EgraphActor @Inject() (
 
   def processEgraph(egraphId: Long, skipBiometrics: Boolean) {
     logging.withTraceableContext("processEgraph[" +egraphId +"," + skipBiometrics +"]") {
-      log("Processing Egraph " + egraphId)
       db.connected(TransactionSerializable) {
         val egraph = egraphStore.findById(egraphId)
         if (egraph.isEmpty) {

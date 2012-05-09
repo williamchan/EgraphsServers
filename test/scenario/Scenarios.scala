@@ -166,19 +166,8 @@ class Scenarios extends DeclaresScenarios {
       val erem = Scenarios.getEremCustomerAccount
       val (starcraftChampionship, kingOfPweensCompetition) = Scenarios.getWillsTwoProducts
 
-      erem.buy(starcraftChampionship)
-        .copy(
-          requestedMessage=Some("Happy 13th birthday, Don!"),
-          messageToCelebrity=Some("My buddy Don is your biggest fan!"),
-          recipientName="Erem Boto"
-        )
-        .save()
-      erem.buy(kingOfPweensCompetition)
-        .copy(
-          requestedMessage=Some("Happy Pweenday, Don!"),
-          messageToCelebrity=Some("Don loves everything you do!"),
-          recipientName="Erem Boto")
-        .save()
+      erem.buy(starcraftChampionship, recipientName="Erem Boto", requestedMessage=Some("Happy 13th birthday, Don!"), messageToCelebrity=Some("My buddy Don is your biggest fan!")).save()
+      erem.buy(kingOfPweensCompetition, recipientName="Erem Boto", requestedMessage=Some("Happy Pweenday, Don!"), messageToCelebrity=Some("Don loves everything you do!")).save()
     }
   )
 
@@ -397,8 +386,8 @@ class Scenarios extends DeclaresScenarios {
         stripeTokenId = payment.testToken().id,
         desiredText = Some("Happy 29th birthday, Erem!"),
         personalNote = Some("I'm your biggest fan!"),
-        celebrity=celebrity,
-        product=product
+        celebrity = celebrity,
+        product = product
       ).execute()
     }
   )

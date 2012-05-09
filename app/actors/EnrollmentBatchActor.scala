@@ -29,7 +29,6 @@ class EnrollmentBatchActor @Inject()(db: DBSession,
 
   def processEnrollmentBatch(enrollmentBatchId: Long) {
     logging.withTraceableContext("processEnrollmentBatch[" + enrollmentBatchId + "]") {
-      log("Processing EnrollmentBatch " + enrollmentBatchId)
       db.connected(TransactionSerializable) {
         val enrollmentBatchOption = enrollmentBatchStore.findById(enrollmentBatchId)
         if (enrollmentBatchOption.isEmpty) {
