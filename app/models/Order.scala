@@ -128,8 +128,14 @@ case class Order(
     val linkActionDefinition: ActionDefinition = Utils.lookupUrl("WebsiteControllers.getEgraph", Map("orderId" -> id.toString))
     linkActionDefinition.absolute()
 
+    val buyingCustomer = this.buyer
+    val receivingCustomer = this.recipient
     email.setFrom(celebrity.urlSlug.get + "@egraphs.com", celebrity.publicName.get)
-    email.addTo(recipient.account.email, recipientName)
+    email.addTo(receivingCustomer.account.email, recipientName)
+    if (buyingCustomer != receivingCustomer) {
+      email.addTo(buyingCustomer.account.email, buyingCustomer.name)
+    }
+
     email.addReplyTo("noreply@egraphs.com")
     email.setSubject("I just finished signing your Egraph")
     email.setMsg(
