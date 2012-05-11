@@ -187,7 +187,7 @@ object PostBuyProductEndpoint extends Logging {
         case e: InsufficientInventoryException => {
           payment.refund(charge.id)
           log("PostBuyProductEndpoint error saving order: " + e.getLocalizedMessage + " . " + purchaseData)
-          // todo(wchan): purchaseData should be stored to a customer leads table
+          // todo(wchan): purchaseData should be stored to a customer leads table per issue #109
           Validation.addError("Inventory", "Our apologies. There is no more inventory available, but your celebrity will sign more Egraphs soon.")
           return WebsiteControllers.redirectWithValidationErrors(GetCelebrityProductEndpoint.url(celebrity, product), Some(false))
         }
@@ -229,8 +229,8 @@ object PostBuyProductEndpoint extends Logging {
       }
 
       // Persist the Order with the Stripe charge info.
-      var order = buyer.buy(product, recipient, recipientName = recipientName, messageToCelebrity = personalNote, requestedMessage = desiredText)
-        .withChargeInfo(stripeCardTokenId = stripeTokenId, stripeCharge = charge)
+      var order = buyer.buy(product, recipient, recipientName = recipientName, messageToCelebrity = personalNote, requestedMessage = desiredText).save()
+      order = order.withChargeInfo(stripeCardTokenId = stripeTokenId, stripeCharge = charge)
 
       if (isDemo) {
         order = order.copy(reviewStatus = Order.ReviewStatus.ApprovedByAdmin.stateValue)

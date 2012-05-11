@@ -21,6 +21,7 @@ case class CashTransactionServices @Inject() (cashTransactionStore: CashTransact
 case class CashTransaction(
   id: Long = 0,
   accountId: Long = 0,
+  orderId: Option[Long] = None,
   amountInCurrency: BigDecimal = 0,
   currencyCode: String = CurrencyUnit.USD.getCode,
   typeString: String = "",
@@ -74,10 +75,12 @@ object CashTransaction {
   //
   sealed abstract class TransactionType(val value: String)
   case object EgraphPurchase extends TransactionType("EgraphPurchase")
+  case object PurchaseRefund extends TransactionType("PurchaseRefund")
   case object CelebrityDisbursement extends TransactionType("CelebrityDisbursement")
 
   val types = Utils.toMap[String, TransactionType](Seq(
     EgraphPurchase,
+    PurchaseRefund,
     CelebrityDisbursement
   ), key=(theType) => theType.value)
 }
@@ -100,6 +103,7 @@ class CashTransactionStore @Inject() (schema: Schema) extends Saves[CashTransact
 
     updateIs(
       theOld.accountId := theNew.accountId,
+      theOld.orderId := theNew.orderId,
       theOld.currencyCode := theNew.currencyCode,
       theOld.amountInCurrency := theNew.amountInCurrency,
       theOld.typeString := theNew.typeString,

@@ -2,7 +2,6 @@ package models
 
 import java.sql.Timestamp
 import org.joda.money.Money
-import models.CashTransaction.EgraphPurchase
 import services.db.{FilterOneTable, KeyedCaseClass, Schema, Saves}
 import services.Finance.TypeConversions._
 import org.apache.commons.mail.HtmlEmail
@@ -13,6 +12,7 @@ import payment.{Charge, Payment}
 import play.mvc.Router.ActionDefinition
 import org.squeryl.Query
 import models.Egraph.EgraphState._
+import models.CashTransaction.{PurchaseRefund, EgraphPurchase}
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -38,7 +38,6 @@ case class Order(
   paymentStateString: String = Order.PaymentState.NotCharged.stateValue,
   reviewStatus: String = Order.ReviewStatus.PendingAdminReview.stateValue,
   rejectionReason: Option[String] = None,
-  transactionId: Option[Long] = None,
   stripeCardTokenId: Option[String] = None,
   stripeChargeId: Option[String] = None,
   amountPaidInCurrency: BigDecimal = 0,
@@ -90,15 +89,33 @@ case class Order(
 
   /** Call this to associate a Stripe Charge with this Order */
   def withChargeInfo(stripeCardTokenId: String, stripeCharge: Charge): Order = {
-    val cashTransaction = CashTransaction(accountId=buyerId, services=services.cashTransactionServices.get)
+    require(id != 0, "Order must have an id")
+    CashTransaction(accountId = buyerId, orderId = Some(id), services = services.cashTransactionServices.get)
       .withCash(amountPaid)
       .withType(EgraphPurchase)
       .save()
 
-    this.copy(stripeCardTokenId = Some(stripeCardTokenId),
-      stripeChargeId = Some(stripeCharge.id),
-      transactionId = Some(cashTransaction.id))
-    .withPaymentState(PaymentState.Charged)
+    this.copy(stripeCardTokenId = Some(stripeCardTokenId), stripeChargeId = Some(stripeCharge.id))
+      .withPaymentState(PaymentState.Charged)
+  }
+
+  /**
+   * refund functionality is ready to be called, but is not exposed anywhere.
+   * Hopefully we will not have many refund requests when we launch.
+   */
+  def refund(): (Order, Charge) = {
+    require(paymentState == PaymentState.Charged, "Refunding an Order requires that the Order be already Charged")
+    require(stripeChargeId.isDefined, "Refunding an Order requires that the Order be already Charged")
+
+    val refundedCharge = services.payment.refund(stripeChargeId.get)
+
+    CashTransaction(accountId = buyerId, orderId = Some(id), services = services.cashTransactionServices.get)
+      .withCash(amountPaid.negated())
+      .withType(PurchaseRefund)
+      .save()
+
+    val refundedOrder = withPaymentState(PaymentState.Refunded)
+    (refundedOrder, refundedCharge)
   }
 
   def approveByAdmin(admin: Administrator): Order = {
@@ -307,7 +324,6 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
       theOld.productId := theNew.productId,
       theOld.inventoryBatchId := theNew.inventoryBatchId,
       theOld.buyerId := theNew.buyerId,
-      theOld.transactionId := theNew.transactionId,
       theOld.paymentStateString := theNew.paymentStateString,
       theOld.reviewStatus := theNew.reviewStatus,
       theOld.rejectionReason := theNew.rejectionReason,

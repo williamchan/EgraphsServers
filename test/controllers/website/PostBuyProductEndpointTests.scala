@@ -6,13 +6,17 @@ import utils.FunctionalTestUtils.CleanDatabaseAfterEachTest
 import services.AppConfig
 import scala.collection.JavaConversions._
 import FunctionalTest._
-import services.db.{TransactionSerializable, DBSession}
 import org.junit.Assert._
 import models._
 import utils.TestData
+import org.squeryl.PrimitiveTypeMode._
+import org.joda.money.CurrencyUnit
+import models.CashTransaction.EgraphPurchase
+import services.db.{Schema, TransactionSerializable, DBSession}
 
 class PostBuyProductEndpointTests extends FunctionalTest with CleanDatabaseAfterEachTest {
   private val db = AppConfig.instance[DBSession]
+  private val schema = AppConfig.instance[Schema]
   private val orderStore = AppConfig.instance[OrderStore]
 
   @Test
@@ -38,7 +42,18 @@ class PostBuyProductEndpointTests extends FunctionalTest with CleanDatabaseAfter
     db.connected(TransactionSerializable) {
       val allCelebOrders = orderStore.findByCelebrity(celebrity.id)
       assertEquals(1, allCelebOrders.toList.length)
-      assertNotNull(allCelebOrders.head.stripeChargeId.get)
+      val order = allCelebOrders.head
+      assertNotNull(order.stripeChargeId.get)
+
+      val cashTransaction = from(schema.cashTransactions)(txn =>
+        where(txn.orderId === Some(order.id))
+          select (txn)
+      ).head
+      assertNotNull(cashTransaction.accountId)
+      assertEquals(order.id, cashTransaction.orderId.get)
+      assertEquals(product.priceInCurrency, cashTransaction.amountInCurrency)
+      assertEquals(CurrencyUnit.USD.getCode, cashTransaction.currencyCode)
+      assertEquals(EgraphPurchase.value, cashTransaction.typeString)
     }
   }
 
@@ -65,6 +80,7 @@ class PostBuyProductEndpointTests extends FunctionalTest with CleanDatabaseAfter
     db.connected(TransactionSerializable) {
       val allCelebOrders = orderStore.findByCelebrity(celebrity.id)
       assertEquals(0, allCelebOrders.toList.length)
+      assertEquals(0, from(schema.cashTransactions)(txn => select (txn)).size) // no CashTransactions should have been created
     }
   }
 }

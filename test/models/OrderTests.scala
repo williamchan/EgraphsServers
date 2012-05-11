@@ -6,7 +6,11 @@ import play.test.UnitFlatSpec
 import utils._
 import models.Egraph.EgraphState
 import services.AppConfig
-import services.payment.{NiceCharge, Payment}
+import org.squeryl.PrimitiveTypeMode._
+import services.db.Schema
+import org.joda.money.CurrencyUnit
+import models.CashTransaction.{PurchaseRefund, EgraphPurchase}
+import services.payment.{Charge, NiceCharge}
 
 class OrderTests extends UnitFlatSpec
   with ShouldMatchers
@@ -16,8 +20,8 @@ class OrderTests extends UnitFlatSpec
   with ClearsDatabaseAndValidationAfter
   with DBTransactionPerTest
 {
+  private val schema = AppConfig.instance[Schema]
   private val orderStore = AppConfig.instance[OrderStore]
-  private val payment = AppConfig.instance[Payment]
   private val orderQueryFilters = AppConfig.instance[OrderQueryFilters]
 
   //
@@ -43,7 +47,6 @@ class OrderTests extends UnitFlatSpec
     toTransform.copy(
       productId = order.productId,
       buyerId = order.buyerId,
-      transactionId = Some(12345),
       recipientId = order.recipientId,
       recipientName = "Derpy Jones",
       stripeCardTokenId = Some("12345"),
@@ -107,29 +110,49 @@ class OrderTests extends UnitFlatSpec
 
   "withChargeInfo" should "set the PaymentState, store stripe info, and create an associated CashTransaction" in {
     val (will, _, _, product) = newOrderStack
-    val order = will.buy(product).withChargeInfo(stripeCardTokenId = "mytoken", stripeCharge = NiceCharge).save()
+    val order = will.buy(product).save().withChargeInfo(stripeCardTokenId = "mytoken", stripeCharge = NiceCharge).save()
 
+    // verify PaymentState
     order.paymentState should be(Order.PaymentState.Charged)
-    order.transactionId.get should be(1)
+
+    // verify Stripe Info
     order.stripeCardTokenId.get should be("mytoken")
     order.stripeChargeId.get.contains("test charge against services.payment.YesMaamPayment") should be(true)
+
+    // verify CashTransaction
+    val cashTransaction = from(schema.cashTransactions)(txn =>
+      where(txn.orderId === Some(order.id))
+        select (txn)
+    ).head
+    cashTransaction.accountId should be(will.id)
+    cashTransaction.orderId should be(Some(order.id))
+    cashTransaction.amountInCurrency should be(product.priceInCurrency)
+    cashTransaction.currencyCode should be(CurrencyUnit.USD.getCode)
+    cashTransaction.typeString should be(EgraphPurchase.value)
   }
 
-//  "refund" should "refund the Stripe charge and change the PaymentState to Refunded" in {
-//    val cashTransactionStore = AppConfig.instance[CashTransactionStore]
-//    val customer = TestData.newSavedCustomer()
-//    val product  = TestData.newSavedProduct()
-//    val token = payment.testToken()
-//    val amount = BigDecimal(100.500000)
-//
-//    val order = customer.buy(product).copy(stripeCardTokenId=Some(token.id),  amountPaidInCurrency=amount)
-//    val charged = order.charge.issueAndSave()
-//    charged.order.stripeChargeId should not be (None)
-//
-//    // todo(wchan): order.refund
-//    payment.refund(charged.order.stripeChargeId.get)
-//    orderStore.findById(order.id).get.paymentState should be(PaymentState.Refunded)
-//  }
+  "refund" should "refund the Stripe charge, change the PaymentState to Refunded, and create a refund CashTransaction" in {
+    val (will, _, _, product) = newOrderStack
+    val order = will.buy(product).save().withChargeInfo(stripeCardTokenId = "mytoken", stripeCharge = NiceCharge).save()
+
+    var (refundedOrder: Order, refundCharge: Charge) = order.refund()
+    refundedOrder = refundedOrder.save()
+    refundedOrder.paymentState should be(Order.PaymentState.Refunded)
+    refundCharge.refunded should be(true)
+
+    val cashTransactions = from(schema.cashTransactions)(txn => where(txn.orderId === Some(order.id)) select (txn))
+    cashTransactions.size should be(2)
+    val purchaseTxn = cashTransactions.find(b => b.transactionType == EgraphPurchase).head
+    purchaseTxn.accountId should be(will.id)
+    purchaseTxn.orderId should be(Some(order.id))
+    purchaseTxn.amountInCurrency should be(BigDecimal(product.price.getAmount))
+    purchaseTxn.currencyCode should be(CurrencyUnit.USD.getCode)
+    val refundTxn = cashTransactions.find(b => b.transactionType == PurchaseRefund).head
+    refundTxn.accountId should be(will.id)
+    refundTxn.orderId should be(Some(order.id))
+    refundTxn.amountInCurrency should be(BigDecimal(product.price.negated().getAmount))
+    refundTxn.currencyCode should be(CurrencyUnit.USD.getCode)
+  }
 
   "findByCelebrity" should "find all of a Celebrity's orders by default" in {
 
