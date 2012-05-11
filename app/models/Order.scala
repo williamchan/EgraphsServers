@@ -133,7 +133,7 @@ case class Order(
     email.setFrom(celebrity.urlSlug.get + "@egraphs.com", celebrity.publicName.get)
     email.addTo(receivingCustomer.account.email, recipientName)
     if (buyingCustomer != receivingCustomer) {
-      email.addTo(buyingCustomer.account.email, buyingCustomer.name)
+      email.addCc(buyingCustomer.account.email, buyingCustomer.name)
     }
 
     email.addReplyTo("noreply@egraphs.com")
