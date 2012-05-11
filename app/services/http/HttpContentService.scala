@@ -12,7 +12,7 @@ class HttpContentService {
         SVGZContentHeaders
 
       case _ =>
-        val mimeType = MimeTypes.getContentType(fileName)
+        val mimeType = playContentType(fileName)
         val contentEncoding = play.utils.HTTP.parseContentType(mimeType).encoding match {
           case null => None
           case realValue => Some(realValue)
@@ -26,6 +26,17 @@ class HttpContentService {
   // Private Methods
   //
   private def fileExtensionRegex = "^.*\\.([^.]+)$".r
+
+  private def playContentType(fileName: String) = {
+    try {
+      MimeTypes.getContentType(fileName)
+    }
+    catch {
+      // TODO: remove this ridiculous NPE check once Play fixes this problem:
+      // https://play.lighthouseapp.com/projects/57987-play-framework/tickets/1519-mimetypesgetcontenttype-nullpointerexception#ticket-1519-2
+      case npe: NullPointerException => MimeTypes.getMimeType(fileName)
+    }
+  }
 }
 
 

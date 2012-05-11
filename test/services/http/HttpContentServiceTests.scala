@@ -1,10 +1,8 @@
 package services.http
 
-import play.test.UnitFlatSpec
-import org.scalatest.matchers.ShouldMatchers
-import org.specs2.mock.Mockito
-import play.mvc.Scope
 import utils.EgraphsUnitTest
+import models.EnrollmentSample
+import play.mvc.Http.Response
 
 class HttpContentServiceTests extends EgraphsUnitTest {
 
@@ -20,5 +18,17 @@ class HttpContentServiceTests extends EgraphsUnitTest {
     val headers = underTest.headersForFilename("a/b/herp.png")
     headers.contentType should be ("image/png")
     headers.contentEncoding should be (None)
+  }
+
+  it should "get the correct type for text files even in the absence of a Response" in {
+    val origResponse = Response.current()
+    try {
+      Response.current.set(null)
+      val headers = underTest.headersForFilename(EnrollmentSample.getSignatureXmlUrl(0))
+      headers.contentType should be ("text/xml")
+    }
+    finally {
+      Response.current.set(origResponse)
+    }
   }
 }
