@@ -31,6 +31,24 @@ private[controllers] trait GetScriptAdminEndpoint {
 
       val action = params.get("action")
       action match {
+        case "gc" => {
+          Runtime.getRuntime.gc()
+        }
+
+        case "print-jvm-params" => {
+          import management.ManagementFactory
+          import scala.collection.JavaConversions._
+
+          var s = ""
+          for (z <- ManagementFactory.getMemoryPoolMXBeans) {
+            if (z.getName.contains("Perm Gen")) {
+              s += (z.getName + " " + z.getUsage.getUsed + " (max: " + z.getUsage.getMax + ").  ")
+            }
+          }
+          s += " Runtime.getRuntime.maxMemory() = " + Runtime.getRuntime.maxMemory() + "."
+          s
+        }
+
         case "kick-egraphs-awaitingverification" => {
           // find all Egraphs that are AwaitingVerification and give them a kick...
           val egraphsAwaitingVerification: Query[(Egraph)] = from(schema.egraphs)(

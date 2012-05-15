@@ -51,4 +51,4 @@ PROJ_BASE=$SCRIPT_DIR/..
 cd $PROJ_BASE
 
 play evolutions:apply --%$DEPLOY_TARGET
-play bees:app:deploy --%$DEPLOY_TARGET -Dakka.config=conf/akka.conf -XX:MaxPermSize=256m
+play bees:app:deploy --%$DEPLOY_TARGET
