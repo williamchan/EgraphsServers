@@ -93,10 +93,15 @@ with ShouldMatchers {
     croppedImage.getHeight should be(200)
   }
 
-  it should "retain an image's alpha layer" in {
+  "crop" should "retain an image's alpha layer" in {
     val originalImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB)
     val cropped = ImageUtil.crop(originalImage, Dimensions(50, 50))
 
     cropped.getType should be(BufferedImage.TYPE_INT_ARGB)
+  }
+
+  "isLandscape" should "return true if landscape and false otherwise" in {
+    Dimensions(width = 100, height = 1).isLandscape should be (true)
+    Dimensions(width = 1, height = 100).isLandscape should be (false)
   }
 }

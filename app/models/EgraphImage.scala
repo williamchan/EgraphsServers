@@ -49,8 +49,13 @@ case class EgraphImage (
     withTransform(ChangeShadowOffsetEgraphImageTransform(offsetX, offsetY))
   }
 
+  /** @see SigningOriginOffsetEgraphImageTransform */
+  def withSigningOriginOffset(signingOriginX: Double, signingOriginY: Double): EgraphImage = {
+    withTransform(SigningOriginOffsetEgraphImageTransform(signingOriginX, signingOriginY))
+  }
+
   /** Returns a copy of this image with the supplied transform applied */
-  def withTransform(transform: EgraphImageTransform): EgraphImage = {
+  private def withTransform(transform: EgraphImageTransform): EgraphImage = {
     this.copy(transforms = transforms :+ transform)
   }
 
@@ -182,7 +187,9 @@ case class EgraphImageIngredients(
   message: Option[Handwriting],
   pen: HandwritingPen,
   photo: BufferedImage,
-  photoDimensionsWhenSigned: Dimensions
+  photoDimensionsWhenSigned: Dimensions,
+  signingOriginX: Int,
+  signingOriginY: Int
 ) {
   /**
    * Returns the combination of signature and message Handwriting.
@@ -203,7 +210,9 @@ object EgraphImageIngredients {
     messageJsonOption: Option[String],
     pen: HandwritingPen,
     photo: BufferedImage,
-    photoDimensionsWhenSigned: Dimensions
+    photoDimensionsWhenSigned: Dimensions,
+    signingOriginX: Int,
+    signingOriginY: Int
   ): EgraphImageIngredients = {
     val signatureHandwriting = Handwriting(signatureJson)
     val messageHandwritingOption = messageJsonOption.map { messageJson =>
@@ -215,7 +224,9 @@ object EgraphImageIngredients {
       messageHandwritingOption,
       pen,
       photo,
-      photoDimensionsWhenSigned
+      photoDimensionsWhenSigned,
+      signingOriginX,
+      signingOriginY
     )
   }
 }
@@ -309,7 +320,6 @@ case class ChangePenWidthEgraphImageTransform(width: Double) extends EgraphImage
   override def apply(toTransform: EgraphImage): EgraphImage = {
     val oldIngredients = toTransform.ingredientFactory()
     val newPen = oldIngredients.pen.copy(width=width)
-
     toTransform.copy(ingredientFactory= ()=> oldIngredients.copy(pen=newPen))
   }
 }
@@ -333,5 +343,22 @@ case class ChangeShadowOffsetEgraphImageTransform(offsetX: Double, offsetY: Doub
 
     toTransform.copy(ingredientFactory= ()=> oldIngredients.copy(pen=newPen))
   }
+}
 
+case class SigningOriginOffsetEgraphImageTransform(signingOriginX: Double, signingOriginY: Double) extends EgraphImageTransform {
+  override val id = {
+    val numberFormat = new DecimalFormat("0")
+
+    "signing-origin-offset-" + numberFormat.format(signingOriginX) + "x" + numberFormat.format(signingOriginY)
+  }
+
+  override def apply(toTransform: EgraphImage): EgraphImage = {
+    val oldIngredients = toTransform.ingredientFactory()
+    val previousSignature = oldIngredients.signature
+    val previousMessageOption = oldIngredients.message
+    val newSignature = previousSignature.translatingBy(signingOriginX, signingOriginY)
+    val newMessageOption = previousMessageOption.map(message => message.translatingBy(signingOriginX, signingOriginY))
+
+    toTransform.copy(ingredientFactory= ()=> oldIngredients.copy(signature=newSignature,message=newMessageOption))
+  }
 }

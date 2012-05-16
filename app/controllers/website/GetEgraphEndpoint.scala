@@ -7,6 +7,7 @@ import services.http.ControllerMethod
 import models.{Order, Egraph, OrderStore, FulfilledOrder}
 import play.templates.Html
 import services.http.OptionParams.Conversions.paramsToOptionalParams
+import services.graphics.Handwriting
 
 private[controllers] trait GetEgraphEndpoint { this: Controller =>
   protected def orderStore: OrderStore
@@ -50,9 +51,9 @@ object GetEgraphEndpoint {
   def html(
     egraph: Egraph,
     order: Order,
-    penWidth: Double=5.0,
-    shadowX: Double=3.0,
-    shadowY: Double=3.0
+    penWidth: Double=Handwriting.defaultPenWidth,
+    shadowX: Double=Handwriting.defaultShadowOffsetX,
+    shadowY: Double=Handwriting.defaultShadowOffsetY
   ): Html = {
     // Get related data model objects
     val product = order.product
@@ -63,6 +64,7 @@ object GetEgraphEndpoint {
     val rawSignedImage = egraph.image(product.photoImage)
     val frameFittedImage = rawSignedImage
       .withPenWidth(penWidth)
+      .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
       .withPenShadowOffset(shadowX, shadowY)
       .scaledToWidth(frame.imageWidthPixels)
 

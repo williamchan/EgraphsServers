@@ -49,10 +49,11 @@ object TestData {
   }
 
   def newSavedProduct(celebrity: Option[Celebrity] = None): Product = {
-    val product = celebrity match {
+    var product = celebrity match {
       case None => newSavedCelebrity().newProduct.save()
       case Some(c) => c.newProduct.copy(name = "prod" + random.nextLong()).save()
     }
+    product = product.saveWithImageAssets(image = Some(product.defaultPhoto.renderFromMaster), icon = None)
     val inventoryBatch = newSavedInventoryBatch(product.celebrity)
     inventoryBatch.products.associate(product)
     product

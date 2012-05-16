@@ -38,6 +38,12 @@ case class Product(
   _defaultFrameName: String = PortraitEgraphFrame.name,
   storyTitle: String = "The Story",
   storyText: String = "(No story has been written for this product)",
+  signingScaleW: Int = 0,
+  signingScaleH: Int = 0,
+  signingOriginX: Int = 0,
+  signingOriginY: Int = 0,
+  signingAreaW: Int = Product.defaultSigningAreaW,
+  signingAreaH: Int = Product.defaultSigningAreaW,
   photoKey: Option[String] = None,
   _iconKey: Option[String] = None,
   created: Timestamp = Time.defaultTimestamp,
@@ -60,17 +66,24 @@ case class Product(
     services.store.save(this)
   }
 
+  /**
+   * Saves product with image and icon. If image is set, then signingScaleW and signingScaleH are also set to default values
+   * depending on the image.
+   */
   def saveWithImageAssets(image: Option[BufferedImage], icon: Option[BufferedImage]): Product = {
     import ImageUtil.Conversions._
 
     // Prepare the product photo, cropped to the suggested frame
     val product = if (image.isDefined) {
-      val frame = EgraphFrame.suggestedFrame(Dimensions(image.get.getWidth, image.get.getHeight))
+      val imageDimensions = Dimensions(image.get.getWidth, image.get.getHeight)
+      val frame = EgraphFrame.suggestedFrame(imageDimensions)
       val imageCroppedToFrame = frame.cropImageForFrame(image.get)
       val imageByteArray = imageCroppedToFrame.asByteArray(ImageAsset.Jpeg)
       // Product has previously been saved so that it has an ID for blobstore to key on
       val savedWithFrame = withFrame(frame).save()
-      savedWithFrame.withPhoto(imageByteArray).save().product
+
+      val signingScaleDimensions = if (imageDimensions.isLandscape) Product.defaultLandscapeSigningScale else Product.defaultPortraitSigningScale
+      savedWithFrame.copy(signingScaleH = signingScaleDimensions.height, signingScaleW = signingScaleDimensions.width).withPhoto(imageByteArray).save().product
     } else {
       save()
     }
@@ -146,7 +159,11 @@ case class Product(
         defaultPhoto
     }
   }
-  
+
+  def signingScalePhoto: ImageAsset = {
+    photo.resizedWidth(signingScaleW).getSaved(AccessPolicy.Public)
+  }
+
   def photoImage: BufferedImage = {
     photo.renderFromMaster
   }
@@ -166,8 +183,14 @@ case class Product(
   def renderedForApi: Map[String, Any] = {
     renderCreatedUpdatedForApi ++ Map(
       "id" -> id,
-      "photoUrl" -> photo.url,
-      "urlSlug" -> urlSlug
+      "photoUrl" -> signingScalePhoto.url,
+      "urlSlug" -> urlSlug,
+      "signingScaleW" -> signingScaleW,
+      "signingScaleH" -> signingScaleH,
+      "signingOriginX" -> signingOriginX,
+      "signingOriginY" -> signingOriginY,
+      "signingAreaW" -> signingAreaW,
+      "signingAreaH" -> signingAreaH
     )
   }
 
@@ -223,6 +246,11 @@ case class Product(
 object Product {
 
   val defaultPrice = 50
+  val defaultSigningAreaW = 1024 // This is the width of an iPad2 screen. Default signing area is 1024x1024.
+  val defaultLandscapeSigningScale = Dimensions(width = 1420, height = 900)
+  val defaultPortraitSigningScale = Dimensions(width = 1024, height = 1428)
+  val minPhotoWidth = 1024
+  val minPhotoHeight = 900
 
   def slugify(productName: String): String = {
     JavaExtensions.slugify(productName, false) // Slugify without lower-casing
@@ -298,6 +326,12 @@ class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: Invent
       theOld._iconKey := theNew._iconKey,
       theOld.storyTitle := theNew.storyTitle,
       theOld.storyText := theNew.storyText,
+      theOld.signingScaleW := theNew.signingScaleW,
+      theOld.signingScaleH := theNew.signingScaleH,
+      theOld.signingOriginX := theNew.signingOriginX,
+      theOld.signingOriginY := theNew.signingOriginY,
+      theOld.signingAreaW := theNew.signingAreaW,
+      theOld.signingAreaH := theNew.signingAreaH,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated
     )

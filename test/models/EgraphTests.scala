@@ -29,7 +29,7 @@ class EgraphTests extends UnitFlatSpec
   }
 
   override def saveEntity(toSave: Egraph) = {
-    toSave.saveWithoutAssets()
+    toSave.save()
   }
 
   override def restoreEntity(id: Long) = {
@@ -83,6 +83,16 @@ class EgraphTests extends UnitFlatSpec
     intercept[IllegalArgumentException] {Egraph().withState(EgraphState.PassedBiometrics).publish(admin)}
   }
 
+  "image" should "return EgraphImage with correctly configured ingredientFactory" in {
+    val egraph = newEntity.withAssets(TestConstants.signatureStr, Some(TestConstants.messageStr), "my audio".getBytes("UTF-8")).save()
+    val egraphImage: EgraphImage = egraph.image()
+    val ingredientFactory = egraphImage.ingredientFactory.apply() // This throws NPEs if signature, message, pen, or photo are uninitialized
+    ingredientFactory.photoDimensionsWhenSigned.width should be(Product.defaultLandscapeSigningScale.width)
+    ingredientFactory.photoDimensionsWhenSigned.height should be(Product.defaultLandscapeSigningScale.height)
+    ingredientFactory.signingOriginX should be(0)
+    ingredientFactory.signingOriginY should be(0)
+  }
+
   "An Egraph" should "save and recover signature and audio data from the blobstore" in {
     val egraph = TestData.newSavedOrder()
       .newEgraph
@@ -131,12 +141,12 @@ class EgraphTests extends UnitFlatSpec
   }
 
   "getEgraphsAndResults" should "filter queries based on EgraphQueryFilters" in {
-    val passedBiometrics = TestData.newSavedOrder().newEgraph.withState(EgraphState.PassedBiometrics).saveWithoutAssets()
-    val failedBiometrics = TestData.newSavedOrder().newEgraph.withState(EgraphState.FailedBiometrics).saveWithoutAssets()
-    val approvedByAdmin = TestData.newSavedOrder().newEgraph.withState(EgraphState.ApprovedByAdmin).saveWithoutAssets()
-    val rejectedByAdmin = TestData.newSavedOrder().newEgraph.withState(EgraphState.RejectedByAdmin).saveWithoutAssets()
-    val awaitingVerification = TestData.newSavedOrder().newEgraph.withState(EgraphState.AwaitingVerification).saveWithoutAssets()
-    val published = TestData.newSavedOrder().newEgraph.withState(EgraphState.Published).saveWithoutAssets()
+    val passedBiometrics = TestData.newSavedOrder().newEgraph.withState(EgraphState.PassedBiometrics).save()
+    val failedBiometrics = TestData.newSavedOrder().newEgraph.withState(EgraphState.FailedBiometrics).save()
+    val approvedByAdmin = TestData.newSavedOrder().newEgraph.withState(EgraphState.ApprovedByAdmin).save()
+    val rejectedByAdmin = TestData.newSavedOrder().newEgraph.withState(EgraphState.RejectedByAdmin).save()
+    val awaitingVerification = TestData.newSavedOrder().newEgraph.withState(EgraphState.AwaitingVerification).save()
+    val published = TestData.newSavedOrder().newEgraph.withState(EgraphState.Published).save()
 
     store.getEgraphsAndResults(egraphQueryFilters.passedBiometrics).toSeq.map(e => e._1).toSet should be(Set(passedBiometrics))
     store.getEgraphsAndResults(egraphQueryFilters.failedBiometrics).toSeq.map(e => e._1).toSet should be(Set(failedBiometrics))
@@ -151,12 +161,12 @@ class EgraphTests extends UnitFlatSpec
     val celebrity = TestData.newSavedCelebrity()
     val product = Some(TestData.newSavedProduct(Some(celebrity)))
 
-    val passedBiometrics = TestData.newSavedOrder(product).newEgraph.withState(EgraphState.PassedBiometrics).saveWithoutAssets()
-    val failedBiometrics = TestData.newSavedOrder(product).newEgraph.withState(EgraphState.FailedBiometrics).saveWithoutAssets()
-    val approvedByAdmin = TestData.newSavedOrder(product).newEgraph.withState(EgraphState.ApprovedByAdmin).saveWithoutAssets()
-    val rejectedByAdmin = TestData.newSavedOrder(product).newEgraph.withState(EgraphState.RejectedByAdmin).saveWithoutAssets()
-    val awaitingVerification = TestData.newSavedOrder(product).newEgraph.withState(EgraphState.AwaitingVerification).saveWithoutAssets()
-    val published = TestData.newSavedOrder(product).newEgraph.withState(EgraphState.Published).saveWithoutAssets()
+    val passedBiometrics = TestData.newSavedOrder(product).newEgraph.withState(EgraphState.PassedBiometrics).save()
+    val failedBiometrics = TestData.newSavedOrder(product).newEgraph.withState(EgraphState.FailedBiometrics).save()
+    val approvedByAdmin = TestData.newSavedOrder(product).newEgraph.withState(EgraphState.ApprovedByAdmin).save()
+    val rejectedByAdmin = TestData.newSavedOrder(product).newEgraph.withState(EgraphState.RejectedByAdmin).save()
+    val awaitingVerification = TestData.newSavedOrder(product).newEgraph.withState(EgraphState.AwaitingVerification).save()
+    val published = TestData.newSavedOrder(product).newEgraph.withState(EgraphState.Published).save()
 
     store.getCelebrityEgraphsAndResults(celebrity, egraphQueryFilters.passedBiometrics).toSeq.map(e => e._1).toSet should be(Set(passedBiometrics))
     store.getCelebrityEgraphsAndResults(celebrity, egraphQueryFilters.failedBiometrics).toSeq.map(e => e._1).toSet should be(Set(failedBiometrics))

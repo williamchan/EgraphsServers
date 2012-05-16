@@ -235,7 +235,7 @@ class OrderTests extends UnitFlatSpec
         order
           .newEgraph
           .withState(state)
-          .saveWithoutAssets()
+          .save()
         (state, order)
     }
 

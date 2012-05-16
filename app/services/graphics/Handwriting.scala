@@ -41,15 +41,21 @@ case class Handwriting(strokes: Seq[HandwritingStroke], transform: AffineTransfo
   /**
    * Returns a Handwriting translated by (x, y) points from the top and left, respectively.
    *
-   * @param x The number of points by which to translate from the left of the drawing origin
-   * @param y The number of points by which to translate from the top of the drawing origin
+   * @param xOffset The number of points by which to translate from the left of the drawing origin
+   * @param yOffset The number of points by which to translate from the top of the drawing origin
    *
    * @return a copy of the Handwriting that will draw its strokes translated by (x, y) pixels.
    */
-  def translatingBy(x: Double, y: Double): Handwriting = {
-    val newTransform = new AffineTransform(transform)
-    newTransform.translate(x, y)
-    copy(transform=newTransform)
+  def translatingBy(xOffset: Double, yOffset: Double): Handwriting = {
+    val newStrokes = for (stroke <- strokes) yield {
+      val newPoints = for (point <- stroke.points) yield {
+        point.copy(x= point.x + xOffset, y= point.y + yOffset)
+      }
+
+      new HandwritingStroke(newPoints)
+    }
+
+    copy(strokes=newStrokes)
   }
 
   /**
@@ -76,6 +82,11 @@ case class Handwriting(strokes: Seq[HandwritingStroke], transform: AffineTransfo
 
 
 object Handwriting extends Logging {
+
+  val defaultPenWidth: Double = 5.0
+  val defaultShadowOffsetX: Double = 3.0
+  val defaultShadowOffsetY: Double = 3.0
+
   /**
    * Creates a Handwriting object out of our internally used JSON format. See that format's
    * [[https://egraphs.jira.com/wiki/display/DEV/API+Endpoints documentation]]
@@ -225,9 +236,9 @@ case class HandwritingShadow(offsetX: Double, offsetY: Double, color: Color)
  * @param transform any additional transforms that should occur to the pen.
  */
 case class HandwritingPen(
-  width: Double=5.0,
+  width: Double=Handwriting.defaultPenWidth,
   color: Color=Color.white,
-  shadowOption:Option[HandwritingShadow]=Some(HandwritingShadow(3.0, 3.0, Color.black)),
+  shadowOption:Option[HandwritingShadow]=Some(HandwritingShadow(Handwriting.defaultShadowOffsetX, Handwriting.defaultShadowOffsetY, Color.black)),
   transform:AffineTransform=new AffineTransform()
 ) {
 

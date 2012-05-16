@@ -56,8 +56,8 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
           val (width, height) = (image.getWidth, image.getHeight)
           val resolutionStr = width + "x" + height
           Validation.isTrue(
-            "Product Photo must be at least 940 in width and 900 in height - resolution was " + resolutionStr,
-            width >= 940 && height >= 900
+            "Product Photo must be at least " + Product.minPhotoWidth + " in width and " + Product.minPhotoHeight + " in height - resolution was " + resolutionStr,
+            width >= Product.minPhotoWidth && height >= Product.minPhotoHeight
           )
         }
 
@@ -67,7 +67,7 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
         Validation.isTrue("Product icon must be a valid image", isProductIconValid)
         for (image <- productIconOption) {
           Validation.isTrue(
-            "Product icon must be at least 41px wide and 41px high",
+            "Product icon must be at least 40px wide and 40px high",
             image.getWidth >= 40 && image.getHeight >= 40
           )
         }

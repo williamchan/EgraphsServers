@@ -2,13 +2,13 @@ package controllers.website.admin
 
 import play.mvc.Controller
 import services.http.{AdminRequestFilters, ControllerMethod}
-import services.AppConfig
 import services.blobs.Blobs
 import services.db.Schema
 import models._
 import org.squeryl.Query
 import org.squeryl.PrimitiveTypeMode._
 import models.Egraph.EgraphState
+import services.{Dimensions, AppConfig}
 
 private[controllers] trait GetScriptAdminEndpoint {
   this: Controller =>
@@ -24,6 +24,7 @@ private[controllers] trait GetScriptAdminEndpoint {
   protected def egraphStore = AppConfig.instance[EgraphStore]
   protected def enrollmentBatchStore = AppConfig.instance[EnrollmentBatchStore]
   protected def inventoryBatchStore = AppConfig.instance[InventoryBatchStore]
+  protected def productStore = AppConfig.instance[ProductStore]
   protected def orderStore = AppConfig.instance[OrderStore]
 
   def getScriptAdmin = controllerMethod() {
@@ -90,6 +91,17 @@ private[controllers] trait GetScriptAdminEndpoint {
             actors.EnrollmentBatchActor.actor ! actors.ProcessEnrollmentBatchMessage(id = enrollmentBatch.get.id)
           }
           "I gave that EnrollmentBatch a kick"
+        }
+
+        case "reset-signingScale" => {
+          val products: Query[(Product)] = from(schema.products)((p) => select(p))
+          for (product <- products) {
+            val image = product.photoImage
+            val imageDimensions = Dimensions(image.getWidth, image.getHeight)
+            val signingScaleDimensions = if (imageDimensions.isLandscape) Product.defaultLandscapeSigningScale else Product.defaultPortraitSigningScale
+            product.copy(signingScaleH = signingScaleDimensions.height, signingScaleW = signingScaleDimensions.width).save()
+          }
+          "signingScaleW and signingScaleH set for all products"
         }
 
         case _ => "Not a valid action"

@@ -8,6 +8,7 @@ import services.AppConfig
 import play.Play
 import javax.imageio.ImageIO
 import utils._
+import java.awt.image.BufferedImage
 
 class ProductTests extends UnitFlatSpec
   with ShouldMatchers
@@ -49,13 +50,30 @@ class ProductTests extends UnitFlatSpec
   //
   // Test cases
   //
+
+  "saveWithImageAssets" should "set signingScaleH and signingScaleW" in {
+    var product = TestData.newSavedProduct().saveWithImageAssets(image = Some(new BufferedImage(/*width*/3000, /*height*/2000, BufferedImage.TYPE_INT_ARGB)), icon = None)
+    product.signingScaleW should be(Product.defaultLandscapeSigningScale.width)
+    product.signingScaleH should be(Product.defaultLandscapeSigningScale.height)
+
+    product = TestData.newSavedProduct().saveWithImageAssets(image = Some(new BufferedImage(/*width*/2000, /*height*/3000, BufferedImage.TYPE_INT_ARGB)), icon = None)
+    product.signingScaleW should be(Product.defaultPortraitSigningScale.width)
+    product.signingScaleH should be(Product.defaultPortraitSigningScale.height)
+  }
+
   "renderedForApi" should "serialize the correct Map for the API" in {
-    val product = TestData.newSavedProduct().copy(name = "Herp Derp").save()
+    val product = TestData.newSavedProduct().copy(name = "Herp Derp", signingOriginX = 50, signingOriginY = 60).save()
 
     val rendered = product.renderedForApi
     rendered("id") should be(product.id)
-    rendered("photoUrl") should be(product.photo.url)
     rendered("urlSlug") should be("Herp-Derp")
+    rendered("photoUrl") should be(product.photo.resizedWidth(product.signingScaleW).url)
+    rendered("signingScaleW") should be(Product.defaultLandscapeSigningScale.width)
+    rendered("signingScaleH") should be(Product.defaultLandscapeSigningScale.height)
+    rendered("signingOriginX") should be(50)
+    rendered("signingOriginY") should be(60)
+    rendered("signingAreaW") should be(Product.defaultSigningAreaW)
+    rendered("signingAreaH") should be(Product.defaultSigningAreaW)
     rendered.contains("created") should be(true)
     rendered.contains("updated") should be(true)
   }

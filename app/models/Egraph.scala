@@ -10,15 +10,13 @@ import vbg.{VBGVerifySampleStore, VBGVerifySample}
 import services.signature.{SignatureBiometricsError, YesMaamSignatureBiometricService, SignatureBiometricService}
 import services._
 import db.{FilterOneTable, Schema, KeyedCaseClass, Saves}
-import graphics.{HandwritingPen, GraphicsSource}
+import graphics.{Handwriting, HandwritingPen, GraphicsSource}
 import java.text.SimpleDateFormat
 import controllers.WebsiteControllers
 import controllers.website.GetCelebrityProductEndpoint
 import com.google.inject.{Provider, Inject}
 import play.utils.HTML.htmlEscape
 import org.squeryl.Query
-import models.Egraph.EgraphState
-import org.squeryl.PrimitiveTypeMode._
 
 import xyzmo.{XyzmoVerifyUserStore, XyzmoVerifyUser}
 import models.Egraph.EgraphState
@@ -118,15 +116,6 @@ case class Egraph(
     services.orderStore.get(orderId)
   }
 
-  /**
-   * Saves the entity without updating the assets. IT IS AN ERROR to call this
-   * method on an Egraph that is being persisted for the first time. Only use
-   * it to update an Egraph's status.
-   */
-  def saveWithoutAssets(): Egraph = {
-    services.store.save(this)
-  }
-
   /** Returns a transform of this object with the new, parameterized state */
   def withState(state: EgraphState): Egraph = {
     copy(stateValue = state.value)
@@ -176,7 +165,7 @@ case class Egraph(
    */
   def image(productPhoto: => BufferedImage=order.product.photoImage):EgraphImage = {
     EgraphImage(
-      ingredientFactory=imageIngredientFactory(productPhoto),
+      ingredientFactory=imageIngredientFactory(order.product, productPhoto),
       graphicsSource=services.graphicsSourceFactory(),
       blobPath=blobKeyBase + "/image"
     )
@@ -189,15 +178,17 @@ case class Egraph(
    * @param productPhoto the photo that should be "signed" by the Egraph's stored vector handwriting.
    *
    */
-  private def imageIngredientFactory(productPhoto: => BufferedImage): () => EgraphImageIngredients = {
+  private def imageIngredientFactory(product: Product, productPhoto: => BufferedImage): () => EgraphImageIngredients = {
     () => {
       val myAssets = assets
       EgraphImageIngredients(
         signatureJson=myAssets.signature,
         messageJsonOption=myAssets.message,
-        pen=HandwritingPen(width=5.0),
+        pen=HandwritingPen(width=Handwriting.defaultPenWidth),
         photo=productPhoto,
-        photoDimensionsWhenSigned=Dimensions(productPhoto.getWidth, productPhoto.getHeight)
+        photoDimensionsWhenSigned=Dimensions(product.signingScaleW, product.signingScaleH),
+        signingOriginX = product.signingOriginX,
+        signingOriginY = product.signingOriginY
       )
     }
   }
@@ -746,13 +737,13 @@ object EgraphFrame {
    * Returns the suggested frame for a given image. Decision is made based on frame
    * dimensions
    */
-  private def suggestedFrameForDimensions(pixelWidth: Int, pixelHeight: Int): EgraphFrame = {
-    if (pixelWidth > pixelHeight) LandscapeEgraphFrame else PortraitEgraphFrame
+  private def suggestedFrameForDimensions(dimensions: Dimensions): EgraphFrame = {
+    if (dimensions.isLandscape) LandscapeEgraphFrame else PortraitEgraphFrame
   }
 
   /** See suggestedFrameForDimensions */
   def suggestedFrame(dimensions: Dimensions): EgraphFrame = {
-    suggestedFrameForDimensions(dimensions.width, dimensions.height)
+    suggestedFrameForDimensions(dimensions)
   }
 }
 

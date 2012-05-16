@@ -106,7 +106,7 @@ class ImageAsset(
   }
 
   /**
-   * Renders the asset from the provided master data.
+   * Renders the asset from the provided master data. This is an expensive call.
    *
    * Throws runtime exceptions if the data were unavailable for
    * whatever reason.

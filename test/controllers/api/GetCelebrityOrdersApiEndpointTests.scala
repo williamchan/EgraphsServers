@@ -57,7 +57,7 @@ class GetCelebrityOrdersApiEndpointTests extends FunctionalTest with CleanDataba
     db.connected(TransactionSerializable) {
       val celebrityId = Scenarios.getWillCelebrityAccount.id
       val allCelebOrders = orderStore.findByCelebrity(celebrityId)
-      Egraph(orderId = allCelebOrders.toSeq.head.id).withState(EgraphState.AwaitingVerification).saveWithoutAssets()
+      Egraph(orderId = allCelebOrders.toSeq.head.id).withState(EgraphState.AwaitingVerification).save()
     }
 
     val response = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/orders?signerActionable=true")
@@ -73,7 +73,7 @@ class GetCelebrityOrdersApiEndpointTests extends FunctionalTest with CleanDataba
     db.connected(TransactionSerializable) {
       val celebrityId = Scenarios.getWillCelebrityAccount.id
       val allCelebOrders = orderStore.findByCelebrity(celebrityId)
-      Egraph(orderId = allCelebOrders.toSeq.head.id).withState(EgraphState.Published).saveWithoutAssets()
+      Egraph(orderId = allCelebOrders.toSeq.head.id).withState(EgraphState.Published).save()
     }
 
     val response = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/orders?signerActionable=true")
@@ -91,7 +91,7 @@ class GetCelebrityOrdersApiEndpointTests extends FunctionalTest with CleanDataba
 
       val celebrityId = Scenarios.getWillCelebrityAccount.id
       val allCelebOrders = orderStore.findByCelebrity(celebrityId)
-      Egraph(orderId = allCelebOrders.toSeq.head.id).withState(RejectedByAdmin).saveWithoutAssets()
+      Egraph(orderId = allCelebOrders.toSeq.head.id).withState(RejectedByAdmin).save()
     }
 
     val response = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/orders?signerActionable=true")
