@@ -74,6 +74,23 @@ class OrderTests extends UnitFlatSpec
     Order().withPaymentState(Order.PaymentState.Charged).paymentState should be (Order.PaymentState.Charged)
   }
 
+  "renderedForApi" should "serialize the correct Map for the API" in {
+    val order = newEntity.save()
+    val buyer = order.buyer
+
+    val rendered = order.renderedForApi
+    rendered("id") should be(order.id)
+    rendered("buyerId") should be(buyer.id)
+    rendered("buyerName") should be(buyer.name)
+    rendered("recipientId") should be(buyer.id)
+    rendered("recipientName") should be(buyer.name)
+    rendered("amountPaidInCents") should be(order.amountPaid.getAmountMinor)
+    rendered("reviewStatus") should be(order.reviewStatus)
+    rendered.contains("created") should be(true)
+    rendered.contains("updated") should be(true)
+    rendered.contains("product") should be(true)
+  }
+
   "approveByAdmin" should "change reviewStatus to ApprovedByAdmin" in {
     val order = newEntity.save()
     order.reviewStatus should be (Order.ReviewStatus.PendingAdminReview.stateValue)

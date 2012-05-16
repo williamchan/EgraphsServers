@@ -49,7 +49,7 @@ class ProductTests extends UnitFlatSpec
   //
   // Test cases
   //
-  "A product" should "serialize the correct Map for the API" in {
+  "renderedForApi" should "serialize the correct Map for the API" in {
     val product = TestData.newSavedProduct().copy(name = "Herp Derp").save()
 
     val rendered = product.renderedForApi

@@ -31,7 +31,7 @@ object TestData {
 
   def newSavedCustomer(): Customer = {
     val acct = Account(email = generateEmail(prefix = "customer-")).save()
-    val cust = Customer().save()
+    val cust = Customer(name = "testcustomer").save()
 
     acct.copy(customerId = Some(cust.id)).save()
 
