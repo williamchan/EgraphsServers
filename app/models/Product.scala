@@ -68,7 +68,7 @@ case class Product(
       val frame = EgraphFrame.suggestedFrame(Dimensions(image.get.getWidth, image.get.getHeight))
       val imageCroppedToFrame = frame.cropImageForFrame(image.get)
       val imageByteArray = imageCroppedToFrame.asByteArray(ImageAsset.Jpeg)
-      // Product have previously been saved so that it has an ID for blobstore to key on
+      // Product has previously been saved so that it has an ID for blobstore to key on
       val savedWithFrame = withFrame(frame).save()
       savedWithFrame.withPhoto(imageByteArray).save().product
     } else {

@@ -10,7 +10,6 @@ import services.blobs.Blobs.Conversions._
 import ImageUtil.Conversions._
 import services.blobs.AccessPolicy
 import com.google.inject.Inject
-import services.AppConfig
 
 case class ImageAssetServices @Inject() (blobs: Blobs, images: ImageUtil)
 

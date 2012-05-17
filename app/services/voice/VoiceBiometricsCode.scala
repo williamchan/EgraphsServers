@@ -46,6 +46,10 @@ object VoiceBiometricsCode extends Enum {
     final val name = "90700";
     val desc = "General problem with recording."
   }
+  val TooLittleSpeechReceived = new EnumVal{
+    final val name = "90800";
+    val desc = "Too little speech received."
+  }
   val SpeechSampleTooLong = new EnumVal{
     final val name = "91100";
     val desc = "Speech sample too long"

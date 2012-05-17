@@ -2,22 +2,16 @@ package services
 
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
-import java.io._
 import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
 import play.Play
-import utils.TestConstants
-import collection.immutable.List
-import org.apache.batik.dom.GenericDOMImplementation
-import java.awt.geom.{Ellipse2D, Path2D}
-import java.awt.{RenderingHints, BasicStroke, Graphics2D}
-import services.graphics.BezierCubic
 
 class ImageUtilTests extends UnitFlatSpec
 with ShouldMatchers {
   def imageUtil = AppConfig.instance[ImageUtil]
 
-/*  it should "test parseSignatureRawCaptureJSON" in {
+  /*
+  it should "test parseSignatureRawCaptureJSON" in {
     val strokeData = imageUtil.parseSignatureRawCaptureJSON(TestConstants.signatureStr)
     val xsByStroke = strokeData._1
     val ysByStroke = strokeData._2
@@ -74,6 +68,7 @@ with ShouldMatchers {
     ImageIO.write(combinedImage, "PNG", combinedImageFile)
     combinedImageFile.length should be(138807)
   }
+  */
 
   it should "resize PNG images correctly" in {
     val image = ImageIO.read(Play.getFile("test/files/image.png"))
@@ -83,59 +78,25 @@ with ShouldMatchers {
 
   "getDimensions" should "return width and height of image" in {
     val dimensions = ImageUtil.getDimensions(Play.getFile("test/files/image.png")).get
-    dimensions.width should be (307)
-    dimensions.height should be (299)
+    dimensions.width should be(307)
+    dimensions.height should be(299)
 
-    ImageUtil.getDimensions(null) should be (None)                                // null case
-    ImageUtil.getDimensions(Play.getFile("doesnotexist")) should be (None)        // empty file
-    ImageUtil.getDimensions(Play.getFile("test/files/8khz.wav")) should be (None) // Not an image file
-  }
-
-  "getCropDimensions" should "crop to ideal dimensions when image is landscape (width > height)" in {
-    val noCrop = ImageUtil.getCropDimensions(Dimensions(width = 1400, height = 1000))
-    noCrop.width should be (1400)
-    noCrop.height should be (1000)
-
-    val cropWidthOff = ImageUtil.getCropDimensions(Dimensions(width = 2000, height = 1000))
-    cropWidthOff.width should be (1400)
-    cropWidthOff.height should be (1000)
-
-    val cropHeightOff = ImageUtil.getCropDimensions(Dimensions(width = 1400, height = 1200))
-    cropHeightOff.width should be (1400)
-    cropHeightOff.height should be (1000)
-  }
-
-  "getCropDimensions" should "crop to ideal dimensions when image is portrait (height > width)" in {
-    val noCrop = ImageUtil.getCropDimensions(Dimensions(width = 718, height = 1000))
-    noCrop.width should be (718)
-    noCrop.height should be (1000)
-
-    val cropHeightOff = ImageUtil.getCropDimensions(Dimensions(width = 900, height = 1000))
-    cropHeightOff.width should be (718)
-    cropHeightOff.height should be (1000)
-
-    val cropWidthOff = ImageUtil.getCropDimensions(Dimensions(width = 718, height = 1200))
-    cropWidthOff.width should be (718)
-    cropWidthOff.height should be (1000)
+    ImageUtil.getDimensions(null) should be(None) // null case
+    ImageUtil.getDimensions(Play.getFile("doesnotexist")) should be(None) // empty file
+    ImageUtil.getDimensions(Play.getFile("test/files/8khz.wav")) should be(None) // Not an image file
   }
 
   "crop" should "crop image to specified dimensions" in {
     val originalImage: BufferedImage = ImageIO.read(Play.getFile("test/files/image.png"))
     val croppedImage: BufferedImage = ImageUtil.crop(originalImage, Dimensions(200, 200))
-    croppedImage.getWidth should be (200)
-    croppedImage.getHeight should be (200)
+    croppedImage.getWidth should be(200)
+    croppedImage.getHeight should be(200)
   }
-  
+
   it should "retain an image's alpha layer" in {
     val originalImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB)
     val cropped = ImageUtil.crop(originalImage, Dimensions(50, 50))
 
-    cropped.getType should be (BufferedImage.TYPE_INT_ARGB)
+    cropped.getType should be(BufferedImage.TYPE_INT_ARGB)
   }
-
-  "getMaxDouble" should "get Max in list of list of Doubles" in {
-    ImageUtil.getMaxDouble(List()) should be(None)
-    ImageUtil.getMaxDouble(List(List(1.0, 2.0, 3.0))).get should be(3.0)
-    ImageUtil.getMaxDouble(List(List(1.0, 2.0, 3.0), List(), List(1.0, 20.0, 3.0))).get should be(20.0)
-  }*/
 }
