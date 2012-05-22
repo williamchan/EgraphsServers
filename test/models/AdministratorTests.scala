@@ -3,7 +3,7 @@ package models
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
-import utils.{DBTransactionPerTest, SavingEntityTests, CreatedUpdatedEntityTests, ClearsDatabaseAndValidationAfter}
+import utils.{DBTransactionPerTest, SavingEntityTests, CreatedUpdatedEntityTests, ClearsDatabaseAndValidationBefore}
 import services.AppConfig
 import services.Time
 
@@ -12,7 +12,7 @@ class AdministratorTests extends UnitFlatSpec
   with BeforeAndAfterEach
   with SavingEntityTests[Administrator]
   with CreatedUpdatedEntityTests[Administrator]
-  with ClearsDatabaseAndValidationAfter
+  with ClearsDatabaseAndValidationBefore
   with DBTransactionPerTest
 {
   val adminStore = AppConfig.instance[AdministratorStore]

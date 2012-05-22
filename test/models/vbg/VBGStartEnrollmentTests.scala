@@ -12,7 +12,7 @@ with ShouldMatchers
 with BeforeAndAfterEach
 with SavingEntityTests[VBGStartEnrollment]
 with CreatedUpdatedEntityTests[VBGStartEnrollment]
-with ClearsDatabaseAndValidationAfter
+with ClearsDatabaseAndValidationBefore
 with DBTransactionPerTest {
   //
   // SavingEntityTests[VBGStartEnrollment] methods

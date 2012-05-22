@@ -11,7 +11,7 @@ with ShouldMatchers
 with BeforeAndAfterEach
 with SavingEntityTests[EnrollmentBatch]
 with CreatedUpdatedEntityTests[EnrollmentBatch]
-with ClearsDatabaseAndValidationAfter
+with ClearsDatabaseAndValidationBefore
 with DBTransactionPerTest {
 
   val store = AppConfig.instance[EnrollmentBatchStore]

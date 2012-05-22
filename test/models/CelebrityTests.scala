@@ -15,7 +15,7 @@ class CelebrityTests extends UnitFlatSpec
   with BeforeAndAfterEach
   with SavingEntityTests[Celebrity]
   with CreatedUpdatedEntityTests[Celebrity]
-  with ClearsDatabaseAndValidationAfter
+  with ClearsDatabaseAndValidationBefore
   with DBTransactionPerTest
 {
   val store = AppConfig.instance[CelebrityStore]

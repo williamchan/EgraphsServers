@@ -1,10 +1,9 @@
 package services.blobs
 
-import utils.EgraphsUnitTest
-import play.Play._
 import play.Play.configuration
+import utils.{ClearsDatabaseAndValidationBefore, EgraphsUnitTest}
 
-class S3BlobVendorTests extends EgraphsUnitTest {
+class S3BlobVendorTests extends EgraphsUnitTest with ClearsDatabaseAndValidationBefore {
   val bucket = "egraphs-unit-test"
 
   "S3BlobVendor" should "not return bad URLs" in {
@@ -24,11 +23,6 @@ class S3BlobVendorTests extends EgraphsUnitTest {
 
     blobStore.clearContainer(bucket)
 
-    try {
-      operation(blobVendor)
-    }
-    finally {
-      blobStore.deleteContainer(bucket)
-    }
+    operation(blobVendor)
   }
 }

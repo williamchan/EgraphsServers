@@ -14,7 +14,7 @@ class EgraphTests extends UnitFlatSpec
   with BeforeAndAfterEach
   with SavingEntityTests[Egraph]
   with CreatedUpdatedEntityTests[Egraph]
-  with ClearsDatabaseAndValidationAfter
+  with ClearsDatabaseAndValidationBefore
   with DBTransactionPerTest
 {
   private val store = AppConfig.instance[EgraphStore]

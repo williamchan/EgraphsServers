@@ -3,13 +3,13 @@ package services
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 import org.scalatest.BeforeAndAfterEach
-import utils.{TestData, DBTransactionPerTest, ClearsDatabaseAndValidationAfter}
+import utils.{TestData, DBTransactionPerTest, ClearsDatabaseAndValidationBefore}
 import models.CelebrityStore
 
 class UtilsTests extends UnitFlatSpec
   with ShouldMatchers
   with BeforeAndAfterEach
-  with ClearsDatabaseAndValidationAfter
+  with ClearsDatabaseAndValidationBefore
   with DBTransactionPerTest
 {
   class Closeable {

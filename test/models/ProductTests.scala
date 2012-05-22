@@ -13,7 +13,7 @@ class ProductTests extends UnitFlatSpec
   with BeforeAndAfterEach
   with SavingEntityTests[Product]
   with CreatedUpdatedEntityTests[Product]
-  with ClearsDatabaseAndValidationAfter
+  with ClearsDatabaseAndValidationBefore
   with DBTransactionPerTest
 {
   val store = AppConfig.instance[ProductStore]

@@ -12,7 +12,7 @@ import utils._
 class AccountTests extends UnitFlatSpec
   with ShouldMatchers
   with BeforeAndAfterEach
-  with ClearsDatabaseAndValidationAfter
+  with ClearsDatabaseAndValidationBefore
   with DBTransactionPerTest
   with AccountTestHelpers
 {
@@ -104,7 +104,7 @@ class AccountStoreTests extends UnitFlatSpec
   with BeforeAndAfterEach
   with SavingEntityTests[Account]
   with CreatedUpdatedEntityTests[Account]
-  with ClearsDatabaseAndValidationAfter
+  with ClearsDatabaseAndValidationBefore
   with DBTransactionPerTest
   with AccountTestHelpers
 {

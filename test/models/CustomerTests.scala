@@ -3,7 +3,7 @@ package models
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.BeforeAndAfterEach
 import play.test.UnitFlatSpec
-import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationAfter, CreatedUpdatedEntityTests, SavingEntityTests, TestData}
+import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationBefore, CreatedUpdatedEntityTests, SavingEntityTests, TestData}
 import services.{Time, AppConfig}
 import exception.InsufficientInventoryException
 
@@ -12,7 +12,7 @@ class CustomerTests extends UnitFlatSpec
   with BeforeAndAfterEach
   with SavingEntityTests[Customer]
   with CreatedUpdatedEntityTests[Customer]
-  with ClearsDatabaseAndValidationAfter
+  with ClearsDatabaseAndValidationBefore
   with DBTransactionPerTest
 {
   val customerStore = AppConfig.instance[CustomerStore]

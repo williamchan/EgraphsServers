@@ -12,7 +12,7 @@ import javax.sound.sampled.{AudioInputStream, AudioFileFormat, AudioSystem}
 import models.{Celebrity, EnrollmentSample, EnrollmentBatch}
 import Blobs.Conversions._
 import org.scalatest.BeforeAndAfterEach
-import utils.{ClearsDatabaseAndValidationAfter, DBTransactionPerTest, TestConstants}
+import utils.{ClearsDatabaseAndValidationBefore, DBTransactionPerTest, TestConstants}
 
 /**
  * IMPORTANT! -- Do not write tests for VBGProdFreeSpeechBiometricServices or VBGBetaFreeSpeechBiometricServices.
@@ -22,7 +22,7 @@ import utils.{ClearsDatabaseAndValidationAfter, DBTransactionPerTest, TestConsta
 class VBGBiometricServicesBaseTests extends UnitFlatSpec
 with ShouldMatchers
 with BeforeAndAfterEach
-with ClearsDatabaseAndValidationAfter
+with ClearsDatabaseAndValidationBefore
 with DBTransactionPerTest {
 
   private val blobs = services.AppConfig.instance[Blobs]

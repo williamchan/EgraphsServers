@@ -3,7 +3,7 @@ package models
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
-import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationAfter, CreatedUpdatedEntityTests, SavingEntityTests}
+import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationBefore, CreatedUpdatedEntityTests, SavingEntityTests}
 import org.joda.money.CurrencyUnit
 import services.AppConfig
 
@@ -12,7 +12,7 @@ class CashTransactionTests extends UnitFlatSpec
   with BeforeAndAfterEach
   with SavingEntityTests[CashTransaction]
   with CreatedUpdatedEntityTests[CashTransaction]
-  with ClearsDatabaseAndValidationAfter
+  with ClearsDatabaseAndValidationBefore
   with DBTransactionPerTest
 {
   val store = AppConfig.instance[CashTransactionStore]

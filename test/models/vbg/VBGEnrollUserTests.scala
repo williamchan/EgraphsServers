@@ -12,7 +12,7 @@ with ShouldMatchers
 with BeforeAndAfterEach
 with SavingEntityTests[VBGEnrollUser]
 with CreatedUpdatedEntityTests[VBGEnrollUser]
-with ClearsDatabaseAndValidationAfter
+with ClearsDatabaseAndValidationBefore
 with DBTransactionPerTest {
   //
   // SavingEntityTests[VBGEnrollUser] methods

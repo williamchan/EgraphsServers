@@ -17,7 +17,7 @@ class OrderTests extends UnitFlatSpec
   with BeforeAndAfterEach
   with SavingEntityTests[Order]
   with CreatedUpdatedEntityTests[Order]
-  with ClearsDatabaseAndValidationAfter
+  with ClearsDatabaseAndValidationBefore
   with DBTransactionPerTest
 {
   private val schema = AppConfig.instance[Schema]

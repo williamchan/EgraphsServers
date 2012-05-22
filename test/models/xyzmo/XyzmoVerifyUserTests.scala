@@ -13,7 +13,7 @@ with ShouldMatchers
 with BeforeAndAfterEach
 with SavingEntityTests[XyzmoVerifyUser]
 with CreatedUpdatedEntityTests[XyzmoVerifyUser]
-with ClearsDatabaseAndValidationAfter
+with ClearsDatabaseAndValidationBefore
 with DBTransactionPerTest {
   //
   // SavingEntityTests[XyzmoVerifyUser] methods

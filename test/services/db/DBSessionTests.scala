@@ -1,7 +1,7 @@
 package services.db
 
 import models.{AccountStore, Account}
-import utils.{ClearsDatabaseAndValidationAfter, EgraphsUnitTest}
+import utils.{ClearsDatabaseAndValidationBefore, EgraphsUnitTest}
 import org.squeryl.Session
 import akka.actor.Actor
 import akka.dispatch.Dispatchers
@@ -10,7 +10,7 @@ import services.logging.Logging
 import services.AppConfig
 import java.sql.Connection
 
-class DBSessionTests extends EgraphsUnitTest with ClearsDatabaseAndValidationAfter with Logging {
+class DBSessionTests extends EgraphsUnitTest with ClearsDatabaseAndValidationBefore with Logging {
   def underTest: (DBSession, Connection) = {
     val connection = mock[Connection]
     (new DBSession(() => connection), connection)

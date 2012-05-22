@@ -11,12 +11,12 @@ import models.{Egraph, EgraphStore}
 import akka.util.TestKit
 import org.scalatest.BeforeAndAfterAll
 import models.Egraph.EgraphState
-import utils.{TestData, ClearsDatabaseAndValidationAfter, TestConstants}
+import utils.{TestData, ClearsDatabaseAndValidationBefore, TestConstants}
 
 class EgraphActorTests extends UnitFlatSpec
 with ShouldMatchers
 with BeforeAndAfterAll
-with ClearsDatabaseAndValidationAfter
+with ClearsDatabaseAndValidationBefore
 with TestKit {
 
   private val egraphActor = actorOf(AppConfig.instance[EgraphActor])

@@ -2,7 +2,7 @@ package models
 
 import play.test.UnitFlatSpec
 import org.scalatest.matchers.ShouldMatchers
-import utils.{ClearsDatabaseAndValidationAfter, DBTransactionPerTest}
+import utils.{ClearsDatabaseAndValidationBefore, DBTransactionPerTest}
 import java.io.FileOutputStream
 import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
@@ -13,7 +13,7 @@ import services.blobs.AccessPolicy.Private
 class ImageAssetTests extends UnitFlatSpec
   with ShouldMatchers
   with DBTransactionPerTest
-  with ClearsDatabaseAndValidationAfter
+  with ClearsDatabaseAndValidationBefore
 {
   val assetServices = AppConfig.instance[ImageAssetServices]
 

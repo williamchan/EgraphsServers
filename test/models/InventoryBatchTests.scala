@@ -11,7 +11,7 @@ with ShouldMatchers
 with BeforeAndAfterEach
 with SavingEntityTests[InventoryBatch]
 with CreatedUpdatedEntityTests[InventoryBatch]
-with ClearsDatabaseAndValidationAfter
+with ClearsDatabaseAndValidationBefore
 with DBTransactionPerTest {
   private val inventoryBatchStore = AppConfig.instance[InventoryBatchStore]
   private val inventoryBatchQueryFilters = AppConfig.instance[InventoryBatchQueryFilters]

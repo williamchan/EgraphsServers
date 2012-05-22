@@ -13,7 +13,7 @@ with ShouldMatchers
 with BeforeAndAfterEach
 with SavingEntityTests[XyzmoEnrollDynamicProfile]
 with CreatedUpdatedEntityTests[XyzmoEnrollDynamicProfile]
-with ClearsDatabaseAndValidationAfter
+with ClearsDatabaseAndValidationBefore
 with DBTransactionPerTest {
   //
   // SavingEntityTests[XyzmoEnrollDynamicProfile] methods

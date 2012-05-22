@@ -6,7 +6,7 @@ import akka.actor.Actor
 import Actor._
 import services.db.{DBSession, TransactionSerializable}
 import services.AppConfig
-import utils.ClearsDatabaseAndValidationAfter
+import utils.ClearsDatabaseAndValidationBefore
 import akka.util.TestKit
 import org.scalatest.BeforeAndAfterAll
 import actors.{ProcessEnrollmentBatchMessage, EnrollmentBatchActor}
@@ -16,7 +16,7 @@ import models.EnrollmentStatus.{Enrolled, NotEnrolled}
 class EnrollmentBatchActorTests extends UnitFlatSpec
 with ShouldMatchers
 with BeforeAndAfterAll
-with ClearsDatabaseAndValidationAfter
+with ClearsDatabaseAndValidationBefore
 with TestKit {
 
   private val enrollmentBatchActor = actorOf(AppConfig.instance[EnrollmentBatchActor])

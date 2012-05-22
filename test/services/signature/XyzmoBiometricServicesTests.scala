@@ -17,7 +17,7 @@ import com.xyzmo.wwww.biometricserver.{WebServiceBiometricPartStub, WebServiceUs
 class XyzmoBiometricServicesTests extends UnitFlatSpec
 with ShouldMatchers
 with BeforeAndAfterEach
-with ClearsDatabaseAndValidationAfter
+with ClearsDatabaseAndValidationBefore
 with DBTransactionPerTest {
 
   "getSignatureDataContainerFromJSON" should "translate JSON signature to Xyzmo SignatureDataContainer" in {

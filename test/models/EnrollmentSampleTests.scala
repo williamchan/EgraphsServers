@@ -15,7 +15,7 @@ with ShouldMatchers
 with BeforeAndAfterEach
 with SavingEntityTests[EnrollmentSample]
 with CreatedUpdatedEntityTests[EnrollmentSample]
-with ClearsDatabaseAndValidationAfter
+with ClearsDatabaseAndValidationBefore
 with DBTransactionPerTest {
   //
   // SavingEntityTests[EnrollmentSample] methods

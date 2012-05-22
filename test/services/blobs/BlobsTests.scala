@@ -3,13 +3,13 @@ package services.blobs
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 import org.scalatest.BeforeAndAfterEach
-import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationAfter}
+import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationBefore}
 import services.AppConfig
 
 class BlobsTests extends UnitFlatSpec
   with ShouldMatchers
   with BeforeAndAfterEach
-  with ClearsDatabaseAndValidationAfter
+  with ClearsDatabaseAndValidationBefore
   with DBTransactionPerTest
 {
   import Blobs.Conversions._

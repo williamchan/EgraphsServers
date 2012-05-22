@@ -3,13 +3,13 @@ package services
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 import org.scalatest.BeforeAndAfterEach
-import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationAfter}
+import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationBefore}
 import org.joda.money.CurrencyUnit
 
 class FinanceTests extends UnitFlatSpec
   with ShouldMatchers
   with BeforeAndAfterEach
-  with ClearsDatabaseAndValidationAfter
+  with ClearsDatabaseAndValidationBefore
   with DBTransactionPerTest
 {
   import Finance.TypeConversions._
