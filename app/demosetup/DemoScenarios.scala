@@ -3,10 +3,9 @@ package demosetup
 import services.blobs.Blobs.Conversions._
 
 import javax.imageio.ImageIO
-import services.{AppConfig, ImageUtil}
+import services.AppConfig
 import services.blobs.Blobs
 import services.db.Schema
-import play.Play
 import models._
 import java.text.SimpleDateFormat
 import org.joda.time.DateTime
@@ -309,8 +308,8 @@ class DemoScenarios extends DeclaresDemoScenarios {
           description = "Buy my Egraph A!",
           storyTitle = "The Story",
           storyText = "{signer_link}{signer_name}{end_link} was born on top. He proved it to the world every single day throughout the 2011 season. A few days afterwards he got a note from {recipient_name} on his iPad. This was his response."
-        ).save().withPhoto(productAPhotoBlob.asByteArray).save()
-        inventoryBatch.products.associate(productWithPhotoA.product)
+        ).saveWithImageAssets(image = Some(ImageIO.read(productAPhotoBlob.asInputStream)), icon = None)
+        inventoryBatch.products.associate(productWithPhotoA)
     }
 
     blobs.getStaticResource(productB) foreach {
@@ -321,8 +320,8 @@ class DemoScenarios extends DeclaresDemoScenarios {
           description = "Buy my Egraph B!",
           storyTitle = "The Story",
           storyText = "{signer_link}{signer_name}{end_link} was born on top. He proved it to the world every single day throughout the 2011 season. A few days afterwards he got a note from {recipient_name} on his iPad. This was his response."
-        ).save().withPhoto(productBPhotoBlob.asByteArray).save()
-        inventoryBatch.products.associate(productWithPhotoB.product)
+        ).saveWithImageAssets(image = Some(ImageIO.read(productBPhotoBlob.asInputStream)), icon = None)
+        inventoryBatch.products.associate(productWithPhotoB)
     }
   }
 }

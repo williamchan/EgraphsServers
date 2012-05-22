@@ -16,6 +16,7 @@ import play.Play
 import services.{Utils, AppConfig}
 import org.joda.time.DateTime
 import java.text.SimpleDateFormat
+import javax.imageio.ImageIO
 
 /**
  * All scenarios supported by the API.
@@ -463,7 +464,8 @@ class Scenarios extends DeclaresScenarios {
   }
 
   private[this] def createProduct(celebrity: Celebrity, priceInCurrency: BigDecimal, name: String, description: String): Product = {
-    val product = celebrity.newProduct.copy(priceInCurrency = priceInCurrency, name = name, description = description).save()
+    val product = celebrity.newProduct.copy(priceInCurrency = priceInCurrency, name = name, description = description)
+      .saveWithImageAssets(image = Some(ImageIO.read(Play.getFile("test/files/longoria/product-2.jpg"))), icon = None)
     val inventoryBatch = InventoryBatch(celebrityId = celebrity.id, numInventory = 100, startDate = today, endDate = future).save()
     inventoryBatch.products.associate(product)
     product

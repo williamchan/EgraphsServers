@@ -1,7 +1,6 @@
 package controllers.nonproduction
 
 import play.mvc._
-import services.blobs.Blobs.Conversions._
 import math.BigDecimal._
 import play.Play
 import services.AppConfig
@@ -12,6 +11,7 @@ import services.http.ControllerMethod
 import services.logging.Logging
 import java.text.SimpleDateFormat
 import org.joda.time.DateTime
+import javax.imageio.ImageIO
 
 object TestControllers extends Controller with Logging {
   val controllerMethod = AppConfig.instance[ControllerMethod]
@@ -109,17 +109,17 @@ object TestControllers extends Controller with Logging {
       priceInCurrency = 50,
       name = celebrity.publicName.get + "'s Product A",
       description = "Tyson 15"
-    ).save().withPhoto(Play.getFile("test/files/longoria/product-2.jpg")).save()
+    ).saveWithImageAssets(image = Some(ImageIO.read(Play.getFile("test/files/longoria/product-2.jpg"))), icon = None)
 
     val product2 = celebrity.newProduct.copy(
       priceInCurrency = 100,
       name = celebrity.publicName.get + "'s Product B",
       description = "Help me... help YOU..."
-    ).save().withPhoto(Play.getFile("test/files/kapler/product-1.jpg")).save()
+    ).saveWithImageAssets(image = Some(ImageIO.read(Play.getFile("test/files/kapler/product-1.jpg"))), icon = None)
 
     val inventoryBatch = InventoryBatch(celebrityId = celebrity.id, numInventory = 100, startDate = today, endDate = future).save()
-    inventoryBatch.products.associate(product1.product)
-    inventoryBatch.products.associate(product2.product)
+    inventoryBatch.products.associate(product1)
+    inventoryBatch.products.associate(product2)
   }
 
   def logStuffThenThrowException() = controllerMethod() {

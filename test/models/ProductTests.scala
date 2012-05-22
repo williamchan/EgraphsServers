@@ -88,13 +88,12 @@ class ProductTests extends UnitFlatSpec
   }
 
   "A product's icon photo" should "start out as the default" in {
-    import services.ImageUtil.Conversions._
     val product = TestData.newSavedProduct()
     val icon = TestData.newSavedProduct().icon
     icon.url should be (TestData.newSavedProduct().defaultIcon.url)
 
     val newIconImage = ImageIO.read(Play.getFile("public/images/egraph_default_plaque_icon.png"))
-    val productWithIcon = product.withIcon(newIconImage.asByteArray(ImageAsset.Png)).save().product
+    val productWithIcon = product.saveWithImageAssets(image = None, icon = Some(newIconImage))
 
     productWithIcon.iconUrl should not be (TestData.newSavedProduct().defaultIcon.url)
   }

@@ -132,7 +132,7 @@ case class Product(
     imageAssetOption.getOrElse(defaultIcon)
   }
 
-  def withIcon(iconImageData:Array[Byte]): ProductWithPhoto = {
+  private def withIcon(iconImageData:Array[Byte]): ProductWithPhoto = {
     val newIconKey = "icon_" + Time.toBlobstoreFormat(Time.now)
 
     ProductWithPhoto(
@@ -141,7 +141,7 @@ case class Product(
     )
   }
 
-  def withPhoto(imageData:Array[Byte]): ProductWithPhoto = {
+  private def withPhoto(imageData:Array[Byte]): ProductWithPhoto = {
     val newPhotoKey = Time.toBlobstoreFormat(Time.now)
 
     ProductWithPhoto(
@@ -251,6 +251,7 @@ object Product {
   val defaultPortraitSigningScale = Dimensions(width = 1024, height = 1428)
   val minPhotoWidth = 1024
   val minPhotoHeight = 1024
+  val minIconWidth = 40
 
   def slugify(productName: String): String = {
     JavaExtensions.slugify(productName, false) // Slugify without lower-casing

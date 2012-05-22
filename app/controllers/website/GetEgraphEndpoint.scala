@@ -4,10 +4,10 @@ import play.mvc.Controller
 import services.blobs.AccessPolicy
 import java.text.SimpleDateFormat
 import services.http.ControllerMethod
-import models.{Order, Egraph, OrderStore, FulfilledOrder}
 import play.templates.Html
 import services.http.OptionParams.Conversions.paramsToOptionalParams
 import services.graphics.Handwriting
+import models._
 
 private[controllers] trait GetEgraphEndpoint { this: Controller =>
   protected def orderStore: OrderStore
@@ -73,7 +73,7 @@ object GetEgraphEndpoint {
 
     // Prepare the icon
     val icon = product.icon
-    val frameFittedIconUrl = icon.resized(41, 41).getSaved(AccessPolicy.Public).url
+    val frameFittedIconUrl = icon.resized(Product.minIconWidth, Product.minIconWidth).getSaved(AccessPolicy.Public).url
 
     // Prepare the story
     val story = egraph.story(celebrity, product, order)

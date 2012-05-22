@@ -68,7 +68,7 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
         for (image <- productIconOption) {
           Validation.isTrue(
             "Product icon must be at least 40px wide and 40px high",
-            image.getWidth >= 40 && image.getHeight >= 40
+            image.getWidth >= Product.minIconWidth && image.getHeight >= Product.minIconWidth
           )
         }
 
