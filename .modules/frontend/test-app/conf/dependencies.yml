@@ -1,0 +1,14 @@
+# Application dependencies
+
+require:
+    - project-modules -> frontend project
+    - play        
+    - play -> scala 0.9.1
+    - play -> less 0.9.1
+
+repositories:
+    - Module Folder:
+        type:       local
+        artifact:   ${application.path}/../../[module]
+        contains:
+            - project-modules
