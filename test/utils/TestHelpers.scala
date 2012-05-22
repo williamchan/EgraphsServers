@@ -11,4 +11,8 @@ object TestHelpers {
     new String(xmlBytes)
   }
 
+  def getBlobKeyFromTestBlobUrl(testBlobUrl: String): String = {
+    testBlobUrl.substring(testBlobUrl.indexOf("test/files/") + "test/files/".length)
+  }
+
 }

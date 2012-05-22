@@ -38,14 +38,14 @@ class HandwritingTests extends EgraphsUnitTest with ClearsDatabaseAndValidationB
   }
 
   "translatingBy" should "translatingBy" in {
-    val writing = Handwriting("{\"x\":[[67.000000]],\"y\": [[198.000000]],\"t\": [[0]]}")
+    val writing = Handwriting(TestConstants.shortWritingStr)
     val translated = writing.translatingBy(xOffset = 100.toDouble, yOffset = 100.toDouble)
     translated.strokes.head.points.head.x should be (167.0)
     translated.strokes.head.points.head.y should be (298.0)
   }
 
   "scalingBy" should "scalingBy" in {
-    val writing = Handwriting("{\"x\":[[67.000000]],\"y\": [[198.000000]],\"t\": [[0]]}")
+    val writing = Handwriting(TestConstants.shortWritingStr)
     val translated = writing.scalingBy(scaleFactor = 2.0)
     translated.strokes.head.points.head.x should be (134.0)
     translated.strokes.head.points.head.y should be (396.0)

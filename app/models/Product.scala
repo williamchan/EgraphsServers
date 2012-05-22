@@ -183,8 +183,9 @@ case class Product(
   def renderedForApi: Map[String, Any] = {
     renderCreatedUpdatedForApi ++ Map(
       "id" -> id,
-      "photoUrl" -> signingScalePhoto.url,
       "urlSlug" -> urlSlug,
+      "photoUrl" -> signingScalePhoto.url,
+      "iPadSigningPhotoUrl" -> signingScalePhoto.url,
       "signingScaleW" -> signingScaleW,
       "signingScaleH" -> signingScaleH,
       "signingOriginX" -> signingOriginX,

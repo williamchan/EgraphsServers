@@ -25,7 +25,7 @@ require:
         exclude:
             - org.mockito -> *
             - org.scala-lang -> scala-library 2.8.1
-    - org.squeryl -> squeryl_2.8.1 0.9.5-RC1:
+    - org.squeryl -> squeryl_2.8.1 0.9.5:
         exclude:
             # Exclude scala library, which is included with play
             - org.scala-lang -> scala-library 2.8.1

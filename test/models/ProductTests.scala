@@ -63,9 +63,11 @@ class ProductTests extends UnitFlatSpec
     val product = TestData.newSavedProduct().copy(name = "Herp Derp", signingOriginX = 50, signingOriginY = 60).save()
 
     val rendered = product.renderedForApi
+    val iPadSigningPhotoUrl: String = product.photo.resizedWidth(product.signingScaleW).url
     rendered("id") should be(product.id)
     rendered("urlSlug") should be("Herp-Derp")
-    rendered("photoUrl") should be(product.photo.resizedWidth(product.signingScaleW).url)
+    rendered("photoUrl") should be(iPadSigningPhotoUrl)
+    rendered("iPadSigningPhotoUrl") should be(iPadSigningPhotoUrl)
     rendered("signingScaleW") should be(Product.defaultLandscapeSigningScale.width)
     rendered("signingScaleH") should be(Product.defaultLandscapeSigningScale.height)
     rendered("signingOriginX") should be(50)
