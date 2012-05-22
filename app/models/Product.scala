@@ -247,10 +247,10 @@ object Product {
 
   val defaultPrice = 50
   val defaultSigningAreaW = 1024 // This is the width of an iPad2 screen. Default signing area is 1024x1024.
-  val defaultLandscapeSigningScale = Dimensions(width = 1420, height = 900)
+  val defaultLandscapeSigningScale = Dimensions(width = 1615, height = 1024)
   val defaultPortraitSigningScale = Dimensions(width = 1024, height = 1428)
   val minPhotoWidth = 1024
-  val minPhotoHeight = 900
+  val minPhotoHeight = 1024
 
   def slugify(productName: String): String = {
     JavaExtensions.slugify(productName, false) // Slugify without lower-casing
