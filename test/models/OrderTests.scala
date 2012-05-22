@@ -141,7 +141,7 @@ class OrderTests extends UnitFlatSpec
       where(txn.orderId === Some(order.id))
         select (txn)
     ).head
-    cashTransaction.accountId should be(will.id)
+    cashTransaction.accountId should be(will.account.id)
     cashTransaction.orderId should be(Some(order.id))
     cashTransaction.amountInCurrency should be(product.priceInCurrency)
     cashTransaction.currencyCode should be(CurrencyUnit.USD.getCode)

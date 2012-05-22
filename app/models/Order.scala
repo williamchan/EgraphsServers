@@ -90,7 +90,7 @@ case class Order(
   /** Call this to associate a Stripe Charge with this Order */
   def withChargeInfo(stripeCardTokenId: String, stripeCharge: Charge): Order = {
     require(id != 0, "Order must have an id")
-    CashTransaction(accountId = buyerId, orderId = Some(id), services = services.cashTransactionServices.get)
+    CashTransaction(accountId = buyer.account.id, orderId = Some(id), services = services.cashTransactionServices.get)
       .withCash(amountPaid)
       .withType(EgraphPurchase)
       .save()
