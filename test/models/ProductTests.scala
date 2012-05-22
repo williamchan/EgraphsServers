@@ -5,8 +5,6 @@ import org.scalatest.BeforeAndAfterEach
 import play.test.UnitFlatSpec
 import services.Time
 import services.AppConfig
-import play.Play
-import javax.imageio.ImageIO
 import utils._
 import java.awt.image.BufferedImage
 
@@ -85,17 +83,6 @@ class ProductTests extends UnitFlatSpec
     store.findByCelebrityAndUrlSlug(celebrityId = celebrity.id, slug = product.urlSlug) should not be (None)
     store.findByCelebrityAndUrlSlug(celebrityId = celebrity.id + 1, slug = product.urlSlug) should be(None)
     store.findByCelebrityAndUrlSlug(celebrityId = celebrity.id, slug = "Herp") should be(None)
-  }
-
-  "A product's icon photo" should "start out as the default" in {
-    val product = TestData.newSavedProduct()
-    val icon = TestData.newSavedProduct().icon
-    icon.url should be (TestData.newSavedProduct().defaultIcon.url)
-
-    val newIconImage = ImageIO.read(Play.getFile("public/images/egraph_default_plaque_icon.png"))
-    val productWithIcon = product.saveWithImageAssets(image = None, icon = Some(newIconImage))
-
-    productWithIcon.iconUrl should not be (TestData.newSavedProduct().defaultIcon.url)
   }
 
   "getRemainingInventoryAndActiveInventoryBatches" should "return total inventory in active InventoryBatches minus the number of relevant Orders" in {
