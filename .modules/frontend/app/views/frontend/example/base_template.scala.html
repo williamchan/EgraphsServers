@@ -1,0 +1,19 @@
+@(title: String = "Default string", body: => Html = Html.empty, afterBodyJs: => Html = Html.empty)
+
+<!doctype html>
+<html>
+  <head>
+    <title>I am the site template. @title.</title>
+    <link rel="stylesheet" href='@asset("public/twitter-bootstrap/less/bootstrap.less")'>
+  </head>
+  <body>
+    <p>
+      This template demonstrates a way to re-use code by wrapping a
+      template in another template.  Most of this page was defined in
+      base_template.scala.html. It was then called by
+      uses_base_template.scala.html and provided this content:
+      <div style="border:1px solid green">@body</div>      
+    </p>
+  </body>
+  <script type="text/javascript">@afterBodyJs</script>
+</html>

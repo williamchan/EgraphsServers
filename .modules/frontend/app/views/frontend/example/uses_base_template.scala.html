@@ -1,0 +1,15 @@
+@()
+
+<!-- Create the parameter that we'll pass to base_template -->
+@baseBody = {
+  <h1>I am the actual page content. I was generated in uses_base_template.scala.html</h1>
+  <p>
+    Notice that we didn't provide all the parameters to
+    base_template.scala.html; we just let afterBodyJs stay default.
+    This gives us the ability to add practically infinite hooks in the
+    base page without changing dependent pages later on.
+  </p>
+}
+
+<!-- Pass the parameters to base_template, who will render the page in the context we want.  -->
+@base_template(title="Rendered partially by uses_base_template.scala.html", body=baseBody)
