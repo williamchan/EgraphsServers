@@ -30,7 +30,7 @@ class PostEgraphApiEndpointTests extends FunctionalTest with CleanDatabaseAfterE
       willChanRequest,
       TestConstants.ApiRoot + "/celebrities/me/orders/" + orderId + "/egraphs",
       APPLICATION_X_WWW_FORM_URLENCODED,
-      "signature=" + TestConstants.signatureStr + "&audio=" + TestConstants.voiceStrPercentEncoded()
+      "signature=" + TestConstants.shortWritingStr + "&audio=" + TestConstants.fakeAudioStrPercentEncoded()
     )
     assertIsOk(response)
 
@@ -38,16 +38,16 @@ class PostEgraphApiEndpointTests extends FunctionalTest with CleanDatabaseAfterE
     assertEquals(BigDecimal(1), json("id"))
 
     import Blobs.Conversions._
-    assertEquals(TestConstants.signatureStr, blobs.get("egraphs/" + json("id") + "/signature.json").get.asString)
+    assertEquals(TestConstants.shortWritingStr, blobs.get("egraphs/" + json("id") + "/signature.json").get.asString)
   }
 
   @Test
   def testPostEgraphAcceptsMessage() {
     FunctionalTestUtils.runWillChanScenariosThroughOrder()
 
-    val signatureStr = TestConstants.signatureStr
-    val audioStr = TestConstants.voiceStrPercentEncoded()
-    val message = TestConstants.messageStr
+    val signatureStr = TestConstants.shortWritingStr
+    val audioStr = TestConstants.fakeAudioStrPercentEncoded()
+    val message = TestConstants.shortWritingStr
 
     val response = POST(
       willChanRequest,
@@ -63,8 +63,8 @@ class PostEgraphApiEndpointTests extends FunctionalTest with CleanDatabaseAfterE
   def testPostEgraphAcceptsEmptyMessage() {
     FunctionalTestUtils.runWillChanScenariosThroughOrder()
 
-    val signatureStr = TestConstants.signatureStr
-    val audioStr = TestConstants.voiceStrPercentEncoded()
+    val signatureStr = TestConstants.shortWritingStr
+    val audioStr = TestConstants.fakeAudioStrPercentEncoded()
 
     val emptyMessageResponse = POST(
       willChanRequest,
@@ -92,27 +92,27 @@ class PostEgraphApiEndpointTests extends FunctionalTest with CleanDatabaseAfterE
       willChanRequest,
       TestConstants.ApiRoot + "/celebrities/me/orders/1/egraphs",
       APPLICATION_X_WWW_FORM_URLENCODED,
-      "signature=&audio=" + TestConstants.voiceStrPercentEncoded()
+      "signature=&audio=" + TestConstants.fakeAudioStrPercentEncoded()
     )
     val noSignatureParameterResponse = POST(
       willChanRequest,
       TestConstants.ApiRoot + "/celebrities/me/orders/1/egraphs",
       APPLICATION_X_WWW_FORM_URLENCODED,
-      "audio=" + TestConstants.voiceStrPercentEncoded()
+      "audio=" + TestConstants.fakeAudioStrPercentEncoded()
     )
 
     val emptyStringAudioResponse = POST(
       willChanRequest,
       TestConstants.ApiRoot + "/celebrities/me/orders/1/egraphs",
       APPLICATION_X_WWW_FORM_URLENCODED,
-      "signature=" + TestConstants.signatureStr + "&audio="
+      "signature=" + TestConstants.shortWritingStr + "&audio="
     )
 
     val noAudioParameterResponse = POST(
       willChanRequest,
       TestConstants.ApiRoot + "/celebrities/me/orders/1/egraphs",
       APPLICATION_X_WWW_FORM_URLENCODED,
-      "signature=" + TestConstants.signatureStr
+      "signature=" + TestConstants.shortWritingStr
     )
 
 
@@ -136,7 +136,7 @@ class PostEgraphApiEndpointTests extends FunctionalTest with CleanDatabaseAfterE
         willChanRequest,
         TestConstants.ApiRoot + "/celebrities/me/orders/" + order("id") + "/egraphs",
         APPLICATION_X_WWW_FORM_URLENCODED,
-        "signature=" + TestConstants.signatureStr + "&audio=" + TestConstants.voiceStr
+        "signature=" + TestConstants.shortWritingStr + "&audio=" + TestConstants.fakeAudioStrPercentEncoded()
       )
       assertIsOk(response)
       numOrders -= 1

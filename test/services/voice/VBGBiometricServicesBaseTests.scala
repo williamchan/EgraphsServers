@@ -97,16 +97,16 @@ with DBTransactionPerTest {
     val order = customer.buy(product).save()
 
     val enrollmentBatch: EnrollmentBatch = EnrollmentBatch(celebrityId = celebrity.id).save()
-    EnrollmentSample(enrollmentBatchId = enrollmentBatch.id).save(signatureStr = TestConstants.signatureStr, voiceStr = Codec.encodeBASE64(enroll1))
-    EnrollmentSample(enrollmentBatchId = enrollmentBatch.id).save(signatureStr = TestConstants.signatureStr, voiceStr = Codec.encodeBASE64(enroll2))
+    EnrollmentSample(enrollmentBatchId = enrollmentBatch.id).save(signatureStr = TestConstants.shortWritingStr, voiceStr = Codec.encodeBASE64(enroll1))
+    EnrollmentSample(enrollmentBatchId = enrollmentBatch.id).save(signatureStr = TestConstants.shortWritingStr, voiceStr = Codec.encodeBASE64(enroll2))
     val enrollResult: Either[VoiceBiometricsError, Boolean] = vbg.enroll(enrollmentBatch)
     enrollResult.right.get should be(true)
 
-    val egraphVerifyTrue: Egraph = Egraph(orderId = order.id).withAssets(signature = TestConstants.signatureStr, message = None, audio = verifyTrue).save()
+    val egraphVerifyTrue: Egraph = Egraph(orderId = order.id).withAssets(signature = TestConstants.shortWritingStr, message = None, audio = verifyTrue).save()
     val verifyResultTrue: Either[VoiceBiometricsError, VBGVerifySample] = vbg.verify(egraphVerifyTrue)
     verifyResultTrue.right.get.success.get should be(true)
 
-    val egraphVerifyFalse: Egraph = Egraph(orderId = order.id).withAssets(signature = TestConstants.signatureStr, message = None, audio = verifyFalse).save()
+    val egraphVerifyFalse: Egraph = Egraph(orderId = order.id).withAssets(signature = TestConstants.shortWritingStr, message = None, audio = verifyFalse).save()
     val verifyResultFalse: Either[VoiceBiometricsError, VBGVerifySample] = vbg.verify(egraphVerifyFalse)
     verifyResultFalse.right.get.success.get should be(false)
   }
@@ -130,19 +130,19 @@ with DBTransactionPerTest {
     val order = customer.buy(product).save()
 
     val enrollmentBatch: EnrollmentBatch = EnrollmentBatch(celebrityId = celebrity.id).save()
-    EnrollmentSample(enrollmentBatchId = enrollmentBatch.id).save(signatureStr = TestConstants.signatureStr, voiceStr = Codec.encodeBASE64(enroll_11))
+    EnrollmentSample(enrollmentBatchId = enrollmentBatch.id).save(signatureStr = TestConstants.shortWritingStr, voiceStr = Codec.encodeBASE64(enroll_11))
     val enrollResult: Either[VoiceBiometricsError, Boolean] = vbg.enroll(enrollmentBatch)
     println("enrollResult.right.get " + enrollResult.right.get)
 
-    val egraphVerify_19: Egraph = Egraph(orderId = order.id).withAssets(signature = TestConstants.signatureStr, message = None, audio = verify_19).save()
+    val egraphVerify_19: Egraph = Egraph(orderId = order.id).withAssets(signature = TestConstants.shortWritingStr, message = None, audio = verify_19).save()
     val verifyResult_19: Either[VoiceBiometricsError, VBGVerifySample] = vbg.verify(egraphVerify_19: Egraph)
     println("verifyResult_19.right.get.errorCode = " + verifyResult_19.right.get.errorCode)
 
-    val egraphVerify_21: Egraph = Egraph(orderId = order.id).withAssets(signature = TestConstants.signatureStr, message = None, audio = verify_21).save()
+    val egraphVerify_21: Egraph = Egraph(orderId = order.id).withAssets(signature = TestConstants.shortWritingStr, message = None, audio = verify_21).save()
     val verifyResult_21: Either[VoiceBiometricsError, VBGVerifySample] = vbg.verify(egraphVerify_21: Egraph)
     println("verifyResult_21.right.get.errorCode = " + verifyResult_21.right.get.errorCode)
 
-    val egraphVerify_30: Egraph = Egraph(orderId = order.id).withAssets(signature = TestConstants.signatureStr, message = None, audio = verify_30).save()
+    val egraphVerify_30: Egraph = Egraph(orderId = order.id).withAssets(signature = TestConstants.shortWritingStr, message = None, audio = verify_30).save()
     val verifyResult_30: Either[VoiceBiometricsError, VBGVerifySample] = vbg.verify(egraphVerify_30: Egraph)
     println("verifyResult_30.right.get.errorCode = " + verifyResult_30.right.get.errorCode)
   }

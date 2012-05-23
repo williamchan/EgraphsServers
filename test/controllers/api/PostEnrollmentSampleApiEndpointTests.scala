@@ -18,8 +18,8 @@ class PostEnrollmentSampleApiEndpointTests extends FunctionalTest with CleanData
       "Will-Chan-is-a-celebrity"
     )
 
-    assertPostEnrollmentSample(signatureStr = TestConstants.signatureStr,
-      voiceStr = TestConstants.voiceStrPercentEncoded(),
+    assertPostEnrollmentSample(signatureStr = TestConstants.shortWritingStr,
+      voiceStr = TestConstants.fakeAudioStrPercentEncoded(),
       isBatchComplete = false,
       numEnrollmentSamplesInBatch = 1)
   }
@@ -30,20 +30,20 @@ class PostEnrollmentSampleApiEndpointTests extends FunctionalTest with CleanData
       "Will-Chan-is-a-celebrity"
     )
 
-    val enrollmentBatchId = assertPostEnrollmentSample(signatureStr = TestConstants.signatureStr,
-      voiceStr = TestConstants.voiceStrPercentEncoded(),
+    val enrollmentBatchId = assertPostEnrollmentSample(signatureStr = TestConstants.shortWritingStr,
+      voiceStr = TestConstants.fakeAudioStrPercentEncoded(),
       isBatchComplete = false,
       numEnrollmentSamplesInBatch = 1)
     for (i <- 1 until EnrollmentBatch.batchSize - 1) {
-      assertPostEnrollmentSample(signatureStr = TestConstants.signatureStr,
-        voiceStr = TestConstants.voiceStrPercentEncoded(),
+      assertPostEnrollmentSample(signatureStr = TestConstants.shortWritingStr,
+        voiceStr = TestConstants.fakeAudioStrPercentEncoded(),
         isBatchComplete = false,
         numEnrollmentSamplesInBatch = i + 1,
         Some(enrollmentBatchId)
       )
     }
-    assertPostEnrollmentSample(signatureStr = TestConstants.signatureStr,
-      voiceStr = TestConstants.voiceStrPercentEncoded(),
+    assertPostEnrollmentSample(signatureStr = TestConstants.shortWritingStr,
+      voiceStr = TestConstants.fakeAudioStrPercentEncoded(),
       isBatchComplete = true,
       numEnrollmentSamplesInBatch = 20,
       Some(enrollmentBatchId))

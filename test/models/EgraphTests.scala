@@ -84,7 +84,7 @@ class EgraphTests extends UnitFlatSpec
   }
 
   "image" should "return EgraphImage with correctly configured ingredientFactory" in {
-    val egraph = newEntity.withAssets(TestConstants.signatureStr, Some(TestConstants.messageStr), TestConstants.fakeAudio).save()
+    val egraph = newEntity.withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.fakeAudioStr()).save()
     val egraphImage: EgraphImage = egraph.image()
     val ingredientFactory = egraphImage.ingredientFactory.apply() // This throws NPEs if signature, message, pen, or photo are uninitialized
     ingredientFactory.photoDimensionsWhenSigned.width should be(Product.defaultLandscapeSigningScale.width)
@@ -96,10 +96,10 @@ class EgraphTests extends UnitFlatSpec
   "An Egraph" should "save and recover signature and audio data from the blobstore" in {
     val egraph = TestData.newSavedOrder()
       .newEgraph
-      .withAssets(TestConstants.signatureStr, Some(TestConstants.messageStr), TestConstants.fakeAudio)
+      .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.fakeAudio)
       .save()
 
-    egraph.assets.signature should be (TestConstants.signatureStr)
+    egraph.assets.signature should be (TestConstants.shortWritingStr)
     egraph.assets.audio.asByteArray should be (TestConstants.fakeAudio)
   }
 

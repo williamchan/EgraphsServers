@@ -9,8 +9,8 @@ import utils.{ClearsDatabaseAndValidationBefore, TestConstants, EgraphsUnitTest}
 class HandwritingTests extends EgraphsUnitTest with ClearsDatabaseAndValidationBefore {
 
   "Handwriting" should "import test samples without exception" in {
-    Handwriting(TestConstants.signatureStr)
-    Handwriting(TestConstants.messageStr)
+    Handwriting(TestConstants.shortWritingStr)
+    Handwriting(TestConstants.shortWritingStr)
   }
 
   it should "render to graphics" in {

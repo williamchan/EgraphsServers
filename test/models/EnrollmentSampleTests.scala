@@ -46,8 +46,8 @@ with DBTransactionPerTest {
   }
 
   "save" should "save signatureStr and voiceStr to Blobstore" in {
-    val signatureStr = TestConstants.signatureStr
-    val voiceStr = TestConstants.voiceStr()
+    val signatureStr = TestConstants.shortWritingStr
+    val voiceStr = TestConstants.fakeAudioStr()
     val saved = newEntity.save(signatureStr = signatureStr, voiceStr = voiceStr)
 
     saved.getSignatureJson should be(signatureStr)

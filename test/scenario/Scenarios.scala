@@ -49,13 +49,13 @@ class Scenarios extends DeclaresScenarios {
     """Sends an email to erem@egraphs.com using the configured SMTP server""",
 
     {() =>
-      val email = new SimpleEmail();
+      val email = new SimpleEmail()
 
       email.setMailSession(Mail.getSession)
-      email.setFrom("ehboto@gmail.com");
-      email.setSubject("Hi");
-      email.setMsg("This is a test mail ... :-)");
-      email.addTo("erem@egraphs.com", "Erem Boto");
+      email.setFrom("ehboto@gmail.com")
+      email.setSubject("Hi")
+      email.setMsg("This is a test mail ... :-)")
+      email.addTo("erem@egraphs.com", "Erem Boto")
 
       mail.send(email)
     }
@@ -187,9 +187,9 @@ class Scenarios extends DeclaresScenarios {
         select (order)
       ).headOption.get
 
-      val egraph = firstOrder
+      firstOrder
         .newEgraph
-        .withAssets(TestConstants.signatureStr, Some(TestConstants.messageStr), Codec.decodeBASE64(TestConstants.voiceStr()))
+        .withAssets(TestConstants.signingAreaSignatureStr, Some(TestConstants.signingAreaMessageStr), Codec.decodeBASE64(TestConstants.voiceStr()))
         .save()
         .withYesMaamBiometricServices
         .verifyBiometrics

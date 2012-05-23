@@ -41,13 +41,13 @@ with TestKit {
     AppConfig.instance[DBSession].connected(TransactionSerializable) {
       egraph1 = TestData.newSavedOrder()
         .newEgraph
-        .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.voiceStr().getBytes("UTF-8"))
+        .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.fakeAudio)
         .save()
     }
     AppConfig.instance[DBSession].connected(TransactionSerializable) {
       egraph2 = TestData.newSavedOrder()
         .newEgraph
-        .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.voiceStr().getBytes("UTF-8"))
+        .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.fakeAudio)
         .save()
     }
     egraph1.stateValue should be(EgraphState.AwaitingVerification.value)
