@@ -1,9 +1,11 @@
-@()
+@(name: String = "Ryan")
 
 <!-- Create the parameter that we'll pass to base_template -->
 @baseBody = {
   <h1>I am the actual page content. I was generated in uses_base_template.scala.html</h1>
   <p>
+    Hello @name,
+    <br />
     Notice that we didn't provide all the parameters to
     base_template.scala.html; we just let afterBodyJs stay default.
     This gives us the ability to add practically infinite hooks in the
