@@ -28,6 +28,8 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
                                 productDescription: String,
                                 productImage: Option[File],
                                 productIcon: Option[File],
+                                signingOriginX: Int,
+                                signingOriginY: Int,
                                 storyTitle: String,
                                 storyText: String) = controllerMethod() {
 
@@ -84,12 +86,14 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
               icon=productIconOption,
               storyTitle=storyTitle,
               storyText=storyText
-            )
+            ).copy(signingOriginX=signingOriginX, signingOriginY=signingOriginY)
           } else {
             val product = productStore.findById(productId).get
             product.copy(
               name=productName,
               description=productDescription,
+              signingOriginX=signingOriginX,
+              signingOriginY=signingOriginY,
               storyTitle=storyTitle,
               storyText=storyText
             ).saveWithImageAssets(image = productImageOption, icon = productIconOption)
@@ -101,7 +105,7 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
         }
         else {
           // There were validation errors
-          redirectWithValidationErrors(celebrity, productId, productName, productDescription, storyTitle, storyText)
+          redirectWithValidationErrors(celebrity, productId, productName, productDescription, signingOriginX, signingOriginY, storyTitle, storyText)
         }
       }
     }
@@ -124,11 +128,15 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
                                            productId: Long,
                                            productName: String,
                                            productDescription: String,
+                                           signingOriginX: Int,
+                                           signingOriginY: Int,
                                            storyTitle: String,
                                            storyText: String): Redirect = {
     flash.put("productId", productId)
     flash.put("productName", productName)
     flash.put("productDescription", productDescription)
+    flash.put("signingOriginX", signingOriginX)
+    flash.put("signingOriginY", signingOriginY)
     flash.put("storyTitle", storyTitle)
     flash.put("storyText", storyText)
     if (productId == 0) {

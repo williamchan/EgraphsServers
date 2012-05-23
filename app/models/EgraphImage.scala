@@ -111,7 +111,7 @@ case class EgraphImage (
    *
    * @return the transformed and rendered EgraphImage
    */
-  private def transformAndRender: EgraphImage = {
+  /*private*/ def transformAndRender: EgraphImage = {
     // Perform the transforms
     val transformedImage = transforms.foldLeft(this) { (currentImage, nextTransform) =>
       nextTransform(currentImage)

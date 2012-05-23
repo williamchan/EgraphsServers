@@ -22,6 +22,10 @@
   @product.map(p => p.photo.resizedWidth(600).getSaved(services.blobs.AccessPolicy.Public).url).getOrElse("")
 }
 
+@productPhotoPreview = {
+  @product.map(p => p.signingAreaPreview(600))
+}
+
 @productIcon = {
   @product.map(p => p.icon.getSaved(services.blobs.AccessPolicy.Public).url).getOrElse("")
 }
@@ -70,8 +74,11 @@
         </fieldset>
         <fieldset>
           <legend>egraph presentation: media</legend>
-          @formField(id="productImage", label="Product Photo", inputType="file", width="span8", help=Some(profileHelp), fields=fields)
-          @profileHelp = { Must be JPG or PNG with minimum dimensions of 1024x1024. Will be cropped. }
+          @formField(id="productImage", label="Product Photo", inputType="file", width="span8", help=Some(photoHelp), fields=fields)
+          @photoHelp = { Must be JPG or PNG with minimum dimensions of 1024x1024. Will be cropped. }
+
+          @formField(id="signingOriginX", label="Signing Origin X", inputType="text", width="span4", fields=fields)
+          @formField(id="signingOriginY", label="Signing Origin Y", inputType="text", width="span4", fields=fields)
 
           @formField(
             id="productIcon",

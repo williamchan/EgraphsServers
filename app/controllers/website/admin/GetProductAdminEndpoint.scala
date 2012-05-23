@@ -29,6 +29,8 @@ private[controllers] trait GetProductAdminEndpoint {
           flash.put("productId", product.id)
           flash.put("productName", product.name)
           flash.put("productDescription", product.description)
+          flash.put("signingOriginX", product.signingOriginX)
+          flash.put("signingOriginY", product.signingOriginY)
           flash.put("storyTitle", product.storyTitle)
           flash.put("storyText", product.storyText)
 
