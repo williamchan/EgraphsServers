@@ -26,6 +26,8 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
   def postEgraph(
     @Required signature: String,
     @Required audio: String,
+    latitude: Option[Double] = None,
+    longitude: Option[Double] = None,
     skipBiometrics: Boolean = false) =
   {
     controllerMethod(openDatabase=false) {
@@ -42,12 +44,11 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
                 if (validationErrors.isEmpty) {
                   val message = request.params.getOption("message")
 
-                  val savedEgraph = order.newEgraph.withAssets(
-                    signature,
-                    message,
-                    Codec.decodeBASE64(audio)
-                  ).save()
-                  val actorMessage = ProcessEgraphMessage(id = savedEgraph.id, skipBiometrics = skipBiometrics)
+                  val savedEgraph = order.newEgraph
+                    .copy(latitude = latitude, longitude = longitude)
+                    .withAssets(signature, message, Codec.decodeBASE64(audio))
+                    .save()
+                  val actorMessage = ProcessEgraphMessage(id = savedEgraph.id)
                   val responseJson = Serializer.SJSON.toJSON(Map("id" -> savedEgraph.id))
                   (actorMessage, responseJson)
 

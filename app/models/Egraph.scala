@@ -65,6 +65,8 @@ case class Egraph(
   id: Long = 0L,
   orderId: Long = 0L,
   stateValue: String = EgraphState.AwaitingVerification.value,
+  latitude: Option[Double] = None,
+  longitude: Option[Double] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: EgraphServices = AppConfig.instance[EgraphServices]
@@ -561,6 +563,8 @@ class EgraphStore @Inject() (schema: Schema) extends Saves[Egraph] with SavesCre
     updateIs(
       theOld.orderId := theNew.orderId,
       theOld.stateValue := theNew.stateValue,
+      theOld.latitude := theNew.latitude,
+      theOld.longitude := theNew.longitude,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated
     )

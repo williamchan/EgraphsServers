@@ -1,7 +1,6 @@
 package controllers.api
 
 import services.blobs.Blobs
-import org.junit.Assert._
 import org.junit.Test
 import play.test.FunctionalTest
 import sjson.json.Serializer
@@ -9,12 +8,17 @@ import utils.FunctionalTestUtils.{CleanDatabaseAfterEachTest, willChanRequest}
 import services.AppConfig
 import services.http.HttpCodes
 import utils.{FunctionalTestUtils, TestConstants}
+import services.db.{TransactionSerializable, DBSession}
+import org.junit.Assert._
+import Blobs.Conversions._
+import models.EgraphStore
 
 class PostEgraphApiEndpointTests extends FunctionalTest with CleanDatabaseAfterEachTest {
 
   import FunctionalTest._
-
-  val blobs = AppConfig.instance[Blobs]
+  private val db = AppConfig.instance[DBSession]
+  private val blobs = AppConfig.instance[Blobs]
+  private val egraphStore = AppConfig.instance[EgraphStore]
 
   @Test
   def testPostEgraph() {
@@ -30,15 +34,19 @@ class PostEgraphApiEndpointTests extends FunctionalTest with CleanDatabaseAfterE
       willChanRequest,
       TestConstants.ApiRoot + "/celebrities/me/orders/" + orderId + "/egraphs",
       APPLICATION_X_WWW_FORM_URLENCODED,
-      "signature=" + TestConstants.shortWritingStr + "&audio=" + TestConstants.fakeAudioStrPercentEncoded()
+      "signature=" + TestConstants.shortWritingStr + "&audio=" + TestConstants.fakeAudioStrPercentEncoded() + "&latitude=37.7821120598956&longitude=-122.400612831116"
     )
     assertIsOk(response)
 
     val json = Serializer.SJSON.in[Map[String, Any]](getContent(response))
     assertEquals(BigDecimal(1), json("id"))
-
-    import Blobs.Conversions._
     assertEquals(TestConstants.shortWritingStr, blobs.get("egraphs/" + json("id") + "/signature.json").get.asString)
+
+    db.connected(TransactionSerializable) {
+      val egraph = egraphStore.findById(json("id").toString.toLong).get
+      assertEquals(Some(37.7821120598956), egraph.latitude)
+      assertEquals(Some(-122.400612831116), egraph.longitude)
+    }
   }
 
   @Test
@@ -114,7 +122,6 @@ class PostEgraphApiEndpointTests extends FunctionalTest with CleanDatabaseAfterE
       APPLICATION_X_WWW_FORM_URLENCODED,
       "signature=" + TestConstants.shortWritingStr
     )
-
 
     assertStatus(HttpCodes.MalformedEgraph, emptyStringSignatureResponse)
     assertStatus(HttpCodes.MalformedEgraph, noSignatureParameterResponse)
