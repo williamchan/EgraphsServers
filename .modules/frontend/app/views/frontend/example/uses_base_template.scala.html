@@ -2,7 +2,6 @@
 
 <!-- Create the parameter that we'll pass to base_template -->
 @baseBody = {
-  <h1>I am the actual page content. I was generated in uses_base_template.scala.html</h1>
   <p>
     Hello @name,
     <br />
@@ -14,4 +13,4 @@
 }
 
 <!-- Pass the parameters to base_template, who will render the page in the context we want.  -->
-@base_template(title="Rendered partially by uses_base_template.scala.html", body=baseBody)
+@base_template(title="Page Title", body=baseBody)
