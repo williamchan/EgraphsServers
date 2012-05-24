@@ -13,7 +13,7 @@ object Application extends Controller {
   
   def index = {
     // Render the landing page
-    frontend.example.html.uses_base_template()
+    frontend.html.landing()
   }
 
   /**

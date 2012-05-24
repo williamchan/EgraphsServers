@@ -1,0 +1,73 @@
+@(title: String = "Default string", body: => Html, afterBody: => Html = Html.empty)
+
+<!doctype html> 
+<!--[if lt IE 7 ]> <html class="ie lt-ie9 ie6 no-js" lang="en"> <![endif]-->
+<!--[if IE 7 ]>    <html class="ie lt-ie9 ie7 no-js" lang="en"> <![endif]-->
+<!--[if IE 8 ]>    <html class="ie lt-ie9 ie8 no-js" lang="en"> <![endif]-->
+<!--[if IE 9 ]>    <html class="ie ie9 no-js" lang="en"> <![endif]-->
+<!--[if gt IE 9]><!--><html class="no-js" lang="en"><!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    
+    <title>@title | Bootstrap, from Twitter</title>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- <link rel="shortcut icon" href="../assets/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png"> -->
+
+    <link href='@asset("public/stylesheets/main.less")' rel="stylesheet">
+
+		<script src='@asset("public/javascripts/modernizr.custom.js")'></script>
+		<script src="http://use.typekit.com/ztt6ynw.js"></script>
+		<script>try{Typekit.load();}catch(e){}</script>
+  
+  </head>
+
+  <body>
+      
+    <div class="container-fluid">
+
+      <div class="hero-unit">
+        <h1>@title</h1>
+        @body
+      </div>
+
+      <div class="row-fluid">
+        <div class="span4">
+          <h2>Heading</h2>
+           <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+          <p><a class="btn" href="#">View details &raquo;</a></p>
+        </div>
+        <div class="span4">
+          <h2>Heading</h2>
+           <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+          <p><a class="btn" href="#">View details &raquo;</a></p>
+       </div>
+        <div class="span4">
+          <h2>Heading</h2>
+          <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+          <p><a class="btn" href="#">View details &raquo;</a></p>
+        </div>
+      </div>
+
+      <hr>
+
+      <footer>
+        <p>&copy; Company 2012</p>
+      </footer>
+
+    </div> <!-- /container -->
+
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script> 
+		<script>window.jQuery || document.write("<script src='@asset("public/javascripts/jquery-1.7.2.min.js")'>\x3C/script>")</script> 
+		<script src='@asset("public/javascripts/functions.js")'></script> 
+		@afterBody
+
+  </body>
+</html>
