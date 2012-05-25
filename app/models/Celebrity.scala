@@ -16,6 +16,7 @@ import java.awt.image.BufferedImage
  */
 case class CelebrityServices @Inject() (
   store: CelebrityStore,
+  accountStore: AccountStore,
   productStore: ProductStore,
   inventoryBatchStore: InventoryBatchStore,
   schema: Schema,
@@ -54,6 +55,10 @@ case class Celebrity(id: Long = 0,
   /**Persists by conveniently delegating to companion object's save method. */
   def save(): Celebrity = {
     services.store.save(this)
+  }
+
+  def account: Account = {
+    services.accountStore.findByCelebrityId(id).get
   }
 
   /** Makes a copy of the object with the new enrollment status applied. */

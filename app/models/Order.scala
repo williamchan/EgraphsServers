@@ -4,7 +4,6 @@ import java.sql.Timestamp
 import org.joda.money.Money
 import services.db.{FilterOneTable, KeyedCaseClass, Schema, Saves}
 import services.Finance.TypeConversions._
-import org.apache.commons.mail.HtmlEmail
 import services._
 import com.google.inject._
 import mail.Mail
@@ -13,6 +12,7 @@ import play.mvc.Router.ActionDefinition
 import org.squeryl.Query
 import models.Egraph.EgraphState._
 import models.CashTransaction.{PurchaseRefund, EgraphPurchase}
+import org.apache.commons.mail.{Email, HtmlEmail}
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -140,6 +140,11 @@ case class Order(
   }
 
   def sendEgraphSignedMail() {
+    val email = prepareEgraphsSignedEmail()
+    services.mail.send(email)
+  }
+
+  protected[models] def prepareEgraphsSignedEmail(): Email = {
     val celebrity = services.celebrityStore.findByOrderId(id).get
     val email = new HtmlEmail()
     val linkActionDefinition: ActionDefinition = Utils.lookupUrl("WebsiteControllers.getEgraph", Map("orderId" -> id.toString))
@@ -147,6 +152,7 @@ case class Order(
 
     val buyingCustomer = this.buyer
     val receivingCustomer = this.recipient
+    println("celebrity.urlSlug.get " + celebrity.urlSlug.get)
     email.setFrom(celebrity.urlSlug.get + "@egraphs.com", celebrity.publicName.get)
     email.addTo(receivingCustomer.account.email, recipientName)
     if (buyingCustomer != receivingCustomer) {
@@ -163,8 +169,7 @@ case class Order(
         linkActionDefinition.url
       ).toString().trim()
     )
-
-    services.mail.send(email)
+    email
   }
 
   /**

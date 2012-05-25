@@ -11,6 +11,7 @@ import services.db.Schema
 import org.joda.money.CurrencyUnit
 import models.CashTransaction.{PurchaseRefund, EgraphPurchase}
 import services.payment.{Charge, NiceCharge}
+import javax.mail.internet.InternetAddress
 
 class OrderTests extends UnitFlatSpec
   with ShouldMatchers
@@ -169,6 +170,14 @@ class OrderTests extends UnitFlatSpec
     refundTxn.orderId should be(Some(order.id))
     refundTxn.amountInCurrency should be(BigDecimal(product.price.negated().getAmount))
     refundTxn.currencyCode should be(CurrencyUnit.USD.getCode)
+  }
+
+  "prepareEgraphsSignedEmail" should "not use celebrity's email" in {
+    val celebrity = TestData.newSavedCelebrity().copy(publicName = Some("Public Celebrity")).save()
+    val order = TestData.newSavedOrder(product = Some(TestData.newSavedProduct(celebrity = Some(celebrity))))
+    val email = order.prepareEgraphsSignedEmail()
+    email.getFromAddress.getAddress should not be (celebrity.account.email)
+    email.getReplyToAddresses.get(0).asInstanceOf[InternetAddress].getAddress should be("noreply@egraphs.com")
   }
 
   "findByCelebrity" should "find all of a Celebrity's orders by default" in {
