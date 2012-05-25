@@ -4,7 +4,7 @@ import org.stringtemplate.v4.ST
 
 /**
  * Performs templating based on the java [[http://www.stringtemplate.org/ StringTemplate]]
- * library. Template variables are delimted by opened and closed curly braces.
+ * library. Template variables are delimited by opened and closed curly braces.
  */
 class TemplateEngine {
   /**

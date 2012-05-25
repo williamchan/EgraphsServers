@@ -25,8 +25,10 @@ object TestData {
 
   val random = new Random
 
+  def getTimeInBlobstoreFormat: String = Time.toBlobstoreFormat(Time.now)
+
   def generateEmail(prefix: String = ""): String = {
-    prefix + Time.toBlobstoreFormat(Time.now) + "@egraphs.com"
+    prefix + getTimeInBlobstoreFormat + "@egraphs.com"
   }
 
   def newSavedAccount(): Account = {
@@ -43,9 +45,10 @@ object TestData {
   }
 
   def newSavedCelebrity(): Celebrity = {
-    val email = generateEmail(prefix = "celebrity-")
+    val identifier = getTimeInBlobstoreFormat
+    val email = "celebrity-" + identifier + "@egraphs.com"
     val acct = Account(email = email).save()
-    val celeb = Celebrity(publicName = Some(email)).save()
+    val celeb = Celebrity(publicName = Some("Celebrity " + identifier)).save()
 
     acct.copy(celebrityId = Some(celeb.id)).save()
 

@@ -13,6 +13,7 @@ import org.squeryl.Query
 import models.Egraph.EgraphState._
 import models.CashTransaction.{PurchaseRefund, EgraphPurchase}
 import org.apache.commons.mail.{Email, HtmlEmail}
+import scala.util.Random
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -22,7 +23,8 @@ case class OrderServices @Inject() (
   payment: Payment,
   mail: Mail,
   cashTransactionServices: Provider[CashTransactionServices],
-  egraphServices: Provider[EgraphServices]
+  egraphServices: Provider[EgraphServices],
+  audioPromptServices: Provider[OrderAudioPromptServices]
 )
 
 /**
@@ -172,6 +174,19 @@ case class Order(
     )
     email
   }
+  /**
+   * Generates an audio prompt based on an random selection from audioPromptTemplates.
+   */
+  protected[models] def generateAudioPrompt(indexOfAudioPromptTemplate: Option[Int] = None): String = {
+    val i = indexOfAudioPromptTemplate.getOrElse(Order.random.nextInt(Order.audioPromptTemplates.length))
+    val orderAudioPrompt = OrderAudioPrompt(
+      audioPromptTemplate=Order.audioPromptTemplates(i),
+      celebName=product.celebrity.publicName.get,
+      recipientName=recipientName,
+      services=services.audioPromptServices.get()
+    )
+    orderAudioPrompt.audioPrompt
+  }
 
   /**
    * Renders the Order as a Map, which will itself be rendered into whichever data format
@@ -190,7 +205,8 @@ case class Order(
       "recipientId" -> recipient.id,
       "recipientName" -> recipientName,
       "amountPaidInCents" -> amountPaid.getAmountMinor,
-      "reviewStatus" -> reviewStatus
+      "reviewStatus" -> reviewStatus,
+      "audioPrompt" -> generateAudioPrompt()
     )
 
     val optionalFields = Utils.makeOptionalFieldMap(
@@ -219,6 +235,16 @@ case class Order(
 case class FulfilledOrder(order: Order, egraph: Egraph)
 
 object Order {
+
+  lazy val random = new Random
+
+  // Update this list with marketing-approved copy per SER-56
+  lazy val audioPromptTemplates = List(
+    "From {signer_name} to {recipient_name} with love",
+    "Hi {recipient_name}, this is {signer_name}. Let’s grow old together, that might be fun",
+    "Roses are red, violets are blue, this is an Egraph from {signer_name} to {recipient_name}"
+  )
+
   //
   // Public Methods
   //
@@ -408,3 +434,47 @@ class OrderQueryFilters @Inject() (schema: Schema) {
   }
 }
 
+case class OrderAudioPromptServices @Inject() (templateEngine: TemplateEngine)
+
+object OrderAudioPromptField extends Utils.Enum {
+  sealed trait EnumVal extends Value
+
+  /** Public name of the celebrity */
+  val CelebrityName = new EnumVal { val name = "signer_name" }
+
+  /** Name of the person receiving the egraph */
+  val RecipientName = new EnumVal { val name = "recipient_name"}
+}
+
+/**
+ * @param audioPromptTemplate title template as specified on the [[models.Product]]
+ * @param celebName the celebrity's public name
+ * @param recipientName name of the [[models.Customer]] receiving the order.
+ * @param services Services needed for the OrderAudioPrompt to manipulate its data properly.
+ */
+case class OrderAudioPrompt(private val audioPromptTemplate: String,
+                            private val celebName: String,
+                            private val recipientName: String,
+                            private val services: OrderAudioPromptServices = AppConfig.instance[OrderAudioPromptServices]) {
+  //
+  // Public methods
+  //
+  def audioPrompt: String = {
+    services.templateEngine.evaluate(audioPromptTemplate, templateParams)
+  }
+
+  //
+  // Private methods
+  //
+  private val templateParams: Map[String, String] = {
+    import OrderAudioPromptField._
+    val pairs = for (templateField <- OrderAudioPromptField.values) yield {
+      val paramValue = templateField match {
+        case CelebrityName => celebName
+        case RecipientName => recipientName
+      }
+      (templateField.name, paramValue)
+    }
+    pairs.toMap
+  }
+}

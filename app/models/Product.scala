@@ -21,7 +21,6 @@ case class ProductServices @Inject() (
   celebStore: CelebrityStore,
   orderStore: OrderStore,
   inventoryBatchStore: InventoryBatchStore,
-  templateEngine: TemplateEngine,
   imageAssetServices: Provider[ImageAssetServices]
 )
 
