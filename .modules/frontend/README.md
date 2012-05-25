@@ -18,3 +18,5 @@ Some things to help you:
 * [Project home](https://egraphs.atlassian.net/wiki/display/EFE/Home)
 * [Development environment](https://egraphs.atlassian.net/wiki/display/EFE/Front-End+Development+Environment)
 * [Issue backlog](https://egraphs.atlassian.net/secure/RapidBoard.jspa?rapidView=10)
+
+Ask erem@egraphs.com if you have any other questions.
