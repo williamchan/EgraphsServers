@@ -1,7 +1,7 @@
 @()
 
 @tweetText = @{"Check out my Egraph!"}
-@tweetLink = @{"http://www.google.com"}
+@tweetLink = @{"https://www.google.com"}
 
 <!doctype html>
 <html>
@@ -14,7 +14,7 @@
 </div>
 
 <div id='fb-root'></div>
-<script src='http://connect.facebook.net/en_US/all.js'></script>
+<script src='https://connect.facebook.net/en_US/all.js'></script>
 <p><a onclick='postToFeed(); return false;'>Post to Facebook Feed</a></p>
 <p id='msg'></p>
 
@@ -29,7 +29,7 @@
     var obj = {
       method: 'feed',
       link: 'www.egraphs.com',
-      picture: 'http://fbrell.com/f8.jpg',
+      picture: 'https://fbrell.com/f8.jpg',
       name: 'Post Name',
       caption: 'Post Caption',
       description: 'Post Description.'
