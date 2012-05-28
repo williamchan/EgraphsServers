@@ -63,6 +63,10 @@ case class Product(
   // Public members
   //
   def save(): Product = {
+    require(!name.isEmpty, "Product: name must be specified")
+    require(!description.isEmpty, "Product: description must be specified")
+    require(!storyTitle.isEmpty, "Product: storyTitle must be specified")
+    require(!storyText.isEmpty, "Product: storyText must be specified")
     services.store.save(this)
   }
 

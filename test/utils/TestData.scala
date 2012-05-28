@@ -29,6 +29,10 @@ object TestData {
     prefix + Time.toBlobstoreFormat(Time.now) + "@egraphs.com"
   }
 
+  def newSavedAccount(): Account = {
+    Account(email = generateEmail(prefix = "acct-")).save()
+  }
+
   def newSavedCustomer(): Customer = {
     val acct = Account(email = generateEmail(prefix = "customer-")).save()
     val cust = Customer(name = "testcustomer").save()
@@ -48,10 +52,14 @@ object TestData {
     celeb
   }
 
+  private def newProduct(celebrity: Celebrity): Product = {
+    celebrity.newProduct.copy(name = "prod" + random.nextLong(), description = "some prod")
+  }
+
   def newSavedProduct(celebrity: Option[Celebrity] = None): Product = {
     var product = celebrity match {
-      case None => newSavedCelebrity().newProduct.save()
-      case Some(c) => c.newProduct.copy(name = "prod" + random.nextLong()).save()
+      case None => newProduct(newSavedCelebrity()).save()
+      case Some(c) => newProduct(c).save()
     }
     product = product.saveWithImageAssets(image = Some(product.defaultPhoto.renderFromMaster), icon = None)
     val inventoryBatch = newSavedInventoryBatch(product.celebrity)
@@ -60,7 +68,7 @@ object TestData {
   }
 
   def newSavedProductWithoutInventoryBatch(celebrity: Celebrity): Product = {
-    celebrity.newProduct.copy(name = "prod" + random.nextLong()).save()
+    newProduct(celebrity).save()
   }
 
   def newSavedInventoryBatch(celebrity: Celebrity) : InventoryBatch = {

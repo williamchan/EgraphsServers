@@ -25,6 +25,7 @@ case class Customer(
   // Public methods
   //
   def save(): Customer = {
+    require(!name.isEmpty, "Customer: name must be specified")
     services.customerStore.save(this)
   }
 
@@ -96,11 +97,11 @@ class CustomerStore @Inject() (
    * or creates one, saves it to the database, then returns it.
    *
    * @param email the address of the Customer to look up or create
-   * @param name name the Customer should have if we have to create him from scratch.
+   * @param name name of the Customer. Used only if the Customer does not already exist.
    *
    * @return a persisted Customer with a valid ID.
    */
-  def findOrCreateByEmail(email: String, name: String=""): Customer = {
+  def findOrCreateByEmail(email: String, name: String): Customer = {
     // TODO: Optimize this using a single outer-join query to get Customer + Account all at once
 
     // Get the Account and Customer face if both exist.

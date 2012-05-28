@@ -3,9 +3,9 @@ package models
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
-import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationBefore, CreatedUpdatedEntityTests, SavingEntityTests}
 import org.joda.money.CurrencyUnit
 import services.AppConfig
+import utils._
 
 class CashTransactionTests extends UnitFlatSpec
   with ShouldMatchers
@@ -21,7 +21,7 @@ class CashTransactionTests extends UnitFlatSpec
   // SavingEntityTests[CashTransaction] methods
   //
   override def newEntity = {
-    CashTransaction(accountId=Account().save().id)
+    CashTransaction(accountId=TestData.newSavedAccount().id)
   }
 
   override def saveEntity(toSave: CashTransaction) = {
@@ -42,6 +42,12 @@ class CashTransactionTests extends UnitFlatSpec
   //
   // Test cases
   //
+
+  "CashTransaction" should "require certain fields" in {
+    val exception = intercept[IllegalArgumentException] {CashTransaction().save()}
+    exception.getLocalizedMessage.contains("CashTransaction: type must be specified") should be(true)
+  }
+
   "A CashTransaction" should "have the correct cash value and currency type" in {
     val amount: BigDecimal = 20.19
     val transaction = CashTransaction(amountInCurrency=amount)

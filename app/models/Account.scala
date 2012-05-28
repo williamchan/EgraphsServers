@@ -24,6 +24,7 @@ case class Account(
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated
 {
   def save(): Account = {
+    require(!email.isEmpty, "Account: email must be specified")
     services.accountStore.save(this)
   }
 

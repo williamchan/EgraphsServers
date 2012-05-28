@@ -60,6 +60,12 @@ class OrderTests extends UnitFlatSpec
   //
   // Test cases
   //
+
+  "Order" should "require certain fields" in {
+    val exception = intercept[IllegalArgumentException] {Order().save()}
+    exception.getLocalizedMessage.contains("Order: recipientName must be specified") should be(true)
+  }
+
   "An order" should "create Egraphs that are properly configured" in {
     val egraph = Order(id=100L).newEgraph
 
