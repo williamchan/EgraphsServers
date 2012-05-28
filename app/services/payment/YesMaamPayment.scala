@@ -19,6 +19,8 @@ class YesMaamPayment extends Payment {
     NiceToken
   }
 
+  def isTest = true
+
   override def bootstrap() { }
 
   override val browserModule: String = {

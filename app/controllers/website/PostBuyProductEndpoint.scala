@@ -6,7 +6,6 @@ import play.data.validation._
 import org.apache.commons.mail.SimpleEmail
 import models._
 import play.mvc.Scope.Flash
-import play.mvc.results.Redirect
 import services.mail.Mail
 import services.{Utils, AppConfig}
 import play.Logger
@@ -18,6 +17,7 @@ import sjson.json.Serializer
 import services.db.{DBSession, TransactionSerializable}
 import services.logging.Logging
 import exception.InsufficientInventoryException
+import play.mvc.results.{Forbidden, Redirect}
 
 trait PostBuyProductEndpoint { this: Controller =>
   import PostBuyProductEndpoint.EgraphPurchaseHandler
@@ -47,13 +47,18 @@ trait PostBuyProductEndpoint { this: Controller =>
           personalNote: Option[String],
           isDemo: Boolean = false) = controllerMethod(openDatabase=false) {
 
-    if (!isDemo) {
-      securityFilters.checkAuthenticity {
+    (isDemo, payment.isTest) match {
+      case (false, _) => {
+        securityFilters.checkAuthenticity {
+          post(recipientName, recipientEmail, buyerName, buyerEmail, stripeTokenId, desiredText, personalNote, isDemo)
+        }
+      }
+
+      case (true, true) => {
         post(recipientName, recipientEmail, buyerName, buyerEmail, stripeTokenId, desiredText, personalNote, isDemo)
       }
-    } else {
-      // TODO(issue #100): Delete this before launch. And delete PostBuyDemoProductEndpoint.
-      post(recipientName, recipientEmail, buyerName, buyerEmail, stripeTokenId, desiredText, personalNote, isDemo)
+
+      case _ => new Forbidden("Cannot place order. Contact Egraphs support/engineering.")
     }
   }
 

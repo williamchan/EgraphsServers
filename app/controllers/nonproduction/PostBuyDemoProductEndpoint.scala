@@ -21,7 +21,7 @@ trait PostBuyDemoProductEndpoint { this: PostBuyProductEndpoint =>
       recipientEmail,
       buyerName,
       buyerEmail,
-      payment.testToken().id,
+      payment.testToken().id, // Will throw xception if payment is StripePayment. Must be StripeTestPayment or YesMaamPayment.
       desiredText,
       personalNote,
       isDemo = true

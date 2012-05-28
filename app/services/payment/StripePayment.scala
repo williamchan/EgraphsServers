@@ -1,81 +1,16 @@
 package services.payment
 
-import com.stripe
-import org.joda.money.Money
-import scala.collection.JavaConversions._
-import services.Utils
-
 /**
- * Stripe-based implementation of [[services.Payment]] service
+ * Stripe-based implementation of [[services.Payment]] service using live account
  */
-class StripePayment extends Payment {
-  //
-  // Payment Methods
-  //
-  override def charge(amount: Money, cardTokenId: String, description: String=""): Charge = {
-    val chargeMap = Map[String, AnyRef](
-      "amount" -> amount.getAmountMinor,
-      "currency" -> amount.getCurrencyUnit.getCode.toLowerCase,
-      "card" -> cardTokenId,
-      "description" -> description
-    )
+class StripePayment extends StripePaymentBase {
 
-    StripeCharge(stripe.model.Charge.create(chargeMap))
-  }
-
-  override def refund(chargeId: String): Charge = {
-    val chargeToRefund = stripe.model.Charge.retrieve(chargeId)
-    StripeCharge(chargeToRefund.refund())
+  override def testToken(): CardToken = {
+    throw new UnsupportedOperationException("Live Stripe implementation does not support test token")
   }
 
   /**
-   * Returns a fake stripe token
+   * @return whether this implementation is for testing purposes
    */
-  override def testToken(): CardToken = {
-    // TODO: Delete this method and any referencing code before launch. This is purely
-    // for spring training demonstrations.
-    import java.lang.Integer
-
-    val defaultCardParams = new java.util.HashMap[String, Object]();
-    val defaultChargeParams = new java.util.HashMap[String, Object]();
-
-    defaultCardParams.put("number", "4242424242424242");
-    defaultCardParams.put("exp_month", new Integer(12));
-    defaultCardParams.put("exp_year", new Integer(2015))
-    defaultCardParams.put("cvc", "123");
-    defaultCardParams.put("name", "Java Bindings Cardholder");
-    defaultCardParams.put("address_line1", "522 Ramona St");
-    defaultCardParams.put("address_line2", "Palo Alto");
-    defaultCardParams.put("address_zip", "94301");
-    defaultCardParams.put("address_state", "CA");
-    defaultCardParams.put("address_country", "USA");
-
-    defaultChargeParams.put("amount", new Integer(100));
-    defaultChargeParams.put("currency", "usd");
-    defaultChargeParams.put("card", defaultCardParams);
-
-    StripeToken(stripe.model.Token.create(defaultChargeParams))
-  }
-
-  override def bootstrap {
-    stripe.Stripe.apiKey = Utils.requiredConfigurationProperty("stripe.key.secret")
-  }
-
-  override val browserModule: String = {
-    "stripe-payment"
-  }
-
-  override val publishableKey: String = {
-    Utils.requiredConfigurationProperty("stripe.key.publishable")
-  }
+  def isTest = false
 }
-
-case class StripeCharge (stripeCharge: stripe.model.Charge) extends Charge {
-  override val id = stripeCharge.getId
-  override val refunded = stripeCharge.getRefunded.booleanValue()
-}
-
-case class StripeToken (stripeToken: stripe.model.Token) extends CardToken {
-  override val id = stripeToken.getId
-}
-

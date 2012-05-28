@@ -14,9 +14,8 @@ class StripePaymentTests extends UnitFlatSpec
 {
   import services.Finance.TypeConversions._
 
-  private val payment = AppConfig.instance[StripePayment]
+  private val payment = AppConfig.instance[StripeTestPayment]
   private val amount: BigDecimal = 60
-
   payment.bootstrap()
 
   "charge" should "successfully charge a token" in {
@@ -74,5 +73,15 @@ class StripePaymentTests extends UnitFlatSpec
       fail("Should have thrown exception")
     }
     exception.getLocalizedMessage.contains("has already been refunded") should be(true)
+  }
+
+  "testToken" should "throw exception when called from live implementation" in {
+    intercept[UnsupportedOperationException] {AppConfig.instance[StripePayment].testToken()}
+  }
+
+  "isTest" should "be false for live implementation, true for others" in {
+    AppConfig.instance[StripePayment].isTest should be (false)
+    AppConfig.instance[StripeTestPayment].isTest should be (true)
+    AppConfig.instance[YesMaamPayment].isTest should be (true)
   }
 }

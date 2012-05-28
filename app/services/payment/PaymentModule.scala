@@ -15,6 +15,7 @@ object PaymentModule extends AbstractModule with ScalaModule {
 
 private[payment] class PaymentProvider @Inject()(
   stripeImpl: Provider[StripePayment],
+  stripeTestImpl: Provider[StripeTestPayment],
   yesmaamImpl: Provider[YesMaamPayment],
   utils: Utils
 ) extends Provider[Payment]
@@ -23,6 +24,9 @@ private[payment] class PaymentProvider @Inject()(
     utils.requiredConfigurationProperty("payment.vendor") match {
       case "yesmaam" =>
         yesmaamImpl.get()
+
+      case "stripetest" =>
+        stripeTestImpl.get()
 
       case "stripe" =>
         stripeImpl.get()

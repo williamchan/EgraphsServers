@@ -33,6 +33,11 @@ trait Payment {
   def testToken(): CardToken
 
   /**
+   * @return whether this implementation is for testing purposes
+   */
+  def isTest: Boolean
+
+  /**
    * Prepares the payment system for use at application start
    */
   def bootstrap()
