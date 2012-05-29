@@ -21,7 +21,7 @@ class CustomerTests extends UnitFlatSpec
   // SavingEntityTests[Account] methods
   //
   override def newEntity = {
-    Customer()
+    Customer(name = "customer")
   }
 
   override def saveEntity(toSave: Customer) = {
@@ -41,6 +41,11 @@ class CustomerTests extends UnitFlatSpec
   //
   // Test cases
   //
+  "Customer" should "require certain fields" in {
+    val exception = intercept[IllegalArgumentException] {Customer().save()}
+    exception.getLocalizedMessage.contains("Customer: name must be specified") should be(true)
+  }
+
   "A customer" should "produce Orders that are properly configured" in {
     val buyer = TestData.newSavedCustomer()
     val recipient = TestData.newSavedCustomer()
@@ -95,10 +100,10 @@ class CustomerTests extends UnitFlatSpec
   "findOrCreateByEmail" should "find or create as appropriate" in {
     val acct = Account(email = "customer-" + Time.toBlobstoreFormat(Time.now) + "@egraphs.com").save()
     acct.customerId should be(None)
-    val customer = customerStore.findOrCreateByEmail(acct.email)
+    val customer = customerStore.findOrCreateByEmail(acct.email, "joe fan")
 
     val updatedAcct = acct.services.accountStore.findById(acct.id).get
     customer.id should be(updatedAcct.customerId.get)
-    customerStore.findOrCreateByEmail(acct.email) should be(customer)
+    customerStore.findOrCreateByEmail(acct.email, "joe fan") should be(customer)
   }
 }

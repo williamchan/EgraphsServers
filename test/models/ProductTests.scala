@@ -22,7 +22,7 @@ class ProductTests extends UnitFlatSpec
   // SavingEntityTests[Product] methods
   //
   override def newEntity = {
-    TestData.newSavedCelebrity().newProduct
+    TestData.newSavedCelebrity().newProduct.copy(name = "prod", description = "desc")
   }
 
   override def saveEntity(toSave: Product) = {
@@ -48,6 +48,17 @@ class ProductTests extends UnitFlatSpec
   //
   // Test cases
   //
+
+  "Product" should "require certain fields" in {
+    var exception = intercept[IllegalArgumentException] {Product().save()}
+    exception.getLocalizedMessage.contains("Product: name must be specified") should be(true)
+    exception = intercept[IllegalArgumentException] {Product(name = "name").save()}
+    exception.getLocalizedMessage.contains("Product: description must be specified") should be(true)
+    exception = intercept[IllegalArgumentException] {Product(name = "name", description = "desc", storyTitle = "").save()}
+    exception.getLocalizedMessage.contains("Product: storyTitle must be specified") should be(true)
+    exception = intercept[IllegalArgumentException] {Product(name = "name", description = "desc", storyText = "").save()}
+    exception.getLocalizedMessage.contains("Product: storyText must be specified") should be(true)
+  }
 
   "saveWithImageAssets" should "set signingScaleH and signingScaleW" in {
     var product = TestData.newSavedProduct().saveWithImageAssets(image = Some(new BufferedImage(/*width*/3000, /*height*/2000, BufferedImage.TYPE_INT_ARGB)), icon = None)

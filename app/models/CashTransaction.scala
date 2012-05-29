@@ -37,6 +37,7 @@ case class CashTransaction(
   //
   /** Persist the transaction */
   def save(): CashTransaction = {
+    require(!typeString.isEmpty, "CashTransaction: type must be specified")
     services.cashTransactionStore.save(this)
   }
 

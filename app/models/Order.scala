@@ -55,6 +55,7 @@ case class Order(
   //
   /** Persists by conveniently delegating to companion object's save method. */
   def save(): Order = {
+    require(!recipientName.isEmpty, "Order: recipientName must be specified")
     services.store.save(this)
   }
 

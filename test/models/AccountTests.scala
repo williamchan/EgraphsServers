@@ -23,6 +23,11 @@ class AccountTests extends UnitFlatSpec
   //
   // Test methods
   //
+  "Account" should "require certain fields" in {
+    val exception = intercept[IllegalArgumentException] {Account().save()}
+    exception.getLocalizedMessage.contains("Account: email must be specified") should be(true)
+  }
+
   "An Account" should "start unprotected" in {
     Account().password should be(None)
   }
@@ -137,7 +142,7 @@ class AccountStoreTests extends UnitFlatSpec
       passwordHash = Some("derp"),
       passwordSalt = Some("derp"),
       celebrityId = Some(Celebrity().save().id),
-      customerId = Some(Customer().save().id),
+      customerId = Some(Customer(name = "name").save().id),
       administratorId = Some(Administrator().save().id)
     )
   }
@@ -163,16 +168,14 @@ class AccountStoreTests extends UnitFlatSpec
   }
   
   it should "find by customer ID correctly" in {
-    val customer = Customer().save()
-
-    val account = Account(customerId=Some(customer.id)).save()
-
+    val customer = TestData.newSavedCustomer()
+    val account = customer.account
     accountStore.findByCustomerId(customer.id) should be (Some(account))
     accountStore.findByCustomerId(customer.id + 1) should be (None)
   }
 
   it should "should persist fine with no celebrity/customer/admin IDs" in {
-    accountStore.save(Account()) // Doesn't throw any errors
+    accountStore.save(Account(email = "email@egraphs.com")) // Doesn't throw any errors
   }
 
   it should "fail to persist with non-null, non-existent celebrity ID" in {
@@ -212,7 +215,7 @@ trait AccountTestHelpers {
   def accountStore: AccountStore
 
   def accountWithPassword(password: String): Account = {
-    accountStore.save(Account().withPassword(password).right.get)
+    accountStore.save(Account(email = "email@egraphs.com").withPassword(password).right.get)
   }
 
   def savedAccountWithEmailAndPassword(email: String, password: String): Account = {

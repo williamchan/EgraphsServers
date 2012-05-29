@@ -230,7 +230,7 @@ object PostBuyProductEndpoint extends Logging {
       val recipient = if (buyerEmail == recipientEmail) {
         buyer
       } else {
-        customerStore.findOrCreateByEmail(recipientEmail)
+        customerStore.findOrCreateByEmail(recipientEmail, recipientName)
       }
 
       // Persist the Order with the Stripe charge info.
