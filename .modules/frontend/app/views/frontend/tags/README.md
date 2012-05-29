@@ -20,10 +20,13 @@ Usage:
 
 ```html
 @(implicit session: play.mvc.Scope.Session)
+
+@import views.frontend.tags
+
 <html>
   <body>
     <!-- Put in a safe form, specifying the form attributes with scala tuple syntax --> 
-    @safeForm("method" -> "GET", action -> "/login") {
+    @tags.safeForm("method" -> "GET", action -> "/login") {
       username: <input type="text" name="fname" />
       password: <input type="password" name="fname" />
       <input type="submit" value="Submit" />

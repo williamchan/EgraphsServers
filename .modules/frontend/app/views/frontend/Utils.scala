@@ -21,7 +21,7 @@ object Utils {
    */
   def formatAttributeTuplesToHtml(tuples: (String, String)*): String = {
     val attributeStrings = for (val (name, value) <- tuples) yield {
-      "\"" + name + "\" = \"" + value + "\""
+      name + " = \"" + value + "\""
     }
 
     attributeStrings.mkString(" ")

@@ -43,3 +43,22 @@ object Application extends Controller {
     frontend.example.html.uses_base_template()
   }
 }
+
+
+/** Test controllers for the @safeForm tag. */
+object SafeFormTestController extends Controller {
+  import views.html
+
+  def safeFormGET = {
+    html.safeFormTest(postWasAuthenticated="Post not authenticated")
+  }
+
+  def safeFormPOST(authenticityToken: String) = {
+    if (session.getAuthenticityToken != authenticityToken) {
+      Forbidden
+    }
+    else {
+      html.safeFormTest(postWasAuthenticated="Post authenticated")
+    }
+  }
+}
