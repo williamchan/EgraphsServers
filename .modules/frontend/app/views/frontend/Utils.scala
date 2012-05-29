@@ -16,7 +16,7 @@ object Utils {
    *   <form @formatAttributeTuplesToHtml("method" -> "GET")>
    *   
    *   // renders as
-   *   <form "method" -> "GET">
+   *   <form method="GET">
    * }}}
    */
   def formatAttributeTuplesToHtml(tuples: (String, String)*): String = {

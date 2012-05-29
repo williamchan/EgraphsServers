@@ -16,10 +16,10 @@ by any Controller.
 Provide the usual form attributes in scala tuple syntax rather than
 html syntax.
 
-Usage:
+Sample .scala.html template usage:
 
 ```html
-@(implicit session: play.mvc.Scope.Session)
+@()(implicit session: play.mvc.Scope.Session)
 
 @import views.frontend.tags
 
