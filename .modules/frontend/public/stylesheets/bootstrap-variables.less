@@ -14,11 +14,12 @@
 // Grays
 // -------------------------
 @black:                 #000;
-@grayDarker:            #222;
+@grayDarker:            #1a1a1a;
 @grayDark:              #333;
 @gray:                  #555;
-@grayLight:             #999;
-@grayLighter:           #eee;
+@grayLight:             #808080;
+@grayLighter:           #ededed;
+@offWhite:              #fafafa;
 @white:                 #fff;
 
 
@@ -36,14 +37,14 @@
 
 // Scaffolding
 // -------------------------
-@bodyBackground:        @white;
-@textColor:             @grayDark;
+@bodyBackground:        @offWhite;
+@textColor:             @grayLight;
 
 
 // Links
 // -------------------------
-@linkColor:             #08c;
-@linkColorHover:        darken(@linkColor, 15%);
+@linkColor:             #29abe2;
+@linkColorHover:        #ff5124; // darken(@linkColor, 15%);
 
 
 // Typography
@@ -52,14 +53,14 @@
 @serifFontFamily:       Georgia, "Times New Roman", Times, serif;
 @monoFontFamily:        Menlo, Monaco, Consolas, "Courier New", monospace;
 
-@baseFontSize:          13px;
+@baseFontSize:          16px;
 @baseFontFamily:        @sansFontFamily;
-@baseLineHeight:        18px;
+@baseLineHeight:        24px;
 @altFontFamily:         @serifFontFamily;
 
 @headingsFontFamily:    inherit; // empty to use BS default, @baseFontFamily
-@headingsFontWeight:    bold;    // instead of browser default, bold
-@headingsColor:         inherit; // empty to use BS default, @textColor
+@headingsFontWeight:    400;    // instead of browser default, bold
+@headingsColor:         @grayDark;
 
 
 // Tables
@@ -197,9 +198,9 @@
 
 // Default 940px grid
 // -------------------------
-@gridColumns:             12;
-@gridColumnWidth:         60px;
-@gridGutterWidth:         20px;
+@gridColumns:             24;
+@gridColumnWidth:         30px;
+@gridGutterWidth:         10px;
 @gridRowWidth:            (@gridColumns * @gridColumnWidth) + (@gridGutterWidth * (@gridColumns - 1));
 
 // Fluid grid
