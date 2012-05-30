@@ -1,0 +1,6 @@
+#{selenium 'Test safeForm tag puts a valid authenticity token into the form it creates'}
+    open('/SafeFormTestController/safeFormGET')
+    verifyTextPresent('Post not authenticated')
+    clickAndWait('css=input[type="submit"]')
+    verifyTextPresent('Post authenticated')
+#{/selenium}
