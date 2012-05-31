@@ -6,7 +6,7 @@ a:hover { text-decoration: none; }
 
 	position: relative;
 	z-index: 1;
-	.box-shadow-bottom;	
+	.box-shadow(0px, 4px, 8px, rgba(0, 0, 0, .5));	
 	background: @offWhite;	
 	padding-top: 2px;
 	padding-bottom: 2px;
@@ -29,14 +29,150 @@ a:hover { text-decoration: none; }
 		
 			a {
 				display: block;
-				padding: 20px 0 20px 40px;
+				line-height: 70px;
+				padding-left: 40px;
+				height: 70px;
 				border-left: 1px solid @white;
 			}
 		
 		}		
 
 	}
+
+	.social { 
+	
+		float: right;	
+				
+		> ul {
 		
+			padding: 20px 0 0 40px;		
+			margin: 0;
+			list-style: none;
+			
+			li {
+				
+				float: left;
+				margin-left: 10px; 
+				
+				a {
+					display: block;
+					width: 30px;
+					height: 31px;
+					text-indent: -9999px;
+					overflow: hidden;
+					background: url(../images/bg-sprite-social-icons.png) no-repeat 0 0;
+				}
+
+				a:hover { background-position: 0 -31px; }
+				
+				a.twitter { background-position: -30px 0; }
+				a.twitter:hover { background-position: -30px -31px; }
+			
+				a.addthis { background-position: -60px 0; }
+				a.addthis:hover { background-position: -60px -62px; }
+				
+			}
+			
+			li:first-child { margin-left: 0; }
+		
+		}
+	
+	}
+	
+	.account {
+		
+		float: right;
+		border-left: 1px solid @grayVeryLight;
+		border-right: 1px solid @grayVeryLight;
+		
+		> ul {
+		
+			position: relative;
+			list-style: none;
+			margin: 0;
+			padding: 20px 40px 0 40px;
+			height: 50px;
+			border-left: 1px solid @white;
+			border-right: 1px solid @white;
+			
+			li {			
+				font-size: 12px;
+				line-height: 1.25em;			
+			}
+			
+			li:first-child {
+				a { color: @linkColorHover; }
+				a:hover { color: @gray; }
+			}
+
+			.account-options {
+			
+				> a {					
+					font-weight: 600;
+					font-size: 14px;
+					line-height: 1em;
+					padding-right: 16px;
+					background: url(../images/bg-top-account-arrow.png) no-repeat 100% 50%;					
+				}
+				
+				> a:hover { background-image: url(../images/bg-top-account-arrow-active.png); }
+		
+				ul {
+					
+					display: none;
+					position: absolute;
+					width: 100%;
+					left: 1px;
+					top: 72px;
+					list-style: none;
+					margin: 0;
+					padding: 0;
+					
+					li {
+
+						font-weight: 400;					
+						font-size: 14px;
+						line-height: 1em;
+						text-shadow: none;				
+						border-bottom: 1px solid rgba(255, 255, 255, .25);
+						background: @orange;
+						opacity: .9;
+						-moz-opacity: .9;
+					
+						a {							
+							color: darken(@white, 10%);
+							display: block;
+							padding: 10px;							
+						}	
+						
+						a:hover {							
+							color: @white;
+							background-color: darken(@orange, 5%);						
+						}
+						
+					}
+					
+					li:last-child { border-bottom: none; }
+				
+				}
+								
+			}
+			
+			.account-options.active {
+			
+				> a { 
+					color: @orange;
+					background-image: url(../images/bg-top-account-arrow-active.png); 
+				}
+			
+				ul { display: block; }
+			
+			}
+		
+		}					
+		
+	}
+
 }
 
 section[role=banner] {
@@ -45,21 +181,201 @@ section[role=banner] {
 }
 
 #content {
+
 	position: relative;
-	background: @grayLighter;
+	background: @contentBackground;
+	padding-bottom: 40px;
 	
 	#main {
 		.gradient;
-		.box-shadow;
+		.box-shadow(0px, 0px, 8px, rgba(0, 0, 0, .5));
 		position: relative;
 		top: -46px;
 		max-width: 1020px;
 		margin-left: auto;
 		margin-right: auto;
 		border-top: 8px solid @white;
-		padding-top: 38px;		
-				
+		padding-top: 40px;					
 	}
 
+	
+}
+
+#bottom {
+
+	padding-top: 40px;
+	padding-bottom: 40px;
+	
+	a { color: @grayLighter; }
+	a:hover{ color: @gray; }
+	
+	nav {
+	
+		margin-bottom: 10px;
+	
+		ol {
+			
+			list-style: none;
+			margin: 0;
+			padding: 0;
+			
+			li { 
+				font-size: 12px;
+				line-height: 1em;
+				float: left;
+				padding-right: 10px;
+				border-right: 1px solid @grayLighter;
+				margin-right: 10px;
+			}
+			
+			li:last-child { 
+				padding-right: 0;
+				border-right: none;
+				margin-right: 0;
+			}
+			
+		}
+	
+	}
+	
+	p small {
+		font-size: 12px;
+		line-height: 1em;
+		color: @grayLighter;
+	}
+	
+	.social {
+		
+		ul {
+		
+			padding: 0;		
+			margin: 0;
+			list-style: none;
+			
+			li {
+				
+				float: left;
+				margin-left: 10px; 
+				
+				a {
+					display: block;
+					width: 30px;
+					height: 31px;
+					text-indent: -9999px;
+					overflow: hidden;
+					background: url(../images/bg-sprite-social-icons.png) no-repeat 0 0;
+				}
+
+				a:hover { background-position: 0 -31px; }
+				
+				a.twitter { background-position: -30px 0; }
+				a.twitter:hover { background-position: -30px -31px; }
+			
+				a.addthis { background-position: -60px 0; }
+				a.addthis:hover { background-position: -60px -62px; }
+				
+			}
+			
+			li:first-child { margin-left: 0; }
+		
+		}
+	
+	}	
+
+}
+
+@media (min-width: 1020px) {
+
+	#top {
+	
+		.logo {
+			
+			margin-left: -20px;
+			padding-right: 20px;
+		
+		}
+		
+		.explore { margin-right: 20px; }
+
+		.social {
+			margin-right: -40px;
+		}
+	
+	}
+
+	#bottom {
+	
+		.row { 
+			margin-left: -40px;
+			margin-right: -40px;
+		}
+		
+		[class*=span] {
+			margin-left: 0;
+			margin-right: 0;
+			width: auto;
+		}
+
+		.social {
+			float: right;
+		}	
+		
+	}
+
+}
+
+@media (max-width: 979px) and (min-width: 768px) {
+
+	#top {
+		
+		.explore p a { padding-left: 20px; }
+		
+		.social {
+						
+			> ul {
+				padding-left: 20px;			
+			}
+			
+		}
+		
+		.account > ul {
+		
+			padding-left: 20px;
+			padding-right: 20px;
+		
+		}
+	
+	}
+
+}
+
+@media only screen and (-webkit-min-device-pixel-ratio: 2) { 
+
+	#top {
+
+		.account {
+			
+			> ul {
+	
+				.account-options {
+				
+					> a {
+						background: url(../images/bg-top-account-arrow-ios.png) no-repeat 100% 50%;	
+						background-size: 9px 5px;				
+					}
+									
+				}
+				
+				.account-options.active {
+				
+					> a { background-image: url(../images/bg-top-account-arrow-active-ios.png); }
+								
+				}
+			
+			}					
+			
+		}
+	
+	}
 	
 }
