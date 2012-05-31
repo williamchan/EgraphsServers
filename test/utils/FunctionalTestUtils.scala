@@ -1,5 +1,6 @@
 package utils
 
+import java.util.Properties
 import models.Account
 import play.mvc.Http.Request
 import play.test.FunctionalTest
@@ -26,6 +27,20 @@ object FunctionalTestUtils {
     req.password = "derp"
 
     req
+  }
+
+  def createRequest(host: String = "www.egraphs.com", url: String = "/", secure: Boolean = false): Request = {
+    val request = FunctionalTest.newRequest()
+    request.host = host
+    request.url = url
+    request.secure = secure
+    request
+  }
+
+  def createProperties(propName: String, propValue: String): Properties = {
+    val playConfig = new Properties
+    playConfig.setProperty(propName, propValue)
+    playConfig
   }
 
   def runScenarios(name: String*) {
