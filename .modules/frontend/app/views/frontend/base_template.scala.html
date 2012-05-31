@@ -37,28 +37,48 @@
     	
     		<div class="row">
     	
-	    		<div class="span4 offset5">
+    			<div class="logo span3">
+    				
+    				<a href="/" title="Egraphs"><img src="http://placehold.it/220x70" alt="Egraphs" /></a>
+    			
+    			</div>
+    	
+	    		<div class="explore span3">
 	    		
 	    			<p><a href="#">Inside an Egraph</a></p>
 	    		
-	    		</div>
+	    		</div> <!-- end .explore -->
 	    		
-	    		<div class="span7 offset8">
-	    		
-	    			<p>Hello, <a href="#">Sign in</a></p>
-	    			<ul>
-	    				<li>
-	    					<a href="#">My Account</a>
-	    					<!-- <ul>
-	    						<li><a href="#">Profile</a></li>
-	    						<li><a href="#">Account Settings</a></li>
-	    						<li><a href="#">My Gallery</a></li>
-	    						<li><a href="#">Logout</a></li>
-	    					</ul> -->
-	    				</li>
-	    			</ul>
-	    		
-	    		</div>
+	    		<div class="span6">
+ 
+	 	    		<div class="social">
+		    		
+		    			<ul class="clearfix">
+		    				<li><a href="#" class="facebook">Facebook</a></li>
+		    				<li><a href="#" class="twitter">Twitter</a></li>
+		    				<!-- <li><a href="#" class="addthis">AddThis</a></li> -->
+		    			</ul>
+		    		
+		    		</div> <!-- end .social -->
+ 
+		    		<nav class="account">
+		    				    			    		
+		    			<ul>
+		    				<li>Hello, <a href="#">Sign in</a></li>
+		    				<li class="account-options">
+		    					<a href="#">My Account</a>
+		    					<ul>
+		    						<li><a href="#profile">Profile</a></li>
+		    						<li><a href="#account">Account Settings</a></li>
+		    						<li><a href="#my-gallery">My Gallery</a></li>
+		    						<li><a href="#logout">Logout</a></li>
+		    					</ul>
+		    				</li>
+		    			</ul>  
+			    			  					    		
+		    		</nav> <!-- end .account --> 
+  		
+	    		</div> 
     		
     		</div>
     	
@@ -67,52 +87,95 @@
     </header> <!-- end #top -->
     
     <section id="masthead-home" role="banner">
+    
+    	<div class="banner-gradient">
 	    
-	    <div class="container">
+		    <div class="container">
+		    
+		    	<div class="row">
+		    	
+		    		<div class="span5">
+		    
+		    			<h1>@title</h1>
+		    	 
+		    			<p><a href="#">Get Started</a></p>
+		    	 
+		    		</div>
+		    	 
+		    	</div>
+		    	
+		    </div>
 	    
-	    	<div class="row">
-	    	
-	    		<div class="span9">
-	    
-	    			<h1>@title</h1>
-	    	 
-	    			<p><a href="#">Get Started</a></p>
-	    	 
-	    		</div>
-	    	 
-	    	</div>
-	    	
-	    </div>
+    	</div> 
     
     </section> <!-- end #masthead-home -->
       
     <section id="content" role="main">
     
-	    <div class="container">
+	    <div id="main">
 	    
-		    <div id="main">
+		    <div class="container">
+			    
+			    	<div id="intro-home" class="row">
+				
+				      <div class="span6">
+				      
+				      	<h1>@intro_sub_head</h1>
+				      	
+				      	@body
+
+				      </div>
+				      
+				      <div class="span5 offset1">
+				      
+				      	<img src='@asset("public/images/intro-egraph.jpg")' alt="intro-egraph">
+				      
+				      </div>
+			      
+			      </div> <!-- end #intro-home -->
+		     
+		    </div>
 		    
-		    	<div id="intro-home" class="row">
-			
-			      <div class="span11 offset1">
-			      	<h1>@intro_sub_head</h1>
-			      	@body
-			      </div>
-			      
-			      <div class="span11 offset1">
-			      
-			      	<img src='@asset("public/images/intro-egraph.jpg")' alt="intro-egraph">
-			      
-			      </div>
-		      
-		      </div> <!-- end #intro-home -->
-		      
-		    </div> <!-- end #main -->
-	     
-	    </div>
+	    </div> <!-- end #main -->
 
     </section> <!-- end #content -->
+    
+    <footer id="bottom" class="container" role="contentinfo">
+    
+    	<div class="row">
+    	
+    		<div class="span6">
+    		
+	    		<nav role="sitemap">
+	    		
+	    			<ol class="clearfix">
+	    				<li><a href="#">Home</a></li>
+	    				<li><a href="#">About Us / Contact</a></li>
+	    				<li><a href="#">FAQ</a></li>
+	    				<li><a href="#">Terms of Use</a></li>
+	    				<li><a href="#">Privacy Policy</a></li>
+	    			</ol>	
+	    			
+	    		</nav>
+    		
+    			<p><small>Copyright 2012 Egraph Corporation</small></p>
+    		
+    		</div>
+    		
+    		<div class="social span6">
+    		
+    			<ul>
+    				<li><a href="#" class="facebook">Facebook</a></li>
+    				<li><a href="#" class="twitter">Twitter</a></li>
+    				<!-- <li><a href="#" class="addthis">AddThis</a></li> -->
+    			</ul>    		
 
+    		</div> <!-- end .social -->
+    	
+    	</div>
+    
+    </footer> <!-- end #bottom -->
+    
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script> 
 		<script>window.jQuery || document.write("<script src='@asset("public/javascripts/jquery-1.7.2.min.js")'>\x3C/script>")</script> 
 		<script src='@asset("public/javascripts/functions.js")'></script> 

@@ -1,22 +1,65 @@
 // The base stylesheet for Egraphs.
 
+a:hover { text-decoration: none; }
+
 #top {
-		background: @offWhite;	
+
+	position: relative;
+	z-index: 1;
+	.box-shadow-bottom;	
+	background: @offWhite;	
+	padding-top: 2px;
+	padding-bottom: 2px;
+	text-shadow: 0 1px 1px @white;
+	
+	p {
+		font-size: 14px;
+		line-height: 1em;
+		margin-bottom: 0;
+	}
+	
+	a { color: @gray; }
+	a:hover { color: @linkColorHover; }
+	
+	.explore {
+	
+		p {
+		
+			border-left: 1px solid @grayVeryLight;
+		
+			a {
+				display: block;
+				padding: 20px 0 20px 40px;
+				border-left: 1px solid @white;
+			}
+		
+		}		
+
+	}
+		
+}
+
+section[role=banner] {
+	position: relative;
+	z-index: 0;
 }
 
 #content {
-	
+	position: relative;
 	background: @grayLighter;
 	
 	#main {
+		.gradient;
+		.box-shadow;
+		position: relative;
+		top: -46px;
+		max-width: 1020px;
+		margin-left: auto;
+		margin-right: auto;
 		border-top: 8px solid @white;
-		padding-top: 38px;
-		margin-top: -46px;
-		margin-bottom: 40px;
-		background: @offWhite;
-		-moz-box-shadow: 0 0 8px rgba(0, 0, 0, .5);
-		-webkit-box-shadow: 0 0 8px rgba(0, 0, 0, .5);
-		box-shadow: 0 0 8px rgba(0, 0, 0, .5);
+		padding-top: 38px;		
+				
 	}
+
 	
 }
