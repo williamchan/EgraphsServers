@@ -14,11 +14,13 @@
 // Grays
 // -------------------------
 @black:                 #000;
-@grayDarker:            #222;
+@grayDarker:            #1a1a1a;
 @grayDark:              #333;
-@gray:                  #555;
-@grayLight:             #999;
-@grayLighter:           #eee;
+@gray:                  #666;
+@grayLight:             #808080;
+@grayLighter:           #b3b3b3;
+@grayVeryLight:         #f2f2f2;
+@offWhite:              #fafafa;
 @white:                 #fff;
 
 
@@ -29,21 +31,22 @@
 @green:                 #46a546;
 @red:                   #9d261d;
 @yellow:                #ffc40d;
-@orange:                #f89406;
+@orange:                #f05129;
 @pink:                  #c3325f;
 @purple:                #7a43b6;
 
 
 // Scaffolding
 // -------------------------
-@bodyBackground:        @white;
-@textColor:             @grayDark;
+@bodyBackground:        @offWhite;
+@contentBackground:     #ededed;
+@textColor:             @grayLight;
 
 
 // Links
 // -------------------------
-@linkColor:             #08c;
-@linkColorHover:        darken(@linkColor, 15%);
+@linkColor:             #29abe2;
+@linkColorHover:        @orange; // darken(@linkColor, 15%);
 
 
 // Typography
@@ -52,14 +55,14 @@
 @serifFontFamily:       Georgia, "Times New Roman", Times, serif;
 @monoFontFamily:        Menlo, Monaco, Consolas, "Courier New", monospace;
 
-@baseFontSize:          13px;
+@baseFontSize:          16px;
 @baseFontFamily:        @sansFontFamily;
-@baseLineHeight:        18px;
+@baseLineHeight:        24px;
 @altFontFamily:         @serifFontFamily;
 
 @headingsFontFamily:    inherit; // empty to use BS default, @baseFontFamily
-@headingsFontWeight:    bold;    // instead of browser default, bold
-@headingsColor:         inherit; // empty to use BS default, @textColor
+@headingsFontWeight:    400;    // instead of browser default, bold
+@headingsColor:         @grayDark;
 
 
 // Tables

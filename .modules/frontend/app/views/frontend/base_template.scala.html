@@ -1,4 +1,4 @@
-@(title: String = "Default string", body: => Html, afterBody: => Html = Html.empty)
+@(title: String = "Default HTML", intro_sub_head: String = "Sub Head Goes Here", body: => Html, afterBody: => Html = Html.empty)
 
 <!doctype html> 
 <!--[if lt IE 7 ]> <html class="ie lt-ie9 ie6 no-js" lang="en"> <![endif]-->
@@ -9,9 +9,9 @@
   <head>
     <meta charset="utf-8">
     
-    <title>@title | Bootstrap, from Twitter</title>
+    <title>Egraphs</title>
     
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
 
@@ -30,40 +30,224 @@
   </head>
 
   <body>
+    
+    <header id="top" role="navigation">
+    
+    	<div class="container">
+    	
+    		<div class="row">
+    	
+    			<div class="logo span3">
+    				
+    				<a href="#" title="Egraphs"><img src="http://placehold.it/220x70" alt="Egraphs" /></a>
+    			
+    			</div>
+    	
+	    		<div class="explore span3">
+	    		
+	    			<p><a href="#">Inside an Egraph</a></p>
+	    		
+	    		</div> <!-- end .explore -->
+	    		
+	    		<div class="span6">
+ 
+	 	    		<div class="social">
+		    		
+		    			<ul class="clearfix">
+		    				<li><a href="#" class="facebook">Facebook</a></li>
+		    				<li><a href="#" class="twitter">Twitter</a></li>
+		    				<!-- <li><a href="#" class="addthis">AddThis</a></li> -->
+		    			</ul>
+		    		
+		    		</div> <!-- end .social -->
+ 
+		    		<nav class="account">
+		    				    			    		
+		    			<ul>
+		    				<li>Hello, <a href="#">Sign in</a></li>
+		    				<li class="account-options">
+		    					<a href="#">My Account</a>
+		    					<ul>
+		    						<li><a href="#profile">Profile</a></li>
+		    						<li><a href="#account">Account Settings</a></li>
+		    						<li><a href="#my-gallery">My Gallery</a></li>
+		    						<li><a href="#logout">Logout</a></li>
+		    					</ul>
+		    				</li>
+		    			</ul>  
+			    			  					    		
+		    		</nav> <!-- end .account --> 
+  		
+	    		</div> 
+    		
+    		</div>
+    	
+    	</div>
+    
+    </header> <!-- end #top -->
+    <section id="masthead-home" role="banner">
+    
+    	<div class="banner-gradient">
+	    
+		    <div class="container">
+		    
+		    	<div class="row">
+		    	
+		    		<div class="span6">
+		    
+		    			<h1>@title</h1>
+		    	 
+		    			<p><a href="#" class="button"><strong>Get Started</strong> <span>&raquo;</span></a></p>
+		    	 
+		    		</div>
+		    	 
+		    	</div>
+		    	
+		    </div>
+	    
+    	</div> 
+    
+    </section> <!-- end #masthead-home -->
       
-    <div class="container-fluid">
+    <section id="content" role="main">
+    
+	    <div id="main">
+	    
+		    <div class="container">
+			    
+			    	<header id="landing-welcome" class="row">
+				
+				      <div class="span6">
+				      
+				      	<h1>@intro_sub_head</h1>
+				      	
+				      	@body
 
-      <div class="hero-unit">
-        <h1>@title</h1>
-        @body
-      </div>
+				      </div>
+				      
+				      <div class="span5 offset1">
+				      
+				      	<img src='@asset("/public/images/intro-egraph.jpg")' alt="intro-egraph">
+				      
+				      </div>
+			      
+			      </header> <!-- end #landing-welcome -->
+		     
+			      <section id="landing-steps">
+			      
+			      	<header>
+			      	
+			      		<h1>Here's How It Works.</h1>
+			      	
+			      	</header>
+			      
+			      	<ol>
 
-      <div class="row-fluid">
-        <div class="span4">
-          <h2>Heading</h2>
-           <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-          <p><a class="btn" href="#">View details &raquo;</a></p>
-        </div>
-        <div class="span4">
-          <h2>Heading</h2>
-           <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-          <p><a class="btn" href="#">View details &raquo;</a></p>
-       </div>
-        <div class="span4">
-          <h2>Heading</h2>
-          <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-          <p><a class="btn" href="#">View details &raquo;</a></p>
-        </div>
-      </div>
+			      		<li class="step-1 clearfix">
+			      		
+			      			<div class="instructions">
+				      		
+					      		<h2><strong>1.</strong> Select Your Celebrity's Photo</h2>
+					      		
+					      		<p>Your star hand-writes a personal message on every egraph, which is why each one starts with a hand selected, professional grade photo. Think of it like the poster or polaroid that you
+		stood in line to get autographed years ago.</p>
 
-      <hr>
+			      			</div> <!-- end .instructions -->
 
-      <footer>
-        <p>&copy; Company 2012</p>
-      </footer>
+									<img src='@asset("/public/images/macbook-air.png")' alt="macbook-air" />
+				      		
+			      		</li> <!-- end .step-1 -->
 
-    </div> <!-- /container -->
+			      		<li class="step-2 clearfix">
 
+			      			<div class="instructions">
+			      							      		
+					      		<h2><strong>2.</strong> Write Your Star a Note</h2>
+					      		
+					      		<p>Everyone loves to be loved, and your star is no different. Remind him of your chance encounter at the supermarket. Ask him to wish you a happy birthday. Reveal your secret crush. <em>He will personally read every single word.</em></p>
+
+					      		<p><small><a href="#">What can I write? &raquo;</a></small></p>
+
+			      			</div> <!-- end .instructions -->
+
+		      				<img src='@asset("/public/images/fpo-keyboard.png")' />
+				      		
+			      		</li> <!-- end .step-2 -->
+			      	
+			      		<li class="step-3 clearfix">
+
+			      			<div class="instructions">
+			      							      		
+					      		<h2><strong>3.</strong> Your Star Responds into the Mic</h2>
+					      		
+											<p>Believe it or not, we book a block of your celebrity's time with your name on it, moments after you finish your note. This gives him plenty of time to find a quiet spot, hand-write you a response, and speak a short message just for you into his iPad's microphone.</p>
+
+											<p><small><a href="#">How do I know it's really him? &raquo;</a></small></p>
+
+			      			</div> <!-- end .instructions -->
+				      	
+			      			<img src='@asset("/public/images/bg-fpo-ipad.png")' alt="bg-fpo-ipad" />
+				      		
+			      		</li> <!-- end .step-3 -->
+			      		
+			      	</ol>
+			      
+			      </section> <!-- end #landing-steps -->
+			      
+			      <section id="landing-details">
+			      
+			      	<header>
+			      	
+			      		<h1>It's Your Egraph &ndash; Ready to Be Shared!</h1>
+
+			      		<p>Your interaction with your star is a rare and unique experience that deserves to be enjoyed and shared. As soon as your celebrity finishes speaking, we capture his voice and script, making them available to you forever, timelessly, in a one-of-a-kind egraph.</p>
+			      	
+			      	</header>
+			      
+			      </section> <!-- end #landing-details -->
+		     
+		    </div>
+		    
+	    </div> <!-- end #main -->
+
+    </section> <!-- end #content -->
+    
+    <footer id="bottom" class="container" role="contentinfo">
+    
+    	<div class="row">
+    	
+    		<div class="span6">
+    		
+	    		<nav role="sitemap">
+	    		
+	    			<ol class="clearfix">
+	    				<li><a href="#">Home</a></li>
+	    				<li><a href="#">About Us / Contact</a></li>
+	    				<li><a href="#">FAQ</a></li>
+	    				<li><a href="#">Terms of Use</a></li>
+	    				<li><a href="#">Privacy Policy</a></li>
+	    			</ol>	
+	    			
+	    		</nav>
+    		
+    			<p><small>Copyright 2012 Egraph Corporation</small></p>
+    		
+    		</div>
+    		
+    		<div class="social span6">
+    		
+    			<ul>
+    				<li><a href="#" class="facebook">Facebook</a></li>
+    				<li><a href="#" class="twitter">Twitter</a></li>
+    				<!-- <li><a href="#" class="addthis">AddThis</a></li> -->
+    			</ul>    		
+
+    		</div> <!-- end .social -->
+    	
+    	</div>
+    
+    </footer> <!-- end #bottom -->
+    
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script> 
 		<script>window.jQuery || document.write("<script src='@asset("public/javascripts/jquery-1.7.2.min.js")'>\x3C/script>")</script> 
 		<script src='@asset("public/javascripts/functions.js")'></script> 
