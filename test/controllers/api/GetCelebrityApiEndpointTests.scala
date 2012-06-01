@@ -11,10 +11,11 @@ import org.junit.Assert._
 import org.junit.Test
 import play.test.FunctionalTest
 import sjson.json.Serializer
-import utils.FunctionalTestUtils.{CleanDatabaseAfterEachTest, willChanRequest, runScenario}
+import utils.FunctionalTestUtils.{willChanRequest, runScenario}
 import models._
 import services.http.CelebrityAccountRequestFilters
 import utils.{MockControllerMethod, TestConstants}
+import controllers.website.EgraphsFunctionalTest
 
 class GetCelebrityApiEndpointTests extends UnitFlatSpec with Mockito with ShouldMatchers
 {
@@ -52,7 +53,7 @@ class GetCelebrityApiEndpointTests extends UnitFlatSpec with Mockito with Should
   }
 }
 
-class GetCelebrityApiEndpointFunctionalTests extends FunctionalTest with CleanDatabaseAfterEachTest {
+class GetCelebrityApiEndpointFunctionalTests extends EgraphsFunctionalTest {
 
   import FunctionalTest._
 

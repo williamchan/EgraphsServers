@@ -5,10 +5,8 @@ import org.junit.Test
 import scala.collection.JavaConversions._
 import play.test.FunctionalTest
 import FunctionalTest._
-import utils.FunctionalTestUtils.CleanDatabaseAfterEachTest
-import java.net.URLDecoder
 
-class PostCelebrityAdminEndpointTests extends AdminFunctionalTest with CleanDatabaseAfterEachTest {
+class PostCelebrityAdminEndpointTests extends AdminFunctionalTest {
 
   @Test
   def testPostCelebrityCreatesCelebrity() {
@@ -41,9 +39,7 @@ class PostCelebrityAdminEndpointTests extends AdminFunctionalTest with CleanData
 
     assertStatus(302, response)
     assertHeaderEquals("Location", "/admin/celebrities/create", response)
-    val decodedCookieValue: String = URLDecoder.decode(response.cookies.get("PLAY_FLASH").value, "US-ASCII")
-    println("decodedCookieValue " + decodedCookieValue)
-    assertTrue(decodedCookieValue.contains("errors:Description,Password,E-mail address"))
+    assertTrue(getPlayFlashCookie(response).contains("errors:Description,Password,E-mail address"))
   }
 
   @Test
@@ -57,8 +53,7 @@ class PostCelebrityAdminEndpointTests extends AdminFunctionalTest with CleanData
 
     assertStatus(302, response)
     assertHeaderEquals("Location", "/admin/celebrities/create", response)
-    val decodedCookieValue: String = URLDecoder.decode(response.cookies.get("PLAY_FLASH").value, "US-ASCII")
-    assertTrue(decodedCookieValue.contains("E-mail address"))
+    assertTrue(getPlayFlashCookie(response).contains("E-mail address"))
   }
 
   @Test
@@ -67,21 +62,17 @@ class PostCelebrityAdminEndpointTests extends AdminFunctionalTest with CleanData
 
     val errorString = "Must provide either Public Name or First and Last Name"
 
-    val withFirstName: String = URLDecoder.decode(POST("/admin/celebrities",
-      getPostStrParams(firstName = "Cassius", lastName = "", publicName = "")).cookies.get("PLAY_FLASH").value, "US-ASCII")
-    assertTrue(withFirstName.contains(errorString))
+    val responseWithFirstName = POST("/admin/celebrities", getPostStrParams(firstName = "Cassius", lastName = "", publicName = ""))
+    assertTrue(getPlayFlashCookie(responseWithFirstName).contains(errorString))
 
-    val withLastName: String = URLDecoder.decode(POST("/admin/celebrities",
-      getPostStrParams(firstName = "", lastName = "Clay", publicName = "")).cookies.get("PLAY_FLASH").value, "US-ASCII")
-    assertTrue(withLastName.contains(errorString))
+    val responseWithLastName = POST("/admin/celebrities", getPostStrParams(firstName = "", lastName = "Clay", publicName = ""))
+    assertTrue(getPlayFlashCookie(responseWithLastName).contains(errorString))
 
-    val withFullName: String = URLDecoder.decode(POST("/admin/celebrities",
-      getPostStrParams(firstName = "Cassius", lastName = "Clay", publicName = "")).cookies.get("PLAY_FLASH").value, "US-ASCII")
-    assertTrue(!withFullName.contains(errorString))
+    val responseWithFullName = POST("/admin/celebrities", getPostStrParams(firstName = "Cassius", lastName = "Clay", publicName = ""))
+    assertTrue(!getPlayFlashCookie(responseWithFullName).contains(errorString))
 
-    val withPublicName: String = URLDecoder.decode(POST("/admin/celebrities",
-      getPostStrParams(firstName = "", lastName = "", publicName = "Muhammad Ali")).cookies.get("PLAY_FLASH").value, "US-ASCII")
-    assertTrue(!withPublicName.contains(errorString))
+    val responseWithPublicName = POST("/admin/celebrities", getPostStrParams(firstName = "", lastName = "", publicName = "Muhammad Ali"))
+    assertTrue(!getPlayFlashCookie(responseWithPublicName).contains(errorString))
   }
 
   @Test
@@ -97,8 +88,7 @@ class PostCelebrityAdminEndpointTests extends AdminFunctionalTest with CleanData
 
     assertStatus(302, response)
     assertHeaderEquals("Location", "/admin/celebrities/create", response)
-    val decodedCookieValue: String = URLDecoder.decode(response.cookies.get("PLAY_FLASH").value, "US-ASCII")
-    assertTrue(decodedCookieValue.contains("errors:Celebrity with e-mail address already exists"))
+    assertTrue(getPlayFlashCookie(response).contains("errors:Celebrity with e-mail address already exists"))
   }
 
 //  @Test
@@ -113,8 +103,7 @@ class PostCelebrityAdminEndpointTests extends AdminFunctionalTest with CleanData
 //
 //    assertStatus(302, response)
 //    assertHeaderEquals("Location", "/admin/celebrities/create", response)
-//    val decodedCookieValue: String = URLDecoder.decode(response.cookies.get("PLAY_FLASH").value, "US-ASCII")
-//    assertTrue(decodedCookieValue.contains("A non-celebrity account with that e-mail already exists. Provide the correct password to turn this account into a celebrity account"))
+//    assertTrue(getPlayFlashCookie(response).contains("A non-celebrity account with that e-mail already exists. Provide the correct password to turn this account into a celebrity account"))
 //  }
 
   @Test
@@ -128,8 +117,7 @@ class PostCelebrityAdminEndpointTests extends AdminFunctionalTest with CleanData
 
     assertStatus(302, response)
     assertHeaderEquals("Location", "/admin/celebrities/create", response)
-    val decodedCookieValue: String = URLDecoder.decode(response.cookies.get("PLAY_FLASH").value, "US-ASCII")
-    assertTrue(decodedCookieValue.contains("errors:password"))
+    assertTrue(getPlayFlashCookie(response).contains("errors:password"))
   }
 
   @Test
@@ -145,8 +133,7 @@ class PostCelebrityAdminEndpointTests extends AdminFunctionalTest with CleanData
 
     assertStatus(302, response)
     assertHeaderEquals("Location", "/admin/celebrities/create", response)
-    val decodedCookieValue: String = URLDecoder.decode(response.cookies.get("PLAY_FLASH").value, "US-ASCII")
-    assertTrue(decodedCookieValue.contains("errors:Celebrity with same website name exists. Provide different public name"))
+    assertTrue(getPlayFlashCookie(response).contains("errors:Celebrity with same website name exists. Provide different public name"))
   }
 
   private def getPostStrParams(celebrityEmail: String = "ali@egraphs.com",

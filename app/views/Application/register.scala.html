@@ -1,0 +1,53 @@
+@(errorFields: Option[List[String]], fields: (String) => String, fbAppId: String, callbackUrl: String
+)(implicit session: play.mvc.Scope.Session)
+
+@import controllers.WebsiteControllers
+@import services.Utils.lookupUrl
+@import views.Application.tags.html.authenticityToken
+@import views.Application.tags.html.errorMessage
+@import views.Application.tags.html.formField
+@import views.Application.html.content_base
+
+@content_base(title="Egraphs - Register", body=body, head=head)
+
+@postRegister = @{
+lookupUrl("WebsiteControllers.postRegister")
+}
+
+@fbScriptSrc = @{ "https://connect.facebook.net/en_US/all.js#appId=" + fbAppId + "&xfbml=1" }
+
+@head = {
+<script src='@asset("public/twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
+}
+
+@body = {
+<div class="admin-content">
+  <div class="form row">
+    <div class="span12 form-column">
+      <form method="POST" action="@postRegister">
+        <fieldset>
+          @authenticityToken()
+          <legend>Sign up</legend>
+          @formField(id="name", label="Name", inputType="text", width="span4", fields=fields)
+          @formField(id="email", label="Email", inputType="text", width="span4", fields=fields)
+          @formField(id="password", label="Choose Password", inputType="password", width="span4", fields=fields)
+          @formField(id="password2", label="Verify Password", inputType="password", width="span4", fields=fields)
+          <div class="actions">
+            <button type="submit" id="submit-button" class="btn large primary fade in">Create my account</button>
+            @errorMessage(errorFields)
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+  <div>
+    <div id="fb-root"></div>
+    <script src=@fbScriptSrc></script>
+    <fb:registration
+            fields="name,email"
+            redirect-uri=@callbackUrl
+            width="530">
+    </fb:registration>
+  </div>
+</div>
+}

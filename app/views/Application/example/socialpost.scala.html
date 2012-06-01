@@ -1,7 +1,12 @@
-@()
-
-@tweetText = @{"Check out my Egraph!"}
-@tweetLink = @{"https://www.google.com"}
+@(fbAppId: String
+, tweetText: String = "Check out my Egraph!"
+, tweetLink: String = "https://www.google.com"
+, fbPostLink: String = "https://www.egraphs.com"
+, fbPostPhoto: String = "https://fbrell.com/f8.jpg"
+, fbPostName: String = "Post Name"
+, fbPostCaption: String = "Post Caption"
+, fbPostDescription: String = "Post Description"
+)
 
 <!doctype html>
 <html>
@@ -21,18 +26,18 @@
 <a href="https://twitter.com/share" class="twitter-share-button" data-text="@tweetText" data-url="@tweetLink" data-count="none">Tweet</a>
 
 <script>
-  FB.init({appId: "156115741184892", status: true, cookie: true});
+  FB.init({appId: @fbAppId, status: true, cookie: true});
 
   function postToFeed() {
 
     // calling the API ...
     var obj = {
       method: 'feed',
-      link: 'www.egraphs.com',
-      picture: 'https://fbrell.com/f8.jpg',
-      name: 'Post Name',
-      caption: 'Post Caption',
-      description: 'Post Description.'
+      link: '@fbPostLink',
+      picture: '@fbPostPhoto',
+      name: '@fbPostName',
+      caption: '@fbPostCaption',
+      description: '@fbPostDescription'
     };
 
     function callback(response) {

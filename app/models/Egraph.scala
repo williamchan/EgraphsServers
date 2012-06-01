@@ -468,6 +468,7 @@ case class EgraphStory(
         case DateOrdered => formatTimestamp(orderTimestamp)
         case DateSigned => formatTimestamp(signingTimestamp)
         case FinishLink => "</a>"
+        case _ => throw new IllegalArgumentException("Template param not recognized")
       }
 
       (templateField.name, paramValue)

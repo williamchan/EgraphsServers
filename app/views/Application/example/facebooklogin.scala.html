@@ -1,4 +1,8 @@
-@()
+@(fbAppId: String, callbackUrl: String)
+
+@fbScriptSrc = @{
+  "https://connect.facebook.net/en_US/all.js#appId=" + fbAppId + "&xfbml=1"
+}
 
 <!doctype html>
 <html>
@@ -9,11 +13,11 @@
 <body>
 <div>
   <div id="fb-root"></div>
-  <script src="https://connect.facebook.net/en_US/all.js#appId=156115741184892&xfbml=1"></script>
+  <script src=@fbScriptSrc></script>
 
   <fb:registration
           fields="name,email"
-          redirect-uri="http://staging.egraphs.com/facebooklogin/callback"
+          redirect-uri=@callbackUrl
           width="530">
   </fb:registration>
 </div>

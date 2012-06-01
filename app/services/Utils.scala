@@ -56,7 +56,7 @@ class Utils @Inject()(@PlayConfig() playConfig: Properties)
   }
 
   /**
-   * Returns up the ActionDefinition for a controller method with a parameter map.
+   * Returns the ActionDefinition for a controller method with a parameter map.
    *
    * For example, to redirect to Shaq's celebrity page:
    * {{{
@@ -75,6 +75,15 @@ class Utils @Inject()(@PlayConfig() playConfig: Properties)
     } else {
       Router.reverse(controllerMethod, params: Map[String, Object])
     }
+  }
+
+  /**
+   * Returns the ActionDefinition with an absolute URL, ie https://www.egraphs.com/myroute.
+   */
+  def lookupAbsoluteUrl(controllerMethod: String, params: Map[String, AnyRef]=Map()): Router.ActionDefinition = {
+    val action = lookupUrl(controllerMethod, params)
+    action.absolute()
+    action
   }
 
   /**

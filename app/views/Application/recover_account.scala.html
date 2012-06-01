@@ -1,0 +1,43 @@
+@(errorFields: Option[List[String]]
+)(implicit session: play.mvc.Scope.Session)
+
+@import controllers.WebsiteControllers
+@import services.Utils.lookupUrl
+@import views.Application.tags.html.authenticityToken
+@import views.Application.tags.html.errorMessage
+@import views.Application.html.content_base
+
+@content_base(title="Egraphs - Password Recovery", body=body, head=head)
+
+@postRecoverAccount = @{
+  lookupUrl("WebsiteControllers.postRecoverAccount")
+}
+
+@head = {
+<script src='@asset("public/twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
+}
+
+@body = {
+<div class="admin-content">
+  <div class="form row">
+    <div class="span12 form-column">
+      <form method="POST" action="@postRecoverAccount">
+        <fieldset>
+          @authenticityToken()
+          <legend>Reset your Password</legend>
+          <div class="clearfix">
+            <label for="email">Email</label>
+            <div class="input">
+              <input class="span4" id="email" name="email" type="text">
+            </div>
+          </div>
+          <div class="actions">
+            <button type="submit" id="submit-button" class="btn large primary fade in">Submit</button>
+            @errorMessage(errorFields)
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+</div>
+}

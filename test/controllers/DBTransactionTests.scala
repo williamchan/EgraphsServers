@@ -3,11 +3,12 @@ package controllers
 import org.junit.Assert._
 import org.junit.Test
 import play.test.FunctionalTest
-import utils.FunctionalTestUtils.{CleanDatabaseAfterEachTest, runScenario}
+import utils.FunctionalTestUtils.runScenario
 import play.Play
+import website.EgraphsFunctionalTest
 
 
-class DBTransactionTests extends FunctionalTest with CleanDatabaseAfterEachTest {
+class DBTransactionTests extends EgraphsFunctionalTest {
 
   import FunctionalTest._
 

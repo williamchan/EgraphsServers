@@ -9,6 +9,9 @@ import org.joda.time.DateTime
  * Convenience methods for dealing with time
  */
 object Time {
+
+  val millisInDay = 86400000
+
   //
   // Public members
   //

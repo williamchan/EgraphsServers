@@ -1,0 +1,15 @@
+@(email: String)
+
+@import views.Application.html.content_base
+
+@content_base(title="Egraphs - Password Recovery", body=body, head=head)
+
+@head = {
+<script src='@asset("public/twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
+}
+
+@body = {
+<div class="admin-content">
+  <legend>We've sent an email to @email with instructions on how to reset your password.</legend>
+</div>
+}

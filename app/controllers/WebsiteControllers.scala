@@ -1,10 +1,9 @@
 package controllers
 
 import website._
-import admin._
-import example.{PostFacebookLoginCallbackEndpoint, GetFacebookLoginEndpoint, GetSocialPostEndpoint}
+import website.admin._
+import example.{GetFacebookLoginEndpoint, GetSocialPostEndpoint}
 import nonproduction.PostBuyDemoProductEndpoint
-import website.GetRootEndpoint
 import services.blobs.Blobs
 import services.mail.Mail
 import services.payment.Payment
@@ -57,15 +56,28 @@ object WebsiteControllers extends Controller
   with PostLogoutAdminEndpoint
   with PostOrderAdminEndpoint
 
+  // customer account endpoints
+  with GetRegisterEndpoint
+  with PostRegisterEndpoint
+  with GetLoginEndpoint
+  with PostLoginEndpoint
+  with PostLogoutEndpoint
+  with GetRecoverAccountEndpoint
+  with PostRecoverAccountEndpoint
+  with GetRecoverAccountConfirmationEndpoint
+  with GetResetPasswordEndpoint
+  with PostResetPasswordEndpoint
+  with PostFacebookLoginCallbackEndpoint
+
   // social media exploratory work
   with GetSocialPostEndpoint
   with GetFacebookLoginEndpoint
-  with PostFacebookLoginCallbackEndpoint
 {
 
   import services.AppConfig.instance
 
   val adminIdKey: String = "admin"
+  val customerIdKey: String = "customer"
 
   // Provide endpoint dependencies
   override protected val dbSession = instance[DBSession]

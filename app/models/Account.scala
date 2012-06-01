@@ -6,6 +6,8 @@ import java.sql.Timestamp
 import services.db.{KeyedCaseClass, Saves, Schema}
 import com.google.inject.Inject
 import services.{AppConfig, Time}
+import java.util.UUID
+import org.apache.commons.codec.binary.Base64
 
 /**
  * Basic account information for any user in the system
@@ -15,6 +17,8 @@ case class Account(
   email: String = "",
   passwordHash: Option[String] = None,
   passwordSalt: Option[String] = None,
+  resetPasswordKey: Option[String] = None,
+  fbUserId: Option[String] = None,
   customerId: Option[Long] = None,
   celebrityId: Option[Long] = None,
   administratorId: Option[Long] = None,
@@ -37,7 +41,7 @@ case class Account(
   }
 
   /**
-   * Sets a new password onto the entity.
+   * Sets a new password onto the entity. Also, sets resetPasswordKey to None, thereby expiring it.
    *
    * @param newPassword the password to set onto the returned element empty passwords or
    *    passwords fewer than 4 characters are invalid.
@@ -55,8 +59,39 @@ case class Account(
       case (_, false) => Left(lengthCheck)
       case (true, true) =>
         val password = Password(newPassword, id)
-        Right(copy(passwordHash = Some(password.hash), passwordSalt = Some(password.salt)))
+        Right(copy(passwordHash = Some(password.hash),
+          passwordSalt = Some(password.salt),
+          resetPasswordKey = None))
     }
+  }
+
+  /**
+   * @return an account with resetPasswordKey set to a newly generated value
+   */
+  def withResetPasswordKey: Account = {
+    val uuid = UUID.randomUUID()
+    val expirationTime = System.currentTimeMillis + Time.millisInDay
+    val key = Base64.encodeBase64URLSafeString(uuid.toString.getBytes) + '.' + expirationTime
+    copy(resetPasswordKey = Some(key))
+  }
+
+  /**
+   * @param attempt the key to verify
+   * @return whether attempt matches non-expired resetPasswordKey, or false if resetPasswordKey is None
+   */
+  def verifyResetPasswordKey(attempt: String): Boolean = {
+    if (resetPasswordKey.isEmpty) return false
+    val indexOfExpirationTime = attempt.lastIndexOf(".") + 1
+    if (indexOfExpirationTime <= 0) return false
+
+    // This guards against malformed attempt Strings
+    val expirationTime = try {
+      attempt.substring(indexOfExpirationTime).toLong
+    } catch {
+      case _ => return false
+    }
+
+    (resetPasswordKey.get == attempt) && (System.currentTimeMillis < expirationTime)
   }
 
   //
@@ -138,6 +173,8 @@ class AccountStore @Inject() (schema: Schema) extends Saves[Account] with SavesC
       theOld.email := theNew.email,
       theOld.passwordHash := theNew.passwordHash,
       theOld.passwordSalt := theNew.passwordSalt,
+      theOld.resetPasswordKey := theNew.resetPasswordKey,
+      theOld.fbUserId := theNew.fbUserId,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated,
       theOld.celebrityId := theNew.celebrityId,
