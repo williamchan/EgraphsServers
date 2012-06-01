@@ -224,16 +224,19 @@ a:hover { text-decoration: none; }
 
 }
 
+/* !Banner */
+
 section[role=banner] {
 	position: relative;
 	z-index: 0;
 }
 
+/* !Content */
+
 #content {
 
 	position: relative;
 	background: @contentBackground;
-	padding-bottom: 40px;
 	
 	#main {
 
@@ -249,10 +252,6 @@ section[role=banner] {
 		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#efefef', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */	
 
 		position: relative;
-		top: -46px;
-		max-width: 1020px;
-		margin-left: auto;
-		margin-right: auto;
 		border-top: 8px solid @white;
 		padding-top: 40px;
 		padding-bottom: 40px;					
@@ -260,6 +259,8 @@ section[role=banner] {
 
 	
 }
+
+/* !Bottom */
 
 #bottom {
 
@@ -344,8 +345,8 @@ section[role=banner] {
 
 }
 
-@media (min-width: 1020px) {
-
+@media (min-width: 1140px) {
+	
 	#top {
 	
 		.logo {
@@ -363,23 +364,20 @@ section[role=banner] {
 	
 	}
 
-	#bottom {
-	
-		.row { 
-			margin-left: -40px;
-			margin-right: -40px;
-		}
+	#content {
+
+		padding-bottom: 40px;
+		margin-bottom: 0;
 		
-		[class*=span] {
-			margin-left: 0;
-			margin-right: 0;
-			width: auto;
+		#main {
+
+			max-width: 1020px;			
+			top: -46px;
+			margin-left: auto;
+			margin-right: auto;
+		
 		}
 
-		.social {
-			float: right;
-		}	
-		
 	}
 
 }
