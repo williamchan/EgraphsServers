@@ -1,16 +1,6 @@
 package services.blobs
 
-import java.util.Properties
-import org.jclouds.filesystem.reference.FilesystemConstants
-import play.Play.configuration
-import org.jclouds.blobstore.{BlobStoreContextFactory, BlobStoreContext, BlobStore}
-import org.jclouds.io.Payload
-import org.jclouds.aws.s3.AWSS3Client
-import org.jclouds.s3.domain.CannedAccessPolicy
-import java.io._
-import play.mvc.Http.Request
-import com.google.inject.Inject
-import org.jclouds.blobstore.domain.{BlobMetadata, Blob}
+import org.jclouds.blobstore.BlobStoreContext
 
 /**
  * Interface for different BlobStore implementations.
