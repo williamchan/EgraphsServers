@@ -171,7 +171,7 @@ object TestControllers extends Controller with Logging {
       "\"No products found for celebrity " + celebrity.publicName + "\""
     } else {
       val buyer = customerServices.customerStore.findOrCreateByEmail(celebrityEmail, celebrity.publicName.get)
-      for (i <- 0 until 5) {
+      for (i <- 0 until numOrders) {
         buyer.buy(product.get, buyer, recipientName=celebrityEmail, messageToCelebrity=Some(msg), requestedMessage=Some(msg))
           .copy(reviewStatus = Order.ReviewStatus.ApprovedByAdmin.stateValue)
           .save()

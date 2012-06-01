@@ -82,7 +82,7 @@ class OrderTests extends UnitFlatSpec
   }
 
   "renderedForApi" should "serialize the correct Map for the API" in {
-    val order = newEntity.save()
+    val order = newEntity.copy(requestedMessage = Some("requestedMessage"), messageToCelebrity = Some("messageToCelebrity")).save()
     val buyer = order.buyer
 
     val rendered = order.renderedForApi
@@ -93,9 +93,21 @@ class OrderTests extends UnitFlatSpec
     rendered("recipientName") should be(buyer.name)
     rendered("amountPaidInCents") should be(order.amountPaid.getAmountMinor)
     rendered("reviewStatus") should be(order.reviewStatus)
+    rendered("requestedMessage") should be(order.requestedMessage.get)
+    rendered("messageToCelebrity") should be(order.messageToCelebrity.get)
+    rendered.contains("audioPrompt") should be(true)
     rendered.contains("created") should be(true)
     rendered.contains("updated") should be(true)
     rendered.contains("product") should be(true)
+  }
+
+  "generateAudioPrompt" should "generate audio prompt from audioPromptTemplates" in {
+    val order = TestData.newSavedOrder()
+    val recipient = order.recipient
+    val celebrity = order.product.celebrity
+    order.generateAudioPrompt(Some(0)) should be("From " + celebrity.publicName.get + " to " + recipient.name + " with love")
+    order.generateAudioPrompt(Some(1)) should be("Hi " + recipient.name + ", this is " + celebrity.publicName.get + ". Let’s grow old together, that might be fun")
+    order.generateAudioPrompt(Some(2)) should be("Roses are red, violets are blue, this is an Egraph from " + celebrity.publicName.get + " to " + recipient.name)
   }
 
   "approveByAdmin" should "change reviewStatus to ApprovedByAdmin" in {
