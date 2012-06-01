@@ -240,9 +240,16 @@ object Order {
 
   // Update this list with marketing-approved copy per SER-56
   lazy val audioPromptTemplates = List(
-    "From {signer_name} to {recipient_name} with love",
-    "Hi {recipient_name}, this is {signer_name}. Let’s grow old together, that might be fun",
-    "Roses are red, violets are blue, this is an Egraph from {signer_name} to {recipient_name}"
+    "Yo {recipient_name}, it’s {signer_name}. It was awesome getting your message. Hope you enjoy this egraph.",
+    "{recipient_name}, it’s {signer_name} here. Thanks for being a great fan. Hopefully we can win some games for you down the stretch.",
+    "Hey {recipient_name}, it’s {signer_name}. Hope you’re having a great day. Thanks for the support!",
+    "This is {signer_name}. {recipient_name}, thanks so much for reaching out to me. I really appreciated your message. Enjoy this egraph!",
+    "Hey, {recipient_name}, it’s {signer_name}. I’ll look for you to post this egraph on twitter!",
+    "{recipient_name}, it’s {signer_name}. Keep swinging for the fences.",
+    "What’s up, {recipient_name}? It’s {signer_name} here. Thanks for connecting with me. Hope you dig this egraph and share it with your friends.",
+    "{recipient_name}, it’s {signer_name} here. I hope you enjoy this egraph. It’s a great way for me to connect with you during the season. Have a great one!",
+    "Hey, it’s {signer_name} creating this egraph for {recipient_name}. Thanks for being an awesome fan.",
+    "Hey, {recipient_name}, it’s {signer_name} here. Thanks for reaching out to me through Egraphs. Have a great day."
   )
 
   //

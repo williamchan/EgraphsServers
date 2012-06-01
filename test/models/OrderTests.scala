@@ -102,12 +102,21 @@ class OrderTests extends UnitFlatSpec
   }
 
   "generateAudioPrompt" should "generate audio prompt from audioPromptTemplates" in {
-    val order = TestData.newSavedOrder()
-    val recipient = order.recipient
-    val celebrity = order.product.celebrity
-    order.generateAudioPrompt(Some(0)) should be("From " + celebrity.publicName.get + " to " + recipient.name + " with love")
-    order.generateAudioPrompt(Some(1)) should be("Hi " + recipient.name + ", this is " + celebrity.publicName.get + ". Let’s grow old together, that might be fun")
-    order.generateAudioPrompt(Some(2)) should be("Roses are red, violets are blue, this is an Egraph from " + celebrity.publicName.get + " to " + recipient.name)
+    val signer_name = "Signer"
+    val recipient_name = "Recipient"
+    val order = TestData.newSavedOrder().copy(recipientName = recipient_name).save()
+    order.product.celebrity.copy(publicName = Some(signer_name)).save()
+
+    order.generateAudioPrompt(Some(0)) should be("Yo Recipient, it’s Signer. It was awesome getting your message. Hope you enjoy this egraph.")
+    order.generateAudioPrompt(Some(1)) should be("Recipient, it’s Signer here. Thanks for being a great fan. Hopefully we can win some games for you down the stretch.")
+    order.generateAudioPrompt(Some(2)) should be("Hey Recipient, it’s Signer. Hope you’re having a great day. Thanks for the support!")
+    order.generateAudioPrompt(Some(3)) should be("This is Signer. Recipient, thanks so much for reaching out to me. I really appreciated your message. Enjoy this egraph!")
+    order.generateAudioPrompt(Some(4)) should be("Hey, Recipient, it’s Signer. I’ll look for you to post this egraph on twitter!")
+    order.generateAudioPrompt(Some(5)) should be("Recipient, it’s Signer. Keep swinging for the fences.")
+    order.generateAudioPrompt(Some(6)) should be("What’s up, Recipient? It’s Signer here. Thanks for connecting with me. Hope you dig this egraph and share it with your friends.")
+    order.generateAudioPrompt(Some(7)) should be("Recipient, it’s Signer here. I hope you enjoy this egraph. It’s a great way for me to connect with you during the season. Have a great one!")
+    order.generateAudioPrompt(Some(8)) should be("Hey, it’s Signer creating this egraph for Recipient. Thanks for being an awesome fan.")
+    order.generateAudioPrompt(Some(9)) should be("Hey, Recipient, it’s Signer here. Thanks for reaching out to me through Egraphs. Have a great day.")
   }
 
   "approveByAdmin" should "change reviewStatus to ApprovedByAdmin" in {
