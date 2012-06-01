@@ -9,30 +9,33 @@
 	
 	.banner-gradient {	
 		background: url(../images/bg-banner-gradient.png) repeat-y 50% 0;
-		padding: 100px 0;
+		padding: 100px 0 146px 0;
 	}
 		
 	h1 {
 		color: @white;
 		font-weight: 300;
-		font-size: 55px;
-		line-height: 1.25em;
+		font-size: 52px;
+		line-height: 1.15em;
+		margin-bottom: .75em;
 		text-shadow: 0 3px 3px rgba(0, 0, 0, .5);
 	}
+	
+	p { margin-bottom: 0; }
 	
 }
 
 .cssgradients #masthead-home .banner-gradient {	
-	background: -moz-linear-gradient(left,  rgba(26,26,26,1) 10%, rgba(26,26,26,0) 30%, rgba(26,26,26,0) 70%, rgba(26,26,26,1) 90%); /* FF3.6+ */
+	background: -moz-linear-gradient(left, rgba(26,26,26,1) 10%, rgba(26,26,26,0) 30%, rgba(26,26,26,0) 70%, rgba(26,26,26,1) 90%); /* FF3.6+ */
 	background: -webkit-gradient(linear, left top, right top, color-stop(10%,rgba(26,26,26,1)), color-stop(30%,rgba(26,26,26,0)), color-stop(70%,rgba(26,26,26,0)), color-stop(90%,rgba(26,26,26,1))); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(left,  rgba(26,26,26,1) 10%,rgba(26,26,26,0) 30%,rgba(26,26,26,0) 70%,rgba(26,26,26,1) 90%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(left,  rgba(26,26,26,1) 10%,rgba(26,26,26,0) 30%,rgba(26,26,26,0) 70%,rgba(26,26,26,1) 90%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(left,  rgba(26,26,26,1) 10%,rgba(26,26,26,0) 30%,rgba(26,26,26,0) 70%,rgba(26,26,26,1) 90%); /* IE10+ */
-	background: linear-gradient(left,  rgba(26,26,26,1) 10%,rgba(26,26,26,0) 30%,rgba(26,26,26,0) 70%,rgba(26,26,26,1) 90%); /* W3C */
+	background: -webkit-linear-gradient(left, rgba(26,26,26,1) 10%,rgba(26,26,26,0) 30%,rgba(26,26,26,0) 70%,rgba(26,26,26,1) 90%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(left, rgba(26,26,26,1) 10%,rgba(26,26,26,0) 30%,rgba(26,26,26,0) 70%,rgba(26,26,26,1) 90%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(left, rgba(26,26,26,1) 10%,rgba(26,26,26,0) 30%,rgba(26,26,26,0) 70%,rgba(26,26,26,1) 90%); /* IE10+ */
+	background: linear-gradient(left, rgba(26,26,26,1) 10%,rgba(26,26,26,0) 30%,rgba(26,26,26,0) 70%,rgba(26,26,26,1) 90%); /* W3C */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='@grayDarker', endColorstr='@grayDarker',GradientType=1 ); /* IE6-9 */
 }
 
-#intro-home {
+#landing-welcome {
 
 	padding-bottom: 40px;
 	
@@ -48,10 +51,189 @@
 		line-height: 1.5em;
 	}
 
-}
+} // end #landing-home
+
+#landing-steps {
+
+	header {
+	
+		border-bottom: 1px solid @white;
+		margin-bottom: 40px;
+	
+		h1 {
+			font-weight: 100;
+			font-size: 30px;
+			line-height: 1.25em;
+			margin-bottom: 0;
+			padding-bottom: .5em;
+			border-bottom: 1px solid #e6e6e6;
+		}
+	
+	}
+
+	ol {
+		
+		list-style: none;	
+		padding: 0;
+		margin: 0;
+		
+		li {
+		
+			margin-bottom: 20px;
+			
+			.instructions {
+							
+				h2 {
+					font-weight: 300;
+					font-size: 20px;
+					line-height: 1.25em;
+					margin-bottom: .5em;					
+				}
+			
+			}
+			
+			img { display: none; }
+		
+		}
+				
+	}
+
+} // end #landing-steps
+
+#landing-details {
+
+	position: relative;
+	padding-bottom: 20px;
+			
+	header {
+		
+		h1 {
+			font-weight: 300;
+			font-size: 30px;
+			line-height: 1.25em;
+			margin-bottom: .25em;
+		}
+		
+	}
+	
+} // end #landing-details
 
 @media (min-width: 1020px) {
 
-	#masthead-home .row { margin-left: -60px; }
+	#masthead-home .row { margin-left: -60px; } // end #masthead-home
+
+	#landing-steps {
+	
+		header {
+		
+			text-align: center;
+		
+			h1 { font-size: 40px; }
+		
+		}
+		
+		ol {			
+	
+			max-width: 700px;
+			margin: 0 auto;	
+		
+			li {
+			
+				margin-bottom: 40px;
+			
+				img { display: block;	}
+				
+				.instructions {
+	
+					margin-bottom: 40px;
+			
+					h2 {
+						
+						font-size: 30px;				
+						strong { margin-left: -35px; }
+					
+					}
+	
+					p {
+						
+						font-size: 18px;
+						line-height: 1.5em;
+						
+						em {
+							font-weight: 600;
+						}
+						
+						small a { text-decoration: underline; }
+						
+					}
+				
+				}
+				
+			}
+			
+			.step-1  { text-align: center; }
+				
+			.step-2 {
+			
+				margin-bottom: 80px;
+			
+				.instructions {
+				
+					position: relative;
+					z-index: 1;
+					float: right;
+					width: 50%;
+					text-align: left;	
+					min-height: 280px;
+				
+				}
+				
+				img {
+					position: absolute;
+					z-index: 0;
+					left: 0;
+				}
+			
+			} // end .step-2 
+		
+			.step-3 {
+			
+				.instructions {
+				
+					position: relative;
+					z-index: 1;
+					float: left;
+					width: 50%;
+					text-align: left;		
+				
+				}			
+			
+				img {
+					position: absolute;
+					z-index: 0;
+					right: 0;
+					top: 1340px;
+				}
+		
+			} // end .step-3 
+		
+		}
+		
+	} // end #landing-steps
+	
+	#landing-details {
+		
+		margin: -80px -40px 0 -40px;
+		
+		header {
+
+			text-align: center;
+			.gradient-white;		
+			text-align: center;
+			padding-top: 40px;
+
+		}
+		
+	}
 
 }

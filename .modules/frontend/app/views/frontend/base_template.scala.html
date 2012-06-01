@@ -1,4 +1,4 @@
-@(title: String = "Default string", intro_sub_head: String = "Sub Head Goes Here", body: => Html, afterBody: => Html = Html.empty)
+@(title: String = "Default HTML", intro_sub_head: String = "Sub Head Goes Here", body: => Html, afterBody: => Html = Html.empty)
 
 <!doctype html> 
 <!--[if lt IE 7 ]> <html class="ie lt-ie9 ie6 no-js" lang="en"> <![endif]-->
@@ -9,7 +9,7 @@
   <head>
     <meta charset="utf-8">
     
-    <title>@title | Egraphs</title>
+    <title>Egraphs</title>
     
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta name="description" content="">
@@ -39,7 +39,7 @@
     	
     			<div class="logo span3">
     				
-    				<a href="/" title="Egraphs"><img src="http://placehold.it/220x70" alt="Egraphs" /></a>
+    				<a href="#" title="Egraphs"><img src="http://placehold.it/220x70" alt="Egraphs" /></a>
     			
     			</div>
     	
@@ -85,7 +85,6 @@
     	</div>
     
     </header> <!-- end #top -->
-    
     <section id="masthead-home" role="banner">
     
     	<div class="banner-gradient">
@@ -94,11 +93,11 @@
 		    
 		    	<div class="row">
 		    	
-		    		<div class="span5">
+		    		<div class="span6">
 		    
 		    			<h1>@title</h1>
 		    	 
-		    			<p><a href="#">Get Started</a></p>
+		    			<p><a href="#" class="button"><strong>Get Started</strong> <span>&raquo;</span></a></p>
 		    	 
 		    		</div>
 		    	 
@@ -116,7 +115,7 @@
 	    
 		    <div class="container">
 			    
-			    	<div id="intro-home" class="row">
+			    	<header id="landing-welcome" class="row">
 				
 				      <div class="span6">
 				      
@@ -128,11 +127,84 @@
 				      
 				      <div class="span5 offset1">
 				      
-				      	<img src='@asset("public/images/intro-egraph.jpg")' alt="intro-egraph">
+				      	<img src='@asset("/public/images/intro-egraph.jpg")' alt="intro-egraph">
 				      
 				      </div>
 			      
-			      </div> <!-- end #intro-home -->
+			      </header> <!-- end #landing-welcome -->
+		     
+			      <section id="landing-steps">
+			      
+			      	<header>
+			      	
+			      		<h1>Here's How It Works.</h1>
+			      	
+			      	</header>
+			      
+			      	<ol>
+
+			      		<li class="step-1 clearfix">
+			      		
+			      			<div class="instructions">
+				      		
+					      		<h2><strong>1.</strong> Select Your Celebrity's Photo</h2>
+					      		
+					      		<p>Your star hand-writes a personal message on every egraph, which is why each one starts with a hand selected, professional grade photo. Think of it like the poster or polaroid that you
+		stood in line to get autographed years ago.</p>
+
+			      			</div> <!-- end .instructions -->
+
+									<img src='@asset("/public/images/macbook-air.png")' alt="macbook-air" />
+				      		
+			      		</li> <!-- end .step-1 -->
+
+			      		<li class="step-2 clearfix">
+
+			      			<div class="instructions">
+			      							      		
+					      		<h2><strong>2.</strong> Write Your Star a Note</h2>
+					      		
+					      		<p>Everyone loves to be loved, and your star is no different. Remind him of your chance encounter at the supermarket. Ask him to wish you a happy birthday. Reveal your secret crush. <em>He will personally read every single word.</em></p>
+
+					      		<p><small><a href="#">What can I write? &raquo;</a></small></p>
+
+			      			</div> <!-- end .instructions -->
+
+		      				<img src='@asset("/public/images/fpo-keyboard.png")' />
+				      		
+			      		</li> <!-- end .step-2 -->
+			      	
+			      		<li class="step-3 clearfix">
+
+			      			<div class="instructions">
+			      							      		
+					      		<h2><strong>3.</strong> Your Star Responds into the Mic</h2>
+					      		
+											<p>Believe it or not, we book a block of your celebrity's time with your name on it, moments after you finish your note. This gives him plenty of time to find a quiet spot, hand-write you a response, and speak a short message just for you into his iPad's microphone.</p>
+
+											<p><small><a href="#">How do I know it's really him? &raquo;</a></small></p>
+
+			      			</div> <!-- end .instructions -->
+				      	
+			      			<img src='@asset("/public/images/bg-fpo-ipad.png")' alt="bg-fpo-ipad" />
+				      		
+			      		</li> <!-- end .step-3 -->
+			      		
+			      	</ol>
+			      
+			      </section> <!-- end #landing-steps -->
+			      
+			      <section id="landing-details">
+			      
+			      	<header>
+			      	
+			      		<h1>It's Your Egraph &ndash; Ready to Be Shared!</h1>
+
+			      		<p>Your interaction with your star is a rare and unique experience that deserves to be enjoyed and shared. As soon as your celebrity finishes speaking, we capture his voice and script, making them available to you forever, timelessly, in a one-of-a-kind egraph.</p>
+			      	
+			      	</header>
+			      
+			      </section> <!-- end #landing-details -->
 		     
 		    </div>
 		    

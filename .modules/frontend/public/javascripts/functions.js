@@ -1,14 +1,14 @@
 $(document).ready(function(){
 	
-	$('#top .account-options a:first').click(function(e) {
+	$('#top .account').click(function(e) {
 	
-		var this_anchor = $(this);
+		var account_options = $(this).find('.account-options');
 	
 		$('body').one('click',function(){
-			this_anchor.parent().removeClass('active');
+			account_options.removeClass('active');
 		});
 
-		this_anchor.parent().addClass('active');
+		account_options.addClass('active');
 	
 		e.stopPropagation();	
 		e.preventDefault();
