@@ -9,6 +9,7 @@ import com.google.inject.{Provider, Inject}
 import org.squeryl.Query
 import services._
 import java.awt.image.BufferedImage
+import models.PublishedStatus.EnumVal
 
 
 /**
@@ -38,10 +39,11 @@ case class Celebrity(id: Long = 0,
                      profilePhotoUpdated: Option[String] = None,
                      enrollmentStatusValue: String = EnrollmentStatus.NotEnrolled.value,
                      isLeftHanded: Boolean = false,
+                     _publishedStatus: String = PublishedStatus.Unpublished.name,
                      created: Timestamp = Time.defaultTimestamp,
                      updated: Timestamp = Time.defaultTimestamp,
                      services: CelebrityServices = AppConfig.instance[CelebrityServices]
-) extends KeyedCaseClass[Long] with HasCreatedUpdated
+) extends KeyedCaseClass[Long] with HasCreatedUpdated with HasPublishedStatus[Celebrity]
 {
   //
   // Additional DB columns
@@ -168,6 +170,13 @@ case class Celebrity(id: Long = 0,
   override def unapplied = Celebrity.unapply(this)
 
   //
+  // PublishedStatus[Celebrity] methods
+  //
+  override def withPublishedStatus(status: EnumVal) = {
+    this.copy(_publishedStatus = status.name)
+  }
+
+  //
   // Private members
   //
   /** Blobstore folder name for stored profile photo data. */
@@ -194,6 +203,7 @@ case class Celebrity(id: Long = 0,
     imageType=ImageAsset.Png,
     services=services.imageAssetServices.get
   )
+
 }
 
 class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {
