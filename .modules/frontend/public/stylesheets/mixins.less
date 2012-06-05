@@ -22,3 +22,19 @@
   -webkit-box-shadow: @arguments;
   -moz-box-shadow: @arguments;
 }
+
+.border-radius-top(@radius) {
+	-webkit-border-top-left-radius: @arguments;
+	-webkit-border-top-right-radius: @arguments;
+	-moz-border-radius-topleft: @arguments;
+	-moz-border-radius-topright: @arguments;
+	border-top-left-radius: @arguments;
+	border-top-right-radius: @arguments;
+}
+
+.transitions(@color, @duration, @easing) {
+	-moz-transition: @arguments;
+	-webkit-transition: @arguments;
+	-o-transition: @arguments;
+	transition: @arguments;
+}

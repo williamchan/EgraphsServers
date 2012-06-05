@@ -3,8 +3,9 @@
 #masthead-home {
 
 	.banner-gradient {
-		padding: 100px 0 0 0;
-		height: 456px;
+		max-width: 1550px;
+		margin: 0 auto;
+		padding: 40px 0;
 	}
 	
 	background: @grayDarker url(../images/landing-masthead-1.jpg) no-repeat 50% 0;
@@ -41,7 +42,7 @@
 		line-height: 1.5em;
 	}
 
-} // end #landing-home
+} // end #landing-welcome
 
 #landing-steps {
 
@@ -93,10 +94,11 @@
 #landing-details {
 
 	position: relative;
-	padding-bottom: 20px;
 			
 	header {
-		
+	
+		margin-bottom: 40px;
+				
 		h1 {
 			font-weight: 300;
 			font-size: 30px;
@@ -104,9 +106,153 @@
 			margin-bottom: .25em;
 		}
 		
+		p {
+			font-size: 18px;
+			line-height: 1.5em;
+			margin-bottom: 0;
+		}
+		
+	}
+	
+	figure {
+		
+		text-align: center;
+		position: relative;
+		margin: 0 0 40px 0;
+		padding: 0;
+		
+		img {
+			display: block;
+			margin: 0 auto 20px auto;
+		}
+		
+		figcaption p span { display: none; }
+		
 	}
 	
 } // end #landing-details
+
+#landing-more {
+
+	margin-bottom: 40px;
+
+	header {
+		
+		text-align: center;
+		margin-bottom: 40px;
+		
+		h1 {
+			margin-bottom: 1em;
+		}
+		
+		p { margin-bottom: 0; }
+		
+	}
+
+	.actions {
+
+		article {
+		
+			padding-top: 50px;
+			margin-bottom: 40px;
+	
+			h2 {
+			
+				font-weight: 600;
+				font-size: 18px;
+				line-height: 1.25em;
+				margin-bottom: .25em;
+				
+				a { color: @grayDark; }
+				a:hover { color: @orange; }
+			
+			}
+
+		}
+
+		.view {
+			background: url(../images/icon-more-view.png) no-repeat 0 0;
+		}
+	
+		.print {
+			background: url(../images/icon-more-print.png) no-repeat 0 0;
+		}
+	
+		.share {
+			background: url(../images/icon-more-share.png) no-repeat 0 0;
+		}
+	
+	}
+	
+	footer {
+	
+		border-top: 1px solid #efefef;
+		
+		h3 {
+			border-top: 1px solid #fff;
+			padding-top: 40px;
+			font-weight: 600;
+			text-transform: uppercase;
+			font-size: 14px;
+			line-height: 1.25em;
+			margin-bottom: .25em;
+			letter-spacing: .1em;
+		}
+		
+		p {
+			font-size: 14px;
+			line-height: 1.5em;
+			margin-bottom: 2em;
+		}
+	
+		article {
+			
+			text-align: center;
+			margin-bottom: 20px;
+			
+			figure {
+			
+				margin: 0 0 10px 0;
+				padding: 0;
+			
+				a {
+	
+					display: block;
+					border: 5px solid transparent;
+				
+					img {
+						display: block;
+					}
+				
+				}
+				
+				a:hover {
+					border-color: @orange;
+				}
+			
+			}
+			
+			h4 {
+			
+				line-height: 1.25em;
+				margin-bottom: 0;
+				font-weight: 600;
+					
+				a { color: @orange; }
+				
+				a:hover { color: @linkColor; }
+				
+			}
+			
+			p {
+				margin-bottom: 0;
+			}	
+			
+		}
+			
+	}
+
+} // #landing-more
 
 @media (min-width: 1340px) {
 
@@ -130,9 +276,18 @@
 	
 }
 
-@media (min-width: 1140px) {
+@media (min-width: 1040px) {
 
-	#masthead-home .row { margin-left: -60px; } // end #masthead-home
+	#masthead-home {
+		
+		.banner-gradient {
+			padding: 100px 0 0 0;
+			height: 456px;
+		}
+		
+		.row { margin-left: -60px; } 
+		
+	} // end #masthead-home
 
 	#landing-steps {
 	
@@ -236,16 +391,149 @@
 	#landing-details {
 		
 		margin: -80px -40px 0 -40px;
-		
-		header {
-
-			text-align: center;
+					
+		header {		
 			.gradient-white;		
-			text-align: center;
+			text-align: center;	
 			padding-top: 40px;
-
+			margin-bottom: 0;
 		}
 		
-	}
+		.content {
+			padding-top: 40px;		
+			background: @white;
+		}
+		
+	} // end #landing-details
 
+	#landing-more {
+		
+		margin-left: -40px;
+		margin-right: -40px;
+		padding: 0 40px;
+		background: @white;
+
+	} // end #landing-more
+
+}
+
+@media (min-width: 979px) {
+
+	#landing-details {
+
+		.wrap {
+			max-width: 700px;
+			margin: 0 auto;		
+		}
+
+		figure {
+
+			figcaption {
+			
+				position: absolute;		
+								
+				p {
+					
+					text-align: left;
+					font-size: 14px;
+					line-height: 1.5em;
+					margin-bottom: 0;
+				
+					a {
+						text-decoration: underline;
+					}
+				
+					span {
+						display: block;
+						position: absolute;
+						text-indent: -9999px;
+						overflow: hidden;
+					}
+					
+				}
+				
+			}
+			
+			.signature {
+			
+				width: 160px;
+				padding-right: 10px;
+	
+				left: -90px;
+				top: 90px;
+				
+				p {
+	
+					text-align: right;
+				
+					span {
+						left: 100%;
+						top: 10px;
+						width: 185px;
+						height: 122px;
+						background: url(../images/bg-diagram-signature.png) no-repeat 0 0;
+					}
+					
+				}
+				
+			}
+			
+			.name {
+			
+				width: 80px;
+				padding-left: 10px;
+				
+				right: -25px;
+				top: 347px;
+				
+				p {
+				
+					text-align: left;
+				
+					span {
+						right: 100%;
+						top: 10px;
+						width: 250px;
+						height: 1px;
+						background: #29abe2;
+					}
+					
+				}
+			
+			}
+			
+			.audio {
+			
+				width: 100px;
+				padding-right: 10px;
+				
+				left: -80px;
+				top: 326px;
+				
+				p {
+				
+					text-align: right;
+					
+					span {
+						left: 100%;
+						top: 10px;
+						width: 220px;
+						height: 1px;
+						background: #29abe2;					
+					}
+				
+				}
+			
+			}
+		
+		}
+		
+	} // end #landing-details
+
+}
+
+@media (max-width:480px) {
+	
+	
+	
 }

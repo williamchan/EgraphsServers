@@ -2,7 +2,15 @@
 
 /* !Globals */
 
+/* !Links */
+
+a, a:link, a:visited {
+	.transitions(color, 0.25s, ease);
+}
+
 a:hover { text-decoration: none; }
+
+/* !Buttons */
 
 .button {
 	
@@ -15,16 +23,16 @@ a:hover { text-decoration: none; }
 	strong {
 		display: block;
 		float: left;
-		font-weight: 400;
+		font-weight: 600;
 		font-size: 14px;
-		letter-spacing: 1px;
+		letter-spacing: .1em;
 		line-height: 32px;
 		color: @white;
 		text-shadow: 0 -1px -1px @grayDark; 
 		height: 35px;
 		background: url(../images/bg-button-mid.png) repeat-x 0 0;
-		padding-left: 20px;
-		padding-right: 20px;
+		padding-left: 25px;
+		padding-right: 25px;
 	}
 
 	span {
@@ -45,6 +53,29 @@ a:hover { text-decoration: none; }
 	
 	strong, span { background-position: 0 100%; }
 
+}
+
+.to-top {
+	
+	float: right;
+	padding: 0;
+	margin: 0;
+	font-size: 14px;
+	line-height: 1em;
+	
+	a {
+		color: @grayLighter;
+		display: block;
+		margin: 0 5px -40px 0;
+		padding: 0 20px;
+		line-height: 40px;
+		height: 40px;
+		.border-radius-top(5px);
+		.box-shadow(0px, 0, 5px, rgba(0, 0, 0, .25));	
+	}
+	
+	a:hover { color: @orange; }
+	
 }
 
 /* !Top */
@@ -231,7 +262,7 @@ a:hover { text-decoration: none; }
 	
 	}
 
-}
+} // end #top
 
 /* !Banner */
 
@@ -292,16 +323,7 @@ section[role=banner] {
 			li { 
 				font-size: 12px;
 				line-height: 1em;
-				float: left;
-				padding-right: 10px;
-				border-right: 1px solid @grayLighter;
-				margin-right: 10px;
-			}
-			
-			li:last-child { 
-				padding-right: 0;
-				border-right: none;
-				margin-right: 0;
+				margin-bottom: .5em;
 			}
 			
 		}
@@ -318,6 +340,7 @@ section[role=banner] {
 		
 		ul {
 		
+			float: right;
 			padding: 0;		
 			margin: 0;
 			list-style: none;
@@ -354,7 +377,7 @@ section[role=banner] {
 
 }
 
-@media (min-width: 1140px) {
+@media (min-width: 1040px) {
 	
 	#top {
 	
@@ -388,6 +411,53 @@ section[role=banner] {
 		}
 
 	}
+	
+	#bottom {
+	
+		.row {
+		
+			margin: 0 -40px;
+
+			[class*=span] { 
+				margin: 0; 
+				width: auto;
+			}
+		
+		}
+	
+	}
+
+}
+
+@media (min-width: 979px) {
+
+	#bottom {
+			
+		nav ol {
+			
+			li {
+				float: left;
+				padding-right: 10px;
+				border-right: 1px solid @grayLighter;
+				margin-right: 10px;
+				margin-bottom: 0;
+			}
+
+			li:last-child { 
+				padding-right: 0;
+				border-right: none;
+				margin-right: 0;
+			}
+		
+		}
+		
+		.social {
+			
+			float: right;
+			
+		}	
+	
+	} // end #bottom
 
 }
 
@@ -412,7 +482,13 @@ section[role=banner] {
 		
 		}
 	
-	}
+	} // end #top
+
+}
+
+@media (max-width: 720px) {
+
+	#bottom .social ul { float: none; }
 
 }
 
