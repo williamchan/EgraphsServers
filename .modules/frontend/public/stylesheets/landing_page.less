@@ -115,6 +115,8 @@
 	}
 	
 	figure {
+	
+		display: none;
 		
 		text-align: center;
 		position: relative;
@@ -427,6 +429,8 @@
 		}
 
 		figure {
+		
+			display: block;
 
 			figcaption {
 			
@@ -532,8 +536,58 @@
 
 }
 
+@media (max-width: 767px) {
+
+	#landing-welcome {
+	
+		.span6 {
+			margin-bottom: 40px;
+		}
+	
+	} // #landing-welcome
+
+}
+
+@media (max-width: 767px) and (min-width: 640px) {
+
+	#landing-welcome {
+	
+		.span6 {
+			float: left;
+			width: 55%;
+		}
+		
+		.span5 {
+			float: right;
+			width: 40%;
+		}
+	
+	} // end #landing-welcome
+
+}
+
+@media (max-width: 767px) and (min-width: 481px) {
+
+	#landing-more {
+	
+		footer {
+		
+			article {
+			
+				float: left;
+				width: 48%;
+				margin-right: 2%;
+			
+			}
+		
+		}
+	
+	} // end #landing-more
+
+}
+
 @media (max-width:480px) {
+
 	
-	
-	
+
 }

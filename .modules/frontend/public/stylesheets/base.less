@@ -84,7 +84,7 @@ a:hover { text-decoration: none; }
 
 	position: relative;
 	z-index: 1;
-	.box-shadow(0px, 4px, 8px, rgba(0, 0, 0, .5));	
+	.box-shadow(0px, 4px, 8px, rgba(0, 0, 0, .25));	
 	background: @offWhite;	
 	padding-top: 2px;
 	padding-bottom: 2px;
@@ -98,6 +98,29 @@ a:hover { text-decoration: none; }
 	
 	a { color: @gray; }
 	a:hover { color: @linkColorHover; }
+	
+	.logo {
+	
+		h1 {
+		
+			width: 175px;
+		
+			a {
+				display: block;
+				height: 70px;
+				text-indent: -9999px;
+				overflow: hidden;
+				background: url(../images/logo.png) no-repeat 0 0;
+			}
+			
+			a:hover { 
+				opacity: .75;
+				-moz-opacity: .75;
+			}
+		
+		}
+	
+	}
 	
 	.explore {
 	
@@ -486,15 +509,97 @@ section[role=banner] {
 
 }
 
-@media (max-width: 720px) {
+@media (max-width: 767px) {
+
+	#top { 
+			
+		.span3 { float: left; }
+		
+		.span6 { float: right; }
+
+		.explore p a { padding-left: 20px; }
+
+		.account > ul {
+			padding-left: 10px;
+			padding-right: 10px;
+		}
+		
+		.social > ul { padding-left: 10px; }
+		
+	}
 
 	#bottom .social ul { float: none; }
+
+}
+
+@media (max-width: 550px) {
+
+	#top {
+	
+		.explore { display: none; }
+			
+		.account > ul {
+			position: static;
+			
+			.account-options ul {
+				left: 0;
+				top: 100%;
+			}
+			
+		}
+	
+	}
+
+}
+
+@media (max-width: 480px) {
+
+	#top {
+	
+		padding-top: 10px;
+		padding-bottom: 0;
+		
+		.logo h1 {
+			
+			width: 100%;
+			
+			a { background-position: 50% 0; }
+			
+		}
+	
+		.span3,.span6 {
+			float: none;
+			overflow: hidden;
+		}
+	
+		.account {
+		
+			float: left;
+			border: none;
+			
+			> ul {
+			
+				padding-left: 0;
+				padding-right: 0;
+				border: none;
+			
+			}
+			
+		
+		}
+	
+	}
 
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio: 2) { 
 
 	#top {
+	
+		.logo h1 a {		
+			background-image: url(../images/logo-ios.png);
+			background-size: 148px 70px;		
+		}
 
 		.account {
 			
