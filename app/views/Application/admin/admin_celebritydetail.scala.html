@@ -39,7 +39,7 @@
         <fieldset>
           @authenticityToken()
           <input id="celebrityId" name="celebrityId" type="hidden" value="@fields("celebrityId")">
-          <input id="publishedStatus" name="publishedStatus" type="hidden" value="@fields("publishedStatus")">
+          <input id="publishedStatus" name="publishedStatusString" type="hidden" value="@fields("publishedStatusString")">
           <legend>Celebrity Details</legend>
 
           @formField(id="celebrityEmail", label="E-mail address", inputType="text", editable=isCreate, width="span4", fields=fields)

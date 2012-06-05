@@ -17,7 +17,7 @@ define([], function() {
       };
 
       publishButton.text(publishStatus.val());
-      
+
       if(publishButton === "Published"){
         publishButton.button("toggle");
       }

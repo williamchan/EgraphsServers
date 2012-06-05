@@ -32,7 +32,7 @@ private[controllers] trait GetCelebrityAdminEndpoint {
               flash.put("lastName", celebrity.lastName.get)
               flash.put("publicName", celebrity.publicName.get)
               flash.put("description", celebrity.description.get)
-              flash.put("publishedStatus", celebrity.publishedStatus.toString)
+              flash.put("publishedStatusString", celebrity.publishedStatus.toString)
 
               GetCelebrityDetail.getCelebrityDetail(isCreate = false, celebrity = Some(celebrity))
             }
