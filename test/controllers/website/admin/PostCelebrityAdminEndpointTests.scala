@@ -7,6 +7,10 @@ import play.test.FunctionalTest
 import FunctionalTest._
 import utils.FunctionalTestUtils.CleanDatabaseAfterEachTest
 import java.net.URLDecoder
+import services.AppConfig
+import models.{PublishedStatus, CelebrityStore}
+import services.db.{TransactionSerializable, DBSession}
+import play.mvc.Http.Response
 
 class PostCelebrityAdminEndpointTests extends AdminFunctionalTest with CleanDatabaseAfterEachTest {
 
@@ -36,13 +40,12 @@ class PostCelebrityAdminEndpointTests extends AdminFunctionalTest with CleanData
   def testPostCelebrityValidatesFields() {
     createAndLoginAsAdmin()
 
-    val postStrParams: Map[String, String] = getPostStrParams("", "", "", "", "", "")
+    val postStrParams: Map[String, String] = getPostStrParams(0, "", "", "", "", "", "")
     val response = POST("/admin/celebrities", postStrParams)
 
     assertStatus(302, response)
     assertHeaderEquals("Location", "/admin/celebrities/create", response)
     val decodedCookieValue: String = URLDecoder.decode(response.cookies.get("PLAY_FLASH").value, "US-ASCII")
-    println("decodedCookieValue " + decodedCookieValue)
     assertTrue(decodedCookieValue.contains("errors:Description,Password,E-mail address"))
   }
 
@@ -149,19 +152,66 @@ class PostCelebrityAdminEndpointTests extends AdminFunctionalTest with CleanData
     assertTrue(decodedCookieValue.contains("errors:Celebrity with same website name exists. Provide different public name"))
   }
 
-  private def getPostStrParams(celebrityEmail: String = "ali@egraphs.com",
+  @Test
+  def testPostCelebrityValidatesPublishedStatus() {
+    createAndLoginAsAdmin()
+
+    val postStrParams: Map[String, String] = getPostStrParams(publishedStatusString = "-")
+
+    val response = POST("/admin/celebrities", postStrParams)
+    assertStatus(302, response)
+    assertHeaderEquals("Location", "/admin/celebrities/create", response)
+    val decodedCookieValue: String = URLDecoder.decode(response.cookies.get("PLAY_FLASH").value, "US-ASCII")
+    assertTrue(decodedCookieValue.contains("errors:Error setting celebrity's published status, please contact support"))
+  }
+
+  @Test
+  def testPostCelebrityCreatesAndUpdatesStatus() {
+    import AppConfig.instance
+
+    createAndLoginAsAdmin()
+    val response = postCelebrityPublishedStatus(status = PublishedStatus.Unpublished.name)
+
+    assertStatus(302, response)
+    assertHeaderEquals("Location", "/admin/celebrities/1?action=preview", response)
+
+    instance[DBSession].connected(TransactionSerializable) {
+      assertEquals(instance[CelebrityStore].get(1).publishedStatus, PublishedStatus.Unpublished)
+    }
+
+    val publishedResponse = postCelebrityPublishedStatus(id = 1, status = PublishedStatus.Published.name)
+
+    assertStatus(302, publishedResponse)
+    assertHeaderEquals("Location", "/admin/celebrities/1?action=preview", response)
+
+    instance[DBSession].connected(TransactionSerializable) {
+      assertEquals(instance[CelebrityStore].get(1).publishedStatus, PublishedStatus.Published)
+    }
+
+  }
+
+  private def getPostStrParams(celebrityId: Long = 0,
+                               celebrityEmail: String = "ali@egraphs.com",
                                celebrityPassword: String = "derp",
                                firstName: String = "Cassius",
                                lastName: String = "Clay",
                                publicName: String = "Muhammad Ali",
-                               description: String = "I am the greatest!"): Map[String, String] = {
+                               description: String = "I am the greatest!",
+                               publishedStatusString: String = "Published" ): Map[String, String] = {
     Map[String, String](
+      "celebrityId" -> celebrityId.toString,
       "celebrityEmail" -> celebrityEmail,
       "celebrityPassword" -> celebrityPassword,
       "firstName" -> firstName,
       "lastName" -> lastName,
       "publicName" -> publicName,
-      "description" -> description
+      "description" -> description,
+      "publishedStatusString" -> publishedStatusString
     )
+  }
+
+  private def postCelebrityPublishedStatus(id: Long = 0, status: String) : Response = {
+    val postStrParams = getPostStrParams(publishedStatusString = status, celebrityId = id)
+    POST("/admin/celebrities", postStrParams)
   }
 }

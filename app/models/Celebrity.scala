@@ -274,7 +274,8 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
       theOld.enrollmentStatusValue := theNew.enrollmentStatusValue,
       theOld.isLeftHanded := theNew.isLeftHanded,
       theOld.created := theNew.created,
-      theOld.updated := theNew.updated
+      theOld.updated := theNew.updated,
+      theOld._publishedStatus := theNew._publishedStatus
     )
   }
 
