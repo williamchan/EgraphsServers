@@ -12,6 +12,12 @@
 
 @head = {
 <script src='@asset("public/twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
+<script src='@asset("public/twitter-bootstrap-1.4.0/js/bootstrap-buttons.js")' type="text/javascript"></script>
+<script type="text/javascript">
+    require(["admin-celebritydetail-page"], function(pageScripts) {
+      pageScripts.go();
+    })
+</script>
 }
 
 @postCelebrity = @{
@@ -29,10 +35,11 @@
   </h1>
   <div class="form row">
     <div class="span12 form-column">
-      <form id="celebrity-form" method="POST" action='@postCelebrity' enctype="multipart/form-data">
+      <form id="admin-celebrity-detail" method="POST" action='@postCelebrity' enctype="multipart/form-data">
         <fieldset>
           @authenticityToken()
           <input id="celebrityId" name="celebrityId" type="hidden" value="@fields("celebrityId")">
+          <input id="publishedStatus" name="publishedStatus" type="hidden" value="@fields("publishedStatus")">
           <legend>Celebrity Details</legend>
 
           @formField(id="celebrityEmail", label="E-mail address", inputType="text", editable=isCreate, width="span4", fields=fields)
@@ -50,6 +57,7 @@
 
           @formField(id="profileImage", label="Profile Photo", inputType="file", width="span8", help=Some(profileHelp), fields=fields)
           @profileHelp = { Must be a 200x200 JPG or PNG }
+          <button class="btn toggle" data-toggle="toggle" id="publish-button" type="button">Published</button>
 
           <div class="actions">
             <button type="submit" id="submit-button" class="btn primary fade in">Save</button>

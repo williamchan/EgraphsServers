@@ -286,7 +286,11 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
   }
 }
 
-abstract sealed class EnrollmentStatus(val value: String)
+abstract sealed class EnrollmentStatus(val value: String) {
+  override def toString: String = {
+    value
+  }
+}
 
 object EnrollmentStatus {
   case object NotEnrolled extends EnrollmentStatus("NotEnrolled")
