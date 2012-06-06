@@ -28,20 +28,31 @@ trait RequireAuthenticityTokenFilter {
   def apply[A](continue: => A)(implicit session: Session, request: Request): Either[Forbidden, A]
 }
 
-/**
- * Provides a RequireAuthenticityTokenFilter to Guice. In test mode it provides a version that doesn't actually
- * check.
- **/
+
 class RequireAuthenticityTokenFilterProvider @Inject()(@PlayId playId: String)
   extends Provider[RequireAuthenticityTokenFilter]
 {
-  override def get = {
-    playId match {
-      case "test" => new DontRequireAuthenticityToken
-      case _ => new DoRequireAuthenticityToken
+  //
+  // Public members
+  //
+  def apply(doCheck: Boolean = true): RequireAuthenticityTokenFilter = {
+    // Only ever check if both (1) we're not in test mode and (2) doCheck is true
+    (playId, doCheck) match {
+      case ("test", _) | (_, false) => new DontRequireAuthenticityToken
+      case (_, true) => new DoRequireAuthenticityToken
     }
   }
+
+
+  //
+  // Provider[RequireAuthenticityTokenFilter] members
+  //
+  override def get = {
+    this.apply(doCheck=true)
+  }
+
 }
+
 
 /** Implementation that actually checks the response */
 private[http] class DoRequireAuthenticityToken @Inject() extends RequireAuthenticityTokenFilter {
@@ -54,6 +65,7 @@ private[http] class DoRequireAuthenticityToken @Inject() extends RequireAuthenti
     }
   }
 }
+
 
 /** Implementation that just processes the request */
 private[http] class DontRequireAuthenticityToken @Inject() extends RequireAuthenticityTokenFilter {
