@@ -18,7 +18,7 @@ class PostCelebrityAdminEndpointTests extends AdminFunctionalTest with CleanData
   def testPostCelebrityCreatesCelebrity() {
     createAndLoginAsAdmin()
 
-    val postStrParams: Map[String, String] = getPostStrParams()
+    val postStrParams: Map[String, String] = getPostCelebrityStrParams()
     val response = POST("/admin/celebrities", postStrParams)
 
     assertStatus(302, response)
@@ -29,7 +29,7 @@ class PostCelebrityAdminEndpointTests extends AdminFunctionalTest with CleanData
   def testPostCelebrityCreatesCelebrityWithFullNameAsPublicName() {
     createAndLoginAsAdmin()
 
-    val postStrParams: Map[String, String] = getPostStrParams(publicName = "")
+    val postStrParams: Map[String, String] = getPostCelebrityStrParams(publicName = "")
     val response = POST("/admin/celebrities", postStrParams)
 
     assertStatus(302, response)
@@ -40,7 +40,7 @@ class PostCelebrityAdminEndpointTests extends AdminFunctionalTest with CleanData
   def testPostCelebrityValidatesFields() {
     createAndLoginAsAdmin()
 
-    val postStrParams: Map[String, String] = getPostStrParams(0, "", "", "", "", "", "")
+    val postStrParams: Map[String, String] = getPostCelebrityStrParams(0, "", "", "", "", "", "")
     val response = POST("/admin/celebrities", postStrParams)
 
     assertStatus(302, response)
@@ -53,7 +53,7 @@ class PostCelebrityAdminEndpointTests extends AdminFunctionalTest with CleanData
   def testPostCelebrityValidatesEmail() {
     createAndLoginAsAdmin()
 
-    val postStrParams: Map[String, String] = getPostStrParams(
+    val postStrParams: Map[String, String] = getPostCelebrityStrParams(
       celebrityEmail = "not a valid email"
     )
     val response = POST("/admin/celebrities", postStrParams)
@@ -71,19 +71,19 @@ class PostCelebrityAdminEndpointTests extends AdminFunctionalTest with CleanData
     val errorString = "Must provide either Public Name or First and Last Name"
 
     val withFirstName: String = URLDecoder.decode(POST("/admin/celebrities",
-      getPostStrParams(firstName = "Cassius", lastName = "", publicName = "")).cookies.get("PLAY_FLASH").value, "US-ASCII")
+      getPostCelebrityStrParams(firstName = "Cassius", lastName = "", publicName = "")).cookies.get("PLAY_FLASH").value, "US-ASCII")
     assertTrue(withFirstName.contains(errorString))
 
     val withLastName: String = URLDecoder.decode(POST("/admin/celebrities",
-      getPostStrParams(firstName = "", lastName = "Clay", publicName = "")).cookies.get("PLAY_FLASH").value, "US-ASCII")
+      getPostCelebrityStrParams(firstName = "", lastName = "Clay", publicName = "")).cookies.get("PLAY_FLASH").value, "US-ASCII")
     assertTrue(withLastName.contains(errorString))
 
     val withFullName: String = URLDecoder.decode(POST("/admin/celebrities",
-      getPostStrParams(firstName = "Cassius", lastName = "Clay", publicName = "")).cookies.get("PLAY_FLASH").value, "US-ASCII")
+      getPostCelebrityStrParams(firstName = "Cassius", lastName = "Clay", publicName = "")).cookies.get("PLAY_FLASH").value, "US-ASCII")
     assertTrue(!withFullName.contains(errorString))
 
     val withPublicName: String = URLDecoder.decode(POST("/admin/celebrities",
-      getPostStrParams(firstName = "", lastName = "", publicName = "Muhammad Ali")).cookies.get("PLAY_FLASH").value, "US-ASCII")
+      getPostCelebrityStrParams(firstName = "", lastName = "", publicName = "Muhammad Ali")).cookies.get("PLAY_FLASH").value, "US-ASCII")
     assertTrue(!withPublicName.contains(errorString))
   }
 
@@ -91,9 +91,9 @@ class PostCelebrityAdminEndpointTests extends AdminFunctionalTest with CleanData
   def testPostCelebrityValidatesThatNoCelebrityWithSameEmailExists() {
     createAndLoginAsAdmin()
 
-    assertHeaderEquals("Location", "/admin/celebrities/1?action=preview", POST("/admin/celebrities", getPostStrParams()))
+    assertHeaderEquals("Location", "/admin/celebrities/1?action=preview", POST("/admin/celebrities", getPostCelebrityStrParams()))
 
-    val postStrParams: Map[String, String] = getPostStrParams(
+    val postStrParams: Map[String, String] = getPostCelebrityStrParams(
       publicName = "Cassius Clay"
     )
     val response = POST("/admin/celebrities", postStrParams)
@@ -124,7 +124,7 @@ class PostCelebrityAdminEndpointTests extends AdminFunctionalTest with CleanData
   def testPostCelebrityValidatesPassword() {
     createAndLoginAsAdmin()
 
-    val postStrParams: Map[String, String] = getPostStrParams(
+    val postStrParams: Map[String, String] = getPostCelebrityStrParams(
       celebrityPassword = "-"
     )
     val response = POST("/admin/celebrities", postStrParams)
@@ -139,9 +139,9 @@ class PostCelebrityAdminEndpointTests extends AdminFunctionalTest with CleanData
   def testPostCelebrityValidatesCelebrityUrlSlugIsUnique() {
     createAndLoginAsAdmin()
 
-    assertHeaderEquals("Location", "/admin/celebrities/1?action=preview", POST("/admin/celebrities", getPostStrParams()))
+    assertHeaderEquals("Location", "/admin/celebrities/1?action=preview", POST("/admin/celebrities", getPostCelebrityStrParams()))
 
-    val postStrParams: Map[String, String] = getPostStrParams(
+    val postStrParams: Map[String, String] = getPostCelebrityStrParams(
       celebrityEmail = "ali2@egraphs.com"
     )
     val response = POST("/admin/celebrities", postStrParams)
@@ -156,7 +156,7 @@ class PostCelebrityAdminEndpointTests extends AdminFunctionalTest with CleanData
   def testPostCelebrityValidatesPublishedStatus() {
     createAndLoginAsAdmin()
 
-    val postStrParams: Map[String, String] = getPostStrParams(publishedStatusString = "-")
+    val postStrParams: Map[String, String] = getPostCelebrityStrParams(publishedStatusString = "-")
 
     val response = POST("/admin/celebrities", postStrParams)
     assertStatus(302, response)
@@ -190,28 +190,10 @@ class PostCelebrityAdminEndpointTests extends AdminFunctionalTest with CleanData
 
   }
 
-  private def getPostStrParams(celebrityId: Long = 0,
-                               celebrityEmail: String = "ali@egraphs.com",
-                               celebrityPassword: String = "derp",
-                               firstName: String = "Cassius",
-                               lastName: String = "Clay",
-                               publicName: String = "Muhammad Ali",
-                               description: String = "I am the greatest!",
-                               publishedStatusString: String = "Published" ): Map[String, String] = {
-    Map[String, String](
-      "celebrityId" -> celebrityId.toString,
-      "celebrityEmail" -> celebrityEmail,
-      "celebrityPassword" -> celebrityPassword,
-      "firstName" -> firstName,
-      "lastName" -> lastName,
-      "publicName" -> publicName,
-      "description" -> description,
-      "publishedStatusString" -> publishedStatusString
-    )
-  }
+
 
   private def postCelebrityPublishedStatus(id: Long = 0, status: String) : Response = {
-    val postStrParams = getPostStrParams(publishedStatusString = status, celebrityId = id)
+    val postStrParams = getPostCelebrityStrParams(publishedStatusString = status, celebrityId = id)
     POST("/admin/celebrities", postStrParams)
   }
 }
