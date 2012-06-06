@@ -3,7 +3,7 @@ package services
 import blobs.BlobModule
 import db.DBModule
 import graphics.GraphicsModule
-import http.{HttpModule, PlayConfig}
+import http.{HttpModule}
 import mail.{MailProvider, Mail}
 import models._
 import models.vbg._
@@ -12,8 +12,6 @@ import payment.PaymentModule
 import signature.SignatureBiometricsModule
 import voice.VoiceBiometricsModule
 import uk.me.lings.scalaguice.{InjectorExtensions, ScalaModule}
-import java.util.Properties
-import play.Play
 import com.google.inject.{Injector, Singleton, Guice, AbstractModule}
 
 class AppConfig extends AbstractModule with ScalaModule {

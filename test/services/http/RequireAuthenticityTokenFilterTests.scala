@@ -58,6 +58,9 @@ class RequireAuthenticityTokenFilterTests extends EgraphsUnitTest {
     }
   }
 
+  //
+  // Private members
+  //
   private def newRequestAndMockSession(requestToken: String, sessionToken: String): (Request, Session) = {
     val request = FunctionalTest.newRequest()
     val session = mock[play.mvc.Scope.Session]
@@ -72,7 +75,7 @@ class RequireAuthenticityTokenFilterTests extends EgraphsUnitTest {
     List(new DontRequireAuthenticityToken, new DoRequireAuthenticityToken)
   }
 
-  def getFilterViaProviderApply(playId: String, doCheck: Boolean): RequireAuthenticityTokenFilter = {
+  private def getFilterViaProviderApply(playId: String, doCheck: Boolean): RequireAuthenticityTokenFilter = {
     new RequireAuthenticityTokenFilterProvider(playId).apply(doCheck)
   }
 }

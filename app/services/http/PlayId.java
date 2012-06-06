@@ -12,6 +12,15 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 /**
  * Guice binding annotation that identifies the String ID
  * of the current play application. See services.http.HttpModule
+ * Usage:
+ *
+ * {{{
+ *     class SomeService(@PlayId playId: String) {
+ *       def printCurrentPlayId {
+ *         println("The current play ID (options: test, staging, demo, live) is: " + playId)
+ *       }
+ *     }
+ * }}}
  */
 @BindingAnnotation
 @Target({ FIELD, PARAMETER, METHOD }) @Retention(RUNTIME)

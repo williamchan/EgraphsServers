@@ -7,9 +7,15 @@ import services.db.{TransactionIsolation, TransactionSerializable, DBSession}
 import play.mvc.Scope.Session
 
 /**
- * Establishes an appropriate execution context for a request.
- * Every function that handles requests begin with a call to an instance of this class
- * or an instance of another class that delegates to it.
+ * Establishes an appropriate execution context for a request handler.
+ *
+ * Every function that handles requests should begin with a call to an instance of this
+ * class or an instance of another class that delegates to it (e.g.
+ * [[services.http.POSTControllerMethod]])
+ *
+ * @param logging used to set up an IDed logging context for the request
+ * @param db used to make a DB connection for the request where appropriate
+ * @param httpsFilter used to ensure that the request occurs over SSL.
  */
 class ControllerMethod @Inject()(logging: LoggingContext, db: DBSession, httpsFilter: HttpsFilter) {
 
@@ -55,8 +61,9 @@ class ControllerMethod @Inject()(logging: LoggingContext, db: DBSession, httpsFi
  * A ControllerMethod with features slightly tweaked for POSTs, particularly
  * re: anti-CSRF support.
  *
- * @param controllerMethod delegate that sets up most context for the request
- * @param authenticityTokenFilter provider for an authenticityTokenFilter.
+ * @param controllerMethod delegate that sets up most of the context for the request
+ * @param authenticityTokenFilter provider for an authenticityTokenFilter which protects
+ *     against CSRF attacks.
  */
 class POSTControllerMethod @Inject()(
   controllerMethod: ControllerMethod,
@@ -74,6 +81,8 @@ class POSTControllerMethod @Inject()(
    * @param session the current session
    * @tparam A return type of Operation
    *
+   * @return either the return value of the `operation` code block or
+   *     a [[play.mvc.results.Forbidden]]
    */
   def apply[A](doCsrfCheck: Boolean = true)(operation: => A)(implicit request: Request, session: Session): Any = {
     controllerMethod() {
@@ -86,13 +95,13 @@ class POSTControllerMethod @Inject()(
 
 
 /**
- * Deviates from POSTControllerMethod in that it specifies that CSRF protection is not to be used
+ * Deviates from POSTControllerMethod by specifying that CSRF protection is not to be used
  * as per http://stackoverflow.com/questions/2267637/what-are-some-viable-techniques-for-combining-csrf-protection-with-restful-apis
  *
- * As long as browsers never contain the Authorization header we should be safe from CSRF.
+ * As long as browsers never contain the Authorization header the API should be safe from CSRF.
  * And they shouldn't contain that header because browsers never hit the API.
  *
- * @param postControllerMethod
+ * @param postControllerMethod delegate that sets up most of the context for the request
  */
 class POSTApiControllerMethod @Inject()(postControllerMethod: POSTControllerMethod) {
 
@@ -104,7 +113,9 @@ class POSTApiControllerMethod @Inject()(postControllerMethod: POSTControllerMeth
    * @param request the current request
    * @param session the current session
    * @tparam A return type of `operation`
-   * @return
+   *
+   * @return the return value of the `operation` code block or the error state of
+   *     postControllerMethod
    */
   def apply[A](operation: => A)(implicit request: Request, session: Session): Any = {
     postControllerMethod(doCsrfCheck=false) {

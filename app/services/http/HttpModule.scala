@@ -1,9 +1,7 @@
 package services.http
 
 import uk.me.lings.scalaguice.ScalaModule
-import java.sql.Connection
-import com.google.inject.{Singleton, AbstractModule}
-import org.squeryl.Session
+import com.google.inject.{AbstractModule}
 import play.Play
 import java.util.Properties
 
