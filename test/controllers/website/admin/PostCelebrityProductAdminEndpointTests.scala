@@ -9,16 +9,16 @@ import java.net.URLDecoder
 import org.junit.Assert._
 import services.AppConfig
 import services.AppConfig._
-import services.db.{TransactionSerializable, DBSession}
 import play.test.FunctionalTest._
 import models.{ProductStore, CelebrityStore, PublishedStatus}
+import services.db.{Schema, TransactionSerializable, DBSession}
 
 class PostCelebrityProductAdminEndpointTests extends AdminFunctionalTest with CleanDatabaseAfterEachTest {
 
   private val profileImage = Play.getFile("test/files/longoria/product-1.jpg")
   private val profileIcon  = Play.getFile("test/files/longoria/profile.jpg")
   @Test
-  def testPostCelebrityProductCreatesPublishedProduct() = {
+  def testPostCelebrityProductCreatesProduct() = {
     createAndLoginAsAdmin()
     createCeleb()
 
@@ -57,15 +57,26 @@ class PostCelebrityProductAdminEndpointTests extends AdminFunctionalTest with Cl
     assertHeaderEquals("Location", "/admin/products/1?action=preview", response)
 
     instance[DBSession].connected(TransactionSerializable) {
+      import org.squeryl.PrimitiveTypeMode._
+      val schema = instance[Schema]
+      for (product <- schema.products) {
+        println(product)
+      }
       assertEquals(instance[ProductStore].get(1).publishedStatus, PublishedStatus.Unpublished)
+
     }
 
     val publishedResponse = postCelebrityProductPublishedStatus(id = 1, status = PublishedStatus.Published.name)
 
     assertStatus(302, publishedResponse)
-    assertHeaderEquals("Location", "/admin/products/1?action=preview", response)
+    assertHeaderEquals("Location", "/admin/products/1?action=preview", publishedResponse)
 
     instance[DBSession].connected(TransactionSerializable) {
+      import org.squeryl.PrimitiveTypeMode._
+      val schema = instance[Schema]
+      for (product <- schema.products) {
+        println(product)
+      }
       assertEquals(instance[ProductStore].get(1).publishedStatus, PublishedStatus.Published)
     }
 
@@ -84,10 +95,10 @@ class PostCelebrityProductAdminEndpointTests extends AdminFunctionalTest with Cl
                               storyTitle: String = "Walk-off home run for a playoff spot",
                               storyText: String = "Earlier in the month, the Rays were facing a deficit of nine games in " +
                                                   "the wild card race to the Boston Red Sox.",
-                              publishedStatusString: String =  PublishedStatus.Published.name) : Map[String, String] = {
+                              publishedStatusString: String =  PublishedStatus.Unpublished.name) : Map[String, String] = {
 
     Map[String, String](
-      "productID" -> productId.toString,
+      "productId" -> productId.toString,
       "productName" -> productName,
       "productDescription" -> productDescription,
       "signingOriginX" -> signingOriginX.toString,
