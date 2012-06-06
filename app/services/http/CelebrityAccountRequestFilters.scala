@@ -100,6 +100,9 @@ class CelebrityAccountRequestFilters @Inject() (
           case None =>
             new NotFound("No celebrity with url \"" + celebrityUrlSlug + "\"")
 
+          case Some(celebrity) if celebrity.publishedStatus == PublishedStatus.Unpublished =>
+            new NotFound(celebrity.publicName.get + "'s Egraphs profile is temporarily unavailable. Check back soon.")
+
           case Some(celebrity) =>
             continue(celebrity)
         }
@@ -132,7 +135,10 @@ class CelebrityAccountRequestFilters @Inject() (
           case None =>
             new NotFound(celebrity.publicName.get + " doesn't have any product with url " + productUrlSlug)
 
-          case Some(product) =>
+          case Some(product) if product.publishedStatus == PublishedStatus.Unpublished =>
+            new NotFound(celebrity.publicName.get + " doesn't have any product with url " + productUrlSlug)
+
+          case Some(product)  =>
             continue(product)
         }
     }

@@ -33,6 +33,18 @@ class CelebrityAccountRequestFiltersTests extends UnitFlatSpec with Mockito with
     request
   }
 
+  private def setupCelebrityMocks(name: String, publishedStatus: PublishedStatus.EnumVal) : (Celebrity, CelebrityStore) = {
+
+
+    val celebStore = mock[CelebrityStore]
+    val celebrity = mock[Celebrity]
+    celebStore.findByUrlSlug(name) returns (Some(celebrity))
+    celebrity.publishedStatus returns publishedStatus
+    celebrity.publicName returns Option(name)
+
+    (celebrity, celebStore)
+  }
+
   "requireCelebrityAccount" should "return 403-Forbidden if celebrityId is empty, null, or not the string 'me'" in {
     // Set up
     val celebrityIds = List("", "Celebrity-That-Isnt-'me'", null)
@@ -105,24 +117,36 @@ class CelebrityAccountRequestFiltersTests extends UnitFlatSpec with Mockito with
     }
   }
 
-  it should "find celebrities that have the provided url slug then continue via callback" in {
-    // Set up
+  "requireCelebrityUrlSlug" should "find celebrities that have the provided url slug then continue via callback" in {
     implicit val request = FunctionalTest.newRequest()
     request.params.put("celebrityUrlSlug", "Shaq")
 
-    val celebStore = mock[CelebrityStore]
-    val celebrity = mock[Celebrity]
-    celebStore.findByUrlSlug("Shaq") returns (Some(celebrity))
-    
-    val blockToCall= mock[Function1[Celebrity, Any]]
-    blockToCall.apply(any) returns new Ok
+    val (celebrity, celebStore) = setupCelebrityMocks(name = "Shaq", publishedStatus = PublishedStatus.Published)
 
     // Run tests
-    val result = instance(celebStore=celebStore).requireCelebrityUrlSlug(blockToCall)
+    val result = instance(celebStore=celebStore).requireCelebrityUrlSlug { celebrity =>
+      "found celebrity"
+    }
 
     // Check expectations
-    result.isInstanceOf[Ok] should be (true)
-    there was one (blockToCall).apply(celebrity)
+    result should be ("found celebrity")
+
+  }
+
+  "requireCelebrityUrlSlug" should "not return celebrities that have not been published yet" in {
+    // Set up
+    try {
+    implicit val request = FunctionalTest.newRequest()
+    request.params.put("celebrityUrlSlug", "Shaq")
+    val (celebrity, celebStore) = setupCelebrityMocks(name = "Shaq", publishedStatus = PublishedStatus.Unpublished)
+
+    // Run tests
+    val result = instance(celebStore=celebStore).requireCelebrityUrlSlug { celebrity => "ok"  }
+
+    result.isInstanceOf[NotFound] should be (true)
+    } catch{
+      case exception => println(exception.printStackTrace())
+    }
   }
 
   "requireCelebrityProductUrl" should "throw up if productUrlSlug is not provided" in {
