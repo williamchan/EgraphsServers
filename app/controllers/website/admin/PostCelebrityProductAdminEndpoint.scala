@@ -80,7 +80,7 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
           case Some(providedStatus) =>
             providedStatus
           case None =>
-            Validation.addError("Error setting celebrity's published status, please contact support", "")
+            Validation.addError("Error setting product's published status, please contact support", "")
             PublishedStatus.Unpublished
         }
 
