@@ -52,7 +52,7 @@ class ControllerMethod @Inject()(logging: LoggingContext, db: DBSession, httpsFi
 
 
 /**
- * Performs a ControllerMethod with features slightly tweaked for POSTs, particularly
+ * A ControllerMethod with features slightly tweaked for POSTs, particularly
  * re: anti-CSRF support.
  *
  * @param controllerMethod delegate that sets up most context for the request
