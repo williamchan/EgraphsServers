@@ -12,6 +12,13 @@
 
 @head = {
 <script src='@asset("public/twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
+<script src='@asset("public/twitter-bootstrap-1.4.0/js/bootstrap-buttons.js")' type="text/javascript"></script>
+<!--TODO Rename JS file?-->
+<script type="text/javascript">
+    require(["admin-celebritydetail-page"], function(pageScripts) {
+    pageScripts.go();
+    })
+</script>
 }
 
 @postProduct = @{
@@ -41,6 +48,7 @@
         <fieldset>
           @authenticityToken()
           <input id="productId" name="productId" type="hidden" value="@fields("productId")">
+          <input id="publishedStatus" name="publishedStatusString" type="hidden" value="@fields("publishedStatusString")">
           <legend>Product Details</legend>
 
           @formField(
@@ -109,6 +117,8 @@
               </span>
             </div>
           </div>
+
+          <button class="btn toggle" data-toggle="toggle" id="publish-button" type="button">Published</button>
 
           <div class="actions">
             <button type="submit" id="submit-button" class="btn primary fade in">Save</button>

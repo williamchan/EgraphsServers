@@ -382,7 +382,8 @@ class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: Invent
       theOld.signingAreaW := theNew.signingAreaW,
       theOld.signingAreaH := theNew.signingAreaH,
       theOld.created := theNew.created,
-      theOld.updated := theNew.updated
+      theOld.updated := theNew.updated,
+      theOld._publishedStatus := theNew._publishedStatus
     )
   }
 

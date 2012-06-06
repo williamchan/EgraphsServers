@@ -148,7 +148,9 @@ case class Celebrity(id: Long = 0,
                  image: Option[BufferedImage],
                  icon: Option[BufferedImage],
                  storyTitle: String,
-                 storyText: String): Product =
+                 storyText: String,
+                 publishedStatus: PublishedStatus.EnumVal = PublishedStatus.Unpublished
+                  ): Product =
   {
     // Create the product without blobstore images, but don't save.
     val product = Product(
@@ -158,7 +160,8 @@ case class Celebrity(id: Long = 0,
       description=description,
       storyTitle=storyTitle,
       storyText=storyText,
-      services=services.productServices.get
+      services=services.productServices.get,
+      _publishedStatus = publishedStatus.name
     )
 
     product.saveWithImageAssets(image, icon)

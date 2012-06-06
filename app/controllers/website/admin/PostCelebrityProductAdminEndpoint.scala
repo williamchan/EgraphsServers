@@ -31,7 +31,8 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
                                 signingOriginX: Int,
                                 signingOriginY: Int,
                                 storyTitle: String,
-                                storyText: String) = controllerMethod() {
+                                storyText: String,
+                                publishedStatusString: String) = controllerMethod() {
 
     securityFilters.checkAuthenticity{
       celebFilters.requireCelebrityId(request) { celebrity =>
@@ -74,6 +75,15 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
           )
         }
 
+        //publishedStatusString validation
+        val publishedStatus = PublishedStatus(publishedStatusString) match {
+          case Some(providedStatus) =>
+            providedStatus
+          case None =>
+            Validation.addError("Error setting celebrity's published status, please contact support", "")
+            PublishedStatus.Unpublished
+        }
+
         // All errors are accumulated. If we have no validation errors then parameters are golden and
         // we delegate creating the Product to the Celebrity.
         if (validationErrors.isEmpty) {
@@ -85,7 +95,8 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
               image=productImageOption,
               icon=productIconOption,
               storyTitle=storyTitle,
-              storyText=storyText
+              storyText=storyText,
+              publishedStatus = publishedStatus
             ).copy(signingOriginX=signingOriginX, signingOriginY=signingOriginY)
           } else {
             val product = productStore.findById(productId).get
@@ -95,7 +106,8 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
               signingOriginX=signingOriginX,
               signingOriginY=signingOriginY,
               storyTitle=storyTitle,
-              storyText=storyText
+              storyText=storyText,
+              _publishedStatus = publishedStatus.name
             ).saveWithImageAssets(image = productImageOption, icon = productIconOption)
           }
 
@@ -105,7 +117,7 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
         }
         else {
           // There were validation errors
-          redirectWithValidationErrors(celebrity, productId, productName, productDescription, signingOriginX, signingOriginY, storyTitle, storyText)
+          redirectWithValidationErrors(celebrity, productId, productName, productDescription, signingOriginX, signingOriginY, storyTitle, storyText, publishedStatusString)
         }
       }
     }
@@ -131,7 +143,8 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
                                            signingOriginX: Int,
                                            signingOriginY: Int,
                                            storyTitle: String,
-                                           storyText: String): Redirect = {
+                                           storyText: String,
+                                           publishedStatusString: String): Redirect = {
     flash.put("productId", productId)
     flash.put("productName", productName)
     flash.put("productDescription", productDescription)
@@ -139,6 +152,7 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
     flash.put("signingOriginY", signingOriginY)
     flash.put("storyTitle", storyTitle)
     flash.put("storyText", storyText)
+    flash.put("publishedStatusString", publishedStatusString)
     if (productId == 0) {
       WebsiteControllers.redirectWithValidationErrors(GetCreateCelebrityProductAdminEndpoint.url(celebrity = celebrity))
     } else {

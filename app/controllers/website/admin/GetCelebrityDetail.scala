@@ -23,8 +23,6 @@ object GetCelebrityDetail {
           Option(flash.get(paramName)).getOrElse("")
       }
     }
-    println("flash: publishedStatusString: " + flash.get("publishedStatusString"))
-    println("fieldDefaults: publishedStatusString: " + fieldDefaults("publishedStatusString"))
 
     // Render the page
     views.Application.admin.html.admin_celebritydetail(isCreate = isCreate, errorFields = errorFields, fields = fieldDefaults, celebrity = celebrity)
