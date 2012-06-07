@@ -5,7 +5,6 @@ import org.junit.Test
 import scala.collection.JavaConversions._
 import play.test.FunctionalTest
 import FunctionalTest._
-import java.net.URLDecoder
 import services.AppConfig
 import models.{PublishedStatus, CelebrityStore}
 import services.db.{TransactionSerializable, DBSession}
@@ -150,8 +149,7 @@ class PostCelebrityAdminEndpointTests extends AdminFunctionalTest {
     val response = POST("/admin/celebrities", postStrParams)
     assertStatus(302, response)
     assertHeaderEquals("Location", "/admin/celebrities/create", response)
-    val decodedCookieValue: String = URLDecoder.decode(response.cookies.get("PLAY_FLASH").value, "US-ASCII")
-    assertTrue(decodedCookieValue.contains("errors:Error setting celebrity's published status, please contact support"))
+    assertTrue(getPlayFlashCookie(response).contains("errors:Error setting celebrity's published status, please contact support"))
   }
 
   @Test
