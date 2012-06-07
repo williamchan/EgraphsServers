@@ -4,9 +4,8 @@
 //
 package controllers
 
-import play._
 import play.mvc._
-import models._ // This gives us ExampleFrontendProject
+import models.frontend.ExampleFrontendProduct
 
 object Application extends Controller {
   import views.frontend
