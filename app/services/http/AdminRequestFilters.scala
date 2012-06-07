@@ -18,17 +18,13 @@ class AdminRequestFilters @Inject()(adminStore: AdministratorStore,
   import OptionParams.Conversions._
 
   def requireAdministratorLogin(continue: (Administrator) => Any)(implicit session: Session, request: Request) = {
-    val adminId = session.get(WebsiteControllers.adminIdKey)
-    if (adminId == null || adminId.isEmpty) {
-      new Redirect(GetLoginAdminEndpoint.url().url)
-    } else {
-      adminStore.findById(adminId.toLong) match {
-        case None => {
-          session.clear()
-          new Redirect(GetLoginAdminEndpoint.url().url)
-        }
-        case Some(admin) => continue(admin)
+    val adminIdStr = session.get(WebsiteControllers.adminIdKey)
+    adminStore.findById(adminIdStr) match {
+      case None => {
+        session.clear()
+        new Redirect(GetLoginAdminEndpoint.url().url)
       }
+      case Some(admin) => continue(admin)
     }
   }
 

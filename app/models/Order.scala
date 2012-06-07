@@ -40,6 +40,7 @@ case class Order(
   paymentStateString: String = Order.PaymentState.NotCharged.stateValue,
   reviewStatus: String = Order.ReviewStatus.PendingAdminReview.stateValue,
   rejectionReason: Option[String] = None,
+  privacyStatus: String = Order.PrivacyStatus.Public.stateValue,
   stripeCardTokenId: Option[String] = None,
   stripeChargeId: Option[String] = None,
   amountPaidInCurrency: BigDecimal = 0,
@@ -88,6 +89,14 @@ case class Order(
   /** Returns an order configured with the provided payment state */
   def withPaymentState(paymentState: PaymentState) = {
     copy(paymentStateString = paymentState.stateValue)
+  }
+
+  def withPrivacyStatus(privacyStatus: PrivacyStatus) = {
+    copy(privacyStatus = privacyStatus.stateValue)
+  }
+
+  def isPublic = {
+    privacyStatus == Order.PrivacyStatus.Public.stateValue
   }
 
   /** Call this to associate a Stripe Charge with this Order */
@@ -225,6 +234,12 @@ case class Order(
     Egraph(orderId=id, services=services.egraphServices.get).withState(AwaitingVerification)
   }
 
+  def isBuyerOrRecipient(customerIdStr: String): Boolean = {
+    if (customerIdStr == null || customerIdStr.isEmpty) return false // customerIdStr is null if there is no cookie value by that key
+    val customerId = customerIdStr.toLong
+    buyerId == customerId || recipientId == customerId
+  }
+
   //
   // KeyedCaseClass[Long] methods
   //
@@ -289,6 +304,21 @@ object Order {
 
     val all = Utils.toMap[String, ReviewStatus](
       Seq(PendingAdminReview, ApprovedByAdmin, RejectedByAdmin, RejectedByCelebrity), key = (state) => state.stateValue
+    )
+  }
+
+  /** Specifies the Order's privacy status */
+  sealed abstract class PrivacyStatus(val stateValue: String)
+
+  object PrivacyStatus {
+
+    /** Only viewable by buyer, recipient, and Egraphs admins */
+    case object Private extends ReviewStatus("Private")
+
+    case object Public extends ReviewStatus("Public")
+
+    val all = Utils.toMap[String, ReviewStatus](
+      Seq(Private, Public), key = (state) => state.stateValue
     )
   }
 
@@ -365,6 +395,7 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
       theOld.paymentStateString := theNew.paymentStateString,
       theOld.reviewStatus := theNew.reviewStatus,
       theOld.rejectionReason := theNew.rejectionReason,
+      theOld.privacyStatus := theNew.privacyStatus,
       theOld.stripeCardTokenId := theNew.stripeCardTokenId,
       theOld.stripeChargeId := theNew.stripeChargeId,
       theOld.amountPaidInCurrency := theNew.amountPaidInCurrency,

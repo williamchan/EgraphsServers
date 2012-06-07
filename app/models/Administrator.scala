@@ -27,6 +27,12 @@ case class AdministratorServices @Inject()(store: AdministratorStore, accountSto
 class AdministratorStore @Inject()(schema: Schema, accountStore: AccountStore) extends Saves[Administrator] with SavesCreatedUpdated[Administrator] {
   import org.squeryl.PrimitiveTypeMode._
 
+  def findById(adminIdStr: String): Option[Administrator] = {
+    if (adminIdStr == null || adminIdStr.isEmpty) return None // adminIdStr is null if there is no cookie value by that key
+    val adminId = adminIdStr.toLong
+    findById(adminId)
+  }
+
   def authenticate(email: String, passwordAttempt: String): Option[Administrator] = {
     val authenticationResult: Either[AccountAuthenticationError, Account] = accountStore.authenticate(email = email, passwordAttempt = passwordAttempt)
 

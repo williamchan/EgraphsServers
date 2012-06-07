@@ -42,6 +42,12 @@ class AdministratorTests extends UnitFlatSpec
   // Test cases
   //
 
+  "findByEmail" should "return None if parameter is not a Long" in {
+    val administrator = TestData.newSavedAdministrator()
+    adminStore.findById(administrator.id.toString).get should be(administrator)
+    adminStore.findById("") should be(None)
+  }
+
   "authenticate" should "return Administrator with correct credentials, else return None" in {
     val pw = TestData.defaultPassword
     val acct = Account(email = "customer-" + Time.toBlobstoreFormat(Time.now) + "@egraphs.com").withPassword(pw).right.get.save()

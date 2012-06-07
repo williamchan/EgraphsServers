@@ -8,8 +8,10 @@ import play.templates.Html
 import services.http.OptionParams.Conversions.paramsToOptionalParams
 import services.graphics.Handwriting
 import models._
+import controllers.WebsiteControllers
 
 private[controllers] trait GetEgraphEndpoint { this: Controller =>
+  protected def administratorStore: AdministratorStore
   protected def orderStore: OrderStore
   protected def controllerMethod: ControllerMethod
 
@@ -27,7 +29,7 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
 
     // Get an order with provided ID
     orderStore.findFulfilledWithId(orderId.toLong) match {
-      case Some(FulfilledOrder(order, egraph)) =>
+      case Some(FulfilledOrder(order, egraph)) if isViewable(order) =>
         GetEgraphEndpoint.html(
           egraph = egraph,
           order = order,
@@ -36,6 +38,9 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
           shadowY = shadowY
         )
 
+      case Some(FulfilledOrder(order, egraph)) =>
+        Forbidden("Egraph cannot be displayed. It may not be available, or you may not have permission to view it.")
+
       case None =>
         NotFound("No Egraph exists with the provided identifier.")
     }
@@ -43,6 +48,17 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
 
   def lookupGetEgraph(orderId: Long) = {
     reverse(this.getEgraph(orderId.toString))
+  }
+
+  private def isViewable(order: Order): Boolean = {
+    val customerIdStr = session.get(WebsiteControllers.customerIdKey)
+    val adminIdStr = session.get(WebsiteControllers.adminIdKey)
+
+    println("customerIdStr " + customerIdStr)
+
+    order.isPublic ||
+      order.isBuyerOrRecipient(customerIdStr) ||
+      administratorStore.findById(adminIdStr).isDefined
   }
 }
 

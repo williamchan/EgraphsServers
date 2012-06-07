@@ -16,7 +16,7 @@ class PostSecurityTests extends EgraphsUnitTest {
 
     val endpointInvocationsThatRequireTokens = List(
       () => endpoints.postLoginAdmin(null, null),
-      () => endpoints.postLogoutAdmin(),
+      () => endpoints.postLogout(),
       () => endpoints.postAccountAdmin(0, null, null),
       () => endpoints.postCelebrityAdmin(0, null, null, null, null, null, null, null),
       () => endpoints.postCelebrityProductAdmin(0, null, null, null, null, 0, 0, null, null, null),

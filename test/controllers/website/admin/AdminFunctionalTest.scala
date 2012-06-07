@@ -21,7 +21,7 @@ trait AdminFunctionalTest extends EgraphsFunctionalTest {
   }
 
   def loginAsAdmin(): Response = {
-    val response = POST("/admin/login", Map[String, String]("email" -> "admin@egraphs.com","password" -> TestData.defaultPassword))
+    val response = POST("/admin/login", Map[String, String]("email" -> "admin@egraphs.com", "password" -> TestData.defaultPassword))
     assertStatus(302, response)
     assertHeaderEquals("Location", "/admin/celebrities", response)
     response
@@ -53,18 +53,4 @@ trait AdminFunctionalTest extends EgraphsFunctionalTest {
       "publishedStatusString" -> publishedStatusString
     )
   }
-  /**
-   * Posts to the admin logout controller.
-   *
-   * HACK ALERT! Also needs to call FunctionalTest.clearCookies because there is no good way to manage session data
-   * in FunctionalTest context. Logout functionality should be manually tested before every public release.
-   */
-  def logoutFromAdminConsole(): Response = {
-    val response = POST("/admin/logout")
-    assertStatus(302, response)
-    assertHeaderEquals("Location", "/admin/login", response)
-    clearCookies()
-    response
-  }
-
 }

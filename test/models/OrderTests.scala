@@ -340,6 +340,17 @@ class OrderTests extends UnitFlatSpec
     orderStore.countOrders(inventoryBatchIds) should be(3)
   }
 
+  "isBuyerOrRecipient" should "return true if customer is either buy or recipient" in {
+    val buyer = TestData.newSavedCustomer()
+    val recipient = TestData.newSavedCustomer()
+    val anotherCustomer = TestData.newSavedCustomer()
+    val order = buyer.buy(TestData.newSavedProduct(), recipient=recipient).save()
+
+    order.isBuyerOrRecipient(buyer.id.toString) should be(true)
+    order.isBuyerOrRecipient(recipient.id.toString) should be(true)
+    order.isBuyerOrRecipient(anotherCustomer.id.toString) should be(false)
+  }
+
   //
   // Private methods
   //

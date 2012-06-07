@@ -14,8 +14,8 @@
   lookupUrl("WebsiteControllers.getCreateCelebrityAdmin")
 }
 
-@postAdminLogout = @{
-  lookupUrl("WebsiteControllers.postLogoutAdmin")
+@postLogout = @{
+  lookupUrl("WebsiteControllers.postLogout")
 }
 
 @postFeaturedCelebrities = @{
@@ -33,7 +33,7 @@
 }
 
 @navContent = {
-  <form id="logout" class="pull-right" method="POST" action='@postAdminLogout' enctype="application/x-www-form-urlencoded">
+  <form id="logout" class="pull-right" method="POST" action='@postLogout' enctype="application/x-www-form-urlencoded">
     @authenticityToken()
     <div>
       <button type="submit" id="logout-button" class="btn fade in">Logout</button>

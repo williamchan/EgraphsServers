@@ -63,7 +63,6 @@ POST    ${api}/celebrities/{celebrityId}/orders/{orderId}/egraphs ApiControllers
 GET     /admin                                                     WebsiteControllers.getRootAdmin
 GET     /admin/login                                               WebsiteControllers.getLoginAdmin
 POST    /admin/login                                               WebsiteControllers.postLoginAdmin
-POST    /admin/logout                                              WebsiteControllers.postLogoutAdmin
 GET     /admin/accounts                                            WebsiteControllers.getAccountsAdmin
 POST    /admin/accounts                                            WebsiteControllers.postAccountAdmin
 GET     /admin/accounts/create                                     WebsiteControllers.getCreateAccountAdmin
@@ -117,7 +116,7 @@ GET     /orders/{<[0-9]+>orderId}/confirm                WebsiteControllers.getO
 GET     /egraph/{<[0-9]+>orderId}                        WebsiteControllers.getEgraph
 
 # Celebrity pages
-GET     /{celebrityUrlSlug}                      WebsiteControllers.getCelebrity
-GET     /{celebrityUrlSlug}/{productUrlSlug}     WebsiteControllers.getCelebrityProduct
-POST    /{celebrityUrlSlug}/{productUrlSlug}/buy WebsiteControllers.postBuyProduct
-POST    /{celebrityUrlSlug}/{productUrlSlug}/buy-demo WebsiteControllers.postBuyDemoProduct
+GET     /{celebrityUrlSlug}                              WebsiteControllers.getCelebrity
+GET     /{celebrityUrlSlug}/{productUrlSlug}             WebsiteControllers.getCelebrityProduct
+POST    /{celebrityUrlSlug}/{productUrlSlug}/buy         WebsiteControllers.postBuyProduct
+POST    /{celebrityUrlSlug}/{productUrlSlug}/buy-demo    WebsiteControllers.postBuyDemoProduct
