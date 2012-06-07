@@ -26,6 +26,8 @@ class PostBuyProductEndpointTests extends EgraphsFunctionalTest {
       (celebrity, product)
     }
 
+
+
     val response = POST("/" + celebrity.urlSlug.get + "/" + product.urlSlug + "/buy",
       Map(
         "recipientName" -> "Erem Recipient",

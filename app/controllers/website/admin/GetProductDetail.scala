@@ -1,9 +1,9 @@
 package controllers.website.admin
 
 import play.templates.Html
-import models.Celebrity
 import play.mvc.Scope.{Session, Flash}
 import play.Play
+import models.{PublishedStatus, Celebrity}
 
 object GetProductDetail {
 
@@ -19,6 +19,8 @@ object GetProductDetail {
           if (isCreate) "{signer_link}{signer_name}{end_link} defeated Dark Lord Sauron in 2012. A few days afterwards he got a note from {recipient_name} on his iPad. This was his response."
           else flash.get("storyText")
         }
+        case "publishedStatusString" =>
+          Option(flash.get("publishedStatusString")).getOrElse(PublishedStatus.Unpublished.name)
         case _ =>
           Option(flash.get(paramName)).getOrElse("")
       }

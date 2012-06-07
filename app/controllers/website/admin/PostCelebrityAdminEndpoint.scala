@@ -36,15 +36,17 @@ trait PostCelebrityAdminEndpoint {
                          lastName: String,
                          publicName: String,
                          description: String,
+                         publishedStatusString: String,
                          profileImage: Option[File] = None) = controllerMethod() {
-
+  //TODO Refactor this controller
     securityFilters.checkAuthenticity{
         adminFilters.requireAdministratorLogin {admin =>
           val isCreate = (celebrityId == 0)
           val tmp = if (isCreate) new Celebrity() else celebrityStore.findById(celebrityId).get
 
           val publicNameStr = if (publicName.isEmpty) firstName + " " + lastName else publicName
-          val celebrity = celebrityWithValues(tmp, firstName = firstName, lastName = lastName, publicNameStr = publicNameStr, description = description)
+          val celebrity = celebrityWithValues(tmp, firstName = firstName, lastName = lastName,
+            publicNameStr = publicNameStr, description = description)
           val celebrityUrlSlug = celebrity.urlSlug
 
           // Account validation, including email and password validations and extant account validations
@@ -98,11 +100,27 @@ trait PostCelebrityAdminEndpoint {
             }
           }
 
+          // publishedStatusString validations
+          val publishedStatus = PublishedStatus(publishedStatusString) match {
+            case Some(providedStatus) =>
+              providedStatus
+            case None =>
+              Validation.addError("Error setting celebrity's published status, please contact support", "")
+              PublishedStatus.Unpublished
+          }
+
           if (!validationErrors.isEmpty) {
-            redirectWithValidationErrors(celebrityId, celebrityEmail, celebrityPassword, firstName, lastName, publicName, description)
+            redirectWithValidationErrors( celebrityId,
+                                          celebrityEmail,
+                                          celebrityPassword,
+                                          firstName,
+                                          lastName,
+                                          publicName,
+                                          description,
+                                          publishedStatusString)
 
           } else {
-            val savedCelebrity = celebrity.save()
+            val savedCelebrity = celebrity.withPublishedStatus(publishedStatus).save()
             // Celebrity must have been previously saved before saving with assets that live in blobstore
             if (profileImage.isDefined) savedCelebrity.saveWithProfilePhoto(profileImage.get)
 
@@ -142,7 +160,8 @@ trait PostCelebrityAdminEndpoint {
                                            firstName: String,
                                            lastName: String,
                                            publicName: String,
-                                           description: String): Redirect = {
+                                           description: String,
+                                           publishedStatusString: String): Redirect = {
     flash.put("celebrityId", celebrityId)
     flash.put("celebrityEmail", celebrityEmail)
     flash.put("celebrityPassword", celebrityPassword)
@@ -150,6 +169,7 @@ trait PostCelebrityAdminEndpoint {
     flash.put("lastName", lastName)
     flash.put("publicName", publicName)
     flash.put("description", description)
+    flash.put("publishedStatusString", publishedStatusString)
     if (celebrityId == 0) {
       WebsiteControllers.redirectWithValidationErrors(GetCreateCelebrityAdminEndpoint.url())
     } else {

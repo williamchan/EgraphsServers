@@ -33,6 +33,7 @@ private[controllers] trait GetProductAdminEndpoint {
           flash.put("signingOriginY", product.signingOriginY)
           flash.put("storyTitle", product.storyTitle)
           flash.put("storyText", product.storyText)
+          flash.put("publishedStatusString", product.publishedStatus.toString)
 
           GetProductDetail.getCelebrityProductDetail(celebrity = product.celebrity, isCreate = false, product = productOption)
         }

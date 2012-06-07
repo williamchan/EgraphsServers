@@ -33,6 +33,7 @@
       <th>Name</th>
       <th>Price</th>
       <th>Description</th>
+      <th>Published?</th>
     </tr>
     @products.map { (product) =>
     <tr>
@@ -49,6 +50,7 @@
       </td>
       <td>@product.price.formatSimply</td>
       <td>@product.description</td>
+      <td>@product.publishedStatus</td>
     </tr>
     }
   </table>

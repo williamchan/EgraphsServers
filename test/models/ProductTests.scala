@@ -15,8 +15,16 @@ class ProductTests extends UnitFlatSpec
   with CreatedUpdatedEntityTests[Product]
   with ClearsDatabaseAndValidationBefore
   with DBTransactionPerTest
+  with HasPublishedStatusTests[Product]
 {
   val store = AppConfig.instance[ProductStore]
+
+  //
+  // HasPublishedStatusTests[Product]
+  //
+  override def newPublishableEntity = {
+    Product()
+  }
 
   //
   // SavingEntityTests[Product] methods
@@ -117,4 +125,6 @@ class ProductTests extends UnitFlatSpec
     product1.getRemainingInventoryAndActiveInventoryBatches() should be ((48, List(inventoryBatch1)))                  // product1 is in inventoryBatch1, which has 2 purchases
     product2.getRemainingInventoryAndActiveInventoryBatches() should be ((97, List(inventoryBatch1, inventoryBatch2))) // product1 is in both inventoryBatch1 and inventoryBatch1, which have 3 purchases total
   }
+
+
 }
