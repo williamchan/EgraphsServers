@@ -32,6 +32,15 @@
 	border-top-right-radius: @arguments;
 }
 
+.border-radius-bottom(@radius) {
+	-webkit-border-bottom-left-radius: @arguments;
+	-webkit-border-bottom-right-radius: @arguments;
+	-moz-border-radius-bottomleft: @arguments;
+	-moz-border-radius-bottomright: @arguments;
+	border-bottom-left-radius: @arguments;
+	border-bottom-right-radius: @arguments;
+}
+
 .transitions(@color, @duration, @easing) {
 	-moz-transition: @arguments;
 	-webkit-transition: @arguments;

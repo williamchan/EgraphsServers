@@ -314,10 +314,16 @@ section[role=banner] {
 		background: linear-gradient(top,  rgba(239,239,239,1) 0%,rgba(255,255,255,1) 100%); /* W3C */
 		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#efefef', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */	
 
-		position: relative;
 		border-top: 8px solid @white;
 		padding-top: 40px;
-		padding-bottom: 40px;					
+		padding-bottom: 40px;			
+		position: relative;		
+	
+	
+		> .container {
+				position: relative;
+		}
+	
 	}
 
 	
@@ -400,24 +406,19 @@ section[role=banner] {
 
 }
 
-@media (min-width: 1040px) {
+@media (min-width: 1340px) {
 	
 	#top {
 	
-		.logo {
-			
-			margin-left: -20px;
-			padding-right: 20px;
-		
-		}
-		
-		.explore { margin-right: 20px; }
-
-		.social {
-			margin-right: -40px;
-		}
+		.logo { margin-left: -20px; }
 	
+		.social { margin-right: -80px; }
+		
 	}
+	
+}
+
+@media (min-width: 1080px) {
 
 	#content {
 
@@ -433,7 +434,28 @@ section[role=banner] {
 		
 		}
 
+	}	
+
+}
+
+@media (max-width: 1024px) {
+	
+	#top {
+	
+		.row { margin-left: 0; }
+	
+		.logo {
+			
+			margin-left: 0;
+			padding-right: 0;
+		
+		}
+
 	}
+
+}
+
+@media (min-width: 1024px) {
 	
 	#bottom {
 	

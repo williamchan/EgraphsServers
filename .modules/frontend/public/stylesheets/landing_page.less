@@ -26,6 +26,103 @@
 	
 }
 
+#landing-stars {
+	
+	h3 {
+		
+		position: absolute;
+		right: 0;
+		top: -75px;
+		font-size: 15px;
+		line-height: 1.5em;
+		margin: 0 20px 0 0;
+
+		a {
+		
+			display: block;
+			text-align: center;
+			padding: 5px 10px 5px 40px;
+			color: @orange;
+			background: @white;
+			.border-radius-top(5px);
+		
+			span { padding-left: 25px; }
+		
+		}
+		
+		a:hover { color: @blue; }
+				
+	}
+
+	.row {
+	
+		margin-top: -40px;
+		margin-bottom: 40px;
+		margin-right: -20px;
+	
+		> div {
+	
+			position: relative;
+			padding: 34px 0 10px 0;
+			background: #fff;
+	
+		}
+	
+	}
+			
+} // end #landing-stars
+
+.celebrities {
+
+		article {
+			
+			text-align: center;
+			margin-bottom: 20px;
+			
+			figure {
+			
+				margin: 0 0 10px 0;
+				padding: 0;
+			
+				a {
+	
+					display: block;
+					border: 5px solid transparent;
+				
+					img {
+						display: block;
+					}
+				
+				}
+				
+				a:hover {
+					border-color: @orange;
+				}
+			
+			}
+			
+			h4 {
+			
+				line-height: 1.25em;
+				margin-bottom: 0;
+				font-weight: 600;
+					
+				a { color: @orange; }
+				
+				a:hover { color: @linkColor; }
+				
+			}
+			
+			p {
+				font-size: 14px;
+				line-height: 1.5em;
+				margin-bottom: 0;
+			}	
+			
+		}
+		
+} // end .celebrities
+
 #landing-welcome {
 
 	padding-bottom: 40px;
@@ -70,9 +167,11 @@
 		
 		li {
 		
-			margin-bottom: 20px;
+			margin-bottom: 40px;
 			
 			.instructions {
+			
+				margin-bottom: 40px;
 							
 				h2 {
 					font-weight: 300;
@@ -83,7 +182,7 @@
 			
 			}
 			
-			img { display: none; }
+			img.positioned { display: none; }
 		
 		}
 				
@@ -190,66 +289,27 @@
 	
 		border-top: 1px solid #efefef;
 		
-		h3 {
-			border-top: 1px solid #fff;
-			padding-top: 40px;
-			font-weight: 600;
-			text-transform: uppercase;
-			font-size: 14px;
-			line-height: 1.25em;
-			margin-bottom: .25em;
-			letter-spacing: .1em;
-		}
+		.callout {
 		
-		p {
-			font-size: 14px;
-			line-height: 1.5em;
-			margin-bottom: 2em;
-		}
+			border-top: 1px solid #fff;
+			padding-top: 40px;			
+		
+			h3 {
 	
-		article {
-			
-			text-align: center;
-			margin-bottom: 20px;
-			
-			figure {
-			
-				margin: 0 0 10px 0;
-				padding: 0;
-			
-				a {
-	
-					display: block;
-					border: 5px solid transparent;
-				
-					img {
-						display: block;
-					}
-				
-				}
-				
-				a:hover {
-					border-color: @orange;
-				}
-			
-			}
-			
-			h4 {
-			
-				line-height: 1.25em;
-				margin-bottom: 0;
 				font-weight: 600;
-					
-				a { color: @orange; }
-				
-				a:hover { color: @linkColor; }
-				
+				text-transform: uppercase;
+				font-size: 14px;
+				line-height: 1.25em;
+				margin-bottom: .25em;
+				letter-spacing: .1em;
 			}
 			
 			p {
-				margin-bottom: 0;
-			}	
-			
+				font-size: 14px;
+				line-height: 1.5em;
+				margin-bottom: 2em;
+			}
+
 		}
 			
 	}
@@ -263,6 +323,8 @@
 		.banner-gradient {	
 			background: url(../images/bg-banner-gradient.png) repeat-y 50% 0;
 		}
+
+		.row { margin-left: -60px; } 
 		
 	}
 	
@@ -278,18 +340,38 @@
 	
 }
 
-@media (min-width: 1040px) {
+@media (min-width: 1080px) {
 
 	#masthead-home {
 		
 		.banner-gradient {
-			padding: 100px 0 0 0;
-			height: 456px;
+			padding: 126px 0 0 0;
+			height: 430px;
+		}
+				
+	} // end #masthead-home
+
+	#landing-stars {
+	
+		h3 {
+			margin-right: 0;
+		}
+	
+		.row {
+		
+			margin-top: 0;
+			
+			> div {
+				margin: -40px -20px 0 -20px;		
+				padding-left: 20px;
+			}
 		}
 		
-		.row { margin-left: -60px; } 
-		
-	} // end #masthead-home
+	} // end #landing-stars
+
+}
+
+@media (min-width: 1024px) {
 
 	#landing-steps {
 	
@@ -309,12 +391,8 @@
 			li {
 			
 				margin-bottom: 40px;
-			
-				img { display: block;	}
 				
 				.instructions {
-	
-					margin-bottom: 40px;
 			
 					h2 {
 						
@@ -357,10 +435,11 @@
 				
 				}
 				
-				img {
+				img.positioned {
+					display: block;
 					position: absolute;
 					z-index: 0;
-					left: 0;
+					left: -40px;
 				}
 			
 			} // end .step-2 
@@ -377,11 +456,12 @@
 				
 				}			
 			
-				img {
+				img.positioned {
+					display: block;
 					position: absolute;
 					z-index: 0;
-					right: 0;
-					top: 1340px;
+					right: -40px;
+					top: 1550px;
 				}
 		
 			} // end .step-3 
@@ -538,6 +618,14 @@
 
 @media (max-width: 767px) {
 
+	#masthead-home {
+		
+		height: 300px;
+		
+		.banner-gradient { display: none; }
+				
+	} // end #masthead-home
+
 	#landing-welcome {
 	
 		.span6 {
@@ -568,26 +656,64 @@
 
 @media (max-width: 767px) and (min-width: 481px) {
 
-	#landing-more {
+	#landing-stars {
 	
-		footer {
+		.row {
+			margin-left: -20px;
+			
+			> div { padding-left: 15px; }
+			
+		}
+	
+	
+	}
+
+	.celebrities {
+	
+		article {
 		
-			article {
-			
-				float: left;
-				width: 48%;
-				margin-right: 2%;
-			
-			}
+			float: left;
+			width: 48%;
+			margin-right: 2%;
 		
 		}
 	
-	} // end #landing-more
+	} // end .celebrities
 
 }
 
 @media (max-width:480px) {
 
+	#landing-stars {
+		
+		.row {
+		
+			margin-left: -20px;
+			
+			> div {
+				padding-left: 20px;
+				padding-right: 20px;
+				padding-top: 24px;
+			}
+		
+		}
 	
+	}
+
+	#landing-welcome {
+	
+		h1 {
+			font-weight: 300;
+			font-size:  30px;
+			line-height: 1.25em;
+			margin-bottom: .25em;
+		}
+		
+		p {
+			font-size: 16px;
+			line-height: 1.5em;
+		}
+	
+	}
 
 }
