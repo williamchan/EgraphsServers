@@ -206,7 +206,6 @@ case class Celebrity(id: Long = 0,
     imageType=ImageAsset.Png,
     services=services.imageAssetServices.get
   )
-
 }
 
 class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {

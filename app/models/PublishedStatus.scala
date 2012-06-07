@@ -3,7 +3,10 @@ package models
 import services.Utils
 
 
-
+/**
+ * Enum for describing whether an object is Published or Unpublished, i.e. when an
+ * admin is not ready to release a celeb or product to the public
+ */
 object PublishedStatus extends Utils.Enum {
   sealed trait EnumVal extends Value
 

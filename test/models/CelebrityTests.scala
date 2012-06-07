@@ -115,6 +115,4 @@ class CelebrityTests extends UnitFlatSpec
     inventoryBatch2.products.associate(product2)
     celebrity.productsInActiveInventoryBatches().toSet should be(Set(product1, product2))
   }
-
-
 }

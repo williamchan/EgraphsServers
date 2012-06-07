@@ -5,6 +5,10 @@ import play.test.UnitFlatSpec
 import org.scalatest.matchers.ShouldMatchers
 import PublishedStatus._
 
+/**
+ * Adds tests for model classes that have implement HasPublishedStatus
+ * @tparam T
+ */
 trait HasPublishedStatusTests[T <: HasPublishedStatus[T]]  {
   this: UnitFlatSpec with ShouldMatchers =>
 

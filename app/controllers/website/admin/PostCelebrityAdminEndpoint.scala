@@ -101,7 +101,6 @@ trait PostCelebrityAdminEndpoint {
           }
 
           // publishedStatusString validations
-
           val publishedStatus = PublishedStatus(publishedStatusString) match {
             case Some(providedStatus) =>
               providedStatus
@@ -109,8 +108,6 @@ trait PostCelebrityAdminEndpoint {
               Validation.addError("Error setting celebrity's published status, please contact support", "")
               PublishedStatus.Unpublished
           }
-
-
 
           if (!validationErrors.isEmpty) {
             redirectWithValidationErrors( celebrityId,
