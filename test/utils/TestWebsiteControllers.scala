@@ -8,6 +8,7 @@ import models.{InventoryBatchQueryFilters, EgraphQueryFilters, OrderQueryFilters
 import services.db.DBSession
 import play.mvc.Controller
 import controllers.website.AllWebsiteEndpoints
+import java.util.Properties
 
 /**
  * Injectable version of AllWebsiteEndpoints.
@@ -22,5 +23,7 @@ case class TestWebsiteControllers @Inject()(
   orderQueryFilters: OrderQueryFilters,
   egraphQueryFilters: EgraphQueryFilters,
   inventoryBatchQueryFilters: InventoryBatchQueryFilters,
-  dbSession: DBSession
+  dbSession: DBSession,
+  playConfig: Properties,
+  facebookAppId: String
 ) extends Controller with AllWebsiteEndpoints

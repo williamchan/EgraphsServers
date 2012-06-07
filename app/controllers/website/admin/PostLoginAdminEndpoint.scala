@@ -6,7 +6,7 @@ import services.Utils
 import controllers.WebsiteControllers
 import play.data.validation.Validation
 import models.{Administrator, AdministratorStore}
-import services.http.{POSTControllerMethod}
+import services.http.POSTControllerMethod
 
 private[controllers] trait PostLoginAdminEndpoint {
   this: Controller =>

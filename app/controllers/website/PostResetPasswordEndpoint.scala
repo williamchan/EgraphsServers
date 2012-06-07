@@ -5,36 +5,32 @@ import play.mvc.results.Redirect
 import services.Utils
 import controllers.WebsiteControllers
 import play.data.validation.Validation
-import services.http.{SecurityRequestFilters, ControllerMethod}
 import models.AccountStore
+import services.http.POSTControllerMethod
 
 private[controllers] trait PostResetPasswordEndpoint {
   this: Controller =>
 
-  protected def controllerMethod: ControllerMethod
-  protected def securityFilters: SecurityRequestFilters
+  protected def postController: POSTControllerMethod
   protected def accountStore: AccountStore
 
-  def postResetPassword(email: String, password: String, password2: String) = controllerMethod() {
+  def postResetPassword(email: String, password: String, password2: String) = postController() {
 
-    securityFilters.checkAuthenticity {
+    Validation.required("Password", password)
+    Validation.isTrue("Passwords do not match", password == password2)
+    val account = accountStore.findByEmail(email).get
+    val passwordValidationOrAccount = account.withPassword(password)
+    for (passwordValidation <- passwordValidationOrAccount.left) {
+      Validation.addError("Password", passwordValidation.error.toString)
+    }
 
-      Validation.required("Password", password)
-      Validation.isTrue("Passwords do not match", password == password2)
-      val account = accountStore.findByEmail(email).get
-      val passwordValidationOrAccount = account.withPassword(password)
-      for (passwordValidation <- passwordValidationOrAccount.left) {
-        Validation.addError("Password", passwordValidation.error.toString)
-      }
+    if (!validationErrors.isEmpty) {
+      WebsiteControllers.redirectWithValidationErrors(GetResetPasswordEndpoint.url(account.id, account.resetPasswordKey.get))
 
-      if (!validationErrors.isEmpty) {
-        WebsiteControllers.redirectWithValidationErrors(GetResetPasswordEndpoint.url(account.id, account.resetPasswordKey.get))
+    } else {
 
-      } else {
-
-        passwordValidationOrAccount.right.get.save()
-        new Redirect(Utils.lookupUrl("WebsiteControllers.getLogin").url)
-      }
+      passwordValidationOrAccount.right.get.save()
+      new Redirect(Utils.lookupUrl("WebsiteControllers.getLogin").url)
     }
   }
 }

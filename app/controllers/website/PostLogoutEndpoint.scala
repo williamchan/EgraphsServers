@@ -3,18 +3,15 @@ package controllers.website
 import play.mvc.Controller
 import play.mvc.results.Redirect
 import services.Utils
-import services.http.{SecurityRequestFilters, ControllerMethod}
+import services.http.POSTControllerMethod
 
 private[controllers] trait PostLogoutEndpoint {
   this: Controller =>
 
-  protected def controllerMethod: ControllerMethod
-  protected def securityFilters: SecurityRequestFilters
+  protected def postController: POSTControllerMethod
 
-  def postLogout() = controllerMethod() {
-    securityFilters.checkAuthenticity{
-      session.clear()
-      new Redirect(Utils.lookupUrl("WebsiteControllers.getRoot").url)
-    }
+  def postLogout() = postController() {
+    session.clear()
+    new Redirect(Utils.lookupUrl("WebsiteControllers.getRoot").url)
   }
 }

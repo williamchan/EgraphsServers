@@ -10,7 +10,9 @@ import services.Utils
 import play.mvc.Router.ActionDefinition
 import play.mvc.results.Redirect
 import services.db.DBSession
-import services.http.{POSTControllerMethod, ControllerMethod, AdminRequestFilters, CelebrityAccountRequestFilters}
+import services.social.FacebookAppId
+import services.http._
+import java.util.Properties
 
 object WebsiteControllers extends Controller with AllWebsiteEndpoints
 {

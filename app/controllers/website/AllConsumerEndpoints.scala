@@ -10,4 +10,9 @@ trait AllConsumerEndpoints extends GetBlobEndpoint
   with GetCelebrityProductEndpoint
   with GetEgraphEndpoint
   with GetOrderConfirmationEndpoint
-  with PostBuyProductEndpoint { this: Controller => }
+  with PostBuyProductEndpoint
+  with PostLoginEndpoint
+  with PostRecoverAccountEndpoint
+  with PostRegisterEndpoint
+  with PostResetPasswordEndpoint
+  with PostFacebookLoginCallbackEndpoint{ this: Controller => }
