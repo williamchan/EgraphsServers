@@ -3,7 +3,7 @@ package services
 import blobs.BlobModule
 import db.DBModule
 import graphics.GraphicsModule
-import http.{HttpModule}
+import http.HttpModule
 import mail.{MailProvider, Mail}
 import models._
 import models.vbg._

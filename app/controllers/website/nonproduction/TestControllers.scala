@@ -1,4 +1,4 @@
-package controllers.nonproduction
+package controllers.website.nonproduction
 
 import play.mvc._
 import math.BigDecimal._

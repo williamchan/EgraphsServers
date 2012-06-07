@@ -1,13 +1,15 @@
 package controllers.website
 
+import admin.AllAdminEndpoints
+import example.AllWebsiteExampleEndpoints
+import play.mvc.Controller
+import controllers.website.nonproduction.PostBuyDemoProductEndpoint
+
 /**
- * Created with IntelliJ IDEA.
- * User: eboto
- * Date: 6/6/12
- * Time: 6:37 PM
- * To change this template use File | Settings | File Templates.
+ * All endpoints for the website (doesn't include the API)
  */
-
-trait AllWebsiteEndpoints {
-
-}
+trait AllWebsiteEndpoints extends GetRootEndpoint
+  with AllConsumerEndpoints
+  with AllAdminEndpoints
+  with AllWebsiteExampleEndpoints
+  with PostBuyDemoProductEndpoint { this: Controller =>}

@@ -84,7 +84,10 @@ class POSTControllerMethod @Inject()(
    * @return either the return value of the `operation` code block or
    *     a [[play.mvc.results.Forbidden]]
    */
-  def apply[A](doCsrfCheck: Boolean = true)(operation: => A)(implicit request: Request, session: Session): Any = {
+  def apply[A](doCsrfCheck: Boolean=true, openDatabase: Boolean=true)
+              (operation: => A)
+              (implicit request: Request, session: Session): Any =
+  {
     controllerMethod() {
       authenticityTokenFilter(doCsrfCheck) {
         operation

@@ -5,14 +5,13 @@ import play.mvc.results.Redirect
 import controllers.WebsiteControllers
 import play.mvc.Controller
 import play.data.validation._
-import services.http.{SecurityRequestFilters, AdminRequestFilters, ControllerMethod}
 import services.Utils
+import services.http.{POSTControllerMethod, AdminRequestFilters}
 
 trait PostAccountAdminEndpoint {
   this: Controller =>
 
-  protected def controllerMethod: ControllerMethod
-  protected def securityFilters: SecurityRequestFilters
+  protected def postController: POSTControllerMethod
   protected def adminFilters: AdminRequestFilters
   protected def accountStore: AccountStore
 
@@ -21,30 +20,27 @@ trait PostAccountAdminEndpoint {
    */
   def postAccountAdmin(accountId: Long = 0,
                        email: String,
-                       password: String) = controllerMethod() {
+                       password: String) = postController() {
+    adminFilters.requireAdministratorLogin { admin =>
+      val isCreate = (accountId == 0)
+      validate(isCreate = isCreate, accountId = accountId, email = email, password = password)
 
-    securityFilters.checkAuthenticity {
-      adminFilters.requireAdministratorLogin { admin =>
-        val isCreate = (accountId == 0)
-        validate(isCreate = isCreate, accountId = accountId, email = email, password = password)
+      if (!validationErrors.isEmpty) {
+        redirectWithValidationErrors(accountId, email)
 
-        if (!validationErrors.isEmpty) {
-          redirectWithValidationErrors(accountId, email)
+      } else {
+        if (isCreate) {
+          Account(email = email).withPassword(password).right.get.save()
 
         } else {
-          if (isCreate) {
-            Account(email = email).withPassword(password).right.get.save()
-
+          val preexistingAccount = accountStore.findById(accountId).get
+          if (isUpdatingPassword(preexistingAccount, password)) {
+            preexistingAccount.copy(email = email).withPassword(password).right.get.save()
           } else {
-            val preexistingAccount = accountStore.findById(accountId).get
-            if (isUpdatingPassword(preexistingAccount, password)) {
-              preexistingAccount.copy(email = email).withPassword(password).right.get.save()
-            } else {
-              preexistingAccount.copy(email = email).save()
-            }
+            preexistingAccount.copy(email = email).save()
           }
-          new Redirect(Utils.lookupUrl("WebsiteControllers.getAccountsAdmin", Map("email" -> email)).url)
         }
+        new Redirect(Utils.lookupUrl("WebsiteControllers.getAccountsAdmin", Map("email" -> email)).url)
       }
     }
   }

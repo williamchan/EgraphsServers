@@ -1,13 +1,10 @@
 package controllers.website.example
 
+import play.mvc.Controller
+
 /**
- * Created with IntelliJ IDEA.
- * User: eboto
- * Date: 6/6/12
- * Time: 6:44 PM
- * To change this template use File | Settings | File Templates.
+ * All endpoints that are non-central, but maintained for purposes of example
  */
-
-class AllWebsiteExampleEndpoints {
-
-}
+trait AllWebsiteExampleEndpoints extends GetFacebookLoginEndpoint
+  with GetSocialPostEndpoint
+  with PostFacebookLoginCallbackEndpoint { this: Controller => }

@@ -13,56 +13,11 @@ import models._
 import services.Utils
 import play.mvc.Router.ActionDefinition
 import play.mvc.results.Redirect
-import services.http.{SecurityRequestFilters, ControllerMethod, AdminRequestFilters, CelebrityAccountRequestFilters}
 import services.db.DBSession
+import services.http.{POSTControllerMethod, ControllerMethod, AdminRequestFilters, CelebrityAccountRequestFilters}
 
-object WebsiteControllers extends Controller
-  with GetRootEndpoint
-  with GetBlobEndpoint
-  with GetCelebrityEndpoint
-  with GetCelebrityProductEndpoint
-  with GetEgraphEndpoint
-  with GetOrderConfirmationEndpoint
-  with PostBuyDemoProductEndpoint
-  with PostBuyProductEndpoint
-
-  // admin endpoints
-  with GetRootAdminEndpoint
-  with GetAccountAdminEndpoint
-  with GetAccountsAdminEndpoint
-  with GetCelebritiesAdminEndpoint
-  with GetCelebrityAdminEndpoint
-  with GetCelebrityEgraphsAdminEndpoint
-  with GetCelebrityInventoryBatchesAdminEndpoint
-  with GetCelebrityOrdersAdminEndpoint
-  with GetCelebrityProductsAdminEndpoint
-  with GetCreateAccountAdminEndpoint
-  with GetCreateCelebrityAdminEndpoint
-  with GetCreateCelebrityInventoryBatchAdminEndpoint
-  with GetCreateCelebrityProductAdminEndpoint
-  with GetEgraphAdminEndpoint
-  with GetEgraphsAdminEndpoint
-  with GetInventoryBatchAdminEndpoint
-  with GetLoginAdminEndpoint
-  with GetOrderAdminEndpoint
-  with GetOrdersAdminEndpoint
-  with GetProductAdminEndpoint
-  with GetScriptAdminEndpoint
-  with PostAccountAdminEndpoint
-  with PostCelebrityAdminEndpoint
-  with PostCelebrityInventoryBatchAdminEndpoint
-  with PostCelebrityProductAdminEndpoint
-  with PostEgraphAdminEndpoint
-  with PostLoginAdminEndpoint
-  with PostLogoutAdminEndpoint
-  with PostOrderAdminEndpoint
-
-  // social media exploratory work
-  with GetSocialPostEndpoint
-  with GetFacebookLoginEndpoint
-  with PostFacebookLoginCallbackEndpoint
+object WebsiteControllers extends Controller with AllWebsiteEndpoints
 {
-
   import services.AppConfig.instance
 
   val adminIdKey: String = "admin"
@@ -70,8 +25,8 @@ object WebsiteControllers extends Controller
   // Provide endpoint dependencies
   override protected val dbSession = instance[DBSession]
   override protected val controllerMethod = instance[ControllerMethod]
+  override protected val postController = instance[POSTControllerMethod]
   override protected val adminFilters = instance[AdminRequestFilters]
-  override protected val securityFilters = instance[SecurityRequestFilters]
   override protected val celebFilters = instance[CelebrityAccountRequestFilters]
   override protected val egraphQueryFilters = instance[EgraphQueryFilters]
   override protected val inventoryBatchQueryFilters = instance[InventoryBatchQueryFilters]

@@ -10,7 +10,6 @@ import services.mail.Mail
 import services.{Utils, AppConfig}
 import play.Logger
 import controllers.WebsiteControllers
-import services.http.{SecurityRequestFilters, ControllerMethod, CelebrityAccountRequestFilters}
 import services.payment.{Charge, Payment}
 import scala.Predef._
 import sjson.json.Serializer
@@ -18,6 +17,7 @@ import services.db.{DBSession, TransactionSerializable}
 import services.logging.Logging
 import exception.InsufficientInventoryException
 import play.mvc.results.{Forbidden, Redirect}
+import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters}
 
 trait PostBuyProductEndpoint { this: Controller =>
   import PostBuyProductEndpoint.EgraphPurchaseHandler
@@ -25,12 +25,11 @@ trait PostBuyProductEndpoint { this: Controller =>
 
   protected def dbSession: DBSession
   protected def celebFilters: CelebrityAccountRequestFilters
-  protected def securityFilters: SecurityRequestFilters
   protected def mail: Mail
   protected def payment: Payment
   protected def accountStore: AccountStore
   protected def customerStore: CustomerStore
-  protected def controllerMethod: ControllerMethod
+  protected def postController: POSTControllerMethod
 
   /**
    * Posts a purchase order against a Celebrity's Product.
@@ -45,20 +44,14 @@ trait PostBuyProductEndpoint { this: Controller =>
           stripeTokenId: String,
           desiredText: Option[String],
           personalNote: Option[String],
-          isDemo: Boolean = false) = controllerMethod(openDatabase=false) {
+          isDemo: Boolean = false) = postController(openDatabase=false) {
 
     (isDemo, payment.isTest) match {
-      case (false, _) => {
-        securityFilters.checkAuthenticity {
-          post(recipientName, recipientEmail, buyerName, buyerEmail, stripeTokenId, desiredText, personalNote, isDemo)
-        }
-      }
-
-      case (true, true) => {
+      case (false, _) | (true, true) =>
         post(recipientName, recipientEmail, buyerName, buyerEmail, stripeTokenId, desiredText, personalNote, isDemo)
-      }
 
-      case _ => new Forbidden("Cannot place order. Contact Egraphs support/engineering.")
+      case _ =>
+        new Forbidden("Cannot place order. Contact Egraphs support/engineering.")
     }
   }
 

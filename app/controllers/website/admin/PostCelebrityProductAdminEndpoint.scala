@@ -9,15 +9,14 @@ import play.data.validation.Validation
 import models._
 import services.logging.Logging
 import services.ImageUtil
-import services.http.{SecurityRequestFilters, ControllerMethod, CelebrityAccountRequestFilters, AdminRequestFilters}
 import play.Play
 import java.text.SimpleDateFormat
+import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters, AdminRequestFilters}
 
 trait PostCelebrityProductAdminEndpoint extends Logging {
   this: Controller =>
 
-  protected def controllerMethod: ControllerMethod
-  protected def securityFilters: SecurityRequestFilters
+  protected def postController: POSTControllerMethod
   protected def adminFilters: AdminRequestFilters
   protected def celebFilters: CelebrityAccountRequestFilters
   protected def celebrityStore: CelebrityStore
@@ -31,82 +30,79 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
                                 signingOriginX: Int,
                                 signingOriginY: Int,
                                 storyTitle: String,
-                                storyText: String) = controllerMethod() {
+                                storyText: String) = postController() {
+    celebFilters.requireCelebrityId(request) { celebrity =>
+      val isCreate = (productId == 0)
 
-    securityFilters.checkAuthenticity{
-      celebFilters.requireCelebrityId(request) { celebrity =>
-        val isCreate = (productId == 0)
+      // Validate text fields
+      required("Product name", productName)
+      if (isCreate) Validation.isTrue("Product image is required", productImage.isDefined)
+      required("Story title", storyTitle)
+      required("Story text", storyText)
+      val productByUrlSlg = productStore.findByCelebrityAndUrlSlug(celebrity.id, Product.slugify(productName))
+      val isUniqueUrlSlug = if (isCreate) {
+        productByUrlSlg.isEmpty
+      } else {
+        productByUrlSlg.isEmpty || (productByUrlSlg.isDefined && productByUrlSlg.get.id == productId)
+      }
+      Validation.isTrue("Celebrity already has a product with name: " + productName, isUniqueUrlSlug)
 
-        // Validate text fields
-        required("Product name", productName)
-        if (isCreate) Validation.isTrue("Product image is required", productImage.isDefined)
-        required("Story title", storyTitle)
-        required("Story text", storyText)
-        val productByUrlSlg = productStore.findByCelebrityAndUrlSlug(celebrity.id, Product.slugify(productName))
-        val isUniqueUrlSlug = if (isCreate) {
-          productByUrlSlg.isEmpty
+      // Validate product image
+      val productImageOption = if (productImage.isDefined) ImageUtil.parseImage(productImage.get) else None
+      val isProductImageValid = (isCreate && !productImageOption.isEmpty) || (!isCreate && (productImage.isEmpty || !productImageOption.isEmpty))
+      Validation.isTrue("Product photo must be a valid image", isProductImageValid)
+      for (image <- productImageOption) {
+        val (width, height) = (image.getWidth, image.getHeight)
+        val resolutionStr = width + "x" + height
+        Validation.isTrue(
+          "Product Photo must be at least " + Product.minPhotoWidth + " in width and " + Product.minPhotoHeight + " in height - resolution was " + resolutionStr,
+          width >= Product.minPhotoWidth && height >= Product.minPhotoHeight
+        )
+      }
+
+      // Validate product icon
+      val productIconOption = if (productIcon.isDefined) ImageUtil.parseImage(productIcon.get) else None
+      val isProductIconValid = (productIcon.isEmpty || !productIconOption.isEmpty)
+      Validation.isTrue("Product icon must be a valid image", isProductIconValid)
+      for (image <- productIconOption) {
+        Validation.isTrue(
+          "Product icon must be at least 40px wide and 40px high",
+          image.getWidth >= Product.minIconWidth && image.getHeight >= Product.minIconWidth
+        )
+      }
+
+      // All errors are accumulated. If we have no validation errors then parameters are golden and
+      // we delegate creating the Product to the Celebrity.
+      if (validationErrors.isEmpty) {
+        log("Request to create product \"" + productName + "\" for celebrity " + celebrity.publicName + " passed all filters.")
+        val savedProduct = if (isCreate) {
+          celebrity.addProduct(
+            name=productName,
+            description=productDescription,
+            image=productImageOption,
+            icon=productIconOption,
+            storyTitle=storyTitle,
+            storyText=storyText
+          ).copy(signingOriginX=signingOriginX, signingOriginY=signingOriginY)
         } else {
-          productByUrlSlg.isEmpty || (productByUrlSlg.isDefined && productByUrlSlg.get.id == productId)
-        }
-        Validation.isTrue("Celebrity already has a product with name: " + productName, isUniqueUrlSlug)
-
-        // Validate product image
-        val productImageOption = if (productImage.isDefined) ImageUtil.parseImage(productImage.get) else None
-        val isProductImageValid = (isCreate && !productImageOption.isEmpty) || (!isCreate && (productImage.isEmpty || !productImageOption.isEmpty))
-        Validation.isTrue("Product photo must be a valid image", isProductImageValid)
-        for (image <- productImageOption) {
-          val (width, height) = (image.getWidth, image.getHeight)
-          val resolutionStr = width + "x" + height
-          Validation.isTrue(
-            "Product Photo must be at least " + Product.minPhotoWidth + " in width and " + Product.minPhotoHeight + " in height - resolution was " + resolutionStr,
-            width >= Product.minPhotoWidth && height >= Product.minPhotoHeight
-          )
+          val product = productStore.findById(productId).get
+          product.copy(
+            name=productName,
+            description=productDescription,
+            signingOriginX=signingOriginX,
+            signingOriginY=signingOriginY,
+            storyTitle=storyTitle,
+            storyText=storyText
+          ).saveWithImageAssets(image = productImageOption, icon = productIconOption)
         }
 
-        // Validate product icon
-        val productIconOption = if (productIcon.isDefined) ImageUtil.parseImage(productIcon.get) else None
-        val isProductIconValid = (productIcon.isEmpty || !productIconOption.isEmpty)
-        Validation.isTrue("Product icon must be a valid image", isProductIconValid)
-        for (image <- productIconOption) {
-          Validation.isTrue(
-            "Product icon must be at least 40px wide and 40px high",
-            image.getWidth >= Product.minIconWidth && image.getHeight >= Product.minIconWidth
-          )
-        }
+        maybeCreateInventoryBatchForDemoMode(savedProduct, isCreate, params.get("createWithoutInventory"))
 
-        // All errors are accumulated. If we have no validation errors then parameters are golden and
-        // we delegate creating the Product to the Celebrity.
-        if (validationErrors.isEmpty) {
-          log("Request to create product \"" + productName + "\" for celebrity " + celebrity.publicName + " passed all filters.")
-          val savedProduct = if (isCreate) {
-            celebrity.addProduct(
-              name=productName,
-              description=productDescription,
-              image=productImageOption,
-              icon=productIconOption,
-              storyTitle=storyTitle,
-              storyText=storyText
-            ).copy(signingOriginX=signingOriginX, signingOriginY=signingOriginY)
-          } else {
-            val product = productStore.findById(productId).get
-            product.copy(
-              name=productName,
-              description=productDescription,
-              signingOriginX=signingOriginX,
-              signingOriginY=signingOriginY,
-              storyTitle=storyTitle,
-              storyText=storyText
-            ).saveWithImageAssets(image = productImageOption, icon = productIconOption)
-          }
-
-          maybeCreateInventoryBatchForDemoMode(savedProduct, isCreate, params.get("createWithoutInventory"))
-
-          new Redirect(GetProductAdminEndpoint.url(productId = savedProduct.id).url + "?action=preview")
-        }
-        else {
-          // There were validation errors
-          redirectWithValidationErrors(celebrity, productId, productName, productDescription, signingOriginX, signingOriginY, storyTitle, storyText)
-        }
+        new Redirect(GetProductAdminEndpoint.url(productId = savedProduct.id).url + "?action=preview")
+      }
+      else {
+        // There were validation errors
+        redirectWithValidationErrors(celebrity, productId, productName, productDescription, signingOriginX, signingOriginY, storyTitle, storyText)
       }
     }
   }
