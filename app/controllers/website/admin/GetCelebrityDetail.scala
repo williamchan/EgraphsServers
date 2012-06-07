@@ -23,7 +23,6 @@ object GetCelebrityDetail {
           Option(flash.get(paramName)).getOrElse("")
       }
     }
-
     // Render the page
     views.Application.admin.html.admin_celebritydetail(isCreate = isCreate, errorFields = errorFields, fields = fieldDefaults, celebrity = celebrity)
   }

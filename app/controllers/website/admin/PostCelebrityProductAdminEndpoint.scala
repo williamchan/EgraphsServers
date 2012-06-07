@@ -84,9 +84,6 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
             PublishedStatus.Unpublished
         }
 
-        println("PublishedStringStatus: " + publishedStatusString)
-        println("publishedStatus after validation: " + publishedStatus.name)
-
         // All errors are accumulated. If we have no validation errors then parameters are golden and
         // we delegate creating the Product to the Celebrity.
         if (validationErrors.isEmpty) {
@@ -109,12 +106,9 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
               signingOriginX=signingOriginX,
               signingOriginY=signingOriginY,
               storyTitle=storyTitle,
-              storyText=storyText,
-              _publishedStatus = publishedStatus.name
-            ).saveWithImageAssets(image = productImageOption, icon = productIconOption)
-
+              storyText=storyText
+            ).withPublishedStatus(publishedStatus).saveWithImageAssets(image = productImageOption, icon = productIconOption)
           }
-          println("after saving, product._publishedStatus " + savedProduct.publishedStatus.name)
 
           maybeCreateInventoryBatchForDemoMode(savedProduct, isCreate, params.get("createWithoutInventory"))
 
@@ -122,8 +116,6 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
         }
         else {
           // There were validation errors
-          println("validation failed")
-          println(validationErrors)
           redirectWithValidationErrors(celebrity, productId, productName, productDescription, signingOriginX, signingOriginY, storyTitle, storyText, publishedStatusString)
         }
       }

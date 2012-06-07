@@ -1,4 +1,5 @@
-# Adds publishedstatus to celebrity and product
+# Adds _publishedStatus to celebrity and product
+
 # --- !Ups
 
 ALTER TABLE celebrity ADD COLUMN _publishedStatus varchar(128) not null;

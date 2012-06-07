@@ -39,7 +39,6 @@ private[controllers] trait GetCelebrityAdminEndpoint {
           }
 
         case _ => new NotFound("No such celebrity")
-
       }
     }
   }

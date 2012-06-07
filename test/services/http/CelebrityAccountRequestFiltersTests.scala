@@ -135,7 +135,6 @@ class CelebrityAccountRequestFiltersTests extends UnitFlatSpec with Mockito with
 
   "requireCelebrityUrlSlug" should "not return celebrities that have not been published yet" in {
     // Set up
-    try {
     implicit val request = FunctionalTest.newRequest()
     request.params.put("celebrityUrlSlug", "Shaq")
     val (celebrity, celebStore) = setupCelebrityMocks(name = "Shaq", publishedStatus = PublishedStatus.Unpublished)
@@ -144,9 +143,6 @@ class CelebrityAccountRequestFiltersTests extends UnitFlatSpec with Mockito with
     val result = instance(celebStore=celebStore).requireCelebrityUrlSlug { celebrity => "ok"  }
 
     result.isInstanceOf[NotFound] should be (true)
-    } catch{
-      case exception => println(exception.printStackTrace())
-    }
   }
 
   "requireCelebrityProductUrl" should "throw up if productUrlSlug is not provided" in {

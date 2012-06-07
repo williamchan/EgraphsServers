@@ -284,8 +284,6 @@ case class Product(
     imageType=ImageAsset.Png,
     services=services.imageAssetServices.get
   ).getSaved(AccessPolicy.Public)
-
-
 }
 
 object Product {

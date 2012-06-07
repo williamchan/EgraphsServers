@@ -13,8 +13,12 @@ import play.test.FunctionalTest._
 import models.{ProductStore, CelebrityStore, PublishedStatus}
 import services.db.{Schema, TransactionSerializable, DBSession}
 
-class PostCelebrityProductAdminEndpointTests extends AdminFunctionalTest with CleanDatabaseAfterEachTest {
+/**
+ * Tests for the PostCelebrityProductAdminEndpoint class for updating and creating celebs
+ */
 
+class PostCelebrityProductAdminEndpointTests extends AdminFunctionalTest with CleanDatabaseAfterEachTest {
+  // Load images for creating products
   private val profileImage = Play.getFile("test/files/longoria/product-1.jpg")
   private val profileIcon  = Play.getFile("test/files/longoria/profile.jpg")
   @Test

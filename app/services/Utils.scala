@@ -144,7 +144,11 @@ object Utils extends Utils(Play.configuration) {
     }
 
     def values: Vector[EnumVal] = _values.get //Here you can get all the enums that exist for this type
-
+    /**
+     * Returns an Option[EnumVal] if the Enum has a corresponding mapping form string to enumval
+     * @param name String name of enum
+     * @return
+     */
     def apply(name: String): Option[EnumVal] = {
       values.filter(en => en.name == name).headOption
     }

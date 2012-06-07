@@ -189,9 +189,7 @@ class PostCelebrityAdminEndpointTests extends AdminFunctionalTest with CleanData
     }
 
   }
-
-
-
+  // Helper function for toggling publishedStatus
   private def postCelebrityPublishedStatus(id: Long = 0, status: String) : Response = {
     val postStrParams = getPostCelebrityStrParams(publishedStatusString = status, celebrityId = id)
     POST("/admin/celebrities", postStrParams)

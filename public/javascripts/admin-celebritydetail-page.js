@@ -5,7 +5,7 @@ define([], function() {
     /**
      * Executes all the scripts for the admin-celebritydetail page.
 
-     * @return nada
+     * @return nothing
      */
     go: function () {
       var publishButton = $("#publish-button");
