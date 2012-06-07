@@ -9,11 +9,13 @@ import services.mail.Mail
 import services.payment.Payment
 import play.mvc.{Router, Controller}
 import models._
-import services.Utils
 import play.mvc.Router.ActionDefinition
 import play.mvc.results.Redirect
-import services.http.{SecurityRequestFilters, ControllerMethod, AdminRequestFilters, CelebrityAccountRequestFilters}
 import services.db.DBSession
+import java.util.Properties
+import services.Utils
+import services.http.{PlayConfig, SecurityRequestFilters, ControllerMethod, AdminRequestFilters, CelebrityAccountRequestFilters}
+import services.social.FacebookAppId
 
 object WebsiteControllers extends Controller
   with GetRootEndpoint
@@ -75,11 +77,15 @@ object WebsiteControllers extends Controller
 {
 
   import services.AppConfig.instance
+  import services.AppConfig.annotatedInstance
 
   val adminIdKey: String = "admin"
   val customerIdKey: String = "customer"
 
   // Provide endpoint dependencies
+  override protected val playConfig = annotatedInstance[PlayConfig, Properties]
+  override protected val facebookAppId = annotatedInstance[FacebookAppId, String]
+
   override protected val dbSession = instance[DBSession]
   override protected val controllerMethod = instance[ControllerMethod]
   override protected val adminFilters = instance[AdminRequestFilters]

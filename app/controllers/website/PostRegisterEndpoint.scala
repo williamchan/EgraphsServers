@@ -38,14 +38,16 @@ private[controllers] trait PostRegisterEndpoint {
           return WebsiteControllers.redirectWithValidationErrors(GetRegisterEndpoint.url())
         }
 
-        // Create Account is none exists, and then create Customer.
+        // Create Account if none exists, and then create Customer.
         val passwordValidationOrAccount = accountOption match {
           case Some(a) => a.withPassword(password)
           case None => {
             Account(email = email).withPassword(password)
           }
         }
-        if (passwordValidationOrAccount.isLeft) Validation.addError("Password", passwordValidationOrAccount.left.get.error.toString)
+        for (passwordValidation <- passwordValidationOrAccount.left) {
+          Validation.addError("Password", passwordValidation.error.toString)
+        }
         if (!validationErrors.isEmpty) {
           return WebsiteControllers.redirectWithValidationErrors(GetRegisterEndpoint.url())
         }

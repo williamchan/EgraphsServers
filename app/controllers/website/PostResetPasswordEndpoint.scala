@@ -23,14 +23,16 @@ private[controllers] trait PostResetPasswordEndpoint {
       Validation.isTrue("Passwords do not match", password == password2)
       val account = accountStore.findByEmail(email).get
       val passwordValidationOrAccount = account.withPassword(password)
-      if (passwordValidationOrAccount.isLeft) Validation.addError("Password", passwordValidationOrAccount.left.get.error.toString)
+      for (passwordValidation <- passwordValidationOrAccount.left) {
+        Validation.addError("Password", passwordValidation.error.toString)
+      }
 
       if (!validationErrors.isEmpty) {
         WebsiteControllers.redirectWithValidationErrors(GetResetPasswordEndpoint.url(account.id, account.resetPasswordKey.get))
 
       } else {
 
-        /*val accountWithNewPassword = */passwordValidationOrAccount.right.get.save()
+        passwordValidationOrAccount.right.get.save()
         new Redirect(Utils.lookupUrl("WebsiteControllers.getLogin").url)
       }
     }

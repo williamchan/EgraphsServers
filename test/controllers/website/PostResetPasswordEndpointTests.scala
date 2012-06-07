@@ -14,7 +14,7 @@ class PostResetPasswordEndpointTests extends EgraphsFunctionalTest {
   private val db = AppConfig.instance[DBSession]
 
   @Test
-  def testPasswordValidation() {
+  def testFailPasswordsMustMatchValidation() {
     val account = db.connected(TransactionSerializable) {
       val customer = TestData.newSavedCustomer()
       customer.account.withResetPasswordKey.save()
@@ -26,7 +26,7 @@ class PostResetPasswordEndpointTests extends EgraphsFunctionalTest {
   }
 
   @Test
-  def testThrowPasswordValidations() {
+  def testFailPasswordMustPassStrengthTestValidation() {
     val account = db.connected(TransactionSerializable) {
       val customer = TestData.newSavedCustomer()
       customer.account.withResetPasswordKey.save()

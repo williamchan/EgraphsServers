@@ -3,12 +3,11 @@ package controllers.website
 import play.mvc.Controller
 import services.Utils
 import services.http.ControllerMethod
-import play.Play
 
 private[controllers] trait GetRegisterEndpoint {
   this: Controller =>
 
-  private def fbAppIdKey = "fb.appid"
+  protected def facebookAppId: String
   protected def controllerMethod: ControllerMethod
 
   def getRegister = controllerMethod() {
@@ -21,11 +20,15 @@ private[controllers] trait GetRegisterEndpoint {
       }
     }
 
-    val fbAppId = Play.configuration.getProperty(fbAppIdKey)
     val action = Utils.lookupAbsoluteUrl("WebsiteControllers.postFacebookLoginCallback")
     val callbackUrl = action.url
 
-    views.Application.html.register(errorFields = errorFields, fields = fieldDefaults, fbAppId = fbAppId, callbackUrl = callbackUrl)
+    views.Application.html.register(
+      errorFields = errorFields,
+      fields = fieldDefaults,
+      fbAppId = facebookAppId,
+      callbackUrl = callbackUrl
+    )
   }
 
 }

@@ -7,11 +7,11 @@ import javax.crypto.spec.SecretKeySpec
 import scala.Predef._
 import util.parsing.json.JSON
 import services.http.ControllerMethod
-import play.Play
 import controllers.WebsiteControllers
 import play.mvc.results.Redirect
 import services.Utils
 import models.{Account, Customer, CustomerStore, AccountStore}
+import java.util.Properties
 import services.db.{TransactionSerializable, DBSession}
 
 /**
@@ -24,7 +24,9 @@ private[controllers] trait PostFacebookLoginCallbackEndpoint {  this: Controller
   protected def controllerMethod: ControllerMethod
   protected def accountStore: AccountStore
   protected def customerStore: CustomerStore
-  private def fbAppSecretKey = "fb.appsecret"
+  protected def playConfig: Properties
+
+  private val fbAppSecretKey = "fb.appsecret"
 
   /**
    * Documentation at https://developers.facebook.com/docs/authentication/signed_request/
@@ -99,7 +101,7 @@ private[controllers] trait PostFacebookLoginCallbackEndpoint {  this: Controller
   }
 
   private def getHash(baseString: String) = {
-    val secretStr = Play.configuration.getProperty(fbAppSecretKey)
+    val secretStr = playConfig.getProperty(fbAppSecretKey)
     val keyBytes = secretStr.getBytes("UTF-8")
     val mac = Mac.getInstance("HMACSHA256")
     val secretKey = new SecretKeySpec(keyBytes, mac.getAlgorithm)

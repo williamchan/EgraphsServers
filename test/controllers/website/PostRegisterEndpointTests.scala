@@ -30,14 +30,14 @@ class PostRegisterEndpointTests extends EgraphsFunctionalTest {
   }
 
   @Test
-  def testThrowPasswordValidations() {
+  def testFailPasswordStrengthValidations() {
     val response = POST("/register", getPostStrParams(email = "a@egraphs.com", password = "h", password2 = "h"))
     assertStatus(302, response)
     assertTrue(getPlayFlashCookie(response).contains("errors"))
   }
 
   @Test
-  def testThrowValidationIfCustomerAlreadyExists() {
+  def testFailCustomerAlreadyExistsValidation() {
     val account = db.connected(TransactionSerializable) {
       val customer = TestData.newSavedCustomer()
       customer.account
