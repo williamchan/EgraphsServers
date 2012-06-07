@@ -9,6 +9,7 @@ import com.google.inject.{Provider, Inject}
 import org.squeryl.Query
 import services._
 import java.awt.image.BufferedImage
+import models.PublishedStatus.EnumVal
 
 
 /**
@@ -38,10 +39,11 @@ case class Celebrity(id: Long = 0,
                      profilePhotoUpdated: Option[String] = None,
                      enrollmentStatusValue: String = EnrollmentStatus.NotEnrolled.value,
                      isLeftHanded: Boolean = false,
+                     _publishedStatus: String = PublishedStatus.Unpublished.name,
                      created: Timestamp = Time.defaultTimestamp,
                      updated: Timestamp = Time.defaultTimestamp,
                      services: CelebrityServices = AppConfig.instance[CelebrityServices]
-) extends KeyedCaseClass[Long] with HasCreatedUpdated
+) extends KeyedCaseClass[Long] with HasCreatedUpdated with HasPublishedStatus[Celebrity]
 {
   //
   // Additional DB columns
@@ -146,7 +148,9 @@ case class Celebrity(id: Long = 0,
                  image: Option[BufferedImage],
                  icon: Option[BufferedImage],
                  storyTitle: String,
-                 storyText: String): Product =
+                 storyText: String,
+                 publishedStatus: PublishedStatus.EnumVal = PublishedStatus.Unpublished
+                  ): Product =
   {
     // Create the product without blobstore images, but don't save.
     val product = Product(
@@ -156,7 +160,8 @@ case class Celebrity(id: Long = 0,
       description=description,
       storyTitle=storyTitle,
       storyText=storyText,
-      services=services.productServices.get
+      services=services.productServices.get,
+      _publishedStatus = publishedStatus.name
     )
 
     product.saveWithImageAssets(image, icon)
@@ -166,6 +171,13 @@ case class Celebrity(id: Long = 0,
   // KeyedCaseClass[Long] methods
   //
   override def unapplied = Celebrity.unapply(this)
+
+  //
+  // PublishedStatus[Celebrity] methods
+  //
+  override def withPublishedStatus(status: EnumVal) = {
+    this.copy(_publishedStatus = status.name)
+  }
 
   //
   // Private members
@@ -264,7 +276,8 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
       theOld.enrollmentStatusValue := theNew.enrollmentStatusValue,
       theOld.isLeftHanded := theNew.isLeftHanded,
       theOld.created := theNew.created,
-      theOld.updated := theNew.updated
+      theOld.updated := theNew.updated,
+      theOld._publishedStatus := theNew._publishedStatus
     )
   }
 
@@ -276,7 +289,11 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
   }
 }
 
-abstract sealed class EnrollmentStatus(val value: String)
+abstract sealed class EnrollmentStatus(val value: String) {
+  override def toString: String = {
+    value
+  }
+}
 
 object EnrollmentStatus {
   case object NotEnrolled extends EnrollmentStatus("NotEnrolled")

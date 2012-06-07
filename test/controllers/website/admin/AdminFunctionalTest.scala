@@ -5,6 +5,7 @@ import FunctionalTest._
 import utils.FunctionalTestUtils.runScenarios
 import scala.collection.JavaConversions._
 import play.mvc.Http.Response
+import models.PublishedStatus
 
 trait AdminFunctionalTest extends FunctionalTest {
 
@@ -24,6 +25,32 @@ trait AdminFunctionalTest extends FunctionalTest {
     response
   }
 
+  def createCeleb(): Response = {
+    val response = POST("/admin/celebrities", getPostCelebrityStrParams())
+    assertStatus(302, response)
+    assertHeaderEquals("Location", "/admin/celebrities/1?action=preview", response)
+    response
+  }
+
+  def getPostCelebrityStrParams(celebrityId: Long = 0,
+                                        celebrityEmail: String = "ali@egraphs.com",
+                                        celebrityPassword: String = "derp",
+                                        firstName: String = "Cassius",
+                                        lastName: String = "Clay",
+                                        publicName: String = "Muhammad Ali",
+                                        description: String = "I am the greatest!",
+                                        publishedStatusString: String = PublishedStatus.Published.name ): Map[String, String] = {
+    Map[String, String](
+      "celebrityId" -> celebrityId.toString,
+      "celebrityEmail" -> celebrityEmail,
+      "celebrityPassword" -> celebrityPassword,
+      "firstName" -> firstName,
+      "lastName" -> lastName,
+      "publicName" -> publicName,
+      "description" -> description,
+      "publishedStatusString" -> publishedStatusString
+    )
+  }
   /**
    * Posts to the admin logout controller.
    *
