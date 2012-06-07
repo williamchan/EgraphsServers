@@ -84,7 +84,7 @@ private object TestModeBootstrap extends Logging {
     db.connected(TransactionSerializable) {
       if (accountStore.findByEmail(adminEmail).isEmpty) {
         val administrator = Administrator().save()
-        Account(email = adminEmail, administratorId = Some(administrator.id)).withPassword("derp").right.get.save()
+        Account(email = adminEmail, administratorId = Some(administrator.id)).withPassword("egraphsa").right.get.save()
         log("Created Administrator with credentials admin@egraphs.com/derp")
       }
     }

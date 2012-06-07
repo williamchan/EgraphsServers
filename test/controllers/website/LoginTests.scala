@@ -22,7 +22,7 @@ class LoginTests extends EgraphsFunctionalTest {
 
   @Test
   def testAuthenticationValidation() {
-    val response = POST("/login", getPostStrParams(email = "idontexist@egraphs.com", password = "herp"))
+    val response = POST("/login", getPostStrParams(email = "idontexist@egraphs.com", password = TestData.defaultPassword))
     assertStatus(302, response)
     assertTrue(getPlayFlashCookie(response).contains("The username or password did not match. Please try again."))
   }

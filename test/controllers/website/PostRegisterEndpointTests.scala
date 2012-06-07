@@ -18,14 +18,14 @@ class PostRegisterEndpointTests extends EgraphsFunctionalTest {
 
   @Test
   def testFieldValidations() {
-    var response = POST("/register", getPostStrParams(email = "a@egraphs.com", password = "derp", password2 = "derp", name = ""))
+    var response = POST("/register", getPostStrParams(email = "a@egraphs.com", name = ""))
     assertStatus(302, response)
     assertTrue(getPlayFlashCookie(response).contains("errors"))
 
-    response = POST("/register", getPostStrParams(email = "", password = "derp", password2 = "derp"))
+    response = POST("/register", getPostStrParams(email = ""))
     assertTrue(getPlayFlashCookie(response).contains("errors"))
 
-    response = POST("/register", getPostStrParams(email = "a@egraphs.com", password = "herp", password2 = "derp"))
+    response = POST("/register", getPostStrParams(email = "a@egraphs.com", password = "herpherp", password2 = "derpderp"))
     assertTrue(getPlayFlashCookie(response).contains("Passwords do not match"))
   }
 
@@ -43,7 +43,7 @@ class PostRegisterEndpointTests extends EgraphsFunctionalTest {
       customer.account
     }
 
-    val response = POST("/register", getPostStrParams(email = account.email, password = "herp", password2 = "herp"))
+    val response = POST("/register", getPostStrParams(email = account.email))
     assertStatus(302, response)
     assertTrue(getPlayFlashCookie(response).contains("Account already exists"))
   }
@@ -55,7 +55,7 @@ class PostRegisterEndpointTests extends EgraphsFunctionalTest {
     }
 
     val customerName = "asdf"
-    val response = POST("/register", getPostStrParams(email = account.email, password = "herp", password2 = "herp", name = customerName))
+    val response = POST("/register", getPostStrParams(email = account.email, name = customerName))
     assertStatus(302, response)
     db.connected(TransactionSerializable) {
       account = accountStore.findById(account.id).get
@@ -66,7 +66,7 @@ class PostRegisterEndpointTests extends EgraphsFunctionalTest {
   @Test
   def testCreatesCustomerIfAccountDoesNotExist() {
     val email = "a@egraphs.com"
-    val response = POST("/register", getPostStrParams(email = email, password = "herp", password2 = "herp"))
+    val response = POST("/register", getPostStrParams(email = email))
     assertStatus(302, response)
     db.connected(TransactionSerializable) {
       val account = accountStore.findByEmail(email).get
@@ -74,7 +74,10 @@ class PostRegisterEndpointTests extends EgraphsFunctionalTest {
     }
   }
 
-  private def getPostStrParams(email: String, password: String, password2: String, name: String = "Joe Customer"): Map[String, String] = {
+  private def getPostStrParams(email: String,
+                               password: String = TestData.defaultPassword,
+                               password2: String = TestData.defaultPassword,
+                               name: String = "Joe Customer"): Map[String, String] = {
     Map[String, String]("email" -> email, "password" -> password, "password2" -> password2, "name" -> name)
   }
 }

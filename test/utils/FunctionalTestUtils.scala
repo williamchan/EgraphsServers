@@ -14,7 +14,7 @@ object FunctionalTestUtils {
    * Makes an account identified by wchan83@egraphs.com/derp
    */
   def willChanAccount: Account = {
-    Account(email = "wchan83@egraphs.com").withPassword("derp").right.get
+    Account(email = "wchan83@egraphs.com").withPassword(TestData.defaultPassword).right.get
   }
 
   /**
@@ -23,7 +23,7 @@ object FunctionalTestUtils {
   def willChanRequest: Request = {
     val req = FunctionalTest.newRequest()
     req.user = "wchan83@egraphs.com"
-    req.password = "derp"
+    req.password = TestData.defaultPassword
 
     req
   }

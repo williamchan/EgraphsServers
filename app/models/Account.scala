@@ -52,7 +52,7 @@ case class Account(
   def withPassword(newPassword: String): Either[ValidationResult, Account] = {
     // Perform checks
     val existsCheck = Validation.required("password", newPassword)
-    val lengthCheck = Validation.minSize("password", newPassword, 4)
+    val lengthCheck = Validation.minSize("password", newPassword, Account.minPasswordLength)
 
     (existsCheck.ok, lengthCheck.ok) match {
       case (false, _) => Left(existsCheck)
@@ -98,6 +98,10 @@ case class Account(
   // KeyedCaseClass methods
   //
   override def unapplied = Account.unapply(this)
+}
+
+object Account {
+  val minPasswordLength = 8
 }
 
 /**

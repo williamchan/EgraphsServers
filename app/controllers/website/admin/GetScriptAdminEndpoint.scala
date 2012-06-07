@@ -76,7 +76,7 @@ private[controllers] trait GetScriptAdminEndpoint {
           if (admin.isEmpty) {
             var account = accountStore.findByEmail(adminEmail)
             if (account.isEmpty) {
-              account = Some(Account(email = adminEmail).withPassword("herp").right.get.save())
+              account = Some(Account(email = adminEmail).save())
             }
             val administrator = Administrator().save()
             account.get.copy(administratorId = Some(administrator.id)).save()
