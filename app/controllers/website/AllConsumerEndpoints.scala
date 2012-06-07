@@ -1,0 +1,11 @@
+package controllers.website
+
+trait AllConsumerEndpoints extends GetBlobEndpoint
+with GetCelebrityEndpoint
+with GetCelebrityProductEndpoint
+with GetEgraphEndpoint
+with GetOrderConfirmationEndpoint
+with PostBuyProductEndpoint
+
+
+}
