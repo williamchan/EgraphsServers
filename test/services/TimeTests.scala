@@ -30,6 +30,6 @@ class TimeTests extends UnitFlatSpec with ShouldMatchers {
     }
 
     result should be (1)
-    duration should be > (0.200)
+    duration should be >= (0.200)
   }
 }
