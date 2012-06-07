@@ -27,6 +27,8 @@ class PostBuyProductEndpointTests extends FunctionalTest with CleanDatabaseAfter
       (celebrity, product)
     }
 
+
+
     val response = POST("/" + celebrity.urlSlug.get + "/" + product.urlSlug + "/buy",
       Map(
         "recipientName" -> "Erem Recipient",

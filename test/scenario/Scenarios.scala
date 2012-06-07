@@ -80,7 +80,7 @@ class Scenarios extends DeclaresScenarios {
         lastName=Some("Chan"),
         publicName=Some("Wizzle"),
         description=Some("Love my fans from New York to Tokyo, from Seoul to the Sudetenland. And for all you haters out there -- don't mess around. I sleep with one eye closed, the other fixed on my Vespene gas supply.")
-      ).save()
+      ).withPublishedStatus(PublishedStatus.Published).save()
 
       Account(email="wchan83@egraphs.com",
               celebrityId=Some(celebrity.id)
@@ -115,7 +115,8 @@ class Scenarios extends DeclaresScenarios {
         image=photoImage,
         icon=iconImage,
         storyTitle="The story and the glory",
-        storyText="{signer_link}{signer_name}{end_link} was born on top. He proved it to the world at the {product_link}{product_name}{end_link}. A few days afterwards he got a note from {recipient_name} on his iPad. This was his response."
+        storyText="{signer_link}{signer_name}{end_link} was born on top. He proved it to the world at the {product_link}{product_name}{end_link}. A few days afterwards he got a note from {recipient_name} on his iPad. This was his response.",
+        publishedStatus = PublishedStatus.Published
       )
 
       val product2 = will.addProduct(
@@ -128,7 +129,8 @@ class Scenarios extends DeclaresScenarios {
         storyText="""
            {signer_link}{signer_name}{end_link} was born on top. On {date_signed}
            he proved it to {recipient_name}.
-           """
+           """,
+        publishedStatus = PublishedStatus.Published
       )
       val inventoryBatch = InventoryBatch(celebrityId = will.id, numInventory = 100, startDate = today, endDate = future).save()
       inventoryBatch.products.associate(product1)
@@ -465,6 +467,7 @@ class Scenarios extends DeclaresScenarios {
 
   private[this] def createProduct(celebrity: Celebrity, priceInCurrency: BigDecimal, name: String, description: String): Product = {
     val product = celebrity.newProduct.copy(priceInCurrency = priceInCurrency, name = name, description = description)
+      .withPublishedStatus(PublishedStatus.Published)
       .saveWithImageAssets(image = Some(ImageIO.read(Play.getFile("test/files/longoria/product-2.jpg"))), icon = None)
     val inventoryBatch = InventoryBatch(celebrityId = celebrity.id, numInventory = 100, startDate = today, endDate = future).save()
     inventoryBatch.products.associate(product)

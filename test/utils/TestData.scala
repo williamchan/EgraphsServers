@@ -48,7 +48,7 @@ object TestData {
     val identifier = getTimeInBlobstoreFormat
     val email = "celebrity-" + identifier + "@egraphs.com"
     val acct = Account(email = email).save()
-    val celeb = Celebrity(publicName = Some("Celebrity " + identifier)).save()
+    val celeb = Celebrity(publicName = Some("Celebrity " + identifier)).withPublishedStatus(PublishedStatus.Published).save()
 
     acct.copy(celebrityId = Some(celeb.id)).save()
 
@@ -56,7 +56,7 @@ object TestData {
   }
 
   private def newProduct(celebrity: Celebrity): Product = {
-    celebrity.newProduct.copy(name = "prod" + random.nextLong(), description = "some prod")
+    celebrity.newProduct.copy(name = "prod" + random.nextLong(), description = "some prod").withPublishedStatus(PublishedStatus.Published)
   }
 
   def newSavedProduct(celebrity: Option[Celebrity] = None): Product = {
