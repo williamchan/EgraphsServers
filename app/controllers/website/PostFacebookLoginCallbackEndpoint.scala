@@ -8,11 +8,11 @@ import scala.Predef._
 import util.parsing.json.JSON
 import services.http.ControllerMethod
 import play.Play
-import services.db.DBSession
 import controllers.WebsiteControllers
 import play.mvc.results.Redirect
 import services.Utils
 import models.{Account, Customer, CustomerStore, AccountStore}
+import services.db.{TransactionSerializable, DBSession}
 
 /**
  * As the final step of the Facebook Oauth2 flow, Facebook posts against this controller to notify Egraphs that they
@@ -47,7 +47,15 @@ private[controllers] trait PostFacebookLoginCallbackEndpoint {  this: Controller
         //        val oauth_token = data.get("oauth_token").getOrElse("")
 
         validateFacebookCallback(algorithm.toString, dataEncoded, signatureEncoded)
-        val customer = loginViaFacebook(registrationName.toString, registrationEmail.toString, user_id.toString)
+
+        val (customer, shouldSendWelcomeEmail) = dbSession.connected(TransactionSerializable) {
+          loginViaFacebook(registrationName.toString, registrationEmail.toString, user_id.toString)
+        }
+        if (shouldSendWelcomeEmail) {
+          dbSession.connected(TransactionSerializable) {
+            customer.sendNewCustomerEmail()
+          }
+        }
         session.put(WebsiteControllers.customerIdKey, customer.id.toString)
         new Redirect(Utils.lookupUrl("WebsiteControllers.getRootEndpoint").url)
       }
@@ -59,20 +67,20 @@ private[controllers] trait PostFacebookLoginCallbackEndpoint {  this: Controller
    * Gets Account-Customer pair, creating them as necessary.
    * Persists fbUserId on the Account returned, and registrationName on the related Customer.
    */
-  private def loginViaFacebook(registrationName: String, registrationEmail: String, user_id: String): Customer = {
+  private def loginViaFacebook(registrationName: String, registrationEmail: String, user_id: String): (Customer, Boolean) = {
     val accountOption = accountStore.findByEmail(registrationEmail)
     val account = accountOption match {
       case Some(a) => a.copy(fbUserId = Some(user_id)).save()
       case None => Account(email = registrationEmail, fbUserId = Some(user_id)).save()
     }
 
-    val customer = account.customerId match {
-      case Some(custId) => customerStore.findById(custId).get
-      case None => Customer()
+    val (customer, shouldSendWelcomeEmail) = account.customerId match {
+      case Some(custId) => (customerStore.findById(custId).get, false)
+      case None => (Customer(), true)
     }
     val savedCustomer = customer.copy(name = registrationName).save()
     if (account.customerId == None) account.copy(customerId = Some(savedCustomer.id)).save()
-    savedCustomer
+    (savedCustomer, shouldSendWelcomeEmail)
   }
 
   /**
