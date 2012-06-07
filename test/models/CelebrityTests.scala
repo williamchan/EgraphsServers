@@ -17,8 +17,16 @@ class CelebrityTests extends UnitFlatSpec
   with CreatedUpdatedEntityTests[Celebrity]
   with ClearsDatabaseAndValidationBefore
   with DBTransactionPerTest
+  with HasPublishedStatusTests[Celebrity]
 {
   val store = AppConfig.instance[CelebrityStore]
+
+  //
+  //  HasPublishedStatus[Celebrity] methods
+  //
+  override def newPublishableEntity = {
+    Celebrity()
+  }
 
   //
   // SavingEntityTests[Celebrity] methods

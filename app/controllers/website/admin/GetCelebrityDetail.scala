@@ -2,7 +2,7 @@ package controllers.website.admin
 
 import play.templates.Html
 import play.mvc.Scope.{Session, Flash}
-import models.Celebrity
+import models.{PublishedStatus, Celebrity}
 
 object GetCelebrityDetail {
 
@@ -17,6 +17,8 @@ object GetCelebrityDetail {
         case "lastName" => flash.get("lastName")
         case "publicName" => flash.get("publicName")
         case "description" => flash.get("description")
+        case "publishedStatusString" =>
+          Option(flash.get("publishedStatusString")).getOrElse(PublishedStatus.Unpublished.toString)
         case _ =>
           Option(flash.get(paramName)).getOrElse("")
       }

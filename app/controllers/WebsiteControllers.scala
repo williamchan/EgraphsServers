@@ -15,10 +15,15 @@ import services.http.{POSTControllerMethod, ControllerMethod, AdminRequestFilter
 object WebsiteControllers extends Controller with AllWebsiteEndpoints
 {
   import services.AppConfig.instance
+  import services.AppConfig.annotatedInstance
 
   val adminIdKey: String = "admin"
+  val customerIdKey: String = "customer"
 
   // Provide endpoint dependencies
+  override protected val playConfig = annotatedInstance[PlayConfig, Properties]
+  override protected val facebookAppId = annotatedInstance[FacebookAppId, String]
+
   override protected val dbSession = instance[DBSession]
   override protected val controllerMethod = instance[ControllerMethod]
   override protected val postController = instance[POSTControllerMethod]

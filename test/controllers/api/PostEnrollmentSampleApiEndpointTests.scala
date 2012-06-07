@@ -4,11 +4,12 @@ import org.junit.Assert._
 import org.junit.Test
 import play.test.FunctionalTest
 import sjson.json.Serializer
-import utils.FunctionalTestUtils.{CleanDatabaseAfterEachTest, willChanRequest, runScenarios}
+import utils.FunctionalTestUtils.{willChanRequest, runScenarios}
 import models._
 import utils.TestConstants
+import controllers.website.EgraphsFunctionalTest
 
-class PostEnrollmentSampleApiEndpointTests extends FunctionalTest with CleanDatabaseAfterEachTest {
+class PostEnrollmentSampleApiEndpointTests extends EgraphsFunctionalTest {
 
   import FunctionalTest._
 

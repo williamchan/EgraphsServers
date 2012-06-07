@@ -4,7 +4,6 @@ import java.util.Properties
 import models.Account
 import play.mvc.Http.Request
 import play.test.FunctionalTest
-import org.junit.After
 
 /**
  * Common functionality required when writing functional tests against
@@ -65,12 +64,5 @@ object FunctionalTestUtils {
       "Erem-buys-Wills-two-products-twice-each",
       "Deliver-All-Orders-to-Celebrities"
     )
-  }
-
-  trait CleanDatabaseAfterEachTest { this: FunctionalTest =>
-    @After
-    def cleanUpDatabase() {
-      FunctionalTest.GET("/test/scenarios/clear")
-    }
   }
 }

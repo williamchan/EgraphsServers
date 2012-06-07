@@ -2,7 +2,6 @@ package controllers.website
 
 import play.test.FunctionalTest
 import org.junit.Test
-import utils.FunctionalTestUtils.CleanDatabaseAfterEachTest
 import services.AppConfig
 import scala.collection.JavaConversions._
 import FunctionalTest._
@@ -14,7 +13,7 @@ import org.joda.money.CurrencyUnit
 import models.CashTransaction.EgraphPurchase
 import services.db.{Schema, TransactionSerializable, DBSession}
 
-class PostBuyProductEndpointTests extends FunctionalTest with CleanDatabaseAfterEachTest {
+class PostBuyProductEndpointTests extends EgraphsFunctionalTest {
   private val db = AppConfig.instance[DBSession]
   private val schema = AppConfig.instance[Schema]
   private val orderStore = AppConfig.instance[OrderStore]
@@ -26,6 +25,8 @@ class PostBuyProductEndpointTests extends FunctionalTest with CleanDatabaseAfter
       val product = TestData.newSavedProduct(Some(celebrity))
       (celebrity, product)
     }
+
+
 
     val response = POST("/" + celebrity.urlSlug.get + "/" + product.urlSlug + "/buy",
       Map(

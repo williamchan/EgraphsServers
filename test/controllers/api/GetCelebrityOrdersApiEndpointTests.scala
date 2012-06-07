@@ -4,15 +4,16 @@ import org.junit.Assert._
 import org.junit.Test
 import play.test.FunctionalTest
 import sjson.json.Serializer
-import utils.FunctionalTestUtils.{CleanDatabaseAfterEachTest, willChanRequest, runScenarios}
+import utils.FunctionalTestUtils.{willChanRequest, runScenarios}
 import scenario.Scenarios
 import models._
 import services.AppConfig
 import services.db.{TransactionSerializable, DBSession}
 import utils.{FunctionalTestUtils, TestConstants}
 import models.Egraph.EgraphState
+import controllers.website.EgraphsFunctionalTest
 
-class GetCelebrityOrdersApiEndpointTests extends FunctionalTest with CleanDatabaseAfterEachTest {
+class GetCelebrityOrdersApiEndpointTests extends EgraphsFunctionalTest {
 
   import FunctionalTest._
 

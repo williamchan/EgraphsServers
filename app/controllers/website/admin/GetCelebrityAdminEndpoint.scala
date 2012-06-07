@@ -5,6 +5,7 @@ import services.Utils
 import services.http.{AdminRequestFilters, ControllerMethod}
 import models.{AccountStore, CelebrityStore}
 import controllers.website.GetCelebrityEndpoint
+import play.mvc.results.{NotFound, Redirect}
 
 private[controllers] trait GetCelebrityAdminEndpoint {
   this: Controller =>
@@ -16,25 +17,28 @@ private[controllers] trait GetCelebrityAdminEndpoint {
 
   def getCelebrityAdmin(celebrityId: Long, action: Option[String] = None) = controllerMethod() {
     adminFilters.requireAdministratorLogin { admin =>
-      val account = accountStore.findByCelebrityId(celebrityId).get
-      val celebrityOption = celebrityStore.findById(celebrityId)
-      val celebrity = celebrityOption.get
 
-      action match {
-        case Some("preview") => {
-          GetCelebrityEndpoint.html(celebrity)
-        }
+      (accountStore.findByCelebrityId(celebrityId), celebrityStore.findById(celebrityId)) match {
+        case (Some(account), Some(celebrity)) =>
+          action match {
+            case Some("preview") => {
+              GetCelebrityEndpoint.html(celebrity)
+            }
 
-        case _ => {
-          flash.put("celebrityId", celebrity.id)
-          flash.put("celebrityEmail", account.email)
-          flash.put("firstName", celebrity.firstName.get)
-          flash.put("lastName", celebrity.lastName.get)
-          flash.put("publicName", celebrity.publicName.get)
-          flash.put("description", celebrity.description.get)
+            case _ => {
+              flash.put("celebrityId", celebrity.id)
+              flash.put("celebrityEmail", account.email)
+              flash.put("firstName", celebrity.firstName.get)
+              flash.put("lastName", celebrity.lastName.get)
+              flash.put("publicName", celebrity.publicName.get)
+              flash.put("description", celebrity.description.get)
+              flash.put("publishedStatusString", celebrity.publishedStatus.toString)
 
-          GetCelebrityDetail.getCelebrityDetail(isCreate = false, celebrity = celebrityOption)
-        }
+              GetCelebrityDetail.getCelebrityDetail(isCreate = false, celebrity = Some(celebrity))
+            }
+          }
+
+        case _ => new NotFound("No such celebrity")
       }
     }
   }

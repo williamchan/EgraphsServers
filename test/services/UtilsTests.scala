@@ -90,4 +90,31 @@ class UtilsTests extends UnitFlatSpec
 
     Utils.pagedQuery(select = celebStore.getCelebrityAccounts, page = 0, pageLength = 3, withTotal = false)._3 should be(None)
   }
+
+  "Enum" should "find Values for strings in its apply method" in {
+    object TestEnum extends Utils.Enum {
+      case class EnumVal(name: String) extends Value
+
+      val Value1 = EnumVal("Value1")
+      val Value2 = EnumVal("Value2")
+    }
+
+    TestEnum("Value1") should be(Some(TestEnum.Value1))
+    TestEnum("Value2") should be(Some(TestEnum.Value2))
+    TestEnum("Herp")   should be(None)
+  }
+
+  "Enum" should "not allow duplicate value entries" in {
+    evaluating {
+      object TestEnum extends Utils.Enum {
+        case class EnumVal(name: String) extends Value
+
+        val Value1 = EnumVal("Value1")
+        val Value2 = EnumVal("Value1")
+      }
+      // Accessing TestEnum to force evaluation to catch require exception
+      TestEnum("herp")
+    } should produce[IllegalArgumentException]
+  }
+
 }

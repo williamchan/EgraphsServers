@@ -3,8 +3,9 @@
 #masthead-home {
 
 	.banner-gradient {
-		padding: 100px 0 0 0;
-		height: 456px;
+		max-width: 1550px;
+		margin: 0 auto;
+		padding: 40px 0;
 	}
 	
 	background: @grayDarker url(../images/landing-masthead-1.jpg) no-repeat 50% 0;
@@ -25,6 +26,103 @@
 	
 }
 
+#landing-stars {
+	
+	h3 {
+		
+		position: absolute;
+		right: 0;
+		top: -75px;
+		font-size: 15px;
+		line-height: 1.5em;
+		margin: 0 20px 0 0;
+
+		a {
+		
+			display: block;
+			text-align: center;
+			padding: 5px 10px 5px 40px;
+			color: @orange;
+			background: @white;
+			.border-radius-top(5px);
+		
+			span { padding-left: 25px; }
+		
+		}
+		
+		a:hover { color: @blue; }
+				
+	}
+
+	.row {
+	
+		margin-top: -40px;
+		margin-bottom: 40px;
+		margin-right: -20px;
+	
+		> div {
+	
+			position: relative;
+			padding: 34px 0 10px 0;
+			background: #fff;
+	
+		}
+	
+	}
+			
+} // end #landing-stars
+
+.celebrities {
+
+		article {
+			
+			text-align: center;
+			margin-bottom: 20px;
+			
+			figure {
+			
+				margin: 0 0 10px 0;
+				padding: 0;
+			
+				a {
+	
+					display: block;
+					border: 5px solid transparent;
+				
+					img {
+						display: block;
+					}
+				
+				}
+				
+				a:hover {
+					border-color: @orange;
+				}
+			
+			}
+			
+			h4 {
+			
+				line-height: 1.25em;
+				margin-bottom: 0;
+				font-weight: 600;
+					
+				a { color: @orange; }
+				
+				a:hover { color: @linkColor; }
+				
+			}
+			
+			p {
+				font-size: 14px;
+				line-height: 1.5em;
+				margin-bottom: 0;
+			}	
+			
+		}
+		
+} // end .celebrities
+
 #landing-welcome {
 
 	padding-bottom: 40px;
@@ -41,7 +139,7 @@
 		line-height: 1.5em;
 	}
 
-} // end #landing-home
+} // end #landing-welcome
 
 #landing-steps {
 
@@ -69,9 +167,11 @@
 		
 		li {
 		
-			margin-bottom: 20px;
+			margin-bottom: 40px;
 			
 			.instructions {
+			
+				margin-bottom: 40px;
 							
 				h2 {
 					font-weight: 300;
@@ -82,7 +182,7 @@
 			
 			}
 			
-			img { display: none; }
+			img.positioned { display: none; }
 		
 		}
 				
@@ -93,10 +193,11 @@
 #landing-details {
 
 	position: relative;
-	padding-bottom: 20px;
 			
 	header {
-		
+	
+		margin-bottom: 40px;
+				
 		h1 {
 			font-weight: 300;
 			font-size: 30px;
@@ -104,9 +205,116 @@
 			margin-bottom: .25em;
 		}
 		
+		p {
+			font-size: 18px;
+			line-height: 1.5em;
+			margin-bottom: 0;
+		}
+		
+	}
+	
+	figure {
+	
+		display: none;
+		
+		text-align: center;
+		position: relative;
+		margin: 0 0 40px 0;
+		padding: 0;
+		
+		img {
+			display: block;
+			margin: 0 auto 20px auto;
+		}
+		
+		figcaption p span { display: none; }
+		
 	}
 	
 } // end #landing-details
+
+#landing-more {
+
+	margin-bottom: 40px;
+
+	header {
+		
+		text-align: center;
+		margin-bottom: 40px;
+		
+		h1 {
+			margin-bottom: 1em;
+		}
+		
+		p { margin-bottom: 0; }
+		
+	}
+
+	.actions {
+
+		article {
+		
+			padding-top: 50px;
+			margin-bottom: 40px;
+	
+			h2 {
+			
+				font-weight: 600;
+				font-size: 18px;
+				line-height: 1.25em;
+				margin-bottom: .25em;
+				
+				a { color: @grayDark; }
+				a:hover { color: @orange; }
+			
+			}
+
+		}
+
+		.view {
+			background: url(../images/icon-more-view.png) no-repeat 0 0;
+		}
+	
+		.print {
+			background: url(../images/icon-more-print.png) no-repeat 0 0;
+		}
+	
+		.share {
+			background: url(../images/icon-more-share.png) no-repeat 0 0;
+		}
+	
+	}
+	
+	footer {
+	
+		border-top: 1px solid #efefef;
+		
+		.callout {
+		
+			border-top: 1px solid #fff;
+			padding-top: 40px;			
+		
+			h3 {
+	
+				font-weight: 600;
+				text-transform: uppercase;
+				font-size: 14px;
+				line-height: 1.25em;
+				margin-bottom: .25em;
+				letter-spacing: .1em;
+			}
+			
+			p {
+				font-size: 14px;
+				line-height: 1.5em;
+				margin-bottom: 2em;
+			}
+
+		}
+			
+	}
+
+} // #landing-more
 
 @media (min-width: 1340px) {
 
@@ -115,6 +323,8 @@
 		.banner-gradient {	
 			background: url(../images/bg-banner-gradient.png) repeat-y 50% 0;
 		}
+
+		.row { margin-left: -60px; } 
 		
 	}
 	
@@ -130,9 +340,38 @@
 	
 }
 
-@media (min-width: 1140px) {
+@media (min-width: 1080px) {
 
-	#masthead-home .row { margin-left: -60px; } // end #masthead-home
+	#masthead-home {
+		
+		.banner-gradient {
+			padding: 126px 0 0 0;
+			height: 430px;
+		}
+				
+	} // end #masthead-home
+
+	#landing-stars {
+	
+		h3 {
+			margin-right: 0;
+		}
+	
+		.row {
+		
+			margin-top: 0;
+			
+			> div {
+				margin: -40px -20px 0 -20px;		
+				padding-left: 20px;
+			}
+		}
+		
+	} // end #landing-stars
+
+}
+
+@media (min-width: 1024px) {
 
 	#landing-steps {
 	
@@ -152,12 +391,8 @@
 			li {
 			
 				margin-bottom: 40px;
-			
-				img { display: block;	}
 				
 				.instructions {
-	
-					margin-bottom: 40px;
 			
 					h2 {
 						
@@ -200,10 +435,11 @@
 				
 				}
 				
-				img {
+				img.positioned {
+					display: block;
 					position: absolute;
 					z-index: 0;
-					left: 0;
+					left: -40px;
 				}
 			
 			} // end .step-2 
@@ -220,11 +456,12 @@
 				
 				}			
 			
-				img {
+				img.positioned {
+					display: block;
 					position: absolute;
 					z-index: 0;
-					right: 0;
-					top: 1340px;
+					right: -40px;
+					top: 1550px;
 				}
 		
 			} // end .step-3 
@@ -236,16 +473,247 @@
 	#landing-details {
 		
 		margin: -80px -40px 0 -40px;
-		
-		header {
-
-			text-align: center;
+					
+		header {		
 			.gradient-white;		
-			text-align: center;
+			text-align: center;	
 			padding-top: 40px;
-
+			margin-bottom: 0;
 		}
 		
+		.content {
+			padding-top: 40px;		
+			background: @white;
+		}
+		
+	} // end #landing-details
+
+	#landing-more {
+		
+		margin-left: -40px;
+		margin-right: -40px;
+		padding: 0 40px;
+		background: @white;
+
+	} // end #landing-more
+
+}
+
+@media (min-width: 979px) {
+
+	#landing-details {
+
+		.wrap {
+			max-width: 700px;
+			margin: 0 auto;		
+		}
+
+		figure {
+		
+			display: block;
+
+			figcaption {
+			
+				position: absolute;		
+								
+				p {
+					
+					text-align: left;
+					font-size: 14px;
+					line-height: 1.5em;
+					margin-bottom: 0;
+				
+					a {
+						text-decoration: underline;
+					}
+				
+					span {
+						display: block;
+						position: absolute;
+						text-indent: -9999px;
+						overflow: hidden;
+					}
+					
+				}
+				
+			}
+			
+			.signature {
+			
+				width: 160px;
+				padding-right: 10px;
+	
+				left: -90px;
+				top: 90px;
+				
+				p {
+	
+					text-align: right;
+				
+					span {
+						left: 100%;
+						top: 10px;
+						width: 185px;
+						height: 122px;
+						background: url(../images/bg-diagram-signature.png) no-repeat 0 0;
+					}
+					
+				}
+				
+			}
+			
+			.name {
+			
+				width: 80px;
+				padding-left: 10px;
+				
+				right: -25px;
+				top: 347px;
+				
+				p {
+				
+					text-align: left;
+				
+					span {
+						right: 100%;
+						top: 10px;
+						width: 250px;
+						height: 1px;
+						background: #29abe2;
+					}
+					
+				}
+			
+			}
+			
+			.audio {
+			
+				width: 100px;
+				padding-right: 10px;
+				
+				left: -80px;
+				top: 326px;
+				
+				p {
+				
+					text-align: right;
+					
+					span {
+						left: 100%;
+						top: 10px;
+						width: 220px;
+						height: 1px;
+						background: #29abe2;					
+					}
+				
+				}
+			
+			}
+		
+		}
+		
+	} // end #landing-details
+
+}
+
+@media (max-width: 767px) {
+
+	#masthead-home {
+		
+		height: 300px;
+		
+		.banner-gradient { display: none; }
+				
+	} // end #masthead-home
+
+	#landing-welcome {
+	
+		.span6 {
+			margin-bottom: 40px;
+		}
+	
+	} // #landing-welcome
+
+}
+
+@media (max-width: 767px) and (min-width: 640px) {
+
+	#landing-welcome {
+	
+		.span6 {
+			float: left;
+			width: 55%;
+		}
+		
+		.span5 {
+			float: right;
+			width: 40%;
+		}
+	
+	} // end #landing-welcome
+
+}
+
+@media (max-width: 767px) and (min-width: 481px) {
+
+	#landing-stars {
+	
+		.row {
+			margin-left: -20px;
+			
+			> div { padding-left: 15px; }
+			
+		}
+	
+	
+	}
+
+	.celebrities {
+	
+		article {
+		
+			float: left;
+			width: 48%;
+			margin-right: 2%;
+		
+		}
+	
+	} // end .celebrities
+
+}
+
+@media (max-width:480px) {
+
+	#landing-stars {
+		
+		.row {
+		
+			margin-left: -20px;
+			
+			> div {
+				padding-left: 20px;
+				padding-right: 20px;
+				padding-top: 24px;
+			}
+		
+		}
+	
+	}
+
+	#landing-welcome {
+	
+		h1 {
+			font-weight: 300;
+			font-size:  30px;
+			line-height: 1.25em;
+			margin-bottom: .25em;
+		}
+		
+		p {
+			font-size: 16px;
+			line-height: 1.5em;
+		}
+	
 	}
 
 }

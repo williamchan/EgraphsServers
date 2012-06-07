@@ -10,6 +10,7 @@ import models.vbg._
 import models.xyzmo._
 import payment.PaymentModule
 import signature.SignatureBiometricsModule
+import social.SocialModule
 import voice.VoiceBiometricsModule
 import uk.me.lings.scalaguice.{InjectorExtensions, ScalaModule}
 import com.google.inject.{Injector, Singleton, Guice, AbstractModule}
@@ -25,6 +26,7 @@ class AppConfig extends AbstractModule with ScalaModule {
     install(SignatureBiometricsModule)
     install(VoiceBiometricsModule)
     install(GraphicsModule)
+    install(SocialModule)
 
     // Model services
     bind[AccountServices].in[Singleton]
@@ -61,6 +63,8 @@ class AppConfig extends AbstractModule with ScalaModule {
 object AppConfig {
 
   import InjectorExtensions._
+  import uk.me.lings.scalaguice.typeLiteral
+  import uk.me.lings.scalaguice.KeyExtensions._
 
   val injector: Injector = {
     // Put a try-catch on making injector and print the error because Guice
@@ -78,5 +82,19 @@ object AppConfig {
 
   def instance[T: Manifest] = {
     injector.instance[T]
+  }
+
+  /**
+   * Gets a class instance bound to a particular annotation. This can be useful for getting, for example,
+   * the particular Properties instance which is bound to PlayConfig, or our application's configuration.
+   *
+   * @tparam A the annotation type (e.g. PlayConfig)
+   * @tparam T the instance type (e.g. Properties)
+   *
+   * @return the instance in question, if it had a matching binding. Otherwise throws
+   *     an exception.
+   */
+  def annotatedInstance[A <: java.lang.annotation.Annotation: Manifest, T: Manifest]: T = {
+    injector.getInstance(typeLiteral[T].annotatedWith[A])
   }
 }

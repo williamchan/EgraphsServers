@@ -15,6 +15,7 @@ import services._
 import scala.Predef._
 import org.squeryl.Query
 import org.squeryl.dsl.ManyToMany
+import models.PublishedStatus.EnumVal
 
 case class ProductServices @Inject() (
   store: ProductStore,
@@ -45,10 +46,11 @@ case class Product(
   signingAreaH: Int = Product.defaultSigningAreaW,
   photoKey: Option[String] = None,
   _iconKey: Option[String] = None,
+  _publishedStatus: String = PublishedStatus.Unpublished.name,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: ProductServices = AppConfig.instance[ProductServices]
-) extends KeyedCaseClass[Long] with HasCreatedUpdated {
+) extends KeyedCaseClass[Long] with HasCreatedUpdated with HasPublishedStatus[Product] {
 
   lazy val inventoryBatches = services.inventoryBatchStore.inventoryBatches(this)
 
@@ -252,6 +254,13 @@ case class Product(
   }
 
   //
+  // HasPublishedStatus[Product] methods
+  //
+  override def withPublishedStatus(status: EnumVal) = {
+    this.copy(_publishedStatus = status.name)
+  }
+
+  //
   // Private members
   //
   private def keyBase = {
@@ -371,7 +380,8 @@ class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: Invent
       theOld.signingAreaW := theNew.signingAreaW,
       theOld.signingAreaH := theNew.signingAreaH,
       theOld.created := theNew.created,
-      theOld.updated := theNew.updated
+      theOld.updated := theNew.updated,
+      theOld._publishedStatus := theNew._publishedStatus
     )
   }
 

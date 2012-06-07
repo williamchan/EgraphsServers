@@ -6,6 +6,7 @@ import play.data.validation.Validation
 import play.test.UnitFlatSpec
 import scala.collection.JavaConversions._
 import services.AppConfig
+import AppConfig.instance
 import AccountAuthenticationError._
 import utils._
 
@@ -16,7 +17,6 @@ class AccountTests extends UnitFlatSpec
   with DBTransactionPerTest
   with AccountTestHelpers
 {
-  import AppConfig.instance
 
   val accountStore = instance[AccountStore]
 
@@ -28,15 +28,15 @@ class AccountTests extends UnitFlatSpec
     exception.getLocalizedMessage.contains("Account: email must be specified") should be(true)
   }
 
-  "An Account" should "start unprotected" in {
+  "An Account" should "start without a password" in {
     Account().password should be(None)
   }
 
-  it should "become protected once a password is set" in {
+  "withPassword" should "set the password on an Account" in {
     accountWithPassword("derp").password should not be (None)
   }
 
-  it should "have different hashes and salts when the same password is set twice" in {
+  "An Account" should "have different hashes and salts when the same password is set twice" in {
     val credential = accountWithPassword("derp")
     val firstPassword = credential.password.get
 
@@ -73,8 +73,9 @@ class AccountTests extends UnitFlatSpec
     }
   }
 
-  it should "fail to authenticate with an AccountPasswordNotSetError if the account wasn't protected" in {
-    Account(email = "derp@derp.com").save()
+  it should "fail to authenticate with an AccountPasswordNotSetError if the account lacks a password" in {
+    val account = Account(email = "derp@derp.com").save()
+    account.password should be(None)
     accountStore.authenticate("derp@derp.com", "supersecret") match {
       case Left(correct: AccountPasswordNotSetError) => // phew
       case anythingElse => fail(anythingElse + " should have been an AccountPasswordNotSetError")
@@ -88,7 +89,37 @@ class AccountTests extends UnitFlatSpec
     }
   }
 
-  it should "save email in lowercase" in {
+  "withResetPasswordKey" should "set resetPasswordKey to newly generated key" in {
+    var account = TestData.newSavedAccount()
+    account.resetPasswordKey should be(None)
+    account = account.withResetPasswordKey.save()
+    account.resetPasswordKey.get should not be(None)
+    account.resetPasswordKey.get.lastIndexOf('.') should not be (-1)
+  }
+
+  "verifyResetPasswordKey" should "return false if resetPasswordKey is None" in {
+    var account = TestData.newSavedAccount()
+    account.verifyResetPasswordKey("whatever") should be(false)
+    account = account.withResetPasswordKey.save()
+    account.verifyResetPasswordKey("whatever.") should be(false)
+    account.verifyResetPasswordKey(account.resetPasswordKey.get) should be(true)
+  }
+
+  "verifyResetPasswordKey" should "return false if resetPasswordKey is expired" in {
+    var account = TestData.newSavedAccount().withResetPasswordKey.save()
+    val oldKey = account.resetPasswordKey.get
+    val newKey = oldKey.substring(0, oldKey.lastIndexOf(".") + 1) + System.currentTimeMillis
+    account = account.copy(resetPasswordKey = Some(newKey)).save()
+    account.verifyResetPasswordKey(account.resetPasswordKey.get) should be(false)
+  }
+
+  "withPassword" should "set resetPasswordKey to None" in {
+    var account = TestData.newSavedAccount().withResetPasswordKey.save()
+    account = account.withPassword("newpassword").right.get.save()
+    account.resetPasswordKey should be(None)
+  }
+
+  "An account" should "save email in lowercase" in {
     val stored = Account(email = "DERP@DERP.COM").save()
     accountStore.findByEmail("derp@derp.com") should be(Some(stored))
   }

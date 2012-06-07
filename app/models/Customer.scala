@@ -6,9 +6,14 @@ import services.db.{KeyedCaseClass, Schema, Saves}
 import services.AppConfig
 import com.google.inject.{Provider, Inject}
 import exception.InsufficientInventoryException
+import org.apache.commons.mail.HtmlEmail
+import services.mail.Mail
 
 /** Services used by each instance of Customer */
-case class CustomerServices @Inject() (accountStore: AccountStore, customerStore: CustomerStore, inventoryBatchStore: InventoryBatchStore)
+case class CustomerServices @Inject() (accountStore: AccountStore,
+                                       customerStore: CustomerStore,
+                                       inventoryBatchStore: InventoryBatchStore,
+                                       mail: Mail)
 
 /**
  * Persistent entity representing customers who buy products from our service.
@@ -69,6 +74,24 @@ case class Customer(
       requestedMessage = requestedMessage,
       inventoryBatchId = inventoryBatchId
     )
+  }
+
+  /**
+   * Sends a welcome email to the customer. Requires a dbSession so that this customer can get its Account.
+   */
+  def sendNewCustomerEmail() {
+    val email = new HtmlEmail()
+    email.setFrom("support@egraphs.com")
+    email.addReplyTo("support@egraphs.com")
+    email.addTo(account.email)
+    email.setSubject("Welcome to Egraphs!")
+    email.setMsg(
+      views.Application.email.html.new_customer_email(
+        customerName = name,
+        email = account.email
+      ).toString().trim()
+    )
+    services.mail.send(email)
   }
 
   //

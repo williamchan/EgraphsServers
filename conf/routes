@@ -99,6 +99,18 @@ GET     /socialpost                                      WebsiteControllers.getS
 GET     /facebooklogin                                   WebsiteControllers.getFacebookLogin
 POST    /facebooklogin/callback                          WebsiteControllers.postFacebookLoginCallback
 
+# customer accounts stubs
+GET     /register                                        WebsiteControllers.getRegister
+POST    /register                                        WebsiteControllers.postRegister
+GET     /login                                           WebsiteControllers.getLogin
+POST    /login                                           WebsiteControllers.postLogin
+POST    /logout                                          WebsiteControllers.postLogout
+GET     /account/recover                                 WebsiteControllers.getRecoverAccount
+POST    /account/recover                                 WebsiteControllers.postRecoverAccount
+GET     /account/recover/confirmation                    WebsiteControllers.getRecoverAccountConfirmation
+GET     /account/reset                                   WebsiteControllers.getResetPassword
+POST    /account/reset                                   WebsiteControllers.postResetPassword
+
 # Order and Egraph pages
 GET     /orders/{<[0-9]+>orderId}/confirm                WebsiteControllers.getOrderConfirmation
 GET     /egraph/{<[0-9]+>orderId}                        WebsiteControllers.getEgraph

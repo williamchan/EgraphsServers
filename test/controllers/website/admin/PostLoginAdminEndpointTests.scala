@@ -4,9 +4,8 @@ import org.junit.Test
 import scala.collection.JavaConversions._
 import play.test.FunctionalTest
 import FunctionalTest._
-import utils.FunctionalTestUtils.CleanDatabaseAfterEachTest
 
-class PostLoginAdminEndpointTests extends AdminFunctionalTest with CleanDatabaseAfterEachTest {
+class PostLoginAdminEndpointTests extends AdminFunctionalTest {
 
   @Test
   def testEmailAndPasswordValidation() {

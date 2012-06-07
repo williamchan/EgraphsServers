@@ -8,11 +8,10 @@ import EgraphState._
 import services.AppConfig
 import services.db.{DBSession, TransactionSerializable}
 import play.test.FunctionalTest._
-import utils.FunctionalTestUtils._
 import models.{EgraphStore, Egraph}
 import utils.TestData
 
-class PostEgraphAdminEndpointTests extends AdminFunctionalTest with CleanDatabaseAfterEachTest {
+class PostEgraphAdminEndpointTests extends AdminFunctionalTest {
 
   private val db = AppConfig.instance[DBSession]
   private val egraphStore = AppConfig.instance[EgraphStore]
