@@ -4,7 +4,7 @@ import services.blobs.Blobs
 import org.junit.Test
 import play.test.FunctionalTest
 import sjson.json.Serializer
-import utils.FunctionalTestUtils.{CleanDatabaseAfterEachTest, willChanRequest}
+import utils.FunctionalTestUtils.willChanRequest
 import services.AppConfig
 import services.http.HttpCodes
 import utils.{FunctionalTestUtils, TestConstants}
@@ -12,8 +12,9 @@ import services.db.{TransactionSerializable, DBSession}
 import org.junit.Assert._
 import Blobs.Conversions._
 import models.EgraphStore
+import controllers.website.EgraphsFunctionalTest
 
-class PostEgraphApiEndpointTests extends FunctionalTest with CleanDatabaseAfterEachTest {
+class PostEgraphApiEndpointTests extends EgraphsFunctionalTest {
 
   import FunctionalTest._
   private val db = AppConfig.instance[DBSession]

@@ -1,23 +1,20 @@
 package controllers.website.admin
 
 import org.junit.Test
-import utils.FunctionalTestUtils.CleanDatabaseAfterEachTest
 import java.io.File
 import scala.collection.JavaConversions._
 import play.Play
-import java.net.URLDecoder
 import org.junit.Assert._
 import services.AppConfig
-import services.AppConfig._
 import play.test.FunctionalTest._
-import models.{ProductStore, CelebrityStore, PublishedStatus}
+import models.{ProductStore, PublishedStatus}
 import services.db.{Schema, TransactionSerializable, DBSession}
 
 /**
  * Tests for the PostCelebrityProductAdminEndpoint class for updating and creating celebs
  */
 
-class PostCelebrityProductAdminEndpointTests extends AdminFunctionalTest with CleanDatabaseAfterEachTest {
+class PostCelebrityProductAdminEndpointTests extends AdminFunctionalTest {
   // Load images for creating products
   private val profileImage = Play.getFile("test/files/longoria/product-1.jpg")
   private val profileIcon  = Play.getFile("test/files/longoria/profile.jpg")
@@ -42,10 +39,7 @@ class PostCelebrityProductAdminEndpointTests extends AdminFunctionalTest with Cl
     val response = POST("/admin/celebrities/1/products", postStrParams, postStrImages)
     assertStatus(302, response)
     assertHeaderEquals("Location", "/admin/celebrities/1/products/create", response)
-
-    val decodedCookieValue: String = URLDecoder.decode(response.cookies.get("PLAY_FLASH").value, "US-ASCII")
-    println("Decoded Cookie:")
-    assertTrue(decodedCookieValue.contains("errors:Error setting product's published status, please contact support"))
+    assertTrue(getPlayFlashCookie(response).contains("errors:Error setting product's published status, please contact support"))
   }
 
   @Test

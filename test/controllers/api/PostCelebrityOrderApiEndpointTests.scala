@@ -4,13 +4,14 @@ import org.junit.Assert._
 import org.junit.Test
 import play.test.FunctionalTest
 import sjson.json.Serializer
-import utils.FunctionalTestUtils.{CleanDatabaseAfterEachTest, willChanRequest}
+import utils.FunctionalTestUtils.willChanRequest
 import models._
 import utils.{FunctionalTestUtils, TestConstants}
 import services.db.{DBSession, TransactionSerializable}
 import services.AppConfig
+import controllers.website.EgraphsFunctionalTest
 
-class PostCelebrityOrderApiEndpointTests extends FunctionalTest with CleanDatabaseAfterEachTest {
+class PostCelebrityOrderApiEndpointTests extends EgraphsFunctionalTest {
 
   import FunctionalTest._
   private val db = AppConfig.instance[DBSession]

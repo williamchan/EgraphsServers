@@ -5,9 +5,10 @@ import FunctionalTest._
 import utils.FunctionalTestUtils.runScenarios
 import scala.collection.JavaConversions._
 import play.mvc.Http.Response
+import controllers.website.EgraphsFunctionalTest
 import models.PublishedStatus
 
-trait AdminFunctionalTest extends FunctionalTest {
+trait AdminFunctionalTest extends EgraphsFunctionalTest {
 
   def createAdmin() {
     runScenarios("Create-Admin")

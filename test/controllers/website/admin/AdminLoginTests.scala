@@ -1,7 +1,6 @@
 package controllers.website.admin
 
 import org.junit.Test
-import utils.FunctionalTestUtils.CleanDatabaseAfterEachTest
 import play.test.FunctionalTest
 import FunctionalTest._
 import utils.TestData
@@ -9,7 +8,7 @@ import models.Celebrity
 import services.{AppConfig, Utils}
 import services.db.{DBSession, TransactionSerializable}
 
-class AdminLoginTests extends AdminFunctionalTest with CleanDatabaseAfterEachTest {
+class AdminLoginTests extends AdminFunctionalTest {
 
   private val db = AppConfig.instance[DBSession]
 

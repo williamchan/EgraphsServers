@@ -1,15 +1,11 @@
 package controllers.api
 
 import org.junit.Assert._
-import play.mvc.Controller
-import models.{Product, Celebrity, Account}
 import sjson.json.Serializer
 import play.test.FunctionalTest
-import utils.FunctionalTestUtils.CleanDatabaseAfterEachTest
 import org.junit.Test
-import services.http.{ControllerMethod, CelebrityAccountRequestFilters}
-import utils.{MockControllerMethod, EgraphsUnitTest, TestConstants, FunctionalTestUtils}
-import org.squeryl.Query
+import utils.{EgraphsUnitTest, TestConstants, FunctionalTestUtils}
+import controllers.website.EgraphsFunctionalTest
 
 class GetCelebrityProductsApiEndpointTests extends EgraphsUnitTest {
   /*"GetCelebrityProductsApiEndpoint" should "return the serialized products" in {
@@ -52,8 +48,7 @@ class GetCelebrityProductsApiEndpointTests extends EgraphsUnitTest {
   }*/
 }
 
-class GetCelebrityProductsApiEndpointFunctionalTests extends FunctionalTest
-  with CleanDatabaseAfterEachTest
+class GetCelebrityProductsApiEndpointFunctionalTests extends EgraphsFunctionalTest
 {
   import FunctionalTest._
 

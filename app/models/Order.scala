@@ -150,8 +150,7 @@ case class Order(
   protected[models] def prepareEgraphsSignedEmail(): Email = {
     val celebrity = services.celebrityStore.findByOrderId(id).get
     val email = new HtmlEmail()
-    val linkActionDefinition: ActionDefinition = Utils.lookupUrl("WebsiteControllers.getEgraph", Map("orderId" -> id.toString))
-    linkActionDefinition.absolute()
+    val linkActionDefinition: ActionDefinition = Utils.lookupAbsoluteUrl("WebsiteControllers.getEgraph", Map("orderId" -> id.toString))
 
     val buyingCustomer = this.buyer
     val receivingCustomer = this.recipient
@@ -479,6 +478,7 @@ case class OrderAudioPrompt(private val audioPromptTemplate: String,
       val paramValue = templateField match {
         case CelebrityName => celebName
         case RecipientName => recipientName
+        case _ => throw new IllegalArgumentException("Template param not recognized")
       }
       (templateField.name, paramValue)
     }
