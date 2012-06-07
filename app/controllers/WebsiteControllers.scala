@@ -1,10 +1,6 @@
 package controllers
 
 import website._
-import admin._
-import example.{PostFacebookLoginCallbackEndpoint, GetFacebookLoginEndpoint, GetSocialPostEndpoint}
-import nonproduction.PostBuyDemoProductEndpoint
-import website.GetRootEndpoint
 import services.blobs.Blobs
 import services.mail.Mail
 import services.payment.Payment
