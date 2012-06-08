@@ -40,7 +40,7 @@ require:
             - org.scalatest -> *
     - play
     - play -> scala 0.9.1
-    - play -> less 0.3.compatibility
+    - play -> less 0.9.1
     - play -> cloudbees 0.2.2
     - play -> mockito 0.1
     - project-modules -> frontend project

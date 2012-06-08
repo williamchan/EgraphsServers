@@ -1,4 +1,4 @@
-@(featuredStars:Seq[models.frontend.landing.FeaturedStar])
+@(featuredStars:Iterable[models.frontend.landing.FeaturedStar])
 
 @featuredStarBlock(clearFix: Boolean) = {
   @for(starRow <- featuredStars.grouped(4).toList) {

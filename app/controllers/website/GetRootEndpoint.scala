@@ -2,20 +2,31 @@ package controllers.website
 
 import play.mvc.Controller
 import services.http.ControllerMethod
-import models.Celebrity
 import services.Utils
 import controllers.WebsiteControllers
+import models.{CelebrityStore, Celebrity}
 
 private[controllers] trait GetRootEndpoint { this: Controller =>
-  import views.Application._
+  import GetRootEndpoint.ModelViewConversions._
+
 
   protected def controllerMethod: ControllerMethod
+  protected def celebrityStore: CelebrityStore
 
   /**
    * Serves the application's landing page.
    */
   def getRootEndpoint = controllerMethod() {
-    html.index()
+    // Get the list of domain objects from the DB
+    val featuredCelebs = celebrityStore.getFeaturedPublishedCelebrities
+
+    // Turn the domain objects into view (FeaturedStars), filtering out the ones
+    // that were invalid due to lack of a public name or url slug.
+    val validStars = for (celeb <- featuredCelebs; validStar <- celeb.asFeaturedStar) yield {
+      validStar
+    }
+
+    views.frontend.html.landing(validStars)
   }
 }
 
@@ -31,7 +42,7 @@ object GetRootEndpoint {
         for (publicName <- celebrity.publicName; urlSlug <- celebrity.urlSlug) yield {
           FeaturedStar(
             name=publicName,
-            secondaryText=Some("Free Agent"), // TODO actually populate with celebrity's team.
+            secondaryText=celebrity.roleDescription,
             imageUrl=Utils.asset("public/images/440x220_placeholder.gif"),
             storefrontUrl=WebsiteControllers.lookupGetCelebrity(urlSlug).url
           )

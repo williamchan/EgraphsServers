@@ -48,8 +48,10 @@ class CelebrityTests extends UnitFlatSpec
       apiKey = Some("apiKey"),
       description = Some("desc"),
       publicName = Some("pname"),
+      isFeatured = true,
+      roleDescription = Some("Pitcher, Tampa Bay Rays"),
       profilePhotoUpdated = Some(Time.toBlobstoreFormat(Time.now))
-    )
+    ).withPublishedStatus(PublishedStatus.Published)
   }
 
   //
@@ -114,5 +116,36 @@ class CelebrityTests extends UnitFlatSpec
     inventoryBatch2.products.associate(product1)
     inventoryBatch2.products.associate(product2)
     celebrity.productsInActiveInventoryBatches().toSet should be(Set(product1, product2))
+  }
+
+  "getFeaturedPublishedCelebrities" should "only return published celebrities that are featured" in {
+    import PublishedStatus.{Published, Unpublished}
+
+    // Set up
+    val featuredPublishedShouldBeInResults = Vector(
+      (true, Published, true),
+      (true, Unpublished, false),
+      (false, Published, false),
+      (false, Unpublished, false)
+    )
+
+    val celebs = for (val (featured, published, _) <- featuredPublishedShouldBeInResults) yield {
+      TestData.newSavedCelebrity()
+        .copy(isFeatured=featured)
+        .withPublishedStatus(published)
+        .save()
+    }
+
+    val results = store.getFeaturedPublishedCelebrities.toList
+
+    // Execute the test on the data table featuredPublishedShouldBeInResults
+    for ( val (celeb, i) <- celebs.zipWithIndex) {
+      val shouldBeInResults = featuredPublishedShouldBeInResults(i)._3
+      if (shouldBeInResults) results should contain (celeb) else results should not contain (celeb)
+    }
+  }
+
+  def newCelebWithFeatureAndPublishedStatus(isFeatured:Boolean, published:PublishedStatus.EnumVal) = {
+
   }
 }

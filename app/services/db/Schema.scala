@@ -39,6 +39,7 @@ class Schema @Inject()(
   on(celebrities)(celebrity =>
     declare(
       celebrity.urlSlug is (unique),
+      celebrity.isFeatured is (indexed),
       celebrity.description is (dbType("varchar(255)"))
     )
   )
