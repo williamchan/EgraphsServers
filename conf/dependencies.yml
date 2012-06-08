@@ -43,6 +43,7 @@ require:
     - play -> less 0.3.compatibility
     - play -> cloudbees 0.2.2
     - play -> mockito 0.1
+    - project-modules -> frontend project
     - provided -> mockito-all 1.9.1-SNAPSHOT
     - provided -> scala-guice_2.8.1 0.1
     - provided -> tritonus_share 0.3.6
@@ -53,6 +54,11 @@ require:
 
 # Non-default repositories
 repositories:
+    - Module Folder:
+        type:       local
+        artifact:   ${application.path}/.modules/[module]
+        contains:
+            - project-modules
     - Akka:
          type: iBiblio
          root: "http://repo.typesafe.com/typesafe/releases"
