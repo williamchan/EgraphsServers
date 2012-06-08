@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+# Tests evolutions
+#
+
+echo ""
+echo "Preparing to run all database evolutions on a fresh db."
+echo ""
+printf "\e[00;31mTHIS WILL DESTROY YOUR LOCAL EGRAPHS SCHEMA.\e[00m Be certain there's no\n"
+echo "special data on this machine's egraphs schema that you'll need before"
+echo "entering in your postgres password (it's probably just postgres)."
+echo "..."
+printf "\e[00;32mOk, ready? What's your postgres password? (probably just \"postgres\")\e[00m\n"
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd $SCRIPT_DIR
+
+psql postgres -f scrub_schema.sql
+PSQL_RESULT=$?
+
+if [ "$PSQL_RESULT" == "0" ]; then
+    echo "Done scrubbing the schema. Performing evolutions."
+    cd ..
+    play evolutions:apply
+else
+    echo ""
+    echo "You chickened out at the last moment. Come back when you're done sucking your thumb."
+fi

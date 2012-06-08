@@ -18,15 +18,18 @@ private[controllers] trait GetCelebritiesAdminEndpoint {
     adminFilters.requireAdministratorLogin { admin =>
       val query = celebrityStore.getCelebrityAccounts
       val pagedQuery: (Iterable[(Celebrity, Account)], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
-      WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebritiesAdminEndpoint.url())
-      views.Application.admin.html.admin_celebrities(celebrityAccounts = pagedQuery._1)
+      WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebritiesAdminEndpoint.location)
+      views.Application.admin.html.admin_celebrities(
+        celebrityAccounts = pagedQuery._1,
+        celebrityStore.getAll // for the Featured Stars chooser
+      )
     }
   }
 }
 
 object GetCelebritiesAdminEndpoint {
 
-  def url(): ActionDefinition = {
+  def location: ActionDefinition = {
     Utils.lookupUrl("WebsiteControllers.getCelebritiesAdmin")
   }
 }

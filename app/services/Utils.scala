@@ -125,6 +125,21 @@ class Utils @Inject()(@PlayConfig() playConfig: Properties)
     )
   }
 
+  /**
+   * Returns valid file asset relative URLs on the Play application's path
+   * given a putative one.
+   *
+   * Throws an exception if the path could not be resolved to an actual file.
+   * For example, Utils.asset("public/javascripts/jquery1.5.2") may succeed,
+   * whereas any misspelling thereof would fail.
+   * @param path the path to check for validity
+   *
+   * @return a valid path, or throw an exception
+   */
+  def asset(path: String): String = {
+    play.mvc.Router.reverse(play.Play.getVirtualFile(path))
+  }
+
   implicit def properties(pairs: (AnyRef, AnyRef)*): Properties = {
     val props = new Properties
     

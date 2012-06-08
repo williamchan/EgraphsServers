@@ -1,0 +1,2 @@
+DROP DATABASE egraphs;
+CREATE DATABASE egraphs;

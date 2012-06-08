@@ -426,7 +426,7 @@ class Scenarios extends DeclaresScenarios {
     "Create Admin",
     adminCategory,
     """
-    Creates an Administrator at admin@egraphs.com/derp
+    Creates an Administrator at admin@egraphs.com/egraphsa
     """,
 
     {() =>

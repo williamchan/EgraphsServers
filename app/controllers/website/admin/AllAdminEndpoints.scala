@@ -34,4 +34,6 @@ trait AllAdminEndpoints
   with PostEgraphAdminEndpoint
   with PostLoginAdminEndpoint
   with PostLogoutAdminEndpoint
-  with PostOrderAdminEndpoint { this: Controller => }
+  with PostOrderAdminEndpoint
+  with PostFeaturedCelebritiesAdminEndpoint
+{ this: Controller => }

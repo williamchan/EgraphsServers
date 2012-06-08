@@ -13,7 +13,7 @@
 // More about case classes: http://www.codecommit.com/blog/scala/case-classes-are-cool
 //
 
-package models
+package models.frontend
 
 /**
  * An example of what a Product might look like. It has been namespaced to Frontend

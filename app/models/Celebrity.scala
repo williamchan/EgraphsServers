@@ -39,6 +39,8 @@ case class Celebrity(id: Long = 0,
                      profilePhotoUpdated: Option[String] = None,
                      enrollmentStatusValue: String = EnrollmentStatus.NotEnrolled.value,
                      isLeftHanded: Boolean = false,
+                     isFeatured: Boolean = false,
+                     roleDescription: Option[String] = None, // e.g. "Pitcher, Red Sox"
                      _publishedStatus: String = PublishedStatus.Unpublished.name,
                      created: Timestamp = Time.defaultTimestamp,
                      updated: Timestamp = Time.defaultTimestamp,
@@ -259,6 +261,31 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
     celebrityAccounts
   }
 
+  def getFeaturedPublishedCelebrities: Iterable[Celebrity] = {
+    from(schema.celebrities)( c =>
+      where(c.isFeatured === true and c._publishedStatus === PublishedStatus.Published.name)
+      select (c)
+    )
+  }
+
+  def getAll: Iterable[Celebrity] = {
+    for (celeb <- schema.celebrities) yield celeb
+  }
+
+  def updateFeaturedCelebrities(newFeaturedCelebIds: Iterable[Long]) {
+    // First update those gentlemen that are no longer featured
+    update(schema.celebrities)(c =>
+      where(c.isFeatured === true and (c.id notIn newFeaturedCelebIds))
+      set(c.isFeatured := false)
+    )
+
+    // Now lets feature the real stars here!
+    update(schema.celebrities)(c =>
+      where(c.id in newFeaturedCelebIds)
+        set(c.isFeatured := true)
+    )
+  }
+
   //
   // Saves[Celebrity] methods
   //
@@ -277,6 +304,8 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
       theOld.isLeftHanded := theNew.isLeftHanded,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated,
+      theOld.isFeatured := theNew.isFeatured,
+      theOld.roleDescription := theNew.roleDescription,
       theOld._publishedStatus := theNew._publishedStatus
     )
   }

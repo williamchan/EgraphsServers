@@ -71,6 +71,7 @@ GET     /admin/accounts/{accountId}                                WebsiteContro
 GET     /admin/celebrities                                         WebsiteControllers.getCelebritiesAdmin
 POST    /admin/celebrities                                         WebsiteControllers.postCelebrityAdmin
 GET     /admin/celebrities/create                                  WebsiteControllers.getCreateCelebrityAdmin
+POST    /admin/celebrities/featured                                WebsiteControllers.postFeaturedCelebrities
 GET     /admin/celebrities/{celebrityId}                           WebsiteControllers.getCelebrityAdmin
 GET     /admin/celebrities/{celebrityId}/egraphs                   WebsiteControllers.getCelebrityEgraphsAdmin
 GET     /admin/celebrities/{celebrityId}/inventorybatches          WebsiteControllers.getCelebrityInventoryBatchesAdmin
