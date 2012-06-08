@@ -44,10 +44,10 @@ trait PostBuyProductEndpoint { this: Controller =>
           stripeTokenId: String,
           desiredText: Option[String],
           personalNote: Option[String],
-          isDemo: Boolean = false) = postController(openDatabase=false) {
+          isDemo: Boolean = false) = postController(openDatabase=false, doCsrfCheck= (!isDemo || !payment.isTest)) {
 
-    (isDemo, payment.isTest) match {
-      case (false, _) | (true, true) =>
+    payment.isTest match {
+      case true =>
         post(recipientName, recipientEmail, buyerName, buyerEmail, stripeTokenId, desiredText, personalNote, isDemo)
 
       case _ =>
