@@ -1,0 +1,44 @@
+@()
+
+@catalogEntry(href: String, description: String) = {<li><a href="@href">@description</a></li>}
+
+<!doctype html>
+<html>
+  <head>
+    <title>Front-end catalog</title>
+  </head>
+  <body>
+    <h1>Front-end catalog</h1>
+    <p>
+      In here you can find the catalog of all the different pages we render, in all their
+      permutations.
+    </p>
+    <p>
+      Without further ado!
+    </p>
+    <h2>Landing page</h2>
+    <ol>
+      @landingEntry(controllerName: String) = {
+        @catalogEntry(href="Landing/" + controllerName, description=controllerName)
+      }
+
+      @for(number <- 0 until 9) {
+        @landingEntry("featured_stars?count=" + number)
+      }
+    </ol>
+
+  </body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+

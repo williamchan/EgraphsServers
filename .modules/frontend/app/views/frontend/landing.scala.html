@@ -1,4 +1,28 @@
-@(title:String = "Egraphs")
+@(featuredStars:Seq[models.frontend.landing.FeaturedStar])
+
+@featuredStarBlock(clearFix: Boolean) = {
+  @for(starRow <- featuredStars.grouped(4).toList) {
+    <div class="celebrities row">
+      @if(clearFix) {<div class="clearfix">}
+
+      @for(star <- starRow) {
+        <article class="span3">
+
+          <figure>
+            <a href="#"><img src="@star.imageUrl" alt="@star.name" /></a>
+          </figure>
+
+          <h4><a href="#">@star.name &rsaquo;</a></h4>
+
+          <p>@star.secondaryText</p>
+
+        </article>        
+      }
+
+      @if(clearFix) {</div>}
+    </div>
+  }
+}
 
 @baseBody = {
   <section id="masthead-home" role="banner">
@@ -35,62 +59,8 @@
 
           <h3><a href="#featured-stars">This Week's Stars <span>+</span></a></h3>
 
-          <div class="celebrities row">
-
-            <div class="clearfix">
-
-              <article class="span3">
-
-                <figure>
-                  <a href="#"><img src="http://placehold.it/440x220" alt="FPO Celebrity" /></a>
-                </figure>
-
-                <h4><a href="#">Celebrity Name &gt;</a></h4>
-
-                <p>Team Name Goes Here</p>
-
-              </article>
-
-              <article class="span3">
-
-                <figure>
-                  <a href="#"><img src="http://placehold.it/440x220" alt="FPO Celebrity" /></a>
-                </figure>
-
-                <h4><a href="#">Celebrity Name &gt;</a></h4>
-
-                <p>Team Name Goes Here</p>
-
-              </article>
-
-              <article class="span3">
-
-                <figure>
-                  <a href="#"><img src="http://placehold.it/440x220" alt="FPO Celebrity" /></a>
-                </figure>
-
-                <h4><a href="#">Celebrity Name &gt;</a></h4>
-
-                <p>Team Name Goes Here</p>
-
-              </article>
-
-              <article class="span3">
-
-                <figure>
-                  <a href="#"><img src="http://placehold.it/440x220" alt="FPO Celebrity" /></a>
-                </figure>
-
-                <h4><a href="#">Celebrity Name &gt;</a></h4>
-
-                <p>Team Name Goes Here</p>
-
-              </article>
-
-            </div>
-
-          </div> <!-- end .celebrities -->
-
+          @featuredStarBlock(clearFix=true)
+          
         </footer> <!-- end #landing-stars -->
 
         <header id="landing-welcome" class="row">
@@ -279,58 +249,8 @@
 
             </div>
 
-            <div class="celebrities row">
-
-              <article class="span3">
-
-                <figure>
-                  <a href="#"><img src="http://placehold.it/440x220" alt="FPO Celebrity" /></a>
-                </figure>
-
-                <h4><a href="#">Celebrity Name &gt;</a></h4>
-
-                <p>Team Name Goes Here</p>
-
-              </article>
-
-              <article class="span3">
-
-                <figure>
-                  <a href="#"><img src="http://placehold.it/440x220" alt="FPO Celebrity" /></a>
-                </figure>
-
-                <h4><a href="#">Celebrity Name &gt;</a></h4>
-
-                <p>Team Name Goes Here</p>
-
-              </article>
-
-              <article class="span3">
-
-                <figure>
-                  <a href="#"><img src="http://placehold.it/440x220" alt="FPO Celebrity" /></a>
-                </figure>
-
-                <h4><a href="#">Celebrity Name &gt;</a></h4>
-
-                <p>Team Name Goes Here</p>
-
-              </article>
-
-              <article class="span3">
-
-                <figure>
-                  <a href="#"><img src="http://placehold.it/440x220" alt="FPO Celebrity" /></a>
-                </figure>
-
-                <h4><a href="#">Celebrity Name &gt;</a></h4>
-
-                <p>Team Name Goes Here</p>
-
-              </article>
-
-            </div> <!-- end .celebrities -->
-
+            @featuredStarBlock(clearFix=false)
+            
           </footer>
 
         </section> <!-- end #landing-more -->			      
@@ -344,4 +264,4 @@
   </section> <!-- end #content -->
 }
 
-@base_template(title=title, body=baseBody)
+@base_template(title="Egraphs", body=baseBody)

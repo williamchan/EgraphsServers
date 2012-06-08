@@ -8,18 +8,17 @@ import play.mvc._
 import models.frontend.ExampleFrontendProduct
 
 object Application extends Controller {
-  import views.frontend
   
   def index = {
     // Render the landing page
-    frontend.html.landing()
+    views.html.catalog()
   }
 
   /**
    * Shows a very simple template. Located at /Application/simple_example
    */
   def simple_example = {
-    frontend.example.html.simple("herp derp")
+    views.frontend.example.html.simple("herp derp")
   }
 
   /**
@@ -31,7 +30,7 @@ object Application extends Controller {
       ExampleFrontendProduct(id="2", name="My Second Product", price="100")
     )
     
-    frontend.example.html.uses_model(products)
+    views.frontend.example.html.uses_model(products)
   }
 
   /**
@@ -39,7 +38,7 @@ object Application extends Controller {
    * In this case base_template_example.
    */
   def code_reuse_example = {
-    frontend.example.html.uses_base_template()
+    views.frontend.example.html.uses_base_template()
   }
 }
 
