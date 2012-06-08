@@ -84,7 +84,7 @@ class Scenarios extends DeclaresScenarios {
 
       Account(email="wchan83@egraphs.com",
               celebrityId=Some(celebrity.id)
-      ).withPassword("derp").right.get.save()
+      ).withPassword(TestData.defaultPassword).right.get.save()
 
      celebrity.saveWithProfilePhoto(Play.getFile("./test/files/will_chan_celebrity_profile.jpg"))
    }

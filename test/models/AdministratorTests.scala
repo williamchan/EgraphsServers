@@ -3,9 +3,9 @@ package models
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
-import utils.{DBTransactionPerTest, SavingEntityTests, CreatedUpdatedEntityTests, ClearsDatabaseAndValidationBefore}
 import services.AppConfig
 import services.Time
+import utils._
 
 class AdministratorTests extends UnitFlatSpec
   with ShouldMatchers
@@ -43,7 +43,7 @@ class AdministratorTests extends UnitFlatSpec
   //
 
   "authenticate" should "return Administrator with correct credentials, else return None" in {
-    val pw = "derp"
+    val pw = TestData.defaultPassword
     val acct = Account(email = "customer-" + Time.toBlobstoreFormat(Time.now) + "@egraphs.com").withPassword(pw).right.get.save()
     adminStore.authenticate(email = acct.email, passwordAttempt = pw) should be(None)
 

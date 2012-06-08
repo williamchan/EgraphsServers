@@ -3,7 +3,7 @@ package services
 import blobs.BlobModule
 import db.DBModule
 import graphics.GraphicsModule
-import http.PlayConfig
+import http.HttpModule
 import mail.{MailProvider, Mail}
 import models._
 import models.vbg._
@@ -13,18 +13,14 @@ import signature.SignatureBiometricsModule
 import social.SocialModule
 import voice.VoiceBiometricsModule
 import uk.me.lings.scalaguice.{InjectorExtensions, ScalaModule}
-import java.util.Properties
-import play.Play
 import com.google.inject.{Injector, Singleton, Guice, AbstractModule}
 
 class AppConfig extends AbstractModule with ScalaModule {
   override def configure() {
-    // Play helpers
-    bind[Properties].annotatedWith[PlayConfig].toInstance(Play.configuration)
-
     // Services
     bind[Mail].toProvider[MailProvider]
     install(DBModule)
+    install(HttpModule)
     install(BlobModule)
     install(PaymentModule)
     install(SignatureBiometricsModule)

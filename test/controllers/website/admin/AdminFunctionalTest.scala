@@ -7,6 +7,7 @@ import scala.collection.JavaConversions._
 import play.mvc.Http.Response
 import controllers.website.EgraphsFunctionalTest
 import models.PublishedStatus
+import utils.TestData
 
 trait AdminFunctionalTest extends EgraphsFunctionalTest {
 
@@ -20,7 +21,7 @@ trait AdminFunctionalTest extends EgraphsFunctionalTest {
   }
 
   def loginAsAdmin(): Response = {
-    val response = POST("/admin/login", Map[String, String]("email" -> "admin@egraphs.com","password" -> "derp"))
+    val response = POST("/admin/login", Map[String, String]("email" -> "admin@egraphs.com","password" -> TestData.defaultPassword))
     assertStatus(302, response)
     assertHeaderEquals("Location", "/admin/celebrities", response)
     response
@@ -35,7 +36,7 @@ trait AdminFunctionalTest extends EgraphsFunctionalTest {
 
   def getPostCelebrityStrParams(celebrityId: Long = 0,
                                         celebrityEmail: String = "ali@egraphs.com",
-                                        celebrityPassword: String = "derp",
+                                        celebrityPassword: String = TestData.defaultPassword,
                                         firstName: String = "Cassius",
                                         lastName: String = "Clay",
                                         publicName: String = "Muhammad Ali",

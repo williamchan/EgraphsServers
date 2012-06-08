@@ -1,4 +1,4 @@
-package controllers.nonproduction
+package controllers.website.nonproduction
 
 import play.test.FunctionalTest
 import org.junit.Test

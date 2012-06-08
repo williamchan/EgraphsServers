@@ -1,4 +1,4 @@
-package controllers.nonproduction
+package controllers.website.nonproduction
 
 import services.payment.Payment
 import controllers.website.PostBuyProductEndpoint

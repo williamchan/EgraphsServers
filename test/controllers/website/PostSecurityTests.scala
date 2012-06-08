@@ -1,31 +1,66 @@
 package controllers.website
 
-import org.junit.Test
-import play.mvc.Http.Response
 import play.test.FunctionalTest
-import FunctionalTest._
-import services.Utils
+import uk.me.lings.scalaguice.ScalaModule
+import services.http.{RequireAuthenticityTokenFilter, RequireAuthenticityTokenFilterProvider}
+import play.mvc.Scope.Session
+import play.mvc.Http.Request
+import play.mvc.results.Forbidden
+import com.google.inject.AbstractModule
+import utils.{TestWebsiteControllers, TestAppConfig, EgraphsUnitTest}
 
-class PostSecurityTests extends FunctionalTest {
+class PostSecurityTests extends EgraphsUnitTest {
+  "Website POST controllers" should "require authenticity token checks" in {
+    val (endpoints, forbiddenInstance) = websiteControllersThatAlwaysFailAuthenticityCheck
+    implicit val request = FunctionalTest.newRequest()
 
-  @Test
-  def testPostControllersRequireAuthenticityToken() {
-    // admin security
-    assertAuthenticityTokenIsRequired(POST(Utils.lookupUrl("WebsiteControllers.postLoginAdmin", Map[String, String]("authenticityCheck" -> "fail")).url))
-    assertAuthenticityTokenIsRequired(POST(Utils.lookupUrl("WebsiteControllers.postLogoutAdmin", Map[String, String]("authenticityCheck" -> "fail")).url))
-    assertAuthenticityTokenIsRequired(POST(Utils.lookupUrl("WebsiteControllers.postAccountAdmin", Map[String, String]("authenticityCheck" -> "fail")).url))
-    assertAuthenticityTokenIsRequired(POST(Utils.lookupUrl("WebsiteControllers.postCelebrityAdmin", Map[String, String]("authenticityCheck" -> "fail")).url))
-    assertAuthenticityTokenIsRequired(POST(Utils.lookupUrl("WebsiteControllers.postCelebrityProductAdmin", Map[String, String]("authenticityCheck" -> "fail", "celebrityId" -> "1")).url))
-    assertAuthenticityTokenIsRequired(POST(Utils.lookupUrl("WebsiteControllers.postOrderAdmin", Map[String, String]("authenticityCheck" -> "fail", "orderId" -> "1")).url))
-    assertAuthenticityTokenIsRequired(POST(Utils.lookupUrl("WebsiteControllers.postEgraphAdmin", Map[String, String]("authenticityCheck" -> "fail", "egraphId" -> "1")).url))
-    assertAuthenticityTokenIsRequired(POST(Utils.lookupUrl("WebsiteControllers.postCelebrityInventoryBatchAdmin", Map[String, String]("authenticityCheck" -> "fail", "celebrityId" -> "1")).url))
+    val endpointInvocationsThatRequireTokens = List(
+      () => endpoints.postLoginAdmin(null, null),
+      () => endpoints.postLogoutAdmin(),
+      () => endpoints.postAccountAdmin(0, null, null),
+      () => endpoints.postCelebrityAdmin(0, null, null, null, null, null, null, null),
+      () => endpoints.postCelebrityProductAdmin(0, null, null, null, null, 0, 0, null, null, null),
+      () => endpoints.postOrderAdmin(0),
+      () => endpoints.postEgraphAdmin(0),
+      () => endpoints.postCelebrityInventoryBatchAdmin(0, 0, null, null)
+    )
 
-    // website security
-    assertAuthenticityTokenIsRequired(POST(Utils.lookupUrl("WebsiteControllers.postBuyProduct", Map[String, String]("authenticityCheck" -> "fail", "celebrityUrlSlug" -> "1", "productUrlSlug" -> "1")).url))
+    for (endpointInvocation <- endpointInvocationsThatRequireTokens) {
+      endpointInvocation() match {
+        case forbidden: Forbidden =>
+          forbidden.getMessage should be (forbiddenInstance.getMessage)
+
+        case somethingElse =>
+          fail("Expected a Forbidden but instead got: " + somethingElse)
+      }
+    }
   }
 
-  private def assertAuthenticityTokenIsRequired(response: Response) {
-    assertStatus(403, response)
-    assertContentMatch("Bad authenticity token", response)
+  private def websiteControllersThatAlwaysFailAuthenticityCheck: (AllWebsiteEndpoints, Forbidden) = {
+    // Slightly modify our application config to always fail authenticity checks and return
+    // an implementation of our endpoints tied to that configuration (along with the specific
+    // instance of Forbidden that should be returned
+    val forbiddenMessage = "failed authenticity token check"
+    val forbidden = new Forbidden(forbiddenMessage)
+
+    val fakeAuthenticityCheckProvider = new RequireAuthenticityTokenFilterProvider(null) {
+      override def apply(doCheck: Boolean): RequireAuthenticityTokenFilter = {
+        new RequireAuthenticityTokenFilter {
+          override def apply[A](operation: => A)(implicit session: Session, request: Request): Either[Forbidden, A] = {
+            Left(forbidden)
+          }
+        }
+      }
+    }
+
+    val moduleWithAlwaysFailAuthenticityCheck = new AbstractModule with ScalaModule {
+      def configure() {
+        bind[RequireAuthenticityTokenFilterProvider].toInstance(fakeAuthenticityCheckProvider)
+      }
+    }
+
+    val testEndpoints = new TestAppConfig(moduleWithAlwaysFailAuthenticityCheck).instance[TestWebsiteControllers]
+
+    (testEndpoints, forbidden)
   }
 }

@@ -296,7 +296,7 @@ class DemoScenarios extends DeclaresDemoScenarios {
 
     Account(email = email,
       celebrityId = Some(celebrity.id)
-    ).withPassword("derp").right.get.save()
+    ).withPassword("egraphsa").right.get.save()
 
     val inventoryBatch = InventoryBatch(celebrityId = celebrity.id, numInventory = 100, startDate = today, endDate = future).save()
 
@@ -336,7 +336,7 @@ object DemoScenarios {
     val adminEmail = "admin@egraphs.com"
     if (accountStore.findByEmail(adminEmail).isEmpty) {
       val administrator = Administrator().save()
-      Account(email = adminEmail, administratorId = Some(administrator.id)).withPassword("derp").right.get.save()
+      Account(email = adminEmail, administratorId = Some(administrator.id)).withPassword("egraphsa").right.get.save()
     }
   }
 

@@ -97,7 +97,7 @@ class PostCelebrityAdminEndpointTests extends AdminFunctionalTest {
 
 //  @Test
 //  def testPostCelebrityChecksThatPasswordMatchesExistingPasswordOnAccount() {
-//    Account(email="wchan83@egraphs.com").withPassword("derp").right.get.save()
+//    Account(email="wchan83@egraphs.com").withPassword(TestData.defaultPassword).right.get.save()
 //
 //    val postStrParams: Map[String, String] = getPostParams(
 //      celebrityEmail = "wchan83@egraphs.com",

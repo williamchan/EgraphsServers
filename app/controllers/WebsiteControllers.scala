@@ -1,81 +1,21 @@
 package controllers
 
 import website._
-import website.admin._
-import example.{GetFacebookLoginEndpoint, GetSocialPostEndpoint}
-import nonproduction.PostBuyDemoProductEndpoint
 import services.blobs.Blobs
 import services.mail.Mail
 import services.payment.Payment
 import play.mvc.{Router, Controller}
 import models._
+import services.Utils
 import play.mvc.Router.ActionDefinition
 import play.mvc.results.Redirect
 import services.db.DBSession
-import java.util.Properties
-import services.Utils
-import services.http.{PlayConfig, SecurityRequestFilters, ControllerMethod, AdminRequestFilters, CelebrityAccountRequestFilters}
 import services.social.FacebookAppId
+import services.http._
+import java.util.Properties
 
-object WebsiteControllers extends Controller
-  with GetRootEndpoint
-  with GetBlobEndpoint
-  with GetCelebrityEndpoint
-  with GetCelebrityProductEndpoint
-  with GetEgraphEndpoint
-  with GetOrderConfirmationEndpoint
-  with PostBuyDemoProductEndpoint
-  with PostBuyProductEndpoint
-
-  // admin endpoints
-  with GetRootAdminEndpoint
-  with GetAccountAdminEndpoint
-  with GetAccountsAdminEndpoint
-  with GetCelebritiesAdminEndpoint
-  with GetCelebrityAdminEndpoint
-  with GetCelebrityEgraphsAdminEndpoint
-  with GetCelebrityInventoryBatchesAdminEndpoint
-  with GetCelebrityOrdersAdminEndpoint
-  with GetCelebrityProductsAdminEndpoint
-  with GetCreateAccountAdminEndpoint
-  with GetCreateCelebrityAdminEndpoint
-  with GetCreateCelebrityInventoryBatchAdminEndpoint
-  with GetCreateCelebrityProductAdminEndpoint
-  with GetEgraphAdminEndpoint
-  with GetEgraphsAdminEndpoint
-  with GetInventoryBatchAdminEndpoint
-  with GetLoginAdminEndpoint
-  with GetOrderAdminEndpoint
-  with GetOrdersAdminEndpoint
-  with GetProductAdminEndpoint
-  with GetScriptAdminEndpoint
-  with PostAccountAdminEndpoint
-  with PostCelebrityAdminEndpoint
-  with PostCelebrityInventoryBatchAdminEndpoint
-  with PostCelebrityProductAdminEndpoint
-  with PostEgraphAdminEndpoint
-  with PostLoginAdminEndpoint
-  with PostLogoutAdminEndpoint
-  with PostOrderAdminEndpoint
-
-  // customer account endpoints
-  with GetRegisterEndpoint
-  with PostRegisterEndpoint
-  with GetLoginEndpoint
-  with PostLoginEndpoint
-  with PostLogoutEndpoint
-  with GetRecoverAccountEndpoint
-  with PostRecoverAccountEndpoint
-  with GetRecoverAccountConfirmationEndpoint
-  with GetResetPasswordEndpoint
-  with PostResetPasswordEndpoint
-  with PostFacebookLoginCallbackEndpoint
-
-  // social media exploratory work
-  with GetSocialPostEndpoint
-  with GetFacebookLoginEndpoint
+object WebsiteControllers extends Controller with AllWebsiteEndpoints
 {
-
   import services.AppConfig.instance
   import services.AppConfig.annotatedInstance
 
@@ -88,8 +28,8 @@ object WebsiteControllers extends Controller
 
   override protected val dbSession = instance[DBSession]
   override protected val controllerMethod = instance[ControllerMethod]
+  override protected val postController = instance[POSTControllerMethod]
   override protected val adminFilters = instance[AdminRequestFilters]
-  override protected val securityFilters = instance[SecurityRequestFilters]
   override protected val celebFilters = instance[CelebrityAccountRequestFilters]
   override protected val egraphQueryFilters = instance[EgraphQueryFilters]
   override protected val inventoryBatchQueryFilters = instance[InventoryBatchQueryFilters]

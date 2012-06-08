@@ -7,21 +7,21 @@
 ###
 %{ if (play.id == "test") }%
 
-GET     /test/scenarios                          nonproduction.ScenarioController.list
-GET     /test/scenarios/clear                    nonproduction.ScenarioController.clear
-GET     /test/scenarios/{urlSlug}                nonproduction.ScenarioController.scenario
-GET     /test/pages/egraph                       nonproduction.TestControllers.getHardwiredEgraphPage
+GET     /test/scenarios                          website.nonproduction.ScenarioController.list
+GET     /test/scenarios/clear                    website.nonproduction.ScenarioController.clear
+GET     /test/scenarios/{urlSlug}                website.nonproduction.ScenarioController.scenario
+GET     /test/pages/egraph                       website.nonproduction.TestControllers.getHardwiredEgraphPage
 
-GET     /demo-setup/list                         nonproduction.DemoSetupController.list
-GET     /demo-setup/clear                        nonproduction.DemoSetupController.clear
-GET     /demo-setup/{urlSlug}                    nonproduction.DemoSetupController.demoScenario
+GET     /demo-setup/list                         website.nonproduction.DemoSetupController.list
+GET     /demo-setup/clear                        website.nonproduction.DemoSetupController.clear
+GET     /demo-setup/{urlSlug}                    website.nonproduction.DemoSetupController.demoScenario
 
-GET     /admin/reset-alpha-state                 nonproduction.TestControllers.resetAlphaState
+GET     /admin/reset-alpha-state                 website.nonproduction.TestControllers.resetAlphaState
 
-GET     /test/request-transaction/without-error  nonproduction.TransactionTestController.makeAccount
-GET     /test/request-transaction/with-error     nonproduction.TransactionTestController.makeAccountAndThrowException
-GET     /test/request-transaction/is-stored      nonproduction.TransactionTestController.isStored
-GET     /test/log-stuff-then-die                 nonproduction.TestControllers.logStuffThenThrowException
+GET     /test/request-transaction/without-error  website.nonproduction.TransactionTestController.makeAccount
+GET     /test/request-transaction/with-error     website.nonproduction.TransactionTestController.makeAccountAndThrowException
+GET     /test/request-transaction/is-stored      website.nonproduction.TransactionTestController.isStored
+GET     /test/log-stuff-then-die                 website.nonproduction.TestControllers.logStuffThenThrowException
 
 ###
 ### Production routes
@@ -36,8 +36,8 @@ GET     /                                       WebsiteControllers.getRootEndpoi
 
 # For Alpha-phase prod mode:
 
-GET     /test/memcached                         nonproduction.TestControllers.memcached
-GET     /test/create-test-orders                nonproduction.TestControllers.createTestOrders
+GET     /test/memcached                         website.nonproduction.TestControllers.memcached
+GET     /test/create-test-orders                website.nonproduction.TestControllers.createTestOrders
 GET     /test/files/{<.*>blobKey}               WebsiteControllers.getBlob
 
 # Map static resources from the /app/public folder to the /public path

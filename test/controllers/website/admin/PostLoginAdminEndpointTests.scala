@@ -4,6 +4,7 @@ import org.junit.Test
 import scala.collection.JavaConversions._
 import play.test.FunctionalTest
 import FunctionalTest._
+import utils.TestData
 
 class PostLoginAdminEndpointTests extends AdminFunctionalTest {
 
@@ -16,7 +17,7 @@ class PostLoginAdminEndpointTests extends AdminFunctionalTest {
 
   @Test
   def testAuthenticationValidation() {
-    val response = POST("/admin/login", getPostStrParams(email = "idontexist@egraphs.com", password = "herp"))
+    val response = POST("/admin/login", getPostStrParams(email = "idontexist@egraphs.com", password = TestData.defaultPassword))
     assertStatus(302, response)
     assertHeaderEquals("Location", "/admin/login", response)
   }

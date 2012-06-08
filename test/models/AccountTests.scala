@@ -33,23 +33,23 @@ class AccountTests extends UnitFlatSpec
   }
 
   "withPassword" should "set the password on an Account" in {
-    accountWithPassword("derp").password should not be (None)
+    accountWithPassword(TestData.defaultPassword).password should not be (None)
   }
 
   "An Account" should "have different hashes and salts when the same password is set twice" in {
-    val credential = accountWithPassword("derp")
+    val credential = accountWithPassword(TestData.defaultPassword)
     val firstPassword = credential.password.get
 
-    val password = credential.withPassword("derp").right.get.password.get
+    val password = credential.withPassword(TestData.defaultPassword).right.get.password.get
 
-    firstPassword.is("derp") should be(true)
-    password.is("derp") should be(true)
+    firstPassword.is(TestData.defaultPassword) should be(true)
+    password.is(TestData.defaultPassword) should be(true)
     password.hash should not be (firstPassword.hash)
     password.salt should not be (firstPassword.salt)
   }
 
-  it should "fail validation for password lengths shorter than 4 characters" in {
-    for (password <- List("", "123")) {
+  it should "fail validation for password lengths shorter than 8 characters" in {
+    for (password <- List("", "egraphs")) {
       val errorOrCredential = Account().withPassword(password)
       errorOrCredential.isLeft should be(true)
 
@@ -59,8 +59,8 @@ class AccountTests extends UnitFlatSpec
     }
   }
 
-  it should "pass validation for password lengths 4 characters and longer" in {
-    Account().withPassword("derp").isRight should be(true)
+  it should "pass validation for password lengths 8 characters and longer" in {
+    Account().withPassword(TestData.defaultPassword).isRight should be(true)
 
     Validation.errors should have length (0)
   }
@@ -170,8 +170,8 @@ class AccountStoreTests extends UnitFlatSpec
   override def transformEntity(toTransform: Account) = {
     toTransform.copy(
       email = "derp",
-      passwordHash = Some("derp"),
-      passwordSalt = Some("derp"),
+      passwordHash = Some(TestData.defaultPassword),
+      passwordSalt = Some(TestData.defaultPassword),
       celebrityId = Some(Celebrity().save().id),
       customerId = Some(Customer(name = "name").save().id),
       administratorId = Some(Administrator().save().id)
@@ -180,7 +180,7 @@ class AccountStoreTests extends UnitFlatSpec
 
   it should "store and retrieve correctly" in {
     // Set up
-    val stored = accountWithPassword("derp")
+    val stored = accountWithPassword(TestData.defaultPassword)
     val storedPassword = stored.password.get
 
     // Run test
@@ -195,7 +195,7 @@ class AccountStoreTests extends UnitFlatSpec
     val recalledPassword = recalled.password.get
     recalled.id should be(stored.id)
     recalledPassword should be(storedPassword)
-    recalledPassword.is("derp") should be(true)
+    recalledPassword.is(TestData.defaultPassword) should be(true)
   }
   
   it should "find by customer ID correctly" in {

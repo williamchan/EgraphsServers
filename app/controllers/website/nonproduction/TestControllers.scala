@@ -1,4 +1,4 @@
-package controllers.nonproduction
+package controllers.website.nonproduction
 
 import play.mvc._
 import math.BigDecimal._
@@ -103,7 +103,7 @@ object TestControllers extends Controller with Logging {
     Account(email = email,
       celebrityId = Some(celebrity.id),
       administratorId = Some(administrator.id)
-    ).withPassword("derp").right.get.save()
+    ).withPassword("egraphsa").right.get.save()
 
     val product1 = celebrity.newProduct.copy(
       priceInCurrency = 50,
