@@ -97,7 +97,6 @@ GET     /admin/script                                              WebsiteContro
 # social media exploratory work
 GET     /socialpost                                      WebsiteControllers.getSocialPost
 GET     /facebooklogin                                   WebsiteControllers.getFacebookLogin
-POST    /facebooklogin/callback                          WebsiteControllers.postFacebookLoginCallback
 
 # customer accounts stubs
 GET     /register                                        WebsiteControllers.getRegister
@@ -110,6 +109,7 @@ POST    /account/recover                                 WebsiteControllers.post
 GET     /account/recover/confirmation                    WebsiteControllers.getRecoverAccountConfirmation
 GET     /account/reset                                   WebsiteControllers.getResetPassword
 POST    /account/reset                                   WebsiteControllers.postResetPassword
+POST    /facebooklogin/callback                          WebsiteControllers.postFacebookLoginCallback
 
 # Order and Egraph pages
 GET     /orders/{<[0-9]+>orderId}/confirm                WebsiteControllers.getOrderConfirmation

@@ -10,8 +10,14 @@ trait AllConsumerEndpoints extends GetBlobEndpoint
   with GetCelebrityProductEndpoint
   with GetEgraphEndpoint
   with GetOrderConfirmationEndpoint
+  with GetLoginEndpoint
+  with GetRecoverAccountEndpoint
+  with GetRecoverAccountConfirmationEndpoint
+  with GetRegisterEndpoint
+  with GetResetPasswordEndpoint
   with PostBuyProductEndpoint
   with PostLoginEndpoint
+  with PostLogoutEndpoint
   with PostRecoverAccountEndpoint
   with PostRegisterEndpoint
   with PostResetPasswordEndpoint
