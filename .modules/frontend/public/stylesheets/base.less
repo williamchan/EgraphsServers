@@ -114,8 +114,7 @@ a:hover { text-decoration: none; }
 			}
 			
 			a:hover { 
-				opacity: .75;
-				-moz-opacity: .75;
+				.opacity(75)
 			}
 		
 		}
@@ -237,12 +236,11 @@ a:hover { text-decoration: none; }
 						line-height: 1em;
 						text-shadow: none;				
 						border-bottom: 1px solid rgba(255, 255, 255, .25);
-						background: @orange;
-						opacity: .9;
-						-moz-opacity: .9;
+						background: lighten(@orange, 5%);
+						.opacity(90);
 					
 						a {							
-							color: darken(@white, 10%);
+							color: @white;
 							display: block;
 							padding: 10px;							
 						}	
