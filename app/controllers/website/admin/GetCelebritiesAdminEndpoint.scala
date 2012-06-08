@@ -21,7 +21,7 @@ private[controllers] trait GetCelebritiesAdminEndpoint {
       WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebritiesAdminEndpoint.location)
       views.Application.admin.html.admin_celebrities(
         celebrityAccounts = pagedQuery._1,
-        celebrityStore.getAll
+        celebrityStore.getAll // for the Featured Stars chooser
       )
     }
   }

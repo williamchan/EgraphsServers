@@ -33,11 +33,27 @@ private[controllers] trait GetRootEndpoint { this: Controller =>
 
 object GetRootEndpoint {
 
+  /**
+   * Converts between domain models from the back-end and view models from
+   * the front-end
+   */
   object ModelViewConversions {
 
+    /**
+     * Amalgam class between the Celebrity domain model and the FeaturedStar
+     * view model from the landing page
+     *
+     * @param celebrity the celebrity to transform into a FeaturedStar
+     */
     class FeaturedStarCelebrity(celebrity: Celebrity) {
       import models.frontend.landing.FeaturedStar
 
+      /**
+       * The celebrity as a FeaturedStar. If some necessary data for the FeaturedStar
+       * were not available (e.g. publicName, storeFrontUrl) then it returns None.
+       *
+       * @return
+       */
       def asFeaturedStar: Option[FeaturedStar] = {
         for (publicName <- celebrity.publicName; urlSlug <- celebrity.urlSlug) yield {
           FeaturedStar(
@@ -50,6 +66,9 @@ object GetRootEndpoint {
       }
     }
 
+    /**
+     * Implcitly convert Celebrity -> FeaturedStarCelebrity
+     */
     implicit def celebrityToFeaturedStarCelebrity(celebrity: Celebrity): FeaturedStarCelebrity = {
       new FeaturedStarCelebrity(celebrity)
     }

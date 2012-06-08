@@ -11,6 +11,12 @@ trait PostFeaturedCelebritiesAdminEndpoint {
   protected def adminFilters: AdminRequestFilters
   protected def celebrityStore: CelebrityStore
 
+  /**
+   * POSTs a new list of celebrity IDs to be featured.
+   * @param celebIds the new set of celebrity IDs to feature
+   *
+   * @return a Redirect to the celebrities admin endpoint.
+   */
   def postFeaturedCelebrities(celebIds: Array[Long]) = postController() {
     adminFilters.requireAdministratorLogin { admin =>
       celebrityStore.updateFeaturedCelebrities(celebIds)

@@ -7,6 +7,11 @@ import models.frontend.landing.FeaturedStar
  * Permutations of the landing page
  */
 object Landing extends Controller {
+
+  /**
+   * Displays a permutation of the landing page with "featured stars" counting
+   * 0 <= n <= sampleStars.length
+   **/
   def featured_stars(count: Int) = {
     views.frontend.html.landing(sampleStars.slice(0, count))
   }
