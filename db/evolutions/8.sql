@@ -2,8 +2,12 @@
 
 # --- !Ups
 
-ALTER TABLE celebrity ADD COLUMN _publishedStatus varchar(128) not null;
-ALTER TABLE product ADD COLUMN _publishedStatus varchar(128) not null;
+ALTER TABLE celebrity ADD COLUMN _publishedStatus varchar(128);
+UPDATE celebrity SET _publishedStatus = 'Published';
+ALTER TABLE celebrity ALTER COLUMN _publishedStatus SET NOT NULL;
+ALTER TABLE product ADD COLUMN _publishedStatus varchar(128);
+UPDATE product SET _publishedStatus = 'Published';
+ALTER TABLE product ALTER COLUMN _publishedStatus SET NOT NULL;
 
 # --- !Downs
 
