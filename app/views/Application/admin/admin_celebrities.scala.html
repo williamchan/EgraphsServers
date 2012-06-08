@@ -18,6 +18,10 @@
   lookupUrl("WebsiteControllers.postLogoutAdmin")
 }
 
+@postFeaturedCelebrities = @{
+  lookupUrl("WebsiteControllers.postFeaturedCelebrities")
+}
+
 @head = {
 <link rel="stylesheet" href='@asset("public/chosen/chosen.css")' >
 <script src='@asset("public/twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
@@ -43,13 +47,15 @@
     Celebrity administration
   </h1>
   <h2>Featured</h2>
-  <form method="POST" action="/admin/celeb/postFeaturedStars">
+  <form method="POST" action="@postFeaturedCelebrities">
     @authenticityToken()
     <div class="row">
       <div class="span6">
         <select data-placeholder="Choose celebrities to feature" name="celebIds" style="width:350px" multiple class="chzn-select">
           @for(celeb <- allCelebrities) {
-            <option value="@celeb.id">@celeb.publicName</option>
+            <option value="@celeb.id" @if(celeb.isFeatured){selected="selected"}>
+              @celeb.publicName
+            </option>
           }
         </select>
       </div>

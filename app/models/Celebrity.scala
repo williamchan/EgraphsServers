@@ -272,6 +272,20 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
     for (celeb <- schema.celebrities) yield celeb
   }
 
+  def updateFeaturedCelebrities(newFeaturedCelebIds: Iterable[Long]) {
+    // First update those gentlemen that are no longer featured
+    update(schema.celebrities)(c =>
+      where(c.isFeatured === true and (c.id notIn newFeaturedCelebIds))
+      set(c.isFeatured := false)
+    )
+
+    // Now lets feature the real stars here!
+    update(schema.celebrities)(c =>
+      where(c.id in newFeaturedCelebIds)
+        set(c.isFeatured := true)
+    )
+  }
+
   //
   // Saves[Celebrity] methods
   //
