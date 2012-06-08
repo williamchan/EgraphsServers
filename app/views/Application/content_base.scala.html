@@ -1,9 +1,10 @@
 @(title:String    = "",
   head:   => Html = Html.empty,
   onLoad: => Html = Html.empty,
+  navContent: => Html = Html.empty,
   body:   => Html = Html.empty)
 
-@base(title=title, head=localHead, onLoad=onLoad, body=localBody)
+@base(title=title, head=localHead, onLoad=onLoad, body=localBody, navContent=navContent)
 
 @localHead = {
   <style type="text/css">

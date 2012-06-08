@@ -1,6 +1,7 @@
 @(title:String    = "",
   head:   => Html = Html.empty,
   onLoad: => Html = Html.empty,
+  navContent: => Html = Html.empty,
   body:   => Html = Html.empty)
 
 <!DOCTYPE html>
@@ -41,8 +42,7 @@
           <a class="brand" href="/">
             <img src='@asset("public/images/egraphs_logo.png")'>
           </a>
-          <ul class="nav">
-          </ul>
+          @navContent
         </div>
       </div>
     </div>

@@ -268,6 +268,10 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
     )
   }
 
+  def getAll: Iterable[Celebrity] = {
+    for (celeb <- schema.celebrities) yield celeb
+  }
+
   //
   // Saves[Celebrity] methods
   //

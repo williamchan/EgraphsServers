@@ -19,7 +19,10 @@ private[controllers] trait GetCelebritiesAdminEndpoint {
       val query = celebrityStore.getCelebrityAccounts
       val pagedQuery: (Iterable[(Celebrity, Account)], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
       WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebritiesAdminEndpoint.url())
-      views.Application.admin.html.admin_celebrities(celebrityAccounts = pagedQuery._1)
+      views.Application.admin.html.admin_celebrities(
+        celebrityAccounts = pagedQuery._1,
+        celebrityStore.getAll
+      )
     }
   }
 }
