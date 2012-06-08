@@ -3,6 +3,8 @@ package controllers.website
 import play.mvc.Controller
 import services.http.ControllerMethod
 import models.Celebrity
+import services.Utils
+import controllers.WebsiteControllers
 
 private[controllers] trait GetRootEndpoint { this: Controller =>
   import views.Application._
@@ -30,8 +32,8 @@ object GetRootEndpoint {
           FeaturedStar(
             name=publicName,
             secondaryText=Some("Free Agent"), // TODO actually populate with celebrity's team.
-            imageUrl="http://placehold.it/440x220",
-            storefrontUrl=urlSlug
+            imageUrl=Utils.asset("public/images/440x220_placeholder.gif"),
+            storefrontUrl=WebsiteControllers.lookupGetCelebrity(urlSlug).url
           )
         }
       }

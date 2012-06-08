@@ -125,6 +125,10 @@ class Utils @Inject()(@PlayConfig() playConfig: Properties)
     )
   }
 
+  def asset(path: String): String = {
+    play.mvc.Router.reverse(play.Play.getVirtualFile(path))
+  }
+
   implicit def properties(pairs: (AnyRef, AnyRef)*): Properties = {
     val props = new Properties
     
