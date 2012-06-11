@@ -1,0 +1,80 @@
+@import views.frontend.tags
+
+@baseBody = {
+  <section id="content" role="main">
+    <div id="main">
+      <div class="container">
+
+        <header>
+          <h1>Account Settings</h1>
+        </header>
+
+        <section id="personal-information">
+
+          <h2>Personal Information</h2>
+          <table>
+            <tr>
+              <th>Name</th><td></td><td></td>
+            </tr>
+            <tr>
+              <th>User</th><td></td><td></td>
+            </tr>
+            <tr>
+              <th>Email</th><td></td><td></td>
+            </tr>
+            <tr>
+              <th>Password</th><td></td><td></td>
+            </tr>
+          </table>
+
+        </section>
+
+        <section id="shipping-address">
+          <h2>Shipping Address</h2>
+          <table>
+            <tr>
+              <th>Primary</th><td></td><td></td>
+            </tr>
+          </table>
+          <p><a href= "#">+ Add Another Shipping Address</a></p>
+        </section>
+
+        <section id="gallery-settings">
+          <h2>My Gallery Settings</h2>
+          <table>
+            <th>Gallery Visibility</th><td>Public</td><td></td>
+          </table>
+        </section>
+
+        <section id="additional-settings">
+          <h2>Additional Settings</h2>
+          <table>
+            <tr>
+              <th>Notices</th>
+              <td>
+                <input type="checkbox" name="notice" value="new_stars"/> New Star Additions (Weekly)
+                <input type="checkbox" name="notice" value="new_products"/> New Products/Features
+                <input type="checkbox" name="notice" value="news"/> News
+                <input type="checkbox" name="notice" value="mlb_updates"/> Updates from Major League Baseball
+              </td>
+            </tr>
+            <tr>
+              <th>Follow Egraphs</th>
+              <td>
+                <input type="checkbox" name="social" value="facebook"/> Facebook
+                <input type="checkbox" name="notice" value="twitter"/> Twitter
+                <input type="checkbox" name="notice" value="tumblr"/>  Tumblr
+
+              </td>
+            </tr>
+          </table>
+        </section>
+        <p>
+        @tags.html.arrow_button(caption="Save Changes", target="#")
+        </p>
+      </div>
+    </div>
+  </section>
+}
+
+@base_template(title="Your Account", body=baseBody)
