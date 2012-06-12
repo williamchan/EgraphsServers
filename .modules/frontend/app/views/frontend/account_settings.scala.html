@@ -2,7 +2,7 @@
 
 @settingRow(title: String, value: String) = {
   <tr class="settings-row">
-    <th class="span6">@title</th><td class="span15">@value</td><td class="span1"><a href="#">Edit</a></td>
+    <th class="span6">@title</th><td class="span15">@value</td><td class="span1"><a href="#" class="edit">Edit</a></td>
   </tr>
 }
 @checkboxRow(label: String, name: String, settings: Map[String, String]) = {
@@ -22,6 +22,24 @@
      </fieldset>
     </td>
   </tr>
+}
+
+@addressRow(title: String, fullname: String, address1:String, address2:String)  = {
+  <tr class="settings-row">
+    <th class="span6">@title</th>
+    <td class="span6">
+      @fullname
+    </td>
+    <td class="span9">
+      <span>
+        <address>
+          @address1<br>
+          @address2
+        </address>
+       </span>
+  </td>
+  <td class="span1"><a href="#" class="edit">Edit</a></td>
+</tr>
 }
 @baseBody = {
   <section id="content" role="main">
@@ -48,24 +66,9 @@
         <section class="settings-group" id="shipping-address">
           <h2>Shipping Address</h2>
           <table class="table">
-            <tr class="settings-row">
-              <th class="span6">Primary</th>
-              <td class="span6">
-                Joshua Johnson
-              </td>
-              <td class="span9">
-                <span>
-                <address>
-                5507 N 58th Street
-                <br>
-                Seattle, WA 98101
-                </address>
-                </span>
-              </td>
-              <td class="span1"><a href="#">Edit</a></td>
-            </tr>
+          @addressRow(title = "Primary", fullname = "Joshua Johnson", address1 = "5507 N 58th Street", address2 = "Seattle, WA 98101")
           </table>
-          <p id="add-link"><a href= "#">+ Add Another Shipping Address</a></p>
+          <a href="#" class="add-link"><p>+ Add Another Shipping Address</p></a>
         </section>
 
         <section class="settings-group" id="gallery-settings">
@@ -87,9 +90,12 @@
                                                                           "tumblr"  -> "Tumblr"))
           </table>
         </section>
-        <p>
-        @tags.html.arrow_button(caption="Save Changes", target="#")
-        </p>
+        <div class="row-fluid">
+          <div class="span9"></div>
+          <div class="span3 save-button">
+            @tags.html.arrow_button(caption="Save Changes", target="#")
+          </div>
+        </div>
       </div>
     </div>
   </section>

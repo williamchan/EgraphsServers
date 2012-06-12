@@ -3,16 +3,24 @@
 }
 
 .settings-row {
-  a {
+  a.edit {
+    font-size: 14px;
     color: @orange;
+    text-align: right;
   }
 
-  a:hover {
+  a:hover.edit {
     color:@blue;
   }
 
-  .span1 {
-    text-align: right;
+  th {
+    font-size: 17px;
+    font-weight: bold;
+    padding-left: 0px;
+  }
+
+  address {
+    margin-bottom: 0px;
   }
 }
 
@@ -26,4 +34,23 @@ section .settings-group {
     font-weight: bold;
     text-transform: uppercase;
   }
+}
+
+.save-button {
+  text-align: right;
+
+  a {
+    text-align: left;
+  }
+}
+
+a.add-link {
+  font-style: italic;
+  font-weight: default;
+  font-size: 14px;
+  color: @gray;
+}
+
+a.add-link:hover p:first-letter{
+  color: @orange;
 }
