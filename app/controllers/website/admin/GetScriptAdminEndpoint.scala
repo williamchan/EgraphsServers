@@ -5,9 +5,9 @@ import services.http.{AdminRequestFilters, ControllerMethod}
 import services.blobs.Blobs
 import services.db.Schema
 import models._
+import enums.EgraphState
 import org.squeryl.Query
 import org.squeryl.PrimitiveTypeMode._
-import models.Egraph.EgraphState
 import services.{Dimensions, AppConfig}
 
 private[controllers] trait GetScriptAdminEndpoint {
@@ -53,7 +53,7 @@ private[controllers] trait GetScriptAdminEndpoint {
         case "kick-egraphs-awaitingverification" => {
           // find all Egraphs that are AwaitingVerification and give them a kick...
           val egraphsAwaitingVerification: Query[(Egraph)] = from(schema.egraphs)(
-            (e) => where(e.stateValue === EgraphState.AwaitingVerification.value) select (e)
+            (e) => where(e._egraphState === EgraphState.AwaitingVerification.name) select (e)
           )
           for (egraph <- egraphsAwaitingVerification) {
             actors.EgraphActor.actor ! actors.ProcessEgraphMessage(id = egraph.id)
@@ -64,7 +64,7 @@ private[controllers] trait GetScriptAdminEndpoint {
         case "kick-egraph" => {
           val egraphId = params.get("egraphId")
           val egraph = egraphStore.findById(id = egraphId.toLong)
-          if (egraph.isDefined && egraph.get.state == EgraphState.AwaitingVerification) {
+          if (egraph.isDefined && egraph.get.egraphState == EgraphState.AwaitingVerification) {
             actors.EgraphActor.actor ! actors.ProcessEgraphMessage(id = egraph.get.id)
           }
           "I gave that Egraph a kick."

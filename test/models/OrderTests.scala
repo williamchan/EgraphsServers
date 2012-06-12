@@ -1,10 +1,10 @@
 package models
 
+import enums.{EgraphState, OrderReviewStatus, PaymentStatus}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 import utils._
-import models.Egraph.EgraphState
 import services.AppConfig
 import org.squeryl.PrimitiveTypeMode._
 import services.db.Schema
@@ -54,7 +54,7 @@ class OrderTests extends UnitFlatSpec
       stripeChargeId = Some("12345"),
       messageToCelebrity = Some("Wizzle you're the best!"),
       requestedMessage = Some("Happy birthday, Erem!")
-    ).withPaymentState(Order.PaymentState.Charged)
+    ).withPaymentStatus(PaymentStatus.Charged)
   }
 
   //
@@ -70,15 +70,15 @@ class OrderTests extends UnitFlatSpec
     val egraph = Order(id=100L).newEgraph
 
     egraph.orderId should be (100L)
-    egraph.state should be (EgraphState.AwaitingVerification)
+    egraph.egraphState should be (EgraphState.AwaitingVerification)
   }
 
   it should "start out not charged" in {
-    Order().paymentState should be (Order.PaymentState.NotCharged)
+    Order().paymentStatus should be (PaymentStatus.NotCharged)
   }
 
   it should "update payment state correctly" in {
-    Order().withPaymentState(Order.PaymentState.Charged).paymentState should be (Order.PaymentState.Charged)
+    Order().withPaymentStatus(PaymentStatus.Charged).paymentStatus should be (PaymentStatus.Charged)
   }
 
   "renderedForApi" should "serialize the correct Map for the API" in {
@@ -121,27 +121,27 @@ class OrderTests extends UnitFlatSpec
 
   "approveByAdmin" should "change reviewStatus to ApprovedByAdmin" in {
     val order = newEntity.save()
-    order.reviewStatus should be (Order.ReviewStatus.PendingAdminReview.stateValue)
+    order.reviewStatus should be (OrderReviewStatus.PendingAdminReview)
     intercept[IllegalArgumentException] {order.approveByAdmin(null)}
     val admin = Administrator().save()
-    order.approveByAdmin(admin).save().reviewStatus should be (Order.ReviewStatus.ApprovedByAdmin.stateValue)
+    order.approveByAdmin(admin).save().reviewStatus should be (OrderReviewStatus.ApprovedByAdmin)
   }
 
   "rejectByAdmin" should "change reviewStatus to RejectedByAdmin" in {
     val order = newEntity.save()
-    order.reviewStatus should be (Order.ReviewStatus.PendingAdminReview.stateValue)
+    order.reviewStatus should be (OrderReviewStatus.PendingAdminReview)
     order.rejectionReason should be (None)
 
     intercept[IllegalArgumentException] {order.rejectByAdmin(null)}
 
     val rejectedOrder = order.rejectByAdmin(Administrator().save(), Some("It made me cry")).save()
-    rejectedOrder.reviewStatus should be (Order.ReviewStatus.RejectedByAdmin.stateValue)
+    rejectedOrder.reviewStatus should be (OrderReviewStatus.RejectedByAdmin)
     rejectedOrder.rejectionReason.get should be ("It made me cry")
   }
 
   "rejectByCelebrity" should "change reviewStatus to RejectedByCelebrity" in {
-    val order = newEntity.copy(reviewStatus = Order.ReviewStatus.ApprovedByAdmin.stateValue).save()
-    order.reviewStatus should be (Order.ReviewStatus.ApprovedByAdmin.stateValue)
+    val order = newEntity.withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
+    order.reviewStatus should be (OrderReviewStatus.ApprovedByAdmin)
     order.rejectionReason should be (None)
 
     intercept[IllegalArgumentException] {newEntity.save().rejectByCelebrity(null)}
@@ -149,16 +149,16 @@ class OrderTests extends UnitFlatSpec
     intercept[IllegalArgumentException] {order.rejectByCelebrity(Celebrity())}
 
     val rejectedOrder = order.rejectByCelebrity(order.product.celebrity, Some("It made me cry")).save()
-    rejectedOrder.reviewStatus should be (Order.ReviewStatus.RejectedByCelebrity.stateValue)
+    rejectedOrder.reviewStatus should be (OrderReviewStatus.RejectedByCelebrity)
     rejectedOrder.rejectionReason.get should be ("It made me cry")
   }
 
-  "withChargeInfo" should "set the PaymentState, store stripe info, and create an associated CashTransaction" in {
+  "withChargeInfo" should "set the PaymentStatus, store stripe info, and create an associated CashTransaction" in {
     val (will, _, _, product) = newOrderStack
     val order = will.buy(product).save().withChargeInfo(stripeCardTokenId = "mytoken", stripeCharge = NiceCharge).save()
 
-    // verify PaymentState
-    order.paymentState should be(Order.PaymentState.Charged)
+    // verify PaymentStatus
+    order.paymentStatus should be(PaymentStatus.Charged)
 
     // verify Stripe Info
     order.stripeCardTokenId.get should be("mytoken")
@@ -176,13 +176,13 @@ class OrderTests extends UnitFlatSpec
     cashTransaction.typeString should be(EgraphPurchase.value)
   }
 
-  "refund" should "refund the Stripe charge, change the PaymentState to Refunded, and create a refund CashTransaction" in {
+  "refund" should "refund the Stripe charge, change the PaymentStatus to Refunded, and create a refund CashTransaction" in {
     val (will, _, _, product) = newOrderStack
     val order = will.buy(product).save().withChargeInfo(stripeCardTokenId = "mytoken", stripeCharge = NiceCharge).save()
 
     var (refundedOrder: Order, refundCharge: Charge) = order.refund()
     refundedOrder = refundedOrder.save()
-    refundedOrder.paymentState should be(Order.PaymentState.Refunded)
+    refundedOrder.paymentStatus should be(PaymentStatus.Refunded)
     refundCharge.refunded should be(true)
 
     val cashTransactions = from(schema.cashTransactions)(txn => where(txn.orderId === Some(order.id)) select (txn))
@@ -250,10 +250,10 @@ class OrderTests extends UnitFlatSpec
 
   it should "exclude orders that have reviewStatus of PendingAdminReview, RejectedByAdmin, or RejectedByCelebrity when composed with ActionableFilter" in {
     val (will, _, celebrity, product) = newOrderStack
-    val actionableOrder = will.buy(product).copy(reviewStatus = Order.ReviewStatus.ApprovedByAdmin.stateValue).save()
-    will.buy(product).copy(reviewStatus = Order.ReviewStatus.PendingAdminReview.stateValue).save()
-    will.buy(product).copy(reviewStatus = Order.ReviewStatus.RejectedByAdmin.stateValue).save()
-    will.buy(product).copy(reviewStatus = Order.ReviewStatus.RejectedByCelebrity.stateValue).save()
+    val actionableOrder = will.buy(product).withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
+    will.buy(product).withReviewStatus(OrderReviewStatus.PendingAdminReview).save()
+    will.buy(product).withReviewStatus(OrderReviewStatus.RejectedByAdmin).save()
+    will.buy(product).withReviewStatus(OrderReviewStatus.RejectedByCelebrity).save()
 
     val found = orderStore.findByCelebrity(celebrity.id, orderQueryFilters.actionableOnly: _*)
     found.toSeq.length should be(1)
@@ -265,13 +265,10 @@ class OrderTests extends UnitFlatSpec
     val admin = Administrator().save()
 
     // Make an order for each Egraph State, and save an Egraph in that state
-    val orders = EgraphState.all.map {
-      case (_, state) =>
+    val ordersByEgraphState = EgraphState.values.map {
+      state =>
         val order = will.buy(product).approveByAdmin(admin).save()
-        order
-          .newEgraph
-          .withState(state)
-          .save()
+        order.newEgraph.withEgraphState(state).save()
         (state, order)
     }
 
@@ -282,18 +279,19 @@ class OrderTests extends UnitFlatSpec
     val found = orderStore.findByCelebrity(celebrity.id, orderQueryFilters.actionableOnly: _*)
 
     found.toSeq.length should be (2)
+    val rejectedByAdminOrder = ordersByEgraphState.find(_._1 == EgraphState.RejectedByAdmin).get._2
     found.toSet should be (Set(
       orderWithoutEgraph,
-      orders(EgraphState.RejectedByAdmin)
+      rejectedByAdminOrder
     ))
   }
 
   it should "only include orders that are pendingAdminReview when composed with that filter" in {
     val (will, _, celebrity, product) = newOrderStack
-    will.buy(product).copy(reviewStatus = Order.ReviewStatus.ApprovedByAdmin.stateValue).save()
-    val pendingOrder = will.buy(product).copy(reviewStatus = Order.ReviewStatus.PendingAdminReview.stateValue).save()
-    will.buy(product).copy(reviewStatus = Order.ReviewStatus.RejectedByAdmin.stateValue).save()
-    will.buy(product).copy(reviewStatus = Order.ReviewStatus.RejectedByCelebrity.stateValue).save()
+    will.buy(product).withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
+    val pendingOrder = will.buy(product).withReviewStatus(OrderReviewStatus.PendingAdminReview).save()
+    will.buy(product).withReviewStatus(OrderReviewStatus.RejectedByAdmin).save()
+    will.buy(product).withReviewStatus(OrderReviewStatus.RejectedByCelebrity).save()
 
     val found = orderStore.findByCelebrity(celebrity.id, orderQueryFilters.pendingAdminReview)
     found.toSeq.length should be(1)
@@ -302,10 +300,10 @@ class OrderTests extends UnitFlatSpec
 
   it should "only include orders that are rejected when composed with that filter" in {
     val (will, _, celebrity, product) = newOrderStack
-    will.buy(product).copy(reviewStatus = Order.ReviewStatus.ApprovedByAdmin.stateValue).save()
-    will.buy(product).copy(reviewStatus = Order.ReviewStatus.PendingAdminReview.stateValue).save()
-    val rejectedOrder1 = will.buy(product).copy(reviewStatus = Order.ReviewStatus.RejectedByAdmin.stateValue).save()
-    val rejectedOrder2 = will.buy(product).copy(reviewStatus = Order.ReviewStatus.RejectedByCelebrity.stateValue).save()
+    will.buy(product).withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
+    will.buy(product).withReviewStatus(OrderReviewStatus.PendingAdminReview).save()
+    val rejectedOrder1 = will.buy(product).withReviewStatus(OrderReviewStatus.RejectedByAdmin).save()
+    val rejectedOrder2 = will.buy(product).withReviewStatus(OrderReviewStatus.RejectedByCelebrity).save()
 
     val found = orderStore.findByCelebrity(celebrity.id, orderQueryFilters.rejected)
     found.toSeq.length should be(2)
@@ -346,9 +344,10 @@ class OrderTests extends UnitFlatSpec
     val anotherCustomer = TestData.newSavedCustomer()
     val order = buyer.buy(TestData.newSavedProduct(), recipient=recipient).save()
 
-    order.isBuyerOrRecipient(buyer.id.toString) should be(true)
-    order.isBuyerOrRecipient(recipient.id.toString) should be(true)
-    order.isBuyerOrRecipient(anotherCustomer.id.toString) should be(false)
+    order.isBuyerOrRecipient(Some(buyer.id)) should be(true)
+    order.isBuyerOrRecipient(Some(recipient.id)) should be(true)
+    order.isBuyerOrRecipient(Some(anotherCustomer.id)) should be(false)
+    order.isBuyerOrRecipient(None) should be(false)
   }
 
   //

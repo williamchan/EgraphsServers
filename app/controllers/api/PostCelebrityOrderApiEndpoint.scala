@@ -4,7 +4,7 @@ import play.mvc.Controller
 import sjson.json.Serializer
 import services.http.{ControllerMethod, OrderRequestFilters, CelebrityAccountRequestFilters}
 import services.db.DBSession
-import models.Order
+import models.enums.OrderReviewStatus
 
 private[controllers] trait PostCelebrityOrderApiEndpoint { this: Controller =>
   protected def dbSession: DBSession
@@ -25,8 +25,8 @@ private[controllers] trait PostCelebrityOrderApiEndpoint { this: Controller =>
         (account, celebrity) =>
           orderFilters.requireOrderIdOfCelebrity(celebrity.id) {
             order =>
-              Order.ReviewStatus.all.get(reviewStatus.getOrElse("")) match {
-                case Some(Order.ReviewStatus.RejectedByCelebrity) => {
+              OrderReviewStatus.apply(reviewStatus.getOrElse("")) match {
+                case Some(OrderReviewStatus.RejectedByCelebrity) => {
                   val rejectedOrder = order.rejectByCelebrity(celebrity, rejectionReason = rejectionReason).save()
                   Serializer.SJSON.toJSON(rejectedOrder.renderedForApi)
                 }

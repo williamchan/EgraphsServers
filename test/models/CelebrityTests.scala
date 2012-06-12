@@ -1,5 +1,6 @@
 package models
 
+import enums.{HasPublishedStatusTests, PublishedStatus}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
@@ -70,7 +71,6 @@ class CelebrityTests extends UnitFlatSpec
     apiMap("lastName") should be ("Chan")
     apiMap("publicName") should be ("Wizzle Chan")
     apiMap("urlSlug") should be ("Wizzle-Chan")
-    Some(apiMap("isLeftHanded")) should be (Some(false))
     apiMap("id") should be (celeb.id)
     apiMap("created") should be (Time.toApiFormat(celeb.created))
     apiMap("updated") should be (Time.toApiFormat(celeb.updated))

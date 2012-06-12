@@ -1,5 +1,6 @@
 package models
 
+import enums.EnrollmentStatus
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec

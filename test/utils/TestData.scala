@@ -7,6 +7,7 @@ import util.Random
 import java.text.SimpleDateFormat
 import org.joda.time.DateTime
 import models._
+import enums.PublishedStatus
 
 /**
  * Renders saved copies of domain objects that satisfy all relational integrity

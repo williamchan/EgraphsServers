@@ -1,21 +1,31 @@
 package models
 
+import enums.AdminRole.EnumVal
+import enums.{HasAdminRole, AdminRole}
 import java.sql.Timestamp
 import services.db.{KeyedCaseClass, Saves, Schema}
 import com.google.inject.Inject
-import services.{Utils, AppConfig, Time}
+import services.{AppConfig, Time}
 
 /**
  * Persistent entity representing administrators of our service.
  */
 case class Administrator(
   id: Long = 0L,
-  role: Option[String] = Some(AdminRole.Superuser.value),
+  _role: String = AdminRole.Superuser.name,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: AdministratorServices = AppConfig.instance[AdministratorServices]
-) extends KeyedCaseClass[Long] with HasCreatedUpdated {
+) extends KeyedCaseClass[Long]
+  with HasCreatedUpdated
+  with HasAdminRole[Administrator] {
+
   override def unapplied = Administrator.unapply(this)
+
+
+  override def withRole(status: EnumVal) = {
+    this.copy(_role = status.name)
+  }
 
   def save(): Administrator = {
     services.store.save(this)
@@ -27,10 +37,11 @@ case class AdministratorServices @Inject()(store: AdministratorStore, accountSto
 class AdministratorStore @Inject()(schema: Schema, accountStore: AccountStore) extends Saves[Administrator] with SavesCreatedUpdated[Administrator] {
   import org.squeryl.PrimitiveTypeMode._
 
-  def findById(adminIdStr: String): Option[Administrator] = {
-    if (adminIdStr == null || adminIdStr.isEmpty) return None // adminIdStr is null if there is no cookie value by that key
-    val adminId = adminIdStr.toLong
-    findById(adminId)
+  def isAdmin(adminId: Option[Long]): Boolean = {
+    adminId match {
+      case None => false
+      case Some(id) => findById(id).isDefined
+    }
   }
 
   def authenticate(email: String, passwordAttempt: String): Option[Administrator] = {
@@ -65,7 +76,7 @@ class AdministratorStore @Inject()(schema: Schema, accountStore: AccountStore) e
   override def defineUpdate(theOld: Administrator, theNew: Administrator) = {
     updateIs(
       theOld.created := theNew.created,
-      theOld.role := theNew.role,
+      theOld._role := theNew._role,
       theOld.updated := theNew.updated
     )
   }
@@ -75,21 +86,5 @@ class AdministratorStore @Inject()(schema: Schema, accountStore: AccountStore) e
   //
   override def withCreatedUpdated(toUpdate: Administrator, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)
-  }
-}
-
-abstract sealed class AdminRole(val value: String)
-
-object AdminRole {
-  case object Superuser extends AdminRole("Superuser")
-  case object AdminDisabled extends AdminRole("AdminDisabled")
-
-  private val states = Utils.toMap[String, AdminRole](Seq(
-    Superuser,
-    AdminDisabled
-  ), key=(theState) => theState.value)
-
-  def apply(value: String) = {
-    states(value)
   }
 }

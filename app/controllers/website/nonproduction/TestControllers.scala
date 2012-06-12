@@ -7,6 +7,7 @@ import services.AppConfig
 import services.blobs.Blobs
 import services.db.Schema
 import models._
+import enums.{OrderReviewStatus, EnrollmentStatus}
 import services.http.ControllerMethod
 import services.logging.Logging
 import java.text.SimpleDateFormat
@@ -87,16 +88,15 @@ object TestControllers extends Controller with Logging {
     "Alpha Testers created!"
   }
 
-  private def createCelebrity(firstName: String, lastName: String, email: String, enrollmentStatus: EnrollmentStatus = EnrollmentStatus.NotEnrolled) {
+  private def createCelebrity(firstName: String, lastName: String, email: String, enrollmentStatus: EnrollmentStatus.EnumVal = EnrollmentStatus.NotEnrolled) {
     println("Creating Celebrity " + email + " ...")
 
     val celebrity = Celebrity(
       firstName = Some(firstName),
       lastName = Some(lastName),
       publicName = Some(firstName + " " + lastName),
-      description = Some("Today's Sriracha is tomorrow's salsa."),
-      enrollmentStatusValue = enrollmentStatus.value
-    ).save()
+      description = Some("Today's Sriracha is tomorrow's salsa.")
+    ).withEnrollmentStatus(enrollmentStatus).save()
 
     val administrator = Administrator().save()
 
@@ -173,7 +173,7 @@ object TestControllers extends Controller with Logging {
       val buyer = customerServices.customerStore.findOrCreateByEmail(celebrityEmail, celebrity.publicName.get)
       for (i <- 0 until numOrders) {
         buyer.buy(product.get, buyer, recipientName=celebrityEmail, messageToCelebrity=Some(msg), requestedMessage=Some(msg))
-          .copy(reviewStatus = Order.ReviewStatus.ApprovedByAdmin.stateValue)
+          .withReviewStatus(OrderReviewStatus.ApprovedByAdmin)
           .save()
       }
       "\"Created " + numOrders + " orders for celebrity " + celebrity.publicName.get + "\""

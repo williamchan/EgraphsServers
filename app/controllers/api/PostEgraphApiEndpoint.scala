@@ -3,7 +3,7 @@ package controllers.api
 import play.mvc.Controller
 import sjson.json.Serializer
 import play.data.validation._
-import services.http.OptionParams.Conversions._
+import services.http.SafePlayParams.Conversions._
 import play.libs.Codec
 import services.http.{ControllerMethod, HttpCodes, OrderRequestFilters, CelebrityAccountRequestFilters}
 import services.db.{TransactionSerializable, DBSession}

@@ -5,10 +5,12 @@ import services.blobs.AccessPolicy
 import java.text.SimpleDateFormat
 import services.http.ControllerMethod
 import play.templates.Html
-import services.http.OptionParams.Conversions.paramsToOptionalParams
+import services.http.SafePlayParams.Conversions.paramsToOptionalParams
 import services.graphics.Handwriting
 import models._
 import controllers.WebsiteControllers
+import play.mvc.results.Redirect
+import services.Utils
 
 private[controllers] trait GetEgraphEndpoint { this: Controller =>
   protected def administratorStore: AdministratorStore
@@ -39,7 +41,7 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
         )
 
       case Some(FulfilledOrder(order, egraph)) =>
-        Forbidden("Egraph cannot be displayed. It may not be available, or you may not have permission to view it.")
+        new Redirect(Utils.lookupUrl("WebsiteControllers.getRootEndpoint").url)
 
       case None =>
         NotFound("No Egraph exists with the provided identifier.")
@@ -51,12 +53,12 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
   }
 
   private def isViewable(order: Order): Boolean = {
-    val customerIdStr = session.get(WebsiteControllers.customerIdKey)
-    val adminIdStr = session.get(WebsiteControllers.adminIdKey)
+    val customerIdOption = session.getLongOption(WebsiteControllers.customerIdKey)
+    val adminIdOption = session.getLongOption(WebsiteControllers.adminIdKey)
 
     order.isPublic ||
-      order.isBuyerOrRecipient(customerIdStr) ||
-      administratorStore.findById(adminIdStr).isDefined
+      order.isBuyerOrRecipient(customerIdOption) ||
+      administratorStore.isAdmin(adminIdOption)
   }
 }
 

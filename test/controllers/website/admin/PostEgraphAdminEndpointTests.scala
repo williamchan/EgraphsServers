@@ -3,13 +3,12 @@ package controllers.website.admin
 import org.junit.Assert._
 import org.junit.Test
 import scala.collection.JavaConversions._
-import models.Egraph.EgraphState
-import EgraphState._
 import services.AppConfig
 import services.db.{DBSession, TransactionSerializable}
 import play.test.FunctionalTest._
 import models.{EgraphStore, Egraph}
 import utils.TestData
+import models.enums.EgraphState
 
 class PostEgraphAdminEndpointTests extends AdminFunctionalTest {
 
@@ -23,8 +22,8 @@ class PostEgraphAdminEndpointTests extends AdminFunctionalTest {
     var egraph2: Egraph = null
     db.connected(TransactionSerializable) {
       val order = TestData.newSavedOrder()
-      egraph1 = Egraph(orderId = order.id).withState(PassedBiometrics).save()
-      egraph2 = Egraph(orderId = order.id).withState(FailedBiometrics).save()
+      egraph1 = Egraph(orderId = order.id).withEgraphState(EgraphState.PassedBiometrics).save()
+      egraph2 = Egraph(orderId = order.id).withEgraphState(EgraphState.FailedBiometrics).save()
     }
 
     val response1 = POST("/admin/egraphs/" + egraph1.id, getPostStrParams("ApprovedByAdmin"))
@@ -33,8 +32,8 @@ class PostEgraphAdminEndpointTests extends AdminFunctionalTest {
     assertStatus(302, response2)
 
     db.connected(TransactionSerializable) {
-      assertEquals(ApprovedByAdmin, egraphStore.findById(egraph1.id).get.state)
-      assertEquals(ApprovedByAdmin, egraphStore.findById(egraph2.id).get.state)
+      assertEquals(EgraphState.ApprovedByAdmin, egraphStore.findById(egraph1.id).get.egraphState)
+      assertEquals(EgraphState.ApprovedByAdmin, egraphStore.findById(egraph2.id).get.egraphState)
     }
   }
 
@@ -45,8 +44,8 @@ class PostEgraphAdminEndpointTests extends AdminFunctionalTest {
     var egraph2: Egraph = null
     db.connected(TransactionSerializable) {
       val order = TestData.newSavedOrder()
-      egraph1 = Egraph(orderId = order.id).withState(PassedBiometrics).save()
-      egraph2 = Egraph(orderId = order.id).withState(FailedBiometrics).save()
+      egraph1 = Egraph(orderId = order.id).withEgraphState(EgraphState.PassedBiometrics).save()
+      egraph2 = Egraph(orderId = order.id).withEgraphState(EgraphState.FailedBiometrics).save()
     }
 
     val response1 = POST("/admin/egraphs/" + egraph1.id, getPostStrParams("RejectedByAdmin"))
@@ -55,8 +54,8 @@ class PostEgraphAdminEndpointTests extends AdminFunctionalTest {
     assertStatus(302, response2)
 
     db.connected(TransactionSerializable) {
-      assertEquals(RejectedByAdmin, egraphStore.findById(egraph1.id).get.state)
-      assertEquals(RejectedByAdmin, egraphStore.findById(egraph2.id).get.state)
+      assertEquals(EgraphState.RejectedByAdmin, egraphStore.findById(egraph1.id).get.egraphState)
+      assertEquals(EgraphState.RejectedByAdmin, egraphStore.findById(egraph2.id).get.egraphState)
     }
   }
 
@@ -65,14 +64,14 @@ class PostEgraphAdminEndpointTests extends AdminFunctionalTest {
     createAndLoginAsAdmin()
     val egraph = db.connected(TransactionSerializable) {
       val order = TestData.newSavedOrder()
-      Egraph(orderId = order.id).withState(ApprovedByAdmin).save()
+      Egraph(orderId = order.id).withEgraphState(EgraphState.ApprovedByAdmin).save()
     }
 
     val response = POST("/admin/egraphs/" + egraph.id, getPostStrParams("Published"))
     assertStatus(302, response)
 
     db.connected(TransactionSerializable) {
-      assertEquals(Published, egraphStore.findById(egraph.id).get.state)
+      assertEquals(EgraphState.Published, egraphStore.findById(egraph.id).get.egraphState)
     }
   }
 

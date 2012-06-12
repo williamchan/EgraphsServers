@@ -1,5 +1,6 @@
 package models
 
+import enums.{HasEgraphState, EgraphState}
 import java.sql.Timestamp
 import services.blobs.AccessPolicy
 import java.awt.image.BufferedImage
@@ -17,9 +18,7 @@ import controllers.website.GetCelebrityProductEndpoint
 import com.google.inject.{Provider, Inject}
 import play.utils.HTML.htmlEscape
 import org.squeryl.Query
-
 import xyzmo.{XyzmoVerifyUserStore, XyzmoVerifyUser}
-import models.Egraph.EgraphState
 
 /**
  * Vital services for an Egraph to perform its necessary functionality
@@ -56,7 +55,6 @@ case class EgraphServices @Inject() (
  *
  * @param id A unique ID for each attempt to fulfill an order
  * @param orderId the order ID that this egraph fulfills
- * @param stateValue String value of the egraph's current state
  * @param created the moment this entity was first inserted into the database
  * @param updated the last moment this entity was updated in the database
  * @param services the functionality for the Egraph to meaningfully manipulate its data.
@@ -64,13 +62,15 @@ case class EgraphServices @Inject() (
 case class Egraph(
   id: Long = 0L,
   orderId: Long = 0L,
-  stateValue: String = EgraphState.AwaitingVerification.value,
+  _egraphState: String = EgraphState.AwaitingVerification.name,
   latitude: Option[Double] = None,
   longitude: Option[Double] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: EgraphServices = AppConfig.instance[EgraphServices]
-) extends KeyedCaseClass[Long] with HasCreatedUpdated
+) extends KeyedCaseClass[Long]
+  with HasCreatedUpdated
+  with HasEgraphState[Egraph]
 {
   import Blobs.Conversions._
   import EgraphState._
@@ -116,16 +116,6 @@ case class Egraph(
   /** Fetches the related order from the db */
   def order: Order = {
     services.orderStore.get(orderId)
-  }
-
-  /** Returns a transform of this object with the new, parameterized state */
-  def withState(state: EgraphState): Egraph = {
-    copy(stateValue = state.value)
-  }
-
-  /** The current state of the Egraph */
-  def state: EgraphState = {
-    EgraphState.all(stateValue)
   }
 
   /**
@@ -232,29 +222,29 @@ case class Egraph(
   }
 
   def isApprovable: Boolean = {
-    state == PassedBiometrics || state == FailedBiometrics
+    egraphState == PassedBiometrics || egraphState == FailedBiometrics
   }
 
   def approve(admin: Administrator): Egraph = {
     require(admin != null, "Must be approved by an Administrator")
     require(isApprovable, "Must have previously been checked by biometrics")
-    withState(ApprovedByAdmin)
+    withEgraphState(ApprovedByAdmin)
   }
 
   def reject(admin: Administrator): Egraph = {
     require(admin != null, "Must be rejected by an Administrator")
     require(isApprovable, "Must have previously been checked by biometrics")
-    withState(RejectedByAdmin)
+    withEgraphState(RejectedByAdmin)
   }
 
   def isPublishable: Boolean = {
-    state == ApprovedByAdmin
+    egraphState == ApprovedByAdmin
   }
 
   def publish(admin: Administrator): Egraph = {
     require(admin != null, "Must be rejected by an Administrator")
     require(isPublishable, "Must have previously been approved by admin")
-    withState(Published)
+    withEgraphState(Published)
   }
 
   /**
@@ -280,14 +270,17 @@ case class Egraph(
       */
     }
 
-    this.withState(newState)
+    withEgraphState(newState)
   }
 
   //
   // KeyedCaseClass[Long] methods
   //
-  override def unapplied = {
-    Egraph.unapply(this)
+  override def unapplied = { Egraph.unapply(this) }
+
+
+  override def withEgraphState(status: EnumVal) = {
+    copy(_egraphState = status.name)
   }
 
   private object Assets extends EgraphAssets {
@@ -333,31 +326,6 @@ case class Egraph(
     //
     private lazy val signatureKey = blobKeyBase + "/signature"
     private lazy val messageKey = blobKeyBase + "/message"
-    private lazy val imageName = "image"
-
-  }
-}
-
-object Egraph {
-  abstract sealed class EgraphState(val value: String)
-
-  object EgraphState {
-    case object AwaitingVerification extends EgraphState("AwaitingVerification")
-    case object Published extends EgraphState("Published")
-    case object PassedBiometrics extends EgraphState("PassedBiometrics")
-    case object FailedBiometrics extends EgraphState("FailedBiometrics")
-    case object ApprovedByAdmin extends EgraphState("ApprovedByAdmin")
-    case object RejectedByAdmin extends EgraphState("RejectedByAdmin")
-
-    /** Map of Egraph state strings to the actual EgraphStates */
-    val all = Utils.toMap[String, EgraphState](Seq(
-      AwaitingVerification,
-      Published,
-      PassedBiometrics,
-      FailedBiometrics,
-      ApprovedByAdmin,
-      RejectedByAdmin
-    ), key=(theState) => theState.value)
   }
 }
 
@@ -563,7 +531,7 @@ class EgraphStore @Inject() (schema: Schema) extends Saves[Egraph] with SavesCre
   override def defineUpdate(theOld: Egraph, theNew: Egraph) = {
     updateIs(
       theOld.orderId := theNew.orderId,
-      theOld.stateValue := theNew.stateValue,
+      theOld._egraphState := theNew._egraphState,
       theOld.latitude := theNew.latitude,
       theOld.longitude := theNew.longitude,
       theOld.created := theNew.created,
@@ -587,7 +555,7 @@ class EgraphQueryFilters @Inject() (schema: Schema) {
   def pendingAdminReview: FilterOneTable[Egraph] = {
     new FilterOneTable[Egraph] {
       override def test(egraph: Egraph) = {
-        (egraph.stateValue in Seq(PassedBiometrics.value, FailedBiometrics.value, ApprovedByAdmin.value))
+        (egraph._egraphState in Seq(PassedBiometrics.name, FailedBiometrics.name, ApprovedByAdmin.name))
       }
     }
   }
@@ -595,7 +563,7 @@ class EgraphQueryFilters @Inject() (schema: Schema) {
   def approvedByAdmin: FilterOneTable[Egraph] = {
     new FilterOneTable[Egraph] {
       override def test(egraph: Egraph) = {
-        (egraph.stateValue === ApprovedByAdmin.value)
+        (egraph._egraphState === ApprovedByAdmin.name)
       }
     }
   }
@@ -603,7 +571,7 @@ class EgraphQueryFilters @Inject() (schema: Schema) {
   def rejectedByAdmin: FilterOneTable[Egraph] = {
     new FilterOneTable[Egraph] {
       override def test(egraph: Egraph) = {
-        (egraph.stateValue === RejectedByAdmin.value)
+        (egraph._egraphState === RejectedByAdmin.name)
       }
     }
   }
@@ -611,7 +579,7 @@ class EgraphQueryFilters @Inject() (schema: Schema) {
   def passedBiometrics: FilterOneTable[Egraph] = {
     new FilterOneTable[Egraph] {
       override def test(egraph: Egraph) = {
-        (egraph.stateValue === PassedBiometrics.value)
+        (egraph._egraphState === PassedBiometrics.name)
       }
     }
   }
@@ -619,7 +587,7 @@ class EgraphQueryFilters @Inject() (schema: Schema) {
   def failedBiometrics: FilterOneTable[Egraph] = {
     new FilterOneTable[Egraph] {
       override def test(egraph: Egraph) = {
-        (egraph.stateValue === FailedBiometrics.value)
+        (egraph._egraphState === FailedBiometrics.name)
       }
     }
   }
@@ -627,7 +595,7 @@ class EgraphQueryFilters @Inject() (schema: Schema) {
   def awaitingVerification: FilterOneTable[Egraph] = {
     new FilterOneTable[Egraph] {
       override def test(egraph: Egraph) = {
-        (egraph.stateValue === AwaitingVerification.value)
+        (egraph._egraphState === AwaitingVerification.name)
       }
     }
   }
@@ -635,7 +603,7 @@ class EgraphQueryFilters @Inject() (schema: Schema) {
   def published: FilterOneTable[Egraph] = {
     new FilterOneTable[Egraph] {
       override def test(egraph: Egraph) = {
-        (egraph.stateValue === Published.value)
+        (egraph._egraphState === Published.name)
       }
     }
   }

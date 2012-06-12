@@ -7,6 +7,7 @@ import services.AppConfig
 import services.blobs.Blobs
 import services.db.Schema
 import models._
+import enums.{OrderReviewStatus, EnrollmentStatus}
 import java.text.SimpleDateFormat
 import org.joda.time.DateTime
 
@@ -48,7 +49,7 @@ class DemoScenarios extends DeclaresDemoScenarios {
         (c) => select(c)
       )
       for (celebrity <- celebrities) {
-        celebrity.copy(enrollmentStatusValue = EnrollmentStatus.Enrolled.value).save()
+        celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
       }
   }
   )
@@ -285,9 +286,8 @@ class DemoScenarios extends DeclaresDemoScenarios {
       description = Some(
         "Love all my fans out there from Seattle to Swaziland." +
           " Your support makes the game worth playing."
-      ),
-      enrollmentStatusValue = EnrollmentStatus.Enrolled.value
-    ).save()
+      )
+    ).withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
 
     blobs.getStaticResource(profile) foreach {
       profilePhotoBlob =>
@@ -344,10 +344,10 @@ object DemoScenarios {
     import org.squeryl.Query
     import org.squeryl.PrimitiveTypeMode._
     val orders: Query[(Order)] = from(schema.orders)(
-      (o) => where(o.reviewStatus === Order.ReviewStatus.PendingAdminReview.stateValue) select (o)
+      (o) => where(o._reviewStatus === OrderReviewStatus.PendingAdminReview.name) select (o)
     )
     for (order <- orders) {
-      order.copy(reviewStatus = Order.ReviewStatus.ApprovedByAdmin.stateValue).save()
+      order.withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
     }
   }
 }

@@ -2,7 +2,8 @@ package controllers.website.admin
 
 import play.templates.Html
 import play.mvc.Scope.{Session, Flash}
-import models.{PublishedStatus, Celebrity}
+import models.enums.PublishedStatus
+import models.Celebrity
 
 object GetCelebrityDetail {
 

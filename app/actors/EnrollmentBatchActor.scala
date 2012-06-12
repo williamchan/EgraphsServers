@@ -8,7 +8,8 @@ import com.google.inject.Inject
 import services.logging.{Logging, LoggingContext}
 import services.signature.SignatureBiometricsError
 import services.voice.VoiceBiometricsError
-import models.{CelebrityStore, EnrollmentBatch, EnrollmentStatus, EnrollmentBatchStore}
+import models.{CelebrityStore, EnrollmentBatch, EnrollmentBatchStore}
+import models.enums.EnrollmentStatus
 
 object EnrollmentBatchActor {
   val actor = actorOf(AppConfig.instance[EnrollmentBatchActor])

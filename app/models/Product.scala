@@ -1,5 +1,7 @@
 package models
 
+import enums.PublishedStatus.EnumVal
+import enums.{PublishedStatus, HasPublishedStatus}
 import java.sql.Timestamp
 import services.db.{FilterOneTable, Schema, Saves, KeyedCaseClass}
 import play.templates.JavaExtensions
@@ -15,7 +17,6 @@ import services._
 import scala.Predef._
 import org.squeryl.Query
 import org.squeryl.dsl.ManyToMany
-import models.PublishedStatus.EnumVal
 
 case class ProductServices @Inject() (
   store: ProductStore,

@@ -11,7 +11,7 @@ import akka.util.TestKit
 import org.scalatest.BeforeAndAfterAll
 import actors.{ProcessEnrollmentBatchMessage, EnrollmentBatchActor}
 import models._
-import models.EnrollmentStatus.{Enrolled, NotEnrolled}
+import enums.EnrollmentStatus
 
 class EnrollmentBatchActorTests extends UnitFlatSpec
 with ShouldMatchers
@@ -41,7 +41,7 @@ with TestKit {
     AppConfig.instance[DBSession].connected(TransactionSerializable) {
       celebrity = Celebrity().save()
       enrollmentBatch = EnrollmentBatch(celebrityId = celebrity.id, isBatchComplete = true).save()
-      celebrity.enrollmentStatus should be(NotEnrolled)
+      celebrity.enrollmentStatus should be(EnrollmentStatus.NotEnrolled)
     }
 
     enrollmentBatchActor !! ProcessEnrollmentBatchMessage(enrollmentBatch.id)
@@ -49,7 +49,7 @@ with TestKit {
       val enrollmentBatchStore = AppConfig.instance[EnrollmentBatchStore]
       enrollmentBatchStore.findById(enrollmentBatch.id).get.isSuccessfulEnrollment should be(Some(true))
       val celebrityStore = AppConfig.instance[CelebrityStore]
-      celebrityStore.findById(celebrity.id).get.enrollmentStatus should be(Enrolled)
+      celebrityStore.findById(celebrity.id).get.enrollmentStatus should be(EnrollmentStatus.Enrolled)
     }
   }
 

@@ -6,6 +6,7 @@ import play.test.FunctionalTest
 import sjson.json.Serializer
 import utils.FunctionalTestUtils.willChanRequest
 import models._
+import enums.OrderReviewStatus
 import utils.{FunctionalTestUtils, TestConstants}
 import services.db.{DBSession, TransactionSerializable}
 import services.AppConfig
@@ -28,13 +29,13 @@ class PostCelebrityOrderApiEndpointTests extends EgraphsFunctionalTest {
       willChanRequest,
       TestConstants.ApiRoot + "/celebrities/me/orders/" + orderId,
       APPLICATION_X_WWW_FORM_URLENCODED,
-      "reviewStatus=" + Order.ReviewStatus.RejectedByCelebrity.stateValue + "&rejectionReason=It+made+me+cry"
+      "reviewStatus=" + OrderReviewStatus.RejectedByCelebrity.name + "&rejectionReason=It+made+me+cry"
     )
     assertIsOk(response)
 
     db.connected(TransactionSerializable) {
       val order = orderStore.findById(orderId.toString.toLong).get
-      assertEquals(Order.ReviewStatus.RejectedByCelebrity.stateValue, order.reviewStatus)
+      assertEquals(OrderReviewStatus.RejectedByCelebrity, order.reviewStatus)
       assertEquals("It made me cry", order.rejectionReason.get)
     }
 

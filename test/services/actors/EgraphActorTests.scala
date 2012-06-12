@@ -10,8 +10,8 @@ import services.AppConfig
 import models.{Egraph, EgraphStore}
 import akka.util.TestKit
 import org.scalatest.BeforeAndAfterAll
-import models.Egraph.EgraphState
 import utils.{TestData, ClearsDatabaseAndValidationBefore, TestConstants}
+import models.enums.EgraphState
 
 class EgraphActorTests extends UnitFlatSpec
 with ShouldMatchers
@@ -50,15 +50,15 @@ with TestKit {
         .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.fakeAudio)
         .save()
     }
-    egraph1.stateValue should be(EgraphState.AwaitingVerification.value)
-    egraph2.stateValue should be(EgraphState.AwaitingVerification.value)
+    egraph1.egraphState should be(EgraphState.AwaitingVerification)
+    egraph2.egraphState should be(EgraphState.AwaitingVerification)
 
     egraphActor !! ProcessEgraphMessage(egraph1.id)
     egraphActor !! ProcessEgraphMessage(egraph2.id)
     AppConfig.instance[DBSession].connected(TransactionSerializable) {
       val egraphStore = AppConfig.instance[EgraphStore]
-      egraphStore.findById(egraph1.id).get.stateValue should be(EgraphState.Published.value)
-      egraphStore.findById(egraph2.id).get.stateValue should be(EgraphState.Published.value)
+      egraphStore.findById(egraph1.id).get.egraphState should be(EgraphState.Published)
+      egraphStore.findById(egraph2.id).get.egraphState should be(EgraphState.Published)
     }
   }
 

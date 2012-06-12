@@ -3,6 +3,7 @@ package services.http
 import play.mvc.Http.Request
 import models._
 import com.google.inject.Inject
+import enums.PublishedStatus
 import play.mvc.results.{Forbidden, NotFound}
 
 /**
@@ -15,7 +16,7 @@ class CelebrityAccountRequestFilters @Inject() (
   accountFilters: AccountRequestFilters,
   productFilters: ProductQueryFilters)
 {
-  import OptionParams.Conversions._
+  import SafePlayParams.Conversions._
 
   /**
    * Filters out requests that didn't provide valid login/password credentials for an [[models.Account]]
@@ -58,8 +59,7 @@ class CelebrityAccountRequestFilters @Inject() (
    * 
    * @param request the request to be checked for existence of the celebrity ID
    * @param continue the code to execute once the celebrity is found
-   * @tparam A the type returned by continue
-   * 
+   *
    * @return either the result of continue or a new NotFound.
    */
   def requireCelebrityId(request: Request)(continue: Celebrity => Any) = {

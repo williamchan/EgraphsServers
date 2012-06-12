@@ -7,7 +7,8 @@ import play.Play
 import org.junit.Assert._
 import services.AppConfig
 import play.test.FunctionalTest._
-import models.{ProductStore, PublishedStatus}
+import models.enums.PublishedStatus
+import models.ProductStore
 import services.db.{Schema, TransactionSerializable, DBSession}
 
 /**

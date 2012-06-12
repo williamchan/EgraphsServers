@@ -13,6 +13,7 @@ import play.test.FunctionalTest
 import sjson.json.Serializer
 import utils.FunctionalTestUtils.{willChanRequest, runScenario}
 import models._
+import enums.EnrollmentStatus
 import services.http.CelebrityAccountRequestFilters
 import utils.{MockControllerMethod, TestConstants}
 import controllers.website.EgraphsFunctionalTest
@@ -75,14 +76,13 @@ class GetCelebrityApiEndpointFunctionalTests extends EgraphsFunctionalTest {
     assertEquals("Wizzle", json("urlSlug"))
     assertEquals("William", json("firstName"))
     assertEquals("Chan", json("lastName"))
-    assertEquals(false, json("isLeftHanded"))
-    assertEquals(EnrollmentStatus.NotEnrolled.value, json("enrollmentStatus"))
+    assertEquals(EnrollmentStatus.NotEnrolled.name, json("enrollmentStatus"))
 
     // These conversions will fail if they're not Longs
     Time.fromApiFormat(json("created").toString)
     Time.fromApiFormat(json("updated").toString)
 
-    assertEquals(9, json.size)
+    assertEquals(8, json.size)
   }
 
   @Test

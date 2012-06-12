@@ -7,7 +7,8 @@ import FunctionalTest._
 import services.AppConfig
 import services.db.{TransactionSerializable, DBSession}
 import utils.{TestConstants, TestData}
-import models.{Egraph, Order}
+import models.Egraph
+import models.enums.{EgraphState, OrderReviewStatus, PrivacyStatus}
 
 class GetEgraphEndpointTests extends AdminFunctionalTest {
 
@@ -20,16 +21,17 @@ class GetEgraphEndpointTests extends AdminFunctionalTest {
       val recipient = TestData.newSavedCustomer()
       val anotherCustomer = TestData.newSavedCustomer()
       val order = buyer.buy(TestData.newSavedProduct(), recipient = recipient)
-        .copy(privacyStatus = Order.PrivacyStatus.Private.stateValue, reviewStatus = Order.ReviewStatus.ApprovedByAdmin.stateValue).save()
-      order.newEgraph.copy(stateValue = Egraph.EgraphState.Published.value)
+        .withPrivacyStatus(PrivacyStatus.Private)
+        .withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
+      order.newEgraph.withEgraphState(EgraphState.Published)
         .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.fakeAudio).save()
       (order.id.toString, buyer.account, recipient.account, anotherCustomer.account)
     }
 
-    // anonymous users and random customers cannot view this egraph
-    assertStatus(403, GET("/egraph/" + orderId))
+    // anonymous users and random customers are redirected away
+    assertStatus(302, GET("/egraph/" + orderId))
     login(anotherAcct)
-    assertStatus(403, GET("/egraph/" + orderId))
+    assertStatus(302, GET("/egraph/" + orderId))
 
     // buyer, recipient, and admins are able to view this egraph
     login(buyerAcct)
@@ -45,8 +47,8 @@ class GetEgraphEndpointTests extends AdminFunctionalTest {
     val orderId: String = db.connected(TransactionSerializable) {
       val buyer = TestData.newSavedCustomer()
       val order = buyer.buy(TestData.newSavedProduct())
-        .copy(reviewStatus = Order.ReviewStatus.ApprovedByAdmin.stateValue).save()
-      order.newEgraph.copy(stateValue = Egraph.EgraphState.Published.value)
+        .withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
+      order.newEgraph.withEgraphState(EgraphState.Published)
         .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.fakeAudio).save()
       order.id.toString
     }

@@ -1,5 +1,6 @@
 package models
 
+import enums.AdminRole
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
@@ -34,7 +35,7 @@ class AdministratorTests extends UnitFlatSpec
 
   override def transformEntity(toTransform: Administrator) = {
     // No Administrator-specific data here to transform yet!
-    toTransform.copy(role = Some("big boss man"))
+    toTransform.withRole(AdminRole.AdminDisabled)
   }
 
 
@@ -42,10 +43,11 @@ class AdministratorTests extends UnitFlatSpec
   // Test cases
   //
 
-  "findByEmail" should "return None if parameter is not a Long" in {
-    val administrator = TestData.newSavedAdministrator()
-    adminStore.findById(administrator.id.toString).get should be(administrator)
-    adminStore.findById("") should be(None)
+  "isAdmin" should "return true if id exists for Administrator, false otherwise" in {
+    val administrator = Administrator().save()
+    adminStore.isAdmin(Some(administrator.id)) should be(true)
+    adminStore.isAdmin(Some(Long.MaxValue)) should be(false)
+    adminStore.isAdmin(None) should be(false)
   }
 
   "authenticate" should "return Administrator with correct credentials, else return None" in {

@@ -5,6 +5,7 @@ import play.mvc.Controller
 import play.data.validation._
 import org.apache.commons.mail.SimpleEmail
 import models._
+import enums.OrderReviewStatus
 import play.mvc.Scope.Flash
 import services.mail.Mail
 import services.{Utils, AppConfig}
@@ -231,7 +232,7 @@ object PostBuyProductEndpoint extends Logging {
       order = order.withChargeInfo(stripeCardTokenId = stripeTokenId, stripeCharge = charge)
 
       if (isDemo) {
-        order = order.copy(reviewStatus = Order.ReviewStatus.ApprovedByAdmin.stateValue)
+        order = order.withReviewStatus(OrderReviewStatus.ApprovedByAdmin)
       }
 
       val savedOrder = order.save()

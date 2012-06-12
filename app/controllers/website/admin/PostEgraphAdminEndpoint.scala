@@ -1,6 +1,7 @@
 package controllers.website.admin
 
 import models._
+import enums.EgraphState
 import play.mvc.results.Redirect
 import play.mvc.Controller
 import services.http.{POSTControllerMethod, AdminRequestFilters}
@@ -13,17 +14,17 @@ trait PostEgraphAdminEndpoint { this: Controller =>
   def postEgraphAdmin(egraphId: Long) = postController() {
     adminFilters.requireEgraph {(egraph, admin) =>
       val egraphStateParam = params.get("egraphState")
-      Egraph.EgraphState.all.get(egraphStateParam) match {
+      EgraphState.apply(egraphStateParam) match {
         case None => Forbidden("Not a valid egraph state")
-        case Some(Egraph.EgraphState.ApprovedByAdmin) => {
+        case Some(EgraphState.ApprovedByAdmin) => {
           egraph.approve(admin).save()
           new Redirect(GetEgraphAdminEndpoint.url(egraphId).url)
         }
-        case Some(Egraph.EgraphState.RejectedByAdmin) => {
+        case Some(EgraphState.RejectedByAdmin) => {
           egraph.reject(admin).save()
           new Redirect(GetEgraphAdminEndpoint.url(egraphId).url)
         }
-        case Some(Egraph.EgraphState.Published) => {
+        case Some(EgraphState.Published) => {
           egraph.publish(admin).save()
           egraph.order.sendEgraphSignedMail()
           new Redirect(GetEgraphAdminEndpoint.url(egraphId).url)

@@ -6,7 +6,7 @@ import utils.FunctionalTestUtils.runScenarios
 import scala.collection.JavaConversions._
 import play.mvc.Http.Response
 import controllers.website.EgraphsFunctionalTest
-import models.PublishedStatus
+import models.enums.PublishedStatus
 import utils.TestData
 
 trait AdminFunctionalTest extends EgraphsFunctionalTest {

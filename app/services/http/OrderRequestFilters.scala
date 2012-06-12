@@ -6,7 +6,7 @@ import play.mvc.results.NotFound
 import models.{OrderQueryFilters, OrderStore, Order}
 
 class OrderRequestFilters @Inject() (orderStore: OrderStore, orderQueryFilters: OrderQueryFilters) {
-  import OptionParams.Conversions._
+  import SafePlayParams.Conversions._
 
   def requireOrderIdOfCelebrity(celebrityId: Long)(onAllow: Order => Any)(implicit request: Request) = {
     request.params.getOption("orderId") match {

@@ -1,5 +1,6 @@
 package models
 
+import enums.EnrollmentStatus
 import java.sql.Timestamp
 import services.Time
 import services.db.{KeyedCaseClass, Schema, Saves}
