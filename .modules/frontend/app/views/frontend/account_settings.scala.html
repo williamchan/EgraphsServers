@@ -1,5 +1,28 @@
 @import views.frontend.tags
 
+@settingRow(title: String, value: String) = {
+  <tr class="settings-row">
+    <th class="span6">@title</th><td class="span15">@value</td><td class="span1"><a href="#">Edit</a></td>
+  </tr>
+}
+@checkboxRow(label: String, name: String, settings: Map[String, String]) = {
+  <tr>
+    <th class="span6">@label</th>
+    <td class="span16">
+     <fieldset>
+       <div class="control-group">
+         <div class="controls">
+          @settings.map { option =>
+            <label class="checkbox settings-col">
+              <input type="checkbox" name="@name" value="@option._1"/>@option._2
+            </label>
+           }
+         </div>
+       </div>
+     </fieldset>
+    </td>
+  </tr>
+}
 @baseBody = {
   <section id="content" role="main">
     <div id="main">
@@ -9,64 +32,59 @@
           <h1>Account Settings</h1>
         </header>
 
-        <section id="personal-information">
+        <section class="settings-group" id="personal-information">
 
-          <h2>Personal Information</h2>
-          <table>
-            <tr>
-              <th>Name</th><td></td><td></td>
-            </tr>
-            <tr>
-              <th>User</th><td></td><td></td>
-            </tr>
-            <tr>
-              <th>Email</th><td></td><td></td>
-            </tr>
-            <tr>
-              <th>Password</th><td></td><td></td>
-            </tr>
+          <h2 >Personal Information</h2>
+          <table class="table">
+            @settingRow(title = "Name", "Joshua Johnson")
+            @settingRow(title = "Username", "Joshua Johnson")
+            @settingRow(title = "Email", "joshua12@gmail.com")
+            @settingRow(title = "Password", "********")
+
           </table>
 
         </section>
 
-        <section id="shipping-address">
+        <section class="settings-group" id="shipping-address">
           <h2>Shipping Address</h2>
-          <table>
-            <tr>
-              <th>Primary</th><td></td><td></td>
+          <table class="table">
+            <tr class="settings-row">
+              <th class="span6">Primary</th>
+              <td class="span6">
+                Joshua Johnson
+              </td>
+              <td class="span9">
+                <span>
+                <address>
+                5507 N 58th Street
+                <br>
+                Seattle, WA 98101
+                </address>
+                </span>
+              </td>
+              <td class="span1"><a href="#">Edit</a></td>
             </tr>
           </table>
-          <p><a href= "#">+ Add Another Shipping Address</a></p>
+          <p id="add-link"><a href= "#">+ Add Another Shipping Address</a></p>
         </section>
 
-        <section id="gallery-settings">
+        <section class="settings-group" id="gallery-settings">
           <h2>My Gallery Settings</h2>
-          <table>
-            <th>Gallery Visibility</th><td>Public</td><td></td>
+          <table class="table">
+            @settingRow(title = "Gallery Visibility", "Public")
+            @settingRow(title = "Gallery URL", "egra.ph/joshuajohnson")
           </table>
         </section>
 
-        <section id="additional-settings">
+        <section class="settings-group" id="additional-settings">
           <h2>Additional Settings</h2>
-          <table>
-            <tr>
-              <th>Notices</th>
-              <td>
-                <input type="checkbox" name="notice" value="new_stars"/> New Star Additions (Weekly)
-                <input type="checkbox" name="notice" value="new_products"/> New Products/Features
-                <input type="checkbox" name="notice" value="news"/> News
-                <input type="checkbox" name="notice" value="mlb_updates"/> Updates from Major League Baseball
-              </td>
-            </tr>
-            <tr>
-              <th>Follow Egraphs</th>
-              <td>
-                <input type="checkbox" name="social" value="facebook"/> Facebook
-                <input type="checkbox" name="notice" value="twitter"/> Twitter
-                <input type="checkbox" name="notice" value="tumblr"/>  Tumblr
-
-              </td>
-            </tr>
+          <table class="table">
+           @checkboxRow(label = "Notices", name = "notice", Map( "new_stars" -> "New Star Additions (Weekly)",
+                                              "news" -> "News",
+                                              "mlb_updates" -> "Updates from Major League Baseball"))
+            @checkboxRow(label = "Follow Egraphs", name = "social", Map( "facebook" -> "Facebook",
+                                                                          "twitter" -> "Twitter",
+                                                                          "tumblr"  -> "Tumblr"))
           </table>
         </section>
         <p>
