@@ -38,13 +38,13 @@ trait PostBuyProductEndpoint { this: Controller =>
    *   the order confirmation page.
    */
   def postBuyProduct(recipientName: String,
-          recipientEmail: String,
-          buyerName: String,
-          buyerEmail: String,
-          stripeTokenId: String,
-          desiredText: Option[String],
-          personalNote: Option[String],
-          isDemo: Boolean = false) = postController(openDatabase=false, doCsrfCheck= (!isDemo || !payment.isTest)) {
+                     recipientEmail: String,
+                     buyerName: String,
+                     buyerEmail: String,
+                     stripeTokenId: String,
+                     desiredText: Option[String],
+                     personalNote: Option[String],
+                     isDemo: Boolean = false) = postController(openDatabase = false, doCsrfCheck = (!isDemo || !payment.isTest)) {
 
     payment.isTest match {
       case true =>
@@ -65,7 +65,12 @@ trait PostBuyProductEndpoint { this: Controller =>
                    isDemo: Boolean = false): Any = {
 
     Logger.info("Receiving purchase order")
-    val (celebrity: Celebrity, product: Product) = validateInputs(recipientName, recipientEmail, buyerName, buyerEmail, stripeTokenId)
+    val (celebrity: Celebrity, product: Product) = validateInputs(
+      recipientName = recipientName,
+      recipientEmail = recipientEmail,
+      buyerName = buyerName,
+      buyerEmail = buyerEmail,
+      stripeTokenId = stripeTokenId)
     if (!validationErrors.isEmpty) {
       return WebsiteControllers.redirectWithValidationErrors(GetCelebrityProductEndpoint.url(celebrity, product), Some(false))
     }
@@ -180,7 +185,13 @@ object PostBuyProductEndpoint extends Logging {
 
       // Persist the Order. This is executed in its own database transaction.
       val (order: Order, buyer: Customer, recipient: Customer) = try {
-        persistOrder(dbSession, customerStore, buyerEmail, buyerName, recipientEmail, product, recipientName, personalNote, desiredText, stripeTokenId, charge, isDemo, accountStore, celebrity)
+        persistOrder(buyerEmail = buyerEmail,
+          buyerName = buyerName,
+          recipientEmail = recipientEmail,
+          recipientName = recipientName,
+          personalNote = personalNote,
+          desiredText = desiredText,
+          stripeTokenId = stripeTokenId, isDemo = isDemo, charge = charge, celebrity = celebrity, product = product, dbSession = dbSession, accountStore = accountStore, customerStore = customerStore)
       } catch {
         case e: InsufficientInventoryException => {
           payment.refund(charge.id)
@@ -197,7 +208,7 @@ object PostBuyProductEndpoint extends Logging {
       }
 
       // If the Stripe charge and Order persistence executed successfully, send a confirmation email and redirect to a confirmation page
-      sendOrderConfirmationEmail(buyerName, buyerEmail, buyer = buyer, recipient = recipient, celebrity, product, order, mail)
+      sendOrderConfirmationEmail(buyerName = buyerName, buyerEmail = buyerEmail, buyer = buyer, recipient = recipient, celebrity, product, order, mail)
       flash.put("orderId", order.id)
       new Redirect(Utils.lookupUrl("WebsiteControllers.getOrderConfirmation", Map("orderId" -> order.id.toString)).url)
     }
@@ -253,7 +264,7 @@ object PostBuyProductEndpoint extends Logging {
     email.addTo(buyerEmail, buyerName)
     email.setSubject("Order Confirmation")
     email.setMsg(views.Application.email.html.order_confirmation_email(
-      buyer, recipient, celebrity, product, order
+      buyer = buyer, recipient = recipient, celebrity, product, order
     ).toString().trim())
     mail.send(email)
   }
