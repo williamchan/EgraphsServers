@@ -54,8 +54,6 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
     val customerIdStr = session.get(WebsiteControllers.customerIdKey)
     val adminIdStr = session.get(WebsiteControllers.adminIdKey)
 
-    println("customerIdStr " + customerIdStr)
-
     order.isPublic ||
       order.isBuyerOrRecipient(customerIdStr) ||
       administratorStore.findById(adminIdStr).isDefined
