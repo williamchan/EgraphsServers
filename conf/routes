@@ -109,7 +109,7 @@ POST    /account/recover                                 WebsiteControllers.post
 GET     /account/recover/confirmation                    WebsiteControllers.getRecoverAccountConfirmation
 GET     /account/reset                                   WebsiteControllers.getResetPassword
 POST    /account/reset                                   WebsiteControllers.postResetPassword
-POST    /facebooklogin/callback                          WebsiteControllers.postFacebookLoginCallback
+GET     /facebooklogin/callback                          WebsiteControllers.getFacebookLoginCallback
 
 # Order and Egraph pages
 GET     /orders/{<[0-9]+>orderId}/confirm                WebsiteControllers.getOrderConfirmation

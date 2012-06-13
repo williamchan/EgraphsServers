@@ -21,4 +21,4 @@ trait AllConsumerEndpoints extends GetBlobEndpoint
   with PostRecoverAccountEndpoint
   with PostRegisterEndpoint
   with PostResetPasswordEndpoint
-  with PostFacebookLoginCallbackEndpoint{ this: Controller => }
+  with GetFacebookLoginCallbackEndpoint{ this: Controller => }

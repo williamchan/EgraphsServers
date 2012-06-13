@@ -3,6 +3,8 @@ package controllers.website
 import play.mvc.Controller
 import services.Utils
 import services.http.ControllerMethod
+import services.social.Facebook
+import java.util.UUID
 
 private[controllers] trait GetLoginEndpoint {
   this: Controller =>
@@ -13,14 +15,10 @@ private[controllers] trait GetLoginEndpoint {
   def getLogin = controllerMethod() {
     val errorFields = Option(flash.get("errors")).map(errString => errString.split(',').toList)
 
-    val action = Utils.lookupAbsoluteUrl("WebsiteControllers.postFacebookLoginCallback")
-    val callbackUrl = action.url
-
-    views.Application.html.login(
-      errorFields = errorFields,
-      fbAppId = facebookAppId,
-      callbackUrl = callbackUrl
-    )
+    val fbState = UUID.randomUUID().toString
+    session.put(Facebook._fbState, fbState)
+    val fbOauthUrl = Facebook.getFbOauthUrl(fbAppId = facebookAppId, state = fbState)
+    views.Application.html.login(errorFields = errorFields, fbOauthUrl = fbOauthUrl)
   }
 
 }

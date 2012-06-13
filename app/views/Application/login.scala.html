@@ -1,4 +1,4 @@
-@(errorFields: Option[List[String]], fbAppId: String, callbackUrl: String
+@(errorFields: Option[List[String]], fbOauthUrl: String
 )(implicit session: play.mvc.Scope.Session)
 
 @import controllers.WebsiteControllers
@@ -12,8 +12,6 @@
 @postLogin = @{
   lookupUrl("WebsiteControllers.postLogin")
 }
-
-@fbScriptSrc = @{ "https://connect.facebook.net/en_US/all.js#appId=" + fbAppId + "&xfbml=1" }
 
 @head = {
 <script src='@asset("public/twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
@@ -50,16 +48,8 @@
   <a class="preview-link" href="/account/recover">
     Forgot your password?
   </a>
-  <div>
-    <div id="fb-root"></div>
-    <script src=@fbScriptSrc></script>
-    <fb:registration
-            fields="name,email"
-            redirect-uri=@callbackUrl
-            width="530">
-    </fb:registration>
+  <div id="facebook">
+    <a class='fb_signup sprite' href=@fbOauthUrl>Login With Facebook</a>
   </div>
 </div>
-
-
 }
