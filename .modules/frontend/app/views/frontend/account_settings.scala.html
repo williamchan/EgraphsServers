@@ -1,10 +1,32 @@
 @import views.frontend.tags
 
-@settingRow(title: String, value: String) = {
-  <tr class="settings-row">
-    <th class="span6">@title</th><td class="span15">@value</td><td class="span1"><a href="#" class="edit">Edit</a></td>
+@settingRow(id:String, title: String, value: String) = {
+  <tr id="@id-display" class="settings-row">
+    <th class="span6">@title</th><td class="span15">@value</td><td class="span1"><a href="#" class="action edit">Edit</a></td>
   </tr>
+ <tr id="@id-edit" class="settings-row hide">
+  <th class="span6">@title</th><td class="span15"><input type="text" value="@value"/></td><td class="span1"><a class="action cancel">Cancel</a></td>
+ </tr>
 }
+
+@addressRow(title: String, fullname: String, address1:String, address2:String)  = {
+<tr class="settings-row">
+  <th class="span6">@title</th>
+  <td class="span6">
+    @fullname
+  </td>
+  <td class="span9">
+      <span>
+        <address>
+          @address1<br>
+          @address2
+        </address>
+       </span>
+  </td>
+  <td class="span1"><a href="#" class="edit">Edit</a></td>
+</tr>
+}
+
 @checkboxRow(label: String, name: String, settings: Map[String, String]) = {
   <tr>
     <th class="span6">@label</th>
@@ -24,29 +46,13 @@
   </tr>
 }
 
-@addressRow(title: String, fullname: String, address1:String, address2:String)  = {
-  <tr class="settings-row">
-    <th class="span6">@title</th>
-    <td class="span6">
-      @fullname
-    </td>
-    <td class="span9">
-      <span>
-        <address>
-          @address1<br>
-          @address2
-        </address>
-       </span>
-  </td>
-  <td class="span1"><a href="#" class="edit">Edit</a></td>
-</tr>
-}
+
 @baseBody = {
-  <section id="content" role="main">
+  <section id="content" role="main" ng-app>
     <div id="main">
       <div class="container">
 
-        <header>
+        <header id="settings-top">
           <h1>Account Settings</h1>
         </header>
 
@@ -54,10 +60,10 @@
 
           <h2 >Personal Information</h2>
           <table class="table">
-            @settingRow(title = "Name", "Joshua Johnson")
-            @settingRow(title = "Username", "Joshua Johnson")
-            @settingRow(title = "Email", "joshua12@gmail.com")
-            @settingRow(title = "Password", "********")
+            @settingRow(id = "fullname", title = "Name", "Joshua Johnson")
+            @settingRow(id = "username",title = "Username", "Joshua Johnson")
+            @settingRow(id = "email", title = "Email", "joshua12@gmail.com")
+            @settingRow(id = "password", title = "Password", "********")
 
           </table>
 
@@ -74,8 +80,8 @@
         <section class="settings-group" id="gallery-settings">
           <h2>My Gallery Settings</h2>
           <table class="table">
-            @settingRow(title = "Gallery Visibility", "Public")
-            @settingRow(title = "Gallery URL", "egra.ph/joshuajohnson")
+            @settingRow(id="gallery-visibility", title = "Gallery Visibility", "Public")
+            @settingRow(id="gallery-url", title = "Gallery URL", "egra.ph/joshuajohnson")
           </table>
         </section>
 

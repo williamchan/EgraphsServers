@@ -3,13 +3,13 @@
 }
 
 .settings-row {
-  a.edit {
+  a.action {
     font-size: 14px;
     color: @orange;
     text-align: right;
   }
 
-  a:hover.edit {
+  a:hover.action {
     color:@blue;
   }
 
@@ -58,4 +58,14 @@ a.add-link {
 
 a.add-link:hover p:first-letter{
   color: @orange;
+}
+
+//Media queries
+
+@media (max-width:480px) {
+  #settings-top {
+    h1 {
+    font-size: 24px;
+    }
+  }
 }

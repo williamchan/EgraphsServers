@@ -1,0 +1,10 @@
+//Configuration to look up correct urls to js files as opposed to relative paths (require's default behavior)
+require.config({
+  baseUrl: "/public/javascripts"
+});
+
+//Call to template js module
+require(["functions"], function(functions) {
+  functions.go();
+});
+
