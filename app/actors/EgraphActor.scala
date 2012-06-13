@@ -4,10 +4,10 @@ import akka.actor.Actor
 import Actor._
 import services.db.{DBSession, TransactionSerializable}
 import services.AppConfig
-import models.Egraph.EgraphState
 import models.EgraphStore
 import com.google.inject.Inject
 import services.logging.{Logging, LoggingContext}
+import models.enums.EgraphState
 
 /**
  * Actor that performs most of the work of creating an egraph and running it through our biometrics
@@ -39,10 +39,10 @@ class EgraphActor @Inject() (
           throw new Exception("EgraphActor could not find Egraph " + egraphId.toString)
         }
 
-        if (egraph.get.stateValue == EgraphState.AwaitingVerification.value) {
+        if (egraph.get.egraphState == EgraphState.AwaitingVerification) {
           val egraphToTest = if (skipBiometrics) egraph.get.withYesMaamBiometricServices else egraph.get
           val testedEgraph = egraphToTest.verifyBiometrics.save()
-          if (testedEgraph.state == EgraphState.Published) {
+          if (testedEgraph.egraphState == EgraphState.Published) {
             testedEgraph.order.sendEgraphSignedMail()
           }
         }

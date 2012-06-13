@@ -23,12 +23,12 @@
 }
 
 @reviewControls = {
-  @if(order.reviewStatus == models.Order.ReviewStatus.PendingAdminReview.stateValue) {
+  @if(order.reviewStatus == models.enums.OrderReviewStatus.PendingAdminReview) {
     <div class="form">
       <form id="approve-form" method="POST" action='@postOrder' enctype="application/x-www-form-urlencoded">
         @authenticityToken()
         <input name="orderId" type="hidden" value="@order.id">
-        <input name="reviewStatus" type="hidden" value="@models.Order.ReviewStatus.ApprovedByAdmin">
+        <input name="reviewStatus" type="hidden" value="@models.enums.OrderReviewStatus.ApprovedByAdmin">
         <div class="actions">
           <h3>Approve so that Celebrity can fulfill</h3>
           <button type="submit" id="approve-button" class="btn primary fade in">Approve</button>
@@ -37,7 +37,7 @@
       <form id="reject-form" method="POST" action='@postOrder' enctype="application/x-www-form-urlencoded">
         @authenticityToken()
         <input name="orderId" type="hidden" value="@order.id">
-        <input name="reviewStatus" type="hidden" value="@models.Order.ReviewStatus.RejectedByAdmin">
+        <input name="reviewStatus" type="hidden" value="@models.enums.OrderReviewStatus.RejectedByAdmin">
         <div class="actions">
           <h3>Reject so that Celebrity will not see this order</h3>
           <label>Rejection Reason</label>
@@ -68,11 +68,12 @@
   @valueRow(label="Product",              value=order.productId, href=productUrl().url)
   @valueRow(label="Buyer",                value=order.buyerId)
   @valueRow(label="RecipientId",          value=order.recipientId)
+  @valueRow(label="Privacy Status",       value=order.privacyStatus)
   @valueRow(label="Created",              value=order.created)
   @valueRow(label="Updated",              value=order.updated)
   <hr/>
   <h2>Payment Details</h2>
-  @valueRow(label="Payment State",        value=order.paymentStateString)
+  @valueRow(label="Payment State",        value=order.paymentStatus)
   @valueRow(label="StripeCardTokenId",    value=order.stripeCardTokenId)
   @valueRow(label="StripeChargeId",       value=order.stripeChargeId)
   @valueRow(label="Amount",               value=order.amountPaid.formatSimply)

@@ -1,5 +1,6 @@
 package models
 
+import enums.EgraphState
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
@@ -7,7 +8,6 @@ import utils._
 import services.blobs.Blobs.Conversions._
 import services.{Dimensions, Time, AppConfig}
 import java.awt.image.BufferedImage
-import models.Egraph.EgraphState
 
 class EgraphTests extends UnitFlatSpec
   with ShouldMatchers
@@ -38,49 +38,46 @@ class EgraphTests extends UnitFlatSpec
 
   override def transformEntity(toTransform: Egraph) = {
     val order = TestData.newSavedOrder()
-    toTransform.copy(
-      orderId = order.id,
-      stateValue = EgraphState.Published.value
-    )
+    toTransform.copy(orderId = order.id).withEgraphState(EgraphState.Published)
   }
 
   //
   // Test cases
   //
-  "An Egraph" should "update its state when withState is called" in {
-    val egraph = Egraph().withState(EgraphState.FailedBiometrics)
+  "An Egraph" should "update its state when withEgraphState is called" in {
+    val egraph = Egraph().withEgraphState(EgraphState.FailedBiometrics)
 
-    egraph.state should be (EgraphState.FailedBiometrics)
+    egraph.egraphState should be (EgraphState.FailedBiometrics)
   }
 
   "approve" should "change state to ApprovedByAdmin" in {
     val admin = Administrator().save()
-    Egraph().withState(EgraphState.PassedBiometrics).approve(admin).state should be(EgraphState.ApprovedByAdmin)
-    Egraph().withState(EgraphState.FailedBiometrics).approve(admin).state should be(EgraphState.ApprovedByAdmin)
-    intercept[IllegalArgumentException] {Egraph().withState(EgraphState.PassedBiometrics).approve(null)}
-    intercept[IllegalArgumentException] {Egraph().withState(EgraphState.AwaitingVerification).approve(admin)}
-    intercept[IllegalArgumentException] {Egraph().withState(EgraphState.Published).approve(admin)}
-    intercept[IllegalArgumentException] {Egraph().withState(EgraphState.RejectedByAdmin).approve(admin)}
+    Egraph().withEgraphState(EgraphState.PassedBiometrics).approve(admin).egraphState should be(EgraphState.ApprovedByAdmin)
+    Egraph().withEgraphState(EgraphState.FailedBiometrics).approve(admin).egraphState should be(EgraphState.ApprovedByAdmin)
+    intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.PassedBiometrics).approve(null)}
+    intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.AwaitingVerification).approve(admin)}
+    intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.Published).approve(admin)}
+    intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.RejectedByAdmin).approve(admin)}
   }
 
   "reject" should "change state to RejectedByAdmin" in {
     val admin = Administrator().save()
-    Egraph().withState(EgraphState.PassedBiometrics).reject(admin).state should be(EgraphState.RejectedByAdmin)
-    Egraph().withState(EgraphState.FailedBiometrics).reject(admin).state should be(EgraphState.RejectedByAdmin)
-    intercept[IllegalArgumentException] {Egraph().withState(EgraphState.PassedBiometrics).reject(null)}
-    intercept[IllegalArgumentException] {Egraph().withState(EgraphState.AwaitingVerification).reject(admin)}
-    intercept[IllegalArgumentException] {Egraph().withState(EgraphState.Published).reject(admin)}
-    intercept[IllegalArgumentException] {Egraph().withState(EgraphState.RejectedByAdmin).reject(admin)}
+    Egraph().withEgraphState(EgraphState.PassedBiometrics).reject(admin).egraphState should be(EgraphState.RejectedByAdmin)
+    Egraph().withEgraphState(EgraphState.FailedBiometrics).reject(admin).egraphState should be(EgraphState.RejectedByAdmin)
+    intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.PassedBiometrics).reject(null)}
+    intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.AwaitingVerification).reject(admin)}
+    intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.Published).reject(admin)}
+    intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.RejectedByAdmin).reject(admin)}
   }
 
   "publish" should "change state to Published" in {
     val admin = Administrator().save()
-    Egraph().withState(EgraphState.ApprovedByAdmin).publish(admin).state should be(EgraphState.Published)
-    intercept[IllegalArgumentException] {Egraph().withState(EgraphState.PassedBiometrics).publish(null)}
-    intercept[IllegalArgumentException] {Egraph().withState(EgraphState.AwaitingVerification).publish(admin)}
-    intercept[IllegalArgumentException] {Egraph().withState(EgraphState.RejectedByAdmin).publish(admin)}
-    intercept[IllegalArgumentException] {Egraph().withState(EgraphState.PassedBiometrics).publish(admin)}
-    intercept[IllegalArgumentException] {Egraph().withState(EgraphState.PassedBiometrics).publish(admin)}
+    Egraph().withEgraphState(EgraphState.ApprovedByAdmin).publish(admin).egraphState should be(EgraphState.Published)
+    intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.PassedBiometrics).publish(null)}
+    intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.AwaitingVerification).publish(admin)}
+    intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.RejectedByAdmin).publish(admin)}
+    intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.PassedBiometrics).publish(admin)}
+    intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.PassedBiometrics).publish(admin)}
   }
 
   "image" should "return EgraphImage with correctly configured ingredientFactory" in {
@@ -107,20 +104,6 @@ class EgraphTests extends UnitFlatSpec
     evaluating { TestData.newSavedOrder().newEgraph.assets } should produce [IllegalArgumentException]
   }
 
-  "Egraph statuses" should "be accessible via their values on the companion object" in {
-    EgraphState.all.foreach( stateTuple =>
-      EgraphState.all(stateTuple._2.value) should be (stateTuple._2)
-    )
-  }
-
-  "allStatuses" should "contain all the states" in {
-    EgraphState.all.size should be (6)
-  }
-
-  it should "throw an exception at an unrecognized string" in {
-    evaluating { EgraphState.all("Herpyderp") } should produce [NoSuchElementException]
-  }
-
   "An Egraph Story" should "render all values correctly in the title" in {
     val storyTemplate = EgraphStoryField.values.foldLeft("") { (accum, field) =>
       accum + "{" + field.name + "}"
@@ -141,12 +124,12 @@ class EgraphTests extends UnitFlatSpec
   }
 
   "getEgraphsAndResults" should "filter queries based on EgraphQueryFilters" in {
-    val passedBiometrics = TestData.newSavedOrder().newEgraph.withState(EgraphState.PassedBiometrics).save()
-    val failedBiometrics = TestData.newSavedOrder().newEgraph.withState(EgraphState.FailedBiometrics).save()
-    val approvedByAdmin = TestData.newSavedOrder().newEgraph.withState(EgraphState.ApprovedByAdmin).save()
-    val rejectedByAdmin = TestData.newSavedOrder().newEgraph.withState(EgraphState.RejectedByAdmin).save()
-    val awaitingVerification = TestData.newSavedOrder().newEgraph.withState(EgraphState.AwaitingVerification).save()
-    val published = TestData.newSavedOrder().newEgraph.withState(EgraphState.Published).save()
+    val passedBiometrics = TestData.newSavedOrder().newEgraph.withEgraphState(EgraphState.PassedBiometrics).save()
+    val failedBiometrics = TestData.newSavedOrder().newEgraph.withEgraphState(EgraphState.FailedBiometrics).save()
+    val approvedByAdmin = TestData.newSavedOrder().newEgraph.withEgraphState(EgraphState.ApprovedByAdmin).save()
+    val rejectedByAdmin = TestData.newSavedOrder().newEgraph.withEgraphState(EgraphState.RejectedByAdmin).save()
+    val awaitingVerification = TestData.newSavedOrder().newEgraph.withEgraphState(EgraphState.AwaitingVerification).save()
+    val published = TestData.newSavedOrder().newEgraph.withEgraphState(EgraphState.Published).save()
 
     store.getEgraphsAndResults(egraphQueryFilters.passedBiometrics).toSeq.map(e => e._1).toSet should be(Set(passedBiometrics))
     store.getEgraphsAndResults(egraphQueryFilters.failedBiometrics).toSeq.map(e => e._1).toSet should be(Set(failedBiometrics))
@@ -161,12 +144,12 @@ class EgraphTests extends UnitFlatSpec
     val celebrity = TestData.newSavedCelebrity()
     val product = Some(TestData.newSavedProduct(Some(celebrity)))
 
-    val passedBiometrics = TestData.newSavedOrder(product).newEgraph.withState(EgraphState.PassedBiometrics).save()
-    val failedBiometrics = TestData.newSavedOrder(product).newEgraph.withState(EgraphState.FailedBiometrics).save()
-    val approvedByAdmin = TestData.newSavedOrder(product).newEgraph.withState(EgraphState.ApprovedByAdmin).save()
-    val rejectedByAdmin = TestData.newSavedOrder(product).newEgraph.withState(EgraphState.RejectedByAdmin).save()
-    val awaitingVerification = TestData.newSavedOrder(product).newEgraph.withState(EgraphState.AwaitingVerification).save()
-    val published = TestData.newSavedOrder(product).newEgraph.withState(EgraphState.Published).save()
+    val passedBiometrics = TestData.newSavedOrder(product).newEgraph.withEgraphState(EgraphState.PassedBiometrics).save()
+    val failedBiometrics = TestData.newSavedOrder(product).newEgraph.withEgraphState(EgraphState.FailedBiometrics).save()
+    val approvedByAdmin = TestData.newSavedOrder(product).newEgraph.withEgraphState(EgraphState.ApprovedByAdmin).save()
+    val rejectedByAdmin = TestData.newSavedOrder(product).newEgraph.withEgraphState(EgraphState.RejectedByAdmin).save()
+    val awaitingVerification = TestData.newSavedOrder(product).newEgraph.withEgraphState(EgraphState.AwaitingVerification).save()
+    val published = TestData.newSavedOrder(product).newEgraph.withEgraphState(EgraphState.Published).save()
 
     store.getCelebrityEgraphsAndResults(celebrity, egraphQueryFilters.passedBiometrics).toSeq.map(e => e._1).toSet should be(Set(passedBiometrics))
     store.getCelebrityEgraphsAndResults(celebrity, egraphQueryFilters.failedBiometrics).toSeq.map(e => e._1).toSet should be(Set(failedBiometrics))

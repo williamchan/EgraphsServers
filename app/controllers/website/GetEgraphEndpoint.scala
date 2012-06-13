@@ -5,11 +5,15 @@ import services.blobs.AccessPolicy
 import java.text.SimpleDateFormat
 import services.http.ControllerMethod
 import play.templates.Html
-import services.http.OptionParams.Conversions.paramsToOptionalParams
+import services.http.SafePlayParams.Conversions.paramsToOptionalParams
 import services.graphics.Handwriting
 import models._
+import controllers.WebsiteControllers
+import play.mvc.results.Redirect
+import services.Utils
 
 private[controllers] trait GetEgraphEndpoint { this: Controller =>
+  protected def administratorStore: AdministratorStore
   protected def orderStore: OrderStore
   protected def controllerMethod: ControllerMethod
 
@@ -27,7 +31,7 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
 
     // Get an order with provided ID
     orderStore.findFulfilledWithId(orderId.toLong) match {
-      case Some(FulfilledOrder(order, egraph)) =>
+      case Some(FulfilledOrder(order, egraph)) if isViewable(order) =>
         GetEgraphEndpoint.html(
           egraph = egraph,
           order = order,
@@ -36,6 +40,9 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
           shadowY = shadowY
         )
 
+      case Some(FulfilledOrder(order, egraph)) =>
+        new Redirect(Utils.lookupUrl("WebsiteControllers.getRootEndpoint").url)
+
       case None =>
         NotFound("No Egraph exists with the provided identifier.")
     }
@@ -43,6 +50,15 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
 
   def lookupGetEgraph(orderId: Long) = {
     reverse(this.getEgraph(orderId.toString))
+  }
+
+  private def isViewable(order: Order): Boolean = {
+    val customerIdOption = session.getLongOption(WebsiteControllers.customerIdKey)
+    val adminIdOption = session.getLongOption(WebsiteControllers.adminIdKey)
+
+    order.isPublic ||
+      order.isBuyerOrRecipient(customerIdOption) ||
+      administratorStore.isAdmin(adminIdOption)
   }
 }
 

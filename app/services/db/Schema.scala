@@ -90,7 +90,7 @@ class Schema @Inject()(
   on(orders)(order =>
     declare(
       order.amountPaidInCurrency is monetaryDbType,
-      columns(order.reviewStatus) are (indexed)
+      columns(order._reviewStatus) are (indexed)
     )
   )
 
@@ -112,7 +112,7 @@ class Schema @Inject()(
   val egraphs = table[Egraph]
   on(egraphs)(egraph =>
     declare(
-      columns(egraph.orderId, egraph.stateValue) are (indexed)
+      columns(egraph.orderId, egraph._egraphState) are (indexed)
     )
   )
 

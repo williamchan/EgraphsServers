@@ -1,5 +1,6 @@
 package models
 
+import enums._
 import java.sql.Timestamp
 import org.joda.money.Money
 import services.db.{FilterOneTable, KeyedCaseClass, Schema, Saves}
@@ -10,7 +11,6 @@ import mail.Mail
 import payment.{Charge, Payment}
 import play.mvc.Router.ActionDefinition
 import org.squeryl.Query
-import models.Egraph.EgraphState._
 import models.CashTransaction.{PurchaseRefund, EgraphPurchase}
 import org.apache.commons.mail.{Email, HtmlEmail}
 import scala.util.Random
@@ -37,9 +37,10 @@ case class Order(
   buyerId: Long = 0,
   recipientId: Long = 0,
   recipientName: String = "",
-  paymentStateString: String = Order.PaymentState.NotCharged.stateValue,
-  reviewStatus: String = Order.ReviewStatus.PendingAdminReview.stateValue,
+  _paymentStatus: String = PaymentStatus.NotCharged.name,
+  _reviewStatus: String = OrderReviewStatus.PendingAdminReview.name,
   rejectionReason: Option[String] = None,
+  _privacyStatus: String = PrivacyStatus.Public.name,
   stripeCardTokenId: Option[String] = None,
   stripeChargeId: Option[String] = None,
   amountPaidInCurrency: BigDecimal = 0,
@@ -48,10 +49,12 @@ case class Order(
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: OrderServices = AppConfig.instance[OrderServices]
-) extends KeyedCaseClass[Long] with HasCreatedUpdated
+) extends KeyedCaseClass[Long]
+  with HasCreatedUpdated
+  with HasPrivacyStatus[Order]
+  with HasPaymentStatus[Order]
+  with HasOrderReviewStatus[Order]
 {
-  import Order._
-
   //
   // Public methods
   //
@@ -63,11 +66,6 @@ case class Order(
 
   def amountPaid: Money = {
     amountPaidInCurrency.toMoney()
-  }
-
-  /** Returns the current payment state */
-  def paymentState: PaymentState = {
-    PaymentState.all(paymentStateString)
   }
 
   /** Retrieves the purchasing Customer from the database. */
@@ -85,9 +83,8 @@ case class Order(
     services.productStore.get(productId)
   }
 
-  /** Returns an order configured with the provided payment state */
-  def withPaymentState(paymentState: PaymentState) = {
-    copy(paymentStateString = paymentState.stateValue)
+  def isPublic = {
+    privacyStatus == PrivacyStatus.Public
   }
 
   /** Call this to associate a Stripe Charge with this Order */
@@ -99,7 +96,7 @@ case class Order(
       .save()
 
     this.copy(stripeCardTokenId = Some(stripeCardTokenId), stripeChargeId = Some(stripeCharge.id))
-      .withPaymentState(PaymentState.Charged)
+      .withPaymentStatus(PaymentStatus.Charged)
   }
 
   /**
@@ -107,7 +104,7 @@ case class Order(
    * Hopefully we will not have many refund requests when we launch.
    */
   def refund(): (Order, Charge) = {
-    require(paymentState == PaymentState.Charged, "Refunding an Order requires that the Order be already Charged")
+    require(paymentStatus == PaymentStatus.Charged, "Refunding an Order requires that the Order be already Charged")
     require(stripeChargeId.isDefined, "Refunding an Order requires that the Order be already Charged")
 
     val refundedCharge = services.payment.refund(stripeChargeId.get)
@@ -117,28 +114,28 @@ case class Order(
       .withType(PurchaseRefund)
       .save()
 
-    val refundedOrder = withPaymentState(PaymentState.Refunded)
+    val refundedOrder = withPaymentStatus(PaymentStatus.Refunded)
     (refundedOrder, refundedCharge)
   }
 
   def approveByAdmin(admin: Administrator): Order = {
     require(admin != null, "Must be approved by an Administrator")
-    require(reviewStatus == Order.ReviewStatus.PendingAdminReview.stateValue, "Must be PendingAdminReview before approving by admin")
-    this.copy(reviewStatus = Order.ReviewStatus.ApprovedByAdmin.stateValue)
+    require(reviewStatus == OrderReviewStatus.PendingAdminReview, "Must be PendingAdminReview before approving by admin")
+    this.withReviewStatus(OrderReviewStatus.ApprovedByAdmin)
   }
 
   def rejectByAdmin(admin: Administrator, rejectionReason: Option[String] = None): Order = {
     require(admin != null, "Must be rejected by an Administrator")
-    require(reviewStatus == Order.ReviewStatus.PendingAdminReview.stateValue, "Must be PendingAdminReview before rejecting by admin")
-    val order = this.copy(reviewStatus = Order.ReviewStatus.RejectedByAdmin.stateValue, rejectionReason = rejectionReason)
+    require(reviewStatus == OrderReviewStatus.PendingAdminReview, "Must be PendingAdminReview before rejecting by admin")
+    val order = this.withReviewStatus(OrderReviewStatus.RejectedByAdmin).copy(rejectionReason = rejectionReason)
     order
   }
 
   def rejectByCelebrity(celebrity: Celebrity, rejectionReason: Option[String] = None): Order = {
     require(celebrity != null, "Must be rejected by Celebrity associated with this Order")
     require(celebrity.id == product.celebrityId, "Must be rejected by Celebrity associated with this Order")
-    require(reviewStatus == Order.ReviewStatus.ApprovedByAdmin.stateValue, "Must be ApprovedByAdmin before rejecting by celebrity")
-    val order = this.copy(reviewStatus = Order.ReviewStatus.RejectedByCelebrity.stateValue, rejectionReason = rejectionReason)
+    require(reviewStatus == OrderReviewStatus.ApprovedByAdmin, "Must be ApprovedByAdmin before rejecting by celebrity")
+    val order = this.withReviewStatus(OrderReviewStatus.RejectedByCelebrity).copy(rejectionReason = rejectionReason)
     order
   }
 
@@ -154,7 +151,6 @@ case class Order(
 
     val buyingCustomer = this.buyer
     val receivingCustomer = this.recipient
-    println("celebrity.urlSlug.get " + celebrity.urlSlug.get)
     email.setFrom(celebrity.urlSlug.get + "@egraphs.com", celebrity.publicName.get)
     email.addTo(receivingCustomer.account.email, recipientName)
     if (buyingCustomer != receivingCustomer) {
@@ -204,7 +200,7 @@ case class Order(
       "recipientId" -> recipient.id,
       "recipientName" -> recipientName,
       "amountPaidInCents" -> amountPaid.getAmountMinor,
-      "reviewStatus" -> reviewStatus,
+      "reviewStatus" -> reviewStatus.name,
       "audioPrompt" -> generateAudioPrompt()
     )
 
@@ -222,13 +218,32 @@ case class Order(
    * Produces a new Egraph associated with this order.
    */
   def newEgraph: Egraph = {
-    Egraph(orderId=id, services=services.egraphServices.get).withState(AwaitingVerification)
+    Egraph(orderId=id, services=services.egraphServices.get)
+  }
+
+  def isBuyerOrRecipient(customerId: Option[Long]): Boolean = {
+    customerId match {
+      case None => false
+      case Some(custId) => buyerId == custId || recipientId == custId
+    }
   }
 
   //
   // KeyedCaseClass[Long] methods
   //
   override def unapplied = Order.unapply(this)
+
+  override def withPrivacyStatus(status: PrivacyStatus.EnumVal) = {
+    this.copy(_privacyStatus = status.name)
+  }
+
+  override def withPaymentStatus(status: PaymentStatus.EnumVal) = {
+    this.copy(_paymentStatus = status.name)
+  }
+
+  override def withReviewStatus(status: OrderReviewStatus.EnumVal) = {
+    this.copy(_reviewStatus = status.name)
+  }
 }
 
 case class FulfilledOrder(order: Order, egraph: Egraph)
@@ -250,48 +265,6 @@ object Order {
     "Hey, it’s {signer_name} creating this egraph for {recipient_name}. Thanks for being an awesome fan.",
     "Hey, {recipient_name}, it’s {signer_name} here. Thanks for reaching out to me through Egraphs. Have a great day."
   )
-
-  //
-  // Public Methods
-  //
-
-  /** Specifies the Order's current status relative to payment */
-  sealed abstract class PaymentState(val stateValue: String)
-
-  object PaymentState {
-    /** We have not yet charged for the order */
-    case object NotCharged extends PaymentState("NotCharged")
-
-    /** We have successfully charged the order */
-    case object Charged extends PaymentState("Charged")
-
-    /** We have refunded the order */
-    case object Refunded extends PaymentState("Refunded")
-
-    val all = Utils.toMap[String, PaymentState](
-      Seq(NotCharged, Charged, Refunded), key=(state) => state.stateValue
-    )
-  }
-
-  /** Specifies the Order's current status relative to content auditing */
-  sealed abstract class ReviewStatus(val stateValue: String)
-
-  object ReviewStatus {
-
-    case object PendingAdminReview extends ReviewStatus("PendingAdminReview")
-
-    /** Order is signerActionable */
-    case object ApprovedByAdmin extends ReviewStatus("ApprovedByAdmin")
-
-    case object RejectedByAdmin extends ReviewStatus("RejectedByAdmin")
-
-    case object RejectedByCelebrity extends ReviewStatus("RejectedByCelebrity")
-
-    val all = Utils.toMap[String, ReviewStatus](
-      Seq(PendingAdminReview, ApprovedByAdmin, RejectedByAdmin, RejectedByCelebrity), key = (state) => state.stateValue
-    )
-  }
-
 }
 
 class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreatedUpdated[Order] {
@@ -308,7 +281,7 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
       where(
         order.id === id and
           egraph.orderId === order.id and
-          egraph.stateValue === Published.value
+          egraph._egraphState === EgraphState.Published.name
       )
         select (FulfilledOrder(order, egraph))
     ).headOption
@@ -362,9 +335,10 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
       theOld.productId := theNew.productId,
       theOld.inventoryBatchId := theNew.inventoryBatchId,
       theOld.buyerId := theNew.buyerId,
-      theOld.paymentStateString := theNew.paymentStateString,
-      theOld.reviewStatus := theNew.reviewStatus,
+      theOld._paymentStatus := theNew._paymentStatus,
+      theOld._reviewStatus := theNew._reviewStatus,
       theOld.rejectionReason := theNew.rejectionReason,
+      theOld._privacyStatus := theNew._privacyStatus,
       theOld.stripeCardTokenId := theNew.stripeCardTokenId,
       theOld.stripeChargeId := theNew.stripeChargeId,
       theOld.amountPaidInCurrency := theNew.amountPaidInCurrency,
@@ -393,13 +367,13 @@ class OrderQueryFilters @Inject() (schema: Schema) {
   private def actionableEgraphs: FilterOneTable[Order] = {
     new FilterOneTable[Order] {
       override def test(order: Order) = {
-        val nonActionableStates = Seq(Published.value, ApprovedByAdmin.value,
-          AwaitingVerification.value, PassedBiometrics.value, FailedBiometrics.value)
+        val nonActionableStates = Seq(EgraphState.Published.name, EgraphState.ApprovedByAdmin.name,
+          EgraphState.AwaitingVerification.name, EgraphState.PassedBiometrics.name, EgraphState.FailedBiometrics.name)
 
         notExists(
           from(schema.egraphs)(egraph =>
             where((egraph.orderId === order.id) and
-              (egraph.stateValue in nonActionableStates))
+              (egraph._egraphState in nonActionableStates))
               select(egraph.id)
           )
         )
@@ -410,7 +384,7 @@ class OrderQueryFilters @Inject() (schema: Schema) {
   private def approvedByAdmin: FilterOneTable[Order] = {
     new FilterOneTable[Order] {
       override def test(order: Order) = {
-        (order.reviewStatus === Order.ReviewStatus.ApprovedByAdmin.stateValue)
+        (order._reviewStatus === OrderReviewStatus.ApprovedByAdmin.name)
       }
     }
   }
@@ -418,7 +392,7 @@ class OrderQueryFilters @Inject() (schema: Schema) {
   def pendingAdminReview: FilterOneTable[Order] = {
     new FilterOneTable[Order] {
       override def test(order: Order) = {
-        (order.reviewStatus === Order.ReviewStatus.PendingAdminReview.stateValue)
+        (order._reviewStatus === OrderReviewStatus.PendingAdminReview.name)
       }
     }
   }
@@ -426,7 +400,7 @@ class OrderQueryFilters @Inject() (schema: Schema) {
   def rejected: FilterOneTable[Order] = {
     new FilterOneTable[Order] {
       override def test(order: Order) = {
-        (order.reviewStatus in Seq(Order.ReviewStatus.RejectedByAdmin.stateValue, Order.ReviewStatus.RejectedByCelebrity.stateValue))
+        (order._reviewStatus in Seq(OrderReviewStatus.RejectedByAdmin.name, OrderReviewStatus.RejectedByCelebrity.name))
       }
     }
   }

@@ -10,6 +10,7 @@ import org.squeryl.PrimitiveTypeMode._
 import models._
 import controllers.WebsiteControllers
 import controllers.website.PostBuyProductEndpoint.EgraphPurchaseHandler
+import enums.{EnrollmentStatus, PublishedStatus}
 import play.libs.{Codec, Mail}
 import services.payment.Payment
 import play.Play

@@ -6,7 +6,8 @@ import scala.collection.JavaConversions._
 import play.test.FunctionalTest
 import FunctionalTest._
 import services.AppConfig
-import models.{PublishedStatus, CelebrityStore}
+import models.enums.PublishedStatus
+import models.CelebrityStore
 import services.db.{TransactionSerializable, DBSession}
 import play.mvc.Http.Response
 

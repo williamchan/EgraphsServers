@@ -1,5 +1,6 @@
 package models
 
+import enums.HasPublishedStatusTests
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.BeforeAndAfterEach
 import play.test.UnitFlatSpec

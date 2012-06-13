@@ -1,5 +1,6 @@
 package models
 
+import enums.{HasEnrollmentStatus, EnrollmentStatus, PublishedStatus, HasPublishedStatus}
 import java.sql.Timestamp
 import services.blobs.AccessPolicy
 import play.templates.JavaExtensions
@@ -9,7 +10,6 @@ import com.google.inject.{Provider, Inject}
 import org.squeryl.Query
 import services._
 import java.awt.image.BufferedImage
-import models.PublishedStatus.EnumVal
 
 
 /**
@@ -37,15 +37,17 @@ case class Celebrity(id: Long = 0,
                      lastName: Option[String] = None,
                      publicName: Option[String] = None,
                      profilePhotoUpdated: Option[String] = None,
-                     enrollmentStatusValue: String = EnrollmentStatus.NotEnrolled.value,
-                     isLeftHanded: Boolean = false,
+                     _enrollmentStatus: String = EnrollmentStatus.NotEnrolled.name,
                      isFeatured: Boolean = false,
                      roleDescription: Option[String] = None, // e.g. "Pitcher, Red Sox"
                      _publishedStatus: String = PublishedStatus.Unpublished.name,
                      created: Timestamp = Time.defaultTimestamp,
                      updated: Timestamp = Time.defaultTimestamp,
                      services: CelebrityServices = AppConfig.instance[CelebrityServices]
-) extends KeyedCaseClass[Long] with HasCreatedUpdated with HasPublishedStatus[Celebrity]
+) extends KeyedCaseClass[Long]
+  with HasCreatedUpdated
+  with HasPublishedStatus[Celebrity]
+  with HasEnrollmentStatus[Celebrity]
 {
   //
   // Additional DB columns
@@ -63,16 +65,6 @@ case class Celebrity(id: Long = 0,
 
   def account: Account = {
     services.accountStore.findByCelebrityId(id).get
-  }
-
-  /** Makes a copy of the object with the new enrollment status applied. */
-  def withEnrollmentStatus(newStatus: EnrollmentStatus): Celebrity = {
-    copy(enrollmentStatusValue=newStatus.value)
-  }
-
-  /** The current Biometric services enrollment status. */
-  def enrollmentStatus: EnrollmentStatus = {
-    EnrollmentStatus(enrollmentStatusValue)
   }
 
   /**Returns all of the celebrity's Products */
@@ -93,11 +85,10 @@ case class Celebrity(id: Long = 0,
       "firstName" -> firstName,
       "lastName" -> lastName,
       "publicName" -> publicName,
-      "urlSlug" -> urlSlug,
-      "isLeftHanded" -> Some(isLeftHanded)
+      "urlSlug" -> urlSlug
     )
 
-    Map("id" -> id, "enrollmentStatus" -> enrollmentStatusValue) ++
+    Map("id" -> id, "enrollmentStatus" -> enrollmentStatus.name) ++
       renderCreatedUpdatedForApi ++
       Utils.makeOptionalFieldMap(optionalFields)
   }
@@ -177,8 +168,12 @@ case class Celebrity(id: Long = 0,
   //
   // PublishedStatus[Celebrity] methods
   //
-  override def withPublishedStatus(status: EnumVal) = {
+  override def withPublishedStatus(status: PublishedStatus.EnumVal) = {
     this.copy(_publishedStatus = status.name)
+  }
+
+  override def withEnrollmentStatus(status: EnrollmentStatus.EnumVal) = {
+    this.copy(_enrollmentStatus = status.name)
   }
 
   //
@@ -300,8 +295,7 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
       theOld.publicName := theNew.publicName,
       theOld.urlSlug := theNew.urlSlug,
       theOld.profilePhotoUpdated := theNew.profilePhotoUpdated,
-      theOld.enrollmentStatusValue := theNew.enrollmentStatusValue,
-      theOld.isLeftHanded := theNew.isLeftHanded,
+      theOld._enrollmentStatus := theNew._enrollmentStatus,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated,
       theOld.isFeatured := theNew.isFeatured,
@@ -315,30 +309,5 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
   //
   override def withCreatedUpdated(toUpdate: Celebrity, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)
-  }
-}
-
-abstract sealed class EnrollmentStatus(val value: String) {
-  override def toString: String = {
-    value
-  }
-}
-
-object EnrollmentStatus {
-  case object NotEnrolled extends EnrollmentStatus("NotEnrolled")
-  case object AttemptingEnrollment extends EnrollmentStatus("AttemptingEnrollment")
-  case object Enrolled extends EnrollmentStatus("Enrolled")
-  case object FailedEnrollment extends EnrollmentStatus("FailedEnrollment")
-
-  private val states = Utils.toMap[String, EnrollmentStatus](Seq(
-    NotEnrolled,
-    AttemptingEnrollment,
-    Enrolled,
-    FailedEnrollment
-  ), key=(theState) => theState.value)
-
-  /** Provides the EnrollmentStatus object that maps to the provided string. */
-  def apply(value: String) = {
-     states(value)
   }
 }

@@ -15,20 +15,20 @@ class AdminRequestFilters @Inject()(adminStore: AdministratorStore,
                                     accountFilters: AccountRequestFilters,
                                     productFilters: ProductQueryFilters) {
 
-  import OptionParams.Conversions._
+  import SafePlayParams.Conversions._
 
   def requireAdministratorLogin(continue: (Administrator) => Any)(implicit session: Session, request: Request) = {
-    val adminId = session.get(WebsiteControllers.adminIdKey)
-    if (adminId == null || adminId.isEmpty) {
-      new Redirect(GetLoginAdminEndpoint.url().url)
-    } else {
-      adminStore.findById(adminId.toLong) match {
-        case None => {
-          session.clear()
-          new Redirect(GetLoginAdminEndpoint.url().url)
-        }
-        case Some(admin) => continue(admin)
+    val adminIdOption = session.getLongOption(WebsiteControllers.adminIdKey)
+    val adminOption = adminIdOption match {
+      case None => None
+      case Some(adminId) => adminStore.findById(adminId)
+    }
+    adminOption match {
+      case None => {
+        session.clear()
+        new Redirect(GetLoginAdminEndpoint.url().url)
       }
+      case Some(admin) => continue(admin)
     }
   }
 

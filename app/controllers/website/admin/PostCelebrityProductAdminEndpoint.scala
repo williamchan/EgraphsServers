@@ -7,6 +7,7 @@ import java.io.File
 import play.data.validation.Validation.required
 import play.data.validation.Validation
 import models._
+import enums.PublishedStatus
 import services.logging.Logging
 import services.ImageUtil
 import play.Play

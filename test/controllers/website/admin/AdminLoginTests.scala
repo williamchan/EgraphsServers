@@ -47,8 +47,8 @@ class AdminLoginTests extends AdminFunctionalTest {
   def testAdminLogout() {
     createAndLoginAsAdmin()
     assertStatus(200, GET(Utils.lookupUrl("WebsiteControllers.getCelebritiesAdmin").url))
-    logoutFromAdminConsole()
 
+    logout()
     val response = GET(Utils.lookupUrl("WebsiteControllers.getCelebritiesAdmin").url)
     assertStatus(302, response)
     assertHeaderEquals("Location", "/admin/login", response)

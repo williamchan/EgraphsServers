@@ -33,7 +33,6 @@ trait AllAdminEndpoints
   with PostCelebrityProductAdminEndpoint
   with PostEgraphAdminEndpoint
   with PostLoginAdminEndpoint
-  with PostLogoutAdminEndpoint
   with PostOrderAdminEndpoint
   with PostFeaturedCelebritiesAdminEndpoint
 { this: Controller => }

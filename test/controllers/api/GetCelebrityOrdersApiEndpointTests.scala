@@ -7,10 +7,10 @@ import sjson.json.Serializer
 import utils.FunctionalTestUtils.{willChanRequest, runScenarios}
 import scenario.Scenarios
 import models._
+import enums.EgraphState
 import services.AppConfig
 import services.db.{TransactionSerializable, DBSession}
 import utils.{FunctionalTestUtils, TestConstants}
-import models.Egraph.EgraphState
 import controllers.website.EgraphsFunctionalTest
 
 class GetCelebrityOrdersApiEndpointTests extends EgraphsFunctionalTest {
@@ -58,7 +58,7 @@ class GetCelebrityOrdersApiEndpointTests extends EgraphsFunctionalTest {
     db.connected(TransactionSerializable) {
       val celebrityId = Scenarios.getWillCelebrityAccount.id
       val allCelebOrders = orderStore.findByCelebrity(celebrityId)
-      Egraph(orderId = allCelebOrders.toSeq.head.id).withState(EgraphState.AwaitingVerification).save()
+      Egraph(orderId = allCelebOrders.toSeq.head.id).withEgraphState(EgraphState.AwaitingVerification).save()
     }
 
     val response = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/orders?signerActionable=true")
@@ -74,7 +74,7 @@ class GetCelebrityOrdersApiEndpointTests extends EgraphsFunctionalTest {
     db.connected(TransactionSerializable) {
       val celebrityId = Scenarios.getWillCelebrityAccount.id
       val allCelebOrders = orderStore.findByCelebrity(celebrityId)
-      Egraph(orderId = allCelebOrders.toSeq.head.id).withState(EgraphState.Published).save()
+      Egraph(orderId = allCelebOrders.toSeq.head.id).withEgraphState(EgraphState.Published).save()
     }
 
     val response = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/orders?signerActionable=true")
@@ -88,11 +88,9 @@ class GetCelebrityOrdersApiEndpointTests extends EgraphsFunctionalTest {
     FunctionalTestUtils.runWillChanScenariosThroughOrder()
 
     db.connected(TransactionSerializable) {
-      import EgraphState._
-
       val celebrityId = Scenarios.getWillCelebrityAccount.id
       val allCelebOrders = orderStore.findByCelebrity(celebrityId)
-      Egraph(orderId = allCelebOrders.toSeq.head.id).withState(RejectedByAdmin).save()
+      Egraph(orderId = allCelebOrders.toSeq.head.id).withEgraphState(EgraphState.RejectedByAdmin).save()
     }
 
     val response = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/orders?signerActionable=true")

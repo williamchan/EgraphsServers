@@ -7,6 +7,7 @@ import util.Random
 import java.text.SimpleDateFormat
 import org.joda.time.DateTime
 import models._
+import enums.PublishedStatus
 
 /**
  * Renders saved copies of domain objects that satisfy all relational integrity
@@ -37,8 +38,20 @@ object TestData {
     Account(email = generateEmail(prefix = "acct-")).save()
   }
 
+  def newSavedAdministrator(_account: Option[Account] = None): Administrator = {
+    val account = if (_account.isDefined) {
+      _account.get
+    } else {
+      newSavedAccount()
+    }
+
+    val admin = Administrator().save()
+    account.copy(administratorId = Some(admin.id))
+    admin
+  }
+
   def newSavedCustomer(): Customer = {
-    val acct = Account(email = generateEmail(prefix = "customer-")).save()
+    val acct = Account(email = generateEmail(prefix = "customer-")).withPassword(defaultPassword).right.get.save()
     val cust = Customer(name = "testcustomer").save()
 
     acct.copy(customerId = Some(cust.id)).save()

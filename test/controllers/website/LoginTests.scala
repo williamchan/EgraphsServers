@@ -35,8 +35,8 @@ class LoginTests extends EgraphsFunctionalTest {
       customer.account.withPassword(password).right.get.save()
     }
 
-    val response = POST("/login", getPostStrParams(email = account.email, password = password))
-    assertEquals("", getPlayFlashCookie(response))
+    val response = login(account, password)
+    assertFalse(getPlayFlashCookie(response).contains("error"))
     // Unfortunately, there is no way to check the session
   }
 
