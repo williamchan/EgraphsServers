@@ -92,7 +92,7 @@ class OrderTests extends UnitFlatSpec
     rendered("recipientId") should be(buyer.id)
     rendered("recipientName") should be(buyer.name)
     rendered("amountPaidInCents") should be(order.amountPaid.getAmountMinor)
-    rendered("reviewStatus") should be(order.reviewStatus)
+    rendered("reviewStatus") should be(order.reviewStatus.name)
     rendered("requestedMessage") should be(order.requestedMessage.get)
     rendered("messageToCelebrity") should be(order.messageToCelebrity.get)
     rendered.contains("audioPrompt") should be(true)
