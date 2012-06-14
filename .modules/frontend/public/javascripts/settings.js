@@ -19,12 +19,6 @@ define([], function() {
           e.preventDefault();
         });
 
-//        $(".cancel").click(function(e){
-//          var containingRow = $(this).parent().parent();
-//          containingRow.addClass('hide');
-//          containingRow.prev().removeClass('hide');
-//          e.preventDefault();
-//        });
       });
     },
           //Controller class for Angular app
@@ -71,14 +65,16 @@ define([], function() {
         var master = $scope.master;
         var userObj = $scope.user;
 
+        //Get second to last element to change the reference to the original master string.
         for(i = 1; i < splitpath.length - 1; i++){
           console.log(splitpath[i]);
           master = master[splitpath[i]];
           userObj = userObj[splitpath[i]];
         }
-        console.log(master[splitpath[splitpath.length - 1]]);
-        console.log(userObj[splitpath[splitpath.length - 1]]);
+
         userObj[splitpath[splitpath.length - 1]] = master[splitpath[splitpath.length - 1]];
+
+
       }
 
       $scope.reset();
@@ -89,8 +85,6 @@ define([], function() {
         parent.prev().removeClass('hide');
         $scope.resetVal(modelString);
       }
-
-
     }
   }
 });
