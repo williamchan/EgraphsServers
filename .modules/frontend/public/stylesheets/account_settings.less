@@ -3,10 +3,17 @@
 }
 
 .settings-row {
+  vertical-align: middle;
+  input {
+    padding-top: 0px;
+    padding-bottom: 0px;
+  }
+
   a.action {
     font-size: 14px;
     color: @orange;
     text-align: right;
+    width: 10%;
   }
 
   a:hover.action {
@@ -24,9 +31,13 @@
   }
 }
 
-.settings-row:last-child {
-  border-bottom: 1px solid @tableBorder;
+.settings-group {
+  table {
+    border-bottom: 1px solid @tableBorder;
+  }
 }
+
+
 
 section .settings-group {
   h2 {

@@ -59,22 +59,6 @@ define([], function() {
             e.preventDefault();
           });
         }
-
-        //TODO move elsewhere
-        $(".edit").click(function(e){
-          var containingRow = $(this).parent().parent()
-          containingRow.addClass('hide')
-          containingRow.next().removeClass('hide')
-          e.preventDefault();
-        });
-
-        $(".cancel").click(function(e){
-          var containingRow = $(this).parent().parent()
-          containingRow.addClass('hide')
-          containingRow.prev().removeClass('hide')
-          e.preventDefault();
-        });
-
       });
     }
   };
