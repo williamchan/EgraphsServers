@@ -1,8 +1,6 @@
 package models.frontend.forms
 
-//
-// The following lives in the view (frontend module)
-//
+
 case class FormError(description: String) {
   override def toString: String = {
     description
