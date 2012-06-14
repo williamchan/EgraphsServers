@@ -5,19 +5,20 @@ trait FormField[+ValueType] {
   // Abstract public members
   //
   def name: String
+
   def stringsToValidate: Iterable[String]
 
-  protected def validation: Either[FormError, ValueType]
+  protected[forms] def validate: Either[FormError, ValueType]
 
   //
   // Public members
   //
   def value: Option[ValueType] = {
-    validation.right.toOption
+    validate.right.toOption
   }
 
   def error: Option[FormError] = {
-    validation.left.toOption
+    validate.left.toOption
   }
 
   def serializeToMap(writeKeyValue: FormSubmission.Writeable) {

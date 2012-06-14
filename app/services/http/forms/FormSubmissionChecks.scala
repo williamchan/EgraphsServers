@@ -2,51 +2,111 @@ package services.http.forms
 
 import com.google.inject.Inject
 import play.data.validation.{Validation}
+import play.data.binding.types.DateBinder
+import java.text.{ParseException, SimpleDateFormat}
+import java.util.Date
+import play.libs.I18N
+import models.{Account, AccountStore}
 
-class FormSubmissionChecks @Inject()() {
+class FormSubmissionChecks @Inject()(accountStore: AccountStore) {
 
   private def playValidation = Validation.current()
 
-  def isInt(string: String): Either[FormError, Int] = {
+  def isInt(string: String, message: String="Valid integer required")
+  : Either[FormError, Int] =
+  {
     try {
       Right(string.toInt)
     } catch {
-      case _:NumberFormatException => Left(new SimpleFormError("Valid integer required"))
+      case _:NumberFormatException => Left(new SimpleFormError(message))
     }
   }
 
-  def isLong(toValidate: String): Either[FormError, Long] = {
+  def isLong(toValidate: String, message: String="Valid number required")
+  : Either[FormError, Long] =
+  {
     try {
       Right(toValidate.toLong)
     } catch {
-      case _:NumberFormatException => Left(new SimpleFormError("Valid long required"))
+      case _:NumberFormatException => Left(new SimpleFormError(message))
     }
   }
 
-  def isBoolean(toValidate: String): Either[FormError, Boolean] = {
+  def isBoolean(toValidate: String, message: String="Valid boolean required")
+  : Either[FormError, Boolean] =
+  {
     toValidate.toLowerCase match {
       case "1" | "true" | "on" | "yes" =>
         Right(true)
+
       case "0" | "false" | "off" | "no" =>
         Right(false)
+
       case _ =>
-        Left(new SimpleFormError("Valid boolean value required"))
+        Left(new SimpleFormError(message))
     }
   }
 
-  def isEmailAddress(toValidate: String): Either[FormError, String] = {
+
+  def isDate(toValidate: String, message: String="Properly formatted date required")
+  : Either[FormError, Date] =
+  {
+    for (notI18nDate <- isDateWithFormat(I18N.getDateFormat, toValidate, message).left;
+         notAnyKnownDate <- isDateWithFormat(DateBinder.ISO8601, toValidate, message).left)
+      yield notAnyKnownDate
+  }
+
+  /** Grabbed wholesale from play.data.binding.types.DateBinder */
+  def isDateWithFormat(
+    format: String,
+    toValidate: String,
+    message: String="Properly formatted date required")
+  : Either[FormError, Date] =
+  {
+    try {
+      val dateFormat = new SimpleDateFormat(format)
+      dateFormat.setLenient(false)
+      Right(dateFormat.parse(toValidate))
+    } catch {
+      case _:ParseException =>
+        Left(new SimpleFormError(message))
+    }
+  }
+
+  def dependentFieldIsValid[ValueType](toValidate: FormField[ValueType])
+  : Either[DependentFieldError, ValueType] =
+  {
+    for (validationError <- toValidate.validate.left) yield new DependentFieldError
+  }
+
+  def isAccountCredential(
+    email: String,
+    password: String,
+    message: String="Username or password did not match")
+  :Either[FormError, Account] =
+  {
+    accountStore.authenticate(email, password) match {
+      case Left(_) => Left(new SimpleFormError(message))
+      case Right(account) => Right(account)
+    }
+  }
+
+  def isEmailAddress(toValidate: String, message: String="Valid email address required")
+  : Either[FormError, String] = {
     if (playValidation.email(toValidate).ok) {
       Right(toValidate)
     } else {
-      Left(new SimpleFormError("Valid email address required"))
+      Left(new SimpleFormError(message))
     }
   }
 
-  def isPhoneNumber(toValidate: String): Either[FormError, String] = {
+  def isPhoneNumber(toValidate: String, message: String = "Valid phone number required")
+  : Either[FormError, String] =
+  {
     if (playValidation.phone(toValidate).ok) {
       Right(toValidate)
     } else {
-      Left(new SimpleFormError("Valid phone number required"))
+      Left(new SimpleFormError(message))
     }
   }
 }
