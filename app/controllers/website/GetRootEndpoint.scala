@@ -9,7 +9,6 @@ import models.{CelebrityStore, Celebrity}
 private[controllers] trait GetRootEndpoint { this: Controller =>
   import GetRootEndpoint.ModelViewConversions._
 
-
   protected def controllerMethod: ControllerMethod
   protected def celebrityStore: CelebrityStore
 
@@ -17,6 +16,8 @@ private[controllers] trait GetRootEndpoint { this: Controller =>
    * Serves the application's landing page.
    */
   def getRootEndpoint = controllerMethod() {
+    views.Application.html.index()
+    /*
     // Get the list of domain objects from the DB
     val featuredCelebs = celebrityStore.getFeaturedPublishedCelebrities
 
@@ -27,6 +28,7 @@ private[controllers] trait GetRootEndpoint { this: Controller =>
     }
 
     views.frontend.html.landing(validStars)
+    */
   }
 }
 
