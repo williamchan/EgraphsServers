@@ -9,6 +9,7 @@ import services.db.DBSession
 import play.mvc.Controller
 import controllers.website.AllWebsiteEndpoints
 import java.util.Properties
+import services.http.forms.FormSubmissionChecks
 
 /**
  * Injectable version of AllWebsiteEndpoints.
@@ -25,5 +26,6 @@ case class TestWebsiteControllers @Inject()(
   inventoryBatchQueryFilters: InventoryBatchQueryFilters,
   dbSession: DBSession,
   playConfig: Properties,
-  facebookAppId: String
+  facebookAppId: String,
+  formChecks: FormSubmissionChecks
 ) extends Controller with AllWebsiteEndpoints

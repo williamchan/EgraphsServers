@@ -2,6 +2,7 @@ package services.http.forms
 
 trait Required[+ValueType] { this: FormField[ValueType] =>
   protected def validateIfPresent: Either[FormError, ValueType]
+  protected def stringToValidate: String = stringsToValidate.head
 
   override final def validate = {
     if (stringsToValidate == null || stringsToValidate.isEmpty) {

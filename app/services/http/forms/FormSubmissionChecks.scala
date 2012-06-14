@@ -79,7 +79,7 @@ class FormSubmissionChecks @Inject()(accountStore: AccountStore) {
     for (validationError <- toValidate.validate.left) yield new DependentFieldError
   }
 
-  def isAccountCredential(
+  def isValidAccount(
     email: String,
     password: String,
     message: String="Username or password did not match")
@@ -88,6 +88,15 @@ class FormSubmissionChecks @Inject()(accountStore: AccountStore) {
     accountStore.authenticate(email, password) match {
       case Left(_) => Left(new SimpleFormError(message))
       case Right(account) => Right(account)
+    }
+  }
+
+  def isCustomerAccount(toValidate: Account, message: String="Valid customer account required")
+  : Either[FormError, Long] =
+  {
+    toValidate.customerId match {
+      case None => Left(new SimpleFormError(message))
+      case Some(id) => Right(id)
     }
   }
 

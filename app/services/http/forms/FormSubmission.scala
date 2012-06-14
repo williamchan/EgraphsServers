@@ -1,5 +1,7 @@
 package services.http.forms
 
+import play.mvc.results.Redirect
+
 trait FormSubmission[+ValidFormType] {
   //
   // Abstract members
@@ -10,19 +12,19 @@ trait FormSubmission[+ValidFormType] {
   //
   // Public members
   //
-  def errorsOrValidForm: Either[Iterable[FormError], ValidFormType] = {
-    val errors = fields.foldLeft(Vector.empty[FormError]) { (accumulatedErrors, field) =>
-      field.error match {
-        case Some(error) => accumulatedErrors :+ error
-        case None => accumulatedErrors
-      }
-    }
+  def errorsOrValidForm
+  : Either[Iterable[FormError], ValidFormType] =
+  {
+    val errors = this.independentErrors
 
     if (errors.isEmpty) Right(formAssumingValid) else Left(errors)
   }
 
-  def serializeToMap(writeKeyValue: FormSubmission.Writeable) {
-    for (field <- fields) field.serializeToMap(writeKeyValue)
+  def redirect(url: String)(implicit flash: play.mvc.Scope.Flash) {
+    import FormSubmission.Conversions._
+
+    this.write(flash.asSubmissionWriteable)
+    new Redirect(url)
   }
 
   //
@@ -41,13 +43,31 @@ trait FormSubmission[+ValidFormType] {
   protected abstract class OptionalField[+ValueType](val name: String) extends Field[Option[ValueType]]
     with Optional[ValueType]
 
+  protected abstract class DerivedField[+ValueType] extends Field[ValueType] {
+    override def name: String = ""
+  }
+
   //
   // Private members
   //
   private var fields = Vector[Field[_]]()
 
+  private def independentErrors:Iterable[FormError] = {
+    fields.foldLeft(Vector.empty[FormError]) { (accumulatedErrors, field) =>
+      field.error match {
+        case None | Some(_:DependentFieldError) => accumulatedErrors
+        case Some(independentError) => accumulatedErrors :+ independentError
+      }
+    }
+  }
+
   private final def addField[T](newField: Field[T]) {
     fields = fields :+ newField
+  }
+
+  private def write(writeKeyValue: FormSubmission.Writeable) {
+    // Write all but the derived fields
+    for (field <- fields if !field.isInstanceOf[DerivedField[_]]) field.write(writeKeyValue)
   }
 }
 
@@ -74,12 +94,18 @@ object FormSubmission {
       }
     }
 
-    implicit def playParamsToSubmissionCompatible(playParams: play.mvc.Scope.Params) = {
-      new SubmissionCompatiblePlayParams(playParams)
+    implicit def playFlashOrSessionToSubmissionCompatible(gettablePuttable: HasGetAndPutString)
+    :SubmissionCompatiblePlayFlashAndSession =
+    {
+      new SubmissionCompatiblePlayFlashAndSession(gettablePuttable)
     }
 
-    implicit def playFlashOrSessionToSubmissionCompatible(gettablePuttable: HasGetAndPutString) = {
-      new SubmissionCompatiblePlayFlashAndSession(gettablePuttable)
+    implicit def playParamsToSubmissionCompatible(playParams: play.mvc.Scope.Params)
+    : SubmissionCompatiblePlayParams =
+    {
+      new SubmissionCompatiblePlayParams(playParams)
     }
   }
 }
+
+

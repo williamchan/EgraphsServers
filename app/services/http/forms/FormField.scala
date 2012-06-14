@@ -21,7 +21,7 @@ trait FormField[+ValueType] {
     validate.left.toOption
   }
 
-  def serializeToMap(writeKeyValue: FormSubmission.Writeable) {
+  def write(writeKeyValue: FormSubmission.Writeable) {
     writeKeyValue(name, stringsToValidate.mkString(","))
   }
 }
