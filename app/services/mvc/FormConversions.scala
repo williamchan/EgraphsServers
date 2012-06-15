@@ -13,9 +13,19 @@ object FormConversions {
     def asViewField: formsview.Field[String] = {
       formsview.Field[String](
         name=modelField.name,
-        values=modelField.stringsToValidate.headOption,
+        values=makeModelFieldStrings,
         error=modelField.error.map(error => error.asViewError)
       )
+    }
+
+    private def makeModelFieldStrings: Iterable[String] = {
+      modelField.stringsToValidate match {
+        case singular if singular.size <= 1 =>
+          singular.headOption
+
+        case plural =>
+          plural
+      }
     }
   }
 

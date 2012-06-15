@@ -4,7 +4,11 @@ trait FormError {
   def description: String
 }
 
-class SimpleFormError(val description: String) extends FormError
+class SimpleFormError(val description: String) extends FormError {
+  override def toString = {
+    this.getClass.getSimpleName.toString + "(" + description + ")"
+  }
+}
 
 case class ValueNotPresentFieldError(description: String = "Required") extends FormError
 

@@ -35,7 +35,7 @@ class FormSubmissionChecks @Inject()(accountStore: AccountStore) {
   def isBoolean(toValidate: String, message: String="Valid boolean required")
   : Either[FormError, Boolean] =
   {
-    toValidate.toLowerCase match {
+    toValidate.trim.toLowerCase match {
       case "1" | "true" | "on" | "yes" =>
         Right(true)
 
@@ -46,7 +46,6 @@ class FormSubmissionChecks @Inject()(accountStore: AccountStore) {
         Left(new SimpleFormError(message))
     }
   }
-
 
   def isDate(toValidate: String, message: String="Properly formatted date required")
   : Either[FormError, Date] =
@@ -128,7 +127,8 @@ object FormSubmissionChecks {
       case null =>
         Left(ValueNotPresentFieldError())
 
-      case strings if (strings.isEmpty || strings.size == 1 && strings.head == "") =>
+      case strings if (strings.isEmpty ||
+                        (strings.size == 1 && (strings.head == "" || strings.head == null))) =>
         Left(ValueNotPresentFieldError())
 
       case strings =>
