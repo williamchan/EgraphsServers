@@ -1492,10 +1492,10 @@
     </wsdl:binding>
     <wsdl:service name="WebServiceUserAndProfile">
         <wsdl:port name="WebServiceUserAndProfileSoap" binding="tns:WebServiceUserAndProfileSoap">
-            <soap:address location="http://23.21.194.63:50200/Webservices/WebServiceUserAndProfile.asmx" />
+            <soap:address location="http://107.21.36.146:50200/Webservices/WebServiceUserAndProfile.asmx" />
         </wsdl:port>
         <wsdl:port name="WebServiceUserAndProfileSoap12" binding="tns:WebServiceUserAndProfileSoap12">
-            <soap12:address location="http://23.21.194.63:50200/Webservices/WebServiceUserAndProfile.asmx" />
+            <soap12:address location="http://107.21.36.146:50200/Webservices/WebServiceUserAndProfile.asmx" />
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

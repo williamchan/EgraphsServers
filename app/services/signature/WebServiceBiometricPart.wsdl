@@ -1395,10 +1395,10 @@
     </wsdl:binding>
     <wsdl:service name="WebServiceBiometricPart">
         <wsdl:port name="WebServiceBiometricPartSoap" binding="tns:WebServiceBiometricPartSoap">
-            <soap:address location="http://23.21.194.63:50200/Webservices/WebServiceBiometricPart.asmx" />
+            <soap:address location="http://107.21.36.146:50200/Webservices/WebServiceBiometricPart.asmx" />
         </wsdl:port>
         <wsdl:port name="WebServiceBiometricPartSoap12" binding="tns:WebServiceBiometricPartSoap12">
-            <soap12:address location="http://23.21.194.63:50200/Webservices/WebServiceBiometricPart.asmx" />
+            <soap12:address location="http://107.21.36.146:50200/Webservices/WebServiceBiometricPart.asmx" />
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

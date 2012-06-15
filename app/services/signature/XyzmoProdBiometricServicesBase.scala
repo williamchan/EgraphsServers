@@ -9,5 +9,5 @@ trait XyzmoProdBiometricServicesBase extends XyzmoBiometricServicesBase {
 
   protected val isBasicAuth: Boolean = true
   protected val domain: String = "ad"
-  protected val host: String = "23.21.194.63"
+  protected val host: String = "107.21.36.146"
 }

@@ -56,10 +56,10 @@
     </wsdl:binding>
     <wsdl:service name="SDCFromJSON">
         <wsdl:port name="SDCFromJSONSoap" binding="tns:SDCFromJSONSoap">
-            <soap:address location="http://23.21.194.63:8081/SDCFromJSON.asmx" />
+            <soap:address location="http://107.21.36.146:8081/SDCFromJSON.asmx" />
         </wsdl:port>
         <wsdl:port name="SDCFromJSONSoap12" binding="tns:SDCFromJSONSoap12">
-            <soap12:address location="http://23.21.194.63:8081/SDCFromJSON.asmx" />
+            <soap12:address location="http://107.21.36.146:8081/SDCFromJSON.asmx" />
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>
