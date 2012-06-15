@@ -20,7 +20,7 @@ trait FormSubmission[+ValidFormType] {
     if (errors.isEmpty) Right(formAssumingValid) else Left(errors)
   }
 
-  def redirect(url: String)(implicit flash: play.mvc.Scope.Flash) {
+  def flashRedirect(url: String)(implicit flash: play.mvc.Scope.Flash) {
     import FormSubmission.Conversions._
 
     this.write(flash.asSubmissionWriteable)
@@ -66,9 +66,14 @@ trait FormSubmission[+ValidFormType] {
   }
 
   private def write(writeKeyValue: FormSubmission.Writeable) {
+    // Write the form name
+    writeKeyValue(formName, "true")
+
     // Write all but the derived fields
     for (field <- fields if !field.isInstanceOf[DerivedField[_]]) field.write(writeKeyValue)
   }
+
+  protected val formName = this.getClass.getName
 }
 
 object FormSubmission {
@@ -106,6 +111,31 @@ object FormSubmission {
       new SubmissionCompatiblePlayParams(playParams)
     }
   }
+
 }
 
 
+abstract class ReadsFormSubmission[+SubmissionType <: FormSubmission[_]]
+  (implicit manifest: Manifest[SubmissionType])
+{
+  //
+  // Abstract members
+  //
+  def instantiateAgainstReadable(readable: FormSubmission.Readable): SubmissionType
+
+  //
+  // Public members
+  //
+  private def formName = manifest.erasure.getName
+
+  def read(readable: FormSubmission.Readable, formChecks: FormSubmissionChecks)
+  : Option[SubmissionType] =
+  {
+    if (!readable(formName).isEmpty) {
+      Some(instantiateAgainstReadable(readable))
+    } else {
+      None
+    }
+  }
+
+}

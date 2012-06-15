@@ -14,6 +14,7 @@ import services.http._
 import forms.FormSubmissionChecks
 import java.util.Properties
 import services.{AppConfig, Utils}
+import website.PostLoginEndpoint.PostLoginFormSubmissionFactory
 
 object WebsiteControllers extends Controller with AllWebsiteEndpoints
 {
@@ -27,8 +28,8 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val playConfig = annotatedInstance[PlayConfig, Properties]
   override protected val facebookAppId = annotatedInstance[FacebookAppId, String]
 
-
-  protected def formChecks: FormSubmissionChecks = AppConfig.instance[FormSubmissionChecks]
+  override protected def formChecks = instance[FormSubmissionChecks]
+  override protected def postLoginForms = instance[PostLoginFormSubmissionFactory]
 
   override protected val dbSession = instance[DBSession]
   override protected val controllerMethod = instance[ControllerMethod]

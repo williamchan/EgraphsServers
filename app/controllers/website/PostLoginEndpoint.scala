@@ -6,22 +6,24 @@ import services.Utils
 import controllers.WebsiteControllers
 import models._
 import services.http.POSTControllerMethod
-import services.http.forms.{FormSubmissionChecks, FormSubmission}
+import com.google.inject.Inject
+import services.http.forms.{ReadsFormSubmission, FormSubmissionChecks, FormSubmission}
+import controllers.website.PostLoginEndpoint.PostLoginFormSubmissionFactory
 
 private[controllers] trait PostLoginEndpoint { this: Controller =>
-  import PostLoginEndpoint.PostLoginFormSubmission
   import FormSubmission.Conversions._
 
   protected def postController: POSTControllerMethod
   protected def accountStore: AccountStore
   protected def formChecks: FormSubmissionChecks
+  protected def postLoginForms: PostLoginFormSubmissionFactory
 
   def postLogin = postController() {
-    val submission = PostLoginFormSubmission(params.asSubmissionReadable, formChecks)
+    val submission = postLoginForms(params.asSubmissionReadable)
 
     submission.errorsOrValidForm match {
       case Left(errors) =>
-        submission.redirect(GetLoginEndpoint.url().url)
+        submission.flashRedirect(GetLoginEndpoint.url().url)
 
       case Right(validForm) =>
         session.put(WebsiteControllers.customerIdKey, validForm.customerId)
@@ -32,8 +34,8 @@ private[controllers] trait PostLoginEndpoint { this: Controller =>
 
 object PostLoginEndpoint {
 
-  /** Resolved product of a fully validated submission */
-  case class PostLoginForm(customerId: Long)
+  /** Class to which the fully validated PostLoginFormSubmission resolves */
+  case class ValidatedPostLoginForm(customerId: Long)
 
   /**
    * Define the fields (and validations thereof) for the form transmitted by this endpoint
@@ -44,7 +46,7 @@ object PostLoginEndpoint {
    * @param check the checks used by forms in our application.
    **/
   case class PostLoginFormSubmission(paramsMap: FormSubmission.Readable, check: FormSubmissionChecks)
-    extends FormSubmission[PostLoginForm]
+    extends FormSubmission[ValidatedPostLoginForm]
   {
     //
     // Fields and validations
@@ -65,7 +67,9 @@ object PostLoginEndpoint {
       def validate = {
         for (validEmail <- check.dependentFieldIsValid(email).right;
              validPassword <- check.dependentFieldIsValid(password).right;
-             validAccount <- check.isValidAccount(validEmail, validPassword, badCredentialsMessage).right;
+             validAccount <- check.isValidAccount(validEmail,
+                                                  validPassword,
+                                                  badCredentialsMessage).right;
              customerId <- check.isCustomerAccount(validAccount, badCredentialsMessage).right)
         yield {
           customerId
@@ -74,14 +78,29 @@ object PostLoginEndpoint {
     }
 
     //
-    // Valid Form
+    // FormSubmission[ValidatedPostLoginForm] members
     //
-    protected def formAssumingValid: PostLoginForm = {
+    protected def formAssumingValid: ValidatedPostLoginForm = {
       // Safely access the account value in here
-      PostLoginForm(customerId.value.get)
+      ValidatedPostLoginForm(customerId.value.get)
     }
 
+    //
+    // Private members
+    //
     private val badCredentialsMessage = "The username and password did not match. Please try again"
+  }
+
+  class PostLoginFormSubmissionFactory @Inject()(formChecks: FormSubmissionChecks)
+    extends ReadsFormSubmission[PostLoginFormSubmission]
+  {
+    def apply(readable: FormSubmission.Readable): PostLoginFormSubmission = {
+      PostLoginFormSubmission(readable, formChecks)
+    }
+
+    def instantiateAgainstReadable(readable: FormSubmission.Readable): PostLoginFormSubmission = {
+      apply(readable)
+    }
   }
 
 }
