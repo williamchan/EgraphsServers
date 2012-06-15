@@ -21,7 +21,7 @@ private[controllers] trait PostLoginEndpoint { this: Controller =>
 
     nonValidatedForm.errorsOrValidatedForm match {
       case Left(errors) =>
-        nonValidatedForm.flashRedirect(GetLoginEndpoint.url().url)
+        nonValidatedForm.redirectThroughFlash(GetLoginEndpoint.url().url)
 
       case Right(validForm) =>
         session.put(WebsiteControllers.customerIdKey, validForm.customerId)

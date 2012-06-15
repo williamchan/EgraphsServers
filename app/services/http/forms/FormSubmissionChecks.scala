@@ -119,3 +119,20 @@ class FormSubmissionChecks @Inject()(accountStore: AccountStore) {
     }
   }
 }
+
+object FormSubmissionChecks {
+  def isPresent(toValidate: Iterable[String])
+  : Either[ValueNotPresentFieldError, Iterable[String]] =
+  {
+    toValidate match {
+      case null =>
+        Left(ValueNotPresentFieldError())
+
+      case strings if (strings.isEmpty || strings.size == 1 && strings.head == "") =>
+        Left(ValueNotPresentFieldError())
+
+      case strings =>
+        Right(strings)
+    }
+  }
+}

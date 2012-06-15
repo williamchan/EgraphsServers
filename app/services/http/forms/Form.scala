@@ -20,11 +20,23 @@ trait Form[+ValidFormType] {
     if (errors.isEmpty) Right(formAssumingValid) else Left(errors)
   }
 
-  def flashRedirect(url: String)(implicit flash: play.mvc.Scope.Flash) {
+  def derivedErrors: Iterable[FormError] = {
+    for (field <- fields if field.isInstanceOf[DerivedField[_]];
+         error <- field.error if !error.isInstanceOf[DependentFieldError])
+    yield {
+      error
+    }
+  }
+
+  def redirectThroughFlash(url: String)(implicit flash: play.mvc.Scope.Flash): Redirect = {
     import Form.Conversions._
 
     this.write(flash.asFormWriteable)
     new Redirect(url)
+  }
+
+  def wasRead: Boolean = {
+    !paramsMap(formName).isEmpty
   }
 
   //
@@ -73,7 +85,7 @@ trait Form[+ValidFormType] {
     for (field <- fields if !field.isInstanceOf[DerivedField[_]]) field.write(writeKeyValue)
   }
 
-  protected val formName = this.getClass.getName
+  protected val formName = this.getClass.getSimpleName
 }
 
 object Form {
@@ -126,7 +138,7 @@ abstract class ReadsFormSubmission[+SubmissionType <: Form[_]]
   //
   // Public members
   //
-  private def formName = manifest.erasure.getName
+  private def formName = manifest.erasure.getSimpleName
 
   def read(readable: Form.Readable, formChecks: FormSubmissionChecks)
   : Option[SubmissionType] =

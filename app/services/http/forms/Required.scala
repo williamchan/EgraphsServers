@@ -5,10 +5,7 @@ trait Required[+ValueType] { this: FormField[ValueType] =>
   protected def stringToValidate: String = stringsToValidate.head
 
   override final def validate = {
-    if (stringsToValidate == null || stringsToValidate.isEmpty) {
-      Left(ValueNotPresentFieldError())
-    } else {
-      validateIfPresent
-    }
+    for (strings <- FormSubmissionChecks.isPresent(stringsToValidate).right;
+         subclassResult <- validateIfPresent.right) yield subclassResult
   }
 }
