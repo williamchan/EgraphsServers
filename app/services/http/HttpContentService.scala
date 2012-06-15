@@ -13,11 +13,7 @@ class HttpContentService {
 
       case _ =>
         val mimeType = playContentType(fileName)
-        val contentEncoding = play.utils.HTTP.parseContentType(mimeType).encoding match {
-          case null => None
-          case realValue => Some(realValue)
-        }
-
+        val contentEncoding = Option(play.utils.HTTP.parseContentType(mimeType).encoding)
         ContentHeaders(mimeType, contentEncoding)
     }
   }

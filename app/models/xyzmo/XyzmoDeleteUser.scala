@@ -33,9 +33,10 @@ case class XyzmoDeleteUser(id: Long = 0,
   }
 
   def withResultBase(resultBase: com.xyzmo.wwww.biometricserver.WebServiceUserAndProfileStub.ResultBase): XyzmoDeleteUser = {
-    val errorInfo = resultBase.getErrorInfo
-    val error = if (errorInfo != null) Some(errorInfo.getError.getValue) else None
-    val errorMsg = if (errorInfo != null) Some(errorInfo.getErrorMsg.take(255)) else None
+    val (error, errorMsg) = Option(resultBase.getErrorInfo) match {
+      case None => (None, None)
+      case Some(errorInfo) => (Some(errorInfo.getError.getValue), Some(errorInfo.getErrorMsg.take(255)))
+    }
     copy(baseResult = resultBase.getBaseResult.getValue,
       error = error,
       errorMsg = errorMsg)

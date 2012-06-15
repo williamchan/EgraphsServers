@@ -80,25 +80,29 @@ case class Product(
     import ImageUtil.Conversions._
 
     // Prepare the product photo, cropped to the suggested frame
-    val product = if (image.isDefined) {
-      val imageDimensions = Dimensions(image.get.getWidth, image.get.getHeight)
-      val frame = EgraphFrame.suggestedFrame(imageDimensions)
-      val imageCroppedToFrame = frame.cropImageForFrame(image.get)
-      val imageByteArray = imageCroppedToFrame.asByteArray(ImageAsset.Jpeg)
-      // Product has previously been saved so that it has an ID for blobstore to key on
-      val savedWithFrame = withFrame(frame).save()
+    val product = image match {
+      case None => save()
+      case Some(img) => {
+        val imageDimensions = Dimensions(img.getWidth, img.getHeight)
+        val frame = EgraphFrame.suggestedFrame(imageDimensions)
+        val imageCroppedToFrame = frame.cropImageForFrame(img)
+        val imageByteArray = imageCroppedToFrame.asByteArray(ImageAsset.Jpeg)
+        // Product has previously been saved so that it has an ID for blobstore to key on
+        val savedWithFrame = withFrame(frame).save()
 
-      val signingScaleDimensions = if (imageDimensions.isLandscape) Product.defaultLandscapeSigningScale else Product.defaultPortraitSigningScale
-      savedWithFrame.copy(signingScaleH = signingScaleDimensions.height, signingScaleW = signingScaleDimensions.width).withPhoto(imageByteArray).save().product
-    } else {
-      save()
+        val signingScaleDimensions = if (imageDimensions.isLandscape) Product.defaultLandscapeSigningScale else Product.defaultPortraitSigningScale
+        savedWithFrame.copy(signingScaleH = signingScaleDimensions.height, signingScaleW = signingScaleDimensions.width).withPhoto(imageByteArray).save().product
+      }
     }
 
     // Prepare the product plaque icon, cropped to a square
-    if (icon.isDefined) {
-      val iconCroppedToSquare = ImageUtil.cropToSquare(icon.get)
-      val iconBytes = iconCroppedToSquare.asByteArray(ImageAsset.Jpeg)
-      product.withIcon(iconBytes).save()
+    icon match {
+      case None =>
+      case Some(ic) => {
+        val iconCroppedToSquare = ImageUtil.cropToSquare(ic)
+        val iconBytes = iconCroppedToSquare.asByteArray(ImageAsset.Jpeg)
+        product.withIcon(iconBytes).save()
+      }
     }
 
     product

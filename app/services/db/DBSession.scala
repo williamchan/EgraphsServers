@@ -43,7 +43,7 @@ class DBSession @Inject() (connectionFactory: () => Connection) extends Logging 
           // case e: PSQLException if e.getSQLState == sqlState_SerializableConcurrentException => {
           //   println("retrying due to sqlState " + sqlState_SerializableConcurrentException)
           // }
-          case e: Exception if (e.getCause != null && e.getCause.getMessage.startsWith(errorStr40001)) => {
+          case e: Exception if (Option(e.getCause).isDefined && e.getCause.getMessage.startsWith(errorStr40001)) => {
             // rollback transaction and allowing subsequent retries to execute
             rollbackAndContinue(connection)
           }

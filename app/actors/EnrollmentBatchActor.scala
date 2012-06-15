@@ -31,17 +31,13 @@ class EnrollmentBatchActor @Inject()(db: DBSession,
   def processEnrollmentBatch(enrollmentBatchId: Long) {
     logging.withTraceableContext("processEnrollmentBatch[" + enrollmentBatchId + "]") {
       db.connected(TransactionSerializable) {
-        val enrollmentBatchOption = enrollmentBatchStore.findById(enrollmentBatchId)
-        if (enrollmentBatchOption.isEmpty) {
-          throw new Exception("EnrollmentBatchActor could not find EnrollmentBatch " + enrollmentBatchId.toString)
+        enrollmentBatchStore.findById(enrollmentBatchId) match {
+          case None => throw new Exception("EnrollmentBatchActor could not find EnrollmentBatch " + enrollmentBatchId.toString)
+          case Some(enrollmentBatch) if (!enrollmentBatch.isBatchComplete || enrollmentBatch.isSuccessfulEnrollment.isDefined) => {
+            throw new Exception("EnrollmentBatchActor did not find EnrollmentBatch in an enrollment state: " + enrollmentBatchId.toString)
+          }
+          case Some(enrollmentBatch) => attemptEnrollment(enrollmentBatch)
         }
-        val enrollmentBatch = enrollmentBatchOption.get
-
-        if (!enrollmentBatch.isBatchComplete || enrollmentBatch.isSuccessfulEnrollment.isDefined) {
-          throw new Exception("EnrollmentBatchActor did not find EnrollmentBatch in an enrollment state: " + enrollmentBatchId.toString)
-        }
-
-        attemptEnrollment(enrollmentBatch)
       }
     }
   }

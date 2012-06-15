@@ -34,23 +34,21 @@ class EgraphActor @Inject() (
   def processEgraph(egraphId: Long, skipBiometrics: Boolean) {
     logging.withTraceableContext("processEgraph[" +egraphId +"," + skipBiometrics +"]") {
       db.connected(TransactionSerializable) {
-        val egraph = egraphStore.findById(egraphId)
-        if (egraph.isEmpty) {
-          throw new Exception("EgraphActor could not find Egraph " + egraphId.toString)
-        }
-
-        if (egraph.get.egraphState == EgraphState.AwaitingVerification) {
-          val egraphToTest = if (skipBiometrics) egraph.get.withYesMaamBiometricServices else egraph.get
-          val testedEgraph = egraphToTest.verifyBiometrics.save()
-          if (testedEgraph.egraphState == EgraphState.Published) {
-            testedEgraph.order.sendEgraphSignedMail()
+        egraphStore.findById(egraphId) match {
+          case None => throw new Exception("EgraphActor could not find Egraph " + egraphId.toString)
+          case Some(egraph) if (egraph.egraphState == EgraphState.AwaitingVerification) => {
+            val egraphToTest = if (skipBiometrics) egraph.withYesMaamBiometricServices else egraph
+            val testedEgraph = egraphToTest.verifyBiometrics.save()
+            if (testedEgraph.egraphState == EgraphState.Published) {
+              testedEgraph.order.sendEgraphSignedMail()
+            }
           }
+          case _ =>
         }
       }
     }
   }
 }
-
 
 object EgraphActor {
   // Singleton instance of EgraphActor allows only one egraph to be fulfilled at a time.

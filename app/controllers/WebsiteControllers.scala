@@ -67,10 +67,9 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
       param => flash += param
     }
 
-    if (permanent.isDefined) {
-      Redirect(redirectUrl.url, permanent.get)
-    } else {
-      Redirect(redirectUrl.url)
+    permanent match {
+      case None => Redirect(redirectUrl.url)
+      case Some(perm) => Redirect(redirectUrl.url, perm)
     }
   }
 

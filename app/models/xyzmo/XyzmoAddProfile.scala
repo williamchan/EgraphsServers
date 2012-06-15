@@ -36,13 +36,19 @@ case class XyzmoAddProfile(id: Long = 0,
 
   def withProfile_Add_v1Response(profile_Add_v1Response: WebServiceUserAndProfileStub.Profile_Add_v1Response): XyzmoAddProfile = {
     val resultBase = profile_Add_v1Response.getProfile_Add_v1Result
-    val errorInfo = resultBase.getErrorInfo
-    val error = if (errorInfo != null) Some(errorInfo.getError.getValue) else None
-    val errorMsg = if (errorInfo != null) Some(errorInfo.getErrorMsg.take(255)) else None
 
-    val okInfo = profile_Add_v1Response.getProfile_Add_v1Result.getOkInfo
-    val profileInfo = if (okInfo != null) Some(okInfo.getProfileInfo) else None
-    val xyzmoProfileId = if (profileInfo.isDefined) Some(profileInfo.get.getProfileId) else None
+    val (error, errorMsg) = Option(resultBase.getErrorInfo) match {
+      case None => (None, None)
+      case Some(errorInfo) => (Some(errorInfo.getError.getValue), Some(errorInfo.getErrorMsg.take(255)))
+    }
+
+    val xyzmoProfileId = Option(profile_Add_v1Response.getProfile_Add_v1Result.getOkInfo) match {
+      case None => None
+      case Some(okInfo) => Option(okInfo.getProfileInfo) match {
+        case None => None
+        case Some(profileInfo) => Option(profileInfo.getProfileId)
+      }
+    }
 
     copy(baseResult = resultBase.getBaseResult.getValue,
       error = error,

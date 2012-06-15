@@ -455,15 +455,11 @@ private class VBGRequest {
   }
 
   def setParameter(paramName: String, paramValue: String) {
-    if (paramName != null && paramValue != null) {
-      requestParams.put(paramName, paramValue)
-    }
+    requestParams.put(paramName, paramValue)
   }
 
   def setRequestType(requestType: String) {
-    if (requestType != null) {
-      this.requestType = requestType
-    }
+    this.requestType = requestType
   }
 
   def getResponseValue(valueName: String): String = {

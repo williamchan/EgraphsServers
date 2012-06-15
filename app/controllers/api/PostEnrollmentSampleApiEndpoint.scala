@@ -49,8 +49,8 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
 
             } else {
               play.Logger.info("Dismissing the invalid postEnrollmentSample request")
-              play.Logger.info("Signature length was " + (if (signature != null) signature.length() else "[signature missing]"))
-              play.Logger.info("Audio length was " + (if (audio != null) audio.length() else "[audio missing]"))
+              if (Option(signature).isEmpty) play.Logger.info("Signature missing")
+              if (Option(audio).isEmpty) play.Logger.info("Audio missing")
               Error(HttpCodes.MalformedEgraph, "")
             }
         }

@@ -8,6 +8,7 @@ import services.logging.Logging
 import java.util.Date
 import play.data.validation.Validation
 import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters, AdminRequestFilters}
+import services.http.SafePlayParams.Conversions._
 
 trait PostCelebrityInventoryBatchAdminEndpoint extends Logging {
   this: Controller =>
@@ -31,8 +32,7 @@ trait PostCelebrityInventoryBatchAdminEndpoint extends Logging {
 
       if (validationErrors.isEmpty) {
         val products = celebrity.products().toList
-        val productsSelected = products.filter(p => params.get("prod" + p.id) != null)
-
+        val productsSelected = products.filter(p => params.getOption("prod" + p.id).isDefined)
         if (isCreate) {
           val inventoryBatch = InventoryBatch(celebrityId = celebrity.id, numInventory = numInventory, startDate = startDate, endDate = endDate).save()
           for (p <- productsSelected) {

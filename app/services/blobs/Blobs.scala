@@ -6,7 +6,7 @@ import org.jclouds.io.Payload
 import java.io._
 import com.google.inject.Inject
 import services.logging.Logging
-import org.jclouds.blobstore.domain.{BlobMetadata, Blob}
+import org.jclouds.blobstore.domain.Blob
 
 /**
  * Convenience methods for storing and loading large binary data: images,
@@ -37,13 +37,7 @@ class Blobs @Inject() (blobProvider: BlobVendor) extends Logging {
    * Retrieve the Blob at a given key.
    */
   def get(key: String): Option[Blob] = {
-    blobStore.getBlob(blobstoreNamespace, key) match {
-      case null =>
-        None
-
-      case blob =>
-        Some(blob)
-    }
+    Option(blobStore.getBlob(blobstoreNamespace, key))
   }
 
   /**
@@ -52,13 +46,7 @@ class Blobs @Inject() (blobProvider: BlobVendor) extends Logging {
    */
   def getStaticResource(key: String) : Option[Blob] = {
     val store: BlobStore = S3BlobVendor.context.getBlobStore
-    store.getBlob(staticResourceBlobstoreNamespace, key) match {
-      case null =>
-        None
-
-      case blob =>
-        Some(blob)
-    }
+    Option(store.getBlob(staticResourceBlobstoreNamespace, key))
   }
 
   /**

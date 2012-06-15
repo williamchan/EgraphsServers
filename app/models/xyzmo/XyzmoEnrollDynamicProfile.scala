@@ -40,16 +40,21 @@ case class XyzmoEnrollDynamicProfile(id: Long = 0,
 
   def withEnrollDynamicProfile_v1Response(enrollDynamicProfile_v1Response: WebServiceBiometricPartStub.EnrollDynamicProfile_v1Response): XyzmoEnrollDynamicProfile = {
     val resultBase = enrollDynamicProfile_v1Response.getEnrollDynamicProfile_v1Result
-    val errorInfo = resultBase.getErrorInfo
-    val error = if (errorInfo != null) Some(errorInfo.getError.getValue) else None
-    val errorMsg = if (errorInfo != null) Some(errorInfo.getErrorMsg.take(255)) else None
+    val (error, errorMsg) = Option(resultBase.getErrorInfo) match {
+      case None => (None, None)
+      case Some(errorInfo) => (Some(errorInfo.getError.getValue), Some(errorInfo.getErrorMsg.take(255)))
+    }
 
-    val okInfo = enrollDynamicProfile_v1Response.getEnrollDynamicProfile_v1Result.getOkInfo
-    val infoEnrollOk = if (okInfo != null) Some(okInfo.getInfoEnrollOk) else None
+    val (enrollResult, infoEnrollOkOption) = Option(enrollDynamicProfile_v1Response.getEnrollDynamicProfile_v1Result.getOkInfo) match {
+      case None => (None, None)
+      case Some(okInfo) => (Option(okInfo.getEnrollResult.getValue), Option(okInfo.getInfoEnrollOk))
+    }
 
-    val enrollResult: Option[String] = if (okInfo != null) Some(okInfo.getEnrollResult.getValue) else None
-    val xyzmoProfileId: Option[String] = if (infoEnrollOk.isDefined) Some(infoEnrollOk.get.getProfileId) else None
-    val nrEnrolled: Option[Int] = if (infoEnrollOk.isDefined) Some(infoEnrollOk.get.getNrEnrolled) else None
+    val (xyzmoProfileId, nrEnrolled) = infoEnrollOkOption match {
+      case None => (None, None)
+      case Some(infoEnrollOk) => (Some(infoEnrollOk.getProfileId), Some(infoEnrollOk.getNrEnrolled))
+    }
+
     val rejectedSignaturesSummary: Option[String] = getRejectedSignaturesSummary(enrollDynamicProfile_v1Response)
 
     copy(baseResult = resultBase.getBaseResult.getValue,
@@ -70,28 +75,34 @@ case class XyzmoEnrollDynamicProfile(id: Long = 0,
     error.getOrElse(None) == WebServiceBiometricPartStub.ErrorStatus.ProfileAlreadyEnrolled.getValue
   }
 
-  private def getSignatureSampleIds(enrollDynamicProfile_v1Response: WebServiceBiometricPartStub.EnrollDynamicProfile_v1Response): Option[String] = {
-    // todo(wchan): Implement once we get rid of SignatureSample
-    None
-  }
+  //    todo(wchan): Implement once we get rid of SignatureSample
+  //  private def getSignatureSampleIds(enrollDynamicProfile_v1Response: WebServiceBiometricPartStub.EnrollDynamicProfile_v1Response): Option[String] = {
+  //    None
+  //  }
 
   private def getRejectedSignaturesSummary(enrollDynamicProfile_v1Response: WebServiceBiometricPartStub.EnrollDynamicProfile_v1Response): Option[String] = {
-    val okInfo = enrollDynamicProfile_v1Response.getEnrollDynamicProfile_v1Result.getOkInfo
-    val rejectedSignaturesSOAPObject = if (okInfo != null) Some(okInfo.getRejectedSignatures) else None
-    val rejectedSignatureArray = if (rejectedSignaturesSOAPObject.isDefined) Some(rejectedSignaturesSOAPObject.get.getRejectedSignature) else None
-
-    if (rejectedSignatureArray.isDefined) {
-      if (rejectedSignatureArray.get != null && rejectedSignatureArray.get.size > 0) {
-        var rejectedSignaturesSummary: String = ""
-        for (rejectedSignature <- rejectedSignatureArray.get) {
-          val index: Int = rejectedSignature.getIndex
-          val reasonString: String = rejectedSignature.getReason.toString
-          rejectedSignaturesSummary += index + ") " + reasonString + ". "
+    Option(enrollDynamicProfile_v1Response.getEnrollDynamicProfile_v1Result.getOkInfo) match {
+      case None => None
+      case Some(okInfo) => {
+        Option(okInfo.getRejectedSignatures) match {
+          case None => None
+          case Some(arrayOfRejectedSignature) => {
+            Option(arrayOfRejectedSignature.getRejectedSignature) match {
+              case Some(rejectedSignatureArray) if (rejectedSignatureArray.size > 0) => {
+                var rejectedSignaturesSummary: String = ""
+                for (rejectedSignature <- rejectedSignatureArray) {
+                  val index: Int = rejectedSignature.getIndex
+                  val reasonString: String = rejectedSignature.getReason.toString
+                  rejectedSignaturesSummary += index + ") " + reasonString + ". "
+                }
+                Some(rejectedSignaturesSummary.take(255))
+              }
+              case _ => None
+            }
+          }
         }
-        return Some(rejectedSignaturesSummary.take(255))
       }
     }
-    None
   }
 
   //

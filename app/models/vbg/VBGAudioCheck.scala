@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import models._
 import org.squeryl.PrimitiveTypeMode._
 import services.AppConfig
-import services.db.{KeyedCaseClass, Schema, Saves}
+import services.db.{Schema, Saves}
 import services.Time
 
 /**

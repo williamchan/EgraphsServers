@@ -11,8 +11,8 @@ import java.io.{PrintWriter, StringWriter}
 /**
  * Helpful utilities with no other place to call home
  */
-class Utils @Inject()(@PlayConfig() playConfig: Properties)
-{
+class Utils @Inject()(@PlayConfig() playConfig: Properties) {
+
   /**
    * Turns any Iterable into a map keyed by a provided function.
    *
@@ -46,7 +46,7 @@ class Utils @Inject()(@PlayConfig() playConfig: Properties)
    *
    * @return the result of usesResource, after closing the resource.
    */
-  def closing [T <: { def close(): Any }, U](resource: T)(usesResource: T => U): U = {
+  def closing[T <: {def close() : Any}, U](resource: T)(usesResource: T => U): U = {
     try {
       usesResource(resource)
     }
@@ -61,13 +61,13 @@ class Utils @Inject()(@PlayConfig() playConfig: Properties)
    * For example, to redirect to Shaq's celebrity page:
    * {{{
    *   val actionDef = Utils.lookupUrl(
-   *     "controllers.WebsiteControllers.getCelebrity",
-   *     Map("celebrityUrlSlug" -> "Shaq")
-   *   )
-   *   redirect(actionDef.url)
+   * "controllers.WebsiteControllers.getCelebrity",
+   * Map("celebrityUrlSlug" -> "Shaq")
+   * )
+   * redirect(actionDef.url)
    * }}}
    */
-  def lookupUrl(controllerMethod: String, params: Map[String, AnyRef]=Map()): Router.ActionDefinition = {
+  def lookupUrl(controllerMethod: String, params: Map[String, AnyRef] = Map()): Router.ActionDefinition = {
     import scala.collection.JavaConversions._
 
     if (params == Map.empty) {
@@ -80,7 +80,7 @@ class Utils @Inject()(@PlayConfig() playConfig: Properties)
   /**
    * Returns the ActionDefinition with an absolute URL, ie https://www.egraphs.com/myroute.
    */
-  def lookupAbsoluteUrl(controllerMethod: String, params: Map[String, AnyRef]=Map()): Router.ActionDefinition = {
+  def lookupAbsoluteUrl(controllerMethod: String, params: Map[String, AnyRef] = Map()): Router.ActionDefinition = {
     val action = lookupUrl(controllerMethod, params)
     action.absolute()
     action
@@ -142,7 +142,7 @@ class Utils @Inject()(@PlayConfig() playConfig: Properties)
 
   implicit def properties(pairs: (AnyRef, AnyRef)*): Properties = {
     val props = new Properties
-    
+
     for (pair <- pairs) props.put(pair._1, pair._2)
 
     props
@@ -150,21 +150,24 @@ class Utils @Inject()(@PlayConfig() playConfig: Properties)
 }
 
 object Utils extends Utils(Play.configuration) {
-  /** DIY exhaustiveness-checking enum type. See https://gist.github.com/1057513 */
+
+  /**DIY exhaustiveness-checking enum type. See https://gist.github.com/1057513 */
   trait Enum {
-    import java.util.concurrent.atomic.AtomicReference //Concurrency paranoia
+
+    import java.util.concurrent.atomic.AtomicReference
 
     type EnumVal <: Value //This is a type that needs to be found in the implementing class
 
-    private val _values = new AtomicReference(Vector[EnumVal]()) //Stores our enum values
+    private val _values = new AtomicReference(Vector[EnumVal]()) //Stores our enum values. Using AtomicReference due to Concurrency paranoia
 
     //Adds an EnumVal to our storage, uses CCAS to make sure it's thread safe, returns the ordinal
-    private final def addEnumVal(newVal: EnumVal): Int = { import _values.{get, compareAndSet => CAS}
+    private final def addEnumVal(newVal: EnumVal): Int = {
+      import _values.{get, compareAndSet => CAS}
       require(this(newVal.name) == None)
 
       val oldVec = _values.get
       val newVec = oldVec :+ newVal
-      if((get eq oldVec) && CAS(oldVec, newVec)) newVec.indexWhere(_ eq newVal) else addEnumVal(newVal)
+      if ((get eq oldVec) && CAS(oldVec, newVec)) newVec.indexWhere(_ eq newVal) else addEnumVal(newVal)
     }
 
     def values: Vector[EnumVal] = _values.get //Here you can get all the enums that exist for this type
@@ -178,15 +181,21 @@ object Utils extends Utils(Play.configuration) {
     }
 
     //This is the trait that we need to extend our EnumVal type with, it does the book-keeping for us
-    protected trait Value { self: EnumVal => //Enforce that no one mixes in Value in a non-EnumVal type
+    protected trait Value {
+      //Enforce that no one mixes in Value in a non-EnumVal type
+      self: EnumVal =>
       final val ordinal = addEnumVal(this) //Adds the EnumVal and returns the ordinal
 
       def name: String //All enum values should have a name
 
-      override def toString = name //And that name is used for the toString operation
+      //And that name is used for the toString operation
+      override def toString = name
+
       override def equals(other: Any) = this eq other.asInstanceOf[AnyRef]
+
       override def hashCode = 31 * (this.getClass.## + name.## + ordinal)
     }
+
   }
 
   val defaultPageLength = 30

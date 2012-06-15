@@ -7,7 +7,6 @@ import services.AppConfig
 import services.blobs.Blobs
 import services.db.{KeyedCaseClass, Schema, Saves}
 import services.Time
-import org.jclouds.blobstore.domain.Blob
 import Blobs.Conversions._
 
 /**
@@ -39,20 +38,16 @@ case class EnrollmentSample(id: Long = 0,
   }
 
   def getWav: Array[Byte] = {
-    val blob: Option[Blob] = services.blobs.get(EnrollmentSample.getWavUrl(id))
-    if (blob.isDefined) {
-      blob.get.asByteArray
-    } else {
-      new Array[Byte](0)
+    services.blobs.get(EnrollmentSample.getWavUrl(id)) match {
+      case None => new Array[Byte](0)
+      case Some(blob) => blob.asByteArray
     }
   }
 
   def getSignatureJson: String = {
-    val blob: Option[Blob] = services.blobs.get(EnrollmentSample.getSignatureJsonUrl(id))
-    if (blob.isDefined) {
-      blob.get.asString
-    } else {
-      ""
+    services.blobs.get(EnrollmentSample.getSignatureJsonUrl(id)) match {
+      case None => ""
+      case Some(blob) => blob.asString
     }
   }
 

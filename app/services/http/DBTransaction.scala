@@ -18,10 +18,9 @@ trait DBTransaction {
 
   @Finally
   def cleanUpPersistence(e: Throwable) {
-    if (e == null) {
-      DBSession.commit()
-    } else {
-      DBSession.rollback()
+    e match {
+      case null => DBSession.commit()
+      case exception => DBSession.rollback()
     }
   }
 

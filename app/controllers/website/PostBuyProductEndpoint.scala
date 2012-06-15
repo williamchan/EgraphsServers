@@ -112,14 +112,14 @@ trait PostBuyProductEndpoint { this: Controller =>
           email("Buyer E-mail address", buyerEmail)
           required("stripeTokenId", stripeTokenId)
 
-          if (recipientEmail != null && !recipientEmail.isEmpty && accountStore.findByEmail(recipientEmail.toLowerCase).isEmpty) {
+          if (recipientEmail != null && !recipientEmail.isEmpty && accountStore.findByEmail(recipientEmail).isEmpty) {
             Validation.`match`(
               "Recipient e-mail address must be a Beta celebrity or a Beta tester",
               recipientEmail.toLowerCase,
               alphaEmailMatcher
             )
           }
-          if (buyerEmail != null && !buyerEmail.isEmpty && accountStore.findByEmail(buyerEmail.toLowerCase).isEmpty) {
+          if (buyerEmail != null && !buyerEmail.isEmpty && accountStore.findByEmail(buyerEmail).isEmpty) {
             Validation.`match`(
               "Recipient e-mail address must be a Beta celebrity or a Beta tester",
               buyerEmail.toLowerCase,

@@ -37,13 +37,20 @@ case class XyzmoVerifyUser(id: Long = 0,
 
   def withVerifyUserBySignatureDynamicToDynamic_v1Response(verifyUserBySignatureDynamicToDynamic_v1Response: WebServiceBiometricPartStub.VerifyUserBySignatureDynamicToDynamic_v1Response): XyzmoVerifyUser = {
     val resultBase = verifyUserBySignatureDynamicToDynamic_v1Response.getVerifyUserBySignatureDynamicToDynamic_v1Result
-    val errorInfo = resultBase.getErrorInfo
-    val error = if (errorInfo != null) Some(errorInfo.getError.getValue) else None
-    val errorMsg = if (errorInfo != null) Some(errorInfo.getErrorMsg.take(255)) else None
 
-    val okInfo = verifyUserBySignatureDynamicToDynamic_v1Response.getVerifyUserBySignatureDynamicToDynamic_v1Result.getOkInfo
-    val isMatch = if (okInfo != null) Some(okInfo.getVerifyResult.getValue == WebServiceBiometricPartStub.VerifyResultEnum.VerifyMatch.getValue) else None
-    val score = if (okInfo != null) Some(okInfo.getScore) else None
+    val (error, errorMsg) = Option(resultBase.getErrorInfo) match {
+      case None => (None, None)
+      case Some(errorInfo) => (Some(errorInfo.getError.getValue), Some(errorInfo.getErrorMsg.take(255)))
+    }
+
+    val (isMatch, score) = Option(verifyUserBySignatureDynamicToDynamic_v1Response.getVerifyUserBySignatureDynamicToDynamic_v1Result.getOkInfo) match {
+      case None => (None, None)
+      case Some(okInfo) => {
+        val isMatch = Some(okInfo.getVerifyResult.getValue == WebServiceBiometricPartStub.VerifyResultEnum.VerifyMatch.getValue)
+        val score = Some(okInfo.getScore)
+        (isMatch, score)
+      }
+    }
 
     copy(baseResult = resultBase.getBaseResult.getValue,
       error = error,

@@ -153,9 +153,8 @@ case class Celebrity(id: Long = 0,
       description=description,
       storyTitle=storyTitle,
       storyText=storyText,
-      services=services.productServices.get,
-      _publishedStatus = publishedStatus.name
-    )
+      services=services.productServices.get
+    ).withPublishedStatus(publishedStatus)
 
     product.saveWithImageAssets(image, icon)
   }

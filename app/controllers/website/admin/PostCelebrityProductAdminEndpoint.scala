@@ -13,6 +13,7 @@ import services.ImageUtil
 import play.Play
 import java.text.SimpleDateFormat
 import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters, AdminRequestFilters}
+import services.http.SafePlayParams.Conversions._
 
 trait PostCelebrityProductAdminEndpoint extends Logging {
   this: Controller =>
@@ -109,7 +110,7 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
         }
 
 
-          maybeCreateInventoryBatchForDemoMode(savedProduct, isCreate, params.get("createWithoutInventory"))
+          maybeCreateInventoryBatchForDemoMode(savedProduct, isCreate)
 
           new Redirect(GetProductAdminEndpoint.url(productId = savedProduct.id).url + "?action=preview")
         }
@@ -124,8 +125,8 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
   /**
    * This is here so that demo'ers don't need to worry about setting up an InventoryBatch for demo Products before making orders.
    */
-  private def maybeCreateInventoryBatchForDemoMode(product: Product, isCreate: Boolean, createWithoutInventory: String) {
-    if (isCreate && (createWithoutInventory == null) && (Play.id == "test")) {
+  private def maybeCreateInventoryBatchForDemoMode(product: Product, isCreate: Boolean) {
+    if (isCreate && (params.getOption("createWithoutInventory").isEmpty) && (Play.id == "test")) {
       val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
       val jan_01_2012 = dateFormat.parse("2012-01-01")
       val future = dateFormat.parse("2020-01-01")
