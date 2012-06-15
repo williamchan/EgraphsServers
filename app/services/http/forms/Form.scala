@@ -2,17 +2,17 @@ package services.http.forms
 
 import play.mvc.results.Redirect
 
-trait FormSubmission[+ValidFormType] {
+trait Form[+ValidFormType] {
   //
   // Abstract members
   //
-  def paramsMap: FormSubmission.Readable
+  def paramsMap: Form.Readable
   protected def formAssumingValid: ValidFormType
 
   //
   // Public members
   //
-  def errorsOrValidForm
+  def errorsOrValidatedForm
   : Either[Iterable[FormError], ValidFormType] =
   {
     val errors = this.independentErrors
@@ -21,9 +21,9 @@ trait FormSubmission[+ValidFormType] {
   }
 
   def flashRedirect(url: String)(implicit flash: play.mvc.Scope.Flash) {
-    import FormSubmission.Conversions._
+    import Form.Conversions._
 
-    this.write(flash.asSubmissionWriteable)
+    this.write(flash.asFormWriteable)
     new Redirect(url)
   }
 
@@ -65,7 +65,7 @@ trait FormSubmission[+ValidFormType] {
     fields = fields :+ newField
   }
 
-  private def write(writeKeyValue: FormSubmission.Writeable) {
+  private def write(writeKeyValue: Form.Writeable) {
     // Write the form name
     writeKeyValue(formName, "true")
 
@@ -76,7 +76,7 @@ trait FormSubmission[+ValidFormType] {
   protected val formName = this.getClass.getName
 }
 
-object FormSubmission {
+object Form {
   type Readable = String => Iterable[String]
   type Writeable = (String, String) => Unit
 
@@ -84,17 +84,17 @@ object FormSubmission {
     type HasGetAndPutString = { def get(key: String): String; def put(key: String, value: String) }
 
     class SubmissionCompatiblePlayParams(playParams: play.mvc.Scope.Params) {
-      def asSubmissionReadable: FormSubmission.Readable = {
+      def asFormReadable: Form.Readable = {
         (key) => playParams.getAll(key)
       }
     }
 
     class SubmissionCompatiblePlayFlashAndSession(gettablePuttable: HasGetAndPutString) {
-      def asSubmissionReadable: FormSubmission.Readable = {
+      def asFormReadable: Form.Readable = {
         (key) => Option(gettablePuttable.get(key))
       }
 
-      def asSubmissionWriteable: FormSubmission.Writeable = {
+      def asFormWriteable: Form.Writeable = {
         (key, value) => gettablePuttable.put(key, value)
       }
     }
@@ -115,20 +115,20 @@ object FormSubmission {
 }
 
 
-abstract class ReadsFormSubmission[+SubmissionType <: FormSubmission[_]]
+abstract class ReadsFormSubmission[+SubmissionType <: Form[_]]
   (implicit manifest: Manifest[SubmissionType])
 {
   //
   // Abstract members
   //
-  def instantiateAgainstReadable(readable: FormSubmission.Readable): SubmissionType
+  def instantiateAgainstReadable(readable: Form.Readable): SubmissionType
 
   //
   // Public members
   //
   private def formName = manifest.erasure.getName
 
-  def read(readable: FormSubmission.Readable, formChecks: FormSubmissionChecks)
+  def read(readable: Form.Readable, formChecks: FormSubmissionChecks)
   : Option[SubmissionType] =
   {
     if (!readable(formName).isEmpty) {

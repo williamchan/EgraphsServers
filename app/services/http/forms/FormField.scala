@@ -21,7 +21,7 @@ trait FormField[+ValueType] {
     validate.left.toOption
   }
 
-  def write(writeKeyValue: FormSubmission.Writeable) {
+  def write(writeKeyValue: Form.Writeable) {
     writeKeyValue(name, stringsToValidate.mkString(","))
   }
 }

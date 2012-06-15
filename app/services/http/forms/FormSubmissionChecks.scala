@@ -83,7 +83,7 @@ class FormSubmissionChecks @Inject()(accountStore: AccountStore) {
     email: String,
     password: String,
     message: String="Username or password did not match")
-  :Either[FormError, Account] =
+  : Either[FormError, Account] =
   {
     accountStore.authenticate(email, password) match {
       case Left(_) => Left(new SimpleFormError(message))

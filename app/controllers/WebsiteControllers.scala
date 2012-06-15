@@ -11,10 +11,9 @@ import play.mvc.results.Redirect
 import services.db.DBSession
 import services.social.FacebookAppId
 import services.http._
-import forms.FormSubmissionChecks
+import forms.{CustomerLoginFormFactory, FormSubmissionChecks}
 import java.util.Properties
-import services.{AppConfig, Utils}
-import website.PostLoginEndpoint.PostLoginFormSubmissionFactory
+import services.Utils
 
 object WebsiteControllers extends Controller with AllWebsiteEndpoints
 {
@@ -29,7 +28,7 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val facebookAppId = annotatedInstance[FacebookAppId, String]
 
   override protected def formChecks = instance[FormSubmissionChecks]
-  override protected def postLoginForms = instance[PostLoginFormSubmissionFactory]
+  override protected def customerLoginForms = instance[CustomerLoginFormFactory]
 
   override protected val dbSession = instance[DBSession]
   override protected val controllerMethod = instance[ControllerMethod]
