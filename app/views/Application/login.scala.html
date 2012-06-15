@@ -1,6 +1,4 @@
-@(email: models.frontend.forms.Field[String],
-  password: models.frontend.forms.Field[String],
-  generalErrors: Iterable[models.frontend.forms.FormError],
+@(form: models.frontend.login_page.LoginForm, 
   fbOauthUrl: String)(implicit session: play.mvc.Scope.Session)
 
 @import controllers.WebsiteControllers
@@ -27,29 +25,29 @@
         <fieldset>
           @authenticityToken()
           <legend>Login</legend>
-          <div class="clearfix @for(error <- email.error) {error}">
-            <label for="@email.name">Email</label>
+          <div class="clearfix @for(error <- form.email.error) {error}">
+            <label for="@form.email.name">Email</label>
             <div class="input">
               <input class="span4"
-                     id="@email.name"
-                     name="@email.name"
+                     id="@form.email.name"
+                     name="@form.email.name"
                      type="text"
-                     value="@email.value">
-              <span class="help-inline">@email.error</span>
+                     value="@form.email.value">
+              <span class="help-inline">@form.email.error</span>
             </div>
           </div>
-          <div class="clearfix @for(error <- password.error) {error}">
-            <label for="@password.name">Password</label>
+          <div class="clearfix @for(error <- form.password.error) {error}">
+            <label for="@form.password.name">Password</label>
             <div class="input">
-              <input class="span4" id="password" name="@password.name" type="password">
-              <span class="help-inline">@password.error</span>
+              <input class="span4" id="form.password" name="@form.password.name" type="password">
+              <span class="help-inline">@form.password.error</span>
             </div>
           </div>
           <div class="actions">
             <button type="submit" id="submit-button" class="btn large primary fade in">Login</button>
-            <div class="form-errors alert-message block-message @if(!generalErrors.isEmpty) {alert-message-has-errors}">
+            <div class="form-errors alert-message block-message @if(!form.generalErrors.isEmpty) {alert-message-has-errors}">
               <ul>
-                @for(error <- generalErrors) {
+                @for(error <- form.generalErrors) {
                   <li>@error</li>
                 }
               </ul>

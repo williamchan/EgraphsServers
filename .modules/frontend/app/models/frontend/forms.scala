@@ -10,8 +10,8 @@ case class FormError(description: String) {
 
 case class Field[+ValueType](
   name: String,
-  values: Iterable[ValueType],
-  error: Option[FormError]
+  values: Iterable[ValueType]=None,
+  error: Option[FormError]=None
 ) extends Iterable[ValueType] {
   final def value = {
     values.headOption

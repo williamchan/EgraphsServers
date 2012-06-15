@@ -140,7 +140,7 @@ abstract class ReadsFormSubmission[+SubmissionType <: Form[_]]
   //
   private def formName = manifest.erasure.getSimpleName
 
-  def read(readable: Form.Readable, formChecks: FormSubmissionChecks)
+  def read(readable: Form.Readable)
   : Option[SubmissionType] =
   {
     if (!readable(formName).isEmpty) {

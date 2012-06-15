@@ -10,11 +10,11 @@ object FormConversions {
   import models.frontend.{forms => formsview}
 
   class FormFieldModelViewConversions(modelField: FormField[_]) {
-    def asViewField(withErrors: Boolean): formsview.Field[String] = {
+    def asViewField: formsview.Field[String] = {
       formsview.Field[String](
         name=modelField.name,
         values=modelField.stringsToValidate.headOption,
-        error=if (withErrors) modelField.error.map(error => error.asViewError) else None
+        error=modelField.error.map(error => error.asViewError)
       )
     }
   }

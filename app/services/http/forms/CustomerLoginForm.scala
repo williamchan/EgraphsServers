@@ -1,6 +1,7 @@
 package services.http.forms
 
 import com.google.inject.Inject
+import services.Utils
 
 /**
  * Define the fields (and validations thereof) for the form transmitted by this endpoint
@@ -13,16 +14,17 @@ import com.google.inject.Inject
 class CustomerLoginForm(val paramsMap: Form.Readable, check: FormSubmissionChecks)
   extends Form[CustomerLoginForm.Validated]
 {
+  import CustomerLoginForm.Fields
   //
   // Fields and validations
   //
-  val email = new RequiredField[String]("email") {
+  val email = new RequiredField[String](Fields.Email.name) {
     def validateIfPresent = {
       for (validEmail <- check.isEmailAddress(stringToValidate).right) yield validEmail
     }
   }
 
-  val password = new RequiredField[String]("password") {
+  val password = new RequiredField[String](Fields.Password.name) {
     def validateIfPresent = {
       Right(stringToValidate)
     }
@@ -58,6 +60,14 @@ class CustomerLoginForm(val paramsMap: Form.Readable, check: FormSubmissionCheck
 
 
 object CustomerLoginForm {
+
+  object Fields extends Utils.Enum {
+    sealed case class EnumVal(name: String) extends Value
+
+    val Email = EnumVal("Email")
+    val Password = EnumVal("Password")
+  }
+
   /** Class to which the fully validated CustomerLoginForm resolves */
   case class Validated(customerId: Long)
 }
