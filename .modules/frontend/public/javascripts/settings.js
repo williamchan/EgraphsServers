@@ -12,7 +12,7 @@ define([], function() {
       $(document).ready(function(){
 
         $(".edit").click(function(e){
-          var containingRow = $(this).parent().parent();
+          var containingRow = $(this).parent();
 
           containingRow.addClass('hide');
           containingRow.next().removeClass('hide');
@@ -24,13 +24,12 @@ define([], function() {
           //Controller class for Angular app
     Controller: function ($scope) {
       //Plugin default values here
-
       $scope.master = { fullname : "Joshua Johnson",
                         username : "joshuajohnson",
                         email : "joshua12@gmail.com",
                         password: "********",
-                        address : [
-                          { title : "Primary",
+                        address :
+                          { title : "Default",
                             fullname : "Joshua Johnson",
                             line1 : "5507 N 58th Street",
                             line2 : "",
@@ -38,7 +37,7 @@ define([], function() {
                             zip : "98101",
                             state : "WA"
                           }
-                        ],
+                        ,
                         gallery : {
                           visibility : "Visible",
                           url : "egr.aphs/joshuaj"
@@ -64,15 +63,16 @@ define([], function() {
         var splitpath = val.split(".");
         var master = $scope.master;
         var userObj = $scope.user;
-
+        //TODO use parse instead
         //Get second to last element to change the reference to the original master string.
         for(i = 1; i < splitpath.length - 1; i++){
           console.log(splitpath[i]);
           master = master[splitpath[i]];
           userObj = userObj[splitpath[i]];
         }
+        console.log("splitpath " + splitpath);
 
-        userObj[splitpath[splitpath.length - 1]] = master[splitpath[splitpath.length - 1]];
+        userObj[splitpath[splitpath.length - 1]] = angular.copy(master[splitpath[splitpath.length - 1]]);
 
 
       }

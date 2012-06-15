@@ -2,53 +2,84 @@
   padding-left: 0px;
 }
 
-.settings-row {
-  vertical-align: middle;
-  input {
-    padding-top: 0px;
-    padding-bottom: 0px;
+.row-settings {
+  i {
+    visibility: hidden;
   }
 
-  a.action {
+  a:hover i{
+    visibility: visible;
+  }
+  input {
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+    padding-top: 0xp;
+  }
+
+  label.ng-label, label.checkbox {
+    text-align: left;
+  }
+
+  label {
+    font-size: 15px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  span:last-child, a.cancel {
+    text-align: right;
+  }
+  a.action span:last-child, a.cancel {
     font-size: 14px;
     color: @orange;
-    text-align: right;
-    width: 10%;
+    .transitions(color, 0.25s, ease);
   }
 
-  a:hover.action {
+  a:hover.action span:last-child, a.cancel:hover {
     color:@blue;
   }
 
-  th {
-    font-size: 17px;
-    font-weight: bold;
-    padding-left: 0px;
+  span:first-child, span:first-child:hover {
+      font-size: 17px;
+      font-weight: bold;
+      padding-left: 0px;
+      color: @grayLight;
+  }
+
+  span, span:hover {
+        color:@grayLight;
+        padding-top: 8px;
+        padding-bottom: 8px;
+  }
+
+  span.help-inline {
+    font-size: 13px;
   }
 
   address {
     margin-bottom: 0px;
   }
+
+  border-bottom: 1px solid @tableBorder;
 }
 
-.settings-group {
-  table {
-    border-bottom: 1px solid @tableBorder;
-  }
+.row-settings:hover {
+    background-color: @tableBackgroundHover;
 }
-
-
 
 section .settings-group {
   h2 {
     font-size: 18px;
     font-weight: bold;
     text-transform: uppercase;
+    border-bottom: 1px solid @tableBorder;
   }
 
   label {
     line-height: 18px;
   }
+
+  margin-bottom: 24px;
 
 }
 
@@ -77,6 +108,22 @@ a.add-link:hover p:first-letter{
   #settings-top {
     h1 {
     font-size: 24px;
+    }
+  }
+}
+//TODO
+@media (max-width:767px) {
+  .row-settings {
+    span:last-child, a.cancel {
+      text-align: left;
+    }
+    i {
+      display: hidden;
+    }
+
+    span {
+      padding-top: 0px;
+      padding-bottom: 0px;
     }
   }
 }

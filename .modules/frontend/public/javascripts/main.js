@@ -3,6 +3,8 @@ var Controller;
 
 
 //Configuration to look up correct urls to js files as opposed to relative paths (require's default behavior)
+//TODO look into play plugin for require.js
+//TODO organizing each page with its own main.js
 require.config({
   baseUrl: "/public/javascripts"
 });

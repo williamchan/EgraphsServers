@@ -1,51 +1,98 @@
 @import views.frontend.tags
-        
-@NameValueRow(model: String, id:String, title: String) = {
-  <tr id="@id-display" class="settings-row">
-    <th class="span6">@title</th><td class="span15 setting-val">{{@model}}</td><td class="span1"><a href="#" class="action edit">Edit</a></td>
-  </tr>
- <tr id="@id-edit" class="settings-row hide">
-  <th class="span6">@title</th><label></label><td class="span15"><input ng-model="@model" type="text"/></td><td class="span1"><a ng-click='cancel("@model", "@id-edit");' class="action cancel">Cancel</a></td>
- </tr>
+
+@NGcancel(model: String, id:String) = {
+  <a ng-click='cancel("@model", "@id-edit");' class="action cancel">
+    <i class="icon-pencil">
+    </i> Cancel
+  </a>
+}
+@NGBinding(model: String, id: String) = {
+  {{@model@id}}
+}
+@NGInput(model: String, id: String) = {
+<input class="span6" ng-model="@model@id" type="text" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"/>
 }
 
-@AddressRow(title: String, fullname: String, address1:String, address2:String)  = {
-<tr class="settings-row">
-  <th class="span6">@title</th>
-  <td class="span6">
-    @fullname
-  </td>
-  <td class="span9">
-      <span>
+@NGSelect(model: String, id: String, options: Array[String]) = {
+  <select ng-model="@model@id" type="text">
+    @options.map { option =>
+      <option value="@option">@option</option>
+    }
+  </select>
+}
+@LabeledNGInput(label: String, model: String, id: String) = {
+  <div class="control-group">
+    <label class="control-label ng-label">@label</label>
+    <div class="controls">
+      @NGInput(model, id)
+    </div>
+  </div>
+}
+
+@LabeledNGSelect(label: String, model: String, id: String, options: Array[String]) = {
+<div class="control-group">
+  <label class="control-label ng-label">@label</label>
+  <div class="controls">
+    @NGSelect(model, id, options)
+  </div>
+</div>
+}
+@AddressRow(address: String, id: String)  = {
+  <div id="@id-display" class="row-settings row-fluid">
+    <a href="#" class="action edit">
+      <span class="span3">@NGBinding(address,".title")</span>
+      <span class="span4">@NGBinding(address,".fullname")</span>
+      <span class="span4">
         <address>
-          @address1<br>
-          @address2
+          @NGBinding(address, ".line1")<br>
+          @NGBinding(address, ".line2")<br ng:show="{{user.address.line2}}">
+          @NGBinding(address, ".city"), @NGBinding(address, ".state") @NGBinding(address, ".zip")
         </address>
-       </span>
-  </td>
-  <td class="span1"><a href="#" class="edit">Edit</a></td>
-</tr>
+      </span>
+      <span class="span1">
+        <i class="icon-pencil">
+        </i> Edit
+      </span>
+    </a>
+  </div>
+  <div id="@id-edit" class="row-settings row-fluid hide">
+      <span class="span1"></span>
+      <span class="span10">
+        <address>
+          @LabeledNGInput("Name", address,".fullname")
+          @LabeledNGInput("Address Line 1", address, ".line1")
+          @LabeledNGInput("Address Line 2", address, ".line2")
+          @LabeledNGInput("City", address, ".city")
+          @tags.ng.html.statepicker("State", address, ".state")
+          @LabeledNGInput("ZIP", address, ".zip")
+        </address>
+      </span>
+      <span class="span1">
+        @NGcancel(address, id)
+      </span>
+  </div>
 }
 
 @checkboxRow(label: String, name: String, settings: Map[String, String]) = {
-  <tr class="settings-row">
-    <th class="span6">@label</th>
-    <td class="span16">
-     <fieldset>
-       <div class="control-group">
-         <div class="controls">
+  <div class="row-settings row-fluid">
+    <span class="span3">
+      @label
+    </span>
+    <span class="span8">
+
+       <span class="control-group">
+         <span class="controls">
           @settings.map { option =>
-            <label class="checkbox settings-col">
+            <label class="checkbox">
               <input type="checkbox" name="@name" value="@option._1"/>@option._2
             </label>
            }
-         </div>
-       </div>
-     </fieldset>
-    </td>
-  </tr>
+         </span>
+       </span>
+    </span>
+    <span class="span1"></span>
+  </div>
 }
-
 
 @baseBody = {
   <section id="content" role="main" ng-controller="Controller">
@@ -55,48 +102,28 @@
         <header id="settings-top">
           <h1>Account Settings</h1>
         </header>
-        <form name="form">
-          <section class="settings-group" id="personal-information">
-
-            <h2 >Personal Information</h2>
-            <table class="table">
-              @NameValueRow(model = "user.fullname", id = "fullname", title = "Name")
-              @NameValueRow(model = "user.username", id = "username",title = "Username")
-              @NameValueRow(model = "user.email", id = "email", title = "Email")
-              @NameValueRow(model = "user.password", id = "password", title = "Password")
-
-            </table>
-
+        <form name="form" class="form-horizontal">
+        <section class="settings-group" id="personal-information">
+            <h2>Personal Information</h2>
+              @tags.html.form_namevalue(model = "user.fullname", id = "fullname", title = "Name")
+              @tags.html.form_namevalue(model = "user.username", id = "username",title = "Username", helper="Gallery Url egra.ph/{{user.username}}")
+              @tags.html.form_namevalue(model = "user.email", id = "email", title = "Email")
+              @tags.html.form_namevalue(model = "user.password", id = "password", title = "Password")
+              @LabeledNGSelect(label = "Gallery Visibility", model = "user.gallery.visibility", id="galleryvisibility", Array("public", "private"))
           </section>
 
           <section class="settings-group" id="shipping-address">
-
             <h2>Shipping Address</h2>
-            <table class="table">
-            @AddressRow(title = "Primary", fullname = "Joshua Johnson", address1 = "5507 N 58th Street", address2 = "Seattle, WA 98101")
-
-            </table>
-            <a href="#" class="add-link"><p>+ Add Another Shipping Address</p></a>
-          </section>
-
-          <section class="settings-group" id="gallery-settings">
-            <h2>My Gallery Settings</h2>
-            <table class="table">
-              @NameValueRow(model = "user.gallery.visibility", id="galleryvisibility", title = "Gallery Visibility")
-              @NameValueRow(model = "user.gallery.url", id="galleryurl", title = "Gallery URL")
-            </table>
+            @AddressRow(address = "user.address", id ="address")
+            <!--<a href="#" class="add-link"><p>+ Add Another Shipping Address</p></a>-->
           </section>
 
           <section class="settings-group" id="additional-settings">
             <h2>Additional Settings</h2>
-            <table class="table">
              @checkboxRow(label = "Notices", name = "notice", Map( "new_stars" -> "New Star Additions (Weekly)",
                                                 "news" -> "News",
                                                 "mlb_updates" -> "Updates from Major League Baseball"))
-              @checkboxRow(label = "Follow Egraphs", name = "social", Map( "facebook" -> "Facebook",
-                                                                            "twitter" -> "Twitter",
-                                                                            "tumblr"  -> "Tumblr"))
-            </table>
+
           </section>
           <div class="row-fluid">
             <div class="span9"></div>
@@ -109,5 +136,4 @@
     </div>
   </section>
 }
-
 @base_template(title="Your Account", body=baseBody)

@@ -1,0 +1,14 @@
+@(label: String, model: String, id: String)
+
+@import views.frontend.tags
+
+<!-- Begin usstates.scala.html -->
+<div class="control-group">
+  <label class="control-label ng-label">@label</label>
+  <div class="controls">
+    <select ng-model="@model@id" type="text" class="span2">
+      @tags.geo.html.usstates()
+    </select>
+  </div>
+</div>
+<!-- End usstates.scala.html -->
