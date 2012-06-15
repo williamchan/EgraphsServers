@@ -64,8 +64,8 @@ object CustomerLoginForm {
   object Fields extends Utils.Enum {
     sealed case class EnumVal(name: String) extends Value
 
-    val Email = EnumVal("Email")
-    val Password = EnumVal("Password")
+    val Email = EnumVal("login.email")
+    val Password = EnumVal("login.password")
   }
 
   /** Class to which the fully validated CustomerLoginForm resolves */

@@ -40,11 +40,11 @@ private[controllers] trait GetLoginEndpoint { this: Controller =>
     // If we couldn't find the form in the flash. We'll just make an empty form
     // with the right names
     maybeFormData.getOrElse {
-      import models.frontend.forms.Field
+      import models.frontend.forms.{Field, FormError}
       import CustomerLoginForm.Fields
 
       login_page.LoginForm(
-        Field(Fields.Email.name), Field(Fields.Password.name), List()
+        Field(Fields.Email.name), Field(Fields.Password.name), List.empty[FormError]
       )
     }
   }
