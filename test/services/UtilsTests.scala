@@ -26,6 +26,7 @@ class UtilsTests extends UnitFlatSpec
   }
 
   "toOption" should "return Some for non-empty String and None for empty String" in {
+    Utils.toOption(null) should be(None)
     Utils.toOption("") should be(None)
     Utils.toOption(" ") should be(Some(" "))
     Utils.toOption("a") should be(Some("a"))

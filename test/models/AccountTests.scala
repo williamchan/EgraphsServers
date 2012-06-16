@@ -129,7 +129,7 @@ class AccountTests extends UnitFlatSpec
     accountStore.findByEmail("derp@derp.com") should be(Some(stored))
   }
 
-  it should "find by email case-insensitively" in {
+  "findByEmail" should "find by email case-insensitively" in {
     val stored = Account(email = "derp@derp.com").save()
     accountStore.findByEmail("DERP@DERP.COM") should be(Some(stored))
   }
@@ -231,6 +231,8 @@ class AccountStoreTests extends UnitFlatSpec
   }
 
   it should "be recoverable by email" in {
+    accountStore.findByEmail(null) should be(None)
+    accountStore.findByEmail("") should be(None)
     val stored = Account(email = "derp@derp.com").save()
     accountStore.findByEmail(stored.email) should be(Some(stored))
   }

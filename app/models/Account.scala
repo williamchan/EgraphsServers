@@ -5,9 +5,9 @@ import play.data.validation.Validation
 import java.sql.Timestamp
 import services.db.{KeyedCaseClass, Saves, Schema}
 import com.google.inject.Inject
-import services.{AppConfig, Time}
 import java.util.UUID
 import org.apache.commons.codec.binary.Base64
+import services.{Utils, AppConfig, Time}
 
 /**
  * Basic account information for any user in the system
@@ -137,13 +137,16 @@ class AccountStore @Inject() (schema: Schema) extends Saves[Account] with SavesC
   // Public methods
   //
   def findByEmail(email: String): Option[Account] = {
-    if (email.isEmpty) return None
-
-    val emailInLowerCase = email.trim().toLowerCase
-    from(schema.accounts)(account =>
-      where(account.email === emailInLowerCase)
-        select (account)
-    ).headOption
+    Utils.toOption(email) match {
+      case None => None
+      case Some(e) => {
+        val emailInLowerCase = e.trim().toLowerCase
+        from(schema.accounts)(account =>
+          where(account.email === emailInLowerCase)
+            select (account)
+        ).headOption
+      }
+    }
   }
 
   def findByAdministratorId(administratorId: Long): Option[Account] = {

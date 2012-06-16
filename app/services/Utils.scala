@@ -26,7 +26,11 @@ class Utils @Inject()(@PlayConfig() playConfig: Properties) {
   }
 
   def toOption(str: String): Option[String] = {
-    if (str.isEmpty) None else Some(str)
+    str match {
+      case null => None
+      case s if (s.isEmpty) => None
+      case _ => Some(str)
+    }
   }
 
   /**
