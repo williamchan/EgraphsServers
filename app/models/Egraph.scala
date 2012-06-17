@@ -12,6 +12,7 @@ import services.signature.{SignatureBiometricsError, YesMaamSignatureBiometricSe
 import services._
 import db.{FilterOneTable, Schema, KeyedCaseClass, Saves}
 import graphics.{Handwriting, HandwritingPen, GraphicsSource}
+import http.PlayConfig
 import java.text.SimpleDateFormat
 import controllers.WebsiteControllers
 import controllers.website.GetCelebrityProductEndpoint
@@ -19,6 +20,7 @@ import com.google.inject.{Provider, Inject}
 import play.utils.HTML.htmlEscape
 import org.squeryl.Query
 import xyzmo.{XyzmoVerifyUserStore, XyzmoVerifyUser}
+import java.util.Properties
 
 /**
  * Vital services for an Egraph to perform its necessary functionality
@@ -44,7 +46,8 @@ case class EgraphServices @Inject() (
   graphicsSourceFactory: () => GraphicsSource,
   voiceBiometrics: VoiceBiometricService,
   signatureBiometrics: SignatureBiometricService,
-  storyServicesProvider: Provider[EgraphStoryServices]
+  storyServicesProvider: Provider[EgraphStoryServices],
+  @PlayConfig playConfig: Properties
 )
 
 /**
@@ -259,18 +262,19 @@ case class Egraph(
 
       // We have return codes from both services. Taking a look at them...
       case (Some(signatureResult), Some(voiceResult)) =>
-        Published // TODO: Remove for April 1 release and write unit tests for the logic below
-        /*
         val isSignatureMatch = signatureResult.isMatch.getOrElse(false)
         val isVoiceMatch = voiceResult.success.getOrElse(false)
         (isSignatureMatch, isVoiceMatch) match {
           case (true, true) => PassedBiometrics
           case _ => FailedBiometrics
         }
-      */
     }
 
-    withEgraphState(newState)
+    // If admin review is turned off (eg to expedite demos), immediately publish the Egraph
+    services.playConfig.getProperty("adminreview.skip") match {
+      case "true" => withEgraphState(EgraphState.Published)
+      case _ => withEgraphState(newState)
+    }
   }
 
   //
