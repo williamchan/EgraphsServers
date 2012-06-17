@@ -10,6 +10,8 @@ import services.signature.SignatureBiometricsError
 import services.voice.VoiceBiometricsError
 import models.{CelebrityStore, EnrollmentBatch, EnrollmentBatchStore}
 import models.enums.EnrollmentStatus
+import services.http.PlayConfig
+import java.util.Properties
 
 object EnrollmentBatchActor {
   val actor = actorOf(AppConfig.instance[EnrollmentBatchActor])
@@ -18,7 +20,8 @@ object EnrollmentBatchActor {
 class EnrollmentBatchActor @Inject()(db: DBSession,
                                      celebrityStore: CelebrityStore,
                                      enrollmentBatchStore: EnrollmentBatchStore,
-                                     logging: LoggingContext
+                                     logging: LoggingContext,
+                                     @PlayConfig playConfig: Properties
                                       ) extends Actor with Logging {
   protected def receive = {
     case ProcessEnrollmentBatchMessage(id: Long) => {
@@ -29,14 +32,19 @@ class EnrollmentBatchActor @Inject()(db: DBSession,
   }
 
   def processEnrollmentBatch(enrollmentBatchId: Long) {
-    logging.withTraceableContext("processEnrollmentBatch[" + enrollmentBatchId + "]") {
-      db.connected(TransactionSerializable) {
-        enrollmentBatchStore.findById(enrollmentBatchId) match {
-          case None => throw new Exception("EnrollmentBatchActor could not find EnrollmentBatch " + enrollmentBatchId.toString)
-          case Some(enrollmentBatch) if (!enrollmentBatch.isBatchComplete || enrollmentBatch.isSuccessfulEnrollment.isDefined) => {
-            throw new Exception("EnrollmentBatchActor did not find EnrollmentBatch in an enrollment state: " + enrollmentBatchId.toString)
+    playConfig.getProperty("biometrics.status") match {
+      case "offline" =>
+      case _ => {
+        logging.withTraceableContext("processEnrollmentBatch[" + enrollmentBatchId + "]") {
+          db.connected(TransactionSerializable) {
+            enrollmentBatchStore.findById(enrollmentBatchId) match {
+              case None => throw new Exception("EnrollmentBatchActor could not find EnrollmentBatch " + enrollmentBatchId.toString)
+              case Some(enrollmentBatch) if (!enrollmentBatch.isBatchComplete || enrollmentBatch.isSuccessfulEnrollment.isDefined) => {
+                throw new Exception("EnrollmentBatchActor did not find EnrollmentBatch in an enrollment state: " + enrollmentBatchId.toString)
+              }
+              case Some(enrollmentBatch) => attemptEnrollment(enrollmentBatch)
+            }
           }
-          case Some(enrollmentBatch) => attemptEnrollment(enrollmentBatch)
         }
       }
     }

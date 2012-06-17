@@ -50,26 +50,6 @@ private[controllers] trait GetScriptAdminEndpoint {
           s
         }
 
-        case "kick-egraphs-awaitingverification" => {
-          // find all Egraphs that are AwaitingVerification and give them a kick...
-          val egraphsAwaitingVerification: Query[(Egraph)] = from(schema.egraphs)(
-            (e) => where(e._egraphState === EgraphState.AwaitingVerification.name) select (e)
-          )
-          for (egraph <- egraphsAwaitingVerification) {
-            actors.EgraphActor.actor ! actors.ProcessEgraphMessage(id = egraph.id)
-          }
-          "I gave all Egraphs AwaitingVerification a kick."
-        }
-
-        case "kick-egraph" => {
-          val egraphId = params.get("egraphId")
-          val egraph = egraphStore.findById(id = egraphId.toLong)
-          if (egraph.isDefined && egraph.get.egraphState == EgraphState.AwaitingVerification) {
-            actors.EgraphActor.actor ! actors.ProcessEgraphMessage(id = egraph.get.id)
-          }
-          "I gave that Egraph a kick."
-        }
-
         case "create-admin" => {
           val adminEmail = params.get("admin-email")
           val admin = administratorStore.findByEmail(adminEmail)
@@ -82,6 +62,33 @@ private[controllers] trait GetScriptAdminEndpoint {
             account.get.copy(administratorId = Some(administrator.id)).save()
           }
           "Admin created"
+        }
+
+        case "kick-egraphs-awaitingverification" => {
+          // find all Egraphs that are AwaitingVerification and give them a kick...
+          val egraphsAwaitingVerification: Query[(Egraph)] = from(schema.egraphs)(
+            (e) => where(e._egraphState === EgraphState.AwaitingVerification.name) select (e)
+          )
+          for (egraph <- egraphsAwaitingVerification) {
+            actors.EgraphActor.actor ! actors.ProcessEgraphMessage(id = egraph.id)
+          }
+          "I gave all Egraphs AwaitingVerification a kick."
+        }
+
+        case "kick-pending-enrollmentbatches" => {
+          for (pendingEnrollmentBatch <- enrollmentBatchStore.getEnrollmentBatchesPending()) {
+            actors.EnrollmentBatchActor.actor ! actors.ProcessEnrollmentBatchMessage(id = pendingEnrollmentBatch.id)
+          }
+          "I gave all pending EnrollmentBatches a kick"
+        }
+
+        case "kick-egraph" => {
+          val egraphId = params.get("egraphId")
+          val egraph = egraphStore.findById(id = egraphId.toLong)
+          if (egraph.isDefined && egraph.get.egraphState == EgraphState.AwaitingVerification) {
+            actors.EgraphActor.actor ! actors.ProcessEgraphMessage(id = egraph.get.id)
+          }
+          "I gave that Egraph a kick."
         }
 
         case "kick-enrollmentbatch" => {

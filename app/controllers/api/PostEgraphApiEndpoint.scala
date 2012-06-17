@@ -28,7 +28,7 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
     @Required audio: String,
     latitude: Option[Double] = None,
     longitude: Option[Double] = None,
-    skipBiometrics: Boolean = false) =
+    skipBiometrics: Boolean = false /*todo(wchan): remove skipBiometrics parameter*/) =
   {
     controllerMethod(openDatabase=false) {
       // Get result of DB transaction that processes the request

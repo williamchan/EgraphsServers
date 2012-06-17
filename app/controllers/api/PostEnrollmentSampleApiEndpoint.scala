@@ -19,7 +19,7 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
 
   def postEnrollmentSample(@Required signature: String,
                            @Required audio: String,
-                           skipBiometrics: Boolean = false) =
+                           skipBiometrics: Boolean = false /*todo(wchan): remove skipBiometrics parameter*/) =
 
     controllerMethod(openDatabase = false) {
       // Get result of DB transaction that processes the request
