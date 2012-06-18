@@ -1,5 +1,7 @@
 package models.frontend.forms
 
+import play.templates.Html
+
 
 case class FormError(description: String) {
   override def toString: String = {
@@ -15,6 +17,14 @@ case class Field[+ValueType](
 ) extends Iterable[ValueType] {
   final def value = {
     values.headOption
+  }
+
+  def ifError(htmlGenerator: => Html): Html = {
+    error.map(error => htmlGenerator).getOrElse(Html.empty)
+  }
+
+  def ifNotError(htmlGenerator: => Html): Html = {
+    error.map(error => Html.empty).getOrElse(htmlGenerator)
   }
 
   //

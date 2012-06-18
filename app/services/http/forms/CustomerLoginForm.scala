@@ -74,7 +74,7 @@ object CustomerLoginForm {
 
 
 class CustomerLoginFormFactory @Inject()(formChecks: FormSubmissionChecks)
-  extends ReadsFormSubmission[CustomerLoginForm]
+  extends ReadsForm[CustomerLoginForm]
 {
   def apply(readable: Form.Readable): CustomerLoginForm = {
     new CustomerLoginForm(readable, formChecks)

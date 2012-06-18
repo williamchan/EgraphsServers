@@ -28,7 +28,7 @@ class FormSubmissionChecksTest extends EgraphsUnitTest {
     val trues  = List("1", "true",  "on",  "yes", "True",  "TRUE",  "YES", "Yes", " true ")
     val falses = List("0", "false", "off", "no" , "False", "FALSE", "NO" , " false ")
 
-    // Run tests
+    // Check expectations
     for (trueValue <- trues) check.isBoolean(trueValue) should be (Right(true))
     for (falseValue <- falses) check.isBoolean(falseValue) should be (Right(false))
 
@@ -50,7 +50,7 @@ class FormSubmissionChecksTest extends EgraphsUnitTest {
     val dateFormat = new SimpleDateFormat(formatString)
     val dateString = "2012-05-10 10:45:00"
 
-    // Run tests
+    // Check expectations
     check.isDateWithFormat(formatString, dateString) should be (
       Right(dateFormat.parse(dateString))
     )
@@ -64,7 +64,7 @@ class FormSubmissionChecksTest extends EgraphsUnitTest {
     val mockFieldResult = Right(100)
     mockField.validate returns mockFieldResult
 
-    // Run tests
+    // Check expectations
     check.dependentFieldIsValid(mockField) should be (mockFieldResult)
   }
 
@@ -73,7 +73,7 @@ class FormSubmissionChecksTest extends EgraphsUnitTest {
     val mockField = mock[FormField[Int]]
     mockField.validate returns Left(new SimpleFormError("herp"))
 
-    // Run tests
+    // Check expectations
     check.dependentFieldIsValid(mockField).isLeft should be (true)
     check.dependentFieldIsValid(mockField).left.get.isInstanceOf[DependentFieldError] should be (true)
   }
@@ -91,7 +91,7 @@ class FormSubmissionChecksTest extends EgraphsUnitTest {
     // Instantiate a new check instance that uses our mock
     val check = new FormSubmissionChecks(mockAccountStore)
 
-    // Run tests
+    // Check expectations
     check.isValidAccount(email, pass) should be (Right(mockAccount))
 
     // Set up to failed authentication and test again
@@ -122,7 +122,7 @@ class FormSubmissionChecksTest extends EgraphsUnitTest {
       List("", "herp"),
       List("herp", "")
     )
-
+    
     val failers: List[Iterable[String]] = List(
       null,
       None,
@@ -131,8 +131,22 @@ class FormSubmissionChecksTest extends EgraphsUnitTest {
       List(null)
     )
 
-    // Run tests
+    // Check expectations
     for (passer <- passers) FormSubmissionChecks.isPresent(passer) should be (Right(passer))
     for (failer <- failers) FormSubmissionChecks.isPresent(failer).isLeft should be (true)
   }
+
+  "isAtMost" should "yield the int that was passed to it if the value was no larger than the argument" in {
+    check.isAtMost(10, 9) should be (Right(9))
+    check.isAtMost(10, 10) should be (Right(10))
+    check.isAtMost(10, 11).isLeft should be (true)
+  }
+
+  "isAtLeast" should "yield the int that was passed to it if the value was no smaller than the argument" in {
+    val legalAge = 21
+    check.isAtLeast(legalAge, 22) should be (Right(22))
+    check.isAtLeast(legalAge, 21) should be (Right(21))
+    check.isAtLeast(legalAge, 20).isLeft should be (true)
+  }
+
 }

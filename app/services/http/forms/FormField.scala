@@ -22,6 +22,6 @@ trait FormField[+ValueType] {
   }
 
   def write(writeKeyValue: Form.Writeable) {
-    writeKeyValue(name, stringsToValidate.mkString(","))
+    writeKeyValue(name, stringsToValidate)
   }
 }

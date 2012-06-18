@@ -25,7 +25,7 @@
         <fieldset>
           @authenticityToken()
           <legend>Login</legend>
-          <div class="clearfix @for(error <- form.email.error) {error}">
+          <div class="clearfix @form.email.ifError {error}">
             <label for="@form.email.name">Email</label>
             <div class="input">
               <input class="span4"
@@ -36,7 +36,7 @@
               <span class="help-inline">@form.email.error</span>
             </div>
           </div>
-          <div class="clearfix @for(error <- form.password.error) {error}">
+          <div class="clearfix @form.password.ifError {error}">
             <label for="@form.password.name">Password</label>
             <div class="input">
               <input class="span4" id="form.password" name="@form.password.name" type="password">

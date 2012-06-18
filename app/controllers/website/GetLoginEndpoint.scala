@@ -30,7 +30,7 @@ private[controllers] trait GetLoginEndpoint { this: Controller =>
   private def makeLoginFormView: LoginFormView = {
     // Get form from flash if possible
     val maybeFormData = customerLoginForms.read(flash.asFormReadable).map { form =>
-      val nonFieldSpecificErrors = form.derivedErrors.map(error => error.asViewError)
+      val nonFieldSpecificErrors = form.fieldInspecificErrors.map(error => error.asViewError)
 
       LoginFormView(
         form.email.asViewField, form.password.asViewField, nonFieldSpecificErrors

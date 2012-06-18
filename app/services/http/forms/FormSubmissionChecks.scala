@@ -117,6 +117,19 @@ class FormSubmissionChecks @Inject()(accountStore: AccountStore) {
       Left(new SimpleFormError(message))
     }
   }
+
+  def isAtMost(maximum: Int, toValidate: Int, message: String = "Over maximum value")
+  : Either[FormError, Int] =
+  {
+    if(toValidate > maximum) Left(new SimpleFormError(message)) else Right(toValidate)
+  }
+
+  def isAtLeast(minimum: Int, toValidate: Int, message: String = "Under minimum value")
+  : Either[FormError, Int] =
+  {
+    if(toValidate < minimum) Left(new SimpleFormError(message)) else Right(toValidate)
+  }
+
 }
 
 object FormSubmissionChecks {
