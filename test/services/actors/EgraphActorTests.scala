@@ -57,8 +57,8 @@ with TestKit {
     egraphActor !! ProcessEgraphMessage(egraph2.id)
     AppConfig.instance[DBSession].connected(TransactionSerializable) {
       val egraphStore = AppConfig.instance[EgraphStore]
-      egraphStore.findById(egraph1.id).get.egraphState should be(EgraphState.PassedBiometrics)
-      egraphStore.findById(egraph2.id).get.egraphState should be(EgraphState.PassedBiometrics)
+      egraphStore.get(egraph1.id).egraphState should be(EgraphState.PassedBiometrics)
+      egraphStore.get(egraph2.id).egraphState should be(EgraphState.PassedBiometrics)
     }
   }
 
