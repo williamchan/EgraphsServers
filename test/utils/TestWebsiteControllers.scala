@@ -9,7 +9,7 @@ import services.db.DBSession
 import play.mvc.Controller
 import controllers.website.AllWebsiteEndpoints
 import java.util.Properties
-import services.http.forms.{CustomerLoginFormFactory, FormSubmissionChecks}
+import services.http.forms.{CustomerLoginFormFactory, FormChecks}
 
 /**
  * Injectable version of AllWebsiteEndpoints.
@@ -27,6 +27,6 @@ case class TestWebsiteControllers @Inject()(
   dbSession: DBSession,
   playConfig: Properties,
   facebookAppId: String,
-  formChecks: FormSubmissionChecks,
+  formChecks: FormChecks,
   customerLoginForms: CustomerLoginFormFactory
 ) extends Controller with AllWebsiteEndpoints

@@ -6,8 +6,8 @@ import java.text.SimpleDateFormat
 import play.data.binding.types.DateBinder
 import models.{AccountAuthenticationError, Account, AccountStore}
 
-class FormSubmissionChecksTest extends EgraphsUnitTest {
-  def check = AppConfig.instance[FormSubmissionChecks]
+class FormChecksTest extends EgraphsUnitTest {
+  def check = AppConfig.instance[FormChecks]
 
   "isInt" should "only accept integer strings and return them as Ints" in {
     check.isInt("1") should be (Right(1))
@@ -89,7 +89,7 @@ class FormSubmissionChecksTest extends EgraphsUnitTest {
     mockAccountStore.authenticate(email, pass) returns Right(mockAccount)
 
     // Instantiate a new check instance that uses our mock
-    val check = new FormSubmissionChecks(mockAccountStore)
+    val check = new FormChecks(mockAccountStore)
 
     // Check expectations
     check.isValidAccount(email, pass) should be (Right(mockAccount))
@@ -132,8 +132,8 @@ class FormSubmissionChecksTest extends EgraphsUnitTest {
     )
 
     // Check expectations
-    for (passer <- passers) FormSubmissionChecks.isPresent(passer) should be (Right(passer))
-    for (failer <- failers) FormSubmissionChecks.isPresent(failer).isLeft should be (true)
+    for (passer <- passers) FormChecks.isPresent(passer) should be (Right(passer))
+    for (failer <- failers) FormChecks.isPresent(failer).isLeft should be (true)
   }
 
   "isAtMost" should "yield the int that was passed to it if the value was no larger than the argument" in {

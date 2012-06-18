@@ -8,7 +8,7 @@ import java.util.Date
 import play.libs.I18N
 import models.{Account, AccountStore}
 
-class FormSubmissionChecks @Inject()(accountStore: AccountStore) {
+class FormChecks @Inject()(accountStore: AccountStore) {
 
   private def playValidation = Validation.current()
 
@@ -132,7 +132,7 @@ class FormSubmissionChecks @Inject()(accountStore: AccountStore) {
 
 }
 
-object FormSubmissionChecks {
+object FormChecks {
   def isPresent(toValidate: Iterable[String])
   : Either[ValueNotPresentFieldError, Iterable[String]] =
   {

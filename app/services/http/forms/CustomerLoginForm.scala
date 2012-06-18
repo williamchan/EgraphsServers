@@ -11,7 +11,7 @@ import services.Utils
  *
  * @param check the checks used by forms in our application.
  **/
-class CustomerLoginForm(val paramsMap: Form.Readable, check: FormSubmissionChecks)
+class CustomerLoginForm(val paramsMap: Form.Readable, check: FormChecks)
   extends Form[CustomerLoginForm.Validated]
 {
   import CustomerLoginForm.Fields
@@ -73,7 +73,7 @@ object CustomerLoginForm {
 }
 
 
-class CustomerLoginFormFactory @Inject()(formChecks: FormSubmissionChecks)
+class CustomerLoginFormFactory @Inject()(formChecks: FormChecks)
   extends ReadsForm[CustomerLoginForm]
 {
   def apply(readable: Form.Readable): CustomerLoginForm = {

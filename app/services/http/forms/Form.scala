@@ -114,13 +114,13 @@ object Form {
     type HasGetAndPutString = { def get(key: String): String; def put(key: String, value: String) }
 
 
-    class SubmissionCompatiblePlayParams(playParams: play.mvc.Scope.Params) {
+    class FormCompatiblePlayParams(playParams: play.mvc.Scope.Params) {
       def asFormReadable: Form.Readable = {
         (key) => Option(playParams.getAll(key)).flatten
       }
     }
 
-    class SubmissionCompatiblePlayFlashAndSession(gettablePuttable: HasGetAndPutString) {
+    class FormCompatiblePlayFlashAndSession(gettablePuttable: HasGetAndPutString) {
       def asFormReadable: Form.Readable = {
         (key) => {
           val valueOption = Option(gettablePuttable.get(key))
@@ -135,16 +135,16 @@ object Form {
       private def delimiter = ",,"
     }
 
-    implicit def playFlashOrSessionToSubmissionCompatible(gettablePuttable: HasGetAndPutString)
-    :SubmissionCompatiblePlayFlashAndSession =
+    implicit def playFlashOrSessionToFormCompatible(gettablePuttable: HasGetAndPutString)
+    :FormCompatiblePlayFlashAndSession =
     {
-      new SubmissionCompatiblePlayFlashAndSession(gettablePuttable)
+      new FormCompatiblePlayFlashAndSession(gettablePuttable)
     }
 
-    implicit def playParamsToSubmissionCompatible(playParams: play.mvc.Scope.Params)
-    : SubmissionCompatiblePlayParams =
+    implicit def playParamsToFormCompatible(playParams: play.mvc.Scope.Params)
+    : FormCompatiblePlayParams =
     {
-      new SubmissionCompatiblePlayParams(playParams)
+      new FormCompatiblePlayParams(playParams)
     }
   }
 }

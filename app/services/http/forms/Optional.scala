@@ -4,7 +4,7 @@ trait Optional[+ValueType] { this: FormField[Option[ValueType]] =>
   protected def validateIfPresent: Either[FormError, ValueType]
 
   override final def validate = {
-    FormSubmissionChecks.isPresent(stringsToValidate) match {
+    FormChecks.isPresent(stringsToValidate) match {
       case Left(_) =>
         Right(None)
 

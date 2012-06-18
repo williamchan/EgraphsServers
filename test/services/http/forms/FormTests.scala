@@ -187,7 +187,7 @@ class FormTests extends EgraphsUnitTest {
   //
   // A sample form class
   //
-  class TestPersonForm(val paramsMap: Form.Readable, check: FormSubmissionChecks)
+  class TestPersonForm(val paramsMap: Form.Readable, check: FormChecks)
     extends Form[TestPersonForm.Valid]
   {
     import TestPersonForm.Fields
@@ -245,7 +245,7 @@ class FormTests extends EgraphsUnitTest {
 
   class TestPersonFormFactory extends ReadsForm[TestPersonForm] {
     def instantiateAgainstReadable(readable: Form.Readable): TestPersonForm = {
-      new TestPersonForm(readable, AppConfig.instance[FormSubmissionChecks])
+      new TestPersonForm(readable, AppConfig.instance[FormChecks])
     }
   }
 
@@ -257,7 +257,7 @@ class FormTests extends EgraphsUnitTest {
   }
 
   private def newForm(readable: Form.Readable): TestPersonForm = {
-    new TestPersonForm(readable, AppConfig.instance[FormSubmissionChecks])
+    new TestPersonForm(readable, AppConfig.instance[FormChecks])
   }
 
   private def newValidForm = {
