@@ -1,19 +1,17 @@
 @(model: String, id:String, length: Int)
 
-<div id="@id-display" class="row-settings row-fluid">
-  <a href="#" class="action edit">
+<a id="@id-display" class="row-settings row-fluid edit">
     <span class="span3">Password</span>
     <span class="span4 setting-val">@{"*".*(length)}</span>
       <span class="span4 help-inline">
   </span>
-    <span class="span1">
+    <span class="span1 action">
       <i class="icon-pencil"></i> Edit
     </span>
-  </a>
-</div>
+</a>
 <div id="@id-edit" class="row-settings row-fluid hide">
   <span class="span1"></span>
-  <span class="span10">
+  <span class="span9">
     <div class="control-group">
       <label class="control-label ng-label">Old Password</label>
       <div class="controls">

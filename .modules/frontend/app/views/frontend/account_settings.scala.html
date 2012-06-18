@@ -1,3 +1,5 @@
+@()(implicit session: play.mvc.Scope.Session)
+
 @import views.frontend.tags
 @import views.frontend.tags.ng
 
@@ -10,7 +12,7 @@
         <header id="settings-top">
           <h1>Account Settings</h1>
         </header>
-        <form name="form" class="form-horizontal">
+      @tags.html.safeForm("method" -> "POST", "action" -> "/account/settings"){
         <section class="settings-group" id="personal-information">
             <h2>Personal Information</h2>
               @tags.ng.html.form_namevalue(model = "user.fullname", id = "fullname", title = "Name")
@@ -22,13 +24,11 @@
                                                                                                                         "private" -> "Private"))
 
           </section>
-
           <section class="settings-group" id="shipping-address">
             <h2>Shipping Address</h2>
             @tags.ng.html.form_address(address = "user.address", id ="address")
             <!--<a href="#" class="add-link"><p>+ Add Another Shipping Address</p></a>-->
           </section>
-
           <section class="settings-group" id="additional-settings">
             <h2>Additional Settings</h2>
              @tags.ng.html.form_checkbox(label = "Notices", model = "user.notices")
@@ -39,7 +39,7 @@
               @tags.html.arrow_button(caption="Save Changes", target="#")
             </div>
           </div>
-        </form>
+        }
       </div>
     </div>
   </section>

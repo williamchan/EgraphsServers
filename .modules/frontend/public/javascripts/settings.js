@@ -12,10 +12,10 @@ define([], function() {
       $(document).ready(function(){
 
         $(".edit").click(function(e){
-          var containingRow = $(this).parent();
+          var thisRow = $(this);
 
-          containingRow.addClass('hide');
-          containingRow.next().removeClass('hide');
+          thisRow.addClass('hide');
+          thisRow.next().removeClass('hide');
           e.preventDefault();
         });
 

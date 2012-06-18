@@ -2,18 +2,23 @@
   padding-left: 0px;
 }
 
-.row-settings {
+.row-settings.hide {
+  display: none;
+}
+
+.row-settings, a.row-settings:visited {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid @tableBorder;
+  display: block;
+
   i {
     visibility: hidden;
   }
 
-  a:hover i{
-    visibility: visible;
-  }
   input {
     margin-top: 0px;
     margin-bottom: 0px;
-
   }
 
   label.ng-label, label.checkbox {
@@ -26,50 +31,53 @@
     text-transform: uppercase;
   }
 
-  span:last-child, a.cancel {
-    text-align: right;
+  span:first-child, span:first-child:hover {
+    font-size: 17px;
+    font-weight: bold;
+    padding-left: 0px;
   }
-  a.action span:last-child, a.cancel {
+
+  span.help-inline {
+      font-size: 13px;
+  }
+
+  .action, a.cancel {
+    text-align: right;
     font-size: 14px;
     color: @orange;
     .transitions(color, 0.25s, ease);
   }
 
-  a:hover.action span:last-child, a.cancel:hover {
-    color:@blue;
-  }
-
-  span:first-child, span:first-child:hover {
-      font-size: 17px;
-      font-weight: bold;
-      padding-left: 0px;
-      color: @grayLight;
-  }
-
-  span, span:hover {
-        color:@grayLight;
-        padding-top: 8px;
-        padding-bottom: 8px;
-  }
-
-  span.help-inline {
-    font-size: 13px;
-  }
 
   address {
     margin-bottom: 0px;
   }
 
-  padding-top: 5px;
-  padding-bottom: 5px;
-  border-bottom: 1px solid @tableBorder;
+  a.cancel:hover {
+      color:@blue;
+      i {
+        visibility: visible;
+      }
+  }
 }
 
-.row-settings:hover {
-    background-color: @tableBackgroundHover;
+
+
+a.row-settings:hover {
+  background-color: @tableBackgroundHover;
+  i {
+    visibility: visible;
+  }
+  span.action {
+    color:@blue;
+  }
 }
+
 
 section .settings-group {
+
+  span {color:@grayLight; }
+
   h2 {
     font-size: 18px;
     font-weight: bold;
