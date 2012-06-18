@@ -1,11 +1,13 @@
 package models
 
+import enums.OrderReviewStatus
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.BeforeAndAfterEach
 import play.test.UnitFlatSpec
 import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationBefore, CreatedUpdatedEntityTests, SavingEntityTests, TestData}
-import services.{Time, AppConfig}
+import services.{Utils, Time, AppConfig}
 import exception.InsufficientInventoryException
+import java.util
 
 class CustomerTests extends UnitFlatSpec
   with ShouldMatchers
@@ -47,9 +49,7 @@ class CustomerTests extends UnitFlatSpec
   }
 
   "A customer" should "produce Orders that are properly configured" in {
-    val buyer = TestData.newSavedCustomer()
-    val recipient = TestData.newSavedCustomer()
-    val product = TestData.newSavedProduct()
+    val (buyer, recipient, product) = savedBuyerRecipientAndProduct()
 
     val order = buyer.buy(product, recipient=recipient)
 
@@ -60,24 +60,34 @@ class CustomerTests extends UnitFlatSpec
   }
 
   it should "make itself the recipient if no recipient is specified" in {
-    val buyer = TestData.newSavedCustomer()
-    val product = TestData.newSavedProduct()
+    val (buyer, _, product) = savedBuyerRecipientAndProduct()
 
     buyer.buy(product).recipientId should be (buyer.id)
   }
 
   "buy" should "set inventoryBatchId on the Order" in {
-    val buyer = TestData.newSavedCustomer()
-    val recipient = TestData.newSavedCustomer()
-    val product = TestData.newSavedProduct()
+    val (buyer, recipient, product) = savedBuyerRecipientAndProduct()
+
     val order = buyer.buy(product, recipient = recipient).save()
     order.inventoryBatchId should be(product.inventoryBatches.head.id)
   }
 
+  "buy" should "create an order whose approval status depends on play config's adminreview.skip" in {
+    // Set up
+    val (buyer, recipient, product) = savedBuyerRecipientAndProduct()
+
+    val buyerWithAdminSkip = buyer.copy(
+      services=buyer.services.copy(playConfig=Utils.properties("adminreview.skip" -> "true"))
+    )
+
+    // Run tests
+    buyer.buy(product, recipient=recipient).reviewStatus should be (OrderReviewStatus.PendingAdminReview)
+    buyerWithAdminSkip.buy(product, recipient=recipient).reviewStatus should be (OrderReviewStatus.ApprovedByAdmin)
+  }
+
   "buy" should "throw InsufficientInventoryException if no inventory is available" in {
-    val buyer = TestData.newSavedCustomer()
-    val recipient = TestData.newSavedCustomer()
-    val product = TestData.newSavedProduct()
+    val (buyer, recipient, product) = savedBuyerRecipientAndProduct()
+
     val inventoryBatch = product.inventoryBatches.head.copy(numInventory = 1).save()
 
     // first one should pass
@@ -105,5 +115,9 @@ class CustomerTests extends UnitFlatSpec
     val updatedAcct = acct.services.accountStore.findById(acct.id).get
     customer.id should be(updatedAcct.customerId.get)
     customerStore.findOrCreateByEmail(acct.email, "joe fan") should be(customer)
+  }
+
+  private def savedBuyerRecipientAndProduct(): (Customer, Customer, Product) = {
+    (TestData.newSavedCustomer(), TestData.newSavedCustomer(), TestData.newSavedProduct())
   }
 }

@@ -1,5 +1,6 @@
 package models
 
+import enums.OrderReviewStatus
 import java.sql.Timestamp
 import services.Time
 import services.db.{KeyedCaseClass, Schema, Saves}
@@ -8,12 +9,15 @@ import com.google.inject.{Provider, Inject}
 import exception.InsufficientInventoryException
 import org.apache.commons.mail.HtmlEmail
 import services.mail.Mail
+import services.http.PlayConfig
+import java.util.Properties
 
 /** Services used by each instance of Customer */
 case class CustomerServices @Inject() (accountStore: AccountStore,
                                        customerStore: CustomerStore,
                                        inventoryBatchStore: InventoryBatchStore,
-                                       mail: Mail)
+                                       mail: Mail,
+                                       @PlayConfig playConfig: Properties)
 
 /**
  * Persistent entity representing customers who buy products from our service.
@@ -64,7 +68,7 @@ case class Customer(
       case _ => 0L // todo(wchan): Do we want to permit the order to go through?
     }
 
-    Order(
+    val order = Order(
       buyerId=id,
       recipientId=recipient.id,
       productId=product.id,
@@ -74,6 +78,12 @@ case class Customer(
       requestedMessage = requestedMessage,
       inventoryBatchId = inventoryBatchId
     )
+
+    // If admin review is turned off (eg to expedite demos), create the Order already approved
+    services.playConfig.getProperty("adminreview.skip") match {
+      case "true" => order.withReviewStatus(OrderReviewStatus.ApprovedByAdmin)
+      case _ => order
+    }
   }
 
   /**
@@ -81,8 +91,8 @@ case class Customer(
    */
   def sendNewCustomerEmail() {
     val email = new HtmlEmail()
-    email.setFrom("support@egraphs.com")
-    email.addReplyTo("support@egraphs.com")
+    email.setFrom("noreply@egraphs.com")
+    email.addReplyTo("noreply@egraphs.com")
     email.addTo(account.email)
     email.setSubject("Welcome to Egraphs!")
     email.setMsg(

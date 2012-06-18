@@ -259,15 +259,12 @@ case class Egraph(
 
       // We have return codes from both services. Taking a look at them...
       case (Some(signatureResult), Some(voiceResult)) =>
-        Published // TODO: Remove for April 1 release and write unit tests for the logic below
-        /*
         val isSignatureMatch = signatureResult.isMatch.getOrElse(false)
         val isVoiceMatch = voiceResult.success.getOrElse(false)
         (isSignatureMatch, isVoiceMatch) match {
           case (true, true) => PassedBiometrics
           case _ => FailedBiometrics
         }
-      */
     }
 
     withEgraphState(newState)

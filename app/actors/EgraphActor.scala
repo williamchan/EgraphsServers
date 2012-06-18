@@ -19,7 +19,7 @@ import java.util.Properties
  * @param egraphStore a store for accessing egraphs from persistence
  * @param logging for generating useful logs.
  */
-class EgraphActor @Inject() (
+case class EgraphActor @Inject() (
   db: DBSession,
   egraphStore: EgraphStore,
   logging: LoggingContext,
@@ -40,15 +40,16 @@ class EgraphActor @Inject() (
       case _ => {
         logging.withTraceableContext("processEgraph[" + egraphId + "]") {
           db.connected(TransactionSerializable) {
-            egraphStore.findById(egraphId) match {
-              case None => throw new Exception("EgraphActor could not find Egraph " + egraphId.toString)
-              case Some(egraph) if (egraph.egraphState == EgraphState.AwaitingVerification) => {
+            egraphStore.get(egraphId) match {
+              case egraph if (egraph.egraphState == EgraphState.AwaitingVerification) => {
                 val testedEgraph = egraph.verifyBiometrics.save()
-                if (testedEgraph.egraphState == EgraphState.Published) {
-                  testedEgraph.order.sendEgraphSignedMail()
+
+                // If admin review is turned off (eg to expedite demos), immediately publish regardless of biometric results
+                if (playConfig.getProperty("adminreview.skip") == "true") {
+                  val publishedEgraph = testedEgraph.withEgraphState(EgraphState.Published).save()
+                  publishedEgraph.order.sendEgraphSignedMail()
                 }
               }
-              case _ =>
             }
           }
         }

@@ -17,7 +17,7 @@ object EnrollmentBatchActor {
   val actor = actorOf(AppConfig.instance[EnrollmentBatchActor])
 }
 
-class EnrollmentBatchActor @Inject()(db: DBSession,
+case class EnrollmentBatchActor @Inject()(db: DBSession,
                                      celebrityStore: CelebrityStore,
                                      enrollmentBatchStore: EnrollmentBatchStore,
                                      logging: LoggingContext,

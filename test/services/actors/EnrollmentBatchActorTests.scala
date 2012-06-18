@@ -36,20 +36,17 @@ with TestKit {
   }
 
   it should "use EnrollmentBatch to enroll Celebrity" in {
-    var celebrity: Celebrity = null
-    var enrollmentBatch: EnrollmentBatch = null
-    AppConfig.instance[DBSession].connected(TransactionSerializable) {
-      celebrity = Celebrity().save()
-      enrollmentBatch = EnrollmentBatch(celebrityId = celebrity.id, isBatchComplete = true).save()
-      celebrity.enrollmentStatus should be(EnrollmentStatus.NotEnrolled)
+    val (celebrity, enrollmentBatch) = AppConfig.instance[DBSession].connected(TransactionSerializable) {
+      val celebrity = Celebrity().save()
+      val enrollmentBatch = EnrollmentBatch(celebrityId = celebrity.id, isBatchComplete = true).save()
+      (celebrity, enrollmentBatch)
     }
+    celebrity.enrollmentStatus should be(EnrollmentStatus.NotEnrolled)
 
     enrollmentBatchActor !! ProcessEnrollmentBatchMessage(enrollmentBatch.id)
     AppConfig.instance[DBSession].connected(TransactionSerializable) {
-      val enrollmentBatchStore = AppConfig.instance[EnrollmentBatchStore]
-      enrollmentBatchStore.findById(enrollmentBatch.id).get.isSuccessfulEnrollment should be(Some(true))
-      val celebrityStore = AppConfig.instance[CelebrityStore]
-      celebrityStore.findById(celebrity.id).get.enrollmentStatus should be(EnrollmentStatus.Enrolled)
+      AppConfig.instance[EnrollmentBatchStore].findById(enrollmentBatch.id).get.isSuccessfulEnrollment should be(Some(true))
+      AppConfig.instance[CelebrityStore].findById(celebrity.id).get.enrollmentStatus should be(EnrollmentStatus.Enrolled)
     }
   }
 
