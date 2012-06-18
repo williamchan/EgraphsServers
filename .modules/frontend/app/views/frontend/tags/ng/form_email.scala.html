@@ -1,10 +1,28 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-        "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-  <title></title>
-</head>
-<body>
+@(model: String, id:String, title: String)
 
-</body>
-</html>
+<div id="@id-display" class="row-settings row-fluid">
+  <a href="#" class="action edit">
+    <span class="span3">@title</span>
+    <span class="span4 setting-val">{{@model}}</span>
+      <span class="span4 help-inline">
+  </span>
+    <span class="span1">
+      <i class="icon-pencil"></i> Edit
+    </span>
+  </a>
+</div>
+<div id="@id-edit" class="row-settings row-fluid hide">
+  <span class="span3">@title</span>
+  <span class="span4">
+    <input ng-model="@model" name="@id" type="email"/>
+  </span>
+  <span class="span4 help-inline error">
+    <span ng-show="form.@id.$error.email">
+      Invalid Email
+    </span>
+
+  </span>
+  <span class="span1">
+    @form_cancel(model, id)
+  </span>
+</div>

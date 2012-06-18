@@ -19,6 +19,18 @@ define([], function() {
           e.preventDefault();
         });
 
+        $("#user_password_confirmation").change(function(e) {
+          password = $("#user_password");
+          password_confirmation = $("#user_password_confirmation");
+
+          if(password.val() === password_confirmation.val()){
+            $("#password_message").addClass("invisible");
+          } else {
+            $("#password_message").removeClass("invisible");
+          }
+            console.log($(this).val());
+        });
+
       });
     },
           //Controller class for Angular app
@@ -27,7 +39,6 @@ define([], function() {
       $scope.master = { fullname : "Joshua Johnson",
                         username : "joshuajohnson",
                         email : "joshua12@gmail.com",
-                        password: "********",
                         address :
                           { title : "Default",
                             fullname : "Joshua Johnson",
@@ -42,13 +53,16 @@ define([], function() {
                           visibility : "Visible",
                           url : "egr.aphs/joshuaj"
                         },
-                        notices : {new_stars : true,
-                                   news : true ,
-                                   mlb_updates : false
-                                  },
-                        social : {facebook : true,
-                                  twitter : false,
-                                  tumblr : true}
+                        notices : [{ text: "New Star Additions (Weekly)",
+                                     name: "new_stars",
+                                     value: true},
+                                   { text: "New Products/Features",
+                                     name: "news",
+                                     value: false},
+                                   { text: "Updates from Major League Baseball",
+                                     name: "mlb_updates",
+                                     value: true}
+                                  ]
                         };
 
       $scope.update = function(user) {

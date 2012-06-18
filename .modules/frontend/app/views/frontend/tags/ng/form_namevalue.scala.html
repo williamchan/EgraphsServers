@@ -1,6 +1,6 @@
-@(model: String, id:String, title: String, helper: String = "")
+@(model: String, id:String, title: String, inputType: String ="text", ngOptions: String = "", helper: String = "")
 
-<!--Begin form_namevalue.scala.html-->
+
 <div id="@id-display" class="row-settings row-fluid">
   <a href="#" class="action edit">
     <span class="span3">@title</span>
@@ -16,15 +16,12 @@
 <div id="@id-edit" class="row-settings row-fluid hide">
   <span class="span3">@title</span>
   <span class="span4">
-    <input ng-model="@model" type="text"/>
+    <input ng-model="@model" type="@inputType"/>
   </span>
   <span class="span4 help-inline">
     @helper
   </span>
   <span class="span1">
-    <a ng-click='cancel("@model", "@id-edit");' class="action cancel">
-      <i class="icon-remove"> </i>Cancel
-    </a>
+    @form_cancel(model, id)
   </span>
 </div>
-<!--End form_namevalue.scala.html-->

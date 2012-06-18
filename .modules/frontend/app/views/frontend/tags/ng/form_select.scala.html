@@ -1,10 +1,17 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-        "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-  <title></title>
-</head>
-<body>
-
-</body>
-</html>
+@(label: String, model: String, id: String, options: Map[String,String])
+<span class="row-settings row-fluid">
+  <span class="span3">
+    @label
+  </span>
+  <span class="span8">
+  <span>
+    <select type="text">
+      @options.map{option =>
+      <option value="@option._1">@option._2</option>
+      }
+    </select>
+  </span>
+  </span>
+  <span class="span1">
+  </span>
+</span>

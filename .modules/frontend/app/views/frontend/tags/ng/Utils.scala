@@ -8,6 +8,8 @@ package views.frontend.tags.ng
  * To change this template use File | Settings | File Templates.
  */
 
-class Utils {
-
+object Utils {
+  def binding(model: String, id: String) : String = {
+    "{{" + model + id + "}}"
+  }
 }

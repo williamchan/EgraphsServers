@@ -1,0 +1,38 @@
+@(address: String, id: String)
+
+@import views.frontend.tags.ng.Utils
+
+
+<div id="@id-display" class="row-settings row-fluid">
+  <a href="#" class="action edit">
+    <span class="span3">@Utils.binding(address,".title")</span>
+    <span class="span4">@Utils.binding(address,".fullname")</span>
+      <span class="span4">
+        <address>
+          @Utils.binding(address, ".line1")<br>
+          @Utils.binding(address, ".line2")<br ng:show="{{user.address.line2}}">
+          @Utils.binding(address, ".city"), @Utils.binding(address, ".state") @Utils.binding(address, ".zip")
+        </address>
+      </span>
+      <span class="span1">
+        <i class="icon-pencil">
+        </i> Edit
+      </span>
+  </a>
+</div>
+<div id="@id-edit" class="row-settings row-fluid hide">
+  <span class="span1"></span>
+      <span class="span10">
+        <address>
+          @form_input("Name", address,".fullname")
+          @form_input("Address Line 1", address, ".line1")
+          @form_input("Address Line 2", address, ".line2")
+          @form_input("City", address, ".city")
+          @statepicker("State", address, ".state")
+          @form_input("ZIP", address, ".zip")
+        </address>
+      </span>
+      <span class="span1">
+        @form_cancel(address, id)
+      </span>
+</div>

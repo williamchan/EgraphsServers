@@ -1,98 +1,6 @@
 @import views.frontend.tags
+@import views.frontend.tags.ng
 
-@NGcancel(model: String, id:String) = {
-  <a ng-click='cancel("@model", "@id-edit");' class="action cancel">
-    <i class="icon-pencil">
-    </i> Cancel
-  </a>
-}
-@NGBinding(model: String, id: String) = {
-  {{@model@id}}
-}
-@NGInput(model: String, id: String) = {
-<input class="span6" ng-model="@model@id" type="text" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"/>
-}
-
-@NGSelect(model: String, id: String, options: Array[String]) = {
-  <select ng-model="@model@id" type="text">
-    @options.map { option =>
-      <option value="@option">@option</option>
-    }
-  </select>
-}
-@LabeledNGInput(label: String, model: String, id: String) = {
-  <div class="control-group">
-    <label class="control-label ng-label">@label</label>
-    <div class="controls">
-      @NGInput(model, id)
-    </div>
-  </div>
-}
-
-@LabeledNGSelect(label: String, model: String, id: String, options: Array[String]) = {
-<div class="control-group">
-  <label class="control-label ng-label">@label</label>
-  <div class="controls">
-    @NGSelect(model, id, options)
-  </div>
-</div>
-}
-@AddressRow(address: String, id: String)  = {
-  <div id="@id-display" class="row-settings row-fluid">
-    <a href="#" class="action edit">
-      <span class="span3">@NGBinding(address,".title")</span>
-      <span class="span4">@NGBinding(address,".fullname")</span>
-      <span class="span4">
-        <address>
-          @NGBinding(address, ".line1")<br>
-          @NGBinding(address, ".line2")<br ng:show="{{user.address.line2}}">
-          @NGBinding(address, ".city"), @NGBinding(address, ".state") @NGBinding(address, ".zip")
-        </address>
-      </span>
-      <span class="span1">
-        <i class="icon-pencil">
-        </i> Edit
-      </span>
-    </a>
-  </div>
-  <div id="@id-edit" class="row-settings row-fluid hide">
-      <span class="span1"></span>
-      <span class="span10">
-        <address>
-          @LabeledNGInput("Name", address,".fullname")
-          @LabeledNGInput("Address Line 1", address, ".line1")
-          @LabeledNGInput("Address Line 2", address, ".line2")
-          @LabeledNGInput("City", address, ".city")
-          @tags.ng.html.statepicker("State", address, ".state")
-          @LabeledNGInput("ZIP", address, ".zip")
-        </address>
-      </span>
-      <span class="span1">
-        @NGcancel(address, id)
-      </span>
-  </div>
-}
-
-@checkboxRow(label: String, name: String, settings: Map[String, String]) = {
-  <div class="row-settings row-fluid">
-    <span class="span3">
-      @label
-    </span>
-    <span class="span8">
-
-       <span class="control-group">
-         <span class="controls">
-          @settings.map { option =>
-            <label class="checkbox">
-              <input type="checkbox" name="@name" value="@option._1"/>@option._2
-            </label>
-           }
-         </span>
-       </span>
-    </span>
-    <span class="span1"></span>
-  </div>
-}
 
 @baseBody = {
   <section id="content" role="main" ng-controller="Controller">
@@ -105,25 +13,25 @@
         <form name="form" class="form-horizontal">
         <section class="settings-group" id="personal-information">
             <h2>Personal Information</h2>
-              @tags.html.form_namevalue(model = "user.fullname", id = "fullname", title = "Name")
-              @tags.html.form_namevalue(model = "user.username", id = "username",title = "Username", helper="Gallery Url egra.ph/{{user.username}}")
-              @tags.html.form_namevalue(model = "user.email", id = "email", title = "Email")
-              @tags.html.form_namevalue(model = "user.password", id = "password", title = "Password")
-              @LabeledNGSelect(label = "Gallery Visibility", model = "user.gallery.visibility", id="galleryvisibility", Array("public", "private"))
+              @tags.ng.html.form_namevalue(model = "user.fullname", id = "fullname", title = "Name")
+              @tags.ng.html.form_namevalue(model = "user.username", id = "username",title = "Username", helper="Gallery Url egra.ph/{{user.username}}")
+              @tags.ng.html.form_email(model = "user.email", id = "email", title = "Email")
+              @tags.ng.html.form_pwchange(model = "user", id = "password", length= 7)
+              @tags.ng.html.form_select(label = "Gallery Visibility", model = "user.gallery.visibility", id="galleryvisibility", Map(
+                                                                                                                        "public" -> "Public",
+                                                                                                                        "private" -> "Private"))
+
           </section>
 
           <section class="settings-group" id="shipping-address">
             <h2>Shipping Address</h2>
-            @AddressRow(address = "user.address", id ="address")
+            @tags.ng.html.form_address(address = "user.address", id ="address")
             <!--<a href="#" class="add-link"><p>+ Add Another Shipping Address</p></a>-->
           </section>
 
           <section class="settings-group" id="additional-settings">
             <h2>Additional Settings</h2>
-             @checkboxRow(label = "Notices", name = "notice", Map( "new_stars" -> "New Star Additions (Weekly)",
-                                                "news" -> "News",
-                                                "mlb_updates" -> "Updates from Major League Baseball"))
-
+             @tags.ng.html.form_checkbox(label = "Notices", model = "user.notices")
           </section>
           <div class="row-fluid">
             <div class="span9"></div>
