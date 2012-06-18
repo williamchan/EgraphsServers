@@ -12,7 +12,6 @@ import services.signature.{SignatureBiometricsError, YesMaamSignatureBiometricSe
 import services._
 import db.{FilterOneTable, Schema, KeyedCaseClass, Saves}
 import graphics.{Handwriting, HandwritingPen, GraphicsSource}
-import http.PlayConfig
 import java.text.SimpleDateFormat
 import controllers.WebsiteControllers
 import controllers.website.GetCelebrityProductEndpoint
@@ -20,7 +19,6 @@ import com.google.inject.{Provider, Inject}
 import play.utils.HTML.htmlEscape
 import org.squeryl.Query
 import xyzmo.{XyzmoVerifyUserStore, XyzmoVerifyUser}
-import java.util.Properties
 
 /**
  * Vital services for an Egraph to perform its necessary functionality
@@ -46,8 +44,7 @@ case class EgraphServices @Inject() (
   graphicsSourceFactory: () => GraphicsSource,
   voiceBiometrics: VoiceBiometricService,
   signatureBiometrics: SignatureBiometricService,
-  storyServicesProvider: Provider[EgraphStoryServices],
-  @PlayConfig playConfig: Properties
+  storyServicesProvider: Provider[EgraphStoryServices]
 )
 
 /**
@@ -270,11 +267,7 @@ case class Egraph(
         }
     }
 
-    // If admin review is turned off (eg to expedite demos), immediately publish the Egraph
-    services.playConfig.getProperty("adminreview.skip") match {
-      case "true" => withEgraphState(EgraphState.Published)
-      case _ => withEgraphState(newState)
-    }
+    withEgraphState(newState)
   }
 
   //
