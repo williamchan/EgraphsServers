@@ -18,10 +18,10 @@ class CustomerTests extends UnitFlatSpec
   val customerStore = AppConfig.instance[CustomerStore]
 
   //
-  // SavingEntityTests[Account] methods
+  // SavingEntityTests[Customer] methods
   //
   override def newEntity = {
-    Customer(name = "customer")
+    Customer(name = "customer", username = "username")
   }
 
   override def saveEntity(toSave: Customer) = {
@@ -42,11 +42,13 @@ class CustomerTests extends UnitFlatSpec
   // Test cases
   //
   "Customer" should "require certain fields" in {
-    val exception = intercept[IllegalArgumentException] {Customer().save()}
+    var exception = intercept[IllegalArgumentException] {Customer().save()}
     exception.getLocalizedMessage.contains("Customer: name must be specified") should be(true)
+    exception = intercept[IllegalArgumentException] {Customer(name = "name").save()}
+    exception.getLocalizedMessage.contains("Customer: username must be specified") should be(true)
   }
 
-  "A customer" should "produce Orders that are properly configured" in {
+  "buy" should "produce Orders that are properly configured" in {
     val buyer = TestData.newSavedCustomer()
     val recipient = TestData.newSavedCustomer()
     val product = TestData.newSavedProduct()
@@ -66,12 +68,14 @@ class CustomerTests extends UnitFlatSpec
     buyer.buy(product).recipientId should be (buyer.id)
   }
 
-  "buy" should "set inventoryBatchId on the Order" in {
+  "buy" should "set inventoryBatchId and expectedDate on the Order" in {
     val buyer = TestData.newSavedCustomer()
     val recipient = TestData.newSavedCustomer()
     val product = TestData.newSavedProduct()
     val order = buyer.buy(product, recipient = recipient).save()
-    order.inventoryBatchId should be(product.inventoryBatches.head.id)
+    val inventoryBatch = product.inventoryBatches.head
+    order.inventoryBatchId should be(inventoryBatch.id)
+    order.expectedDate.get should be(inventoryBatch.getExpectedDate)
   }
 
   "buy" should "throw InsufficientInventoryException if no inventory is available" in {
@@ -105,5 +109,12 @@ class CustomerTests extends UnitFlatSpec
     val updatedAcct = acct.services.accountStore.findById(acct.id).get
     customer.id should be(updatedAcct.customerId.get)
     customerStore.findOrCreateByEmail(acct.email, "joe fan") should be(customer)
+  }
+
+  "findByUsername" should "find by username case-insensitively" in {
+    val customer = TestData.newSavedCustomer()
+    customerStore.findByUsername(customer.username).get should be(customer)
+    customerStore.findByUsername(customer.username.toUpperCase).get should be(customer)
+    customerStore.findByUsername(customer.username.toLowerCase).get should be(customer)
   }
 }

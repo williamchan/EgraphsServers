@@ -32,6 +32,17 @@ case class Account(
     services.accountStore.save(this)
   }
 
+  /**
+   * Creates a Customer with a default username based on the Account's email. Throws an exception if customerId is defined.
+   *
+   * @param name name of Customer
+   * @return newly created Customer
+   */
+  def createCustomer(name: String): Customer = {
+    require(customerId.isEmpty, "Cannot create Customer on Account that already has one")
+    Customer(name = name, username = email.split("@").head)
+  }
+
   def password: Option[Password] = {
     (passwordHash, passwordSalt) match {
       case (Some(""), Some("")) => None
@@ -107,7 +118,7 @@ object Account {
 /**
  * Services used by each Account object
  */
-case class AccountServices @Inject() (accountStore: AccountStore)
+case class AccountServices @Inject() (accountStore: AccountStore, customerStore: CustomerStore)
 
 class AccountStore @Inject() (schema: Schema) extends Saves[Account] with SavesCreatedUpdated[Account] {
   import org.squeryl.PrimitiveTypeMode._

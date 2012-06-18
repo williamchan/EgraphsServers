@@ -21,6 +21,9 @@ case class CustomerServices @Inject() (accountStore: AccountStore,
 case class Customer(
   id: Long = 0L,
   name: String = "",
+  username: String = "",
+  isGalleryVisible: Boolean = true,
+  notice_stars: Boolean = false,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: CustomerServices = AppConfig.instance[CustomerServices]
@@ -31,6 +34,7 @@ case class Customer(
   //
   def save(): Customer = {
     require(!name.isEmpty, "Customer: name must be specified")
+    require(!username.isEmpty, "Customer: username must be specified")
     services.customerStore.save(this)
   }
 
@@ -59,9 +63,9 @@ case class Customer(
     if (remainingInventory <= 0 || activeInventoryBatches.headOption.isEmpty) throw new InsufficientInventoryException("Must have available inventory to purchase product " + product.id)
 
     val batchToOrderAgainst = services.inventoryBatchStore.selectAvailableInventoryBatch(activeInventoryBatches)
-    val inventoryBatchId = batchToOrderAgainst match {
-      case Some(b) => b.id
-      case _ => 0L // todo(wchan): Do we want to permit the order to go through?
+    val (inventoryBatchId, expectedDate) = batchToOrderAgainst match {
+      case Some(b) => (b.id, Option(b.getExpectedDate))
+      case _ => (0L, None) // todo(wchan): Do we want to permit the order to go through?
     }
 
     Order(
@@ -72,7 +76,8 @@ case class Customer(
       recipientName = recipientName,
       messageToCelebrity = messageToCelebrity,
       requestedMessage = requestedMessage,
-      inventoryBatchId = inventoryBatchId
+      inventoryBatchId = inventoryBatchId,
+      expectedDate = expectedDate
     )
   }
 
@@ -137,19 +142,20 @@ class CustomerStore @Inject() (
 
     customerOption match {
       // Customer already existed
-      case Some(customer) =>
-        customer
+      case Some(customer) => customer
 
       // Customer face didn't exist. Use existing or new Account to create
       // the face and return it.
       case None =>
-        val customer = Customer(name=name, services=customerServices.get).save()
         val account = accountOption.getOrElse(Account(email=email, services=accountServices.get))
-
+        val customer = account.createCustomer(name).save()
         account.copy(customerId=Some(customer.id)).save()
-
         customer
     }
+  }
+
+  def findByUsername(username: String): Option[Customer] = {
+    from(schema.customers)((customer) => where(lower(customer.username) === username.toLowerCase) select (customer)).headOption
   }
 
   //

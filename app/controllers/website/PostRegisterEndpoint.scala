@@ -50,7 +50,7 @@ private[controllers] trait PostRegisterEndpoint {
       }
 
       val account = passwordValidationOrAccount.right.get
-      val customer = Customer(name = name).save()
+      val customer = account.createCustomer(name).save()
       account.copy(customerId = Some(customer.id)).save()
       customer
     }

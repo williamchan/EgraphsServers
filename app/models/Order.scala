@@ -14,6 +14,7 @@ import org.squeryl.Query
 import models.CashTransaction.{PurchaseRefund, EgraphPurchase}
 import org.apache.commons.mail.{Email, HtmlEmail}
 import scala.util.Random
+import java.util.Date
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -46,6 +47,7 @@ case class Order(
   amountPaidInCurrency: BigDecimal = 0,
   messageToCelebrity: Option[String] = None,
   requestedMessage: Option[String] = None,
+  expectedDate: Option[Date] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: OrderServices = AppConfig.instance[OrderServices]
@@ -346,6 +348,7 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
       theOld.recipientName := theNew.recipientName,
       theOld.messageToCelebrity := theNew.messageToCelebrity,
       theOld.requestedMessage := theNew.requestedMessage,
+      theOld.expectedDate := theNew.expectedDate,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated
     )

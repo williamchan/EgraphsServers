@@ -40,6 +40,10 @@ with DBTransactionPerTest {
   //
   // Test cases
   //
+  "getExpectedDate" should "return a Date 7 days after endDate" in {
+    newEntity.getExpectedDate should be(TestData.jan_08_2012)
+  }
+
   "findByCelebrity" should "filter by activeOnly when composed with filter" in {
     val celebrity = TestData.newSavedCelebrity()
 
