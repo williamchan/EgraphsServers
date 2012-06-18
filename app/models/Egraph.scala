@@ -276,8 +276,8 @@ case class Egraph(
   override def unapplied = { Egraph.unapply(this) }
 
 
-  override def withEgraphState(status: EnumVal) = {
-    copy(_egraphState = status.name)
+  override def withEgraphState(enum: EnumVal) = {
+    copy(_egraphState = enum.name)
   }
 
   private object Assets extends EgraphAssets {

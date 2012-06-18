@@ -34,5 +34,5 @@ trait HasEgraphState[T] {
     )
   }
 
-  def withEgraphState(status: EgraphState.EnumVal): T
+  def withEgraphState(enum: EgraphState.EnumVal): T
 }

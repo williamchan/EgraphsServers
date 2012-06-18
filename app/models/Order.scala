@@ -42,6 +42,7 @@ case class Order(
   _reviewStatus: String = OrderReviewStatus.PendingAdminReview.name,
   rejectionReason: Option[String] = None,
   _privacyStatus: String = PrivacyStatus.Public.name,
+  _orderType: String = OrderType.SignatureWithMessage.name,
   stripeCardTokenId: Option[String] = None,
   stripeChargeId: Option[String] = None,
   amountPaidInCurrency: BigDecimal = 0,
@@ -56,6 +57,7 @@ case class Order(
   with HasPrivacyStatus[Order]
   with HasPaymentStatus[Order]
   with HasOrderReviewStatus[Order]
+  with HasOrderType[Order]
 {
   //
   // Public methods
@@ -203,7 +205,8 @@ case class Order(
       "recipientName" -> recipientName,
       "amountPaidInCents" -> amountPaid.getAmountMinor,
       "reviewStatus" -> reviewStatus.name,
-      "audioPrompt" -> generateAudioPrompt()
+      "audioPrompt" -> generateAudioPrompt(),
+      "orderType" -> orderType.name
     )
 
     val optionalFields = Utils.makeOptionalFieldMap(
@@ -245,6 +248,10 @@ case class Order(
 
   override def withReviewStatus(status: OrderReviewStatus.EnumVal) = {
     this.copy(_reviewStatus = status.name)
+  }
+
+  def withOrderType(enum: OrderType.EnumVal) = {
+    this.copy(_orderType = enum.name)
   }
 }
 
@@ -341,6 +348,7 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
       theOld._reviewStatus := theNew._reviewStatus,
       theOld.rejectionReason := theNew.rejectionReason,
       theOld._privacyStatus := theNew._privacyStatus,
+      theOld._orderType := theNew._orderType,
       theOld.stripeCardTokenId := theNew.stripeCardTokenId,
       theOld.stripeChargeId := theNew.stripeChargeId,
       theOld.amountPaidInCurrency := theNew.amountPaidInCurrency,
