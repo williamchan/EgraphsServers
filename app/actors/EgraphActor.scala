@@ -19,7 +19,7 @@ import java.util.Properties
  * @param egraphStore a store for accessing egraphs from persistence
  * @param logging for generating useful logs.
  */
-class EgraphActor @Inject() (
+case class EgraphActor @Inject() (
   db: DBSession,
   egraphStore: EgraphStore,
   logging: LoggingContext,

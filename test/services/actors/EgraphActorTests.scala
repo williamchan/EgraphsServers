@@ -12,7 +12,6 @@ import akka.util.TestKit
 import org.scalatest.BeforeAndAfterAll
 import utils.{TestData, ClearsDatabaseAndValidationBefore, TestConstants}
 import models.enums.EgraphState
-import services.logging.LoggingContext
 
 class EgraphActorTests extends UnitFlatSpec
 with ShouldMatchers
@@ -23,7 +22,6 @@ with TestKit {
   private val egraphActor = actorOf(AppConfig.instance[EgraphActor])
   private val egraphStore = AppConfig.instance[EgraphStore]
   private val db = AppConfig.instance[DBSession]
-  private val logging = AppConfig.instance[LoggingContext]
 
   override protected def beforeAll() {
     egraphActor.start()
@@ -71,7 +69,7 @@ with TestKit {
         .save()
     }
 
-    val actor = actorOf(new EgraphActor(playConfig=Utils.properties("adminreview.skip" -> "true"), egraphStore = egraphStore, db = db, logging = logging))
+    val actor = actorOf(AppConfig.instance[EgraphActor].copy(playConfig=Utils.properties("adminreview.skip" -> "true")))
     actor.start()
     actor !! ProcessEgraphMessage(egraph.id)
     db.connected(TransactionSerializable) {
