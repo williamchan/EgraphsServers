@@ -15,8 +15,9 @@ class CustomerLoginForm(val paramsMap: Form.Readable, check: FormChecks)
   extends Form[CustomerLoginForm.Validated]
 {
   import CustomerLoginForm.Fields
+
   //
-  // Fields and validations
+  // Field values and validations
   //
   val email = new RequiredField[String](Fields.Email.name) {
     def validateIfPresent = {
@@ -30,6 +31,8 @@ class CustomerLoginForm(val paramsMap: Form.Readable, check: FormChecks)
     }
   }
 
+  // customerId is a field derived from the other two, which means it has no entry
+  // in the paramsMap
   val customerId = new DerivedField[Long] {
     def validate = {
       for (validEmail <- check.dependentFieldIsValid(email).right;
@@ -73,13 +76,25 @@ object CustomerLoginForm {
 }
 
 
+/**
+ * Factory that reads the CustomerLoginForm from either the request parameters (for a POST)
+ * or the flash (for a redirected GET)
+ *
+ * @param formChecks checks used to validate the POST.
+ */
 class CustomerLoginFormFactory @Inject()(formChecks: FormChecks)
   extends ReadsForm[CustomerLoginForm]
 {
+  //
+  // Public members
+  //
   def apply(readable: Form.Readable): CustomerLoginForm = {
     new CustomerLoginForm(readable, formChecks)
   }
 
+  //
+  // ReadsForm[CustomerLoginForm] members
+  //
   def instantiateAgainstReadable(readable: Form.Readable): CustomerLoginForm = {
     apply(readable)
   }

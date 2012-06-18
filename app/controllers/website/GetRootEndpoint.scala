@@ -9,7 +9,6 @@ import models.{CelebrityStore, Celebrity}
 private[controllers] trait GetRootEndpoint { this: Controller =>
   import GetRootEndpoint.ModelViewConversions._
 
-
   protected def controllerMethod: ControllerMethod
   protected def celebrityStore: CelebrityStore
 

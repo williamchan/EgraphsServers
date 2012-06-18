@@ -11,7 +11,7 @@ import play.mvc.results.Redirect
 import services.db.DBSession
 import services.social.FacebookAppId
 import services.http._
-import forms.{CustomerLoginFormFactory, FormChecks}
+import forms.{CustomerLoginFormFactory}
 import java.util.Properties
 import services.Utils
 
@@ -27,7 +27,6 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val playConfig = annotatedInstance[PlayConfig, Properties]
   override protected val facebookAppId = annotatedInstance[FacebookAppId, String]
 
-  override protected def formChecks = instance[FormChecks]
   override protected def customerLoginForms = instance[CustomerLoginFormFactory]
 
   override protected val dbSession = instance[DBSession]

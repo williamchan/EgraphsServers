@@ -5,6 +5,12 @@ import services.http.forms.FormError
 
 /**
  * Converts back-end models of forms into front-end models
+ * Usage:
+ * {{{
+ *   import FormConversions._
+ *
+ *   render_scala_tempalte(myFormField.asViewField)
+ * }}}
  */
 object FormConversions {
   import models.frontend.{forms => formsview}
