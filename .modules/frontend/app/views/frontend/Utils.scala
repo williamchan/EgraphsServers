@@ -26,4 +26,12 @@ object Utils {
 
     attributeStrings.mkString(" ")
   }
+
+  /**
+   *  Returns a string for an angular.js binding
+   *
+   **/
+  def binding(model: String, id: String) : String = {
+    "{{" + model + id + "}}"
+  }
 }

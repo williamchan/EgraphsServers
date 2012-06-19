@@ -1,4 +1,4 @@
-@(title: String, body: => Html)
+@(title: String, jsMain: String = "", body: => Html)
 
 @import views.frontend.tags
 
@@ -29,6 +29,8 @@
 		<script src='@asset("public/javascripts/modernizr.custom.js")'></script>
 		<script src="https://use.typekit.com/ztt6ynw.js"></script>
 		<script>try{Typekit.load();}catch(e){}</script>
+    <script>var Egraphs = Egraphs || {};
+            Egraphs.jsMain = "@jsMain";</script>
   
   </head>
 

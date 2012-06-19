@@ -5,7 +5,7 @@
 
 
 @baseBody = {
-  <section id="content" role="main" ng-controller="Controller">
+  <section ng-cloak id="content" role="main" ng-controller="Controller">
     <div id="main">
       <div class="container" id="settings-page">
 
@@ -44,4 +44,4 @@
     </div>
   </section>
 }
-@base_template(title="Your Account", body=baseBody)
+@base_template(title="Your Account", jsMain = "settings", body=baseBody)
