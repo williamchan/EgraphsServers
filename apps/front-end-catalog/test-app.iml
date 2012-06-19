@@ -3,8 +3,6 @@
   <component name="FacetManager">
     <facet type="scala" name="Scala">
       <configuration>
-        <option name="compilerLibraryLevel" value="Global" />
-        <option name="compilerLibraryName" value="scala-compiler-2.8.1" />
         <option name="fsc" value="true" />
       </configuration>
     </facet>
@@ -16,10 +14,8 @@
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/tmp/generated" isTestSource="false" />
     </content>
-    <content url="file://$MODULE_DIR$/modules/cloudbees-0.2.2" />
     <content url="file://$MODULE_DIR$/modules/less-0.9.1" />
-    <content url="file://$MODULE_DIR$/modules/mockito-0.1" />
-    <content url="file://$MODULE_DIR$/../../modules/frontend">
+    <content url="file://$MODULE_DIR$/../website/../../modules/frontend">
       <sourceFolder url="file://$MODULE_DIR$/../../modules/frontend/app" isTestSource="false" />
     </content>
     <content url="file://$PLAY_HOME$/modules/scala-0.9.1">
@@ -31,23 +27,16 @@
     <orderEntry type="module-library">
       <library name="Project Libraries">
         <CLASSES>
-          <root url="file://$MODULE_DIR$/lib" />
           <root url="file://$MODULE_DIR$/modules/less-0.9.1/src" />
-          <root url="file://$MODULE_DIR$/modules/mockito-0.1/src" />
-          <root url="file://$MODULE_DIR$/modules/cloudbees-0.2.2/src" />
           <root url="file://$PLAY_HOME$/modules/scala-0.9.1/src" />
           <root url="file://$MODULE_DIR$/../../modules/frontend/src" />
           <root url="file://$MODULE_DIR$/modules/less-0.9.1/lib" />
-          <root url="file://$MODULE_DIR$/modules/mockito-0.1/lib" />
-          <root url="file://$MODULE_DIR$/modules/cloudbees-0.2.2/lib" />
           <root url="file://$PLAY_HOME$/modules/scala-0.9.1/lib" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
         <jarDirectory url="file://$MODULE_DIR$/lib" recursive="false" />
-        <jarDirectory url="file://$MODULE_DIR$/modules/cloudbees-0.2.2/lib" recursive="false" />
         <jarDirectory url="file://$MODULE_DIR$/modules/less-0.9.1/lib" recursive="false" />
-        <jarDirectory url="file://$MODULE_DIR$/modules/mockito-0.1/lib" recursive="false" />
         <jarDirectory url="file://$PLAY_HOME$/modules/scala-0.9.1/lib" recursive="false" />
       </library>
     </orderEntry>

@@ -10,7 +10,7 @@ All the work you intend to use in production should happen in
 scripting and styling.
 
 When you're ready to get hacking, you should open the test application
-using `test-app/run-test-server.command` and access the site on the
+using `front-end-catalog/run-test-server.command` and access the site on the
 port you specify at the prompt.
 
 Some things to help you:

@@ -1,6 +1,6 @@
 //
 // Controllers for testing the views you write in .modules/frontend/app/views
-// Use alongside .modules/frontend/app/test-app/conf/routes to render your pages.
+// Use alongside apps/front-end-catalog/conf/routes to render your pages.
 //
 package controllers
 
