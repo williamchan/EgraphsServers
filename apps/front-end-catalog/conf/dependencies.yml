@@ -1,7 +1,7 @@
 # Application dependencies
 
 require:
-    - project-modules -> frontend project
+    - egraphs-modules -> frontend HEAD
     - play        
     - play -> scala 0.9.1
     - play -> less 0.9.1
@@ -9,6 +9,6 @@ require:
 repositories:
     - Module Folder:
         type:       local
-        artifact:   ${application.path}/../../[module]
+        artifact:   ${application.path}/../../modules/[module]
         contains:
-            - project-modules
+            - egraphs-modules
