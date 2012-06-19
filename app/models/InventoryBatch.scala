@@ -8,6 +8,7 @@ import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
 import java.util.Date
 import org.squeryl.dsl.ManyToMany
+import org.joda.time.DateTime
 
 case class InventoryBatchServices @Inject()(store: InventoryBatchStore,
                                             productStore: ProductStore,
@@ -28,6 +29,13 @@ case class InventoryBatch(
 
   def celebrity: Celebrity = {
     services.celebStore.get(celebrityId)
+  }
+
+  /**
+   * @return Date 7 days after endDate
+   */
+  def getExpectedDate: Date = {
+    new DateTime(endDate).plusDays(7).toDate
   }
 
   //

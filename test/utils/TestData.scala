@@ -17,6 +17,7 @@ object TestData {
 
   val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
   lazy val jan_01_2012 = dateFormat.parse("2012-01-01")
+  lazy val jan_08_2012 = dateFormat.parse("2012-01-08")
   lazy val feb_01_2012 = dateFormat.parse("2012-02-01")
   lazy val today = DateTime.now().toLocalDate.toDate
   lazy val tomorrow = new DateTime().plusDays(1).toLocalDate.toDate
@@ -32,6 +33,16 @@ object TestData {
 
   def generateEmail(prefix: String = ""): String = {
     prefix + getTimeInBlobstoreFormat + "@egraphs.com"
+  }
+
+  def newSavedAddress(account: Option[Account] = None): Address = {
+    Address(accountId = account.getOrElse(newSavedAccount()).id,
+      addressLine1 = "615 2nd Ave",
+      addressLine2 = "Suite 300",
+      city = "Seattle",
+      state = "WA",
+      postalCode = "98104"
+    ).save()
   }
 
   def newSavedAccount(): Account = {
@@ -52,10 +63,8 @@ object TestData {
 
   def newSavedCustomer(): Customer = {
     val acct = Account(email = generateEmail(prefix = "customer-")).withPassword(defaultPassword).right.get.save()
-    val cust = Customer(name = "testcustomer").save()
-
+    val cust = acct.createCustomer(name = "Test Customer").save()
     acct.copy(customerId = Some(cust.id)).save()
-
     cust
   }
 

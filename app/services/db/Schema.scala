@@ -28,9 +28,21 @@ class Schema @Inject()(
   import uk.me.lings.scalaguice.InjectorExtensions._
 
   //
+  // Addresses
+  //
+  val addresses = table[Address]
+  on(addresses)(address =>
+    declare(
+      address.state is (dbType("varchar(2)")),
+      address.postalCode is (dbType("varchar(20)"))
+    )
+  )
+
+  //
   // Customers
   //
   val customers = table[Customer]
+  on(customers)(customer => declare(customer.username is unique))
 
   //
   // Celebrities
@@ -53,21 +65,22 @@ class Schema @Inject()(
   // Cash transactions
   //
   val cashTransactions = table[CashTransaction]
-  on(cashTransactions)(cashTransaction =>
-    declare(cashTransaction.amountInCurrency is monetaryDbType)
-  )
+  on(cashTransactions)(cashTransaction => declare(cashTransaction.amountInCurrency is monetaryDbType))
 
   //
   // Accounts
   //
   val accounts = table[Account]
-  on(accounts)(account => declare(account.email is (unique)))
+  on(accounts)(account => declare(account.email is unique))
 
   val accountToCustomer = oneAccountPerRowOn(customers, (account) => account.customerId)
   val accountToAdministrator = oneAccountPerRowOn(administrators, (acct) => acct.administratorId)
   val accountToCelebrity = oneAccountPerRowOn(celebrities, (account) => account.celebrityId)
   val accountToTransaction = oneToManyRelation(accounts, cashTransactions).via(
     (account, cashTransaction) => account.id === cashTransaction.accountId)
+  val accountToAddress = oneToManyRelation(accounts, addresses).via(
+    (account, address) => account.id === address.accountId)
+
 
   //
   // Products
@@ -110,11 +123,7 @@ class Schema @Inject()(
   // Egraphs
   //
   val egraphs = table[Egraph]
-  on(egraphs)(egraph =>
-    declare(
-      columns(egraph.orderId, egraph._egraphState) are (indexed)
-    )
-  )
+  on(egraphs)(egraph => declare(columns(egraph.orderId, egraph._egraphState) are indexed))
 
   val orderToEgraphs = oneToManyRelation(orders, egraphs)
     .via((order, egraph) => order.id === egraph.orderId)
@@ -153,7 +162,7 @@ class Schema @Inject()(
   celebrityToEnrollmentBatches.foreignKeyDeclaration.constrainReference(onDelete cascade)
   on(enrollmentBatches)(enrollmentBatch =>
     declare(
-      columns(enrollmentBatch.celebrityId, enrollmentBatch.isBatchComplete, enrollmentBatch.isSuccessfulEnrollment) are (indexed)
+      columns(enrollmentBatch.celebrityId, enrollmentBatch.isBatchComplete, enrollmentBatch.isSuccessfulEnrollment) are indexed
     )
   )
 
@@ -203,31 +212,19 @@ class Schema @Inject()(
   val enrollmentBatchToXyzmoDeleteUserTable = oneToManyRelation(enrollmentBatches, xyzmoDeleteUserTable)
     .via((enrollmentBatch, xyzmoDeleteUser) => enrollmentBatch.id === xyzmoDeleteUser.enrollmentBatchId)
   enrollmentBatchToXyzmoDeleteUserTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
-  on(xyzmoDeleteUserTable)(xyzmoDeleteUser =>
-    declare(
-      xyzmoDeleteUser.errorMsg is (dbType("varchar(255)"))
-    )
-  )
+  on(xyzmoDeleteUserTable)(xyzmoDeleteUser => declare(xyzmoDeleteUser.errorMsg is dbType("varchar(255)")))
 
   val xyzmoAddUserTable = table[XyzmoAddUser]
   val enrollmentBatchToXyzmoAddUserTable = oneToManyRelation(enrollmentBatches, xyzmoAddUserTable)
     .via((enrollmentBatch, xyzmoAddUser) => enrollmentBatch.id === xyzmoAddUser.enrollmentBatchId)
   enrollmentBatchToXyzmoAddUserTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
-  on(xyzmoAddUserTable)(xyzmoAddUser =>
-    declare(
-      xyzmoAddUser.errorMsg is (dbType("varchar(255)"))
-    )
-  )
+  on(xyzmoAddUserTable)(xyzmoAddUser => declare(xyzmoAddUser.errorMsg is dbType("varchar(255)")))
 
   val xyzmoAddProfileTable = table[XyzmoAddProfile]
   val enrollmentBatchToXyzmoAddProfileTable = oneToManyRelation(enrollmentBatches, xyzmoAddProfileTable)
     .via((enrollmentBatch, xyzmoAddProfile) => enrollmentBatch.id === xyzmoAddProfile.enrollmentBatchId)
   enrollmentBatchToXyzmoAddProfileTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
-  on(xyzmoAddProfileTable)(xyzmoAddProfile =>
-    declare(
-      xyzmoAddProfile.errorMsg is (dbType("varchar(255)"))
-    )
-  )
+  on(xyzmoAddProfileTable)(xyzmoAddProfile => declare(xyzmoAddProfile.errorMsg is dbType("varchar(255)")))
 
   val xyzmoEnrollDynamicProfileTable = table[XyzmoEnrollDynamicProfile]
   val enrollmentBatchToXyzmoEnrollDynamicProfileTable = oneToManyRelation(enrollmentBatches, xyzmoEnrollDynamicProfileTable)
@@ -246,11 +243,7 @@ class Schema @Inject()(
   val egraphToXyzmoVerifyUserTable = oneToManyRelation(egraphs, xyzmoVerifyUserTable)
     .via((egraph, xyzmoVerifyUser) => egraph.id === xyzmoVerifyUser.egraphId)
   egraphToXyzmoVerifyUserTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
-  on(xyzmoVerifyUserTable)(xyzmoVerifyUser =>
-    declare(
-      xyzmoVerifyUser.errorMsg is (dbType("varchar(255)"))
-    )
-  )
+  on(xyzmoVerifyUserTable)(xyzmoVerifyUser => declare(xyzmoVerifyUser.errorMsg is dbType("varchar(255)")))
 
   //
   // Public methods
@@ -378,6 +371,7 @@ class Schema @Inject()(
   override def callbacks = {
     Seq(
       factoryFor(accounts) is Account(services = injector.instance[AccountServices]),
+      factoryFor(addresses) is Address(services = injector.instance[AddressServices]),
       factoryFor(cashTransactions) is CashTransaction(services = injector.instance[CashTransactionServices]),
       factoryFor(celebrities) is Celebrity(services = injector.instance[CelebrityServices]),
       factoryFor(customers) is Customer(services = injector.instance[CustomerServices]),

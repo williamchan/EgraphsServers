@@ -30,6 +30,7 @@ class AppConfig extends AbstractModule with ScalaModule {
 
     // Model services
     bind[AccountServices].in[Singleton]
+    bind[AddressServices].in[Singleton]
     bind[CashTransactionServices].in[Singleton]
     bind[CustomerServices].in[Singleton]
     bind[CelebrityServices].in[Singleton]

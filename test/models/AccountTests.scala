@@ -129,6 +129,17 @@ class AccountTests extends UnitFlatSpec
     accountStore.findByEmail("derp@derp.com") should be(Some(stored))
   }
 
+  "createCustomer" should "create Customer with username based on email" in {
+    val account = TestData.newSavedAccount()
+    val customer = account.createCustomer("Test User").save()
+    account.email.contains(customer.username) should be(true)
+  }
+
+  "createCustomer" should "throw exception if called on account that already has a customer" in {
+    val customer = TestData.newSavedCustomer()
+    intercept[IllegalArgumentException] {customer.account.createCustomer("Another User")}
+  }
+
   "findByEmail" should "find by email case-insensitively" in {
     val stored = Account(email = "derp@derp.com").save()
     accountStore.findByEmail("DERP@DERP.COM") should be(Some(stored))
@@ -173,7 +184,7 @@ class AccountStoreTests extends UnitFlatSpec
       passwordHash = Some(TestData.defaultPassword),
       passwordSalt = Some(TestData.defaultPassword),
       celebrityId = Some(Celebrity().save().id),
-      customerId = Some(Customer(name = "name").save().id),
+      customerId = Some(Customer(name = "name", username = "username").save().id),
       administratorId = Some(Administrator().save().id)
     )
   }
