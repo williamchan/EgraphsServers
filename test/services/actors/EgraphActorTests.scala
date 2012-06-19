@@ -6,8 +6,8 @@ import actors.{ProcessEgraphMessage, EgraphActor}
 import akka.actor.Actor
 import Actor._
 import services.db.{DBSession, TransactionSerializable}
-import services.AppConfig
-import models.{Egraph, EgraphStore}
+import services.{Utils, AppConfig}
+import models.EgraphStore
 import akka.util.TestKit
 import org.scalatest.BeforeAndAfterAll
 import utils.{TestData, ClearsDatabaseAndValidationBefore, TestConstants}
@@ -20,6 +20,8 @@ with ClearsDatabaseAndValidationBefore
 with TestKit {
 
   private val egraphActor = actorOf(AppConfig.instance[EgraphActor])
+  private val egraphStore = AppConfig.instance[EgraphStore]
+  private val db = AppConfig.instance[DBSession]
 
   override protected def beforeAll() {
     egraphActor.start()
@@ -36,16 +38,14 @@ with TestKit {
   }
 
   it should "process Egraph" in {
-    var egraph1: Egraph = null
-    var egraph2: Egraph = null
-    AppConfig.instance[DBSession].connected(TransactionSerializable) {
-      egraph1 = TestData.newSavedOrder()
+    val egraph1 = db.connected(TransactionSerializable) {
+      TestData.newSavedOrder()
         .newEgraph
         .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.fakeAudio)
         .save()
     }
-    AppConfig.instance[DBSession].connected(TransactionSerializable) {
-      egraph2 = TestData.newSavedOrder()
+    val egraph2 = db.connected(TransactionSerializable) {
+      TestData.newSavedOrder()
         .newEgraph
         .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.fakeAudio)
         .save()
@@ -55,10 +55,25 @@ with TestKit {
 
     egraphActor !! ProcessEgraphMessage(egraph1.id)
     egraphActor !! ProcessEgraphMessage(egraph2.id)
-    AppConfig.instance[DBSession].connected(TransactionSerializable) {
-      val egraphStore = AppConfig.instance[EgraphStore]
-      egraphStore.findById(egraph1.id).get.egraphState should be(EgraphState.Published)
-      egraphStore.findById(egraph2.id).get.egraphState should be(EgraphState.Published)
+    db.connected(TransactionSerializable) {
+      egraphStore.get(egraph1.id).egraphState should be(EgraphState.PassedBiometrics)
+      egraphStore.get(egraph2.id).egraphState should be(EgraphState.PassedBiometrics)
+    }
+  }
+
+  it should "immediately publish an Egraph if play config's adminreview.skip is true" in {
+    val egraph = db.connected(TransactionSerializable) {
+      TestData.newSavedOrder()
+        .newEgraph
+        .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.fakeAudio)
+        .save()
+    }
+
+    val actor = actorOf(AppConfig.instance[EgraphActor].copy(playConfig=Utils.properties("adminreview.skip" -> "true")))
+    actor.start()
+    actor !! ProcessEgraphMessage(egraph.id)
+    db.connected(TransactionSerializable) {
+      egraphStore.get(egraph.id).egraphState should be(EgraphState.Published)
     }
   }
 

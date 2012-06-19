@@ -1,11 +1,13 @@
 package models
 
+import enums.OrderReviewStatus
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.BeforeAndAfterEach
 import play.test.UnitFlatSpec
 import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationBefore, CreatedUpdatedEntityTests, SavingEntityTests, TestData}
-import services.{Time, AppConfig}
+import services.{Utils, Time, AppConfig}
 import exception.InsufficientInventoryException
+import java.util
 
 class CustomerTests extends UnitFlatSpec
   with ShouldMatchers
@@ -18,10 +20,10 @@ class CustomerTests extends UnitFlatSpec
   val customerStore = AppConfig.instance[CustomerStore]
 
   //
-  // SavingEntityTests[Customer] methods
+  // SavingEntityTests[Account] methods
   //
   override def newEntity = {
-    Customer(name = "customer", username = "username")
+    Customer(name = "customer")
   }
 
   override def saveEntity(toSave: Customer) = {
@@ -42,16 +44,12 @@ class CustomerTests extends UnitFlatSpec
   // Test cases
   //
   "Customer" should "require certain fields" in {
-    var exception = intercept[IllegalArgumentException] {Customer().save()}
+    val exception = intercept[IllegalArgumentException] {Customer().save()}
     exception.getLocalizedMessage.contains("Customer: name must be specified") should be(true)
-    exception = intercept[IllegalArgumentException] {Customer(name = "name").save()}
-    exception.getLocalizedMessage.contains("Customer: username must be specified") should be(true)
   }
 
-  "buy" should "produce Orders that are properly configured" in {
-    val buyer = TestData.newSavedCustomer()
-    val recipient = TestData.newSavedCustomer()
-    val product = TestData.newSavedProduct()
+  "A customer" should "produce Orders that are properly configured" in {
+    val (buyer, recipient, product) = savedBuyerRecipientAndProduct()
 
     val order = buyer.buy(product, recipient=recipient)
 
@@ -62,26 +60,34 @@ class CustomerTests extends UnitFlatSpec
   }
 
   it should "make itself the recipient if no recipient is specified" in {
-    val buyer = TestData.newSavedCustomer()
-    val product = TestData.newSavedProduct()
+    val (buyer, _, product) = savedBuyerRecipientAndProduct()
 
     buyer.buy(product).recipientId should be (buyer.id)
   }
 
-  "buy" should "set inventoryBatchId and expectedDate on the Order" in {
-    val buyer = TestData.newSavedCustomer()
-    val recipient = TestData.newSavedCustomer()
-    val product = TestData.newSavedProduct()
+  "buy" should "set inventoryBatchId on the Order" in {
+    val (buyer, recipient, product) = savedBuyerRecipientAndProduct()
+
     val order = buyer.buy(product, recipient = recipient).save()
-    val inventoryBatch = product.inventoryBatches.head
-    order.inventoryBatchId should be(inventoryBatch.id)
-    order.expectedDate.get should be(inventoryBatch.getExpectedDate)
+    order.inventoryBatchId should be(product.inventoryBatches.head.id)
+  }
+
+  "buy" should "create an order whose approval status depends on play config's adminreview.skip" in {
+    // Set up
+    val (buyer, recipient, product) = savedBuyerRecipientAndProduct()
+
+    val buyerWithAdminSkip = buyer.copy(
+      services=buyer.services.copy(playConfig=Utils.properties("adminreview.skip" -> "true"))
+    )
+
+    // Run tests
+    buyer.buy(product, recipient=recipient).reviewStatus should be (OrderReviewStatus.PendingAdminReview)
+    buyerWithAdminSkip.buy(product, recipient=recipient).reviewStatus should be (OrderReviewStatus.ApprovedByAdmin)
   }
 
   "buy" should "throw InsufficientInventoryException if no inventory is available" in {
-    val buyer = TestData.newSavedCustomer()
-    val recipient = TestData.newSavedCustomer()
-    val product = TestData.newSavedProduct()
+    val (buyer, recipient, product) = savedBuyerRecipientAndProduct()
+
     val inventoryBatch = product.inventoryBatches.head.copy(numInventory = 1).save()
 
     // first one should pass
@@ -111,10 +117,7 @@ class CustomerTests extends UnitFlatSpec
     customerStore.findOrCreateByEmail(acct.email, "joe fan") should be(customer)
   }
 
-  "findByUsername" should "find by username case-insensitively" in {
-    val customer = TestData.newSavedCustomer()
-    customerStore.findByUsername(customer.username).get should be(customer)
-    customerStore.findByUsername(customer.username.toUpperCase).get should be(customer)
-    customerStore.findByUsername(customer.username.toLowerCase).get should be(customer)
+  private def savedBuyerRecipientAndProduct(): (Customer, Customer, Product) = {
+    (TestData.newSavedCustomer(), TestData.newSavedCustomer(), TestData.newSavedProduct())
   }
 }
