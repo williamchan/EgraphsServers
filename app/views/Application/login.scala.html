@@ -1,5 +1,5 @@
-@(errorFields: Option[List[String]], fbOauthUrl: String
-)(implicit session: play.mvc.Scope.Session)
+@(form: models.frontend.login_page.LoginForm, 
+  fbOauthUrl: String)(implicit session: play.mvc.Scope.Session)
 
 @import controllers.WebsiteControllers
 @import services.Utils.lookupUrl
@@ -25,29 +25,38 @@
         <fieldset>
           @authenticityToken()
           <legend>Login</legend>
-          <div class="clearfix">
-            <label for="email">Email</label>
+          <div class="clearfix @form.email.ifError {error}">
+            <label for="@form.email.name">Email</label>
             <div class="input">
-              <input class="span4" id="email" name="email" type="text">
+              <input class="span4"
+                     id="@form.email.name"
+                     name="@form.email.name"
+                     type="text"
+                     value="@form.email.value">
+              <span class="help-inline">@form.email.error</span>
             </div>
           </div>
-          <div class="clearfix">
-            <label for="password">Password</label>
+          <div class="clearfix @form.password.ifError {error}">
+            <label for="@form.password.name">Password</label>
             <div class="input">
-              <input class="span4" id="password" name="password" type="password">
+              <input class="span4" id="form.password" name="@form.password.name" type="password">
+              <span class="help-inline">@form.password.error</span>
             </div>
           </div>
           <div class="actions">
             <button type="submit" id="submit-button" class="btn large primary fade in">Login</button>
-            @errorMessage(errorFields)
-          </div>
+            <div class="form-errors alert-message block-message @if(!form.generalErrors.isEmpty) {alert-message-has-errors}">
+              <ul>
+                @for(error <- form.generalErrors) {
+                  <li>@error</li>
+                }
+              </ul>
+            </div>
         </fieldset>
       </form>
     </div>
   </div>
-  <a class="preview-link" href="/account/recover">
-    Forgot your password?
-  </a>
+  <a class="preview-link" href="/account/recover">Forgot your password?</a>
   <div id="facebook">
     <a class='fb_signup sprite' href=@fbOauthUrl>Login With Facebook</a>
   </div>

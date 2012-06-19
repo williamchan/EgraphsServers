@@ -6,13 +6,14 @@ import services.mail.Mail
 import services.payment.Payment
 import play.mvc.{Router, Controller}
 import models._
-import services.Utils
 import play.mvc.Router.ActionDefinition
 import play.mvc.results.Redirect
 import services.db.DBSession
 import services.social.FacebookAppId
 import services.http._
+import forms.{CustomerLoginFormFactory}
 import java.util.Properties
+import services.Utils
 
 object WebsiteControllers extends Controller with AllWebsiteEndpoints
 {
@@ -25,6 +26,8 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   // Provide endpoint dependencies
   override protected val playConfig = annotatedInstance[PlayConfig, Properties]
   override protected val facebookAppId = annotatedInstance[FacebookAppId, String]
+
+  override protected def customerLoginForms = instance[CustomerLoginFormFactory]
 
   override protected val dbSession = instance[DBSession]
   override protected val controllerMethod = instance[ControllerMethod]

@@ -1,6 +1,6 @@
 package utils
 
-import services.Time
+import services.{AppConfig, Time}
 import java.io.File
 import play.Play
 import util.Random
@@ -115,6 +115,9 @@ object TestData {
     }
   }
 
+  def newControllers: TestWebsiteControllers = {
+    AppConfig.instance[TestWebsiteControllers]
+  }
 
   object Longoria {
     require(fileBase.exists(), "Evan Longoria test photos were not found at " + fileBase.getAbsoluteFile)

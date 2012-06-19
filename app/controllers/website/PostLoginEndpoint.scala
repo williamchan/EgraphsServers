@@ -4,32 +4,29 @@ import play.mvc.Controller
 import play.mvc.results.Redirect
 import services.Utils
 import controllers.WebsiteControllers
-import play.data.validation.Validation
 import models._
 import services.http.POSTControllerMethod
+import services.http.forms.{CustomerLoginFormFactory, Form}
 
-private[controllers] trait PostLoginEndpoint {
-  this: Controller =>
+private[controllers] trait PostLoginEndpoint { this: Controller =>
+  import Form.Conversions._
 
   protected def postController: POSTControllerMethod
   protected def accountStore: AccountStore
+  protected def customerLoginForms: CustomerLoginFormFactory
 
-  def postLogin(email: String, password: String) = postController() {
+  def postLogin() = postController() {
+    // Read a CustomerLoginForm from the params
+    val nonValidatedForm = customerLoginForms(params.asFormReadable)
 
-    Validation.required("Email", email)
-    Validation.email("Email", email)
-    Validation.required("Password", password)
+    // Handle valid or error cases
+    nonValidatedForm.errorsOrValidatedForm match {
+      case Left(errors) =>
+        nonValidatedForm.redirectThroughFlash(GetLoginEndpoint.url().url)
 
-    val accountLoginAttempt: Either[AccountAuthenticationError, Account] = accountStore.authenticate(email, password)
-    Validation.isTrue("The username or password did not match. Please try again.",
-      accountLoginAttempt.isRight && accountLoginAttempt.right.get.customerId.isDefined)
-
-    if (!validationErrors.isEmpty) {
-      WebsiteControllers.redirectWithValidationErrors(GetLoginEndpoint.url())
-
-    } else {
-      session.put(WebsiteControllers.customerIdKey, accountLoginAttempt.right.get.customerId.get.toString)
-      new Redirect(Utils.lookupUrl("WebsiteControllers.getRootEndpoint").url)
+      case Right(validForm) =>
+        session.put(WebsiteControllers.customerIdKey, validForm.customerId)
+        new Redirect(Utils.lookupUrl("WebsiteControllers.getRootEndpoint").url)
     }
   }
 }
