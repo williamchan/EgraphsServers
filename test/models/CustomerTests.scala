@@ -23,7 +23,7 @@ class CustomerTests extends UnitFlatSpec
   // SavingEntityTests[Account] methods
   //
   override def newEntity = {
-    Customer(name = "customer")
+    Customer(name = "customer", username = "username")
   }
 
   override def saveEntity(toSave: Customer) = {
