@@ -1,5 +1,5 @@
 /* Scripting for the settings page */
-define([], function() {
+define([], function () {
 
   return {
     /**
@@ -9,7 +9,7 @@ define([], function() {
      */
     go: function () {
       //Bindings for edit buttons
-      $(document).ready(function(){
+      $(document).ready(function () {
 
         $(".edit").click(function(e){
           var thisRow = $(this);
@@ -19,21 +19,21 @@ define([], function() {
           e.preventDefault();
         });
 
-        $("#user_password_confirmation").change(function(e) {
-          password = $("#user_password");
-          password_confirmation = $("#user_password_confirmation");
+        $("#user_password_confirmation").change(function (e) {
+          var password = $("#user_password");
+          var password_confirmation = $("#user_password_confirmation");
 
-          if(password.val() === password_confirmation.val()){
+          if(password.val() === password_confirmation.val()) {
             $("#password_message").addClass("invisible");
           } else {
             $("#password_message").removeClass("invisible");
           }
-            console.log($(this).val());
+//            console.log($(this).val());
         });
 
       });
     },
-          //Controller class for Angular app
+    //Controller class for Angular app
     Controller: function ($scope) {
       //Plugin default values here
       $scope.master = { fullname : "Joshua Johnson",
@@ -47,8 +47,7 @@ define([], function() {
                             city : "Seattle",
                             zip : "98101",
                             state : "WA"
-                          }
-                        ,
+                          },
                         gallery : {
                           visibility : "Visible",
                           url : "egr.aphs/joshuaj"
@@ -65,30 +64,28 @@ define([], function() {
                                   ]
                         };
 
-      $scope.update = function(user) {
+      $scope.update = function (user) {
         $scope.master = angular.copy(user);
       };
 
-      $scope.reset = function() {
+      $scope.reset = function () {
         $scope.user = angular.copy($scope.master);
       }
 
-      $scope.resetVal = function(val) {
+      //Resets an individual value in a form by doing a lookup for the model reference.
+      $scope.resetVal = function (val) {
         var splitpath = val.split(".");
         var master = $scope.master;
         var userObj = $scope.user;
-        //TODO use parse instead
         //Get second to last element to change the reference to the original master string.
         for(i = 1; i < splitpath.length - 1; i++){
           console.log(splitpath[i]);
           master = master[splitpath[i]];
           userObj = userObj[splitpath[i]];
         }
-        console.log("splitpath " + splitpath);
+//        console.log("splitpath " + splitpath);
 
         userObj[splitpath[splitpath.length - 1]] = angular.copy(master[splitpath[splitpath.length - 1]]);
-
-
       }
 
       $scope.reset();
