@@ -1,0 +1,9 @@
+@(model: String, id:String)
+
+@import views.frontend.tags.ng.Utils
+
+
+<a ng-click='cancel("@model", "@id-edit");' class="action cancel">
+  <i class="icon-pencil">
+  </i> Cancel @Utils.binding("rest", "test")
+</a>

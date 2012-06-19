@@ -1,0 +1,41 @@
+@(model: String, id:String, length: Int)
+
+<a id="@id-display" class="row-settings row-fluid edit">
+    <span class="span3">Password</span>
+    <span class="span4 setting-val">@{"*".*(length)}</span>
+      <span class="span4 help-inline">
+  </span>
+    <span class="span1 action">
+      <i class="icon-pencil"></i> Edit
+    </span>
+</a>
+<div id="@id-edit" class="row-settings row-fluid hide">
+  <span class="span1"></span>
+  <span class="span9">
+    <div class="control-group">
+      <label class="control-label ng-label">Old Password</label>
+      <div class="controls">
+        <input ng-model="@{model + ".oldpassword"}" type="password" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"/>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label ng-label">New Password</label>
+      <div class="controls">
+        <input id="user_password" name="newpass" ng-minlength="8" ng-model="@{model + ".newpassword"}" type="password" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"/>
+        <span ng-show="form.newpass.$error.minlength">Password must be at least 8 characters</span>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label ng-label">Verify Password</label>
+      <div class="controls">
+        <input id="user_password_confirmation" name="match" type="password" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"/>
+        <span id="password_message" class="invisible">Passwords do not match</span>
+      </div>
+    </div>
+  </span>
+  <span class="span1 help-inline">
+  </span>
+  <span class="span1">
+    @form_cancel(model, id)
+  </span>
+</div>

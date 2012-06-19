@@ -1,0 +1,19 @@
+@(label: String, model: String)
+
+<div class="row-settings row-fluid">
+    <span class="span3">
+      @label
+    </span>
+    <span class="span8">
+
+       <span class="control-group">
+         <span class="controls">
+            <label ng-repeat="item in @model" class="checkbox">
+              <input type="checkbox" name="{{item.name}}" ng-model="item.value"/>{{item.text}}
+            </label>
+         </span>
+       </span>
+    </span>
+  <span class="span1"></span>
+</div>
+
