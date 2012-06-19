@@ -1,5 +1,6 @@
-self: play -> frontend project
+self: egraphs -> frontend HEAD
 
-# Any project that uses this module should provide play-scala and play-less
 require:
-    - play
+  - play
+  - play -> scala 0.9.1
+  - play -> less 0.9.1

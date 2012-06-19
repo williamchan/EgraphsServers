@@ -1,14 +1,12 @@
 # Application dependencies
 
 require:
-    - egraphs-modules -> frontend HEAD
-    - play        
-    - play -> scala 0.9.1
-    - play -> less 0.9.1
+    - egraphs -> frontend HEAD
 
 repositories:
-    - Module Folder:
+    - egraphsModules:
         type:       local
+        descriptor: ${application.path}/../../modules/[module]/conf/dependencies.yml
         artifact:   ${application.path}/../../modules/[module]
         contains:
-            - egraphs-modules
+            - egraphs -> *
