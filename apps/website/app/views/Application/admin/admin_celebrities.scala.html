@@ -1,0 +1,129 @@
+@(celebrityAccounts: Iterable[(models.Celebrity, models.Account)],
+  allCelebrities: Iterable[models.Celebrity]
+)(implicit flash:play.mvc.Scope.Flash, session: play.mvc.Scope.Session)
+
+@import controllers.WebsiteControllers
+@import services.Utils.lookupUrl
+@import views.Application.tags.html.authenticityToken
+@import views.Application.html.content_base
+@import views.Application.tags.html.pagination
+
+@content_base(title="Admin - Celebrities", body=body, head=head, navContent=navContent, onLoad=onBodyLoad)
+
+@getCreateCelebrity = @{
+  lookupUrl("WebsiteControllers.getCreateCelebrityAdmin")
+}
+
+@postLogout = @{
+  lookupUrl("WebsiteControllers.postLogout")
+}
+
+@postFeaturedCelebrities = @{
+  lookupUrl("WebsiteControllers.postFeaturedCelebrities")
+}
+
+@head = {
+<link rel="stylesheet" href='@asset("public/chosen/chosen.css")' >
+<script src='@asset("public/twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
+<script src='@asset("public/chosen/chosen.jquery.min.js")' type="text/javascript"></script>
+}
+
+@onBodyLoad = {
+  $('.chzn-select').chosen();
+}
+
+@navContent = {
+  <form id="logout" class="pull-right" method="POST" action='@postLogout' enctype="application/x-www-form-urlencoded">
+    @authenticityToken()
+    <div>
+      <button type="submit" id="logout-button" class="btn fade in">Logout</button>
+    </div>
+  </form>
+}
+
+@body = {
+<div class="admin-content">
+  <h1>
+    Celebrity administration
+  </h1>
+  <h2>Featured</h2>
+  <form method="POST" action="@postFeaturedCelebrities">
+    @authenticityToken()
+    <div class="row">
+      <div class="span6">
+        <select data-placeholder="Choose celebrities to feature" name="celebIds" style="width:350px" multiple class="chzn-select">
+          @for(celeb <- allCelebrities) {
+            <option value="@celeb.id" @if(celeb.isFeatured){selected="selected"}>
+              @celeb.publicName
+            </option>
+          }
+        </select>
+      </div>
+      <div class="span2">
+        <input class="btn primary fade in" type="submit" value="Save"/>
+      </div>
+    </div>
+  </form>
+  <h2>All @flash.get("TotalResultsStr")</h2>
+  <form method="link" action="@getCreateCelebrity">
+    <input class="btn primary fade in" type="submit" value="New Celebrity"/>
+  </form>
+  <table>
+    <tr>
+      <th></th>
+      <th>Id</th>
+      <th>Email</th>
+      <th>Public Name</th>
+      <th>First</th>
+      <th>Last</th>
+      <th>Enrolled?</th>
+      <th>Published?</th>
+      <th>Products</th>
+      <th>Orders</th>
+      <th>Egraphs</th>
+      <th>Inventory</th>
+    </tr>
+    @celebrityAccounts.map { case (celebrity, account) =>
+    <tr>
+      <td>
+        <a class="preview-link" href="/admin/celebrities/@celebrity.id">
+          Details
+        </a>
+      </td>
+      <td>@celebrity.id</td>
+      <td>@account.email</td>
+      <td>
+        <a class="preview-link" href="/@celebrity.urlSlug">
+          @celebrity.publicName
+        </a>
+      </td>
+      <td>@celebrity.firstName</td>
+      <td>@celebrity.lastName</td>
+      <td>@celebrity.enrollmentStatus</td>
+      <td>@celebrity.publishedStatus</td>
+      <td>
+        <a class="preview-link" href="/admin/celebrities/@celebrity.id/products">
+        Products
+        </a>
+      </td>
+      <td>
+        <a class="preview-link" href="/admin/celebrities/@celebrity.id/orders?filter=pendingAdminReview">
+          Orders
+        </a>
+      </td>
+      <td>
+        <a class="preview-link" href="/admin/celebrities/@celebrity.id/egraphs">
+          Egraphs
+        </a>
+      </td>
+      <td>
+        <a class="preview-link" href="/admin/celebrities/@celebrity.id/inventorybatches">
+          Inventory
+        </a>
+      </td>
+    </tr>
+    }
+  </table>
+  @pagination()
+</div>
+}

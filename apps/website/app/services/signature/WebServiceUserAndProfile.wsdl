@@ -1,0 +1,1501 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://wwww.xyzmo.com/biometricserver/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" targetNamespace="http://wwww.xyzmo.com/biometricserver/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+    <wsdl:types>
+        <s:schema elementFormDefault="qualified" targetNamespace="http://wwww.xyzmo.com/biometricserver/">
+            <s:element name="User_Add_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="displayName" type="s:string" />
+                        <s:element minOccurs="1" maxOccurs="1" name="bioUserStatus" type="tns:BioUserStatus" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:simpleType name="BioUserStatus">
+                <s:restriction base="s:string">
+                    <s:enumeration value="Inactive" />
+                    <s:enumeration value="Active" />
+                </s:restriction>
+            </s:simpleType>
+            <s:element name="User_Add_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="User_Add_v1Result" type="tns:ResultBase" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="ResultBase">
+                <s:sequence>
+                    <s:element minOccurs="1" maxOccurs="1" name="baseResult" type="tns:BaseResultEnum" />
+                    <s:element minOccurs="0" maxOccurs="1" name="errorInfo" type="tns:ErrorInfo" />
+                    <s:element minOccurs="0" maxOccurs="1" name="requestID" type="s:string" />
+                </s:sequence>
+            </s:complexType>
+            <s:simpleType name="BaseResultEnum">
+                <s:restriction base="s:string">
+                    <s:enumeration value="ok" />
+                    <s:enumeration value="failed" />
+                </s:restriction>
+            </s:simpleType>
+            <s:complexType name="ErrorInfo">
+                <s:sequence>
+                    <s:element minOccurs="1" maxOccurs="1" name="error" type="tns:ErrorStatus" />
+                    <s:element minOccurs="0" maxOccurs="1" name="errorMsg" type="s:string" />
+                </s:sequence>
+            </s:complexType>
+            <s:simpleType name="ErrorStatus">
+                <s:restriction base="s:string">
+                    <s:enumeration value="BioUserAlreadyExists" />
+                    <s:enumeration value="BioUserDoesNotExist" />
+                    <s:enumeration value="BioUserParameterIsNull" />
+                    <s:enumeration value="BioUserUnknown" />
+                    <s:enumeration value="EmptyArgumentError" />
+                    <s:enumeration value="ArgumentError" />
+                    <s:enumeration value="BioUserInactive" />
+                    <s:enumeration value="ProfileUnknown" />
+                    <s:enumeration value="ProfileIncomplete" />
+                    <s:enumeration value="ProfileNotActive" />
+                    <s:enumeration value="NoProfileToCompare" />
+                    <s:enumeration value="ProfileNotEmpty" />
+                    <s:enumeration value="ProfileAlreadyEnrolled" />
+                    <s:enumeration value="NrRequiredSignaturesArgumentError" />
+                    <s:enumeration value="ServerConfigurationEntryMissing" />
+                    <s:enumeration value="ServerConfigurationEntryWrong" />
+                    <s:enumeration value="ProfileAlreadyExists" />
+                    <s:enumeration value="ProfileDoesNotExist" />
+                    <s:enumeration value="ProfileParameterIsNull" />
+                    <s:enumeration value="AESKeyNotFound" />
+                    <s:enumeration value="CertificateError" />
+                    <s:enumeration value="InvalidDBMode" />
+                    <s:enumeration value="IDColumnForDeleteNotFound" />
+                    <s:enumeration value="DalDBError" />
+                    <s:enumeration value="DalDBDeadLockError" />
+                    <s:enumeration value="DalDBTimeOutError" />
+                    <s:enumeration value="AccessNotGranted" />
+                    <s:enumeration value="DEMOLicenseDateValidationRegistryKeyError" />
+                    <s:enumeration value="DEMOLicenseDateValidationRegistryKeyValueError" />
+                    <s:enumeration value="DEMOLicenseDateValidationError" />
+                    <s:enumeration value="LicenseSignatureValidationFileDoesNotExist" />
+                    <s:enumeration value="LicenseSignatureValidationNoSignature" />
+                    <s:enumeration value="LicenseSignatureValidationMoreThenOneSignature" />
+                    <s:enumeration value="LicenseSignatureValidationIsNotCorrect" />
+                    <s:enumeration value="LicenseSignatureValidationError" />
+                    <s:enumeration value="LicenseMachineIdValidationNoNode" />
+                    <s:enumeration value="LicenseMachineIdValidationIsNotValid" />
+                    <s:enumeration value="LicenseMachineIdValidationError" />
+                    <s:enumeration value="LicenseDateValidationNoExpirationDateNode" />
+                    <s:enumeration value="LicenseDateValidationLicenseFinished" />
+                    <s:enumeration value="LicenseDateValidationError" />
+                    <s:enumeration value="LicenseMaxCapacityValidationNoNode" />
+                    <s:enumeration value="LicenseMaxCapacityValidationIncorrectValue" />
+                    <s:enumeration value="LicenseMaxCapacityValidationError" />
+                    <s:enumeration value="UnexpectedException" />
+                    <s:enumeration value="AccessDenied" />
+                    <s:enumeration value="InernalError" />
+                    <s:enumeration value="WrongUIDFormat" />
+                    <s:enumeration value="InvalidImageFormat" />
+                    <s:enumeration value="InvalidSignatureData" />
+                    <s:enumeration value="ProfileHistoryDoesNotExist" />
+                    <s:enumeration value="ProfileAlreadyValidated" />
+                    <s:enumeration value="ProfileNotValidated" />
+                    <s:enumeration value="AuditTrailMissingOrDeleted" />
+                    <s:enumeration value="SigEngineValidationError" />
+                    <s:enumeration value="ProfileInconsistent" />
+                    <s:enumeration value="LowPressureLevelError" />
+                    <s:enumeration value="EncryptedSignatureDataDecryptionFailed" />
+                </s:restriction>
+            </s:simpleType>
+            <s:element name="User_GetInfosFromAllUsers_v1">
+                <s:complexType />
+            </s:element>
+            <s:element name="User_GetInfosFromAllUsers_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="User_GetInfosFromAllUsers_v1Result" type="tns:UserInfosResult_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="UserInfosResult_v1">
+                <s:complexContent mixed="false">
+                    <s:extension base="tns:ResultBase">
+                        <s:sequence>
+                            <s:element minOccurs="0" maxOccurs="1" name="okInfo" type="tns:UsersInfoResult" />
+                        </s:sequence>
+                    </s:extension>
+                </s:complexContent>
+            </s:complexType>
+            <s:complexType name="UsersInfoResult">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="1" name="UserInfoList" type="tns:ArrayOfUserInfo" />
+                    <s:element minOccurs="1" maxOccurs="1" name="nrUserEntries" type="s:int" />
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="ArrayOfUserInfo">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="unbounded" name="UserInfo" nillable="true" type="tns:UserInfo" />
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="UserInfo">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                    <s:element minOccurs="0" maxOccurs="1" name="displayName" type="s:string" />
+                    <s:element minOccurs="1" maxOccurs="1" name="userStatus" type="tns:BioUserStatus" />
+                    <s:element minOccurs="1" maxOccurs="1" name="validationLevel" type="tns:ValidationLevelEnum" />
+                    <s:element minOccurs="1" maxOccurs="1" name="statDynamicFailedCount" type="s:int" />
+                    <s:element minOccurs="1" maxOccurs="1" name="statDynamicFailedSeqCount" type="s:int" />
+                    <s:element minOccurs="1" maxOccurs="1" name="statDynamicSuccessCount" type="s:int" />
+                    <s:element minOccurs="1" maxOccurs="1" name="statStaticFailedCount" type="s:int" />
+                    <s:element minOccurs="1" maxOccurs="1" name="statStaticFailedSeqCount" type="s:int" />
+                    <s:element minOccurs="1" maxOccurs="1" name="statStaticSuccessCount" type="s:int" />
+                </s:sequence>
+            </s:complexType>
+            <s:simpleType name="ValidationLevelEnum">
+                <s:restriction base="s:string">
+                    <s:enumeration value="Undefined" />
+                    <s:enumeration value="Default" />
+                    <s:enumeration value="Off" />
+                </s:restriction>
+            </s:simpleType>
+            <s:element name="User_GetInfosFromUserRange_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="1" maxOccurs="1" name="numberFirst" type="s:int" />
+                        <s:element minOccurs="1" maxOccurs="1" name="numberLast" type="s:int" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="User_GetInfosFromUserRange_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="User_GetInfosFromUserRange_v1Result" type="tns:UserInfosResult_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="User_GetInfosFromUserFilteredRange_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="strFilterUser" type="s:string" />
+                        <s:element minOccurs="1" maxOccurs="1" name="numberFirst" type="s:int" />
+                        <s:element minOccurs="1" maxOccurs="1" name="numberLast" type="s:int" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="User_GetInfosFromUserFilteredRange_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="User_GetInfosFromUserFilteredRange_v1Result" type="tns:UserInfosResult_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="User_ReturnNumberUsers_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="strFilterUser" type="s:string" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="User_ReturnNumberUsers_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="User_ReturnNumberUsers_v1Result" type="tns:UserCountResult_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="UserCountResult_v1">
+                <s:complexContent mixed="false">
+                    <s:extension base="tns:ResultBase">
+                        <s:sequence>
+                            <s:element minOccurs="0" maxOccurs="1" name="okInfo" type="tns:UsersCountResult" />
+                        </s:sequence>
+                    </s:extension>
+                </s:complexContent>
+            </s:complexType>
+            <s:complexType name="UsersCountResult">
+                <s:sequence>
+                    <s:element minOccurs="1" maxOccurs="1" name="nrUserEntries" type="s:int" />
+                </s:sequence>
+            </s:complexType>
+            <s:element name="User_GetInfosFromFilteredUsers_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="strFilterUser" type="s:string" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="User_GetInfosFromFilteredUsers_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="User_GetInfosFromFilteredUsers_v1Result" type="tns:UserInfosResult_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="User_GetInfo_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="User_GetInfo_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="User_GetInfo_v1Result" type="tns:UserInfoResult_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="UserInfoResult_v1">
+                <s:complexContent mixed="false">
+                    <s:extension base="tns:ResultBase">
+                        <s:sequence>
+                            <s:element minOccurs="0" maxOccurs="1" name="okInfo" type="tns:UserInfoResult" />
+                        </s:sequence>
+                    </s:extension>
+                </s:complexContent>
+            </s:complexType>
+            <s:complexType name="UserInfoResult">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="1" name="userInfo" type="tns:UserInfo" />
+                </s:sequence>
+            </s:complexType>
+            <s:element name="User_Delete_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="User_Delete_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="User_Delete_v1Result" type="tns:ResultBase" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="User_ChangeUserAttributes_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="newDisplayName" type="s:string" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="User_ChangeUserAttributes_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="User_ChangeUserAttributes_v1Result" type="tns:ResultBase" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="User_Suspend_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="User_Suspend_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="User_Suspend_v1Result" type="tns:ResultBase" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="User_Resume_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="User_Resume_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="User_Resume_v1Result" type="tns:ResultBase" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="User_TurnOffValidation_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="User_TurnOffValidation_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="User_TurnOffValidation_v1Result" type="tns:ResultBase" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="User_TurnOnValidation_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="User_TurnOnValidation_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="User_TurnOnValidation_v1Result" type="tns:ValidateResultInfo_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="ValidateResultInfo_v1">
+                <s:complexContent mixed="false">
+                    <s:extension base="tns:ResultBase">
+                        <s:sequence>
+                            <s:element minOccurs="0" maxOccurs="1" name="okInfo" type="tns:ValidationResult" />
+                        </s:sequence>
+                    </s:extension>
+                </s:complexContent>
+            </s:complexType>
+            <s:complexType name="ValidationResult">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="1" name="unvalidatedProfileLst" type="tns:ArrayOfString" />
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="ArrayOfString">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="s:string" />
+                </s:sequence>
+            </s:complexType>
+            <s:element name="User_ResetStatistics_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="User_ResetStatistics_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="User_ResetStatistics_v1Result" type="tns:ResultBase" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="User_GetInfosFromAllProfiles_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="User_GetInfosFromAllProfiles_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="User_GetInfosFromAllProfiles_v1Result" type="tns:ProfileInfosResult_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="ProfileInfosResult_v1">
+                <s:complexContent mixed="false">
+                    <s:extension base="tns:ResultBase">
+                        <s:sequence>
+                            <s:element minOccurs="0" maxOccurs="1" name="okInfo" type="tns:ProfilesResult" />
+                        </s:sequence>
+                    </s:extension>
+                </s:complexContent>
+            </s:complexType>
+            <s:complexType name="ProfilesResult">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="1" name="ProfileList" type="tns:ArrayOfProfileInfo" />
+                    <s:element minOccurs="1" maxOccurs="1" name="nrProfileEntries" type="s:int" />
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="ArrayOfProfileInfo">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="unbounded" name="ProfileInfo" nillable="true" type="tns:ProfileInfo" />
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="ProfileInfo">
+                <s:sequence>
+                    <s:element minOccurs="1" maxOccurs="1" name="activeSignatures" type="s:int" />
+                    <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                    <s:element minOccurs="0" maxOccurs="1" name="profileId" type="s:string" />
+                    <s:element minOccurs="1" maxOccurs="1" name="modDT" type="s:dateTime" />
+                    <s:element minOccurs="0" maxOccurs="1" name="profileName" type="s:string" />
+                    <s:element minOccurs="1" maxOccurs="1" name="status" type="tns:ProfileStatus" />
+                    <s:element minOccurs="1" maxOccurs="1" name="validationStatus" type="tns:ValidationStatusEnum" />
+                    <s:element minOccurs="1" maxOccurs="1" name="enrollStatus" type="tns:EnrollmentStatusEnum" />
+                    <s:element minOccurs="1" maxOccurs="1" name="type" type="tns:ProfileType" />
+                    <s:element minOccurs="1" maxOccurs="1" name="statFailedCount" type="s:int" />
+                    <s:element minOccurs="1" maxOccurs="1" name="statFailedSeqCount" type="s:int" />
+                    <s:element minOccurs="1" maxOccurs="1" name="statSuccessCount" type="s:int" />
+                </s:sequence>
+            </s:complexType>
+            <s:simpleType name="ProfileStatus">
+                <s:restriction base="s:string">
+                    <s:enumeration value="Active" />
+                    <s:enumeration value="Inactive" />
+                </s:restriction>
+            </s:simpleType>
+            <s:simpleType name="ValidationStatusEnum">
+                <s:restriction base="s:string">
+                    <s:enumeration value="Undefined" />
+                    <s:enumeration value="Validated" />
+                    <s:enumeration value="Unvalidated" />
+                </s:restriction>
+            </s:simpleType>
+            <s:simpleType name="EnrollmentStatusEnum">
+                <s:restriction base="s:string">
+                    <s:enumeration value="Undefined" />
+                    <s:enumeration value="ProfileEmpty" />
+                    <s:enumeration value="ProfileMinNrSignaturesForVerificationNotReached" />
+                    <s:enumeration value="ProfileMinNrSignaturesForVerificationReached" />
+                    <s:enumeration value="ProfileComplete" />
+                </s:restriction>
+            </s:simpleType>
+            <s:simpleType name="ProfileType">
+                <s:restriction base="s:string">
+                    <s:enumeration value="Dynamic" />
+                    <s:enumeration value="Static" />
+                </s:restriction>
+            </s:simpleType>
+            <s:element name="Profile_GetInfo_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="profileId" type="s:string" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="Profile_GetInfo_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="Profile_GetInfo_v1Result" type="tns:ProfileInfoResult_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="ProfileInfoResult_v1">
+                <s:complexContent mixed="false">
+                    <s:extension base="tns:ResultBase">
+                        <s:sequence>
+                            <s:element minOccurs="0" maxOccurs="1" name="okInfo" type="tns:ProfileResult" />
+                        </s:sequence>
+                    </s:extension>
+                </s:complexContent>
+            </s:complexType>
+            <s:complexType name="ProfileResult">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="1" name="profileInfo" type="tns:ProfileInfo" />
+                </s:sequence>
+            </s:complexType>
+            <s:element name="Profile_GetInfo_v2">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="profileName" type="s:string" />
+                        <s:element minOccurs="1" maxOccurs="1" name="profileType" type="tns:ProfileType" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="Profile_GetInfo_v2Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="Profile_GetInfo_v2Result" type="tns:ProfileInfoResult_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="Profile_Add_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="profileName" type="s:string" />
+                        <s:element minOccurs="1" maxOccurs="1" name="profileType" type="tns:ProfileType" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="Profile_Add_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="Profile_Add_v1Result" type="tns:ProfileInfoResult_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="Profile_Suspend_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="profileId" type="s:string" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="Profile_Suspend_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="Profile_Suspend_v1Result" type="tns:ResultBase" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="Profile_Resume_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="profileId" type="s:string" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="Profile_Resume_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="Profile_Resume_v1Result" type="tns:ResultBase" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="Profile_Delete_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="profileId" type="s:string" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="Profile_Delete_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="Profile_Delete_v1Result" type="tns:ResultBase" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="Profile_ResetStatistics_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="profileId" type="s:string" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="Profile_ResetStatistics_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="Profile_ResetStatistics_v1Result" type="tns:ProfileInfoResult_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="Profile_GetInfosFromAllSignatures_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="profileId" type="s:string" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="Profile_GetInfosFromAllSignatures_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="Profile_GetInfosFromAllSignatures_v1Result" type="tns:SignatureInfosResult_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="SignatureInfosResult_v1">
+                <s:complexContent mixed="false">
+                    <s:extension base="tns:ResultBase">
+                        <s:sequence>
+                            <s:element minOccurs="0" maxOccurs="1" name="okInfo" type="tns:SignatureInfos" />
+                        </s:sequence>
+                    </s:extension>
+                </s:complexContent>
+            </s:complexType>
+            <s:complexType name="SignatureInfos">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="1" name="SigInfoList" type="tns:ArrayOfSignatureInfo" />
+                    <s:element minOccurs="1" maxOccurs="1" name="nrSignatureEntries" type="s:int" />
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="ArrayOfSignatureInfo">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="unbounded" name="SignatureInfo" nillable="true" type="tns:SignatureInfo" />
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="SignatureInfo">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="1" name="signatureId" type="s:string" />
+                    <s:element minOccurs="1" maxOccurs="1" name="modDT" type="s:dateTime" />
+                    <s:element minOccurs="1" maxOccurs="1" name="usedForVerification" type="s:boolean" />
+                    <s:element minOccurs="0" maxOccurs="1" name="evDisplayInfosDevice" type="s:string" />
+                </s:sequence>
+            </s:complexType>
+            <s:element name="ProfileHistory_GetInfosFromAllSignatures_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="profileHistoryId" type="s:string" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="ProfileHistory_GetInfosFromAllSignatures_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="ProfileHistory_GetInfosFromAllSignatures_v1Result" type="tns:SignatureInfosResult_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="DynamicSignature_GetInfo_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="signatureId" type="s:string" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="DynamicSignature_GetInfo_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="DynamicSignature_GetInfo_v1Result" type="tns:DynamicSignatureInfoResult_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="DynamicSignatureInfoResult_v1">
+                <s:complexContent mixed="false">
+                    <s:extension base="tns:ResultBase">
+                        <s:sequence>
+                            <s:element minOccurs="0" maxOccurs="1" name="okInfo" type="tns:DynamicSignatureInfo" />
+                        </s:sequence>
+                    </s:extension>
+                </s:complexContent>
+            </s:complexType>
+            <s:complexType name="DynamicSignatureInfo">
+                <s:sequence>
+                    <s:element minOccurs="1" maxOccurs="1" name="physicalSizeWidth" type="s:float" />
+                    <s:element minOccurs="1" maxOccurs="1" name="physicalSizeHeight" type="s:float" />
+                    <s:element minOccurs="0" maxOccurs="1" name="deviceName" type="s:string" />
+                    <s:element minOccurs="0" maxOccurs="1" name="deviceId" type="s:string" />
+                    <s:element minOccurs="0" maxOccurs="1" name="deviceVersion" type="s:string" />
+                    <s:element minOccurs="1" maxOccurs="1" name="dateTime" type="s:dateTime" />
+                </s:sequence>
+            </s:complexType>
+            <s:element name="DynamicSignature_GetImage_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="signatureId" type="s:string" />
+                        <s:element minOccurs="1" maxOccurs="1" name="imageWidth" type="s:int" />
+                        <s:element minOccurs="1" maxOccurs="1" name="imageHeight" type="s:int" />
+                        <s:element minOccurs="1" maxOccurs="1" name="sigThickness" type="s:int" />
+                        <s:element minOccurs="1" maxOccurs="1" name="penColor" type="tns:ColorStruct" />
+                        <s:element minOccurs="1" maxOccurs="1" name="backgroundColor" type="tns:ColorStruct" />
+                        <s:element minOccurs="1" maxOccurs="1" name="sigImageFormat" type="tns:SigImageFormat" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="ColorStruct">
+                <s:sequence>
+                    <s:element minOccurs="1" maxOccurs="1" name="a" type="s:int" />
+                    <s:element minOccurs="1" maxOccurs="1" name="r" type="s:int" />
+                    <s:element minOccurs="1" maxOccurs="1" name="g" type="s:int" />
+                    <s:element minOccurs="1" maxOccurs="1" name="b" type="s:int" />
+                </s:sequence>
+            </s:complexType>
+            <s:simpleType name="SigImageFormat">
+                <s:restriction base="s:string">
+                    <s:enumeration value="png" />
+                    <s:enumeration value="jpg" />
+                    <s:enumeration value="bmp" />
+                    <s:enumeration value="gif" />
+                </s:restriction>
+            </s:simpleType>
+            <s:element name="DynamicSignature_GetImage_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="DynamicSignature_GetImage_v1Result" type="tns:SignatureImageResult_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="SignatureImageResult_v1">
+                <s:complexContent mixed="false">
+                    <s:extension base="tns:ResultBase">
+                        <s:sequence>
+                            <s:element minOccurs="0" maxOccurs="1" name="okInfo" type="tns:SignatureImageResult" />
+                        </s:sequence>
+                    </s:extension>
+                </s:complexContent>
+            </s:complexType>
+            <s:complexType name="SignatureImageResult">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="1" name="imageData" type="s:base64Binary" />
+                    <s:element minOccurs="1" maxOccurs="1" name="imageFormat" type="tns:SigImageFormat" />
+                </s:sequence>
+            </s:complexType>
+            <s:element name="StaticSignature_GetImage_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="signatureId" type="s:string" />
+                        <s:element minOccurs="1" maxOccurs="1" name="sigImageFormat" type="tns:SigImageFormat" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="StaticSignature_GetImage_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="StaticSignature_GetImage_v1Result" type="tns:SignatureImageResult_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+        </s:schema>
+    </wsdl:types>
+    <wsdl:message name="User_Add_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:User_Add_v1" />
+    </wsdl:message>
+    <wsdl:message name="User_Add_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:User_Add_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="User_GetInfosFromAllUsers_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:User_GetInfosFromAllUsers_v1" />
+    </wsdl:message>
+    <wsdl:message name="User_GetInfosFromAllUsers_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:User_GetInfosFromAllUsers_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="User_GetInfosFromUserRange_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:User_GetInfosFromUserRange_v1" />
+    </wsdl:message>
+    <wsdl:message name="User_GetInfosFromUserRange_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:User_GetInfosFromUserRange_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="User_GetInfosFromUserFilteredRange_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:User_GetInfosFromUserFilteredRange_v1" />
+    </wsdl:message>
+    <wsdl:message name="User_GetInfosFromUserFilteredRange_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:User_GetInfosFromUserFilteredRange_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="User_ReturnNumberUsers_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:User_ReturnNumberUsers_v1" />
+    </wsdl:message>
+    <wsdl:message name="User_ReturnNumberUsers_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:User_ReturnNumberUsers_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="User_GetInfosFromFilteredUsers_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:User_GetInfosFromFilteredUsers_v1" />
+    </wsdl:message>
+    <wsdl:message name="User_GetInfosFromFilteredUsers_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:User_GetInfosFromFilteredUsers_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="User_GetInfo_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:User_GetInfo_v1" />
+    </wsdl:message>
+    <wsdl:message name="User_GetInfo_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:User_GetInfo_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="User_Delete_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:User_Delete_v1" />
+    </wsdl:message>
+    <wsdl:message name="User_Delete_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:User_Delete_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="User_ChangeUserAttributes_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:User_ChangeUserAttributes_v1" />
+    </wsdl:message>
+    <wsdl:message name="User_ChangeUserAttributes_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:User_ChangeUserAttributes_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="User_Suspend_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:User_Suspend_v1" />
+    </wsdl:message>
+    <wsdl:message name="User_Suspend_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:User_Suspend_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="User_Resume_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:User_Resume_v1" />
+    </wsdl:message>
+    <wsdl:message name="User_Resume_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:User_Resume_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="User_TurnOffValidation_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:User_TurnOffValidation_v1" />
+    </wsdl:message>
+    <wsdl:message name="User_TurnOffValidation_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:User_TurnOffValidation_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="User_TurnOnValidation_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:User_TurnOnValidation_v1" />
+    </wsdl:message>
+    <wsdl:message name="User_TurnOnValidation_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:User_TurnOnValidation_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="User_ResetStatistics_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:User_ResetStatistics_v1" />
+    </wsdl:message>
+    <wsdl:message name="User_ResetStatistics_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:User_ResetStatistics_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="User_GetInfosFromAllProfiles_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:User_GetInfosFromAllProfiles_v1" />
+    </wsdl:message>
+    <wsdl:message name="User_GetInfosFromAllProfiles_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:User_GetInfosFromAllProfiles_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="Profile_GetInfo_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:Profile_GetInfo_v1" />
+    </wsdl:message>
+    <wsdl:message name="Profile_GetInfo_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:Profile_GetInfo_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="Profile_GetInfo_v2SoapIn">
+        <wsdl:part name="parameters" element="tns:Profile_GetInfo_v2" />
+    </wsdl:message>
+    <wsdl:message name="Profile_GetInfo_v2SoapOut">
+        <wsdl:part name="parameters" element="tns:Profile_GetInfo_v2Response" />
+    </wsdl:message>
+    <wsdl:message name="Profile_Add_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:Profile_Add_v1" />
+    </wsdl:message>
+    <wsdl:message name="Profile_Add_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:Profile_Add_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="Profile_Suspend_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:Profile_Suspend_v1" />
+    </wsdl:message>
+    <wsdl:message name="Profile_Suspend_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:Profile_Suspend_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="Profile_Resume_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:Profile_Resume_v1" />
+    </wsdl:message>
+    <wsdl:message name="Profile_Resume_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:Profile_Resume_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="Profile_Delete_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:Profile_Delete_v1" />
+    </wsdl:message>
+    <wsdl:message name="Profile_Delete_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:Profile_Delete_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="Profile_ResetStatistics_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:Profile_ResetStatistics_v1" />
+    </wsdl:message>
+    <wsdl:message name="Profile_ResetStatistics_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:Profile_ResetStatistics_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="Profile_GetInfosFromAllSignatures_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:Profile_GetInfosFromAllSignatures_v1" />
+    </wsdl:message>
+    <wsdl:message name="Profile_GetInfosFromAllSignatures_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:Profile_GetInfosFromAllSignatures_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="ProfileHistory_GetInfosFromAllSignatures_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:ProfileHistory_GetInfosFromAllSignatures_v1" />
+    </wsdl:message>
+    <wsdl:message name="ProfileHistory_GetInfosFromAllSignatures_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:ProfileHistory_GetInfosFromAllSignatures_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="DynamicSignature_GetInfo_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:DynamicSignature_GetInfo_v1" />
+    </wsdl:message>
+    <wsdl:message name="DynamicSignature_GetInfo_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:DynamicSignature_GetInfo_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="DynamicSignature_GetImage_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:DynamicSignature_GetImage_v1" />
+    </wsdl:message>
+    <wsdl:message name="DynamicSignature_GetImage_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:DynamicSignature_GetImage_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="StaticSignature_GetImage_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:StaticSignature_GetImage_v1" />
+    </wsdl:message>
+    <wsdl:message name="StaticSignature_GetImage_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:StaticSignature_GetImage_v1Response" />
+    </wsdl:message>
+    <wsdl:portType name="WebServiceUserAndProfileSoap">
+        <wsdl:operation name="User_Add_v1">
+            <wsdl:input message="tns:User_Add_v1SoapIn" />
+            <wsdl:output message="tns:User_Add_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="User_GetInfosFromAllUsers_v1">
+            <wsdl:input message="tns:User_GetInfosFromAllUsers_v1SoapIn" />
+            <wsdl:output message="tns:User_GetInfosFromAllUsers_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="User_GetInfosFromUserRange_v1">
+            <wsdl:input message="tns:User_GetInfosFromUserRange_v1SoapIn" />
+            <wsdl:output message="tns:User_GetInfosFromUserRange_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="User_GetInfosFromUserFilteredRange_v1">
+            <wsdl:input message="tns:User_GetInfosFromUserFilteredRange_v1SoapIn" />
+            <wsdl:output message="tns:User_GetInfosFromUserFilteredRange_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="User_ReturnNumberUsers_v1">
+            <wsdl:input message="tns:User_ReturnNumberUsers_v1SoapIn" />
+            <wsdl:output message="tns:User_ReturnNumberUsers_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="User_GetInfosFromFilteredUsers_v1">
+            <wsdl:input message="tns:User_GetInfosFromFilteredUsers_v1SoapIn" />
+            <wsdl:output message="tns:User_GetInfosFromFilteredUsers_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="User_GetInfo_v1">
+            <wsdl:input message="tns:User_GetInfo_v1SoapIn" />
+            <wsdl:output message="tns:User_GetInfo_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="User_Delete_v1">
+            <wsdl:input message="tns:User_Delete_v1SoapIn" />
+            <wsdl:output message="tns:User_Delete_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="User_ChangeUserAttributes_v1">
+            <wsdl:input message="tns:User_ChangeUserAttributes_v1SoapIn" />
+            <wsdl:output message="tns:User_ChangeUserAttributes_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="User_Suspend_v1">
+            <wsdl:input message="tns:User_Suspend_v1SoapIn" />
+            <wsdl:output message="tns:User_Suspend_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="User_Resume_v1">
+            <wsdl:input message="tns:User_Resume_v1SoapIn" />
+            <wsdl:output message="tns:User_Resume_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="User_TurnOffValidation_v1">
+            <wsdl:input message="tns:User_TurnOffValidation_v1SoapIn" />
+            <wsdl:output message="tns:User_TurnOffValidation_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="User_TurnOnValidation_v1">
+            <wsdl:input message="tns:User_TurnOnValidation_v1SoapIn" />
+            <wsdl:output message="tns:User_TurnOnValidation_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="User_ResetStatistics_v1">
+            <wsdl:input message="tns:User_ResetStatistics_v1SoapIn" />
+            <wsdl:output message="tns:User_ResetStatistics_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="User_GetInfosFromAllProfiles_v1">
+            <wsdl:input message="tns:User_GetInfosFromAllProfiles_v1SoapIn" />
+            <wsdl:output message="tns:User_GetInfosFromAllProfiles_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="Profile_GetInfo_v1">
+            <wsdl:input message="tns:Profile_GetInfo_v1SoapIn" />
+            <wsdl:output message="tns:Profile_GetInfo_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="Profile_GetInfo_v2">
+            <wsdl:input message="tns:Profile_GetInfo_v2SoapIn" />
+            <wsdl:output message="tns:Profile_GetInfo_v2SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="Profile_Add_v1">
+            <wsdl:input message="tns:Profile_Add_v1SoapIn" />
+            <wsdl:output message="tns:Profile_Add_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="Profile_Suspend_v1">
+            <wsdl:input message="tns:Profile_Suspend_v1SoapIn" />
+            <wsdl:output message="tns:Profile_Suspend_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="Profile_Resume_v1">
+            <wsdl:input message="tns:Profile_Resume_v1SoapIn" />
+            <wsdl:output message="tns:Profile_Resume_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="Profile_Delete_v1">
+            <wsdl:input message="tns:Profile_Delete_v1SoapIn" />
+            <wsdl:output message="tns:Profile_Delete_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="Profile_ResetStatistics_v1">
+            <wsdl:input message="tns:Profile_ResetStatistics_v1SoapIn" />
+            <wsdl:output message="tns:Profile_ResetStatistics_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="Profile_GetInfosFromAllSignatures_v1">
+            <wsdl:input message="tns:Profile_GetInfosFromAllSignatures_v1SoapIn" />
+            <wsdl:output message="tns:Profile_GetInfosFromAllSignatures_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="ProfileHistory_GetInfosFromAllSignatures_v1">
+            <wsdl:input message="tns:ProfileHistory_GetInfosFromAllSignatures_v1SoapIn" />
+            <wsdl:output message="tns:ProfileHistory_GetInfosFromAllSignatures_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="DynamicSignature_GetInfo_v1">
+            <wsdl:input message="tns:DynamicSignature_GetInfo_v1SoapIn" />
+            <wsdl:output message="tns:DynamicSignature_GetInfo_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="DynamicSignature_GetImage_v1">
+            <wsdl:input message="tns:DynamicSignature_GetImage_v1SoapIn" />
+            <wsdl:output message="tns:DynamicSignature_GetImage_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="StaticSignature_GetImage_v1">
+            <wsdl:input message="tns:StaticSignature_GetImage_v1SoapIn" />
+            <wsdl:output message="tns:StaticSignature_GetImage_v1SoapOut" />
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="WebServiceUserAndProfileSoap" type="tns:WebServiceUserAndProfileSoap">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="User_Add_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_Add_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_GetInfosFromAllUsers_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_GetInfosFromAllUsers_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_GetInfosFromUserRange_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_GetInfosFromUserRange_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_GetInfosFromUserFilteredRange_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_GetInfosFromUserFilteredRange_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_ReturnNumberUsers_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_ReturnNumberUsers_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_GetInfosFromFilteredUsers_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_GetInfosFromFilteredUsers_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_GetInfo_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_GetInfo_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_Delete_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_Delete_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_ChangeUserAttributes_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_ChangeUserAttributes_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_Suspend_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_Suspend_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_Resume_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_Resume_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_TurnOffValidation_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_TurnOffValidation_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_TurnOnValidation_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_TurnOnValidation_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_ResetStatistics_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_ResetStatistics_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_GetInfosFromAllProfiles_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_GetInfosFromAllProfiles_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Profile_GetInfo_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/Profile_GetInfo_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Profile_GetInfo_v2">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/Profile_GetInfo_v2" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Profile_Add_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/Profile_Add_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Profile_Suspend_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/Profile_Suspend_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Profile_Resume_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/Profile_Resume_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Profile_Delete_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/Profile_Delete_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Profile_ResetStatistics_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/Profile_ResetStatistics_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Profile_GetInfosFromAllSignatures_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/Profile_GetInfosFromAllSignatures_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="ProfileHistory_GetInfosFromAllSignatures_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/ProfileHistory_GetInfosFromAllSignatures_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="DynamicSignature_GetInfo_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/DynamicSignature_GetInfo_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="DynamicSignature_GetImage_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/DynamicSignature_GetImage_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="StaticSignature_GetImage_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/StaticSignature_GetImage_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="WebServiceUserAndProfileSoap12" type="tns:WebServiceUserAndProfileSoap">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="User_Add_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_Add_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_GetInfosFromAllUsers_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_GetInfosFromAllUsers_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_GetInfosFromUserRange_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_GetInfosFromUserRange_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_GetInfosFromUserFilteredRange_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_GetInfosFromUserFilteredRange_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_ReturnNumberUsers_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_ReturnNumberUsers_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_GetInfosFromFilteredUsers_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_GetInfosFromFilteredUsers_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_GetInfo_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_GetInfo_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_Delete_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_Delete_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_ChangeUserAttributes_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_ChangeUserAttributes_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_Suspend_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_Suspend_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_Resume_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_Resume_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_TurnOffValidation_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_TurnOffValidation_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_TurnOnValidation_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_TurnOnValidation_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_ResetStatistics_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_ResetStatistics_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="User_GetInfosFromAllProfiles_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/User_GetInfosFromAllProfiles_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Profile_GetInfo_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/Profile_GetInfo_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Profile_GetInfo_v2">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/Profile_GetInfo_v2" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Profile_Add_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/Profile_Add_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Profile_Suspend_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/Profile_Suspend_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Profile_Resume_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/Profile_Resume_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Profile_Delete_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/Profile_Delete_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Profile_ResetStatistics_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/Profile_ResetStatistics_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Profile_GetInfosFromAllSignatures_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/Profile_GetInfosFromAllSignatures_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="ProfileHistory_GetInfosFromAllSignatures_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/ProfileHistory_GetInfosFromAllSignatures_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="DynamicSignature_GetInfo_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/DynamicSignature_GetInfo_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="DynamicSignature_GetImage_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/DynamicSignature_GetImage_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="StaticSignature_GetImage_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/StaticSignature_GetImage_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="WebServiceUserAndProfile">
+        <wsdl:port name="WebServiceUserAndProfileSoap" binding="tns:WebServiceUserAndProfileSoap">
+            <soap:address location="http://107.21.36.146:50200/Webservices/WebServiceUserAndProfile.asmx" />
+        </wsdl:port>
+        <wsdl:port name="WebServiceUserAndProfileSoap12" binding="tns:WebServiceUserAndProfileSoap12">
+            <soap12:address location="http://107.21.36.146:50200/Webservices/WebServiceUserAndProfile.asmx" />
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

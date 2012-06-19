@@ -1,0 +1,1404 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://wwww.xyzmo.com/biometricserver/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" targetNamespace="http://wwww.xyzmo.com/biometricserver/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+    <wsdl:types>
+        <s:schema elementFormDefault="qualified" targetNamespace="http://wwww.xyzmo.com/biometricserver/">
+            <s:element name="EnrollDynamicProfile_v2">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="profileId" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="signatureDataContainerXmlStrArr" type="tns:ArrayOfString" />
+                        <s:element minOccurs="1" maxOccurs="1" name="continuous" type="s:boolean" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="ArrayOfString">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="s:string" />
+                </s:sequence>
+            </s:complexType>
+            <s:element name="EnrollDynamicProfile_v2Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="EnrollDynamicProfile_v2Result" type="tns:EnrollResultInfo_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="EnrollResultInfo_v1">
+                <s:complexContent mixed="false">
+                    <s:extension base="tns:ResultBase">
+                        <s:sequence>
+                            <s:element minOccurs="0" maxOccurs="1" name="okInfo" type="tns:EnrollResult" />
+                        </s:sequence>
+                    </s:extension>
+                </s:complexContent>
+            </s:complexType>
+            <s:complexType name="ResultBase">
+                <s:sequence>
+                    <s:element minOccurs="1" maxOccurs="1" name="baseResult" type="tns:BaseResultEnum" />
+                    <s:element minOccurs="0" maxOccurs="1" name="errorInfo" type="tns:ErrorInfo" />
+                    <s:element minOccurs="0" maxOccurs="1" name="requestID" type="s:string" />
+                </s:sequence>
+            </s:complexType>
+            <s:simpleType name="BaseResultEnum">
+                <s:restriction base="s:string">
+                    <s:enumeration value="ok" />
+                    <s:enumeration value="failed" />
+                </s:restriction>
+            </s:simpleType>
+            <s:complexType name="ErrorInfo">
+                <s:sequence>
+                    <s:element minOccurs="1" maxOccurs="1" name="error" type="tns:ErrorStatus" />
+                    <s:element minOccurs="0" maxOccurs="1" name="errorMsg" type="s:string" />
+                </s:sequence>
+            </s:complexType>
+            <s:simpleType name="ErrorStatus">
+                <s:restriction base="s:string">
+                    <s:enumeration value="BioUserAlreadyExists" />
+                    <s:enumeration value="BioUserDoesNotExist" />
+                    <s:enumeration value="BioUserParameterIsNull" />
+                    <s:enumeration value="BioUserUnknown" />
+                    <s:enumeration value="EmptyArgumentError" />
+                    <s:enumeration value="ArgumentError" />
+                    <s:enumeration value="BioUserInactive" />
+                    <s:enumeration value="ProfileUnknown" />
+                    <s:enumeration value="ProfileIncomplete" />
+                    <s:enumeration value="ProfileNotActive" />
+                    <s:enumeration value="NoProfileToCompare" />
+                    <s:enumeration value="ProfileNotEmpty" />
+                    <s:enumeration value="ProfileAlreadyEnrolled" />
+                    <s:enumeration value="NrRequiredSignaturesArgumentError" />
+                    <s:enumeration value="ServerConfigurationEntryMissing" />
+                    <s:enumeration value="ServerConfigurationEntryWrong" />
+                    <s:enumeration value="ProfileAlreadyExists" />
+                    <s:enumeration value="ProfileDoesNotExist" />
+                    <s:enumeration value="ProfileParameterIsNull" />
+                    <s:enumeration value="AESKeyNotFound" />
+                    <s:enumeration value="CertificateError" />
+                    <s:enumeration value="InvalidDBMode" />
+                    <s:enumeration value="IDColumnForDeleteNotFound" />
+                    <s:enumeration value="DalDBError" />
+                    <s:enumeration value="DalDBDeadLockError" />
+                    <s:enumeration value="DalDBTimeOutError" />
+                    <s:enumeration value="AccessNotGranted" />
+                    <s:enumeration value="DEMOLicenseDateValidationRegistryKeyError" />
+                    <s:enumeration value="DEMOLicenseDateValidationRegistryKeyValueError" />
+                    <s:enumeration value="DEMOLicenseDateValidationError" />
+                    <s:enumeration value="LicenseSignatureValidationFileDoesNotExist" />
+                    <s:enumeration value="LicenseSignatureValidationNoSignature" />
+                    <s:enumeration value="LicenseSignatureValidationMoreThenOneSignature" />
+                    <s:enumeration value="LicenseSignatureValidationIsNotCorrect" />
+                    <s:enumeration value="LicenseSignatureValidationError" />
+                    <s:enumeration value="LicenseMachineIdValidationNoNode" />
+                    <s:enumeration value="LicenseMachineIdValidationIsNotValid" />
+                    <s:enumeration value="LicenseMachineIdValidationError" />
+                    <s:enumeration value="LicenseDateValidationNoExpirationDateNode" />
+                    <s:enumeration value="LicenseDateValidationLicenseFinished" />
+                    <s:enumeration value="LicenseDateValidationError" />
+                    <s:enumeration value="LicenseMaxCapacityValidationNoNode" />
+                    <s:enumeration value="LicenseMaxCapacityValidationIncorrectValue" />
+                    <s:enumeration value="LicenseMaxCapacityValidationError" />
+                    <s:enumeration value="UnexpectedException" />
+                    <s:enumeration value="AccessDenied" />
+                    <s:enumeration value="InernalError" />
+                    <s:enumeration value="WrongUIDFormat" />
+                    <s:enumeration value="InvalidImageFormat" />
+                    <s:enumeration value="InvalidSignatureData" />
+                    <s:enumeration value="ProfileHistoryDoesNotExist" />
+                    <s:enumeration value="ProfileAlreadyValidated" />
+                    <s:enumeration value="ProfileNotValidated" />
+                    <s:enumeration value="AuditTrailMissingOrDeleted" />
+                    <s:enumeration value="SigEngineValidationError" />
+                    <s:enumeration value="ProfileInconsistent" />
+                    <s:enumeration value="LowPressureLevelError" />
+                    <s:enumeration value="EncryptedSignatureDataDecryptionFailed" />
+                </s:restriction>
+            </s:simpleType>
+            <s:complexType name="EnrollResult">
+                <s:sequence>
+                    <s:element minOccurs="1" maxOccurs="1" name="enrollResult" type="tns:EnrollResultEnum" />
+                    <s:element minOccurs="0" maxOccurs="1" name="infoEnrollOk" type="tns:EnrollOkInfo" />
+                    <s:element minOccurs="0" maxOccurs="1" name="rejectedSignatures" type="tns:ArrayOfRejectedSignature" />
+                    <s:element minOccurs="1" maxOccurs="1" name="signatureNormalizationActive" type="s:boolean" />
+                </s:sequence>
+            </s:complexType>
+            <s:simpleType name="EnrollResultEnum">
+                <s:restriction base="s:string">
+                    <s:enumeration value="EnrollCompleted" />
+                    <s:enumeration value="EnrollContinued" />
+                    <s:enumeration value="EnrollRejected" />
+                </s:restriction>
+            </s:simpleType>
+            <s:complexType name="EnrollOkInfo">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="1" name="profileId" type="s:string" />
+                    <s:element minOccurs="1" maxOccurs="1" name="nrEnrolled" type="s:int" />
+                    <s:element minOccurs="1" maxOccurs="1" name="nrNotVerificationEnabledSignaturesInProfile" type="s:int" />
+                    <s:element minOccurs="0" maxOccurs="1" name="dbSigIdsRemovedOnEnrollComplete" type="tns:ArrayOfString" />
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="ArrayOfRejectedSignature">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="unbounded" name="RejectedSignature" nillable="true" type="tns:RejectedSignature" />
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="RejectedSignature">
+                <s:sequence>
+                    <s:element minOccurs="1" maxOccurs="1" name="reason" type="tns:Reason" />
+                    <s:element minOccurs="1" maxOccurs="1" name="index" type="s:int" />
+                </s:sequence>
+            </s:complexType>
+            <s:simpleType name="Reason">
+                <s:restriction base="s:string">
+                    <s:enumeration value="nrexeeded" />
+                    <s:enumeration value="consistency" />
+                    <s:enumeration value="complexity" />
+                    <s:enumeration value="compatibility" />
+                </s:restriction>
+            </s:simpleType>
+            <s:element name="EnrollDynamicProfile_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="profileName" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="signatureDataContainerXmlStrArr" type="tns:ArrayOfString" />
+                        <s:element minOccurs="1" maxOccurs="1" name="continuous" type="s:boolean" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="EnrollDynamicProfile_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="EnrollDynamicProfile_v1Result" type="tns:EnrollResultInfo_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="ValidateDynamicProfile_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="arrOfSigIds" type="tns:ArrayOfString" />
+                        <s:element minOccurs="0" maxOccurs="1" name="profileId" type="s:string" />
+                        <s:element minOccurs="1" maxOccurs="1" name="continuous" type="s:boolean" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="ValidateDynamicProfile_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="ValidateDynamicProfile_v1Result" type="tns:ValidateResultInfo_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="ValidateResultInfo_v1">
+                <s:complexContent mixed="false">
+                    <s:extension base="tns:ResultBase">
+                        <s:sequence>
+                            <s:element minOccurs="0" maxOccurs="1" name="okInfo" type="tns:ValidateResult" />
+                        </s:sequence>
+                    </s:extension>
+                </s:complexContent>
+            </s:complexType>
+            <s:complexType name="ValidateResult">
+                <s:sequence>
+                    <s:element minOccurs="1" maxOccurs="1" name="validateResult" type="tns:ValidateResultEnum" />
+                    <s:element minOccurs="0" maxOccurs="1" name="infoValidateOk" type="tns:ValidateOkInfo" />
+                    <s:element minOccurs="0" maxOccurs="1" name="rejectedSignatures" type="tns:ArrayOfRejectedSignature" />
+                    <s:element minOccurs="1" maxOccurs="1" name="signatureNormalizationActive" type="s:boolean" />
+                </s:sequence>
+            </s:complexType>
+            <s:simpleType name="ValidateResultEnum">
+                <s:restriction base="s:string">
+                    <s:enumeration value="ValidateProfileComplete" />
+                    <s:enumeration value="ValidateProfileContinued" />
+                    <s:enumeration value="ValidateRejected" />
+                </s:restriction>
+            </s:simpleType>
+            <s:complexType name="ValidateOkInfo">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="1" name="profileId" type="s:string" />
+                    <s:element minOccurs="1" maxOccurs="1" name="nrAccepted" type="s:int" />
+                </s:sequence>
+            </s:complexType>
+            <s:element name="EnrollStaticProfile_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="profileName" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="sigBmpArrLst" type="tns:ArrayOfBase64Binary" />
+                        <s:element minOccurs="1" maxOccurs="1" name="continuous" type="s:boolean" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="ArrayOfBase64Binary">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="unbounded" name="base64Binary" nillable="true" type="s:base64Binary" />
+                </s:sequence>
+            </s:complexType>
+            <s:element name="EnrollStaticProfile_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="EnrollStaticProfile_v1Result" type="tns:EnrollResultInfo_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="EnrollStaticProfile_v2">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="profileId" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="sigBmpArrLst" type="tns:ArrayOfBase64Binary" />
+                        <s:element minOccurs="1" maxOccurs="1" name="continuous" type="s:boolean" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="EnrollStaticProfile_v2Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="EnrollStaticProfile_v2Result" type="tns:EnrollResultInfo_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="IdentifyUserBySignatureDynamicToDynamic_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="signatureDataContainerXmlStr" type="s:string" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="IdentifyUserBySignatureDynamicToDynamic_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="IdentifyUserBySignatureDynamicToDynamic_v1Result" type="tns:IdentifyResultInfo_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="IdentifyResultInfo_v1">
+                <s:complexContent mixed="false">
+                    <s:extension base="tns:ResultBase">
+                        <s:sequence>
+                            <s:element minOccurs="0" maxOccurs="1" name="okInfo" type="tns:IdentifyResult" />
+                        </s:sequence>
+                    </s:extension>
+                </s:complexContent>
+            </s:complexType>
+            <s:complexType name="IdentifyResult">
+                <s:sequence>
+                    <s:element minOccurs="1" maxOccurs="1" name="identifyResult" type="tns:IdentifyResultEnum" />
+                    <s:element minOccurs="0" maxOccurs="1" name="infoIdentifyMatch" type="tns:IdentifyMatchInfo" />
+                    <s:element minOccurs="1" maxOccurs="1" name="qualityLevel" type="tns:QualityLevelEnum" />
+                </s:sequence>
+            </s:complexType>
+            <s:simpleType name="IdentifyResultEnum">
+                <s:restriction base="s:string">
+                    <s:enumeration value="IdentifyMatch" />
+                    <s:enumeration value="IdentifyNoMatch" />
+                </s:restriction>
+            </s:simpleType>
+            <s:complexType name="IdentifyMatchInfo">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="1" name="matchingExtUserId" type="s:string" />
+                    <s:element minOccurs="0" maxOccurs="1" name="matchingProfileId" type="s:string" />
+                    <s:element minOccurs="0" maxOccurs="1" name="matchingProfileName" type="s:string" />
+                    <s:element minOccurs="1" maxOccurs="1" name="score" type="s:int" />
+                </s:sequence>
+            </s:complexType>
+            <s:simpleType name="QualityLevelEnum">
+                <s:list>
+                    <s:simpleType>
+                        <s:restriction base="s:string">
+                            <s:enumeration value="NoFlag" />
+                            <s:enumeration value="Static" />
+                            <s:enumeration value="Dynamic" />
+                            <s:enumeration value="Basic" />
+                            <s:enumeration value="Advanced" />
+                            <s:enumeration value="High" />
+                            <s:enumeration value="MixedDevices" />
+                            <s:enumeration value="Normalization" />
+                        </s:restriction>
+                    </s:simpleType>
+                </s:list>
+            </s:simpleType>
+            <s:element name="IdentifyUserProfileBySignatureDynamicToDynamic_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="signatureDataContainerXmlStr" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="profileName" type="s:string" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="IdentifyUserProfileBySignatureDynamicToDynamic_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="IdentifyUserProfileBySignatureDynamicToDynamic_v1Result" type="tns:IdentifyResultInfo_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserProfileBySignatureDynamicToDynamic_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="signatureDataContainerXmlStr" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="profileName" type="s:string" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserProfileBySignatureDynamicToDynamic_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="VerifyUserProfileBySignatureDynamicToDynamic_v1Result" type="tns:VerifyResultInfo_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="VerifyResultInfo_v1">
+                <s:complexContent mixed="false">
+                    <s:extension base="tns:ResultBase">
+                        <s:sequence>
+                            <s:element minOccurs="0" maxOccurs="1" name="okInfo" type="tns:VerifyResult" />
+                        </s:sequence>
+                    </s:extension>
+                </s:complexContent>
+            </s:complexType>
+            <s:complexType name="VerifyResult">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="1" name="infoVerifyMatch" type="tns:VerifyMatchInfo" />
+                    <s:element minOccurs="1" maxOccurs="1" name="qualityLevel" type="tns:QualityLevelEnum" />
+                    <s:element minOccurs="1" maxOccurs="1" name="score" type="s:int" />
+                    <s:element minOccurs="1" maxOccurs="1" name="verifyResult" type="tns:VerifyResultEnum" />
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="VerifyMatchInfo">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="1" name="matchingProfileId" type="s:string" />
+                    <s:element minOccurs="0" maxOccurs="1" name="matchingProfileName" type="s:string" />
+                    <s:element minOccurs="1" maxOccurs="1" name="signatureInProfileReplaced" type="s:boolean" />
+                </s:sequence>
+            </s:complexType>
+            <s:simpleType name="VerifyResultEnum">
+                <s:restriction base="s:string">
+                    <s:enumeration value="VerifyMatch" />
+                    <s:enumeration value="VerifyNoMatch" />
+                </s:restriction>
+            </s:simpleType>
+            <s:element name="VerifyUserProfileBySignatureStaticToStatic_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="sigBmpArr" type="s:base64Binary" />
+                        <s:element minOccurs="0" maxOccurs="1" name="profileName" type="s:string" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserProfileBySignatureStaticToStatic_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="VerifyUserProfileBySignatureStaticToStatic_v1Result" type="tns:VerifyResultInfo_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserProfileBySignatureDynamicToStatic_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="signatureDataContainerXmlStr" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="profileName" type="s:string" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserProfileBySignatureDynamicToStatic_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="VerifyUserProfileBySignatureDynamicToStatic_v1Result" type="tns:VerifyResultInfo_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserProfileBySignatureStaticToDynamic_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="sigBmpArr" type="s:base64Binary" />
+                        <s:element minOccurs="0" maxOccurs="1" name="profileName" type="s:string" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserProfileBySignatureStaticToDynamic_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="VerifyUserProfileBySignatureStaticToDynamic_v1Result" type="tns:VerifyResultInfo_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserBySignatureDynamicToDynamic_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="signatureDataContainerXmlStr" type="s:string" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserBySignatureDynamicToDynamic_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="VerifyUserBySignatureDynamicToDynamic_v1Result" type="tns:VerifyResultInfo_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserBySignatureDynamicToStatic_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="signatureDataContainerXmlStr" type="s:string" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserBySignatureDynamicToStatic_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="VerifyUserBySignatureDynamicToStatic_v1Result" type="tns:VerifyResultInfo_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserBySignatureStaticToStatic_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="sigBmpArr" type="s:base64Binary" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserBySignatureStaticToStatic_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="VerifyUserBySignatureStaticToStatic_v1Result" type="tns:VerifyResultInfo_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserBySignatureStaticToDynamic_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="sigBmpArr" type="s:base64Binary" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserBySignatureStaticToDynamic_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="VerifyUserBySignatureStaticToDynamic_v1Result" type="tns:VerifyResultInfo_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="IdentifyUserBySignatureDynamicToDynamicSignedResponse_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="signatureDataContainerXmlStr" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="sigEncryptionCertRawDataSets" type="tns:ArrayOfBase64Binary" />
+                        <s:element minOccurs="1" maxOccurs="1" name="signatureHashAlgorithm" type="tns:XmlDSigSignatureAlgorithm" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:simpleType name="XmlDSigSignatureAlgorithm">
+                <s:restriction base="s:string">
+                    <s:enumeration value="Sha1" />
+                    <s:enumeration value="Sha224" />
+                    <s:enumeration value="Sha256" />
+                    <s:enumeration value="Sha384" />
+                    <s:enumeration value="Sha512" />
+                    <s:enumeration value="MD5" />
+                    <s:enumeration value="Ripemd160" />
+                </s:restriction>
+            </s:simpleType>
+            <s:element name="IdentifyUserBySignatureDynamicToDynamicSignedResponse_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="IdentifyUserBySignatureDynamicToDynamicSignedResponse_v1Result" type="tns:IdentifyResultSignedResponse_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="IdentifyResultSignedResponse_v1">
+                <s:complexContent mixed="false">
+                    <s:extension base="tns:ResultBase">
+                        <s:sequence>
+                            <s:element minOccurs="0" maxOccurs="1" name="okInfo" type="s:string" />
+                        </s:sequence>
+                    </s:extension>
+                </s:complexContent>
+            </s:complexType>
+            <s:element name="IdentifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="signatureDataContainerXmlStr" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="profileName" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="sigEncryptionCertRawDataSets" type="tns:ArrayOfBase64Binary" />
+                        <s:element minOccurs="1" maxOccurs="1" name="signatureHashAlgorithm" type="tns:XmlDSigSignatureAlgorithm" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="IdentifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="IdentifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1Result" type="tns:IdentifyResultSignedResponse_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="signatureDataContainerXmlStr" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="profileName" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="sigEncryptionCertRawDataSets" type="tns:ArrayOfBase64Binary" />
+                        <s:element minOccurs="1" maxOccurs="1" name="signatureHashAlgorithm" type="tns:XmlDSigSignatureAlgorithm" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="VerifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1Result" type="tns:VerifyResultSignedResponse_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="VerifyResultSignedResponse_v1">
+                <s:complexContent mixed="false">
+                    <s:extension base="tns:ResultBase">
+                        <s:sequence>
+                            <s:element minOccurs="0" maxOccurs="1" name="okInfo" type="s:string" />
+                        </s:sequence>
+                    </s:extension>
+                </s:complexContent>
+            </s:complexType>
+            <s:element name="VerifyUserProfileBySignatureStaticToStaticSignedResponse_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="sigBmpArr" type="s:base64Binary" />
+                        <s:element minOccurs="0" maxOccurs="1" name="profileName" type="s:string" />
+                        <s:element minOccurs="1" maxOccurs="1" name="signatureHashAlgorithm" type="tns:XmlDSigSignatureAlgorithm" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserProfileBySignatureStaticToStaticSignedResponse_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="VerifyUserProfileBySignatureStaticToStaticSignedResponse_v1Result" type="tns:VerifyResultSignedResponse_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserProfileBySignatureDynamicToStaticSignedResponse_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="signatureDataContainerXmlStr" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="profileName" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="sigEncryptionCertRawDataSets" type="tns:ArrayOfBase64Binary" />
+                        <s:element minOccurs="1" maxOccurs="1" name="signatureHashAlgorithm" type="tns:XmlDSigSignatureAlgorithm" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserProfileBySignatureDynamicToStaticSignedResponse_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="VerifyUserProfileBySignatureDynamicToStaticSignedResponse_v1Result" type="tns:VerifyResultSignedResponse_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserProfileBySignatureStaticToDynamicSignedResponse_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="sigBmpArr" type="s:base64Binary" />
+                        <s:element minOccurs="0" maxOccurs="1" name="profileName" type="s:string" />
+                        <s:element minOccurs="1" maxOccurs="1" name="signatureHashAlgorithm" type="tns:XmlDSigSignatureAlgorithm" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserProfileBySignatureStaticToDynamicSignedResponse_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="VerifyUserProfileBySignatureStaticToDynamicSignedResponse_v1Result" type="tns:VerifyResultSignedResponse_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserBySignatureDynamicToDynamicSignedResponse_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="signatureDataContainerXmlStr" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="sigEncryptionCertRawDataSets" type="tns:ArrayOfBase64Binary" />
+                        <s:element minOccurs="1" maxOccurs="1" name="signatureHashAlgorithm" type="tns:XmlDSigSignatureAlgorithm" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserBySignatureDynamicToDynamicSignedResponse_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="VerifyUserBySignatureDynamicToDynamicSignedResponse_v1Result" type="tns:VerifyResultSignedResponse_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserBySignatureDynamicToStaticSignedResponse_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="signatureDataContainerXmlStr" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="sigEncryptionCertRawDataSets" type="tns:ArrayOfBase64Binary" />
+                        <s:element minOccurs="1" maxOccurs="1" name="signatureHashAlgorithm" type="tns:XmlDSigSignatureAlgorithm" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserBySignatureDynamicToStaticSignedResponse_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="VerifyUserBySignatureDynamicToStaticSignedResponse_v1Result" type="tns:VerifyResultSignedResponse_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserBySignatureStaticToStaticSignedResponse_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="sigBmpArr" type="s:base64Binary" />
+                        <s:element minOccurs="1" maxOccurs="1" name="signatureHashAlgorithm" type="tns:XmlDSigSignatureAlgorithm" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserBySignatureStaticToStaticSignedResponse_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="VerifyUserBySignatureStaticToStaticSignedResponse_v1Result" type="tns:VerifyResultSignedResponse_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserBySignatureStaticToDynamicSignedResponse_v1">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="bioUserId" type="s:string" />
+                        <s:element minOccurs="0" maxOccurs="1" name="sigBmpArr" type="s:base64Binary" />
+                        <s:element minOccurs="1" maxOccurs="1" name="signatureHashAlgorithm" type="tns:XmlDSigSignatureAlgorithm" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+            <s:element name="VerifyUserBySignatureStaticToDynamicSignedResponse_v1Response">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="1" name="VerifyUserBySignatureStaticToDynamicSignedResponse_v1Result" type="tns:VerifyResultSignedResponse_v1" />
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+        </s:schema>
+    </wsdl:types>
+    <wsdl:message name="EnrollDynamicProfile_v2SoapIn">
+        <wsdl:part name="parameters" element="tns:EnrollDynamicProfile_v2" />
+    </wsdl:message>
+    <wsdl:message name="EnrollDynamicProfile_v2SoapOut">
+        <wsdl:part name="parameters" element="tns:EnrollDynamicProfile_v2Response" />
+    </wsdl:message>
+    <wsdl:message name="EnrollDynamicProfile_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:EnrollDynamicProfile_v1" />
+    </wsdl:message>
+    <wsdl:message name="EnrollDynamicProfile_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:EnrollDynamicProfile_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="ValidateDynamicProfile_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:ValidateDynamicProfile_v1" />
+    </wsdl:message>
+    <wsdl:message name="ValidateDynamicProfile_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:ValidateDynamicProfile_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="EnrollStaticProfile_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:EnrollStaticProfile_v1" />
+    </wsdl:message>
+    <wsdl:message name="EnrollStaticProfile_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:EnrollStaticProfile_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="EnrollStaticProfile_v2SoapIn">
+        <wsdl:part name="parameters" element="tns:EnrollStaticProfile_v2" />
+    </wsdl:message>
+    <wsdl:message name="EnrollStaticProfile_v2SoapOut">
+        <wsdl:part name="parameters" element="tns:EnrollStaticProfile_v2Response" />
+    </wsdl:message>
+    <wsdl:message name="IdentifyUserBySignatureDynamicToDynamic_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:IdentifyUserBySignatureDynamicToDynamic_v1" />
+    </wsdl:message>
+    <wsdl:message name="IdentifyUserBySignatureDynamicToDynamic_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:IdentifyUserBySignatureDynamicToDynamic_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="IdentifyUserProfileBySignatureDynamicToDynamic_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:IdentifyUserProfileBySignatureDynamicToDynamic_v1" />
+    </wsdl:message>
+    <wsdl:message name="IdentifyUserProfileBySignatureDynamicToDynamic_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:IdentifyUserProfileBySignatureDynamicToDynamic_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserProfileBySignatureDynamicToDynamic_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:VerifyUserProfileBySignatureDynamicToDynamic_v1" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserProfileBySignatureDynamicToDynamic_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:VerifyUserProfileBySignatureDynamicToDynamic_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserProfileBySignatureStaticToStatic_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:VerifyUserProfileBySignatureStaticToStatic_v1" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserProfileBySignatureStaticToStatic_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:VerifyUserProfileBySignatureStaticToStatic_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserProfileBySignatureDynamicToStatic_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:VerifyUserProfileBySignatureDynamicToStatic_v1" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserProfileBySignatureDynamicToStatic_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:VerifyUserProfileBySignatureDynamicToStatic_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserProfileBySignatureStaticToDynamic_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:VerifyUserProfileBySignatureStaticToDynamic_v1" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserProfileBySignatureStaticToDynamic_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:VerifyUserProfileBySignatureStaticToDynamic_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserBySignatureDynamicToDynamic_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:VerifyUserBySignatureDynamicToDynamic_v1" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserBySignatureDynamicToDynamic_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:VerifyUserBySignatureDynamicToDynamic_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserBySignatureDynamicToStatic_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:VerifyUserBySignatureDynamicToStatic_v1" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserBySignatureDynamicToStatic_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:VerifyUserBySignatureDynamicToStatic_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserBySignatureStaticToStatic_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:VerifyUserBySignatureStaticToStatic_v1" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserBySignatureStaticToStatic_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:VerifyUserBySignatureStaticToStatic_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserBySignatureStaticToDynamic_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:VerifyUserBySignatureStaticToDynamic_v1" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserBySignatureStaticToDynamic_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:VerifyUserBySignatureStaticToDynamic_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="IdentifyUserBySignatureDynamicToDynamicSignedResponse_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:IdentifyUserBySignatureDynamicToDynamicSignedResponse_v1" />
+    </wsdl:message>
+    <wsdl:message name="IdentifyUserBySignatureDynamicToDynamicSignedResponse_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:IdentifyUserBySignatureDynamicToDynamicSignedResponse_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="IdentifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:IdentifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1" />
+    </wsdl:message>
+    <wsdl:message name="IdentifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:IdentifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:VerifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:VerifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserProfileBySignatureStaticToStaticSignedResponse_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:VerifyUserProfileBySignatureStaticToStaticSignedResponse_v1" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserProfileBySignatureStaticToStaticSignedResponse_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:VerifyUserProfileBySignatureStaticToStaticSignedResponse_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserProfileBySignatureDynamicToStaticSignedResponse_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:VerifyUserProfileBySignatureDynamicToStaticSignedResponse_v1" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserProfileBySignatureDynamicToStaticSignedResponse_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:VerifyUserProfileBySignatureDynamicToStaticSignedResponse_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserProfileBySignatureStaticToDynamicSignedResponse_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:VerifyUserProfileBySignatureStaticToDynamicSignedResponse_v1" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserProfileBySignatureStaticToDynamicSignedResponse_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:VerifyUserProfileBySignatureStaticToDynamicSignedResponse_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserBySignatureDynamicToDynamicSignedResponse_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:VerifyUserBySignatureDynamicToDynamicSignedResponse_v1" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserBySignatureDynamicToDynamicSignedResponse_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:VerifyUserBySignatureDynamicToDynamicSignedResponse_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserBySignatureDynamicToStaticSignedResponse_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:VerifyUserBySignatureDynamicToStaticSignedResponse_v1" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserBySignatureDynamicToStaticSignedResponse_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:VerifyUserBySignatureDynamicToStaticSignedResponse_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserBySignatureStaticToStaticSignedResponse_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:VerifyUserBySignatureStaticToStaticSignedResponse_v1" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserBySignatureStaticToStaticSignedResponse_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:VerifyUserBySignatureStaticToStaticSignedResponse_v1Response" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserBySignatureStaticToDynamicSignedResponse_v1SoapIn">
+        <wsdl:part name="parameters" element="tns:VerifyUserBySignatureStaticToDynamicSignedResponse_v1" />
+    </wsdl:message>
+    <wsdl:message name="VerifyUserBySignatureStaticToDynamicSignedResponse_v1SoapOut">
+        <wsdl:part name="parameters" element="tns:VerifyUserBySignatureStaticToDynamicSignedResponse_v1Response" />
+    </wsdl:message>
+    <wsdl:portType name="WebServiceBiometricPartSoap">
+        <wsdl:operation name="EnrollDynamicProfile_v2">
+            <wsdl:input message="tns:EnrollDynamicProfile_v2SoapIn" />
+            <wsdl:output message="tns:EnrollDynamicProfile_v2SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="EnrollDynamicProfile_v1">
+            <wsdl:input message="tns:EnrollDynamicProfile_v1SoapIn" />
+            <wsdl:output message="tns:EnrollDynamicProfile_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="ValidateDynamicProfile_v1">
+            <wsdl:input message="tns:ValidateDynamicProfile_v1SoapIn" />
+            <wsdl:output message="tns:ValidateDynamicProfile_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="EnrollStaticProfile_v1">
+            <wsdl:input message="tns:EnrollStaticProfile_v1SoapIn" />
+            <wsdl:output message="tns:EnrollStaticProfile_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="EnrollStaticProfile_v2">
+            <wsdl:input message="tns:EnrollStaticProfile_v2SoapIn" />
+            <wsdl:output message="tns:EnrollStaticProfile_v2SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="IdentifyUserBySignatureDynamicToDynamic_v1">
+            <wsdl:input message="tns:IdentifyUserBySignatureDynamicToDynamic_v1SoapIn" />
+            <wsdl:output message="tns:IdentifyUserBySignatureDynamicToDynamic_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="IdentifyUserProfileBySignatureDynamicToDynamic_v1">
+            <wsdl:input message="tns:IdentifyUserProfileBySignatureDynamicToDynamic_v1SoapIn" />
+            <wsdl:output message="tns:IdentifyUserProfileBySignatureDynamicToDynamic_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserProfileBySignatureDynamicToDynamic_v1">
+            <wsdl:input message="tns:VerifyUserProfileBySignatureDynamicToDynamic_v1SoapIn" />
+            <wsdl:output message="tns:VerifyUserProfileBySignatureDynamicToDynamic_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserProfileBySignatureStaticToStatic_v1">
+            <wsdl:input message="tns:VerifyUserProfileBySignatureStaticToStatic_v1SoapIn" />
+            <wsdl:output message="tns:VerifyUserProfileBySignatureStaticToStatic_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserProfileBySignatureDynamicToStatic_v1">
+            <wsdl:input message="tns:VerifyUserProfileBySignatureDynamicToStatic_v1SoapIn" />
+            <wsdl:output message="tns:VerifyUserProfileBySignatureDynamicToStatic_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserProfileBySignatureStaticToDynamic_v1">
+            <wsdl:input message="tns:VerifyUserProfileBySignatureStaticToDynamic_v1SoapIn" />
+            <wsdl:output message="tns:VerifyUserProfileBySignatureStaticToDynamic_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserBySignatureDynamicToDynamic_v1">
+            <wsdl:input message="tns:VerifyUserBySignatureDynamicToDynamic_v1SoapIn" />
+            <wsdl:output message="tns:VerifyUserBySignatureDynamicToDynamic_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserBySignatureDynamicToStatic_v1">
+            <wsdl:input message="tns:VerifyUserBySignatureDynamicToStatic_v1SoapIn" />
+            <wsdl:output message="tns:VerifyUserBySignatureDynamicToStatic_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserBySignatureStaticToStatic_v1">
+            <wsdl:input message="tns:VerifyUserBySignatureStaticToStatic_v1SoapIn" />
+            <wsdl:output message="tns:VerifyUserBySignatureStaticToStatic_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserBySignatureStaticToDynamic_v1">
+            <wsdl:input message="tns:VerifyUserBySignatureStaticToDynamic_v1SoapIn" />
+            <wsdl:output message="tns:VerifyUserBySignatureStaticToDynamic_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="IdentifyUserBySignatureDynamicToDynamicSignedResponse_v1">
+            <wsdl:input message="tns:IdentifyUserBySignatureDynamicToDynamicSignedResponse_v1SoapIn" />
+            <wsdl:output message="tns:IdentifyUserBySignatureDynamicToDynamicSignedResponse_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="IdentifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1">
+            <wsdl:input message="tns:IdentifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1SoapIn" />
+            <wsdl:output message="tns:IdentifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1">
+            <wsdl:input message="tns:VerifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1SoapIn" />
+            <wsdl:output message="tns:VerifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserProfileBySignatureStaticToStaticSignedResponse_v1">
+            <wsdl:input message="tns:VerifyUserProfileBySignatureStaticToStaticSignedResponse_v1SoapIn" />
+            <wsdl:output message="tns:VerifyUserProfileBySignatureStaticToStaticSignedResponse_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserProfileBySignatureDynamicToStaticSignedResponse_v1">
+            <wsdl:input message="tns:VerifyUserProfileBySignatureDynamicToStaticSignedResponse_v1SoapIn" />
+            <wsdl:output message="tns:VerifyUserProfileBySignatureDynamicToStaticSignedResponse_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserProfileBySignatureStaticToDynamicSignedResponse_v1">
+            <wsdl:input message="tns:VerifyUserProfileBySignatureStaticToDynamicSignedResponse_v1SoapIn" />
+            <wsdl:output message="tns:VerifyUserProfileBySignatureStaticToDynamicSignedResponse_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserBySignatureDynamicToDynamicSignedResponse_v1">
+            <wsdl:input message="tns:VerifyUserBySignatureDynamicToDynamicSignedResponse_v1SoapIn" />
+            <wsdl:output message="tns:VerifyUserBySignatureDynamicToDynamicSignedResponse_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserBySignatureDynamicToStaticSignedResponse_v1">
+            <wsdl:input message="tns:VerifyUserBySignatureDynamicToStaticSignedResponse_v1SoapIn" />
+            <wsdl:output message="tns:VerifyUserBySignatureDynamicToStaticSignedResponse_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserBySignatureStaticToStaticSignedResponse_v1">
+            <wsdl:input message="tns:VerifyUserBySignatureStaticToStaticSignedResponse_v1SoapIn" />
+            <wsdl:output message="tns:VerifyUserBySignatureStaticToStaticSignedResponse_v1SoapOut" />
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserBySignatureStaticToDynamicSignedResponse_v1">
+            <wsdl:input message="tns:VerifyUserBySignatureStaticToDynamicSignedResponse_v1SoapIn" />
+            <wsdl:output message="tns:VerifyUserBySignatureStaticToDynamicSignedResponse_v1SoapOut" />
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="WebServiceBiometricPartSoap" type="tns:WebServiceBiometricPartSoap">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="EnrollDynamicProfile_v2">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/EnrollDynamicProfile_v2" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="EnrollDynamicProfile_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/EnrollDynamicProfile_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="ValidateDynamicProfile_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/ValidateDynamicProfile_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="EnrollStaticProfile_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/EnrollStaticProfile_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="EnrollStaticProfile_v2">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/EnrollStaticProfile_v2" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="IdentifyUserBySignatureDynamicToDynamic_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/IdentifyUserBySignatureDynamicToDynamic_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="IdentifyUserProfileBySignatureDynamicToDynamic_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/IdentifyUserProfileBySignatureDynamicToDynamic_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserProfileBySignatureDynamicToDynamic_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserProfileBySignatureDynamicToDynamic_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserProfileBySignatureStaticToStatic_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserProfileBySignatureStaticToStatic_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserProfileBySignatureDynamicToStatic_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserProfileBySignatureDynamicToStatic_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserProfileBySignatureStaticToDynamic_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserProfileBySignatureStaticToDynamic_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserBySignatureDynamicToDynamic_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserBySignatureDynamicToDynamic_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserBySignatureDynamicToStatic_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserBySignatureDynamicToStatic_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserBySignatureStaticToStatic_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserBySignatureStaticToStatic_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserBySignatureStaticToDynamic_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserBySignatureStaticToDynamic_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="IdentifyUserBySignatureDynamicToDynamicSignedResponse_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/IdentifyUserBySignatureDynamicToDynamicSignedResponse_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="IdentifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/IdentifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserProfileBySignatureStaticToStaticSignedResponse_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserProfileBySignatureStaticToStaticSignedResponse_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserProfileBySignatureDynamicToStaticSignedResponse_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserProfileBySignatureDynamicToStaticSignedResponse_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserProfileBySignatureStaticToDynamicSignedResponse_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserProfileBySignatureStaticToDynamicSignedResponse_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserBySignatureDynamicToDynamicSignedResponse_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserBySignatureDynamicToDynamicSignedResponse_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserBySignatureDynamicToStaticSignedResponse_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserBySignatureDynamicToStaticSignedResponse_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserBySignatureStaticToStaticSignedResponse_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserBySignatureStaticToStaticSignedResponse_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserBySignatureStaticToDynamicSignedResponse_v1">
+            <soap:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserBySignatureStaticToDynamicSignedResponse_v1" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="WebServiceBiometricPartSoap12" type="tns:WebServiceBiometricPartSoap">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="EnrollDynamicProfile_v2">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/EnrollDynamicProfile_v2" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="EnrollDynamicProfile_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/EnrollDynamicProfile_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="ValidateDynamicProfile_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/ValidateDynamicProfile_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="EnrollStaticProfile_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/EnrollStaticProfile_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="EnrollStaticProfile_v2">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/EnrollStaticProfile_v2" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="IdentifyUserBySignatureDynamicToDynamic_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/IdentifyUserBySignatureDynamicToDynamic_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="IdentifyUserProfileBySignatureDynamicToDynamic_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/IdentifyUserProfileBySignatureDynamicToDynamic_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserProfileBySignatureDynamicToDynamic_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserProfileBySignatureDynamicToDynamic_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserProfileBySignatureStaticToStatic_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserProfileBySignatureStaticToStatic_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserProfileBySignatureDynamicToStatic_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserProfileBySignatureDynamicToStatic_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserProfileBySignatureStaticToDynamic_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserProfileBySignatureStaticToDynamic_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserBySignatureDynamicToDynamic_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserBySignatureDynamicToDynamic_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserBySignatureDynamicToStatic_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserBySignatureDynamicToStatic_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserBySignatureStaticToStatic_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserBySignatureStaticToStatic_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserBySignatureStaticToDynamic_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserBySignatureStaticToDynamic_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="IdentifyUserBySignatureDynamicToDynamicSignedResponse_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/IdentifyUserBySignatureDynamicToDynamicSignedResponse_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="IdentifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/IdentifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserProfileBySignatureDynamicToDynamicSignedResponse_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserProfileBySignatureStaticToStaticSignedResponse_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserProfileBySignatureStaticToStaticSignedResponse_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserProfileBySignatureDynamicToStaticSignedResponse_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserProfileBySignatureDynamicToStaticSignedResponse_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserProfileBySignatureStaticToDynamicSignedResponse_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserProfileBySignatureStaticToDynamicSignedResponse_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserBySignatureDynamicToDynamicSignedResponse_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserBySignatureDynamicToDynamicSignedResponse_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserBySignatureDynamicToStaticSignedResponse_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserBySignatureDynamicToStaticSignedResponse_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserBySignatureStaticToStaticSignedResponse_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserBySignatureStaticToStaticSignedResponse_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="VerifyUserBySignatureStaticToDynamicSignedResponse_v1">
+            <soap12:operation soapAction="http://wwww.xyzmo.com/biometricserver/VerifyUserBySignatureStaticToDynamicSignedResponse_v1" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="WebServiceBiometricPart">
+        <wsdl:port name="WebServiceBiometricPartSoap" binding="tns:WebServiceBiometricPartSoap">
+            <soap:address location="http://107.21.36.146:50200/Webservices/WebServiceBiometricPart.asmx" />
+        </wsdl:port>
+        <wsdl:port name="WebServiceBiometricPartSoap12" binding="tns:WebServiceBiometricPartSoap12">
+            <soap12:address location="http://107.21.36.146:50200/Webservices/WebServiceBiometricPart.asmx" />
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

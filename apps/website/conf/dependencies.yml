@@ -1,0 +1,94 @@
+# Application dependencies. Keep these in alphabetical order.
+
+require:
+    - batik -> batik-rasterizer 1.6
+    - batik -> batik-svggen 1.6
+    - com.google.inject -> guice 2.0
+    - com.stripe -> stripe-java 1.0.1
+    - egraphs -> frontend HEAD
+    - net.debasishg -> sjson_2.8.1 0.12:
+        exclude:
+            # Exclude scala because its included with play-scala
+            - org.scala-lang -> scala-library 2.8.1
+    - org.antlr -> stringtemplate 4.0.2
+    - org.apache.axis2 -> axis2 1.6.1
+    - org.apache.axis2 -> axis2-transport-http 1.6.1
+    - org.apache.axis2 -> axis2-transport-local 1.6.1
+    - org.jclouds.api -> filesystem 1.2.1:
+        exclude:
+            - org.clojure -> *
+    - org.jclouds.provider -> aws-s3 1.2.1:
+        exclude:
+            - org.clojure -> *
+    - org.joda -> joda-money 0.6
+    - joda-time -> joda-time 2.1
+    - org.specs2 -> specs2_2.8.1 1.5:
+        exclude:
+            - org.mockito -> *
+            - org.scala-lang -> scala-library 2.8.1
+    - org.squeryl -> squeryl_2.8.1 0.9.5:
+        exclude:
+            # Exclude scala library, which is included with play
+            - org.scala-lang -> scala-library 2.8.1
+            # Exclude DB-specific libs
+            - net.sourceforge.jtds -> *
+            - postgresql -> *
+            - org.apache.derby -> *
+            - com.h2database -> *
+            - mysql -> *
+            # Exclude testing libs
+            - junit -> *
+            - org.scalatest -> *
+    - play
+    - play -> scala 0.9.1
+    - play -> cloudbees 0.2.2
+    - play -> mockito 0.1
+    - provided -> mockito-all 1.9.1-SNAPSHOT
+    - provided -> scala-guice_2.8.1 0.1
+    - provided -> tritonus_share 0.3.6
+    - provided -> tritonus_remaining 0.3.6
+    - provided -> xyzmo 1.0
+    - xml-apis -> xml-apis-ext 1.3.04
+    - xml-apis -> xml-apis 1.3.04
+
+# Non-default repositories
+repositories:
+    - egraphsModules:
+        type:       local
+        descriptor: ${application.path}/../../modules/[module]/conf/dependencies.yml
+        artifact:   ${application.path}/../../modules/[module]
+        contains:
+            - egraphs -> *
+    - Akka:
+         type: iBiblio
+         root: "http://repo.typesafe.com/typesafe/releases"
+         contains:
+             - se.scalablesolutions.akka -> *
+             - org.codehaus.aspectwerkz -> *
+    # Provides otherwise unresolved dependency of Akka
+    - guiceyfruit:
+         type: iBiblio
+         root: "http://guiceyfruit.googlecode.com/svn/repo/releases/"
+         contains:
+             - org.guiceyfruit -> *
+    - provided:
+          type:       local
+          descriptor: "${application.path}/../[module]/conf/dependencies.yml"
+          artifact:   "${application.path}/external/[module]-[revision].jar"
+          contains:
+             - provided -> *
+    - scalatools:
+         type: iBiblio
+         root: "http://scala-tools.org/repo-releases"
+         contains:
+             - org.scalamock -> *
+             - org.squeryl -> *
+             - net.databinder -> *
+             - net.debasishg -> *
+             - org.specs2 -> specs2_2.8.1 1.5
+    - scalatools-snapshots:
+         type: iBiblio
+         root: "http://scala-tools.org/repo-snapshots"
+         contains:
+             - org.specs2 -> specs2-scalaz-core_2.8.1
+

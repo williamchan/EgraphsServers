@@ -1,5 +1,0 @@
-self: play -> frontend project
-
-# Any project that uses this module should provide play-scala and play-less
-require:
-    - play
