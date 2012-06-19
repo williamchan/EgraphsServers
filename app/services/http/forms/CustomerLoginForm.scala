@@ -14,7 +14,7 @@ import services.Utils
 class CustomerLoginForm(val paramsMap: Form.Readable, check: FormChecks)
   extends Form[CustomerLoginForm.Validated]
 {
-  import CustomerLoginForm.Fields
+  import CustomerLoginForm.{Fields, badCredentialsMessage}
 
   //
   // Field values and validations
@@ -54,15 +54,11 @@ class CustomerLoginForm(val paramsMap: Form.Readable, check: FormChecks)
     // Safely access the account value in here
     CustomerLoginForm.Validated(customerId.value.get)
   }
-
-  //
-  // Private members
-  //
-  private val badCredentialsMessage = "The username and password did not match. Please try again"
 }
 
 
 object CustomerLoginForm {
+  val badCredentialsMessage = "The username and password did not match. Please try again"
 
   object Fields extends Utils.Enum {
     sealed case class EnumVal(name: String) extends Value

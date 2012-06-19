@@ -10,6 +10,7 @@ import scala.collection.JavaConversions._
 import services.Utils
 import utils.TestData
 import org.junit.Assert._
+import services.http.forms.CustomerLoginForm
 
 trait EgraphsFunctionalTest extends FunctionalTest with CleanDatabaseAfterEachTest {
 
@@ -18,8 +19,16 @@ trait EgraphsFunctionalTest extends FunctionalTest with CleanDatabaseAfterEachTe
   }
 
   def login(account: Account, password: String = TestData.defaultPassword): Response = {
+    import CustomerLoginForm.Fields
+
     clearCookies()
-    val response = POST(Utils.lookupUrl("WebsiteControllers.postLogin"), Map[String, String]("email" -> account.email,"password" -> password))
+    val response = POST(
+      Utils.lookupUrl("WebsiteControllers.postLogin"),
+      Map[String, String](
+        Fields.Email.name -> account.email,
+        Fields.Password.name -> password
+      )
+    )
     assertStatus(302, response)
     assertFalse(getPlayFlashCookie(response).contains("error"))
     response
