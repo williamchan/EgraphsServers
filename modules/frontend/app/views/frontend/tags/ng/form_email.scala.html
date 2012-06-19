@@ -11,16 +11,13 @@
   </a>
 <div id="@id-edit" class="row-settings row-fluid hide">
   <span class="span3">@title</span>
-  <span class="span4">
+  <span class="span7 controls">
     <input ng-model="@model" name="@id" type="email"/>
+     <span ng-show="form.@id.$error.email">Invalid e-mail address.</span>
   </span>
-  <span class="span4 help-inline error">
-    <span ng-show="form.@id.$error.email">
-      Invalid Email
-    </span>
 
   </span>
-  <span class="span1">
+  <span class="span2 action">
     @form_cancel(model, id)
   </span>
 </div>

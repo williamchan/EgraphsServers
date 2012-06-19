@@ -1,26 +1,26 @@
 @(address: String, id: String)
 
-@import views.frontend.tags.ng.Utils
+@import views.frontend.Utils
 
 
 <a id="@id-display" class="row-settings row-fluid action edit">
   <span class="span3">@Utils.binding(address,".title")</span>
   <span class="span4">@Utils.binding(address,".fullname")</span>
-  <span class="span4">
+  <span class="span3">
     <address>
       @Utils.binding(address, ".line1")<br>
       @Utils.binding(address, ".line2")<br ng:show="{{user.address.line2}}">
       @Utils.binding(address, ".city"), @Utils.binding(address, ".state") @Utils.binding(address, ".zip")
       </address>
   </span>
-  <span class="span1 action">
+  <span class="span2 action">
       <i class="icon-pencil">
       </i> Edit
   </span>
 </a>
 <div id="@id-edit" class="row-settings row-fluid hide">
   <span class="span1"></span>
-      <span class="span10">
+      <span class="span9">
         <address>
           @form_input("Name", address,".fullname")
           @form_input("Address Line 1", address, ".line1")
@@ -30,7 +30,7 @@
           @form_input("ZIP", address, ".zip")
         </address>
       </span>
-      <span class="span1">
+      <span class="span2 action">
         @form_cancel(address, id)
       </span>
 </div>
