@@ -5,6 +5,7 @@ require:
     - batik -> batik-svggen 1.6
     - com.google.inject -> guice 2.0
     - com.stripe -> stripe-java 1.0.1
+    - egraphs -> frontend HEAD
     - net.debasishg -> sjson_2.8.1 0.12:
         exclude:
             # Exclude scala because its included with play-scala
@@ -40,10 +41,8 @@ require:
             - org.scalatest -> *
     - play
     - play -> scala 0.9.1
-    - play -> less 0.9.1
     - play -> cloudbees 0.2.2
     - play -> mockito 0.1
-    - project-modules -> frontend project
     - provided -> mockito-all 1.9.1-SNAPSHOT
     - provided -> scala-guice_2.8.1 0.1
     - provided -> tritonus_share 0.3.6
@@ -54,11 +53,12 @@ require:
 
 # Non-default repositories
 repositories:
-    - Module Folder:
+    - egraphsModules:
         type:       local
-        artifact:   ${application.path}/.modules/[module]
+        descriptor: ${application.path}/../../modules/[module]/conf/dependencies.yml
+        artifact:   ${application.path}/../../modules/[module]
         contains:
-            - project-modules
+            - egraphs -> *
     - Akka:
          type: iBiblio
          root: "http://repo.typesafe.com/typesafe/releases"

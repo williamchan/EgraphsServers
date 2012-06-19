@@ -1,0 +1,12 @@
+# Application dependencies
+
+require:
+    - egraphs -> frontend HEAD
+
+repositories:
+    - egraphsModules:
+        type:       local
+        descriptor: ${application.path}/../../modules/[module]/conf/dependencies.yml
+        artifact:   ${application.path}/../../modules/[module]
+        contains:
+            - egraphs -> *

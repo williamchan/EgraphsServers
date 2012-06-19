@@ -1,0 +1,6 @@
+self: egraphs -> frontend HEAD
+
+require:
+  - play
+  - play -> scala 0.9.1
+  - play -> less 0.9.1
