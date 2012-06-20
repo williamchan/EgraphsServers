@@ -8,7 +8,6 @@ import play.mvc.Controller
  * Permutations of the Checkout: Personalize.
  */
 object Checkout extends Controller {
-  import frontend.formatting.services.MoneyFormatting.Conversions._
 
   def index = {
     views.frontend.html.celebrity_storefront_checkout()
