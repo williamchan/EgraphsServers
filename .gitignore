@@ -20,4 +20,4 @@ tmp
 *.ser
 *.pyc
 
-war/WEB-INF/cloudbees-web.xml
+apps/website/war/WEB-INF/cloudbees-web.xml
