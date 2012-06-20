@@ -1,10 +1,11 @@
 /* Scripting for the single celebrity page in carousel mode */
-define(["celebrity-storefront", "Egraphs"], function(storefront, Egraphs) {
+define(["services/celebrity-social", "Egraphs"], 
+function(social, Egraphs) {
   var celebTwitterInfo = Egraphs.page.twitter_info;
 
   return {
     go: function() {
-      storefront.populateCelebrityTweets(".recent-tweets .tweets", celebTwitterInfo);
+      social.populateCelebrityTweets(".recent-tweets .tweets", celebTwitterInfo);
     }
   };
 });

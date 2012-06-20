@@ -1,5 +1,5 @@
 /* Scripting shared between both celebrity storefront pages */
-define(["jquery.tweet"], function() {
+define(["libs/jquery.tweet"], function() {
   return {
     /** 
      * Populates a celebrity's tweets inside of the given selector
