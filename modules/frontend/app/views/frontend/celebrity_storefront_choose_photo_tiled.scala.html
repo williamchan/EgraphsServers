@@ -2,6 +2,7 @@
   products: Iterable[models.frontend.storefront.ChoosePhotoProductTile],
   iconImageUrls: Iterable[String])
 
+@import views.frontend.tags.html.storefront_breadcrumbs_responsive
 @import frontend.formatting.MoneyFormatting.Conversions._
 @import frontend.formatting.DateFormatting.Conversions._
 
@@ -16,18 +17,7 @@
 
       <div class="grid inner clearfix">
 
-        <header class="clearfix">
-
-          <ol>
-            <li class="active"><span><strong><span>Step</span> 1</strong></li>
-            <li><span><strong><span>Step</span> 2</strong></li>
-            <li><span><strong><span>Step</span> 3</strong></li>
-            <li><span><strong><span>Step</span> 4</strong></li>
-          </ol>
-
-          <h1><strong>1.</strong> Choose Photo</h1>
-
-        </header>
+        @storefront_breadcrumbs_responsive()
 
         <!-- List all the products -->
         @for((product, productNum) <- products.zipWithIndex) {

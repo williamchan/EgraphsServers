@@ -1,5 +1,7 @@
 @()
 
+@import views.frontend.tags.html.storefront_breadcrumbs_responsive
+
 @headJs = {
   Egraphs.page.twitter_info = {handle:"davidprice14", name:"David Price"};
 }
@@ -10,20 +12,9 @@
     	<div class="container">
     	
     		<div class="carousel-slider inner clearfix">
-    		
-    			<header class="clearfix">
 
-    				<ol>
-    					<li class="active"><span><strong><span>Step</span> 1</strong></li>
-    					<li><span><strong><span>Step</span> 2</strong></li>
-    					<li><span><strong><span>Step</span> 3</strong></li>
-    					<li><span><strong><span>Step</span> 4</strong></li>
-    				</ol>
+          @storefront_breadcrumbs_responsive()
 
-    				<h1><strong>1.</strong> Choose Photo</h1>
-    				
-    			</header>
-    			
     			<div class="flexslider">
     			
 	    			<ul class="slides">
