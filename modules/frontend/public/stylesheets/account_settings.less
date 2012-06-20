@@ -1,151 +1,152 @@
+// Styles for the account settings page
+.row-settings.hide {
+  display: none;
+}
 
-  .row-settings.hide {
-    display: none;
+a.row-settings {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.row-settings, .row-settings:visited {
+  border-bottom: 1px solid @tableBorder;
+  display: block;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  //hide icon by default
+  i {
+    visibility: hidden;
   }
 
-  a.row-settings {
-    padding-top: 10px;
-    padding-bottom: 10px;
+  input {
+    margin-top: 0px;
+    margin-bottom: 0px;
   }
-  .row-settings, .row-settings:visited {
-    border-bottom: 1px solid @tableBorder;
-    display: block;
-    padding-top: 5px;
+
+  label.ng-label, label.checkbox {
+    text-align: left;
+  }
+
+  label.control-label {
+    font-size: 15px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  span:first-child, span:first-child:hover {
+    font-size: 17px;
+    font-weight: bold;
+    padding-left: 0px;
+  }
+
+  span.help-inline {
+      font-size: 13px;
+  }
+
+  //TODO figure out why its black on pageload
+  span.action, a.cancel {
+    text-align: right;
+    font-size: 14px;
+    color: @orange;
+    .transitions(color 0.25s ease);
+  }
+
+  span {
+    margin-top: 5px;
     padding-bottom: 5px;
-    //hide icon by default
-    i {
-      visibility: hidden;
-    }
-
-    input {
-      margin-top: 0px;
-      margin-bottom: 0px;
-    }
-
-    label.ng-label, label.checkbox {
-      text-align: left;
-    }
-
-    label.control-label {
-      font-size: 15px;
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-
-    span:first-child, span:first-child:hover {
-      font-size: 17px;
-      font-weight: bold;
-      padding-left: 0px;
-    }
-
-    span.help-inline {
-        font-size: 13px;
-    }
-
-    //TODO figure out why its black on pageload
-    span.action, a.cancel {
-      text-align: right;
-      font-size: 14px;
-      color: @orange;
-      .transitions(color, 0.25s, ease);
-    }
-
-    span {
-      margin-top: 5px;
-      padding-bottom: 5px;
-    }
-
-
-    address {
-      margin-bottom: 0px;
-    }
-
-    a.cancel:hover {
-      color:@blue;
-      i {
-        visibility: visible;
-      }
-    }
-
-
   }
 
-  .setting-val {
 
+  address {
+    margin-bottom: 0px;
   }
 
-  a.row-settings:hover {
+  a.cancel:hover {
+    color:@blue;
     i {
       visibility: visible;
     }
+  }
 
-    span.action {
-      color:@blue;
+
+}
+
+.setting-val {
+
+}
+
+a.row-settings:hover {
+  i {
+    visibility: visible;
+  }
+
+  span.action {
+    color:@blue;
+  }
+}
+
+section .settings-group {
+
+  span {color:@grayLight; }
+
+  h2 {
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-bottom: 1px solid @tableBorder;
+  }
+
+  label {
+    line-height: 18px;
+  }
+
+  margin-bottom: 24px;
+
+}
+
+.save-button {
+  text-align: right;
+}
+
+a.add-link {
+  font-style: italic;
+  font-weight: default;
+  font-size: 14px;
+  color: @gray;
+}
+
+a.add-link:hover p:first-letter{
+  color: @orange;
+}
+
+//Media queries
+
+@media (max-width:480px) {
+  #settings-top {
+    h1 {
+    font-size: 24px;
     }
   }
+}
 
-  section .settings-group {
-
-    span {color:@grayLight; }
-
-    h2 {
-      font-size: 18px;
-      font-weight: bold;
-      text-transform: uppercase;
-      border-bottom: 1px solid @tableBorder;
+//TODO
+@media (max-width:767px) {
+  .row-settings {
+    span:last-child, a.cancel {
+      text-align: left;
+    }
+    i {
+      display: hidden;
     }
 
-    label {
-      line-height: 18px;
-    }
-
-    margin-bottom: 24px;
-
-  }
-
-  .save-button {
-    text-align: right;
-  }
-
-  a.add-link {
-    font-style: italic;
-    font-weight: default;
-    font-size: 14px;
-    color: @gray;
-  }
-
-  a.add-link:hover p:first-letter{
-    color: @orange;
-  }
-
-  //Media queries
-
-  @media (max-width:480px) {
-    #settings-top {
-      h1 {
-      font-size: 24px;
-      }
+    span {
+      padding-top: 0px;
+      padding-bottom: 0px;
     }
   }
-  //TODO
-  @media (max-width:767px) {
-    .row-settings {
-      span:last-child, a.cancel {
-        text-align: left;
-      }
-      i {
-        display: hidden;
-      }
+}
 
-      span {
-        padding-top: 0px;
-        padding-bottom: 0px;
-      }
-    }
+@media (min-width: 767px) {
+  .row-settings {
+      //height: 50px;
   }
-
-  @media (min-width: 767px) {
-    .row-settings {
-        //height: 50px;
-    }
-  }
+}
