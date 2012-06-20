@@ -17,13 +17,14 @@
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#80ffffff', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */
 }
 
-.box-shadow(@x, @y, @blur, @color) {
+//.box-shadow(@x, @y, @blur, @color) {
+.box-shadow(@arguments) {
   box-shadow: @arguments;
   -webkit-box-shadow: @arguments;
   -moz-box-shadow: @arguments;
 }
 
-.border-radius-top(@radius) {
+.border-radius-top(@arguments) {
 	-webkit-border-top-left-radius: @arguments;
 	-webkit-border-top-right-radius: @arguments;
 	-moz-border-radius-topleft: @arguments;
@@ -32,7 +33,7 @@
 	border-top-right-radius: @arguments;
 }
 
-.border-radius-bottom(@radius) {
+.border-radius-bottom(@arguments) {
 	-webkit-border-bottom-left-radius: @arguments;
 	-webkit-border-bottom-right-radius: @arguments;
 	-moz-border-radius-bottomleft: @arguments;
