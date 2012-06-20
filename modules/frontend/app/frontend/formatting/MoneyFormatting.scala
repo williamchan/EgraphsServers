@@ -1,7 +1,5 @@
 package frontend.formatting
 
-package services
-
 import org.joda.money.{CurrencyUnit, Money}
 import java.math.RoundingMode
 

@@ -1,6 +1,9 @@
-@(celeb: models.frontend.storefront.ChoosePhotoCelebrity=null,
-  products: Iterable[models.frontend.storefront.ChoosePhotoProductTile]=null,
-  iconImageUrls: Iterable[String]=null)
+@(celeb: models.frontend.storefront.ChoosePhotoCelebrity,
+  products: Iterable[models.frontend.storefront.ChoosePhotoProductTile],
+  iconImageUrls: Iterable[String])
+
+@import frontend.formatting.MoneyFormatting.Conversions._
+@import frontend.formatting.DateFormatting.Conversions._
 
 @headJs = {
   Egraphs.page.twitter_info = {handle:"davidprice14", name:"David Price"};
@@ -26,113 +29,26 @@
 
         </header>
 
-        <article>
+        <!-- List all the products -->
+        @for((product, productNum) <- products.zipWithIndex) {
+          <article>
 
-          <div class="thumb">
+            <div class="thumb">
 
-            <a href="#"><img src="http://placehold.it/340x200" alt="FPO" /></a>
+              <a href="@product.targetUrl"><img src="@product.imageUrl" alt="@product.name" /></a>
 
-          </div>
+            </div>
 
-          <h2><a href="#">First MLB Victory &raquo;</a></h2>
+            <h2><a href="#">@product.name &raquo;</a></h2>
 
-          <p class="series">1 / 6</p>
+            <p class="series">@{productNum+1} / @products.size</p>
 
-          <p class="price">$100</p>
+            <p class="price">@product.price.formatSimply</p>
 
-          <div class="orientation landscape">landscape size</div>
+            <div class="@product.orientation.tileClass">@product.orientation.tileClass</div>
 
-        </article>
-
-        <article>
-
-          <div class="thumb">
-
-            <a href="#"><img src="http://placehold.it/340x200" alt="FPO" /></a>
-
-          </div>
-
-          <h2><a href="#">First MLB Victory &raquo;</a></h2>
-
-          <p class="series">2 / 6</p>
-
-          <p class="price">$100</p>
-
-          <div class="orientation portrait">portrait size</div>
-
-        </article>
-
-        <article>
-
-          <div class="thumb">
-
-            <a href="#"><img src="http://placehold.it/340x200" alt="FPO" /></a>
-
-          </div>
-
-          <h2><a href="#">First MLB Victory &raquo;</a></h2>
-
-          <p class="series">3 / 6</p>
-
-          <p class="price">$100</p>
-
-          <div class="orientation landscape">landscape size</div>
-
-        </article>
-
-        <article>
-
-          <div class="thumb">
-
-            <a href="#"><img src="http://placehold.it/340x200" alt="FPO" /></a>
-
-          </div>
-
-          <h2><a href="#">First MLB Victory &raquo;</a></h2>
-
-          <p class="series">4 / 6</p>
-
-          <p class="price">$100</p>
-
-          <div class="orientation landscape">landscape size</div>
-
-        </article>
-
-        <article>
-
-          <div class="thumb">
-
-            <a href="#"><img src="http://placehold.it/340x200" alt="FPO" /></a>
-
-          </div>
-
-          <h2><a href="#">First MLB Victory &raquo;</a></h2>
-
-          <p class="series">5 / 6</p>
-
-          <p class="price">$100</p>
-
-          <div class="orientation portrait">portrait size</div>
-
-        </article>
-
-        <article>
-
-          <div class="thumb">
-
-            <a href="#"><img src="http://placehold.it/340x200" alt="FPO" /></a>
-
-          </div>
-
-          <h2><a href="#">First MLB Victory &raquo;</a></h2>
-
-          <p class="series">6 / 6</p>
-
-          <p class="price">$100</p>
-
-          <div class="orientation landscape">landscape size</div>
-
-        </article>
+          </article>
+        }
 
       </div> <!-- end .grid -->
 
@@ -151,14 +67,14 @@
           <header>
 
             <figure>
-              <img src="http://placehold.it/80x100" alt="FPO" />
+              <img src="@celeb.profileUrl" alt="FPO" />
             </figure>
 
             <div>
 
-              <h1>David Price</h1>
-              <h2>Major League Baseball</h2>
-              <h3>Pitcher, Tampa Bay Rays</h3>
+              <h1>@celeb.name</h1>
+              <h2>@celeb.category</h2>
+              <h3>@celeb.categoryRole</h3>
 
             </div>
 
@@ -166,9 +82,9 @@
 
           <footer class="product-availability">
 
-            <p>Guaranteed Delivery: <strong>June 19, 2012</strong></p>
+            <p>Guaranteed Delivery: <strong>@celeb.deliveryDate.formatDayAsPlainLanguage</strong></p>
 
-            <p>Quantity Available: <strong>4</strong></p>
+            <p>Quantity Available: <strong>@celeb.quantityAvailable</strong></p>
 
           </footer> <!-- end .product-availability -->
 
