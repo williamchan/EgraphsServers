@@ -1,5 +1,5 @@
 /* Scripting for the settings page */
-define([], function () {
+define(["angular"], function () {
   //Controller class for Angular app
   var Controller = function ($scope) {
   //Plugin default values here
