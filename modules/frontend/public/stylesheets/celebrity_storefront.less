@@ -110,15 +110,14 @@
 }
 
 
-#products {
+.wrapper {
 
 	background: url(../images/bg-photos.png) repeat 0 0 fixed;
 
 	header { 
 	
 		display: none; 
-		width: 94%;
-		margin: 0 auto 40px auto;
+		margin-bottom: 40px;
 	
 		h1 {
 
@@ -177,14 +176,19 @@
 
 	.container { 
 	
+		position: relative;
 		background: @white; 
-		padding: 30px 0 60px 0;
+		padding: 30px 0;
 
+		.inner {
+				width: 94%;
+				margin: 0 auto;
+		}
+		
 		.grid {
 		
-			width: 94%;
-			margin: 0 auto;
 			padding-left: 5px;
+			padding-bottom: 30px;
 					
 			article {
 			
@@ -267,13 +271,11 @@
 		} // end .grid
 
 		.single {
-		
-			position: relative;
-
+				
 			.flex-direction-nav {
 					
+					height: auto;
 					text-align: center;
-					margin-bottom: 20px; 
 					
 					li { 
 					
@@ -295,9 +297,6 @@
 			} // end .flex-direction-nav
 			
 			.slide {
-
-				width: 94%;
-				margin: 0 auto;
 
 				figure {
 					
@@ -416,9 +415,20 @@
 		
 		} // end .single
 
+	} // end .container
+	
+	&.inset {
+		
+		background: @grayVeryLight;
+		padding-bottom: 80px;
+		
+		.container {
+			.box-shadow(0px 2px 8px rgba(0, 0, 0, .15));			
+		}
+		
 	}
 
-} // end #products
+} // end .wrapper
 
 .celebrity-information {
 
@@ -637,11 +647,11 @@
 
 @media (max-width: 1020px) {
 	
-	#products {
+	.wrapper {
 	
 		header { display: block; }
 		
-		.container { padding-bottom: 0; }
+		// .container { padding-bottom: 0; }
 		
 	}
 
@@ -649,7 +659,7 @@
 
 @media (max-width: 979px) and (min-width: 651px) {
 
-	#products {
+	.wrapper {
 	
 		.container {
 	
@@ -695,21 +705,25 @@
 		
 		}
 	
-	} // end #products
+	} // end .wrapper
 
 }
 
 @media (min-width: 801px) {
 
-	#products .container .single {
+	.wrapper .container .single {
+	
+			padding-bottom: 30px;
 
 			.flex-direction-nav {
 			
+				height: 0;
 				margin-bottom: 0;
 			
 				li {
 										
 					a {
+					
 						border: none;
 						padding: 0;
 						display: block;
@@ -722,19 +736,20 @@
 						overflow: hidden;
 						background: url(../images/bg-slide-navigation.png) no-repeat 100% 50%;
 						.transitions(background .25s ease-in-out);
-					}
 					
-					a:hover {
-						background-color: rgba(0, 0, 0, .1);
-					}
+						&:hover {
+							background-color: rgba(0, 0, 0, .1);
+						}
+						
+						&.next {
+							left: 100%;
+							background-position: 0 50%;
+						}
+						
+						&.prev {
+							right: 100%;
+						}
 					
-					a.next {
-						right: -40px;
-						background-position: 0 50%;
-					}
-					
-					a.prev {
-						left: -40px;
 					}
 					
 				}
@@ -809,7 +824,7 @@
 
 @media (max-width: 650px) {
 
-	#products {
+	.wrapper {
 	
 		.container {
 	
@@ -852,20 +867,18 @@
 		
 		}
 	
-	} // end #products	
+	} // end .wrapper	
 
 }
 
 @media (max-width: 550px) {
 
-	#products {
+	.wrapper {
 	
 		.container {
 		
 			.grid {
 				
-				width: auto;
-				margin: 0;
 				padding-left: 0;
 				
 				article {
@@ -882,21 +895,15 @@
 				
 			} // end .grid
 			
-			.single {
-			
-				
-			
-			} // end .single
-			
 		}
 	
-	} // end #products
+	} // end .wrapper
 
 }
 
 @media (max-width: 480px) {
 
-	#products {
+	.wrapper {
 	
 		header {
 
@@ -916,9 +923,13 @@
 	
 		.container {
 		
+			.inner { 
+				width: auto;
+				margin: 0;				
+				padding: 0 20px; 
+			}
+		
 			.grid {
-			
-				padding: 0 20px;
 				
 				article {
 					
@@ -930,15 +941,15 @@
 			} // end .grid
 			
 			.single { 
-				
-				padding: 0 20px; 
+			
+				padding-bottom: 0;
 				
 				.slide { width: 100%; }
-			
+							
 			} // end .single
 			
 		}
 	
-	} // end #products
+	} // end .wrapper
 
 }
