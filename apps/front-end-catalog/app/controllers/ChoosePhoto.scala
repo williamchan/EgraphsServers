@@ -14,6 +14,10 @@ object ChoosePhoto extends Controller {
     views.frontend.html.celebrity_storefront_choose_photo_tiled()
   }
 
+  def carousel = {
+    views.frontend.html.celebrity_storefront_choose_photo_carousel()
+  }
+
   private def sampleTile = {
     ChoosePhotoProductTile(
       name="2012 All-Star Game",
