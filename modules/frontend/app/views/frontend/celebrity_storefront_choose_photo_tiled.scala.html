@@ -1,4 +1,6 @@
-@()
+@(celeb: models.frontend.storefront.ChoosePhotoCelebrity=null,
+  products: Iterable[models.frontend.storefront.ChoosePhotoProductTile]=null,
+  iconImageUrls: Iterable[String]=null)
 
 @headJs = {
   Egraphs.page.twitter_info = {handle:"davidprice14", name:"David Price"};
