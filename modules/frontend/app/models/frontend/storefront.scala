@@ -23,6 +23,7 @@ case class ChoosePhotoCelebrity(
   profileUrl: String,
   category: String,
   categoryRole: String,
+  bio:String,
   twitterUsername: String,
   quantityAvailable: Int,
   deliveryDate: Date
@@ -34,4 +35,11 @@ case class ChoosePhotoProductTile(
   imageUrl: String,
   targetUrl: String,
   orientation: ProductOrientation
+)
+
+case class ChoosePhotoRecentEgraph(
+  productTitle: String,
+  ownersName: String,
+  imageUrl: String,
+  url: String
 )

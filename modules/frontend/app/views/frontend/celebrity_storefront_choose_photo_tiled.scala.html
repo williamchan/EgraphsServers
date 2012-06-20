@@ -1,5 +1,6 @@
 @(celeb: models.frontend.storefront.ChoosePhotoCelebrity,
   products: Iterable[models.frontend.storefront.ChoosePhotoProductTile],
+  recentEgraphs: Iterable[models.frontend.storefront.ChoosePhotoRecentEgraph],
   iconImageUrls: Iterable[String])
 
 @import views.frontend.tags.html.storefront_breadcrumbs_responsive
@@ -7,7 +8,7 @@
 @import frontend.formatting.DateFormatting.Conversions._
 
 @headJs = {
-  Egraphs.page.twitter_info = {handle:"davidprice14", name:"David Price"};
+  Egraphs.page.twitter_info = {handle:"@celeb.twitterUsername", name:"@celeb.name"};
 }
 
 @baseBody = {
@@ -89,43 +90,26 @@
               <div class="bio">
 
                 <h4>Biography</h4>
-
-                <p>Hoping to make his 3rd straight All-Star game appearance in 2012, David Price is one of the American League's most formidable pitchers. With 31 wins and a X.XX ERA over the past 2 seasons, Price's numbers stack up with just about any pitcher in the majors. He's off to a fast start this year &ndash; expect him to be leading the way for the Rays down the stretch come October.</p>
-
-                <p>Interesting fact: David Price is nearly inseparable with his French Bulldog, Astro. In fact, when the Rays decided to give away an action figure of Price, he insisted that they create one for Astro, too. Word. Oh, and in case you're wondering, yes, we are looking into whether or not Astro will create egraphs for his fans. We'll keep you posted.</p>
-
+                <p>@Html(celeb.bio)</p>
               </div> <!-- end .bio -->
 
               <footer class="recently-purchased clearfix">
 
-                <h4>Recently Purchased David Price Egraphs</h4>
+                <h4>Egraphs Recently Made By @celeb.name</h4>
 
-                <article>
+                @for(egraph <- recentEgraphs) {
+                  <article>
 
-                  <a href="#"><img src="http://placehold.it/340x200" alt="FPO" /></a>
+                    <a href="@egraph.url">
+                      <img src="@egraph.imageUrl"
+                           alt="@egraph.productTitle for @egraph.ownersName" />
+                    </a>
 
-                  <h2><a href="#">Image Title Here</a></h2>
-                  <p><a href="#">Owners Name</a></p>
+                    <h2><a href="#">@egraph.productTitle</a></h2>
+                    <p><a href="#">for @egraph.ownersName</a></p>
 
-                </article>
-
-                <article>
-
-                  <a href="#"><img src="http://placehold.it/340x200" alt="FPO" /></a>
-
-                  <h2><a href="#">Image Title Here</a></h2>
-                  <p><a href="#">Owners Name</a></p>
-
-                </article>
-
-                <article>
-
-                  <a href="#"><img src="http://placehold.it/340x200" alt="FPO" /></a>
-
-                  <h2><a href="#">Image Title Here</a></h2>
-                  <p><a href="#">Owners Name</a></p>
-
-                </article>
+                  </article>
+                }
 
               </footer> <!-- end .recently-purchased -->
 
