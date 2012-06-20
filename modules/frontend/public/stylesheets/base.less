@@ -5,13 +5,12 @@
 /* !Links */
 
 a, a:link, a:visited {
-	.transitions(color, 0.25s, ease);
+	.transitions(color 0.25s ease);
 }
 
 a:hover { text-decoration: none; }
 
 /* !Buttons */
-
 
 button  {
   margin: 0px;
@@ -32,7 +31,7 @@ button  {
 		display: block;
 		float: left;
 		font-weight: 600;
-		font-size: 14px;
+		font-size: 16px;
 		letter-spacing: .1em;
 		line-height: 32px;
 		color: @white;
@@ -92,7 +91,7 @@ button  {
 
 	position: relative;
 	z-index: 1;
-	.box-shadow(0px, 4px, 8px, rgba(0, 0, 0, .25));	
+	.box-shadow(0px, 2px, 4px, rgba(0, 0, 0, .15));	
 	background: @offWhite;	
 	padding-top: 2px;
 	padding-bottom: 2px;
@@ -212,6 +211,7 @@ button  {
 			
 			li:first-child {
 				a { color: @linkColorHover; }
+				a:hover { color: @gray; }
 			}
 
 			.account-options {
@@ -305,6 +305,7 @@ section[role=banner] {
 
 	position: relative;
 	background: @contentBackground;
+	.box-shadow(0 -8px 8px -8px rgba(0, 0, 0, .5));
 	
 	#main {
 
@@ -328,23 +329,13 @@ section[role=banner] {
 		> .container {
 				position: relative;
 		}
+	
 	}
-
-	h1 {
-    font-weight: 100;
-    font-size: 40px;
-    line-height: 1.25em;
-    margin-bottom: .25em;
-    margin-top: .75em;
-  }
-
-  input.ng-invalid.ng-dirty {
-    background-color : @errorBackground;
-  }
-
-  input.ng-valid.ng-dirty {
-    background-color: @successBackground;
-  }
+	
+	#main.sub { 
+		border-top: none; 
+		background: @offWhite;
+	}
 
 	
 }
@@ -425,6 +416,46 @@ section[role=banner] {
 	}	
 
 }
+
+/* !Flexslider Base Styles */
+
+.flex-container a:active,
+.flexslider a:active,
+.flex-container a:focus,
+.flexslider a:focus  { outline: none; }
+
+.slides,
+.flex-control-nav,
+.flex-direction-nav { margin: 0; padding: 0; list-style: none; }
+
+.flexslider {
+	margin: 0; 
+	padding: 0;
+
+	.slides {
+		
+		> li { display: none; -webkit-backface-visibility: hidden; }
+		
+		img { max-width: 100%; display: block; }
+		
+	}
+
+	.slides:after {
+      content: ".";
+      display: block;
+      clear: both;
+      visibility: hidden;
+      line-height: 0;
+      height: 0;
+    }
+}
+ 
+.flex-pauseplay span { text-transform: capitalize; }
+html[xmlns] .slides { display: block; }
+* html .slides { height: 1%; }
+.no-js .slides > li:first-child { display: block; }
+
+/* !Media Queries */
 
 @media (min-width: 1340px) {
 	

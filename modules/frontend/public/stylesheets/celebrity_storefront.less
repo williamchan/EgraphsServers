@@ -1,5 +1,117 @@
 // The Egraphs celebrity storefront stylesheet.
 
+/* !Breadcrumbs */
+.breadcrumbs {
+
+	background: lighten(@gray, 50%);
+	
+	ol {
+	
+		list-style: none;
+		margin: 0;
+		padding: 0;
+				
+		li {
+				
+			float: left;
+			color: @white;
+			text-shadow: 0 -1px 0 lighten(@gray, 40%);
+			
+			a { color: @white; }
+			
+			a:hover { 
+			
+				color: @gray; 
+				text-shadow: 0 1px 0 @white;
+				
+				span strong { 
+					color: @white;
+					background-color: @orange; 
+				}
+				
+			}
+			
+			span {
+				
+				display: block;
+				float: left;
+				font-size: 16px;
+				font-weight: 700;
+				line-height: 22px;
+				height: 22px;
+				letter-spacing: 1px;
+				padding: 5px 15px;
+				
+				strong {
+				
+					display: block;
+					float: left;
+					margin-right: 15px;
+					font-size: 16px;
+					letter-spacing: normal;
+					text-align: center;
+					color: lighten(@gray, 40%);
+					text-shadow: none;
+					width: 22px;
+					background: @offWhite;
+					.box-shadow(inset 0 1px 1px 0 lighten(@gray, 30%));
+					.border-radius(11px);
+					
+					span { display: none; }
+					
+				}
+			
+			}
+			
+			&.first span { padding-left: 0; }
+			
+			small { 
+				display: block;
+				float: left;
+				width: 16px;
+				height: 32px;
+				background: url(../images/bg-breadcrumb-arrow.png) no-repeat 0 0;
+				text-indent: -9999px;
+				overflow: hidden;
+			}
+			
+			&.previous small { background-position: 0 100%; }
+			
+			&.active {
+			
+				color: @orange;
+				text-shadow: 0 1px 1px @white;
+				
+				span { 
+				
+					background: url(../images/bg-breadcrumb-active.png) repeat-x 0 0; 
+				
+					strong { 
+						color: @white;
+						background-color: @orange;
+					}
+				
+				}
+				
+				small {
+					background-position: 0 -32px;
+				}
+				
+			}
+			
+		}
+			
+	}
+	
+}
+
+@media (max-width: 1020px) {
+
+	.breadcrumbs { display: none; }
+	
+}
+
+
 #products {
 
 	background: url(../images/bg-photos.png) repeat 0 0 fixed;
