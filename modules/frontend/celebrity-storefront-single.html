@@ -24,10 +24,16 @@
     <!-- remove before going live // or just compile LESS via CodeKit and remove client-side compiling -->
     <script>localStorage.clear();</script>
 
-		<script src='/public/javascripts/modernizr.custom.js'></script>
-		<script src="https://use.typekit.com/ztt6ynw.js"></script>
-		<script>try{Typekit.load();}catch(e){}</script>
-  
+	<script src='/public/javascripts/modernizr.custom.js'></script>
+	<script src="https://use.typekit.com/ztt6ynw.js"></script>
+	<script>try{Typekit.load();}catch(e){}</script>
+    <script>
+      var Egraphs = Egraphs || {};
+      Egraphs.page = Egraphs.page || {};
+      Egraphs.page.jsMain = ["functions", "celebrity-storefront-carousel"];
+      Egraphs.page.twitter_info = {handle:"davidprice14", name:"David Price"};
+    </script>
+        
   </head>
 
   <body>
@@ -380,14 +386,8 @@
     
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script> 
 		<script>window.jQuery || document.write("<script src='/public/javascripts/jquery-1.7.2.min.js'>\x3C/script>")</script> 
-		<script src='/public/javascripts/jquery.flexslider-min.js'></script> 		
-
-		<script>
-			var twitter_info = ['davidprice14',"David Price"];
-		</script>
-		<script src='/public/javascripts/jquery.tweet.js'></script> 		
-
-		<script src='/public/javascripts/functions.js'></script> 		
-
+        <script data-main='/public/javascripts/main.js'
+            src='/public/javascripts/require-1.0.2.js'
+            type="text/javascript" ></script>
   </body>
 </html>

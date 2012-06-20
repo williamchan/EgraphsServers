@@ -8,8 +8,12 @@ require.config({
 // to load in the variable Egraphs.jsMain. Get those modules and load
 // them by executing the 'go' method which they better have.
 var Egraphs = Egraphs || {};
+Egraphs.page = Egraphs.page || {};
 
-require(Egraphs.jsMain, function() {
+// Provide the Egraphs scope as a module to any future require() calls
+define("Egraphs", [], function() { return Egraphs; });
+
+require(Egraphs.page.jsMain, function() {
   var mainModules = arguments,
     numModules = mainModules.length,
     i = 0,
