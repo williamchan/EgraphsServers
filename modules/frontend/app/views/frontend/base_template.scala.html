@@ -1,4 +1,4 @@
-@(title: String, jsMain: String = "", body: => Html)
+@(title: String, jsMain: String = "", headJs: => Html = Html.empty, body: => Html)
 
 @import views.frontend.tags
 
@@ -37,6 +37,7 @@
       var Egraphs = Egraphs || {};
       Egraphs.page = Egraphs.page || {};
       Egraphs.page.jsMain = ["pages/base-template", "@jsMain"];
+      @headJs
     </script>
 
   </head>

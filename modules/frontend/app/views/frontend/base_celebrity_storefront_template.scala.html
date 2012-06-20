@@ -1,0 +1,24 @@
+@(title: String, headJs: => Html = Html.empty, jsMain: String = "", body: => Html)
+
+@baseBody = {
+  <div class="breadcrumbs">
+    <div class="container">
+      <ol class="clearfix">
+        <li class="first"><a href="#"><span><strong><span>Step</span> 1</strong> Choose Photo</span> <small>&raquo;</small></a></li>
+        <li class="previous"><a href="#"><span><strong><span>Step</span> 2</strong> Personalize</span> <small>&raquo;</small></a></li>
+        <li class="active"><span><strong><span>Step</span> 3</strong> Review</span> <small>&raquo;</small></li>
+        <li><span><strong><span>Step</span> 4</strong> Checkout</span> <small>&raquo;</small></li>
+        <li><span><strong><span>Step</span> 5</strong> Finalize Order</span> <small>&raquo;</small></li>
+      </ol>
+    </div>
+  </div>  <!-- end .breadcrumbs -->
+
+  @body
+}
+
+@base_template(
+  title=title + " | Celebrity Storefront | Egraphs",
+  jsMain=jsMain,
+  headJs=headJs,
+  body=baseBody
+)
