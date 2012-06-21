@@ -62,6 +62,46 @@ button  {
 
 }
 
+.social {
+
+//    float: right;
+
+    > ul {
+
+        padding: 20px 0 0 40px;
+        margin: 0;
+        list-style: none;
+
+        li {
+
+            float: left;
+            margin-left: 10px;
+
+            a {
+                display: block;
+                width: 30px;
+                height: 31px;
+                text-indent: -9999px;
+                overflow: hidden;
+                background: url(../images/bg-sprite-social-icons.png) no-repeat 0 0;
+            }
+
+            a:hover { background-position: 0 -31px; }
+
+            a.twitter { background-position: -30px 0; }
+            a.twitter:hover { background-position: -30px -31px; }
+
+            a.addthis { background-position: -60px 0; }
+            a.addthis:hover { background-position: -60px -62px; }
+
+        }
+
+        li:first-child { margin-left: 0; }
+
+    }
+
+}
+
 .to-top {
 	
 	float: right;
@@ -88,6 +128,10 @@ button  {
 /* !Top */
 
 #top {
+
+    .social {
+      float: right;
+    }
 
 	position: relative;
 	z-index: 1;
@@ -146,46 +190,6 @@ button  {
 
 	}
 
-	.social { 
-	
-		float: right;	
-				
-		> ul {
-		
-			padding: 20px 0 0 40px;		
-			margin: 0;
-			list-style: none;
-			
-			li {
-				
-				float: left;
-				margin-left: 10px; 
-				
-				a {
-					display: block;
-					width: 30px;
-					height: 31px;
-					text-indent: -9999px;
-					overflow: hidden;
-					background: url(../images/bg-sprite-social-icons.png) no-repeat 0 0;
-				}
-
-				a:hover { background-position: 0 -31px; }
-				
-				a.twitter { background-position: -30px 0; }
-				a.twitter:hover { background-position: -30px -31px; }
-			
-				a.addthis { background-position: -60px 0; }
-				a.addthis:hover { background-position: -60px -62px; }
-				
-			}
-			
-			li:first-child { margin-left: 0; }
-		
-		}
-	
-	}
-	
 	.account {
 	
 		cursor: pointer;
