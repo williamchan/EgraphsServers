@@ -32,8 +32,9 @@
     </ol>
     <h2>Account gallery</h2>
     <ol>
-        @catalogEntry("account/gallery?user=leeroyjenkins", "account gallery")
-
+      @for(number <- 0 until 4) {
+        @catalogEntry("account/gallery?user=leeroyjenkins&count=" + number, "account/gallery?user=leeroyjenkins&count=" + number)
+      }
     </ol>
   </body>
 </html>

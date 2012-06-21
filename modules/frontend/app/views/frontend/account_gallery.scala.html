@@ -8,7 +8,12 @@
         <header>
           <h1>My Gallery</h1>
           <div class="row-fluid">
-            <span class="span4"> @username's Egraphs</span><span> Egraphs / 1 Pending, 2 Finished</span>
+            <span class="span8"> @username's Egraphs</span>
+            <span class="span4 count">
+              <strong>@egraphs.length Egraphs</strong> /
+              <strong>@{egraphs.filter(_.orderStatus == "pending").length}</strong>
+              Pending, <strong>@{egraphs.filter(_.orderStatus == "finished").length}</strong>
+              Finished</span>
           </div>
         </header>
         <section id="galleryrows">
@@ -44,7 +49,7 @@
                   </div>
               </div>
                 <div class="controls">
-                  Control object renders here.
+                  @controlRenderer.render
                 </div>
               </div>
             </div>

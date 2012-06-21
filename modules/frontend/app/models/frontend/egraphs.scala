@@ -27,11 +27,24 @@ case class OrderDetails(
   UPSNumber : String)
 
 abstract class GalleryControlRenderer {
+  def render : String
 }
 
-object AdminGalleryControl extends GalleryControlRenderer{}
+object AdminGalleryControl extends GalleryControlRenderer{
+  override def render = {
+    "AdminGalleryControl"
+  }
+}
 
-object OwnerGalleryControl extends GalleryControlRenderer{}
+object OwnerGalleryControl extends GalleryControlRenderer{
+  override def render  = {
+    "OwnerGalleryControl"
+  }
+}
 
-object OtherGalleryControl extends GalleryControlRenderer{}
+object OtherGalleryControl extends GalleryControlRenderer{
+  override def render = {
+    "OtherGalleryControl"
+  }
+}
 
