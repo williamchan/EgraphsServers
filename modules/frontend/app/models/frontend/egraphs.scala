@@ -15,25 +15,26 @@ case class Egraph(
   orientation: String = "landscape",
   productDescription:String,
   productTitle: String,
-  signedTimestamp: Date,
+  id:Int = 0,
+  signedTimestamp: String,
   publishedStatus: String = "unpublished",
   orderStatus: String = "pending",
   orderDetails: Option[OrderDetails] = None)
 
 case class OrderDetails(
-  orderDate: Date,
+  orderDate: String,
   orderNumber: Int,
-  price: Float,
+  price: String,
   statusText: String,
   shippingMethod : String,
   UPSNumber : String)
 
 abstract class GalleryControlRenderer {
-  def render : Elem
+  def render(id: Int, status: String) : Elem
 }
 
 object AdminGalleryControl extends GalleryControlRenderer{
-  override def render = {
+  override def render(id: Int, status:String) = {
     val ns =
     <ul>
       <li>
@@ -52,7 +53,7 @@ object AdminGalleryControl extends GalleryControlRenderer{
 }
 
 object OwnerGalleryControl extends GalleryControlRenderer{
-  override def render  = {
+  override def render(id: Int, status:String)  = {
     val ns = <ul>
       <li>
         <a href="#">View Fullscreen</a>
@@ -63,13 +64,16 @@ object OwnerGalleryControl extends GalleryControlRenderer{
       <li>
         <a href="#">Order Prints</a>
       </li>
+      <li>
+        status
+      </li>
     </ul>
     ns
   }
 }
 
 object OtherGalleryControl extends GalleryControlRenderer{
-  override def render = {
+  override def render(id: Int, status:String) = {
     val ns = <ul>
       <li>
         <a href="#">View Fullscreen</a>

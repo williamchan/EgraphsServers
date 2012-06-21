@@ -1,6 +1,77 @@
 @(username: String, egraphs: List[models.frontend.egraphs.Egraph], controlRenderer: models.frontend.egraphs.GalleryControlRenderer)
 
+@finishedEgraph(egraph: models.frontend.egraphs.Egraph, index: Int) = {
+  <div class="row-fluid row-egraph">
+    <div class="span12">
+      <div class="number">@(index+1)</div>
+      <h3>@egraph.productTitle</h3>
+    </div>
+    <div class="row-fluid">
+      <div class="span7">
+        <figure class="@egraph.orientation">
+          <img src="@egraph.thumbnailUrl"></img>
+        </figure>
+      </div>
+      <div class="span5 right">
+        <div>
+          @egraph.productUrl<br>
+          Signed @egraph.signedTimestamp
+        </div>
+        <div>
+          <p>@egraph.productDescription</p>
+        </div>
+        <div class="padding-fix">
+          <div class="social">
+            <ul class="clearfix">
+              <li><span class="social-label">Share this</span></li>
+              <li><a href="#" class="facebook">Facebook</a></li>
+              <li><a href="https://twitter.com/egraphs" class="twitter">Twitter</a></li>
+              <!-- <li><a href="#" class="addthis">AddThis</a></li> -->
+            </ul>
+          </div>
+        </div>
+        <div class="controls">
+          @Html(controlRenderer.render(egraph.id, egraph.publishedStatus).toString())
+        </div>
+      </div>
+    </div>
+  </div>
+}
 
+@pendingEgraph(egraph: models.frontend.egraphs.Egraph, orderDetails: models.frontend.egraphs.OrderDetails, index: Int) = {
+  <div class="row-fluid row-egraph">
+    <div class="span12">
+      <div class="number">@(index+1)</div>
+      <span>
+        <h3>@egraph.productTitle</h3><span class="order-line">Pending Order</span>
+      </span>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span4">
+    <figure>
+      <img src="@egraph.thumbnailUrl" width="60%" height="60%">
+      </img>
+    </figure>
+    </div>
+    <div class="span4">
+      <div>
+        <span class="order-label">Order Date</span><span class="order-detail">@orderDetails.orderDate</span>
+      </div>
+      <div>
+        <span class="order-label">Order Number</span><span class="order-detail">@orderDetails.orderNumber</span>
+      </div>
+      <div>
+        <span class="order-label">Price</span><span class="order-detail">@orderDetails.price</span>
+      </div>
+    </div>
+    <div class="span4">
+      <span>Status: </span><br>
+      <span>Shipping</span><br>
+      <span>UPS Tracking Number</span><br>
+    </div>
+  </div>
+}
 @baseBody = {
   <section id="content">
     <div id="main">
@@ -16,45 +87,24 @@
               Finished</span>
           </div>
         </header>
-        <section id="galleryrows">
-        @for((egraph,i) <- egraphs.zipWithIndex) {
-
-          <div class="row-fluid row-egraph">
-            <div class="span12">
-              <div class="number">@(i+1)</div>
-              <h3>@egraph.productTitle</h3>
-            </div>
-            <div class="row-fluid">
-              <div class="span7">
-                <figure class="@egraph.orientation">
-                  <img src="@egraph.thumbnailUrl"></img>
-                </figure>
-              </div>
-              <div class="span5 right">
-                <div>
-                  @egraph.productUrl<br>
-                  Signed @egraph.signedTimestamp
-                </div>
-                <div>
-                  <p>@egraph.productDescription</p>
-                </div>
-                <div class="padding-fix">
-                  <div class="social">
-                      <ul class="clearfix">
-                        <li><span class="social-label">Share this</span></li>
-                        <li><a href="#" class="facebook">Facebook</a></li>
-                        <li><a href="https://twitter.com/egraphs" class="twitter">Twitter</a></li>
-                        <!-- <li><a href="#" class="addthis">AddThis</a></li> -->
-                      </ul>
-                  </div>
-              </div>
-                <div class="controls">
-                  @Html(controlRenderer.render.toString())
-                </div>
-              </div>
-            </div>
-          </div>
+        @if(egraphs.length == 0) {
+          <section>
+            <h1>
+              DERP DERP @username doesn't have any egraphs...
+            </h1>
+          </section>
         }
+        <section id="galleryrows">
+        @for((egraph,index) <- egraphs.filter(_.orderStatus == "pending").zipWithIndex) {
+          @pendingEgraph(egraph, egraph.orderDetails.get ,index)
+        }
+
+        @for((egraph,index) <- egraphs.filter(_.orderStatus == "finished").zipWithIndex) {
+          @finishedEgraph(egraph, index)
+        }
+
+
+
         </section>
       </div>
     </div>

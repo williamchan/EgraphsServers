@@ -12,10 +12,29 @@
     border-top: 1px solid @tableBorder;
   }
 
-  h3 {
+  span h3 {
     font-size: 18px;
     font-weight: bold;
     text-transform: uppercase;
+    display: inline-block;
+  }
+
+  span.order-line {
+    color: @orange;
+    font-weight: light;
+    font-style: italic;
+    font-size: 18px;
+    padding-left: 5px;
+  }
+
+  span.order-detail {
+    width: 50%;
+  }
+
+  span.order-label {
+    font-weight: bold;
+    width: 50%;
+    display: inline-block;
   }
 
   .right > div {
