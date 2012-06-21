@@ -26,7 +26,13 @@ private[controllers] trait PostLoginEndpoint { this: Controller =>
 
       case Right(validForm) =>
         session.put(WebsiteControllers.customerIdKey, validForm.customerId)
-        new Redirect(Utils.lookupUrl("WebsiteControllers.getRootEndpoint").url)
+
+        // Redirect
+        // TODO(wchan): Test this
+        Utils.toOption(session.get(WebsiteControllers.redirectUponLogin)) match {
+          case None => new Redirect(Utils.lookupUrl("WebsiteControllers.getRootEndpoint").url)
+          case Some(url) => new Redirect(url)
+        }
     }
   }
 }

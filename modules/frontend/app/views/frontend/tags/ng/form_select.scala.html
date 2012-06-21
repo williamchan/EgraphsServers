@@ -1,17 +1,21 @@
-@(label: String, model: String, id: String, options: Map[String,String])
+@(label: String, model: String, name: String, options: Map[String,String], initValue: String = "")
+@{/* TODO: Figure out how to use ng model here. */}
+
+@isSelected(v:String) = { @if(v==initValue) {selected="selected"} }
+
 <span class="row-settings row-fluid">
   <span class="span3">
     @label
   </span>
   <span class="span8">
-  <span>
-    <select type="text">
-      @options.map{option =>
-      <option value="@option._1">@option._2</option>
-      }
-    </select>
-  </span>
-  </span>
+    <span>
+      <select name="@name">
+        @options.map{option =>
+          <option id= value="@option._1" @isSelected(option._1)>@option._2</option>
+        }
+      </select>
+    </span>
+    </span>
   <span class="span1">
   </span>
 </span>

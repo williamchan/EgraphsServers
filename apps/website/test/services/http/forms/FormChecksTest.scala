@@ -4,7 +4,7 @@ import utils.EgraphsUnitTest
 import services.AppConfig
 import java.text.SimpleDateFormat
 import play.data.binding.types.DateBinder
-import models.{AccountAuthenticationError, Account, AccountStore}
+import models.{CustomerStore, AccountAuthenticationError, Account, AccountStore}
 
 class FormChecksTest extends EgraphsUnitTest {
   def check = AppConfig.instance[FormChecks]
@@ -89,7 +89,7 @@ class FormChecksTest extends EgraphsUnitTest {
     mockAccountStore.authenticate(email, pass) returns Right(mockAccount)
 
     // Instantiate a new check instance that uses our mock
-    val check = new FormChecks(mockAccountStore)
+    val check = new FormChecks(mockAccountStore, mock[CustomerStore])
 
     // Check expectations
     check.isValidAccount(email, pass) should be (Right(mockAccount))

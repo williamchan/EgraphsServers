@@ -1,44 +1,65 @@
-@()(implicit session: play.mvc.Scope.Session)
+@(form:models.frontend.account.AccountSettingsForm)(implicit session: play.mvc.Scope.Session)
 
 @import views.frontend.tags
 @import views.frontend.tags.ng
 
+@init = {
+  Egraphs.page.user = {
+    fullname : "@form.fullname.value",
+    username : "@form.username.value",
+    email : "@form.email.value",
+    address : {
+      title : "Default",
+      line1 : "@form.addressLine1.value",
+      line2 : "@form.addressLine2.value",
+      city : "@form.city.value",
+      state : "@form.state.value",
+      postalCode : "@form.postalCode.value"
+    },
+    gallery : {visibility : "@form.galleryVisibility.value"},
+    notices : [
+      {
+        text: "New Star Additions (Weekly)",
+        name: "new_stars",
+        value: @form.notice_stars.value
+      }
+    ]
+  };
+}
 
 @baseBody = {
+  <script>@init</script>
   <section ng-cloak id="content" role="main" ng-controller="Controller">
     <div id="main">
       <div class="container" id="settings-page">
-
         <header id="settings-top">
           <h1>Account Settings</h1>
         </header>
       @tags.html.safeForm("method" -> "POST", "action" -> "/account/settings"){
         <section class="settings-group" id="personal-information">
-            <h2>Personal Information</h2>
-              @tags.ng.html.form_namevalue(model = "user.fullname", id = "fullname", title = "Name")
-              @tags.ng.html.form_namevalue(model = "user.username", id = "username",title = "Username", helper="Gallery Url egra.ph/{{user.username}}")
-              @tags.ng.html.form_email(model = "user.email", id = "email", title = "Email")
-              @tags.ng.html.form_pwchange(model = "user", id = "password", length= 7)
-              @tags.ng.html.form_select(label = "Gallery Visibility", model = "user.gallery.visibility", id="galleryvisibility", Map(
-                                                                                                                        "public" -> "Public",
-                                                                                                                        "private" -> "Private"))
-
-          </section>
-          <section class="settings-group" id="shipping-address">
-            <h2>Shipping Address</h2>
-            @tags.ng.html.form_address(address = "user.address", id ="address")
-            <!--<a href="#" class="add-link"><p>+ Add Another Shipping Address</p></a>-->
-          </section>
-          <section class="settings-group" id="additional-settings">
-            <h2>Additional Settings</h2>
-             @tags.ng.html.form_checkbox(label = "Notices", model = "user.notices")
-          </section>
-          <div class="row-fluid">
-            <div class="span9"></div>
-            <div class="span3 save-button">
-              @tags.html.arrow_button(caption="Save Changes", target="#")
-            </div>
+          <h2>Personal Information</h2>
+          @tags.ng.html.form_namevalue(model = "user.fullname", name={form.fullname.name}, label="Name")
+          @tags.ng.html.form_namevalue(model = "user.username", name={form.username.name}, label="Username", helper="Gallery Url egra.ph/{{user.username}}")
+          @tags.ng.html.form_email(model = "user.email", name={form.email.name}, label="Email")
+          @tags.ng.html.form_pwchange(model = "user")
+          @tags.ng.html.form_select(model = "user.gallery.visibility", name={form.galleryVisibility.name}, label = "Gallery Visibility",
+          options = Map("public" -> "Public","private" -> "Private"), initValue={form.galleryVisibility.value.getOrElse("public")})
+        </section>
+        <section class="settings-group" id="shipping-address">
+          <h2>Shipping Address</h2>
+          @tags.ng.html.form_address(model = "user.address", name="address")
+          <!--<a href="#" class="add-link"><p>+ Add Another Shipping Address</p></a>-->
+        </section>
+        <section class="settings-group" id="additional-settings">
+          <h2>Additional Settings</h2>
+          @tags.ng.html.form_checkbox(model = "user.notices", name="notices", label = "Notices")
+        </section>
+        <div class="row-fluid">
+          <div class="span9"></div>
+          <div class="span3 save-button">
+            @tags.html.arrow_button(caption="Save Changes", target="#")
           </div>
+        </div>
         }
       </div>
     </div>

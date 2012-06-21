@@ -6,7 +6,7 @@ import play.data.binding.types.DateBinder
 import java.text.{ParseException, SimpleDateFormat}
 import java.util.Date
 import play.libs.I18N
-import models.{Account, AccountStore}
+import models.{CustomerStore, Account, AccountStore}
 
 /**
  * A set of checks used by [[services.http.forms.Form]] to validate its
@@ -14,7 +14,7 @@ import models.{Account, AccountStore}
  *
  * @param accountStore the store for Accounts.
  */
-class FormChecks @Inject()(accountStore: AccountStore) {
+class FormChecks @Inject()(accountStore: AccountStore, customerStore: CustomerStore) {
 
   /**
    * Returns an Integer if the String could be turned into one.
@@ -174,6 +174,24 @@ class FormChecks @Inject()(accountStore: AccountStore) {
   : Either[FormError, Int] =
   {
     if(toValidate < minimum) Left(new SimpleFormError(message)) else Right(toValidate)
+  }
+
+  def isUniqueEmail(toValidate: String, message: String = "Unique email required")
+  : Either[FormError, String] = {
+    if (accountStore.findByEmail(toValidate).isEmpty) {
+      Right(toValidate)
+    } else {
+      Left(new SimpleFormError(message))
+    }
+  }
+
+  def isUniqueUsername(toValidate: String, message: String = "Unique username required")
+  : Either[FormError, String] = {
+    if (customerStore.findByUsername(toValidate).isEmpty) {
+      Right(toValidate)
+    } else {
+      Left(new SimpleFormError(message))
+    }
   }
 
   //

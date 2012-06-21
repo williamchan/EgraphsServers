@@ -11,7 +11,7 @@ import play.mvc.results.Redirect
 import services.db.DBSession
 import services.social.FacebookAppId
 import services.http._
-import forms.{CustomerLoginFormFactory}
+import forms.{AccountSettingsFormFactory, CustomerLoginFormFactory}
 import java.util.Properties
 import services.Utils
 
@@ -22,18 +22,21 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
 
   val adminIdKey: String = "admin"
   val customerIdKey: String = "customer"
+  val redirectUponLogin: String = "redirectUponLogin"
 
   // Provide endpoint dependencies
   override protected val playConfig = annotatedInstance[PlayConfig, Properties]
   override protected val facebookAppId = annotatedInstance[FacebookAppId, String]
 
   override protected def customerLoginForms = instance[CustomerLoginFormFactory]
+  override protected def accountSettingsForms = instance[AccountSettingsFormFactory]
 
   override protected val dbSession = instance[DBSession]
   override protected val controllerMethod = instance[ControllerMethod]
   override protected val postController = instance[POSTControllerMethod]
   override protected val adminFilters = instance[AdminRequestFilters]
   override protected val celebFilters = instance[CelebrityAccountRequestFilters]
+  override protected val customerFilters = instance[CustomerRequestFilters]
   override protected val egraphQueryFilters = instance[EgraphQueryFilters]
   override protected val inventoryBatchQueryFilters = instance[InventoryBatchQueryFilters]
   override protected val orderQueryFilters = instance[OrderQueryFilters]

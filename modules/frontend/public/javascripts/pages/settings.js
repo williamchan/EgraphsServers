@@ -1,35 +1,10 @@
 /* Scripting for the settings page */
-define(["libs/angular"], function () {
+define(["Egraphs", "libs/angular"], function (Egraphs) {
   //Controller class for Angular app
   var Controller = function ($scope) {
-  //Plugin default values here
-    $scope.master = { fullname : "Joshua Johnson",
-                      username : "joshuajohnson",
-                      email : "joshua12@gmail.com",
-                      address :
-                        { title : "Default",
-                          fullname : "Joshua Johnson",
-                          line1 : "5507 N 58th Street",
-                          line2 : "",
-                          city : "Seattle",
-                          zip : "98101",
-                          state : "WA"
-                        },
-                      gallery : {
-                        visibility : "Visible",
-                        url : "egr.aphs/joshuaj"
-                      },
-                      notices : [{ text: "New Star Additions (Weekly)",
-                                   name: "new_stars",
-                                   value: true},
-                                 { text: "New Products/Features",
-                                   name: "news",
-                                   value: false},
-                                 { text: "Updates from Major League Baseball",
-                                   name: "mlb_updates",
-                                   value: true}
-                                ]
-                      };
+    //Plugin default values here
+    // $scope.user is undefined here... how to initialize it?
+    $scope.master = angular.copy(Egraphs.page.user)
 
     $scope.update = function (user) {
       $scope.master = angular.copy(user);

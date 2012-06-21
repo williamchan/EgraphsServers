@@ -1,34 +1,34 @@
-@(model: String, id:String, length: Int)
+@(model: String)
 
-<a id="@id-display" class="row-settings row-fluid edit">
+<a id="password-display" class="row-settings row-fluid edit">
     <span class="span3">Password</span>
-    <span class="span4 setting-val">@{"*".*(length)}</span>
+    <span class="span4 setting-val">@{"*".*(40)}</span>
       <span class="span4 help-inline">
   </span>
     <span class="span1 action">
       <i class="icon-pencil"></i> Edit
     </span>
 </a>
-<div id="@id-edit" class="row-settings row-fluid hide">
+<div id="password-edit" class="row-settings row-fluid hide">
   <span class="span1"></span>
   <span class="span8">
     <div class="control-group">
       <label class="control-label ng-label">Old Password</label>
       <div class="controls">
-        <input ng-model="@{model + ".oldpassword"}" type="password" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"/>
+        <input ng-model="@{model + ".oldPassword"}" name="oldPassword" type="password" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"/>
       </div>
     </div>
     <div class="control-group">
       <label class="control-label ng-label">New Password</label>
       <div class="controls">
-        <input id="user_password" name="newpass" ng-minlength="8" ng-model="@{model + ".newpassword"}" type="password" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"/>
-        <span ng-show="form.newpass.$error.minlength">Password must be at least 8 characters</span>
+        <input ng-model="@{model + ".newPassword"}" ng-minlength="8" id="user_password" name="newPassword" type="password" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"/>
+        <span ng-show="form.newPassword.$error.minlength">Password must be at least 8 characters</span>
       </div>
     </div>
     <div class="control-group">
       <label class="control-label ng-label">Verify Password</label>
       <div class="controls">
-        <input id="user_password_confirmation" name="match" type="password" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"/>
+        <input id="user_password_confirmation" name="passwordConfirm" type="password" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"/>
         <span id="password_message" class="invisible">Passwords do not match</span>
       </div>
     </div>
@@ -36,6 +36,6 @@
   <span class="span1 help-inline">
   </span>
   <span class="span2 action cancel">
-    @form_cancel(model, id)
+    @form_cancel(model, "password")
   </span>
 </div>
