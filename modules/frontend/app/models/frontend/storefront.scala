@@ -8,15 +8,18 @@ sealed case class ProductOrientation(
   tileClass: String
 )
 
+
 case object PortraitOrientation extends ProductOrientation(
   name="portrait size",
   tileClass="orientation portrait"
 )
 
+
 case object LandscapeOrientation extends ProductOrientation(
   name="landscape size",
   tileClass="orientation landscape"
 )
+
 
 case class ChoosePhotoCelebrity(
   name: String,
@@ -29,6 +32,7 @@ case class ChoosePhotoCelebrity(
   deliveryDate: Date
 )
 
+
 case class ChoosePhotoTileProduct(
   name: String,
   price: Money,
@@ -37,6 +41,7 @@ case class ChoosePhotoTileProduct(
   orientation: ProductOrientation
 )
 
+
 case class ChoosePhotoRecentEgraph(
   productTitle: String,
   ownersName: String,
@@ -44,11 +49,13 @@ case class ChoosePhotoRecentEgraph(
   url: String
 )
 
+
 case class ChoosePhotoPartnerIcon(
   partnerName: String,
   imageUrl: String,
   link: String
 )
+
 
 case class ChoosePhotoCarouselProduct(
   name: String,
