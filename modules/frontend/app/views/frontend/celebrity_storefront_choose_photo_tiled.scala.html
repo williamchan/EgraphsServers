@@ -1,17 +1,13 @@
 @(celeb: models.frontend.storefront.ChoosePhotoCelebrity,
   products: Iterable[models.frontend.storefront.ChoosePhotoProductTile],
   recentEgraphs: Iterable[models.frontend.storefront.ChoosePhotoRecentEgraph],
-  iconImageUrls: Iterable[String])
+  partnerIcons: Iterable[models.frontend.storefront.ChoosePhotoPartnerIcon])
 
 @import views.frontend.tags.html.storefront_breadcrumbs_responsive
 @import frontend.formatting.MoneyFormatting.Conversions._
 @import frontend.formatting.DateFormatting.Conversions._
 
-@headJs = {
-  Egraphs.page.twitter_info = {handle:"@celeb.twitterUsername", name:"@celeb.name"};
-}
-
-@baseBody = {
+@photoSection = {
   <section class="wrapper" role="main">
 
     <div class="container">
@@ -30,7 +26,7 @@
 
             </div>
 
-            <h2><a href="#">@product.name &raquo;</a></h2>
+            <h2><a href="@product.targetUrl">@product.name &raquo;</a></h2>
 
             <p class="series">@{productNum+1} / @products.size</p>
 
@@ -46,114 +42,13 @@
     </div> <!-- end .container -->
 
   </section> <!-- end .wrapper -->
-
-  <section id="content" role="contentinfo">
-
-    <div id="main" class="sub">
-
-      <div class="container celebrity-information">
-
-        <div class="top clearfix">
-
-          <header>
-
-            <figure>
-              <img src="@celeb.profileUrl" alt="FPO" />
-            </figure>
-
-            <div>
-
-              <h1>@celeb.name</h1>
-              <h2>@celeb.category</h2>
-              <h3>@celeb.categoryRole</h3>
-
-            </div>
-
-          </header>
-
-          <footer class="product-availability">
-
-            <p>Guaranteed Delivery: <strong>@celeb.deliveryDate.formatDayAsPlainLanguage</strong></p>
-
-            <p>Quantity Available: <strong>@celeb.quantityAvailable</strong></p>
-
-          </footer> <!-- end .product-availability -->
-
-        </div> <!-- end .top -->
-
-        <div class="middle clearfix">
-
-          <div class="main">
-
-            <div class="clearfix">
-
-              <div class="bio">
-
-                <h4>Biography</h4>
-                <p>@Html(celeb.bio)</p>
-              </div> <!-- end .bio -->
-
-              <footer class="recently-purchased clearfix">
-
-                <h4>Egraphs Recently Made By @celeb.name</h4>
-
-                @for(egraph <- recentEgraphs) {
-                  <article>
-
-                    <a href="@egraph.url">
-                      <img src="@egraph.imageUrl"
-                           alt="@egraph.productTitle for @egraph.ownersName" />
-                    </a>
-
-                    <h2><a href="#">@egraph.productTitle</a></h2>
-                    <p><a href="#">for @egraph.ownersName</a></p>
-
-                  </article>
-                }
-
-              </footer> <!-- end .recently-purchased -->
-
-            </div> <!-- end .clearfix -->
-
-          </div> <!-- end .main -->
-
-          <aside class="recent-tweets">
-
-            <div>
-
-              <h4>David's Recent Tweets</h4>
-
-              <div class="tweets"></div> <!-- end .tweets -->
-
-            </div>
-
-          </aside> <!-- end .recent-tweets -->
-
-        </div> <!-- end .middle -->
-
-        <footer class="bottom">
-
-          <ul class="celebrity-partnerships clearfix">
-            <li><a href="#"><img src="http://placehold.it/100x50" alt="FPO" /></a></li>
-            <li><a href="#"><img src="http://placehold.it/100x50" alt="FPO" /></a></li>
-            <li><a href="#"><img src="http://placehold.it/100x50" alt="FPO" /></a></li>
-            <li><a href="#"><img src="http://placehold.it/100x50" alt="FPO" /></a></li>
-          </ul> <!-- end .celebrity-partnerships -->
-
-        </footer> <!-- end .bottom -->
-
-        <!-- <p class="to-top"><a href="#top">Back to Top</a></p> -->
-
-      </div> <!-- end .celebrity-information -->
-
-    </div> <!-- end #main -->
-
-  </section> <!-- end #content -->
 }
 
-@base_celebrity_storefront_template(
+@base_celebrity_storefront_choose_photo_template(
   title="Choose a photo",
-  headJs=headJs,
   jsMain="pages/celebrity-storefront-tiled",
-  body=baseBody
+  celeb=celeb,
+  recentEgraphs=recentEgraphs,
+  partnerIcons=partnerIcons,
+  photoSection=photoSection
 )

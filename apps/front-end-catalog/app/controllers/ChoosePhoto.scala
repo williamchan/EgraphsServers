@@ -2,8 +2,11 @@ package controllers
 
 import play.mvc.Controller
 
-import models.frontend.storefront.{ChoosePhotoCelebrity, PortraitOrientation, ChoosePhotoProductTile, ChoosePhotoRecentEgraph}
+import models.frontend.storefront._
 import java.text.SimpleDateFormat
+import models.frontend.storefront.ChoosePhotoProductTile
+import models.frontend.storefront.ChoosePhotoRecentEgraph
+import models.frontend.storefront.ChoosePhotoCelebrity
 
 /**
  * Permutations of the Celebrity Storefront: Choose Photo, tiled view.
@@ -18,7 +21,7 @@ object ChoosePhoto extends Controller {
       sampleCeleb,
       for (i <- 1 to 2) yield sampleTile,
       for (i <- 1 to 1) yield sampleEgraph,
-      List(icon)
+      List(samplePartnerIcon, samplePartnerIcon)
     )
   }
 
@@ -53,12 +56,16 @@ object ChoosePhoto extends Controller {
       name="2012 All-Star Game",
       price=BigDecimal(100.00).toMoney(),
       imageUrl="http://placehold.it/340x200",
-      targetUrl="#",
+      targetUrl="/2012-All-Star-Game",
       orientation=PortraitOrientation
     )
   }
 
-  private def icon = "http://placehold.it/100x50"
+  private def samplePartnerIcon = ChoosePhotoPartnerIcon(
+    partnerName="Major League Baseball",
+    imageUrl="http://placehold.it/100x50",
+    link="/MLB"
+  )
 
   private val sampleBio = {
     """Hoping to make his 3rd straight All-Star game appearance in 2012, David Price is one of the American League's most formidable pitchers. With 31 wins and a X.XX ERA over the past 2 seasons, Price's numbers stack up with just about any pitcher in the majors. He's off to a fast start this year – expect him to be leading the way for the Rays down the stretch come October.

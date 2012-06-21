@@ -43,3 +43,9 @@ case class ChoosePhotoRecentEgraph(
   imageUrl: String,
   url: String
 )
+
+case class ChoosePhotoPartnerIcon(
+  partnerName: String,
+  imageUrl: String,
+  link: String
+)
