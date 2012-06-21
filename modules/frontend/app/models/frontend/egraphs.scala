@@ -3,7 +3,9 @@
 //
 package models.frontend.egraphs
 
-import java.util.Date;
+import java.util.Date
+import xml.Elem
+;
 
 case class Egraph(
   productUrl:String,
@@ -27,24 +29,54 @@ case class OrderDetails(
   UPSNumber : String)
 
 abstract class GalleryControlRenderer {
-  def render : String
+  def render : Elem
 }
 
 object AdminGalleryControl extends GalleryControlRenderer{
   override def render = {
-    "AdminGalleryControl"
+    val ns =
+    <ul>
+      <li>
+        <a href="#">View Fullscreen</a>
+      </li>
+      <li>
+        <a href="#">Download</a>
+      </li>
+      <li>
+        <a href="#">Order Prints</a>
+      </li>
+    </ul>
+
+    ns
   }
 }
 
 object OwnerGalleryControl extends GalleryControlRenderer{
   override def render  = {
-    "OwnerGalleryControl"
+    val ns = <ul>
+      <li>
+        <a href="#">View Fullscreen</a>
+      </li>
+      <li>
+        <a href="#">Download</a>
+      </li>
+      <li>
+        <a href="#">Order Prints</a>
+      </li>
+    </ul>
+    ns
   }
 }
 
 object OtherGalleryControl extends GalleryControlRenderer{
   override def render = {
-    "OtherGalleryControl"
+    val ns = <ul>
+      <li>
+        <a href="#">View Fullscreen</a>
+      </li>
+    </ul>
+
+    ns
   }
 }
 
