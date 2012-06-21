@@ -1,248 +1,107 @@
-@()
+@(celeb: models.frontend.storefront.ChoosePhotoCelebrity,
+  products: Iterable[models.frontend.storefront.ChoosePhotoCarouselProduct],
+  firstCarouselProductIndex: Int,
+  tiledViewLink: String,
+  recentEgraphs: Iterable[models.frontend.storefront.ChoosePhotoRecentEgraph],
+  partnerIcons: Iterable[models.frontend.storefront.ChoosePhotoPartnerIcon]
+)(implicit session: play.mvc.Scope.Session)
 
-@import views.frontend.tags.html.storefront_breadcrumbs_responsive
+@import views.frontend.tags.html.{storefront_breadcrumbs_responsive, safeForm}
+@import frontend.formatting.MoneyFormatting.Conversions._
+@import frontend.formatting.DateFormatting.Conversions._
 
 @headJs = {
-  Egraphs.page.twitter_info = {handle:"davidprice14", name:"David Price"};
+  Egraphs.page.firstSlideInCarousel = @firstCarouselProductIndex;
+  Egraphs.page.productUrls = [@products.map(product => "\"" + product.carouselUrl + "\"").mkString(",")]
 }
 
-@baseBody = {
-    <section class="wrapper" role="main">
-    
-    	<div class="container">
-    	
-    		<div class="carousel-slider inner clearfix">
+@photoSection = {
+  <section class="wrapper" role="main">
 
-          @storefront_breadcrumbs_responsive()
+    <div class="container">
 
-    			<div class="flexslider">
-    			
-	    			<ul class="slides">
-	
-	    				<li>
-	    				
-	    					<div class="slide clearfix">
-				
-					    		<figure>
-					    		
-					    			<img src="http://placehold.it/575x400" alt="FPO" />
-					    			
-					    			<figcaption>1 / 6</figcaption>
-					    		
-					    		</figure>
-					    		
-					    		<div class="description">
-					    		
-					    			<div class="summary clearfix">
-						    		
-						    			<h2>First MLB Victory</h2>
-						    			
-						    			<p><strong>St. Petersburg, FL - 10/03/11</strong> David Price throws a pitch during game 7 of the 2008 ALCS against the Boston Red Sox. He threw the final four outs and earned his first career save in the game.</p>
-						    		
-						    			<p class="price">$50.00</p>
-						    		
-						    			<p><a href="#" class="button"><strong>Personalize</strong> <span>&raquo;</span></a></p>
-					    								    			
-					    			</div>
-					    								    			
-					    			<p class="see-all"><a href="#">See All Photos</a></p>
+      <div class="carousel-slider inner clearfix">
 
-					    			<div class="share clearfix">
-					    			
-					    				<p>Share this</p>
-					    				
-					    				<ul>
-					    					<li><a href="#" class="facebook">Facebook</a></li>
-					    					<li><a href="#" class="twitter">Twitter</a></li>
-					    				</ul>
-					    			
-					    			</div> <!-- end .share -->
-					    		
-					    		</div> <!-- end .description -->
-				    		
-	    					</div> <!-- end .slide -->
-	    			
-	    				</li>
-	    			
-	    				<li>
-	    				
-	    					<div class="slide clearfix">
-				
-					    		<figure>
-					    		
-					    			<img src="http://placehold.it/575x400" alt="FPO" />
-					    			
-					    			<figcaption>2 / 6</figcaption>
-					    		
-					    		</figure>
-					    		
-					    		<div class="description">
-					    		
-					    			<div class="summary clearfix">
-						    		
-						    			<h2>Second Product</h2>
-						    			
-						    			<p><strong>St. Petersburg, FL - 10/03/11</strong> David Price throws a pitch during game 7 of the 2008 ALCS against the Boston Red Sox. He threw the final four outs and earned his first career save in the game.</p>
-						    		
-						    			<p class="price">$50.00</p>
-						    		
-						    			<p><a href="#" class="button"><strong>Personalize</strong> <span>&raquo;</span></a></p>
-					    			
-					    			</div>
-					    			
-					    			<p class="see-all"><a href="#">See All Photos</a></p>
-					    			
-					    			<div class="share clearfix">
-					    			
-					    				<p>Share this</p>
-					    				
-					    				<ul>
-					    					<li><a href="#" class="facebook">Facebook</a></li>
-					    					<li><a href="#" class="twitter">Twitter</a></li>
-					    				</ul>
-					    			
-					    			</div> <!-- end .share -->
-					    		
-					    		</div> <!-- end .description -->
-				    		
-	    					</div> <!-- end .slide -->
-	    			
-	    				</li> 
-		    		
-	    			</ul> <!-- end .slides -->
-    			
-	    		</div> <!-- end .flexslider -->
-	    		    	
-	    	</div> <!-- end .carousel-slider -->	
+        @storefront_breadcrumbs_responsive()
 
-    	</div> <!-- end .container -->
-    
-    </section> <!-- end .wrapper -->
-      
-    <section id="content" role="contentinfo">
-    
-	    <div id="main" class="sub">
-	    
-		    <div class="container celebrity-information">
-		    
-	    		<div class="top clearfix">
+        <div class="flexslider">
 
-		    		<header>
-		    		
-		    			<figure>
-			    			<img src="http://placehold.it/80x100" alt="FPO" />
-		    			</figure>
-		    		
-		    			<div>
-		    		
-		    				<h1>David Price</h1>
-		    				<h2>Major League Baseball</h2>
-		    				<h3>Pitcher, Tampa Bay Rays</h3>
-		    			
-		    			</div>
-		    			
-		    		</header>
-		     
-		    		<footer class="product-availability">
-			    		
-			    		<p>Guaranteed Delivery: <strong>June 19, 2012</strong></p>
-			    		
-			    		<p>Quantity Available: <strong>4</strong></p>
-			    		
-		    		</footer> <!-- end .product-availability -->
+          <ul class="slides">
 
-	    		</div> <!-- end .top -->
-		    		
-		    	<div class="middle clearfix">
-		    		
-		    		<div class="main">
-		    		
-		    			<div class="clearfix">
-		    			
-		    				<div class="bio">
-		    			
-		    					<h4>Biography</h4>
-		    				
-		    					<p>Hoping to make his 3rd straight All-Star game appearance in 2012, David Price is one of the American League's most formidable pitchers. With 31 wins and a X.XX ERA over the past 2 seasons, Price's numbers stack up with just about any pitcher in the majors. He's off to a fast start this year &ndash; expect him to be leading the way for the Rays down the stretch come October.</p>
+            <!-- Iterate through the products -->
+            @{/* TODO: make this and the tile view do something reasonable with zero products */}
+            @for((product, index) <- products.zipWithIndex) {
+              <li>
 
-		    					<p>Interesting fact: David Price is nearly inseparable with his French Bulldog, Astro. In fact, when the Rays decided to give away an action figure of Price, he insisted that they create one for Astro, too. Word. Oh, and in case you're wondering, yes, we are looking into whether or not Astro will create egraphs for his fans. We'll keep you posted.</p>
-		    		
-		    				</div> <!-- end .bio -->
-		    				
-		    				<footer class="recently-purchased clearfix">
-		    				
-		    					<h4>Recently Purchased David Price Egraphs</h4>
-		    				
-		    					<article>
-		    						
-		    						<a href="#"><img src="http://placehold.it/340x200" alt="FPO" /></a>
-		    						
-		    						<h2><a href="#">Image Title Here</a></h2>
-		    						<p><a href="#">Owners Name</a></p>
-		    					
-		    					</article>
+                <div class="slide clearfix">
 
-		    					<article>
-		    						
-		    						<a href="#"><img src="http://placehold.it/340x200" alt="FPO" /></a>
-		    						
-		    						<h2><a href="#">Image Title Here</a></h2>
-		    						<p><a href="#">Owners Name</a></p>
-		    					
-		    					</article>
+                  <figure>
 
-		    					<article>
-		    						
-		    						<a href="#"><img src="http://placehold.it/340x200" alt="FPO" /></a>
-		    						
-		    						<h2><a href="#">Image Title Here</a></h2>
-		    						<p><a href="#">Owners Name</a></p>
-		    					
-		    					</article>
-		    				
-		    				</footer> <!-- end .recently-purchased -->
-		    			
-		    			</div> <!-- end .clearfix -->
-		    		
-		    		</div> <!-- end .main -->
-		    		
-		    		<aside class="recent-tweets">
-		    		
-		    			<div>
-		    		
-		    				<h4>David's Recent Tweets</h4>
-			    		
-		    				<div class="tweets"></div> <!-- end .tweets -->
-			    		
-		    			</div>
-			    		
-		    		</aside> <!-- end .recent-tweets -->
-		    		
-		    		</div> <!-- end .middle -->	    		
-		    				    		
-		    		<footer class="bottom">
-		    		
-		    			<ul class="celebrity-partnerships clearfix">		    			
-		    				<li><a href="#"><img src="http://placehold.it/100x50" alt="FPO" /></a></li>
-		    				<li><a href="#"><img src="http://placehold.it/100x50" alt="FPO" /></a></li>
-		    				<li><a href="#"><img src="http://placehold.it/100x50" alt="FPO" /></a></li>
-		    				<li><a href="#"><img src="http://placehold.it/100x50" alt="FPO" /></a></li>		    			
-		    			</ul> <!-- end .celebrity-partnerships -->
-		    		
-		    		</footer> <!-- end .bottom -->
-		     
-			      <!-- <p class="to-top"><a href="#top">Back to Top</a></p> -->
+                    <img src="@product.imageUrl" alt="@product.name. @product.description" />
 
-		    </div> <!-- end .celebrity-information -->
-	    
-	    </div> <!-- end #main -->
+                    <figcaption>@{index + 1} / @products.size</figcaption>
 
-    </section> <!-- end #content -->
+                  </figure>
+
+                  <div class="description">
+
+                    <div class="summary clearfix">
+
+                      <h2>@product.name</h2>
+
+                      <p>@Html(product.description)</p>
+
+                      <p class="price">@product.price.formatSimply</p>
+
+                      @safeForm("action" -> product.personalizeLink, "method" -> "POST") {
+                        <p>
+
+                          <button type="submit" class="button">
+
+                            <strong>Personalize</strong><span>&raquo;</span>
+
+                          </button>
+
+                        </p>
+                      }
+                    </div>
+
+                    <p class="see-all"><a href="@tiledViewLink">See All Photos</a></p>
+
+                    <div class="share clearfix">
+
+                      <p>Share this</p>
+
+                      <ul>
+                        <li><a href="@product.facebookShareLink" class="facebook">Facebook</a></li>
+                        <li><a href="@product.twitterShareLink" class="twitter">Twitter</a></li>
+                      </ul>
+
+                    </div> <!-- end .share -->
+
+                  </div> <!-- end .description -->
+
+                </div> <!-- end .slide -->
+
+              </li>
+            } <!-- Done iterating products -->
+          </ul> <!-- end .slides -->
+
+        </div> <!-- end .flexslider -->
+
+      </div> <!-- end .carousel-slider -->
+
+    </div> <!-- end .container -->
+
+  </section> <!-- end .wrapper -->
 }
 
-@base_celebrity_storefront_template(
-  title="Choose a photo",
-  headJs=headJs,
+@base_celebrity_storefront_choose_photo_template(
+  title="Photo",
   jsMain="pages/celebrity-storefront-carousel",
-  body=baseBody
+  celeb=celeb,
+  headJs=headJs,
+  recentEgraphs=recentEgraphs,
+  partnerIcons=partnerIcons,
+  photoSection=photoSection
 )

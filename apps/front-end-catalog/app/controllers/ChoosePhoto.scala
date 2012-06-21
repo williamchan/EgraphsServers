@@ -4,7 +4,7 @@ import play.mvc.Controller
 
 import models.frontend.storefront._
 import java.text.SimpleDateFormat
-import models.frontend.storefront.ChoosePhotoProductTile
+import models.frontend.storefront.ChoosePhotoTileProduct
 import models.frontend.storefront.ChoosePhotoRecentEgraph
 import models.frontend.storefront.ChoosePhotoCelebrity
 
@@ -18,37 +18,55 @@ object ChoosePhoto extends Controller {
 
   def withProducts(num: Int = 1) = {
     val products = for(i <- 1 to num) yield sampleTile
-    RenderTiles().copy(products=products).render
+    ChoosePhotoDefaults().copy(products=products).renderTiles
   }
 
   def withRecentEgraphs(num: Int = 1) = {
     val recentEgraphs = for (i <- 1 to num) yield sampleEgraph
-    RenderTiles().copy(recentEgraphs=recentEgraphs).render
+    ChoosePhotoDefaults().copy(recentEgraphs=recentEgraphs).renderTiles
   }
 
   def withPartnerIcons(num: Int=1) = {
     val icons = for (i <- 1 to num) yield samplePartnerIcon
-    RenderTiles().copy(partnerIcons=icons).render
+    ChoosePhotoDefaults().copy(partnerIcons=icons).renderTiles
   }
 
   def landscape = {
-    RenderTiles().copy(products=List(sampleTile.copy(orientation=LandscapeOrientation))).render
+    ChoosePhotoDefaults().copy(products=List(sampleTile.copy(orientation=LandscapeOrientation))).renderTiles
   }
 
   def longBio = {
     val longBio = (for(i <- 1 to 4) yield sampleBio).mkString("<br/><br/>")
-    RenderTiles().copy(celeb = sampleCeleb.copy(bio=longBio)).render
+    ChoosePhotoDefaults().copy(celeb = sampleCeleb.copy(bio=longBio)).renderTiles
   }
 
-  private[ChoosePhoto] case class RenderTiles(
+  def carousel(num: Int=3, focus: Int=1) = {
+    val carouselProducts = for (i <- 1 to num) yield sampleCarouselProduct
+
+    ChoosePhotoDefaults().copy(
+      carouselProducts=carouselProducts,
+      firstCarouselIndex=focus - 1
+    ).renderCarousel
+  }
+
+  private[ChoosePhoto] case class ChoosePhotoDefaults(
     celeb: ChoosePhotoCelebrity = sampleCeleb,
-    products: Iterable[ChoosePhotoProductTile] = for (i <- 1 to 2) yield sampleTile,
+    products: Iterable[ChoosePhotoTileProduct] = for (i <- 1 to 2) yield sampleTile,
+    carouselProducts: Iterable[ChoosePhotoCarouselProduct] = for (i <- 1 to 2) yield sampleCarouselProduct,
+    firstCarouselIndex: Int = 0,
+    tiledViewLink: String="/Herp-Derpson/photos",
     recentEgraphs: Iterable[ChoosePhotoRecentEgraph] = for (i <- 1 to 1) yield sampleEgraph,
     partnerIcons: Iterable[ChoosePhotoPartnerIcon] = List(samplePartnerIcon, samplePartnerIcon)
   ) {
-    def render = {
+    def renderTiles = {
       views.frontend.html.celebrity_storefront_choose_photo_tiled(
         celeb, products, recentEgraphs, partnerIcons
+      )
+    }
+
+    def renderCarousel = {
+      views.frontend.html.celebrity_storefront_choose_photo_carousel(
+        celeb, carouselProducts, firstCarouselIndex, tiledViewLink, recentEgraphs, partnerIcons
       )
     }
   }
@@ -75,12 +93,8 @@ object ChoosePhoto extends Controller {
     )
   }
 
-  def carousel = {
-    views.frontend.html.celebrity_storefront_choose_photo_carousel()
-  }
-
   private def sampleTile = {
-    ChoosePhotoProductTile(
+    ChoosePhotoTileProduct(
       name="2012 All-Star Game",
       price=BigDecimal(100.00).toMoney(),
       imageUrl="http://placehold.it/340x200",
@@ -99,6 +113,20 @@ object ChoosePhoto extends Controller {
     """Hoping to make his 3rd straight All-Star game appearance in 2012, David Price is one of the American League's most formidable pitchers. With 31 wins and a X.XX ERA over the past 2 seasons, Price's numbers stack up with just about any pitcher in the majors. He's off to a fast start this year – expect him to be leading the way for the Rays down the stretch come October.
       <br/><br/>
       Interesting fact: David Price is nearly inseparable with his French Bulldog, Astro. In fact, when the Rays decided to give away an action figure of Price, he insisted that they create one for Astro, too. Word. Oh, and in case you're wondering, yes, we are looking into whether or not Astro will create egraphs for his fans. We'll keep you posted."""
+  }
+
+  private val sampleCarouselProduct = {
+    ChoosePhotoCarouselProduct(
+      name="2011 All-Star Game",
+      description="<strong>St. Petersburg, FL - 10/03/11</strong> David Price throws a pitch during game 7 of the 2008 ALCS against the Boston Red Sox. He threw the final four outs and earned his first career save in the game.",
+      price=BigDecimal(100.00).toMoney(),
+      imageUrl="http://placehold.it/575x400",
+      personalizeLink="/2011-All-Star-Game/personalize",
+      orientation=LandscapeOrientation,
+      carouselUrl="this-product's-carousel-url",
+      facebookShareLink="facebook-share-link",
+      twitterShareLink="twitter-share-link"
+    )
   }
 }
 

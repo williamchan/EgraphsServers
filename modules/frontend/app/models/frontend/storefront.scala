@@ -29,7 +29,7 @@ case class ChoosePhotoCelebrity(
   deliveryDate: Date
 )
 
-case class ChoosePhotoProductTile(
+case class ChoosePhotoTileProduct(
   name: String,
   price: Money,
   imageUrl: String,
@@ -48,4 +48,16 @@ case class ChoosePhotoPartnerIcon(
   partnerName: String,
   imageUrl: String,
   link: String
+)
+
+case class ChoosePhotoCarouselProduct(
+  name: String,
+  description: String,
+  price: Money,
+  imageUrl: String,
+  personalizeLink: String,
+  orientation: ProductOrientation,
+  carouselUrl:String,
+  facebookShareLink: String,
+  twitterShareLink: String
 )

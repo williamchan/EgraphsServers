@@ -1,5 +1,6 @@
 @(title: String,
   jsMain: String = "",
+  headJs: => Html = Html.empty,
   celeb: models.frontend.storefront.ChoosePhotoCelebrity,
   recentEgraphs: Iterable[models.frontend.storefront.ChoosePhotoRecentEgraph],
   partnerIcons: Iterable[models.frontend.storefront.ChoosePhotoPartnerIcon],
@@ -10,6 +11,7 @@
 
 @choosePhotoHeadJs = {
   Egraphs.page.twitter_info = {handle:"@celeb.twitterUsername", name:"@celeb.name"};
+  @headJs
 }
 
 @baseBody = {
@@ -122,7 +124,7 @@
 }
 
 @base_celebrity_storefront_template(
-  title=title + " | Celebrity Storefront | Egraphs",
+  title=title + " | " + celeb.name,
   jsMain=jsMain,
   headJs=choosePhotoHeadJs,
   body=baseBody
