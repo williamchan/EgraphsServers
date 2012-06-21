@@ -1,7 +1,12 @@
 @()
 
 @catalogEntry(href: String, description: String) = {<li><a href="@href">@description</a></li>}
-
+@galleryEntry(href: String) = {
+  <li>@href as
+    <a href="@href&role=other">other</a>
+    <a href="@href&role=admin">admin</a>
+    <a href="@href&role=owner">owner</a>
+  </li>}
 <!doctype html>
 <html>
   <head>
@@ -33,7 +38,7 @@
     <h2>Account gallery</h2>
     <ol>
       @for(number <- 0 until 4) {
-        @catalogEntry("account/gallery?user=leeroyjenkins&count=" + number, "account/gallery?user=leeroyjenkins&count=" + number)
+        @galleryEntry("account/gallery?user=leeroyjenkins&count=" + number)
       }
     </ol>
   </body>
