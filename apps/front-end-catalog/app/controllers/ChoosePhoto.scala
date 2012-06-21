@@ -16,13 +16,41 @@ object ChoosePhoto extends Controller {
 
   val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
 
-  def index = {
-    views.frontend.html.celebrity_storefront_choose_photo_tiled(
-      sampleCeleb,
-      for (i <- 1 to 2) yield sampleTile,
-      for (i <- 1 to 1) yield sampleEgraph,
-      List(samplePartnerIcon, samplePartnerIcon)
-    )
+  def withProducts(num: Int = 1) = {
+    val products = for(i <- 1 to num) yield sampleTile
+    RenderTiles().copy(products=products).render
+  }
+
+  def withRecentEgraphs(num: Int = 1) = {
+    val recentEgraphs = for (i <- 1 to num) yield sampleEgraph
+    RenderTiles().copy(recentEgraphs=recentEgraphs).render
+  }
+
+  def withPartnerIcons(num: Int=1) = {
+    val icons = for (i <- 1 to num) yield samplePartnerIcon
+    RenderTiles().copy(partnerIcons=icons).render
+  }
+
+  def landscape = {
+    RenderTiles().copy(products=List(sampleTile.copy(orientation=LandscapeOrientation))).render
+  }
+
+  def longBio = {
+    val longBio = (for(i <- 1 to 4) yield sampleBio).mkString("<br/><br/>")
+    RenderTiles().copy(celeb = sampleCeleb.copy(bio=longBio)).render
+  }
+
+  private[ChoosePhoto] case class RenderTiles(
+    celeb: ChoosePhotoCelebrity = sampleCeleb,
+    products: Iterable[ChoosePhotoProductTile] = for (i <- 1 to 2) yield sampleTile,
+    recentEgraphs: Iterable[ChoosePhotoRecentEgraph] = for (i <- 1 to 1) yield sampleEgraph,
+    partnerIcons: Iterable[ChoosePhotoPartnerIcon] = List(samplePartnerIcon, samplePartnerIcon)
+  ) {
+    def render = {
+      views.frontend.html.celebrity_storefront_choose_photo_tiled(
+        celeb, products, recentEgraphs, partnerIcons
+      )
+    }
   }
 
   private def sampleCeleb = {
@@ -56,7 +84,7 @@ object ChoosePhoto extends Controller {
       name="2012 All-Star Game",
       price=BigDecimal(100.00).toMoney(),
       imageUrl="http://placehold.it/340x200",
-      targetUrl="/2012-All-Star-Game",
+      targetUrl="/Herp-Derpson/photos/2012-All-Star-Game",
       orientation=PortraitOrientation
     )
   }
