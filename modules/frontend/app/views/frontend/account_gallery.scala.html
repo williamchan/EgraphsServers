@@ -3,8 +3,10 @@
 @finishedEgraph(egraph: models.frontend.egraphs.Egraph, index: Int) = {
   <div class="row-fluid row-egraph">
     <div class="span12">
-      <div class="number">@(index+1)</div>
-      <h3>@egraph.productTitle</h3>
+      <div class="number">@(index+1)</div><br>
+      <span>
+        <h3>@egraph.productTitle</h3>
+      </span>
     </div>
     <div class="row-fluid">
       <div class="span7">
@@ -42,33 +44,34 @@
   <div class="row-fluid row-egraph">
     <div class="span12">
       <div class="number">@(index+1)</div>
+      <br>
       <span>
-        <h3>@egraph.productTitle</h3><span class="order-line">Pending Order</span>
+        <h3>@egraph.productTitle</h3><span class="order-line"> &nbsp;Pending Order</span>
       </span>
     </div>
   </div>
   <div class="row-fluid">
-    <div class="span4">
+    <div class="span3">
     <figure>
-      <img src="@egraph.thumbnailUrl" width="60%" height="60%">
+      <img src="@egraph.thumbnailUrl">
       </img>
     </figure>
     </div>
-    <div class="span4">
-      <div>
-        <span class="order-label">Order Date</span><span class="order-detail">@orderDetails.orderDate</span>
+    <div class="span6">
+      <div class="order-row">
+        <span class="order-label">Order Date</span><span class="order-detail"> @orderDetails.orderDate</span>
       </div>
-      <div>
+      <div class="order-row">
         <span class="order-label">Order Number</span><span class="order-detail">@orderDetails.orderNumber</span>
       </div>
-      <div>
-        <span class="order-label">Price</span><span class="order-detail">@orderDetails.price</span>
+      <div class="order-row">
+        <span class="order-label">Price</span><span class="order-detail"> @orderDetails.price</span>
       </div>
     </div>
-    <div class="span4">
-      <span>Status: </span><br>
-      <span>Shipping</span><br>
-      <span>UPS Tracking Number</span><br>
+    <div class="span3 shipping-details">
+      <span>Status: </span>@orderDetails.statusText<br>
+      <span>Shipping: </span>@orderDetails.shippingMethod<br>
+      <span>UPS Tracking Number: </span>@orderDetails.UPSNumber<br>
     </div>
   </div>
 }
