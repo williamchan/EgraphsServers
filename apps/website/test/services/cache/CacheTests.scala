@@ -1,6 +1,6 @@
 package services.cache
 
-import utils.{TestAppConfig, EgraphsUnitTest}
+import utils.{TestData, TestAppConfig, EgraphsUnitTest}
 import uk.me.lings.scalaguice.ScalaModule
 import com.google.inject.AbstractModule
 import services.http.PlayConfig
@@ -10,19 +10,21 @@ import java.util
 trait CacheTests { this: EgraphsUnitTest =>
   def cacheInstance: Cache
 
+  import TestData.makeTestCacheKey
+
   "A cache" should "return None for an empty key" in {
-    cacheInstance.get("this-is-a-long-key-that-should-not-exist") should be (None)
+    cacheInstance.get(makeTestCacheKey) should be (None)
   }
 
   "A cache" should "set and get a String" in {
-    deletingKey(makeTestKey) { (cache, key) =>
+    deletingKey(makeTestCacheKey) { (cache, key) =>
       cache.set(key, "herp", 5)
       cache.get(key) should be (Some("herp"))
     }
   }
 
   "A cache" should "set and get a Map" in {
-    deletingKey(makeTestKey) { (cache, key) =>
+    deletingKey(makeTestCacheKey) { (cache, key) =>
       val value = scala.collection.immutable.Map("red" -> "blue")
       cache.set(key, value, 5)
       cache.get[Map[String, String]](key) should be (Some(value))
@@ -30,7 +32,7 @@ trait CacheTests { this: EgraphsUnitTest =>
   }
 
   "A cache" should "delete a key" in {
-    deletingKey(makeTestKey) { (cache, key) =>
+    deletingKey(makeTestCacheKey) { (cache, key) =>
       val value = "herp"
       cache.set(key, value, 5)
       cache.delete(key)
@@ -38,9 +40,16 @@ trait CacheTests { this: EgraphsUnitTest =>
     }
   }
 
-  private def makeTestKey = {
-    "this_is_a_test_case_key_" + new util.Date().getTime
-  }
+    "A cache" should "respect the expiration deadline" in {
+      deletingKey(makeTestCacheKey) { (cache, key) =>
+        val value = "herp"
+        cache.set(key, value, 1)
+        Thread.sleep(2000)
+        cache.get(key) should be (None)
+      }
+    }
+
+
 
   private def deletingKey(key: String)(operation: (Cache, String) => Any) = {
     val cache = cacheInstance

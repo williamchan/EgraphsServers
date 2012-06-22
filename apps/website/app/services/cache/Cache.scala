@@ -63,7 +63,7 @@ private[cache] class CacheFactory @Inject()(@PlayConfig playConfig: util.Propert
 object CacheFactory extends Logging
 
 
-private[cache] class RedisCache (jedis: Jedis) extends Cache {
+private[cache] class RedisCache @Inject()(jedis: Jedis) extends Cache {
   import RedisApplicationCache._
   import Utils.closing
 

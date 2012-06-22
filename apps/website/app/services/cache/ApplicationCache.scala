@@ -1,21 +1,24 @@
 package services.cache
 
 import services.http.{PlayId, HostInfo}
-import java.io._
 import com.google.inject.Inject
 import play.libs.Time
 
-class ApplicationCache @Inject()(
+case class ApplicationCache @Inject()(
   cacheFactory: () => Cache,
   hostInfo: HostInfo,
   @PlayId playId: String
 ) {
-  def set[T <: Serializable](key: String, value: T, expiration: Option[String]=None) {
+  def set[T <: AnyRef](key: String, value: T, expiration: Option[String]=None) {
     cache.set(fullKey(key), value, parseDuration(expiration))
   }
 
-  def get[T <: Serializable : Manifest](key: String): Option[T] = {
+  def get[T <: AnyRef](key: String): Option[T] = {
     cache.get(fullKey(key))
+  }
+
+  def delete(key: String) = {
+    cache.delete(fullKey(key))
   }
 
   // Protected helper methods
@@ -32,12 +35,12 @@ class ApplicationCache @Inject()(
     fullKey(key).getBytes
   }
 
-  private[cache] def hostId: String = {
+  private[cache] val hostId: String = {
     playId match {
       // For test instances we don't want to collide namespaces with production ones
       // or with other test ones
       case "test" =>
-        hostInfo.userName + "@" + hostInfo.computerName + "(" + hostInfo.macAddress + ")"
+        "test_" + hostInfo.userName + "_" + hostInfo.computerName + "_" + hostInfo.macAddress
 
       // All production instances with a given id should share cache namespace
       case _ =>
