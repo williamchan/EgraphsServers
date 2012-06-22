@@ -3,10 +3,37 @@
 #personalize {
   
   form {
-  
+
     float: left;
     width: 60%;
-  
+
+    .btn-group {
+      margin-bottom:15px;
+    }
+
+    .btn-custom-radio {
+       width:110px;
+       .buttonBackground(lighten(@gray, 60%), lighten(@gray, 45%));
+       text-transform:uppercase;
+       font-size:0.75em;
+       line-height:1.3em;
+       padding-top:5px;
+       padding-bottom:5px;
+       color: lighten(@gray, 10%);
+       font-weight: 100;
+       text-shadow: 0px 1px 0px white;
+
+       &.active,
+       &:active {
+         .gradientBar(@orange, lighten(@orange, 10%));
+         *background-color: @orange;
+         .reset-filter();
+         font-weight:600;
+         color:white;
+         text-shadow: 0px -1px 0px black;
+       }
+
+    }
     fieldset {
 
       position: relative;      
