@@ -1,6 +1,7 @@
 package services
 
 import blobs.BlobModule
+import cache.CacheModule
 import db.DBModule
 import graphics.GraphicsModule
 import http.HttpModule
@@ -20,6 +21,7 @@ class AppConfig extends AbstractModule with ScalaModule {
     // Services
     bind[Mail].toProvider[MailProvider]
     install(DBModule)
+    install(CacheModule)
     install(HttpModule)
     install(BlobModule)
     install(PaymentModule)
