@@ -3,7 +3,7 @@ package services.http
 import utils.EgraphsUnitTest
 
 class HostInfoTests extends EgraphsUnitTest {
-  def hostInfo = new HostInfo
+  private def hostInfo = new HostInfo
 
   "macAddress" should "return the machine's mac address" in {
     hostInfo.macAddress.length should be (17)
@@ -14,7 +14,6 @@ class HostInfoTests extends EgraphsUnitTest {
   }
 
   "userName" should "return a name" in {
-    println(hostInfo.userName)
     hostInfo.userName should not be (null)
     hostInfo.userName should not be ("")
   }

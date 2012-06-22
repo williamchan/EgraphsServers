@@ -42,14 +42,5 @@
     <mapping directory="" vcs="" />
     <mapping directory="$PROJECT_DIR$/../.." vcs="Git" />
   </component>
-  <component name="libraryTable">
-    <library name="views">
-      <CLASSES>
-        <root url="file://$PROJECT_DIR$/tmp/classes/views" />
-      </CLASSES>
-      <JAVADOC />
-      <SOURCES />
-    </library>
-  </component>
 </project>
 

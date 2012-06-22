@@ -23,6 +23,14 @@ trait Logging {
 
   /**Logs a message to INFO by default */
   def log(message: => String) {
+    play.Logger.info(annotateMessage(message))
+  }
+
+  def error(message: => String) {
+    play.Logger.error(annotateMessage(message))
+  }
+
+  private def annotateMessage(message: String): String = {
     val sb = new StringBuilder
 
     colorize("[", TerminalColorLightGray, sb)
@@ -31,7 +39,7 @@ trait Logging {
     sb.append(" ")
     colorize(message, TerminalColorDefaultBold, sb)
 
-    play.Logger.info(sb.toString())
+    sb.toString()
   }
 }
 
