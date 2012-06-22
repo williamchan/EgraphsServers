@@ -69,18 +69,18 @@ class ServerSession private[http] (
   }
 
   /**
-   * Empties all tuples from the cache
+   * Empties all tuples from the session
    *
-   * @return the emptied cache
+   * @return the emptied session
    */
   def emptied: ServerSession = {
     this.withData(Map.empty[String, Any])
   }
 
   /**
-   * Gets a tuple Option from the cache. See class docs for usage.
+   * Gets a tuple Option from the session. See class docs for usage.
    *
-   * @param key the key to get from the cache
+   * @param key the key to get from the session
    * @tparam T the type of tuple.
    * @return Some(the value) or None if the key wasn't found
    */
@@ -89,7 +89,7 @@ class ServerSession private[http] (
   }
 
   /**
-   * Returns a copy of the cache with the new tuples set into it. This
+   * Returns a copy of the session with the new tuples set into it. This
    * will override previous settings.
    *
    * See class documentation for usage info.
@@ -102,7 +102,7 @@ class ServerSession private[http] (
   }
 
   /**
-   * Returns a copy of the cache with the tuple corresponding to the
+   * Returns a copy of the session with the tuple corresponding to the
    * provided keys removed from it.
    *
    * @param keys keys for the tuples to remove
@@ -130,7 +130,7 @@ class ServerSession private[http] (
   }
 
   private lazy val data: Map[String, Any] = {
-    // Return, in order of precedence, (1) the provided data (2) data from the cache,
+    // Return, in order of precedence, (1) the provided data (2) data from the session,
     // (3) an empty Map[String, String]
     providedData.getOrElse {
       appCache.get[Map[String, Any]](cacheKey).getOrElse {
@@ -188,10 +188,10 @@ object ServerSession extends Logging {
 /**
  * Default factory that yields new session caches.
  *
- * @param cacheServices services needed for new instances of ServerSession
+ * @param sessionServices services needed for new instances of ServerSession
  */
-private[http] class ServerSessionFactory @Inject() (cacheServices:ServerSessionServices) extends (() => ServerSession) {
+private[http] class ServerSessionFactory @Inject() (sessionServices:ServerSessionServices) extends (() => ServerSession) {
   def apply(): ServerSession = {
-    new ServerSession(providedData=None, services=cacheServices)
+    new ServerSession(providedData=None, services=sessionServices)
   }
 }
