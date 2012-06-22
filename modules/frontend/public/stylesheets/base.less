@@ -6,9 +6,12 @@
 
 a, a:link, a:visited {
 	.transitions(color 0.25s ease);
+	&:hover { text-decoration: none; }
+	&.tip { 
+		font-size: 90%;
+		text-decoration: underline; 
+	}
 }
-
-a:hover { text-decoration: none; }
 
 /* !Buttons */
 
@@ -84,6 +87,14 @@ button  {
 	a:hover { color: @orange; }
 	
 }
+
+/* Misc. Utils */
+
+.left { float: left; }
+.right { float: right; }
+
+.align-left { text-align: left; }
+.align-right { text-align: right; }
 
 /* !Top */
 

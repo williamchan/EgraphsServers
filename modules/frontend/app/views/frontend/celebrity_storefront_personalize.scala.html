@@ -33,7 +33,8 @@
         				    <div class="clearfix">
         				      <label class="instructions" for="gift">Is This a Gift? <small>Current guaranteed delivery: 04/22/12</small></label>
         				      <div class="input">
-        				        <input type="checkbox" name="gift" value="yes">
+        				        <input id="gift" type="checkbox" name="gift" value="yes" checked="checked">
+        				        <p><small><a href="#" class="tip">How does gifting work?</a></small></p>
         				      </div>
         				    </div>
       				    </div> <!-- end .field -->
@@ -42,7 +43,7 @@
         				    <div class="clearfix">
         				      <label class="instructions" for="recepient-name">Gift Recipient's Name:</label>
         				      <div class="input">
-          				      <input id="recepient-name" type="text" name="email" required>
+          				      <input id="recepient-name" type="text" name="email">
         				      </div>
         				    </div>
       				    </div> <!-- end .field -->
@@ -51,7 +52,7 @@
         				    <div class="clearfix">
         				      <label class="instructions" for="recepient-email">Gift Recipient's Email:</label>
         				      <div class="input">
-        				        <input id="recepient-email" type="text" name="email" required>
+        				        <input id="recepient-email" type="text" name="email">
         				        <div class="alert alert-error">
           				        <button type="button" class="close" data-dismiss="alert">&times;</button>
           				        <strong>Oh snap!</strong> Change a few things up and try submitting again.
@@ -78,8 +79,8 @@
                       </div>
                       <div class="input">
         				        <div id="egraph-message">
-        				          <textarea name="message" rows="8" cols="1"></textarea>
-        				          <p><small><a href="#">How do I know it's really him?</a></small></p>
+        				          <textarea id="egraph-message-text" name="message" rows="8" cols="1"></textarea>
+        				          <p class="align-right"><small><a href="#" class="tip">How do I know it's really him?</a></small></p>
         				        </div>
         				      </div>
         				    </div>
@@ -102,7 +103,15 @@
       				  
       				  </fieldset>
       				  
-      				  @tags.html.arrow_button(caption="Review", target="#")
+      				  <fieldset class="submit">
+      				  
+      				  	<div class="clearfix">
+      				  
+      				 			@tags.html.arrow_button(caption="Review", target="#", classes="button right")
+      				 		
+      				  	</div>
+      				  
+      				  </fieldset>
       				  
       				</form> <!-- end form -->
       				

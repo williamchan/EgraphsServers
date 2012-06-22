@@ -1,5 +1,5 @@
 /* Scripting shared between forms */
-define(["libs/jquery.watermark.min", "libs/iphonecheckboxes/iphone-style-checkboxes", "libs/twitter-bootstrap/bootstrap-alert"], function() {
+define(["libs/jquery.watermark.min", "libs/iphonecheckboxes/iphone-style-checkboxes", "libs/twitter-bootstrap/bootstrap-alert", "libs/twitter-bootstrap/bootstrap-button"], function() {
   return {
     
     /** 
@@ -19,7 +19,7 @@ define(["libs/jquery.watermark.min", "libs/iphonecheckboxes/iphone-style-checkbo
      * @param params custom parameters for placeholder text (e.g. { checkedLabel: 'YES', uncheckedLabel: 'NO'})
      **/    
     setIphoneCheckbox: function(selector, params) {
-      $(selector).iphoneStyle();
+      $(selector).iphoneStyle(params);
     },
 
     /** 
@@ -28,6 +28,15 @@ define(["libs/jquery.watermark.min", "libs/iphonecheckboxes/iphone-style-checkbo
      **/    
     setAlert: function(selector) {
       $(selector).alert();
+    },
+
+    /** 
+     * Creates button group
+     * @param selector the selectors to use
+     * @method methow Toggles push state. Gives the button the appearance that it has been activated.
+     **/    
+    setButton: function(selector, method) {
+      $(selector).button(method);
     }
     
   };
