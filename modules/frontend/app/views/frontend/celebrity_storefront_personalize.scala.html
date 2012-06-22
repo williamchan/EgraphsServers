@@ -1,0 +1,122 @@
+@()
+
+@import views.frontend.tags.html.storefront_breadcrumbs_responsive
+@import views.frontend.tags
+
+@headJs = {
+  Egraphs.page.celeb = "David Price";
+}
+
+@baseBody = {
+    <section id="content" class="top" role="main">
+    
+      <div id="main" class="sub">
+      
+        <div id="checkout" class="container" >
+			
+					 @storefront_breadcrumbs_responsive()
+					 		
+    				<header>	
+    				  <h1>Personalize Your Egraph</h1>
+    				  <h2>David Price | First MLB Victory</h2>  				
+    				</header>
+    				
+    				<div id="personalize" class="clearfix">
+    				
+      				<form method="post" action="./">
+  
+      				  <fieldset>
+
+      				    <legend>A</legend>
+      				  
+      				    <div class="field">
+        				    <div class="clearfix">
+        				      <label class="instructions" for="gift">Is This a Gift? <small>Current guaranteed delivery: 04/22/12</small></label>
+        				      <div class="input">
+        				        <input type="checkbox" name="gift" value="yes">
+        				      </div>
+        				    </div>
+      				    </div> <!-- end .field -->
+      				    
+      				    <div class="field">
+        				    <div class="clearfix">
+        				      <label class="instructions" for="recepient-name">Gift Recipient's Name:</label>
+        				      <div class="input">
+          				      <input id="recepient-name" type="text" name="email" required>
+        				      </div>
+        				    </div>
+      				    </div> <!-- end .field -->
+      				    
+      				    <div class="field last">
+        				    <div class="clearfix">
+        				      <label class="instructions" for="recepient-email">Gift Recipient's Email:</label>
+        				      <div class="input">
+        				        <input id="recepient-email" type="text" name="email" required>
+        				        <div class="alert alert-error">
+          				        <button type="button" class="close" data-dismiss="alert">&times;</button>
+          				        <strong>Oh snap!</strong> Change a few things up and try submitting again.
+          				      </div>
+        				      </div>
+        				    </div>
+      				    </div> <!-- end .field -->
+      				  
+      				  </fieldset>
+  
+      				  <fieldset>
+
+      				    <legend>B</legend>
+      				  
+      				    <div class="field last">
+        				    <div class="clearfix">
+        				      <label class="instructions">David Price Should Write: <small>140 character limit.</small> <small>All messages are subject to approval.</small></label>
+        				      <div class="input">
+        				        <div id="egraph-message">
+        				          <textarea name="message" rows="8" cols="1"></textarea>
+        				          <p><small><a href="#">How do I know it's really him?</a></small></p>
+        				        </div>
+        				      </div>
+        				    </div>
+      				    </div> <!-- end .field -->
+      				          				  
+      				  </fieldset>
+  
+      				  <fieldset class="last">
+      				    
+      				    <legend>C</legend>
+      				  
+      				    <div class="field last">
+        				    <div class="clearfix">
+        				      <label class="instructions" for="your-message">Your Note to David Price: <small>140 character limit.</small> <small>All messages are subject to approval.</small></label>
+        				      <div class="input">
+        				        <textarea id="your-message" name="message" rows="8" cols="1"></textarea>
+        				      </div>
+        				    </div>
+      				    </div> <!-- end .field -->     				    
+      				  
+      				  </fieldset>
+      				  
+      				  @tags.html.arrow_button(caption="Review", target="#")
+      				  
+      				</form> <!-- end form -->
+      				
+      				<aside>
+      				
+      				  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+      				
+      				</aside>
+  			
+      		</div> <!-- end #personalize -->
+
+        </div> <!-- end #checkout -->
+
+    	</div> <!-- end #main -->
+    
+    </section> <!-- end #content -->
+}
+
+@base_celebrity_storefront_template(
+  title="Personalize",
+  jsMain="pages/celebrity-storefront-personalize",
+  headJs=headJs,
+  body=baseBody
+)

@@ -1,5 +1,5 @@
 /* Scripting for the single celebrity page in carousel mode */
-define(["services/celebrity-social", "Egraphs", "libs/jquery.flexslider-min"], 
+define(["services/celebrity-social", "Egraphs", "libs/flexslider/jquery.flexslider-min"], 
 function(social, Egraphs) {
   var page = Egraphs.page,
       celebTwitterInfo = page.twitter_info,

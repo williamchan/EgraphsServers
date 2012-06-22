@@ -1,0 +1,81 @@
+// The Egraphs personalize stylesheet.
+
+#personalize {
+  
+  form {
+  
+    float: left;
+    width: 60%;
+  
+    fieldset {
+
+      position: relative;      
+      border-top: 1px solid @white;
+      border-bottom: 1px solid lighten(@gray, 50%);  
+      border-right: 1px solid lighten(@gray, 50%); 
+      padding: 40px 0 20px 0;
+      
+      &.last { 
+        border-bottom: none;
+      }
+      
+      .field {
+        
+        margin-bottom: 20px;
+        
+        &.last { margin-bottom: 0; }
+        
+        > div {
+        
+          width: 95%;
+          margin-bottom: 0;
+        
+          label.instructions {
+          
+            float: left;
+            width: 30%;
+            
+          }
+          
+          .input {
+          
+            float: right;
+            width: 65%;
+            
+            #egraph-message p { 
+              text-align: right; 
+              a { text-decoration: underline; }
+            }            
+            
+          }
+        
+        }
+        
+      } // end .field
+      
+      legend {
+        .inline-block;
+        width: auto;        
+        position: absolute;
+        left: 0;
+        top: 0;
+        text-align: center;
+        margin: 0;
+        background: @orange;
+        padding: 0 5px;
+        color: @white;
+        text-transform: uppercase;
+        font-size: 14px;
+        line-height: 1.5em;       
+      } // end .callout
+    
+    } // end .fieldset
+  
+  }
+  
+  aside {
+    float: right;
+    width: 40%;
+  }
+  
+}
