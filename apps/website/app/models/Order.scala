@@ -315,6 +315,28 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
     )
   }
 
+  def getEgraphsAndOrders(recipientId: Long) : Query[(Order, Option[Egraph])] = {
+    join(schema.orders, schema.egraphs.leftOuter) (
+      (order, egraph) =>
+        where(order.recipientId === recipientId and egraph.map(_._egraphState) === EgraphState.Published.name)
+          select(order, egraph)
+          on(order.id === egraph.map(_.orderId))
+    )
+  }
+
+  def findByCustomerId(customerId: Long, filters: FilterOneTable[Order]*): Query[Order] = {
+    import schema.orders
+
+    from(orders)(order =>
+      where(
+          order.recipientId === customerId and
+          FilterOneTable.reduceFilters(filters, order)
+      )
+        select (order)
+        orderBy (order.created asc)
+    )
+  }
+
   def findByFilter(filters: FilterOneTable[Order]*): Query[Order] = {
     import schema.orders
 

@@ -110,6 +110,7 @@ GET     /account/recover/confirmation                    WebsiteControllers.getR
 GET     /account/reset                                   WebsiteControllers.getResetPassword
 POST    /account/reset                                   WebsiteControllers.postResetPassword
 GET     /facebooklogin/callback                          WebsiteControllers.getFacebookLoginCallback
+GET     /account/{<[0-9]+>customerId}/gallery            WebsiteControllers.getCustomerGallery
 
 # Order and Egraph pages
 GET     /orders/{<[0-9]+>orderId}/confirm                WebsiteControllers.getOrderConfirmation

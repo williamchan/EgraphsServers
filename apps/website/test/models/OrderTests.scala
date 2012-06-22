@@ -351,6 +351,29 @@ class OrderTests extends UnitFlatSpec
     order.isBuyerOrRecipient(None) should be(false)
   }
 
+  "findByCustomerId" should "return orders with the customer as intended recipient" in {
+    val buyer = TestData.newSavedCustomer()
+    val recipient = TestData.newSavedCustomer()
+
+    val order = recipient.buy(TestData.newSavedProduct(), recipient=recipient).save()
+
+    orderStore.findByCustomerId(recipient.id).size should be (1)
+
+    val order2 = recipient.buy(TestData.newSavedProduct(), recipient=recipient).save()
+
+    orderStore.findByCustomerId(recipient.id).size should be (2)
+
+    val order3 = buyer.buy(TestData.newSavedProduct(), recipient=recipient).save()
+
+    orderStore.findByCustomerId(recipient.id).size should be (3)
+
+  }
+
+  "getEgraphsandOrders" should "returns orders and their associated egraphs" in {
+    val buyer = TestData.newSavedCustomer()
+
+  }
+
   //
   // Private methods
   //
