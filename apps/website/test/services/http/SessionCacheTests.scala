@@ -16,7 +16,7 @@ class SessionCacheTests extends EgraphsUnitTest {
 
       // Run test
       val valueBeforeSave = cache(key)
-      (cache + (key -> value)).save()
+      cache.setting(key -> value).save()
       val valueAfterSave = newCache(key)
 
       // Check expectations
@@ -30,7 +30,7 @@ class SessionCacheTests extends EgraphsUnitTest {
       // Set up
       val (key, value) = testStringKeyValue
       val cache = newCache
-      val savedCache = (cache + (key -> value)).save()
+      val savedCache = cache.setting(key -> value).save()
 
       // Run test
       val restoredBeforeEmpty = newCache(key)
@@ -47,7 +47,7 @@ class SessionCacheTests extends EgraphsUnitTest {
     deletingSessionCacheAfter {
       // Set up
       val (key, value) = testStringKeyValue
-      val toSave = newCache + (key -> value)
+      val toSave = newCache.setting(key -> value)
 
       // Run test
       val restoredBeforeSave = newCache(key)
@@ -66,12 +66,12 @@ class SessionCacheTests extends EgraphsUnitTest {
     val (key, value) = testStringKeyValue
 
     // Run tests
-    val cacheWithValueAdded = cache + (key -> value)
-    val cacheWithValueRemoved = cache - key
+    val cacheWithValueSet = cache.setting(key -> value)
+    val cacheWithValueRemoved = cache.removing(key)
 
     // Check expectations
     cache.isEmpty should be (true)
-    cacheWithValueAdded(key) should be (Some(value))
+    cacheWithValueSet(key) should be (Some(value))
     cacheWithValueRemoved(key) should be (None)
   }
 

@@ -24,16 +24,19 @@ import services.logging.Logging
  *     }
  *
  *     // Add customerId to the session
- *     serverSession.with("customerId" -> 1).save()
+ *     serverSession.setting("customerId" -> 1).save()
  *
  *     // Set celebrityId and adminId
- *     serverSession.with("celebrityId" -> 1, "adminId" -> 2).save()
+ *     serverSession.setting("celebrityId" -> 1, "adminId" -> 2).save()
  *
  *     // Get adminId
  *     serverSession[String]("adminId")  // should be Some(2)
  *
  *     // Delete adminId
- *     serverSession.without("adminId").save()
+ *     serverSession.removing("adminId").save()
+ *
+ *     // Delete celebrity and customer id
+ *     serverSession.removing("celebrityId", "customerId").save()
  *
  *     // Clear out the entire session
  *     serverSession.emptied.save()
@@ -85,16 +88,27 @@ class SessionCache private[http] (
     data.get(key).map(value => value.asInstanceOf[T])
   }
 
-  def ++ (keyValues: Traversable[(String, Any)]): SessionCache = {
+  /**
+   * Returns a copy of the cache with the new tuples set into it. This
+   * will override previous settings.
+   *
+   * See class documentation for usage info.
+   *
+   * @param keyValues the new tuples
+   * @return
+   */
+  def setting (keyValues: (String, Any) *): SessionCache = {
     this.withData(data ++ keyValues)
   }
 
-  def + (keyValue: (String, Any)): SessionCache = {
-    this.withData(data + keyValue)
-  }
-
-  def - (key: String): SessionCache = {
-    this.withData(data - key)
+  /**
+   * Returns a copy of the cache with the tuple corresponding to the
+   * provided keys removed from it.
+   *
+   * @param keys keys for the tuples to remove
+   */
+  def removing (keys: String*): SessionCache = {
+    this.withData(data -- keys)
   }
 
   //
@@ -105,7 +119,6 @@ class SessionCache private[http] (
   }
 
   override protected[this] def newBuilder: mutable.Builder[(String, Any), SessionCache] = {
-    println("SESSIONCACHE newbuilder")
     new ListBuffer[(String, Any)]().mapResult(tuples => this.withData(tuples.toMap))
   }
 
