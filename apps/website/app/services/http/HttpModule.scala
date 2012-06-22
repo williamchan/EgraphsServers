@@ -12,11 +12,8 @@ import play.mvc.Scope.Session
 object HttpModule extends AbstractModule with ScalaModule {
   override def configure() {
     bind[Properties].annotatedWith[PlayConfig].toInstance(Play.configuration)
-    bind[Session].toProvider(new Provider[Session] {
-      def get(): Session = {
-        Session.current()
-      }
-    })
+    bind[() => Session].toInstance(() => Session.current())
+    bind[() => SessionCache].to[SessionCacheFactory]
     bind[String].annotatedWith[PlayId].toInstance(Play.id)
 
     bind[RequireAuthenticityTokenFilter].toProvider[RequireAuthenticityTokenFilterProvider]

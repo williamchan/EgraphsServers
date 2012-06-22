@@ -29,7 +29,8 @@ class ApplicationCacheTests extends EgraphsUnitTest {
     val cache = makeApplicationCache
     cache.set(key, "herp", Some("1s"))
     cache.cacheFactory().get(cache.fullKey(key)) should be (Some("herp"))
-    cache.get(key) should be (Some("herp"))
+    cache(key) should be (Some("herp"))
+    cache.get(key) should be (cache(key))
     cache.delete(key)
   }
 

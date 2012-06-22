@@ -13,21 +13,37 @@ trait CacheTests { this: EgraphsUnitTest =>
   import TestData.makeTestCacheKey
 
   "A cache" should "return None for an empty key" in {
-    cacheInstance.get(makeTestCacheKey) should be (None)
+    cacheInstance.get[String](makeTestCacheKey) should be (None)
   }
 
-  "A cache" should "set and get a String" in {
-    deletingKey(makeTestCacheKey) { (cache, key) =>
-      cache.set(key, "herp", 5)
-      cache.get(key) should be (Some("herp"))
+  "A cache" should "set and get a variety of values" in {
+    def values = List(
+      "herp",
+      Map("1" -> "2"),
+      List("1", "2", "3"),
+      5,
+      2.22
+    )
+
+    for (value <- values) {
+      deletingKey(makeTestCacheKey) { (cache, key) =>
+        cache.set(key, value, 5)
+        cache.get(key) should be (Some(value))
+      }
     }
   }
 
   "A cache" should "set and get a Map" in {
     deletingKey(makeTestCacheKey) { (cache, key) =>
-      val value = scala.collection.immutable.Map("red" -> "blue")
+      val value = Map(
+        "red" -> "blue",
+        "one" -> "two",
+        "herp" -> "derp",
+        "alpha" -> "omega",
+        "hard" -> "soft"
+      )
       cache.set(key, value, 5)
-      cache.get[Map[String, String]](key) should be (Some(value))
+      cache.get[scala.collection.Map[String,String]](key) should be (Some(value))
     }
   }
 
@@ -36,20 +52,18 @@ trait CacheTests { this: EgraphsUnitTest =>
       val value = "herp"
       cache.set(key, value, 5)
       cache.delete(key)
-      cache.get(key) should be (None)
+      cache.get[String](key) should be (None)
     }
   }
 
-    "A cache" should "respect the expiration deadline" in {
-      deletingKey(makeTestCacheKey) { (cache, key) =>
-        val value = "herp"
-        cache.set(key, value, 1)
-        Thread.sleep(2000)
-        cache.get(key) should be (None)
-      }
+  "A cache" should "respect the expiration deadline" in {
+    deletingKey(makeTestCacheKey) { (cache, key) =>
+      val value = "herp"
+      cache.set(key, value, 1)
+      Thread.sleep(2000)
+      cache.get[String](key) should be (None)
     }
-
-
+  }
 
   private def deletingKey(key: String)(operation: (Cache, String) => Any) = {
     val cache = cacheInstance

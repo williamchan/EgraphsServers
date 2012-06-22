@@ -12,8 +12,8 @@ import play.modules.redis.{RedisConnectionManager}
 import java.util
 
 private[cache] trait Cache {
-  def set[T <: AnyRef](key: String, value: T, expirationSeconds: Int)
-  def get[T <: AnyRef : Manifest](key: String): Option[T]
+  def set[T](key: String, value: T, expirationSeconds: Int)
+  def get[T : Manifest](key: String): Option[T]
   def delete(key: String)
   def clear()
 }
@@ -68,7 +68,7 @@ private[cache] class RedisCache @Inject()(jedis: Jedis) extends Cache {
   import Utils.closing
 
 
-  def set[T <: AnyRef](key: String, value: T, expirationSeconds: Int) {
+  override def set[T](key: String, value: T, expirationSeconds: Int) {
     require(manifest.erasure.isInstanceOf[Serializable])
     val keyBytes = key.getBytes
 
@@ -76,7 +76,7 @@ private[cache] class RedisCache @Inject()(jedis: Jedis) extends Cache {
 
   }
 
-  override def get[T <: AnyRef : Manifest](key: String): Option[T] = {
+  override def get[T : Manifest](key: String): Option[T] = {
     require(manifest.erasure.isInstanceOf[Serializable])
     val bytes = jedis.get(key.getBytes)
 
@@ -98,7 +98,7 @@ private[cache] class RedisCache @Inject()(jedis: Jedis) extends Cache {
   //
   // Private members
   //
-  private def fromByteArray[T <: AnyRef : Manifest](bytes: Array[Byte]): Option[T] = {
+  private def fromByteArray[T : Manifest](bytes: Array[Byte]): Option[T] = {
     try {
       closing(new ByteArrayInputStream(bytes)) { byteStream =>
         closing(new ObjectInputStream(byteStream)) { objectStream =>
@@ -126,10 +126,10 @@ private[cache] class RedisCache @Inject()(jedis: Jedis) extends Cache {
     }
   }
 
-  private def toByteArray(toSerialize: AnyRef): Array[Byte] = {
+  private def toByteArray(toSerialize: Any): Array[Byte] = {
     closing(new ByteArrayOutputStream()) { byteStream =>
       closing(new ObjectOutputStream(byteStream)) { objectStream =>
-        objectStream.writeObject(toSerialize)
+        objectStream.writeObject(toSerialize.asInstanceOf[AnyRef])
 
         byteStream.toByteArray
       }
@@ -142,23 +142,14 @@ private[cache] object RedisApplicationCache extends Logging
 
 
 private[cache] class InMemoryCache @Inject() (cache: EhCacheImpl) extends Cache {
-  import InMemoryCache._
 
-  override def set[T <: AnyRef](key: String, value: T, expirationSeconds: Int) {
-    cache.set(key, value, expirationSeconds)
+  override def set[T](key: String, value: T, expirationSeconds: Int) {
+    cache.set(key, value.asInstanceOf[AnyRef], expirationSeconds)
   }
 
-  override def get[T <: AnyRef : Manifest](key: String): Option[T] = {
-    cache.get(key) match {
-      case null => None
-      case ourType: T => Some(ourType)
-      case unexpectedObject =>
-        error("Failed to deserialize object into a " +
-          manifest.erasure.getName + ": " +
-          unexpectedObject
-        )
-        None
-    }
+  override def get[T : Manifest](key: String): Option[T] = {
+    // No, this is not type-safe. There's no way to make it so.
+    Option(cache.get(key)).map(value => value.asInstanceOf[T])
   }
 
   def clear() {

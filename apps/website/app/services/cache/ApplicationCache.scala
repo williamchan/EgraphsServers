@@ -3,18 +3,29 @@ package services.cache
 import services.http.{PlayId, HostInfo}
 import com.google.inject.Inject
 import play.libs.Time
+import services.logging.Logging
 
 case class ApplicationCache @Inject()(
   cacheFactory: () => Cache,
   hostInfo: HostInfo,
   @PlayId playId: String
 ) {
-  def set[T <: AnyRef](key: String, value: T, expiration: Option[String]=None) {
-    cache.set(fullKey(key), value, parseDuration(expiration))
+  import ApplicationCache._
+
+  def apply[T : Manifest](key: String): Option[T] = {
+    val result = cache.get[T](fullKey(key))
+    log("GET " + key + " -> " + result)
+
+    result
   }
 
-  def get[T <: AnyRef](key: String): Option[T] = {
-    cache.get(fullKey(key))
+  def get[T : Manifest](key: String): Option[T] = {
+    this.apply[T](key)
+  }
+
+  def set[T](key: String, value: T, expiration: Option[String]=None) {
+    cache.set(fullKey(key), value, parseDuration(expiration))
+    log("SET " + key + " -> " + value)
   }
 
   def delete(key: String) = {
@@ -52,3 +63,5 @@ case class ApplicationCache @Inject()(
     cacheFactory()
   }
 }
+
+object ApplicationCache extends Logging
