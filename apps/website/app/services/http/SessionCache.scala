@@ -8,16 +8,53 @@ import collection.mutable.ListBuffer
 import play.mvc.Scope.Session
 import services.logging.Logging
 
+/**
+ * Cache for a single user session. The cache is keyed by the session ID cookie provided
+ * by Play.
+ *
+ * In addition to the specific usage here you can use it however you would any other
+ * traversable: e.g. you can filter, map, etc over the tuples.
+ *
+ * Usage:
+ * {{{
+ *   class MyClass @Inject() (serverSessionFactory: () => SessionCache) {
+ *
+ *     private def serverSession = {
+ *       serverSessionFactory()
+ *     }
+ *
+ *     // Add customerId to the session
+ *     serverSession.with("customerId" -> 1).save()
+ *
+ *     // Set celebrityId and adminId
+ *     serverSession.with("celebrityId" -> 1, "adminId" -> 2).save()
+ *
+ *     // Get adminId
+ *     serverSession[String]("adminId")  // should be Some(2)
+ *
+ *     // Delete adminId
+ *     serverSession.without("adminId").save()
+ *
+ *     // Clear out the entire session
+ *     serverSession.emptied.save()
+ *
+ *   }
+ * }}}
+ *
+ * @param providedData Optional data of this current instance. If this is None then
+ *     the instance will reach out to the Application cache to grab it.
+ * @param services services needed for the SessionCache to operate correctly.
+ */
 class SessionCache private[http] (
   providedData: Option[Map[String, Any]],
   services: SessionCacheServices
 ) extends Traversable[(String, Any)] with TraversableLike[(String, Any), SessionCache]
 {
-  import SessionCache._
-
-  //
-  // Public members
-  //
+  /**
+   * Stores the map represented by this object into the [[services.cache.ApplicationCache]]
+   *
+   * @return the instance that was stored
+   */
   def save(): SessionCache = {
     if (data.isEmpty) {
       appCache.delete(cacheKey)
@@ -28,10 +65,22 @@ class SessionCache private[http] (
     this
   }
 
+  /**
+   * Empties all tuples from the cache
+   *
+   * @return the emptied cache
+   */
   def emptied: SessionCache = {
     this.withData(Map.empty[String, Any])
   }
 
+  /**
+   * Gets a tuple Option from the cache. See class docs for usage.
+   *
+   * @param key the key to get from the cache
+   * @tparam T the type of tuple.
+   * @return Some(the value) or None if the key wasn't found
+   */
   def apply[T : Manifest](key: String): Option[T] = {
     data.get(key).map(value => value.asInstanceOf[T])
   }
@@ -123,6 +172,11 @@ object SessionCache extends Logging {
 }
 
 
+/**
+ * Default factory that yields new session caches.
+ *
+ * @param cacheServices services needed for new instances of SessionCache
+ */
 private[http] class SessionCacheFactory @Inject() (cacheServices:SessionCacheServices) extends (() => SessionCache) {
   def apply(): SessionCache = {
     new SessionCache(providedData=None, services=cacheServices)

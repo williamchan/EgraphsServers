@@ -4,8 +4,32 @@ package services.logging
  * Provides any class that mixes it in with easy logging functionality.
  */
 trait Logging {
-
   import Logging._
+
+  /**Logs a message to INFO by default */
+  def log(message: => String) {
+    play.Logger.info(annotateMessage(message))
+  }
+
+  /** Logs a message at ERROR log level */
+  def error(message: => String) {
+    play.Logger.error(annotateMessage(message))
+  }
+
+  //
+  // Private members
+  //
+  private def annotateMessage(message: String): String = {
+    val sb = new StringBuilder
+
+    colorize("[", TerminalColorLightGray, sb)
+    colorize(shortClassName, TerminalColorLightGray, sb)
+    colorize("]", TerminalColorLightGray, sb)
+    sb.append(" ")
+    colorize(message, TerminalColorDefaultBold, sb)
+
+    sb.toString()
+  }
 
   /**
    * The class name used in the logs is the final part of the fully qualified named. For example,
@@ -19,27 +43,6 @@ trait Logging {
     } else {
       fullName.substring(0, MAX_CLASSNAME_SIZE) + "\u2026"
     }
-  }
-
-  /**Logs a message to INFO by default */
-  def log(message: => String) {
-    play.Logger.info(annotateMessage(message))
-  }
-
-  def error(message: => String) {
-    play.Logger.error(annotateMessage(message))
-  }
-
-  private def annotateMessage(message: String): String = {
-    val sb = new StringBuilder
-
-    colorize("[", TerminalColorLightGray, sb)
-    colorize(shortClassName, TerminalColorLightGray, sb)
-    colorize("]", TerminalColorLightGray, sb)
-    sb.append(" ")
-    colorize(message, TerminalColorDefaultBold, sb)
-
-    sb.toString()
   }
 }
 

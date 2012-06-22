@@ -2,7 +2,10 @@ package services.http
 
 import services.Utils
 
-
+/**
+ * Enumerates the different deployment targets we have. Prefer using these
+ * enums over hard-coding the strings.
+ */
 object DeploymentTarget extends Utils.Enum {
   sealed trait EnumVal extends Value
 
