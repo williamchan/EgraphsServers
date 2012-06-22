@@ -13,7 +13,7 @@ object HttpModule extends AbstractModule with ScalaModule {
   override def configure() {
     bind[Properties].annotatedWith[PlayConfig].toInstance(Play.configuration)
     bind[() => Session].toInstance(() => Session.current())
-    bind[() => SessionCache].to[SessionCacheFactory]
+    bind[() => ServerSession].to[ServerSessionFactory]
     bind[String].annotatedWith[PlayId].toInstance(Play.id)
 
     bind[RequireAuthenticityTokenFilter].toProvider[RequireAuthenticityTokenFilterProvider]

@@ -17,48 +17,48 @@ import services.logging.Logging
  *
  * Usage:
  * {{{
- *   class MyClass @Inject() (serverSessionFactory: () => SessionCache) {
+ *   class MyClass @Inject() (sessionFactory: () => ServerSession) {
  *
- *     private def serverSession = {
- *       serverSessionFactory()
+ *     private def session = {
+ *       sessionFactory()
  *     }
  *
  *     // Add customerId to the session
- *     serverSession.setting("customerId" -> 1).save()
+ *     session.setting("customerId" -> 1).save()
  *
  *     // Set celebrityId and adminId
- *     serverSession.setting("celebrityId" -> 1, "adminId" -> 2).save()
+ *     session.setting("celebrityId" -> 1, "adminId" -> 2).save()
  *
  *     // Get adminId
- *     serverSession[String]("adminId")  // should be Some(2)
+ *     session[String]("adminId")  // should be Some(2)
  *
  *     // Delete adminId
- *     serverSession.removing("adminId").save()
+ *     session.removing("adminId").save()
  *
  *     // Delete celebrity and customer id
- *     serverSession.removing("celebrityId", "customerId").save()
+ *     session.removing("celebrityId", "customerId").save()
  *
  *     // Clear out the entire session
- *     serverSession.emptied.save()
+ *     session.emptied.save()
  *
  *   }
  * }}}
  *
  * @param providedData Optional data of this current instance. If this is None then
  *     the instance will reach out to the Application cache to grab it.
- * @param services services needed for the SessionCache to operate correctly.
+ * @param services services needed for the ServerSession to operate correctly.
  */
-class SessionCache private[http] (
+class ServerSession private[http] (
   providedData: Option[Map[String, Any]],
-  services: SessionCacheServices
-) extends Traversable[(String, Any)] with TraversableLike[(String, Any), SessionCache]
+  services: ServerSessionServices
+) extends Traversable[(String, Any)] with TraversableLike[(String, Any), ServerSession]
 {
   /**
    * Stores the map represented by this object into the [[services.cache.ApplicationCache]]
    *
    * @return the instance that was stored
    */
-  def save(): SessionCache = {
+  def save(): ServerSession = {
     if (data.isEmpty) {
       appCache.delete(cacheKey)
     } else {
@@ -73,7 +73,7 @@ class SessionCache private[http] (
    *
    * @return the emptied cache
    */
-  def emptied: SessionCache = {
+  def emptied: ServerSession = {
     this.withData(Map.empty[String, Any])
   }
 
@@ -97,7 +97,7 @@ class SessionCache private[http] (
    * @param keyValues the new tuples
    * @return
    */
-  def setting (keyValues: (String, Any) *): SessionCache = {
+  def setting (keyValues: (String, Any) *): ServerSession = {
     this.withData(data ++ keyValues)
   }
 
@@ -107,7 +107,7 @@ class SessionCache private[http] (
    *
    * @param keys keys for the tuples to remove
    */
-  def removing (keys: String*): SessionCache = {
+  def removing (keys: String*): ServerSession = {
     this.withData(data -- keys)
   }
 
@@ -118,7 +118,7 @@ class SessionCache private[http] (
     data.foreach(f)
   }
 
-  override protected[this] def newBuilder: mutable.Builder[(String, Any), SessionCache] = {
+  override protected[this] def newBuilder: mutable.Builder[(String, Any), ServerSession] = {
     new ListBuffer[(String, Any)]().mapResult(tuples => this.withData(tuples.toMap))
   }
 
@@ -126,7 +126,7 @@ class SessionCache private[http] (
   // Private members
   //
   private def withData(newData: Map[String, Any]) = {
-    new SessionCache(providedData=Some(newData), services=services)
+    new ServerSession(providedData=Some(newData), services=services)
   }
 
   private lazy val data: Map[String, Any] = {
@@ -153,13 +153,13 @@ class SessionCache private[http] (
 }
 
 
-case class SessionCacheServices @Inject() (
+case class ServerSessionServices @Inject() (
   sessionFactory: () => play.mvc.Scope.Session,
   appCache: ApplicationCache
 )
 
 
-object SessionCache extends Logging {
+object ServerSession extends Logging {
   // Uncomment this and finish the canBuildFrom implementation if you find that you need some of the
   // methods provided by having a custom CanBuildFrom implicit for the type (e.g. ++). See the
   // Traversable and TraversableLike scaladocs to see which methods benefit from having an
@@ -169,15 +169,15 @@ object SessionCache extends Logging {
   // If that confused the hell out of you like it did me, check out the following Gist:
   // https://gist.github.com/1136259
   //
-  /*def cacheFact:SessionCacheFactory = null
+  /*def cacheFact:ServerSessionFactory = null
 
-  override protected[this] def newBuilder: mutable.Builder[(String, Any), SessionCache] = {
-    new ListBuffer[(String, Any)]().mapResult(tuples => new SessionCache(null, null, withData(tuples.toMap)))
+  override protected[this] def newBuilder: mutable.Builder[(String, Any), ServerSession] = {
+    new ListBuffer[(String, Any)]().mapResult(tuples => new ServerSession(null, null, withData(tuples.toMap)))
   }
 
 
   implicit def canBuildFrom = {
-    new CanBuildFrom[Traversable[(String,Any)], (String,Any), SessionCache] {
+    new CanBuildFrom[Traversable[(String,Any)], (String,Any), ServerSession] {
       def apply() = newBuilder
       def apply(from: Traversable[(String,Int)]) = newBuilder
     }
@@ -188,10 +188,10 @@ object SessionCache extends Logging {
 /**
  * Default factory that yields new session caches.
  *
- * @param cacheServices services needed for new instances of SessionCache
+ * @param cacheServices services needed for new instances of ServerSession
  */
-private[http] class SessionCacheFactory @Inject() (cacheServices:SessionCacheServices) extends (() => SessionCache) {
-  def apply(): SessionCache = {
-    new SessionCache(providedData=None, services=cacheServices)
+private[http] class ServerSessionFactory @Inject() (cacheServices:ServerSessionServices) extends (() => ServerSession) {
+  def apply(): ServerSession = {
+    new ServerSession(providedData=None, services=cacheServices)
   }
 }
