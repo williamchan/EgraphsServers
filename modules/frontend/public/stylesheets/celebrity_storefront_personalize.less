@@ -1,292 +1,106 @@
 // The Egraphs personalize stylesheet.
 
-.col2 {
-
-  > div { border-bottom: 1px solid lighten(@gray, 50%); }
+.initial-order-information {
+	
+	padding: 40px 0 0 40px;      	  
   
-  .main {
-
-    float: left;
-    width: 60%;
-
-    margin: 0;
+  figure {
+  
+  	position: relative;
+    margin: 0 0 30px 0;
     padding: 0;
-
-    fieldset {
-
-      position: relative;      
-      border-top: 1px solid @white;
-      border-bottom: 1px solid lighten(@gray, 50%);  
-      border-right: 1px solid lighten(@gray, 50%); 
-      padding: 40px 0 20px 0;
-      
-      &.last, &.submit { 
-        border-bottom: none;
-      }
-      
-      &.submit {
-      
-      	border-top: none;
-      	padding-bottom: 80px;
-      	
-      	> div {
-	      	padding-right: 40px;	
-      	}
-      	
-      }
-      
-      .field {
-        
-        margin-bottom: 20px;
-        
-        &.last { margin-bottom: 0; }
-        
-        > div {
-        
-          padding-right: 40px;
-          margin-bottom: 0;
-        
-          label.instructions {
-          
-            float: left;
-            width: 30%;
-            
-          }
-          
-          .input {
-          
-            float: right;
-            width: 65%;           
-            
-          }
-        
-        }
-        
-      } // end .field
-      
-      legend {
-      
-        display: block;
-        width: auto;        
-        position: absolute;
-        left: 0;
-        top: 0;
-        text-align: center;
-        margin: 0;
-        background: @orange;
-        padding: 0 6px;
-        color: @white;
-        text-transform: uppercase;
-        font-size: 14px;
-        line-height: 1.5em;  
-        
-        span { display: none; }
-             
-      } // end .callout
     
-    } // end .fieldset    
-
-    .btn-group {
-      margin-bottom:15px;
+    img { display: block; }
+	    
+    .recepient-information {
+    	.callout-left;
+	  	left: 20px;
+	  	top: 60px;
     }
-
-    .btn-custom-radio {
-       width:110px;
-       .buttonBackground(lighten(@gray, 60%), lighten(@gray, 45%));
-       text-transform:uppercase;
-       font-size:0.75em;
-       line-height:1.3em;
-       padding-top:5px;
-       padding-bottom:5px;
-       color: lighten(@gray, 10%);
-       font-weight: 100;
-       text-shadow: 0px 1px 0px white;
-
-       &.active,
-       &:active {
-         .gradientBar(@orange, lighten(@orange, 10%));
-         *background-color: @orange;
-         .reset-filter();
-         font-weight:600;
-         color:white;
-         text-shadow: 0px -1px 0px black;
-       }
-
+    
+    .egraph-message {
+    	.callout-right;
+	  	left: 200px;
+	  	top: 200px;
     }
+    
+  }
   
-  } // end .main
-  
-  aside {
-  
-    float: right;
-    width: 40%;
-    border-top: 1px solid @white;
+  .order-summary {
+    
+    border-top: 1px solid lighten(@gray, 50%);
+    text-transform: uppercase;
+    text-shadow: 0 1px 0 @white;
+	    
+    h2 {
+	    border-top: 1px solid @white;
+	    padding: 10px 0;
+	    margin: 0;
+	    border-bottom: 1px solid lighten(@gray, 50%);
+	    color: @gray;
+	    font-weight: 600;
+	    font-size: 15px;
+	    line-height: 1em;
+    }
+    
+    .celebrity-information {
 
-    .initial-order-information {
+	    border-bottom: 1px solid @white;
+	    margin-bottom: 20px;
+    
+	    .name {
+		    border-top: 1px solid @white;
+		    padding-top: 20px;
+		    margin-bottom: 0;
+		    font-weight: 600;
+		    font-size: 14px;
+		    line-height: 1.25em;	
+		    color: @grayLight;		    
+	    }
+	    
+	    .product {
+		    margin-bottom: 0;		
+		    padding-bottom: 20px;
+		    border-bottom: 1px solid lighten(@gray, 50%);
+		    font-size: 14px;
+		    line-height: 1.25em;	    
+	    }
+    
+    }
+    
+    .order-totals {
+    
+    	border-bottom: 1px solid @white;
+    	margin-bottom: 20px;
     	
-    	padding: 40px 0 0 40px;      	  
+	    table {
 	    
-	    figure {
-	    
-	    	position: relative;
-		    margin: 0 0 30px 0;
-		    padding: 0;
+		    width: 100%;
+		    font-size: 14px;
+		    line-height: 1.25em;	
 		    
-		    img { display: block; }
-			    
-		    .recepient-information {
-		    	.callout-left;
-			  	left: 20px;
-			  	top: 60px;
+		    th {
+		    	width: 40%;
+			    text-align: left;
+			    font-weight: 600;
 		    }
 		    
-		    .egraph-message {
-		    	.callout-right;
-			  	left: 200px;
-			  	top: 200px;
+		    td {
+			    text-align: right;
+			    font-weight: 400;
+		    }
+		    
+		    .total {
+			    th, td {
+				    padding: 10px 0 20px;
+				    border-bottom: 1px solid lighten(@gray, 50%); 
+			    }
 		    }
 		    
 	    }
 	    
-	    .order-summary {
-		    
-		    border-top: 1px solid lighten(@gray, 50%);
-		    text-transform: uppercase;
-		    text-shadow: 0 1px 0 @white;
-			    
-		    h2 {
-			    border-top: 1px solid @white;
-			    padding: 10px 0;
-			    margin: 0;
-			    border-bottom: 1px solid lighten(@gray, 50%);
-			    color: @gray;
-			    font-weight: 600;
-			    font-size: 15px;
-			    line-height: 1em;
-		    }
-		    
-		    .celebrity-information {
-
-			    border-bottom: 1px solid @white;
-			    margin-bottom: 20px;
-		    
-			    .name {
-				    border-top: 1px solid @white;
-				    padding-top: 20px;
-				    margin-bottom: 0;
-				    font-weight: 600;
-				    font-size: 14px;
-				    line-height: 1.25em;	
-				    color: @grayLight;		    
-			    }
-			    
-			    .product {
-				    margin-bottom: 0;		
-				    padding-bottom: 20px;
-				    border-bottom: 1px solid lighten(@gray, 50%);
-				    font-size: 14px;
-				    line-height: 1.25em;	    
-			    }
-		    
-		    }
-		    
-		    .order-totals {
-		    
-		    	border-bottom: 1px solid @white;
-		    	margin-bottom: 20px;
-		    	
-			    table {
-			    
-				    width: 100%;
-				    font-size: 14px;
-				    line-height: 1.25em;	
-				    
-				    th {
-				    	width: 40%;
-					    text-align: left;
-					    font-weight: 600;
-				    }
-				    
-				    td {
-					    text-align: right;
-					    font-weight: 400;
-				    }
-				    
-				    .total {
-					    th, td {
-						    padding: 10px 0 20px;
-						    border-bottom: 1px solid lighten(@gray, 50%); 
-					    }
-				    }
-				    
-			    }
-			    
-		    }
-	    
-	    } 
-		    	    
-    } // end .initial-order-information
-    
-  }
+    }
   
-  footer {
-	 
-	  border-top: 1px solid @white;
-	  padding-top: 40px;
-	  color: @grayLight;
-		text-shadow: 0 1px 0 @white;
-	  
-	  p {
-		  float: left;
-		  font-weight: 600;
-		  font-size: 16px;
-		  line-height: 60px;
-		  margin-right: 40px;
-		  margin-bottom: 0;
-		  
-		  a.logo-entrust {
-			  
-			  .inline-block;
-			  width: 60px;
-			  height: 60px;
-			  background: url(../images/logo-entrust.gif) no-repeat 0 0;
-			  text-indent: -9999px;
-			  overflow: hidden;
-			  margin-left: 10px;
-			  
-			  &:hover { .opacity(75); }
-			  
-		  }
-		  
-	  }
-	  
-	  ul {
-		  
-		  float: left;
-		  list-style: none;
-		  margin: 0 0 0 -20px;
-		  padding: 0;
-		  
-		  li {
-			  
-			  float: left;
-			  margin-right: 10px;
-			  width: 45px;
-			  height: 60px;
-			  text-indent: -9999px;
-			  overflow: hidden;
-			  background: url(../images/bg-credit-cards.png) no-repeat 0 50%;
-			  
-			  &:last-child { margin-right: 0; }
-			  
-			  &.mastercard { background-position: -45px 50%; }
-			  &.amex { background-position: -90px 50%; }
-			  &.discover { background-position: 100% 50%; }
-			  
-		  }
-		  
-	  }
-	 
-  }
-  
-} // end .col2
+  } 
+    	    
+} // end .initial-order-information
