@@ -111,8 +111,4 @@ class CacheFactoryTests extends EgraphsUnitTest {
     val factory = appConfigWithCacheSetting(cacheConfig).instance[() => Cache]
     factory()
   }
-
-  private def cacheFactory = {
-    AppConfig.instance[CacheFactory]
-  }
 }
