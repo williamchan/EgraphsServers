@@ -1,10 +1,10 @@
 // The Egraphs personalize stylesheet.
 
-#personalize {
+.col2 {
 
-  border-bottom: 1px solid lighten(@gray, 50%); 
+  > div { border-bottom: 1px solid lighten(@gray, 50%); }
   
-  form {
+  .main {
 
     float: left;
     width: 60%;
@@ -30,7 +30,7 @@
       	padding-bottom: 80px;
       	
       	> div {
-	      	width: 95%;	
+	      	padding-right: 40px;	
       	}
       	
       }
@@ -43,7 +43,7 @@
         
         > div {
         
-          width: 95%;
+          padding-right: 40px;
           margin-bottom: 0;
         
           label.instructions {
@@ -65,7 +65,8 @@
       } // end .field
       
       legend {
-        .inline-block;
+      
+        display: block;
         width: auto;        
         position: absolute;
         left: 0;
@@ -73,11 +74,14 @@
         text-align: center;
         margin: 0;
         background: @orange;
-        padding: 0 5px;
+        padding: 0 6px;
         color: @white;
         text-transform: uppercase;
         font-size: 14px;
-        line-height: 1.5em;       
+        line-height: 1.5em;  
+        
+        span { display: none; }
+             
       } // end .callout
     
     } // end .fieldset    
@@ -110,11 +114,179 @@
 
     }
   
-  }
+  } // end .main
   
   aside {
+  
     float: right;
     width: 40%;
+    border-top: 1px solid @white;
+
+    .initial-order-information {
+    	
+    	padding: 40px 0 0 40px;      	  
+	    
+	    figure {
+	    
+	    	position: relative;
+		    margin: 0 0 30px 0;
+		    padding: 0;
+		    
+		    img { display: block; }
+			    
+		    .recepient-information {
+		    	.callout-left;
+			  	left: 20px;
+			  	top: 60px;
+		    }
+		    
+		    .egraph-message {
+		    	.callout-right;
+			  	left: 200px;
+			  	top: 200px;
+		    }
+		    
+	    }
+	    
+	    .order-summary {
+		    
+		    border-top: 1px solid lighten(@gray, 50%);
+		    text-transform: uppercase;
+		    text-shadow: 0 1px 0 @white;
+			    
+		    h2 {
+			    border-top: 1px solid @white;
+			    padding: 10px 0;
+			    margin: 0;
+			    border-bottom: 1px solid lighten(@gray, 50%);
+			    color: @gray;
+			    font-weight: 600;
+			    font-size: 15px;
+			    line-height: 1em;
+		    }
+		    
+		    .celebrity-information {
+
+			    border-bottom: 1px solid @white;
+			    margin-bottom: 20px;
+		    
+			    .name {
+				    border-top: 1px solid @white;
+				    padding-top: 20px;
+				    margin-bottom: 0;
+				    font-weight: 600;
+				    font-size: 14px;
+				    line-height: 1.25em;	
+				    color: @grayLight;		    
+			    }
+			    
+			    .product {
+				    margin-bottom: 0;		
+				    padding-bottom: 20px;
+				    border-bottom: 1px solid lighten(@gray, 50%);
+				    font-size: 14px;
+				    line-height: 1.25em;	    
+			    }
+		    
+		    }
+		    
+		    .order-totals {
+		    
+		    	border-bottom: 1px solid @white;
+		    	margin-bottom: 20px;
+		    	
+			    table {
+			    
+				    width: 100%;
+				    font-size: 14px;
+				    line-height: 1.25em;	
+				    
+				    th {
+				    	width: 40%;
+					    text-align: left;
+					    font-weight: 600;
+				    }
+				    
+				    td {
+					    text-align: right;
+					    font-weight: 400;
+				    }
+				    
+				    .total {
+					    th, td {
+						    padding: 10px 0 20px;
+						    border-bottom: 1px solid lighten(@gray, 50%); 
+					    }
+				    }
+				    
+			    }
+			    
+		    }
+	    
+	    } 
+		    	    
+    } // end .initial-order-information
+    
   }
   
-}
+  footer {
+	 
+	  border-top: 1px solid @white;
+	  padding-top: 40px;
+	  color: @grayLight;
+		text-shadow: 0 1px 0 @white;
+	  
+	  p {
+		  float: left;
+		  font-weight: 600;
+		  font-size: 16px;
+		  line-height: 60px;
+		  margin-right: 40px;
+		  margin-bottom: 0;
+		  
+		  a.logo-entrust {
+			  
+			  .inline-block;
+			  width: 60px;
+			  height: 60px;
+			  background: url(../images/logo-entrust.gif) no-repeat 0 0;
+			  text-indent: -9999px;
+			  overflow: hidden;
+			  margin-left: 10px;
+			  
+			  &:hover { .opacity(75); }
+			  
+		  }
+		  
+	  }
+	  
+	  ul {
+		  
+		  float: left;
+		  list-style: none;
+		  margin: 0 0 0 -20px;
+		  padding: 0;
+		  
+		  li {
+			  
+			  float: left;
+			  margin-right: 10px;
+			  width: 45px;
+			  height: 60px;
+			  text-indent: -9999px;
+			  overflow: hidden;
+			  background: url(../images/bg-credit-cards.png) no-repeat 0 50%;
+			  
+			  &:last-child { margin-right: 0; }
+			  
+			  &.mastercard { background-position: -45px 50%; }
+			  &.amex { background-position: -90px 50%; }
+			  &.discover { background-position: 100% 50%; }
+			  
+		  }
+		  
+	  }
+	 
+  }
+  
+} // end .col2

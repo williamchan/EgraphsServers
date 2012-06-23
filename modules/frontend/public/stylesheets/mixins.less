@@ -48,3 +48,29 @@
 	-o-transition: @arguments;
 	transition: @arguments;
 }
+
+.callout {
+  
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  color: @white;
+  font-size: 14px;
+  line-height: 1.5em;
+  
+  span { display: none; }
+  
+}
+
+.callout-left {
+	.callout;
+	padding-left: 8px;
+  background: url(../images/bg-icon-marker-left.png) no-repeat 0 0;	
+}
+
+.callout-right {
+	.callout;
+	text-align: right;
+	padding-right: 10px;
+  background: url(../images/bg-icon-marker-right.png) no-repeat 100% 0;
+}
