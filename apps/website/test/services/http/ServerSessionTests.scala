@@ -137,6 +137,27 @@ class ServerSessionTests extends EgraphsUnitTest {
     }
   }
 
+  "namespaces" should "return the correct server session namespaces" in {
+    deletingSessionAfter {
+      // Create a root namespace and 4 sub-namespaces
+      def noNamespace = newSession
+      def ns1 = newSession.namespaced("ns1")
+      def ns2 = ns1.namespaced("ns2")
+      def ns3 = ns2.namespaced("ns3")
+
+      // Add "namespace name" key into each of the 4 namespaces
+      for (namespacedSession <- List(noNamespace, ns1, ns2, ns3)) {
+        namespacedSession.setting("namespace name" -> namespacedSession.namespace).save()
+      }
+
+      // Verify that each namespace only reports its own direct child namespaces
+      noNamespace.namespaces.map(_.namespace).toSet should be (Set("ns1"))
+      ns1.namespaces.map(_.namespace).toSet should be (Set("ns1/ns2"))
+      ns2.namespaces.map(_.namespace).toSet should be (Set("ns1/ns2/ns3"))
+      ns3.namespaces.isEmpty should be(true)
+    }
+  }
+
   //
   // Helper methods
   //
@@ -148,7 +169,7 @@ class ServerSessionTests extends EgraphsUnitTest {
   private def newNamespacedSession = {
     newSession.namespaced("ns")
   }
-  private def setHerpAndNsHerpIntoSession = {
+  private def setHerpAndNsHerpIntoSession() = {
     newSession.setting("herp" -> "derp")
       .namespaced("ns")
       .setting("herp" -> "ns-derp")

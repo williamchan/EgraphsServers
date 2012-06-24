@@ -77,6 +77,26 @@ class ServerSession private[http] (
     new ServerSession(providedData, applyNamespace(newNamespace), services)
   }
 
+  def namespaces: Traversable[ServerSession] = {
+    // Iterate through the keys in this namespace and choose unique set of ones that have subkeys
+    val namespaces = namespacedData.foldLeft(Set.empty[String]) { (namespaces, nextKeyValue) =>
+      val key = nextKeyValue._1
+
+      val keyParts = key.replaceFirst(applyNamespace(to=""), "").split("/")
+
+      println("Removing " + applyNamespace("") + " from " + key + " produced " + keyParts.toList)
+
+      if (keyParts.size > 1) {
+        namespaces + keyParts.head
+      } else {
+        namespaces
+      }
+    }
+
+    // Create namespace sessions out of the uniques
+    namespaces.map(ns => this.namespaced(ns))
+  }
+
   /**
    * Empties all tuples from this namespace of the session
    *
