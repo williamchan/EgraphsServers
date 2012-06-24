@@ -55,7 +55,7 @@ trait FormField[+ValueType] {
     writeKeyValue(name, stringsToValidate)
   }
 
-  private[forms] def write[T <: FormWriteable](writeable: T): T = {
+  private[forms] def write[T](writeable: FormWriteable[T]): FormWriteable[T] = {
     writeable.withData(name -> stringsToValidate)
   }
 }

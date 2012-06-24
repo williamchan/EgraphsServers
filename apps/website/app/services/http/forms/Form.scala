@@ -244,7 +244,7 @@ trait Form[+ValidFormType] {
     writeKeyValue(serializedErrorsKey, Some(errorString))
   }
 
-  private[forms] def write[T <: FormWriteable](formWriteable: T): T = {
+  private[forms] def write[T](formWriteable: FormWriteable[T]): FormWriteable[T] = {
     // Write all the submitted fields
     val submittedFields = fields.filter(field => !field.isInstanceOf[DerivedField[_]])
     val submittedFieldsWritten = submittedFields.foldLeft(formWriteable)(
@@ -268,8 +268,9 @@ object Form {
   /** Interface for anything that can be written to from a Form subtype */
   type Writeable = (String, Iterable[String]) => Unit
 
-  trait FormWriteable {
-    def withData(toAdd:(String, Iterable[String])): this.type
+  trait FormWriteable[T] {
+    def written: T
+    def withData(toAdd:(String, Iterable[String])): FormWriteable[T]
   }
 
   /** Separates serialized errors */
@@ -283,10 +284,14 @@ object Form {
 
   type StringPuttable = { def put(key: String, value: String) }
 
-  class MutableMapWriteable[T <: StringPuttable](val puttable: T) extends FormWriteable
+  class MutableMapWriteable[T <: StringPuttable](val puttable: T) extends FormWriteable[T]
   {
 
-    def withData(toAdd: (String, Iterable[String])): this.type = {
+    val written: T = {
+      puttable
+    }
+
+    def withData(toAdd: (String, Iterable[String])): MutableMapWriteable[T] = {
       val (key, rawValues) = toAdd
 
       // Replace instances of the serialization delimiter with something reasonable
@@ -300,18 +305,17 @@ object Form {
     }
   }
 
-  /*class ServerSessionWriteable(val written: ServerSession) extends FormWriteable {
+  class ServerSessionWriteable(val written: ServerSession) extends FormWriteable[ServerSession] {
     def withData(toAdd: (String, Iterable[String])): ServerSessionWriteable = {
-      null
+      new ServerSessionWriteable(written.setting(toAdd))
     }
-  }*/
+  }
 
   /**
    * Implicit conversions for transforming request- and session-specific values into Form.Readable
    * and Form.Writeable instances.
    */
   object Conversions {
-
     //
     // Conversion classes
     //
@@ -329,8 +333,18 @@ object Form {
         }
       }
 
-      def asFormWriteable: FormWriteable = {
-        new MutableMapWriteable[T](gettablePuttable)
+      def asFormWriteable: FormWriteable[T] = {
+        new MutableMapWriteable(gettablePuttable)
+      }
+    }
+
+    class FormCompatibleServerSession(serverSession: ServerSession) {
+      def asFormReadable: Form.Readable = {
+        (key) => serverSession[Iterable[String]](key).flatten
+      }
+
+      def asFormWriteable: ServerSessionWriteable = {
+        new ServerSessionWriteable(serverSession)
       }
     }
 
@@ -353,6 +367,12 @@ object Form {
     : FormCompatiblePlayParams =
     {
       new FormCompatiblePlayParams(playParams)
+    }
+
+    implicit def serverSessionToFormCompatible(serverSession: ServerSession)
+    : FormCompatibleServerSession =
+    {
+      new FormCompatibleServerSession(serverSession)
     }
   }
 

@@ -5,6 +5,7 @@ import services.AppConfig
 import play.test.FunctionalTest
 import play.mvc.Scope
 import Form.Conversions._
+import services.http.ServerSession
 
 class FormTests extends EgraphsUnitTest {
   import TestPersonForm.Fields
@@ -184,6 +185,32 @@ class FormTests extends EgraphsUnitTest {
     read("multiple values").toList should be (List("first", "second"))
   }
 
+  "Conversions" should "correctly convert a ServerSession into a writeable/readable" in {
+    // Set up
+    val sessionFactory = (AppConfig.instance[() => ServerSession])
+
+    try {
+      // Run tests
+      val writeable = sessionFactory().asFormWriteable
+
+      writeable
+        .withData("single value" -> List("herp"))
+        .withData("multiple value" -> List("herp", "derp"))
+        .written
+        .save()
+
+      // Check expectations
+      val read = sessionFactory().asFormReadable
+
+      read("null").toList should be (List())
+      read("single value").toList should be (List("herp"))
+      read("multiple value").toList should be (List("herp", "derp"))
+    }
+
+    finally {
+      sessionFactory().emptied.save()
+    }
+  }
 
   //
   // A sample form class
