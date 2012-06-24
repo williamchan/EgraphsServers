@@ -273,9 +273,6 @@ object Form {
     def withData(toAdd:(String, Iterable[String])): FormWriteable[T]
   }
 
-  /** Separates serialized errors */
-  private[Form] val errorSeparator = "…"
-
   /**
    * Structural type that allows any String-String puttable and gettable to turn into Form.Readable and
    * Form.Writeable
@@ -380,6 +377,9 @@ object Form {
   // Private members
   //
   private val serializationDelimiter = ",,,"
+
+  /** Separates serialized errors */
+  private[Form] val errorSeparator = "…"
 }
 
 

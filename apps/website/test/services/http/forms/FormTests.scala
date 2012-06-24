@@ -187,11 +187,9 @@ class FormTests extends EgraphsUnitTest {
 
   "Conversions" should "correctly convert a ServerSession into a writeable/readable" in {
     // Set up
-    val sessionFactory = (AppConfig.instance[() => ServerSession])
-
     try {
       // Run tests
-      val writeable = sessionFactory().asFormWriteable
+      val writeable = newServerSession.asFormWriteable
 
       writeable
         .withData("single value" -> List("herp"))
@@ -200,16 +198,18 @@ class FormTests extends EgraphsUnitTest {
         .save()
 
       // Check expectations
-      val read = sessionFactory().asFormReadable
+      val read = newServerSession.asFormReadable
 
       read("null").toList should be (List())
       read("single value").toList should be (List("herp"))
       read("multiple value").toList should be (List("herp", "derp"))
+    } finally {
+      newServerSession.emptied.save()
     }
+  }
 
-    finally {
-      sessionFactory().emptied.save()
-    }
+  def newServerSession = {
+    AppConfig.instance[() => ServerSession].apply()
   }
 
   //
