@@ -7,9 +7,7 @@ import redis.clients.jedis.Jedis
 import scala.Some
 import services.logging.Logging
 import services.Utils
-import services.http.{PlayConfig}
-import play.modules.redis.{RedisConnectionManager}
-import java.util
+import play.modules.redis.RedisConnectionManager
 
 /**
  * Trait for any class that implements a Cache in our system. Caches are simple key value stores.
@@ -91,26 +89,26 @@ private[cache] trait Cache {
  *       can't be made to the cache server then it defaults to the in-memory cache.
  * - "memory": An in-memory implementation that delegates to Play's [[play.cache.EhCacheImpl]]
  **/
-private[cache] class CacheFactory @Inject()(@PlayConfig playConfig: util.Properties)
-  extends (() => Cache)
+private[cache] class CacheFactory @Inject()(
+  utils: Utils,
+  jedisFactory: JedisFactory
+) extends (() => Cache)
 {
   import CacheFactory._
 
   def apply(): Cache = {
-    playConfig.getProperty("application.cache") match {
-      case "memory" =>
+    val appCacheValue = utils.requiredConfigurationProperty("application.cache")
+    println("appCacheValue was " + appCacheValue.split("\\.").toList)
+
+    appCacheValue.split("\\.").toList match {
+      case List("memory") =>
         inMemoryCache
 
-      case "redis" =>
-        try {
-          redisCache
-        } catch {
-          case oops: Exception =>
-            error("Unable to connect to redis cache instance. Falling back to in-memory cache")
-            Utils.logException(oops)
+      case List("redis", dbNumber) =>
+        redisCacheIfPossible(db=dbNumber.toInt)
 
-            inMemoryCache
-        }
+      case List("redis") =>
+        redisCacheIfPossible()
 
       case unrecognized =>
         throw new IllegalArgumentException(
@@ -122,18 +120,59 @@ private[cache] class CacheFactory @Inject()(@PlayConfig playConfig: util.Propert
   //
   // Private members
   //
-  private[cache] def inMemoryCache = {
+  private[cache] def inMemoryCache: Cache = {
     new InMemoryCache(EhCacheImpl.getInstance())
   }
 
-  private[cache] def redisCache = {
-    new RedisCache(RedisConnectionManager.getRawConnection)
+  private[cache] def redisCacheIfPossible(db: Int=JedisFactory.defaultRedisDb): Cache = {
+    val maybeJedis = jedisFactory(db=db)
+    val maybeRedisCache = maybeJedis.map(jedis => new RedisCache(jedis))
+
+    maybeRedisCache.getOrElse {
+      log("Falling back to in-memory cache due to failure to acquire redis connection")
+
+      inMemoryCache
+    }
+  }
+
+  private[cache] def redisCacheOrBust(db: Int=JedisFactory.defaultRedisDb): Cache = {
+    jedisFactory(db).map(jedis => new RedisCache(jedis)).getOrElse {
+      throw new Exception(
+        "All we wanted was a redis cache implementation," +
+        " but now we want to watch the world burn."
+      )
+    }
   }
 }
 
 
 object CacheFactory extends Logging
 
+
+private[cache] class JedisFactory @Inject()() {
+  def apply(db: Int=JedisFactory.defaultRedisDb): Option[Jedis] = {
+    val maybeJedis = try {
+      Some(RedisConnectionManager.getRawConnection)
+    } catch {
+      case oops =>
+        error("Unable to connect to redis cache instance.")
+        Utils.logException(oops)
+
+        None
+    }
+
+    // Select the correct database index
+    maybeJedis.map { jedis =>
+      jedis.select(db)
+
+      jedis
+    }
+  }
+}
+
+object JedisFactory {
+  val defaultRedisDb = 3
+}
 
 /**
  * Cache implementation based on connection to our Redis server. Prefer getting
