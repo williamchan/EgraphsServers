@@ -171,7 +171,7 @@ private[cache] class JedisFactory @Inject()() {
 }
 
 object JedisFactory {
-  val defaultRedisDb = 3
+  val defaultRedisDb = 5
 }
 
 /**
