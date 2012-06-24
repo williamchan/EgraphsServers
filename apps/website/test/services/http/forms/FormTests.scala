@@ -155,11 +155,12 @@ class FormTests extends EgraphsUnitTest {
   "Conversions" should "correctly convert a Scope.Flash into a writeable" in {
     // Set up
     val flash = new Scope.Flash
-    val write = flash.asFormWriteable
+    val writeable = flash.asFormWriteable
     val read = flash.asFormReadable
 
-    write("single value", List("herp"))
-    write("multiple value", List("herp", "derp"))
+    writeable
+      .withData("single value" -> List("herp"))
+      .withData("multiple value" -> List("herp", "derp"))
 
     // Check expectations
     read("null").toList should be (List())
