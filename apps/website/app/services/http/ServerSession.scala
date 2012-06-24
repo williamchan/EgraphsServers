@@ -1,13 +1,13 @@
 package services.http
 
-import services.cache.{NamespacedCache, CacheFactory}
+import services.cache.{Cache, CacheFactory}
 import com.google.inject.Inject
 import scala.collection.immutable.Map
 import collection.{mutable, TraversableLike}
 import collection.mutable.ListBuffer
 import play.mvc.Scope.Session
 import services.logging.Logging
-import services.Time
+import services.{Namespacing, AppConfig, Time}
 
 /**
  * Cache for a single user session. The cache is keyed by the session ID cookie provided
@@ -51,8 +51,11 @@ import services.Time
  */
 class ServerSession private[http] (
   providedData: Option[Map[String, Any]],
-  services: ServerSessionServices
-) extends Traversable[(String, Any)] with TraversableLike[(String, Any), ServerSession]
+  val namespace: String="",
+  services: ServerSessionServices = AppConfig.instance[ServerSessionServices]
+) extends Traversable[(String, Any)]
+  with TraversableLike[(String, Any), ServerSession]
+  with Namespacing
 {
   import Time.IntsToSeconds._
   /**
@@ -70,13 +73,17 @@ class ServerSession private[http] (
     this
   }
 
+  def namespaced(newNamespace: String): ServerSession = {
+    new ServerSession(providedData, applyNamespace(newNamespace), services)
+  }
+
   /**
-   * Empties all tuples from the session
+   * Empties all tuples from this namespace of the session
    *
    * @return the emptied session
    */
   def emptied: ServerSession = {
-    this.withData(Map.empty[String, Any])
+    this.withData(data -- namespacedData.keySet)
   }
 
   /**
@@ -87,7 +94,11 @@ class ServerSession private[http] (
    * @return Some(the value) or None if the key wasn't found
    */
   def apply[T : Manifest](key: String): Option[T] = {
-    data.get(key).map(value => value.asInstanceOf[T])
+    data.get(applyNamespace(key)).map(value => value.asInstanceOf[T])
+  }
+
+  def get[T : Manifest](key: String): Option[T] = {
+    apply(key)
   }
 
   /**
@@ -100,7 +111,7 @@ class ServerSession private[http] (
    * @return
    */
   def setting (keyValues: (String, Any) *): ServerSession = {
-    this.withData(data ++ keyValues)
+    this.withData(data ++ applyNamespace(keyValues))
   }
 
   /**
@@ -110,25 +121,27 @@ class ServerSession private[http] (
    * @param keys keys for the tuples to remove
    */
   def removing (keys: String*): ServerSession = {
-    this.withData(data -- keys)
+    this.withData(data -- keys.map(key => applyNamespace(key)))
   }
 
   //
   // Traversable and TraversableLike members
   //
   override def foreach[U](f: ((String, Any)) => U) {
-    data.foreach(f)
+    namespacedData.foreach(f)
   }
 
   override protected[this] def newBuilder: mutable.Builder[(String, Any), ServerSession] = {
-    new ListBuffer[(String, Any)]().mapResult(tuples => this.withData(tuples.toMap))
+    new ListBuffer[(String, Any)]().mapResult { tuples =>
+      this.withData(applyNamespace(tuples).toMap)
+    }
   }
 
   //
   // Private members
   //
   private def withData(newData: Map[String, Any]) = {
-    new ServerSession(providedData=Some(newData), services=services)
+    new ServerSession(providedData=Some(newData), namespace=namespace, services=services)
   }
 
   private lazy val data: Map[String, Any] = {
@@ -149,8 +162,20 @@ class ServerSession private[http] (
     "session_" + session.getId
   }
 
-  private def appCache: NamespacedCache = {
+  private def appCache: Cache = {
     services.cacheFactory.applicationCache
+  }
+
+  private def applyNamespace(to: Traversable[(String, Any)]): Traversable[(String, Any)] = {
+    for ((key, value) <- to) yield (applyNamespace(key), value)
+  }
+
+  private def namespacedData: Map[String, Any] = {
+    if (namespace == "") {
+      data
+    } else {
+      data.filterKeys(key => key.startsWith(namespace))
+    }
   }
 }
 

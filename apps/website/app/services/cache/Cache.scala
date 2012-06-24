@@ -1,14 +1,5 @@
 package services.cache
 
-import com.google.inject.Inject
-import java.io._
-import play.cache.EhCacheImpl
-import redis.clients.jedis.Jedis
-import scala.Some
-import services.logging.Logging
-import services.Utils
-import play.modules.redis.RedisConnectionManager
-
 /**
  * Trait for any class that implements a Cache in our system. Caches are simple key value stores.
  *
@@ -40,7 +31,7 @@ import play.modules.redis.RedisConnectionManager
  *   }
  * }}}
  */
-private[cache] trait Cache {
+trait Cache {
   /**
    * Sets a Serializable object into the cache on the specified key for a particular amount of time.
    * Overwrites any existing values.

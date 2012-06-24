@@ -78,11 +78,62 @@ class ServerSessionTests extends EgraphsUnitTest {
   "The session key" should "contain the session ID and the word 'session'" in {
     deletingSessionAfter {
       // Set up
-      val session = new ServerSession(None, AppConfig.instance[ServerSessionServices])
+      val session = new ServerSession(None)
 
       // Check expectations
       session.cacheKey.contains(play.mvc.Scope.Session.current().getId) should be (true)
       session.cacheKey.contains("session") should be (true)
+    }
+  }
+
+  "namespacing" should "get and set on the namespace correctly" in {
+    // Set up
+    deletingSessionAfter {
+      setHerpAndNsHerpIntoSession
+
+      // Check expectations: herp and ns/herp should be different
+      newSession.get("herp") should be (Some("derp"))
+      newNamespacedSession.get("herp") should be (Some("ns-derp"))
+      newSession.get("ns/herp") should be (newNamespacedSession.get("herp"))
+
+      /*// Re-add the namespaced one, delete the original and see that the namespaced exists
+      newSession.namespaced("ns").setting("derp-ns" -> ).save()
+      newSession.namespaced("")
+      newSession.get("herp") should be (Some(""))*/
+    }
+  }
+
+  "deleting from a namespace" should "not affect the upper namespaces" in {
+    deletingSessionAfter {
+      setHerpAndNsHerpIntoSession
+
+      newNamespacedSession.removing("herp").save()
+      newNamespacedSession.get("herp") should be (None)
+      newSession.get("herp") should be (Some("derp"))
+    }
+  }
+
+  "namespacing" should "apply to arbitrary depth" in {
+    deletingSessionAfter {
+      newSession
+        .namespaced("1")
+        .namespaced("2")
+        .setting("herp" -> "derp")
+        .save()
+
+      newSession.get("1/2/herp") should be (Some("derp"))
+    }
+  }
+
+  "namespacing" should "empty from the namespace correctly" in {
+    deletingSessionAfter {
+      setHerpAndNsHerpIntoSession
+      newNamespacedSession.setting("just another key" -> "and value").save()
+      newNamespacedSession.size should be (2)
+      newNamespacedSession.emptied.save()
+      newNamespacedSession.size should be (0)
+      newSession.size should be (1)
+      newNamespacedSession.isEmpty should be (true)
     }
   }
 
@@ -92,6 +143,16 @@ class ServerSessionTests extends EgraphsUnitTest {
   private def newSession: ServerSession = {
     val factory = AppConfig.instance[() => ServerSession]
     factory()
+  }
+
+  private def newNamespacedSession = {
+    newSession.namespaced("ns")
+  }
+  private def setHerpAndNsHerpIntoSession = {
+    newSession.setting("herp" -> "derp")
+      .namespaced("ns")
+      .setting("herp" -> "ns-derp")
+      .save()
   }
 
   private def deletingSessionAfter(operation: => Any) = {

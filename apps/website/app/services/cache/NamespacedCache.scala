@@ -1,8 +1,11 @@
 package services.cache
 
-import com.google.inject.Inject
+import services.logging.Logging
+import services.Namespacing
 
-class NamespacedCache (namespace: String="", cache: Cache) extends Cache {
+class NamespacedCache (val namespace: String="", cache: Cache) extends Cache with Namespacing {
+  import NamespacedCache._
+
   def namespaced(newNamespace: String): NamespacedCache = {
     new NamespacedCache(applyNamespace(newNamespace), cache)
   }
@@ -11,11 +14,15 @@ class NamespacedCache (namespace: String="", cache: Cache) extends Cache {
   // Cache members
   //
   def set[T](key: String, value: T, expirationSeconds: Int) {
+    log("SET " + key + " -> " + value)
     cache.set(applyNamespace(key), value, expirationSeconds)
   }
 
   def get[T: Manifest](key: String): Option[T] = {
-    cache.get[T](applyNamespace(key))
+    val value = cache.get[T](applyNamespace(key))
+    log("GET " + key + " -> " + value)
+
+    value
   }
 
   def delete(key: String) {
@@ -25,11 +32,7 @@ class NamespacedCache (namespace: String="", cache: Cache) extends Cache {
   def clear() {
     cache.clear()
   }
-
-  //
-  // Private members
-  //
-  private def applyNamespace(toNamespace: String) = {
-    if (namespace == "") toNamespace else namespace + "/" + toNamespace
-  }
 }
+
+
+object NamespacedCache extends Logging
