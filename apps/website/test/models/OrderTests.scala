@@ -96,7 +96,7 @@ class OrderTests extends UnitFlatSpec
     rendered("requestedMessage") should be(order.requestedMessage.get)
     rendered("messageToCelebrity") should be(order.messageToCelebrity.get)
     rendered.contains("audioPrompt") should be(true)
-    rendered("orderType") should be(order.orderType.name)
+    rendered("orderType") should be(order.writtenMessageChoice.name)
     rendered.contains("created") should be(true)
     rendered.contains("updated") should be(true)
     rendered.contains("product") should be(true)

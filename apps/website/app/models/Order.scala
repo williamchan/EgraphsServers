@@ -42,7 +42,7 @@ case class Order(
   _reviewStatus: String = OrderReviewStatus.PendingAdminReview.name,
   rejectionReason: Option[String] = None,
   _privacyStatus: String = PrivacyStatus.Public.name,
-  _orderType: String = OrderType.SignatureWithMessage.name,
+  _orderType: String = WrittenMessageChoice.SpecificMessage.name,
   stripeCardTokenId: Option[String] = None,
   stripeChargeId: Option[String] = None,
   amountPaidInCurrency: BigDecimal = 0,
@@ -57,7 +57,7 @@ case class Order(
   with HasPrivacyStatus[Order]
   with HasPaymentStatus[Order]
   with HasOrderReviewStatus[Order]
-  with HasOrderType[Order]
+  with HasWrittenMessageChoice[Order]
 {
   //
   // Public methods
@@ -206,7 +206,7 @@ case class Order(
       "amountPaidInCents" -> amountPaid.getAmountMinor,
       "reviewStatus" -> reviewStatus.name,
       "audioPrompt" -> generateAudioPrompt(),
-      "orderType" -> orderType.name
+      "orderType" -> writtenMessageChoice.name
     )
 
     val optionalFields = Utils.makeOptionalFieldMap(
@@ -250,7 +250,7 @@ case class Order(
     this.copy(_reviewStatus = status.name)
   }
 
-  def withOrderType(enum: OrderType.EnumVal) = {
+  def withWrittenMessageChoice(enum: WrittenMessageChoice.EnumVal) = {
     this.copy(_orderType = enum.name)
   }
 }
