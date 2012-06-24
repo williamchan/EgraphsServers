@@ -3,9 +3,11 @@ package services.cache
 import utils.{TestData, TestAppConfig, EgraphsUnitTest}
 import uk.me.lings.scalaguice.ScalaModule
 import com.google.inject.AbstractModule
-import services.http.PlayConfig
+import services.http.{PlayId, DeploymentTarget, HostInfo, PlayConfig}
 import services.AppConfig
 import java.util
+import services.http.DeploymentTarget._
+import scala.Some
 
 trait CacheTests { this: EgraphsUnitTest =>
   def cacheInstance: Cache
@@ -94,12 +96,12 @@ class RedisCacheTests extends EgraphsUnitTest {
   // our code actually selects the real one, we have to keep grabbing new ones from AppConfig
   // even if only to discard them.
   "Namespaced redis caches" should "actually be namespaced" in {
-    import CacheFactoryTests.cacheFromAppWithCacheSetting
+    import CacheFactoryTests.lowLevelCacheWithPlaySettings
 
     // Set up
     val (key, db1Value, db2Value) = (TestData.makeTestCacheKey, "herp", "derp")
-    def firstDb = cacheFromAppWithCacheSetting("redis.12")
-    def secondDb = cacheFromAppWithCacheSetting("redis.13")
+    def firstDb = lowLevelCacheWithPlaySettings("redis.12")
+    def secondDb = lowLevelCacheWithPlaySettings("redis.13")
 
     // Run test
     firstDb.set(key, db1Value, 5)
@@ -116,27 +118,48 @@ class CacheFactoryTests extends EgraphsUnitTest {
   import CacheFactoryTests._
 
   "The bound cache factory" should "return the correct values for each server environment" in {
-    AppConfig.instance[() => Cache].apply().getClass should be (classOf[InMemoryCache])
-    cacheFromAppWithCacheSetting("memory").getClass should be(classOf[InMemoryCache])
-    cacheFromAppWithCacheSetting("redis").getClass should be (classOf[RedisCache])
-    cacheFromAppWithCacheSetting("redis.12").getClass should be (classOf[RedisCache])
-    cacheFromAppWithCacheSetting("redis.13").getClass should be (classOf[RedisCache])
+    AppConfig.instance[CacheFactory].lowLevelCache.getClass should be (classOf[InMemoryCache])
+    lowLevelCacheWithPlaySettings("memory").getClass should be(classOf[InMemoryCache])
+    lowLevelCacheWithPlaySettings("redis").getClass should be (classOf[RedisCache])
+    lowLevelCacheWithPlaySettings("redis.12").getClass should be (classOf[RedisCache])
+    lowLevelCacheWithPlaySettings("redis.13").getClass should be (classOf[RedisCache])
+  }
+
+  "hostId" should "be the application id when in staging, demo, live" in {
+    for (playId <- List(Staging, Demo, Live).map(_.name)) {
+      val appConfig = appConfigWithCacheSetting("redis", playId)
+      appConfig.instance[CacheFactory].hostId should be (playId)
+    }
+  }
+
+  "hostId" should "include the application id and some identifying info during test" in {
+    val hostInfo = AppConfig.instance[HostInfo]
+    val hostId = AppConfig.instance[CacheFactory].hostId
+
+    hostId.contains(Test.name) should be (true)
+    hostId.contains(hostInfo.macAddress) should be (true)
+    hostId.contains(hostInfo.userName) should be (true)
+    hostId.contains(hostInfo.computerName) should be (true)
   }
 }
 
-
 object CacheFactoryTests {
-  private[cache] def cacheFromAppWithCacheSetting(cacheConfig: String): Cache = {
-    val factory = appConfigWithCacheSetting(cacheConfig).instance[() => Cache]
-    factory()
+  private[cache] def lowLevelCacheWithPlaySettings(
+    cacheConfig: String,
+    playId: String=DeploymentTarget.Test.name
+  ): Cache =
+  {
+    val factory = appConfigWithCacheSetting(cacheConfig, playId).instance[CacheFactory]
+    factory.lowLevelCache
   }
 
-  private def appConfigWithCacheSetting(cacheConfig: String): TestAppConfig = {
+  private def appConfigWithCacheSetting(cacheConfig: String, playId: String): TestAppConfig = {
     new TestAppConfig(new AbstractModule with ScalaModule {
       def configure() {
         val props = new util.Properties()
         props.put("application.cache", cacheConfig)
         bind[util.Properties].annotatedWith[PlayConfig].toInstance(props)
+        bind[String].annotatedWith[PlayId].toInstance(playId)
       }
     })
   }

@@ -100,4 +100,49 @@ object Time {
     dateFormat
   }
 
+  object IntsToSeconds {
+    class SecondDurations(int: Int) {
+      //
+      // Singulars
+      //
+      def second: Int = {
+        int
+      }
+
+      def minute: Int = {
+        second * 60
+      }
+
+      def hour: Int = {
+        minutes * 60
+      }
+
+      def day: Int = {
+        hour * 24
+      }
+
+      //
+      // Plurals
+      //
+      def days: Int = {
+        day
+      }
+
+      def seconds: Int = {
+        second
+      }
+
+      def minutes: Int = {
+        minute
+      }
+
+      def hours: Int = {
+        hour
+      }
+    }
+
+    implicit def intsToSecondDurations(int: Int): SecondDurations = {
+      new SecondDurations(int)
+    }
+  }
 }

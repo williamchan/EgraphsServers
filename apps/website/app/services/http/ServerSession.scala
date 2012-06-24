@@ -1,12 +1,13 @@
 package services.http
 
-import services.cache.ApplicationCache
+import services.cache.{NamespacedCache, CacheFactory}
 import com.google.inject.Inject
 import scala.collection.immutable.Map
 import collection.{mutable, TraversableLike}
 import collection.mutable.ListBuffer
 import play.mvc.Scope.Session
 import services.logging.Logging
+import services.Time
 
 /**
  * Cache for a single user session. The cache is keyed by the session ID cookie provided
@@ -53,6 +54,7 @@ class ServerSession private[http] (
   services: ServerSessionServices
 ) extends Traversable[(String, Any)] with TraversableLike[(String, Any), ServerSession]
 {
+  import Time.IntsToSeconds._
   /**
    * Stores the map represented by this object into the [[services.cache.ApplicationCache]]
    *
@@ -62,7 +64,7 @@ class ServerSession private[http] (
     if (data.isEmpty) {
       appCache.delete(cacheKey)
     } else {
-      appCache.set(cacheKey, data, Some("30d"))
+      appCache.set(cacheKey, data, 30.days)
     }
 
     this
@@ -147,15 +149,15 @@ class ServerSession private[http] (
     "session_" + session.getId
   }
 
-  private def appCache: ApplicationCache = {
-    services.appCache
+  private def appCache: NamespacedCache = {
+    services.cacheFactory.applicationCache
   }
 }
 
 
 case class ServerSessionServices @Inject() (
   sessionFactory: () => play.mvc.Scope.Session,
-  appCache: ApplicationCache
+  cacheFactory: CacheFactory
 )
 
 
