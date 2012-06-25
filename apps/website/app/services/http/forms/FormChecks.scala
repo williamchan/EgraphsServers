@@ -1,7 +1,7 @@
 package services.http.forms
 
 import com.google.inject.Inject
-import play.data.validation.{Validation}
+import play.data.validation.Validation
 import play.data.binding.types.DateBinder
 import java.text.{ParseException, SimpleDateFormat}
 import java.util.Date
@@ -17,10 +17,16 @@ import services.Utils
  */
 class FormChecks @Inject()(accountStore: AccountStore, productStore: ProductStore) {
 
-  def isSomeValue[T](toValidate: Option[T], message: String="Was not a value")
+  def isPresent(toValidate: Iterable[String])
+  : Either[ValueNotPresentFieldError, Iterable[String]] =
+  {
+    FormChecks.isPresent(toValidate)
+  }
+
+  def isSomeValue[T](toValidate: Iterable[T], message: String="Was not a value")
   : Either[FormError, T] =
   {
-    toValidate.map(value => Right(value)).getOrElse(error(message))
+    toValidate.headOption.map(value => Right(value)).getOrElse(error(message))
   }
 
 
@@ -69,7 +75,7 @@ class FormChecks @Inject()(accountStore: AccountStore, productStore: ProductStor
   }
 
   // If the string was present it checks for the positive value,
-  // but if it was not present it defaults to false. This is because of the wya
+  // If it was not present it defaults to false. This is because of the wya
   // that forms work.
   def isChecked(toValidate: Option[String], message:String="Was not checked")
   : Either[FormError, Boolean] =
@@ -203,6 +209,21 @@ class FormChecks @Inject()(accountStore: AccountStore, productStore: ProductStor
   : Either[FormError, Int] =
   {
     if(toValidate < minimum) error(message) else Right(toValidate)
+  }
+
+  def isBetweenInclusive(
+    minimum: Int,
+    maximum: Int,
+    toValidate: Int,
+    message: String = "Must be within range"
+  ): Either[FormError, Int] =
+  {
+    for (
+      _ <- this.isAtLeast(minimum, toValidate, message).right;
+      _ <- this.isAtMost(maximum, toValidate, message).right
+    ) yield {
+      toValidate
+    }
   }
 
   //

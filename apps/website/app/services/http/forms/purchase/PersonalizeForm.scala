@@ -10,6 +10,10 @@ class PersonalizeForm(val paramsMap: Form.Readable, check: FormChecks)
 {
   import PersonalizeForm.Params
 
+  private def validations(toValidate: Iterable[String]) = {
+    new PurchaseFormValidation(toValidate, check)
+  }
+
   //
   // Field values and validations
   //
@@ -17,18 +21,15 @@ class PersonalizeForm(val paramsMap: Form.Readable, check: FormChecks)
     val name = Params.IsGift
 
     def validate: Either[FormError, RecipientChoice] = {
-      for (isGift <- check.isChecked(stringsToValidate.headOption).right) yield {
-        if (isGift) RecipientChoice.Other else RecipientChoice.Self
-      }
+      validations(stringsToValidate).validateRecipientChoiceField
     }
   }
 
-  val recipientName = new RequiredField[String](Params.RecipientName) {
-    def validateIfPresent: Either[FormError, String] = {
-      for (_ <- check.isAtLeast(2, stringToValidate.length, "Must be at least 2 characters").right)
-      yield {
-        stringToValidate
-      }
+  val recipientName = new Field[String] {
+    val name = Params.RecipientName
+
+    def validate: Either[FormError, String] = {
+      validations(stringsToValidate).validateRecipientNameField
     }
   }
 
@@ -36,43 +37,22 @@ class PersonalizeForm(val paramsMap: Form.Readable, check: FormChecks)
     val name = Params.RecipientEmail
 
     def validate: Either[FormError, Option[String]] = {
-      val emailOption = stringsToValidate.headOption
-
-      for (validRecipientChoice <- check.dependentFieldIsValid(recipientChoice).right;
-           validEmailOption <- validateEmailGivenRecipient(emailOption, validRecipientChoice).right)
+      for (
+        validRecipientChoice <- check.dependentFieldIsValid(recipientChoice).right;
+        validEmailOption <- validations(stringsToValidate)
+                              .validateRecipientEmailField(validRecipientChoice).right
+      )
       yield {
         validEmailOption
       }
     }
-
-    // Validate the recipient email given whether it was being gifted or not. If it was a gift
-    // then the e-mail was required, but if it was bought for self then we don't need the email.
-    private def validateEmailGivenRecipient(email: Option[String], recipientChoice: RecipientChoice)
-    : Either[FormError, Option[String]] =
-    {
-      recipientChoice match {
-        case RecipientChoice.Self =>
-          Right(None)
-
-        case RecipientChoice.Other =>
-          for (value <- check.isSomeValue(email).right;
-               _ <- check.isEmailAddress(value, "Valid e-mail address required").right)
-          yield {
-            Some(value)
-          }
-      }
-    }
   }
 
-  val writtenMessageChoice = new RequiredField[WrittenMessageChoice](Params.WrittenMessageChoice) {
-    def validateIfPresent: Either[FormError, WrittenMessageChoice] = {
-      for (messageChoice <- check.isSomeValue(
-                              WrittenMessageChoice(stringToValidate),
-                              "Message choice must be valid"
-                            ).right)
-      yield {
-        messageChoice
-      }
+  val writtenMessageChoice = new Field[WrittenMessageChoice] {
+    val name = Params.WrittenMessageChoice
+
+    def validate = {
+      validations(stringsToValidate).validateWrittenMessageChoice
     }
   }
 
@@ -81,63 +61,29 @@ class PersonalizeForm(val paramsMap: Form.Readable, check: FormChecks)
     val name = Params.WrittenMessage
 
     def validate: Either[FormError, Option[String]] = {
-      val messageTextOption = stringsToValidate.headOption
-
-      for (validMessageChoice <- check.dependentFieldIsValid(writtenMessageChoice).right;
-           validMessageTextOption <- validateWrittenMessageGivenMessageChoice(
-                                       messageTextOption,
-                                       validMessageChoice
-                                     ).right)
+      for (
+        validMessageChoice <- check.dependentFieldIsValid(writtenMessageChoice).right;
+        validMessageTextOption <- validations(stringsToValidate)
+                                    .validateWrittenMessage(validMessageChoice).right)
       yield {
         validMessageTextOption
       }
     }
+  }
 
-    private def validateWrittenMessageGivenMessageChoice(
-      messageOption: Option[String],
-      messageChoice: WrittenMessageChoice
-    ): Either[FormError, Option[String]] = {
-      import WrittenMessageChoice._
+  val noteToCelebrity = new Field[Option[String]] {
+    val name = Params.NoteToCelebrity
 
-      messageChoice match {
-        case CelebrityChoosesMessage | SignatureOnly =>
-          Right(None)
-
-        case SpecificMessage =>
-          for (writtenMessage <- check.isSomeValue(
-                                   messageOption,
-                                   "Required if you want a specific message written"
-                                 ).right;
-               _ <- validateMessageOrNoteLength(writtenMessage).right)
-          yield {
-            Some(writtenMessage)
-          }
-      }
+    def validate: Either[FormError, Option[String]] = {
+      validations(stringsToValidate).validateNoteToCelebrity
     }
   }
 
-  val noteToCelebrity = new OptionalField[String](Params.NoteToCelebrity) {
-    def validateIfPresent: Either[FormError, String] = {
-      validateMessageOrNoteLength(stringToValidate)
-    }
-  }
   //
   // Form[ValidatedPersonalizeForm] members
   //
   protected def formAssumingValid: PersonalizeForm.Validated = {
     PersonalizeForm.Validated()
-  }
-
-  //
-  // Private members
-  //
-  private def validateMessageOrNoteLength(messageOrNote: String): Either[FormError, String] = {
-    import PersonalizeForm.{minMessageChars, maxMessageChars, messageLengthWarning}
-    for (_ <- check.isAtLeast(minMessageChars, messageOrNote.length, messageLengthWarning).right;
-         _ <- check.isAtMost(maxMessageChars, messageOrNote.length, messageLengthWarning).right)
-    yield {
-      messageOrNote
-    }
   }
 }
 

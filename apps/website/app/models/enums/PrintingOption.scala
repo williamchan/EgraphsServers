@@ -2,14 +2,11 @@ package models.enums
 
 import services.Utils
 
+sealed abstract class PrintingOption(val name: String)
+
 object PrintingOption extends Utils.Enum {
-  sealed trait EnumVal extends Value
+  sealed abstract class EnumVal(name: String) extends PrintingOption(name) with Value
 
-  val HighQualityPrint = new EnumVal {
-    val name = "HighQualityPrint"
-  }
-
-  val DoNotPrint = new EnumVal {
-    val name = "DoNotPrint"
-  }
+  object HighQualityPrint extends EnumVal("HighQualityPrint")
+  object DoNotPrint extends EnumVal("DoNotPrint")
 }
