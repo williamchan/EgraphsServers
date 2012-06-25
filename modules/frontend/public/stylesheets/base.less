@@ -43,6 +43,9 @@ button  {
 		background: url(../images/bg-button-mid.png) repeat-x 0 0;
 		padding-left: 25px;
 		padding-right: 25px;
+		
+		em { font-style: normal; }
+		
 	}
 
 	span {
@@ -54,14 +57,36 @@ button  {
 		text-indent: -9999px;
 		overflow: hidden;
 	}
-
-}
-
-.button:hover {
-
-	background-position: 0 100%;
 	
-	strong, span { background-position: 0 100%; }
+	&:hover {
+	
+		background-position: 0 100%;
+		
+		strong, span { background-position: 0 100%; }
+	
+	}	
+	
+	&.facebook {
+		
+		padding-left: 22px;
+		background-image: url(../images/bg-button-left-facebook.png);
+		
+		strong {
+			background-image: url(../images/bg-button-mid-facebook.png);	
+			em {
+				display: block;
+				width: 65px;
+				height: 13px;
+				margin-top: 8px;
+				text-indent: -9999px;
+				overflow: hidden;
+				background: url(../images/logotype-facebook.png) no-repeat 0 50%;
+			}		
+		}
+		
+		span { background-image: url(../images/bg-button-right-facebook.png); }	
+		
+	}
 
 }
 
@@ -342,6 +367,7 @@ section[role=banner] {
 		}
 
 		&.sub { 
+			padding-top: 20px;
 			border-top: none; 
 			background: @offWhite;
 		}

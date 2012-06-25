@@ -1,0 +1,105 @@
+@()
+
+@import views.frontend.tags.html.storefront_breadcrumbs_responsive
+@import views.frontend.tags
+
+@baseBody = {
+    <div id="content" class="top" role="main">
+    
+      <div id="main" class="sub">
+      
+        <section id="checkout" class="container">
+			
+				 @storefront_breadcrumbs_responsive()
+				 		
+  				<header>	
+  				  <h1>Review Order</h1>
+  				  <h2>David Price | First MLB Victory</h2>  				
+  				</header>
+
+  				<div class="review clearfix">
+
+	  				<figure>
+									
+							<img src='@asset("public/images/fpo-egraph.png")' alt="fpo-egraph" />
+						
+							<figcaption class="egraph-message left">
+							
+								<h2><strong>B.</strong> David Price will write <span>&raquo;</span></h2>
+								
+								<p>Happy Birthday Joshua! Keep swinging for the fences. Lorem ium dolor etsun et tepera.</p>
+							
+							</figcaption>
+
+							<figcaption class="recepient-name right">
+							
+								<h2><strong>B.</strong> Recepient's Name <span>&raquo;</span></h2>
+								
+								<p>Joshua Johnson</p>
+							
+							</figcaption>
+						
+						</figure>
+	
+	  				<form action="./" method="post" class="wrap">
+	  				
+	  					<div class="clearfix">
+
+			  				<p class="price right">$50.00</p>
+	  				
+			  				<div class="left">
+			  				
+			  					<h2>Your message to David Price:</h2>
+			  				
+			  					<p>Dear David – you rock! Can’t wait to see you in Oakland! Joshua Johnson</p>
+			  				
+			  				</div>
+		  				
+	  					</div>
+		  				
+	  					<fieldset class="left">
+	  					
+	  						<label>Would you like to order a high quality print of your Egraph?</label>
+	  						<p><input id="order-print" type="checkbox" name="printed" value="yes"></p>
+	  					
+	  					</fieldset>
+	  					
+	  					<fieldset class="right">
+	  					
+	  						<p>Guaranteed Delivery:<br /> <strong>June 19, 2012</strong></p>
+	  					
+	  						@tags.html.arrow_button(caption="Checkout", target="#", classes="button")
+	  					
+	  					</fieldset>
+						
+	  				</form> <!-- end .wrap -->
+
+  				</div> <!-- end .review -->
+
+					<footer class="clearfix">
+					
+						<p>Secured by: <a href="#" class="logo-entrust">Entrust</a></p>
+						
+						<p>Accepted payment types:</p>
+						
+						<ul>
+							<li class="visa">Visa</li>
+							<li class="mastercard">Mastercard</li>
+							<li class="amex">American Express</li>
+							<li class="discover">Discover</li>
+						</ul>
+							
+					</footer>
+  			
+        </section> <!-- end #checkout -->
+
+    	</div> <!-- end #main -->
+    
+    </div> <!-- end #content -->
+}
+
+@base_celebrity_storefront_template(
+  title="Review Order",
+  jsMain="pages/celebrity-storefront-review",
+  body=baseBody
+)

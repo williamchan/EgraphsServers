@@ -3,10 +3,6 @@
 @import views.frontend.tags.html.storefront_breadcrumbs_responsive
 @import views.frontend.tags
 
-@headJs = {
-  Egraphs.page.celeb = "David Price";
-}
-
 @baseBody = {
     <div id="content" class="top" role="main">
     
@@ -17,7 +13,7 @@
 				 @storefront_breadcrumbs_responsive()
 				 		
   				<header>	
-  				  <h1>Personalize Your Egraph</h1>
+  				  <h1>Checkout</h1>
   				  <h2>David Price | First MLB Victory</h2>  				
   				</header>
   				  				
@@ -26,97 +22,80 @@
 						<div class="clearfix">
 					
 	    				<form class="main" method="post" action="./">
-	
-							<div class="order-overview clearfix">
-								
-								<figure>
-								
-									<img src='@asset("public/images/fpo-egraph.png")' alt="fpo-egraph" />
-								
-									<figcaption class="recepient-information">
-										A<span>. Recipient Information</span>
-									</figcaption>
-									
-									<figcaption class="egraph-message">
-										B<span>. Egraph Message</span>	    						  	
-									</figcaption>
-								
-								</figure>
-							
-							</div>
-	
+	    					
 	    				  <fieldset>
-	
-	    				    <legend>A<span>. Recipient Information</span></legend>
 	    				  
+		    					<h3>Where do you want to ship your Egraph?</h3>
+	    				    
 	    				    <div class="field">
 	      				    <div class="clearfix">
-	      				      <label class="instructions" for="gift">Is This a Gift? <small>Current guaranteed delivery: 04/22/12</small></label>
+	      				      <label class="instructions" for="first-name">First Name:</label>
 	      				      <div class="input">
-	      				        <input id="gift" type="checkbox" name="gift" value="yes" checked="checked">
-	      				        <p><small><a href="#" class="tip">How does gifting work?</a></small></p>
+	        				      <input id="first-name" type="text" name="fname">
+	      				      </div>
+	      				    </div>
+	    				    </div> <!-- end .field -->
+
+	    				    <div class="field">
+	      				    <div class="clearfix">
+	      				      <label class="instructions" for="last-name">Last Name:</label>
+	      				      <div class="input">
+	        				      <input id="last-name" type="text" name="lname">
 	      				      </div>
 	      				    </div>
 	    				    </div> <!-- end .field -->
 	    				    
 	    				    <div class="field">
 	      				    <div class="clearfix">
-	      				      <label class="instructions" for="recepient-name">Gift Recipient's Name:</label>
+	      				      <label class="instructions" for="email">Email:</label>
 	      				      <div class="input">
-	        				      <input id="recepient-name" type="text" name="email">
+	        				      <input id="email" type="email" name="email">
 	      				      </div>
 	      				    </div>
 	    				    </div> <!-- end .field -->
 	    				    
-	    				    <div class="field last">
+	    				    <div class="field">
 	      				    <div class="clearfix">
-	      				      <label class="instructions" for="recepient-email">Gift Recipient's Email:</label>
-	      				      <div class="input control-group error">
-	      				        <input id="recepient-email" type="text" name="email">
-	      				        <div class="alert alert-error">
-	        				        <button type="button" class="close" data-dismiss="alert">&times;</button>
-	        				        <strong>Oh snap!</strong> Change a few things up and try submitting again.
-	        				      </div>
+	      				      <label class="instructions" for="address">Address:</label>
+	      				      <div class="input">
+		      				      <p>
+		        				      <input id="address" type="text" name="address">
+		      				      </p>
+		      				      <p>
+		        				      <input id="address2" type="text" name="address2">
+		      				      </p>
 	      				      </div>
 	      				    </div>
-	    				    </div> <!-- end .field -->
-	    				  
-	    				  </fieldset>
+	    				    </div> <!-- end .field -->	 
+	    				       				  
+	    				  </fieldset>	  
 	
 	    				  <fieldset>
-	
-	    				    <legend>B<span>. Egraph Message</span></legend>
 	    				  
-	    				    <div class="field last">
+	    				  	<h3>Billing Information</h3>
+	    				    
+	    				    <div class="field">
 	      				    <div class="clearfix">
-	      				      <label class="instructions">David Price Should Write: <small>140 character limit.</small> <small>All messages are subject to approval.</small></label>
-	                    <div class="input">
-	                      <div id="message-options" class="btn-group" data-toggle="buttons-radio">
-	                        <button type="button" value="specific" class="btn btn-primary btn-custom-radio active">A specific<br /> message</button>
-	                        <button type="button" value="anything" class="btn btn-primary btn-custom-radio">Anything he<br /> wants</button>
-	                        <button type="button" value="signature" class="btn btn-primary btn-custom-radio">Signature<br /> only</button>
-	                      </div>
-	      				        <div id="egraph-message">
-	      				          <textarea id="egraph-message-text" name="message" rows="8" cols="1"></textarea>
-	      				          <p class="align-right"><small><a href="#" class="tip">How do I know it's really him?</a></small></p>
-	      				        </div>
-	      				        <input type="hidden" id="message-type" name="message-type" value="specific">
+	      				      <label class="instructions" for="card-type">Card Type:</label>
+	      				      <div class="input">
+	        				      <select id="card-type" name="card-type">
+	        				      	<option>Visa</option>
+	        				      	<option>Mastercard</option>
+	        				      	<option>American Express</option>
+	        				      	<option>Discover</option>
+	        				      </select>
 	      				      </div>
 	      				    </div>
 	    				    </div> <!-- end .field -->
-	    				          				  
-	    				  </fieldset>
-	
-	    				  <fieldset class="last">
-	    				  
-	    				    <div class="field last">
+
+	    				    <div class="field">
 	      				    <div class="clearfix">
-	      				      <label class="instructions" for="your-message">Your Note to David Price: <small>140 character limit.</small> <small>All messages are subject to approval.</small></label>
+	      				      <label class="instructions" for="card-number">Card Number:</label>
 	      				      <div class="input">
-	      				        <textarea id="your-message" name="message" rows="8" cols="1"></textarea>
+	        				      <input id="card-number" type="text" name="card-number">
 	      				      </div>
 	      				    </div>
-	    				    </div> <!-- end .field -->     				    
+	    				    </div> <!-- end .field -->	
 	    				  
 	    				  </fieldset>
 	    				  
@@ -124,7 +103,7 @@
 	    				  
 	    				  	<div class="clearfix">
 	    				  
-	    				 			@tags.html.arrow_button(caption="Review", target="#", classes="button right")
+	    				 			@tags.html.arrow_button(caption="Finalize Order", target="#", classes="button right")
 	    				 		
 	    				  	</div>
 	    				  
@@ -213,8 +192,7 @@
 }
 
 @base_celebrity_storefront_template(
-  title="Personalize",
-  jsMain="pages/celebrity-storefront-personalize",
-  headJs=headJs,
+  title="Checkout",
+  jsMain="pages/celebrity-storefront-checkout",
   body=baseBody
 )
