@@ -1,4 +1,4 @@
-@(form:models.frontend.account.AccountSettingsForm)(implicit session: play.mvc.Scope.Session)
+@(form:models.frontend.account.AccountSettingsForm, displayableErrors: List[String] = List())(implicit session: play.mvc.Scope.Session)
 
 @import views.frontend.tags
 @import views.frontend.tags.ng
@@ -27,13 +27,26 @@
   };
 }
 
+@errors = {
+  @if(displayableErrors.length > 0) {
+    <span style="
+      display: inline-block;
+      margin-left: 5px;
+      color: red;
+      border: 1px solid red;
+      padding: 2px;
+      ">Errors: @displayableErrors.mkString(", ")</span>
+  }
+}
+
 @baseBody = {
   <script>@init</script>
   <section ng-cloak id="content" role="main" ng-controller="Controller">
     <div id="main">
       <div class="container" id="settings-page">
         <header id="settings-top">
-          <h1>Account Settings</h1>
+          <h1 style="display: inline-block;">Account Settings</h1>
+          @errors
         </header>
       @tags.html.safeForm("method" -> "POST", "action" -> "/account/settings"){
         <section class="settings-group" id="personal-information">

@@ -21,7 +21,6 @@ class CustomerRequestFilters @Inject()(customerStore: CustomerStore) {
     customerOption match {
       case None => {
         session.clear()
-        // TODO(wchan): Test this
         session.put(WebsiteControllers.redirectUponLogin, request.url)
         new Redirect(GetLoginEndpoint.url().url)
       }

@@ -1,13 +1,15 @@
 package services.http.forms
 
-import utils.EgraphsUnitTest
+import utils.{TestData, EgraphsUnitTest}
 import services.AppConfig
 import java.text.SimpleDateFormat
 import play.data.binding.types.DateBinder
 import models.{CustomerStore, AccountAuthenticationError, Account, AccountStore}
+import services.db.{TransactionSerializable, DBSession}
 
 class FormChecksTest extends EgraphsUnitTest {
   def check = AppConfig.instance[FormChecks]
+  private val db = AppConfig.instance[DBSession]
 
   "isInt" should "only accept integer strings and return them as Ints" in {
     check.isInt("1") should be (Right(1))
@@ -149,4 +151,19 @@ class FormChecksTest extends EgraphsUnitTest {
     check.isAtLeast(legalAge, 20).isLeft should be (true)
   }
 
+  "isUniqueEmail" should "yield the string if it does not already exist in account.email" in {
+    db.connected(TransactionSerializable) {
+      check.isUniqueEmail("new@egraphs.com") should be(Right("new@egraphs.com"))
+      val account = TestData.newSavedAccount()
+      check.isUniqueEmail(account.email).isLeft should be(true)
+    }
+  }
+
+  "isUniqueUsername" should "yield the string if it does not already exist in customer.username" in {
+    db.connected(TransactionSerializable) {
+      check.isUniqueUsername("me") should be(Right("me"))
+      val customer = TestData.newSavedCustomer()
+      check.isUniqueUsername(customer.username).isLeft should be(true)
+    }
+  }
 }

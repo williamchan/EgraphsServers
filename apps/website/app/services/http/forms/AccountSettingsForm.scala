@@ -98,11 +98,12 @@ class AccountSettingsForm(val paramsMap: Form.Readable, check: FormChecks, custo
   // Form[ValidatedAccountSettingsForm] members
   //
   protected def formAssumingValid: AccountSettingsForm.Validated = {
-    // Safely access the account value in here
+    // todo(wchan): Where does this weird string come from??
     val stateStr = state.value.get match {
       case Some("? string: ?") => ""
       case _ => state.value.get.getOrElse("")
     }
+    // Safely access the account value in here
     AccountSettingsForm.Validated(
       fullname = fullname.value.get,
       username = username.value.get,

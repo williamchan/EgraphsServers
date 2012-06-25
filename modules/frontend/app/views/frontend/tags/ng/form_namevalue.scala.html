@@ -1,14 +1,12 @@
 @(model: String, name:String, label: String, inputType: String ="text", helper: String = "")
 
 <a id="@name-display" class="row-settings row-fluid edit">
-    <span class="span3">@label</span>
-    <span class="span4 setting-val">{{@model}}</span>
-      <span class="span3 help-inline">
-    @helper
+  <span class="span3">@label</span>
+  <span class="span4 setting-val">{{@model}}</span>
+  <span class="span3 help-inline">@helper</span>
+  <span class="span2 action">
+    <i class="icon-pencil"></i> Edit
   </span>
-    <span class="span2 action">
-      <i class="icon-pencil"></i> Edit
-    </span>
 </a>
 
 <div id="@name-edit" class="row-settings row-fluid hide">
@@ -16,9 +14,7 @@
   <span class="span4">
     <input ng-model="@model" name="@name" type="@inputType"/>
   </span>
-  <span class="span3 help-inline">
-    @helper
-  </span>
+  <span class="span3 help-inline">@helper</span>
   <span class="span2 action">
     @form_cancel(model, name)
   </span>

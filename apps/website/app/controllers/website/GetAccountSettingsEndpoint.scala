@@ -21,7 +21,14 @@ private[controllers] trait GetAccountSettingsEndpoint { this: Controller =>
 
     customerFilters.requireCustomerLogin { (customer, account) =>
 //    customerFilters.tmp { (customer, account) =>
-      views.frontend.html.account_settings(form = makeFormView(customer, account))
+      val form = makeFormView(customer, account)
+      val displayableErrors = (List(form.fullname.error, form.username.error, form.email.error,
+        form.oldPassword.error, form.newPassword.error, form.passwordConfirm.error,
+        form.addressLine1.error,form.addressLine2.error, form.city.error, form.state.error, form.postalCode.error,
+        form.galleryVisibility.error, form.notice_stars.error) ::: form.generalErrors.toList)
+        .asInstanceOf[List[Option[FormError]]].filter(e => e.isDefined).map(e => e.get.description)
+
+      views.frontend.html.account_settings(form=form, displayableErrors)
     }
   }
 
@@ -30,14 +37,14 @@ private[controllers] trait GetAccountSettingsEndpoint { this: Controller =>
     val maybeFormData = accountSettingsForms.getFormReader(customer, account).read(flash.asFormReadable).map { form =>
       val nonFieldSpecificErrors = form.fieldInspecificErrors.map(error => error.asViewError)
 
-      // TODO: asViewField should probably handle these
+      // TODO: asViewField should probably handle these... where does weird string come from
       val stateViewField = form.state.value.get match {
         case Some("? string: ?") => form.state.asViewField.copy(values = List(""))
         case _ => form.state.asViewField
       }
       val noticeStarsViewField = form.noticeStars.value.get match {
-        case None => form.noticeStars.asViewField.copy(values = List("false"))
-        case _ => form.noticeStars.asViewField
+        case Some("on") => form.noticeStars.asViewField.copy(values = List("true")) // "on" comes from checkbox
+        case _ => form.noticeStars.asViewField.copy(values = List("false"))         // value is missing if checkbox is unchecked
       }
       AccountSettingsFormView(
         fullname = form.fullname.asViewField,

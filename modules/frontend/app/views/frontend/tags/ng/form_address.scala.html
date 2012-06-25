@@ -9,25 +9,25 @@
       @Utils.binding(model, ".line1")<br>
       @Utils.binding(model, ".line2")<br>
       @Utils.binding(model, ".city"), @Utils.binding(model, ".state") @Utils.binding(model, ".postalCode")
-      </address>
+    </address>
   </span>
   <span class="span2 action">
-      <i class="icon-pencil">
-      </i> Edit
+    <i class="icon-pencil"></i> Edit
   </span>
 </a>
+
 <div id="@name-edit" class="row-settings row-fluid hide">
   <span class="span1"></span>
-      <span class="span9">
-        <address>
-          @form_input(label="Address Line 1", model={model+".line1"}, name={name+".line1"})
-          @form_input(label="Address Line 2", model={model+".line2"}, name={name+".line2"})
-          @form_input(label="City", model={model+".city"}, name={name+".city"})
-          @statepicker(label="State", model={model+".state"}, name={name+".state"})
-          @form_input(label="Zip", model={model+".postalCode"}, name={name+".postalCode"})
-        </address>
-      </span>
-      <span class="span2 action">
-        @form_cancel(model, name)
-      </span>
+  <span class="span9">
+    <address>
+      @form_input(label="Address Line 1", model={model+".line1"}, name={name+".line1"})
+      @form_input(label="Address Line 2", model={model+".line2"}, name={name+".line2"})
+      @form_input(label="City", model={model+".city"}, name={name+".city"})
+      @statepicker(label="State", model={model+".state"}, name={name+".state"})
+      @form_input(label="Zip", model={model+".postalCode"}, name={name+".postalCode"})
+    </address>
+  </span>
+  <span class="span2 action">
+    @form_cancel(model, name)
+  </span>
 </div>
