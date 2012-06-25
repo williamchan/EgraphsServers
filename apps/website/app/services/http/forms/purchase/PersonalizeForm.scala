@@ -3,7 +3,6 @@ package services.http.forms.purchase
 import com.google.inject.Inject
 import services.http.forms.{FormError, ReadsForm, FormChecks, Form}
 import models.enums.{WrittenMessageChoice, RecipientChoice}
-import models.enums.RecipientChoice.EnumVal
 
 
 class PersonalizeForm(val paramsMap: Form.Readable, check: FormChecks)
