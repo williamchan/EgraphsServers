@@ -16,7 +16,6 @@ private[controllers] trait PostAccountSettingsEndpoint { this: Controller =>
 
   def postAccountSettings() = postController() {
     customerFilters.requireCustomerLogin { (customer, account) =>
-//    customerFilters.tmp { (customer, account) =>
       // Read a AccountSettingsForm from the params
       val nonValidatedForm = accountSettingsForms(params.asFormReadable, customer, account)
 

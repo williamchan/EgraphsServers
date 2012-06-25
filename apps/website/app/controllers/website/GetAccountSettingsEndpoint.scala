@@ -20,7 +20,6 @@ private[controllers] trait GetAccountSettingsEndpoint { this: Controller =>
   def getAccountSettings = controllerMethod() {
 
     customerFilters.requireCustomerLogin { (customer, account) =>
-//    customerFilters.tmp { (customer, account) =>
       val form = makeFormView(customer, account)
       val displayableErrors = (List(form.fullname.error, form.username.error, form.email.error,
         form.oldPassword.error, form.newPassword.error, form.passwordConfirm.error,

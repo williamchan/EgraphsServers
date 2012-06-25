@@ -27,9 +27,4 @@ class CustomerRequestFilters @Inject()(customerStore: CustomerStore) {
       case Some(customer) => continue(customer, customer.account)
     }
   }
-
-  def tmp(continue: (Customer, Account) => Any) = {
-    val customer = customerStore.get(1L)
-    continue(customer, customer.account)
-  }
 }

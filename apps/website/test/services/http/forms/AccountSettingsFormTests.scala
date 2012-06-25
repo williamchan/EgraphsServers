@@ -11,6 +11,8 @@ class AccountSettingsFormTests extends EgraphsUnitTest
 
   import AccountSettingsForm.Fields
 
+  // Need help writing these tests. How do I instantiate a AccountSettingsForm?
+
 //  "Required parameters" should "be required" in {
 //    val customer = TestData.newSavedCustomer()
 //    val account = customer.account
