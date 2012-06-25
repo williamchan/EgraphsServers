@@ -318,7 +318,7 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
   def getEgraphsAndOrders(recipientId: Long) : Query[(Order, Option[Egraph])] = {
     join(schema.orders, schema.egraphs.leftOuter) (
       (order, egraph) =>
-        where(order.recipientId === recipientId and egraph.map(_._egraphState) === EgraphState.Published.name)
+        where(order.recipientId === recipientId)
           select(order, egraph)
           on(order.id === egraph.map(_.orderId))
     )

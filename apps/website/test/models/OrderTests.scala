@@ -1,6 +1,6 @@
 package models
 
-import enums.{EgraphState, OrderReviewStatus, PaymentStatus}
+import enums.{EnrollmentStatus, EgraphState, OrderReviewStatus, PaymentStatus}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
@@ -370,7 +370,24 @@ class OrderTests extends UnitFlatSpec
   }
 
   "getEgraphsandOrders" should "returns orders and their associated egraphs" in {
-    val buyer = TestData.newSavedCustomer()
+    val (buyer, recipient, celebrity, product) = newOrderStack
+    val admin = Administrator().save()
+    celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
+
+    val order = buyer.buy(product, recipient=recipient).save()
+    val order1 = recipient.buy(product, recipient=recipient).save()
+
+    val egraph = order.newEgraph.save()
+    egraph.verifyBiometrics.approve(admin).publish(admin).save()
+
+    val results = orderStore.getEgraphsAndOrders(recipient.id)
+
+    results.size should be (2)
+
+    val queried_egraph = results.head._2.get
+
+    queried_egraph.id should be (1)
+
 
   }
 
