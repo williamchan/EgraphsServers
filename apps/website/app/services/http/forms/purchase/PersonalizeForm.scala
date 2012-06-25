@@ -9,13 +9,13 @@ import models.enums.RecipientChoice.EnumVal
 class PersonalizeForm(val paramsMap: Form.Readable, check: FormChecks)
   extends Form[PersonalizeForm.Validated]
 {
-  import PersonalizeForm.Fields
+  import PersonalizeForm.Params
 
   //
   // Field values and validations
   //
   val recipientChoice = new Field[RecipientChoice.EnumVal]() {
-    val name = Fields.IsGift
+    val name = Params.IsGift
 
     def validate: Either[FormError, RecipientChoice.EnumVal] = {
       for (isGift <- check.isChecked(stringsToValidate.headOption).right) yield {
@@ -24,7 +24,7 @@ class PersonalizeForm(val paramsMap: Form.Readable, check: FormChecks)
     }
   }
 
-  val recipientName = new RequiredField[String](Fields.RecipientName) {
+  val recipientName = new RequiredField[String](Params.RecipientName) {
     def validateIfPresent: Either[FormError, String] = {
       for (_ <- check.isAtLeast(2, stringToValidate.length, "Must be at least 2 characters").right)
       yield {
@@ -34,7 +34,7 @@ class PersonalizeForm(val paramsMap: Form.Readable, check: FormChecks)
   }
 
   val recipientEmail = new Field[Option[String]] {
-    val name = Fields.RecipientEmail
+    val name = Params.RecipientEmail
 
     def validate: Either[FormError, Option[String]] = {
       val emailOption = stringsToValidate.headOption
@@ -65,7 +65,7 @@ class PersonalizeForm(val paramsMap: Form.Readable, check: FormChecks)
     }
   }
 
-  val writtenMessageChoice = new RequiredField[WrittenMessageChoice.EnumVal](Fields.WrittenMessageChoice) {
+  val writtenMessageChoice = new RequiredField[WrittenMessageChoice.EnumVal](Params.WrittenMessageChoice) {
     def validateIfPresent: Either[FormError, WrittenMessageChoice.EnumVal] = {
       for (messageChoice <- check.isSomeValue(
                               WrittenMessageChoice(stringToValidate),
@@ -79,7 +79,7 @@ class PersonalizeForm(val paramsMap: Form.Readable, check: FormChecks)
 
   // Necessary only if writtenMessageChoice was specified, then it must be no more than 140 characters
   val writtenMessage = new Field[Option[String]] {
-    val name = Fields.WrittenMessage
+    val name = Params.WrittenMessage
 
     def validate: Either[FormError, Option[String]] = {
       val messageTextOption = stringsToValidate.headOption
@@ -95,7 +95,7 @@ class PersonalizeForm(val paramsMap: Form.Readable, check: FormChecks)
     }
 
     private def validateWrittenMessageGivenMessageChoice(
-      writtenMessageOption: Option[String],
+      messageOption: Option[String],
       messageChoice: WrittenMessageChoice.EnumVal
     ): Either[FormError, Option[String]] = {
       import WrittenMessageChoice._
@@ -106,10 +106,10 @@ class PersonalizeForm(val paramsMap: Form.Readable, check: FormChecks)
 
         case SpecificMessage =>
           for (writtenMessage <- check.isSomeValue(
-                                   writtenMessageOption,
+                                   messageOption,
                                    "Required if you want a specific message written"
                                  ).right;
-               messageChoice <- validateMessageOrNoteLength(writtenMessage).right)
+               _ <- validateMessageOrNoteLength(writtenMessage).right)
           yield {
             Some(writtenMessage)
           }
@@ -117,7 +117,7 @@ class PersonalizeForm(val paramsMap: Form.Readable, check: FormChecks)
     }
   }
 
-  val noteToCelebrity = new OptionalField[String](Fields.NoteToCelebrity) {
+  val noteToCelebrity = new OptionalField[String](Params.NoteToCelebrity) {
     def validateIfPresent: Either[FormError, String] = {
       validateMessageOrNoteLength(stringToValidate)
     }
@@ -144,7 +144,7 @@ class PersonalizeForm(val paramsMap: Form.Readable, check: FormChecks)
 
 
 object PersonalizeForm {
-  object Fields {
+  object Params {
     val IsGift = "order.personalize.isGift"
     val RecipientName = "order.personalize.recipient.name"
     val RecipientEmail = "order.personalize.recipient.email"
