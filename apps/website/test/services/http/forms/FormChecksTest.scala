@@ -111,6 +111,14 @@ class FormChecksTest extends EgraphsUnitTest {
     check.isEmailAddress("Herp derpson").isLeft should be (true)
   }
 
+  "isAlphaNumeric" should "yield string if it passes regex otherwise an error" in {
+    val str = "asdflkjh12340987zxcoiu"
+    check.isAlphaNumeric(str) should be (Right(str))
+    check.isAlphaNumeric("@").isLeft should be (true)
+    check.isAlphaNumeric("?").isLeft should be (true)
+    check.isAlphaNumeric("&").isLeft should be (true)
+  }
+
   "isPhoneNumber" should "yield a phone number if syntactically valid otherwise an error" in {
     check.isPhoneNumber("650-223-4456") should be (Right("650-223-4456"))
     check.isPhoneNumber("herp derpson").isLeft should be (true)

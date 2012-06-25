@@ -29,7 +29,8 @@ class AccountSettingsForm(val paramsMap: Form.Readable, check: FormChecks, custo
       if (customer.username == stringToValidate) {
         Right(stringToValidate)
       } else {
-        for (valid <- check.isUniqueUsername(stringToValidate).right) yield valid
+        for (valid <- check.isAlphaNumeric(stringToValidate, "Username must be letters or numbers").right;
+             valid2 <- check.isUniqueUsername(stringToValidate, "Username already taken").right) yield valid
       }
     }
   }
@@ -40,7 +41,7 @@ class AccountSettingsForm(val paramsMap: Form.Readable, check: FormChecks, custo
         Right(stringToValidate)
       } else {
         for (valid <- check.isEmailAddress(stringToValidate).right;
-             valid2 <- check.isUniqueEmail(stringToValidate).right) yield valid
+             valid2 <- check.isUniqueEmail(stringToValidate, "Email already taken").right) yield valid
       }
     }
   }

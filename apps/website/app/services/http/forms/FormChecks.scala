@@ -144,6 +144,15 @@ class FormChecks @Inject()(accountStore: AccountStore, customerStore: CustomerSt
     }
   }
 
+  def isAlphaNumeric(toValidate: String, message: String="Must be alphanumeric")
+  : Either[FormError, String] = {
+    if (playValidation.`match`(toValidate, "[a-zA-Z0-9]*").ok) {
+      Right(toValidate)
+    } else {
+      Left(new SimpleFormError(message))
+    }
+  }
+
   /**
    * Returns the provided string unaltered if it was a valid phone number according
    * to Play.
