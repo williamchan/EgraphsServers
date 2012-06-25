@@ -89,7 +89,7 @@ class FormChecksTest extends EgraphsUnitTest {
     mockAccountStore.authenticate(email, pass) returns Right(mockAccount)
 
     // Instantiate a new check instance that uses our mock
-    val check = new FormChecks(mockAccountStore)
+    val check = new FormChecks(mockAccountStore, null)
 
     // Check expectations
     check.isValidAccount(email, pass) should be (Right(mockAccount))

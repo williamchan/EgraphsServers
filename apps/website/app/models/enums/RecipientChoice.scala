@@ -3,14 +3,8 @@ package models.enums
 import services.Utils
 
 object RecipientChoice extends Utils.Enum {
-  sealed trait EnumVal extends Value
+  sealed abstract class EnumVal(val name: String) extends Value
 
-  val Self = new EnumVal {
-    val name = "Self"
-  }
-
-  // Let the celebrity write whatever they want
-  val Other = new EnumVal {
-    val name = "Other"
-  }
+  object Self extends EnumVal("Self")
+  object Other extends EnumVal("Other")
 }

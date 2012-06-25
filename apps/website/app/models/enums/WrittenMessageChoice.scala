@@ -3,20 +3,14 @@ package models.enums
 import services.Utils
 
 object WrittenMessageChoice extends Utils.Enum {
-  sealed trait EnumVal extends Value
+  sealed abstract class EnumVal(val name: String) extends Value
 
-  val SpecificMessage = new EnumVal {
-    val name = "SignatureWithMessage"
-  }
+  object SpecificMessage extends EnumVal("SignatureWithMessage")
 
   // Let the celebrity write whatever they want
-  val CelebrityChoosesMessage = new EnumVal {
-    val name = "SignatureWithArbitraryMessage"
-  }
+  object CelebrityChoosesMessage extends EnumVal("SignatureWithArbitraryMessage")
 
-  val SignatureOnly = new EnumVal {
-    val name = "SignatureOnly"
-  }
+  object SignatureOnly extends EnumVal("SignatureOnly")
 }
 
 trait HasWrittenMessageChoice[T] {

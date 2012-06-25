@@ -251,6 +251,10 @@ case class Product(
     (totalInventory - numOrders, activeInventoryBatches)
   }
 
+  def remainingInventoryCount: Int = {
+    this.getRemainingInventoryAndActiveInventoryBatches()._1
+  }
+
   //
   // KeyedCaseClass[Long] methods
   //

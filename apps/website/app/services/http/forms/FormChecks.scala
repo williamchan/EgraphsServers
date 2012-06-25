@@ -6,7 +6,8 @@ import play.data.binding.types.DateBinder
 import java.text.{ParseException, SimpleDateFormat}
 import java.util.Date
 import play.libs.I18N
-import models.{Account, AccountStore}
+import models.{ProductStore, Account, AccountStore, Product}
+import services.Utils
 
 /**
  * A set of checks used by [[services.http.forms.Form]] to validate its
@@ -14,7 +15,14 @@ import models.{Account, AccountStore}
  *
  * @param accountStore the store for Accounts.
  */
-class FormChecks @Inject()(accountStore: AccountStore) {
+class FormChecks @Inject()(accountStore: AccountStore, productStore: ProductStore) {
+
+  def isSomeValue[T](toValidate: Option[T], message: String="Was not a value")
+  : Either[FormError, T] =
+  {
+    toValidate.map(value => Right(value)).getOrElse(error(message))
+  }
+
 
   /**
    * Returns an Integer if the String could be turned into one.
@@ -25,7 +33,7 @@ class FormChecks @Inject()(accountStore: AccountStore) {
     try {
       Right(string.toInt)
     } catch {
-      case _:NumberFormatException => Left(new SimpleFormError(message))
+      case _:NumberFormatException => error(message)
     }
   }
 
@@ -38,7 +46,7 @@ class FormChecks @Inject()(accountStore: AccountStore) {
     try {
       Right(toValidate.toLong)
     } catch {
-      case _:NumberFormatException => Left(new SimpleFormError(message))
+      case _:NumberFormatException => error(message)
     }
   }
 
@@ -56,8 +64,22 @@ class FormChecks @Inject()(accountStore: AccountStore) {
         Right(false)
 
       case _ =>
-        Left(new SimpleFormError(message))
+        error(message)
     }
+  }
+
+  // If the string was present it checks for the positive value,
+  // but if it was not present it defaults to false. This is because of the wya
+  // that forms work.
+  def isChecked(toValidate: Option[String], message:String="Was not checked")
+  : Either[FormError, Boolean] =
+  {
+    toValidate.map(string => isBoolean(string, message)).getOrElse(Right(false))
+  }
+
+  def isTrue(toValidate:Boolean, message: String="Should have been true")
+  : Either[FormError, Boolean] = {
+    if (toValidate) Right(toValidate) else error(message)
   }
 
   /**
@@ -90,7 +112,7 @@ class FormChecks @Inject()(accountStore: AccountStore) {
       Right(dateFormat.parse(toValidate))
     } catch {
       case _:ParseException =>
-        Left(new SimpleFormError(message))
+        error(message)
     }
   }
 
@@ -114,10 +136,17 @@ class FormChecks @Inject()(accountStore: AccountStore) {
   : Either[FormError, Account] =
   {
     accountStore.authenticate(email, password) match {
-      case Left(_) => Left(new SimpleFormError(message))
+      case Left(_) => error(message)
       case Right(account) => Right(account)
     }
   }
+
+  def isProductId(productId: Long, message: String="Product ID was invalid"): Either[FormError, Product] = {
+    productStore.findById(productId).map(prod => Right(prod)).getOrElse {
+      error(message)
+    }
+  }
+
 
   /**
    * Returns the customer ID if the provided account had a customer face
@@ -126,7 +155,7 @@ class FormChecks @Inject()(accountStore: AccountStore) {
   : Either[FormError, Long] =
   {
     toValidate.customerId match {
-      case None => Left(new SimpleFormError(message))
+      case None => error(message)
       case Some(id) => Right(id)
     }
   }
@@ -140,7 +169,7 @@ class FormChecks @Inject()(accountStore: AccountStore) {
     if (playValidation.email(toValidate).ok) {
       Right(toValidate)
     } else {
-      Left(new SimpleFormError(message))
+      error(message)
     }
   }
 
@@ -154,7 +183,7 @@ class FormChecks @Inject()(accountStore: AccountStore) {
     if (playValidation.phone(toValidate).ok) {
       Right(toValidate)
     } else {
-      Left(new SimpleFormError(message))
+      error(message)
     }
   }
 
@@ -164,7 +193,7 @@ class FormChecks @Inject()(accountStore: AccountStore) {
   def isAtMost(maximum: Int, toValidate: Int, message: String = "Over maximum value")
   : Either[FormError, Int] =
   {
-    if(toValidate > maximum) Left(new SimpleFormError(message)) else Right(toValidate)
+    if(toValidate > maximum) error(message) else Right(toValidate)
   }
 
   /**
@@ -173,13 +202,19 @@ class FormChecks @Inject()(accountStore: AccountStore) {
   def isAtLeast(minimum: Int, toValidate: Int, message: String = "Under minimum value")
   : Either[FormError, Int] =
   {
-    if(toValidate < minimum) Left(new SimpleFormError(message)) else Right(toValidate)
+    if(toValidate < minimum) error(message) else Right(toValidate)
   }
 
   //
   // Private members
   //
-  private def playValidation = Validation.current()
+  private def playValidation = {
+    Validation.current()
+  }
+
+  private def error(message: String): Left[FormError, Nothing] = {
+    Left(new SimpleFormError(message))
+  }
 }
 
 object FormChecks {
