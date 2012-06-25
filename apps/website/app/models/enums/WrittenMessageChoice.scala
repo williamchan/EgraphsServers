@@ -2,8 +2,10 @@ package models.enums
 
 import services.Utils
 
+sealed abstract class WrittenMessageChoice(val name: String)
+
 object WrittenMessageChoice extends Utils.Enum {
-  sealed abstract class EnumVal(val name: String) extends Value
+  sealed abstract class EnumVal(name: String) extends WrittenMessageChoice(name) with Value
 
   object SpecificMessage extends EnumVal("SignatureWithMessage")
 
@@ -16,11 +18,11 @@ object WrittenMessageChoice extends Utils.Enum {
 trait HasWrittenMessageChoice[T] {
   def _orderType: String
 
-  def writtenMessageChoice: WrittenMessageChoice.EnumVal = {
+  def writtenMessageChoice: WrittenMessageChoice = {
     WrittenMessageChoice(_orderType).getOrElse(
       throw new IllegalArgumentException(_orderType)
     )
   }
 
-  def withWrittenMessageChoice(enum: WrittenMessageChoice.EnumVal): T
+  def withWrittenMessageChoice(enum: WrittenMessageChoice): T
 }

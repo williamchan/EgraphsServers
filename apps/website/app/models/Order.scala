@@ -250,7 +250,7 @@ case class Order(
     this.copy(_reviewStatus = status.name)
   }
 
-  def withWrittenMessageChoice(enum: WrittenMessageChoice.EnumVal) = {
+  def withWrittenMessageChoice(enum: WrittenMessageChoice) = {
     this.copy(_orderType = enum.name)
   }
 }

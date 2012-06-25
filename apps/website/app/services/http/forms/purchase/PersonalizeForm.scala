@@ -13,10 +13,10 @@ class PersonalizeForm(val paramsMap: Form.Readable, check: FormChecks)
   //
   // Field values and validations
   //
-  val recipientChoice = new Field[RecipientChoice.EnumVal]() {
+  val recipientChoice = new Field[RecipientChoice]() {
     val name = Params.IsGift
 
-    def validate: Either[FormError, RecipientChoice.EnumVal] = {
+    def validate: Either[FormError, RecipientChoice] = {
       for (isGift <- check.isChecked(stringsToValidate.headOption).right) yield {
         if (isGift) RecipientChoice.Other else RecipientChoice.Self
       }
@@ -47,7 +47,7 @@ class PersonalizeForm(val paramsMap: Form.Readable, check: FormChecks)
 
     // Validate the recipient email given whether it was being gifted or not. If it was a gift
     // then the e-mail was required, but if it was bought for self then we don't need the email.
-    private def validateEmailGivenRecipient(email: Option[String], recipientChoice: RecipientChoice.EnumVal)
+    private def validateEmailGivenRecipient(email: Option[String], recipientChoice: RecipientChoice)
     : Either[FormError, Option[String]] =
     {
       recipientChoice match {
@@ -64,8 +64,8 @@ class PersonalizeForm(val paramsMap: Form.Readable, check: FormChecks)
     }
   }
 
-  val writtenMessageChoice = new RequiredField[WrittenMessageChoice.EnumVal](Params.WrittenMessageChoice) {
-    def validateIfPresent: Either[FormError, WrittenMessageChoice.EnumVal] = {
+  val writtenMessageChoice = new RequiredField[WrittenMessageChoice](Params.WrittenMessageChoice) {
+    def validateIfPresent: Either[FormError, WrittenMessageChoice] = {
       for (messageChoice <- check.isSomeValue(
                               WrittenMessageChoice(stringToValidate),
                               "Message choice must be valid"
@@ -95,7 +95,7 @@ class PersonalizeForm(val paramsMap: Form.Readable, check: FormChecks)
 
     private def validateWrittenMessageGivenMessageChoice(
       messageOption: Option[String],
-      messageChoice: WrittenMessageChoice.EnumVal
+      messageChoice: WrittenMessageChoice
     ): Either[FormError, Option[String]] = {
       import WrittenMessageChoice._
 
