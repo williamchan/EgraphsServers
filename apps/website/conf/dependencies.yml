@@ -40,9 +40,10 @@ require:
             - junit -> *
             - org.scalatest -> *
     - play
-    - play -> scala 0.9.1
     - play -> cloudbees 0.2.2
     - play -> mockito 0.1
+    - play -> redis 0.3
+    - play -> scala 0.9.1
     - provided -> mockito-all 1.9.1-SNAPSHOT
     - provided -> scala-guice_2.8.1 0.1
     - provided -> tritonus_share 0.3.6

@@ -6,6 +6,7 @@
 #        'live' - the publicly-facing egraphs server.
 #        'demo' - the demo server, used for hard-wired.
 #        'staging' - the staging server.
+#        'hydrogen' - the hydrogen test server.
 #
 
 
@@ -28,7 +29,7 @@ case "$DEPLOY_TARGET" in
     fi
 
     ;;
-  'demo'|'staging')
+  'demo'|'staging'|'hydrogen')
     # It's always ok to deploy to demo and staging.
 	;;
   *)
@@ -37,7 +38,7 @@ case "$DEPLOY_TARGET" in
     echo ""
     echo "Usage: "
     echo "    tools/deploy [deployment target]"
-    echo "Valid deployment targets are 'live', 'demo', and 'staging'. (omit the single quotes)"
+    echo "Valid deployment targets are 'live', 'demo', 'staging', and 'hydrogen'. (omit the single quotes)"
     exit 1
 	;;  
 esac
