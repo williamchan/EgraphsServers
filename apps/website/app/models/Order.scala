@@ -42,7 +42,7 @@ case class Order(
   _reviewStatus: String = OrderReviewStatus.PendingAdminReview.name,
   rejectionReason: Option[String] = None,
   _privacyStatus: String = PrivacyStatus.Public.name,
-  _orderType: String = OrderType.SignatureWithMessage.name,
+  _writtenMessageRequest: String = WrittenMessageRequest.SpecificMessage.name,
   stripeCardTokenId: Option[String] = None,
   stripeChargeId: Option[String] = None,
   amountPaidInCurrency: BigDecimal = 0,
@@ -57,7 +57,7 @@ case class Order(
   with HasPrivacyStatus[Order]
   with HasPaymentStatus[Order]
   with HasOrderReviewStatus[Order]
-  with HasOrderType[Order]
+  with HasWrittenMessageRequest[Order]
 {
   //
   // Public methods
@@ -196,6 +196,16 @@ case class Order(
     val buyer = customerStore.findById(buyerId).get
     val recipient = if (buyerId != recipientId) customerStore.findById(recipientId).get else buyer
 
+    // Alias CelebrityChoosesMessage to SpecificMessage for now -- iPad doesn't need to know
+    // the difference.
+    val writtenMessageRequestToWrite = writtenMessageRequest match {
+      case WrittenMessageRequest.CelebrityChoosesMessage =>
+        WrittenMessageRequest.SpecificMessage
+
+      case otherValue =>
+        otherValue
+    }
+
     val requiredFields = Map(
       "id" -> id,
       "product" -> product.renderedForApi,
@@ -206,12 +216,12 @@ case class Order(
       "amountPaidInCents" -> amountPaid.getAmountMinor,
       "reviewStatus" -> reviewStatus.name,
       "audioPrompt" -> generateAudioPrompt(),
-      "orderType" -> orderType.name
+      "orderType" -> writtenMessageRequestToWrite.name
     )
 
     val optionalFields = Utils.makeOptionalFieldMap(
       List(
-        "requestedMessage" -> requestedMessage,
+        "requestedMessage" -> writtenMessageRequestText,
         "messageToCelebrity" -> messageToCelebrity
       )
     )
@@ -250,8 +260,24 @@ case class Order(
     this.copy(_reviewStatus = status.name)
   }
 
-  def withOrderType(enum: OrderType.EnumVal) = {
-    this.copy(_orderType = enum.name)
+  def withWrittenMessageRequest(enum: WrittenMessageRequest) = {
+    this.copy(_writtenMessageRequest = enum.name)
+  }
+
+  //
+  // Private members
+  //
+  private def writtenMessageRequestText:Option[String] = {
+    writtenMessageRequest match {
+      case WrittenMessageRequest.SignatureOnly =>
+        None
+
+      case WrittenMessageRequest.CelebrityChoosesMessage =>
+        Some("[Make up a message and write it!]")
+
+      case WrittenMessageRequest.SpecificMessage =>
+        requestedMessage
+    }
   }
 }
 
@@ -348,7 +374,7 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
       theOld._reviewStatus := theNew._reviewStatus,
       theOld.rejectionReason := theNew.rejectionReason,
       theOld._privacyStatus := theNew._privacyStatus,
-      theOld._orderType := theNew._orderType,
+      theOld._writtenMessageRequest := theNew._writtenMessageRequest,
       theOld.stripeCardTokenId := theNew.stripeCardTokenId,
       theOld.stripeChargeId := theNew.stripeChargeId,
       theOld.amountPaidInCurrency := theNew.amountPaidInCurrency,

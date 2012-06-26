@@ -5,6 +5,7 @@ import services.AppConfig
 import play.test.FunctionalTest
 import play.mvc.Scope
 import Form.Conversions._
+import services.http.ServerSession
 
 class FormTests extends EgraphsUnitTest {
   import TestPersonForm.Fields
@@ -155,11 +156,12 @@ class FormTests extends EgraphsUnitTest {
   "Conversions" should "correctly convert a Scope.Flash into a writeable" in {
     // Set up
     val flash = new Scope.Flash
-    val write = flash.asFormWriteable
+    val writeable = flash.asFormWriteable
     val read = flash.asFormReadable
 
-    write("single value", List("herp"))
-    write("multiple value", List("herp", "derp"))
+    writeable
+      .withData("single value" -> List("herp"))
+      .withData("multiple value" -> List("herp", "derp"))
 
     // Check expectations
     read("null").toList should be (List())
@@ -183,6 +185,32 @@ class FormTests extends EgraphsUnitTest {
     read("multiple values").toList should be (List("first", "second"))
   }
 
+  "Conversions" should "correctly convert a ServerSession into a writeable/readable" in {
+    // Set up
+    try {
+      // Run tests
+      val writeable = newServerSession.asFormWriteable
+
+      writeable
+        .withData("single value" -> List("herp"))
+        .withData("multiple value" -> List("herp", "derp"))
+        .written
+        .save()
+
+      // Check expectations
+      val read = newServerSession.asFormReadable
+
+      read("null").toList should be (List())
+      read("single value").toList should be (List("herp"))
+      read("multiple value").toList should be (List("herp", "derp"))
+    } finally {
+      newServerSession.emptied.save()
+    }
+  }
+
+  def newServerSession = {
+    AppConfig.instance[() => ServerSession].apply()
+  }
 
   //
   // A sample form class

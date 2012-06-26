@@ -218,7 +218,7 @@ object Utils extends Utils(Play.configuration) {
     (results, page, total)
   }
 
-  def logException(e: Exception) {
+  def logException(e: Throwable) {
     val stringWriter = new StringWriter()
     e.printStackTrace(new PrintWriter(stringWriter))
     play.Logger.error("Fatal error: " + e.getClass + ": " + e.getMessage)
