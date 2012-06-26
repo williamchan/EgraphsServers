@@ -1,0 +1,198 @@
+@()
+
+@import views.frontend.tags.html.storefront_breadcrumbs_responsive
+@import views.frontend.tags
+
+@baseBody = {
+    <div id="content" class="top" role="main">
+    
+      <div id="main" class="sub">
+      
+        <section id="checkout" class="container" >
+			
+				 @storefront_breadcrumbs_responsive()
+				 		
+  				<header>	
+  				  <h1>Checkout</h1>
+  				  <h2>David Price | First MLB Victory</h2>  				
+  				</header>
+  				  				
+					<div class="col2">
+					
+						<div class="clearfix">
+					
+	    				<form class="main" method="post" action="./">
+	    					
+	    				  <fieldset>
+	    				  
+		    					<h3>Where do you want to ship your Egraph?</h3>
+	    				    
+	    				    <div class="field">
+	      				    <div class="clearfix">
+	      				      <label class="instructions" for="first-name">First Name:</label>
+	      				      <div class="input">
+	        				      <input id="first-name" type="text" name="fname">
+	      				      </div>
+	      				    </div>
+	    				    </div> <!-- end .field -->
+
+	    				    <div class="field">
+	      				    <div class="clearfix">
+	      				      <label class="instructions" for="last-name">Last Name:</label>
+	      				      <div class="input">
+	        				      <input id="last-name" type="text" name="lname">
+	      				      </div>
+	      				    </div>
+	    				    </div> <!-- end .field -->
+	    				    
+	    				    <div class="field">
+	      				    <div class="clearfix">
+	      				      <label class="instructions" for="email">Email:</label>
+	      				      <div class="input">
+	        				      <input id="email" type="email" name="email">
+	      				      </div>
+	      				    </div>
+	    				    </div> <!-- end .field -->
+	    				    
+	    				    <div class="field">
+	      				    <div class="clearfix">
+	      				      <label class="instructions" for="address">Address:</label>
+	      				      <div class="input">
+		      				      <p>
+		        				      <input id="address" type="text" name="address">
+		      				      </p>
+		      				      <p>
+		        				      <input id="address2" type="text" name="address2">
+		      				      </p>
+	      				      </div>
+	      				    </div>
+	    				    </div> <!-- end .field -->	 
+	    				       				  
+	    				  </fieldset>	  
+	
+	    				  <fieldset>
+	    				  
+	    				  	<h3>Billing Information</h3>
+	    				    
+	    				    <div class="field">
+	      				    <div class="clearfix">
+	      				      <label class="instructions" for="card-type">Card Type:</label>
+	      				      <div class="input">
+	        				      <select id="card-type" name="card-type">
+	        				      	<option>Visa</option>
+	        				      	<option>Mastercard</option>
+	        				      	<option>American Express</option>
+	        				      	<option>Discover</option>
+	        				      </select>
+	      				      </div>
+	      				    </div>
+	    				    </div> <!-- end .field -->
+
+	    				    <div class="field">
+	      				    <div class="clearfix">
+	      				      <label class="instructions" for="card-number">Card Number:</label>
+	      				      <div class="input">
+	        				      <input id="card-number" type="text" name="card-number">
+	      				      </div>
+	      				    </div>
+	    				    </div> <!-- end .field -->	
+	    				  
+	    				  </fieldset>
+	    				  
+	    				  <fieldset class="submit">
+	    				  
+	    				  	<div class="clearfix">
+	    				  
+	    				 			@tags.html.arrow_button(caption="Finalize Order", target="#", classes="button right")
+	    				 		
+	    				  	</div>
+	    				  
+	    				  </fieldset>
+	    				  
+	    				</form> <!-- end .main -->
+	    				
+	    				<aside>
+	    				
+	    					<div class="order-overview clearfix">
+	    						  
+	    						  <figure>
+	    						  
+	    						  	<img src="/public/images/fpo-egraph.png" alt="fpo-egraph" />
+	    						  
+	    						  	<figcaption class="recepient-information">
+	    						  		A<span>. Recipient Information</span>
+	    						  	</figcaption>
+	    						  	
+	    						  	<figcaption class="egraph-message">
+	    						  		B<span>. Egraph Message</span>	    						  	
+	    						  	</figcaption>
+	    						  
+	    						  </figure>
+	    						  	
+		    				  	<div class="order-summary">
+		    				  	
+		    				  		<h2>Summary</h2>
+		    				  		
+		    				  		<div class="celebrity-information">
+		    				  			<h3 class="name">David Price</h3>
+		    				  			<p class="product">First MLB Victory</p>
+		    				  		</div>
+		    				  		
+		    				  		<div class="order-totals">		    				  		
+												<table>
+													<tr>
+														<th>Subtotal</th>
+														<td>$50.00</td>
+													</tr>
+													<tr>
+														<th>Shipping</th>
+														<td>$0.00</td>
+													</tr>
+													<tr>
+														<th>Tax</th>
+														<td>$_.__</td>
+													</tr>
+													<tr class="total">
+														<th>Total</th>
+														<td>$50.00</td>
+													</tr>
+												</table>    		    				  		
+		    				  		</div>			  		
+		    				  	
+		    				  	</div>
+		    				  
+	    					</div> <!-- end .order-overview -->
+	    				
+	    				</aside>
+	  			
+						</div> <!-- end .clearfix -->
+						
+						<footer class="clearfix">
+						
+							<p>Secured by: <a href="#" class="logo-entrust">Entrust</a></p>
+							
+							<p>Accepted payment types:</p>
+							
+							<ul>
+								<li class="visa">Visa</li>
+								<li class="mastercard">Mastercard</li>
+								<li class="amex">American Express</li>
+								<li class="discover">Discover</li>
+							</ul>
+								
+						</footer>
+  			
+  				</div> <!-- end .col2 -->
+  			
+        </section> <!-- end #checkout -->
+
+    	</div> <!-- end #main -->
+    
+    </div> <!-- end #content -->
+}
+
+@base_celebrity_storefront_template(
+  title="Checkout",
+  jsMain="pages/celebrity-storefront-checkout",
+  body=baseBody
+)

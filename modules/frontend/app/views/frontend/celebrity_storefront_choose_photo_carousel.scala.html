@@ -1,0 +1,119 @@
+@(celeb: models.frontend.storefront.ChoosePhotoCelebrity,
+  products: Iterable[models.frontend.storefront.ChoosePhotoCarouselProduct],
+  firstCarouselProductIndex: Int,
+  tiledViewLink: String,
+  recentEgraphs: Iterable[models.frontend.storefront.ChoosePhotoRecentEgraph],
+  partnerIcons: Iterable[models.frontend.storefront.ChoosePhotoPartnerIcon]
+)(implicit session: play.mvc.Scope.Session)
+
+@{/**
+    Renders the Choose Photo page in Carousel view.
+
+    celeb - the celebrity viewmodel to be rendered
+    products - the product viewmodels to be rendered
+    firstCarouselProductIndex - the index in the carousel that should be selected
+        first
+     tiledViewLink - Link to return to ChoosePhoto tiled view from carousel view
+     recentEgraphs - Viewmodels for recently signed egraphs.
+     partnerIcons - Viewmodels for partner organizations.
+*/}
+
+@import views.frontend.tags.html.{storefront_breadcrumbs_responsive, safeForm}
+@import frontend.formatting.MoneyFormatting.Conversions._
+@import frontend.formatting.DateFormatting.Conversions._
+
+@headJs = {
+  Egraphs.page.firstSlideInCarousel = @firstCarouselProductIndex;
+  Egraphs.page.productUrls = [@products.map(product => "\"" + product.carouselUrl + "\"").mkString(",")]
+}
+
+@photoSection = {
+  <section class="wrapper" role="main">
+
+    <div class="container">
+
+      <div class="carousel-slider inner clearfix">
+
+        @storefront_breadcrumbs_responsive()
+
+        <div class="flexslider">
+
+          <ul class="slides">
+
+            <!-- Iterate through the products -->
+            @{/* TODO: make this and the tile view do something reasonable with zero products */}
+            @for((product, index) <- products.zipWithIndex) {
+              <li>
+
+                <div class="slide clearfix">
+
+                  <figure>
+
+                    <img src="@product.imageUrl" alt="@product.name. @product.description" />
+
+                    <figcaption>@{index + 1} / @products.size</figcaption>
+
+                  </figure>
+
+                  <div class="description">
+
+                    <div class="summary clearfix">
+
+                      <h2>@product.name</h2>
+
+                      <p>@Html(product.description)</p>
+
+                      <p class="price">@product.price.formatSimply</p>
+
+                      @safeForm("action" -> product.personalizeLink, "method" -> "POST") {
+                        <p>
+
+                          <button type="submit" class="button">
+
+                            <strong>Personalize</strong><span>&raquo;</span>
+
+                          </button>
+
+                        </p>
+                      }
+                    </div>
+
+                    <p class="see-all"><a href="@tiledViewLink">See All Photos</a></p>
+
+                    <div class="share clearfix">
+
+                      <p>Share this</p>
+
+                      <ul>
+                        <li><a href="@product.facebookShareLink" class="facebook">Facebook</a></li>
+                        <li><a href="@product.twitterShareLink" class="twitter">Twitter</a></li>
+                      </ul>
+
+                    </div> <!-- end .share -->
+
+                  </div> <!-- end .description -->
+
+                </div> <!-- end .slide -->
+
+              </li>
+            } <!-- Done iterating products -->
+          </ul> <!-- end .slides -->
+
+        </div> <!-- end .flexslider -->
+
+      </div> <!-- end .carousel-slider -->
+
+    </div> <!-- end .container -->
+
+  </section> <!-- end .wrapper -->
+}
+
+@base_celebrity_storefront_choose_photo_template(
+  title="Photo",
+  jsMain="pages/celebrity-storefront-carousel",
+  celeb=celeb,
+  headJs=headJs,
+  recentEgraphs=recentEgraphs,
+  partnerIcons=partnerIcons,
+  photoSection=photoSection
+)

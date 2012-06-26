@@ -1,0 +1,220 @@
+@()
+
+@import views.frontend.tags.html.storefront_breadcrumbs_responsive
+@import views.frontend.tags
+
+@headJs = {
+  Egraphs.page.celeb = "David Price";
+}
+
+@baseBody = {
+    <div id="content" class="top" role="main">
+    
+      <div id="main" class="sub">
+      
+        <section id="checkout" class="container" >
+			
+				 @storefront_breadcrumbs_responsive()
+				 		
+  				<header>	
+  				  <h1>Personalize Your Egraph</h1>
+  				  <h2>David Price | First MLB Victory</h2>  				
+  				</header>
+  				  				
+					<div class="col2">
+					
+						<div class="clearfix">
+					
+	    				<form class="main" method="post" action="./">
+	
+							<div class="order-overview clearfix">
+								
+								<figure>
+								
+									<img src='@asset("public/images/fpo-egraph.png")' alt="fpo-egraph" />
+								
+									<figcaption class="recepient-information">
+										A<span>. Recipient Information</span>
+									</figcaption>
+									
+									<figcaption class="egraph-message">
+										B<span>. Egraph Message</span>	    						  	
+									</figcaption>
+								
+								</figure>
+							
+							</div>
+	
+	    				  <fieldset>
+	
+	    				    <legend>A<span>. Recipient Information</span></legend>
+	    				  
+	    				    <div class="field">
+	      				    <div class="clearfix">
+	      				      <label class="instructions" for="gift">Is This a Gift? <small>Current guaranteed delivery: 04/22/12</small></label>
+	      				      <div class="input">
+	      				        <input id="gift" type="checkbox" name="gift" value="yes" checked="checked">
+	      				        <p><small><a href="#" class="tip">How does gifting work?</a></small></p>
+	      				      </div>
+	      				    </div>
+	    				    </div> <!-- end .field -->
+	    				    
+	    				    <div class="field">
+	      				    <div class="clearfix">
+	      				      <label class="instructions" for="recepient-name">Gift Recipient's Name:</label>
+	      				      <div class="input">
+	        				      <input id="recepient-name" type="text" name="email">
+	      				      </div>
+	      				    </div>
+	    				    </div> <!-- end .field -->
+	    				    
+	    				    <div class="field last">
+	      				    <div class="clearfix">
+	      				      <label class="instructions" for="recepient-email">Gift Recipient's Email:</label>
+	      				      <div class="input control-group error">
+	      				        <input id="recepient-email" type="text" name="email">
+	      				        <div class="alert alert-error">
+	        				        <button type="button" class="close" data-dismiss="alert">&times;</button>
+	        				        <strong>Oh snap!</strong> Change a few things up and try submitting again.
+	        				      </div>
+	      				      </div>
+	      				    </div>
+	    				    </div> <!-- end .field -->
+	    				  
+	    				  </fieldset>
+	
+	    				  <fieldset>
+	
+	    				    <legend>B<span>. Egraph Message</span></legend>
+	    				  
+	    				    <div class="field last">
+	      				    <div class="clearfix">
+	      				      <label class="instructions">David Price Should Write: <small>140 character limit.</small> <small>All messages are subject to approval.</small></label>
+	                    <div class="input">
+	                      <div id="message-options" class="btn-group" data-toggle="buttons-radio">
+	                        <button type="button" value="specific" class="btn btn-primary btn-custom-radio active">A specific<br /> message</button>
+	                        <button type="button" value="anything" class="btn btn-primary btn-custom-radio">Anything he<br /> wants</button>
+	                        <button type="button" value="signature" class="btn btn-primary btn-custom-radio">Signature<br /> only</button>
+	                      </div>
+	      				        <div id="egraph-message">
+	      				          <textarea id="egraph-message-text" name="message" rows="8" cols="1"></textarea>
+	      				          <p class="align-right"><small><a href="#" class="tip">How do I know it's really him?</a></small></p>
+	      				        </div>
+	      				        <input type="hidden" id="message-type" name="message-type" value="specific">
+	      				      </div>
+	      				    </div>
+	    				    </div> <!-- end .field -->
+	    				          				  
+	    				  </fieldset>
+	
+	    				  <fieldset class="last">
+	    				  
+	    				    <div class="field last">
+	      				    <div class="clearfix">
+	      				      <label class="instructions" for="your-message">Your Note to David Price: <small>140 character limit.</small> <small>All messages are subject to approval.</small></label>
+	      				      <div class="input">
+	      				        <textarea id="your-message" name="message" rows="8" cols="1"></textarea>
+	      				      </div>
+	      				    </div>
+	    				    </div> <!-- end .field -->     				    
+	    				  
+	    				  </fieldset>
+	    				  
+	    				  <fieldset class="submit">
+	    				  
+	    				  	<div class="clearfix">
+	    				  
+	    				 			@tags.html.arrow_button(caption="Review", target="#", classes="button right")
+	    				 		
+	    				  	</div>
+	    				  
+	    				  </fieldset>
+	    				  
+	    				</form> <!-- end .main -->
+	    				
+	    				<aside>
+	    				
+	    					<div class="order-overview clearfix">
+	    						  
+	    						  <figure>
+	    						  
+	    						  	<img src="/public/images/fpo-egraph.png" alt="fpo-egraph" />
+	    						  
+	    						  	<figcaption class="recepient-information">
+	    						  		A<span>. Recipient Information</span>
+	    						  	</figcaption>
+	    						  	
+	    						  	<figcaption class="egraph-message">
+	    						  		B<span>. Egraph Message</span>	    						  	
+	    						  	</figcaption>
+	    						  
+	    						  </figure>
+	    						  	
+		    				  	<div class="order-summary">
+		    				  	
+		    				  		<h2>Summary</h2>
+		    				  		
+		    				  		<div class="celebrity-information">
+		    				  			<h3 class="name">David Price</h3>
+		    				  			<p class="product">First MLB Victory</p>
+		    				  		</div>
+		    				  		
+		    				  		<div class="order-totals">		    				  		
+												<table>
+													<tr>
+														<th>Subtotal</th>
+														<td>$50.00</td>
+													</tr>
+													<tr>
+														<th>Shipping</th>
+														<td>$0.00</td>
+													</tr>
+													<tr>
+														<th>Tax</th>
+														<td>$_.__</td>
+													</tr>
+													<tr class="total">
+														<th>Total</th>
+														<td>$50.00</td>
+													</tr>
+												</table>    		    				  		
+		    				  		</div>			  		
+		    				  	
+		    				  	</div>
+		    				  
+	    					</div> <!-- end .order-overview -->
+	    				
+	    				</aside>
+	  			
+						</div> <!-- end .clearfix -->
+						
+						<footer class="clearfix">
+						
+							<p>Secured by: <a href="#" class="logo-entrust">Entrust</a></p>
+							
+							<p>Accepted payment types:</p>
+							
+							<ul>
+								<li class="visa">Visa</li>
+								<li class="mastercard">Mastercard</li>
+								<li class="amex">American Express</li>
+								<li class="discover">Discover</li>
+							</ul>
+								
+						</footer>
+  			
+  				</div> <!-- end .col2 -->
+  			
+        </section> <!-- end #checkout -->
+
+    	</div> <!-- end #main -->
+    
+    </div> <!-- end #content -->
+}
+
+@base_celebrity_storefront_template(
+  title="Personalize",
+  jsMain="pages/celebrity-storefront-personalize",
+  headJs=headJs,
+  body=baseBody
+)
