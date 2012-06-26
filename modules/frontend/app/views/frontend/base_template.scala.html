@@ -1,5 +1,22 @@
-@(title: String, jsMain: String = "", body: => Html)
+@(title: String, jsMain: String = "", headJs: => Html = Html.empty, body: => Html)
 
+@{/**
+    Base template for the consumer website. It provides many hooks to customize
+    the page, while setting reasonable defaults into each of them.
+
+    title - the title for the page. This will automatically be concatenated with
+        "| Egraphs"
+
+    jsMain - the javascript file that contains the scripting for the page being rendered.
+        These files should mostly be contained in public/javascripts/pages
+
+    headJs - any raw javascript that should be executed immediately after Egraphs.page
+        is initialized. populate Egraphs.page using this hook to have the server communicate
+        information to the client-side scripts which can include "Egraphs" as a module using
+        require.js.
+
+    body - the HTML that should be rendered as the body of the page.
+*/}
 @import views.frontend.tags
 
 <!doctype html> 
@@ -12,7 +29,7 @@
   <head>
     <meta charset="utf-8">
     
-    <title>@title</title>
+    <title>@{title + " | Egraphs"}</title>
     
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta name="description" content="">
@@ -37,6 +54,7 @@
       var Egraphs = Egraphs || {};
       Egraphs.page = Egraphs.page || {};
       Egraphs.page.jsMain = ["pages/base-template", "@jsMain"];
+      @headJs
     </script>
 
   </head>

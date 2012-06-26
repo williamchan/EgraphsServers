@@ -4,7 +4,7 @@ import utils.{TestData, EgraphsUnitTest}
 import services.AppConfig
 import java.text.SimpleDateFormat
 import play.data.binding.types.DateBinder
-import models.{CustomerStore, AccountAuthenticationError, Account, AccountStore}
+import models.{AccountAuthenticationError, Account, AccountStore}
 import services.db.{TransactionSerializable, DBSession}
 
 class FormChecksTest extends EgraphsUnitTest {
@@ -91,7 +91,7 @@ class FormChecksTest extends EgraphsUnitTest {
     mockAccountStore.authenticate(email, pass) returns Right(mockAccount)
 
     // Instantiate a new check instance that uses our mock
-    val check = new FormChecks(mockAccountStore, mock[CustomerStore])
+    val check = new FormChecks(mockAccountStore, null, null)
 
     // Check expectations
     check.isValidAccount(email, pass) should be (Right(mockAccount))
@@ -174,4 +174,12 @@ class FormChecksTest extends EgraphsUnitTest {
       check.isUniqueUsername(customer.username).isLeft should be(true)
     }
   }
+
+  "isChecked" should "properly deal with the POSTed string from a checkbox" in (pending)
+
+  "isTrue" should "fail out if false and continue chaining if true" in (pending)
+
+  "isSomeValue" should "return the value on the right if it was Some(value), otherwise a FormError" in (pending)
+
+  "isBetweenInclusive" should "return values within its specified bounds on the right" in (pending)
 }

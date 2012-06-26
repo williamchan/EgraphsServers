@@ -1,6 +1,8 @@
 package services.http.forms
 
 import play.mvc.results.Redirect
+import services.http.ServerSession
+import services.http.forms.Form.FormWriteable
 
 /**
  * Abstraction of an HTTP form. Extend and use it to abstract parameter validation from domain logic.
@@ -94,9 +96,9 @@ trait Form[+ValidFormType] {
    * Serializes the form into the Flash scope and returns a redirect to the specified
    * URL.
    *
-   * @param url
-   * @param flash
-   * @return
+   * @param url the url to redirect to
+   * @param flash the current flash scope into which the form should be saved.
+   * @return a Redirect result for Play to process
    */
   def redirectThroughFlash(url: String)(implicit flash: play.mvc.Scope.Flash): Redirect = {
     import Form.Conversions._
@@ -147,6 +149,40 @@ trait Form[+ValidFormType] {
 
     // Adds the field to the form
     addField(this)
+  }
+
+  /**
+   * Convenience method for specifying a field with less verbosity.
+   * Usage {{{
+   *   def check: FormChecks // gets assigned somehow...
+   *
+   *   val appleCount:Field[Int] = field("appleCount").validatedBy { paramValues =>
+   *     for (
+   *       param <- check.isSomeValue(paramValues.headOption).right;
+   *       int <- check.isInt(param).right
+   *     ) yield {
+   *       int
+   *     }
+   *   }
+   * }}}
+   */
+  protected def field[ValueType](paramName: String): FieldBuilder[ValueType] = {
+    new FieldBuilder[ValueType](paramName)
+  }
+
+  /** Class used to help in convenience method `field`. See that method's documentation */
+  protected class FieldBuilder[-ValueType](paramName: String) {
+
+    def validatedBy[T <: ValueType](validation: (Iterable[String]) => Either[FormError, T])
+    : Field[T] =
+    {
+      new Field[T] {
+        val name = paramName
+        val validate: Either[FormError, T] = {
+          validation(stringsToValidate)
+        }
+      }
+    }
   }
 
   /**
@@ -240,6 +276,20 @@ trait Form[+ValidFormType] {
     val errorString = _fieldInspecificErrors.map(error => error.description).mkString(Form.errorSeparator)
     writeKeyValue(serializedErrorsKey, Some(errorString))
   }
+
+  private[forms] def write[T](formWriteable: FormWriteable[T]): FormWriteable[T] = {
+    // Write all the submitted fields
+    val submittedFields = fields.filter(field => !field.isInstanceOf[DerivedField[_]])
+    val submittedFieldsWritten = submittedFields.foldLeft(formWriteable)(
+      (writeable, nextField) => nextField.write(writeable)
+    )
+
+    // Write form name and errors
+    val errorString = _fieldInspecificErrors.map(error => error.description).mkString(Form.errorSeparator)
+    submittedFieldsWritten
+      .withData(formName -> Some("true"))
+      .withData(serializedErrorsKey -> Some(errorString))
+  }
 }
 
 
@@ -249,47 +299,127 @@ object Form {
   type Readable = String => Iterable[String]
 
   /** Interface for anything that can be written to from a Form subtype */
+  @Deprecated
   type Writeable = (String, Iterable[String]) => Unit
 
-  /** Separates serialized errors */
-  private[Form] val errorSeparator = "…"
 
   /**
-   * Implicit conversions for transforming request- and session-specific values into Form.Readable
+   * Interface for anything that can be written to from a Form subtype
+   *
+   * See [[services.http.forms.Form.ServerSessionWriteable]] for an example.
+   *
+   * @tparam T the type that is being written into
+   */
+  trait FormWriteable[T] {
+    /**
+     * Returns an instance of the type being written, with all previously writte
+     * tuples applied.
+     */
+    def written: T
+
+    /**
+     * Returns a new instance of the FormWriteable with the parameterized
+     * pair written into it.
+     * */
+    def withData(toAdd:(String, Iterable[String])): FormWriteable[T]
+  }
+
+  /**
+   * Structural type that allows any String-String puttable and gettable to turn into Form.Readable and
+   * Form.Writeable
+   */
+  type StringGettablePuttable = { def get(key: String): String; def put(key: String, value: String) }
+
+  type StringPuttable = { def put(key: String, value: String) }
+
+  /**
+   * FormWriteable that allows forms to write into any object that has a `def put(key: String, value: String)`
+   * method. This includes most java map-like types including Play! scopes.
+   */
+  class MutableMapWriteable[T <: StringPuttable](val puttable: T) extends FormWriteable[T]
+  {
+
+    //
+    // FormWriteable members
+    //
+    val written: T = {
+      puttable
+    }
+
+    def withData(toAdd: (String, Iterable[String])): MutableMapWriteable[T] = {
+      val (key, rawValues) = toAdd
+
+      // Replace instances of the serialization delimiter with something reasonable
+      val escapedValues = rawValues.map(eachValue =>
+        eachValue.replace(serializationDelimiter, "...")
+      )
+
+      puttable.put(key, escapedValues.mkString(serializationDelimiter))
+
+      this
+    }
+  }
+
+  /**
+   * FormWriteable that allows forms to write into a cache-backed ServerSession.
+   */
+  class ServerSessionWriteable(val written: ServerSession) extends FormWriteable[ServerSession] {
+    def withData(toAdd: (String, Iterable[String])): ServerSessionWriteable = {
+      new ServerSessionWriteable(written.setting(toAdd))
+    }
+  }
+
+  /**
+   * Implicit conversions for transforming some of our services into Form.Readable
    * and Form.Writeable instances.
    */
   object Conversions {
-    /**
-     * Structural type that allows any String-String puttable and gettable to turn into Form.Readable and
-     * Form.Writeable
-     */
-    type HasGetAndPutString = { def get(key: String): String; def put(key: String, value: String) }
-
+    //
+    // Conversion classes
+    //
     class FormCompatiblePlayParams(playParams: play.mvc.Scope.Params) {
       def asFormReadable: Form.Readable = {
         (key) => Option(playParams.getAll(key)).flatten
       }
     }
 
-    class FormCompatiblePlayFlashAndSession(gettablePuttable: HasGetAndPutString) {
+    class FormCompatiblePlayFlashAndSession[T <: StringGettablePuttable](gettablePuttable: T) {
       def asFormReadable: Form.Readable = {
         (key) => {
           val valueOption = Option(gettablePuttable.get(key))
-          valueOption.map(valueString => valueString.split(delimiter)).flatten
+          valueOption.map(valueString => valueString.split(serializationDelimiter)).flatten
         }
       }
 
-      def asFormWriteable: Form.Writeable = {
-        (key, values) => gettablePuttable.put(key, values.mkString(delimiter))
+      def asFormWriteable: FormWriteable[T] = {
+        new MutableMapWriteable(gettablePuttable)
       }
-
-      private def delimiter = ",,"
     }
 
-    implicit def playFlashOrSessionToFormCompatible(gettablePuttable: HasGetAndPutString)
-    :FormCompatiblePlayFlashAndSession =
+
+    class FormCompatibleServerSession(serverSession: ServerSession) {
+      def asFormReadable: Form.Readable = {
+        (key) => serverSession[Iterable[String]](key).flatten
+      }
+
+      def asFormWriteable: ServerSessionWriteable = {
+        new ServerSessionWriteable(serverSession)
+      }
+    }
+
+    implicit def playFlashOrSessionToFormCompatible[T <: StringGettablePuttable](gettablePuttable: T)
+    :FormCompatiblePlayFlashAndSession[T] =
     {
       new FormCompatiblePlayFlashAndSession(gettablePuttable)
+    }
+
+    //
+    // Implicit conversions
+    //
+    implicit def playFlashOrSessionToMutableMapWriteable[T <: StringPuttable](puttable: T)
+    : MutableMapWriteable[T] =
+    {
+      new MutableMapWriteable(puttable)
     }
 
     implicit def playParamsToFormCompatible(playParams: play.mvc.Scope.Params)
@@ -297,7 +427,21 @@ object Form {
     {
       new FormCompatiblePlayParams(playParams)
     }
+
+    implicit def serverSessionToFormCompatible(serverSession: ServerSession)
+    : FormCompatibleServerSession =
+    {
+      new FormCompatibleServerSession(serverSession)
+    }
   }
+
+  //
+  // Private members
+  //
+  private val serializationDelimiter = ",,,"
+
+  /** Separates serialized errors */
+  private[Form] val errorSeparator = "…"
 }
 
 
@@ -314,8 +458,6 @@ object Form {
  *   }
  * }}}
  *
- * @param manifest
- * @tparam FormType
  */
 abstract class ReadsForm[+FormType <: Form[_]](implicit manifest: Manifest[FormType])
 {

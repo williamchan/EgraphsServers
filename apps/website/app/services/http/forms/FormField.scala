@@ -1,5 +1,7 @@
 package services.http.forms
 
+import services.http.forms.Form.FormWriteable
+
 /**
  * Base definition of a Field as implemented in [[services.http.forms.Form]]
  *
@@ -49,7 +51,12 @@ trait FormField[+ValueType] {
   //
   // Private members
   //
+  @Deprecated
   private[forms]def write(writeKeyValue: Form.Writeable) {
     writeKeyValue(name, stringsToValidate)
+  }
+
+  private[forms] def write[T](writeable: FormWriteable[T]): FormWriteable[T] = {
+    writeable.withData(name -> stringsToValidate)
   }
 }

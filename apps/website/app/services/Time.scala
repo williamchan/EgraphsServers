@@ -100,4 +100,64 @@ object Time {
     dateFormat
   }
 
+  /**
+   * Implicit conversions that turn Ints with various duration units into their
+   * representative values in seconds.
+   *
+   * Usage:
+   * {{{
+   *   import Time.IntsToSeconds._
+   *
+   *   // The following are true
+   *   1.second ==  1
+   *   1.minute ==  60
+   *   2.minutes == 120
+   *   1.hour   ==  3600
+   * }}}
+   */
+  object IntsToSeconds {
+    class SecondDurations(int: Int) {
+      //
+      // Singulars
+      //
+      def second: Int = {
+        int
+      }
+
+      def minute: Int = {
+        second * 60
+      }
+
+      def hour: Int = {
+        minutes * 60
+      }
+
+      def day: Int = {
+        hour * 24
+      }
+
+      //
+      // Plurals
+      //
+      def days: Int = {
+        day
+      }
+
+      def seconds: Int = {
+        second
+      }
+
+      def minutes: Int = {
+        minute
+      }
+
+      def hours: Int = {
+        hour
+      }
+    }
+
+    implicit def intsToSecondDurations(int: Int): SecondDurations = {
+      new SecondDurations(int)
+    }
+  }
 }
