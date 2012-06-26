@@ -1,0 +1,18 @@
+{
+	"folders":
+	[
+		{
+      "path": ".",
+      "folder_exclude_patterns": ["documentation", "dist", "src"]
+    },
+		{
+			"path": "../../apps/front-end-catalog", 
+      "folder_exclude_patterns": ["tmp", "test-result", "modules", "lib"]
+		}
+	],
+  "settings": {"tab_size": 2},
+  "build_systems": {
+    "name": "Refresh play",
+    "cmd": "curl localhost:9000"
+  }
+}
