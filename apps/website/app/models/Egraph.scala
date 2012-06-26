@@ -241,6 +241,10 @@ case class Egraph(
     egraphState == ApprovedByAdmin
   }
 
+  def isPublished: Boolean = {
+    (egraphState == Published)
+  }
+
   def publish(admin: Administrator): Egraph = {
     require(admin != null, "Must be rejected by an Administrator")
     require(isPublishable, "Must have previously been approved by admin")
@@ -663,6 +667,11 @@ sealed trait EgraphFrame {
   /** Height of the image in pixels as displayed on the egraph page */
   def imageHeightPixels: Int
 
+  /** Width of the image in pixels as displayed on the gallery page */
+  def thumbnailWidthPixels: Int
+
+  /** Height of the image in pixels as displayed on the gallery page **/
+  def thumbnailHeightPixels: Int
   //
   // Implemented members
   //
@@ -729,6 +738,9 @@ object PortraitEgraphFrame extends EgraphFrame {
 
   override val imageWidthPixels = 377
   override val imageHeightPixels = 526
+
+  override val thumbnailWidthPixels = 189
+  override val thumbnailHeightPixels = 263
 }
 
 /** The default egraph landscape photo frame */
@@ -741,4 +753,7 @@ object LandscapeEgraphFrame extends EgraphFrame {
 
   override val imageWidthPixels = 595
   override val imageHeightPixels = 377
+
+  override val thumbnailWidthPixels = 298
+  override val thumbnailHeightPixels = 189
 }

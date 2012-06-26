@@ -5,36 +5,45 @@ package models.frontend.egraphs
 
 import java.util.Date
 import xml.Elem
-;
+import org.squeryl.Query
+import org.joda.money.Money
 
-case class Egraph(
-  productUrl:String,
-  downloadUrl: String,
-  orderUrl: String,
-  thumbnailUrl: String  = "http://placehold.it/500x400",
-  orientation: String = "landscape",
-  productDescription:String,
-  productTitle: String,
-  id:Int = 0,
-  signedTimestamp: String,
-  publishedStatus: String = "unpublished",
-  orderStatus: String = "pending",
-  orderDetails: Option[OrderDetails] = None)
+
+trait EgraphViewModel {
+  def orderId: Long
+  def orientation: models.EgraphFrame
+  def productUrl: String
+  def productTitle: String
+  def productDescription: String
+  def thumbnailUrl: String
+}
+
+case class PendingEgraphViewModel(
+  orderStatus: models.enums.orderReviewStatus.EnumVal,
+  orderDetails: OrderDetails)
+  extends EgraphViewModel
+
+case class FulfilledEgraphViewModel(
+  downloadUrl: Option[String],
+  publicStatus: models.enums.PrivacyStatus.EnumVal,
+  signedTimestamp: String)
+  extends EgraphViewModel
 
 case class OrderDetails(
   orderDate: String,
-  orderNumber: Int,
-  price: String,
+  orderNumber: Long,
+  price: Money,
   statusText: String,
   shippingMethod : String,
   UPSNumber : String)
 
+//Map over option
 abstract class GalleryControlRenderer {
-  def render(id: Int, status: String) : Elem
+  def render(id: Long, status: String) : Elem
 }
 
 object AdminGalleryControl extends GalleryControlRenderer{
-  override def render(id: Int, status:String) = {
+  override def render(id: Long, status:String) = {
     val ns =
     <ul>
       <li>
@@ -53,7 +62,7 @@ object AdminGalleryControl extends GalleryControlRenderer{
 }
 
 object OwnerGalleryControl extends GalleryControlRenderer{
-  override def render(id: Int, status:String)  = {
+  override def render(id: Long, status:String)  = {
     val ns = <ul>
       <li>
         <a href="#">View Fullscreen</a>
@@ -73,7 +82,7 @@ object OwnerGalleryControl extends GalleryControlRenderer{
 }
 
 object OtherGalleryControl extends GalleryControlRenderer{
-  override def render(id: Int, status:String) = {
+  override def render(id: Long, status:String) = {
     val ns = <ul>
       <li>
         <a href="#">View Fullscreen</a>

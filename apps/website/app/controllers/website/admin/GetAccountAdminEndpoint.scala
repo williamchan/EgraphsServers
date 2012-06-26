@@ -14,7 +14,7 @@ private[controllers] trait GetAccountAdminEndpoint {
   protected def celebrityStore: CelebrityStore
 
   def getAccountAdmin(accountId: Long) = controllerMethod() {
-    adminFilters.requireAdministratorLogin { admin =>
+    adminFilters.requireAdministratorLogin({ admin =>
       val errorFields = Option(flash.get("errors")).map(errString => errString.split(',').toList)
 
       val account = accountStore.findById(accountId).get
@@ -33,7 +33,7 @@ private[controllers] trait GetAccountAdminEndpoint {
         }
       }
       views.Application.admin.html.admin_accountdetail(isCreate = false, errorFields = errorFields, fields = fieldDefaults)
-    }
+    })
   }
 }
 
