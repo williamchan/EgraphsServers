@@ -5,20 +5,16 @@ import services.Utils
 import services.http.forms.{ReadsForm, FormChecks, Form}
 
 
-class SelectProductForm(val paramsMap: Form.Readable, check: FormChecks)
+class SelectProductForm(val paramsMap: Form.Readable, check: PurchaseFormChecksFactory)
   extends Form[SelectProductForm.Validated]
 {
-  import SelectProductForm.{Fields}
+  import SelectProductForm.{Params}
 
   //
   // Field values and validations
   //
-  val product = new RequiredField[models.Product](Fields.ProductId.name) {
-    def validateIfPresent = {
-      for (idAsLong <- check.isLong(stringToValidate).right;
-           product <- check.isProductId(idAsLong).right)
-      yield product
-    }
+  val product = field(Params.ProductId).validatedBy { paramValues =>
+    check(paramValues).isProductId
   }
 
   //
@@ -32,10 +28,8 @@ class SelectProductForm(val paramsMap: Form.Readable, check: FormChecks)
 
 
 object SelectProductForm {
-  object Fields extends Utils.Enum {
-    sealed case class EnumVal(name: String) extends Value
-
-    val ProductId = EnumVal("order.productId")
+  object Params {
+    val ProductId = "order.productId"
   }
 
   /** Class to which the fully validated SelectProductForm resolves */
@@ -43,14 +37,14 @@ object SelectProductForm {
 }
 
 
-class SelectProductFormFactory @Inject()(formChecks: FormChecks)
+class SelectProductFormFactory @Inject()(purchaseFormValidations: PurchaseFormChecksFactory)
   extends ReadsForm[SelectProductForm]
 {
   //
   // Public members
   //
   def apply(readable: Form.Readable): SelectProductForm = {
-    new SelectProductForm(readable, formChecks)
+    new SelectProductForm(readable, purchaseFormValidations)
   }
 
   //

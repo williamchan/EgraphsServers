@@ -7,7 +7,6 @@ import java.text.{ParseException, SimpleDateFormat}
 import java.util.Date
 import play.libs.I18N
 import models.{ProductStore, Account, AccountStore, Product}
-import services.Utils
 
 /**
  * A set of checks used by [[services.http.forms.Form]] to validate its

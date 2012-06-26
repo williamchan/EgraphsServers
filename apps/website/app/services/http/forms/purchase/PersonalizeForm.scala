@@ -1,89 +1,72 @@
 package services.http.forms.purchase
 
 import com.google.inject.Inject
-import services.http.forms.{FormError, ReadsForm, FormChecks, Form}
+import services.http.forms.{ReadsForm, FormChecks, Form}
 import models.enums.{WrittenMessageChoice, RecipientChoice}
 
 
-class PersonalizeForm(val paramsMap: Form.Readable, check: FormChecks)
+class PersonalizeForm(
+  val paramsMap: Form.Readable,
+  check: FormChecks,
+  checkField: PurchaseFormChecksFactory
+)
   extends Form[PersonalizeForm.Validated]
 {
   import PersonalizeForm.Params
 
-  private def validations(toValidate: Iterable[String]) = {
-    new PurchaseFormValidation(toValidate, check)
-  }
-
   //
   // Field values and validations
   //
-  val recipientChoice = new Field[RecipientChoice]() {
-    val name = Params.IsGift
+  val recipientChoice = field(Params.IsGift).validatedBy { paramValues =>
+    checkField(paramValues).isRecipientChoice
+  }
 
-    def validate: Either[FormError, RecipientChoice] = {
-      validations(stringsToValidate).validateRecipientChoiceField
+  val recipientName = field(Params.RecipientName).validatedBy { paramValues =>
+    checkField(paramValues).isName
+  }
+
+  val recipientEmail = field(Params.RecipientEmail).validatedBy { paramValues =>
+    for (
+      validRecipientChoice <- check.dependentFieldIsValid(recipientChoice).right;
+      validEmailOption <- checkField(paramValues)
+                            .isRecipientEmailGivenRecipient(validRecipientChoice).right
+    ) yield {
+      validEmailOption
     }
   }
 
-  val recipientName = new Field[String] {
-    val name = Params.RecipientName
-
-    def validate: Either[FormError, String] = {
-      validations(stringsToValidate).validateRecipientNameField
-    }
+  val writtenMessageChoice = field(Params.WrittenMessageChoice).validatedBy { paramValues =>
+    checkField(paramValues).isWrittenMessageChoice
   }
 
-  val recipientEmail = new Field[Option[String]] {
-    val name = Params.RecipientEmail
-
-    def validate: Either[FormError, Option[String]] = {
-      for (
-        validRecipientChoice <- check.dependentFieldIsValid(recipientChoice).right;
-        validEmailOption <- validations(stringsToValidate)
-                              .validateRecipientEmailField(validRecipientChoice).right
-      )
-      yield {
-        validEmailOption
-      }
-    }
-  }
-
-  val writtenMessageChoice = new Field[WrittenMessageChoice] {
-    val name = Params.WrittenMessageChoice
-
-    def validate = {
-      validations(stringsToValidate).validateWrittenMessageChoice
-    }
-  }
 
   // Necessary only if writtenMessageChoice was specified, then it must be no more than 140 characters
-  val writtenMessage = new Field[Option[String]] {
-    val name = Params.WrittenMessage
-
-    def validate: Either[FormError, Option[String]] = {
-      for (
-        validMessageChoice <- check.dependentFieldIsValid(writtenMessageChoice).right;
-        validMessageTextOption <- validations(stringsToValidate)
-                                    .validateWrittenMessage(validMessageChoice).right)
-      yield {
-        validMessageTextOption
-      }
+  val writtenMessage = field(Params.WrittenMessage).validatedBy { paramValues =>
+    for (
+      messageChoice <- check.dependentFieldIsValid(writtenMessageChoice).right;
+      validMessageTextOption <- checkField(paramValues)
+                                  .isWrittenMessageTextGivenChoice(messageChoice).right
+    ) yield {
+      validMessageTextOption
     }
   }
 
-  val noteToCelebrity = new Field[Option[String]] {
-    val name = Params.NoteToCelebrity
-
-    def validate: Either[FormError, Option[String]] = {
-      validations(stringsToValidate).validateNoteToCelebrity
-    }
+  val noteToCelebrity = field(Params.NoteToCelebrity).validatedBy { paramValues =>
+    checkField(paramValues).isOptionalNoteToCelebrity
   }
 
   //
   // Form[ValidatedPersonalizeForm] members
   //
   protected def formAssumingValid: PersonalizeForm.Validated = {
-    PersonalizeForm.Validated()
+    PersonalizeForm.Validated(
+      recipientChoice.value.get,
+      recipientName.value.get,
+      recipientEmail.value.get,
+      writtenMessageChoice.value.get,
+      writtenMessage.value.get,
+      noteToCelebrity.value.get
+    )
   }
 }
 
@@ -104,18 +87,25 @@ object PersonalizeForm {
   val messageLengthWarning = "Should be between " +
     minMessageChars + " and " + maxMessageChars + " characters."
 
-  case class Validated()
+  case class Validated(
+    recipient: RecipientChoice,
+    recipientName: String,
+    recipientEmail: Option[String],
+    writtenMessageChoice: WrittenMessageChoice,
+    writtenMessageMaybe: Option[String],
+    noteToCelebriity: Option[String]
+  )
 }
 
 
-class PersonalizeFormFactory @Inject()(formChecks: FormChecks)
+class PersonalizeFormFactory @Inject()(formChecks: FormChecks, purchaseFormChecks: PurchaseFormChecksFactory)
   extends ReadsForm[PersonalizeForm]
 {
   //
   // Public members
   //
   def apply(readable: Form.Readable): PersonalizeForm = {
-    new PersonalizeForm(readable, formChecks)
+    new PersonalizeForm(readable, formChecks, purchaseFormChecks)
   }
 
   //

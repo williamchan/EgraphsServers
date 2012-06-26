@@ -2,14 +2,14 @@ package services.http.forms.purchase
 
 import services.http.forms.{FormChecks, FormError}
 import models.enums.{WrittenMessageChoice, RecipientChoice, PrintingOption}
-import models.enums.WrittenMessageChoice
+import com.google.inject.Inject
 
-class PurchaseFormValidation(toValidate: Iterable[String], check: FormChecks) {
-  import PurchaseFormValidations._
+class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
+  import PurchaseFormChecks._
 
-  def validateHighQualityPrintField: Either[FormError, PrintingOption] = {
+  def isPrintingOption: Either[FormError, PrintingOption] = {
     for (
-      param <- check.isSomeValue(toValidate, "Required").right;
+      param <- check.isSomeValue(toValidate, requiredError).right;
       printingChoice <- check.isSomeValue(
                           PrintingOption(param),
                           "Was not a valid printing option"
@@ -19,9 +19,9 @@ class PurchaseFormValidation(toValidate: Iterable[String], check: FormChecks) {
     }
   }
 
-  def validateSelectProductField: Either[FormError, models.Product] ={
+  def isProductId: Either[FormError, models.Product] ={
     for (
-      param <- check.isSomeValue(toValidate, "Required").right;
+      param <- check.isSomeValue(toValidate, requiredError).right;
       paramAsLong <- check.isLong(param).right;
       product <- check.isProductId(paramAsLong).right
     ) yield {
@@ -29,29 +29,20 @@ class PurchaseFormValidation(toValidate: Iterable[String], check: FormChecks) {
     }
   }
 
-  def validateRecipientChoiceField
+  def isRecipientChoice
   : Either[FormError, RecipientChoice] =
   {
     for (
-      param <- check.isSomeValue(toValidate, "Required").right;
+      param <- check.isSomeValue(toValidate, requiredError).right;
       recipientChoice <- check.isSomeValue(RecipientChoice(param), "Invalid recipient choice").right
     ) yield {
       recipientChoice
     }
   }
 
-  def validateRecipientNameField: Either[FormError, String] = {
-    for (
-      name <- check.isSomeValue(toValidate, "Required").right;
-      _ <- check.isBetweenInclusive(2, 30, name.length, nameLengthErrorString).right
-    ) yield {
-      name
-    }
-  }
-
   // Validate the recipient email given whether it was being gifted or not. If it was a gift
   // then the e-mail was required, but if it was bought for self then we don't need the email.
-  def validateRecipientEmailField(recipientChoice: RecipientChoice)
+  def isRecipientEmailGivenRecipient(recipientChoice: RecipientChoice)
   : Either[FormError, Option[String]] =
   {
     recipientChoice match {
@@ -59,18 +50,13 @@ class PurchaseFormValidation(toValidate: Iterable[String], check: FormChecks) {
         Right(None)
 
       case RecipientChoice.Other =>
-        for (
-          email <- check.isSomeValue(toValidate, "Required").right;
-          _ <- check.isEmailAddress(email, "Invalid email address").right
-        ) yield {
-          Some(email)
-        }
+        isEmail.right.map(email => Some(email))
     }
   }
 
-  def validateWrittenMessageChoice: Either[FormError, WrittenMessageChoice] = {
+  def isWrittenMessageChoice: Either[FormError, WrittenMessageChoice] = {
     for (
-      param <- check.isSomeValue(toValidate, "Required").right;
+      param <- check.isSomeValue(toValidate, requiredError).right;
       messageChoice <- check.isSomeValue(
                          WrittenMessageChoice(param),
                          "Message choice must be valid"
@@ -80,7 +66,7 @@ class PurchaseFormValidation(toValidate: Iterable[String], check: FormChecks) {
     }
   }
 
-  def validateWrittenMessage(messageChoice: WrittenMessageChoice)
+  def isWrittenMessageTextGivenChoice(messageChoice: WrittenMessageChoice)
   : Either[FormError, Option[String]] =
   {
     import WrittenMessageChoice._
@@ -92,7 +78,7 @@ class PurchaseFormValidation(toValidate: Iterable[String], check: FormChecks) {
 
       case SpecificMessage =>
         for (
-          writtenMessage <- check.isSomeValue(toValidate, "Required").right;
+          writtenMessage <- check.isSomeValue(toValidate, requiredError).right;
           _ <- check.isBetweenInclusive(
                  minWrittenMessageChars,
                  maxWrittenMessageChars,
@@ -105,7 +91,7 @@ class PurchaseFormValidation(toValidate: Iterable[String], check: FormChecks) {
     }
   }
 
-  def validateNoteToCelebrity: Either[FormError, Option[String]] = {
+  def isOptionalNoteToCelebrity: Either[FormError, Option[String]] = {
     // If there was a string, make sure it's valid
     val maybeErrorOrValidNote = toValidate.headOption.map { note =>
       for (_ <- check.isBetweenInclusive(
@@ -123,14 +109,42 @@ class PurchaseFormValidation(toValidate: Iterable[String], check: FormChecks) {
     maybeErrorOrValidNote.getOrElse(Right(None))
   }
 
+  def isPaymentToken: Either[FormError, String] = {
+    for (param <- check.isSomeValue(toValidate, requiredError).right) yield {
+      param
+    }
+  }
+
+  def isName: Either[FormError, String] = {
+    for (
+      name <- check.isSomeValue(toValidate, requiredError).right;
+      _ <- check.isBetweenInclusive(2, 30, name.length, nameLengthErrorString).right
+    ) yield {
+      name
+    }
+  }
+
+  def isEmail: Either[FormError, String] = {
+    for (
+      param <- check.isSomeValue(toValidate, requiredError).right;
+      email <- check.isEmailAddress(param).right
+    ) yield {
+      email
+    }
+  }
+
+  def isPresent: Either[FormError, Iterable[String]] = {
+    check.isPresent(toValidate)
+  }
+
   //
   // Private members
   //
 }
 
-object PurchaseFormValidations {
-  private[purchase] val nameLengthErrorString = "Must be between two and 30 characters"
-
+object PurchaseFormChecks {
+  private[purchase] val requiredError = "Required"
+  private[purchase] val nameLengthErrorString = "Must be between two and 30 characters"  
   private[purchase] val minWrittenMessageChars = 5
   private[purchase] val maxWrittenMessageChars = 140
   private[purchase] val minNoteToCelebChars = minWrittenMessageChars
@@ -144,7 +158,13 @@ object PurchaseFormValidations {
     textAreaLengthErrorString(minNoteToCelebChars, maxNoteToCelebChars)
   }
 
-  def textAreaLengthErrorString(min: Int, max: Int): String = {
+  private[purchase] def textAreaLengthErrorString(min: Int, max: Int): String = {
     "Must be between " + min + " and " + max + " characters"
+  }
+}
+
+class PurchaseFormChecksFactory @Inject()(check: FormChecks){
+  def apply(toValidate: Iterable[String]): PurchaseFormChecks = {
+    new PurchaseFormChecks(toValidate, check)
   }
 }

@@ -1,7 +1,6 @@
 package services.http.forms
 
 import play.mvc.results.Redirect
-import play.mvc.Scope.Session
 import services.http.ServerSession
 import services.http.forms.Form.FormWriteable
 
@@ -150,6 +149,40 @@ trait Form[+ValidFormType] {
 
     // Adds the field to the form
     addField(this)
+  }
+
+  /**
+   * Convenience method for specifying a field with less verbosity.
+   * Usage {{{
+   *   def check: FormChecks // gets assigned somehow...
+   *
+   *   val appleCount:Field[Int] = field("appleCount").validatedBy { paramValues =>
+   *     for (
+   *       param <- check.isSomeValue(paramValues.headOption).right;
+   *       int <- check.isInt(param).right
+   *     ) yield {
+   *       int
+   *     }
+   *   }
+   * }}}
+   */
+  protected def field[ValueType](paramName: String): FieldBuilder[ValueType] = {
+    new FieldBuilder[ValueType](paramName)
+  }
+
+  /** Class used to help in convenience method `field`. See that method's documentation */
+  protected class FieldBuilder[-ValueType](paramName: String) {
+
+    def validatedBy[T <: ValueType](validation: (Iterable[String]) => Either[FormError, T])
+    : Field[T] =
+    {
+      new Field[T] {
+        val name = paramName
+        def validate: Either[FormError, T] = {
+          validation(stringsToValidate)
+        }
+      }
+    }
   }
 
   /**

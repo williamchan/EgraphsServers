@@ -3,19 +3,18 @@ package services.http.forms.purchase
 import services.http.forms._
 import models.enums.PrintingOption
 
-class ReviewForm(val paramsMap: Form.Readable, check: FormChecks) extends Form[ReviewForm.Valid] {
+class ReviewForm(val paramsMap: Form.Readable, check: PurchaseFormChecksFactory) extends Form[ReviewForm.Valid] {
   import ReviewForm.Params
 
-  val validations = new ReviewForm.Validations(check)
-
-  val highQualityPrint = new RequiredField[PrintingOption](Params.HighQualityPrint) {
-    def validateIfPresent = {
-      validations.validatePrintField(this.stringToValidate)
-    }
+  val highQualityPrint = field(Params.HighQualityPrint).validatedBy { paramValues =>
+    check(paramValues).isPrintingOption
   }
 
+  //
+  // Form members
+  //
   override def formAssumingValid:ReviewForm.Valid = {
-    new ReviewForm.Valid
+    new ReviewForm.Valid(highQualityPrint.value.get)
   }
 }
 
@@ -24,7 +23,7 @@ object ReviewForm {
     val HighQualityPrint = "order.review.highQualityPrint"
   }
 
-  class Valid
+  class Valid(printingChoice: PrintingOption)
 
   class Validations(check: FormChecks) {
     def validatePrintField(toValidate: String): Either[FormError, PrintingOption] = {
