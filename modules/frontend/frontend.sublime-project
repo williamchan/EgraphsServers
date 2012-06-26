@@ -15,6 +15,6 @@
   },
   "build_systems": [{
     "name": "Refresh play",
-    "cmd": ["${project_path}/build_play.sh"]
+    "cmd": ["${project_path}/build_through_play.sh"]
   }]
 }
