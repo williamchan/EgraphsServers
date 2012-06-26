@@ -37,7 +37,7 @@ object MoneyFormatting {
     case class RichMoney(money: Money) {
 
       /**
-       * Provides a sensible human formatting for cash.
+       * Provides a minimal and sensible human formatting for cash.
        *
        * Money(100) -> "$100"
        * Money(100.5) -> "$100.50"

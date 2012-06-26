@@ -2,7 +2,6 @@ package controllers
 
 import play.mvc.Controller
 
-/* import models.frontend.storefront.{ } */
 
 /**
  * Permutations of the Checkout: Personalize.

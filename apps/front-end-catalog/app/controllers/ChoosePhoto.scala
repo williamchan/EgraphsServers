@@ -16,30 +16,37 @@ object ChoosePhoto extends Controller {
 
   val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
 
+  /** Renders tiled-view with n products */
   def withProducts(num: Int = 1) = {
     val products = for(i <- 1 to num) yield sampleTile
     ChoosePhotoDefaults().copy(products=products).renderTiles
   }
 
+  /** Renders tiled view with n recent egraphs */
   def withRecentEgraphs(num: Int = 1) = {
     val recentEgraphs = for (i <- 1 to num) yield sampleEgraph
     ChoosePhotoDefaults().copy(recentEgraphs=recentEgraphs).renderTiles
   }
 
+  /** Renders tiled view with n partner icons (e.g. MLB, Tampa Bay Rays, etc) */
   def withPartnerIcons(num: Int=1) = {
     val icons = for (i <- 1 to num) yield samplePartnerIcon
     ChoosePhotoDefaults().copy(partnerIcons=icons).renderTiles
   }
 
+  /** Renders one landscape product */
   def landscape = {
     ChoosePhotoDefaults().copy(products=List(sampleTile.copy(orientation=LandscapeOrientation))).renderTiles
   }
 
+
+  /** Renders the choose photo page with a long bio */
   def longBio = {
     val longBio = (for(i <- 1 to 4) yield sampleBio).mkString("<br/><br/>")
     ChoosePhotoDefaults().copy(celeb = sampleCeleb.copy(bio=longBio)).renderTiles
   }
 
+  /** Renders the carousel with n products, initially focusing on a particular product */
   def carousel(num: Int=3, focus: Int=1) = {
     val carouselProducts = for (i <- 1 to num) yield sampleCarouselProduct
 
@@ -49,6 +56,9 @@ object ChoosePhoto extends Controller {
     ).renderCarousel
   }
 
+  //
+  // Private members
+  //
   private[ChoosePhoto] case class ChoosePhotoDefaults(
     celeb: ChoosePhotoCelebrity = sampleCeleb,
     products: Iterable[ChoosePhotoTileProduct] = for (i <- 1 to 2) yield sampleTile,

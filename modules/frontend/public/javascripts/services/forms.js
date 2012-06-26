@@ -33,7 +33,8 @@ define(["libs/jquery.watermark.min", "libs/iphonecheckboxes/iphone-style-checkbo
     /** 
      * Creates button group
      * @param selector the selectors to use
-     * @method methow Toggles push state. Gives the button the appearance that it has been activated.
+     * @method method Toggles push state. Gives the button the appearance that it has been activated.
+     *   See http://twitter.github.com/bootstrap/javascript.html#buttons
      **/    
     setButton: function(selector, method) {
       $(selector).button(method);

@@ -6,6 +6,18 @@
   partnerIcons: Iterable[models.frontend.storefront.ChoosePhotoPartnerIcon]
 )(implicit session: play.mvc.Scope.Session)
 
+@{/**
+    Renders the Choose Photo page in Carousel view.
+
+    celeb - the celebrity viewmodel to be rendered
+    products - the product viewmodels to be rendered
+    firstCarouselProductIndex - the index in the carousel that should be selected
+        first
+     tiledViewLink - Link to return to ChoosePhoto tiled view from carousel view
+     recentEgraphs - Viewmodels for recently signed egraphs.
+     partnerIcons - Viewmodels for partner organizations.
+*/}
+
 @import views.frontend.tags.html.{storefront_breadcrumbs_responsive, safeForm}
 @import frontend.formatting.MoneyFormatting.Conversions._
 @import frontend.formatting.DateFormatting.Conversions._

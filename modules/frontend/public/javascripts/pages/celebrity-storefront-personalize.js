@@ -19,14 +19,13 @@ function(forms, Egraphs) {
       forms.setDefaultText("#your-message", "Write here to tell "+celeb+" something you’d like him to know.");
       forms.setAlert('.alert');
       forms.setButton('.btn-group', 'toggle');
+
+      // change hidden input
+      $('#message-options button').click(function() { $('#message-type').val($(this).val()); });
+      // show message
+      $('#message-options button:eq(0)').click(function() { $('#egraph-message').show(); });
+      // hide message
+      $('#message-options button:not(:eq(0))').click(function() { $('#egraph-message').hide(); });
     }    
   };
-  
 });
-
-// change hidden input
-$('#message-options button').click(function() { $('#message-type').val($(this).val()); });
-// show message
-$('#message-options button:eq(0)').click(function() { $('#egraph-message').show(); });
-// hide message
-$('#message-options button:not(:eq(0))').click(function() { $('#egraph-message').hide(); });
