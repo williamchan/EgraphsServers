@@ -2,7 +2,7 @@ package services.http.forms.purchase
 
 import com.google.inject.Inject
 import services.http.forms.{ReadsForm, FormChecks, Form}
-import models.enums.{WrittenMessageChoice, RecipientChoice}
+import models.enums.{WrittenMessageRequest, RecipientChoice}
 
 
 /**
@@ -38,17 +38,17 @@ class PersonalizeForm(
     }
   }
 
-  val writtenMessageChoice = field(Params.WrittenMessageChoice).validatedBy { paramValues =>
-    checkField(paramValues).isWrittenMessageChoice
+  val writtenMessageRequest = field(Params.WrittenMessageRequest).validatedBy { paramValues =>
+    checkField(paramValues).isWrittenMessageRequest
   }
 
 
-  // Necessary only if writtenMessageChoice was specified, then it must be no more than 140 characters
-  val writtenMessage = field(Params.WrittenMessage).validatedBy { paramValues =>
+  // Necessary only if writtenMessageRequest was specified, then it must be no more than 140 characters
+  val writtenMessageRequestText = field(Params.WrittenMessageRequestText).validatedBy { paramValues =>
     for (
-      messageChoice <- check.dependentFieldIsValid(writtenMessageChoice).right;
+      messageRequest <- check.dependentFieldIsValid(writtenMessageRequest).right;
       validMessageTextOption <- checkField(paramValues)
-                                  .isWrittenMessageTextGivenChoice(messageChoice).right
+                                  .isWrittenMessageTextGivenRequest(messageRequest).right
     ) yield {
       validMessageTextOption
     }
@@ -66,8 +66,8 @@ class PersonalizeForm(
       recipientChoice.value.get,
       recipientName.value.get,
       recipientEmail.value.get,
-      writtenMessageChoice.value.get,
-      writtenMessage.value.get,
+      writtenMessageRequest.value.get,
+      writtenMessageRequestText.value.get,
       noteToCelebrity.value.get
     )
   }
@@ -79,8 +79,8 @@ object PersonalizeForm {
     val IsGift = "order.personalize.isGift"
     val RecipientName = "order.personalize.recipient.name"
     val RecipientEmail = "order.personalize.recipient.email"
-    val WrittenMessageChoice = "order.personalize.message.choice"
-    val WrittenMessage = "order.personalize.message.text"
+    val WrittenMessageRequest = "order.personalize.message.choice"
+    val WrittenMessageRequestText = "order.personalize.message.text"
     val NoteToCelebrity = "order.personalize.note_to_celeb"
   }
 
@@ -94,7 +94,7 @@ object PersonalizeForm {
     recipient: RecipientChoice,
     recipientName: String,
     recipientEmail: Option[String],
-    writtenMessageChoice: WrittenMessageChoice,
+    writtenMessageRequest: WrittenMessageRequest,
     writtenMessageMaybe: Option[String],
     noteToCelebriity: Option[String]
   )

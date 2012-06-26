@@ -15,7 +15,7 @@ class PurchaseFormValidationsTests extends EgraphsUnitTest {
         validations.isProductId,
         validations.isRecipientChoice,
         validations.isName,
-        validations.isWrittenMessageChoice,
+        validations.isWrittenMessageRequest,
         validations.isPrintingOption
       )
 

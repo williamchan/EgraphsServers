@@ -1,7 +1,7 @@
 package services.http.forms.purchase
 
 import services.http.forms.{FormChecks, FormError}
-import models.enums.{WrittenMessageChoice, RecipientChoice, PrintingOption}
+import models.enums.{WrittenMessageRequest, RecipientChoice, PrintingOption}
 import com.google.inject.Inject
 
 /**
@@ -83,18 +83,18 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
   }
 
   /**
-   * Returns a [[models.enums.WrittenMessageChoice]] on the right if the provided parameters
+   * Returns a [[models.enums.WrittenMessageRequest]] on the right if the provided parameters
    * mapped to a valid enum value.
    */
-  def isWrittenMessageChoice: Either[FormError, WrittenMessageChoice] = {
+  def isWrittenMessageRequest: Either[FormError, WrittenMessageRequest] = {
     for (
       param <- check.isSomeValue(toValidate, requiredError).right;
-      messageChoice <- check.isSomeValue(
-                         WrittenMessageChoice(param),
+      messageRequest <- check.isSomeValue(
+                         WrittenMessageRequest(param),
                          "Message choice must be valid"
                        ).right
     ) yield {
-      messageChoice
+      messageRequest
     }
   }
 
@@ -102,15 +102,15 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
    * Returns None on the right if the purchaser didn't want to specify a message. Otherwise
    * returns Some(valid message) on the right.
    *
-   * @param messageChoice choice for written message: signature only, chosen-by-celebrity,
+   * @param messageRequest choice for written message: signature only, chosen-by-celebrity,
    *    or a specific message
    */
-  def isWrittenMessageTextGivenChoice(messageChoice: WrittenMessageChoice)
+  def isWrittenMessageTextGivenRequest(messageRequest: WrittenMessageRequest)
   : Either[FormError, Option[String]] =
   {
-    import WrittenMessageChoice._
+    import WrittenMessageRequest._
 
-    messageChoice match {
+    messageRequest match {
       // There are no messages for signature only or for when the celebrity choosesn
       case CelebrityChoosesMessage | SignatureOnly =>
         Right(None)
