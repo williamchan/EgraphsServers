@@ -5,13 +5,11 @@ package models.frontend.egraphs
 
 import java.util.Date
 import xml.Elem
-import org.squeryl.Query
-import org.joda.money.Money
 
 
 trait EgraphViewModel {
   def orderId: Long
-  def orientation: models.EgraphFrame
+  def orientation: String
   def productUrl: String
   def productTitle: String
   def productDescription: String
@@ -19,20 +17,30 @@ trait EgraphViewModel {
 }
 
 case class PendingEgraphViewModel(
-  orderStatus: models.enums.orderReviewStatus.EnumVal,
-  orderDetails: OrderDetails)
-  extends EgraphViewModel
+  orderStatus: String,
+  orderDetails: OrderDetails,
+  orderId: Long,
+  orientation: String,
+  productUrl: String,
+  productTitle: String,
+  productDescription: String,
+  thumbnailUrl: String) extends EgraphViewModel
 
 case class FulfilledEgraphViewModel(
   downloadUrl: Option[String],
-  publicStatus: models.enums.PrivacyStatus.EnumVal,
-  signedTimestamp: String)
-  extends EgraphViewModel
+  publicStatus: String,
+  signedTimestamp: String,
+  orderId: Long,
+  orientation: String,
+  productUrl: String,
+  productTitle: String,
+  productDescription: String,
+  thumbnailUrl: String) extends EgraphViewModel
 
 case class OrderDetails(
   orderDate: String,
   orderNumber: Long,
-  price: Money,
+  price: String,
   statusText: String,
   shippingMethod : String,
   UPSNumber : String)

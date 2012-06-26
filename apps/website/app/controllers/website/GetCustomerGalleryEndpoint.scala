@@ -59,9 +59,8 @@ private[controllers] trait GetCustomerGalleryEndpoint { this: Controller =>
           List(pendingOrders.map((order:Order, egraphOption:Option[Egraph]) => GalleryEgraphFactory.makeView(order, egraphOption)),
                fulfilledOrders.map((order:Order, egraphOption:Option[Egraph]) => GalleryEgraphFactory.makeView(order, egraphOption)))
         case OtherGalleryControl =>
-          List(fulfilledOrders.filter((order:Order, egraphOption:Option[Egraph]) => egraphOption
-          )
-      }
+          List(fulfilledOrders.filter((order:Order, egraphOption:Option[Egraph]) => egraphOption))
+    }
 
       views.frontend.html.account_gallery(customer.username, List(), galleryControl)
     }
@@ -73,26 +72,27 @@ object GalleryEgraphFactory {
 
   def makeFulfilledEgraphViewModel(orders:Traversable[(Order, Option[Egraph])], privacyFilter: PrivacyStatus.type) :
     List[FulfilledEgraphViewModel] = {
-    List(for((order, optionEgraph) <- orders; egraph <- optionEgraph;)
-    {
-      val product = order.product
-      val rawImage = egraph.image(product.photoImage).scaledToWidth(product.frame.thumbnailWidthPixels)
-      FulfilledEgraphViewModel(
-        orderId = order.id,
-        orientation = product.frame,
-        productUrl = "//" + product.celebrity.urlSlug + "/" + product.urlSlug,
-        productTitle = product.storyTitle,
-        productDescription = product.description
-        thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Private),
-        downloadUrl = Option("egraph/" + order.id),
-        publicStatus = order.privacyStatus,
-        signedTimeStamp = egraph.created.toString
-       )
-    })
+      for((order, optionEgraph) <- orders;
+                         egraph <- optionEgraph)
+      yield {
+        val product = order.product
+        val rawImage = egraph.image(product.photoImage).scaledToWidth(product.frame.thumbnailWidthPixels)
+        FulfilledEgraphViewModel(
+          orderId = order.id,
+          orientation = product.frame.name,
+          productUrl = "//" + product.celebrity.urlSlug + "/" + product.urlSlug,
+          productTitle = product.storyTitle,
+          productDescription = product.description
+          thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Private),
+          downloadUrl = Option("egraph/" + order.id),
+          publicStatus = order.privacyStatus.name,
+          signedTimeStamp = egraph.created.toString
+        )
+      }
   }
 
   def makePendingOrderEgraphViewModel(orders: Traversable[(Order, Option[Egraph])]) : List[PendingEgraphViewModel] = {
-    List(for((order, optionEgraph) <- orders;){
+    for((order, optionEgraph) <- orders) yield {
       val product = order.product
       PendingEgraphViewModel(
         orderId = order.id,
@@ -101,7 +101,7 @@ object GalleryEgraphFactory {
         productTitle = product.storyTitle,
         productDescription = product.description,
         thumbnailUrl = "",
-        orderStatus = order.get_reviewStatus(),
+        orderStatus = order.reviewStatus.name,
         orderDetails = OrderDetails(
           orderDate = order.created.toString(),
           orderNumber = order.id,
@@ -111,7 +111,7 @@ object GalleryEgraphFactory {
           UPSNumber = ""
         )
       )
-    })
+    }
   }
 
   def makeView(order: Order, optionEgraph : Option[Egraph]) : models.frontend.egraphs.Egraph = {
@@ -140,7 +140,7 @@ object GalleryEgraphFactory {
           viewEgraph.orderDetails = models.frontend.egraphs.OrderDetails(
             orderDate = order.created.toString(),
             orderNumber = order.id,
-            price = order.amountPaid,
+            price = order.amountPaid.toString,
             statusText = "Pending",
             shippingMethod = "",
             UPSNumber = ""

@@ -1,6 +1,6 @@
-@(username: String, egraphs: List[models.frontend.egraphs.Egraph], controlRenderer: models.frontend.egraphs.GalleryControlRenderer)
+@(username: String, egraphs: List[models.frontend.egraphs.EgraphViewModel], controlRenderer: models.frontend.egraphs.GalleryControlRenderer)
 
-@finishedEgraph(egraph: models.frontend.egraphs.Egraph, index: Int) = {
+@fulfilledEgraph(egraph: models.frontend.egraphs.FulfilledEgraphViewModel, index: Int) = {
   <div class="row-fluid row-egraph">
     <div class="span12">
       <div class="number">@(index+1)</div><br>
@@ -33,14 +33,14 @@
           </div>
         </div>
         <div class="controls">
-          @Html(controlRenderer.render(egraph.id, egraph.publicStatus.name).toString())
+          @Html(controlRenderer.render(egraph.orderId, egraph.publicStatus).toString())
         </div>
       </div>
     </div>
   </div>
 }
 
-@pendingEgraph(egraph: models.frontend.egraphs.Egraph, orderDetails: models.frontend.egraphs.OrderDetails, index: Int) = {
+@pendingEgraph(egraph: models.frontend.egraphs.PendingEgraphViewModel, orderDetails: models.frontend.egraphs.OrderDetails, index: Int) = {
   <div class="row-fluid row-egraph">
     <div class="span12">
       <div class="number">@(index+1)</div>
@@ -85,8 +85,8 @@
             <span class="span8"> @username's Egraphs</span>
             <span class="span4 count">
               <strong>@egraphs.length Egraphs</strong> /
-              <strong>@{egraphs.filter(_.orderStatus == "pending").length}</strong>
-              Pending, <strong>@{egraphs.filter(_.orderStatus == "finished").length}</strong>
+              <strong>@{egraphs.filter(egraph => egraph.isInstanceOf[models.frontend.egraphs.PendingEgraphViewModel]).length}</strong>
+              Pending, <strong>@{egraphs.filter(egraph => egraph.isInstanceOf[models.frontend.egraphs.FulfilledEgraphViewModel]).length}</strong>
               Finished</span>
           </div>
         </header>
@@ -98,16 +98,14 @@
           </section>
         }
         <section id="galleryrows">
-        @for((egraph,index) <- egraphs.filter(_.orderStatus == "pending").zipWithIndex) {
-          @pendingEgraph(egraph, egraph.orderDetails.get ,index)
+        @for((egraph,index) <- egraphs.zipWithIndex){
+          @{egraph match {
+            case e: models.frontend.egraphs.PendingEgraphViewModel => pendingEgraph(e, e.orderDetails, index)
+            case e: models.frontend.egraphs.FulfilledEgraphViewModel => fulfilledEgraph(e, index)
+            case _ => ""
+          }
+          }
         }
-
-        @for((egraph,index) <- egraphs.filter(_.orderStatus == "finished").zipWithIndex) {
-          @finishedEgraph(egraph, index)
-        }
-
-
-
         </section>
       </div>
     </div>
