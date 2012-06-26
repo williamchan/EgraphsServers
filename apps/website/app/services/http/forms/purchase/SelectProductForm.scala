@@ -1,12 +1,10 @@
 package services.http.forms.purchase
 
-import com.google.inject.Inject
-import services.Utils
-import services.http.forms.{ReadsForm, FormChecks, Form}
+import services.http.forms.{Form}
 
 
 class SelectProductForm(val paramsMap: Form.Readable, check: PurchaseFormChecksFactory)
-  extends Form[SelectProductForm.Validated]
+  extends Form[Product]
 {
   import SelectProductForm.{Params}
 
@@ -20,37 +18,14 @@ class SelectProductForm(val paramsMap: Form.Readable, check: PurchaseFormChecksF
   //
   // Form[ValidatedSelectProductForm] members
   //
-  protected def formAssumingValid: SelectProductForm.Validated = {
+  protected def formAssumingValid: Product = {
     // Safely access the account value in here
-    SelectProductForm.Validated(product.value.get)
+    product.value.get
   }
 }
-
 
 object SelectProductForm {
   object Params {
     val ProductId = "order.productId"
-  }
-
-  /** Class to which the fully validated SelectProductForm resolves */
-  case class Validated(product: Product)
-}
-
-
-class SelectProductFormFactory @Inject()(purchaseFormValidations: PurchaseFormChecksFactory)
-  extends ReadsForm[SelectProductForm]
-{
-  //
-  // Public members
-  //
-  def apply(readable: Form.Readable): SelectProductForm = {
-    new SelectProductForm(readable, purchaseFormValidations)
-  }
-
-  //
-  // ReadsForm[SelectProductForm] members
-  //
-  def instantiateAgainstReadable(readable: Form.Readable): SelectProductForm = {
-    apply(readable)
   }
 }

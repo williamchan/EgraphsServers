@@ -5,6 +5,9 @@ import services.http.forms.{ReadsForm, FormChecks, Form}
 import models.enums.{WrittenMessageChoice, RecipientChoice}
 
 
+/**
+ * Purchase flow form for egraph personalization
+ */
 class PersonalizeForm(
   val paramsMap: Form.Readable,
   check: FormChecks,

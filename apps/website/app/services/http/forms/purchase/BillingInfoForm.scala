@@ -1,8 +1,11 @@
 package services.http.forms.purchase
 
-import services.http.forms.{Form}
+import services.http.forms.Form
 
 
+/**
+ * Purchase flow form for billing info
+ */
 class BillingInfoForm(val paramsMap: Form.Readable, check: PurchaseFormChecksFactory)
   extends Form[BillingInfoForm.Valid]
 {

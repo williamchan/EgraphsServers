@@ -178,7 +178,7 @@ trait Form[+ValidFormType] {
     {
       new Field[T] {
         val name = paramName
-        def validate: Either[FormError, T] = {
+        val validate: Either[FormError, T] = {
           validation(stringsToValidate)
         }
       }
