@@ -32,4 +32,20 @@ class TimeTests extends UnitFlatSpec with ShouldMatchers {
     result should be (1)
     duration should be >= (0.200)
   }
+
+  "second duration conversions" should "be correct" in {
+    import Time.IntsToSeconds._
+
+    1.second should be (1)
+    1.minute should be (60)
+    1.hour should be (3600)
+    1.day should be (3600 * 24)
+
+    1.seconds should be (1.second)
+    1.minutes should be (1.minute)
+    1.hours should be (1.hour)
+    1.days should be (1.day)
+
+    2.seconds should be (2)
+  }
 }

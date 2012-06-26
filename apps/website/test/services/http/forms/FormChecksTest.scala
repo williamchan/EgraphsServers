@@ -89,7 +89,7 @@ class FormChecksTest extends EgraphsUnitTest {
     mockAccountStore.authenticate(email, pass) returns Right(mockAccount)
 
     // Instantiate a new check instance that uses our mock
-    val check = new FormChecks(mockAccountStore)
+    val check = new FormChecks(mockAccountStore, null)
 
     // Check expectations
     check.isValidAccount(email, pass) should be (Right(mockAccount))
@@ -149,4 +149,11 @@ class FormChecksTest extends EgraphsUnitTest {
     check.isAtLeast(legalAge, 20).isLeft should be (true)
   }
 
+  "isChecked" should "properly deal with the POSTed string from a checkbox" in (pending)
+
+  "isTrue" should "fail out if false and continue chaining if true" in (pending)
+
+  "isSomeValue" should "return the value on the right if it was Some(value), otherwise a FormError" in (pending)
+
+  "isBetweenInclusive" should "return values within its specified bounds on the right" in (pending)
 }

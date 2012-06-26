@@ -19,5 +19,6 @@ tmp
 *.log
 *.ser
 *.pyc
+*.sublime-workspace
 
-war/WEB-INF/cloudbees-web.xml
+apps/website/war/WEB-INF/cloudbees-web.xml

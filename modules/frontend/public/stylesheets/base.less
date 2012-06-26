@@ -6,9 +6,12 @@
 
 a, a:link, a:visited {
 	.transitions(color 0.25s ease);
+	&:hover { text-decoration: none; }
+	&.tip { 
+		font-size: 90%;
+		text-decoration: underline; 
+	}
 }
-
-a:hover { text-decoration: none; }
 
 /* !Buttons */
 
@@ -40,6 +43,9 @@ button  {
 		background: url(../images/bg-button-mid.png) repeat-x 0 0;
 		padding-left: 25px;
 		padding-right: 25px;
+		
+		em { font-style: normal; }
+		
 	}
 
 	span {
@@ -51,14 +57,36 @@ button  {
 		text-indent: -9999px;
 		overflow: hidden;
 	}
-
-}
-
-.button:hover {
-
-	background-position: 0 100%;
 	
-	strong, span { background-position: 0 100%; }
+	&:hover {
+	
+		background-position: 0 100%;
+		
+		strong, span { background-position: 0 100%; }
+	
+	}	
+	
+	&.facebook {
+		
+		padding-left: 22px;
+		background-image: url(../images/bg-button-left-facebook.png);
+		
+		strong {
+			background-image: url(../images/bg-button-mid-facebook.png);	
+			em {
+				display: block;
+				width: 65px;
+				height: 13px;
+				margin-top: 8px;
+				text-indent: -9999px;
+				overflow: hidden;
+				background: url(../images/logotype-facebook.png) no-repeat 0 50%;
+			}		
+		}
+		
+		span { background-image: url(../images/bg-button-right-facebook.png); }	
+		
+	}
 
 }
 
@@ -118,12 +146,20 @@ button  {
 		line-height: 40px;
 		height: 40px;
 		.border-radius-top(5px);
-		.box-shadow(0px, 0, 5px, rgba(0, 0, 0, .25));	
+		.box-shadow(0px 0 5px rgba(0, 0, 0, .25));	
 	}
 	
 	a:hover { color: @orange; }
 	
 }
+
+/* Misc. Utils */
+
+.left { float: left; }
+.right { float: right; }
+
+.align-left { text-align: left; }
+.align-right { text-align: right; }
 
 /* !Top */
 
@@ -135,7 +171,7 @@ button  {
 
 	position: relative;
 	z-index: 1;
-	.box-shadow(0px, 2px, 4px, rgba(0, 0, 0, .15));	
+	.box-shadow(0px 2px 4px rgba(0, 0, 0, .15));	
 	background: @offWhite;	
 	padding-top: 2px;
 	padding-bottom: 2px;
@@ -313,7 +349,7 @@ section[role=banner] {
 	
 	#main {
 
-		.box-shadow(0px, 0px, 8px, rgba(0, 0, 0, .5));
+		.box-shadow(0px 0px 8px rgba(0, 0, 0, .5));
 
 		background: rgb(239,239,239); /* Old browsers */
 		background: -moz-linear-gradient(top,  rgba(239,239,239,1) 0%, rgba(255,255,255,1) 100%); /* FF3.6+ */
@@ -333,14 +369,25 @@ section[role=banner] {
 		> .container {
 				position: relative;
 		}
-	
-	}
-	
-	#main.sub { 
-		border-top: none; 
-		background: @offWhite;
-	}
 
+		&.sub { 
+			padding-top: 20px;
+			border-top: none; 
+			background: @offWhite;
+		}
+	
+	}
+	
+	&.top {
+		
+		.box-shadow(0px 0px 4px rgba(0, 0, 0, .25));
+		
+		#main {
+			.box-shadow(0px 4px 8px rgba(0, 0, 0, .25));
+			top: auto;
+		}
+		
+	}
 	
 }
 
@@ -420,44 +467,6 @@ section[role=banner] {
 	}	
 
 }
-
-/* !Flexslider Base Styles */
-
-.flex-container a:active,
-.flexslider a:active,
-.flex-container a:focus,
-.flexslider a:focus  { outline: none; }
-
-.slides,
-.flex-control-nav,
-.flex-direction-nav { margin: 0; padding: 0; list-style: none; }
-
-.flexslider {
-	margin: 0; 
-	padding: 0;
-
-	.slides {
-		
-		> li { display: none; -webkit-backface-visibility: hidden; }
-		
-		img { max-width: 100%; display: block; }
-		
-	}
-
-	.slides:after {
-      content: ".";
-      display: block;
-      clear: both;
-      visibility: hidden;
-      line-height: 0;
-      height: 0;
-    }
-}
- 
-.flex-pauseplay span { text-transform: capitalize; }
-html[xmlns] .slides { display: block; }
-* html .slides { height: 1%; }
-.no-js .slides > li:first-child { display: block; }
 
 /* !Media Queries */
 

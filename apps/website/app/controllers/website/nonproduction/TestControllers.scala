@@ -150,7 +150,12 @@ object TestControllers extends Controller with Logging {
       "gabe@egraphs.com",
       "mike@egraphs.com",
       "j@egraphs.com",
-      "kate@egraphs.com")
+      "kate@egraphs.com",
+      "preston@egraphs.com",
+      "derek@egraphs.com",
+      "aj@egraphs.com",
+      "willsalzman@egraphs.com",
+      "siegfried@egraphs.com")
 
     for (email <- celebrityEmails) {
       val account = accountServices.accountStore.findByEmail(email)
@@ -158,7 +163,7 @@ object TestControllers extends Controller with Logging {
         results = ("\"Unable to find Account " + email + "\"") :: results
       } else {
         val celebrity = celebrityServices.store.findById(account.get.celebrityId.get)
-        results = (orderFromCelebrity(celebrity = celebrity.get, celebrityEmail = email, msg = msg, numOrders = 5)) :: results
+        results = (orderFromCelebrity(celebrity = celebrity.get, celebrityEmail = email, msg = msg, numOrders = 10)) :: results
       }
     }
 

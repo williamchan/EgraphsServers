@@ -1,6 +1,7 @@
 self: egraphs -> frontend HEAD
 
 require:
+  - org.joda -> joda-money 0.6
   - play
   - play -> scala 0.9.1
   - play -> less 0.9.1

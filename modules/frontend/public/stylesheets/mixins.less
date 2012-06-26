@@ -17,13 +17,14 @@
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#80ffffff', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */
 }
 
-.box-shadow(@x, @y, @blur, @color) {
+//.box-shadow(@x, @y, @blur, @color) {
+.box-shadow(@arguments) {
   box-shadow: @arguments;
   -webkit-box-shadow: @arguments;
   -moz-box-shadow: @arguments;
 }
 
-.border-radius-top(@radius) {
+.border-radius-top(@arguments) {
 	-webkit-border-top-left-radius: @arguments;
 	-webkit-border-top-right-radius: @arguments;
 	-moz-border-radius-topleft: @arguments;
@@ -32,7 +33,7 @@
 	border-top-right-radius: @arguments;
 }
 
-.border-radius-bottom(@radius) {
+.border-radius-bottom(@arguments) {
 	-webkit-border-bottom-left-radius: @arguments;
 	-webkit-border-bottom-right-radius: @arguments;
 	-moz-border-radius-bottomleft: @arguments;
@@ -46,4 +47,30 @@
 	-webkit-transition: @arguments;
 	-o-transition: @arguments;
 	transition: @arguments;
+}
+
+.marker {
+  
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  color: @white;
+  font-size: 14px;
+  line-height: 1.5em;
+  
+  span { display: none; }
+  
+}
+
+.marker-left {
+	.marker;
+	padding-left: 8px;
+  background: url(../images/bg-icon-marker-left.png) no-repeat 0 0;	
+}
+
+.marker-right {
+	.marker;
+	text-align: right;
+	padding-right: 10px;
+  background: url(../images/bg-icon-marker-right.png) no-repeat 100% 0;
 }

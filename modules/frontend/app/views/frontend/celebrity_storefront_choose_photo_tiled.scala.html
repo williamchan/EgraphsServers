@@ -1,0 +1,66 @@
+@(celeb: models.frontend.storefront.ChoosePhotoCelebrity,
+  products: Iterable[models.frontend.storefront.ChoosePhotoTileProduct],
+  recentEgraphs: Iterable[models.frontend.storefront.ChoosePhotoRecentEgraph],
+  partnerIcons: Iterable[models.frontend.storefront.ChoosePhotoPartnerIcon])
+
+@{/**
+     Renders the Choose Photo page with the products tiled.
+
+     celeb - Viewmodel for the celebrity whose catalog is being rendered
+
+     products - List of viewmodel for the products being sold.
+
+     recentEgraphs - Viewmodels for recently sold egraphs
+
+     partnerIcons - viewmodels for partner organizations
+*/}
+
+@import views.frontend.tags.html.storefront_breadcrumbs_responsive
+@import frontend.formatting.MoneyFormatting.Conversions._
+@import frontend.formatting.DateFormatting.Conversions._
+
+@photoSection = {
+  <section class="wrapper" role="main">
+
+    <div class="container">
+
+      <div class="grid inner clearfix">
+
+        @storefront_breadcrumbs_responsive()
+
+        <!-- List all the products -->
+        @for((product, productNum) <- products.zipWithIndex) {
+          <article>
+
+            <div class="thumb">
+
+              <a href="@product.targetUrl"><img src="@product.imageUrl" alt="@product.name" /></a>
+
+            </div>
+
+            <h2><a href="@product.targetUrl">@product.name &raquo;</a></h2>
+
+            <p class="series">@{productNum+1} / @products.size</p>
+
+            <p class="price">@product.price.formatSimply</p>
+
+            <div class="@product.orientation.tileClass">@product.orientation.tileClass</div>
+
+          </article>
+        }
+
+      </div> <!-- end .grid -->
+
+    </div> <!-- end .container -->
+
+  </section> <!-- end .wrapper -->
+}
+
+@base_celebrity_storefront_choose_photo_template(
+  title="Choose a photo",
+  jsMain="pages/celebrity-storefront-tiled",
+  celeb=celeb,
+  recentEgraphs=recentEgraphs,
+  partnerIcons=partnerIcons,
+  photoSection=photoSection
+)

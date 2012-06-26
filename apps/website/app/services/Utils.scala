@@ -4,14 +4,14 @@ import http.PlayConfig
 import play.mvc.Router
 import play.Play
 import com.google.inject.Inject
-import java.util.Properties
+import java.util
 import org.squeryl.Query
-import java.io.{PrintWriter, StringWriter}
+import java.io.{Serializable, PrintWriter, StringWriter}
 
 /**
  * Helpful utilities with no other place to call home
  */
-class Utils @Inject()(@PlayConfig() playConfig: Properties) {
+class Utils @Inject()(@PlayConfig() playConfig: util.Properties) {
 
   /**
    * Turns any Iterable into a map keyed by a provided function.
@@ -144,8 +144,8 @@ class Utils @Inject()(@PlayConfig() playConfig: Properties) {
     play.mvc.Router.reverse(play.Play.getVirtualFile(path))
   }
 
-  implicit def properties(pairs: (AnyRef, AnyRef)*): Properties = {
-    val props = new Properties
+  implicit def properties(pairs: (AnyRef, AnyRef)*): util.Properties = {
+    val props = new util.Properties
 
     for (pair <- pairs) props.put(pair._1, pair._2)
 
@@ -185,7 +185,7 @@ object Utils extends Utils(Play.configuration) {
     }
 
     //This is the trait that we need to extend our EnumVal type with, it does the book-keeping for us
-    protected trait Value {
+    protected trait Value extends Serializable {
       //Enforce that no one mixes in Value in a non-EnumVal type
       self: EnumVal =>
       final val ordinal = addEnumVal(this) //Adds the EnumVal and returns the ordinal
@@ -195,7 +195,15 @@ object Utils extends Utils(Play.configuration) {
       //And that name is used for the toString operation
       override def toString = name
 
-      override def equals(other: Any) = this eq other.asInstanceOf[AnyRef]
+      override def equals(other: Any) = {
+        other match {
+          case thisType: Value =>
+            thisType.name == this.name
+
+          case otherType =>
+            this eq other.asInstanceOf[AnyRef]
+        }
+      }
 
       override def hashCode = 31 * (this.getClass.## + name.## + ordinal)
     }
@@ -210,7 +218,7 @@ object Utils extends Utils(Play.configuration) {
     (results, page, total)
   }
 
-  def logException(e: Exception) {
+  def logException(e: Throwable) {
     val stringWriter = new StringWriter()
     e.printStackTrace(new PrintWriter(stringWriter))
     play.Logger.error("Fatal error: " + e.getClass + ": " + e.getMessage)

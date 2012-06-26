@@ -35,6 +35,10 @@ object TestData {
     prefix + getTimeInBlobstoreFormat + "@egraphs.com"
   }
 
+  def makeTestCacheKey: String = {
+    "this_is_a_test_case_key_" + new java.util.Date().getTime
+  }
+
   def newSavedAddress(account: Option[Account] = None): Address = {
     Address(accountId = account.getOrElse(newSavedAccount()).id,
       addressLine1 = "615 2nd Ave",

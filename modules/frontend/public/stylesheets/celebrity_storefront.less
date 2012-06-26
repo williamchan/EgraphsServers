@@ -17,26 +17,23 @@
 			color: @white;
 			text-shadow: 0 -1px 0 lighten(@gray, 40%);
 			
-			a { color: @white; }
-			
-			a:hover { 
+			a { 
 			
 				color: @gray; 
 				text-shadow: 0 1px 0 @white;
-				
+					
 				span strong { 
-					color: @white;
-					background-color: @orange; 
+					color: @orange;
 				}
-				
-			}
+			
+			}			
 			
 			span {
 				
 				display: block;
 				float: left;
 				font-size: 16px;
-				font-weight: 700;
+				//font-weight: 700;
 				line-height: 22px;
 				height: 22px;
 				letter-spacing: 1px;
@@ -63,7 +60,7 @@
 			
 			}
 			
-			&.first span { padding-left: 0; }
+			// &.first span { padding-left: 0; }
 			
 			small { 
 				display: block;
@@ -84,6 +81,7 @@
 				
 				span { 
 				
+					font-weight: 700;
 					background: url(../images/bg-breadcrumb-active.png) repeat-x 0 0; 
 				
 					strong { 
@@ -105,88 +103,85 @@
 	
 }
 
-@media (max-width: 1020px) {
+.mobile-steps { 
 
-	.breadcrumbs { display: none; }
+	display: none; 
+	margin-bottom: 40px;
+
+	h1 {
+
+		float: left;
+		font-size: 20px;
+		line-height: 24px;
+		margin-bottom: 0;
 	
-}
+	}
+	
+	ol {
+	
+		float: right;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		
+		li {
+		
+			float: left;
+			margin-left: 10px;
+			
+			strong {
+			
+				.inline-block;
+				font-size: 16px;
+				line-height: 24px;
+				letter-spacing: normal;
+				text-align: center;
+				color: @gray;
+				text-shadow: none;
+				width: 24px;
+				height: 24px;
+				background: @offWhite;
+				.box-shadow(inset 0 1px 1px 0 lighten(@gray, 30%));
+				.border-radius(12px);		
+				
+				span { display: none; }
+								
+			}
+			
+		}
+		
+		li.active {
+		
+			strong { 
+				color: @white;
+				background-color: @orange;
+			}
+			
+		}
+		
+	}
 
+} // end .mobile-steps
 
-#products {
+.wrapper {
 
 	background: url(../images/bg-photos.png) repeat 0 0 fixed;
 
-	header { 
-	
-		display: none; 
-		width: 94%;
-		margin: 0 auto 40px auto;
-	
-		h1 {
-
-			float: left;
-			font-size: 24px;
-			line-height: 24px;
-			margin-bottom: 0;
-		
-		}
-		
-		ol {
-		
-			float: right;
-			list-style: none;
-			margin: 0;
-			padding: 0;
-			
-			li {
-			
-				float: left;
-				margin-left: 10px;
-				
-				strong {
-				
-					.inline-block;
-					font-size: 16px;
-					line-height: 24px;
-					letter-spacing: normal;
-					text-align: center;
-					color: @gray;
-					text-shadow: none;
-					width: 24px;
-					height: 24px;
-					background: @offWhite;
-					.box-shadow(inset 0 1px 1px 0 lighten(@gray, 30%));
-					.border-radius(12px);		
-					
-					span { display: none; }
-									
-				}
-				
-			}
-			
-			li.active {
-			
-				strong { 
-					color: @white;
-					background-color: @orange;
-				}
-				
-			}
-			
-		}
-	
-	}
-
 	.container { 
 	
-		background: @white; 
-		padding: 30px 0 60px 0;
+		position: relative;
+		background: @offWhite; 
+		padding: 30px 0;
 
+		.inner {
+				width: 94%;
+				margin: 0 auto;
+		}
+		
 		.grid {
 		
-			width: 94%;
-			margin: 0 auto;
 			padding-left: 5px;
+			padding-bottom: 30px;
 					
 			article {
 			
@@ -268,14 +263,12 @@
 	
 		} // end .grid
 
-		.single {
-		
-			position: relative;
-
+		.carousel-slider {
+				
 			.flex-direction-nav {
 					
+					height: auto;
 					text-align: center;
-					margin-bottom: 20px; 
 					
 					li { 
 					
@@ -297,9 +290,6 @@
 			} // end .flex-direction-nav
 			
 			.slide {
-
-				width: 94%;
-				margin: 0 auto;
 
 				figure {
 					
@@ -416,11 +406,22 @@
 
 			}
 		
-		} // end .single
+		} // end .carousel-slider
 
+	} // end .container
+	
+	&.inset {
+		
+		background: @grayVeryLight;
+		padding-bottom: 80px;
+		
+		.container {
+			.box-shadow(0px 2px 8px rgba(0, 0, 0, .15));			
+		}
+		
 	}
 
-} // end #products
+} // end .wrapper
 
 .celebrity-information {
 
@@ -541,10 +542,11 @@
 					margin-right: 6%;
 					margin-bottom: 20px;
 					text-align: center;
-					
+
 					a { color: @grayLight; }
-					a:hover { color: @blue; }
-					
+
+  			  &:hover a { color: @blue;	}
+
 					img {
 						display: block;
 						margin-bottom: 10px;
@@ -638,24 +640,20 @@
 } // end .celebrity-information
 
 @media (max-width: 1020px) {
-	
-	#products {
-	
-		header { display: block; }
-		
-		.container { padding-bottom: 0; }
-		
-	}
+
+  .breadcrumbs { display: none; }
+
+	.mobile-steps { display: block; }
 
 }
 
 @media (max-width: 979px) and (min-width: 651px) {
 
-	#products {
+	.wrapper {
 	
 		.container {
 	
-			.single {
+			.carousel-slider {
 				
 				.slide {
 				
@@ -697,21 +695,25 @@
 		
 		}
 	
-	} // end #products
+	} // end .wrapper
 
 }
 
 @media (min-width: 801px) {
 
-	#products .container .single {
+	.wrapper .container .carousel-slider {
+	
+			padding-bottom: 30px;
 
 			.flex-direction-nav {
 			
+				height: 0;
 				margin-bottom: 0;
 			
 				li {
 										
 					a {
+					
 						border: none;
 						padding: 0;
 						display: block;
@@ -724,26 +726,27 @@
 						overflow: hidden;
 						background: url(../images/bg-slide-navigation.png) no-repeat 100% 50%;
 						.transitions(background .25s ease-in-out);
-					}
 					
-					a:hover {
-						background-color: rgba(0, 0, 0, .1);
-					}
+						&:hover {
+							background-color: rgba(0, 0, 0, .1);
+						}
+						
+						&.next {
+							left: 100%;
+							background-position: 0 50%;
+						}
+						
+						&.prev {
+							right: 100%;
+						}
 					
-					a.next {
-						right: -40px;
-						background-position: 0 50%;
-					}
-					
-					a.prev {
-						left: -40px;
 					}
 					
 				}
 				
 			} // end .flex-direction-nav
 			
-	} // end .single
+	} // end .carousel-slider
 	
 }
 
@@ -811,11 +814,11 @@
 
 @media (max-width: 650px) {
 
-	#products {
+	.wrapper {
 	
 		.container {
 	
-			.single {
+			.carousel-slider {
 				
 				.slide {
 				
@@ -854,20 +857,18 @@
 		
 		}
 	
-	} // end #products	
+	} // end .wrapper	
 
 }
 
 @media (max-width: 550px) {
 
-	#products {
+	.wrapper {
 	
 		.container {
 		
 			.grid {
 				
-				width: auto;
-				margin: 0;
 				padding-left: 0;
 				
 				article {
@@ -884,21 +885,15 @@
 				
 			} // end .grid
 			
-			.single {
-			
-				
-			
-			} // end .single
-			
 		}
 	
-	} // end #products
+	} // end .wrapper
 
 }
 
 @media (max-width: 480px) {
 
-	#products {
+	.wrapper {
 	
 		header {
 
@@ -918,9 +913,13 @@
 	
 		.container {
 		
+			.inner { 
+				width: auto;
+				margin: 0;				
+				padding: 0 20px; 
+			}
+		
 			.grid {
-			
-				padding: 0 20px;
 				
 				article {
 					
@@ -931,16 +930,16 @@
 				
 			} // end .grid
 			
-			.single { 
-				
-				padding: 0 20px; 
+			.carousel-slider { 
+			
+				padding-bottom: 0;
 				
 				.slide { width: 100%; }
-			
-			} // end .single
+							
+			} // end .carousel-slider
 			
 		}
 	
-	} // end #products
+	} // end .wrapper
 
 }
