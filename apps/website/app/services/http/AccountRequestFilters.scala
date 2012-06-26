@@ -37,7 +37,9 @@ class AccountRequestFilters @Inject() (accountStore: AccountStore, customerStore
    */
 
   def requireValidCustomerId(customerId: Long)(continue: Customer => Any)(implicit request: Request) = {
-    val resultOption = customerStore.findById(customerId).map(customer => continue(customer))
-    resultOption.getOrElse(new NotFound("Customer not found."))
+    customerStore.findById(customerId) match {
+      case None => new NotFound("Customer not found.")
+      case Some(customer) => continue(customer)
+    }
   }
 }

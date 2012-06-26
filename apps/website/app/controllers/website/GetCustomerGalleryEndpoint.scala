@@ -15,6 +15,7 @@ import scala.Some
 import models.Egraph
 import scala.Some
 import models.Egraph
+import java.text.SimpleDateFormat
 
 
 private[controllers] trait GetCustomerGalleryEndpoint { this: Controller =>
@@ -72,6 +73,7 @@ private[controllers] trait GetCustomerGalleryEndpoint { this: Controller =>
 }
 
 object GalleryEgraphFactory {
+  protected val dateFormat = new SimpleDateFormat("MMM dd, yyyy K:mma")
 
   def makeFulfilledEgraphViewModel(orders:List[(Order, Option[Egraph])]) :
     List[FulfilledEgraphViewModel] = {
@@ -89,7 +91,7 @@ object GalleryEgraphFactory {
           thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Private),
           downloadUrl = Option("egraph/" + order.id),
           publicStatus = order.privacyStatus.name,
-          signedTimestamp = egraph.created.toString
+          signedTimestamp = dateFormat.format(egraph.created)
         )
       }
   }
@@ -106,7 +108,7 @@ object GalleryEgraphFactory {
         thumbnailUrl = "",
         orderStatus = order.reviewStatus.name,
         orderDetails = new OrderDetails(
-          orderDate = order.created.toString(),
+          orderDate = dateFormat.format(order.created),
           orderNumber = order.id,
           price = order.amountPaid.toString(),
           statusText = "",
@@ -116,4 +118,6 @@ object GalleryEgraphFactory {
       )
     }
   }
+
+
 }
