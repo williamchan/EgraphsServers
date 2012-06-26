@@ -55,10 +55,8 @@ private[cache] class RedisCache @Inject()(jedis: Jedis) extends Cache {
   //
   private def fromByteArray[T: Manifest](bytes: Array[Byte]): Option[T] = {
     try {
-      closing(new ByteArrayInputStream(bytes)) {
-        byteStream =>
-          closing(new ObjectInputStream(byteStream)) {
-            objectStream =>
+      closing(new ByteArrayInputStream(bytes)) { byteStream =>
+          closing(new ObjectInputStream(byteStream)) { objectStream =>
               Some(objectStream.readObject().asInstanceOf[T])
           }
       }
@@ -84,14 +82,11 @@ private[cache] class RedisCache @Inject()(jedis: Jedis) extends Cache {
   }
 
   private def toByteArray(toSerialize: Any): Array[Byte] = {
-    closing(new ByteArrayOutputStream()) {
-      byteStream =>
-        closing(new ObjectOutputStream(byteStream)) {
-          objectStream =>
-            objectStream.writeObject(toSerialize.asInstanceOf[AnyRef])
-
-            byteStream.toByteArray
-        }
+    closing(new ByteArrayOutputStream()) { byteStream =>
+      closing(new ObjectOutputStream(byteStream)) { objectStream =>
+          objectStream.writeObject(toSerialize.asInstanceOf[AnyRef])
+          byteStream.toByteArray
+      }
     }
   }
 }

@@ -299,10 +299,28 @@ object Form {
   type Readable = String => Iterable[String]
 
   /** Interface for anything that can be written to from a Form subtype */
+  @Deprecated
   type Writeable = (String, Iterable[String]) => Unit
 
+
+  /**
+   * Interface for anything that can be written to from a Form subtype
+   *
+   * See [[services.http.forms.Form.ServerSessionWriteable]] for an example.
+   *
+   * @tparam T the type that is being written into
+   */
   trait FormWriteable[T] {
+    /**
+     * Returns an instance of the type being written, with all previously writte
+     * tuples applied.
+     */
     def written: T
+
+    /**
+     * Returns a new instance of the FormWriteable with the parameterized
+     * pair written into it.
+     * */
     def withData(toAdd:(String, Iterable[String])): FormWriteable[T]
   }
 
@@ -314,9 +332,16 @@ object Form {
 
   type StringPuttable = { def put(key: String, value: String) }
 
+  /**
+   * FormWriteable that allows forms to write into any object that has a `def put(key: String, value: String)`
+   * method. This includes most java map-like types including Play! scopes.
+   */
   class MutableMapWriteable[T <: StringPuttable](val puttable: T) extends FormWriteable[T]
   {
 
+    //
+    // FormWriteable members
+    //
     val written: T = {
       puttable
     }
@@ -335,6 +360,9 @@ object Form {
     }
   }
 
+  /**
+   * FormWriteable that allows forms to write into a cache-backed ServerSession.
+   */
   class ServerSessionWriteable(val written: ServerSession) extends FormWriteable[ServerSession] {
     def withData(toAdd: (String, Iterable[String])): ServerSessionWriteable = {
       new ServerSessionWriteable(written.setting(toAdd))
@@ -342,7 +370,7 @@ object Form {
   }
 
   /**
-   * Implicit conversions for transforming request- and session-specific values into Form.Readable
+   * Implicit conversions for transforming some of our services into Form.Readable
    * and Form.Writeable instances.
    */
   object Conversions {
@@ -367,6 +395,7 @@ object Form {
         new MutableMapWriteable(gettablePuttable)
       }
     }
+
 
     class FormCompatibleServerSession(serverSession: ServerSession) {
       def asFormReadable: Form.Readable = {

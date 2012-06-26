@@ -22,7 +22,7 @@ class ShippingInfoForm(
   }
 
   val address1 = field(Params.AddressLine1).validatedBy { paramValues =>
-    check.isSomeValue(paramValues)
+    check.isSomeValue(paramValues.filter(value => value != ""))
   }
 
   val address2 = field(Params.AddressLine2).validatedBy { paramValues =>

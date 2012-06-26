@@ -1,12 +1,14 @@
 package services.http.forms.purchase
 
-import services.http.forms.{Form}
+import services.http.forms.Form
 
-
+/**
+ * Purchase flow form for selecting a product.
+ */
 class SelectProductForm(val paramsMap: Form.Readable, check: PurchaseFormChecksFactory)
   extends Form[Product]
 {
-  import SelectProductForm.{Params}
+  import SelectProductForm.Params
 
   //
   // Field values and validations
@@ -16,10 +18,9 @@ class SelectProductForm(val paramsMap: Form.Readable, check: PurchaseFormChecksF
   }
 
   //
-  // Form[ValidatedSelectProductForm] members
+  // Form members
   //
   protected def formAssumingValid: Product = {
-    // Safely access the account value in here
     product.value.get
   }
 }

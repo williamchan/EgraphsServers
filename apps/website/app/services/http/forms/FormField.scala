@@ -51,6 +51,7 @@ trait FormField[+ValueType] {
   //
   // Private members
   //
+  @Deprecated
   private[forms]def write(writeKeyValue: Form.Writeable) {
     writeKeyValue(name, stringsToValidate)
   }

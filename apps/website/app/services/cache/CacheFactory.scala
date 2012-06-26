@@ -16,7 +16,7 @@ import services.http.{PlayId, DeploymentTarget, HostInfo}
  *       can't be made to the cache server then it defaults to the in-memory cache. It defaults to
  *       the fifth database index in redis.
  *
- * - "redis.1, redis.2, etc": A Redis cache implementation against a specific database index 0 - 15
+ * - "redis.1", "redis.2", etc: A Redis cache implementation against a specific database index 0 - 15
  *       on our hosted distributed cache.
  *
  * - "memory": An in-memory implementation that delegates to Play's [[play.cache.EhCacheImpl]]

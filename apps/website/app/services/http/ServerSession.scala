@@ -16,6 +16,9 @@ import services.{Namespacing, AppConfig, Time}
  * In addition to the specific usage here you can use it however you would any other
  * traversable: e.g. you can filter, map, etc over the tuples.
  *
+ * You can create namespaced copies of this session, which effectively creates "folders"
+ * within the session that you can separately populate and blow away.
+ *
  * Usage:
  * {{{
  *   class MyClass @Inject() (sessionFactory: () => ServerSession) {
@@ -39,6 +42,16 @@ import services.{Namespacing, AppConfig, Time}
  *     // Delete celebrity and customer id
  *     session.removing("celebrityId", "customerId").save()
  *
+ *     // Create a folder called "shopping-cart"
+ *     val cart = session.namespaced("shopping-cart")
+ *
+ *     // Save the number of items into the cart.
+ *     // The absolute key becomes "shopping-cart/numItems"
+ *     cart.setting("numItems", 0).save()
+ *
+ *     // Clear the cart. This wouldn't delete anything outside of the cart.
+ *     cart.emptied.save()
+ *
  *     // Clear out the entire session
  *     session.emptied.save()
  *
@@ -47,6 +60,8 @@ import services.{Namespacing, AppConfig, Time}
  *
  * @param providedData Optional data of this current instance. If this is None then
  *     the instance will reach out to the Application cache to grab it.
+ * @param namespace the current namespace of this server session instance, e.g. "shopping-cart".
+ *     A namespace allows you to create a named "sub-folder" within the session.
  * @param services services needed for the ServerSession to operate correctly.
  */
 class ServerSession private[http] (
@@ -73,6 +88,13 @@ class ServerSession private[http] (
     this
   }
 
+  /**
+   * Create a new "folder" or "keyspace" inside of the session. That keyspace can be separately
+   * added to, removed from, and cleared out without affecting parent keys.
+   *
+   * @param newNamespace name of the new space, e.g. "shopping-cart"
+   * @return a ServerSession representing the new namespace.
+   */
   def namespaced(newNamespace: String): ServerSession = {
     new ServerSession(providedData, applyNamespace(newNamespace), services)
   }
@@ -117,6 +139,7 @@ class ServerSession private[http] (
     data.get(applyNamespace(key)).map(value => value.asInstanceOf[T])
   }
 
+  /** Alias for apply */
   def get[T : Manifest](key: String): Option[T] = {
     apply(key)
   }

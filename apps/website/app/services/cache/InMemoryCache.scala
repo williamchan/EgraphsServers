@@ -12,7 +12,9 @@ import services.logging.Logging
  * @param cache the EhCacheImpl from play.
  */
 private[cache] class InMemoryCache @Inject()(cache: EhCacheImpl) extends Cache {
-
+  //
+  // Cache members
+  //
   override def set[T](key: String, value: T, expirationSeconds: Int) {
     cache.set(key, value.asInstanceOf[AnyRef], expirationSeconds)
   }

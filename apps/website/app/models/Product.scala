@@ -251,6 +251,7 @@ case class Product(
     (totalInventory - numOrders, activeInventoryBatches)
   }
 
+  /** Returns the remaining inventory in this product's batch */
   def remainingInventoryCount: Int = {
     this.getRemainingInventoryAndActiveInventoryBatches()._1
   }

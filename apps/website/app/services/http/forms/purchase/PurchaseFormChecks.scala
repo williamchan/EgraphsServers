@@ -4,9 +4,24 @@ import services.http.forms.{FormChecks, FormError}
 import models.enums.{WrittenMessageChoice, RecipientChoice, PrintingOption}
 import com.google.inject.Inject
 
+/**
+ * Checks used to perform field validation specifically on parameters submitted for the
+ * purchase form.
+ *
+ * Prefer to access instances via the [[services.http.forms.purchase.PurchaseFormChecksFactory]].
+ *
+ * See the [[services.http.forms.purchase.PersonalizeForm]] for good usage examples.
+ *
+ * @param toValidate the string to validate
+ * @param check the generic form checking library
+ */
 class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
   import PurchaseFormChecks._
 
+  /**
+   * Returns the PrintingOption on the right if the provided parameter mapped
+   * to a valid PrintingOption enum value.
+   */
   def isPrintingOption: Either[FormError, PrintingOption] = {
     for (
       param <- check.isSomeValue(toValidate, requiredError).right;
@@ -19,7 +34,12 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
     }
   }
 
-  def isProductId: Either[FormError, models.Product] ={
+  /**
+   * Returns a [[models.Product]] on the right if the provided parameter
+   * mapped to a valid product ID. It does not check the product's inventory batch
+   * for availability.
+   */
+  def isProductId: Either[FormError, models.Product] = {
     for (
       param <- check.isSomeValue(toValidate, requiredError).right;
       paramAsLong <- check.isLong(param).right;
@@ -29,6 +49,10 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
     }
   }
 
+  /**
+   * Returns a [[models.enums.RecipientChoice]] on the right if the provided parameters
+   * mapped to a valid one.
+   */
   def isRecipientChoice
   : Either[FormError, RecipientChoice] =
   {
@@ -40,8 +64,12 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
     }
   }
 
-  // Validate the recipient email given whether it was being gifted or not. If it was a gift
-  // then the e-mail was required, but if it was bought for self then we don't need the email.
+  /**
+   * Returns None on the right if this is a self-purchase (because we will get the e-mail address later)
+   * and Some(email) on the right if it was both a gift and a valid e-mail address.
+   *
+   * @param recipientChoice the target for the egraph: self or someone else.
+   */
   def isRecipientEmailGivenRecipient(recipientChoice: RecipientChoice)
   : Either[FormError, Option[String]] =
   {
@@ -54,6 +82,10 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
     }
   }
 
+  /**
+   * Returns a [[models.enums.WrittenMessageChoice]] on the right if the provided parameters
+   * mapped to a valid enum value.
+   */
   def isWrittenMessageChoice: Either[FormError, WrittenMessageChoice] = {
     for (
       param <- check.isSomeValue(toValidate, requiredError).right;
@@ -66,6 +98,13 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
     }
   }
 
+  /**
+   * Returns None on the right if the purchaser didn't want to specify a message. Otherwise
+   * returns Some(valid message) on the right.
+   *
+   * @param messageChoice choice for written message: signature only, chosen-by-celebrity,
+   *    or a specific message
+   */
   def isWrittenMessageTextGivenChoice(messageChoice: WrittenMessageChoice)
   : Either[FormError, Option[String]] =
   {
@@ -91,9 +130,14 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
     }
   }
 
+  /**
+   * Returns Some(note to the celebrity) on the right if the string existed, but if it wasn't
+   * provided it returns None.
+   */
   def isOptionalNoteToCelebrity: Either[FormError, Option[String]] = {
     // If there was a string, make sure it's valid
-    val maybeErrorOrValidNote = toValidate.headOption.map { note =>
+    val maybeNote = toValidate.headOption.filter(note => note != "")
+    val maybeErrorOrValidNote = maybeNote.map { note =>
       for (_ <- check.isBetweenInclusive(
                   minNoteToCelebChars,
                   maxNoteToCelebChars,
@@ -109,12 +153,19 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
     maybeErrorOrValidNote.getOrElse(Right(None))
   }
 
+  /**
+   * Return the payment token on the right if it existed. Later on we could add
+   * an actual call to the Stripe API to make sure the token is legit.
+   */
   def isPaymentToken: Either[FormError, String] = {
     for (param <- check.isSomeValue(toValidate, requiredError).right) yield {
       param
     }
   }
 
+  /**
+   * Returns a human name on the right if it existed and passed length checks.
+   */
   def isName: Either[FormError, String] = {
     for (
       name <- check.isSomeValue(toValidate, requiredError).right;
@@ -124,6 +175,9 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
     }
   }
 
+  /**
+   * Returns an e-mail address on the right if it existed and passed regex checks.
+   */
   def isEmail: Either[FormError, String] = {
     for (
       param <- check.isSomeValue(toValidate, requiredError).right;
@@ -133,6 +187,9 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
     }
   }
 
+  /**
+   * Returns the set of strings on the right if there was at least one of them.
+   */
   def isPresent: Either[FormError, Iterable[String]] = {
     check.isPresent(toValidate)
   }
@@ -163,6 +220,12 @@ object PurchaseFormChecks {
   }
 }
 
+/**
+ * Injectable accessor for PurchaseFormChecks.
+ *
+ * See the [[services.http.forms.purchase.PersonalizeForm]] for good usage examples.
+ * @param check
+ */
 class PurchaseFormChecksFactory @Inject()(check: FormChecks){
   def apply(toValidate: Iterable[String]): PurchaseFormChecks = {
     new PurchaseFormChecks(toValidate, check)

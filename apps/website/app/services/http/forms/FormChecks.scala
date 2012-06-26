@@ -16,6 +16,10 @@ import models.{ProductStore, Account, AccountStore, Product}
  */
 class FormChecks @Inject()(accountStore: AccountStore, productStore: ProductStore) {
 
+  /**
+   * Returns the provided string on the right if it contained at least one non-empty-stirng
+   * value.
+   */
   def isPresent(toValidate: Iterable[String])
   : Either[ValueNotPresentFieldError, Iterable[String]] =
   {
@@ -73,15 +77,21 @@ class FormChecks @Inject()(accountStore: AccountStore, productStore: ProductStor
     }
   }
 
-  // If the string was present it checks for the positive value,
-  // If it was not present it defaults to false. This is because of the wya
-  // that forms work.
+  /**
+   * Returns true on the right if the parameter value as posted by an HTML checkbox corresponded
+   * to true. Returns false on the right if it was not present. Returns an error if it was
+   * present but did not correspond to true.
+   */
   def isChecked(toValidate: Option[String], message:String="Was not checked")
   : Either[FormError, Boolean] =
   {
     toValidate.map(string => isBoolean(string, message)).getOrElse(Right(false))
   }
 
+  /**
+   * Returns true on the right that the provided boolean was true, otherwise
+   * returns the error message on the left.
+   */
   def isTrue(toValidate:Boolean, message: String="Should have been true")
   : Either[FormError, Boolean] = {
     if (toValidate) Right(toValidate) else error(message)
@@ -146,6 +156,9 @@ class FormChecks @Inject()(accountStore: AccountStore, productStore: ProductStor
     }
   }
 
+  /**
+   * Returns true that the provided ID corresponds to an actual product id in the database.
+   */
   def isProductId(productId: Long, message: String="Product ID was invalid"): Either[FormError, Product] = {
     productStore.findById(productId).map(prod => Right(prod)).getOrElse {
       error(message)
@@ -210,6 +223,10 @@ class FormChecks @Inject()(accountStore: AccountStore, productStore: ProductStor
     if(toValidate < minimum) error(message) else Right(toValidate)
   }
 
+  /**
+   * Returns true on the right if a number to validate fell between a minimum and
+   * maximum, inclusive.
+   */
   def isBetweenInclusive(
     minimum: Int,
     maximum: Int,

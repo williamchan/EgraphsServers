@@ -100,6 +100,21 @@ object Time {
     dateFormat
   }
 
+  /**
+   * Implicit conversions that turn Ints with various duration units into their
+   * representative values in seconds.
+   *
+   * Usage:
+   * {{{
+   *   import Time.IntsToSeconds._
+   *
+   *   // The following are true
+   *   1.second ==  1
+   *   1.minute ==  60
+   *   2.minutes == 120
+   *   1.hour   ==  3600
+   * }}}
+   */
   object IntsToSeconds {
     class SecondDurations(int: Int) {
       //

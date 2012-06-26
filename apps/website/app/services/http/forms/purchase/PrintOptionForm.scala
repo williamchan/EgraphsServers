@@ -10,6 +10,9 @@ import models.enums.PrintingOption
 class PrintOptionForm(val paramsMap: Form.Readable, check: PurchaseFormChecksFactory) extends Form[PrintingOption] {
   import PrintOptionForm.Params
 
+  //
+  // Fields
+  //
   val highQualityPrint = field(Params.HighQualityPrint).validatedBy { paramValues =>
     check(paramValues).isPrintingOption
   }

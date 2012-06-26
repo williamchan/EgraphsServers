@@ -5,6 +5,11 @@ import redis.clients.jedis.Jedis
 import play.modules.redis.RedisConnectionManager
 import services.Utils
 
+/**
+ * Factory for the lowest-level Redis connection.
+ *
+ * Throws up everywhere if it can't connect to a redis connection.
+ */
 private[cache] class JedisFactory @Inject()() {
   def apply(db: Int = JedisFactory.defaultRedisDb): Option[Jedis] = {
     val maybeJedis = try {
@@ -28,5 +33,5 @@ private[cache] class JedisFactory @Inject()() {
 }
 
 object JedisFactory {
-  val defaultRedisDb = 5
+  private[cache] val defaultRedisDb = 5
 }
