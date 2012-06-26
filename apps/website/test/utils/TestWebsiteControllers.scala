@@ -1,7 +1,7 @@
 package utils
 
 import com.google.inject.Inject
-import services.http.{PlayConfig, CelebrityAccountRequestFilters, AdminRequestFilters, POSTControllerMethod, ControllerMethod}
+import services.http._
 import services.mail.Mail
 import services.payment.Payment
 import models.{InventoryBatchQueryFilters, EgraphQueryFilters, OrderQueryFilters}
@@ -21,6 +21,7 @@ import play.test.FunctionalTest
 case class TestWebsiteControllers @Inject()(
   controllerMethod: ControllerMethod,
   postController: POSTControllerMethod,
+  accountRequestFilters: AccountRequestFilters,
   adminFilters: AdminRequestFilters,
   celebFilters: CelebrityAccountRequestFilters,
   mail: Mail,

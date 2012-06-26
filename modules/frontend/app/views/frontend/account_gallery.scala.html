@@ -1,4 +1,4 @@
-@(username: String, egraphs: List[models.frontend.egraphs.EgraphViewModel], controlRenderer: models.frontend.egraphs.GalleryControlRenderer)
+@(username: String, egraphs: List[models.frontend.egraphs.EgraphViewModel], controlRenderer: models.frontend.egraphs.GalleryControlRenderer)(implicit session: play.mvc.Scope.Session)
 
 @fulfilledEgraph(egraph: models.frontend.egraphs.FulfilledEgraphViewModel, index: Int) = {
   <div class="row-fluid row-egraph">
