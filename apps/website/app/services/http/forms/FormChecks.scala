@@ -288,16 +288,16 @@ object FormChecks {
    * Returns the provided strings unaltered if there was at least one non-null
    * non-empty string in them.
    */
-  def isPresent(toValidate: Iterable[String])
+  def isPresent(toValidate: Iterable[String], message: String = "Required")
   : Either[ValueNotPresentFieldError, Iterable[String]] =
   {
     toValidate match {
       case null =>
-        Left(ValueNotPresentFieldError())
+        Left(ValueNotPresentFieldError(message))
 
       case strings if (strings.isEmpty ||
                         (strings.size == 1 && (strings.head == "" || strings.head == null))) =>
-        Left(ValueNotPresentFieldError())
+        Left(ValueNotPresentFieldError(message))
 
       case strings =>
         Right(strings)

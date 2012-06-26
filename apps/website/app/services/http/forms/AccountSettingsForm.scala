@@ -22,6 +22,7 @@ class AccountSettingsForm(val paramsMap: Form.Readable, check: FormChecks, custo
   //
   val fullname = new RequiredField[String](Fields.Fullname.name) {
     def validateIfPresent = Right(stringToValidate)
+    override def errorMessage = "Name is required"
   }
 
   val username = new RequiredField[String](Fields.Username.name) {
@@ -33,6 +34,7 @@ class AccountSettingsForm(val paramsMap: Form.Readable, check: FormChecks, custo
              valid2 <- check.isUniqueUsername(stringToValidate, "Username already taken").right) yield valid
       }
     }
+    override def errorMessage = "Username is required"
   }
 
   val email = new RequiredField[String](Fields.Email.name) {
@@ -44,6 +46,7 @@ class AccountSettingsForm(val paramsMap: Form.Readable, check: FormChecks, custo
              valid2 <- check.isUniqueEmail(stringToValidate, "Email already taken").right) yield valid
       }
     }
+    override def errorMessage = "Email is required"
   }
 
   val galleryVisibility = new RequiredField[String](Fields.GalleryVisibility.name) {
