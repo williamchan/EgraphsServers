@@ -52,10 +52,16 @@
     font-family: @sansFontFamily;
   }
   
-  input[type=text], input[type=email], textarea {    
+  input[type=text], input[type=email], textarea, select {    
     width: 97%;
     font-size: 14px;
     line-height: 1.125em;
+    
+    &.inline { 
+    	width: auto; 
+    	margin-right: 10px;
+    }
+    
   }
 
 	.btn-group {
@@ -153,8 +159,17 @@
 			    
 			    margin-bottom: 10px;
 			    
+			    &.add-bottom { margin-bottom: 40px; }		    
 			    &.last { margin-bottom: 0; }
 			    
+			    &.inline { 
+			    
+			    	margin-bottom: 20px;
+			    	
+			    	label { display: inline; } 
+			    	
+			    }
+			   
 			    > div {
 			    
 			      padding-right: 40px;
@@ -335,7 +350,8 @@
         
           float: none;
           width: auto;
-          margin-bottom: 20px;
+          padding: 0;
+          margin-bottom: 10px;
           
         }
         

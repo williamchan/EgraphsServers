@@ -7,6 +7,7 @@ function(forms, Egraphs) {
 
   return {
     go: function() {
+    
       forms.setIphoneCheckbox('#gift', { 
       	checkedLabel: 'YES', 
       	uncheckedLabel: 'NO',
@@ -15,6 +16,7 @@ function(forms, Egraphs) {
       		$(elem).parents(field).siblings(field).slideToggle();
         }
       });
+      
       forms.setDefaultText("#egraph-message textarea", "This is the message that "+celeb+" will write on your egraph.");
       forms.setDefaultText("#your-message", "Write here to tell "+celeb+" something you’d like him to know.");
       forms.setAlert('.alert');
@@ -26,6 +28,7 @@ function(forms, Egraphs) {
       $('#message-options button:eq(0)').click(function() { $('#egraph-message').show(); });
       // hide message
       $('#message-options button:not(:eq(0))').click(function() { $('#egraph-message').hide(); });
+      
     }    
   };
 });
