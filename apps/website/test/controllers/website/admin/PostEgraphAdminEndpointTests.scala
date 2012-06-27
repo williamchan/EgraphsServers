@@ -44,8 +44,8 @@ class PostEgraphAdminEndpointTests extends AdminFunctionalTest {
     var egraph2: Egraph = null
     db.connected(TransactionSerializable) {
       val order = TestData.newSavedOrder()
-      egraph1 = Egraph(orderId = order.id).withEgraphState(EgraphState.PassedBiometrics).save()
-      egraph2 = Egraph(orderId = order.id).withEgraphState(EgraphState.FailedBiometrics).save()
+      egraph1 = TestData.newSavedEgraph(Some(order)).withEgraphState(EgraphState.PassedBiometrics).save()
+      egraph2 = TestData.newSavedEgraph(Some(order)).withEgraphState(EgraphState.FailedBiometrics).save()
     }
 
     val response1 = POST("/admin/egraphs/" + egraph1.id, getPostStrParams("RejectedByAdmin"))
@@ -63,8 +63,7 @@ class PostEgraphAdminEndpointTests extends AdminFunctionalTest {
   def testPublishEgraph() {
     createAndLoginAsAdmin()
     val egraph = db.connected(TransactionSerializable) {
-      val order = TestData.newSavedOrder()
-      Egraph(orderId = order.id).withEgraphState(EgraphState.ApprovedByAdmin).save()
+      TestData.newSavedEgraph().withEgraphState(EgraphState.ApprovedByAdmin).save()
     }
 
     val response = POST("/admin/egraphs/" + egraph.id, getPostStrParams("Published"))

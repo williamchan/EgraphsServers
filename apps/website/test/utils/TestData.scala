@@ -119,6 +119,16 @@ object TestData {
     }
   }
 
+  def newSavedEgraph(orderOption: Option[Order] = None): Egraph = {
+    val order = orderOption match {
+      case None => newSavedOrder()
+      case Some(o) => o
+    }
+    order.newEgraph
+      .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.fakeAudio)
+      .save()
+  }
+
   def newControllers: TestWebsiteControllers = {
     AppConfig.instance[TestWebsiteControllers]
   }
