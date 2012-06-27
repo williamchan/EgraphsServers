@@ -6,7 +6,10 @@ import play.data.binding.types.DateBinder
 import java.text.{ParseException, SimpleDateFormat}
 import java.util.Date
 import play.libs.I18N
-import models.{ProductStore, Account, AccountStore, Product}
+import models._
+import scala.Right
+import scala.Some
+import scala.Left
 
 /**
  * A set of checks used by [[services.http.forms.Form]] to validate its
@@ -14,7 +17,7 @@ import models.{ProductStore, Account, AccountStore, Product}
  *
  * @param accountStore the store for Accounts.
  */
-class FormChecks @Inject()(accountStore: AccountStore, productStore: ProductStore) {
+class FormChecks @Inject()(accountStore: AccountStore, customerStore: CustomerStore, productStore: ProductStore) {
 
   /**
    * Returns the provided string on the right if it contained at least one non-empty-stirng
@@ -31,7 +34,6 @@ class FormChecks @Inject()(accountStore: AccountStore, productStore: ProductStor
   {
     toValidate.headOption.map(value => Right(value)).getOrElse(error(message))
   }
-
 
   /**
    * Returns an Integer if the String could be turned into one.
@@ -191,6 +193,15 @@ class FormChecks @Inject()(accountStore: AccountStore, productStore: ProductStor
     }
   }
 
+  def isAlphaNumeric(toValidate: String, message: String="Must be alphanumeric")
+  : Either[FormError, String] = {
+    if (playValidation.`match`(toValidate, "[a-zA-Z0-9]*").ok) {
+      Right(toValidate)
+    } else {
+      Left(new SimpleFormError(message))
+    }
+  }
+
   /**
    * Returns the provided string unaltered if it was a valid phone number according
    * to Play.
@@ -242,6 +253,24 @@ class FormChecks @Inject()(accountStore: AccountStore, productStore: ProductStor
     }
   }
 
+  def isUniqueEmail(toValidate: String, message: String = "Unique email required")
+  : Either[FormError, String] = {
+    if (accountStore.findByEmail(toValidate).isEmpty) {
+      Right(toValidate)
+    } else {
+      Left(new SimpleFormError(message))
+    }
+  }
+
+  def isUniqueUsername(toValidate: String, message: String = "Unique username required")
+  : Either[FormError, String] = {
+    if (customerStore.findByUsername(toValidate).isEmpty) {
+      Right(toValidate)
+    } else {
+      Left(new SimpleFormError(message))
+    }
+  }
+
   //
   // Private members
   //
@@ -259,16 +288,16 @@ object FormChecks {
    * Returns the provided strings unaltered if there was at least one non-null
    * non-empty string in them.
    */
-  def isPresent(toValidate: Iterable[String])
+  def isPresent(toValidate: Iterable[String], message: String = "Required")
   : Either[ValueNotPresentFieldError, Iterable[String]] =
   {
     toValidate match {
       case null =>
-        Left(ValueNotPresentFieldError())
+        Left(ValueNotPresentFieldError(message))
 
       case strings if (strings.isEmpty ||
                         (strings.size == 1 && (strings.head == "" || strings.head == null))) =>
-        Left(ValueNotPresentFieldError())
+        Left(ValueNotPresentFieldError(message))
 
       case strings =>
         Right(strings)

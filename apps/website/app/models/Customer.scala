@@ -176,6 +176,9 @@ class CustomerStore @Inject() (
   override def defineUpdate(theOld: Customer, theNew: Customer) = {
     updateIs(
       theOld.name  := theNew.name,
+      theOld.username  := theNew.username,
+      theOld.isGalleryVisible  := theNew.isGalleryVisible,
+      theOld.notice_stars := theNew.notice_stars,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated
     )

@@ -1,36 +1,33 @@
-@(address: String, id: String)
+@(model: String, name: String)
 
 @import views.frontend.Utils
 
-
-<a id="@id-display" class="row-settings row-fluid action edit">
-  <span class="span3">@Utils.binding(address,".title")</span>
-  <span class="span4">@Utils.binding(address,".fullname")</span>
+<a id="@name-display" class="row-settings row-fluid action edit">
+  <span class="span3">@Utils.binding(model,".title")</span>
   <span class="span3">
     <address>
-      @Utils.binding(address, ".line1")<br>
-      @Utils.binding(address, ".line2")<br ng:show="{{user.address.line2}}">
-      @Utils.binding(address, ".city"), @Utils.binding(address, ".state") @Utils.binding(address, ".zip")
-      </address>
+      @Utils.binding(model, ".line1")<br>
+      @Utils.binding(model, ".line2")<br>
+      @Utils.binding(model, ".city"), @Utils.binding(model, ".state") @Utils.binding(model, ".postalCode")
+    </address>
   </span>
   <span class="span2 action">
-      <i class="icon-pencil">
-      </i> Edit
+    <i class="icon-pencil"></i> Edit
   </span>
 </a>
-<div id="@id-edit" class="row-settings row-fluid hide">
+
+<div id="@name-edit" class="row-settings row-fluid hide">
   <span class="span1"></span>
-      <span class="span9">
-        <address>
-          @form_input("Name", address,".fullname")
-          @form_input("Address Line 1", address, ".line1")
-          @form_input("Address Line 2", address, ".line2")
-          @form_input("City", address, ".city")
-          @statepicker("State", address, ".state")
-          @form_input("ZIP", address, ".zip")
-        </address>
-      </span>
-      <span class="span2 action">
-        @form_cancel(address, id)
-      </span>
+  <span class="span9">
+    <address>
+      @form_input(label="Address Line 1", model={model+".line1"}, name={name+".line1"})
+      @form_input(label="Address Line 2", model={model+".line2"}, name={name+".line2"})
+      @form_input(label="City", model={model+".city"}, name={name+".city"})
+      @statepicker(label="State", model={model+".state"}, name={name+".state"})
+      @form_input(label="Zip", model={model+".postalCode"}, name={name+".postalCode"})
+    </address>
+  </span>
+  <span class="span2 action">
+    @form_cancel(model, name)
+  </span>
 </div>

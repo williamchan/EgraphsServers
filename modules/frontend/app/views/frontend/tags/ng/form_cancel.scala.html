@@ -1,9 +1,5 @@
-@(model: String, id:String)
+@(model: String, name:String)
 
-@import views.frontend.Utils
-
-
-<a ng-click='cancel("@model", "@id-edit");' class="action cancel">
-  <i class="icon-pencil">
-  </i> Cancel @Utils.binding("rest", "test")
+<a ng-click='cancel("@model", "@name-edit");' class="action cancel">
+  <i class="icon-pencil"></i> Cancel
 </a>

@@ -1,18 +1,23 @@
 package models.frontend.account
 
+import models.frontend.forms.{Field, FormError}
+
 /**
  * The settings as seen on the account_settings page
  */
-case class AccountSettings(
-  name:String,
-  username:String,
-  email:String,
-  passwordLength:Int,
-  galleryUrl:String
+case class AccountSettingsForm(
+  fullname: Field[String],
+  username: Field[String],
+  email: Field[String],
+  galleryVisibility: Field[String],
+  oldPassword: Field[String],
+  newPassword: Field[String],
+  passwordConfirm: Field[String],
+  addressLine1: Field[String],
+  addressLine2: Field[String],
+  city: Field[String],
+  state: Field[String],
+  postalCode: Field[String],
+  notice_stars: Field[String],
+  generalErrors: Iterable[FormError]
 )
-
-
-
-
-
-
