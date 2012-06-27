@@ -4,7 +4,7 @@ import play.mvc.Controller
 import models.frontend.account.AccountSettingsForm
 import models.frontend.forms.{FormError, Field}
 
-object Account extends Controller {
+object Account extends Controller with DefaultHeaderAndFooterData {
 
   def settings() = {
     request.method match {

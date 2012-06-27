@@ -1,4 +1,7 @@
-@(title: String, headJs: => Html = Html.empty, jsMain: String = "", body: => Html)
+@(title: String, headJs: => Html = Html.empty, jsMain: String = "", body: => Html)(
+  implicit headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData
+)
 @{/**
    Renders the base template for the Celebrity Storefront. This includes all breadcrumbs.
 */}

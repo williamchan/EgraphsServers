@@ -1,4 +1,27 @@
-@()
+@(headerData: models.frontend.header.HeaderData)
+@{/** Renders the default header using the provided header data. */}
+
+@import models.frontend.header.HeaderLoggedIn
+@import models.frontend.header.HeaderNotLoggedIn
+
+@loggedInHeader(status: HeaderLoggedIn) = {
+  <li>Hello, <a href="#">@status.name</a></li>
+  <li class="account-options">
+    <a href="@status.accountSettingsUrl">My Account</a>
+    <ul>
+    <li><a href="@status.profileUrl">Profile</a></li>
+    <li><a href="@status.accountSettingsUrl">Account Settings</a></li>
+    <li><a href="@status.galleryUrl">My Gallery</a></li>
+    <li><a href="@status.logoutUrl">Logout</a></li>
+    </ul>
+  </li>
+}
+
+@notLoggedInHeader(status: HeaderNotLoggedIn) = {
+  <li>Hello, <a href="@status.loginUrl">Sign in</a></li>
+  <li class="account-options"><a href="@status.loginUrl">My Account</a></li>
+}
+
 <!-- Begin site_header.scala.html -->
 <header id="top" role="navigation">
   
@@ -14,7 +37,7 @@
       
 	  <div class="explore span3">
 	    
-	    <p><a href="#">Inside an Egraph</a></p>
+	    <p><a href="@headerData.insideAnEgraphLink">Inside an Egraph</a></p>
 	    
 	  </div> <!-- end .explore -->
 	  
@@ -23,26 +46,20 @@
 	 	<div class="social">
 		  
 		  <ul class="clearfix">
-		    <li><a href="#" class="facebook">Facebook</a></li>
-		    <li><a href="https://twitter.com/egraphs" class="twitter">Twitter</a></li>
+		    <li><a href="@headerData.egraphsFacebookLink" class="facebook">Facebook</a></li>
+		    <li><a href="@headerData.egraphsTwitterLink" class="twitter">Twitter</a></li>
 		    <!-- <li><a href="#" class="addthis">AddThis</a></li> -->
 		  </ul>
 		  
 		</div> <!-- end .social -->
         
-		<nav class="account">
+		<nav class="account @if(headerData.loggedInStatus.isRight) {logged-in}">
 		  
 		  <ul>
-		    <li>Hello, <a href="#">Sign in</a></li>
-		    <li class="account-options">
-		      <a href="#">My Account</a>
-		      <ul>
-		    	<li><a href="#profile">Profile</a></li>
-		    	<li><a href="#account">Account Settings</a></li>
-		    	<li><a href="#my-gallery">My Gallery</a></li>
-		    	<li><a href="#logout">Logout</a></li>
-		      </ul>
-		    </li>
+        @{headerData.loggedInStatus match {
+          case Left(notLoggedIn) => notLoggedInHeader(notLoggedIn)
+          case Right(loggedIn) => loggedInHeader(loggedIn)
+        }}
 		  </ul>  
 		  
 		</nav> <!-- end .account --> 

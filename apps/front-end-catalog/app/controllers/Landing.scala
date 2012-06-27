@@ -6,7 +6,7 @@ import models.frontend.landing.FeaturedStar
 /**
  * Permutations of the landing page
  */
-object Landing extends Controller {
+object Landing extends Controller with DefaultHeaderAndFooterData {
 
   /**
    * Displays a permutation of the landing page with "featured stars" counting
