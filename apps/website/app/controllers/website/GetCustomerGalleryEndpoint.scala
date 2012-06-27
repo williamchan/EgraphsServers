@@ -2,7 +2,6 @@ package controllers.website
 
 import services.http.{AccountRequestFilters, SafePlayParams, ControllerMethod}
 import play.mvc.Controller
-import play.templates.Html
 import models._
 import controllers.WebsiteControllers
 import enums.{PrivacyStatus, OrderReviewStatus, EgraphState, PublishedStatus}
@@ -12,9 +11,7 @@ import scala.Some
 import models.Egraph
 import services.blobs.AccessPolicy
 import scala.Some
-import models.Egraph
 import scala.Some
-import models.Egraph
 import java.text.SimpleDateFormat
 
 
@@ -30,7 +27,7 @@ private[controllers] trait GetCustomerGalleryEndpoint { this: Controller =>
   def getCustomerGallery(galleryCustomerId: Long) = controllerMethod() {
 
     accountRequestFilters.requireValidCustomerId(galleryCustomerId){ customer =>
-
+      //TODO sbilstein moves these functions into separate areas for testing
       val adminGalleryControlOption = for(
         sessionAdminId <- session.getLongOption(WebsiteControllers.adminIdKey);
         adminOption   <- administratorStore.findById(sessionAdminId)) yield AdminGalleryControl
@@ -54,70 +51,23 @@ private[controllers] trait GetCustomerGalleryEndpoint { this: Controller =>
 
       val pendingOrders = orders_and_egraphs.filter(orderEgraph =>
         orderEgraph._1.reviewStatus != OrderReviewStatus.ApprovedByAdmin)
+
       val fulfilledOrders = orders_and_egraphs.filter(orderEgraph =>
         orderEgraph._1.reviewStatus == OrderReviewStatus.ApprovedByAdmin)
 
-      val orders = galleryControl match {
+      //The type system makes me angry here, Factory takes iterables of the filtered queries
+      //need to add some filtering according to privacy status.
+      val orders:List[EgraphViewModel] = galleryControl match {
         case AdminGalleryControl | OwnerGalleryControl =>
-            GalleryEgraphFactory.makePendingEgraphViewModel(pendingOrders.toList) ++
-            GalleryEgraphFactory.makeFulfilledEgraphViewModel(fulfilledOrders.toList)
+          GalleryOrderFactory.makePendingEgraphViewModel(pendingOrders).toList ++
+            GalleryOrderFactory.makeFulfilledEgraphViewModel(fulfilledOrders).flatten.toList
+        case _ =>
+          GalleryOrderFactory.makeFulfilledEgraphViewModel(fulfilledOrders).flatten.toList
 
-        case OtherGalleryControl =>
-          GalleryEgraphFactory.makeFulfilledEgraphViewModel(fulfilledOrders.toList)
-    }
-
+      }
       views.frontend.html.account_gallery(customer.username, orders, galleryControl)
     }
-
   }
 }
 
-object GalleryEgraphFactory {
-  protected val dateFormat = new SimpleDateFormat("MMM dd, yyyy K:mma")
 
-  def makeFulfilledEgraphViewModel(orders:List[(Order, Option[Egraph])]) :
-    List[FulfilledEgraphViewModel] = {
-      for((order, optionEgraph) <- orders;
-                         egraph <- optionEgraph)
-      yield {
-        val product = order.product
-        val rawImage = egraph.image(product.photoImage).scaledToWidth(product.frame.thumbnailWidthPixels)
-        FulfilledEgraphViewModel(
-          orderId = order.id,
-          orientation = product.frame.name,
-          productUrl = "//" + product.celebrity.urlSlug + "/" + product.urlSlug,
-          productTitle = product.storyTitle,
-          productDescription = product.description,
-          thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Private),
-          downloadUrl = Option("egraph/" + order.id),
-          publicStatus = order.privacyStatus.name,
-          signedTimestamp = dateFormat.format(egraph.created)
-        )
-      }
-  }
-
-  def makePendingEgraphViewModel(orders: List[(Order, Option[Egraph])]) : List[PendingEgraphViewModel] = {
-    for((order, optionEgraph) <- orders) yield {
-      val product = order.product
-      PendingEgraphViewModel(
-        orderId = order.id,
-        orientation = product.frame.name,
-        productUrl = "//" + product.celebrity.urlSlug + "/" + product.urlSlug,
-        productTitle = product.storyTitle,
-        productDescription = product.description,
-        thumbnailUrl = "",
-        orderStatus = order.reviewStatus.name,
-        orderDetails = new OrderDetails(
-          orderDate = dateFormat.format(order.created),
-          orderNumber = order.id,
-          price = order.amountPaid.toString(),
-          statusText = "",
-          shippingMethod = "",
-          UPSNumber = ""
-        )
-      )
-    }
-  }
-
-
-}
