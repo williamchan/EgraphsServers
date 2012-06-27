@@ -10,13 +10,10 @@
 GET     /test/scenarios                          website.nonproduction.ScenarioController.list
 GET     /test/scenarios/clear                    website.nonproduction.ScenarioController.clear
 GET     /test/scenarios/{urlSlug}                website.nonproduction.ScenarioController.scenario
-GET     /test/pages/egraph                       website.nonproduction.TestControllers.getHardwiredEgraphPage
 
 GET     /demo-setup/list                         website.nonproduction.DemoSetupController.list
 GET     /demo-setup/clear                        website.nonproduction.DemoSetupController.clear
 GET     /demo-setup/{urlSlug}                    website.nonproduction.DemoSetupController.demoScenario
-
-GET     /admin/reset-alpha-state                 website.nonproduction.TestControllers.resetAlphaState
 
 GET     /test/request-transaction/without-error  website.nonproduction.TransactionTestController.makeAccount
 GET     /test/request-transaction/with-error     website.nonproduction.TransactionTestController.makeAccountAndThrowException
@@ -36,8 +33,6 @@ GET     /                                       WebsiteControllers.getRootEndpoi
 
 # For Alpha-phase prod mode:
 
-GET     /test/memcached                         website.nonproduction.TestControllers.memcached
-GET     /test/create-test-orders                website.nonproduction.TestControllers.createTestOrders
 GET     /test/files/{<.*>blobKey}               WebsiteControllers.getBlob
 
 # Map static resources from the /app/public folder to the /public path
@@ -104,6 +99,8 @@ POST    /register                                        WebsiteControllers.post
 GET     /login                                           WebsiteControllers.getLogin
 POST    /login                                           WebsiteControllers.postLogin
 POST    /logout                                          WebsiteControllers.postLogout
+GET     /account/settings                                WebsiteControllers.getAccountSettings
+POST    /account/settings                                WebsiteControllers.postAccountSettings
 GET     /account/recover                                 WebsiteControllers.getRecoverAccount
 POST    /account/recover                                 WebsiteControllers.postRecoverAccount
 GET     /account/recover/confirmation                    WebsiteControllers.getRecoverAccountConfirmation

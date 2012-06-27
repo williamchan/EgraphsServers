@@ -6,6 +6,7 @@ import play.mvc.Controller
  * All endpoints associated with the consumer-facing website
  */
 trait AllConsumerEndpoints extends GetBlobEndpoint
+  with GetAccountSettingsEndpoint
   with GetCelebrityEndpoint
   with GetCelebrityProductEndpoint
   with GetCustomerGalleryEndpoint
@@ -16,6 +17,7 @@ trait AllConsumerEndpoints extends GetBlobEndpoint
   with GetRecoverAccountConfirmationEndpoint
   with GetRegisterEndpoint
   with GetResetPasswordEndpoint
+  with PostAccountSettingsEndpoint
   with PostBuyProductEndpoint
   with PostLoginEndpoint
   with PostLogoutEndpoint

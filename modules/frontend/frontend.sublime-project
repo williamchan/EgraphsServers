@@ -1,6 +1,5 @@
 {
-	"folders":
-	[
+	"folders": [
 		{
       "path": ".",
       "folder_exclude_patterns": ["documentation", "dist", "src"]
@@ -10,9 +9,12 @@
       "folder_exclude_patterns": ["tmp", "test-result", "modules", "lib"]
 		}
 	],
-  "settings": {"tab_size": 2},
-  "build_systems": {
+  "settings": {
+    "tab_size": 2,
+    "show_panel_on_build": false
+  },
+  "build_systems": [{
     "name": "Refresh play",
-    "cmd": "curl localhost:9000"
-  }
+    "cmd": ["${project_path}/build_through_play.sh"]
+  }]
 }

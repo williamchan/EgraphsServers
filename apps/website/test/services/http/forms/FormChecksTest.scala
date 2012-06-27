@@ -1,13 +1,15 @@
 package services.http.forms
 
-import utils.EgraphsUnitTest
+import utils.{TestData, EgraphsUnitTest}
 import services.AppConfig
 import java.text.SimpleDateFormat
 import play.data.binding.types.DateBinder
 import models.{AccountAuthenticationError, Account, AccountStore}
+import services.db.{TransactionSerializable, DBSession}
 
 class FormChecksTest extends EgraphsUnitTest {
   def check = AppConfig.instance[FormChecks]
+  private val db = AppConfig.instance[DBSession]
 
   "isInt" should "only accept integer strings and return them as Ints" in {
     check.isInt("1") should be (Right(1))
@@ -89,7 +91,7 @@ class FormChecksTest extends EgraphsUnitTest {
     mockAccountStore.authenticate(email, pass) returns Right(mockAccount)
 
     // Instantiate a new check instance that uses our mock
-    val check = new FormChecks(mockAccountStore, null)
+    val check = new FormChecks(mockAccountStore, null, null)
 
     // Check expectations
     check.isValidAccount(email, pass) should be (Right(mockAccount))
@@ -107,6 +109,14 @@ class FormChecksTest extends EgraphsUnitTest {
   "isEmailAddress" should "yield an email address if syntactically valid email otherwise an error" in {
     check.isEmailAddress("erem@egraphs.com") should be (Right("erem@egraphs.com"))
     check.isEmailAddress("Herp derpson").isLeft should be (true)
+  }
+
+  "isAlphaNumeric" should "yield string if it passes regex otherwise an error" in {
+    val str = "asdflkjh12340987zxcoiu"
+    check.isAlphaNumeric(str) should be (Right(str))
+    check.isAlphaNumeric("@").isLeft should be (true)
+    check.isAlphaNumeric("?").isLeft should be (true)
+    check.isAlphaNumeric("&").isLeft should be (true)
   }
 
   "isPhoneNumber" should "yield a phone number if syntactically valid otherwise an error" in {
@@ -147,6 +157,22 @@ class FormChecksTest extends EgraphsUnitTest {
     check.isAtLeast(legalAge, 22) should be (Right(22))
     check.isAtLeast(legalAge, 21) should be (Right(21))
     check.isAtLeast(legalAge, 20).isLeft should be (true)
+  }
+
+  "isUniqueEmail" should "yield the string if it does not already exist in account.email" in {
+    db.connected(TransactionSerializable) {
+      check.isUniqueEmail("new@egraphs.com") should be(Right("new@egraphs.com"))
+      val account = TestData.newSavedAccount()
+      check.isUniqueEmail(account.email).isLeft should be(true)
+    }
+  }
+
+  "isUniqueUsername" should "yield the string if it does not already exist in customer.username" in {
+    db.connected(TransactionSerializable) {
+      check.isUniqueUsername("me") should be(Right("me"))
+      val customer = TestData.newSavedCustomer()
+      check.isUniqueUsername(customer.username).isLeft should be(true)
+    }
   }
 
   "isChecked" should "properly deal with the POSTed string from a checkbox" in (pending)

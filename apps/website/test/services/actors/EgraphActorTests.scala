@@ -38,18 +38,8 @@ with TestKit {
   }
 
   it should "process Egraph" in {
-    val egraph1 = db.connected(TransactionSerializable) {
-      TestData.newSavedOrder()
-        .newEgraph
-        .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.fakeAudio)
-        .save()
-    }
-    val egraph2 = db.connected(TransactionSerializable) {
-      TestData.newSavedOrder()
-        .newEgraph
-        .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.fakeAudio)
-        .save()
-    }
+    val egraph1 = db.connected(TransactionSerializable) { TestData.newSavedEgraph() }
+    val egraph2 = db.connected(TransactionSerializable) { TestData.newSavedEgraph() }
     egraph1.egraphState should be(EgraphState.AwaitingVerification)
     egraph2.egraphState should be(EgraphState.AwaitingVerification)
 
@@ -62,12 +52,7 @@ with TestKit {
   }
 
   it should "immediately publish an Egraph if play config's adminreview.skip is true" in {
-    val egraph = db.connected(TransactionSerializable) {
-      TestData.newSavedOrder()
-        .newEgraph
-        .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.fakeAudio)
-        .save()
-    }
+    val egraph = db.connected(TransactionSerializable) { TestData.newSavedEgraph() }
 
     val actor = actorOf(AppConfig.instance[EgraphActor].copy(playConfig=Utils.properties("adminreview.skip" -> "true")))
     actor.start()
