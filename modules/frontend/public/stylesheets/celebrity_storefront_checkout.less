@@ -31,7 +31,7 @@
     text-transform: uppercase;
     font-weight: 600;
     font-size: 14px;
-    line-height: 1.125em;  
+    line-height: 1.25em;  
     padding: 6px 0;  
             
     small {
@@ -121,7 +121,17 @@
 			  	padding-bottom: 80px;
 			  	
 			  	> div {
+			  	
 			    	padding-right: 40px;	
+			    	
+			    	p { 
+			    		float: left;
+			    		width: 60%;
+				    	font-size: 14px;
+				    	line-height: 1.25em;
+				    	margin-bottom: 20px;
+			    	}
+			    	
 			  	}
 			  	
 			  } 
@@ -298,6 +308,29 @@
 					border-right: none;
 					
 					.field > div { padding-right: 0; }
+					
+					&.submit {
+					
+						padding-top: 0;
+						border-top: 1px solid lighten(@gray, 50%);
+						padding-bottom: 50px;
+					
+						> div { 
+						
+							padding-top: 20px;
+							border-top: 1px solid @white;						
+							padding-right: 0; 
+						
+							.right { float: none; }
+						
+							p { 
+								float: none;
+								width: auto;
+								margin-bottom: 20px;
+							}
+						
+						}
+					}
 				
 				}
 				

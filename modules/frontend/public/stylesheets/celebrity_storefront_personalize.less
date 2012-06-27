@@ -74,11 +74,24 @@
 		    margin-bottom: 20px;
 	    }
     
-	    p, dl {
+	    p {		  
+	      		    
+		    font-size: 14px;
+		   	line-height: 1.25em;
+		   	margin-bottom: 0;
+		   	
+		   	a { 
+		   		color: @orange; 
+		   		&:hover { color: @blue; }
+		   	}
+		   	
+	    }
+
+	    dl {
 
 		    margin-bottom: 10px;
 
-		    dt, dd {
+		   dt, dd {
 		   		font-size: 12px;
 		   		line-height: 1.25em;	
 		   		margin: 0;
@@ -106,7 +119,7 @@
     .order-totals {
     
     	border-bottom: 1px solid @white;
-    	margin-bottom: 20px;
+    	margin-bottom: 60px;
     	
 	    table {
 	    
@@ -157,8 +170,15 @@
   }
   
   .celebrity-information {
+
 	  border-bottom: none;
 	  margin-bottom: 0;
+
+    .last {	
+	    padding-bottom: 0;
+	    border-bottom: none;    
+    }
+
   }
 	
 }
@@ -183,6 +203,7 @@
 								
 				.order-totals { 
 				
+					padding-top: 20px;			
 					border-bottom: none; 
 				
 					table {
