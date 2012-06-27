@@ -2,8 +2,12 @@
   implicit headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData
 )
+
 @{/**
    Renders the base template for the Celebrity Storefront. This includes all breadcrumbs.
+
+   For all variables see base_template.scala.html, to which this template almost wholely
+   delegates.
 */}
 
 @baseBody = {

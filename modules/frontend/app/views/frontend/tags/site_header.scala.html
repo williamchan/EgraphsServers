@@ -5,6 +5,7 @@
 @import models.frontend.header.HeaderNotLoggedIn
 
 @loggedInHeader(status: HeaderLoggedIn) = {
+  @{/** Renders the account menu for users that are logged in */}
   <li>Hello, <a href="#">@status.name</a></li>
   <li class="account-options">
     <a href="@status.accountSettingsUrl">My Account</a>
@@ -18,6 +19,7 @@
 }
 
 @notLoggedInHeader(status: HeaderNotLoggedIn) = {
+  @{/** Renders the account menu for users that are not in */}
   <li>Hello, <a href="@status.loginUrl">Sign in</a></li>
   <li class="account-options"><a href="@status.loginUrl">My Account</a></li>
 }

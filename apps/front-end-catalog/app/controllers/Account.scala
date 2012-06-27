@@ -1,9 +1,12 @@
 package controllers
 
+import models.frontend.forms.{FormError, Field}
 import play.mvc.Controller
 import models.frontend.account.AccountSettingsForm
-import models.frontend.forms.{FormError, Field}
 
+/**
+ * Test controller for viewing permutations of the account settings page.
+ */
 object Account extends Controller with DefaultHeaderAndFooterData {
 
   def settings() = {
