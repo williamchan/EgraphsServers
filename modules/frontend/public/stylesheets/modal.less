@@ -1,0 +1,114 @@
+// Styles for a custom egraphs modal window (base: Twitter Boostrap Modal)
+
+@media screen and (max-width: 979px) {
+	
+	.modal.egraphs {
+	
+		top: 20px;
+		width: 90%;
+		margin-left: -45%;	
+		margin-top: 0;
+		padding: 0;
+		
+		.modal-header {
+		
+			position: relative;
+			width: 94%;
+			margin: 0 auto;
+			border-bottom-color: lighten(@gray, 50%);
+			
+			h2 {
+				font-size: 30px;
+				font-weight: 400;
+			}
+		
+			.close {
+			
+				.opacity(75);
+				float: none;
+				position: absolute;
+				right: 0;
+				top: 20px;
+				font-weight: 100;
+				font-size: 30px;
+				line-height: 1em;
+				color: @orange;
+				
+				&:hover { .opacity(100); }
+				
+			}
+		
+		}
+		
+		.modal-body {
+		
+			max-height: inherit;
+			width: 94%;
+			margin: 0 auto;
+			
+			.wrap {
+				
+				figure {
+					margin: 0;
+					padding: 0;
+					float: left;
+					width: 60%;
+				}
+				
+				> div {
+					float: right;
+					width: 35%;
+					padding: 40px 0;
+				}
+				
+			}
+			
+		}
+		
+	}	
+	
+}
+
+@media screen and (max-width: 554px) {
+	
+	.modal.egraphs {
+	
+		left: 50%;
+		width: 90%;
+		margin-left: -45%;
+		
+		.modal-header {
+			
+			h2 {
+				font-size: 20px;
+			}
+
+			.close {
+				top: 10px;
+			}
+		
+		}
+		
+		.modal-body {
+			
+			.wrap {
+				
+				figure {
+					float: none;
+					width: auto;
+					margin-bottom: 20px;
+				}
+				
+				> div {
+					float: none;
+					width: auto;
+					padding: 0;
+				}
+				
+			}
+			
+		}
+		
+	}	
+	
+}
