@@ -30,9 +30,6 @@ GET     /test/log-stuff-then-die                 website.nonproduction.TestContr
 %{ if (true) }%
 # Home page
 GET     /                                       WebsiteControllers.getRootEndpoint
-
-# For Alpha-phase prod mode:
-
 GET     /test/files/{<.*>blobKey}               WebsiteControllers.getBlob
 
 # Map static resources from the /app/public folder to the /public path
@@ -91,7 +88,6 @@ GET     /admin/script                                              WebsiteContro
 
 # social media exploratory work
 GET     /socialpost                                      WebsiteControllers.getSocialPost
-GET     /facebooklogin                                   WebsiteControllers.getFacebookLogin
 
 # customer accounts stubs
 GET     /register                                        WebsiteControllers.getRegister

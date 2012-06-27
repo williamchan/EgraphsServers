@@ -104,7 +104,7 @@ object GetEgraphEndpoint {
       storyLayoutColumns = frame.cssStoryColumnClasses,
       storyTitle = story.title,
       storyBody = story.body,
-      audioUrl = egraph.assets.audioUrl,
+      audioUrl = egraph.assets.audioMp3Url,
       signedImageUrl = frameFittedImageUrl,
       signedOnDate = new SimpleDateFormat("MMMM dd, yyyy").format(egraph.created)
     )

@@ -97,7 +97,21 @@ class EgraphTests extends UnitFlatSpec
       .save()
 
     egraph.assets.signature should be (TestConstants.shortWritingStr)
-    egraph.assets.audio.asByteArray should be (TestConstants.fakeAudio)
+    egraph.assets.audioWav.asByteArray should be (TestConstants.fakeAudio)
+  }
+
+  "initializeMp3" should "store mp3 asset" in {
+    val egraph = TestData.newSavedEgraphWithRealAudio()
+    intercept[NoSuchElementException] { egraph.assets.audioMp3 }
+    egraph.assets.initializeMp3()
+    egraph.assets.audioMp3.asByteArray.length should be > (0)
+  }
+
+  "audioMp3Url" should "lazily create mp3 asset" in {
+    val egraph = TestData.newSavedEgraphWithRealAudio()
+    intercept[NoSuchElementException] { egraph.assets.audioMp3 }
+    egraph.assets.audioMp3Url.endsWith("audio.mp3") should be(true)
+    egraph.assets.audioMp3.asByteArray.length should be > (0)
   }
 
   "An Egraph" should "throw an exception if assets are accessed on an unsaved Egraph" in {

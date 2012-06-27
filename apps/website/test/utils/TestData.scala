@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat
 import org.joda.time.DateTime
 import models._
 import enums.PublishedStatus
+import play.libs.Codec
 
 /**
  * Renders saved copies of domain objects that satisfy all relational integrity
@@ -126,6 +127,12 @@ object TestData {
     }
     order.newEgraph
       .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.fakeAudio)
+      .save()
+  }
+
+  def newSavedEgraphWithRealAudio(): Egraph = {
+    newSavedOrder().newEgraph
+      .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), Codec.decodeBASE64(TestConstants.voiceStr()))
       .save()
   }
 

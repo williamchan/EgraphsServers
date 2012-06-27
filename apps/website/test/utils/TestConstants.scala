@@ -29,12 +29,12 @@ object TestConstants {
   }
 
   def voiceStr(): String = {
-    val wavBinary = Blobs.Conversions.fileToByteArray(Play.getFile("test/files/44khz.wav"))
+    val wavBinary = TestHelpers.fileAsBytes("test/files/44khz.wav")
     Codec.encodeBASE64(wavBinary)
   }
 
   def voiceStr_8khz(): String = {
-    val wavBinary = Blobs.Conversions.fileToByteArray(Play.getFile("test/files/8khz.wav"))
+    val wavBinary = TestHelpers.fileAsBytes("test/files/8khz.wav")
     Codec.encodeBASE64(wavBinary)
   }
 
