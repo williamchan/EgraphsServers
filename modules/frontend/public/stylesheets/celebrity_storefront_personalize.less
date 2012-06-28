@@ -11,18 +11,23 @@
     padding: 0;
     
     img { display: block; }
-	    
-    .recepient-information {
-    	.marker-right;
-    	right: 60px;
-	  	bottom: 30px;
-	  	
+
+		.recepient-information {
+			.marker-right;
+    	right: 20%;
+	  	bottom: 12%;	  	
     }
     
     .egraph-message {
     	.marker-left;
-	  	left: 20px;
-	  	top: 60px;
+	  	left: 6%;
+	  	top: 15%;
+    }
+    
+    .egraph-audio {
+    	.marker-left;
+	  	left: 18%;
+	  	bottom: 15%;
     }
     
   }
@@ -30,7 +35,6 @@
   .order-summary {
     
     border-top: 1px solid lighten(@gray, 50%);
-    text-transform: uppercase;
     text-shadow: 0 1px 0 @white;
 	    
     h2 {
@@ -42,6 +46,7 @@
 	    font-weight: 600;
 	    font-size: 15px;
 	    line-height: 1em;
+	    text-transform: uppercase;
     }
     
     .celebrity-information {
@@ -49,7 +54,7 @@
 	    border-bottom: 1px solid @white;
 	    margin-bottom: 20px;
     
-	    .name {
+	    h3 {
 		    border-top: 1px solid @white;
 		    padding-top: 20px;
 		    margin-bottom: 0;
@@ -57,14 +62,56 @@
 		    font-size: 14px;
 		    line-height: 1.25em;	
 		    color: @grayLight;		    
+		    text-transform: uppercase;
 	    }
 	    
-	    .product {
+	    h4 {
+		    font-weight: 600;
+		    font-size: 14px;
+		    line-height: 1.25em;	
+		    color: @grayLight;	
+		    text-transform: uppercase;
+		    margin-bottom: 20px;
+	    }
+    
+	    p {		  
+	      		    
+		    font-size: 14px;
+		   	line-height: 1.25em;
+		   	margin-bottom: 0;
+		   	
+		   	a { 
+		   		color: @orange; 
+		   		&:hover { color: @blue; }
+		   	}
+		   	
+	    }
+
+	    dl {
+
+		    margin-bottom: 10px;
+
+		   dt, dd {
+		   		font-size: 12px;
+		   		line-height: 1.25em;	
+		   		margin: 0;
+		   		padding: 0;			    
+		    }
+		    
+		    dt {
+			    strong { color: @orange; }
+		    }
+		    
+		    dd {
+			    margin-bottom: 10px;
+		    }
+
+	    }
+
+	    .last {
 		    margin-bottom: 0;		
 		    padding-bottom: 20px;
-		    border-bottom: 1px solid lighten(@gray, 50%);
-		    font-size: 14px;
-		    line-height: 1.25em;	    
+		    border-bottom: 1px solid lighten(@gray, 50%);    
 	    }
     
     }
@@ -72,7 +119,7 @@
     .order-totals {
     
     	border-bottom: 1px solid @white;
-    	margin-bottom: 20px;
+    	margin-bottom: 60px;
     	
 	    table {
 	    
@@ -84,6 +131,7 @@
 		    	width: 40%;
 			    text-align: left;
 			    font-weight: 600;
+			    text-transform: uppercase;
 		    }
 		    
 		    td {
@@ -109,51 +157,30 @@
 .main .order-overview { 
 
 	display: none; 
-	padding: 40px 0;
+	padding: 40px 0 15px 0;
 	border-bottom: 1px solid lighten(@gray, 50%); 
 	max-width: 555px;
 
-  figure { margin: 0; }
+  figure { 
+  
+  	margin: 0 0 25px 0; 
+    
+    .egraph-audio { left: 23%; }
+  
+  }
+  
+  .celebrity-information {
+
+	  border-bottom: none;
+	  margin-bottom: 0;
+
+    .last {	
+	    padding-bottom: 0;
+	    border-bottom: none;    
+    }
+
+  }
 	
-}
-
-@media (max-width: 979px) {
-
-	.order-overview {  	  
-	  
-	  figure {
-		    
-	    .recepient-information {
-	    	bottom: 20px;
-	    }
-	    
-	  }
-	
-	}	
-
-}
-
-@media (max-width: 767px) and (min-width: 481px) {
-
-	.main .order-overview { 
-	
-	  figure {
-	
-	    .egraph-message {
-		  	left: 40px;
-		  	top: 80px;
-	    }
-		
-	    .recepient-information {
-	    	right: 110px;
-		  	bottom: 60px;
-		  	
-	    }
-	  
-	  }
-		
-	}	
-
 }
 
 @media (max-width: 767px) {
@@ -170,12 +197,13 @@
 	
 			padding: 0;
 			
-			figure {	display: none; }
+			figure, .celebrity-information { display: none; }
 			
 			.order-summary {
 								
 				.order-totals { 
 				
+					padding-top: 20px;			
 					border-bottom: none; 
 				
 					table {
@@ -198,21 +226,5 @@
 		}
 		
 	}
-
-}
-
-@media (max-width: 480px) {
-
-	.main .order-overview { 
-	
-	  figure {
-		
-	    .recepient-information {
-		  	bottom: 30px;		  	
-	    }
-	  
-	  }
-		
-	}	
 
 }

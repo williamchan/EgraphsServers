@@ -1,0 +1,65 @@
+// The Egraphs checkout finalize stylesheet.
+
+#checkout {
+
+	.finalize {
+		
+		fieldset {
+			
+			.field {
+				
+				address, ul, p {
+					font-size: 14px;
+					line-height: 1.5em;
+				}
+				
+				ul {
+					list-style: none;
+					margin: 0 0 20px 0;
+					li { 
+						line-height: 1.5em;
+						padding: 0;
+						margin: 0;
+					}
+				}
+				
+			} // end .field
+			
+			&.submit {
+				min-height: 400px; // make sure it's always longer than the aside
+			}
+			
+		}
+		
+	}
+		
+}
+
+@media (max-width: 767px) {
+	
+#checkout {
+
+	.finalize {
+		
+		fieldset {
+		
+			.field {
+		
+				.left, .right {
+					float: none;
+					margin-bottom: 20px;
+				}
+			
+			}
+			
+			&.submit {
+				min-height: inherit;
+			}
+			
+		}
+		
+	}
+		
+}	
+
+}
