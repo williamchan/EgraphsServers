@@ -1,7 +1,6 @@
 package controllers.website
 
 import play.mvc.Controller
-
 import play.data.validation._
 import org.apache.commons.mail.SimpleEmail
 import models._
@@ -17,7 +16,7 @@ import sjson.json.Serializer
 import services.db.{DBSession, TransactionSerializable}
 import services.logging.Logging
 import exception.InsufficientInventoryException
-import play.mvc.results.{Forbidden, Redirect}
+import play.mvc.results.Redirect
 import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters}
 
 trait PostBuyProductEndpoint { this: Controller =>
@@ -47,24 +46,6 @@ trait PostBuyProductEndpoint { this: Controller =>
                      personalNote: Option[String],
                      isDemo: Boolean = false) = postController(openDatabase = false, doCsrfCheck = (!isDemo || !payment.isTest)) {
 
-    payment.isTest match {
-      case true =>
-        post(recipientName, recipientEmail, buyerName, buyerEmail, stripeTokenId, desiredText, personalNote, isDemo)
-
-      case _ =>
-        new Forbidden("Cannot place order. Contact Egraphs support/engineering.")
-    }
-  }
-
-  private def post(recipientName: String,
-                   recipientEmail: String,
-                   buyerName: String,
-                   buyerEmail: String,
-                   stripeTokenId: String,
-                   desiredText: Option[String],
-                   personalNote: Option[String],
-                   isDemo: Boolean = false): Any = {
-
     Logger.info("Receiving purchase order")
     val (celebrity: Celebrity, product: Product) = validateInputs(
       recipientName = recipientName,
@@ -72,30 +53,32 @@ trait PostBuyProductEndpoint { this: Controller =>
       buyerName = buyerName,
       buyerEmail = buyerEmail,
       stripeTokenId = stripeTokenId)
-    if (!validationErrors.isEmpty) {
-      return WebsiteControllers.redirectWithValidationErrors(GetCelebrityProductEndpoint.url(celebrity, product), Some(false))
-    }
 
-    Logger.info("No validation errors")
-    val purchaseHandler: EgraphPurchaseHandler = EgraphPurchaseHandler(
-      recipientName = recipientName,
-      recipientEmail = recipientEmail,
-      buyerName = buyerName,
-      buyerEmail = buyerEmail,
-      stripeTokenId = stripeTokenId,
-      desiredText = desiredText,
-      personalNote = personalNote,
-      celebrity = celebrity,
-      product = product,
-      flash = flash,
-      mail = mail,
-      customerStore = customerStore,
-      accountStore = accountStore,
-      dbSession = dbSession,
-      payment = payment,
-      isDemo = isDemo
-    )
-    purchaseHandler.execute()
+    if (!validationErrors.isEmpty) {
+      WebsiteControllers.redirectWithValidationErrors(GetCelebrityProductEndpoint.url(celebrity, product), Some(false))
+
+    } else {
+      Logger.info("No validation errors")
+      val purchaseHandler: EgraphPurchaseHandler = EgraphPurchaseHandler(
+        recipientName = recipientName,
+        recipientEmail = recipientEmail,
+        buyerName = buyerName,
+        buyerEmail = buyerEmail,
+        stripeTokenId = stripeTokenId,
+        desiredText = desiredText,
+        personalNote = personalNote,
+        celebrity = celebrity,
+        product = product,
+        flash = flash,
+        mail = mail,
+        customerStore = customerStore,
+        accountStore = accountStore,
+        dbSession = dbSession,
+        payment = payment,
+        isDemo = isDemo
+      )
+      purchaseHandler.execute()
+    }
   }
 
   private def validateInputs(recipientName: String, recipientEmail: String, buyerName: String, buyerEmail: String, stripeTokenId: String): (Celebrity, Product) = {
