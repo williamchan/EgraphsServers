@@ -57,6 +57,7 @@ private[controllers] trait GetCustomerGalleryEndpoint { this: Controller =>
 
       //The type system makes me angry here, Factory takes iterables of the filtered queries
       //TODO need to add some filtering according to privacy status.
+
       val orders:List[EgraphViewModel] = galleryControl match {
         case AdminGalleryControl | OwnerGalleryControl =>
           GalleryOrderFactory.makePendingEgraphViewModel(pendingOrders).toList ++

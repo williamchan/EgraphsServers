@@ -534,7 +534,7 @@ object GalleryOrderFactory {
     for ((order:Order, optionEgraph:Option[Egraph]) <- orders) yield {
       optionEgraph.map( egraph => {
         val product = order.product
-        val rawImage = egraph.image(product.photoImage).scaledToWidth(product.frame.thumbnailWidthPixels)
+        val rawImage = egraph.thumbnail(product.photoImage).scaledToWidth(product.frame.thumbnailWidthPixels)
         new FulfilledEgraphViewModel(
           orderId = order.id,
           orientation = product.frame.name,

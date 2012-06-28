@@ -11,7 +11,7 @@ import vbg.{VBGVerifySampleStore, VBGVerifySample}
 import services.signature.{SignatureBiometricsError, YesMaamSignatureBiometricService, SignatureBiometricService}
 import services._
 import db.{FilterOneTable, Schema, KeyedCaseClass, Saves}
-import graphics.{Handwriting, HandwritingPen, GraphicsSource}
+import graphics.{RasterGraphicsSource, Handwriting, HandwritingPen, GraphicsSource}
 import java.text.SimpleDateFormat
 import controllers.WebsiteControllers
 import controllers.website.GetCelebrityProductEndpoint
@@ -42,6 +42,7 @@ case class EgraphServices @Inject() (
   xyzmoVerifyUserStore: XyzmoVerifyUserStore,
   blobs: Blobs,
   graphicsSourceFactory: () => GraphicsSource,
+  rasterGraphicsSourceFactory: () => RasterGraphicsSource,
   voiceBiometrics: VoiceBiometricService,
   signatureBiometrics: SignatureBiometricService,
   storyServicesProvider: Provider[EgraphStoryServices]
@@ -159,6 +160,14 @@ case class Egraph(
     EgraphImage(
       ingredientFactory=imageIngredientFactory(order.product, productPhoto),
       graphicsSource=services.graphicsSourceFactory(),
+      blobPath=blobKeyBase + "/image"
+    )
+  }
+
+  def thumbnail(productPhoto: => BufferedImage=order.product.photoImage):EgraphImage = {
+    EgraphImage(
+      ingredientFactory=imageIngredientFactory(order.product, productPhoto),
+      graphicsSource = services.rasterGraphicsSourceFactory(),
       blobPath=blobKeyBase + "/image"
     )
   }

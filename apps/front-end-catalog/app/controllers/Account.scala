@@ -16,8 +16,8 @@ object Account extends Controller {
                         "owner" -> OwnerGalleryControl)
   val pendingThumbnails = Map("landscape" -> "http://placehold.it/230x185",
                         "portrait" -> "http://placehold.it/170x225")
-  val portraitSVG  = "http://localhost:9000/public/images/global_width_350px.svg"
-  val landscapeSVG = "http://localhost:9000/public/images/global_width_510px.svg"
+  val portraitPNG  = "http://localhost:9000/public/images/width-350px.png"
+  val landscapePNG = "http://localhost:9000/public/images/width-510px.png"
 
   def settings() = {
     request.method match {
@@ -116,7 +116,7 @@ object Account extends Controller {
         productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
           "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
           " quam. In hac habitasse platea dictumst.",
-        thumbnailUrl = landscapeSVG
+        thumbnailUrl = landscapePNG
       ),
       FulfilledEgraphViewModel(
         downloadUrl=Option("egr.aphs/" + user + "2"),
@@ -130,7 +130,7 @@ object Account extends Controller {
         productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
           "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
           " quam. In hac habitasse platea dictumst.",
-        thumbnailUrl = portraitSVG
+        thumbnailUrl = portraitPNG
       ),
       FulfilledEgraphViewModel(
         downloadUrl=Option("egr.aphs/" + user + "2"),
@@ -144,7 +144,7 @@ object Account extends Controller {
         productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
           "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
           " quam. In hac habitasse platea dictumst.",
-        thumbnailUrl = landscapeSVG
+        thumbnailUrl = landscapePNG
       )
     )
   }
