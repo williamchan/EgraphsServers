@@ -47,16 +47,16 @@ private[controllers] trait GetCustomerGalleryEndpoint { this: Controller =>
       val galleryControl = galleryControlPrecedence.flatten.head
 
       //Left outerjoin on orders and egraphs
-      val orders_and_egraphs = orderStore.getEgraphsAndOrders(galleryCustomerId)
+      val orders_and_egraphs = orderStore.getEgraphsAndOrders(galleryCustomerId).toList
 
       val pendingOrders = orders_and_egraphs.filter(orderEgraph =>
-        orderEgraph._1.reviewStatus != OrderReviewStatus.ApprovedByAdmin)
+        !(orderEgraph._2.map(_.egraphState) == Some(EgraphState.Published)))
 
       val fulfilledOrders = orders_and_egraphs.filter(orderEgraph =>
-        orderEgraph._1.reviewStatus == OrderReviewStatus.ApprovedByAdmin)
+        orderEgraph._2.map(_.egraphState) == Some(EgraphState.Published))
 
       //The type system makes me angry here, Factory takes iterables of the filtered queries
-      //need to add some filtering according to privacy status.
+      //TODO need to add some filtering according to privacy status.
       val orders:List[EgraphViewModel] = galleryControl match {
         case AdminGalleryControl | OwnerGalleryControl =>
           GalleryOrderFactory.makePendingEgraphViewModel(pendingOrders).toList ++

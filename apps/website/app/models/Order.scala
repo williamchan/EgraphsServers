@@ -538,7 +538,7 @@ object GalleryOrderFactory {
         new FulfilledEgraphViewModel(
           orderId = order.id,
           orientation = product.frame.name,
-          productUrl = "//" + product.celebrity.urlSlug + "/" + product.urlSlug,
+          productUrl = "egra.ph/" + product.celebrity.urlSlug.getOrElse() + "/" + product.urlSlug,
           productTitle = product.storyTitle,
           productDescription = product.description,
           thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Private),
@@ -553,13 +553,15 @@ object GalleryOrderFactory {
   def makePendingEgraphViewModel(orders: Iterable[(Order, Option[Egraph])]) : Iterable[PendingEgraphViewModel] = {
     for ((order:Order, optionEgraph:Option[Egraph]) <- orders) yield {
       val product = order.product
+//      val rawImage = ImageUtil
+      val imageUrl = product.photo.resizedWidth(product.frame.thumbnailWidthPixels).getSaved(AccessPolicy.Public).url
       PendingEgraphViewModel(
         orderId = order.id,
         orientation = product.frame.name,
         productUrl = "//" + product.celebrity.urlSlug + "/" + product.urlSlug,
         productTitle = product.storyTitle,
         productDescription = product.description,
-        thumbnailUrl = "",
+        thumbnailUrl = imageUrl,
         orderStatus = order.reviewStatus.name,
         orderDetails = new OrderDetails(
           orderDate = dateFormat.format(order.created),

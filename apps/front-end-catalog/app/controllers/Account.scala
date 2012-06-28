@@ -3,14 +3,19 @@ package controllers
 import play.mvc.Controller
 import models.frontend.account.AccountSettingsForm
 import models.frontend.forms.{FormError, Field}
+import models.frontend.egraphs._
+import models.frontend.forms.FormError
+import models.frontend.egraphs.FulfilledEgraphViewModel
+import models.frontend.account.AccountSettingsForm
+import models.frontend.forms.Field
 
 object Account extends Controller {
 
   val roles = Map ("other" -> OtherGalleryControl,
                         "admin" -> AdminGalleryControl,
                         "owner" -> OwnerGalleryControl)
-  val thumbnails = Map("landscape" -> "http://placehold.it/500x400",
-                        "portrait" -> "http://placehold.it/400x560")
+  val thumbnails = Map("landscape" -> "http://placehold.it/298x188",
+                        "portrait" -> "http://placehold.it/189x263")
   def settings() = {
     request.method match {
       case "POST" => {
@@ -105,7 +110,7 @@ object Account extends Controller {
         productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
           "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
           " quam. In hac habitasse platea dictumst.",
-        thumbnailUrl = thumbnails("landscape")
+        thumbnailUrl = "/images/global-width-298px.svgz"
       ),
       FulfilledEgraphViewModel(
         downloadUrl=Option("egr.aphs/" + user + "2"),
@@ -118,7 +123,7 @@ object Account extends Controller {
         productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
           "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
           " quam. In hac habitasse platea dictumst.",
-        thumbnailUrl = thumbnails("portrait")
+        thumbnailUrl = "../images/global-width-189px.svgz"
       ),
       FulfilledEgraphViewModel(
         downloadUrl=Option("egr.aphs/" + user + "2"),
@@ -131,7 +136,7 @@ object Account extends Controller {
         productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
           "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
           " quam. In hac habitasse platea dictumst.",
-        thumbnailUrl = thumbnails("landscape")
+        thumbnailUrl = "../images/global-width-298px.svgz"
       )
     )
   }

@@ -81,9 +81,6 @@ object OwnerGalleryControl extends GalleryControlRenderer{
       <li>
         <a href="#">Order Prints</a>
       </li>
-      <li>
-        status
-      </li>
     </ul>
     ns
   }
