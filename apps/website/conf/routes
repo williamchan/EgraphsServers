@@ -119,7 +119,7 @@ POST    /{celebrityUrlSlug}/{productUrlSlug}/buy         WebsiteControllers.post
 POST    /{celebrityUrlSlug}/{productUrlSlug}/buy-demo    WebsiteControllers.postBuyDemoProduct
 
 ##
-## Final Consumer Website
+## Production Consumer Website
 ##
-%{ consumer_base = '/new' }%
-GET ${consumer_base}/{celebrityUrlSlug}/{productUrlSlug}          WebsiteControllers.getStorefrontChoosePhotoTiled
+# %{ consumer_base = '/new' }%
+# GET ${consumer_base}/{celebrityUrlSlug}/{productUrlSlug}          WebsiteControllers.getStorefrontChoosePhotoTiled
