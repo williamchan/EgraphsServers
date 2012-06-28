@@ -3,7 +3,7 @@
 @fulfilledEgraph(egraph: models.frontend.egraphs.FulfilledEgraphViewModel, index: Int) = {
   <div class="row-fluid row-egraph">
     <div class="span12">
-      <div class="number">@(index+1)</div><br>
+      <div class="number">@(index+1)</div><br class="number-br">
       <span>
         <h3>@egraph.productPublicName.map(publicName => publicName + ":") @egraph.productTitle</h3>
       </span>
@@ -44,7 +44,7 @@
   <div class="row-fluid row-egraph">
     <div class="span12">
       <div class="number">@(index+1)</div>
-      <br>
+      <br class="number-br">
       <span>
         <h3>@egraph.productPublicName.map(publicName => publicName + ":") @egraph.productTitle</h3><span class="order-line"> &nbsp;Pending Order</span>
       </span>
@@ -52,7 +52,7 @@
   </div>
   <div class="row-fluid">
     <div class="span3">
-      <div class="@egraph.orientation">
+      <div class="pending-@egraph.orientation">
         <img src="@egraph.thumbnailUrl">
         </img>
       </div>
@@ -62,7 +62,7 @@
         <span class="order-label">Order Date</span><span class="order-detail"> @orderDetails.orderDate</span>
       </div>
       <div class="order-row">
-        <span class="order-label">Order Number</span><span class="order-detail">@orderDetails.orderNumber</span>
+        <span class="order-label">Order Number</span><span class="order-detail"> @orderDetails.orderNumber</span>
       </div>
       <div class="order-row">
         <span class="order-label">Price</span><span class="order-detail"> @orderDetails.price</span>

@@ -5,13 +5,21 @@
     border: none;
   }
 
+  div.pending-portrait {
+    max-width: 100%;
+  }
+
+  div.pending-landscape {
+    max-width: 100%;
+  }
+
   div.landscape {
     margin-left: 0px;
     margin-bottom: 10px;
-
   }
 
   div.portrait{
+
   }
 
   .row-egraph {
@@ -128,4 +136,35 @@
     margin-bottom: 17px;
   }
 
+}
+
+@media (max-width: 480px) {
+  #galleryrows {
+      span.order-line {
+        font-size: 14px;
+        padding-left: 0px;
+        padding-bottom: 5px;
+      }
+      span h3 {
+        font-size: 14px;
+      }
+
+      br.number-br {
+        display: none;
+      }
+      div.shipping-details {
+       position: static;
+      }
+  }
+
+  #gallerytop {
+    span.count {
+      text-align: left;
+    }
+
+    div.row-fluid {
+      margin-top: 0px;
+    }
+
+  }
 }

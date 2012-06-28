@@ -71,7 +71,7 @@ object Account extends Controller {
         orientation = "portrait",
         productUrl="egr.aphs/" + user +"/1",
         productTitle = "Telling Jokes",
-        productPublicName = "Jimmy Fallon",
+        productPublicName = Option("Jimmy Fallon"),
         productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
           "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
           " quam. In hac habitasse platea dictumst. Etiam at lectus at nisi blandit lobort" +
@@ -92,7 +92,7 @@ object Account extends Controller {
         orientation = "landscape",
         productUrl="egr.aphs/" + user +"/1",
         productTitle = "You In Reverse",
-        productPublicName = "Built To Spill",
+        productPublicName = Option("Built To Spill"),
         productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
           "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
           " quam. In hac habitasse platea dictumst. Etiam at lectus at nisi blandit lobort" +
@@ -112,7 +112,7 @@ object Account extends Controller {
         orientation = "landscape",
         productUrl="egr.aphs/" + user +"/1",
         productTitle = "Man or Velociraptor?",
-        productPublicName = "Chris Bosh",
+        productPublicName = Option("Chris Bosh"),
         productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
           "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
           " quam. In hac habitasse platea dictumst.",
@@ -126,7 +126,7 @@ object Account extends Controller {
         orientation = "portrait",
         productUrl="egr.aphs/" + user +"/2",
         productTitle = "King James",
-        productPublicName = "Lebron James",
+        productPublicName = None,
         productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
           "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
           " quam. In hac habitasse platea dictumst.",
@@ -140,7 +140,7 @@ object Account extends Controller {
         orientation = "landscape",
         productUrl="egr.aphs/" + user +"/2",
         productTitle = "A cool bro",
-        productPublicName = "Dwyane Wade",
+        productPublicName = Option("Dwyane Wade"),
         productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
           "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
           " quam. In hac habitasse platea dictumst.",
