@@ -11,6 +11,7 @@ trait EgraphViewModel {
   def orderId: Long
   def orientation: String
   def productUrl: String
+  def productPublicName: Option[String]
   def productTitle: String
   def productDescription: String
   def thumbnailUrl: String
@@ -22,6 +23,7 @@ case class PendingEgraphViewModel(
   orderId: Long,
   orientation: String,
   productUrl: String,
+  productPublicName: Option[String],
   productTitle: String,
   productDescription: String,
   thumbnailUrl: String) extends EgraphViewModel
@@ -33,6 +35,7 @@ case class FulfilledEgraphViewModel(
   orderId: Long,
   orientation: String,
   productUrl: String,
+  productPublicName: Option[String],
   productTitle: String,
   productDescription: String,
   thumbnailUrl: String) extends EgraphViewModel

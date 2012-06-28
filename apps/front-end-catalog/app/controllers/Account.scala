@@ -14,8 +14,11 @@ object Account extends Controller {
   val roles = Map ("other" -> OtherGalleryControl,
                         "admin" -> AdminGalleryControl,
                         "owner" -> OwnerGalleryControl)
-  val thumbnails = Map("landscape" -> "http://placehold.it/298x188",
-                        "portrait" -> "http://placehold.it/189x263")
+  val pendingThumbnails = Map("landscape" -> "http://placehold.it/230x185",
+                        "portrait" -> "http://placehold.it/170x225")
+  val portraitSVG  = "http://localhost:9000/public/images/global_width_350px.svg"
+  val landscapeSVG = "http://localhost:9000/public/images/global_width_510px.svg"
+
   def settings() = {
     request.method match {
       case "POST" => {
@@ -67,14 +70,15 @@ object Account extends Controller {
         orderId = 45,
         orientation = "portrait",
         productUrl="egr.aphs/" + user +"/1",
-        productTitle = "Jimmy Fallon: Telling Jokes",
+        productTitle = "Telling Jokes",
+        productPublicName = "Jimmy Fallon",
         productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
           "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
           " quam. In hac habitasse platea dictumst. Etiam at lectus at nisi blandit lobort" +
           "is. Donec viverra rhoncus iaculis. In a nibh tellus. Phasellus dignissim egesta" +
           "s erat nec vestibulum. Proin blandit pellentesque massa, vitae venenatis mauris" +
           " volutpat at.",
-        thumbnailUrl = thumbnails("portrait")),
+        thumbnailUrl = pendingThumbnails("portrait")),
       PendingEgraphViewModel(
         orderStatus = "pending",
         orderDetails = new OrderDetails(
@@ -85,16 +89,17 @@ object Account extends Controller {
           shippingMethod = "UPS",
           UPSNumber = "45Z343YHYU3343322J"),
         orderId = 45,
-        orientation = "portrait",
+        orientation = "landscape",
         productUrl="egr.aphs/" + user +"/1",
-        productTitle = "Built To Spill: You In Reverse",
+        productTitle = "You In Reverse",
+        productPublicName = "Built To Spill",
         productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
           "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
           " quam. In hac habitasse platea dictumst. Etiam at lectus at nisi blandit lobort" +
           "is. Donec viverra rhoncus iaculis. In a nibh tellus. Phasellus dignissim egesta" +
           "s erat nec vestibulum. Proin blandit pellentesque massa, vitae venenatis mauris" +
           " volutpat at.",
-        thumbnailUrl = thumbnails("portrait"))
+        thumbnailUrl = pendingThumbnails("landscape"))
     )
   }
   private def makeEgraphs(user: String): List[FulfilledEgraphViewModel]  = {
@@ -106,11 +111,12 @@ object Account extends Controller {
         orderId = 23,
         orientation = "landscape",
         productUrl="egr.aphs/" + user +"/1",
-        productTitle = "Chris Bosh: Man or Velociraptor?",
+        productTitle = "Man or Velociraptor?",
+        productPublicName = "Chris Bosh",
         productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
           "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
           " quam. In hac habitasse platea dictumst.",
-        thumbnailUrl = "/images/global-width-298px.svgz"
+        thumbnailUrl = landscapeSVG
       ),
       FulfilledEgraphViewModel(
         downloadUrl=Option("egr.aphs/" + user + "2"),
@@ -119,11 +125,12 @@ object Account extends Controller {
         orderId = 23,
         orientation = "portrait",
         productUrl="egr.aphs/" + user +"/2",
-        productTitle = "Lebron James: King James",
+        productTitle = "King James",
+        productPublicName = "Lebron James",
         productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
           "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
           " quam. In hac habitasse platea dictumst.",
-        thumbnailUrl = "../images/global-width-189px.svgz"
+        thumbnailUrl = portraitSVG
       ),
       FulfilledEgraphViewModel(
         downloadUrl=Option("egr.aphs/" + user + "2"),
@@ -132,11 +139,12 @@ object Account extends Controller {
         orderId = 23,
         orientation = "landscape",
         productUrl="egr.aphs/" + user +"/2",
-        productTitle = "Dwyane Wade: A cool bro",
+        productTitle = "A cool bro",
+        productPublicName = "Dwyane Wade",
         productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
           "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
           " quam. In hac habitasse platea dictumst.",
-        thumbnailUrl = "../images/global-width-298px.svgz"
+        thumbnailUrl = landscapeSVG
       )
     )
   }

@@ -672,6 +672,12 @@ sealed trait EgraphFrame {
 
   /** Height of the image in pixels as displayed on the gallery page **/
   def thumbnailHeightPixels: Int
+
+  /** Width of image in pixels as display on gallery page when a pending order **/
+  def pendingWidthPixels: Int
+
+  /** Height of image in pixels as display on gallery page when a pending order **/
+  def pendingHeightPixels: Int
   //
   // Implemented members
   //
@@ -739,8 +745,11 @@ object PortraitEgraphFrame extends EgraphFrame {
   override val imageWidthPixels = 377
   override val imageHeightPixels = 526
 
-  override val thumbnailWidthPixels = 189
-  override val thumbnailHeightPixels = 263
+  override val thumbnailWidthPixels = 350
+  override val thumbnailHeightPixels = 525
+
+  override val pendingWidthPixels = 170
+  override val pendingHeightPixels = 225
 }
 
 /** The default egraph landscape photo frame */
@@ -754,6 +763,9 @@ object LandscapeEgraphFrame extends EgraphFrame {
   override val imageWidthPixels = 595
   override val imageHeightPixels = 377
 
-  override val thumbnailWidthPixels = 298
-  override val thumbnailHeightPixels = 189
+  override val thumbnailWidthPixels = 510
+  override val thumbnailHeightPixels = 410
+
+  override val pendingWidthPixels = 230
+  override val pendingHeightPixels = 185
 }

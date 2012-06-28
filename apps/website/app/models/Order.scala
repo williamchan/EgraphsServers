@@ -539,6 +539,7 @@ object GalleryOrderFactory {
           orderId = order.id,
           orientation = product.frame.name,
           productUrl = "egra.ph/" + product.celebrity.urlSlug.getOrElse() + "/" + product.urlSlug,
+          productPublicName = product.celebrity.publicName,
           productTitle = product.storyTitle,
           productDescription = product.description,
           thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Private),
@@ -554,12 +555,13 @@ object GalleryOrderFactory {
     for ((order:Order, optionEgraph:Option[Egraph]) <- orders) yield {
       val product = order.product
 //      val rawImage = ImageUtil
-      val imageUrl = product.photo.resizedWidth(product.frame.thumbnailWidthPixels).getSaved(AccessPolicy.Public).url
+      val imageUrl = product.photo.resizedWidth(product.frame.pendingWidthPixels).getSaved(AccessPolicy.Public).url
       PendingEgraphViewModel(
         orderId = order.id,
         orientation = product.frame.name,
         productUrl = "//" + product.celebrity.urlSlug + "/" + product.urlSlug,
         productTitle = product.storyTitle,
+        productPublicName = product.celebrity.publicName,
         productDescription = product.description,
         thumbnailUrl = imageUrl,
         orderStatus = order.reviewStatus.name,

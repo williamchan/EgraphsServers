@@ -5,12 +5,12 @@
     <div class="span12">
       <div class="number">@(index+1)</div><br>
       <span>
-        <h3>@egraph.productTitle</h3>
+        <h3>@egraph.productPublicName.map(publicName => publicName + ":") @egraph.productTitle</h3>
       </span>
     </div>
     <div class="row-fluid">
       <div class="span7">
-        <div class="@egraph.orientation thumbnail">
+        <div class="@egraph.orientation">
           <iframe src="@egraph.thumbnailUrl" alt="Egraph preview"></iframe>
         </div>
       </div>
@@ -46,13 +46,13 @@
       <div class="number">@(index+1)</div>
       <br>
       <span>
-        <h3>@egraph.productTitle</h3><span class="order-line"> &nbsp;Pending Order</span>
+        <h3>@egraph.productPublicName.map(publicName => publicName + ":") @egraph.productTitle</h3><span class="order-line"> &nbsp;Pending Order</span>
       </span>
     </div>
   </div>
   <div class="row-fluid">
     <div class="span3">
-      <div class="@egraph.orientation thumbnail">
+      <div class="@egraph.orientation">
         <img src="@egraph.thumbnailUrl">
         </img>
       </div>
@@ -79,10 +79,9 @@
   <section id="content">
     <div id="main">
       <div class="container">
-        <header>
-          <h1>My Gallery</h1>
+        <header id="gallerytop">
           <div class="row-fluid">
-            <span class="span8"> @username's Egraphs</span>
+            <span class="span8 username">@username's Egraphs</span>
             <span class="span4 count">
               <strong>@egraphs.length Egraphs</strong> /
               <strong>@{egraphs.filter(egraph => egraph.isInstanceOf[models.frontend.egraphs.PendingEgraphViewModel]).length}</strong>
