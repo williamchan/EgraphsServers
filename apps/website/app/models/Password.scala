@@ -5,6 +5,8 @@ import play.libs.Codec
 import java.math.BigInteger
 import java.util.Date
 import play.libs.Crypto
+import play.data.validation.Validation
+import play.data.validation.Validation.ValidationResult
 
 case class Password (hash: String, salt: String) {
   /**
@@ -34,6 +36,20 @@ object Password {
   /** Returns a new, random number sized against our hash function's cipher. */
   def randomSaltNumber (): String = {
     Codec.encodeBASE64(new BigInteger(256, random).toByteArray)
+  }
+
+  /**
+   * @param password to validate
+   * @return validation errors or the password
+   */
+  def validate(password: String): Either[ValidationResult, String] = {
+    val existsCheck = Validation.required("password", password)
+    val lengthCheck = Validation.minSize("password", password, Account.minPasswordLength)
+    (existsCheck.ok, lengthCheck.ok) match {
+      case (false, _) => Left(existsCheck)
+      case (_, false) => Left(lengthCheck)
+      case (true, true) => Right(password)
+    }
   }
 
   /**

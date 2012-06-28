@@ -18,6 +18,8 @@ import services.{Utils, AppConfig}
 import org.joda.time.DateTime
 import java.text.SimpleDateFormat
 import javax.imageio.ImageIO
+import controllers.website.GetAccountSettingsEndpoint
+import services.http.EgraphsSession
 
 /**
  * All scenarios supported by the API.
@@ -32,6 +34,7 @@ class Scenarios extends DeclaresScenarios {
   private val adminCategory = "Admin Helpers"
   private val apiCategory = "API Helpers"
   private val celebrityPageCategory = "Celebrity Page"
+  private val accountSettingsPage = "Account Settings Page"
   private val productPageCategory = "Product Page"
   private val orderConfirmationPageCategory = "Order Confirmation Page"
   private val egraphPageCategory = "Egraph Page"
@@ -447,6 +450,24 @@ class Scenarios extends DeclaresScenarios {
   }
   )
 
+  toScenarios add Scenario(
+    "Bring up the account settings page",
+    accountSettingsPage,
+    """
+    Changes All new Orders to ApprovedByAdmin, which makes them signable
+    """, {
+    () =>
+      Scenario.play(
+        "Erem-is-a-customer"
+      )
+
+      egraphsSession.withLong(EgraphsSession.Key.CustomerId, 1).save()
+
+      new Redirect(GetAccountSettingsEndpoint.url().url)
+    }
+  )
+
+
   private[this] def redirectToWizzle = {
     new Redirect(
       WebsiteControllers.lookupGetCelebrity("Wizzle").url
@@ -456,6 +477,10 @@ class Scenarios extends DeclaresScenarios {
   //
   // Product-related members
   //
+  private def egraphsSession:EgraphsSession = {
+    AppConfig.instance[() => EgraphsSession].apply()
+  }
+
   private[this] def createAndSaveStarcraftProduct: Product = {
     Scenario.play("Will-Chan-is-a-celebrity")
 

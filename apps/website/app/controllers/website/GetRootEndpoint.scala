@@ -69,7 +69,7 @@ object GetRootEndpoint {
     }
 
     /**
-     * Implcitly convert Celebrity -> FeaturedStarCelebrity
+     * Implicitly convert Celebrity -> FeaturedStarCelebrity
      */
     implicit def celebrityToFeaturedStarCelebrity(celebrity: Celebrity): FeaturedStarCelebrity = {
       new FeaturedStarCelebrity(celebrity)

@@ -1,7 +1,6 @@
 package models
 
 import play.data.validation.Validation.ValidationResult
-import play.data.validation.Validation
 import java.sql.Timestamp
 import services.db.{KeyedCaseClass, Saves, Schema}
 import com.google.inject.Inject
@@ -61,18 +60,14 @@ case class Account(
    *    result against the provided entity (left).
    */
   def withPassword(newPassword: String): Either[ValidationResult, Account] = {
-    // Perform checks
-    val existsCheck = Validation.required("password", newPassword)
-    val lengthCheck = Validation.minSize("password", newPassword, Account.minPasswordLength)
-
-    (existsCheck.ok, lengthCheck.ok) match {
-      case (false, _) => Left(existsCheck)
-      case (_, false) => Left(lengthCheck)
-      case (true, true) =>
+    Password.validate(newPassword) match {
+      case Left(validationResult) => Left(validationResult)
+      case _ => {
         val password = Password(newPassword, id)
         Right(copy(passwordHash = Some(password.hash),
           passwordSalt = Some(password.salt),
           resetPasswordKey = None))
+      }
     }
   }
 
@@ -105,6 +100,10 @@ case class Account(
     (resetPasswordKey.get == attempt) && (System.currentTimeMillis < expirationTime)
   }
 
+  def addresses = {
+    services.addressStore.findByAccount(id)
+  }
+
   //
   // KeyedCaseClass methods
   //
@@ -118,7 +117,7 @@ object Account {
 /**
  * Services used by each Account object
  */
-case class AccountServices @Inject() (accountStore: AccountStore, customerStore: CustomerStore)
+case class AccountServices @Inject() (accountStore: AccountStore, customerStore: CustomerStore, addressStore: AddressStore)
 
 class AccountStore @Inject() (schema: Schema) extends Saves[Account] with SavesCreatedUpdated[Account] {
   import org.squeryl.PrimitiveTypeMode._

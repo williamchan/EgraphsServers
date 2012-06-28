@@ -1,23 +1,21 @@
-@(model: String, id:String, title: String)
+@(model: String, name:String, label: String)
 
-<a id="@id-display" class="row-settings row-fluid action edit">
-    <span class="span3">@title</span>
-    <span class="span4 setting-val">{{@model}}</span>
-      <span class="span4 help-inline">
-  </span>
-    <span class="span1 action">
+<a id="@name-display" class="row-settings row-fluid action edit">
+  <span class="span3">@label</span>
+  <span class="span4 setting-val">{{@model}}</span>
+  <span class="span4 help-inline"></span>
+  <span class="span1 action">
       <i class="icon-pencil"></i> Edit
-    </span>
-  </a>
-<div id="@id-edit" class="row-settings row-fluid hide">
-  <span class="span3">@title</span>
-  <span class="span7 controls">
-    <input ng-model="@model" name="@id" type="email"/>
-     <span ng-show="form.@id.$error.email">Invalid e-mail address.</span>
   </span>
+</a>
 
+<div id="@name-edit" class="row-settings row-fluid hide">
+  <span class="span3">@label</span>
+  <span class="span7 controls">
+    <input ng-model="@model" name="@name" type="email"/>
+     <span ng-show="form.@name.$error.email">Invalid e-mail address.</span>
   </span>
   <span class="span2 action">
-    @form_cancel(model, id)
+    @form_cancel(model, name)
   </span>
 </div>

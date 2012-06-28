@@ -1,4 +1,5 @@
 @()
+@{/** Catalogs the permutations of every page we render. */}
 
 @catalogEntry(href: String, description: String) = {<li><a href="@href">@description</a></li>}
 
@@ -16,6 +17,11 @@
     <p>
       Without further ado!
     </p>
+    <h2>Base template</h2>
+    <ol>
+      @catalogEntry("BaseTemplate/loggedIn", "Logged in")
+      @catalogEntry("BaseTemplate/notLoggedIn", "Not logged in")
+    </ol>
     <h2>Landing page</h2>
     <ol>
       @landingEntry(controllerName: String) = {
@@ -69,16 +75,3 @@
     </ol>
   </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-

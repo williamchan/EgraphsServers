@@ -5,7 +5,22 @@
   recentEgraphs: Iterable[models.frontend.storefront.ChoosePhotoRecentEgraph],
   partnerIcons: Iterable[models.frontend.storefront.ChoosePhotoPartnerIcon],
   photoSection: => Html
-)
+)(implicit headerData: models.frontend.header.HeaderData, 
+  footerData: models.frontend.footer.FooterData)
+@{/**
+  Base template for the two permutations of the "Choose photo" page in the celebrity
+  storefront (tiled and carousel). See base_celebrity_storefront_choose_photo_tiled.scala.html.
+
+  title - the title of the page. This will be concatenated with the celebrity's name.
+  jsMain - see base_template.scala.html
+  headJs - see base_template.scala.html
+  celeb - viewmodel of the celebrity to render.
+  recentEgraphs - viewmodel of the recent egraphs to render.
+  partnerIcons - viewmodel of the partner icons to render (e.g. MLB)
+  photoSection - the actual content: either the tiles or the carousel.
+
+  headerData & footerData - see base_template.scala.html
+*/}
 
 @import frontend.formatting.DateFormatting.Conversions._
 

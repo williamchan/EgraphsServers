@@ -1,4 +1,4 @@
-@(label: String, model: String, id: String)
+@(label: String, model: String, name: String)
 
 @import views.frontend.tags
 
@@ -6,7 +6,7 @@
 <div class="control-group">
   <label class="control-label ng-label">@label</label>
   <div class="controls">
-    <select ng-model="@model@id" type="text" class="span3">
+    <select ng-model="@model" name="@name" type="text" class="span3">
       @tags.geo.html.usstates()
     </select>
   </div>

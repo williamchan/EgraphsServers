@@ -1,4 +1,6 @@
-@(title: String, jsMain: String = "", headJs: => Html = Html.empty, body: => Html)
+@(title: String, jsMain: String = "", headJs: => Html = Html.empty, body: => Html)(
+  implicit headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData)
 
 @{/**
     Base template for the consumer website. It provides many hooks to customize
@@ -9,13 +11,19 @@
 
     jsMain - the javascript file that contains the scripting for the page being rendered.
         These files should mostly be contained in public/javascripts/pages
-
+ 
     headJs - any raw javascript that should be executed immediately after Egraphs.page
         is initialized. populate Egraphs.page using this hook to have the server communicate
         information to the client-side scripts which can include "Egraphs" as a module using
         require.js.
 
     body - the HTML that should be rendered as the body of the page.
+
+    headerData - extra implicit data necessary for the base template to render
+        the header. This is logged-in information, links to other parts of the site that
+        reside in the base template.
+
+    footerData - extra implicit data necessary to render the footer.
 */}
 @import views.frontend.tags
 
@@ -61,11 +69,11 @@
 
   <body>
     
-    @tags.html.site_header()
+    @tags.html.site_header(headerData)
     <!-- Begin base template body -->
     @body
     <!-- End base template body -->
-    @tags.html.site_footer()
+    @tags.html.site_footer(footerData)
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
     <script>window.jQuery || document.write("<script src='@asset("public/javascripts/libs/jquery-1.7.2.min.js")'>\x3C/script>")</script>

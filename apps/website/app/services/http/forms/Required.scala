@@ -13,8 +13,13 @@ trait Required[+ValueType] { this: FormField[ValueType] =>
    */
   protected def validateIfPresent: Either[FormError, ValueType]
 
+  /**
+   * Message of FormError if required value is missing.
+   */
+  def errorMessage: String = "Required"
+
   override final def validate = {
-    for (strings <- FormChecks.isPresent(stringsToValidate).right;
+    for (strings <- FormChecks.isPresent(stringsToValidate, errorMessage).right;
          subclassResult <- validateIfPresent.right) yield subclassResult
   }
 }
