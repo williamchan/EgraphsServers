@@ -7,19 +7,48 @@
 
   div.pending-portrait {
     max-width: 100%;
+    margin-bottom: 20px;
+    margin-left: 12%;
   }
 
   div.pending-landscape {
     max-width: 100%;
+    margin-bottom: 20px;
+  }
+//Stub code for experimenting with repsonsive svgs
+  div.landscape {
+//   position: relative;
+//    padding-top: 25px;
+//    padding-bottom: 63.333%;
+//    height: 0;
+    overflow: hidden;
   }
 
-  div.landscape {
-    margin-left: 0px;
-    margin-bottom: 10px;
+  div.landscape iframe {
+//    position: absolute;
+//    width: 80%;
+//    height: 80%;
+//    left: 0;
+//    top: 0;
+    border: none;
   }
 
   div.portrait{
+//   position: relative;
+//   padding-top: 25px;
+//    padding-bottom: 139%;
+//    height: 0;
+    overflow: hidden;
+    margin-left: 15%;
+  }
 
+  div.portrait iframe{
+//    position: absolute;
+//    width: 70%;
+//    height: 70%;
+//    left: 0;
+//    top: 0;
+    border: none;
   }
 
   .row-egraph {
@@ -137,33 +166,54 @@
   }
 
 }
+@media (max-width: 979px) {
+  #galleryrows {
+    div.portrait, div.pending-portrait {
+     margin-left: 0px;
+    }
+  }
+
+}
+
+@media (max-width: 767px) {
+
+  #galleryrows {
+    .portait, .landscape, .pending-portrait, .pending-landscape {
+      text-align: center;
+    }
+
+    div.shipping-details {
+     position: static;
+    }
+  }
+}
 
 @media (max-width: 480px) {
-  #galleryrows {
-      span.order-line {
-        font-size: 14px;
-        padding-left: 0px;
-        padding-bottom: 5px;
-      }
-      span h3 {
-        font-size: 14px;
-      }
 
-      br.number-br {
-        display: none;
-      }
-      div.shipping-details {
-       position: static;
-      }
+  #galleryrows {
+    span.order-line {
+      font-size: 14px;
+      padding-left: 0px;
+      padding-bottom: 5px;
+    }
+    span h3 {
+      font-size: 14px;
+    }
+
+    br.number-br {
+      display: none;
+    }
+
   }
 
   #gallerytop {
-    span.count {
-      text-align: left;
-    }
 
     div.row-fluid {
       margin-top: 0px;
+    }
+
+    span.count {
+      text-align: left;
     }
 
   }
