@@ -8,8 +8,11 @@ import services.http.forms.AccountSettingsForm.Fields
 import services.http.forms.AccountSettingsFormFactory
 import models.{Customer, Account}
 import models.frontend.account.{AccountSettingsForm => AccountSettingsFormView}
+import services.mvc.ImplicitHeaderAndFooterData
 
-private[controllers] trait GetAccountSettingsEndpoint { this: Controller =>
+private[controllers] trait GetAccountSettingsEndpoint extends ImplicitHeaderAndFooterData {
+  this: Controller =>
+
   import services.mvc.FormConversions._
   import services.http.forms.Form.Conversions._
 
@@ -21,6 +24,7 @@ private[controllers] trait GetAccountSettingsEndpoint { this: Controller =>
 
     customerFilters.requireCustomerLogin { (customer, account) =>
       val form = makeFormView(customer, account)
+
       val displayableErrors = (List(form.fullname.error, form.username.error, form.email.error,
         form.oldPassword.error, form.newPassword.error, form.passwordConfirm.error,
         form.addressLine1.error,form.addressLine2.error, form.city.error, form.state.error, form.postalCode.error,

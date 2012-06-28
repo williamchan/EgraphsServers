@@ -6,7 +6,7 @@ import play.mvc.Controller
 /**
  * Permutations of the Checkout: Review.
  */
-object Review extends Controller {
+object Review extends Controller with DefaultHeaderAndFooterData {
 
   def index = {
     views.frontend.html.celebrity_storefront_review()

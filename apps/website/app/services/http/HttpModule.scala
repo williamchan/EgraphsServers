@@ -14,8 +14,9 @@ object HttpModule extends AbstractModule with ScalaModule {
     bind[Properties].annotatedWith[PlayConfig].toInstance(Play.configuration)
     bind[() => Session].toInstance(() => Session.current())
     bind[() => ServerSession].to[ServerSessionFactory]
-    bind[String].annotatedWith[PlayId].toInstance(Play.id)
+    bind[() => EgraphsSession].to[EgraphsSessionFactory]
 
+    bind[String].annotatedWith[PlayId].toInstance(Play.id)
     bind[RequireAuthenticityTokenFilter].toProvider[RequireAuthenticityTokenFilterProvider]
   }
 }
