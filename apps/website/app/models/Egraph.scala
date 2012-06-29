@@ -302,7 +302,7 @@ case class Egraph(
     override def audioMp3Url = {
       blobs.getUrlOption((mp3Key)) match {
         case None => {
-          initializeMp3()
+          generateAndSaveMp3()
           blobs.getUrl((mp3Key))
         }
         case Some(url) => url
@@ -312,7 +312,7 @@ case class Egraph(
     /**
      * Encodes an mp3 from the wav asset and stores the mp3 to the blobstore.
      */
-    override def initializeMp3() {
+    override def generateAndSaveMp3() {
       val mp3 = AudioConverter.convertWavToMp3(audioWav.asByteArray, blobKeyBase)
       blobs.put(mp3Key, mp3, access=AccessPolicy.Public)
     }
@@ -522,7 +522,7 @@ trait EgraphAssets {
   /**
    * Encodes an mp3 from the wav asset and stores the mp3 to the blobstore.
    */
-  def initializeMp3()
+  def generateAndSaveMp3()
 
   /** Stores the assets in the blobstore */
   def save(signature: String, message: Option[String], audio: Array[Byte])

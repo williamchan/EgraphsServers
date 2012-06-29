@@ -53,7 +53,7 @@ case class EgraphActor @Inject() (
                 val testedEgraph = egraph.verifyBiometrics.save()
 
                 // Initializes the mp3 from the wav.
-                egraph.assets.initializeMp3()
+                egraph.assets.generateAndSaveMp3()
 
                 // If admin review is turned off (eg to expedite demos), immediately publish regardless of biometric results
                 if (playConfig.getProperty("adminreview.skip") == "true") {

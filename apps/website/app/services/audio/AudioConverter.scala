@@ -1,8 +1,7 @@
 package services.audio
 
-import services.TempFile
+import services.{Utils, TempFile}
 import com.xuggle.mediatool.ToolFactory
-import java.io.{File, FileOutputStream}
 import services.blobs.Blobs
 
 object AudioConverter {
@@ -21,7 +20,7 @@ object AudioConverter {
     // save sourceAudio to temp file
     val sourceTempFile = TempFile.named(tempFilesId + "/audio.wav")
     val targetTempFile = TempFile.named(tempFilesId + "/audio.mp3")
-    saveToFile(sourceAudio, sourceTempFile)
+    Utils.saveToFile(sourceAudio, sourceTempFile)
 
     convertToMp3(sourceTempFile.getPath, targetTempFile.getPath)
     val audioAsMp3 = Blobs.Conversions.fileToByteArray(targetTempFile)
@@ -43,16 +42,5 @@ object AudioConverter {
     val writer = ToolFactory.makeWriter(targetTempFileLoc, reader)
     reader.addListener(writer)
     while (reader.readPacket() == null) {}
-  }
-
-  /**
-   * @param bytes bytes to be written to the file
-   * @param file the intended file location
-   */
-  private def saveToFile(bytes: Array[Byte], file: File) {
-    file.getParentFile.mkdirs()
-    val out = new FileOutputStream(file)
-    out.write(bytes)
-    out.close()
   }
 }

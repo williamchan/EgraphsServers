@@ -11,10 +11,10 @@ object TestHelpers {
   }
 
   def getStringFromFile(file: File): String = {
-    val xmlIn: FileInputStream = new FileInputStream(file)
-    val xmlBytes: Array[Byte] = new Array[Byte](xmlIn.available)
-    xmlIn.read(xmlBytes)
-    new String(xmlBytes)
+    val inputStream: FileInputStream = new FileInputStream(file)
+    val bytes: Array[Byte] = new Array[Byte](inputStream.available)
+    inputStream.read(bytes)
+    new String(bytes)
   }
 
   def getBlobKeyFromTestBlobUrl(testBlobUrl: String): String = {

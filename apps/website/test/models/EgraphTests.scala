@@ -100,10 +100,10 @@ class EgraphTests extends UnitFlatSpec
     egraph.assets.audioWav.asByteArray should be (TestConstants.fakeAudio)
   }
 
-  "initializeMp3" should "store mp3 asset" in {
+  "generateAndSaveMp3" should "store mp3 asset" in {
     val egraph = TestData.newSavedEgraphWithRealAudio()
     intercept[NoSuchElementException] { egraph.assets.audioMp3 }
-    egraph.assets.initializeMp3()
+    egraph.assets.generateAndSaveMp3()
     egraph.assets.audioMp3.asByteArray.length should be > (0)
   }
 
