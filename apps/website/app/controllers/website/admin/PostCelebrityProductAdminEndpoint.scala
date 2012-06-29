@@ -9,7 +9,7 @@ import play.data.validation.Validation
 import models._
 import enums.PublishedStatus
 import services.logging.Logging
-import services.ImageUtil
+import services.{Dimensions, ImageUtil}
 import play.Play
 import java.text.SimpleDateFormat
 import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters, AdminRequestFilters}
@@ -57,10 +57,19 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
       for (image <- productImageOption) {
         val (width, height) = (image.getWidth, image.getHeight)
         val resolutionStr = width + "x" + height
+        val isOriginalImageTooSmall = width < Product.minPhotoWidth || height < Product.minPhotoHeight
         Validation.isTrue(
           "Product Photo must be at least " + Product.minPhotoWidth + " in width and " + Product.minPhotoHeight + " in height - resolution was " + resolutionStr,
-          width >= Product.minPhotoWidth && height >= Product.minPhotoHeight
+          !isOriginalImageTooSmall
         )
+        if (!isOriginalImageTooSmall) {
+          val croppedDimensions = EgraphFrame.suggestedFrame(Dimensions(width, height)).getCropDimensions(image)
+          Validation.isTrue(
+            "Product Photo must be at just a bit larger because it would be cropped to below 1024 on one side. "
+              + "Please upscale the image (you can do this with Mac Preview) or find a larger image",
+            !(croppedDimensions.width < Product.minPhotoWidth || croppedDimensions.height < Product.minPhotoHeight)
+          )
+        }
       }
 
       // Validate product icon

@@ -679,26 +679,31 @@ sealed trait EgraphFrame {
    * Returns a copy of an image of arbitrary dimensions, cropped so that it
    * will fit in the frame once resized to imageWidthPixels by imageHeightPixels.
    *
-   * Returns the cropped image.
-   *
-   * @param image
+   * @param image image to crop
    * @return a cropped copy of the image argument.
    */
   def cropImageForFrame(image: BufferedImage): BufferedImage = {
+    val cropDimensions = getCropDimensions(image)
+    ImageUtil.crop(image, cropDimensions)
+  }
+
+  /**
+   * @param image image for which to calculate dimensions it would be cropped to
+   * @return dimensions the image would be cropped to
+   */
+  def getCropDimensions(image: BufferedImage): Dimensions = {
     val targetAspectRatio = this.imageAspectRatio
     val originalWidth = image.getWidth.toDouble
     val originalHeight = image.getHeight.toDouble
     val originalAspectRatio = originalWidth / originalHeight
 
-    val cropDimensions = if (originalAspectRatio < targetAspectRatio) {
+    if (originalAspectRatio < targetAspectRatio) {
       // the original is too tall. Use all of width and limit height.
-      Dimensions(width=originalWidth.toInt, height=(originalWidth / targetAspectRatio).toInt)
+      Dimensions(width = originalWidth.toInt, height = (originalWidth / targetAspectRatio).toInt)
     } else {
       // the original is too narrow. Use all of height and limit width.
-      Dimensions(width=(originalHeight * targetAspectRatio).toInt, height=originalHeight.toInt)
+      Dimensions(width = (originalHeight * targetAspectRatio).toInt, height = originalHeight.toInt)
     }
-
-    ImageUtil.crop(image, cropDimensions)
   }
 }
 
