@@ -1,6 +1,6 @@
 package services.audio
 
-import services.{Utils, TempFile}
+import services.{SampleRateConverter, Utils, TempFile}
 import com.xuggle.mediatool.ToolFactory
 import services.blobs.Blobs
 
@@ -17,10 +17,13 @@ object AudioConverter {
    * @return bytes of the mp3 encoded from the source audio
    */
   def convertWavToMp3(sourceAudio: Array[Byte], tempFilesId: String): Array[Byte] = {
+    // Ensure that WAV is in the correct format before passing to Xuggler's converter
+    val sourceWav = SampleRateConverter.convert(44100f, sourceAudio)
+
     // save sourceAudio to temp file
     val sourceTempFile = TempFile.named(tempFilesId + "/audio.wav")
     val targetTempFile = TempFile.named(tempFilesId + "/audio.mp3")
-    Utils.saveToFile(sourceAudio, sourceTempFile)
+    Utils.saveToFile(sourceWav, sourceTempFile)
 
     convertToMp3(sourceTempFile.getPath, targetTempFile.getPath)
     val audioAsMp3 = Blobs.Conversions.fileToByteArray(targetTempFile)
