@@ -17,7 +17,7 @@ private[controllers] trait GetAccountAdminEndpoint {
     adminFilters.requireAdministratorLogin { admin =>
       val errorFields = Option(flash.get("errors")).map(errString => errString.split(',').toList)
 
-      val account = accountStore.findById(accountId).get
+      val account = accountStore.get(accountId)
       val password = account.password match {
         case Some(ps: Password) => ps.hash
         case None => ""

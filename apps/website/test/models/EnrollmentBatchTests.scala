@@ -63,11 +63,11 @@ with DBTransactionPerTest {
     enrollmentBatch.isBatchComplete should be(false)
 
     enrollmentBatch.addEnrollmentSample(signatureStr = TestConstants.shortWritingStr, voiceStr = TestConstants.fakeAudioStr())
-    enrollmentBatch = store.findById(enrollmentBatch.id).get
+    enrollmentBatch = store.get(enrollmentBatch.id)
     enrollmentBatch.getNumEnrollmentSamples should be(EnrollmentBatch.batchSize)
     enrollmentBatch.isBatchComplete should be(true)
 
-    celebStore.findById(celeb.id).get.enrollmentStatus should be(EnrollmentStatus.AttemptingEnrollment)
+    celebStore.get(celeb.id).enrollmentStatus should be(EnrollmentStatus.AttemptingEnrollment)
   }
 
   "getEnrollmentSamples" should "return list of EnrollmentSamples" in {

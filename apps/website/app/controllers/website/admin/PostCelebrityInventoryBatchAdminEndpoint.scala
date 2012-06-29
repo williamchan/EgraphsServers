@@ -39,7 +39,7 @@ trait PostCelebrityInventoryBatchAdminEndpoint extends Logging {
             inventoryBatch.products.associate(p)
           }
         } else {
-          val ib = inventoryBatchStore.findById(inventoryBatchId).get
+          val ib = inventoryBatchStore.get(inventoryBatchId)
           val inventoryBatch = ib.copy(numInventory = numInventory, startDate = startDate, endDate = endDate).save()
 
           // todo(wchan): This logic is generally useful for ManyToManys

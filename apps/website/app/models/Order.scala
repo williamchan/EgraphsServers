@@ -193,8 +193,8 @@ case class Order(
    */
   def renderedForApi: Map[String, Any] = {
     val customerStore = services.customerStore
-    val buyer = customerStore.findById(buyerId).get
-    val recipient = if (buyerId != recipientId) customerStore.findById(recipientId).get else buyer
+    val buyer = customerStore.get(buyerId)
+    val recipient = if (buyerId != recipientId) customerStore.get(recipientId) else buyer
 
     // Alias CelebrityChoosesMessage to SpecificMessage for now -- iPad doesn't need to know
     // the difference.

@@ -535,15 +535,15 @@ object Scenarios {
   }
 
   def getWillCelebrityAccount: Celebrity = {
-    celebrityStore.findById(getWillAccount.celebrityId.get).get
+    celebrityStore.get(getWillAccount.celebrityId.get)
   }
 
   def getWillsTwoProducts: (Product, Product) = {
-    (productStore.findById(1L).get, productStore.findById(2L).get)
+    (productStore.get(1L), productStore.get(2L))
   }
 
   def getEremCustomerAccount: Customer = {
-    customerStore.findById(1L).get
+    customerStore.get(1L)
   }
 }
 

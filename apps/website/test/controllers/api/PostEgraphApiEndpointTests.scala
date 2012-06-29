@@ -44,7 +44,7 @@ class PostEgraphApiEndpointTests extends EgraphsFunctionalTest {
     assertEquals(TestConstants.shortWritingStr, blobs.get("egraphs/" + json("id") + "/signature.json").get.asString)
 
     db.connected(TransactionSerializable) {
-      val egraph = egraphStore.findById(json("id").toString.toLong).get
+      val egraph = egraphStore.get(json("id").toString.toLong)
       assertEquals(Some(37.7821120598956), egraph.latitude)
       assertEquals(Some(-122.400612831116), egraph.longitude)
     }

@@ -98,7 +98,7 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
             publishedStatus=publishedStatus
           ).copy(signingOriginX=signingOriginX, signingOriginY=signingOriginY)
         } else {
-          val product = productStore.findById(productId).get
+          val product = productStore.get(productId)
           product.copy(
             name=productName,
             description=productDescription,
