@@ -1,25 +1,50 @@
 package models.frontend.storefront
 
 import models.frontend.storefront.StorefrontBreadcrumb.ActiveStatus
-import play.templates.Html
+import models.frontend.storefront.StorefrontBreadcrumb.ActiveStatus.BreadcrumbNotActive
 
 class StorefrontBreadcrumbs(
   breadcrumbs: Seq[StorefrontBreadcrumb]
 )
 {
   import StorefrontBreadcrumb.ActiveStatus._
+  import StorefrontBreadcrumb.Crumb._
 
+  /*def indexOfType(crumb: StorefrontBreadcrumb.Crumb):Int = {
+    val index = crumb match {
+      case ChoosePhoto => 0
+      case Personalize  => 1
+      case Review => 2
+      case Checkout => 3
+      case Finalize => 4
+    }
+
+    index
+  }*/
+  
   def indexed:Seq[(StorefrontBreadcrumb, Int)] = {
     breadcrumbs.zipWithIndex
   }
+  
+  def withUrls(crumbsToUrls: Map[StorefrontBreadcrumb.Crumb, String]) = {
+    val newCrumbs = for (crumb <- breadcrumbs) yield {
+      crumb.copy(url=crumbsToUrls.get(crumb.crumbType))
+    }
+
+    new StorefrontBreadcrumbs(newCrumbs)
+  }
 
   def withActive(toSetActive: StorefrontBreadcrumb.Crumb) = {
-    val newCrumbs = breadcrumbs.grouped(2).map { crumbPair =>
+    // Iterate by pairs, adding breadcrumbs.last to make sure that every actual
+    // breadcrumb gets a chance to be the first in the pair.
+    val newCrumbs = (breadcrumbs :+ breadcrumbs.last).sliding(2).map { crumbPair =>
+      println("pair is -- " + crumbPair.map(_.crumbType).mkString(", "))
       val newStatus = crumbPair match {
         case Seq(current, next) if current.crumbType == toSetActive =>
+
           BreadcrumbActive
 
-        case Seq(current, next) if current.crumbType == toSetActive =>
+        case Seq(current, next) if next.crumbType == toSetActive =>
           BreadcrumbBeforeActive
 
         case _ =>
@@ -48,7 +73,7 @@ object StorefrontBreadcrumbs {
   }
 
   private def defaultBreadcrumb(name: StorefrontBreadcrumb.Crumb): StorefrontBreadcrumb = {
-    StorefrontBreadcrumb(name, None, ActiveStatus.BreadcrumbActive)
+    StorefrontBreadcrumb(name, None, BreadcrumbNotActive)
   }
 }
 

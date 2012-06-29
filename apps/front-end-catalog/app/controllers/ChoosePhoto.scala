@@ -11,7 +11,10 @@ import models.frontend.storefront.ChoosePhotoCelebrity
 /**
  * Permutations of the Celebrity Storefront: Choose Photo, tiled view.
  */
-object ChoosePhoto extends Controller with DefaultHeaderAndFooterData {
+object ChoosePhoto extends Controller
+  with DefaultHeaderAndFooterData
+  with DefaultStorefrontBreadcrumbs
+{
   import frontend.formatting.MoneyFormatting.Conversions._
 
   val dateFormat = new SimpleDateFormat("yyyy-MM-dd")

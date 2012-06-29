@@ -1,7 +1,7 @@
 @(title: String, headJs: => Html = Html.empty, jsMain: String = "", body: => Html)(
   implicit headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData,
-  storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs = null
+  storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs
 )
 
 @{/**
@@ -17,10 +17,10 @@
       <ol class="clearfix">
         @{/** Iterate over the breadcrumbs, setting the right classes for active/previous/first */}
         @for((crumb, index) <- storefrontBreadcrumbs.indexed) {
-          <li class="@if(index == 1) {first} @if(crumb.isActive) {active} @if(crumb.isAdjacentPreviousToActive) {previous}">
+          <li class="@if(index == 0) {first} @if(crumb.isActive) {active} @if(crumb.isAdjacentPreviousToActive) {previous}">
             @{/** Only wrap in an anchor if there was a URL, which indicates that the form has been completed */}
             @for(url <- crumb.url) {<a href="@url">}
-              <span><strong><span>Step</span>@index</strong> @crumb.name</span> <small>&raquo;</small></a>
+              <span><strong><span>Step</span>@{index + 1}</strong> @crumb.name</span> <small>&raquo;</small></a>
             @for(url <- crumb.url) {</a>}
             </li>
           </li>

@@ -4,12 +4,14 @@ import play.mvc.Controller
 
 
 /**
- * Permutations of the Checkout: Review.
+ * Permutations of the Checkout: Login.
  */
-object Review extends Controller with DefaultHeaderAndFooterData {
-
+object Login extends Controller
+  with DefaultHeaderAndFooterData
+  with DefaultStorefrontBreadcrumbs
+{
   def index = {
-    views.frontend.html.celebrity_storefront_review()
+    views.frontend.html.celebrity_storefront_login()
   }
 
 }

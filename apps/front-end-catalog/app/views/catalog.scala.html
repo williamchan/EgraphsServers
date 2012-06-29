@@ -47,6 +47,17 @@
       @catalogEntry("ChoosePhoto/withPartnerIcons?num=6", "6 partner icons")
       @catalogEntry("ChoosePhoto/longBio", "Super long bio")
     </ol>
+    <h2>Storefront template (focus on the breadcrumbs)</h2>
+    <ol>
+      @catalogEntry("StorefrontTemplate/noneActiveOrComplete", "No crumb active or complete")
+
+      @for(crumbIndex <- 1 to 5) {
+        @catalogEntry(
+          "StorefrontTemplate/active?crumbIndex=" + crumbIndex,
+          "crumb " + crumbIndex + " active"
+        )
+      }      
+    </ol>
     <h2>Storefront: Choose Photo Page (tiles)</h2>
     <ol>
       @catalogEntry("ChoosePhoto/withProducts?num=0", "0 portrait products")

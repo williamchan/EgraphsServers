@@ -1,9 +1,12 @@
 @(celeb: models.frontend.storefront.ChoosePhotoCelebrity,
   products: Iterable[models.frontend.storefront.ChoosePhotoTileProduct],
   recentEgraphs: Iterable[models.frontend.storefront.ChoosePhotoRecentEgraph],
-  partnerIcons: Iterable[models.frontend.storefront.ChoosePhotoPartnerIcon])(
+  partnerIcons: Iterable[models.frontend.storefront.ChoosePhotoPartnerIcon]
+)(
   implicit headerData: models.frontend.header.HeaderData,
-  footerData: models.frontend.footer.FooterData)
+  footerData: models.frontend.footer.FooterData,
+  storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs
+)
 
 @{/**
      Renders the Choose Photo page with the products tiled.

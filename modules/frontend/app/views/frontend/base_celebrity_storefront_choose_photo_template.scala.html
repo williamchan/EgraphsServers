@@ -6,7 +6,9 @@
   partnerIcons: Iterable[models.frontend.storefront.ChoosePhotoPartnerIcon],
   photoSection: => Html
 )(implicit headerData: models.frontend.header.HeaderData, 
-  footerData: models.frontend.footer.FooterData)
+  footerData: models.frontend.footer.FooterData,
+  storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs
+)
 @{/**
   Base template for the two permutations of the "Choose photo" page in the celebrity
   storefront (tiled and carousel). See base_celebrity_storefront_choose_photo_tiled.scala.html.
