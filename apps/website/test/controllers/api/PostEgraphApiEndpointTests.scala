@@ -5,7 +5,7 @@ import org.junit.Test
 import play.test.FunctionalTest
 import sjson.json.Serializer
 import utils.FunctionalTestUtils.willChanRequest
-import services.AppConfig
+import services.{Time, AppConfig}
 import services.http.HttpCodes
 import utils.{FunctionalTestUtils, TestConstants}
 import services.db.{TransactionSerializable, DBSession}
@@ -35,7 +35,9 @@ class PostEgraphApiEndpointTests extends EgraphsFunctionalTest {
       willChanRequest,
       TestConstants.ApiRoot + "/celebrities/me/orders/" + orderId + "/egraphs",
       APPLICATION_X_WWW_FORM_URLENCODED,
-      "signature=" + TestConstants.shortWritingStr + "&audio=" + TestConstants.fakeAudioStrPercentEncoded() + "&latitude=37.7821120598956&longitude=-122.400612831116"
+      "signature=" + TestConstants.shortWritingStr + "&audio=" + TestConstants.fakeAudioStrPercentEncoded()
+        + "&latitude=37.7821120598956&longitude=-122.400612831116"
+        + "&signedAt=2012-07-12+15:11:22.987"
     )
     assertIsOk(response)
 
@@ -47,6 +49,7 @@ class PostEgraphApiEndpointTests extends EgraphsFunctionalTest {
       val egraph = egraphStore.get(json("id").toString.toLong)
       assertEquals(Some(37.7821120598956), egraph.latitude)
       assertEquals(Some(-122.400612831116), egraph.longitude)
+      assertEquals(Time.timestamp("2012-07-12 15:11:22.987", Time.ipadDateFormat), egraph.signedAt)
     }
   }
 

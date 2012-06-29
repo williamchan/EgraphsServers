@@ -66,6 +66,7 @@ case class Egraph(
   _egraphState: String = EgraphState.AwaitingVerification.name,
   latitude: Option[Double] = None,
   longitude: Option[Double] = None,
+  signedAt: Option[Timestamp] = None,         // GMT (just like all other timestamps)
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: EgraphServices = AppConfig.instance[EgraphServices]
@@ -246,6 +247,17 @@ case class Egraph(
     require(admin != null, "Must be rejected by an Administrator")
     require(isPublishable, "Must have previously been approved by admin")
     withEgraphState(Published)
+  }
+
+  /**
+   * Convenience method to return signedAt if it exists, otherwise created
+   * @return signedAt if it exists, otherwise created
+   */
+  def getSignedAt: Timestamp = {
+    signedAt match {
+      case Some(signedAtTimestamp) => signedAtTimestamp
+      case None => created
+    }
   }
 
   /**
@@ -563,6 +575,7 @@ class EgraphStore @Inject() (schema: Schema) extends Saves[Egraph] with SavesCre
       theOld._egraphState := theNew._egraphState,
       theOld.latitude := theNew.latitude,
       theOld.longitude := theNew.longitude,
+      theOld.signedAt := theNew.signedAt,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated
     )

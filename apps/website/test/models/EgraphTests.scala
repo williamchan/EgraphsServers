@@ -80,6 +80,15 @@ class EgraphTests extends UnitFlatSpec
     intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.PassedBiometrics).publish(admin)}
   }
 
+  "getSignedAt" should "return signedAt timestamp if it exists, otherwise created" in {
+    var egraph = TestData.newSavedEgraph().copy(signedAt = Time.timestamp("2012-07-12 15:11:22.987", Time.ipadDateFormat)).save()
+    egraph.signedAt should not be(None)
+    egraph.signedAt should not be(Some(egraph.created))
+
+    egraph = egraph.copy(signedAt = None).save()
+    egraph.signedAt should be(None)
+  }
+
   "image" should "return EgraphImage with correctly configured ingredientFactory" in {
     val egraph = newEntity.withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.fakeAudioStr()).save()
     val egraphImage: EgraphImage = egraph.image()
