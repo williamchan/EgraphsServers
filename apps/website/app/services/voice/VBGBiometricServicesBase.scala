@@ -198,7 +198,7 @@ trait VBGBiometricServicesBase {
 
   protected[voice] def sendVerifySampleRequest(egraph: Egraph, transactionId: Long): VBGVerifySample = {
     import services.blobs.Blobs.Conversions._
-    val wavBinary: Array[Byte] = egraph.assets.audio.asByteArray
+    val wavBinary: Array[Byte] = egraph.assets.audioWav.asByteArray
     val voiceSampleBase64_downSampled: String = convertWavTo8kHzBase64(wavBinary)
 
     val request = new VBGRequest

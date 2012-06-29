@@ -10,6 +10,7 @@ import services.voice.{VoiceBiometricsError, YesMaamVoiceBiometricService, Voice
 import vbg.{VBGVerifySampleStore, VBGVerifySample}
 import services.signature.{SignatureBiometricsError, YesMaamSignatureBiometricService, SignatureBiometricService}
 import services._
+import audio.AudioConverter
 import db.{FilterOneTable, Schema, KeyedCaseClass, Saves}
 import graphics.{Handwriting, HandwritingPen, GraphicsSource}
 import java.text.SimpleDateFormat
@@ -290,8 +291,30 @@ case class Egraph(
       blobs.get(signatureJsonKey).get.asString
     }
 
-    override def audio: Blob = {
-      blobs.get(audioKey).get
+    override def audioWav: Blob = {
+      blobs.get(wavKey).get
+    }
+
+    override def audioMp3: Blob = {
+      blobs.get(mp3Key).get
+    }
+
+    override def audioMp3Url = {
+      blobs.getUrlOption((mp3Key)) match {
+        case None => {
+          generateAndSaveMp3()
+          blobs.getUrl((mp3Key))
+        }
+        case Some(url) => url
+      }
+    }
+
+    /**
+     * Encodes an mp3 from the wav asset and stores the mp3 to the blobstore.
+     */
+    override def generateAndSaveMp3() {
+      val mp3 = AudioConverter.convertWavToMp3(audioWav.asByteArray, blobKeyBase)
+      blobs.put(mp3Key, mp3, access=AccessPolicy.Public)
     }
 
     override def message: Option[String] = {
@@ -300,13 +323,9 @@ case class Egraph(
       }
     }
 
-    override def audioUrl = {
-      blobs.getUrl(audioKey)
-    }
-
     override def save(signature: String, message: Option[String], audio: Array[Byte]) {
       blobs.put(signatureJsonKey, signature, access=AccessPolicy.Private)
-      blobs.put(audioKey, audio, access=AccessPolicy.Public)
+      blobs.put(wavKey, audio, access=AccessPolicy.Public)
 
       // Put in the message if it was provided
       message.foreach { messageString =>
@@ -314,7 +333,8 @@ case class Egraph(
       }
     }
 
-    lazy val audioKey = blobKeyBase + "/audio.wav"
+    lazy val wavKey = blobKeyBase + "/audio.wav"
+    lazy val mp3Key = blobKeyBase + "/audio.mp3"
     lazy val signatureJsonKey = signatureKey + ".json"
     lazy val messageJsonKey = messageKey + ".json"
 
@@ -483,14 +503,26 @@ trait EgraphAssets {
   def message: Option[String]
 
   /**
-   * Retrieves the bytes of audio from the blobstore.
+   * Retrieves the bytes of Wav audio from the blobstore.
    */
-  def audio: Blob
+  def audioWav: Blob
 
   /**
-   * Retrieves the url of the audio in the blobstore.
+   * Retrieves the bytes of mp3 audio from the blobstore.
+   * Also lazily initializes the mp3 from the wav, though EgraphActor should have handled that.
    */
-  def audioUrl: String
+  def audioMp3: Blob
+
+  /**
+   * Retrieves the url of the mp3 in the blobstore.
+   * Also lazily initializes the mp3 from the wav, though EgraphActor should have handled that.
+   */
+  def audioMp3Url: String
+
+  /**
+   * Encodes an mp3 from the wav asset and stores the mp3 to the blobstore.
+   */
+  def generateAndSaveMp3()
 
   /** Stores the assets in the blobstore */
   def save(signature: String, message: Option[String], audio: Array[Byte])
