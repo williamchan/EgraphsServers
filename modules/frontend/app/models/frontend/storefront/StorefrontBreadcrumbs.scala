@@ -8,9 +8,9 @@ class StorefrontBreadcrumbs(
 )
 {
   import StorefrontBreadcrumb.ActiveStatus._
-  import StorefrontBreadcrumb.Crumb._
+  import StorefrontBreadcrumb.CrumbChoice._
 
-  /*def indexOfType(crumb: StorefrontBreadcrumb.Crumb):Int = {
+  /*def indexOfType(crumb: StorefrontBreadcrumb.CrumbChoice):Int = {
     val index = crumb match {
       case ChoosePhoto => 0
       case Personalize  => 1
@@ -26,25 +26,24 @@ class StorefrontBreadcrumbs(
     breadcrumbs.zipWithIndex
   }
   
-  def withUrls(crumbsToUrls: Map[StorefrontBreadcrumb.Crumb, String]) = {
+  def withUrls(crumbsToUrls: Map[StorefrontBreadcrumb.CrumbChoice, String]) = {
     val newCrumbs = for (crumb <- breadcrumbs) yield {
-      crumb.copy(url=crumbsToUrls.get(crumb.crumbType))
+      crumb.copy(url=crumbsToUrls.get(crumb.crumbChoice))
     }
 
     new StorefrontBreadcrumbs(newCrumbs)
   }
 
-  def withActive(toSetActive: StorefrontBreadcrumb.Crumb) = {
+  def withActive(toSetActive: StorefrontBreadcrumb.CrumbChoice) = {
     // Iterate by pairs, adding breadcrumbs.last to make sure that every actual
     // breadcrumb gets a chance to be the first in the pair.
     val newCrumbs = (breadcrumbs :+ breadcrumbs.last).sliding(2).map { crumbPair =>
-      println("pair is -- " + crumbPair.map(_.crumbType).mkString(", "))
       val newStatus = crumbPair match {
-        case Seq(current, next) if current.crumbType == toSetActive =>
+        case Seq(current, next) if current.crumbChoice == toSetActive =>
 
           BreadcrumbActive
 
-        case Seq(current, next) if next.crumbType == toSetActive =>
+        case Seq(current, next) if next.crumbChoice == toSetActive =>
           BreadcrumbBeforeActive
 
         case _ =>
@@ -60,7 +59,7 @@ class StorefrontBreadcrumbs(
 
 
 object StorefrontBreadcrumbs {
-  import StorefrontBreadcrumb.Crumb._
+  import StorefrontBreadcrumb.CrumbChoice._
   
   private val breadcrumbNames = Seq(
     ChoosePhoto, Personalize, Review, Checkout, Finalize    
@@ -72,21 +71,21 @@ object StorefrontBreadcrumbs {
     )
   }
 
-  private def defaultBreadcrumb(name: StorefrontBreadcrumb.Crumb): StorefrontBreadcrumb = {
+  private def defaultBreadcrumb(name: StorefrontBreadcrumb.CrumbChoice): StorefrontBreadcrumb = {
     StorefrontBreadcrumb(name, None, BreadcrumbNotActive)
   }
 }
 
 
 case class StorefrontBreadcrumb(
-  crumbType: StorefrontBreadcrumb.Crumb,
+  crumbChoice: StorefrontBreadcrumb.CrumbChoice,
   url: Option[String],
   activeStatus: ActiveStatus
 ) {
   import StorefrontBreadcrumb.ActiveStatus._
 
   def name = {
-    crumbType.name
+    crumbChoice.name
   }
 
   def isActive = {
@@ -100,13 +99,13 @@ case class StorefrontBreadcrumb(
 
 
 object StorefrontBreadcrumb {
-  sealed abstract class Crumb(val name: String)
-  object Crumb {
-    case object ChoosePhoto extends Crumb("Choose Photo")
-    case object Personalize extends Crumb("Personalize")
-    case object Review extends Crumb("Review")
-    case object Checkout extends Crumb("Checkout")
-    case object Finalize extends Crumb("Finalize")
+  sealed abstract class CrumbChoice(val name: String)
+  object CrumbChoice {
+    case object ChoosePhoto extends CrumbChoice("Choose Photo")
+    case object Personalize extends CrumbChoice("Personalize")
+    case object Review extends CrumbChoice("Review")
+    case object Checkout extends CrumbChoice("Checkout")
+    case object Finalize extends CrumbChoice("Finalize")
   }
   
   sealed trait ActiveStatus

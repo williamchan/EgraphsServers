@@ -4,7 +4,7 @@ import models.frontend.storefront.{StorefrontBreadcrumb, StorefrontBreadcrumbs}
 import play.mvc.Controller
 
 object StorefrontTemplate extends Controller with DefaultHeaderAndFooterData {
-  import StorefrontBreadcrumb.Crumb._
+  import StorefrontBreadcrumb.CrumbChoice._
 
   def noneActiveOrComplete = {
     implicit val breadcrumbs = defaultBreadcrumbs
