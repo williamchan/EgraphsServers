@@ -84,7 +84,7 @@ object TestData {
   }
 
   private def newProduct(celebrity: Celebrity): Product = {
-    celebrity.newProduct.copy(name = "prod" + random.nextLong(), description = "some prod").withPublishedStatus(PublishedStatus.Published)
+    celebrity.newProduct.copy(name = "prod" + random.nextLong(), description = "some prod", priceInCurrency = 1).withPublishedStatus(PublishedStatus.Published)
   }
 
   def newSavedProduct(celebrity: Option[Celebrity] = None): Product = {
