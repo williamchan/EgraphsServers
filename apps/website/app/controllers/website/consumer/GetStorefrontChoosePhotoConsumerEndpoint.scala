@@ -25,8 +25,8 @@ private[consumer] trait GetStorefrontChoosePhotoConsumerEndpoint
     celebFilters.requireCelebrityUrlSlug { celebrity =>
       val celebrityUrlSlug = celebrity.urlSlug.getOrElse("/")
 
-      val productViews = for (product <- celebrity.productsInActiveInventoryBatches()) yield {
-        product.asChoosePhotoTileView(celebrityUrlSlug=celebrityUrlSlug)
+      val productViews = for ((product, inventoryRemaining) <- celebrity.getActiveProductsWithInventoryRemaining()) yield {
+        product.asChoosePhotoTileView(celebrityUrlSlug=celebrityUrlSlug, quantityRemaining = inventoryRemaining)
       }
 
       views.frontend.html.celebrity_storefront_choose_photo_tiled(

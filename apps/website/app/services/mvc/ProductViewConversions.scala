@@ -10,7 +10,8 @@ import models.frontend.storefront.ProductOrientation
 import models.frontend.storefront.ChoosePhotoTileProduct
 
 class ProductViewConversions(product: Product) {
-  def asChoosePhotoTileView(celebrityUrlSlug: String=product.celebrity.urlSlug.getOrElse("/"))
+  def asChoosePhotoTileView(celebrityUrlSlug: String = product.celebrity.urlSlug.getOrElse("/"),
+                            quantityRemaining: Int = product.remainingInventoryCount)
   : ChoosePhotoTileProduct =
   {
     val carouselViewLink=WebsiteControllers.lookupGetStorefrontChoosePhotoCarousel(
@@ -23,7 +24,7 @@ class ProductViewConversions(product: Product) {
       price=product.price,
       imageUrl=productThumbnailUrl(width=340),
       targetUrl=carouselViewLink,
-      quantityRemaining=product.remainingInventoryCount,
+      quantityRemaining=quantityRemaining,
       orientation=orientationOfFrame(product.frame)
     )
   }

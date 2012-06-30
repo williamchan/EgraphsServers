@@ -21,6 +21,7 @@ case class CelebrityServices @Inject() (
   productStore: ProductStore,
   orderStore: OrderStore,
   inventoryBatchStore: InventoryBatchStore,
+  inventoryBatchQueryFilters: InventoryBatchQueryFilters,
   schema: Schema,
   productServices: Provider[ProductServices],
   imageAssetServices: Provider[ImageAssetServices]
@@ -71,6 +72,39 @@ case class Celebrity(id: Long = 0,
   /**Returns all of the celebrity's Products */
   def products(filters: FilterOneTable[Product]*): Query[Product] = {
     services.productStore.findByCelebrity(id, filters: _*)
+  }
+
+  // todo(wchan): comment this!
+
+  def getActiveProductsWithInventoryRemaining(): Seq[(Product, Int)] = {
+    // 1) query for active InventoryBatches
+    val activeIBs = services.inventoryBatchStore.findByCelebrity(id, services.inventoryBatchQueryFilters.activeOnly)
+    val inventoryBatches = Utils.toMap(activeIBs, key=(theIB: InventoryBatch) => theIB.id)
+    val inventoryBatchIds = inventoryBatches.keys.toList
+
+    // 2) calculate quantity remaining for each InventoryBatch
+    val inventoryBatchIdsAndOrderCounts: Map[Long, Int] = Map(services.orderStore.countOrdersByInventoryBatch(inventoryBatchIds): _*)
+    val inventoryBatchIdsAndNumRemaining: Map[Long, Int] = for ((batchId, orderCount) <- inventoryBatchIdsAndOrderCounts) yield {
+      (batchId, (inventoryBatches.get(batchId).get.numInventory - orderCount))
+    }
+
+    // 3) query for products and inventoryBatchProducts on inventoryBatchIds
+    val productsAndBatchIdsQuery: Query[(Product, Long)] = services.productStore.getProductAndInventoryBatchAssociations(inventoryBatchIds)
+    // TODO - This implementation using a mutable map should be rewritten to use an immutable Map.
+    val productsAndBatchIds = scala.collection.mutable.Map[Product, Set[Long]]()
+    for ((product, batchId) <- productsAndBatchIdsQuery) {
+      productsAndBatchIds.get(product) match {
+        case None => productsAndBatchIds.put(product, Set(batchId))
+        case Some(set) => productsAndBatchIds.put(product, set + batchId)
+      }
+    }
+
+    // 4) for each product, sum quantity remaining for each associated batch
+    val productsWithInventoryRemaining: scala.collection.mutable.Map[Product, Int] = productsAndBatchIds.map(b => {
+      val totalNumRemainingForProduct = (for (batchId <- b._2) yield inventoryBatchIdsAndNumRemaining.get(batchId).getOrElse(0)).sum
+      (b._1, totalNumRemainingForProduct)
+    })
+    productsWithInventoryRemaining.toSeq
   }
 
   def productsInActiveInventoryBatches(): Seq[Product] = {

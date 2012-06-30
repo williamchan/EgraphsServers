@@ -339,6 +339,31 @@ class OrderTests extends UnitFlatSpec
     orderStore.countOrders(inventoryBatchIds) should be(3)
   }
 
+  "countOrdersByInventoryBatch" should "return tuples of inventoryBatch's id and orders against that batch" in {
+    val celebrity = TestData.newSavedCelebrity()
+    val customer = TestData.newSavedCustomer()
+    val product1 = TestData.newSavedProductWithoutInventoryBatch(celebrity = celebrity)
+    val product2 = TestData.newSavedProductWithoutInventoryBatch(celebrity = celebrity)
+    val product3 = TestData.newSavedProductWithoutInventoryBatch(celebrity = celebrity)
+    val inventoryBatch1 = TestData.newSavedInventoryBatch(celebrity = celebrity)
+    val inventoryBatch2 = TestData.newSavedInventoryBatch(celebrity = celebrity)
+    val inventoryBatch3 = TestData.newSavedInventoryBatch(celebrity = celebrity)
+    inventoryBatch1.products.associate(product1)
+    inventoryBatch1.products.associate(product2)
+    inventoryBatch2.products.associate(product3)
+    customer.buy(product1).save()
+    customer.buy(product2).save()
+    customer.buy(product3).save()
+
+    val inventoryBatchIds = Seq(inventoryBatch1.id, inventoryBatch2.id, inventoryBatch3.id)
+    val inventoryBatchIdsAndOrderCount = orderStore.countOrdersByInventoryBatch(inventoryBatchIds)
+    inventoryBatchIdsAndOrderCount.length should be(2) // Query excludes rows with zero count
+    inventoryBatchIdsAndOrderCount(0)._1 should be(inventoryBatch1.id)
+    inventoryBatchIdsAndOrderCount(0)._2 should be(2)
+    inventoryBatchIdsAndOrderCount(1)._1 should be(inventoryBatch2.id)
+    inventoryBatchIdsAndOrderCount(1)._2 should be(1)
+  }
+
   "isBuyerOrRecipient" should "return true if customer is either buy or recipient" in {
     val buyer = TestData.newSavedCustomer()
     val recipient = TestData.newSavedCustomer()

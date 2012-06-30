@@ -240,6 +240,10 @@ case class Product(
     services.celebStore.get(celebrityId)
   }
 
+  // todo(wchan): comment this!
+  /**
+   * @return
+   */
   def getRemainingInventoryAndActiveInventoryBatches(): (Int, Seq[InventoryBatch]) = {
     val activeInventoryBatches = services.inventoryBatchStore.getActiveInventoryBatches(this).toSeq
     val accumulatedInventoryCountAndBatchId = (0, List.empty[Long])
@@ -339,6 +343,13 @@ class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: Invent
           and (Time.today between(inventoryBatch.startDate, inventoryBatch.endDate))
       )
         select (product)
+    )
+  }
+
+  def getProductAndInventoryBatchAssociations(inventoryBatchIds: Seq[Long]) = {
+    from(schema.products, schema.inventoryBatchProducts, schema.inventoryBatches)((product, association, inventoryBatch) =>
+      where(association.productId === product.id and (association.inventoryBatchId in inventoryBatchIds))
+        select ((product, association.inventoryBatchId))
     )
   }
 

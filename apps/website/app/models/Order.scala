@@ -369,11 +369,24 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
     )
   }
 
+  // todo(wchan): comment this!
   def countOrders(inventoryBatchIds: Seq[Long]): Int = {
     from(schema.orders)(order =>
       where(order.inventoryBatchId in inventoryBatchIds)
         compute (count)
     ).toInt
+  }
+
+  // todo(wchan): comment this!
+  def countOrdersByInventoryBatch(inventoryBatchIds: Seq[Long]): Seq[(Long, Int)] = {
+    import org.squeryl.PrimitiveTypeMode
+    import org.squeryl.dsl.GroupWithMeasures
+    val query: Query[GroupWithMeasures[PrimitiveTypeMode.LongType, PrimitiveTypeMode.LongType]] = from(schema.orders)(order =>
+      where(order.inventoryBatchId in inventoryBatchIds)
+        groupBy (order.inventoryBatchId)
+        compute (count)
+    )
+    query.toSeq.map(f => (f.key, f.measures.toInt))
   }
 
   //

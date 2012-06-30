@@ -103,7 +103,30 @@ class CelebrityTests extends UnitFlatSpec
     profilePhoto.renderFromMaster.asByteArray(ImageAsset.Png).length should be (imageAsset.renderFromMaster.asByteArray(ImageAsset.Png).length)
   }
 
-  "getActiveProducts" should "return Products associated with active InventoryBatches" in {
+  // todo(wchan): comment this!
+  "getActiveProductsWithInventoryRemaining" should "return Products with quantity remaining" in {
+    val celebrity = TestData.newSavedCelebrity()
+    val customer = TestData.newSavedCustomer()
+    val product1 = TestData.newSavedProductWithoutInventoryBatch(celebrity = celebrity)
+    val product2 = TestData.newSavedProductWithoutInventoryBatch(celebrity = celebrity)
+    val product3 = TestData.newSavedProductWithoutInventoryBatch(celebrity = celebrity)
+    val inventoryBatch1 = TestData.newSavedInventoryBatch(celebrity = celebrity)
+    val inventoryBatch2 = TestData.newSavedInventoryBatch(celebrity = celebrity)
+    val inventoryBatch3 = TestData.newSavedInventoryBatch(celebrity = celebrity)
+    product1.inventoryBatches.associate(inventoryBatch1)
+    product1.inventoryBatches.associate(inventoryBatch2)
+    product2.inventoryBatches.associate(inventoryBatch2)
+    customer.buy(product1).save().copy(inventoryBatchId = inventoryBatch1.id).save()
+    customer.buy(product1).save().copy(inventoryBatchId = inventoryBatch2.id).save()
+    customer.buy(product2).save()
+
+    val productsWithInventoryRemaining = celebrity.getActiveProductsWithInventoryRemaining()
+    productsWithInventoryRemaining.toMap.get(product1) should be(Some(inventoryBatch1.numInventory + inventoryBatch2.numInventory - 3))
+    productsWithInventoryRemaining.toMap.get(product2) should be(Some(inventoryBatch2.numInventory - 2))
+    productsWithInventoryRemaining.toMap.get(product3) should be(None)
+  }
+
+  "productsInActiveInventoryBatches" should "return Products associated with active InventoryBatches" in {
     val celebrity = TestData.newSavedCelebrity()
     celebrity.productsInActiveInventoryBatches().length should be(0)
 
