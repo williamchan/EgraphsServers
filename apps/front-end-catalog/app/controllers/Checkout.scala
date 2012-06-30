@@ -10,10 +10,9 @@ object Checkout extends Controller
   with DefaultStorefrontBreadcrumbs
 {
 
-
-def index = {
+  def index = {
+    println("Whoops! I executed")
     views.frontend.html.celebrity_storefront_checkout()
   }
-
 }
 

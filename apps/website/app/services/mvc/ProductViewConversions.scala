@@ -14,10 +14,10 @@ class ProductViewConversions(product: Product) {
                             quantityRemaining: Int = product.remainingInventoryCount)
   : ChoosePhotoTileProduct =
   {
-    val carouselViewLink=WebsiteControllers.lookupGetStorefrontChoosePhotoCarousel(
+    val carouselViewLink=reverse(getStorefrontChoosePhotoCarousel(
       celebrityUrlSlug,
       product.urlSlug
-    ).url
+    )).url
 
     ChoosePhotoTileProduct(
       name=product.name,
@@ -37,7 +37,7 @@ class ProductViewConversions(product: Product) {
       description=product.description,
       price=product.price,
       imageUrl=productThumbnailUrl(width=575),
-      personalizeLink=WebsiteControllers.lookupPostChoosePhoto(celebUrlSlug, product.urlSlug).url,
+      personalizeLink=reverse(postStorefrontChoosePhoto(celebUrlSlug, product.urlSlug)).url,
       orientation = orientationOfFrame(product.frame),
       carouselUrl=product.urlSlug,
       facebookShareLink="/", // TODO: actually pass the facebook share link

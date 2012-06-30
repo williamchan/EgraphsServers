@@ -42,7 +42,7 @@ private[consumer] trait GetStorefrontChoosePhotoConsumerEndpoint
   {
     celebFilters.requireCelebrityAndProductUrlSlugs{ (celeb, product) =>
       val products = celeb.productsInActiveInventoryBatches().toSeq
-      val tiledViewLink = this.lookupGetStorefrontChoosePhotoTiled(celebrityUrlSlug).url
+      val tiledViewLink = this.reverse(this.getStorefrontChoosePhotoTiled(celebrityUrlSlug)).url
 
       products.findIndexOf(next => next.id == product.id) match {
         case -1 =>
@@ -63,14 +63,6 @@ private[consumer] trait GetStorefrontChoosePhotoConsumerEndpoint
           )
       }
     }
-  }
-
-  def lookupGetStorefrontChoosePhotoTiled(celebrityUrlSlug: String) = {
-    reverse(this.getStorefrontChoosePhotoTiled(celebrityUrlSlug))
-  }
-
-  def lookupGetStorefrontChoosePhotoCarousel(celebrityUrlSlug: String, productUrlSlug: String) = {
-    reverse(this.getStorefrontChoosePhotoCarousel(celebrityUrlSlug: String, productUrlSlug))
   }
 }
 

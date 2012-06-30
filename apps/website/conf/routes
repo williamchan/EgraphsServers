@@ -89,8 +89,8 @@ GET     /admin/script                                              WebsiteContro
 
 GET ${consumer_base}/{celebrityUrlSlug}/photos       WebsiteControllers.getStorefrontChoosePhotoTiled
 GET ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}  WebsiteControllers.getStorefrontChoosePhotoCarousel
-GET ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/next  WebsiteControllers.postStorefrontChoosePhoto
-
+POST ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/next  WebsiteControllers.postStorefrontChoosePhoto
+GET ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/personalize  WebsiteControllers.getStorefrontPersonalize
 
 ##
 ## Website

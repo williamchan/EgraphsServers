@@ -21,7 +21,7 @@ import services.{Namespacing, AppConfig, Time}
  *
  * Usage:
  * {{{
- *   class MyClass @Inject() (sessionFactory: () => ServerSession) {
+ *   class MyClass @Inject() (sessionFactory: ServerSessionFactory) {
  *
  *     private def session = {
  *       sessionFactory()
@@ -260,8 +260,16 @@ object ServerSession extends Logging {
  *
  * @param sessionServices services needed for new instances of ServerSession
  */
-private[http] class ServerSessionFactory @Inject() (sessionServices:ServerSessionServices) extends (() => ServerSession) {
+class ServerSessionFactory @Inject() (sessionServices:ServerSessionServices) extends (() => ServerSession) {
   def apply(): ServerSession = {
     new ServerSession(providedData=None, services=sessionServices)
+  }
+
+  def shoppingCart: ServerSession = {
+    this.apply().namespaced("cart")
+  }
+
+  def celebrityStorefrontCart(celebrityId: Long): ServerSession = {
+    this.shoppingCart.namespaced("celeb-" + celebrityId)
   }
 }
