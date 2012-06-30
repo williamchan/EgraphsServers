@@ -16,5 +16,6 @@ case class ChoosePhotoTileProduct(
   price: Money,
   imageUrl: String,
   targetUrl: String,
+  quantityRemaining: Int,
   orientation: ProductOrientation
 )

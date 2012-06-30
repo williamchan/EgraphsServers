@@ -91,9 +91,7 @@ object ChoosePhoto extends Controller
       category="Major League Baseball",
       bio=sampleBio,
       categoryRole="Pitcher, Tampa Bay Rays",
-      twitterUsername="davidprice14",
-      quantityAvailable=10,
-      deliveryDate=dateFormat.parse("2012-07-13")
+      twitterUsername=Some("davidprice14")
     )
   }
 
@@ -112,6 +110,7 @@ object ChoosePhoto extends Controller
       price=BigDecimal(100.00).toMoney(),
       imageUrl="http://placehold.it/340x200",
       targetUrl="/Herp-Derpson/photos/2012-All-Star-Game",
+      quantityRemaining=10,
       orientation=PortraitOrientation
     )
   }

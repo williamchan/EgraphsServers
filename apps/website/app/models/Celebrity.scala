@@ -19,6 +19,7 @@ case class CelebrityServices @Inject() (
   store: CelebrityStore,
   accountStore: AccountStore,
   productStore: ProductStore,
+  orderStore: OrderStore,
   inventoryBatchStore: InventoryBatchStore,
   schema: Schema,
   productServices: Provider[ProductServices],
@@ -76,6 +77,10 @@ case class Celebrity(id: Long = 0,
     services.productStore.findActiveProductsByCelebrity(id).toSeq
   }
 
+  def ordersRecentlyFulfilled: Iterable[FulfilledProductOrder] = {
+    services.orderStore.findMostRecentlyFulfilledByCelebrity(this.id)
+  }
+
   /**
    * Renders the Celebrity as a Map, which will itself be rendered into whichever data format
    * by the API (e.g. JSON)
@@ -91,6 +96,22 @@ case class Celebrity(id: Long = 0,
     Map("id" -> id, "enrollmentStatus" -> enrollmentStatus.name) ++
       renderCreatedUpdatedForApi ++
       Utils.makeOptionalFieldMap(optionalFields)
+  }
+
+  def category: String = {
+    "{This should be the category}"
+  }
+
+  def categoryRole: String = {
+    "{This should be the category role}"
+  }
+
+  def bio: String = {
+    "{This should be the bio}"
+  }
+
+  def twitterUsername: Option[String] = {
+    Some("DAVIDprice14")
   }
 
   /**

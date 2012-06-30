@@ -282,6 +282,7 @@ case class Order(
 }
 
 case class FulfilledOrder(order: Order, egraph: Egraph)
+case class FulfilledProductOrder(product: Product, order:Order, egraph: Egraph)
 
 object Order {
 
@@ -320,6 +321,21 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
       )
         select (FulfilledOrder(order, egraph))
     ).headOption
+  }
+
+  def findMostRecentlyFulfilledByCelebrity(celebrityId: Long): Iterable[FulfilledProductOrder] = {
+    import schema.{celebrities, products, orders, egraphs}
+
+    from(celebrities, products, orders, egraphs)((celeb, product, order, egraph) =>
+      where(
+        celeb.id === celebrityId and
+        celeb.id === product.celebrityId and
+        product.id === order.productId and
+        order.id === egraph.orderId and
+        egraph._egraphState === EgraphState.Published.name
+      )
+      select(FulfilledProductOrder(product, order, egraph))
+    )
   }
 
   /**

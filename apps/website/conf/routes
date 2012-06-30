@@ -86,6 +86,16 @@ GET     /admin/products/{productId}                                WebsiteContro
 GET     /admin/script                                              WebsiteControllers.getScriptAdmin
 
 ##
+## Production Consumer Website
+##
+%{ consumer_base = '/new' }%
+
+GET ${consumer_base}/{celebrityUrlSlug}/photos       WebsiteControllers.getStorefrontChoosePhotoTiled
+GET ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}  WebsiteControllers.getStorefrontChoosePhotoCarousel
+GET ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/next  WebsiteControllers.postStorefrontChoosePhoto
+
+
+##
 ## Website
 ##
 
@@ -117,9 +127,3 @@ GET     /{celebrityUrlSlug}                              WebsiteControllers.getC
 GET     /{celebrityUrlSlug}/{productUrlSlug}             WebsiteControllers.getCelebrityProduct
 POST    /{celebrityUrlSlug}/{productUrlSlug}/buy         WebsiteControllers.postBuyProduct
 POST    /{celebrityUrlSlug}/{productUrlSlug}/buy-demo    WebsiteControllers.postBuyDemoProduct
-
-##
-## Production Consumer Website
-##
-# %{ consumer_base = '/new' }%
-# GET ${consumer_base}/{celebrityUrlSlug}/{productUrlSlug}          WebsiteControllers.getStorefrontChoosePhotoTiled
