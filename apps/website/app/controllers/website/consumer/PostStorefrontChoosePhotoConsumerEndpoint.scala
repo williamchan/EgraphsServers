@@ -22,7 +22,7 @@ trait PostStorefrontChoosePhotoConsumerEndpoint
       purchaseFormFactory.formsForStorefront(celeb.id).withProductId(product.id).save()
 
       // Redirect either to a url specified by the POST params or to the Personalize page.
-      import WebsiteControllers.{reverse, getStorefrontPersonalize}
+      import WebsiteControllers.getStorefrontPersonalize
       Utils.redirectToClientProvidedTarget(
         urlIfNoTarget=reverse(getStorefrontPersonalize(celebrityUrlSlug, productUrlSlug)).url
       )
