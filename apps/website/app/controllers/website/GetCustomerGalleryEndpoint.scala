@@ -64,8 +64,10 @@ private[controllers] trait GetCustomerGalleryEndpoint { this: Controller =>
           GalleryOrderFactory.makePendingEgraphViewModel(pendingOrders).toList ++
             GalleryOrderFactory.makeFulfilledEgraphViewModel(fulfilledOrders, facebookAppId).flatten.toList
         case _ =>
-          GalleryOrderFactory.makeFulfilledEgraphViewModel(fulfilledOrders, facebookAppId).flatten.toList
-
+          GalleryOrderFactory.makeFulfilledEgraphViewModel(fulfilledOrders.filter(
+            orderAndOption => {
+              orderAndOption._1.privacyStatus == PrivacyStatus.Public
+            }), facebookAppId).flatten.toList
       }
       views.frontend.html.account_gallery(customer.username, orders, galleryControl)
     }

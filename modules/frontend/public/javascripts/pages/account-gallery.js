@@ -4,24 +4,25 @@ function(forms, Egraphs) {
 
   var page = Egraphs.page;
 
+  var toggle_map = {
+    true : 'Public',
+    false  : 'Private'
+  }
+  var calloutSpeed =  500;
+
+  var postCallback = function(data, id, callout, toggle) {
+    console.log(data);
+    if(data.privacyStatus === "Public" || data.privacyStatus === "Private"){
+      callout.text("This egraph is now " + data.privacyStatus.toLowerCase() + ".");
+    } else {
+      callout.text("There was an error, please try again later");
+    }
+    callout.fadeIn(calloutSpeed);
+    toggle.slideToggle();
+  }
+
   return {
     go: function() {
-      var toggle_map = {
-        true : 'Public',
-        false  : 'Private'
-      }
-      var calloutSpeed =  500;
-
-      var postCallback = function(data, id, callout, toggle) {
-        console.log(data);
-        if(data.privacyStatus === "Public" || data.privacyStatus === "Private"){
-          callout.text("This egraph is now " + data.privacyStatus.toLowerCase() + ".");
-        } else {
-          callout.text("There was an error, please try again later");
-        }
-        callout.fadeIn(calloutSpeed);
-        toggle.slideToggle();
-      }
 
       forms.setIphoneCheckbox('.private', {
         checkedLabel: 'YES',
