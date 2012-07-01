@@ -339,7 +339,7 @@ class OrderTests extends UnitFlatSpec
     orderStore.countOrders(inventoryBatchIds) should be(3)
   }
 
-  "countOrdersByInventoryBatch" should "return tuples of inventoryBatch's id and orders against that batch" in {
+  "countOrdersByInventoryBatch" should "return tuples of inventoryBatch's id and orders placed against that batch" in {
     val celebrity = TestData.newSavedCelebrity()
     val customer = TestData.newSavedCustomer()
     val product1 = TestData.newSavedProductWithoutInventoryBatch(celebrity = celebrity)

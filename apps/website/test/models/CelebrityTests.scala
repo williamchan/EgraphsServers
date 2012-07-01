@@ -103,7 +103,12 @@ class CelebrityTests extends UnitFlatSpec
     profilePhoto.renderFromMaster.asByteArray(ImageAsset.Png).length should be (imageAsset.renderFromMaster.asByteArray(ImageAsset.Png).length)
   }
 
-  // todo(wchan): comment this!
+  /**
+   * Sample data: Product1 in IB1 and IB2, and Product 2 in IB2. All IBs have default numInventory of 50.
+   *              Placing one order against IB1 and two orders against IB2 should reduce the quantity available by 1 and 2, respectively.
+   *              So, because IB1 has available quantity of 49 and IB2 has available quantity of 48,
+   *              Product1 should have 97 quantity available and Product2 should have 48.
+   */
   "getActiveProductsWithInventoryRemaining" should "return Products with quantity remaining" in {
     val celebrity = TestData.newSavedCelebrity()
     val customer = TestData.newSavedCustomer()
@@ -112,7 +117,7 @@ class CelebrityTests extends UnitFlatSpec
     val product3 = TestData.newSavedProductWithoutInventoryBatch(celebrity = celebrity)
     val inventoryBatch1 = TestData.newSavedInventoryBatch(celebrity = celebrity)
     val inventoryBatch2 = TestData.newSavedInventoryBatch(celebrity = celebrity)
-    val inventoryBatch3 = TestData.newSavedInventoryBatch(celebrity = celebrity)
+    val inventoryBatch3 = TestData.newSavedInventoryBatch(celebrity = celebrity) // random InventoryBatch just for kicks
     product1.inventoryBatches.associate(inventoryBatch1)
     product1.inventoryBatches.associate(inventoryBatch2)
     product2.inventoryBatches.associate(inventoryBatch2)

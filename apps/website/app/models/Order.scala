@@ -369,7 +369,13 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
     )
   }
 
-  // todo(wchan): comment this!
+  /**
+   * To calculate the remaining inventory available in an InventoryBatch, the number of Orders that have been placed
+   * against that InventoryBatch must be known. This method returns the total number of Orders placed againsts all
+   * InventoryBatches of interest.
+   *
+   * @return the total number of Orders placed againsts all InventoryBatches denoted by inventoryBatchIds
+   */
   def countOrders(inventoryBatchIds: Seq[Long]): Int = {
     from(schema.orders)(order =>
       where(order.inventoryBatchId in inventoryBatchIds)
@@ -377,7 +383,13 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
     ).toInt
   }
 
-  // todo(wchan): comment this!
+  /**
+   * To calculate the remaining inventory available in an InventoryBatch, the number of Orders that have been placed
+   * against that InventoryBatch must be known. This method returns the total number of Orders placed againsts each
+   * InventoryBatch of interest.
+   *
+   * @return tuples of (inventoryBatchId, orderCount)
+   */
   def countOrdersByInventoryBatch(inventoryBatchIds: Seq[Long]): Seq[(Long, Int)] = {
     import org.squeryl.PrimitiveTypeMode
     import org.squeryl.dsl.GroupWithMeasures

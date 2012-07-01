@@ -240,9 +240,11 @@ case class Product(
     services.celebStore.get(celebrityId)
   }
 
-  // todo(wchan): comment this!
   /**
-   * @return
+   * Returns the remaining inventory of this Product and the active InventoryBatches for this Product.
+   *
+   * wchan: I have to admit that I don't remember why I wrote it this way. But the InventoryBatches are used when
+   * created an Order against a specific InventoryBatch (this way, the InventoryBatch will already be in memory).
    */
   def getRemainingInventoryAndActiveInventoryBatches(): (Int, Seq[InventoryBatch]) = {
     val activeInventoryBatches = services.inventoryBatchStore.getActiveInventoryBatches(this).toSeq

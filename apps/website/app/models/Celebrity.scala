@@ -74,8 +74,19 @@ case class Celebrity(id: Long = 0,
     services.productStore.findByCelebrity(id, filters: _*)
   }
 
-  // todo(wchan): comment this!
-
+  /**
+   * Gets this Celebrity's Products that can be purchased along with the quantity available of each Product.
+   * Excludes Products that are not available, such as those that are not in an active InventoryBatch based on
+   * startDate and endDate, as well as those that are sold out of quantity.
+   *
+   * This implementation is hopefully more performant than getting all active Products and then calculating the
+   * quantity available for each Product, but this assumption has yet to be tested.
+   *
+   * This implementation executes 3 queries, the first for the InventoryBatches, the second to aid in calculating the
+   * quantity available to each InventoryBatch, and the third to get the Products and their InventoryBatch associations.
+   *
+   * @return a sequence of purchase-able Products along with the available quantity of each Product.
+   */
   def getActiveProductsWithInventoryRemaining(): Seq[(Product, Int)] = {
     // 1) query for active InventoryBatches
     val activeIBs = services.inventoryBatchStore.findByCelebrity(id, services.inventoryBatchQueryFilters.activeOnly)
