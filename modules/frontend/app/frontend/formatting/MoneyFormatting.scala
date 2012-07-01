@@ -54,6 +54,10 @@ object MoneyFormatting {
 
         money.getCurrencyUnit.getSymbol + amountFormatted
       }
+
+      def formatPrecisely = {
+        money.getCurrencyUnit.getSymbol + "%.2f".format(money.getAmount)
+      }
     }
 
     /**

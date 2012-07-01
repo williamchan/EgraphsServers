@@ -12,7 +12,10 @@ fi
 
 echo "Building scala resources on play app at localhost:$port..."
 
-# First curl for scala builfd
+# Open a browser to the build page in the background
+open -g "http://localhost:$port/build"
+
+# First curl for scala build
 build_results=`curl localhost:$port/build 2>/dev/null`
 curl_return_value=$?
 
