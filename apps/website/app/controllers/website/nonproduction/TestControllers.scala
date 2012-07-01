@@ -19,4 +19,12 @@ object TestControllers extends Controller with Logging {
     val illegalE = new IllegalArgumentException("Bear")
     throw new RuntimeException("Process was mauled by a bear", illegalE)
   }
+
+  def throwError(error: String) = controllerMethod() {
+    error match {
+      case "403" => Forbidden("")
+      case "404" => NotFound("")
+      case _ => Error("")
+    }
+  }
 }
