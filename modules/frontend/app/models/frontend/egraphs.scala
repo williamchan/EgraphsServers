@@ -59,7 +59,7 @@ object AdminGalleryControl extends GalleryControlRenderer{
     val ns =
     <ul>
       <li>
-        <a href="#">View Fullscreen</a>
+        <a href={"/egraph/" +id } >View Fullscreen</a>
       </li>
       <li>
         <a href="#">Download</a>
@@ -78,7 +78,7 @@ object OwnerGalleryControl extends GalleryControlRenderer{
     val ns =
         <ul>
         <li>
-          <a href="#">View Fullscreen</a>
+          <a href={"/egraph/" +id }>View Fullscreen</a>
         </li>
         <li>
           <a href="#">Download</a>
@@ -96,7 +96,7 @@ object OtherGalleryControl extends GalleryControlRenderer{
   override def render(id: Long, status:String) = {
     val ns = <ul>
       <li>
-        <a href="#">View Fullscreen</a>
+        <a href={"/egraph/" +id }>View Fullscreen</a>
       </li>
     </ul>
 
