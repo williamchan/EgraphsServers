@@ -1,7 +1,7 @@
 package controllers
 
 import play.mvc.Controller
-import models.frontend.storefront.{StorefrontOrderSummary, PersonalizeForm}
+import models.frontend.storefront.{PersonalizeMessageOption, StorefrontOrderSummary, PersonalizeForm}
 import java.util
 import models.frontend.forms.FormError
 
@@ -25,6 +25,26 @@ object Personalize extends Controller
   def allErrors = {
     views.frontend.html.celebrity_storefront_personalize(
       form=allErrorsPersonalizeForm,
+      guaranteedDelivery=new util.Date,
+      orderSummary=defaultOrderSummary
+    )
+  }
+
+  def allPrePopulatedValues = {
+    val default = defaultPersonalizeForm
+    import default._
+
+    val form = default.copy(
+      isGift=isGift.copy(values=Some(true)),
+      recipientName=recipientName.copy(values=Some("Erem Boto")),
+      recipientEmail=recipientEmail.copy(values=Some("erem@egraphs.com")),
+      messageOption=messageOption.copy(values=Some(PersonalizeMessageOption.AnythingHeWants)),
+      messageText=messageText.copy(values=Some("Happy 30th birthday")),
+      noteToCelebrity=noteToCelebrity.copy(values=Some("You're the best!"))
+    )
+
+    views.frontend.html.celebrity_storefront_personalize(
+      form,
       guaranteedDelivery=new util.Date,
       orderSummary=defaultOrderSummary
     )

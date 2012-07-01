@@ -5,7 +5,7 @@ function(forms, Egraphs) {
   var page = Egraphs.page,
       celeb = page.celeb;
   
-  function setIsGift(isGift) {    
+  function setIsGift(isGift) {
     var visibleWhenIsGift = $('.gift-only');
     var visibleWhenIsNotGift = $('.non-gift-only');
     
@@ -20,20 +20,19 @@ function(forms, Egraphs) {
       toHide = visibleWhenIsGift;
     }
     
-    forms.enableChildInputs(toShow, true);       
+    forms.enableChildInputs(toShow, true);
 
     toShow.slideDown(250, function() {
       toHide.slideUp(250, function() {
-        forms.enableChildInputs(toHide, false);        
+        forms.enableChildInputs(toHide, false);
       });
     });
   }
 
-
   return {
-    go: function() {    
-      forms.setIphoneCheckbox('#gift', { 
-        checkedLabel: 'YES', 
+    go: function() {
+      forms.setIphoneCheckbox('#gift', {
+        checkedLabel: 'YES',
         uncheckedLabel: 'NO',
         onChange: function(elem, isGift) {
           setIsGift(isGift);
@@ -41,11 +40,11 @@ function(forms, Egraphs) {
       });
 
       forms.setDefaultText(
-        "#egraph-message textarea", 
+        "#egraph-message textarea",
         celeb.name + " will write this on your egraph."
       );
       forms.setDefaultText(
-        "#your-message", 
+        "#your-message",
         "Is there something you would like "+ celeb.name +" to know?"
       );
       forms.setAlert('.alert');
@@ -58,7 +57,7 @@ function(forms, Egraphs) {
       $('#message-options button:eq(0)').click(function() { $('#egraph-message').slideDown(); });
       
       // hide message
-      $('#message-options button:not(:eq(0))').click(function() { $('#egraph-message').slideUp(); });      
+      $('#message-options button:not(:eq(0))').click(function() { $('#egraph-message').slideUp(); });
     }
   };
 });

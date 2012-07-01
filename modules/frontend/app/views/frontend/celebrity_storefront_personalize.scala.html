@@ -148,15 +148,15 @@
                         		Signature<br /> only
 	                        </button>
 	                      </div>
-	      				        <div id="egraph-message" 
+	      				        <div id="egraph-message"
 	      				             style="@if(form.messageOption.value != Some(SpecificMessage)) {display:none}">
 	      				          <textarea id="egraph-message-text"
 	      				                    rows="8" 
 	      				                    cols="1">@form.messageText.value</textarea>
 	      				          <p class="align-right"><small><a href="#" class="tip">How do I know it's really him?</a></small></p>
 	      				        </div>
-	      				        <input type="hidden" 
-	      				               id="message-type" 
+	      				        <input type="hidden"
+	      				               id="message-type"
 	      				               name="@form.messageOption.name"
 	      				               value="@form.messageOption.value">
 	      				      }
@@ -239,7 +239,7 @@
 													@for(taxCost <- orderSummary.tax) {
 														<tr>
 															<th>Tax</th>
-															<td>$_.__</td>
+															<td>@orderSummary.tax</td>
 														</tr>
 													}
 													<tr class="total">
@@ -257,8 +257,6 @@
 	  			
 						</div> <!-- end .clearfix -->
 						
-						@tags.html.credit_cards_footer()
-  			
   				</div> <!-- end .col2 -->
   			
         </section> <!-- end #checkout -->
