@@ -1,5 +1,13 @@
 // Styles for the account settings page
 #galleryrows {
+  .photo-frame {
+    border: 7px solid @white;
+    -moz-box-shadow: 0px 1px 5px @gray;
+    -webkit-box-shadow: 0px 1px 5px @gray;
+    -o-box-shadow: 0px 1px 5px @gray;
+    -ms-bow-shadow: 0px 1px 5px @gray;
+  }
+
   div.thumbnail {
     max-width: 100%;
     border: none;
@@ -8,65 +16,37 @@
   div.input {
     display: inline-block;
   }
+
+  div.pending-landscape {
+    max-width: 100%;
+    margin-bottom: 20px;
+    margin-right: 5px;
+  }
+
   div.pending-portrait {
     max-width: 100%;
     margin-bottom: 20px;
     margin-left: 12%;
   }
 
-  div.pending-landscape {
-    max-width: 100%;
-    margin-bottom: 20px;
-  }
-//Stub code for experimenting with repsonsive svgs
   div.landscape {
-//   position: relative;
-//    padding-top: 25px;
-//    padding-bottom: 63.333%;
-//    height: 0;
     overflow: hidden;
     max-width: 100%;
   }
 
-  div.landscape iframe {
-//    position: absolute;
-//    width: 80%;
-//    height: 80%;
-//    left: 0;
-//    top: 0;
-    border: none;
-  }
-
   div.portrait{
-//   position: relative;
-//   padding-top: 25px;
-//    padding-bottom: 139%;
-//    height: 0;
     overflow: hidden;
     margin-left: 15%;
     max-width: 100%;
     margin-bottom: 15px;
   }
 
-div.landscape, div.portrait {
-  padding: 5px 5px 5px 5px;
-}
+  div.landscape, div.portrait {
+    padding: 5px 5px 5px 5px;
+  }
 
-div.landscape img, div.portrait img {
-    border: 7px solid @white;
-     -moz-box-shadow: 0px 1px 5px @gray;
-    -webkit-box-shadow: 0px 1px 5px @gray;
-    -o-box-shadow: 0px 1px 5px @gray;
-    -ms-bow-shadow: 0px 1px 5px @gray;
-}
-
-  div.portrait iframe{
-//    position: absolute;
-//    width: 70%;
-//    height: 70%;
-//    left: 0;
-//    top: 0;
-    border: none;
+  div.landscape img, div.portrait img {
+    .photo-frame;
   }
 
   .row-egraph {
@@ -128,6 +108,7 @@ div.landscape img, div.portrait img {
     position: relative;
     left: 5%;
   }
+
   div.shipping-details span {
     font-weight: bold;
   }
@@ -192,6 +173,7 @@ div.landscape img, div.portrait img {
     color: @orange;
   }
 }
+
 #gallerytop {
   span.username {
     font-size: 22px;
@@ -206,6 +188,7 @@ div.landscape img, div.portrait img {
   }
 
 }
+
 @media (max-width: 979px) {
   #galleryrows {
     div.portrait, div.pending-portrait {
@@ -247,7 +230,6 @@ div.landscape img, div.portrait img {
   }
 
   #gallerytop {
-
     div.row-fluid {
       margin-top: 0px;
     }
@@ -255,6 +237,5 @@ div.landscape img, div.portrait img {
     span.count {
       text-align: left;
     }
-
   }
 }

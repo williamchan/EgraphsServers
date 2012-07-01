@@ -14,6 +14,17 @@ import scala.Some
 import scala.Some
 import java.text.SimpleDateFormat
 
+/**
+ * Controller for displaying customer galleries. Galleries serve as a "wall of egraphs".
+ * The main functionality of this controller is to determine what level of control and visibility
+ * the requesting user has over the egrpahs being shown.
+ *
+ * Admin-> An admin should be able to see any egraph or pending order and any details associated with it.
+ * Owner-> An owner should be able to see any egraphs they own and any pending orders.
+ * Others->Some user, logged in or not, should be able to see only fulfilled egraphs set as public by the Owner.
+ *
+ **/
+
 
 private[controllers] trait GetCustomerGalleryEndpoint { this: Controller =>
   protected def controllerMethod: ControllerMethod
@@ -28,16 +39,17 @@ private[controllers] trait GetCustomerGalleryEndpoint { this: Controller =>
   def getCustomerGallery(galleryCustomerId: Long) = controllerMethod() {
 
     accountRequestFilters.requireValidCustomerId(galleryCustomerId){ customer =>
-      //TODO sbilstein moves these functions into separate areas for testing
+
+      //If admin is true admin
       val adminGalleryControlOption = for(
         sessionAdminId <- session.getLongOption(WebsiteControllers.adminIdKey);
         adminOption   <- administratorStore.findById(sessionAdminId)) yield AdminGalleryControl
-
+      //if customerId is the same as the gallery requested
       val sessionGalleryControlOption = for(
         sessionCustomerId <- session.getLongOption(WebsiteControllers.customerIdKey);
         if (sessionCustomerId == galleryCustomerId)) yield OwnerGalleryControl
 
-      //Determine appropriate gallery control
+      //In priority order
       val galleryControlPrecedence = List(
         adminGalleryControlOption,
         sessionGalleryControlOption,
@@ -47,7 +59,8 @@ private[controllers] trait GetCustomerGalleryEndpoint { this: Controller =>
       //Pop off control with highest precedence
       val galleryControl = galleryControlPrecedence.flatten.head
 
-      //Left outerjoin on orders and egraphs
+
+      //get orders
       val orders_and_egraphs = orderStore.getEgraphsAndOrders(galleryCustomerId).toList
 
       val pendingOrders = orders_and_egraphs.filter(orderEgraph =>
@@ -56,19 +69,23 @@ private[controllers] trait GetCustomerGalleryEndpoint { this: Controller =>
       val fulfilledOrders = orders_and_egraphs.filter(orderEgraph =>
         orderEgraph._2.map(_.egraphState) == Some(EgraphState.Published))
 
-      //The type system makes me angry here, Factory takes iterables of the filtered queries
-      //TODO need to add some filtering according to privacy status.
 
       val orders:List[EgraphViewModel] = galleryControl match {
         case AdminGalleryControl | OwnerGalleryControl =>
           GalleryOrderFactory.makePendingEgraphViewModel(pendingOrders).toList ++
             GalleryOrderFactory.makeFulfilledEgraphViewModel(fulfilledOrders, facebookAppId).flatten.toList
         case _ =>
+          if (customer.isGalleryVisible){
           GalleryOrderFactory.makeFulfilledEgraphViewModel(fulfilledOrders.filter(
             orderAndOption => {
               orderAndOption._1.privacyStatus == PrivacyStatus.Public
             }), facebookAppId).flatten.toList
+          } else {
+            List()
+          }
+
       }
+
       views.frontend.html.account_gallery(customer.username, orders, galleryControl)
     }
   }

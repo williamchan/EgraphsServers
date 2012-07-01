@@ -1,13 +1,13 @@
 package controllers
 
 import play.mvc.Controller
-import models.frontend.account.AccountSettingsForm
-import models.frontend.forms.{FormError, Field}
 import models.frontend.egraphs._
 import models.frontend.forms.FormError
 import models.frontend.egraphs.FulfilledEgraphViewModel
 import models.frontend.account.AccountSettingsForm
 import models.frontend.forms.Field
+import play.mvc.results.RenderJson
+import sjson.json.Serializer
 
 object Account extends Controller {
 
@@ -56,6 +56,13 @@ object Account extends Controller {
     val egraphs = pending ::: completed
 
     views.frontend.html.account_gallery(user, egraphs, roles(role))
+  }
+
+  //Basic controller for testing privacy toggles on the gallery pages
+  def privacy(orderId: String) = {
+    val status = request.params.get("privacyStatus");
+    println("privacy status: " + status)
+    new RenderJson(Serializer.SJSON.toJSON(Map("privacyStatus" -> status)))
   }
 
   private def makePendingEgraphs(user: String) : List[PendingEgraphViewModel] = {

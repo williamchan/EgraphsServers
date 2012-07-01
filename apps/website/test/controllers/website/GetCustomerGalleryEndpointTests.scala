@@ -6,16 +6,17 @@ import play.test.FunctionalTest
 import FunctionalTest._
 import services.AppConfig
 import services.db.{TransactionSerializable, DBSession}
-import utils.TestData
+import utils.{TestConstants, TestData}
+import models.enums.PrivacyStatus
 
 class GetCustomerGalleryEndpointTests extends AdminFunctionalTest{
   private val db = AppConfig.instance[DBSession]
 
+  @Test
   def testRetrievesEmptyGalleryOfCustomer() {
     val userId = db.connected(TransactionSerializable) {
       TestData.newSavedCustomer()
     }
-    assertIsOk( GET("/account/" + userId + "/gallery"))
+    assertIsOk(GET("/account/" + userId + "/gallery"))
   }
-
 }

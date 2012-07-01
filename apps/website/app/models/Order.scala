@@ -542,13 +542,13 @@ object GalleryOrderFactory {
           fbAppId = fbAppId,
           redirectURI = "http://www.egraphs.com/account/" + order.recipient.username,
           orderId = order.id,
-          orientation = product.frame.name,
-          productUrl = "egra.ph/" + product.celebrity.urlSlug.getOrElse() + "/" + product.urlSlug,
+          orientation = product.frame.name.toLowerCase,
+          productUrl = "http://www.egraphs.com/" + product.celebrity.urlSlug.getOrElse() + "/" + product.urlSlug,
           productPublicName = product.celebrity.publicName,
           productTitle = product.storyTitle,
           productDescription = product.description,
           thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Private),
-          downloadUrl = Option("egraph/" + order.id),
+          downloadUrl = Option("http://www.egraphs.com/egraph/" + order.id),
           publicStatus = order.privacyStatus.name,
           signedTimestamp = dateFormat.format(egraph.created)
         )
@@ -562,8 +562,8 @@ object GalleryOrderFactory {
       val imageUrl = product.photo.resizedWidth(product.frame.pendingWidthPixels).getSaved(AccessPolicy.Public).url
       PendingEgraphViewModel(
         orderId = order.id,
-        orientation = product.frame.name,
-        productUrl = "//" + product.celebrity.urlSlug + "/" + product.urlSlug,
+        orientation = product.frame.name.toLowerCase,
+        productUrl = "http://www.egraphs.com/" + product.celebrity.urlSlug + "/" + product.urlSlug,
         productTitle = product.storyTitle,
         productPublicName = product.celebrity.publicName,
         productDescription = product.description,

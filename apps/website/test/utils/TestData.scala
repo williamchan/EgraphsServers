@@ -7,7 +7,8 @@ import util.Random
 import java.text.SimpleDateFormat
 import org.joda.time.DateTime
 import models._
-import enums.PublishedStatus
+import enums.{EgraphState, PublishedStatus}
+import play.libs.Codec
 
 /**
  * Renders saved copies of domain objects that satisfy all relational integrity
@@ -119,6 +120,17 @@ object TestData {
     }
   }
 
+  def newFulfilledOrder(customer: Customer) : (Order, Egraph) = {
+    val order = customer.buy(TestData.newSavedProduct()).save()
+    (order, order.newEgraph
+      .withAssets(TestConstants.signingAreaSignatureStr, Some(TestConstants.signingAreaMessageStr), Codec.decodeBASE64(TestConstants.voiceStr()))
+      .save()
+      .withYesMaamBiometricServices
+      .verifyBiometrics
+      .withEgraphState(EgraphState.Published)
+      .save())
+
+  }
 
 
 
