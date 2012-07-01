@@ -3,7 +3,6 @@
 //
 package models.frontend.egraphs
 
-import java.util.Date
 import xml.Elem
 
 
@@ -32,6 +31,8 @@ case class FulfilledEgraphViewModel(
   downloadUrl: Option[String],
   publicStatus: String,
   signedTimestamp: String,
+  fbAppId: String,
+  redirectURI: String,
   orderId: Long,
   orientation: String,
   productUrl: String,
@@ -74,17 +75,19 @@ object AdminGalleryControl extends GalleryControlRenderer{
 
 object OwnerGalleryControl extends GalleryControlRenderer{
   override def render(id: Long, status:String)  = {
-    val ns = <ul>
-      <li>
-        <a href="#">View Fullscreen</a>
-      </li>
-      <li>
-        <a href="#">Download</a>
-      </li>
-      <li>
-        <a href="#">Order Prints</a>
-      </li>
-    </ul>
+    val ns =
+        <ul>
+        <li>
+          <a href="#">View Fullscreen</a>
+        </li>
+        <li>
+          <a href="#">Download</a>
+        </li>
+        <li>
+          <a href="#">Order Prints</a>
+        </li>
+      </ul>
+
     ns
   }
 }

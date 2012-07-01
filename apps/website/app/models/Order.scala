@@ -17,7 +17,9 @@ import models.CashTransaction.{PurchaseRefund, EgraphPurchase}
 import org.apache.commons.mail.{Email, HtmlEmail}
 import scala.util.Random
 import java.util.Date
+import com.google.inject.Inject
 import java.text.SimpleDateFormat
+import services.http.PlayConfig
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -527,15 +529,18 @@ case class OrderAudioPrompt(private val audioPromptTemplate: String,
  */
 
 object GalleryOrderFactory {
+
   protected val dateFormat = new SimpleDateFormat("MMM dd, yyyy K:mma")
 
-  def makeFulfilledEgraphViewModel(orders: Iterable[(Order, Option[Egraph])]) :
+  def makeFulfilledEgraphViewModel(orders: Iterable[(Order, Option[Egraph])], fbAppId: String) :
     Iterable[Option[FulfilledEgraphViewModel]] = {
     for ((order:Order, optionEgraph:Option[Egraph]) <- orders) yield {
       optionEgraph.map( egraph => {
         val product = order.product
         val rawImage = egraph.thumbnail(product.photoImage).scaledToWidth(product.frame.thumbnailWidthPixels)
         new FulfilledEgraphViewModel(
+          fbAppId = fbAppId,
+          redirectURI = "http://www.egraphs.com/account/" + order.recipient.username,
           orderId = order.id,
           orientation = product.frame.name,
           productUrl = "egra.ph/" + product.celebrity.urlSlug.getOrElse() + "/" + product.urlSlug,
@@ -554,7 +559,6 @@ object GalleryOrderFactory {
   def makePendingEgraphViewModel(orders: Iterable[(Order, Option[Egraph])]) : Iterable[PendingEgraphViewModel] = {
     for ((order:Order, optionEgraph:Option[Egraph]) <- orders) yield {
       val product = order.product
-//      val rawImage = ImageUtil
       val imageUrl = product.photo.resizedWidth(product.frame.pendingWidthPixels).getSaved(AccessPolicy.Public).url
       PendingEgraphViewModel(
         orderId = order.id,

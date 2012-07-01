@@ -420,7 +420,7 @@ class OrderTests extends UnitFlatSpec
     val results = List((order, Option(egraph)), (order, None))
 
 
-    val fulfilledViews = GalleryOrderFactory.makeFulfilledEgraphViewModel(results)
+    val fulfilledViews = GalleryOrderFactory.makeFulfilledEgraphViewModel(results, "fakeappid")
     //create an egraph
 
     fulfilledViews.size should be (2)

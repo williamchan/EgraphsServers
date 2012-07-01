@@ -21,6 +21,7 @@ private[controllers] trait GetCustomerGalleryEndpoint { this: Controller =>
   protected def administratorStore: AdministratorStore
   protected def orderStore: OrderStore
   protected def accountRequestFilters: AccountRequestFilters
+  protected def facebookAppId: String
 
   import SafePlayParams.Conversions._
 
@@ -61,9 +62,9 @@ private[controllers] trait GetCustomerGalleryEndpoint { this: Controller =>
       val orders:List[EgraphViewModel] = galleryControl match {
         case AdminGalleryControl | OwnerGalleryControl =>
           GalleryOrderFactory.makePendingEgraphViewModel(pendingOrders).toList ++
-            GalleryOrderFactory.makeFulfilledEgraphViewModel(fulfilledOrders).flatten.toList
+            GalleryOrderFactory.makeFulfilledEgraphViewModel(fulfilledOrders, facebookAppId).flatten.toList
         case _ =>
-          GalleryOrderFactory.makeFulfilledEgraphViewModel(fulfilledOrders).flatten.toList
+          GalleryOrderFactory.makeFulfilledEgraphViewModel(fulfilledOrders, facebookAppId).flatten.toList
 
       }
       views.frontend.html.account_gallery(customer.username, orders, galleryControl)

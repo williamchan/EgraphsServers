@@ -18,6 +18,8 @@ object Account extends Controller {
                         "portrait" -> "http://placehold.it/170x225")
   val portraitPNG  = "http://localhost:9000/public/images/width-350px.png"
   val landscapePNG = "http://localhost:9000/public/images/width-510px.png"
+  val fbAppId = "375687459147542"
+  val fbAppSecret = "d38e551a2eb9b7c97fbb3bfb2896d426"
 
   def settings() = {
     request.method match {
@@ -67,7 +69,7 @@ object Account extends Controller {
           statusText = "In progress",
           shippingMethod = "UPS",
           UPSNumber = "45Z343YHYU3343322J"),
-        orderId = 45,
+        orderId = 1,
         orientation = "portrait",
         productUrl="egr.aphs/" + user +"/1",
         productTitle = "Telling Jokes",
@@ -88,7 +90,7 @@ object Account extends Controller {
           statusText = "In progress",
           shippingMethod = "UPS",
           UPSNumber = "45Z343YHYU3343322J"),
-        orderId = 45,
+        orderId = 2,
         orientation = "landscape",
         productUrl="egr.aphs/" + user +"/1",
         productTitle = "You In Reverse",
@@ -108,7 +110,9 @@ object Account extends Controller {
         downloadUrl=Option("egr.aphs/" + user + "1"),
         publicStatus = "public",
         signedTimestamp = "Nov 12th 2012 @ 4:30 PM",
-        orderId = 23,
+        fbAppId =fbAppId,
+        redirectURI = "http://staging.egraphs.com/" + user,
+        orderId = 3,
         orientation = "landscape",
         productUrl="egr.aphs/" + user +"/1",
         productTitle = "Man or Velociraptor?",
@@ -122,7 +126,9 @@ object Account extends Controller {
         downloadUrl=Option("egr.aphs/" + user + "2"),
         publicStatus = "public",
         signedTimestamp = "Nov 12th 2012 @ 4:30 PM",
-        orderId = 23,
+        fbAppId = fbAppId,
+        redirectURI = "http://staging.egraphs.com/" + user,
+        orderId = 4,
         orientation = "portrait",
         productUrl="egr.aphs/" + user +"/2",
         productTitle = "King James",
@@ -136,7 +142,9 @@ object Account extends Controller {
         downloadUrl=Option("egr.aphs/" + user + "2"),
         publicStatus = "public",
         signedTimestamp = "Nov 12th 2012 @ 4:30 PM",
-        orderId = 23,
+        fbAppId = fbAppId,
+        redirectURI = "http://staging.egraphs.com/" + user,
+        orderId = 5,
         orientation = "landscape",
         productUrl="egr.aphs/" + user +"/2",
         productTitle = "A cool bro",

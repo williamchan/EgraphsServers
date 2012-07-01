@@ -1,4 +1,6 @@
 @(username: String, egraphs: List[models.frontend.egraphs.EgraphViewModel], controlRenderer: models.frontend.egraphs.GalleryControlRenderer)(implicit session: play.mvc.Scope.Session)
+@import views.frontend.Utils
+@import models.frontend.egraphs._
 
 @fulfilledEgraph(egraph: models.frontend.egraphs.FulfilledEgraphViewModel, index: Int) = {
   <div class="row-fluid row-egraph">
@@ -26,14 +28,36 @@
           <div class="social">
             <ul class="clearfix">
               <li><span class="social-label">Share this</span></li>
-              <li><a href="#" class="facebook">Facebook</a></li>
-              <li><a href="https://twitter.com/egraphs" class="twitter">Twitter</a></li>
-              <!-- <li><a href="#" class="addthis">AddThis</a></li> -->
+              <li>
+                <a href="@Utils.feedDialogLink(
+                  appId = egraph.fbAppId,
+                  picUrl = "http://fbrell.com/f8.jpg",
+                  name= "Egraphs",
+                  caption = "My Egraph",
+                  description= "My egraph",
+                  redirectURI = egraph.redirectURI
+                )" class="facebook">Facebook
+                </a>
+              </li>
+              <li>
+                <a href="@Utils.tweetButtonLink(
+                  url= "http://www.egraphs.com/",
+                  text= "Whatever"
+                  )" target="_blank" class="twitter">Twitter
+                </a>
+              </li>
             </ul>
           </div>
         </div>
         <div class="controls">
+          @if(controlRenderer == OwnerGalleryControl){
+            @views.frontend.tags.html.toggle(styleclass="private",
+              name="privacy",
+              id=egraph.orderId.toString,
+              checked = (egraph.publicStatus == "Public"))
+          }
           @Html(controlRenderer.render(egraph.orderId, egraph.publicStatus).toString())
+
         </div>
       </div>
     </div>
@@ -113,6 +137,6 @@
 
 @base_template(
 title="Gallery",
-jsMain="pages/landing",
+jsMain="pages/account-gallery",
 body=baseBody
 )

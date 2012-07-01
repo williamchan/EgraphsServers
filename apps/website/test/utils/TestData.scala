@@ -119,6 +119,9 @@ object TestData {
     }
   }
 
+
+
+
   def newSavedEgraph(orderOption: Option[Order] = None): Egraph = {
     val order = orderOption match {
       case None => newSavedOrder()
