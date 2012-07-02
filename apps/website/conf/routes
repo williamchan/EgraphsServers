@@ -86,9 +86,6 @@ GET     /admin/script                                              WebsiteContro
 ## Website
 ##
 
-# social media exploratory work
-GET     /socialpost                                      WebsiteControllers.getSocialPost
-
 # customer accounts stubs
 GET     /register                                        WebsiteControllers.getRegister
 POST    /register                                        WebsiteControllers.postRegister
