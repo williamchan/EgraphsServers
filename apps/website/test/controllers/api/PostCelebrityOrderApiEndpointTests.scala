@@ -34,7 +34,7 @@ class PostCelebrityOrderApiEndpointTests extends EgraphsFunctionalTest {
     assertIsOk(response)
 
     db.connected(TransactionSerializable) {
-      val order = orderStore.findById(orderId.toString.toLong).get
+      val order = orderStore.get(orderId.toString.toLong)
       assertEquals(OrderReviewStatus.RejectedByCelebrity, order.reviewStatus)
       assertEquals("It made me cry", order.rejectionReason.get)
     }

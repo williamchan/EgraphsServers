@@ -21,6 +21,7 @@ import play.test.FunctionalTest
 case class TestWebsiteControllers @Inject()(
   controllerMethod: ControllerMethod,
   postController: POSTControllerMethod,
+  accountRequestFilters: AccountRequestFilters,
   adminFilters: AdminRequestFilters,
   celebFilters: CelebrityAccountRequestFilters,
   customerFilters: CustomerRequestFilters,

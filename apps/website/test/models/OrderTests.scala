@@ -1,6 +1,6 @@
 package models
 
-import enums.{EgraphState, OrderReviewStatus, PaymentStatus}
+import enums.{EnrollmentStatus, EgraphState, OrderReviewStatus, PaymentStatus}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
@@ -374,6 +374,84 @@ class OrderTests extends UnitFlatSpec
     order.isBuyerOrRecipient(Some(recipient.id)) should be(true)
     order.isBuyerOrRecipient(Some(anotherCustomer.id)) should be(false)
     order.isBuyerOrRecipient(None) should be(false)
+  }
+
+  "findByCustomerId" should "return orders with the customer as intended recipient" in {
+    val buyer = TestData.newSavedCustomer()
+    val recipient = TestData.newSavedCustomer()
+
+    val order = recipient.buy(TestData.newSavedProduct(), recipient=recipient).save()
+
+    orderStore.findByCustomerId(recipient.id).size should be (1)
+
+    val order2 = recipient.buy(TestData.newSavedProduct(), recipient=recipient).save()
+
+    orderStore.findByCustomerId(recipient.id).size should be (2)
+
+    val order3 = buyer.buy(TestData.newSavedProduct(), recipient=recipient).save()
+
+    orderStore.findByCustomerId(recipient.id).size should be (3)
+
+  }
+
+  "getEgraphsandOrders" should "returns orders and their associated egraphs" in {
+    val (buyer, recipient, celebrity, product) = newOrderStack
+    val admin = Administrator().save()
+    celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
+
+    val order = buyer.buy(product, recipient=recipient).save()
+    val order1 = recipient.buy(product, recipient=recipient).save()
+
+    val egraph = order.newEgraph.save()
+    egraph.verifyBiometrics.approve(admin).publish(admin).save()
+
+    val results = orderStore.getEgraphsAndOrders(recipient.id)
+
+    results.size should be (2)
+
+    val queried_egraph = results.head._2.get
+
+    queried_egraph.id should be (1)
+
+  }
+
+  "GalleryOrderFactory" should "create PendingEgraphViewModels from orders" in {
+    val (buyer, recipient, celebrity, product) = newOrderStack
+    val admin = Administrator().save()
+    celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
+
+    val order = buyer.buy(product, recipient=recipient).save()
+    val order1 = recipient.buy(product, recipient=recipient).save()
+
+    val results = orderStore.getEgraphsAndOrders(recipient.id)
+
+    val pendingViews = GalleryOrderFactory.makePendingEgraphViewModel(results)
+
+    pendingViews.size should be (2)
+
+    pendingViews.head.orderId should be (order.id)
+    pendingViews.toList(1).orderId should be (order1.id)
+  }
+
+  "GalleryOrderFactory" should "create FulfilledEgraphViewModels from orders" in  {
+    val (buyer, recipient, celebrity, product) = newOrderStack
+    val admin = Administrator().save()
+    celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
+
+    val order = buyer.buy(product, recipient=recipient).save()
+    val order1 = buyer.buy(product, recipient=recipient).save()
+    val egraph = TestData.newSavedEgraph()
+
+    val results = List((order, Option(egraph)), (order, None))
+
+
+    val fulfilledViews = GalleryOrderFactory.makeFulfilledEgraphViewModel(results, "fakeappid")
+    //create an egraph
+
+    fulfilledViews.size should be (2)
+    fulfilledViews.toList(0).get.orderId should be (order.id)
+    //unfulfilled egraph should not have created a view model
+    fulfilledViews.toList(1).isEmpty should be (true)
   }
 
   //

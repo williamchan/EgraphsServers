@@ -112,7 +112,7 @@ class CustomerTests extends UnitFlatSpec
     acct.customerId should be(None)
     val customer = customerStore.findOrCreateByEmail(acct.email, "joe fan")
 
-    val updatedAcct = acct.services.accountStore.findById(acct.id).get
+    val updatedAcct = acct.services.accountStore.get(acct.id)
     customer.id should be(updatedAcct.customerId.get)
     customerStore.findOrCreateByEmail(acct.email, "joe fan") should be(customer)
   }

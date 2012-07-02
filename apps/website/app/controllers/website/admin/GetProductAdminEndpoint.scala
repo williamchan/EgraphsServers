@@ -17,8 +17,7 @@ private[controllers] trait GetProductAdminEndpoint {
 
   def getProductAdmin(productId: Long, action: Option[String] = None) = controllerMethod() {
     adminFilters.requireAdministratorLogin { admin =>
-      val productOption = productStore.findById(productId)
-      val product = productOption.get
+      val product = productStore.get(productId)
 
       action match {
         case Some("preview") => {
@@ -35,7 +34,7 @@ private[controllers] trait GetProductAdminEndpoint {
           flash.put("storyText", product.storyText)
           flash.put("publishedStatusString", product.publishedStatus.toString)
 
-          GetProductDetail.getCelebrityProductDetail(celebrity = product.celebrity, isCreate = false, product = productOption)
+          GetProductDetail.getCelebrityProductDetail(celebrity = product.celebrity, isCreate = false, product = Option(product))
         }
       }
     }

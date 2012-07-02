@@ -153,7 +153,7 @@ object PostBuyProductEndpoint extends Logging {
         "desiredText" -> desiredText.getOrElse(""),
         "personalNote" -> personalNote.getOrElse(""),
         "productId" -> product.id,
-        "productPrice" -> product.price
+        "productPrice" -> product.price.getAmount
       ))
 
       // Attempt Stripe charge. If a credit card-related error occurred, redirect to purchase screen.
@@ -161,7 +161,7 @@ object PostBuyProductEndpoint extends Logging {
         payment.charge(product.price, stripeTokenId, "Egraph Order from " + buyerEmail)
       } catch {
         case stripeException: com.stripe.exception.InvalidRequestException => {
-          log("PostBuyProductEndpoint error charging card: " + stripeException.getLocalizedMessage + " . " + purchaseData)
+          saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = "Credit card issue.")
           Validation.addError("Credit card", "There was an issue with the credit card")
           return WebsiteControllers.redirectWithValidationErrors(GetCelebrityProductEndpoint.url(celebrity, product), Some(false))
         }
@@ -179,14 +179,13 @@ object PostBuyProductEndpoint extends Logging {
       } catch {
         case e: InsufficientInventoryException => {
           payment.refund(charge.id)
-          log("PostBuyProductEndpoint error saving order: " + e.getLocalizedMessage + " . " + purchaseData)
-          // todo(wchan): purchaseData should be stored to a customer leads table per issue #109
+          saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = e.getLocalizedMessage)
           Validation.addError("Inventory", "Our apologies. There is no more inventory available, but your celebrity will sign more Egraphs soon.")
           return WebsiteControllers.redirectWithValidationErrors(GetCelebrityProductEndpoint.url(celebrity, product), Some(false))
         }
         case e: Exception => {
           payment.refund(charge.id)
-          log("PostBuyProductEndpoint error: " + e.getLocalizedMessage + " . " + purchaseData)
+          saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = e.getLocalizedMessage)
           throw (e)
         }
       }
@@ -232,6 +231,12 @@ object PostBuyProductEndpoint extends Logging {
       val savedOrder = order.save()
 
       (savedOrder, buyer, recipient)
+    }
+  }
+
+  private def saveFailedPurchaseData(dbSession: DBSession, purchaseData: String, errorDescription: String) {
+    dbSession.connected(TransactionSerializable) {
+      FailedPurchaseData(purchaseData = purchaseData, errorDescription = errorDescription.take(128 /*128 is the column width*/)).save()
     }
   }
 

@@ -49,7 +49,7 @@ trait PostCelebrityAdminEndpoint {
                          logoImage: Option[File] = None) = postController() {
       adminFilters.requireAdministratorLogin { admin =>
         val isCreate = (celebrityId == 0)
-        val tmp = if (isCreate) new Celebrity() else celebrityStore.findById(celebrityId).get
+        val tmp = if (isCreate) new Celebrity() else celebrityStore.get(celebrityId)
 
         val publicNameStr = if (publicName.isEmpty) firstName + " " + lastName else publicName
         val celebrity = celebrityWithValues(tmp, firstName = firstName, lastName = lastName, publicNameStr = publicNameStr, description = description,

@@ -41,6 +41,7 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val dbSession = instance[DBSession]
   override protected val controllerMethod = instance[ControllerMethod]
   override protected val postController = instance[POSTControllerMethod]
+  override protected val accountRequestFilters = instance[AccountRequestFilters]
   override protected val adminFilters = instance[AdminRequestFilters]
   override protected val celebFilters = instance[CelebrityAccountRequestFilters]
   override protected val customerFilters = instance[CustomerRequestFilters]

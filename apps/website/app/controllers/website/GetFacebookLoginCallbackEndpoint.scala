@@ -78,7 +78,7 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
 
     val (customer, shouldSendWelcomeEmail) = account.customerId match {
       case Some(custId) => {
-        (customerStore.findById(custId).get, false)
+        (customerStore.get(custId), false)
       }
       case None => {
         val customer = account.createCustomer(name = registrationName).save()

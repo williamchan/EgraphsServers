@@ -11,6 +11,7 @@ import org.joda.time.DateTime
 object Time {
 
   val millisInDay = 86400000
+  val ipadDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
 
   //
   // Public members
@@ -27,6 +28,15 @@ object Time {
 
   def today:Date = {
     DateTime.now().toDate
+  }
+
+  def timestamp(dateStr: String, dateFormat: DateFormat): Option[Timestamp] = {
+    if (dateStr.isEmpty) {
+      None
+    } else {
+      val date = dateFormat.parse(dateStr)
+      Some(new Timestamp(date.getTime))
+    }
   }
 
   /**

@@ -292,6 +292,14 @@ case class Product(
       services=services.imageAssetServices.get
   ).getSaved(AccessPolicy.Public)
 
+  lazy val defaultPhotoPortrait = ImageAsset(
+    Play.getFile("test/files/longoria/product-1.jpg"),
+    keyBase="defaults/product",
+    name="photo",
+    imageType=ImageAsset.Jpeg,
+    services=services.imageAssetServices.get
+  ).getSaved(AccessPolicy.Public)
+
   lazy val defaultIcon = ImageAsset(
     Play.getFile("public/images/egraph_default_plaque_icon.png"),
     keyBase="defaults/product",

@@ -3,8 +3,24 @@ package services
 import play.test.UnitFlatSpec
 import org.scalatest.matchers.ShouldMatchers
 import java.sql.Date
+import org.joda.time.DateTime
 
 class TimeTests extends UnitFlatSpec with ShouldMatchers {
+
+  "timestamp" should "convert Date string to timestamp" in {
+    Time.timestamp("", Time.ipadDateFormat) should be(None)
+
+    val timestamp = Time.timestamp("2012-07-12 15:11:22.987", Time.ipadDateFormat)
+    val dateTime = new DateTime()
+      .withYear(2012)
+      .withMonthOfYear(7)
+      .withDayOfMonth(12)
+      .withHourOfDay(15)
+      .withMinuteOfHour(11)
+      .withSecondOfMinute(22)
+      .withMillisOfSecond(987)
+    timestamp.get.getTime should be(dateTime.toDate.getTime)
+  }
 
   "API format converters" should "produce correct values" in {
     val dateMillis = 1320961084580L

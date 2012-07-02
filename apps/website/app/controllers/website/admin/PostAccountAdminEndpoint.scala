@@ -33,7 +33,7 @@ trait PostAccountAdminEndpoint {
           Account(email = email).withPassword(password).right.get.save()
 
         } else {
-          val preexistingAccount = accountStore.findById(accountId).get
+          val preexistingAccount = accountStore.get(accountId)
           if (isUpdatingPassword(preexistingAccount, password)) {
             preexistingAccount.copy(email = email).withPassword(password).right.get.save()
           } else {
@@ -64,7 +64,7 @@ trait PostAccountAdminEndpoint {
       if (passwordValidationOrAccount.isLeft) Validation.addError("Password", passwordValidationOrAccount.left.get.error.toString)
 
     } else {
-      val preexistingAccount = accountStore.findById(accountId).get
+      val preexistingAccount = accountStore.get(accountId)
 
       val isEmailUnique = accountByEmail.isEmpty || accountByEmail.get.id == accountId
       Validation.isTrue("An account with that email address already exists", isEmailUnique)

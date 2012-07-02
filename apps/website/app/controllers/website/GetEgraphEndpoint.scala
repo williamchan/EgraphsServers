@@ -78,12 +78,12 @@ object GetEgraphEndpoint {
     // Prepare the framed image
     val frame = product.frame
     val rawSignedImage = egraph.image(product.photoImage)
+    //TODO w1zzle handle this (see if its worth removing the signing origin transform)
     val frameFittedImage = rawSignedImage
       .withPenWidth(penWidth)
       .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
       .withPenShadowOffset(shadowX, shadowY)
       .scaledToWidth(frame.imageWidthPixels)
-
     // TODO: change this saveAndGetUrl to getSavedUrl when we're comfortable enough with image quality to cache them permanently.
     val frameFittedImageUrl = frameFittedImage.saveAndGetUrl(AccessPolicy.Public)
 
@@ -104,7 +104,7 @@ object GetEgraphEndpoint {
       storyLayoutColumns = frame.cssStoryColumnClasses,
       storyTitle = story.title,
       storyBody = story.body,
-      audioUrl = egraph.assets.audioUrl,
+      audioUrl = egraph.assets.audioMp3Url,
       signedImageUrl = frameFittedImageUrl,
       signedOnDate = new SimpleDateFormat("MMMM dd, yyyy").format(egraph.created)
     )

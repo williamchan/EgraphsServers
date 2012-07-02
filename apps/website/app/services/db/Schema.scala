@@ -247,6 +247,12 @@ class Schema @Inject()(
   on(xyzmoVerifyUserTable)(xyzmoVerifyUser => declare(xyzmoVerifyUser.errorMsg is dbType("varchar(255)")))
 
   //
+  // FailedPurchaseData
+  //
+  val failedPurchaseData = table[FailedPurchaseData]
+  on(failedPurchaseData)(datum => declare( datum.purchaseData is (dbType("varchar(1000)")) ))
+
+  //
   // Public methods
   //
   /**Clears out the schema and recreates it. For God's sake don't do this in production. */
@@ -380,6 +386,7 @@ class Schema @Inject()(
       factoryFor(egraphs) is Egraph(services = injector.instance[EgraphServices]),
       factoryFor(enrollmentBatches) is EnrollmentBatch(services = injector.instance[EnrollmentBatchServices]),
       factoryFor(enrollmentSamples) is EnrollmentSample(services = injector.instance[EnrollmentSampleServices]),
+      factoryFor(failedPurchaseData) is FailedPurchaseData(services = injector.instance[FailedPurchaseDataServices]),
       factoryFor(inventoryBatches) is InventoryBatch(services = injector.instance[InventoryBatchServices]),
       factoryFor(inventoryBatchProducts) is InventoryBatchProduct(services = injector.instance[InventoryBatchProductServices]),
       factoryFor(orders) is Order(services = injector.instance[OrderServices]),

@@ -38,13 +38,14 @@ class Scenarios extends DeclaresScenarios {
   private val productPageCategory = "Product Page"
   private val orderConfirmationPageCategory = "Order Confirmation Page"
   private val egraphPageCategory = "Egraph Page"
+  private val galleryPageCategory = "My Gallery"
 
   private val mail = AppConfig.instance[services.mail.Mail]
 
   private lazy val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
   private lazy val today = DateTime.now().toLocalDate.toDate
   private lazy val future = dateFormat.parse("2020-01-01")
-
+  //TODO sbilstein this page really needs some refactoring
   toScenarios add Scenario(
     "Send an email to erem@egraphs.com",
 
@@ -130,7 +131,7 @@ class Scenarios extends DeclaresScenarios {
         description="In classic form, Wizzle dominated the competition and left mouths agape.",
         priceInCurrency=70,
         storyTitle="The story and the glory",
-        image=photoImage,
+        image=Some(Product().defaultPhotoPortrait.renderFromMaster),
         icon=iconImage,
         storyText="""
            {signer_link}{signer_name}{end_link} was born on top. On {date_signed}
@@ -205,6 +206,34 @@ class Scenarios extends DeclaresScenarios {
         .save()
     }
   )
+
+  toScenarios add Scenario(
+    "Will fulfills Erem's second product order",
+    apiCategory,
+    """
+      Will fulfills Erem's second product order
+    """,
+
+    {() =>
+      val (starcraftChampionship, kingOfPweensCompetition) = Scenarios.getWillsTwoProducts
+
+      val secondOrder = from(schema.orders)(order =>
+        where(order.id in List(starcraftChampionship.id))
+          select (order)
+      ).headOption.get
+
+      secondOrder
+        .newEgraph
+        .withAssets(TestConstants.signingAreaSignatureStr, Some(TestConstants.signingAreaMessageStr), Codec.decodeBASE64(TestConstants.voiceStr()))
+        .save()
+        .withYesMaamBiometricServices
+        .verifyBiometrics
+        .withEgraphState(EgraphState.Published)
+        .save()
+    }
+  )
+
+
 
   toScenarios add Scenario(
     "Will is faux-enrolled in biometric services",
@@ -430,6 +459,50 @@ class Scenarios extends DeclaresScenarios {
   )
 
   toScenarios add Scenario(
+    "1 valid, fulfilled signed egraphs",
+    galleryPageCategory,
+
+    """
+      Creates one signed egraphs and displays the gallery not logged in
+    """,
+    {() =>
+      Scenario.clearAll()
+      Scenario.play(
+        "Will-Chan-is-a-celebrity",
+        "Will-has-two-products",
+        "Erem-is-a-customer",
+        "Erem-buys-Wills-two-products-twice-each",
+        "Deliver-All-Orders-to-Celebrities",
+        "Will-fulfills-one-of-Erems-product-orders"
+      )
+
+      new Redirect("/account/1/gallery")
+    }
+  )
+
+  toScenarios add Scenario(
+    "2 valid, fulfilled signed egraphs",
+    galleryPageCategory,
+
+    """
+        Creates one signed egraphs and displays the gallery not logged in
+    """,
+    {() =>
+      Scenario.clearAll()
+      Scenario.play(
+        "Will-Chan-is-a-celebrity",
+        "Will-has-two-products",
+        "Erem-is-a-customer",
+        "Erem-buys-Wills-two-products-twice-each",
+        "Deliver-All-Orders-to-Celebrities",
+        "Will-fulfills-one-of-Erems-product-orders",
+        "Will-fulfills-Erems-second-product-order"
+      )
+      new Redirect("/account/1/gallery")
+    }
+  )
+
+  toScenarios add Scenario(
     "Create Admin",
     adminCategory,
     """
@@ -537,15 +610,15 @@ object Scenarios {
   }
 
   def getWillCelebrityAccount: Celebrity = {
-    celebrityStore.findById(getWillAccount.celebrityId.get).get
+    celebrityStore.get(getWillAccount.celebrityId.get)
   }
 
   def getWillsTwoProducts: (Product, Product) = {
-    (productStore.findById(1L).get, productStore.findById(2L).get)
+    (productStore.get(1L), productStore.get(2L))
   }
 
   def getEremCustomerAccount: Customer = {
-    customerStore.findById(1L).get
+    customerStore.get(1L)
   }
 }
 

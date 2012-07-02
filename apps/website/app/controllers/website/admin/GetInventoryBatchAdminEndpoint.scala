@@ -14,15 +14,14 @@ private[controllers] trait GetInventoryBatchAdminEndpoint {
 
   def getInventoryBatchAdmin(inventoryBatchId: Long, action: Option[String] = None) = controllerMethod() {
     adminFilters.requireAdministratorLogin { admin =>
-      val inventoryBatchOption = inventoryBatchStore.findById(inventoryBatchId)
-      val inventoryBatch = inventoryBatchOption.get
+      val inventoryBatch = inventoryBatchStore.get(inventoryBatchId)
 
       flash.put("inventoryBatchId", inventoryBatch.id)
       flash.put("numInventory", inventoryBatch.numInventory)
       flash.put("startDate", inventoryBatch.startDate)
       flash.put("endDate", inventoryBatch.endDate)
 
-      GetInventoryBatchDetail.getCelebrityInventoryBatchDetail(celebrity = inventoryBatch.celebrity, inventoryBatch = inventoryBatchOption)
+      GetInventoryBatchDetail.getCelebrityInventoryBatchDetail(celebrity = inventoryBatch.celebrity, inventoryBatch = Option(inventoryBatch))
     }
   }
 }

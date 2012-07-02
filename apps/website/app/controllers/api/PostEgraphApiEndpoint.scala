@@ -9,6 +9,7 @@ import services.http.{ControllerMethod, HttpCodes, OrderRequestFilters, Celebrit
 import services.db.{TransactionSerializable, DBSession}
 import actors.ProcessEgraphMessage
 import akka.actor.ActorRef
+import services.Time
 
 private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
   protected def egraphActor: ActorRef
@@ -28,6 +29,7 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
     @Required audio: String,
     latitude: Option[Double] = None,
     longitude: Option[Double] = None,
+    signedAt: String = "",
     skipBiometrics: Boolean = false /*todo(wchan): remove skipBiometrics parameter*/) =
   {
     controllerMethod(openDatabase=false) {
@@ -45,7 +47,7 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
                   val message = request.params.getOption("message")
 
                   val savedEgraph = order.newEgraph
-                    .copy(latitude = latitude, longitude = longitude)
+                    .copy(latitude = latitude, longitude = longitude, signedAt = Time.timestamp(signedAt, Time.ipadDateFormat))
                     .withAssets(signature, message, Codec.decodeBASE64(audio))
                     .save()
                   val actorMessage = ProcessEgraphMessage(id = savedEgraph.id)

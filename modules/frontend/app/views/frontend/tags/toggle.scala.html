@@ -1,0 +1,21 @@
+@(styleclass: String , name: String, id: String, checked: Boolean)
+<form name="privacy-@name">
+  <div class="clearfix">
+  <fieldset>
+    <div class="field" id="@id">
+
+        <span>
+        <label class="instructions" for="@name">Public?</label>
+        <div class="input">
+        @if(checked){
+          <input class="@styleclass" type="checkbox" name="@name" checked="checked"/>
+        }else{
+          <input class="@styleclass" type="checkbox" name="@name"/>
+        }
+        </div>
+</span>
+    </div> <!-- end .field -->
+  </fieldset>
+  </div>
+  <small><span class="toggle-callout" id="info-@id">&nbsp;</span></small>
+</form>

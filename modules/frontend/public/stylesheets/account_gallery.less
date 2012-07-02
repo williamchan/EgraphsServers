@@ -1,0 +1,241 @@
+// Styles for the account settings page
+#galleryrows {
+  .photo-frame {
+    border: 7px solid @white;
+    -moz-box-shadow: 0px 1px 5px @gray;
+    -webkit-box-shadow: 0px 1px 5px @gray;
+    -o-box-shadow: 0px 1px 5px @gray;
+    -ms-bow-shadow: 0px 1px 5px @gray;
+  }
+
+  div.thumbnail {
+    max-width: 100%;
+    border: none;
+  }
+
+  div.input {
+    display: inline-block;
+  }
+
+  div.pending-landscape {
+    max-width: 100%;
+    margin-bottom: 20px;
+    margin-right: 5px;
+  }
+
+  div.pending-portrait {
+    max-width: 100%;
+    margin-bottom: 20px;
+    margin-left: 12%;
+  }
+
+  div.landscape {
+    overflow: hidden;
+    max-width: 100%;
+  }
+
+  div.portrait{
+    overflow: hidden;
+    margin-left: 15%;
+    max-width: 100%;
+    margin-bottom: 15px;
+  }
+
+  div.landscape, div.portrait {
+    padding: 5px 5px 5px 5px;
+  }
+
+  div.landscape img, div.portrait img {
+    .photo-frame;
+  }
+
+  .row-egraph {
+    border-top: 1px solid @tableBorder;
+  }
+
+  span h3 {
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: uppercase;
+    display: inline-block;
+  }
+
+  span.order-line {
+    color: @orange;
+    font-weight: light;
+    font-style: italic;
+    font-size: 18px;
+    padding-left: 5px;
+  }
+
+  div.order-row {
+    border-top: 1px solid @tableBorder;
+  }
+
+  div.order-row:last-child {
+    border-bottom: 1px solid @tableBorder;
+  }
+
+  span.order-detail {
+    width: 50%;
+  }
+
+  span.order-label {
+    font-weight: bold;
+    width: 50%;
+    display: inline-block;
+  }
+
+  label.instructions {
+    text-transform: uppercase;
+    font-weight: bold;
+    float: left;
+    margin-right: 10px;
+    font-size: 17px;
+    padding-top: 5px;
+  }
+
+  form {
+    margin-bottom: 0px;
+  }
+
+
+  div.iphoneCheckContainer {
+    display: inline-block;
+  }
+
+  div.shipping-details {
+    position: relative;
+    left: 5%;
+  }
+
+  div.shipping-details span {
+    font-weight: bold;
+  }
+
+  .right > div {
+    border-bottom: 1px solid @tableBorder;
+    padding-top: 30px;
+    padding-bottom: 10px;
+  }
+
+  .right > div:first-child {
+    padding-top: 14px;
+  }
+
+  .right div:last-child {
+    border-bottom: 0px;
+  }
+
+  .right div:first-child {
+    font-size: 15px;
+    font-weight: bold;
+    color: @grayDark;
+  }
+
+  .social-label {
+    color: @blue;
+    font-weight: normal;
+  }
+
+  .social > ul {
+    padding-left: 0px;
+  }
+
+  div.social {
+    padding-top: 15px;
+  }
+
+  .number {
+    background-color: black;
+    color: @white;
+    display: inline-block;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  div.padding-fix {
+    padding-top: 0px;
+  }
+
+  ul {
+    list-style-type: none;
+    padding:0;
+    margin:0;
+  }
+
+  li a {
+    color: @gray;
+    text-decoration: underline;
+  }
+
+  li a:hover {
+    color: @orange;
+  }
+}
+
+#gallerytop {
+  span.username {
+    font-size: 22px;
+  }
+  span.count {
+    text-align: right;
+  }
+
+  div.row-fluid {
+    margin-top: 20px;
+    margin-bottom: 17px;
+  }
+
+}
+
+@media (max-width: 979px) {
+  #galleryrows {
+    div.portrait, div.pending-portrait {
+     margin-left: 0px;
+    }
+  }
+
+}
+
+@media (max-width: 767px) {
+
+  #galleryrows {
+    .portait, .landscape, .pending-portrait, .pending-landscape {
+      text-align: center;
+    }
+
+    div.shipping-details {
+     position: static;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+
+  #galleryrows {
+    span.order-line {
+      font-size: 14px;
+      padding-left: 0px;
+      padding-bottom: 5px;
+    }
+    span h3 {
+      font-size: 14px;
+    }
+
+    br.number-br {
+      display: none;
+    }
+
+  }
+
+  #gallerytop {
+    div.row-fluid {
+      margin-top: 0px;
+    }
+
+    span.count {
+      text-align: left;
+    }
+  }
+}

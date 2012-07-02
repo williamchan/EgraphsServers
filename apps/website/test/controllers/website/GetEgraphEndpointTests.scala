@@ -7,8 +7,8 @@ import FunctionalTest._
 import services.AppConfig
 import services.db.{TransactionSerializable, DBSession}
 import utils.{TestConstants, TestData}
-import models.Egraph
 import models.enums.{EgraphState, OrderReviewStatus, PrivacyStatus}
+import play.libs.Codec
 
 class GetEgraphEndpointTests extends AdminFunctionalTest {
 
@@ -24,7 +24,7 @@ class GetEgraphEndpointTests extends AdminFunctionalTest {
         .withPrivacyStatus(PrivacyStatus.Private)
         .withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
       order.newEgraph.withEgraphState(EgraphState.Published)
-        .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.fakeAudio).save()
+        .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), Codec.decodeBASE64(TestConstants.voiceStr())).save()
       (order.id.toString, buyer.account, recipient.account, anotherCustomer.account)
     }
 
@@ -49,7 +49,7 @@ class GetEgraphEndpointTests extends AdminFunctionalTest {
       val order = buyer.buy(TestData.newSavedProduct())
         .withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
       order.newEgraph.withEgraphState(EgraphState.Published)
-        .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.fakeAudio).save()
+        .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), Codec.decodeBASE64(TestConstants.voiceStr())).save()
       order.id.toString
     }
 

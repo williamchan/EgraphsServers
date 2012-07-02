@@ -30,9 +30,6 @@ GET     /test/log-stuff-then-die                 website.nonproduction.TestContr
 %{ if (true) }%
 # Home page
 GET     /                                       WebsiteControllers.getRootEndpoint
-
-# For Alpha-phase prod mode:
-
 GET     /test/files/{<.*>blobKey}               WebsiteControllers.getBlob
 
 # Map static resources from the /app/public folder to the /public path
@@ -101,7 +98,6 @@ GET ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/next  WebsiteCon
 
 # social media exploratory work
 GET     /socialpost                                      WebsiteControllers.getSocialPost
-GET     /facebooklogin                                   WebsiteControllers.getFacebookLogin
 
 # customer accounts stubs
 GET     /register                                        WebsiteControllers.getRegister
@@ -117,9 +113,12 @@ GET     /account/recover/confirmation                    WebsiteControllers.getR
 GET     /account/reset                                   WebsiteControllers.getResetPassword
 POST    /account/reset                                   WebsiteControllers.postResetPassword
 GET     /facebooklogin/callback                          WebsiteControllers.getFacebookLoginCallback
+GET     /account/{<[0-9]+>galleryCustomerId}/gallery     WebsiteControllers.getCustomerGallery
+
 
 # Order and Egraph pages
 GET     /orders/{<[0-9]+>orderId}/confirm                WebsiteControllers.getOrderConfirmation
+POST    /orders/{<[0-9]+>orderId}/configure              WebsiteControllers.postOrderPrivacy
 GET     /egraph/{<[0-9]+>orderId}                        WebsiteControllers.getEgraph
 
 # Celebrity pages

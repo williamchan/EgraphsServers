@@ -25,7 +25,7 @@ class AccountRequestFiltersTests extends UnitFlatSpec with Mockito with ShouldMa
     val blockToExecute = mock[Function1[Account,  Any]]
 
     // Execute test
-    new AccountRequestFilters(accountStore).requireAuthenticatedAccount(blockToExecute)
+    new AccountRequestFilters(accountStore, null).requireAuthenticatedAccount(blockToExecute)
 
     // Check expectations
     there was one(blockToExecute).apply(account)
@@ -47,7 +47,7 @@ class AccountRequestFiltersTests extends UnitFlatSpec with Mockito with ShouldMa
       val blockThatShouldNotExecute= mock[Function1[Account, Any]]
       
       // Execute
-      val result = new AccountRequestFilters(accountStore)
+      val result = new AccountRequestFilters(accountStore, null)
         .requireAuthenticatedAccount(blockThatShouldNotExecute)
 
       // Check expectations

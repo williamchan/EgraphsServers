@@ -58,7 +58,7 @@ class PostRegisterEndpointTests extends EgraphsFunctionalTest {
     val response = POST("/register", getPostStrParams(email = account.email, name = customerName))
     assertStatus(302, response)
     db.connected(TransactionSerializable) {
-      account = accountStore.findById(account.id).get
+      account = accountStore.get(account.id)
       assertEquals(customerName, customerStore.findById(account.customerId.get).get.name)
     }
   }
@@ -70,7 +70,7 @@ class PostRegisterEndpointTests extends EgraphsFunctionalTest {
     assertStatus(302, response)
     db.connected(TransactionSerializable) {
       val account = accountStore.findByEmail(email).get
-      assertEquals(account.customerId.get, customerStore.findById(account.customerId.get).get.id)
+      assertEquals(account.customerId.get, customerStore.get(account.customerId.get).id)
     }
   }
 

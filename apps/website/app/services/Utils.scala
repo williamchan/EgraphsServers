@@ -6,7 +6,8 @@ import play.Play
 import com.google.inject.Inject
 import java.util
 import org.squeryl.Query
-import java.io.{Serializable, PrintWriter, StringWriter}
+import java.io._
+import scala.Some
 
 /**
  * Helpful utilities with no other place to call home
@@ -150,6 +151,17 @@ class Utils @Inject()(@PlayConfig() playConfig: util.Properties) {
     for (pair <- pairs) props.put(pair._1, pair._2)
 
     props
+  }
+
+  /**
+   * @param bytes bytes to be written to the file
+   * @param file the intended file location
+   */
+  def saveToFile(bytes: Array[Byte], file: File) {
+    file.getParentFile.mkdirs()
+    val out = new FileOutputStream(file)
+    out.write(bytes)
+    out.close()
   }
 }
 

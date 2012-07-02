@@ -5,6 +5,7 @@
       <configuration>
         <option name="compilerLibraryLevel" value="Global" />
         <option name="compilerLibraryName" value="scala-compiler-2.8.1" />
+        <option name="fsc" value="true" />
       </configuration>
     </facet>
   </component>
@@ -18,15 +19,9 @@
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/tmp/generated" isTestSource="false" />
     </content>
-    <content url="file://$MODULE_DIR$/modules/cloudbees-0.2.2">
-      <sourceFolder url="file://$MODULE_DIR$/modules/cloudbees-0.2.2/app" isTestSource="false" />
-    </content>
-    <content url="file://$MODULE_DIR$/modules/less-0.9.1">
-      <sourceFolder url="file://$MODULE_DIR$/modules/less-0.9.1/app" isTestSource="false" />
-    </content>
-    <content url="file://$MODULE_DIR$/modules/mockito-0.1">
-      <sourceFolder url="file://$MODULE_DIR$/modules/mockito-0.1/app" isTestSource="false" />
-    </content>
+    <content url="file://$MODULE_DIR$/modules/cloudbees-0.2.2" />
+    <content url="file://$MODULE_DIR$/modules/less-0.9.1" />
+    <content url="file://$MODULE_DIR$/modules/mockito-0.1" />
     <content url="file://$MODULE_DIR$/modules/redis-0.3">
       <sourceFolder url="file://$MODULE_DIR$/modules/redis-0.3/app" isTestSource="false" />
     </content>

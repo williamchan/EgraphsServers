@@ -10,8 +10,9 @@ import services.voice.{VoiceBiometricsError, YesMaamVoiceBiometricService, Voice
 import vbg.{VBGVerifySampleStore, VBGVerifySample}
 import services.signature.{SignatureBiometricsError, YesMaamSignatureBiometricService, SignatureBiometricService}
 import services._
+import audio.AudioConverter
 import db.{FilterOneTable, Schema, KeyedCaseClass, Saves}
-import graphics.{Handwriting, HandwritingPen, GraphicsSource}
+import graphics.{RasterGraphicsSource, Handwriting, HandwritingPen, GraphicsSource}
 import java.text.SimpleDateFormat
 import controllers.WebsiteControllers
 import controllers.website.GetCelebrityProductEndpoint
@@ -42,6 +43,7 @@ case class EgraphServices @Inject() (
   xyzmoVerifyUserStore: XyzmoVerifyUserStore,
   blobs: Blobs,
   graphicsSourceFactory: () => GraphicsSource,
+  rasterGraphicsSourceFactory: () => RasterGraphicsSource,
   voiceBiometrics: VoiceBiometricService,
   signatureBiometrics: SignatureBiometricService,
   storyServicesProvider: Provider[EgraphStoryServices]
@@ -65,6 +67,7 @@ case class Egraph(
   _egraphState: String = EgraphState.AwaitingVerification.name,
   latitude: Option[Double] = None,
   longitude: Option[Double] = None,
+  signedAt: Option[Timestamp] = None,         // GMT (just like all other timestamps)
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: EgraphServices = AppConfig.instance[EgraphServices]
@@ -163,6 +166,14 @@ case class Egraph(
     )
   }
 
+  def thumbnail(productPhoto: => BufferedImage=order.product.photoImage):EgraphImage = {
+    EgraphImage(
+      ingredientFactory=imageIngredientFactory(order.product, productPhoto),
+      graphicsSource = services.rasterGraphicsSourceFactory(),
+      blobPath=blobKeyBase + "/image"
+    )
+  }
+
   /**
    * Returns a function that retrieves all the necessary (expensive) data for drawing an Egraph.
    * The function will only be evaluated if the required image doesn't already exist on the blobstore.
@@ -241,10 +252,25 @@ case class Egraph(
     egraphState == ApprovedByAdmin
   }
 
+  def isPublished: Boolean = {
+    (egraphState == Published)
+  }
+
   def publish(admin: Administrator): Egraph = {
     require(admin != null, "Must be rejected by an Administrator")
     require(isPublishable, "Must have previously been approved by admin")
     withEgraphState(Published)
+  }
+
+  /**
+   * Convenience method to return signedAt if it exists, otherwise created
+   * @return signedAt if it exists, otherwise created
+   */
+  def getSignedAt: Timestamp = {
+    signedAt match {
+      case Some(signedAtTimestamp) => signedAtTimestamp
+      case None => created
+    }
   }
 
   /**
@@ -290,8 +316,30 @@ case class Egraph(
       blobs.get(signatureJsonKey).get.asString
     }
 
-    override def audio: Blob = {
-      blobs.get(audioKey).get
+    override def audioWav: Blob = {
+      blobs.get(wavKey).get
+    }
+
+    override def audioMp3: Blob = {
+      blobs.get(mp3Key).get
+    }
+
+    override def audioMp3Url = {
+      blobs.getUrlOption((mp3Key)) match {
+        case None => {
+          generateAndSaveMp3()
+          blobs.getUrl((mp3Key))
+        }
+        case Some(url) => url
+      }
+    }
+
+    /**
+     * Encodes an mp3 from the wav asset and stores the mp3 to the blobstore.
+     */
+    override def generateAndSaveMp3() {
+      val mp3 = AudioConverter.convertWavToMp3(audioWav.asByteArray, blobKeyBase)
+      blobs.put(mp3Key, mp3, access=AccessPolicy.Public)
     }
 
     override def message: Option[String] = {
@@ -300,13 +348,9 @@ case class Egraph(
       }
     }
 
-    override def audioUrl = {
-      blobs.getUrl(audioKey)
-    }
-
     override def save(signature: String, message: Option[String], audio: Array[Byte]) {
       blobs.put(signatureJsonKey, signature, access=AccessPolicy.Private)
-      blobs.put(audioKey, audio, access=AccessPolicy.Public)
+      blobs.put(wavKey, audio, access=AccessPolicy.Public)
 
       // Put in the message if it was provided
       message.foreach { messageString =>
@@ -314,7 +358,8 @@ case class Egraph(
       }
     }
 
-    lazy val audioKey = blobKeyBase + "/audio.wav"
+    lazy val wavKey = blobKeyBase + "/audio.wav"
+    lazy val mp3Key = blobKeyBase + "/audio.mp3"
     lazy val signatureJsonKey = signatureKey + ".json"
     lazy val messageJsonKey = messageKey + ".json"
 
@@ -483,14 +528,26 @@ trait EgraphAssets {
   def message: Option[String]
 
   /**
-   * Retrieves the bytes of audio from the blobstore.
+   * Retrieves the bytes of Wav audio from the blobstore.
    */
-  def audio: Blob
+  def audioWav: Blob
 
   /**
-   * Retrieves the url of the audio in the blobstore.
+   * Retrieves the bytes of mp3 audio from the blobstore.
+   * Also lazily initializes the mp3 from the wav, though EgraphActor should have handled that.
    */
-  def audioUrl: String
+  def audioMp3: Blob
+
+  /**
+   * Retrieves the url of the mp3 in the blobstore.
+   * Also lazily initializes the mp3 from the wav, though EgraphActor should have handled that.
+   */
+  def audioMp3Url: String
+
+  /**
+   * Encodes an mp3 from the wav asset and stores the mp3 to the blobstore.
+   */
+  def generateAndSaveMp3()
 
   /** Stores the assets in the blobstore */
   def save(signature: String, message: Option[String], audio: Array[Byte])
@@ -520,6 +577,8 @@ class EgraphStore @Inject() (schema: Schema) extends Saves[Egraph] with SavesCre
     )
   }
 
+
+
   //
   // Saves[Egraph] methods
   //
@@ -531,6 +590,7 @@ class EgraphStore @Inject() (schema: Schema) extends Saves[Egraph] with SavesCre
       theOld._egraphState := theNew._egraphState,
       theOld.latitude := theNew.latitude,
       theOld.longitude := theNew.longitude,
+      theOld.signedAt := theNew.signedAt,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated
     )
@@ -661,6 +721,17 @@ sealed trait EgraphFrame {
   /** Height of the image in pixels as displayed on the egraph page */
   def imageHeightPixels: Int
 
+  /** Width of the image in pixels as displayed on the gallery page */
+  def thumbnailWidthPixels: Int
+
+  /** Height of the image in pixels as displayed on the gallery page **/
+  def thumbnailHeightPixels: Int
+
+  /** Width of image in pixels as display on gallery page when a pending order **/
+  def pendingWidthPixels: Int
+
+  /** Height of image in pixels as display on gallery page when a pending order **/
+  def pendingHeightPixels: Int
   //
   // Implemented members
   //
@@ -679,26 +750,31 @@ sealed trait EgraphFrame {
    * Returns a copy of an image of arbitrary dimensions, cropped so that it
    * will fit in the frame once resized to imageWidthPixels by imageHeightPixels.
    *
-   * Returns the cropped image.
-   *
-   * @param image
+   * @param image image to crop
    * @return a cropped copy of the image argument.
    */
   def cropImageForFrame(image: BufferedImage): BufferedImage = {
+    val cropDimensions = getCropDimensions(image)
+    ImageUtil.crop(image, cropDimensions)
+  }
+
+  /**
+   * @param image image for which to calculate dimensions it would be cropped to
+   * @return dimensions the image would be cropped to
+   */
+  def getCropDimensions(image: BufferedImage): Dimensions = {
     val targetAspectRatio = this.imageAspectRatio
     val originalWidth = image.getWidth.toDouble
     val originalHeight = image.getHeight.toDouble
     val originalAspectRatio = originalWidth / originalHeight
 
-    val cropDimensions = if (originalAspectRatio < targetAspectRatio) {
+    if (originalAspectRatio < targetAspectRatio) {
       // the original is too tall. Use all of width and limit height.
-      Dimensions(width=originalWidth.toInt, height=(originalWidth / targetAspectRatio).toInt)
+      Dimensions(width = originalWidth.toInt, height = (originalWidth / targetAspectRatio).toInt)
     } else {
       // the original is too narrow. Use all of height and limit width.
-      Dimensions(width=(originalHeight * targetAspectRatio).toInt, height=originalHeight.toInt)
+      Dimensions(width = (originalHeight * targetAspectRatio).toInt, height = originalHeight.toInt)
     }
-
-    ImageUtil.crop(image, cropDimensions)
   }
 }
 
@@ -727,6 +803,12 @@ object PortraitEgraphFrame extends EgraphFrame {
 
   override val imageWidthPixels = 377
   override val imageHeightPixels = 526
+
+  override val thumbnailWidthPixels = 350
+  override val thumbnailHeightPixels = 525
+
+  override val pendingWidthPixels = 170
+  override val pendingHeightPixels = 225
 }
 
 /** The default egraph landscape photo frame */
@@ -739,4 +821,10 @@ object LandscapeEgraphFrame extends EgraphFrame {
 
   override val imageWidthPixels = 595
   override val imageHeightPixels = 377
+
+  override val thumbnailWidthPixels = 510
+  override val thumbnailHeightPixels = 410
+
+  override val pendingWidthPixels = 230
+  override val pendingHeightPixels = 185
 }

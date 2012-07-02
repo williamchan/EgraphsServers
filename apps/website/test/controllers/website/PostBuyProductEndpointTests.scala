@@ -17,6 +17,7 @@ class PostBuyProductEndpointTests extends EgraphsFunctionalTest {
   private val db = AppConfig.instance[DBSession]
   private val schema = AppConfig.instance[Schema]
   private val orderStore = AppConfig.instance[OrderStore]
+  private val failedPurchaseDataStore = AppConfig.instance[FailedPurchaseDataStore]
 
   @Test
   def testBuyEgraphSucceeds() {
@@ -25,8 +26,6 @@ class PostBuyProductEndpointTests extends EgraphsFunctionalTest {
       val product = TestData.newSavedProduct(Some(celebrity))
       (celebrity, product)
     }
-
-
 
     val response = POST("/" + celebrity.urlSlug.get + "/" + product.urlSlug + "/buy",
       Map(
@@ -82,6 +81,15 @@ class PostBuyProductEndpointTests extends EgraphsFunctionalTest {
       val allCelebOrders = orderStore.findByCelebrity(celebrity.id)
       assertEquals(0, allCelebOrders.toList.length)
       assertEquals(0, from(schema.cashTransactions)(txn => select (txn)).size) // no CashTransactions should have been created
+
+      // Check that FailedPurchaseData was saved
+      val failedPurchaseData = failedPurchaseDataStore.get(1)
+      assertEquals(true, failedPurchaseData.errorDescription.startsWith("Must have available inventory to purchase product"))
+      assertEquals(true, failedPurchaseData.purchaseData.contains("Erem Recipient"))
+      assertEquals(true, failedPurchaseData.purchaseData.contains("Erem Recipient"))
+      assertEquals(true, failedPurchaseData.purchaseData.contains("erem@egraphs.com"))
+      assertEquals(true, failedPurchaseData.purchaseData.contains("Erem Buyer"))
+      assertEquals(true, failedPurchaseData.purchaseData.contains("\"productId\":1"))
     }
   }
 }
