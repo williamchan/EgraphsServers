@@ -35,9 +35,6 @@ case class CelebrityServices @Inject() (
  */
 case class Celebrity(id: Long = 0,
                      apiKey: Option[String] = None,
-                     description: Option[String] = None,                            // unnecessary?
-                     firstName: Option[String] = None,                              // unnecessary?
-                     lastName: Option[String] = None,                               // unnecessary?
                      publicName: Option[String] = None,
                      casualName: Option[String] = None,                             // e.g. "David" instead of "David Price"
                      organization: String = "",                                     // e.g. "Major League Baseball"
@@ -139,8 +136,6 @@ case class Celebrity(id: Long = 0,
    */
   def renderedForApi: Map[String, Any] = {
     val optionalFields = List(
-      "firstName" -> firstName,
-      "lastName" -> lastName,
       "publicName" -> publicName,
       "urlSlug" -> urlSlug
     )
@@ -148,14 +143,6 @@ case class Celebrity(id: Long = 0,
     Map("id" -> id, "enrollmentStatus" -> enrollmentStatus.name) ++
       renderCreatedUpdatedForApi ++
       Utils.makeOptionalFieldMap(optionalFields)
-  }
-
-  def category: String = {
-    "{This should be the category}"
-  }
-
-  def categoryRole: String = {
-    "{This should be the category role}"
   }
 
   /**
@@ -432,10 +419,7 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
       theOld.apiKey := theNew.apiKey,
       theOld.bio := theNew.bio,
       theOld.casualName := theNew.casualName,
-      theOld.description := theNew.description,
-      theOld.firstName := theNew.firstName,
       theOld.isFeatured := theNew.isFeatured,
-      theOld.lastName := theNew.lastName,
       theOld.organization := theNew.organization,
       theOld.profilePhotoUpdated := theNew.profilePhotoUpdated,
       theOld.publicName := theNew.publicName,

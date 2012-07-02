@@ -67,16 +67,10 @@ class PostCelebrityAdminEndpointTests extends AdminFunctionalTest {
 
     val errorString = "Must provide either Public Name or First and Last Name"
 
-    val responseWithFirstName = POST("/admin/celebrities", getPostCelebrityStrParams(firstName = "Cassius", lastName = "", publicName = ""))
-    assertTrue(getPlayFlashCookie(responseWithFirstName).contains(errorString))
+    val responseWithoutPublicName = POST("/admin/celebrities", getPostCelebrityStrParams(publicName = ""))
+    assertTrue(getPlayFlashCookie(responseWithoutPublicName).contains(errorString))
 
-    val responseWithLastName = POST("/admin/celebrities", getPostCelebrityStrParams(firstName = "", lastName = "Clay", publicName = ""))
-    assertTrue(getPlayFlashCookie(responseWithLastName).contains(errorString))
-
-    val responseWithFullName = POST("/admin/celebrities", getPostCelebrityStrParams(firstName = "Cassius", lastName = "Clay", publicName = ""))
-    assertTrue(!getPlayFlashCookie(responseWithFullName).contains(errorString))
-
-    val responseWithPublicName = POST("/admin/celebrities", getPostCelebrityStrParams(firstName = "", lastName = "", publicName = "Muhammad Ali"))
+    val responseWithPublicName = POST("/admin/celebrities", getPostCelebrityStrParams(publicName = "Muhammad Ali"))
     assertTrue(!getPlayFlashCookie(responseWithPublicName).contains(errorString))
   }
 

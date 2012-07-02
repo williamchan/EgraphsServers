@@ -47,7 +47,6 @@ class CelebrityTests extends UnitFlatSpec
   override def transformEntity(toTransform: Celebrity) = {
     toTransform.copy(
       apiKey = Some("apiKey"),
-      description = Some("desc"),
       publicName = Some("pname"),
       isFeatured = true,
       roleDescription = Some("Pitcher, Tampa Bay Rays"),
@@ -59,16 +58,9 @@ class CelebrityTests extends UnitFlatSpec
   // Test cases
   //
   "A Celebrity" should "render to API format properly" in {
-    val celeb = Celebrity(
-      firstName = Some("Will"),
-      lastName = Some("Chan"),
-      publicName = Some("Wizzle Chan")
-    ).save()
-
+    val celeb = Celebrity(publicName = Some("Wizzle Chan")).save()
     val apiMap = celeb.renderedForApi
 
-    apiMap("firstName") should be ("Will")
-    apiMap("lastName") should be ("Chan")
     apiMap("publicName") should be ("Wizzle Chan")
     apiMap("urlSlug") should be ("Wizzle-Chan")
     apiMap("id") should be (celeb.id)

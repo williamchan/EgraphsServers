@@ -54,16 +54,10 @@
         </fieldset>
         <fieldset>
           <legend>Celebrity Details</legend>
-          @formField(id="firstName", label="First Name", inputType="text", width="span4", fields=fields)
-          @formField(id="lastName", label="Last Name", inputType="text", width="span4", fields=fields)
-
-          @formField(id="publicName", label="Public Name", inputType="text", width="span4", help=Some(publicNameHelp), fields=fields)
-          @publicNameHelp = { Celebrity's popular name, eg "A-Rod" for Alex Rodriguez. Default is "First Last" }
+          @formField(id="publicName", label="Public Name", inputType="text", width="span4", fields=fields)
 
           @formField(id="casualName", label="Casual Name", inputType="text", width="span4", help=Some(casualNameHelp), fields=fields)
           @casualNameHelp = { e.g. "David" instead of "David Price" }
-
-          @formField(id="description", label="Description", inputType="text", width="span4", fields=fields)
 
           @formField(id="organization", label="Organization", inputType="text", width="span4", help=Some(organizationHelp), fields=fields)
           @organizationHelp = { e.g. "Major League Baseball" }

@@ -74,8 +74,6 @@ class GetCelebrityApiEndpointFunctionalTests extends EgraphsFunctionalTest {
     assertNotNull(json("id"))
     assertEquals("Wizzle", json("publicName"))
     assertEquals("Wizzle", json("urlSlug"))
-    assertEquals("William", json("firstName"))
-    assertEquals("Chan", json("lastName"))
     assertEquals(EnrollmentStatus.NotEnrolled.name, json("enrollmentStatus"))
 
     // These conversions will fail if they're not Longs

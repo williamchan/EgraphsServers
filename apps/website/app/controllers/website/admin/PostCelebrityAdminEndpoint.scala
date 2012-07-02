@@ -34,10 +34,7 @@ trait PostCelebrityAdminEndpoint {
   def postCelebrityAdmin(celebrityId: Long = 0,
                          celebrityEmail: String,
                          celebrityPassword: String,
-                         firstName: String,
-                         lastName: String,
                          publicName: String,
-                         description: String,
                          publishedStatusString: String,
                          bio: String,
                          casualName: String,
@@ -51,8 +48,7 @@ trait PostCelebrityAdminEndpoint {
         val isCreate = (celebrityId == 0)
         val tmp = if (isCreate) new Celebrity() else celebrityStore.get(celebrityId)
 
-        val publicNameStr = if (publicName.isEmpty) firstName + " " + lastName else publicName
-        val celebrity = celebrityWithValues(tmp, firstName = firstName, lastName = lastName, publicNameStr = publicNameStr, description = description,
+        val celebrity = celebrityWithValues(tmp, publicName = publicName,
           bio = bio, casualName = casualName, organization = organization, roleDescription = roleDescription, twitterUsername = twitterUsername)
         val celebrityUrlSlug = celebrity.urlSlug
 
@@ -81,13 +77,11 @@ trait PostCelebrityAdminEndpoint {
           }
         }
 
-        Validation.required("Description", description)
+        Validation.required("Public Name", publicName)
         Validation.required("Short Bio", bio)
         Validation.required("Organization", organization)
 
         // Name validations
-        val isNameRequirementSatisfied = !publicName.isEmpty || (!firstName.isEmpty && !lastName.isEmpty)
-        Validation.isTrue("Must provide either Public Name or First and Last Name", isNameRequirementSatisfied)
         if (celebrityUrlSlug.isDefined) {
           val celebrityByUrlSlug = celebrityStore.findByUrlSlug(celebrityUrlSlug.get)
           val isUniqueUrlSlug = if (isCreate) {
@@ -149,9 +143,8 @@ trait PostCelebrityAdminEndpoint {
         if (!validationErrors.isEmpty) {
           redirectWithValidationErrors(
             celebrityId = celebrityId, celebrityEmail = celebrityEmail, celebrityPassword = celebrityPassword,
-            firstName = firstName, lastName = lastName, publicName = publicName, description = description,
-            publishedStatusString = publishedStatusString,
-            bio = bio, casualName = casualName, organization = organization, roleDescription = roleDescription, twitterUsername = twitterUsername)
+            publicName = publicName, publishedStatusString = publishedStatusString, bio = bio,
+            casualName = casualName, organization = organization, roleDescription = roleDescription, twitterUsername = twitterUsername)
 
         } else {
           val savedCelebrity = celebrity.withPublishedStatus(publishedStatus).save()
@@ -165,7 +158,7 @@ trait PostCelebrityAdminEndpoint {
             // Send the order email
             val email = new SimpleEmail()
             email.setFrom("noreply@egraphs.com", "Egraphs")
-            email.addTo(celebrityEmail, publicNameStr)
+            email.addTo(celebrityEmail, publicName)
             email.setSubject("Egraphs Celebrity Account Created")
             email.setMsg(views.Application.email.html.celebrity_created_email(celebrity = savedCelebrity, email = celebrityEmail).toString().trim())
             mail.send(email)
@@ -178,19 +171,13 @@ trait PostCelebrityAdminEndpoint {
   }
 
   private def celebrityWithValues(celebrity: Celebrity,
-                                  firstName: String,
-                                  lastName: String,
-                                  publicNameStr: String,
-                                  description: String,
+                                  publicName: String,
                                   bio: String,
                                   casualName: String,
                                   organization: String,
                                   roleDescription: String,
                                   twitterUsername: String): Celebrity = {
-    celebrity.copy(firstName = Utils.toOption(firstName),
-      lastName = Utils.toOption(lastName),
-      publicName = Utils.toOption(publicNameStr),
-      description = Utils.toOption(description),
+    celebrity.copy(publicName = Utils.toOption(publicName),
       bio = bio,
       casualName = Utils.toOption(casualName),
       organization = organization,
@@ -202,10 +189,7 @@ trait PostCelebrityAdminEndpoint {
   private def redirectWithValidationErrors(celebrityId: Long,
                                            celebrityEmail: String,
                                            celebrityPassword: String,
-                                           firstName: String,
-                                           lastName: String,
                                            publicName: String,
-                                           description: String,
                                            publishedStatusString: String,
                                            bio: String,
                                            casualName: String,
@@ -215,10 +199,7 @@ trait PostCelebrityAdminEndpoint {
     flash.put("celebrityId", celebrityId)
     flash.put("celebrityEmail", celebrityEmail)
     flash.put("celebrityPassword", celebrityPassword)
-    flash.put("firstName", firstName)
-    flash.put("lastName", lastName)
     flash.put("publicName", publicName)
-    flash.put("description", description)
     flash.put("publishedStatusString", publishedStatusString)
     flash.put("bio", bio)
     flash.put("casualName", casualName)

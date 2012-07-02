@@ -464,7 +464,7 @@ class OrderTests extends UnitFlatSpec
   private def newOrderStack = {
     val buyer  = TestData.newSavedCustomer().copy(name="Will Chan").save()
     val recipient = TestData.newSavedCustomer().copy(name="Erem Boto").save()
-    val celebrity = Celebrity(firstName=Some("George"), lastName=Some("Martin")).save()
+    val celebrity = Celebrity(publicName=Some("George Martin")).save()
     val product = TestData.newSavedProduct(celebrity = Some(celebrity))
     (buyer, recipient, celebrity, product)
   }

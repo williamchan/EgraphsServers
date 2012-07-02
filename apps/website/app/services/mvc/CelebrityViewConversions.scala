@@ -21,8 +21,8 @@ class CelebrityViewConversions(celeb: Celebrity) {
     ChoosePhotoCelebrity(
       name=celeb.publicName.getOrElse("Anonymous"),
       profileUrl=profileUrl,
-      category=celeb.category,
-      categoryRole=celeb.categoryRole,
+      organization=celeb.organization,
+      roleDescription=celeb.roleDescription.getOrElse(""),
       bio=celeb.bio,
       twitterUsername=celeb.twitterUsername
     )
