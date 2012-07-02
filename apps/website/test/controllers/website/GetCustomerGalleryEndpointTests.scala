@@ -15,7 +15,7 @@ class GetCustomerGalleryEndpointTests extends AdminFunctionalTest{
   @Test
   def testRetrievesEmptyGalleryOfCustomer() {
     val userId = db.connected(TransactionSerializable) {
-      TestData.newSavedCustomer()
+      TestData.newSavedCustomer().id
     }
     assertIsOk(GET("/account/" + userId + "/gallery"))
   }
