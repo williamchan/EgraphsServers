@@ -10,8 +10,9 @@ import models.enums.{PrintingOption, WrittenMessageRequest}
 import PrintingOption.HighQualityPrint
 import PrintOptionForm.Params
 import controllers.WebsiteControllers
-import WebsiteControllers.getStorefrontPersonalize
+import WebsiteControllers.{getStorefrontPersonalize, getStorefrontCheckout}
 import SafePlayParams.Conversions._
+import services.Utils
 
 /**
  * Endpoint for serving up the Choose Photo page
@@ -40,21 +41,11 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
         // Make sure there's inventory
         inventoryBatch <- forms.nextInventoryBatchOrRedirect(celebrityUrlSlug, product).right;
 
-        // Make sure we've got a personalize form in storage, or redirect to personalize
-        personalizeForm <- forms.personalizeFormOrRedirectToPersonalizeForm(
-                             celebrityUrlSlug,
-                             productUrlSlug
-                           ).right;
-
-        // Get the validated version of the personalize form so we don't have to do a bunch of .gets
-        validPersonalizeForm <- personalizeForm.errorsOrValidatedForm.left.map { formError =>
-                                  val action = reverse(getStorefrontPersonalize(
-                                    celebrityUrlSlug,
-                                    productUrlSlug
-                                  ))
-
-                                  new Redirect(action.url)
-                                }.right
+        // Make sure we've got a valid personalize form in storage, or redirect to personalize
+        validPersonalizeForm <- forms.validPersonalizeFormOrRedirectToPersonalizeForm(
+                                  celebrityUrlSlug,
+                                  productUrlSlug
+                                ).right
       ) yield {
         val textCelebWillWrite = makeTextForCelebToWrite(
           validPersonalizeForm.writtenMessageRequest,
@@ -93,8 +84,11 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
       ) yield {
         forms.withHighQualityPrint(validPrintOption).save()
 
-        // TODO: redirect to "Checkout As" screen if not logged in
+        // TODO: redirect to "Checkout As" screen if not logged in rather than straight to
+        // checkout.
+        val defaultNextUrl = reverse(getStorefrontCheckout(celebrityUrlSlug, productUrlSlug)).url
 
+        Utils.redirectToClientProvidedTarget(urlIfNoTarget=defaultNextUrl)
       }
     }
   }

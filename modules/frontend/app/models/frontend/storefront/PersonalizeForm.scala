@@ -1,6 +1,6 @@
 package models.frontend.storefront
 
-import models.frontend.forms.{FormError, Field}
+import models.frontend.forms.Field
 
 case class PersonalizeForm (
   actionUrl: String,

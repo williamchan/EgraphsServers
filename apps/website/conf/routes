@@ -94,6 +94,8 @@ GET ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/personalize  Web
 POST ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/personalize WebsiteControllers.postStorefrontPersonalize
 GET ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/review WebsiteControllers.getStorefrontReview
 POST ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/review WebsiteControllers.postStorefrontReview
+GET ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/checkout WebsiteControllers.getStorefrontCheckout
+POST ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/checkout WebsiteControllers.postStorefrontCheckout
 
 ##
 ## Website

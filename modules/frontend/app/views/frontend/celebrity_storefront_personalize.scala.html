@@ -68,7 +68,7 @@
 	      				      <label class="instructions" for="gift">
 	      				      	Is This a Gift? <small>Current guaranteed delivery: @guaranteedDelivery.formatDayAsPlainLanguage</small>
 	      				      </label>
-	      				      @bootstrapInputField(form.isGift) {
+	      				      @tags.html.bootstrap_input_field(form.isGift) {
 	      				        <input id="gift" 
 	      				               type="checkbox"
 	      				               name="@form.isGift.name"
@@ -82,7 +82,7 @@
 	    				    <div class="field non-gift-only" style="@for(checked <- form.isGift if checked) {display: none;}">
 	      				    <div class="clearfix">
 	      				      <label class="instructions" for="your-name">Your Name:</label>
-	      				      @bootstrapInputField(form.recipientName) {
+	      				      @tags.html.bootstrap_input_field(form.recipientName) {
 	        				      <input id="your-name"	        				             
 	        				             type="text"
 	        				             name="@form.recipientName.name"
@@ -95,7 +95,7 @@
 	    				    <div class="field gift-only" style="@for(checked <- form.isGift if !checked) {display: none;}">
 	      				    <div class="clearfix">
 	      				      <label class="instructions" for="recipient-name">Gift Recipient's Name:</label>
-	      				      @bootstrapInputField(form.recipientName) {
+	      				      @tags.html.bootstrap_input_field(form.recipientName) {
 	        				      <input id="recipient-name"
 	        				             type="text"	        				             
 	        				             name="@form.recipientName.name"
@@ -109,7 +109,7 @@
 	    				    <div class="field last gift-only" style="@for(checked <- form.isGift if !checked) {display: none;}">
 	      				    <div class="clearfix">
 	      				      <label class="instructions" for="recipient-email">Gift Recipient's Email:</label>
-	      				      @bootstrapInputField(form.recipientEmail) {
+	      				      @tags.html.bootstrap_input_field(form.recipientEmail) {
 	      				        <input id="recipient-email" 
 	      				               type="text"
 	      				               name="@form.recipientEmail.name"
@@ -130,7 +130,7 @@
 	      				      	@orderSummary.celebrityName Should Write: 
 	      				      	<small>140 character limit.</small> 
 	      				      	<small>All messages are subject to approval.</small></label>
-	                    @bootstrapInputField(form.messageText) {
+	                    @tags.html.bootstrap_input_field(form.messageText) {
 	                      <div id="message-options" class="btn-group" data-toggle="buttons-radio">
 	                        <button type="button"
 	                                value="SignatureWithMessage"
@@ -175,7 +175,7 @@
 	      				        <small>140 character limit.</small>
 	      				        <small>All messages are subject to approval.</small>
     				      		</label>
-	      				      @bootstrapInputField(form.noteToCelebrity) {
+	      				      @tags.html.bootstrap_input_field(form.noteToCelebrity) {
 	      				        <textarea id="your-message" 
 	      				                  name="@form.noteToCelebrity.name"
 								                  rows="8"
@@ -265,24 +265,6 @@
     	</div> <!-- end #main -->
     
     </div> <!-- end #content -->
-}
-
-@dismissableAlert(message: => Html) = {
-	<div class="alert alert-error">
-	  <button type="button" class="close" data-dismiss="alert">&times;</button>
-	  @message
-	</div>
-}
-
-@bootstrapInputField(field: models.frontend.forms.Field[_])(inputBody: => Html) = {
-  <div class="input control-group @field.ifError {error}">
-    @inputBody  
-  	@for(error <- field.error) {
-  	  @dismissableAlert {
-  	    @{/** <strong>Oops!</strong> */}@error
-  	  }
-  	}
-  </div>
 }
 
 @ifSpecificMessageOrDefault(html: => Html) = {

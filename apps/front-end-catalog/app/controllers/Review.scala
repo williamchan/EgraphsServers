@@ -26,7 +26,7 @@ object Review extends Controller
     productName: String = "{product title}",
     celebrityWillWrite: String = "{what he will write}",
     recipientName: String = "{recipient name}",
-    noteToCelebrity: String = "{note to celebrity}",
+    noteToCelebrity: Option[String] = Some("{note to celebrity}"),
     basePrice: org.joda.money.Money = Money.zero(CurrencyUnit.USD),
     guaranteedDelivery: java.util.Date = new util.Date(),
     highQualityPrintParamName: String = "highqualityprintparamname",

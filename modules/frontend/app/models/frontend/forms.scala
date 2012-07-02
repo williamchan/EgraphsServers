@@ -92,10 +92,20 @@ case class Field[+ValueType](
     error.map(error => Html.empty).getOrElse(htmlGenerator)
   }
 
+  def withError(errorMessage: String): Field[ValueType] = {
+    this.copy(error=Some(FormError(errorMessage)))
+  }
+
   //
   // Iterable[ValueType] members
   //
   def iterator: Iterator[ValueType] = {
     values.iterator
+  }
+}
+
+object Field {
+  def empty[T:Manifest](name: String) = {
+    Field[T](name=name, values=None, error=None)
   }
 }

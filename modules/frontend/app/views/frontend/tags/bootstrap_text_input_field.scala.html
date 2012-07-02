@@ -1,0 +1,22 @@
+@(labelText: String, 
+  field: models.frontend.forms.Field[_],
+  hint: String="",
+  size:Option[Int]=None,
+  inputClass: String="",
+  omitName: Boolean=false
+)
+
+  <div class="field">
+    <div class="clearfix">
+      <label class="instructions" for="@field.name">@labelText<small>@hint</small></label>
+      @bootstrap_input_field(field) {
+        <input 
+          id="@field.name" 
+          @if(!omitName) {name="@field.name"}
+          type="text" 
+          value="@field.value"
+          class="@inputClass"
+          @for(sizeValue <- size) {size="@sizeValue"}>      
+      }
+    </div>
+  </div> <!-- End .field (@field.name) -->

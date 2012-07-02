@@ -1,0 +1,13 @@
+@(field: models.frontend.forms.Field[_])(inputBody: => Html)
+
+<div class="input control-group @field.name @field.ifError {error}">
+  @inputBody
+  
+  @{/** Error reporting */}  
+  <div class="alert alert-error @field.ifNotError {hidden}">
+    @for(error <- field.error) {
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      <span class="error-message">@{/** <strong>Oops!</strong> */}@error</span>
+    }
+  </div>
+</div>

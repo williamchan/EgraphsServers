@@ -5,7 +5,7 @@ import com.google.inject.Inject
 import play.mvc.results.Redirect
 import controllers.WebsiteControllers
 import models.{InventoryBatch, Celebrity, Product}
-import controllers.WebsiteControllers.{getStorefrontPersonalize, reverse, getStorefrontChoosePhotoTiled}
+import controllers.WebsiteControllers.{getStorefrontPersonalize, getStorefrontReview, reverse, getStorefrontChoosePhotoTiled}
 import org.joda.money.{CurrencyUnit, Money}
 import models.enums.PrintingOption
 
@@ -60,6 +60,14 @@ class PurchaseForms @Inject()(
     this.withSession(storefrontSession.setting(Key.HighQualityPrint -> doPrint))
   }
 
+  def highQualityPrintOrRedirectToReviewForm(celebrityUrlSlug: String, productUrlSlug: String): Either[Redirect, PrintingOption] = {
+    highQualityPrint.toRight(left= {
+      val redirectAction = reverse(getStorefrontReview(celebrityUrlSlug, productUrlSlug)).url
+
+      new Redirect(redirectAction)
+    })
+  }
+
   def personalizeForm(flashOption: Option[play.mvc.Scope.Flash]=None): Option[PersonalizeForm] = {
     val formReader = formReaders.forPersonalizeForm
 
@@ -70,12 +78,31 @@ class PurchaseForms @Inject()(
 
   def personalizeFormOrRedirectToPersonalizeForm(celebrityUrlSlug: String, productUrlSlug: String)
   : Either[Redirect, PersonalizeForm] = {
-    import WebsiteControllers.getStorefrontPersonalize
 
     personalizeForm().toRight(left= {
       val action = reverse(getStorefrontPersonalize(celebrityUrlSlug, productUrlSlug))
       new Redirect(action.url)
     })
+  }
+
+  def validPersonalizeFormOrRedirectToPersonalizeForm(celebrityUrlSlug: String, productUrlSlug: String)
+  : Either[Redirect, PersonalizeForm.Validated] = {
+    for (
+      personalizeForm <- personalizeFormOrRedirectToPersonalizeForm(
+                              celebrityUrlSlug,
+                              productUrlSlug
+                            ).right;
+      valid <-  personalizeForm.errorsOrValidatedForm.left.map { formError =>
+                  val action = reverse(getStorefrontPersonalize(
+                    celebrityUrlSlug,
+                    productUrlSlug
+                  ))
+
+                  new Redirect(action.url)
+                }.right
+    ) yield {
+      valid
+    }
   }
 
   def withPersonalizeForm(form: PersonalizeForm) = {

@@ -25,7 +25,7 @@ trait StorefrontPersonalizeConsumerEndpoints
     celebFilters.requireCelebrityAndProductUrlSlugs { (celeb, product) =>
       val forms = purchaseFormFactory.formsForStorefront(celeb.id)
 
-      val redirectOrResult = for (
+      for (
         // Make sure the submitted product ID matches the one in the session, otherwise redirect
         // to the Choose Photo screen
         formProductId <- forms.matchProductIdOrRedirectToChoosePhoto(celeb, product).right;
@@ -69,8 +69,6 @@ trait StorefrontPersonalizeConsumerEndpoints
           orderSummary=orderSummary
         )
       }
-
-      redirectOrResult.fold(redirect => redirect, result => result)
     }
   }
 
@@ -84,7 +82,7 @@ trait StorefrontPersonalizeConsumerEndpoints
       val form = formReader.instantiateAgainstReadable(params.asFormReadable)
 
       // Comprehend over a bunch of validation checks
-      val errorOrSuccessRedirect = for (
+      for (
         // Product ID in the url had to match the product currently being ordered,
         // or redirect to choose photo.
         productId <- purchaseForms.matchProductIdOrRedirectToChoosePhoto(celeb, product).right;
@@ -103,8 +101,6 @@ trait StorefrontPersonalizeConsumerEndpoints
 
         Utils.redirectToClientProvidedTarget(urlIfNoTarget=defaultNextUrl)
       }
-
-      errorOrSuccessRedirect.fold(errorRedirect => errorRedirect, successRedirect => successRedirect)
     }
   }
 }

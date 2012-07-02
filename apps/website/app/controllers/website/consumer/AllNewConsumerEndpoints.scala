@@ -7,4 +7,5 @@ trait AllNewConsumerEndpoints
   extends StorefrontChoosePhotoConsumerEndpoints
   with StorefrontPersonalizeConsumerEndpoints
   with StorefrontReviewConsumerEndpoints
+  with StorefrontCheckoutConsumerEndpoints
 { this: Controller => }

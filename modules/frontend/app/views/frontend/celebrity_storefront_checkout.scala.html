@@ -1,9 +1,15 @@
-@()(implicit headerData: models.frontend.header.HeaderData, 
+@(form: models.frontend.storefront.CheckoutFormView,
+  summary: models.frontend.storefront.CheckoutOrderSummary,
+  paymentPublicKey: String 
+)(
+  implicit headerData: models.frontend.header.HeaderData, 
   footerData: models.frontend.footer.FooterData,
   storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs
 )
 
-@import views.frontend.tags.html.storefront_breadcrumbs_responsive
+@import models.frontend.forms.{Field, FormError}
+@import views.frontend.tags.html.{storefront_breadcrumbs_responsive, bootstrap_text_input_field, bootstrap_input_field}
+
 @import views.frontend.tags
 
 @baseBody = {
@@ -12,517 +18,292 @@
       <div id="main" class="sub">
       
         <section id="checkout" class="container" >
-			
-				 @storefront_breadcrumbs_responsive()
-				 		
-  				<header>	
-  				  <h1>Checkout</h1>
-  				  <h2>David Price | First MLB Victory</h2>  				
-  				</header>
-  				  				
-					<div class="col2">
-					
-						<div class="clearfix">
-					
-	    				<form class="main" method="post" action="./">
+      
+         @storefront_breadcrumbs_responsive()
+            
+          <header>  
+            <h1>Checkout</h1>
+            <h2>@summary.celebrityName | @summary.productName</h2>
+          </header>
+                    
+          <div class="col2">
+          
+            <div class="clearfix">
+          
+              <form class="main" method="post" action="./">
 
-	    					<div class="order-overview">
-	    						  
-	    						  <figure>
-	    						  
-	    						  	<img src="/public/images/fpo-egraph.png" alt="fpo-egraph" />
-	    						  
-	    						  	<figcaption class="recepient-information">
-	    						  		A<span>. Recipient Information</span>
-	    						  	</figcaption>
-	    						  	
-	    						  	<figcaption class="egraph-message">
-	    						  		B<span>. Egraph Message</span>	    						  	
-	    						  	</figcaption>
-	    						  	
-	    						  	<figcaption class="egraph-audio">
-	    						  		C<span>. Egraph Audio</span>	    						  	
-	    						  	</figcaption>
-	    						  
-	    						  </figure>
+                <div class="order-overview">
+                    
+                    <figure>
+                    
+                      <img src="/public/images/fpo-egraph.png" alt="fpo-egraph" />
+                    
+                      <figcaption class="recipient-information">
+                        A<span>. Recipient Information</span>
+                      </figcaption>
+                      
+                      <figcaption class="egraph-message">
+                        B<span>. Egraph Message</span>                      
+                      </figcaption>
+                      
+                      <figcaption class="egraph-audio">
+                        C<span>. Egraph Audio</span>                      
+                      </figcaption>
+                    
+                    </figure>
 
-	    						  <div class="order-summary">
-		    				  			    				  		
-		    				  		<div class="celebrity-information">
-		    				  			<h3>David Price</h3>
-		    				  			<h4>First MLB Victory</h4>
-		    				  			<dl>
-		    				  				<dt><strong>A.</strong> Recepients Name</dt>
-		    				  				<dd>Joshua Johnson</dd>
-		    				  				<dt><strong>B.</strong> David Price Will Write</dt>
-		    				  				<dd>Happy Birthday Joshua! Keep swinging for the fences! Lorem ium dolor etsun et tepera.</dd>
-		    				  				<dt><strong>C.</strong> David Price Will Record and Audio Message</dt>
-		    				  			</dl>
-		    				  		</div>			  		
-		    				  	
-		    				  	</div>
-	    						  
-	    					</div> <!-- end .order-overview -->
-	    					
-	    				  <fieldset>
-	    				  
-		    					<h3>Where do you want to ship your Egraph?</h3>
-	    				    
-	    				    <div class="field">
-	      				    <div class="clearfix">
-	      				      <label class="instructions" for="shipping-first-name">First Name:</label>
-	      				      <div class="input">
-	        				      <input id="shipping-first-name" type="text" name="shipping-fname">
-	      				      </div>
-	      				    </div>
-	    				    </div> <!-- end .field -->
+                    <div class="order-summary">
+                                          
+                      <div class="celebrity-information">
+                        <h3>@summary.celebrityName</h3>
+                        <h4>First MLB Victory</h4>
+                        <dl>
+                          <dt><strong>A.</strong> Recipient's Name</dt>
+                          <dd>@summary.recipientName</dd>
+                          <dt><strong>B.</strong> @summary.celebrityName Will Write</dt>
+                          <dd>Happy Birthday Joshua! Keep swinging for the fences! Lorem ium dolor etsun et tepera.</dd>
+                          <dt><strong>C.</strong> @summary.celebrityName Will Record an Audio Message</dt>
+                        </dl>
+                      </div>            
+                    
+                    </div>
+                    
+                </div> <!-- end .order-overview -->
+                
+                @for(shipping <- form.shipping) {
+                  <fieldset>
+                  
+                    <h3>Where do you want to ship your Egraph?</h3>
+                    
+                    @bootstrap_text_input_field("Full Name: ", shipping.fullName)
+                    @bootstrap_text_input_field("Email:", shipping.email)
+                    @bootstrap_text_input_field("Address:", shipping.address1)
+                    @bootstrap_text_input_field("", shipping.address2)
+                    @bootstrap_text_input_field("City:", shipping.city)
 
-	    				    <div class="field">
-	      				    <div class="clearfix">
-	      				      <label class="instructions" for="shipping-last-name">Last Name:</label>
-	      				      <div class="input">
-	        				      <input id="shipping-last-name" type="text" name="shipping-lname">
-	      				      </div>
-	      				    </div>
-	    				    </div> <!-- end .field -->
+                    <div class="field">
+                      <div class="clearfix">
+                        <label class="instructions" for="@shipping.state.name">State:</label>
+                        <div class="input select control-group @shipping.state.ifError {error}">
+                          <select data-placeholder="Choose a state..." id="@shipping.state.name" name="@shipping.state.name" class="chsn-select">
+                            <option value></option>
+                            @tags.geo.html.usstates(selected=shipping.state.value.getOrElse(""))
+                          </select>
+                          @for(error <- shipping.city.error) {
+                            <div class="alert alert-error @shipping.state.ifError {error}">
+                              <button type="button" class="close" data-dismiss="alert">&times;</button>
+                              @error
+                            </div>
+                          }           
+                        </div>
+                      </div>
+                    </div>
 
-	    				    <div class="field">
-	      				    <div class="clearfix">
-	      				      <label class="instructions" for="shipping-phone">Phone:</label>
-	      				      <div class="input">
-	        				      <input id="shipping-phone" type="text" name="shipping-phone">
-	      				      </div>
-	      				    </div>
-	    				    </div> <!-- end .field -->
-	    				    
-	    				    <div class="field">
-	      				    <div class="clearfix">
-	      				      <label class="instructions" for="shipping-email">Email:</label>
-	      				      <div class="input">
-	        				      <input id="shipping-email" type="email" name="shipping-email">
-	      				      </div>
-	      				    </div>
-	    				    </div> <!-- end .field -->
-	    				    
-	    				    <div class="field">
-	      				    <div class="clearfix">
-	      				      <label class="instructions" for="shipping-address">Address:</label>
-	      				      <div class="input">
-		      				      <p>
-		        				      <input id="shipping-address" type="text" name="address">
-		      				      </p>
-		      				      <p>
-		        				      <input id="shipping-address2" type="text" name="shipping-address2">
-		      				      </p>
-	      				      </div>
-	      				    </div>
-	    				    </div> <!-- end .field -->	 
+                    @bootstrap_text_input_field(
+                      "Zip:",
+                       shipping.postalCode,
+                       inputClass="inline",
+                       size=Some(10)                       
+                    )
 
-	    				    <div class="field">
-	      				    <div class="clearfix">
-	      				      <label class="instructions" for="shipping-city">City:</label>
-	      				      <div class="input">
-	        				      <input id="shipping-city" type="text" name="shipping-city">
-	      				      </div>
-	      				    </div>
-	    				    </div> <!-- end .field -->
+                    @{/** Disable shipping type until we support it.
+                    <div class="field">
+                      <div class="clearfix">
+                        <label class="instructions" for="shipping-method">Shipping Method:</label>
+                        <div class="input">
+                          <p>
+                            <select id="shipping-method" name="shipping-method">
+                              <option value="standard">Standard: FREE Arrives 7-14 Days</option>
+                            </select>
+                          </p>
+                          <p><small>Estimated arrival is based on the delivery date of the digital Egraph. You will be notified when the printed Egraph has been shipped. <a href="#">Questions?</a></small></p>
+                        </div>
+                      </div>
+                    </div> <!-- end .field -->*/}
+                                
+                  </fieldset>
+                }
+  
+                <fieldset class="last">
+                
+                  <h3>Billing Information</h3>
 
-	    				    <div class="field">
-	      				    <div class="clearfix">
-	      				      <label class="instructions" for="shipping-state">State:</label>
-	      				      <div class="input">
-												<select id="shipping-state" name="shipping-state">
-													<option value="AL">Alabama</option>
-													<option value="AK">Alaska</option>
-													<option value="AZ">Arizona</option>
-													<option value="AR">Arkansas</option>
-													<option value="CA">California</option>
-													<option value="CO">Colorado</option>
-													<option value="CT">Connecticut</option>
-													<option value="DE">Delaware</option>
-													<option value="FL">Florida</option>
-													<option value="GA">Georgia</option>
-													<option value="HI">Hawaii</option>
-													<option value="ID">Idaho</option>
-													<option value="IL">Illinois</option>
-													<option value="IN">Indiana</option>
-													<option value="IA">Iowa</option>
-													<option value="KS">Kansas</option>
-													<option value="KY">Kentucky</option>
-													<option value="LA">Louisiana</option>
-													<option value="ME">Maine</option>
-													<option value="MD">Maryland</option>
-													<option value="MA">Massachusetts</option>
-													<option value="MI">Michigan</option>
-													<option value="MN">Minnesota</option>
-													<option value="MS">Mississippi</option>
-													<option value="MO">Missouri</option>
-													<option value="MT">Montana</option>
-													<option value="NE">Nebraska</option>
-													<option value="NV">Nevada</option>
-													<option value="NH">New Hampshire</option>
-													<option value="NJ">New Jersey</option>
-													<option value="NM">New Mexico</option>
-													<option value="NY">New York</option>
-													<option value="NC">North Carolina</option>
-													<option value="ND">North Dakota</option>
-													<option value="OH">Ohio</option>
-													<option value="OK">Oklahoma</option>
-													<option value="OR">Oregon</option>
-													<option value="PA">Pennsylvania</option>
-													<option value="RI">Rhode Island</option>
-													<option value="SC">South Carolina</option>
-													<option value="SD">South Dakota</option>
-													<option value="TN">Tennessee</option>
-													<option value="TX">Texas</option>
-													<option value="UT">Utah</option>
-													<option value="VT">Vermont</option>
-													<option value="VA">Virginia</option>
-													<option value="WA" selected>Washington</option>
-													<option value="DC">Washington D.C.</option>
-													<option value="WV">West Virginia</option>
-													<option value="WI">Wisconsin</option>
-													<option value="WY">Wyoming</option>
-												</select>
-	      				      </div>
-	      				    </div>
-	    				    </div> <!-- end .field -->
+                  <div class="field inline @if(form.shipping.isEmpty) {hidden}">
+                    <input type="checkbox"
+                           id="billing-same" 
+                           name="billing-same" 
+                           value="yes" 
+                           @for(value <- form.shippingIsSameAsBilling if value && form.shipping.isDefined) {checked}>
+                    <label for="billing-same">My billing info is the same as my shipping.</label>                   
+                  </div> <!-- end .field.inline-->
 
-	    				    <div class="field">
-	      				    <div class="clearfix">
-	      				      <label class="instructions" for="shipping-zip">Zip:</label>
-	      				      <div class="input">
-	        				      <input id="shipping-zip" type="text" name="shipping-zip" class="inline" size="10">
-	      				      </div>
-	      				    </div>
-	    				    </div> <!-- end .field -->
+                  <div id="billing-info">
+                    @bootstrap_text_input_field("Email:", form.billing.email)
+                    @bootstrap_text_input_field(
+                      "Full name:",
+                      form.billing.fullName,
+                      hint="As it appears on your card"
+                    )
+                    @bootstrap_text_input_field(
+                      "Zip: ", 
+                      form.billing.postalCode,
+                      inputClass="inline",
+                      size=Some(10)
+                    )
+                  </div> <!-- end #billing-info -->
 
-	    				    <div class="field">
-	      				    <div class="clearfix">
-	      				      <label class="instructions" for="shipping-method">Shipping Method:</label>
-	      				      <div class="input">
-		      				      <p>
-			      				      <select id="shipping-method" name="shipping-method">
-			      				      	<option value="standard">Standard: FREE Arrives 7-14 Days</option>
-			      				      </select>
-		      				      </p>
-		      				      <p><small>Estimated arrival is based on the delivery date of the digital Egraph. You will be notified when the printed Egraph has been shipped. <a href="#">Questions?</a></small></p>
-	      				      </div>
-	      				    </div>
-	    				    </div> <!-- end .field -->
-	    				       				  
-	    				  </fieldset>	  
-	
-	    				  <fieldset class="last">
-	    				  
-	    				  	<h3>Billing Information</h3>
-	    				    
-	    				    <div class="field">
-	      				    <div class="clearfix">
-	      				      <label class="instructions" for="card-type">Card Type:</label>
-	      				      <div class="input">
-	        				      <select id="card-type" name="card-type">
-	        				      	<option>Visa</option>
-	        				      	<option>Mastercard</option>
-	        				      	<option>American Express</option>
-	        				      	<option>Discover</option>
-	        				      </select>
-	      				      </div>
-	      				    </div>
-	    				    </div> <!-- end .field -->
+                  @bootstrap_text_input_field(
+                    "Card Number: ",
+                    Field(name="stripe-card-number"),
+                    omitName=true
+                  )
 
-	    				    <div class="field">
-	      				    <div class="clearfix">
-	      				      <label class="instructions" for="card-number">Card Number:</label>
-	      				      <div class="input">
-	        				      <input id="card-number" type="text" name="card-number">
-	      				      </div>
-	      				    </div>
-	    				    </div> <!-- end .field -->	
-
-	    				    <div class="field">
-	      				    <div class="clearfix">
-	      				      <label class="instructions" for="card-exp">Exp. Date:</label>
-	      				      <div class="input">
-	        				      <select id="card-exp" name="card-exp-month" class="inline">
-	        				      	<option value="">Month</option>
-	        				      	<option value="01">January</option>
-	        				      	<option value="02">February</option>
-	        				      </select>
-	        				      <select name="card-exp-year" class="inline">
-	        				      	<option value="">Year</option>
-	        				      	<option value="2016">2016</option>
-	        				      	<option value="2015">2015</option>
-	        				      	<option value="2014">2014</option>
-	        				      </select>
-	      				      </div>
-	      				    </div>
-	    				    </div> <!-- end .field -->	
-	    				    
-	    				    <div class="field add-bottom">
-	      				    <div class="clearfix">
-	      				      <label class="instructions" for="card-cvv">Security Code:</label>
-	      				      <div class="input">
-	        				      <p><input id="card-cvv" type="text" name="card-cvv" class="inline" size="4">
-	        				      <small><a href="#" class="tip">What's this?</a></small></p>
-	      				      </div>
-	      				    </div>
-	    				    </div> <!-- end .field -->	
-	    				    
-	    				    <div class="field inline">
-	    				    	<input type="checkbox" id="billing-same" name="billing-same" value="yes" checked>
-	    				    	<label for="billing-same">My billing address is the same as my shipping address.</label>	    				    	
-	    				    </div> <!-- end .field.inline-->
-	    				    
-	    				    <div id="billing-info">
-	    				    
-		    				    <div class="field">
-		      				    <div class="clearfix">
-		      				      <label class="instructions" for="billing-first-name">First Name:</label>
-		      				      <div class="input">
-		        				      <input id="billing-first-name" type="text" name="billing-fname">
-		      				      </div>
-		      				    </div>
-		    				    </div> <!-- end .field -->
-	
-		    				    <div class="field">
-		      				    <div class="clearfix">
-		      				      <label class="instructions" for="billing-last-name">Last Name:</label>
-		      				      <div class="input">
-		        				      <input id="billing-last-name" type="text" name="billing-lname">
-		      				      </div>
-		      				    </div>
-		    				    </div> <!-- end .field -->
-		    				    
-		    				    <div class="field">
-		      				    <div class="clearfix">
-		      				      <label class="instructions" for="billing-email">Email:</label>
-		      				      <div class="input">
-		        				      <input id="billing-email" type="email" name="billing-email">
-		      				      </div>
-		      				    </div>
-		    				    </div> <!-- end .field -->
-		    				    
-		    				    <div class="field">
-		      				    <div class="clearfix">
-		      				      <label class="instructions" for="billing-address">Address:</label>
-		      				      <div class="input">
-			      				      <p>
-			        				      <input id="billing-address" type="text" name="address">
-			      				      </p>
-			      				      <p>
-			        				      <input id="billing-address2" type="text" name="billing-address2">
-			      				      </p>
-		      				      </div>
-		      				    </div>
-		    				    </div> <!-- end .field -->	 
-	
-		    				    <div class="field">
-		      				    <div class="clearfix">
-		      				      <label class="instructions" for="billing-city">City:</label>
-		      				      <div class="input">
-		        				      <input id="billing-city" type="text" name="billing-city">
-		      				      </div>
-		      				    </div>
-		    				    </div> <!-- end .field -->
-	
-		    				    <div class="field">
-		      				    <div class="clearfix">
-		      				      <label class="instructions" for="billing-state">State:</label>
-		      				      <div class="input">
-													<select id="billing-state" name="billing-state">
-														<option value="AL">Alabama</option>
-														<option value="AK">Alaska</option>
-														<option value="AZ">Arizona</option>
-														<option value="AR">Arkansas</option>
-														<option value="CA">California</option>
-														<option value="CO">Colorado</option>
-														<option value="CT">Connecticut</option>
-														<option value="DE">Delaware</option>
-														<option value="FL">Florida</option>
-														<option value="GA">Georgia</option>
-														<option value="HI">Hawaii</option>
-														<option value="ID">Idaho</option>
-														<option value="IL">Illinois</option>
-														<option value="IN">Indiana</option>
-														<option value="IA">Iowa</option>
-														<option value="KS">Kansas</option>
-														<option value="KY">Kentucky</option>
-														<option value="LA">Louisiana</option>
-														<option value="ME">Maine</option>
-														<option value="MD">Maryland</option>
-														<option value="MA">Massachusetts</option>
-														<option value="MI">Michigan</option>
-														<option value="MN">Minnesota</option>
-														<option value="MS">Mississippi</option>
-														<option value="MO">Missouri</option>
-														<option value="MT">Montana</option>
-														<option value="NE">Nebraska</option>
-														<option value="NV">Nevada</option>
-														<option value="NH">New Hampshire</option>
-														<option value="NJ">New Jersey</option>
-														<option value="NM">New Mexico</option>
-														<option value="NY">New York</option>
-														<option value="NC">North Carolina</option>
-														<option value="ND">North Dakota</option>
-														<option value="OH">Ohio</option>
-														<option value="OK">Oklahoma</option>
-														<option value="OR">Oregon</option>
-														<option value="PA">Pennsylvania</option>
-														<option value="RI">Rhode Island</option>
-														<option value="SC">South Carolina</option>
-														<option value="SD">South Dakota</option>
-														<option value="TN">Tennessee</option>
-														<option value="TX">Texas</option>
-														<option value="UT">Utah</option>
-														<option value="VT">Vermont</option>
-														<option value="VA">Virginia</option>
-														<option value="WA" selected>Washington</option>
-														<option value="DC">Washington D.C.</option>
-														<option value="WV">West Virginia</option>
-														<option value="WI">Wisconsin</option>
-														<option value="WY">Wyoming</option>
-													</select>
-		      				      </div>
-		      				    </div>
-		    				    </div> <!-- end .field -->
-	
-		    				    <div class="field">
-		      				    <div class="clearfix">
-		      				      <label class="instructions" for="billing-zip">Zip:</label>
-		      				      <div class="input">
-		        				      <input id="billing-zip" type="text" name="billing-zip" class="inline" size="10">
-		      				      </div>
-		      				    </div>
-		    				    </div> <!-- end .field -->	    				    	
-
-		    				    <div class="field">
-		      				    <div class="clearfix">
-		      				      <label class="instructions" for="billing-phone">Phone:</label>
-		      				      <div class="input">
-		        				      <input id="billing-phone" type="text" name="billing-phone">
-		      				      </div>
-		      				    </div>
-		    				    </div> <!-- end .field -->
-		    				    
-		    				    <div class="field">
-		      				    <div class="clearfix">
-		      				      <label class="instructions" for="billing-email">Email:</label>
-		      				      <div class="input">
-		        				      <input id="billing-email" type="email" name="billing-email">
-		      				      </div>
-		      				    </div>
-		    				    </div> <!-- end .field -->
-	    				    
-	    				    </div> <!-- end #billing-info -->
-	    				  
-	    				  </fieldset>
-	    				  
-	    				  <fieldset class="submit">
-	    				  
-	    				  	<div class="clearfix">
-	    				  
-	    				 			@tags.html.arrow_button(caption="Finalize Order", target="#", classes="button right")
-	    				 		
-	    				  	</div>
-	    				  
-	    				  </fieldset>
-	    				  
-	    				</form> <!-- end .main -->
-	    				
-	    				<aside>
-	    				
-	    					<div class="order-overview clearfix">
-	    						  
-	    						  <figure>
-	    						  
-	    						  	<img src="/public/images/fpo-egraph.png" alt="fpo-egraph" />
-	    						  
-	    						  	<figcaption class="recepient-information">
-	    						  		A<span>. Recipient Information</span>
-	    						  	</figcaption>
-	    						  	
-	    						  	<figcaption class="egraph-message">
-	    						  		B<span>. Egraph Message</span>	    						  	
-	    						  	</figcaption>
-	    						  	
-	    						  	<figcaption class="egraph-audio">
-	    						  		C<span>. Egraph Audio</span>	    						  	
-	    						  	</figcaption>
-	    						  
-	    						  </figure>
-	    						  	
-		    				  	<div class="order-summary">
-		    				  	
-		    				  		<h2>Summary</h2>
-		    				  		
-		    				  		<div class="celebrity-information">
-		    				  			<h3>David Price</h3>
-		    				  			<h4>First MLB Victory</h4>
-		    				  			<dl class="last">
-		    				  				<dt><strong>A.</strong> Recepients Name</dt>
-		    				  				<dd>Joshua Johnson</dd>
-		    				  				<dt><strong>B.</strong> David Price Will Write</dt>
-		    				  				<dd>Happy Birthday Joshua! Keep swinging for the fences! Lorem ium dolor etsun et tepera.</dd>
-		    				  				<dt><strong>C.</strong> David Price Will Record and Audio Message</dt>
-		    				  			</dl>
-		    				  		</div>
-		    				  		
-		    				  		<div class="order-totals">		    				  		
-												<table>
-													<tr>
-														<th>Subtotal</th>
-														<td>$50.00</td>
-													</tr>
-													<tr>
-														<th>Shipping</th>
-														<td>$0.00</td>
-													</tr>
-													<tr>
-														<th>Tax</th>
-														<td>$_.__</td>
-													</tr>
-													<tr class="total">
-														<th>Total</th>
-														<td>$50.00</td>
-													</tr>
-												</table>    		    				  		
-		    				  		</div>			  		
-		    				  	
-		    				  	</div>
-		    				  
-	    					</div> <!-- end .order-overview -->
-	    				
-	    				</aside>
-	  			
-						</div> <!-- end .clearfix -->
-						
-						<footer class="clearfix">
-						
-							<p>Secured by: <a href="#" class="logo-entrust">Entrust</a></p>
-							
-							<p>Accepted payment types:</p>
-							
-							<ul>
-								<li class="visa">Visa</li>
-								<li class="mastercard">Mastercard</li>
-								<li class="amex">American Express</li>
-								<li class="discover">Discover</li>
-							</ul>
-								
-						</footer>
-  			
-  				</div> <!-- end .col2 -->
-  			
+                  <div class="field stripe-card-expiry" >
+                    <div class="clearfix">
+                      <label class="instructions" for="card-exp">Exp. Date:</label>
+                      <div class="input select card-expiry">
+                        <select id="card-exp-month" class="inline chsn-select" data-placeholder="Month">
+                          <option value></option>
+                          <option value="01">January</option>
+                          <option value="02">February</option>
+                          <option value="03">March</option>
+                          <option value="04">April</option>
+                          <option value="05">May</option>
+                          <option value="06">June</option>
+                          <option value="07">July</option>
+                          <option value="08">August</option>
+                          <option value="09">September</option>
+                          <option value="10">October</option>
+                          <option value="11">November</option>
+                          <option value="12">December</option>
+                        </select>
+                        <select id="card-exp-year" name="card-exp-year" class="inline chsn-select" data-placeholder="Year">
+                          <option value></option>
+                          @for(year <- 2012 until 2020) {
+                            <option value="@year">@year</option>
+                          }
+                        </select>
+                        <div class="alert alert-error hidden">
+                          <button type="button" class="close" data-dismiss="alert">&times;</button>
+                          <span class="error-message">Expiry date error</span>
+                        </div>
+                      </div>            
+                    </div>
+                  </div> <!-- end .field -->  
+                                    
+                  <div class="field add-bottom">
+                    <div class="clearfix">
+                      <label class="instructions" for="card-cvv">Security Code:</label>
+                      <div class="input card-cvv">
+                        <p>
+                          <input id="card-cvv" type="text" name="card-cvv" class="inline" size="4">
+                          <small><a href="#" class="tip">What's this?</a></small>
+                          <div class="alert alert-error">
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                            <span class="error-message">Expiry date error</span>
+                          </div>
+                        </p>
+                      </div>
+                    </div>
+                  </div> <!-- end .field -->  
+                                  
+                </fieldset>
+                
+                <fieldset class="submit">
+                
+                  <div class="clearfix">
+                
+                    @tags.html.arrow_button(caption="Finalize Order",
+                     target="#",
+                     classes="button right")
+                  
+                  </div>
+                
+                </fieldset>
+                
+              </form> <!-- end .main -->
+              
+              <aside>
+              
+                <div class="order-overview clearfix">
+                    
+                    <figure>
+                    
+                      <img src="/public/images/fpo-egraph.png" alt="fpo-egraph" />
+                    
+                      <figcaption class="recipient-information">
+                        A<span>. Recipient Information</span>
+                      </figcaption>
+                      
+                      <figcaption class="egraph-message">
+                        B<span>. Egraph Message</span>                      
+                      </figcaption>
+                      
+                      <figcaption class="egraph-audio">
+                        C<span>. Egraph Audio</span>                      
+                      </figcaption>
+                    
+                    </figure>
+                      
+                    <div class="order-summary">
+                    
+                      <h2>Summary</h2>
+                      
+                      <div class="celebrity-information">
+                        <h3>@summary.celebrityName</h3>
+                        <h4>First MLB Victory</h4>
+                        <dl class="last">
+                          <dt><strong>A.</strong> Recipient's Name</dt>
+                          <dd>@summary.recipientName</dd>
+                          <dt><strong>B.</strong> @summary.celebrityName Will Write</dt>
+                          <dd>Happy Birthday Joshua! Keep swinging for the fences! Lorem ium dolor etsun et tepera.</dd>
+                          <dt><strong>C.</strong> @summary.celebrityName Will Record an Audio Message</dt>
+                        </dl>
+                      </div>
+                      
+                      <div class="order-totals">                      
+                        <table>
+                          <tr>
+                            <th>Subtotal</th>
+                            <td>$50.00</td>
+                          </tr>
+                          <tr>
+                            <th>Shipping</th>
+                            <td>$0.00</td>
+                          </tr>
+                          <tr>
+                            <th>Tax</th>
+                            <td>$_.__</td>
+                          </tr>
+                          <tr class="total">
+                            <th>Total</th>
+                            <td>$50.00</td>
+                          </tr>
+                        </table>                          
+                      </div>            
+                    
+                    </div>
+                  
+                </div> <!-- end .order-overview -->
+              
+              </aside>
+          
+            </div> <!-- end .clearfix -->
+            
+            @tags.html.credit_cards_footer()        
+          </div> <!-- end .col2 -->
+        
         </section> <!-- end #checkout -->
 
-    	</div> <!-- end #main -->
+      </div> <!-- end #main -->
     
     </div> <!-- end #content -->
 }
 
 @base_celebrity_storefront_template(
   title="Checkout",
+
   jsMain="pages/celebrity-storefront-checkout",
+
   body=baseBody
 )
