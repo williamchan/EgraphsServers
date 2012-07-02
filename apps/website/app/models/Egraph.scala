@@ -12,7 +12,7 @@ import services.signature.{SignatureBiometricsError, YesMaamSignatureBiometricSe
 import services._
 import audio.AudioConverter
 import db.{FilterOneTable, Schema, KeyedCaseClass, Saves}
-import graphics.{Handwriting, HandwritingPen, GraphicsSource}
+import graphics.{RasterGraphicsSource, Handwriting, HandwritingPen, GraphicsSource}
 import java.text.SimpleDateFormat
 import controllers.WebsiteControllers
 import controllers.website.GetCelebrityProductEndpoint
@@ -43,6 +43,7 @@ case class EgraphServices @Inject() (
   xyzmoVerifyUserStore: XyzmoVerifyUserStore,
   blobs: Blobs,
   graphicsSourceFactory: () => GraphicsSource,
+  rasterGraphicsSourceFactory: () => RasterGraphicsSource,
   voiceBiometrics: VoiceBiometricService,
   signatureBiometrics: SignatureBiometricService,
   storyServicesProvider: Provider[EgraphStoryServices]
@@ -165,6 +166,14 @@ case class Egraph(
     )
   }
 
+  def thumbnail(productPhoto: => BufferedImage=order.product.photoImage):EgraphImage = {
+    EgraphImage(
+      ingredientFactory=imageIngredientFactory(order.product, productPhoto),
+      graphicsSource = services.rasterGraphicsSourceFactory(),
+      blobPath=blobKeyBase + "/image"
+    )
+  }
+
   /**
    * Returns a function that retrieves all the necessary (expensive) data for drawing an Egraph.
    * The function will only be evaluated if the required image doesn't already exist on the blobstore.
@@ -241,6 +250,10 @@ case class Egraph(
 
   def isPublishable: Boolean = {
     egraphState == ApprovedByAdmin
+  }
+
+  def isPublished: Boolean = {
+    (egraphState == Published)
   }
 
   def publish(admin: Administrator): Egraph = {
@@ -564,6 +577,8 @@ class EgraphStore @Inject() (schema: Schema) extends Saves[Egraph] with SavesCre
     )
   }
 
+
+
   //
   // Saves[Egraph] methods
   //
@@ -706,6 +721,17 @@ sealed trait EgraphFrame {
   /** Height of the image in pixels as displayed on the egraph page */
   def imageHeightPixels: Int
 
+  /** Width of the image in pixels as displayed on the gallery page */
+  def thumbnailWidthPixels: Int
+
+  /** Height of the image in pixels as displayed on the gallery page **/
+  def thumbnailHeightPixels: Int
+
+  /** Width of image in pixels as display on gallery page when a pending order **/
+  def pendingWidthPixels: Int
+
+  /** Height of image in pixels as display on gallery page when a pending order **/
+  def pendingHeightPixels: Int
   //
   // Implemented members
   //
@@ -777,6 +803,12 @@ object PortraitEgraphFrame extends EgraphFrame {
 
   override val imageWidthPixels = 377
   override val imageHeightPixels = 526
+
+  override val thumbnailWidthPixels = 350
+  override val thumbnailHeightPixels = 525
+
+  override val pendingWidthPixels = 170
+  override val pendingHeightPixels = 225
 }
 
 /** The default egraph landscape photo frame */
@@ -789,4 +821,10 @@ object LandscapeEgraphFrame extends EgraphFrame {
 
   override val imageWidthPixels = 595
   override val imageHeightPixels = 377
+
+  override val thumbnailWidthPixels = 510
+  override val thumbnailHeightPixels = 410
+
+  override val pendingWidthPixels = 230
+  override val pendingHeightPixels = 185
 }

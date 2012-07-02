@@ -159,3 +159,9 @@ object SVGZGraphicsSource {
     new SVGZGraphicsSource(new SVGGraphicsSource(width, height))
   }
 }
+
+object RasterGraphicsSource {
+  def apply(width: Int, height: Int): RasterGraphicsSource = {
+    new RasterGraphicsSource(width, height)
+  }
+}

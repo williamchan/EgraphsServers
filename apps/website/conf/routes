@@ -103,9 +103,12 @@ GET     /account/recover/confirmation                    WebsiteControllers.getR
 GET     /account/reset                                   WebsiteControllers.getResetPassword
 POST    /account/reset                                   WebsiteControllers.postResetPassword
 GET     /facebooklogin/callback                          WebsiteControllers.getFacebookLoginCallback
+GET     /account/{<[0-9]+>galleryCustomerId}/gallery     WebsiteControllers.getCustomerGallery
+
 
 # Order and Egraph pages
 GET     /orders/{<[0-9]+>orderId}/confirm                WebsiteControllers.getOrderConfirmation
+POST    /orders/{<[0-9]+>orderId}/configure              WebsiteControllers.postOrderPrivacy
 GET     /egraph/{<[0-9]+>orderId}                        WebsiteControllers.getEgraph
 
 # Celebrity pages

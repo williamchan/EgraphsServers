@@ -4,13 +4,13 @@ import play.mvc.{Before, Controller}
 import models._
 import play.mvc.Http.Request
 import com.google.inject.Inject
-import play.mvc.results.Forbidden
+import play.mvc.results.{NotFound, Forbidden}
 
 /**
  * Provides functions whose callback parameters are only called when the egraphs database
  * found Accounts that match provided credentials.
  */
-class AccountRequestFilters @Inject() (accountStore: AccountStore) {
+class AccountRequestFilters @Inject() (accountStore: AccountStore, customerStore: CustomerStore) {
 
   /**
    * Calls the `continue` callback parameter only if the basic-auth user and password values
@@ -29,6 +29,17 @@ class AccountRequestFilters @Inject() (accountStore: AccountStore) {
 
       case Left(_: AccountAuthenticationError) =>
         new Forbidden("Email/password information was incorrect.")
+    }
+  }
+
+  /**
+   * Validate that customer exists
+   */
+
+  def requireValidCustomerId(customerId: Long)(continue: Customer => Any)(implicit request: Request) = {
+    customerStore.findById(customerId) match {
+      case None => new NotFound("Customer not found.")
+      case Some(customer) => continue(customer)
     }
   }
 }

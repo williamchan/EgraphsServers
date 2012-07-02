@@ -1,11 +1,13 @@
 package models
 
 import enums._
+import frontend.egraphs.{OrderDetails, PendingEgraphViewModel, FulfilledEgraphViewModel}
 import java.sql.Timestamp
 import org.joda.money.Money
 import services.db.{FilterOneTable, KeyedCaseClass, Schema, Saves}
 import services.Finance.TypeConversions._
 import services._
+import blobs.AccessPolicy
 import com.google.inject._
 import mail.Mail
 import payment.{Charge, Payment}
@@ -15,6 +17,9 @@ import models.CashTransaction.{PurchaseRefund, EgraphPurchase}
 import org.apache.commons.mail.{Email, HtmlEmail}
 import scala.util.Random
 import java.util.Date
+import com.google.inject.Inject
+import java.text.SimpleDateFormat
+import services.http.PlayConfig
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -341,6 +346,28 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
     )
   }
 
+  def getEgraphsAndOrders(recipientId: Long) : Query[(Order, Option[Egraph])] = {
+    join(schema.orders, schema.egraphs.leftOuter) (
+      (order, egraph) =>
+        where(order.recipientId === recipientId)
+          select(order, egraph)
+          on(order.id === egraph.map(_.orderId))
+    )
+  }
+
+  def findByCustomerId(customerId: Long, filters: FilterOneTable[Order]*): Query[Order] = {
+    import schema.orders
+
+    from(orders)(order =>
+      where(
+          order.recipientId === customerId and
+          FilterOneTable.reduceFilters(filters, order)
+      )
+        select (order)
+        orderBy (order.created asc)
+    )
+  }
+
   def findByFilter(filters: FilterOneTable[Order]*): Query[Order] = {
     import schema.orders
 
@@ -494,5 +521,63 @@ case class OrderAudioPrompt(private val audioPromptTemplate: String,
       (templateField.name, paramValue)
     }
     pairs.toMap
+  }
+}
+
+/**
+ * Factory object for creating ViewModels from Orders and Option(Egraphs)
+ */
+
+object GalleryOrderFactory {
+
+  protected val dateFormat = new SimpleDateFormat("MMM dd, yyyy K:mma")
+
+  def makeFulfilledEgraphViewModel(orders: Iterable[(Order, Option[Egraph])], fbAppId: String) :
+    Iterable[Option[FulfilledEgraphViewModel]] = {
+    for ((order:Order, optionEgraph:Option[Egraph]) <- orders) yield {
+      optionEgraph.map( egraph => {
+        val product = order.product
+        val rawImage = egraph.thumbnail(product.photoImage).scaledToWidth(product.frame.thumbnailWidthPixels)
+        new FulfilledEgraphViewModel(
+          fbAppId = fbAppId,
+          redirectURI = "http://www.egraphs.com/account/" + order.recipient.username,
+          orderId = order.id,
+          orientation = product.frame.name.toLowerCase,
+          productUrl = "http://www.egraphs.com/" + product.celebrity.urlSlug.getOrElse() + "/" + product.urlSlug,
+          productPublicName = product.celebrity.publicName,
+          productTitle = product.storyTitle,
+          productDescription = product.description,
+          thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Private),
+          downloadUrl = Option("http://www.egraphs.com/egraph/" + order.id),
+          publicStatus = order.privacyStatus.name,
+          signedTimestamp = dateFormat.format(egraph.created)
+        )
+      })
+    }
+  }
+
+  def makePendingEgraphViewModel(orders: Iterable[(Order, Option[Egraph])]) : Iterable[PendingEgraphViewModel] = {
+    for ((order:Order, optionEgraph:Option[Egraph]) <- orders) yield {
+      val product = order.product
+      val imageUrl = product.photo.resizedWidth(product.frame.pendingWidthPixels).getSaved(AccessPolicy.Public).url
+      PendingEgraphViewModel(
+        orderId = order.id,
+        orientation = product.frame.name.toLowerCase,
+        productUrl = "http://www.egraphs.com/" + product.celebrity.urlSlug + "/" + product.urlSlug,
+        productTitle = product.storyTitle,
+        productPublicName = product.celebrity.publicName,
+        productDescription = product.description,
+        thumbnailUrl = imageUrl,
+        orderStatus = order.reviewStatus.name,
+        orderDetails = new OrderDetails(
+          orderDate = dateFormat.format(order.created),
+          orderNumber = order.id,
+          price = order.amountPaid.toString(),
+          statusText = "",
+          shippingMethod = "",
+          UPSNumber = ""
+        )
+      )
+    }
   }
 }

@@ -2,6 +2,11 @@
 
 require:
     - egraphs -> frontend HEAD
+    #Including so we can build mock controllers with ajax interfaces.
+    - net.debasishg -> sjson_2.8.1 0.12:
+        exclude:
+            # Exclude scala because its included with play-scala
+            - org.scala-lang -> scala-library 2.8.1
 
 repositories:
     - egraphsModules:

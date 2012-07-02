@@ -7,7 +7,7 @@ import util.Random
 import java.text.SimpleDateFormat
 import org.joda.time.DateTime
 import models._
-import enums.PublishedStatus
+import enums.{EgraphState, PublishedStatus}
 import play.libs.Codec
 
 /**
@@ -85,7 +85,7 @@ object TestData {
   }
 
   private def newProduct(celebrity: Celebrity): Product = {
-    celebrity.newProduct.copy(name = "prod" + random.nextLong(), description = "some prod", priceInCurrency = 1).withPublishedStatus(PublishedStatus.Published)
+    celebrity.newProduct.copy(name = "prod" + random.nextLong(), description = "some prod").withPublishedStatus(PublishedStatus.Published)
   }
 
   def newSavedProduct(celebrity: Option[Celebrity] = None): Product = {
@@ -119,6 +119,20 @@ object TestData {
       }
     }
   }
+
+  def newFulfilledOrder(customer: Customer) : (Order, Egraph) = {
+    val order = customer.buy(TestData.newSavedProduct()).save()
+    (order, order.newEgraph
+      .withAssets(TestConstants.signingAreaSignatureStr, Some(TestConstants.signingAreaMessageStr), Codec.decodeBASE64(TestConstants.voiceStr()))
+      .save()
+      .withYesMaamBiometricServices
+      .verifyBiometrics
+      .withEgraphState(EgraphState.Published)
+      .save())
+
+  }
+
+
 
   def newSavedEgraph(orderOption: Option[Order] = None): Egraph = {
     val order = orderOption match {
