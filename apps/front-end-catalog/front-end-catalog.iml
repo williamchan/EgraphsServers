@@ -3,15 +3,18 @@
   <component name="FacetManager">
     <facet type="scala" name="Scala">
       <configuration>
-        <option name="compilerLibraryLevel" value="Global" />
+        <option name="fsc" value="true" />
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" inherit-compiler-output="true">
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
+    <output url="file:///production/front-end-catalog/.out" />
+    <output-test url="file:///test/front-end-catalog" />
     <exclude-output />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/app" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/tmp" isTestSource="false" />
     </content>
     <content url="file://$MODULE_DIR$/../../modules/frontend">
       <sourceFolder url="file://$MODULE_DIR$/../../modules/frontend/app" isTestSource="false" />

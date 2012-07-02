@@ -1,18 +1,14 @@
 package controllers.website
 
-import services.http.{AccountRequestFilters, SafePlayParams, ControllerMethod}
+import services.http.{SafePlayParams, AccountRequestFilters, ControllerMethod}
+import services.Utils
 import play.mvc.Controller
 import models._
 import controllers.WebsiteControllers
-import enums.{PrivacyStatus, OrderReviewStatus, EgraphState, PublishedStatus}
+import enums.{PrivacyStatus, EgraphState}
 import models.frontend.egraphs._
-import play.mvc.Scope.Session
 import scala.Some
-import models.Egraph
-import services.blobs.AccessPolicy
-import scala.Some
-import scala.Some
-import java.text.SimpleDateFormat
+import services.mvc.ImplicitHeaderAndFooterData
 
 /**
  * Controller for displaying customer galleries. Galleries serve as a "wall of egraphs".
@@ -26,7 +22,7 @@ import java.text.SimpleDateFormat
  **/
 
 
-private[controllers] trait GetCustomerGalleryEndpoint { this: Controller =>
+private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
   protected def controllerMethod: ControllerMethod
   protected def customerStore: CustomerStore
   protected def administratorStore: AdministratorStore
@@ -55,7 +51,6 @@ private[controllers] trait GetCustomerGalleryEndpoint { this: Controller =>
         sessionGalleryControlOption,
         Some(OtherGalleryControl)
       )
-
       //Pop off control with highest precedence
       val galleryControl = galleryControlPrecedence.flatten.head
 

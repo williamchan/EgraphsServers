@@ -1,4 +1,8 @@
-@(username: String, egraphs: List[models.frontend.egraphs.EgraphViewModel], controlRenderer: models.frontend.egraphs.GalleryControlRenderer)(implicit session: play.mvc.Scope.Session)
+@(username: String, egraphs: List[models.frontend.egraphs.EgraphViewModel], controlRenderer: models.frontend.egraphs.GalleryControlRenderer)(
+implicit session: play.mvc.Scope.Session,
+headerData: models.frontend.header.HeaderData,
+footerData: models.frontend.footer.FooterData
+)
 @import views.frontend.Utils
 @import models.frontend.egraphs._
 
