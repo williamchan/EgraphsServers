@@ -21,7 +21,7 @@ class PersonalizeForm(
   // Field values and validations
   //
   val recipientChoice = field(Params.IsGift).validatedBy { paramValues =>
-    checkField(paramValues).isRecipientChoice
+    checkField(paramValues).isGift
   }
 
   val recipientName = field(Params.RecipientName).validatedBy { paramValues =>

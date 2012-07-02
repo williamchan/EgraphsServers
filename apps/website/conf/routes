@@ -91,6 +91,8 @@ GET ${consumer_base}/{celebrityUrlSlug}/photos       WebsiteControllers.getStore
 GET ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}  WebsiteControllers.getStorefrontChoosePhotoCarousel
 POST ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/next  WebsiteControllers.postStorefrontChoosePhoto
 GET ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/personalize  WebsiteControllers.getStorefrontPersonalize
+POST ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/personalize/next WebsiteControllers.postStorefrontPersonalize
+GET ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/review WebsiteControllers.getStorefrontReview
 
 ##
 ## Website

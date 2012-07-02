@@ -2,7 +2,7 @@ package utils
 
 import com.google.inject.Inject
 import services.http._
-import forms.purchase.PurchaseFormFactory
+import forms.purchase.{PurchaseFormReaders, PurchaseFormFactory}
 import services.mail.Mail
 import services.payment.Payment
 import models.{InventoryBatchQueryFilters, EgraphQueryFilters, OrderQueryFilters}
@@ -33,6 +33,7 @@ case class TestWebsiteControllers @Inject()(
   inventoryBatchQueryFilters: InventoryBatchQueryFilters,
   dbSession: DBSession,
   purchaseFormFactory: PurchaseFormFactory,
+  purchaseFormReaders: PurchaseFormReaders,
   @PlayConfig playConfig: Properties,
   facebookAppId: String,
   formChecks: FormChecks,

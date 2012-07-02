@@ -16,6 +16,7 @@ import com.google.inject.{Provider, Inject}
 import services._
 import org.squeryl.Query
 import org.squeryl.dsl.ManyToMany
+import java.util
 
 case class ProductServices @Inject() (
   store: ProductStore,
@@ -254,6 +255,12 @@ case class Product(
     }
     val numOrders = services.orderStore.countOrders(inventoryBatchIds)
     (totalInventory - numOrders, activeInventoryBatches)
+  }
+
+  def nextInventoryBatchToEnd: Option[InventoryBatch] = {
+    val batches = services.inventoryBatchStore.getActiveInventoryBatches(this).toSeq
+
+    batches.sortWith((batch1, batch2) => batch1.endDate.before(batch2.endDate)).headOption
   }
 
   /** Returns the remaining inventory in this product's batch */

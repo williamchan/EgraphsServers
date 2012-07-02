@@ -65,9 +65,3 @@ private[consumer] trait GetStorefrontChoosePhotoConsumerEndpoint
     }
   }
 }
-
-private[consumer] object GetStorefrontChoosePhotoConsumerEndpoint {
-  object ChoosePhotoViewingOption {
-    // Fill this with portrait and landscape
-  }
-}

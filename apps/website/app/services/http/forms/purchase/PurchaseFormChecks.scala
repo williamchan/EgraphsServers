@@ -49,18 +49,13 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
     }
   }
 
-  /**
-   * Returns a [[models.enums.RecipientChoice]] on the right if the provided parameters
-   * mapped to a valid one.
-   */
-  def isRecipientChoice
+  def isGift
   : Either[FormError, RecipientChoice] =
   {
     for (
-      param <- check.isSomeValue(toValidate, requiredError).right;
-      recipientChoice <- check.isSomeValue(RecipientChoice(param), "Invalid recipient choice").right
+      isGift <- check.isChecked(toValidate.headOption).right
     ) yield {
-      recipientChoice
+      if (isGift) RecipientChoice.Other else RecipientChoice.Self
     }
   }
 
@@ -118,12 +113,12 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
       case SpecificMessage =>
         for (
           writtenMessage <- check.isSomeValue(toValidate, requiredError).right;
-          _ <- check.isBetweenInclusive(
-                 minWrittenMessageChars,
-                 maxWrittenMessageChars,
-                 writtenMessage.length,
-                 writtenMessageLengthErrorString
-               ).right
+          messageOfCorrectLength <- check.isBetweenInclusive(
+                                      minWrittenMessageChars,
+                                      maxWrittenMessageChars,
+                                      writtenMessage.length,
+                                      writtenMessageLengthErrorString
+                                    ).right
         ) yield {
           Some(writtenMessage)
         }
@@ -201,7 +196,7 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
 
 object PurchaseFormChecks {
   private[purchase] val requiredError = "Required"
-  private[purchase] val nameLengthErrorString = "Must be between two and 30 characters"  
+  private[purchase] val nameLengthErrorString = "Must be between 2 and 30 characters"
   private[purchase] val minWrittenMessageChars = 5
   private[purchase] val maxWrittenMessageChars = 140
   private[purchase] val minNoteToCelebChars = minWrittenMessageChars
@@ -212,7 +207,7 @@ object PurchaseFormChecks {
   }
 
   private[purchase] val noteToCelebLengthErrorString = {
-    textAreaLengthErrorString(minNoteToCelebChars, maxNoteToCelebChars)
+    textAreaLengthErrorString(minNoteToCelebChars, maxNoteToCelebChars) + " if present "
   }
 
   private[purchase] def textAreaLengthErrorString(min: Int, max: Int): String = {

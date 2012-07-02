@@ -48,6 +48,10 @@ trait FormField[+ValueType] {
     validate.left.toOption
   }
 
+  def independentError: Option[FormError] = {
+    validate.left.toOption.filter(error => !error.isInstanceOf[DependentFieldError])
+  }
+
   //
   // Private members
   //
@@ -57,6 +61,10 @@ trait FormField[+ValueType] {
   }
 
   private[forms] def write[T](writeable: FormWriteable[T]): FormWriteable[T] = {
-    writeable.withData(name -> stringsToValidate)
+    if (!stringsToValidate.isEmpty && stringsToValidate.head != "") {
+      writeable.withData(name -> stringsToValidate)
+    } else {
+      writeable
+    }
   }
 }

@@ -11,6 +11,7 @@
 
 @import views.frontend.tags.html.storefront_breadcrumbs_responsive
 @import views.frontend.tags
+@import models.frontend.storefront.PersonalizeMessageOption
 @import models.frontend.storefront.PersonalizeMessageOption.{SpecificMessage, AnythingHeWants, SignatureOnly}
 @import frontend.formatting.MoneyFormatting.Conversions._
 @import frontend.formatting.DateFormatting.Conversions._
@@ -19,8 +20,6 @@
   Egraphs.page.celeb = {name: "@orderSummary.celebrityName"};
   Egraphs.page.isGift = @form.isGift.value.getOrElse(false);
 }
-
-
 
 @baseBody = {
     <div id="content" class="top" role="main">
@@ -88,7 +87,7 @@
 	        				             type="text"
 	        				             name="@form.recipientName.name"
 	        				             value="@form.recipientName.value"
-                               @for(checked <- form.isGift if checked) {disabled}>	      				        
+                               @for(checked <- form.isGift if checked) {disabled}>
                      	}
 	      				    </div>
 	    				    </div> <!-- end .field -->
@@ -101,7 +100,8 @@
 	        				             type="text"	        				             
 	        				             name="@form.recipientName.name"
 	        				             value="@form.recipientName.value"
-	        				             @for(checked <- form.isGift if !checked) {disabled}>
+	        				             @for(checked <- form.isGift if !checked) {disabled}
+	        				             @if(form.isGift.value.isEmpty) {disabled}>
 	      				      }
 	      				    </div>
 	    				    </div> <!-- end .field -->
@@ -130,35 +130,36 @@
 	      				      	@orderSummary.celebrityName Should Write: 
 	      				      	<small>140 character limit.</small> 
 	      				      	<small>All messages are subject to approval.</small></label>
-	                    @bootstrapInputField(form.noteToCelebrity) {
+	                    @bootstrapInputField(form.messageText) {
 	                      <div id="message-options" class="btn-group" data-toggle="buttons-radio">
 	                        <button type="button"
-	                                value="specific"
-	                                class="btn btn-primary btn-custom-radio @if(form.messageOption.value == Some(SpecificMessage)) {active}">
+	                                value="SignatureWithMessage"
+	                                class="btn btn-primary btn-custom-radio @ifSpecificMessageOrDefault {active}">
 	                        	A specific<br /> message
 	                        </button>
 	                        <button type="button" 
-	                                value="anything" 
+	                                value="CelebrityChoosesMessage" 
 	                                class="btn btn-primary btn-custom-radio @if(form.messageOption.value == Some(AnythingHeWants)) {active}">
                           	Anything he<br /> wants
                         	</button>
 	                        <button type="button"
-	                                value="signature"
+	                                value="SignatureOnly"
 	                                class="btn btn-primary btn-custom-radio @if(form.messageOption.value == Some(SignatureOnly)) {active}">
                         		Signature<br /> only
 	                        </button>
 	                      </div>
 	      				        <div id="egraph-message"
-	      				             style="@if(form.messageOption.value != Some(SpecificMessage)) {display:none}">
+	      				             style="@ifNotSpecificMessageOrDefault {display:none}">
 	      				          <textarea id="egraph-message-text"
-	      				                    rows="8" 
+	      				                    name="@form.messageText.name"
+	      				                    rows="8"
 	      				                    cols="1">@form.messageText.value</textarea>
 	      				          <p class="align-right"><small><a href="#" class="tip">How do I know it's really him?</a></small></p>
 	      				        </div>
 	      				        <input type="hidden"
 	      				               id="message-type"
 	      				               name="@form.messageOption.name"
-	      				               value="@form.messageOption.value">
+	      				               value="@for(value <- form.messageOption) {@value.paramValue}">
 	      				      }
 	      				    </div>
 	    				    </div> <!-- end .field -->
@@ -282,6 +283,24 @@
   	  }
   	}
   </div>
+}
+
+@ifSpecificMessageOrDefault(html: => Html) = {
+	@{
+		val specificMessageSet = Set(Some(SpecificMessage: PersonalizeMessageOption), None)
+		if(specificMessageSet.contains(form.messageOption.value)) {
+			html
+		}
+	}
+}
+
+@ifNotSpecificMessageOrDefault(html: => Html) = {
+	@{
+		val specificMessageSet = Set(Some(SpecificMessage: PersonalizeMessageOption), None)
+		if(!specificMessageSet.contains(form.messageOption.value)) {
+			html
+		}
+	}
 }
 
 @base_celebrity_storefront_template(
