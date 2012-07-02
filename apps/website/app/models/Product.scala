@@ -14,7 +14,6 @@ import play.Play
 import services.blobs.AccessPolicy
 import com.google.inject.{Provider, Inject}
 import services._
-import scala.Predef._
 import org.squeryl.Query
 import org.squeryl.dsl.ManyToMany
 
@@ -45,7 +44,7 @@ case class Product(
   signingOriginY: Int = 0,
   signingAreaW: Int = Product.defaultSigningAreaW,
   signingAreaH: Int = Product.defaultSigningAreaW,
-  photoKey: Option[String] = None,
+  photoKey: Option[String] = None, // todo: rename to _photoKey
   _iconKey: Option[String] = None,
   _publishedStatus: String = PublishedStatus.Unpublished.name,
   created: Timestamp = Time.defaultTimestamp,

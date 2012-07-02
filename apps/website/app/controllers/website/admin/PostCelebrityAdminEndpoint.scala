@@ -24,6 +24,8 @@ trait PostCelebrityAdminEndpoint {
   protected def accountStore: AccountStore
 
   /**
+   * This code has become Frankenstein. Refactor to use services.http.forms.Form
+   *
    * First validates inputs, and either redirects with error messages or creates a Celebrity.
    *
    * @return a redirect either to the Create Celebrity page with form errors or to
@@ -37,13 +39,21 @@ trait PostCelebrityAdminEndpoint {
                          publicName: String,
                          description: String,
                          publishedStatusString: String,
-                         profileImage: Option[File] = None) = postController() {
+                         bio: String,
+                         casualName: String,
+                         organization: String,
+                         roleDescription: String,
+                         twitterUsername: String,
+                         profileImage: Option[File] = None,
+                         landingPageImage: Option[File] = None,
+                         logoImage: Option[File] = None) = postController() {
       adminFilters.requireAdministratorLogin { admin =>
         val isCreate = (celebrityId == 0)
         val tmp = if (isCreate) new Celebrity() else celebrityStore.findById(celebrityId).get
 
         val publicNameStr = if (publicName.isEmpty) firstName + " " + lastName else publicName
-        val celebrity = celebrityWithValues(tmp, firstName = firstName, lastName = lastName, publicNameStr = publicNameStr, description = description)
+        val celebrity = celebrityWithValues(tmp, firstName = firstName, lastName = lastName, publicNameStr = publicNameStr, description = description,
+          bio = bio, casualName = casualName, organization = organization, roleDescription = roleDescription, twitterUsername = twitterUsername)
         val celebrityUrlSlug = celebrity.urlSlug
 
         // Account validation, including email and password validations and extant account validations
@@ -72,6 +82,8 @@ trait PostCelebrityAdminEndpoint {
         }
 
         Validation.required("Description", description)
+        Validation.required("Short Bio", bio)
+        Validation.required("Organization", organization)
 
         // Name validations
         val isNameRequirementSatisfied = !publicName.isEmpty || (!firstName.isEmpty && !lastName.isEmpty)
@@ -97,29 +109,54 @@ trait PostCelebrityAdminEndpoint {
           }
         }
 
-          // publishedStatusString validations
-          val publishedStatus = PublishedStatus(publishedStatusString) match {
-            case Some(providedStatus) =>
-              providedStatus
-            case None =>
-              Validation.addError("Error setting celebrity's published status, please contact support", "")
-              PublishedStatus.Unpublished
+        // landingPageImage validations and prepare to persist landingPageImage file
+        val landingPageImageOption = landingPageImage match {
+          case None => None
+          case Some(imageFile) => {
+            val parsedImage = ImageUtil.parseImage(imageFile)
+            parsedImage.map(image => {
+              val (width, height) = (image.getWidth, image.getHeight)
+              Validation.isTrue("Landing Page Image must be at least " + Celebrity.minLandingPageImageWidth + " in width and " + Celebrity.minLandingPageImageHeight + " in height - resolution was " + width + "x" + height,
+                width >= Celebrity.minLandingPageImageWidth && height >= Celebrity.minLandingPageImageHeight)
+            })
+            parsedImage
           }
+        }
 
-          if (!validationErrors.isEmpty) {
-            redirectWithValidationErrors( celebrityId,
-                                          celebrityEmail,
-                                          celebrityPassword,
-                                          firstName,
-                                          lastName,
-                                          publicName,
-                                          description,
-                                          publishedStatusString)
+        // logo validations and prepare to persist logo file
+        val logoImageImageOption = logoImage match {
+          case None => None
+          case Some(imageFile) => {
+            val parsedImage = ImageUtil.parseImage(imageFile)
+            parsedImage.map(image => {
+              val (width, height) = (image.getWidth, image.getHeight)
+              Validation.isTrue("Logo Image must be at least " + Celebrity.minLogoWidth + " in width and " + Celebrity.minLogoWidth + " in height - resolution was " + width + "x" + height,
+                width >= Celebrity.minLogoWidth && height >= Celebrity.minLogoWidth)
+              Validation.isTrue("Logo Image must be square. Resolution was " + width + "x" + height, width == height)
+            })
+            parsedImage
+          }
+        }
 
-          } else {
-            val savedCelebrity = celebrity.withPublishedStatus(publishedStatus).save()
-            // Celebrity must have been previously saved before saving with assets that live in blobstore
-            if (profileImage.isDefined) savedCelebrity.saveWithProfilePhoto(profileImage.get)
+        // publishedStatusString validations
+        val publishedStatus = PublishedStatus(publishedStatusString) match {
+          case Some(providedStatus) => providedStatus
+          case None =>
+            Validation.addError("Error setting celebrity's published status, please contact support", "")
+            PublishedStatus.Unpublished
+        }
+
+        if (!validationErrors.isEmpty) {
+          redirectWithValidationErrors(
+            celebrityId = celebrityId, celebrityEmail = celebrityEmail, celebrityPassword = celebrityPassword,
+            firstName = firstName, lastName = lastName, publicName = publicName, description = description,
+            publishedStatusString = publishedStatusString,
+            bio = bio, casualName = casualName, organization = organization, roleDescription = roleDescription, twitterUsername = twitterUsername)
+
+        } else {
+          val savedCelebrity = celebrity.withPublishedStatus(publishedStatus).save()
+          // Celebrity must have been previously saved before saving with assets that live in blobstore
+          if (profileImage.isDefined) savedCelebrity.saveWithProfilePhoto(profileImage.get)
 
           if (isCreate) {
 
@@ -133,6 +170,7 @@ trait PostCelebrityAdminEndpoint {
             email.setMsg(views.Application.email.html.celebrity_created_email(celebrity = savedCelebrity, email = celebrityEmail).toString().trim())
             mail.send(email)
           }
+          savedCelebrity.saveWithImageAssets(landingPageImageOption, logoImageImageOption)
 
           new Redirect(GetCelebrityAdminEndpoint.url(celebrityId = savedCelebrity.id).url + "?action=preview")
         }
@@ -143,11 +181,22 @@ trait PostCelebrityAdminEndpoint {
                                   firstName: String,
                                   lastName: String,
                                   publicNameStr: String,
-                                  description: String): Celebrity = {
+                                  description: String,
+                                  bio: String,
+                                  casualName: String,
+                                  organization: String,
+                                  roleDescription: String,
+                                  twitterUsername: String): Celebrity = {
     celebrity.copy(firstName = Utils.toOption(firstName),
       lastName = Utils.toOption(lastName),
       publicName = Utils.toOption(publicNameStr),
-      description = Utils.toOption(description))
+      description = Utils.toOption(description),
+      bio = bio,
+      casualName = Utils.toOption(casualName),
+      organization = organization,
+      roleDescription = Utils.toOption(roleDescription),
+      twitterUsername = Utils.toOption(twitterUsername)
+    )
   }
 
   private def redirectWithValidationErrors(celebrityId: Long,
@@ -157,7 +206,12 @@ trait PostCelebrityAdminEndpoint {
                                            lastName: String,
                                            publicName: String,
                                            description: String,
-                                           publishedStatusString: String): Redirect = {
+                                           publishedStatusString: String,
+                                           bio: String,
+                                           casualName: String,
+                                           organization: String,
+                                           roleDescription: String,
+                                           twitterUsername: String): Redirect = {
     flash.put("celebrityId", celebrityId)
     flash.put("celebrityEmail", celebrityEmail)
     flash.put("celebrityPassword", celebrityPassword)
@@ -166,6 +220,11 @@ trait PostCelebrityAdminEndpoint {
     flash.put("publicName", publicName)
     flash.put("description", description)
     flash.put("publishedStatusString", publishedStatusString)
+    flash.put("bio", bio)
+    flash.put("casualName", casualName)
+    flash.put("organization", organization)
+    flash.put("roleDescription", roleDescription)
+    flash.put("twitterUsername", twitterUsername)
     if (celebrityId == 0) {
       WebsiteControllers.redirectWithValidationErrors(GetCreateCelebrityAdminEndpoint.url())
     } else {

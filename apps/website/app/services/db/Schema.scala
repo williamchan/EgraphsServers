@@ -52,7 +52,8 @@ class Schema @Inject()(
     declare(
       celebrity.urlSlug is (unique),
       celebrity.isFeatured is (indexed),
-      celebrity.description is (dbType("varchar(255)"))
+      celebrity.description is (dbType("varchar(255)")),
+      celebrity.bio is (dbType("text"))
     )
   )
 

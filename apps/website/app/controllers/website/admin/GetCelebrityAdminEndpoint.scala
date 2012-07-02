@@ -5,7 +5,7 @@ import services.Utils
 import services.http.{AdminRequestFilters, ControllerMethod}
 import models.{AccountStore, CelebrityStore}
 import controllers.website.GetCelebrityEndpoint
-import play.mvc.results.{NotFound, Redirect}
+import play.mvc.results.NotFound
 
 private[controllers] trait GetCelebrityAdminEndpoint {
   this: Controller =>
@@ -28,6 +28,11 @@ private[controllers] trait GetCelebrityAdminEndpoint {
             case _ => {
               flash.put("celebrityId", celebrity.id)
               flash.put("celebrityEmail", account.email)
+              flash.put("bio", celebrity.bio)
+              flash.put("casualName", celebrity.casualName.getOrElse(""))
+              flash.put("organization", celebrity.organization)
+              flash.put("roleDescription", celebrity.roleDescription.getOrElse(""))
+              flash.put("twitterUsername", celebrity.twitterUsername.getOrElse(""))
               flash.put("firstName", celebrity.firstName.get)
               flash.put("lastName", celebrity.lastName.get)
               flash.put("publicName", celebrity.publicName.get)

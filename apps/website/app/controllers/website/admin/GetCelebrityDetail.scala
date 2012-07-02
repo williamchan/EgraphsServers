@@ -14,14 +14,17 @@ object GetCelebrityDetail {
       (paramName: String) => paramName match {
         case "celebrityId" => flash.get("celebrityId")
         case "celebrityEmail" => flash.get("celebrityEmail")
+        case "bio" => flash.get("bio")
+        case "casualName" => flash.get("casualName")
+        case "description" => flash.get("description")
         case "firstName" => flash.get("firstName")
         case "lastName" => flash.get("lastName")
+        case "organization" => flash.get("organization")
         case "publicName" => flash.get("publicName")
-        case "description" => flash.get("description")
-        case "publishedStatusString" =>
-          Option(flash.get("publishedStatusString")).getOrElse(PublishedStatus.Unpublished.toString)
-        case _ =>
-          Option(flash.get(paramName)).getOrElse("")
+        case "publishedStatusString" => Option(flash.get("publishedStatusString")).getOrElse(PublishedStatus.Unpublished.toString)
+        case "roleDescription" => flash.get("roleDescription")
+        case "twitterUsername" => flash.get("twitterUsername")
+        case _ => Option(flash.get(paramName)).getOrElse("")
       }
     }
     // Render the page

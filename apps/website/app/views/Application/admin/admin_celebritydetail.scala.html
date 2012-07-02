@@ -28,6 +28,14 @@
   @celebrity.map(c => c.profilePhoto.resizedWidth(200).getSaved(services.blobs.AccessPolicy.Public).url).getOrElse("")
 }
 
+@landingPageImage = {
+  @celebrity.map(c => c.landingPageImage.resizedWidth(400).getSaved(services.blobs.AccessPolicy.Public).url).getOrElse("")
+}
+
+@logoImage = {
+  @celebrity.map(c => c.logoImage.resizedWidth(40).getSaved(services.blobs.AccessPolicy.Public).url).getOrElse("")
+}
+
 @body = {
 <div class="admin-content">
   <h1>
@@ -40,25 +48,54 @@
           @authenticityToken()
           <input id="celebrityId" name="celebrityId" type="hidden" value="@fields("celebrityId")">
           <input id="publishedStatus" name="publishedStatusString" type="hidden" value="@fields("publishedStatusString")">
-          <legend>Celebrity Details</legend>
-
+          <legend>Account Details</legend>
           @formField(id="celebrityEmail", label="E-mail address", inputType="text", editable=isCreate, width="span4", fields=fields)
-
           @formField(id="celebrityPassword", label="Password", inputType="text", editable=isCreate, width="span4", fields=fields)
-
+        </fieldset>
+        <fieldset>
+          <legend>Celebrity Details</legend>
           @formField(id="firstName", label="First Name", inputType="text", width="span4", fields=fields)
-
           @formField(id="lastName", label="Last Name", inputType="text", width="span4", fields=fields)
 
           @formField(id="publicName", label="Public Name", inputType="text", width="span4", help=Some(publicNameHelp), fields=fields)
           @publicNameHelp = { Celebrity's popular name, eg "A-Rod" for Alex Rodriguez. Default is "First Last" }
 
+          @formField(id="casualName", label="Casual Name", inputType="text", width="span4", help=Some(casualNameHelp), fields=fields)
+          @casualNameHelp = { e.g. "David" instead of "David Price" }
+
           @formField(id="description", label="Description", inputType="text", width="span4", fields=fields)
 
-          @formField(id="profileImage", label="Profile Photo", inputType="file", width="span8", help=Some(profileHelp), fields=fields)
-          @profileHelp = { Must be a 200x200 JPG or PNG }
-          <button class="btn toggle" data-toggle="toggle" id="publish-button" type="button">Published</button>
+          @formField(id="organization", label="Organization", inputType="text", width="span4", help=Some(organizationHelp), fields=fields)
+          @organizationHelp = { e.g. "Major League Baseball" }
 
+          @formField(id="roleDescription", label="Role Description", inputType="text", width="span4", help=Some(roleHelp), fields=fields)
+          @roleHelp = { e.g. "Pitcher, Tampa Bay Rays" }
+
+          <div class="clearfix">
+            <label for="bio">Short Bio</label>
+            <div class="input">
+              <textarea class="xlarge" id="bio" name="bio" rows="3">@fields("bio")</textarea>
+            </div>
+          </div>
+
+          @formField(id="twitterUsername", label="Twitter Username", inputType="text", width="span4", fields=fields)
+
+        </fieldset>
+        <fieldset>
+          <legend>Images</legend>
+          @formField(id="profileImage", label="Profile Photo", inputType="file", width="span8", help=Some(profileImageHelp), fields=fields)
+          @profileImageHelp = { Must be a 200x200 JPG or PNG. }
+
+          @formField(id="landingPageImage", label="Landing Page Image", inputType="file", width="span8", help=Some(landingPageImageHelp), fields=fields)
+          @landingPageImageHelp = { Must be at least 1500x556. Should be center-balanced photo of celebrity. }
+
+          @formField(id="logoImage", label="Team/Org Logo", inputType="file", width="span8", help=Some(logoImageHelp), fields=fields)
+          @logoImageHelp = { Must be PNP of square dimensions. Logo of team or organization. }
+
+        </fieldset>
+        <fieldset>
+          <legend>Publish</legend>
+          <button class="btn toggle" data-toggle="toggle" id="publish-button" type="button">Published</button>
           <div class="actions">
             <button type="submit" id="submit-button" class="btn primary fade in">Save</button>
             <button type="reset" id="reset-button" class="btn primary fade in">Reset</button>
@@ -69,6 +106,10 @@
       <div class="span2 profile-thumbnail" >
         <legend>Current Profile</legend>
         <img src="@profilePhoto">
+        <legend>Current Landing Page Image</legend>
+        <img src="@landingPageImage">
+        <legend>Current Logo</legend>
+        <img src="@logoImage">
       </div>
     </div>
   </div>

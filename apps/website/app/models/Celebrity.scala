@@ -10,6 +10,7 @@ import com.google.inject.{Provider, Inject}
 import org.squeryl.Query
 import services._
 import java.awt.image.BufferedImage
+import models.Celebrity.CelebrityWithImage
 
 
 /**
@@ -34,15 +35,21 @@ case class CelebrityServices @Inject() (
  */
 case class Celebrity(id: Long = 0,
                      apiKey: Option[String] = None,
-                     description: Option[String] = None,
-                     firstName: Option[String] = None,
-                     lastName: Option[String] = None,
+                     description: Option[String] = None,                            // unnecessary?
+                     firstName: Option[String] = None,                              // unnecessary?
+                     lastName: Option[String] = None,                               // unnecessary?
                      publicName: Option[String] = None,
-                     profilePhotoUpdated: Option[String] = None,
+                     casualName: Option[String] = None,                             // e.g. "David" instead of "David Price"
+                     organization: String = "",                                     // e.g. "Major League Baseball"
+                     bio: String = "",
+                     roleDescription: Option[String] = None,                        // e.g. "Pitcher, Red Sox"
+                     twitterUsername: Option[String] = None,
+                     profilePhotoUpdated: Option[String] = None, // todo: rename to _profilePhotoKey
                      _enrollmentStatus: String = EnrollmentStatus.NotEnrolled.name,
                      isFeatured: Boolean = false,
-                     roleDescription: Option[String] = None, // e.g. "Pitcher, Red Sox"
                      _publishedStatus: String = PublishedStatus.Unpublished.name,
+                     _landingPageImageKey: Option[String] = None,
+                     _logoImageKey: Option[String] = None,
                      created: Timestamp = Time.defaultTimestamp,
                      updated: Timestamp = Time.defaultTimestamp,
                      services: CelebrityServices = AppConfig.instance[CelebrityServices]
@@ -151,14 +158,6 @@ case class Celebrity(id: Long = 0,
     "{This should be the category role}"
   }
 
-  def bio: String = {
-    "{This should be the bio}"
-  }
-
-  def twitterUsername: Option[String] = {
-    Some("DAVIDprice14")
-  }
-
   /**
    * Saves the celebrity entity after first uploading the provided image
    * data as the master copy for the Celebrity's profile. The data should be in
@@ -171,14 +170,10 @@ case class Celebrity(id: Long = 0,
   def saveWithProfilePhoto(imageData: Array[Byte]): (Celebrity, ImageAsset) = {
     val celebrityToSave = this.copy(profilePhotoUpdated = Some(Time.toBlobstoreFormat(Time.now)))
     val assetName = celebrityToSave.profilePhotoAssetNameOption.get
-    val image = ImageAsset(
-      imageData, keyBase, assetName, ImageAsset.Png, services=services.imageAssetServices.get
-    )
-
+    val image = ImageAsset(imageData, keyBase, assetName, ImageAsset.Png, services=services.imageAssetServices.get)
     // Upload the image then save the entity, confident that the resulting entity
     // will have a valid master image.
     image.save(AccessPolicy.Public)
-
     (celebrityToSave.save(), image)
   }
 
@@ -191,6 +186,56 @@ case class Celebrity(id: Long = 0,
       .flatMap( assetName => Some(ImageAsset(keyBase, assetName, ImageAsset.Png, services=services.imageAssetServices.get)) )
       .getOrElse(defaultProfile)
   }
+
+  def withLandingPageImage(imageData: Array[Byte]): CelebrityWithImage = {
+    val newImageKey = "landing_" + Time.toBlobstoreFormat(Time.now)
+    CelebrityWithImage(
+      celebrity=this.copy(_landingPageImageKey=Some(newImageKey)),
+      image=ImageAsset(imageData, keyBase, newImageKey, ImageAsset.Png, services.imageAssetServices.get)
+    ).save()
+  }
+  def landingPageImage: ImageAsset = {
+    _landingPageImageKey.flatMap(theKey => Some(ImageAsset(keyBase, theKey, ImageAsset.Png, services=services.imageAssetServices.get))) match {
+      case Some(imageAsset) => imageAsset
+      case None => defaultLandingPageImage
+    }
+  }
+
+  def withLogoImage(imageData: Array[Byte]): CelebrityWithImage = {
+    val newImageKey = "logo_" + Time.toBlobstoreFormat(Time.now)
+    CelebrityWithImage(
+      celebrity=this.copy(_logoImageKey=Some(newImageKey)),
+      image=ImageAsset(imageData, keyBase, newImageKey, ImageAsset.Png, services.imageAssetServices.get)
+    ).save()
+  }
+  def logoImage: ImageAsset = {
+    _logoImageKey.flatMap(theKey => Some(ImageAsset(keyBase, theKey, ImageAsset.Png, services=services.imageAssetServices.get))) match {
+      case Some(imageAsset) => imageAsset
+      case None => defaultLogoImage
+    }
+  }
+
+  def saveWithImageAssets(/*profileImage: Option[BufferedImage], */ landingPageImage: Option[BufferedImage], logoImage: Option[BufferedImage]): Celebrity = {
+    import ImageUtil.Conversions._
+    // todo: refactor profile image saving to here
+    var celebrity = landingPageImage match {
+      case None => this
+      case Some(image) => {
+        // todo(wchan): crop image?
+        val landingPageImageBytes = image.asByteArray(ImageAsset.Jpeg)
+        withLandingPageImage(landingPageImageBytes).save().celebrity
+      }
+    }
+    celebrity = logoImage match {
+      case None => this
+      case Some(image) => {
+        val iconImageBytes = image.asByteArray(ImageAsset.Jpeg)
+        celebrity.withLogoImage(iconImageBytes).save().celebrity
+      }
+    }
+    celebrity
+  }
+
 
   /**Creates a new Product associated with the celebrity. The product is not yet persisted. */
   def newProduct: Product = {
@@ -257,7 +302,6 @@ case class Celebrity(id: Long = 0,
    */
   private def keyBase = {
     require(id > 0, "Can not determine blobstore key when no id exists yet for this entity in the relational database")
-
     "celebrity/" + id
   }
 
@@ -268,6 +312,38 @@ case class Celebrity(id: Long = 0,
     imageType=ImageAsset.Png,
     services=services.imageAssetServices.get
   )
+  lazy val defaultLandingPageImage = ImageAsset(
+    play.Play.getFile("public/images/1500x556_blank.jpg"),
+    keyBase="defaults/celebrity",
+    name="landingPageImage",
+    imageType=ImageAsset.Png,
+    services=services.imageAssetServices.get
+  )
+  lazy val defaultLogoImage = ImageAsset(
+    play.Play.getFile("public/images/40x40_blank.jpg"),
+    keyBase="defaults/celebrity",
+    name="logoImage",
+    imageType=ImageAsset.Png,
+    services=services.imageAssetServices.get
+  )
+}
+
+object Celebrity {
+  val defaultLandingPageImageDimensions = Dimensions(width = minLandingPageImageWidth, height = minLandingPageImageHeight)
+  val landingPageImageAspectRatio = minLandingPageImageWidth.toDouble / minLandingPageImageHeight
+  val defaultLogoDimensions = Dimensions(width = minLogoWidth, height = minLogoWidth)
+  val minLandingPageImageWidth = 1500
+  val minLandingPageImageHeight = 556
+  val minLogoWidth = 40
+
+  // Similar to ProductWithPhoto
+  case class CelebrityWithImage(celebrity: Celebrity, image: ImageAsset) {
+    def save(): CelebrityWithImage = {
+      val savedImage = image.save(AccessPolicy.Public)
+      val saved = celebrity.save()
+      CelebrityWithImage(saved, savedImage)
+    }
+  }
 }
 
 class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {
@@ -354,18 +430,24 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
   override def defineUpdate(theOld: Celebrity, theNew: Celebrity) = {
     updateIs(
       theOld.apiKey := theNew.apiKey,
+      theOld.bio := theNew.bio,
+      theOld.casualName := theNew.casualName,
       theOld.description := theNew.description,
       theOld.firstName := theNew.firstName,
-      theOld.lastName := theNew.lastName,
-      theOld.publicName := theNew.publicName,
-      theOld.urlSlug := theNew.urlSlug,
-      theOld.profilePhotoUpdated := theNew.profilePhotoUpdated,
-      theOld._enrollmentStatus := theNew._enrollmentStatus,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated,
       theOld.isFeatured := theNew.isFeatured,
+      theOld.lastName := theNew.lastName,
+      theOld.organization := theNew.organization,
+      theOld.profilePhotoUpdated := theNew.profilePhotoUpdated,
+      theOld.publicName := theNew.publicName,
       theOld.roleDescription := theNew.roleDescription,
-      theOld._publishedStatus := theNew._publishedStatus
+      theOld.twitterUsername := theNew.twitterUsername,
+      theOld.urlSlug := theNew.urlSlug,
+      theOld._enrollmentStatus := theNew._enrollmentStatus,
+      theOld._publishedStatus := theNew._publishedStatus,
+      theOld._landingPageImageKey := theNew._landingPageImageKey,
+      theOld._logoImageKey := theNew._logoImageKey,
+      theOld.created := theNew.created,
+      theOld.updated := theNew.updated
     )
   }
 
