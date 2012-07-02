@@ -9,7 +9,10 @@ import models.frontend.forms.Field
 import play.mvc.results.RenderJson
 import sjson.json.Serializer
 
-object Account extends Controller {
+/**
+ * Test controller for viewing permutations of the account settings page.
+ */
+object Account extends Controller with DefaultHeaderAndFooterData {
 
   val roles = Map ("other" -> OtherGalleryControl,
                         "admin" -> AdminGalleryControl,

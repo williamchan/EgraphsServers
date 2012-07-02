@@ -161,6 +161,83 @@ button  {
 .align-left { text-align: left; }
 .align-right { text-align: right; }
 
+/* Modal Overrides */
+
+.modal.egraphs {
+
+	width: 890px;
+	margin-left: -485px;	
+	margin-top: -295px;
+	padding: 15px 40px;
+	background-color: @offWhite; 
+	
+	.modal-header {
+	
+		position: relative;
+		padding: 20px 0px;
+		border-bottom-color: lighten(@gray, 50%);
+		
+		h2 {
+			font-size: 40px;
+			line-height: 1em;
+			font-weight: 100;
+			margin-bottom: 0;
+		}
+	
+		.close {
+		
+			.opacity(75);
+			float: none;
+			position: absolute;
+			right: -28px;
+			top: -10px;
+			font-weight: 100;
+			font-size: 40px;
+			line-height: 1em;
+			color: @orange;
+			
+			&:hover { .opacity(100); }
+			
+		}
+	
+	}
+	
+	.modal-body {
+	
+		max-height: 650px;
+		padding: 40px 0;
+		border-top: 1px solid @white;		
+		
+		.wrap {
+		
+			width: 94%;
+			margin: 0 auto;
+			
+			figure {
+				margin: 0;
+				padding: 0;
+				float: left;
+				width: 60%;
+			}
+			
+			> div {
+				
+				float: right;
+				width: 35%;
+				padding: 60px 0;
+				
+				> .btn { margin-right: 10px; }
+				
+				.btn { margin-bottom: 20px; }
+				
+			}
+			
+		}
+		
+	}
+	
+}
+
 /* !Top */
 
 #top {

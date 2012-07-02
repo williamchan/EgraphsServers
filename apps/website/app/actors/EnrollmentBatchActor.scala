@@ -68,7 +68,7 @@ case class EnrollmentBatchActor @Inject()(db: DBSession,
     val isSuccessfulEnrollment = isSuccessfulSignatureEnrollment && isSuccessfulVoiceEnrollment
     enrollmentBatch.copy(isSuccessfulEnrollment = Some(isSuccessfulEnrollment)).save()
 
-    val celebrity = celebrityStore.findById(enrollmentBatch.celebrityId).get
+    val celebrity = celebrityStore.get(enrollmentBatch.celebrityId)
     if (isSuccessfulEnrollment) {
       celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
     } else {

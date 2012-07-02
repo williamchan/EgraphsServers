@@ -20,13 +20,20 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   import services.AppConfig.instance
   import services.AppConfig.annotatedInstance
 
-  val adminIdKey: String = "admin"
-  val customerIdKey: String = "customer"
-  val redirectUponLogin: String = "redirectUponLogin"
+  /** Use EgraphsSession instead */
+  @Deprecated val adminIdKey: String = "admin"
+
+  /** Use EgraphsSession instead */
+  @Deprecated val customerIdKey: String = "customer"
+
+  /** Use EgraphsSession instead */
+  @Deprecated val redirectUponLogin: String = "redirectUponLogin"
 
   // Provide endpoint dependencies
   override protected val playConfig = annotatedInstance[PlayConfig, Properties]
   override protected val facebookAppId = annotatedInstance[FacebookAppId, String]
+
+  override protected def egraphsSessionFactory: () => EgraphsSession = instance[() => EgraphsSession]
 
   override protected def customerLoginForms = instance[CustomerLoginFormFactory]
   override protected def accountSettingsForms = instance[AccountSettingsFormFactory]

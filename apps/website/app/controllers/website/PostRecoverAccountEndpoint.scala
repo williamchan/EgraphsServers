@@ -40,7 +40,7 @@ private[controllers] trait PostRecoverAccountEndpoint {
       // save Account with new resetPasswordKey (and also gets the Customer so we can write a personalized email)
       val (account, customer) = dbSession.connected(TransactionSerializable) {
         val account = accountOption.get.withResetPasswordKey.save()
-        val customer = customerStore.findById(account.customerId.get).get
+        val customer = customerStore.get(account.customerId.get)
         (account, customer)
       }
 

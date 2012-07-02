@@ -28,10 +28,10 @@ private[controllers] trait GetCelebrityAdminEndpoint {
             case _ => {
               flash.put("celebrityId", celebrity.id)
               flash.put("celebrityEmail", account.email)
-              flash.put("firstName", celebrity.firstName.get)
-              flash.put("lastName", celebrity.lastName.get)
-              flash.put("publicName", celebrity.publicName.get)
-              flash.put("description", celebrity.description.get)
+              flash.put("firstName", celebrity.firstName.getOrElse(""))
+              flash.put("lastName", celebrity.lastName.getOrElse(""))
+              flash.put("publicName", celebrity.publicName.getOrElse(""))
+              flash.put("description", celebrity.description.getOrElse(""))
               flash.put("publishedStatusString", celebrity.publishedStatus.toString)
 
               GetCelebrityDetail.getCelebrityDetail(isCreate = false, celebrity = Some(celebrity))

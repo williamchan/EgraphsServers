@@ -12,4 +12,5 @@ trait AllWebsiteEndpoints extends GetRootEndpoint
   with AllConsumerEndpoints
   with AllAdminEndpoints
   with AllWebsiteExampleEndpoints
-  with PostBuyDemoProductEndpoint { this: Controller =>}
+  with PostBuyDemoProductEndpoint
+{ this: Controller =>}

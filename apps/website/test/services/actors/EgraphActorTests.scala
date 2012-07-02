@@ -10,7 +10,7 @@ import services.{Utils, AppConfig}
 import models.EgraphStore
 import akka.util.TestKit
 import org.scalatest.BeforeAndAfterAll
-import utils.{TestData, ClearsDatabaseAndValidationBefore, TestConstants}
+import utils.{TestData, ClearsDatabaseAndValidationBefore}
 import models.enums.EgraphState
 
 class EgraphActorTests extends UnitFlatSpec
@@ -38,8 +38,8 @@ with TestKit {
   }
 
   it should "process Egraph" in {
-    val egraph1 = db.connected(TransactionSerializable) { TestData.newSavedEgraph() }
-    val egraph2 = db.connected(TransactionSerializable) { TestData.newSavedEgraph() }
+    val egraph1 = db.connected(TransactionSerializable) { TestData.newSavedEgraphWithRealAudio() }
+    val egraph2 = db.connected(TransactionSerializable) { TestData.newSavedEgraphWithRealAudio() }
     egraph1.egraphState should be(EgraphState.AwaitingVerification)
     egraph2.egraphState should be(EgraphState.AwaitingVerification)
 
@@ -51,8 +51,15 @@ with TestKit {
     }
   }
 
+  it should "initialize mp3 asset from wav asset" in  {
+    import services.blobs.Blobs.Conversions._
+    val egraph = db.connected(TransactionSerializable) { TestData.newSavedEgraphWithRealAudio() }
+    egraphActor !! ProcessEgraphMessage(egraph.id)
+    egraph.assets.audioMp3.asByteArray.length should be > (0)
+  }
+
   it should "immediately publish an Egraph if play config's adminreview.skip is true" in {
-    val egraph = db.connected(TransactionSerializable) { TestData.newSavedEgraph() }
+    val egraph = db.connected(TransactionSerializable) { TestData.newSavedEgraphWithRealAudio() }
 
     val actor = actorOf(AppConfig.instance[EgraphActor].copy(playConfig=Utils.properties("adminreview.skip" -> "true")))
     actor.start()
@@ -61,5 +68,4 @@ with TestKit {
       egraphStore.get(egraph.id).egraphState should be(EgraphState.Published)
     }
   }
-
 }

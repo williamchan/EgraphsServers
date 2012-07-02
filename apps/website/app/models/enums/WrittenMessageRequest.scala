@@ -12,12 +12,12 @@ sealed abstract class WrittenMessageRequest(val name: String)
 object WrittenMessageRequest extends Utils.Enum {
   sealed abstract class EnumVal(name: String) extends WrittenMessageRequest(name) with Value
 
-  object SpecificMessage extends EnumVal("SignatureWithMessage")
+  val SpecificMessage = new EnumVal("SignatureWithMessage") {}
 
   // Let the celebrity write whatever they want
-  object CelebrityChoosesMessage extends EnumVal("CelebrityChoosesMessage")
+  val CelebrityChoosesMessage = new EnumVal("CelebrityChoosesMessage") {}
 
-  object SignatureOnly extends EnumVal("SignatureOnly")
+  val SignatureOnly = new EnumVal("SignatureOnly") {}
 }
 
 trait HasWrittenMessageRequest[T] {

@@ -36,6 +36,7 @@ case class TestWebsiteControllers @Inject()(
   formChecks: FormChecks,
   customerLoginForms: CustomerLoginFormFactory,
   accountSettingsForms: AccountSettingsFormFactory,
+  egraphsSessionFactory: () => EgraphsSession,
   fakeRequest: Request = FunctionalTest.newRequest(),
   fakeSession: Session = new Session(),
   fakeFlash: Flash = new Flash()

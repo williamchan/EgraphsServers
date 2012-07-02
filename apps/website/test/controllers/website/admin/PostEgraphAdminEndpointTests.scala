@@ -32,8 +32,8 @@ class PostEgraphAdminEndpointTests extends AdminFunctionalTest {
     assertStatus(302, response2)
 
     db.connected(TransactionSerializable) {
-      assertEquals(EgraphState.ApprovedByAdmin, egraphStore.findById(egraph1.id).get.egraphState)
-      assertEquals(EgraphState.ApprovedByAdmin, egraphStore.findById(egraph2.id).get.egraphState)
+      assertEquals(EgraphState.ApprovedByAdmin, egraphStore.get(egraph1.id).egraphState)
+      assertEquals(EgraphState.ApprovedByAdmin, egraphStore.get(egraph2.id).egraphState)
     }
   }
 
@@ -54,8 +54,8 @@ class PostEgraphAdminEndpointTests extends AdminFunctionalTest {
     assertStatus(302, response2)
 
     db.connected(TransactionSerializable) {
-      assertEquals(EgraphState.RejectedByAdmin, egraphStore.findById(egraph1.id).get.egraphState)
-      assertEquals(EgraphState.RejectedByAdmin, egraphStore.findById(egraph2.id).get.egraphState)
+      assertEquals(EgraphState.RejectedByAdmin, egraphStore.get(egraph1.id).egraphState)
+      assertEquals(EgraphState.RejectedByAdmin, egraphStore.get(egraph2.id).egraphState)
     }
   }
 
@@ -70,7 +70,7 @@ class PostEgraphAdminEndpointTests extends AdminFunctionalTest {
     assertStatus(302, response)
 
     db.connected(TransactionSerializable) {
-      assertEquals(EgraphState.Published, egraphStore.findById(egraph.id).get.egraphState)
+      assertEquals(EgraphState.Published, egraphStore.get(egraph.id).egraphState)
     }
   }
 

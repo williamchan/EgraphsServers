@@ -80,6 +80,15 @@ class EgraphTests extends UnitFlatSpec
     intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.PassedBiometrics).publish(admin)}
   }
 
+  "getSignedAt" should "return signedAt timestamp if it exists, otherwise created" in {
+    var egraph = TestData.newSavedEgraph().copy(signedAt = Time.timestamp("2012-07-12 15:11:22.987", Time.ipadDateFormat)).save()
+    egraph.signedAt should not be(None)
+    egraph.signedAt should not be(Some(egraph.created))
+
+    egraph = egraph.copy(signedAt = None).save()
+    egraph.signedAt should be(None)
+  }
+
   "image" should "return EgraphImage with correctly configured ingredientFactory" in {
     val egraph = newEntity.withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.fakeAudioStr()).save()
     val egraphImage: EgraphImage = egraph.image()
@@ -97,7 +106,21 @@ class EgraphTests extends UnitFlatSpec
       .save()
 
     egraph.assets.signature should be (TestConstants.shortWritingStr)
-    egraph.assets.audio.asByteArray should be (TestConstants.fakeAudio)
+    egraph.assets.audioWav.asByteArray should be (TestConstants.fakeAudio)
+  }
+
+  "generateAndSaveMp3" should "store mp3 asset" in {
+    val egraph = TestData.newSavedEgraphWithRealAudio()
+    intercept[NoSuchElementException] { egraph.assets.audioMp3 }
+    egraph.assets.generateAndSaveMp3()
+    egraph.assets.audioMp3.asByteArray.length should be > (0)
+  }
+
+  "audioMp3Url" should "lazily create mp3 asset" in {
+    val egraph = TestData.newSavedEgraphWithRealAudio()
+    intercept[NoSuchElementException] { egraph.assets.audioMp3 }
+    egraph.assets.audioMp3Url.endsWith("audio.mp3") should be(true)
+    egraph.assets.audioMp3.asByteArray.length should be > (0)
   }
 
   "An Egraph" should "throw an exception if assets are accessed on an unsaved Egraph" in {

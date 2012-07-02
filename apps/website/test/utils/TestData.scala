@@ -144,6 +144,12 @@ object TestData {
       .save()
   }
 
+  def newSavedEgraphWithRealAudio(): Egraph = {
+    newSavedOrder().newEgraph
+      .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), Codec.decodeBASE64(TestConstants.voiceStr()))
+      .save()
+  }
+
   def newControllers: TestWebsiteControllers = {
     AppConfig.instance[TestWebsiteControllers]
   }

@@ -1,7 +1,6 @@
 package controllers.website
 
 import play.mvc.Controller
-
 import play.data.validation._
 import org.apache.commons.mail.SimpleEmail
 import models._
@@ -17,7 +16,7 @@ import sjson.json.Serializer
 import services.db.{DBSession, TransactionSerializable}
 import services.logging.Logging
 import exception.InsufficientInventoryException
-import play.mvc.results.{Forbidden, Redirect}
+import play.mvc.results.Redirect
 import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters}
 
 trait PostBuyProductEndpoint { this: Controller =>
@@ -47,24 +46,6 @@ trait PostBuyProductEndpoint { this: Controller =>
                      personalNote: Option[String],
                      isDemo: Boolean = false) = postController(openDatabase = false, doCsrfCheck = (!isDemo || !payment.isTest)) {
 
-    payment.isTest match {
-      case true =>
-        post(recipientName, recipientEmail, buyerName, buyerEmail, stripeTokenId, desiredText, personalNote, isDemo)
-
-      case _ =>
-        new Forbidden("Cannot place order. Contact Egraphs support/engineering.")
-    }
-  }
-
-  private def post(recipientName: String,
-                   recipientEmail: String,
-                   buyerName: String,
-                   buyerEmail: String,
-                   stripeTokenId: String,
-                   desiredText: Option[String],
-                   personalNote: Option[String],
-                   isDemo: Boolean = false): Any = {
-
     Logger.info("Receiving purchase order")
     val (celebrity: Celebrity, product: Product) = validateInputs(
       recipientName = recipientName,
@@ -72,30 +53,32 @@ trait PostBuyProductEndpoint { this: Controller =>
       buyerName = buyerName,
       buyerEmail = buyerEmail,
       stripeTokenId = stripeTokenId)
-    if (!validationErrors.isEmpty) {
-      return WebsiteControllers.redirectWithValidationErrors(GetCelebrityProductEndpoint.url(celebrity, product), Some(false))
-    }
 
-    Logger.info("No validation errors")
-    val purchaseHandler: EgraphPurchaseHandler = EgraphPurchaseHandler(
-      recipientName = recipientName,
-      recipientEmail = recipientEmail,
-      buyerName = buyerName,
-      buyerEmail = buyerEmail,
-      stripeTokenId = stripeTokenId,
-      desiredText = desiredText,
-      personalNote = personalNote,
-      celebrity = celebrity,
-      product = product,
-      flash = flash,
-      mail = mail,
-      customerStore = customerStore,
-      accountStore = accountStore,
-      dbSession = dbSession,
-      payment = payment,
-      isDemo = isDemo
-    )
-    purchaseHandler.execute()
+    if (!validationErrors.isEmpty) {
+      WebsiteControllers.redirectWithValidationErrors(GetCelebrityProductEndpoint.url(celebrity, product), Some(false))
+
+    } else {
+      Logger.info("No validation errors")
+      val purchaseHandler: EgraphPurchaseHandler = EgraphPurchaseHandler(
+        recipientName = recipientName,
+        recipientEmail = recipientEmail,
+        buyerName = buyerName,
+        buyerEmail = buyerEmail,
+        stripeTokenId = stripeTokenId,
+        desiredText = desiredText,
+        personalNote = personalNote,
+        celebrity = celebrity,
+        product = product,
+        flash = flash,
+        mail = mail,
+        customerStore = customerStore,
+        accountStore = accountStore,
+        dbSession = dbSession,
+        payment = payment,
+        isDemo = isDemo
+      )
+      purchaseHandler.execute()
+    }
   }
 
   private def validateInputs(recipientName: String, recipientEmail: String, buyerName: String, buyerEmail: String, stripeTokenId: String): (Celebrity, Product) = {
@@ -170,7 +153,7 @@ object PostBuyProductEndpoint extends Logging {
         "desiredText" -> desiredText.getOrElse(""),
         "personalNote" -> personalNote.getOrElse(""),
         "productId" -> product.id,
-        "productPrice" -> product.price
+        "productPrice" -> product.price.getAmount
       ))
 
       // Attempt Stripe charge. If a credit card-related error occurred, redirect to purchase screen.
@@ -178,7 +161,7 @@ object PostBuyProductEndpoint extends Logging {
         payment.charge(product.price, stripeTokenId, "Egraph Order from " + buyerEmail)
       } catch {
         case stripeException: com.stripe.exception.InvalidRequestException => {
-          log("PostBuyProductEndpoint error charging card: " + stripeException.getLocalizedMessage + " . " + purchaseData)
+          saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = "Credit card issue.")
           Validation.addError("Credit card", "There was an issue with the credit card")
           return WebsiteControllers.redirectWithValidationErrors(GetCelebrityProductEndpoint.url(celebrity, product), Some(false))
         }
@@ -196,14 +179,13 @@ object PostBuyProductEndpoint extends Logging {
       } catch {
         case e: InsufficientInventoryException => {
           payment.refund(charge.id)
-          log("PostBuyProductEndpoint error saving order: " + e.getLocalizedMessage + " . " + purchaseData)
-          // todo(wchan): purchaseData should be stored to a customer leads table per issue #109
+          saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = e.getLocalizedMessage)
           Validation.addError("Inventory", "Our apologies. There is no more inventory available, but your celebrity will sign more Egraphs soon.")
           return WebsiteControllers.redirectWithValidationErrors(GetCelebrityProductEndpoint.url(celebrity, product), Some(false))
         }
         case e: Exception => {
           payment.refund(charge.id)
-          log("PostBuyProductEndpoint error: " + e.getLocalizedMessage + " . " + purchaseData)
+          saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = e.getLocalizedMessage)
           throw (e)
         }
       }
@@ -249,6 +231,12 @@ object PostBuyProductEndpoint extends Logging {
       val savedOrder = order.save()
 
       (savedOrder, buyer, recipient)
+    }
+  }
+
+  private def saveFailedPurchaseData(dbSession: DBSession, purchaseData: String, errorDescription: String) {
+    dbSession.connected(TransactionSerializable) {
+      FailedPurchaseData(purchaseData = purchaseData, errorDescription = errorDescription.take(128 /*128 is the column width*/)).save()
     }
   }
 

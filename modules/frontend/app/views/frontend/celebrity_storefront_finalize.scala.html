@@ -1,0 +1,237 @@
+@()(implicit headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData)
+
+@import views.frontend.tags.html.storefront_breadcrumbs_responsive
+@import views.frontend.tags
+
+@baseBody = {
+    <div id="content" class="top" role="main">
+    
+      <div id="main" class="sub">
+      
+        <section id="checkout" class="container" >
+			
+				 @storefront_breadcrumbs_responsive()
+				 		
+  				<header>	
+  				  <h1>Finalize Order</h1>
+  				  <h2>David Price | First MLB Victory</h2>  				
+  				</header>
+  				  				
+					<div class="col2">
+					
+						<div class="finalize clearfix">
+					
+	    				<form class="main" method="post" action="./">
+
+	    					<div class="order-overview">
+	    						  
+	    						  <figure>
+	    						  
+	    						  	<img src="/public/images/fpo-egraph.png" alt="fpo-egraph" />
+	    						  
+	    						  	<figcaption class="recepient-information">
+	    						  		A<span>. Recipient Information</span>
+	    						  	</figcaption>
+	    						  	
+	    						  	<figcaption class="egraph-message">
+	    						  		B<span>. Egraph Message</span>	    						  	
+	    						  	</figcaption>
+	    						  	
+	    						  	<figcaption class="egraph-audio">
+	    						  		C<span>. Egraph Audio</span>	    						  	
+	    						  	</figcaption>
+	    						  
+	    						  </figure>
+
+	    						  <div class="order-summary">
+		    				  			    				  		
+		    				  		<div class="celebrity-information">
+		    				  			<h3>David Price</h3>
+		    				  			<h4>First MLB Victory</h4>
+		    				  			<dl>
+		    				  				<dt>Your Message to David Price</dt>
+		    				  				<dd>Dear David – you rock! Can’t wait to see you in Oakland! Joshua Johnson</dd>
+		    				  				<dt><strong>A.</strong> Recepients Name</dt>
+		    				  				<dd>Joshua Johnson</dd>
+		    				  				<dt><strong>B.</strong> David Price Will Write</dt>
+		    				  				<dd>Happy Birthday Joshua! Keep swinging for the fences! Lorem ium dolor etsun et tepera.</dd>
+		    				  				<dt><strong>C.</strong> David Price Will Record and Audio Message</dt>
+		    				  			</dl>
+		    				  			<p class="last"><a href="#">Edit</a></p>
+		    				  		</div>			  		
+		    				  	
+		    				  	</div>
+	    						  
+	    					</div> <!-- end .order-overview -->
+	    					
+	    				  <fieldset>
+	    				  
+		    					<h3>Shipping Information</h3>
+
+		    					<div class="field clearfix">
+
+		    				  	<div class="left">
+		    				  		<address>
+		    				  			<strong>Joshua Johnson</strong><br />
+		    				  			5507 N 58th Street<br />
+		    				  			Seattle, WA 98102
+		    				  		</address>
+		    				  		<p><a href="#">Edit</a></p>
+		    				  	</div>
+		    				  
+		    				  	<div class="right">
+											<ul>
+												<li>Standard: FREE</li>
+												<li>Arrives 7-14 Days</li>
+											</ul>
+		    				  	</div>
+	    				  	
+		    					</div>
+	    				       				  
+	    				  </fieldset>	  
+	
+	    				  <fieldset class="last">
+	    				  
+	    				  	<h3>Billing Information</h3>
+
+	    				  	<div class="field clearfix">
+
+		    				  	<div class="left">
+		    				  		<ul>
+		    				  			<li><strong>Joshua Johnson</strong></li>
+		    				  			<li>Visa XXXXXXXXXXXX4021</li>
+		    				  			<li>
+		    				  				<address>
+		    				  					5507 N 58th Street<br />
+		    				  					Seattle, WA 98102
+		    				  				</address>
+		    				  			</li>
+		    				  		</ul>
+		    				  		<p><a href="#">Edit</a></p>
+		    				  	</div>
+		    				  
+		    				  	<div class="right">
+											<ul>
+												<li>Joshua12@@gmail.com</li>
+												<li>206.322.3484</li>
+											</ul>
+		    				  	</div>	
+	    				  	
+	    				  	</div>    				  	
+	    				  	
+	    				  </fieldset>
+	    				  
+	    				  <fieldset class="submit">
+	    				  
+	    				  	<div class="clearfix">
+
+	    				  		<p>If all information is correct lorem ipsum dolor casa etsun et tepurar lorem ipsumain lora.</p>
+	    				  	
+ 	    				 			@tags.html.arrow_button(caption="Purchase", target="#", classes="button right")
+	    				  	    				 		
+	    				  	</div>
+	    				  
+	    				  </fieldset>
+	    				  
+	    				</form> <!-- end .main -->
+	    				
+	    				<aside>
+	    				
+	    					<div class="order-overview clearfix">
+	    						  
+	    						  <figure>
+	    						  
+	    						  	<img src="/public/images/fpo-egraph.png" alt="fpo-egraph" />
+	    						  
+	    						  	<figcaption class="recepient-information">
+	    						  		A<span>. Recipient Information</span>
+	    						  	</figcaption>
+	    						  	
+	    						  	<figcaption class="egraph-message">
+	    						  		B<span>. Egraph Message</span>	    						  	
+	    						  	</figcaption>
+	    						  	
+	    						  	<figcaption class="egraph-audio">
+	    						  		C<span>. Egraph Audio</span>	    						  	
+	    						  	</figcaption>
+	    						  
+	    						  </figure>
+	    						  	
+		    				  	<div class="order-summary">
+		    				  	
+		    				  		<h2>Summary</h2>
+		    				  		
+		    				  		<div class="celebrity-information">
+		    				  			<h3>David Price</h3>
+		    				  			<h4>First MLB Victory</h4>
+		    				  			<dl>
+		    				  				<dt>Your Message to David Price</dt>
+		    				  				<dd>Dear David – you rock! Can’t wait to see you in Oakland! Joshua Johnson</dd>
+		    				  				<dt><strong>A.</strong> Recepients Name</dt>
+		    				  				<dd>Joshua Johnson</dd>
+		    				  				<dt><strong>B.</strong> David Price Will Write</dt>
+		    				  				<dd>Happy Birthday Joshua! Keep swinging for the fences! Lorem ium dolor etsun et tepera.</dd>
+		    				  				<dt><strong>C.</strong> David Price Will Record and Audio Message</dt>
+		    				  			</dl>
+		    				  			<p class="last"><a href="#">Edit</a></p>
+		    				  		</div>
+		    				  		
+		    				  		<div class="order-totals">		    				  		
+												<table>
+													<tr>
+														<th>Subtotal</th>
+														<td>$50.00</td>
+													</tr>
+													<tr>
+														<th>Shipping</th>
+														<td>$0.00</td>
+													</tr>
+													<tr>
+														<th>Tax</th>
+														<td>$_.__</td>
+													</tr>
+													<tr class="total">
+														<th>Total</th>
+														<td>$50.00</td>
+													</tr>
+												</table>    		    				  		
+		    				  		</div>			  		
+		    				  	
+		    				  	</div>
+		    				  
+	    					</div> <!-- end .order-overview -->
+	    				
+	    				</aside>
+	  			
+						</div> <!-- end .finalize -->
+						
+						<footer class="clearfix">
+						
+							<p>Secured by: <a href="#" class="logo-entrust">Entrust</a></p>
+							
+							<p>Accepted payment types:</p>
+							
+							<ul>
+								<li class="visa">Visa</li>
+								<li class="mastercard">Mastercard</li>
+								<li class="amex">American Express</li>
+								<li class="discover">Discover</li>
+							</ul>
+								
+						</footer>
+  			
+  				</div> <!-- end .col2 -->
+  			
+        </section> <!-- end #checkout -->
+
+    	</div> <!-- end #main -->
+    
+    </div> <!-- end #content -->
+}
+
+@base_celebrity_storefront_template(
+  title="Finalize Order",
+  jsMain="pages/celebrity-storefront-finalize",
+  body=baseBody
+)

@@ -17,7 +17,7 @@ define([], function() {
         });
 
         // show top account menu on click
-        $('#top .account').click(function(e){
+        $('#top .account.logged-in').click(function(e){
           var account_options = $(this).find('.account-options');
           $('body').one('click',function(){
             account_options.removeClass('active');

@@ -4,7 +4,9 @@
   tiledViewLink: String,
   recentEgraphs: Iterable[models.frontend.storefront.ChoosePhotoRecentEgraph],
   partnerIcons: Iterable[models.frontend.storefront.ChoosePhotoPartnerIcon]
-)(implicit session: play.mvc.Scope.Session)
+)(implicit session: play.mvc.Scope.Session, 
+  headerData: models.frontend.header.HeaderData, 
+  footerData: models.frontend.footer.FooterData)
 
 @{/**
     Renders the Choose Photo page in Carousel view.
@@ -16,6 +18,8 @@
      tiledViewLink - Link to return to ChoosePhoto tiled view from carousel view
      recentEgraphs - Viewmodels for recently signed egraphs.
      partnerIcons - Viewmodels for partner organizations.
+
+     headerData & footerData - see base_template.scala.html
 */}
 
 @import views.frontend.tags.html.{storefront_breadcrumbs_responsive, safeForm}

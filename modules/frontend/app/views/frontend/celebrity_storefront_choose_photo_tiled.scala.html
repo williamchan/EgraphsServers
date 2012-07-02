@@ -1,18 +1,19 @@
 @(celeb: models.frontend.storefront.ChoosePhotoCelebrity,
   products: Iterable[models.frontend.storefront.ChoosePhotoTileProduct],
   recentEgraphs: Iterable[models.frontend.storefront.ChoosePhotoRecentEgraph],
-  partnerIcons: Iterable[models.frontend.storefront.ChoosePhotoPartnerIcon])
+  partnerIcons: Iterable[models.frontend.storefront.ChoosePhotoPartnerIcon])(
+  implicit headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData)
 
 @{/**
      Renders the Choose Photo page with the products tiled.
 
      celeb - Viewmodel for the celebrity whose catalog is being rendered
-
      products - List of viewmodel for the products being sold.
-
      recentEgraphs - Viewmodels for recently sold egraphs
-
      partnerIcons - viewmodels for partner organizations
+
+     headerData & footerData - see base_template.scala.html
 */}
 
 @import views.frontend.tags.html.storefront_breadcrumbs_responsive

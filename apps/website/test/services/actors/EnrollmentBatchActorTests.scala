@@ -45,8 +45,8 @@ with TestKit {
 
     enrollmentBatchActor !! ProcessEnrollmentBatchMessage(enrollmentBatch.id)
     AppConfig.instance[DBSession].connected(TransactionSerializable) {
-      AppConfig.instance[EnrollmentBatchStore].findById(enrollmentBatch.id).get.isSuccessfulEnrollment should be(Some(true))
-      AppConfig.instance[CelebrityStore].findById(celebrity.id).get.enrollmentStatus should be(EnrollmentStatus.Enrolled)
+      AppConfig.instance[EnrollmentBatchStore].get(enrollmentBatch.id).isSuccessfulEnrollment should be(Some(true))
+      AppConfig.instance[CelebrityStore].get(celebrity.id).enrollmentStatus should be(EnrollmentStatus.Enrolled)
     }
   }
 

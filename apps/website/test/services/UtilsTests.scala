@@ -3,7 +3,7 @@ package services
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
 import org.scalatest.BeforeAndAfterEach
-import utils.{TestData, DBTransactionPerTest, ClearsDatabaseAndValidationBefore}
+import utils.{TestHelpers, TestData, DBTransactionPerTest, ClearsDatabaseAndValidationBefore}
 import models.CelebrityStore
 
 class UtilsTests extends UnitFlatSpec
@@ -67,6 +67,16 @@ class UtilsTests extends UnitFlatSpec
 
   it should "throw an exception for configuration properties that don't exist" in {
     evaluating { Utils.requiredConfigurationProperty("herp") } should produce[IllegalArgumentException]
+  }
+
+  "saveToFile" should "save bytes parameter to a file" in {
+    val file = TempFile.named("helloworld.txt")
+    try {
+      Utils.saveToFile("hello world".getBytes, file)
+      TestHelpers.getStringFromFile(file) should be("hello world")
+    } finally {
+      file.delete()
+    }
   }
 
   "pageQuery" should "return paged Query and total number of results if specified" in {
