@@ -4,8 +4,7 @@ import play.mvc.Controller
 
 /** All endpoints for the consumer website */
 trait AllNewConsumerEndpoints
-  extends GetStorefrontChoosePhotoConsumerEndpoint
-  with PostStorefrontChoosePhotoConsumerEndpoint
+  extends StorefrontChoosePhotoConsumerEndpoints
   with StorefrontPersonalizeConsumerEndpoints
-  with GetStorefrontReviewEndpoint
+  with StorefrontReviewEndpoints
 { this: Controller => }

@@ -1,15 +1,19 @@
 package controllers.website.consumer
 
-import services.http.{CelebrityAccountRequestFilters, ControllerMethod}
+import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters, ControllerMethod}
 import play.mvc.Controller
 
 import services.mvc.{ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
 import play.mvc.results.Redirect
+import services.http.forms.purchase.PurchaseFormFactory
+import controllers.WebsiteControllers
+import services.Utils
+import controllers.WebsiteControllers.getStorefrontPersonalize
 
 /**
  * Endpoint for serving up the Choose Photo page
  */
-private[consumer] trait GetStorefrontChoosePhotoConsumerEndpoint
+private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
   extends ImplicitHeaderAndFooterData
   with ImplicitStorefrontBreadcrumbData
 { this: Controller =>
@@ -19,6 +23,8 @@ private[consumer] trait GetStorefrontChoosePhotoConsumerEndpoint
 
   protected def controllerMethod: ControllerMethod
   protected def celebFilters: CelebrityAccountRequestFilters
+  protected def postController: POSTControllerMethod
+  protected def purchaseFormFactory: PurchaseFormFactory
 
   def getStorefrontChoosePhotoTiled(celebrityUrlSlug: String) = controllerMethod()
   {
@@ -64,4 +70,18 @@ private[consumer] trait GetStorefrontChoosePhotoConsumerEndpoint
       }
     }
   }
+
+  def postStorefrontChoosePhoto(celebrityUrlSlug: String, productUrlSlug: String) = postController() {
+    celebFilters.requireCelebrityAndProductUrlSlugs { (celeb, product) =>
+    // Save the forms with the new product ID
+      purchaseFormFactory.formsForStorefront(celeb.id).withProductId(product.id).save()
+
+      // Redirect either to a url specified by the POST params or to the Personalize page.
+      import WebsiteControllers.getStorefrontPersonalize
+      Utils.redirectToClientProvidedTarget(
+        urlIfNoTarget=reverse(getStorefrontPersonalize(celebrityUrlSlug, productUrlSlug)).url
+      )
+    }
+  }
+
 }
