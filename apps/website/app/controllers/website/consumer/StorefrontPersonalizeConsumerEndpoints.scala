@@ -32,12 +32,7 @@ trait StorefrontPersonalizeConsumerEndpoints
 
         // Get the next open inventory batch that an order would go into, and if there's no
         // inventory then redirect to the insufficient inventory page.
-        nextInventoryBatch <- product.nextInventoryBatchToEnd.toRight(
-                                left=forms.redirectToInsufficientInventoryPage(
-                                  celebrityUrlSlug,
-                                  productUrlSlug
-                                )
-                              ).right
+        nextInventoryBatch <- forms.nextInventoryBatchOrRedirect(celebrityUrlSlug, product).right
       ) yield {
         val actionTarget = reverse(postStorefrontPersonalize(celebrityUrlSlug, productUrlSlug)).url
 

@@ -18,19 +18,13 @@ import com.google.inject.Inject
 class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
   import PurchaseFormChecks._
 
-  /**
-   * Returns the PrintingOption on the right if the provided parameter mapped
-   * to a valid PrintingOption enum value.
-   */
   def isPrintingOption: Either[FormError, PrintingOption] = {
+    import PrintingOption.{HighQualityPrint, DoNotPrint}
+
     for (
-      param <- check.isSomeValue(toValidate, requiredError).right;
-      printingChoice <- check.isSomeValue(
-                          PrintingOption(param),
-                          "Was not a valid printing option"
-                        ).right
+      doPrint <- check.isChecked(toValidate.headOption).right
     ) yield {
-      printingChoice
+      if (doPrint) HighQualityPrint else DoNotPrint
     }
   }
 

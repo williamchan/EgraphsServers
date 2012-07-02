@@ -2,7 +2,7 @@ package utils
 
 import com.google.inject.Inject
 import services.http._
-import forms.purchase.{PurchaseFormReaders, PurchaseFormFactory}
+import forms.purchase.{PurchaseFormChecksFactory, PurchaseFormReaders, PurchaseFormFactory}
 import services.mail.Mail
 import services.payment.Payment
 import models.{InventoryBatchQueryFilters, EgraphQueryFilters, OrderQueryFilters}
@@ -14,6 +14,7 @@ import services.http.forms.{AccountSettingsFormFactory, CustomerLoginFormFactory
 import play.mvc.Scope.{Session, Flash}
 import play.mvc.Http.Request
 import play.test.FunctionalTest
+import services.AppConfig
 
 /**
  * Injectable version of AllWebsiteEndpoints with configurable session, flash,
@@ -43,7 +44,8 @@ case class TestWebsiteControllers @Inject()(
   fakeRequest: Request = FunctionalTest.newRequest(),
   fakeSession: Session = new Session(),
   fakeFlash: Flash = new Flash()
-) extends Controller with AllWebsiteEndpoints {
+)() extends Controller with AllWebsiteEndpoints {
+  val checkPurchaseField: PurchaseFormChecksFactory = AppConfig.instance[PurchaseFormChecksFactory]
   override def request = fakeRequest
   override def params = request.params
   override def session = fakeSession

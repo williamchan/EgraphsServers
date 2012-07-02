@@ -6,5 +6,5 @@ import play.mvc.Controller
 trait AllNewConsumerEndpoints
   extends StorefrontChoosePhotoConsumerEndpoints
   with StorefrontPersonalizeConsumerEndpoints
-  with StorefrontReviewEndpoints
+  with StorefrontReviewConsumerEndpoints
 { this: Controller => }

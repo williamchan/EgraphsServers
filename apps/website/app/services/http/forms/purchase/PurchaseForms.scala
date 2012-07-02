@@ -4,9 +4,10 @@ import services.http.{ServerSessionFactory, ServerSession}
 import com.google.inject.Inject
 import play.mvc.results.Redirect
 import controllers.WebsiteControllers
-import models.{Celebrity, Product}
-import WebsiteControllers.{reverse, getStorefrontChoosePhotoTiled}
+import models.{InventoryBatch, Celebrity, Product}
+import controllers.WebsiteControllers.{getStorefrontPersonalize, reverse, getStorefrontChoosePhotoTiled}
 import org.joda.money.{CurrencyUnit, Money}
+import models.enums.PrintingOption
 
 class PurchaseForms @Inject()(
   formReaders: PurchaseFormReaders,
@@ -36,20 +37,45 @@ class PurchaseForms @Inject()(
       .plus(tax.getOrElse(zero))
   }
 
+  def nextInventoryBatchOrRedirect(celebrityUrlSlug: String, product: models.Product)
+  : Either[Redirect, InventoryBatch] =
+  {
+    product.nextInventoryBatchToEnd.toRight(
+      left=this.redirectToInsufficientInventoryPage(
+        celebrityUrlSlug,
+        product.urlSlug
+      )
+    )
+  }
+
   def withProductId(productId: Long): PurchaseForms = {
     this.withSession(storefrontSession.setting(Key.ProductId -> productId))
+  }
+
+  def highQualityPrint: Option[PrintingOption] = {
+    storefrontSession.get(Key.HighQualityPrint)
+  }
+
+  def withHighQualityPrint(doPrint: PrintingOption) = {
+    this.withSession(storefrontSession.setting(Key.HighQualityPrint -> doPrint))
   }
 
   def personalizeForm(flashOption: Option[play.mvc.Scope.Flash]=None): Option[PersonalizeForm] = {
     val formReader = formReaders.forPersonalizeForm
 
-    flashOption.foreach { flash =>
-      println("While deserializing, flash was: " + flash)
-    }
-
     flashOption.map(flash => formReader.read(flash.asFormReadable)).getOrElse {
       formReader.read(storefrontSession.asFormReadable)
     }
+  }
+
+  def personalizeFormOrRedirectToPersonalizeForm(celebrityUrlSlug: String, productUrlSlug: String)
+  : Either[Redirect, PersonalizeForm] = {
+    import WebsiteControllers.getStorefrontPersonalize
+
+    personalizeForm().toRight(left= {
+      val action = reverse(getStorefrontPersonalize(celebrityUrlSlug, productUrlSlug))
+      new Redirect(action.url)
+    })
   }
 
   def withPersonalizeForm(form: PersonalizeForm) = {
@@ -92,6 +118,7 @@ class PurchaseForms @Inject()(
 object PurchaseForms {
   object Key {
     val ProductId = "productId"
+    val HighQualityPrint = "order.review.highQualityPrint"
   }
 }
 
