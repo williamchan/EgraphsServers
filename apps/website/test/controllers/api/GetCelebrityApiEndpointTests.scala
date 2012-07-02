@@ -80,7 +80,7 @@ class GetCelebrityApiEndpointFunctionalTests extends EgraphsFunctionalTest {
     Time.fromApiFormat(json("created").toString)
     Time.fromApiFormat(json("updated").toString)
 
-    assertEquals(8, json.size)
+    assertEquals(6, json.size)
   }
 
   @Test
