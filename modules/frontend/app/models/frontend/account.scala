@@ -23,5 +23,7 @@ case class AccountSettingsForm(
 )
 
 case class AccountVerificationForm(
-  username: String
+  email: Field[String],
+  newPassword: Field[String],
+  passwordConfirm: Field[String]
 )

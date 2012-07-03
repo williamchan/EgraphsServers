@@ -14,8 +14,6 @@ private[controllers] trait GetVerifyAccountEndpoint extends ImplicitHeaderAndFoo
   protected def customerStore: CustomerStore
   protected def accountStore: AccountStore
 
-  import services.http.SafePlayParams.Conversions._
-
   def getVerifyAccount(accountId: String, key: String) = controllerMethod() {
 
     accountStore.findByCustomerId(accountId.toLong) match {
@@ -23,15 +21,14 @@ private[controllers] trait GetVerifyAccountEndpoint extends ImplicitHeaderAndFoo
         account.emailVerify().save()
 
         val customerOption = for(customerId <- account.customerId;
-            customer   <- customerStore.findById(customerId)) yield {
-          customer
+            customerOption   <- customerStore.findById(customerId)) yield {
+          customerOption
         }
-
+        //User should always have both of these
         val (username, name) = customerOption match {
           case Some(customer) => (customer.username, customer.name)
           case None => ("", "")
         }
-        println("verified!")
         views.frontend.html.account_verification(username, name)
       case _ =>
         Forbidden("The verification URL you used is either out of date or invalid.")

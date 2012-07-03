@@ -53,7 +53,33 @@ object Account extends Controller with DefaultHeaderAndFooterData {
   }
 
   def verify() = {
-    views.frontend.html.account_verification("willchan", "Will")
+    request.method match {
+      case "POST" => {
+        println("POST data")
+        println(params.allSimple())
+        views.frontend.html.simple_confirmation(
+          "Account Verified",
+          """
+          <p>
+          Your new password been confirmed. Continue on to the rest of the <a href="/">Egraph's</a> website.
+          </p>
+          Thanks,
+          <br>
+          The team at Egraphs
+          """
+
+        )
+      }
+      case _ => {
+        views.frontend.html.account_verification(
+          AccountVerificationForm(
+            email =  Field(name = "email", values = List("will@egraphs.com")),
+            newPassword = Field(name="newPassword"),
+            passwordConfirm = Field(name="passwordConfirm")
+          )
+        )
+      }
+    }
   }
 
   def gallery(user: String = "userdude", count: Int =  1, role: String = "other", pending: Int = 0) = {
