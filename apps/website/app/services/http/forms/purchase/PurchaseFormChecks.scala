@@ -18,6 +18,10 @@ import com.google.inject.Inject
 class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
   import PurchaseFormChecks._
 
+  /**
+   * True on the right that the provided checkbox form parameter
+   * specified a printing option.
+   */
   def isPrintingOption: Either[FormError, PrintingOption] = {
     import PrintingOption.{HighQualityPrint, DoNotPrint}
 
@@ -28,6 +32,11 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
     }
   }
 
+  /**
+   * True on the right if the provided parameter was a valid one for a
+   * checkbox. This makes it succeed if it didn't exist (false) or if it had
+   * some expected affirmative otherwise ("yes", "1", etc)
+   */
   def isCheckBoxValue: Either[FormError, Boolean] = {
     for (
       checked <- check.isChecked(toValidate.headOption).right
@@ -51,6 +60,9 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
     }
   }
 
+  /**
+   * True that the checkbox form parameter specified a recipient choice
+   */
   def isGift
   : Either[FormError, RecipientChoice] =
   {
@@ -160,6 +172,10 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
     }
   }
 
+  /**
+   * True on the right if the form parameter was a valid zip code. We could make this actually
+   * check zip codes later on if we wanted.
+   */
   def isZipCode: Either[FormError, String] = {
     for (
       param <- check.isSomeValue(toValidate, requiredError).right;

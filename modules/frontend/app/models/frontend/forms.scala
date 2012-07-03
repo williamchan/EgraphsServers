@@ -92,6 +92,7 @@ case class Field[+ValueType](
     error.map(error => Html.empty).getOrElse(htmlGenerator)
   }
 
+  /** Returns a copy of this product, equipped with the provided error. */
   def withError(errorMessage: String): Field[ValueType] = {
     this.copy(error=Some(FormError(errorMessage)))
   }
@@ -105,6 +106,7 @@ case class Field[+ValueType](
 }
 
 object Field {
+  /** Provides a version of the field with the given name but void of values or errors. */
   def empty[T:Manifest](name: String) = {
     Field[T](name=name, values=None, error=None)
   }

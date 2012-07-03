@@ -15,14 +15,16 @@ import SafePlayParams.Conversions._
 import services.Utils
 
 /**
- * Endpoint for serving up the Choose Photo page
+ * Manages GET and POST of the Review page in the purchase flow.
  */
 private[consumer] trait StorefrontReviewConsumerEndpoints
   extends ImplicitHeaderAndFooterData
   with ImplicitStorefrontBreadcrumbData {
   this: Controller =>
 
-
+  //
+  // Services
+  //
   protected def controllerMethod: ControllerMethod
   protected def postController: POSTControllerMethod
   protected def purchaseFormFactory: PurchaseFormFactory
@@ -30,23 +32,36 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
   protected def celebFilters: CelebrityAccountRequestFilters
   protected def checkPurchaseField: PurchaseFormChecksFactory
 
+  //
+  // Controllers
+  //
+  /**
+   * Controller that GETs the "Review" page in the purchase flow.
+   *
+   * @param celebrityUrlSlug identifies the celebrity from which the user is purchasing
+   * @param productUrlSlug identifies the photo being personalized
+   * @return the web page, or a Redirect to earlier forms in the flow if their data
+   *   was found to be lacking.
+   */
   def getStorefrontReview(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod() {
     celebFilters.requireCelebrityAndProductUrlSlugs { (celeb, product) =>
+      // Get the purchase forms out of the server session
       val forms = purchaseFormFactory.formsForStorefront(celeb.id)
 
       for (
-        // Make sure the product ID matches
+        // Make sure the product ID in this URL matches the one in the form
         formProductId <- forms.matchProductIdOrRedirectToChoosePhoto(celeb, product).right;
 
-        // Make sure there's inventory
+        // Make sure there's inventory on the product
         inventoryBatch <- forms.nextInventoryBatchOrRedirect(celebrityUrlSlug, product).right;
 
-        // Make sure we've got a valid personalize form in storage, or redirect to personalize
+        // Make sure we've got a valid personalize form in storage
         validPersonalizeForm <- forms.validPersonalizeFormOrRedirectToPersonalizeForm(
                                   celebrityUrlSlug,
                                   productUrlSlug
                                 ).right
       ) yield {
+        // Everything looks good for rendering the page!
         val textCelebWillWrite = makeTextForCelebToWrite(
           validPersonalizeForm.writtenMessageRequest,
           validPersonalizeForm.writtenMessageText
@@ -72,16 +87,31 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
     }
   }
 
+  /**
+   * Controller for POSTing the Review form in the purchase flow.
+   *
+   * @param celebrityUrlSlug identifies the celebrity from which the user is purchasing
+   * @param productUrlSlug identifies the photo being personalized
+   * @return a Redirect to the next step in the purchase flow if successful, otherwise
+   *    a Redirect back to the form to handle errors.
+   */
   def postStorefrontReview(celebrityUrlSlug: String, productUrlSlug: String) = postController() {
     celebFilters.requireCelebrityAndProductUrlSlugs { (celeb, product) =>
+      // Get the purchase forms for this celeb's storefront out of the server session
       val forms = purchaseFormFactory.formsForStorefront(celeb.id)
 
+      // Validate in a for comprehension
       for (
+        // Product ID of the URL has to match the product stored in the session
         productId <- forms.matchProductIdOrRedirectToChoosePhoto(celeb, product).right;
+
+        // User has to have posted a valid printing option. Which should be impossible to
+        // screw up because it was a damned checkbox.
         validPrintOption <- checkPurchaseField(params.getOption(Params.HighQualityPrint))
                               .isPrintingOption
                               .right
       ) yield {
+        // Save this form into the server session
         forms.withHighQualityPrint(validPrintOption).save()
 
         // TODO: redirect to "Checkout As" screen if not logged in rather than straight to
@@ -93,6 +123,9 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
     }
   }
 
+  //
+  // Private members
+  //
   private def makeTextForCelebToWrite(messageRequest: WrittenMessageRequest, messageText: Option[String])
   : String = {
     messageRequest match {

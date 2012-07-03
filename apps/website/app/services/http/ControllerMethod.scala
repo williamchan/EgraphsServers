@@ -52,7 +52,7 @@ class ControllerMethod @Inject()(logging: LoggingContext, db: DBSession, httpsFi
       }
     }
 
-    // Automatically unpack either types
+    // Automatically unpack Either types
     redirectOrResult.fold(
       error => error,
       result => result match {

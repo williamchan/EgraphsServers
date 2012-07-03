@@ -15,6 +15,25 @@
 	session: play.mvc.Scope.Session
 )
 
+@{/** The review order page in the purchase flow. This is also where they choose whether to
+      buy a physical print or not.
+
+      celebrityName - the name of the celebrity
+      productTitle - the title of the celebrity
+      celebrityWillWrite - what the celebrity will write, or a description
+          of what he will write.
+      recipientName - who will be receiving the egraph
+      noteToCelebrity - a short letter from the buyer to the celebrity.
+      basePrice - the base price of the product being purchased
+      guaranteedDelivery - date by which the recipient will be guaranteed to
+          receive their egraph.
+      highQualityPrintParamName - the parameter name to use when posting the
+          user's choice relative to whether to buy a high-quality print or not.
+      highQualityPrint - whether to check or not to check the print option check
+          box by default
+      actionUrl - the target at which to post the selected printing option.
+*/}
+
 @import frontend.formatting.MoneyFormatting.Conversions._
 @import frontend.formatting.DateFormatting.Conversions._
 @import views.frontend.tags.html.storefront_breadcrumbs_responsive

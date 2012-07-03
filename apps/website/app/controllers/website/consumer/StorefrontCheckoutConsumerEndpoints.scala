@@ -14,13 +14,16 @@ import play.mvc.results.Redirect
 import controllers.website.PostBuyProductEndpoint.EgraphPurchaseHandler
 
 /**
- * Endpoint for serving up the Choose Photo page
+ * Endpoint for serving up the Checkout form
  */
 private[consumer] trait StorefrontCheckoutConsumerEndpoints
   extends ImplicitHeaderAndFooterData
   with ImplicitStorefrontBreadcrumbData {
   this: Controller =>
 
+  //
+  // Services
+  //
   protected def controllerMethod: ControllerMethod
   protected def postController: POSTControllerMethod
   protected def purchaseFormFactory: PurchaseFormFactory
@@ -29,6 +32,15 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
   protected def checkPurchaseField: PurchaseFormChecksFactory
   protected def payment: Payment
 
+  //
+  // Controllers
+  //
+  /** Controller that GETs the checkout page, or Redirects to another form if there was
+   *  insufficient data in the user's session to present the checkout page.
+   *
+   *  @param celebrityUrlSlug identifies the celebrity whose product is being checked out.
+   *  @param productUrlSlug identifies the product being checked out.
+   **/
   def getStorefrontCheckout(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod() {
     celebFilters.requireCelebrityAndProductUrlSlugs { (celeb, product) =>
       val forms = purchaseFormFactory.formsForStorefront(celeb.id)
@@ -52,6 +64,7 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
                               productUrlSlug
                             ).right
       ) yield {
+        // View for the shipping form -- only show it if ordering a print.
         val maybeShippingFormView = highQualityPrint match {
           case PrintingOption.HighQualityPrint =>
             val restoredOrDefaultShipping = forms.shippingForm(Some(flash)).map {
@@ -66,6 +79,7 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
             None
         }
 
+        // View for the billing form.
         val billingFormView = forms.billingForm(Some(flash)).map { billing =>
           billing.asCheckoutPageView
         }.getOrElse {
@@ -86,12 +100,14 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
           total=forms.total(product.price)
         )
 
+        // Collect both the shipping form and billing form into a single viewmodel
         val checkoutFormView = CheckoutFormView(
           actionUrl=reverse(postStorefrontCheckout(celebrityUrlSlug, productUrlSlug)).url,
           billing=billingFormView,
           shipping=maybeShippingFormView
         )
 
+        // Now baby you've got a stew goin!
         views.frontend.html.celebrity_storefront_checkout(
           form=checkoutFormView,
           summary=orderSummary,
@@ -101,17 +117,25 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
     }
   }
 
+  /**
+   * Controller that POSTs the form served by
+   * [[controllers.website.consumer.StorefrontCheckoutConsumerEndpoints.getStorefrontCheckout()]]
+   *
+   * @param celebrityUrlSlug identifies the celebrity being purchased from
+   * @param productUrlSlug identifies the product being purchased
+   * @return a redirect either to the finalize order page or back to this form to fix errors.
+   */
   def postStorefrontCheckout(celebrityUrlSlug: String, productUrlSlug: String) = postController() {
     celebFilters.requireCelebrityAndProductUrlSlugs {
       (celeb, product) =>
         val forms = purchaseFormFactory.formsForStorefront(celeb.id)
-        val shippingFormReader = purchaseFormReaders.forShippingForm
 
+        // For-comprehend over a bunch of validations
         for (
           // Product ID in the url must match the product being ordered, or redirect to photo
           productId <- forms.matchProductIdOrRedirectToChoosePhoto(celeb, product).right;
 
-          // There must be inventory
+          // There must be remaining inventory on the product
           inventoryBatch <- forms.nextInventoryBatchOrRedirect(celebrityUrlSlug, product).right;
 
           // Gotta have a valid personalize form in storage
@@ -126,7 +150,7 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
                                 productUrlSlug
                               ).right;
 
-          // And valid shipping information (if necessary by printing option)
+          // And valid shipping information (if necessary given the printing option)
           maybeShippingForms <- redirectOrValidShippingFormOption(
                                   printingOption,
                                   celebrityUrlSlug,
@@ -143,6 +167,8 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
         ) yield {
           forms.withHighQualityPrint(printingOption).save()
 
+          // Buy the egraph
+          // TODO: instead go to the Finalize Order page.
           EgraphPurchaseHandler(
             recipientName=validPersonalizeForm.recipientName,
             recipientEmail=validPersonalizeForm.recipientEmail.getOrElse(validBillingForm.email),
@@ -158,6 +184,9 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
     }
   }
 
+  //
+  // Private members
+  //
   private def redirectOrValidShippingFormOption(
     printingOption: PrintingOption,
     celebrityUrlSlug: String,
@@ -207,6 +236,7 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
     new Redirect(reverse(getStorefrontCheckout(celebrityUrlSlug, productUrlSlug)).url)
   }
 
+  // TODO: This is a repeat of a function in I think the ReviewController. Undo the copy-paste.
   private def makeTextForCelebToWrite(messageRequest: WrittenMessageRequest, messageText: Option[String])
   : String = {
     messageRequest match {

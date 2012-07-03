@@ -8,6 +8,11 @@ import services.Utils
 import controllers.WebsiteControllers
 import WebsiteControllers.{reverse, getStorefrontChoosePhotoTiled}
 
+/**
+ * Converts Celebrities into various view models defined in the front-end module
+ *
+ * @param celeb the celebrity to convert.
+ */
 class CelebrityViewConversions(celeb: Celebrity) {
 
   /**

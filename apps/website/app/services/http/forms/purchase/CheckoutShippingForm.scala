@@ -4,7 +4,7 @@ import services.http.forms.{FormChecks, Form}
 import services.http.forms.purchase.CheckoutShippingForm.Valid
 
 /**
- * Purchase flow form for shipping information.
+ * Purchase flow form for shipping information, as provided on the checkout page.
  */
 class CheckoutShippingForm(
   val paramsMap: Form.Readable,

@@ -9,6 +9,16 @@
   session: play.mvc.Scope.Session
 )
 
+@{/** Renders the checkout page in the purchase flow.
+
+      form - the checkout form to render
+      summary - an order summary for rendering
+      paymentJsModule - the javascript module that should be used to process payments.
+        in production this will always be Stripe, but for testing we sometimes use the
+        yes-maam implementation. See payment.js for how this gets routed.
+      paymentPublicKey - the key used to identify our requests to our payment provider.
+*/}
+
 @import models.frontend.forms.{Field, FormError}
 @import views.frontend.tags.html.{storefront_breadcrumbs_responsive, bootstrap_text_input_field, bootstrap_input_field, safeForm}
 @import frontend.formatting.MoneyFormatting.Conversions._

@@ -40,6 +40,7 @@ define(["libs/jquery.watermark.min", "libs/iphonecheckboxes/iphone-style-checkbo
       $(selector).button(method);
     },
 
+    /** Takes a jQuery object and enable/disables all inputs child to it. */
     enableChildInputs: function($toDisable, enable) {
       $toDisable.find('input').each(function() {
         $this = $(this);

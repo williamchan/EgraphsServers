@@ -6,12 +6,11 @@ import play.mvc.Controller
 import services.mvc.{ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
 import play.mvc.results.Redirect
 import services.http.forms.purchase.PurchaseFormFactory
-import controllers.WebsiteControllers
 import services.Utils
 import controllers.WebsiteControllers.getStorefrontPersonalize
 
 /**
- * Endpoint for serving up the Choose Photo page
+ * Manages GET and POST of celebrity photos in the purchase flow.
  */
 private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
   extends ImplicitHeaderAndFooterData
@@ -21,11 +20,24 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
   import services.mvc.CelebrityViewConversions._
   import services.mvc.ProductViewConversions._
 
+  //
+  // Services
+  //
   protected def controllerMethod: ControllerMethod
   protected def celebFilters: CelebrityAccountRequestFilters
   protected def postController: POSTControllerMethod
   protected def purchaseFormFactory: PurchaseFormFactory
 
+  //
+  // Controllers
+  //
+  /**
+   * Controller that serves the "tiled" view of the celebrity storefront's Choose Photo
+   * screen.
+   *
+   * @param celebrityUrlSlug identifies the celebrity storefront to serve.
+   * @return the web page.
+   */
   def getStorefrontChoosePhotoTiled(celebrityUrlSlug: String) = controllerMethod()
   {
     celebFilters.requireCelebrityUrlSlug { celebrity =>
@@ -44,6 +56,14 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
     }
   }
 
+  /**
+   * Controller that serves the "carousel" view of the celebrity storefront's Choose Photo
+   * screen.
+   *
+   * @param celebrityUrlSlug identifies the celebrity whose storefront to serve.
+   * @param productUrlSlug identifies the first product to display.
+   * @return the web page.
+   */
   def getStorefrontChoosePhotoCarousel(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod()
   {
     celebFilters.requireCelebrityAndProductUrlSlugs{ (celeb, product) =>
@@ -71,13 +91,19 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
     }
   }
 
+  /**
+   * Controller that receives the first part of the purchase flow: photo selection.
+   *
+   * @param celebrityUrlSlug identifies the celebrity to purchase from
+   * @param productUrlSlug identifies the photo being selected.
+   * @return
+   */
   def postStorefrontChoosePhoto(celebrityUrlSlug: String, productUrlSlug: String) = postController() {
     celebFilters.requireCelebrityAndProductUrlSlugs { (celeb, product) =>
-    // Save the forms with the new product ID
+      // Save the purchase forms with the new product ID
       purchaseFormFactory.formsForStorefront(celeb.id).withProductId(product.id).save()
 
       // Redirect either to a url specified by the POST params or to the Personalize page.
-      import WebsiteControllers.getStorefrontPersonalize
       Utils.redirectToClientProvidedTarget(
         urlIfNoTarget=reverse(getStorefrontPersonalize(celebrityUrlSlug, productUrlSlug)).url
       )

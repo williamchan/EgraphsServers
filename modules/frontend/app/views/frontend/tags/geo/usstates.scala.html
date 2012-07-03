@@ -50,6 +50,15 @@
     "WI" -> "Wisconsin",
     "WY" -> "Wyoming")
 )
+
+@{/** Prints <option> tags for each state.
+
+      selected - abbreviation for the state whose <option> tag should have a "selected" attribute on
+          it. No tags are "selected" if this is not provided or if it doesn't match a known abbreviation.
+
+      states - Don't touch this.
+*/}
+
 <!-- Begin usstates.scala.html -->
 @for((abbreviation, name) <- states) {
   <option value="@abbreviation" @if(abbreviation == selected) {selected}>@name</option>

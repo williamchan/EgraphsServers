@@ -5,8 +5,15 @@ import models.frontend.storefront.ChoosePhotoRecentEgraph
 import services.blobs.AccessPolicy
 import controllers.WebsiteControllers
 
+/**
+ * Implicit conversions to turn [[models.Order]]s into related view models.
+ */
 object OrderViewConversions {
 
+  /**
+   * Turns an order and associated product and egraph into a ChoosePhotoRecentEgraph,
+   * which is used on the Choose Photo page.
+   **/
   def productOrderAndEgraphToChoosePhotoRecentEgraph(product: Product, order: Order, egraph: Egraph)
   : ChoosePhotoRecentEgraph =
   {

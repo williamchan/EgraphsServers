@@ -5,7 +5,6 @@ import java.util
 /**
  * Face for a Celebrity as viewed in the Choose Photo page
  *
- * TODO: re-enable quantity available and delivery date
  *
  * @param name the celebrity's name. e.g. "David Ortiz"
  * @param profileUrl URL for the celebrity's profile image

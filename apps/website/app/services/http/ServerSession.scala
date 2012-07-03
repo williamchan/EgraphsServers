@@ -265,10 +265,18 @@ class ServerSessionFactory @Inject() (sessionServices:ServerSessionServices) ext
     new ServerSession(providedData=None, services=sessionServices)
   }
 
+  /** Returns the server-session namespace associated with this user's shopping cart */
   def shoppingCart: ServerSession = {
     this.apply().namespaced("cart")
   }
 
+  /**
+   * Returns the server-session namespace associated with the items in the user's shopping
+   * cart that are associated with the given [[models.Celebrity]]'s storefront
+   *
+   * @param celebrityId id of the celebrity whose storefront items in the user's
+   *   cart we should access.
+   */
   def celebrityStorefrontCart(celebrityId: Long): ServerSession = {
     this.shoppingCart.namespaced("celeb-" + celebrityId)
   }

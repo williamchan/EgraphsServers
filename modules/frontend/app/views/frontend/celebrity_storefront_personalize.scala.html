@@ -9,6 +9,15 @@
   session: play.mvc.Scope.Session
 )
 
+@{/** Renders the personalize page in the celebrity storefront.
+
+      form - the models.frontend.storefront.PersonalizeForm to render
+      guaranteedDelivery - the date by which the product is guaranteed to be delivered
+      orderSummary - brief summary for the order up until this point.
+
+      (the implicit parameters are documented in the base template from which they get used)
+*/}
+
 @import views.frontend.tags.html.storefront_breadcrumbs_responsive
 @import views.frontend.tags
 @import models.frontend.storefront.PersonalizeMessageOption

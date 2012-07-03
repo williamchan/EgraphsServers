@@ -3,7 +3,6 @@ package services.http.forms.purchase
 import services.http.{ServerSessionFactory, ServerSession}
 import com.google.inject.Inject
 import play.mvc.results.Redirect
-import controllers.WebsiteControllers
 import models.{InventoryBatch, Celebrity, Product}
 import controllers.WebsiteControllers.{getStorefrontPersonalize, getStorefrontReview, reverse, getStorefrontChoosePhotoTiled}
 import org.joda.money.{CurrencyUnit, Money}
@@ -11,6 +10,15 @@ import models.enums.PrintingOption
 import services.http.forms.{Form, ReadsForm}
 import play.mvc.Scope.Flash
 
+/**
+ * Represents the cache-persisted forms in the purchase flow.
+ *
+ * See the controllers in [[controllers.website.consumer]] for usage.
+ *
+ * @param formReaders readers for grabbing the different forms out of the session
+ *     or flash when nevessary.
+ * @param storefrontSession a `ServerSession` namespaced to a particular celebrity's storefront.
+ */
 class PurchaseForms @Inject()(
   formReaders: PurchaseFormReaders,
   storefrontSession: ServerSession
@@ -19,18 +27,40 @@ class PurchaseForms @Inject()(
 
   import PurchaseForms.Key
 
+  /** The  ID of the [[models.Product]] being purchased from the storefront */
   def productId: Option[Long] = {
     storefrontSession[Long](Key.ProductId)
   }
 
+  /**
+   * Returns a copy of this object equipped with the new productId.
+   */
+  def withProductId(productId: Long): PurchaseForms = {
+    this.withSession(storefrontSession.setting(Key.ProductId -> productId))
+  }
+
+  /**
+   * The current cost of shipping the physical print (or possibly for the full physical
+   * print). This will be None if no physical print has been ordered.
+   **/
   def shippingPrice: Option[Money] = {
     None
   }
 
+  /**
+   * The current tax cost for the purchase. None if not applicable.
+   */
   def tax: Option[Money] = {
     None
   }
 
+  /**
+   * The full cost of the purchase. This is the cost of the product plust
+   * shipping and tax.
+   *
+   * @param basePrice the price of the product
+   * @return the full price.
+   */
   def total(basePrice: Money): Money = {
     val zero = Money.zero(CurrencyUnit.USD)
 
@@ -39,43 +69,36 @@ class PurchaseForms @Inject()(
       .plus(tax.getOrElse(zero))
   }
 
-  def nextInventoryBatchOrRedirect(celebrityUrlSlug: String, product: models.Product)
-  : Either[Redirect, InventoryBatch] =
-  {
-    product.nextInventoryBatchToEnd.toRight(
-      left=this.redirectToInsufficientInventoryPage(
-        celebrityUrlSlug,
-        product.urlSlug
-      )
-    )
-  }
-
-  def withProductId(productId: Long): PurchaseForms = {
-    this.withSession(storefrontSession.setting(Key.ProductId -> productId))
-  }
-
+  /**
+   * Gets the selected PrintingOption or none if it hasn't yet been supplied.
+   */
   def highQualityPrint: Option[PrintingOption] = {
     storefrontSession.get(Key.HighQualityPrint)
   }
 
-  def withHighQualityPrint(doPrint: PrintingOption) = {
-    this.withSession(storefrontSession.setting(Key.HighQualityPrint -> doPrint))
+  /** Returns a copy of this with a new PrintingOption */
+  def withHighQualityPrint(printingOption: PrintingOption) = {
+    this.withSession(storefrontSession.setting(Key.HighQualityPrint -> printingOption))
   }
 
-  def highQualityPrintOrRedirectToReviewForm(celebrityUrlSlug: String, productUrlSlug: String): Either[Redirect, PrintingOption] = {
-    highQualityPrint.toRight(left= {
-      val redirectAction = reverse(getStorefrontReview(celebrityUrlSlug, productUrlSlug)).url
-
-      new Redirect(redirectAction)
-    })
-  }
-
+  /**
+   * Reads the shipping form out of the server session, or (optionally, preferentially)
+   * out of the flash scope.
+   *
+   * @param flashOption flash out of which to preferentially read the form.
+   */
   def shippingForm(flashOption: Option[Flash]=None): Option[CheckoutShippingForm] ={
     getFormFromFlashOrSession(formReaders.forShippingForm, flashOption)
   }
 
+  /**
+   * Reads the billing form out of the server session, or (optionally, preferentially) out
+   * of the flash scope.
+   *
+   * @param flashOption flash out of which to preferentially read the form.
+   */
   def billingForm(flashOption: Option[Flash]=None): Option[CheckoutBillingForm] = {
-    // First read out the shipping form to tell if shipping was the same as billing.
+    // First read out the shipping form to tell if shipping info was the same as billing.
     val shippingFormOption = shippingForm(flashOption)
     val billingSameAsShippingOption = for(
       shipping <- shippingFormOption;
@@ -84,9 +107,9 @@ class PurchaseForms @Inject()(
       billingSameAsShipping
     }
 
-    // We can only get an Option[BillingReader] because, in certain cases, reading the billing
-    // info is only possible in the presence of a shipping info. For example, if a high
-    // quality print was specified and billing was the same as shipping
+    // We can only get an Option[ReadsForm[CheckoutBillingForm]] because, in certain cases, validating
+    // the billing info is only possible in the presence of a shipping info. For example, if a high
+    // quality print was specified and the user wants us to use the same billing as his shipping
     val maybeBillingReader = (this.highQualityPrint, billingSameAsShippingOption) match {
       case (Some(PrintingOption.HighQualityPrint), Some(true)) =>
         // If high quality print was specified, and billing is same as shipping, return the billing form
@@ -116,16 +139,12 @@ class PurchaseForms @Inject()(
     }
   }
 
-  private def getFormFromFlashOrSession[FormType <: Form[_]](
-    reader: ReadsForm[FormType],
-     flashOption: Option[Flash]
-  ): Option[FormType] =
-  {
-    flashOption.map(flash => reader.read(flash.asFormReadable)).getOrElse {
-      reader.read(storefrontSession.asFormReadable)
-    }
-  }
-
+  /**
+   * Reads the personalize form out of the server session, or (optionally, preferentially)
+   * out of the flash scope.
+   *
+   * @param flashOption flash out of which to preferentially read the form.
+   */
   def personalizeForm(flashOption: Option[play.mvc.Scope.Flash]=None): Option[PersonalizeForm] = {
     val formReader = formReaders.forPersonalizeForm
 
@@ -134,39 +153,72 @@ class PurchaseForms @Inject()(
     }
   }
 
-  def personalizeFormOrRedirectToPersonalizeForm(celebrityUrlSlug: String, productUrlSlug: String)
-  : Either[Redirect, PersonalizeForm] = {
-
-    personalizeForm().toRight(left= {
-      val action = reverse(getStorefrontPersonalize(celebrityUrlSlug, productUrlSlug))
-      new Redirect(action.url)
-    })
-  }
-
-  def validPersonalizeFormOrRedirectToPersonalizeForm(celebrityUrlSlug: String, productUrlSlug: String)
-  : Either[Redirect, PersonalizeForm.Validated] = {
-    for (
-      personalizeForm <- personalizeFormOrRedirectToPersonalizeForm(
-                              celebrityUrlSlug,
-                              productUrlSlug
-                            ).right;
-      valid <-  personalizeForm.errorsOrValidatedForm.left.map { formError =>
-                  val action = reverse(getStorefrontPersonalize(
-                    celebrityUrlSlug,
-                    productUrlSlug
-                  ))
-
-                  new Redirect(action.url)
-                }.right
-    ) yield {
-      valid
-    }
-  }
-
+  /**
+   * Returns a copy of this object equipped with the provided personalize form.
+   * Call `save` to persist changes.
+   */
   def withPersonalizeForm(form: PersonalizeForm) = {
     this.withSession(form.write(storefrontSession.asFormWriteable).written)
   }
 
+  /**
+   * Persists any differences between this object and the one that instantiated
+   * it. For example, persists any changes due to `withPersonalizeForm`, `withProductId`,
+   * etc.
+   *
+   * @return a copy of this object, saved.
+   */
+  def save(): PurchaseForms = {
+    new PurchaseForms(formReaders, storefrontSession.save())
+  }
+
+  //
+  // Redirections.
+  // TODO: Refactor these into another class; they all do pretty similar things
+  //
+  /**
+   * Returns the product's next active inventory batch on the right if there is one,
+   * or redirects to a "Product lacks inventory" page on the left.
+   * @param celebrityUrlSlug identifies the celebrity, for the redirect.
+   * @param product the product to check for available inventory.
+   */
+  def nextInventoryBatchOrRedirect(celebrityUrlSlug: String, product: models.Product)
+  : Either[Redirect, InventoryBatch] =
+  {
+    product.nextInventoryBatchToEnd.toRight(
+      left=this.redirectToInsufficientInventoryPage(
+        celebrityUrlSlug,
+        product.urlSlug
+      )
+    )
+  }
+
+
+  /**
+   * Returns the printing option on the right if one has been provided in a previously
+   * supplied form. Otherwise returns a redirect to the page that provides the high
+   * quality print on the left.
+   *
+   * @param celebrityUrlSlug identifies the celebrity for the redirect
+   * @param productUrlSlug identifies the product for the redirect
+   */
+  def highQualityPrintOrRedirectToReviewForm(celebrityUrlSlug: String, productUrlSlug: String): Either[Redirect, PrintingOption] = {
+    highQualityPrint.toRight(left= {
+      val redirectAction = reverse(getStorefrontReview(celebrityUrlSlug, productUrlSlug)).url
+
+      new Redirect(redirectAction)
+    })
+  }
+
+
+  /**
+   * Returns the product ID being purchased on the right if one has been provided in a previously
+   * supplied form. Otherwise returns a redirect to the page that allows the user to choose
+   * a product on the left.
+   *
+   * @param celebrity the celebrity for the redirect
+   * @param product the product for the redirect
+   */
   def matchProductIdOrRedirectToChoosePhoto(celebrity:Celebrity, product:Product): Either[Redirect, Long] = {
     lazy val thisChoosePhotoRedirect = choosePhotoRedirect(celebrity.urlSlug.getOrElse("/"))
 
@@ -179,18 +231,34 @@ class PurchaseForms @Inject()(
     }
   }
 
-  def redirectToInsufficientInventoryPage(celebrityUrlSlug: String, productUrlSlug: String) = {
-    // TODO: Make this actually redirect to a page that shows insufficient inventory
-    new Redirect(reverse(getStorefrontChoosePhotoTiled(celebrityUrlSlug)).url)
+  /**
+   * Returns a validated PersonalizeForm on the right if one has been provided in a previously
+   * supplied form. Otherwise returns a redirect to the page that allows the user to
+   * personalize his egraph purchase on the left.
+   *
+   * @param celebrityUrlSlug identifies the celebrity for the redirect
+   * @param productUrlSlug identifies the product for the redirect
+   */
+  def validPersonalizeFormOrRedirectToPersonalizeForm(celebrityUrlSlug: String, productUrlSlug: String)
+  : Either[Redirect, PersonalizeForm.Validated] = {
+    for (
+      personalizeForm <- personalizeFormOrRedirectToPersonalizeForm(
+        celebrityUrlSlug,
+        productUrlSlug
+      ).right;
+      valid <-  personalizeForm.errorsOrValidatedForm.left.map { formError =>
+        val action = reverse(getStorefrontPersonalize(
+          celebrityUrlSlug,
+          productUrlSlug
+        ))
+
+        new Redirect(action.url)
+      }.right
+    ) yield {
+      valid
+    }
   }
 
-  def choosePhotoRedirect(celebrityUrlSlug: String): Redirect = {
-    new Redirect(reverse(getStorefrontChoosePhotoTiled(celebrityUrlSlug)).url)
-  }
-
-  def save(): PurchaseForms = {
-    new PurchaseForms(formReaders, storefrontSession.save())
-  }
 
   //
   // Private members
@@ -198,6 +266,35 @@ class PurchaseForms @Inject()(
   private def withSession(storefrontSession: ServerSession): PurchaseForms = {
     new PurchaseForms(formReaders, storefrontSession)
   }
+
+  private def getFormFromFlashOrSession[FormType <: Form[_]](
+    reader: ReadsForm[FormType],
+    flashOption: Option[Flash]
+    ): Option[FormType] =
+  {
+    flashOption.map(flash => reader.read(flash.asFormReadable)).getOrElse {
+      reader.read(storefrontSession.asFormReadable)
+    }
+  }
+
+  private def redirectToInsufficientInventoryPage(celebrityUrlSlug: String, productUrlSlug: String) = {
+    // TODO: Make this actually redirect to a page that shows insufficient inventory
+    new Redirect(reverse(getStorefrontChoosePhotoTiled(celebrityUrlSlug)).url)
+  }
+
+  private def choosePhotoRedirect(celebrityUrlSlug: String): Redirect = {
+    new Redirect(reverse(getStorefrontChoosePhotoTiled(celebrityUrlSlug)).url)
+  }
+
+  def personalizeFormOrRedirectToPersonalizeForm(celebrityUrlSlug: String, productUrlSlug: String)
+  : Either[Redirect, PersonalizeForm] = {
+
+    personalizeForm().toRight(left= {
+      val action = reverse(getStorefrontPersonalize(celebrityUrlSlug, productUrlSlug))
+      new Redirect(action.url)
+    })
+  }
+
 }
 
 object PurchaseForms {

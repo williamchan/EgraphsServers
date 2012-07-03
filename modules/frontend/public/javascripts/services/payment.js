@@ -1,3 +1,5 @@
+/* Module provides different payment service implementations for usage in production and testing
+ */
 define(["libs/stripe-v1"],
 function() {
   var yesMaamPayment = {

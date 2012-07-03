@@ -126,6 +126,9 @@ case class Celebrity(id: Long = 0,
     services.productStore.findActiveProductsByCelebrity(id).toSeq
   }
 
+  /**
+   * The orders sorted by most recently fulfilled.
+   */
   def ordersRecentlyFulfilled: Iterable[FulfilledProductOrder] = {
     services.orderStore.findMostRecentlyFulfilledByCelebrity(this.id)
   }

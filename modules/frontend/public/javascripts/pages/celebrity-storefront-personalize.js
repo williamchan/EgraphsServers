@@ -4,7 +4,8 @@ function(forms, Egraphs) {
   
   var page = Egraphs.page,
       celeb = page.celeb;
-  
+
+  /** Animation dynamics for the gift swap effect. */
   function setIsGift(isGift) {
     var visibleWhenIsGift = $('.gift-only');
     var visibleWhenIsNotGift = $('.non-gift-only');

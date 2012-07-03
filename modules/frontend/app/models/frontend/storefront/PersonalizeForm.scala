@@ -2,6 +2,20 @@ package models.frontend.storefront
 
 import models.frontend.forms.Field
 
+/**
+ * View model for the personalize form, as rendered here:
+ * [[views.frontend.html.celebrity_storefront_personalize]]
+ *
+ *
+ * @param actionUrl target for POSTing the form
+ * @param isGift true that the egraph is a gift
+ * @param recipientName the name of the recipient
+ * @param recipientEmail the recipient's email address
+ * @param messageOption what the celebrity should write: a specific message,
+ *    whatever he wants, or just his signature.
+ * @param messageText text for the message.
+ * @param noteToCelebrity a letter for the celebrity's eyes only.
+ */
 case class PersonalizeForm (
   actionUrl: String,
   isGift: Field[Boolean],
@@ -13,6 +27,10 @@ case class PersonalizeForm (
 )
 
 object PersonalizeForm {
+  /**
+   * Returns an empty, basic version of the form
+   * with parameter names as specified in these arguments.
+   */
   def empty(
     actionUrl: String,
     isGiftParam: String,

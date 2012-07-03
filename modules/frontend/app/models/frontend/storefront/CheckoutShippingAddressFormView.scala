@@ -2,6 +2,21 @@ package models.frontend.storefront
 
 import models.frontend.forms.Field
 
+/**
+ * Shipping form as rendered in the CheckoutScreen
+ *
+ * See [[views.frontend.html.celebrity_storefront_checkout]]
+ *
+ * @param fullName name of the shipping recipient
+ * @param email email address of the shipping recipient
+ * @param address1 first address line of the shipping recipient
+ * @param address2 second address line of the shipping recipient
+ * @param city city for shipping
+ * @param state state for shipping
+ * @param postalCode postal (ZIP) code for shipping
+ * @param billingIsSameAsShipping true that we should use the information here
+ *   for billing purposes as well.
+ */
 case class CheckoutShippingAddressFormView(
   fullName: Field[String],
   email: Field[String],

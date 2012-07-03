@@ -257,6 +257,13 @@ case class Product(
     (totalInventory - numOrders, activeInventoryBatches)
   }
 
+  /**
+   * Returns the most appropriate inventory batch to purchase from on this product, if there
+   * were any active inventory batches.
+   *
+   * The most appropriate is the one that will get egraph to the customer fastest, which is
+   * the inventory batch that ends the soonest.
+   */
   def nextInventoryBatchToEnd: Option[InventoryBatch] = {
     val batches = services.inventoryBatchStore.getActiveInventoryBatches(this).toSeq
 

@@ -6,6 +6,20 @@
   omitName: Boolean=false
 )
 
+@{/** Makes a default (not that versatile) text field with the name of a models.frontend.forms.Field.
+
+      See the checkout form for good examples.
+
+      Parameters:
+
+      labelText - the text that should be put into the label for the field. e.g. "Email address:"
+      field - the Field object, for use in naming the <input> and for error reporting.
+      hint - any coaching that should go below the label
+      inputClass - any additional classes that should be put onto the input element
+      omitName - whether or not to omit the name of the input (for example, for sensitive card data
+          we don't even want to have the info hit our servers.
+*/}
+
   <div class="field">
     <div class="clearfix">
       <label class="instructions" for="@field.name">@labelText<small>@hint</small></label>

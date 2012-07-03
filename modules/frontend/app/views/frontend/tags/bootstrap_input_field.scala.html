@@ -1,5 +1,18 @@
 @(field: models.frontend.forms.Field[_])(inputBody: => Html)
 
+@{/** Makes a bootstrap-style input field out of the provided Field. Includes error reporting alert box.
+      See the personalize form in the purchase flow for good usage.
+
+      Usage:
+        @bootstrap_input_field(form.recipientName) {
+          <input type="text" value="@form.recipientName.value">
+        }
+
+      field - the field to wrap in a <div class="input">
+      inputBody - the actual form element to render (e.g. <input>, <select>, <textarea>, etc)
+*/}
+
+ @{/** Wrap everything in div.input */}
 <div class="input control-group @field.name @field.ifError {error}">
   @inputBody
   

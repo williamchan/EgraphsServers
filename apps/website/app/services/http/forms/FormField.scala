@@ -42,12 +42,17 @@ trait FormField[+ValueType] {
   }
 
   /**
-   * The validation errors, if there were any. Otherwise None.
+   * The validation error, if there was one. Otherwise None.
    */
   def error: Option[FormError] = {
     validate.left.toOption
   }
 
+  /**
+   * The validation error, but only if it wasnt a DependentFieldError (meaning,
+   * an error that could not be validated because a field upon which its validation
+   * depended could also not be validated.
+   */
   def independentError: Option[FormError] = {
     validate.left.toOption.filter(error => !error.isInstanceOf[DependentFieldError])
   }

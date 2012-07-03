@@ -1,5 +1,8 @@
 package models.frontend.storefront
 
+/**
+ * Choices for how the written message should be personalized.
+ */
 sealed abstract class PersonalizeMessageOption(val paramValue: String)
 
 object PersonalizeMessageOption {

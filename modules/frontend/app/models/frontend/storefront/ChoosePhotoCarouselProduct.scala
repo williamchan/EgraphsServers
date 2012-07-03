@@ -11,7 +11,7 @@ import org.joda.money.Money
  * @param personalizeLink link to the product's personalize page at
  * @param orientation the image's orientation
  * @param carouselUrl what the URL should change to when this product is selected on
- *                    the carousel.
+ *     the carousel.
  * @param facebookShareLink link to share this photo on facebook
  * @param twitterShareLink link to share this photo on twitter
  */

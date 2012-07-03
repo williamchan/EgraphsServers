@@ -9,7 +9,17 @@ import models.frontend.storefront.ChoosePhotoCarouselProduct
 import models.frontend.storefront.ProductOrientation
 import models.frontend.storefront.ChoosePhotoTileProduct
 
+/**
+ * Conversions to turn [[models.Product]]s into their view analogs.
+ *
+ * @param product the product to convert.
+ */
 class ProductViewConversions(product: Product) {
+  /**
+   * Renders the [[models.Product]] as a tile for [[views.frontend.html.celebrity_storefront_choose_photo_tiled]]
+   * @param celebrityUrlSlug identifies the celebrity for use in generating a target url
+   * @param quantityRemaining the remaining inventory before the product is "sold out".
+   */
   def asChoosePhotoTileView(celebrityUrlSlug: String = product.celebrity.urlSlug.getOrElse("/"),
                             quantityRemaining: Int = product.remainingInventoryCount)
   : ChoosePhotoTileProduct =
@@ -29,6 +39,11 @@ class ProductViewConversions(product: Product) {
     )
   }
 
+  /**
+   * Renders the [[models.Product]] as a tile for [[views.frontend.html.celebrity_storefront_choose_photo_carousel]]
+   *
+   * @param celebUrlSlug identifies the celebrity for forming the link to post the product selection.
+   */
   def asChoosePhotoCarouselView(celebUrlSlug: String=product.celebrity.urlSlug.getOrElse("/"))
   : ChoosePhotoCarouselProduct =
   {
@@ -50,6 +65,9 @@ class ProductViewConversions(product: Product) {
     )
   }
 
+  //
+  // Private members
+  //
   private def productThumbnailUrl(width: Int):String = {
     product.photo.resizedWidth(width).withImageType(Jpeg).getSaved(AccessPolicy.Public).url
   }

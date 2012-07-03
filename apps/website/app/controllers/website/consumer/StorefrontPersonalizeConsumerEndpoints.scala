@@ -10,19 +10,37 @@ import models.frontend.storefront.{PersonalizeForm => PersonalizeFormView, Store
 import services.Utils
 import services.http.forms.Form.Conversions._
 
+/**
+ * Manages GET and POST of the egraph purchase personalization form.
+ */
 trait StorefrontPersonalizeConsumerEndpoints
   extends ImplicitHeaderAndFooterData
   with ImplicitStorefrontBreadcrumbData
 { this: Controller =>
 
+  //
+  // Services
+  //
   protected def controllerMethod: ControllerMethod
   protected def postController: POSTControllerMethod
   protected def purchaseFormFactory: PurchaseFormFactory
   protected def purchaseFormReaders: PurchaseFormReaders
   protected def celebFilters: CelebrityAccountRequestFilters
 
+  //
+  // Controllers
+  //
+  /**
+   * Gets the personalization form page in the purchase flow.
+   *
+   * @param celebrityUrlSlug identifies the celebrity from which the user is purchasing
+   * @param productUrlSlug identifies the photo being personalized
+   * @return the web page, or a redirect if the product was not found in the user's server-
+   *     side session cache.
+   */
   def getStorefrontPersonalize(celebrityUrlSlug: String, productUrlSlug: String):Any = controllerMethod() {
     celebFilters.requireCelebrityAndProductUrlSlugs { (celeb, product) =>
+      // Get the purchase forms specific to this celebrity's storefront.
       val forms = purchaseFormFactory.formsForStorefront(celeb.id)
 
       for (
@@ -36,10 +54,12 @@ trait StorefrontPersonalizeConsumerEndpoints
       ) yield {
         val actionTarget = reverse(postStorefrontPersonalize(celebrityUrlSlug, productUrlSlug)).url
 
+        // Try to get the forms out of the flash primarily and server-session secondarily.
         val formViewOption = forms.personalizeForm(Some(flash)).map { form =>
           form.asPersonalizeFormView(actionTarget)
         }
 
+        // If neither flash nor server had the forms, render a default, empty form.
         val formView = formViewOption.getOrElse {
           import PersonalizeForm.Params
 
@@ -72,13 +92,22 @@ trait StorefrontPersonalizeConsumerEndpoints
     }
   }
 
+  /**
+   * Accepts form POSTs of the personalization form in the purchase flow.
+   *
+   * @param celebrityUrlSlug identifies the celebrity from which the user is purchasing
+   * @param productUrlSlug identifies the photo being personalized
+   * @return a Redirect to the Review page if successful, or back to this form page if unsuccessful.
+   */
   def postStorefrontPersonalize(celebrityUrlSlug: String, productUrlSlug: String) = postController() {
     import WebsiteControllers.getStorefrontReview
 
     celebFilters.requireCelebrityAndProductUrlSlugs { (celeb, product) =>
+      // Get the set of purchase forms from the server session
       val purchaseForms = purchaseFormFactory.formsForStorefront(celeb.id)
-      val formReader = purchaseFormReaders.forPersonalizeForm
 
+      // Read the Personalize form out of the parameters
+      val formReader = purchaseFormReaders.forPersonalizeForm
       val form = formReader.instantiateAgainstReadable(params.asFormReadable)
 
       // Comprehend over a bunch of validation checks

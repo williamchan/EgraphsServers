@@ -287,6 +287,8 @@ case class Order(
 }
 
 case class FulfilledOrder(order: Order, egraph: Egraph)
+
+/** Thin semantic wrapper around a tuple for product order and egraph */
 case class FulfilledProductOrder(product: Product, order:Order, egraph: Egraph)
 
 object Order {
@@ -328,6 +330,11 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
     ).headOption
   }
 
+  /**
+   * Returns the most recently fulfilled egraphs created by a [[models.Celebrity]]
+   *
+   * @param celebrityId ID of the celebrity.
+   */
   def findMostRecentlyFulfilledByCelebrity(celebrityId: Long): Iterable[FulfilledProductOrder] = {
     import schema.{celebrities, products, orders, egraphs}
 

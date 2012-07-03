@@ -28,6 +28,22 @@ object FormConversions {
       )
     }
 
+    /**
+     *  Turns a FormField into a view field given that you provide a small conversion.
+     *
+     *  Usage:
+     *  {{{
+     *    import FormConversions._
+     *
+     *    val modelField:FormField[Money] = // This exists in some form somewhere
+     *    val viewField:Field[String] = modelField.asViewFieldWithConversion { money =>
+     *      money.getAmount().toString
+     *    }
+     *  }}}
+     * @param convertToViewValue function that turns the model field's type into the view field's.
+     * @tparam ViewFieldT type of the view field
+     * @return a frontend Field[ViewFieldT]
+     */
     def asViewFieldWithConversion[ViewFieldT : Manifest](convertToViewValue: ModelFieldT => ViewFieldT)
     : Field[ViewFieldT] =
     {
@@ -50,6 +66,10 @@ object FormConversions {
   }
 
   class PersonalizeFormViewConversions(form: PersonalizeForm) {
+
+    /**
+     * Converts the [[services.http.forms.purchase.PersonalizeForm]] into its front-end view analog.
+     */
     def asPersonalizeFormView(actionUrl: String): PersonalizeFormView = {
       val isGiftField = form.recipientChoice.asViewFieldWithConversion { recipientChoice =>
         (recipientChoice == RecipientChoice.Other)
@@ -82,6 +102,11 @@ object FormConversions {
   }
 
   class CheckoutBillingFormViewConversions(form: CheckoutBillingForm) {
+
+    /**
+     * Converts the [[services.http.forms.purchase.CheckoutBillingForm]] into its
+     * front-end view analog.
+     */
     def asCheckoutPageView: CheckoutBillingInfoView = {
       CheckoutBillingInfoView(
         fullName = form.name.asViewField,
@@ -92,6 +117,11 @@ object FormConversions {
   }
 
   class CheckoutShippingFormViewConversions(form: CheckoutShippingForm) {
+
+    /**
+     * Converts the [[services.http.forms.purchase.CheckoutShippingForm]] into its
+     * front-end view analog.
+     */
     def asCheckoutPageView: CheckoutShippingAddressFormView = {
       CheckoutShippingAddressFormView(
         fullName = form.name.asViewField,

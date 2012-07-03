@@ -93,6 +93,10 @@ class Utils @Inject()(@PlayConfig() playConfig: util.Properties) {
     action
   }
 
+  /**
+   * Redirects to a targetUrl found in the request params. If that url could not be found, it redirects to
+   * the URL in the argument.
+   */
   def redirectToClientProvidedTarget(urlIfNoTarget: String)(implicit params: play.mvc.Scope.Params): Redirect = {
     import services.http.SafePlayParams.Conversions._
 

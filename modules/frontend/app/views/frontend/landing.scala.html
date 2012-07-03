@@ -4,6 +4,11 @@
   footerData: models.frontend.footer.FooterData
 )
 
+@{/** Consumer landing page
+
+      featuredStars - the list of celebrities to feature.
+*/}
+
 @featuredStarBlock(clearFix: Boolean) = {
   @for(starRow <- featuredStars.grouped(4).toList) {
     <div class="celebrities row">
