@@ -279,7 +279,7 @@ trait Form[+ValidFormType] {
     writeKeyValue(serializedErrorsKey, Some(errorString))
   }
 
-  private[forms] def write[T](formWriteable: FormWriteable[T]): FormWriteable[T] = {
+  def write[T](formWriteable: FormWriteable[T]): FormWriteable[T] = {
     // Write all the submitted fields
     val submittedFields = fields.filter(field => !field.isInstanceOf[DerivedField[_]])
     val submittedFieldsWritten = submittedFields.foldLeft(formWriteable)(

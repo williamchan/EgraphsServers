@@ -57,7 +57,6 @@ object CheckoutBillingForm {
     val Name = "order.billing.name"
     val Email = "order.billing.email"
     val PostalCode = "order.billing.postalCode"
-    val ShippingSameAsBilling = "order.shipping.sameAsBilling"
   }
 
   case class Valid(paymentToken: String, name: String, email: String, postalCode: String)

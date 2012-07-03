@@ -26,7 +26,7 @@ class CheckoutShippingForm(
   }
 
   val address1 = field(Params.AddressLine1).validatedBy { paramValues =>
-    check.isSomeValue(paramValues.filter(value => value != ""))
+    check.isSomeValue(paramValues.filter(value => value != ""), "Required")
   }
 
   val address2 = field(Params.AddressLine2).validatedBy { paramValues =>
@@ -34,11 +34,11 @@ class CheckoutShippingForm(
   }
 
   val city = field(Params.City).validatedBy { paramValues =>
-    check.isSomeValue(paramValues)
+    check.isSomeValue(paramValues, "Required")
   }
 
   val state = field(Params.State).validatedBy { paramValues =>
-    check.isSomeValue(paramValues)
+    check.isSomeValue(paramValues, "Required")
   }
 
   val postalCode = field(Params.PostalCode).validatedBy { paramValues =>

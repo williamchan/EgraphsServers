@@ -20,7 +20,7 @@
   Egraphs.page.checkout = {
     paymentJsModule: "@paymentJsModule",
     paymentApiKey: "@paymentPublicKey",
-    buyerPostalCodeFieldName: "@form.billing.postalCode.name",
+    buyerPostalCodeFieldName: "@form.billing.postalCode.name",    
     productPriceInCents: @summary.total.getAmountMinor
   }
 }
@@ -132,7 +132,7 @@
                     <div class="field inline">
                       <input type="checkbox"
                              id="billing-same" 
-                             name="@shipping.billingIsSameAsShipping"
+                             name="@shipping.billingIsSameAsShipping.name"
                              value="yes" 
                              @for(billingIsSame <- shipping.billingIsSameAsShipping; if billingIsSame) {checked}>
                       <label for="billing-same">My billing info is the same as my shipping.</label>

@@ -6,11 +6,12 @@ import play.mvc.Controller
 import services.mvc.{ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
 import services.http.forms.purchase._
 import models.enums.{PrintingOption, WrittenMessageRequest}
-import PrintOptionForm.Params
-import SafePlayParams.Conversions._
+import services.http.forms.Form.Conversions._
 import services.mvc.FormConversions.{checkoutBillingFormToViewConverter, checkoutShippingFormToViewConverter}
 import models.frontend.storefront.{CheckoutFormView, CheckoutOrderSummary, CheckoutBillingInfoView, CheckoutShippingAddressFormView}
 import services.payment.Payment
+import play.mvc.results.Redirect
+import controllers.website.PostBuyProductEndpoint.EgraphPurchaseHandler
 
 /**
  * Endpoint for serving up the Choose Photo page
@@ -104,18 +105,106 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
     celebFilters.requireCelebrityAndProductUrlSlugs {
       (celeb, product) =>
         val forms = purchaseFormFactory.formsForStorefront(celeb.id)
+        val shippingFormReader = purchaseFormReaders.forShippingForm
 
         for (
+          // Product ID in the url must match the product being ordered, or redirect to photo
           productId <- forms.matchProductIdOrRedirectToChoosePhoto(celeb, product).right;
-          validPrintOption <- checkPurchaseField(params.getOption(Params.HighQualityPrint))
-            .isPrintingOption
-            .right
+
+          // There must be inventory
+          inventoryBatch <- forms.nextInventoryBatchOrRedirect(celebrityUrlSlug, product).right;
+
+          // Gotta have a valid personalize form in storage
+          validPersonalizeForm <- forms.validPersonalizeFormOrRedirectToPersonalizeForm(
+                                    celebrityUrlSlug,
+                                    productUrlSlug
+                                  ).right;
+
+          // And a printing option from the review page
+          printingOption <- forms.highQualityPrintOrRedirectToReviewForm(
+                                celebrityUrlSlug,
+                                productUrlSlug
+                              ).right;
+
+          // And valid shipping information (if necessary by printing option)
+          maybeShippingForms <- redirectOrValidShippingFormOption(
+                                  printingOption,
+                                  celebrityUrlSlug,
+                                  productUrlSlug
+                                ).right;
+
+          // Billing form has to be legit. Hand it the shipping form in case of
+          // they had entered "billing matches shipping"
+          validBillingForm <- redirectOrValidBillingForm(
+                                maybeShippingForms._1,
+                                celebrityUrlSlug,
+                                productUrlSlug
+                              ).right
         ) yield {
-          forms.withHighQualityPrint(validPrintOption).save()
+          forms.withHighQualityPrint(printingOption).save()
 
-
+          EgraphPurchaseHandler(
+            recipientName=validPersonalizeForm.recipientName,
+            recipientEmail=validPersonalizeForm.recipientEmail.getOrElse(validBillingForm.email),
+            buyerName=validBillingForm.name,
+            buyerEmail=validBillingForm.email,
+            stripeTokenId=validBillingForm.paymentToken,
+            desiredText=validPersonalizeForm.writtenMessageText,
+            personalNote=validPersonalizeForm.noteToCelebriity,
+            celebrity=celeb,
+            product=product
+          ).execute()
         }
     }
+  }
+
+  private def redirectOrValidShippingFormOption(
+    printingOption: PrintingOption,
+    celebrityUrlSlug: String,
+    productUrlSlug: String
+  ): Either[Redirect, (Option[CheckoutShippingForm], Option[CheckoutShippingForm.Valid])] = {
+    printingOption match {
+      case PrintingOption.HighQualityPrint =>
+        val formReader = purchaseFormReaders.forShippingForm
+        val shippingForm = formReader.instantiateAgainstReadable(params.asFormReadable)
+        val errorsOrValid = shippingForm.errorsOrValidatedForm
+        val redirectOrValid = errorsOrValid.left.map { error =>
+         redirectCheckoutFormsThroughFlash(celebrityUrlSlug, productUrlSlug)
+        }
+
+        redirectOrValid.right.map(valid => (Some(shippingForm), Some(valid)))
+
+      case PrintingOption.DoNotPrint =>
+        Right((None, None))
+    }
+  }
+
+  private def redirectOrValidBillingForm(
+    maybeShippingForm: Option[CheckoutShippingForm],
+    celebrityUrlSlug: String,
+    productUrlSlug: String
+  ): Either[Redirect, CheckoutBillingForm.Valid] = {
+    val billingFormReader = purchaseFormReaders.forBillingForm(maybeShippingForm)
+    val billingForm = billingFormReader.instantiateAgainstReadable(params.asFormReadable)
+    val errorsOrValid = billingForm.errorsOrValidatedForm
+
+    errorsOrValid.left.map { _ =>
+      redirectCheckoutFormsThroughFlash(celebrityUrlSlug, productUrlSlug)
+    }
+  }
+
+  private def redirectCheckoutFormsThroughFlash(celebrityUrlSlug: String, productUrlSlug: String): Redirect = {
+    // Get readers for the shipping and billing forms
+    val readers = List(purchaseFormReaders.forShippingForm, purchaseFormReaders.forBillingForm(None))
+
+    val paramFormReadable = params.asFormReadable
+    val formWriteableFlash = flash.asFormWriteable
+
+    for (formReader <- readers) {
+      formReader.instantiateAgainstReadable(paramFormReadable).write(formWriteableFlash)
+    }
+
+    new Redirect(reverse(getStorefrontCheckout(celebrityUrlSlug, productUrlSlug)).url)
   }
 
   private def makeTextForCelebToWrite(messageRequest: WrittenMessageRequest, messageText: Option[String])

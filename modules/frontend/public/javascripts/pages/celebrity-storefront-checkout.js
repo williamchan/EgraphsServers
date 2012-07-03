@@ -59,7 +59,11 @@ function(forms, payment, Egraphs) {
         $submitButton.removeAttr("disabled");
       } else {
         // Ok we've got a token. Let's submit it.
-        $form.append("<input type='hidden' name='stripeTokenId' value='" + response.id + "'/>");
+        $form.append(
+          "<input type='hidden' name='order.billing.token' value='" +
+          response.id +
+          "'/>"
+        );
         $form.get(0).submit();
       }
     };
