@@ -3,7 +3,7 @@ define(["services/forms", "Egraphs", "libs/twitter-bootstrap/bootstrap-button"],
   function (forms, Egraphs) {
 
     var page = Egraphs.page;
-    var calloutSpeed =  1000;
+    var calloutSpeedms =  1000;
     //Map checkbox values to privacy enumbs
     var toggle_map = {
       'true'   : 'Public',
@@ -17,7 +17,7 @@ define(["services/forms", "Egraphs", "libs/twitter-bootstrap/bootstrap-button"],
       } else {
         callout.text("There was an error, please try again later");
       }
-      callout.fadeIn(calloutSpeed);
+      callout.fadeIn(calloutSpeedms);
       toggle.slideToggle();
     };
 
@@ -41,7 +41,7 @@ define(["services/forms", "Egraphs", "libs/twitter-bootstrap/bootstrap-button"],
               //404s and other connection issues
               error: function () {
                 callout.text("Connection error, try again later.");
-                callout.fadeIn(calloutSpeed);
+                callout.fadeIn(calloutSpeedms);
               },
               success: function (data) {
                 postCallback(data, id, callout, toggle);
