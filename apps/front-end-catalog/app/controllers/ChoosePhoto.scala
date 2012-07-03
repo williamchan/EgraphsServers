@@ -88,9 +88,9 @@ object ChoosePhoto extends Controller
     ChoosePhotoCelebrity(
       name="Herp Derpson",
       profileUrl="http://placehold.it/80x100",
-      category="Major League Baseball",
+      organization="Major League Baseball",
       bio=sampleBio,
-      categoryRole="Pitcher, Tampa Bay Rays",
+      roleDescription="Pitcher, Tampa Bay Rays",
       twitterUsername=Some("davidprice14")
     )
   }
