@@ -1,7 +1,7 @@
 /* Scripting shared between both celebrity storefront pages */
 define(["libs/jquery.tweet"], function() {
   return {
-    /** 
+    /**
      * Populates a celebrity's tweets inside of the given selector
      * @param selector the selectors to fill with the celebrity's tweets
      * @param celebTwitterInfo an object with a .name and .handle field, that correspond

@@ -4,10 +4,8 @@
   @inputBody
   
   @{/** Error reporting */}  
-  <div class="alert alert-error @field.ifNotError {hidden}">
-    @for(error <- field.error) {
-      <button type="button" class="close" data-dismiss="alert">&times;</button>
-      <span class="error-message">@{/** <strong>Oops!</strong> */}@error</span>
-    }
+  <div class="alert alert-error @field.ifNotError {hidden}">    
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <span class="error-message">@{/** <strong>Oops!</strong> */}@field.error</span>    
   </div>
 </div>

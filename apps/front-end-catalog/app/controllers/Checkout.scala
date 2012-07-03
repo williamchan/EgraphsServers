@@ -17,7 +17,7 @@ object Checkout extends Controller
     views.frontend.html.celebrity_storefront_checkout(
       form=defaultCheckoutForm,
       summary=defaultOrderSummary,
-      paymentPublicKey="{the payment key}"
+      paymentPublicKey=testStripeKey
     )
   }
 
@@ -25,7 +25,7 @@ object Checkout extends Controller
     views.frontend.html.celebrity_storefront_checkout(
       form=allErrorsCheckoutForm,
       summary=defaultOrderSummary,
-      paymentPublicKey="{the payment key}"
+      paymentPublicKey=testStripeKey
     )
   }
 
@@ -104,6 +104,10 @@ object Checkout extends Controller
       "stateParam",
       "postalCodeParam"
     )
+  }
+
+  private val testStripeKey = {
+    "pk_qIGUDirehUxj2GTFwgeRBkOfHIWdX"
   }
 }
 

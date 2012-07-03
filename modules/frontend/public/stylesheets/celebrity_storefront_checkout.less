@@ -68,9 +68,14 @@
     
   }
 
+  .field.state select {
+  	// Make sure the select field doesn't get too big
+  	width:220px;
+  }
+
   .input.select.error {
-  	// Style the chosen select boxes  	
-  	@errorBorder: 1px solid @errorText;  	
+  	// Style the chosen select boxes	
+  	@errorBorder: 1px solid @errorText;
 
   	.chzn-container a, {
   		border:@errorBorder;
@@ -143,6 +148,7 @@
 			  	border-top: none;
 			  	border-bottom: none;
 			  	padding-bottom: 80px;
+			  	padding-top:10px;
 			  	
 			  	> div {
 			  	
