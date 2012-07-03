@@ -37,6 +37,14 @@ object ChoosePhoto extends Controller
     ChoosePhotoDefaults().copy(partnerIcons=icons).renderTiles
   }
 
+  /** Renders tiled view of a celebrity that lacks a twitter handle */
+  def withoutTwitterHandle = {
+    val defaults = ChoosePhotoDefaults()
+    ChoosePhotoDefaults().copy(
+      celeb=defaults.celeb.copy(twitterUsername=None)
+    ).renderTiles
+  }
+
   /** Renders one landscape product */
   def landscape = {
     ChoosePhotoDefaults().copy(products=List(sampleTile.copy(orientation=LandscapeOrientation))).renderTiles

@@ -111,7 +111,12 @@
 
             <div>
 
-              <h4>@celeb.name's Recent Tweets</h4>
+              <h4>
+                @if(celeb.twitterUsername.isDefined) {@celeb.name's Recent Tweets} else {
+                  @celeb.name on Twitter
+                }
+
+              </h4>
 
               <div class="tweets"></div> <!-- end .tweets -->
 

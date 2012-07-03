@@ -37,7 +37,6 @@ case class TestWebsiteControllers @Inject()(
   purchaseFormReaders: PurchaseFormReaders,
   @PlayConfig playConfig: Properties,
   facebookAppId: String,
-  formChecks: FormChecks,
   customerLoginForms: CustomerLoginFormFactory,
   accountSettingsForms: AccountSettingsFormFactory,
   egraphsSessionFactory: () => EgraphsSession,
@@ -45,7 +44,8 @@ case class TestWebsiteControllers @Inject()(
   fakeSession: Session = new Session(),
   fakeFlash: Flash = new Flash()
 )() extends Controller with AllWebsiteEndpoints {
-  val checkPurchaseField: PurchaseFormChecksFactory = AppConfig.instance[PurchaseFormChecksFactory]
+  val checkPurchaseField = AppConfig.instance[PurchaseFormChecksFactory]
+  val formChecks = AppConfig.instance[FormChecks]
   override def request = fakeRequest
   override def params = request.params
   override def session = fakeSession

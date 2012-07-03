@@ -3,7 +3,7 @@ package services.mvc
 import services.blobs.AccessPolicy
 import models.frontend.storefront._
 import models.ImageAsset.Jpeg
-import controllers.WebsiteControllers
+import controllers.WebsiteControllers.{reverse, getStorefrontChoosePhotoCarousel, postStorefrontChoosePhoto}
 import models.{Product, LandscapeEgraphFrame, EgraphFrame, PortraitEgraphFrame}
 import models.frontend.storefront.ChoosePhotoCarouselProduct
 import models.frontend.storefront.ProductOrientation
@@ -32,11 +32,16 @@ class ProductViewConversions(product: Product) {
   def asChoosePhotoCarouselView(celebUrlSlug: String=product.celebrity.urlSlug.getOrElse("/"))
   : ChoosePhotoCarouselProduct =
   {
+    val imageWidth = product.frame match {
+      case PortraitEgraphFrame => 340
+      case LandscapeEgraphFrame => 575
+    }
+
     ChoosePhotoCarouselProduct(
       name=product.name,
       description=product.description,
       price=product.price,
-      imageUrl=productThumbnailUrl(width=575),
+      imageUrl=productThumbnailUrl(width=imageWidth),
       personalizeLink=reverse(postStorefrontChoosePhoto(celebUrlSlug, product.urlSlug)).url,
       orientation = orientationOfFrame(product.frame),
       carouselUrl=product.urlSlug,
