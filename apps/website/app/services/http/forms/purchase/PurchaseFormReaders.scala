@@ -14,6 +14,24 @@ class PurchaseFormReaders @Inject()(
     }
   }
 
+  def forShippingForm: ReadsForm[CheckoutShippingForm] = {
+    newReaderWithConstructor { readable =>
+      new CheckoutShippingForm(readable, formChecks, purchaseFormChecksFactory)
+    }
+  }
+
+  def forBillingForm(shippingFormOption: Option[CheckoutShippingForm])
+  : ReadsForm[CheckoutBillingForm] = {
+    newReaderWithConstructor { readable =>
+      new CheckoutBillingForm(
+        readable,
+        formChecks,
+        purchaseFormChecksFactory,
+        shippingFormOption
+      )
+    }
+  }
+
   private def newReaderWithConstructor[FormType <: Form[_] : Manifest]
   (constructFormFromReadable: Form.Readable => FormType): ReadsForm[FormType] =
   {

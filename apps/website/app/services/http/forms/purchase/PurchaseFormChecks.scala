@@ -28,6 +28,14 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
     }
   }
 
+  def isCheckBoxValue: Either[FormError, Boolean] = {
+    for (
+      checked <- check.isChecked(toValidate.headOption).right
+    ) yield {
+      checked
+    }
+  }
+
   /**
    * Returns a [[models.Product]] on the right if the provided parameter
    * mapped to a valid product ID. It does not check the product's inventory batch
@@ -152,6 +160,21 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
     }
   }
 
+  def isZipCode: Either[FormError, String] = {
+    for (
+      param <- check.isSomeValue(toValidate, requiredError).right;
+      _ <- check.isBetweenInclusive(
+                          5,
+                          5,
+                          param.length,
+                          "Not a valid postal code")
+                        .right;
+      _ <- check.isInt(param, "Not a valid postal code").right
+    ) yield {
+      param
+    }
+  }
+
   /**
    * Returns a human name on the right if it existed and passed length checks.
    */
@@ -189,7 +212,7 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
 }
 
 object PurchaseFormChecks {
-  private[purchase] val requiredError = "Required"
+  private[purchase] val requiredError = "Required field"
   private[purchase] val nameLengthErrorString = "Must be between 2 and 30 characters"
   private[purchase] val minWrittenMessageChars = 5
   private[purchase] val maxWrittenMessageChars = 140
@@ -201,7 +224,7 @@ object PurchaseFormChecks {
   }
 
   private[purchase] val noteToCelebLengthErrorString = {
-    textAreaLengthErrorString(minNoteToCelebChars, maxNoteToCelebChars) + " if present "
+    textAreaLengthErrorString(minNoteToCelebChars, maxNoteToCelebChars)
   }
 
   private[purchase] def textAreaLengthErrorString(min: Int, max: Int): String = {

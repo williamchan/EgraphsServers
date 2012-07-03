@@ -1,9 +1,10 @@
 /* Scripting for the checkout page */
-define(["services/forms", "Egraphs", "libs/chosen/chosen.jquery.min", "https://js.stripe.com/v1/"],
-function(forms, Egraphs) {
+define(["services/forms", "services/payment", "Egraphs", "libs/chosen/chosen.jquery.min"],
+function(forms, payment, Egraphs) {
   var checkout = Egraphs.page.checkout;
+  var paymentModule = payment[checkout.paymentJsModule];
 
-  var $generalErrorsInputDiv = function() {    
+  var $generalErrorsInputDiv = function() {
     return $(".general-errors");
   };
 
@@ -39,7 +40,6 @@ function(forms, Egraphs) {
     var setFieldError = function($inputDiv, isError, errorMessage) {
       $fieldErrorDiv = $inputDiv.find(".alert-error");
       if (isError) {
-        console.log($inputDiv);
         $inputDiv.addClass("error");
         $fieldErrorDiv.removeClass("hidden");
       } else {
@@ -54,12 +54,11 @@ function(forms, Egraphs) {
       clearAllErrors();
 
       if (response.error) {
-        console.log(response.error);
         var targetAndMessage = targetAndMessageForError(response.error);
         setFieldError(targetAndMessage.target, true, targetAndMessage.message);
         $submitButton.removeAttr("disabled");
       } else {
-        // Ok we've got a token. Let's submit the fuck out of it.
+        // Ok we've got a token. Let's submit it.
         $form.append("<input type='hidden' name='stripeTokenId' value='" + response.id + "'/>");
         $form.get(0).submit();
       }
@@ -88,8 +87,8 @@ function(forms, Egraphs) {
     };
 
     var errorParameterToDomElement = {
-      "exp_year": {element:$expiry, defaultMessage: "Please choose a date"},
-      "exp_month": {element:$expiry, defaultMessage: "Please enter your card's expiration date"},
+      "exp_year": {element:$expiry, defaultMessage: "Enter an expiration date"},
+      "exp_month": {element:$expiry, defaultMessage: "Enter an expiration date"},
       "cvc": {element:$cvc, defaultMessage: "Invalid CVC"},
       "number": {element: $card, defaultMessage: "Invalid card number"}
     };
@@ -98,19 +97,20 @@ function(forms, Egraphs) {
     this.bind = function() {
       $form.submit(function(event) {
         try {
-        var expiration = expiryDates();
-        var tokenParams = {
-          number: cardNumber(),
-          cvc: cardCvc(),
-          exp_month: parseInt(expiration[0], 10),
-          exp_year: parseInt(expiration[1], 10)
-        };
-        
-        Stripe.createToken(tokenParams, checkout.productPriceInCents, paymentResponseHandler);
-        return false;
+          var expiration = expiryDates();
+          var tokenParams = {
+            number: cardNumber(),
+            cvc: cardCvc(),
+            exp_month: parseInt(expiration[0], 10),
+            exp_year: parseInt(expiration[1], 10)
+          };
+          
+          paymentModule.createToken(tokenParams, checkout.productPriceInCents, paymentResponseHandler);
+          
+          // Stop the form form submitting
+          return false;
         } finally {
-        // prevent the form from submitting with the default action
-        return false;
+          return false;
         }
       });
     };
@@ -120,7 +120,7 @@ function(forms, Egraphs) {
     go: function() {
       $(document).ready(function() {
         // Enable payments
-        Stripe.setPublishableKey(checkout.paymentApiKey);
+        paymentModule.setPublishableKey(checkout.paymentApiKey);
         var $cardNumberInputDiv = $(".input.stripe-card-number");
         var $cvcInputDiv = $(".input.card-cvc");
         var $expiryInputDiv = $(".input.card-expiry");

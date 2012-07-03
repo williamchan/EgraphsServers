@@ -29,6 +29,14 @@ object Checkout extends Controller
     )
   }
 
+  def noShipping = {
+    views.frontend.html.celebrity_storefront_checkout(
+      form=defaultCheckoutForm.copy(shipping=None),
+      summary=defaultOrderSummary,
+      paymentPublicKey=testStripeKey
+    )
+  }
+
   private def defaultOrderSummary = {
     CheckoutOrderSummary(
       celebrityName="{celebrity name}",
@@ -48,15 +56,9 @@ object Checkout extends Controller
       billing=CheckoutBillingInfoView.empty(
         "fullNameParam",
         "emailParam",
-        "zipParam",
-        "paymentTokenParam",
-        "cardNumber",
-        "cardExpiryMonth",
-        "cardExpiryYear",
-        "cardCvvParam"
+        "zipParam"
       ),
-      shipping=Some(defaultShippingForm),
-      shippingIsSameAsBillingParam="shippingSameAsBilling"
+      shipping=Some(defaultShippingForm)
     )
   }
 
@@ -68,17 +70,12 @@ object Checkout extends Controller
     val newBilling = defaultBilling.copy(
       fullName=defaultBilling.fullName.withError(error),
       email=defaultBilling.email.withError(error),
-      postalCode=defaultBilling.postalCode.withError(error),
-      paymentToken=defaultBilling.paymentToken.withError(error),
-      cardNumber=defaultBilling.cardNumber.withError(error),
-      cardExpiryMonth=defaultBilling.cardExpiryMonth.withError(error),
-      cardExpiryYear=defaultBilling.cardExpiryYear.withError(error)
+      postalCode=defaultBilling.postalCode.withError(error)
     )
 
     val newShipping = defaultShippingForm.copy(
       fullName=defaultShippingForm.fullName.withError(error),
-      phone=defaultShippingForm.phone.withError(error),
-      email=defaultShippingForm.phone.withError(error),
+      email=defaultShippingForm.email.withError(error),
       address1=defaultShippingForm.address1.withError(error),
       address2=defaultShippingForm.address2.withError(error),
       city=defaultShippingForm.city.withError(error),
@@ -88,8 +85,7 @@ object Checkout extends Controller
 
     defaultCheckoutForm.copy(
       billing=newBilling,
-      shipping=Some(newShipping),
-      shippingIsSameAsBilling=Field("shipping-same-as-billing", Some(false))
+      shipping=Some(newShipping)
     )
   }
 

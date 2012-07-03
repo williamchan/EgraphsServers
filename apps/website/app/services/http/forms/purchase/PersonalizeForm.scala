@@ -95,7 +95,7 @@ object PersonalizeForm {
     recipientName: String,
     recipientEmail: Option[String],
     writtenMessageRequest: WrittenMessageRequest,
-    writtenMessageMaybe: Option[String],
+    writtenMessageText: Option[String],
     noteToCelebriity: Option[String]
   )
 }

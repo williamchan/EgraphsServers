@@ -13,4 +13,3 @@ case class CheckoutOrderSummary(
   tax: Option[Money],
   total: Money
 )
-

@@ -2,8 +2,8 @@ package services.mvc
 
 import services.http.forms.FormField
 import services.http.forms.FormError
-import services.http.forms.purchase.PersonalizeForm
-import models.frontend.storefront.{PersonalizeForm => PersonalizeFormView, PersonalizeMessageOption}
+import services.http.forms.purchase.{CheckoutShippingForm, CheckoutBillingForm, PersonalizeForm}
+import models.frontend.storefront.{PersonalizeForm => PersonalizeFormView, CheckoutShippingAddressFormView, CheckoutBillingInfoView, CheckoutFormView, PersonalizeMessageOption}
 import models.frontend.forms.Field
 import models.enums.{WrittenMessageRequest, RecipientChoice}
 
@@ -81,6 +81,31 @@ object FormConversions {
     }
   }
 
+  class CheckoutBillingFormViewConversions(form: CheckoutBillingForm) {
+    def asCheckoutPageView: CheckoutBillingInfoView = {
+      CheckoutBillingInfoView(
+        fullName = form.name.asViewField,
+        email = form.email.asViewField,
+        postalCode = form.postalCode.asViewField
+      )
+    }
+  }
+
+  class CheckoutShippingFormViewConversions(form: CheckoutShippingForm) {
+    def asCheckoutPageView: CheckoutShippingAddressFormView = {
+      CheckoutShippingAddressFormView(
+        fullName = form.name.asViewField,
+        email = form.email.asViewField,
+        address1 = form.address1.asViewField,
+        address2 = form.address2.asViewField,
+        city = form.city.asViewField,
+        state = form.state.asViewField,
+        postalCode = form.postalCode.asViewField,
+        billingIsSameAsShipping = form.billingIsSameAsShipping.asViewFieldWithConversion(bool => bool)
+      )
+    }
+  }
+
   class FormErrorModelViewConversions(modelError: FormError) {
     def asViewError: formsview.FormError = {
       formsview.FormError(modelError.description)
@@ -100,4 +125,15 @@ object FormConversions {
   implicit def personalizeFormToView(form: PersonalizeForm): PersonalizeFormViewConversions = {
     new PersonalizeFormViewConversions(form)
   }
+
+  implicit def checkoutBillingFormToViewConverter(form: CheckoutBillingForm)
+  : CheckoutBillingFormViewConversions = {
+    new CheckoutBillingFormViewConversions(form)
+  }
+
+  implicit def checkoutShippingFormToViewConverter(form: CheckoutShippingForm)
+  : CheckoutShippingFormViewConversions = {
+    new CheckoutShippingFormViewConversions(form)
+  }
+
 }

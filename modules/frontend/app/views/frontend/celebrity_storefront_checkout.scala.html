@@ -1,5 +1,6 @@
 @(form: models.frontend.storefront.CheckoutFormView,
   summary: models.frontend.storefront.CheckoutOrderSummary,
+  paymentJsModule: String = "yes-maam-payment",
   paymentPublicKey: String
 )(
   implicit headerData: models.frontend.header.HeaderData, 
@@ -17,6 +18,7 @@
 
 @headJs = {
   Egraphs.page.checkout = {
+    paymentJsModule: "@paymentJsModule",
     paymentApiKey: "@paymentPublicKey",
     buyerPostalCodeFieldName: "@form.billing.postalCode.name",
     productPriceInCents: @summary.total.getAmountMinor
@@ -63,19 +65,7 @@
                     </figure>
 
                     <div class="order-summary">
-                                          
-                      <div class="celebrity-information">
-                        <h3>@summary.celebrityName</h3>
-                        <h4>First MLB Victory</h4>
-                        <dl>
-                          <dt><strong>A.</strong> Recipient's Name</dt>
-                          <dd>@summary.recipientName</dd>
-                          <dt><strong>B.</strong> @summary.celebrityName Will Write</dt>
-                          <dd>Happy Birthday Joshua! Keep swinging for the fences! Lorem ium dolor etsun et tepera.</dd>
-                          <dt><strong>C.</strong> @summary.celebrityName Will Record an Audio Message</dt>
-                        </dl>
-                      </div>            
-                    
+                      @orderDetails
                     </div>
                     
                 </div> <!-- end .order-overview -->
@@ -138,14 +128,16 @@
                 
                   <h3>Billing Information</h3>
 
-                  <div class="field inline @if(form.shipping.isEmpty) {hidden}">
-                    <input type="checkbox"
-                           id="billing-same" 
-                           name="billing-same" 
-                           value="yes" 
-                           @for(value <- form.shippingIsSameAsBilling if value && form.shipping.isDefined) {checked}>
-                    <label for="billing-same">My billing info is the same as my shipping.</label>                   
-                  </div> <!-- end .field.inline-->
+                  @for(shipping <- form.shipping) {
+                    <div class="field inline">
+                      <input type="checkbox"
+                             id="billing-same" 
+                             name="@shipping.billingIsSameAsShipping"
+                             value="yes" 
+                             @for(billingIsSame <- shipping.billingIsSameAsShipping; if billingIsSame) {checked}>
+                      <label for="billing-same">My billing info is the same as my shipping.</label>
+                    </div> <!-- end .field.inline-->
+                  }
 
                   <div id="billing-info">
                     @bootstrap_text_input_field("Email:", form.billing.email)
@@ -265,17 +257,7 @@
                     
                       <h2>Summary</h2>
                       
-                      <div class="celebrity-information">
-                        <h3>@summary.celebrityName</h3>
-                        <h4>@summary.productName</h4>
-                        <dl class="last">
-                          <dt><strong>A.</strong> Recipient's Name</dt>
-                          <dd>@summary.recipientName</dd>
-                          <dt><strong>B.</strong> @summary.celebrityName Will Write</dt>
-                          <dd>Happy Birthday Joshua! Keep swinging for the fences! Lorem ium dolor etsun et tepera.</dd>
-                          <dt><strong>C.</strong> @summary.celebrityName Will Record an Audio Message</dt>
-                        </dl>
-                      </div>
+                      @orderDetails
                       
                       <div class="order-totals">                      
                         <table>
@@ -318,6 +300,20 @@
       </div> <!-- end #main -->
     
     </div> <!-- end #content -->
+}
+
+@orderDetails = {
+  <div class="celebrity-information">
+    <h3>@summary.celebrityName</h3>
+    <h4>@summary.productName</h4>
+    <dl class="last">
+      <dt><strong>A.</strong> Recipient's name</dt>
+      <dd>@summary.recipientName</dd>
+      <dt><strong>B.</strong> @summary.celebrityName will write</dt>
+      <dd>@summary.messageText</dd>
+      <dt><strong>C.</strong> @summary.celebrityName will record an audio message</dt>
+    </dl>
+  </div> 
 }
 
 @base_celebrity_storefront_template(

@@ -49,7 +49,7 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
       ) yield {
         val textCelebWillWrite = makeTextForCelebToWrite(
           validPersonalizeForm.writtenMessageRequest,
-          validPersonalizeForm.writtenMessageMaybe
+          validPersonalizeForm.writtenMessageText
         )
 
         val doPrint = forms.highQualityPrint
@@ -97,8 +97,8 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
   : String = {
     messageRequest match {
       // TODO: Make these strings respond to gender
-      case WrittenMessageRequest.SignatureOnly => "His signature only"
-      case WrittenMessageRequest.CelebrityChoosesMessage => "Whatever he wants"
+      case WrittenMessageRequest.SignatureOnly => "His signature only."
+      case WrittenMessageRequest.CelebrityChoosesMessage => "Whatever he wants."
       case WrittenMessageRequest.SpecificMessage => messageText.getOrElse("")
     }
   }

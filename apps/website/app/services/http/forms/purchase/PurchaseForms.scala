@@ -8,6 +8,8 @@ import models.{InventoryBatch, Celebrity, Product}
 import controllers.WebsiteControllers.{getStorefrontPersonalize, getStorefrontReview, reverse, getStorefrontChoosePhotoTiled}
 import org.joda.money.{CurrencyUnit, Money}
 import models.enums.PrintingOption
+import services.http.forms.{Form, ReadsForm}
+import play.mvc.Scope.Flash
 
 class PurchaseForms @Inject()(
   formReaders: PurchaseFormReaders,
@@ -66,6 +68,62 @@ class PurchaseForms @Inject()(
 
       new Redirect(redirectAction)
     })
+  }
+
+  def shippingForm(flashOption: Option[Flash]=None): Option[CheckoutShippingForm] ={
+    getFormFromFlashOrSession(formReaders.forShippingForm, flashOption)
+  }
+
+  def billingForm(flashOption: Option[Flash]=None): Option[CheckoutBillingForm] = {
+    // First read out the shipping form to tell if shipping was the same as billing.
+    val shippingFormOption = shippingForm(flashOption)
+    val billingSameAsShippingOption = for(
+      shipping <- shippingFormOption;
+      billingSameAsShipping <- shipping.billingIsSameAsShipping.value
+    ) yield {
+      billingSameAsShipping
+    }
+
+    // We can only get an Option[BillingReader] because, in certain cases, reading the billing
+    // info is only possible in the presence of a shipping info. For example, if a high
+    // quality print was specified and billing was the same as shipping
+    val maybeBillingReader = (this.highQualityPrint, billingSameAsShippingOption) match {
+      case (Some(PrintingOption.HighQualityPrint), Some(true)) =>
+        // If high quality print was specified, and billing is same as shipping, return the billing form
+        // with the shipping form dependency provided
+        for (shipping <- shippingForm(flashOption)) yield {
+          formReaders.forBillingForm(Some(shipping))
+        }
+
+      case (None, _) | (_, None) =>
+        // If either the high quality print status or billing-same-as-shipping status were
+        // unavailable then we have insufficient info to create the billing form.
+        None
+
+      case _ =>
+        // If no high quality print was specified, or one was specified but the shipping
+        // wasn't the same as the billing, do not provide the shipping form dependency
+        // to the billing form for validation.
+        Some(formReaders.forBillingForm(None))
+    }
+
+    // If the reader exists, use it to read the form from either the flash or the session.
+    for (
+      billingReader <- maybeBillingReader;
+      form <- getFormFromFlashOrSession(billingReader, flashOption)
+    ) yield {
+      form
+    }
+  }
+
+  private def getFormFromFlashOrSession[FormType <: Form[_]](
+    reader: ReadsForm[FormType],
+     flashOption: Option[Flash]
+  ): Option[FormType] =
+  {
+    flashOption.map(flash => reader.read(flash.asFormReadable)).getOrElse {
+      reader.read(storefrontSession.asFormReadable)
+    }
   }
 
   def personalizeForm(flashOption: Option[play.mvc.Scope.Flash]=None): Option[PersonalizeForm] = {

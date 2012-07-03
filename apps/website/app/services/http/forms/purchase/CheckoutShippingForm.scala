@@ -21,6 +21,10 @@ class CheckoutShippingForm(
     checkPurchaseField(paramValues).isName
   }
 
+  val email = field(Params.Email).validatedBy { paramValues =>
+    checkPurchaseField(paramValues).isEmail
+  }
+
   val address1 = field(Params.AddressLine1).validatedBy { paramValues =>
     check.isSomeValue(paramValues.filter(value => value != ""))
   }
@@ -41,12 +45,17 @@ class CheckoutShippingForm(
     checkPurchaseField(paramValues).isZipCode
   }
 
+  val billingIsSameAsShipping = field(Params.BillingIsSame).validatedBy { paramValues =>
+    checkPurchaseField(paramValues).isCheckBoxValue
+  }
+
   //
   // Form members
   //
   protected def formAssumingValid: Valid = {
     CheckoutShippingForm.Valid(
       name.value.get,
+      email.value.get,
       address1.value.get,
       address2.value.get,
       city.value.get,
@@ -59,15 +68,18 @@ class CheckoutShippingForm(
 object CheckoutShippingForm {
   object Params {
     val Name = "order.shipping.name"
+    val Email = "order.shipping.email"
     val AddressLine1 = "order.shipping.address1"
     val AddressLine2 = "order.shipping.address2"
     val City = "order.shipping.city"
     val State = "order.shipping.state"
     val PostalCode = "order.shipping.postalCode"
+    val BillingIsSame = "order.billing.isSameAsShipping"
   }
 
   case class Valid(
     name: String,
+    email: String,
     addressLine1: String,
     addressLine2: Option[String],
     city: String,
