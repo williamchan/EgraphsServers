@@ -4,7 +4,7 @@ import play.mvc.Controller
 import models.frontend.egraphs._
 import models.frontend.forms.FormError
 import models.frontend.egraphs.FulfilledEgraphViewModel
-import models.frontend.account.AccountSettingsForm
+import models.frontend.account.{AccountVerificationForm, AccountSettingsForm}
 import models.frontend.forms.Field
 import play.mvc.results.RenderJson
 import sjson.json.Serializer
@@ -50,6 +50,10 @@ object Account extends Controller with DefaultHeaderAndFooterData {
         views.frontend.html.account_settings(form)
       }
     }
+  }
+
+  def verify() = {
+    views.frontend.html.account_verification("willchan", "Will")
   }
 
   def gallery(user: String = "userdude", count: Int =  1, role: String = "other", pending: Int = 0) = {

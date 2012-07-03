@@ -21,3 +21,7 @@ case class AccountSettingsForm(
   notice_stars: Field[String],
   generalErrors: Iterable[FormError]
 )
+
+case class AccountVerificationForm(
+  username: String
+)

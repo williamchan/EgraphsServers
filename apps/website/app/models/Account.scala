@@ -16,6 +16,7 @@ case class Account(
   email: String = "",
   passwordHash: Option[String] = None,
   passwordSalt: Option[String] = None,
+  emailVerified: Boolean = false,
   resetPasswordKey: Option[String] = None,
   fbUserId: Option[String] = None,
   customerId: Option[Long] = None,
@@ -48,6 +49,10 @@ case class Account(
       case (Some(hash), Some(salt)) => Some(Password(hash, salt))
       case _ => None
     }
+  }
+
+  def emailVerify() : Account = {
+    copy(emailVerified = true)
   }
 
   /**
@@ -196,7 +201,8 @@ class AccountStore @Inject() (schema: Schema) extends Saves[Account] with SavesC
       theOld.updated := theNew.updated,
       theOld.celebrityId := theNew.celebrityId,
       theOld.customerId := theNew.customerId,
-      theOld.administratorId := theNew.administratorId
+      theOld.administratorId := theNew.administratorId,
+      theOld.emailVerified := theNew.emailVerified
     )
   }
 
@@ -224,4 +230,5 @@ object AccountAuthenticationError {
   class AccountCredentialsError extends AccountAuthenticationError
   class AccountPasswordNotSetError extends AccountAuthenticationError
   class AccountNotFoundError extends AccountAuthenticationError
+  class AccountNotVerifiedError extends AccountAuthenticationError
 }

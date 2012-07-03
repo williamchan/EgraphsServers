@@ -32,6 +32,14 @@ class AccountTests extends UnitFlatSpec
     Account().password should be(None)
   }
 
+  "An Account" should "start without email verification" in {
+    Account().emailVerified should be(false)
+  }
+
+  "emailVerify" should "set the account to verified" in {
+    Account().emailVerify().emailVerified should be(true)
+  }
+
   "withPassword" should "set the password on an Account" in {
     accountWithPassword(TestData.defaultPassword).password should not be (None)
   }

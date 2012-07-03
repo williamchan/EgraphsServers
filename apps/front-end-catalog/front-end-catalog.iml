@@ -16,11 +16,11 @@
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/tmp" isTestSource="false" />
     </content>
-    <content url="file://$MODULE_DIR$/../../modules/frontend">
-      <sourceFolder url="file://$MODULE_DIR$/../../modules/frontend/app" isTestSource="false" />
-    </content>
     <content url="file://$MODULE_DIR$/modules/less-0.9.1">
       <sourceFolder url="file://$MODULE_DIR$/modules/less-0.9.1/app" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../modules/frontend">
+      <sourceFolder url="file://$MODULE_DIR$/../../modules/frontend/app" isTestSource="false" />
     </content>
     <content url="file://$PLAY_HOME$/modules/scala-0.9.1">
       <sourceFolder url="file://$PLAY_HOME$/modules/scala-0.9.1/app" isTestSource="false" />

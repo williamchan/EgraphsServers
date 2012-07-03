@@ -1,0 +1,29 @@
+@(username: String, name: String)(
+implicit session: play.mvc.Scope.Session,
+headerData: models.frontend.header.HeaderData,
+footerData: models.frontend.footer.FooterData
+)
+
+@import views.frontend.tags
+@import views.frontend.tags.ng
+
+@baseBody = {
+<section id="content" role="main">
+
+  <div id="main">
+
+    <div class="container">
+    	<h1>
+    		Account Verification
+    	</h1>
+    	<p>
+        Hi @name,<br>
+          Thanks for verifying your account with <a href="/">Egraphs</a>! 
+    	</p>
+      Best,<br>
+      Egraphs
+    </div>
+  </div>
+</section>
+}
+@base_template(title="Verify Account", jsMain = "pages/settings", body=baseBody)
