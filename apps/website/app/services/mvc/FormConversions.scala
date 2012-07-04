@@ -96,7 +96,7 @@ object FormConversions {
       request match {
         case SpecificMessage => PersonalizeMessageOption.SpecificMessage
         case SignatureOnly => PersonalizeMessageOption.SignatureOnly
-        case CelebrityChoosesMessage => PersonalizeMessageOption.AnythingHeWants
+        case CelebrityChoosesMessage => PersonalizeMessageOption.CelebrityChoosesMessage
       }
     }
   }

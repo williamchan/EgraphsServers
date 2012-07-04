@@ -38,7 +38,7 @@ object Personalize extends Controller
       isGift=isGift.copy(values=Some(true)),
       recipientName=recipientName.copy(values=Some("Erem Boto")),
       recipientEmail=recipientEmail.copy(values=Some("erem@egraphs.com")),
-      messageOption=messageOption.copy(values=Some(PersonalizeMessageOption.AnythingHeWants)),
+      messageOption=messageOption.copy(values=Some(PersonalizeMessageOption.CelebrityChoosesMessage)),
       messageText=messageText.copy(values=Some("Happy 30th birthday")),
       noteToCelebrity=noteToCelebrity.copy(values=Some("You're the best!"))
     )

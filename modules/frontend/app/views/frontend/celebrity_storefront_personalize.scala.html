@@ -21,7 +21,7 @@
 @import views.frontend.tags.html.storefront_breadcrumbs_responsive
 @import views.frontend.tags
 @import models.frontend.storefront.PersonalizeMessageOption
-@import models.frontend.storefront.PersonalizeMessageOption.{SpecificMessage, AnythingHeWants, SignatureOnly}
+@import models.frontend.storefront.PersonalizeMessageOption.{SpecificMessage, CelebrityChoosesMessage, SignatureOnly}
 @import frontend.formatting.MoneyFormatting.Conversions._
 @import frontend.formatting.DateFormatting.Conversions._
 
@@ -148,7 +148,7 @@
 	                        </button>
 	                        <button type="button" 
 	                                value="CelebrityChoosesMessage" 
-	                                class="btn btn-primary btn-custom-radio @if(form.messageOption.value == Some(AnythingHeWants)) {active}">
+	                                class="btn btn-primary btn-custom-radio @if(form.messageOption.value == Some(CelebrityChoosesMessage)) {active}">
                           	Anything he<br /> wants
                         	</button>
 	                        <button type="button"
