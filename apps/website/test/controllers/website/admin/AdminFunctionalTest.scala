@@ -35,21 +35,19 @@ trait AdminFunctionalTest extends EgraphsFunctionalTest {
   }
 
   def getPostCelebrityStrParams(celebrityId: Long = 0,
-                                        celebrityEmail: String = "ali@egraphs.com",
-                                        celebrityPassword: String = TestData.defaultPassword,
-                                        firstName: String = "Cassius",
-                                        lastName: String = "Clay",
-                                        publicName: String = "Muhammad Ali",
-                                        description: String = "I am the greatest!",
-                                        publishedStatusString: String = PublishedStatus.Published.name ): Map[String, String] = {
+                                celebrityEmail: String = "ali@egraphs.com",
+                                celebrityPassword: String = TestData.defaultPassword,
+                                publicName: String = "Muhammad Ali",
+                                bio: String = "The greatest Celebrity of them all!",
+                                organization: String = "Major League Baseball",
+                                publishedStatusString: String = PublishedStatus.Published.name): Map[String, String] = {
     Map[String, String](
       "celebrityId" -> celebrityId.toString,
       "celebrityEmail" -> celebrityEmail,
       "celebrityPassword" -> celebrityPassword,
-      "firstName" -> firstName,
-      "lastName" -> lastName,
       "publicName" -> publicName,
-      "description" -> description,
+      "bio" -> bio,
+      "organization" -> organization,
       "publishedStatusString" -> publishedStatusString
     )
   }

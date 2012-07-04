@@ -2,6 +2,10 @@
 
 #checkout {
   
+	#card-exp-year {
+		min-width:70px;
+	}
+
   header {
   
     padding-bottom: 20px;
@@ -64,6 +68,31 @@
     
   }
 
+  .field.state select {
+  	// Make sure the select field doesn't get too big
+  	width:220px;
+  }
+
+  .input.select.error {
+  	// Style the chosen select boxes	
+  	@errorBorder: 1px solid @errorText;
+
+  	.chzn-container a, {
+  		border:@errorBorder;
+  	}
+
+  	.chzn-drop {
+  		border-right: @errorBorder;
+  		border-left: @errorBorder;
+  		border-bottom: @errorBorder;
+  	}
+
+  	.alert {
+  		// Make the error boxes for Chosen select boxes appear properly
+  		margin-top:10px;
+  	}
+  }
+
 	.btn-group {
 	  margin-bottom:15px;
 	}
@@ -119,6 +148,7 @@
 			  	border-top: none;
 			  	border-bottom: none;
 			  	padding-bottom: 80px;
+			  	padding-top:10px;
 			  	
 			  	> div {
 			  	

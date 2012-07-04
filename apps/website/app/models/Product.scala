@@ -14,9 +14,9 @@ import play.Play
 import services.blobs.AccessPolicy
 import com.google.inject.{Provider, Inject}
 import services._
-import scala.Predef._
 import org.squeryl.Query
 import org.squeryl.dsl.ManyToMany
+import java.util
 
 case class ProductServices @Inject() (
   store: ProductStore,
@@ -45,7 +45,7 @@ case class Product(
   signingOriginY: Int = 0,
   signingAreaW: Int = Product.defaultSigningAreaW,
   signingAreaH: Int = Product.defaultSigningAreaW,
-  photoKey: Option[String] = None,
+  photoKey: Option[String] = None, // todo: rename to _photoKey
   _iconKey: Option[String] = None,
   _publishedStatus: String = PublishedStatus.Unpublished.name,
   created: Timestamp = Time.defaultTimestamp,
@@ -240,6 +240,12 @@ case class Product(
     services.celebStore.get(celebrityId)
   }
 
+  /**
+   * Returns the remaining inventory of this Product and the active InventoryBatches for this Product.
+   *
+   * wchan: I have to admit that I don't remember why I wrote it this way. But the InventoryBatches are used when
+   * created an Order against a specific InventoryBatch (this way, the InventoryBatch will already be in memory).
+   */
   def getRemainingInventoryAndActiveInventoryBatches(): (Int, Seq[InventoryBatch]) = {
     val activeInventoryBatches = services.inventoryBatchStore.getActiveInventoryBatches(this).toSeq
     val accumulatedInventoryCountAndBatchId = (0, List.empty[Long])
@@ -249,6 +255,19 @@ case class Product(
     }
     val numOrders = services.orderStore.countOrders(inventoryBatchIds)
     (totalInventory - numOrders, activeInventoryBatches)
+  }
+
+  /**
+   * Returns the most appropriate inventory batch to purchase from on this product, if there
+   * were any active inventory batches.
+   *
+   * The most appropriate is the one that will get egraph to the customer fastest, which is
+   * the inventory batch that ends the soonest.
+   */
+  def nextInventoryBatchToEnd: Option[InventoryBatch] = {
+    val batches = services.inventoryBatchStore.getActiveInventoryBatches(this).toSeq
+
+    batches.sortWith((batch1, batch2) => batch1.endDate.before(batch2.endDate)).headOption
   }
 
   /** Returns the remaining inventory in this product's batch */
@@ -347,6 +366,13 @@ class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: Invent
           and (Time.today between(inventoryBatch.startDate, inventoryBatch.endDate))
       )
         select (product)
+    )
+  }
+
+  def getProductAndInventoryBatchAssociations(inventoryBatchIds: Seq[Long]) = {
+    from(schema.products, schema.inventoryBatchProducts, schema.inventoryBatches)((product, association, inventoryBatch) =>
+      where(association.productId === product.id and (association.inventoryBatchId in inventoryBatchIds))
+        select ((product, association.inventoryBatchId))
     )
   }
 

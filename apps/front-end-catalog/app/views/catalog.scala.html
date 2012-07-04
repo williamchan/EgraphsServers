@@ -58,6 +58,17 @@
       @catalogEntry("ChoosePhoto/withPartnerIcons?num=6", "6 partner icons")
       @catalogEntry("ChoosePhoto/longBio", "Super long bio")
     </ol>
+    <h2>Storefront template (focus on the breadcrumbs)</h2>
+    <ol>
+      @catalogEntry("StorefrontTemplate/noneActiveOrComplete", "No crumb active or complete")
+
+      @for(crumbIndex <- 1 to 5) {
+        @catalogEntry(
+          "StorefrontTemplate/active?crumbIndex=" + crumbIndex,
+          "crumb " + crumbIndex + " active"
+        )
+      }      
+    </ol>
     <h2>Storefront: Choose Photo Page (tiles)</h2>
     <ol>
       @catalogEntry("ChoosePhoto/withProducts?num=0", "0 portrait products")
@@ -75,7 +86,19 @@
       @catalogEntry("ChoosePhoto/withProducts?num=1", "1 product")
       @catalogEntry("ChoosePhoto/withProducts?num=2", "2 products")
     </ol>
+    <h2>Storefront: Personalize</h2>
+    <ol>
+      @catalogEntry("Personalize/index", "Basic")
+      @catalogEntry("Personalize/allErrors", "All fields have errors")
+      @catalogEntry("Personalize/allErrors", "All fields are populated")
+    </ol>
     <h2>Storefront: Checkout</h2>
+    <ol>
+      @catalogEntry("Checkout/index", "Basic")
+      @catalogEntry("Checkout/allErrors", "All server-generated errors")
+      @catalogEntry("Checkout/noShipping", "No shipping information")
+    </ol>
+    <h2>Storefront: All</h2>
     <ol>
       @catalogEntry("Personalize/index", "Personalize")
       @catalogEntry("Review/index", "Review")

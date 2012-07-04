@@ -52,7 +52,15 @@ class ControllerMethod @Inject()(logging: LoggingContext, db: DBSession, httpsFi
       }
     }
 
-    redirectOrResult.fold(error => error, result => result)
+    // Automatically unpack Either types
+    redirectOrResult.fold(
+      error => error,
+      result => result match {
+        case Right(someResult) => someResult
+        case Left(someRedirect) => someRedirect
+        case _ => result
+      }
+    )
   }
 }
 

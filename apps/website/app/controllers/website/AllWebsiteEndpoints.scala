@@ -1,6 +1,7 @@
 package controllers.website
 
 import admin.AllAdminEndpoints
+import consumer.AllNewConsumerEndpoints
 import play.mvc.Controller
 import controllers.website.nonproduction.PostBuyDemoProductEndpoint
 
@@ -9,6 +10,7 @@ import controllers.website.nonproduction.PostBuyDemoProductEndpoint
  */
 trait AllWebsiteEndpoints extends GetRootEndpoint
   with AllConsumerEndpoints
+  with AllNewConsumerEndpoints
   with AllAdminEndpoints
   with PostBuyDemoProductEndpoint
 { this: Controller =>}

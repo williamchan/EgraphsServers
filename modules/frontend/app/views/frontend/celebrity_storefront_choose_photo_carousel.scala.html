@@ -4,9 +4,12 @@
   tiledViewLink: String,
   recentEgraphs: Iterable[models.frontend.storefront.ChoosePhotoRecentEgraph],
   partnerIcons: Iterable[models.frontend.storefront.ChoosePhotoPartnerIcon]
-)(implicit session: play.mvc.Scope.Session, 
+)(
+  implicit session: play.mvc.Scope.Session,
   headerData: models.frontend.header.HeaderData, 
-  footerData: models.frontend.footer.FooterData)
+  footerData: models.frontend.footer.FooterData,
+  storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs
+)
 
 @{/**
     Renders the Choose Photo page in Carousel view.
@@ -20,6 +23,7 @@
      partnerIcons - Viewmodels for partner organizations.
 
      headerData & footerData - see base_template.scala.html
+     storefrontBreadcrumbs - see base_celebrity_storefront_template
 */}
 
 @import views.frontend.tags.html.{storefront_breadcrumbs_responsive, safeForm}

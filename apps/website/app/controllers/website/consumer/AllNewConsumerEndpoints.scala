@@ -1,5 +1,12 @@
 package controllers.website.consumer
 
-/** All endpoints for the consumer website */
-trait AllNewConsumerEndpoints
+import play.mvc.Controller
 
+/** All endpoints for the recent consumer website */
+trait AllNewConsumerEndpoints
+  extends GetRootConsumerEndpoint
+  with StorefrontChoosePhotoConsumerEndpoints
+  with StorefrontPersonalizeConsumerEndpoints
+  with StorefrontReviewConsumerEndpoints
+  with StorefrontCheckoutConsumerEndpoints
+{ this: Controller => }

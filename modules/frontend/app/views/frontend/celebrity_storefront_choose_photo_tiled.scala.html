@@ -1,9 +1,12 @@
 @(celeb: models.frontend.storefront.ChoosePhotoCelebrity,
   products: Iterable[models.frontend.storefront.ChoosePhotoTileProduct],
   recentEgraphs: Iterable[models.frontend.storefront.ChoosePhotoRecentEgraph],
-  partnerIcons: Iterable[models.frontend.storefront.ChoosePhotoPartnerIcon])(
+  partnerIcons: Iterable[models.frontend.storefront.ChoosePhotoPartnerIcon]
+)(
   implicit headerData: models.frontend.header.HeaderData,
-  footerData: models.frontend.footer.FooterData)
+  footerData: models.frontend.footer.FooterData,
+  storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs
+)
 
 @{/**
      Renders the Choose Photo page with the products tiled.
@@ -14,6 +17,7 @@
      partnerIcons - viewmodels for partner organizations
 
      headerData & footerData - see base_template.scala.html
+     storefrontBreadcrumbs - see base_celebrity_storefront_template
 */}
 
 @import views.frontend.tags.html.storefront_breadcrumbs_responsive
@@ -41,7 +45,7 @@
 
             <h2><a href="@product.targetUrl">@product.name &raquo;</a></h2>
 
-            <p class="series">@{productNum+1} / @products.size</p>
+            <p class="series">@product.quantityRemaining left</p>
 
             <p class="price">@product.price.formatSimply</p>
 

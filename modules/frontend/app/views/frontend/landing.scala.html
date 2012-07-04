@@ -1,7 +1,13 @@
-@(featuredStars:Iterable[models.frontend.landing.FeaturedStar])(
+@(featuredStars:Iterable[models.frontend.landing.FeaturedStar]
+)(
   implicit headerData: models.frontend.header.HeaderData, 
   footerData: models.frontend.footer.FooterData
 )
+
+@{/** Consumer landing page
+
+      featuredStars - the list of celebrities to feature.
+*/}
 
 @featuredStarBlock(clearFix: Boolean) = {
   @for(starRow <- featuredStars.grouped(4).toList) {

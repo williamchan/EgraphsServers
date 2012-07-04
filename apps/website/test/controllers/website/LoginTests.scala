@@ -22,8 +22,6 @@ class LoginFunctionalTests extends EgraphsFunctionalTest {
 
     val flashCookie = getPlayFlashCookie(response)
     assertTrue(flashCookie.contains("CustomerLoginForm:true"))
-    assertTrue(flashCookie.contains(Fields.Email.name + ":"))
-    assertTrue(flashCookie.contains(Fields.Password.name + ":"))
   }
 
   private def getPostStrParams(email: String, password: String): Map[String, String] = {

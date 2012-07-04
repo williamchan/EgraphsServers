@@ -1,0 +1,59 @@
+package services.http.forms.purchase
+
+import com.google.inject.Inject
+import services.http.forms.{Form, ReadsForm, FormChecks}
+
+/**
+ * Provides readers for all the form types used in the purcahse flow
+ *
+ * @param formChecks low-level checks used for validating forms
+ * @param purchaseFormChecksFactory high-level checks used for
+ *     validating purchase forms
+ **/
+class PurchaseFormReaders @Inject()(
+  formChecks: FormChecks,
+  purchaseFormChecksFactory: PurchaseFormChecksFactory
+) {
+
+  def forPersonalizeForm: ReadsForm[PersonalizeForm] = {
+    newReaderWithConstructor { readable =>
+      new PersonalizeForm(readable, formChecks, purchaseFormChecksFactory)
+    }
+  }
+
+  def forShippingForm: ReadsForm[CheckoutShippingForm] = {
+    newReaderWithConstructor { readable =>
+      new CheckoutShippingForm(readable, formChecks, purchaseFormChecksFactory)
+    }
+  }
+
+  /**
+   * @param shippingFormOption Provide a shipping form only if it should be
+   *   used to grab information that wasn't provided to the billing form. e.g.
+   *   in the case when the customer specified "My billing info is my shipping info"
+   */
+  def forBillingForm(shippingFormOption: Option[CheckoutShippingForm])
+  : ReadsForm[CheckoutBillingForm] = {
+    newReaderWithConstructor { readable =>
+      new CheckoutBillingForm(
+        readable,
+        formChecks,
+        purchaseFormChecksFactory,
+        shippingFormOption
+      )
+    }
+  }
+
+  //
+  // Private members
+  //
+  private def newReaderWithConstructor[FormType <: Form[_] : Manifest]
+  (constructFormFromReadable: Form.Readable => FormType): ReadsForm[FormType] =
+  {
+    new ReadsForm[FormType]() {
+      def instantiateAgainstReadable(readable: Form.Readable): FormType = {
+        constructFormFromReadable(readable)
+      }
+    }
+  }
+}
