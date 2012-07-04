@@ -139,7 +139,9 @@ trait Form[+ValidFormType] {
     /**
      * The string parameters that this field is responsible for validationg
      */
-    override val stringsToValidate = paramsMap(this.name)
+    override def stringsToValidate = {
+      paramsMap(this.name)
+    }
 
     /**
      * For convenience, the first value Option of stringsToValidate
@@ -277,7 +279,7 @@ trait Form[+ValidFormType] {
     writeKeyValue(serializedErrorsKey, Some(errorString))
   }
 
-  private[forms] def write[T](formWriteable: FormWriteable[T]): FormWriteable[T] = {
+  def write[T](formWriteable: FormWriteable[T]): FormWriteable[T] = {
     // Write all the submitted fields
     val submittedFields = fields.filter(field => !field.isInstanceOf[DerivedField[_]])
     val submittedFieldsWritten = submittedFields.foldLeft(formWriteable)(
@@ -379,7 +381,9 @@ object Form {
     //
     class FormCompatiblePlayParams(playParams: play.mvc.Scope.Params) {
       def asFormReadable: Form.Readable = {
-        (key) => Option(playParams.getAll(key)).flatten
+        (key) => {
+          Option(playParams.getAll(key)).flatten
+        }
       }
     }
 

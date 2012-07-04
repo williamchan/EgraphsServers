@@ -71,7 +71,7 @@ class FormChecks @Inject()(accountStore: AccountStore, customerStore: CustomerSt
       case "1" | "true" | "on" | "yes" =>
         Right(true)
 
-      case "0" | "false" | "off" | "no" =>
+      case "" | "0" | "false" | "off" | "no" =>
         Right(false)
 
       case _ =>

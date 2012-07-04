@@ -1,6 +1,41 @@
-@()(implicit headerData: models.frontend.header.HeaderData, 
-  footerData: models.frontend.footer.FooterData)
+@(celebrityName: String,
+  productTitle: String,
+  celebrityWillWrite: String,
+  recipientName: String,
+  noteToCelebrity: Option[String],
+  basePrice: org.joda.money.Money,
+  guaranteedDelivery: java.util.Date,
+  highQualityPrintParamName: String,
+  highQualityPrint: Boolean,
+  actionUrl: String
+)(
+  implicit headerData: models.frontend.header.HeaderData, 
+  footerData: models.frontend.footer.FooterData,
+	storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs,
+	session: play.mvc.Scope.Session
+)
 
+@{/** The review order page in the purchase flow. This is also where they choose whether to
+      buy a physical print or not.
+
+      celebrityName - the name of the celebrity
+      productTitle - the title of the celebrity
+      celebrityWillWrite - what the celebrity will write, or a description
+          of what he will write.
+      recipientName - who will be receiving the egraph
+      noteToCelebrity - a short letter from the buyer to the celebrity.
+      basePrice - the base price of the product being purchased
+      guaranteedDelivery - date by which the recipient will be guaranteed to
+          receive their egraph.
+      highQualityPrintParamName - the parameter name to use when posting the
+          user's choice relative to whether to buy a high-quality print or not.
+      highQualityPrint - whether to check or not to check the print option check
+          box by default
+      actionUrl - the target at which to post the selected printing option.
+*/}
+
+@import frontend.formatting.MoneyFormatting.Conversions._
+@import frontend.formatting.DateFormatting.Conversions._
 @import views.frontend.tags.html.storefront_breadcrumbs_responsive
 @import views.frontend.tags
 
@@ -15,7 +50,7 @@
 				 		
   				<header>	
   				  <h1>Review Order</h1>
-  				  <h2>David Price | First MLB Victory</h2>  				
+  				  <h2>@celebrityName | @productTitle</h2>
   				</header>
 
   				<div class="review clearfix">
@@ -26,33 +61,33 @@
 						
 							<figcaption class="egraph-message left">
 							
-								<h2><strong>B.</strong> David Price will write <span>&raquo;</span></h2>
+								<h2><strong>B.</strong> @celebrityName will write <span>&raquo;</span></h2>
 								
-								<p>Happy Birthday Joshua! Keep swinging for the fences. Lorem ium dolor etsun et tepera.</p>
+								<p>@celebrityWillWrite</p>
 							
 							</figcaption>
 
-							<figcaption class="recepient-name right">
+							<figcaption class="recipient-name right">
 							
-								<h2><strong>B.</strong> Recepient's Name <span>&raquo;</span></h2>
+								<h2><strong>B.</strong> Recipient's Name <span>&raquo;</span></h2>
 								
-								<p>Joshua Johnson</p>
+								<p>@recipientName</p>
 							
 							</figcaption>
 						
 						</figure>
 	
-	  				<form action="./" method="post" class="wrap">
+	  				@tags.html.safeForm("action" ->  actionUrl, "method" -> "post", "class" -> "wrap") {
 	  				
 	  					<div class="clearfix">
 
-			  				<p class="price right">$50.00</p>
+			  				<p class="price right">@basePrice.formatSimply</p>
 	  				
 			  				<div class="left">
 			  				
-			  					<h2>Your message to David Price:</h2>
+			  					<h2>Your message to @celebrityName:</h2>
 			  				
-			  					<p>Dear David – you rock! Can’t wait to see you in Oakland! Joshua Johnson</p>
+			  					<p>@noteToCelebrity.getOrElse {<i>None provided</i>}</p>
 			  				
 			  				</div>
 		  				
@@ -61,37 +96,25 @@
 	  					<fieldset class="left">
 	  					
 	  						<label>Would you like to order a high quality print of your Egraph?</label>
-	  						<p><input id="order-print" type="checkbox" name="printed" value="yes"></p>
+	  						<p><input id="order-print" 
+	  						          type="checkbox" 
+	  						          name="@highQualityPrintParamName" 
+	  						          value="yes" @if(highQualityPrint) {checked}></p>
 	  					
 	  					</fieldset>
 	  					
 	  					<fieldset class="right">
 	  					
-	  						<p>Guaranteed Delivery:<br /> <strong>June 19, 2012</strong></p>
+	  						<p>Guaranteed Delivery:<br /> <strong>@guaranteedDelivery.formatDayAsPlainLanguage</strong></p>
 	  					
 	  						@tags.html.arrow_button(caption="Checkout", target="#", classes="button")
 	  					
 	  					</fieldset>
 						
-	  				</form> <!-- end .wrap -->
+	  				} <!-- end .wrap -->
 
   				</div> <!-- end .review -->
-
-					<footer class="clearfix">
-					
-						<p>Secured by: <a href="#" class="logo-entrust">Entrust</a></p>
-						
-						<p>Accepted payment types:</p>
-						
-						<ul>
-							<li class="visa">Visa</li>
-							<li class="mastercard">Mastercard</li>
-							<li class="amex">American Express</li>
-							<li class="discover">Discover</li>
-						</ul>
-							
-					</footer>
-  			
+ 			
         </section> <!-- end #checkout -->
 
     	</div> <!-- end #main -->

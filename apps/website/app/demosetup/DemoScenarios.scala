@@ -74,37 +74,10 @@ class DemoScenarios extends DeclaresDemoScenarios {
   """, {
     () =>
       DemoScenario.clearAll()
-      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
-      createCelebrity("Gabe", "Kapler1", "gabe1@egraphs.com", "gabekapler", publicName = "Gabe Kapler 1")
-      createCelebrity("Gabe", "Kapler2", "gabe2@egraphs.com", "gabekapler", publicName = "Gabe Kapler 2")
-      createCelebrity("Gabe", "Kapler3", "gabe3@egraphs.com", "gabekapler", publicName = "Gabe Kapler 3")
-  }
-  )
-
-  toDemoScenarios add DemoScenario(
-  "Create all celebrities",
-  meetingCategory,
-  "", {
-    () =>
-      DemoScenario.clearAll()
-      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
-      createCelebrity("Clayton", "Kershaw", "ckershaw@egraphs.com", "claytonkershaw")
-      createCelebrity("Don", "Mattingly", "dmattingly@egraphs.com", "donmattingly")
-      createCelebrity("David", "Ortiz", "dortiz@egraphs.com", "davidortiz")
-      createCelebrity("Dustin", "Pedroia", "dpedroia@egraphs.com", "dustinpedroia")
-      createCelebrity("Hanley", "Ramirez", "hramirez@egraphs.com", "hanleyramirez")
-      createCelebrity("Evan", "Longoria", "elongoria@egraphs.com", "evanlongoria")
-      createCelebrity("Prince", "Fielder", "pfielder@egraphs.com", "princefielder")
-      createCelebrity("Curtis", "Granderson", "cgranderson@egraphs.com", "curtisgranderson")
-      createCelebrity("Nick", "Swisher", "nswisher@egraphs.com", "nickswisher")
-      createCelebrity("Barry", "Bonds", "bbonds@egraphs.com", "barrybonds")
-      createCelebrity("Ryan", "Braun", "rbraun@egraphs.com", "ryanbraun")
-      createCelebrity("Zach", "Apter", "zach@egraphs.com", "zachapter")
-      createCelebrity("Bono", "Braun", "bono@egraphs.com", "paulhewson", publicName = "Bono")
-
-      createCelebrity("Gabe", "Kapler1", "gabe1@egraphs.com", "gabekapler", publicName = "Gabe Kapler 1")
-      createCelebrity("Gabe", "Kapler2", "gabe2@egraphs.com", "gabekapler", publicName = "Gabe Kapler 2")
-      createCelebrity("Gabe", "Kapler3", "gabe3@egraphs.com", "gabekapler", publicName = "Gabe Kapler 3")
+      createCelebrity("gabe@egraphs.com", "gabekapler", "Gabe Kapler")
+      createCelebrity("gabe1@egraphs.com", "gabekapler", "Gabe Kapler 1")
+      createCelebrity("gabe2@egraphs.com", "gabekapler", "Gabe Kapler 2")
+      createCelebrity("gabe3@egraphs.com", "gabekapler", "Gabe Kapler 3")
   }
   )
 
@@ -114,189 +87,27 @@ class DemoScenarios extends DeclaresDemoScenarios {
   "Prepares data for Zach's ad-hoc meetings. Creates: Zach Apter (zach@egraphs.com/derp)", {
     () =>
       DemoScenario.clearAll()
-      createCelebrity("Zach", "Apter", "zach@egraphs.com", "zachapter")
+      createCelebrity("zach@egraphs.com", "zachapter", "Zach Apter")
   }
   )
 
-  toDemoScenarios add DemoScenario(
-  "Bono",
-  meetingCategory,
-  "Prepares data for ad-hoc meetings that necessitate non-sports stars. Creates: Bono (bono@egraphs.com/derp)", {
-    () =>
-      DemoScenario.clearAll()
-      createCelebrity("Bono", "Braun", "bono@egraphs.com", "paulhewson", publicName = "Bono")
-  }
-  )
-
-  toDemoScenarios add DemoScenario(
-  "Jan 16 2012 agent meetings",
-  meetingCategory,
-  """
-  Prepares data for Hendricks Sports Management meeting. Creates:
-  Clayton Kershaw (ckershaw@egraphs.com/derp)
-  """, {
-    () =>
-      DemoScenario.clearAll()
-      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
-      createCelebrity("Clayton", "Kershaw", "ckershaw@egraphs.com", "claytonkershaw")
-  }
-  )
-
-  toDemoScenarios add DemoScenario(
-  "Jan 17 2012 agent meetings",
-  meetingCategory,
-  """
-  Prepares data for Ray Schulte meeting. Creates:
-  Don Mattingly (dmattingly@egraphs.com/derp)
-  """, {
-    () =>
-      DemoScenario.clearAll()
-      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
-      createCelebrity("Don", "Mattingly", "dmattingly@egraphs.com", "donmattingly")
-  }
-  )
-
-  toDemoScenarios add DemoScenario(
-  "Jan 18 2012 agent meetings",
-  meetingCategory,
-  """
-  Prepares data for SFX meeting. Creates:
-  David Ortiz (dortiz@egraphs.com/derp)
-  """, {
-    () =>
-      DemoScenario.clearAll()
-      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
-      createCelebrity("David", "Ortiz", "dortiz@egraphs.com", "davidortiz")
-  }
-  )
-
-  toDemoScenarios add DemoScenario(
-  "Jan 19 2012 agent meetings",
-  meetingCategory,
-  """
-  Prepares data for Aces, Sam and Seth Levinson meeting. Creates:
-  Dustin Pedroia (dpedroia@egraphs.com/derp)
-  """, {
-    () =>
-      DemoScenario.clearAll()
-      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
-      createCelebrity("Dustin", "Pedroia", "dpedroia@egraphs.com", "dustinpedroia")
-  }
-  )
-
-  toDemoScenarios add DemoScenario(
-  "Jan 20 2012 agent meetings",
-  meetingCategory,
-  """
-  Prepares data for Wasserman Media Group meeting. Creates:
-  Hanley Ramirez (hramirez@egraphs.com/derp)
-  """, {
-    () =>
-      DemoScenario.clearAll()
-      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
-      createCelebrity("Hanley", "Ramirez", "hramirez@egraphs.com", "hanleyramirez")
-  }
-  )
-
-  toDemoScenarios add DemoScenario(
-  "Jan 24 2012 agent meetings",
-  meetingCategory,
-  """
-  Prepares data for TWC Sports Management and Boras Corporation meetings. Creates:
-  Evan Longoria (elongoria@egraphs.com/derp),
-  Prince Fielder (pfielder@egraphs.com/derp)
-  """, {
-    () =>
-      DemoScenario.clearAll()
-      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
-      createCelebrity("Evan", "Longoria", "elongoria@egraphs.com", "evanlongoria")
-      createCelebrity("Prince", "Fielder", "pfielder@egraphs.com", "princefielder")
-  }
-  )
-
-  toDemoScenarios add DemoScenario(
-  "Jan 25 2012 agent meetings",
-  meetingCategory,
-  """
-  Prepares data for Matt Brown meeting. Creates:
-  Curtis Granderson (cgranderson@egraphs.com/derp)
-  """, {
-    () =>
-      DemoScenario.clearAll()
-      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
-      createCelebrity("Curtis", "Granderson", "cgranderson@egraphs.com", "curtisgranderson")
-  }
-  )
-
-  toDemoScenarios add DemoScenario(
-  "Jan 26 2012 agent meetings",
-  meetingCategory,
-  """
-  Prepares data for Dan Lozano meeting. Creates:
-  Nick Swisher (nswisher@egraphs.com/derp)
-  """, {
-    () =>
-      DemoScenario.clearAll()
-      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
-      createCelebrity("Nick", "Swisher", "nswisher@egraphs.com", "nickswisher")
-  }
-  )
-
-  toDemoScenarios add DemoScenario(
-  "Jan 27 2012 agent meetings",
-  meetingCategory,
-  """
-  Prepares data for Beverly Hills Sports Council and CAA meetings. Creates:
-  Barry Bonds (bbonds@egraphs.com/derp),
-  Ryan Braun (rbraun@egraphs.com/derp)
-  """, {
-    () =>
-      DemoScenario.clearAll()
-      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
-      createCelebrity("Barry", "Bonds", "bbonds@egraphs.com", "barrybonds")
-      createCelebrity("Ryan", "Braun", "rbraun@egraphs.com", "ryanbraun")
-  }
-  )
-
-  toDemoScenarios add DemoScenario(
-  "Feb 10 2012 agent meetings",
-  meetingCategory,
-  """
-  Creates: Ne-Yo (neyo@egraphs.com/derp)
-  """, {
-    () =>
-      DemoScenario.clearAll()
-      createCelebrity("Gabe", "Kapler", "gabe@egraphs.com", "gabekapler")
-      createCelebrity("Ne-Yo", "", "neyo@egraphs.com", "neyo", "Ne-Yo")
-  }
-  )
-
-  private def createCelebrity(firstName: String, lastName: String, email: String, s3ResourceId: String, publicName: String = null) {
+  private def createCelebrity(email: String, s3ResourceId: String, publicName: String) {
     println("Creating Celebrity " + email + " ...")
 
     val profile = "demo/" + s3ResourceId + "/" + s3ResourceId + "-profile.jpg"
     val productA = "demo/" + s3ResourceId + "/" + s3ResourceId + "-product-a.jpg"
     val productB = "demo/" + s3ResourceId + "/" + s3ResourceId + "-product-b.jpg"
-    val realPublicName = if (publicName == null) firstName + " " + lastName else publicName
 
     val celebrity = Celebrity(
-      firstName = Some(firstName),
-      lastName = Some(lastName),
-      publicName = Some(realPublicName),
-      description = Some(
-        "Love all my fans out there from Seattle to Swaziland." +
-          " Your support makes the game worth playing."
-      )
+      publicName = Some(publicName),
+      bio = "Love all my fans out there from Seattle to Swaziland."
     ).withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
 
     blobs.getStaticResource(profile) foreach {
-      profilePhotoBlob =>
-        celebrity.saveWithProfilePhoto(profilePhotoBlob.asByteArray)
+      profilePhotoBlob => celebrity.saveWithProfilePhoto(profilePhotoBlob.asByteArray)
     }
 
-    Account(email = email,
-      celebrityId = Some(celebrity.id)
-    ).withPassword("egraphsa").right.get.save()
+    Account(email = email, celebrityId = Some(celebrity.id)).withPassword("egraphsa").right.get.save()
 
     val inventoryBatch = InventoryBatch(celebrityId = celebrity.id, numInventory = 100, startDate = today, endDate = future).save()
 
@@ -304,7 +115,7 @@ class DemoScenarios extends DeclaresDemoScenarios {
       productAPhotoBlob =>
         val productWithPhotoA = celebrity.newProduct.copy(
           priceInCurrency = 50,
-          name = firstName + "'s Product A",
+          name = publicName + "'s Product A",
           description = "Buy my Egraph A!",
           storyTitle = "The Story",
           storyText = "{signer_link}{signer_name}{end_link} was born on top. He proved it to the world every single day throughout the 2011 season. A few days afterwards he got a note from {recipient_name} on his iPad. This was his response."
@@ -316,7 +127,7 @@ class DemoScenarios extends DeclaresDemoScenarios {
       productBPhotoBlob =>
         val productWithPhotoB = celebrity.newProduct.copy(
           priceInCurrency = 100,
-          name = firstName + "'s Product B",
+          name = publicName + "'s Product B",
           description = "Buy my Egraph B!",
           storyTitle = "The Story",
           storyText = "{signer_link}{signer_name}{end_link} was born on top. He proved it to the world every single day throughout the 2011 season. A few days afterwards he got a note from {recipient_name} on his iPad. This was his response."

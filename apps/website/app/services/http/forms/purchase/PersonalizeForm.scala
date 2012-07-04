@@ -20,14 +20,19 @@ class PersonalizeForm(
   //
   // Field values and validations
   //
+  /** Whether the egraph is for yourself or a friend */
   val recipientChoice = field(Params.IsGift).validatedBy { paramValues =>
-    checkField(paramValues).isRecipientChoice
+    checkField(paramValues).isGift
   }
 
+  /** Name of the recipient (whether self or friend) */
   val recipientName = field(Params.RecipientName).validatedBy { paramValues =>
     checkField(paramValues).isName
   }
 
+  /**
+   * Recipient's email; not necessary if it's self (we'll just grab the e-mail from the purchase form later)
+   */
   val recipientEmail = field(Params.RecipientEmail).validatedBy { paramValues =>
     for (
       validRecipientChoice <- check.dependentFieldIsValid(recipientChoice).right;
@@ -38,12 +43,18 @@ class PersonalizeForm(
     }
   }
 
+  /**
+   * Choice for the written message: should the celebrity write something in particular,
+   * write whatever he wants, or just sign the damn thing?
+   */
   val writtenMessageRequest = field(Params.WrittenMessageRequest).validatedBy { paramValues =>
     checkField(paramValues).isWrittenMessageRequest
   }
 
-
-  // Necessary only if writtenMessageRequest was specified, then it must be no more than 140 characters
+  /**
+   * Text of the message to write. Necessary only if writtenMessageRequest was specified, then it must be no more
+   * than 140 characters.
+   **/
   val writtenMessageRequestText = field(Params.WrittenMessageRequestText).validatedBy { paramValues =>
     for (
       messageRequest <- check.dependentFieldIsValid(writtenMessageRequest).right;
@@ -54,6 +65,7 @@ class PersonalizeForm(
     }
   }
 
+  /** Optional personal note to the celebrity. "I'm your biggest fan", etc. */
   val noteToCelebrity = field(Params.NoteToCelebrity).validatedBy { paramValues =>
     checkField(paramValues).isOptionalNoteToCelebrity
   }
@@ -95,29 +107,7 @@ object PersonalizeForm {
     recipientName: String,
     recipientEmail: Option[String],
     writtenMessageRequest: WrittenMessageRequest,
-    writtenMessageMaybe: Option[String],
+    writtenMessageText: Option[String],
     noteToCelebriity: Option[String]
   )
 }
-
-
-class PersonalizeFormFactory @Inject()(formChecks: FormChecks, purchaseFormChecks: PurchaseFormChecksFactory)
-  extends ReadsForm[PersonalizeForm]
-{
-  //
-  // Public members
-  //
-  def apply(readable: Form.Readable): PersonalizeForm = {
-    new PersonalizeForm(readable, formChecks, purchaseFormChecks)
-  }
-
-  //
-  // ReadsForm[PersonalizeForm] members
-  //
-  def instantiateAgainstReadable(readable: Form.Readable): PersonalizeForm = {
-    apply(readable)
-  }
-}
-
-
-

@@ -83,11 +83,24 @@ GET     /admin/products/{productId}                                WebsiteContro
 GET     /admin/script                                              WebsiteControllers.getScriptAdmin
 
 ##
+## Production Consumer Website
+##
+%{ consumer_base = '/new' }%
+
+GET ${consumer_base}  WebsiteControllers.getRootConsumerEndpoint
+GET ${consumer_base}/{celebrityUrlSlug}/photos  WebsiteControllers.getStorefrontChoosePhotoTiled
+GET ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}   WebsiteControllers.getStorefrontChoosePhotoCarousel
+POST ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}  WebsiteControllers.postStorefrontChoosePhoto
+GET ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/personalize  WebsiteControllers.getStorefrontPersonalize
+POST ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/personalize WebsiteControllers.postStorefrontPersonalize
+GET ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/review       WebsiteControllers.getStorefrontReview
+POST ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/review      WebsiteControllers.postStorefrontReview
+GET ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/checkout     WebsiteControllers.getStorefrontCheckout
+POST ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/checkout    WebsiteControllers.postStorefrontCheckout
+
+##
 ## Website
 ##
-
-# social media exploratory work
-GET     /socialpost                                      WebsiteControllers.getSocialPost
 
 # customer accounts stubs
 GET     /register                                        WebsiteControllers.getRegister
@@ -118,9 +131,3 @@ GET     /{celebrityUrlSlug}                              WebsiteControllers.getC
 GET     /{celebrityUrlSlug}/{productUrlSlug}             WebsiteControllers.getCelebrityProduct
 POST    /{celebrityUrlSlug}/{productUrlSlug}/buy         WebsiteControllers.postBuyProduct
 POST    /{celebrityUrlSlug}/{productUrlSlug}/buy-demo    WebsiteControllers.postBuyDemoProduct
-
-##
-## Production Consumer Website
-##
-# %{ consumer_base = '/new' }%
-# GET ${consumer_base}/{celebrityUrlSlug}/{productUrlSlug}          WebsiteControllers.getStorefrontChoosePhotoTiled

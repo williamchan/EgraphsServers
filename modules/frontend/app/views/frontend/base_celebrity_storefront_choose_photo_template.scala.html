@@ -6,7 +6,9 @@
   partnerIcons: Iterable[models.frontend.storefront.ChoosePhotoPartnerIcon],
   photoSection: => Html
 )(implicit headerData: models.frontend.header.HeaderData, 
-  footerData: models.frontend.footer.FooterData)
+  footerData: models.frontend.footer.FooterData,
+  storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs
+)
 @{/**
   Base template for the two permutations of the "Choose photo" page in the celebrity
   storefront (tiled and carousel). See base_celebrity_storefront_choose_photo_tiled.scala.html.
@@ -20,6 +22,7 @@
   photoSection - the actual content: either the tiles or the carousel.
 
   headerData & footerData - see base_template.scala.html
+  storefrontBreadcrumbs - see base_celebrity_storefront_template
 */}
 
 @import frontend.formatting.DateFormatting.Conversions._
@@ -50,20 +53,22 @@
             <div>
 
               <h1>@celeb.name</h1>
-              <h2>@celeb.category</h2>
-              <h3>@celeb.categoryRole</h3>
+              <h2>@celeb.organization</h2>
+              <h3>@celeb.roleDescription</h3>
 
             </div>
 
           </header>
 
-          <footer class="product-availability">
+          @{/** TODO: re-enable this if we do celebrity-level availability
+
+            <footer class="product-availability">
 
             <p>Guaranteed Delivery: <strong>@celeb.deliveryDate.formatDayAsPlainLanguage</strong></p>
 
             <p>Quantity Available: <strong>@celeb.quantityAvailable</strong></p>
 
-          </footer> <!-- end .product-availability -->
+          </footer> <!-- end .product-availability --> */}
 
         </div> <!-- end .top -->
 
@@ -107,7 +112,12 @@
 
             <div>
 
-              <h4>David's Recent Tweets</h4>
+              <h4>
+                @if(celeb.twitterUsername.isDefined) {@celeb.name's Recent Tweets} else {
+                  @celeb.name on Twitter
+                }
+
+              </h4>
 
               <div class="tweets"></div> <!-- end .tweets -->
 

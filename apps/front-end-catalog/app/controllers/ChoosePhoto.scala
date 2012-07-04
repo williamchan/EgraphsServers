@@ -11,7 +11,10 @@ import models.frontend.storefront.ChoosePhotoCelebrity
 /**
  * Permutations of the Celebrity Storefront: Choose Photo, tiled view.
  */
-object ChoosePhoto extends Controller with DefaultHeaderAndFooterData {
+object ChoosePhoto extends Controller
+  with DefaultHeaderAndFooterData
+  with DefaultStorefrontBreadcrumbs
+{
   import frontend.formatting.MoneyFormatting.Conversions._
 
   val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
@@ -32,6 +35,14 @@ object ChoosePhoto extends Controller with DefaultHeaderAndFooterData {
   def withPartnerIcons(num: Int=1) = {
     val icons = for (i <- 1 to num) yield samplePartnerIcon
     ChoosePhotoDefaults().copy(partnerIcons=icons).renderTiles
+  }
+
+  /** Renders tiled view of a celebrity that lacks a twitter handle */
+  def withoutTwitterHandle = {
+    val defaults = ChoosePhotoDefaults()
+    ChoosePhotoDefaults().copy(
+      celeb=defaults.celeb.copy(twitterUsername=None)
+    ).renderTiles
   }
 
   /** Renders one landscape product */
@@ -85,12 +96,10 @@ object ChoosePhoto extends Controller with DefaultHeaderAndFooterData {
     ChoosePhotoCelebrity(
       name="Herp Derpson",
       profileUrl="http://placehold.it/80x100",
-      category="Major League Baseball",
+      organization="Major League Baseball",
       bio=sampleBio,
-      categoryRole="Pitcher, Tampa Bay Rays",
-      twitterUsername="davidprice14",
-      quantityAvailable=10,
-      deliveryDate=dateFormat.parse("2012-07-13")
+      roleDescription="Pitcher, Tampa Bay Rays",
+      twitterUsername=Some("davidprice14")
     )
   }
 
@@ -109,6 +118,7 @@ object ChoosePhoto extends Controller with DefaultHeaderAndFooterData {
       price=BigDecimal(100.00).toMoney(),
       imageUrl="http://placehold.it/340x200",
       targetUrl="/Herp-Derpson/photos/2012-All-Star-Game",
+      quantityRemaining=10,
       orientation=PortraitOrientation
     )
   }

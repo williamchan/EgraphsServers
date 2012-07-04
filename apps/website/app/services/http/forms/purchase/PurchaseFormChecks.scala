@@ -19,18 +19,29 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
   import PurchaseFormChecks._
 
   /**
-   * Returns the PrintingOption on the right if the provided parameter mapped
-   * to a valid PrintingOption enum value.
+   * True on the right that the provided checkbox form parameter
+   * specified a printing option.
    */
   def isPrintingOption: Either[FormError, PrintingOption] = {
+    import PrintingOption.{HighQualityPrint, DoNotPrint}
+
     for (
-      param <- check.isSomeValue(toValidate, requiredError).right;
-      printingChoice <- check.isSomeValue(
-                          PrintingOption(param),
-                          "Was not a valid printing option"
-                        ).right
+      doPrint <- check.isChecked(toValidate.headOption).right
     ) yield {
-      printingChoice
+      if (doPrint) HighQualityPrint else DoNotPrint
+    }
+  }
+
+  /**
+   * True on the right if the provided parameter was a valid one for a
+   * checkbox. This makes it succeed if it didn't exist (false) or if it had
+   * some expected affirmative otherwise ("yes", "1", etc)
+   */
+  def isCheckBoxValue: Either[FormError, Boolean] = {
+    for (
+      checked <- check.isChecked(toValidate.headOption).right
+    ) yield {
+      checked
     }
   }
 
@@ -50,17 +61,15 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
   }
 
   /**
-   * Returns a [[models.enums.RecipientChoice]] on the right if the provided parameters
-   * mapped to a valid one.
+   * True that the checkbox form parameter specified a recipient choice
    */
-  def isRecipientChoice
+  def isGift
   : Either[FormError, RecipientChoice] =
   {
     for (
-      param <- check.isSomeValue(toValidate, requiredError).right;
-      recipientChoice <- check.isSomeValue(RecipientChoice(param), "Invalid recipient choice").right
+      isGift <- check.isChecked(toValidate.headOption).right
     ) yield {
-      recipientChoice
+      if (isGift) RecipientChoice.Other else RecipientChoice.Self
     }
   }
 
@@ -118,12 +127,12 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
       case SpecificMessage =>
         for (
           writtenMessage <- check.isSomeValue(toValidate, requiredError).right;
-          _ <- check.isBetweenInclusive(
-                 minWrittenMessageChars,
-                 maxWrittenMessageChars,
-                 writtenMessage.length,
-                 writtenMessageLengthErrorString
-               ).right
+          messageOfCorrectLength <- check.isBetweenInclusive(
+                                      minWrittenMessageChars,
+                                      maxWrittenMessageChars,
+                                      writtenMessage.length,
+                                      writtenMessageLengthErrorString
+                                    ).right
         ) yield {
           Some(writtenMessage)
         }
@@ -159,6 +168,25 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
    */
   def isPaymentToken: Either[FormError, String] = {
     for (param <- check.isSomeValue(toValidate, requiredError).right) yield {
+      param
+    }
+  }
+
+  /**
+   * True on the right if the form parameter was a valid zip code. We could make this actually
+   * check zip codes later on if we wanted.
+   */
+  def isZipCode: Either[FormError, String] = {
+    for (
+      param <- check.isSomeValue(toValidate, requiredError).right;
+      _ <- check.isBetweenInclusive(
+                          5,
+                          5,
+                          param.length,
+                          "Not a valid postal code")
+                        .right;
+      _ <- check.isInt(param, "Not a valid postal code").right
+    ) yield {
       param
     }
   }
@@ -200,8 +228,8 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
 }
 
 object PurchaseFormChecks {
-  private[purchase] val requiredError = "Required"
-  private[purchase] val nameLengthErrorString = "Must be between two and 30 characters"  
+  private[purchase] val requiredError = "Required field"
+  private[purchase] val nameLengthErrorString = "Must be between 2 and 30 characters"
   private[purchase] val minWrittenMessageChars = 5
   private[purchase] val maxWrittenMessageChars = 140
   private[purchase] val minNoteToCelebChars = minWrittenMessageChars

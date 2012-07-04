@@ -74,15 +74,13 @@ class GetCelebrityApiEndpointFunctionalTests extends EgraphsFunctionalTest {
     assertNotNull(json("id"))
     assertEquals("Wizzle", json("publicName"))
     assertEquals("Wizzle", json("urlSlug"))
-    assertEquals("William", json("firstName"))
-    assertEquals("Chan", json("lastName"))
     assertEquals(EnrollmentStatus.NotEnrolled.name, json("enrollmentStatus"))
 
     // These conversions will fail if they're not Longs
     Time.fromApiFormat(json("created").toString)
     Time.fromApiFormat(json("updated").toString)
 
-    assertEquals(8, json.size)
+    assertEquals(6, json.size)
   }
 
   @Test

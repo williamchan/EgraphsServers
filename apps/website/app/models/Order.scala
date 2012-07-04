@@ -288,6 +288,9 @@ case class Order(
 
 case class FulfilledOrder(order: Order, egraph: Egraph)
 
+/** Thin semantic wrapper around a tuple for product order and egraph */
+case class FulfilledProductOrder(product: Product, order:Order, egraph: Egraph)
+
 object Order {
 
   lazy val random = new Random
@@ -325,6 +328,26 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
       )
         select (FulfilledOrder(order, egraph))
     ).headOption
+  }
+
+  /**
+   * Returns the most recently fulfilled egraphs created by a [[models.Celebrity]]
+   *
+   * @param celebrityId ID of the celebrity.
+   */
+  def findMostRecentlyFulfilledByCelebrity(celebrityId: Long): Iterable[FulfilledProductOrder] = {
+    import schema.{celebrities, products, orders, egraphs}
+
+    from(celebrities, products, orders, egraphs)((celeb, product, order, egraph) =>
+      where(
+        celeb.id === celebrityId and
+        celeb.id === product.celebrityId and
+        product.id === order.productId and
+        order.id === egraph.orderId and
+        egraph._egraphState === EgraphState.Published.name
+      )
+      select(FulfilledProductOrder(product, order, egraph))
+    )
   }
 
   /**
@@ -380,11 +403,36 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
     )
   }
 
+  /**
+   * To calculate the remaining inventory available in an InventoryBatch, the number of Orders that have been placed
+   * against that InventoryBatch must be known. This method returns the total number of Orders placed againsts all
+   * InventoryBatches of interest.
+   *
+   * @return the total number of Orders placed againsts all InventoryBatches denoted by inventoryBatchIds
+   */
   def countOrders(inventoryBatchIds: Seq[Long]): Int = {
     from(schema.orders)(order =>
       where(order.inventoryBatchId in inventoryBatchIds)
         compute (count)
     ).toInt
+  }
+
+  /**
+   * To calculate the remaining inventory available in an InventoryBatch, the number of Orders that have been placed
+   * against that InventoryBatch must be known. This method returns the total number of Orders placed againsts each
+   * InventoryBatch of interest.
+   *
+   * @return tuples of (inventoryBatchId, orderCount)
+   */
+  def countOrdersByInventoryBatch(inventoryBatchIds: Seq[Long]): Seq[(Long, Int)] = {
+    import org.squeryl.PrimitiveTypeMode
+    import org.squeryl.dsl.GroupWithMeasures
+    val query: Query[GroupWithMeasures[PrimitiveTypeMode.LongType, PrimitiveTypeMode.LongType]] = from(schema.orders)(order =>
+      where(order.inventoryBatchId in inventoryBatchIds)
+        groupBy (order.inventoryBatchId)
+        compute (count)
+    )
+    query.toSeq.map(f => (f.key, f.measures.toInt))
   }
 
   //

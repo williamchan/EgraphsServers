@@ -8,6 +8,8 @@ import java.util
 import org.squeryl.Query
 import java.io._
 import scala.Some
+import java.io.{Serializable, PrintWriter, StringWriter}
+import play.mvc.results.Redirect
 
 /**
  * Helpful utilities with no other place to call home
@@ -89,6 +91,16 @@ class Utils @Inject()(@PlayConfig() playConfig: util.Properties) {
     val action = lookupUrl(controllerMethod, params)
     action.absolute()
     action
+  }
+
+  /**
+   * Redirects to a targetUrl found in the request params. If that url could not be found, it redirects to
+   * the URL in the argument.
+   */
+  def redirectToClientProvidedTarget(urlIfNoTarget: String)(implicit params: play.mvc.Scope.Params): Redirect = {
+    import services.http.SafePlayParams.Conversions._
+
+    new Redirect(params.getOption("targetUrl").getOrElse(urlIfNoTarget))
   }
 
   /**

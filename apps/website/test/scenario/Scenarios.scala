@@ -81,10 +81,9 @@ class Scenarios extends DeclaresScenarios {
      demosetup.DemoScenarios.createAdmin()
 
       val celebrity = Celebrity(
-        firstName=Some("William"),
-        lastName=Some("Chan"),
         publicName=Some("Wizzle"),
-        description=Some("Love my fans from New York to Tokyo, from Seoul to the Sudetenland. And for all you haters out there -- don't mess around. I sleep with one eye closed, the other fixed on my Vespene gas supply.")
+        bio="Love my fans from New York to Tokyo, from Seoul to the Sudetenland. And for all you haters out there -- don't mess around. I sleep with one eye closed, the other fixed on my Vespene gas supply.",
+        organization = "Major League Baseball"
       ).withPublishedStatus(PublishedStatus.Published).save()
 
       Account(email="wchan83@egraphs.com",
