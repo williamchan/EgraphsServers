@@ -19,8 +19,8 @@ class AccountVerificationForm(val paramsMap: Form.Readable, check: FormChecks, a
 
   val secretKey = new RequiredField[String](Fields.SecretKey.name) {
     def validateIfPresent = {
-      stringToValidate match {
-        case account.resetPasswordKey => Right(stringToValidate)
+      account.resetPasswordKey match {
+        case Some(key) if key == stringToValidate => Right(stringToValidate)
         case _=> Left(new SimpleFormError("URL expired or incorrect"))
       }
     }

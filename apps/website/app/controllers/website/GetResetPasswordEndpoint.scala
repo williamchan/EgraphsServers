@@ -10,6 +10,7 @@ import models.frontend.account.{AccountVerificationForm => AccountVerificationFo
 import services.http.SafePlayParams.Conversions._
 import services.mvc.ImplicitHeaderAndFooterData
 import services.http.forms.AccountVerificationFormFactory
+import services.http.forms.AccountVerificationForm.Fields
 
 private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
 
@@ -22,18 +23,15 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
   protected def accountVerificationForms: AccountVerificationFormFactory
 
   def getResetPassword(email: String, secretKey: String) = controllerMethod() {
-    accountRequestFilters.requireValidAccountEmail(email) { account =>
+    //flash takes precedence over url arg
+    accountRequestFilters.requireValidAccountEmail(flash.getOption("email").getOrElse(email)) { account =>
       val form = makeFormView(account)
 
       val displayableErrors = List(form.newPassword.error, form.passwordConfirm.error, form.email.error)
         .asInstanceOf[List[Option[FormError]]].filter(e => e.isDefined).map(e => e.get.description)
-      //check for email
-//      println("Secret Key is: " + form.secretKey.value.getOrElse("no value"))
-//      println("Secret Key variable: " + secretKey)
-//      for(secretKey <- form.secretKey.value) yield {
-        if (account.verifyResetPasswordKey(form.secretKey.name) == true) {
+
+        if (account.verifyResetPasswordKey(form.secretKey.value.getOrElse("")) == true) {
           views.frontend.html.account_verification(form=form, displayableErrors=displayableErrors)
-//        }
         } else {
          Forbidden("The password reset URL you used is either out of date or invalid.")
       }
@@ -57,10 +55,10 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
       val secretKeyOption = params.getOption("secretKey")
 
       AccountVerificationFormView(
-        email = Field[String](emailOption.getOrElse("")),
-        secretKey = Field[String](secretKeyOption.getOrElse("")),
-        passwordConfirm = Field[String](""),
-        newPassword = Field[String]("")
+        email= Field(name = Fields.Email.name, values = List(emailOption.getOrElse(""))),
+        secretKey = Field(name = Fields.SecretKey.name, values = List(secretKeyOption.getOrElse(""))),
+        passwordConfirm = Field(name = Fields.PasswordConfirm.name, values = List("")),
+        newPassword = Field[String](name = Fields.NewPassword.name, values = List(""))
       )
     }
   }

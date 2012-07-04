@@ -19,3 +19,5 @@ tmp
 *.sublime-workspace
 
 apps/website/war/WEB-INF/cloudbees-web.xml
+
+apps/website/eGraphsServers.ipr

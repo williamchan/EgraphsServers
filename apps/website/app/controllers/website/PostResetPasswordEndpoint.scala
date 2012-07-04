@@ -17,10 +17,10 @@ private[controllers] trait PostResetPasswordEndpoint extends ImplicitHeaderAndFo
   protected def accountVerificationForms: AccountVerificationFormFactory
   protected def accountRequestFilters: AccountRequestFilters
 
-  def postResetPassword(email: String) = postController() {
-
-    accountRequestFilters.requireValidAccountEmail(email) { account =>
+  def postResetPassword() = postController() {
+    accountRequestFilters.requireValidAccountEmail(request.params.getOption("email").getOrElse("Nothing")) { account =>
       val nonValidatedForm = accountVerificationForms(params.asFormReadable, account)
+
         nonValidatedForm.errorsOrValidatedForm match {
           case Left(errors) => {
             nonValidatedForm.redirectThroughFlash(GetResetPasswordEndpoint.redirectUrl.url)

@@ -19,11 +19,10 @@ class PostResetPasswordEndpointTests extends EgraphsFunctionalTest {
       val customer = TestData.newSavedCustomer()
       customer.account.withResetPasswordKey.save()
     }
-
     val response = POST("/account/reset", getPostStrParams(secretKey = account.resetPasswordKey.get, email = account.email,
       newPassword = "password1", passwordConfirm = "password2"))
     assertStatus(302, response)
-    assertTrue(getPlayFlashCookie(response).contains("Passwords do not match"))
+    assertTrue(getPlayFlashCookie(response).contains("errors"))
   }
 
   @Test
@@ -43,16 +42,18 @@ class PostResetPasswordEndpointTests extends EgraphsFunctionalTest {
   def testSetsNewPassword() {
     val account = db.connected(TransactionSerializable) {
       val customer = TestData.newSavedCustomer()
-      customer.account
+      customer.account.withResetPasswordKey.save()
     }
 
     val response = POST("/account/reset", getPostStrParams(secretKey = account.resetPasswordKey.get, email = account.email,
       newPassword = "password", passwordConfirm = "password"))
+    println("response: " + response)
+    assertStatus(200, response)
     assertFalse(getPlayFlashCookie(response).contains("error"))
     // Unfortunately, there is no way to check the session
   }
 
   private def getPostStrParams(secretKey: String, email: String, newPassword: String, passwordConfirm: String): Map[String, String] = {
-    Map[String, String]("secretKey" -> secretKey, "email" -> email, "password" -> newPassword, "password2" -> passwordConfirm)
+    Map[String, String]("secretKey" -> secretKey, "email" -> email, "newPassword" -> newPassword, "passwordConfirm" -> passwordConfirm)
   }
 }
