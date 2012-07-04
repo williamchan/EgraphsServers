@@ -7,7 +7,7 @@
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" inherit-compiler-output="false">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
     <output url="file:///production/front-end-catalog/.out" />
     <output-test url="file:///test/front-end-catalog" />
     <exclude-output />
@@ -58,12 +58,10 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$PLAY_HOME$/framework/play-1.2.4.jar!/" />
+          <root url="jar://$PLAY_HOME$/framework/play-1.2.5.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES>
-          <root url="file://$PLAY_HOME$/framework/src" />
-        </SOURCES>
+        <SOURCES />
       </library>
     </orderEntry>
   </component>
