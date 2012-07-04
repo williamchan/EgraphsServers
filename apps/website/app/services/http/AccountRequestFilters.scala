@@ -42,4 +42,11 @@ class AccountRequestFilters @Inject() (accountStore: AccountStore, customerStore
       case Some(customer) => continue(customer)
     }
   }
+
+  def requireValidAccountEmail(email:String)(continue: Account => Any)(implicit request: Request) = {
+    accountStore.findByEmail(email) match {
+      case None => new NotFound("Account not found.")
+      case Some(account) => continue(account)
+    }
+  }
 }

@@ -1,6 +1,6 @@
 package services.http.forms
 
-import models.{Password, Customer, Account}
+import models.{Password, Account}
 import services.Utils
 import com.google.inject.Inject
 
@@ -13,12 +13,17 @@ import com.google.inject.Inject
  * @param check the checks used by forms in our application.
  **/
 
-class AccountVerificationForm(val paramsMap: Form.Readable, check: FormChecks) extends Form[AccountVerificationForm.Validated]
+class AccountVerificationForm(val paramsMap: Form.Readable, check: FormChecks, account: Account) extends Form[AccountVerificationForm.Validated]
 {
   import AccountVerificationForm.Fields
 
   val secretKey = new RequiredField[String](Fields.SecretKey.name) {
-    def validateIfPresent = Right(stringToValidate)
+    def validateIfPresent = {
+      stringToValidate match {
+        case account.resetPasswordKey => Right(stringToValidate)
+        case _=> Left(new SimpleFormError("URL expired or incorrect"))
+      }
+    }
   }
 
   val email = new RequiredField[String](Fields.Email.name) {
@@ -40,6 +45,7 @@ class AccountVerificationForm(val paramsMap: Form.Readable, check: FormChecks) e
       }
     }
   }
+
 
   //
   // Form[ValidatedAccountVerificationForm] members
@@ -72,19 +78,23 @@ object AccountVerificationForm {
 }
 
 class AccountVerificationFormFactory @Inject()(formChecks: FormChecks)
-  extends ReadsForm[AccountVerificationForm]
 {
   //
   // Public members
   //
-  def apply(readable: Form.Readable): AccountVerificationForm = {
-    new AccountVerificationForm(readable, formChecks)
+  def apply(readable: Form.Readable, account: Account): AccountVerificationForm = {
+    new AccountVerificationForm(readable, formChecks, account)
   }
 
-  //
-  // ReadsForm[AccountVerificationForm] members
-  //
-  def instantiateAgainstReadable(readable: Form.Readable): AccountVerificationForm = {
-    apply(readable)
+
+  /**
+   * Need a specialized form reader her to pass in Account.
+   */
+  def getFormReader(account: Account): ReadsForm[AccountVerificationForm] = {
+    new ReadsForm[AccountVerificationForm]() {
+      override def instantiateAgainstReadable(readable: Form.Readable) = {
+        new AccountVerificationForm(readable, formChecks, account)
+      }
+    }
   }
 }
