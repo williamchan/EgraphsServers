@@ -101,8 +101,8 @@ GET     /account/recover                                 WebsiteControllers.getR
 POST    /account/recover                                 WebsiteControllers.postRecoverAccount
 GET     /account/recover/confirmation                    WebsiteControllers.getRecoverAccountConfirmation
 GET     /account/reset                                   WebsiteControllers.getResetPassword
-POST    /account/reset                                   WebsiteControllers.postResetPassword
 GET     /account/verify                                  WebsiteControllers.getResetPassword
+POST    /account/verify                                  WebsiteControllers.postResetPassword
 GET     /facebooklogin/callback                          WebsiteControllers.getFacebookLoginCallback
 GET     /account/{<[0-9]+>galleryCustomerId}/gallery     WebsiteControllers.getCustomerGallery
 
