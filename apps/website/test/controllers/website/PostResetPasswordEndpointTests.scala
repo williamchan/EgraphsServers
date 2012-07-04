@@ -20,7 +20,8 @@ class PostResetPasswordEndpointTests extends EgraphsFunctionalTest {
       customer.account.withResetPasswordKey.save()
     }
 
-    val response = POST("/account/reset", getPostStrParams(email = account.email, password = "password1", password2 = "password2"))
+    val response = POST("/account/reset", getPostStrParams(secretKey = account.resetPasswordKey.get, email = account.email,
+      newPassword = "password1", passwordConfirm = "password2"))
     assertStatus(302, response)
     assertTrue(getPlayFlashCookie(response).contains("Passwords do not match"))
   }
@@ -32,7 +33,8 @@ class PostResetPasswordEndpointTests extends EgraphsFunctionalTest {
       customer.account.withResetPasswordKey.save()
     }
 
-    val response = POST("/account/reset", getPostStrParams(email = account.email, password = "p", password2 = "p"))
+    val response = POST("/account/reset", getPostStrParams(secretKey = account.resetPasswordKey.get,email = account.email,
+      newPassword = "p", passwordConfirm = "p"))
     assertStatus(302, response)
     assertTrue(getPlayFlashCookie(response).contains("errors"))
   }
@@ -44,12 +46,13 @@ class PostResetPasswordEndpointTests extends EgraphsFunctionalTest {
       customer.account
     }
 
-    val response = POST("/account/reset", getPostStrParams(email = account.email, password = "password", password2 = "password"))
+    val response = POST("/account/reset", getPostStrParams(secretKey = account.resetPasswordKey.get, email = account.email,
+      newPassword = "password", passwordConfirm = "password"))
     assertFalse(getPlayFlashCookie(response).contains("error"))
     // Unfortunately, there is no way to check the session
   }
 
-  private def getPostStrParams(email: String, password: String, password2: String): Map[String, String] = {
-    Map[String, String]("email" -> email, "password" -> password, "password2" -> password2)
+  private def getPostStrParams(secretKey: String, email: String, newPassword: String, passwordConfirm: String): Map[String, String] = {
+    Map[String, String]("secretKey" -> secretKey, "email" -> email, "password" -> newPassword, "password2" -> passwordConfirm)
   }
 }

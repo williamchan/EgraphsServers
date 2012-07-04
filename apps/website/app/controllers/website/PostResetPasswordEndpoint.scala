@@ -3,34 +3,34 @@ package controllers.website
 import play.mvc.Controller
 import play.mvc.results.Redirect
 import services.Utils
-import controllers.WebsiteControllers
-import play.data.validation.Validation
 import models.AccountStore
 import services.http.POSTControllerMethod
+import models.frontend.account.{AccountVerificationForm => AccountVerificationFormView}
+import services.http.forms.{AccountVerificationForm, AccountVerificationFormFactory, Form}
+import services.mvc.ImplicitHeaderAndFooterData
 
-private[controllers] trait PostResetPasswordEndpoint {
+private[controllers] trait PostResetPasswordEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
+  import Form.Conversions._
 
   protected def postController: POSTControllerMethod
   protected def accountStore: AccountStore
+  protected def accountVerificationForms: AccountVerificationFormFactory
 
-  def postResetPassword(email: String, password: String, password2: String) = postController() {
 
-    Validation.required("Password", password)
-    Validation.isTrue("Passwords do not match", password == password2)
-    val account = accountStore.findByEmail(email).get
-    val passwordValidationOrAccount = account.withPassword(password)
-    for (passwordValidation <- passwordValidationOrAccount.left) {
-      Validation.addError("Password", passwordValidation.error.toString)
+  def postResetPassword() = postController() {
+    val nonValidatedForm = accountVerificationForms(params.asFormReadable)
+
+    nonValidatedForm.errorsOrValidatedForm match {
+      case Left(errors) => {
+        nonValidatedForm.redirectThroughFlash(GetResetPasswordEndpoint.redirectUrl.url)
+      }
+      case Right(validForm) => {
+        for(account <- accountStore.findByEmail(validForm.email); if account.verifyResetPasswordKey(validForm.secretKey))
+          yield {views.frontend.html.simple_confirmation(header = "Password Reset", body ="Change this")}
+      }
     }
 
-    if (!validationErrors.isEmpty) {
-      WebsiteControllers.redirectWithValidationErrors(GetResetPasswordEndpoint.url(account.id, account.resetPasswordKey.get))
-
-    } else {
-
-      passwordValidationOrAccount.right.get.save()
-      new Redirect(Utils.lookupUrl("WebsiteControllers.getLogin").url)
-    }
+    Forbidden("The reset url you are using is incorrect or expired.")
   }
 }

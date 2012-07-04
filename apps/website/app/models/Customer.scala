@@ -11,8 +11,7 @@ import org.apache.commons.mail.HtmlEmail
 import services.mail.Mail
 import services.http.PlayConfig
 import java.util.Properties
-import play.mvc.Router.ActionDefinition
-import controllers.website.GetVerifyAccountEndpoint
+import controllers.website.GetResetPasswordEndpoint
 
 /** Services used by each instance of Customer */
 case class CustomerServices @Inject() (accountStore: AccountStore,
@@ -106,7 +105,7 @@ case class Customer(
       views.Application.email.html.new_customer_email(
         customerName = name,
         email = account.email,
-        verifyPasswordUrl = GetVerifyAccountEndpoint.url(id, account.resetPasswordKey.get)
+        verifyPasswordUrl = GetResetPasswordEndpoint.url(id, account.resetPasswordKey.get).url
       ).toString().trim()
     )
     services.mail.send(email)

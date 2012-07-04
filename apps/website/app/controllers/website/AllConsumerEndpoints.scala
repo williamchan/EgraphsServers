@@ -17,7 +17,6 @@ trait AllConsumerEndpoints extends GetBlobEndpoint
   with GetRecoverAccountConfirmationEndpoint
   with GetRegisterEndpoint
   with GetResetPasswordEndpoint
-  with GetVerifyAccountEndpoint
   with PostAccountSettingsEndpoint
   with PostBuyProductEndpoint
   with PostLoginEndpoint

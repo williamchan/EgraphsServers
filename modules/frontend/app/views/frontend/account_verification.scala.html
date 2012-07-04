@@ -18,6 +18,8 @@ footerData: models.frontend.footer.FooterData
       </header>
       @tags.html.safeForm("method" -> "POST", "action" -> "/account/verify"){
       <section class="settings-group" id="password-reset">
+        <input type="hidden" name="secretKey" value="@form.secretKey.value.getOrElse(" ")"/>
+        <input type="hidden" name="email" value="@form.email.value.getOrElse(" ")"/>
       <div class="row-settings row-fluid">
         <div class="span12">
         <h2>Enter your new password below</h2>

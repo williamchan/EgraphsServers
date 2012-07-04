@@ -73,9 +73,10 @@ object Account extends Controller with DefaultHeaderAndFooterData {
       case _ => {
         views.frontend.html.account_verification(
           AccountVerificationForm(
-            email =  Field(name = "email", values = List("will@egraphs.com")),
             newPassword = Field(name="newPassword"),
-            passwordConfirm = Field(name="passwordConfirm")
+            passwordConfirm = Field(name="passwordConfirm"),
+            email = Field(name="email", values=List("will@egraphs.com")),
+            secretKey = Field(name="secretKey", values=List("SECRETSAUCE"))
           )
         )
       }
