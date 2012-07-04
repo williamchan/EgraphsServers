@@ -1,5 +1,5 @@
 /* Scripting for the personalization page */
-define(["services/forms", "Egraphs", "libs/twitter-bootstrap/bootstrap-button"],
+define(["services/forms", "Egraphs", "bootstrap/bootstrap-button"],
 function(forms, Egraphs) {
   
   var page = Egraphs.page,

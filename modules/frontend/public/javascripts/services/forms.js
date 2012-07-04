@@ -1,5 +1,11 @@
 /* Scripting shared between forms */
-define(["libs/jquery.watermark.min", "libs/iphonecheckboxes/iphone-style-checkboxes", "libs/twitter-bootstrap/bootstrap-alert", "libs/twitter-bootstrap/bootstrap-button"], function() {
+define([
+    "libs/jquery.watermark.min",
+    "libs/iphonecheckboxes/iphone-style-checkboxes",
+    "bootstrap/bootstrap-alert",
+    "bootstrap/bootstrap-button"],
+
+function() {
   return {
     
     /**

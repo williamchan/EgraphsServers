@@ -11,7 +11,7 @@ require:
 repositories:
     - egraphsModules:
         type:       local
-        descriptor: ${application.path}/../../modules/[module]/conf/dependencies.yml
-        artifact:   ${application.path}/../../modules/[module]
+        descriptor: ${application.path}/project-modules/[module]/conf/dependencies.yml
+        artifact:   ${application.path}/project-modules/[module]
         contains:
             - egraphs -> *

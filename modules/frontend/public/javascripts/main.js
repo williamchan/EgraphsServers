@@ -1,7 +1,10 @@
 // Configuration to look up correct urls to js files as opposed to relative
 // paths (require's default behavior)
 require.config({
-  baseUrl: "/public/javascripts"
+  baseUrl: "/public/javascripts",
+  paths: {
+    bootstrap: '/public/twitter-bootstrap/js'
+  }
 });
 
 // The current page should have provided an array of javascript modules
@@ -24,9 +27,3 @@ require(Egraphs.page.jsMain, function() {
     mainModule.go();
   }
 });
-
-
-
-
-
-
