@@ -102,9 +102,6 @@ POST ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/checkout    Web
 ## Website
 ##
 
-# social media exploratory work
-GET     /socialpost                                      WebsiteControllers.getSocialPost
-
 # customer accounts stubs
 GET     /register                                        WebsiteControllers.getRegister
 POST    /register                                        WebsiteControllers.postRegister
