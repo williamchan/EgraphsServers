@@ -1,0 +1,71 @@
+@()(
+implicit session: play.mvc.Scope.Session,
+headerData: models.frontend.header.HeaderData,
+footerData: models.frontend.footer.FooterData
+)
+@import views.frontend.Utils
+@import models.frontend.egraphs._
+
+@baseBody = {
+
+<section id="content" role="main">
+  <div id="main" class="about-us">
+    <div class="row-fluid">
+      <div class="span12 masthead-static">
+        <img src="/public/images/landing-masthead-1.jpg"/>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row-fluid">
+        <div class="span12">
+          <h1>About Us</h1>
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span12">
+          <span class="lede">
+            It doesn’t matter how old you are or where you come from: we are all fans.
+          </span>
+          <div class="row-fluid">
+            <div class="span6">
+              <p>
+                Some of us drive hundreds of miles to watch our football teams and others stand
+                in the rain for hours to get a glimpse of our favorite musician. There’s a star
+                out there that each of us would “cross the Sahara” to connect with – at egraphs,
+                we’re working to make that possible.
+              </p>
+            </div>
+            <div class="span6">
+              <p>
+                By bringing your celebrities together in one location, fans can easily find their
+                favorite stars and connect with them through an egraph: a 1005 personalized voice
+                and written message from the star to the fan that can be shared with the world.
+              </p>
+              <a href="#">Want to learn more?</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span12">
+          Sincerely,<br>
+          The Egraphs Team
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span12">
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+}
+@base_template(
+title="Gallery",
+jsMain="pages/account-gallery",
+body=baseBody
+)

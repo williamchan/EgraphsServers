@@ -19,4 +19,8 @@ object Static extends Controller with DefaultHeaderAndFooterData {
       """
     )
   }
+
+  def about() = {
+    views.frontend.html.about_us()
+  }
 }
