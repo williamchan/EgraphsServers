@@ -12,6 +12,7 @@ import models.frontend.storefront.{CheckoutFormView, CheckoutOrderSummary, Check
 import services.payment.Payment
 import play.mvc.results.Redirect
 import controllers.website.PostBuyProductEndpoint.EgraphPurchaseHandler
+import controllers.WebsiteControllers
 
 /**
  * Endpoint for serving up the Checkout form
@@ -59,7 +60,7 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
                                 ).right;
 
         // Make sure we've got a high-quality print option from the Review page, or redirect to it
-        highQualityPrint <- forms.highQualityPrintOrRedirectToReviewForm(
+        highQualityPrint <- forms.printingOptionOrRedirectToReviewForm(
                               celebrityUrlSlug,
                               productUrlSlug
                             ).right
@@ -90,7 +91,7 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
           celebrityName=celeb.publicName.getOrElse("Anonymous"),
           productName=product.name,
           recipientName=validPersonalizeForm.recipientName,
-          messageText=makeTextForCelebToWrite(
+          messageText=PurchaseForms.makeTextForCelebToWrite(
             validPersonalizeForm.writtenMessageRequest,
             validPersonalizeForm.writtenMessageText
           ),
@@ -145,7 +146,7 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
                                   ).right;
 
           // And a printing option from the review page
-          printingOption <- forms.highQualityPrintOrRedirectToReviewForm(
+          printingOption <- forms.printingOptionOrRedirectToReviewForm(
                                 celebrityUrlSlug,
                                 productUrlSlug
                               ).right;
@@ -159,27 +160,25 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
 
           // Billing form has to be legit. Hand it the shipping form in case of
           // they had entered "billing matches shipping"
-          validBillingForm <- redirectOrValidBillingForm(
-                                maybeShippingForms._1,
-                                celebrityUrlSlug,
-                                productUrlSlug
-                              ).right
+          billingForms <- redirectOrValidBillingForms(
+                                 maybeShippingForms._1,
+                                 celebrityUrlSlug,
+                                 productUrlSlug
+                               ).right
         ) yield {
-          forms.withHighQualityPrint(printingOption).save()
+          val billingForm = billingForms._1
+          val maybeShippingForm = maybeShippingForms._1
 
-          // Buy the egraph
-          // TODO: instead go to the Finalize Order page.
-          EgraphPurchaseHandler(
-            recipientName=validPersonalizeForm.recipientName,
-            recipientEmail=validPersonalizeForm.recipientEmail.getOrElse(validBillingForm.email),
-            buyerName=validBillingForm.name,
-            buyerEmail=validBillingForm.email,
-            stripeTokenId=validBillingForm.paymentToken,
-            desiredText=validPersonalizeForm.writtenMessageText,
-            personalNote=validPersonalizeForm.noteToCelebriity,
-            celebrity=celeb,
-            product=product
-          ).execute()
+          // Write the shipping form into the session if it was there
+          val formsWithShippingForm = maybeShippingForm.map( shipping => forms.withForm(shipping))
+
+          // Write the billing form if it was there and save.
+          formsWithShippingForm.getOrElse(forms).withForm(billingForm).save()
+
+          // Redirect to Finalize screen.
+          import WebsiteControllers.getStorefrontFinalize
+
+          new Redirect(reverse(getStorefrontFinalize(celebrityUrlSlug, productUrlSlug)).url)
         }
     }
   }
@@ -208,18 +207,20 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
     }
   }
 
-  private def redirectOrValidBillingForm(
+  private def redirectOrValidBillingForms(
     maybeShippingForm: Option[CheckoutShippingForm],
     celebrityUrlSlug: String,
     productUrlSlug: String
-  ): Either[Redirect, CheckoutBillingForm.Valid] = {
+  ): Either[Redirect, (CheckoutBillingForm, CheckoutBillingForm.Valid)] = {
     val billingFormReader = purchaseFormReaders.forBillingForm(maybeShippingForm)
     val billingForm = billingFormReader.instantiateAgainstReadable(params.asFormReadable)
     val errorsOrValid = billingForm.errorsOrValidatedForm
 
-    errorsOrValid.left.map { _ =>
+    val redirectOrValid = errorsOrValid.left.map { _ =>
       redirectCheckoutFormsThroughFlash(celebrityUrlSlug, productUrlSlug)
     }
+
+    redirectOrValid.right.map(validForm => (billingForm, validForm))
   }
 
   private def redirectCheckoutFormsThroughFlash(celebrityUrlSlug: String, productUrlSlug: String): Redirect = {
@@ -234,17 +235,6 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
     }
 
     new Redirect(reverse(getStorefrontCheckout(celebrityUrlSlug, productUrlSlug)).url)
-  }
-
-  // TODO: This is a repeat of a function in I think the ReviewController. Undo the copy-paste.
-  private def makeTextForCelebToWrite(messageRequest: WrittenMessageRequest, messageText: Option[String])
-  : String = {
-    messageRequest match {
-      // TODO: Make these strings respond to gender
-      case WrittenMessageRequest.SignatureOnly => "His signature only."
-      case WrittenMessageRequest.CelebrityChoosesMessage => "Whatever he wants."
-      case WrittenMessageRequest.SpecificMessage => messageText.getOrElse("")
-    }
   }
 
   private def defaultBillingView:CheckoutBillingInfoView = {

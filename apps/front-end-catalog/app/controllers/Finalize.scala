@@ -52,7 +52,6 @@ object Finalize extends Controller
       celebName="{personalization celeb}",
       productTitle="{product title}",
       recipientName="{recipient name}",
-      messageOption=PersonalizeMessageOption.SpecificMessage,
       messageText= "{message text}",
       editUrl="{edit personalization url"
     )
