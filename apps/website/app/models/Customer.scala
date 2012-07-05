@@ -105,7 +105,7 @@ case class Customer(
       views.Application.email.html.new_customer_email(
         customerName = name,
         email = account.email,
-        verifyPasswordUrl = GetResetPasswordEndpoint.url(id, account.resetPasswordKey.get).url
+        verifyPasswordUrl = GetResetPasswordEndpoint.absoluteUrl(account.email, account.resetPasswordKey.get).url
       ).toString().trim()
     )
     services.mail.send(email)

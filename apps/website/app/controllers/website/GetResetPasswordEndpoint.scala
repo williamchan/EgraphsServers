@@ -66,9 +66,9 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
 
 object GetResetPasswordEndpoint {
 
-  def url(accountId: Long, resetPasswordKey: String): ActionDefinition = {
-    Utils.lookupUrl("WebsiteControllers.getResetPassword",
-      Map("accountId" -> accountId.toString, "passwordRecoveryKey" -> resetPasswordKey))
+  def absoluteUrl(email: String, secretKey: String): ActionDefinition = {
+    Utils.lookupAbsoluteUrl("WebsiteControllers.getResetPassword",
+      Map("email" -> email, "secretKey" -> secretKey))
   }
 
   def redirectUrl : ActionDefinition = {

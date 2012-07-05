@@ -9,7 +9,6 @@ import services.db.{DBSession, TransactionSerializable}
 import models.{Customer, Account, CustomerStore, AccountStore}
 import services.mail.Mail
 import org.apache.commons.mail.HtmlEmail
-import play.mvc.Router.ActionDefinition
 import services.http.POSTControllerMethod
 
 private[controllers] trait PostRecoverAccountEndpoint {
@@ -55,8 +54,6 @@ private[controllers] trait PostRecoverAccountEndpoint {
    * Sends an email so that the customer can reset password via the getResetPassword endpoint
    */
   private def sendRecoveryPasswordEmail(account: Account, customer: Customer) {
-    val linkActionDefinition: ActionDefinition = GetResetPasswordEndpoint.url(account.id, account.resetPasswordKey.get)
-    linkActionDefinition.absolute()
     val email = new HtmlEmail()
     email.setFrom("support@egraphs.com")
     email.addReplyTo("support@egraphs.com")
@@ -66,7 +63,7 @@ private[controllers] trait PostRecoverAccountEndpoint {
       views.Application.email.html.reset_password_email(
         customerName = customer.name,
         email = account.email,
-        resetPasswordUrl = linkActionDefinition.url
+        resetPasswordUrl = GetResetPasswordEndpoint.absoluteUrl(account.email, account.resetPasswordKey.get).url
       ).toString().trim()
     )
     mail.send(email)

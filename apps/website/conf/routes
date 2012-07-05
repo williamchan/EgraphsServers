@@ -113,10 +113,8 @@ POST    /account/settings                                WebsiteControllers.post
 GET     /account/recover                                 WebsiteControllers.getRecoverAccount
 POST    /account/recover                                 WebsiteControllers.postRecoverAccount
 GET     /account/recover/confirmation                    WebsiteControllers.getRecoverAccountConfirmation
-GET     /account/reset                                   WebsiteControllers.getResetPassword
 GET     /account/verify                                  WebsiteControllers.getResetPassword
 POST    /account/verify                                  WebsiteControllers.postResetPassword
-POST    /account/reset                                   WebsiteControllers.postResetPassword
 GET     /facebooklogin/callback                          WebsiteControllers.getFacebookLoginCallback
 GET     /account/{<[0-9]+>galleryCustomerId}/gallery     WebsiteControllers.getCustomerGallery
 
