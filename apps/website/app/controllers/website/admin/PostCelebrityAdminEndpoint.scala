@@ -97,9 +97,6 @@ trait PostCelebrityAdminEndpoint {
           val dimensions = ImageUtil.getDimensions(profileImage.get)
           if (dimensions.isEmpty) {
             Validation.addError("Profile Photo", "No image found for Profile Photo")
-          } else {
-            val resolutionStr = dimensions.get.width + ":" + dimensions.get.height
-            Validation.isTrue("Profile Photo must be 200x200 - resolution was " + resolutionStr, dimensions.get.width == 200 && dimensions.get.height == 200)
           }
         }
 

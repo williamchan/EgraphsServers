@@ -77,8 +77,7 @@
         </fieldset>
         <fieldset>
           <legend>Images</legend>
-          @formField(id="profileImage", label="Profile Photo", inputType="file", width="span8", help=Some(profileImageHelp), fields=fields)
-          @profileImageHelp = { Must be a 200x200 JPG or PNG. }
+          @formField(id="profileImage", label="Profile Photo", inputType="file", width="span8", fields=fields)
 
           @formField(id="landingPageImage", label="Landing Page Image", inputType="file", width="span8", help=Some(landingPageImageHelp), fields=fields)
           @landingPageImageHelp = { Must be at least 1500x556. Should be center-balanced photo of celebrity. }
