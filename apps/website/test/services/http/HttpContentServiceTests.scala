@@ -25,7 +25,7 @@ class HttpContentServiceTests extends EgraphsUnitTest {
     try {
       Response.current.set(null)
       val headers = underTest.headersForFilename(EnrollmentSample.getSignatureXmlUrl(0))
-      headers.contentType should be ("text/xml")
+      headers.contentType should include ("text/xml")
     }
     finally {
       Response.current.set(origResponse)

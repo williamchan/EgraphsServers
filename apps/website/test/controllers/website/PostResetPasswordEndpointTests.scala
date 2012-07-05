@@ -5,13 +5,14 @@ import org.junit.Test
 import scala.collection.JavaConversions._
 import play.test.FunctionalTest
 import FunctionalTest._
-import services.AppConfig
+import services.{Utils, AppConfig}
 import services.db.{TransactionSerializable, DBSession}
 import utils.TestData
 
 class PostResetPasswordEndpointTests extends EgraphsFunctionalTest {
 
   private val db = AppConfig.instance[DBSession]
+  private val url = Utils.lookupUrl("WebsiteControllers.postResetPassword").url
 
   @Test
   def testFailPasswordsMustMatchValidation() {
@@ -19,7 +20,7 @@ class PostResetPasswordEndpointTests extends EgraphsFunctionalTest {
       val customer = TestData.newSavedCustomer()
       customer.account.withResetPasswordKey.save()
     }
-    val response = POST("/account/reset", getPostStrParams(secretKey = account.resetPasswordKey.get, email = account.email,
+    val response = POST(url, getPostStrParams(secretKey = account.resetPasswordKey.get, email = account.email,
       newPassword = "password1", passwordConfirm = "password2"))
     assertStatus(302, response)
     assertTrue(getPlayFlashCookie(response).contains("errors"))
@@ -32,7 +33,8 @@ class PostResetPasswordEndpointTests extends EgraphsFunctionalTest {
       customer.account.withResetPasswordKey.save()
     }
 
-    val response = POST("/account/reset", getPostStrParams(secretKey = account.resetPasswordKey.get,email = account.email,
+
+    val response = POST(url, getPostStrParams(secretKey = account.resetPasswordKey.get,email = account.email,
       newPassword = "p", passwordConfirm = "p"))
     assertStatus(302, response)
     assertTrue(getPlayFlashCookie(response).contains("errors"))
@@ -45,7 +47,7 @@ class PostResetPasswordEndpointTests extends EgraphsFunctionalTest {
       customer.account.withResetPasswordKey.save()
     }
 
-    val response = POST("/account/reset", getPostStrParams(secretKey = account.resetPasswordKey.get, email = account.email,
+    val response = POST(url, getPostStrParams(secretKey = account.resetPasswordKey.get, email = account.email,
       newPassword = "password", passwordConfirm = "password"))
     println("response: " + response)
     assertStatus(200, response)
