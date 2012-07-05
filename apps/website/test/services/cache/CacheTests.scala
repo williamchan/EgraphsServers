@@ -136,10 +136,10 @@ class CacheFactoryTests extends EgraphsUnitTest {
     val hostInfo = AppConfig.instance[HostInfo]
     val hostId = AppConfig.instance[CacheFactory].hostId
 
-    hostId.contains(Test.name) should be (true)
-    hostId.contains(hostInfo.macAddress) should be (true)
-    hostId.contains(hostInfo.userName) should be (true)
-    hostId.contains(hostInfo.computerName) should be (true)
+    hostId should include (Test.name)
+    hostId should include (hostInfo.macAddress)
+    hostId should include (hostInfo.userName)
+    hostId should include (hostInfo.computerName)
   }
 }
 

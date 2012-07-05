@@ -75,8 +75,8 @@ class FormTests extends EgraphsUnitTest {
     errorStrings.size should be (2)
 
     val fullErrorString = errorStrings.mkString(", ")
-    fullErrorString.contains("Valid email address required") should be (true)
-    fullErrorString.contains("Under minimum value") should be (true)
+    fullErrorString should include ("Valid email address required")
+    fullErrorString should include ("Under minimum value")
   }
 
   "Form.errorsOrValidatedForm" should "return Right(ValidFormType) if there were no errors" in {
@@ -121,7 +121,7 @@ class FormTests extends EgraphsUnitTest {
         recoveredForm.favoriteFruits.stringsToValidate should be (originalForm.favoriteFruits.stringsToValidate)
 
         val errorString = recoveredForm.fieldInspecificErrors.map(error => error.description).mkString
-        errorString.contains(formErrorString) should be (true)
+        errorString should include (formErrorString)
 
       case None =>
         fail("A form should have been recovered from the flash")

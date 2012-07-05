@@ -25,7 +25,7 @@ class AccountTests extends UnitFlatSpec
   //
   "Account" should "require certain fields" in {
     val exception = intercept[IllegalArgumentException] {Account().save()}
-    exception.getLocalizedMessage.contains("Account: email must be specified") should be(true)
+    exception.getLocalizedMessage should include("Account: email must be specified")
   }
 
   "An Account" should "start without a password" in {
@@ -140,7 +140,7 @@ class AccountTests extends UnitFlatSpec
   "createCustomer" should "create Customer with username based on email" in {
     val account = TestData.newSavedAccount()
     val customer = account.createCustomer("Test User").save()
-    account.email.contains(customer.username) should be(true)
+    account.email should include(customer.username)
   }
 
   "createCustomer" should "throw exception if called on account that already has a customer" in {
@@ -232,21 +232,21 @@ class AccountStoreTests extends UnitFlatSpec
     val thrown = evaluating {
                               accountStore.save(Account(celebrityId = Some(1L)))
                             } should produce[RuntimeException]
-    thrown.getMessage.toUpperCase.contains("CELEBRITYID") should be(true)
+    thrown.getMessage.toUpperCase should include("CELEBRITYID")
   }
 
   it should "fail to persist with non-null, non-existent customer ID" in {
     val thrown = evaluating {
                               accountStore.save(Account(customerId = Some(1L)))
                             } should produce[RuntimeException]
-    thrown.getMessage.toUpperCase.contains("CUSTOMERID") should be(true)
+    thrown.getMessage.toUpperCase should include("CUSTOMERID")
   }
 
   it should "fail to persist with non-null, non-existent administrator ID" in {
     val thrown = evaluating {
                               accountStore.save(Account(administratorId = Some(1L)))
                             } should produce[RuntimeException]
-    thrown.getMessage.toUpperCase.contains("ADMINISTRATORID") should be(true)
+    thrown.getMessage.toUpperCase should include("ADMINISTRATORID")
   }
 
   it should "be recoverable by email" in {

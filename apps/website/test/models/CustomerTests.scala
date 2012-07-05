@@ -45,7 +45,7 @@ class CustomerTests extends UnitFlatSpec
   //
   "Customer" should "require certain fields" in {
     val exception = intercept[IllegalArgumentException] {Customer().save()}
-    exception.getLocalizedMessage.contains("Customer: name must be specified") should be(true)
+    exception.getLocalizedMessage should include("Customer: name must be specified")
   }
 
   "A customer" should "produce Orders that are properly configured" in {
@@ -97,14 +97,14 @@ class CustomerTests extends UnitFlatSpec
     val exception0 = intercept[InsufficientInventoryException] {
       buyer.buy(product, recipient = recipient).save()
     }
-    exception0.getLocalizedMessage.contains("Must have available inventory to purchase product") should be(true)
+    exception0.getLocalizedMessage should include("Must have available inventory to purchase product")
 
     // should fail due to lack of active InventoryBatch
     inventoryBatch.copy(numInventory = 10, startDate = TestData.jan_01_2012, endDate = TestData.jan_01_2012).save()
     val exception1 = intercept[InsufficientInventoryException] {
       buyer.buy(product, recipient = recipient).save()
     }
-    exception1.getLocalizedMessage.contains("Must have available inventory to purchase product") should be(true)
+    exception1.getLocalizedMessage should include("Must have available inventory to purchase product")
   }
 
   "findOrCreateByEmail" should "find or create as appropriate" in {

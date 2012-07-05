@@ -60,13 +60,13 @@ class ProductTests extends UnitFlatSpec
 
   "Product" should "require certain fields" in {
     var exception = intercept[IllegalArgumentException] {Product().save()}
-    exception.getLocalizedMessage.contains("Product: name must be specified") should be(true)
+    exception.getLocalizedMessage should include ("Product: name must be specified")
     exception = intercept[IllegalArgumentException] {Product(name = "name").save()}
-    exception.getLocalizedMessage.contains("Product: description must be specified") should be(true)
+    exception.getLocalizedMessage should include ("Product: description must be specified")
     exception = intercept[IllegalArgumentException] {Product(name = "name", description = "desc", storyTitle = "").save()}
-    exception.getLocalizedMessage.contains("Product: storyTitle must be specified") should be(true)
+    exception.getLocalizedMessage should include ("Product: storyTitle must be specified")
     exception = intercept[IllegalArgumentException] {Product(name = "name", description = "desc", storyText = "").save()}
-    exception.getLocalizedMessage.contains("Product: storyText must be specified") should be(true)
+    exception.getLocalizedMessage should include ("Product: storyText must be specified")
   }
 
   "saveWithImageAssets" should "set signingScaleH and signingScaleW" in {

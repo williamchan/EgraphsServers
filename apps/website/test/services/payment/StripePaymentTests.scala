@@ -36,7 +36,7 @@ class StripePaymentTests extends UnitFlatSpec
         "services.payment..StripePaymentTests, \"Test double-charging with token\".")
       fail("Should have thrown exception")
     }
-    exception.getLocalizedMessage.contains("You cannot use a stripe token more than once") should be(true)
+    exception.getLocalizedMessage should include ("You cannot use a stripe token more than once")
   }
 
   "refund" should "successfully refund a charge" in {
@@ -55,7 +55,7 @@ class StripePaymentTests extends UnitFlatSpec
       payment.refund("doesnotexist")
       fail("Should have thrown exception")
     }
-    exception.getLocalizedMessage.contains("No such charge") should be(true)
+    exception.getLocalizedMessage should include ("No such charge")
   }
 
   "refund" should "throw exception if called on a charge that has already been refunded" in {
@@ -72,7 +72,7 @@ class StripePaymentTests extends UnitFlatSpec
       payment.refund(charge.id)
       fail("Should have thrown exception")
     }
-    exception.getLocalizedMessage.contains("has already been refunded") should be(true)
+    exception.getLocalizedMessage should include ("has already been refunded")
   }
 
   "testToken" should "throw exception when called from live implementation" in {

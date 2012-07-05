@@ -63,7 +63,7 @@ class OrderTests extends UnitFlatSpec
 
   "Order" should "require certain fields" in {
     val exception = intercept[IllegalArgumentException] {Order().save()}
-    exception.getLocalizedMessage.contains("Order: recipientName must be specified") should be(true)
+    exception.getLocalizedMessage should include ("Order: recipientName must be specified")
   }
 
   "An order" should "create Egraphs that are properly configured" in {
@@ -163,7 +163,7 @@ class OrderTests extends UnitFlatSpec
 
     // verify Stripe Info
     order.stripeCardTokenId.get should be("mytoken")
-    order.stripeChargeId.get.contains("test charge against services.payment.YesMaamPayment") should be(true)
+    order.stripeChargeId.get should include ("test charge against services.payment.YesMaamPayment")
 
     // verify CashTransaction
     val cashTransaction = from(schema.cashTransactions)(txn =>

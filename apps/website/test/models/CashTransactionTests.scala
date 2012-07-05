@@ -45,7 +45,7 @@ class CashTransactionTests extends UnitFlatSpec
 
   "CashTransaction" should "require certain fields" in {
     val exception = intercept[IllegalArgumentException] {CashTransaction().save()}
-    exception.getLocalizedMessage.contains("CashTransaction: type must be specified") should be(true)
+    exception.getLocalizedMessage should include("CashTransaction: type must be specified")
   }
 
   "A CashTransaction" should "have the correct cash value and currency type" in {

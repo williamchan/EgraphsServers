@@ -106,7 +106,7 @@ class DBSessionTests extends EgraphsUnitTest with ClearsDatabaseAndValidationBef
       }
     } should produce [RuntimeException]
 
-    thrown.getMessage.contains("40001") should be (true) // Access due to concurrent update
+    thrown.getMessage should include ("40001") // Access due to concurrent update
  }
 }
 

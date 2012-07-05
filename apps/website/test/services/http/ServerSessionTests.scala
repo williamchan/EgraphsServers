@@ -81,8 +81,8 @@ class ServerSessionTests extends EgraphsUnitTest {
       val session = new ServerSession(None)
 
       // Check expectations
-      session.cacheKey.contains(play.mvc.Scope.Session.current().getId) should be (true)
-      session.cacheKey.contains("session") should be (true)
+      session.cacheKey should include (play.mvc.Scope.Session.current().getId)
+      session.cacheKey should include ("session")
     }
   }
 
