@@ -1,6 +1,8 @@
-@()(implicit headerData: models.frontend.header.HeaderData,
+@(model: models.frontend.storefront.FinalizeViewModel)(
+  implicit headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData,
-  storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs
+  storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs,
+  session: play.mvc.Scope.Session
 )
 
 @import views.frontend.tags.html.storefront_breadcrumbs_responsive
@@ -17,7 +19,7 @@
 				 		
   				<header>	
   				  <h1>Finalize Order</h1>
-  				  <h2>David Price | First MLB Victory</h2>  				
+  				  <h2>@model.personalization.celebName | @model.personalization.productTitle</h2> 
   				</header>
   				  				
 					<div class="col2">
@@ -32,7 +34,7 @@
 	    						  
 	    						  	<img src="/public/images/fpo-egraph.png" alt="fpo-egraph" />
 	    						  
-	    						  	<figcaption class="recepient-information">
+	    						  	<figcaption class="recipient-information">
 	    						  		A<span>. Recipient Information</span>
 	    						  	</figcaption>
 	    						  	
@@ -47,51 +49,47 @@
 	    						  </figure>
 
 	    						  <div class="order-summary">
-		    				  			    				  		
-		    				  		<div class="celebrity-information">
-		    				  			<h3>David Price</h3>
-		    				  			<h4>First MLB Victory</h4>
-		    				  			<dl>
-		    				  				<dt>Your Message to David Price</dt>
-		    				  				<dd>Dear David – you rock! Can’t wait to see you in Oakland! Joshua Johnson</dd>
-		    				  				<dt><strong>A.</strong> Recepients Name</dt>
-		    				  				<dd>Joshua Johnson</dd>
-		    				  				<dt><strong>B.</strong> David Price Will Write</dt>
-		    				  				<dd>Happy Birthday Joshua! Keep swinging for the fences! Lorem ium dolor etsun et tepera.</dd>
-		    				  				<dt><strong>C.</strong> David Price Will Record and Audio Message</dt>
-		    				  			</dl>
-		    				  			<p class="last"><a href="#">Edit</a></p>
-		    				  		</div>			  		
-		    				  	
+		    				  		@orderDetails		    				  	
 		    				  	</div>
 	    						  
 	    					</div> <!-- end .order-overview -->
 	    					
-	    				  <fieldset>
-	    				  
-		    					<h3>Shipping Information</h3>
-
-		    					<div class="field clearfix">
-
-		    				  	<div class="left">
-		    				  		<address>
-		    				  			<strong>Joshua Johnson</strong><br />
-		    				  			5507 N 58th Street<br />
-		    				  			Seattle, WA 98102
-		    				  		</address>
-		    				  		<p><a href="#">Edit</a></p>
-		    				  	</div>
+	    					@for(shipping <- model.shipping) {
+		    				  <fieldset>
 		    				  
-		    				  	<div class="right">
-											<ul>
-												<li>Standard: FREE</li>
-												<li>Arrives 7-14 Days</li>
-											</ul>
-		    				  	</div>
-	    				  	
-		    					</div>
-	    				       				  
-	    				  </fieldset>	  
+			    					<h3>Shipping Information</h3>
+
+			    					<div class="field clearfix">
+
+			    				  	<div class="left">
+			    				  	  <ul>
+			    				  	    <li><strong>@shipping.name</strong></li>
+			    				  	    <li>@shipping.email</li>
+			    				  	  </ul>
+
+			    				  	</div>
+			    				  
+			    				  	<div class="right">
+			    				  		<address>
+			    				  			@shipping.addressLine1<br />
+			    				  			@for(line2 <- shipping.addressLine2) {
+			    				  				@line2<br />
+			    				  			}
+			    				  			@shipping.city, @shipping.state, @shipping.postalCode<br />
+			    				  		</address>
+
+												<!--<ul>
+													<li>Standard: FREE</li>
+													<li>Arrives 7-14 Days</li>
+												</ul>-->
+			    				  	</div>
+		    				  	
+			    					</div>
+
+	    				  		<p><a href="@shipping.editUrl">Edit</a></p>
+
+		    				  </fieldset>
+	    				  }
 	
 	    				  <fieldset class="last">
 	    				  
@@ -101,26 +99,22 @@
 
 		    				  	<div class="left">
 		    				  		<ul>
-		    				  			<li><strong>Joshua Johnson</strong></li>
-		    				  			<li>Visa XXXXXXXXXXXX4021</li>
-		    				  			<li>
-		    				  				<address>
-		    				  					5507 N 58th Street<br />
-		    				  					Seattle, WA 98102
-		    				  				</address>
-		    				  			</li>
+		    				  			<li><strong>@model.billing.name</strong></li>
+												<li>@model.billing.email</li>
 		    				  		</ul>
-		    				  		<p><a href="#">Edit</a></p>
 		    				  	</div>
 		    				  
 		    				  	<div class="right">
 											<ul>
-												<li>Joshua12@@gmail.com</li>
-												<li>206.322.3484</li>
+												<li class="credit-card">Visa XXXXXXXXXXXX4021</li>
+												<li>@model.billing.postalCode</li>
 											</ul>
 		    				  	</div>	
-	    				  	
+
 	    				  	</div>    				  	
+
+  				  		  <p><a href="@model.billing.editUrl">Edit</a></p>
+
 	    				  	
 	    				  </fieldset>
 	    				  
@@ -128,10 +122,14 @@
 	    				  
 	    				  	<div class="clearfix">
 
-	    				  		<p>If all information is correct lorem ipsum dolor casa etsun et tepurar lorem ipsumain lora.</p>
+	    				  		<p>If all information is correct, click <strong>purchase</strong> to get @model.personalization.celebName started on your egraph.</p>
 	    				  	
- 	    				 			@tags.html.arrow_button(caption="Purchase", target="#", classes="button right")
-	    				  	    				 		
+ 	    				 			@tags.html.arrow_button(
+ 	    				 			  caption="Purchase",
+ 	    				 			  target=model.purchaseUrl,
+ 	    				 			  classes="button right"
+ 	    				 			)
+ 	    				 			
 	    				  	</div>
 	    				  
 	    				  </fieldset>
@@ -146,7 +144,7 @@
 	    						  
 	    						  	<img src="/public/images/fpo-egraph.png" alt="fpo-egraph" />
 	    						  
-	    						  	<figcaption class="recepient-information">
+	    						  	<figcaption class="recipient-information">
 	    						  		A<span>. Recipient Information</span>
 	    						  	</figcaption>
 	    						  	
@@ -163,43 +161,16 @@
 		    				  	<div class="order-summary">
 		    				  	
 		    				  		<h2>Summary</h2>
-		    				  		
-		    				  		<div class="celebrity-information">
-		    				  			<h3>David Price</h3>
-		    				  			<h4>First MLB Victory</h4>
-		    				  			<dl>
-		    				  				<dt>Your Message to David Price</dt>
-		    				  				<dd>Dear David – you rock! Can’t wait to see you in Oakland! Joshua Johnson</dd>
-		    				  				<dt><strong>A.</strong> Recepients Name</dt>
-		    				  				<dd>Joshua Johnson</dd>
-		    				  				<dt><strong>B.</strong> David Price Will Write</dt>
-		    				  				<dd>Happy Birthday Joshua! Keep swinging for the fences! Lorem ium dolor etsun et tepera.</dd>
-		    				  				<dt><strong>C.</strong> David Price Will Record and Audio Message</dt>
-		    				  			</dl>
-		    				  			<p class="last"><a href="#">Edit</a></p>
-		    				  		</div>
-		    				  		
-		    				  		<div class="order-totals">		    				  		
-												<table>
-													<tr>
-														<th>Subtotal</th>
-														<td>$50.00</td>
-													</tr>
-													<tr>
-														<th>Shipping</th>
-														<td>$0.00</td>
-													</tr>
-													<tr>
-														<th>Tax</th>
-														<td>$_.__</td>
-													</tr>
-													<tr class="total">
-														<th>Total</th>
-														<td>$50.00</td>
-													</tr>
-												</table>    		    				  		
-		    				  		</div>			  		
-		    				  	
+											
+											@orderDetails
+
+											@tags.html.storefront_price_summary(
+											  model.price.base,
+											  model.price.physicalGood,
+											  model.price.tax,
+											  model.price.total
+											)
+     		    				  	
 		    				  	</div>
 		    				  
 	    					</div> <!-- end .order-overview -->
@@ -208,20 +179,7 @@
 	  			
 						</div> <!-- end .finalize -->
 						
-						<footer class="clearfix">
-						
-							<p>Secured by: <a href="#" class="logo-entrust">Entrust</a></p>
-							
-							<p>Accepted payment types:</p>
-							
-							<ul>
-								<li class="visa">Visa</li>
-								<li class="mastercard">Mastercard</li>
-								<li class="amex">American Express</li>
-								<li class="discover">Discover</li>
-							</ul>
-								
-						</footer>
+						@tags.html.credit_cards_footer()
   			
   				</div> <!-- end .col2 -->
   			
@@ -230,6 +188,16 @@
     	</div> <!-- end #main -->
     
     </div> <!-- end #content -->
+}
+
+@orderDetails = {
+  @tags.html.storefront_order_details(
+  	model.personalization.celebName, 
+    model.personalization.productTitle, 
+    model.personalization.recipientName, 
+    model.personalization.messageText,
+    Some(model.personalization.editUrl)
+  )
 }
 
 @base_celebrity_storefront_template(

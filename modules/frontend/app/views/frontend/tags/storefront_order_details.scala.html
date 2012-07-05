@@ -1,0 +1,22 @@
+@(celebName: String,
+  productName: String,
+  recipientName: String,
+  messageText: String,
+  maybeEditUrl: Option[String] = None
+)
+
+<div class="celebrity-information">
+  <h3>@celebName</h3>
+  <h4>@productName</h4>
+  <dl class="@if(maybeEditUrl.isEmpty) {last}">
+    <dt><strong>A.</strong> Recipient's name</dt>
+    <dd>@recipientName</dd>
+    <dt><strong>B.</strong> @celebName will write</dt>
+    <dd>@messageText</dd>
+    <dt><strong>C.</strong> @celebName will record an audio message</dt>
+  </dl>
+  @for(editUrl <- maybeEditUrl) {
+    <p class="last"><a href="editUrl">Edit</a></p>
+  }
+
+</div> 

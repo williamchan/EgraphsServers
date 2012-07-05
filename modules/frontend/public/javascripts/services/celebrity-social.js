@@ -1,4 +1,6 @@
+/* global: define */
 /* Scripting shared between both celebrity storefront pages */
+
 define(["libs/jquery.tweet"], function() {
   var filterOutReplies = function(t){
     var matches = /^@\w+/.test(t['tweet_raw_text']);
