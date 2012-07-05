@@ -26,7 +26,7 @@ private[controllers] trait PostLoginEndpoint { this: Controller =>
 
       case Right(validForm) =>
         session.put(WebsiteControllers.customerIdKey, validForm.customerId)
-
+        //check to see if logged in
         // Redirect
         // TODO(wchan): Test this
         Utils.toOption(session.get(WebsiteControllers.redirectUponLogin)) match {

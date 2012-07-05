@@ -22,7 +22,8 @@ class PostSecurityTests extends EgraphsUnitTest {
       () => endpoints.postCelebrityProductAdmin(0, null, null, null, null, 0, 0, null, null, null),
       () => endpoints.postOrderAdmin(0),
       () => endpoints.postEgraphAdmin(0),
-      () => endpoints.postCelebrityInventoryBatchAdmin(0, 0, null, null)
+      () => endpoints.postCelebrityInventoryBatchAdmin(0, 0, null, null),
+      () => endpoints.postResetPassword()
     )
 
     for (endpointInvocation <- endpointInvocationsThatRequireTokens) {

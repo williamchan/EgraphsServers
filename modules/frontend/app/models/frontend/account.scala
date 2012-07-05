@@ -21,3 +21,10 @@ case class AccountSettingsForm(
   notice_stars: Field[String],
   generalErrors: Iterable[FormError]
 )
+
+case class AccountVerificationForm(
+  newPassword: Field[String],
+  passwordConfirm: Field[String],
+  email: Field[String],
+  secretKey: Field[String]
+)

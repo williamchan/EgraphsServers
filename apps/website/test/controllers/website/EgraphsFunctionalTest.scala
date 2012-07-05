@@ -18,6 +18,10 @@ trait EgraphsFunctionalTest extends FunctionalTest with CleanDatabaseAfterEachTe
     URLDecoder.decode(response.cookies.get("PLAY_FLASH").value, "US-ASCII")
   }
 
+  def getPlayErrorCookie(response: Response): String = {
+    URLDecoder.decode(response.cookies.get("PLAY_ERRORS").value, "US-ASCII")
+  }
+
   def login(account: Account, password: String = TestData.defaultPassword): Response = {
     import CustomerLoginForm.Fields
 

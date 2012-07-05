@@ -5,13 +5,14 @@ import org.junit.Test
 import scala.collection.JavaConversions._
 import play.test.FunctionalTest
 import FunctionalTest._
-import services.AppConfig
+import services.{Utils, AppConfig}
 import services.db.{TransactionSerializable, DBSession}
 import utils.TestData
 
 class PostResetPasswordEndpointTests extends EgraphsFunctionalTest {
 
   private val db = AppConfig.instance[DBSession]
+  private val url = Utils.lookupUrl("WebsiteControllers.postResetPassword").url
 
   @Test
   def testFailPasswordsMustMatchValidation() {
@@ -19,10 +20,10 @@ class PostResetPasswordEndpointTests extends EgraphsFunctionalTest {
       val customer = TestData.newSavedCustomer()
       customer.account.withResetPasswordKey.save()
     }
-
-    val response = POST("/account/reset", getPostStrParams(email = account.email, password = "password1", password2 = "password2"))
+    val response = POST(url, getPostStrParams(secretKey = account.resetPasswordKey.get, email = account.email,
+      newPassword = "password1", passwordConfirm = "password2"))
     assertStatus(302, response)
-    assertTrue(getPlayFlashCookie(response).contains("Passwords do not match"))
+    assertTrue(getPlayFlashCookie(response).contains("errors"))
   }
 
   @Test
@@ -32,7 +33,9 @@ class PostResetPasswordEndpointTests extends EgraphsFunctionalTest {
       customer.account.withResetPasswordKey.save()
     }
 
-    val response = POST("/account/reset", getPostStrParams(email = account.email, password = "p", password2 = "p"))
+
+    val response = POST(url, getPostStrParams(secretKey = account.resetPasswordKey.get,email = account.email,
+      newPassword = "p", passwordConfirm = "p"))
     assertStatus(302, response)
     assertTrue(getPlayFlashCookie(response).contains("errors"))
   }
@@ -41,15 +44,18 @@ class PostResetPasswordEndpointTests extends EgraphsFunctionalTest {
   def testSetsNewPassword() {
     val account = db.connected(TransactionSerializable) {
       val customer = TestData.newSavedCustomer()
-      customer.account
+      customer.account.withResetPasswordKey.save()
     }
 
-    val response = POST("/account/reset", getPostStrParams(email = account.email, password = "password", password2 = "password"))
+    val response = POST(url, getPostStrParams(secretKey = account.resetPasswordKey.get, email = account.email,
+      newPassword = "password", passwordConfirm = "password"))
+    println("response: " + response)
+    assertStatus(200, response)
     assertFalse(getPlayFlashCookie(response).contains("error"))
     // Unfortunately, there is no way to check the session
   }
 
-  private def getPostStrParams(email: String, password: String, password2: String): Map[String, String] = {
-    Map[String, String]("email" -> email, "password" -> password, "password2" -> password2)
+  private def getPostStrParams(secretKey: String, email: String, newPassword: String, passwordConfirm: String): Map[String, String] = {
+    Map[String, String]("secretKey" -> secretKey, "email" -> email, "newPassword" -> newPassword, "passwordConfirm" -> passwordConfirm)
   }
 }

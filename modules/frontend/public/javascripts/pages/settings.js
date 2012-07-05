@@ -71,7 +71,6 @@ define(["Egraphs", "libs/angular"], function (Egraphs) {
           } else {
             $("#password_message").removeClass("invisible");
           }
-//            console.log($(this).val());
         });
 
       });

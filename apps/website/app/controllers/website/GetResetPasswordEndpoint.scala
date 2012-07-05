@@ -1,45 +1,77 @@
 package controllers.website
 
 import play.mvc.Controller
+import services.http.{AccountRequestFilters, ControllerMethod}
 import services.Utils
-import services.http.ControllerMethod
-import models.AccountStore
+import models.{Account, AccountStore}
+import models.frontend.forms.{FormError, Field}
 import play.mvc.Router.ActionDefinition
+import models.frontend.account.{AccountVerificationForm => AccountVerificationFormView}
+import services.http.SafePlayParams.Conversions._
+import services.mvc.ImplicitHeaderAndFooterData
+import services.http.forms.AccountVerificationFormFactory
+import services.http.forms.AccountVerificationForm.Fields
 
-private[controllers] trait GetResetPasswordEndpoint {
-  this: Controller =>
+private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
+
+  import services.mvc.FormConversions._
+  import services.http.forms.Form.Conversions._
 
   protected def controllerMethod: ControllerMethod
   protected def accountStore: AccountStore
+  protected def accountRequestFilters: AccountRequestFilters
+  protected def accountVerificationForms: AccountVerificationFormFactory
 
-  def getResetPassword(accountId: Long, passwordRecoveryKey: String) = controllerMethod() {
-    val errorFields = Option(flash.get("errors")).map(errString => errString.split(',').toList)
+  def getResetPassword(email: String, secretKey: String) = controllerMethod() {
+    //flash takes precedence over url arg
+    accountRequestFilters.requireValidAccountEmail(flash.getOption("email").getOrElse(email)) { account =>
+      val form = makeFormView(account)
 
-    accountStore.findById(accountId) match {
-      case Some(account) if account.verifyResetPasswordKey(passwordRecoveryKey) =>
-        val fieldDefaults: (String => String) = {
-          (paramName: String) => paramName match {
-            case "email" => account.email
-            case "displayemail" => account.email // non-editable form fields don't seem to be posted, so using displayemail
-                                                 // for display and using email as a hidden form field
-            case _ =>
-              Option(flash.get(paramName)).getOrElse("")
-          }
-        }
+      val displayableErrors = List(form.newPassword.error, form.passwordConfirm.error, form.email.error)
+        .asInstanceOf[List[Option[FormError]]].filter(e => e.isDefined).map(e => e.get.description)
 
-        views.Application.html.reset_password(errorFields = errorFields, fields = fieldDefaults)
-
-      case _ =>
-        Forbidden("The password recovery URL you used is either out of date or invalid.")
+        if (account.verifyResetPasswordKey(form.secretKey.value.getOrElse("")) == true) {
+          views.frontend.html.account_verification(form=form, displayableErrors=displayableErrors)
+        } else {
+         Forbidden("The password reset URL you used is either out of date or invalid.")
+      }
     }
   }
 
+  private def makeFormView(account: Account) : AccountVerificationFormView = {
+    //check flash for presence of secretKey and Email
+    val maybeFormData = accountVerificationForms.getFormReader(account).read(flash.asFormReadable).map { form =>
+      AccountVerificationFormView(
+        form.secretKey.asViewField,
+        form.email.asViewField,
+        form.newPassword.asViewField,
+        form.passwordConfirm.asViewField
+      )
+    }
+
+    //check url params for secret key and email
+    maybeFormData.getOrElse {
+      val emailOption = params.getOption("email")
+      val secretKeyOption = params.getOption("secretKey")
+
+      AccountVerificationFormView(
+        email= Field(name = Fields.Email.name, values = List(emailOption.getOrElse(""))),
+        secretKey = Field(name = Fields.SecretKey.name, values = List(secretKeyOption.getOrElse(""))),
+        passwordConfirm = Field(name = Fields.PasswordConfirm.name, values = List("")),
+        newPassword = Field[String](name = Fields.NewPassword.name, values = List(""))
+      )
+    }
+  }
 }
 
 object GetResetPasswordEndpoint {
 
-  def url(accountId: Long, resetPasswordKey: String): ActionDefinition = {
-    Utils.lookupUrl("WebsiteControllers.getResetPassword",
-      Map("accountId" -> accountId.toString, "passwordRecoveryKey" -> resetPasswordKey))
+  def absoluteUrl(email: String, secretKey: String): ActionDefinition = {
+    Utils.lookupAbsoluteUrl("WebsiteControllers.getResetPassword",
+      Map("email" -> email, "secretKey" -> secretKey))
+  }
+
+  def redirectUrl : ActionDefinition = {
+    Utils.lookupUrl("WebsiteControllers.getResetPassword")
   }
 }

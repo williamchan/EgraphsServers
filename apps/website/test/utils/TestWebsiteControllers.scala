@@ -10,7 +10,7 @@ import services.db.DBSession
 import play.mvc.Controller
 import controllers.website.AllWebsiteEndpoints
 import java.util.Properties
-import services.http.forms.{AccountSettingsFormFactory, CustomerLoginFormFactory, FormChecks}
+import forms.{AccountVerificationFormFactory, AccountSettingsFormFactory, CustomerLoginFormFactory, FormChecks}
 import play.mvc.Scope.{Session, Flash}
 import play.mvc.Http.Request
 import play.test.FunctionalTest
@@ -33,18 +33,19 @@ case class TestWebsiteControllers @Inject()(
   egraphQueryFilters: EgraphQueryFilters,
   inventoryBatchQueryFilters: InventoryBatchQueryFilters,
   dbSession: DBSession,
-  purchaseFormFactory: PurchaseFormFactory,
-  purchaseFormReaders: PurchaseFormReaders,
   @PlayConfig playConfig: Properties,
   facebookAppId: String,
   customerLoginForms: CustomerLoginFormFactory,
   accountSettingsForms: AccountSettingsFormFactory,
+  accountVerificationForms: AccountVerificationFormFactory,
   egraphsSessionFactory: () => EgraphsSession,
   fakeRequest: Request = FunctionalTest.newRequest(),
   fakeSession: Session = new Session(),
   fakeFlash: Flash = new Flash()
 )() extends Controller with AllWebsiteEndpoints {
   val checkPurchaseField = AppConfig.instance[PurchaseFormChecksFactory]
+  val purchaseFormFactory = AppConfig.instance[PurchaseFormFactory]
+  val purchaseFormReaders = AppConfig.instance[PurchaseFormReaders]
   val formChecks = AppConfig.instance[FormChecks]
   override def request = fakeRequest
   override def params = request.params

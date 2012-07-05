@@ -4,7 +4,7 @@ import play.mvc.Controller
 import models.frontend.egraphs._
 import models.frontend.forms.FormError
 import models.frontend.egraphs.FulfilledEgraphViewModel
-import models.frontend.account.AccountSettingsForm
+import models.frontend.account.{AccountVerificationForm, AccountSettingsForm}
 import models.frontend.forms.Field
 import play.mvc.results.RenderJson
 import sjson.json.Serializer
@@ -48,6 +48,37 @@ object Account extends Controller with DefaultHeaderAndFooterData {
           generalErrors = List.empty[FormError]
         )
         views.frontend.html.account_settings(form)
+      }
+    }
+  }
+
+  def verify() = {
+    request.method match {
+      case "POST" => {
+        println("POST data")
+        println(params.allSimple())
+        views.frontend.html.simple_confirmation(
+          "Account Verified",
+          """
+          <p>
+          Your new password been confirmed. Continue on to the rest of the <a href="/">Egraph's</a> website.
+          </p>
+          Thanks,
+          <br>
+          The team at Egraphs
+          """
+
+        )
+      }
+      case _ => {
+        views.frontend.html.account_verification(
+          AccountVerificationForm(
+            newPassword = Field(name="newPassword"),
+            passwordConfirm = Field(name="passwordConfirm"),
+            email = Field(name="email", values=List("will@egraphs.com")),
+            secretKey = Field(name="secretKey", values=List("SECRETSAUCE"))
+          )
+        )
       }
     }
   }

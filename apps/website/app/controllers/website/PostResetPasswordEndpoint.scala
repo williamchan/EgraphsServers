@@ -1,36 +1,41 @@
 package controllers.website
 
 import play.mvc.Controller
-import play.mvc.results.Redirect
-import services.Utils
-import controllers.WebsiteControllers
-import play.data.validation.Validation
 import models.AccountStore
-import services.http.POSTControllerMethod
+import services.http.{SafePlayParams, AccountRequestFilters, POSTControllerMethod}
+import models.frontend.account.{AccountVerificationForm => AccountVerificationFormView}
+import services.http.forms.{AccountVerificationForm, AccountVerificationFormFactory, Form}
+import services.mvc.ImplicitHeaderAndFooterData
 
-private[controllers] trait PostResetPasswordEndpoint {
-  this: Controller =>
+private[controllers] trait PostResetPasswordEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
+
+  import Form.Conversions._
+  import SafePlayParams.Conversions._
 
   protected def postController: POSTControllerMethod
   protected def accountStore: AccountStore
+  protected def accountVerificationForms: AccountVerificationFormFactory
+  protected def accountRequestFilters: AccountRequestFilters
 
-  def postResetPassword(email: String, password: String, password2: String) = postController() {
+  def postResetPassword() = postController() {
+    accountRequestFilters.requireValidAccountEmail(request.params.getOption("email").getOrElse("Nothing")) { account =>
+      val nonValidatedForm = accountVerificationForms(params.asFormReadable, account)
 
-    Validation.required("Password", password)
-    Validation.isTrue("Passwords do not match", password == password2)
-    val account = accountStore.findByEmail(email).get
-    val passwordValidationOrAccount = account.withPassword(password)
-    for (passwordValidation <- passwordValidationOrAccount.left) {
-      Validation.addError("Password", passwordValidation.error.toString)
+        nonValidatedForm.errorsOrValidatedForm match {
+          case Left(errors) => {
+            nonValidatedForm.redirectThroughFlash(GetResetPasswordEndpoint.redirectUrl.url)
+          }
+          //form validates secret key
+          case Right(validForm) => {
+              val validationOrAccount = account.withPassword(validForm.passwordConfirm)
+              for (validation <- validationOrAccount.left) yield {
+                //Should never reach here, form validation should have caught any password problems.
+                Forbidden("The reset url you are using is incorrect or expired.")
+              }
+              validationOrAccount.right.get.emailVerify().save()
+              views.frontend.html.simple_confirmation(header = "Password Reset", body ="Change this")
+            }
+          }
+      }
     }
-
-    if (!validationErrors.isEmpty) {
-      WebsiteControllers.redirectWithValidationErrors(GetResetPasswordEndpoint.url(account.id, account.resetPasswordKey.get))
-
-    } else {
-
-      passwordValidationOrAccount.right.get.save()
-      new Redirect(Utils.lookupUrl("WebsiteControllers.getLogin").url)
-    }
-  }
 }
