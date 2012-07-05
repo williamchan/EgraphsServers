@@ -7,6 +7,7 @@
 
 @import views.frontend.tags.html.storefront_breadcrumbs_responsive
 @import views.frontend.tags
+@import frontend.formatting.MoneyFormatting.Conversions._
 
 @headJs = {
   Egraphs.page.finalize = {
@@ -71,21 +72,23 @@
 			    					<div class="field clearfix">
 
 			    				  	<div class="left">
-			    				  	  <ul>
-			    				  	    <li><strong>@shipping.name</strong></li>
-			    				  	    <li>@shipping.email</li>
+		    				  		  <address>
+		    				  		    <strong>@shipping.name</strong><br />
+			    				  			@shipping.addressLine1<br />
+			    				  			@for(line2 <- shipping.addressLine2) {@line2<br />}
+			    				  			@shipping.city, @shipping.state, @shipping.postalCode<br />
+			    				  		</address>
+
+			    				  	  <ul>			    				  	    
+			    				  	    
 			    				  	  </ul>
 
 			    				  	</div>
 			    				  
 			    				  	<div class="right">
-			    				  		<address>
-			    				  			@shipping.addressLine1<br />
-			    				  			@for(line2 <- shipping.addressLine2) {
-			    				  				@line2<br />
-			    				  			}
-			    				  			@shipping.city, @shipping.state, @shipping.postalCode<br />
-			    				  		</address>
+			    				  	  <ul>			    				  	
+			    				  			<li>@shipping.email</li>
+			    				  		</ul>
 
 												<!--<ul>
 													<li>Standard: FREE</li>
@@ -109,14 +112,14 @@
 		    				  	<div class="left">
 		    				  		<ul>
 		    				  			<li><strong>@model.billing.name</strong></li>
-												<li>@model.billing.email</li>
+												<li class="credit-card">Loading payment info...</li>
+												<li>@model.billing.postalCode</li>
 		    				  		</ul>
 		    				  	</div>
 		    				  
 		    				  	<div class="right">
 											<ul>
-												<li class="credit-card">Loading payment info...</li>
-												<li>@model.billing.postalCode</li>
+												<li>@model.billing.email</li>
 											</ul>
 		    				  	</div>	
 
@@ -131,7 +134,7 @@
 	    				  
 	    				  	<div class="clearfix">
 
-	    				  		<p>If all information is correct, click <strong>purchase</strong> to get @model.personalization.celebName started on your egraph.</p>
+	    				  		<p>Click <strong>purchase</strong> to get @model.personalization.celebName started on your egraph. You will be charged <strong>@model.price.total.formatSimply</strong>.</p>
 	    				  	
  	    				 			@tags.html.arrow_button(
  	    				 			  caption="Purchase",

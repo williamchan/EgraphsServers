@@ -13,7 +13,7 @@ function(forms, payment, Egraphs) {
           var $ccElem = $('.credit-card');
           if (status === 200) {
             var card = response.card;
-            $ccElem.text(card.type + " ending in " + card.last4);
+            $ccElem.text("Card: ************" + card.last4);
           } else {
             $ccElem.text("Error retrieving your payment info. Please contact support.");
           }

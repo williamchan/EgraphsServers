@@ -153,11 +153,7 @@ class PurchaseForms @Inject()(
    * @param flashOption flash out of which to preferentially read the form.
    */
   def personalizeForm(flashOption: Option[Flash]=None): Option[PersonalizeForm] = {
-    val formReader = formReaders.forPersonalizeForm
-
-    flashOption.map(flash => formReader.read(flash.asFormReadable)).getOrElse {
-      formReader.read(storefrontSession.asFormReadable)
-    }
+    getFormFromFlashOrSession(formReaders.forPersonalizeForm, flashOption)
   }
 
   /**
@@ -308,9 +304,14 @@ class PurchaseForms @Inject()(
     flashOption: Option[Flash]
     ): Option[FormType] =
   {
-    flashOption.map(flash => reader.read(flash.asFormReadable)).getOrElse {
-      reader.read(storefrontSession.asFormReadable)
+    val maybeFormFromFlash = for (
+      flash <- flashOption;
+      form <- reader.read(flash.asFormReadable)
+    ) yield {
+      form
     }
+
+    maybeFormFromFlash.orElse(reader.read(storefrontSession.asFormReadable))
   }
 
   private def redirectToCheckout(celebrityUrlSlug: String, productUrlSlug: String): Redirect = {
