@@ -25,9 +25,6 @@
     <content url="file://$MODULE_DIR$/modules/redis-0.3">
       <sourceFolder url="file://$MODULE_DIR$/modules/redis-0.3/app" isTestSource="false" />
     </content>
-    <content url="file://$PLAY_HOME$/modules/scala-0.9.1">
-      <sourceFolder url="file://$PLAY_HOME$/modules/scala-0.9.1/app" isTestSource="false" />
-    </content>
     <orderEntry type="jdk" jdkName="1.6" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="inheritedJdk" />
@@ -39,21 +36,26 @@
           <root url="file://$MODULE_DIR$/modules/less-0.9.1/src" />
           <root url="file://$MODULE_DIR$/modules/cloudbees-0.2.2/src" />
           <root url="file://$MODULE_DIR$/modules/mockito-0.1/src" />
-          <root url="file://$PLAY_HOME$/modules/scala-0.9.1/src" />
           <root url="file://$MODULE_DIR$/../../modules/frontend/src" />
           <root url="file://$MODULE_DIR$/modules/redis-0.3/lib" />
           <root url="file://$MODULE_DIR$/modules/less-0.9.1/lib" />
           <root url="file://$MODULE_DIR$/modules/cloudbees-0.2.2/lib" />
           <root url="file://$MODULE_DIR$/modules/mockito-0.1/lib" />
           <root url="file://$PLAY_HOME$/modules/scala-0.9.1/lib" />
+          <root url="file://$MODULE_DIR$/lib" />
+          <root url="file://$PLAY_HOME$/modules/scala-0.9.1/lib" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="file://$PLAY_HOME$/modules/scala-0.9.1/src" />
+        </SOURCES>
+        <jarDirectory url="file://$MODULE_DIR$/lib" recursive="false" />
         <jarDirectory url="file://$MODULE_DIR$/lib" recursive="false" />
         <jarDirectory url="file://$MODULE_DIR$/modules/cloudbees-0.2.2/lib" recursive="false" />
         <jarDirectory url="file://$MODULE_DIR$/modules/less-0.9.1/lib" recursive="false" />
         <jarDirectory url="file://$MODULE_DIR$/modules/mockito-0.1/lib" recursive="false" />
         <jarDirectory url="file://$MODULE_DIR$/modules/redis-0.3/lib" recursive="false" />
+        <jarDirectory url="file://$PLAY_HOME$/modules/scala-0.9.1/lib" recursive="false" />
         <jarDirectory url="file://$PLAY_HOME$/modules/scala-0.9.1/lib" recursive="false" />
       </library>
     </orderEntry>
@@ -70,7 +72,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$PLAY_HOME$/framework/play-1.2.5.jar!/" />
+          <root url="jar://$PLAY_HOME$/framework/play-1.2.4.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
