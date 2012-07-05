@@ -73,12 +73,18 @@ class PurchaseForms @Inject()(
    * Gets the selected PrintingOption or none if it hasn't yet been supplied.
    */
   def highQualityPrint: Option[PrintingOption] = {
-    storefrontSession.get(Key.HighQualityPrint)
+    for (
+      printingOptionString <- storefrontSession.get[String](Key.HighQualityPrint);
+      printingOption <- PrintingOption(printingOptionString)
+    ) yield {
+      printingOption
+    }
+
   }
 
   /** Returns a copy of this with a new PrintingOption */
   def withHighQualityPrint(printingOption: PrintingOption) = {
-    this.withSession(storefrontSession.setting(Key.HighQualityPrint -> printingOption))
+    this.withSession(storefrontSession.setting(Key.HighQualityPrint -> printingOption.name))
   }
 
   /**
