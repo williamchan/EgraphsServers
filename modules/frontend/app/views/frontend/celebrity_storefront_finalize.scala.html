@@ -8,6 +8,15 @@
 @import views.frontend.tags.html.storefront_breadcrumbs_responsive
 @import views.frontend.tags
 
+@headJs = {
+  Egraphs.page.finalize = {
+    paymentJsModule: "@model.billing.paymentJsModule",
+    cardtoken: "@model.billing.paymentToken",
+    paymentApiKey: "@model.billing.paymentApiKey"
+  }
+}
+
+
 @baseBody = {
     <div id="content" class="top" role="main">
     
@@ -106,7 +115,7 @@
 		    				  
 		    				  	<div class="right">
 											<ul>
-												<li class="credit-card">Visa XXXXXXXXXXXX4021</li>
+												<li class="credit-card">Loading payment info...</li>
 												<li>@model.billing.postalCode</li>
 											</ul>
 		    				  	</div>	
@@ -203,5 +212,6 @@
 @base_celebrity_storefront_template(
   title="Finalize Order",
   jsMain="pages/celebrity-storefront-finalize",
+  headJs=headJs,
   body=baseBody
 )

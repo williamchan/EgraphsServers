@@ -5,6 +5,7 @@ case class FinalizeBillingViewModel (
   email: String,
   postalCode: String,
   paymentToken: String,
+  paymentApiKey: String,
   paymentJsModule: String,
   editUrl: String
 )

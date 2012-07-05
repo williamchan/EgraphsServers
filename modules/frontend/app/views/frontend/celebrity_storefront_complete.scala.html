@@ -1,9 +1,14 @@
-@()(implicit headerData: models.frontend.header.HeaderData,
+@(model: models.frontend.storefront.OrderCompleteViewModel
+)(implicit headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData,
-  storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs
+  storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs,
+  session: play.mvc.Scope.Session
 )
 
 @{/** Renders the Order Complete page in the celebrity storefront. */}
+
+@import frontend.formatting.MoneyFormatting.Conversions._
+@import frontend.formatting.DateFormatting.Conversions._
 
 @import views.frontend.tags.html.storefront_breadcrumbs_responsive
 @import views.frontend.tags
@@ -19,16 +24,16 @@
 				 		
   				<header>	
   				  <h1>Order Complete</h1>
-  				  <h2>David Price | First MLB Victory</h2>  				
+  				  <h2>@model.celebName | @model.productName</h2>  				
   				</header>
 
   				<div class="complete clearfix">
   				
   					<div class="congrats">
   					
-  						<h2>Now it's David Price's Turn</h2>
+  						<h2>Now it's @model.celebName's Turn</h2>
   					
-  						<p>Congratulations! We just booked you a slice of time on David Price's schedule to complete your order. For now, just sit back and relax. David will send you an email as soon as he's done creating your Egraph, so look forward to hearing from him!</p>
+  						<p>Congratulations! We just booked you a slice of time on @model.celebName's schedule to complete your order. For now, just sit back and relax. @model.celebName will send you an email as soon as he's done creating your Egraph, so look forward to hearing from him!</p>
   						
   						<p><small><a href="#" class="tip">What happen's now?</a></small></p>
   						  				
@@ -42,35 +47,35 @@
   								<caption>Order Details</caption>
 									<tr>
 										<th>Egraph Order Date:</th>
-										<td>June 12, 2012</td>
+										<td>@model.orderDate.formatDayAsPlainLanguage</td>
 									</tr>
 									<tr>
 										<th>Egraph Purchased by:</th>
-										<td>Joshua Johnson</td>
+										<td>@model.buyerName</td>
 									</tr>
 									<tr>
 										<th>Egraph Owner:</th>
-										<td>Joshua Johnson</td>
+										<td>@model.ownerName</td>
 									</tr>
 									<tr>
 										<th>Owner's Email:</th>
-										<td>Joshua12@@gmail.com</td>
+										<td>@model.ownerEmail</td>
 									</tr>
 									<tr>
 										<th>Celebrity:</th>
-										<td>David Price</td>
+										<td>@model.celebName</td>
 									</tr>
 									<tr>
 										<th>Order Number:</th>
-										<td>2387354</td>
+										<td>@model.orderNumber</td>
 									</tr>
 									<tr>
 										<th>Price:</th>
-										<td>$50.00</td>
+										<td>@model.totalPrice.formatPrecisely</td>
 									</tr>
 									<tr>
 										<th>Guaranteed Delivery:</th>
-										<td>June 19, 2012</td>
+										<td>@model.guaranteedDeliveryDate.formatDayAsPlainLanguage</td>
 									</tr>
   							</table>
   							
@@ -81,10 +86,12 @@
   						
   							<h3>Order Changes</h3>
   							
-  							<p>Because we are scheduling time in David Price's calendar there are limitations in our capabilities to refund your purchase. You have 15 minutes to modify or cancel your order.</p>
+  							<p>Because we are scheduling time in @model.celebName's calendar there are limitations in our capabilities to refund your purchase. You have 15 minutes to modify or cancel your order.</p>
   							
   							<ul>
-  								<li><a href="#">Modify Order</a></li>
+  								@{/** Re-enable this when we support order modification.
+                    <li><a href="#">Modify Order</a></li>
+                  */}
   								<li><a href="#modal-content" data-toggle="modal">Cancel Order</a></li>
   							</ul>
   						
@@ -113,8 +120,10 @@
 	  			</figure>
 	  			
 	  			<div>
-	  				<p>Are you sure you want to cancel your order for David Price's Egraph?</p>
-	  				<button class="btn" data-toggle="button">Cancel Order</button>
+	  				<p>Are you sure you want to cancel your order for @model.celebName's Egraph?</p>
+            @tags.html.safeForm("method" -> "POST", "action" -> model.cancelOrderUrl) {
+	  				  <button class="btn" data-toggle="button">Cancel Order</button>
+            }
 	  				<button class="btn" data-toggle="button" data-dismiss="modal">Do Not Cancel</button>
 	  			</div>
 	  			

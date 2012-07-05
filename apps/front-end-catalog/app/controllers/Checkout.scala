@@ -102,7 +102,7 @@ object Checkout extends Controller
     )
   }
 
-  private val testStripeKey = {
+  val testStripeKey = {
     "pk_qIGUDirehUxj2GTFwgeRBkOfHIWdX"
   }
 }

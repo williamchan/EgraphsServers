@@ -41,7 +41,8 @@ object Finalize extends Controller
       email="{email}",
       paymentToken="{paymentToken}",
       postalCode="{billing postal code}",
-      paymentJsModule="{paymentJsModule}",
+      paymentJsModule="yes-maam-payment",
+      paymentApiKey=Checkout.testStripeKey,
       editUrl="{edit billing url}"
     )
   }

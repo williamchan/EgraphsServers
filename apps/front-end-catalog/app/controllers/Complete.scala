@@ -1,6 +1,8 @@
 package controllers
 
 import play.mvc.Controller
+import models.frontend.storefront.OrderCompleteViewModel
+import java.util
 
 /**
  * Permutations of the Checkout: Order Complete.
@@ -10,7 +12,25 @@ object Complete extends Controller
   with DefaultStorefrontBreadcrumbs
 {
   def index = {
-    views.frontend.html.celebrity_storefront_complete()
+    views.frontend.html.celebrity_storefront_complete(defaultOrderCompleteViewModel)
+  }
+
+  def defaultOrderCompleteViewModel = {
+    import frontend.formatting.MoneyFormatting.Conversions._
+
+    OrderCompleteViewModel(
+      orderDate=new util.Date(),
+      orderNumber=100L,
+      buyerName="{buyer name}",
+      buyerEmail="{buyer email}",
+      ownerName="{owner name}",
+      ownerEmail="{owner email}",
+      celebName="{celebrity name}",
+      productName="{product name}",
+      totalPrice=BigDecimal(100.00).toMoney(),
+      guaranteedDeliveryDate=new util.Date(),
+      cancelOrderUrl="/cancel-order-url"
+    )
   }
 
 }
