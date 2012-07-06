@@ -2,7 +2,7 @@
  */
 define(["libs/stripe-v1"],
 function() {
-  /** A bald-faced mock implementation of stripe.js */
+  /** A bald-faced mock implementation of stripe.js. See https://stripe.com/docs/stripe.js */
   var yesMaamPayment = {
     setPublishableKey: function(lol) {
       // I don't cryptographically secure anything. I'm about as safe

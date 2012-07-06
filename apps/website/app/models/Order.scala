@@ -92,6 +92,7 @@ case class Order(
     services.productStore.get(productId)
   }
 
+  /** Retrieves the inventory batch against which the order was made */
   def inventoryBatch: InventoryBatch = {
     services.inventoryStore.get(inventoryBatchId)
   }

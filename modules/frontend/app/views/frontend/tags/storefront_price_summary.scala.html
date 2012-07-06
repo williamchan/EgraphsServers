@@ -4,6 +4,15 @@
   total: org.joda.money.Money
 )
 
+@{/** Prints a summary of the ongoing price of an order.
+
+        baseprice - the base price of a product
+        maybePhysicalGood - the price of ordering the physical good, if a
+            physical good is part of the order.
+        maybeTax - the cost of taxes, if applicable.
+        total - the total cost.
+*/}
+
 @import frontend.formatting.MoneyFormatting.Conversions._
 
 <div class="order-totals">

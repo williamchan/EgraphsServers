@@ -11,16 +11,7 @@
 	],
   "settings": {
     "tab_size": 2,
-    "show_panel_on_build": false,
-    "jshint_options":
-      {
-          "evil": true,
-          "regexdash": true,
-          "browser": true,
-          "wsh": true,
-          "sub": true,
-          "latedef": true
-      }
+    "show_panel_on_build": false
   },
   "build_systems": [{
     "name": "Refresh play",

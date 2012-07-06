@@ -24,7 +24,7 @@ import services.http.forms.purchase.PurchaseForms.AllShippingForms
 import models.Celebrity
 
 /**
- * Manages GET and POST of the Review page in the purchase flow.
+ * Manages GET and POST of the Finalize page in the purchase flow.
  */
 private[consumer] trait StorefrontFinalizeConsumerEndpoints
   extends ImplicitHeaderAndFooterData
@@ -35,26 +35,19 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
   // Services
   //
   protected def controllerMethod: ControllerMethod
-
   protected def postController: POSTControllerMethod
-
   protected def purchaseFormFactory: PurchaseFormFactory
-
   protected def purchaseFormReaders: PurchaseFormReaders
-
   protected def celebFilters: CelebrityAccountRequestFilters
-
   protected def checkPurchaseField: PurchaseFormChecksFactory
-
   protected def payment: Payment
-
   protected def dbSession: DBSession
 
   //
   // Controllers
   //
   /**
-   * Controller that GETs the "Review" page in the purchase flow.
+   * Controller that GETs the "Finalize" page in the purchase flow.
    *
    * @param celebrityUrlSlug identifies the celebrity from which the user is purchasing
    * @param productUrlSlug identifies the photo being personalized
@@ -137,11 +130,11 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
   }
 
   /**
-   * Controller for POSTing the Review form in the purchase flow.
+   * Controller for POSTing the Finalize form in the purchase flow.
    *
    * @param celebrityUrlSlug identifies the celebrity from which the user is purchasing
    * @param productUrlSlug identifies the photo being personalized
-   * @return a Redirect to the next step in the purchase flow if successful, otherwise
+   * @return a Redirect to the order complete page if successful, otherwise
    *         a Redirect back to the form to handle errors.
    */
   def postStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug: String) = postController(openDatabase=false) {
@@ -154,7 +147,8 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
         }
       }
     }
-
+    // TODO: fix the type erasure that happens in our celebFilters so that a match like this
+    // isnt necessary.
     redirectOrPurchaseData match {
       case Right((celeb: Celebrity, product:models.Product, shippingForms: AllShippingForms)) =>
         val AllShippingForms(productId, inventoryBatch, personalization, billing, shipping) = shippingForms

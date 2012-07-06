@@ -32,7 +32,17 @@ class PurchaseForms @Inject()(
   def productId: Option[Long] = {
     storefrontSession[Long](Key.ProductId)
   }
-  
+
+  /**
+   * Retrieves all the valid purchase form data for this product purchase on the right.
+   * If the data wasn't available then it returns a redirect to the form page that
+   * will provide the data on the left.
+   *
+   * @param celeb the celebrity being purchased from
+   * @param product the product being purchasedf
+   * @return either all the data on the right, or a Redirect to the page
+   *   to get the data on the left.
+   */
   def allPurchaseFormsOrRedirect(celeb: Celebrity, product: Product) = {
     val celebrityUrlSlug = celeb.urlSlug.getOrElse("Anonymous")
     for (
@@ -242,6 +252,13 @@ class PurchaseForms @Inject()(
     })
   }
 
+  /**
+   * Returns an Option[shipping form] on the right either if it was present or if it was absent but
+   * its absence was expected (because no print has been ordered)
+   *
+   * @param celebrityUrlSlug identifies the celebrity for the redirect
+   * @param productUrlSlug identifies the product for the redirect
+   */
   def validShippingFormOptionOrRedirectToCheckout(celebrityUrlSlug: String, productUrlSlug: String)
   : Either[Redirect, Option[(CheckoutShippingForm, CheckoutShippingForm.Valid)]] = {
     for (
@@ -256,6 +273,13 @@ class PurchaseForms @Inject()(
     }
   }
 
+  /**
+   * Returns a valid checkout form on the right if it was present, or a redirect to the checkout
+   * form on the right if it was absent.
+   *
+   * @param celebrityUrlSlug identifies the celebrity for the redirect
+   * @param productUrlSlug identifies the product for the redirect
+   */
   def validCheckoutFormsOrRedirectToCheckout(celebrityUrlSlug: String, productUrlSlug: String)
   : Either[Redirect, (CheckoutBillingForm.Valid, Option[CheckoutShippingForm.Valid])] = {
     lazy val redirectToCheckout = this.redirectToCheckout(celebrityUrlSlug, productUrlSlug)
@@ -395,6 +419,15 @@ object PurchaseForms {
     val HighQualityPrint = "order.review.highQualityPrint"
   }
 
+  /**
+   * Returns the most appropriate displayable string for a given combination of WrittenMessageRequest
+   * and Option[String].
+   *
+   * @param messageRequest the option specified by the user in the order. For example `SignatureOnly`
+   * @param messageText the text specified by the user in the order, if appropriate given the `messageRequest`.
+   *
+   * @return a user-presentable string.
+   */
   def makeTextForCelebToWrite(messageRequest: WrittenMessageRequest, messageText: Option[String])
   : String = {
     messageRequest match {

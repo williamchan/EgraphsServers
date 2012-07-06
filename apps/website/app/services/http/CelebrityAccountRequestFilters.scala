@@ -4,9 +4,7 @@ import play.mvc.Http.Request
 import models._
 import com.google.inject.Inject
 import enums.PublishedStatus
-import play.mvc.results.{Redirect, Forbidden, NotFound}
-import models.Celebrity.CelebrityWithProduct
-import views.Application.html.{celebrity, product}
+import play.mvc.results.{Forbidden, NotFound}
 
 /**
  * Functions that filter out whose callback parameters are only called when the egraphs

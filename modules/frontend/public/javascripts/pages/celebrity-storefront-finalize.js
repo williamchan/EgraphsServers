@@ -6,6 +6,7 @@ function(forms, payment, Egraphs) {
 
   return {
     go: function() {
+      // Use the provided purchase token to present redacted card info.
       $(document).ready(function() {
         // Populate the credit card field
         paymentModule.setPublishableKey(thisPage.paymentApiKey);
