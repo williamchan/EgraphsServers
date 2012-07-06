@@ -36,10 +36,20 @@ private[blobs] trait BlobVendor {
    */
   def urlOption(namespace: String, key: String): Option[String]
 
+  /**
+   * Tests that there exists a value for the key in the specified namespace exists.
+   *
+   * @param namespace the key namespace -- equivalent to an Amazon S3 bucket or a file-system folder
+   * @param key the unique key name against which an object may be stored
+   * @return true that a value exists for the namespace and key
+   */
   def exists(namespace: String, key: String): Boolean = {
     blobStore.blobExists(namespace, key)
   }
 
+  /**
+   * Returns the underlying jcloud BlobStore implementation for this BlobVendor.
+   */
   private def blobStore: BlobStore = {
     context.getBlobStore
   }

@@ -1,7 +1,21 @@
 package services.blobs
 
+/**
+ * Class that enables easy composition of BlobVendors.
+ *
+ * Usage:
+ * {{{
+ *   class MyNewBlobVendor(blobVendorDelegate: BlobVendor) extends BlobVendor with BlobVendorComposition {
+ *     // Only override the members of BlobVendor that you don't want to delegate
+ *     // within this class. By default it delegates the entire interface.
+ *   }
+ * }}}
+ */
 private[blobs] trait BlobVendorComposition extends BlobVendor {
 
+  /**
+   * Object to which to delegate the BlobVendor interface
+   */
   protected def blobVendorDelegate: BlobVendor
 
   def put(namespace: String, key: String, data: Array[Byte], access: AccessPolicy) {

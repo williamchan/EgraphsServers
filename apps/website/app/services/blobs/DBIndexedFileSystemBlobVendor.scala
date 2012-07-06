@@ -4,6 +4,13 @@ import com.google.inject.Inject
 import models.{BlobKey, BlobKeyStore}
 import services.AppConfig
 
+/**
+ * BlobVendor implementation that caches key urls in the database to avoid expensive
+ * round-trips on queries that don't require the full Blob data.
+ *
+ * @param blobKeyStore store for a [[models.BlobKey]]
+ * @param blobVendorDelegate vendor to which which this class delegates the actual blob management.
+ */
 class DBIndexedFileSystemBlobVendor @Inject() (blobKeyStore: BlobKeyStore, protected val blobVendorDelegate: BlobVendor)
   extends FileSystemBlobVendor
   with BlobVendorComposition
