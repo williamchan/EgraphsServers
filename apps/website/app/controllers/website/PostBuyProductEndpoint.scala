@@ -22,7 +22,6 @@ import java.text.SimpleDateFormat
 
 trait PostBuyProductEndpoint { this: Controller =>
   import PostBuyProductEndpoint.EgraphPurchaseHandler
-  import PostBuyProductEndpoint.alphaEmailMatcher
 
   protected def dbSession: DBSession
   protected def celebFilters: CelebrityAccountRequestFilters
@@ -96,21 +95,6 @@ trait PostBuyProductEndpoint { this: Controller =>
           email("Buyer E-mail address", buyerEmail)
           required("stripeTokenId", stripeTokenId)
 
-          if (recipientEmail != null && !recipientEmail.isEmpty && accountStore.findByEmail(recipientEmail).isEmpty) {
-            Validation.`match`(
-              "Recipient e-mail address must be a Beta celebrity or a Beta tester",
-              recipientEmail.toLowerCase,
-              alphaEmailMatcher
-            )
-          }
-          if (buyerEmail != null && !buyerEmail.isEmpty && accountStore.findByEmail(buyerEmail).isEmpty) {
-            Validation.`match`(
-              "Recipient e-mail address must be a Beta celebrity or a Beta tester",
-              buyerEmail.toLowerCase,
-              alphaEmailMatcher
-            )
-          }
-
           (celebrity, product)
       }
     }
@@ -120,7 +104,6 @@ trait PostBuyProductEndpoint { this: Controller =>
 
 object PostBuyProductEndpoint extends Logging {
 
-  private[PostBuyProductEndpoint] val alphaEmailMatcher = ".*@(egraphs|raysbaseball).com|zachapter@gmail.com"
   private val dateFormat = new SimpleDateFormat("MMMM dd, yyyy")
 
   /**
