@@ -36,4 +36,20 @@ object Static extends Controller with DefaultHeaderAndFooterData {
 
     views.frontend.html.inside_egraph(tableOfContents)
   }
+
+  def terms() = {
+    views.frontend.html.terms()
+  }
+
+  def contact() = {
+    views.frontend.html.contact()
+  }
+
+  def privacy() = {
+    views.frontend.html.privacy()
+  }
+
+  def faq() = {
+    views.frontend.html.faq()
+  }
 }
