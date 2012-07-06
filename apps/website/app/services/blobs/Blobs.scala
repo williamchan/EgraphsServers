@@ -30,7 +30,7 @@ class Blobs @Inject() (blobProvider: BlobVendor) extends Logging {
    * @return true that a blob with the given key exists
    */
   def exists(key: String): Boolean = {
-    blobStore.blobExists(blobstoreNamespace, key)
+    blobProvider.exists(blobstoreNamespace, key)
   }
 
   /**
@@ -109,7 +109,7 @@ class Blobs @Inject() (blobProvider: BlobVendor) extends Logging {
    * jclouds api is needed.
    */
   def blobStore: BlobStore = {
-    context.getBlobStore
+    blobProvider.context.getBlobStore
   }
 
   /**
@@ -164,8 +164,11 @@ class Blobs @Inject() (blobProvider: BlobVendor) extends Logging {
  */
 
 object Blobs {
+  /** Key for the blobstore in application config */
+  private[blobs] val blobstoreConfigKey = "blobstore"
+
   /** Type of blobstore. See "blobstore" in application.conf */
-  private[blobs] val blobstoreType = configuration.getProperty("blobstore")
+  private[blobs] val blobstoreType = configuration.getProperty(blobstoreConfigKey)
 
   /** Namespace of blobstore; equivalent to S3's bucket */
   private[blobs] val blobstoreNamespace = configuration.getProperty("blobstore.namespace")

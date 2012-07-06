@@ -8,7 +8,7 @@ import play.mvc.Http.Request
 /**
  * [[services.blobs.BlobVendor]] implementation on the local system.
  */
-private[blobs] object FileSystemBlobVendor extends BlobVendor {
+private[blobs] class FileSystemBlobVendor extends BlobVendor {
   //
   // BlobVendor members
   //
@@ -51,6 +51,12 @@ private[blobs] object FileSystemBlobVendor extends BlobVendor {
   // Private Members
   //
   private def urlBase = {
-    Request.current().getBase + "/test/files"
+    val serverUrl = Request.current() match {
+      case req: Request => req.getBase
+      case null => "http://localhost:9000"
+    }
+    serverUrl + "/test/files"
   }
 }
+
+private[blobs] object FileSystemBlobVendor extends FileSystemBlobVendor()

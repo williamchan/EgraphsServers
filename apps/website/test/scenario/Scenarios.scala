@@ -385,6 +385,28 @@ class Scenarios extends DeclaresScenarios {
   )
 
   toScenarios add Scenario(
+  "Alpha Users",
+  celebrityPageCategory,
+  """Create Lots of Users""",
+
+  {() =>
+    Scenario.clearAll()
+    createCelebrity("Erem Boto", "erem@egraphs.com")
+    createCelebrity("Andrew Smith", "andrew@egraphs.com")
+    createCelebrity("David Auld", "david@egraphs.com")
+    createCelebrity("Eric Feeny", "eric@egraphs.com")
+    createCelebrity("Will Chan", "will@egraphs.com")
+    createCelebrity("Zach Apter", "zachapter@gmail.com")
+    createCelebrity("Brian Auld", "bauld@raysbaseball.com")
+    createCelebrity("Michael Kalt", "mkalt@raysbaseball.com")
+    createCelebrity("Matt Silverman", "msilverman@raysbaseball.com")
+    createCelebrity("Gabe Kapler", "gabe@egraphs.com")
+    createCelebrity("Mike Ginal", "mike@egraphs.com")
+    createCelebrity("J Cohn", "j@egraphs.com")
+  }
+  )
+
+  toScenarios add Scenario(
     "Accessed from Celebrity Page or from URL",
 
     productPageCategory,
@@ -532,9 +554,7 @@ class Scenarios extends DeclaresScenarios {
       Scenario.play(
         "Erem-is-a-customer"
       )
-
       egraphsSession.withLong(EgraphsSession.Key.CustomerId, 1).save()
-
       new Redirect(GetAccountSettingsEndpoint.url().url)
     }
   )
@@ -564,6 +584,21 @@ class Scenarios extends DeclaresScenarios {
     )
   }
 
+  private def createCelebrity(name: String, email: String) {
+    import javax.imageio.ImageIO
+    import play.Play
+    val celebrity = Celebrity(publicName = Some(name), bio = "Today's Sriracha is tomorrow's salsa.", isFeatured = true)
+      .withEnrollmentStatus(EnrollmentStatus.Enrolled).withPublishedStatus(PublishedStatus.Published).save()
+    Account(email = email, celebrityId = Some(celebrity.id)).withPassword("egraphsa").right.get.save()
+    val inventoryBatch = InventoryBatch(celebrityId = celebrity.id, numInventory = 100, startDate = today, endDate = future).save()
+    for (i <- 1 until 8) yield {
+      val product = celebrity.newProduct.copy(priceInCurrency = 100, name = celebrity.publicName.get + "'s Product " + i, description = "Help me... help YOU...")
+        .withPublishedStatus(PublishedStatus.Published)
+        .saveWithImageAssets(image = Some(ImageIO.read(Play.getFile("test/files/kapler/product-1.jpg"))), icon = None)
+      inventoryBatch.products.associate(product)
+    }
+  }
+
   private[this] def createProduct(celebrity: Celebrity, priceInCurrency: BigDecimal, name: String, description: String): Product = {
     val product = celebrity.newProduct.copy(priceInCurrency = priceInCurrency, name = name, description = description)
       .withPublishedStatus(PublishedStatus.Published)
@@ -576,13 +611,6 @@ class Scenarios extends DeclaresScenarios {
   private[this] def redirectToStarcraftProduct = {
     new Redirect(
       Utils.lookupUrl("WebsiteControllers.getCelebrityProduct", starcraftProductSlugs).url
-    )
-  }
-
-  private[this] def redirectToOrderConfirmationPage(params: Map[String, String] = Map()) =
-  {
-    new Redirect(
-      Utils.lookupUrl("WebsiteControllers.getCelebrityProduct", starcraftProductSlugs ++ params).url
     )
   }
 
