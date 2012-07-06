@@ -164,8 +164,11 @@ class Blobs @Inject() (blobProvider: BlobVendor) extends Logging {
  */
 
 object Blobs {
+  /** Key for the blobstore in application config */
+  private[blobs] val blobstoreConfigKey = "blobstore"
+
   /** Type of blobstore. See "blobstore" in application.conf */
-  private[blobs] val blobstoreType = configuration.getProperty("blobstore")
+  private[blobs] val blobstoreType = configuration.getProperty(blobstoreConfigKey)
 
   /** Namespace of blobstore; equivalent to S3's bucket */
   private[blobs] val blobstoreNamespace = configuration.getProperty("blobstore.namespace")
