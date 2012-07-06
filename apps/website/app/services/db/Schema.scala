@@ -66,7 +66,6 @@ class Schema @Inject()(
   //
   val cashTransactions = table[CashTransaction]
   on(cashTransactions)(cashTransaction => declare(cashTransaction.amountInCurrency is monetaryDbType))
-
   //
   // Accounts
   //
@@ -252,6 +251,17 @@ class Schema @Inject()(
   on(failedPurchaseData)(datum => declare( datum.purchaseData is (dbType("varchar(1000)")) ))
 
   //
+  // BlobKeys
+  //
+  val blobKeys = table[BlobKey]
+  on(blobKeys)(blobKey =>
+    declare(
+      blobKey.key is (unique),
+      blobKey.url is dbType("varchar(255)")
+    )
+  )
+
+  //
   // Public methods
   //
   /**Clears out the schema and recreates it. For God's sake don't do this in production. */
@@ -378,6 +388,7 @@ class Schema @Inject()(
     Seq(
       factoryFor(accounts) is Account(services = injector.instance[AccountServices]),
       factoryFor(addresses) is Address(services = injector.instance[AddressServices]),
+      factoryFor(blobKeys) is BlobKey(services = injector.instance[BlobKeyServices]),
       factoryFor(cashTransactions) is CashTransaction(services = injector.instance[CashTransactionServices]),
       factoryFor(celebrities) is Celebrity(services = injector.instance[CelebrityServices]),
       factoryFor(customers) is Customer(services = injector.instance[CustomerServices]),

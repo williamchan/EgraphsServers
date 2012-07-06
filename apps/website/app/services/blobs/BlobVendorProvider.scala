@@ -1,6 +1,5 @@
 package services.blobs
 
-import play.Play.configuration
 import com.google.inject.Provider
 
 /**
@@ -11,10 +10,10 @@ private[blobs] class BlobVendorProvider(blobstoreType: String) extends Provider[
   def get() = {
     blobstoreType match {
       case "s3" =>
-        S3BlobVendor
+        DBIndexedS3BlobVendor
 
       case "filesystem" =>
-        FileSystemBlobVendor
+        DBIndexedFileSystemBlobVendor
 
       case unknownType =>
         throw new IllegalStateException(

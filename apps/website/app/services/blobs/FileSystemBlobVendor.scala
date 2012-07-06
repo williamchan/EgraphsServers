@@ -8,7 +8,7 @@ import play.mvc.Http.Request
 /**
  * [[services.blobs.BlobVendor]] implementation on the local system.
  */
-private[blobs] object FileSystemBlobVendor extends BlobVendor {
+private[blobs] class FileSystemBlobVendor extends BlobVendor {
   //
   // BlobVendor members
   //
@@ -54,3 +54,5 @@ private[blobs] object FileSystemBlobVendor extends BlobVendor {
     Request.current().getBase + "/test/files"
   }
 }
+
+private[blobs] object FileSystemBlobVendor extends FileSystemBlobVendor()

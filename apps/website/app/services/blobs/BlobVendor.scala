@@ -1,6 +1,7 @@
 package services.blobs
 
-import org.jclouds.blobstore.BlobStoreContext
+import org.jclouds.blobstore.{BlobStore, BlobStoreContext}
+import org.jclouds.blobstore.domain.Blob
 
 /**
  * Interface for different BlobStore implementations.
@@ -34,4 +35,12 @@ private[blobs] trait BlobVendor {
    * @return Some(URL) if the resource was found, otherwise None.
    */
   def urlOption(namespace: String, key: String): Option[String]
+
+  def exists(namespace: String, key: String): Boolean = {
+    blobStore.blobExists(namespace, key)
+  }
+
+  private def blobStore: BlobStore = {
+    context.getBlobStore
+  }
 }

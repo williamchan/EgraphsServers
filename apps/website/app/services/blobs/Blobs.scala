@@ -30,7 +30,7 @@ class Blobs @Inject() (blobProvider: BlobVendor) extends Logging {
    * @return true that a blob with the given key exists
    */
   def exists(key: String): Boolean = {
-    blobStore.blobExists(blobstoreNamespace, key)
+    blobProvider.exists(blobstoreNamespace, key)
   }
 
   /**
@@ -109,7 +109,7 @@ class Blobs @Inject() (blobProvider: BlobVendor) extends Logging {
    * jclouds api is needed.
    */
   def blobStore: BlobStore = {
-    context.getBlobStore
+    blobProvider.context.getBlobStore
   }
 
   /**
