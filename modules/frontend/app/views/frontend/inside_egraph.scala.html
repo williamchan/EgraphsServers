@@ -21,12 +21,14 @@ footerData: models.frontend.footer.FooterData
 
     <div class="container">
         <div class="row-fluid">
-          <div class="span4 toc">
-           <ul>
-            @for( s <- tableOfContents.map( t => t.renderHtml)){
-              @Html(s)
-             }
-           </ul>
+          <div class="span4">
+            <div class="toc">
+            <ul>
+              @for( s <- tableOfContents.map( t => t.renderHtml)){
+                @Html(s)
+               }
+            </ul>
+            </div>
           </div>
           <div class="span8">
             <h1>

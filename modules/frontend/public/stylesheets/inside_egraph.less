@@ -31,6 +31,10 @@ div.inside-egraph {
     	display: inline-block;
     }
 
+    .selected {
+      color: @orange;
+    }
+
   }
 
   span.emphasis {
@@ -187,6 +191,13 @@ div.inside-egraph {
   .callout {
     margin-left: 115px;
     width: auto;
+  }
+
+  @media(min-width:768px) {
+    div.toc {
+      position: fixed;
+      top: 475px;
+    }
   }
 
 }

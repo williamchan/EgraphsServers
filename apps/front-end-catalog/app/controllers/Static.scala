@@ -28,7 +28,7 @@ object Static extends Controller with DefaultHeaderAndFooterData {
   def inside() = {
     val tableOfContents =
     List(
-      Section(title="Introduction", url="#intro", subsection = None),
+      Section(title="Introduction", url="#inside", subsection = None),
       Section(title="What is an Egraph?", url="#what", subsection = None),
       Section(title="The Biometric Authentication Process", url="#biometric", subsection = None),
       Section(title="What Can I Do With My Egraph", url="#do", subsection = None)
