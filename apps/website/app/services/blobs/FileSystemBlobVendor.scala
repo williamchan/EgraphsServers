@@ -51,7 +51,11 @@ private[blobs] class FileSystemBlobVendor extends BlobVendor {
   // Private Members
   //
   private def urlBase = {
-    Request.current().getBase + "/test/files"
+    val serverUrl = Request.current() match {
+      case req: Request => req.getBase
+      case null => "http://localhost:9000"
+    }
+    serverUrl + "/test/files"
   }
 }
 

@@ -12,10 +12,10 @@ class DBIndexedFileSystemBlobVendor @Inject() (blobKeyStore: BlobKeyStore, prote
   override def put(namespace: String, key: String, data: Array[Byte], access: AccessPolicy) {
     super.put(namespace, key, data, access)
     val url = super.urlOption(namespace, key).getOrElse("")
-    try {
-      BlobKey(key = key, url = url).save()
-    } catch {
-      case e: RuntimeException =>
+
+    blobKeyStore.findByKey(key) match {
+      case None => BlobKey(key = key, url = url).save()
+      case Some(blobKey) => blobKey.copy(url = url).save()
     }
   }
 
