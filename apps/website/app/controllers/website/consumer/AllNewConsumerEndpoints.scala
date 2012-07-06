@@ -9,4 +9,5 @@ trait AllNewConsumerEndpoints
   with StorefrontPersonalizeConsumerEndpoints
   with StorefrontReviewConsumerEndpoints
   with StorefrontCheckoutConsumerEndpoints
+  with StorefrontFinalizeConsumerEndpoints
 { this: Controller => }

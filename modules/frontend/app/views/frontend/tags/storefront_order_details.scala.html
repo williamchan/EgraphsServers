@@ -1,0 +1,32 @@
+@(celebName: String,
+  productName: String,
+  recipientName: String,
+  messageText: String,
+  maybeEditUrl: Option[String] = None
+)
+
+@{/** Provides a summary of order personalization.
+
+        celebName - the name of the celebrity. e.g. David Price
+        productName - the name of the product. e.g. MLB Finals 2012
+        messageText - the message that should be written, or a placeholder
+            thereof (e.g. for a signature-only order this could be "Just his signature"
+        maybeEditUrl - Provide a url if you want there to be a link to the form that
+            can be used to edit the provided information
+*/}
+
+<div class="celebrity-information">
+  <h3>@celebName</h3>
+  <h4>@productName</h4>
+  <dl class="@if(maybeEditUrl.isEmpty) {last}">
+    <dt><strong>A.</strong> Recipient's name</dt>
+    <dd>@recipientName</dd>
+    <dt><strong>B.</strong> @celebName will write</dt>
+    <dd>@messageText</dd>
+    <dt><strong>C.</strong> @celebName will record an audio message</dt>
+  </dl>
+  @for(editUrl <- maybeEditUrl) {
+    <p class="last"><a href="@editUrl">Edit</a></p>
+  }
+
+</div> 

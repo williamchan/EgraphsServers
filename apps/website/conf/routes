@@ -88,7 +88,7 @@ GET     /admin/script/?                                            WebsiteContro
 ##
 %{ consumer_base = '/new' }%
 
-GET     ${consumer_base}                                                            WebsiteControllers.getRootConsumerEndpoint
+GET     ${consumer_base}/?                                                          WebsiteControllers.getRootConsumerEndpoint
 GET     ${consumer_base}/{celebrityUrlSlug}/photos/?                                WebsiteControllers.getStorefrontChoosePhotoTiled
 GET     ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/?               WebsiteControllers.getStorefrontChoosePhotoCarousel
 POST    ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}                 WebsiteControllers.postStorefrontChoosePhoto
@@ -98,6 +98,9 @@ GET     ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/review/?    
 POST    ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/review          WebsiteControllers.postStorefrontReview
 GET     ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/checkout/?      WebsiteControllers.getStorefrontCheckout
 POST    ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/checkout        WebsiteControllers.postStorefrontCheckout
+GET     ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/finalize/?      WebsiteControllers.getStorefrontFinalize
+POST    ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/finalize        WebsiteControllers.postStorefrontFinalize
+
 
 ##
 ## Website

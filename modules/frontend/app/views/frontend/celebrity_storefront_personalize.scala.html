@@ -234,33 +234,12 @@
 		    				  			<h4 class="last">@orderSummary.productName</h4>
 		    				  		</div>
 		    				  		
-		    				  		<div class="order-totals">		
-												<table>
-													<tr>
-														<th>Base price</th>
-														<td>@orderSummary.subtotal.formatPrecisely</td>
-													</tr>
-													@for(shippingCost <- orderSummary.shipping) {
-														<tr>
-															<th>High Quality Print</th>
-															<td>@shippingCost.formatPrecisely</td>
-														</tr>
-													}
-													@for(taxCost <- orderSummary.tax) {
-														<tr>
-															<th>Tax</th>
-															<td>@orderSummary.tax</td>
-														</tr>
-													}
-													<tr class="total">
-														<th>Total</th>
-														<td>@orderSummary.total.formatPrecisely</td>
-													</tr>
-												</table>
-		    				  		</div>			  		
-		    				  	
-		    				  	</div>
-		    				  
+		    				  		@tags.html.storefront_price_summary(
+		    				  			orderSummary.subtotal,
+		    				  			orderSummary.shipping,
+		    				  			orderSummary.tax,
+		    				  			orderSummary.total
+		    				  		)		    				  
 	    					</div> <!-- end .order-overview -->
 	    				
 	    				</aside>

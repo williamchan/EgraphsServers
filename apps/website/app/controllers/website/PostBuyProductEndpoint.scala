@@ -178,7 +178,11 @@ object PostBuyProductEndpoint extends Logging {
       // If the Stripe charge and Order persistence executed successfully, send a confirmation email and redirect to a confirmation page
       sendOrderConfirmationEmail(buyerName = buyerName, buyerEmail = buyerEmail, recipientName = recipientName, recipientEmail = recipientEmail, celebrity, product, order, mail)
       flash.put("orderId", order.id)
-      new Redirect(Utils.lookupUrl("WebsiteControllers.getOrderConfirmation", Map("orderId" -> order.id.toString)).url)
+
+      // Redirect
+      import WebsiteControllers.{reverse, getOrderConfirmation}
+
+      new Redirect(reverse(getOrderConfirmation(order.id)).url)
     }
   }
 
