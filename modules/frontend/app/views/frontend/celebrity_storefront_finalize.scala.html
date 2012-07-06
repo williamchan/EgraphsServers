@@ -36,7 +36,7 @@
 					
 						<div class="finalize clearfix">
 					
-	    				<form class="main" method="post" action="./">
+	    				@tags.html.safeForm("class" -> "main", "method" -> "POST", "action" -> model.purchaseUrl) {
 
 	    					<div class="order-overview">
 	    						  
@@ -141,12 +141,13 @@
  	    				 			  target=model.purchaseUrl,
  	    				 			  classes="button right"
  	    				 			)
+
  	    				 			
 	    				  	</div>
 	    				  
 	    				  </fieldset>
 	    				  
-	    				</form> <!-- end .main -->
+	    				} <!-- end .main -->
 	    				
 	    				<aside>
 	    				

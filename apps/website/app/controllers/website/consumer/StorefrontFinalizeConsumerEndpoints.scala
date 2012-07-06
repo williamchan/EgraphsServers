@@ -18,6 +18,10 @@ import models.frontend.storefront.FinalizeBillingViewModel
 import models.frontend.storefront.FinalizeViewModel
 import models.frontend.storefront.FinalizePersonalizationViewModel
 import models.frontend.storefront.FinalizeShippingViewModel
+import controllers.website.PostBuyProductEndpoint.EgraphPurchaseHandler
+import services.db.{TransactionSerializable, DBSession}
+import services.http.forms.purchase.PurchaseForms.AllShippingForms
+import models.Celebrity
 
 /**
  * Manages GET and POST of the Review page in the purchase flow.
@@ -44,6 +48,8 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
 
   protected def payment: Payment
 
+  protected def dbSession: DBSession
+
   //
   // Controllers
   //
@@ -60,27 +66,15 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
       // Get the purchase forms out of the server session
       val forms = purchaseFormFactory.formsForStorefront(celeb.id)
 
-      for (
-      // Make sure the product ID in this URL matches the one in the form
-        formProductId <- forms.matchProductIdOrRedirectToChoosePhoto(celeb, product).right;
-
-        // Make sure there's inventory on the product
-        inventoryBatch <- forms.nextInventoryBatchOrRedirect(celebrityUrlSlug, product).right;
-
-        // Make sure we've got a valid personalize form in storage
-        validPersonalizeForm <- forms.validPersonalizeFormOrRedirectToPersonalizeForm(
-                                  celebrityUrlSlug,
-                                  productUrlSlug
-                                ).right;
-
-      // Make sure we've got valid personalize forms.
-        validCheckoutForms <- forms.validCheckoutFormsOrRedirectToCheckout(
-                                celebrityUrlSlug,
-                                productUrlSlug
-                              ).right
-      ) yield {
-        // Everything looks good for rendering the page!
-        val (billing, maybeShipping) = validCheckoutForms
+      for (allPurchaseForms <- forms.allPurchaseFormsOrRedirect(celeb, product).right) yield {
+        // Everything looks good for rendering the page! Unpack the purchase data.
+        val AllShippingForms(
+          formProductId,
+          inventoryBatch,
+          validPersonalizeForm,
+          billing,
+          maybeShipping
+        ) = allPurchaseForms
 
         // Create the checkout viewmodels
         val checkoutUrl = reverse(getStorefrontCheckout(celebrityUrlSlug, productUrlSlug)).url
@@ -150,36 +144,42 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
    * @return a Redirect to the next step in the purchase flow if successful, otherwise
    *         a Redirect back to the form to handle errors.
    */
-  def postStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug: String) = postController() {
-    celebFilters.requireCelebrityAndProductUrlSlugs {
-      (celeb, product) =>
-      // Get the purchase forms for this celeb's storefront out of the server session
+  def postStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug: String) = postController(openDatabase=false) {
+    // Get all the sweet, sweet purchase form data in a database transaction
+    val redirectOrPurchaseData = dbSession.connected(TransactionSerializable) {
+      celebFilters.requireCelebrityAndProductUrlSlugs { (celeb, product) =>
         val forms = purchaseFormFactory.formsForStorefront(celeb.id)
-
-        // Validate in a for comprehension
-        for (
-        // Product ID of the URL has to match the product stored in the session
-          productId <- forms.matchProductIdOrRedirectToChoosePhoto(celeb, product).right;
-
-          // User has to have posted a valid printing option. Which should be impossible to
-          // screw up because it was a damned checkbox.
-          validPrintOption <- checkPurchaseField(params.getOption(Params.HighQualityPrint))
-            .isPrintingOption
-            .right
-        ) yield {
-          // Save this form into the server session
-          /*forms.withHighQualityPrint(validPrintOption).save()
-
-          // TODO: redirect to "Checkout As" screen if not logged in rather than straight to
-          // checkout.
-          val defaultNextUrl = reverse(getStorefrontCheckout(celebrityUrlSlug, productUrlSlug)).url
-
-          Utils.redirectToClientProvidedTarget(urlIfNoTarget = defaultNextUrl)*/
+        for (formData <- forms.allPurchaseFormsOrRedirect(celeb, product).right) yield {
+          (celeb, product, formData)
         }
+      }
+    }
+
+    redirectOrPurchaseData match {
+      case Right((celeb: Celebrity, product:models.Product, shippingForms: AllShippingForms)) =>
+        val AllShippingForms(productId, inventoryBatch, personalization, billing, shipping) = shippingForms
+        EgraphPurchaseHandler(
+          recipientName=personalization.recipientName,
+          recipientEmail=personalization.recipientEmail.getOrElse(billing.email),
+          buyerName=billing.name,
+          buyerEmail=billing.email,
+          stripeTokenId=billing.paymentToken,
+          desiredText=personalization.writtenMessageText,
+          personalNote=personalization.noteToCelebriity,
+          celebrity=celeb,
+          product=product
+        ).execute()
+
+
+      case Left(result: play.mvc.Http.Response)  =>
+        result
+
+      case result: play.mvc.Http.Response =>
+        result
+
+      case whoops =>
+        throw new RuntimeException("This was not expected as a response to a purchase request: " + whoops)
+
     }
   }
-
-  //
-  // Private members
-  //
 }

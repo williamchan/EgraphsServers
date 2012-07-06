@@ -9,6 +9,7 @@ import org.joda.money.{CurrencyUnit, Money}
 import models.enums.{WrittenMessageRequest, PrintingOption}
 import services.http.forms.{Form, ReadsForm}
 import play.mvc.Scope.Flash
+import services.http.forms.purchase.PurchaseForms.AllShippingForms
 
 /**
  * Represents the cache-persisted forms in the purchase flow.
@@ -30,6 +31,33 @@ class PurchaseForms @Inject()(
   /** The  ID of the [[models.Product]] being purchased from the storefront */
   def productId: Option[Long] = {
     storefrontSession[Long](Key.ProductId)
+  }
+  
+  def allPurchaseFormsOrRedirect(celeb: Celebrity, product: Product) = {
+    val celebrityUrlSlug = celeb.urlSlug.getOrElse("Anonymous")
+    for (
+      // Make sure the product ID in this URL matches the one in the form
+      productId <- matchProductIdOrRedirectToChoosePhoto(celeb, product).right;
+  
+      // Make sure there's inventory on the product
+      inventoryBatch <- nextInventoryBatchOrRedirect(celebrityUrlSlug, product).right;
+  
+      // Make sure we've got a valid personalize form in storage
+      validPersonalizeForm <- validPersonalizeFormOrRedirectToPersonalizeForm(
+        celebrityUrlSlug,
+        product.urlSlug
+      ).right;
+  
+      // Make sure we've got valid personalize forms.
+      validCheckoutForms <- validCheckoutFormsOrRedirectToCheckout(
+        celebrityUrlSlug,
+        product.urlSlug
+      ).right
+    ) yield {
+      val (validBilling, validShipping) = validCheckoutForms
+
+      AllShippingForms(productId, inventoryBatch, validPersonalizeForm, validBilling, validShipping)
+    }
   }
 
   /**
@@ -376,6 +404,14 @@ object PurchaseForms {
       case WrittenMessageRequest.SpecificMessage => messageText.getOrElse("")
     }
   }
+
+  case class AllShippingForms(
+    productId: Long,
+    inventoryBatch: InventoryBatch,
+    personalization: PersonalizeForm.Validated,
+    billing: CheckoutBillingForm.Valid,
+    shipping: Option[CheckoutShippingForm.Valid]
+  )
 }
 
 class PurchaseFormFactory @Inject()(

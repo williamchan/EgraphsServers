@@ -334,6 +334,8 @@ object Celebrity {
       CelebrityWithImage(saved, savedImage)
     }
   }
+
+  case class CelebrityWithProduct(celeb: Celebrity, product: Product)
 }
 
 class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {

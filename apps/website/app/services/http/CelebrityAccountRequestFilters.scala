@@ -4,7 +4,9 @@ import play.mvc.Http.Request
 import models._
 import com.google.inject.Inject
 import enums.PublishedStatus
-import play.mvc.results.{Forbidden, NotFound}
+import play.mvc.results.{Redirect, Forbidden, NotFound}
+import models.Celebrity.CelebrityWithProduct
+import views.Application.html.{celebrity, product}
 
 /**
  * Functions that filter out whose callback parameters are only called when the egraphs
@@ -75,10 +77,14 @@ class CelebrityAccountRequestFilters @Inject() (
   }
   
   /**
+   * Prefer using celebrityUrlSlugOrNotFound
+   *
    * Filters out requests that didn't provide a valid `celebrityUrlSlug` parameter.
    *
    * Calls the `continue` callback parameter with the corresponding [[models.Celebrity]] if the filter
    * passed.
+   *
+   *
    *
    * @param continue function to call if the request passed the filter
    * @param request the request whose params should be checked by the filter
