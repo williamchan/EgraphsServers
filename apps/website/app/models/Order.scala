@@ -24,6 +24,7 @@ case class OrderServices @Inject() (
   store: OrderStore,
   customerStore: CustomerStore,
   celebrityStore: CelebrityStore,
+  inventoryStore: InventoryBatchStore,
   productStore: ProductStore,
   payment: Payment,
   mail: Mail,
@@ -89,6 +90,10 @@ case class Order(
   /** Retrieves the purchased Product from the database */
   def product: Product = {
     services.productStore.get(productId)
+  }
+
+  def inventoryBatch: InventoryBatch = {
+    services.inventoryStore.get(inventoryBatchId)
   }
 
   def isPublic = {

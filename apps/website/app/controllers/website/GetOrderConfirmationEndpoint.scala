@@ -3,45 +3,59 @@ package controllers.website
 import play.mvc.Controller
 
 import models._
+import frontend.storefront.OrderCompleteViewModel
 import services.http.ControllerMethod
+import play.mvc.results.Redirect
+import controllers.WebsiteControllers
+import java.util
+import services.mvc.ImplicitHeaderAndFooterData
 
 /**
  * Serves the page confirming that an Egraph order was made
  */
 
-private[controllers] trait GetOrderConfirmationEndpoint { this: Controller =>
+private[controllers] trait GetOrderConfirmationEndpoint extends ImplicitHeaderAndFooterData
+{ this: Controller =>
+
   protected def orderStore: OrderStore
   protected def controllerMethod: ControllerMethod
 
-  def getOrderConfirmation = controllerMethod() {
+  def getOrderConfirmation(orderId: Long) = controllerMethod() {
     // Get order ID from flash scope -- it's OK to just read it
     // because it can only have been provided by our own code (in this case
     // probably PostBuyProductEndpoint)
-    val orderIdOption = Option(flash.get("orderId"))
+    import services.http.SafePlayParams.Conversions._
 
-    orderIdOption match {
-      case None =>
-        Forbidden("I'm sorry, Dave, I'm afraid I can't serve this page for you.")
+    val maybeOrderIdFromFlash = flash.getLongOption("orderId")
 
-      case Some(orderId) =>
-        orderStore.findById(orderId.toLong) match {
-          case None =>
-            NotFound("No order with id " + orderId + " exists.")
+    val maybeHtml = for (
+      flashOrderId <- maybeOrderIdFromFlash if flashOrderId == orderId;
+      order <- orderStore.findById(flashOrderId)
+    ) yield {
+      val product = order.product
+      val buyer = order.buyer
+      val buyerAccount = buyer.account
+      val recipient = order.recipient
+      val recipientAccount = recipient.account
+      val celeb = product.celebrity
 
-          case Some(order) =>
-            val product = order.product
-            val buyer = order.buyer
-
-            views.Application.html.order_confirmation(
-              buyer,
-              buyer.account,
-              order.recipient,
-              product.celebrity,
-              product,
-              order
-            )
-        }
+      views.frontend.html.celebrity_storefront_complete(
+        OrderCompleteViewModel (
+          orderDate = order.created,
+          orderNumber = order.id,
+          buyerName = buyer.name,
+          buyerEmail = buyerAccount.email,
+          ownerName = recipient.name,
+          ownerEmail = recipientAccount.email,
+          celebName = celeb.publicName.getOrElse("Anonymous"),
+          productName = product.name,
+          totalPrice = order.amountPaid,
+          guaranteedDeliveryDate = order.inventoryBatch.getExpectedDate
+        )
+      )
     }
+
+    maybeHtml.getOrElse(new Redirect(reverse(WebsiteControllers.getRootConsumerEndpoint).url))
   }
 }
 

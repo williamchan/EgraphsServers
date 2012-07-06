@@ -28,8 +28,7 @@ object Complete extends Controller
       celebName="{celebrity name}",
       productName="{product name}",
       totalPrice=BigDecimal(100.00).toMoney(),
-      guaranteedDeliveryDate=new util.Date(),
-      cancelOrderUrl="/cancel-order-url"
+      guaranteedDeliveryDate=new util.Date()
     )
   }
 

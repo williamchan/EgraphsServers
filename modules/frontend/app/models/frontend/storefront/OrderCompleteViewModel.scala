@@ -13,6 +13,5 @@ case class OrderCompleteViewModel (
   celebName: String,
   productName: String,
   totalPrice: Money,
-  guaranteedDeliveryDate: Date,
-  cancelOrderUrl: String
+  guaranteedDeliveryDate: Date
 )

@@ -1,8 +1,6 @@
 @(model: models.frontend.storefront.OrderCompleteViewModel
 )(implicit headerData: models.frontend.header.HeaderData,
-  footerData: models.frontend.footer.FooterData,
-  storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs,
-  session: play.mvc.Scope.Session
+  footerData: models.frontend.footer.FooterData  
 )
 
 @{/** Renders the Order Complete page in the celebrity storefront. */}
@@ -33,9 +31,9 @@
   					
   						<h2>Now it's @model.celebName's Turn</h2>
   					
-  						<p>Congratulations! We just booked you a slice of time on @model.celebName's schedule to complete your order. For now, just sit back and relax. @model.celebName will send you an email as soon as he's done creating your Egraph, so look forward to hearing from him!</p>
+  						<p>Congratulations! We just booked you a slice of time on @model.celebName's schedule to complete your order. For now, just sit back and relax. @model.celebName will send you an email as soon as he's done creating your egraph, so look forward to hearing from him!</p>
   						
-  						<p><small><a href="#" class="tip">What happen's now?</a></small></p>
+  						<p><small><a href="#" class="tip">What happens now?</a></small></p>
   						  				
   					</div>
 
@@ -86,13 +84,16 @@
   						
   							<h3>Order Changes</h3>
   							
-  							<p>Because we are scheduling time in @model.celebName's calendar there are limitations in our capabilities to refund your purchase. You have 15 minutes to modify or cancel your order.</p>
+  							<p>To make changes to your order, please contact egraphs support at 
+                  <a href="mailto:support@@egraphs.com">support@@egraphs.com</a>
+                </p>
   							
   							<ul>
-  								@{/** Re-enable this when we support order modification.
+  								@{/** Re-enable this when we support order cancellation and modification.
                     <li><a href="#">Modify Order</a></li>
-                  */}
+                  
   								<li><a href="#modal-content" data-toggle="modal">Cancel Order</a></li>
+                  */}
   							</ul>
   						
   						</div>
@@ -121,9 +122,10 @@
 	  			
 	  			<div>
 	  				<p>Are you sure you want to cancel your order for @model.celebName's Egraph?</p>
+            @{/** Un-Comment when we support cancelling.
             @tags.html.safeForm("method" -> "POST", "action" -> model.cancelOrderUrl) {
 	  				  <button class="btn" data-toggle="button">Cancel Order</button>
-            }
+            }*/}
 	  				<button class="btn" data-toggle="button" data-dismiss="modal">Do Not Cancel</button>
 	  			</div>
 	  			
@@ -133,7 +135,7 @@
     
 }
 
-@base_celebrity_storefront_template(
+@base_template(
   title="Order Complete",
   jsMain="pages/celebrity-storefront-complete",
   body=baseBody
