@@ -5,9 +5,9 @@ package services.blobs
  *
  * Usage:
  * {{{
- *   class MyNewBlobVendor(blobVendorDelegate: BlobVendor) extends BlobVendor with BlobVendorComposition {
+ *   class MyNewBlobVendor(protected val blobVendorDelegate: BlobVendor) extends BlobVendor with BlobVendorComposition {
  *     // Only override the members of BlobVendor that you don't want to delegate
- *     // within this class. By default it delegates the entire interface.
+ *     // to blobVendorDelegate within this class. By default it delegates the entire interface.
  *   }
  * }}}
  */

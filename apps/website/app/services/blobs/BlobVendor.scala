@@ -37,7 +37,7 @@ private[blobs] trait BlobVendor {
   def urlOption(namespace: String, key: String): Option[String]
 
   /**
-   * Tests that there exists a value for the key in the specified namespace exists.
+   * Tests that there exists a value for the key in the specified namespace.
    *
    * @param namespace the key namespace -- equivalent to an Amazon S3 bucket or a file-system folder
    * @param key the unique key name against which an object may be stored
