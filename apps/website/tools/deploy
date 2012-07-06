@@ -13,6 +13,10 @@
 # Parse the deployment target
 DEPLOY_TARGET=$1
 
+function echo_green {
+  printf "\e[00;32m$1\e[00m\n"
+}
+
 case "$DEPLOY_TARGET" in
   'live')
     # Check to make super-d-duper sure they want to deploy to live.
@@ -43,7 +47,7 @@ case "$DEPLOY_TARGET" in
 	;;  
 esac
 
-printf "\e[00;32mDeploying application to target '$DEPLOY_TARGET'.\e[00m\n\n"
+echo_green "EGRAPHS: Deploying application to target '$DEPLOY_TARGET'"
 
 # OK everything's groovy...let's do the deploy from the project base folder
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -51,5 +55,20 @@ PROJ_BASE=$SCRIPT_DIR/..
 
 cd $PROJ_BASE
 
+# First of all blow away our cached module definitions. When the cloudbees, 
+# plugin archives into a WAR file we want the module link to be relative
+# to $PROJ_BASE/project-modules
+echo_green "EGRAPHS: Destroying caches (Egraphs module definitions, .class files)..."
+rm -rf "$HOME/.ivy2/cache/egraphs"
+rm -rf "$PROJ_BASE/modules"
+play clean
+
+echo_green "EGRAPHS: Resolving dependencies..."
+play dependencies --sync
+play dependencies
+
+echo_green "EGRAPHS: Updating remote database..."
 play evolutions:apply --%$DEPLOY_TARGET
+
+echo_green "EGRAPHS: Deploying to Cloudbees..."
 play bees:app:deploy --%$DEPLOY_TARGET
