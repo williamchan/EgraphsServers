@@ -19,7 +19,6 @@ import scala.util.Random
 import java.util.Date
 import com.google.inject.Inject
 import java.text.SimpleDateFormat
-import services.http.PlayConfig
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -156,7 +155,6 @@ case class Order(
   protected[models] def prepareEgraphsSignedEmail(): Email = {
     val celebrity = services.celebrityStore.findByOrderId(id).get
     val email = new HtmlEmail()
-    val linkActionDefinition: ActionDefinition = Utils.lookupAbsoluteUrl("WebsiteControllers.getEgraph", Map("orderId" -> id.toString))
 
     val buyingCustomer = this.buyer
     val receivingCustomer = this.recipient
@@ -169,11 +167,9 @@ case class Order(
     email.addReplyTo("noreply@egraphs.com")
     email.setSubject("I just finished signing your Egraph")
     email.setMsg(
-      views.Application.email.html.egraph_signed_email(
-        celebrity,
-        product,
-        this,
-        linkActionDefinition.url
+      views.frontend.html.email_view_egraph(viewEgraphUrl = Utils.lookupAbsoluteUrl("WebsiteControllers.getEgraph", Map("orderId" -> id.toString)).url,
+        celebrityName = celebrity.publicName.getOrElse("Egraphs"), // make publicName a String instead of a Option[String]
+        recipientName = receivingCustomer.name
       ).toString().trim()
     )
     email

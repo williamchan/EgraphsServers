@@ -18,6 +18,7 @@ import services.logging.Logging
 import exception.InsufficientInventoryException
 import play.mvc.results.Redirect
 import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters}
+import java.text.SimpleDateFormat
 
 trait PostBuyProductEndpoint { this: Controller =>
   import PostBuyProductEndpoint.EgraphPurchaseHandler
@@ -120,6 +121,7 @@ trait PostBuyProductEndpoint { this: Controller =>
 object PostBuyProductEndpoint extends Logging {
 
   private[PostBuyProductEndpoint] val alphaEmailMatcher = ".*@(egraphs|raysbaseball).com|zachapter@gmail.com"
+  private val dateFormat = new SimpleDateFormat("MMMM dd, yyyy")
 
   /**
    * Performs the meat of the purchase controller's interaction with domain
@@ -191,7 +193,7 @@ object PostBuyProductEndpoint extends Logging {
       }
 
       // If the Stripe charge and Order persistence executed successfully, send a confirmation email and redirect to a confirmation page
-      sendOrderConfirmationEmail(buyerName = buyerName, buyerEmail = buyerEmail, buyer = buyer, recipient = recipient, celebrity, product, order, mail)
+      sendOrderConfirmationEmail(buyerName = buyerName, buyerEmail = buyerEmail, recipientName = recipientName, recipientEmail = recipientEmail, celebrity, product, order, mail)
       flash.put("orderId", order.id)
       new Redirect(Utils.lookupUrl("WebsiteControllers.getOrderConfirmation", Map("orderId" -> order.id.toString)).url)
     }
@@ -242,19 +244,31 @@ object PostBuyProductEndpoint extends Logging {
 
   private def sendOrderConfirmationEmail(buyerName: String,
                                          buyerEmail: String,
-                                         buyer: Customer,
-                                         recipient: Customer,
+                                         recipientName: String,
+                                         recipientEmail: String,
                                          celebrity: Celebrity,
                                          product: Product,
                                          order: Order,
                                          mail: Mail) {
+    import services.Finance.TypeConversions._
+
     val email = new SimpleEmail()
     email.setFrom("noreply@egraphs.com", "Egraphs")
     email.addTo(buyerEmail, buyerName)
     email.setSubject("Order Confirmation")
-    email.setMsg(views.Application.email.html.order_confirmation_email(
-      buyer = buyer, recipient = recipient, celebrity, product, order
-    ).toString().trim())
+    email.setMsg(
+      views.frontend.html.email_order_confirmation(
+        buyerName = buyerName,
+        recipientName = recipientName,
+        recipientEmail = recipientEmail,
+        celebrityName = celebrity.publicName.get,
+        productName = product.name,
+        orderDate = dateFormat.format(order.created),
+        orderId = order.id.toString,
+        pricePaid = order.amountPaid.formatSimply,
+        deliveredyDate = dateFormat.format(order.expectedDate.get) // all new Orders have expectedDate... will turn this into Date instead of Option[Date]
+      ).toString().trim()
+    )
     mail.send(email)
   }
 }
