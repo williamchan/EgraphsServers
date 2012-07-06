@@ -1,6 +1,7 @@
 package controllers
 
 import play.mvc.Controller
+import models.frontend.contents.Section
 
 /**
  * Test controller for any generic static pages
@@ -22,5 +23,17 @@ object Static extends Controller with DefaultHeaderAndFooterData {
 
   def about() = {
     views.frontend.html.about_us()
+  }
+
+  def inside() = {
+    val tableOfContents =
+    List(
+      Section(title="Introduction", url="#intro", subsection = None),
+      Section(title="What is an Egraph?", url="#what", subsection = None),
+      Section(title="The Biometric Authentication Process", url="#biometric", subsection = None),
+      Section(title="What Can I Do With My Egraph", url="#do", subsection = None)
+    )
+
+    views.frontend.html.inside_egraph(tableOfContents)
   }
 }

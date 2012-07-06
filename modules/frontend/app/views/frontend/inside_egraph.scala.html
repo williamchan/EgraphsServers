@@ -1,0 +1,190 @@
+@(tableOfContents: List[models.frontend.contents.Section])(
+implicit session: play.mvc.Scope.Session,
+headerData: models.frontend.header.HeaderData,
+footerData: models.frontend.footer.FooterData
+)
+@import views.frontend.Utils
+@import models.frontend.contents._
+
+
+
+
+@baseBody = {
+
+<section id="content" role="main" xmlns="http://www.w3.org/1999/html">
+  <div id="main" class="inside-egraph">
+    <div class="row-fluid">
+      <div class="span12 masthead-static">
+        <img src="/public/images/landing-masthead-1.jpg"/>
+      </div>
+    </div>
+
+    <div class="container">
+        <div class="row-fluid">
+          <div class="span4 toc">
+           <ul>
+            @for( s <- tableOfContents.map( t => t.renderHtml)){
+              @Html(s)
+             }
+           </ul>
+          </div>
+          <div class="span8">
+            <h1>
+              <a id="inside"></a>
+              Inside an Egraph</h1>
+            <div>
+              <p>
+                Want to learn more about how egraphs work and what our patent-pending authentication process entails?
+                You’ve come to the right place. Let's take an inside look at an egraph:
+              </p>
+              <ol>
+                <li>
+                  What is an egraph?
+                </li>
+                <li>
+                  The biometric authentication process
+                </li>
+                <li>
+                  What can I do with my egraph?
+                </li>
+              </ol>
+            </div>
+
+            <div>
+              <h2>
+                <a id="what">
+                </a>
+                What is an egraph?</h2>
+              <div><p>
+                An egraph is a personalized interaction between a star and fan. The fan receives a 100% personalized and
+                authenticated written and audio message – along with a handpicked high quality image – in a beautiful
+                digital gallery that can be shared with the world. The egraph includes:
+                </p>
+
+                <div>
+                  <figure>
+                    <div>
+                    <img src='@asset("public/images/fpo-egraph-diagram.jpg")' alt="fpo-egraph-diagram" class="scale" />
+                    </div>
+                    <figcaption class="signature">
+
+                      <p>A hand-written message and signature from your star<span>&raquo;</span></p>
+
+                    </figcaption> <!-- end .signature -->
+
+                    <figcaption class="audio">
+
+                      <p>An audio message addressed to you from your star<span>&raquo;</span></p>
+
+                    </figcaption> <!-- end .audio -->
+
+                    <figcaption class="name">
+
+                      <p>A certificate of authenticity showing the full history of your interaction</p>
+
+                    </figcaption> <!-- end .name -->
+                    <figcaption>
+                      <p>
+                      <a href="#">Want to know what you can do with your egraph?<span>&raquo;</span></a>
+                      </p>
+                    </figcaption>
+
+                  </figure>
+                </div>
+
+              </div>
+            </div>
+            <div>
+              <a id="biometric"></a>
+              <h2>The Biometric Authentication Process</h2>
+              <p>
+                The first thing we do with any star is personally sit down with him to create his biometric footprint – a
+                two-factor identification of his voice and signature profile. By doing this, we know that it’s him
+                creating egraphs for fans, no matter where his in the world. Getting a great biometric footprint used
+                in verification is just important for us as it is to you and the star because we’re obsessed about the
+                quality and authenticity of the egraph you receive. Here’s how we create the biometric footprint:
+              </p>
+              <div class="diagram">
+                <img src='@asset("/public/images/voiceprint.png")'/>
+              </div>
+              <div class="callout">
+                <h3>Voiceprint</h3>
+                <p>
+                  We collect audio samples from each star to create his voiceprint. Our technology extracts pitch, tone
+                  , cadence and other voice patterns that get turned into mathematical representations/statistical models.
+                  We store these representations in electronic format for use in authentication.
+                </p>
+              </div>
+              <div class="diagram">
+                <img src='@asset("/public/images/signaturediagram.png")'/>
+              </div>
+              <div class="callout">
+                <h3>Written Signature Profile</h3>
+                <p>
+                  Like the voiceprint, we collect in-person samples of the star’s signature. Our signature identification
+                  technology measures a person’s speed, rhythm, acceleration and movement when they sign their name on an
+                  iPad. Similar to the voiceprint, these are stored as complex algorithms for use in authentication.
+                </p>
+              </div>
+              <p>
+                Authentication: When a celebrity creates an Egraph, we test both the audio message and the written
+                signature to verify it’s your star that actually created it. If the voice message and signature pass our
+                tests, then the egraph immediately gets sent to you. If the voice message recording and the signature
+                don’t match with the voiceprint and signature profile we captured during enrollment, we have someone
+                from our Quality Assurance team look into the issue. If we’re not sure it’s your star, then we won’t
+                pass the egraph to you. We will let you know immediately and refund your money while we look further
+                into the matter. That is our commitment to you – because we cannot afford to lose your trust in the
+                quality and authenticity of the product.
+              </p>
+            </div>
+            <div>
+              <a id="do"></a>
+              <h2>What Can I Do With My Egraphs?</h2>
+              <p>Receiving an email directly from your star with a link to your egraph is just the beginning. Here are
+                all of the things that you can do:</p>
+              <ol>
+                <li>
+                  <span class="emphasis">Check out the egraph </span>in its entirety – the image, written message and
+                  audio recording. Plus, you can view the certificate of authenticity for all of the vital details about
+                  when the egraph was created.
+                </li>
+                <li>
+                  <span class="emphasis">Share it </span>with your friends and family via your favorite social network.
+                  Try to tweet it back to your star! You never know what they’ll say and do.
+                </li>
+                <li>
+                  <span class="emphasis">Download the egraph </span> – the image and written signature – in a high
+                  resolution file. Plus, if you want, we’ll send you a WAV file of the audio message. Maybe you want
+                  that as your new ringtone???
+                </li>
+                <li>
+                  <span class="emphasis">Purchase a high quality framed print</span> – maybe you want to hang it up on
+                  your wall. We offer a service that enables you to send a beautiful, framed egraph – with the
+                  certificated of authenticity – anywhere in the world.
+                </li>
+                <li>
+                  <span class="emphasis">Send it as a greeting card</span> – let’s say you’re giving dad an egraph for
+                  his birthday; you can also give him an egraph greeting card (similar in size and shape to a birthday
+                  card) that contains the egraph image and written signature with a personalized message from you. Plus,
+                  the card has the certificate of authenticity and a QR code that links directly to the star’s voice
+                  message online.
+                </li>
+              </ol>
+              <p>
+                If you have other suggestions, we’d love to know! Email us your comments here:
+                <a href="mailto:ideas@@egraphs.com">ideas@@egraphs.com</a>.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</section>
+
+}
+
+@base_template(
+title="Inside an Egraph",
+jsMain="pages/inside-egraph",
+body=baseBody
+)
