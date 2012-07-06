@@ -124,7 +124,7 @@ trait StorefrontPersonalizeConsumerEndpoints
                      }.right
       ) yield {
         // Everything looked good. Save the form into the cache and move on with life.
-        purchaseForms.withPersonalizeForm(form).save()
+        purchaseForms.withForm(form).save()
 
         val defaultNextUrl = reverse(getStorefrontReview(celebrityUrlSlug, productUrlSlug)).url
 

@@ -1,0 +1,28 @@
+<!--[if lt IE 7 ]> <html class="ie lt-ie9 ie6 no-js" lang="en"> <![endif]-->
+<!--[if IE 7 ]>    <html class="ie lt-ie9 ie7 no-js" lang="en"> <![endif]-->
+<!--[if IE 8 ]>    <html class="ie lt-ie9 ie8 no-js" lang="en"> <![endif]-->
+<!--[if IE 9 ]>    <html class="ie ie9 no-js" lang="en"> <![endif]-->
+<!--[if gt IE 9]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<!-- Begin base_template.scala.html -->
+<head>
+  <meta charset="utf-8">
+  <title>${_arg}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <link rel="shortcut icon" type="image/png" href='/public/images/favicon.png'>
+  <link href='/public/stylesheets/main.less' rel="stylesheet">
+
+  <!-- Front-load scripting assets that are necessary for attractive display -->
+  <script src='/public/javascripts/libs/modernizr.custom.js'></script>
+  <script src="https://use.typekit.com/ztt6ynw.js"></script>
+  <script>try{Typekit.load();}catch(e){}</script>
+  <script src='/public/javascripts/libs/angular.js'></script>
+
+  <!-- Configure egraphs scripting main classes (these will automatically be loaded by main.js -->
+  <script>
+    var Egraphs = Egraphs || {};
+    Egraphs.page = Egraphs.page || {};
+    Egraphs.page.jsMain = ["pages/base-template"];
+  </script>
+</head>

@@ -102,9 +102,7 @@ case class Customer(
     email.addTo(account.email)
     email.setSubject("Welcome to Egraphs!")
     email.setMsg(
-      views.Application.email.html.new_customer_email(
-        customerName = name,
-        email = account.email,
+      views.frontend.html.email_account_verification(
         verifyPasswordUrl = GetResetPasswordEndpoint.absoluteUrl(account.email, account.resetPasswordKey.get).url
       ).toString().trim()
     )

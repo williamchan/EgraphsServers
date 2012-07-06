@@ -268,32 +268,13 @@
                       <h2>Summary</h2>
                       
                       @orderDetails
-                      
-                      <div class="order-totals">                      
-                        <table>
-                          <tr>
-                            <th>Base price</th>
-                            <td>@summary.basePrice.formatPrecisely</td>
-                          </tr>
-                          @for(printPrice <- summary.shipping) {
-                            <tr>
-                              <th>High-quality print</th>
-                              <td>@printPrice.formatPrecisely</td>
-                            </tr>
-                          }
-                          @for(taxPrice <- summary.tax) {
-                            <tr>
-                              <th>Tax</th>
-                              <td>@taxPrice.formatPrecisely</td>
-                            </tr>
-                          }
-                          <tr class="total">
-                            <th>Total</th>
-                            <td>@summary.total.formatPrecisely</td>
-                          </tr>
-                        </table>
-                      </div>
-                    
+
+                      @tags.html.storefront_price_summary(
+                        summary.basePrice,
+                        summary.shipping,
+                        summary.tax,
+                        summary.total
+                      )
                     </div>
                   
                 </div> <!-- end .order-overview -->
@@ -313,17 +294,7 @@
 }
 
 @orderDetails = {
-  <div class="celebrity-information">
-    <h3>@summary.celebrityName</h3>
-    <h4>@summary.productName</h4>
-    <dl class="last">
-      <dt><strong>A.</strong> Recipient's name</dt>
-      <dd>@summary.recipientName</dd>
-      <dt><strong>B.</strong> @summary.celebrityName will write</dt>
-      <dd>@summary.messageText</dd>
-      <dt><strong>C.</strong> @summary.celebrityName will record an audio message</dt>
-    </dl>
-  </div> 
+  @tags.html.storefront_order_details(summary.celebrityName, summary.productName, summary.recipientName, summary.messageText)
 }
 
 @base_celebrity_storefront_template(

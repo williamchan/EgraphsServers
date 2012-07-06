@@ -1,0 +1,41 @@
+@(basePrice: org.joda.money.Money, 
+  maybePhysicalGood: Option[org.joda.money.Money], 
+  maybeTax: Option[org.joda.money.Money], 
+  total: org.joda.money.Money
+)
+
+@{/** Prints a summary of the ongoing price of an order.
+
+        baseprice - the base price of a product
+        maybePhysicalGood - the price of ordering the physical good, if a
+            physical good is part of the order.
+        maybeTax - the cost of taxes, if applicable.
+        total - the total cost.
+*/}
+
+@import frontend.formatting.MoneyFormatting.Conversions._
+
+<div class="order-totals">
+  <table>
+    <tr>
+      <th>Base price</th>
+      <td>@basePrice.formatPrecisely</td>
+    </tr>
+    @for(physicalGood <- maybePhysicalGood) {
+      <tr>
+        <th>High-quality print</th>
+        <td>@physicalGood.formatPrecisely</td>
+      </tr>
+    }
+    @for(taxPrice <- maybeTax) {
+      <tr>
+        <th>Tax</th>
+        <td>@taxPrice.formatPrecisely</td>
+      </tr>
+    }
+    <tr class="total">
+      <th>Total</th>
+      <td>@total.formatPrecisely</td>
+    </tr>
+  </table>
+</div>

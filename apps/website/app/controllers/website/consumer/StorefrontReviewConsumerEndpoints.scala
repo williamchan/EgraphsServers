@@ -62,7 +62,7 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
                                 ).right
       ) yield {
         // Everything looks good for rendering the page!
-        val textCelebWillWrite = makeTextForCelebToWrite(
+        val textCelebWillWrite = PurchaseForms.makeTextForCelebToWrite(
           validPersonalizeForm.writtenMessageRequest,
           validPersonalizeForm.writtenMessageText
         )
@@ -123,16 +123,4 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
     }
   }
 
-  //
-  // Private members
-  //
-  private def makeTextForCelebToWrite(messageRequest: WrittenMessageRequest, messageText: Option[String])
-  : String = {
-    messageRequest match {
-      // TODO: Make these strings respond to gender
-      case WrittenMessageRequest.SignatureOnly => "His signature only."
-      case WrittenMessageRequest.CelebrityChoosesMessage => "Whatever he wants."
-      case WrittenMessageRequest.SpecificMessage => messageText.getOrElse("")
-    }
-  }
 }

@@ -6,8 +6,7 @@ import play.test.{FunctionalTest, UnitFlatSpec}
 import models._
 import enums.PublishedStatus
 import play.mvc.Http.Request
-import services.db.FilterOneTable
-import play.mvc.results.{BadRequest, Forbidden, NotFound, Ok}
+import play.mvc.results.{Forbidden, NotFound, Ok}
 
 class CelebrityAccountRequestFiltersTests extends UnitFlatSpec with Mockito with ShouldMatchers {
 

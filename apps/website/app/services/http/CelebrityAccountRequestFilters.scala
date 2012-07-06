@@ -75,10 +75,14 @@ class CelebrityAccountRequestFilters @Inject() (
   }
   
   /**
+   * Prefer using celebrityUrlSlugOrNotFound
+   *
    * Filters out requests that didn't provide a valid `celebrityUrlSlug` parameter.
    *
    * Calls the `continue` callback parameter with the corresponding [[models.Celebrity]] if the filter
    * passed.
+   *
+   *
    *
    * @param continue function to call if the request passed the filter
    * @param request the request whose params should be checked by the filter
