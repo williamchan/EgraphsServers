@@ -1,6 +1,6 @@
 @(form: models.frontend.storefront.CheckoutFormView,
   summary: models.frontend.storefront.CheckoutOrderSummary,
-  paymentJsModule: String = "yes-maam-payment",
+  paymentJsModule: String,
   paymentPublicKey: String
 )(
   implicit headerData: models.frontend.header.HeaderData, 

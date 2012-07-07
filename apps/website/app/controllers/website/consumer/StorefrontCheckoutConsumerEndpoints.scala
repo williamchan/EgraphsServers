@@ -112,6 +112,7 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
         views.frontend.html.celebrity_storefront_checkout(
           form=checkoutFormView,
           summary=orderSummary,
+          paymentJsModule=payment.browserModule,
           paymentPublicKey=payment.publishableKey
         )
       }

@@ -12,31 +12,24 @@ object Checkout extends Controller
   with DefaultHeaderAndFooterData
   with DefaultStorefrontBreadcrumbs
 {
-
+  //
+  // Public members
+  //
   def index = {
-    views.frontend.html.celebrity_storefront_checkout(
-      form=defaultCheckoutForm,
-      summary=defaultOrderSummary,
-      paymentPublicKey=testStripeKey
-    )
+    render()
   }
 
   def allErrors = {
-    views.frontend.html.celebrity_storefront_checkout(
-      form=allErrorsCheckoutForm,
-      summary=defaultOrderSummary,
-      paymentPublicKey=testStripeKey
-    )
+    render(form=allErrorsCheckoutForm)
   }
 
   def noShipping = {
-    views.frontend.html.celebrity_storefront_checkout(
-      form=defaultCheckoutForm.copy(shipping=None),
-      summary=defaultOrderSummary,
-      paymentPublicKey=testStripeKey
-    )
+    render(form=defaultCheckoutForm.copy(shipping=None))
   }
 
+  //
+  // Private members
+  //
   private def defaultOrderSummary = {
     CheckoutOrderSummary(
       celebrityName="{celebrity name}",
@@ -104,6 +97,20 @@ object Checkout extends Controller
 
   val testStripeKey = {
     "pk_qIGUDirehUxj2GTFwgeRBkOfHIWdX"
+  }
+
+  private def render(
+    form: CheckoutFormView=defaultCheckoutForm,
+    summary: CheckoutOrderSummary=defaultOrderSummary,
+    paymentJsModule: String="yes-maam",
+    paymentPublicKey: String=testStripeKey
+  ) = {
+    views.frontend.html.celebrity_storefront_checkout(
+      form=form,
+      summary=summary,
+      paymentJsModule=paymentJsModule,
+      paymentPublicKey=testStripeKey
+    )
   }
 }
 
