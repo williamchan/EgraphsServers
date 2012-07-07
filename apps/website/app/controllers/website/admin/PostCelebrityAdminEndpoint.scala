@@ -11,8 +11,8 @@ import play.data.validation.Validation.ValidationResult
 import services.blobs.Blobs.Conversions._
 import java.io.File
 import services.{ImageUtil, Utils}
-import org.apache.commons.mail.SimpleEmail
 import services.http.{POSTControllerMethod, AdminRequestFilters}
+import org.apache.commons.mail.HtmlEmail
 
 trait PostCelebrityAdminEndpoint {
   this: Controller =>
@@ -153,7 +153,7 @@ trait PostCelebrityAdminEndpoint {
             passwordValidationOrAccount.right.get.copy(celebrityId = Some(savedCelebrity.id)).save()
 
             // Send the order email
-            val email = new SimpleEmail()
+            val email = new HtmlEmail()
             email.setFrom("noreply@egraphs.com", "Egraphs")
             email.addTo(celebrityEmail, publicName)
             email.setSubject("Egraphs Celebrity Account Created")

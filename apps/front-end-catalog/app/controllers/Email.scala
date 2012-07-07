@@ -8,6 +8,9 @@ import play.mvc.Controller
 object Email extends Controller {
 
   def index = {
+    val emailLogoSrc = "../public/images/email-logo.jpg"
+    val emailFacebookSrc = "../public/images/email-facebook.jpg"
+    val emailTwitterSrc = "../public/images/email-twitter.jpg"
     views.frontend.html.email_order_confirmation(
       buyerName = "Joshua Johnson",
       recipientName = "Carlos Pena",
@@ -17,19 +20,38 @@ object Email extends Controller {
       orderDate = "June 12, 2012",
       orderId = "2387354",
       pricePaid = "$50.00",
-      deliveredyDate = "June 19, 2012"
+      deliveredyDate = "June 19, 2012",
+      emailLogoSrc = emailLogoSrc,
+      emailFacebookSrc = emailFacebookSrc,
+      emailTwitterSrc = emailTwitterSrc
     )
   }
 
   def verify = {
-    views.frontend.html.email_account_verification("http://www.egraphs.com/word")
+    val emailLogoSrc = "../public/images/email-logo.jpg"
+    val emailFacebookSrc = "../public/images/email-facebook.jpg"
+    val emailTwitterSrc = "../public/images/email-twitter.jpg"
+    views.frontend.html.email_account_verification(
+      "http://www.egraphs.com/word",
+      emailLogoSrc = emailLogoSrc,
+      emailFacebookSrc = emailFacebookSrc,
+      emailTwitterSrc = emailTwitterSrc
+    )
   }
 
   def view_egraph = {
+    val emailLogoSrc = "../public/images/email-logo.jpg"
+    val emailFacebookSrc = "../public/images/email-facebook.jpg"
+    val emailTwitterSrc = "../public/images/email-twitter.jpg"
+    val emailViewEgraphSrc = "../public/images/email-btn-view-egraph.jpg"
     views.frontend.html.email_view_egraph(
       viewEgraphUrl = "https://www.egraphs.com/gallery/carlosdiaz/davidortiz1",
       celebrityName = "Big Papi",
-      recipientName = "Carlos Pena"
+      recipientName = "Carlos Pena",
+      emailLogoSrc = emailLogoSrc,
+      emailFacebookSrc = emailFacebookSrc,
+      emailTwitterSrc = emailTwitterSrc,
+      emailViewEgraphSrc = emailViewEgraphSrc
     )
   }
 }

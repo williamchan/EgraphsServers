@@ -12,6 +12,7 @@ import services.mail.Mail
 import services.http.PlayConfig
 import java.util.Properties
 import controllers.website.GetResetPasswordEndpoint
+import play.Play
 
 /** Services used by each instance of Customer */
 case class CustomerServices @Inject() (accountStore: AccountStore,
@@ -101,11 +102,17 @@ case class Customer(
     email.addReplyTo("noreply@egraphs.com")
     email.addTo(account.email)
     email.setSubject("Welcome to Egraphs!")
-    email.setMsg(
-      views.frontend.html.email_account_verification(
-        verifyPasswordUrl = GetResetPasswordEndpoint.absoluteUrl(account.email, account.resetPasswordKey.get).url
-      ).toString().trim()
+    val emailLogoSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-logo.jpg"))
+    val emailFacebookSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-facebook.jpg"))
+    val emailTwitterSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-twitter.jpg"))
+    val html = views.frontend.html.email_account_verification(
+      verifyPasswordUrl = GetResetPasswordEndpoint.absoluteUrl(account.email, account.resetPasswordKey.get).url,
+      emailLogoSrc = emailLogoSrc,
+      emailFacebookSrc = emailFacebookSrc,
+      emailTwitterSrc = emailTwitterSrc
     )
+    email.setHtmlMsg(html.toString())
+    email.setTextMsg("Welcome to Egraphs! Please verify your email.")
     services.mail.send(email)
   }
 

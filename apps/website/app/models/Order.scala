@@ -19,6 +19,7 @@ import scala.util.Random
 import java.util.Date
 import com.google.inject.Inject
 import java.text.SimpleDateFormat
+import play.Play
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -172,12 +173,20 @@ case class Order(
 
     email.addReplyTo("noreply@egraphs.com")
     email.setSubject("I just finished signing your Egraph")
-    email.setMsg(
-      views.frontend.html.email_view_egraph(viewEgraphUrl = Utils.lookupAbsoluteUrl("WebsiteControllers.getEgraph", Map("orderId" -> id.toString)).url,
-        celebrityName = celebrity.publicName.getOrElse("Egraphs"), // make publicName a String instead of a Option[String]
-        recipientName = receivingCustomer.name
-      ).toString().trim()
+    val emailLogoSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-logo.jpg"))
+    val emailFacebookSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-facebook.jpg"))
+    val emailTwitterSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-twitter.jpg"))
+    val emailViewEgraphSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-btn-view-egraph.jpg"))
+    val html = views.frontend.html.email_view_egraph(viewEgraphUrl = Utils.lookupAbsoluteUrl("WebsiteControllers.getEgraph", Map("orderId" -> id.toString)).url,
+      celebrityName = celebrity.publicName.getOrElse("Egraphs"), // make publicName a String instead of a Option[String]
+      recipientName = receivingCustomer.name,
+      emailLogoSrc = emailLogoSrc,
+      emailFacebookSrc = emailFacebookSrc,
+      emailTwitterSrc = emailTwitterSrc,
+      emailViewEgraphSrc = emailViewEgraphSrc
     )
+    email.setHtmlMsg(html.toString())
+    email.setTextMsg("I just finished putting the final touches on my egraph to you.")
     email
   }
   /**

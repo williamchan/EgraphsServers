@@ -6,7 +6,11 @@
   orderDate: String,
   orderId: String,
   pricePaid: String,
-  deliveredyDate: String)
+  deliveredyDate: String,
+  emailLogoSrc: String,
+  emailFacebookSrc: String,
+  emailTwitterSrc: String
+)
 
 @import views.frontend.tags
 
@@ -19,15 +23,15 @@
 			<tr>
 				<td align="middle">
 					<table cellpadding="0" cellspacing="0" width="600px" align="middle" bgcolor="#fafafa" background='@asset("public/images/email-bg-main.jpg")' style="width: 600px; margin: 0 auto; background: #fafafa url('@asset("public/images/email-bg-main.jpg")') repeat-y 50% 0;">
-						<tr>
-							<td><img border="0" src='@asset("public/images/email-shim.gif")' width="520" height="40" /></td>
-						</tr>
+						<!--<tr>-->
+							<!--<td><img border="0" src='@asset("public/images/email-shim.gif")' width="520" height="40" /></td>-->
+						<!--</tr>-->
 						<tr>
 							<td align="middle">
 								<table cellpadding="0" cellspacing="0" width="520px" style="width: 520px;">
 									<tr>
 										<td align="left" valign="top">
-											@tags.email.html.email_header()
+											@tags.email.html.email_header(emailLogoSrc, emailFacebookSrc, emailTwitterSrc)
 
 											<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 32px; line-height: 40px; color: #444444; text-shadow: 0 1px 0 #ffffff; text-align: left; margin-top: 0; margin-bottom: 0;">
                         Order Confirmation
@@ -40,9 +44,9 @@
                       </p>
 											<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
                         Thank you so much for purchasing an Egraph. Please find your order summary information below. A detailed summary of your order is also at
-                        <a style="color: #ff5124; text-decoration: none; border: none; outline: none;" href="mailto:support@@egraphs.com">support@@egraphs.com</a>.
+                        <a style="color: #ff5124; text-decoration: none; border: none; outline: none;" href="https://www.egraphs.com">www.egraphs.com</a>.
                       </p>
-											<img border="0" src='@asset("public/images/email-rule-content.gif")' width="520" height="42" />
+											<!--<img border="0" src='@asset("public/images/email-rule-content.gif")' width="520" height="42" />-->
 											<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px; line-height: 22px; font-weight: bold; color: #444444; text-shadow: 0 1px 0 #ffffff; text-align: left; margin-top: 0; margin-bottom: 10px;">
                         ORDER DETAILS
                       </p>
@@ -156,7 +160,7 @@
 												  </td>
 												</tr>
 											</table>
-											<img border="0" src='@asset("public/images/email-rule-content.gif")' width="520" height="42" />
+											<!--<img border="0" src='@asset("public/images/email-rule-content.gif")' width="520" height="42" />-->
 											<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; font-weight: normal; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">Thank you,<br />
                         The Egraphs Team
                       </p>
@@ -165,9 +169,9 @@
 								</table>
 							</td>
 						</tr>
-						<tr>
-							<td><img border="0" src='@asset("public/images/email-shim.gif")' width="520" height="40" /></td>
-						</tr>
+						<!--<tr>-->
+							<!--<td><img border="0" src='@asset("public/images/email-shim.gif")' width="520" height="40" /></td>-->
+						<!--</tr>-->
 					</table>
           @tags.email.html.email_footer()
 				</td>

@@ -2,13 +2,12 @@ package controllers.website
 
 import play.mvc.Controller
 import play.data.validation._
-import org.apache.commons.mail.SimpleEmail
 import models._
 import enums.OrderReviewStatus
 import play.mvc.Scope.Flash
 import services.mail.Mail
 import services.{Utils, AppConfig}
-import play.Logger
+import play.{Play, Logger}
 import controllers.WebsiteControllers
 import services.payment.{Charge, Payment}
 import scala.Predef._
@@ -19,6 +18,7 @@ import exception.InsufficientInventoryException
 import play.mvc.results.Redirect
 import services.http.{ServerSessionFactory, POSTControllerMethod, CelebrityAccountRequestFilters}
 import java.text.SimpleDateFormat
+import org.apache.commons.mail.HtmlEmail
 
 trait PostBuyProductEndpoint { this: Controller =>
   import PostBuyProductEndpoint.EgraphPurchaseHandler
@@ -243,24 +243,29 @@ object PostBuyProductEndpoint extends Logging {
                                          order: Order,
                                          mail: Mail) {
     import services.Finance.TypeConversions._
-
-    val email = new SimpleEmail()
+    val email = new HtmlEmail()
     email.setFrom("noreply@egraphs.com", "Egraphs")
     email.addTo(buyerEmail, buyerName)
     email.setSubject("Order Confirmation")
-    email.setMsg(
-      views.frontend.html.email_order_confirmation(
-        buyerName = buyerName,
-        recipientName = recipientName,
-        recipientEmail = recipientEmail,
-        celebrityName = celebrity.publicName.get,
-        productName = product.name,
-        orderDate = dateFormat.format(order.created),
-        orderId = order.id.toString,
-        pricePaid = order.amountPaid.formatSimply,
-        deliveredyDate = dateFormat.format(order.expectedDate.get) // all new Orders have expectedDate... will turn this into Date instead of Option[Date]
-      ).toString().trim()
+    val emailLogoSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-logo.jpg"))
+    val emailFacebookSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-facebook.jpg"))
+    val emailTwitterSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-twitter.jpg"))
+    val html = views.frontend.html.email_order_confirmation(
+      buyerName = buyerName,
+      recipientName = recipientName,
+      recipientEmail = recipientEmail,
+      celebrityName = celebrity.publicName.get,
+      productName = product.name,
+      orderDate = dateFormat.format(order.created),
+      orderId = order.id.toString,
+      pricePaid = order.amountPaid.formatSimply,
+      deliveredyDate = dateFormat.format(order.expectedDate.get), // all new Orders have expectedDate... will turn this into Date instead of Option[Date]
+      emailLogoSrc = emailLogoSrc,
+      emailFacebookSrc = emailFacebookSrc,
+      emailTwitterSrc = emailTwitterSrc
     )
+    email.setHtmlMsg(html.toString())
+    email.setTextMsg("Thank you so much for purchasing an Egraph. Please find your order summary information below.")
     mail.send(email)
   }
 }

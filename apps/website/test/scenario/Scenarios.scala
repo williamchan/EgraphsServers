@@ -2,7 +2,7 @@ package scenario
 
 import services.db.Schema
 import services.blobs.Blobs
-import org.apache.commons.mail.SimpleEmail
+import org.apache.commons.mail.HtmlEmail
 import play.mvc.results.Redirect
 import Blobs.Conversions._
 import utils.{TestConstants, TestData}
@@ -11,7 +11,7 @@ import models._
 import controllers.WebsiteControllers
 import controllers.website.PostBuyProductEndpoint.EgraphPurchaseHandler
 import enums.{EgraphState, EnrollmentStatus, PublishedStatus}
-import play.libs.{Codec, Mail}
+import play.libs.Codec
 import services.payment.Payment
 import play.Play
 import services.{Utils, AppConfig}
@@ -46,25 +46,89 @@ class Scenarios extends DeclaresScenarios {
   private lazy val today = DateTime.now().toLocalDate.toDate
   private lazy val future = dateFormat.parse("2020-01-01")
   //TODO sbilstein this page really needs some refactoring
+
   toScenarios add Scenario(
-    "Send an email to erem@egraphs.com",
-
+    "Send account confirmation email to will@egraphs.com",
     apiCategory,
-
-    """Sends an email to erem@egraphs.com using the configured SMTP server""",
-
+    """Sends account confirmation email to will@egraphs.com using the configured SMTP server""",
     {() =>
-      val email = new SimpleEmail()
-
-      email.setMailSession(Mail.getSession)
-      email.setFrom("ehboto@gmail.com")
-      email.setSubject("Hi")
-      email.setMsg("This is a test mail ... :-)")
-      email.addTo("erem@egraphs.com", "Erem Boto")
-
+      val email = new HtmlEmail()
+      email.setFrom("noreply@egraphs.com")
+      email.addReplyTo("noreply@egraphs.com")
+      email.addTo("will@egraphs.com")
+      email.setSubject("Welcome to Egraphs!")
+      val emailLogoSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-logo.jpg"))
+      val emailFacebookSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-facebook.jpg"))
+      val emailTwitterSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-twitter.jpg"))
+      val html = views.frontend.html.email_account_verification(
+        verifyPasswordUrl = "https://www.google.com",
+        emailLogoSrc = emailLogoSrc,
+        emailFacebookSrc = emailFacebookSrc,
+        emailTwitterSrc = emailTwitterSrc
+      )
+      email.setHtmlMsg(html.toString())
+      email.setTextMsg("Welcome to Egraphs! Please verify your email.")
       mail.send(email)
     }
+  )
 
+  toScenarios add Scenario(
+  "Send order confirmation email to will@egraphs.com",
+  apiCategory,
+  """Sends order confirmation email to will@egraphs.com using the configured SMTP server""",
+  {() =>
+    val email = new HtmlEmail()
+    email.setFrom("noreply@egraphs.com", "Egraphs")
+    email.addTo("will@egraphs.com", "Will Chan")
+    email.setSubject("Order Confirmation")
+    val emailLogoSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-logo.jpg"))
+    val emailFacebookSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-facebook.jpg"))
+    val emailTwitterSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-twitter.jpg"))
+    val html = views.frontend.html.email_order_confirmation(
+      buyerName = "Will Chan",
+      recipientName = "Andrew Smith",
+      recipientEmail = "me@egraphs.com",
+      celebrityName = "Celebrity Joe",
+      productName = "Product 1",
+      orderDate = "Jan 1, 2012",
+      orderId = "1234",
+      pricePaid = "$50.00",
+      deliveredyDate = "Jan 8, 2012",
+      emailLogoSrc = emailLogoSrc,
+      emailFacebookSrc = emailFacebookSrc,
+      emailTwitterSrc = emailTwitterSrc
+    )
+    email.setHtmlMsg(html.toString())
+    email.setTextMsg("Thank you so much for purchasing an Egraph. Please find your order summary information below.")
+    mail.send(email)
+  }
+  )
+
+  toScenarios add Scenario(
+  "Send egraph fulfilled email to will@egraphs.com",
+  apiCategory,
+  """Sends egraph fulfilled email to will@egraphs.com using the configured SMTP server""",
+  {() =>
+    val email = new HtmlEmail()
+    email.setFrom("celebrity@egraphs.com", "Celebrity Jane")
+    email.addTo("will@egraphs.com", "Will Chan")
+    email.addReplyTo("noreply@egraphs.com")
+    email.setSubject("I just finished signing your Egraph")
+    val emailLogoSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-logo.jpg"))
+    val emailFacebookSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-facebook.jpg"))
+    val emailTwitterSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-twitter.jpg"))
+    val emailViewEgraphSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-btn-view-egraph.jpg"))
+    val html = views.frontend.html.email_view_egraph(viewEgraphUrl = "http://www.google.com",
+      celebrityName = "Celebrity Jane",
+      recipientName = "Will Chan",
+      emailLogoSrc = emailLogoSrc,
+      emailFacebookSrc = emailFacebookSrc,
+      emailTwitterSrc = emailTwitterSrc,
+      emailViewEgraphSrc = emailViewEgraphSrc
+    )
+    email.setHtmlMsg(html.toString())
+    mail.send(email)
+  }
   )
 
   toScenarios add Scenario(

@@ -1,4 +1,11 @@
-@(viewEgraphUrl: String, celebrityName: String, recipientName: String)
+@(viewEgraphUrl: String,
+  celebrityName: String,
+  recipientName: String,
+  emailLogoSrc: String,
+  emailFacebookSrc: String,
+  emailTwitterSrc: String,
+  emailViewEgraphSrc: String
+)
 
 @import views.frontend.tags
 
@@ -10,15 +17,15 @@
 		<table cellpadding="0" cellspacing="0" width="100%" bgcolor="#f0f0f0" style="width: 100%; background: #f0f0f0;">
 				<td align="middle">
 					<table cellpadding="0" cellspacing="0" width="600px" align="middle" bgcolor="#fafafa" background='@asset("public/images/email-bg-main.jpg")' style="width: 600px; margin: 0 auto; background: #fafafa url('@asset("public/images/email-bg-main.jpg")') repeat-y 50% 0;">
-						<tr>
-							<td><img border="0" src='@asset("public/images/email-shim.gif")' width="520" height="40" /></td>
-						</tr>
+						<!--<tr>-->
+							<!--<td><img border="0" src='@asset("public/images/email-shim.gif")' width="520" height="40" /></td>-->
+						<!--</tr>-->
 						<tr>
 							<td align="middle">
 								<table cellpadding="0" cellspacing="0" width="520px" style="width: 520px;">
 									<tr>
 										<td align="left" valign="top">
-                      @tags.email.html.email_header()
+                      @tags.email.html.email_header(emailLogoSrc, emailFacebookSrc, emailTwitterSrc)
 
 											<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
                         Hi @recipientName,
@@ -55,7 +62,7 @@
 											
 											<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
                         <a style="color: #ff5124; text-decoration: none; border: none; outline: none;" href="@viewEgraphUrl" title="View your Egraph">
-                          <img border="0" src='@asset("public/images/email-btn-view-egraph.jpg")' alt="View your Egraph" width="156" height="35" />
+                          <img border="0" src="@emailViewEgraphSrc" alt="View your Egraph" width="156" height="35" />
                         </a>
                       </p>
 										</td>
@@ -63,9 +70,9 @@
 								</table>
 							</td>
 						</tr>
-						<tr>
-							<td><img border="0" src='@asset("public/images/email-shim.gif")' width="520" height="40" /></td>
-						</tr>
+						<!--<tr>-->
+							<!--<td><img border="0" src='@asset("public/images/email-shim.gif")' width="520" height="40" /></td>-->
+						<!--</tr>-->
 					</table>
           @tags.email.html.email_footer()
 				</td>
