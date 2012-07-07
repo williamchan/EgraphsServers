@@ -107,8 +107,8 @@ POST    ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/finalize    
 ##
 
 # customer accounts stubs
-GET     /about                                           WebsiteControllers.getAbout
-GET     /inside                                          WebsiteControllers.getInsideEgraph
+GET     /about/?                                         WebsiteControllers.getAbout
+GET     /inside-an-egraph/?                              WebsiteControllers.getInsideEgraph
 GET     /register/?                                      WebsiteControllers.getRegister
 POST    /register                                        WebsiteControllers.postRegister
 GET     /login/?                                         WebsiteControllers.getLogin

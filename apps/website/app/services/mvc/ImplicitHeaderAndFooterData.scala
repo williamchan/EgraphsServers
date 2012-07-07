@@ -28,7 +28,7 @@ trait ImplicitHeaderAndFooterData {
     // TODO(erem): After integrating static pages then replace these hard links with
     // relative ones.
     FooterData(
-      "/about-us",
+      "/about",
       "/faq",
       "/terms-of-use",
       "/privacy-policy",
