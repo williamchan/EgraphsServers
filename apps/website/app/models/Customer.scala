@@ -2,9 +2,8 @@ package models
 
 import enums.OrderReviewStatus
 import java.sql.Timestamp
-import services.Time
+import services.{Utils, Time, AppConfig}
 import services.db.{KeyedCaseClass, Schema, Saves}
-import services.AppConfig
 import com.google.inject.{Provider, Inject}
 import exception.InsufficientInventoryException
 import org.apache.commons.mail.HtmlEmail
@@ -97,26 +96,24 @@ case class Customer(
    * Sends a welcome email to the customer. Requires a dbSession so that this customer can get its Account.
    */
   def sendNewCustomerEmail() {
-    // TODO(wchan): emails, stupid stupid emails
-    /*
     val email = new HtmlEmail()
     email.setFrom("noreply@egraphs.com")
     email.addReplyTo("noreply@egraphs.com")
     email.addTo(account.email)
     email.setSubject("Welcome to Egraphs!")
-    val emailLogoSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-logo.jpg"))
-    val emailFacebookSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-facebook.jpg"))
-    val emailTwitterSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-twitter.jpg"))
+    val emailLogoSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-logo.jpg")))
+    val emailFacebookSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-facebook.jpg")))
+    val emailTwitterSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-twitter.jpg")))
+    val verifyPasswordUrl = GetResetPasswordEndpoint.absoluteUrl(account.email, account.resetPasswordKey.get).url
     val html = views.frontend.html.email_account_verification(
-      verifyPasswordUrl = GetResetPasswordEndpoint.absoluteUrl(account.email, account.resetPasswordKey.get).url,
+      verifyPasswordUrl = verifyPasswordUrl,
       emailLogoSrc = emailLogoSrc,
       emailFacebookSrc = emailFacebookSrc,
       emailTwitterSrc = emailTwitterSrc
     )
     email.setHtmlMsg(html.toString())
-    email.setTextMsg("Welcome to Egraphs! Please verify your email.")
+    email.setTextMsg(views.frontend.html.email_account_verification_text(verifyPasswordUrl).toString())
     services.mail.send(email)
-    */
   }
 
   //

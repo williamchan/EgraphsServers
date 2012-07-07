@@ -11,7 +11,6 @@ import blobs.AccessPolicy
 import com.google.inject._
 import mail.Mail
 import payment.{Charge, Payment}
-import play.mvc.Router.ActionDefinition
 import org.squeryl.Query
 import models.CashTransaction.{PurchaseRefund, EgraphPurchase}
 import org.apache.commons.mail.{Email, HtmlEmail}
@@ -155,11 +154,8 @@ case class Order(
   }
 
   def sendEgraphSignedMail() {
-    // TODO(wchan): emails, stupid stupid emails
-    /*
     val email = prepareEgraphsSignedEmail()
     services.mail.send(email)
-    */
   }
 
   protected[models] def prepareEgraphsSignedEmail(): Email = {
@@ -176,20 +172,20 @@ case class Order(
 
     email.addReplyTo("noreply@egraphs.com")
     email.setSubject("I just finished signing your Egraph")
-    val emailLogoSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-logo.jpg"))
-    val emailFacebookSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-facebook.jpg"))
-    val emailTwitterSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-twitter.jpg"))
-    val emailViewEgraphSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-btn-view-egraph.jpg"))
-    val html = views.frontend.html.email_view_egraph(viewEgraphUrl = Utils.lookupAbsoluteUrl("WebsiteControllers.getEgraph", Map("orderId" -> id.toString)).url,
+    val emailLogoSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-logo.jpg")))
+    val emailFacebookSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-facebook.jpg")))
+    val emailTwitterSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-twitter.jpg")))
+    val viewEgraphUrl = Utils.lookupAbsoluteUrl("WebsiteControllers.getEgraph", Map("orderId" -> id.toString)).url
+    val html = views.frontend.html.email_view_egraph(
+      viewEgraphUrl = viewEgraphUrl,
       celebrityName = celebrity.publicName.getOrElse("Egraphs"), // make publicName a String instead of a Option[String]
       recipientName = receivingCustomer.name,
       emailLogoSrc = emailLogoSrc,
       emailFacebookSrc = emailFacebookSrc,
-      emailTwitterSrc = emailTwitterSrc,
-      emailViewEgraphSrc = emailViewEgraphSrc
+      emailTwitterSrc = emailTwitterSrc
     )
     email.setHtmlMsg(html.toString())
-    email.setTextMsg("I just finished putting the final touches on my egraph to you.")
+    email.setTextMsg(views.frontend.html.email_view_egraph_text(viewEgraphUrl = viewEgraphUrl, celebrityName = celebrity.publicName.getOrElse("Egraphs"), recipientName = receivingCustomer.name).toString())
     email
   }
   /**

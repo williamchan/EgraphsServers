@@ -242,16 +242,14 @@ object PostBuyProductEndpoint extends Logging {
                                          product: Product,
                                          order: Order,
                                          mail: Mail) {
-    // TODO(wchan): emails, stupid stupid emails
-    /*
     import services.Finance.TypeConversions._
     val email = new HtmlEmail()
     email.setFrom("noreply@egraphs.com", "Egraphs")
     email.addTo(buyerEmail, buyerName)
     email.setSubject("Order Confirmation")
-    val emailLogoSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-logo.jpg"))
-    val emailFacebookSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-facebook.jpg"))
-    val emailTwitterSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-twitter.jpg"))
+    val emailLogoSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-logo.jpg")))
+    val emailFacebookSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-facebook.jpg")))
+    val emailTwitterSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-twitter.jpg")))
     val html = views.frontend.html.email_order_confirmation(
       buyerName = buyerName,
       recipientName = recipientName,
@@ -267,8 +265,17 @@ object PostBuyProductEndpoint extends Logging {
       emailTwitterSrc = emailTwitterSrc
     )
     email.setHtmlMsg(html.toString())
-    email.setTextMsg("Thank you so much for purchasing an Egraph. Please find your order summary information below.")
+    email.setTextMsg(views.frontend.html.email_order_confirmation_text(
+      buyerName = buyerName,
+      recipientName = recipientName,
+      recipientEmail = recipientEmail,
+      celebrityName = celebrity.publicName.get,
+      productName = product.name,
+      orderDate = dateFormat.format(order.created),
+      orderId = order.id.toString,
+      pricePaid = order.amountPaid.formatSimply,
+      deliveredyDate = dateFormat.format(order.expectedDate.get)
+    ).toString())
     mail.send(email)
-    */
   }
 }
