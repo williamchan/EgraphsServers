@@ -4,6 +4,7 @@ import com.google.inject.Inject
 import models.{BlobKey, BlobKeyStore}
 import services.logging.Logging
 import services.Utils
+import org.jclouds.blobstore.domain.Blob
 
 /**
  * BlobVendor implementation that caches key urls in the database to avoid expensive
@@ -16,7 +17,10 @@ class DBIndexedBlobVendor @Inject()(blobKeyStore: BlobKeyStore, protected val bl
   extends FileSystemBlobVendor
   with BlobVendorComposition
 {
-  import DBIndexedBlobVendor._
+
+  override def get(namespace: String, key: String): Option[Blob] = {
+    blobVendorDelegate.get(namespace, key)
+  }
 
   override def put(namespace: String, key: String, data: Array[Byte], access: AccessPolicy) {
     blobVendorDelegate.put(namespace, key, data, access)

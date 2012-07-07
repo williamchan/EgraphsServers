@@ -37,7 +37,7 @@ class Blobs @Inject() (blobProvider: BlobVendor) extends Logging {
    * Retrieve the Blob at a given key.
    */
   def get(key: String): Option[Blob] = {
-    Option(blobStore.getBlob(blobstoreNamespace, key))
+    blobProvider.get(blobstoreNamespace, key)
   }
 
   /**
@@ -78,6 +78,8 @@ class Blobs @Inject() (blobProvider: BlobVendor) extends Logging {
 
   /** Delete the data at a certain key. */
   def delete(key: String) {
+    // wchan: We don't need a delete method... Hopefully, we don't ever have to delete assets. But if we do, this method
+    // should use blobProvider and not blobStore directly.
     blobStore.removeBlob(blobstoreNamespace, key)
   }
 

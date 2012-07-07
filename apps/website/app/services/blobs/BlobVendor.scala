@@ -16,6 +16,10 @@ private[blobs] trait BlobVendor {
    */
   def checkConfiguration()
 
+  def get(namespace: String, key: String): Option[Blob] = {
+    Option(blobStore.getBlob(namespace, key))
+  }
+
   /**
    * Puts an object into a key with a particular namespace.
    *

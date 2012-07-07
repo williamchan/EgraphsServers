@@ -1,5 +1,7 @@
 package services.blobs
 
+import org.jclouds.blobstore.domain.Blob
+
 /**
  * Class that enables easy composition of BlobVendors.
  *
@@ -18,6 +20,10 @@ private[blobs] trait BlobVendorComposition extends BlobVendor {
    */
   protected def blobVendorDelegate: BlobVendor
 
+  override def get(namespace: String, key: String): Option[Blob] = {
+    blobVendorDelegate.get(namespace, key)
+  }
+
   def put(namespace: String, key: String, data: Array[Byte], access: AccessPolicy) {
     blobVendorDelegate.put(namespace, key, data, access)
   }
@@ -26,7 +32,7 @@ private[blobs] trait BlobVendorComposition extends BlobVendor {
     blobVendorDelegate.exists(namespace, key)
   }
 
-  override def urlOption(namespace: String, key: String) = {
+  def urlOption(namespace: String, key: String) = {
     blobVendorDelegate.urlOption(namespace, key)
   }
 }
