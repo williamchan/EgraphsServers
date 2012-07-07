@@ -17,7 +17,7 @@ import services.db.{DBSession, TransactionSerializable}
 import services.logging.Logging
 import exception.InsufficientInventoryException
 import play.mvc.results.Redirect
-import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters}
+import services.http.{ServerSessionFactory, POSTControllerMethod, CelebrityAccountRequestFilters}
 import java.text.SimpleDateFormat
 
 trait PostBuyProductEndpoint { this: Controller =>
@@ -111,22 +111,25 @@ object PostBuyProductEndpoint extends Logging {
    * objects. Having it as a separate case class makes it more testable.
    */
   // TODO(erem): Refactor this class to be injected
-  case class EgraphPurchaseHandler(recipientName: String,
-                                   recipientEmail: String,
-                                   buyerName: String,
-                                   buyerEmail: String,
-                                   stripeTokenId: String,
-                                   desiredText: Option[String],
-                                   personalNote: Option[String],
-                                   celebrity: Celebrity,
-                                   product: Product,
-                                   flash: Flash = Flash.current(),
-                                   mail: Mail = AppConfig.instance[Mail],
-                                   customerStore: CustomerStore = AppConfig.instance[CustomerStore],
-                                   accountStore: AccountStore = AppConfig.instance[AccountStore],
-                                   dbSession: DBSession = AppConfig.instance[DBSession],
-                                   payment: Payment = AppConfig.instance[Payment],
-                                   isDemo: Boolean = false) {
+  case class EgraphPurchaseHandler(
+    recipientName: String,
+    recipientEmail: String,
+    buyerName: String,
+    buyerEmail: String,
+    stripeTokenId: String,
+    desiredText: Option[String],
+    personalNote: Option[String],
+    celebrity: Celebrity,
+    product: Product,
+    flash: Flash = Flash.current(),
+    mail: Mail = AppConfig.instance[Mail],
+    customerStore: CustomerStore = AppConfig.instance[CustomerStore],
+    accountStore: AccountStore = AppConfig.instance[AccountStore],
+    dbSession: DBSession = AppConfig.instance[DBSession],
+    payment: Payment = AppConfig.instance[Payment],
+    serverSessions: ServerSessionFactory = AppConfig.instance[ServerSessionFactory],
+    isDemo: Boolean = false
+  ) {
     def execute(): Any = {
 
       val purchaseData: String = Serializer.SJSON.toJSON(Map(
@@ -179,7 +182,9 @@ object PostBuyProductEndpoint extends Logging {
       sendOrderConfirmationEmail(buyerName = buyerName, buyerEmail = buyerEmail, recipientName = recipientName, recipientEmail = recipientEmail, celebrity, product, order, mail)
       flash.put("orderId", order.id)
 
-      // Redirect
+      // Clear out the shopping cart and redirect
+      serverSessions.celebrityStorefrontCart(celebrity.id).emptied.save()
+
       import WebsiteControllers.{reverse, getOrderConfirmation}
 
       new Redirect(reverse(getOrderConfirmation(order.id)).url)
