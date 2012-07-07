@@ -16,6 +16,17 @@ object Landing extends Controller with DefaultHeaderAndFooterData {
     views.frontend.html.landing(sampleStars.slice(0, count))
   }
 
+  def single_celebrity(publicName: String = "David Price",
+                       casualName: String = "David",
+                       isMale: Boolean = true) = {
+    views.frontend.html.celebrity_landing(
+      celebrityPublicName = publicName,
+      celebrityCasualName = casualName,
+      /*landingPageImageUrl: String, */
+      celebrityIsMale = isMale
+    )
+  }
+
   private def makeSampleStar(name: String, secondaryText: Option[String]): FeaturedStar = {
     import play.templates.JavaExtensions.slugify
 

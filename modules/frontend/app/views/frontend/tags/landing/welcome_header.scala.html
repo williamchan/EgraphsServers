@@ -1,0 +1,27 @@
+@(celebrityPublicName: Option[String] = None, celebrityIsMale: Boolean = true)
+
+<header id="landing-welcome" class="row">
+
+  <div class="span6">
+
+    <h1>With Egraphs you can.</h1>
+
+    <p>
+      An egraph is a direct line between you and
+      @celebrityPublicName.getOrElse("your favorite star"). Cut
+      through the red tape and tell @celebrityPublicName.getOrElse("your star")
+      whatever you want. @views.frontend.Utils.heOrShe(celebrityIsMale, true)'ll
+      talk back to you. Your moment with @views.frontend.Utils.himOrHer(celebrityIsMale)
+      gets frozen in time through an egraph. Share it on your Facebook
+      wall. Hang it on your bedroom wall. Do whatever you want
+      <em>&ndash; it’s your egraph.</em>
+    </p>
+  </div>
+
+  <div class="span5 offset1">
+
+    <img src='/public/images/intro-egraph.jpg' alt="intro-egraph">
+
+  </div>
+
+</header> <!-- end #landing-welcome -->
