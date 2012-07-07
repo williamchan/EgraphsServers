@@ -27,6 +27,10 @@ object Checkout extends Controller
     render(form=defaultCheckoutForm.copy(shipping=None))
   }
 
+  def stripePayment = {
+    render(paymentJsModule = "stripe-payment")
+  }
+
   //
   // Private members
   //
@@ -102,7 +106,7 @@ object Checkout extends Controller
   private def render(
     form: CheckoutFormView=defaultCheckoutForm,
     summary: CheckoutOrderSummary=defaultOrderSummary,
-    paymentJsModule: String="yes-maam",
+    paymentJsModule: String="yes-maam-payment",
     paymentPublicKey: String=testStripeKey
   ) = {
     views.frontend.html.celebrity_storefront_checkout(

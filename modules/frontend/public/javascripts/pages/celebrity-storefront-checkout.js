@@ -61,7 +61,7 @@ function(forms, payment, Egraphs) {
      * @param errorMessage message to put into the error field
      */
     var setFieldError = function($inputDiv, isError, errorMessage) {
-      $fieldErrorDiv = $inputDiv.find(".alert-error");
+      var $fieldErrorDiv = $inputDiv.find(".alert-error");
       if (isError) {
         $inputDiv.addClass("error");
         $fieldErrorDiv.removeClass("hidden");
@@ -98,12 +98,12 @@ function(forms, payment, Egraphs) {
      * @return {target: (some input div, such as $card), message: (some error message string)}
      */
     var targetAndMessageForError = function(error) {
-      var paramTarget = errorParameterToDomElement[error.param];
+      var paramTarget = errorParameterToDomElement[error.param] || defaultErrorParameterDomElement;
       var message = errorCodeToMessage[error.code];
 
       return {
-        target: paramTarget.element || $generalErrorsInputDiv(),
-        message: message || paramTarget.defaultMessage || "Unknown error processing payments"
+        target: paramTarget.element,
+        message: message || paramTarget.defaultMessage
       };
     };
 
@@ -116,8 +116,7 @@ function(forms, payment, Egraphs) {
       "invalid_cvc": "Invalid CVC",
       "expired_card": "This card is expired",
       "incorrect_cvc": "Security code not accepted",
-      "card_declined": "This card was declined",
-      "processing_error": "There was an issue with our payment processor. Isn't it worth another shot?"
+      "card_declined": "This card was declined"
     };
 
     /**
@@ -130,6 +129,11 @@ function(forms, payment, Egraphs) {
       "cvc": {element:$cvc, defaultMessage: "Invalid CVC"},
       "number": {element: $card, defaultMessage: "Invalid card number"}
     };
+    var defaultErrorParameterDomElement = {
+      element: $generalErrorsInputDiv(),
+      defaultMessage: "There was an issue with our payment processor. Isn't it worth another shot?"
+    };
+
 
     /**
      * Binds the controller onto handlers in the dom and on its services.
