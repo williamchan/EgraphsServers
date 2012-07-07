@@ -7,7 +7,8 @@ import play.cache.EhCacheImpl
 import services.http.{PlayId, DeploymentTarget, HostInfo}
 
 /**
- * Yields the configured [[services.cache.Cache]] implementation.
+ * Yields the configured [[services.cache.Cache]] implementation. See the documentation for
+ * that class for information on how to use our cacheing layer.
  *
  * Implementation selection is governed by the play configuration "application.cache"
  * property. Valid values:
