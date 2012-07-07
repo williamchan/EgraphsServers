@@ -242,6 +242,8 @@ object PostBuyProductEndpoint extends Logging {
                                          product: Product,
                                          order: Order,
                                          mail: Mail) {
+    // TODO(wchan): emails, stupid stupid emails
+    /*
     import services.Finance.TypeConversions._
     val email = new HtmlEmail()
     email.setFrom("noreply@egraphs.com", "Egraphs")
@@ -267,5 +269,6 @@ object PostBuyProductEndpoint extends Logging {
     email.setHtmlMsg(html.toString())
     email.setTextMsg("Thank you so much for purchasing an Egraph. Please find your order summary information below.")
     mail.send(email)
+    */
   }
 }

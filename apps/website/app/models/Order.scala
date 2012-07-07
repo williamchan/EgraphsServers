@@ -155,8 +155,11 @@ case class Order(
   }
 
   def sendEgraphSignedMail() {
+    // TODO(wchan): emails, stupid stupid emails
+    /*
     val email = prepareEgraphsSignedEmail()
     services.mail.send(email)
+    */
   }
 
   protected[models] def prepareEgraphsSignedEmail(): Email = {

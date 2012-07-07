@@ -97,6 +97,8 @@ case class Customer(
    * Sends a welcome email to the customer. Requires a dbSession so that this customer can get its Account.
    */
   def sendNewCustomerEmail() {
+    // TODO(wchan): emails, stupid stupid emails
+    /*
     val email = new HtmlEmail()
     email.setFrom("noreply@egraphs.com")
     email.addReplyTo("noreply@egraphs.com")
@@ -114,6 +116,7 @@ case class Customer(
     email.setHtmlMsg(html.toString())
     email.setTextMsg("Welcome to Egraphs! Please verify your email.")
     services.mail.send(email)
+    */
   }
 
   //
