@@ -15,39 +15,29 @@ object Personalize extends Controller
 {
 
   def index = {
-    views.frontend.html.celebrity_storefront_personalize(
-      form=defaultPersonalizeForm,
-      guaranteedDelivery=new util.Date,
-      orderSummary=defaultOrderSummary
-    )
+    render()
   }
 
   def allErrors = {
-    views.frontend.html.celebrity_storefront_personalize(
-      form=allErrorsPersonalizeForm,
-      guaranteedDelivery=new util.Date,
-      orderSummary=defaultOrderSummary
-    )
+    render(personalizeForm=allErrorsPersonalizeForm)
+  }
+
+  def lowCharacterLimit = {
+    render(messageCharacterLimit = 60)
   }
 
   def allPrePopulatedValues = {
     val default = defaultPersonalizeForm
     import default._
 
-    val form = default.copy(
+    render(personalizeForm=default.copy(
       isGift=isGift.copy(values=Some(true)),
       recipientName=recipientName.copy(values=Some("Erem Boto")),
       recipientEmail=recipientEmail.copy(values=Some("erem@egraphs.com")),
       messageOption=messageOption.copy(values=Some(PersonalizeMessageOption.CelebrityChoosesMessage)),
       messageText=messageText.copy(values=Some("Happy 30th birthday")),
       noteToCelebrity=noteToCelebrity.copy(values=Some("You're the best!"))
-    )
-
-    views.frontend.html.celebrity_storefront_personalize(
-      form,
-      guaranteedDelivery=new util.Date,
-      orderSummary=defaultOrderSummary
-    )
+    ))
   }
 
   private def defaultPersonalizeForm = {
@@ -84,6 +74,20 @@ object Personalize extends Controller
       recipientEmail=default.recipientEmail.copy(error=error),
       messageText=default.messageText.copy(error=error),
       noteToCelebrity=default.noteToCelebrity.copy(error=error)
+    )
+  }
+
+  private def render(
+    personalizeForm: PersonalizeForm=defaultPersonalizeForm,
+    guaranteedDelivery:util.Date = new util.Date(),
+    messageCharacterLimit: Int = 140,
+    orderSummary: StorefrontOrderSummary = defaultOrderSummary
+  ) = {
+    views.frontend.html.celebrity_storefront_personalize(
+      form=personalizeForm,
+      guaranteedDelivery=guaranteedDelivery,
+      messageCharacterLimit=messageCharacterLimit,
+      orderSummary=orderSummary
     )
   }
 }

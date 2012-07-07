@@ -28,6 +28,11 @@ package services.cache
  *
  *     // Delete the object
  *     cache.delete("a map")
+ *
+ *     // Cache the result of an expensive operation for a short amount of time.
+ *     cache.cacheing("something expensive", 30.seconds) {
+ *       doSomethingExpensive()
+ *     }
  *   }
  * }}}
  */
@@ -70,4 +75,19 @@ trait Cache {
    * Clears the entire cache. Avoid doing this except on an ad-hoc basis.
    */
   def clear()
+
+  /**
+   * Caches the result of an operation
+   *
+   * Usage: see class documentation.
+   **/
+  def cacheing[T: Manifest](key: String, duration: Int)(operation: => T): T = {
+    this.get[T](key).getOrElse {
+      val operationResult = operation
+
+      this.set(key, operationResult, duration)
+
+      operationResult
+    }
+  }
 }

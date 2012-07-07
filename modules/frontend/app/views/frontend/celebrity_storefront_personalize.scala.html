@@ -1,4 +1,5 @@
 @(form: models.frontend.storefront.PersonalizeForm,
+  messageCharacterLimit:Int,
   guaranteedDelivery: java.util.Date,
   orderSummary: models.frontend.storefront.StorefrontOrderSummary
 )(
@@ -137,7 +138,7 @@
 	      				    <div class="clearfix">
 	      				      <label class="instructions">
 	      				      	@orderSummary.celebrityName Should Write: 
-	      				      	<small>140 character limit.</small> 
+	      				      	<small>@messageCharacterLimit character limit.</small> 
 	      				      	<small>All messages are subject to approval.</small></label>
 	                    @tags.html.bootstrap_input_field(form.messageText) {
 	                      <div id="message-options" class="btn-group" data-toggle="buttons-radio">

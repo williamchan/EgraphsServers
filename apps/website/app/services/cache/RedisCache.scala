@@ -28,7 +28,6 @@ private[cache] class RedisCache @Inject()(jedis: Jedis) extends Cache {
     val keyBytes = key.getBytes
 
     jedis.setex(keyBytes, expirationSeconds, toByteArray(value))
-
   }
 
   override def get[T: Manifest](key: String): Option[T] = {

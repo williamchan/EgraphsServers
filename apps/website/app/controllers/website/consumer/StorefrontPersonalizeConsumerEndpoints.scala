@@ -3,7 +3,7 @@ package controllers.website.consumer
 import services.mvc.{ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
 import play.mvc.Controller
 import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters, ControllerMethod}
-import services.http.forms.purchase.{PurchaseFormReaders, PersonalizeForm, PurchaseFormFactory}
+import services.http.forms.purchase.{PurchaseFormChecks, PurchaseFormReaders, PersonalizeForm, PurchaseFormFactory}
 import services.mvc.FormConversions.personalizeFormToView
 import controllers.WebsiteControllers
 import models.frontend.storefront.{PersonalizeForm => PersonalizeFormView, StorefrontOrderSummary}
@@ -86,6 +86,7 @@ trait StorefrontPersonalizeConsumerEndpoints
         views.frontend.html.celebrity_storefront_personalize(
           form=formView,
           guaranteedDelivery=nextInventoryBatch.endDate,
+          messageCharacterLimit=PurchaseFormChecks.maxWrittenMessageChars,
           orderSummary=orderSummary
         )
       }

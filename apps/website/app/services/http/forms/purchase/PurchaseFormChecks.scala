@@ -231,7 +231,9 @@ object PurchaseFormChecks {
   private[purchase] val requiredError = "Required field"
   private[purchase] val nameLengthErrorString = "Must be between 2 and 30 characters"
   private[purchase] val minWrittenMessageChars = 5
-  private[purchase] val maxWrittenMessageChars = 140
+
+  /** The maximum number of characters a written message request can contain */
+  val maxWrittenMessageChars = 60
   private[purchase] val minNoteToCelebChars = minWrittenMessageChars
   private[purchase] val maxNoteToCelebChars = maxWrittenMessageChars
 
@@ -252,7 +254,8 @@ object PurchaseFormChecks {
  * Injectable accessor for PurchaseFormChecks.
  *
  * See the [[services.http.forms.purchase.PersonalizeForm]] for good usage examples.
- * @param check
+ *
+ * @param check low-level checkers used to perform these higher level checks.
  */
 class PurchaseFormChecksFactory @Inject()(check: FormChecks){
   def apply(toValidate: Iterable[String]): PurchaseFormChecks = {
