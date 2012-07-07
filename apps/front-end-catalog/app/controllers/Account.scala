@@ -31,25 +31,16 @@ object Account extends Controller with DefaultHeaderAndFooterData {
         println(params.allSimple())
       }
       case _ => {
-        val form = AccountSettingsForm(
-          fullname = Field(name = "fullname", values = List("Will Chan")),
-          username = Field(name = "username", values = List("willchan")),
-          email = Field(name = "email", values = List("will@egraphs.com")),
-          oldPassword = Field(name = "oldPassword"),
-          newPassword = Field(name = "newPassword"),
-          passwordConfirm = Field(name = "passwordConfirm"),
-          addressLine1 = Field(name = "address.line1", values = List("615 2nd Ave")),
-          addressLine2 = Field(name = "address.line2", values = List("Suite 300")),
-          city = Field(name = "city", values = List("Seattle")),
-          state = Field(name = "state", values = List("WA")),
-          postalCode = Field(name = "postalCode", values = List("98102")),
-          galleryVisibility = Field(name = "galleryVisibility", values = List("private")),
-          notice_stars = Field(name = "notice_stars", values = List("true")),
-          generalErrors = List.empty[FormError]
-        )
-        views.frontend.html.account_settings(form)
+        views.frontend.html.account_settings(AccountSettingsFormFactory.default)
       }
     }
+  }
+
+  def errors() = {
+    views.frontend.html.account_settings(
+      AccountSettingsFormFactory.errors,
+      List("derp", "herp", "dont ever ever ever ever")
+    )
   }
 
   def verify() = {
@@ -195,6 +186,49 @@ object Account extends Controller with DefaultHeaderAndFooterData {
           " quam. In hac habitasse platea dictumst.",
         thumbnailUrl = landscapePNG
       )
+    )
+  }
+}
+
+object AccountSettingsFormFactory {
+  def default : AccountSettingsForm = {
+    AccountSettingsForm(
+      fullname = Field(name = "fullname", values = List("Will Chan")),
+      username = Field(name = "username", values = List("willchan")),
+      email = Field(name = "email", values = List("will@egraphs.com")),
+      oldPassword = Field(name = "oldPassword"),
+      newPassword = Field(name = "newPassword"),
+      passwordConfirm = Field(name = "passwordConfirm"),
+      addressLine1 = Field(name = "address.line1", values = List("615 2nd Ave")),
+      addressLine2 = Field(name = "address.line2", values = List("Suite 300")),
+      city = Field(name = "city", values = List("Seattle")),
+      state = Field(name = "state", values = List("WA")),
+      postalCode = Field(name = "postalCode", values = List("98102")),
+      galleryVisibility = Field(name = "galleryVisibility", values = List("private")),
+      notice_stars = Field(name = "notice_stars", values = List("true")),
+      generalErrors = List.empty[FormError]
+    )
+  }
+
+  def errors : AccountSettingsForm = {
+    val basic = default
+    val error = Some(FormError("Get outa here this is no good!"))
+
+    basic.copy(
+      fullname = basic.fullname.copy(error=error),
+      username = basic.username.copy(error=error),
+      email = basic.email.copy(error=error),
+      oldPassword = basic.oldPassword.copy(error=error),
+      newPassword = basic.newPassword.copy(error=error),
+      passwordConfirm = basic.oldPassword.copy(error=error),
+      addressLine1 = Field(name = "address.line1", values = List("615 2nd Ave")),
+      addressLine2 = Field(name = "address.line2", values = List("Suite 300")),
+      city = Field(name = "city", values = List("Seattle")),
+      state = Field(name = "state", values = List("WA")),
+      postalCode = Field(name = "postalCode", values = List("98102")),
+      galleryVisibility = Field(name = "galleryVisibility", values = List("private")),
+      notice_stars = Field(name = "notice_stars", values = List("true")),
+      generalErrors = List(FormError("Derp"),FormError("Sclerp"),FormError("Lerp"))
     )
   }
 }
