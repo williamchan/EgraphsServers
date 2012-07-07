@@ -21,7 +21,7 @@ import services.http.forms.purchase.PurchaseForms.AllShippingForms
  * @param storefrontSession a `ServerSession` namespaced to a particular celebrity's storefront.
  */
 class PurchaseForms @Inject()(
-  formReaders: PurchaseFormReaders,
+  formReaders: FormReaders,
   storefrontSession: ServerSession
 ) {
   import services.http.forms.Form.Conversions._
@@ -448,7 +448,7 @@ object PurchaseForms {
 }
 
 class PurchaseFormFactory @Inject()(
-  formReaders: PurchaseFormReaders,
+  formReaders: FormReaders,
   serverSessions: ServerSessionFactory
 ) {
   def formsForStorefront(celebrityId: Long) = {

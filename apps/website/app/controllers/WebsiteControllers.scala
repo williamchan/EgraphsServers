@@ -12,7 +12,7 @@ import services.db.DBSession
 import services.social.FacebookAppId
 import services.http._
 import forms.AccountVerificationFormFactory
-import forms.purchase.{PurchaseFormChecksFactory, PurchaseFormReaders, PurchaseFormFactory}
+import forms.purchase.{PurchaseFormChecksFactory, FormReaders, PurchaseFormFactory}
 import forms.{AccountSettingsFormFactory, CustomerLoginFormFactory}
 import java.util.Properties
 import services.Utils
@@ -44,7 +44,7 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected def checkPurchaseField: PurchaseFormChecksFactory = instance[PurchaseFormChecksFactory]
 
   override protected val purchaseFormFactory = instance[PurchaseFormFactory]
-  override protected val purchaseFormReaders = instance[PurchaseFormReaders]
+  override protected val formReaders = instance[FormReaders]
   override protected val dbSession = instance[DBSession]
   override protected val controllerMethod = instance[ControllerMethod]
   override protected val postController = instance[POSTControllerMethod]

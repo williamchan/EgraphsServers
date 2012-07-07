@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import services.Utils
 
 /**
- * Define the fields (and validations thereof) for the form transmitted by this endpoint
+ * Define the fields (and validations thereof) for logging in to our system as a customer.
  *
  * @param paramsMap either the request parameters or flash parameters converted to Readable
  *     by Form.Conversions._
@@ -19,31 +19,47 @@ class CustomerLoginForm(val paramsMap: Form.Readable, check: FormChecks)
   //
   // Field values and validations
   //
-  val email = new RequiredField[String](Fields.Email.name) {
-    def validateIfPresent = {
-      for (validEmail <- check.isEmailAddress(stringToValidate).right) yield validEmail
+  val email = field(Fields.Email).validatedBy { toValidate =>
+    for (
+      // Email or username is required to log in
+      submitted <- check.isSomeValue(toValidate, "We're gonna need this").right;
+
+      // Value's gotta be a valid email
+      validEmail <- check.isEmailAddress(submitted).right
+    ) yield {
+      validEmail
     }
   }
 
-  val password = new RequiredField[String](Fields.Password.name) {
-    def validateIfPresent = {
-      Right(stringToValidate)
+  val password = field(Fields.Password).validatedBy { toValidate =>
+    for (
+      // Password is required to log in
+      submitted <- check.isSomeValue(toValidate, "We're gonna need this").right;
+
+      // Needs to match up to our internal metric for passwords
+      validPassword <- check.isValidPassword(submitted).right
+    ) yield {
+      validPassword
     }
   }
 
   // customerId is a field derived from the other two, which means it has no entry
   // in the paramsMap
-  val customerId = new DerivedField[Long] {
-    def validate = {
-      for (validEmail <- check.dependentFieldIsValid(email).right;
-           validPassword <- check.dependentFieldIsValid(password).right;
-           validAccount <- check.isValidAccount(validEmail,
-             validPassword,
-             badCredentialsMessage).right;
-           customerId <- check.isCustomerAccount(validAccount, badCredentialsMessage).right)
-      yield {
-        customerId
-      }
+  val customerId = field.validatedBy { toValidate =>
+    for (
+      // Submitted email had to be valid
+      validEmail <- check.dependentFieldIsValid(email).right;
+
+      // Submitted password had to be valid
+      validPassword <- check.dependentFieldIsValid(password).right;
+
+      // Email and password had to match up to a known account
+      validAccount <- check.isValidAccount(validEmail, validPassword, badCredentialsMessage).right;
+
+      // That known account had to have a customer face.
+      customerId <- check.isCustomerAccount(validAccount, badCredentialsMessage).right
+    ) yield {
+      customerId
     }
   }
 
@@ -58,13 +74,11 @@ class CustomerLoginForm(val paramsMap: Form.Readable, check: FormChecks)
 
 
 object CustomerLoginForm {
-  val badCredentialsMessage = "The username and password did not match. Please try again"
+  val badCredentialsMessage = "The login and password did not match. Try again?"
 
-  object Fields extends Utils.Enum {
-    sealed case class EnumVal(name: String) extends Value
-
-    val Email = EnumVal("login.email")
-    val Password = EnumVal("login.password")
+  object Fields {
+    val Email = "login.email"
+    val Password = "login.password"
   }
 
   /** Class to which the fully validated CustomerLoginForm resolves */

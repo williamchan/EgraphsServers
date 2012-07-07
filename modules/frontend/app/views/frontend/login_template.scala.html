@@ -1,0 +1,151 @@
+@(loginForm: models.frontend.login_page.LoginFormViewModel,
+  title: String,
+  jsMain: String,  
+  header: => Html,
+  currentOwnerHeader: => Html,
+  newOwnerHeader: => Html,
+  newOwnerContent: => Html,  
+  newOwnerTargetUrl: String,
+  fbHeader: => Html,
+  fbContent: => Html,
+  fbAuthUrl: String,
+  headJs: => Html = Html.empty
+)(implicit headerData: models.frontend.header.HeaderData, 
+  footerData: models.frontend.footer.FooterData,
+  session: play.mvc.Scope.Session
+)
+
+@{/** Base template for rendering permutations of the 3-column login page. See login.scala.html
+      for a good usage example.
+
+      loginForm - the form for existing users to log in to our system.
+      header - the title of the login page. e.g. "How would you like to sign in?"
+      currentOwnerHeader - header for the column enabling current Egraphs account
+          holders to log-in.
+      newOwnerHeader - header for the column enabling people new to Egraphs
+          to log in and/or check out.
+      newOwnerContent - HTML content for the center column
+      newOwnerTargetUrl - the POST target for whatever action occurs in the
+          center column (for example, registration)
+      fbHeader - Header text for the facebook column
+      fbContent - Content for the facebook login column
+      fbAuthUrl - Url the user's browser should GET in order to begin the oauth login flow
+          with Facebook.
+
+      title, jsMain, headJs - See base_template
+*/}
+
+@import views.frontend.tags.html.storefront_breadcrumbs_responsive
+@import views.frontend.tags
+@import models.frontend.forms.{Field, FormError}
+
+@baseBody = {
+    <div id="content" class="top" role="main">
+    
+      <div id="main" class="sub">
+      
+        <section id="checkout" class="container">							
+				 		
+  				<header>	
+  				  <h1>@header</h1>
+  				</header>
+
+  				<div class="row login clearfix">
+  				
+  					<section class="span4">
+  					
+  						@tags.html.safeForm(
+                "action" -> loginForm.actionUrl, 
+                "method" -> "post", 
+                "class" -> "login-option"
+               ) {
+  						
+  							<h2>@currentOwnerHeader</h2>
+  							
+  							<div class="clearfix">
+  							
+	  							<fieldset>	  			
+                    @tags.html.bootstrap_text_input_field("Username / Email:", loginForm.email)
+
+                    @tags.html.bootstrap_text_input_field(
+                      "Password:", 
+                      loginForm.password,
+                      inputType="password"
+                    )
+
+										<p class="account-actions"><small><a href="@loginForm.forgotPasswordUrl" class="tip">Forgot your username or password?</a></small>
+                    
+                    @for(error <- loginForm.generalErrors.headOption) {
+                      <div class="general-errors">
+                        <div class="alert alert-error @if(loginForm.generalErrors.isEmpty) {hidden}">
+                          <button type="button" class="close" data-dismiss="alert">&times;</button>
+                          <span class="error-message">@error</span>
+                        </div>
+                      </div>
+                    }
+
+										@{/**<em>&ndash; or &ndash;</em>
+										
+										<a href="#" class="create-account">Create an account<span>&gt;</span></a></p>*/}
+										
+	  							</fieldset>
+								
+  							</div>
+								
+								@tags.html.arrow_button(caption="Sign In", classes="button")					
+  				
+  						} <!-- end safe form -->
+  				
+  					</section>
+
+  					<section class="span4">
+  					
+	  					@tags.html.safeForm(
+                "id" -> "new-account-form",
+                "action" -> newOwnerTargetUrl,
+                "method" -> "post",
+                "class" -> "login-option"
+              ) {
+
+	  						<h2>@newOwnerHeader</h2>
+
+	  						<div class="clearfix">@newOwnerContent</div>
+								                
+							  @tags.html.arrow_button(caption="Continue", classes="button create-account")		
+
+							} <!-- end safe form -->			
+  				
+  					</section>
+  					
+   					<section class="span4">
+   					
+	   					<div class="login-option last">
+	   					
+	   						<h2>@fbHeader</h2>
+	  				
+	   						<div class="clearfix">
+	  				      @fbContent								
+	   						</div>					
+	  				    <form method="GET" action="@fbAuthUrl">
+								  @tags.html.arrow_button(caption="Facebook", classes="button facebook")
+                </form>
+							
+							</div>
+  				
+  					</section>
+  				
+  				</div> <!-- end .login_page -->
+
+        </section> <!-- end #checkout -->
+
+    	</div> <!-- end #main -->
+    
+    </div> <!-- end #content -->
+}
+
+@base_template(
+  title=title,
+  jsMain=jsMain,
+  headJs=headJs,
+  body=baseBody
+)

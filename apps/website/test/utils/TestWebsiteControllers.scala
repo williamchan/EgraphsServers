@@ -2,7 +2,7 @@ package utils
 
 import com.google.inject.Inject
 import services.http._
-import forms.purchase.{PurchaseFormChecksFactory, PurchaseFormReaders, PurchaseFormFactory}
+import forms.purchase.{PurchaseFormChecksFactory, FormReaders, PurchaseFormFactory}
 import services.mail.Mail
 import services.payment.Payment
 import models.{InventoryBatchQueryFilters, EgraphQueryFilters, OrderQueryFilters}
@@ -45,7 +45,7 @@ case class TestWebsiteControllers @Inject()(
 )() extends Controller with AllWebsiteEndpoints {
   val checkPurchaseField = AppConfig.instance[PurchaseFormChecksFactory]
   val purchaseFormFactory = AppConfig.instance[PurchaseFormFactory]
-  val purchaseFormReaders = AppConfig.instance[PurchaseFormReaders]
+  val formReaders = AppConfig.instance[FormReaders]
   val formChecks = AppConfig.instance[FormChecks]
   override def request = fakeRequest
   override def params = request.params

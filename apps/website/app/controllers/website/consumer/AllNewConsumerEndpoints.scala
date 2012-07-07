@@ -6,6 +6,7 @@ import play.mvc.Controller
 trait AllNewConsumerEndpoints
   extends GetRootConsumerEndpoint
   with CelebrityLandingConsumerEndpoint
+  with PostRegisterConsumerEndpoint
   with StorefrontChoosePhotoConsumerEndpoints
   with StorefrontPersonalizeConsumerEndpoints
   with StorefrontReviewConsumerEndpoints

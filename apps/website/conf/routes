@@ -101,7 +101,7 @@ GET     ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/checkout/?  
 POST    ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/checkout        WebsiteControllers.postStorefrontCheckout
 GET     ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/finalize/?      WebsiteControllers.getStorefrontFinalize
 POST    ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/finalize        WebsiteControllers.postStorefrontFinalize
-
+POST    ${consumer_base}/register                                                   WebsiteControllers.postRegisterConsumerEndpoint
 
 ##
 ## Website
