@@ -1,5 +1,6 @@
 package controllers.website
 
+import consumer.StorefrontChoosePhotoConsumerEndpoints
 import play.mvc.Controller
 import play.data.validation._
 import models._
@@ -55,7 +56,7 @@ trait PostBuyProductEndpoint { this: Controller =>
       stripeTokenId = stripeTokenId)
 
     if (!validationErrors.isEmpty) {
-      WebsiteControllers.redirectWithValidationErrors(GetCelebrityProductEndpoint.url(celebrity, product), Some(false))
+      WebsiteControllers.redirectWithValidationErrors(StorefrontChoosePhotoConsumerEndpoints.url(celebrity, product), Some(false))
 
     } else {
       Logger.info("No validation errors")
@@ -151,7 +152,7 @@ object PostBuyProductEndpoint extends Logging {
         case stripeException: com.stripe.exception.InvalidRequestException => {
           saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = "Credit card issue.")
           Validation.addError("Credit card", "There was an issue with the credit card")
-          return WebsiteControllers.redirectWithValidationErrors(GetCelebrityProductEndpoint.url(celebrity, product), Some(false))
+          return WebsiteControllers.redirectWithValidationErrors(StorefrontChoosePhotoConsumerEndpoints.url(celebrity, product), Some(false))
         }
       }
 
@@ -169,7 +170,7 @@ object PostBuyProductEndpoint extends Logging {
           payment.refund(charge.id)
           saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = e.getLocalizedMessage)
           Validation.addError("Inventory", "Our apologies. There is no more inventory available, but your celebrity will sign more Egraphs soon.")
-          return WebsiteControllers.redirectWithValidationErrors(GetCelebrityProductEndpoint.url(celebrity, product), Some(false))
+          return WebsiteControllers.redirectWithValidationErrors(StorefrontChoosePhotoConsumerEndpoints.url(celebrity, product), Some(false))
         }
         case e: Exception => {
           payment.refund(charge.id)

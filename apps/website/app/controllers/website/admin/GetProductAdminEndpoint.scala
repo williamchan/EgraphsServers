@@ -3,8 +3,7 @@ package controllers.website.admin
 import play.mvc.Controller
 import services.Utils
 import services.http.{ControllerMethod, AdminRequestFilters}
-import models.{ProductStore, Celebrity}
-import controllers.website.GetCelebrityProductEndpoint
+import models.ProductStore
 import services.payment.Payment
 
 private[controllers] trait GetProductAdminEndpoint {
@@ -20,9 +19,9 @@ private[controllers] trait GetProductAdminEndpoint {
       val product = productStore.get(productId)
 
       action match {
-        case Some("preview") => {
-          GetCelebrityProductEndpoint.html(celebrity = product.celebrity, product = product, payment = payment)
-        }
+//        case Some("preview") => {
+//          GetCelebrityProductEndpoint.html(celebrity = product.celebrity, product = product, payment = payment)
+//        }
 
         case _ => {
           flash.put("productId", product.id)

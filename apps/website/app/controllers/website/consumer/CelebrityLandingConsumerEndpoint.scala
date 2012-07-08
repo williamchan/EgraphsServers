@@ -1,9 +1,10 @@
 package controllers.website.consumer
 
-import play.mvc.Controller
+import play.mvc.{Router, Controller}
 import services.http.{CelebrityAccountRequestFilters, ControllerMethod}
 import services.mvc.ImplicitHeaderAndFooterData
 import services.blobs.AccessPolicy
+import services.Utils
 
 private[consumer] trait CelebrityLandingConsumerEndpoint
   extends ImplicitHeaderAndFooterData
@@ -23,4 +24,12 @@ private[consumer] trait CelebrityLandingConsumerEndpoint
       )
     }
   }
+}
+
+object CelebrityLandingConsumerEndpoint {
+
+  def url(celebrityUrlSlug: String): Router.ActionDefinition = {
+    Utils.lookupUrl("WebsiteControllers.getCelebrityLanding", Map("celebrityUrlSlug" -> celebrityUrlSlug))
+  }
+
 }

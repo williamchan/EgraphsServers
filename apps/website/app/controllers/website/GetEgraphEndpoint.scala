@@ -41,7 +41,7 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
         )
 
       case Some(FulfilledOrder(order, egraph)) =>
-        new Redirect(Utils.lookupUrl("WebsiteControllers.getRootEndpoint").url)
+        new Redirect(Utils.lookupUrl("WebsiteControllers.getRootConsumerEndpoint").url)
 
       case None =>
         NotFound("No Egraph exists with the provided identifier.")

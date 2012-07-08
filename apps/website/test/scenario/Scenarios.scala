@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat
 import javax.imageio.ImageIO
 import controllers.website.GetAccountSettingsEndpoint
 import services.http.EgraphsSession
+import controllers.website.consumer.CelebrityLandingConsumerEndpoint
 
 /**
  * All scenarios supported by the API.
@@ -643,7 +644,7 @@ class Scenarios extends DeclaresScenarios {
 
   private[this] def redirectToWizzle = {
     new Redirect(
-      WebsiteControllers.lookupGetCelebrity("Wizzle").url
+      CelebrityLandingConsumerEndpoint.url("Wizzle").url
     )
   }
 
@@ -691,7 +692,7 @@ class Scenarios extends DeclaresScenarios {
 
   private[this] def redirectToStarcraftProduct = {
     new Redirect(
-      Utils.lookupUrl("WebsiteControllers.getCelebrityProduct", starcraftProductSlugs).url
+      Utils.lookupUrl("WebsiteControllers.getStorefrontChoosePhotoCarousel", starcraftProductSlugs).url
     )
   }
 

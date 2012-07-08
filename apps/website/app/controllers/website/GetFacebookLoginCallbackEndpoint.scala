@@ -48,7 +48,7 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
           }
         }
         // todo(wchan): redirect to target location... maybe put target url in session scope
-        new Redirect(Utils.lookupUrl("WebsiteControllers.getRootEndpoint").url)
+        new Redirect(Utils.lookupUrl("WebsiteControllers.getRootConsumerEndpoint").url)
 
       }
       case _ => {
@@ -56,7 +56,7 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
           ", error_reason = " + error_reason.getOrElse("") +
           ", error_description = " + error_description.getOrElse(""))
         // todo(wchan): redirect to target location... maybe put target url in session scope
-        new Redirect(Utils.lookupUrl("WebsiteControllers.getRootEndpoint").url)
+        new Redirect(Utils.lookupUrl("WebsiteControllers.getRootConsumerEndpoint").url)
       }
     }
   }

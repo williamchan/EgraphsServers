@@ -12,6 +12,6 @@ private[controllers] trait PostLogoutEndpoint {
 
   def postLogout() = postController() {
     session.clear()
-    new Redirect(Utils.lookupUrl("WebsiteControllers.getRootEndpoint").url)
+    new Redirect(Utils.lookupUrl("WebsiteControllers.getRootConsumerEndpoint").url)
   }
 }

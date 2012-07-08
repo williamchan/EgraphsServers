@@ -1,21 +1,18 @@
-package controllers.website
+package controllers.website.consumer
 
 import play.mvc.Controller
+import controllers.website._
 
-/**
- * All endpoints associated with the consumer-facing website
- */
-trait AllConsumerEndpoints extends GetBlobEndpoint
+/** All endpoints for the recent consumer website */
+trait AllConsumerEndpoints
+  extends GetBlobEndpoint
   with GetAccountSettingsEndpoint
-  with GetCelebrityEndpoint
-  with GetCelebrityProductEndpoint
   with GetCustomerGalleryEndpoint
   with GetEgraphEndpoint
   with GetOrderConfirmationEndpoint
   with GetLoginEndpoint
   with GetRecoverAccountEndpoint
   with GetRecoverAccountConfirmationEndpoint
-  with GetRegisterEndpoint
   with GetResetPasswordEndpoint
   with GetStaticEndpoint
   with PostAccountSettingsEndpoint
@@ -24,6 +21,13 @@ trait AllConsumerEndpoints extends GetBlobEndpoint
   with PostLogoutEndpoint
   with PostOrderConfigureEndpoint
   with PostRecoverAccountEndpoint
-  with PostRegisterEndpoint
   with PostResetPasswordEndpoint
-  with GetFacebookLoginCallbackEndpoint{ this: Controller => }
+  with GetFacebookLoginCallbackEndpoint
+  with CelebrityLandingConsumerEndpoint
+  with PostRegisterConsumerEndpoint
+  with StorefrontChoosePhotoConsumerEndpoints
+  with StorefrontPersonalizeConsumerEndpoints
+  with StorefrontReviewConsumerEndpoints
+  with StorefrontCheckoutConsumerEndpoints
+  with StorefrontFinalizeConsumerEndpoints
+{ this: Controller => }

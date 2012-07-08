@@ -4,8 +4,8 @@ import play.mvc.Controller
 import services.Utils
 import services.http.{AdminRequestFilters, ControllerMethod}
 import models.{AccountStore, CelebrityStore}
-import controllers.website.GetCelebrityEndpoint
 import play.mvc.results.NotFound
+import controllers.website.consumer.CelebrityLandingConsumerEndpoint
 
 private[controllers] trait GetCelebrityAdminEndpoint {
   this: Controller =>
@@ -21,9 +21,9 @@ private[controllers] trait GetCelebrityAdminEndpoint {
       (accountStore.findByCelebrityId(celebrityId), celebrityStore.findById(celebrityId)) match {
         case (Some(account), Some(celebrity)) =>
           action match {
-            case Some("preview") => {
-              GetCelebrityEndpoint.html(celebrity)
-            }
+//            case Some("preview") => {
+//              CelebrityLandingConsumerEndpoint.html(celebrity)
+//            }
 
             case _ => {
               flash.put("celebrityId", celebrity.id)

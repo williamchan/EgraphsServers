@@ -28,7 +28,7 @@ class PostBuyDemoProductEndpointTests extends EgraphsFunctionalTest {
     )
 
     assertStatus(302, response)
-    assertHeaderEquals("Location", "/Wizzle/2010-Starcraft-2-Championships", response)
+    assertHeaderEquals("Location", "/Wizzle/photos/2010-Starcraft-2-Championships", response)
     db.connected(TransactionSerializable) {
       val celebrityId = Scenarios.getWillCelebrityAccount.id
       val allCelebOrders = orderStore.findByCelebrity(celebrityId)
