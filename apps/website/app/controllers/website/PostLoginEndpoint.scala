@@ -28,10 +28,9 @@ private[controllers] trait PostLoginEndpoint { this: Controller =>
         session.put(WebsiteControllers.customerIdKey, validForm.customerId)
         //check to see if logged in
         // Redirect
-        // TODO(wchan): Test this
         Utils.toOption(session.get(WebsiteControllers.redirectUponLogin)) match {
-          case None => new Redirect(Utils.lookupUrl("WebsiteControllers.getRootEndpoint").url)
-          case Some(url) => new Redirect(url)
+          case None => new Redirect(reverse(WebsiteControllers.getRootConsumerEndpoint).url)
+          case Some(url) => new Redirect(url) // TODO(wchan): This would be awkward if redirecting to a page user lacks permissions
         }
     }
   }
