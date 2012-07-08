@@ -1,0 +1,50 @@
+@(featureStarsFooter: Option[Html] = None, celebrityPublicName: Option[String] = None)
+
+<section id="landing-more">
+
+  <div class="actions row">
+
+    <article class="view span4">
+
+      <h2><a href="#">Viewing Your Egraph</a></h2>
+
+      <p>Consectetur adipiscing elit. Cras aliquet, sem sed rutrum dignissim, magna enim eta pretium ante. Rutrum dignissim, magna enim. <a href="#">Learn More &raquo;</a></p>
+
+    </article> <!-- end .view -->
+
+    <article class="print span4">
+
+      <h2><a href="#">Printing Your Egraph</a></h2>
+
+      <p>Consectetur adipiscing elit. Cras aliquet, sem sed rutrum dignissim, magna enim eta pretium ante. Rutrum dignissim, magna enim. <a href="#">Learn More &raquo;</a></p>
+
+    </article> <!-- end .print -->
+
+    <article class="share span4">
+
+      <h2><a href="#">Sharing Your Egraph</a></h2>
+
+      <p>Consectetur adipiscing elit. Cras aliquet, sem sed rutrum dignissim, magna enim eta pretium ante. Rutrum dignissim, magna enim. <a href="#">Learn More &raquo;</a></p>
+
+    </article> <!-- end .share -->
+
+  </div> <!-- end .row -->
+
+  <header>
+
+    <h1>
+      @{
+        celebrityPublicName match {
+          case None => "Which Star Will You Connect With?"
+          case Some(name) => "Connect with " + name
+        }
+      }
+    </h1>
+
+    <p><a href="#" class="button"><strong>Get Started</strong> <span>&raquo;</span></a></p>
+
+  </header>
+
+  @featureStarsFooter.getOrElse("")
+
+</section> <!-- end #landing-more -->

@@ -89,6 +89,7 @@ GET     /admin/script/?                                            WebsiteContro
 %{ consumer_base = '/new' }%
 
 GET     ${consumer_base}/?                                                          WebsiteControllers.getRootConsumerEndpoint
+GET     ${consumer_base}/{celebrityUrlSlug}/?                                       WebsiteControllers.getCelebrityLanding
 GET     ${consumer_base}/{celebrityUrlSlug}/photos/?                                WebsiteControllers.getStorefrontChoosePhotoTiled
 GET     ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}/?               WebsiteControllers.getStorefrontChoosePhotoCarousel
 POST    ${consumer_base}/{celebrityUrlSlug}/photos/{productUrlSlug}                 WebsiteControllers.postStorefrontChoosePhoto

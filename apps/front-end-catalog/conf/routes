@@ -14,5 +14,6 @@ GET     /public/                                staticDir:public
 GET     /build                                  Build.index
 
 POST    /orders/{<[0-9]+>orderId}/configure     Account.privacy
+
 # Catch all
 *       /{controller}/{action}                  {controller}.{action}
