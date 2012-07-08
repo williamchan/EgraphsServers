@@ -1,132 +1,75 @@
-@()(implicit headerData: models.frontend.header.HeaderData, 
+@(loginForm: models.frontend.login_page.LoginFormViewModel,
+  newOwnerTargetUrl: String,
+  celebrityName: String = "Herp Derpson",
+  maybeGiftRecipient: Option[String] = None,
+  fbAuthUrl: String
+)(implicit headerData: models.frontend.header.HeaderData, 
   footerData: models.frontend.footer.FooterData,
-  storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs
+  storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs,
+  session: play.mvc.Scope.Session
 )
+
+@{/** Performs login from the checkout flow.
+
+      loginForm - the form that should be used for an existing egraph owned to log in
+      newOwnerTargetUrl - the url that individuals that choose to log in as a "New
+          egraph owner" should hit.
+      celebrityName - name of the celebrity being purchased from.
+      maybeGiftRecipient - the name where applicable of the individual for whom the
+          user is buying the egraph.
+*/}
 
 @import views.frontend.tags.html.storefront_breadcrumbs_responsive
 @import views.frontend.tags
 
-@baseBody = {
-    <div id="content" class="top" role="main">
-    
-      <div id="main" class="sub">
-      
-        <section id="checkout" class="container">
-			
-				 @storefront_breadcrumbs_responsive()
-				 		
-  				<header>	
-  				  <h1>How Would You Like To Checkout?</h1>
-  				</header>
 
-  				<div class="row login clearfix">
-  				
-  					<section class="span4">
-  					
-  						<form action="./" method="post">
-  						
-  							<h2>Egraphs Account</h2>
-  							
-  							<div class="clearfix">
-  							
-	  							<fieldset>
-	  				
-										<legend>Sign In</legend>
-										
-										<p>
-											<label>Username:</label>
-											<input type="text" name="user"> 
-										</p>
-										
-										<p>
-											<label>Password:</label>
-											<input type="password" name="pass"> 
-										</p>
-										
-										<p class="account-actions"><small><a href="#" class="tip">Forgot your username or password?</a></small>
-										
-										<em>&ndash; or &ndash;</em>
-										
-										<a href="#" class="create-account">Create Account <span>&gt;</span></a></p>
-										
-	  							</fieldset>
-								
-  							</div>
-								
-								@tags.html.arrow_button(caption="Sign In", target="#", classes="button")					
-  				
-  						</form>
-  				
-  					</section>
+@header = {How would you like to check out?}
 
-  					<section class="span4">
-  					
-	  					<form action="./" method="post">
-	  					
-	  						<h2>Guest Checkout</h2>
-	  						
-	  						<div class="clearfix">
-		  				
-									<p>There is no log-in required to checkout as a guest. Creating an account will provide you with the following features:</p>
-	
-									<ul>
-										<li>Info on upcoming featured stars</li>
-										<li>Express checkout</li>
-										<li>Save and share your Egraphs in myGallery</li>   
-									</ul>
-								
-	  						</div>
-								
-								@tags.html.arrow_button(caption="Continue", target="#", classes="button")		
-							
-							</form>			
-  				
-  					</section>
-  					
-   					<section class="span4">
-   					
-	   					<form action="./" method="post" class="last">
-	   					
-	   						<h2>Login with Facebook</h2>
-	  				
-	   						<div class="clearfix">
-	  				
-									<p>By choosing this option, you’ll be lorem ipsum dolor et ataepa. Vesti bulum et blandit quam. Viva museo tortor erat. Pellent esque magna et tellus, congue at fermentum in.</p>  
-								
-	   						</div>					
-	  				
-								@tags.html.arrow_button(caption="Facebook", target="#", classes="button facebook")
-							
-							</form>
-  				
-  					</section>
-  				
-  				</div> <!-- end .login -->
+@currentOwnerHeader = {As a current egraph owner}
+ 
+@newOwnerHeader = {As a new egraph owner}
 
-					<footer class="clearfix">
-					
-						<p>Secured by: <a href="#" class="logo-entrust">Entrust</a></p>
-						
-						<p>Accepted payment types:</p>
-						
-						<ul>
-							<li class="visa">Visa</li>
-							<li class="mastercard">Mastercard</li>
-							<li class="amex">American Express</li>
-							<li class="discover">Discover</li>
-						</ul>
-							
-					</footer>
-  			
-        </section> <!-- end #checkout -->
-
-    	</div> <!-- end #main -->
-    
-    </div> <!-- end #content -->
+@newOwnerContent = {
+  @if(maybeGiftRecipient.isEmpty) {
+    <p>
+      When you finish ordering, we will automatically create an account for you against the e-mail you provide in the next screen.
+    </p>
+    <p>
+      Your new account will let you track order status, receive your completed egraph, share it with friends, and quite a bit more.
+    </p>
+  }
+  @for(giftRecipient <- maybeGiftRecipient) {
+    <p>
+      When you finish ordering, we will automatically create accounts for you and @giftRecipient against the e-mail addresses entered during the order process.
+    </p>
+    <p>
+      Your new accounts will let you track order status, receive the egraph when it's done, share it with friends, and quite a bit more.
+    </p>    
+  } 
+  <p>You just have to press that big red <strong>Continue</strong> button.</p>     
 }
 
-@base_celebrity_storefront_template(
-  title="Login",
+@fbHeader = {Through my Facebook account}
+
+@fbContent = {
+  <p>
+    Click the blue button if you want your Egraph purchase to be secured against your Facebook account. Don't worry, you can change your mind whenever you want.
+  </p>
+  <p>
+    Could it really be that easy? Let's find out...
+  </p>
+}
+
+@login_template(
+  loginForm=loginForm,
+  title="How would you like to check out?",
   jsMain="pages/celebrity-storefront-login",
-  body=baseBody
+  header=header, 
+  currentOwnerHeader=currentOwnerHeader,
+  newOwnerHeader=newOwnerHeader,
+  newOwnerContent=newOwnerContent,
+  newOwnerTargetUrl=newOwnerTargetUrl,
+  fbHeader=fbHeader,  
+  fbContent=fbContent,
+  fbAuthUrl=fbAuthUrl
 )

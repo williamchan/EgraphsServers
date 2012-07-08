@@ -172,6 +172,17 @@ trait Form[+ValidFormType] {
     new FieldBuilder[ValueType](paramName)
   }
 
+  /**
+   * Allows you to build a field that is dependent upon other fields, rather than
+   * being necessarily associate with a particular parameter value.
+   *
+   * See [[services.http.forms.CustomerLoginForm]] for usage.
+   *
+   */
+  protected def field[ValueType]: FieldBuilder[ValueType] = {
+    new FieldBuilder[ValueType]("")
+  }
+
   /** Class used to help in convenience method `field`. See that method's documentation */
   protected class FieldBuilder[-ValueType](paramName: String) {
 

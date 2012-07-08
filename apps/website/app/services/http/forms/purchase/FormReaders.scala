@@ -1,16 +1,16 @@
 package services.http.forms.purchase
 
 import com.google.inject.Inject
-import services.http.forms.{Form, ReadsForm, FormChecks}
+import services.http.forms._
 
 /**
- * Provides readers for all the form types used in the purcahse flow
+ * Provides readers for most of the HTTP form types we use.
  *
  * @param formChecks low-level checks used for validating forms
  * @param purchaseFormChecksFactory high-level checks used for
  *     validating purchase forms
  **/
-class PurchaseFormReaders @Inject()(
+class FormReaders @Inject()(
   formChecks: FormChecks,
   purchaseFormChecksFactory: PurchaseFormChecksFactory
 ) {
@@ -24,6 +24,18 @@ class PurchaseFormReaders @Inject()(
   def forShippingForm: ReadsForm[CheckoutShippingForm] = {
     newReaderWithConstructor { readable =>
       new CheckoutShippingForm(readable, formChecks, purchaseFormChecksFactory)
+    }
+  }
+
+  def forCustomerLoginForm: ReadsForm[CustomerLoginForm] = {
+    newReaderWithConstructor { readable =>
+      new CustomerLoginForm(readable, formChecks)
+    }
+  }
+
+  def forRegistrationForm: ReadsForm[AccountRegistrationForm] = {
+    newReaderWithConstructor { readable =>
+      new AccountRegistrationForm(readable, formChecks)
     }
   }
 

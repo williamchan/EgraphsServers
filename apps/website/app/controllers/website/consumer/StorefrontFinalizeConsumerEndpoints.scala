@@ -37,7 +37,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
   protected def controllerMethod: ControllerMethod
   protected def postController: POSTControllerMethod
   protected def purchaseFormFactory: PurchaseFormFactory
-  protected def purchaseFormReaders: PurchaseFormReaders
+  protected def formReaders: FormReaders
   protected def celebFilters: CelebrityAccountRequestFilters
   protected def checkPurchaseField: PurchaseFormChecksFactory
   protected def payment: Payment

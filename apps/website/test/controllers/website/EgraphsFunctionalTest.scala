@@ -29,8 +29,8 @@ trait EgraphsFunctionalTest extends FunctionalTest with CleanDatabaseAfterEachTe
     val response = POST(
       Utils.lookupUrl("WebsiteControllers.postLogin"),
       Map[String, String](
-        Fields.Email.name -> account.email,
-        Fields.Password.name -> password
+        Fields.Email -> account.email,
+        Fields.Password -> password
       )
     )
     assertStatus(302, response)

@@ -5,18 +5,24 @@ import services.Utils
 import services.http.ControllerMethod
 import services.social.Facebook
 import java.util.UUID
-import services.http.forms.{CustomerLoginForm, CustomerLoginFormFactory}
-import models.frontend.login_page.{LoginForm => LoginFormView}
+import models.frontend.login_page.{AccountRegistrationFormViewModel, LoginFormViewModel}
+import services.http.forms.purchase.FormReaders
+import services.mvc.forms.{AccountRegistrationFormViewConversions, LoginFormViewConversions}
+import services.mvc.ImplicitHeaderAndFooterData
 
-private[controllers] trait GetLoginEndpoint { this: Controller =>
-  import services.mvc.FormConversions._
+private[controllers] trait GetLoginEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
   import services.http.forms.Form.Conversions._
-  import models.frontend.login_page
 
+  //
+  // Services
+  //
   protected def facebookAppId: String
   protected def controllerMethod: ControllerMethod
-  protected def customerLoginForms: CustomerLoginFormFactory
+  protected def formReaders: FormReaders
 
+  //
+  // Controllers
+  //
   def getLogin = controllerMethod() {
     // Save a new FB state ID into the session
     val fbState = UUID.randomUUID().toString
@@ -24,29 +30,40 @@ private[controllers] trait GetLoginEndpoint { this: Controller =>
     val fbOauthUrl = Facebook.getFbOauthUrl(fbAppId = facebookAppId, state = fbState)
 
     // Render
-    views.Application.html.login(form=makeLoginFormView, fbOauthUrl=fbOauthUrl)
+    views.frontend.html.login(
+      loginForm=makeLoginFormView,
+      registrationForm=makeRegisterFormView,
+      fbAuthUrl=fbOauthUrl
+    )
   }
 
-  private def makeLoginFormView: LoginFormView = {
-    // Get form from flash if possible
-    val maybeFormData = customerLoginForms.read(flash.asFormReadable).map { form =>
-      val nonFieldSpecificErrors = form.fieldInspecificErrors.map(error => error.asViewError)
 
-      LoginFormView(
-        form.email.asViewField, form.password.asViewField, nonFieldSpecificErrors
-      )
-    }
+  //
+  // Private members
+  //
+  private def makeLoginFormView: LoginFormViewModel = {
+    import LoginFormViewConversions._
+
+    // Get form from flash if possible
+    val flashAsReadable = flash.asFormReadable
+    val maybeFormFromFlash = formReaders.forCustomerLoginForm.read(flashAsReadable)
+    val maybeFormViewModel = maybeFormFromFlash.map(form => form.asView)
 
     // If we couldn't find the form in the flash we'll just make an empty form
     // with the right names
-    maybeFormData.getOrElse {
-      import models.frontend.forms.{Field, FormError}
-      import CustomerLoginForm.Fields
+    maybeFormViewModel.getOrElse(LoginFormViewConversions.defaultView)
+  }
 
-      login_page.LoginForm(
-        Field(Fields.Email.name), Field(Fields.Password.name), List.empty[FormError]
-      )
-    }
+  private def makeRegisterFormView: AccountRegistrationFormViewModel = {
+    import services.mvc.forms.AccountRegistrationFormViewConversions._
+
+    // Get for form flash if possible
+    val flashAsReadable = flash.asFormReadable
+    val maybeFormFromFlash = formReaders.forRegistrationForm.read(flashAsReadable)
+    val maybeFormViewModel = maybeFormFromFlash.map(form => form.asView)
+
+    // Get the default
+    maybeFormViewModel.getOrElse(AccountRegistrationFormViewConversions.defaultView)
   }
 }
 

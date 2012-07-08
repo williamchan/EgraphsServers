@@ -28,7 +28,7 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
   protected def controllerMethod: ControllerMethod
   protected def postController: POSTControllerMethod
   protected def purchaseFormFactory: PurchaseFormFactory
-  protected def purchaseFormReaders: PurchaseFormReaders
+  protected def formReaders: FormReaders
   protected def celebFilters: CelebrityAccountRequestFilters
   protected def checkPurchaseField: PurchaseFormChecksFactory
   protected def payment: Payment
@@ -194,7 +194,7 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
   ): Either[Redirect, (Option[CheckoutShippingForm], Option[CheckoutShippingForm.Valid])] = {
     printingOption match {
       case PrintingOption.HighQualityPrint =>
-        val formReader = purchaseFormReaders.forShippingForm
+        val formReader = formReaders.forShippingForm
         val shippingForm = formReader.instantiateAgainstReadable(params.asFormReadable)
         val errorsOrValid = shippingForm.errorsOrValidatedForm
         val redirectOrValid = errorsOrValid.left.map { error =>
@@ -213,7 +213,7 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
     celebrityUrlSlug: String,
     productUrlSlug: String
   ): Either[Redirect, (CheckoutBillingForm, CheckoutBillingForm.Valid)] = {
-    val billingFormReader = purchaseFormReaders.forBillingForm(maybeShippingForm)
+    val billingFormReader = formReaders.forBillingForm(maybeShippingForm)
     val billingForm = billingFormReader.instantiateAgainstReadable(params.asFormReadable)
     val errorsOrValid = billingForm.errorsOrValidatedForm
 
@@ -226,7 +226,7 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
 
   private def redirectCheckoutFormsThroughFlash(celebrityUrlSlug: String, productUrlSlug: String): Redirect = {
     // Get readers for the shipping and billing forms
-    val readers = List(purchaseFormReaders.forShippingForm, purchaseFormReaders.forBillingForm(None))
+    val readers = List(formReaders.forShippingForm, formReaders.forBillingForm(None))
 
     val paramFormReadable = params.asFormReadable
     val formWriteableFlash = flash.asFormWriteable

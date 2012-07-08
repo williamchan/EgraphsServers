@@ -25,7 +25,7 @@ class LoginFunctionalTests extends EgraphsFunctionalTest {
   }
 
   private def getPostStrParams(email: String, password: String): Map[String, String] = {
-    Map[String, String](Fields.Email.name -> email, Fields.Password.name -> password)
+    Map[String, String](Fields.Email -> email, Fields.Password -> password)
   }
 }
 
@@ -46,10 +46,7 @@ class LoginUnitTests extends EgraphsUnitTest with ClearsDatabaseAndValidationBef
           case Some(form) =>
             form.email.value should be (Some("idontexist@egraphs.com"))
             form.password.value should be (Some(TestData.defaultPassword))
-            form.fieldInspecificErrors.map(_.description).headOption.getOrElse("") should be (
-              CustomerLoginForm.badCredentialsMessage
-            )
-
+            
           case None =>
             fail("There should have been serialized form in the flash")
         }
@@ -82,8 +79,8 @@ class LoginUnitTests extends EgraphsUnitTest with ClearsDatabaseAndValidationBef
 
   private def testControllers(email: String, password:String): TestWebsiteControllers = {
     val controllers = TestData.newControllers
-    controllers.params.put(Fields.Email.name, email)
-    controllers.params.put(Fields.Password.name, password)
+    controllers.params.put(Fields.Email, email)
+    controllers.params.put(Fields.Password, password)
 
     controllers
   }
