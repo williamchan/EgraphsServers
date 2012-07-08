@@ -22,7 +22,7 @@ object Landing extends Controller with DefaultHeaderAndFooterData {
     views.frontend.html.celebrity_landing(
       celebrityPublicName = publicName,
       celebrityCasualName = casualName,
-      /*landingPageImageUrl: String, */
+      landingPageImageUrl = "/public/images/bikini_masthead.jpg",
       celebrityIsMale = isMale
     )
   }

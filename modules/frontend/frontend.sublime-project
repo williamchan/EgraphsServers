@@ -6,7 +6,7 @@
     },
 		{
 			"path": "../../apps/front-end-catalog", 
-      "folder_exclude_patterns": ["tmp", "test-result", "modules", "lib"]
+      "folder_exclude_patterns": ["tmp", "test-result", "modules", "lib", "project-modules"]
 		}
 	],
   "settings": {

@@ -158,6 +158,7 @@ class Scenarios extends DeclaresScenarios {
 
    {() =>
      demosetup.DemoScenarios.createAdmin()
+     import Blobs.Conversions._
 
       val celebrity = Celebrity(
         publicName=Some("Wizzle"),
@@ -170,6 +171,7 @@ class Scenarios extends DeclaresScenarios {
       ).withPassword(TestData.defaultPassword).right.get.save()
 
      celebrity.saveWithProfilePhoto(Play.getFile("./test/files/will_chan_celebrity_profile.jpg"))
+     celebrity.withLandingPageImage(Play.getFile("./test/files/bikini_masthead.jpg")).save()
    }
   )
 

@@ -1,4 +1,4 @@
-@(celebrityPublicName: String, celebrityCasualName: String, /*landingPageImageUrl: String, */celebrityIsMale: Boolean = true
+@(celebrityPublicName: String, celebrityCasualName: String, landingPageImageUrl: String, celebrityIsMale: Boolean = true
 )(
   implicit headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData
@@ -9,7 +9,7 @@
 @import views.frontend.tags
 
 @baseBody = {
-  @tags.landing.html.masthead_section(Option(celebrityPublicName))
+  @tags.landing.html.masthead_section(Option(celebrityPublicName), landingPageImageUrl)
 
   <section id="content" role="main">
 

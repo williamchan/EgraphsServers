@@ -3,6 +3,7 @@ package controllers.website.consumer
 import play.mvc.Controller
 import services.http.{CelebrityAccountRequestFilters, ControllerMethod}
 import services.mvc.ImplicitHeaderAndFooterData
+import services.blobs.AccessPolicy
 
 private[consumer] trait CelebrityLandingConsumerEndpoint
   extends ImplicitHeaderAndFooterData
@@ -17,7 +18,7 @@ private[consumer] trait CelebrityLandingConsumerEndpoint
       views.frontend.html.celebrity_landing(
         celebrityPublicName = publicName,
         celebrityCasualName = celebrity.casualName.getOrElse(publicName),
-        /*landingPageImageUrl: String, */
+        landingPageImageUrl = celebrity.landingPageImage.getSaved(AccessPolicy.Public).url,
         celebrityIsMale = true
       )
     }
