@@ -55,8 +55,8 @@
       @tags.html.safeForm("method" -> "POST", "action" -> "/account/settings"){
         <section class="settings-group" id="personal-information">
           <h2>Personal Information</h2>
-          @tags.ng.html.form_namevalue(model = "user.fullname", name={form.fullname.name}, label="Name")
-          @tags.ng.html.form_namevalue(model = "user.username", name={form.username.name}, label="Username", helper="Gallery Url egra.ph/{{user.username}}")
+          @tags.ng.html.form_namevalue(model = "user.fullname", field={form.fullname}, label="Name")
+          @tags.ng.html.form_namevalue(model = "user.username", field={form.username}, label="Username", helper="Gallery Url egra.ph/{{user.username}}")
           @tags.ng.html.form_email(model = "user.email", name={form.email.name}, label="Email")
           @tags.ng.html.form_pwchange(model = "user")
           @tags.ng.html.form_select(model = "user.gallery.visibility", name={form.galleryVisibility.name}, label = "Gallery Visibility",

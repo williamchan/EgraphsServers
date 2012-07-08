@@ -1,25 +1,29 @@
 // Styles for the account settings page
-.row-settings.hide {
-  display: none;
-}
-
 a.row-settings {
   padding-top: 10px;
   padding-bottom: 10px;
 }
+
+.none {
+    display: none ! important
+}
+
 .row-settings, .row-settings:visited {
   border-bottom: 1px solid @tableBorder;
   display: block;
   padding-top: 5px;
   padding-bottom: 5px;
+
   //hide icon by default
   i {
     visibility: hidden;
   }
 
-  input {
-    margin-top: 0px;
-    margin-bottom: 0px;
+  .alert button.close {
+    position: relative;
+    float: right;
+    top: 3px;
+    right: 50px;
   }
 
   label.ng-label, label.checkbox {
@@ -32,7 +36,7 @@ a.row-settings {
     text-transform: uppercase;
   }
 
-  span:first-child, span:first-child:hover {
+  span.row-label {
     font-size: 17px;
     font-weight: bold;
     padding-left: 0px;
@@ -135,7 +139,7 @@ a.add-link:hover p:first-letter{
       text-align: left;
     }
     i {
-      display: hidden;
+      display: none;
     }
 
     span {
