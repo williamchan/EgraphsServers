@@ -4,7 +4,6 @@ import play.mvc.Controller
 import services.Utils
 import services.http.{ControllerMethod, AdminRequestFilters}
 import models.ProductStore
-import services.payment.Payment
 
 private[controllers] trait GetProductAdminEndpoint {
   this: Controller =>
@@ -12,7 +11,6 @@ private[controllers] trait GetProductAdminEndpoint {
   protected def controllerMethod: ControllerMethod
   protected def adminFilters: AdminRequestFilters
   protected def productStore: ProductStore
-  protected def payment: Payment
 
   def getProductAdmin(productId: Long, action: Option[String] = None) = controllerMethod() {
     adminFilters.requireAdministratorLogin { admin =>

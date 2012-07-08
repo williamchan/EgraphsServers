@@ -16,25 +16,13 @@ trait ImplicitHeaderAndFooterData {
   protected def customerStore: CustomerStore
 
   implicit def siteHeaderData: HeaderData = {
-    HeaderData(
-      loggedInStatus=getHeaderLoggedInStatus,
-      insideAnEgraphLink="/inside-an-egraph",
-      egraphsTwitterLink=twitterLink,
-      egraphsFacebookLink=facebookLink
-    )
+    HeaderData(loggedInStatus=getHeaderLoggedInStatus)
   }
 
   implicit def siteFooterData: FooterData = {
     // TODO(erem): After integrating static pages then replace these hard links with
     // relative ones.
-    FooterData(
-      "/about",
-      "/faq",
-      "/terms-of-use",
-      "/privacy-policy",
-      "http://www.twitter.com/egraphs",
-      "http://www.facebook.com/egraphs"
-    )
+    FooterData()
   }
 
   //
@@ -72,6 +60,9 @@ trait ImplicitHeaderAndFooterData {
     "users/" + user + "/" + lastPart
   }
 
-  private val twitterLink = "http://www.twitter.com/egraphs"
-  private val facebookLink = "http://www.facebook.com/egraphs"
+}
+
+object ImplicitHeaderAndFooterData {
+  val twitterLink = "http://www.twitter.com/egraphs"
+  val facebookLink = "http://www.facebook.com/egraphs"
 }

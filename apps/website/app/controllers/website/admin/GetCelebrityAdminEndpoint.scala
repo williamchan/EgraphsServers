@@ -6,6 +6,8 @@ import services.http.{AdminRequestFilters, ControllerMethod}
 import models.{AccountStore, CelebrityStore}
 import play.mvc.results.NotFound
 import controllers.website.consumer.CelebrityLandingConsumerEndpoint
+import models.frontend.header.{HeaderNotLoggedIn, HeaderData}
+import models.frontend.footer.FooterData
 
 private[controllers] trait GetCelebrityAdminEndpoint {
   this: Controller =>
@@ -21,9 +23,9 @@ private[controllers] trait GetCelebrityAdminEndpoint {
       (accountStore.findByCelebrityId(celebrityId), celebrityStore.findById(celebrityId)) match {
         case (Some(account), Some(celebrity)) =>
           action match {
-//            case Some("preview") => {
-//              CelebrityLandingConsumerEndpoint.html(celebrity)
-//            }
+            case Some("preview") => {
+              CelebrityLandingConsumerEndpoint.getCelebrityLandingHtml(celebrity)(HeaderData(), FooterData())
+            }
 
             case _ => {
               flash.put("celebrityId", celebrity.id)

@@ -1,5 +1,7 @@
 package models.frontend.footer
 
+import services.mvc.ImplicitHeaderAndFooterData
+
 /**
  * Data needed to fgormat the footer
  *
@@ -11,10 +13,10 @@ package models.frontend.footer
  * @param egraphsFacebookLink link to the Egraphs facebook page
  */
 case class FooterData(
-  aboutUsLink: String,
-  faqLink: String,
-  termsOfUseLink: String,
-  privacyPolicyLink: String,
-  egraphsTwitterLink: String,
-  egraphsFacebookLink: String
+  aboutUsLink: String="/about",
+  faqLink: String="/faq",
+  termsOfUseLink: String="/terms-of-use",
+  privacyPolicyLink: String="/privacy-policy",
+  egraphsTwitterLink: String=ImplicitHeaderAndFooterData.twitterLink,
+  egraphsFacebookLink: String=ImplicitHeaderAndFooterData.facebookLink
 )
