@@ -1,22 +1,30 @@
 // Styles for the account settings page
-a.row-settings {
-  padding-top: 10px;
-  padding-bottom: 10px;
-}
 
 .none {
     display: none ! important
 }
 
+a.row-settings, a.row-settings:visited {
+padding-bottom: 2px;
+}
 .row-settings, .row-settings:visited {
   border-bottom: 1px solid @tableBorder;
-  display: block;
+  display: inline-block;
   padding-top: 5px;
-  padding-bottom: 5px;
+
 
   //hide icon by default
   i {
     visibility: hidden;
+  }
+
+  input {
+    margin-top: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    margin-bottom: 0px;
+    position: relative;
+
   }
 
   .alert button.close {
