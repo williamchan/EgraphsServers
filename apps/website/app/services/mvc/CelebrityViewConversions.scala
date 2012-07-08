@@ -54,7 +54,7 @@ class CelebrityViewConversions(celeb: Celebrity) {
       FeaturedStar(
         name = publicName,
         secondaryText = celeb.roleDescription,
-        imageUrl = Utils.asset("public/images/440x220_placeholder.gif"),
+        imageUrl = celeb.landingPageImage.resizedWidth(440).getSaved(AccessPolicy.Public).url,
         storefrontUrl = reverse(getStorefrontChoosePhotoTiled(urlSlug)).url
       )
     }

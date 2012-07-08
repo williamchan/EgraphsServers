@@ -88,20 +88,20 @@
 				padding: 0;
 			
 				a {
-	
+					
 					display: block;
-					border: 5px solid transparent;
-				
+					padding: 4px;
+					border: 1px solid lighten(@orange, 10%);
+					// .box-shadow(0px 0px 6px lighten(@orange, 25%);
+					@transition: border .2s linear, box-shadow .2s linear;
+					.transition(@transition);
+					
 					img {
 						display: block;
 					}
-				
+
 				}
-				
-				a:hover {
-					border-color: @orange;
-				}
-			
+							
 			}
 			
 			h4 {
@@ -109,20 +109,29 @@
 				line-height: 1.25em;
 				margin-bottom: 0;
 				font-weight: 600;
-					
-				a { color: @orange; }
 				
-				a:hover { color: @linkColor; }
-				
+				a {
+					color:@orange;
+				}
 			}
 			
 			p {
 				font-size: 14px;
 				line-height: 1.5em;
 				margin-bottom: 0;
-			}	
+			}
+
+			&:hover {
+				// Put link hover styles on article so that the picture and the text change style together
+				figure a {					
+					.box-shadow(0px 0px 6px @orange);
+					border-color: @orange;
+				}
+
+				a { color: @orange; }
+			}
 			
-		}
+		} // end article
 		
 } // end .celebrities
 
