@@ -15,10 +15,10 @@ trait AllConsumerEndpoints
   with GetRecoverAccountConfirmationEndpoint
   with GetResetPasswordEndpoint
   with GetStaticEndpoint
+  with LogoutEndpoints
   with PostAccountSettingsEndpoint
   with PostBuyProductEndpoint
   with PostLoginEndpoint
-  with PostLogoutEndpoint
   with PostOrderConfigureEndpoint
   with PostRecoverAccountEndpoint
   with PostResetPasswordEndpoint

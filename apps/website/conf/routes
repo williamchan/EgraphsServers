@@ -105,6 +105,7 @@ GET     /facebooklogin/callback/?                                   WebsiteContr
 GET     /inside-an-egraph/?                                         WebsiteControllers.getInsideEgraph
 GET     /login/?                                                    WebsiteControllers.getLogin
 POST    /login                                                      WebsiteControllers.postLogin
+GET     /logout/?                                                   WebsiteControllers.getLogout
 POST    /logout                                                     WebsiteControllers.postLogout
 GET     /orders/{<[0-9]+>orderId}/confirm/?                         WebsiteControllers.getOrderConfirmation
 POST    /orders/{<[0-9]+>orderId}/configure                         WebsiteControllers.postOrderPrivacy

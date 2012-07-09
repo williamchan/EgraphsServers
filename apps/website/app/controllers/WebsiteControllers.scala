@@ -28,9 +28,6 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   /** Use EgraphsSession instead */
   @Deprecated val customerIdKey: String = "customer"
 
-  /** Use EgraphsSession instead */
-  @Deprecated val redirectUponLogin: String = "redirectUponLogin"
-
   // Provide endpoint dependencies
   override protected val playConfig = annotatedInstance[PlayConfig, Properties]
   override protected val facebookAppId = annotatedInstance[FacebookAppId, String]

@@ -21,7 +21,6 @@ class CustomerRequestFilters @Inject()(customerStore: CustomerStore) {
     customerOption match {
       case None => {
         session.clear()
-        session.put(WebsiteControllers.redirectUponLogin, request.url)
         new Redirect(GetLoginEndpoint.url().url)
       }
       case Some(customer) => continue(customer, customer.account)

@@ -47,16 +47,14 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
             customer.sendNewCustomerEmail()
           }
         }
-        // todo(wchan): redirect to target location... maybe put target url in session scope
-        new Redirect(Utils.lookupUrl("WebsiteControllers.getRootConsumerEndpoint").url)
+        new Redirect(reverse(WebsiteControllers.getCustomerGallery(customer.id)).url)
 
       }
       case _ => {
         log("Facebook Oauth flow halted. error =  " + error.getOrElse("") +
           ", error_reason = " + error_reason.getOrElse("") +
           ", error_description = " + error_description.getOrElse(""))
-        // todo(wchan): redirect to target location... maybe put target url in session scope
-        new Redirect(Utils.lookupUrl("WebsiteControllers.getRootConsumerEndpoint").url)
+        new Redirect(reverse(WebsiteControllers.getRootConsumerEndpoint).url)
       }
     }
   }
