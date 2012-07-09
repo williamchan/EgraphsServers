@@ -358,6 +358,7 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
         egraph._egraphState === EgraphState.Published.name
       )
       select(FulfilledProductOrder(product, order, egraph))
+      orderBy (egraph.created desc)
     )
   }
 
