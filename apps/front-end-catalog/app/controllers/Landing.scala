@@ -23,7 +23,7 @@ object Landing extends Controller with DefaultHeaderAndFooterData {
       getStartedUrl = "/David-Price/photos",
       celebrityPublicName = publicName,
       celebrityCasualName = casualName,
-      landingPageImageUrl = "/public/images/bikini_masthead.jpg",
+      landingPageImageUrl = "/public/images/ortiz_masthead.jpg",
       celebrityIsMale = isMale
     )
   }
