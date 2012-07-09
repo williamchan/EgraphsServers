@@ -18,7 +18,7 @@ object TestHelpers {
   }
 
   def getBlobKeyFromTestBlobUrl(testBlobUrl: String): String = {
-    testBlobUrl.substring(testBlobUrl.indexOf("test/files/") + "test/files/".length)
+    testBlobUrl.substring(testBlobUrl.indexOf("blob/files/") + "blob/files/".length)
   }
 
 }

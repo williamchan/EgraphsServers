@@ -55,7 +55,7 @@ private[blobs] class FileSystemBlobVendor extends BlobVendor {
       case req: Request => req.getBase
       case null => "http://localhost:9000"
     }
-    serverUrl + "/test/files"
+    serverUrl + "/blob/files"
   }
 }
 

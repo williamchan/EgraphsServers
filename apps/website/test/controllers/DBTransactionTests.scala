@@ -33,7 +33,7 @@ class DBTransactionTests extends EgraphsFunctionalTest {
   def testBlobIsAccessibleViaEgraphsLink() {
     runScenario("A-public-image-is-on-the-blobstore")
 
-    val response = GET("/test/files/a/b/derp.jpg")
+    val response = GET("/blob/files/a/b/derp.jpg")
     assertIsOk(response)
 
     val actualFile = Play.getFile("./test/files/derp.jpg")

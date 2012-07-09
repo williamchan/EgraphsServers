@@ -352,7 +352,7 @@ class Scenarios extends DeclaresScenarios {
 
     """
     Adds an image with the key "a/b/derp.jpg" key to the blobstore. It
-    should be accessible via /test/files/a/b/derp.jpg
+    should be accessible via /blob/files/a/b/derp.jpg
     """,
 
     {() =>

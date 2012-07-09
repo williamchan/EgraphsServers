@@ -34,7 +34,7 @@ GET     /test/throwError                         website.nonproduction.TestContr
 %{ if (true) }%
 
 # Home page
-GET     /test/files/{<.*>blobKey}               WebsiteControllers.getBlob
+GET     /blob/files/{<.*>blobKey}               WebsiteControllers.getBlob
 
 # Map static resources from the /app/public folder to the /public path
 GET     /public/                                staticDir:public
