@@ -104,6 +104,7 @@ POST    /account/verify                                             WebsiteContr
 GET     /account/{<[0-9]+>galleryCustomerId}/gallery/?              WebsiteControllers.getCustomerGallery
 GET     /egraph/{<[0-9]+>orderId}/?                                 WebsiteControllers.getEgraph
 GET     /facebooklogin/callback/?                                   WebsiteControllers.getFacebookLoginCallback
+GET     /faq/?                                                      WebsiteControllers.getFAQ
 GET     /inside-an-egraph/?                                         WebsiteControllers.getInsideEgraph
 GET     /login/?                                                    WebsiteControllers.getLogin
 POST    /login                                                      WebsiteControllers.postLogin

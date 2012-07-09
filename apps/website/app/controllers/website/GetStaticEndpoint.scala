@@ -13,6 +13,11 @@ private[controllers] trait GetStaticEndpoint extends ImplicitHeaderAndFooterData
     views.frontend.html.about_us(learnMoreUrl = Utils.lookupUrl("WebsiteControllers.getInsideEgraph").url)
   }
 
+  def getFAQ = controllerMethod() {
+    views.frontend.html.faq()
+  }
+
+
   def getInsideEgraph = controllerMethod() {
     val tableOfContents =
       List(
