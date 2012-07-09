@@ -1,5 +1,4 @@
-// @import "../soundmanager/360-player/360player.less";
-// @import "../soundmanager/360-player/360player-visualization.less";
+@import "../twitter-bootstrap/less/bootstrap.less";
 
 @storyTextMargin: 25px;
 @storyTextWidth: 215px; 
@@ -51,7 +50,9 @@
 
 html.egraph-page, .egraph-page body {
   height:100%;
-  min-height:880px;
+  // ensures that the soundmanager <embed> doesnt accidentally cause our gradient to
+  // start repeating
+  min-height:820px;
 }
 
 .egraph-page body {
@@ -176,10 +177,11 @@ html.egraph-page, .egraph-page body {
               position:relative;
               top:-82px;
               left:-64px;
+              cursor:default; // We only want the pointer over the play button              
             }
             
             .player-widget.ui360-vis {
-              
+
               .sm2-timing {
                 // Adjust the play widget's display;
                 color:#f4f4f4;
@@ -575,5 +577,13 @@ html.egraph-page, .egraph-page body {
         z-index:-1
       }
     }
+  }
+
+  #sm2-container {
+    // Put the <embed> added by SoundManager at the top of the page instead of screwing up the
+    // body gradient at the top.
+    position:absolute;
+    top:0px;
+    left:0px;
   }
 }
