@@ -57,8 +57,9 @@
           <h2>Personal Information</h2>
           @tags.ng.html.form_namevalue(model = "user.fullname", field={form.fullname}, label="Name")
           @tags.ng.html.form_namevalue(model = "user.username", field={form.username}, label="Username", helper="Gallery Url egra.ph/{{user.username}}")
-          @tags.ng.html.form_email(model = "user.email", name={form.email.name}, label="Email")
-          @tags.ng.html.form_pwchange(model = "user")
+          @tags.ng.html.form_email(model = "user.email", field={form.email}, label="Email")
+          @tags.ng.html.form_pwchange(model = "user", oldField=form.oldPassword, newField=form.newPassword,
+            confirmField=form.passwordConfirm)
           @tags.ng.html.form_select(model = "user.gallery.visibility", name={form.galleryVisibility.name}, label = "Gallery Visibility",
           options = Map("public" -> "Public","private" -> "Private"), initValue={form.galleryVisibility.value.getOrElse("public")})
         </section>

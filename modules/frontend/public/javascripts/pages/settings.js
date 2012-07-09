@@ -63,16 +63,16 @@ define(["Egraphs", "libs/angular", "services/forms"], function (Egraphs) {
           e.preventDefault();
         });
 
-        $("#user_password_confirmation").change(function (e) {
-          var password = $("#user_password");
-          var password_confirmation = $("#user_password_confirmation");
-
-          if(password.val() === password_confirmation.val()) {
-            $("#password_message").addClass("invisible");
-          } else {
-            $("#password_message").removeClass("invisible");
-          }
-        });
+//        $("#user_password_confirmation").change(function (e) {
+//          var password = $("#user_password");
+//          var password_confirmation = $("#user_password_confirmation");
+//
+//          if(password.val() === password_confirmation.val()) {
+//            $("#password_message").addClass("invisible");
+//          } else {
+//            $("#password_message").removeClass("invisible");
+//          }
+//        });
 
       });
     }
