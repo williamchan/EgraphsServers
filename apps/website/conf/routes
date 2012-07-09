@@ -28,6 +28,11 @@ GET     /test/throwError                         website.nonproduction.TestContr
 ##
 ## Defaults
 ##
+
+# Need this TRUE conditional, otherwise the if (play.id == test) conditional from above
+# applies to ALL THE REST OF THE ROUTES.
+%{ if (true) }%
+
 # Home page
 GET     /test/files/{<.*>blobKey}               WebsiteControllers.getBlob
 
