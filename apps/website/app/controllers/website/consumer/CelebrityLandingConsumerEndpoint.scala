@@ -5,6 +5,7 @@ import services.http.{CelebrityAccountRequestFilters, ControllerMethod}
 import services.mvc.ImplicitHeaderAndFooterData
 import services.blobs.AccessPolicy
 import services.Utils
+import models.ImageAsset
 
 private[consumer] trait CelebrityLandingConsumerEndpoint
   extends ImplicitHeaderAndFooterData
@@ -15,11 +16,16 @@ private[consumer] trait CelebrityLandingConsumerEndpoint
 
   def getCelebrityLanding(celebrityUrlSlug: String) = controllerMethod() {
     celebFilters.requireCelebrityUrlSlug { celebrity =>
+      val landingPageImageUrl = celebrity.landingPageImage
+        .withImageType(ImageAsset.Jpeg)
+        .getSaved(AccessPolicy.Public)
+        .url
+
       val publicName = celebrity.publicName.get
       views.frontend.html.celebrity_landing(
         celebrityPublicName = publicName,
         celebrityCasualName = celebrity.casualName.getOrElse(publicName),
-        landingPageImageUrl = celebrity.landingPageImage.getSaved(AccessPolicy.Public).url,
+        landingPageImageUrl = landingPageImageUrl,
         celebrityIsMale = true
       )
     }

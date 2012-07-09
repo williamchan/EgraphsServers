@@ -164,7 +164,8 @@ class Scenarios extends DeclaresScenarios {
       val celebrity = Celebrity(
         publicName=Some("Wizzle"),
         bio="Love my fans from New York to Tokyo, from Seoul to the Sudetenland. And for all you haters out there -- don't mess around. I sleep with one eye closed, the other fixed on my Vespene gas supply.",
-        organization = "Major League Baseball"
+        organization = "Major League Baseball",
+        isFeatured = true
       ).withPublishedStatus(PublishedStatus.Published).save()
 
       Account(email="wchan83@egraphs.com",
