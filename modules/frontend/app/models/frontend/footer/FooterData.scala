@@ -11,10 +11,10 @@ package models.frontend.footer
  * @param egraphsFacebookLink link to the Egraphs facebook page
  */
 case class FooterData(
-  aboutUsLink: String,
-  faqLink: String,
-  termsOfUseLink: String,
-  privacyPolicyLink: String,
-  egraphsTwitterLink: String,
-  egraphsFacebookLink: String
+  aboutUsLink: String="/about",
+  faqLink: String="/faq",
+  termsOfUseLink: String="/terms-of-use",
+  privacyPolicyLink: String="/privacy-policy",
+  egraphsTwitterLink: String = "http://www.twitter.com/egraphs",
+  egraphsFacebookLink: String = "http://www.facebook.com/egraphs"
 )

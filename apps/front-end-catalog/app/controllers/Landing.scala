@@ -13,13 +13,14 @@ object Landing extends Controller with DefaultHeaderAndFooterData {
    * 0 <= n <= sampleStars.length
    **/
   def featured_stars(count: Int) = {
-    views.frontend.html.landing(sampleStars.slice(0, count))
+    views.frontend.html.landing(featuredStars = sampleStars.slice(0, count))
   }
 
   def single_celebrity(publicName: String = "David Price",
                        casualName: String = "David",
                        isMale: Boolean = true) = {
     views.frontend.html.celebrity_landing(
+      getStartedUrl = "/David-Price/photos",
       celebrityPublicName = publicName,
       celebrityCasualName = casualName,
       landingPageImageUrl = "/public/images/bikini_masthead.jpg",

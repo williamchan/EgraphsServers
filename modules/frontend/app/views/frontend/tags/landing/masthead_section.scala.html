@@ -1,4 +1,4 @@
-@(celebrityPublicName: Option[String] = None, mastheadImageUrl: String = "/public/images/landing-masthead-1.jpg")
+@(celebrityPublicName: Option[String] = None, mastheadImageUrl: String = "/public/images/landing-masthead-1.jpg", getStartedUrl: Option[String] = None)
 
 <section id="masthead-home" role="banner" style="background: #1A1A1A url(@mastheadImageUrl) no-repeat 50% 0;">
 
@@ -12,7 +12,7 @@
 
           <h1>What if you could have a minute with @celebrityPublicName.getOrElse("your star")?</h1>
 
-          <p><a href="#" class="button"><strong>Get Started</strong> <span>&raquo;</span></a></p>
+          @getStartedUrl.map { url => <p><a href="@url" class="button"><strong>Get Started</strong> <span>&raquo;</span></a></p> }
 
         </div>
 

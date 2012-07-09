@@ -1,5 +1,6 @@
 /* Scripting for the base template page */
 define([], function() {
+  var menuStatus = "closed";
 
   return {
     /**
@@ -18,13 +19,17 @@ define([], function() {
 
         // show top account menu on click
         $('#top .account.logged-in').click(function(e){
-          var account_options = $(this).find('.account-options');
-          $('body').one('click',function(){
-            account_options.removeClass('active');
-          });
-          account_options.addClass('active');
-          e.stopPropagation();
-          e.preventDefault();
+          if (menuStatus === "closed") {
+            var account_options = $(this).find('.account-options');
+            $('body').one('click',function(){
+              account_options.removeClass('active');
+              menuStatus = "closed";
+            });
+            account_options.addClass('active');
+            menuStatus = "open";
+            e.stopPropagation();
+            e.preventDefault();
+          }
         });
 
         // smooth scroll to top

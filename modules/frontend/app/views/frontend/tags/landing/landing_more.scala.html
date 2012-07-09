@@ -1,4 +1,4 @@
-@(featureStarsFooter: Option[Html] = None, celebrityPublicName: Option[String] = None)
+@(featureStarsFooter: Option[Html] = None, celebrityPublicName: Option[String] = None, getStartedUrl: Option[String] = None)
 
 <section id="landing-more">
 
@@ -6,25 +6,25 @@
 
     <article class="view span4">
 
-      <h2><a href="#">Viewing Your Egraph</a></h2>
+      <h2><a href="/inside-an-egraph#do">Viewing Your Egraph</a></h2>
 
-      <p>Consectetur adipiscing elit. Cras aliquet, sem sed rutrum dignissim, magna enim eta pretium ante. Rutrum dignissim, magna enim. <a href="#">Learn More &raquo;</a></p>
+      <p>Consectetur adipiscing elit. Cras aliquet, sem sed rutrum dignissim, magna enim eta pretium ante. Rutrum dignissim, magna enim. <a href="/inside-an-egraph#do">Learn More &raquo;</a></p>
 
     </article> <!-- end .view -->
 
     <article class="print span4">
 
-      <h2><a href="#">Printing Your Egraph</a></h2>
+      <h2><a href="/inside-an-egraph#do">Printing Your Egraph</a></h2>
 
-      <p>Consectetur adipiscing elit. Cras aliquet, sem sed rutrum dignissim, magna enim eta pretium ante. Rutrum dignissim, magna enim. <a href="#">Learn More &raquo;</a></p>
+      <p>Consectetur adipiscing elit. Cras aliquet, sem sed rutrum dignissim, magna enim eta pretium ante. Rutrum dignissim, magna enim. <a href="/inside-an-egraph#do">Learn More &raquo;</a></p>
 
     </article> <!-- end .print -->
 
     <article class="share span4">
 
-      <h2><a href="#">Sharing Your Egraph</a></h2>
+      <h2><a href="/inside-an-egraph#do">Sharing Your Egraph</a></h2>
 
-      <p>Consectetur adipiscing elit. Cras aliquet, sem sed rutrum dignissim, magna enim eta pretium ante. Rutrum dignissim, magna enim. <a href="#">Learn More &raquo;</a></p>
+      <p>Consectetur adipiscing elit. Cras aliquet, sem sed rutrum dignissim, magna enim eta pretium ante. Rutrum dignissim, magna enim. <a href="/inside-an-egraph#do">Learn More &raquo;</a></p>
 
     </article> <!-- end .share -->
 
@@ -41,7 +41,7 @@
       }
     </h1>
 
-    <p><a href="#" class="button"><strong>Get Started</strong> <span>&raquo;</span></a></p>
+    @getStartedUrl.map { url => <p><a href="@url" class="button"><strong>Get Started</strong> <span>&raquo;</span></a></p> }
 
   </header>
 

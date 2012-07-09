@@ -1,4 +1,4 @@
-@()(
+@(learnMoreUrl: String)(
 implicit session: play.mvc.Scope.Session,
 headerData: models.frontend.header.HeaderData,
 footerData: models.frontend.footer.FooterData
@@ -42,7 +42,7 @@ footerData: models.frontend.footer.FooterData
                 favorite stars and connect with them through an egraph: a personalized voice
                 and written message from the star to the fan that can be shared with the world.
               </p>
-              <a href="#">Want to learn more?</a>
+              <a href="@learnMoreUrl">Want to learn more?</a>
             </div>
           </div>
         </div>
