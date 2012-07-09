@@ -29,6 +29,6 @@ private[controllers] trait GetRootConsumerEndpoint extends ImplicitHeaderAndFoot
       validStar
     }
 
-    views.frontend.html.landing(validStars)
+    views.frontend.html.landing(featuredStars = validStars)
   }
 }

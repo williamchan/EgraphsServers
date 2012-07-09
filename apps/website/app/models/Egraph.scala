@@ -14,12 +14,11 @@ import audio.AudioConverter
 import db.{FilterOneTable, Schema, KeyedCaseClass, Saves}
 import graphics.{RasterGraphicsSource, Handwriting, HandwritingPen, GraphicsSource}
 import java.text.SimpleDateFormat
-import controllers.WebsiteControllers
-import controllers.website.GetCelebrityProductEndpoint
 import com.google.inject.{Provider, Inject}
 import play.utils.HTML.htmlEscape
 import org.squeryl.Query
 import xyzmo.{XyzmoVerifyUserStore, XyzmoVerifyUser}
+import controllers.website.consumer.{StorefrontChoosePhotoConsumerEndpoints, CelebrityLandingConsumerEndpoint}
 
 /**
  * Vital services for an Egraph to perform its necessary functionality
@@ -492,12 +491,12 @@ case class EgraphStory(
   }
 
   private def startCelebPageLink: String = {
-    htmlAnchorStart(href=WebsiteControllers.lookupGetCelebrity(celebUrlSlug).url)
+    htmlAnchorStart(href=CelebrityLandingConsumerEndpoint.url(celebUrlSlug).url)
   }
 
   private def startProductLink: String = {
     htmlAnchorStart(
-      href=GetCelebrityProductEndpoint.urlFromSlugs(celebUrlSlug, productUrlSlug).url
+      href=StorefrontChoosePhotoConsumerEndpoints.url(celebUrlSlug, productUrlSlug).url
     )
   }
 

@@ -13,7 +13,7 @@ import org.joda.money.Money
  * @param carouselUrl what the URL should change to when this product is selected on
  *     the carousel.
  * @param facebookShareLink link to share this photo on facebook
- * @param twitterShareLink link to share this photo on twitter
+ * @param twitterShareText default text to share this photo on twitter
  */
 case class ChoosePhotoCarouselProduct(
   name: String,
@@ -24,5 +24,6 @@ case class ChoosePhotoCarouselProduct(
   orientation: ProductOrientation,
   carouselUrl: String,
   facebookShareLink: String,
-  twitterShareLink: String
+  twitterShareText: String,
+  carouselViewLink: String
 )

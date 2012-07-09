@@ -1,11 +1,10 @@
 package services.mvc
 
-import models.frontend.header.{HeaderLoggedInStatus, HeaderNotLoggedIn, HeaderLoggedIn, HeaderData}
+import models.frontend.header.{HeaderNotLoggedIn, HeaderLoggedIn, HeaderData}
 import models.frontend.footer.FooterData
-import play.mvc.Scope.Session
-import controllers.WebsiteControllers
 import services.http.EgraphsSession
 import models.{Customer, CustomerStore}
+import services.Utils
 
 /**
  * Provides implicit data necessary to render the header and footer of the website's
@@ -16,25 +15,13 @@ trait ImplicitHeaderAndFooterData {
   protected def customerStore: CustomerStore
 
   implicit def siteHeaderData: HeaderData = {
-    HeaderData(
-      loggedInStatus=getHeaderLoggedInStatus,
-      insideAnEgraphLink="/inside-an-egraph",
-      egraphsTwitterLink=twitterLink,
-      egraphsFacebookLink=facebookLink
-    )
+    HeaderData(loggedInStatus=getHeaderLoggedInStatus)
   }
 
   implicit def siteFooterData: FooterData = {
     // TODO(erem): After integrating static pages then replace these hard links with
     // relative ones.
-    FooterData(
-      "/about",
-      "/faq",
-      "/terms-of-use",
-      "/privacy-policy",
-      "http://www.twitter.com/egraphs",
-      "http://www.facebook.com/egraphs"
-    )
+    FooterData()
   }
 
   //
@@ -42,13 +29,11 @@ trait ImplicitHeaderAndFooterData {
   //
   private def getHeaderLoggedInStatus: Either[HeaderNotLoggedIn, HeaderLoggedIn] = {
     val headerLoggedInOption = getCustomerOption.map { customer =>
-      def customerUrl(lastPart: String) = "users/" + customer + "/" + lastPart
-
       HeaderLoggedIn(
         name=customer.name,
-        profileUrl=customerUrl("profile"),
-        accountSettingsUrl=customerUrl("settings"),
-        galleryUrl=customerUrl("/gallery"),
+        profileUrl="",
+        accountSettingsUrl=Utils.lookupUrl("WebsiteControllers.getAccountSettings").url,
+        galleryUrl=Utils.lookupUrl("WebsiteControllers.getCustomerGallery", Map("galleryCustomerId" -> customer.id.toString)).url,
         logoutUrl="/logout"
       )
     }
@@ -72,6 +57,4 @@ trait ImplicitHeaderAndFooterData {
     "users/" + user + "/" + lastPart
   }
 
-  private val twitterLink = "http://www.twitter.com/egraphs"
-  private val facebookLink = "http://www.facebook.com/egraphs"
 }

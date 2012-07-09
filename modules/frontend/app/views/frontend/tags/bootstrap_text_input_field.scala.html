@@ -1,6 +1,7 @@
 @(labelText: String, 
   field: models.frontend.forms.Field[_],
   hint: String="",
+  inputType: String = "text",
   size:Option[Int]=None,
   inputClass: String="",
   omitName: Boolean=false
@@ -15,6 +16,8 @@
       labelText - the text that should be put into the label for the field. e.g. "Email address:"
       field - the Field object, for use in naming the <input> and for error reporting.
       hint - any coaching that should go below the label
+      inputType - the type of text input that should be displayed: e.g. "email", "password",
+          "text", etc.
       inputClass - any additional classes that should be put onto the input element
       omitName - whether or not to omit the name of the input (for example, for sensitive card data
           we don't even want to have the info hit our servers.
@@ -27,7 +30,7 @@
         <input 
           id="@field.name" 
           @if(!omitName) {name="@field.name"}
-          type="text" 
+          type="@inputType" 
           value="@field.value"
           class="@inputClass"
           @for(sizeValue <- size) {size="@sizeValue"}>      

@@ -1,6 +1,6 @@
 package services.mvc
 
-import models.Celebrity
+import models.{ImageAsset, Celebrity}
 import models.frontend.storefront.{ChoosePhotoRecentEgraph, ChoosePhotoCelebrity}
 import services.blobs.AccessPolicy
 import models.frontend.landing.FeaturedStar
@@ -51,10 +51,17 @@ class CelebrityViewConversions(celeb: Celebrity) {
    */
   def asFeaturedStar: Option[FeaturedStar] = {
     for (publicName <- celeb.publicName; urlSlug <- celeb.urlSlug) yield {
+      val mastheadImageUrl = celeb
+        .landingPageImage
+        .withImageType(ImageAsset.Jpeg)
+        .resizedWidth(440)
+        .getSaved(AccessPolicy.Public)
+        .url
+
       FeaturedStar(
         name = publicName,
         secondaryText = celeb.roleDescription,
-        imageUrl = Utils.asset("public/images/440x220_placeholder.gif"),
+        imageUrl = mastheadImageUrl,
         storefrontUrl = reverse(getStorefrontChoosePhotoTiled(urlSlug)).url
       )
     }

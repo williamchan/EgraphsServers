@@ -76,7 +76,7 @@
 	    				    <div class="field">
 	      				    <div class="clearfix">
 	      				      <label class="instructions" for="gift">
-	      				      	Is This a Gift? <small>Current guaranteed delivery: @guaranteedDelivery.formatDayAsPlainLanguage</small>
+	      				      	Is This a Gift? <small>Expected Delivery By: @guaranteedDelivery.formatDayAsPlainLanguage</small>
 	      				      </label>
 	      				      @tags.html.bootstrap_input_field(form.isGift) {
 	      				        <input id="gift" 
@@ -164,7 +164,7 @@
 	      				                    name="@form.messageText.name"
 	      				                    rows="8"
 	      				                    cols="1">@form.messageText.value</textarea>
-	      				          <p class="align-right"><small><a href="#" class="tip">How do I know it's really him?</a></small></p>
+	      				          <p class="align-right"><small><a href="/inside-an-egraph#biometric" target="_blank" class="tip">How do I know it's really him?</a></small></p>
 	      				        </div>
 	      				        <input type="hidden"
 	      				               id="message-type"
@@ -200,7 +200,7 @@
 	    				  
 	    				  	<div class="clearfix">
 	    				  
-	    				 			@tags.html.arrow_button(caption="Review", target="#", classes="button right")
+	    				 			@tags.html.arrow_button(caption="Review", classes="button right")
 	    				 		
 	    				  	</div>
 	    				  

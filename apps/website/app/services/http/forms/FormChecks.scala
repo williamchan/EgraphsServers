@@ -193,6 +193,17 @@ class FormChecks @Inject()(accountStore: AccountStore, customerStore: CustomerSt
     }
   }
 
+  /**
+   * Checks that the provided string is a valid password as per our not-so-stringent
+   * password strength checks.
+   */
+  def isValidPassword(toValidate: String, message: String="")
+  : Either[FormError, String] = {
+    Password.validate(toValidate).left.map(playValidation =>
+      new SimpleFormError(if (message == "") playValidation.error.message() else message)
+    )
+  }
+
   def isAlphaNumeric(toValidate: String, message: String="Must be alphanumeric")
   : Either[FormError, String] = {
     if (playValidation.`match`(toValidate, "[a-zA-Z0-9]*").ok) {

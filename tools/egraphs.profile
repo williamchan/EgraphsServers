@@ -48,4 +48,5 @@ export eg_monitoring=ec2-50-16-114-74.compute-1.amazonaws.com
 export egdb_staging=ec2-107-21-229-179.compute-1.amazonaws.com
 export egdb_beta=ec2-50-19-82-23.compute-1.amazonaws.com
 export egdb_live=ec2-23-21-137-254.compute-1.amazonaws.com
-export eg_helium=ec2-23-22-221-28.compute-1.amazonaws.com
+export helium=ec2-23-22-221-28.compute-1.amazonaws.com
+export lithium=ec2-50-19-67-97.compute-1.amazonaws.com

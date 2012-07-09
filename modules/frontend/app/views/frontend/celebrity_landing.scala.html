@@ -1,0 +1,43 @@
+@(getStartedUrl: String, celebrityPublicName: String, celebrityCasualName: String, landingPageImageUrl: String, celebrityIsMale: Boolean = true
+)(
+  implicit headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData
+)
+
+@{/** Celebrity landing page */}
+
+@import views.frontend.tags
+
+@baseBody = {
+  @tags.landing.html.masthead_section(Option(celebrityPublicName), landingPageImageUrl, Option(getStartedUrl))
+
+  <section id="content" role="main">
+
+    <div id="main">
+
+      <div class="container">
+
+        @tags.landing.html.welcome_header(Option(celebrityPublicName), celebrityIsMale)
+
+        @tags.landing.html.landing_steps(Option(celebrityPublicName), Option(celebrityCasualName), celebrityIsMale)
+
+        @tags.landing.html.landing_details(Option(celebrityPublicName), Option(celebrityCasualName), celebrityIsMale)
+
+        @tags.landing.html.landing_more(None, Option(celebrityPublicName), Option(getStartedUrl))
+
+        <p class="to-top"><a href="#top">Back to Top</a></p>
+
+      </div>
+      <!-- end .container -->
+
+    </div>
+    <!-- end #main -->
+
+  </section> <!-- end #content -->
+}
+
+@base_template(
+  title="What if you could have a minute with " + celebrityPublicName + "? | Egraphs",
+  jsMain="pages/landing",
+  body=baseBody
+)

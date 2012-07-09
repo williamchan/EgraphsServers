@@ -1,13 +1,13 @@
 package controllers.website.consumer
 
 import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters, ControllerMethod}
-import play.mvc.Controller
-
+import play.mvc.{Router, Controller}
 import services.mvc.{ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
 import play.mvc.results.Redirect
 import services.http.forms.purchase.PurchaseFormFactory
 import services.Utils
 import controllers.WebsiteControllers.getStorefrontPersonalize
+import models.{Celebrity, Product}
 
 /**
  * Manages GET and POST of celebrity photos in the purchase flow.
@@ -27,6 +27,7 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
   protected def celebFilters: CelebrityAccountRequestFilters
   protected def postController: POSTControllerMethod
   protected def purchaseFormFactory: PurchaseFormFactory
+  protected def facebookAppId: String
 
   //
   // Controllers
@@ -76,7 +77,7 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
 
         case indexOfProductInProductList =>
           val productViews = for (product <- products) yield {
-            product.asChoosePhotoCarouselView(celebUrlSlug=celeb.urlSlug.getOrElse("/"))
+            product.asChoosePhotoCarouselView(celebUrlSlug=celeb.urlSlug.getOrElse("/"), fbAppId = facebookAppId)
           }
 
           views.frontend.html.celebrity_storefront_choose_photo_carousel(
@@ -109,5 +110,18 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
       )
     }
   }
-
 }
+
+object StorefrontChoosePhotoConsumerEndpoints {
+
+  def url(celebrity:Celebrity, product:Product): Router.ActionDefinition = {
+    url(celebrity.urlSlug.get, product.urlSlug)
+  }
+
+  def url(celebrityUrlSlug: String, productUrlSlug: String): Router.ActionDefinition = {
+    Utils.lookupUrl("WebsiteControllers.getStorefrontChoosePhotoCarousel",
+      Map("celebrityUrlSlug" -> celebrityUrlSlug, "productUrlSlug" -> productUrlSlug)
+    )
+  }
+}
+

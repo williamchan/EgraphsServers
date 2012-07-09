@@ -10,7 +10,6 @@ import services.graphics.Handwriting
 import models._
 import controllers.WebsiteControllers
 import play.mvc.results.Redirect
-import services.Utils
 
 private[controllers] trait GetEgraphEndpoint { this: Controller =>
   protected def administratorStore: AdministratorStore
@@ -41,7 +40,7 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
         )
 
       case Some(FulfilledOrder(order, egraph)) =>
-        new Redirect(Utils.lookupUrl("WebsiteControllers.getRootEndpoint").url)
+        new Redirect(reverse(WebsiteControllers.getRootConsumerEndpoint).url)
 
       case None =>
         NotFound("No Egraph exists with the provided identifier.")

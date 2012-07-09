@@ -1,0 +1,80 @@
+@(celebrityPublicName: Option[String] = None, celebrityCasualName: Option[String] = None, celebrityIsMale: Boolean = true)
+
+<section id="landing-steps">
+
+  <header>
+
+    <h1>Here's How It Works.</h1>
+
+  </header>
+
+  <ol>
+
+    <li class="step-1 clearfix">
+
+      <div class="instructions">
+
+        <h2>
+          <strong>1.</strong> Select
+          @{
+          celebrityPublicName match {
+              case None => "Your Celebrity's Photo"
+              case Some(name) => "a Photo of " + name
+            }
+          }
+        </h2>
+
+        <p>@celebrityPublicName.getOrElse("Your star") hand-writes a personal message on every egraph,
+          which is why each one starts with a hand selected, professional grade photo. Think of it like
+          the poster or polaroid that you stood in line to get autographed years ago.
+        </p>
+
+      </div> <!-- end .instructions -->
+
+      <img src='@asset("/public/images/macbook-air.png")' alt="macbook-air" />
+
+    </li> <!-- end .step-1 -->
+
+    <li class="step-2 clearfix">
+
+      <div class="instructions">
+
+        <h2><strong>2.</strong> Write Your Star a Note</h2>
+
+        <p>Everyone loves to be loved, and @celebrityPublicName.getOrElse("your star") is no different.
+          Remind @views.frontend.Utils.himOrHer(celebrityIsMale) of your chance encounter
+          at the supermarket. Ask @views.frontend.Utils.himOrHer(celebrityIsMale) to wish you a happy birthday.
+          Reveal your secret crush.
+          <em>@views.frontend.Utils.heOrShe(celebrityIsMale, true) will personally read every single word.</em>
+        </p>
+
+        <p><small><a href="#">What can I write? &raquo;</a></small></p>
+
+      </div> <!-- end .instructions -->
+
+      <img src='@asset("/public/images/fpo-keyboard.png")' alt="keyboard" class="positioned" />
+
+    </li> <!-- end .step-2 -->
+
+    <li class="step-3 clearfix">
+
+      <div class="instructions">
+
+        <h2><strong>3.</strong> @celebrityPublicName.getOrElse("Your star") Responds into the Mic</h2>
+
+        <p>Believe it or not, we book a block of @celebrityPublicName.getOrElse("your celebrity")'s time
+          with your name on it, moments after you finish your note. This gives @celebrityCasualName.getOrElse("him")
+          plenty of time to find a quiet spot, hand-write you a response, and speak a short message
+          just for you into @views.frontend.Utils.hisOrHer(celebrityIsMale) iPad's microphone.</p>
+
+        <p><small><a href="/inside-an-egraph#biometric" target="_blank">How do I know it's really @views.frontend.Utils.himOrHer(celebrityIsMale)? &raquo;</a></small></p>
+
+      </div> <!-- end .instructions -->
+
+      <img src='@asset("/public/images/bg-fpo-ipad.png")' alt="ipad" class="positioned" />
+
+    </li> <!-- end .step-3 -->
+
+  </ol>
+
+</section> <!-- end #landing-steps -->

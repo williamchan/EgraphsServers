@@ -3,7 +3,7 @@ package controllers.website.consumer
 import services.mvc.{ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
 import play.mvc.Controller
 import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters, ControllerMethod}
-import services.http.forms.purchase.{PurchaseFormChecks, PurchaseFormReaders, PersonalizeForm, PurchaseFormFactory}
+import services.http.forms.purchase.{PurchaseFormChecks, FormReaders, PersonalizeForm, PurchaseFormFactory}
 import services.mvc.FormConversions.personalizeFormToView
 import controllers.WebsiteControllers
 import models.frontend.storefront.{PersonalizeForm => PersonalizeFormView, StorefrontOrderSummary}
@@ -24,7 +24,7 @@ trait StorefrontPersonalizeConsumerEndpoints
   protected def controllerMethod: ControllerMethod
   protected def postController: POSTControllerMethod
   protected def purchaseFormFactory: PurchaseFormFactory
-  protected def purchaseFormReaders: PurchaseFormReaders
+  protected def formReaders: FormReaders
   protected def celebFilters: CelebrityAccountRequestFilters
 
   //
@@ -108,7 +108,7 @@ trait StorefrontPersonalizeConsumerEndpoints
       val purchaseForms = purchaseFormFactory.formsForStorefront(celeb.id)
 
       // Read the Personalize form out of the parameters
-      val formReader = purchaseFormReaders.forPersonalizeForm
+      val formReader = formReaders.forPersonalizeForm
       val form = formReader.instantiateAgainstReadable(params.asFormReadable)
 
       // Comprehend over a bunch of validation checks

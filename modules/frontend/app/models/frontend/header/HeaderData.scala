@@ -9,8 +9,8 @@ package models.frontend.header
  * @param egraphsFacebookLink link to our facebook page
  */
 case class HeaderData(
-  loggedInStatus: Either[HeaderNotLoggedIn, HeaderLoggedIn],
-  insideAnEgraphLink: String,
-  egraphsTwitterLink: String,
-  egraphsFacebookLink: String  
+  loggedInStatus: Either[HeaderNotLoggedIn, HeaderLoggedIn] = Left(HeaderNotLoggedIn("/")),
+  insideAnEgraphLink: String = "/inside-an-egraph",
+  egraphsTwitterLink: String = "http://www.twitter.com/egraphs",
+  egraphsFacebookLink: String = "http://www.facebook.com/egraphs"
 )

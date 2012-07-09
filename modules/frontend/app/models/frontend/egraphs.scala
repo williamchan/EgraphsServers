@@ -28,11 +28,11 @@ case class PendingEgraphViewModel(
   thumbnailUrl: String) extends EgraphViewModel
 
 case class FulfilledEgraphViewModel(
-  downloadUrl: Option[String],
+  viewEgraphUrl: String,
   publicStatus: String,
   signedTimestamp: String,
-  fbAppId: String,
-  redirectURI: String,
+  facebookShareLink: String,
+  twitterShareText: String,
   orderId: Long,
   orientation: String,
   productUrl: String,

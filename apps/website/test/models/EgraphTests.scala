@@ -143,7 +143,7 @@ class EgraphTests extends UnitFlatSpec
       signingTimestamp = Time.fromApiFormat("2011-02-10 13:00:00.256")
     )
     story.title should be ("Herpy Derpson")
-    story.body should be ("Herpy Derpson<a href='/Herpy-Derpson' >Erem RecipientNBA Finals 2012<a href='/Herpy-Derpson/NBA-Finals-2012' >February 10, 2012February 10, 2011</a>")
+    story.body should be ("Herpy Derpson<a href='/Herpy-Derpson' >Erem RecipientNBA Finals 2012<a href='/Herpy-Derpson/photos/NBA-Finals-2012' >February 10, 2012February 10, 2011</a>")
   }
 
   "getEgraphsAndResults" should "filter queries based on EgraphQueryFilters" in {

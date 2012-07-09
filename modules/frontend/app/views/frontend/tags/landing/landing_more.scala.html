@@ -1,0 +1,22 @@
+@(featureStarsFooter: Option[Html] = None, celebrityPublicName: Option[String] = None, getStartedUrl: Option[String] = None)
+
+<section id="landing-more">
+
+  <header>
+
+    <h1>
+      @{
+        celebrityPublicName match {
+          case None => "Which Star Will You Connect With?"
+          case Some(name) => "Connect with " + name
+        }
+      }
+    </h1>
+
+    @getStartedUrl.map { url => <p><a href="@url" class="button"><strong>Get Started</strong> <span>&raquo;</span></a></p> }
+
+  </header>
+
+  @featureStarsFooter.getOrElse("")
+
+</section> <!-- end #landing-more -->

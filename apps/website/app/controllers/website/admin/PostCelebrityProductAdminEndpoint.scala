@@ -9,11 +9,15 @@ import play.data.validation.Validation
 import models._
 import enums.PublishedStatus
 import services.logging.Logging
-import services.{Dimensions, ImageUtil}
+import services.ImageUtil
 import play.Play
 import java.text.SimpleDateFormat
 import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters, AdminRequestFilters}
 import services.http.SafePlayParams.Conversions._
+import services.Utils._
+import services.Dimensions
+import models.InventoryBatch
+import scala.Some
 
 trait PostCelebrityProductAdminEndpoint extends Logging {
   this: Controller =>
@@ -98,38 +102,36 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
         log("Request to create product \"" + productName + "\" for celebrity " + celebrity.publicName + " passed all filters.")
         val savedProduct = if (isCreate) {
           celebrity.addProduct(
-            name=productName,
-            description=productDescription,
-            image=productImageOption,
-            icon=productIconOption,
-            storyTitle=storyTitle,
-            storyText=storyText,
-            publishedStatus=publishedStatus
-          ).copy(signingOriginX=signingOriginX, signingOriginY=signingOriginY)
+            name = productName,
+            description = productDescription,
+            image = productImageOption,
+            icon = productIconOption,
+            storyTitle = storyTitle,
+            storyText = storyText,
+            publishedStatus = publishedStatus
+          ).copy(signingOriginX = signingOriginX, signingOriginY = signingOriginY)
         } else {
           val product = productStore.get(productId)
           product.copy(
-            name=productName,
-            description=productDescription,
-            signingOriginX=signingOriginX,
-            signingOriginY=signingOriginY,
-            storyTitle=storyTitle,
-            storyText=storyText
+            name = productName,
+            description = productDescription,
+            signingOriginX = signingOriginX,
+            signingOriginY = signingOriginY,
+            storyTitle = storyTitle,
+            storyText = storyText
           ).withPublishedStatus(publishedStatus).saveWithImageAssets(image = productImageOption, icon = productIconOption)
         }
 
-
-          maybeCreateInventoryBatchForDemoMode(savedProduct, isCreate)
-
-          new Redirect(GetProductAdminEndpoint.url(productId = savedProduct.id).url + "?action=preview")
-        }
-        else {
-          // There were validation errors
-          redirectWithValidationErrors(celebrity, productId, productName, productDescription, signingOriginX, signingOriginY, storyTitle, storyText, publishedStatusString)
-        }
+        maybeCreateInventoryBatchForDemoMode(savedProduct, isCreate)
+        new Redirect(lookupUrl("WebsiteControllers.getStorefrontChoosePhotoTiled", Map("celebrityUrlSlug" -> celebrity.urlSlug.get)).url)
+      }
+      else {
+        // There were validation errors
+        redirectWithValidationErrors(celebrity, productId, productName, productDescription, signingOriginX, signingOriginY, storyTitle, storyText, publishedStatusString)
       }
     }
-  
+    }
+
 
   /**
    * This is here so that demo'ers don't need to worry about setting up an InventoryBatch for demo Products before making orders.

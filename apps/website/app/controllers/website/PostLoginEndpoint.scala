@@ -2,7 +2,6 @@ package controllers.website
 
 import play.mvc.Controller
 import play.mvc.results.Redirect
-import services.Utils
 import controllers.WebsiteControllers
 import models._
 import services.http.POSTControllerMethod
@@ -26,13 +25,7 @@ private[controllers] trait PostLoginEndpoint { this: Controller =>
 
       case Right(validForm) =>
         session.put(WebsiteControllers.customerIdKey, validForm.customerId)
-        //check to see if logged in
-        // Redirect
-        // TODO(wchan): Test this
-        Utils.toOption(session.get(WebsiteControllers.redirectUponLogin)) match {
-          case None => new Redirect(Utils.lookupUrl("WebsiteControllers.getRootEndpoint").url)
-          case Some(url) => new Redirect(url)
-        }
+        new Redirect(reverse(WebsiteControllers.getCustomerGallery(validForm.customerId)).url)
     }
   }
 }

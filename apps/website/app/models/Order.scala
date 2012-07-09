@@ -11,7 +11,6 @@ import blobs.AccessPolicy
 import com.google.inject._
 import mail.Mail
 import payment.{Charge, Payment}
-import play.mvc.Router.ActionDefinition
 import org.squeryl.Query
 import models.CashTransaction.{PurchaseRefund, EgraphPurchase}
 import org.apache.commons.mail.{Email, HtmlEmail}
@@ -20,6 +19,7 @@ import java.util.Date
 import com.google.inject.Inject
 import java.text.SimpleDateFormat
 import play.Play
+import controllers.website.consumer.StorefrontChoosePhotoConsumerEndpoints
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -155,11 +155,8 @@ case class Order(
   }
 
   def sendEgraphSignedMail() {
-    // TODO(wchan): emails, stupid stupid emails
-    /*
     val email = prepareEgraphsSignedEmail()
     services.mail.send(email)
-    */
   }
 
   protected[models] def prepareEgraphsSignedEmail(): Email = {
@@ -176,20 +173,20 @@ case class Order(
 
     email.addReplyTo("noreply@egraphs.com")
     email.setSubject("I just finished signing your Egraph")
-    val emailLogoSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-logo.jpg"))
-    val emailFacebookSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-facebook.jpg"))
-    val emailTwitterSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-twitter.jpg"))
-    val emailViewEgraphSrc = "cid:"+email.embed(Play.getFile("../../modules/frontend/public/images/email-btn-view-egraph.jpg"))
-    val html = views.frontend.html.email_view_egraph(viewEgraphUrl = Utils.lookupAbsoluteUrl("WebsiteControllers.getEgraph", Map("orderId" -> id.toString)).url,
+    val emailLogoSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-logo.jpg")))
+    val emailFacebookSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-facebook.jpg")))
+    val emailTwitterSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-twitter.jpg")))
+    val viewEgraphUrl = Utils.lookupAbsoluteUrl("WebsiteControllers.getEgraph", Map("orderId" -> id.toString)).url
+    val html = views.frontend.html.email_view_egraph(
+      viewEgraphUrl = viewEgraphUrl,
       celebrityName = celebrity.publicName.getOrElse("Egraphs"), // make publicName a String instead of a Option[String]
       recipientName = receivingCustomer.name,
       emailLogoSrc = emailLogoSrc,
       emailFacebookSrc = emailFacebookSrc,
-      emailTwitterSrc = emailTwitterSrc,
-      emailViewEgraphSrc = emailViewEgraphSrc
+      emailTwitterSrc = emailTwitterSrc
     )
     email.setHtmlMsg(html.toString())
-    email.setTextMsg("I just finished putting the final touches on my egraph to you.")
+    email.setTextMsg(views.frontend.html.email_view_egraph_text(viewEgraphUrl = viewEgraphUrl, celebrityName = celebrity.publicName.getOrElse("Egraphs"), recipientName = receivingCustomer.name).toString())
     email
   }
   /**
@@ -361,6 +358,7 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
         egraph._egraphState === EgraphState.Published.name
       )
       select(FulfilledProductOrder(product, order, egraph))
+      orderBy (egraph.created desc)
     )
   }
 
@@ -599,18 +597,29 @@ object GalleryOrderFactory {
     for ((order:Order, optionEgraph:Option[Egraph]) <- orders) yield {
       optionEgraph.map( egraph => {
         val product = order.product
+        val celebrity = product.celebrity
         val rawImage = egraph.thumbnail(product.photoImage).scaledToWidth(product.frame.thumbnailWidthPixels)
+        val thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Public)
+        val viewEgraphUrl = Utils.lookupAbsoluteUrl("WebsiteControllers.getEgraph", Map("orderId" -> order.id.toString)).url
+        val facebookShareLink = views.frontend.Utils.feedDialogLink(
+          appId = fbAppId,
+          picUrl = thumbnailUrl,
+          name= celebrity.publicName.get + " just wrote me an egraph",
+          caption = "We are all fans.",
+          description= "Check it out!",
+          link = viewEgraphUrl
+        )
         new FulfilledEgraphViewModel(
-          fbAppId = fbAppId,
-          redirectURI = "http://www.egraphs.com/account/" + order.recipient.username,
+          facebookShareLink = facebookShareLink,
+          twitterShareText = celebrity.publicName.get + " just wrote me an egraph!",
           orderId = order.id,
           orientation = product.frame.name.toLowerCase,
-          productUrl = "http://www.egraphs.com/" + product.celebrity.urlSlug.getOrElse() + "/" + product.urlSlug,
+          productUrl = StorefrontChoosePhotoConsumerEndpoints.url(celebrity, product).url,
           productPublicName = product.celebrity.publicName,
           productTitle = product.storyTitle,
           productDescription = product.description,
-          thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Private),
-          downloadUrl = Option("http://www.egraphs.com/egraph/" + order.id),
+          thumbnailUrl = thumbnailUrl,
+          viewEgraphUrl = viewEgraphUrl,
           publicStatus = order.privacyStatus.name,
           signedTimestamp = dateFormat.format(egraph.created)
         )
@@ -621,13 +630,14 @@ object GalleryOrderFactory {
   def makePendingEgraphViewModel(orders: Iterable[(Order, Option[Egraph])]) : Iterable[PendingEgraphViewModel] = {
     for ((order:Order, optionEgraph:Option[Egraph]) <- orders) yield {
       val product = order.product
+      val celebrity = product.celebrity
       val imageUrl = product.photo.resizedWidth(product.frame.pendingWidthPixels).getSaved(AccessPolicy.Public).url
       PendingEgraphViewModel(
         orderId = order.id,
         orientation = product.frame.name.toLowerCase,
-        productUrl = "http://www.egraphs.com/" + product.celebrity.urlSlug + "/" + product.urlSlug,
+        productUrl = StorefrontChoosePhotoConsumerEndpoints.url(celebrity, product).url,
         productTitle = product.storyTitle,
-        productPublicName = product.celebrity.publicName,
+        productPublicName = celebrity.publicName,
         productDescription = product.description,
         thumbnailUrl = imageUrl,
         orderStatus = order.reviewStatus.name,

@@ -43,15 +43,13 @@ object Email extends Controller {
     val emailLogoSrc = "../public/images/email-logo.jpg"
     val emailFacebookSrc = "../public/images/email-facebook.jpg"
     val emailTwitterSrc = "../public/images/email-twitter.jpg"
-    val emailViewEgraphSrc = "../public/images/email-btn-view-egraph.jpg"
     views.frontend.html.email_view_egraph(
       viewEgraphUrl = "https://www.egraphs.com/gallery/carlosdiaz/davidortiz1",
       celebrityName = "Big Papi",
       recipientName = "Carlos Pena",
       emailLogoSrc = emailLogoSrc,
       emailFacebookSrc = emailFacebookSrc,
-      emailTwitterSrc = emailTwitterSrc,
-      emailViewEgraphSrc = emailViewEgraphSrc
+      emailTwitterSrc = emailTwitterSrc
     )
   }
 }
