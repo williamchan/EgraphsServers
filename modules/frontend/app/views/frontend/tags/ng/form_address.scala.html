@@ -3,19 +3,19 @@
 @import views.frontend.Utils
 
 <a id="@name-display" class="row-settings row-fluid action edit
-  @{ List(
+  @{ val errors = List(
       form.addressLine1.error,
       form.addressLine2.error,
       form.city.error,
       form.state.error,
       form.postalCode.error)
-      .flatten.headOption.map(a =>"").getOrElse("none") }">
+      errors.flatten.headOption.map(a =>"none").getOrElse("") }">
   <span class="span3 row-label">@Utils.binding(model,".title")</span>
   <span class="span7">
     <address>
       @Utils.binding(model, ".line1")<br>
       @Utils.binding(model, ".line2")<br>
-      @Utils.binding(model, ".city"), @Utils.binding(model, ".state") @Utils.binding(model, ".postalCode")
+      @Utils.binding(model, ".city") @Utils.binding(model, ".state") @Utils.binding(model, ".postalCode")
     </address>
   </span>
   <span class="span2 action">
@@ -24,13 +24,13 @@
 </a>
 
 <div id="@name-edit" class="row-settings row-fluid
-  @{ List(
+  @{ val errors = List(
       form.addressLine1.error,
       form.addressLine2.error,
       form.city.error,
       form.state.error,
       form.postalCode.error)
-      .flatten.headOption.map(a =>"").getOrElse("") }">
+      errors.flatten.headOption.map(a =>"").getOrElse("none") }">
   <span class="span1"></span>
   <span class="span5">
     <address>
