@@ -1,5 +1,13 @@
 @import "../twitter-bootstrap/less/bootstrap.less";
 
+.linear-gradient-multi( ... ) {
+  background-image: -webkit-linear-gradient(@arguments);
+  background-image: -moz-linear-gradient(@arguments);
+  background-image: -ms-linear-gradient(@arguments);
+  background-image: -o-linear-gradient(@arguments);
+  background-image: linear-gradient(@arguments);
+}
+
 @storyTextMargin: 25px;
 @storyTextWidth: 215px; 
 
@@ -48,14 +56,7 @@
   src:url('/public/typefaces/BebasNeue.otf')
 }
 
-html.egraph-page, .egraph-page body {
-  height:100%;
-  // ensures that the soundmanager <embed> doesnt accidentally cause our gradient to
-  // start repeating
-  min-height:820px;
-}
-
-.egraph-page body {
+html.egraph-page {
   @bgGradientStart: 5px;
   
   @step1Color: lighten(@darkestBackground, 10%);
@@ -69,15 +70,33 @@ html.egraph-page, .egraph-page body {
   @step3Color: lighten(@darkestBackground, 7%);
   @step3TransitionHeight: @step2MaintenanceHeight + 268px;
 
-  background: -webkit-linear-gradient(
-    -90deg,
-    @darkestBackground @bgGradientStart,
-    @step1Color @step1TransitionHeight,
-    @step1Color @step1MaintenanceHeight,
-    @step2Color @step2TransitionHeight,
-    @step2Color @step2MaintenanceHeight,
-    @step3Color @step3TransitionHeight
-  );
+  //
+  // START BACKGROUND GRADIENT
+  //
+ 
+  background: #e5eaea; /* Old browsers */
+  
+  // The 'true' definition, which colors turn into the ones below:;
+  // background: -webkit-linear-gradient(
+  //   -90deg, 
+  //   @darkestBackground @bgGradientStart, 
+  //   @step1Color @step1TransitionHeight, 
+  //   @step1Color @step1MaintenanceHeight, 
+  //   @step2Color @step2TransitionHeight, 
+  //   @step2Color @step2MaintenanceHeight, 
+  //   @step3Color @step3TransitionHeight
+  // );
+
+  // Result of feeding the definition above into ColorZilla (http://www.colorzilla.com/gradient-editor/)  
+  .linear-gradient-multi(~'-90deg, #d1d9db 5px,#edf1f1 64px,#edf1f1 184px,#d1d9db 385px,#d1d9db 473px,#e5eaea 741px');
+
+  // Make sure the gradient is always visible no matter page size. This is mostly
+  // due to warping that happens with the SoundManager <embed>
+  background-size:auto 200%; 
+
+  body {
+    background:none;
+  }
 
   .container {
     // Change the usual 940px width to 1000px for the egraph page
@@ -125,11 +144,8 @@ html.egraph-page, .egraph-page body {
           left:0px;
           width:100%;
           height:100%;
-          background: -webkit-linear-gradient(32deg,
-                                              rgba(255,255,255,0) 0%,
-                                              rgba(255,255,255,0) 55%,
-                                              rgba(255,255,255,0.15) 60%,
-                                              rgba(255,255,255,0.25) 100%);
+          
+          .linear-gradient-multi(~'32deg, rgba(255,255,255,0) 0%,rgba(255,255,255,0) 55%,rgba(255,255,255,0.15) 60%,rgba(255,255,255,0.25) 100%'); 
         }
 
         .fx-mat-glow {
@@ -273,11 +289,10 @@ html.egraph-page, .egraph-page body {
               left:0px;
               width:100%;
               height:100%;
-              background: -webkit-linear-gradient(67deg,
-                                                  rgba(255,255,255,0) 0%,
-                                                  rgba(255,255,255,0) 59%,
-                                                  rgba(255,255,255,0.08) 61%)
-            }          
+
+              background: none;
+              .linear-gradient-multi(~'67deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 59%, rgba(255,255,255,0.08) 61%');
+            }
           }
           
         }
@@ -290,11 +305,9 @@ html.egraph-page, .egraph-page body {
           top:1px;
           width:@plaqueWidth - 2px;
           height:@plaqueHeight;
-          background: -webkit-linear-gradient(80deg,
-                                              rgba(255,255,255,0) 0%,
-                                              rgba(255,255,255,0) 56%,
-                                              rgba(255,255,255,0.03) 58%,
-                                              rgba(255,255,255,0.07) 100%);
+
+          background: none;
+          .linear-gradient-multi(~'80deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 56%, rgba(255,255,255,0.03) 58%, rgba(255,255,255,0.07) 100%');
         }
 
         .fx-top-reflection {
@@ -303,7 +316,7 @@ html.egraph-page, .egraph-page body {
           left:1px;
           width:@plaqueWidth - 2px;
           height:1px;
-          background: -webkit-linear-gradient(45deg, rgba(20,20,20,1) 0%,rgba(160,160,160,1) 100%); /* Chrome10+,Safari5.1+ */
+          #gradient > .directional(rgba(20,20,20,1),rgba(160,160,160,1), 45deg);
         }
 
         .fx-right-reflection {
@@ -312,10 +325,7 @@ html.egraph-page, .egraph-page body {
           height:@plaqueHeight - 2px;
           position:absolute;
           width:1px;
-          background: -webkit-linear-gradient(45deg,
-                                              rgba(110,110,110,1) 0%,
-                                              rgba(20,20,20,1) 10%,
-                                              rgba(160,160,160,1) 100%); /* Chrome10+,Safari5.1+ */        
+          .linear-gradient-multi(~'45deg, rgba(110,110,110,1) 0%, rgba(20,20,20,1) 10%, rgba(160,160,160,1) 100%');
         }
       }
     }
