@@ -604,14 +604,14 @@ object GalleryOrderFactory {
         val facebookShareLink = views.frontend.Utils.feedDialogLink(
           appId = fbAppId,
           picUrl = thumbnailUrl,
-          name= celebrity.publicName.get + " just wrote me an egraph",
+          name= celebrity.publicName.get + " just created an egraph for me!",
           caption = "We are all fans.",
           description= "Check it out!",
           link = viewEgraphUrl
         )
         new FulfilledEgraphViewModel(
           facebookShareLink = facebookShareLink,
-          twitterShareText = celebrity.publicName.get + " just wrote me an egraph!",
+          twitterShareText = celebrity.publicName.get + " just created an egraph for me!",
           orderId = order.id,
           orientation = product.frame.name.toLowerCase,
           productUrl = StorefrontChoosePhotoConsumerEndpoints.url(celebrity, product).url,
