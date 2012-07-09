@@ -85,7 +85,7 @@ object Account extends Controller with DefaultHeaderAndFooterData {
 
   //Basic controller for testing privacy toggles on the gallery pages
   def privacy(orderId: String) = {
-    val status = request.params.get("privacyStatus");
+    val status = request.params.get("privacyStatus")
     println("privacy status: " + status)
     new RenderJson(Serializer.SJSON.toJSON(Map("privacyStatus" -> status)))
   }
@@ -139,11 +139,11 @@ object Account extends Controller with DefaultHeaderAndFooterData {
   private def makeEgraphs(user: String): List[FulfilledEgraphViewModel]  = {
     List(
       FulfilledEgraphViewModel(
-        downloadUrl=Option("egr.aphs/" + user + "1"),
+        viewEgraphUrl="egr.aphs/" + user + "1",
         publicStatus = "public",
         signedTimestamp = "Nov 12th 2012 @ 4:30 PM",
-        fbAppId =fbAppId,
-        redirectURI = "http://staging.egraphs.com/" + user,
+        facebookShareLink = "www.facebook.com",
+        twitterShareText = "twitter text!",
         orderId = 3,
         orientation = "landscape",
         productUrl="egr.aphs/" + user +"/1",
@@ -155,11 +155,11 @@ object Account extends Controller with DefaultHeaderAndFooterData {
         thumbnailUrl = landscapePNG
       ),
       FulfilledEgraphViewModel(
-        downloadUrl=Option("egr.aphs/" + user + "2"),
+        viewEgraphUrl="egr.aphs/" + user + "2",
         publicStatus = "public",
         signedTimestamp = "Nov 12th 2012 @ 4:30 PM",
-        fbAppId = fbAppId,
-        redirectURI = "http://staging.egraphs.com/" + user,
+        facebookShareLink = "www.facebook.com",
+        twitterShareText = "twitter text!",
         orderId = 4,
         orientation = "portrait",
         productUrl="egr.aphs/" + user +"/2",
@@ -171,11 +171,11 @@ object Account extends Controller with DefaultHeaderAndFooterData {
         thumbnailUrl = portraitPNG
       ),
       FulfilledEgraphViewModel(
-        downloadUrl=Option("egr.aphs/" + user + "2"),
+        viewEgraphUrl="egr.aphs/" + user + "2",
         publicStatus = "public",
         signedTimestamp = "Nov 12th 2012 @ 4:30 PM",
-        fbAppId = fbAppId,
-        redirectURI = "http://staging.egraphs.com/" + user,
+        facebookShareLink = "www.facebook.com",
+        twitterShareText = "twitter text!",
         orderId = 5,
         orientation = "landscape",
         productUrl="egr.aphs/" + user +"/2",
