@@ -39,6 +39,8 @@ GET     /blob/files/{<.*>blobKey}               WebsiteControllers.getBlob
 # Map static resources from the /app/public folder to the /public path
 GET     /public/                                staticDir:public
 GET     /favicon.ico                            staticFile:/public/images/favicon.ico
+GET     /documents/CelebrityAgreement           staticFile:/public/documents/CelebrityAgreement.pdf
+
 
 ##
 ## API
