@@ -8,6 +8,13 @@
   background-image: linear-gradient(@arguments);
 }
 
+.non-webkit-radial-gradient( ... ) {
+  background: -moz-radial-gradient(@arguments);
+  background: -ms-radial-gradient(@arguments);
+  background: -o-radial-gradient(@arguments);  
+  background: radial-gradient(@arguments);
+}
+
 @storyTextMargin: 25px;
 @storyTextWidth: 215px; 
 //
@@ -345,7 +352,8 @@ html.egraph-page {
                                    50% 20, 19,
                                    50% 120, 120,
                                    from(@spotlightColor), to(rgba(255,255,255,0)));
-      background: -moz-radial-gradient(center 16px, ellipse farthest-side, @spotlightColor 30%, rgba(255, 255, 255, 0) 100%)
+      
+      .non-webkit-radial-gradient(~'center 16px, ellipse farthest-side, @{spotlightColor} 30%, rgba(255, 255, 255, 0) 100%');      
     }
 
     .right-spotlight {
@@ -359,7 +367,8 @@ html.egraph-page {
                                    50% 50, 49,
                                    50% 220, 220,
                                    from(@spotlightColor), to(rgba(255,255,255,0)));
-      background: -moz-radial-gradient(center -340px, ellipse farthest-side, @spotlightColor 50%, rgba(255, 255, 255, 0) 80%)
+      
+      .non-webkit-radial-gradient(~'center -340px, ellipse farthest-side, @{spotlightColor} 50%, rgba(255, 255, 255, 0) 80%');
     }  
     
     .label {
@@ -409,7 +418,8 @@ html.egraph-page {
                                      from(@spotlightColor),
                                      to(rgba(255,255,255,0)));
 
-        background: -moz-radial-gradient(334px 317px, ellipse farthest-side, @spotlightColor 100px, rgba(255, 255, 255, 0) 216px)
+        
+        .non-webkit-radial-gradient(~'334px 317px, ellipse farthest-side, @{spotlightColor} 100px, rgba(255, 255, 255, 0) 216px');
 
       }
       .story-text-spotlight {
@@ -426,7 +436,8 @@ html.egraph-page {
                                      from(fadeout(@spotlightColor, 40%)),
                                      to(rgba(255,255,255,0)));
 
-        background: -moz-radial-gradient(229px 243px, ellipse farthest-side, fadeout(@spotlightColor, 15%) 75px, rgba(255, 255, 255, 0) 263px)
+        @gradientStartColor: fadeout(@spotlightColor, 15%);
+        .non-webkit-radial-gradient(~'229px 243px, ellipse farthest-side, @{gradientStartColor} 75px, rgba(255, 255, 255, 0) 263px');
       }
       
     .photo-column {
@@ -497,7 +508,8 @@ html.egraph-page {
                                      from(fadeout(@spotlightColor, 10%)),
                                      to(rgba(255,255,255,0)));
 
-        background: -moz-radial-gradient(357px 287px, ellipse farthest-side, @spotlightColor 100px, rgba(255, 255, 255, 0) 216px)
+        
+        .non-webkit-radial-gradient(~'357px 287px, ellipse farthest-side, @{spotlightColor} 100px, rgba(255, 255, 255, 0) 216px');
       }
       
       .story-text-spotlight {
@@ -514,7 +526,8 @@ html.egraph-page {
                                      from(fadeout(@spotlightColor, 40%)),
                                      to(rgba(255,255,255,0)));
         
-        background: -moz-radial-gradient(331px 243px, ellipse farthest-side, fadeout(@spotlightColor, 25%) 75px, rgba(255, 255, 255, 0) 213px)
+        @gradientStartColor: fadeout(@spotlightColor, 25%);
+        .non-webkit-radial-gradient(~'331px 243px, ellipse farthest-side, @{gradientStartColor} 75px, rgba(255, 255, 255, 0) 213px');
       }
       
       .photo-column {
