@@ -10,7 +10,7 @@ padding-bottom: 2px;
 .row-settings, .row-settings:visited {
   border-bottom: 1px solid @tableBorder;
   display: inline-block;
-  padding-top: 5px;
+  //padding-top: 5px;
 
 
   //hide icon by default
@@ -27,12 +27,17 @@ padding-bottom: 2px;
 
   }
 
-  span.alert button.close {
-    position: relative;
-    float: right;
-    top: 2px;
-    right: 50px;
-    display:block;
+  div.alert button.close {
+    top: 3px;
+    display:inline-block;
+
+  }
+
+
+  div.alert {
+    padding-top: 0px;
+    padding-bottom: 0px;
+    margin-bottom: 0px;
   }
 
   label.ng-label, label.checkbox {

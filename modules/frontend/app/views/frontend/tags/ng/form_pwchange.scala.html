@@ -52,36 +52,15 @@
   <span class="span4">
     <div class="control-group">
       <label class="control-label ng-label">&nbsp;</label>
-      <span class="alert alert-error @oldField.ifNotError {hidden}">
-        <button type="button" class="close" data-dismiss="alert">
-          &times;
-        </button>
-        <span class="error-message">
-          @oldField.error
-        </span>
-      </span>
+      @form_error(oldField)
     </div>
     <div class="control-group">
-    <label class="control-label ng-label">&nbsp;</label>
-    <span class="alert alert-error @newField.ifNotError {hidden}">
-      <button type="button" class="close" data-dismiss="alert">
-        &times;
-      </button>
-      <span class="error-message">
-        @newField.error
-      </span>
-    </span>
+      <label class="control-label ng-label">&nbsp;</label>
+      @form_error(newField)
     </div>
-    <label class="control-label ng-label">&nbsp;</label>
     <div class="control-group">
-    <span class="alert alert-error @confirmField.ifNotError {hidden}">
-      <button type="button" class="close" data-dismiss="alert">
-        &times;
-      </button>
-      <span class="error-message">
-        @confirmField.error
-      </span>
-    </span>
+      <label class="control-label ng-label">&nbsp;</label>
+      @form_error(confirmField)
     </div>
   </span>
   <span class="span1 help-inline"></span>

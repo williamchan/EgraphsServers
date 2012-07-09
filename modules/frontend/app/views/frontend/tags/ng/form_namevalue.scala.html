@@ -15,14 +15,7 @@
     <input ng-model="@model" name="@field.name" type="@inputType"/>
   </span>
   <span class="span4">
-    <span class="alert alert-error @field.ifNotError {hidden}">
-      <button type="button" class="close" data-dismiss="alert">
-        &times;
-      </button>
-      <span class="error-message">
-        @field.error
-      </span>
-    </span>
+    @form_error(field)
   </span>
 
   <span class="span1 action">
