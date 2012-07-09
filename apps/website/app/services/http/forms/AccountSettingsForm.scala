@@ -30,7 +30,7 @@ class AccountSettingsForm(val paramsMap: Form.Readable, check: FormChecks, custo
       if (customer.username == stringToValidate) {
         Right(stringToValidate)
       } else {
-        for (valid <- check.isAlphaNumeric(stringToValidate, "Username must one word and letters or numbers").right;
+        for (valid <- check.isAlphaNumeric(stringToValidate, "Username must be letters or numbers, no spaces").right;
              valid2 <- check.isUniqueUsername(stringToValidate, "Username already taken").right) yield valid
       }
     }
