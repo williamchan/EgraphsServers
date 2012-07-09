@@ -12,7 +12,7 @@ object Egraph extends Controller with DefaultHeaderAndFooterData {
   //
   // Public members
   //
-  def index = {
+  def landscape = {
     val frame = LandscapeEgraphFrame
 
     views.frontend.html.egraph(
@@ -22,7 +22,7 @@ object Egraph extends Controller with DefaultHeaderAndFooterData {
       frame.cssFrameColumnClasses,
       "/public/images/egraph_default_plaque_icon.png",
       frame.cssStoryColumnClasses,
-      "The story and the glory",
+      "Jose Bautista",
       """
         Derpson, son of Herp Derpington himself, was the epitome of wisdom and class.
         Known to dip fried fish in spicy soy sauce, nary a day went by that he didn't
@@ -34,6 +34,30 @@ object Egraph extends Controller with DefaultHeaderAndFooterData {
       "May 10, 1983"
     )
   }
+
+  def portrait = {
+    val frame = PortraitEgraphFrame
+
+    views.frontend.html.egraph(
+      "Herp Derpson",
+      "Derp Herpson",
+      frame.cssClass,
+      frame.cssFrameColumnClasses,
+      "/public/images/egraph_default_plaque_icon.png",
+      frame.cssStoryColumnClasses,
+      "Jose Bautista",
+      """
+        Derpson, son of Herp Derpington himself, was the epitome of wisdom and class.
+        Known to dip fried fish in spicy soy sauce, nary a day went by that he didn't
+        fundamentally change the nature of his fans interaction with fast food. One day
+        he got a letter from Derp Herpson, and the rest as they say was history.
+      """,
+      "http://freshly-ground.com/data/audio/sm2/Adrian%20Glynn%20-%20Blue%20Belle%20Lament.mp3",
+      "/public/images/sample_portrait_egraph.svg",
+      "May 10, 1983"
+    )
+  }
+
 
   object PortraitEgraphFrame {
     val name: String = "Default Portrait"

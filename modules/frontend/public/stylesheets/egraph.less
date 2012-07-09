@@ -10,7 +10,6 @@
 
 @storyTextMargin: 25px;
 @storyTextWidth: 215px; 
-
 //
 // General variables
 //
@@ -346,6 +345,7 @@ html.egraph-page {
                                    50% 20, 19,
                                    50% 120, 120,
                                    from(@spotlightColor), to(rgba(255,255,255,0)));
+      background: -moz-radial-gradient(center 16px, ellipse farthest-side, @spotlightColor 30%, rgba(255, 255, 255, 0) 100%)
     }
 
     .right-spotlight {
@@ -359,6 +359,7 @@ html.egraph-page {
                                    50% 50, 49,
                                    50% 220, 220,
                                    from(@spotlightColor), to(rgba(255,255,255,0)));
+      background: -moz-radial-gradient(center -340px, ellipse farthest-side, @spotlightColor 50%, rgba(255, 255, 255, 0) 80%)
     }  
     
     .label {
@@ -407,6 +408,9 @@ html.egraph-page {
                                      45% 45%, 275,
                                      from(@spotlightColor),
                                      to(rgba(255,255,255,0)));
+
+        background: -moz-radial-gradient(334px 317px, ellipse farthest-side, @spotlightColor 100px, rgba(255, 255, 255, 0) 216px)
+
       }
       .story-text-spotlight {
         position:absolute;
@@ -421,6 +425,8 @@ html.egraph-page {
                                      50% 50%, 275,
                                      from(fadeout(@spotlightColor, 40%)),
                                      to(rgba(255,255,255,0)));
+
+        background: -moz-radial-gradient(229px 243px, ellipse farthest-side, fadeout(@spotlightColor, 15%) 75px, rgba(255, 255, 255, 0) 263px)
       }
       
     .photo-column {
@@ -458,14 +464,15 @@ html.egraph-page {
 
     .story-column {
       padding-top:109px;
-        text-shadow: 1px 2px 0.5px white;
+      padding-left:50px;
+      text-shadow: 1px 2px 0.5px white;
 
-        .story-text {
-      position:relative;
-          margin-left:@storyTextMargin;
-          width:@storyTextWidth;
-          line-height:179%;
-        }
+      .story-text {
+        position:relative;
+        margin-left:@storyTextMargin;
+        width:@storyTextWidth;
+        line-height:179%;
+      }
     }
     }
 
@@ -473,7 +480,7 @@ html.egraph-page {
     .landscape {
 
       .right-spotlight {
-        left:210px;
+        left:210px;        
       }
       
       .story-spotlight {
@@ -489,6 +496,8 @@ html.egraph-page {
                                      50% 60%, 265,
                                      from(fadeout(@spotlightColor, 10%)),
                                      to(rgba(255,255,255,0)));
+
+        background: -moz-radial-gradient(357px 287px, ellipse farthest-side, @spotlightColor 100px, rgba(255, 255, 255, 0) 216px)
       }
       
       .story-text-spotlight {
@@ -504,6 +513,8 @@ html.egraph-page {
                                      50% 60%, 285,
                                      from(fadeout(@spotlightColor, 40%)),
                                      to(rgba(255,255,255,0)));
+        
+        background: -moz-radial-gradient(331px 243px, ellipse farthest-side, fadeout(@spotlightColor, 25%) 75px, rgba(255, 255, 255, 0) 213px)
       }
       
       .photo-column {
@@ -540,7 +551,7 @@ html.egraph-page {
       }
 
     .story-column {
-      padding-top:175px;      
+      padding-top:170px;      
       text-shadow: 1px 2px 0.5px white;
 
       .story-text {
