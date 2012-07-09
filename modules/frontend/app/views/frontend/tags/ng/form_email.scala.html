@@ -1,7 +1,7 @@
-@(model: String, name:String, label: String)
+@(model: String, field: models.frontend.forms.Field[_], label: String)
 
-<a id="@name-display" class="row-settings row-fluid action edit">
-  <span class="span3">@label</span>
+<a id="@field.name-display" class="row-settings row-fluid edit @field.ifError {none}">
+  <span class="span3 row-label">@label</span>
   <span class="span4 setting-val">{{@model}}</span>
   <span class="span4 help-inline"></span>
   <span class="span1 action">
@@ -9,13 +9,18 @@
   </span>
 </a>
 
-<div id="@name-edit" class="row-settings row-fluid hide">
-  <span class="span3">@label</span>
-  <span class="span7 controls">
-    <input ng-model="@model" name="@name" type="email"/>
-     <span ng-show="form.@name.$error.email">Invalid e-mail address.</span>
+<div id="@field.name-edit" class="row-settings row-fluid @field.ifNotError {none}">
+  <span class="span3 row-label">@label</span>
+  <span class="span4 controls">
+    <input ng-model="@model" name="@field.name" type="email"/>
+
   </span>
-  <span class="span2 action">
-    @form_cancel(model, name)
+  <!--<span ng-show="form.@field.name.$error.email">Invalid e-mail address.</span>-->
+  <span class="span4">
+    @form_error(field)
+  </span>
+
+  <span class="span1 action">
+    @form_cancel(model, field.name)
   </span>
 </div>
