@@ -62,23 +62,19 @@ object Utils {
     }
   }
 
-  def feedDialogLink(appId: String, picUrl:String, name:String, caption:String, description:String,
-                     redirectURI:String) : String = {
+  def feedDialogLink(appId: String,
+                     picUrl:String,
+                     name:String,
+                     caption:String,
+                     description:String,
+                     link:String) : String = {
 
     "https://www.facebook.com/dialog/feed?" +
     "app_id=" + appId +
-    "&link=https://developers.facebook.com/docs/reference/dialogs/" +
+    "&link=" + link +
     "&picture=" + picUrl +
     "&name=" + name +
     "&caption=" + caption +
-    "&description=" + description +
-    "&redirect_uri=" + redirectURI
-  }
-
-  def tweetButtonLink(url: String, text:String) : String = {
-    "https://twitter.com/share?url="+url+
-    "&via-user=egraphs" +
-    "&related=egraphs" +
-    "&text=" + text
+    "&description=" + description
   }
 }

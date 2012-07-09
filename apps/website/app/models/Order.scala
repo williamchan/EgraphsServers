@@ -19,6 +19,7 @@ import java.util.Date
 import com.google.inject.Inject
 import java.text.SimpleDateFormat
 import play.Play
+import controllers.website.consumer.StorefrontChoosePhotoConsumerEndpoints
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -595,18 +596,29 @@ object GalleryOrderFactory {
     for ((order:Order, optionEgraph:Option[Egraph]) <- orders) yield {
       optionEgraph.map( egraph => {
         val product = order.product
+        val celebrity = product.celebrity
         val rawImage = egraph.thumbnail(product.photoImage).scaledToWidth(product.frame.thumbnailWidthPixels)
+        val thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Public)
+        val viewEgraphUrl = Utils.lookupAbsoluteUrl("WebsiteControllers.getEgraph", Map("orderId" -> order.id.toString)).url
+        val facebookShareLink = views.frontend.Utils.feedDialogLink(
+          appId = fbAppId,
+          picUrl = thumbnailUrl,
+          name= celebrity.publicName.get + " just wrote me an egraph",
+          caption = "We are all fans.",
+          description= "Check it out!",
+          link = viewEgraphUrl
+        )
         new FulfilledEgraphViewModel(
-          fbAppId = fbAppId,
-          redirectURI = "http://www.egraphs.com/account/" + order.recipient.username,
+          facebookShareLink = facebookShareLink,
+          twitterShareText = celebrity.publicName.get + " just wrote me an egraph!",
           orderId = order.id,
           orientation = product.frame.name.toLowerCase,
-          productUrl = "http://www.egraphs.com/" + product.celebrity.urlSlug.getOrElse() + "/" + product.urlSlug,
+          productUrl = StorefrontChoosePhotoConsumerEndpoints.url(celebrity, product).url,
           productPublicName = product.celebrity.publicName,
           productTitle = product.storyTitle,
           productDescription = product.description,
-          thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Private),
-          downloadUrl = Option("http://www.egraphs.com/egraph/" + order.id),
+          thumbnailUrl = thumbnailUrl,
+          viewEgraphUrl = viewEgraphUrl,
           publicStatus = order.privacyStatus.name,
           signedTimestamp = dateFormat.format(egraph.created)
         )
@@ -617,13 +629,14 @@ object GalleryOrderFactory {
   def makePendingEgraphViewModel(orders: Iterable[(Order, Option[Egraph])]) : Iterable[PendingEgraphViewModel] = {
     for ((order:Order, optionEgraph:Option[Egraph]) <- orders) yield {
       val product = order.product
+      val celebrity = product.celebrity
       val imageUrl = product.photo.resizedWidth(product.frame.pendingWidthPixels).getSaved(AccessPolicy.Public).url
       PendingEgraphViewModel(
         orderId = order.id,
         orientation = product.frame.name.toLowerCase,
-        productUrl = "http://www.egraphs.com/" + product.celebrity.urlSlug + "/" + product.urlSlug,
+        productUrl = StorefrontChoosePhotoConsumerEndpoints.url(celebrity, product).url,
         productTitle = product.storyTitle,
-        productPublicName = product.celebrity.publicName,
+        productPublicName = celebrity.publicName,
         productDescription = product.description,
         thumbnailUrl = imageUrl,
         orderStatus = order.reviewStatus.name,

@@ -6,6 +6,18 @@ footerData: models.frontend.footer.FooterData
 @import views.frontend.Utils
 @import models.frontend.egraphs._
 
+<script>
+  !function (d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (!d.getElementById(id)) {
+  js = d.createElement(s);
+  js.id = id;
+  js.src = "//platform.twitter.com/widgets.js";
+  fjs.parentNode.insertBefore(js, fjs);
+  }
+  }(document, "script", "twitter-wjs");
+</script>
+
 @fulfilledEgraph(egraph: models.frontend.egraphs.FulfilledEgraphViewModel, index: Int) = {
   <div class="row-fluid row-egraph">
     <div class="span12">
@@ -33,29 +45,10 @@ footerData: models.frontend.footer.FooterData
             <ul class="clearfix">
               <li><span class="social-label">Share this</span></li>
               <li>
-                <a href="@Utils.feedDialogLink(
-                  appId = egraph.fbAppId,
-                  picUrl = "http://fbrell.com/f8.jpg",
-                  name= "Egraphs",
-                  caption = "http://www.egraphs.com",
-                  description= "An egraph is a personal interaction between " +
-                                "a star and a fan: the fan writes to their " +
-                                "favorite star, and the star sends back a 100% "  +
-                                "personalized and authenticated handwritten note " +
-                                "and audio message. The note is written on a beautiful " +
-                                "photo backdrop to provide an ideal canvas for displaying and sharing. " +
-                                "Egraphs are digital interactions, making it possible for stars to " +
-                                "connect with fans anywhere in the world.",
-                  redirectURI = egraph.redirectURI
-                )" class="facebook">Facebook
-                </a>
+                <a href="@egraph.facebookShareLink" class="facebook" target="_blank">Facebook</a>
               </li>
               <li>
-                <a href="@Utils.tweetButtonLink(
-                  url= "http://www.egraphs.com/egraph/" + egraph.orderId,
-                  text= "Check out my egraph from " + egraph.productPublicName.getOrElse("publicname") + "!"
-                  )" target="_blank" class="twitter">Twitter
-                </a>
+                <a href="https://twitter.com/share" class="twitter-share-button" data-text="@egraph.twitterShareText" data-url="@egraph.viewEgraphUrl" data-count="none">Twitter</a>
               </li>
             </ul>
           </div>

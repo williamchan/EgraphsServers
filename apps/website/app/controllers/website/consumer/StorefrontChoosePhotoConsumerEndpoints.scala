@@ -27,6 +27,7 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
   protected def celebFilters: CelebrityAccountRequestFilters
   protected def postController: POSTControllerMethod
   protected def purchaseFormFactory: PurchaseFormFactory
+  protected def facebookAppId: String
 
   //
   // Controllers
@@ -76,7 +77,7 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
 
         case indexOfProductInProductList =>
           val productViews = for (product <- products) yield {
-            product.asChoosePhotoCarouselView(celebUrlSlug=celeb.urlSlug.getOrElse("/"))
+            product.asChoosePhotoCarouselView(celebUrlSlug=celeb.urlSlug.getOrElse("/"), fbAppId = facebookAppId)
           }
 
           views.frontend.html.celebrity_storefront_choose_photo_carousel(
