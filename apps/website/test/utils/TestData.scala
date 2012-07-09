@@ -45,7 +45,7 @@ object TestData {
       addressLine1 = "615 2nd Ave",
       addressLine2 = "Suite 300",
       city = "Seattle",
-      state = "WA",
+      _state = "WA",
       postalCode = "98104"
     ).save()
   }
