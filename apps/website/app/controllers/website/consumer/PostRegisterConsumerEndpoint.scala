@@ -1,9 +1,9 @@
 package controllers.website.consumer
 
 import play.mvc.Controller
-import services.http.{EgraphsSession, POSTControllerMethod, ControllerMethod}
+import services.http.{EgraphsSession, POSTControllerMethod}
 import models._
-import services.mvc.{ImplicitHeaderAndFooterData, CelebrityViewConversions}
+import services.mvc.ImplicitHeaderAndFooterData
 import services.http.forms.purchase.FormReaders
 import services.http.forms.Form
 import controllers.WebsiteControllers
@@ -59,8 +59,7 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
         customer.sendNewCustomerEmail()
       }
 
-      // We're done here. Send him back home.
-      new Redirect(reverse(WebsiteControllers.getRootConsumerEndpoint).url)
+      new Redirect(reverse(WebsiteControllers.getAccountSettings).url)
     }
   }
 
