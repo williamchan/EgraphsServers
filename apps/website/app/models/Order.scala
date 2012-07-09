@@ -645,7 +645,7 @@ object GalleryOrderFactory {
           orderDate = dateFormat.format(order.created),
           orderNumber = order.id,
           price = order.amountPaid.toString(),
-          statusText = "",
+          statusText = "Pending",
           shippingMethod = "",
           UPSNumber = ""
         )
