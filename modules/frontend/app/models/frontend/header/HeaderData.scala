@@ -1,7 +1,5 @@
 package models.frontend.header
 
-import services.mvc.ImplicitHeaderAndFooterData
-
 /**
  * Data necessary for rendering the photo
  * @param loggedInStatus the logged in status of the viewer. This is used to differentially
@@ -13,6 +11,6 @@ import services.mvc.ImplicitHeaderAndFooterData
 case class HeaderData(
   loggedInStatus: Either[HeaderNotLoggedIn, HeaderLoggedIn] = Left(HeaderNotLoggedIn("/")),
   insideAnEgraphLink: String = "/inside-an-egraph",
-  egraphsTwitterLink: String = ImplicitHeaderAndFooterData.twitterLink,
-  egraphsFacebookLink: String = ImplicitHeaderAndFooterData.facebookLink
+  egraphsTwitterLink: String = "http://www.twitter.com/egraphs",
+  egraphsFacebookLink: String = "http://www.facebook.com/egraphs"
 )

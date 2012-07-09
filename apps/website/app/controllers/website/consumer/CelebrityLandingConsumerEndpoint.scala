@@ -29,6 +29,7 @@ object CelebrityLandingConsumerEndpoint {
   def getCelebrityLandingHtml(celebrity: Celebrity)(implicit headerData: HeaderData, footerData: FooterData): Html = {
     val publicName = celebrity.publicName.get
     views.frontend.html.celebrity_landing(
+      getStartedUrl = Utils.lookupUrl("WebsiteControllers.getStorefrontChoosePhotoTiled", Map("celebrityUrlSlug" -> celebrity.urlSlug.get)).url,
       celebrityPublicName = publicName,
       celebrityCasualName = celebrity.casualName.getOrElse(publicName),
       landingPageImageUrl = celebrity.landingPageImage.getSaved(AccessPolicy.Public).url,

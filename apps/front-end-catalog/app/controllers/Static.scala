@@ -22,7 +22,7 @@ object Static extends Controller with DefaultHeaderAndFooterData {
   }
 
   def about() = {
-    views.frontend.html.about_us()
+    views.frontend.html.about_us("/inside-an-egraph")
   }
 
   def inside() = {

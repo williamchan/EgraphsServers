@@ -4,12 +4,13 @@ import play.mvc.Controller
 import services.http.ControllerMethod
 import services.mvc.ImplicitHeaderAndFooterData
 import models.frontend.contents.Section
+import services.Utils
 
 private[controllers] trait GetStaticEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
   protected def controllerMethod: ControllerMethod
 
   def getAbout = controllerMethod() {
-    views.frontend.html.about_us()
+    views.frontend.html.about_us(learnMoreUrl = Utils.lookupUrl("WebsiteControllers.getInsideEgraph").url)
   }
 
   def getInsideEgraph = controllerMethod() {
