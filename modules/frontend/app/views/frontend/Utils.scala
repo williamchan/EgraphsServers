@@ -70,11 +70,11 @@ object Utils {
                      link:String) : String = {
 
     "https://www.facebook.com/dialog/feed?" +
-    "app_id=" + appId +
-    "&link=" + link +
-    "&picture=" + picUrl +
-    "&name=" + name +
-    "&caption=" + caption +
-    "&description=" + description
+      "app_id=" + appId +
+      "&redirect_uri=" + link +
+      "&picture=" + picUrl +
+      "&name=" + name +
+      "&caption=" + caption +
+      "&description=" + description
   }
 }
