@@ -603,11 +603,11 @@ object GalleryOrderFactory {
         val viewEgraphUrl = Utils.lookupAbsoluteUrl("WebsiteControllers.getEgraph", Map("orderId" -> order.id.toString)).url
         val facebookShareLink = views.frontend.Utils.feedDialogLink(
           appId = fbAppId,
-          picUrl = thumbnailUrl,
-          name= celebrity.publicName.get + " just created an egraph for me!",
+          picUrl = "http://www.egraphs.com/public/images/logo.png",
+          name = "My Egraph from " + celebrity.publicName.get + "!",
           caption = product.storyTitle,
           description= product.description,
-          link = viewEgraphUrl
+          link = "http://www.egraphs.com/user/" +order.recipient.username
         )
         new FulfilledEgraphViewModel(
           facebookShareLink = facebookShareLink,
