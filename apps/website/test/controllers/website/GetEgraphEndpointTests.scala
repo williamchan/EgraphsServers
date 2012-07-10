@@ -29,9 +29,9 @@ class GetEgraphEndpointTests extends AdminFunctionalTest {
     }
 
     // anonymous users and random customers are redirected away
-    assertStatus(302, GET("/egraph/" + orderId))
+    assertStatus(403, GET("/egraph/" + orderId))
     login(anotherAcct)
-    assertStatus(302, GET("/egraph/" + orderId))
+    assertStatus(403, GET("/egraph/" + orderId))
 
     // buyer, recipient, and admins are able to view this egraph
     login(buyerAcct)
