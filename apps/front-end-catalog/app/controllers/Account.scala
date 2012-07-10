@@ -139,11 +139,19 @@ object Account extends Controller with DefaultHeaderAndFooterData {
   private def makeEgraphs(user: String): List[FulfilledEgraphViewModel]  = {
     List(
       FulfilledEgraphViewModel(
-        viewEgraphUrl="egr.aphs/" + user + "1",
+        viewEgraphUrl="www.egraphs.com/egraph/" + user + "1",
         publicStatus = "public",
         signedTimestamp = "Nov 12th 2012 @ 4:30 PM",
-        facebookShareLink = "www.facebook.com",
-        twitterShareLink = "www.twitter.com",
+        facebookShareLink = views.frontend.Utils.getFacebookShareLink(
+          appId=fbAppId,
+          picUrl = "http://www.egraphs.com/public/images/logo.png",
+          name = "Chris Bosh",
+          caption = "Winning the finals",
+          description = "The story of this photo",
+          link = "http://www.egraphs.com"
+        ),
+        twitterShareLink = views.frontend.Utils.getTwitterShareLink("http://www.egraphs.com/egraphs/1/",
+          "Chris bosh gave me an eGraph!"),
         orderId = 3,
         orientation = "landscape",
         productUrl="egr.aphs/" + user +"/1",
@@ -158,8 +166,8 @@ object Account extends Controller with DefaultHeaderAndFooterData {
         viewEgraphUrl="egr.aphs/" + user + "2",
         publicStatus = "public",
         signedTimestamp = "Nov 12th 2012 @ 4:30 PM",
-        facebookShareLink = "www.facebook.com",
-        twitterShareLink = "www.twitter.com",
+        facebookShareLink = "http://www.facebook.com",
+        twitterShareLink = "http://www.twitter.com",
         orderId = 4,
         orientation = "portrait",
         productUrl="egr.aphs/" + user +"/2",

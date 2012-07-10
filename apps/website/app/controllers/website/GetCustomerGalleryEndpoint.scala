@@ -32,58 +32,66 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
 
   import SafePlayParams.Conversions._
 
-  def getCustomerGallery(galleryCustomerId: Long) = controllerMethod() {
+  def getCustomerGalleryByUsername(username: String) = controllerMethod() {
+    accountRequestFilters.requireValidCustomerUsername(username) {
+      customer => serveCustomerGallery(customer)
+    }
+  }
 
-    accountRequestFilters.requireValidCustomerId(galleryCustomerId){ customer =>
+  def getCustomerGalleryById(galleryCustomerId: Long) = controllerMethod() {
+    accountRequestFilters.requireValidCustomerId(galleryCustomerId){
+      customer => serveCustomerGallery(customer)
+    }
+  }
 
-      //If admin is true admin
-      val adminGalleryControlOption = for(
-        sessionAdminId <- session.getLongOption(WebsiteControllers.adminIdKey);
-        adminOption   <- administratorStore.findById(sessionAdminId)) yield AdminGalleryControl
-      //if customerId is the same as the gallery requested
-      val sessionGalleryControlOption = for(
-        sessionCustomerId <- session.getLongOption(WebsiteControllers.customerIdKey);
-        if (sessionCustomerId == galleryCustomerId)) yield OwnerGalleryControl
+  def serveCustomerGallery(customer:Customer) : Any = {
+    val galleryCustomerId = customer.id
+    //If admin is true admin
+    val adminGalleryControlOption = for(
+      sessionAdminId <- session.getLongOption(WebsiteControllers.adminIdKey);
+      adminOption   <- administratorStore.findById(sessionAdminId)) yield AdminGalleryControl
+    //if customerId is the same as the gallery requested
+    val sessionGalleryControlOption = for(
+      sessionCustomerId <- session.getLongOption(WebsiteControllers.customerIdKey);
+      if (sessionCustomerId == galleryCustomerId)) yield OwnerGalleryControl
 
-      //In priority order
-      val galleryControlPrecedence = List(
-        adminGalleryControlOption,
-        sessionGalleryControlOption,
-        Some(OtherGalleryControl)
-      )
-      //Pop off control with highest precedence
-      val galleryControl = galleryControlPrecedence.flatten.head
-
-
-      //get orders
-      val orders_and_egraphs = orderStore.getEgraphsAndOrders(galleryCustomerId).toList
-
-      val pendingOrders = orders_and_egraphs.filter(orderEgraph =>
-        !(orderEgraph._2.map(_.egraphState) == Some(EgraphState.Published)))
-
-      val fulfilledOrders = orders_and_egraphs.filter(orderEgraph =>
-        orderEgraph._2.map(_.egraphState) == Some(EgraphState.Published))
+    //In priority order
+    val galleryControlPrecedence = List(
+      adminGalleryControlOption,
+      sessionGalleryControlOption,
+      Some(OtherGalleryControl)
+    )
+    //Pop off control with highest precedence
+    val galleryControl = galleryControlPrecedence.flatten.head
 
 
-      val orders:List[EgraphViewModel] = galleryControl match {
-        case AdminGalleryControl | OwnerGalleryControl =>
-          GalleryOrderFactory.makePendingEgraphViewModel(pendingOrders).toList ++
-            GalleryOrderFactory.makeFulfilledEgraphViewModel(fulfilledOrders, facebookAppId).flatten.toList
-        case _ =>
-          if (customer.isGalleryVisible){
+    //get orders
+    val orders_and_egraphs = orderStore.getEgraphsAndOrders(galleryCustomerId).toList
+
+    val pendingOrders = orders_and_egraphs.filter(orderEgraph =>
+      !(orderEgraph._2.map(_.egraphState) == Some(EgraphState.Published)))
+
+    val fulfilledOrders = orders_and_egraphs.filter(orderEgraph =>
+      orderEgraph._2.map(_.egraphState) == Some(EgraphState.Published))
+
+
+    val orders:List[EgraphViewModel] = galleryControl match {
+      case AdminGalleryControl | OwnerGalleryControl =>
+        GalleryOrderFactory.makePendingEgraphViewModel(pendingOrders).toList ++
+          GalleryOrderFactory.makeFulfilledEgraphViewModel(fulfilledOrders, facebookAppId).flatten.toList
+      case _ =>
+        if (customer.isGalleryVisible){
           GalleryOrderFactory.makeFulfilledEgraphViewModel(fulfilledOrders.filter(
             orderAndOption => {
               orderAndOption._1.privacyStatus == PrivacyStatus.Public
             }), facebookAppId).flatten.toList
-          } else {
-            List()
-          }
-
-      }
-
-      views.frontend.html.account_gallery(customer.username, orders, galleryControl)
+        } else {
+          List()
+        }
     }
+    views.frontend.html.account_gallery(customer.username, orders, galleryControl)
   }
+
 }
 
 

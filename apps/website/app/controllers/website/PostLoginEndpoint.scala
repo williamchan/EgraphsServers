@@ -25,7 +25,7 @@ private[controllers] trait PostLoginEndpoint { this: Controller =>
 
       case Right(validForm) =>
         session.put(WebsiteControllers.customerIdKey, validForm.customerId)
-        new Redirect(reverse(WebsiteControllers.getCustomerGallery(validForm.customerId)).url)
+        new Redirect(reverse(WebsiteControllers.getCustomerGalleryById(validForm.customerId)).url)
     }
   }
 }

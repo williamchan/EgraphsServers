@@ -35,7 +35,7 @@ define(["Egraphs"],
           }
           //highlight the correct link when you reach the spot on the page.link_+pos
           var min = Number.MAX_VALUE;
-          var minLink;
+          var mLink;
           for(i in link_pos) {
             if(i - top < min) {
               min = top - i;
