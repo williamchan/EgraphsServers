@@ -40,7 +40,14 @@ case class Account(
    */
   def createCustomer(name: String): Customer = {
     require(customerId.isEmpty, "Cannot create Customer on Account that already has one")
-    Customer(name = name, username = email.split("@").head)
+    var username = email.split("@").head
+    //Check if username already taken. append random digits until its unique.
+    
+    val rnd = new scala.util.Random
+    while(services.customerStore.findByUsername(username).exists(p => true)) {
+      username = username + rnd.nextInt(9).toString
+    }
+    Customer(name = name, username=username)
   }
 
   def password: Option[Password] = {
