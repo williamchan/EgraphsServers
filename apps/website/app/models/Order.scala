@@ -605,13 +605,13 @@ object GalleryOrderFactory {
           appId = fbAppId,
           picUrl = thumbnailUrl,
           name= celebrity.publicName.get + " just created an egraph for me!",
-          caption = "We are all fans.",
-          description= "Check it out!",
+          caption = product.storyTitle,
+          description= product.description,
           link = viewEgraphUrl
         )
         new FulfilledEgraphViewModel(
           facebookShareLink = facebookShareLink,
-          twitterShareText = celebrity.publicName.get + " just created an egraph for me!",
+          twitterShareText = celebrity.publicName.get + " just created an egraph for me! Check it out here: " + viewEgraphUrl,
           orderId = order.id,
           orientation = product.frame.name.toLowerCase,
           productUrl = StorefrontChoosePhotoConsumerEndpoints.url(celebrity, product).url,
