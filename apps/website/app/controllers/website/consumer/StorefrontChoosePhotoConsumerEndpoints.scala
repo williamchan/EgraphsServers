@@ -68,16 +68,18 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
   def getStorefrontChoosePhotoCarousel(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod()
   {
     celebFilters.requireCelebrityAndProductUrlSlugs{ (celeb, product) =>
-      val products = celeb.productsInActiveInventoryBatches().toSeq
       val tiledViewLink = this.reverse(this.getStorefrontChoosePhotoTiled(celebrityUrlSlug)).url
 
-      products.findIndexOf(next => next.id == product.id) match {
+      val productsAndInventoryRemaining = celeb.getActiveProductsWithInventoryRemaining()
+      productsAndInventoryRemaining.findIndexOf(next => next._1.id == product.id) match {
         case -1 =>
           new Redirect(tiledViewLink)
 
         case indexOfProductInProductList =>
-          val productViews = for (product <- products) yield {
-            product.asChoosePhotoCarouselView(celebUrlSlug=celeb.urlSlug.getOrElse("/"), fbAppId = facebookAppId)
+          val productViews = for (productWithInventoryRemaining <- productsAndInventoryRemaining) yield {
+            val product = productWithInventoryRemaining._1
+            val quantityRemaining = productWithInventoryRemaining._2
+            product.asChoosePhotoCarouselView(celebUrlSlug=celeb.urlSlug.getOrElse("/"), quantityRemaining = quantityRemaining, fbAppId = facebookAppId)
           }
 
           views.frontend.html.celebrity_storefront_choose_photo_carousel(

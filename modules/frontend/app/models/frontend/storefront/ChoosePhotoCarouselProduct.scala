@@ -25,5 +25,6 @@ case class ChoosePhotoCarouselProduct(
   carouselUrl: String,
   facebookShareLink: String,
   twitterShareLink: String,
-  carouselViewLink: String
+  carouselViewLink: String,
+  quantityRemaining: Int
 )

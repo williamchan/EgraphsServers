@@ -73,17 +73,17 @@
 
                       <p class="price">@product.price.formatSimply</p>
 
-                      @safeForm("action" -> product.personalizeLink, "method" -> "POST") {
-                        <p>
-
-                          <button type="submit" class="button">
-
-                            <strong>Personalize</strong><span>&raquo;</span>
-
-                          </button>
-
-                        </p>
-                      }
+                      <p>
+                        @if(product.quantityRemaining > 0){
+                          @safeForm("action" -> product.personalizeLink, "method" -> "POST") {
+                            <button type="submit" class="button">
+                              <strong>Personalize</strong><span>&raquo;</span>
+                            </button>
+                          }
+                        } else {
+                          <strong>Sold Out!</strong>
+                        }
+                      </p>
                     </div>
 
                     <p class="see-all"><a href="@tiledViewLink">See All Photos</a></p>

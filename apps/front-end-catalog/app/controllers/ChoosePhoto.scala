@@ -146,7 +146,8 @@ object ChoosePhoto extends Controller
       carouselUrl="this-product's-carousel-url",
       facebookShareLink="facebook-share-link",
       twitterShareLink = "www.twitter.com",
-      carouselViewLink="www.egraphs.com"
+      carouselViewLink="www.egraphs.com",
+      quantityRemaining=50
     )
   }
 }
