@@ -108,6 +108,7 @@ trait PostBuyProductEndpoint { this: Controller =>
 }
 
 object PostBuyProductEndpoint extends Logging {
+  import WebsiteControllers.{reverse, getOrderConfirmation}
 
   private val dateFormat = new SimpleDateFormat("MMMM dd, yyyy")
 
@@ -182,8 +183,7 @@ object PostBuyProductEndpoint extends Logging {
         case e: InsufficientInventoryException => {
           payment.refund(charge.id)
           saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = e.getLocalizedMessage)
-          Validation.addError("Inventory", "Our apologies. There is no more inventory available, but your celebrity will sign more Egraphs soon.")
-          return WebsiteControllers.redirectWithValidationErrors(StorefrontChoosePhotoConsumerEndpoints.url(celebrity, product), Some(false))
+          return new Redirect(reverse(WebsiteControllers.getStorefrontNoInventory(celebrity.urlSlug.get, product.urlSlug)).url)
         }
         case e: Exception => {
           payment.refund(charge.id)
@@ -199,7 +199,6 @@ object PostBuyProductEndpoint extends Logging {
       // Clear out the shopping cart and redirect
       serverSessions.celebrityStorefrontCart(celebrity.id).emptied.save()
 
-      import WebsiteControllers.{reverse, getOrderConfirmation}
       new Redirect(reverse(getOrderConfirmation(order.id)).url)
     }
   }

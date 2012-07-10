@@ -1,0 +1,48 @@
+@(celebrityName: String, productName: String)(
+  implicit headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData
+)
+
+@baseBody = {
+<div id="content" class="top" role="main">
+
+  <div id="main" class="sub">
+
+    <section id="checkout" class="container">
+
+      <header>
+        <h1>Could not place your order</h1>
+        <h2>@celebrityName | @productName</h2>
+      </header>
+
+      <div class="failed clearfix">
+
+        <div class="no-inventory">
+
+          <h2>We're out of stock</h2>
+
+          <p>
+            We're really sorry, but it looks like this product has just run out of stock. Your credit card has not been charged.
+            <small><a href="/faq#how-many" class="tip">Out of stock?</a></small>
+          </p>
+
+          <p>
+            Please continue <a href="/">shopping</a>, or follow us on <a href="http://www.twitter.com/egraphs">Twitter</a> to learn about future availabilities.
+          </p>
+
+        </div>
+
+      </div> <!-- end .no-inventory -->
+
+    </section> <!-- end #failed -->
+
+  </div> <!-- end #main -->
+
+</div> <!-- end #content -->
+
+}
+
+@base_template(
+  title="Order Failed - No Inventory",
+  body=baseBody
+)
