@@ -33,7 +33,7 @@ trait ImplicitHeaderAndFooterData {
         name=customer.name,
         profileUrl="",
         accountSettingsUrl=Utils.lookupUrl("WebsiteControllers.getAccountSettings").url,
-        galleryUrl=Utils.lookupUrl("WebsiteControllers.getCustomerGallery", Map("galleryCustomerId" -> customer.id.toString)).url,
+        galleryUrl=Utils.lookupUrl("WebsiteControllers.getCustomerGalleryById", Map("galleryCustomerId" -> customer.id.toString)).url,
         logoutUrl="/logout"
       )
     }
