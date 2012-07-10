@@ -3,18 +3,21 @@ package controllers.website
 import play.mvc.Controller
 import services.blobs.AccessPolicy
 import java.text.SimpleDateFormat
-import services.http.ControllerMethod
+import services.http.{EgraphsSession, ControllerMethod}
 import play.templates.Html
 import services.http.SafePlayParams.Conversions.paramsToOptionalParams
 import services.graphics.Handwriting
 import models._
 import controllers.WebsiteControllers
+import frontend.egraph.{LandscapeEgraphFrameViewModel, PortraitEgraphFrameViewModel}
 import play.mvc.results.Redirect
+import services.AppConfig
 
 private[controllers] trait GetEgraphEndpoint { this: Controller =>
   protected def administratorStore: AdministratorStore
   protected def orderStore: OrderStore
   protected def controllerMethod: ControllerMethod
+  protected def facebookAppId: String
 
   /**
    * Serves up a single egraph HTML page. The egraph number is actually the number
@@ -31,12 +34,19 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
     // Get an order with provided ID
     orderStore.findFulfilledWithId(orderId.toLong) match {
       case Some(FulfilledOrder(order, egraph)) if isViewable(order) =>
+        val maybeCustomerId = session.getLongOption(WebsiteControllers.customerIdKey)
+        val maybeGalleryLink = maybeCustomerId.map { id =>
+          reverse(WebsiteControllers.getCustomerGallery(id)).url
+        }
+
         GetEgraphEndpoint.html(
           egraph = egraph,
           order = order,
           penWidth = penWidth,
           shadowX = shadowX,
-          shadowY = shadowY
+          shadowY = shadowY,
+          facebookAppId = facebookAppId,
+          galleryLink = maybeGalleryLink
         )
       case Some(FulfilledOrder(order, egraph)) => Forbidden("This Egraph is private.")
       case None => NotFound("No Egraph exists with the provided identifier.")
@@ -64,14 +74,21 @@ object GetEgraphEndpoint {
     order: Order,
     penWidth: Double=Handwriting.defaultPenWidth,
     shadowX: Double=Handwriting.defaultShadowOffsetX,
-    shadowY: Double=Handwriting.defaultShadowOffsetY
+    shadowY: Double=Handwriting.defaultShadowOffsetY,
+    facebookAppId: String = "",
+    galleryLink: Option[String] = None
   ): Html = {
     // Get related data model objects
     val product = order.product
     val celebrity = product.celebrity
+    val recipient = order.recipient
 
     // Prepare the framed image
-    val frame = product.frame
+    val frame = product.frame match {
+      case PortraitEgraphFrame => PortraitEgraphFrameViewModel
+      case LandscapeEgraphFrame => LandscapeEgraphFrameViewModel
+    }
+
     val rawSignedImage = egraph.image(product.photoImage)
     //TODO w1zzle handle this (see if its worth removing the signing origin transform)
     val frameFittedImage = rawSignedImage
@@ -79,8 +96,9 @@ object GetEgraphEndpoint {
       .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
       .withPenShadowOffset(shadowX, shadowY)
       .scaledToWidth(frame.imageWidthPixels)
-    // TODO: change this saveAndGetUrl to getSavedUrl when we're comfortable enough with image quality to cache them permanently.
-    val frameFittedImageUrl = frameFittedImage.saveAndGetUrl(AccessPolicy.Public)
+
+    val svgzImageUrl = frameFittedImage.getSavedUrl(AccessPolicy.Public)
+    val rasterImageUrl = frameFittedImage.rasterized.getSavedUrl(AccessPolicy.Public)
 
     // Prepare the icon
     val icon = product.icon
@@ -89,8 +107,31 @@ object GetEgraphEndpoint {
     // Prepare the story
     val story = egraph.story(celebrity, product, order)
 
+    // Signed at date
+    val formattedSigningDate = new SimpleDateFormat("MMMM dd, yyyy").format(egraph.signedAt.getOrElse(egraph.created))
+
+    // Social links
+    val celebName = celebrity.publicName.get
+    val thisPageLink = WebsiteControllers.reverse(WebsiteControllers.getEgraph(order.id.toString)).url
+    val shareOnFacebookLink = views.frontend.Utils.getFacebookShareLink(
+      appId = facebookAppId,
+      picUrl = rasterImageUrl,
+      name = celebName + " egraph for " + recipient.name,
+      caption = "Created by " + celebName + " on " + formattedSigningDate,
+      description = "",
+      link = thisPageLink
+    )
+
+    val tweetTextIfCelebHasTwitterName = celebrity.twitterUsername.map { celebTwitterName =>
+      "Hey @" + celebTwitterName + " this is one choice egraph you made."
+    }
+
+    val tweetText = tweetTextIfCelebHasTwitterName.getOrElse {
+      "Check this choice egraph from " + celebName + "."
+    }
+
     // Render
-    views.Application.html.egraph(
+    views.frontend.html.egraph(
       signerName = celebrity.publicName.getOrElse("Anony mouse"),
       recipientName = order.recipientName,
       frameCssClass = frame.cssClass,
@@ -100,8 +141,11 @@ object GetEgraphEndpoint {
       storyTitle = story.title,
       storyBody = story.body,
       audioUrl = egraph.assets.audioMp3Url,
-      signedImageUrl = frameFittedImageUrl,
-      signedOnDate = new SimpleDateFormat("MMMM dd, yyyy").format(egraph.created)
+      signedImageUrl = svgzImageUrl,
+      signedOnDate = formattedSigningDate,
+      shareOnFacebookLink = shareOnFacebookLink,
+      shareOnTwitterLink = views.frontend.Utils.getTwitterShareLink(thisPageLink, tweetText),
+      galleryLink = galleryLink
     )
   }
 

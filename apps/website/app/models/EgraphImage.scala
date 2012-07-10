@@ -54,6 +54,14 @@ case class EgraphImage (
     withTransform(SigningOriginOffsetEgraphImageTransform(signingOriginX, signingOriginY))
   }
 
+  /**
+   * Returns a version of this EgraphImage that will render as a rasterized PNG rather than
+   * the default vector
+   **/
+  def rasterized: EgraphImage = {
+    this.copy(graphicsSource = services.rasterGraphicsSourceFactory())
+  }
+
   /** Returns a copy of this image with the supplied transform applied */
   private def withTransform(transform: EgraphImageTransform): EgraphImage = {
     this.copy(transforms = transforms :+ transform)
@@ -166,7 +174,10 @@ object EgraphImage extends Logging
  *
  * @param blobs the application blobstore
  */
-case class EgraphImageServices @Inject() (blobs: Blobs)
+case class EgraphImageServices @Inject() (
+  blobs: Blobs,
+  rasterGraphicsSourceFactory: () => RasterGraphicsSource
+)
 
 /**
  * Data necessary for EgraphImage to perform its full functionality.

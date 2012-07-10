@@ -165,14 +165,6 @@ case class Egraph(
     )
   }
 
-  def thumbnail(productPhoto: => BufferedImage=order.product.photoImage):EgraphImage = {
-    EgraphImage(
-      ingredientFactory=imageIngredientFactory(order.product, productPhoto),
-      graphicsSource = services.rasterGraphicsSourceFactory(),
-      blobPath=blobKeyBase + "/image"
-    )
-  }
-
   /**
    * Returns a function that retrieves all the necessary (expensive) data for drawing an Egraph.
    * The function will only be evaluated if the required image doesn't already exist on the blobstore.

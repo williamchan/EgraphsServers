@@ -1,0 +1,160 @@
+@(signerName: String,
+  recipientName: String,
+  frameCssClass: String,
+  frameLayoutColumns: String,
+  productIconUrl: String,
+  storyLayoutColumns: String,
+  storyTitle: String,
+  storyBody: String,
+  audioUrl: String,
+  signedImageUrl: String,
+  signedOnDate: String,  
+  shareOnFacebookLink: String,
+  shareOnTwitterLink: String,
+  galleryLink: Option[String] = None
+)
+<!doctype html>
+<html class="egraph-page">
+  <head>
+    <title>@signerName egraph for @recipientName</title>
+    <!-- svg shim for IE -->
+    <!--[if lt IE 9]>
+      <script src="@asset("public/svgweb/src/svg.js")" type="text/javascript"></script>
+    <![endif]-->
+
+    <!-- Styles go here  -->
+    <link href='@asset("public/stylesheets/egraph.less")' 
+          rel="stylesheet" 
+          type="text/css">
+    <link href='@asset("public/soundmanager/360-player/360player.css")' 
+          rel="stylesheet" 
+          type="text/css">
+    <link href='@asset("public/soundmanager/360-player/360player-visualization.css")' 
+          rel="stylesheet" 
+          type="text/css">
+  </head>
+  <body>
+    <!-- Body content -->
+    <div class="container" id="egraph-page">
+      <div class="egraph-content @frameCssClass">
+        <div class="left-spotlight"></div>
+        <div class="right-spotlight"></div>
+        <div class="story-spotlight"></div>
+        <div class="story-text-spotlight"></div>
+        <div class="row">
+          <div class="@frameLayoutColumns photo-column" >
+            <div class="egraph">
+              <div class="frame">
+                <div class="image-aperture">
+                  <iframe src="@signedImageUrl" class="signed-photo" alt="Signed photo"></iframe>
+                  <div class="fx-mat-glow"></div>                
+                  <div class="fx-mat-shadow"></div>               
+                  <div class="fx-glass-shine"></div>
+                </div>
+                <div class="plaque">
+                  <img src='@asset("public/images/egraph_plaque.png")' alt="plaque" >
+                  <div class="plaque-content">
+                    <div class="player" >
+                      <div class="ui360 ui360-vis player-widget"><a href="@audioUrl"></a></div>
+                    </div>
+                    <div class="plaque-separator"></div>
+                    <div class="hero-text" >
+                      <div class="hero-text-centered">
+                        <div class="signer">@signerName</div>
+                        <div class="signed-for">signed for</div>
+                        <div class="signee">@recipientName</div>
+                      </div>
+                    </div>
+                    <div class="plaque-separator"></div>                                        
+                    <div class="product-icon-and-date-box">
+                      <div class="product-icon-content">
+                        <div class="product-icon-centered">
+                          <img src='@productIconUrl' />
+                        </div>
+                      </div>
+                      <div class="signing-date">@signedOnDate</div>
+                      <div class="fx-shine"></div>
+                    </div>                    
+                  </div>
+                  <div class="fx-plaque-shine"></div>
+                  <div class="fx-top-reflection"></div>
+                  <div class="fx-right-reflection"></div>                                    
+                </div>
+              </div>
+            </div>
+            <!-- <img src="egraph_frame_no_light.png" > -->
+          </div>
+          <div class="@storyLayoutColumns story-column" >
+            <h1 class="story-column-element embossed" emboss="@storyTitle.toUpperCase">@storyTitle.toUpperCase</h1>
+            <div class="story-column-element separator"></div>
+            <div class="story-column-element story-text">@Html(storyBody)
+            </div>                        
+            <div class="story-column-element">
+              <a href="@galleryLink.getOrElse("/")" class="egraphs-logo">
+                <img class="logo-inactive" src='@asset("/public/images/egraphs_logo_inactive.png")' alt="Egraphs Logo">
+                <img class="logo-active" src='@asset("/public/images/egraphs_logo_active.png")' alt="Egraphs Logo">
+              </a>
+            </div>
+            <div class="story-column-element separator"></div>
+            <div class="story-column-element social">              
+              <ul class="clearfix">
+                <li><a href="@shareOnFacebookLink" class="facebook">Facebook</a></li>
+                <li><a href="@shareOnTwitterLink" class="twitter">Twitter</a></li>
+                <!-- <li><a href="#" class="addthis">AddThis</a></li> -->
+              </ul>              
+            </div>
+            <div class="story-column-element gallery-link">              
+              <a href="#">Gallery</a>
+            </div>
+          </div> <!-- End story column -->
+        </div>
+      </div>
+    </div>
+    <!-- Scripting goes here -->
+    <!-- soundmanager2 360-degree player -->
+    <script type="text/javascript" src='@asset("public/soundmanager/360-player/script/berniecode-animator.js")'></script>
+    <!-- special IE-only canvas fix -->
+    <!--[if IE]><script type="text/javascript" src='@asset("public/soundmanager/360-player/script/excanvas.js")'></script><![endif]-->
+
+    <!-- Core soundmanager2 -->
+    <script type="text/javascript" src='@asset("public/soundmanager/script/soundmanager2-nodebug-jsmin.js")'></script>
+    <script type="text/javascript" src='@asset("public/soundmanager/360-player/script/360player.js")'></script>
+    <script type="text/javascript">
+      soundManager.url = '/public/soundmanager/swf/'; // path to directory containing SM2 SWF
+
+      soundManager.useFastPolling = true; // increased JS callback frequency, combined with useHighPerformance = true
+
+      threeSixtyPlayer.config.scaleFont = (navigator.userAgent.match(/msie/i)?false:true);
+      threeSixtyPlayer.config.showHMSTime = true;
+
+      if (threeSixtyPlayer.config.useWaveformData) {
+        soundManager.flash9Options.useWaveformData = true;
+      }
+      if (threeSixtyPlayer.config.useEQData) {
+        soundManager.flash9Options.useEQData = true;
+      }
+      if (threeSixtyPlayer.config.usePeakData) {
+        soundManager.flash9Options.usePeakData = true;
+      }
+      
+      if (threeSixtyPlayer.config.useWaveformData ||
+          (threeSixtyPlayer.flash9Options && (threeSixtyPlayer.flash9Options.useEQData ||
+          threeSixtyPlayer.flash9Options.usePeakData)))
+      {
+        // even if HTML5 supports MP3, prefer flash so the visualization features can be used.
+        soundManager.preferFlash = true;
+      }
+
+      if (window.location.href.match(/html5/i)) {
+        // for testing IE 9, etc.
+        soundManager.useHTML5Audio = true;
+      }
+
+      // enable some spectrum stuffs
+
+      threeSixtyPlayer.config.useWaveformData = true;
+      threeSixtyPlayer.config.useEQData = true;
+      
+    </script>    
+  </body>
+</html>
