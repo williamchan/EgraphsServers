@@ -29,17 +29,17 @@ class GetEgraphEndpointTests extends AdminFunctionalTest {
     }
 
     // anonymous users and random customers are redirected away
-    assertStatus(403, GET("/egraph/" + orderId))
+    assertStatus(403, GET("/" + orderId))
     login(anotherAcct)
-    assertStatus(403, GET("/egraph/" + orderId))
+    assertStatus(403, GET("/" + orderId))
 
     // buyer, recipient, and admins are able to view this egraph
     login(buyerAcct)
-    assertIsOk(GET("/egraph/" + orderId))
+    assertIsOk(GET("/" + orderId))
     login(recipientAcct)
-    assertIsOk(GET("/egraph/" + orderId))
+    assertIsOk(GET("/" + orderId))
     createAndLoginAsAdmin()
-    assertIsOk(GET("/egraph/" + orderId))
+    assertIsOk(GET("/" + orderId))
   }
 
   @Test
@@ -53,6 +53,6 @@ class GetEgraphEndpointTests extends AdminFunctionalTest {
       order.id.toString
     }
 
-    assertIsOk(GET("/egraph/" + orderId))
+    assertIsOk(GET("/" + orderId))
   }
 }
