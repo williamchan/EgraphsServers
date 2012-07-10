@@ -607,11 +607,11 @@ object GalleryOrderFactory {
           name = "My Egraph from " + celebrity.publicName.get + "!",
           caption = product.storyTitle,
           description= product.description,
-          link = "http://www.egraphs.com/user/" +order.recipient.username
+          link = viewEgraphUrl
         )
         val twitterShareLink = views.frontend.Utils.getTwitterShareLink(
           link = viewEgraphUrl,
-          text = celebrity.publicName.get + " just created an egraph for me! Check it out here "
+          text = celebrity.publicName.get + " just created an egraph for me! Check it out here: "
         )
         new FulfilledEgraphViewModel(
           facebookShareLink = facebookShareLink,

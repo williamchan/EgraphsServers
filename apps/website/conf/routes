@@ -102,7 +102,7 @@ GET     /account/recover/confirmation/?                             WebsiteContr
 GET     /account/verify/?                                           WebsiteControllers.getResetPassword
 POST    /account/verify                                             WebsiteControllers.postResetPassword
 GET     /account/{<[0-9]+>galleryCustomerId}/gallery/?              WebsiteControllers.getCustomerGalleryById
-GET     /user/{username}/?                                          WebsiteControllers.getCustomerGalleryByUsername
+GET     /account/{username}/?                                       WebsiteControllers.getCustomerGalleryByUsername
 GET     /egraph/{<[0-9]+>orderId}/?                                 WebsiteControllers.getEgraph
 GET     /facebooklogin/callback/?                                   WebsiteControllers.getFacebookLoginCallback
 GET     /faq/?                                                      WebsiteControllers.getFAQ

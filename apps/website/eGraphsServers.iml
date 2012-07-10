@@ -18,6 +18,7 @@
       <sourceFolder url="file://$MODULE_DIR$/app" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/tmp/generated" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/tmp" isTestSource="false" />
     </content>
     <content url="file://$MODULE_DIR$/modules/cloudbees-0.2.2" />
     <content url="file://$MODULE_DIR$/modules/less-0.9.1" />
