@@ -8,7 +8,11 @@
   storyBody: String,
   audioUrl: String,
   signedImageUrl: String,
-  signedOnDate: String)
+  signedOnDate: String,  
+  shareOnFacebookLink: String,
+  shareOnTwitterLink: String,
+  galleryLink: Option[String] = None
+)
 <!doctype html>
 <html class="egraph-page">
   <head>
@@ -81,7 +85,7 @@
             <div class="story-column-element story-text">@Html(storyBody)
             </div>                        
             <div class="story-column-element">
-              <a href="/" class="egraphs-logo">
+              <a href="@galleryLink.getOrElse("/")" class="egraphs-logo">
                 <img class="logo-inactive" src='@asset("/public/images/egraphs_logo_inactive.png")' alt="Egraphs Logo">
                 <img class="logo-active" src='@asset("/public/images/egraphs_logo_active.png")' alt="Egraphs Logo">
               </a>
@@ -89,11 +93,14 @@
             <div class="story-column-element separator"></div>
             <div class="story-column-element social">              
               <ul class="clearfix">
-                <li><a href="http://www.facebook.com/Egraphs" class="facebook">Facebook</a></li>
-                <li><a href="http://www.twitter.com/Egraphs" class="twitter">Twitter</a></li>
+                <li><a href="@shareOnFacebookLink" class="facebook">Facebook</a></li>
+                <li><a href="@shareOnTwitterLink" class="twitter">Twitter</a></li>
                 <!-- <li><a href="#" class="addthis">AddThis</a></li> -->
               </ul>              
-            </div>             
+            </div>
+            <div class="story-column-element gallery-link">              
+              <a href="#">Gallery</a>
+            </div>
           </div> <!-- End story column -->
         </div>
       </div>

@@ -117,6 +117,7 @@ html.egraph-page {
   .photo-column {
     .egraph {
       position:relative;
+      background-color:#333;
 
       .frame {
         .box-shadow(-6px 10px 12px 0px rgba(0, 0, 0, .4));
@@ -432,6 +433,17 @@ html.egraph-page {
           border-bottom:1px solid #ccc;
           border-right:1px solid #ccc;
           box-shadow:0px 1px white;    
+        }
+
+        &.gallery-link {
+          display: none;
+          margin-top:10px;
+          margin-left:17px;
+          text-align:center;
+          
+          a {
+            color: lighten(@grayGreen, 10%);
+          }
         }
       }
 
