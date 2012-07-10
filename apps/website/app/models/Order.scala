@@ -597,7 +597,7 @@ object GalleryOrderFactory {
       optionEgraph.map( egraph => {
         val product = order.product
         val celebrity = product.celebrity
-        val rawImage = egraph.thumbnail(product.photoImage).scaledToWidth(product.frame.thumbnailWidthPixels)
+        val rawImage = egraph.image(product.photoImage).rasterized.scaledToWidth(product.frame.thumbnailWidthPixels)
         val thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Public)
         val viewEgraphUrl = Utils.lookupAbsoluteUrl("WebsiteControllers.getEgraph", Map("orderId" -> order.id.toString)).url
         val facebookShareLink = views.frontend.Utils.feedDialogLink(

@@ -1,8 +1,7 @@
 package controllers
 
 import play.mvc.Controller
-import models.frontend.storefront.{CheckoutOrderSummary, CheckoutShippingAddressFormView, CheckoutBillingInfoView, CheckoutFormView}
-import org.joda.money.{CurrencyUnit, Money}
+import models.frontend.egraph.{LandscapeEgraphFrameViewModel, PortraitEgraphFrameViewModel}
 
 /**
  * Permutations of the Checkout: Checkout.
@@ -13,7 +12,7 @@ object Egraph extends Controller with DefaultHeaderAndFooterData {
   // Public members
   //
   def landscape = {
-    val frame = LandscapeEgraphFrame
+    val frame = LandscapeEgraphFrameViewModel
 
     views.frontend.html.egraph(
       "Herp Derpson",
@@ -33,12 +32,12 @@ object Egraph extends Controller with DefaultHeaderAndFooterData {
       "/public/images/sample_landscape_egraph.svg",
       "May 10, 1983",
       shareOnFacebookLink="/shareOnFacebookLink",
-      shareOnTwitterLink= "/shareOnTwitterLink"  
+      shareOnTwitterText= "This is my test egraph"  
     )
   }
 
   def portrait = {
-    val frame = PortraitEgraphFrame
+    val frame = PortraitEgraphFrameViewModel
 
     views.frontend.html.egraph(
       "Herp Derpson",
@@ -58,43 +57,8 @@ object Egraph extends Controller with DefaultHeaderAndFooterData {
       "/public/images/sample_portrait_egraph.svg",
       "May 10, 1983",
       shareOnFacebookLink="/shareOnFacebookLink",
-      shareOnTwitterLink= "/shareOnTwitterLink"      
+      shareOnTwitterText= "This is my test egraph!"      
     )
-  }
-
-
-  object PortraitEgraphFrame {
-    val name: String = "Default Portrait"
-
-    val cssClass  = "portrait"
-    val cssFrameColumnClasses = "offset1 span6"
-    val cssStoryColumnClasses = "span5"
-
-    val imageWidthPixels = 377
-    val imageHeightPixels = 526
-
-    val thumbnailWidthPixels = 350
-    val thumbnailHeightPixels = 525
-
-    val pendingWidthPixels = 170
-    val pendingHeightPixels = 225
-  }
-
-  object LandscapeEgraphFrame {
-    val name = "Default Landscape"
-
-    val cssClass  = "landscape"
-    val cssFrameColumnClasses = "span9"
-    val cssStoryColumnClasses = "span3"
-
-    val imageWidthPixels = 595
-    val imageHeightPixels = 377
-
-    val thumbnailWidthPixels = 510
-    val thumbnailHeightPixels = 410
-
-    val pendingWidthPixels = 230
-    val pendingHeightPixels = 185
   }
 }
 

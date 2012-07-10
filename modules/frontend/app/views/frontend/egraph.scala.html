@@ -10,7 +10,7 @@
   signedImageUrl: String,
   signedOnDate: String,  
   shareOnFacebookLink: String,
-  shareOnTwitterLink: String,
+  shareOnTwitterText: String,
   galleryLink: Option[String] = None
 )
 <!doctype html>
@@ -85,7 +85,7 @@
             <!-- <img src="egraph_frame_no_light.png" > -->
           </div>
           <div class="@storyLayoutColumns story-column" >
-            <h1 class="embossed" emboss="@storyTitle.toUpperCase">@storyTitle.toUpperCase</h1>
+            <h1 class="story-column-element embossed" emboss="@storyTitle.toUpperCase">@storyTitle.toUpperCase</h1>
             <div class="story-column-element separator"></div>
             <div class="story-column-element story-text">@Html(storyBody)
             </div>                        
@@ -99,7 +99,7 @@
             <div class="story-column-element social">              
               <ul class="clearfix">
                 <li><a href="@shareOnFacebookLink" class="facebook">Facebook</a></li>
-                <li><a href="@shareOnTwitterLink" class="twitter">Twitter</a></li>
+                <li><a href="@shareOnTwitterText" class="twitter">Twitter</a></li>
                 <!-- <li><a href="#" class="addthis">AddThis</a></li> -->
               </ul>              
             </div>
