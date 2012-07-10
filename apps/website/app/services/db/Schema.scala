@@ -102,7 +102,9 @@ class Schema @Inject()(
   on(orders)(order =>
     declare(
       order.amountPaidInCurrency is monetaryDbType,
-      columns(order._reviewStatus) are (indexed)
+      columns(order._reviewStatus) are (indexed),
+      order.billingPostalCode is (dbType("varchar(20)")),
+      order.shippingAddress is (dbType("varchar(255)"))
     )
   )
 

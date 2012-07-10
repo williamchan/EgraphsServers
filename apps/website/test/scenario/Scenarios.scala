@@ -4,7 +4,6 @@ import services.db.Schema
 import services.blobs.Blobs
 import org.apache.commons.mail.HtmlEmail
 import play.mvc.results.Redirect
-import Blobs.Conversions._
 import utils.{TestConstants, TestData}
 import org.squeryl.PrimitiveTypeMode._
 import models._
@@ -528,7 +527,9 @@ class Scenarios extends DeclaresScenarios {
         desiredText = Some("Happy 29th birthday, Erem!"),
         personalNote = Some("I'm your biggest fan!"),
         celebrity = celebrity,
-        product = product
+        product = product,
+        price = product.price,
+        billingPostalCode = "55555"
       ).execute()
     }
   )

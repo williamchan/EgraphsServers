@@ -9,7 +9,7 @@ import org.joda.money.{CurrencyUnit, Money}
 import models.enums.{WrittenMessageRequest, PrintingOption}
 import services.http.forms.{Form, ReadsForm}
 import play.mvc.Scope.Flash
-import services.http.forms.purchase.PurchaseForms.AllShippingForms
+import services.http.forms.purchase.PurchaseForms.AllPurchaseForms
 
 /**
  * Represents the cache-persisted forms in the purchase flow.
@@ -66,7 +66,7 @@ class PurchaseForms @Inject()(
     ) yield {
       val (validBilling, validShipping) = validCheckoutForms
 
-      AllShippingForms(productId, inventoryBatch, validPersonalizeForm, validBilling, validShipping)
+      AllPurchaseForms(productId, inventoryBatch, validPersonalizeForm, validBilling, validShipping)
     }
   }
 
@@ -82,7 +82,11 @@ class PurchaseForms @Inject()(
    * print). This will be None if no physical print has been ordered.
    **/
   def shippingPrice: Option[Money] = {
-    None
+    import frontend.formatting.MoneyFormatting.Conversions._
+    this.highQualityPrint match {
+      case Some(PrintingOption.HighQualityPrint) => Some(BigDecimal(45).toMoney())
+      case _ => None
+    }
   }
 
   /**
@@ -438,7 +442,7 @@ object PurchaseForms {
     }
   }
 
-  case class AllShippingForms(
+  case class AllPurchaseForms(
     productId: Long,
     inventoryBatch: InventoryBatch,
     personalization: PersonalizeForm.Validated,

@@ -4,7 +4,7 @@ import consumer.StorefrontChoosePhotoConsumerEndpoints
 import play.mvc.Controller
 import play.data.validation._
 import models._
-import enums.OrderReviewStatus
+import enums.{PrintingOption, OrderReviewStatus}
 import play.mvc.Scope.Flash
 import services.mail.Mail
 import services.{Utils, AppConfig}
@@ -20,6 +20,8 @@ import play.mvc.results.Redirect
 import services.http.{ServerSessionFactory, POSTControllerMethod, CelebrityAccountRequestFilters}
 import java.text.SimpleDateFormat
 import org.apache.commons.mail.HtmlEmail
+import org.joda.money.Money
+import services.http.forms.purchase.CheckoutShippingForm
 
 trait PostBuyProductEndpoint { this: Controller =>
   import PostBuyProductEndpoint.EgraphPurchaseHandler
@@ -70,6 +72,8 @@ trait PostBuyProductEndpoint { this: Controller =>
         personalNote = personalNote,
         celebrity = celebrity,
         product = product,
+        price = product.price,
+        billingPostalCode = "55555",
         flash = flash,
         mail = mail,
         customerStore = customerStore,
@@ -122,6 +126,10 @@ object PostBuyProductEndpoint extends Logging {
     personalNote: Option[String],
     celebrity: Celebrity,
     product: Product,
+    price: Money,
+    billingPostalCode: String,
+    printingOption: PrintingOption = PrintingOption.DoNotPrint,
+    shippingForm: Option[CheckoutShippingForm.Valid] = None,
     flash: Flash = Flash.current(),
     mail: Mail = AppConfig.instance[Mail],
     customerStore: CustomerStore = AppConfig.instance[CustomerStore],
@@ -164,7 +172,12 @@ object PostBuyProductEndpoint extends Logging {
           recipientName = recipientName,
           personalNote = personalNote,
           desiredText = desiredText,
-          stripeTokenId = stripeTokenId, isDemo = isDemo, charge = charge, celebrity = celebrity, product = product, dbSession = dbSession, accountStore = accountStore, customerStore = customerStore)
+          stripeTokenId = stripeTokenId,
+          price = price,
+          billingPostalCode = billingPostalCode,
+          printingOption = printingOption,
+          shippingForm = shippingForm,
+          isDemo = isDemo, charge = charge, celebrity = celebrity, product = product, dbSession = dbSession, accountStore = accountStore, customerStore = customerStore)
       } catch {
         case e: InsufficientInventoryException => {
           payment.refund(charge.id)
@@ -187,7 +200,6 @@ object PostBuyProductEndpoint extends Logging {
       serverSessions.celebrityStorefrontCart(celebrity.id).emptied.save()
 
       import WebsiteControllers.{reverse, getOrderConfirmation}
-
       new Redirect(reverse(getOrderConfirmation(order.id)).url)
     }
   }
@@ -203,6 +215,10 @@ object PostBuyProductEndpoint extends Logging {
                            desiredText: Option[String],
                            stripeTokenId: String,
                            charge: Charge,
+                           price: Money,
+                           billingPostalCode: String,
+                           printingOption: PrintingOption,
+                           shippingForm: Option[CheckoutShippingForm.Valid],
                            isDemo: Boolean,
                            accountStore: AccountStore,
                            celebrity: Celebrity): (Order, Customer, Customer) = {
@@ -216,7 +232,25 @@ object PostBuyProductEndpoint extends Logging {
       }
 
       // Persist the Order with the Stripe charge info.
-      var order = buyer.buy(product, recipient, recipientName = recipientName, messageToCelebrity = personalNote, requestedMessage = desiredText).save()
+      val shippingAddress = shippingForm match {
+        case Some(form) => {
+          val addressLine2Part = form.addressLine2 match {
+            case Some(s) => s + ", "
+            case None => ""
+          }
+          Some(form.name + ", " +
+            form.addressLine1 + ", " +
+            addressLine2Part +
+            form.city + ", " +
+            form.state + " " +
+            form.postalCode)
+        }
+        case _ => None
+      }
+      val shippingInfo = ShippingInfo(_printingOption = printingOption.name, shippingAddress = shippingAddress)
+      var order = buyer.buy(product, recipient, recipientName = recipientName, messageToCelebrity = personalNote, requestedMessage = desiredText)
+        .copy(amountPaidInCurrency = BigDecimal(price.getAmount), billingPostalCode = Option(billingPostalCode), shippingInfo = shippingInfo)
+        .save()
       order = order.withChargeInfo(stripeCardTokenId = stripeTokenId, stripeCharge = charge)
 
       if (isDemo) {

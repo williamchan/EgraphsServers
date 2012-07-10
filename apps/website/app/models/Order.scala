@@ -37,6 +37,11 @@ case class OrderServices @Inject() (
 /**
  * Persistent entity representing the Orders made upon Products of our service
  */
+case class ShippingInfo(
+  _printingOption: String = PrintingOption.DoNotPrint.name,
+  shippingAddress: Option[String] = None
+)
+
 case class Order(
   id: Long = 0,
   productId: Long = 0,
@@ -52,9 +57,11 @@ case class Order(
   stripeCardTokenId: Option[String] = None,
   stripeChargeId: Option[String] = None,
   amountPaidInCurrency: BigDecimal = 0,
+  billingPostalCode: Option[String] = None,
   messageToCelebrity: Option[String] = None,
   requestedMessage: Option[String] = None,
   expectedDate: Option[Date] = None,
+  shippingInfo: ShippingInfo = ShippingInfo(),
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: OrderServices = AppConfig.instance[OrderServices]
@@ -65,6 +72,9 @@ case class Order(
   with HasOrderReviewStatus[Order]
   with HasWrittenMessageRequest[Order]
 {
+  val _printingOption = shippingInfo._printingOption
+  val shippingAddress = shippingInfo.shippingAddress
+
   //
   // Public methods
   //
@@ -470,11 +480,13 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
       theOld.messageToCelebrity := theNew.messageToCelebrity,
       theOld.requestedMessage := theNew.requestedMessage,
       theOld.expectedDate := theNew.expectedDate,
+      theOld.billingPostalCode := theNew.billingPostalCode,
+      theOld._printingOption := theNew._printingOption,
+      theOld.shippingAddress := theNew.shippingAddress,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated
     )
   }
-
   //
   // SavesCreatedUpdated[Order] methods
   //

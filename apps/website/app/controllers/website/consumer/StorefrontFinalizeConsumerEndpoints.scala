@@ -20,7 +20,7 @@ import models.frontend.storefront.FinalizePersonalizationViewModel
 import models.frontend.storefront.FinalizeShippingViewModel
 import controllers.website.PostBuyProductEndpoint.EgraphPurchaseHandler
 import services.db.{TransactionSerializable, DBSession}
-import services.http.forms.purchase.PurchaseForms.AllShippingForms
+import services.http.forms.purchase.PurchaseForms.AllPurchaseForms
 import models.Celebrity
 
 /**
@@ -61,7 +61,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
 
       for (allPurchaseForms <- forms.allPurchaseFormsOrRedirect(celeb, product).right) yield {
         // Everything looks good for rendering the page! Unpack the purchase data.
-        val AllShippingForms(
+        val AllPurchaseForms(
           formProductId,
           inventoryBatch,
           validPersonalizeForm,
@@ -143,15 +143,15 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
       celebFilters.requireCelebrityAndProductUrlSlugs { (celeb, product) =>
         val forms = purchaseFormFactory.formsForStorefront(celeb.id)
         for (formData <- forms.allPurchaseFormsOrRedirect(celeb, product).right) yield {
-          (celeb, product, formData)
+          (celeb, product, formData, forms)
         }
       }
     }
     // TODO: fix the type erasure that happens in our celebFilters so that a match like this
     // isnt necessary.
     redirectOrPurchaseData match {
-      case Right((celeb: Celebrity, product:models.Product, shippingForms: AllShippingForms)) =>
-        val AllShippingForms(productId, inventoryBatch, personalization, billing, shipping) = shippingForms
+      case Right((celeb: Celebrity, product:models.Product, shippingForms: AllPurchaseForms, forms: PurchaseForms)) =>
+        val AllPurchaseForms(productId, inventoryBatch, personalization, billing, shipping) = shippingForms
         EgraphPurchaseHandler(
           recipientName=personalization.recipientName,
           recipientEmail=personalization.recipientEmail.getOrElse(billing.email),
@@ -161,7 +161,11 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
           desiredText=personalization.writtenMessageText,
           personalNote=personalization.noteToCelebriity,
           celebrity=celeb,
-          product=product
+          product=product,
+          price=forms.total(product.price),
+          billingPostalCode=billing.postalCode,
+          printingOption=forms.highQualityPrint.getOrElse(PrintingOption.DoNotPrint),
+          shippingForm=shipping
         ).execute()
 
 
