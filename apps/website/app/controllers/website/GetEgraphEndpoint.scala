@@ -36,7 +36,7 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
       case Some(FulfilledOrder(order, egraph)) if isViewable(order) =>
         val maybeCustomerId = session.getLongOption(WebsiteControllers.customerIdKey)
         val maybeGalleryLink = maybeCustomerId.map { id =>
-          reverse(WebsiteControllers.getCustomerGallery(id)).url
+          reverse(WebsiteControllers.getCustomerGalleryById(id)).url
         }
 
         GetEgraphEndpoint.html(
