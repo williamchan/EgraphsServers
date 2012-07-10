@@ -1,21 +1,17 @@
-@(celebrityPublicName: Option[String] = None, celebrityIsMale: Boolean = true)
+@(celebrityPublicName: Option[String] = None, celebrityCasualName: Option[String] = None, celebrityIsMale: Boolean = true)
 
 <header id="landing-welcome" class="row">
 
   <div class="span6">
 
-    <h1>With Egraphs you can.</h1>
+    <h1>Egraphs gets you a direct line to him.</h1>
 
     <p>
-      An egraph is a direct line between you and
-      @celebrityPublicName.getOrElse("your favorite star"). Cut
-      through the red tape and tell @celebrityPublicName.getOrElse("your star")
-      whatever you want. @views.frontend.Utils.heOrShe(celebrityIsMale, true)'ll
-      talk back to you. Your moment with @views.frontend.Utils.himOrHer(celebrityIsMale)
-      gets frozen in time through an egraph. Share it on your Facebook
-      wall. Hang it on your bedroom wall. Do whatever you want
-      <em>&ndash; it’s your egraph.</em>
+      Think of an egraph like an improved version of the poster or photo you stood in line to get autographed years ago. Except now you cut straight through the red tape. Tell @celebrityCasualName.getOrElse("your favorite player") whatever you want. He talks right back to you. Your moment with him gets frozen in time through an egraph—a combination of a photo, a handwritten note and signature, and a personalized audio message. Share it on your Facebook wall. Hang it on your bedroom wall. Do whatever you want <em>&ndash; it’s your egraph.</em>
     </p>
+	  <p>
+	    <em>This is how it works:</em>
+	  </p>
   </div>
 
   <div class="span5 offset1">

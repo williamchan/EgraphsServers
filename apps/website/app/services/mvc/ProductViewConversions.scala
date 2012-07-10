@@ -57,7 +57,7 @@ class ProductViewConversions(product: Product) {
     carouselViewRoute.absolute()
     val carouselViewLink = carouselViewRoute.url
 
-    val facebookShareLink = views.frontend.Utils.feedDialogLink(
+    val facebookShareLink = views.frontend.Utils.getFacebookShareLink(
       appId = fbAppId,
       picUrl = productThumbnailUrl,
       name= "Egraphs from " + product.celebrity.publicName.get,
@@ -66,6 +66,10 @@ class ProductViewConversions(product: Product) {
         "anywhere in the world. The fan writes to their favorite star, and the star sends back a 100% " +
         "personalized and authenticated handwritten note and audio message.",
       link = carouselViewLink
+    )
+    val twitterShareLink = views.frontend.Utils.getTwitterShareLink(
+      link = carouselViewLink,
+      text = "Check it out. " + product.celebrity.publicName.get + " is signing egraphs!"
     )
     ChoosePhotoCarouselProduct(
       name=product.name,
@@ -76,7 +80,7 @@ class ProductViewConversions(product: Product) {
       orientation = orientationOfFrame(product.frame),
       carouselUrl=product.urlSlug,
       facebookShareLink=facebookShareLink,
-      twitterShareText="Check it out. " + product.celebrity.publicName.get + " is signing egraphs!",
+      twitterShareLink=twitterShareLink,
       carouselViewLink = carouselViewLink
     )
   }

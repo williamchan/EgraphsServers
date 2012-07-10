@@ -601,7 +601,7 @@ object GalleryOrderFactory {
         val rawImage = egraph.thumbnail(product.photoImage).scaledToWidth(product.frame.thumbnailWidthPixels)
         val thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Public)
         val viewEgraphUrl = Utils.lookupAbsoluteUrl("WebsiteControllers.getEgraph", Map("orderId" -> order.id.toString)).url
-        val facebookShareLink = views.frontend.Utils.feedDialogLink(
+        val facebookShareLink = views.frontend.Utils.getFacebookShareLink(
           appId = fbAppId,
           picUrl = thumbnailUrl,
           name= celebrity.publicName.get + " just created an egraph for me!",
@@ -609,9 +609,13 @@ object GalleryOrderFactory {
           description= "Check it out!",
           link = viewEgraphUrl
         )
+        val twitterShareLink = views.frontend.Utils.getTwitterShareLink(
+          link = viewEgraphUrl,
+          text = celebrity.publicName.get + " just created an egraph for me!"
+        )
         new FulfilledEgraphViewModel(
           facebookShareLink = facebookShareLink,
-          twitterShareText = celebrity.publicName.get + " just created an egraph for me!",
+          twitterShareLink = twitterShareLink,
           orderId = order.id,
           orientation = product.frame.name.toLowerCase,
           productUrl = StorefrontChoosePhotoConsumerEndpoints.url(celebrity, product).url,
