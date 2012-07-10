@@ -112,13 +112,14 @@ object GetEgraphEndpoint {
 
     // Social links
     val celebName = celebrity.publicName.get
-    val shareOnFacebookLink = views.frontend.Utils.feedDialogLink(
+    val thisPageLink = WebsiteControllers.reverse(WebsiteControllers.getEgraph(order.id.toString)).url
+    val shareOnFacebookLink = views.frontend.Utils.getFacebookShareLink(
       appId = facebookAppId,
       picUrl = rasterImageUrl,
       name = celebName + " egraph for " + recipient.name,
       caption = "Created by " + celebName + " on " + formattedSigningDate,
       description = "",
-      link = WebsiteControllers.reverse(WebsiteControllers.getEgraph(order.id.toString)).url
+      link = thisPageLink
     )
 
     val tweetTextIfCelebHasTwitterName = celebrity.twitterUsername.map { celebTwitterName =>
@@ -143,7 +144,7 @@ object GetEgraphEndpoint {
       signedImageUrl = svgzImageUrl,
       signedOnDate = formattedSigningDate,
       shareOnFacebookLink = shareOnFacebookLink,
-      shareOnTwitterText = tweetText,
+      shareOnTwitterLink = views.frontend.Utils.getTwitterShareLink(thisPageLink, tweetText),
       galleryLink = galleryLink
     )
   }

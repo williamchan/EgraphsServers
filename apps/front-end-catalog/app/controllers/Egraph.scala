@@ -32,7 +32,7 @@ object Egraph extends Controller with DefaultHeaderAndFooterData {
       "/public/images/sample_landscape_egraph.svg",
       "May 10, 1983",
       shareOnFacebookLink="/shareOnFacebookLink",
-      shareOnTwitterText= "This is my test egraph"  
+      shareOnTwitterLink= "This is my test egraph"
     )
   }
 
@@ -57,7 +57,7 @@ object Egraph extends Controller with DefaultHeaderAndFooterData {
       "/public/images/sample_portrait_egraph.svg",
       "May 10, 1983",
       shareOnFacebookLink="/shareOnFacebookLink",
-      shareOnTwitterText= "This is my test egraph!"      
+      shareOnTwitterLink= "This is my test egraph!"
     )
   }
 }
