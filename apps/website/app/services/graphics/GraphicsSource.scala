@@ -5,7 +5,7 @@ import javax.imageio.ImageIO
 import java.io._
 import models.ImageAsset
 import org.apache.batik.dom.GenericDOMImplementation
-import java.awt.{Dimension, Graphics2D}
+import java.awt.{RenderingHints, Dimension, Graphics2D}
 import java.util.zip.GZIPOutputStream
 import services.{Utils, Dimensions}
 import org.apache.batik.svggen.{SVGGeneratorContext, SVGGraphics2D}
@@ -42,7 +42,26 @@ class RasterGraphicsSource(
 ) extends GraphicsSource
 {
   lazy val image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
-  override lazy val graphics = image.getGraphics.asInstanceOf[Graphics2D]
+  override lazy val graphics = {
+    import scala.collection.JavaConversions._
+    import RenderingHints._
+
+    val theGraphics = image.getGraphics.asInstanceOf[Graphics2D]
+    theGraphics.addRenderingHints(
+      Map(
+        KEY_RENDERING -> VALUE_RENDER_QUALITY,
+        KEY_ANTIALIASING -> VALUE_ANTIALIAS_ON,
+        KEY_ALPHA_INTERPOLATION -> VALUE_ALPHA_INTERPOLATION_QUALITY,
+        KEY_COLOR_RENDERING -> VALUE_COLOR_RENDER_QUALITY,
+        KEY_DITHERING -> VALUE_DITHER_ENABLE,
+        KEY_FRACTIONALMETRICS -> VALUE_FRACTIONALMETRICS_ON,
+        KEY_INTERPOLATION -> VALUE_INTERPOLATION_BILINEAR,
+        KEY_TEXT_ANTIALIASING -> VALUE_TEXT_ANTIALIAS_ON
+      )
+    )
+
+    theGraphics
+  }
 
   override def dimensions = {
     Dimensions(width, height)

@@ -162,12 +162,16 @@ case class EgraphImage (
         ids.mkString(sep="_")
     }
 
-    blobPath + "/" + idString + "." + graphicsSource.fileExtension
+    blobPath + "/" + idString + "-v" + EgraphImage.Version + "." + graphicsSource.fileExtension
   }
 }
 
 
-object EgraphImage extends Logging
+object EgraphImage extends Logging {
+  // Increment this every time we improve EgraphImage rendering to avoid
+  // Caches serving up old versions.
+  val Version = 1
+}
 
 /**
  * Services necessary for EgraphImage to perform its full functionality.

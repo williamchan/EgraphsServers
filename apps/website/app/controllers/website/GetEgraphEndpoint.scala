@@ -126,7 +126,10 @@ object GetEgraphEndpoint {
 
     // Social links
     val celebName = celebrity.publicName.get
-    val thisPageLink = WebsiteControllers.reverse(WebsiteControllers.getEgraph(order.id.toString)).url
+    val thisPageAction = WebsiteControllers.reverse(WebsiteControllers.getEgraph(order.id.toString))
+    thisPageAction.absolute()
+    val thisPageLink = thisPageAction.url
+
     val shareOnFacebookLink = views.frontend.Utils.getFacebookShareLink(
       appId = facebookAppId,
       picUrl = rasterImageUrl,
