@@ -101,7 +101,8 @@ POST    /account/recover                                            WebsiteContr
 GET     /account/recover/confirmation/?                             WebsiteControllers.getRecoverAccountConfirmation
 GET     /account/verify/?                                           WebsiteControllers.getResetPassword
 POST    /account/verify                                             WebsiteControllers.postResetPassword
-GET     /account/{<[0-9]+>galleryCustomerId}/gallery/?              WebsiteControllers.getCustomerGallery
+GET     /account/{<[0-9]+>galleryCustomerId}/gallery/?              WebsiteControllers.getCustomerGalleryById
+GET     /user/{username}/?                                          WebsiteControllers.getCustomerGalleryByUsername
 GET     /egraph/{<[0-9]+>orderId}/?                                 WebsiteControllers.getEgraph
 GET     /facebooklogin/callback/?                                   WebsiteControllers.getFacebookLoginCallback
 GET     /faq/?                                                      WebsiteControllers.getFAQ
