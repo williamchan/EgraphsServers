@@ -14,11 +14,17 @@ import play.mvc.results.Redirect
 import services.AppConfig
 
 private[controllers] trait GetEgraphEndpoint { this: Controller =>
+  //
+  // Services
+  //
   protected def administratorStore: AdministratorStore
   protected def orderStore: OrderStore
   protected def controllerMethod: ControllerMethod
   protected def facebookAppId: String
 
+  //
+  // Controllers
+  //
   /**
    * Serves up a single egraph HTML page. The egraph number is actually the number
    * of the associated order, as several attempts to satisfy an egraph could have
@@ -53,6 +59,14 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
     }
   }
 
+  /** Redirects the old egraph url /egraph/{orderId} to the current url */
+  def getEgraphRedirect(orderId: String) = {
+    new Redirect(reverse(getEgraph(orderId)).url)
+  }
+
+  //
+  // Other public members
+  //
   def lookupGetEgraph(orderId: Long) = {
     reverse(this.getEgraph(orderId.toString))
   }
