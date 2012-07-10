@@ -25,7 +25,7 @@ class AddressTests extends UnitFlatSpec
       addressLine1 = "Celebrity Marketplace",
       addressLine2 = "202 29th Ave",
       city = "Seattle",
-      state = "WA",
+      _state = "WA",
       postalCode = "98122"
     )
   }

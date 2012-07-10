@@ -33,7 +33,7 @@ class Schema @Inject()(
   val addresses = table[Address]
   on(addresses)(address =>
     declare(
-      address.state is (dbType("varchar(2)")),
+      address._state is (dbType("varchar(2)")),
       address.postalCode is (dbType("varchar(20)"))
     )
   )

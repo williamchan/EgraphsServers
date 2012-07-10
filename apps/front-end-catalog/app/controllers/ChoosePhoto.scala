@@ -145,7 +145,7 @@ object ChoosePhoto extends Controller
       orientation=LandscapeOrientation,
       carouselUrl="this-product's-carousel-url",
       facebookShareLink="facebook-share-link",
-      twitterShareText="twitter text",
+      twitterShareLink = "www.twitter.com",
       carouselViewLink="www.egraphs.com"
     )
   }

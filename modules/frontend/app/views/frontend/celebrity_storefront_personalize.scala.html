@@ -76,7 +76,7 @@
 	    				    <div class="field">
 	      				    <div class="clearfix">
 	      				      <label class="instructions" for="gift">
-	      				      	Is This a Gift? <small>Current guaranteed delivery: @guaranteedDelivery.formatDayAsPlainLanguage</small>
+	      				      	Is This a Gift? <small>Expected Delivery By: @guaranteedDelivery.formatDayAsPlainLanguage</small>
 	      				      </label>
 	      				      @tags.html.bootstrap_input_field(form.isGift) {
 	      				        <input id="gift" 
@@ -84,7 +84,7 @@
 	      				               name="@form.isGift.name"
 	      				               value="yes"
 	      				               @for(checked <- form.isGift if checked) {checked}>
-	      				        <p><small><a href="#" class="tip">How does gifting work?</a></small></p>
+	      				        <p><small><a href="/faq#gift" target="_blank" class="tip">How does gifting work?</a></small></p>
 	      				      }
 	      				    </div>
 	    				    </div> <!-- end .field -->

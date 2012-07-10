@@ -32,7 +32,7 @@ case class FulfilledEgraphViewModel(
   publicStatus: String,
   signedTimestamp: String,
   facebookShareLink: String,
-  twitterShareText: String,
+  twitterShareLink: String,
   orderId: Long,
   orientation: String,
   productUrl: String,
@@ -59,7 +59,7 @@ object AdminGalleryControl extends GalleryControlRenderer{
     val ns =
     <ul>
       <li>
-        <a href={"/egraph/" +id } >View Fullscreen</a>
+        <a href={"/egraph/" +id } >View Full Egraph</a>
       </li>
       <li>
         <a href="#">Download</a>
@@ -78,7 +78,7 @@ object OwnerGalleryControl extends GalleryControlRenderer{
     val ns =
         <ul>
         <li>
-          <a href={"/egraph/" +id }>View Fullscreen</a>
+          <a href={"/egraph/" +id }>View Full Egraph</a>
         </li>
         <li>
           <a href="#">Download</a>
@@ -96,7 +96,7 @@ object OtherGalleryControl extends GalleryControlRenderer{
   override def render(id: Long, status:String) = {
     val ns = <ul>
       <li>
-        <a href={"/egraph/" +id }>View Fullscreen</a>
+        <a href={"/egraph/" +id }>View Full Egraph</a>
       </li>
     </ul>
 

@@ -1,5 +1,5 @@
 /* Scripting for the settings page */
-define(["Egraphs", "libs/angular"], function (Egraphs) {
+define(["Egraphs", "libs/angular", "services/forms"], function (Egraphs) {
   //Controller class for Angular app
   var Controller = function ($scope) {
     //Plugin default values here
@@ -33,9 +33,10 @@ define(["Egraphs", "libs/angular"], function (Egraphs) {
 
     $scope.cancel = function (modelString, parentID) {
       var parent = $("#" + parentID);
-      parent.addClass('hide');
-      parent.prev().removeClass('hide');
+      parent.addClass('none');
+      parent.prev().removeClass('none');
       $scope.resetVal(modelString);
+      e.preventDefault();
     }
   }
 
@@ -57,21 +58,21 @@ define(["Egraphs", "libs/angular"], function (Egraphs) {
         $(".edit").click(function(e){
           var thisRow = $(this);
 
-          thisRow.addClass('hide');
-          thisRow.next().removeClass('hide');
+          thisRow.addClass('none');
+          thisRow.next().removeClass('none');
           e.preventDefault();
         });
 
-        $("#user_password_confirmation").change(function (e) {
-          var password = $("#user_password");
-          var password_confirmation = $("#user_password_confirmation");
-
-          if(password.val() === password_confirmation.val()) {
-            $("#password_message").addClass("invisible");
-          } else {
-            $("#password_message").removeClass("invisible");
-          }
-        });
+//        $("#user_password_confirmation").change(function (e) {
+//          var password = $("#user_password");
+//          var password_confirmation = $("#user_password_confirmation");
+//
+//          if(password.val() === password_confirmation.val()) {
+//            $("#password_message").addClass("invisible");
+//          } else {
+//            $("#password_message").removeClass("invisible");
+//          }
+//        });
 
       });
     }

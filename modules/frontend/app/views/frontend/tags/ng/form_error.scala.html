@@ -1,0 +1,10 @@
+@(field: models.frontend.forms.Field[_])
+    <div class="alert alert-error @field.ifNotError {invisible}">
+      <button type="button" class="close" data-dismiss="alert">
+        &times;
+      </button>
+      <span class="error-message">
+        @field.error &nbsp;
+      </span>
+
+    </div>

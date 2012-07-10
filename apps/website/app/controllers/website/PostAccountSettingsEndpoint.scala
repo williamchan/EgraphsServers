@@ -48,7 +48,7 @@ private[controllers] trait PostAccountSettingsEndpoint { this: Controller =>
       case None => Address(accountId = account.id)
       case Some(a) => a
     }
-    address.copy(addressLine1 = addressLine1, addressLine2 = addressLine2, city = city, state = state, postalCode = postalCode).save()
+    address.copy(addressLine1 = addressLine1, addressLine2 = addressLine2, city = city, _state = state, postalCode = postalCode).save()
 
     // Persist Customer changes
     customer.copy(name = fullname, username = username,

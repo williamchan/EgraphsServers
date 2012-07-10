@@ -1,7 +1,14 @@
-@(model: String)
+@(model: String,
+  oldField: models.frontend.forms.Field[_],
+  newField: models.frontend.forms.Field[_],
+  confirmField: models.frontend.forms.Field[_]
+)
 
-<a id="password-display" class="row-settings row-fluid edit">
-  <span class="span3">Password</span>
+<a id="password-display" class="row-settings row-fluid edit @{
+    val errors = List(oldField.error, newField.error, confirmField.error)
+    errors.flatten.headOption.map(a => "none").getOrElse("")
+}">
+  <span class="span3 row-label">Password</span>
   <span class="span4 setting-val">@{"*".*(40)}</span>
   <span class="span4 help-inline"></span>
   <span class="span1 action">
@@ -9,9 +16,13 @@
   </span>
 </a>
 
-<div id="password-edit" class="row-settings row-fluid hide">
+<div id="password-edit" class="row-settings row-fluid
+  @{
+    val errors = List(oldField.error, newField.error, confirmField.error)
+    errors.flatten.headOption.map(a => "").getOrElse("none")
+  }">
   <span class="span1"></span>
-  <span class="span8">
+  <span class="span4">
 
     <div class="control-group">
       <label class="control-label ng-label">Old Password</label>
@@ -26,7 +37,6 @@
       <div class="controls">
         <input ng-model="@{model + ".newPassword"}" ng-minlength="8" id="user_password" name="newPassword"
         type="password" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"/>
-        <span ng-show="form.newPassword.$error.minlength">Password must be at least 8 characters</span>
       </div>
     </div>
 
@@ -35,8 +45,22 @@
       <div class="controls">
         <input id="user_password_confirmation" name="passwordConfirm" type="password"
                xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"/>
-        <span id="password_message" class="invisible">Passwords do not match</span>
       </div>
+    </div>
+  </span>
+
+  <span class="span4">
+    <div class="control-group">
+      <label class="control-label ng-label">&nbsp;</label>
+      @form_error(oldField)
+    </div>
+    <div class="control-group">
+      <label class="control-label ng-label">&nbsp;</label>
+      @form_error(newField)
+    </div>
+    <div class="control-group">
+      <label class="control-label ng-label">&nbsp;</label>
+      @form_error(confirmField)
     </div>
   </span>
   <span class="span1 help-inline"></span>

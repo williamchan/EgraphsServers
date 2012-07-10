@@ -358,6 +358,7 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
         egraph._egraphState === EgraphState.Published.name
       )
       select(FulfilledProductOrder(product, order, egraph))
+      orderBy (egraph.created desc)
     )
   }
 
@@ -600,17 +601,21 @@ object GalleryOrderFactory {
         val rawImage = egraph.image(product.photoImage).rasterized.scaledToWidth(product.frame.thumbnailWidthPixels)
         val thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Public)
         val viewEgraphUrl = Utils.lookupAbsoluteUrl("WebsiteControllers.getEgraph", Map("orderId" -> order.id.toString)).url
-        val facebookShareLink = views.frontend.Utils.feedDialogLink(
+        val facebookShareLink = views.frontend.Utils.getFacebookShareLink(
           appId = fbAppId,
           picUrl = thumbnailUrl,
-          name= celebrity.publicName.get + " just wrote me an egraph",
+          name= celebrity.publicName.get + " just created an egraph for me!",
           caption = "We are all fans.",
           description= "Check it out!",
           link = viewEgraphUrl
         )
+        val twitterShareLink = views.frontend.Utils.getTwitterShareLink(
+          link = viewEgraphUrl,
+          text = celebrity.publicName.get + " just created an egraph for me!"
+        )
         new FulfilledEgraphViewModel(
           facebookShareLink = facebookShareLink,
-          twitterShareText = celebrity.publicName.get + " just wrote me an egraph!",
+          twitterShareLink = twitterShareLink,
           orderId = order.id,
           orientation = product.frame.name.toLowerCase,
           productUrl = StorefrontChoosePhotoConsumerEndpoints.url(celebrity, product).url,
@@ -644,7 +649,7 @@ object GalleryOrderFactory {
           orderDate = dateFormat.format(order.created),
           orderNumber = order.id,
           price = order.amountPaid.toString(),
-          statusText = "",
+          statusText = "Pending",
           shippingMethod = "",
           UPSNumber = ""
         )

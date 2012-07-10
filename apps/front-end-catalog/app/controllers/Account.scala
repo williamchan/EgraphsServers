@@ -143,7 +143,7 @@ object Account extends Controller with DefaultHeaderAndFooterData {
         publicStatus = "public",
         signedTimestamp = "Nov 12th 2012 @ 4:30 PM",
         facebookShareLink = "www.facebook.com",
-        twitterShareText = "twitter text!",
+        twitterShareLink = "www.twitter.com",
         orderId = 3,
         orientation = "landscape",
         productUrl="egr.aphs/" + user +"/1",
@@ -159,7 +159,7 @@ object Account extends Controller with DefaultHeaderAndFooterData {
         publicStatus = "public",
         signedTimestamp = "Nov 12th 2012 @ 4:30 PM",
         facebookShareLink = "www.facebook.com",
-        twitterShareText = "twitter text!",
+        twitterShareLink = "www.twitter.com",
         orderId = 4,
         orientation = "portrait",
         productUrl="egr.aphs/" + user +"/2",
@@ -175,7 +175,7 @@ object Account extends Controller with DefaultHeaderAndFooterData {
         publicStatus = "public",
         signedTimestamp = "Nov 12th 2012 @ 4:30 PM",
         facebookShareLink = "www.facebook.com",
-        twitterShareText = "twitter text!",
+        twitterShareLink = "www.twitter.com",
         orderId = 5,
         orientation = "landscape",
         productUrl="egr.aphs/" + user +"/2",
@@ -212,20 +212,20 @@ object AccountSettingsFormFactory {
 
   def errors : AccountSettingsForm = {
     val basic = default
-    val error = Some(FormError("Get outa here this is no good!"))
+    val error = Some(FormError("Get outta here this is no good!"))
 
     basic.copy(
-      fullname = basic.fullname.copy(error=error),
+      fullname = basic.fullname.copy(error=Option(FormError("fullname error"))),
       username = basic.username.copy(error=error),
       email = basic.email.copy(error=error),
       oldPassword = basic.oldPassword.copy(error=error),
       newPassword = basic.newPassword.copy(error=error),
       passwordConfirm = basic.oldPassword.copy(error=error),
-      addressLine1 = Field(name = "address.line1", values = List("615 2nd Ave")),
-      addressLine2 = Field(name = "address.line2", values = List("Suite 300")),
-      city = Field(name = "city", values = List("Seattle")),
+      addressLine1 = basic.addressLine1.copy(error=error),
+      addressLine2 = basic.addressLine2.copy(error=Option(FormError("derp"))),
+      city = basic.city.copy(error=error),
       state = Field(name = "state", values = List("WA")),
-      postalCode = Field(name = "postalCode", values = List("98102")),
+      postalCode = basic.postalCode.copy(error=error),
       galleryVisibility = Field(name = "galleryVisibility", values = List("private")),
       notice_stars = Field(name = "notice_stars", values = List("true")),
       generalErrors = List(FormError("Derp"),FormError("Sclerp"),FormError("Lerp"))

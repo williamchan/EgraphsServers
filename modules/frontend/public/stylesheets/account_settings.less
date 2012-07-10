@@ -1,17 +1,18 @@
 // Styles for the account settings page
-.row-settings.hide {
-  display: none;
+
+.none {
+    display: none ! important
 }
 
-a.row-settings {
-  padding-top: 10px;
-  padding-bottom: 10px;
+a.row-settings, a.row-settings:visited {
+padding-bottom: 2px;
 }
 .row-settings, .row-settings:visited {
   border-bottom: 1px solid @tableBorder;
-  display: block;
-  padding-top: 5px;
-  padding-bottom: 5px;
+  display: inline-block;
+  //padding-top: 5px;
+
+
   //hide icon by default
   i {
     visibility: hidden;
@@ -19,6 +20,26 @@ a.row-settings {
 
   input {
     margin-top: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    margin-bottom: 0px;
+    position: relative;
+
+  }
+
+  div.alert button.close {
+    top: 3px;
+    display:inline-block;
+
+  }
+
+  label.checkbox {
+    color: inherit;
+  }
+
+  div.alert {
+    padding-top: 0px;
+    padding-bottom: 0px;
     margin-bottom: 0px;
   }
 
@@ -32,7 +53,7 @@ a.row-settings {
     text-transform: uppercase;
   }
 
-  span:first-child, span:first-child:hover {
+  span.row-label {
     font-size: 17px;
     font-weight: bold;
     padding-left: 0px;
@@ -135,7 +156,7 @@ a.add-link:hover p:first-letter{
       text-align: left;
     }
     i {
-      display: hidden;
+      display: none;
     }
 
     span {

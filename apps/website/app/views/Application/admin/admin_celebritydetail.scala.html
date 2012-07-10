@@ -25,7 +25,7 @@
 }
 
 @profilePhoto = {
-  @celebrity.map(c => c.profilePhoto.resizedWidth(200).getSaved(services.blobs.AccessPolicy.Public).url).getOrElse("")
+  @celebrity.map(c => c.profilePhoto.resizedWidth(80).getSaved(services.blobs.AccessPolicy.Public).url).getOrElse("")
 }
 
 @landingPageImage = {
@@ -77,13 +77,14 @@
         </fieldset>
         <fieldset>
           <legend>Images</legend>
-          @formField(id="profileImage", label="Profile Photo", inputType="file", width="span8", fields=fields)
+          @formField(id="profileImage", label="Profile Photo", inputType="file", width="span8", help=Some(profileImageHelp), fields=fields)
+          @profileImageHelp = { Must be square dimensions of at least 100x100. }
 
           @formField(id="landingPageImage", label="Landing Page Image", inputType="file", width="span8", help=Some(landingPageImageHelp), fields=fields)
-          @landingPageImageHelp = { Must be at least 1500x556. Should be center-balanced photo of celebrity. }
+          @landingPageImageHelp = { Must be JPG at least 1500x556. Keep that 2.7 aspect ratio for best results. Should be center-balanced photo of celebrity. }
 
           @formField(id="logoImage", label="Team/Org Logo", inputType="file", width="span8", help=Some(logoImageHelp), fields=fields)
-          @logoImageHelp = { Must be PNP of square dimensions. Logo of team or organization. }
+          @logoImageHelp = { Must be PNP of square dimensions of at least 40x40. Logo of team or organization. }
 
         </fieldset>
         <fieldset>

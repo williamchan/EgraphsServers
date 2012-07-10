@@ -30,7 +30,7 @@ class AccountSettingsForm(val paramsMap: Form.Readable, check: FormChecks, custo
       if (customer.username == stringToValidate) {
         Right(stringToValidate)
       } else {
-        for (valid <- check.isAlphaNumeric(stringToValidate, "Username must be letters or numbers").right;
+        for (valid <- check.isAlphaNumeric(stringToValidate, "Username must be letters or numbers, no spaces").right;
              valid2 <- check.isUniqueUsername(stringToValidate, "Username already taken").right) yield valid
       }
     }
@@ -57,7 +57,7 @@ class AccountSettingsForm(val paramsMap: Form.Readable, check: FormChecks, custo
     def validateIfPresent = {
       account.password match {
         case Some(pw) if pw.is(stringToValidate) => Right(stringToValidate)
-        case _ => Left(new SimpleFormError("Old password does not match"))
+        case _ => Left(new SimpleFormError("Password is incorrect"))
       }
     }
   }
@@ -73,7 +73,7 @@ class AccountSettingsForm(val paramsMap: Form.Readable, check: FormChecks, custo
     def validateIfPresent = {
       newPassword.value match {
         case Some(Some(password)) if password == stringToValidate => Right(stringToValidate)
-        case _ => Left(new SimpleFormError("Passwords do not match"))
+        case _ => Left(new SimpleFormError("New passwords do not match"))
       }
     }
   }

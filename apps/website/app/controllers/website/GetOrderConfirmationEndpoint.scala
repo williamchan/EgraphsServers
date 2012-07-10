@@ -5,9 +5,6 @@ import play.mvc.Controller
 import models._
 import frontend.storefront.OrderCompleteViewModel
 import services.http.ControllerMethod
-import play.mvc.results.Redirect
-import controllers.WebsiteControllers
-import java.util
 import services.mvc.ImplicitHeaderAndFooterData
 
 /**
@@ -55,7 +52,7 @@ private[controllers] trait GetOrderConfirmationEndpoint extends ImplicitHeaderAn
       )
     }
 
-    maybeHtml.getOrElse(new Redirect(reverse(WebsiteControllers.getRootConsumerEndpoint).url))
+    maybeHtml.getOrElse(NotFound("Order confirmation has expired."))
   }
 }
 

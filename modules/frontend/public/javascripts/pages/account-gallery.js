@@ -4,7 +4,7 @@ define(["services/forms", "Egraphs", "bootstrap/bootstrap-button"],
 
     var page = Egraphs.page;
     var calloutSpeedms =  1000;
-    //Map checkbox values to privacy enumbs
+    //Map checkbox values to privacy enums
     var toggle_map = {
       'true'   : 'Public',
       'false'  : 'Private'
@@ -36,7 +36,7 @@ define(["services/forms", "Egraphs", "bootstrap/bootstrap-button"],
             //Send the request, on callback indicate success
             $.ajax({
               url:  "/orders/" + id + "/configure",
-              data: {privacyStatus : toggle_map[value]},
+              data: {privacyStatus : toggle_map[value], authenticityToken : Egraphs.page.authenticityToken},
               type: 'post',
               //404s and other connection issues
               error: function () {

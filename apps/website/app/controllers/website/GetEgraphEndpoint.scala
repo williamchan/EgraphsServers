@@ -48,12 +48,8 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
           facebookAppId = facebookAppId,
           galleryLink = maybeGalleryLink
         )
-
-      case Some(FulfilledOrder(order, egraph)) =>
-        new Redirect(reverse(WebsiteControllers.getRootConsumerEndpoint).url)
-
-      case None =>
-        NotFound("No Egraph exists with the provided identifier.")
+      case Some(FulfilledOrder(order, egraph)) => Forbidden("This Egraph is private.")
+      case None => NotFound("No Egraph exists with the provided identifier.")
     }
   }
 
