@@ -604,8 +604,8 @@ object GalleryOrderFactory {
         val facebookShareLink = views.frontend.Utils.getFacebookShareLink(
           appId = fbAppId,
           picUrl = "http://www.egraphs.com/public/images/logo.png",
-          name = "My Egraph from " + celebrity.publicName.get + "!",
-          caption = product.storyTitle,
+          name = celebrity.publicName.get + "'s egraph for " +order.recipient.username,
+          caption = "Created by " + celebrity.publicName + " on " + egraph.getSignedAt,
           description= product.description,
           link = viewEgraphUrl
         )
