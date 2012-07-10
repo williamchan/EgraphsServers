@@ -21,6 +21,7 @@
 // General variables
 //
 @darkestBackground: darken(#dfe5e6, 5%);
+@spotlightColor: white;
 
 //
 // Portrait variables
@@ -379,16 +380,6 @@ html.egraph-page {
       box-shadow:1px 1px 0px #999;
       border-radius:0px; 
     }
-
-    a.egraphs-logo {
-      margin-left:@storyTextMargin;
-      font-size:18px; 
-      
-      &:hover {
-        text-decoration: none; 
-      }
-    }
-
     
     h1 {
       // We have to slightly darken @grayGreen so it looks correct behind the 0.1 alpha transparency
@@ -399,10 +390,116 @@ html.egraph-page {
       font-weight:normal;
       font-family: "Bebas Neue", Impact;
       text-shadow:none;
-      margin-left:@storyTextMargin;
+      margin-left:@storyTextMargin;      
     }
 
-    @spotlightColor: white;
+
+    .embossed {
+      position:relative;
+
+      &:before {
+        content: attr(emboss);
+        position:absolute;
+        color:rgba(255,255,255,0.2);
+        top:2px;
+      }
+
+      &:after {
+        content: attr(emboss);
+        position:absolute;
+        top: 1px;
+        left: 0px;
+        color:transparent;
+        text-shadow: 0 0 0.5px white;
+        z-index:-1
+      }
+    }    
+
+    .story-column {
+      text-shadow: 1px 2px 0.5px white;
+
+      .story-column-element {
+        position:relative;
+        margin-left:@storyTextMargin;
+        width:@storyTextWidth;
+
+        &.separator {          
+          margin-top:10px;
+          margin-bottom:8px;
+          
+          width:@storyTextWidth + 10px;
+          left: -5px;
+          border-bottom:1px solid #ccc;
+          border-right:1px solid #ccc;
+          box-shadow:0px 1px white;    
+        }
+      }
+
+      .story-text {
+        padding-top:3px;
+        line-height:179%;
+        padding-bottom:3px;
+      }
+
+      a.egraphs-logo {
+        display:block;
+        position:relative;
+        margin-left:30px;
+        margin-top:33px;
+        margin-bottom:11px;
+
+        img.logo-active {
+          position:absolute;
+          left:0px;        
+          .opacity(1);
+          .transition(opacity .2s linear);
+        }
+        
+        &:hover img.logo-active {
+          .opacity(100);
+        }
+      }
+
+      .social {
+
+        > ul {
+            padding: 13px 0 0 63px;
+            margin: 0;
+            list-style: none;
+
+            li {
+                float: left;
+                margin-left: 10px;
+
+                a {
+                    display: block;
+                    width: 30px;
+                    height: 31px;
+                    text-indent: -9999px;
+                    overflow: hidden;
+                    background: url(/public/images/egraph_page_bg-sprite-social-icons.png) no-repeat 0 0;
+                }
+
+                a:hover { background-position: 0 -31px; }
+
+                a.twitter { background-position: -30px 0; }
+                a.twitter:hover { background-position: -30px -31px; }
+
+                a.addthis { background-position: -60px 0; }
+                a.addthis:hover { background-position: -60px -62px; }
+
+            } // End li
+
+            li:first-child { margin-left: 0; }
+        } // End > ul
+
+      } // End social
+
+    }
+
+    //
+    // Begin portrait-specific styles
+    //
     .portrait {
       .story-spotlight {
         position:absolute;
@@ -440,54 +537,49 @@ html.egraph-page {
         .non-webkit-radial-gradient(~'229px 243px, ellipse farthest-side, @{gradientStartColor} 75px, rgba(255, 255, 255, 0) 263px');
       }
       
-    .photo-column {
-      padding-top:@portraitFrameTopMargin;
+      .photo-column {
+        padding-top:@portraitFrameTopMargin;
 
-        .frame {
-          background:url(/public/images/egraph_frame_portrait.png) no-repeat;
-          width:@portraitFrameHeight;
-          height:@portraitFrameWidth;
-        }
+          .frame {
+            background:url(/public/images/egraph_frame_portrait.png) no-repeat;
+            width:@portraitFrameHeight;
+            height:@portraitFrameWidth;
+          }
 
-        .plaque {
-          top:@portraitPlaqueTopMargin;
-          left:@portraitPlaqueLeftMargin;        
-        }
-        
-        .image-aperture {
-          left:@portraitImageLeftMargin; 
-          top:@portraitImageTopMargin;
-          width:@portraitImageWidth;
-          height:@portraitImageHeight;
-
-          iframe.signed-photo {
+          .plaque {
+            top:@portraitPlaqueTopMargin;
+            left:@portraitPlaqueLeftMargin;        
+          }
+          
+          .image-aperture {
+            left:@portraitImageLeftMargin; 
+            top:@portraitImageTopMargin;
             width:@portraitImageWidth;
             height:@portraitImageHeight;
+
+            iframe.signed-photo {
+              width:@portraitImageWidth;
+              height:@portraitImageHeight;
+            }
           }
-        }
 
-        .fx-glass-shine {
-          top:2px;
-          width:@portraitImageWidth - 1px;
-          height:@portraitImageHeight - 2px;
-        }
-    } 
+          .fx-glass-shine {
+            top:2px;
+            width:@portraitImageWidth - 1px;
+            height:@portraitImageHeight - 2px;
+          }
+      } // End .photo-column
 
-    .story-column {
-      padding-top:109px;
-      padding-left:50px;
-      text-shadow: 1px 2px 0.5px white;
-
-      .story-text {
-        position:relative;
-        margin-left:@storyTextMargin;
-        width:@storyTextWidth;
-        line-height:179%;
+      .story-column {
+        padding-top:109px;
+        padding-left:50px;
       }
-    }
-    }
 
-    // Landscape-specific deviations from the standard layout
+    } // End .portrait
+
+    //
+    // Begin landscape-only styles
+    // 
     .landscape {
 
       .right-spotlight {
@@ -563,54 +655,12 @@ html.egraph-page {
         }
       }
 
-    .story-column {
-      padding-top:170px;      
-      text-shadow: 1px 2px 0.5px white;
-
-      .story-text {
-        position:relative;
-        margin-left:@storyTextMargin;
-        width:@storyTextWidth;
-        line-height:179%;
+      .story-column {
+        padding-top:170px;      
+        text-shadow: 1px 2px 0.5px white;
       }
-    }
       
-    }
-
-    .story-title-separator {
-      position:relative;
-      margin-left:@storyTextMargin - 5px;
-      margin-top:10px;
-    margin-bottom:8px;
-
-      height:0px;
-      width:@storyTextWidth + 5px;
-      border-bottom:1px solid #ccc;
-      border-right:1px solid #ccc;
-      box-shadow:0px 1px white;    
-    }
-
-
-    .embossed {
-      position:relative;
-
-      &:before {
-        content: attr(emboss);
-        position:absolute;
-        color:rgba(255,255,255,0.2);
-        top:2px;
-      }
-
-      &:after {
-        content: attr(emboss);
-        position:absolute;
-        top: 1px;
-        left: 0px;
-        color:transparent;
-        text-shadow: 0 0 0.5px white;
-        z-index:-1
-      }
-    }
+    } // End .landscape
   }
 
   #sm2-container {
