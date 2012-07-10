@@ -32,7 +32,7 @@ case class FulfilledEgraphViewModel(
   publicStatus: String,
   signedTimestamp: String,
   facebookShareLink: String,
-  twitterShareText: String,
+  twitterShareLink: String,
   orderId: Long,
   orientation: String,
   productUrl: String,

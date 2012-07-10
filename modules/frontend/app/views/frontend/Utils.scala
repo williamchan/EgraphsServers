@@ -62,12 +62,12 @@ object Utils {
     }
   }
 
-  def feedDialogLink(appId: String,
-                     picUrl:String,
-                     name:String,
-                     caption:String,
-                     description:String,
-                     link:String) : String = {
+  def getFacebookShareLink(appId: String,
+                           picUrl: String,
+                           name: String,
+                           caption: String,
+                           description: String,
+                           link: String): String = {
 
     "https://www.facebook.com/dialog/feed?" +
       "app_id=" + appId +
@@ -76,5 +76,12 @@ object Utils {
       "&name=" + name +
       "&caption=" + caption +
       "&description=" + description
+  }
+
+  def getTwitterShareLink(link: String,
+                          text: String): String = {
+    "https://twitter.com/intent/tweet?" +
+      "url=" + link +
+      "&text=" + text
   }
 }
