@@ -6,7 +6,6 @@ import models.{Customer, Account, CustomerStore, AccountStore}
 import services.mail.Mail
 import org.apache.commons.mail.HtmlEmail
 import services.http.{SafePlayParams, AccountRequestFilters, POSTControllerMethod}
-import services.http.forms.Form
 import services.mvc.ImplicitHeaderAndFooterData
 
 private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndFooterData {
@@ -25,8 +24,11 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
     accountRequestFilters.requireValidAccountEmail(request.params.getOption("email").getOrElse("Nothing")) {
       account =>
 
-        val customer  =   dbSession.connected(TransactionSerializable) { customerStore.get(account.customerId.get) }
-        sendRecoveryPasswordEmail(account, customer)
+        val (customer, accountWithResetPassKey) = dbSession.connected(TransactionSerializable) {
+          val accountWithResetPassKey = account.withResetPasswordKey.save()
+          (customerStore.get(account.customerId.get), accountWithResetPassKey)
+        }
+        sendRecoveryPasswordEmail(accountWithResetPassKey, customer)
 
         flash.put("email", request.params.getOption("email").getOrElse(""))
 
