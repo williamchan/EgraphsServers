@@ -40,4 +40,5 @@ private[controllers] trait PostResetPasswordEndpoint extends ImplicitHeaderAndFo
         }
       }
     }
+  }
 }
