@@ -14,9 +14,28 @@
 			padding: 40px 0 0 0;
 			border-top: 1px solid @white;
 	
-			img {
-				display: block;
+			.preview-container {
+				position: relative;
 				margin: 0 auto;
+				max-width:555px; // Landscape frame size. 
+				
+				img {
+					display: block;
+					position:relative;
+
+					&.preview {
+						position:absolute;
+						margin: 0 auto;
+		    		left:9.5%;
+		    		top:8.42%;
+		    		width:81.88%;		    		
+					}
+
+					&.frame {
+						position:relative;
+						margin: 0 auto;
+					}
+				}
 			}
 			
 			figcaption {
@@ -78,7 +97,7 @@
 				}
 				
 				&.recipient-name {
-					left: 60%;
+					left: 55%;
 					bottom: 15%;
 				}
 				

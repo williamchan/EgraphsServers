@@ -1,4 +1,6 @@
-@(model: models.frontend.storefront.FinalizeViewModel)(
+@(model: models.frontend.storefront.FinalizeViewModel,
+  orientation: String = "orientation-landscape"
+)(
   implicit headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData,
   storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs,
@@ -45,24 +47,7 @@
 
 	    					<div class="order-overview">
 	    						  
-	    						  <figure>
-	    						  
-	    						  	<img src="/public/images/fpo-egraph.png" alt="fpo-egraph" />
-	    						  
-	    						  	<figcaption class="recipient-information">
-	    						  		A<span>. Recipient Information</span>
-	    						  	</figcaption>
-	    						  	
-	    						  	<figcaption class="egraph-message">
-	    						  		B<span>. Egraph Message</span>	    						  	
-	    						  	</figcaption>
-	    						  	
-	    						  	<figcaption class="egraph-audio">
-	    						  		C<span>. Egraph Audio</span>	    						  	
-	    						  	</figcaption>
-	    						  
-	    						  </figure>
-
+                    @tags.html.egraphPreview(orientation)
 	    						  <div class="order-summary">
 		    				  		@orderDetails		    				  	
 		    				  	</div>
@@ -152,25 +137,9 @@
 	    				<aside>
 	    				
 	    					<div class="order-overview clearfix">
-	    						  
-	    						  <figure>
-	    						  
-	    						  	<img src="/public/images/fpo-egraph.png" alt="fpo-egraph" />
-	    						  
-	    						  	<figcaption class="recipient-information">
-	    						  		A<span>. Recipient Information</span>
-	    						  	</figcaption>
-	    						  	
-	    						  	<figcaption class="egraph-message">
-	    						  		B<span>. Egraph Message</span>	    						  	
-	    						  	</figcaption>
-	    						  	
-	    						  	<figcaption class="egraph-audio">
-	    						  		C<span>. Egraph Audio</span>	    						  	
-	    						  	</figcaption>
-	    						  
-	    						  </figure>
-	    						  	
+                    
+                    @tags.html.egraphPreview(orientation)
+	
 		    				  	<div class="order-summary">
 		    				  	
 		    				  		<h2>Summary</h2>
