@@ -17,6 +17,13 @@ object Review extends Controller
     DefaultRenderer().render
   }
 
+  def portrait = {
+    DefaultRenderer(
+      productPreviewUrl = "http://placehold.it/302x420",
+      orientation="orientation-portrait"
+    ).render
+  }  
+
   def withPrint = {
     DefaultRenderer().copy(highQualityPrint=true).render
   }
@@ -31,7 +38,9 @@ object Review extends Controller
     guaranteedDelivery: java.util.Date = new util.Date(),
     highQualityPrintParamName: String = "highqualityprintparamname",
     highQualityPrint: Boolean = false,
-    actionUrl: String = "/action-url"
+    actionUrl: String = "/action-url",
+    productPreviewUrl: String = "http://placehold.it/454x288",
+    orientation:String = "orientation-landscape"
   ) {
     def render: Html = {
       views.frontend.html.celebrity_storefront_review(
@@ -44,7 +53,9 @@ object Review extends Controller
         guaranteedDelivery,
         highQualityPrintParamName,
         highQualityPrint,
-        actionUrl
+        actionUrl,
+        productPreviewUrl,
+        orientation
       )
     }
   }

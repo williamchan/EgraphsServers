@@ -13,6 +13,7 @@ import controllers.WebsiteControllers
 import WebsiteControllers.{getStorefrontPersonalize, getStorefrontCheckout}
 import SafePlayParams.Conversions._
 import services.Utils
+import services.blobs.AccessPolicy
 
 /**
  * Manages GET and POST of the Review page in the purchase flow.
@@ -81,7 +82,9 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
           guaranteedDelivery = inventoryBatch.endDate,
           highQualityPrintParamName = Params.HighQualityPrint,
           highQualityPrint = doPrint,
-          actionUrl = reverse(postStorefrontReview(celebrityUrlSlug, productUrlSlug)).url
+          actionUrl = reverse(postStorefrontReview(celebrityUrlSlug, productUrlSlug)).url,
+          productPreviewUrl=product.photoAtPurchasePreviewSize.getSaved(AccessPolicy.Public).url,
+          orientation=product.frame.previewCssClass
         )
       }
     }

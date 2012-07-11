@@ -2,7 +2,9 @@
 writtenMessageCharacterLimit:Int,
   messageToCelebrityCharacterLimit:Int,
   guaranteedDelivery: java.util.Date,
-  orderSummary: models.frontend.storefront.StorefrontOrderSummary
+  orderSummary: models.frontend.storefront.StorefrontOrderSummary,
+  productPreviewUrl: String,
+  orientation: String
 )(
   // Implicit parameter list
 	implicit headerData: models.frontend.header.HeaderData, 
@@ -14,7 +16,7 @@ writtenMessageCharacterLimit:Int,
 @{/** Renders the personalize page in the celebrity storefront.
 
       form - the models.frontend.storefront.PersonalizeForm to render
-      guaranteedDelivery - the date by which the product is guaranteed to be delivered
+      guaranteedDelivery - the date by which the digital product is guaranteed to be delivered
       orderSummary - brief summary for the order up until this point.
 
       (the implicit parameters are documented in the base template from which they get used)
@@ -52,27 +54,18 @@ writtenMessageCharacterLimit:Int,
 					
 	    				@tags.html.safeForm("class" -> "main", "method" -> "post", "action" -> form.actionUrl)	{
 	
-								<div class="order-overview">
-									
-									<figure>
-									
-										<img src='@asset("public/images/fpo-egraph.png")' alt="fpo-egraph" />
-									
-										<figcaption class="recipient-information">
-											A<span>. Recipient Information</span>
-										</figcaption>
-										
-										<figcaption class="egraph-message">
-											B<span>. Egraph Message</span>	    						  	
-										</figcaption>
-									
-									</figure>
-								
-	    					</div> <!-- end .order-overview -->
-	    						
+								<div class="order-overview @orientation">
+								  @tags.html.egraphPreview(
+								  	productPreviewUrl,
+								    orientation
+								  )
+								</div>				
 	    				  <fieldset>
-	
-	    				    <legend>A<span>. Recipient Information</span></legend>
+
+	    				    <legend>
+	    				    	<div class="letter">A</div>
+	    				    	<div class="text">Recipient</div>
+	    				    </legend>
 	    				  
 	    				    <div class="field">
 	      				    <div class="clearfix">
@@ -129,11 +122,14 @@ writtenMessageCharacterLimit:Int,
 	      				    </div>
 	    				    </div> <!-- end .field -->
 	    				  
-	    				  </fieldset>
+	    				  </fieldset> <!-- End Egraph Recipient Fields -->
 	
 	    				  <fieldset>
 	
-	    				    <legend>B<span>. Egraph Message</span></legend>
+	    				    <legend>
+	    				    	<div class="letter">B</div>
+	    				    	<div class="text">Written Message</div>
+	    				    </legend>
 	    				  
 	    				    <div class="field last">
 	      				    <div class="clearfix">
@@ -174,9 +170,21 @@ writtenMessageCharacterLimit:Int,
 	      				      }
 	      				    </div>
 	    				    </div> <!-- end .field -->
+    				    </fieldset> <!-- end Egraph Message fields -->
+
+	    				  <fieldset class="audio">
+	
+	    				    <legend>
+	    				    	<div class="letter">C</div>
+	    				    	<div class="text">Audio Message</div>
+	    				    </legend>	    				    
+
+	    				    <div class="content last">
+	    				    	@orderSummary.celebrityName will record an audio message for you.
+	    				    </div>
 	    				          				  
 	    				  </fieldset>
-	
+
 	    				  <fieldset class="last">
 	    				  
 	    				    <div class="field last">
@@ -211,22 +219,12 @@ writtenMessageCharacterLimit:Int,
 	    				
 	    				<aside>
 	    				
-	    					<div class="order-overview clearfix">
-	    						  
-	    						  <figure>
-	    						  
-	    						  	<img src="/public/images/fpo-egraph.png" alt="fpo-egraph" />
-	    						  
-	    						  	<figcaption class="recipient-information">
-	    						  		A<span>. Recipient Information</span>
-	    						  	</figcaption>
-	    						  	
-	    						  	<figcaption class="egraph-message">
-	    						  		B<span>. Egraph Message</span>	    						  	
-	    						  	</figcaption>
-	    						  
-	    						  </figure>
-	    						  	
+	    					<div class="order-overview @orientation clearfix">
+	    						  @tags.html.egraphPreview(
+	    						  	productPreviewUrl,
+	    						    orientation
+	    						  )
+
 		    				  	<div class="order-summary">
 		    				  	
 		    				  		<h2>Summary</h2>
@@ -241,7 +239,8 @@ writtenMessageCharacterLimit:Int,
 		    				  			orderSummary.shipping,
 		    				  			orderSummary.tax,
 		    				  			orderSummary.total
-		    				  		)		    				  
+		    				  		)
+	    				  		</div> <!-- end .order-summary -->
 	    					</div> <!-- end .order-overview -->
 	    				
 	    				</aside>

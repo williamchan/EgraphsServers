@@ -19,6 +19,13 @@ object Checkout extends Controller
     render()
   }
 
+  def portrait = {
+    render(
+      productPreviewUrl = "http://placehold.it/302x420",
+      orientation="orientation-portrait"
+    )
+  }
+
   def allErrors = {
     render(form=allErrorsCheckoutForm)
   }
@@ -107,13 +114,17 @@ object Checkout extends Controller
     form: CheckoutFormView=defaultCheckoutForm,
     summary: CheckoutOrderSummary=defaultOrderSummary,
     paymentJsModule: String="yes-maam-payment",
-    paymentPublicKey: String=testStripeKey
+    paymentPublicKey: String=testStripeKey,
+    productPreviewUrl: String = "http://placehold.it/454x288",
+    orientation: String = "orientation-landscape"
   ) = {
     views.frontend.html.celebrity_storefront_checkout(
       form=form,
       summary=summary,
       paymentJsModule=paymentJsModule,
-      paymentPublicKey=testStripeKey
+      paymentPublicKey=testStripeKey,
+      productPreviewUrl=productPreviewUrl,
+      orientation=orientation
     )
   }
 }

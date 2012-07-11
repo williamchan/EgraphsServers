@@ -22,6 +22,7 @@ import controllers.website.PostBuyProductEndpoint.EgraphPurchaseHandler
 import services.db.{TransactionSerializable, DBSession}
 import services.http.forms.purchase.PurchaseForms.AllPurchaseForms
 import models.Celebrity
+import services.blobs.AccessPolicy
 
 /**
  * Manages GET and POST of the Finalize page in the purchase flow.
@@ -124,7 +125,11 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
           purchaseUrl=reverse(postStorefrontFinalize(celebrityUrlSlug, productUrlSlug)).url
         )
 
-        views.frontend.html.celebrity_storefront_finalize(finalizeViewModel)
+        views.frontend.html.celebrity_storefront_finalize(
+          finalizeViewModel,
+          productPreviewUrl=product.photoAtPurchasePreviewSize.getSaved(AccessPolicy.Public).url,
+          orientation=product.frame.previewCssClass
+        )
       }
     }
   }

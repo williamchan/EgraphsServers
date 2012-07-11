@@ -13,6 +13,7 @@ import services.payment.Payment
 import play.mvc.results.Redirect
 import controllers.website.PostBuyProductEndpoint.EgraphPurchaseHandler
 import controllers.WebsiteControllers
+import services.blobs.AccessPolicy
 
 /**
  * Endpoint for serving up the Checkout form
@@ -113,7 +114,9 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
           form=checkoutFormView,
           summary=orderSummary,
           paymentJsModule=payment.browserModule,
-          paymentPublicKey=payment.publishableKey
+          paymentPublicKey=payment.publishableKey,
+          productPreviewUrl=product.photoAtPurchasePreviewSize.getSaved(AccessPolicy.Public).url,
+          orientation=product.frame.previewCssClass
         )
       }
     }

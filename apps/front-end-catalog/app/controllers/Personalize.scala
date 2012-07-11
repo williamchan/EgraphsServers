@@ -18,6 +18,13 @@ object Personalize extends Controller
     render()
   }
 
+  def portrait = {
+    render(
+      productPreviewUrl = "http://placehold.it/302x420",
+      orientation="orientation-portrait"
+    )
+  }
+
   def allErrors = {
     render(personalizeForm=allErrorsPersonalizeForm)
   }
@@ -81,14 +88,18 @@ object Personalize extends Controller
     personalizeForm: PersonalizeForm=defaultPersonalizeForm,
     guaranteedDelivery:util.Date = new util.Date(),
     writtenMessageCharacterLimit: Int = 100,
-    orderSummary: StorefrontOrderSummary = defaultOrderSummary
+    orderSummary: StorefrontOrderSummary = defaultOrderSummary,
+    productPreviewUrl: String = "http://placehold.it/454x288",
+    orientation: String = "orientation-landscape"
   ) = {
     views.frontend.html.celebrity_storefront_personalize(
       form=personalizeForm,
       guaranteedDelivery=guaranteedDelivery,
       writtenMessageCharacterLimit=writtenMessageCharacterLimit,
       messageToCelebrityCharacterLimit=140,
-      orderSummary=orderSummary
+      orderSummary=orderSummary,
+      productPreviewUrl = productPreviewUrl,
+      orientation=orientation
     )
   }
 }

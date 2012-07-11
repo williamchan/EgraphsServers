@@ -170,7 +170,11 @@ case class Product(
     }
   }
 
-  // This is pretty crappy. This would be much better done on the browser-side. Left this disabled.
+  def photoAtPurchasePreviewSize: ImageAsset = {
+    photo.resizedWidth(frame.purchasePreviewWidth)
+  }
+
+// This is pretty crappy. This would be much better done on the browser-side. Left this disabled.
   // Enable it by using productPhotoPreview instead of productPhoto on admin_celebrityproductdetail.scala.html.
   def signingAreaPreview(width: Int = 600): String = {
     import graphics.{Handwriting, HandwritingPen}

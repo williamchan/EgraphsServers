@@ -19,7 +19,19 @@ object Finalize extends Controller
 {
 
   def index = {
-    views.frontend.html.celebrity_storefront_finalize(defaultFinalizeViewModel)
+    views.frontend.html.celebrity_storefront_finalize(
+      defaultFinalizeViewModel,
+      productPreviewUrl= "http://placehold.it/454x288",
+      orientation="orientation-landscape"
+    )
+  }
+
+  def portrait = {
+    views.frontend.html.celebrity_storefront_finalize(
+      defaultFinalizeViewModel,
+      productPreviewUrl = "http://placehold.it/302x420",
+      orientation="orientation-portrait"
+    )
   }
   
   def defaultShippingModel = {

@@ -14,10 +14,41 @@
 			padding: 40px 0 0 0;
 			border-top: 1px solid @white;
 	
-			img {
-				display: block;
+			.preview-container {
+				position: relative;
 				margin: 0 auto;
-			}
+				
+				img {
+					display: block;
+					position:relative;
+					
+					&.preview {
+						position:absolute;
+						margin: 0 auto;
+					}
+
+					&.frame {
+						position:relative;
+						margin: 0 auto;
+					}					
+				}
+
+				&.orientation-landscape {
+					max-width: @landscapeFrameSize;
+
+					img.preview {
+						.landscape-egraph-preview-ratios;
+					}
+				}
+
+				&.orientation-portrait {
+					max-width: @portraitFrameSize;
+
+					img.preview {
+						.portrait-egraph-preview-ratios;
+					}
+				}
+			} // End .preview-container
 			
 			figcaption {
 			
@@ -78,7 +109,7 @@
 				}
 				
 				&.recipient-name {
-					left: 60%;
+					left: 55%;
 					bottom: 15%;
 				}
 				

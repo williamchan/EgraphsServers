@@ -1,10 +1,10 @@
 package services.blobs
 
 import com.google.inject.{Inject, Provider}
-import services.AppConfig
 import models.BlobKeyStore
 import services.http.PlayConfig
 import java.util.Properties
+import services.cache.CacheFactory
 
 /**
  * Provides the active BlobVendor to Guice, which is dictated by the "blobstore" value in
@@ -12,6 +12,7 @@ import java.util.Properties
  */
 private[blobs] class BlobVendorProvider @Inject() (
   blobKeyStore: BlobKeyStore,
+  cacheFactory: CacheFactory,
   @PlayConfig playConfig: Properties
 ) extends Provider[BlobVendor]
 {
@@ -20,16 +21,20 @@ private[blobs] class BlobVendorProvider @Inject() (
   def get() = {
     blobstoreType match {
       case "s3" =>
-        new DBIndexedBlobVendor(blobKeyStore, S3BlobVendor)
+        decorate(S3BlobVendor)
 
       case "filesystem" =>
-        new DBIndexedBlobVendor(blobKeyStore, FileSystemBlobVendor)
+        decorate(FileSystemBlobVendor)
 
       case unknownType =>
         throw new IllegalStateException(
           "application.conf: \"blobstore\" value \"" + unknownType + "\" not supported."
         )
     }
+  }
+
+  private def decorate(baseBlobVendor: BlobVendor): BlobVendor = {
+    new CacheIndexedBlobVendor(cacheFactory, new DBIndexedBlobVendor(blobKeyStore, baseBlobVendor))
   }
 }
 

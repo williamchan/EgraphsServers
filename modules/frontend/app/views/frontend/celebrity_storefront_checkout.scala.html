@@ -1,7 +1,9 @@
 @(form: models.frontend.storefront.CheckoutFormView,
   summary: models.frontend.storefront.CheckoutOrderSummary,
   paymentJsModule: String,
-  paymentPublicKey: String
+  paymentPublicKey: String,
+  productPreviewUrl: String,
+  orientation: String = "orientation-landscape"
 )(
   implicit headerData: models.frontend.header.HeaderData, 
   footerData: models.frontend.footer.FooterData,
@@ -54,25 +56,12 @@
             <div class="clearfix">
           
               @safeForm("class" -> "main", "id" -> "checkout-form", "method" -> "post", "action" ->form.actionUrl) {
-                <div class="order-overview">
+                <div class="order-overview @orientation">
                     
-                    <figure>
-                    
-                      <img src="/public/images/fpo-egraph.png" alt="fpo-egraph" />
-                    
-                      <figcaption class="recipient-information">
-                        A<span>. Recipient Information</span>
-                      </figcaption>
-                      
-                      <figcaption class="egraph-message">
-                        B<span>. Egraph Message</span>                      
-                      </figcaption>
-                      
-                      <figcaption class="egraph-audio">
-                        C<span>. Egraph Audio</span>                      
-                      </figcaption>
-                    
-                    </figure>
+                    @tags.html.egraphPreview(
+                      productPreviewUrl,
+                      orientation
+                    )
 
                     <div class="order-summary">
                       @orderDetails
@@ -241,26 +230,12 @@
               
               <aside>
               
-                <div class="order-overview clearfix">
+                <div class="order-overview @orientation clearfix">
                     
-                    <figure>
-                    
-                      <img src="/public/images/fpo-egraph.png" alt="fpo-egraph" />
-                    
-                      <figcaption class="recipient-information">
-                        A<span>. Recipient Information</span>
-                      </figcaption>
-                      
-                      <figcaption class="egraph-message">
-                        B<span>. Egraph Message</span>                      
-                      </figcaption>
-                      
-                      <figcaption class="egraph-audio">
-                        C<span>. Egraph Audio</span>                      
-                      </figcaption>
-                    
-                    </figure>
-                      
+                    @tags.html.egraphPreview(
+                      productPreviewUrl,
+                      orientation
+                    )  
                     <div class="order-summary">
                     
                       <h2>Summary</h2>
