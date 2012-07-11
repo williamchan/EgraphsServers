@@ -8,6 +8,7 @@
   highQualityPrintParamName: String,
   highQualityPrint: Boolean,
   actionUrl: String,
+  productPreviewUrl: String,
   orientation: String
 )(
   implicit headerData: models.frontend.header.HeaderData, 
@@ -58,11 +59,10 @@
 
 	  				<figure>
               <div class="preview-container @orientation">
+                <img class="preview" src="@productPreviewUrl" />
                 @if(orientation == "orientation-landscape") {
-                  <img class="preview" src="http://placehold.it/454x288" />
     							<img class="frame" src='@asset("public/images/fpo-egraph.png")' alt="fpo-egraph" />
                 } else {
-                  <img class="preview" src="http://placehold.it/302x420" />
                   <img class="frame" src='@asset("public/images/fpo-egraph-portrait.png")' alt="fpo-egraph" />
                 }
 

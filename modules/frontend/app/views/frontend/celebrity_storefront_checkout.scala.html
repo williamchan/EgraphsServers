@@ -2,6 +2,7 @@
   summary: models.frontend.storefront.CheckoutOrderSummary,
   paymentJsModule: String,
   paymentPublicKey: String,
+  productPreviewUrl: String,
   orientation: String = "orientation-landscape"
 )(
   implicit headerData: models.frontend.header.HeaderData, 
@@ -57,7 +58,10 @@
               @safeForm("class" -> "main", "id" -> "checkout-form", "method" -> "post", "action" ->form.actionUrl) {
                 <div class="order-overview @orientation">
                     
-                    @tags.html.egraphPreview(orientation)
+                    @tags.html.egraphPreview(
+                      productPreviewUrl,
+                      orientation
+                    )
 
                     <div class="order-summary">
                       @orderDetails
@@ -228,7 +232,10 @@
               
                 <div class="order-overview @orientation clearfix">
                     
-                    @tags.html.egraphPreview(orientation)  
+                    @tags.html.egraphPreview(
+                      productPreviewUrl,
+                      orientation
+                    )  
                     <div class="order-summary">
                     
                       <h2>Summary</h2>

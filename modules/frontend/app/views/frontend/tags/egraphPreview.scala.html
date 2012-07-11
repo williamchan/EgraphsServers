@@ -1,13 +1,18 @@
-@(orientation: String = "orientation-portrait")
+@(productPreviewUrl: String,
+  orientation: String
+)
 
 @{/** Renders the purchase preview of an egraph as seen in the 
   celebrity storefront. Must always be placed in a .order-overview container.
 
+  productPreviewUrl - URL to an image that, if portrait orientation, must be 302x420 px, and if landscape 454x288
+
   */}
 
 <figure class="@orientation">  
+  <img class="preview" src="http://placehold.it/454x288" />
   @if(orientation == "orientation-landscape") {
-    <img class="preview" src="http://placehold.it/454x288" />
+
 
     <img class="frame" src="/public/images/fpo-egraph.png" alt="fpo-egraph" />
   } else {    

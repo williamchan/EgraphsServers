@@ -3,6 +3,7 @@ writtenMessageCharacterLimit:Int,
   messageToCelebrityCharacterLimit:Int,
   guaranteedDelivery: java.util.Date,
   orderSummary: models.frontend.storefront.StorefrontOrderSummary,
+  productPreviewUrl: String,
   orientation: String
 )(
   // Implicit parameter list
@@ -54,7 +55,10 @@ writtenMessageCharacterLimit:Int,
 	    				@tags.html.safeForm("class" -> "main", "method" -> "post", "action" -> form.actionUrl)	{
 	
 								<div class="order-overview @orientation">
-								  @tags.html.egraphPreview(orientation)
+								  @tags.html.egraphPreview(
+								  	productPreviewUrl,
+								    orientation
+								  )
 								</div>				
 	    				  <fieldset>
 
@@ -216,7 +220,10 @@ writtenMessageCharacterLimit:Int,
 	    				<aside>
 	    				
 	    					<div class="order-overview @orientation clearfix">
-	    						  @tags.html.egraphPreview(orientation)
+	    						  @tags.html.egraphPreview(
+	    						  	productPreviewUrl,
+	    						    orientation
+	    						  )
 
 		    				  	<div class="order-summary">
 		    				  	

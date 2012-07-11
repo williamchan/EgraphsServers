@@ -18,7 +18,10 @@ object Review extends Controller
   }
 
   def portrait = {
-    DefaultRenderer(orientation="orientation-portrait").render
+    DefaultRenderer(
+      productPreviewUrl = "http://placehold.it/302x420",
+      orientation="orientation-portrait"
+    ).render
   }  
 
   def withPrint = {
@@ -36,6 +39,7 @@ object Review extends Controller
     highQualityPrintParamName: String = "highqualityprintparamname",
     highQualityPrint: Boolean = false,
     actionUrl: String = "/action-url",
+    productPreviewUrl: String = "http://placehold.it/454x288",
     orientation:String = "orientation-landscape"
   ) {
     def render: Html = {
@@ -50,6 +54,7 @@ object Review extends Controller
         highQualityPrintParamName,
         highQualityPrint,
         actionUrl,
+        productPreviewUrl,
         orientation
       )
     }
