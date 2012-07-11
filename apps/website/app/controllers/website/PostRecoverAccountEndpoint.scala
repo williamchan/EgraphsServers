@@ -1,52 +1,36 @@
 package controllers.website
 
 import play.mvc.Controller
-import play.mvc.results.Redirect
-import services.Utils
-import controllers.WebsiteControllers
-import play.data.validation.Validation
 import services.db.{DBSession, TransactionSerializable}
 import models.{Customer, Account, CustomerStore, AccountStore}
 import services.mail.Mail
 import org.apache.commons.mail.HtmlEmail
-import services.http.POSTControllerMethod
+import services.http.{SafePlayParams, AccountRequestFilters, POSTControllerMethod}
+import services.http.forms.Form
+import services.mvc.ImplicitHeaderAndFooterData
 
-private[controllers] trait PostRecoverAccountEndpoint {
+private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
+  import SafePlayParams.Conversions._
 
   protected def dbSession: DBSession
   protected def postController: POSTControllerMethod
   protected def accountStore: AccountStore
   protected def customerStore: CustomerStore
+  protected def accountRequestFilters: AccountRequestFilters
   protected def mail: Mail
 
-  def postRecoverAccount(email: String) = postController(openDatabase=false) {
+  def postRecoverAccount() = postController() {
+    println("success!")
+    accountRequestFilters.requireValidAccountEmail(request.params.getOption("email").getOrElse("Nothing")) {
+      account =>
 
-    Validation.required("Email", email)
-    Validation.email("Email", email)
+        val customer  =   dbSession.connected(TransactionSerializable) { customerStore.get(account.customerId.get) }
+        sendRecoveryPasswordEmail(account, customer)
 
-    val accountOption = dbSession.connected(TransactionSerializable) {
-      accountStore.findByEmail(email)
-    }
-    if (validationErrors.isEmpty) {
-      Validation.isTrue("No account exists with that email", accountOption.isDefined && accountOption.get.customerId.isDefined)
-    }
+        flash.put("email", request.params.getOption("email").getOrElse(""))
 
-    if (!validationErrors.isEmpty) {
-      WebsiteControllers.redirectWithValidationErrors(GetRecoverAccountEndpoint.url())
-
-    } else {
-      // save Account with new resetPasswordKey (and also gets the Customer so we can write a personalized email)
-      val (account, customer) = dbSession.connected(TransactionSerializable) {
-        val account = accountOption.get.withResetPasswordKey.save()
-        val customer = customerStore.get(account.customerId.get)
-        (account, customer)
-      }
-
-      sendRecoveryPasswordEmail(account, customer)
-
-      flash.put("email", email)
-      new Redirect(Utils.lookupUrl("WebsiteControllers.getRecoverAccountConfirmation").url)
+        views.frontend.html.simple_confirmation(header = "Success", body ="Instructions for recovering your account have been sent to your email address.")
     }
   }
 

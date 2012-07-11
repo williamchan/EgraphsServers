@@ -33,7 +33,7 @@ private[controllers] trait PostResetPasswordEndpoint extends ImplicitHeaderAndFo
                 Forbidden("The reset url you are using is incorrect or expired.")
               }
               validationOrAccount.right.get.emailVerify().save()
-              views.frontend.html.simple_confirmation(header = "Password Reset", body ="Change this")
+              views.frontend.html.simple_confirmation(header = "Password Reset", body ="Your password has been reset. Please try logging in again.")
             }
           }
       }

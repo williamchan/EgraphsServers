@@ -4,7 +4,7 @@ import play.mvc.Controller
 import models.frontend.egraphs._
 import models.frontend.forms.FormError
 import models.frontend.egraphs.FulfilledEgraphViewModel
-import models.frontend.account.{AccountRecoveryForm, AccountVerificationForm, AccountSettingsForm}
+import models.frontend.account.{AccountRecoverForm, AccountVerificationForm, AccountSettingsForm}
 import models.frontend.forms.Field
 import play.mvc.results.RenderJson
 import sjson.json.Serializer
@@ -62,7 +62,7 @@ object Account extends Controller with DefaultHeaderAndFooterData {
         )
       }
       case _ => {
-        views.frontend.html.account_recover(AccountRecoveryForm(
+        views.frontend.html.account_recover(AccountRecoverForm(
           email = Field(name="email")
         ))
       }

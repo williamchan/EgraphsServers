@@ -4,16 +4,35 @@ import play.mvc.Controller
 import services.Utils
 import services.http.ControllerMethod
 
-private[controllers] trait GetRecoverAccountEndpoint {
+import services.mvc.ImplicitHeaderAndFooterData
+import models.frontend.forms.Field
+import models.frontend.account.{AccountRecoverForm => AccountRecoverFormView}
+import services.http.forms.AccountRecoverFormFactory
+import services.http.forms.AccountRecoverForm.Fields
+import services.http.SafePlayParams.Conversions._
+
+private[controllers] trait GetRecoverAccountEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
 
+  import services.mvc.FormConversions._
+  import services.http.forms.Form.Conversions._
+
   protected def controllerMethod: ControllerMethod
+  protected def accountRecoverForms: AccountRecoverFormFactory
 
   def getRecoverAccount = controllerMethod() {
-    val errorFields = Option(flash.get("errors")).map(errString => errString.split(',').toList)
-    views.Application.html.recover_account(errorFields = errorFields)
-  }
+    val maybeFormData = accountRecoverForms.getFormReader.read(flash.asFormReadable).map { form =>
+      AccountRecoverFormView(
+        form.email.asViewField
+      )
+    }
 
+    views.frontend.html.account_recover(
+      maybeFormData.getOrElse(
+        AccountRecoverFormView(email = Field(name = Fields.Email.name, values = List("")))
+      )
+    )
+  }
 }
 
 object GetRecoverAccountEndpoint {

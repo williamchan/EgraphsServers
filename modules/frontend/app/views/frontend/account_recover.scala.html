@@ -1,4 +1,4 @@
-@(form:models.frontend.account.AccountRecoveryForm, displayableErrors: List[String] = List())(
+@(form:models.frontend.account.AccountRecoverForm, displayableErrors: List[String] = List())(
 implicit session: play.mvc.Scope.Session,
 headerData: models.frontend.header.HeaderData,
 footerData: models.frontend.footer.FooterData
@@ -19,11 +19,11 @@ footerData: models.frontend.footer.FooterData
       <section class="settings-group" id="password-reset">
         <div class="row-settings row-fluid">
           <div class="span12">
-            <h2>Enter your email address</h2>
+            <h2>Please enter your email address to recover your account</h2>
             <div class="control-group">
-              <label class="control-label ng-label">New Password</label>
+              <label class="control-label ng-label">Email</label>
               <div class="controls">
-                <input ng-model="user.email" type="email" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"/>
+                <input ng-model="user.email" type="email" name="email" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"/>
               </div>
             </div>
           </div>
@@ -32,7 +32,7 @@ footerData: models.frontend.footer.FooterData
       <div class="row-fluid">
         <div class="span9"></div>
         <div class="span3 save-button">
-          @tags.html.arrow_button(caption="Save Changes")
+          @tags.html.arrow_button(caption="Submit")
         </div>
       </div>
       }

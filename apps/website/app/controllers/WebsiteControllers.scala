@@ -11,9 +11,8 @@ import play.mvc.results.Redirect
 import services.db.DBSession
 import services.social.FacebookAppId
 import services.http._
-import forms.AccountVerificationFormFactory
+import forms.{AccountRecoverFormFactory, AccountVerificationFormFactory, AccountSettingsFormFactory, CustomerLoginFormFactory}
 import forms.purchase.{PurchaseFormChecksFactory, FormReaders, PurchaseFormFactory}
-import forms.{AccountSettingsFormFactory, CustomerLoginFormFactory}
 import java.util.Properties
 import services.Utils
 
@@ -37,6 +36,7 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected def customerLoginForms = instance[CustomerLoginFormFactory]
   override protected def accountSettingsForms = instance[AccountSettingsFormFactory]
   override protected def accountVerificationForms = instance[AccountVerificationFormFactory]
+  override protected def accountRecoverForms = instance[AccountRecoverFormFactory]
 
   override protected def checkPurchaseField: PurchaseFormChecksFactory = instance[PurchaseFormChecksFactory]
 
