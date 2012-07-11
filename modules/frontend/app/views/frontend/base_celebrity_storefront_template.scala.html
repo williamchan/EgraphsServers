@@ -22,8 +22,7 @@
             @{/** Only wrap in an anchor if there was a URL, which indicates that the form has been completed */}
             @for(url <- crumb.url) {<a href="@url">}
               <span><strong><span>Step</span>@{index + 1}</strong> @crumb.name</span> <small>&raquo;</small></a>
-            @for(url <- crumb.url) {</a>}
-            </li>
+            @for(url <- crumb.url) {</a>}            
           </li>
         }
       </ol>

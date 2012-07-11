@@ -108,12 +108,31 @@
 	display: none; 
 	margin-bottom: 40px;
 
-	h1 {
+	.section-title {
+		float:left;
+		color:#333;
+	}
 
-		float: left;
+	h1 {
+		display:block;
+		float: left;/*
 		font-size: 16px;
 		line-height: 24px;
-		margin-bottom: 0;
+		margin-bottom: 0;*/
+		margin-right:5px;
+		font-size: 16px;
+		line-height: 24px;
+		letter-spacing: normal;
+		text-align: center;
+		color: white;
+		text-shadow: none;
+		width: 24px;
+		height: 24px;
+		background: @offWhite;
+		.box-shadow(inset 0 1px 1px 0 lighten(@gray, 30%));
+		.border-radius(12px);
+		
+		background-color:@orange;
 	
 	}
 	
@@ -150,6 +169,12 @@
 			
 		}
 		
+	  li a {
+			strong {
+				color: @orange;
+				background-color:@white;
+			}
+		}
 		li.active {
 		
 			strong { 

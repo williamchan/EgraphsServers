@@ -3,7 +3,7 @@ package controllers.website.consumer
 import services.http.{SafePlayParams, POSTControllerMethod, CelebrityAccountRequestFilters, ControllerMethod}
 import play.mvc.Controller
 
-import services.mvc.{ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
+import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
 import services.http.forms.purchase._
 import models.enums.{PrintingOption, WrittenMessageRequest}
 import PrintingOption.HighQualityPrint
@@ -43,6 +43,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
   protected def checkPurchaseField: PurchaseFormChecksFactory
   protected def payment: Payment
   protected def dbSession: DBSession
+  protected def breadcrumbData: StorefrontBreadcrumbData
 
   //
   // Controllers
@@ -124,6 +125,8 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
           price=priceViewModel,
           purchaseUrl=reverse(postStorefrontFinalize(celebrityUrlSlug, productUrlSlug)).url
         )
+
+        implicit def crumbs = breadcrumbData.crumbsForRequest(celeb.id, celebrityUrlSlug, Some(productUrlSlug))
 
         views.frontend.html.celebrity_storefront_finalize(
           finalizeViewModel,

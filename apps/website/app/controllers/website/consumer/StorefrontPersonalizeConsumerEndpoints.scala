@@ -1,6 +1,6 @@
 package controllers.website.consumer
 
-import services.mvc.{ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
+import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
 import play.mvc.Controller
 import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters, ControllerMethod}
 import services.http.forms.purchase.{PurchaseFormChecks, FormReaders, PersonalizeForm, PurchaseFormFactory}
@@ -27,6 +27,7 @@ trait StorefrontPersonalizeConsumerEndpoints
   protected def purchaseFormFactory: PurchaseFormFactory
   protected def formReaders: FormReaders
   protected def celebFilters: CelebrityAccountRequestFilters
+  protected def breadcrumbData: StorefrontBreadcrumbData
 
   //
   // Controllers
@@ -83,6 +84,8 @@ trait StorefrontPersonalizeConsumerEndpoints
           tax = forms.tax,
           total = forms.total(basePrice=product.price)
         )
+
+        implicit def crumbs = breadcrumbData.crumbsForRequest(celeb.id, celebrityUrlSlug, Some(productUrlSlug))
 
         views.frontend.html.celebrity_storefront_personalize(
           form=formView,

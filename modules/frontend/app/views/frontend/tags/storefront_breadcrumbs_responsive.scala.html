@@ -1,4 +1,4 @@
-@()
+@(storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs)
 
 @{/** Tiny breadcrumbs that only appear at a certain browser size.
 
@@ -6,17 +6,26 @@
       display breadcrumbs
 */}
 
+
 <div class="mobile-steps clearfix">
-
   <ol>
-@{/**    <li class="previous"><span><strong><span>Step</span> 1</strong></li>
-    <li class="active"><span><strong><span>Step</span> 2</strong></li> */}
-    <li><span><strong><span>Step</span> 1</strong></li>
-    <li><span><strong><span>Step</span> 2</strong></li>
-    <li><span><strong><span>Step</span> 3</strong></li>
-    <li><span><strong><span>Step</span> 4</strong></li>
+    @for((crumb, index) <- storefrontBreadcrumbs.indexed) {
+      <li class="@if(crumb.isActive) {active} @if(crumb.isAdjacentPreviousToActive) {previous}">
+        @for(url <- crumb.url) {<a href="@url"}
+          <span><strong><span>Step</span> @{index + 1}</strong>
+        @for(url <- crumb.url) {</a>}
+      </li>
+    }
   </ol>
+  
+  @for((crumb, index) <- storefrontBreadcrumbs.indexed if crumb.isActive) {
+    <div class="section-title">
+      <h1><strong>@{index + 1}</strong></h1>
+      @crumb.name
+    </div>
+  }
 
-  <h1><strong>1.</strong> Choose Photo</h1>
+  
 
-</div>
+</div>  
+

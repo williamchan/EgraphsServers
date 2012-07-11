@@ -2,12 +2,12 @@ package controllers.website.consumer
 
 import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters, ControllerMethod}
 import play.mvc.{Router, Controller}
-import services.mvc.{ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
+import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
 import play.mvc.results.Redirect
 import services.http.forms.purchase.PurchaseFormFactory
 import services.Utils
 import controllers.WebsiteControllers.getStorefrontPersonalize
-import models.{Celebrity, Product}
+import models.{ProductStore, Celebrity, Product}
 
 /**
  * Manages GET and POST of celebrity photos in the purchase flow.
@@ -28,6 +28,8 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
   protected def postController: POSTControllerMethod
   protected def purchaseFormFactory: PurchaseFormFactory
   protected def facebookAppId: String
+  protected def breadcrumbData: StorefrontBreadcrumbData
+  protected def productStore: ProductStore
 
   //
   // Controllers
@@ -47,6 +49,18 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
       val productViews = for ((product, inventoryRemaining) <- celebrity.getActiveProductsWithInventoryRemaining()) yield {
         product.asChoosePhotoTileView(celebrityUrlSlug=celebrityUrlSlug, quantityRemaining = inventoryRemaining)
       }
+
+      val forms = purchaseFormFactory.formsForStorefront(celebrity.id)
+
+      val maybeProductUrlSlug = for (
+        productIdBeingOrdered <- forms.productId;
+        product <- productStore.findById(productIdBeingOrdered)
+      ) yield {
+        product.urlSlug
+      }
+
+
+      implicit def crumbs = breadcrumbData.crumbsForRequest(celebrity.id, celebrityUrlSlug, maybeProductUrlSlug)
 
       views.frontend.html.celebrity_storefront_choose_photo_tiled(
         celeb=celebrity.asChoosePhotoView,
@@ -81,6 +95,8 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
             val quantityRemaining = productWithInventoryRemaining._2
             product.asChoosePhotoCarouselView(celebUrlSlug=celeb.urlSlug.getOrElse("/"), quantityRemaining = quantityRemaining, fbAppId = facebookAppId)
           }
+
+          implicit def crumbs = breadcrumbData.crumbsForRequest(celeb.id, celebrityUrlSlug, Some(productUrlSlug))
 
           views.frontend.html.celebrity_storefront_choose_photo_carousel(
             celeb = celeb.asChoosePhotoView,

@@ -3,7 +3,7 @@ package controllers.website.consumer
 import services.http.{SafePlayParams, POSTControllerMethod, CelebrityAccountRequestFilters, ControllerMethod}
 import play.mvc.Controller
 
-import services.mvc.{ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
+import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
 import services.http.forms.purchase._
 import models.enums.{PrintingOption, WrittenMessageRequest}
 import services.http.forms.Form.Conversions._
@@ -33,6 +33,7 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
   protected def celebFilters: CelebrityAccountRequestFilters
   protected def checkPurchaseField: PurchaseFormChecksFactory
   protected def payment: Payment
+  protected def breadcrumbData: StorefrontBreadcrumbData
 
   //
   // Controllers
@@ -108,6 +109,8 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
           billing=billingFormView,
           shipping=maybeShippingFormView
         )
+
+        implicit def crumbs = breadcrumbData.crumbsForRequest(celeb.id, celebrityUrlSlug, Some(productUrlSlug))
 
         // Now baby you've got a stew goin!
         views.frontend.html.celebrity_storefront_checkout(

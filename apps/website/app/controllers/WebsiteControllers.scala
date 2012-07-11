@@ -15,6 +15,7 @@ import forms.{AccountRecoverFormFactory, AccountVerificationFormFactory, Account
 import forms.purchase.{PurchaseFormChecksFactory, FormReaders, PurchaseFormFactory}
 import java.util.Properties
 import services.Utils
+import services.mvc.StorefrontBreadcrumbData
 
 object WebsiteControllers extends Controller with AllWebsiteEndpoints
 {
@@ -33,6 +34,7 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
 
   override protected def egraphsSessionFactory: () => EgraphsSession = instance[() => EgraphsSession]
 
+  override protected def breadcrumbData = instance[StorefrontBreadcrumbData]
   override protected def customerLoginForms = instance[CustomerLoginFormFactory]
   override protected def accountSettingsForms = instance[AccountSettingsFormFactory]
   override protected def accountVerificationForms = instance[AccountVerificationFormFactory]

@@ -3,7 +3,7 @@ package controllers.website.consumer
 import services.http.{SafePlayParams, POSTControllerMethod, CelebrityAccountRequestFilters, ControllerMethod}
 import play.mvc.Controller
 
-import services.mvc.{ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
+import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
 import play.mvc.results.Redirect
 import services.http.forms.purchase._
 import models.enums.{PrintingOption, WrittenMessageRequest}
@@ -32,6 +32,7 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
   protected def formReaders: FormReaders
   protected def celebFilters: CelebrityAccountRequestFilters
   protected def checkPurchaseField: PurchaseFormChecksFactory
+  protected def breadcrumbData: StorefrontBreadcrumbData
 
   //
   // Controllers
@@ -71,6 +72,8 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
         val doPrint = forms.highQualityPrint
           .map(printingOption => printingOption == HighQualityPrint)
           .getOrElse(false)
+
+        implicit def crumbs = breadcrumbData.crumbsForRequest(celeb.id, celebrityUrlSlug, Some(productUrlSlug))
 
         views.frontend.html.celebrity_storefront_review(
           celebrityName = celeb.publicName.getOrElse("Anonymous"),
