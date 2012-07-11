@@ -21,21 +21,24 @@ private[controllers] trait PostResetPasswordEndpoint extends ImplicitHeaderAndFo
     accountRequestFilters.requireValidAccountEmail(request.params.getOption("email").getOrElse("Nothing")) { account =>
       val nonValidatedForm = accountVerificationForms(params.asFormReadable, account)
 
-        nonValidatedForm.errorsOrValidatedForm match {
-          case Left(errors) => {
-            nonValidatedForm.redirectThroughFlash(GetResetPasswordEndpoint.redirectUrl.url)
+      nonValidatedForm.errorsOrValidatedForm match {
+        case Left(errors) => {
+          nonValidatedForm.redirectThroughFlash(GetResetPasswordEndpoint.redirectUrl.url)
+        }
+        //form validates secret key
+        case Right(validForm) => {
+          val validationOrAccount = account.withPassword(validForm.passwordConfirm)
+          for (validation <- validationOrAccount.left) yield {
+            //Should never reach here, form validation should have caught any password problems.
+            Forbidden("The reset url you are using is incorrect or expired.")
           }
-          //form validates secret key
-          case Right(validForm) => {
-              val validationOrAccount = account.withPassword(validForm.passwordConfirm)
-              for (validation <- validationOrAccount.left) yield {
-                //Should never reach here, form validation should have caught any password problems.
-                Forbidden("The reset url you are using is incorrect or expired.")
-              }
-              validationOrAccount.right.get.emailVerify().save()
-              views.frontend.html.simple_confirmation(header = "Password Reset", body ="Change this")
-            }
-          }
+          validationOrAccount.right.get.emailVerify().save()
+          views.frontend.html.simple_confirmation(
+            header = "Password Reset",
+            body = "You have successfully changed your password!"
+          )
+        }
       }
     }
+  }
 }
