@@ -12,7 +12,6 @@ import services.cache.CacheFactory
  */
 private[blobs] class BlobVendorProvider @Inject() (
   cacheFactory: CacheFactory,
-  blobKeyStore: BlobKeyStore,
   @PlayConfig playConfig: Properties
 ) extends Provider[BlobVendor]
 {
@@ -21,10 +20,10 @@ private[blobs] class BlobVendorProvider @Inject() (
   def get() = {
     blobstoreType match {
       case "s3" =>
-        new CacheIndexedBlobVendor(cacheFactory, blobKeyStore, S3BlobVendor)
+        new CacheIndexedBlobVendor(cacheFactory, S3BlobVendor)
 
       case "filesystem" =>
-        new CacheIndexedBlobVendor(cacheFactory, blobKeyStore, FileSystemBlobVendor)
+        new CacheIndexedBlobVendor(cacheFactory, FileSystemBlobVendor)
 
       case unknownType =>
         throw new IllegalStateException(

@@ -1,6 +1,7 @@
 package services.blobs
 
 import org.jclouds.blobstore.domain.Blob
+import org.jclouds.blobstore.BlobStoreContext
 
 /**
  * Class that enables easy composition of BlobVendors.
@@ -22,6 +23,14 @@ private[blobs] trait BlobVendorComposition extends BlobVendor {
 
   override def get(namespace: String, key: String): Option[Blob] = {
     blobVendorDelegate.get(namespace, key)
+  }
+
+  override def checkConfiguration() {
+    blobVendorDelegate.checkConfiguration()
+  }
+
+  override def context: BlobStoreContext = {
+    blobVendorDelegate.context
   }
 
   def put(namespace: String, key: String, data: Array[Byte], access: AccessPolicy) {
