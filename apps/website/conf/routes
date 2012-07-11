@@ -95,6 +95,7 @@ GET     /admin/script/?                                             WebsiteContr
 GET     /?                                                          WebsiteControllers.getRootConsumerEndpoint
 GET     /about/?                                                    WebsiteControllers.getAbout
 GET     /terms/?                                                    WebsiteControllers.getTerms
+GET     /privacy/?                                                  WebsiteControllers.getPrivacy
 GET     /account/settings/?                                         WebsiteControllers.getAccountSettings
 POST    /account/settings                                           WebsiteControllers.postAccountSettings
 GET     /account/recover/?                                          WebsiteControllers.getRecoverAccount

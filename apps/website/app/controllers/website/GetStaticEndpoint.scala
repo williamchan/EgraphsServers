@@ -21,6 +21,10 @@ private[controllers] trait GetStaticEndpoint extends ImplicitHeaderAndFooterData
     views.frontend.html.terms()
   }
 
+  def getPrivacy = controllerMethod() {
+    views.frontend.html.privacy()
+  }
+
 
   def getInsideEgraph = controllerMethod() {
     val tableOfContents =

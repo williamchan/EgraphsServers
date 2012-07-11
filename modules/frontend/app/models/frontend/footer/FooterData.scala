@@ -13,8 +13,8 @@ package models.frontend.footer
 case class FooterData(
   aboutUsLink: String="/about",
   faqLink: String="/faq",
-  termsOfUseLink: String="/terms-of-use",
-  privacyPolicyLink: String="/privacy-policy",
+  termsOfUseLink: String="/terms",
+  privacyPolicyLink: String="/privacy",
   egraphsTwitterLink: String = "http://www.twitter.com/egraphs",
   egraphsFacebookLink: String = "http://www.facebook.com/egraphs"
 )
