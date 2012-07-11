@@ -10,6 +10,7 @@ define(["Egraphs"],
     var selectLink = function (link) {
       $(".toc-link").removeClass("selected");
       $(".arrow-right").addClass("invisible");
+
       link.addClass("selected");
       link.prev().removeClass("invisible");
     }
@@ -35,15 +36,15 @@ define(["Egraphs"],
           }
           //highlight the correct link when you reach the spot on the page.link_+pos
           var min = Number.MAX_VALUE;
-          var mLink;
+          var mLinkid;
           for(i in link_pos) {
             if(i - top < min) {
               min = top - i;
-              mLink = link_pos[i];
+              mLinkId = $(link_pos[i]).attr('id');
 
             }
           }
-          selectLink($('a[href="#' + mLink.attr('id') + '"]'));
+          selectLink($('a[href="#' + mLinkId + '"]'));
 
         });
 
