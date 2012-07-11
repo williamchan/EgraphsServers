@@ -9,6 +9,7 @@ import controllers.WebsiteControllers
 import models.frontend.storefront.{PersonalizeForm => PersonalizeFormView, StorefrontOrderSummary}
 import services.Utils
 import services.http.forms.Form.Conversions._
+import services.blobs.AccessPolicy
 
 /**
  * Manages GET and POST of the egraph purchase personalization form.
@@ -88,7 +89,9 @@ trait StorefrontPersonalizeConsumerEndpoints
           guaranteedDelivery=nextInventoryBatch.endDate,
           writtenMessageCharacterLimit=PurchaseFormChecks.maxWrittenMessageChars,
           messageToCelebrityCharacterLimit=PurchaseFormChecks.maxNoteToCelebChars,
-          orderSummary=orderSummary
+          orderSummary=orderSummary,
+          productPreviewUrl=product.photoAtPurchasePreviewSize.getSaved(AccessPolicy.Public).url,
+          orientation=product.frame.previewCssClass
         )
       }
     }

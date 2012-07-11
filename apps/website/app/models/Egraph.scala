@@ -694,6 +694,19 @@ sealed trait EgraphFrame {
   def cssClass: String
 
   /**
+   * This doesn't belong here. It's the css class that identifies the frame
+   * when it's being used for a product preview in the checkout flow.
+   **/
+  def previewCssClass: String
+
+  /**
+   * This doesn't belong here. It's the width at which the previews should be
+   * rendered in the purchase flow.
+   * This doesn't belong here.
+   */
+  def purchasePreviewWidth: Int
+
+  /**
    * Twitter Bootstrap classes that specify the width of the egraph page
    * portion occupied by the frame. e.g. "offset1 span5"
    *
@@ -788,6 +801,9 @@ object EgraphFrame {
 object PortraitEgraphFrame extends EgraphFrame {
   override val name: String = "Default Portrait"
 
+  override val previewCssClass = "orientation-portrait"
+  override val purchasePreviewWidth = 302
+
   override val cssClass  = "portrait"
   override val cssFrameColumnClasses = "offset1 span6"
   override val cssStoryColumnClasses = "span5"
@@ -805,6 +821,9 @@ object PortraitEgraphFrame extends EgraphFrame {
 /** The default egraph landscape photo frame */
 object LandscapeEgraphFrame extends EgraphFrame {
   override val name = "Default Landscape"
+
+  override val previewCssClass = "orientation-landscape"
+  override val purchasePreviewWidth = 454
 
   override val cssClass  = "landscape"
   override val cssFrameColumnClasses = "span8"
