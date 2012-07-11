@@ -1,0 +1,44 @@
+@(form:models.frontend.account.AccountRecoveryForm, displayableErrors: List[String] = List())(
+implicit session: play.mvc.Scope.Session,
+headerData: models.frontend.header.HeaderData,
+footerData: models.frontend.footer.FooterData
+)
+
+@import views.frontend.tags
+@import views.frontend.tags.ng
+
+
+@baseBody = {
+<section ng-cloak id="content" class="top" role="main" ng-controller="Controller">
+  <div id="main" class="sub">
+    <div class="container" id="settings-page">
+      <header id="settings-top">
+        <h1 style="display: inline-block;">Account Recovery</h1>
+      </header>
+      @tags.html.safeForm("method" -> "POST", "action" -> "/account/recover"){
+      <section class="settings-group" id="password-reset">
+        <div class="row-settings row-fluid">
+          <div class="span12">
+            <h2>Enter your email address</h2>
+            <div class="control-group">
+              <label class="control-label ng-label">New Password</label>
+              <div class="controls">
+                <input ng-model="user.email" type="email" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"/>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <div class="row-fluid">
+        <div class="span9"></div>
+        <div class="span3 save-button">
+          @tags.html.arrow_button(caption="Save Changes")
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+</section>
+}
+
+@base_template(title="Account Recovery", jsMain = "pages/account-verification", body=baseBody)

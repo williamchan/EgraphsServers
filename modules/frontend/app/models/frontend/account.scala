@@ -28,3 +28,7 @@ case class AccountVerificationForm(
   email: Field[String],
   secretKey: Field[String]
 )
+
+case class AccountRecoveryForm(
+  email: Field[String]
+)
