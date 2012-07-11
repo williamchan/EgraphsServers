@@ -122,8 +122,9 @@ object GetEgraphEndpoint {
     val story = egraph.story(celebrity, product, order)
 
     // Signed at date
-    val formattedSigningDate = new SimpleDateFormat("MMMM dd, yyyy").format(egraph.signedAt.getOrElse(egraph.created))
+    val formattedSigningDate = new SimpleDateFormat("MMMM dd, yyyy").format(egraph.getSignedAt)
 
+    // TODO refactor with social-related code in Order
     // Social links
     val celebName = celebrity.publicName.get
     val thisPageAction = WebsiteControllers.reverse(WebsiteControllers.getEgraph(order.id.toString))
@@ -142,9 +143,8 @@ object GetEgraphEndpoint {
     val tweetTextIfCelebHasTwitterName = celebrity.twitterUsername.map { celebTwitterName =>
       "Hey @" + celebTwitterName + " this is one choice egraph you made."
     }
-
     val tweetText = tweetTextIfCelebHasTwitterName.getOrElse {
-      "Check this choice egraph from " + celebName + "."
+      "Check out this choice egraph from " + celebName + "."
     }
 
     // Render
