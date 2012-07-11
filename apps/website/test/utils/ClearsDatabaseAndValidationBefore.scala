@@ -5,6 +5,7 @@ import play.data.validation.Validation
 import services.blobs.Blobs
 import services.AppConfig
 import services.db.{TransactionSerializable, DBSession, Schema}
+import services.cache.Cache
 
 /**
  * Mix this trait in to your Suite class to make sure that Play Validation
@@ -15,6 +16,7 @@ trait ClearsDatabaseAndValidationBefore extends BeforeAndAfterEach { this: Suite
     super.beforeEach()
     Validation.clear()
     AppConfig.instance[Blobs].scrub()
+    AppConfig.instance[Cache].clear()
     AppConfig.instance[DBSession].connected(TransactionSerializable) {
       AppConfig.instance[Schema].scrub()
     }
