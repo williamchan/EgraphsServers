@@ -55,7 +55,7 @@
             <div class="clearfix">
           
               @safeForm("class" -> "main", "id" -> "checkout-form", "method" -> "post", "action" ->form.actionUrl) {
-                <div class="order-overview">
+                <div class="order-overview @orientation">
                     
                     @tags.html.egraphPreview(orientation)
 
@@ -226,7 +226,7 @@
               
               <aside>
               
-                <div class="order-overview clearfix">
+                <div class="order-overview @orientation clearfix">
                     
                     @tags.html.egraphPreview(orientation)  
                     <div class="order-summary">

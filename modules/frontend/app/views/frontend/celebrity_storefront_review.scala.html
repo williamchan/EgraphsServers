@@ -7,7 +7,8 @@
   guaranteedDelivery: java.util.Date,
   highQualityPrintParamName: String,
   highQualityPrint: Boolean,
-  actionUrl: String
+  actionUrl: String,
+  orientation: String
 )(
   implicit headerData: models.frontend.header.HeaderData, 
   footerData: models.frontend.footer.FooterData,
@@ -56,10 +57,14 @@
   				<div class="review clearfix">
 
 	  				<figure>
-              <div class="preview-container">                
-                <img class="preview" src="http://placehold.it/454x288" />
-
-  							<img class="frame" src='@asset("public/images/fpo-egraph.png")' alt="fpo-egraph" />
+              <div class="preview-container @orientation">
+                @if(orientation == "orientation-landscape") {
+                  <img class="preview" src="http://placehold.it/454x288" />
+    							<img class="frame" src='@asset("public/images/fpo-egraph.png")' alt="fpo-egraph" />
+                } else {
+                  <img class="preview" src="http://placehold.it/302x420" />
+                  <img class="frame" src='@asset("public/images/fpo-egraph-portrait.png")' alt="fpo-egraph" />
+                }
 
               </div>
 						

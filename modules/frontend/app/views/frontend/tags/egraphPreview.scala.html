@@ -1,14 +1,19 @@
-@(orientation: String = "orientation-landscape")
+@(orientation: String = "orientation-portrait")
 
 @{/** Renders the purchase preview of an egraph as seen in the 
   celebrity storefront. Must always be placed in a .order-overview container.
 
   */}
 
-<figure class="@orientation">
-  <img class="preview" src="http://placehold.it/454x288" /> 
+<figure class="@orientation">  
+  @if(orientation == "orientation-landscape") {
+    <img class="preview" src="http://placehold.it/454x288" />
 
-  <img class="frame" src="/public/images/fpo-egraph.png" alt="fpo-egraph" />                  
+    <img class="frame" src="/public/images/fpo-egraph.png" alt="fpo-egraph" />
+  } else {    
+    <img class="preview" src="http://placehold.it/302x420" />
+    <img class="frame" src="/public/images/fpo-egraph-portrait.png" alt="fpo-egraph" />      
+  }
 
   <figcaption class="recipient-information">
     A<span>. Recipient Information</span>

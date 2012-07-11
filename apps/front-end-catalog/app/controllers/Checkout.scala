@@ -19,6 +19,10 @@ object Checkout extends Controller
     render()
   }
 
+  def portrait = {
+    render(orientation="orientation-portrait")
+  }
+
   def allErrors = {
     render(form=allErrorsCheckoutForm)
   }
@@ -107,13 +111,15 @@ object Checkout extends Controller
     form: CheckoutFormView=defaultCheckoutForm,
     summary: CheckoutOrderSummary=defaultOrderSummary,
     paymentJsModule: String="yes-maam-payment",
-    paymentPublicKey: String=testStripeKey
+    paymentPublicKey: String=testStripeKey,
+    orientation: String = "orientation-landscape"
   ) = {
     views.frontend.html.celebrity_storefront_checkout(
       form=form,
       summary=summary,
       paymentJsModule=paymentJsModule,
-      paymentPublicKey=testStripeKey
+      paymentPublicKey=testStripeKey,
+      orientation
     )
   }
 }

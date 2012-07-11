@@ -21,6 +21,13 @@ object Finalize extends Controller
   def index = {
     views.frontend.html.celebrity_storefront_finalize(defaultFinalizeViewModel)
   }
+
+  def portrait = {
+    views.frontend.html.celebrity_storefront_finalize(
+      defaultFinalizeViewModel,
+      orientation="orientation-portrait"
+    )
+  }
   
   def defaultShippingModel = {
     FinalizeShippingViewModel(

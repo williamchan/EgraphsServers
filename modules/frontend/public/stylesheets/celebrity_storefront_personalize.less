@@ -4,48 +4,79 @@
 	
 	padding: 40px 0 0 40px;      	  
   
-  figure.orientation-landscape {
-  
+  figure {
   	position: relative;  	
     margin: 0 0 30px 0;
     padding: 0;
 
-    img { 
-    	display: block;
+    img {
+	  	display: block;
 
-    	&.preview {    		
-    		position:absolute;
-    		left:9.5%;
-    		top:8.42%;
-    		width:81.88%;
-    	}
+	  	&.preview {
+	  		position:absolute;
+	  	}
 
-    	&.frame {
-    		position:relative;    		
-    	}
-
+	  	&.frame {
+	  		position:relative;
+	  	}
     }
 
-		.recipient-information {
-			.marker-right;
-    	right: 36%;
-	  	bottom: 13%;	  	
-    }
-    
-    .egraph-message {
-    	.marker-left;
-	  	left: 6%;
-	  	top: 15%;
-    }
-    
-    .egraph-audio {
-    	.marker-left;
-	  	left: 18%;
-	  	bottom: 18%;
-    }
-    
-  } // end .orientation-landscape
-  
+	  &.orientation-landscape {
+	  
+	    img {
+	    	&.preview {
+	    		.landscape-egraph-preview-ratios
+	    	}
+	    }
+
+			.recipient-information {
+				.marker-right;
+	    	right: 36%;
+		  	bottom: 13%;	  	
+	    }
+	    
+	    .egraph-message {
+	    	.marker-left;
+		  	left: 6%;
+		  	top: 15%;
+	    }
+	    
+	    .egraph-audio {
+	    	.marker-left;
+		  	left: 18%;
+		  	bottom: 18%;
+	    }
+	    
+	  } // end .orientation-landscape
+
+	  &.orientation-portrait {
+
+	  	img {
+	  		&.preview {						  			
+	  			.portrait-egraph-preview-ratios
+	  		}
+	  	}
+
+			.recipient-information {
+				.marker-right;
+	    	right: 36%;
+		  	bottom: 13%;	  	
+	    }
+	    
+	    .egraph-message {
+	    	.marker-left;
+		  	left: 6%;
+		  	top: 15%;
+	    }
+	    
+	    .egraph-audio {
+	    	.marker-left;
+		  	left: 6%;
+		  	bottom: 14%;
+	    }
+
+	  } // end .orientation-portrait
+  }
   .order-summary {
     
     border-top: 1px solid lighten(@gray, 50%);
@@ -172,8 +203,15 @@
 
 	display: none; 
 	padding: 40px 0 15px 0;
-	border-bottom: 1px solid lighten(@gray, 50%); 
-	max-width: 555px;
+	border-bottom: 1px solid lighten(@gray, 50%);
+
+	&.orientation-landscape {
+		max-width: @landscapeFrameSize;
+	}
+
+	&.orientation-portrait {
+		max-width: @portraitFrameSize;
+	}
 
   figure { 
   
@@ -194,7 +232,7 @@
 
   }
 	
-}
+} // end .main .order-overview
 
 @media (max-width: 767px) {
 

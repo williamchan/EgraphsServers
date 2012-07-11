@@ -18,6 +18,10 @@ object Personalize extends Controller
     render()
   }
 
+  def portrait = {
+    render(orientation="orientation-portrait")
+  }
+
   def allErrors = {
     render(personalizeForm=allErrorsPersonalizeForm)
   }
@@ -81,14 +85,16 @@ object Personalize extends Controller
     personalizeForm: PersonalizeForm=defaultPersonalizeForm,
     guaranteedDelivery:util.Date = new util.Date(),
     writtenMessageCharacterLimit: Int = 100,
-    orderSummary: StorefrontOrderSummary = defaultOrderSummary
+    orderSummary: StorefrontOrderSummary = defaultOrderSummary,
+    orientation: String = "orientation-landscape"
   ) = {
     views.frontend.html.celebrity_storefront_personalize(
       form=personalizeForm,
       guaranteedDelivery=guaranteedDelivery,
       writtenMessageCharacterLimit=writtenMessageCharacterLimit,
       messageToCelebrityCharacterLimit=140,
-      orderSummary=orderSummary
+      orderSummary=orderSummary,
+      orientation=orientation
     )
   }
 }
