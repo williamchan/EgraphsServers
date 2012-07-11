@@ -6,6 +6,7 @@ require:
     - com.google.inject -> guice 2.0
     - com.stripe -> stripe-java 1.0.1
     - egraphs -> frontend HEAD
+    - egraphs -> redis 0.3    
     - net.debasishg -> sjson_2.8.1 0.12:
         exclude:
             # Exclude scala because its included with play-scala
@@ -41,8 +42,7 @@ require:
             - org.scalatest -> *
     - play
     - play -> cloudbees 0.2.2
-    - play -> mockito 0.1
-    - play -> redis 0.3
+    - play -> mockito 0.1    
     - play -> scala 0.9.1
     - provided -> mockito-all 1.9.1-SNAPSHOT
     - provided -> scala-guice_2.8.1 0.1
