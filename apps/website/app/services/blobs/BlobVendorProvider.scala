@@ -11,6 +11,7 @@ import services.cache.CacheFactory
  * application.conf
  */
 private[blobs] class BlobVendorProvider @Inject() (
+  blobKeyStore: BlobKeyStore,
   cacheFactory: CacheFactory,
   @PlayConfig playConfig: Properties
 ) extends Provider[BlobVendor]
@@ -20,16 +21,20 @@ private[blobs] class BlobVendorProvider @Inject() (
   def get() = {
     blobstoreType match {
       case "s3" =>
-        new CacheIndexedBlobVendor(cacheFactory, S3BlobVendor)
+        decorate(S3BlobVendor)
 
       case "filesystem" =>
-        new CacheIndexedBlobVendor(cacheFactory, FileSystemBlobVendor)
+        decorate(FileSystemBlobVendor)
 
       case unknownType =>
         throw new IllegalStateException(
           "application.conf: \"blobstore\" value \"" + unknownType + "\" not supported."
         )
     }
+  }
+
+  private def decorate(baseBlobVendor: BlobVendor): BlobVendor = {
+    new CacheIndexedBlobVendor(cacheFactory, new DBIndexedBlobVendor(blobKeyStore, baseBlobVendor))
   }
 }
 
