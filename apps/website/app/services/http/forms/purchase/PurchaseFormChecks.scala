@@ -230,12 +230,13 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
 object PurchaseFormChecks {
   private[purchase] val requiredError = "Required field"
   private[purchase] val nameLengthErrorString = "Must be between 2 and 30 characters"
-  private[purchase] val minWrittenMessageChars = 5
 
   /** The maximum number of characters a written message request can contain */
+  val minWrittenMessageChars = 5
   val maxWrittenMessageChars = 60
-  private[purchase] val minNoteToCelebChars = minWrittenMessageChars
-  private[purchase] val maxNoteToCelebChars = maxWrittenMessageChars
+
+  val minNoteToCelebChars = 5
+  val maxNoteToCelebChars = 140
 
   private[purchase] val writtenMessageLengthErrorString = {
     textAreaLengthErrorString(minWrittenMessageChars, maxWrittenMessageChars)

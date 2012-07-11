@@ -23,7 +23,7 @@ object Personalize extends Controller
   }
 
   def lowCharacterLimit = {
-    render(messageCharacterLimit = 60)
+    render(writtenMessageCharacterLimit = 60)
   }
 
   def allPrePopulatedValues = {
@@ -80,13 +80,14 @@ object Personalize extends Controller
   private def render(
     personalizeForm: PersonalizeForm=defaultPersonalizeForm,
     guaranteedDelivery:util.Date = new util.Date(),
-    messageCharacterLimit: Int = 140,
+    writtenMessageCharacterLimit: Int = 100,
     orderSummary: StorefrontOrderSummary = defaultOrderSummary
   ) = {
     views.frontend.html.celebrity_storefront_personalize(
       form=personalizeForm,
       guaranteedDelivery=guaranteedDelivery,
-      messageCharacterLimit=messageCharacterLimit,
+      writtenMessageCharacterLimit=writtenMessageCharacterLimit,
+      messageToCelebrityCharacterLimit=140,
       orderSummary=orderSummary
     )
   }
