@@ -44,9 +44,8 @@
     
       <div id="main" class="sub">
       
-        <section id="checkout" class="container">							
-				 		
-  				<header>	
+        <section id="checkout" class="container">								 		
+  				<header>
   				  <h1>@header</h1>
   				</header>
 
@@ -65,7 +64,7 @@
   							<div class="clearfix">
   							
 	  							<fieldset>	  			
-                    @tags.html.bootstrap_text_input_field("Username / Email:", loginForm.email)
+                    @tags.html.bootstrap_text_input_field(labelText = "Email:", field = loginForm.email, inputType="email")
 
                     @tags.html.bootstrap_text_input_field(
                       "Password:", 
