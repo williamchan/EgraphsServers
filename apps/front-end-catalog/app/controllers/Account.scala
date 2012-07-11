@@ -4,7 +4,7 @@ import play.mvc.Controller
 import models.frontend.egraphs._
 import models.frontend.forms.FormError
 import models.frontend.egraphs.FulfilledEgraphViewModel
-import models.frontend.account.{AccountVerificationForm, AccountSettingsForm}
+import models.frontend.account.{AccountRecoverForm, AccountVerificationForm, AccountSettingsForm}
 import models.frontend.forms.Field
 import play.mvc.results.RenderJson
 import sjson.json.Serializer
@@ -43,6 +43,31 @@ object Account extends Controller with DefaultHeaderAndFooterData {
     )
   }
 
+  def recover() = {
+    request.method match {
+      case "POST" => {
+        println("POST data")
+        println(params.allSimple())
+        views.frontend.html.simple_confirmation(
+          "Password Recovery",
+          """
+          <p>
+          Please check your email address for your account recovery information.
+          </p>
+          Thanks,
+          <br>
+          The team at Egraphs
+          """
+
+        )
+      }
+      case _ => {
+        views.frontend.html.account_recover(AccountRecoverForm(
+          email = Field(name="email")
+        ))
+      }
+    }
+  }
   def verify() = {
     request.method match {
       case "POST" => {

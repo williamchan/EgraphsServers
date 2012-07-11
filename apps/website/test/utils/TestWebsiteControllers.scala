@@ -10,7 +10,7 @@ import services.db.DBSession
 import play.mvc.Controller
 import controllers.website.AllWebsiteEndpoints
 import java.util.Properties
-import forms.{AccountVerificationFormFactory, AccountSettingsFormFactory, CustomerLoginFormFactory, FormChecks}
+import forms._
 import play.mvc.Scope.{Session, Flash}
 import play.mvc.Http.Request
 import play.test.FunctionalTest
@@ -38,6 +38,7 @@ case class TestWebsiteControllers @Inject()(
   customerLoginForms: CustomerLoginFormFactory,
   accountSettingsForms: AccountSettingsFormFactory,
   accountVerificationForms: AccountVerificationFormFactory,
+  accountRecoverForms: AccountRecoverFormFactory,
   egraphsSessionFactory: () => EgraphsSession,
   fakeRequest: Request = FunctionalTest.newRequest(),
   fakeSession: Session = new Session(),
