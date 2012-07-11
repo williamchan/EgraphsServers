@@ -613,17 +613,28 @@ object GalleryOrderFactory {
         val rawImage = egraph.image(product.photoImage).rasterized.scaledToWidth(product.frame.thumbnailWidthPixels)
         val thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Public)
         val viewEgraphUrl = Utils.lookupAbsoluteUrl("WebsiteControllers.getEgraph", Map("orderId" -> order.id.toString)).url
+
+        // TODO refactor with social-related code in GetEgraphEndpoint
+        val celebName = celebrity.publicName.get
+        val formattedSigningDate = new SimpleDateFormat("MMMM dd, yyyy").format(egraph.getSignedAt)
         val facebookShareLink = views.frontend.Utils.getFacebookShareLink(
           appId = fbAppId,
-          picUrl = "http://www.egraphs.com/public/images/logo.png",
-          name = celebrity.publicName.get + "'s egraph for " +order.recipient.username,
-          caption = "Created by " + celebrity.publicName + " on " + egraph.getSignedAt,
-          description= product.description,
+          picUrl = thumbnailUrl,
+          name = celebName + " egraph for " + order.recipient.name,
+          caption = "Created by " + celebName + " on " + formattedSigningDate,
+          description= "",
           link = viewEgraphUrl
         )
+
+        val tweetTextIfCelebHasTwitterName = celebrity.twitterUsername.map { celebTwitterName =>
+          "Hey @" + celebTwitterName + " this is one choice egraph you made."
+        }
+        val tweetText = tweetTextIfCelebHasTwitterName.getOrElse {
+          "Check out this choice egraph from " + celebName + "."
+        }
         val twitterShareLink = views.frontend.Utils.getTwitterShareLink(
           link = viewEgraphUrl,
-          text = celebrity.publicName.get + " just created an egraph for me! Check it out here: "
+          text = tweetText
         )
         new FulfilledEgraphViewModel(
           facebookShareLink = facebookShareLink,

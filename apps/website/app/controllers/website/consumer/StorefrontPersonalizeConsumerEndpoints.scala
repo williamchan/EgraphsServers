@@ -86,7 +86,8 @@ trait StorefrontPersonalizeConsumerEndpoints
         views.frontend.html.celebrity_storefront_personalize(
           form=formView,
           guaranteedDelivery=nextInventoryBatch.endDate,
-          messageCharacterLimit=PurchaseFormChecks.maxWrittenMessageChars,
+          writtenMessageCharacterLimit=PurchaseFormChecks.maxWrittenMessageChars,
+          messageToCelebrityCharacterLimit=PurchaseFormChecks.maxNoteToCelebChars,
           orderSummary=orderSummary
         )
       }

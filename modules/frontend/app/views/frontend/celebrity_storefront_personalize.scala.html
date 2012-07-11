@@ -1,5 +1,6 @@
 @(form: models.frontend.storefront.PersonalizeForm,
-  messageCharacterLimit:Int,
+writtenMessageCharacterLimit:Int,
+  messageToCelebrityCharacterLimit:Int,
   guaranteedDelivery: java.util.Date,
   orderSummary: models.frontend.storefront.StorefrontOrderSummary
 )(
@@ -76,7 +77,7 @@
 	    				    <div class="field">
 	      				    <div class="clearfix">
 	      				      <label class="instructions" for="gift">
-	      				      	Is This a Gift? <small>Expected Delivery By: @guaranteedDelivery.formatDayAsPlainLanguage</small>
+	      				      	Is This a Gift? <small>Expected Digital Delivery: @guaranteedDelivery.formatDayAsPlainLanguage</small>
 	      				      </label>
 	      				      @tags.html.bootstrap_input_field(form.isGift) {
 	      				        <input id="gift" 
@@ -138,7 +139,7 @@
 	      				    <div class="clearfix">
 	      				      <label class="instructions">
 	      				      	@orderSummary.celebrityName Should Write: 
-	      				      	<small>@messageCharacterLimit character limit.</small> 
+	      				      	<small>@writtenMessageCharacterLimit character limit.</small>
 	      				      	<small>All messages are subject to approval.</small></label>
 	                    @tags.html.bootstrap_input_field(form.messageText) {
 	                      <div id="message-options" class="btn-group" data-toggle="buttons-radio">
@@ -182,7 +183,7 @@
 	      				    <div class="clearfix">
 	      				      <label class="instructions" for="your-message">
 	      				        Your Note to @orderSummary.celebrityName:
-	      				        <small>140 character limit.</small>
+	      				        <small>@messageToCelebrityCharacterLimit character limit.</small>
 	      				        <small>All messages are subject to approval.</small>
     				      		</label>
 	      				      @tags.html.bootstrap_input_field(form.noteToCelebrity) {
