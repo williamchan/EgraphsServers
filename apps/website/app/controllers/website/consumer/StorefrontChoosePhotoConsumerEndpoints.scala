@@ -46,8 +46,8 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
     celebFilters.requireCelebrityUrlSlug { celebrity =>
       val celebrityUrlSlug = celebrity.urlSlug.getOrElse("/")
 
-      val productViews = for ((product, inventoryRemaining) <- celebrity.getActiveProductsWithInventoryRemaining()) yield {
-        product.asChoosePhotoTileView(celebrityUrlSlug=celebrityUrlSlug, quantityRemaining = inventoryRemaining)
+      val productViews = for (product <- celebrity.productsInActiveInventoryBatches()) yield {
+        product.asChoosePhotoTileView(celebrityUrlSlug=celebrityUrlSlug)
       }
 
       val forms = purchaseFormFactory.formsForStorefront(celebrity.id)
@@ -82,18 +82,16 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
   def getStorefrontChoosePhotoCarousel(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod()
   {
     celebFilters.requireCelebrityAndProductUrlSlugs{ (celeb, product) =>
+      val products = celeb.productsInActiveInventoryBatches().toSeq
       val tiledViewLink = this.reverse(this.getStorefrontChoosePhotoTiled(celebrityUrlSlug)).url
 
-      val productsAndInventoryRemaining = celeb.getActiveProductsWithInventoryRemaining()
-      productsAndInventoryRemaining.findIndexOf(next => next._1.id == product.id) match {
+      products.findIndexOf(next => next.id == product.id) match {
         case -1 =>
           new Redirect(tiledViewLink)
 
         case indexOfProductInProductList =>
-          val productViews = for (productWithInventoryRemaining <- productsAndInventoryRemaining) yield {
-            val product = productWithInventoryRemaining._1
-            val quantityRemaining = productWithInventoryRemaining._2
-            product.asChoosePhotoCarouselView(celebUrlSlug=celeb.urlSlug.getOrElse("/"), quantityRemaining = quantityRemaining, fbAppId = facebookAppId)
+          val productViews = for (product <- products) yield {
+            product.asChoosePhotoCarouselView(celebUrlSlug=celeb.urlSlug.getOrElse("/"), fbAppId = facebookAppId)
           }
 
           implicit def crumbs = breadcrumbData.crumbsForRequest(celeb.id, celebrityUrlSlug, Some(productUrlSlug))

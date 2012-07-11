@@ -21,7 +21,7 @@ class ProductViewConversions(product: Product) {
    * @param quantityRemaining the remaining inventory before the product is "sold out".
    */
   def asChoosePhotoTileView(celebrityUrlSlug: String = product.celebrity.urlSlug.getOrElse("/"),
-                            quantityRemaining: Int)
+                            quantityRemaining: Int = product.remainingInventoryCount)
   : ChoosePhotoTileProduct =
   {
     val carouselViewLink=reverse(getStorefrontChoosePhotoCarousel(
@@ -45,7 +45,7 @@ class ProductViewConversions(product: Product) {
    * @param celebUrlSlug identifies the celebrity for forming the link to post the product selection.
    */
   def asChoosePhotoCarouselView(celebUrlSlug: String=product.celebrity.urlSlug.getOrElse("/"),
-                                quantityRemaining: Int,
+                                quantityRemaining: Int = product.remainingInventoryCount,
                                 fbAppId: String)
   : ChoosePhotoCarouselProduct =
   {
