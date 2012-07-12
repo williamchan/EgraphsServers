@@ -16,7 +16,7 @@ trait ClearsDatabaseAndValidationBefore extends BeforeAndAfterEach { this: Suite
     super.beforeEach()
     Validation.clear()
     AppConfig.instance[Blobs].scrub()
-    AppConfig.instance[Cache].clear()
+//    AppConfig.instance[Cache].clear() // todo(wchan): Why does this stop all unit tests from running?
     AppConfig.instance[DBSession].connected(TransactionSerializable) {
       AppConfig.instance[Schema].scrub()
     }
