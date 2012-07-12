@@ -4,5 +4,12 @@ require:
   - org.joda -> joda-money 0.6
   - play
   - play -> scala 0.9.1
-  - play -> less 0.9.1
+  - egraphs -> less 0.9.1
 
+repositories:
+  - egraphsModules:
+      type:       local
+      descriptor: ${application.path}/project-modules/[module]/conf/dependencies.yml
+      artifact:   ${application.path}/project-modules/[module]
+      contains:
+          - egraphs -> *

@@ -1,0 +1,9 @@
+bin
+eclipse
+test-result
+samples-and-tests
+dist
+tmp
+.project
+.classpath
+.settings
