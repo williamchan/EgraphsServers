@@ -160,7 +160,8 @@ writtenMessageCharacterLimit:Int,
 	      				          <textarea id="egraph-message-text"
 	      				                    name="@form.messageText.name"
 	      				                    rows="8"
-	      				                    cols="1">@form.messageText.value</textarea>
+	      				                    cols="1"
+                                            maxlength="100">@form.messageText.value</textarea>
 	      				          <p class="align-right"><small><a href="/inside-an-egraph#biometric" target="_blank" class="tip">How do I know it's really him?</a></small></p>
 	      				        </div>
 	      				        <input type="hidden"
@@ -195,7 +196,7 @@ writtenMessageCharacterLimit:Int,
 	      				        <small>All messages are subject to approval.</small>
     				      		</label>
 	      				      @tags.html.bootstrap_input_field(form.noteToCelebrity) {
-	      				        <textarea id="your-message" 
+	      				        <textarea maxlength="140" id="your-message"
 	      				                  name="@form.noteToCelebrity.name"
 								                  rows="8"
 	      				                  cols="1">@form.noteToCelebrity.value</textarea>
