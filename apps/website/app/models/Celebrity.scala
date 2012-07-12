@@ -399,16 +399,18 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
   }
 
   def updateFeaturedCelebrities(newFeaturedCelebIds: Iterable[Long]) {
+    // newFeaturedCelebIds can apparently be null
+    val safeNewFeaturedCelebIds = if (newFeaturedCelebIds != null) newFeaturedCelebIds else List.empty[Long]
     // First update those gentlemen that are no longer featured
     update(schema.celebrities)(c =>
-      where(c.isFeatured === true and (c.id notIn newFeaturedCelebIds))
-      set(c.isFeatured := false)
+      where(c.isFeatured === true and (c.id notIn safeNewFeaturedCelebIds))
+        set (c.isFeatured := false)
     )
 
     // Now lets feature the real stars here!
     update(schema.celebrities)(c =>
-      where(c.id in newFeaturedCelebIds)
-        set(c.isFeatured := true)
+      where(c.id in safeNewFeaturedCelebIds)
+        set (c.isFeatured := true)
     )
   }
 
