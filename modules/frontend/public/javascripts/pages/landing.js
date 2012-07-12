@@ -6,7 +6,7 @@ define([], function () {
       var landing_celebrities_btn = $('#landing-stars h3 a');
       var landing_celebrities = $('#landing-stars .celebrities');
 
-      landing_celebrities.hide().css('opacity', '0');
+      //landing_celebrities.hide().css('opacity', '0');
 
       landing_celebrities_btn.hover(function(){
         $(this).parent().animate({ top: '-80px' }, 200);
@@ -15,11 +15,11 @@ define([], function () {
       });
 
       if (screen.width > 480) {
-          landing_celebrities_btn.toggle(function(e){
-            landing_celebrities.slideDown('fast').animate({ opacity: 1 });
+          landing_celebrities_btn.toggle(function(e)
+          { landing_celebrities.animate({ opacity: 0 }).slideUp('fast');
             e.preventDefault();
-          }, function(e) {
-            landing_celebrities.animate({ opacity: 0 }).slideUp('fast');
+          },function(e){
+            landing_celebrities.slideDown('fast').animate({ opacity: 1 });
             e.preventDefault();
           });
       } else {
