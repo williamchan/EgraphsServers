@@ -1,6 +1,6 @@
 /* Scripting shared between both celebrity storefront pages */
 define(["libs/jquery.tweet"], function() {
-  var filterOutReplies = function(t){
+  var filterOutReplies = function(t) {
     var matches = /^@\w+/.test(t['tweet_raw_text']);
     return !matches;
   };
@@ -39,6 +39,26 @@ define(["libs/jquery.tweet"], function() {
     });
   };
 
+  /**
+   * Populates the tweets from the egraphs feed.
+   */
+  var populateEgraphsTweets = function() {
+    $(".recent-tweets .tweets").tweet({
+      username: "Egraphs",
+      filter: filterOutReplies,
+      avatar_size: 40,
+      fetch: 20, // the last twenty tweets should contain at least 3 that are not @replies ;-)
+      count: 3,
+      loading_text: "Loading tweets...",
+      template: "<!-- {avatar} --> <span class='tweet-heading'><strong>" +
+                     "Egraphs" +
+                     "</strong> @" +
+                     "Egraphs" +
+                     "</span> {text} {time}"
+    });
+
+  };
+
   return {
     /**
      * Populates a celebrity's tweets inside of the given selector
@@ -47,11 +67,12 @@ define(["libs/jquery.tweet"], function() {
      *   to the celebrity's plain name and twitter handle.
      **/
     populateCelebrityTweets: function(selector, celebTwitterInfo) {
-      if (celebTwitterInfo.handle === "") {
+      populateEgraphsTweets();
+      /*if (celebTwitterInfo.handle === "") {
         populateTweetsOfCelebWithoutUsername(celebTwitterInfo.name);
       } else {
         populateTweetsOfCelebWithUsername(celebTwitterInfo);
-      }
+      }*/
     }
   };
 });
