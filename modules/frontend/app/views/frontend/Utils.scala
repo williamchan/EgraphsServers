@@ -75,7 +75,8 @@ object Utils {
       "&picture=" + picUrl +
       "&name=" + name +
       "&caption=" + caption +
-      "&description=" + description
+      "&description=" + description +
+      "&link=" + link
   }
 
   def getTwitterShareLink(link: String,
