@@ -45,7 +45,9 @@
 
             <h2><a href="@product.targetUrl">@product.name &raquo;</a></h2>
 
-            <p class="series">Available</p>
+            <p class="series">
+              @if(product.quantityRemaining > 0){ Available } else { Sold Out! }
+            </p>
 
             <p class="price">@product.price.formatSimply</p>
 

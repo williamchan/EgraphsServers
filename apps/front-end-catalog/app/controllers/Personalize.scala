@@ -87,7 +87,7 @@ object Personalize extends Controller
   private def render(
     personalizeForm: PersonalizeForm=defaultPersonalizeForm,
     guaranteedDelivery:util.Date = new util.Date(),
-    writtenMessageCharacterLimit: Int = 100,
+    writtenMessageCharacterLimit: Int = 60,
     orderSummary: StorefrontOrderSummary = defaultOrderSummary,
     productPreviewUrl: String = "http://placehold.it/454x288",
     orientation: String = "orientation-landscape"
