@@ -4,7 +4,7 @@ import consumer.StorefrontChoosePhotoConsumerEndpoints
 import play.mvc.Controller
 import play.data.validation._
 import models._
-import enums.{PrintingOption, OrderReviewStatus}
+import enums.{WrittenMessageRequest, PrintingOption, OrderReviewStatus}
 import play.mvc.Scope.Flash
 import services.mail.Mail
 import services.{Utils, AppConfig}
@@ -131,6 +131,7 @@ object PostBuyProductEndpoint extends Logging {
     billingPostalCode: String,
     printingOption: PrintingOption = PrintingOption.DoNotPrint,
     shippingForm: Option[CheckoutShippingForm.Valid] = None,
+    writtenMessageRequest: WrittenMessageRequest = WrittenMessageRequest.SpecificMessage,
     flash: Flash = Flash.current(),
     mail: Mail = AppConfig.instance[Mail],
     customerStore: CustomerStore = AppConfig.instance[CustomerStore],
@@ -178,6 +179,7 @@ object PostBuyProductEndpoint extends Logging {
           billingPostalCode = billingPostalCode,
           printingOption = printingOption,
           shippingForm = shippingForm,
+          writtenMessageRequest = writtenMessageRequest,
           isDemo = isDemo, charge = charge, celebrity = celebrity, product = product, dbSession = dbSession, accountStore = accountStore, customerStore = customerStore)
       } catch {
         case e: InsufficientInventoryException => {
@@ -218,6 +220,7 @@ object PostBuyProductEndpoint extends Logging {
                            billingPostalCode: String,
                            printingOption: PrintingOption,
                            shippingForm: Option[CheckoutShippingForm.Valid],
+                           writtenMessageRequest: WrittenMessageRequest,
                            isDemo: Boolean,
                            accountStore: AccountStore,
                            celebrity: Celebrity): (Order, Customer, Customer) = {
@@ -249,6 +252,7 @@ object PostBuyProductEndpoint extends Logging {
       val shippingInfo = ShippingInfo(_printingOption = printingOption.name, shippingAddress = shippingAddress)
       var order = buyer.buy(product, recipient, recipientName = recipientName, messageToCelebrity = personalNote, requestedMessage = desiredText)
         .copy(amountPaidInCurrency = BigDecimal(price.getAmount), billingPostalCode = Option(billingPostalCode), shippingInfo = shippingInfo)
+        .withWrittenMessageRequest(writtenMessageRequest)
         .save()
       order = order.withChargeInfo(stripeCardTokenId = stripeTokenId, stripeCharge = charge)
 

@@ -173,7 +173,8 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
           price=forms.total(product.price),
           billingPostalCode=billing.postalCode,
           printingOption=forms.highQualityPrint.getOrElse(PrintingOption.DoNotPrint),
-          shippingForm=shipping
+          shippingForm=shipping,
+          writtenMessageRequest=personalization.writtenMessageRequest
         ).execute()
 
 
