@@ -433,6 +433,18 @@ class OrderTests extends UnitFlatSpec
     pendingViews.toList(1).orderId should be (order1.id)
   }
 
+  "redactedName" should "redact properly" in {
+    Order(recipientName="Herp Derpson-Schiller").redactedRecipientName should be ("Herp D.S.")
+    Order(recipientName="Herp").redactedRecipientName should be ("Herp")
+    Order(recipientName="Herp Derpson bin-Hoffberger").redactedRecipientName should be ("Herp D.b.H.")
+    Order(recipientName="Herp D").redactedRecipientName should be ("Herp D.")
+
+    for (herpDerpson <- List("Herp D", "Herp Derpson", "Herp Derpson ", " Herp Derpson", "Herp  Derpson")) {
+      Order(recipientName=herpDerpson).redactedRecipientName should be ("Herp D.")
+    }
+  }
+
+
   "GalleryOrderFactory" should "create FulfilledEgraphViewModels from orders" in  {
     val (buyer, recipient, celebrity, product) = newOrderStack
     val admin = Administrator().save()

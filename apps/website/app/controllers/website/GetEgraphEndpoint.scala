@@ -150,7 +150,7 @@ object GetEgraphEndpoint {
     // Render
     views.frontend.html.egraph(
       signerName = celebrity.publicName.getOrElse("Anony mouse"),
-      recipientName = order.recipientName,
+      recipientName = order.redactedRecipientName,
       frameCssClass = frame.cssClass,
       frameLayoutColumns = frame.cssFrameColumnClasses,
       productIconUrl = frameFittedIconUrl,

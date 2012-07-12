@@ -112,6 +112,21 @@ case class Order(
     privacyStatus == PrivacyStatus.Public
   }
 
+  def redactedRecipientName: String = {
+    val nameParts = recipientName.trim.split("( )|(-)").toList
+
+    val firstName = nameParts.head
+    val lastNames = nameParts.tail.filter(thePart => thePart != "")
+    val lastNamesRedacted = if (lastNames.isEmpty) {
+      ""
+    } else {
+      println(lastNames)
+      lastNames.map(theName => theName(0)).mkString(" ", ".", ".")
+    }
+
+    firstName + lastNamesRedacted
+  }
+
   /** Call this to associate a Stripe Charge with this Order */
   def withChargeInfo(stripeCardTokenId: String, stripeCharge: Charge): Order = {
     require(id != 0, "Order must have an id")
