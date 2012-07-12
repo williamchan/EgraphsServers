@@ -13,7 +13,10 @@
   shareOnTwitterLink: String,
   galleryLink: Option[String] = None
 )
+@import views.frontend.tags
+
 <!doctype html>
+
 <html class="egraph-page">
   <head>
     <title>@signerName egraph for @recipientName</title>
@@ -32,6 +35,7 @@
     <link href='@asset("public/soundmanager/360-player/360player-visualization.css")' 
           rel="stylesheet" 
           type="text/css">
+    @tags.html.analytics()      
   </head>
   <body>
     <!-- Body content -->
