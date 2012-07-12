@@ -365,7 +365,8 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
         celeb.id === product.celebrityId and
         product.id === order.productId and
         order.id === egraph.orderId and
-        egraph._egraphState === EgraphState.Published.name
+        egraph._egraphState === EgraphState.Published.name and
+        order._privacyStatus === PrivacyStatus.Public.name
       )
       select(FulfilledProductOrder(product, order, egraph))
       orderBy (egraph.created desc)

@@ -12,14 +12,11 @@ footerData: models.frontend.footer.FooterData
 <section ng-cloak id="content" class="top" role="main" ng-controller="Controller">
   <div id="main" class="sub">
     <div class="container" id="settings-page">
-      <header id="settings-top">
-        <h1 style="display: inline-block;">Account Recovery</h1>
-      </header>
       @tags.html.safeForm("method" -> "POST", "action" -> "/account/recover"){
       <section class="settings-group" id="password-reset">
         <div class="row-settings row-fluid">
           <div class="span12">
-            <h2>Please enter your email address to recover your account</h2>
+            <h3>Need to set your password? Please enter your email address.</h3>
             <div class="control-group">
               <label class="control-label ng-label">Email</label>
               <div class="controls">
