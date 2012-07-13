@@ -82,7 +82,7 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
           recipientName = validPersonalizeForm.recipientName,
           noteToCelebrity = validPersonalizeForm.noteToCelebriity,
           basePrice = product.price,
-          guaranteedDelivery = inventoryBatch.endDate,
+          guaranteedDelivery = inventoryBatch.getExpectedDate,
           highQualityPrintParamName = Params.HighQualityPrint,
           highQualityPrint = doPrint,
           actionUrl = reverse(postStorefrontReview(celebrityUrlSlug, productUrlSlug)).url,
