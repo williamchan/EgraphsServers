@@ -31,14 +31,14 @@ public class PlayLessEngine {
     LessEngine lessEngine;
     Boolean devMode;
     Boolean useEternalCache;
-    Pattern importPattern = Pattern.compile(".*@import\\s*\"(.*?)\".*");
-    final Map<String, Long> lastModifiedCache;
+    Pattern importPattern = Pattern.compile(".*@import\\s*\"(.*?)\".*");    
+    final Map<String, String> filenameToEtag;
 
     PlayLessEngine(Boolean devMode, Boolean useEternalCache) {
         lessEngine = new LessEngine();
         this.devMode = devMode;
         this.useEternalCache = useEternalCache;
-        this.lastModifiedCache = new ConcurrentHashMap<String, Long>();
+        this.filenameToEtag = new ConcurrentHashMap<String, String>();
     }
 
     /**
@@ -54,36 +54,20 @@ public class PlayLessEngine {
         return css;
     }
 
-    public long lastModifiedCachedRecursive(File lessFile) {
-        long lastModified;
+    public String getEtag(File lessFile) {
+        String filenameToEtagKey = lastModifiedCacheKeyForFile(lessFile);
+        String cachedEtagOrNull = filenameToEtag.get(filenameToEtagKey);
 
-        // Calculate lastModified
-        if (useEternalCache) {
-            // Since we're in eternal cache mode, we will just cache the LastModified
-            // information forever.            
-            String cacheKey = lastModifiedCacheKeyForFile(lessFile);
-            Long lastModifiedOrNull = lastModifiedCache.get(cacheKey);          // cacheGet(cacheKey, Long.class);
-
-            if (lastModifiedOrNull != null) {
-                play.Logger.info(
-                    "LESS " + lessFile.getName() + 
-                    ": Accessed Last-Modified info from eternal cache"                    
-                );
-                lastModified = lastModifiedOrNull;
-            } else {
-                play.Logger.info(
-                    "LESS " + lessFile.getName() + 
-                    ": Did not find file Last-Modified info in eternal cache."
-                );
-                lastModified = lastModifiedRecursive(lessFile);
-                lastModifiedCache.put(cacheKey, lastModified);
-            }
+        String etag;
+        if (cachedEtagOrNull != null) {
+            etag = cachedEtagOrNull;
         } else {
-            // No eternal cache -- recalculate lastModified from the actual disk.
-            lastModified = lastModifiedRecursive(lessFile);
+            String css = this.get(lessFile);
+            etag = play.libs.Crypto.passwordHash(css);
+            filenameToEtag.put(filenameToEtagKey, etag);
         }
-        
-        return lastModified;
+
+        return "\"" + etag + "\"";
     }
 
     private String lastModifiedCacheKeyForFile(File lessFile) {
