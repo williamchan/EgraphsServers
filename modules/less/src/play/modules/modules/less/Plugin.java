@@ -46,8 +46,7 @@ public class Plugin extends PlayPlugin {
 
     private void handleResponse(VirtualFile file, Request request, Response response) {
         long lastModified = playLessEngine.lastModifiedCachedRecursive(file.getRealFile());
-        final String etag = "\"" + lastModified + "-" + file.hashCode() + "\"";
-
+        final String etag = "\"" + lastModified + "\"";
 
         play.mvc.Http.Header ifNoneMatch = request.headers.get("if-none-match");
 
