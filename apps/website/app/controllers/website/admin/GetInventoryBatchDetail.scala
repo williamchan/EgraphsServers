@@ -38,7 +38,8 @@ object GetInventoryBatchDetail {
       errorFields = errorFields,
       fields = fieldDefaults,
       inventoryBatch = inventoryBatch,
-      products = products
+      products = products,
+      remainingInventory = inventoryBatch.map(ib => ib.getRemainingInventory)
     )
   }
 

@@ -38,6 +38,7 @@
       <th>Recipient</th>
       <th>Review Status</th>
       <th>Payment State</th>
+      <th>Expected Date</th>
       <th>Msg to Celebrity</th>
       <th>Requested Msg</th>
     </tr>
@@ -53,6 +54,7 @@
       <td>@order.recipientName</td>
       <td>@order.reviewStatus</td>
       <td>@order.paymentStatus</td>
+      <td>@order.expectedDate</td>
       <td>@order.messageToCelebrity.getOrElse("")</td>
       <td>@order.requestedMessage.getOrElse("")</td>
     </tr>

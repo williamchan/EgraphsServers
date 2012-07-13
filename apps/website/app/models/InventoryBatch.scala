@@ -11,6 +11,7 @@ import org.squeryl.dsl.ManyToMany
 import org.joda.time.DateTime
 
 case class InventoryBatchServices @Inject()(store: InventoryBatchStore,
+                                            orderStore: OrderStore,
                                             productStore: ProductStore,
                                             celebStore: CelebrityStore)
 
@@ -36,6 +37,10 @@ case class InventoryBatch(
    */
   def getExpectedDate: Date = {
     new DateTime(endDate).plusDays(7).toDate
+  }
+
+  def getRemainingInventory: Int = {
+    numInventory - services.orderStore.countOrders(List(id))
   }
 
   //

@@ -3,7 +3,7 @@ package controllers.website.admin
 import play.mvc.Controller
 import services.Utils
 import services.http.{AdminRequestFilters, ControllerMethod}
-import models.OrderStore
+import models.{Egraph, OrderStore}
 
 private[controllers] trait GetOrderAdminEndpoint { this: Controller =>
 
@@ -17,7 +17,19 @@ private[controllers] trait GetOrderAdminEndpoint { this: Controller =>
   def getOrderAdmin(orderId: Long) = controllerMethod() {
     adminFilters.requireAdministratorLogin { admin =>
       orderStore.findById(orderId) match {
-        case Some(order) => views.Application.admin.html.admin_order(order = order)
+        case Some(order) => {
+          val buyer = order.buyer
+          val recipient = if (order.buyerId == order.recipientId) buyer else order.recipient
+          val fulfillingEgraph: Option[Egraph] = orderStore.findFulfilledWithId(orderId).map(f => f.egraph)
+          views.Application.admin.html.admin_order(
+            order = order,
+            product = order.product,
+            buyer = buyer,
+            buyerEmail = buyer.account.email,
+            recipient = recipient,
+            recipientEmail = recipient.account.email,
+            fulfillingEgraph = fulfillingEgraph)
+        }
         case None => NotFound("Order with id " + orderId.toString + " not found")
       }
     }

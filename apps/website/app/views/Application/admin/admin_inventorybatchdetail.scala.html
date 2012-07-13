@@ -1,4 +1,10 @@
-@(isCreate: Boolean, celebrity: models.Celebrity, errorFields: Option[List[String]], fields: (String) => String, inventoryBatch: Option[models.InventoryBatch] = None, products : Iterable[(models.Product, Boolean)]
+@(isCreate: Boolean,
+  celebrity: models.Celebrity,
+  errorFields: Option[List[String]],
+  fields: (String) => String,
+  inventoryBatch: Option[models.InventoryBatch] = None,
+  products : Iterable[(models.Product, Boolean)],
+  remainingInventory: Option[Int] = None
 )(implicit session: play.mvc.Scope.Session)
 
 @import controllers.WebsiteControllers
@@ -24,6 +30,7 @@
   <h1>
     @celebrity.publicName.get - @{if(isCreate) "Create" else "Update"} Inventory Batch
   </h1>
+  @views.Application.tags.html.valueRow(label="Remaining Inventory", value=remainingInventory.getOrElse(""))
   <div class="form row">
     <div class="span12 form-column">
       <form id="inventorybatch-form" method="POST" action='@postInventoryBatch' enctype="multipart/form-data">

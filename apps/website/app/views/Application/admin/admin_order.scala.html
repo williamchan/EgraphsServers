@@ -1,4 +1,10 @@
-@(order: models.Order)(implicit session: play.mvc.Scope.Session)
+@(order: models.Order,
+  product: models.Product,
+  buyer: models.Customer,
+  buyerEmail: String,
+  recipient: models.Customer,
+  recipientEmail: String,
+  fulfillingEgraph: Option[models.Egraph])(implicit session: play.mvc.Scope.Session)
 
 @import controllers.WebsiteControllers
 @import services.Finance.TypeConversions._
@@ -20,6 +26,10 @@
 
 @productUrl() = @{
   lookupUrl("WebsiteControllers.getProductAdmin", Map("productId" -> order.productId.toString))
+}
+
+@isFulfilled() = @{
+  fulfillingEgraph.isDefined
 }
 
 @reviewControls = {
@@ -61,22 +71,31 @@
   @valueRow(label="RecipientName",        value=order.recipientName)
   @valueRow(label="Message To Celebrity", value=order.messageToCelebrity)
   @valueRow(label="Requested Message",    value=order.requestedMessage)
+  @valueRow(label="Is Fulfilled?",        value=isFulfilled())
   @reviewControls
   <hr/>
   <h2>Order Details</h2>
   @valueRow(label="Id",                   value=order.id)
   @valueRow(label="Product",              value=order.productId, href=productUrl().url)
-  @valueRow(label="Buyer",                value=order.buyerId)
-  @valueRow(label="RecipientId",          value=order.recipientId)
-  @valueRow(label="Privacy Status",       value=order.privacyStatus)
+  @valueRow(label="BuyerId",              value=buyer.id)
+  @valueRow(label="Buyer name",           value=buyer.name)
+  @valueRow(label="Buyer email",          value=buyerEmail)
+  @valueRow(label="RecipientId",          value=recipient.id)
+  @valueRow(label="Recipient name",       value=recipient.name)
+  @valueRow(label="Recipient email",      value=recipientEmail)
   @valueRow(label="Expected Date",        value=order.expectedDate)
+  @valueRow(label="Privacy Status",       value=order.privacyStatus)
+  @valueRow(label="Rejection Reason",     value=order.rejectionReason.getOrElse(""))
   @valueRow(label="Created",              value=order.created)
   @valueRow(label="Updated",              value=order.updated)
   <hr/>
   <h2>Payment Details</h2>
-  @valueRow(label="Payment State",        value=order.paymentStatus)
+  @valueRow(label="Payment Status",       value=order.paymentStatus)
+  @valueRow(label="Amount",               value=order.amountPaid.formatSimply)
+  @valueRow(label="Billing Postal Code",  value=order.billingPostalCode.getOrElse(""))
+  @valueRow(label="Printing Option",      value=order._printingOption)
+  @valueRow(label="Shipping Address",     value=order.shippingAddress.getOrElse(""))
   @valueRow(label="StripeCardTokenId",    value=order.stripeCardTokenId)
   @valueRow(label="StripeChargeId",       value=order.stripeChargeId)
-  @valueRow(label="Amount",               value=order.amountPaid.formatSimply)
 </div>
 }

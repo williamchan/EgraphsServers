@@ -46,6 +46,10 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
       if (isCreate) Validation.isTrue("Product image is required", productImage.isDefined)
       required("Story title", storyTitle)
       required("Story text", storyText)
+
+      Validation.isTrue("Product name has maximum length of 128", productName.length < 128)                // column width in database
+      Validation.isTrue("Product description has maximum length of 128", productDescription.length < 128)  // column width in database
+
       val productByUrlSlg = productStore.findByCelebrityAndUrlSlug(celebrity.id, Product.slugify(productName))
       val isUniqueUrlSlug = if (isCreate) {
         productByUrlSlg.isEmpty

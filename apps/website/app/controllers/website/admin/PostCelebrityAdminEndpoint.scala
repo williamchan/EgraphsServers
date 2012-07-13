@@ -81,6 +81,10 @@ trait PostCelebrityAdminEndpoint {
         Validation.required("Short Bio", bio)
         Validation.required("Organization", organization)
 
+        Validation.isTrue("Public Name has maximum length of 128", publicName.length < 128)            // column width in database
+        Validation.isTrue("Organization has maximum length of 128", organization.length < 128)         // column width in database
+        Validation.isTrue("Role Description has maximum length of 128", roleDescription.length < 128)  // column width in database
+
         // Name validations
         if (celebrityUrlSlug.isDefined) {
           val celebrityByUrlSlug = celebrityStore.findByUrlSlug(celebrityUrlSlug.get)
