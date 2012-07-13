@@ -41,6 +41,25 @@
 @import views.frontend.tags.html.storefront_breadcrumbs_responsive
 @import views.frontend.tags
 
+@previewModal = {
+  <div class="modal hide" id="frame-preview">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">×</button>
+      <h3>Example Framed Egraph</h3>
+    </div>
+    <div class="modal-body">
+      <img src='@asset("public/images/physical-preview.jpg")' alt="fpo-egraph-diagram" class="scale" />
+    </div>
+    <div class="modal-description">
+      Your framed egraph contains a high quality print, certificate of authentication and custom cut mat inside of
+      an 10” X 14” frame.
+    </div>
+    <div class="modal-footer">
+      <button data-dismiss="modal" class="button"><strong><em>Close</em></strong><span>&raquo;</span></button>
+    </div>
+  </div>
+}
+
 @baseBody = {
     <div id="content" class="top" role="main">
     
@@ -54,7 +73,7 @@
   				  <h1>Review Order</h1>
   				  <h2>@celebrityName | @productTitle</h2>
   				</header>
-
+                @previewModal
   				<div class="review clearfix">
 
 	  				<figure>
@@ -103,13 +122,25 @@
 	  					</div>
 		  				
 	  					<fieldset class="left">
-	  					
-	  						<label>Would you like to order a high quality print of your Egraph for an additional $45?</label>
-	  						<p><input id="order-print" 
+
+	  						<label>
+                                Would you like to order a high quality framed version of your egraph for an additional $45?
+
+
+                              </label>
+	  						<p>
+                                <input id="order-print"
 	  						          type="checkbox" 
 	  						          name="@highQualityPrintParamName" 
-	  						          value="yes" @if(highQualityPrint) {checked}></p>
-	  					
+	  						          value="yes" @if(highQualityPrint) {checked}>
+                                <small>
+                                  <a data-toggle="modal" class="tip" href="#frame-preview" id="preview-shoutout">
+                                    Take a look
+                                  </a>
+                                </small>
+                              </p>
+
+
 	  					</fieldset>
 	  					
 	  					<fieldset class="right">
