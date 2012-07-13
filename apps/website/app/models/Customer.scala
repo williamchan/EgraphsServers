@@ -101,9 +101,12 @@ case class Customer(
     email.addReplyTo("noreply@egraphs.com")
     email.addTo(account.email)
     email.setSubject("Welcome to Egraphs!")
-    val emailLogoSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-logo.jpg")))
-    val emailFacebookSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-facebook.jpg")))
-    val emailTwitterSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-twitter.jpg")))
+    //    val emailLogoSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-logo.jpg")))
+    //    val emailFacebookSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-facebook.jpg")))
+    //    val emailTwitterSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-twitter.jpg")))
+    val emailLogoSrc = ""
+    val emailFacebookSrc = ""
+    val emailTwitterSrc = ""
     val verifyPasswordUrl = GetResetPasswordEndpoint.absoluteUrl(account.email, account.resetPasswordKey.get).url
     val html = views.frontend.html.email_account_verification(
       verifyPasswordUrl = verifyPasswordUrl,

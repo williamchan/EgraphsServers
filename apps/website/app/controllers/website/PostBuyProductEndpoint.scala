@@ -285,9 +285,12 @@ object PostBuyProductEndpoint extends Logging {
     email.setFrom("noreply@egraphs.com", "Egraphs")
     email.addTo(buyerEmail, buyerName)
     email.setSubject("Order Confirmation")
-    val emailLogoSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-logo.jpg")))
-    val emailFacebookSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-facebook.jpg")))
-    val emailTwitterSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-twitter.jpg")))
+//    val emailLogoSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-logo.jpg")))
+//    val emailFacebookSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-facebook.jpg")))
+//    val emailTwitterSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-twitter.jpg")))
+    val emailLogoSrc = ""
+    val emailFacebookSrc = ""
+    val emailTwitterSrc = ""
     val html = views.frontend.html.email_order_confirmation(
       buyerName = buyerName,
       recipientName = recipientName,

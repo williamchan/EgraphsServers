@@ -198,9 +198,12 @@ case class Order(
 
     email.addReplyTo("noreply@egraphs.com")
     email.setSubject("I just finished signing your Egraph")
-    val emailLogoSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-logo.jpg")))
-    val emailFacebookSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-facebook.jpg")))
-    val emailTwitterSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-twitter.jpg")))
+    //    val emailLogoSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-logo.jpg")))
+    //    val emailFacebookSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-facebook.jpg")))
+    //    val emailTwitterSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-twitter.jpg")))
+    val emailLogoSrc = ""
+    val emailFacebookSrc = ""
+    val emailTwitterSrc = ""
     val viewEgraphUrl = Utils.lookupAbsoluteUrl("WebsiteControllers.getEgraph", Map("orderId" -> id.toString)).url
     val html = views.frontend.html.email_view_egraph(
       viewEgraphUrl = viewEgraphUrl,
