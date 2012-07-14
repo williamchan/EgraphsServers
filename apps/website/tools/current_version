@@ -1,0 +1,10 @@
+#!/bin/bash
+# Prints the current version of the git repository. Generally for use when committing
+# to a remote server. See 'deploy' for usage.
+
+version=`git rev-parse HEAD`
+deployer_name=`git config --get 'user.name'`
+
+echo "VERSION: $version"
+echo "DEPLOYED ON: `date`"
+echo "BY: $deployer_name, with all the love and support of the Egraphs team."
