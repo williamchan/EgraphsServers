@@ -71,7 +71,7 @@ echo_green "EGRAPHS: Updating remote database..."
 play evolutions:apply --%$DEPLOY_TARGET
 
 echo_green "EGRAPHS: Setting /public/VERSION.txt"
-$SCRIPT_DIR/current_version > $PROJ_BASE/public/VERSION
+$SCRIPT_DIR/current_version > $PROJ_BASE/public/VERSION.txt
 
 echo_green "EGRAPHS: Deploying to Cloudbees..."
 play bees:app:deploy --%$DEPLOY_TARGET
