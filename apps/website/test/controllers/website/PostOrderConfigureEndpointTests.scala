@@ -7,13 +7,12 @@ import scala.collection.JavaConversions._
 import FunctionalTest._
 import services.AppConfig
 import models.OrderStore
-import services.db.{TransactionSerializable, DBSession}
+import services.db.TransactionSerializable
 import utils.TestData
 import models.enums.PrivacyStatus
 
 
 class PostOrderConfigureEndpointTests extends EgraphsFunctionalTest {
-  private val db = AppConfig.instance[DBSession]
   private val orderStore = AppConfig.instance[OrderStore]
 
   @Test

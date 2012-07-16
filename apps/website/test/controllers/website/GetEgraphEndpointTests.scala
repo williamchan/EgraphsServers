@@ -4,15 +4,12 @@ import admin.AdminFunctionalTest
 import org.junit.Test
 import play.test.FunctionalTest
 import FunctionalTest._
-import services.AppConfig
-import services.db.{TransactionSerializable, DBSession}
+import services.db.TransactionSerializable
 import utils.{TestConstants, TestData}
 import models.enums.{EgraphState, OrderReviewStatus, PrivacyStatus}
 import play.libs.Codec
 
 class GetEgraphEndpointTests extends AdminFunctionalTest {
-
-  private val db = AppConfig.instance[DBSession]
 
   @Test
   def testPrivateEgraphsAreOnlyViewableByBuyerAndRecipientAndAdmin() {

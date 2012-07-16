@@ -9,7 +9,7 @@ import scenario.Scenarios
 import models._
 import enums.EgraphState
 import services.AppConfig
-import services.db.{TransactionSerializable, DBSession}
+import services.db.TransactionSerializable
 import utils.{FunctionalTestUtils, TestConstants}
 import controllers.website.EgraphsFunctionalTest
 
@@ -17,7 +17,6 @@ class GetCelebrityOrdersApiEndpointTests extends EgraphsFunctionalTest {
 
   import FunctionalTest._
 
-  private val db = AppConfig.instance[DBSession]
   private val orderStore = AppConfig.instance[OrderStore]
 
   @Test

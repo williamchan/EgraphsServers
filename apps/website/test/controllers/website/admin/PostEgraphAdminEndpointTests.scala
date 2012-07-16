@@ -4,7 +4,7 @@ import org.junit.Assert._
 import org.junit.Test
 import scala.collection.JavaConversions._
 import services.AppConfig
-import services.db.{DBSession, TransactionSerializable}
+import services.db.TransactionSerializable
 import play.test.FunctionalTest._
 import models.{EgraphStore, Egraph}
 import utils.TestData
@@ -12,7 +12,6 @@ import models.enums.EgraphState
 
 class PostEgraphAdminEndpointTests extends AdminFunctionalTest {
 
-  private val db = AppConfig.instance[DBSession]
   private val egraphStore = AppConfig.instance[EgraphStore]
 
   @Test

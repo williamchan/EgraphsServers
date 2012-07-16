@@ -5,12 +5,10 @@ import play.test.FunctionalTest
 import FunctionalTest._
 import utils.TestData
 import models.Celebrity
-import services.{AppConfig, Utils}
-import services.db.{DBSession, TransactionSerializable}
+import services.Utils
+import services.db.TransactionSerializable
 
 class AdminLoginTests extends AdminFunctionalTest {
-
-  private val db = AppConfig.instance[DBSession]
 
   @Test
   def testAdminLoginProtectsAdminConsole() {

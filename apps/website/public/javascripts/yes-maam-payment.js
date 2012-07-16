@@ -10,7 +10,7 @@ define([], function() {
       // as unprotected sex.
     },
 
-    createToken: function(configObj, amount, handler) {
+    createToken: function(configObj, handler) {
       // My payment implementation on the server doesn't care what I
       // generate here; it'll always response "Yes ma'am".
       handler(200, {id:"A Token...not that it matters"});

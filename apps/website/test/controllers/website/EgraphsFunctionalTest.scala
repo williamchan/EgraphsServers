@@ -7,12 +7,15 @@ import FunctionalTest._
 import models.Account
 import org.junit.After
 import scala.collection.JavaConversions._
-import services.Utils
+import services.{AppConfig, Utils}
 import utils.TestData
 import org.junit.Assert._
 import services.http.forms.CustomerLoginForm
+import services.db.DBSession
 
 trait EgraphsFunctionalTest extends FunctionalTest with CleanDatabaseAfterEachTest {
+
+  protected val db = AppConfig.instance[DBSession]
 
   def getPlayFlashCookie(response: Response): String = {
     URLDecoder.decode(response.cookies.get("PLAY_FLASH").value, "US-ASCII")

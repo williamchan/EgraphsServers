@@ -6,14 +6,14 @@ import utils.FunctionalTestUtils
 import services.AppConfig
 import scala.collection.JavaConversions._
 import FunctionalTest._
-import services.db.{TransactionSerializable, DBSession}
+import services.db.TransactionSerializable
 import scenario.Scenarios
 import models.OrderStore
 import org.junit.Assert._
 import controllers.website.EgraphsFunctionalTest
 
 class PostBuyDemoProductEndpointTests extends EgraphsFunctionalTest {
-  private val db = AppConfig.instance[DBSession]
+
   private val orderStore = AppConfig.instance[OrderStore]
 
   @Test
