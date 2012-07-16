@@ -72,19 +72,13 @@ object AdminGalleryControl extends GalleryControlRenderer{
     ns
   }
 }
-
+//TODO download link, order prints link
 object OwnerGalleryControl extends GalleryControlRenderer{
   override def render(id: Long, status:String)  = {
     val ns =
         <ul>
         <li>
           <a href={"/" +id }>View Full Egraph</a>
-        </li>
-        <li>
-          <a href="#">Download</a>
-        </li>
-        <li>
-          <a href="#">Order Prints</a>
         </li>
       </ul>
 
