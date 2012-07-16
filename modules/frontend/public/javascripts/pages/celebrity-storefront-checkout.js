@@ -149,7 +149,7 @@ function(forms, payment, Egraphs) {
             exp_year: parseInt(expiration[1], 10)
           };
           
-          paymentModule.createToken(tokenParams, checkout.productPriceInCents, paymentResponseHandler);
+          paymentModule.createToken(tokenParams, paymentResponseHandler);
           
           // Stop the form form submitting
           return false;
