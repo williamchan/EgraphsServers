@@ -8,10 +8,11 @@ import FunctionalTest._
 import services.Utils
 import services.db.TransactionSerializable
 import utils.TestData
+import controllers.WebsiteControllers
 
 class PostResetPasswordEndpointTests extends EgraphsFunctionalTest {
 
-  private val url = Utils.lookupUrl("WebsiteControllers.postResetPassword").url
+  private val url = WebsiteControllers.reverse(WebsiteControllers.postResetPassword())
 
   @Test
   def testFailPasswordsMustMatchValidation() {
