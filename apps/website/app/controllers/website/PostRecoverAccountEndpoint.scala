@@ -20,7 +20,6 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
   protected def mail: Mail
 
   def postRecoverAccount() = postController() {
-    println("success!")
     accountRequestFilters.requireValidAccountEmail(request.params.getOption("email").getOrElse("Nothing")) {
       account =>
 

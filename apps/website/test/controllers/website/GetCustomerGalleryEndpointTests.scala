@@ -4,13 +4,10 @@ import admin.AdminFunctionalTest
 import org.junit.Test
 import play.test.FunctionalTest
 import FunctionalTest._
-import services.AppConfig
-import services.db.{TransactionSerializable, DBSession}
-import utils.{TestConstants, TestData}
-import models.enums.PrivacyStatus
+import services.db.TransactionSerializable
+import utils.TestData
 
 class GetCustomerGalleryEndpointTests extends AdminFunctionalTest{
-  private val db = AppConfig.instance[DBSession]
 
   @Test
   def testRetrievesGalleryOfCustomer() {

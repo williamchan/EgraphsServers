@@ -8,14 +8,13 @@ import utils.FunctionalTestUtils.willChanRequest
 import models._
 import enums.OrderReviewStatus
 import utils.{FunctionalTestUtils, TestConstants}
-import services.db.{DBSession, TransactionSerializable}
+import services.db.TransactionSerializable
 import services.AppConfig
 import controllers.website.EgraphsFunctionalTest
 
 class PostCelebrityOrderApiEndpointTests extends EgraphsFunctionalTest {
 
   import FunctionalTest._
-  private val db = AppConfig.instance[DBSession]
   private val orderStore = AppConfig.instance[OrderStore]
 
   @Test

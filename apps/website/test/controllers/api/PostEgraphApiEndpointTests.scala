@@ -8,7 +8,7 @@ import utils.FunctionalTestUtils.willChanRequest
 import services.{Time, AppConfig}
 import services.http.HttpCodes
 import utils.{FunctionalTestUtils, TestConstants}
-import services.db.{TransactionSerializable, DBSession}
+import services.db.TransactionSerializable
 import org.junit.Assert._
 import Blobs.Conversions._
 import models.EgraphStore
@@ -17,7 +17,6 @@ import controllers.website.EgraphsFunctionalTest
 class PostEgraphApiEndpointTests extends EgraphsFunctionalTest {
 
   import FunctionalTest._
-  private val db = AppConfig.instance[DBSession]
   private val blobs = AppConfig.instance[Blobs]
   private val egraphStore = AppConfig.instance[EgraphStore]
 

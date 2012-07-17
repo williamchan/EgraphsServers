@@ -11,10 +11,9 @@ import utils.TestData
 import org.squeryl.PrimitiveTypeMode._
 import org.joda.money.CurrencyUnit
 import models.CashTransaction.EgraphPurchase
-import services.db.{Schema, TransactionSerializable, DBSession}
+import services.db.{Schema, TransactionSerializable}
 
 class PostBuyProductEndpointTests extends EgraphsFunctionalTest {
-  private val db = AppConfig.instance[DBSession]
   private val schema = AppConfig.instance[Schema]
   private val orderStore = AppConfig.instance[OrderStore]
   private val failedPurchaseDataStore = AppConfig.instance[FailedPurchaseDataStore]

@@ -95,7 +95,7 @@ define([], function() {
 				cvc: $('#cardCvc').val(),
 				exp_month: $('#cardExpirationMonth').val(),
 				exp_year: $('#cardExpirationYear').val()
-			}, productPriceInCents, stripeResponseHandler);
+			}, stripeResponseHandler);
 
 			// prevent the form from submitting with the default action
 			return false;

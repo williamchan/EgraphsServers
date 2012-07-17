@@ -5,13 +5,12 @@ import org.junit.Test
 import scala.collection.JavaConversions._
 import play.test.FunctionalTest
 import FunctionalTest._
-import services.{Utils, AppConfig}
-import services.db.{TransactionSerializable, DBSession}
+import services.Utils
+import services.db.TransactionSerializable
 import utils.TestData
 
 class PostResetPasswordEndpointTests extends EgraphsFunctionalTest {
 
-  private val db = AppConfig.instance[DBSession]
   private val url = Utils.lookupUrl("WebsiteControllers.postResetPassword").url
 
   @Test

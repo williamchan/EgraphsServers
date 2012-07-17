@@ -5,13 +5,10 @@ import org.junit.Test
 import scala.collection.JavaConversions._
 import play.test.FunctionalTest
 import FunctionalTest._
-import services.AppConfig
-import services.db.{TransactionSerializable, DBSession}
+import services.db.TransactionSerializable
 import utils.TestData
 
 class PostRecoverAccountEndpointTests extends EgraphsFunctionalTest {
-
-  private val db = AppConfig.instance[DBSession]
 
   @Test
   def testEmailValidation() {

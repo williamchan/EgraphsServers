@@ -6,7 +6,7 @@ import scala.collection.JavaConversions._
 import play.test.FunctionalTest
 import FunctionalTest._
 import services.AppConfig
-import services.db.{TransactionSerializable, DBSession}
+import services.db.TransactionSerializable
 import utils.{ClearsDatabaseAndValidationBefore, EgraphsUnitTest, TestWebsiteControllers, TestData}
 import services.http.forms.{Form, CustomerLoginFormFactory, CustomerLoginForm}
 import CustomerLoginForm.Fields
@@ -32,7 +32,6 @@ class LoginFunctionalTests extends EgraphsFunctionalTest {
 
 class LoginUnitTests extends EgraphsUnitTest with ClearsDatabaseAndValidationBefore {
   import Form.Conversions._
-  private val db = AppConfig.instance[DBSession]
 
   "postLogin" should "redirect to login with form information when passwords don't match" in {
     val controller = testControllers(email="idontexist@egraphs.com", password=TestData.defaultPassword)

@@ -7,8 +7,8 @@ import models._
 import enums.{WrittenMessageRequest, PrintingOption, OrderReviewStatus}
 import play.mvc.Scope.Flash
 import services.mail.Mail
-import services.{Utils, AppConfig}
-import play.{Play, Logger}
+import services.AppConfig
+import play.Logger
 import controllers.WebsiteControllers
 import services.payment.{Charge, Payment}
 import scala.Predef._
@@ -152,12 +152,12 @@ object PostBuyProductEndpoint extends Logging {
         "desiredText" -> desiredText.getOrElse(""),
         "personalNote" -> personalNote.getOrElse(""),
         "productId" -> product.id,
-        "productPrice" -> product.price.getAmount
+        "productPrice" -> price.getAmount
       ))
 
       // Attempt Stripe charge. If a credit card-related error occurred, redirect to purchase screen.
       val charge = try {
-        payment.charge(product.price, stripeTokenId, "Egraph Order from " + buyerEmail)
+        payment.charge(price, stripeTokenId, "Egraph Order from " + buyerEmail)
       } catch {
         case stripeException: com.stripe.exception.InvalidRequestException => {
           saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = "Credit card issue.")
