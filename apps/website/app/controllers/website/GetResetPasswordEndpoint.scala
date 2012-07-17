@@ -38,6 +38,17 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
     }
   }
 
+  def getVerifyAccount() =  controllerMethod() {
+    accountRequestFilters.requireValidAccountEmail(request.params.getOption("email").getOrElse("Nothing")) { account =>
+      if(account.verifyResetPasswordKey(request.params.getOption("secretKey").getOrElse(""))){
+        account.emailVerify().save()
+        views.frontend.html.simple_confirmation("Account Verified", "Your account has been successfully verified.")
+      } else {
+        Forbidden("The password reset URL you used is either out of date or invalid.")
+      }
+    }
+  }
+
   private def makeFormView(account: Account) : AccountVerificationFormView = {
     //check flash for presence of secretKey and Email
     val maybeFormData = accountVerificationForms.getFormReader(account).read(flash.asFormReadable).map { form =>

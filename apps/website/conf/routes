@@ -101,8 +101,7 @@ POST    /account/settings                                           WebsiteContr
 GET     /account/recover/?                                          WebsiteControllers.getRecoverAccount
 POST    /account/recover                                            WebsiteControllers.postRecoverAccount
 GET     /account/recover/confirmation/?                             WebsiteControllers.getRecoverAccountConfirmation
-GET     /account/verify/?                                           WebsiteControllers.getResetPassword
-POST    /account/verify                                             WebsiteControllers.postResetPassword
+GET     /account/verify/?                                           WebsiteControllers.getVerifyAccount
 GET     /account/{<[0-9]+>galleryCustomerId}/gallery/?              WebsiteControllers.getCustomerGalleryById
 GET     /account/{username}/?                                       WebsiteControllers.getCustomerGalleryByUsername
 GET     /egraph/{<[0-9]+>orderId}/?                                 WebsiteControllers.getEgraphRedirect

@@ -11,6 +11,7 @@ import utils.TestData
 import controllers.WebsiteControllers
 
 class PostResetPasswordEndpointTests extends EgraphsFunctionalTest {
+  import controllers.WebsiteControllers
 
   private val url = WebsiteControllers.reverse(WebsiteControllers.postResetPassword())
 
