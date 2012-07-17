@@ -16,8 +16,7 @@ class PostRecoverAccountEndpointTests extends EgraphsFunctionalTest {
   @Test
   def testEmailValidation() {
     val response = POST("/account/recover", getPostStrParams(email = ""))
-    assertStatus(302, response)
-    assertTrue(getPlayFlashCookie(response).contains("errors:Email"))
+    assertStatus(404, response)
   }
 
   @Test
