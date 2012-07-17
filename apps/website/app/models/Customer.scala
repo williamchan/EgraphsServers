@@ -12,6 +12,7 @@ import services.http.PlayConfig
 import java.util.Properties
 import controllers.website.GetResetPasswordEndpoint
 import play.Play
+import controllers.WebsiteControllers
 
 /** Services used by each instance of Customer */
 case class CustomerServices @Inject() (accountStore: AccountStore,
@@ -107,7 +108,8 @@ case class Customer(
     val emailLogoSrc = ""
     val emailFacebookSrc = ""
     val emailTwitterSrc = ""
-    val verifyPasswordUrl = GetResetPasswordEndpoint.absoluteUrl(account.email, account.resetPasswordKey.get).url
+    val verifyPasswordUrl = WebsiteControllers.reverse(WebsiteControllers.getVerifyAccount()).url + "?email=" + account.email + "&secretKey=" +
+      account.resetPasswordKey.get
     val html = views.frontend.html.email_account_verification(
       verifyPasswordUrl = verifyPasswordUrl,
       emailLogoSrc = emailLogoSrc,

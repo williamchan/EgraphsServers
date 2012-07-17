@@ -1,7 +1,7 @@
 package controllers.website
 
 import play.mvc.Controller
-import services.http.{AccountRequestFilters, ControllerMethod}
+import services.http.{EgraphsSession, AccountRequestFilters, ControllerMethod}
 import services.Utils
 import models.{Account, AccountStore}
 import models.frontend.forms.{FormError, Field}
