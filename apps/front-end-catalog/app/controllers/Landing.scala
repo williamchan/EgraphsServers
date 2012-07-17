@@ -16,6 +16,11 @@ object Landing extends Controller with DefaultHeaderAndFooterData {
     views.frontend.html.landing(featuredStars = sampleStars.slice(0, count))
   }
 
+  def featured_stars_with_no_inventory() = {
+    val stars = sampleStars.map(star => star.copy(hasInventoryRemaining = false))
+    views.frontend.html.landing(featuredStars=stars)
+  }
+
   def single_celebrity(publicName: String = "David Price",
                        casualName: String = "David",
                        isMale: Boolean = true) = {
@@ -31,10 +36,10 @@ object Landing extends Controller with DefaultHeaderAndFooterData {
   private def makeSampleStar(name: String, secondaryText: Option[String]): FeaturedStar = {
     import play.templates.JavaExtensions.slugify
 
-    FeaturedStar(name, secondaryText, sampleImageUrl, "/" + slugify(name))
+    FeaturedStar(name, secondaryText, sampleImageUrl, "/" + slugify(name), hasInventoryRemaining = true)
   }
 
-  private val sampleImageUrl = "http://placehold.it/440x220"
+  private val sampleImageUrl = "http://placehold.it/440x157"
   private val sampleStars = Seq(
     makeSampleStar("David Price", Some("Tampa Bay Rays")),
     makeSampleStar("Josh Hamilton", Some("Texas Rangers")),

@@ -13,6 +13,95 @@ a, a:link, a:visited {
 	}
 }
 
+// A type of link appropriate for presenting a captioned image.
+// Mix this in on the highest parent container that wishes to have its
+// hover trigger the glowed around contained a.glowborder
+.glowborder-link-container() {
+	a.glowborder {
+		display: block;
+		padding: 4px;
+		border: 1px solid lighten(@orange, 10%);		
+		@transition: border .2s linear, box-shadow .2s linear;
+		.transition(@transition);
+		
+		img {
+			display: block;
+		}
+  }
+
+  a { color: @orange; }
+
+	&:hover a.glowborder {
+		.box-shadow(0px 0px 6px @orange);
+		border-color: @orange;
+	}
+
+}
+
+/* !Ribbons */
+div.ribbon {	
+	position: absolute;
+	font-size: 0.9em;
+	line-height:1.95em;
+	bottom:11px;
+	font-weight: 400;
+	padding-left:21px;
+	padding-right:10px;	
+	text-align:center;	
+	margin-left: -12px;
+	color: white;
+	// background-color: lighten(@orange, 10%);
+	.gradientBar(lighten(@orange, 10%), darken(@orange, 7%));
+	text-shadow: 0px 1px 0px #333;
+	-webkit-box-shadow: 0px 2px 4px #888;
+	-moz-box-shadow: 0px 2px 4px #888;
+	box-shadow: 0px 2px 4px #888;
+
+  &:before, &:after {
+		content: ' ';
+		position: absolute;
+		width: 0;
+		height: 0;
+  }
+
+	&:before
+	{
+		width: 30px;
+		left: -30px;
+		top: 12px;
+		border-width: 20px 10px;
+		border-style: solid;
+		border-color: #999 #999 #999 transparent;
+	}
+
+	&.simple:before
+	{
+		// The simple ribbon has no fancy tattering on the right side
+		display: none;
+	}
+
+	&.flag:before
+	{
+		// The fancy tattered right-side of a flag-view
+		width: 0px;
+		left: auto;
+		right: -2px;
+		top: 0px;
+		border-color: transparent #fff transparent transparent;
+	}
+
+	&:after
+	{
+		// The folded-back portion of the ribbon
+		@foldedPartOfRibbonColor: darken(@orange, 20%);
+		left: 0px;
+		top: 100%;
+		border-width: 3px 6px;
+		border-style: solid;
+		border-color: @foldedPartOfRibbonColor @foldedPartOfRibbonColor transparent transparent;
+	}
+} // end ribbons
+
 /* !Buttons */
 
 button  {

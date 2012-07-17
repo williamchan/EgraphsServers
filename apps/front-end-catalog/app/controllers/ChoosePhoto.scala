@@ -37,6 +37,23 @@ object ChoosePhoto extends Controller
     ChoosePhotoDefaults().copy(partnerIcons=icons).renderTiles
   }
 
+  def tilesWithSoldOut = {
+    val products = Seq(
+      sampleTile.copy(quantityRemaining = 0 )
+    )
+
+    ChoosePhotoDefaults().copy(products=products).renderTiles
+  }
+
+  def carouselWithSoldOut = {
+    val products = Seq(
+      sampleCarouselProduct.copy(quantityRemaining = 0)
+    )
+
+    ChoosePhotoDefaults().copy(carouselProducts=products).renderCarousel
+  }
+
+
   /** Renders tiled view of a celebrity that lacks a twitter handle */
   def withoutTwitterHandle = {
     val defaults = ChoosePhotoDefaults()

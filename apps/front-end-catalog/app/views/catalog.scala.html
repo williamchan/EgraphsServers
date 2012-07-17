@@ -36,6 +36,7 @@
       @for(number <- 0 until 9) {
         @landingEntry("featured_stars?count=" + number)
       }
+      @catalogEntry("Landing/featured_stars_with_no_inventory", "Featured stars -- no inventory")
     </ol>
     <h2>Account Settings</h2>
     <ol>
@@ -95,6 +96,7 @@
       @catalogEntry("ChoosePhoto/withProducts?num=1", "1 portrait product")
       @catalogEntry("ChoosePhoto/withProducts?num=6", "6 portrait products")
       @catalogEntry("ChoosePhoto/landscape", "1 landscape product")
+      @catalogEntry("ChoosePhoto/tilesWithSoldOut", "1 sold out product")      
     </ol>
 
     <h2>Storefront: Choose Photo Page (carousel)</h2>
@@ -105,6 +107,7 @@
       @catalogEntry("ChoosePhoto/withProducts?num=0", "0 products")
       @catalogEntry("ChoosePhoto/withProducts?num=1", "1 product")
       @catalogEntry("ChoosePhoto/withProducts?num=2", "2 products")
+      @catalogEntry("ChoosePhoto/carouselWithSoldOut", "1 sold out product")
     </ol>
     <h2>Storefront: Personalize</h2>
     <ol>
@@ -148,7 +151,7 @@
     </ol>
     <h2>Celebrity Landing Page</h2>
     <ol>
-      @catalogEntry("Landing/single_celebrity", "Celebrity landing - male")
+      @catalogEntry("Landing/single_celebrity", "Celebrity landing - male")      
       @catalogEntry("Landing/single_celebrity?publicName=Mia+Hamm&casualName=Mia&isMale=0", "Celebrity landing - female")
     </ol>
     <h2>Egraph Page</h2>

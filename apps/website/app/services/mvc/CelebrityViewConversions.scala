@@ -62,7 +62,8 @@ class CelebrityViewConversions(celeb: Celebrity) {
         name = publicName,
         secondaryText = celeb.roleDescription,
         imageUrl = mastheadImageUrl,
-        storefrontUrl = reverse(getStorefrontChoosePhotoTiled(urlSlug)).url
+        storefrontUrl = reverse(getStorefrontChoosePhotoTiled(urlSlug)).url,
+        hasInventoryRemaining = !celeb.getActiveProductsWithInventoryRemaining().isEmpty
       )
     }
   }

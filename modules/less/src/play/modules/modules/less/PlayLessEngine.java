@@ -55,11 +55,11 @@ public class PlayLessEngine {
     }
 
     public String getEtag(File lessFile) {
-        String filenameToEtagKey = lastModifiedCacheKeyForFile(lessFile);
+        String filenameToEtagKey = etagCacheKeyForFile(lessFile);
         String cachedEtagOrNull = filenameToEtag.get(filenameToEtagKey);
 
         String etag;
-        if (cachedEtagOrNull != null) {
+        if (useEternalCache && cachedEtagOrNull != null) {
             etag = cachedEtagOrNull;
         } else {
             String css = this.get(lessFile);
@@ -70,8 +70,8 @@ public class PlayLessEngine {
         return "\"" + etag + "\"";
     }
 
-    private String lastModifiedCacheKeyForFile(File lessFile) {
-        return "less_last_modified_" + lessFile.getPath();
+    private String etagCacheKeyForFile(File lessFile) {
+        return "less_etag_" + lessFile.getPath();
     }
 
     // TODO: Maybe prevent infinite looping here, in case of an import loop?
