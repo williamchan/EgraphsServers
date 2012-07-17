@@ -18,9 +18,13 @@
 
       @for(star <- starRow) {
         <article class="span3">
-
           <figure>
-            <a href="@star.storefrontUrl"><img src="@star.imageUrl" alt="@star.name" /></a>
+            @if(!star.hasInventoryRemaining) {
+              <div class="ribbon simple">Sold out</div>
+            }
+            <a class="glowborder" href="@star.storefrontUrl" >
+              <img src="@star.imageUrl" alt="@star.name" />              
+            </a>
           </figure>
 
           <h4><a href="@star.storefrontUrl">@star.name &rsaquo;</a></h4>

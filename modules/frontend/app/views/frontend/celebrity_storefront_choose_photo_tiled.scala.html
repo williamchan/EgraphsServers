@@ -24,6 +24,10 @@
 @import frontend.formatting.MoneyFormatting.Conversions._
 @import frontend.formatting.DateFormatting.Conversions._
 
+@productLink(product: models.frontend.storefront.ChoosePhotoTileProduct) = {
+  @if(product.quantityRemaining > 0) {@product.targetUrl} else {/faq/#how-many}
+}
+
 @photoSection = {
   <section class="wrapper" role="main">
 
@@ -35,18 +39,21 @@
 
         <!-- List all the products -->
         @for((product, productNum) <- products.zipWithIndex) {
-          <article>
 
-            <div class="thumb">
+          <article>            
+            <div class="thumb">              
+              <a class="glowborder" href="@productLink(product)">
+                <img src="@product.imageUrl" alt="@product.name" />                
+              </a>
+              
+            </div>            
 
-              <a href="@product.targetUrl"><img src="@product.imageUrl" alt="@product.name" /></a>
-
-            </div>
-
-            <h2><a href="@product.targetUrl">@product.name &raquo;</a></h2>
+            <h2><a href="@productLink(product)">@product.name &raquo;</a></h2>
 
             <p class="series">
-              @if(product.quantityRemaining > 0){ Available } else { Sold Out! }
+              @if(product.quantityRemaining > 0){ Available } else { 
+                <a href="/faq#how-many">Sold Out!</a>
+              }
             </p>
 
             <p class="price">@product.price.formatSimply</p>

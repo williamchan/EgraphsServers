@@ -58,11 +58,17 @@ class CelebrityViewConversions(celeb: Celebrity) {
         .getSaved(AccessPolicy.Public)
         .url
 
+      val activeProductsAndInventory = celeb.getActiveProductsWithInventoryRemaining()
+      val purchaseableProducts = activeProductsAndInventory.filter { productAndCount =>
+        productAndCount._2 > 0
+      }
+
       FeaturedStar(
         name = publicName,
         secondaryText = celeb.roleDescription,
         imageUrl = mastheadImageUrl,
-        storefrontUrl = reverse(getStorefrontChoosePhotoTiled(urlSlug)).url
+        storefrontUrl = reverse(getStorefrontChoosePhotoTiled(urlSlug)).url,
+        hasInventoryRemaining = !purchaseableProducts.isEmpty
       )
     }
   }

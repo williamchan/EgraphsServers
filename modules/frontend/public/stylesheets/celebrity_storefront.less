@@ -213,30 +213,12 @@
 				float: left;
 				width: 27.3333%;
 				margin: 0 3% 20px 3%;
+				.glowborder-link-container();
 				
 				.thumb {
-					
 					margin-bottom: 10px;
-					
-					a {
-					
-						display: block;
-						margin-left: -5px;
-						border: 5px solid transparent;
-					
-						img { display: block; }
-					
-					}
-					
-					a:hover {
-						
-						border-color: @orange;
-						
-					}
-					
-					
 				}
-				
+
 				h2 {
 					
 					float: left;
@@ -244,10 +226,6 @@
 					font-size: 15px;
 					line-height: 1.25em;
 					margin-bottom: 0;
-					
-					a { color: @orange; }
-					
-					a:hover { color: @blue; }
 					
 				}
 				
@@ -967,4 +945,11 @@
 	
 	} // end .wrapper
 
+} // end @media(max-widthL 480px)
+@media(max-width: 320px) {
+	.mobile-steps .section-title h1 {
+		// iPhone screens in portrait aren't wide enough to fit the
+		// the extra breadcrumb that represents the currently selected.
+		display: none;
+	}
 }

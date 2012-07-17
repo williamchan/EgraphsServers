@@ -7,5 +7,6 @@ case class FeaturedStar(
   name: String,
   secondaryText: Option[String],
   imageUrl: String,
-  storefrontUrl: String
+  storefrontUrl: String,
+  hasInventoryRemaining: Boolean
 )
