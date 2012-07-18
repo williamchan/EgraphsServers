@@ -56,7 +56,7 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
 
       // Shoot out a welcome email
       dbSession.connected(TransactionReadCommitted) {
-        customer.sendNewCustomerEmail()
+        customer.sendNewCustomerEmail(verificationNeeded = true)
       }
 
       new Redirect(reverse(WebsiteControllers.getAccountSettings).url)
