@@ -69,14 +69,7 @@ function() {
       $(textSelector).keyup(
         function(e) {
           var characters_left = maxChars-$(this).val().length;
-          var display_text;
-          if(characters_left === 1) {
-            display_text = "1 character left"
-          } else {
-            display_text = characters_left + " characters left"
-          }
-
-          $(counterSelector).text(display_text);
+          $(counterSelector).text(characters_left);
         }
       );
     }
