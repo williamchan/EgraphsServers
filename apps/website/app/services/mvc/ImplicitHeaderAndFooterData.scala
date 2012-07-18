@@ -30,7 +30,7 @@ trait ImplicitHeaderAndFooterData {
   //
   private def getHeaderLoggedInStatus: Either[HeaderNotLoggedIn, HeaderLoggedIn] = {
     val headerLoggedInOption = getCustomerOption.map { customer =>
-      val url = WebsiteControllers.reverse(WebsiteControllers.getCustomerGalleryById(customer.id)).url
+      val url = WebsiteControllers.reverse(WebsiteControllers.getCustomerGalleryByUsername(customer.username)).url
 
       HeaderLoggedIn(
         name=customer.name,
