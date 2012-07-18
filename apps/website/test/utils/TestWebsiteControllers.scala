@@ -16,6 +16,7 @@ import play.mvc.Http.Request
 import play.test.FunctionalTest
 import services.AppConfig
 import services.mvc.StorefrontBreadcrumbData
+import services.cache.CacheFactory
 
 /**
  * Injectable version of AllWebsiteEndpoints with configurable session, flash,
@@ -45,11 +46,14 @@ case class TestWebsiteControllers @Inject()(
   fakeSession: Session = new Session(),
   fakeFlash: Flash = new Flash()
 )() extends Controller with AllWebsiteEndpoints {
-  val breadcrumbData = AppConfig.instance[StorefrontBreadcrumbData]
-  val checkPurchaseField = AppConfig.instance[PurchaseFormChecksFactory]
-  val purchaseFormFactory = AppConfig.instance[PurchaseFormFactory]
-  val formReaders = AppConfig.instance[FormReaders]
-  val formChecks = AppConfig.instance[FormChecks]
+  import AppConfig.instance
+  
+  val breadcrumbData = instance[StorefrontBreadcrumbData]
+  val checkPurchaseField = instance[PurchaseFormChecksFactory]
+  val purchaseFormFactory = instance[PurchaseFormFactory]
+  val formReaders = instance[FormReaders]
+  val formChecks = instance[FormChecks]
+  val cacheFactory = instance[CacheFactory]
   override def request = fakeRequest
   override def params = request.params
   override def session = fakeSession
