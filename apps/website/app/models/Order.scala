@@ -18,7 +18,6 @@ import scala.util.Random
 import java.util.Date
 import com.google.inject.Inject
 import java.text.SimpleDateFormat
-import play.Play
 import controllers.website.consumer.StorefrontChoosePhotoConsumerEndpoints
 
 case class OrderServices @Inject() (
@@ -37,7 +36,7 @@ case class OrderServices @Inject() (
 /**
  * Persistent entity representing the Orders made upon Products of our service
  */
-case class ShippingInfo(
+@Deprecated case class ShippingInfo(
   _printingOption: String = PrintingOption.DoNotPrint.name,
   shippingAddress: Option[String] = None
 )
@@ -61,7 +60,7 @@ case class Order(
   messageToCelebrity: Option[String] = None,
   requestedMessage: Option[String] = None,
   expectedDate: Option[Date] = None,
-  shippingInfo: ShippingInfo = ShippingInfo(),
+  @Deprecated shippingInfo: ShippingInfo = ShippingInfo(),
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: OrderServices = AppConfig.instance[OrderServices]
@@ -72,8 +71,8 @@ case class Order(
   with HasOrderReviewStatus[Order]
   with HasWrittenMessageRequest[Order]
 {
-  val _printingOption = shippingInfo._printingOption
-  val shippingAddress = shippingInfo.shippingAddress
+  @Deprecated val _printingOption = shippingInfo._printingOption
+  @Deprecated val shippingAddress = shippingInfo.shippingAddress
 
   //
   // Public methods
