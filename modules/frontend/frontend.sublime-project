@@ -16,5 +16,26 @@
   "build_systems": [{
     "name": "Refresh play",
     "cmd": ["${project_path}/build_through_play.sh"]
-  }]
+  }],
+
+  /* SublimeLinter settings.
+   * Paste into Preferences > Package Settings > SublimeLinter > Settings - User
+   * If you don't find that option, then use Package Control to install SublimeLinter.
+   */
+  "jshint_options":
+    {
+        "evil": true,
+        "regexdash": true,
+        "browser": true,
+        "wsh": true,
+        "trailing": true,
+        "latedef": true,
+        "undef": true,
+        "sub": true,
+        "predef": [
+            "define",
+            "require",
+            "$"
+         ]
+    }
 }
