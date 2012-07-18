@@ -45,7 +45,7 @@
         <section class="settings-group" id="personal-information">
           <h2>Personal Information</h2>
           @tags.ng.html.form_namevalue(model = "user.fullname", field={form.fullname}, label="Name")
-          @tags.ng.html.form_namevalue(model = "user.username", field={form.username}, label="Username", helper="Gallery Url egraphs.com/account/{{user.username}}")
+          @tags.ng.html.form_namevalue(model = "user.username", field={form.username}, label="Username", helper="egraphs.com/account/{{user.username}}")
           @tags.ng.html.form_email(model = "user.email", field={form.email}, label="Email")
           @tags.ng.html.form_pwchange(model = "user", oldField=form.oldPassword, newField=form.newPassword,
             confirmField=form.passwordConfirm)

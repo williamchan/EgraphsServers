@@ -1,4 +1,4 @@
-define(["Egraphs"],
+define(["Egraphs", "bootstrap/bootstrap-modal"],
   function (Egraphs) {
     var toc = $("#toc");
          var links = $(".toc-anchor");
@@ -13,7 +13,7 @@ define(["Egraphs"],
 
       link.addClass("selected");
       link.prev().removeClass("invisible");
-    }
+    };
 
     return {
        go: function() {
@@ -36,7 +36,8 @@ define(["Egraphs"],
           }
           //highlight the correct link when you reach the spot on the page.link_+pos
           var min = Number.MAX_VALUE;
-          var mLinkid;
+          var mLinkId;
+          var i;
           for(i in link_pos) {
             if(i - top < min) {
               min = top - i;
@@ -53,6 +54,6 @@ define(["Egraphs"],
 
 
       }
-    }
+    };
   }
 );

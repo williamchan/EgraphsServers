@@ -59,6 +59,9 @@ function(forms, Egraphs) {
       
       // hide message
       $('#message-options button:not(:eq(0))').click(function() { $('#egraph-message').slideUp(); });
+
+      forms.bindCounter("#egraph-message-text", "#egraph-message-count", Egraphs.page.egraphMessageLimit);
+      forms.bindCounter("#your-message", "#your-message-count", Egraphs.page.yourMessageLimit);
     }
   };
 });

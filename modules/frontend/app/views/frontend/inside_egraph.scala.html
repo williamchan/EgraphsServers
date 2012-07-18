@@ -4,6 +4,7 @@ headerData: models.frontend.header.HeaderData,
 footerData: models.frontend.footer.FooterData
 )
 @import views.frontend.Utils
+@import views.frontend.tags.html.physical_preview_modal
 @import models.frontend.contents._
 
 
@@ -18,7 +19,7 @@ footerData: models.frontend.footer.FooterData
         <img src='@asset("/public/images/contact-us.jpg")'/>
       </div>
     </div>
-
+    @physical_preview_modal()
     <div class="container">
         <div class="row-fluid">
           <div class="span4">
@@ -143,7 +144,11 @@ footerData: models.frontend.footer.FooterData
                 </li>
 
                 <li>
-                  <span class="emphasis">Purchase a high quality framed print</span>. We offer a service that enables fans to order a beautiful, framed egraph – with the certificate of authenticity – to be shipped anywhere in the country.
+                  <span class="emphasis">Purchase a high quality framed print</span>. We offer a service that enables fans to order a beautiful,
+                  <a data-toggle="modal" class="tip" href="#frame-preview" id="preview-shoutout">
+                    framed egraph
+                  </a>
+                   – with the certificate of authenticity – to be shipped anywhere in the country.
                 </li>
               </ol>
               <p>

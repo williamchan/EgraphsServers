@@ -39,26 +39,10 @@
 @import frontend.formatting.MoneyFormatting.Conversions._
 @import frontend.formatting.DateFormatting.Conversions._
 @import views.frontend.tags.html.storefront_breadcrumbs_responsive
+@import views.frontend.tags.html.physical_preview_modal
 @import views.frontend.tags
 
-@previewModal = {
-  <div class="modal hide" id="frame-preview">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal">×</button>
-      <h3>Example Framed Egraph</h3>
-    </div>
-    <div class="modal-body">
-      <img src='@asset("public/images/physical-preview.jpg")' alt="fpo-egraph-diagram" class="scale" />
-    </div>
-    <div class="modal-description">
-      Your framed egraph contains a high quality print, certificate of authenticity, and custom cut mat inside of
-      a 10” X 14” frame.
-    </div>
-    <div class="modal-footer">
-      <button data-dismiss="modal" class="button"><strong><em>Close</em></strong><span>&raquo;</span></button>
-    </div>
-  </div>
-}
+
 
 @baseBody = {
     <div id="content" class="top" role="main">
@@ -73,7 +57,7 @@
   				  <h1>Review Order</h1>
   				  <h2>@celebrityName | @productTitle</h2>
   				</header>
-                @previewModal
+                @physical_preview_modal()
   				<div class="review clearfix">
 
 	  				<figure>

@@ -56,7 +56,22 @@ function() {
             $this.attr('disabled', 'disabled');
         }
       });
+    },
+
+    /**
+     * Binds character counter to keyup
+     * @param selector for text input
+     * @param selector object representing the count
+     * @param max value of decreasing count
+     * @method updates an object with text counting the number of characters left in a text input.
+     **/
+    bindCounter: function(textSelector, counterSelector, maxChars) {
+      $(textSelector).keyup(
+        function(e) {
+          var characters_left = maxChars-$(this).val().length;
+          $(counterSelector).text(characters_left);
+        }
+      );
     }
-    
   };
 });

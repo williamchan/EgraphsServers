@@ -624,7 +624,7 @@ case class OrderAudioPrompt(private val audioPromptTemplate: String,
 
 object GalleryOrderFactory {
 
-  protected val dateFormat = new SimpleDateFormat("MMM dd, yyyy K:mma")
+  protected val dateFormat = new SimpleDateFormat("MMM dd, yyyy K:mma z")
 
   def makeFulfilledEgraphViewModel(orders: Iterable[(Order, Option[Egraph])], fbAppId: String) :
     Iterable[Option[FulfilledEgraphViewModel]] = {

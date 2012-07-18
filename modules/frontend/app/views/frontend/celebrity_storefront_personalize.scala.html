@@ -1,5 +1,5 @@
 @(form: models.frontend.storefront.PersonalizeForm,
-writtenMessageCharacterLimit:Int,
+  writtenMessageCharacterLimit:Int,
   messageToCelebrityCharacterLimit:Int,
   guaranteedDelivery: java.util.Date,
   orderSummary: models.frontend.storefront.StorefrontOrderSummary,
@@ -15,6 +15,10 @@ writtenMessageCharacterLimit:Int,
 
 @{/** Renders the personalize page in the celebrity storefront.
 
+      writtenMessageCharacterLimit - the maximum number of characters to
+        request for the celebrity to write.
+      messageToCelebrityCharacterLimit - the maximum number of characters
+        a customer can write to a celebrity.
       form - the models.frontend.storefront.PersonalizeForm to render
       guaranteedDelivery - the date by which the digital product is guaranteed to be delivered
       orderSummary - brief summary for the order up until this point.
@@ -32,6 +36,8 @@ writtenMessageCharacterLimit:Int,
 @headJs = {
   Egraphs.page.celeb = {name: "@orderSummary.celebrityName"};
   Egraphs.page.isGift = @form.isGift.value.getOrElse(false);
+	Egraphs.page.egraphMessageLimit = @writtenMessageCharacterLimit;
+  Egraphs.page.yourMessageLimit = @messageToCelebrityCharacterLimit;
 }
 
 @baseBody = {
@@ -161,9 +167,12 @@ writtenMessageCharacterLimit:Int,
 	      				                    name="@form.messageText.name"
 	      				                    rows="8"
 	      				                    cols="1"
-                                            maxlength="60">@form.messageText.value</textarea>
-	      				          <p class="align-right"><small><a href="/inside-an-egraph#biometric" target="_blank" class="tip">How do I know it's really him?</a></small></p>
-	      				        </div>
+                                            maxlength="@writtenMessageCharacterLimit">@form.messageText.value</textarea>
+                                  <p class="character-count"><small id="egraph-message-count">@writtenMessageCharacterLimit</small><small> left</small></p>
+	      				          <p class="align-right"><small><a href="/inside-an-egraph#biometric" target="_blank" class="tip">How do I know it's really him?</a></small>
+                                  </p>
+
+                                  </div>
 	      				        <input type="hidden"
 	      				               id="message-type"
 	      				               name="@form.messageOption.name"
@@ -196,12 +205,14 @@ writtenMessageCharacterLimit:Int,
 	      				        <small>All messages are subject to approval.</small>
     				      		</label>
 	      				      @tags.html.bootstrap_input_field(form.noteToCelebrity) {
-	      				        <textarea maxlength="140" id="your-message"
+	      				        <textarea maxlength="@messageToCelebrityCharacterLimit" id="your-message"
 	      				                  name="@form.noteToCelebrity.name"
 								                  rows="8"
 	      				                  cols="1">@form.noteToCelebrity.value</textarea>
+                                <p class="character-count"><small id="your-message-count">@messageToCelebrityCharacterLimit</small><small> left</small></p>
 	      				      }
 	      				    </div>
+
 	    				    </div> <!-- end .field -->     				    
 	    				  
 	    				  </fieldset>
