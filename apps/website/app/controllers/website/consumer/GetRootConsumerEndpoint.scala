@@ -32,7 +32,7 @@ private[controllers] trait GetRootConsumerEndpoint extends ImplicitHeaderAndFoot
   def getRootConsumerEndpoint = controllerMethod() {
     val validStars = cacheFactory.applicationCache.cacheing("featured-stars", 30.seconds) {
       // Get the list of domain objects from the DB
-      val featuredCelebs = celebrityStore.getFeaturedPublishedCelebrities
+      val featuredCelebs = celebrityStore.getFeaturedPublishedCelebrities.toIndexedSeq
 
       // Turn the domain objects into view (FeaturedStars), filtering out the ones
       // that were invalid due to lack of a public name or url slug.
@@ -41,7 +41,7 @@ private[controllers] trait GetRootConsumerEndpoint extends ImplicitHeaderAndFoot
       }
 
       // Return an IndexedSeq, which is serializable to the cache
-      featuredCelebViewModels.toIndexedSeq
+      featuredStars
     }
 
     views.frontend.html.landing(featuredStars = validStars)
