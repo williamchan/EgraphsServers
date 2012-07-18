@@ -1,4 +1,4 @@
-define(["Egraphs"],
+define(["Egraphs", "bootstrap/bootstrap-modal"],
   function (Egraphs) {
     var toc = $("#toc");
          var links = $(".toc-anchor");
