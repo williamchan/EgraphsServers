@@ -35,6 +35,11 @@ writtenMessageCharacterLimit:Int,
 }
 
 @baseBody = {
+
+    <script>
+      Egraphs.page.egraphMessageLimit = @writtenMessageCharacterLimit;
+      Egraphs.page.yourMessageLimit = @messageToCelebrityCharacterLimit;
+    </script>
     <div id="content" class="top" role="main">
     
       <div id="main" class="sub">
@@ -161,9 +166,12 @@ writtenMessageCharacterLimit:Int,
 	      				                    name="@form.messageText.name"
 	      				                    rows="8"
 	      				                    cols="1"
-                                            maxlength="60">@form.messageText.value</textarea>
-	      				          <p class="align-right"><small><a href="/inside-an-egraph#biometric" target="_blank" class="tip">How do I know it's really him?</a></small></p>
-	      				        </div>
+                                            maxlength="@writtenMessageCharacterLimit">@form.messageText.value</textarea>
+                                  <p class="character-count"><small id="egraph-message-count">@writtenMessageCharacterLimit</small></p>
+	      				          <p class="align-right"><small><a href="/inside-an-egraph#biometric" target="_blank" class="tip">How do I know it's really him?</a></small>
+                                  </p>
+
+                                  </div>
 	      				        <input type="hidden"
 	      				               id="message-type"
 	      				               name="@form.messageOption.name"
@@ -196,12 +204,14 @@ writtenMessageCharacterLimit:Int,
 	      				        <small>All messages are subject to approval.</small>
     				      		</label>
 	      				      @tags.html.bootstrap_input_field(form.noteToCelebrity) {
-	      				        <textarea maxlength="140" id="your-message"
+	      				        <textarea maxlength="@messageToCelebrityCharacterLimit" id="your-message"
 	      				                  name="@form.noteToCelebrity.name"
 								                  rows="8"
 	      				                  cols="1">@form.noteToCelebrity.value</textarea>
+                                <p class="character-count"><small id="your-message-count">@messageToCelebrityCharacterLimit</small></p>
 	      				      }
 	      				    </div>
+
 	    				    </div> <!-- end .field -->     				    
 	    				  
 	    				  </fieldset>
