@@ -81,7 +81,7 @@ repositories:
              - provided -> *
     - scalatools:
          type: iBiblio
-         root: "http://scala-tools.org/repo-releases"
+         root: "https://oss.sonatype.org/content/groups/scala-tools"
          contains:
              - org.scalamock -> *
              - org.squeryl -> *
@@ -90,7 +90,7 @@ repositories:
              - org.specs2 -> specs2_2.8.1 1.5
     - scalatools-snapshots:
          type: iBiblio
-         root: "http://scala-tools.org/repo-snapshots"
+         root: "https://oss.sonatype.org/content/repositories/snapshots"
          contains:
              - org.specs2 -> specs2-scalaz-core_2.8.1
     - xuggle:
