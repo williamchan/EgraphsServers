@@ -32,14 +32,11 @@ writtenMessageCharacterLimit:Int,
 @headJs = {
   Egraphs.page.celeb = {name: "@orderSummary.celebrityName"};
   Egraphs.page.isGift = @form.isGift.value.getOrElse(false);
+  Egraphs.page.egraphMessageLimit = @writtenMessageCharacterLimit;
+  Egraphs.page.yourMessageLimit = @messageToCelebrityCharacterLimit;
 }
 
 @baseBody = {
-
-    <script>
-      Egraphs.page.egraphMessageLimit = @writtenMessageCharacterLimit;
-      Egraphs.page.yourMessageLimit = @messageToCelebrityCharacterLimit;
-    </script>
     <div id="content" class="top" role="main">
     
       <div id="main" class="sub">
@@ -167,7 +164,9 @@ writtenMessageCharacterLimit:Int,
 	      				                    rows="8"
 	      				                    cols="1"
                                             maxlength="@writtenMessageCharacterLimit">@form.messageText.value</textarea>
-                                  <p class="character-count"><small id="egraph-message-count">@writtenMessageCharacterLimit</small></p>
+                                  <p class="character-count" id="egraph-message-count">
+                                    @writtenMessageCharacterLimit characters left
+                                  </p>
 	      				          <p class="align-right"><small><a href="/inside-an-egraph#biometric" target="_blank" class="tip">How do I know it's really him?</a></small>
                                   </p>
 
@@ -208,8 +207,12 @@ writtenMessageCharacterLimit:Int,
 	      				                  name="@form.noteToCelebrity.name"
 								                  rows="8"
 	      				                  cols="1">@form.noteToCelebrity.value</textarea>
-                                <p class="character-count"><small id="your-message-count">@messageToCelebrityCharacterLimit</small></p>
-	      				      }
+
+                                  <p class="character-count" id="your-message-count">
+                                    @messageToCelebrityCharacterLimit characters left
+                                  </p>
+
+                                }
 	      				    </div>
 
 	    				    </div> <!-- end .field -->     				    
