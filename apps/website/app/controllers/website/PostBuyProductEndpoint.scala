@@ -262,6 +262,10 @@ object PostBuyProductEndpoint extends Logging {
 
       val savedOrder = order.save()
 
+      if (printingOption == PrintingOption.HighQualityPrint) {
+        PrintOrder(orderId = savedOrder.id, shippingAddress = shippingAddress.getOrElse("")).save()
+      }
+
       (savedOrder, buyer, recipient)
     }
   }
