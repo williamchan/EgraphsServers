@@ -2,13 +2,16 @@ package controllers.website.admin
 
 import play.mvc.Controller
 import services.http.{AdminRequestFilters, ControllerMethod}
-import services.blobs.Blobs
+import services.blobs.{AccessPolicy, Blobs}
 import services.db.Schema
 import models._
 import enums.EgraphState
 import org.squeryl.Query
 import org.squeryl.PrimitiveTypeMode._
-import services.{Dimensions, AppConfig}
+import services.AppConfig
+import services.graphics.Handwriting
+import services.report._
+import play.mvc.results.RenderBinary
 
 private[controllers] trait GetScriptAdminEndpoint {
   this: Controller =>
@@ -100,15 +103,38 @@ private[controllers] trait GetScriptAdminEndpoint {
           "I gave that EnrollmentBatch a kick"
         }
 
-        case "reset-signingScale" => {
-          val products: Query[(Product)] = from(schema.products)((p) => select(p))
-          for (product <- products) {
-            val image = product.photoImage
-            val imageDimensions = Dimensions(image.getWidth, image.getHeight)
-            val signingScaleDimensions = if (imageDimensions.isLandscape) Product.defaultLandscapeSigningScale else Product.defaultPortraitSigningScale
-            product.copy(signingScaleH = signingScaleDimensions.height, signingScaleW = signingScaleDimensions.width).save()
-          }
-          "signingScaleW and signingScaleH set for all products"
+        case "email-list-report" => {
+          val emailListReport = new EmailListReport(schema)
+          new RenderBinary(emailListReport.report(), emailListReport.reportName + ".csv")
+        }
+
+        case "inventory-batch-report" => {
+          val inventoryBatchReportService = new InventoryBatchReport(schema)
+          new RenderBinary(inventoryBatchReportService.report(), inventoryBatchReportService.reportName + ".csv")
+        }
+
+        case "order-report" => {
+          val orderReportService = new OrderReport(schema)
+          new RenderBinary(orderReportService.report(), orderReportService.reportName + ".csv")
+        }
+
+        case "physical-print-report" => {
+          val printOrderService = new PrintOrderReport(schema)
+          new RenderBinary(printOrderService.report(), printOrderService.reportName + ".csv")
+        }
+
+        case "generate-large-egraph" => {
+          val width = 2446 // width from Feeny
+          val egraphId = params.get("egraphId").toLong
+          val egraph = egraphStore.get(egraphId)
+          val order = egraph.order
+          val product = order.product
+          val rawSignedImage = egraph.image(product.photoImage)
+          val image = rawSignedImage
+            .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
+            .scaledToWidth(width)
+//          image.getSavedUrl(AccessPolicy.Public)
+          image.rasterized.getSavedUrl(AccessPolicy.Public)
         }
 
         case _ => "Not a valid action"
