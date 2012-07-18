@@ -1,5 +1,5 @@
 @(form: models.frontend.storefront.PersonalizeForm,
-writtenMessageCharacterLimit:Int,
+  writtenMessageCharacterLimit:Int,
   messageToCelebrityCharacterLimit:Int,
   guaranteedDelivery: java.util.Date,
   orderSummary: models.frontend.storefront.StorefrontOrderSummary,
@@ -15,6 +15,10 @@ writtenMessageCharacterLimit:Int,
 
 @{/** Renders the personalize page in the celebrity storefront.
 
+      writtenMessageCharacterLimit - the maximum number of characters to
+        request for the celebrity to write.
+      messageToCelebrityCharacterLimit - the maximum number of characters
+        a customer can write to a celebrity.
       form - the models.frontend.storefront.PersonalizeForm to render
       guaranteedDelivery - the date by which the digital product is guaranteed to be delivered
       orderSummary - brief summary for the order up until this point.
@@ -32,7 +36,11 @@ writtenMessageCharacterLimit:Int,
 @headJs = {
   Egraphs.page.celeb = {name: "@orderSummary.celebrityName"};
   Egraphs.page.isGift = @form.isGift.value.getOrElse(false);
+<<<<<<< HEAD
   Egraphs.page.egraphMessageLimit = @writtenMessageCharacterLimit;
+=======
+	Egraphs.page.egraphMessageLimit = @writtenMessageCharacterLimit;
+>>>>>>> A couple fixes from code review. EFE-155
   Egraphs.page.yourMessageLimit = @messageToCelebrityCharacterLimit;
 }
 
@@ -164,9 +172,7 @@ writtenMessageCharacterLimit:Int,
 	      				                    rows="8"
 	      				                    cols="1"
                                             maxlength="@writtenMessageCharacterLimit">@form.messageText.value</textarea>
-                                  <p class="character-count" id="egraph-message-count">
-                                    @writtenMessageCharacterLimit characters left
-                                  </p>
+                                  <p class="character-count"><small id="egraph-message-count">@writtenMessageCharacterLimit</small><small> left</small></p>
 	      				          <p class="align-right"><small><a href="/inside-an-egraph#biometric" target="_blank" class="tip">How do I know it's really him?</a></small>
                                   </p>
 
@@ -207,12 +213,8 @@ writtenMessageCharacterLimit:Int,
 	      				                  name="@form.noteToCelebrity.name"
 								                  rows="8"
 	      				                  cols="1">@form.noteToCelebrity.value</textarea>
-
-                                  <p class="character-count" id="your-message-count">
-                                    @messageToCelebrityCharacterLimit characters left
-                                  </p>
-
-                                }
+                                <p class="character-count"><small id="your-message-count">@messageToCelebrityCharacterLimit</small><small> left</small></p>
+	      				      }
 	      				    </div>
 
 	    				    </div> <!-- end .field -->     				    
