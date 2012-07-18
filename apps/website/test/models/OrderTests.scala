@@ -1,6 +1,6 @@
 package models
 
-import enums.{EnrollmentStatus, EgraphState, OrderReviewStatus, PaymentStatus}
+import enums._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.ShouldMatchers
 import play.test.UnitFlatSpec
@@ -152,6 +152,33 @@ class OrderTests extends UnitFlatSpec
     val rejectedOrder = order.rejectByCelebrity(order.product.celebrity, Some("It made me cry")).save()
     rejectedOrder.reviewStatus should be (OrderReviewStatus.RejectedByCelebrity)
     rejectedOrder.rejectionReason.get should be ("It made me cry")
+  }
+
+  "approveByAdmin" should "not overwrite shipping info" in {
+    val order = newEntity.copy(shippingInfo = ShippingInfo(shippingAddress = Some("My Home"), _printingOption = PrintingOption.HighQualityPrint.name)).save()
+    order.approveByAdmin(Administrator().save()).save()
+
+    val adminedOrder = orderStore.get(order.id)
+    adminedOrder._printingOption should be(PrintingOption.HighQualityPrint.name)
+    adminedOrder.shippingAddress should be(Some("My Home"))
+  }
+
+  "rejectByAdmin" should "not overwrite shipping info" in {
+    val order = newEntity.copy(shippingInfo = ShippingInfo(shippingAddress = Some("My Home"), _printingOption = PrintingOption.HighQualityPrint.name)).save()
+    order.rejectByAdmin(Administrator().save()).save()
+
+    val adminedOrder = orderStore.get(order.id)
+    adminedOrder._printingOption should be(PrintingOption.HighQualityPrint.name)
+    adminedOrder.shippingAddress should be(Some("My Home"))
+  }
+
+  "rejectByCelebrity" should "not overwrite shipping info" in {
+    val order = newEntity.withReviewStatus(OrderReviewStatus.ApprovedByAdmin).copy(shippingInfo = ShippingInfo(shippingAddress = Some("My Home"), _printingOption = PrintingOption.HighQualityPrint.name)).save()
+    order.rejectByCelebrity(order.product.celebrity, Some("It made me cry")).save()
+
+    val adminedOrder = orderStore.get(order.id)
+    adminedOrder._printingOption should be(PrintingOption.HighQualityPrint.name)
+    adminedOrder.shippingAddress should be(Some("My Home"))
   }
 
   "withChargeInfo" should "set the PaymentStatus, store stripe info, and create an associated CashTransaction" in {

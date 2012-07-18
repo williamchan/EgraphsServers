@@ -161,22 +161,26 @@ case class Order(
   def approveByAdmin(admin: Administrator): Order = {
     require(admin != null, "Must be approved by an Administrator")
     require(reviewStatus == OrderReviewStatus.PendingAdminReview, "Must be PendingAdminReview before approving by admin")
-    this.withReviewStatus(OrderReviewStatus.ApprovedByAdmin)
+    // TODO SER-98: How to keep _printingOption and shippingAddress intact without this hack?!
+    val omg = this.copy(shippingInfo = ShippingInfo(_printingOption = _printingOption, shippingAddress = shippingAddress))
+    omg.withReviewStatus(OrderReviewStatus.ApprovedByAdmin)
   }
 
   def rejectByAdmin(admin: Administrator, rejectionReason: Option[String] = None): Order = {
     require(admin != null, "Must be rejected by an Administrator")
     require(reviewStatus == OrderReviewStatus.PendingAdminReview, "Must be PendingAdminReview before rejecting by admin")
-    val order = this.withReviewStatus(OrderReviewStatus.RejectedByAdmin).copy(rejectionReason = rejectionReason)
-    order
+    // TODO SER-98: How to keep _printingOption and shippingAddress intact without this hack?!
+    val omg = this.copy(shippingInfo = ShippingInfo(_printingOption = _printingOption, shippingAddress = shippingAddress))
+    omg.withReviewStatus(OrderReviewStatus.RejectedByAdmin).copy(rejectionReason = rejectionReason)
   }
 
   def rejectByCelebrity(celebrity: Celebrity, rejectionReason: Option[String] = None): Order = {
     require(celebrity != null, "Must be rejected by Celebrity associated with this Order")
     require(celebrity.id == product.celebrityId, "Must be rejected by Celebrity associated with this Order")
     require(reviewStatus == OrderReviewStatus.ApprovedByAdmin, "Must be ApprovedByAdmin before rejecting by celebrity")
-    val order = this.withReviewStatus(OrderReviewStatus.RejectedByCelebrity).copy(rejectionReason = rejectionReason)
-    order
+    // TODO SER-98: How to keep _printingOption and shippingAddress intact without this hack?!
+    val omg = this.copy(shippingInfo = ShippingInfo(_printingOption = _printingOption, shippingAddress = shippingAddress))
+    omg.withReviewStatus(OrderReviewStatus.RejectedByCelebrity).copy(rejectionReason = rejectionReason)
   }
 
   def sendEgraphSignedMail() {
