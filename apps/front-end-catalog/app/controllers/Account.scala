@@ -227,7 +227,7 @@ object AccountSettingsFormFactory {
   def default : AccountSettingsForm = {
     AccountSettingsForm(
       fullname = Field(name = "fullname", values = List("Will Chan")),
-      username = Field(name = "username", values = List("willchan")),
+      username = Field(name = "username", values = List("willchan.m.odell")),
       email = Field(name = "email", values = List("will@egraphs.com")),
       oldPassword = Field(name = "oldPassword"),
       newPassword = Field(name = "newPassword"),

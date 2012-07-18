@@ -2,8 +2,8 @@
 
 <a id="@field.name-display" class="row-settings edit row-fluid @field.ifError {none}">
   <span class="span3 row-label">@label</span>
-  <span class="span4 setting-val">{{@model}}</span>
-  <span class="span3 help-inline">@helper</span>
+  <span class="span3 setting-val">{{@model}}</span>
+  <span class="span4 help-inline">@Html(helper)</span>
   <span class="span2 action">
     <i class="icon-pencil"></i> Edit
   </span>
@@ -14,11 +14,11 @@
   <span class="span4">
     <input ng-model="@model" name="@field.name" type="@inputType"/>
   </span>
-  <span class="span4">
+  <span class="span3">
     @form_error(field)
   </span>
 
-  <span class="span1 action">
+  <span class="span2 action">
     @form_cancel(model, field.name)
   </span>
 </div>
