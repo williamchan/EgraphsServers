@@ -112,12 +112,12 @@ case class Customer(
     if (verificationNeeded){
       val verifyPasswordUrl = WebsiteControllers.reverse(WebsiteControllers.getVerifyAccount()).url + "?email=" + account.email + "&secretKey=" +
         account.resetPasswordKey.get
-      email.setHtmlMsg(frontend.html.email_account_verification(
+      email.setHtmlMsg(views.frontend.html.email_account_verification(
           verifyPasswordUrl = verifyPasswordUrl,
           emailLogoSrc = emailLogoSrc,
           emailFacebookSrc = emailFacebookSrc,
           emailTwitterSrc = emailTwitterSrc
-        )
+        ).toString()
       )
       email.setTextMsg(views.frontend.html.email_account_verification_text(verifyPasswordUrl).toString())
     } else {
@@ -125,7 +125,7 @@ case class Customer(
           emailLogoSrc = emailLogoSrc,
           emailFacebookSrc = emailFacebookSrc,
           emailTwitterSrc = emailTwitterSrc
-        )
+        ).toString()
       )
       email.setTextMsg(views.frontend.html.email_account_confirmation_text.toString())
     }
