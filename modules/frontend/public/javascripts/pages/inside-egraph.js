@@ -37,7 +37,8 @@ define(["Egraphs", "bootstrap/bootstrap-modal"],
           //highlight the correct link when you reach the spot on the page.link_+pos
           var min = Number.MAX_VALUE;
           var mLinkId;
-          for(var i in link_pos) {
+          var i;
+          for(i in link_pos) {
             if(i - top < min) {
               min = top - i;
               mLinkId = $(link_pos[i]).attr('id');
