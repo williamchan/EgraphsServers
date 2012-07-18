@@ -18,7 +18,6 @@ import scala.util.Random
 import java.util.Date
 import com.google.inject.Inject
 import java.text.SimpleDateFormat
-import play.Play
 import controllers.website.consumer.StorefrontChoosePhotoConsumerEndpoints
 
 case class OrderServices @Inject() (
@@ -37,7 +36,7 @@ case class OrderServices @Inject() (
 /**
  * Persistent entity representing the Orders made upon Products of our service
  */
-case class ShippingInfo(
+@Deprecated case class ShippingInfo(
   _printingOption: String = PrintingOption.DoNotPrint.name,
   shippingAddress: Option[String] = None
 )
@@ -61,7 +60,7 @@ case class Order(
   messageToCelebrity: Option[String] = None,
   requestedMessage: Option[String] = None,
   expectedDate: Option[Date] = None,
-  shippingInfo: ShippingInfo = ShippingInfo(),
+  @Deprecated shippingInfo: ShippingInfo = ShippingInfo(),
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: OrderServices = AppConfig.instance[OrderServices]
@@ -72,8 +71,8 @@ case class Order(
   with HasOrderReviewStatus[Order]
   with HasWrittenMessageRequest[Order]
 {
-  val _printingOption = shippingInfo._printingOption
-  val shippingAddress = shippingInfo.shippingAddress
+  @Deprecated val _printingOption = shippingInfo._printingOption
+  @Deprecated val shippingAddress = shippingInfo.shippingAddress
 
   //
   // Public methods
@@ -161,22 +160,26 @@ case class Order(
   def approveByAdmin(admin: Administrator): Order = {
     require(admin != null, "Must be approved by an Administrator")
     require(reviewStatus == OrderReviewStatus.PendingAdminReview, "Must be PendingAdminReview before approving by admin")
-    this.withReviewStatus(OrderReviewStatus.ApprovedByAdmin)
+    // TODO SER-98: How to keep _printingOption and shippingAddress intact without this hack?!
+    val omg = this.copy(shippingInfo = ShippingInfo(_printingOption = _printingOption, shippingAddress = shippingAddress))
+    omg.withReviewStatus(OrderReviewStatus.ApprovedByAdmin)
   }
 
   def rejectByAdmin(admin: Administrator, rejectionReason: Option[String] = None): Order = {
     require(admin != null, "Must be rejected by an Administrator")
     require(reviewStatus == OrderReviewStatus.PendingAdminReview, "Must be PendingAdminReview before rejecting by admin")
-    val order = this.withReviewStatus(OrderReviewStatus.RejectedByAdmin).copy(rejectionReason = rejectionReason)
-    order
+    // TODO SER-98: How to keep _printingOption and shippingAddress intact without this hack?!
+    val omg = this.copy(shippingInfo = ShippingInfo(_printingOption = _printingOption, shippingAddress = shippingAddress))
+    omg.withReviewStatus(OrderReviewStatus.RejectedByAdmin).copy(rejectionReason = rejectionReason)
   }
 
   def rejectByCelebrity(celebrity: Celebrity, rejectionReason: Option[String] = None): Order = {
     require(celebrity != null, "Must be rejected by Celebrity associated with this Order")
     require(celebrity.id == product.celebrityId, "Must be rejected by Celebrity associated with this Order")
     require(reviewStatus == OrderReviewStatus.ApprovedByAdmin, "Must be ApprovedByAdmin before rejecting by celebrity")
-    val order = this.withReviewStatus(OrderReviewStatus.RejectedByCelebrity).copy(rejectionReason = rejectionReason)
-    order
+    // TODO SER-98: How to keep _printingOption and shippingAddress intact without this hack?!
+    val omg = this.copy(shippingInfo = ShippingInfo(_printingOption = _printingOption, shippingAddress = shippingAddress))
+    omg.withReviewStatus(OrderReviewStatus.RejectedByCelebrity).copy(rejectionReason = rejectionReason)
   }
 
   def sendEgraphSignedMail() {

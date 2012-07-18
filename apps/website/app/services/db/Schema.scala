@@ -122,6 +122,15 @@ class Schema @Inject()(
   recipientCustomerToOrders.foreignKeyDeclaration.constrainReference(onDelete cascade)
 
   //
+  // PrintOrder
+  //
+  val printOrders = table[PrintOrder]
+  on(printOrders)(printOrder => declare(printOrder.shippingAddress is (dbType("varchar(255)"))))
+  val orderToPrintOrders = oneToManyRelation(orders, printOrders)
+    .via((order, printOrder) => order.id === printOrder.orderId)
+  orderToPrintOrders.foreignKeyDeclaration.constrainReference(onDelete cascade)
+
+  //
   // Egraphs
   //
   val egraphs = table[Egraph]
@@ -403,6 +412,7 @@ class Schema @Inject()(
       factoryFor(inventoryBatches) is InventoryBatch(services = injector.instance[InventoryBatchServices]),
       factoryFor(inventoryBatchProducts) is InventoryBatchProduct(services = injector.instance[InventoryBatchProductServices]),
       factoryFor(orders) is Order(services = injector.instance[OrderServices]),
+      factoryFor(printOrders) is PrintOrder(services = injector.instance[PrintOrderServices]),
       factoryFor(products) is Product(services = injector.instance[ProductServices]),
       factoryFor(vbgAudioCheckTable) is VBGAudioCheck(services = injector.instance[VBGAudioCheckServices]),
       factoryFor(vbgEnrollUserTable) is VBGEnrollUser(services = injector.instance[VBGEnrollUserServices]),
