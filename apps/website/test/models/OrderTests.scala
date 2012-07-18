@@ -156,7 +156,11 @@ class OrderTests extends UnitFlatSpec
 
   "approveByAdmin" should "not overwrite shipping info" in {
     val order = newEntity.copy(shippingInfo = ShippingInfo(shippingAddress = Some("My Home"), _printingOption = PrintingOption.HighQualityPrint.name)).save()
-    order.approveByAdmin(Administrator().save()).save()
+    val reloadedOrder = orderStore.get(order.id)
+    reloadedOrder._printingOption should be(PrintingOption.HighQualityPrint.name)
+    reloadedOrder.shippingAddress should be(Some("My Home"))
+    reloadedOrder.shippingInfo should be(ShippingInfo()) // Why is this true?!?!?!?!?!?!
+    reloadedOrder.approveByAdmin(Administrator().save()).save()
 
     val adminedOrder = orderStore.get(order.id)
     adminedOrder._printingOption should be(PrintingOption.HighQualityPrint.name)
@@ -165,7 +169,10 @@ class OrderTests extends UnitFlatSpec
 
   "rejectByAdmin" should "not overwrite shipping info" in {
     val order = newEntity.copy(shippingInfo = ShippingInfo(shippingAddress = Some("My Home"), _printingOption = PrintingOption.HighQualityPrint.name)).save()
-    order.rejectByAdmin(Administrator().save()).save()
+    val reloadedOrder = orderStore.get(order.id)
+    reloadedOrder._printingOption should be(PrintingOption.HighQualityPrint.name)
+    reloadedOrder.shippingAddress should be(Some("My Home"))
+    reloadedOrder.rejectByAdmin(Administrator().save()).save()
 
     val adminedOrder = orderStore.get(order.id)
     adminedOrder._printingOption should be(PrintingOption.HighQualityPrint.name)
@@ -174,7 +181,10 @@ class OrderTests extends UnitFlatSpec
 
   "rejectByCelebrity" should "not overwrite shipping info" in {
     val order = newEntity.withReviewStatus(OrderReviewStatus.ApprovedByAdmin).copy(shippingInfo = ShippingInfo(shippingAddress = Some("My Home"), _printingOption = PrintingOption.HighQualityPrint.name)).save()
-    order.rejectByCelebrity(order.product.celebrity, Some("It made me cry")).save()
+    val reloadedOrder = orderStore.get(order.id)
+    reloadedOrder._printingOption should be(PrintingOption.HighQualityPrint.name)
+    reloadedOrder.shippingAddress should be(Some("My Home"))
+    reloadedOrder.rejectByCelebrity(order.product.celebrity, Some("It made me cry")).save()
 
     val adminedOrder = orderStore.get(order.id)
     adminedOrder._printingOption should be(PrintingOption.HighQualityPrint.name)
