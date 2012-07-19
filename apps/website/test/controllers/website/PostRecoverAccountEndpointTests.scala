@@ -7,12 +7,13 @@ import play.test.FunctionalTest
 import FunctionalTest._
 import services.db.TransactionSerializable
 import utils.TestData
+import controllers.WebsiteControllers
 
 class PostRecoverAccountEndpointTests extends EgraphsFunctionalTest {
-
+  val url = WebsiteControllers.reverse(WebsiteControllers.postRecoverAccount()).url
   @Test
   def testEmailValidation() {
-    val response = POST("/account/recover", getPostStrParams(email = ""))
+    val response = POST(url, getPostStrParams(email = ""))
     assertStatus(404, response)
   }
 
@@ -23,7 +24,7 @@ class PostRecoverAccountEndpointTests extends EgraphsFunctionalTest {
       customer.account
     }
 
-    val response = POST("/account/recover", getPostStrParams(email = account.email))
+    val response = POST(url, getPostStrParams(email = account.email))
     assertFalse(getPlayFlashCookie(response).contains("error"))
   }
 

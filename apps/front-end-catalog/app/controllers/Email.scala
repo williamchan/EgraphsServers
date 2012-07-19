@@ -52,4 +52,15 @@ object Email extends Controller {
       emailTwitterSrc = emailTwitterSrc
     )
   }
+
+  def confirm = {
+    val emailLogoSrc = "../public/images/email-logo.jpg"
+    val emailFacebookSrc = "../public/images/email-facebook.jpg"
+    val emailTwitterSrc = "../public/images/email-twitter.jpg"
+    views.frontend.html.email_account_confirmation(
+      emailLogoSrc = emailLogoSrc,
+      emailFacebookSrc = emailFacebookSrc,
+      emailTwitterSrc = emailTwitterSrc
+    )
+  }
 }

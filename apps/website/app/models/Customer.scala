@@ -12,6 +12,7 @@ import services.http.PlayConfig
 import java.util.Properties
 import controllers.website.GetResetPasswordEndpoint
 import play.Play
+import controllers.WebsiteControllers
 
 /** Services used by each instance of Customer */
 case class CustomerServices @Inject() (accountStore: AccountStore,
@@ -95,7 +96,7 @@ case class Customer(
   /**
    * Sends a welcome email to the customer. Requires a dbSession so that this customer can get its Account.
    */
-  def sendNewCustomerEmail() {
+  def sendNewCustomerEmail(verificationNeeded: Boolean = false) {
     val email = new HtmlEmail()
     email.setFrom("noreply@egraphs.com")
     email.addReplyTo("noreply@egraphs.com")
@@ -107,15 +108,28 @@ case class Customer(
     val emailLogoSrc = ""
     val emailFacebookSrc = ""
     val emailTwitterSrc = ""
-    val verifyPasswordUrl = GetResetPasswordEndpoint.absoluteUrl(account.email, account.resetPasswordKey.get).url
-    val html = views.frontend.html.email_account_verification(
-      verifyPasswordUrl = verifyPasswordUrl,
-      emailLogoSrc = emailLogoSrc,
-      emailFacebookSrc = emailFacebookSrc,
-      emailTwitterSrc = emailTwitterSrc
-    )
-    email.setHtmlMsg(html.toString())
-    email.setTextMsg(views.frontend.html.email_account_verification_text(verifyPasswordUrl).toString())
+
+    if (verificationNeeded){
+      val verifyPasswordUrl = WebsiteControllers.reverse(WebsiteControllers.getVerifyAccount()).url + "?email=" + account.email + "&secretKey=" +
+        account.resetPasswordKey.get
+      email.setHtmlMsg(views.frontend.html.email_account_verification(
+          verifyPasswordUrl = verifyPasswordUrl,
+          emailLogoSrc = emailLogoSrc,
+          emailFacebookSrc = emailFacebookSrc,
+          emailTwitterSrc = emailTwitterSrc
+        ).toString()
+      )
+      email.setTextMsg(views.frontend.html.email_account_verification_text(verifyPasswordUrl).toString())
+    } else {
+      email.setHtmlMsg(views.frontend.html.email_account_confirmation(
+          emailLogoSrc = emailLogoSrc,
+          emailFacebookSrc = emailFacebookSrc,
+          emailTwitterSrc = emailTwitterSrc
+        ).toString()
+      )
+      email.setTextMsg(views.frontend.html.email_account_confirmation_text.toString())
+    }
+
     services.mail.send(email)
   }
 
