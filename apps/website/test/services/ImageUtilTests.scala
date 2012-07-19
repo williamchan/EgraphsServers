@@ -1,13 +1,11 @@
 package services
 
-import org.scalatest.matchers.ShouldMatchers
-import play.test.UnitFlatSpec
 import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
 import play.Play
+import utils.EgraphsUnitTest
 
-class ImageUtilTests extends UnitFlatSpec
-with ShouldMatchers {
+class ImageUtilTests extends EgraphsUnitTest {
   def imageUtil = AppConfig.instance[ImageUtil]
 
   /*

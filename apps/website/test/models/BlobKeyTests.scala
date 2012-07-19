@@ -1,17 +1,12 @@
 package models
 
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.matchers.ShouldMatchers
-import play.test.UnitFlatSpec
 import services.AppConfig.instance
 import utils._
 
-class BlobKeyTests extends UnitFlatSpec
-  with ShouldMatchers
-  with BeforeAndAfterEach
+class BlobKeyTests extends EgraphsUnitTest
+  with ClearsDatabaseAndValidationBefore
   with SavingEntityTests[BlobKey]
   with CreatedUpdatedEntityTests[BlobKey]
-  with ClearsDatabaseAndValidationBefore
   with DBTransactionPerTest
 {
 

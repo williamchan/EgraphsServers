@@ -1,7 +1,6 @@
 package services
 
 import utils.EgraphsUnitTest
-import org.stringtemplate.v4.STGroup
 
 class TemplateEngineTests extends EgraphsUnitTest {
   

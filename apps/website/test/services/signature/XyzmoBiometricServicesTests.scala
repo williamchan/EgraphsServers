@@ -2,10 +2,7 @@ package services.signature
 
 import models._
 import models.xyzmo._
-import org.scalatest.matchers.ShouldMatchers
 import play.Play
-import play.test.UnitFlatSpec
-import org.scalatest.BeforeAndAfterEach
 import utils._
 import com.xyzmo.wwww.biometricserver.{WebServiceBiometricPartStub, WebServiceUserAndProfileStub}
 
@@ -14,11 +11,10 @@ import com.xyzmo.wwww.biometricserver.{WebServiceBiometricPartStub, WebServiceUs
  * They will clobber live data because we use Celebrity IDs as userIds on Xyzmo.
  * Instead, XyzmoTestBiometricServices exists for automated tests of live Xyzmo server.
  */
-class XyzmoBiometricServicesTests extends UnitFlatSpec
-with ShouldMatchers
-with BeforeAndAfterEach
-with ClearsDatabaseAndValidationBefore
-with DBTransactionPerTest {
+class XyzmoBiometricServicesTests extends EgraphsUnitTest
+  with ClearsDatabaseAndValidationBefore
+  with DBTransactionPerTest
+{
 
   "getSignatureDataContainerFromJSON" should "translate JSON signature to Xyzmo SignatureDataContainer" in {
     val signatureStr = "{\"x\": [[67.000000,95.148125,121.414230,151.011597,184.484879,220.291779,255.567886,286.501556,309.481903,323.661255,330.677368,329.015503,314.300873,286.385437,250.558655,217.980347,193.512695,176.263016,165.300140,159.014847,157.115494,160.330505,169.060867,178.425415,184.570480,187.983826,189.809998,191.832565,195.283707,199.417374,204.345871,209.509872,213.854752,217.919907,221.642914,224.634918,227.225143,230.400024,234.414795,239.085846,243.766159,248.264023,253.522644,260.599274,271.696045,288.132111,308.927979,333.386017,359.410614,382.158661,396.454376,402.097565,400.621460,388.776703,364.600494,333.177917,305.941589,287.241943,278.034637,279.602814,290.141541,301.486359,309.847778,315.732635,319.328156,321.800903,323.903931,325.749268,327.481232,329.846252,331.954407,333.949432,335.725739,337.252045,339.370941,342.000000,345.000000]]," +

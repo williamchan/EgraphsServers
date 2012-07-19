@@ -1,14 +1,10 @@
 package services
 
-import org.scalatest.matchers.ShouldMatchers
-import play.test.UnitFlatSpec
-import org.scalatest.BeforeAndAfterEach
-import utils.{TestHelpers, TestData, DBTransactionPerTest, ClearsDatabaseAndValidationBefore}
+import utils._
 import models.CelebrityStore
+import scala.Some
 
-class UtilsTests extends UnitFlatSpec
-  with ShouldMatchers
-  with BeforeAndAfterEach
+class UtilsTests extends EgraphsUnitTest
   with ClearsDatabaseAndValidationBefore
   with DBTransactionPerTest
 {

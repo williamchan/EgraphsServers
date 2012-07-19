@@ -1,14 +1,12 @@
 package services
 
 import blobs.Blobs
-import play.test.UnitFlatSpec
-import org.scalatest.matchers.ShouldMatchers
 import javax.sound.sampled.{AudioSystem, AudioFormat}
 import java.io._
 import play.Play
+import utils.EgraphsUnitTest
 
-class SampleRateConverterTests extends UnitFlatSpec
-with ShouldMatchers {
+class SampleRateConverterTests extends EgraphsUnitTest {
 
   val blobs = AppConfig.instance[Blobs]
 

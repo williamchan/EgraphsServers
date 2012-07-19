@@ -1,19 +1,14 @@
 package models
 
 import enums.AdminRole
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.matchers.ShouldMatchers
-import play.test.UnitFlatSpec
 import services.AppConfig
 import services.Time
 import utils._
 
-class AdministratorTests extends UnitFlatSpec
-  with ShouldMatchers
-  with BeforeAndAfterEach
+class AdministratorTests extends EgraphsUnitTest
+  with ClearsDatabaseAndValidationBefore
   with SavingEntityTests[Administrator]
   with CreatedUpdatedEntityTests[Administrator]
-  with ClearsDatabaseAndValidationBefore
   with DBTransactionPerTest
 {
   val adminStore = AppConfig.instance[AdministratorStore]

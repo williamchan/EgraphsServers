@@ -1,19 +1,14 @@
 package models.vbg
 
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.matchers.ShouldMatchers
-import play.test.UnitFlatSpec
 import utils._
 import services.AppConfig
 import models.{EnrollmentBatch, Celebrity}
 
-class VBGAudioCheckTests extends UnitFlatSpec
-with ShouldMatchers
-with BeforeAndAfterEach
-with SavingEntityTests[VBGAudioCheck]
-with CreatedUpdatedEntityTests[VBGAudioCheck]
-with ClearsDatabaseAndValidationBefore
-with DBTransactionPerTest {
+class VBGAudioCheckTests extends EgraphsUnitTest
+  with ClearsDatabaseAndValidationBefore
+  with SavingEntityTests[VBGAudioCheck]
+  with CreatedUpdatedEntityTests[VBGAudioCheck]
+  with DBTransactionPerTest {
   //
   // SavingEntityTests[VBGAudioCheck] methods
   //

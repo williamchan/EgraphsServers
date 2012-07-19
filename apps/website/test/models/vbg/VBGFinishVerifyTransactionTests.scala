@@ -1,19 +1,14 @@
 package models.vbg
 
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.matchers.ShouldMatchers
-import play.test.UnitFlatSpec
 import utils._
 import services.AppConfig
 import models.Egraph
 
-class VBGFinishVerifyTransactionTests extends UnitFlatSpec
-with ShouldMatchers
-with BeforeAndAfterEach
-with SavingEntityTests[VBGFinishVerifyTransaction]
-with CreatedUpdatedEntityTests[VBGFinishVerifyTransaction]
-with ClearsDatabaseAndValidationBefore
-with DBTransactionPerTest {
+class VBGFinishVerifyTransactionTests extends EgraphsUnitTest
+  with ClearsDatabaseAndValidationBefore
+  with SavingEntityTests[VBGFinishVerifyTransaction]
+  with CreatedUpdatedEntityTests[VBGFinishVerifyTransaction]
+  with DBTransactionPerTest {
   //
   // SavingEntityTests[VBGFinishVerifyTransaction] methods
   //

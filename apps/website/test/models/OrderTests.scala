@@ -1,9 +1,6 @@
 package models
 
 import enums._
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.matchers.ShouldMatchers
-import play.test.UnitFlatSpec
 import utils._
 import services.AppConfig
 import org.squeryl.PrimitiveTypeMode._
@@ -13,12 +10,10 @@ import models.CashTransaction.{PurchaseRefund, EgraphPurchase}
 import services.payment.{Charge, NiceCharge}
 import javax.mail.internet.InternetAddress
 
-class OrderTests extends UnitFlatSpec
-  with ShouldMatchers
-  with BeforeAndAfterEach
+class OrderTests extends EgraphsUnitTest
+  with ClearsDatabaseAndValidationBefore
   with SavingEntityTests[Order]
   with CreatedUpdatedEntityTests[Order]
-  with ClearsDatabaseAndValidationBefore
   with DBTransactionPerTest
 {
   private val schema = AppConfig.instance[Schema]

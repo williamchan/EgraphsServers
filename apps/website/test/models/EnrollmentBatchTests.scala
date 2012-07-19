@@ -1,19 +1,14 @@
 package models
 
 import enums.EnrollmentStatus
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.matchers.ShouldMatchers
-import play.test.UnitFlatSpec
 import utils._
 import services.AppConfig
 
-class EnrollmentBatchTests extends UnitFlatSpec
-with ShouldMatchers
-with BeforeAndAfterEach
-with SavingEntityTests[EnrollmentBatch]
-with CreatedUpdatedEntityTests[EnrollmentBatch]
-with ClearsDatabaseAndValidationBefore
-with DBTransactionPerTest {
+class EnrollmentBatchTests extends EgraphsUnitTest
+  with ClearsDatabaseAndValidationBefore
+  with SavingEntityTests[EnrollmentBatch]
+  with CreatedUpdatedEntityTests[EnrollmentBatch]
+  with DBTransactionPerTest {
 
   val store = AppConfig.instance[EnrollmentBatchStore]
   val celebStore = AppConfig.instance[CelebrityStore]

@@ -1,11 +1,9 @@
 package services.audio
 
-import play.test.UnitFlatSpec
-import org.scalatest.matchers.ShouldMatchers
-import utils.TestHelpers
+import utils.{EgraphsUnitTest, TestHelpers}
 import services.TempFile
 
-class AudioConverterTests extends UnitFlatSpec with ShouldMatchers {
+class AudioConverterTests extends EgraphsUnitTest {
 
   private val tempFilesId = "AudioConverterTests"
 

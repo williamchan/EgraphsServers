@@ -1,14 +1,13 @@
 package services.http
 
-import org.scalatest.matchers.ShouldMatchers
-import org.specs2.mock.Mockito
-import play.test.{FunctionalTest, UnitFlatSpec}
+import play.test.FunctionalTest
 import models._
 import enums.PublishedStatus
 import play.mvc.Http.Request
 import play.mvc.results.{Forbidden, NotFound, Ok}
+import utils.{ClearsDatabaseAndValidationBefore, EgraphsUnitTest}
 
-class CelebrityAccountRequestFiltersTests extends UnitFlatSpec with Mockito with ShouldMatchers {
+class CelebrityAccountRequestFiltersTests extends EgraphsUnitTest with ClearsDatabaseAndValidationBefore {
 
   private def niceAccountFilter(account: Account=mock[Account]) = {
     // Returns an AccountRequestFilter that always yields a particular account

@@ -1,6 +1,6 @@
 package services.http.forms
 
-import utils.{FunctionalTestUtils, EgraphsUnitTest}
+import utils.EgraphsUnitTest
 import services.AppConfig
 import play.test.FunctionalTest
 import play.mvc.Scope

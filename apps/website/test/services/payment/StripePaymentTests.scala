@@ -1,16 +1,9 @@
 package services.payment
 
-import org.scalatest.matchers.ShouldMatchers
-import play.test.UnitFlatSpec
-import org.scalatest.BeforeAndAfterEach
-import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationBefore}
+import utils.EgraphsUnitTest
 import services.AppConfig
 
-class StripePaymentTests extends UnitFlatSpec
-  with ShouldMatchers
-  with BeforeAndAfterEach
-  with ClearsDatabaseAndValidationBefore
-  with DBTransactionPerTest
+class StripePaymentTests extends EgraphsUnitTest
 {
   import services.Finance.TypeConversions._
 

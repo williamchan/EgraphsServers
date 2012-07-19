@@ -1,19 +1,14 @@
 package models.vbg
 
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.matchers.ShouldMatchers
-import play.test.UnitFlatSpec
 import utils._
 import services.AppConfig
 import models.{EnrollmentBatch, Celebrity}
 
-class VBGFinishEnrollTransactionTests extends UnitFlatSpec
-with ShouldMatchers
-with BeforeAndAfterEach
-with SavingEntityTests[VBGFinishEnrollTransaction]
-with CreatedUpdatedEntityTests[VBGFinishEnrollTransaction]
-with ClearsDatabaseAndValidationBefore
-with DBTransactionPerTest {
+class VBGFinishEnrollTransactionTests extends EgraphsUnitTest
+  with ClearsDatabaseAndValidationBefore
+  with SavingEntityTests[VBGFinishEnrollTransaction]
+  with CreatedUpdatedEntityTests[VBGFinishEnrollTransaction]
+  with DBTransactionPerTest {
   //
   // SavingEntityTests[VBGFinishEnrollTransaction] methods
   //

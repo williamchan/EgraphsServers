@@ -1,17 +1,9 @@
 package services
 
-import org.scalatest.matchers.ShouldMatchers
-import play.test.UnitFlatSpec
-import org.scalatest.BeforeAndAfterEach
-import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationBefore}
 import org.joda.money.CurrencyUnit
+import utils.EgraphsUnitTest
 
-class FinanceTests extends UnitFlatSpec
-  with ShouldMatchers
-  with BeforeAndAfterEach
-  with ClearsDatabaseAndValidationBefore
-  with DBTransactionPerTest
-{
+class FinanceTests extends EgraphsUnitTest {
   import Finance.TypeConversions._
 
   val amount: BigDecimal = 1000.51

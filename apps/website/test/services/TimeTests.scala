@@ -1,11 +1,10 @@
 package services
 
-import play.test.UnitFlatSpec
-import org.scalatest.matchers.ShouldMatchers
 import java.sql.Date
 import org.joda.time.DateTime
+import utils.EgraphsUnitTest
 
-class TimeTests extends UnitFlatSpec with ShouldMatchers {
+class TimeTests extends EgraphsUnitTest {
 
   "timestamp" should "convert Date string to timestamp" in {
     Time.timestamp("", Time.ipadDateFormat) should be(None)

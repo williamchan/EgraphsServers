@@ -5,10 +5,11 @@ import services.AppConfig
 import java.text.SimpleDateFormat
 import play.data.binding.types.DateBinder
 import models.{AccountAuthenticationError, Account, AccountStore}
-import services.db.TransactionSerializable
+import services.db.{DBSession, TransactionSerializable}
 
 class FormChecksTest extends EgraphsUnitTest {
   def check = AppConfig.instance[FormChecks]
+  private val db = AppConfig.instance[DBSession]
 
   "isInt" should "only accept integer strings and return them as Ints" in {
     check.isInt("1") should be (Right(1))

@@ -1,14 +1,9 @@
 package services.http
 
-import org.scalatest.matchers.ShouldMatchers
-import org.specs2.mock.Mockito
 import play.mvc.Scope
-import play.test.UnitFlatSpec
+import utils.EgraphsUnitTest
 
-class SafePlayParamsTests extends UnitFlatSpec
-  with ShouldMatchers
-  with Mockito
-{
+class SafePlayParamsTests extends EgraphsUnitTest {
   import SafePlayParams.Conversions._
 
   "getOption" should "turn empty string parameters into None" in {

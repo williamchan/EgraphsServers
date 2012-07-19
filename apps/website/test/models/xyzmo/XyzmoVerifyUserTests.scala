@@ -1,20 +1,15 @@
 package models.xyzmo
 
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.matchers.ShouldMatchers
-import play.test.UnitFlatSpec
 import utils._
 import services.AppConfig
 import com.xyzmo.wwww.biometricserver.WebServiceBiometricPartStub
 import models.Egraph
 
-class XyzmoVerifyUserTests extends UnitFlatSpec
-with ShouldMatchers
-with BeforeAndAfterEach
-with SavingEntityTests[XyzmoVerifyUser]
-with CreatedUpdatedEntityTests[XyzmoVerifyUser]
-with ClearsDatabaseAndValidationBefore
-with DBTransactionPerTest {
+class XyzmoVerifyUserTests extends EgraphsUnitTest
+  with ClearsDatabaseAndValidationBefore
+  with SavingEntityTests[XyzmoVerifyUser]
+  with CreatedUpdatedEntityTests[XyzmoVerifyUser]
+  with DBTransactionPerTest {
   //
   // SavingEntityTests[XyzmoVerifyUser] methods
   //

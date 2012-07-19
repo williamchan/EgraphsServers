@@ -10,7 +10,10 @@ import services.logging.Logging
 import services.AppConfig
 import java.sql.Connection
 
-class DBSessionTests extends EgraphsUnitTest with ClearsDatabaseAndValidationBefore with Logging {
+class DBSessionTests extends EgraphsUnitTest
+  with ClearsDatabaseAndValidationBefore
+  with Logging
+{
   def underTest: (DBSession, Connection) = {
     val connection = mock[Connection]
     (new DBSession(() => connection), connection)

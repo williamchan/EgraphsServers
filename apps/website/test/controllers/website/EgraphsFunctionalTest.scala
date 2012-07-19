@@ -12,8 +12,12 @@ import utils.TestData
 import org.junit.Assert._
 import services.http.forms.CustomerLoginForm
 import services.db.DBSession
+import org.scalatest.matchers.ShouldMatchers
 
-trait EgraphsFunctionalTest extends FunctionalTest with CleanDatabaseAfterEachTest {
+trait EgraphsFunctionalTest extends FunctionalTest
+  with CleanDatabaseAfterEachTest
+  with ShouldMatchers
+{
 
   protected val db = AppConfig.instance[DBSession]
 

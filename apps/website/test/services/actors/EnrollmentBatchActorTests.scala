@@ -1,23 +1,21 @@
 package services.actors
 
-import org.scalatest.matchers.ShouldMatchers
-import play.test.UnitFlatSpec
 import akka.actor.Actor
 import Actor._
 import services.db.{DBSession, TransactionSerializable}
 import services.AppConfig
-import utils.ClearsDatabaseAndValidationBefore
+import utils.{ClearsDatabaseAndValidationBefore, EgraphsUnitTest}
 import akka.util.TestKit
-import org.scalatest.BeforeAndAfterAll
 import actors.{ProcessEnrollmentBatchMessage, EnrollmentBatchActor}
 import models._
 import enums.EnrollmentStatus
+import org.scalatest.BeforeAndAfterAll
 
-class EnrollmentBatchActorTests extends UnitFlatSpec
-with ShouldMatchers
-with BeforeAndAfterAll
-with ClearsDatabaseAndValidationBefore
-with TestKit {
+class EnrollmentBatchActorTests extends EgraphsUnitTest
+  with ClearsDatabaseAndValidationBefore
+  with BeforeAndAfterAll
+  with TestKit
+{
 
   private val enrollmentBatchActor = actorOf(AppConfig.instance[EnrollmentBatchActor])
 

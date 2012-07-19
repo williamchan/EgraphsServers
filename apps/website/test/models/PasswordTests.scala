@@ -1,17 +1,15 @@
 package models
 
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.matchers.ShouldMatchers
 import play.data.validation.Validation
-import play.test.UnitFlatSpec
 import play.libs.Codec
+import utils.EgraphsUnitTest
+import org.scalatest.BeforeAndAfterEach
 
-class PasswordTests extends UnitFlatSpec
-  with ShouldMatchers
+class PasswordTests extends EgraphsUnitTest
   with BeforeAndAfterEach
 {
 
-  override def afterEach() {
+  override def beforeEach() {
     Validation.clear()
   }
 

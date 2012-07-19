@@ -3,10 +3,9 @@ package services.graphics
 import java.io.FileOutputStream
 import org.apache.commons.io.IOUtils
 import java.awt.BasicStroke
-import utils.{ClearsDatabaseAndValidationBefore, TestConstants, EgraphsUnitTest}
+import utils.{TestConstants, EgraphsUnitTest}
 
-
-class HandwritingTests extends EgraphsUnitTest with ClearsDatabaseAndValidationBefore {
+class HandwritingTests extends EgraphsUnitTest {
 
   "Handwriting" should "import test samples without exception" in {
     Handwriting(TestConstants.shortWritingStr)

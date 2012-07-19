@@ -1,11 +1,9 @@
 package services
 
-import org.scalatest.matchers.ShouldMatchers
 import play.libs.Codec
-import play.test.UnitFlatSpec
+import utils.EgraphsUnitTest
 
-class Base64Tests extends UnitFlatSpec
-with ShouldMatchers {
+class Base64Tests extends EgraphsUnitTest {
 
   it should "encode and decode Base64" in {
     val str = "Base64 encode this text."

@@ -1,8 +1,6 @@
 package utils
 
 import services.{AppConfig, Time}
-import java.io.File
-import play.Play
 import util.Random
 import java.text.SimpleDateFormat
 import org.joda.time.DateTime
@@ -132,8 +130,6 @@ object TestData {
 
   }
 
-
-
   def newSavedEgraph(orderOption: Option[Order] = None): Egraph = {
     val order = orderOption match {
       case None => newSavedOrder()
@@ -153,22 +149,4 @@ object TestData {
   def newControllers: TestWebsiteControllers = {
     AppConfig.instance[TestWebsiteControllers]
   }
-
-  object Longoria {
-    require(fileBase.exists(), "Evan Longoria test photos were not found at " + fileBase.getAbsoluteFile)
-
-    val profilePhoto = longoFile("profile.jpg")
-    val productPhotos = Array(longoFile("product-1.jpg"), longoFile("product-2.jpg"), longoFile("product-3.jpg"))
-
-    private val fileBase = Play.getFile("test/files/longoria")
-
-    private def longoFile(filename: String): File = {
-      Play.getFile(fileBase + "/" + filename)
-    }
-  }
-
-  object Kapler {
-    val productPhotos = Array(Play.getFile("test/files/kapler/product-1.jpg"))
-  }
-
 }

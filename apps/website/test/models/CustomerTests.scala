@@ -1,20 +1,14 @@
 package models
 
 import enums.OrderReviewStatus
-import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.BeforeAndAfterEach
-import play.test.UnitFlatSpec
-import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationBefore, CreatedUpdatedEntityTests, SavingEntityTests, TestData}
+import utils._
 import services.{Utils, Time, AppConfig}
 import exception.InsufficientInventoryException
-import java.util
 
-class CustomerTests extends UnitFlatSpec
-  with ShouldMatchers
-  with BeforeAndAfterEach
+class CustomerTests extends EgraphsUnitTest
+  with ClearsDatabaseAndValidationBefore
   with SavingEntityTests[Customer]
   with CreatedUpdatedEntityTests[Customer]
-  with ClearsDatabaseAndValidationBefore
   with DBTransactionPerTest
 {
   val customerStore = AppConfig.instance[CustomerStore]

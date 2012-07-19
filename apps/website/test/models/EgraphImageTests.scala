@@ -1,16 +1,14 @@
 package models
 
-import play.test.UnitFlatSpec
-import org.scalatest.matchers.ShouldMatchers
 import services.AppConfig
 import services.blobs.{Blobs, AccessPolicy}
 import Blobs.Conversions._
 import utils._
 
-class EgraphImageTests extends UnitFlatSpec
-  with ShouldMatchers
+class EgraphImageTests extends EgraphsUnitTest
+  with ClearsDatabaseAndValidationBefore
   with DBTransactionPerTest
-  with ClearsDatabaseAndValidationBefore {
+{
 
   private val blobs = AppConfig.instance[Blobs]
 

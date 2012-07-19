@@ -1,20 +1,15 @@
 package models.xyzmo
 
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.matchers.ShouldMatchers
-import play.test.UnitFlatSpec
 import utils._
 import services.AppConfig
 import com.xyzmo.wwww.biometricserver.WebServiceUserAndProfileStub
 import models.{EnrollmentBatch, Celebrity}
 
-class XyzmoAddUserTests extends UnitFlatSpec
-with ShouldMatchers
-with BeforeAndAfterEach
-with SavingEntityTests[XyzmoAddUser]
-with CreatedUpdatedEntityTests[XyzmoAddUser]
-with ClearsDatabaseAndValidationBefore
-with DBTransactionPerTest {
+class XyzmoAddUserTests extends EgraphsUnitTest
+  with ClearsDatabaseAndValidationBefore
+  with SavingEntityTests[XyzmoAddUser]
+  with CreatedUpdatedEntityTests[XyzmoAddUser]
+  with DBTransactionPerTest {
   //
   // SavingEntityTests[XyzmoAddUser] methods
   //

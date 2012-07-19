@@ -40,6 +40,7 @@ trait AdminFunctionalTest extends EgraphsFunctionalTest {
                                 publicName: String = "Muhammad Ali",
                                 bio: String = "The greatest Celebrity of them all!",
                                 organization: String = "Major League Baseball",
+                                roleDescription: String = "A man of peace",
                                 publishedStatusString: String = PublishedStatus.Published.name): Map[String, String] = {
     Map[String, String](
       "celebrityId" -> celebrityId.toString,
@@ -48,6 +49,7 @@ trait AdminFunctionalTest extends EgraphsFunctionalTest {
       "publicName" -> publicName,
       "bio" -> bio,
       "organization" -> organization,
+      "roleDescription" -> roleDescription,
       "publishedStatusString" -> publishedStatusString
     )
   }

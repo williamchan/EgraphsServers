@@ -1,16 +1,13 @@
 package services.graphics
 
-import play.test.UnitFlatSpec
-import org.scalatest.matchers.ShouldMatchers
-import java.io.File
 import java.awt.{Graphics2D, RenderingHints, BasicStroke}
 import java.awt.image.BufferedImage
 import java.awt.geom.{Ellipse2D, Path2D}
 import play.Play
 import javax.imageio.ImageIO
+import utils.EgraphsUnitTest
 
-class BezierCubicTests extends UnitFlatSpec
-with ShouldMatchers {
+class BezierCubicTests extends EgraphsUnitTest {
 
   it should "evaluate to the correct x and y coordinates" in {
     val bezier = BezierCubic(

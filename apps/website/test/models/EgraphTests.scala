@@ -1,20 +1,15 @@
 package models
 
 import enums.EgraphState
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.matchers.ShouldMatchers
-import play.test.UnitFlatSpec
 import utils._
 import services.blobs.Blobs.Conversions._
 import services.{Dimensions, Time, AppConfig}
 import java.awt.image.BufferedImage
 
-class EgraphTests extends UnitFlatSpec
-  with ShouldMatchers
-  with BeforeAndAfterEach
+class EgraphTests extends EgraphsUnitTest
+  with ClearsDatabaseAndValidationBefore
   with SavingEntityTests[Egraph]
   with CreatedUpdatedEntityTests[Egraph]
-  with ClearsDatabaseAndValidationBefore
   with DBTransactionPerTest
 {
   private val store = AppConfig.instance[EgraphStore]

@@ -2,7 +2,6 @@ package services.http
 
 import utils.EgraphsUnitTest
 import services.AppConfig
-
 import play.mvc.Scope
 import play.mvc.Scope.Session
 

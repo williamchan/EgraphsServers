@@ -6,15 +6,14 @@ import models.enums.{PrintingOption, WrittenMessageRequest}
 import services.Finance.TypeConversions._
 import services.AppConfig
 import services.payment.StripeTestPayment
-import services.db.TransactionSerializable
+import services.db.{DBSession, TransactionSerializable}
 import models.{PrintOrderStore, CashTransactionStore, OrderStore}
 import services.http.forms.purchase.CheckoutShippingForm
 import org.joda.money.Money
 
-class EgraphPurchaseHandlerTests
-  extends EgraphsUnitTest
-  with ClearsDatabaseAndValidationBefore {
+class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsDatabaseAndValidationBefore {
 
+  private val db = AppConfig.instance[DBSession]
   private val orderStore = AppConfig.instance[OrderStore]
   private val cashTransactionStore = AppConfig.instance[CashTransactionStore]
   private val printOrderStore = AppConfig.instance[PrintOrderStore]

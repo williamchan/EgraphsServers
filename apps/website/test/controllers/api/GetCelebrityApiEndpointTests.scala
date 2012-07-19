@@ -1,11 +1,8 @@
 package controllers.api
 
-import org.specs2.mock.Mockito
 import play.mvc.Http.Request
 import play.mvc.Controller
-import org.scalatest.matchers.ShouldMatchers
 import play.mvc.results.Forbidden
-import play.test.UnitFlatSpec
 import services.Time
 import org.junit.Assert._
 import org.junit.Test
@@ -15,11 +12,10 @@ import utils.FunctionalTestUtils.{willChanRequest, runScenario}
 import models._
 import enums.EnrollmentStatus
 import services.http.CelebrityAccountRequestFilters
-import utils.{MockControllerMethod, TestConstants}
+import utils.{ClearsDatabaseAndValidationBefore, EgraphsUnitTest, MockControllerMethod, TestConstants}
 import controllers.website.EgraphsFunctionalTest
 
-class GetCelebrityApiEndpointTests extends UnitFlatSpec with Mockito with ShouldMatchers
-{
+class GetCelebrityApiEndpointTests extends EgraphsUnitTest with ClearsDatabaseAndValidationBefore {
 
   private def testController(reqFilters: CelebrityAccountRequestFilters): GetCelebrityApiEndpoint = {
     new Controller with GetCelebrityApiEndpoint {

@@ -1,8 +1,6 @@
 package models
 
-import play.test.UnitFlatSpec
-import org.scalatest.matchers.ShouldMatchers
-import utils.{ClearsDatabaseAndValidationBefore, DBTransactionPerTest}
+import utils.{ClearsDatabaseAndValidationBefore, DBTransactionPerTest, EgraphsUnitTest}
 import java.io.FileOutputStream
 import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
@@ -10,8 +8,7 @@ import play.Play
 import services.{ImageUtil, TempFile, AppConfig}
 import services.blobs.AccessPolicy.Private
 
-class ImageAssetTests extends UnitFlatSpec
-  with ShouldMatchers
+class ImageAssetTests extends EgraphsUnitTest
   with DBTransactionPerTest
   with ClearsDatabaseAndValidationBefore
 {

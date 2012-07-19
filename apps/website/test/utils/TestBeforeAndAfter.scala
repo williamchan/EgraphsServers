@@ -1,10 +1,6 @@
 package utils
 
-import org.scalatest.matchers.ShouldMatchers
-import play.test.UnitFlatSpec
-
-class TestBeforeAndAfterClosuresFlat extends UnitFlatSpec
-  with ShouldMatchers
+class TestBeforeAndAfterClosuresFlat extends EgraphsUnitTest
   with BeforeAndAfterClosures
 {
   var beforeExecutionCount = 0
@@ -46,8 +42,7 @@ trait IncrementsExecutionCounts { this: BeforeAndAfterClosures =>
   }
 }
 
-class TestBeforeAndAfterClosuresMixedIn extends UnitFlatSpec
-  with ShouldMatchers
+class TestBeforeAndAfterClosuresMixedIn extends EgraphsUnitTest
   with BeforeAndAfterClosures
   with IncrementsExecutionCounts
 {

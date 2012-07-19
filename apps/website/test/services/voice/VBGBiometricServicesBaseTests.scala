@@ -1,29 +1,26 @@
 package services.voice
 
-import models.vbg.VBGVerifySample
 import models._
-import utils.TestData
+import utils._
 import play.Play
-import play.test.UnitFlatSpec
-import org.scalatest.matchers.ShouldMatchers
 import services.blobs.Blobs
 import play.libs.Codec
 import javax.sound.sampled.{AudioInputStream, AudioFileFormat, AudioSystem}
 import models.{Celebrity, EnrollmentSample, EnrollmentBatch}
 import Blobs.Conversions._
-import org.scalatest.BeforeAndAfterEach
-import utils.{ClearsDatabaseAndValidationBefore, DBTransactionPerTest, TestConstants}
+import models.Egraph
+import scala.Some
+import vbg.VBGVerifySample
 
 /**
  * IMPORTANT! -- Do not write tests for VBGProdFreeSpeechBiometricServices or VBGBetaFreeSpeechBiometricServices.
  * They will clobber live data because we use Celebrity IDs as userIds on VBG.
  * Instead, VBGTestFreeSpeechBiometricServices exists for automated tests of celebrity-fs-en account.
  */
-class VBGBiometricServicesBaseTests extends UnitFlatSpec
-with ShouldMatchers
-with BeforeAndAfterEach
-with ClearsDatabaseAndValidationBefore
-with DBTransactionPerTest {
+class VBGBiometricServicesBaseTests extends EgraphsUnitTest
+  with ClearsDatabaseAndValidationBefore
+  with DBTransactionPerTest
+{
 
   private val blobs = services.AppConfig.instance[Blobs]
 

@@ -1,24 +1,23 @@
 package services.actors
 
-import org.scalatest.matchers.ShouldMatchers
-import play.test.UnitFlatSpec
 import actors.{ProcessEgraphMessage, EgraphActor}
 import akka.actor.Actor
 import Actor._
-import services.db.TransactionSerializable
+import services.db.{DBSession, TransactionSerializable}
 import services.{Utils, AppConfig}
 import models.EgraphStore
 import akka.util.TestKit
-import org.scalatest.BeforeAndAfterAll
-import utils.{EgraphsUnitTest, TestData, ClearsDatabaseAndValidationBefore}
+import utils.{ClearsDatabaseAndValidationBefore, EgraphsUnitTest, TestData}
 import models.enums.EgraphState
+import org.scalatest.BeforeAndAfterAll
 
 class EgraphActorTests extends EgraphsUnitTest
-with BeforeAndAfterAll
-with ClearsDatabaseAndValidationBefore
-with TestKit {
+  with ClearsDatabaseAndValidationBefore
+  with BeforeAndAfterAll
+  with TestKit {
 
   private val egraphActor = actorOf(AppConfig.instance[EgraphActor])
+  private val db = AppConfig.instance[DBSession]
   private val egraphStore = AppConfig.instance[EgraphStore]
 
   override protected def beforeAll() {

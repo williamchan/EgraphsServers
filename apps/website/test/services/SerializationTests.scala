@@ -1,9 +1,8 @@
 package services
 
-import org.scalatest.matchers.ShouldMatchers
-import play.test.UnitFlatSpec
+import utils.EgraphsUnitTest
 
-class SerializationTests extends UnitFlatSpec with ShouldMatchers {
+class SerializationTests extends EgraphsUnitTest {
   import services.Utils.makeOptionalFieldMap
 
   "makeOptionalFieldMap" should "return an empty map if no options have a value" in {

@@ -1,20 +1,15 @@
 package models
 
 import enums.HasPublishedStatusTests
-import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.BeforeAndAfterEach
-import play.test.UnitFlatSpec
 import services.Time
 import services.AppConfig
 import utils._
 import java.awt.image.BufferedImage
 
-class ProductTests extends UnitFlatSpec
-  with ShouldMatchers
-  with BeforeAndAfterEach
+class ProductTests extends EgraphsUnitTest
+  with ClearsDatabaseAndValidationBefore
   with SavingEntityTests[Product]
   with CreatedUpdatedEntityTests[Product]
-  with ClearsDatabaseAndValidationBefore
   with DBTransactionPerTest
   with HasPublishedStatusTests[Product]
 {

@@ -1,15 +1,12 @@
 package services.http
 
-import org.scalatest.matchers.ShouldMatchers
-import org.specs2.mock.Mockito
-import play.mvc.Http.Request
 import models.{Account, AccountStore}
-import play.test.{FunctionalTest, UnitFlatSpec}
+import play.test.FunctionalTest
 import models.AccountAuthenticationError.{AccountNotFoundError, AccountPasswordNotSetError, AccountCredentialsError}
 import play.mvc.results.Forbidden
+import utils.{ClearsDatabaseAndValidationBefore, EgraphsUnitTest}
 
-class AccountRequestFiltersTests extends UnitFlatSpec with Mockito with ShouldMatchers {
-
+class AccountRequestFiltersTests extends EgraphsUnitTest with ClearsDatabaseAndValidationBefore {
 
   "requiresAuthenticatedAccount" should "execute the provided block if a matching account was found" in {
     // Set up

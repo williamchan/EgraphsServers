@@ -1,9 +1,6 @@
 package models
 
 import enums.{HasPublishedStatusTests, PublishedStatus}
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.matchers.ShouldMatchers
-import play.test.UnitFlatSpec
 import javax.imageio.ImageIO
 import services.Time
 import services.ImageUtil.Conversions._
@@ -11,12 +8,10 @@ import services.AppConfig
 import play.Play
 import utils._
 
-class CelebrityTests extends UnitFlatSpec
-  with ShouldMatchers
-  with BeforeAndAfterEach
+class CelebrityTests extends EgraphsUnitTest
+  with ClearsDatabaseAndValidationBefore
   with SavingEntityTests[Celebrity]
   with CreatedUpdatedEntityTests[Celebrity]
-  with ClearsDatabaseAndValidationBefore
   with DBTransactionPerTest
   with HasPublishedStatusTests[Celebrity]
 {

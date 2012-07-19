@@ -1,18 +1,13 @@
 package models
 
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.matchers.ShouldMatchers
-import play.test.UnitFlatSpec
 import org.joda.money.CurrencyUnit
 import services.AppConfig
 import utils._
 
-class CashTransactionTests extends UnitFlatSpec
-  with ShouldMatchers
-  with BeforeAndAfterEach
+class CashTransactionTests extends EgraphsUnitTest
+  with ClearsDatabaseAndValidationBefore
   with SavingEntityTests[CashTransaction]
   with CreatedUpdatedEntityTests[CashTransaction]
-  with ClearsDatabaseAndValidationBefore
   with DBTransactionPerTest
 {
   val store = AppConfig.instance[CashTransactionStore]

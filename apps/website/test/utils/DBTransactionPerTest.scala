@@ -1,7 +1,6 @@
 package utils
 
 import org.scalatest.{Suite, BeforeAndAfterEach}
-import org.squeryl.SessionFactory
 import services.db.DBSession
 
 /**

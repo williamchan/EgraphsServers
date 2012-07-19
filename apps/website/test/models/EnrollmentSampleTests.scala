@@ -1,22 +1,17 @@
 package models
 
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.matchers.ShouldMatchers
 import play.libs.Codec
-import play.test.UnitFlatSpec
 import utils._
 import services.AppConfig
 import services.blobs.Blobs
 import Blobs.Conversions._
 import play.Play
 
-class EnrollmentSampleTests extends UnitFlatSpec
-with ShouldMatchers
-with BeforeAndAfterEach
-with SavingEntityTests[EnrollmentSample]
-with CreatedUpdatedEntityTests[EnrollmentSample]
-with ClearsDatabaseAndValidationBefore
-with DBTransactionPerTest {
+class EnrollmentSampleTests extends EgraphsUnitTest
+  with ClearsDatabaseAndValidationBefore
+  with SavingEntityTests[EnrollmentSample]
+  with CreatedUpdatedEntityTests[EnrollmentSample]
+  with DBTransactionPerTest {
   //
   // SavingEntityTests[EnrollmentSample] methods
   //

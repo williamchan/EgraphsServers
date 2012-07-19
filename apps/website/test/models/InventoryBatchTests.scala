@@ -1,18 +1,12 @@
 package models
 
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.matchers.ShouldMatchers
-import play.test.UnitFlatSpec
 import utils._
 import services.AppConfig
 
-class InventoryBatchTests extends UnitFlatSpec
-with ShouldMatchers
-with BeforeAndAfterEach
-with SavingEntityTests[InventoryBatch]
-with CreatedUpdatedEntityTests[InventoryBatch]
-with ClearsDatabaseAndValidationBefore
-with DBTransactionPerTest {
+class InventoryBatchTests extends EgraphsUnitTest
+  with SavingEntityTests[InventoryBatch]
+  with CreatedUpdatedEntityTests[InventoryBatch]
+  with DBTransactionPerTest {
   private val inventoryBatchStore = AppConfig.instance[InventoryBatchStore]
   private val inventoryBatchQueryFilters = AppConfig.instance[InventoryBatchQueryFilters]
 

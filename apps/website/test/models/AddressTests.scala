@@ -1,17 +1,12 @@
 package models
 
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.matchers.ShouldMatchers
-import play.test.UnitFlatSpec
 import utils._
 import services.AppConfig
 
-class AddressTests extends UnitFlatSpec
-  with ShouldMatchers
-  with BeforeAndAfterEach
+class AddressTests extends EgraphsUnitTest
+  with ClearsDatabaseAndValidationBefore
   with SavingEntityTests[Address]
   with CreatedUpdatedEntityTests[Address]
-  with ClearsDatabaseAndValidationBefore
   with DBTransactionPerTest {
 
   private val addressStore = AppConfig.instance[AddressStore]
