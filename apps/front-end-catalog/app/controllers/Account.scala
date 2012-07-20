@@ -4,7 +4,7 @@ import play.mvc.Controller
 import models.frontend.egraphs._
 import models.frontend.forms.FormError
 import models.frontend.egraphs.FulfilledEgraphViewModel
-import models.frontend.account.{AccountRecoverForm, AccountVerificationForm, AccountSettingsForm}
+import models.frontend.account.{AccountRecoverForm, AccountPasswordResetForm, AccountSettingsForm}
 import models.frontend.forms.Field
 import play.mvc.results.RenderJson
 import sjson.json.Serializer
@@ -73,6 +73,8 @@ object Account extends Controller with DefaultHeaderAndFooterData {
       case "POST" => {
         println("POST data")
         println(params.allSimple())
+      }
+      case _ => {
         views.frontend.html.simple_confirmation(
           "Account Verified",
           """
@@ -83,20 +85,19 @@ object Account extends Controller with DefaultHeaderAndFooterData {
           <br>
           The team at Egraphs
           """
-
-        )
-      }
-      case _ => {
-        views.frontend.html.account_verification(
-          AccountVerificationForm(
-            newPassword = Field(name="newPassword"),
-            passwordConfirm = Field(name="passwordConfirm"),
-            email = Field(name="email", values=List("will@egraphs.com")),
-            secretKey = Field(name="secretKey", values=List("SECRETSAUCE"))
-          )
         )
       }
     }
+  }
+  def reset() = {
+    views.frontend.html.account_password_reset(
+      AccountPasswordResetForm(
+        newPassword = Field(name="newPassword"),
+        passwordConfirm = Field(name="passwordConfirm"),
+        email = Field(name="email", values=List("will@egraphs.com")),
+        secretKey = Field(name="secretKey", values=List("SECRETSAUCE"))
+      )
+    )
   }
 
   def gallery(user: String = "userdude", count: Int =  1, role: String = "other", pending: Int = 0) = {

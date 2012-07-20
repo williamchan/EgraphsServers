@@ -1,16 +1,16 @@
 package controllers.website
 
 import play.mvc.Controller
-import services.http.{EgraphsSession, AccountRequestFilters, ControllerMethod}
+import services.http.{AccountRequestFilters, ControllerMethod}
 import services.Utils
 import models.{Account, AccountStore}
 import models.frontend.forms.{FormError, Field}
 import play.mvc.Router.ActionDefinition
-import models.frontend.account.{AccountVerificationForm => AccountVerificationFormView}
+import models.frontend.account.{AccountPasswordResetForm => AccountPasswordResetFormView}
 import services.http.SafePlayParams.Conversions._
 import services.mvc.ImplicitHeaderAndFooterData
-import services.http.forms.AccountVerificationFormFactory
-import services.http.forms.AccountVerificationForm.Fields
+import services.http.forms.AccountPasswordResetFormFactory
+import services.http.forms.AccountPasswordResetForm.Fields
 
 private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
 
@@ -20,7 +20,7 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
   protected def controllerMethod: ControllerMethod
   protected def accountStore: AccountStore
   protected def accountRequestFilters: AccountRequestFilters
-  protected def accountVerificationForms: AccountVerificationFormFactory
+  protected def accountPasswordResetForms: AccountPasswordResetFormFactory
 
   def getResetPassword(email: String, secretKey: String) = controllerMethod() {
     //flash takes precedence over url arg
@@ -31,7 +31,7 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
         .asInstanceOf[List[Option[FormError]]].filter(e => e.isDefined).map(e => e.get.description)
 
         if (account.verifyResetPasswordKey(form.secretKey.value.getOrElse("")) == true) {
-          views.frontend.html.account_verification(form=form, displayableErrors=displayableErrors)
+          views.frontend.html.account_password_reset(form=form, displayableErrors=displayableErrors)
         } else {
          Forbidden("The password reset URL you used is either out of date or invalid.")
       }
@@ -49,10 +49,10 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
     }
   }
 
-  private def makeFormView(account: Account) : AccountVerificationFormView = {
+  private def makeFormView(account: Account) : AccountPasswordResetFormView = {
     //check flash for presence of secretKey and Email
-    val maybeFormData = accountVerificationForms.getFormReader(account).read(flash.asFormReadable).map { form =>
-      AccountVerificationFormView(
+    val maybeFormData = accountPasswordResetForms.getFormReader(account).read(flash.asFormReadable).map { form =>
+      AccountPasswordResetFormView(
         form.secretKey.asViewField,
         form.email.asViewField,
         form.newPassword.asViewField,
@@ -65,7 +65,7 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
       val emailOption = params.getOption("email")
       val secretKeyOption = params.getOption("secretKey")
 
-      AccountVerificationFormView(
+      AccountPasswordResetFormView(
         email= Field(name = Fields.Email.name, values = List(emailOption.getOrElse(""))),
         secretKey = Field(name = Fields.SecretKey.name, values = List(secretKeyOption.getOrElse(""))),
         passwordConfirm = Field(name = Fields.PasswordConfirm.name, values = List("")),
