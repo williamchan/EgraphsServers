@@ -39,7 +39,7 @@ case class TestWebsiteControllers @Inject()(
   facebookAppId: String,
   customerLoginForms: CustomerLoginFormFactory,
   accountSettingsForms: AccountSettingsFormFactory,
-  accountVerificationForms: AccountVerificationFormFactory,
+  accountPasswordResetForms: AccountPasswordResetFormFactory,
   accountRecoverForms: AccountRecoverFormFactory,
   egraphsSessionFactory: () => EgraphsSession,
   fakeRequest: Request = FunctionalTest.newRequest(),

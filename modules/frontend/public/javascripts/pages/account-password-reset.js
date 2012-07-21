@@ -1,4 +1,4 @@
-/* Scripting for the verification page */
+/* Scripting for the password reset page */
 define(["Egraphs", "libs/angular"], function (Egraphs) {
   var Controller = function ($scope) {
     $scope.master = angular.copy(Egraphs.page.user)
@@ -9,7 +9,7 @@ define(["Egraphs", "libs/angular"], function (Egraphs) {
   }
   return {
   /**
-   * Executes all the scripts for the verification template
+   * Executes all the scripts for the password reset template
    *
    * @return nothing
    */

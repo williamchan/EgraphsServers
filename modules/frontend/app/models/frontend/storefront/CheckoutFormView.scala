@@ -1,7 +1,5 @@
 package models.frontend.storefront
 
-import models.frontend.forms.Field
-
 /**
  * View of the checkout screen's form. It is actually composed of
  * several different forms.

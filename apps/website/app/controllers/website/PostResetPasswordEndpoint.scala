@@ -3,8 +3,7 @@ package controllers.website
 import play.mvc.Controller
 import models.AccountStore
 import services.http.{SafePlayParams, AccountRequestFilters, POSTControllerMethod}
-import models.frontend.account.{AccountVerificationForm => AccountVerificationFormView}
-import services.http.forms.{AccountVerificationForm, AccountVerificationFormFactory, Form}
+import services.http.forms.{AccountPasswordResetFormFactory, Form}
 import services.mvc.ImplicitHeaderAndFooterData
 
 private[controllers] trait PostResetPasswordEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
@@ -14,12 +13,12 @@ private[controllers] trait PostResetPasswordEndpoint extends ImplicitHeaderAndFo
 
   protected def postController: POSTControllerMethod
   protected def accountStore: AccountStore
-  protected def accountVerificationForms: AccountVerificationFormFactory
+  protected def accountPasswordResetForms: AccountPasswordResetFormFactory
   protected def accountRequestFilters: AccountRequestFilters
 
   def postResetPassword() = postController() {
     accountRequestFilters.requireValidAccountEmail(request.params.getOption("email").getOrElse("Nothing")) { account =>
-      val nonValidatedForm = accountVerificationForms(params.asFormReadable, account)
+      val nonValidatedForm = accountPasswordResetForms(params.asFormReadable, account)
 
       nonValidatedForm.errorsOrValidatedForm match {
         case Left(errors) => {

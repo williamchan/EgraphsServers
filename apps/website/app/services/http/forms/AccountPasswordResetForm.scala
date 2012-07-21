@@ -13,9 +13,9 @@ import com.google.inject.Inject
  * @param check the checks used by forms in our application.
  **/
 
-class AccountVerificationForm(val paramsMap: Form.Readable, check: FormChecks, account: Account) extends Form[AccountVerificationForm.Validated]
+class AccountPasswordResetForm(val paramsMap: Form.Readable, check: FormChecks, account: Account) extends Form[AccountPasswordResetForm.Validated]
 {
-  import AccountVerificationForm.Fields
+  import AccountPasswordResetForm.Fields
 
   val secretKey = new RequiredField[String](Fields.SecretKey.name) {
     def validateIfPresent = {
@@ -48,13 +48,13 @@ class AccountVerificationForm(val paramsMap: Form.Readable, check: FormChecks, a
 
 
   //
-  // Form[ValidatedAccountVerificationForm] members
+  // Form[ValidatedAccountPasswordResetForm] members
   //
 
-  protected def formAssumingValid: AccountVerificationForm.Validated = {
+  protected def formAssumingValid: AccountPasswordResetForm.Validated = {
     // Safely access the account value in here
 
-    AccountVerificationForm.Validated(
+    AccountPasswordResetForm.Validated(
       newPassword = newPassword.value.get,
       passwordConfirm = passwordConfirm.value.get,
       secretKey = secretKey.value.get,
@@ -63,7 +63,7 @@ class AccountVerificationForm(val paramsMap: Form.Readable, check: FormChecks, a
   }
 }
 
-object AccountVerificationForm {
+object AccountPasswordResetForm {
   object Fields extends Utils.Enum {
     sealed case class EnumVal(name: String) extends Value
 
@@ -77,23 +77,23 @@ object AccountVerificationForm {
   case class Validated(newPassword: String, passwordConfirm: String, email: String, secretKey: String)
 }
 
-class AccountVerificationFormFactory @Inject()(formChecks: FormChecks)
+class AccountPasswordResetFormFactory @Inject()(formChecks: FormChecks)
 {
   //
   // Public members
   //
-  def apply(readable: Form.Readable, account: Account): AccountVerificationForm = {
-    new AccountVerificationForm(readable, formChecks, account)
+  def apply(readable: Form.Readable, account: Account): AccountPasswordResetForm = {
+    new AccountPasswordResetForm(readable, formChecks, account)
   }
 
 
   /**
    * Need a specialized form reader her to pass in Account.
    */
-  def getFormReader(account: Account): ReadsForm[AccountVerificationForm] = {
-    new ReadsForm[AccountVerificationForm]() {
+  def getFormReader(account: Account): ReadsForm[AccountPasswordResetForm] = {
+    new ReadsForm[AccountPasswordResetForm]() {
       override def instantiateAgainstReadable(readable: Form.Readable) = {
-        new AccountVerificationForm(readable, formChecks, account)
+        new AccountPasswordResetForm(readable, formChecks, account)
       }
     }
   }

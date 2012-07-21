@@ -10,9 +10,6 @@ import org.apache.commons.mail.HtmlEmail
 import services.mail.Mail
 import services.http.PlayConfig
 import java.util.Properties
-import controllers.website.GetResetPasswordEndpoint
-import play.Play
-import controllers.WebsiteControllers
 
 /** Services used by each instance of Customer */
 case class CustomerServices @Inject() (accountStore: AccountStore,
@@ -109,23 +106,23 @@ case class Customer(
     val emailFacebookSrc = ""
     val emailTwitterSrc = ""
 
-    if (verificationNeeded){
-      val verifyPasswordUrl = WebsiteControllers.reverse(WebsiteControllers.getVerifyAccount()).url + "?email=" + account.email + "&secretKey=" +
-        account.resetPasswordKey.get
-      email.setHtmlMsg(views.frontend.html.email_account_verification(
-          verifyPasswordUrl = verifyPasswordUrl,
-          emailLogoSrc = emailLogoSrc,
-          emailFacebookSrc = emailFacebookSrc,
-          emailTwitterSrc = emailTwitterSrc
-        ).toString()
+    if (verificationNeeded) {
+      val verifyPasswordUrl = Utils.lookupAbsoluteUrl("WebsiteControllers.getVerifyAccount",
+        Map("email" -> account.email, "secretKey" -> account.resetPasswordKey.get)).url
+        email.setHtmlMsg(views.frontend.html.email_account_verification(
+        verifyPasswordUrl = verifyPasswordUrl,
+        emailLogoSrc = emailLogoSrc,
+        emailFacebookSrc = emailFacebookSrc,
+        emailTwitterSrc = emailTwitterSrc
+      ).toString()
       )
       email.setTextMsg(views.frontend.html.email_account_verification_text(verifyPasswordUrl).toString())
     } else {
       email.setHtmlMsg(views.frontend.html.email_account_confirmation(
-          emailLogoSrc = emailLogoSrc,
-          emailFacebookSrc = emailFacebookSrc,
-          emailTwitterSrc = emailTwitterSrc
-        ).toString()
+        emailLogoSrc = emailLogoSrc,
+        emailFacebookSrc = emailFacebookSrc,
+        emailTwitterSrc = emailTwitterSrc
+      ).toString()
       )
       email.setTextMsg(views.frontend.html.email_account_confirmation_text.toString())
     }

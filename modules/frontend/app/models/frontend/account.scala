@@ -22,7 +22,7 @@ case class AccountSettingsForm(
   generalErrors: Iterable[FormError]
 )
 
-case class AccountVerificationForm(
+case class AccountPasswordResetForm(
   newPassword: Field[String],
   passwordConfirm: Field[String],
   email: Field[String],
