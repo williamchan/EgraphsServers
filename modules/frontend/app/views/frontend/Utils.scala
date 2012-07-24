@@ -4,7 +4,8 @@ package views.frontend
  * Front-end utilities that otherwise had no home.
  */
 object Utils {
-  
+  val cdnAssets = play.configuration.conf.getProperty("cdn.enabled") == "true"
+  val cdnUrl = play.configuration.conf.getProperty("cloudfront.domain")
   /**
    * Formats a series of String / String tuples into an attribute string suitable for
    * use in an HTML tag. This is most useful when writing a wrapper around the creation
@@ -25,6 +26,23 @@ object Utils {
     }
 
     attributeStrings.mkString(" ")
+  }
+
+  /**
+   * Drop-in replacement for @asset. Use to take advantage of cloudfront on live.
+   * Paths are always absolute to root. Leading '/' is optional.
+   * @param path
+   * @return path to asset. 
+   */
+
+  def cdnAsset(path: String) : String = {
+    if(cdnAssets)
+      path(0) match {
+        case '/' => "https://" + cdnUrl + path
+        case _ =>  "https://" + cdnUrl + "/" + path
+      }
+    else
+      play.mvc.Router.reverse(play.Play.getVirtualFile(path))
   }
 
   /**

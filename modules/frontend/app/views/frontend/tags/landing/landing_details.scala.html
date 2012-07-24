@@ -1,5 +1,7 @@
 @(celebrityPublicName: Option[String] = None, celebrityCasualName: Option[String] = None, celebrityIsMale: Boolean = true)
 
+@import views.frontend.Utils.cdnAsset
+
 <section id="landing-details">
 
   <header>
@@ -23,7 +25,7 @@
 
       <figure>
 
-        <img src='@asset("public/images/fpo-egraph-diagram.jpg")' alt="fpo-egraph-diagram" class="scale" />
+        <img src='@cdnAsset("public/images/fpo-egraph-diagram.jpg")' alt="fpo-egraph-diagram" class="scale" />
 
         <figcaption class="signature">
 

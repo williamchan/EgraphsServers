@@ -1,5 +1,7 @@
 @(celebrityPublicName: Option[String] = None, celebrityCasualName: Option[String] = None, celebrityIsMale: Boolean = true)
 
+@import views.frontend.Utils.cdnAsset
+
 <section id="landing-steps">
 
   <ol>
@@ -24,7 +26,7 @@
 
       </div> <!-- end .instructions -->
 
-      <img src='@asset("/public/images/macbook-air.png")' alt="macbook-air" />
+      <img src='@cdnAsset("public/images/macbook-air.png")' alt="macbook-air" />
 
     </li> <!-- end .step-1 -->
 
@@ -40,7 +42,7 @@
 
       </div> <!-- end .instructions -->
 
-      <img src='@asset("/public/images/fpo-keyboard.png")' alt="keyboard" class="positioned" />
+      <img src='@cdnAsset("public/images/fpo-keyboard.png")' alt="keyboard" class="positioned" />
 
     </li> <!-- end .step-2 -->
 
@@ -58,7 +60,7 @@
 
       </div> <!-- end .instructions -->
 
-      <img src='@asset("/public/images/bg-fpo-ipad.png")' alt="ipad" class="positioned" />
+      <img src='@cdnAsset("public/images/bg-fpo-ipad.png")' alt="ipad" class="positioned" />
 
     </li> <!-- end .step-3 -->
 
