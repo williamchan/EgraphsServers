@@ -21,7 +21,7 @@ class CloudfrontBlobVendor @Inject()(domain: String, override protected val blob
     delegateResponse.map( urlString =>
       {
         val url = new URL(urlString)
-        "http://" + domain + url.getPath
+        "https://" + domain + url.getPath
       }
     )
   }
