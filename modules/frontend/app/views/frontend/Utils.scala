@@ -32,7 +32,7 @@ object Utils {
    * Drop-in replacement for @asset. Use to take advantage of cloudfront on live.
    * Paths are always absolute to root. Leading '/' is optional.
    * @param path
-   * @return path to asset. 
+   * @return path to asset.
    */
 
   def cdnAsset(path: String) : String = {
