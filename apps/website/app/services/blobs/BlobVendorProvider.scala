@@ -17,11 +17,13 @@ private[blobs] class BlobVendorProvider @Inject() (
 ) extends Provider[BlobVendor]
 {
   private val blobstoreType = playConfig.getProperty(Blobs.blobstoreConfigKey)
+  private val cloudfrontDomain = playConfig.getProperty("cloudfront.domain")
 
   def get() = {
     blobstoreType match {
       case "s3" =>
-        decorate(S3BlobVendor)
+        decorateCDN(decorate(S3BlobVendor))
+
 
       case "filesystem" =>
         decorate(FileSystemBlobVendor)
@@ -36,6 +38,11 @@ private[blobs] class BlobVendorProvider @Inject() (
   private def decorate(baseBlobVendor: BlobVendor): BlobVendor = {
     new CacheIndexedBlobVendor(cacheFactory, new DBIndexedBlobVendor(blobKeyStore, baseBlobVendor))
   }
+  
+  private def decorateCDN(baseBlobVendor: BlobVendor): BlobVendor = {
+    new CloudfrontBlobVendor(cloudfrontDomain, new DBIndexedBlobVendor(blobKeyStore, baseBlobVendor))
+  }
+
 }
 
 
