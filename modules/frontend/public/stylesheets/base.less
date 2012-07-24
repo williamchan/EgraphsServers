@@ -13,6 +13,23 @@ a, a:link, a:visited {
 	}
 }
 
+
+.tooltip {
+	&.in {
+		.opacity(90);		
+	}
+
+	&.top .tooltip-arrow {
+		border-top:5px solid white;
+	}
+
+	.tooltip-inner {
+		color:@orange;
+		background-color:white;
+		font-weight:400;		
+	}
+}
+
 // A type of link appropriate for presenting a captioned image.
 // Mix this in on the highest parent container that wishes to have its
 // hover trigger the glowed around contained a.glowborder

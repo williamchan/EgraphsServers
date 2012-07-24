@@ -20,7 +20,10 @@
         <article class="span3">
           <figure>
             @if(!star.hasInventoryRemaining) {
-              <div class="ribbon simple">Sold out</div>
+              <div class="ribbon simple">
+                <a class="soldout-tooltip" href="#" rel="tooltip" title="More available soon!">Sold out <span class="question">?</span>
+                </a>
+              </div>
             }
             <a class="glowborder" href="@star.storefrontUrl" >
               <img src="@star.imageUrl" alt="@star.name" />              
@@ -42,7 +45,7 @@
 @featuredStarsFooter = {
   <footer>
     <div id="featured-stars" class="callout">
-      <h3>This Week's Featured Stars</h3>
+      <h3>Featured Stars</h3>
       <p>Browse one of their galleries to get started making your own egraph.</p>
     </div>
     @featuredStarBlock(clearFix=false)
@@ -59,7 +62,7 @@
       <div class="container">
 
         <footer id="landing-stars">
-          <h3><a href="#featured-stars">This Week's Stars <span>+</span></a></h3>
+          <h3><a href="#featured-stars">Featured Stars <span>+</span></a></h3>
           @featuredStarBlock(clearFix=true)
         </footer> <!-- end #landing-stars -->
 

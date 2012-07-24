@@ -1,7 +1,11 @@
 /* Scripting for the landing page */
-define([], function () {
+define(["bootstrap/bootstrap-tooltip", "bootstrap/bootstrap-popover"],
+function () {
   return {
     go: function() {
+
+      $(".soldout-tooltip").tooltip({placement:"top"});
+
       // Set up featured stars
       var landing_celebrities_btn = $('#landing-stars h3 a');
       var landing_celebrities = $('#landing-stars .celebrities');
