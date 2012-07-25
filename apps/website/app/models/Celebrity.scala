@@ -99,9 +99,12 @@ case class Celebrity(id: Long = 0,
 
     // 2) calculate quantity remaining for each InventoryBatch
     val inventoryBatchIdsAndOrderCounts: Map[Long, Int] = Map(services.orderStore.countOrdersByInventoryBatch(inventoryBatchIds): _*)
-    val inventoryBatchIdsAndNumRemaining: Map[Long, Int] = for ((batchId, orderCount) <- inventoryBatchIdsAndOrderCounts) yield {
-      (batchId, (inventoryBatches.get(batchId).get.numInventory - orderCount))
-    }
+
+    val inventoryBatchIdsAndNumRemaining : Map[Long, Int] = inventoryBatchIds.map( id =>
+      {
+        (id, inventoryBatches.get(id).get.numInventory - inventoryBatchIdsAndOrderCounts.get(id).getOrElse(0))
+      }
+    ).toMap
 
     // 3) query for products and inventoryBatchProducts on inventoryBatchIds
     val productsAndBatchIdsQuery: Query[(Product, Long)] = services.productStore.getProductAndInventoryBatchAssociations(inventoryBatchIds)
