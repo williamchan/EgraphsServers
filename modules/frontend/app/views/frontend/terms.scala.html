@@ -5,14 +5,14 @@ footerData: models.frontend.footer.FooterData
 )
 @import views.frontend.Utils
 @import models.frontend.egraphs._
-
+@import views.frontend.Utils.cdnAsset
 @baseBody = {
 
 <section id="content" role="main">
 <div id="main" class="about-us statics">
 <div class="row-fluid">
   <div class="span12 masthead-static">
-    <img src='@asset("/public/images/kerry-wood.jpg")'/>
+    <img src='@cdnAsset("public/images/kerry-wood.jpg")'/>
   </div>
 </div>
 

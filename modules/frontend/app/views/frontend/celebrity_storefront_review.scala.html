@@ -41,6 +41,7 @@
 @import views.frontend.tags.html.storefront_breadcrumbs_responsive
 @import views.frontend.tags.html.physical_preview_modal
 @import views.frontend.tags
+@import views.frontend.Utils.cdnAsset
 
 
 
@@ -64,9 +65,9 @@
               <div class="preview-container @orientation">
                 <img class="preview" src="@productPreviewUrl" />
                 @if(orientation == "orientation-landscape") {
-    							<img class="frame" src='@asset("public/images/fpo-egraph.png")' alt="fpo-egraph" />
+    							<img class="frame" src='@cdnAsset("public/images/fpo-egraph.png")' alt="fpo-egraph" />
                 } else {
-                  <img class="frame" src='@asset("public/images/fpo-egraph-portrait.png")' alt="fpo-egraph" />
+                  <img class="frame" src='@cdnAsset("public/images/fpo-egraph-portrait.png")' alt="fpo-egraph" />
                 }
 
               </div>

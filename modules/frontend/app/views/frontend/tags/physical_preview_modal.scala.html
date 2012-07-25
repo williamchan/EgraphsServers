@@ -1,5 +1,6 @@
 @()
 
+@import views.frontend.Utils.cdnAsset
 @{/** The HTML for a modal-dialog that previews a framed physical egraph.
   
   The modal dialog has id "frame-preview" and is hidden by default. To invoke
@@ -20,7 +21,7 @@
     <h3>Example Framed Egraph</h3>
   </div>
   <div class="modal-body">
-    <img src='@asset("public/images/physical-preview.jpg")' alt="fpo-egraph-diagram" class="scale" />
+    <img src='@cdnAsset("public/images/physical-preview.jpg")' alt="fpo-egraph-diagram" class="scale" />
   </div>
   <div class="modal-description">
     Your framed egraph contains a high quality print, certificate of authenticity, and custom cut mat inside of
