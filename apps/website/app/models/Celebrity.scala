@@ -98,27 +98,30 @@ case class Celebrity(id: Long = 0,
     val inventoryBatchIds = inventoryBatches.keys.toList
 
     // 2) calculate quantity remaining for each InventoryBatch
-    val inventoryBatchIdsAndOrderCounts: Map[Long, Int] = Map(services.orderStore.countOrdersByInventoryBatch(inventoryBatchIds): _*)
+    val inventoryBatchIdsAndOrderCounts: Map[Long, Int] =
+      Map(services.orderStore.countOrdersByInventoryBatch(inventoryBatchIds): _*)
 
-    val inventoryBatchIdsAndNumRemaining : Map[Long, Int] = inventoryBatchIds.map( id =>
-      {
+    val inventoryBatchIdsAndNumRemaining : Map[Long, Int] = inventoryBatchIds.map{ id =>
         (id, inventoryBatches.get(id).get.numInventory - inventoryBatchIdsAndOrderCounts.get(id).getOrElse(0))
+      }.toMap
+
+    // 3) query for products and inventoryBatchProducts on inventoryBatchIds
+    val productsAndBatchIdsQuery: Query[(Product, Long)] =
+      services.productStore.getProductAndInventoryBatchAssociations(inventoryBatchIds)
+
+    val products = for((product, batchId) <- productsAndBatchIdsQuery) yield {
+      product
+    }
+
+    val productsAndBatchIds = products.map(product =>
+      {
+       val ids =  for((p, id) <- productsAndBatchIdsQuery if p.id == product.id) yield Set(id)
+       (product, ids.reduceLeft((s1, s2) => s1 | s2 ))
       }
     ).toMap
 
-    // 3) query for products and inventoryBatchProducts on inventoryBatchIds
-    val productsAndBatchIdsQuery: Query[(Product, Long)] = services.productStore.getProductAndInventoryBatchAssociations(inventoryBatchIds)
-    // TODO - This implementation using a mutable map should be rewritten to use an immutable Map.
-    val productsAndBatchIds = scala.collection.mutable.Map[Product, Set[Long]]()
-    for ((product, batchId) <- productsAndBatchIdsQuery) {
-      productsAndBatchIds.get(product) match {
-        case None => productsAndBatchIds.put(product, Set(batchId))
-        case Some(set) => productsAndBatchIds.put(product, set + batchId)
-      }
-    }
-
     // 4) for each product, sum quantity remaining for each associated batch
-    val productsWithInventoryRemaining: scala.collection.mutable.Map[Product, Int] = productsAndBatchIds.map(b => {
+    val productsWithInventoryRemaining: Map[Product, Int] = productsAndBatchIds.map(b => {
       val totalNumRemainingForProduct = (for (batchId <- b._2) yield inventoryBatchIdsAndNumRemaining.get(batchId).getOrElse(0)).sum
       (b._1, totalNumRemainingForProduct)
     })
