@@ -86,6 +86,7 @@
   <hr/>
   <h2>Egraph Details</h2>
   @valueRow(label="Id",                   value=egraph.id)
+  @valueRow(label="Signed At",            value=egraph.signedAt.getOrElse(""))
   @valueRow(label="Created",              value=egraph.created)
   @valueRow(label="Updated",              value=egraph.updated)
 </div>
