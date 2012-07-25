@@ -4,7 +4,7 @@ package views.frontend
  * Front-end utilities that otherwise had no home.
  */
 object Utils {
-  val cdnAssets = play.configuration.conf.getProperty("cdn.enabled") == "true"
+  val cdnAssets = play.configuration.conf.getProperty("cdn.enabled")
   val cdnUrl = play.configuration.conf.getProperty("cloudfront.domain")
   /**
    * Formats a series of String / String tuples into an attribute string suitable for
@@ -36,13 +36,14 @@ object Utils {
    */
 
   def cdnAsset(path: String) : String = {
-    if(cdnAssets)
-      path(0) match {
-        case '/' => "https://" + cdnUrl + path
-        case _ =>  "https://" + cdnUrl + "/" + path
-      }
-    else
-      play.mvc.Router.reverse(play.Play.getVirtualFile(path))
+    cdnAssets match {
+      case "true" =>
+        path(0) match {
+          case '/' => "https://" + cdnUrl + path
+          case _ =>  "https://" + cdnUrl + "/" + path
+        }
+      case _ => play.mvc.Router.reverse(play.Play.getVirtualFile(path))
+    }
   }
 
   /**
