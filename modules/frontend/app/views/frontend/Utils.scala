@@ -31,10 +31,10 @@ object Utils {
   /**
    * Drop-in replacement for @asset. Use to take advantage of cloudfront on live.
    * Paths are always absolute to root. Leading '/' is optional.
-   * @param path
-   * @return path to asset.
+   *
+   * @param path path relative to the application root. This should usually be "public/some-file"
+   * @return path to asset on the currently configured CDN.
    */
-
   def cdnAsset(path: String) : String = {
     cdnAssets match {
       case "true" =>
@@ -42,6 +42,7 @@ object Utils {
           case '/' => "https://" + cdnUrl + path
           case _ =>  "https://" + cdnUrl + "/" + path
         }
+
       case _ => play.mvc.Router.reverse(play.Play.getVirtualFile(path))
     }
   }

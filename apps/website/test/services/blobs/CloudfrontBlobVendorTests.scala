@@ -17,9 +17,6 @@ class CloudfrontBlobVendorTests extends EgraphsUnitTest with ClearsDatabaseAndVa
     cloudfrontVendor.put(namespace, key, bytes , AccessPolicy.Public)
 
     val urlOption = cloudfrontVendor.urlOption(namespace, key)
-    urlOption.get should be("http://egraphs-test.edge.egraphs.com/blob/files/derp")
+    urlOption.get should be("https://egraphs-test.edge.egraphs.com/blob/files/derp")
   }
-
-
-
 }

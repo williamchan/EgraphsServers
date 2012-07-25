@@ -22,11 +22,10 @@ private[blobs] class BlobVendorProvider @Inject() (
   def get() = {
     blobstoreType match {
       case "s3" =>
-        decorateCDN(decorate(S3BlobVendor))
-
+        decorateCDN(decorateCache(S3BlobVendor))
 
       case "filesystem" =>
-        decorate(FileSystemBlobVendor)
+        decorateCache(FileSystemBlobVendor)
 
       case unknownType =>
         throw new IllegalStateException(
@@ -35,7 +34,7 @@ private[blobs] class BlobVendorProvider @Inject() (
     }
   }
 
-  private def decorate(baseBlobVendor: BlobVendor): BlobVendor = {
+  private def decorateCache(baseBlobVendor: BlobVendor): BlobVendor = {
     new CacheIndexedBlobVendor(cacheFactory, new DBIndexedBlobVendor(blobKeyStore, baseBlobVendor))
   }
   
