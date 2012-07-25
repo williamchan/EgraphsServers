@@ -104,7 +104,8 @@ object GetEgraphEndpoint {
     }
 
     val rawSignedImage = egraph.image(product.photoImage)
-    //TODO w1zzle handle this (see if its worth removing the signing origin transform)
+    // TODO SER-170 this code is quite similar to that in GalleryOrderFactory.
+    // Refactor together and put withSigningOriginOffset inside EgraphImage.
     val frameFittedImage = rawSignedImage
       .withPenWidth(penWidth)
       .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)

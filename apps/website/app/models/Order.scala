@@ -632,7 +632,11 @@ object GalleryOrderFactory {
       optionEgraph.map( egraph => {
         val product = order.product
         val celebrity = product.celebrity
-        val rawImage = egraph.image(product.photoImage).rasterized.scaledToWidth(product.frame.thumbnailWidthPixels)
+        // TODO SER-170 this code is quite similar to that in GetEgraphEndpoint.
+        // Refactor together and put withSigningOriginOffset inside EgraphImage.
+        val rawImage = egraph.image(product.photoImage).rasterized
+          .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
+          .scaledToWidth(product.frame.thumbnailWidthPixels)
         val thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Public)
         val viewEgraphUrl = Utils.lookupAbsoluteUrl("WebsiteControllers.getEgraph", Map("orderId" -> order.id.toString)).url
 
