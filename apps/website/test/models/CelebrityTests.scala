@@ -90,9 +90,8 @@ class CelebrityTests extends EgraphsUnitTest
     profilePhoto.renderFromMaster.asByteArray(ImageAsset.Png).length should be (imageAsset.renderFromMaster.asByteArray(ImageAsset.Png).length)
   }
 
-  "getActiveProductsWithInventoryRemaining" should "return Products with quantity remaining without any orders" in {
+  "getActiveProductsWithInventoryRemaining" should "return Products with quantity remaining equal to numInventory if no orders exist" in {
     val celebrity = TestData.newSavedCelebrity()
-    val customer = TestData.newSavedCustomer()
     val product = TestData.newSavedProductWithoutInventoryBatch(celebrity = celebrity)
     val inventoryBatch = TestData.newSavedInventoryBatch(celebrity = celebrity)
     product.inventoryBatches.associate(inventoryBatch)

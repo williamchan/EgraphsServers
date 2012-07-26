@@ -106,16 +106,12 @@ case class Celebrity(id: Long = 0,
       }.toMap
 
     // 3) query for products and inventoryBatchProducts on inventoryBatchIds
-    val productsAndBatchIdsQuery: Query[(Product, Long)] =
+    val productsAndBatchAssociations: Query[(Product, Long)] =
       services.productStore.getProductAndInventoryBatchAssociations(inventoryBatchIds)
 
-    val products = for((product, batchId) <- productsAndBatchIdsQuery) yield {
-      product
-    }
-
-    val productsAndBatchIds = products.map(product =>
+    val productsAndBatchIds = productsAndBatchAssociations.toMap.keySet.map(product =>
       {
-       val ids =  for((p, id) <- productsAndBatchIdsQuery if p.id == product.id) yield Set(id)
+       val ids =  for((p, id) <- productsAndBatchAssociations if p.id == product.id) yield Set(id)
        (product, ids.reduceLeft((s1, s2) => s1 | s2 ))
       }
     ).toMap
