@@ -90,6 +90,16 @@ class CelebrityTests extends EgraphsUnitTest
     profilePhoto.renderFromMaster.asByteArray(ImageAsset.Png).length should be (imageAsset.renderFromMaster.asByteArray(ImageAsset.Png).length)
   }
 
+  "getActiveProductsWithInventoryRemaining" should "return Products with quantity remaining equal to numInventory if no orders exist" in {
+    val celebrity = TestData.newSavedCelebrity()
+    val product = TestData.newSavedProductWithoutInventoryBatch(celebrity = celebrity)
+    val inventoryBatch = TestData.newSavedInventoryBatch(celebrity = celebrity)
+    product.inventoryBatches.associate(inventoryBatch)
+
+    val productsWithInventoryRemaining = celebrity.getActiveProductsWithInventoryRemaining()
+    productsWithInventoryRemaining.toMap.get(product) should be(Some(inventoryBatch.numInventory))
+
+  }
   /**
    * Sample data: Product1 in IB1 and IB2, and Product 2 in IB2. All IBs have default numInventory of 50.
    *              Placing one order against IB1 and two orders against IB2 should reduce the quantity available by 1 and 2, respectively.
