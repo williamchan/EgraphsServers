@@ -29,7 +29,7 @@ private[controllers] trait GetCelebrityEnrollmentTemplateApiEndpoint { this: Con
           "Joe books very few judges",
           "Here I was in Miami and Illinois"
         )
-        val myNameIs: List[String] = List("My name is " + celebrity.publicName.getOrElse("..."))
+        val myNameIs: List[String] = List("My name is " + celebrity.publicName)
         val _1_thru_5: List[String] = List("One, two, three, four, five")
         val _6_thru_10: List[String] = List("Six, seven, eight, nine, ten")
         val enrollmentPhrases: List[String] = myNameIs ::: _1_thru_5 ::: phonymsPhrases ::: phonymsPhrases ::: _6_thru_10 ::: myNameIs

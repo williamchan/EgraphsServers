@@ -105,7 +105,7 @@ class CelebrityAccountRequestFilters @Inject() (
             new NotFound("No celebrity with url \"" + celebrityUrlSlug + "\"")
 
           case Some(celebrity) if celebrity.publishedStatus != PublishedStatus.Published =>
-            new NotFound(celebrity.publicName.get + "'s Egraphs profile is temporarily unavailable. Check back soon.")
+            new NotFound(celebrity.publicName + "'s Egraphs profile is temporarily unavailable. Check back soon.")
 
           case Some(celebrity) =>
             continue(celebrity)
@@ -137,10 +137,10 @@ class CelebrityAccountRequestFilters @Inject() (
       case Some(productUrlSlug) =>
         celebrity.products(productFilters.byUrlSlug(productUrlSlug)).headOption match {
           case None =>
-            new NotFound(celebrity.publicName.get + " doesn't have any product with url " + productUrlSlug)
+            new NotFound(celebrity.publicName + " doesn't have any product with url " + productUrlSlug)
 
           case Some(product) if product.publishedStatus != PublishedStatus.Published =>
-            new NotFound(celebrity.publicName.get + " doesn't have any product with url " + productUrlSlug)
+            new NotFound(celebrity.publicName + " doesn't have any product with url " + productUrlSlug)
 
           case Some(product)  =>
             continue(product)

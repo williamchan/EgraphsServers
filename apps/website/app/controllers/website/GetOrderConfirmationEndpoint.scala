@@ -44,7 +44,7 @@ private[controllers] trait GetOrderConfirmationEndpoint extends ImplicitHeaderAn
           buyerEmail = buyerAccount.email,
           ownerName = recipient.name,
           ownerEmail = recipientAccount.email,
-          celebName = celeb.publicName.getOrElse("Anonymous"),
+          celebName = celeb.publicName,
           productName = product.name,
           totalPrice = order.amountPaid,
           guaranteedDeliveryDate = order.inventoryBatch.getExpectedDate

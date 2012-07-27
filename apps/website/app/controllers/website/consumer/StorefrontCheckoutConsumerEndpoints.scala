@@ -90,7 +90,7 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
         }
 
         val orderSummary = CheckoutOrderSummary(
-          celebrityName=celeb.publicName.getOrElse("Anonymous"),
+          celebrityName=celeb.publicName,
           productName=product.name,
           recipientName=validPersonalizeForm.recipientName,
           messageText=PurchaseForms.makeTextForCelebToWrite(

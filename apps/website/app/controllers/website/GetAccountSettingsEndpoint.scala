@@ -71,7 +71,7 @@ private[controllers] trait GetAccountSettingsEndpoint extends ImplicitHeaderAndF
     maybeFormData.getOrElse {
       val (addressLine1, addressLine2, city, state, postalCode) = account.addresses.headOption match {
         case None => ("", "", "", "", "")
-        case Some(address) => (address.addressLine1, address.addressLine2, address.city, address._state, address.postalCode)
+        case Some(address) => (address.addressLine1, address.addressLine2.getOrElse(""), address.city, address._state, address.postalCode)
       }
       AccountSettingsFormView(
         fullname = Field(name = Fields.Fullname.name, values = List(customer.name)),

@@ -127,7 +127,7 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
         }
 
         maybeCreateInventoryBatchForDemoMode(savedProduct, isCreate)
-        new Redirect(lookupUrl("WebsiteControllers.getStorefrontChoosePhotoTiled", Map("celebrityUrlSlug" -> celebrity.urlSlug.get)).url)
+        new Redirect(lookupUrl("WebsiteControllers.getStorefrontChoosePhotoTiled", Map("celebrityUrlSlug" -> celebrity.urlSlug)).url)
       }
       else {
         // There were validation errors

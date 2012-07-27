@@ -20,7 +20,7 @@ private[consumer] trait StorefrontFailedConsumerEndpoints
   def getStorefrontNoInventory(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod()
   {
     celebFilters.requireCelebrityAndProductUrlSlugs { (celeb, product) =>
-      views.frontend.html.celebrity_storefront_no_inventory(celeb.publicName.get, product.name)
+      views.frontend.html.celebrity_storefront_no_inventory(celeb.publicName, product.name)
     }
   }
 

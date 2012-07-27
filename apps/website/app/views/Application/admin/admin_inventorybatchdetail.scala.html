@@ -28,7 +28,7 @@
 @body = {
 <div class="admin-content">
   <h1>
-    @celebrity.publicName.get - @{if(isCreate) "Create" else "Update"} Inventory Batch
+    @celebrity.publicName - @{if(isCreate) "Create" else "Update"} Inventory Batch
   </h1>
   @views.Application.tags.html.valueRow(label="Remaining Inventory", value=remainingInventory.getOrElse(""))
   <div class="form row">

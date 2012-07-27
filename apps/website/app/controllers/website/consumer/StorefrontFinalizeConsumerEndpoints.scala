@@ -99,7 +99,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
 
         // Create the personalization viewmodel
         val personalizationViewModel = FinalizePersonalizationViewModel(
-          celebName=celeb.publicName.getOrElse("Anonymous"),
+          celebName=celeb.publicName,
           productTitle=product.name,
           recipientName = validPersonalizeForm.recipientName,
           messageText=PurchaseForms.makeTextForCelebToWrite(

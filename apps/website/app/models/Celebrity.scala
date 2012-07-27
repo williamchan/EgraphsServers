@@ -35,7 +35,7 @@ case class CelebrityServices @Inject() (
  */
 case class Celebrity(id: Long = 0,
                      apiKey: Option[String] = None,
-                     publicName: Option[String] = None,
+                     publicName: String = "",
                      casualName: Option[String] = None,                             // e.g. "David" instead of "David Price"
                      organization: String = "",                                     // e.g. "Major League Baseball"
                      bio: String = "",
@@ -59,7 +59,7 @@ case class Celebrity(id: Long = 0,
   // Additional DB columns
   //
   /**The slug used to access this Celebrity's page on the main site. */
-  val urlSlug: Option[String] = publicName.map(name => JavaExtensions.slugify(name, false)) // Slugify without lower-casing
+  val urlSlug: String = JavaExtensions.slugify(publicName) // Slugify without lower-casing
 
   //
   // Public members
@@ -140,14 +140,10 @@ case class Celebrity(id: Long = 0,
    * by the API (e.g. JSON)
    */
   def renderedForApi: Map[String, Any] = {
-    val optionalFields = List(
-      "publicName" -> publicName,
-      "urlSlug" -> urlSlug
-    )
+    Map("id" -> id, "enrollmentStatus" -> enrollmentStatus.name,  "publicName" -> publicName,
+      "urlSlug" -> urlSlug) ++
+      renderCreatedUpdatedForApi
 
-    Map("id" -> id, "enrollmentStatus" -> enrollmentStatus.name) ++
-      renderCreatedUpdatedForApi ++
-      Utils.makeOptionalFieldMap(optionalFields)
   }
 
   /**
@@ -348,7 +344,7 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
     if (slug.isEmpty) return None
 
     from(schema.celebrities)(celebrity =>
-      where(celebrity.urlSlug === Some(slug))
+      where(celebrity.urlSlug === slug)
         select (celebrity)
     ).headOption
   }

@@ -35,7 +35,7 @@ private[controllers] trait GetCelebrityAdminEndpoint {
               flash.put("organization", celebrity.organization)
               flash.put("roleDescription", celebrity.roleDescription.getOrElse(""))
               flash.put("twitterUsername", celebrity.twitterUsername.getOrElse(""))
-              flash.put("publicName", celebrity.publicName.getOrElse(""))
+              flash.put("publicName", celebrity.publicName)
               flash.put("publishedStatusString", celebrity.publishedStatus.toString)
 
               GetCelebrityDetail.getCelebrityDetail(isCreate = false, celebrity = Some(celebrity))

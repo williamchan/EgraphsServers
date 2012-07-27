@@ -39,8 +39,7 @@ class CelebrityAccountRequestFiltersTests extends EgraphsUnitTest with ClearsDat
     val celebrity = mock[Celebrity]
     celebStore.findByUrlSlug(name) returns (Some(celebrity))
     celebrity.publishedStatus returns publishedStatus
-    celebrity.publicName returns Option(name)
-
+    celebrity.publicName returns name
     (celebrity, celebStore)
   }
 
