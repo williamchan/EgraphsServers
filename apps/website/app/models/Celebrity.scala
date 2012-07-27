@@ -59,7 +59,7 @@ case class Celebrity(id: Long = 0,
   // Additional DB columns
   //
   /**The slug used to access this Celebrity's page on the main site. */
-  val urlSlug: String = JavaExtensions.slugify(publicName) // Slugify without lower-casing
+  val urlSlug: String = JavaExtensions.slugify(publicName, false) // Slugify without lower-casing
 
   //
   // Public members

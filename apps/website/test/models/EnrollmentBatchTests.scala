@@ -79,10 +79,10 @@ class EnrollmentBatchTests extends EgraphsUnitTest
 
   "getEnrollmentBatchesPending" should "return batches with true isBatchComplete and null isSuccessfulEnrollment" in {
     val pendingBatch = EnrollmentBatch(celebrityId = Celebrity().save().id, isBatchComplete = true, isSuccessfulEnrollment = None).save()
-    EnrollmentBatch(celebrityId = Celebrity().save().id, isBatchComplete = true, isSuccessfulEnrollment = Some(false)).save()
-    EnrollmentBatch(celebrityId = Celebrity().save().id, isBatchComplete = true, isSuccessfulEnrollment = Some(true)).save()
-    EnrollmentBatch(celebrityId = Celebrity().save().id, isBatchComplete = false, isSuccessfulEnrollment = Some(false)).save()
-    EnrollmentBatch(celebrityId = Celebrity().save().id, isBatchComplete = false, isSuccessfulEnrollment = Some(true)).save()
+    EnrollmentBatch(celebrityId = Celebrity(publicName="a").save().id, isBatchComplete = true, isSuccessfulEnrollment = Some(false)).save()
+    EnrollmentBatch(celebrityId = Celebrity(publicName="b").save().id, isBatchComplete = true, isSuccessfulEnrollment = Some(true)).save()
+    EnrollmentBatch(celebrityId = Celebrity(publicName="c").save().id, isBatchComplete = false, isSuccessfulEnrollment = Some(false)).save()
+    EnrollmentBatch(celebrityId = Celebrity(publicName="d").save().id, isBatchComplete = false, isSuccessfulEnrollment = Some(true)).save()
 
     val pendingEnrollmentBatches = store.getEnrollmentBatchesPending()
     pendingEnrollmentBatches.length should be(1)
