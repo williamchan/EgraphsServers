@@ -131,7 +131,7 @@ object Account extends Controller with DefaultHeaderAndFooterData {
         orientation = "portrait",
         productUrl="egr.aphs/" + user +"/1",
         productTitle = "Telling Jokes",
-        productPublicName = Option("Jimmy Fallon"),
+        productPublicName = "Jimmy Fallon",
         productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
           "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
           " quam. In hac habitasse platea dictumst. Etiam at lectus at nisi blandit lobort" +
@@ -152,7 +152,7 @@ object Account extends Controller with DefaultHeaderAndFooterData {
         orientation = "landscape",
         productUrl="egr.aphs/" + user +"/1",
         productTitle = "You In Reverse",
-        productPublicName = Option("Built To Spill"),
+        productPublicName = "Built To Spill",
         productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
           "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
           " quam. In hac habitasse platea dictumst. Etiam at lectus at nisi blandit lobort" +
@@ -182,7 +182,7 @@ object Account extends Controller with DefaultHeaderAndFooterData {
         orientation = "landscape",
         productUrl="egr.aphs/" + user +"/1",
         productTitle = "Man or Velociraptor?",
-        productPublicName = Option("Chris Bosh"),
+        productPublicName = "Chris Bosh",
         productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
           "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
           " quam. In hac habitasse platea dictumst.",
@@ -198,7 +198,7 @@ object Account extends Controller with DefaultHeaderAndFooterData {
         orientation = "portrait",
         productUrl="egr.aphs/" + user +"/2",
         productTitle = "King James",
-        productPublicName = None,
+        productPublicName = "Lebron-bron",
         productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
           "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
           " quam. In hac habitasse platea dictumst.",
@@ -214,7 +214,7 @@ object Account extends Controller with DefaultHeaderAndFooterData {
         orientation = "landscape",
         productUrl="egr.aphs/" + user +"/2",
         productTitle = "A cool bro",
-        productPublicName = Option("Dwyane Wade"),
+        productPublicName = "Dwyane Wade",
         productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
           "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
           " quam. In hac habitasse platea dictumst.",
