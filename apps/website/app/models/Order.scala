@@ -220,8 +220,10 @@ case class Order(
     email.setTextMsg(views.frontend.html.email_view_egraph_text(viewEgraphUrl = viewEgraphUrl, celebrityName = celebrity.publicName.getOrElse("Egraphs"), recipientName = receivingCustomer.name).toString())
     email
   }
+
   /**
-   * Generates an audio prompt based on an random selection from audioPromptTemplates.
+   * This was formerly used for the "audioPrompt", which is being tweaked to encourage creation of more unique Egraphs.
+   * @return an audio prompt based on an random selection from audioPromptTemplates.
    */
   protected[models] def generateAudioPrompt(indexOfAudioPromptTemplate: Option[Int] = None): String = {
     val i = indexOfAudioPromptTemplate.getOrElse(Order.random.nextInt(Order.audioPromptTemplates.length))
@@ -262,7 +264,7 @@ case class Order(
       "recipientName" -> recipientName,
       "amountPaidInCents" -> amountPaid.getAmountMinor,
       "reviewStatus" -> reviewStatus.name,
-      "audioPrompt" -> generateAudioPrompt(),
+      "audioPrompt" -> ("Recipient: " + recipientName),
       "orderType" -> writtenMessageRequestToWrite.name
     )
 
