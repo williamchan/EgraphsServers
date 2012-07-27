@@ -1,5 +1,4 @@
-#ALTER TABLE Celebrity ALTER COLUMN bio DROP NOT NULL;
-#ALTER TABLE Celebrity ALTER COLUMN bio SET NOT NULL;
+#Alters columns to be not null when appropiate for SER-152
 
 ALTER TABLE Address ALTER COLUMN addressline2 DROP NOT NULL;
 
