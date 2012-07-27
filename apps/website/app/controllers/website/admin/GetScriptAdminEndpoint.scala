@@ -9,7 +9,6 @@ import enums.EgraphState
 import org.squeryl.Query
 import org.squeryl.PrimitiveTypeMode._
 import services.AppConfig
-import services.graphics.Handwriting
 import services.report._
 import play.mvc.results.RenderBinary
 
@@ -104,23 +103,23 @@ private[controllers] trait GetScriptAdminEndpoint {
         }
 
         case "email-list-report" => {
-          val emailListReport = new EmailListReport(schema)
-          new RenderBinary(emailListReport.report(), emailListReport.reportName + ".csv")
+          val report = new EmailListReport(schema).report()
+          new RenderBinary(report, report.getName)
         }
 
         case "inventory-batch-report" => {
-          val inventoryBatchReportService = new InventoryBatchReport(schema)
-          new RenderBinary(inventoryBatchReportService.report(), inventoryBatchReportService.reportName + ".csv")
+          val report = new InventoryBatchReport(schema).report()
+          new RenderBinary(report, report.getName)
         }
 
         case "order-report" => {
-          val orderReportService = new OrderReport(schema)
-          new RenderBinary(orderReportService.report(), orderReportService.reportName + ".csv")
+          val report = new OrderReport(schema).report()
+          new RenderBinary(report, report.getName)
         }
 
         case "physical-print-report" => {
-          val printOrderService = new PrintOrderReport(schema)
-          new RenderBinary(printOrderService.report(), printOrderService.reportName + ".csv")
+          val report = new PrintOrderReport(schema).report()
+          new RenderBinary(report, report.getName)
         }
 
         case "generate-large-egraph" => {

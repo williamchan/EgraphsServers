@@ -9,7 +9,7 @@ import services.Time
  */
 trait Report {
 
-  val reportName: String
+  protected val reportName: String
 
   protected val newline = "\r\n"
 
@@ -18,7 +18,7 @@ trait Report {
   }
 
   protected def csvFile(csv: StringBuilder, reportName: String = reportName): File = {
-    val file = File.createTempFile(reportName + "-" + Time.toBlobstoreFormat(Time.now), "csv")
+    val file = File.createTempFile(reportName + "-" + Time.toBlobstoreFormat(Time.today), ".csv")
     file.deleteOnExit()
     val out = new FileOutputStream(file)
     out.write(csv.toString().getBytes)
