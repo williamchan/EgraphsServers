@@ -1,0 +1,27 @@
+#!/bin/bash
+#
+# Generates documentation about the egraphs postgres database schema
+# being served at localhost.
+#
+# The documentation is placed at the $WEBSITE_APP/tmp/schema_docs
+#
+# Executing this code requires that the graphviz package be installed.
+# You can install it using macports (http://www.macports.org/)
+#
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PROJ_DIR="$SCRIPT_DIR/.."
+PLAY_PATH=`which play`
+PLAY_DIR=`dirname $PLAY_PATH`
+POSTGRES_JAR=$PLAY_DIR/framework/lib/postgresql-9.0.jar
+
+java -jar $SCRIPT_DIR/schemaSpy_5.0.0.jar \
+  -t pgsql \
+  -host localhost \
+  -dp $POSTGRES_JAR \
+  -db egraphs \
+  -schemas public \
+  -u root \
+  -hq \
+  -p postgres \
+  -o $PROJ_DIR/tmp/schema_docs
