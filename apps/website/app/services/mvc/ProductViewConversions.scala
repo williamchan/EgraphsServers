@@ -20,7 +20,7 @@ class ProductViewConversions(product: Product) {
    * @param celebrityUrlSlug identifies the celebrity for use in generating a target url
    * @param quantityRemaining the remaining inventory before the product is "sold out".
    */
-  def asChoosePhotoTileView(celebrityUrlSlug: String = product.celebrity.urlSlug.getOrElse("/"),
+  def asChoosePhotoTileView(celebrityUrlSlug: String = product.celebrity.urlSlug,
                             quantityRemaining: Int = product.remainingInventoryCount)
   : ChoosePhotoTileProduct =
   {
@@ -44,7 +44,7 @@ class ProductViewConversions(product: Product) {
    *
    * @param celebUrlSlug identifies the celebrity for forming the link to post the product selection.
    */
-  def asChoosePhotoCarouselView(celebUrlSlug: String=product.celebrity.urlSlug.getOrElse("/"),
+  def asChoosePhotoCarouselView(celebUrlSlug: String=product.celebrity.urlSlug,
                                 quantityRemaining: Int = product.remainingInventoryCount,
                                 fbAppId: String)
   : ChoosePhotoCarouselProduct =
@@ -62,7 +62,7 @@ class ProductViewConversions(product: Product) {
     val facebookShareLink = views.frontend.Utils.getFacebookShareLink(
       appId = fbAppId,
       picUrl = productThumbnailUrl,
-      name= "Egraphs from " + product.celebrity.publicName.get,
+      name= "Egraphs from " + product.celebrity.publicName,
       caption = "We are all fans.",
       description= "Egraphs are digital interactions, making it possible for stars to connect with fans " +
         "anywhere in the world. The fan writes to their favorite star, and the star sends back a 100% " +
@@ -71,7 +71,7 @@ class ProductViewConversions(product: Product) {
     )
     val twitterShareLink = views.frontend.Utils.getTwitterShareLink(
       link = carouselViewLink,
-      text = "Check it out. " + product.celebrity.publicName.get + " is signing egraphs!"
+      text = "Check it out. " + product.celebrity.publicName + " is signing egraphs!"
     )
     ChoosePhotoCarouselProduct(
       name=product.name,

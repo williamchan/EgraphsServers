@@ -101,7 +101,7 @@ class OrderTests extends EgraphsUnitTest
     val signer_name = "Signer"
     val recipient_name = "Recipient"
     val order = TestData.newSavedOrder().copy(recipientName = recipient_name).save()
-    order.product.celebrity.copy(publicName = Some(signer_name)).save()
+    order.product.celebrity.copy(publicName = signer_name).save()
 
     order.generateAudioPrompt(Some(0)) should be("Yo Recipient, it’s Signer. It was awesome getting your message. Hope you enjoy this egraph.")
     order.generateAudioPrompt(Some(1)) should be("Recipient, it’s Signer here. Thanks for being a great fan. Hopefully we can win some games for you down the stretch.")
@@ -233,7 +233,7 @@ class OrderTests extends EgraphsUnitTest
   }
 
   "prepareEgraphsSignedEmail" should "not use celebrity's email" in {
-    val celebrity = TestData.newSavedCelebrity().copy(publicName = Some("Public Celebrity")).save()
+    val celebrity = TestData.newSavedCelebrity().copy(publicName = "Public Celebrity").save()
     val order = TestData.newSavedOrder(product = Some(TestData.newSavedProduct(celebrity = Some(celebrity))))
     val email = order.prepareEgraphsSignedEmail()
     email.getFromAddress.getAddress should not be (celebrity.account.email)

@@ -127,7 +127,7 @@ object GetEgraphEndpoint {
 
     // TODO refactor with social-related code in Order
     // Social links
-    val celebName = celebrity.publicName.get
+    val celebName = celebrity.publicName
     val thisPageAction = WebsiteControllers.reverse(WebsiteControllers.getEgraph(order.id.toString))
     thisPageAction.absolute()
     val thisPageLink = thisPageAction.url
@@ -150,7 +150,7 @@ object GetEgraphEndpoint {
 
     // Render
     views.frontend.html.egraph(
-      signerName = celebrity.publicName.getOrElse("Anony mouse"),
+      signerName = celebrity.publicName,
       recipientName = order.recipientName,
       frameCssClass = frame.cssClass,
       frameLayoutColumns = frame.cssFrameColumnClasses,

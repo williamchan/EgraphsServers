@@ -185,7 +185,7 @@ object PostBuyProductEndpoint extends Logging {
         case e: InsufficientInventoryException => {
           payment.refund(charge.id)
           saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = e.getLocalizedMessage)
-          return new Redirect(reverse(WebsiteControllers.getStorefrontNoInventory(celebrity.urlSlug.get, product.urlSlug)).url)
+          return new Redirect(reverse(WebsiteControllers.getStorefrontNoInventory(celebrity.urlSlug, product.urlSlug)).url)
         }
         case e: Exception => {
           payment.refund(charge.id)
@@ -299,7 +299,7 @@ object PostBuyProductEndpoint extends Logging {
       buyerName = buyerName,
       recipientName = recipientName,
       recipientEmail = recipientEmail,
-      celebrityName = celebrity.publicName.get,
+      celebrityName = celebrity.publicName,
       productName = product.name,
       orderDate = dateFormat.format(order.created),
       orderId = order.id.toString,
@@ -314,7 +314,7 @@ object PostBuyProductEndpoint extends Logging {
       buyerName = buyerName,
       recipientName = recipientName,
       recipientEmail = recipientEmail,
-      celebrityName = celebrity.publicName.get,
+      celebrityName = celebrity.publicName,
       productName = product.name,
       orderDate = dateFormat.format(order.created),
       orderId = order.id.toString,

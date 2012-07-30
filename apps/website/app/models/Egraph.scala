@@ -96,8 +96,8 @@ case class Egraph(
     EgraphStory(
       titleTemplate=product.storyTitle,
       bodyTemplate=product.storyText,
-      celebName=signer.publicName.get,
-      celebUrlSlug=signer.urlSlug.get,
+      celebName=signer.publicName,
+      celebUrlSlug=signer.urlSlug,
       recipientName=order.recipientName,
       productName=product.name,
       productUrlSlug=product.urlSlug,

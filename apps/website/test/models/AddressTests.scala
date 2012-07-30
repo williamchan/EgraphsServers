@@ -18,7 +18,7 @@ class AddressTests extends EgraphsUnitTest
     val account = TestData.newSavedAccount()
     Address(accountId = account.id,
       addressLine1 = "Celebrity Marketplace",
-      addressLine2 = "202 29th Ave",
+      addressLine2 = Option("202 29th Ave"),
       city = "Seattle",
       _state = "WA",
       postalCode = "98122"
