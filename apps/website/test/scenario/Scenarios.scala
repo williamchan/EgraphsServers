@@ -161,7 +161,7 @@ class Scenarios extends DeclaresScenarios {
      import Blobs.Conversions._
 
       val celebrity = Celebrity(
-        publicName=Some("Wizzle"),
+        publicName="Wizzle",
         bio="Love my fans from New York to Tokyo, from Seoul to the Sudetenland. And for all you haters out there -- don't mess around. I sleep with one eye closed, the other fixed on my Vespene gas supply.",
         organization = "Major League Baseball",
         isFeatured = true
@@ -671,12 +671,12 @@ class Scenarios extends DeclaresScenarios {
   private def createCelebrity(name: String, email: String) {
     import javax.imageio.ImageIO
     import play.Play
-    val celebrity = Celebrity(publicName = Some(name), bio = "Today's Sriracha is tomorrow's salsa.", isFeatured = true)
+    val celebrity = Celebrity(publicName = name, bio = "Today's Sriracha is tomorrow's salsa.", isFeatured = true)
       .withEnrollmentStatus(EnrollmentStatus.Enrolled).withPublishedStatus(PublishedStatus.Published).save()
     Account(email = email, celebrityId = Some(celebrity.id)).withPassword("egraphsa").right.get.save()
     val inventoryBatch = InventoryBatch(celebrityId = celebrity.id, numInventory = 100, startDate = today, endDate = future).save()
     for (i <- 1 until 8) yield {
-      val product = celebrity.newProduct.copy(priceInCurrency = 100, name = celebrity.publicName.get + "'s Product " + i, description = "Help me... help YOU...")
+      val product = celebrity.newProduct.copy(priceInCurrency = 100, name = celebrity.publicName + "'s Product " + i, description = "Help me... help YOU...")
         .withPublishedStatus(PublishedStatus.Published)
         .saveWithImageAssets(image = Some(ImageIO.read(Play.getFile("test/files/kapler/product-1.jpg"))), icon = None)
       inventoryBatch.products.associate(product)

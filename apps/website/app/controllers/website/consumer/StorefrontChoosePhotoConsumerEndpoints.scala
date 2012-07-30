@@ -44,7 +44,7 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
   def getStorefrontChoosePhotoTiled(celebrityUrlSlug: String) = controllerMethod()
   {
     celebFilters.requireCelebrityUrlSlug { celebrity =>
-      val celebrityUrlSlug = celebrity.urlSlug.getOrElse("/")
+      val celebrityUrlSlug = celebrity.urlSlug
 
       val productViews = for (product <- celebrity.productsInActiveInventoryBatches()) yield {
         product.asChoosePhotoTileView(celebrityUrlSlug=celebrityUrlSlug)
@@ -91,7 +91,7 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
 
         case indexOfProductInProductList =>
           val productViews = for (product <- products) yield {
-            product.asChoosePhotoCarouselView(celebUrlSlug=celeb.urlSlug.getOrElse("/"), fbAppId = facebookAppId)
+            product.asChoosePhotoCarouselView(celebUrlSlug=celeb.urlSlug, fbAppId = facebookAppId)
           }
 
           implicit def crumbs = breadcrumbData.crumbsForRequest(celeb.id, celebrityUrlSlug, Some(productUrlSlug))
@@ -131,7 +131,7 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
 object StorefrontChoosePhotoConsumerEndpoints {
 
   def url(celebrity:Celebrity, product:Product): Router.ActionDefinition = {
-    url(celebrity.urlSlug.get, product.urlSlug)
+    url(celebrity.urlSlug, product.urlSlug)
   }
 
   def url(celebrityUrlSlug: String, productUrlSlug: String): Router.ActionDefinition = {

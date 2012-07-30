@@ -86,15 +86,15 @@ trait PostCelebrityAdminEndpoint {
         Validation.isTrue("Role Description has maximum length of 128", roleDescription.length < 128)  // column width in database
 
         // Name validations
-        if (celebrityUrlSlug.isDefined) {
-          val celebrityByUrlSlug = celebrityStore.findByUrlSlug(celebrityUrlSlug.get)
+//        if (celebrityUrlSlug.isDefined) {
+          val celebrityByUrlSlug = celebrityStore.findByUrlSlug(celebrityUrlSlug)
           val isUniqueUrlSlug = if (isCreate) {
             celebrityByUrlSlug.isEmpty
           } else {
             celebrityByUrlSlug.isEmpty || (celebrityByUrlSlug.isDefined && celebrityByUrlSlug.get.id == celebrityId)
           }
           Validation.isTrue("Celebrity with same website name exists. Provide different public name", isUniqueUrlSlug)
-        }
+//        }
 
         // Profile image validations
         if (profileImage.isDefined) {
@@ -178,7 +178,7 @@ trait PostCelebrityAdminEndpoint {
                                   organization: String,
                                   roleDescription: String,
                                   twitterUsername: String): Celebrity = {
-    celebrity.copy(publicName = Utils.toOption(publicName),
+    celebrity.copy(publicName = publicName,
       bio = bio,
       casualName = Utils.toOption(casualName),
       organization = organization,

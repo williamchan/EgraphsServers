@@ -41,7 +41,7 @@ object TestData {
   def newSavedAddress(account: Option[Account] = None): Address = {
     Address(accountId = account.getOrElse(newSavedAccount()).id,
       addressLine1 = "615 2nd Ave",
-      addressLine2 = "Suite 300",
+      addressLine2 = Option("Suite 300"),
       city = "Seattle",
       _state = "WA",
       postalCode = "98104"
@@ -75,7 +75,7 @@ object TestData {
     val identifier = getTimeInBlobstoreFormat
     val email = "celebrity-" + identifier + "@egraphs.com"
     val acct = Account(email = email).save()
-    val celeb = Celebrity(publicName = Some("Celebrity " + identifier)).withPublishedStatus(PublishedStatus.Published).save()
+    val celeb = Celebrity(publicName = "Celebrity " + identifier).withPublishedStatus(PublishedStatus.Published).save()
 
     acct.copy(celebrityId = Some(celeb.id)).save()
 

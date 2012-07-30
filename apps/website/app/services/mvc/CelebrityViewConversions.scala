@@ -34,7 +34,7 @@ class CelebrityViewConversions(celeb: Celebrity) {
   def asChoosePhotoView: ChoosePhotoCelebrity = {
     val profileUrl = celeb.profilePhoto.resizedWidth(80).getSaved(AccessPolicy.Public).url
     ChoosePhotoCelebrity(
-      name=celeb.publicName.getOrElse("Anonymous"),
+      name=celeb.publicName,
       profileUrl=profileUrl,
       organization=celeb.organization,
       roleDescription=celeb.roleDescription.getOrElse(""),
@@ -49,28 +49,27 @@ class CelebrityViewConversions(celeb: Celebrity) {
    *
    * @return
    */
-  def asFeaturedStar: Option[FeaturedStar] = {
-    for (publicName <- celeb.publicName; urlSlug <- celeb.urlSlug) yield {
-      val mastheadImageUrl = celeb
-        .landingPageImage
-        .withImageType(ImageAsset.Jpeg)
-        .resizedWidth(440)
-        .getSaved(AccessPolicy.Public)
-        .url
+  def asFeaturedStar: FeaturedStar = {
+    val mastheadImageUrl = celeb
+      .landingPageImage
+      .withImageType(ImageAsset.Jpeg)
+      .resizedWidth(440)
+      .getSaved(AccessPolicy.Public)
+      .url
 
-      val activeProductsAndInventory = celeb.getActiveProductsWithInventoryRemaining()
-      val purchaseableProducts = activeProductsAndInventory.filter { productAndCount =>
-        productAndCount._2 > 0
-      }
-
-      FeaturedStar(
-        name = publicName,
-        secondaryText = celeb.roleDescription,
-        imageUrl = mastheadImageUrl,
-        storefrontUrl = reverse(getStorefrontChoosePhotoTiled(urlSlug)).url,
-        hasInventoryRemaining = !purchaseableProducts.isEmpty
-      )
+    val activeProductsAndInventory = celeb.getActiveProductsWithInventoryRemaining()
+    val purchaseableProducts = activeProductsAndInventory.filter { productAndCount =>
+      productAndCount._2 > 0
     }
+
+    FeaturedStar(
+      name = celeb.publicName,
+      secondaryText = celeb.roleDescription,
+      imageUrl = mastheadImageUrl,
+      storefrontUrl = reverse(getStorefrontChoosePhotoTiled(celeb.urlSlug)).url,
+      hasInventoryRemaining = !purchaseableProducts.isEmpty
+    )
+
   }
 }
 

@@ -44,7 +44,7 @@ class PurchaseForms @Inject()(
    *   to get the data on the left.
    */
   def allPurchaseFormsOrRedirect(celeb: Celebrity, product: Product) = {
-    val celebrityUrlSlug = celeb.urlSlug.getOrElse("Anonymous")
+    val celebrityUrlSlug = celeb.urlSlug
     for (
       // Make sure the product ID in this URL matches the one in the form
       productId <- matchProductIdOrRedirectToChoosePhoto(celeb, product).right;
@@ -308,7 +308,7 @@ class PurchaseForms @Inject()(
    * @param product the product for the redirect
    */
   def matchProductIdOrRedirectToChoosePhoto(celebrity:Celebrity, product:Product): Either[Redirect, Long] = {
-    lazy val thisChoosePhotoRedirect = choosePhotoRedirect(celebrity.urlSlug.getOrElse("/"))
+    lazy val thisChoosePhotoRedirect = choosePhotoRedirect(celebrity.urlSlug)
 
     // Redirect if either this form has no productId or the provided product Id didn't match
     for (

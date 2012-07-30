@@ -76,7 +76,7 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
         implicit def crumbs = breadcrumbData.crumbsForRequest(celeb.id, celebrityUrlSlug, Some(productUrlSlug))
 
         views.frontend.html.celebrity_storefront_review(
-          celebrityName = celeb.publicName.getOrElse("Anonymous"),
+          celebrityName = celeb.publicName,
           productTitle = product.name,
           celebrityWillWrite = textCelebWillWrite,
           recipientName = validPersonalizeForm.recipientName,

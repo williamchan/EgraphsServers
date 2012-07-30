@@ -26,7 +26,7 @@ class PostBuyProductEndpointTests extends EgraphsFunctionalTest {
       (celebrity, product)
     }
 
-    val response = POST("/" + celebrity.urlSlug.get + "/" + product.urlSlug + "/buy",
+    val response = POST("/" + celebrity.urlSlug + "/" + product.urlSlug + "/buy",
       Map(
         "recipientName" -> "Erem Recipient",
         "recipientEmail" -> "erem@egraphs.com",
@@ -65,7 +65,7 @@ class PostBuyProductEndpointTests extends EgraphsFunctionalTest {
       (celebrity, product)
     }
 
-    val response = POST("/" + celebrity.urlSlug.get + "/" + product.urlSlug + "/buy",
+    val response = POST("/" + celebrity.urlSlug + "/" + product.urlSlug + "/buy",
       Map(
         "recipientName" -> "Erem Recipient",
         "recipientEmail" -> "erem@egraphs.com",

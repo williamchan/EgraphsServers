@@ -77,7 +77,7 @@ trait StorefrontPersonalizeConsumerEndpoints
         }
 
         val orderSummary = StorefrontOrderSummary(
-          celebrityName = celeb.publicName.getOrElse("Anonymouse"),
+          celebrityName = celeb.publicName,
           productName = product.name,
           subtotal = product.price,
           shipping = forms.shippingPrice,

@@ -193,7 +193,7 @@ case class Order(
 
     val buyingCustomer = this.buyer
     val receivingCustomer = this.recipient
-    email.setFrom(celebrity.urlSlug.get + "@egraphs.com", celebrity.publicName.get)
+    email.setFrom(celebrity.urlSlug + "@egraphs.com", celebrity.publicName)
     email.addTo(receivingCustomer.account.email, recipientName)
     if (buyingCustomer != receivingCustomer) {
       email.addCc(buyingCustomer.account.email, buyingCustomer.name)
@@ -210,24 +210,26 @@ case class Order(
     val viewEgraphUrl = Utils.lookupAbsoluteUrl("WebsiteControllers.getEgraph", Map("orderId" -> id.toString)).url
     val html = views.frontend.html.email_view_egraph(
       viewEgraphUrl = viewEgraphUrl,
-      celebrityName = celebrity.publicName.getOrElse("Egraphs"), // make publicName a String instead of a Option[String]
+      celebrityName = celebrity.publicName,
       recipientName = receivingCustomer.name,
       emailLogoSrc = emailLogoSrc,
       emailFacebookSrc = emailFacebookSrc,
       emailTwitterSrc = emailTwitterSrc
     )
     email.setHtmlMsg(html.toString())
-    email.setTextMsg(views.frontend.html.email_view_egraph_text(viewEgraphUrl = viewEgraphUrl, celebrityName = celebrity.publicName.getOrElse("Egraphs"), recipientName = receivingCustomer.name).toString())
+    email.setTextMsg(views.frontend.html.email_view_egraph_text(viewEgraphUrl = viewEgraphUrl, celebrityName = celebrity.publicName, recipientName = receivingCustomer.name).toString())
     email
   }
+
   /**
-   * Generates an audio prompt based on an random selection from audioPromptTemplates.
+   * This was formerly used for the "audioPrompt", which is being tweaked to encourage creation of more unique Egraphs.
+   * @return an audio prompt based on an random selection from audioPromptTemplates.
    */
   protected[models] def generateAudioPrompt(indexOfAudioPromptTemplate: Option[Int] = None): String = {
     val i = indexOfAudioPromptTemplate.getOrElse(Order.random.nextInt(Order.audioPromptTemplates.length))
     val orderAudioPrompt = OrderAudioPrompt(
       audioPromptTemplate=Order.audioPromptTemplates(i),
-      celebName=product.celebrity.publicName.get,
+      celebName=product.celebrity.publicName,
       recipientName=recipientName,
       services=services.audioPromptServices.get()
     )
@@ -262,7 +264,7 @@ case class Order(
       "recipientName" -> recipientName,
       "amountPaidInCents" -> amountPaid.getAmountMinor,
       "reviewStatus" -> reviewStatus.name,
-      "audioPrompt" -> generateAudioPrompt(),
+      "audioPrompt" -> ("Recipient: " + recipientName),
       "orderType" -> writtenMessageRequestToWrite.name
     )
 
@@ -641,7 +643,7 @@ object GalleryOrderFactory {
         val viewEgraphUrl = Utils.lookupAbsoluteUrl("WebsiteControllers.getEgraph", Map("orderId" -> order.id.toString)).url
 
         // TODO refactor with social-related code in GetEgraphEndpoint
-        val celebName = celebrity.publicName.get
+        val celebName = celebrity.publicName
         val formattedSigningDate = new SimpleDateFormat("MMMM dd, yyyy").format(egraph.getSignedAt)
         val facebookShareLink = views.frontend.Utils.getFacebookShareLink(
           appId = fbAppId,

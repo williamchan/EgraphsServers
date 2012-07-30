@@ -36,8 +36,8 @@ private[controllers] trait GetRootConsumerEndpoint extends ImplicitHeaderAndFoot
 
       // Turn the domain objects into view (FeaturedStars), filtering out the ones
       // that were invalid due to lack of a public name or url slug.
-      val featuredStars = for (celeb <- featuredCelebs; validStar <- celeb.asFeaturedStar) yield {
-        validStar
+      val featuredStars = for (celeb <- featuredCelebs) yield {
+        celeb.asFeaturedStar
       }
 
       // Return an IndexedSeq, which is serializable to the cache

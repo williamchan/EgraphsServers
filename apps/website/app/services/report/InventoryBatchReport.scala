@@ -37,7 +37,7 @@ class InventoryBatchReport @Inject()(schema: Schema) extends Report {
         batch.numInventory,
         batch.numInventory - batchIdsAndOrderCount.get(batch.id).getOrElse(0),
         batch.celebrityId,
-        batchAndCelebrityName._2.getOrElse("")
+        batchAndCelebrityName._2
       ))
     }
     csvFile(csv)

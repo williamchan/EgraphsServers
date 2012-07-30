@@ -99,7 +99,7 @@ class DemoScenarios extends DeclaresDemoScenarios {
     val productB = "demo/" + s3ResourceId + "/" + s3ResourceId + "-product-b.jpg"
 
     val celebrity = Celebrity(
-      publicName = Some(publicName),
+      publicName = publicName,
       bio = "Love all my fans out there from Seattle to Swaziland."
     ).withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
 

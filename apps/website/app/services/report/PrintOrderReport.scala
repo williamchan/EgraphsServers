@@ -50,7 +50,7 @@ class PrintOrderReport @Inject() (schema: Schema) extends Report {
         recipient.name,
         account.email,
         order.shippingAddress.getOrElse("").replaceAll(",", " "),
-        celebrity.publicName.get,
+        celebrity.publicName,
         celebrity.id,
         egraph._egraphState)
       )

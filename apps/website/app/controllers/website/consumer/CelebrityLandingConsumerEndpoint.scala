@@ -32,9 +32,9 @@ object CelebrityLandingConsumerEndpoint {
       .withImageType(ImageAsset.Jpeg)
       .getSaved(AccessPolicy.Public)
       .url
-    val publicName = celebrity.publicName.get
+    val publicName = celebrity.publicName
     views.frontend.html.celebrity_landing(
-      getStartedUrl = Utils.lookupUrl("WebsiteControllers.getStorefrontChoosePhotoTiled", Map("celebrityUrlSlug" -> celebrity.urlSlug.get)).url,
+      getStartedUrl = Utils.lookupUrl("WebsiteControllers.getStorefrontChoosePhotoTiled", Map("celebrityUrlSlug" -> celebrity.urlSlug)).url,
       celebrityPublicName = publicName,
       celebrityCasualName = celebrity.casualName.getOrElse(publicName),
       landingPageImageUrl = landingPageImageUrl,
