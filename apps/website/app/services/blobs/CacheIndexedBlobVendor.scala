@@ -1,7 +1,6 @@
 package services.blobs
 
 import com.google.inject.Inject
-import models.BlobKeyStore
 import services.cache.CacheFactory
 import services.{Utils, Time}
 import services.logging.Logging

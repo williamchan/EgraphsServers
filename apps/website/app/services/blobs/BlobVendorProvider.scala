@@ -35,16 +35,10 @@ private[blobs] class BlobVendorProvider @Inject() (
   }
 
   private def decorateCache(baseBlobVendor: BlobVendor): BlobVendor = {
-    new CacheIndexedBlobVendor(cacheFactory, new DBIndexedBlobVendor(blobKeyStore, baseBlobVendor))
+    new CacheIndexedBlobVendor(cacheFactory, baseBlobVendor)
   }
-  
+
   private def decorateCDN(baseBlobVendor: BlobVendor): BlobVendor = {
-    new CloudfrontBlobVendor(cloudfrontDomain, new DBIndexedBlobVendor(blobKeyStore, baseBlobVendor))
+    new CloudfrontBlobVendor(cloudfrontDomain, baseBlobVendor)
   }
-
 }
-
-
-
-
-
