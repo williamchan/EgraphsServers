@@ -17,7 +17,6 @@ trait AllConsumerEndpoints
   with GetStaticEndpoint
   with LogoutEndpoints
   with PostAccountSettingsEndpoint
-  with PostBuyProductEndpoint
   with PostLoginEndpoint
   with PostOrderConfigureEndpoint
   with PostRecoverAccountEndpoint

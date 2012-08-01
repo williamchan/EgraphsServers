@@ -37,8 +37,8 @@ class Schema @Inject()(
   val addresses = table[Address]
   on(addresses)(address =>
     declare(
-      address._state is (dbType("varchar(2)")),
-      address.postalCode is (dbType("varchar(20)"))
+      address._state is dbType("varchar(2)"),
+      address.postalCode is dbType("varchar(20)")
     )
   )
 
@@ -47,20 +47,23 @@ class Schema @Inject()(
   val blobKeys = table[BlobKey]
   on(blobKeys)(blobKey =>
     declare(
-      blobKey.key is (unique),
+      blobKey.key is unique,
       blobKey.url is dbType("varchar(255)")
     )
   )
 
   val cashTransactions = table[CashTransaction]
-  on(cashTransactions)(cashTransaction => declare(cashTransaction.amountInCurrency is monetaryDbType))
+  on(cashTransactions)(cashTransaction => declare(
+    cashTransaction.amountInCurrency is monetaryDbType,
+    cashTransaction.billingPostalCode is dbType("varchar(20)"))
+  )
 
   val celebrities = table[Celebrity]
   on(celebrities)(celebrity =>
     declare(
-      celebrity.urlSlug is (unique),
-      celebrity.isFeatured is (indexed),
-      celebrity.bio is (dbType("text"))
+      celebrity.urlSlug is unique,
+      celebrity.isFeatured is indexed,
+      celebrity.bio is dbType("text")
     )
   )
 
@@ -80,13 +83,13 @@ class Schema @Inject()(
   val enrollmentSamples = table[EnrollmentSample]
 
   val failedPurchaseData = table[FailedPurchaseData]
-  on(failedPurchaseData)(datum => declare( datum.purchaseData is (dbType("varchar(1000)")) ))
+  on(failedPurchaseData)(datum => declare( datum.purchaseData is dbType("varchar(1000)") ))
 
   val inventoryBatches = table[InventoryBatch]
   on(inventoryBatches)(inventoryBatch =>
     declare(
-      columns(inventoryBatch.startDate, inventoryBatch.endDate) are (indexed),
-      columns(inventoryBatch.celebrityId, inventoryBatch.startDate, inventoryBatch.endDate) are (indexed)
+      columns(inventoryBatch.startDate, inventoryBatch.endDate) are indexed,
+      columns(inventoryBatch.celebrityId, inventoryBatch.startDate, inventoryBatch.endDate) are indexed
     )
   )
 
@@ -94,16 +97,19 @@ class Schema @Inject()(
   on(orders)(order =>
     declare(
       order.amountPaidInCurrency is monetaryDbType,
-      columns(order._reviewStatus) are (indexed),
-      order.billingPostalCode is (dbType("varchar(20)")),
-      order.shippingAddress is (dbType("varchar(255)")),
+      columns(order._reviewStatus) are indexed,
+      order.billingPostalCode is dbType("varchar(20)"),
+      order.shippingAddress is dbType("varchar(255)"),
       order.messageToCelebrity is dbType("varchar(140)")
     )
   )
 
   val printOrders = table[PrintOrder]
   on(printOrders)(printOrder => declare(
-    printOrder.shippingAddress is (dbType("varchar(255)")))
+    printOrder.amountPaidInCurrency is monetaryDbType,
+    printOrder.isFulfilled is indexed,
+    printOrder.pngUrl is dbType("varchar(255)"),
+    printOrder.shippingAddress is dbType("varchar(255)"))
   )
 
   val products = table[Product]
@@ -111,7 +117,7 @@ class Schema @Inject()(
     declare(
       product.priceInCurrency is monetaryDbType,
       product.storyText is dbType("text"),
-      columns(product.celebrityId, product.urlSlug) are (unique)
+      columns(product.celebrityId, product.urlSlug) are unique
     )
   )
 
@@ -132,9 +138,9 @@ class Schema @Inject()(
   val xyzmoEnrollDynamicProfileTable = table[XyzmoEnrollDynamicProfile]
   on(xyzmoEnrollDynamicProfileTable)(xyzmoEnrollDynamicProfile =>
     declare(
-      xyzmoEnrollDynamicProfile.errorMsg is (dbType("varchar(255)")),
-      xyzmoEnrollDynamicProfile.rejectedSignaturesSummary is (dbType("varchar(255)")),
-      xyzmoEnrollDynamicProfile.enrollmentSampleIds is (dbType("varchar(255)"))
+      xyzmoEnrollDynamicProfile.errorMsg is dbType("varchar(255)"),
+      xyzmoEnrollDynamicProfile.rejectedSignaturesSummary is dbType("varchar(255)"),
+      xyzmoEnrollDynamicProfile.enrollmentSampleIds is dbType("varchar(255)")
     )
   )
   val xyzmoVerifyUserTable = table[XyzmoVerifyUser]
@@ -149,7 +155,7 @@ class Schema @Inject()(
     .via[InventoryBatchProduct]((inventoryBatch, product, join) => (join.inventoryBatchId === inventoryBatch.id, join.productId === product.id))
   on(inventoryBatchProducts)(inventoryBatchProduct =>
     declare(
-      columns(inventoryBatchProduct.inventoryBatchId, inventoryBatchProduct.productId) are (unique)
+      columns(inventoryBatchProduct.inventoryBatchId, inventoryBatchProduct.productId) are unique
     )
   )
 

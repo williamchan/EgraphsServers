@@ -5,20 +5,16 @@ import play.mvc.Controller
 
 import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
 import services.http.forms.purchase._
-import models.enums.{PrintingOption, WrittenMessageRequest}
-import PrintingOption.HighQualityPrint
-import PrintOptionForm.Params
+import models.enums.PrintingOption
 import controllers.WebsiteControllers
 import WebsiteControllers.{getStorefrontCheckout, getStorefrontPersonalize}
-import SafePlayParams.Conversions._
-import services.Utils
 import models.frontend.storefront._
 import services.payment.Payment
 import models.frontend.storefront.FinalizeBillingViewModel
 import models.frontend.storefront.FinalizeViewModel
 import models.frontend.storefront.FinalizePersonalizationViewModel
 import models.frontend.storefront.FinalizeShippingViewModel
-import controllers.website.PostBuyProductEndpoint.EgraphPurchaseHandler
+import controllers.website.EgraphPurchaseHandler
 import services.db.{TransactionSerializable, DBSession}
 import services.http.forms.purchase.PurchaseForms.AllPurchaseForms
 import models.Celebrity
@@ -114,7 +110,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
            base=product.price,
            physicalGood=forms.shippingPrice,
            tax=forms.tax,
-           total=forms.total(product.price)
+           total=forms.total(basePrice = product.price)
         )
 
         // Create the final viewmodel
@@ -170,7 +166,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
           personalNote=personalization.noteToCelebriity,
           celebrity=celeb,
           product=product,
-          price=forms.total(product.price),
+          totalAmountPaid=forms.total(basePrice = product.price),
           billingPostalCode=billing.postalCode,
           printingOption=forms.highQualityPrint.getOrElse(PrintingOption.DoNotPrint),
           shippingForm=shipping,

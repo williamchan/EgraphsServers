@@ -19,7 +19,7 @@ class OrderReport @Inject()(schema: Schema) extends Report {
           on(order.buyerId === buyer.id, order.recipientId === recipient.id, order.productId === product.id, order.id === egraph.map(_.orderId))
     )
 
-    val headerLine = csvLine("orderid", "amount", "paymentstatus", "reviewstatus", "billingpostalcode", "ordercreated",
+    val headerLine = csvLine("orderid", "amount", "paymentstatus", "reviewstatus", "ordercreated",
       "productid", "celebrityid", "buyerid", "buyername", "recipientid", "recipientname",
       "candidateegraphid", "candidateegraphstate")
     val csv = new StringBuilder(headerLine)
@@ -34,7 +34,6 @@ class OrderReport @Inject()(schema: Schema) extends Report {
         order.amountPaidInCurrency,
         order._paymentStatus,
         order._reviewStatus,
-        order.billingPostalCode.getOrElse(""),
         order.created,
         product.id,
         product.celebrityId,

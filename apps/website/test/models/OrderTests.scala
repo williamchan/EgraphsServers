@@ -3,10 +3,8 @@ package models
 import enums._
 import utils._
 import services.AppConfig
-import org.squeryl.PrimitiveTypeMode._
 import services.db.Schema
 import org.joda.money.CurrencyUnit
-import models.CashTransaction.{PurchaseRefund, EgraphPurchase}
 import services.payment.{Charge, NiceCharge}
 import javax.mail.internet.InternetAddress
 
@@ -16,9 +14,9 @@ class OrderTests extends EgraphsUnitTest
   with CreatedUpdatedEntityTests[Order]
   with DBTransactionPerTest
 {
-  private val schema = AppConfig.instance[Schema]
   private val orderStore = AppConfig.instance[OrderStore]
   private val orderQueryFilters = AppConfig.instance[OrderQueryFilters]
+  private val cashTransactionStore = AppConfig.instance[CashTransactionStore]
 
   //
   // SavingEntityTests[Order] methods
@@ -45,8 +43,6 @@ class OrderTests extends EgraphsUnitTest
       buyerId = order.buyerId,
       recipientId = order.recipientId,
       recipientName = "Derpy Jones",
-      stripeCardTokenId = Some("12345"),
-      stripeChargeId = Some("12345"),
       messageToCelebrity = Some("Wizzle you're the best!"),
       requestedMessage = Some("Happy birthday, Erem!")
     ).withPaymentStatus(PaymentStatus.Charged)
@@ -188,44 +184,45 @@ class OrderTests extends EgraphsUnitTest
 
   "withChargeInfo" should "set the PaymentStatus, store stripe info, and create an associated CashTransaction" in {
     val (will, _, _, product) = newOrderStack
-    val order = will.buy(product).save().withChargeInfo(stripeCardTokenId = "mytoken", stripeCharge = NiceCharge).save()
+    val order = will.buy(product).withPaymentStatus(PaymentStatus.Charged).save()
+    CashTransaction(accountId = will.account.id, orderId = Some(order.id), stripeCardTokenId = Some("mytoken"), stripeChargeId = Some(NiceCharge.id),billingPostalCode = Some("55555"))
+      .withCash(product.price).withCashTransactionType(CashTransactionType.EgraphPurchase).save()
 
     // verify PaymentStatus
     order.paymentStatus should be(PaymentStatus.Charged)
 
-    // verify Stripe Info
-    order.stripeCardTokenId.get should be("mytoken")
-    order.stripeChargeId.get should include ("test charge against services.payment.YesMaamPayment")
-
     // verify CashTransaction
-    val cashTransaction = from(schema.cashTransactions)(txn =>
-      where(txn.orderId === Some(order.id))
-        select (txn)
-    ).head
+
+    val cashTransaction = cashTransactionStore.findByOrderId(order.id).head
     cashTransaction.accountId should be(will.account.id)
     cashTransaction.orderId should be(Some(order.id))
     cashTransaction.amountInCurrency should be(product.priceInCurrency)
     cashTransaction.currencyCode should be(CurrencyUnit.USD.getCode)
-    cashTransaction.typeString should be(EgraphPurchase.value)
+    cashTransaction.cashTransactionType should be(CashTransactionType.EgraphPurchase)
+    cashTransaction.stripeCardTokenId.get should be("mytoken")
+    cashTransaction.stripeChargeId.get should include ("test charge against services.payment.YesMaamPayment")
+
   }
 
   "refund" should "refund the Stripe charge, change the PaymentStatus to Refunded, and create a refund CashTransaction" in {
     val (will, _, _, product) = newOrderStack
-    val order = will.buy(product).save().withChargeInfo(stripeCardTokenId = "mytoken", stripeCharge = NiceCharge).save()
+    val order = will.buy(product).withPaymentStatus(PaymentStatus.Charged).save()
+    CashTransaction(accountId = will.account.id, orderId = Some(order.id), stripeCardTokenId = Some("mytoken"), stripeChargeId = Some(NiceCharge.id),billingPostalCode = Some("55555"))
+      .withCash(product.price).withCashTransactionType(CashTransactionType.EgraphPurchase).save()
 
     var (refundedOrder: Order, refundCharge: Charge) = order.refund()
     refundedOrder = refundedOrder.save()
     refundedOrder.paymentStatus should be(PaymentStatus.Refunded)
     refundCharge.refunded should be(true)
 
-    val cashTransactions = from(schema.cashTransactions)(txn => where(txn.orderId === Some(order.id)) select (txn))
+    val cashTransactions = cashTransactionStore.findByOrderId(order.id)
     cashTransactions.size should be(2)
-    val purchaseTxn = cashTransactions.find(b => b.transactionType == EgraphPurchase).head
+    val purchaseTxn = cashTransactions.find(b => b.cashTransactionType == CashTransactionType.EgraphPurchase).head
     purchaseTxn.accountId should be(will.id)
     purchaseTxn.orderId should be(Some(order.id))
     purchaseTxn.amountInCurrency should be(BigDecimal(product.price.getAmount))
     purchaseTxn.currencyCode should be(CurrencyUnit.USD.getCode)
-    val refundTxn = cashTransactions.find(b => b.transactionType == PurchaseRefund).head
+    val refundTxn = cashTransactions.find(b => b.cashTransactionType == CashTransactionType.PurchaseRefund).head
     refundTxn.accountId should be(will.id)
     refundTxn.orderId should be(Some(order.id))
     refundTxn.amountInCurrency should be(BigDecimal(product.price.negated().getAmount))

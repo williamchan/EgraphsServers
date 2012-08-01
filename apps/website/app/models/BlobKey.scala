@@ -7,6 +7,8 @@ import db.{Schema, Saves, KeyedCaseClass}
 
 case class BlobKeyServices @Inject()(store: BlobKeyStore)
 
+// We have stopped using this table.
+@Deprecated
 case class BlobKey(id: Long = 0L,
                    key: String = "",
                    url: String = "",

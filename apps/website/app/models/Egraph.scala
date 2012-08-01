@@ -568,7 +568,15 @@ class EgraphStore @Inject() (schema: Schema) extends Saves[Egraph] with SavesCre
     )
   }
 
-
+  def findByOrder(orderId: Long, filters: FilterOneTable[Egraph]*): Query[Egraph] = {
+    from(schema.egraphs)(egraph =>
+      where(
+        egraph.orderId === orderId and
+          FilterOneTable.reduceFilters(filters, egraph)
+      )
+        select (egraph)
+    )
+  }
 
   //
   // Saves[Egraph] methods
@@ -652,6 +660,14 @@ class EgraphQueryFilters @Inject() (schema: Schema) {
     new FilterOneTable[Egraph] {
       override def test(egraph: Egraph) = {
         (egraph._egraphState === Published.name)
+      }
+    }
+  }
+
+  def publishedOrApproved: FilterOneTable[Egraph] = {
+    new FilterOneTable[Egraph] {
+      override def test(egraph: Egraph) = {
+        (egraph._egraphState in Seq(Published.name, ApprovedByAdmin.name))
       }
     }
   }

@@ -12,7 +12,6 @@ import com.google.inject._
 import mail.Mail
 import payment.{Charge, Payment}
 import org.squeryl.Query
-import models.CashTransaction.{PurchaseRefund, EgraphPurchase}
 import org.apache.commons.mail.{Email, HtmlEmail}
 import scala.util.Random
 import java.util.Date
@@ -53,10 +52,10 @@ case class Order(
   rejectionReason: Option[String] = None,
   _privacyStatus: String = PrivacyStatus.Public.name,
   _writtenMessageRequest: String = WrittenMessageRequest.SpecificMessage.name,
-  stripeCardTokenId: Option[String] = None,
-  stripeChargeId: Option[String] = None,
+  @Deprecated stripeCardTokenId: Option[String] = None,
+  @Deprecated stripeChargeId: Option[String] = None,
   amountPaidInCurrency: BigDecimal = 0,
-  billingPostalCode: Option[String] = None,
+  @Deprecated billingPostalCode: Option[String] = None,
   messageToCelebrity: Option[String] = None,
   requestedMessage: Option[String] = None,
   expectedDate: Option[Date] = None,
@@ -126,33 +125,20 @@ case class Order(
     firstName + lastNamesRedacted
   }
 
-  /** Call this to associate a Stripe Charge with this Order */
-  def withChargeInfo(stripeCardTokenId: String, stripeCharge: Charge): Order = {
-    require(id != 0, "Order must have an id")
-    CashTransaction(accountId = buyer.account.id, orderId = Some(id), services = services.cashTransactionServices.get)
-      .withCash(amountPaid)
-      .withType(EgraphPurchase)
-      .save()
-
-    this.copy(stripeCardTokenId = Some(stripeCardTokenId), stripeChargeId = Some(stripeCharge.id))
-      .withPaymentStatus(PaymentStatus.Charged)
-  }
-
   /**
-   * refund functionality is ready to be called, but is not exposed anywhere.
+   * Refund functionality is ready to be called, but is not exposed anywhere.
    * Hopefully we will not have many refund requests when we launch.
    */
   def refund(): (Order, Charge) = {
     require(paymentStatus == PaymentStatus.Charged, "Refunding an Order requires that the Order be already Charged")
-    require(stripeChargeId.isDefined, "Refunding an Order requires that the Order be already Charged")
+    val cashTransaction = services.cashTransactionServices.get().cashTransactionStore.findByOrderId(id).headOption
+    require(cashTransaction.isDefined && cashTransaction.get.stripeChargeId.isDefined, "Refunding an Order requires that the Order be already Charged")
 
-    val refundedCharge = services.payment.refund(stripeChargeId.get)
-
+    val refundedCharge = services.payment.refund(cashTransaction.get.stripeChargeId.get)
     CashTransaction(accountId = buyerId, orderId = Some(id), services = services.cashTransactionServices.get)
       .withCash(amountPaid.negated())
-      .withType(PurchaseRefund)
+      .withCashTransactionType(CashTransactionType.PurchaseRefund)
       .save()
-
     val refundedOrder = withPaymentStatus(PaymentStatus.Refunded)
     (refundedOrder, refundedCharge)
   }

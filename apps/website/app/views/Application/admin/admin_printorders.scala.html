@@ -1,0 +1,47 @@
+@(printOrdersAndOrders: Iterable[(models.PrintOrder, models.Order)])(implicit flash:play.mvc.Scope.Flash)
+
+@import controllers.WebsiteControllers
+@import services.Utils.lookupUrl
+@import views.Application.tags.html.pagination
+@import views.Application.html.content_base
+
+@content_base(title="Admin - Print Orders", body=body, head=head)
+
+@head = {
+<script src='@asset("public/twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
+}
+
+@body = {
+<div class="admin-content">
+  <h1>
+    Print Orders @flash.get("TotalResultsStr")
+  </h1>
+  <div>
+    <h2>Filters:</h2>
+    <ul class="span16">
+      <li><a href="?filter=unfulfilled">Unfilfilled</a></li>
+      <li><a href="?filter=fulfilled">Filfilled</a></li>
+      <li><a href="?filter=all">All</a></li>
+    </ul>
+  </div>
+  <table>
+    <tr>
+      <th></th>
+      <th>Id</th>
+      <th>Fulfilled?</th>
+    </tr>
+    @printOrdersAndOrders.map { case (printOrder, order) =>
+    <tr>
+      <td>
+        <a class="preview-link" href="/admin/printorders/@printOrder.id">
+          Details
+        </a>
+      </td>
+      <td>@printOrder.id</td>
+      <td>@printOrder.isFulfilled</td>
+    </tr>
+    }
+  </table>
+  @pagination()
+</div>
+}
