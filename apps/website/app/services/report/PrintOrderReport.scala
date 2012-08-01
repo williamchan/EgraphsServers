@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import models._
 import services.db.Schema
 import org.squeryl.PrimitiveTypeMode._
-import enums.{EgraphState, PrintingOption}
+import enums.EgraphState
 import org.squeryl.Query
 import java.io.File
 
@@ -17,7 +17,7 @@ class PrintOrderReport @Inject() (schema: Schema) extends Report {
    */
   def report(): File = {
     import schema.{orders, egraphs, customers, accounts, products, celebrities}
-    val printOrders: Query[(Order, Customer, Account, Celebrity, Egraph)] =
+    val printOrders: Query[(Order, Account, Celebrity, Egraph)] =
       from(orders, customers, accounts, products, celebrities, egraphs)((order, recipient, account, product, celebrity, egraph) =>
         where(
           // TODO: Once the first 49 print orders are fulfilled, rewrite to query PrintOrder table
@@ -29,7 +29,7 @@ class PrintOrderReport @Inject() (schema: Schema) extends Report {
             egraph.orderId === order.id and
             (egraph._egraphState in Seq(EgraphState.Published.name, EgraphState.ApprovedByAdmin.name))
         )
-          select(order, recipient, account, celebrity, egraph)
+          select(order, account, celebrity, egraph)
           orderBy (order.id asc)
       )
 
@@ -38,18 +38,17 @@ class PrintOrderReport @Inject() (schema: Schema) extends Report {
     val csv = new StringBuilder(headerLine)
     for (o <- printOrders) {
       val order = o._1
-      val recipient = o._2
-      val account = o._3
-      val celebrity = o._4
-      val egraph = o._5
+      val account = o._2
+      val celebrity = o._3
+      val egraph = o._4
       csv.append(csvLine(
         order.id,
         order.amountPaidInCurrency,
         egraph.id,
         egraph.signedAt.getOrElse(egraph.created),
-        recipient.name,
+        order.recipientName,
         account.email,
-        order.shippingAddress.getOrElse("").replaceAll(",", " "),
+        "", // This will come from ShippingInfo once the initial print orders are fulfilled
         celebrity.publicName,
         celebrity.id,
         egraph._egraphState)

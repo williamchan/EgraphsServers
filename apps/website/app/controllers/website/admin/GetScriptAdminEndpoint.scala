@@ -122,6 +122,7 @@ private[controllers] trait GetScriptAdminEndpoint {
           new RenderBinary(report, report.getName)
         }
 
+        // Will be moved into PrintOrder functionality.
         case "generate-large-egraph" => {
           val width = 2446 // width from Feeny
           val egraphId = params.get("egraphId").toLong
@@ -132,7 +133,6 @@ private[controllers] trait GetScriptAdminEndpoint {
           val image = rawSignedImage
             .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
             .scaledToWidth(width)
-//          image.getSavedUrl(AccessPolicy.Public)
           image.rasterized.getSavedUrl(AccessPolicy.Public)
         }
 
