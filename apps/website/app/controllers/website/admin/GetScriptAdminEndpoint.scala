@@ -2,13 +2,15 @@ package controllers.website.admin
 
 import play.mvc.Controller
 import services.http.{AdminRequestFilters, ControllerMethod}
-import services.blobs.Blobs
+import services.blobs.{AccessPolicy, Blobs}
 import services.db.Schema
 import models._
 import enums.EgraphState
 import org.squeryl.Query
 import org.squeryl.PrimitiveTypeMode._
-import services.{Dimensions, AppConfig}
+import services.AppConfig
+import services.report._
+import play.mvc.results.RenderBinary
 
 private[controllers] trait GetScriptAdminEndpoint {
   this: Controller =>
@@ -100,15 +102,38 @@ private[controllers] trait GetScriptAdminEndpoint {
           "I gave that EnrollmentBatch a kick"
         }
 
-        case "reset-signingScale" => {
-          val products: Query[(Product)] = from(schema.products)((p) => select(p))
-          for (product <- products) {
-            val image = product.photoImage
-            val imageDimensions = Dimensions(image.getWidth, image.getHeight)
-            val signingScaleDimensions = if (imageDimensions.isLandscape) Product.defaultLandscapeSigningScale else Product.defaultPortraitSigningScale
-            product.copy(signingScaleH = signingScaleDimensions.height, signingScaleW = signingScaleDimensions.width).save()
-          }
-          "signingScaleW and signingScaleH set for all products"
+        case "email-list-report" => {
+          val report = new EmailListReport(schema).report()
+          new RenderBinary(report, report.getName)
+        }
+
+        case "inventory-batch-report" => {
+          val report = new InventoryBatchReport(schema).report()
+          new RenderBinary(report, report.getName)
+        }
+
+        case "order-report" => {
+          val report = new OrderReport(schema).report()
+          new RenderBinary(report, report.getName)
+        }
+
+        case "physical-print-report" => {
+          val report = new PrintOrderReport(schema).report()
+          new RenderBinary(report, report.getName)
+        }
+
+        // Will be moved into PrintOrder functionality.
+        case "generate-large-egraph" => {
+          val width = 2446 // width from Feeny
+          val egraphId = params.get("egraphId").toLong
+          val egraph = egraphStore.get(egraphId)
+          val order = egraph.order
+          val product = order.product
+          val rawSignedImage = egraph.image(product.photoImage)
+          val image = rawSignedImage
+            .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
+            .scaledToWidth(width)
+          image.rasterized.getSavedUrl(AccessPolicy.Public)
         }
 
         case _ => "Not a valid action"

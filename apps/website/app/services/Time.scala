@@ -51,7 +51,7 @@ object Time {
   }
 
   /**
-   * Transforms the provided API-formatted date string into a Timestasmp, assuming that
+   * Transforms the provided API-formatted date string into a Timestamp, assuming that
    * it adheres to the API format described in toApiFormat.
    */
   def fromApiFormat(dateString: String): Timestamp = {
