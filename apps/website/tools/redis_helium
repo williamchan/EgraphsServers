@@ -1,0 +1,50 @@
+#!/bin/bash
+#
+# Connects to the redis instance on helium (he.egraphs.com) and performs the redis
+# command provided in the arguments. You must have redis-cli 
+# installed.
+#
+# In order to use this command you must have the server's
+# redis auth credentials set in your environment variable
+# HELIUM_REDIS_AUTH. Find them in Lastpass.
+# 
+# By default it queries the LIVE database. 
+#
+# Usage:
+#   > export HELIUM_REDIS_AUTH=mySuperSecretRedisPassword
+#   > tools/redis_helium GET myKey
+#   (nil)
+#
+#   > tools/redis_helium GET someOtherKey
+#   (nil)
+#
+
+# Check that redis is installed
+which redis-cli > /dev/null
+found_redis_cli=$?
+if [ "$found_redis_cli" == 0 ]; then
+
+  # Check that an auth is provided
+  if [ -n "$HELIUM_REDIS_AUTH" ]; then
+
+    # Issue the redis commands against live. Herp!
+    redis_db=1 # the live db
+    redis-cli \
+      -h he.egraphs.com \
+      -p 6379 \
+      -n $redis_db \
+      -a $HELIUM_REDIS_AUTH \
+      $@
+  else
+    echo 'Please set the HELIUM_REDIS_AUTH variable so I can authenticate against redis.'
+    echo 'You can find it in Lastpass under the key redis(helium)'
+    echo ''
+    echo 'Syntax is:'
+    echo ' > export HELIUM_REDIS_AUTH=mySuperSecretRedisPassword'
+  
+  fi # End auth check
+
+else
+  echo 'Could not find "redis-cli" command. Please download macports and use it to install redis libraries.'
+fi # end redis-cli check
+
