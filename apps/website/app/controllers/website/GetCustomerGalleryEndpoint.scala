@@ -9,6 +9,7 @@ import enums.{PrivacyStatus, EgraphState}
 import models.frontend.egraphs._
 import scala.Some
 import services.mvc.ImplicitHeaderAndFooterData
+import models.GalleryOrderFactory
 
 /**
  * Controller for displaying customer galleries. Galleries serve as a "wall of egraphs".
@@ -68,18 +69,7 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
     //get orders
     val orders_and_egraphs = orderStore.getEgraphsAndOrders(galleryCustomerId).toList
 
-    val pendingOrders = orders_and_egraphs.filter(orderEgraph => {
-      val maybeEgraph = orderEgraph._2
-      maybeEgraph match {
-        case None => true
-        case Some(egraph) => egraph.egraphState match {
-          case EgraphState.Published => false
-          case EgraphState.RejectedByAdmin => false
-          case EgraphState.FailedBiometrics => false
-          case _ => true
-        }
-      }
-    })
+    val pendingOrders = GalleryOrderFactory.filterPendingOrders(orders_and_egraphs)
 
     val fulfilledOrders = orders_and_egraphs.filter(orderEgraph =>
       orderEgraph._2.map(_.egraphState) == Some(EgraphState.Published)
