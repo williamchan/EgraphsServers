@@ -81,7 +81,7 @@ class Scenarios extends DeclaresScenarios {
   {() =>
     val email = new HtmlEmail()
     email.setFrom("noreply@egraphs.com", "Egraphs")
-    email.addTo("will@egraphs.com", "Will Chan")
+    email.addTo("will@egraphs.com")
     email.setSubject("Order Confirmation")
     val emailLogoSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-logo.jpg")))
     val emailFacebookSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-facebook.jpg")))
@@ -124,7 +124,7 @@ class Scenarios extends DeclaresScenarios {
   {() =>
     val email = new HtmlEmail()
     email.setFrom("celebrity@egraphs.com", "Celebrity Jane")
-    email.addTo("will@egraphs.com", "Will Chan")
+    email.addTo("will@egraphs.com")
     email.addReplyTo("noreply@egraphs.com")
     email.setSubject("I just finished signing your Egraph")
     val emailLogoSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-logo.jpg")))

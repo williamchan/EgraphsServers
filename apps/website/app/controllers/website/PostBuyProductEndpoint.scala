@@ -287,7 +287,7 @@ object PostBuyProductEndpoint extends Logging {
     import services.Finance.TypeConversions._
     val email = new HtmlEmail()
     email.setFrom("noreply@egraphs.com", "Egraphs")
-    email.addTo(buyerEmail, buyerName)
+    email.addTo(buyerEmail)
     email.setSubject("Order Confirmation")
 //    val emailLogoSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-logo.jpg")))
 //    val emailFacebookSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-facebook.jpg")))

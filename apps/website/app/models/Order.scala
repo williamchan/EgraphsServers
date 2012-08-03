@@ -194,9 +194,9 @@ case class Order(
     val buyingCustomer = this.buyer
     val receivingCustomer = this.recipient
     email.setFrom(celebrity.urlSlug + "@egraphs.com", celebrity.publicName)
-    email.addTo(receivingCustomer.account.email, recipientName)
+    email.addTo(receivingCustomer.account.email)
     if (buyingCustomer != receivingCustomer) {
-      email.addCc(buyingCustomer.account.email, buyingCustomer.name)
+      email.addCc(buyingCustomer.account.email)
     }
 
     email.addReplyTo("noreply@egraphs.com")
@@ -211,13 +211,13 @@ case class Order(
     val html = views.frontend.html.email_view_egraph(
       viewEgraphUrl = viewEgraphUrl,
       celebrityName = celebrity.publicName,
-      recipientName = receivingCustomer.name,
+      recipientName = recipientName,
       emailLogoSrc = emailLogoSrc,
       emailFacebookSrc = emailFacebookSrc,
       emailTwitterSrc = emailTwitterSrc
     )
     email.setHtmlMsg(html.toString())
-    email.setTextMsg(views.frontend.html.email_view_egraph_text(viewEgraphUrl = viewEgraphUrl, celebrityName = celebrity.publicName, recipientName = receivingCustomer.name).toString())
+    email.setTextMsg(views.frontend.html.email_view_egraph_text(viewEgraphUrl = viewEgraphUrl, celebrityName = celebrity.publicName, recipientName = recipientName).toString())
     email
   }
 
