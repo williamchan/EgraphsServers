@@ -67,14 +67,16 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
 
 
     //get orders
-    val orders_and_egraphs = orderStore.getEgraphsAndOrders(galleryCustomerId).toList
+    val ordersAndEgraphs = orderStore.getEgraphsAndOrders(galleryCustomerId).toList
 
-    val pendingOrders = GalleryOrderFactory.filterPendingOrders(orders_and_egraphs)
+    val pendingOrders = GalleryOrderFactory.filterPendingOrders(ordersAndEgraphs)
 
-    val fulfilledOrders = orders_and_egraphs.filter(orderEgraph =>
-      orderEgraph._2.map(_.egraphState) == Some(EgraphState.Published)
-    )
-
+    val fulfilledOrders = for (
+      orderAndMaybeEgraph <- ordersAndEgraphs;
+      publishedEgraph <- orderAndMaybeEgraph._2 if publishedEgraph.egraphState == EgraphState.Published
+    ) yield {
+      orderAndMaybeEgraph
+    }
 
     val orders:List[EgraphViewModel] = galleryControl match {
       case AdminGalleryControl | OwnerGalleryControl =>

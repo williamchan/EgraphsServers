@@ -630,20 +630,29 @@ object GalleryOrderFactory {
 
   /**
    * Helper function for filtering out rejected egraphs to create a list of pending egraphs.
-   * @param orders_and_egraphs list of orders and associated egraphs
-   * @return list of orders and egraphs that can be considered pending to a user. 
+   * @param ordersAndEgraphs list of orders and associated egraphs
+   * @return list of orders and egraphs that can be considered pending to a user.
    */
-  def filterPendingOrders(orders_and_egraphs: List[(Order, Option[Egraph])]) =
+  def filterPendingOrders(ordersAndEgraphs: List[(Order, Option[Egraph])]): List[(Order, Option[Egraph])] =
   {
-    orders_and_egraphs.filter(orderEgraph => {
+    ordersAndEgraphs.filter(orderEgraph => {
       val maybeEgraph = orderEgraph._2
       maybeEgraph match {
+        // Order-egraph combos without Egraphs are pending
         case None => true
+
+        // Order-egraph combos whose egraphs are published, rejected, or failed biometric testing
+        // are not pending
         case Some(egraph) => egraph.egraphState match {
-          case EgraphState.Published => false
-          case EgraphState.RejectedByAdmin => false
-          case EgraphState.FailedBiometrics => false
-          case _ => true
+          case EgraphState.Published |
+               EgraphState.RejectedByAdmin |
+               EgraphState.FailedBiometrics => false
+
+          case EgraphState.AwaitingVerification |
+               EgraphState.PassedBiometrics |
+               EgraphState.ApprovedByAdmin => true
+
+          case badValue => throw new Exception("Unexpected enum value: " + badValue)
         }
       }
     })
