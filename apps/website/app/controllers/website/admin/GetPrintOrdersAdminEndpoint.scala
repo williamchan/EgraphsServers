@@ -24,9 +24,9 @@ private[controllers] trait GetPrintOrdersAdminEndpoint {
           case "all" => printOrderStore.findByFilter()
           case _ => printOrderStore.findByFilter(printOrderQueryFilters.unfulfilled)
         }
-        val pagedQuery: (Iterable[(PrintOrder, Order)], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
+        val pagedQuery: (Iterable[(PrintOrder, Order, Option[Egraph])], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
         WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetPrintOrdersAdminEndpoint.url(), filter = Some(filter))
-        views.Application.admin.html.admin_printorders(printOrdersAndOrders = pagedQuery._1)
+        views.Application.admin.html.admin_printorders(printOrderDate = pagedQuery._1)
     }
   }
 }

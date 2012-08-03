@@ -20,13 +20,14 @@ egraph: Option[models.Egraph])(implicit session: play.mvc.Scope.Session)
 }
 
 @adminControls = {
-  @if(!printOrder.isFulfilled) {
+  @if(!printOrder.isFulfilled && printOrder.pngUrl.isDefined) {
     <div class="form">
       <form id="fulfill-form" method="POST" action='@postPrintOrder' enctype="application/x-www-form-urlencoded">
         @authenticityToken()
         <input name="printOrderId" type="hidden" value="@printOrder.id">
         <input name="action" type="hidden" value="markFulfilled">
         <div class="actions">
+          <h3>Mark this PrintOrder as shipped</h3>
           <button type="submit" id="fulfill-button" class="btn primary fade in">Mark Fulfilled</button>
         </div>
       </form>
@@ -39,6 +40,7 @@ egraph: Option[models.Egraph])(implicit session: play.mvc.Scope.Session)
         <input name="printOrderId" type="hidden" value="@printOrder.id">
         <input name="action" type="hidden" value="generatePNG">
         <div class="actions">
+          <h3>Generate PNG... this takes a while</h3>
           <button type="submit" id="png-button" class="btn primary fade in">Create PNG</button>
         </div>
       </form>
@@ -57,7 +59,7 @@ egraph: Option[models.Egraph])(implicit session: play.mvc.Scope.Session)
   <h2>Print Order Details</h2>
   @valueRow(label="Id",                   value=printOrder.id)
   @valueRow(label="Is Fulfilled?",        value=printOrder.isFulfilled)
-  @valueRow(label="PNG Url",              value=printOrder.pngUrl)
+  @valueRow(label="PNG Url",              value=printOrder.pngUrl, href=printOrder.pngUrl.getOrElse("") )
   @valueRow(label="Shipping Address",     value=printOrder.shippingAddress)
   @valueRow(label="Amount",               value=printOrder.amountPaid.formatSimply)
   <hr/>

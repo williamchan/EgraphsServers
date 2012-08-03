@@ -1,6 +1,7 @@
 package models
 
 import com.google.inject.Inject
+import enums.EgraphState._
 import java.sql.Timestamp
 import services.{AppConfig, Time}
 import services.db.{FilterOneTable, Saves, Schema, KeyedCaseClass}
@@ -68,14 +69,12 @@ object PrintOrder {
 class PrintOrderStore @Inject() (schema: Schema) extends Saves[PrintOrder] with SavesCreatedUpdated[PrintOrder] {
   import org.squeryl.PrimitiveTypeMode._
 
-  def findByFilter(filters: FilterOneTable[PrintOrder]*): Query[(PrintOrder, Order)] = {
-    from(schema.printOrders, schema.orders)((printOrder, order) =>
-      where(
-        order.id === printOrder.orderId and
-        FilterOneTable.reduceFilters(filters, printOrder)
-      )
-        select (printOrder, order)
+  def findByFilter(filters: FilterOneTable[PrintOrder]*): Query[(PrintOrder, Order, Option[Egraph])] = {
+    join(schema.orders, schema.printOrders, schema.egraphs.leftOuter)((order, printOrder, egraph) =>
+      where(FilterOneTable.reduceFilters(filters, printOrder))
+        select(printOrder, order, egraph)
         orderBy (printOrder.created asc)
+        on(printOrder.orderId === order.id, order.id === egraph.map(_.orderId) and (egraph.map(_._egraphState) in Seq(ApprovedByAdmin.name, Published.name)))
     )
   }
 

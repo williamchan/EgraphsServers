@@ -1,4 +1,4 @@
-@(printOrdersAndOrders: Iterable[(models.PrintOrder, models.Order)])(implicit flash:play.mvc.Scope.Flash)
+@(printOrderDate: Iterable[(models.PrintOrder, models.Order, Option[models.Egraph])])(implicit flash:play.mvc.Scope.Flash)
 
 @import controllers.WebsiteControllers
 @import services.Utils.lookupUrl
@@ -20,7 +20,7 @@
     <h2>Filters:</h2>
     <ul class="span16">
       <li><a href="?filter=unfulfilled">Unfilfilled</a></li>
-      <li><a href="?filter=fulfilled">Filfilled</a></li>
+      <li><a href="?filter=fulfilled">Fulfilled</a></li>
       <li><a href="?filter=all">All</a></li>
     </ul>
   </div>
@@ -29,8 +29,10 @@
       <th></th>
       <th>Id</th>
       <th>Fulfilled?</th>
+      <th>Has PNG?</th>
+      <th>Egraph ready?</th>
     </tr>
-    @printOrdersAndOrders.map { case (printOrder, order) =>
+    @printOrderDate.map { case (printOrder, order, egraphOption) =>
     <tr>
       <td>
         <a class="preview-link" href="/admin/printorders/@printOrder.id">
@@ -39,6 +41,8 @@
       </td>
       <td>@printOrder.id</td>
       <td>@printOrder.isFulfilled</td>
+      <td>@printOrder.pngUrl.isDefined</td>
+      <td>@egraphOption.isDefined</td>
     </tr>
     }
   </table>
