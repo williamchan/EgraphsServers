@@ -441,7 +441,28 @@ class OrderTests extends EgraphsUnitTest
     val queried_egraph = results.head._2.get
 
     queried_egraph.id should be (1)
+  }
 
+  "filterPendingOrders" should "return filtered results with user displayable egraphs" in {
+    val (buyer, recipient, celebrity, product) = newOrderStack
+    val admin = Administrator().save()
+    celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
+
+    val order = buyer.buy(product, recipient=recipient).save()
+
+    val egraph = order.newEgraph.save()
+
+    TestData.newSavedEgraph(Some(order)).withEgraphState(EgraphState.FailedBiometrics).save()
+    TestData.newSavedEgraph(Some(order)).withEgraphState(EgraphState.RejectedByAdmin).save()
+    TestData.newSavedEgraph(Some(order)).withEgraphState(EgraphState.Published).save()
+
+    val results = GalleryOrderFactory.filterPendingOrders(orderStore.getEgraphsAndOrders(recipient.id).toList)
+
+    results.size should be (1)
+
+    val queried_egraph = results.head._2.get
+
+    queried_egraph.id should be (1)
   }
 
   "GalleryOrderFactory" should "create PendingEgraphViewModels from orders" in {

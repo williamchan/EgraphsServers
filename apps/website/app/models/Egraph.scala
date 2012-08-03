@@ -223,6 +223,25 @@ case class Egraph(
     Assets
   }
 
+  /**
+   * Egraphs that are published, rejected, or failed biometric testing are not pending; they will not be
+   * delivered to the user
+   * @return Whether an egraph is on its way to a user
+   */
+  def isPendingEgraph: Boolean = {
+    egraphState match {
+      case EgraphState.Published |
+           EgraphState.RejectedByAdmin |
+           EgraphState.FailedBiometrics => false
+
+      case EgraphState.AwaitingVerification |
+           EgraphState.PassedBiometrics |
+           EgraphState.ApprovedByAdmin => true
+
+      case badValue => throw new Exception("Unexpected enum value: " + badValue)
+    }
+  }
+
   def isApprovable: Boolean = {
     egraphState == PassedBiometrics || egraphState == FailedBiometrics
   }

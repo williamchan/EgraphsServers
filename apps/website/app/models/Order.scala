@@ -180,9 +180,9 @@ case class Order(
     val buyingCustomer = this.buyer
     val receivingCustomer = this.recipient
     email.setFrom(celebrity.urlSlug + "@egraphs.com", celebrity.publicName)
-    email.addTo(receivingCustomer.account.email, recipientName)
+    email.addTo(receivingCustomer.account.email)
     if (buyingCustomer != receivingCustomer) {
-      email.addCc(buyingCustomer.account.email, buyingCustomer.name)
+      email.addCc(buyingCustomer.account.email)
     }
 
     email.addReplyTo("noreply@egraphs.com")
@@ -197,13 +197,13 @@ case class Order(
     val html = views.frontend.html.email_view_egraph(
       viewEgraphUrl = viewEgraphUrl,
       celebrityName = celebrity.publicName,
-      recipientName = receivingCustomer.name,
+      recipientName = recipientName,
       emailLogoSrc = emailLogoSrc,
       emailFacebookSrc = emailFacebookSrc,
       emailTwitterSrc = emailTwitterSrc
     )
     email.setHtmlMsg(html.toString())
-    email.setTextMsg(views.frontend.html.email_view_egraph_text(viewEgraphUrl = viewEgraphUrl, celebrityName = celebrity.publicName, recipientName = receivingCustomer.name).toString())
+    email.setTextMsg(views.frontend.html.email_view_egraph_text(viewEgraphUrl = viewEgraphUrl, celebrityName = celebrity.publicName, recipientName = recipientName).toString())
     email
   }
 
@@ -613,6 +613,25 @@ case class OrderAudioPrompt(private val audioPromptTemplate: String,
 object GalleryOrderFactory {
 
   protected val dateFormat = new SimpleDateFormat("MMM dd, yyyy K:mma z")
+
+  /**
+   * Helper function for filtering out rejected egraphs to create a list of pending orders and optional
+   * associated egraphs.
+   * @param ordersAndEgraphs list of orders and associated egraphs
+   * @return list of orders and egraphs that can be considered pending to a user. There can be more than one
+   * egraph associated with a particular order.
+   */
+  def filterPendingOrders(ordersAndEgraphs: List[(Order, Option[Egraph])]): List[(Order, Option[Egraph])] =
+  {
+    ordersAndEgraphs.filter(orderEgraph => {
+      val maybeEgraph = orderEgraph._2
+      maybeEgraph match {
+        // Order-egraph combos without Egraphs are pending
+        case None => true
+        case Some(egraph) => egraph.isPendingEgraph
+      }
+    })
+  }
 
   def makeFulfilledEgraphViewModel(orders: Iterable[(Order, Option[Egraph])], fbAppId: String) :
     Iterable[Option[FulfilledEgraphViewModel]] = {
