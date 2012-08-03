@@ -457,6 +457,7 @@ class OrderTests extends EgraphsUnitTest
 
     TestData.newSavedEgraph(Some(order)).withEgraphState(EgraphState.FailedBiometrics).save()
     TestData.newSavedEgraph(Some(order)).withEgraphState(EgraphState.RejectedByAdmin).save()
+    TestData.newSavedEgraph(Some(order)).withEgraphState(EgraphState.Published).save()
 
     val results = GalleryOrderFactory.filterPendingOrders(orderStore.getEgraphsAndOrders(recipient.id).toList)
 
