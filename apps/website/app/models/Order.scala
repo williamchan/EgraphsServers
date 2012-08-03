@@ -628,6 +628,25 @@ object GalleryOrderFactory {
 
   protected val dateFormat = new SimpleDateFormat("MMM dd, yyyy K:mma z")
 
+  /**
+   * Helper function for filtering out rejected egraphs to create a list of pending orders and optional
+   * associated egraphs.
+   * @param ordersAndEgraphs list of orders and associated egraphs
+   * @return list of orders and egraphs that can be considered pending to a user. There can be more than one
+   * egraph associated with a particular order.
+   */
+  def filterPendingOrders(ordersAndEgraphs: List[(Order, Option[Egraph])]): List[(Order, Option[Egraph])] =
+  {
+    ordersAndEgraphs.filter(orderEgraph => {
+      val maybeEgraph = orderEgraph._2
+      maybeEgraph match {
+        // Order-egraph combos without Egraphs are pending
+        case None => true
+        case Some(egraph) => egraph.isPendingEgraph
+      }
+    })
+  }
+
   def makeFulfilledEgraphViewModel(orders: Iterable[(Order, Option[Egraph])], fbAppId: String) :
     Iterable[Option[FulfilledEgraphViewModel]] = {
     for ((order:Order, optionEgraph:Option[Egraph]) <- orders) yield {
