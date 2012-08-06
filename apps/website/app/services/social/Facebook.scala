@@ -6,6 +6,8 @@ import java.util.Properties
 import play.libs.WS
 import services.http.PlayConfig
 import sjson.json.Serializer
+import models.FulfilledOrder
+import java.text.SimpleDateFormat
 
 /**
  * Provides our Facebook App ID to Guice as an injectable string
@@ -89,5 +91,26 @@ object Facebook {
       }
       case _ => throw new RuntimeException("Facebook access error encountered: " + response.getString)
     }
+  }
+
+  /**
+   * @param fulfilledOrder order and egraph
+   * @param thumbnailUrl url to thumbnail image
+   * @param viewEgraphUrl url to egraph page
+   * @return a link with everything Facebook needs to make a wall post
+   */
+  def getEgraphShareLink(fbAppId: String, fulfilledOrder: FulfilledOrder, thumbnailUrl: String, viewEgraphUrl: String): String = {
+    val order = fulfilledOrder.order
+    val egraph = fulfilledOrder.egraph
+    val celebName = order.product.celebrity.publicName
+    val formattedSigningDate = new SimpleDateFormat("MMMM dd, yyyy").format(egraph.getSignedAt)
+    views.frontend.Utils.getFacebookShareLink(
+      appId = fbAppId,
+      picUrl = thumbnailUrl,
+      name = celebName + " egraph for " + order.recipientName,
+      caption = "Created by " + celebName + " on " + formattedSigningDate,
+      description = "",
+      link = viewEgraphUrl
+    )
   }
 }

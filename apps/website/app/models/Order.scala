@@ -19,6 +19,7 @@ import java.util.Date
 import com.google.inject.Inject
 import java.text.SimpleDateFormat
 import controllers.website.consumer.StorefrontChoosePhotoConsumerEndpoints
+import social.{Twitter, Facebook}
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -661,28 +662,12 @@ object GalleryOrderFactory {
         val thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Public)
         val viewEgraphUrl = Utils.lookupAbsoluteUrl("WebsiteControllers.getEgraph", Map("orderId" -> order.id.toString)).url
 
-        // TODO refactor with social-related code in GetEgraphEndpoint
-        val celebName = celebrity.publicName
-        val formattedSigningDate = new SimpleDateFormat("MMMM dd, yyyy").format(egraph.getSignedAt)
-        val facebookShareLink = views.frontend.Utils.getFacebookShareLink(
-          appId = fbAppId,
-          picUrl = thumbnailUrl,
-          name = celebName + " egraph for " + order.recipient.name,
-          caption = "Created by " + celebName + " on " + formattedSigningDate,
-          description= "",
-          link = viewEgraphUrl
-        )
+        val facebookShareLink = Facebook.getEgraphShareLink(fbAppId = fbAppId,
+          fulfilledOrder = FulfilledOrder(order = order, egraph = egraph),
+          thumbnailUrl = thumbnailUrl,
+          viewEgraphUrl = viewEgraphUrl)
+        val twitterShareLink = Twitter.getEgraphShareLink(celebrity = celebrity, viewEgraphUrl = viewEgraphUrl)
 
-        val tweetTextIfCelebHasTwitterName = celebrity.twitterUsername.map { celebTwitterName =>
-          "Hey @" + celebTwitterName + " this is one choice egraph you made."
-        }
-        val tweetText = tweetTextIfCelebHasTwitterName.getOrElse {
-          "Check out this choice egraph from " + celebName + "."
-        }
-        val twitterShareLink = views.frontend.Utils.getTwitterShareLink(
-          link = viewEgraphUrl,
-          text = tweetText
-        )
         new FulfilledEgraphViewModel(
           facebookShareLink = facebookShareLink,
           twitterShareLink = twitterShareLink,
