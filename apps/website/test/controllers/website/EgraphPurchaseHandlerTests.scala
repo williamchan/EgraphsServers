@@ -7,7 +7,7 @@ import services.Finance.TypeConversions._
 import services.AppConfig
 import services.payment.StripeTestPayment
 import services.db.{DBSession, TransactionSerializable}
-import models.{PrintOrderStore, CashTransactionStore, OrderStore}
+import models.{Product, PrintOrderStore, CashTransactionStore, OrderStore}
 import services.http.forms.purchase.CheckoutShippingForm
 import org.joda.money.Money
 
@@ -47,7 +47,7 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsDatabaseAndV
       email = ""
     )
     executePurchaseHandler(
-      price = BigDecimal(50).toMoney(),
+      price = Product.defaultPrice.toMoney(),
       printingOption = PrintingOption.HighQualityPrint,
       shippingForm = Some(shippingForm))
 
@@ -63,7 +63,7 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsDatabaseAndV
                                      printingOption: PrintingOption = PrintingOption.DoNotPrint,
                                      shippingForm: Option[CheckoutShippingForm.Valid] = None) {
     val (celebrity, product) = db.connected(TransactionSerializable) {
-      val product = TestData.newSavedProduct().copy(priceInCurrency = BigDecimal(50))
+      val product = TestData.newSavedProduct()
       (product.celebrity, product)
     }
 

@@ -16,7 +16,6 @@ import com.google.inject.{Provider, Inject}
 import services._
 import org.squeryl.Query
 import org.squeryl.dsl.ManyToMany
-import java.util
 
 case class ProductServices @Inject() (
   store: ProductStore,
@@ -33,7 +32,7 @@ case class ProductServices @Inject() (
 case class Product(
   id: Long = 0L,
   celebrityId: Long = 0L,
-  priceInCurrency: BigDecimal = 0,
+  priceInCurrency: BigDecimal = Product.defaultPrice,
   name: String = "",
   description: String = "",
   _defaultFrameName: String = PortraitEgraphFrame.name,
@@ -329,7 +328,7 @@ case class Product(
 
 object Product {
 
-  val defaultPrice = 50
+  val defaultPrice = BigDecimal(50)
   val defaultSigningAreaW = 1024 // This is the width of an iPad2 screen. Default signing area is 1024x1024.
   val defaultLandscapeSigningScale = Dimensions(width = 1615, height = 1024)
   val defaultPortraitSigningScale = Dimensions(width = 1024, height = 1428)

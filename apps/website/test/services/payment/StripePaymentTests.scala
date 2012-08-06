@@ -12,8 +12,13 @@ class StripePaymentTests extends EgraphsUnitTest
   payment.bootstrap()
 
   "charge" should "successfully charge a token" in {
-    val token = payment.testToken()
-    val charge = payment.charge(amount.toMoney(), token.id,
+    val charge = payment.charge(amount.toMoney(), payment.testToken().id,
+      "services.payment..StripePaymentTests, \"charge should successfully charge a token\". Looks like it worked.")
+    charge.id should not be (null)
+  }
+
+  "charge" should "successfully work if amount is in smaller than penny increments" in {
+    val charge = payment.charge(BigDecimal(10.12345).toMoney(), payment.testToken().id,
       "services.payment..StripePaymentTests, \"charge should successfully charge a token\". Looks like it worked.")
     charge.id should not be (null)
   }
@@ -33,8 +38,7 @@ class StripePaymentTests extends EgraphsUnitTest
   }
 
   "refund" should "successfully refund a charge" in {
-    val token = payment.testToken()
-    val charge = payment.charge(amount.toMoney(), token.id,
+    val charge = payment.charge(amount.toMoney(), payment.testToken().id,
       "services.payment..StripePaymentTests, \"This charge should be refunded\".")
     charge.refunded should be(false)
 
@@ -52,8 +56,7 @@ class StripePaymentTests extends EgraphsUnitTest
   }
 
   "refund" should "throw exception if called on a charge that has already been refunded" in {
-    val token = payment.testToken()
-    val charge = payment.charge(amount.toMoney(), token.id,
+    val charge = payment.charge(amount.toMoney(), payment.testToken().id,
       "services.payment..StripePaymentTests, \"This charge should be refunded\".")
     charge.refunded should be(false)
 

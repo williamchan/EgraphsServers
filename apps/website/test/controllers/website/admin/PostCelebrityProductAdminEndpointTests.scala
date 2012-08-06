@@ -8,7 +8,7 @@ import org.junit.Assert._
 import services.AppConfig
 import play.test.FunctionalTest._
 import models.enums.PublishedStatus
-import models.ProductStore
+import models.{Product, ProductStore}
 import services.db.{Schema, TransactionSerializable, DBSession}
 import services.AppConfig._
 
@@ -26,7 +26,7 @@ class PostCelebrityProductAdminEndpointTests extends AdminFunctionalTest {
     createAndLoginAsAdmin()
     createCeleb()
 
-    val response = POST("/admin/celebrities/1/products", getCelebParams(), getCelebImages())
+    val response = POST("/admin/celebrities/1/products", productParams(), productImages())
     assertStatus(302, response)
     instance[DBSession].connected(TransactionSerializable) {
       assertEquals(instance[ProductStore].get(1).publishedStatus, PublishedStatus.Unpublished)
@@ -39,8 +39,8 @@ class PostCelebrityProductAdminEndpointTests extends AdminFunctionalTest {
     createAndLoginAsAdmin()
     createCeleb()
 
-    val postStrParams: Map[String, String] = getCelebParams(publishedStatusString = "-")
-    val postStrImages = getCelebImages()
+    val postStrParams: Map[String, String] = productParams(publishedStatusString = "-")
+    val postStrImages = productImages()
 
     val response = POST("/admin/celebrities/1/products", postStrParams, postStrImages)
     assertStatus(302, response)
@@ -76,24 +76,26 @@ class PostCelebrityProductAdminEndpointTests extends AdminFunctionalTest {
   }
 
   private def postCelebrityProductPublishedStatus(id: Long = 0, status: String)= {
-    POST("/admin/celebrities/1/products", getCelebParams(productId = id, publishedStatusString = status),
-      getCelebImages())
+    POST("/admin/celebrities/1/products", productParams(productId = id, publishedStatusString = status),
+      productImages())
   }
 
-  private def getCelebParams(productId: Long = 0,
-                              productName: String = "Evan Longoria of the Tampa Bay Rays",
-                              productDescription: String =  "Evan Longoria, third baseman for the Rays is a standout player",
-                              signingOriginX: Int = 100,
-                              signingOriginY: Int = 100,
-                              storyTitle: String = "Walk-off home run for a playoff spot",
-                              storyText: String = "Earlier in the month, the Rays were facing a deficit of nine games in " +
-                                                  "the wild card race to the Boston Red Sox.",
-                              publishedStatusString: String =  PublishedStatus.Unpublished.name) : Map[String, String] = {
+  private def productParams(productId: Long = 0,
+                            productName: String = "Evan Longoria of the Tampa Bay Rays",
+                            productDescription: String =  "Evan Longoria, third baseman for the Rays is a standout player",
+                            priceInCurrency: BigDecimal = Product.defaultPrice,
+                            signingOriginX: Int = 100,
+                            signingOriginY: Int = 100,
+                            storyTitle: String = "Walk-off home run for a playoff spot",
+                            storyText: String = "Earlier in the month, the Rays were facing a deficit of nine games in " +
+                                                "the wild card race to the Boston Red Sox.",
+                            publishedStatusString: String =  PublishedStatus.Unpublished.name) : Map[String, String] = {
 
     Map[String, String](
       "productId" -> productId.toString,
       "productName" -> productName,
       "productDescription" -> productDescription,
+      "priceInCurrency" -> priceInCurrency.toString(),
       "signingOriginX" -> signingOriginX.toString,
       "signingOriginY" -> signingOriginY.toString,
       "storyTitle" -> storyTitle,
@@ -102,7 +104,7 @@ class PostCelebrityProductAdminEndpointTests extends AdminFunctionalTest {
     )
   }
 
-  private def getCelebImages(productImage: File =  profileImage,
+  private def productImages(productImage: File =  profileImage,
                              productIcon:  File =  profileIcon) : Map[String, File] = {
     Map[String, File](
       "productImage" -> productImage,
