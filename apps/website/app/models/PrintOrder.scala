@@ -43,8 +43,13 @@ case class PrintOrder(id: Long = 0,
     amountPaidInCurrency.toMoney()
   }
 
-  def generatePng(): Option[String] = {
-    val width = 2446 // width that seems to work for physical prints
+  /**
+   * Generates a print-sized png from an associated published or approved Egraph, if one exists.
+   *
+   * @param width width of print-sized png to generate
+   * @return url of generated image, if it was generated
+   */
+  def generatePng(width: Int = PrintOrder.defaultPngWidth): Option[String] = {
     val order = services.orderStore.get(orderId)
     services.egraphStore.findByOrder(orderId, services.egraphQueryFilters.publishedOrApproved).headOption.map {egraph =>
       val product = order.product
@@ -64,6 +69,7 @@ case class PrintOrder(id: Long = 0,
 
 object PrintOrder {
   val pricePerPrint = BigDecimal(45)
+  val defaultPngWidth = 2446         // 2446 seems to work well for physical prints
 }
 
 class PrintOrderStore @Inject() (schema: Schema) extends Saves[PrintOrder] with SavesCreatedUpdated[PrintOrder] {
@@ -75,6 +81,15 @@ class PrintOrderStore @Inject() (schema: Schema) extends Saves[PrintOrder] with 
         select(printOrder, order, egraph)
         orderBy (printOrder.created asc)
         on(printOrder.orderId === order.id, order.id === egraph.map(_.orderId) and (egraph.map(_._egraphState) in Seq(ApprovedByAdmin.name, Published.name)))
+    )
+  }
+
+  def findHasEgraphNoPng(): Query[(PrintOrder, Order, Option[Egraph])] = {
+    join(schema.orders, schema.printOrders, schema.egraphs)((order, printOrder, egraph) =>
+      where(printOrder.isFulfilled === false and printOrder.pngUrl.isNull)
+        select(printOrder, order, Option(egraph))
+        orderBy (printOrder.created asc)
+        on(printOrder.orderId === order.id, order.id === egraph.orderId and (egraph._egraphState in Seq(ApprovedByAdmin.name, Published.name)))
     )
   }
 
@@ -110,6 +125,14 @@ class PrintOrderQueryFilters @Inject() (schema: Schema) {
     new FilterOneTable[PrintOrder] {
       override def test(printOrder: PrintOrder) = {
         (printOrder.isFulfilled === true)
+      }
+    }
+  }
+
+  def hasPng: FilterOneTable[PrintOrder] = {
+    new FilterOneTable[PrintOrder] {
+      override def test(printOrder: PrintOrder) = {
+        (printOrder.isFulfilled === false and printOrder.pngUrl.isNotNull)
       }
     }
   }
