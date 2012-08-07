@@ -2,8 +2,7 @@ package controllers.website
 
 import play.mvc.Controller
 import services.blobs.AccessPolicy
-import java.text.SimpleDateFormat
-import services.http.{EgraphsSession, ControllerMethod}
+import services.http.ControllerMethod
 import play.templates.Html
 import services.http.SafePlayParams.Conversions.paramsToOptionalParams
 import services.graphics.Handwriting
@@ -11,7 +10,8 @@ import models._
 import controllers.WebsiteControllers
 import frontend.egraph.{LandscapeEgraphFrameViewModel, PortraitEgraphFrameViewModel}
 import play.mvc.results.Redirect
-import services.AppConfig
+import services.social.{Twitter, Facebook}
+import java.text.SimpleDateFormat
 
 private[controllers] trait GetEgraphEndpoint { this: Controller =>
   //
@@ -95,7 +95,6 @@ object GetEgraphEndpoint {
     // Get related data model objects
     val product = order.product
     val celebrity = product.celebrity
-    val recipient = order.recipient
 
     // Prepare the framed image
     val frame = product.frame match {
@@ -125,28 +124,17 @@ object GetEgraphEndpoint {
     // Signed at date
     val formattedSigningDate = new SimpleDateFormat("MMMM dd, yyyy").format(egraph.getSignedAt)
 
-    // TODO refactor with social-related code in Order
     // Social links
-    val celebName = celebrity.publicName
     val thisPageAction = WebsiteControllers.reverse(WebsiteControllers.getEgraph(order.id.toString))
     thisPageAction.absolute()
     val thisPageLink = thisPageAction.url
 
-    val shareOnFacebookLink = views.frontend.Utils.getFacebookShareLink(
-      appId = facebookAppId,
-      picUrl = rasterImageUrl,
-      name = celebName + " egraph for " + recipient.name,
-      caption = "Created by " + celebName + " on " + formattedSigningDate,
-      description = "",
-      link = thisPageLink
-    )
+    val facebookShareLink = Facebook.getEgraphShareLink(fbAppId = facebookAppId,
+      fulfilledOrder = FulfilledOrder(order = order, egraph = egraph),
+      thumbnailUrl = rasterImageUrl,
+      viewEgraphUrl = thisPageLink)
 
-    val tweetTextIfCelebHasTwitterName = celebrity.twitterUsername.map { celebTwitterName =>
-      "Hey @" + celebTwitterName + " this is one choice egraph you made."
-    }
-    val tweetText = tweetTextIfCelebHasTwitterName.getOrElse {
-      "Check out this choice egraph from " + celebName + "."
-    }
+    val twitterShareLink = Twitter.getEgraphShareLink(celebrity = celebrity, viewEgraphUrl = thisPageLink)
 
     // Render
     views.frontend.html.egraph(
@@ -161,8 +149,8 @@ object GetEgraphEndpoint {
       audioUrl = egraph.assets.audioMp3Url,
       signedImageUrl = svgzImageUrl,
       signedOnDate = formattedSigningDate,
-      shareOnFacebookLink = shareOnFacebookLink,
-      shareOnTwitterLink = views.frontend.Utils.getTwitterShareLink(thisPageLink, tweetText),
+      shareOnFacebookLink = facebookShareLink,
+      shareOnTwitterLink = twitterShareLink,
       galleryLink = galleryLink
     )
   }

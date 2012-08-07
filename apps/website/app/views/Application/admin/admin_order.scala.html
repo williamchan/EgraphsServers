@@ -4,7 +4,8 @@
   buyerEmail: String,
   recipient: models.Customer,
   recipientEmail: String,
-  fulfillingEgraph: Option[models.Egraph])(implicit session: play.mvc.Scope.Session)
+  fulfillingEgraph: Option[models.Egraph],
+  fields: (String) => String)(implicit session: play.mvc.Scope.Session)
 
 @import controllers.WebsiteControllers
 @import services.Finance.TypeConversions._
@@ -28,17 +29,13 @@
   lookupUrl("WebsiteControllers.getProductAdmin", Map("productId" -> order.productId.toString))
 }
 
-@isFulfilled() = @{
-  fulfillingEgraph.isDefined
-}
-
 @reviewControls = {
   @if(order.reviewStatus == models.enums.OrderReviewStatus.PendingAdminReview) {
     <div class="form">
       <form id="approve-form" method="POST" action='@postOrder' enctype="application/x-www-form-urlencoded">
         @authenticityToken()
         <input name="orderId" type="hidden" value="@order.id">
-        <input name="reviewStatus" type="hidden" value="@models.enums.OrderReviewStatus.ApprovedByAdmin">
+        <input name="action" type="hidden" value="approve">
         <div class="actions">
           <h3>Approve so that Celebrity can fulfill</h3>
           <button type="submit" id="approve-button" class="btn primary fade in">Approve</button>
@@ -47,7 +44,7 @@
       <form id="reject-form" method="POST" action='@postOrder' enctype="application/x-www-form-urlencoded">
         @authenticityToken()
         <input name="orderId" type="hidden" value="@order.id">
-        <input name="reviewStatus" type="hidden" value="@models.enums.OrderReviewStatus.RejectedByAdmin">
+        <input name="action" type="hidden" value="reject">
         <div class="actions">
           <h3>Reject so that Celebrity will not see this order</h3>
           <label>Rejection Reason</label>
@@ -55,6 +52,17 @@
             <input name="rejectionReason" type="text" maxlength="128"/>
           </div>
           <button type="submit" id="reject-button" class="btn primary fade in">Reject</button>
+        </div>
+      </form>
+      <form id="editMessages-form" method="POST" action='@postOrder' enctype="application/x-www-form-urlencoded">
+        @authenticityToken()
+        <input name="orderId" type="hidden" value="@order.id">
+        <input name="action" type="hidden" value="editMessages">
+        <div class="actions">
+          <h3>Edit messages -- please edit with care!</h3>
+          @formField(id="messageToCelebrity", label="Message to Celebrity", inputType="text", width="span8", fields=fields)
+          @formField(id="requestedMessage"  , label="Requested Message"   , inputType="text", width="span8", fields=fields)
+          <button type="submit" id="editMessages-button" class="btn primary fade in">Edit Messages</button>
         </div>
       </form>
     </div>
@@ -69,9 +77,12 @@
   <h2>Admin Review</h2>
   @valueRow(label="Review Status",        value=order.reviewStatus)
   @valueRow(label="RecipientName",        value=order.recipientName)
-  @valueRow(label="Message To Celebrity", value=order.messageToCelebrity)
-  @valueRow(label="Requested Message",    value=order.requestedMessage)
-  @valueRow(label="Is Fulfilled?",        value=isFulfilled())
+  @{/** Avoid repeating these values. */}
+  @if(order.reviewStatus != models.enums.OrderReviewStatus.PendingAdminReview) {
+    @valueRow(label="Message To Celebrity", value=order.messageToCelebrity)
+    @valueRow(label="Requested Message",    value=order.requestedMessage)
+  }
+  @valueRow(label="Has Published Egraph?",value=fulfillingEgraph.isDefined)
   @reviewControls
   <hr/>
   <h2>Order Details</h2>

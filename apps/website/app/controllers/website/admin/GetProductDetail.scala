@@ -4,7 +4,7 @@ import play.templates.Html
 import play.mvc.Scope.{Session, Flash}
 import play.Play
 import models.enums.PublishedStatus
-import models.Celebrity
+import models.{Product, Celebrity}
 
 object GetProductDetail {
 
@@ -15,6 +15,7 @@ object GetProductDetail {
         case "productId" => flash.get("productId")
         case "productName" => flash.get("productName")
         case "productDescription" => flash.get("productDescription")
+        case "priceInCurrency" => Option(flash.get("priceInCurrency")).getOrElse("%.2f" format Product.defaultPrice)
         case "storyTitle" => if (isCreate) "The Story" else flash.get("storyTitle")
         case "storyText" => {
           if (isCreate) "{signer_link}{signer_name}{end_link} defeated Dark Lord Sauron in 2012. A few days afterwards he got a note from {recipient_name} on his iPad. This was his response."

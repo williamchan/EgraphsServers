@@ -11,9 +11,6 @@ private[controllers] trait GetOrderAdminEndpoint { this: Controller =>
   protected def orderStore: OrderStore
   protected def controllerMethod: ControllerMethod
 
-  /**
-   * Serves the website's Celebrity root page.
-   */
   def getOrderAdmin(orderId: Long) = controllerMethod() {
     adminFilters.requireAdministratorLogin { admin =>
       orderStore.findById(orderId) match {
@@ -21,6 +18,14 @@ private[controllers] trait GetOrderAdminEndpoint { this: Controller =>
           val buyer = order.buyer
           val recipient = if (order.buyerId == order.recipientId) buyer else order.recipient
           val fulfillingEgraph: Option[Egraph] = orderStore.findFulfilledWithId(orderId).map(f => f.egraph)
+
+          val fieldDefaults: (String => String) = {
+            (paramName: String) => paramName match {
+              case "messageToCelebrity" => order.messageToCelebrity.getOrElse("")
+              case "requestedMessage" => order.requestedMessage.getOrElse("")
+            }
+          }
+
           views.Application.admin.html.admin_order(
             order = order,
             product = order.product,
@@ -28,7 +33,8 @@ private[controllers] trait GetOrderAdminEndpoint { this: Controller =>
             buyerEmail = buyer.account.email,
             recipient = recipient,
             recipientEmail = recipient.account.email,
-            fulfillingEgraph = fulfillingEgraph)
+            fulfillingEgraph = fulfillingEgraph,
+            fields = fieldDefaults)
         }
         case None => NotFound("Order with id " + orderId.toString + " not found")
       }

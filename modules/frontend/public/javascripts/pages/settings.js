@@ -3,7 +3,6 @@ define(["Egraphs", "libs/angular", "services/forms"], function (Egraphs) {
   //Controller class for Angular app
   var Controller = function ($scope) {
     //Plugin default values here
-    // $scope.user is undefined here... how to initialize it?
     $scope.master = angular.copy(Egraphs.page.user)
 
     $scope.update = function (user) {

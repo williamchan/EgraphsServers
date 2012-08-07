@@ -19,7 +19,7 @@ class PostSecurityTests extends EgraphsUnitTest with ClearsDatabaseAndValidation
       () => endpoints.postLogout(),
       () => endpoints.postAccountAdmin(0, null, null),
       () => endpoints.postCelebrityAdmin(0, null, null, null, null, null, null, null, null, null),
-      () => endpoints.postCelebrityProductAdmin(0, null, null, null, null, 0, 0, null, null, null),
+      () => endpoints.postCelebrityProductAdmin(0, null, null, 0, null, null, 0, 0, null, null, null),
       () => endpoints.postOrderAdmin(0),
       () => endpoints.postEgraphAdmin(0),
       () => endpoints.postCelebrityInventoryBatchAdmin(0, 0, null, null),

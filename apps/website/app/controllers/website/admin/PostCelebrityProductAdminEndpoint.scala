@@ -31,6 +31,7 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
   def postCelebrityProductAdmin(productId: Long = 0,
                                 productName: String,
                                 productDescription: String,
+                                priceInCurrency: Double,
                                 productImage: Option[File],
                                 productIcon: Option[File],
                                 signingOriginX: Int,
@@ -108,6 +109,7 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
           celebrity.addProduct(
             name = productName,
             description = productDescription,
+            priceInCurrency = BigDecimal(priceInCurrency),
             image = productImageOption,
             icon = productIconOption,
             storyTitle = storyTitle,
@@ -119,6 +121,7 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
           product.copy(
             name = productName,
             description = productDescription,
+            priceInCurrency = BigDecimal(priceInCurrency),
             signingOriginX = signingOriginX,
             signingOriginY = signingOriginY,
             storyTitle = storyTitle,

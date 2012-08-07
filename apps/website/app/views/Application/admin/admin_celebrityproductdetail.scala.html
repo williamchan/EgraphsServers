@@ -68,6 +68,14 @@
             fields=fields
           )
 
+          @formField(
+            id="priceInCurrency",
+            label="Price in USD",
+            inputType="text",
+            width="span4",
+            fields=fields
+          )
+
           @if(isCreate && isTestMode) {
             @formField(
               id="createWithoutInventory",
