@@ -5,7 +5,7 @@ import services.http.{AdminRequestFilters, ControllerMethod}
 import services.blobs.{AccessPolicy, Blobs}
 import services.db.Schema
 import models._
-import enums.EgraphState
+import enums.{OrderReviewStatus, EgraphState}
 import org.squeryl.Query
 import org.squeryl.PrimitiveTypeMode._
 import services.AppConfig
@@ -133,8 +133,17 @@ private[controllers] trait GetScriptAdminEndpoint {
           val image = rawSignedImage
             .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
             .scaledToWidth(width)
-          image.rasterized.getSavedUrl(AccessPolicy.Public)
+          image.rasterized.getSavedUrl(AccessPolicy.Public) // also returns URL
         }
+
+//        case "unapprove-orders" => {
+//          val orderIds = List[Long]()
+//          for (orderId <- orderIds) {
+//            val order = orderStore.get(orderId)
+//            order.withReviewStatus(OrderReviewStatus.PendingAdminReview).save()
+//          }
+//          "Orders have been reset to reviewStatus = 'PendingAdminReview'"
+//        }
 
         case _ => "Not a valid action"
       }
