@@ -85,9 +85,6 @@ POST    /admin/login                                                WebsiteContr
 GET     /admin/orders/?                                             WebsiteControllers.getOrdersAdmin
 GET     /admin/orders/{orderId}/?                                   WebsiteControllers.getOrderAdmin
 POST    /admin/orders/{orderId}                                     WebsiteControllers.postOrderAdmin
-GET     /admin/printorders/?                                        WebsiteControllers.getPrintOrdersAdmin
-GET     /admin/printorders/{printOrderId}/?                         WebsiteControllers.getPrintOrderAdmin
-POST    /admin/printorders/{printOrderId}                           WebsiteControllers.postPrintOrderAdmin
 GET     /admin/products/{productId}/?                               WebsiteControllers.getProductAdmin
 GET     /admin/script/?                                             WebsiteControllers.getScriptAdmin
 
@@ -136,4 +133,12 @@ GET     /{celebrityUrlSlug}/photos/{productUrlSlug}/finalize/?      WebsiteContr
 POST    /{celebrityUrlSlug}/photos/{productUrlSlug}/finalize        WebsiteControllers.postStorefrontFinalize
 GET     /{celebrityUrlSlug}/photos/{productUrlSlug}/no-inventory/?  WebsiteControllers.getStorefrontNoInventory
 
+##
+## Admin Restricted Functionality - We want to keep certain admin functionality off customer-facing servers.
+##
+%{ adminAccessLevel = play.configuration.getProperty('admin.access.level') }%
+%{ if (adminAccessLevel == 'full') }%
+GET     /admin/printorders/?                                        WebsiteControllers.getPrintOrdersAdmin
+GET     /admin/printorders/{printOrderId}/?                         WebsiteControllers.getPrintOrderAdmin
+POST    /admin/printorders/{printOrderId}                           WebsiteControllers.postPrintOrderAdmin
 POST    /{celebrityUrlSlug}/{productUrlSlug}/buy-demo               WebsiteControllers.postBuyDemoProduct
