@@ -181,11 +181,12 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
       param <- check.isSomeValue(toValidate, requiredError).right;
       _ <- check.isBetweenInclusive(
                           5,
-                          5,
+                          7,
                           param.length,
                           "Not a valid postal code")
-                        .right;
-      _ <- check.isInt(param, "Not a valid postal code").right
+                        .right
+//      SER-196: Rewrite to be a general solution for international addresses
+//      _ <- check.isInt(param, "Not a valid postal code").right
     ) yield {
       param
     }
