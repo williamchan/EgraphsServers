@@ -4,6 +4,7 @@
   buyerEmail: String,
   recipient: models.Customer,
   recipientEmail: String,
+  celebrityName: String,
   fulfillingEgraph: Option[models.Egraph],
   fields: (String) => String)(implicit session: play.mvc.Scope.Session)
 
@@ -87,6 +88,7 @@
   <hr/>
   <h2>Order Details</h2>
   @valueRow(label="Id",                   value=order.id)
+  @valueRow(label="Celebrity",            value=celebrityName)
   @valueRow(label="Product",              value=order.productId, href=productUrl().url)
   @valueRow(label="BuyerId",              value=buyer.id)
   @valueRow(label="Buyer name",           value=buyer.name)
