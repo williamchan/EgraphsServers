@@ -243,7 +243,11 @@ case class Egraph(
   }
 
   def isApprovable: Boolean = {
-    egraphState == PassedBiometrics || egraphState == FailedBiometrics
+    List(PassedBiometrics, FailedBiometrics).contains(egraphState)
+  }
+
+  def isRejectable: Boolean = {
+    List(PassedBiometrics, FailedBiometrics, ApprovedByAdmin).contains(egraphState)
   }
 
   def approve(admin: Administrator): Egraph = {
@@ -254,7 +258,7 @@ case class Egraph(
 
   def reject(admin: Administrator): Egraph = {
     require(admin != null, "Must be rejected by an Administrator")
-    require(isApprovable, "Must have previously been checked by biometrics")
+    require(isRejectable, "Must have previously been checked by biometrics or been approved")
     withEgraphState(RejectedByAdmin)
   }
 
@@ -263,7 +267,7 @@ case class Egraph(
   }
 
   def isPublished: Boolean = {
-    (egraphState == Published)
+    egraphState == Published
   }
 
   def publish(admin: Administrator): Egraph = {
