@@ -120,7 +120,6 @@ class DBSession @Inject() (connectionFactory: () => Connection) extends Logging 
  * Manages provision of Squeryl database sessions for every job or request.
  */
 object DBSession {
-
   /**
    * Ensures that a Squeryl session is available for use in later calls. This
    * should be before any application code in Controllers or Tests. In general

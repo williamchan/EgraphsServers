@@ -6,7 +6,8 @@ require:
     - com.google.inject -> guice 2.0
     - com.stripe -> stripe-java 1.0.1
     - egraphs -> frontend HEAD
-    - egraphs -> redis 0.3    
+    - egraphs -> redis 0.3
+    - junit-addons -> junit-addons 1.4
     - net.debasishg -> sjson_2.8.1 0.12:
         exclude:
             # Exclude scala because its included with play-scala

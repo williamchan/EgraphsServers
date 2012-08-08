@@ -7,7 +7,7 @@ import services.AppConfig
 import services.payment.StripeTestPayment
 import services.db.{DBSession, TransactionSerializable}
 import models.FailedPurchaseDataStore
-import models.{Product, PrintOrderStore, CashTransactionStore, OrderStore}
+import models.{Product, PrintOrderStore, CashTransactionStore, Order, OrderStore}
 import services.http.forms.purchase.CheckoutShippingForm
 import org.joda.money.{CurrencyUnit, Money}
 
@@ -45,6 +45,13 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsDatabaseAndV
       cashTransaction.cashTransactionType should be(CashTransactionType.EgraphPurchase)
     }
   }
+
+//  it should "create Order and CashTransaction with price (not Product.Price)" in {
+//    val order = executePurchaseHandler(price = BigDecimal(95).toMoney())
+//    db.connected(TransactionSerializable) {
+//      // CashTransaction is a local record of the Stripe charge. If it is correct, then the Stripe charge should be correct.
+//      orderStore.get(order.id).amountPaid should be(BigDecimal(95).toMoney())
+//      cashTransactionStore.get(1).amountInCurrency should be(BigDecimal(95))
 
   it should "create Order and PrintOrder and CashTransaction with totalAmountPaid if PrintingOption is HighQualityPrint" in {
     val shippingForm = CheckoutShippingForm.Valid(
@@ -117,7 +124,8 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsDatabaseAndV
 
   private def executePurchaseHandler(totalAmountPaid: Money = BigDecimal(50).toMoney(),
                                      printingOption: PrintingOption = PrintingOption.DoNotPrint,
-                                     shippingForm: Option[CheckoutShippingForm.Valid] = None) {
+                                     shippingForm: Option[CheckoutShippingForm.Valid] = None): Order =
+  {
     val (celebrity, product) = db.connected(TransactionSerializable) {
       val product = TestData.newSavedProduct()
       (product.celebrity, product)
@@ -139,6 +147,10 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsDatabaseAndV
       shippingForm = shippingForm,
       writtenMessageRequest = WrittenMessageRequest.SpecificMessage
     )
-    purchaseHandler.execute()
+    val result = purchaseHandler.performPurchase()
+    result.fold(
+      error => throw new Exception("Performing purchase failed."),
+      order => order
+    )
   }
 }

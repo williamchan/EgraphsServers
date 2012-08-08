@@ -56,26 +56,47 @@ case class EgraphPurchaseHandler(
 
   private val dateFormat = new SimpleDateFormat("MMMM dd, yyyy")
 
-  def execute(): Any = {
-    val purchaseData: String = Serializer.SJSON.toJSON(Map(
-      "recipientName" -> recipientName,
-      "recipientEmail" -> recipientEmail,
-      "buyerName" -> buyerName,
-      "buyerEmail" -> buyerEmail,
-      "stripeTokenId" -> stripeTokenId,
-      "desiredText" -> desiredText.getOrElse(""),
-      "personalNote" -> personalNote.getOrElse(""),
-      "productId" -> product.id,
-      "productPrice" -> totalAmountPaid.getAmount
-    ))
+  private def purchaseData: String = Serializer.SJSON.toJSON(Map(
+    "recipientName" -> recipientName,
+    "recipientEmail" -> recipientEmail,
+    "buyerName" -> buyerName,
+    "buyerEmail" -> buyerEmail,
+    "stripeTokenId" -> stripeTokenId,
+    "desiredText" -> desiredText.getOrElse(""),
+    "personalNote" -> personalNote.getOrElse(""),
+    "productId" -> product.id,
+    "productPrice" -> totalAmountPaid.getAmount
+  ))
 
-    // Attempt Stripe charge. If a credit card-related error occurred, redirect to purchase screen.
+  def execute(): Redirect = {
+    val errorOrOrder = performPurchase
+
+    val redirect = errorOrOrder.fold(
+      (error) => error match {
+        case stripeError: PurchaseFailedStripeError =>
+          //Attempt Stripe charge. If a credit card-related error occurred, redirect to purchase screen.
+          return new Redirect(reverse(WebsiteControllers.getStorefrontCreditCardError(celebrity.urlSlug, product.urlSlug, stripeError.stripeException.getLocalizedMessage)).url)
+        case PurchaseFailedInsufficientInventory =>
+          //A redirect to the insufficient inventory page
+          new Redirect(reverse(WebsiteControllers.getStorefrontNoInventory(celebrity.urlSlug, product.urlSlug)).url)
+        case PurchaseFailedError =>
+          return new Redirect(reverse(WebsiteControllers.getStorefrontPurchaseError(celebrity.urlSlug, product.urlSlug)).url)
+      },
+      (successfulOrder) =>
+        //A redirect to the order confirmation page
+        new Redirect(reverse(getOrderConfirmation(successfulOrder.id)).url)
+    )
+
+    redirect
+  }
+
+  def performPurchase(): Either[PurchaseFailed, Order] = {
     val charge = try {
       payment.charge(totalAmountPaid, stripeTokenId, "Egraph Order from " + buyerEmail)
     } catch {
-      case stripeException: com.stripe.exception.StripeException => {
+      case stripeException: com.stripe.exception.InvalidRequestException => {
         saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = "Credit card issue: " + stripeException.getLocalizedMessage)
-        return new Redirect(reverse(WebsiteControllers.getStorefrontCreditCardError(celebrity.urlSlug, product.urlSlug, stripeException.getLocalizedMessage)).url)
+        return Left(PurchaseFailedStripeError(stripeException))
       }
     }
 
@@ -93,17 +114,23 @@ case class EgraphPurchaseHandler(
         printingOption = printingOption,
         shippingForm = shippingForm,
         writtenMessageRequest = writtenMessageRequest,
-        isDemo = isDemo, charge = charge, celebrity = celebrity, product = product, dbSession = dbSession, accountStore = accountStore, customerStore = customerStore)
+        isDemo = isDemo,
+        charge = charge,
+        celebrity = celebrity,
+        product = product,
+        dbSession = dbSession,
+        accountStore = accountStore,
+        customerStore = customerStore)
     } catch {
       case e: InsufficientInventoryException => {
         payment.refund(charge.id)
         saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = e.getLocalizedMessage)
-        return new Redirect(reverse(WebsiteControllers.getStorefrontNoInventory(celebrity.urlSlug, product.urlSlug)).url)
+        return Left(PurchaseFailedInsufficientInventory)
       }
       case e: Exception => {
         payment.refund(charge.id)
         saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = e.getLocalizedMessage)
-        return new Redirect(reverse(WebsiteControllers.getStorefrontPurchaseError(celebrity.urlSlug, product.urlSlug)).url)
+        return Left(PurchaseFailedError)
       }
     }
 
@@ -113,9 +140,16 @@ case class EgraphPurchaseHandler(
 
     // Clear out the shopping cart and redirect
     serverSessions.celebrityStorefrontCart(celebrity.id).emptied.save()
-
-    new Redirect(reverse(getOrderConfirmation(order.id)).url)
+    Right(order)
   }
+
+  // Failure base type
+  sealed abstract trait PurchaseFailed
+
+  // Our two failure cases for if the payment vendor failed or there was insufficient inventory
+  case class PurchaseFailedStripeError(stripeException: com.stripe.exception.InvalidRequestException) extends PurchaseFailed
+  case object PurchaseFailedInsufficientInventory extends PurchaseFailed
+  case object PurchaseFailedError extends PurchaseFailed
 
   private def persistOrder(dbSession: DBSession,
                            customerStore: CustomerStore,
