@@ -44,8 +44,8 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
         }
         if (shouldSendWelcomeEmail) {
           dbSession.connected(TransactionSerializable) {
-            customer.account.withResetPasswordKey.save()
-            customer.sendNewCustomerEmail(verificationNeeded = false)
+            val account = customer.account.withResetPasswordKey.save()
+            Customer.sendNewCustomerEmail(account = account, verificationNeeded = false, mail = customer.services.mail)
           }
         }
         new Redirect(reverse(WebsiteControllers.getAccountSettings).url)

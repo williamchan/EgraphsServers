@@ -11,6 +11,7 @@ import services.db.{TransactionReadCommitted, TransactionSerializable, DBSession
 import play.mvc.results.Redirect
 import scala.Some
 import services.logging.Logging
+import Form.Conversions._
 
 /**
  * The POST target for creating a new account at egraphs.
@@ -18,23 +19,15 @@ import services.logging.Logging
 private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
 
-  import Form.Conversions._
-
   //
   // Services
   //
   protected def postController: POSTControllerMethod
-
   protected def celebrityStore: CelebrityStore
-
   protected def formReaders: FormReaders
-
   protected def accountStore: AccountStore
-
   protected def customerStore: CustomerStore
-
   protected def dbSession: DBSession
-
   protected def egraphsSessionFactory: () => EgraphsSession
 
   //
@@ -56,7 +49,7 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
 
       // Shoot out a welcome email
       dbSession.connected(TransactionReadCommitted) {
-        customer.sendNewCustomerEmail(verificationNeeded = true)
+        Customer.sendNewCustomerEmail(account = account, verificationNeeded = true, mail = customer.services.mail)
       }
 
       new Redirect(reverse(WebsiteControllers.getAccountSettings).url)

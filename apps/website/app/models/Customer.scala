@@ -90,10 +90,16 @@ case class Customer(
     }
   }
 
-  /**
-   * Sends a welcome email to the customer. Requires a dbSession so that this customer can get its Account.
-   */
-  def sendNewCustomerEmail(verificationNeeded: Boolean = false) {
+  //
+  // KeyedCaseClass[Long] methods
+  //
+  override def unapplied = {
+    Customer.unapply(this)
+  }
+}
+
+object Customer {
+  def sendNewCustomerEmail(account: Account, verificationNeeded: Boolean = false, mail: Mail) {
     val email = new HtmlEmail()
     email.setFrom("noreply@egraphs.com")
     email.addReplyTo("noreply@egraphs.com")
@@ -109,7 +115,7 @@ case class Customer(
     if (verificationNeeded) {
       val verifyPasswordUrl = Utils.lookupAbsoluteUrl("WebsiteControllers.getVerifyAccount",
         Map("email" -> account.email, "secretKey" -> account.resetPasswordKey.get)).url
-        email.setHtmlMsg(views.frontend.html.email_account_verification(
+      email.setHtmlMsg(views.frontend.html.email_account_verification(
         verifyPasswordUrl = verifyPasswordUrl,
         emailLogoSrc = emailLogoSrc,
         emailFacebookSrc = emailFacebookSrc,
@@ -127,15 +133,9 @@ case class Customer(
       email.setTextMsg(views.frontend.html.email_account_confirmation_text.toString())
     }
 
-    services.mail.send(email)
+    mail.send(email)
   }
 
-  //
-  // KeyedCaseClass[Long] methods
-  //
-  override def unapplied = {
-    Customer.unapply(this)
-  }
 }
 
 class CustomerStore @Inject() (
