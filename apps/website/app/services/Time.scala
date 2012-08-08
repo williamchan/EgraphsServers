@@ -3,7 +3,7 @@ package services
 import java.sql.Timestamp
 import java.util.{TimeZone, Date}
 import java.text.{DateFormat, SimpleDateFormat}
-import org.joda.time.DateTime
+import org.joda.time.{DateMidnight, DateTime}
 
 /**
  * Convenience methods for dealing with time
@@ -29,6 +29,16 @@ object Time {
   def today:Date = {
     DateTime.now().toDate
   }
+
+  /**
+   * @return the very start of the current month
+   */
+  def currentMonthStart: DateTime = new DateMidnight().withDayOfMonth(1).toDateTime
+
+  /**
+   * @return the very start of the previous month
+   */
+  def previousMonthStart: DateTime = currentMonthStart.minusMonths(1)
 
   def timestamp(dateStr: String, dateFormat: DateFormat): Option[Timestamp] = {
     if (dateStr.isEmpty) {

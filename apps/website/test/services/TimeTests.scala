@@ -6,6 +6,19 @@ import utils.EgraphsUnitTest
 
 class TimeTests extends EgraphsUnitTest {
 
+  "currentMonthStart" should "return DateTime that is the first of this month" in {
+    val currentMonthStart = Time.currentMonthStart
+    currentMonthStart.getMinuteOfDay should be(0)
+    currentMonthStart.getHourOfDay should be(0)
+    currentMonthStart.getDayOfMonth should be(1)
+    currentMonthStart.getMonthOfYear should be(new DateTime().getMonthOfYear)
+    currentMonthStart.getYear should be(new DateTime().getYear)
+  }
+
+  "previousMonthStart" should "return DateTime that is the first of previous month" in {
+    Time.previousMonthStart should be(Time.currentMonthStart.minusMonths(1))
+  }
+
   "timestamp" should "convert Date string to timestamp" in {
     Time.timestamp("", Time.ipadDateFormat) should be(None)
 

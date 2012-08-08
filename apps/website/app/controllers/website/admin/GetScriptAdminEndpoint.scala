@@ -34,10 +34,6 @@ private[controllers] trait GetScriptAdminEndpoint {
 
       val action = params.get("action")
       action match {
-        case "gc" => {
-          Runtime.getRuntime.gc()
-        }
-
         case "print-jvm-params" => {
           import management.ManagementFactory
           import scala.collection.JavaConversions._
@@ -84,41 +80,28 @@ private[controllers] trait GetScriptAdminEndpoint {
           "I gave all pending EnrollmentBatches a kick"
         }
 
-        case "kick-egraph" => {
-          val egraphId = params.get("egraphId")
-          val egraph = egraphStore.findById(id = egraphId.toLong)
-          if (egraph.isDefined && egraph.get.egraphState == EgraphState.AwaitingVerification) {
-            actors.EgraphActor.actor ! actors.ProcessEgraphMessage(id = egraph.get.id)
-          }
-          "I gave that Egraph a kick."
-        }
-
-        case "kick-enrollmentbatch" => {
-          val batchId = params.get("batchId")
-          val enrollmentBatch = enrollmentBatchStore.findById(id = batchId.toLong)
-          if (enrollmentBatch.isDefined) {
-            actors.EnrollmentBatchActor.actor ! actors.ProcessEnrollmentBatchMessage(id = enrollmentBatch.get.id)
-          }
-          "I gave that EnrollmentBatch a kick"
-        }
-
         case "email-list-report" => {
           val report = new EmailListReport(schema).report()
           new RenderBinary(report, report.getName)
         }
-
         case "inventory-batch-report" => {
           val report = new InventoryBatchReport(schema).report()
           new RenderBinary(report, report.getName)
         }
-
         case "order-report" => {
           val report = new OrderReport(schema).report()
           new RenderBinary(report, report.getName)
         }
-
         case "physical-print-report" => {
           val report = new PrintOrderReport(schema).report()
+          new RenderBinary(report, report.getName)
+        }
+        case "monthly-celebrity-order-report" => {
+          val report = new MonthlyCelebrityOrderReport(schema).report()
+          new RenderBinary(report, report.getName)
+        }
+        case "monthly-celebrity-print-order-report" => {
+          val report = new MonthlyCelebrityPrintOrderReport(schema).report()
           new RenderBinary(report, report.getName)
         }
 
