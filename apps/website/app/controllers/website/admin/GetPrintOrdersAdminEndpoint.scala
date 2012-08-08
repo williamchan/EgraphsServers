@@ -20,7 +20,7 @@ private[controllers] trait GetPrintOrdersAdminEndpoint {
       admin =>
         val query = filter match {
           case "unfulfilled" => printOrderStore.findByFilter(printOrderQueryFilters.unfulfilled)
-          case "hasEgraphNoPng" => printOrderStore.findHasEgraphNoPng()
+          case "hasEgraphButLacksPng" => printOrderStore.findHasEgraphButLacksPng()
           case "hasPng" => printOrderStore.findByFilter(printOrderQueryFilters.hasPng)
           case "fulfilled" => printOrderStore.findByFilter(printOrderQueryFilters.fulfilled)
           case "all" => printOrderStore.findByFilter()
