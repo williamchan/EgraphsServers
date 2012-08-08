@@ -84,6 +84,10 @@ class PrintOrderStore @Inject() (schema: Schema) extends Saves[PrintOrder] with 
     )
   }
 
+  /**
+   * Returns a list of PrintOrders that have egraphs but for which high-res PNGs have not yet
+   * been generated for creating the physical collateral.
+   */
   def findHasEgraphNoPng(): Query[(PrintOrder, Order, Option[Egraph])] = {
     join(schema.orders, schema.printOrders, schema.egraphs)((order, printOrder, egraph) =>
       where(printOrder.isFulfilled === false and printOrder.pngUrl.isNull)
@@ -129,6 +133,7 @@ class PrintOrderQueryFilters @Inject() (schema: Schema) {
     }
   }
 
+  /** Matches PrintOrders that already have generated high-res PNGs */
   def hasPng: FilterOneTable[PrintOrder] = {
     new FilterOneTable[PrintOrder] {
       override def test(printOrder: PrintOrder) = {
