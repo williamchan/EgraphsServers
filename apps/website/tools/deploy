@@ -3,10 +3,11 @@
 # Deploys the application to our hosting...which is currently Cloudbees.
 #
 # $1 - The server to which to deploy. Options:
-#        'live' - the publicly-facing egraphs server.
-#        'demo' - the demo server, used for hard-wired.
-#        'staging' - the staging server.
-#        'hydrogen' - the hydrogen test server.
+#        'live' - www.egraphs.com
+#        'demo' - beta.egraphs.com - lol
+#        'staging' - staging.egraphs.com used for demos - lol
+#        'hydrogen' - the hydrogen test server
+#        'boron' - admin.egraphs.com
 #
 
 
@@ -33,7 +34,7 @@ case "$DEPLOY_TARGET" in
     fi
 
     ;;
-  'demo'|'staging'|'hydrogen')
+  'demo'|'staging'|'hydrogen'|'boron')
     # It's always ok to deploy to demo and staging.
 	;;
   *)
@@ -42,7 +43,7 @@ case "$DEPLOY_TARGET" in
     echo ""
     echo "Usage: "
     echo "    tools/deploy [deployment target]"
-    echo "Valid deployment targets are 'live', 'demo', 'staging', and 'hydrogen'. (omit the single quotes)"
+    echo "Valid deployment targets are 'live', 'demo', 'staging', 'hydrogen', 'boron'. (omit the single quotes)"
     exit 1
 	;;  
 esac
