@@ -3,7 +3,7 @@ package services.http.forms.purchase
 import services.http.{ServerSessionFactory, ServerSession}
 import com.google.inject.Inject
 import play.mvc.results.Redirect
-import models.{InventoryBatch, Celebrity, Product}
+import models.{PrintOrder, InventoryBatch, Celebrity, Product}
 import controllers.WebsiteControllers.{getStorefrontPersonalize, getStorefrontReview, reverse, getStorefrontChoosePhotoTiled, getStorefrontCheckout}
 import org.joda.money.{CurrencyUnit, Money}
 import models.enums.{WrittenMessageRequest, PrintingOption}
@@ -84,7 +84,7 @@ class PurchaseForms @Inject()(
   def shippingPrice: Option[Money] = {
     import frontend.formatting.MoneyFormatting.Conversions._
     this.highQualityPrint match {
-      case Some(PrintingOption.HighQualityPrint) => Some(BigDecimal(45).toMoney())
+      case Some(PrintingOption.HighQualityPrint) => Some(PrintOrder.pricePerPrint.toMoney())
       case _ => None
     }
   }

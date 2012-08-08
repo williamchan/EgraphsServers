@@ -56,6 +56,7 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val egraphQueryFilters = instance[EgraphQueryFilters]
   override protected val inventoryBatchQueryFilters = instance[InventoryBatchQueryFilters]
   override protected val orderQueryFilters = instance[OrderQueryFilters]
+  override protected val printOrderQueryFilters = instance[PrintOrderQueryFilters]
 
   override protected val blobs = instance[Blobs]
   override protected val mail = instance[Mail]
@@ -68,6 +69,7 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val egraphStore = instance[EgraphStore]
   override protected val inventoryBatchStore = instance[InventoryBatchStore]
   override protected val orderStore = instance[OrderStore]
+  override protected val printOrderStore = instance[PrintOrderStore]
   override protected val productStore = instance[ProductStore]
 
   /**

@@ -12,6 +12,7 @@ class AdminRequestFilters @Inject()(adminStore: AdministratorStore,
                                     celebStore: CelebrityStore,
                                     egraphStore: EgraphStore,
                                     orderStore: OrderStore,
+                                    printOrderStore: PrintOrderStore,
                                     accountFilters: AccountRequestFilters,
                                     productFilters: ProductQueryFilters) {
 
@@ -66,6 +67,24 @@ class AdminRequestFilters @Inject()(adminStore: AdministratorStore,
             case Some(order) => {
               continue(order, admin)
             }
+          }
+        }
+      }
+    }
+  }
+
+  def requirePrintOrder(continue: (PrintOrder) => Any)(implicit session: Session, request: Request) = {
+    requireAdministratorLogin { admin =>
+      request.params.getOption("printOrderId") match {
+        case None =>
+          new Forbidden("Valid PrintOrder ID was required but not provided")
+
+        case Some(printOrderId) => {
+          printOrderStore.findById(printOrderId.toLong) match {
+            case None =>
+              new Forbidden("No PrintOrder was found with ID " + printOrderId)
+
+            case Some(printOrder) => continue(printOrder)
           }
         }
       }

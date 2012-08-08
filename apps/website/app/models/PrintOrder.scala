@@ -1,21 +1,30 @@
 package models
 
 import com.google.inject.Inject
+import enums.EgraphState._
 import java.sql.Timestamp
 import services.{AppConfig, Time}
-import services.db.{Saves, Schema, KeyedCaseClass}
+import services.db.{FilterOneTable, Saves, Schema, KeyedCaseClass}
+import services.Finance.TypeConversions._
+import org.joda.money.Money
+import services.blobs.AccessPolicy
+import org.squeryl.Query
 
-case class PrintOrderServices @Inject() (store: PrintOrderStore, orderStore: OrderStore)
+case class PrintOrderServices @Inject() (store: PrintOrderStore,
+                                         orderStore: OrderStore,
+                                         egraphStore: EgraphStore,
+                                         egraphQueryFilters: EgraphQueryFilters)
 
 /**
  * Persistent entity representing the Orders made upon Products of our service
  */
-
 case class PrintOrder(id: Long = 0,
                       orderId: Long = 0,
                       shippingAddress: String = "",
                       quantity: Int = 1,
                       isFulfilled: Boolean = false,
+                      amountPaidInCurrency: BigDecimal = PrintOrder.pricePerPrint,
+                      pngUrl: Option[String] = None,
                       created: Timestamp = Time.defaultTimestamp,
                       updated: Timestamp = Time.defaultTimestamp,
                       services: PrintOrderServices = AppConfig.instance[PrintOrderServices])
@@ -30,14 +39,64 @@ case class PrintOrder(id: Long = 0,
     services.store.save(this)
   }
 
+  def amountPaid: Money = {
+    amountPaidInCurrency.toMoney()
+  }
+
+  /**
+   * Generates a print-sized png from an associated published or approved Egraph, if one exists.
+   *
+   * @param width width of print-sized png to generate
+   * @return url of generated image, if it was generated
+   */
+  def generatePng(width: Int = PrintOrder.defaultPngWidth): Option[String] = {
+    val order = services.orderStore.get(orderId)
+    services.egraphStore.findByOrder(orderId, services.egraphQueryFilters.publishedOrApproved).headOption.map {egraph =>
+      val product = order.product
+      val rawSignedImage = egraph.image(product.photoImage)
+      val image = rawSignedImage
+        .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
+        .scaledToWidth(width)
+      image.rasterized.getSavedUrl(AccessPolicy.Public)
+    }
+  }
+
   //
   // KeyedCaseClass[Long] methods
   //
   override def unapplied = PrintOrder.unapply(this)
 }
 
+object PrintOrder {
+  val pricePerPrint = BigDecimal(45)
+  val defaultPngWidth = 2446         // 2446 seems to work well for physical prints
+}
+
 class PrintOrderStore @Inject() (schema: Schema) extends Saves[PrintOrder] with SavesCreatedUpdated[PrintOrder] {
   import org.squeryl.PrimitiveTypeMode._
+
+  def findByFilter(filters: FilterOneTable[PrintOrder]*): Query[(PrintOrder, Order, Option[Egraph])] = {
+    join(schema.orders, schema.printOrders, schema.egraphs.leftOuter)((order, printOrder, egraph) =>
+      where(FilterOneTable.reduceFilters(filters, printOrder))
+        select(printOrder, order, egraph)
+        orderBy (printOrder.created asc)
+        on(printOrder.orderId === order.id, order.id === egraph.map(_.orderId) and (egraph.map(_._egraphState) in Seq(ApprovedByAdmin.name, Published.name)))
+    )
+  }
+
+  /**
+   * Returns a list of PrintOrders that have egraphs but for which high-res PNGs have not yet
+   * been generated for creating the physical collateral.
+   */
+  def findHasEgraphButLacksPng(): Query[(PrintOrder, Order, Option[Egraph])] = {
+    join(schema.orders, schema.printOrders, schema.egraphs)((order, printOrder, egraph) =>
+      where(printOrder.isFulfilled === false and printOrder.pngUrl.isNull)
+        select(printOrder, order, Option(egraph))
+        orderBy (printOrder.created asc)
+        on(printOrder.orderId === order.id, order.id === egraph.orderId and (egraph._egraphState in Seq(ApprovedByAdmin.name, Published.name)))
+    )
+  }
+
   //
   // Saves[PrintOrder] methods
   //
@@ -49,6 +108,8 @@ class PrintOrderStore @Inject() (schema: Schema) extends Saves[PrintOrder] with 
       theOld.shippingAddress := theNew.shippingAddress,
       theOld.quantity := theNew.quantity,
       theOld.isFulfilled := theNew.isFulfilled,
+      theOld.amountPaidInCurrency := theNew.amountPaidInCurrency,
+      theOld.pngUrl := theNew.pngUrl,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated
     )
@@ -60,3 +121,33 @@ class PrintOrderStore @Inject() (schema: Schema) extends Saves[PrintOrder] with 
     toUpdate.copy(created=created, updated=updated)
   }
 }
+
+class PrintOrderQueryFilters @Inject() (schema: Schema) {
+  import org.squeryl.PrimitiveTypeMode._
+
+  def fulfilled: FilterOneTable[PrintOrder] = {
+    new FilterOneTable[PrintOrder] {
+      override def test(printOrder: PrintOrder) = {
+        (printOrder.isFulfilled === true)
+      }
+    }
+  }
+
+  /** Matches PrintOrders that already have generated high-res PNGs */
+  def hasPng: FilterOneTable[PrintOrder] = {
+    new FilterOneTable[PrintOrder] {
+      override def test(printOrder: PrintOrder) = {
+        (printOrder.isFulfilled === false and printOrder.pngUrl.isNotNull)
+      }
+    }
+  }
+
+  def unfulfilled: FilterOneTable[PrintOrder] = {
+    new FilterOneTable[PrintOrder] {
+      override def test(printOrder: PrintOrder) = {
+        (printOrder.isFulfilled === false)
+      }
+    }
+  }
+}
+

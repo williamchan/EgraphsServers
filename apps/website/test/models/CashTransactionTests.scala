@@ -31,7 +31,7 @@ class CashTransactionTests extends EgraphsUnitTest
     toTransform.copy(
       accountId = Account(email="derp").save().id,
       amountInCurrency = 1
-    ).withType(CashTransaction.EgraphPurchase)
+    )
   }
 
   //

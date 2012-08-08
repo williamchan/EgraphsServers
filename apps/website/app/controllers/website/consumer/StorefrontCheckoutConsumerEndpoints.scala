@@ -1,17 +1,16 @@
 package controllers.website.consumer
 
-import services.http.{SafePlayParams, POSTControllerMethod, CelebrityAccountRequestFilters, ControllerMethod}
+import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters, ControllerMethod}
 import play.mvc.Controller
 
 import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
 import services.http.forms.purchase._
-import models.enums.{PrintingOption, WrittenMessageRequest}
+import models.enums.PrintingOption
 import services.http.forms.Form.Conversions._
 import services.mvc.FormConversions.{checkoutBillingFormToViewConverter, checkoutShippingFormToViewConverter}
 import models.frontend.storefront.{CheckoutFormView, CheckoutOrderSummary, CheckoutBillingInfoView, CheckoutShippingAddressFormView}
 import services.payment.Payment
 import play.mvc.results.Redirect
-import controllers.website.PostBuyProductEndpoint.EgraphPurchaseHandler
 import controllers.WebsiteControllers
 import services.blobs.AccessPolicy
 
@@ -100,7 +99,7 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
           basePrice=product.price,
           shipping=forms.shippingPrice,
           tax=forms.tax,
-          total=forms.total(product.price)
+          total=forms.total(basePrice = product.price)
         )
 
         // Collect both the shipping form and billing form into a single viewmodel

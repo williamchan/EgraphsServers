@@ -8,7 +8,7 @@ import utils.{TestConstants, TestData}
 import org.squeryl.PrimitiveTypeMode._
 import models._
 import controllers.WebsiteControllers
-import controllers.website.PostBuyProductEndpoint.EgraphPurchaseHandler
+import controllers.website.EgraphPurchaseHandler
 import enums.{EgraphState, EnrollmentStatus, PublishedStatus}
 import play.libs.Codec
 import services.payment.Payment
@@ -528,7 +528,7 @@ class Scenarios extends DeclaresScenarios {
         personalNote = Some("I'm your biggest fan!"),
         celebrity = celebrity,
         product = product,
-        price = product.price,
+        totalAmountPaid = product.price,
         billingPostalCode = "55555"
       ).execute()
     }

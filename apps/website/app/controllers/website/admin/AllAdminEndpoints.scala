@@ -25,6 +25,8 @@ trait AllAdminEndpoints
   with GetLoginAdminEndpoint
   with GetOrderAdminEndpoint
   with GetOrdersAdminEndpoint
+  with GetPrintOrderAdminEndpoint
+  with GetPrintOrdersAdminEndpoint
   with GetProductAdminEndpoint
   with GetScriptAdminEndpoint
   with PostAccountAdminEndpoint
@@ -34,5 +36,6 @@ trait AllAdminEndpoints
   with PostEgraphAdminEndpoint
   with PostLoginAdminEndpoint
   with PostOrderAdminEndpoint
+  with PostPrintOrderAdminEndpoint
   with PostFeaturedCelebritiesAdminEndpoint
 { this: Controller => }

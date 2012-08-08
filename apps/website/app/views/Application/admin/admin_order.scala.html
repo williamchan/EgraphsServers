@@ -105,10 +105,5 @@
   <h2>Payment Details</h2>
   @valueRow(label="Payment Status",       value=order.paymentStatus)
   @valueRow(label="Amount",               value=order.amountPaid.formatSimply)
-  @valueRow(label="Billing Postal Code",  value=order.billingPostalCode.getOrElse(""))
-  @valueRow(label="Printing Option",      value=order._printingOption)
-  @valueRow(label="Shipping Address",     value=order.shippingAddress.getOrElse(""))
-  @valueRow(label="StripeCardTokenId",    value=order.stripeCardTokenId)
-  @valueRow(label="StripeChargeId",       value=order.stripeChargeId)
 </div>
 }

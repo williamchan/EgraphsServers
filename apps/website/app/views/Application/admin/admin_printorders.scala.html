@@ -1,0 +1,53 @@
+@(printOrderDate: Iterable[(models.PrintOrder, models.Order, Option[models.Egraph])])(implicit flash:play.mvc.Scope.Flash)
+
+@import controllers.WebsiteControllers
+@import services.Utils.lookupUrl
+@import views.Application.tags.html.pagination
+@import views.Application.html.content_base
+
+@content_base(title="Admin - Print Orders", body=body, head=head)
+
+@head = {
+<script src='@asset("public/twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
+}
+
+@body = {
+<div class="admin-content">
+  <h1>
+    Print Orders @flash.get("TotalResultsStr")
+  </h1>
+  <div>
+    <h2>Filters:</h2>
+    <ul class="span16">
+      <li><a href="?filter=unfulfilled">Unfilfilled</a></li>
+      <li><a href="?filter=hasEgraphButLacksPng">Has Egraph, no Png</a></li>
+      <li><a href="?filter=hasPng">Has Png (unfilfilled)</a></li>
+      <li><a href="?filter=fulfilled">Fulfilled</a></li>
+      <li><a href="?filter=all">All</a></li>
+    </ul>
+  </div>
+  <table>
+    <tr>
+      <th></th>
+      <th>Id</th>
+      <th>Fulfilled?</th>
+      <th>Has PNG?</th>
+      <th>Egraph ready?</th>
+    </tr>
+    @printOrderDate.map { case (printOrder, order, egraphOption) =>
+    <tr>
+      <td>
+        <a class="preview-link" href="/admin/printorders/@printOrder.id">
+          Details
+        </a>
+      </td>
+      <td>@printOrder.id</td>
+      <td>@printOrder.isFulfilled</td>
+      <td>@printOrder.pngUrl.isDefined</td>
+      <td>@egraphOption.isDefined</td>
+    </tr>
+    }
+  </table>
+  @pagination()
+</div>
+}

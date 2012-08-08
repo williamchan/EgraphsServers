@@ -134,5 +134,12 @@ POST    /{celebrityUrlSlug}/photos/{productUrlSlug}/finalize        WebsiteContr
 GET     /{celebrityUrlSlug}/photos/{productUrlSlug}/cc-error/?      WebsiteControllers.getStorefrontCreditCardError
 GET     /{celebrityUrlSlug}/photos/{productUrlSlug}/no-inventory/?  WebsiteControllers.getStorefrontNoInventory
 GET     /{celebrityUrlSlug}/photos/{productUrlSlug}/purchase-error/? WebsiteControllers.getStorefrontPurchaseError
-POST    /{celebrityUrlSlug}/{productUrlSlug}/buy                    WebsiteControllers.postBuyProduct
+
+##
+## Admin Restricted Functionality - We want to keep certain admin functionality off customer-facing servers.
+##
+%{ if (play.configuration.getProperty('admin.tools.enabled') == 'full') }%
+GET     /admin/printorders/?                                        WebsiteControllers.getPrintOrdersAdmin
+GET     /admin/printorders/{printOrderId}/?                         WebsiteControllers.getPrintOrderAdmin
+POST    /admin/printorders/{printOrderId}                           WebsiteControllers.postPrintOrderAdmin
 POST    /{celebrityUrlSlug}/{productUrlSlug}/buy-demo               WebsiteControllers.postBuyDemoProduct

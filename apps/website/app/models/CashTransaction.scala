@@ -1,11 +1,14 @@
 package models
 
+import enums._
 import org.joda.money.{CurrencyUnit, Money}
 import java.sql.Timestamp
-import services.{Utils, Time}
+import services.Time
 import com.google.inject.Inject
 import services.AppConfig
 import services.db.{Schema, Saves, KeyedCaseClass}
+import org.squeryl.PrimitiveTypeMode._
+import org.squeryl.Query
 
 /**
  * Services used by every instance of CashTransaction
@@ -21,23 +24,28 @@ case class CashTransactionServices @Inject() (cashTransactionStore: CashTransact
 case class CashTransaction(
   id: Long = 0,
   accountId: Long = 0,
-  orderId: Option[Long] = None,
+  orderId: Option[Long] = None,       // This should probably be a oneToMany
+  printOrderId: Option[Long] = None,  // This should probably be a oneToMany
   amountInCurrency: BigDecimal = 0,
+  billingPostalCode: Option[String] = None,
   currencyCode: String = CurrencyUnit.USD.getCode,
-  typeString: String = "",
+  _cashTransactionType: String = "",
+  stripeCardTokenId: Option[String] = None,
+  stripeChargeId: Option[String] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: CashTransactionServices = AppConfig.instance[CashTransactionServices]
-) extends KeyedCaseClass[Long] with HasCreatedUpdated
+) extends KeyedCaseClass[Long]
+  with HasCreatedUpdated
+  with HasCashTransactionType[CashTransaction]
 {
-  import CashTransaction._
 
   //
   // Public members
   //
   /** Persist the transaction */
   def save(): CashTransaction = {
-    require(!typeString.isEmpty, "CashTransaction: type must be specified")
+    require(!_cashTransactionType.isEmpty, "CashTransaction: type must be specified")
     services.cashTransactionStore.save(this)
   }
 
@@ -54,39 +62,32 @@ case class CashTransaction(
     )
   }
 
-  def transactionType: TransactionType = {
-    CashTransaction.types(typeString)
-  }
-
-  def withType(newType: TransactionType): CashTransaction = {
-    copy(typeString=newType.value)
-  }
-
   //
   // KeyedCaseClass[Long] members
   //
-  override def unapplied = {
-    CashTransaction.unapply(this)
+  override def unapplied = CashTransaction.unapply(this)
+
+  override def withCashTransactionType(enum: CashTransactionType.EnumVal) = {
+    this.copy(_cashTransactionType = enum.name)
   }
 }
 
-object CashTransaction {
-  //
-  // Public members
-  //
-  sealed abstract class TransactionType(val value: String)
-  case object EgraphPurchase extends TransactionType("EgraphPurchase")
-  case object PurchaseRefund extends TransactionType("PurchaseRefund")
-  case object CelebrityDisbursement extends TransactionType("CelebrityDisbursement")
-
-  val types = Utils.toMap[String, TransactionType](Seq(
-    EgraphPurchase,
-    PurchaseRefund,
-    CelebrityDisbursement
-  ), key=(theType) => theType.value)
-}
-
 class CashTransactionStore @Inject() (schema: Schema) extends Saves[CashTransaction] with SavesCreatedUpdated[CashTransaction] {
+
+  def findByOrderId(orderId: Long): Query[CashTransaction] = {
+    from(schema.cashTransactions)(txn =>
+      where(txn.orderId === Some(orderId))
+        select (txn)
+    )
+  }
+
+  def findByPrintOrderId(printOrderId: Long): Query[CashTransaction] = {
+    from(schema.cashTransactions)(txn =>
+      where(txn.printOrderId === Some(printOrderId))
+        select (txn)
+    )
+  }
+
   //
   // SavesCreatedUpdated[CashTransaction] members
   //
@@ -100,16 +101,18 @@ class CashTransactionStore @Inject() (schema: Schema) extends Saves[CashTransact
   protected def table = schema.cashTransactions
 
   def defineUpdate(theOld: CashTransaction, theNew: CashTransaction) = {
-    import org.squeryl.PrimitiveTypeMode._
 
     updateIs(
       theOld.accountId := theNew.accountId,
       theOld.orderId := theNew.orderId,
-      theOld.currencyCode := theNew.currencyCode,
+      theOld.printOrderId := theNew.printOrderId,
       theOld.amountInCurrency := theNew.amountInCurrency,
-      theOld.typeString := theNew.typeString,
+      theOld.billingPostalCode := theNew.billingPostalCode,
+      theOld.currencyCode := theNew.currencyCode,
+      theOld._cashTransactionType := theNew._cashTransactionType,
+      theOld.stripeCardTokenId := theNew.stripeCardTokenId,
+      theOld.stripeChargeId := theNew.stripeChargeId,
       theOld.updated := theNew.updated
     )
   }
 }
-

@@ -5,7 +5,7 @@ import services.http._
 import forms.purchase.{PurchaseFormChecksFactory, FormReaders, PurchaseFormFactory}
 import services.mail.Mail
 import services.payment.Payment
-import models.{InventoryBatchQueryFilters, EgraphQueryFilters, OrderQueryFilters}
+import models._
 import services.db.DBSession
 import play.mvc.Controller
 import controllers.website.AllWebsiteEndpoints
@@ -58,4 +58,6 @@ case class TestWebsiteControllers @Inject()(
   override def params = request.params
   override def session = fakeSession
   override def flash = fakeFlash
+  override def printOrderStore = instance[PrintOrderStore]
+  override def printOrderQueryFilters = instance[PrintOrderQueryFilters]
 }

@@ -53,8 +53,7 @@ class UtilsTests extends EgraphsUnitTest
 
   "lookupUrl" should "find controllers that exist" in {
     val params = Map("celebrityUrlSlug" -> "Wizzle", "productUrlSlug" -> "Herp")
-    Utils.lookupUrl("WebsiteControllers.postBuyProduct", params).url should be ("/Wizzle/Herp/buy")
-
+    Utils.lookupUrl("WebsiteControllers.getStorefrontChoosePhotoCarousel", params).url should be ("/Wizzle/photos/Herp")
   }
 
   "requiredConfigurationProperty" should "get existing configuration properties fine" in {
