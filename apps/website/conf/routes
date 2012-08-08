@@ -131,7 +131,9 @@ GET     /{celebrityUrlSlug}/photos/{productUrlSlug}/checkout/?      WebsiteContr
 POST    /{celebrityUrlSlug}/photos/{productUrlSlug}/checkout        WebsiteControllers.postStorefrontCheckout
 GET     /{celebrityUrlSlug}/photos/{productUrlSlug}/finalize/?      WebsiteControllers.getStorefrontFinalize
 POST    /{celebrityUrlSlug}/photos/{productUrlSlug}/finalize        WebsiteControllers.postStorefrontFinalize
+GET     /{celebrityUrlSlug}/photos/{productUrlSlug}/cc-error/?      WebsiteControllers.getStorefrontCreditCardError
 GET     /{celebrityUrlSlug}/photos/{productUrlSlug}/no-inventory/?  WebsiteControllers.getStorefrontNoInventory
+GET     /{celebrityUrlSlug}/photos/{productUrlSlug}/purchase-error/? WebsiteControllers.getStorefrontPurchaseError
 
 ##
 ## Admin Restricted Functionality - We want to keep certain admin functionality off customer-facing servers.

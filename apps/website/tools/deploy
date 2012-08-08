@@ -67,9 +67,6 @@ echo_green "EGRAPHS: Resolving dependencies..."
 play dependencies --sync
 play dependencies
 
-echo_green "EGRAPHS: Updating remote database..."
-play evolutions:apply --%$DEPLOY_TARGET
-
 echo_green "EGRAPHS: Setting /public/VERSION.txt"
 $SCRIPT_DIR/current_version > $PROJ_BASE/public/VERSION.txt
 

@@ -5,6 +5,7 @@ import play.mvc.Scope.{Session, Flash}
 import play.Play
 import models.enums.PublishedStatus
 import models.{Product, Celebrity}
+import org.apache.commons.lang.StringEscapeUtils
 
 object GetProductDetail {
 
@@ -13,8 +14,8 @@ object GetProductDetail {
     val fieldDefaults: (String => String) = {
       (paramName: String) => paramName match {
         case "productId" => flash.get("productId")
-        case "productName" => flash.get("productName")
-        case "productDescription" => flash.get("productDescription")
+        case "productName" => StringEscapeUtils.escapeHtml(flash.get("productName"))
+        case "productDescription" => StringEscapeUtils.escapeHtml(flash.get("productDescription"))
         case "priceInCurrency" => Option(flash.get("priceInCurrency")).getOrElse("%.2f" format Product.defaultPrice)
         case "storyTitle" => if (isCreate) "The Story" else flash.get("storyTitle")
         case "storyText" => {

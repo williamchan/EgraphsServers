@@ -24,4 +24,18 @@ private[consumer] trait StorefrontFailedConsumerEndpoints
     }
   }
 
+  def getStorefrontCreditCardError(celebrityUrlSlug: String, productUrlSlug: String, creditCardMsg: String) = controllerMethod()
+  {
+    celebFilters.requireCelebrityAndProductUrlSlugs { (celeb, product) =>
+      views.frontend.html.celebrity_storefront_creditcard_error(celeb.publicName, product.name, creditCardMsg)
+    }
+  }
+
+  def getStorefrontPurchaseError(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod()
+  {
+    celebFilters.requireCelebrityAndProductUrlSlugs { (celeb, product) =>
+      views.frontend.html.celebrity_storefront_purchase_error(celeb.publicName, product.name)
+    }
+  }
+
 }

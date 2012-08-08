@@ -1,7 +1,5 @@
 package controllers.website
 
-import consumer.StorefrontChoosePhotoConsumerEndpoints
-import play.data.validation._
 import models._
 import enums._
 import play.mvc.Scope.Flash
@@ -75,10 +73,9 @@ case class EgraphPurchaseHandler(
     val charge = try {
       payment.charge(totalAmountPaid, stripeTokenId, "Egraph Order from " + buyerEmail)
     } catch {
-      case stripeException: com.stripe.exception.InvalidRequestException => {
-        saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = "Credit card issue.")
-        Validation.addError("Credit card", "There was an issue with the credit card")
-        return WebsiteControllers.redirectWithValidationErrors(StorefrontChoosePhotoConsumerEndpoints.url(celebrity, product), Some(false))
+      case stripeException: com.stripe.exception.StripeException => {
+        saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = "Credit card issue: " + stripeException.getLocalizedMessage)
+        return new Redirect(reverse(WebsiteControllers.getStorefrontCreditCardError(celebrity.urlSlug, product.urlSlug, stripeException.getLocalizedMessage)).url)
       }
     }
 
@@ -106,7 +103,7 @@ case class EgraphPurchaseHandler(
       case e: Exception => {
         payment.refund(charge.id)
         saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = e.getLocalizedMessage)
-        throw (e)
+        return new Redirect(reverse(WebsiteControllers.getStorefrontPurchaseError(celebrity.urlSlug, product.urlSlug)).url)
       }
     }
 

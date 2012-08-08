@@ -4,6 +4,7 @@ import play.templates.Html
 import play.mvc.Scope.{Session, Flash}
 import models.enums.PublishedStatus
 import models.Celebrity
+import org.apache.commons.lang.StringEscapeUtils
 
 object GetCelebrityDetail {
 
@@ -14,13 +15,13 @@ object GetCelebrityDetail {
       (paramName: String) => paramName match {
         case "celebrityId" => flash.get("celebrityId")
         case "celebrityEmail" => flash.get("celebrityEmail")
-        case "bio" => flash.get("bio")
-        case "casualName" => flash.get("casualName")
-        case "organization" => flash.get("organization")
-        case "publicName" => flash.get("publicName")
+        case "bio" => StringEscapeUtils.escapeHtml(flash.get("bio"))
+        case "casualName" => StringEscapeUtils.escapeHtml(flash.get("casualName"))
+        case "organization" => StringEscapeUtils.escapeHtml(flash.get("organization"))
+        case "publicName" => StringEscapeUtils.escapeHtml(flash.get("publicName"))
         case "publishedStatusString" => Option(flash.get("publishedStatusString")).getOrElse(PublishedStatus.Unpublished.toString)
-        case "roleDescription" => flash.get("roleDescription")
-        case "twitterUsername" => flash.get("twitterUsername")
+        case "roleDescription" => StringEscapeUtils.escapeHtml(flash.get("roleDescription"))
+        case "twitterUsername" => StringEscapeUtils.escapeHtml(flash.get("twitterUsername"))
         case _ => Option(flash.get(paramName)).getOrElse("")
       }
     }
