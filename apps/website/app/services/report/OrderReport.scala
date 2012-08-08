@@ -10,17 +10,17 @@ class OrderReport @Inject()(schema: Schema) extends Report {
   override val reportName = "order-report"
 
   def report(): File = {
-    import schema.{orders, customers, products, egraphs}
+    import schema.{orders, customers, products, celebrities, egraphs}
 
-    val orderViews = join(orders, customers, customers, products, egraphs.leftOuter)(
-      (order, buyer, recipient, product, egraph) =>
-        select(order, buyer, recipient, product, egraph)
+    val orderViews = join(orders, customers, customers, products, celebrities, egraphs.leftOuter)(
+      (order, buyer, recipient, product, celebrity, egraph) =>
+        select(order, buyer, recipient, product, celebrity, egraph)
           orderBy (order.id asc)
-          on(order.buyerId === buyer.id, order.recipientId === recipient.id, order.productId === product.id, order.id === egraph.map(_.orderId))
+          on(order.buyerId === buyer.id, order.recipientId === recipient.id, order.productId === product.id, product.celebrityId === celebrity.id, order.id === egraph.map(_.orderId))
     )
 
     val headerLine = csvLine("orderid", "amount", "paymentstatus", "reviewstatus", "billingpostalcode", "ordercreated",
-      "productid", "celebrityid", "buyerid", "buyername", "recipientid", "recipientname",
+      "productid", "celebrityid", "celebrityName", "buyerid", "buyername", "recipientid", "recipientname",
       "candidateegraphid", "candidateegraphstate")
     val csv = new StringBuilder(headerLine)
     for (orderView <- orderViews) {
@@ -28,7 +28,8 @@ class OrderReport @Inject()(schema: Schema) extends Report {
       val buyer = orderView._2
       val recipient = orderView._3
       val product = orderView._4
-      val candidateEgraph = orderView._5
+      val celebrity = orderView._5
+      val candidateEgraph = orderView._6
       csv.append(csvLine(
         order.id,
         order.amountPaidInCurrency,
@@ -37,7 +38,8 @@ class OrderReport @Inject()(schema: Schema) extends Report {
         order.billingPostalCode.getOrElse(""),
         order.created,
         product.id,
-        product.celebrityId,
+        celebrity.id,
+        celebrity.publicName,
         buyer.id,
         buyer.name,
         recipient.id,
