@@ -57,7 +57,7 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsDatabaseAndV
       email = ""
     )
     executePurchaseHandler(
-      totalAmountPaid = Product.defaultPrice.toMoney(),
+      totalAmountPaid = BigDecimal(95).toMoney(),
       printingOption = PrintingOption.HighQualityPrint,
       shippingForm = Some(shippingForm))
 
