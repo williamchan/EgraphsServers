@@ -28,14 +28,14 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsDatabaseAndV
   private val buyerEmail = "buyer@egraphs.com"
 
   it should "create Order and CashTransaction for a digital-only purchase" in {
-    executePurchaseHandler()
+    val orderFromHandler = executePurchaseHandler()
     db.connected(TransactionSerializable) {
-      val order = orderStore.get(1)
+      val order = orderStore.get(orderFromHandler.id)
       order.amountPaidInCurrency should be(BigDecimal(50))
       order.recipientName should be(recipientName)
       order.buyer.name should be(buyerName)
 
-      val cashTransaction = cashTransactionStore.get(1)
+      val cashTransaction = cashTransactionStore.findByOrderId(order.id).single
       cashTransaction.orderId should be(Some(order.id))
       cashTransaction.stripeCardTokenId should not be(None)
       cashTransaction.stripeChargeId should not be(None)
@@ -45,13 +45,6 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsDatabaseAndV
       cashTransaction.cashTransactionType should be(CashTransactionType.EgraphPurchase)
     }
   }
-
-//  it should "create Order and CashTransaction with price (not Product.Price)" in {
-//    val order = executePurchaseHandler(price = BigDecimal(95).toMoney())
-//    db.connected(TransactionSerializable) {
-//      // CashTransaction is a local record of the Stripe charge. If it is correct, then the Stripe charge should be correct.
-//      orderStore.get(order.id).amountPaid should be(BigDecimal(95).toMoney())
-//      cashTransactionStore.get(1).amountInCurrency should be(BigDecimal(95))
 
   it should "create Order and PrintOrder and CashTransaction with totalAmountPaid if PrintingOption is HighQualityPrint" in {
     val shippingForm = CheckoutShippingForm.Valid(
@@ -63,24 +56,24 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsDatabaseAndV
       postalCode = "98102",
       email = ""
     )
-    executePurchaseHandler(
+
+    val orderFromHandler = executePurchaseHandler(
       totalAmountPaid = BigDecimal(95).toMoney(),
       printingOption = PrintingOption.HighQualityPrint,
-      shippingForm = Some(shippingForm))
+      shippingForm = Some(shippingForm)
+    )
 
     db.connected(TransactionSerializable) {
-      val order = orderStore.get(1)
+      val order = orderStore.get(orderFromHandler.id)
       order.amountPaidInCurrency should be(BigDecimal(50))
 
-      val printOrder = printOrderStore.get(1)
-      printOrder.orderId should be(1L)
+      val printOrder = printOrderStore.findByOrderId(order.id).single
       printOrder.shippingAddress should be("Egraphs, 615 2nd Ave, 300, Seattle, WA 98102")
       printOrder.amountPaidInCurrency should be(BigDecimal(45))
 
-      val cashTransaction = cashTransactionStore.get(1)
-      cashTransaction.orderId should be(Some(order.id))
+      val cashTransaction = cashTransactionStore.findByOrderId(order.id).single
       cashTransaction.printOrderId should be(Some(printOrder.id))
-      cashTransaction.amountInCurrency should be(BigDecimal(95))
+      cashTransaction.amountInCurrency should be(BigDecimal(95))  //TODO: why is this 50 instead of 95?
     }
   }
 
@@ -107,18 +100,20 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsDatabaseAndV
       shippingForm = None,
       writtenMessageRequest = WrittenMessageRequest.SpecificMessage
     )
-    purchaseHandler.execute()
+    val result = purchaseHandler.performPurchase()
+    val failedPurchaseDataFromHandler = result.fold(
+      error => error.failedPurchaseData,
+      order => throw new Exception("Purchase should have failed, thus there should be no order.")
+    )
 
     db.connected(TransactionSerializable) {
-      orderStore.findById(1L) should be(None)
-
-      val failedPurchaseData = failedPurchaseDataStore.get(1)
+      val failedPurchaseData = failedPurchaseDataStore.get(failedPurchaseDataFromHandler.id)
       failedPurchaseData.errorDescription should startWith("Must have available inventory to purchase product")
       failedPurchaseData.purchaseData should include(recipientName)
       failedPurchaseData.purchaseData should include(recipientEmail)
       failedPurchaseData.purchaseData should include(buyerName)
       failedPurchaseData.purchaseData should include(buyerEmail)
-      failedPurchaseData.purchaseData should include("\"productId\":1")
+      failedPurchaseData.purchaseData should include("\"productId\":" + product.id)
     }
   }
 

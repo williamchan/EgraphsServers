@@ -71,15 +71,16 @@ case class EgraphPurchaseHandler(
   def execute(): Redirect = {
     val errorOrOrder = performPurchase
 
+    println(errorOrOrder)
     val redirect = errorOrOrder.fold(
       (error) => error match {
         case stripeError: PurchaseFailedStripeError =>
           //Attempt Stripe charge. If a credit card-related error occurred, redirect to purchase screen.
           return new Redirect(reverse(WebsiteControllers.getStorefrontCreditCardError(celebrity.urlSlug, product.urlSlug, stripeError.stripeException.getLocalizedMessage)).url)
-        case PurchaseFailedInsufficientInventory =>
+        case _: PurchaseFailedInsufficientInventory =>
           //A redirect to the insufficient inventory page
           new Redirect(reverse(WebsiteControllers.getStorefrontNoInventory(celebrity.urlSlug, product.urlSlug)).url)
-        case PurchaseFailedError =>
+        case _: PurchaseFailedError =>
           return new Redirect(reverse(WebsiteControllers.getStorefrontPurchaseError(celebrity.urlSlug, product.urlSlug)).url)
       },
       (successfulOrder) =>
@@ -95,8 +96,8 @@ case class EgraphPurchaseHandler(
       payment.charge(totalAmountPaid, stripeTokenId, "Egraph Order from " + buyerEmail)
     } catch {
       case stripeException: com.stripe.exception.InvalidRequestException => {
-        saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = "Credit card issue: " + stripeException.getLocalizedMessage)
-        return Left(PurchaseFailedStripeError(stripeException))
+        val failedPurchaseData = saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = "Credit card issue: " + stripeException.getLocalizedMessage)
+        return Left(PurchaseFailedStripeError(failedPurchaseData, stripeException))
       }
     }
 
@@ -124,13 +125,13 @@ case class EgraphPurchaseHandler(
     } catch {
       case e: InsufficientInventoryException => {
         payment.refund(charge.id)
-        saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = e.getLocalizedMessage)
-        return Left(PurchaseFailedInsufficientInventory)
+        val failedPurchaseData = saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = e.getLocalizedMessage)
+        return Left(PurchaseFailedInsufficientInventory(failedPurchaseData))
       }
       case e: Exception => {
         payment.refund(charge.id)
-        saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = e.getLocalizedMessage)
-        return Left(PurchaseFailedError)
+        val failedPurchaseData = saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = e.getLocalizedMessage)
+        return Left(PurchaseFailedError(failedPurchaseData))
       }
     }
 
@@ -144,12 +145,12 @@ case class EgraphPurchaseHandler(
   }
 
   // Failure base type
-  sealed abstract trait PurchaseFailed
+  sealed abstract class PurchaseFailed(val failedPurchaseData: FailedPurchaseData)
 
   // Our two failure cases for if the payment vendor failed or there was insufficient inventory
-  case class PurchaseFailedStripeError(stripeException: com.stripe.exception.InvalidRequestException) extends PurchaseFailed
-  case object PurchaseFailedInsufficientInventory extends PurchaseFailed
-  case object PurchaseFailedError extends PurchaseFailed
+  case class PurchaseFailedStripeError(override val failedPurchaseData: FailedPurchaseData, stripeException: com.stripe.exception.InvalidRequestException) extends PurchaseFailed(failedPurchaseData)
+  case class PurchaseFailedInsufficientInventory(override val failedPurchaseData: FailedPurchaseData) extends PurchaseFailed(failedPurchaseData)
+  case class PurchaseFailedError(override val failedPurchaseData: FailedPurchaseData) extends PurchaseFailed(failedPurchaseData)
 
   private def persistOrder(dbSession: DBSession,
                            customerStore: CustomerStore,
@@ -220,9 +221,10 @@ case class EgraphPurchaseHandler(
     }
   }
 
-  private def saveFailedPurchaseData(dbSession: DBSession, purchaseData: String, errorDescription: String) {
+  private def saveFailedPurchaseData(dbSession: DBSession, purchaseData: String, errorDescription: String): FailedPurchaseData =  {
+    val failedPurchaseData = FailedPurchaseData(purchaseData = purchaseData, errorDescription = errorDescription.take(128 /*128 is the column width*/))
     dbSession.connected(TransactionSerializable) {
-      FailedPurchaseData(purchaseData = purchaseData, errorDescription = errorDescription.take(128 /*128 is the column width*/)).save()
+      failedPurchaseData.save()
     }
   }
 
