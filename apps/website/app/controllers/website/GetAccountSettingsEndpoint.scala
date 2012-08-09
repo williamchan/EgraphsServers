@@ -2,13 +2,13 @@ package controllers.website
 
 import play.mvc.Controller
 import services.http.{CustomerRequestFilters, ControllerMethod}
-import services.Utils
 import models.frontend.forms.{FormError, Field}
 import services.http.forms.AccountSettingsForm.Fields
 import services.http.forms.AccountSettingsFormFactory
 import models.{Customer, Account}
 import models.frontend.account.{AccountSettingsForm => AccountSettingsFormView}
 import services.mvc.ImplicitHeaderAndFooterData
+import controllers.WebsiteControllers
 
 private[controllers] trait GetAccountSettingsEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
@@ -95,7 +95,5 @@ private[controllers] trait GetAccountSettingsEndpoint extends ImplicitHeaderAndF
 
 object GetAccountSettingsEndpoint {
 
-  def url() = {
-    Utils.lookupUrl("WebsiteControllers.getAccountSettings")
-  }
+  def url() = WebsiteControllers.reverse(WebsiteControllers.getAccountSettings)
 }

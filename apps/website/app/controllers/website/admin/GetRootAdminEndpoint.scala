@@ -1,9 +1,9 @@
 package controllers.website.admin
 
 import play.mvc.Controller
-import services.Utils
 import play.mvc.results.Redirect
 import services.http.{AdminRequestFilters, ControllerMethod}
+import controllers.WebsiteControllers
 
 private[controllers] trait GetRootAdminEndpoint {
   this: Controller =>
@@ -21,6 +21,6 @@ private[controllers] trait GetRootAdminEndpoint {
 object GetRootAdminEndpoint {
 
   def url() = {
-    Utils.lookupUrl("WebsiteControllers.getRootAdmin")
+    WebsiteControllers.reverse(WebsiteControllers.getRootAdmin)
   }
 }

@@ -3,6 +3,8 @@ package models
 import enums.EgraphState
 import utils._
 import services.AppConfig
+import services.blobs.Blobs
+import Blobs.Conversions._
 
 class PrintOrderTests extends EgraphsUnitTest
   with ClearsDatabaseAndValidationBefore
@@ -38,5 +40,6 @@ class PrintOrderTests extends EgraphsUnitTest
     egraph = egraph.withEgraphState(EgraphState.ApprovedByAdmin).save()
     val pngUrl: Option[String] = printOrder.generatePng(100)
     pngUrl.get should endWith("blob/files/egraphs/1/image/signing-origin-offset-0x0_global-width-100px-v1.png")
+    TestHelpers.getBlobFromTestBlobUrl(pngUrl.get).get.asByteArray.length should be(19376)
   }
 }

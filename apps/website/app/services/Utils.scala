@@ -74,6 +74,7 @@ class Utils @Inject()(@PlayConfig() playConfig: util.Properties) {
    * redirect(actionDef.url)
    * }}}
    */
+  @Deprecated // Use WebsiteControllers.reverse instead.
   def lookupUrl(controllerMethod: String, params: Map[String, AnyRef] = Map()): Router.ActionDefinition = {
     import scala.collection.JavaConversions._
 
@@ -85,12 +86,14 @@ class Utils @Inject()(@PlayConfig() playConfig: util.Properties) {
   }
 
   /**
-   * Returns the ActionDefinition with an absolute URL, ie https://www.egraphs.com/myroute.
+   * @param action the controller action of interest
+   * @return the absolute URL associated with the action starting with the application's baseUrl, eg if the base url was
+   *         "https://www.egraphs.com/" and the action maps to "/login", then "https://www.egraphs.com/login" is returned
    */
-  def lookupAbsoluteUrl(controllerMethod: String, params: Map[String, AnyRef] = Map()): Router.ActionDefinition = {
-    val action = lookupUrl(controllerMethod, params)
-    action.absolute()
-    action
+  def absoluteUrl(action: Router.ActionDefinition): String = {
+    val baseUrl = requiredConfigurationProperty("application.baseUrl")
+    val relativeUrl = action.url
+    composeUrl(baseUrl, relativeUrl)
   }
 
   /**
@@ -174,6 +177,23 @@ class Utils @Inject()(@PlayConfig() playConfig: util.Properties) {
     val out = new FileOutputStream(file)
     out.write(bytes)
     out.close()
+  }
+
+  /**
+   * Why am I writing this? Because the application.baseUrl config parameter seems to have a trailing "/" in all of the
+   * Play examples while a url from ActionDefinitions has a leading "/". So, I wanted to make sure that we are using
+   * application.baseUrl correctly and also correctly composing absolute Urls.
+   *
+   * @param baseUrl eg "https://www.egraphs.com/"
+   * @param relativeUrl eg "/login"
+   * @return the concatenated full Url
+   */
+  private[services] def composeUrl(baseUrl: String, relativeUrl: String): String = {
+    (baseUrl.endsWith("/"), relativeUrl.startsWith("/")) match {
+      case (true, true) => baseUrl + relativeUrl.substring(1)
+      case (true, false) | (false, true) => baseUrl + relativeUrl
+      case (false, false) => baseUrl + "/" + relativeUrl
+    }
   }
 }
 

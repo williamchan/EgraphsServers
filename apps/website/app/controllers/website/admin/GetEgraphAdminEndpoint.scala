@@ -1,10 +1,10 @@
 package controllers.website.admin
 
 import play.mvc.Controller
-import services.Utils
 import services.http.{AdminRequestFilters, ControllerMethod}
 import models.EgraphStore
 import controllers.website.GetEgraphEndpoint
+import controllers.WebsiteControllers
 
 private[controllers] trait GetEgraphAdminEndpoint { this: Controller =>
 
@@ -31,6 +31,6 @@ private[controllers] trait GetEgraphAdminEndpoint { this: Controller =>
 object GetEgraphAdminEndpoint {
 
   def url(egraphId: Long) = {
-    Utils.lookupUrl("WebsiteControllers.getEgraphAdmin", Map("egraphId" -> egraphId.toString))
+    WebsiteControllers.reverse(WebsiteControllers.getEgraphAdmin(egraphId))
   }
 }

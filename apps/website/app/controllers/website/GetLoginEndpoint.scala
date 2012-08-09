@@ -9,6 +9,7 @@ import models.frontend.login_page.{AccountRegistrationFormViewModel, LoginFormVi
 import services.http.forms.purchase.FormReaders
 import services.mvc.forms.{AccountRegistrationFormViewConversions, LoginFormViewConversions}
 import services.mvc.ImplicitHeaderAndFooterData
+import controllers.WebsiteControllers
 
 private[controllers] trait GetLoginEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
   import services.http.forms.Form.Conversions._
@@ -69,7 +70,5 @@ private[controllers] trait GetLoginEndpoint extends ImplicitHeaderAndFooterData 
 
 object GetLoginEndpoint {
 
-  def url() = {
-    Utils.lookupUrl("WebsiteControllers.getLogin")
-  }
+  def url() = WebsiteControllers.reverse(WebsiteControllers.getLogin)
 }

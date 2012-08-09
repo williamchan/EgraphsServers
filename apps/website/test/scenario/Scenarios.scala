@@ -693,16 +693,7 @@ class Scenarios extends DeclaresScenarios {
   }
 
   private[this] def redirectToStarcraftProduct = {
-    new Redirect(
-      Utils.lookupUrl("WebsiteControllers.getStorefrontChoosePhotoCarousel", starcraftProductSlugs).url
-    )
-  }
-
-  private[this] def starcraftProductSlugs = {
-    Map(
-      "celebrityUrlSlug" -> "Wizzle",
-      "productUrlSlug" -> "2010-Starcraft-2-Championships"
-    )
+    new Redirect(WebsiteControllers.reverse(WebsiteControllers.getStorefrontChoosePhotoCarousel("Wizzle", "2010-Starcraft-2-Championships")).url)
   }
 }
 

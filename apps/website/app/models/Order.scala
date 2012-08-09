@@ -19,6 +19,7 @@ import com.google.inject.Inject
 import java.text.SimpleDateFormat
 import controllers.website.consumer.StorefrontChoosePhotoConsumerEndpoints
 import social.{Twitter, Facebook}
+import controllers.WebsiteControllers
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -194,7 +195,8 @@ case class Order(
     val emailLogoSrc = ""
     val emailFacebookSrc = ""
     val emailTwitterSrc = ""
-    val viewEgraphUrl = Utils.lookupAbsoluteUrl("WebsiteControllers.getEgraph", Map("orderId" -> id.toString)).url
+    val viewEgraphAction = WebsiteControllers.reverse(WebsiteControllers.getEgraph(id.toString))
+    val viewEgraphUrl = Utils.absoluteUrl(viewEgraphAction)
     val html = views.frontend.html.email_view_egraph(
       viewEgraphUrl = viewEgraphUrl,
       celebrityName = celebrity.publicName,
@@ -646,7 +648,8 @@ object GalleryOrderFactory {
           .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
           .scaledToWidth(product.frame.thumbnailWidthPixels)
         val thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Public)
-        val viewEgraphUrl = Utils.lookupAbsoluteUrl("WebsiteControllers.getEgraph", Map("orderId" -> order.id.toString)).url
+        val viewEgraphAction = WebsiteControllers.reverse(WebsiteControllers.getEgraph(order.id.toString))
+        val viewEgraphUrl = Utils.absoluteUrl(viewEgraphAction)
 
         val facebookShareLink = Facebook.getEgraphShareLink(fbAppId = fbAppId,
           fulfilledOrder = FulfilledOrder(order = order, egraph = egraph),

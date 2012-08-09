@@ -6,12 +6,10 @@ import org.junit.Test
 import play.test.FunctionalTest
 import FunctionalTest._
 import services.db.TransactionSerializable
-import utils.{TestConstants, TestData}
-import models.enums.{EgraphState, OrderReviewStatus, PrivacyStatus}
-import play.libs.Codec
+import utils.TestData
 import controllers.WebsiteControllers
 import services.AppConfig
-import models.{AccountStore, OrderStore}
+import models.AccountStore
 
 
 class GetVerifyAccountEndpointTests extends AdminFunctionalTest {

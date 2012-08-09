@@ -1,9 +1,9 @@
 package controllers.website.admin
 
 import play.mvc.Controller
-import services.Utils
 import services.http.{ControllerMethod, AdminRequestFilters}
 import models.InventoryBatchStore
+import controllers.WebsiteControllers
 
 private[controllers] trait GetInventoryBatchAdminEndpoint {
   this: Controller =>
@@ -29,6 +29,6 @@ private[controllers] trait GetInventoryBatchAdminEndpoint {
 object GetInventoryBatchAdminEndpoint {
 
   def url(inventoryBatchId: Long) = {
-    Utils.lookupUrl("WebsiteControllers.getInventoryBatchAdmin", Map("inventoryBatchId" -> inventoryBatchId.toString))
+    WebsiteControllers.reverse(WebsiteControllers.getInventoryBatchAdmin(inventoryBatchId))
   }
 }
