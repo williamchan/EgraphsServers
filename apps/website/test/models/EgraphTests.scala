@@ -67,12 +67,20 @@ class EgraphTests extends EgraphsUnitTest
 
   "publish" should "change state to Published" in {
     val admin = Administrator().save()
-    Egraph().withEgraphState(EgraphState.ApprovedByAdmin).publish(admin).egraphState should be(EgraphState.Published)
-    intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.PassedBiometrics).publish(null)}
-    intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.AwaitingVerification).publish(admin)}
-    intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.RejectedByAdmin).publish(admin)}
-    intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.PassedBiometrics).publish(admin)}
-    intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.PassedBiometrics).publish(admin)}
+    TestData.newSavedEgraph().withEgraphState(EgraphState.ApprovedByAdmin).publish(admin).egraphState should be(EgraphState.Published)
+    intercept[IllegalArgumentException] {TestData.newSavedEgraph().withEgraphState(EgraphState.PassedBiometrics).publish(null)}
+    intercept[IllegalArgumentException] {TestData.newSavedEgraph().withEgraphState(EgraphState.AwaitingVerification).publish(admin)}
+    intercept[IllegalArgumentException] {TestData.newSavedEgraph().withEgraphState(EgraphState.RejectedByAdmin).publish(admin)}
+    intercept[IllegalArgumentException] {TestData.newSavedEgraph().withEgraphState(EgraphState.PassedBiometrics).publish(admin)}
+    intercept[IllegalArgumentException] {TestData.newSavedEgraph().withEgraphState(EgraphState.PassedBiometrics).publish(admin)}
+  }
+
+  "publish" should "fail if there is another non-rejected Egraph" in {
+    val admin = Administrator().save()
+    val order = TestData.newSavedOrder()
+    Egraph().copy(orderId = order.id).save()
+    val egraph = Egraph().copy(orderId = order.id).withEgraphState(EgraphState.ApprovedByAdmin).save()
+    intercept[IllegalArgumentException] {egraph.publish(admin)}
   }
 
   "getSignedAt" should "return signedAt timestamp if it exists, otherwise created" in {

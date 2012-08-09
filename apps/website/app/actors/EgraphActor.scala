@@ -4,7 +4,7 @@ import akka.actor.Actor
 import Actor._
 import services.db.{DBSession, TransactionSerializable}
 import services.AppConfig
-import models.EgraphStore
+import models.{EgraphQueryFilters, EgraphStore}
 import com.google.inject.Inject
 import services.logging.{Logging, LoggingContext}
 import models.enums.EgraphState
@@ -22,6 +22,7 @@ import java.util.Properties
 case class EgraphActor @Inject() (
   db: DBSession,
   egraphStore: EgraphStore,
+  egraphQueryFilters: EgraphQueryFilters,
   logging: LoggingContext,
   @PlayConfig playConfig: Properties
 ) extends Actor with Logging
@@ -48,18 +49,24 @@ case class EgraphActor @Inject() (
       case _ => {
         logging.withTraceableContext("processEgraph[" + egraphId + "]") {
           db.connected(TransactionSerializable) {
-            egraphStore.get(egraphId) match {
-              case egraph if (egraph.egraphState == EgraphState.AwaitingVerification) => {
-                val testedEgraph = egraph.verifyBiometrics.save()
+            val egraph = egraphStore.get(egraphId)
 
-                // Initializes the mp3 from the wav.
-                egraph.assets.generateAndSaveMp3()
+            // Check that there is not another Egraph out there. This helps guard against accidentally approving or
+            // publishing multiple Egraphs for the same Order.
+            if (egraphStore.findByOrder(egraph.orderId, egraphQueryFilters.notRejected).size > 1) {
+              egraph.withEgraphState(EgraphState.RejectedByAdmin).save()
+            }
 
-                // If admin review is turned off (eg to expedite demos), immediately publish regardless of biometric results
-                if (playConfig.getProperty("adminreview.skip") == "true") {
-                  val publishedEgraph = testedEgraph.withEgraphState(EgraphState.Published).save()
-                  publishedEgraph.order.sendEgraphSignedMail()
-                }
+            else if (egraph.egraphState == EgraphState.AwaitingVerification) {
+              val testedEgraph = egraph.verifyBiometrics.save()
+
+              // Initializes the mp3 from the wav.
+              egraph.assets.generateAndSaveMp3()
+
+              // If admin review is turned off (eg to expedite demos), immediately publish regardless of biometric results
+              if (playConfig.getProperty("adminreview.skip") == "true") {
+                val publishedEgraph = testedEgraph.withEgraphState(EgraphState.Published).save()
+                publishedEgraph.order.sendEgraphSignedMail()
               }
             }
           }
@@ -79,4 +86,5 @@ object EgraphActor {
 // ===== Messages =====
 // ====================
 sealed trait EgraphMessage
+
 case class ProcessEgraphMessage(id: Long) extends EgraphMessage

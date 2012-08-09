@@ -38,6 +38,7 @@ case class EgraphServices @Inject() (
   store: EgraphStore,
   celebStore: CelebrityStore,
   orderStore: OrderStore,
+  egraphQueryFilters: EgraphQueryFilters,
   vbgVerifySampleStore: VBGVerifySampleStore,
   xyzmoVerifyUserStore: XyzmoVerifyUserStore,
   blobs: Blobs,
@@ -273,6 +274,7 @@ case class Egraph(
   def publish(admin: Administrator): Egraph = {
     require(admin != null, "Must be rejected by an Administrator")
     require(isPublishable, "Must have previously been approved by admin")
+    require((services.store.findByOrder(orderId, services.egraphQueryFilters.notRejected).size == 1), "There is another Egraph in the admin flow for the same Order")
     withEgraphState(Published)
   }
 
@@ -691,6 +693,14 @@ class EgraphQueryFilters @Inject() (schema: Schema) {
     new FilterOneTable[Egraph] {
       override def test(egraph: Egraph) = {
         (egraph._egraphState in Seq(Published.name, ApprovedByAdmin.name))
+      }
+    }
+  }
+
+  def notRejected: FilterOneTable[Egraph] = {
+    new FilterOneTable[Egraph] {
+      override def test(egraph: Egraph) = {
+        not(egraph._egraphState === RejectedByAdmin.name)
       }
     }
   }

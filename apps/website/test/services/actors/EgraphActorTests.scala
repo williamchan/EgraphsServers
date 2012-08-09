@@ -65,4 +65,17 @@ class EgraphActorTests extends EgraphsUnitTest
       egraphStore.get(egraph.id).egraphState should be(EgraphState.Published)
     }
   }
+
+  it should "be automatically reject the Egraph if a non-rejected Egraph already exists for the associated Order" in {
+    val egraph = db.connected(TransactionSerializable) {
+      val otherEgraph = TestData.newSavedEgraphWithRealAudio().withEgraphState(EgraphState.AwaitingVerification).save()
+      TestData.newSavedEgraphWithRealAudio().copy(orderId = otherEgraph.orderId).save()
+    }
+    egraph.egraphState should be(EgraphState.AwaitingVerification)
+
+    egraphActor !! ProcessEgraphMessage(egraph.id)
+    db.connected(TransactionSerializable) {
+      egraphStore.get(egraph.id).egraphState should be(EgraphState.RejectedByAdmin)
+    }
+  }
 }
