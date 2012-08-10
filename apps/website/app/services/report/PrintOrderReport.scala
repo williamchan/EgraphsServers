@@ -33,15 +33,15 @@ class PrintOrderReport @Inject() (schema: Schema) extends Report {
           orderBy (order.id asc)
       )
 
-    val headerLine = csvLine("orderId", "amount", "egraphid", "signedAt",
+    val headerLine = tsvLine("orderId", "amount", "egraphid", "signedAt",
       "recipientName", "recipientEmail", "recipientAddress", "celebrityPublicName", "celebrityId", "egraphstate")
-    val csv = new StringBuilder(headerLine)
+    val tsv = new StringBuilder(headerLine)
     for (o <- printOrders) {
       val order = o._1
       val account = o._2
       val celebrity = o._3
       val egraph = o._4
-      csv.append(csvLine(
+      tsv.append(tsvLine(
         order.id,
         order.amountPaidInCurrency,
         egraph.id,
@@ -54,6 +54,6 @@ class PrintOrderReport @Inject() (schema: Schema) extends Report {
         egraph._egraphState)
       )
     }
-    csvFile(csv)
+    tsvFile(tsv)
   }
 }

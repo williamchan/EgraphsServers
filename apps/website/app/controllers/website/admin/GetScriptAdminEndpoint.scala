@@ -1,33 +1,24 @@
 package controllers.website.admin
 
 import play.mvc.Controller
-import services.http.{AdminRequestFilters, ControllerMethod}
-import services.blobs.{AccessPolicy, Blobs}
-import services.db.Schema
 import models._
-import enums.{OrderReviewStatus, EgraphState}
+import models.enums.EgraphState
 import org.squeryl.Query
 import org.squeryl.PrimitiveTypeMode._
 import services.AppConfig
-import services.report._
-import play.mvc.results.RenderBinary
+import services.db.Schema
+import services.http.{AdminRequestFilters, ControllerMethod}
 
+/**
+ * These actions can be executed by any admin.
+ */
 private[controllers] trait GetScriptAdminEndpoint {
   this: Controller =>
 
   protected def controllerMethod: ControllerMethod
   protected def adminFilters: AdminRequestFilters
-  protected def blobs = AppConfig.instance[Blobs]
-  protected def schema = AppConfig.instance[Schema]
-  protected def accountStore = AppConfig.instance[AccountStore]
-  protected def administratorStore = AppConfig.instance[AdministratorStore]
-  protected def celebrityStore = AppConfig.instance[CelebrityStore]
-  protected def customerStore = AppConfig.instance[CustomerStore]
-  protected def egraphStore = AppConfig.instance[EgraphStore]
-  protected def enrollmentBatchStore = AppConfig.instance[EnrollmentBatchStore]
-  protected def inventoryBatchStore = AppConfig.instance[InventoryBatchStore]
-  protected def productStore = AppConfig.instance[ProductStore]
-  protected def orderStore = AppConfig.instance[OrderStore]
+  private lazy val schema = AppConfig.instance[Schema]
+  private lazy val enrollmentBatchStore = AppConfig.instance[EnrollmentBatchStore]
 
   def getScriptAdmin = controllerMethod() {
     adminFilters.requireAdministratorLogin {admin =>
@@ -48,20 +39,6 @@ private[controllers] trait GetScriptAdminEndpoint {
           s
         }
 
-        case "create-admin" => {
-          val adminEmail = params.get("admin-email")
-          val admin = administratorStore.findByEmail(adminEmail)
-          if (admin.isEmpty) {
-            var account = accountStore.findByEmail(adminEmail)
-            if (account.isEmpty) {
-              account = Some(Account(email = adminEmail).save())
-            }
-            val administrator = Administrator().save()
-            account.get.copy(administratorId = Some(administrator.id)).save()
-          }
-          "Admin created"
-        }
-
         case "kick-egraphs-awaitingverification" => {
           // find all Egraphs that are AwaitingVerification and give them a kick...
           val egraphsAwaitingVerification: Query[(Egraph)] = from(schema.egraphs)(
@@ -79,54 +56,6 @@ private[controllers] trait GetScriptAdminEndpoint {
           }
           "I gave all pending EnrollmentBatches a kick"
         }
-
-        case "email-list-report" => {
-          val report = new EmailListReport(schema).report()
-          new RenderBinary(report, report.getName)
-        }
-        case "inventory-batch-report" => {
-          val report = new InventoryBatchReport(schema).report()
-          new RenderBinary(report, report.getName)
-        }
-        case "order-report" => {
-          val report = new OrderReport(schema).report()
-          new RenderBinary(report, report.getName)
-        }
-        case "physical-print-report" => {
-          val report = new PrintOrderReport(schema).report()
-          new RenderBinary(report, report.getName)
-        }
-        case "monthly-celebrity-order-report" => {
-          val report = new MonthlyCelebrityOrderReport(schema).report()
-          new RenderBinary(report, report.getName)
-        }
-        case "monthly-celebrity-print-order-report" => {
-          val report = new MonthlyCelebrityPrintOrderReport(schema).report()
-          new RenderBinary(report, report.getName)
-        }
-
-        // Will be moved into PrintOrder functionality.
-        case "generate-large-egraph" => {
-          val width = 2446 // width from Feeny
-          val egraphId = params.get("egraphId").toLong
-          val egraph = egraphStore.get(egraphId)
-          val order = egraph.order
-          val product = order.product
-          val rawSignedImage = egraph.image(product.photoImage)
-          val image = rawSignedImage
-            .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
-            .scaledToWidth(width)
-          image.rasterized.getSavedUrl(AccessPolicy.Public) // also returns URL
-        }
-
-//        case "unapprove-orders" => {
-//          val orderIds = List[Long]()
-//          for (orderId <- orderIds) {
-//            val order = orderStore.get(orderId)
-//            order.withReviewStatus(OrderReviewStatus.PendingAdminReview).save()
-//          }
-//          "Orders have been reset to reviewStatus = 'PendingAdminReview'"
-//        }
 
         case _ => "Not a valid action"
       }

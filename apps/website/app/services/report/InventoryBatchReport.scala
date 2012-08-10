@@ -14,10 +14,10 @@ class InventoryBatchReport @Inject()(schema: Schema) extends Report {
   override val reportName = "inventory-batch-report"
 
   def report(): File = {
-    val oneMonthAgo = new DateTime().minusDays(30).toDate
+    val ninetyDaysAgo = new DateTime().minusDays(90).toDate
     import schema.{inventoryBatches, celebrities}
     val batchesAndCelebrityName = from(inventoryBatches, celebrities)((inventoryBatch, celebrity) =>
-      where((inventoryBatch.startDate between(oneMonthAgo, Time.today)) and
+      where((inventoryBatch.endDate > ninetyDaysAgo) and
         inventoryBatch.celebrityId === celebrity.id)
         select (inventoryBatch, celebrity.publicName)
         orderBy (inventoryBatch.id asc)
@@ -26,11 +26,11 @@ class InventoryBatchReport @Inject()(schema: Schema) extends Report {
     // This is useful for calculating inventory remaining.
     val batchIdsAndOrderCount = getOrderCountByBatchId(batchesAndCelebrityName.map(b => b._1.id).toList)
 
-    val headerLine = csvLine("inventoryBatchId", "startDate", "endDate", "numInventory", "remainingInventory", "celebrityId", "celebrityPublicName")
-    val csv = new StringBuilder(headerLine)
+    val headerLine = tsvLine("inventoryBatchId", "startDate", "endDate", "numInventory", "remainingInventory", "celebrityId", "celebrityPublicName")
+    val tsv = new StringBuilder(headerLine)
     for (batchAndCelebrityName <- batchesAndCelebrityName) {
       val batch = batchAndCelebrityName._1
-      csv.append(csvLine(
+      tsv.append(tsvLine(
         batch.id,
         batch.startDate,
         batch.endDate,
@@ -40,7 +40,7 @@ class InventoryBatchReport @Inject()(schema: Schema) extends Report {
         batchAndCelebrityName._2
       ))
     }
-    csvFile(csv)
+    tsvFile(tsv)
   }
 
   private def getOrderCountByBatchId(batchIds: List[Long]): Map[Long, Int] = {

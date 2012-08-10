@@ -13,15 +13,15 @@ trait Report {
 
   protected val newline = "\r\n"
 
-  protected def csvLine(args: Any*): String = {
-    (args.toList ::: List(newline)).mkString(",")
+  protected def tsvLine(args: Any*): String = {
+    (args.toList ::: List(newline)).mkString("\t")
   }
 
-  protected def csvFile(csv: StringBuilder, reportName: String = reportName): File = {
-    val file = File.createTempFile(reportName + "-" + Time.toBlobstoreFormat(Time.today), ".csv")
+  protected def tsvFile(tsv: StringBuilder, reportName: String = reportName): File = {
+    val file = File.createTempFile(reportName + "-" + Time.toBlobstoreFormat(Time.today), ".tsv")
     file.deleteOnExit()
     val out = new FileOutputStream(file)
-    out.write(csv.toString().getBytes)
+    out.write(tsv.toString().getBytes)
     out.close()
     file
   }

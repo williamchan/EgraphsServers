@@ -29,6 +29,8 @@ trait AllAdminEndpoints
   with GetPrintOrdersAdminEndpoint
   with GetProductAdminEndpoint
   with GetScriptAdminEndpoint
+  with GetReportsAdminEndpoint
+  with GetSheriffAdminEndpoint
   with PostAccountAdminEndpoint
   with PostCelebrityAdminEndpoint
   with PostCelebrityInventoryBatchAdminEndpoint
