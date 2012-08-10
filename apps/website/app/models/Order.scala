@@ -131,12 +131,32 @@ case class Order(
    * Hopefully we will not have many refund requests when we launch.
    */
   def refund(): (Order, Charge) = {
+    // Do a bunch of validation to make sure we have everything to do this refund
     require(paymentStatus == PaymentStatus.Charged, "Refunding an Order requires that the Order be already Charged")
-    val cashTransaction = services.cashTransactionServices.get().cashTransactionStore.findByOrderId(id).headOption
-    require(cashTransaction.isDefined && cashTransaction.get.stripeChargeId.isDefined, "Refunding an Order requires that the Order be already Charged")
+    val cashTransactionService = services.cashTransactionServices.get()
+    val maybeCashTransaction = cashTransactionService.cashTransactionStore.findByOrderId(id).headOption
 
-    val refundedCharge = services.payment.refund(cashTransaction.get.stripeChargeId.get)
-    CashTransaction(accountId = buyerId, orderId = Some(id), services = services.cashTransactionServices.get)
+    require(maybeCashTransaction.isDefined && maybeCashTransaction.get.stripeChargeId.isDefined, "Refunding an Order requires that the Order be already Charged")
+    val cashTransaction = maybeCashTransaction.get
+    val stripeChargeId = cashTransaction.stripeChargeId.get
+
+    // Do the refund and exception handling
+    val maybeCustomer = services.customerStore.findById(buyerId)
+    val errorStringOrRefundedOrderAndCharge = for (
+      customer <- maybeCustomer.toRight("There is no customer!").right
+    ) yield {
+      doRefund(customer, stripeChargeId, cashTransactionService)
+    }
+
+    errorStringOrRefundedOrderAndCharge.fold(
+      (errorString) => throw new Exception(errorString),
+      (orderAndCharge) => orderAndCharge
+    )
+  }
+
+  private def doRefund(buyer: Customer, stripeChargeId: String, cashTransactionService: CashTransactionServices): (Order, Charge) = {
+    val refundedCharge = services.payment.refund(stripeChargeId)
+    CashTransaction(accountId = buyer.account.id, orderId = Some(id), services = cashTransactionService)
       .withCash(amountPaid.negated())
       .withCashTransactionType(CashTransactionType.PurchaseRefund)
       .save()

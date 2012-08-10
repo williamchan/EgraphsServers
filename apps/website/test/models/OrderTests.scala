@@ -94,10 +94,10 @@ class OrderTests extends EgraphsUnitTest
   }
 
   "generateAudioPrompt" should "generate audio prompt from audioPromptTemplates" in {
-    val signer_name = "Signer"
-    val recipient_name = "Recipient"
-    val order = TestData.newSavedOrder().copy(recipientName = recipient_name).save()
-    order.product.celebrity.copy(publicName = signer_name).save()
+    val signerName = "Signer"
+    val recipientName = "Recipient"
+    val order = TestData.newSavedOrder().copy(recipientName = recipientName).save()
+    order.product.celebrity.copy(publicName = signerName).save()
 
     order.generateAudioPrompt(Some(0)) should be("Yo Recipient, it’s Signer. It was awesome getting your message. Hope you enjoy this egraph.")
     order.generateAudioPrompt(Some(1)) should be("Recipient, it’s Signer here. Thanks for being a great fan. Hopefully we can win some games for you down the stretch.")
@@ -210,6 +210,11 @@ class OrderTests extends EgraphsUnitTest
     CashTransaction(accountId = will.account.id, orderId = Some(order.id), stripeCardTokenId = Some("mytoken"), stripeChargeId = Some(NiceCharge.id),billingPostalCode = Some("55555"))
       .withCash(product.price).withCashTransactionType(CashTransactionType.EgraphPurchase).save()
 
+    val accountStore = AppConfig.instance[AccountStore]
+    println("Customer = " + will)
+    val account = accountStore.findByCustomerId(will.id)
+    println("Account = " + account)
+
     var (refundedOrder: Order, refundCharge: Charge) = order.refund()
     refundedOrder = refundedOrder.save()
     refundedOrder.paymentStatus should be(PaymentStatus.Refunded)
@@ -218,12 +223,12 @@ class OrderTests extends EgraphsUnitTest
     val cashTransactions = cashTransactionStore.findByOrderId(order.id)
     cashTransactions.size should be(2)
     val purchaseTxn = cashTransactions.find(b => b.cashTransactionType == CashTransactionType.EgraphPurchase).head
-    purchaseTxn.accountId should be(will.id)
+    purchaseTxn.accountId should be(will.account.id)
     purchaseTxn.orderId should be(Some(order.id))
     purchaseTxn.amountInCurrency should be(BigDecimal(product.price.getAmount))
     purchaseTxn.currencyCode should be(CurrencyUnit.USD.getCode)
     val refundTxn = cashTransactions.find(b => b.cashTransactionType == CashTransactionType.PurchaseRefund).head
-    refundTxn.accountId should be(will.id)
+    refundTxn.accountId should be(will.account.id)
     refundTxn.orderId should be(Some(order.id))
     refundTxn.amountInCurrency should be(BigDecimal(product.price.negated().getAmount))
     refundTxn.currencyCode should be(CurrencyUnit.USD.getCode)
@@ -428,19 +433,19 @@ class OrderTests extends EgraphsUnitTest
     val admin = Administrator().save()
     celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
 
-    val order = buyer.buy(product, recipient=recipient).save()
-    val order1 = recipient.buy(product, recipient=recipient).save()
+    val order1 = buyer.buy(product, recipient=recipient).save()
+    val order2 = recipient.buy(product, recipient=recipient).save()
 
-    val egraph = order.newEgraph.save()
+    val egraph = order1.newEgraph.save()
     egraph.verifyBiometrics.approve(admin).publish(admin).save()
 
     val results = orderStore.getEgraphsAndOrders(recipient.id)
 
     results.size should be (2)
 
-    val queried_egraph = results.head._2.get
+    val queriedEgraph = results.head._2.get
 
-    queried_egraph.id should be (1)
+    queriedEgraph.id should be (egraph.id)
   }
 
   "filterPendingOrders" should "return filtered results with user displayable egraphs" in {
@@ -460,9 +465,9 @@ class OrderTests extends EgraphsUnitTest
 
     results.size should be (1)
 
-    val queried_egraph = results.head._2.get
+    val queriedEgraph = results.head._2.get
 
-    queried_egraph.id should be (1)
+    queriedEgraph.id should be (egraph.id)
   }
 
   "GalleryOrderFactory" should "create PendingEgraphViewModels from orders" in {
@@ -524,8 +529,8 @@ class OrderTests extends EgraphsUnitTest
   }
 
   private def newOrderStack = {
-    val buyer  = TestData.newSavedCustomer().save()
-    val recipient = TestData.newSavedCustomer().save()
+    val buyer  = TestData.newSavedCustomer()
+    val recipient = TestData.newSavedCustomer()
     val celebrity = TestData.newSavedCelebrity()
     val product = TestData.newSavedProduct(celebrity = Some(celebrity))
     (buyer, recipient, celebrity, product)
