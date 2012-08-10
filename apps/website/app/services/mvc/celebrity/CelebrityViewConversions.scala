@@ -1,12 +1,13 @@
-package services.mvc
+package services.mvc.celebrity
 
 import models.{ImageAsset, Celebrity}
 import models.frontend.storefront.{ChoosePhotoRecentEgraph, ChoosePhotoCelebrity}
 import services.blobs.AccessPolicy
-import models.frontend.landing.FeaturedStar
+import models.frontend.landing.CatalogStar
 import services.Utils
 import controllers.WebsiteControllers
 import WebsiteControllers.{reverse, getStorefrontChoosePhotoTiled}
+import services.mvc.OrderViewConversions
 
 /**
  * Converts Celebrities into various view models defined in the front-end module
@@ -19,12 +20,13 @@ class CelebrityViewConversions(celeb: Celebrity) {
    * The celebrity's "Recent Egraphs" views as seen in the Choose Photo pages.
    */
   def recentlyFulfilledEgraphChoosePhotoViews: Iterable[ChoosePhotoRecentEgraph] = {
-    celeb.ordersRecentlyFulfilled.take(6).map { fulfilled =>
-      OrderViewConversions.productOrderAndEgraphToChoosePhotoRecentEgraph(
-        fulfilled.product,
-        fulfilled.order,
-        fulfilled.egraph
-      )
+    celeb.ordersRecentlyFulfilled.take(6).map {
+      fulfilled =>
+        OrderViewConversions.productOrderAndEgraphToChoosePhotoRecentEgraph(
+          fulfilled.product,
+          fulfilled.order,
+          fulfilled.egraph
+        )
     }
   }
 
@@ -34,22 +36,20 @@ class CelebrityViewConversions(celeb: Celebrity) {
   def asChoosePhotoView: ChoosePhotoCelebrity = {
     val profileUrl = celeb.profilePhoto.resizedWidth(80).getSaved(AccessPolicy.Public).url
     ChoosePhotoCelebrity(
-      name=celeb.publicName,
-      profileUrl=profileUrl,
-      organization=celeb.organization,
-      roleDescription=celeb.roleDescription.getOrElse(""),
-      bio=celeb.bio,
-      twitterUsername=celeb.twitterUsername
+      name = celeb.publicName,
+      profileUrl = profileUrl,
+      organization = celeb.organization,
+      roleDescription = celeb.roleDescription.getOrElse(""),
+      bio = celeb.bio,
+      twitterUsername = celeb.twitterUsername
     )
   }
 
   /**
-   * The celebrity as a FeaturedStar. If some necessary data for the FeaturedStar
+   * The celebrity as a CatalogStar. If some necessary data for the CatalogStar
    * were not available (e.g. publicName, storeFrontUrl) then it returns None.
-   *
-   * @return
    */
-  def asFeaturedStar: FeaturedStar = {
+  def asCatalogStar: CatalogStar = {
     val mastheadImageUrl = celeb
       .landingPageImage
       .withImageType(ImageAsset.Jpeg)
@@ -58,24 +58,33 @@ class CelebrityViewConversions(celeb: Celebrity) {
       .url
 
     val activeProductsAndInventory = celeb.getActiveProductsWithInventoryRemaining()
-    val purchaseableProducts = activeProductsAndInventory.filter { productAndCount =>
-      productAndCount._2 > 0
+    val purchaseableProducts = activeProductsAndInventory.filter {
+      productAndCount =>
+        productAndCount._2 > 0
     }
 
-    FeaturedStar(
+    val choosePhotoUrl = Utils.lookupUrl(
+      "WebsiteControllers.getStorefrontChoosePhotoTiled",
+      Map("celebrityUrlSlug" -> celeb.urlSlug)
+    ).url
+
+    CatalogStar(
       name = celeb.publicName,
       secondaryText = celeb.roleDescription,
       imageUrl = mastheadImageUrl,
-      storefrontUrl = reverse(getStorefrontChoosePhotoTiled(celeb.urlSlug)).url,
-      hasInventoryRemaining = !purchaseableProducts.isEmpty
+      storefrontUrl = choosePhotoUrl,
+      hasInventoryRemaining = !purchaseableProducts.isEmpty,
+      isFeatured = celeb.isFeatured
     )
-
   }
 }
 
-
-object CelebrityViewConversions {
-  implicit def celebrityAsCelebrityViewConversions(celebrity: Celebrity):CelebrityViewConversions = {
+object CelebrityViewConversions extends CelebrityViewConverting {
+  //
+  // CelebrityViewConverting members
+  //
+  override implicit def celebrityAsCelebrityViewConversions(celebrity: Celebrity)
+  : CelebrityViewConversions = {
     new CelebrityViewConversions(celebrity)
   }
 }

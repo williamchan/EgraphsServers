@@ -5,6 +5,8 @@ import services.blobs.Blobs
 import play.Play
 import services.AppConfig
 import org.jclouds.blobstore.domain.Blob
+import akka.actor.{Actor, ActorRef}
+import akka.actor.Actor.actorOf
 
 object TestHelpers {
 
@@ -28,6 +30,33 @@ object TestHelpers {
   def getBlobFromTestBlobUrl(testBlobUrl: String): Option[Blob] = {
     val blobKey = getBlobKeyFromTestBlobUrl(testBlobUrl)
     blobs.get(blobKey)
+  }
+
+  def withActorUnderTest[ActorT <: Actor: Manifest, ResultT]
+  (actorInstance: => ActorT)(operation: ActorRef => ResultT): ResultT =
+  {
+    val actor = actorOf(actorInstance).start()
+
+    stoppingActor(actor)(operation)
+  }
+
+  def withActorUnderTest[ActorT <: Actor: Manifest, ResultT]
+  (operation: ActorRef => ResultT): ResultT =
+  {
+    val actor = actorOf[ActorT].start()
+
+    stoppingActor(actor)(operation)
+  }
+
+  private def stoppingActor[ActorT <: Actor: Manifest, ResultT]
+  (actor: ActorRef)(operation: ActorRef => ResultT): ResultT =
+  {
+    try {
+      operation(actor)
+    }
+    finally {
+      actor.stop()
+    }
   }
 
 }

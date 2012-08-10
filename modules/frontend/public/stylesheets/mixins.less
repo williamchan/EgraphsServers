@@ -49,6 +49,41 @@
 	transition: @arguments;
 }
 
+//
+// Renders correctly-scaled social buttons as a sprite represented by bg-sprite-social-icons.png.
+//
+// Params:
+//   cellEdgeLength -- the intended size of one edge of the button.
+//
+.social-sprite(@cellEdgeLength) {
+  @spriteColumns: 3;
+  @spriteRows: 3;
+  @facebookX: 0%;
+  @twitterX: 50%;
+  @defaultY: 0%;
+  @hoverY: 50%;
+
+  display: inline-block;
+  width: @cellEdgeLength;
+  height: @cellEdgeLength;
+  position: relative;  
+  text-indent: -9999px;
+  overflow: hidden;
+  background: url(../images/bg-sprite-social-icons.png) no-repeat;
+  background-size: percentage(@spriteColumns) percentage(@spriteRows);
+
+  &.facebook {
+    background-position: @facebookX @defaultY;
+    &:hover { background-position: @facebookX @hoverY; }
+  }
+
+  &.twitter {
+    background-position: @twitterX @defaultY;
+    &:hover { background-position: @twitterX @hoverY; }
+  }
+}
+
+
 .marker {
   
   position: absolute;

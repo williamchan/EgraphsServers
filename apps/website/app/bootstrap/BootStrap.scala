@@ -12,6 +12,7 @@ import services.logging.{Logging, LoggingContext}
 import services.{AppConfig, Utils, TempFile}
 import services.db.{TransactionSerializable, Schema, DBSession}
 import models.{AccountStore, Account, Administrator}
+import services.mvc.celebrity.{CatalogStarsActor, UpdateCatalogStarsActor}
 
 @OnApplicationStart
 class BootStrap extends Job with Logging {
@@ -42,8 +43,10 @@ class BootStrap extends Job with Logging {
         TestModeBootstrap.run()
       }
 
+      akka.actor.Scheduler.restart
       actors.EgraphActor.actor.start()
       actors.EnrollmentBatchActor.actor.start()
+      services.mvc.MvcModule.init()
 
       log("Finished bootstrapping application")
     }

@@ -1,10 +1,10 @@
-@(featureStarsFooter: Option[Html] = None, celebrityPublicName: Option[String] = None, getStartedUrl: Option[String] = None)
+@(starsFooter: Option[Html] = None, celebrityPublicName: Option[String] = None, getStartedUrl: Option[String] = None)
 
 <section id="landing-more">
 
   <header>
 
-    <h1>
+    <h1 id="connect-with-your-star">
       @{
         celebrityPublicName match {
           case None => "Which star will you connect with?"
@@ -17,6 +17,6 @@
 
   </header>
 
-  @featureStarsFooter.getOrElse("")
+  @starsFooter.getOrElse("")
 
 </section> <!-- end #landing-more -->

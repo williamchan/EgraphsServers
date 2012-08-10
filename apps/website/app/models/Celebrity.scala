@@ -392,12 +392,24 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
     )
   }
 
+  /**
+   * Returns all celebrities that should be discoverable by visitors on the website, and no
+   * celebrities that should not be discoverable.
+   **/
+  def getPublishedCelebrities: Iterable[Celebrity] = {
+    from(schema.celebrities)(c =>
+      where(c._publishedStatus === PublishedStatus.Published.name)
+      select (c)
+    )
+  }
+
   def getAll: Iterable[Celebrity] = {
     for (celeb <- schema.celebrities) yield celeb
   }
 
   def updateFeaturedCelebrities(newFeaturedCelebIds: Iterable[Long]) {
     // newFeaturedCelebIds can apparently be null
+    // TODO: find where the source of null was and remove it; we should not have null checks in this code.
     val safeNewFeaturedCelebIds = if (newFeaturedCelebIds != null) newFeaturedCelebIds else List.empty[Long]
     // First update those gentlemen that are no longer featured
     update(schema.celebrities)(c =>

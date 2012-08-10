@@ -1,4 +1,4 @@
-@(featuredStars:Iterable[models.frontend.landing.FeaturedStar]
+@(stars:Iterable[models.frontend.landing.CatalogStar]
 )(
   implicit headerData: models.frontend.header.HeaderData, 
   footerData: models.frontend.footer.FooterData
@@ -6,13 +6,14 @@
 
 @{/** Consumer landing page
 
-      featuredStars - the list of celebrities to feature.
+      stars - the list of all publicly-discoverable celebrities.
 */}
 
+@import models.frontend.landing.CatalogStar
 @import views.frontend.tags
 
-@featuredStarBlock(clearFix: Boolean) = {
-  @for(starRow <- featuredStars.grouped(4).toList) {
+@starsBlock(stars: Iterable[CatalogStar], clearFix: Boolean) = {
+  @for(starRow <- stars.grouped(4).toList) {
     <div class="celebrities row">
       @if(clearFix) {<div class="clearfix">}
 
@@ -42,18 +43,18 @@
   }
 }
 
-@featuredStarsFooter = {
+@starsFooter = {
   <footer>
     <div id="featured-stars" class="callout">
-      <h3>Featured Stars</h3>
+      <h3>Our Stars</h3>
       <p>Browse one of their galleries to get started making your own egraph.</p>
     </div>
-    @featuredStarBlock(clearFix=false)
+    @starsBlock(stars, clearFix=false)
   </footer>
 }
 
 @baseBody = {
-  @tags.landing.html.masthead_section()
+  @tags.landing.html.masthead_section(getStartedUrl=Some("#connect-with-your-star"))
 
   <section id="content" role="main">
 
@@ -63,7 +64,7 @@
 
         <footer id="landing-stars">
           <h3><a href="#featured-stars">Featured Stars <span>+</span></a></h3>
-          @featuredStarBlock(clearFix=true)
+          @starsBlock(stars.filter(star => star.isFeatured), clearFix=true)
         </footer> <!-- end #landing-stars -->
 
         @tags.landing.html.welcome_header()
@@ -72,7 +73,7 @@
 
         @tags.landing.html.landing_details()
 
-        @tags.landing.html.landing_more(featureStarsFooter = Some(featuredStarsFooter))
+        @tags.landing.html.landing_more(starsFooter = Some(starsFooter))
 
         <p class="to-top"><a href="#top">Back to Top</a></p>
 

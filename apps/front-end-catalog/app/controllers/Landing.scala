@@ -1,7 +1,7 @@
 package controllers
 
 import play.mvc.Controller
-import models.frontend.landing.FeaturedStar
+import models.frontend.landing.CatalogStar
 
 /**
  * Permutations of the landing page
@@ -9,16 +9,20 @@ import models.frontend.landing.FeaturedStar
 object Landing extends Controller with DefaultHeaderAndFooterData {
 
   /**
-   * Displays a permutation of the landing page with "featured stars" counting
+   * Displays a permutation of the landing page with "catalog stars" counting
    * 0 <= n <= sampleStars.length
    **/
   def featured_stars(count: Int) = {
-    views.frontend.html.landing(featuredStars = sampleStars.slice(0, count))
+    val stars = sampleStars.zipWithIndex.map { case (star, index) =>
+      star.copy(isFeatured = index < count)
+    }
+
+    views.frontend.html.landing(stars)
   }
 
   def featured_stars_with_no_inventory() = {
     val stars = sampleStars.map(star => star.copy(hasInventoryRemaining = false))
-    views.frontend.html.landing(featuredStars=stars)
+    views.frontend.html.landing(stars)
   }
 
   def single_celebrity(publicName: String = "David Price",
@@ -33,10 +37,17 @@ object Landing extends Controller with DefaultHeaderAndFooterData {
     )
   }
 
-  private def makeSampleStar(name: String, secondaryText: Option[String]): FeaturedStar = {
+  private def makeSampleStar(name: String, secondaryText: Option[String]): CatalogStar = {
     import play.templates.JavaExtensions.slugify
 
-    FeaturedStar(name, secondaryText, sampleImageUrl, "/" + slugify(name), hasInventoryRemaining = true)
+    CatalogStar(
+      name,
+      secondaryText,
+      sampleImageUrl,
+      "/" + slugify(name),
+      hasInventoryRemaining = true,
+      isFeatured = false
+    )
   }
 
   private val sampleImageUrl = "http://placehold.it/440x157"

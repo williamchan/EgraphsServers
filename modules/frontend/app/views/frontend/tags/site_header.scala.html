@@ -26,51 +26,64 @@
 
 <!-- Begin site_header.scala.html -->
 <header id="top" role="navigation">
-  
   <div class="container">
-    
     <div class="row">
-      
-      <div class="logo span3">
-    	
-    	<h1><a href="/" title="Egraphs">Egraphs</a></h1>
-    	
-      </div>
-      
-	  <div class="explore span3">
-	    
-	    <p><a href="@headerData.insideAnEgraphLink">Inside an egraph</a></p>
-	    
-	  </div> <!-- end .explore -->
-	  
-	  <div class="span6">
-        
-	 	<div class="social">
-		  
-		  <ul class="clearfix">
-		    <li><a href="@headerData.egraphsFacebookLink" class="facebook">Facebook</a></li>
-		    <li><a href="@headerData.egraphsTwitterLink" class="twitter">Twitter</a></li>
-		    <!-- <li><a href="#" class="addthis">AddThis</a></li> -->
-		  </ul>
-		  
-		</div> <!-- end .social -->
-        
-		<nav class="account @if(headerData.loggedInStatus.isRight) {logged-in}">
-		  
-		  <ul>
-        @{headerData.loggedInStatus match {
-          case Left(notLoggedIn) => notLoggedInHeader(notLoggedIn)
-          case Right(loggedIn) => loggedInHeader(loggedIn)
-        }}
-		  </ul>  
-		  
-		</nav> <!-- end .account --> 
-  		
-	  </div> 
-      
-    </div>
-    
-  </div>
-  
+      <div id="logo-account-social">
+        <div class="logo span">
+      	
+        	<h1><a href="/" title="Egraphs">Egraphs</a></h1>
+      	
+        </div>
+        <div id="account-social">
+          <div class="social">
+            
+            <ul class="clearfix">
+              <li><a href="@headerData.egraphsFacebookLink" class="facebook">Facebook</a></li>
+              <li><a href="@headerData.egraphsTwitterLink" class="twitter">Twitter</a></li>
+              <!-- <li><a href="#" class="addthis">AddThis</a></li> -->
+            </ul>
+            
+          </div> <!-- end .social -->
+
+          <nav class="account @if(headerData.loggedInStatus.isRight) {logged-in}">
+            
+            <ul>
+              @{headerData.loggedInStatus match {
+                case Left(notLoggedIn) => notLoggedInHeader(notLoggedIn)
+                case Right(loggedIn) => loggedInHeader(loggedIn)
+              }}
+            </ul>
+          </nav>
+        </div> <!-- end #account-social -->
+      </div> <!-- end #logo-account-social -->
+
+      <div class="linkz">
+        <div class="navbar-item our-stars">
+          
+          <p><a class="separator-after" href="@headerData.ourStarsLink">Find your star</a></p>
+          
+        </div> <!-- end .our-stars -->
+              
+        <div class="navbar-item">
+          
+          <p><a class="separator-after" href="@headerData.insideAnEgraphLink">Inside an egraph</a></p>
+          
+        </div> <!-- end .explore -->
+        <div class="navbar-item mobile-only">
+          
+          <p><span class="separator-after"><a href="@headerData.egraphsFacebookLink" class="responsive-social-sprite facebook">f</a></span></p>
+          
+        </div> <!-- end responsive fb link -->
+        <div class="navbar-item mobile-only">
+          
+          <p><a href="@headerData.egraphsTwitterLink" class="responsive-social-sprite twitter">t</a></p>
+          
+        </div> <!-- end responsive twitter link -->
+
+      </div> <!-- end .linkz -->
+
+    </div> <!-- end .container -->
+  </div> <!-- end .row -->
+
 </header> <!-- end #top -->
 <!-- End site_header.scala.html -->
