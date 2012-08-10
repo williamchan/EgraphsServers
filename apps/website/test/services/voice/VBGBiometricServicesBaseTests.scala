@@ -78,9 +78,9 @@ class VBGBiometricServicesBaseTests extends EgraphsUnitTest
   /**
    * This test costs $0.40 per run.
    */
-  "VBGTestFreeSpeechBiometricServices" should "test end-to-end" in {
-    testVBGEnrollAndVerify(VBGTestFreeSpeechBiometricServices)
-  }
+//  "VBGTestFreeSpeechBiometricServices" should "test end-to-end" in {
+//    testVBGEnrollAndVerify(VBGTestFreeSpeechBiometricServices)
+//  }
 
   private def testVBGEnrollAndVerify(vbg: VBGBiometricServicesBase) {
     val enroll1: Array[Byte] = blobs.getStaticResource("test-files/vbg/enroll1.wav").get.asByteArray
