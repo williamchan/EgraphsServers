@@ -34,7 +34,8 @@ trait ClearsDatabaseAndValidationBefore extends BeforeAndAfterEach { this: Suite
   private def truncateTables {
     val schema = AppConfig.instance[Schema]
     val tables = PrivateAccessor.getField(schema, "org$squeryl$Schema$$_tables").asInstanceOf[ArrayBuffer[Table[_]]]
-//    tables.foreach(table => table.deleteWhere(_ => 1===1))
+    // This is another way we could have done this, it has similar performance.
+    // tables.foreach(table => table.deleteWhere(_ => 1===1))
     val tableNames = tables.map(table => table.name)
     val statement = Session.currentSession.connection.prepareStatement("TRUNCATE " + tableNames.mkString(", "))
     println("TRUNCATE " + tableNames.mkString(", "))

@@ -68,16 +68,17 @@ class DBSessionTests extends EgraphsUnitTest
   it should "Save and recall an Account correctly both within and between transactions" in {
     val dbSession = AppConfig.instance[DBSession]
 
-    dbSession.connected(TransactionSerializable) {
+    val savedAccount = dbSession.connected(TransactionSerializable) {
       val account = Account(email="herpyderpson@derp.org")
 
       account.id should be (0)
       val saved = account.save()
-      saved.id should be (1)
+      saved.id should not be (0)
+      saved
     }
 
     dbSession.connected(TransactionSerializable) {
-      val restored = AppConfig.instance[AccountStore].findById(1)
+      val restored = AppConfig.instance[AccountStore].findById(savedAccount.id)
       restored should not be (None)
       restored.get.email should be ("herpyderpson@derp.org")
     }
@@ -88,7 +89,7 @@ class DBSessionTests extends EgraphsUnitTest
     val accountStore = AppConfig.instance[AccountStore]
 
     // Insert and commit an Account
-    dbSession.connected(TransactionSerializable) {
+    val account: Account = dbSession.connected(TransactionSerializable) {
       Account(email="herpyderpson@derp.org").save()
     }
 
@@ -99,10 +100,10 @@ class DBSessionTests extends EgraphsUnitTest
     // Create two different sessions that both alter the same element
     val thrown = evaluating {
       dbSession.connected(TransactionSerializable) {
-        val outerAccount = accountStore.get(1L)
+        val outerAccount = accountStore.get(account.id)
         // Inner transaction
         dbSession.connected(TransactionSerializable) {
-          accountStore.get(1L).copy(email=mainThreadEmail).save()
+          accountStore.get(account.id).copy(email=mainThreadEmail).save()
         }
 
         outerAccount.copy(email=actorEmail).save()
