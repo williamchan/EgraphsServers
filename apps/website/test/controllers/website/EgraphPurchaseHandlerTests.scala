@@ -142,6 +142,7 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsDatabaseAndV
       shippingForm = shippingForm,
       writtenMessageRequest = WrittenMessageRequest.SpecificMessage
     )
+
     val result = purchaseHandler.performPurchase()
     result.fold(
       error => throw new Exception("Performing purchase failed."),

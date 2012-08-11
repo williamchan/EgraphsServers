@@ -13,7 +13,8 @@ import org.squeryl.{Session, Table}
 
 /**
  * Mix this trait in to your Suite class to make sure that Play Validation
- * and all DB data are scrubbed in between test runs.
+ * and all DB data are scrubbed in between test runs.  Note: It is quicker to drop the data than to have to recreate the
+ * whole schema again.
  */
 trait ClearsDatabaseAndValidationBefore extends BeforeAndAfterEach { this: Suite =>
   override def beforeEach() {
@@ -24,7 +25,6 @@ trait ClearsDatabaseAndValidationBefore extends BeforeAndAfterEach { this: Suite
     val (_, timeInSecond) = Time.stopwatch {
       AppConfig.instance[DBSession].connected(TransactionSerializable) {
         truncateTables
-//        AppConfig.instance[Schema].scrub()
       }
     }
 

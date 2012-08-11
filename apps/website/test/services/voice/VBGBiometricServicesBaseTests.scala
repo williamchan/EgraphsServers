@@ -76,7 +76,7 @@ class VBGBiometricServicesBaseTests extends EgraphsUnitTest
   }
 
   /**
-   * This test costs $0.40 per run.
+   * This test costs $0.40 per run.  We shouldn't run this test regularly.
    */
 //  "VBGTestFreeSpeechBiometricServices" should "test end-to-end" in {
 //    testVBGEnrollAndVerify(VBGTestFreeSpeechBiometricServices)

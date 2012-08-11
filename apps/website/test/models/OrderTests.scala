@@ -211,9 +211,7 @@ class OrderTests extends EgraphsUnitTest
       .withCash(product.price).withCashTransactionType(CashTransactionType.EgraphPurchase).save()
 
     val accountStore = AppConfig.instance[AccountStore]
-    println("Customer = " + will)
     val account = accountStore.findByCustomerId(will.id)
-    println("Account = " + account)
 
     var (refundedOrder: Order, refundCharge: Charge) = order.refund()
     refundedOrder = refundedOrder.save()

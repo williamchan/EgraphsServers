@@ -68,10 +68,13 @@ case class EgraphPurchaseHandler(
     "productPrice" -> totalAmountPaid.getAmount
   ))
 
+  /**
+   * Performs the purchase the purchase with error handling.
+   * @return A Redirect to either an order confirmation page or some error page.
+   */
   def execute(): Redirect = {
     val errorOrOrder = performPurchase
 
-    println(errorOrOrder)
     val redirect = errorOrOrder.fold(
       (error) => error match {
         case stripeError: PurchaseFailedStripeError =>
@@ -222,9 +225,8 @@ case class EgraphPurchaseHandler(
   }
 
   private def saveFailedPurchaseData(dbSession: DBSession, purchaseData: String, errorDescription: String): FailedPurchaseData =  {
-    val failedPurchaseData = FailedPurchaseData(purchaseData = purchaseData, errorDescription = errorDescription.take(128 /*128 is the column width*/))
     dbSession.connected(TransactionSerializable) {
-      failedPurchaseData.save()
+      FailedPurchaseData(purchaseData = purchaseData, errorDescription = errorDescription.take(128 /*128 is the column width*/)).save()
     }
   }
 
