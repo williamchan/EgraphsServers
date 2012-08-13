@@ -8,6 +8,7 @@
 #        'staging' - staging.egraphs.com used for demos - lol
 #        'hydrogen' - the hydrogen test server
 #        'boron' - admin.egraphs.com
+#        'carbon' - external-facing demo server
 #
 
 
@@ -34,8 +35,7 @@ case "$DEPLOY_TARGET" in
     fi
 
     ;;
-  'demo'|'staging'|'hydrogen'|'boron')
-    # It's always ok to deploy to demo and staging.
+  'demo'|'staging'|'hydrogen'|'boron'|'carbon')
 	;;
   *)
 	# Error us out -- no valid deployment target
@@ -43,7 +43,7 @@ case "$DEPLOY_TARGET" in
     echo ""
     echo "Usage: "
     echo "    tools/deploy [deployment target]"
-    echo "Valid deployment targets are 'live', 'demo', 'staging', 'hydrogen', 'boron'. (omit the single quotes)"
+    echo "Valid deployment targets are 'live', 'demo', 'staging', 'hydrogen', 'boron', 'carbon'. (omit the single quotes)"
     exit 1
 	;;  
 esac
