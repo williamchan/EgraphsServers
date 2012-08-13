@@ -25,6 +25,9 @@ private[controllers] trait GetScriptAdminEndpoint {
 
       val action = params.get("action")
       action match {
+        /**
+         * Prints basic parameters about the JVM the instance is running on
+         */
         case "print-jvm-params" => {
           import management.ManagementFactory
           import scala.collection.JavaConversions._
@@ -39,6 +42,10 @@ private[controllers] trait GetScriptAdminEndpoint {
           s
         }
 
+        /**
+         * Processes all egraphs that have been posted by a celeb but not verified by biometrics.
+         * Pushes the egraphs to biometrics, in order to get to the admin flow.
+         */
         case "kick-egraphs-awaitingverification" => {
           // find all Egraphs that are AwaitingVerification and give them a kick...
           val egraphsAwaitingVerification: Query[(Egraph)] = from(schema.egraphs)(
@@ -50,6 +57,9 @@ private[controllers] trait GetScriptAdminEndpoint {
           "I gave all Egraphs AwaitingVerification a kick."
         }
 
+        /**
+         * Enrolls all celebrities that are stuck awaiting enrollment.
+         */
         case "kick-pending-enrollmentbatches" => {
           for (pendingEnrollmentBatch <- enrollmentBatchStore.getEnrollmentBatchesPending()) {
             actors.EnrollmentBatchActor.actor ! actors.ProcessEnrollmentBatchMessage(id = pendingEnrollmentBatch.id)
