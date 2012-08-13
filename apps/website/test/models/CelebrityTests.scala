@@ -82,7 +82,7 @@ class CelebrityTests extends EgraphsUnitTest
 
     val (savedCeleb, imageAsset) = celeb.save().saveWithProfilePhoto(image.asByteArray(ImageAsset.Png))
 
-    imageAsset.key should include ("celebrity/1")
+    imageAsset.key should include ("celebrity/" + celeb.id)
     savedCeleb.profilePhotoUpdated.get.toLong should be (Time.toBlobstoreFormat(Time.now).toLong plusOrMinus 10000)
     savedCeleb.profilePhoto should not be (None)
 
@@ -171,24 +171,29 @@ class CelebrityTests extends EgraphsUnitTest
   }
 
   "updateFeaturedCelebrities" should "remove celebs that weren't in the updated featured list" in {
-    featuredStateOfCelebWhen(celebWasFeatured=true, newFeaturedIds=List(0)) should be (false)
+    featuredStateOfCelebWhen(celebWasFeatured=true, includeCelebInNewFeaturedCelebs=false) should be (false)
   }
 
   "updateFeaturedCelebrities" should "keep featured celebs" in {
-    featuredStateOfCelebWhen(celebWasFeatured=true, newFeaturedIds=List(1)) should be (true)
+    featuredStateOfCelebWhen(celebWasFeatured=true, includeCelebInNewFeaturedCelebs=true) should be (true)
   }
 
   "updateFeaturedCelebrities" should "set newly featured celebs" in {
-    featuredStateOfCelebWhen(celebWasFeatured=false, newFeaturedIds=List(1)) should be (true)
+    featuredStateOfCelebWhen(celebWasFeatured=false, includeCelebInNewFeaturedCelebs=true) should be (true)
   }
 
   private def featuredStateOfCelebWhen(
     celebWasFeatured: Boolean,
-    newFeaturedIds: Iterable[Long]): Boolean =
+    includeCelebInNewFeaturedCelebs: Boolean): Boolean =
   {
     val celeb = TestData.newSavedCelebrity().copy(isFeatured=celebWasFeatured).save()
-    store.updateFeaturedCelebrities(newFeaturedIds)
+    val newFeaturedCelebs = if(includeCelebInNewFeaturedCelebs) {
+      List(celeb.id)
+    } else {
+      List(0L) // a list of celebrity ids that can't be this celebrity
+    }
 
+    store.updateFeaturedCelebrities(newFeaturedCelebs)
     store.get(celeb.id).isFeatured
   }
 

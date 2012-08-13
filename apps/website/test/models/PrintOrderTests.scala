@@ -37,6 +37,6 @@ class PrintOrderTests extends EgraphsUnitTest
 
     egraph = egraph.withEgraphState(EgraphState.ApprovedByAdmin).save()
     val pngUrl: Option[String] = printOrder.generatePng(100)
-    pngUrl.get should endWith("blob/files/egraphs/1/image/signing-origin-offset-0x0_global-width-100px-v1.png")
+    pngUrl.get should endWith("blob/files/egraphs/" + egraph.id + "/image/signing-origin-offset-0x0_global-width-100px-v1.png")
   }
 }

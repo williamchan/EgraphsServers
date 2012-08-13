@@ -75,6 +75,13 @@ object PrintOrder {
 class PrintOrderStore @Inject() (schema: Schema) extends Saves[PrintOrder] with SavesCreatedUpdated[PrintOrder] {
   import org.squeryl.PrimitiveTypeMode._
 
+  def findByOrderId(orderId: Long): Query[PrintOrder] = {
+    from(schema.printOrders)(printOrder =>
+      where(printOrder.orderId === Some(orderId))
+        select (printOrder)
+    )
+  }
+
   def findByFilter(filters: FilterOneTable[PrintOrder]*): Query[(PrintOrder, Order, Option[Egraph])] = {
     join(schema.orders, schema.printOrders, schema.egraphs.leftOuter)((order, printOrder, egraph) =>
       where(FilterOneTable.reduceFilters(filters, printOrder))
