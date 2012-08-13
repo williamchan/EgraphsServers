@@ -9,35 +9,32 @@
 <body>
 <h1>Admin Tools</h1>
 <p>
-  Welcome to Tools. Please do not run these more than necessary.
-  <a href="https://egraphs.atlassian.net/wiki/display/DEV/Tools">Wiki documentation available here</a>.
+  Welcome to tools. These are a collection of scripts that don't impact the server performance wise and are
+  safe to run by admins.
+
 </p>
-<h2>Orders</h2>
+<h2>JVM</h2>
 <ol>
   <li>
-    <a href="?action=order-report">Order Report</a> - Note: an Order will have multiple rows if there are multiple outstanding candidate Egraphs (rejected Egraphs are excluded).
+    <a href="/admin/script?action=print-jvm-params">Print JVM Params</a>
+    Prints paramaters related to the JVM this instance is running on.
+  </li>
+</ol>
+<ol>
+  <li>
+    <a href="/admin/script?action=kick-egraphs-awaitingverification">
+      Kicks egraphs awaiting verification</a>
+
+  </li>
+</ol>
+<ol>
+  <li>
+    <a href="/admin/script?action=kick-pending-enrollmentbatches">
+      Kicks pending enrollment batches
+    </a>
   </li>
 </ol>
 
-<h2>Physical Print Report</h2>
-<ol>
-  <li><a href="?action=physical-print-report">Physical Print Report</a></li>
-</ol>
 
-<h2>Inventory Batches</h2>
-<ol>
-  <li><a href="?action=inventory-batch-report">Inventory Batch Report</a> - Goes back 90 days based on end date</li>
-</ol>
-
-<h2>Monthly Celebrity Payment Tools</h2>
-<ol>
-  <li><a href="?action=monthly-celebrity-order-report">Digital Order View</a> - for previous full month</li>
-  <li><a href="?action=monthly-celebrity-print-order-report">Print Order View</a> - for previous full month</li>
-</ol>
-
-<h2>Email lists</h2>
-<ol>
-  <li><a href="?action=email-list-report">New Stars Updates Subscribers</a></li>
-</ol>
 </body>
 </html>
