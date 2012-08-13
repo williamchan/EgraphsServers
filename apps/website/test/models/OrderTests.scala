@@ -3,7 +3,6 @@ package models
 import enums._
 import utils._
 import services.AppConfig
-import services.db.Schema
 import org.joda.money.CurrencyUnit
 import services.payment.{Charge, NiceCharge}
 import javax.mail.internet.InternetAddress
@@ -390,10 +389,12 @@ class OrderTests extends EgraphsUnitTest
     val inventoryBatchIds = Seq(inventoryBatch1.id, inventoryBatch2.id, inventoryBatch3.id)
     val inventoryBatchIdsAndOrderCount = orderStore.countOrdersByInventoryBatch(inventoryBatchIds)
     inventoryBatchIdsAndOrderCount.length should be(2) // Query excludes rows with zero count
-    inventoryBatchIdsAndOrderCount(0)._1 should be(inventoryBatch1.id)
-    inventoryBatchIdsAndOrderCount(0)._2 should be(2)
-    inventoryBatchIdsAndOrderCount(1)._1 should be(inventoryBatch2.id)
-    inventoryBatchIdsAndOrderCount(1)._2 should be(1)
+    val resultForInventoryBatch1 = inventoryBatchIdsAndOrderCount.find(p => p._1 == inventoryBatch1.id)
+    resultForInventoryBatch1.isDefined should be(true)
+    resultForInventoryBatch1.get._2 should be(2)
+    val resultForInventoryBatch2 = inventoryBatchIdsAndOrderCount.find(p => p._1 == inventoryBatch2.id)
+    resultForInventoryBatch2.isDefined should be(true)
+    resultForInventoryBatch2.get._2 should be(1)
   }
 
   "isBuyerOrRecipient" should "return true if customer is either buy or recipient" in {
