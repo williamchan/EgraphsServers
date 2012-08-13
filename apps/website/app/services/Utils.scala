@@ -64,6 +64,8 @@ class Utils @Inject()(@PlayConfig() playConfig: util.Properties) {
 
   /**
    * Returns the ActionDefinition for a controller method with a parameter map.
+   * For some reason, WebsiteControllers.reverse does not seem to work outside of a controller context.
+   * But, I am hopeful these URL-related helper methods will go away once we move to Play 2.0.
    *
    * For example, to redirect to Shaq's celebrity page:
    * {{{
@@ -86,6 +88,8 @@ class Utils @Inject()(@PlayConfig() playConfig: util.Properties) {
   }
 
   /**
+   * I am hopeful these URL-related helper methods will go away once we move to Play 2.0.
+   *
    * @param action the controller action of interest
    * @return the absolute URL associated with the action starting with the application's baseUrl, eg if the base url was
    *         "https://www.egraphs.com/" and the action maps to "/login", then "https://www.egraphs.com/login" is returned

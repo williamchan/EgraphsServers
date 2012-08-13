@@ -1,6 +1,6 @@
 package controllers.website
 
-import play.mvc.Controller
+import play.mvc.{Router, Controller}
 import services.blobs.AccessPolicy
 import services.http.ControllerMethod
 import play.templates.Html
@@ -155,4 +155,7 @@ object GetEgraphEndpoint {
     )
   }
 
+  def url(orderId: Long): Router.ActionDefinition = {
+    Utils.lookupUrl("WebsiteControllers.getEgraph", Map("orderId" -> orderId.toString))
+  }
 }

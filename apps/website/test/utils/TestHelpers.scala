@@ -8,7 +8,7 @@ import org.jclouds.blobstore.domain.Blob
 
 object TestHelpers {
 
-  private lazy val blobs = AppConfig.instance[Blobs]
+  private val blobs = AppConfig.instance[Blobs]
 
   def fileAsBytes(filename: String): Array[Byte] = {
     Blobs.Conversions.fileToByteArray(Play.getFile(filename))
