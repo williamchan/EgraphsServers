@@ -21,12 +21,12 @@ class EmailListReport @Inject()(schema: Schema) extends Report {
           select (&(account.email))
       )
 
-    val headerLine = csvLine("email")
-    val csv = new StringBuilder(headerLine)
+    val headerLine = tsvLine("email")
+    val tsv = new StringBuilder(headerLine)
     for (email <- subscriberEmails) {
-      csv.append(csvLine(email))
+      tsv.append(tsvLine(email))
     }
-    csvFile(csv)
+    tsvFile(tsv)
   }
 
 }

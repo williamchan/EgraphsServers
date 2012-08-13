@@ -59,11 +59,7 @@ class XyzmoBiometricServicesTests extends EgraphsUnitTest
     //    val enrollmentResult: Either[SignatureBiometricsError, Boolean] = xyzmo.enroll(enrollmentBatch)
     //    enrollmentResult.right.get should be(true)
 
-    val xyzmoDeleteUser: XyzmoDeleteUser = XyzmoTestBiometricServices.deleteUser(enrollmentBatch = enrollmentBatch)
-    xyzmoDeleteUser.baseResult should be(WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue)
-    xyzmoDeleteUser.error should be(None)
-    xyzmoDeleteUser.errorMsg should be(None)
-
+    // If this test fails intermittently, it could be because we didn't properly clear the Xyzmo service of our User data
     val xyzmoAddUser: XyzmoAddUser = XyzmoTestBiometricServices.addUser(enrollmentBatch = enrollmentBatch)
     xyzmoAddUser.baseResult should be(WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue)
     xyzmoAddUser.error should be(None)
@@ -100,5 +96,10 @@ class XyzmoBiometricServicesTests extends EgraphsUnitTest
     xyzmoVerifyUser_NoMatch.errorMsg should be(None)
     xyzmoVerifyUser_NoMatch.isMatch.get should be(false)
     xyzmoVerifyUser_NoMatch.score.get should be(0)
+
+    val xyzmoDeleteUser: XyzmoDeleteUser = XyzmoTestBiometricServices.deleteUser(enrollmentBatch = enrollmentBatch)
+    xyzmoDeleteUser.baseResult should be(WebServiceUserAndProfileStub.BaseResultEnum.ok.getValue)
+    xyzmoDeleteUser.error should be(None)
+    xyzmoDeleteUser.errorMsg should be(None)
   }
 }

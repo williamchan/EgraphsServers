@@ -4,6 +4,7 @@ import com.google.inject.Inject
 import services.db.Schema
 import java.io.File
 import org.squeryl.PrimitiveTypeMode._
+import models.enums.EgraphState
 
 class OrderReport @Inject()(schema: Schema) extends Report {
 
@@ -14,17 +15,19 @@ class OrderReport @Inject()(schema: Schema) extends Report {
 
     val orderViews = join(orders, customers, customers, products, celebrities, egraphs.leftOuter)(
       (order, buyer, recipient, product, celebrity, egraph) =>
-        select(order, buyer, recipient, product, celebrity, egraph)
+        where(not(egraph.map(_._egraphState) === Some(EgraphState.RejectedByAdmin.name)))
+          select(order, buyer, recipient, product, celebrity, egraph)
           orderBy (order.id asc)
           on(order.buyerId === buyer.id, order.recipientId === recipient.id, order.productId === product.id, product.celebrityId === celebrity.id, order.id === egraph.map(_.orderId))
     )
 
-    val headerLine = csvLine(
+    val headerLine = tsvLine(
       "orderid",
       "amount",
       "paymentstatus",
       "reviewstatus",
       "ordercreated",
+      "expectedDate",
       "productid",
       "celebrityid",
       "celebrityName",
@@ -35,7 +38,7 @@ class OrderReport @Inject()(schema: Schema) extends Report {
       "candidateegraphid",
       "candidateegraphstate"
     )
-    val csv = new StringBuilder(headerLine)
+    val tsv = new StringBuilder(headerLine)
     for (orderView <- orderViews) {
       val order = orderView._1
       val buyer = orderView._2
@@ -43,12 +46,13 @@ class OrderReport @Inject()(schema: Schema) extends Report {
       val product = orderView._4
       val celebrity = orderView._5
       val candidateEgraph = orderView._6
-      csv.append(csvLine(
+      tsv.append(tsvLine(
         order.id,
         order.amountPaidInCurrency,
         order._paymentStatus,
         order._reviewStatus,
         order.created,
+        order.expectedDate.getOrElse(""),
         product.id,
         celebrity.id,
         celebrity.publicName,
@@ -60,6 +64,6 @@ class OrderReport @Inject()(schema: Schema) extends Report {
         candidateEgraph.map(_._egraphState).getOrElse("")
       ))
     }
-    csvFile(csv)
+    tsvFile(tsv)
   }
 }

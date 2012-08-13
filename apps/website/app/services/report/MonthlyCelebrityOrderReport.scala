@@ -27,17 +27,17 @@ class MonthlyCelebrityOrderReport @Inject()(schema: Schema) extends Report {
           orderBy (celebrity.publicName)
       )
 
-    val timeRangeLine = csvLine(previousMonthStart, currentMonthStart)
-    val headerLine = csvLine("productId", "celebrityPublicName", "numSold", "totalRevenue")
-    val csv = new StringBuilder(timeRangeLine).append(headerLine)
+    val timeRangeLine = tsvLine(previousMonthStart, currentMonthStart)
+    val headerLine = tsvLine("productId", "celebrityPublicName", "numSold", "totalRevenue")
+    val tsv = new StringBuilder(timeRangeLine).append(headerLine)
     for (row <- query) {
-      csv.append(csvLine(
+      tsv.append(tsvLine(
         row.key._1,
         row.key._2,
         row.measures._1,
         row.measures._2.getOrElse(0)
       ))
     }
-    csvFile(csv)
+    tsvFile(tsv)
   }
 }
