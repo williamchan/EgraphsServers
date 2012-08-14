@@ -4,24 +4,24 @@
 <!doctype html>
 <html>
 <head>
-  <title>Admin Tools</title>
+  <title>Self-Service Tools</title>
 </head>
 <body>
-<h1>Admin Tools</h1>
+<h1>Self-Service Tools</h1>
 <p>
   Welcome to tools. These are a collection of scripts that don't impact the server performance wise and are
   safe to run by admins.
 
 </p>
-<h2>JVM</h2>
+<h2>Scripts</h2>
 <ull>
   <li>
-    <a href="/admin/script?action=print-jvm-params">Print JVM Params</a><br>
+    <a href="?action=print-jvm-params">Print JVM Params</a><br>
     Prints basic parameters about the JVM the instance is running on
 
   </li>
   <li>
-    <a href="/admin/script?action=kick-egraphs-awaitingverification">
+    <a href="?action=kick-egraphs-awaitingverification">
       Kicks egraphs awaiting verification</a>
     <br>
     Processes all egraphs that have been posted by a celeb but not verified by biometrics.
@@ -29,7 +29,7 @@
 
   </li>
   <li>
-    <a href="/admin/script?action=kick-pending-enrollmentbatches">
+    <a href="?action=kick-pending-enrollmentbatches">
       Kicks pending enrollment batches
     </a><br>
     Enrolls all celebrities that are stuck awaiting enrollment.

@@ -31,19 +31,18 @@ private[controllers] trait GetToolsAdminEndpoint {
   private lazy val schema = AppConfig.instance[Schema]
   private lazy val enrollmentBatchStore = AppConfig.instance[EnrollmentBatchStore]
 
-  def getSheriffAdmin = controllerMethod() {
+  def getToolsAdmin = controllerMethod() {
     adminFilters.requireAdministratorLogin {admin =>
 
       val actionOption = Option(params.get("action"))
-
       actionOption match {
         case Some(action) => action match {
           //
           // Write your one-time script here.
           //
           case "sheriff" => {
-  //          val order = orderStore.get(543)
-  //          order.copy(recipientName = "Ernesto J Pantoia").save()
+          // val order = orderStore.get(543)
+          // order.copy(recipientName = "Ernesto J Pantoia").save()
           }
 
           /**
@@ -87,7 +86,6 @@ private[controllers] trait GetToolsAdminEndpoint {
             }
             "I gave all pending EnrollmentBatches a kick"
           }
-
           case _ => "Not a valid action"
         }
         case _ => views.Application.admin.html.admin_tools()
