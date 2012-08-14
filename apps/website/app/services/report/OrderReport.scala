@@ -29,7 +29,7 @@ class OrderReport @Inject()(schema: Schema) extends Report {
       "amount",
       "paymentstatus",
       "reviewstatus",
-      "ordercreated",
+      "ordercreatedPST",
       "expectedDate",
       "productid",
       "celebrityid",
