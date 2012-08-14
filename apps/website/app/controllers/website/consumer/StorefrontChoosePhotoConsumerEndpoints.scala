@@ -8,6 +8,7 @@ import services.http.forms.purchase.PurchaseFormFactory
 import services.Utils
 import controllers.WebsiteControllers.getStorefrontPersonalize
 import models.{ProductStore, Celebrity, Product}
+import controllers.WebsiteControllers
 
 /**
  * Manages GET and POST of celebrity photos in the purchase flow.
@@ -135,9 +136,7 @@ object StorefrontChoosePhotoConsumerEndpoints {
   }
 
   def url(celebrityUrlSlug: String, productUrlSlug: String): Router.ActionDefinition = {
-    Utils.lookupUrl("WebsiteControllers.getStorefrontChoosePhotoCarousel",
-      Map("celebrityUrlSlug" -> celebrityUrlSlug, "productUrlSlug" -> productUrlSlug)
-    )
+    WebsiteControllers.reverse(WebsiteControllers.getStorefrontChoosePhotoCarousel(celebrityUrlSlug, productUrlSlug))
   }
 }
 

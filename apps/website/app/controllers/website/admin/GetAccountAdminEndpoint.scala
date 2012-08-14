@@ -1,9 +1,9 @@
 package controllers.website.admin
 
 import play.mvc.Controller
-import services.Utils
 import services.http.{AdminRequestFilters, ControllerMethod}
 import models.{Password, AccountStore, CelebrityStore}
+import controllers.WebsiteControllers
 
 private[controllers] trait GetAccountAdminEndpoint {
   this: Controller =>
@@ -40,6 +40,6 @@ private[controllers] trait GetAccountAdminEndpoint {
 object GetAccountAdminEndpoint {
 
   def url(accountId: Long) = {
-    Utils.lookupUrl("WebsiteControllers.getAccountAdmin", Map("accountId" -> accountId.toString))
+    WebsiteControllers.reverse(WebsiteControllers.getAccountAdmin(accountId))
   }
 }

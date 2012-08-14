@@ -1,10 +1,10 @@
 package controllers.website.admin
 
 import play.mvc.Controller
-import services.Utils
 import services.http.{AdminRequestFilters, ControllerMethod}
 import models._
 import scala.Some
+import controllers.WebsiteControllers
 
 private[controllers] trait GetPrintOrderAdminEndpoint { this: Controller =>
 
@@ -33,6 +33,6 @@ private[controllers] trait GetPrintOrderAdminEndpoint { this: Controller =>
 object GetPrintOrderAdminEndpoint {
 
   def url(printOrderId: Long) = {
-    Utils.lookupUrl("WebsiteControllers.getPrintOrderAdmin", Map("printOrderId" -> printOrderId.toString))
+    WebsiteControllers.reverse(WebsiteControllers.getPrintOrderAdmin(printOrderId))
   }
 }

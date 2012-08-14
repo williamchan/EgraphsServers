@@ -5,7 +5,6 @@ import play.mvc.results.Redirect
 import controllers.WebsiteControllers
 import play.mvc.Controller
 import play.data.validation._
-import services.Utils
 import services.http.{POSTControllerMethod, AdminRequestFilters}
 
 trait PostAccountAdminEndpoint {
@@ -40,7 +39,7 @@ trait PostAccountAdminEndpoint {
             preexistingAccount.copy(email = email).save()
           }
         }
-        new Redirect(Utils.lookupUrl("WebsiteControllers.getAccountsAdmin", Map("email" -> email)).url)
+        new Redirect(WebsiteControllers.reverse(WebsiteControllers.getAccountsAdmin(email)).url)
       }
     }
   }

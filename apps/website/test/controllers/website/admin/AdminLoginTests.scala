@@ -7,6 +7,7 @@ import utils.TestData
 import models.Celebrity
 import services.Utils
 import services.db.TransactionSerializable
+import controllers.WebsiteControllers
 
 class AdminLoginTests extends AdminFunctionalTest {
 
@@ -19,26 +20,26 @@ class AdminLoginTests extends AdminFunctionalTest {
     }
     val celebrityIdMap = Map[String, String]("celebrityId" -> celebrity.id.toString)
 
-    assertStatus(302, GET(Utils.lookupUrl("WebsiteControllers.getCelebritiesAdmin").url))
+    assertStatus(302, GET(WebsiteControllers.reverse(WebsiteControllers.getCelebritiesAdmin()).url))
     assertStatus(302, GET(Utils.lookupUrl("WebsiteControllers.getCelebrityEgraphsAdmin", celebrityIdMap).url))
     assertStatus(302, GET(Utils.lookupUrl("WebsiteControllers.getCelebrityInventoryBatchesAdmin", celebrityIdMap).url))
     assertStatus(302, GET(Utils.lookupUrl("WebsiteControllers.getCelebrityOrdersAdmin", celebrityIdMap).url))
     assertStatus(302, GET(Utils.lookupUrl("WebsiteControllers.getCelebrityProductsAdmin", celebrityIdMap).url))
-    assertStatus(302, GET(Utils.lookupUrl("WebsiteControllers.getCreateCelebrityAdmin").url))
+    assertStatus(302, GET(WebsiteControllers.reverse(WebsiteControllers.getCreateCelebrityAdmin).url))
     assertStatus(302, GET(Utils.lookupUrl("WebsiteControllers.getCreateCelebrityInventoryBatchAdmin", celebrityIdMap).url))
     assertStatus(302, GET(Utils.lookupUrl("WebsiteControllers.getCreateCelebrityProductAdmin", celebrityIdMap).url))
-    assertStatus(302, GET(Utils.lookupUrl("WebsiteControllers.getEgraphsAdmin").url))
+    assertStatus(302, GET(WebsiteControllers.reverse(WebsiteControllers.getEgraphsAdmin()).url))
 
     loginAsAdmin()
-    assertStatus(200, GET(Utils.lookupUrl("WebsiteControllers.getCelebritiesAdmin").url))
+    assertStatus(200, GET(WebsiteControllers.reverse(WebsiteControllers.getCelebritiesAdmin()).url))
     assertStatus(200, GET(Utils.lookupUrl("WebsiteControllers.getCelebrityEgraphsAdmin", celebrityIdMap).url))
     assertStatus(200, GET(Utils.lookupUrl("WebsiteControllers.getCelebrityInventoryBatchesAdmin", celebrityIdMap).url))
     assertStatus(200, GET(Utils.lookupUrl("WebsiteControllers.getCelebrityOrdersAdmin", celebrityIdMap).url))
     assertStatus(200, GET(Utils.lookupUrl("WebsiteControllers.getCelebrityProductsAdmin", celebrityIdMap).url))
-    assertStatus(200, GET(Utils.lookupUrl("WebsiteControllers.getCreateCelebrityAdmin").url))
+    assertStatus(200, GET(WebsiteControllers.reverse(WebsiteControllers.getCreateCelebrityAdmin).url))
     assertStatus(200, GET(Utils.lookupUrl("WebsiteControllers.getCreateCelebrityInventoryBatchAdmin", celebrityIdMap).url))
     assertStatus(200, GET(Utils.lookupUrl("WebsiteControllers.getCreateCelebrityProductAdmin", celebrityIdMap).url))
-    assertStatus(200, GET(Utils.lookupUrl("WebsiteControllers.getEgraphsAdmin").url))
+    assertStatus(200, GET(WebsiteControllers.reverse(WebsiteControllers.getEgraphsAdmin()).url))
   }
 
   @Test

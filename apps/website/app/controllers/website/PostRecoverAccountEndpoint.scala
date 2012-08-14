@@ -48,7 +48,7 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
       views.Application.email.html.reset_password_email(
         customerName = customer.name,
         email = account.email,
-        resetPasswordUrl = GetResetPasswordEndpoint.absoluteUrl(account.email, account.resetPasswordKey.get).url
+        resetPasswordUrl = GetResetPasswordEndpoint.absoluteUrl(account.email, account.resetPasswordKey.get)
       ).toString().trim()
     )
     mail.send(email)

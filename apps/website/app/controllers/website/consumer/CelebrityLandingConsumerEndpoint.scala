@@ -10,6 +10,7 @@ import models.Celebrity
 import models.frontend.header.HeaderData
 import models.frontend.footer.FooterData
 import play.templates.Html
+import controllers.WebsiteControllers
 
 private[consumer] trait CelebrityLandingConsumerEndpoint
   extends ImplicitHeaderAndFooterData
@@ -34,7 +35,7 @@ object CelebrityLandingConsumerEndpoint {
       .url
     val publicName = celebrity.publicName
     views.frontend.html.celebrity_landing(
-      getStartedUrl = Utils.lookupUrl("WebsiteControllers.getStorefrontChoosePhotoTiled", Map("celebrityUrlSlug" -> celebrity.urlSlug)).url,
+      getStartedUrl = WebsiteControllers.reverse(WebsiteControllers.getStorefrontChoosePhotoTiled(celebrity.urlSlug)).url,
       celebrityPublicName = publicName,
       celebrityCasualName = celebrity.casualName.getOrElse(publicName),
       landingPageImageUrl = landingPageImageUrl,
@@ -43,7 +44,7 @@ object CelebrityLandingConsumerEndpoint {
   }
 
   def url(celebrityUrlSlug: String): Router.ActionDefinition = {
-    Utils.lookupUrl("WebsiteControllers.getCelebrityLanding", Map("celebrityUrlSlug" -> celebrityUrlSlug))
+    WebsiteControllers.reverse(WebsiteControllers.getCelebrityLanding(celebrityUrlSlug))
   }
 
 }

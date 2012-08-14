@@ -1,13 +1,13 @@
 package controllers.website.admin
 
 import play.mvc.Controller
-import services.Utils
 import services.http.{AdminRequestFilters, ControllerMethod}
 import models.{AccountStore, CelebrityStore}
 import play.mvc.results.NotFound
 import controllers.website.consumer.CelebrityLandingConsumerEndpoint
-import models.frontend.header.{HeaderNotLoggedIn, HeaderData}
+import models.frontend.header.HeaderData
 import models.frontend.footer.FooterData
+import controllers.WebsiteControllers
 
 private[controllers] trait GetCelebrityAdminEndpoint {
   this: Controller =>
@@ -51,6 +51,6 @@ private[controllers] trait GetCelebrityAdminEndpoint {
 object GetCelebrityAdminEndpoint {
 
   def url(celebrityId: Long) = {
-    Utils.lookupUrl("WebsiteControllers.getCelebrityAdmin", Map("celebrityId" -> celebrityId.toString))
+    WebsiteControllers.reverse(WebsiteControllers.getCelebrityAdmin(celebrityId))
   }
 }

@@ -113,8 +113,9 @@ object Customer {
     val emailTwitterSrc = ""
 
     if (verificationNeeded) {
-      val verifyPasswordUrl = Utils.lookupAbsoluteUrl("WebsiteControllers.getVerifyAccount",
-        Map("email" -> account.email, "secretKey" -> account.resetPasswordKey.get)).url
+      val verifyPasswordAction = Utils.lookupUrl("WebsiteControllers.getVerifyAccount",
+        Map("email" -> account.email, "secretKey" -> account.resetPasswordKey.get))
+      val verifyPasswordUrl = Utils.absoluteUrl(verifyPasswordAction)
       email.setHtmlMsg(views.frontend.html.email_account_verification(
         verifyPasswordUrl = verifyPasswordUrl,
         emailLogoSrc = emailLogoSrc,

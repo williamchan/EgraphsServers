@@ -2,7 +2,6 @@ package controllers.website.admin
 
 import play.mvc.Controller
 import play.mvc.results.Redirect
-import services.Utils
 import controllers.WebsiteControllers
 import play.data.validation.Validation
 import models.{Administrator, AdministratorStore}
@@ -30,7 +29,7 @@ private[controllers] trait PostLoginAdminEndpoint {
 
     } else {
       session.put(WebsiteControllers.adminIdKey, administrator.get.id.toString)
-      new Redirect(Utils.lookupUrl("WebsiteControllers.getCelebritiesAdmin").url)
+      new Redirect(WebsiteControllers.reverse(WebsiteControllers.getCelebritiesAdmin()).url)
     }
   }
 }

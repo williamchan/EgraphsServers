@@ -4,7 +4,6 @@ import models.frontend.header.{HeaderNotLoggedIn, HeaderLoggedIn, HeaderData}
 import models.frontend.footer.FooterData
 import services.http.EgraphsSession
 import models.{Customer, CustomerStore}
-import services.Utils
 import controllers.WebsiteControllers
 
 /**
@@ -35,7 +34,7 @@ trait ImplicitHeaderAndFooterData {
       HeaderLoggedIn(
         name=customer.name,
         profileUrl="",
-        accountSettingsUrl=Utils.lookupUrl("WebsiteControllers.getAccountSettings").url,
+        accountSettingsUrl=WebsiteControllers.reverse(WebsiteControllers.getAccountSettings).url,
         galleryUrl=url,
         logoutUrl="/logout"
       )

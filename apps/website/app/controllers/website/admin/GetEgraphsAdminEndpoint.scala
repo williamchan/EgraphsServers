@@ -40,6 +40,6 @@ private[controllers] trait GetEgraphsAdminEndpoint {
 object GetEgraphsAdminEndpoint {
 
   def url(): ActionDefinition = {
-    Utils.lookupUrl("WebsiteControllers.getEgraphsAdmin")
+    WebsiteControllers.reverse(WebsiteControllers.getEgraphsAdmin())
   }
 }

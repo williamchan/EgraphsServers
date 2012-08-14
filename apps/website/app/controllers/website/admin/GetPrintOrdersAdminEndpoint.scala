@@ -36,6 +36,6 @@ private[controllers] trait GetPrintOrdersAdminEndpoint {
 object GetPrintOrdersAdminEndpoint {
 
   def url(): ActionDefinition = {
-    Utils.lookupUrl("WebsiteControllers.getPrintOrdersAdmin")
+    WebsiteControllers.reverse(WebsiteControllers.getPrintOrdersAdmin())
   }
 }

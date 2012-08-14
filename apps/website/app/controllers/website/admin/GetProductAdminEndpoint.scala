@@ -1,9 +1,9 @@
 package controllers.website.admin
 
 import play.mvc.Controller
-import services.Utils
 import services.http.{ControllerMethod, AdminRequestFilters}
 import models.ProductStore
+import controllers.WebsiteControllers
 
 private[controllers] trait GetProductAdminEndpoint {
   this: Controller =>
@@ -42,6 +42,6 @@ private[controllers] trait GetProductAdminEndpoint {
 object GetProductAdminEndpoint {
 
   def url(productId: Long) = {
-    Utils.lookupUrl("WebsiteControllers.getProductAdmin", Map("productId" -> productId.toString))
+    WebsiteControllers.reverse(WebsiteControllers.getProductAdmin(productId))
   }
 }
