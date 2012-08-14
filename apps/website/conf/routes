@@ -87,8 +87,7 @@ GET     /admin/orders/{orderId}/?                                   WebsiteContr
 POST    /admin/orders/{orderId}                                     WebsiteControllers.postOrderAdmin
 GET     /admin/products/{productId}/?                               WebsiteControllers.getProductAdmin
 GET     /admin/reports/?                                            WebsiteControllers.getReportsAdmin
-GET     /admin/script/?                                             WebsiteControllers.getScriptAdmin
-GET     /admin/sheriff/?                                            WebsiteControllers.getSheriffAdmin
+GET     /admin/tools/?                                              WebsiteControllers.getToolsAdmin
 
 ##
 ## Consumer Website

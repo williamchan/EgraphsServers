@@ -1,0 +1,41 @@
+@()
+@{/** All of the Tools we have. Wiki reference available at https://egraphs.atlassian.net/wiki/display/DEV/Tools */}
+
+<!doctype html>
+<html>
+<head>
+  <title>Self-Service Tools</title>
+</head>
+<body>
+<h1>Self-Service Tools</h1>
+<p>
+  Welcome to tools. These are a collection of scripts that don't impact the server performance wise and are
+  safe to run by admins.
+
+</p>
+<h2>Scripts</h2>
+<ull>
+  <li>
+    <a href="?action=print-jvm-params">Print JVM Params</a><br>
+    Prints basic parameters about the JVM the instance is running on
+
+  </li>
+  <li>
+    <a href="?action=kick-egraphs-awaitingverification">
+      Kicks egraphs awaiting verification</a>
+    <br>
+    Processes all egraphs that have been posted by a celeb but not verified by biometrics.
+    Pushes the egraphs to biometrics, in order to get to the admin flow.
+
+  </li>
+  <li>
+    <a href="?action=kick-pending-enrollmentbatches">
+      Kicks pending enrollment batches
+    </a><br>
+    Enrolls all celebrities that are stuck awaiting enrollment.
+  </li>
+</ul>
+
+
+</body>
+</html>

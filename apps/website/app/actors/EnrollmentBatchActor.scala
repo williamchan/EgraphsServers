@@ -31,6 +31,10 @@ case class EnrollmentBatchActor @Inject()(db: DBSession,
     case _ =>
   }
 
+  /**
+   * Actor method for kicking off an enrollment batch
+   * @param enrollmentBatchId
+   */
   def processEnrollmentBatch(enrollmentBatchId: Long) {
     playConfig.getProperty("biometrics.status") match {
       case "offline" =>

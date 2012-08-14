@@ -5,10 +5,13 @@ import services.db.Schema
 import java.io.File
 import org.squeryl.PrimitiveTypeMode._
 import models.enums.EgraphState
+import java.text.SimpleDateFormat
+import java.util.TimeZone
 
 class OrderReport @Inject()(schema: Schema) extends Report {
 
   override val reportName = "order-report"
+
 
   def report(): File = {
     import schema.{orders, customers, products, celebrities, egraphs}
@@ -26,7 +29,7 @@ class OrderReport @Inject()(schema: Schema) extends Report {
       "amount",
       "paymentstatus",
       "reviewstatus",
-      "ordercreated",
+      "ordercreatedPST",
       "expectedDate",
       "productid",
       "celebrityid",
@@ -38,6 +41,9 @@ class OrderReport @Inject()(schema: Schema) extends Report {
       "candidateegraphid",
       "candidateegraphstate"
     )
+    // TODO wow this java library sucks
+    val dateFormatter = new SimpleDateFormat("HH:mm:ss yyyy-MM-dd")
+    dateFormatter.setTimeZone(TimeZone.getTimeZone("PST"))
     val tsv = new StringBuilder(headerLine)
     for (orderView <- orderViews) {
       val order = orderView._1
@@ -51,7 +57,7 @@ class OrderReport @Inject()(schema: Schema) extends Report {
         order.amountPaidInCurrency,
         order._paymentStatus,
         order._reviewStatus,
-        order.created,
+        dateFormatter.format(order.created),
         order.expectedDate.getOrElse(""),
         product.id,
         celebrity.id,
