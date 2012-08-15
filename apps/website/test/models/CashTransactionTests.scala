@@ -5,7 +5,7 @@ import services.AppConfig
 import utils._
 
 class CashTransactionTests extends EgraphsUnitTest
-  with ClearsDatabaseAndValidationBefore
+  with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityTests[CashTransaction]
   with CreatedUpdatedEntityTests[CashTransaction]
   with DBTransactionPerTest

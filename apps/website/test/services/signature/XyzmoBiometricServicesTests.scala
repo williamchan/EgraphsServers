@@ -12,7 +12,7 @@ import com.xyzmo.wwww.biometricserver.{WebServiceBiometricPartStub, WebServiceUs
  * Instead, XyzmoTestBiometricServices exists for automated tests of live Xyzmo server.
  */
 class XyzmoBiometricServicesTests extends EgraphsUnitTest
-  with ClearsDatabaseAndValidationBefore
+  with ClearsCacheAndBlobsAndValidationBefore
   with DBTransactionPerTest
 {
 

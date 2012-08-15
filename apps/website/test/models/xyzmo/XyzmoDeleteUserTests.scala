@@ -6,7 +6,7 @@ import com.xyzmo.wwww.biometricserver.WebServiceUserAndProfileStub
 import models.{EnrollmentBatch, Celebrity}
 
 class XyzmoDeleteUserTests extends EgraphsUnitTest
-  with ClearsDatabaseAndValidationBefore
+  with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityTests[XyzmoDeleteUser]
   with CreatedUpdatedEntityTests[XyzmoDeleteUser]
   with DBTransactionPerTest {

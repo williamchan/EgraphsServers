@@ -4,9 +4,9 @@ import models.{Account, AccountStore}
 import play.test.FunctionalTest
 import models.AccountAuthenticationError.{AccountNotFoundError, AccountPasswordNotSetError, AccountCredentialsError}
 import play.mvc.results.Forbidden
-import utils.{ClearsDatabaseAndValidationBefore, EgraphsUnitTest}
+import utils.{ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest}
 
-class AccountRequestFiltersTests extends EgraphsUnitTest with ClearsDatabaseAndValidationBefore {
+class AccountRequestFiltersTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValidationBefore {
 
   "requiresAuthenticatedAccount" should "execute the provided block if a matching account was found" in {
     // Set up

@@ -18,14 +18,14 @@ import vbg.VBGVerifySample
  * Instead, VBGTestFreeSpeechBiometricServices exists for automated tests of celebrity-fs-en account.
  */
 class VBGBiometricServicesBaseTests extends EgraphsUnitTest
-  with ClearsDatabaseAndValidationBefore
+  with ClearsCacheAndBlobsAndValidationBefore
   with DBTransactionPerTest
 {
 
   private val blobs = services.AppConfig.instance[Blobs]
 
   "enroll" should "call saveCombinedWavToBlobStore" in {
-    val celebrity = Celebrity().save()
+    val celebrity = TestData.newSavedCelebrity()
     val enrollmentBatch = EnrollmentBatch(celebrityId = celebrity.id).save()
     val voiceStr = TestConstants.voiceStr()
     new EnrollmentSample(enrollmentBatchId = enrollmentBatch.id).save("", voiceStr = voiceStr)

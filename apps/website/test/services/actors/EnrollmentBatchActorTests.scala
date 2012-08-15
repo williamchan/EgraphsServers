@@ -4,7 +4,7 @@ import akka.actor.Actor
 import Actor._
 import services.db.{DBSession, TransactionSerializable}
 import services.AppConfig
-import utils.{ClearsDatabaseAndValidationBefore, EgraphsUnitTest}
+import utils.{ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest}
 import akka.util.TestKit
 import actors.{ProcessEnrollmentBatchMessage, EnrollmentBatchActor}
 import models._
@@ -12,7 +12,7 @@ import enums.EnrollmentStatus
 import org.scalatest.BeforeAndAfterAll
 
 class EnrollmentBatchActorTests extends EgraphsUnitTest
-  with ClearsDatabaseAndValidationBefore
+  with ClearsCacheAndBlobsAndValidationBefore
   with BeforeAndAfterAll
   with TestKit
 {

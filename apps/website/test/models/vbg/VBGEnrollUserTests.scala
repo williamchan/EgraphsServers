@@ -5,7 +5,7 @@ import services.AppConfig
 import models.{EnrollmentBatch, Celebrity}
 
 class VBGEnrollUserTests extends EgraphsUnitTest
-  with ClearsDatabaseAndValidationBefore
+  with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityTests[VBGEnrollUser]
   with CreatedUpdatedEntityTests[VBGEnrollUser]
   with DBTransactionPerTest {

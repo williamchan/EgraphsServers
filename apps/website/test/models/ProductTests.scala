@@ -7,7 +7,7 @@ import utils._
 import java.awt.image.BufferedImage
 
 class ProductTests extends EgraphsUnitTest
-  with ClearsDatabaseAndValidationBefore
+  with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityTests[Product]
   with CreatedUpdatedEntityTests[Product]
   with DBTransactionPerTest

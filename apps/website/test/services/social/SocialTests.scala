@@ -1,11 +1,11 @@
 package services.social
 
-import utils.{DBTransactionPerTest, ClearsDatabaseAndValidationBefore, TestData, EgraphsUnitTest}
+import utils.{DBTransactionPerTest, ClearsCacheAndBlobsAndValidationBefore, TestData, EgraphsUnitTest}
 import models.FulfilledOrder
 import models.enums.EgraphState
 
 class SocialTests extends EgraphsUnitTest
-  with ClearsDatabaseAndValidationBefore
+  with ClearsCacheAndBlobsAndValidationBefore
   with DBTransactionPerTest
 {
 

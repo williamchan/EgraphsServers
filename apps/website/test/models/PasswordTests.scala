@@ -22,7 +22,7 @@ class PasswordTests extends EgraphsUnitTest
   }
 
   it should "respect the password regardless of how many different salts are used" in {
-    for (i <- 1 to 100) {
+    for (_ <- 1 to 100) {
       Password("derp", 0).is("derp") should be (true)
     }
   }

@@ -7,7 +7,7 @@ import play.test.FunctionalTest
 import FunctionalTest._
 import services.AppConfig
 import services.db.{DBSession, TransactionSerializable}
-import utils.{ClearsDatabaseAndValidationBefore, EgraphsUnitTest, TestWebsiteControllers, TestData}
+import utils.{ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest, TestWebsiteControllers, TestData}
 import services.http.forms.{Form, CustomerLoginFormFactory, CustomerLoginForm}
 import CustomerLoginForm.Fields
 import play.mvc.results.Redirect
@@ -30,7 +30,7 @@ class LoginFunctionalTests extends EgraphsFunctionalTest {
 }
 
 
-class LoginUnitTests extends EgraphsUnitTest with ClearsDatabaseAndValidationBefore {
+class LoginUnitTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValidationBefore {
   import Form.Conversions._
   private val db = AppConfig.instance[DBSession]
 

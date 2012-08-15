@@ -237,7 +237,7 @@ object Utils extends Utils(Play.configuration) {
   val defaultPageLength = 30
 
   def pagedQuery[A](select: Query[A], page: Int = 1, pageLength: Int = defaultPageLength, withTotal: Boolean = true): (Iterable[A], Int, Option[Int]) = {
-    val total = if (withTotal) Some(select.count((a) => true)) else None
+    val total = if (withTotal) Some(select.count(_ => true)) else None
     val results = select.page(offset = pageLength * (page - 1), pageLength = pageLength)
     (results, page, total)
   }

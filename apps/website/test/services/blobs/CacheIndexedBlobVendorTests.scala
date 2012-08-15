@@ -1,9 +1,9 @@
 package services.blobs
 
-import utils.{ClearsDatabaseAndValidationBefore, EgraphsUnitTest}
+import utils.{ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest}
 import services.cache.CacheFactory
 
-class CacheIndexedBlobVendorTests extends EgraphsUnitTest with ClearsDatabaseAndValidationBefore {
+class CacheIndexedBlobVendorTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValidationBefore {
 
   "put" should "not cache if url is not available" in {
     val namespace = "testnamespace"

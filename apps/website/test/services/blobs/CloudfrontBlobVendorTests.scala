@@ -1,9 +1,9 @@
 package services.blobs
 
-import utils.{EgraphsUnitTest, ClearsDatabaseAndValidationBefore}
+import utils.{EgraphsUnitTest, ClearsCacheAndBlobsAndValidationBefore}
 import play.Play._
 
-class CloudfrontBlobVendorTests extends EgraphsUnitTest with ClearsDatabaseAndValidationBefore {
+class CloudfrontBlobVendorTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValidationBefore {
   private val cloudfrontDomain = configuration.getProperty("cloudfront.domain")
 
   "cloudfrontVendor" should "not return bad Urls" in {

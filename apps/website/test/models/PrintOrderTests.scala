@@ -5,7 +5,7 @@ import utils._
 import services.AppConfig
 
 class PrintOrderTests extends EgraphsUnitTest
-  with ClearsDatabaseAndValidationBefore
+  with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityTests[PrintOrder]
   with CreatedUpdatedEntityTests[PrintOrder]
   with DBTransactionPerTest {

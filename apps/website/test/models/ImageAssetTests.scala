@@ -1,6 +1,6 @@
 package models
 
-import utils.{ClearsDatabaseAndValidationBefore, DBTransactionPerTest, EgraphsUnitTest}
+import utils.{ClearsCacheAndBlobsAndValidationBefore, DBTransactionPerTest, EgraphsUnitTest}
 import java.io.FileOutputStream
 import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
@@ -10,7 +10,7 @@ import services.blobs.AccessPolicy.Private
 
 class ImageAssetTests extends EgraphsUnitTest
   with DBTransactionPerTest
-  with ClearsDatabaseAndValidationBefore
+  with ClearsCacheAndBlobsAndValidationBefore
 {
   val assetServices = AppConfig.instance[ImageAssetServices]
 

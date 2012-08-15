@@ -4,7 +4,7 @@ import services.AppConfig.instance
 import utils._
 
 class BlobKeyTests extends EgraphsUnitTest
-  with ClearsDatabaseAndValidationBefore
+  with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityTests[BlobKey]
   with CreatedUpdatedEntityTests[BlobKey]
   with DBTransactionPerTest

@@ -4,7 +4,7 @@ import utils._
 import services.AppConfig
 
 class AddressTests extends EgraphsUnitTest
-  with ClearsDatabaseAndValidationBefore
+  with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityTests[Address]
   with CreatedUpdatedEntityTests[Address]
   with DBTransactionPerTest {

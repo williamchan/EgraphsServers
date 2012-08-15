@@ -7,12 +7,12 @@ import services.db.{DBSession, TransactionSerializable}
 import services.{Utils, AppConfig}
 import models.EgraphStore
 import akka.util.TestKit
-import utils.{ClearsDatabaseAndValidationBefore, EgraphsUnitTest, TestData}
+import utils.{ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest, TestData}
 import models.enums.EgraphState
 import org.scalatest.BeforeAndAfterAll
 
 class EgraphActorTests extends EgraphsUnitTest
-  with ClearsDatabaseAndValidationBefore
+  with ClearsCacheAndBlobsAndValidationBefore
   with BeforeAndAfterAll
   with TestKit {
 
