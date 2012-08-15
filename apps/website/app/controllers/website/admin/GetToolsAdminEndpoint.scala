@@ -36,13 +36,14 @@ private[controllers] trait GetToolsAdminEndpoint {
 
       val actionOption = Option(params.get("action"))
       actionOption match {
+        case None => views.Application.admin.html.admin_tools()
         case Some(action) => action match {
           //
           // Write your one-time script here.
           //
           case "sheriff" => {
-          // val order = orderStore.get(543)
-          // order.copy(recipientName = "Ernesto J Pantoia").save()
+            // val order = orderStore.get(543)
+            // order.copy(recipientName = "Ernesto J Pantoia").save()
           }
 
           /**
@@ -86,52 +87,51 @@ private[controllers] trait GetToolsAdminEndpoint {
             }
             "I gave all pending EnrollmentBatches a kick"
           }
+
+          //
+          // Keep the rest of these actions commented out. With great power comes great responsibility...
+          // at least until these actions are made self-serve for the Operations team.
+          //
+//          case "generate-large-egraph" =>
+//          {
+//            val egraphId = params.get("egraphId").toLong
+//            val egraph = egraphStore.get(egraphId)
+//            val order = egraph.order
+//            val product = order.product
+//            val rawSignedImage = egraph.image(product.photoImage)
+//            val targetWidth = {
+//              val masterWidth = product.photoImage.getWidth
+//              if (masterWidth < PrintOrder.defaultPngWidth) masterWidth else PrintOrder.defaultPngWidth
+//            }
+//            val image = rawSignedImage
+//              .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
+//              .scaledToWidth(targetWidth)
+//            image.rasterized.getSavedUrl(services.blobs.AccessPolicy.Public) // also returns URL
+//          }
+//          case "unapprove-orders" => {
+//            val orderIds = List[Long]()
+//            for (orderId <- orderIds) {
+//              val order = orderStore.get(orderId)
+//              order.withReviewStatus(OrderReviewStatus.PendingAdminReview).save()
+//            }
+//            "Orders have been reset to reviewStatus = 'PendingAdminReview'"
+//          }
+//          case "create-admin" => {
+//            val adminEmail = params.get("admin-email")
+//            val admin = administratorStore.findByEmail(adminEmail)
+//            if (admin.isEmpty) {
+//              var account = accountStore.findByEmail(adminEmail)
+//              if (account.isEmpty) {
+//                account = Some(Account(email = adminEmail).save())
+//              }
+//              val administrator = Administrator().save()
+//              account.get.copy(administratorId = Some(administrator.id)).save()
+//            }
+//            "Admin created"
+//          }
           case _ => "Not a valid action"
         }
-        case _ => views.Application.admin.html.admin_tools()
       }
     }
   }
 }
-
-// Will be moved into PrintOrder functionality.
-//        case "generate-large-egraph" => {
-//          val width = 2446 // width from Feeny
-//          val egraphId = params.get("egraphId").toLong
-//          val egraph = egraphStore.get(egraphId)
-//          val order = egraph.order
-//          val product = order.product
-//          val rawSignedImage = egraph.image(product.photoImage)
-//          val image = rawSignedImage
-//            .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
-//            .scaledToWidth(width)
-//          image.rasterized.getSavedUrl(AccessPolicy.Public) // also returns URL
-//        }
-
-//
-// Keep the rest of these actions commented out. With great power comes great responsibility...
-// at least until these actions are made self-serve for the Operations team.
-//
-
-//        case "unapprove-orders" => {
-//          val orderIds = List[Long]()
-//          for (orderId <- orderIds) {
-//            val order = orderStore.get(orderId)
-//            order.withReviewStatus(OrderReviewStatus.PendingAdminReview).save()
-//          }
-//          "Orders have been reset to reviewStatus = 'PendingAdminReview'"
-//        }
-
-//        case "create-admin" => {
-//          val adminEmail = params.get("admin-email")
-//          val admin = administratorStore.findByEmail(adminEmail)
-//          if (admin.isEmpty) {
-//            var account = accountStore.findByEmail(adminEmail)
-//            if (account.isEmpty) {
-//              account = Some(Account(email = adminEmail).save())
-//            }
-//            val administrator = Administrator().save()
-//            account.get.copy(administratorId = Some(administrator.id)).save()
-//          }
-//          "Admin created"
-//        }

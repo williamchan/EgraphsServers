@@ -54,9 +54,14 @@ case class PrintOrder(id: Long = 0,
     services.egraphStore.findByOrder(orderId, services.egraphQueryFilters.publishedOrApproved).headOption.map {egraph =>
       val product = order.product
       val rawSignedImage = egraph.image(product.photoImage)
+      // targetWidth is either the default width, or the width of the master if necessary to avoid upscaling
+      val targetWidth = {
+        val masterWidth = product.photoImage.getWidth
+        if (masterWidth < PrintOrder.defaultPngWidth) masterWidth else PrintOrder.defaultPngWidth
+      }
       val image = rawSignedImage
         .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
-        .scaledToWidth(width)
+        .scaledToWidth(targetWidth)
       image.rasterized.getSavedUrl(AccessPolicy.Public)
     }
   }
