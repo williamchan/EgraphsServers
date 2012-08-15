@@ -188,6 +188,8 @@ class Utils @Inject()(@PlayConfig() playConfig: util.Properties) {
    * Play examples while a url from ActionDefinitions has a leading "/". So, I wanted to make sure that we are using
    * application.baseUrl correctly and also correctly composing absolute Urls.
    *
+   * I am hopeful these URL-related helper methods will go away once we move to Play 2.0.
+   *
    * @param baseUrl eg "https://www.egraphs.com/"
    * @param relativeUrl eg "/login"
    * @return the concatenated full Url

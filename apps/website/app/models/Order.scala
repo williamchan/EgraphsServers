@@ -13,7 +13,6 @@ import mail.Mail
 import payment.{Charge, Payment}
 import org.squeryl.Query
 import org.apache.commons.mail.{Email, HtmlEmail}
-import scala.util.Random
 import java.util.Date
 import com.google.inject.Inject
 import java.text.SimpleDateFormat
@@ -30,8 +29,7 @@ case class OrderServices @Inject() (
   payment: Payment,
   mail: Mail,
   cashTransactionServices: Provider[CashTransactionServices],
-  egraphServices: Provider[EgraphServices],
-  audioPromptServices: Provider[OrderAudioPromptServices]
+  egraphServices: Provider[EgraphServices]
 )
 
 /**
@@ -231,21 +229,6 @@ case class Order(
   }
 
   /**
-   * This was formerly used for the "audioPrompt", which is being tweaked to encourage creation of more unique Egraphs.
-   * @return an audio prompt based on an random selection from audioPromptTemplates.
-   */
-  protected[models] def generateAudioPrompt(indexOfAudioPromptTemplate: Option[Int] = None): String = {
-    val i = indexOfAudioPromptTemplate.getOrElse(Order.random.nextInt(Order.audioPromptTemplates.length))
-    val orderAudioPrompt = OrderAudioPrompt(
-      audioPromptTemplate=Order.audioPromptTemplates(i),
-      celebName=product.celebrity.publicName,
-      recipientName=recipientName,
-      services=services.audioPromptServices.get()
-    )
-    orderAudioPrompt.audioPrompt
-  }
-
-  /**
    * Renders the Order as a Map, which will itself be rendered into whichever data format
    * by the API (e.g. JSON)
    */
@@ -343,25 +326,6 @@ case class FulfilledOrder(order: Order, egraph: Egraph)
 
 /** Thin semantic wrapper around a tuple for product order and egraph */
 case class FulfilledProductOrder(product: Product, order:Order, egraph: Egraph)
-
-object Order {
-
-  lazy val random = new Random
-
-  // Update this list with marketing-approved copy per SER-56
-  lazy val audioPromptTemplates = List(
-    "Yo {recipient_name}, it’s {signer_name}. It was awesome getting your message. Hope you enjoy this egraph.",
-    "{recipient_name}, it’s {signer_name} here. Thanks for being a great fan. Hopefully we can win some games for you down the stretch.",
-    "Hey {recipient_name}, it’s {signer_name}. Hope you’re having a great day. Thanks for the support!",
-    "This is {signer_name}. {recipient_name}, thanks so much for reaching out to me. I really appreciated your message. Enjoy this egraph!",
-    "Hey, {recipient_name}, it’s {signer_name}. I’ll look for you to post this egraph on twitter!",
-    "{recipient_name}, it’s {signer_name}. Keep swinging for the fences.",
-    "What’s up, {recipient_name}? It’s {signer_name} here. Thanks for connecting with me. Hope you dig this egraph and share it with your friends.",
-    "{recipient_name}, it’s {signer_name} here. I hope you enjoy this egraph. It’s a great way for me to connect with you during the season. Have a great one!",
-    "Hey, it’s {signer_name} creating this egraph for {recipient_name}. Thanks for being an awesome fan.",
-    "Hey, {recipient_name}, it’s {signer_name} here. Thanks for reaching out to me through Egraphs. Have a great day."
-  )
-}
 
 class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreatedUpdated[Order] {
   import org.squeryl.PrimitiveTypeMode._
@@ -580,52 +544,6 @@ class OrderQueryFilters @Inject() (schema: Schema) {
         (order.id === id)
       }
     }
-  }
-}
-
-case class OrderAudioPromptServices @Inject() (templateEngine: TemplateEngine)
-
-object OrderAudioPromptField extends Utils.Enum {
-  sealed trait EnumVal extends Value
-
-  /** Public name of the celebrity */
-  val CelebrityName = new EnumVal { val name = "signer_name" }
-
-  /** Name of the person receiving the egraph */
-  val RecipientName = new EnumVal { val name = "recipient_name"}
-}
-
-/**
- * @param audioPromptTemplate title template as specified on the [[models.Product]]
- * @param celebName the celebrity's public name
- * @param recipientName name of the [[models.Customer]] receiving the order.
- * @param services Services needed for the OrderAudioPrompt to manipulate its data properly.
- */
-case class OrderAudioPrompt(private val audioPromptTemplate: String,
-                            private val celebName: String,
-                            private val recipientName: String,
-                            private val services: OrderAudioPromptServices = AppConfig.instance[OrderAudioPromptServices]) {
-  //
-  // Public methods
-  //
-  def audioPrompt: String = {
-    services.templateEngine.evaluate(audioPromptTemplate, templateParams)
-  }
-
-  //
-  // Private methods
-  //
-  private val templateParams: Map[String, String] = {
-    import OrderAudioPromptField._
-    val pairs = for (templateField <- OrderAudioPromptField.values) yield {
-      val paramValue = templateField match {
-        case CelebrityName => celebName
-        case RecipientName => recipientName
-        case _ => throw new IllegalArgumentException("Template param not recognized")
-      }
-      (templateField.name, paramValue)
-    }
-    pairs.toMap
   }
 }
 

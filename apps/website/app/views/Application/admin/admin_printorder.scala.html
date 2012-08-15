@@ -1,5 +1,6 @@
 @(printOrder: models.PrintOrder,
 order: models.Order,
+recipientEmail: String,
 egraph: Option[models.Egraph])(implicit session: play.mvc.Scope.Session)
 
 @import controllers.WebsiteControllers
@@ -70,6 +71,10 @@ egraph: Option[models.Egraph])(implicit session: play.mvc.Scope.Session)
   @valueRow(label="Message To Celebrity", value=order.messageToCelebrity)
   @valueRow(label="Requested Message",    value=order.requestedMessage)
   @valueRow(label="Expected Date",        value=order.expectedDate)
+  @valueRow(label="Recipient Email",      value=recipientEmail)
+  <hr/>
+  <h2>Egraph Details</h2>
+  @valueRow(label="Signed At",            value=egraph.map(_.getSignedAt))
   <hr/>
 </div>
 }

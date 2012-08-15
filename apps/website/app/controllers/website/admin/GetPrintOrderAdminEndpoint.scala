@@ -21,8 +21,9 @@ private[controllers] trait GetPrintOrderAdminEndpoint { this: Controller =>
         case Some(printOrder) => {
           printOrder
           val order = orderStore.get(printOrder.orderId)
+          val recipientEmail = order.recipient.account.email
           val egraph = egraphStore.findByOrder(printOrder.orderId, egraphQueryFilters.publishedOrApproved).headOption
-          views.Application.admin.html.admin_printorder(printOrder = printOrder, order = order, egraph = egraph)
+          views.Application.admin.html.admin_printorder(printOrder = printOrder, order = order, recipientEmail = recipientEmail, egraph = egraph)
         }
         case None => NotFound("Print Order with id " + printOrderId.toString + " not found")
       }
