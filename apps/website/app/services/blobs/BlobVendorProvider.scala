@@ -18,11 +18,15 @@ private[blobs] class BlobVendorProvider @Inject() (
 {
   private val blobstoreType = playConfig.getProperty(Blobs.blobstoreConfigKey)
   private val cloudfrontDomain = playConfig.getProperty("cloudfront.domain")
+  private val cdnEnabled = playConfig.getProperty("cdn.enabled")
 
   def get() = {
     blobstoreType match {
       case "s3" =>
-        decorateCDN(decorateCache(S3BlobVendor))
+        cdnEnabled match {
+          case "true" => decorateCDN(decorateCache(S3BlobVendor))
+          case _      => decorateCache(S3BlobVendor)
+        }
 
       case "filesystem" =>
         decorateCache(FileSystemBlobVendor)
