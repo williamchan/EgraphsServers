@@ -18,8 +18,7 @@ class OrderReport @Inject()(schema: Schema) extends Report {
 
     val orderViews = join(orders, customers, customers, products, celebrities, egraphs.leftOuter)(
       (order, buyer, recipient, product, celebrity, egraph) =>
-        where(not(egraph.map(_._egraphState) === Some(EgraphState.RejectedByAdmin.name)))
-          select(order, buyer, recipient, product, celebrity, egraph)
+        select(order, buyer, recipient, product, celebrity, egraph)
           orderBy (order.id asc)
           on(order.buyerId === buyer.id, order.recipientId === recipient.id, order.productId === product.id, product.celebrityId === celebrity.id, order.id === egraph.map(_.orderId))
     )
