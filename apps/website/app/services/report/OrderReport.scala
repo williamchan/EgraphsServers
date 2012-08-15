@@ -29,7 +29,8 @@ class OrderReport @Inject()(schema: Schema) extends Report {
       "amount",
       "paymentstatus",
       "reviewstatus",
-      "ordercreatedPST",
+      "ordertimePST",
+      "orderdatePST",
       "expectedDate",
       "productid",
       "celebrityid",
@@ -42,7 +43,10 @@ class OrderReport @Inject()(schema: Schema) extends Report {
       "candidateegraphstate"
     )
     // TODO wow this java library sucks
-    val dateFormatter = new SimpleDateFormat("HH:mm:ss yyyy-MM-dd")
+    val timeFormatter = new SimpleDateFormat("HH:mm:ss")
+    val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
+
+    timeFormatter.setTimeZone(TimeZone.getTimeZone("PST"))
     dateFormatter.setTimeZone(TimeZone.getTimeZone("PST"))
     val tsv = new StringBuilder(headerLine)
     for (orderView <- orderViews) {
@@ -57,6 +61,7 @@ class OrderReport @Inject()(schema: Schema) extends Report {
         order.amountPaidInCurrency,
         order._paymentStatus,
         order._reviewStatus,
+        timeFormatter.format(order.created),
         dateFormatter.format(order.created),
         order.expectedDate.getOrElse(""),
         product.id,
