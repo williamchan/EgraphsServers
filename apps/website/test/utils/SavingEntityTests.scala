@@ -41,7 +41,9 @@ trait SavingEntityTests[T <: KeyedEntity[Long]] { this: UnitFlatSpec with Should
   }
 
   "Restoring an unsaved id" should "return None" in {
-    restoreEntity(1) should be (None)
+    // We can only guarentee that 0 shouldn't be used as an id already if we aren't clearing the database, but max
+    // probably isn't either and it makes for a more interesting test.
+    restoreEntity(Integer.MAX_VALUE) should be (None)
   }
 
   "Restoring an updated instance" should "yield the updated version, not the original" in {

@@ -9,7 +9,7 @@ import play.Play
 import utils._
 
 class CelebrityTests extends EgraphsUnitTest
-  with ClearsDatabaseAndValidationBefore
+  with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityTests[Celebrity]
   with CreatedUpdatedEntityTests[Celebrity]
   with DBTransactionPerTest

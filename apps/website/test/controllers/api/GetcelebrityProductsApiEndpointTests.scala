@@ -4,10 +4,10 @@ import org.junit.Assert._
 import sjson.json.Serializer
 import play.test.FunctionalTest
 import org.junit.Test
-import utils.{ClearsDatabaseAndValidationBefore, EgraphsUnitTest, TestConstants, FunctionalTestUtils}
+import utils.{ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest, TestConstants, FunctionalTestUtils}
 import controllers.website.EgraphsFunctionalTest
 
-class GetCelebrityProductsApiEndpointTests extends EgraphsUnitTest with ClearsDatabaseAndValidationBefore {
+class GetCelebrityProductsApiEndpointTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValidationBefore {
   /*"GetCelebrityProductsApiEndpoint" should "return the serialized products" in {
     val mockFilters = mock[CelebrityAccountRequestFilters]
     

@@ -5,7 +5,7 @@ import services.AppConfig
 import models.Egraph
 
 class VBGFinishVerifyTransactionTests extends EgraphsUnitTest
-  with ClearsDatabaseAndValidationBefore
+  with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityTests[VBGFinishVerifyTransaction]
   with CreatedUpdatedEntityTests[VBGFinishVerifyTransaction]
   with DBTransactionPerTest {

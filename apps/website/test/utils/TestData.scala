@@ -30,8 +30,8 @@ object TestData {
 
   def getTimeInBlobstoreFormat: String = Time.toBlobstoreFormat(Time.now)
 
-  def generateEmail(prefix: String = ""): String = {
-    prefix + getTimeInBlobstoreFormat + "@egraphs.com"
+  def generateEmail(prefix: String = "", domain: String = "egraphs.com"): String = {
+    prefix + getTimeInBlobstoreFormat + "@" + domain
   }
 
   def makeTestCacheKey: String = {

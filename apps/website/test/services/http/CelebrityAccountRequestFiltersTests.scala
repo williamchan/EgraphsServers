@@ -5,9 +5,9 @@ import models._
 import enums.PublishedStatus
 import play.mvc.Http.Request
 import play.mvc.results.{Forbidden, NotFound, Ok}
-import utils.{ClearsDatabaseAndValidationBefore, EgraphsUnitTest}
+import utils.{ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest}
 
-class CelebrityAccountRequestFiltersTests extends EgraphsUnitTest with ClearsDatabaseAndValidationBefore {
+class CelebrityAccountRequestFiltersTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValidationBefore {
 
   private def niceAccountFilter(account: Account=mock[Account]) = {
     // Returns an AccountRequestFilter that always yields a particular account

@@ -8,7 +8,7 @@ import Blobs.Conversions._
 import play.Play
 
 class EnrollmentSampleTests extends EgraphsUnitTest
-  with ClearsDatabaseAndValidationBefore
+  with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityTests[EnrollmentSample]
   with CreatedUpdatedEntityTests[EnrollmentSample]
   with DBTransactionPerTest {

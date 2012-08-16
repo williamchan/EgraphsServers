@@ -8,7 +8,7 @@ import AccountAuthenticationError._
 import utils._
 
 class AccountTests extends EgraphsUnitTest
-  with ClearsDatabaseAndValidationBefore
+  with ClearsCacheAndBlobsAndValidationBefore
   with DBTransactionPerTest
   with AccountTestHelpers
 {
@@ -150,7 +150,7 @@ class AccountTests extends EgraphsUnitTest
 }
 
 class AccountStoreTests extends EgraphsUnitTest
-  with ClearsDatabaseAndValidationBefore
+  with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityTests[Account]
   with CreatedUpdatedEntityTests[Account]
   with DBTransactionPerTest

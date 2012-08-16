@@ -7,9 +7,9 @@ import play.mvc.Scope.Session
 import play.mvc.Http.Request
 import play.mvc.results.Forbidden
 import com.google.inject.AbstractModule
-import utils.{ClearsDatabaseAndValidationBefore, TestWebsiteControllers, TestAppConfig, EgraphsUnitTest}
+import utils.{ClearsCacheAndBlobsAndValidationBefore, TestWebsiteControllers, TestAppConfig, EgraphsUnitTest}
 
-class PostSecurityTests extends EgraphsUnitTest with ClearsDatabaseAndValidationBefore {
+class PostSecurityTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValidationBefore {
   "Website POST controllers" should "require authenticity token checks" in {
     val (endpoints, forbiddenInstance) = websiteControllersThatAlwaysFailAuthenticityCheck
     implicit val request = FunctionalTest.newRequest()

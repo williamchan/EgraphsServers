@@ -6,7 +6,7 @@ import services.AppConfig
 import utils._
 
 class AccountSettingsFormTests extends EgraphsUnitTest
-  with ClearsDatabaseAndValidationBefore
+  with ClearsCacheAndBlobsAndValidationBefore
   with DBTransactionPerTest {
 
   import AccountSettingsForm.Fields

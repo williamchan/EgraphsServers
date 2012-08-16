@@ -5,7 +5,7 @@ import utils._
 import services.AppConfig
 
 class EnrollmentBatchTests extends EgraphsUnitTest
-  with ClearsDatabaseAndValidationBefore
+  with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityTests[EnrollmentBatch]
   with CreatedUpdatedEntityTests[EnrollmentBatch]
   with DBTransactionPerTest {

@@ -1,10 +1,10 @@
 package services.blobs
 
-import utils.{ClearsDatabaseAndValidationBefore, EgraphsUnitTest, DBTransactionPerTest}
+import utils.{ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest, DBTransactionPerTest}
 import services.AppConfig
 
 class BlobsTests extends EgraphsUnitTest
-  with ClearsDatabaseAndValidationBefore
+  with ClearsCacheAndBlobsAndValidationBefore
   with DBTransactionPerTest
 {
   import Blobs.Conversions._

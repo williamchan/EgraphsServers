@@ -1,6 +1,6 @@
 package controllers.website
 
-import utils.{ClearsDatabaseAndValidationBefore, TestData, EgraphsUnitTest}
+import utils.{ClearsCacheAndBlobsAndValidationBefore, TestData, EgraphsUnitTest}
 import models.enums.{CashTransactionType, PrintingOption, WrittenMessageRequest}
 import services.Finance.TypeConversions._
 import services.AppConfig
@@ -11,7 +11,7 @@ import models.{Product, PrintOrderStore, CashTransactionStore, Order, OrderStore
 import services.http.forms.purchase.CheckoutShippingForm
 import org.joda.money.{CurrencyUnit, Money}
 
-class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsDatabaseAndValidationBefore {
+class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValidationBefore {
 
   private val db = AppConfig.instance[DBSession]
   private val orderStore = AppConfig.instance[OrderStore]

@@ -6,7 +6,7 @@ import services.Time
 import utils._
 
 class AdministratorTests extends EgraphsUnitTest
-  with ClearsDatabaseAndValidationBefore
+  with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityTests[Administrator]
   with CreatedUpdatedEntityTests[Administrator]
   with DBTransactionPerTest

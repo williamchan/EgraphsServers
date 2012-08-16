@@ -1,7 +1,7 @@
 package services.db
 
 import models.{AccountStore, Account}
-import utils.{ClearsDatabaseAndValidationBefore, EgraphsUnitTest}
+import utils.{TestData, ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest}
 import org.squeryl.Session
 import akka.actor.Actor
 import akka.dispatch.Dispatchers
@@ -11,7 +11,7 @@ import services.AppConfig
 import java.sql.Connection
 
 class DBSessionTests extends EgraphsUnitTest
-  with ClearsDatabaseAndValidationBefore
+  with ClearsCacheAndBlobsAndValidationBefore
   with Logging
 {
   def underTest: (DBSession, Connection) = {
@@ -68,8 +68,9 @@ class DBSessionTests extends EgraphsUnitTest
   it should "Save and recall an Account correctly both within and between transactions" in {
     val dbSession = AppConfig.instance[DBSession]
 
+    val emailAddress = TestData.generateEmail("herpyderpson", "derp.org")
     val savedAccount = dbSession.connected(TransactionSerializable) {
-      val account = Account(email="herpyderpson@derp.org")
+      val account = Account(email=emailAddress)
 
       account.id should be (0)
       val saved = account.save()
@@ -80,7 +81,7 @@ class DBSessionTests extends EgraphsUnitTest
     dbSession.connected(TransactionSerializable) {
       val restored = AppConfig.instance[AccountStore].findById(savedAccount.id)
       restored should not be (None)
-      restored.get.email should be ("herpyderpson@derp.org")
+      restored.get.email should be (emailAddress)
     }
   }
 
@@ -89,13 +90,14 @@ class DBSessionTests extends EgraphsUnitTest
     val accountStore = AppConfig.instance[AccountStore]
 
     // Insert and commit an Account
+    val emailAddress = TestData.generateEmail("originalAddress", "derp.org")
     val account: Account = dbSession.connected(TransactionSerializable) {
-      Account(email="herpyderpson@derp.org").save()
+      Account(email=emailAddress).save()
     }
 
     // Prepare an actor that will modify the account name
-    val actorEmail = "derpyherpson@derp.org"
-    val mainThreadEmail = "werpyschmerpson@derp.org"
+    val actorEmail = TestData.generateEmail("actorEmail", "derp.org")
+    val mainThreadEmail = TestData.generateEmail("mainThreadEmail", "derp.org")
 
     // Create two different sessions that both alter the same element
     val thrown = evaluating {

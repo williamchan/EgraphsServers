@@ -5,7 +5,7 @@ import services.AppConfig
 import models.{EnrollmentBatch, Celebrity}
 
 class VBGAudioCheckTests extends EgraphsUnitTest
-  with ClearsDatabaseAndValidationBefore
+  with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityTests[VBGAudioCheck]
   with CreatedUpdatedEntityTests[VBGAudioCheck]
   with DBTransactionPerTest {

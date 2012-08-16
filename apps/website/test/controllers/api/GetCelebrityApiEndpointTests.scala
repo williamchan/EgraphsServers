@@ -12,10 +12,10 @@ import utils.FunctionalTestUtils.{willChanRequest, runScenario}
 import models._
 import enums.EnrollmentStatus
 import services.http.CelebrityAccountRequestFilters
-import utils.{ClearsDatabaseAndValidationBefore, EgraphsUnitTest, MockControllerMethod, TestConstants}
+import utils.{ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest, MockControllerMethod, TestConstants}
 import controllers.website.EgraphsFunctionalTest
 
-class GetCelebrityApiEndpointTests extends EgraphsUnitTest with ClearsDatabaseAndValidationBefore {
+class GetCelebrityApiEndpointTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValidationBefore {
 
   private def testController(reqFilters: CelebrityAccountRequestFilters): GetCelebrityApiEndpoint = {
     new Controller with GetCelebrityApiEndpoint {

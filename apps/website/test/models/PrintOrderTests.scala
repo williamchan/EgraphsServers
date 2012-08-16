@@ -7,7 +7,7 @@ import services.blobs.Blobs
 import Blobs.Conversions._
 
 class PrintOrderTests extends EgraphsUnitTest
-  with ClearsDatabaseAndValidationBefore
+  with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityTests[PrintOrder]
   with CreatedUpdatedEntityTests[PrintOrder]
   with DBTransactionPerTest {

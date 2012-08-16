@@ -6,7 +6,7 @@ import services.{Utils, Time, AppConfig}
 import exception.InsufficientInventoryException
 
 class CustomerTests extends EgraphsUnitTest
-  with ClearsDatabaseAndValidationBefore
+  with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityTests[Customer]
   with CreatedUpdatedEntityTests[Customer]
   with DBTransactionPerTest
