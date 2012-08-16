@@ -3,14 +3,14 @@ package services
 import java.sql.Timestamp
 import java.util.{TimeZone, Date}
 import java.text.{DateFormat, SimpleDateFormat}
-import org.joda.time.{DateMidnight, DateTime}
+import org.joda.time.{DateTimeConstants, DateMidnight, DateTime}
 
 /**
  * Convenience methods for dealing with time
  */
 object Time {
 
-  val millisInDay = 86400000
+  val millisInDay = DateTimeConstants.MILLIS_PER_DAY
   val ipadDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
 
   //
@@ -145,15 +145,15 @@ object Time {
       }
 
       def minute: Int = {
-        second * 60
+        DateTimeConstants.SECONDS_PER_MINUTE
       }
 
       def hour: Int = {
-        minutes * 60
+        DateTimeConstants.SECONDS_PER_HOUR
       }
 
       def day: Int = {
-        hour * 24
+        DateTimeConstants.SECONDS_PER_DAY
       }
 
       //
