@@ -35,11 +35,11 @@ class PrintOrderTests extends EgraphsUnitTest
     var egraph = TestData.newSavedEgraph()
     val order = egraph.order
     val printOrder = PrintOrder(orderId = order.id).save()
-    printOrder.generatePng(100) should be(None)
+    printOrder.generatePng() should be(None)
 
     egraph = egraph.withEgraphState(EgraphState.ApprovedByAdmin).save()
-    val pngUrl: Option[String] = printOrder.generatePng(100)
-    pngUrl.get should endWith("blob/files/egraphs/" + egraph.id + "/image/signing-origin-offset-0x0_global-width-100px-v1.png")
-    TestHelpers.getBlobFromTestBlobUrl(pngUrl.get).get.asByteArray.length should be(19376)
+    val pngUrl: Option[String] = printOrder.generatePng()
+    pngUrl.get should endWith("blob/files/egraphs/" + egraph.id + "/image/signing-origin-offset-0x0_global-width-2160px-v1.png")
+    TestHelpers.getBlobFromTestBlobUrl(pngUrl.get).get.asByteArray.length should be(6458576)
   }
 }

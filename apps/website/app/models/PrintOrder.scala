@@ -45,11 +45,9 @@ case class PrintOrder(id: Long = 0,
 
   /**
    * Generates a print-sized png from an associated published or approved Egraph, if one exists.
-   *
-   * @param width width of print-sized png to generate
    * @return url of generated image, if it was generated
    */
-  def generatePng(width: Int = PrintOrder.defaultPngWidth): Option[String] = {
+  def generatePng(): Option[String] = {
     val order = services.orderStore.get(orderId)
     services.egraphStore.findByOrder(orderId, services.egraphQueryFilters.publishedOrApproved).headOption.map {egraph =>
       val product = order.product
