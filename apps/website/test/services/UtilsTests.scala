@@ -1,12 +1,8 @@
 package services
 
 import utils._
-import models.CelebrityStore
-import scala.Some
 
 class UtilsTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
-  with DBTransactionPerTest
 {
   class Closeable {
     var closed = false
