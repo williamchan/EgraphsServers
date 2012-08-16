@@ -8,6 +8,7 @@ import models.{Product, LandscapeEgraphFrame, EgraphFrame, PortraitEgraphFrame}
 import models.frontend.storefront.ChoosePhotoCarouselProduct
 import models.frontend.storefront.ProductOrientation
 import models.frontend.storefront.ChoosePhotoTileProduct
+import services.Utils
 
 /**
  * Conversions to turn [[models.Product]]s into their view analogs.
@@ -56,8 +57,7 @@ class ProductViewConversions(product: Product) {
     val productThumbnailUrl = getProductThumbnailUrl(width=imageWidth)
 
     val carouselViewRoute=reverse(getStorefrontChoosePhotoCarousel(celebUrlSlug, product.urlSlug))
-    carouselViewRoute.absolute()
-    val carouselViewLink = carouselViewRoute.url
+    val carouselViewLink = Utils.absoluteUrl(carouselViewRoute)
 
     val facebookShareLink = views.frontend.Utils.getFacebookShareLink(
       appId = fbAppId,

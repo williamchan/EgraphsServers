@@ -1,6 +1,6 @@
 package controllers.website
 
-import play.mvc.Controller
+import play.mvc.{Router, Controller}
 import services.blobs.AccessPolicy
 import services.http.ControllerMethod
 import play.templates.Html
@@ -12,6 +12,7 @@ import frontend.egraph.{LandscapeEgraphFrameViewModel, PortraitEgraphFrameViewMo
 import play.mvc.results.Redirect
 import services.social.{Twitter, Facebook}
 import java.text.SimpleDateFormat
+import services.Utils
 
 private[controllers] trait GetEgraphEndpoint { this: Controller =>
   //
@@ -126,8 +127,7 @@ object GetEgraphEndpoint {
 
     // Social links
     val thisPageAction = WebsiteControllers.reverse(WebsiteControllers.getEgraph(order.id.toString))
-    thisPageAction.absolute()
-    val thisPageLink = thisPageAction.url
+    val thisPageLink = Utils.absoluteUrl(thisPageAction)
 
     val facebookShareLink = Facebook.getEgraphShareLink(fbAppId = facebookAppId,
       fulfilledOrder = FulfilledOrder(order = order, egraph = egraph),
@@ -155,4 +155,7 @@ object GetEgraphEndpoint {
     )
   }
 
+  def url(orderId: Long): Router.ActionDefinition = {
+    Utils.lookupUrl("WebsiteControllers.getEgraph", Map("orderId" -> orderId.toString))
+  }
 }

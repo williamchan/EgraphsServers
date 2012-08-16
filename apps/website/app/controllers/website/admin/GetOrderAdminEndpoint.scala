@@ -1,10 +1,10 @@
 package controllers.website.admin
 
 import play.mvc.Controller
-import services.Utils
 import services.http.{AdminRequestFilters, ControllerMethod}
 import models.{Egraph, OrderStore}
 import org.apache.commons.lang.StringEscapeUtils
+import controllers.WebsiteControllers
 
 private[controllers] trait GetOrderAdminEndpoint { this: Controller =>
 
@@ -49,6 +49,6 @@ private[controllers] trait GetOrderAdminEndpoint { this: Controller =>
 object GetOrderAdminEndpoint {
 
   def url(orderId: Long) = {
-    Utils.lookupUrl("WebsiteControllers.getOrderAdmin", Map("orderId" -> orderId.toString))
+    WebsiteControllers.reverse(WebsiteControllers.getOrderAdmin(orderId))
   }
 }

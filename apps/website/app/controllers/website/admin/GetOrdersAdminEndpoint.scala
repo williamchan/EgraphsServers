@@ -35,6 +35,6 @@ private[controllers] trait GetOrdersAdminEndpoint {
 object GetOrdersAdminEndpoint {
 
   def url(): ActionDefinition = {
-    Utils.lookupUrl("WebsiteControllers.getOrdersAdmin")
+    WebsiteControllers.reverse(WebsiteControllers.getOrdersAdmin())
   }
 }

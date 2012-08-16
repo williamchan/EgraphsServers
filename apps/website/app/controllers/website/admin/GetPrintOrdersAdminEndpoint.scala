@@ -15,7 +15,7 @@ private[controllers] trait GetPrintOrdersAdminEndpoint {
   protected def printOrderQueryFilters: PrintOrderQueryFilters
   protected def printOrderStore: PrintOrderStore
 
-  def getPrintOrdersAdmin(filter: String = "all", page: Int = 1) = controllerMethod() {
+  def getPrintOrdersAdmin(filter: String = "unfulfilled", page: Int = 1) = controllerMethod() {
     adminFilters.requireAdministratorLogin {
       admin =>
         val query = filter match {
@@ -36,6 +36,6 @@ private[controllers] trait GetPrintOrdersAdminEndpoint {
 object GetPrintOrdersAdminEndpoint {
 
   def url(): ActionDefinition = {
-    Utils.lookupUrl("WebsiteControllers.getPrintOrdersAdmin")
+    WebsiteControllers.reverse(WebsiteControllers.getPrintOrdersAdmin())
   }
 }

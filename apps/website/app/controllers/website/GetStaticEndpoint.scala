@@ -5,12 +5,13 @@ import services.http.ControllerMethod
 import services.mvc.ImplicitHeaderAndFooterData
 import models.frontend.contents.Section
 import services.Utils
+import controllers.WebsiteControllers
 
 private[controllers] trait GetStaticEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
   protected def controllerMethod: ControllerMethod
 
   def getAbout = controllerMethod() {
-    views.frontend.html.about_us(learnMoreUrl = Utils.lookupUrl("WebsiteControllers.getInsideEgraph").url)
+    views.frontend.html.about_us(learnMoreUrl = WebsiteControllers.reverse(WebsiteControllers.getInsideEgraph).url)
   }
 
   def getFAQ = controllerMethod() {

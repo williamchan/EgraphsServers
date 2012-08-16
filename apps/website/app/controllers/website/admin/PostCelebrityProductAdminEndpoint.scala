@@ -14,7 +14,6 @@ import play.Play
 import java.text.SimpleDateFormat
 import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters, AdminRequestFilters}
 import services.http.SafePlayParams.Conversions._
-import services.Utils._
 import services.Dimensions
 import models.InventoryBatch
 import scala.Some
@@ -130,7 +129,7 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
         }
 
         maybeCreateInventoryBatchForDemoMode(savedProduct, isCreate)
-        new Redirect(lookupUrl("WebsiteControllers.getStorefrontChoosePhotoTiled", Map("celebrityUrlSlug" -> celebrity.urlSlug)).url)
+        new Redirect(WebsiteControllers.reverse(WebsiteControllers.getStorefrontChoosePhotoTiled(celebrity.urlSlug)).url)
       }
       else {
         // There were validation errors

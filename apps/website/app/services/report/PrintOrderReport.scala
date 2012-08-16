@@ -45,7 +45,7 @@ class PrintOrderReport @Inject() (schema: Schema) extends Report {
         order.id,
         order.amountPaidInCurrency,
         egraph.id,
-        egraph.signedAt.getOrElse(egraph.created),
+        egraph.getSignedAt,
         order.recipientName,
         account.email,
         "", // This will come from ShippingInfo once the initial print orders are fulfilled

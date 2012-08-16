@@ -1,6 +1,7 @@
 package services
 
 import utils._
+import controllers.WebsiteControllers
 
 class UtilsTests extends EgraphsUnitTest
 {
@@ -50,6 +51,19 @@ class UtilsTests extends EgraphsUnitTest
   "lookupUrl" should "find controllers that exist" in {
     val params = Map("celebrityUrlSlug" -> "Wizzle", "productUrlSlug" -> "Herp")
     Utils.lookupUrl("WebsiteControllers.getStorefrontChoosePhotoCarousel", params).url should be ("/Wizzle/photos/Herp")
+  }
+
+  "absoluteUrl" should "prepend the url with application.baseUrl" in {
+    val action = WebsiteControllers.reverse(WebsiteControllers.getStorefrontChoosePhotoCarousel("Wizzle", "2010-Starcraft-2-Championships"))
+    val myUtils = new Utils(Utils.properties("application.baseUrl" -> "https://www.mysite.com/"))
+    myUtils.absoluteUrl(action) should be("https://www.mysite.com/Wizzle/photos/2010-Starcraft-2-Championships")
+  }
+
+  "composeUrl" should "include just one slash when joining a base URL to a relative URL" in {
+    Utils.composeUrl("https://www.egraphs.com/", "/login") should be("https://www.egraphs.com/login")
+    Utils.composeUrl("https://www.egraphs.com/", "login")  should be("https://www.egraphs.com/login")
+    Utils.composeUrl("https://www.egraphs.com" , "/login") should be("https://www.egraphs.com/login")
+    Utils.composeUrl("https://www.egraphs.com" , "login")  should be("https://www.egraphs.com/login")
   }
 
   "requiredConfigurationProperty" should "get existing configuration properties fine" in {

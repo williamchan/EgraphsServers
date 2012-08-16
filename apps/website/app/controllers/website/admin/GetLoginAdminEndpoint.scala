@@ -3,6 +3,7 @@ package controllers.website.admin
 import play.mvc.Controller
 import services.Utils
 import services.http.ControllerMethod
+import controllers.WebsiteControllers
 
 private[controllers] trait GetLoginAdminEndpoint {
   this: Controller =>
@@ -19,6 +20,6 @@ private[controllers] trait GetLoginAdminEndpoint {
 object GetLoginAdminEndpoint {
 
   def url() = {
-    Utils.lookupUrl("WebsiteControllers.getLoginAdmin")
+    WebsiteControllers.reverse(WebsiteControllers.getLoginAdmin)
   }
 }

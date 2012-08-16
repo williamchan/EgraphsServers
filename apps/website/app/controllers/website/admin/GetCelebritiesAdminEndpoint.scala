@@ -30,6 +30,6 @@ private[controllers] trait GetCelebritiesAdminEndpoint {
 object GetCelebritiesAdminEndpoint {
 
   def location: ActionDefinition = {
-    Utils.lookupUrl("WebsiteControllers.getCelebritiesAdmin")
+    WebsiteControllers.reverse(WebsiteControllers.getCelebritiesAdmin())
   }
 }

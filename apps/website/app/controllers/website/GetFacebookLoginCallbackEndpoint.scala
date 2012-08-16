@@ -101,5 +101,8 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
 }
 
 object GetFacebookLoginCallbackEndpoint {
-  def getCallbackUrl = Utils.lookupAbsoluteUrl("WebsiteControllers.getFacebookLoginCallback").url
+  def getCallbackUrl = {
+    val action = Utils.lookupUrl("WebsiteControllers.getFacebookLoginCallback")
+    Utils.absoluteUrl(action)
+  }
 }

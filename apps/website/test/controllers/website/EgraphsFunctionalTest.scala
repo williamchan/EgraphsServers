@@ -7,12 +7,13 @@ import FunctionalTest._
 import models.Account
 import org.junit.After
 import scala.collection.JavaConversions._
-import services.{AppConfig, Utils}
+import services.AppConfig
 import utils.TestData
 import org.junit.Assert._
 import services.http.forms.CustomerLoginForm
 import services.db.DBSession
 import org.scalatest.matchers.ShouldMatchers
+import controllers.WebsiteControllers
 
 trait EgraphsFunctionalTest extends FunctionalTest
   with CleanDatabaseAfterEachTest
@@ -34,7 +35,7 @@ trait EgraphsFunctionalTest extends FunctionalTest
 
     clearCookies()
     val response = POST(
-      Utils.lookupUrl("WebsiteControllers.postLogin"),
+      WebsiteControllers.reverse(WebsiteControllers.postLogin()),
       Map[String, String](
         Fields.Email -> account.email,
         Fields.Password -> password
@@ -51,7 +52,7 @@ trait EgraphsFunctionalTest extends FunctionalTest
    * in FunctionalTest context. Logout functionality should be manually tested before every public release.
    */
   def logout(): Response = {
-    val response = POST(Utils.lookupUrl("WebsiteControllers.postLogout").url)
+    val response = POST(WebsiteControllers.reverse(WebsiteControllers.postLogin()).url)
     assertStatus(302, response)
     clearCookies()
     response

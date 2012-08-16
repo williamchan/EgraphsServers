@@ -10,6 +10,7 @@ import models.frontend.account.{AccountRecoverForm => AccountRecoverFormView}
 import services.http.forms.AccountRecoverFormFactory
 import services.http.forms.AccountRecoverForm.Fields
 import services.http.SafePlayParams.Conversions._
+import controllers.WebsiteControllers
 
 private[controllers] trait GetRecoverAccountEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
@@ -37,7 +38,5 @@ private[controllers] trait GetRecoverAccountEndpoint extends ImplicitHeaderAndFo
 
 object GetRecoverAccountEndpoint {
 
-  def url() = {
-    Utils.lookupUrl("WebsiteControllers.getRecoverAccount")
-  }
+  def url() = WebsiteControllers.reverse(WebsiteControllers.getRecoverAccount)
 }
