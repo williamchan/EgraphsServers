@@ -121,6 +121,8 @@ class Schema @Inject()(
     )
   )
 
+  val usernameHistory = table[UsernameHistory]
+
   // ugh, why did I make so many biometrics tables?
   val vbgAudioCheckTable = table[VBGAudioCheck]
   val vbgEnrollUserTable = table[VBGEnrollUser]

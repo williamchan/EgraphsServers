@@ -65,15 +65,15 @@ object TestData {
   }
 
   def newSavedCustomer(): Customer = {
-    val acct = Account(email = generateEmail(prefix = "customer-")).withPassword(defaultPassword).right.get.save()
-    val cust = acct.createCustomer(name = "Test Customer").save()
-    acct.copy(customerId = Some(cust.id)).save()
-    cust
+    val account = Account(email = generateEmail(prefix = "customer-")).withPassword(defaultPassword).right.get.save()
+    val customer = acct.createCustomer(name = "Test Customer").save()
+    account.copy(customerId = Some(customer.id)).save()
+    customer
   }
 
   def newSavedCelebrity(): Celebrity = {
     val identifier = getTimeInBlobstoreFormat
-    val email = "celebrity-" + identifier + "@egraphs.com"
+    val email = generateEmail("celebrity-")
     val acct = Account(email = email).save()
     val celeb = Celebrity(publicName = "Celebrity " + identifier).withPublishedStatus(PublishedStatus.Published).save()
 

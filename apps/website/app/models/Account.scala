@@ -213,8 +213,7 @@ class AccountStore @Inject() (schema: Schema) extends Saves[Account] with SavesC
     )
   }
 
-  beforeInsert(withEmailInLowerCase)
-  beforeUpdate(withEmailInLowerCase)
+  beforeInsertOrUpdate(withEmailInLowerCase)
 
   private def withEmailInLowerCase(toUpdate: Account): Account = {
     toUpdate.copy(email = toUpdate.email.trim().toLowerCase)

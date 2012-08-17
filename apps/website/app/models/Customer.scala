@@ -15,6 +15,7 @@ import java.util.Properties
 case class CustomerServices @Inject() (accountStore: AccountStore,
                                        customerStore: CustomerStore,
                                        inventoryBatchStore: InventoryBatchStore,
+                                       usernameHistoryStore: UsernameHistoryStore,
                                        mail: Mail,
                                        @PlayConfig playConfig: Properties)
 
@@ -187,6 +188,7 @@ class CustomerStore @Inject() (
   }
 
   def findByUsername(username: String): Option[Customer] = {
+    //TODO: change this to instead use UsernameHistoryStore
     from(schema.customers)((customer) => where(lower(customer.username) === username.toLowerCase) select (customer)).headOption
   }
 

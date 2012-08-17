@@ -31,7 +31,7 @@ class AccountSettingsForm(val paramsMap: Form.Readable, check: FormChecks, custo
         Right(stringToValidate)
       } else {
         for (valid <- check.isAlphaNumeric(stringToValidate, "Username must be letters or numbers, no spaces").right;
-             valid2 <- check.isUniqueUsername(stringToValidate, "Username already taken").right) yield valid
+             _ <- check.isUniqueUsername(stringToValidate, "Username already taken").right) yield valid
       }
     }
     override def errorMessage = "Username is required"
@@ -43,7 +43,7 @@ class AccountSettingsForm(val paramsMap: Form.Readable, check: FormChecks, custo
         Right(stringToValidate)
       } else {
         for (valid <- check.isEmailAddress(stringToValidate).right;
-             valid2 <- check.isUniqueEmail(stringToValidate, "Email already taken").right) yield valid
+             _ <- check.isUniqueEmail(stringToValidate, "Email already taken").right) yield valid
       }
     }
     override def errorMessage = "Email is required"

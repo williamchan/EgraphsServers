@@ -1,7 +1,7 @@
 package services.db
 
-import org.squeryl.Table
-import org.squeryl.dsl.ast.UpdateAssignment
+import org.squeryl.{KeyedEntity,Table}
+import org.squeryl.dsl.ast.{EqualityExpression, UpdateAssignment}
 import org.squeryl.PrimitiveTypeMode._
 
 /**
@@ -48,7 +48,11 @@ import org.squeryl.PrimitiveTypeMode._
  * }
  * }}}
  */
-trait Saves[T <: {def id : Long}] {
+
+//This becomes saves long
+trait Saves[T <: KeyedEntity[Long]] extends SavesAll[Long, T]
+
+trait SavesAll[KeyT, T <: KeyedEntity[KeyT]] {
 
   //
   // Abstract members
@@ -106,13 +110,7 @@ trait Saves[T <: {def id : Long}] {
    * @return the final object that was saved, after all transforms
    */
   final def save(toSave: T): T = {
-    toSave.id match {
-      case n if n <= 0 =>
-        insert(toSave)
-
-      case _ =>
-        updateTable(toSave)
-    }
+    insertOrUpdate(toSave)
   }
 
   /**
@@ -122,8 +120,14 @@ trait Saves[T <: {def id : Long}] {
    *
    * @return the located object or None
    */
-  def findById(id: Long): Option[T] = {
-    from(table)(row => where(row.id === id) select (row)).headOption
+  def findById(id: KeyT): Option[T] = {
+    id match {
+      case i : Long =>
+        from(table)(row => where(row.id.asInstanceOf[Long] === i) select (row)).headOption
+      case s : String =>
+        from(table)(row => where(row.id.asInstanceOf[String] === s) select (row)).headOption
+      case _ => None
+    }
   }
 
   /**
@@ -135,7 +139,7 @@ trait Saves[T <: {def id : Long}] {
    *
    * @throws a RuntimeException with ID information if it failed to find the entity.
    */
-  def get(id: Long)(implicit m: Manifest[T]): T = {
+  def get(id: KeyT)(implicit m: Manifest[T]): T = {
     findById(id).getOrElse(
       throw new RuntimeException(
         "DB contained no instances of class " + m.erasure.getName + " with id="+id
@@ -144,43 +148,35 @@ trait Saves[T <: {def id : Long}] {
   }
 
   /**
-   * Hook to provide an entity transform that will be applied before inserting any
+   * Hook to provide an entity transform that will be applied before inserting or updating any
    * new object.
    *
    * See class documentation for usage.
    */
-  final def beforeInsert(transform: (T) => T) {
-    preInsertTransforms = preInsertTransforms ++ Vector(transform)
-  }
-
-  /**
-   * Hook to provide a transform to apply before updating any new object.
-   *
-   * See class documentation for usage.
-   */
-  final def beforeUpdate(transform: (T) => T) {
-    preUpdateTransforms = preUpdateTransforms ++ Vector(transform)
+  final def beforeInsertOrUpdate(transform: (T) => T) {
+    preInsertOrUpdateTransforms = preInsertOrUpdateTransforms ++ Vector(transform)
   }
 
   //
   // Private API
   //
-  private var preInsertTransforms = Vector.empty[(T) => T]
-  private var preUpdateTransforms = Vector.empty[(T) => T]
+  private var preInsertOrUpdateTransforms = Vector.empty[(T) => T]
 
-  private def insert(toInsert: T): T = {
-    table.insert(performTransforms(preInsertTransforms, toInsert))
+  private def insertOrUpdate(toUpsert: T): T = {
+//    table.insert(performTransforms(preInsertOrUpdateTransforms, toUpsert))
+    table.insertOrUpdate(performTransforms(preInsertOrUpdateTransforms, toUpsert))
   }
 
-  private def updateTable(toUpdate: T): T = {
-    val finalEntity = performTransforms(preUpdateTransforms, toUpdate)
-    update(table)(row =>
-      where((row.id) === finalEntity.id)
-        set (defineUpdate(row, finalEntity): _*)
-    )
-
-    finalEntity
-  }
+  //TODO: don't let me commit with this commented
+//  private def updateTable(toUpdate: T): T = {
+//    val finalEntity = performTransforms(preUpdateTransforms, toUpdate)
+//    update(table)(row =>
+//      where((row.id) === finalEntity.id)
+//        set (defineUpdate(row, finalEntity): _*)
+//    )
+//
+//    finalEntity
+//  }
 
   private def performTransforms(transforms: Seq[(T) => T], entityToTransform: T): T = {
     transforms.foldLeft(entityToTransform)((currEntity, nextTransform) => nextTransform(currEntity))
