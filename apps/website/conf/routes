@@ -101,7 +101,6 @@ GET     /account/settings/?                                         WebsiteContr
 POST    /account/settings                                           WebsiteControllers.postAccountSettings
 GET     /account/recover/?                                          WebsiteControllers.getRecoverAccount
 POST    /account/recover                                            WebsiteControllers.postRecoverAccount
-GET     /account/recover/confirmation/?                             WebsiteControllers.getRecoverAccountConfirmation
 GET     /account/reset/?                                            WebsiteControllers.getResetPassword
 POST    /account/reset                                              WebsiteControllers.postResetPassword
 GET     /account/verify/?                                           WebsiteControllers.getVerifyAccount

@@ -12,7 +12,6 @@ trait AllConsumerEndpoints
   with GetOrderConfirmationEndpoint
   with GetLoginEndpoint
   with GetRecoverAccountEndpoint
-  with GetRecoverAccountConfirmationEndpoint
   with GetResetPasswordEndpoint
   with GetStaticEndpoint
   with LogoutEndpoints
