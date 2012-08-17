@@ -3,22 +3,26 @@ package controllers.website
 import play.mvc.Controller
 
 import models._
-import frontend.storefront.OrderCompleteViewModel
 import services.http.ControllerMethod
 import services.mvc.{OrderCompleteViewModelFactory, ImplicitHeaderAndFooterData}
-import play.templates.Html
 
 /**
- * Serves the page confirming that an Egraph order was made
+ * Serves the page confirming to the purchasing customer that an Egraph order was made.
+ * See celebrity_storefront_complete.scala.html
  */
-
 private[controllers] trait GetOrderConfirmationEndpoint extends ImplicitHeaderAndFooterData
 { this: Controller =>
 
+  //
+  // Services
+  //
   protected def orderStore: OrderStore
   protected def controllerMethod: ControllerMethod
   protected def orderCompleteViewModelFactory: OrderCompleteViewModelFactory
 
+  //
+  // Controllers
+  //
   def getOrderConfirmation(orderId: Long) = controllerMethod() {
     // Get order ID from flash scope -- it's OK to just read it
     // because it can only have been provided by our own code (in this case
