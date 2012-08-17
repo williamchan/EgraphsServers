@@ -10,11 +10,6 @@
 GET     /test/scenarios                          website.nonproduction.ScenarioController.list
 GET     /test/scenarios/clear                    website.nonproduction.ScenarioController.clear
 GET     /test/scenarios/{urlSlug}                website.nonproduction.ScenarioController.scenario
-
-GET     /demo-setup/list                         website.nonproduction.DemoSetupController.list
-GET     /demo-setup/clear                        website.nonproduction.DemoSetupController.clear
-GET     /demo-setup/{urlSlug}                    website.nonproduction.DemoSetupController.demoScenario
-
 GET     /test/request-transaction/without-error  website.nonproduction.TransactionTestController.makeAccount
 GET     /test/request-transaction/with-error     website.nonproduction.TransactionTestController.makeAccountAndThrowException
 GET     /test/request-transaction/is-stored      website.nonproduction.TransactionTestController.isStored

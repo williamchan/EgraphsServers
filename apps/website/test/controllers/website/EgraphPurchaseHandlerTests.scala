@@ -73,7 +73,7 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheAndBlob
 
       val cashTransaction = cashTransactionStore.findByOrderId(order.id).single
       cashTransaction.printOrderId should be(Some(printOrder.id))
-      cashTransaction.amountInCurrency should be(BigDecimal(95))  //TODO: why is this 50 instead of 95?
+      cashTransaction.amountInCurrency should be(BigDecimal(95))
     }
   }
 
