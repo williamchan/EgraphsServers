@@ -15,7 +15,7 @@ import play.mvc.Scope.{Session, Flash}
 import play.mvc.Http.Request
 import play.test.FunctionalTest
 import services.AppConfig
-import services.mvc.StorefrontBreadcrumbData
+import services.mvc.{OrderCompleteViewModelFactory, StorefrontBreadcrumbData}
 import services.cache.CacheFactory
 
 /**
@@ -60,4 +60,5 @@ case class TestWebsiteControllers @Inject()(
   override def flash = fakeFlash
   override def printOrderStore = instance[PrintOrderStore]
   override def printOrderQueryFilters = instance[PrintOrderQueryFilters]
+  override def orderCompleteViewModelFactory = instance[OrderCompleteViewModelFactory]
 }

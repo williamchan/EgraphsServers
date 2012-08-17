@@ -15,7 +15,7 @@ import forms.{AccountRecoverFormFactory, AccountPasswordResetFormFactory, Accoun
 import forms.purchase.{PurchaseFormChecksFactory, FormReaders, PurchaseFormFactory}
 import java.util.Properties
 import services.Utils
-import services.mvc.StorefrontBreadcrumbData
+import services.mvc.{OrderCompleteViewModelFactory, StorefrontBreadcrumbData}
 import services.cache.CacheFactory
 
 object WebsiteControllers extends Controller with AllWebsiteEndpoints
@@ -41,6 +41,8 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected def accountSettingsForms = instance[AccountSettingsFormFactory]
   override protected def accountPasswordResetForms = instance[AccountPasswordResetFormFactory]
   override protected def accountRecoverForms = instance[AccountRecoverFormFactory]
+
+  override protected def orderCompleteViewModelFactory: OrderCompleteViewModelFactory = instance[OrderCompleteViewModelFactory]
 
   override protected def checkPurchaseField: PurchaseFormChecksFactory = instance[PurchaseFormChecksFactory]
 

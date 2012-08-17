@@ -5,7 +5,8 @@ import play.mvc.Controller
 import models._
 import frontend.storefront.OrderCompleteViewModel
 import services.http.ControllerMethod
-import services.mvc.ImplicitHeaderAndFooterData
+import services.mvc.{OrderCompleteViewModelFactory, ImplicitHeaderAndFooterData}
+import play.templates.Html
 
 /**
  * Serves the page confirming that an Egraph order was made
@@ -16,6 +17,7 @@ private[controllers] trait GetOrderConfirmationEndpoint extends ImplicitHeaderAn
 
   protected def orderStore: OrderStore
   protected def controllerMethod: ControllerMethod
+  protected def orderCompleteViewModelFactory: OrderCompleteViewModelFactory
 
   def getOrderConfirmation(orderId: Long) = controllerMethod() {
     // Get order ID from flash scope -- it's OK to just read it
@@ -29,30 +31,11 @@ private[controllers] trait GetOrderConfirmationEndpoint extends ImplicitHeaderAn
       flashOrderId <- maybeOrderIdFromFlash if flashOrderId == orderId;
       order <- orderStore.findById(flashOrderId)
     ) yield {
-      val product = order.product
-      val buyer = order.buyer
-      val buyerAccount = buyer.account
-      val recipient = order.recipient
-      val recipientAccount = recipient.account
-      val celeb = product.celebrity
-
       views.frontend.html.celebrity_storefront_complete(
-        OrderCompleteViewModel (
-          orderDate = order.created,
-          orderNumber = order.id,
-          buyerName = buyer.name,
-          buyerEmail = buyerAccount.email,
-          ownerName = recipient.name,
-          ownerEmail = recipientAccount.email,
-          celebName = celeb.publicName,
-          productName = product.name,
-          totalPrice = order.amountPaid,
-          guaranteedDeliveryDate = order.inventoryBatch.getExpectedDate
-        )
+        orderCompleteViewModelFactory.fromOrder(order)
       )
     }
 
     maybeHtml.getOrElse(NotFound("Order confirmation has expired."))
   }
 }
-
