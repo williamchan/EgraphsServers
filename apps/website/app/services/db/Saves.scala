@@ -50,7 +50,31 @@ import org.squeryl.PrimitiveTypeMode._
  */
 
 //This becomes saves long
-trait Saves[T <: KeyedEntity[Long]] extends SavesAll[Long, T]
+trait Saves[T <: KeyedEntity[Long]] extends SavesAll[Long, T] {
+  override final def save(toSave: T): T = {
+    toSave.id match {
+      case n if n <= 0 =>
+        insert(toSave)
+
+      case _ =>
+        updateTable(toSave)
+    }
+  }
+
+  private def insert(toInsert: T): T = {
+    table.insert(performTransforms(preInsertOrUpdateTransforms, toInsert))
+  }
+
+  private def updateTable(toUpdate: T): T = {
+    val finalEntity = performTransforms(preInsertOrUpdateTransforms, toUpdate)
+    update(table)(row =>
+      where((row.id) === finalEntity.id)
+        set (defineUpdate(row, finalEntity): _*)
+    )
+
+    finalEntity
+  }
+}
 
 trait SavesAll[KeyT, T <: KeyedEntity[KeyT]] {
 
@@ -109,7 +133,7 @@ trait SavesAll[KeyT, T <: KeyedEntity[KeyT]] {
    *
    * @return the final object that was saved, after all transforms
    */
-  final def save(toSave: T): T = {
+  def save(toSave: T): T = {
     insertOrUpdate(toSave)
   }
 
@@ -160,7 +184,7 @@ trait SavesAll[KeyT, T <: KeyedEntity[KeyT]] {
   //
   // Private API
   //
-  private var preInsertOrUpdateTransforms = Vector.empty[(T) => T]
+  private[db] var preInsertOrUpdateTransforms = Vector.empty[(T) => T]
 
   private def insertOrUpdate(toUpsert: T): T = {
 //    table.insert(performTransforms(preInsertOrUpdateTransforms, toUpsert))
@@ -178,7 +202,7 @@ trait SavesAll[KeyT, T <: KeyedEntity[KeyT]] {
 //    finalEntity
 //  }
 
-  private def performTransforms(transforms: Seq[(T) => T], entityToTransform: T): T = {
+  private[db] def performTransforms(transforms: Seq[(T) => T], entityToTransform: T): T = {
     transforms.foldLeft(entityToTransform)((currEntity, nextTransform) => nextTransform(currEntity))
   }
 }
