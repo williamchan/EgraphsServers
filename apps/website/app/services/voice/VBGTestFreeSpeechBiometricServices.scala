@@ -11,7 +11,4 @@ import java.net.URL
 object VBGTestFreeSpeechBiometricServices extends VBGProdFreeSpeechBiometricServicesBase {
 
   override protected val _userIdPrefix: String = "test"
-
-  // testing service04 before making full switchover from service02
-  override protected val _url: URL = new URL("https://service04.voicebiogroup.com/service/xmlapi")
 }
