@@ -13,11 +13,11 @@ import services.logging.Logging
  *
  * Responds to:
  *   CatalogStarsActor.GetCatalogStars
- *      Returns Some(IndexedSeq[CatalogStar]) if a cached value was found, None
- *      if no cached value was found.
+ *      Returns Some(IndexedSeq[CatalogStar]) if a cached value was found,
+ *      None if no cached value was found.
  *
  *   CatalogStarsActor.SetCatalogStars
- *      Returns nothing.
+ *      Returns nothing, but sets the celeb catalog.
  */
 private[celebrity] class CatalogStarsActor extends Actor with Logging {
 

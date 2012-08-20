@@ -7,11 +7,9 @@ import services.cache.{NamespacedCache, CacheFactory}
 import TestHelpers.withActorUnderTest
 import com.google.inject.Inject
 import services.AppConfig
-import akka.actor.{Actor, ActorRef}
+import akka.actor.ActorRef
 import models.frontend.landing.CatalogStar
-import services.mvc.celebrity.UpdateCatalogStarsActor.UpdateCatalogStars
 import org.specs2.mock.Mockito
-import services.mvc.celebrity.CatalogStarsActor.GetCatalogStars
 import services.mvc.celebrity.UpdateCatalogStarsActor.UpdateCatalogStars
 import services.mvc.celebrity.CatalogStarsActor.GetCatalogStars
 

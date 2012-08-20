@@ -1,7 +1,6 @@
 package services.mvc.celebrity
 
 import utils.EgraphsUnitTest
-import akka.actor.Actor._
 import models.frontend.landing.CatalogStar
 import akka.actor.ActorRef
 import utils.TestHelpers.withActorUnderTest

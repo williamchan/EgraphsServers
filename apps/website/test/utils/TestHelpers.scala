@@ -32,23 +32,29 @@ object TestHelpers {
     blobs.get(blobKey)
   }
 
+  /**
+   * Convenience method that starts the actor, executes the operation, and stops the actor.
+   */
   def withActorUnderTest[ActorT <: Actor: Manifest, ResultT]
   (actorInstance: => ActorT)(operation: ActorRef => ResultT): ResultT =
   {
     val actor = actorOf(actorInstance).start()
 
-    stoppingActor(actor)(operation)
+    executeOperationThenStop(actor)(operation)
   }
 
+  /**
+   * Convenience method that starts the actor, executes the operation, and stops the actor.
+   */
   def withActorUnderTest[ActorT <: Actor: Manifest, ResultT]
   (operation: ActorRef => ResultT): ResultT =
   {
     val actor = actorOf[ActorT].start()
 
-    stoppingActor(actor)(operation)
+    executeOperationThenStop(actor)(operation)
   }
 
-  private def stoppingActor[ActorT <: Actor: Manifest, ResultT]
+  private[this] def executeOperationThenStop[ActorT <: Actor: Manifest, ResultT]
   (actor: ActorRef)(operation: ActorRef => ResultT): ResultT =
   {
     try {
