@@ -395,11 +395,14 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
   /**
    * Returns all celebrities that should be discoverable by visitors on the website, and no
    * celebrities that should not be discoverable.
+   *
+   * Returns them ordered alphabetically by their public name.
    **/
   def getPublishedCelebrities: Iterable[Celebrity] = {
     from(schema.celebrities)(c =>
       where(c._publishedStatus === PublishedStatus.Published.name)
       select (c)
+      orderBy (lower(c.publicName))
     )
   }
 

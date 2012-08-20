@@ -38,17 +38,17 @@ private[celebrity] class UpdateCatalogStarsActor @Inject()(
       // Get the stars from the cache preferentially. This reduces round-trips to the database in multi-instance
       // deployments because one instance can share the results from another.
       val cache = cacheFactory.applicationCache
-      val featuredStars = cache.cacheing(resultsCacheKey, updatePeriodSeconds) {
+      val catalogStars = cache.cacheing(resultsCacheKey, updatePeriodSeconds) {
         // Due to cache miss, this instance must update from the database. Get all the stars and
         // their sold-out info.
         db.connected(TransactionSerializable) {
           log.info("Updating landing page celebrities")
 
           // Get the list of domain objects from the DB
-          val featuredCelebs = celebrityStore.getPublishedCelebrities.toIndexedSeq
+          val publishedCelebs = celebrityStore.getPublishedCelebrities.toIndexedSeq
 
           // Turn the domain objects into ViewModels (CatalogStars)
-          for (celeb <- featuredCelebs) yield {
+          for (celeb <- publishedCelebs) yield {
             celeb.asCatalogStar
           }
         }
@@ -56,8 +56,8 @@ private[celebrity] class UpdateCatalogStarsActor @Inject()(
 
       // Send the celebs to an actor that will be in charge of serving them to
       // the landing page.
-      log.info("Transmitting " + featuredStars.length + " stars to the serving actor " + recipientActor)
-      recipientActor ! CatalogStarsActor.SetCatalogStars(featuredStars)
+      log.info("Transmitting " + catalogStars.length + " stars to the serving actor " + recipientActor)
+      recipientActor ! CatalogStarsActor.SetCatalogStars(catalogStars)
 
       // Send back completion. This is mostly so that the tests won't sit there waiting forever
       // for a response.
