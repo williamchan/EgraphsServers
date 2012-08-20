@@ -4,7 +4,7 @@ import enums.{HasEnrollmentStatus, EnrollmentStatus, PublishedStatus, HasPublish
 import java.sql.Timestamp
 import services.blobs.AccessPolicy
 import play.templates.JavaExtensions
-import services.db.{FilterOneTable, KeyedCaseClass, Schema, Saves}
+import services.db.{FilterOneTable, KeyedCaseClass, Schema, SavesWithLongKey}
 import services.blobs.Blobs.Conversions._
 import com.google.inject.{Provider, Inject}
 import org.squeryl.Query
@@ -334,7 +334,7 @@ object Celebrity {
   }
 }
 
-class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {
+class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebrity] with SavesCreatedUpdated[Celebrity] {
   import org.squeryl.PrimitiveTypeMode._
 
   //
@@ -428,7 +428,7 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
   }
 
   //
-  // Saves[Celebrity] methods
+  // SavesWithLongKey[Celebrity] methods
   //
   override val table = schema.celebrities
 

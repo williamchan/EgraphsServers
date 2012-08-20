@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import models._
 import org.squeryl.PrimitiveTypeMode._
 import services.AppConfig
-import services.db.{Schema, Saves}
+import services.db.{Schema, SavesWithLongKey}
 import services.Time
 
 /**
@@ -41,10 +41,10 @@ case class VBGStartVerification(id: Long = 0,
 
 }
 
-class VBGStartVerificationStore @Inject()(schema: Schema) extends Saves[VBGStartVerification] with SavesCreatedUpdated[VBGStartVerification] {
+class VBGStartVerificationStore @Inject()(schema: Schema) extends SavesWithLongKey[VBGStartVerification] with SavesCreatedUpdated[VBGStartVerification] {
 
   //
-  // Saves[VBGStartVerification] methods
+  // SavesWithLongKey[VBGStartVerification] methods
   //
   override val table = schema.vbgStartVerificationTable
 

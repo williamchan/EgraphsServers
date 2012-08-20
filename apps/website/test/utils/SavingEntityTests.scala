@@ -16,7 +16,7 @@ trait SavingEntityIdStringTests[T <: KeyedEntity[String]] extends SavingEntityTe
 }
 
 /**
- * Test set for any class whose companion object implements Saves[TheClass]
+ * Test set for any class whose companion object implements SavesWithLongKey[TheClass]
  *
  * Ensures that basic CRUD works properly.
  */

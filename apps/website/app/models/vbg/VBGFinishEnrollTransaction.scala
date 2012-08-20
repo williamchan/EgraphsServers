@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import models._
 import org.squeryl.PrimitiveTypeMode._
 import services.AppConfig
-import services.db.{Schema, Saves}
+import services.db.{Schema, SavesWithLongKey}
 import services.Time
 
 /**
@@ -41,10 +41,10 @@ case class VBGFinishEnrollTransaction(id: Long = 0,
 
 }
 
-class VBGFinishEnrollTransactionStore @Inject()(schema: Schema) extends Saves[VBGFinishEnrollTransaction] with SavesCreatedUpdated[VBGFinishEnrollTransaction] {
+class VBGFinishEnrollTransactionStore @Inject()(schema: Schema) extends SavesWithLongKey[VBGFinishEnrollTransaction] with SavesCreatedUpdated[VBGFinishEnrollTransaction] {
 
   //
-  // Saves[VBGFinishEnrollTransaction] methods
+  // SavesWithLongKey[VBGFinishEnrollTransaction] methods
   //
   override val table = schema.vbgFinishEnrollTransactionTable
 

@@ -2,7 +2,7 @@ package models
 
 import play.data.validation.Validation.ValidationResult
 import java.sql.Timestamp
-import services.db.{KeyedCaseClass, Saves, Schema}
+import services.db.{KeyedCaseClass, SavesWithLongKey, Schema}
 import com.google.inject.Inject
 import java.util.UUID
 import org.apache.commons.codec.binary.Base64
@@ -147,7 +147,7 @@ object Account {
  */
 case class AccountServices @Inject() (accountStore: AccountStore, customerStore: CustomerStore, addressStore: AddressStore)
 
-class AccountStore @Inject() (schema: Schema) extends Saves[Account] with SavesCreatedUpdated[Account] {
+class AccountStore @Inject() (schema: Schema) extends SavesWithLongKey[Account] with SavesCreatedUpdated[Account] {
   import org.squeryl.PrimitiveTypeMode._
 
   def authenticate(email: String, passwordAttempt: String): Either[AccountAuthenticationError, Account] = {
@@ -209,7 +209,7 @@ class AccountStore @Inject() (schema: Schema) extends Saves[Account] with SavesC
   }
 
   //
-  // Saves[Account] methods
+  // SavesWithLongKey[Account] methods
   //
   override val table = schema.accounts
 

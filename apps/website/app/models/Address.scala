@@ -3,7 +3,7 @@ package models
 import com.google.inject.Inject
 import java.sql.Timestamp
 import services.{AppConfig, Time}
-import services.db.{Saves, Schema, KeyedCaseClass}
+import services.db.{SavesWithLongKey, Schema, KeyedCaseClass}
 import org.squeryl.Query
 
 case class AddressServices @Inject()(store: AddressStore,
@@ -39,7 +39,7 @@ case class Address(id: Long = 0,
   override def unapplied = Address.unapply(this)
 }
 
-class AddressStore @Inject()(schema: Schema) extends Saves[Address] with SavesCreatedUpdated[Address] {
+class AddressStore @Inject()(schema: Schema) extends SavesWithLongKey[Address] with SavesCreatedUpdated[Address] {
   import org.squeryl.PrimitiveTypeMode._
 
   //
@@ -51,7 +51,7 @@ class AddressStore @Inject()(schema: Schema) extends Saves[Address] with SavesCr
   }
 
   //
-  // Saves[Address] methods
+  // SavesWithLongKey[Address] methods
   //
   override val table = schema.addresses
 

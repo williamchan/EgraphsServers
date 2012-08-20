@@ -3,7 +3,7 @@ package models
 import enums.PublishedStatus.EnumVal
 import enums.{PublishedStatus, HasPublishedStatus}
 import java.sql.Timestamp
-import services.db.{FilterOneTable, Schema, Saves, KeyedCaseClass}
+import services.db.{FilterOneTable, Schema, SavesWithLongKey, KeyedCaseClass}
 import play.templates.JavaExtensions
 import org.joda.money.Money
 import services.Finance.TypeConversions._
@@ -353,7 +353,7 @@ object Product {
   }
 }
 
-class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: InventoryBatchQueryFilters) extends Saves[Product] with SavesCreatedUpdated[Product] {
+class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: InventoryBatchQueryFilters) extends SavesWithLongKey[Product] with SavesCreatedUpdated[Product] {
   import org.squeryl.PrimitiveTypeMode._
 
   //
@@ -404,7 +404,7 @@ class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: Invent
   }
 
   //
-  // Saves[Product] methods
+  // SavesWithLongKey[Product] methods
   //
   def table = schema.products
 

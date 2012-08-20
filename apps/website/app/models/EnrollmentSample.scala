@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import play.libs.Codec
 import services.AppConfig
 import services.blobs.Blobs
-import services.db.{KeyedCaseClass, Schema, Saves}
+import services.db.{KeyedCaseClass, Schema, SavesWithLongKey}
 import services.Time
 import Blobs.Conversions._
 
@@ -77,11 +77,11 @@ object EnrollmentSample {
   }
 }
 
-class EnrollmentSampleStore @Inject()(schema: Schema) extends Saves[EnrollmentSample] with SavesCreatedUpdated[EnrollmentSample] {
+class EnrollmentSampleStore @Inject()(schema: Schema) extends SavesWithLongKey[EnrollmentSample] with SavesCreatedUpdated[EnrollmentSample] {
   import org.squeryl.PrimitiveTypeMode._
 
   //
-  // Saves[EnrollmentSample] methods
+  // SavesWithLongKey[EnrollmentSample] methods
   //
   override val table = schema.enrollmentSamples
 

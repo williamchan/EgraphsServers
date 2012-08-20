@@ -16,7 +16,7 @@ import sun.security.krb5.internal.ktab.KeyTab
  * {{{
  *    case class Person(id: Long = 0L, name: String = "") extends Keyed[Long]
  *
- *    object Person extends Saves[Person] {
+ *    object Person extends SavesWithLongKey[Person] {
  *       override val table = MySquerylDb.people
  *
  *       override def defineUpdate (theOld: person, theNew: person) = {
@@ -35,7 +35,7 @@ import sun.security.krb5.internal.ktab.KeyTab
  * {{{
  *   case class Person(id: Long = 0L, name: String = "", created: Date = new Date(0L))
  *
- *   object Person extends Saves[Person] {
+ *   object Person extends SavesWithLongKey[Person] {
  *     beforeInsert((personToTransform) => personToTransform.copy(created=new Date()))
  *
  *     override val table: Table[Person] = MySquerylDb.people
@@ -50,8 +50,7 @@ import sun.security.krb5.internal.ktab.KeyTab
  * }}}
  */
 
-//TODO: This becomes saves long
-trait Saves[T <: KeyedEntity[Long]] extends SavesAll[Long, T] {
+trait SavesWithLongKey[T <: KeyedEntity[Long]] extends Saves[Long, T] {
   override protected final def keysEqual(id: Long, otherId: Long): LogicalBoolean = {
     id === otherId
   }
@@ -67,7 +66,7 @@ trait Saves[T <: KeyedEntity[Long]] extends SavesAll[Long, T] {
   }
 }
 
-trait SavesStringKey[T <: KeyedEntity[String]] extends SavesAll[String, T] {
+trait SavesWithStringKey[T <: KeyedEntity[String]] extends Saves[String, T] {
   override protected final def keysEqual(id: String, otherId: String): LogicalBoolean = {
     id === otherId
   }
@@ -85,7 +84,7 @@ trait SavesStringKey[T <: KeyedEntity[String]] extends SavesAll[String, T] {
   }
 }
 
-trait SavesAll[KeyT, T <: KeyedEntity[KeyT]] {
+trait Saves[KeyT, T <: KeyedEntity[KeyT]] {
 
   //
   // Abstract members
@@ -102,7 +101,7 @@ trait SavesAll[KeyT, T <: KeyedEntity[KeyT]] {
    * {{{
    *   case class Fruit(id: Long, name: String) Keyed[Long]
    *
-   *   object Fruit extends Saves[Fruit] {
+   *   object Fruit extends SavesWithLongKey[Fruit] {
    *     override def defineUpdate(theOld: Fruit, theNew: Fruit) = {
    *        import org.squeryl.PrimitiveTypeMode._
    *        updateIs(

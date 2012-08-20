@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import models._
 import org.squeryl.PrimitiveTypeMode._
 import services.AppConfig
-import services.db.{Schema, Saves}
+import services.db.{Schema, SavesWithLongKey}
 import services.Time
 
 /**
@@ -48,7 +48,7 @@ case class VBGVerifySample(id: Long = 0,
 
 }
 
-class VBGVerifySampleStore @Inject()(schema: Schema) extends Saves[VBGVerifySample] with SavesCreatedUpdated[VBGVerifySample] {
+class VBGVerifySampleStore @Inject()(schema: Schema) extends SavesWithLongKey[VBGVerifySample] with SavesCreatedUpdated[VBGVerifySample] {
 
   def findByEgraph(egraph: Egraph): Option[VBGVerifySample] = {
     from(schema.vbgVerifySampleTable)(vbgVerifySample =>
@@ -58,7 +58,7 @@ class VBGVerifySampleStore @Inject()(schema: Schema) extends Saves[VBGVerifySamp
   }
 
   //
-  // Saves[VBGVerifySample] methods
+  // SavesWithLongKey[VBGVerifySample] methods
   //
   override val table = schema.vbgVerifySampleTable
 

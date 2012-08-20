@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import enums.EgraphState._
 import java.sql.Timestamp
 import services.{AppConfig, Time}
-import services.db.{FilterOneTable, Saves, Schema, KeyedCaseClass}
+import services.db.{FilterOneTable, SavesWithLongKey, Schema, KeyedCaseClass}
 import services.Finance.TypeConversions._
 import org.joda.money.Money
 import services.blobs.AccessPolicy
@@ -75,7 +75,7 @@ object PrintOrder {
   val defaultPngWidth = 2446         // 2446 seems to work well for physical prints
 }
 
-class PrintOrderStore @Inject() (schema: Schema) extends Saves[PrintOrder] with SavesCreatedUpdated[PrintOrder] {
+class PrintOrderStore @Inject() (schema: Schema) extends SavesWithLongKey[PrintOrder] with SavesCreatedUpdated[PrintOrder] {
   import org.squeryl.PrimitiveTypeMode._
 
   def findByOrderId(orderId: Long): Query[PrintOrder] = {
@@ -108,7 +108,7 @@ class PrintOrderStore @Inject() (schema: Schema) extends Saves[PrintOrder] with 
   }
 
   //
-  // Saves[PrintOrder] methods
+  // SavesWithLongKey[PrintOrder] methods
   //
   override val table = schema.printOrders
 

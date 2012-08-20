@@ -1,7 +1,7 @@
 package models
 
 import com.google.inject.{Provider, Inject}
-import services.db.{SavesStringKey, SavesAll, Saves, Schema}
+import services.db.{SavesWithStringKey, SavesWithLongKey, Schema}
 import java.sql.Timestamp
 
 /**
@@ -14,7 +14,7 @@ import java.sql.Timestamp
 
 class UsernameHistoryStore @Inject() (
   schema: Schema
-) extends SavesStringKey[UsernameHistory] with SavesCreatedUpdatedAll[String, UsernameHistory]
+) extends SavesWithStringKey[UsernameHistory] with SavesCreatedUpdatedAll[String, UsernameHistory]
 {
   import org.squeryl.PrimitiveTypeMode._
 
@@ -27,7 +27,7 @@ class UsernameHistoryStore @Inject() (
   }
 
   //
-  // Saves[UsernameHistory] methods
+  // SavesWithLongKey[UsernameHistory] methods
   //
   override val table = schema.usernameHistories
 

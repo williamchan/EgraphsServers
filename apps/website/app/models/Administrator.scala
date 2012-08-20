@@ -3,7 +3,7 @@ package models
 import enums.AdminRole.EnumVal
 import enums.{HasAdminRole, AdminRole}
 import java.sql.Timestamp
-import services.db.{KeyedCaseClass, Saves, Schema}
+import services.db.{KeyedCaseClass, SavesWithLongKey, Schema}
 import com.google.inject.Inject
 import services.{AppConfig, Time}
 
@@ -34,7 +34,7 @@ case class Administrator(
 
 case class AdministratorServices @Inject()(store: AdministratorStore, accountStore: AccountStore)
 
-class AdministratorStore @Inject()(schema: Schema, accountStore: AccountStore) extends Saves[Administrator] with SavesCreatedUpdated[Administrator] {
+class AdministratorStore @Inject()(schema: Schema, accountStore: AccountStore) extends SavesWithLongKey[Administrator] with SavesCreatedUpdated[Administrator] {
   import org.squeryl.PrimitiveTypeMode._
 
   def isAdmin(adminId: Option[Long]): Boolean = {
@@ -69,7 +69,7 @@ class AdministratorStore @Inject()(schema: Schema, accountStore: AccountStore) e
   }
 
   //
-  // Saves[Administrator] methods
+  // SavesWithLongKey[Administrator] methods
   //
   override val table = schema.administrators
 

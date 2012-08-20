@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import models._
 import org.squeryl.PrimitiveTypeMode._
 import services.AppConfig
-import services.db.{Schema, Saves}
+import services.db.{Schema, SavesWithLongKey}
 import services.Time
 
 /**
@@ -41,10 +41,10 @@ case class VBGStartEnrollment(id: Long = 0,
 
 }
 
-class VBGStartEnrollmentStore @Inject()(schema: Schema) extends Saves[VBGStartEnrollment] with SavesCreatedUpdated[VBGStartEnrollment] {
+class VBGStartEnrollmentStore @Inject()(schema: Schema) extends SavesWithLongKey[VBGStartEnrollment] with SavesCreatedUpdated[VBGStartEnrollment] {
 
   //
-  // Saves[VBGStartEnrollment] methods
+  // SavesWithLongKey[VBGStartEnrollment] methods
   //
   override val table = schema.vbgStartEnrollmentTable
 

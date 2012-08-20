@@ -2,7 +2,7 @@ package models
 
 import java.util.Date
 import java.sql.Timestamp
-import services.db.{SavesAll, KeyedCaseClass, Saves}
+import services.db.{Saves, KeyedCaseClass, SavesWithLongKey}
 import services.Time
 
 /**
@@ -26,19 +26,19 @@ trait HasCreatedUpdated {
   }
 }
 
+//TODO: Remove this before checkin
+trait SavesCreatedUpdated[T <: KeyedCaseClass[Long] with HasCreatedUpdated] extends SavesCreatedUpdatedAll[Long, T] {
+  this: Saves[Long, T] =>
+}
+
 /**
  * Mix into an object that you want to handle saving of objects with created and updated fields
  * (usually this will be the companion object of some case class)
  *
  * See [[models.Account]] for an example.
  */
-//TODO: Remove this before checkin
-trait SavesCreatedUpdated[T <: KeyedCaseClass[Long] with HasCreatedUpdated] extends SavesCreatedUpdatedAll[Long, T] {
-  this: SavesAll[Long, T] =>
-}
-
 trait SavesCreatedUpdatedAll[KeyT, T <: KeyedCaseClass[KeyT] with HasCreatedUpdated] {
-  this: SavesAll[KeyT, T] =>
+  this: Saves[KeyT, T] =>
 
   //
   // Abstract members

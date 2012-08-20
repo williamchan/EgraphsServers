@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import models._
 import org.squeryl.PrimitiveTypeMode._
 import services.AppConfig
-import services.db.{KeyedCaseClass, Schema, Saves}
+import services.db.{KeyedCaseClass, Schema, SavesWithLongKey}
 import services.Time
 import com.xyzmo.wwww.biometricserver.WebServiceUserAndProfileStub
 
@@ -64,10 +64,10 @@ case class XyzmoAddProfile(id: Long = 0,
 
 }
 
-class XyzmoAddProfileStore @Inject()(schema: Schema) extends Saves[XyzmoAddProfile] with SavesCreatedUpdated[XyzmoAddProfile] {
+class XyzmoAddProfileStore @Inject()(schema: Schema) extends SavesWithLongKey[XyzmoAddProfile] with SavesCreatedUpdated[XyzmoAddProfile] {
 
   //
-  // Saves[XyzmoAddProfile] methods
+  // SavesWithLongKey[XyzmoAddProfile] methods
   //
   override val table = schema.xyzmoAddProfileTable
 

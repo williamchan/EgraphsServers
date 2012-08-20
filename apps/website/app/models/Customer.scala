@@ -3,7 +3,7 @@ package models
 import enums.OrderReviewStatus
 import java.sql.Timestamp
 import services.{Utils, Time, AppConfig}
-import services.db.{KeyedCaseClass, Schema, Saves}
+import services.db.{KeyedCaseClass, Schema, SavesWithLongKey}
 import com.google.inject.{Provider, Inject}
 import exception.InsufficientInventoryException
 import org.apache.commons.mail.HtmlEmail
@@ -145,7 +145,7 @@ class CustomerStore @Inject() (
   accountStore: AccountStore,
   customerServices: Provider[CustomerServices],
   accountServices: Provider[AccountServices]
-) extends Saves[Customer] with SavesCreatedUpdated[Customer]
+) extends SavesWithLongKey[Customer] with SavesCreatedUpdated[Customer]
 {
   import org.squeryl.PrimitiveTypeMode._
 
@@ -196,7 +196,7 @@ class CustomerStore @Inject() (
   }
 
   //
-  // Saves[Customer] methods
+  // SavesWithLongKey[Customer] methods
   //
   override val table = schema.customers
 

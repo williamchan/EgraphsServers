@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import models._
 import org.squeryl.PrimitiveTypeMode._
 import services.AppConfig
-import services.db.{Schema, Saves}
+import services.db.{Schema, SavesWithLongKey}
 import services.Time
 
 /**
@@ -42,10 +42,10 @@ case class VBGAudioCheck(id: Long = 0,
 
 }
 
-class VBGAudioCheckStore @Inject()(schema: Schema) extends Saves[VBGAudioCheck] with SavesCreatedUpdated[VBGAudioCheck] {
+class VBGAudioCheckStore @Inject()(schema: Schema) extends SavesWithLongKey[VBGAudioCheck] with SavesCreatedUpdated[VBGAudioCheck] {
 
   //
-  // Saves[VBGAudioCheck] methods
+  // SavesWithLongKey[VBGAudioCheck] methods
   //
   override val table = schema.vbgAudioCheckTable
 

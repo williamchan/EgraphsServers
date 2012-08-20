@@ -28,7 +28,7 @@ case class InventoryBatchProduct(
   }
 }
 
-class InventoryBatchProductStore @Inject()(schema: Schema) extends Saves[InventoryBatchProduct] {
+class InventoryBatchProductStore @Inject()(schema: Schema) extends SavesWithLongKey[InventoryBatchProduct] {
   import org.squeryl.PrimitiveTypeMode._
 
   //
