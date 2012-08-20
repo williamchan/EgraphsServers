@@ -30,6 +30,9 @@ class OrderCompleteViewModelFactory @Inject()() {
     )
   }
 
+  //
+  // Private members
+  //
   /**
    * Creates the ViewModel from the lowest-level domain models.
    *
@@ -45,7 +48,7 @@ class OrderCompleteViewModelFactory @Inject()() {
    *
    * @return a ViewModel that populates the order complete page.
    */
-  def fromModels(
+  private def fromModels(
     celeb: Celebrity,
     product: Product,
     buyer: Customer,
