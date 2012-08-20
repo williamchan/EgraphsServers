@@ -22,8 +22,8 @@ class UsernameHistoryStore @Inject() (
   // Public members
   //
 
-  def findByUsername(username: String): Seq[UsernameHistory] = {
-    from(schema.usernameHistories)((history) => where(lower(history.username) === username.toLowerCase) select (history)).toSeq
+  def findByCustomer(customer: Customer): Seq[UsernameHistory] = {
+    from(schema.usernameHistories)((history) => where(history.customerId === customer.id) select (history)).toSeq
   }
 
   //
