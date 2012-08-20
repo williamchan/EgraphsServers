@@ -14,7 +14,7 @@ import java.sql.Timestamp
 
 class UsernameHistoryStore @Inject() (
   schema: Schema
-) extends SavesWithStringKey[UsernameHistory] with SavesCreatedUpdatedAll[String, UsernameHistory]
+) extends SavesWithStringKey[UsernameHistory] with SavesCreatedUpdated[String, UsernameHistory]
 {
   import org.squeryl.PrimitiveTypeMode._
 
@@ -42,7 +42,7 @@ class UsernameHistoryStore @Inject() (
   }
 
   //
-  // SavesCreatedUpdated[UsernameHistory] methods
+  // SavesCreatedUpdated[Long,UsernameHistory] methods
   //
   override def withCreatedUpdated(toUpdate: UsernameHistory, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)

@@ -41,7 +41,7 @@ case class VBGFinishEnrollTransaction(id: Long = 0,
 
 }
 
-class VBGFinishEnrollTransactionStore @Inject()(schema: Schema) extends SavesWithLongKey[VBGFinishEnrollTransaction] with SavesCreatedUpdated[VBGFinishEnrollTransaction] {
+class VBGFinishEnrollTransactionStore @Inject()(schema: Schema) extends SavesWithLongKey[VBGFinishEnrollTransaction] with SavesCreatedUpdated[Long,VBGFinishEnrollTransaction] {
 
   //
   // SavesWithLongKey[VBGFinishEnrollTransaction] methods
@@ -59,7 +59,7 @@ class VBGFinishEnrollTransactionStore @Inject()(schema: Schema) extends SavesWit
   }
 
   //
-  // SavesCreatedUpdated[VBGFinishEnrollTransaction] methods
+  // SavesCreatedUpdated[Long,VBGFinishEnrollTransaction] methods
   //
   override def withCreatedUpdated(toUpdate: VBGFinishEnrollTransaction, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

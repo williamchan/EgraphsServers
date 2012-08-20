@@ -49,7 +49,7 @@ case class XyzmoAddUser(id: Long = 0,
 
 }
 
-class XyzmoAddUserStore @Inject()(schema: Schema) extends SavesWithLongKey[XyzmoAddUser] with SavesCreatedUpdated[XyzmoAddUser] {
+class XyzmoAddUserStore @Inject()(schema: Schema) extends SavesWithLongKey[XyzmoAddUser] with SavesCreatedUpdated[Long,XyzmoAddUser] {
 
   //
   // SavesWithLongKey[XyzmoAddUser] methods
@@ -68,7 +68,7 @@ class XyzmoAddUserStore @Inject()(schema: Schema) extends SavesWithLongKey[Xyzmo
   }
 
   //
-  // SavesCreatedUpdated[XyzmoAddUser] methods
+  // SavesCreatedUpdated[Long,XyzmoAddUser] methods
   //
   override def withCreatedUpdated(toUpdate: XyzmoAddUser, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

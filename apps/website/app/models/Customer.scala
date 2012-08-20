@@ -145,7 +145,7 @@ class CustomerStore @Inject() (
   accountStore: AccountStore,
   customerServices: Provider[CustomerServices],
   accountServices: Provider[AccountServices]
-) extends SavesWithLongKey[Customer] with SavesCreatedUpdated[Customer]
+) extends SavesWithLongKey[Customer] with SavesCreatedUpdated[Long,Customer]
 {
   import org.squeryl.PrimitiveTypeMode._
 
@@ -212,7 +212,7 @@ class CustomerStore @Inject() (
   }
 
   //
-  // SavesCreatedUpdated[Customer] methods
+  // SavesCreatedUpdated[Long,Customer] methods
   //
   override def withCreatedUpdated(toUpdate: Customer, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)

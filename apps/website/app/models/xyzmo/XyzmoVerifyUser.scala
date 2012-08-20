@@ -70,7 +70,7 @@ case class XyzmoVerifyUser(id: Long = 0,
 
 }
 
-class XyzmoVerifyUserStore @Inject()(schema: Schema) extends SavesWithLongKey[XyzmoVerifyUser] with SavesCreatedUpdated[XyzmoVerifyUser] {
+class XyzmoVerifyUserStore @Inject()(schema: Schema) extends SavesWithLongKey[XyzmoVerifyUser] with SavesCreatedUpdated[Long,XyzmoVerifyUser] {
 
   def findByEgraph(egraph: Egraph): Option[XyzmoVerifyUser] = {
     from(schema.xyzmoVerifyUserTable)(xyzmoVerifyUser =>
@@ -98,7 +98,7 @@ class XyzmoVerifyUserStore @Inject()(schema: Schema) extends SavesWithLongKey[Xy
   }
 
   //
-  // SavesCreatedUpdated[XyzmoVerifyUser] methods
+  // SavesCreatedUpdated[Long,XyzmoVerifyUser] methods
   //
   override def withCreatedUpdated(toUpdate: XyzmoVerifyUser, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

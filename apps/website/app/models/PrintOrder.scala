@@ -75,7 +75,7 @@ object PrintOrder {
   val defaultPngWidth = 2446         // 2446 seems to work well for physical prints
 }
 
-class PrintOrderStore @Inject() (schema: Schema) extends SavesWithLongKey[PrintOrder] with SavesCreatedUpdated[PrintOrder] {
+class PrintOrderStore @Inject() (schema: Schema) extends SavesWithLongKey[PrintOrder] with SavesCreatedUpdated[Long,PrintOrder] {
   import org.squeryl.PrimitiveTypeMode._
 
   def findByOrderId(orderId: Long): Query[PrintOrder] = {
@@ -125,7 +125,7 @@ class PrintOrderStore @Inject() (schema: Schema) extends SavesWithLongKey[PrintO
     )
   }
   //
-  // SavesCreatedUpdated[PrintOrder] methods
+  // SavesCreatedUpdated[Long,PrintOrder] methods
   //
   override def withCreatedUpdated(toUpdate: PrintOrder, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)

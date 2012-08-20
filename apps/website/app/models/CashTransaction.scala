@@ -72,7 +72,7 @@ case class CashTransaction(
   }
 }
 
-class CashTransactionStore @Inject() (schema: Schema) extends SavesWithLongKey[CashTransaction] with SavesCreatedUpdated[CashTransaction] {
+class CashTransactionStore @Inject() (schema: Schema) extends SavesWithLongKey[CashTransaction] with SavesCreatedUpdated[Long,CashTransaction] {
 
   def findByOrderId(orderId: Long): Query[CashTransaction] = {
     from(schema.cashTransactions)(txn =>
@@ -89,7 +89,7 @@ class CashTransactionStore @Inject() (schema: Schema) extends SavesWithLongKey[C
   }
 
   //
-  // SavesCreatedUpdated[CashTransaction] members
+  // SavesCreatedUpdated[Long,CashTransaction] members
   //
   override protected def withCreatedUpdated(toUpdate: CashTransaction, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)

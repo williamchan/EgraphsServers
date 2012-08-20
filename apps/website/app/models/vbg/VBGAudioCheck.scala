@@ -42,7 +42,7 @@ case class VBGAudioCheck(id: Long = 0,
 
 }
 
-class VBGAudioCheckStore @Inject()(schema: Schema) extends SavesWithLongKey[VBGAudioCheck] with SavesCreatedUpdated[VBGAudioCheck] {
+class VBGAudioCheckStore @Inject()(schema: Schema) extends SavesWithLongKey[VBGAudioCheck] with SavesCreatedUpdated[Long,VBGAudioCheck] {
 
   //
   // SavesWithLongKey[VBGAudioCheck] methods
@@ -61,7 +61,7 @@ class VBGAudioCheckStore @Inject()(schema: Schema) extends SavesWithLongKey[VBGA
   }
 
   //
-  // SavesCreatedUpdated[VBGAudioCheck] methods
+  // SavesCreatedUpdated[Long,VBGAudioCheck] methods
   //
   override def withCreatedUpdated(toUpdate: VBGAudioCheck, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

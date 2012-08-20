@@ -42,7 +42,7 @@ case class VBGEnrollUser(id: Long = 0,
 
 }
 
-class VBGEnrollUserStore @Inject()(schema: Schema) extends SavesWithLongKey[VBGEnrollUser] with SavesCreatedUpdated[VBGEnrollUser] {
+class VBGEnrollUserStore @Inject()(schema: Schema) extends SavesWithLongKey[VBGEnrollUser] with SavesCreatedUpdated[Long,VBGEnrollUser] {
 
   def findByEnrollmentBatch(enrollmentBatch: EnrollmentBatch): Option[VBGEnrollUser] = {
     from(schema.vbgEnrollUserTable)(vbgEnrollUser =>
@@ -68,7 +68,7 @@ class VBGEnrollUserStore @Inject()(schema: Schema) extends SavesWithLongKey[VBGE
   }
 
   //
-  // SavesCreatedUpdated[VBGEnrollUser] methods
+  // SavesCreatedUpdated[Long,VBGEnrollUser] methods
   //
   override def withCreatedUpdated(toUpdate: VBGEnrollUser, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

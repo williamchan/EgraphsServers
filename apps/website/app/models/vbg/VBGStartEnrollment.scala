@@ -41,7 +41,7 @@ case class VBGStartEnrollment(id: Long = 0,
 
 }
 
-class VBGStartEnrollmentStore @Inject()(schema: Schema) extends SavesWithLongKey[VBGStartEnrollment] with SavesCreatedUpdated[VBGStartEnrollment] {
+class VBGStartEnrollmentStore @Inject()(schema: Schema) extends SavesWithLongKey[VBGStartEnrollment] with SavesCreatedUpdated[Long,VBGStartEnrollment] {
 
   //
   // SavesWithLongKey[VBGStartEnrollment] methods
@@ -59,7 +59,7 @@ class VBGStartEnrollmentStore @Inject()(schema: Schema) extends SavesWithLongKey
   }
 
   //
-  // SavesCreatedUpdated[VBGStartEnrollment] methods
+  // SavesCreatedUpdated[Long,VBGStartEnrollment] methods
   //
   override def withCreatedUpdated(toUpdate: VBGStartEnrollment, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

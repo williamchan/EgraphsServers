@@ -77,7 +77,7 @@ object EnrollmentSample {
   }
 }
 
-class EnrollmentSampleStore @Inject()(schema: Schema) extends SavesWithLongKey[EnrollmentSample] with SavesCreatedUpdated[EnrollmentSample] {
+class EnrollmentSampleStore @Inject()(schema: Schema) extends SavesWithLongKey[EnrollmentSample] with SavesCreatedUpdated[Long,EnrollmentSample] {
   import org.squeryl.PrimitiveTypeMode._
 
   //
@@ -94,7 +94,7 @@ class EnrollmentSampleStore @Inject()(schema: Schema) extends SavesWithLongKey[E
   }
 
   //
-  // SavesCreatedUpdated[EnrollmentSample] methods
+  // SavesCreatedUpdated[Long,EnrollmentSample] methods
   //
   override def withCreatedUpdated(toUpdate: EnrollmentSample, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

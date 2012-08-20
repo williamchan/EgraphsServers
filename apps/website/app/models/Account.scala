@@ -147,7 +147,7 @@ object Account {
  */
 case class AccountServices @Inject() (accountStore: AccountStore, customerStore: CustomerStore, addressStore: AddressStore)
 
-class AccountStore @Inject() (schema: Schema) extends SavesWithLongKey[Account] with SavesCreatedUpdated[Account] {
+class AccountStore @Inject() (schema: Schema) extends SavesWithLongKey[Account] with SavesCreatedUpdated[Long,Account] {
   import org.squeryl.PrimitiveTypeMode._
 
   def authenticate(email: String, passwordAttempt: String): Either[AccountAuthenticationError, Account] = {
@@ -236,7 +236,7 @@ class AccountStore @Inject() (schema: Schema) extends SavesWithLongKey[Account] 
   }
 
   //
-  // SavesCreatedUpdated[Account] methods
+  // SavesCreatedUpdated[Long,Account] methods
   //
   override protected def withCreatedUpdated(toUpdate: Account,
                                             created: Timestamp,

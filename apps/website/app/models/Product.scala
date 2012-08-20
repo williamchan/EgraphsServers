@@ -353,7 +353,7 @@ object Product {
   }
 }
 
-class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: InventoryBatchQueryFilters) extends SavesWithLongKey[Product] with SavesCreatedUpdated[Product] {
+class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: InventoryBatchQueryFilters) extends SavesWithLongKey[Product] with SavesCreatedUpdated[Long,Product] {
   import org.squeryl.PrimitiveTypeMode._
 
   //
@@ -433,7 +433,7 @@ class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: Invent
   }
 
   //
-  // SavesCreatedUpdated[Product] methods
+  // SavesCreatedUpdated[Long,Product] methods
   //
   override def withCreatedUpdated(toUpdate: Product, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)

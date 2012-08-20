@@ -59,7 +59,7 @@ case class InventoryBatch(
 
 }
 
-class InventoryBatchStore @Inject()(schema: Schema, orderStore: OrderStore, inventoryBatchQueryFilters: InventoryBatchQueryFilters) extends SavesWithLongKey[InventoryBatch] with SavesCreatedUpdated[InventoryBatch] {
+class InventoryBatchStore @Inject()(schema: Schema, orderStore: OrderStore, inventoryBatchQueryFilters: InventoryBatchQueryFilters) extends SavesWithLongKey[InventoryBatch] with SavesCreatedUpdated[Long,InventoryBatch] {
 
   def findByCelebrity(celebrityId: Long, filters: FilterOneTable[InventoryBatch]*): Query[InventoryBatch] = {
     from(schema.inventoryBatches)((inventoryBatch) =>

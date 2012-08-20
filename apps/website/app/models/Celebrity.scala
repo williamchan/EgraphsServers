@@ -334,7 +334,7 @@ object Celebrity {
   }
 }
 
-class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebrity] with SavesCreatedUpdated[Celebrity] {
+class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebrity] with SavesCreatedUpdated[Long,Celebrity] {
   import org.squeryl.PrimitiveTypeMode._
 
   //
@@ -454,7 +454,7 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
   }
 
   //
-  // SavesCreatedUpdated[Celebrity] methods
+  // SavesCreatedUpdated[Long,Celebrity] methods
   //
   override def withCreatedUpdated(toUpdate: Celebrity, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

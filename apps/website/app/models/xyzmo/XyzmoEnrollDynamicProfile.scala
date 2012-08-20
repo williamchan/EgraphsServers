@@ -112,7 +112,7 @@ case class XyzmoEnrollDynamicProfile(id: Long = 0,
 
 }
 
-class XyzmoEnrollDynamicProfileStore @Inject()(schema: Schema) extends SavesWithLongKey[XyzmoEnrollDynamicProfile] with SavesCreatedUpdated[XyzmoEnrollDynamicProfile] {
+class XyzmoEnrollDynamicProfileStore @Inject()(schema: Schema) extends SavesWithLongKey[XyzmoEnrollDynamicProfile] with SavesCreatedUpdated[Long,XyzmoEnrollDynamicProfile] {
 
   def findByEnrollmentBatch(enrollmentBatch: EnrollmentBatch): Option[XyzmoEnrollDynamicProfile] = {
     from(schema.xyzmoEnrollDynamicProfileTable)(xyzmoEnrollDynamicProfile =>
@@ -143,7 +143,7 @@ class XyzmoEnrollDynamicProfileStore @Inject()(schema: Schema) extends SavesWith
   }
 
   //
-  // SavesCreatedUpdated[XyzmoEnrollDynamicProfile] methods
+  // SavesCreatedUpdated[Long,XyzmoEnrollDynamicProfile] methods
   //
   override def withCreatedUpdated(toUpdate: XyzmoEnrollDynamicProfile, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

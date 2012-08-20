@@ -41,7 +41,7 @@ case class VBGStartVerification(id: Long = 0,
 
 }
 
-class VBGStartVerificationStore @Inject()(schema: Schema) extends SavesWithLongKey[VBGStartVerification] with SavesCreatedUpdated[VBGStartVerification] {
+class VBGStartVerificationStore @Inject()(schema: Schema) extends SavesWithLongKey[VBGStartVerification] with SavesCreatedUpdated[Long,VBGStartVerification] {
 
   //
   // SavesWithLongKey[VBGStartVerification] methods
@@ -59,7 +59,7 @@ class VBGStartVerificationStore @Inject()(schema: Schema) extends SavesWithLongK
   }
 
   //
-  // SavesCreatedUpdated[VBGStartVerification] methods
+  // SavesCreatedUpdated[Long,VBGStartVerification] methods
   //
   override def withCreatedUpdated(toUpdate: VBGStartVerification, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

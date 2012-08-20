@@ -34,7 +34,7 @@ case class Administrator(
 
 case class AdministratorServices @Inject()(store: AdministratorStore, accountStore: AccountStore)
 
-class AdministratorStore @Inject()(schema: Schema, accountStore: AccountStore) extends SavesWithLongKey[Administrator] with SavesCreatedUpdated[Administrator] {
+class AdministratorStore @Inject()(schema: Schema, accountStore: AccountStore) extends SavesWithLongKey[Administrator] with SavesCreatedUpdated[Long,Administrator] {
   import org.squeryl.PrimitiveTypeMode._
 
   def isAdmin(adminId: Option[Long]): Boolean = {
@@ -82,7 +82,7 @@ class AdministratorStore @Inject()(schema: Schema, accountStore: AccountStore) e
   }
 
   //
-  // SavesCreatedUpdated[Administrator] methods
+  // SavesCreatedUpdated[Long,Administrator] methods
   //
   override def withCreatedUpdated(toUpdate: Administrator, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)

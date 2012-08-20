@@ -39,7 +39,7 @@ case class Address(id: Long = 0,
   override def unapplied = Address.unapply(this)
 }
 
-class AddressStore @Inject()(schema: Schema) extends SavesWithLongKey[Address] with SavesCreatedUpdated[Address] {
+class AddressStore @Inject()(schema: Schema) extends SavesWithLongKey[Address] with SavesCreatedUpdated[Long,Address] {
   import org.squeryl.PrimitiveTypeMode._
 
   //
@@ -69,7 +69,7 @@ class AddressStore @Inject()(schema: Schema) extends SavesWithLongKey[Address] w
   }
 
   //
-  // SavesCreatedUpdated[Address] methods
+  // SavesCreatedUpdated[Long,Address] methods
   //
   override def withCreatedUpdated(toUpdate: Address, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

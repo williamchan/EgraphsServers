@@ -26,18 +26,13 @@ trait HasCreatedUpdated {
   }
 }
 
-//TODO: Remove this before checkin
-trait SavesCreatedUpdated[T <: KeyedCaseClass[Long] with HasCreatedUpdated] extends SavesCreatedUpdatedAll[Long, T] {
-  this: Saves[Long, T] =>
-}
-
 /**
  * Mix into an object that you want to handle saving of objects with created and updated fields
  * (usually this will be the companion object of some case class)
  *
  * See [[models.Account]] for an example.
  */
-trait SavesCreatedUpdatedAll[KeyT, T <: KeyedCaseClass[KeyT] with HasCreatedUpdated] {
+trait SavesCreatedUpdated[KeyT, T <: KeyedCaseClass[KeyT] with HasCreatedUpdated] {
   this: Saves[KeyT, T] =>
 
   //

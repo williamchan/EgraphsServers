@@ -22,7 +22,7 @@ case class FailedPurchaseData(
 
 case class FailedPurchaseDataServices @Inject()(store: FailedPurchaseDataStore)
 
-class FailedPurchaseDataStore @Inject()(schema: Schema) extends SavesWithLongKey[FailedPurchaseData] with SavesCreatedUpdated[FailedPurchaseData] {
+class FailedPurchaseDataStore @Inject()(schema: Schema) extends SavesWithLongKey[FailedPurchaseData] with SavesCreatedUpdated[Long,FailedPurchaseData] {
   import org.squeryl.PrimitiveTypeMode._
 
   //

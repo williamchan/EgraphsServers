@@ -327,7 +327,7 @@ case class FulfilledOrder(order: Order, egraph: Egraph)
 /** Thin semantic wrapper around a tuple for product order and egraph */
 case class FulfilledProductOrder(product: Product, order:Order, egraph: Egraph)
 
-class OrderStore @Inject() (schema: Schema) extends SavesWithLongKey[Order] with SavesCreatedUpdated[Order] {
+class OrderStore @Inject() (schema: Schema) extends SavesWithLongKey[Order] with SavesCreatedUpdated[Long,Order] {
   import org.squeryl.PrimitiveTypeMode._
   //
   // Public methods
@@ -485,7 +485,7 @@ class OrderStore @Inject() (schema: Schema) extends SavesWithLongKey[Order] with
     )
   }
   //
-  // SavesCreatedUpdated[Order] methods
+  // SavesCreatedUpdated[Long,Order] methods
   //
   override def withCreatedUpdated(toUpdate: Order, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)
