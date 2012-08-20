@@ -1,8 +1,9 @@
 package services.db
 
 import org.squeryl.{KeyedEntity,Table}
-import org.squeryl.dsl.ast.{EqualityExpression, UpdateAssignment}
+import org.squeryl.dsl.ast.{LogicalBoolean, EqualityExpression, UpdateAssignment}
 import org.squeryl.PrimitiveTypeMode._
+import sun.security.krb5.internal.ktab.KeyTab
 
 /**
  * Gives an object the ability to save instances of the associated type, eg Person.save(personInstance).
@@ -49,8 +50,12 @@ import org.squeryl.PrimitiveTypeMode._
  * }}}
  */
 
-//This becomes saves long
+//TODO: This becomes saves long
 trait Saves[T <: KeyedEntity[Long]] extends SavesAll[Long, T] {
+  override protected final def keysEqual(id: Long, otherId: Long): LogicalBoolean = {
+    id === otherId
+  }
+
   override final def save(toSave: T): T = {
     toSave.id match {
       case n if n <= 0 =>
@@ -60,19 +65,23 @@ trait Saves[T <: KeyedEntity[Long]] extends SavesAll[Long, T] {
         updateTable(toSave)
     }
   }
+}
 
-  private def insert(toInsert: T): T = {
-    table.insert(performTransforms(preInsertOrUpdateTransforms, toInsert))
+trait SavesStringKey[T <: KeyedEntity[String]] extends SavesAll[String, T] {
+  override protected final def keysEqual(id: String, otherId: String): LogicalBoolean = {
+    id === otherId
   }
 
-  private def updateTable(toUpdate: T): T = {
-    val finalEntity = performTransforms(preInsertOrUpdateTransforms, toUpdate)
-    update(table)(row =>
-      where((row.id) === finalEntity.id)
-        set (defineUpdate(row, finalEntity): _*)
-    )
+  override final def save(toSave: T): T = {
+    val maybeSaved = findById(toSave.id)
 
-    finalEntity
+    maybeSaved match {
+      case None =>
+        insert(toSave)
+
+      case _ =>
+        updateTable(toSave)
+    }
   }
 }
 
@@ -88,8 +97,6 @@ trait SavesAll[KeyT, T <: KeyedEntity[KeyT]] {
    * Defines how to update an old row in the database with the new one, using the syntax
    * that usually appears in a Squeryl set() clause. Usually this will be just a matter of taking
    * all the persisted properties and setting them.
-   *
-   * Note: Every KeyedCaseClass will need to override defineUpdate until SQueryL manual mutation of KeyedEntity.
    *
    * For example:
    * {{{
@@ -133,9 +140,7 @@ trait SavesAll[KeyT, T <: KeyedEntity[KeyT]] {
    *
    * @return the final object that was saved, after all transforms
    */
-  def save(toSave: T): T = {
-    insertOrUpdate(toSave)
-  }
+  def save(toSave: T): T
 
   /**
    * Locates an object by its id.
@@ -144,14 +149,8 @@ trait SavesAll[KeyT, T <: KeyedEntity[KeyT]] {
    *
    * @return the located object or None
    */
-  def findById(id: KeyT): Option[T] = {
-    id match {
-      case i : Long =>
-        from(table)(row => where(row.id.asInstanceOf[Long] === i) select (row)).headOption
-      case s : String =>
-        from(table)(row => where(row.id.asInstanceOf[String] === s) select (row)).headOption
-      case _ => None
-    }
+  def findById(id: KeyT): Option[T]= {
+    from(table)(row => where(keysEqual(row.id, id)) select (row)).headOption
   }
 
   /**
@@ -171,6 +170,8 @@ trait SavesAll[KeyT, T <: KeyedEntity[KeyT]] {
     )
   }
 
+  protected def keysEqual(id: KeyT, otherId: KeyT): LogicalBoolean
+
   /**
    * Hook to provide an entity transform that will be applied before inserting or updating any
    * new object.
@@ -184,25 +185,27 @@ trait SavesAll[KeyT, T <: KeyedEntity[KeyT]] {
   //
   // Private API
   //
-  private[db] var preInsertOrUpdateTransforms = Vector.empty[(T) => T]
+  private var preInsertOrUpdateTransforms = Vector.empty[(T) => T]
 
-  private def insertOrUpdate(toUpsert: T): T = {
-//    table.insert(performTransforms(preInsertOrUpdateTransforms, toUpsert))
+  protected def insertOrUpdate(toUpsert: T): T = {
     table.insertOrUpdate(performTransforms(preInsertOrUpdateTransforms, toUpsert))
   }
 
-  //TODO: don't let me commit with this commented
-//  private def updateTable(toUpdate: T): T = {
-//    val finalEntity = performTransforms(preUpdateTransforms, toUpdate)
-//    update(table)(row =>
-//      where((row.id) === finalEntity.id)
-//        set (defineUpdate(row, finalEntity): _*)
-//    )
-//
-//    finalEntity
-//  }
+  protected def insert(toInsert: T): T = {
+    table.insert(performTransforms(preInsertOrUpdateTransforms, toInsert))
+  }
 
-  private[db] def performTransforms(transforms: Seq[(T) => T], entityToTransform: T): T = {
+  protected def updateTable(toUpdate: T): T = {
+    val finalEntity = performTransforms(preInsertOrUpdateTransforms, toUpdate)
+    update(table)(row =>
+      where(keysEqual((row.id), finalEntity.id))
+        set (defineUpdate(row, finalEntity): _*)
+    )
+
+    finalEntity
+  }
+
+  private def performTransforms(transforms: Seq[(T) => T], entityToTransform: T): T = {
     transforms.foldLeft(entityToTransform)((currEntity, nextTransform) => nextTransform(currEntity))
   }
 }

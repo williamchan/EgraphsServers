@@ -10,8 +10,8 @@ import utils._
 
 class CelebrityTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with SavingEntityTests[Celebrity]
-  with CreatedUpdatedEntityTests[Celebrity]
+  with SavingEntityIdLongTests[Celebrity]
+  with CreatedUpdatedEntityTests[Long, Celebrity]
   with DBTransactionPerTest
   with HasPublishedStatusTests[Celebrity]
 {

@@ -1,7 +1,7 @@
 package models
 
 import com.google.inject.{Provider, Inject}
-import services.db.{SavesAll, Saves, Schema}
+import services.db.{SavesStringKey, SavesAll, Saves, Schema}
 import java.sql.Timestamp
 
 /**
@@ -14,7 +14,7 @@ import java.sql.Timestamp
 
 class UsernameHistoryStore @Inject() (
   schema: Schema
-) extends SavesAll[String, UsernameHistory] with SavesCreatedUpdatedAll[String, UsernameHistory]
+) extends SavesStringKey[UsernameHistory] with SavesCreatedUpdatedAll[String, UsernameHistory]
 {
   import org.squeryl.PrimitiveTypeMode._
 
@@ -23,13 +23,13 @@ class UsernameHistoryStore @Inject() (
   //
 
   def findByUsername(username: String): Seq[UsernameHistory] = {
-    from(schema.usernameHistory)((history) => where(lower(history.username) === username.toLowerCase) select (history)).toSeq
+    from(schema.usernameHistories)((history) => where(lower(history.username) === username.toLowerCase) select (history)).toSeq
   }
 
   //
   // Saves[UsernameHistory] methods
   //
-  override val table = schema.usernameHistory
+  override val table = schema.usernameHistories
 
   override def defineUpdate(theOld: UsernameHistory, theNew: UsernameHistory) = {
     updateIs(

@@ -50,6 +50,22 @@ case class Account(
     Customer(name = name, username=username)
   }
 
+  /**
+   * Creates a UsernameHistory with a default username based on the Account's email. Throws an exception if username is defined.
+   *
+   * @return newly created Customer
+   */
+  def createUsername(): UsernameHistory = {
+    var username = email.split("@").head
+    //Check if username already taken. append random digits until its unique.
+
+    val rnd = new scala.util.Random
+    while(services.customerStore.findByUsername(username).exists(p => true)) {
+      username = username + rnd.nextInt(9).toString
+    }
+    UsernameHistory(id = username)
+  }
+
   def password: Option[Password] = {
     (passwordHash, passwordSalt) match {
       case (Some(""), Some("")) => None

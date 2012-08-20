@@ -7,8 +7,8 @@ import models.{EnrollmentBatch, Celebrity}
 
 class XyzmoDeleteUserTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with SavingEntityTests[XyzmoDeleteUser]
-  with CreatedUpdatedEntityTests[XyzmoDeleteUser]
+  with SavingEntityIdLongTests[XyzmoDeleteUser]
+  with CreatedUpdatedEntityTests[Long, XyzmoDeleteUser]
   with DBTransactionPerTest {
   //
   // SavingEntityTests[XyzmoDeleteUser] methods

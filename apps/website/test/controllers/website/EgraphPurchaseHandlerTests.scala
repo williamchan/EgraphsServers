@@ -23,9 +23,9 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheAndBlob
   payment.bootstrap()
 
   private val recipientName = "My Recipient"
-  private val recipientEmail = "recipient@egraphs.com"
+  private val recipientEmail = TestData.generateEmail(prefix = "recipient")
   private val buyerName = "My Buyer"
-  private val buyerEmail = "buyer@egraphs.com"
+  private val buyerEmail = TestData.generateEmail(prefix = "buyer")
 
   it should "create Order and CashTransaction for a digital-only purchase" in {
     val orderFromHandler = executePurchaseHandler()
@@ -126,7 +126,7 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheAndBlob
       (product.celebrity, product)
     }
 
-    val purchaseHandler: EgraphPurchaseHandler = EgraphPurchaseHandler(
+    val purchaseHandler = EgraphPurchaseHandler(
       recipientName = recipientName,
       recipientEmail = recipientEmail,
       buyerName = buyerName,
@@ -145,7 +145,7 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheAndBlob
 
     val result = purchaseHandler.performPurchase()
     result.fold(
-      error => throw new Exception("Performing purchase failed."),
+      error => throw new Exception("Performing purchase failed. " + error),
       order => order
     )
   }

@@ -6,8 +6,8 @@ import utils._
 
 class CashTransactionTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with SavingEntityTests[CashTransaction]
-  with CreatedUpdatedEntityTests[CashTransaction]
+  with SavingEntityIdLongTests[CashTransaction]
+  with CreatedUpdatedEntityTests[Long, CashTransaction]
   with DBTransactionPerTest
 {
   val store = AppConfig.instance[CashTransactionStore]

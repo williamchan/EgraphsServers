@@ -8,8 +8,8 @@ import java.awt.image.BufferedImage
 
 class EgraphTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with SavingEntityTests[Egraph]
-  with CreatedUpdatedEntityTests[Egraph]
+  with SavingEntityIdLongTests[Egraph]
+  with CreatedUpdatedEntityTests[Long, Egraph]
   with DBTransactionPerTest
 {
   private val store = AppConfig.instance[EgraphStore]

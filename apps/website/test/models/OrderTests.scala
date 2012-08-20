@@ -9,8 +9,8 @@ import javax.mail.internet.InternetAddress
 
 class OrderTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with SavingEntityTests[Order]
-  with CreatedUpdatedEntityTests[Order]
+  with SavingEntityIdLongTests[Order]
+  with CreatedUpdatedEntityTests[Long, Order]
   with DBTransactionPerTest
 {
   private val orderStore = AppConfig.instance[OrderStore]

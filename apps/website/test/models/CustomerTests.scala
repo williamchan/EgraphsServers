@@ -7,8 +7,8 @@ import exception.InsufficientInventoryException
 
 class CustomerTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with SavingEntityTests[Customer]
-  with CreatedUpdatedEntityTests[Customer]
+  with SavingEntityIdLongTests[Customer]
+  with CreatedUpdatedEntityTests[Long, Customer]
   with DBTransactionPerTest
 {
   val customerStore = AppConfig.instance[CustomerStore]

@@ -151,8 +151,8 @@ class AccountTests extends EgraphsUnitTest
 
 class AccountStoreTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with SavingEntityTests[Account]
-  with CreatedUpdatedEntityTests[Account]
+  with SavingEntityIdLongTests[Account]
+  with CreatedUpdatedEntityTests[Long, Account]
   with DBTransactionPerTest
   with AccountTestHelpers
 {

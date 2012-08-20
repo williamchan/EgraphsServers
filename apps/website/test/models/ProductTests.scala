@@ -8,8 +8,8 @@ import java.awt.image.BufferedImage
 
 class ProductTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with SavingEntityTests[Product]
-  with CreatedUpdatedEntityTests[Product]
+  with SavingEntityIdLongTests[Product]
+  with CreatedUpdatedEntityTests[Long, Product]
   with DBTransactionPerTest
   with HasPublishedStatusTests[Product]
 {

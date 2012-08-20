@@ -36,6 +36,8 @@ object TestData {
     prefix + getTimeInBlobstoreFormat + randomInt + "@" + domain
   }
 
+  def generateUsername(): String = {RandomStringUtils.randomAlphabetic(30)}
+
   def generateFullname(): String = {
     RandomStringUtils.randomAlphabetic(10) + " " + RandomStringUtils.randomAlphabetic(10)
   }
@@ -73,6 +75,7 @@ object TestData {
   def newSavedCustomer(): Customer = {
     val account = Account(email = generateEmail(prefix = "customer-")).withPassword(defaultPassword).right.get.save()
     val customer = account.createCustomer(name = "Test Customer").save()
+    account.createUsername().copy(customerId = customer.id).save()
     account.copy(customerId = Some(customer.id)).save()
     customer
   }

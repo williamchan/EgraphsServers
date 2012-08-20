@@ -4,8 +4,8 @@ import utils._
 import services.AppConfig
 
 class InventoryBatchTests extends EgraphsUnitTest
-  with SavingEntityTests[InventoryBatch]
-  with CreatedUpdatedEntityTests[InventoryBatch]
+  with SavingEntityIdLongTests[InventoryBatch]
+  with CreatedUpdatedEntityTests[Long, InventoryBatch]
   with DBTransactionPerTest {
   private val inventoryBatchStore = AppConfig.instance[InventoryBatchStore]
   private val inventoryBatchQueryFilters = AppConfig.instance[InventoryBatchQueryFilters]

@@ -6,8 +6,8 @@ import services.AppConfig
 
 class EnrollmentBatchTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with SavingEntityTests[EnrollmentBatch]
-  with CreatedUpdatedEntityTests[EnrollmentBatch]
+  with SavingEntityIdLongTests[EnrollmentBatch]
+  with CreatedUpdatedEntityTests[Long, EnrollmentBatch]
   with DBTransactionPerTest {
 
   val store = AppConfig.instance[EnrollmentBatchStore]

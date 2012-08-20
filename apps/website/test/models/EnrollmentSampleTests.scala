@@ -9,8 +9,8 @@ import play.Play
 
 class EnrollmentSampleTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with SavingEntityTests[EnrollmentSample]
-  with CreatedUpdatedEntityTests[EnrollmentSample]
+  with SavingEntityIdLongTests[EnrollmentSample]
+  with CreatedUpdatedEntityTests[Long, EnrollmentSample]
   with DBTransactionPerTest {
   //
   // SavingEntityTests[EnrollmentSample] methods

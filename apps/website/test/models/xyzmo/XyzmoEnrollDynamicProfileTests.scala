@@ -7,8 +7,8 @@ import models.{EnrollmentBatch, Celebrity}
 
 class XyzmoEnrollDynamicProfileTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with SavingEntityTests[XyzmoEnrollDynamicProfile]
-  with CreatedUpdatedEntityTests[XyzmoEnrollDynamicProfile]
+  with SavingEntityIdLongTests[XyzmoEnrollDynamicProfile]
+  with CreatedUpdatedEntityTests[Long, XyzmoEnrollDynamicProfile]
   with DBTransactionPerTest {
   //
   // SavingEntityTests[XyzmoEnrollDynamicProfile] methods

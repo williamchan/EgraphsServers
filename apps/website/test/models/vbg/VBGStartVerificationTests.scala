@@ -6,8 +6,8 @@ import models.Egraph
 
 class VBGStartVerificationTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with SavingEntityTests[VBGStartVerification]
-  with CreatedUpdatedEntityTests[VBGStartVerification]
+  with SavingEntityIdLongTests[VBGStartVerification]
+  with CreatedUpdatedEntityTests[Long, VBGStartVerification]
   with DBTransactionPerTest {
   //
   // SavingEntityTests[VBGStartVerification] methods

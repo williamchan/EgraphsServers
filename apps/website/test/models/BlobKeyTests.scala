@@ -5,8 +5,8 @@ import utils._
 
 class BlobKeyTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with SavingEntityTests[BlobKey]
-  with CreatedUpdatedEntityTests[BlobKey]
+  with SavingEntityIdLongTests[BlobKey]
+  with CreatedUpdatedEntityTests[Long, BlobKey]
   with DBTransactionPerTest
 {
 

@@ -6,8 +6,8 @@ import models.{EnrollmentBatch, Celebrity}
 
 class VBGFinishEnrollTransactionTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with SavingEntityTests[VBGFinishEnrollTransaction]
-  with CreatedUpdatedEntityTests[VBGFinishEnrollTransaction]
+  with SavingEntityIdLongTests[VBGFinishEnrollTransaction]
+  with CreatedUpdatedEntityTests[Long, VBGFinishEnrollTransaction]
   with DBTransactionPerTest {
   //
   // SavingEntityTests[VBGFinishEnrollTransaction] methods

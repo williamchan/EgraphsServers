@@ -181,8 +181,11 @@ class CustomerStore @Inject() (
       // the face and return it.
       case None =>
         val account = accountOption.getOrElse(Account(email=email, services=accountServices.get))
-        val customer = account.createCustomer(name).save()
+        val unsavedCustomer = account.createCustomer(name)
+        val unsavedUsernameHistory = account.createUsername()
+        val customer = unsavedCustomer.save()
         account.copy(customerId=Some(customer.id)).save()
+        val usernameHistory = unsavedUsernameHistory.copy(customerId=customer.id).save()
         customer
     }
   }

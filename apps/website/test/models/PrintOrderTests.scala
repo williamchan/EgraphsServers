@@ -8,8 +8,8 @@ import Blobs.Conversions._
 
 class PrintOrderTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with SavingEntityTests[PrintOrder]
-  with CreatedUpdatedEntityTests[PrintOrder]
+  with SavingEntityIdLongTests[PrintOrder]
+  with CreatedUpdatedEntityTests[Long, PrintOrder]
   with DBTransactionPerTest {
 
   private val store = AppConfig.instance[PrintOrderStore]

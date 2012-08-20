@@ -10,8 +10,8 @@ import services.Time.{defaultTimestamp, now}
  * Mix this in with test cases for any entity that uses the HasCreatedUpdated
  * and SavesCreatedUpdated to ensure that the behavior is correct
  */
-trait CreatedUpdatedEntityTests[T <: HasCreatedUpdated with KeyedEntity[Long]] {
-  this: UnitFlatSpec with ShouldMatchers with SavingEntityTests[T] =>
+trait CreatedUpdatedEntityTests[KeyT, T <: HasCreatedUpdated with KeyedEntity[KeyT]] {
+  this: UnitFlatSpec with ShouldMatchers with SavingEntityTests[KeyT, T] =>
 
   //
   // Test cases
