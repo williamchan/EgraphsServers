@@ -37,7 +37,7 @@ trait CreatedUpdatedEntityTests[KeyT, T <: HasCreatedUpdated with KeyedEntity[Ke
   "An updated instance" should "have only the 'updated' field altered" in {
     // Set up
     val inserted = saveEntity(newEntity)
-    val sleepDuration = 20L
+    val sleepDuration = 1L
 
     Thread.sleep(sleepDuration)
 
