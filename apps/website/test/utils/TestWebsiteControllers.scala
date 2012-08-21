@@ -15,8 +15,8 @@ import play.mvc.Scope.{Session, Flash}
 import play.mvc.Http.Request
 import play.test.FunctionalTest
 import services.AppConfig
+import services.mvc.celebrity.CatalogStarsQuery
 import services.mvc.{OrderCompleteViewModelFactory, StorefrontBreadcrumbData}
-import services.cache.CacheFactory
 
 /**
  * Injectable version of AllWebsiteEndpoints with configurable session, flash,
@@ -53,12 +53,12 @@ case class TestWebsiteControllers @Inject()(
   val purchaseFormFactory = instance[PurchaseFormFactory]
   val formReaders = instance[FormReaders]
   val formChecks = instance[FormChecks]
-  val cacheFactory = instance[CacheFactory]
   override def request = fakeRequest
   override def params = request.params
   override def session = fakeSession
   override def flash = fakeFlash
   override def printOrderStore = instance[PrintOrderStore]
   override def printOrderQueryFilters = instance[PrintOrderQueryFilters]
+  override def catalogStarsQuery = instance[CatalogStarsQuery]
   override def orderCompleteViewModelFactory = instance[OrderCompleteViewModelFactory]
 }

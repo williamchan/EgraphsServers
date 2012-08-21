@@ -1,5 +1,7 @@
 // The base stylesheet for Egraphs.
 
+@import "site_header.less";
+
 /* !Globals */
 
 /* !Links */
@@ -12,7 +14,6 @@ a, a:link, a:visited {
 		text-decoration: underline; 
 	}
 }
-
 
 .tooltip {
 	&.in {
@@ -191,7 +192,6 @@ button  {
 		span { background-image: url(../images/bg-button-right-facebook.png); }	
 		
 	}
-
 }
 
 .social {
@@ -210,22 +210,9 @@ button  {
             margin-left: 10px;
 
             a {
-                display: block;
-                width: 30px;
-                height: 31px;
-                text-indent: -9999px;
-                overflow: hidden;
-                background: url(../images/bg-sprite-social-icons.png) no-repeat 0 0;
+            	.social-sprite(30px);
+            	display:block;
             }
-
-            a:hover { background-position: 0 -31px; }
-
-            a.twitter { background-position: -30px 0; }
-            a.twitter:hover { background-position: -30px -31px; }
-
-            a.addthis { background-position: -60px 0; }
-            a.addthis:hover { background-position: -60px -62px; }
-
         }
 
         li:first-child { margin-left: 0; }
@@ -358,174 +345,6 @@ button  {
 
 /* !Top */
 
-#top {
-
-    .social {
-      float: right;
-    }
-
-	position: relative;
-	z-index: 1;
-	.box-shadow(0px 2px 4px rgba(0, 0, 0, .15));	
-	background: @offWhite;	
-	padding-top: 2px;
-	padding-bottom: 2px;
-	text-shadow: 0 1px 1px @white;
-	
-	p {
-		font-size: 14px;
-		line-height: 1em;
-		margin-bottom: 0;
-	}
-	
-	a { color: @gray; }
-	a:hover { color: @linkColorHover; }
-	
-	.logo {
-	
-		h1 {
-		
-			width: 175px;
-		
-			a {
-				display: block;
-				height: 70px;
-				text-indent: -9999px;
-				overflow: hidden;
-				background: url(../images/logo.png) no-repeat 0 0;
-			}
-			
-			a:hover { 
-				.opacity(75)
-			}
-		
-		}
-	
-	}
-	
-	.explore {
-	
-		p {
-		
-			border-left: 1px solid @grayVeryLight;
-		
-			a {
-				display: block;
-				line-height: 70px;
-				padding-left: 40px;
-				height: 70px;
-				border-left: 1px solid @white;
-			}
-		
-		}		
-
-	}
-
-	.account {
-	
-		cursor: pointer;
-		
-		float: right;
-		border-left: 1px solid @grayVeryLight;
-		border-right: 1px solid @grayVeryLight;
-		
-		> ul {
-		
-			position: relative;
-			list-style: none;
-			margin: 0;
-			padding: 20px 40px 0 40px;
-			height: 50px;
-			border-left: 1px solid @white;
-			border-right: 1px solid @white;
-			
-			li {			
-				font-size: 12px;
-				line-height: 1.25em;			
-			}
-			
-			li:first-child {
-				a { color: @linkColorHover; }
-				a:hover { color: @gray; }
-			}
-
-			.account-options {
-			
-				> a {					
-					font-weight: 600;
-					font-size: 14px;
-					line-height: 1em;
-					padding-right: 16px;
-					background: url(../images/bg-top-account-arrow.png) no-repeat 100% 50%;					
-				}
-				
-				> a:hover { background-image: url(../images/bg-top-account-arrow-active.png); }
-		
-				ul {
-					
-					display: none;
-					position: absolute;
-					width: 100%;
-					left: 1px;
-					top: 72px;
-					list-style: none;
-					margin: 0;
-					padding: 0;
-					
-					li {
-
-						font-weight: 400;					
-						font-size: 14px;
-						line-height: 1em;
-						text-shadow: none;				
-						border-bottom: 1px solid rgba(255, 255, 255, .25);
-						background: lighten(@orange, 5%);
-						.opacity(90);
-					
-						a {							
-							color: @white;
-							display: block;
-							padding: 10px;							
-						}	
-						
-						a:hover {							
-							color: @white;
-							background-color: darken(@orange, 5%);						
-						}
-						
-					}
-					
-					li:last-child { border-bottom: none; }
-				
-				}
-								
-			}
-			
-			.account-options.active {
-			
-				> a { 
-					color: @orange;
-					background-image: url(../images/bg-top-account-arrow-active.png); 
-				}
-			
-				ul { display: block; }
-			
-			}
-		
-		}					
-		
-	}
-	
-	.account.hover .account-options {
-	
-		> a { 
-			color: @orange;
-			background-image: url(../images/bg-top-account-arrow-active.png); 
-		}
-	
-	}
-
-} // end #top
 
 /* !Banner */
 
@@ -625,7 +444,6 @@ section[role=banner] {
 	.social {
 		
 		ul {
-		
 			float: right;
 			padding: 0;		
 			margin: 0;
@@ -637,22 +455,9 @@ section[role=banner] {
 				margin-left: 10px; 
 				
 				a {
+					.social-sprite(30px);
 					display: block;
-					width: 30px;
-					height: 31px;
-					text-indent: -9999px;
-					overflow: hidden;
-					background: url(../images/bg-sprite-social-icons.png) no-repeat 0 0;
 				}
-
-				a:hover { background-position: 0 -31px; }
-				
-				a.twitter { background-position: -30px 0; }
-				a.twitter:hover { background-position: -30px -31px; }
-			
-				a.addthis { background-position: -60px 0; }
-				a.addthis:hover { background-position: -60px -62px; }
-				
 			}
 			
 			li:first-child { margin-left: 0; }
@@ -665,17 +470,6 @@ section[role=banner] {
 
 /* !Media Queries */
 
-@media (min-width: 1340px) {
-	
-	#top {
-	
-		.logo { margin-left: -20px; }
-	
-		.social { margin-right: -80px; }
-		
-	}
-	
-}
 
 @media (min-width: 1080px) {
 
@@ -697,22 +491,6 @@ section[role=banner] {
 
 }
 
-@media (max-width: 1024px) {
-	
-	#top {
-	
-		.row { margin-left: 0; }
-	
-		.logo {
-			
-			margin-left: 0;
-			padding-right: 0;
-		
-		}
-
-	}
-
-}
 
 @media (min-width: 1024px) {
 	
@@ -765,146 +543,9 @@ section[role=banner] {
 
 }
 
-@media (max-width: 979px) and (min-width: 768px) {
-
-	#top {
-		
-		.explore p a { padding-left: 20px; }
-		
-		.social {
-						
-			> ul {
-				padding-left: 20px;			
-			}
-			
-		}
-		
-		.account > ul {
-		
-			padding-left: 20px;
-			padding-right: 20px;
-		
-		}
-	
-	} // end #top
-
-}
-
 @media (max-width: 767px) {
-
-	#top { 
-			
-		.span3 { float: left; }
-		
-		.span6 { float: right; }
-
-		.explore p a { padding-left: 20px; }
-
-		.account > ul {
-			padding-left: 10px;
-			padding-right: 10px;
-		}
-		
-		.social > ul { padding-left: 10px; }
-		
-	}
 
 	#bottom .social ul { float: none; }
 
 }
 
-@media (max-width: 550px) {
-
-	#top {
-	
-		.explore { display: none; }
-			
-		.account > ul {
-			position: static;
-			
-			.account-options ul {
-				left: 0;
-				top: 100%;
-			}
-			
-		}
-	
-	}
-
-}
-
-@media (max-width: 480px) {
-
-	#top {
-	
-		padding-top: 10px;
-		padding-bottom: 0;
-		
-		.logo h1 {
-			
-			width: 100%;
-			
-			a { background-position: 50% 0; }
-			
-		}
-	
-		.span3,.span6 {
-			float: none;
-			overflow: hidden;
-		}
-	
-		.account {
-		
-			float: left;
-			border: none;
-			
-			> ul {
-			
-				padding-left: 0;
-				padding-right: 0;
-				border: none;
-			
-			}
-			
-		
-		}
-	
-	}
-
-}
-
-@media only screen and (-webkit-min-device-pixel-ratio: 2) { 
-
-	#top {
-	
-		.logo h1 a {		
-			background-image: url(../images/logo-ios.png);
-			background-size: 148px 70px;		
-		}
-
-		.account {
-			
-			> ul {
-	
-				.account-options {
-				
-					> a {
-						background: url(../images/bg-top-account-arrow-ios.png) no-repeat 100% 50%;	
-						background-size: 9px 5px;				
-					}
-									
-				}
-				
-				.account-options.active {
-				
-					> a { background-image: url(../images/bg-top-account-arrow-active-ios.png); }
-								
-				}
-			
-			}					
-			
-		}
-	
-	}
-	
-}

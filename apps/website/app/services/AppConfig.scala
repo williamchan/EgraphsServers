@@ -9,6 +9,7 @@ import mail.{MailProvider, Mail}
 import models._
 import models.vbg._
 import models.xyzmo._
+import mvc.MvcModule
 import payment.PaymentModule
 import signature.SignatureBiometricsModule
 import social.SocialModule
@@ -29,6 +30,7 @@ class AppConfig extends AbstractModule with ScalaModule {
     install(VoiceBiometricsModule)
     install(GraphicsModule)
     install(SocialModule)
+    install(MvcModule)
 
     // Model services
     bind[AccountServices].in[Singleton]

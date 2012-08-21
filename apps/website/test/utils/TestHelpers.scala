@@ -5,10 +5,17 @@ import services.blobs.Blobs
 import play.Play
 import services.AppConfig
 import org.jclouds.blobstore.domain.Blob
+import akka.actor.{Actor, ActorRef}
+import akka.actor.Actor.actorOf
 
 object TestHelpers {
 
   private val blobs = AppConfig.instance[Blobs]
+
+  def putPublicImageOnBlobStore() {
+    import Blobs.Conversions._
+    blobs.put("a/b/derp.jpg", Play.getFile("./test/files/derp.jpg"))
+  }
 
   def fileAsBytes(filename: String): Array[Byte] = {
     Blobs.Conversions.fileToByteArray(Play.getFile(filename))
@@ -28,6 +35,39 @@ object TestHelpers {
   def getBlobFromTestBlobUrl(testBlobUrl: String): Option[Blob] = {
     val blobKey = getBlobKeyFromTestBlobUrl(testBlobUrl)
     blobs.get(blobKey)
+  }
+
+  /**
+   * Convenience method that starts the actor, executes the operation, and stops the actor.
+   */
+  def withActorUnderTest[ActorT <: Actor: Manifest, ResultT]
+  (actorInstance: => ActorT)(operation: ActorRef => ResultT): ResultT =
+  {
+    val actor = actorOf(actorInstance).start()
+
+    executeOperationThenStop(actor)(operation)
+  }
+
+  /**
+   * Convenience method that starts the actor, executes the operation, and stops the actor.
+   */
+  def withActorUnderTest[ActorT <: Actor: Manifest, ResultT]
+  (operation: ActorRef => ResultT): ResultT =
+  {
+    val actor = actorOf[ActorT].start()
+
+    executeOperationThenStop(actor)(operation)
+  }
+
+  private[this] def executeOperationThenStop[ActorT <: Actor: Manifest, ResultT]
+  (actor: ActorRef)(operation: ActorRef => ResultT): ResultT =
+  {
+    try {
+      operation(actor)
+    }
+    finally {
+      actor.stop()
+    }
   }
 
 }

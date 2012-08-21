@@ -3,10 +3,9 @@ package controllers
 import org.junit.Assert._
 import org.junit.Test
 import play.test.FunctionalTest
-import utils.FunctionalTestUtils.runScenario
 import play.Play
 import website.EgraphsFunctionalTest
-
+import utils.TestHelpers
 
 class DBTransactionTests extends EgraphsFunctionalTest {
 
@@ -31,7 +30,7 @@ class DBTransactionTests extends EgraphsFunctionalTest {
 
   @Test
   def testBlobIsAccessibleViaEgraphsLink() {
-    runScenario("A-public-image-is-on-the-blobstore")
+    TestHelpers.putPublicImageOnBlobStore()
 
     val response = GET("/blob/files/a/b/derp.jpg")
     assertIsOk(response)

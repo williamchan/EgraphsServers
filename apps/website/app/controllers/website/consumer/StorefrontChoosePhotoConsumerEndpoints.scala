@@ -9,6 +9,7 @@ import services.Utils
 import controllers.WebsiteControllers.getStorefrontPersonalize
 import models.{ProductStore, Celebrity, Product}
 import controllers.WebsiteControllers
+import services.mvc.celebrity.CelebrityViewConversions
 
 /**
  * Manages GET and POST of celebrity photos in the purchase flow.
@@ -18,7 +19,7 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
   with ImplicitStorefrontBreadcrumbData
 { this: Controller =>
 
-  import services.mvc.CelebrityViewConversions._
+  import services.mvc.celebrity.CelebrityViewConversions._
   import services.mvc.ProductViewConversions._
 
   //

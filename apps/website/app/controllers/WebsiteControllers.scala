@@ -15,8 +15,8 @@ import forms.{AccountRecoverFormFactory, AccountPasswordResetFormFactory, Accoun
 import forms.purchase.{PurchaseFormChecksFactory, FormReaders, PurchaseFormFactory}
 import java.util.Properties
 import services.Utils
+import services.mvc.celebrity.CatalogStarsQuery
 import services.mvc.{OrderCompleteViewModelFactory, StorefrontBreadcrumbData}
-import services.cache.CacheFactory
 
 object WebsiteControllers extends Controller with AllWebsiteEndpoints
 {
@@ -34,7 +34,6 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val facebookAppId = annotatedInstance[FacebookAppId, String]
 
   override protected def egraphsSessionFactory: () => EgraphsSession = instance[() => EgraphsSession]
-  override protected def cacheFactory = instance[CacheFactory]
 
   override protected def breadcrumbData = instance[StorefrontBreadcrumbData]
   override protected def customerLoginForms = instance[CustomerLoginFormFactory]
@@ -42,6 +41,7 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected def accountPasswordResetForms = instance[AccountPasswordResetFormFactory]
   override protected def accountRecoverForms = instance[AccountRecoverFormFactory]
 
+  override protected def catalogStarsQuery: CatalogStarsQuery = instance[CatalogStarsQuery]
   override protected def orderCompleteViewModelFactory: OrderCompleteViewModelFactory = instance[OrderCompleteViewModelFactory]
 
   override protected def checkPurchaseField: PurchaseFormChecksFactory = instance[PurchaseFormChecksFactory]
