@@ -14,7 +14,7 @@ import java.sql.Timestamp
 
 class UsernameHistoryStore @Inject() (
   schema: Schema
-) extends SavesWithStringKey[UsernameHistory] with SavesCreatedUpdated[String, UsernameHistory]
+) extends SavesWithStringKey[Username] with SavesCreatedUpdated[String, Username]
 {
   import org.squeryl.PrimitiveTypeMode._
 
@@ -22,8 +22,51 @@ class UsernameHistoryStore @Inject() (
   // Public members
   //
 
-  def findByCustomer(customer: Customer): Seq[UsernameHistory] = {
+  /**
+   * Gets the customer's current username.
+   * @param customer
+   * @return
+   */
+  def findCurrentByCustomer(customer: Customer): Option[Username] = {
+    findCurrentByCustomerId(customer.id)
+  }
+
+  /**
+   * Gets the customer's current username.
+   * @param customerId
+   * @return
+   */
+  def findCurrentByCustomerId(customerId: Long): Option[Username] = {
+    val allUsernames = findAllByCustomerId(customerId)
+
+    def permanentUsername = {username: Username => username.isPermanent}
+    def defaultUsername = {username: Username => !username.isPermanent && !username.isRemoved}
+
+    if (allUsernames.exists(permanentUsername)) {
+      allUsernames.find(permanentUsername)
+    } else if (allUsernames.exists(defaultUsername)) {
+      allUsernames.find(defaultUsername)
+    } else {
+      None
+    }
+  }
+
+  /**
+   * Gets all the usernames that are or were once associated with the customer.
+   * @param customer
+   * @return
+   */
+  def findAllByCustomer(customer: Customer): Seq[Username] = {
     from(schema.usernameHistories)((history) => where(history.customerId === customer.id) select (history)).toSeq
+  }
+
+  /**
+   * Gets all the usernames that are or were once associated with the customer.
+   * @param customerId
+   * @return
+   */
+  def findAllByCustomerId(customerId: Long): Seq[Username] = {
+    from(schema.usernameHistories)((history) => where(history.customerId === customerId) select (history)).toSeq
   }
 
   //
@@ -31,7 +74,7 @@ class UsernameHistoryStore @Inject() (
   //
   override val table = schema.usernameHistories
 
-  override def defineUpdate(theOld: UsernameHistory, theNew: UsernameHistory) = {
+  override def defineUpdate(theOld: Username, theNew: Username) = {
     updateIs(
       theOld.username  := theNew.username,
       theOld.customerId := theNew.customerId,
@@ -44,7 +87,7 @@ class UsernameHistoryStore @Inject() (
   //
   // SavesCreatedUpdated[Long,UsernameHistory] methods
   //
-  override def withCreatedUpdated(toUpdate: UsernameHistory, created: Timestamp, updated: Timestamp) = {
+  override def withCreatedUpdated(toUpdate: Username, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)
   }
 }

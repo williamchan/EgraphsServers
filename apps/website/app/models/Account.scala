@@ -55,7 +55,7 @@ case class Account(
    *
    * @return newly created Customer
    */
-  def createUsername(): UsernameHistory = {
+  def createUsername(): Username = {
     var username = email.split("@").head
     //Check if username already taken. append random digits until its unique.
 
@@ -63,7 +63,7 @@ case class Account(
     while(services.customerStore.findByUsername(username).exists(p => true)) {
       username = username + rnd.nextInt(9).toString
     }
-    UsernameHistory(id = username)
+    Username(id = username)
   }
 
   def password: Option[Password] = {
