@@ -21,18 +21,18 @@ class CelebrityTests extends EgraphsUnitTest
   //  HasPublishedStatus[Celebrity] methods
   //
   override def newPublishableEntity = {
-    Celebrity()
+    Celebrity(publicName = TestData.generateFullname())
   }
 
   //
   // SavingEntityTests[Celebrity] methods
   //
   override def newEntity = {
-    Celebrity()
+    Celebrity(publicName = TestData.generateFullname())
   }
 
   override def saveEntity(toSave: Celebrity) = {
-    store.save(toSave)
+    toSave.save()
   }
 
   override def restoreEntity(id: Long) = {

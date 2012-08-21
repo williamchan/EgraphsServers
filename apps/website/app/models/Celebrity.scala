@@ -66,6 +66,7 @@ case class Celebrity(id: Long = 0,
   //
   /**Persists by conveniently delegating to companion object's save method. */
   def save(): Celebrity = {
+    require(!publicName.isEmpty, "A celebrity without a publicName is hardly a celebrity at all.")
     services.store.save(this)
   }
 

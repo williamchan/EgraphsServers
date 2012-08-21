@@ -184,7 +184,7 @@ class AccountStoreTests extends EgraphsUnitTest
       email = "derp",
       passwordHash = Some(TestData.defaultPassword),
       passwordSalt = Some(TestData.defaultPassword),
-      celebrityId = Some(Celebrity().save().id),
+      celebrityId = Some(Celebrity(publicName = "MYYK").save().id),
       customerId = Some(Customer(name = "name", username = "username").save().id),
       administratorId = Some(Administrator().save().id)
     )
