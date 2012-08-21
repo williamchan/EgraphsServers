@@ -12,6 +12,11 @@ object TestHelpers {
 
   private val blobs = AppConfig.instance[Blobs]
 
+  def putPublicImageOnBlobStore() {
+    import Blobs.Conversions._
+    blobs.put("a/b/derp.jpg", Play.getFile("./test/files/derp.jpg"))
+  }
+
   def fileAsBytes(filename: String): Array[Byte] = {
     Blobs.Conversions.fileToByteArray(Play.getFile(filename))
   }
