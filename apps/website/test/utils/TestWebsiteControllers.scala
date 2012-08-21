@@ -15,8 +15,8 @@ import play.mvc.Scope.{Session, Flash}
 import play.mvc.Http.Request
 import play.test.FunctionalTest
 import services.AppConfig
-import services.mvc.StorefrontBreadcrumbData
 import services.mvc.celebrity.CatalogStarsQuery
+import services.mvc.{OrderCompleteViewModelFactory, StorefrontBreadcrumbData}
 
 /**
  * Injectable version of AllWebsiteEndpoints with configurable session, flash,
@@ -60,4 +60,5 @@ case class TestWebsiteControllers @Inject()(
   override def printOrderStore = instance[PrintOrderStore]
   override def printOrderQueryFilters = instance[PrintOrderQueryFilters]
   override def catalogStarsQuery = instance[CatalogStarsQuery]
+  override def orderCompleteViewModelFactory = instance[OrderCompleteViewModelFactory]
 }
