@@ -4,7 +4,7 @@ import akka.actor.Actor
 import Actor._
 import services.db.{DBSession, TransactionSerializable}
 import services.AppConfig
-import utils.{ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest}
+import utils.{TestData, ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest}
 import akka.util.TestKit
 import actors.{ProcessEnrollmentBatchMessage, EnrollmentBatchActor}
 import models._
@@ -35,7 +35,7 @@ class EnrollmentBatchActorTests extends EgraphsUnitTest
 
   it should "use EnrollmentBatch to enroll Celebrity" in {
     val (celebrity, enrollmentBatch) = AppConfig.instance[DBSession].connected(TransactionSerializable) {
-      val celebrity = Celebrity().save()
+      val celebrity = TestData.newSavedCelebrity()
       val enrollmentBatch = EnrollmentBatch(celebrityId = celebrity.id, isBatchComplete = true).save()
       (celebrity, enrollmentBatch)
     }

@@ -40,12 +40,12 @@ class UsernameHistoryStore @Inject() (
     val allUsernames = findAllByCustomerId(customerId)
 
     def permanentUsername = {username: Username => username.isPermanent}
-    def defaultUsername = {username: Username => !username.isPermanent && !username.isRemoved}
+    def anyValidUsername = {username: Username => !username.isRemoved}
 
     if (allUsernames.exists(permanentUsername)) {
       allUsernames.find(permanentUsername)
-    } else if (allUsernames.exists(defaultUsername)) {
-      allUsernames.find(defaultUsername)
+    } else if (allUsernames.exists(anyValidUsername)) {
+      allUsernames.find(anyValidUsername)
     } else {
       None
     }
@@ -79,6 +79,7 @@ class UsernameHistoryStore @Inject() (
       theOld.username  := theNew.username,
       theOld.customerId := theNew.customerId,
       theOld.isPermanent  := theNew.isPermanent,
+      theOld.isRemoved  := theNew.isRemoved,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated
     )

@@ -76,7 +76,7 @@ class XyzmoEnrollDynamicProfileTests extends EgraphsUnitTest
   }
 
   "findByEgraph" should "return VBGVerifySample" in {
-    val enrollmentBatch = EnrollmentBatch(celebrityId = new Celebrity().save().id).save()
+    val enrollmentBatch = EnrollmentBatch(celebrityId = TestData.newSavedCelebrity().id).save()
     store.findByEnrollmentBatch(enrollmentBatch) should be(None)
 
     val xyzmoEnrollDynamicProfile = new XyzmoEnrollDynamicProfile(enrollmentBatchId = enrollmentBatch.id).save()
@@ -84,7 +84,7 @@ class XyzmoEnrollDynamicProfileTests extends EgraphsUnitTest
   }
 
   def newEntity = {
-    val enrollmentBatch = EnrollmentBatch(celebrityId = new Celebrity().save().id).save()
+    val enrollmentBatch = EnrollmentBatch(celebrityId = TestData.newSavedCelebrity().id).save()
     new XyzmoEnrollDynamicProfile(enrollmentBatchId = enrollmentBatch.id)
   }
 

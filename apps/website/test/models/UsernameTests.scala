@@ -44,7 +44,7 @@ with DBTransactionPerTest
   //
   "Username" should "require certain fields" in {
     val exception = intercept[RuntimeException] {Username().save()}
-    exception.getLocalizedMessage should include("ERROR: insert or update on table \"usernamehistory\" violates foreign key constraint")
+    exception.getLocalizedMessage should include("ERROR: insert or update on table \"usernames\" violates foreign key constraint")
   }
 
   "Multiple Usernames" should "be able to belong to a customer" in {
@@ -74,7 +74,7 @@ with DBTransactionPerTest
     val customer = TestData.newSavedCustomer()
     val usernameHistory = usernameHistoryStore.findAllByCustomer(customer)
     usernameHistory.length should be (1)
-    usernameHistory.head.copy(isRemoved = true).save() //make the username permanent
+    usernameHistory.head.copy(isRemoved = true).save() //make the username removed
 
     val currentUsername = usernameHistoryStore.findCurrentByCustomer(customer)
     currentUsername should be (None)

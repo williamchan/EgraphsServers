@@ -19,7 +19,7 @@ class EnrollmentSampleTests extends EgraphsUnitTest
   val store = AppConfig.instance[EnrollmentSampleStore]
 
   def newEntity = {
-    val celebrity = Celebrity().save()
+    val celebrity = TestData.newSavedCelebrity()
     val enrollmentBatch = EnrollmentBatch(celebrityId = celebrity.id).save()
     EnrollmentSample(enrollmentBatchId = enrollmentBatch.id)
   }

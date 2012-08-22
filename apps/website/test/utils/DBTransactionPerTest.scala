@@ -14,7 +14,7 @@ trait DBTransactionPerTest extends BeforeAndAfterEach { this: Suite =>
   }
 
   override def afterEach() {
-    DBSession.rollback()
+    DBSession.commit()
     super.afterEach()
   }
 

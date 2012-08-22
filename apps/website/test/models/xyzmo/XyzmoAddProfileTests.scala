@@ -52,7 +52,7 @@ class XyzmoAddProfileTests extends EgraphsUnitTest
   }
 
   def newEntity = {
-    val enrollmentBatch = EnrollmentBatch(celebrityId = new Celebrity().save().id).save()
+    val enrollmentBatch = EnrollmentBatch(celebrityId = TestData.newSavedCelebrity().id).save()
     new XyzmoAddProfile(enrollmentBatchId = enrollmentBatch.id, baseResult = "ok")
   }
 

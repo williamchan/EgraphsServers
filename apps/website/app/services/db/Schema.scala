@@ -121,7 +121,7 @@ class Schema @Inject()(
     )
   )
 
-  val usernameHistories = table[Username]
+  val usernameHistories = table[Username]("Usernames")
   on(usernameHistories)(usernameHistory =>
     declare(
       usernameHistory.id is  dbType("varchar(255)"),

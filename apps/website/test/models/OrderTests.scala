@@ -459,8 +459,8 @@ class OrderTests extends EgraphsUnitTest
     val admin = Administrator().save()
     celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
 
-    val order = buyer.buy(product, recipient=recipient).save()
-    val order1 = recipient.buy(product, recipient=recipient).save()
+    val order1 = buyer.buy(product, recipient=recipient).save()
+    val order2 = recipient.buy(product, recipient=recipient).save()
 
     val results = orderStore.getEgraphsAndOrders(recipient.id)
 
@@ -468,8 +468,9 @@ class OrderTests extends EgraphsUnitTest
 
     pendingViews.size should be (2)
 
-    pendingViews.head.orderId should be (order.id)
-    pendingViews.toList(1).orderId should be (order1.id)
+    val orderIds = pendingViews.map(pendingView => pendingView.orderId)
+    orderIds should contain (order1.id)
+    orderIds should contain (order2.id)
   }
 
   "redactedName" should "redact properly" in {
