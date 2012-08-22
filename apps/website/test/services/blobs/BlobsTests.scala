@@ -1,7 +1,9 @@
 package services.blobs
 
-import utils.{ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest, DBTransactionPerTest}
+import utils.{TestHelpers, ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest, DBTransactionPerTest}
 import services.AppConfig
+import services.Time
+import Time.IntsToSeconds._
 
 class BlobsTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
@@ -36,6 +38,22 @@ class BlobsTests extends EgraphsUnitTest
     blobs.delete(key)
 
     blobs.get("myKey") should be (None)
+  }
+
+  "getStaticResourceUrl" should "return short-term signed URL to static S3 resource" in {
+    val expirationSeconds = 5.minutes
+    val signedUrl = blobs.getStaticResourceUrl(key = "derp", expirationSeconds = 5.minutes)
+    val expires = System.currentTimeMillis() / 1000 + expirationSeconds
+
+    val urlAndQueryParams = TestHelpers.splitUrl(signedUrl)
+    urlAndQueryParams._1 should be("https://egraphs-static-resources.s3.amazonaws.com/derp")
+    val queryParams = urlAndQueryParams._2
+    queryParams(0)._1 should be("AWSAccessKeyId")
+    queryParams(0)._2 should be("AKIAJ33ZTKZIPYXRC66A")
+    queryParams(1)._1 should be("Expires")
+    queryParams(1)._2.toLong should be(expires plusOrMinus 5)
+    queryParams(2)._1 should be("Signature")
+    queryParams(2)._2.length should be > (30)
   }
 
   "RichBlob" should "convert properly" in {

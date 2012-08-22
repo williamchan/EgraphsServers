@@ -44,6 +44,7 @@ GET     /documents/CelebrityAgreement           staticFile:/public/documents/Cel
 
 GET     ${api}/celebrities/{celebrityId}                           ApiControllers.getCelebrity
 GET     ${api}/celebrities/{celebrityId}/enrollmenttemplate        ApiControllers.getCelebrityEnrollmentTemplate
+GET     ${api}/celebrities/{celebrityId}/mobileappinfo             ApiControllers.getCelebrityMobileAppInfo
 GET     ${api}/celebrities/{celebrityId}/products                  ApiControllers.getCelebrityProducts
 GET     ${api}/celebrities/{celebrityId}/orders                    ApiControllers.getCelebrityOrders
 POST    ${api}/celebrities/{celebrityId}/orders/{orderId}          ApiControllers.postCelebrityOrder

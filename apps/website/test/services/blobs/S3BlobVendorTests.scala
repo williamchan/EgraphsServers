@@ -25,4 +25,12 @@ class S3BlobVendorTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValid
 
     operation(blobVendor)
   }
+
+  // Tests Query String Authentication Example from http://s3.amazonaws.com/doc/s3-developer-guide/RESTAuthentication.html
+  "sign" should "return signature" in {
+    val awsSecretKey = "OtxrzxIsfpFjA7SwPzILwy8Bw21TLhquhboDYROV"
+    val expectedSignature	= "vjbyPxybdZaNmGa%2ByT272YEAiv4%3D"
+
+    S3BlobVendor.sign(namespace = "quotes", key = "nelson", expires = 1141889120, awsSecretKey = awsSecretKey) should be(expectedSignature)
+  }
 }

@@ -7,6 +7,8 @@ import java.io._
 import com.google.inject.Inject
 import services.logging.Logging
 import org.jclouds.blobstore.domain.Blob
+import services.Time
+import Time.IntsToSeconds._
 
 /**
  * Convenience methods for storing and loading large binary data: images,
@@ -41,12 +43,26 @@ class Blobs @Inject() (blobProvider: BlobVendor) extends Logging {
   }
 
   /**
-   * Retrieve the Blob at a given key from the static resources blobstore.
-   * Always attempts to access Amazon S3.
+   * Retrieve the Blob at a given key from the static resources blobstore. Always attempts to access Amazon S3.
+   * Delete this method after Play 2.0. Use getStaticResourceUrl instead.
    */
+  @Deprecated
   def getStaticResource(key: String) : Option[Blob] = {
     val store: BlobStore = S3BlobVendor.context.getBlobStore
     Option(store.getBlob(staticResourceBlobstoreNamespace, key))
+  }
+
+  /**
+   * Returns a short-lived signed URL to the blob location denoted by the key parameter in the static resource S3 bucket.
+   * This URL follows the query string authentication specification as described in this documentation:
+   * http://s3.amazonaws.com/doc/s3-developer-guide/RESTAuthentication.html. Note that a URL will be returned even if
+   * the key does not point to any resource, ie passing in "IDoNotExist" as the key will still return a signed URL.
+   */
+  def getStaticResourceUrl(key: String, expirationSeconds: Int = 5.minutes): String = {
+    val expires = System.currentTimeMillis() / 1000 + expirationSeconds
+    val baseUrl = S3BlobVendor.context.getSigner.signGetBlob(staticResourceBlobstoreNamespace, key).getEndpoint
+    val signature = S3BlobVendor.sign(namespace = staticResourceBlobstoreNamespace, key = key, expires = expires)
+    baseUrl + "?" + "AWSAccessKeyId=" + S3BlobVendor.s3id + "&Expires=" + expires + "&Signature=" + signature
   }
 
   /**
