@@ -4,14 +4,6 @@ import com.google.inject.{Provider, Inject}
 import services.db.{SavesWithStringKey, SavesWithLongKey, Schema}
 import java.sql.Timestamp
 
-/**
- * Created with IntelliJ IDEA.
- * User: myyk
- * Date: 8/15/12
- * Time: 7:06 PM
- * To change this template use File | Settings | File Templates.
- */
-
 class UsernameHistoryStore @Inject() (
   schema: Schema
 ) extends SavesWithStringKey[Username] with SavesCreatedUpdated[String, Username]
