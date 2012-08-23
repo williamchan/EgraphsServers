@@ -36,11 +36,11 @@ class AccountTests extends EgraphsUnitTest
   }
 
   "withPassword" should "set the password on an Account" in {
-    accountWithPassword(TestData.defaultPassword).password should not be (None)
+    savedAccountWithEmailAndPassword(TestData.defaultPassword).password should not be (None)
   }
 
   "An Account" should "have different hashes and salts when the same password is set twice" in {
-    val credential = accountWithPassword(TestData.defaultPassword)
+    val credential = savedAccountWithEmailAndPassword(TestData.defaultPassword)
     val firstPassword = credential.password.get
 
     val password = credential.withPassword(TestData.defaultPassword).right.get.password.get
@@ -69,24 +69,24 @@ class AccountTests extends EgraphsUnitTest
   }
 
   it should "fail to authenticate with an AccountCredentialsError if the password is wrong" in {
-    savedAccountWithEmailAndPassword("derp@derp.com", "supersecret")
-    accountStore.authenticate("derp@derp.com", "superWRONG") match {
+    val account = savedAccountWithEmailAndPassword("supersecret")
+    accountStore.authenticate(account.email, "superWRONG") match {
       case Left(correct: AccountCredentialsError) => // phew
       case anythingElse => fail(anythingElse + " should have been a credentials error")
     }
   }
 
   it should "fail to authenticate with an AccountPasswordNotSetError if the account lacks a password" in {
-    val account = Account(email = "derp@derp.com").save()
+    val account = Account(email = TestData.generateEmail()).save()
     account.password should be(None)
-    accountStore.authenticate("derp@derp.com", "supersecret") match {
+    accountStore.authenticate(account.email, "supersecret") match {
       case Left(correct: AccountPasswordNotSetError) => // phew
       case anythingElse => fail(anythingElse + " should have been an AccountPasswordNotSetError")
     }
   }
 
   it should "fail to authenticate with an AccountNotFoundError if an account with the given email didnt exist" in {
-    accountStore.authenticate("derp@derp.com", "supersecret") match {
+    accountStore.authenticate(TestData.generateEmail(), "supersecret") match {
       case Left(correct: AccountNotFoundError) => // phew
       case anythingElse => fail(anythingElse + " should have been an AccountNotFoundError")
     }
@@ -123,29 +123,26 @@ class AccountTests extends EgraphsUnitTest
   }
 
   "An account" should "save email in lowercase" in {
-    val stored = Account(email = "DERP@DERP.COM").save()
-    accountStore.findByEmail("derp@derp.com") should be(Some(stored))
+    val stored = TestData.newSavedAccount().copy(email = TestData.generateEmail().toUpperCase).save()
+    accountStore.findByEmail(stored.email.toLowerCase) should be(Some(stored.copy(email = stored.email.toLowerCase)))
   }
 
   it should "save email trimmed" in {
-    val stored = Account(email = "                    derp@derp.com                    ").save()
-    accountStore.findByEmail("derp@derp.com") should be(Some(stored))
+    val stored = TestData.newSavedAccount()
+      .copy(email =  "                    " + TestData.generateEmail() + "                    ").save()
+    accountStore.findByEmail(stored.email.trim) should be(Some(stored))
   }
 
   "createCustomer" should "create Customer with username based on email" in {
     val account = TestData.newSavedAccount()
     val customer = account.createCustomer("Test User").save()
     account.email should include(customer.username)
+    //TODO: SER-223 should update this test to use the new table.
   }
 
   "createCustomer" should "throw exception if called on account that already has a customer" in {
     val customer = TestData.newSavedCustomer()
     intercept[IllegalArgumentException] {customer.account.createCustomer("Another User")}
-  }
-
-  "findByEmail" should "find by email case-insensitively" in {
-    val stored = Account(email = "derp@derp.com").save()
-    accountStore.findByEmail("DERP@DERP.COM") should be(Some(stored))
   }
 }
 
@@ -168,11 +165,11 @@ class AccountStoreTests extends EgraphsUnitTest
   // SavingEntityTests[Account] methods
   //
   override def newEntity = {
-    Account()
+    Account(email = TestData.generateEmail())
   }
 
   override def saveEntity(toSave: Account) = {
-    accountStore.save(toSave)
+    toSave.save()
   }
 
   override def restoreEntity(accountId: Long) = {
@@ -181,18 +178,18 @@ class AccountStoreTests extends EgraphsUnitTest
 
   override def transformEntity(toTransform: Account) = {
     toTransform.copy(
-      email = "derp",
+      email = TestData.generateEmail(),
       passwordHash = Some(TestData.defaultPassword),
       passwordSalt = Some(TestData.defaultPassword),
-      celebrityId = Some(Celebrity(publicName = "MYYK").save().id),
-      customerId = Some(Customer(name = "name", username = "username").save().id),
+      celebrityId = Some(Celebrity(publicName = TestData.generateFullname()).save().id),
+      customerId = Some(Customer(name = "name", username = TestData.generateUsername()).save().id),
       administratorId = Some(Administrator().save().id)
     )
   }
 
   it should "store and retrieve correctly" in {
     // Set up
-    val stored = accountWithPassword(TestData.defaultPassword)
+    val stored = savedAccountWithEmailAndPassword(TestData.defaultPassword)
     val storedPassword = stored.password.get
 
     // Run test
@@ -218,7 +215,7 @@ class AccountStoreTests extends EgraphsUnitTest
   }
 
   it should "should persist fine with no celebrity/customer/admin IDs" in {
-    accountStore.save(Account(email = "email@egraphs.com")) // Doesn't throw any errors
+    Account(email = TestData.generateEmail()).save() // Doesn't throw any errors
   }
 
   it should "fail to persist with non-null, non-existent celebrity ID" in {
@@ -245,13 +242,13 @@ class AccountStoreTests extends EgraphsUnitTest
   it should "be recoverable by email" in {
     accountStore.findByEmail(null) should be(None)
     accountStore.findByEmail("") should be(None)
-    val stored = Account(email = "derp@derp.com").save()
+    val stored = Account(email = TestData.generateEmail()).save()
     accountStore.findByEmail(stored.email) should be(Some(stored))
   }
 
   it should "authenticate the correct email and password in" in {
-    val stored = savedAccountWithEmailAndPassword("derp@derp.com", "supersecret")
-    accountStore.authenticate("derp@derp.com", "supersecret") should be(Right(stored))
+    val stored = savedAccountWithEmailAndPassword("supersecret")
+    accountStore.authenticate(stored.email, "supersecret") should be(Right(stored))
   }
 
 }
@@ -259,11 +256,7 @@ class AccountStoreTests extends EgraphsUnitTest
 trait AccountTestHelpers {
   def accountStore: AccountStore
 
-  def accountWithPassword(password: String): Account = {
-    accountStore.save(Account(email = "email@egraphs.com").withPassword(password).right.get)
-  }
-
-  def savedAccountWithEmailAndPassword(email: String, password: String): Account = {
-    Account(email = "derp@derp.com").withPassword("supersecret").right.get.save()
+  def savedAccountWithEmailAndPassword(password: String): Account = {
+    TestData.newSavedAccount().withPassword(password).right.get.save()
   }
 }

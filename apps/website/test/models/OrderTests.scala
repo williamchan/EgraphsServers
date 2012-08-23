@@ -214,7 +214,7 @@ class OrderTests extends EgraphsUnitTest
   }
 
   "prepareEgraphsSignedEmail" should "not use celebrity's email" in {
-    val celebrity = TestData.newSavedCelebrity().copy(publicName = "Public Celebrity").save()
+    val celebrity = TestData.newSavedCelebrity()
     val order = TestData.newSavedOrder(product = Some(TestData.newSavedProduct(celebrity = Some(celebrity))))
     val email = order.prepareEgraphsSignedEmail()
     email.getFromAddress.getAddress should not be (celebrity.account.email)

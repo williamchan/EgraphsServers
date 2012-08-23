@@ -17,7 +17,7 @@ class CustomerTests extends EgraphsUnitTest
   // SavingEntityTests[Account] methods
   //
   override def newEntity = {
-    Customer(name = "customer", username = "username")
+    Customer(name = "customer", username = TestData.generateUsername())
   }
 
   override def saveEntity(toSave: Customer) = {
@@ -102,7 +102,7 @@ class CustomerTests extends EgraphsUnitTest
   }
 
   "findOrCreateByEmail" should "find or create as appropriate" in {
-    val acct = Account(email = "customer-" + Time.toBlobstoreFormat(Time.now) + "@egraphs.com").save()
+    val acct = TestData.newSavedAccount()
     acct.customerId should be(None)
     val customer = customerStore.findOrCreateByEmail(acct.email, "joe fan")
 

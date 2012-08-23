@@ -29,7 +29,7 @@ class CashTransactionTests extends EgraphsUnitTest
 
   override def transformEntity(toTransform: CashTransaction) = {
     toTransform.copy(
-      accountId = Account(email="derp").save().id,
+      accountId = TestData.newSavedAccount().id,
       amountInCurrency = 1
     )
   }

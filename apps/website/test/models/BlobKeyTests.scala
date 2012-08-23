@@ -2,6 +2,7 @@ package models
 
 import services.AppConfig.instance
 import utils._
+import org.apache.commons.lang.RandomStringUtils
 
 class BlobKeyTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
@@ -10,13 +11,15 @@ class BlobKeyTests extends EgraphsUnitTest
   with DBTransactionPerTest
 {
 
+  def randomKey = RandomStringUtils.randomAlphanumeric(50)
+
   def store = instance[BlobKeyStore]
 
   //
   // SavingEntityTests[BlobKey] methods
   //
   override def newEntity = {
-    BlobKey()
+    BlobKey( key = randomKey )
   }
 
   override def saveEntity(toSave: BlobKey) = {
@@ -29,16 +32,16 @@ class BlobKeyTests extends EgraphsUnitTest
 
   override def transformEntity(toTransform: BlobKey) = {
     toTransform.copy(
-      key = "derp",
+      key = RandomStringUtils.randomAlphanumeric(50),
       url = "www.google.com"
     )
   }
 
   "key" should "be unique" in {
-    BlobKey(key = "herp", url = "www.egraphs.com").save()
+    val saved = BlobKey(key = randomKey, url = "www.egraphs.com").save()
     // TODO - refactor this and other tests with this pattern for checking PSQLException
     val exception = intercept[RuntimeException] {
-      BlobKey(key = "herp", url = "www.egraphs.com").save()
+      BlobKey(key = saved.key, url = saved.url).save()
     }
     val psqlException = exception.getCause
     psqlException.getClass.getCanonicalName should be("org.postgresql.util.PSQLException")
@@ -46,8 +49,9 @@ class BlobKeyTests extends EgraphsUnitTest
   }
 
   "findByKey" should "find by Key!" in {
-    store.findByKey("herp") should be(None)
-    val blobKey = BlobKey(key = "herp", url = "www.egraphs.com").save()
-    store.findByKey("herp").get should be(blobKey)
+    val testKey = randomKey
+    store.findByKey(testKey) should be(None)
+    val blobKey = BlobKey(key = testKey, url = "www.egraphs.com").save()
+    store.findByKey(testKey).get should be(blobKey)
   }
 }

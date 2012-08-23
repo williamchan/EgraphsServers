@@ -33,7 +33,7 @@ class EnrollmentSampleTests extends EgraphsUnitTest
   }
 
   override def transformEntity(toTransform: EnrollmentSample) = {
-    val enrollmentBatch = EnrollmentBatch(celebrityId = Celebrity(publicName="a").save().id).save()
+    val enrollmentBatch = EnrollmentBatch(celebrityId = TestData.newSavedCelebrity().id).save()
     toTransform.copy(
       // Actually, not much to test here. Just providing something here for now.
       enrollmentBatchId = enrollmentBatch.id

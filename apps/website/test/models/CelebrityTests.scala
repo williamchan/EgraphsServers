@@ -42,7 +42,7 @@ class CelebrityTests extends EgraphsUnitTest
   override def transformEntity(toTransform: Celebrity) = {
     toTransform.copy(
       apiKey = Some("apiKey"),
-      publicName = "pname",
+      publicName = TestData.generateFullname(),
       isFeatured = true,
       roleDescription = Some("Pitcher, Tampa Bay Rays"),
       profilePhotoUpdated = Some(Time.toBlobstoreFormat(Time.now))
@@ -53,11 +53,12 @@ class CelebrityTests extends EgraphsUnitTest
   // Test cases
   //
   "A Celebrity" should "render to API format properly" in {
-    val celeb = Celebrity(publicName = "Wizzle Chan").save()
+    val publicName = TestData.generateFullname()
+    val celeb = Celebrity(publicName = publicName).save()
     val apiMap = celeb.renderedForApi
 
-    apiMap("publicName") should be ("Wizzle Chan")
-    apiMap("urlSlug") should be ("Wizzle-Chan")
+    apiMap("publicName") should be (publicName)
+    apiMap("urlSlug") should be (publicName.replaceAll(" ", "-"))
     apiMap("id") should be (celeb.id)
     apiMap("created") should be (Time.toApiFormat(celeb.created))
     apiMap("updated") should be (Time.toApiFormat(celeb.updated))

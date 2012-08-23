@@ -191,7 +191,7 @@ class CustomerStore @Inject() (
   }
 
   def findByUsername(username: String): Option[Customer] = {
-    //TODO: change this to instead use UsernameHistoryStore when that is ready
+    //TODO: SER-223 (in progress) change this to instead use UsernameHistoryStore when that is ready
     from(schema.customers)((customer) => where(lower(customer.username) === username.toLowerCase) select (customer)).headOption
   }
 

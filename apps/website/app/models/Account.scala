@@ -40,14 +40,7 @@ case class Account(
    */
   def createCustomer(name: String): Customer = {
     require(customerId.isEmpty, "Cannot create Customer on Account that already has one")
-    var username = email.split("@").head
-    //Check if username already taken. append random digits until its unique.
-    
-    val rnd = new scala.util.Random
-    while(services.customerStore.findByUsername(username).exists(p => true)) {
-      username = username + rnd.nextInt(9).toString
-    }
-    Customer(name = name, username=username)
+    Customer(name = name, username = createUsernameStringFromEmail())
   }
 
   /**
@@ -56,14 +49,20 @@ case class Account(
    * @return newly created Customer
    */
   def createUsername(): Username = {
+    Username(id = createUsernameStringFromEmail())
+  }
+
+  private def createUsernameStringFromEmail(): String = {
     var username = email.split("@").head
     //Check if username already taken. append random digits until its unique.
 
     val rnd = new scala.util.Random
+    //TODO: we should fix this logic, since it could be an infinite loop if there is more than 10 users with that username prefix
+    //we could probably do this sequentially, at least it would be bounded then
     while(services.customerStore.findByUsername(username).exists(p => true)) {
       username = username + rnd.nextInt(9).toString
     }
-    Username(id = username)
+    username
   }
 
   def password: Option[Password] = {

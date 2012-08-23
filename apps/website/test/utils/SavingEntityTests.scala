@@ -52,8 +52,6 @@ trait SavingEntityTests[KeyT, T <: KeyedEntity[KeyT]] { this: UnitFlatSpec with 
     val maybeRestored = restoreEntity(saved.id)
 
     maybeRestored should not be (None)
-    println("/n" + saved)
-    println(maybeRestored.get)
     maybeRestored.get should be (saved)
   }
 
