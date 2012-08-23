@@ -57,8 +57,6 @@ case class Account(
     //Check if username already taken. append random digits until its unique.
 
     val rnd = new scala.util.Random
-    //TODO: we should fix this logic, since it could be an infinite loop if there is more than 10 users with that username prefix
-    //we could probably do this sequentially, at least it would be bounded then
     while(services.customerStore.findByUsername(username).exists(p => true)) {
       username = username + rnd.nextInt(9).toString
     }
