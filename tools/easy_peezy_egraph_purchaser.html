@@ -1,7 +1,32 @@
 <!DOCTYPE html>
+<!-- 
+  This is an HTML / CSS / JS application that facilitates making mock egraph purchases on any 
+  non-production installation of the Egraphs software. It is meant for either internal use 
+  or e-mail distribution to trusted partners who need an easy way to make mock purchases on the 
+  fly.
+
+  The app only works if the browser opening this file already has authenticated itself against the
+  target software installation.
+
+  TO USE THE APP:
+
+  1. Open this file in a modern browser
+  2. Follow the instructions to fill in the information
+  3. Press the button at the buttom to generate the order.
+
+  TO CONFIGURE THE APP FOR PARTNERS TO USE:
+
+  1. Scan down to the "BEGIN CONFIGURATION" section 10-20 lines below this header
+  2. Alter whatever values you want until you see the words END CONFIGURATION. The configuration
+     options should be well documented
+  3. Re-load the browser to make sure the outcome is what you expected. Go ahead and
+     generate a few test orders.
+  4. Rename this file appropriately given the audience
+  5. E-mail this file to the trusted partner.
+-->
 <html ng-app>
   <head>
-    <title>Egraphs! Get your Egraphs Here!</title>
+    <title>Egraphs! Get your egraphs here!</title>
     <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.1.0/css/bootstrap-combined.min.css">    
     <link href='http://fonts.googleapis.com/css?family=Rye' rel='stylesheet' type='text/css'>
     <link rel="shortcut icon" type="image/png" href='https://www.egraphs.com/public/images/favicon.png'>
@@ -10,16 +35,32 @@
     <script src="http://code.angularjs.org/angular-1.0.1.min.js"></script>
     <script type="text/javascript">
       function BuyDemoController ($scope) {
-        // Edit these to be the header and egraphs domain appropriate for the recipient of this file.
-        // The script won't work unless the person viewing the page has already entered in their 
-        // credentials on that domain, and the cookies are live in their browser.
-        $scope.heading = "Sony Music";
-        $scope.domain = "http://localhost:9000"; // "https://beta.egraphs.com";
+        /////////////////////////// 
+        // BEGIN CONFIGURATION   //
+        ///////////////////////////
+
+        // heading - text that the header should say: e.g. "Sony Music".
+        $scope.heading = "Easy-Peezy Egraph Purchaser";
+
+        // domain - the protocol, domain, and port containing the non-production instance of the
+        //     Egraphs software. e.g. "http://localhost:9000"
+        $scope.domain = "https://beta.egraphs.com";
         
-        // Populate a list of celebrities and products.
+        // celebs - an array of Celebrity objects. A Celebrity object has three properties:
+        //     name: The celebrity name that should be presented to the person opening the application.
+        //         e.g. "David Ortiz"
         //
-        // A celebrity has a name for presentation, a urlSlug for constructing the purchase url,
-        // and an array of products. Products have a name and urlSlug as well.
+        //     urlSlug: The portion of the url that identifies this celebrity on the target instance
+        //         of the Egraphs software. You can harvest this from the URL of the "Choose Photo"
+        //         page. e.g. "David-Ortiz"
+        //
+        //     products: An array of Product objects. A Product has two properties:
+        //         name: The product name that should be presented to the person running the application
+        //             e.g. "2012 All-Star Game"
+        //
+        //         urlSlug: The portion of the url that identifies this celebrity on the target
+        //             instance of the Egraphs software. You can harvest this from the URL of the
+        //              "Personalize" page. e.g. "2012-All-Star-Game"        
         $scope.celebs = [
           { name: "Kate Odell", 
             urlSlug: "Kate-Odell",
@@ -33,21 +74,21 @@
             products: [
               {name: "Product A (At Bat)", urlSlug: "Eric-Feenys-Product-A"},
               {name: "Product B (J Timb)", urlSlug: "Eric-Feenys-Product-B"}
-            ] 
+            ]
           }
         ];
 
         // Default order info. This should all be self-explanatory.
         $scope.orderInfo = {
-          recipient: {name: "Joe Recipient", email:"joe.recipient@egraphs.com"},
-          buyer: {name: "Joe Buyer", email:"joe.buyer@egraphs.com"},
+          recipient: {name: "Joe Recipient", email: "joe.recipient@egraphs.com"},
+          buyer: {name: "Joe Buyer", email: "joe.buyer@egraphs.com"},
           desiredText: "Happy 13th birthday, Joe!",
           personalNote: "I'm your biggest fan!"
         };
 
-        /////////////////////////////////////
-        // Don't touch anything below here //
-        /////////////////////////////////////
+        ///////////////////////////
+        //   END CONFIGURATION   //
+        ///////////////////////////
         $scope.celeb = $scope.celebs[0];
         $scope.product = $scope.celeb.products[0];
 
@@ -99,13 +140,13 @@
       </div>
       <div class="container">
         <div id="order-info" class="">
-          <p><span class="illuminated">T</span>his little form exists to help you create mock egraph orders
-          for demoing. To get started, you gotta first <a href="{{domain}}">go to the website</a> 
+          <p><span class="illuminated">T</span>his little form will help you create mock egraph orders
+          for demoing. To get started, first <a href="{{domain}}">go to the website</a> 
           we set up for you and make sure your credentials are solid.</p>
 
           <p>
             If you see the egraphs logo here ( <img id="credentials-test" src="{{domain}}/public/images/logo.png" > ) then you're good to go!
-            If not, then <a href="{{domain}}">go put in your credentials</a>.
+            If not, <a href="{{domain}}">go put in your credentials</a> and refresh this page.
           </p>
           
           
