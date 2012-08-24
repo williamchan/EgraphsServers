@@ -43,7 +43,7 @@
         $scope.heading = "Easy-Peezy Egraph Purchaser";
 
         // domain - the protocol, domain, and port containing the non-production instance of the
-        //     Egraphs software
+        //     Egraphs software. e.g. "http://localhost:9000"
         $scope.domain = "https://beta.egraphs.com";
         
         // celebs - an array of Celebrity objects. A Celebrity object has three properties:
@@ -60,11 +60,7 @@
         //
         //         urlSlug: The portion of the url that identifies this celebrity on the target
         //             instance of the Egraphs software. You can harvest this from the URL of the
-        //              "Personalize" page. e.g. "2012-All-Star-Game"
-        //     
-        //
-        // A celebrity has a name for presentation, a urlSlug for constructing the purchase url,
-        // and an array of products. Products have a name and urlSlug as well.
+        //              "Personalize" page. e.g. "2012-All-Star-Game"        
         $scope.celebs = [
           { name: "Kate Odell", 
             urlSlug: "Kate-Odell",
@@ -84,8 +80,8 @@
 
         // Default order info. This should all be self-explanatory.
         $scope.orderInfo = {
-          recipient: {name: "Joe Recipient", email:"joe.recipient@egraphs.com"},
-          buyer: {name: "Joe Buyer", email:"joe.buyer@egraphs.com"},
+          recipient: {name: "Joe Recipient", email: "joe.recipient@egraphs.com"},
+          buyer: {name: "Joe Buyer", email: "joe.buyer@egraphs.com"},
           desiredText: "Happy 13th birthday, Joe!",
           personalNote: "I'm your biggest fan!"
         };
