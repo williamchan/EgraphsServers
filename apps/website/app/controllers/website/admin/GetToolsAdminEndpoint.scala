@@ -139,21 +139,32 @@ private[controllers] trait GetToolsAdminEndpoint {
 //            </html>
 
 //          case "generate-large-egraph" =>
-//          {
-//            val egraphId = params.get("egraphId").toLong
-//            val egraph = egraphStore.get(egraphId)
-//            val order = egraph.order
-//            val product = order.product
-//            val rawSignedImage = egraph.image(product.photoImage)
-//            val targetWidth = {
-//              val masterWidth = product.photoImage.getWidth
-//              if (masterWidth < PrintOrder.defaultPngWidth) masterWidth else PrintOrder.defaultPngWidth
+//            import services.http.SafePlayParams.Conversions._
+//            val orderStore = AppConfig.instance[OrderStore]
+//            val errorOrBlobUrl = for (
+//              orderId <- params.getLongOption("orderId").toRight("orderId param required").right;
+//              fulfilledOrder <- orderStore
+//                                  .findFulfilledWithId(orderId)
+//                                  .toRight("No fulfilled order with ID" + orderId + "found")
+//                                  .right
+//            ) yield {
+//              val FulfilledOrder(order, egraph) = fulfilledOrder
+//              val product = order.product
+//              val productPhoto = product.photoImage
+//              val targetWidth = {
+//                val masterWidth = productPhoto.getWidth
+//                if (masterWidth < PrintOrder.defaultPngWidth) masterWidth else PrintOrder.defaultPngWidth
+//              }
+//
+//              egraph.image(productPhoto)
+//                .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
+//                .scaledToWidth(targetWidth)
+//                .rasterized
+//                .saveAndGetUrl(services.blobs.AccessPolicy.Public)
 //            }
-//            val image = rawSignedImage
-//              .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
-//              .scaledToWidth(targetWidth)
-//            image.rasterized.getSavedUrl(services.blobs.AccessPolicy.Public) // also returns URL
-//          }
+//
+//            errorOrBlobUrl.fold(error => error, url => url)
+
 //          case "unapprove-orders" => {
 //            val orderIds = List[Long]()
 //            for (orderId <- orderIds) {
