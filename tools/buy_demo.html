@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html ng-app>
+  <head>
+    <title>Egraphs! Get your Egraphs Here!</title>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.1.0/css/bootstrap-combined.min.css">    
+    <link href='http://fonts.googleapis.com/css?family=Rye' rel='stylesheet' type='text/css'>
+    <link rel="shortcut icon" type="image/png" href='https://www.egraphs.com/public/images/favicon.png'>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+    <script src="https://ajax.cdnjs.com/ajax/libs/mustache.js/0.4.2/mustache.min.js" type="text/javascript"></script>
+    <script src="http://code.angularjs.org/angular-1.0.1.min.js"></script>
+    <script type="text/javascript">
+      function BuyDemoController ($scope) {
+        // Edit these to be the header and egraphs domain appropriate for the recipient of this file.
+        // The script won't work unless the person viewing the page has already entered in their 
+        // credentials on that domain, and the cookies are live in their browser.
+        $scope.heading = "Sony Music";
+        $scope.domain = "http://localhost:9000"; // "https://beta.egraphs.com";
+        
+        // Populate a list of celebrities and products.
+        //
+        // A celebrity has a name for presentation, a urlSlug for constructing the purchase url,
+        // and an array of products. Products have a name and urlSlug as well.
+        $scope.celebs = [
+          { name: "Kate Odell", 
+            urlSlug: "Kate-Odell",
+            products: [
+              {name: "Soccer 2", urlSlug: "soccer2"},
+              {name: "World Cup", urlSlug: "World-Cup"}
+            ]
+          },
+          { name: "Eric Feeny", 
+            urlSlug: "Eric-Feeny",
+            products: [
+              {name: "Product A (At Bat)", urlSlug: "Eric-Feenys-Product-A"},
+              {name: "Product B (J Timb)", urlSlug: "Eric-Feenys-Product-B"}
+            ] 
+          }
+        ];
+
+        // Default order info. This should all be self-explanatory.
+        $scope.orderInfo = {
+          recipient: {name: "Joe Recipient", email:"joe.recipient@egraphs.com"},
+          buyer: {name: "Joe Buyer", email:"joe.buyer@egraphs.com"},
+          desiredText: "Happy 13th birthday, Joe!",
+          personalNote: "I'm your biggest fan!"
+        };
+
+        /////////////////////////////////////
+        // Don't touch anything below here //
+        /////////////////////////////////////
+        $scope.celeb = $scope.celebs[0];
+        $scope.product = $scope.celeb.products[0];
+
+
+        $scope.changeCelebrity = function(newCeleb) {          
+          $scope.product = newCeleb.products[0]
+        };
+      }
+    </script>
+    <style>
+      .illuminated {        
+        font-family: 'Rye', cursive;
+        font-size:4em;
+      }
+      .navbar .brand img {
+        height: 50px;
+        margin-right: 20px        
+      }
+
+      #order-info {
+        margin-top:20px;
+      }
+
+      #order-info fieldset {
+        margin-bottom: 15px;
+      }
+
+      .btn.submit {
+        margin-top: 20px;
+      }
+
+      #credentials-test {
+        display:inline-block;
+        width:70px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app" class="" ng-controller="BuyDemoController">
+      <div class="navbar">
+        <div class="navbar-inner">
+          <div class="container">
+            <div class="brand" href="#">
+              <a href="https://www.egraphs.com"><img src="https://www.egraphs.com/public/images/logo.png"></img></a>
+              {{heading}}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="container">
+        <div id="order-info" class="">
+          <p><span class="illuminated">T</span>his little form exists to help you create mock egraph orders
+          for demoing. To get started, you gotta first <a href="{{domain}}">go to the website</a> 
+          we set up for you and make sure your credentials are solid.</p>
+
+          <p>
+            If you see the egraphs logo here ( <img id="credentials-test" src="{{domain}}/public/images/logo.png" > ) then you're good to go!
+            If not, then <a href="{{domain}}">go put in your credentials</a>.
+          </p>
+          
+          
+          <form method="POST" action="{{domain}}/{{celeb.urlSlug}}/{{product.urlSlug}}/buy-demo">
+            <fieldset>
+              <legend>Choose a star and photo</legend>
+              <select ng-model="celeb" ng-options="celeb as celeb.name for celeb in celebs" ng-change="changeCelebrity(celeb)"></select>
+              <select ng-model="product" required ng-options="product as product.name for product in celeb.products"></select>
+            </fieldset>            
+            <fieldset>
+              <legend>Who will be receiving the egraph?</legend>
+              <input name="recipientName" type="text" ng-model="orderInfo.recipient.name">
+              <input name="recipientEmail" type="text" ng-model="orderInfo.recipient.email">
+            </fieldset>
+            <fieldset>
+              <legend>Who is buying the egraph?</legend>
+              <input name="buyerName" type="text"  ng-model="orderInfo.buyer.name">
+              <input name="buyerEmail" type="text"  ng-model="orderInfo.buyer.email">
+            </fieldset>
+            <fieldset>
+              <legend>What do you want {{celeb.name}} to write?</legend>
+              <input name="desiredText" type="text" class="span12" ng-model="orderInfo.desiredText">
+            </fieldset>
+            <fieldset>
+              <legend>Is there anything personal you want {{celeb.name}} to know?</legend>
+              <input name="personalNote" type="text" class="span12" ng-model="orderInfo.personalNote">
+            </fieldset>
+            <button class="btn btn-primary submit">This button makes you feel really, really good</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.1.0/js/bootstrap.min.js" type="text/javascript"></script>
+  </body>
+</html>
