@@ -12,6 +12,7 @@ class CustomerTests extends EgraphsUnitTest
   with DBTransactionPerTest
 {
   val customerStore = AppConfig.instance[CustomerStore]
+  val usernameHistoryStore = AppConfig.instance[UsernameHistoryStore]
 
   //
   // SavingEntityTests[Account] methods
@@ -101,17 +102,27 @@ class CustomerTests extends EgraphsUnitTest
     exception1.getLocalizedMessage should include("Must have available inventory to purchase product")
   }
 
-  "findOrCreateByEmail" should "find or create as appropriate" in {
-    val acct = TestData.newSavedAccount()
-    acct.customerId should be(None)
-    val customer = customerStore.findOrCreateByEmail(acct.email, "joe fan")
-
-    val updatedAcct = acct.services.accountStore.get(acct.id)
-    customer.id should be(updatedAcct.customerId.get)
-    customerStore.findOrCreateByEmail(acct.email, "joe fan") should be(customer)
-  }
-
   private def savedBuyerRecipientAndProduct(): (Customer, Customer, Product) = {
     (TestData.newSavedCustomer(), TestData.newSavedCustomer(), TestData.newSavedProduct())
+  }
+
+  "findOrCreateByEmail" should "find or create as appropriate" in {
+    val (customer, account) = createCustomerWithFindOrCreateByEmail()
+
+    val updatedAcct = account.services.accountStore.get(account.id)
+    customer.id should be(updatedAcct.customerId.get)
+    customerStore.findOrCreateByEmail(account.email, "joe fan") should be(customer)
+  }
+
+  "findOrCreateByEmail" should "create an username when it creates." in {
+    val (customer, _) = createCustomerWithFindOrCreateByEmail()
+    usernameHistoryStore.findCurrentByCustomer(customer) should not be (None)
+  }
+
+  private def createCustomerWithFindOrCreateByEmail(): (Customer, Account) = {
+    val account = TestData.newSavedAccount()
+    account.customerId should be(None)
+    val customer = customerStore.findOrCreateByEmail(account.email, "joe fan")
+    (customer, account)
   }
 }

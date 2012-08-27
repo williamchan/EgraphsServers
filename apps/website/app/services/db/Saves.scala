@@ -178,24 +178,41 @@ trait Saves[KeyT, T <: KeyedEntity[KeyT]] {
    * See class documentation for usage.
    */
   final def beforeInsertOrUpdate(transform: (T) => T) {
-    preInsertOrUpdateTransforms = preInsertOrUpdateTransforms ++ Vector(transform)
+    beforeInsert(transform)
+    beforeUpdate(transform)
+  }
+
+  /**
+   * Hook to provide an entity transform that will be applied before inserting any
+   * new object.
+   *
+   * See class documentation for usage.
+   */
+  final def beforeInsert(transform: (T) => T) {
+    preInsertTransforms = preInsertTransforms ++ Vector(transform)
+  }
+
+  /**
+   * Hook to provide a transform to apply before updating any new object.
+   *
+   * See class documentation for usage.
+   */
+  final def beforeUpdate(transform: (T) => T) {
+    preUpdateTransforms = preUpdateTransforms ++ Vector(transform)
   }
 
   //
   // Private API
   //
-  private var preInsertOrUpdateTransforms = Vector.empty[(T) => T]
-
-  protected def insertOrUpdate(toUpsert: T): T = {
-    table.insertOrUpdate(performTransforms(preInsertOrUpdateTransforms, toUpsert))
-  }
+  private var preInsertTransforms = Vector.empty[(T) => T]
+  private var preUpdateTransforms = Vector.empty[(T) => T]
 
   protected def insert(toInsert: T): T = {
-    table.insert(performTransforms(preInsertOrUpdateTransforms, toInsert))
+    table.insert(performTransforms(preInsertTransforms, toInsert))
   }
 
   protected def updateTable(toUpdate: T): T = {
-    val finalEntity = performTransforms(preInsertOrUpdateTransforms, toUpdate)
+    val finalEntity = performTransforms(preUpdateTransforms, toUpdate)
     update(table)(row =>
       where(keysEqual((row.id), finalEntity.id))
         set (defineUpdate(row, finalEntity): _*)

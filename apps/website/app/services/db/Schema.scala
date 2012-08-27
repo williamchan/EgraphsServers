@@ -124,7 +124,7 @@ class Schema @Inject()(
   val usernameHistories = table[Username]("Usernames")
   on(usernameHistories)(usernameHistory =>
     declare(
-      usernameHistory.id is  dbType("varchar(255)"),
+      usernameHistory.id is dbType("varchar(255)"),
       usernameHistory.customerId is indexed
     )
   )

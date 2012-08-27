@@ -67,7 +67,7 @@ with DBTransactionPerTest
 
     // try to make another username permanent should fail
     val exception = intercept[Exception] {Username( id = TestData.generateUsername(), customerId = customer.id, isPermanent = true).save()}
-    exception.getLocalizedMessage should include("There can only be one permenant username")
+    exception.getLocalizedMessage should include("There can only be one permanent username")
   }
 
   "Username" should "not be the current username for a customer if it is removed" in {

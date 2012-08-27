@@ -7,7 +7,7 @@ import org.squeryl.annotations.Column
 
 /**
  * Persistent entity representing a customer's username.  This may not be their current user name, but one that they
- * once had at the very least.  There should be at most 1 Username per customerId that isPermenant.
+ * once had at the very least.  There should be at most 1 Username per customerId that isPermanent.
  */
 case class Username(
   @Column("username")
@@ -59,7 +59,7 @@ case class RichUsername(username: Username) {
 
   def save(): Username = {
     if(username.isPermanent && !canBePermanent) {
-      throw new Exception("There can only be one permenant username for each customerId.  Cannot make this username permenant.")
+      throw new Exception("There can only be one permanent username for each customerId.  Cannot make this username permanent.")
     }
 
     services.usernameHistoryStore.save(username)
