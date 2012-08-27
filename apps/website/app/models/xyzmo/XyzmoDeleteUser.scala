@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import models._
 import org.squeryl.PrimitiveTypeMode._
 import services.AppConfig
-import services.db.{KeyedCaseClass, Schema, Saves}
+import services.db.{KeyedCaseClass, Schema, SavesWithLongKey}
 import services.Time
 
 /**
@@ -49,10 +49,10 @@ case class XyzmoDeleteUser(id: Long = 0,
 
 }
 
-class XyzmoDeleteUserStore @Inject()(schema: Schema) extends Saves[XyzmoDeleteUser] with SavesCreatedUpdated[XyzmoDeleteUser] {
+class XyzmoDeleteUserStore @Inject()(schema: Schema) extends SavesWithLongKey[XyzmoDeleteUser] with SavesCreatedUpdated[Long,XyzmoDeleteUser] {
 
   //
-  // Saves[XyzmoDeleteUser] methods
+  // SavesWithLongKey[XyzmoDeleteUser] methods
   //
   override val table = schema.xyzmoDeleteUserTable
 
@@ -68,7 +68,7 @@ class XyzmoDeleteUserStore @Inject()(schema: Schema) extends Saves[XyzmoDeleteUs
   }
 
   //
-  // SavesCreatedUpdated[XyzmoDeleteUser] methods
+  // SavesCreatedUpdated[Long,XyzmoDeleteUser] methods
   //
   override def withCreatedUpdated(toUpdate: XyzmoDeleteUser, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

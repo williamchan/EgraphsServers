@@ -3,13 +3,24 @@ package utils
 import org.scalatest.matchers.ShouldMatchers
 import org.squeryl.KeyedEntity
 import play.test.UnitFlatSpec
+import org.apache.commons.lang.RandomStringUtils
+
+trait SavingEntityIdLongTests[T <: KeyedEntity[Long]] extends SavingEntityTests[Long, T] { this: UnitFlatSpec with ShouldMatchers =>
+  def newIdValue = 0L
+  def improbableIdValue = Integer.MAX_VALUE
+}
+
+trait SavingEntityIdStringTests[T <: KeyedEntity[String]] extends SavingEntityTests[String, T] { this: UnitFlatSpec with ShouldMatchers =>
+  val newIdValue = RandomStringUtils.randomAlphanumeric(30)
+  def improbableIdValue = RandomStringUtils.randomAlphanumeric(30)
+}
 
 /**
- * Test set for any class whose companion object implements Saves[TheClass]
+ * Test set for any class whose companion object implements SavesWithLongKey[TheClass]
  *
  * Ensures that basic CRUD works properly.
  */
-trait SavingEntityTests[T <: KeyedEntity[Long]] { this: UnitFlatSpec with ShouldMatchers =>
+trait SavingEntityTests[KeyT, T <: KeyedEntity[KeyT]] { this: UnitFlatSpec with ShouldMatchers =>
   //
   // Abstract Methods
   //
@@ -20,16 +31,20 @@ trait SavingEntityTests[T <: KeyedEntity[Long]] { this: UnitFlatSpec with Should
   def saveEntity(toSave: T): T
 
   /** Load an entity with the given id from the data store */
-  def restoreEntity(id: Long): Option[T]
+  def restoreEntity(id: KeyT): Option[T]
 
   /** Transform all fields directly managed by the class and its companion. */
   def transformEntity(toTransform: T): T
-  
+
+  def newIdValue: KeyT
+
+  def improbableIdValue: KeyT
+
   //
   // Test cases
   //
-  "A new instance" should "have initial id <= 0" in {
-    newEntity.id should be <= (0L)
+  "A new instance" should "have initial id equal to " + newIdValue in {
+    newEntity.id should be === (newIdValue)
   }
 
   "A restored instance" should "be the same as the originally saved one" in {
@@ -43,7 +58,7 @@ trait SavingEntityTests[T <: KeyedEntity[Long]] { this: UnitFlatSpec with Should
   "Restoring an unsaved id" should "return None" in {
     // We can only guarentee that 0 shouldn't be used as an id already if we aren't clearing the database, but max
     // probably isn't either and it makes for a more interesting test.
-    restoreEntity(Integer.MAX_VALUE) should be (None)
+    restoreEntity(improbableIdValue) should be (None)
   }
 
   "Restoring an updated instance" should "yield the updated version, not the original" in {

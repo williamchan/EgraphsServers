@@ -7,8 +7,8 @@ import models.{EnrollmentBatch, Celebrity}
 
 class XyzmoDeleteUserTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with SavingEntityTests[XyzmoDeleteUser]
-  with CreatedUpdatedEntityTests[XyzmoDeleteUser]
+  with SavingEntityIdLongTests[XyzmoDeleteUser]
+  with CreatedUpdatedEntityTests[Long, XyzmoDeleteUser]
   with DBTransactionPerTest {
   //
   // SavingEntityTests[XyzmoDeleteUser] methods
@@ -31,7 +31,7 @@ class XyzmoDeleteUserTests extends EgraphsUnitTest
   }
 
   def newEntity = {
-    val enrollmentBatch = EnrollmentBatch(celebrityId = new Celebrity().save().id).save()
+    val enrollmentBatch = EnrollmentBatch(celebrityId = TestData.newSavedCelebrity().id).save()
     new XyzmoDeleteUser(enrollmentBatchId = enrollmentBatch.id, baseResult = "ok")
   }
 

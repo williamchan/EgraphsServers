@@ -6,8 +6,8 @@ import models.{EnrollmentBatch, Celebrity}
 
 class VBGFinishEnrollTransactionTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with SavingEntityTests[VBGFinishEnrollTransaction]
-  with CreatedUpdatedEntityTests[VBGFinishEnrollTransaction]
+  with SavingEntityIdLongTests[VBGFinishEnrollTransaction]
+  with CreatedUpdatedEntityTests[Long, VBGFinishEnrollTransaction]
   with DBTransactionPerTest {
   //
   // SavingEntityTests[VBGFinishEnrollTransaction] methods
@@ -21,7 +21,7 @@ class VBGFinishEnrollTransactionTests extends EgraphsUnitTest
   }
 
   def newEntity = {
-    val enrollmentBatch = EnrollmentBatch(celebrityId = new Celebrity().save().id).save()
+    val enrollmentBatch = EnrollmentBatch(celebrityId = TestData.newSavedCelebrity().id).save()
     new VBGFinishEnrollTransaction(enrollmentBatchId = enrollmentBatch.id)
   }
 

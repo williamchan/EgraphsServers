@@ -2,7 +2,7 @@ package models
 
 import play.data.validation.Validation.ValidationResult
 import java.sql.Timestamp
-import services.db.{KeyedCaseClass, Saves, Schema}
+import services.db.{KeyedCaseClass, SavesWithLongKey, Schema}
 import com.google.inject.Inject
 import java.util.UUID
 import org.apache.commons.codec.binary.Base64
@@ -40,14 +40,27 @@ case class Account(
    */
   def createCustomer(name: String): Customer = {
     require(customerId.isEmpty, "Cannot create Customer on Account that already has one")
+    Customer(name = name, username = createUsernameStringFromEmail())
+  }
+
+  /**
+   * Creates a UsernameHistory with a default username based on the Account's email. Throws an exception if username is defined.
+   *
+   * @return newly created Customer
+   */
+  def createUsername(): Username = {
+    Username(id = createUsernameStringFromEmail())
+  }
+
+  private def createUsernameStringFromEmail(): String = {
     var username = email.split("@").head
     //Check if username already taken. append random digits until its unique.
-    
+
     val rnd = new scala.util.Random
     while(services.customerStore.findByUsername(username).exists(p => true)) {
       username = username + rnd.nextInt(9).toString
     }
-    Customer(name = name, username=username)
+    username
   }
 
   def password: Option[Password] = {
@@ -131,7 +144,7 @@ object Account {
  */
 case class AccountServices @Inject() (accountStore: AccountStore, customerStore: CustomerStore, addressStore: AddressStore)
 
-class AccountStore @Inject() (schema: Schema) extends Saves[Account] with SavesCreatedUpdated[Account] {
+class AccountStore @Inject() (schema: Schema) extends SavesWithLongKey[Account] with SavesCreatedUpdated[Long,Account] {
   import org.squeryl.PrimitiveTypeMode._
 
   def authenticate(email: String, passwordAttempt: String): Either[AccountAuthenticationError, Account] = {
@@ -193,7 +206,7 @@ class AccountStore @Inject() (schema: Schema) extends Saves[Account] with SavesC
   }
 
   //
-  // Saves[Account] methods
+  // SavesWithLongKey[Account] methods
   //
   override val table = schema.accounts
 
@@ -213,15 +226,14 @@ class AccountStore @Inject() (schema: Schema) extends Saves[Account] with SavesC
     )
   }
 
-  beforeInsert(withEmailInLowerCase)
-  beforeUpdate(withEmailInLowerCase)
+  beforeInsertOrUpdate(withEmailInLowerCase)
 
   private def withEmailInLowerCase(toUpdate: Account): Account = {
     toUpdate.copy(email = toUpdate.email.trim().toLowerCase)
   }
 
   //
-  // SavesCreatedUpdated[Account] methods
+  // SavesCreatedUpdated[Long,Account] methods
   //
   override protected def withCreatedUpdated(toUpdate: Account,
                                             created: Timestamp,

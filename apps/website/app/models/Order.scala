@@ -4,7 +4,7 @@ import enums._
 import frontend.egraphs.{OrderDetails, PendingEgraphViewModel, FulfilledEgraphViewModel}
 import java.sql.Timestamp
 import org.joda.money.Money
-import services.db.{FilterOneTable, KeyedCaseClass, Schema, Saves}
+import services.db.{FilterOneTable, KeyedCaseClass, Schema, SavesWithLongKey}
 import services.Finance.TypeConversions._
 import services._
 import blobs.AccessPolicy
@@ -327,7 +327,7 @@ case class FulfilledOrder(order: Order, egraph: Egraph)
 /** Thin semantic wrapper around a tuple for product order and egraph */
 case class FulfilledProductOrder(product: Product, order:Order, egraph: Egraph)
 
-class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreatedUpdated[Order] {
+class OrderStore @Inject() (schema: Schema) extends SavesWithLongKey[Order] with SavesCreatedUpdated[Long,Order] {
   import org.squeryl.PrimitiveTypeMode._
   //
   // Public methods
@@ -455,7 +455,7 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
   }
 
   //
-  // Saves[Order] methods
+  // SavesWithLongKey[Order] methods
   //
   override val table = schema.orders
 
@@ -485,7 +485,7 @@ class OrderStore @Inject() (schema: Schema) extends Saves[Order] with SavesCreat
     )
   }
   //
-  // SavesCreatedUpdated[Order] methods
+  // SavesCreatedUpdated[Long,Order] methods
   //
   override def withCreatedUpdated(toUpdate: Order, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)

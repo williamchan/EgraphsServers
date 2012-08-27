@@ -6,8 +6,8 @@ import models.Egraph
 
 class VBGFinishVerifyTransactionTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with SavingEntityTests[VBGFinishVerifyTransaction]
-  with CreatedUpdatedEntityTests[VBGFinishVerifyTransaction]
+  with SavingEntityIdLongTests[VBGFinishVerifyTransaction]
+  with CreatedUpdatedEntityTests[Long, VBGFinishVerifyTransaction]
   with DBTransactionPerTest {
   //
   // SavingEntityTests[VBGFinishVerifyTransaction] methods

@@ -8,8 +8,8 @@ import java.awt.image.BufferedImage
 
 class ProductTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with SavingEntityTests[Product]
-  with CreatedUpdatedEntityTests[Product]
+  with SavingEntityIdLongTests[Product]
+  with CreatedUpdatedEntityTests[Long, Product]
   with DBTransactionPerTest
   with HasPublishedStatusTests[Product]
 {
@@ -94,7 +94,7 @@ class ProductTests extends EgraphsUnitTest
   }
 
   "findByCelebrityAndUrlSlug" should "return Product with matching name and celebrityId" in {
-    val celebrity = Celebrity().save()
+    val celebrity = TestData.newSavedCelebrity()
     val product = TestData.newSavedProduct(celebrity = Some(celebrity)).copy(name = "Herp Derp").save()
 
     store.findByCelebrityAndUrlSlug(celebrityId = celebrity.id, slug = product.urlSlug) should not be (None)

@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import models._
 import org.squeryl.PrimitiveTypeMode._
 import services.AppConfig
-import services.db.{KeyedCaseClass, Schema, Saves}
+import services.db.{KeyedCaseClass, Schema, SavesWithLongKey}
 import services.Time
 import com.xyzmo.wwww.biometricserver.WebServiceBiometricPartStub
 
@@ -112,7 +112,7 @@ case class XyzmoEnrollDynamicProfile(id: Long = 0,
 
 }
 
-class XyzmoEnrollDynamicProfileStore @Inject()(schema: Schema) extends Saves[XyzmoEnrollDynamicProfile] with SavesCreatedUpdated[XyzmoEnrollDynamicProfile] {
+class XyzmoEnrollDynamicProfileStore @Inject()(schema: Schema) extends SavesWithLongKey[XyzmoEnrollDynamicProfile] with SavesCreatedUpdated[Long,XyzmoEnrollDynamicProfile] {
 
   def findByEnrollmentBatch(enrollmentBatch: EnrollmentBatch): Option[XyzmoEnrollDynamicProfile] = {
     from(schema.xyzmoEnrollDynamicProfileTable)(xyzmoEnrollDynamicProfile =>
@@ -122,7 +122,7 @@ class XyzmoEnrollDynamicProfileStore @Inject()(schema: Schema) extends Saves[Xyz
   }
 
   //
-  // Saves[XyzmoEnrollDynamicProfile] methods
+  // SavesWithLongKey[XyzmoEnrollDynamicProfile] methods
   //
   override val table = schema.xyzmoEnrollDynamicProfileTable
 
@@ -143,7 +143,7 @@ class XyzmoEnrollDynamicProfileStore @Inject()(schema: Schema) extends Saves[Xyz
   }
 
   //
-  // SavesCreatedUpdated[XyzmoEnrollDynamicProfile] methods
+  // SavesCreatedUpdated[Long,XyzmoEnrollDynamicProfile] methods
   //
   override def withCreatedUpdated(toUpdate: XyzmoEnrollDynamicProfile, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

@@ -6,8 +6,8 @@ import utils._
 
 class CashTransactionTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with SavingEntityTests[CashTransaction]
-  with CreatedUpdatedEntityTests[CashTransaction]
+  with SavingEntityIdLongTests[CashTransaction]
+  with CreatedUpdatedEntityTests[Long, CashTransaction]
   with DBTransactionPerTest
 {
   val store = AppConfig.instance[CashTransactionStore]
@@ -29,7 +29,7 @@ class CashTransactionTests extends EgraphsUnitTest
 
   override def transformEntity(toTransform: CashTransaction) = {
     toTransform.copy(
-      accountId = Account(email="derp").save().id,
+      accountId = TestData.newSavedAccount().id,
       amountInCurrency = 1
     )
   }

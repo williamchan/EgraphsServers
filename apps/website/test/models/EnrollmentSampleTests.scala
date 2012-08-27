@@ -9,8 +9,8 @@ import play.Play
 
 class EnrollmentSampleTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with SavingEntityTests[EnrollmentSample]
-  with CreatedUpdatedEntityTests[EnrollmentSample]
+  with SavingEntityIdLongTests[EnrollmentSample]
+  with CreatedUpdatedEntityTests[Long, EnrollmentSample]
   with DBTransactionPerTest {
   //
   // SavingEntityTests[EnrollmentSample] methods
@@ -19,7 +19,7 @@ class EnrollmentSampleTests extends EgraphsUnitTest
   val store = AppConfig.instance[EnrollmentSampleStore]
 
   def newEntity = {
-    val celebrity = Celebrity().save()
+    val celebrity = TestData.newSavedCelebrity()
     val enrollmentBatch = EnrollmentBatch(celebrityId = celebrity.id).save()
     EnrollmentSample(enrollmentBatchId = enrollmentBatch.id)
   }
@@ -33,7 +33,7 @@ class EnrollmentSampleTests extends EgraphsUnitTest
   }
 
   override def transformEntity(toTransform: EnrollmentSample) = {
-    val enrollmentBatch = EnrollmentBatch(celebrityId = Celebrity(publicName="a").save().id).save()
+    val enrollmentBatch = EnrollmentBatch(celebrityId = TestData.newSavedCelebrity().id).save()
     toTransform.copy(
       // Actually, not much to test here. Just providing something here for now.
       enrollmentBatchId = enrollmentBatch.id

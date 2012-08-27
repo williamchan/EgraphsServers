@@ -2,7 +2,7 @@ package models
 
 import com.google.inject.Inject
 import services._
-import db.{FilterOneTable, Schema, Saves, KeyedCaseClass}
+import db.{FilterOneTable, Schema, SavesWithLongKey, KeyedCaseClass}
 import org.squeryl.Query
 import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
@@ -59,7 +59,7 @@ case class InventoryBatch(
 
 }
 
-class InventoryBatchStore @Inject()(schema: Schema, orderStore: OrderStore, inventoryBatchQueryFilters: InventoryBatchQueryFilters) extends Saves[InventoryBatch] with SavesCreatedUpdated[InventoryBatch] {
+class InventoryBatchStore @Inject()(schema: Schema, orderStore: OrderStore, inventoryBatchQueryFilters: InventoryBatchQueryFilters) extends SavesWithLongKey[InventoryBatch] with SavesCreatedUpdated[Long,InventoryBatch] {
 
   def findByCelebrity(celebrityId: Long, filters: FilterOneTable[InventoryBatch]*): Query[InventoryBatch] = {
     from(schema.inventoryBatches)((inventoryBatch) =>

@@ -3,7 +3,7 @@ package models
 import enums.OrderReviewStatus
 import java.sql.Timestamp
 import services.{Utils, Time, AppConfig}
-import services.db.{KeyedCaseClass, Schema, Saves}
+import services.db.{KeyedCaseClass, Schema, SavesWithLongKey}
 import com.google.inject.{Provider, Inject}
 import exception.InsufficientInventoryException
 import org.apache.commons.mail.HtmlEmail
@@ -15,6 +15,7 @@ import java.util.Properties
 case class CustomerServices @Inject() (accountStore: AccountStore,
                                        customerStore: CustomerStore,
                                        inventoryBatchStore: InventoryBatchStore,
+                                       usernameHistoryStore: UsernameHistoryStore,
                                        mail: Mail,
                                        @PlayConfig playConfig: Properties)
 
@@ -144,7 +145,7 @@ class CustomerStore @Inject() (
   accountStore: AccountStore,
   customerServices: Provider[CustomerServices],
   accountServices: Provider[AccountServices]
-) extends Saves[Customer] with SavesCreatedUpdated[Customer]
+) extends SavesWithLongKey[Customer] with SavesCreatedUpdated[Long,Customer]
 {
   import org.squeryl.PrimitiveTypeMode._
 
@@ -180,18 +181,22 @@ class CustomerStore @Inject() (
       // the face and return it.
       case None =>
         val account = accountOption.getOrElse(Account(email=email, services=accountServices.get))
-        val customer = account.createCustomer(name).save()
+        val unsavedCustomer = account.createCustomer(name)
+        val unsavedUsernameHistory = account.createUsername()
+        val customer = unsavedCustomer.save()
         account.copy(customerId=Some(customer.id)).save()
+        val usernameHistory = unsavedUsernameHistory.copy(customerId=customer.id).save()
         customer
     }
   }
 
   def findByUsername(username: String): Option[Customer] = {
+    //TODO: SER-223 (in progress) change this to instead use UsernameHistoryStore when that is ready
     from(schema.customers)((customer) => where(lower(customer.username) === username.toLowerCase) select (customer)).headOption
   }
 
   //
-  // Saves[Customer] methods
+  // SavesWithLongKey[Customer] methods
   //
   override val table = schema.customers
 
@@ -207,7 +212,7 @@ class CustomerStore @Inject() (
   }
 
   //
-  // SavesCreatedUpdated[Customer] methods
+  // SavesCreatedUpdated[Long,Customer] methods
   //
   override def withCreatedUpdated(toUpdate: Customer, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)

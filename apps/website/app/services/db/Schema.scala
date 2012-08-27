@@ -121,6 +121,14 @@ class Schema @Inject()(
     )
   )
 
+  val usernameHistories = table[Username]("Usernames")
+  on(usernameHistories)(usernameHistory =>
+    declare(
+      usernameHistory.id is dbType("varchar(255)"),
+      usernameHistory.customerId is indexed
+    )
+  )
+
   // ugh, why did I make so many biometrics tables?
   val vbgAudioCheckTable = table[VBGAudioCheck]
   val vbgEnrollUserTable = table[VBGEnrollUser]
@@ -163,21 +171,25 @@ class Schema @Inject()(
   // oneToManyRelation declarations -- please keep these organized
   //
 
-  val accountToAdministrator = oneAccountPerRowOn(administrators, (acct) => acct.administratorId)
+  val accountToAdministrator = oneAccountPerRowOn(administrators, (account) => account.administratorId)
   val accountToCelebrity = oneAccountPerRowOn(celebrities, (account) => account.celebrityId)
   val accountToCustomer = oneAccountPerRowOn(customers, (account) => account.customerId)
-  val accountToAddress = oneToManyRelation(accounts, addresses).via(
-    (account, address) => account.id === address.accountId)
-  val accountToTransaction = oneToManyRelation(accounts, cashTransactions).via(
-    (account, cashTransaction) => account.id === cashTransaction.accountId)
+  val accountToAddress = oneToManyRelation(accounts, addresses)
+    .via((account, address) => account.id === address.accountId)
+  val accountToTransaction = oneToManyRelation(accounts, cashTransactions)
+    .via((account, cashTransaction) => account.id === cashTransaction.accountId)
 
   val celebrityToEnrollmentBatches = oneToManyRelation(celebrities, enrollmentBatches)
     .via((celebrity, enrollmentBatch) => celebrity.id === enrollmentBatch.celebrityId)
   celebrityToEnrollmentBatches.foreignKeyDeclaration.constrainReference(onDelete cascade)
-  val celebrityToProduct = oneToManyRelation(celebrities, products).
-    via((celebrity, product) => celebrity.id === product.celebrityId)
-  val celebrityToInventoryBatches = oneToManyRelation(celebrities, inventoryBatches).
-    via((celebrity, inventoryBatch) => celebrity.id === inventoryBatch.celebrityId)
+  val celebrityToProduct = oneToManyRelation(celebrities, products)
+    .via((celebrity, product) => celebrity.id === product.celebrityId)
+  val celebrityToInventoryBatches = oneToManyRelation(celebrities, inventoryBatches)
+    .via((celebrity, inventoryBatch) => celebrity.id === inventoryBatch.celebrityId)
+
+  val customerToUsernameHistory = oneToManyRelation(customers, usernameHistories)
+    .via((customer, usernameHistory) => customer.id === usernameHistory.customerId)
+  customerToUsernameHistory.foreignKeyDeclaration.constrainReference(onDelete cascade)
 
   val buyingCustomerToOrders = oneToManyRelation(customers, orders)
     .via((customer, order) => customer.id === order.buyerId)

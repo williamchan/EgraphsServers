@@ -5,8 +5,8 @@ import services.AppConfig
 
 class AddressTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with SavingEntityTests[Address]
-  with CreatedUpdatedEntityTests[Address]
+  with SavingEntityIdLongTests[Address]
+  with CreatedUpdatedEntityTests[Long, Address]
   with DBTransactionPerTest {
 
   private val addressStore = AppConfig.instance[AddressStore]

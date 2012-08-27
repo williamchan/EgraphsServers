@@ -2,7 +2,7 @@ package models
 
 import com.google.inject.Inject
 import services._
-import db.{Schema, Saves, KeyedCaseClass}
+import db.{Schema, SavesWithLongKey, KeyedCaseClass}
 import java.sql.Timestamp
 
 case class FailedPurchaseData(
@@ -22,7 +22,7 @@ case class FailedPurchaseData(
 
 case class FailedPurchaseDataServices @Inject()(store: FailedPurchaseDataStore)
 
-class FailedPurchaseDataStore @Inject()(schema: Schema) extends Saves[FailedPurchaseData] with SavesCreatedUpdated[FailedPurchaseData] {
+class FailedPurchaseDataStore @Inject()(schema: Schema) extends SavesWithLongKey[FailedPurchaseData] with SavesCreatedUpdated[Long,FailedPurchaseData] {
   import org.squeryl.PrimitiveTypeMode._
 
   //

@@ -7,8 +7,8 @@ import models.Egraph
 
 class XyzmoVerifyUserTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with SavingEntityTests[XyzmoVerifyUser]
-  with CreatedUpdatedEntityTests[XyzmoVerifyUser]
+  with SavingEntityIdLongTests[XyzmoVerifyUser]
+  with CreatedUpdatedEntityTests[Long, XyzmoVerifyUser]
   with DBTransactionPerTest {
   //
   // SavingEntityTests[XyzmoVerifyUser] methods

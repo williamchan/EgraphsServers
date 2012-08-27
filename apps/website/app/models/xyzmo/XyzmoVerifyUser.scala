@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import models._
 import org.squeryl.PrimitiveTypeMode._
 import services.AppConfig
-import services.db.{KeyedCaseClass, Schema, Saves}
+import services.db.{KeyedCaseClass, Schema, SavesWithLongKey}
 import services.Time
 import com.xyzmo.wwww.biometricserver.WebServiceBiometricPartStub
 
@@ -70,7 +70,7 @@ case class XyzmoVerifyUser(id: Long = 0,
 
 }
 
-class XyzmoVerifyUserStore @Inject()(schema: Schema) extends Saves[XyzmoVerifyUser] with SavesCreatedUpdated[XyzmoVerifyUser] {
+class XyzmoVerifyUserStore @Inject()(schema: Schema) extends SavesWithLongKey[XyzmoVerifyUser] with SavesCreatedUpdated[Long,XyzmoVerifyUser] {
 
   def findByEgraph(egraph: Egraph): Option[XyzmoVerifyUser] = {
     from(schema.xyzmoVerifyUserTable)(xyzmoVerifyUser =>
@@ -80,7 +80,7 @@ class XyzmoVerifyUserStore @Inject()(schema: Schema) extends Saves[XyzmoVerifyUs
   }
 
   //
-  // Saves[XyzmoVerifyUser] methods
+  // SavesWithLongKey[XyzmoVerifyUser] methods
   //
   override val table = schema.xyzmoVerifyUserTable
 
@@ -98,7 +98,7 @@ class XyzmoVerifyUserStore @Inject()(schema: Schema) extends Saves[XyzmoVerifyUs
   }
 
   //
-  // SavesCreatedUpdated[XyzmoVerifyUser] methods
+  // SavesCreatedUpdated[Long,XyzmoVerifyUser] methods
   //
   override def withCreatedUpdated(toUpdate: XyzmoVerifyUser, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

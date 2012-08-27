@@ -7,17 +7,18 @@ import exception.InsufficientInventoryException
 
 class CustomerTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with SavingEntityTests[Customer]
-  with CreatedUpdatedEntityTests[Customer]
+  with SavingEntityIdLongTests[Customer]
+  with CreatedUpdatedEntityTests[Long, Customer]
   with DBTransactionPerTest
 {
   val customerStore = AppConfig.instance[CustomerStore]
+  val usernameHistoryStore = AppConfig.instance[UsernameHistoryStore]
 
   //
   // SavingEntityTests[Account] methods
   //
   override def newEntity = {
-    Customer(name = "customer", username = "username")
+    Customer(name = "customer", username = TestData.generateUsername())
   }
 
   override def saveEntity(toSave: Customer) = {
@@ -101,17 +102,27 @@ class CustomerTests extends EgraphsUnitTest
     exception1.getLocalizedMessage should include("Must have available inventory to purchase product")
   }
 
-  "findOrCreateByEmail" should "find or create as appropriate" in {
-    val acct = Account(email = "customer-" + Time.toBlobstoreFormat(Time.now) + "@egraphs.com").save()
-    acct.customerId should be(None)
-    val customer = customerStore.findOrCreateByEmail(acct.email, "joe fan")
-
-    val updatedAcct = acct.services.accountStore.get(acct.id)
-    customer.id should be(updatedAcct.customerId.get)
-    customerStore.findOrCreateByEmail(acct.email, "joe fan") should be(customer)
-  }
-
   private def savedBuyerRecipientAndProduct(): (Customer, Customer, Product) = {
     (TestData.newSavedCustomer(), TestData.newSavedCustomer(), TestData.newSavedProduct())
+  }
+
+  "findOrCreateByEmail" should "find or create as appropriate" in {
+    val (customer, account) = createCustomerWithFindOrCreateByEmail()
+
+    val updatedAcct = account.services.accountStore.get(account.id)
+    customer.id should be(updatedAcct.customerId.get)
+    customerStore.findOrCreateByEmail(account.email, "joe fan") should be(customer)
+  }
+
+  "findOrCreateByEmail" should "create an username when it creates." in {
+    val (customer, _) = createCustomerWithFindOrCreateByEmail()
+    usernameHistoryStore.findCurrentByCustomer(customer) should not be (None)
+  }
+
+  private def createCustomerWithFindOrCreateByEmail(): (Customer, Account) = {
+    val account = TestData.newSavedAccount()
+    account.customerId should be(None)
+    val customer = customerStore.findOrCreateByEmail(account.email, "joe fan")
+    (customer, account)
   }
 }

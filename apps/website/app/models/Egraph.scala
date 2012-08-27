@@ -11,7 +11,7 @@ import vbg.{VBGVerifySampleStore, VBGVerifySample}
 import services.signature.{SignatureBiometricsError, YesMaamSignatureBiometricService, SignatureBiometricService}
 import services._
 import audio.AudioConverter
-import db.{FilterOneTable, Schema, KeyedCaseClass, Saves}
+import db.{FilterOneTable, Schema, KeyedCaseClass, SavesWithLongKey}
 import graphics.{RasterGraphicsSource, Handwriting, HandwritingPen, GraphicsSource}
 import java.text.SimpleDateFormat
 import com.google.inject.{Provider, Inject}
@@ -569,7 +569,7 @@ trait EgraphAssets {
   def save(signature: String, message: Option[String], audio: Array[Byte])
 }
 
-class EgraphStore @Inject() (schema: Schema) extends Saves[Egraph] with SavesCreatedUpdated[Egraph] {
+class EgraphStore @Inject() (schema: Schema) extends SavesWithLongKey[Egraph] with SavesCreatedUpdated[Long,Egraph] {
   import org.squeryl.PrimitiveTypeMode._
 
   def getEgraphsAndResults(filters: FilterOneTable[Egraph]*): Query[(Egraph, Option[VBGVerifySample], Option[XyzmoVerifyUser])] = {
@@ -604,7 +604,7 @@ class EgraphStore @Inject() (schema: Schema) extends Saves[Egraph] with SavesCre
   }
 
   //
-  // Saves[Egraph] methods
+  // SavesWithLongKey[Egraph] methods
   //
   override val table = schema.egraphs
 
@@ -621,7 +621,7 @@ class EgraphStore @Inject() (schema: Schema) extends Saves[Egraph] with SavesCre
   }
 
   //
-  // SavesCreatedUpdated[Egraph] methods
+  // SavesCreatedUpdated[Long,Egraph] methods
   //
   override def withCreatedUpdated(toUpdate: Egraph, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)

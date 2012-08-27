@@ -3,7 +3,7 @@ package models
 import enums.PublishedStatus.EnumVal
 import enums.{PublishedStatus, HasPublishedStatus}
 import java.sql.Timestamp
-import services.db.{FilterOneTable, Schema, Saves, KeyedCaseClass}
+import services.db.{FilterOneTable, Schema, SavesWithLongKey, KeyedCaseClass}
 import play.templates.JavaExtensions
 import org.joda.money.Money
 import services.Finance.TypeConversions._
@@ -353,7 +353,7 @@ object Product {
   }
 }
 
-class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: InventoryBatchQueryFilters) extends Saves[Product] with SavesCreatedUpdated[Product] {
+class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: InventoryBatchQueryFilters) extends SavesWithLongKey[Product] with SavesCreatedUpdated[Long,Product] {
   import org.squeryl.PrimitiveTypeMode._
 
   //
@@ -404,7 +404,7 @@ class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: Invent
   }
 
   //
-  // Saves[Product] methods
+  // SavesWithLongKey[Product] methods
   //
   def table = schema.products
 
@@ -433,7 +433,7 @@ class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: Invent
   }
 
   //
-  // SavesCreatedUpdated[Product] methods
+  // SavesCreatedUpdated[Long,Product] methods
   //
   override def withCreatedUpdated(toUpdate: Product, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)

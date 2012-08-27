@@ -6,7 +6,7 @@ import java.sql.Timestamp
 import services.Time
 import com.google.inject.Inject
 import services.AppConfig
-import services.db.{Schema, Saves, KeyedCaseClass}
+import services.db.{Schema, SavesWithLongKey, KeyedCaseClass}
 import org.squeryl.PrimitiveTypeMode._
 import org.squeryl.Query
 
@@ -72,7 +72,7 @@ case class CashTransaction(
   }
 }
 
-class CashTransactionStore @Inject() (schema: Schema) extends Saves[CashTransaction] with SavesCreatedUpdated[CashTransaction] {
+class CashTransactionStore @Inject() (schema: Schema) extends SavesWithLongKey[CashTransaction] with SavesCreatedUpdated[Long,CashTransaction] {
 
   def findByOrderId(orderId: Long): Query[CashTransaction] = {
     from(schema.cashTransactions)(txn =>
@@ -89,14 +89,14 @@ class CashTransactionStore @Inject() (schema: Schema) extends Saves[CashTransact
   }
 
   //
-  // SavesCreatedUpdated[CashTransaction] members
+  // SavesCreatedUpdated[Long,CashTransaction] members
   //
   override protected def withCreatedUpdated(toUpdate: CashTransaction, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)
   }
 
   //
-  // Saves[CashTransaction] members
+  // SavesWithLongKey[CashTransaction] members
   //
   protected def table = schema.cashTransactions
 

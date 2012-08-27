@@ -3,7 +3,7 @@ package models
 import enums.EnrollmentStatus
 import java.sql.Timestamp
 import services.Time
-import services.db.{KeyedCaseClass, Schema, Saves}
+import services.db.{KeyedCaseClass, Schema, SavesWithLongKey}
 import services.AppConfig
 import services.signature.{SignatureBiometricService, SignatureBiometricsError}
 import services.voice.{VoiceBiometricService, VoiceBiometricsError}
@@ -95,7 +95,7 @@ object EnrollmentBatch {
   }
 }
 
-class EnrollmentBatchStore @Inject() (schema: Schema) extends Saves[EnrollmentBatch] with SavesCreatedUpdated[EnrollmentBatch] {
+class EnrollmentBatchStore @Inject() (schema: Schema) extends SavesWithLongKey[EnrollmentBatch] with SavesCreatedUpdated[Long,EnrollmentBatch] {
   import org.squeryl.PrimitiveTypeMode._
 
   def getOpenEnrollmentBatch(celebrity: Celebrity): Option[EnrollmentBatch] = {
@@ -128,7 +128,7 @@ class EnrollmentBatchStore @Inject() (schema: Schema) extends Saves[EnrollmentBa
   }
 
   //
-  // Saves[EnrollmentBatch] methods
+  // SavesWithLongKey[EnrollmentBatch] methods
   //
   override val table = schema.enrollmentBatches
 
@@ -143,7 +143,7 @@ class EnrollmentBatchStore @Inject() (schema: Schema) extends Saves[EnrollmentBa
   }
 
   //
-  // SavesCreatedUpdated[EnrollmentBatch] methods
+  // SavesCreatedUpdated[Long,EnrollmentBatch] methods
   //
   override def withCreatedUpdated(toUpdate: EnrollmentBatch, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

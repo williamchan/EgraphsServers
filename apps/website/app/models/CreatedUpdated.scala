@@ -2,7 +2,7 @@ package models
 
 import java.util.Date
 import java.sql.Timestamp
-import services.db.{KeyedCaseClass, Saves}
+import services.db.{Saves, KeyedCaseClass, SavesWithLongKey}
 import services.Time
 
 /**
@@ -32,8 +32,8 @@ trait HasCreatedUpdated {
  *
  * See [[models.Account]] for an example.
  */
-trait SavesCreatedUpdated[T <: KeyedCaseClass[Long] with HasCreatedUpdated] {
-  this: Saves[T] =>
+trait SavesCreatedUpdated[KeyT, T <: KeyedCaseClass[KeyT] with HasCreatedUpdated] {
+  this: Saves[KeyT, T] =>
 
   //
   // Abstract members
@@ -49,12 +49,11 @@ trait SavesCreatedUpdated[T <: KeyedCaseClass[Long] with HasCreatedUpdated] {
   // Private implementation
   //
   private def setCreatedAndUpdatedFields(toUpdate: T): T = {
-    val timestamp = now
-    withCreatedUpdated(toUpdate, timestamp, timestamp)
-  }
-
-  private def setUpdatedField(toUpdate: T): T = {
-    withCreatedUpdated(toUpdate, created = toUpdate.created, updated = now)
+    if (toUpdate.created == Time.defaultTimestamp) {
+      withCreatedUpdated(toUpdate, now, now)
+    } else { // update
+      withCreatedUpdated(toUpdate, created = toUpdate.created, updated = now)
+    }
   }
 
   private def now: Timestamp = {
@@ -62,6 +61,5 @@ trait SavesCreatedUpdated[T <: KeyedCaseClass[Long] with HasCreatedUpdated] {
   }
 
   // Saving lifecycle hooks
-  beforeInsert(setCreatedAndUpdatedFields)
-  beforeUpdate(setUpdatedField)
+  beforeInsertOrUpdate(setCreatedAndUpdatedFields)
 }

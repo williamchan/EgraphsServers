@@ -52,13 +52,13 @@ class TimeTests extends EgraphsUnitTest {
 
   "stopwatch" should "report accurate times in seconds" in {
     val (result, duration) = Time.stopwatch {
-      Thread.sleep(200)
+      Thread.sleep(10)
 
       1
     }
 
     result should be (1)
-    duration should be >= (0.200)
+    duration should be >= (0.010)
   }
 
   "second duration conversions" should "be correct" in {

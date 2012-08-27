@@ -7,6 +7,7 @@ import org.joda.time.DateTime
 import models._
 import enums.{EgraphState, PublishedStatus}
 import play.libs.Codec
+import org.apache.commons.lang.RandomStringUtils
 
 /**
  * Renders saved copies of domain objects that satisfy all relational integrity
@@ -31,7 +32,14 @@ object TestData {
   def getTimeInBlobstoreFormat: String = Time.toBlobstoreFormat(Time.now)
 
   def generateEmail(prefix: String = "", domain: String = "egraphs.com"): String = {
-    prefix + getTimeInBlobstoreFormat + "@" + domain
+    val randomInt = random.nextInt() // this is necessary since 2 calls with same parameter could produce the same time blobstore time if run in quick succession.
+    prefix + getTimeInBlobstoreFormat + randomInt + "@" + domain
+  }
+
+  def generateUsername(): String = {RandomStringUtils.randomAlphabetic(30)}
+
+  def generateFullname(): String = {
+    RandomStringUtils.randomAlphabetic(10) + " " + RandomStringUtils.randomAlphabetic(10)
   }
 
   def makeTestCacheKey: String = {
@@ -65,17 +73,18 @@ object TestData {
   }
 
   def newSavedCustomer(): Customer = {
-    val acct = Account(email = generateEmail(prefix = "customer-")).withPassword(defaultPassword).right.get.save()
-    val cust = acct.createCustomer(name = "Test Customer").save()
-    acct.copy(customerId = Some(cust.id)).save()
-    cust
+    val account = Account(email = generateEmail(prefix = "customer-")).withPassword(defaultPassword).right.get.save()
+    val customer = account.createCustomer(name = "Test Customer").save()
+    account.createUsername().copy(customerId = customer.id).save()
+    account.copy(customerId = Some(customer.id)).save()
+    customer
   }
 
   def newSavedCelebrity(): Celebrity = {
-    val identifier = getTimeInBlobstoreFormat
-    val email = "celebrity-" + identifier + "@egraphs.com"
+    val fullName = generateFullname()
+    val email = generateEmail(fullName.replaceAll(" ", "."))
     val acct = Account(email = email).save()
-    val celeb = Celebrity(publicName = "Celebrity " + identifier).withPublishedStatus(PublishedStatus.Published).save()
+    val celeb = Celebrity(publicName = fullName).withPublishedStatus(PublishedStatus.Published).save()
 
     acct.copy(celebrityId = Some(celeb.id)).save()
 

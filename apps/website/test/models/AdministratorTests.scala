@@ -7,8 +7,8 @@ import utils._
 
 class AdministratorTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with SavingEntityTests[Administrator]
-  with CreatedUpdatedEntityTests[Administrator]
+  with SavingEntityIdLongTests[Administrator]
+  with CreatedUpdatedEntityTests[Long, Administrator]
   with DBTransactionPerTest
 {
   val adminStore = AppConfig.instance[AdministratorStore]

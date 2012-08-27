@@ -8,8 +8,8 @@ import java.awt.image.BufferedImage
 
 class EgraphTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with SavingEntityTests[Egraph]
-  with CreatedUpdatedEntityTests[Egraph]
+  with SavingEntityIdLongTests[Egraph]
+  with CreatedUpdatedEntityTests[Long, Egraph]
   with DBTransactionPerTest
 {
   private val store = AppConfig.instance[EgraphStore]
@@ -157,13 +157,17 @@ class EgraphTests extends EgraphsUnitTest
     val awaitingVerification = TestData.newSavedOrder().newEgraph.withEgraphState(EgraphState.AwaitingVerification).save()
     val published = TestData.newSavedOrder().newEgraph.withEgraphState(EgraphState.Published).save()
 
-    store.getEgraphsAndResults(egraphQueryFilters.passedBiometrics).toSeq.map(e => e._1).toSet should be(Set(passedBiometrics))
-    store.getEgraphsAndResults(egraphQueryFilters.failedBiometrics).toSeq.map(e => e._1).toSet should be(Set(failedBiometrics))
-    store.getEgraphsAndResults(egraphQueryFilters.approvedByAdmin).toSeq.map(e => e._1).toSet should be(Set(approvedByAdmin))
-    store.getEgraphsAndResults(egraphQueryFilters.rejectedByAdmin).toSeq.map(e => e._1).toSet should be(Set(rejectedByAdmin))
-    store.getEgraphsAndResults(egraphQueryFilters.awaitingVerification).toSeq.map(e => e._1).toSet should be(Set(awaitingVerification))
-    store.getEgraphsAndResults(egraphQueryFilters.published).toSeq.map(e => e._1).toSet should be(Set(published))
-    store.getEgraphsAndResults(egraphQueryFilters.pendingAdminReview).toSeq.map(e => e._1).toSet should be(Set(passedBiometrics, failedBiometrics, approvedByAdmin))
+    val toCheck = store.getEgraphsAndResults(egraphQueryFilters.passedBiometrics).toSeq.map(e => e._1).toSet
+    store.getEgraphsAndResults(egraphQueryFilters.passedBiometrics).toSeq.map(e => e._1).toSet should contain(passedBiometrics)
+    store.getEgraphsAndResults(egraphQueryFilters.failedBiometrics).toSeq.map(e => e._1).toSet should contain(failedBiometrics)
+    store.getEgraphsAndResults(egraphQueryFilters.approvedByAdmin).toSeq.map(e => e._1).toSet should contain(approvedByAdmin)
+    store.getEgraphsAndResults(egraphQueryFilters.rejectedByAdmin).toSeq.map(e => e._1).toSet should contain(rejectedByAdmin)
+    store.getEgraphsAndResults(egraphQueryFilters.awaitingVerification).toSeq.map(e => e._1).toSet should contain(awaitingVerification)
+    store.getEgraphsAndResults(egraphQueryFilters.published).toSeq.map(e => e._1).toSet should contain(published)
+    val  pendingAdminReview = store.getEgraphsAndResults(egraphQueryFilters.pendingAdminReview).toSeq.map(e => e._1).toSet
+    pendingAdminReview should contain(passedBiometrics)
+    pendingAdminReview should contain(failedBiometrics)
+    pendingAdminReview should contain(approvedByAdmin)
   }
 
   "getCelebrityEgraphsAndResults" should "filter queries based on EgraphQueryFilters" in {

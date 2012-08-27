@@ -4,7 +4,7 @@ import enums.{HasEnrollmentStatus, EnrollmentStatus, PublishedStatus, HasPublish
 import java.sql.Timestamp
 import services.blobs.AccessPolicy
 import play.templates.JavaExtensions
-import services.db.{FilterOneTable, KeyedCaseClass, Schema, Saves}
+import services.db.{FilterOneTable, KeyedCaseClass, Schema, SavesWithLongKey}
 import services.blobs.Blobs.Conversions._
 import com.google.inject.{Provider, Inject}
 import org.squeryl.Query
@@ -66,6 +66,7 @@ case class Celebrity(id: Long = 0,
   //
   /**Persists by conveniently delegating to companion object's save method. */
   def save(): Celebrity = {
+    require(!publicName.isEmpty, "A celebrity without a publicName is hardly a celebrity at all.")
     services.store.save(this)
   }
 
@@ -334,7 +335,7 @@ object Celebrity {
   }
 }
 
-class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with SavesCreatedUpdated[Celebrity] {
+class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebrity] with SavesCreatedUpdated[Long,Celebrity] {
   import org.squeryl.PrimitiveTypeMode._
 
   //
@@ -428,7 +429,7 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
   }
 
   //
-  // Saves[Celebrity] methods
+  // SavesWithLongKey[Celebrity] methods
   //
   override val table = schema.celebrities
 
@@ -454,7 +455,7 @@ class CelebrityStore @Inject() (schema: Schema) extends Saves[Celebrity] with Sa
   }
 
   //
-  // SavesCreatedUpdated[Celebrity] methods
+  // SavesCreatedUpdated[Long,Celebrity] methods
   //
   override def withCreatedUpdated(toUpdate: Celebrity, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

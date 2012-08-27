@@ -1,8 +1,9 @@
 package services.db
 
-import org.squeryl.Table
-import org.squeryl.dsl.ast.UpdateAssignment
+import org.squeryl.{KeyedEntity,Table}
+import org.squeryl.dsl.ast.{LogicalBoolean, EqualityExpression, UpdateAssignment}
 import org.squeryl.PrimitiveTypeMode._
+import sun.security.krb5.internal.ktab.KeyTab
 
 /**
  * Gives an object the ability to save instances of the associated type, eg Person.save(personInstance).
@@ -15,7 +16,7 @@ import org.squeryl.PrimitiveTypeMode._
  * {{{
  *    case class Person(id: Long = 0L, name: String = "") extends Keyed[Long]
  *
- *    object Person extends Saves[Person] {
+ *    object Person extends SavesWithLongKey[Person] {
  *       override val table = MySquerylDb.people
  *
  *       override def defineUpdate (theOld: person, theNew: person) = {
@@ -34,7 +35,7 @@ import org.squeryl.PrimitiveTypeMode._
  * {{{
  *   case class Person(id: Long = 0L, name: String = "", created: Date = new Date(0L))
  *
- *   object Person extends Saves[Person] {
+ *   object Person extends SavesWithLongKey[Person] {
  *     beforeInsert((personToTransform) => personToTransform.copy(created=new Date()))
  *
  *     override val table: Table[Person] = MySquerylDb.people
@@ -48,7 +49,42 @@ import org.squeryl.PrimitiveTypeMode._
  * }
  * }}}
  */
-trait Saves[T <: {def id : Long}] {
+
+trait SavesWithLongKey[T <: KeyedEntity[Long]] extends Saves[Long, T] {
+  override protected final def keysEqual(id: Long, otherId: Long): LogicalBoolean = {
+    id === otherId
+  }
+
+  override final def save(toSave: T): T = {
+    toSave.id match {
+      case n if n <= 0 =>
+        insert(toSave)
+
+      case _ =>
+        updateTable(toSave)
+    }
+  }
+}
+
+trait SavesWithStringKey[T <: KeyedEntity[String]] extends Saves[String, T] {
+  override protected final def keysEqual(id: String, otherId: String): LogicalBoolean = {
+    id === otherId
+  }
+
+  override final def save(toSave: T): T = {
+    val maybeSaved = findById(toSave.id)
+
+    maybeSaved match {
+      case None =>
+        insert(toSave)
+
+      case _ =>
+        updateTable(toSave)
+    }
+  }
+}
+
+trait Saves[KeyT, T <: KeyedEntity[KeyT]] {
 
   //
   // Abstract members
@@ -61,13 +97,11 @@ trait Saves[T <: {def id : Long}] {
    * that usually appears in a Squeryl set() clause. Usually this will be just a matter of taking
    * all the persisted properties and setting them.
    *
-   * Note: Every KeyedCaseClass will need to override defineUpdate until SQueryL manual mutation of KeyedEntity.
-   *
    * For example:
    * {{{
    *   case class Fruit(id: Long, name: String) Keyed[Long]
    *
-   *   object Fruit extends Saves[Fruit] {
+   *   object Fruit extends SavesWithLongKey[Fruit] {
    *     override def defineUpdate(theOld: Fruit, theNew: Fruit) = {
    *        import org.squeryl.PrimitiveTypeMode._
    *        updateIs(
@@ -105,15 +139,7 @@ trait Saves[T <: {def id : Long}] {
    *
    * @return the final object that was saved, after all transforms
    */
-  final def save(toSave: T): T = {
-    toSave.id match {
-      case n if n <= 0 =>
-        insert(toSave)
-
-      case _ =>
-        updateTable(toSave)
-    }
-  }
+  def save(toSave: T): T
 
   /**
    * Locates an object by its id.
@@ -122,8 +148,8 @@ trait Saves[T <: {def id : Long}] {
    *
    * @return the located object or None
    */
-  def findById(id: Long): Option[T] = {
-    from(table)(row => where(row.id === id) select (row)).headOption
+  def findById(id: KeyT): Option[T]= {
+    from(table)(row => where(keysEqual(row.id, id)) select (row)).headOption
   }
 
   /**
@@ -135,12 +161,25 @@ trait Saves[T <: {def id : Long}] {
    *
    * @throws a RuntimeException with ID information if it failed to find the entity.
    */
-  def get(id: Long)(implicit m: Manifest[T]): T = {
+  def get(id: KeyT)(implicit m: Manifest[T]): T = {
     findById(id).getOrElse(
       throw new RuntimeException(
         "DB contained no instances of class " + m.erasure.getName + " with id="+id
       )
     )
+  }
+
+  protected def keysEqual(id: KeyT, otherId: KeyT): LogicalBoolean
+
+  /**
+   * Hook to provide an entity transform that will be applied before inserting or updating any
+   * new object.
+   *
+   * See class documentation for usage.
+   */
+  final def beforeInsertOrUpdate(transform: (T) => T) {
+    beforeInsert(transform)
+    beforeUpdate(transform)
   }
 
   /**
@@ -168,14 +207,14 @@ trait Saves[T <: {def id : Long}] {
   private var preInsertTransforms = Vector.empty[(T) => T]
   private var preUpdateTransforms = Vector.empty[(T) => T]
 
-  private def insert(toInsert: T): T = {
+  protected def insert(toInsert: T): T = {
     table.insert(performTransforms(preInsertTransforms, toInsert))
   }
 
-  private def updateTable(toUpdate: T): T = {
+  protected def updateTable(toUpdate: T): T = {
     val finalEntity = performTransforms(preUpdateTransforms, toUpdate)
     update(table)(row =>
-      where((row.id) === finalEntity.id)
+      where(keysEqual((row.id), finalEntity.id))
         set (defineUpdate(row, finalEntity): _*)
     )
 
