@@ -98,7 +98,7 @@ case class EgraphPurchaseHandler(
     val charge = try {
       payment.charge(totalAmountPaid, stripeTokenId, "Egraph Order from " + buyerEmail)
     } catch {
-      case stripeException: com.stripe.exception.InvalidRequestException => {
+      case stripeException: com.stripe.exception.StripeException => {
         val failedPurchaseData = saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = "Credit card issue: " + stripeException.getLocalizedMessage)
         return Left(PurchaseFailedStripeError(failedPurchaseData, stripeException))
       }
@@ -151,7 +151,7 @@ case class EgraphPurchaseHandler(
   sealed abstract class PurchaseFailed(val failedPurchaseData: FailedPurchaseData)
 
   // Our two failure cases for if the payment vendor failed or there was insufficient inventory
-  case class PurchaseFailedStripeError(override val failedPurchaseData: FailedPurchaseData, stripeException: com.stripe.exception.InvalidRequestException) extends PurchaseFailed(failedPurchaseData)
+  case class PurchaseFailedStripeError(override val failedPurchaseData: FailedPurchaseData, stripeException: com.stripe.exception.StripeException) extends PurchaseFailed(failedPurchaseData)
   case class PurchaseFailedInsufficientInventory(override val failedPurchaseData: FailedPurchaseData) extends PurchaseFailed(failedPurchaseData)
   case class PurchaseFailedError(override val failedPurchaseData: FailedPurchaseData) extends PurchaseFailed(failedPurchaseData)
 
