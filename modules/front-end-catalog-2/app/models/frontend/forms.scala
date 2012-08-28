@@ -5,7 +5,7 @@
 
 package models.frontend.forms
 
-import play.templates.Html
+import play.api.templates.Html
 
 /**
  * An error in the form that was identified by the server.

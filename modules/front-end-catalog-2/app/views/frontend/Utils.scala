@@ -1,11 +1,12 @@
 package views.frontend
+import play.Play
 
 /**
  * Front-end utilities that otherwise had no home.
  */
 object Utils {
-  val cdnAssets = play.configuration.conf.getProperty("cdn.enabled")
-  val cdnUrl = play.configuration.conf.getProperty("cloudfront.domain")
+  val cdnAssets = Play.application().configuration().getString("cdn.enabled")
+  val cdnUrl = Play.application().configuration() .getString("cloudfront.domain")
   /**
    * Formats a series of String / String tuples into an attribute string suitable for
    * use in an HTML tag. This is most useful when writing a wrapper around the creation

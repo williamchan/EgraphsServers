@@ -8,7 +8,7 @@ object ApplicationBuild extends Build {
   val appVersion = "2.0-SNAPSHOT"
 
   val appDependencies = Seq(
-//    "play" % "scala" % "0.9.1",
+//    "play" %% "scala" % "0.9.1",
     "org.joda" % "joda-money" % "0.6"
   )
 
