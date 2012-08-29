@@ -159,7 +159,7 @@ case class Order(
       .withCash(amountPaid.negated())
       .withCashTransactionType(CashTransactionType.PurchaseRefund)
       .save()
-    val refundedOrder = withPaymentStatus(PaymentStatus.Refunded)
+    val refundedOrder = withPaymentStatus(PaymentStatus.Refunded).save()
     (refundedOrder, refundedCharge)
   }
 
