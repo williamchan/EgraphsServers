@@ -6,6 +6,9 @@ import enums.PublishedStatus
 import play.mvc.Http.Request
 import play.mvc.results.{Forbidden, NotFound, Ok}
 import utils.{ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest}
+import java.util.Properties
+import play.mvc.Scope.Session
+import services.Utils
 
 class CelebrityAccountRequestFiltersTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValidationBefore {
 
@@ -20,8 +23,12 @@ class CelebrityAccountRequestFiltersTests extends EgraphsUnitTest with ClearsCac
     accountFilters
   }
 
-  private def instance(celebStore: CelebrityStore=null, accountFilters: AccountRequestFilters=null, productFilters:ProductQueryFilters=null) = {
-    new CelebrityAccountRequestFilters(celebStore, accountFilters, productFilters)
+  private def instance(celebStore: CelebrityStore=null,
+                       accountFilters: AccountRequestFilters=null,
+                       productFilters:ProductQueryFilters=null,
+                       administratorStore: AdministratorStore=null,
+                       playConfig: Properties=Utils.properties("admin.tools.enabled" -> "restricted")) = {
+    new CelebrityAccountRequestFilters(celebStore, accountFilters, productFilters, administratorStore, playConfig)
   }
   
   private def requestWithCelebrityId(celebrityId: String) = {
@@ -32,9 +39,7 @@ class CelebrityAccountRequestFiltersTests extends EgraphsUnitTest with ClearsCac
     request
   }
 
-  private def setupCelebrityMocks(name: String, publishedStatus: PublishedStatus.EnumVal) : (Celebrity, CelebrityStore) = {
-
-
+  private def setupCelebrityMocks(name: String = "Shaq", publishedStatus: PublishedStatus.EnumVal) : (Celebrity, CelebrityStore) = {
     val celebStore = mock[CelebrityStore]
     val celebrity = mock[Celebrity]
     celebStore.findByUrlSlug(name) returns (Some(celebrity))
@@ -49,6 +54,7 @@ class CelebrityAccountRequestFiltersTests extends EgraphsUnitTest with ClearsCac
 
     for (celebrityId <- celebrityIds) {
       implicit val request = requestWithCelebrityId(celebrityId)
+      implicit val session = mock[play.mvc.Scope.Session]
 
       val blockThatShouldntExecute = mock[Function2[Account, Celebrity, Any]]
 
@@ -65,6 +71,7 @@ class CelebrityAccountRequestFiltersTests extends EgraphsUnitTest with ClearsCac
   it should "Return a server error if the request credentials specify an account that has no celebrity face" in {
     // Set up
     implicit val request = requestWithCelebrityId("me")
+    implicit val session = mock[play.mvc.Scope.Session]
 
     val blockThatShouldntExecute = mock[Function2[Account, Celebrity, Any]]
     val account = mock[Account]
@@ -83,6 +90,7 @@ class CelebrityAccountRequestFiltersTests extends EgraphsUnitTest with ClearsCac
   it should "call back with the correct Account and Celebrity if celebrityId is 'me' and an Account with Celebrity face exists" in {
     // Set up
     implicit val request = requestWithCelebrityId("me")
+    implicit val session = mock[play.mvc.Scope.Session]
 
     val continuationBlock = mock[Function2[Account, Celebrity, Any]]
     continuationBlock.apply(any,any) returns (new Ok)
@@ -105,7 +113,7 @@ class CelebrityAccountRequestFiltersTests extends EgraphsUnitTest with ClearsCac
 
   "requireCelebrityUrlSlug" should "throw up if celebrityUrlSlug is not provided" in {
     for (value <- List("", null)) {
-      implicit val request = FunctionalTest.newRequest()
+      implicit val (request, session) = newRequestAndMockSession
       request.params.put("celebrityUrlSlug", value)
       
       val blockToCall = mock[Function1[Celebrity, Any]]
@@ -115,37 +123,41 @@ class CelebrityAccountRequestFiltersTests extends EgraphsUnitTest with ClearsCac
     }
   }
 
-  "requireCelebrityUrlSlug" should "find celebrities that have the provided url slug then continue via callback" in {
-    implicit val request = FunctionalTest.newRequest()
+  "requireCelebrityUrlSlug" should "find celebritiy with the provided url slug then continue via callback" in {
+    implicit val (request, session) = newRequestAndMockSession
     request.params.put("celebrityUrlSlug", "Shaq")
+    val (celebrity, celebStore) = setupCelebrityMocks(publishedStatus = PublishedStatus.Published)
 
-    val (celebrity, celebStore) = setupCelebrityMocks(name = "Shaq", publishedStatus = PublishedStatus.Published)
-
-    // Run tests
     val result = instance(celebStore=celebStore).requireCelebrityUrlSlug { celebrity =>
       "found celebrity"
     }
-
-    // Check expectations
     result should be ("found celebrity")
-
   }
 
-  "requireCelebrityUrlSlug" should "not return celebrities that have not been published yet" in {
-    // Set up
-    implicit val request = FunctionalTest.newRequest()
+  "requireCelebrityUrlSlug" should "not return celebrity that is unpublished" in {
+    implicit val (request, session) = newRequestAndMockSession
     request.params.put("celebrityUrlSlug", "Shaq")
-    val (celebrity, celebStore) = setupCelebrityMocks(name = "Shaq", publishedStatus = PublishedStatus.Unpublished)
+    val (celebrity, celebStore) = setupCelebrityMocks(publishedStatus = PublishedStatus.Unpublished)
 
-    // Run tests
     val result = instance(celebStore=celebStore).requireCelebrityUrlSlug { celebrity => "ok"  }
-
     result.isInstanceOf[NotFound] should be (true)
+  }
+
+  "requireCelebrityUrlSlug" should "return unpublished celebrity if user is admin and full admin tools are enabled" in {
+    implicit val (request, session) = newRequestAndMockSession
+    request.params.put("celebrityUrlSlug", "Shaq")
+    val (celebrity, celebStore) = setupCelebrityMocks(publishedStatus = PublishedStatus.Unpublished)
+    val adminStore = mock[AdministratorStore]
+    adminStore.isAdmin(None) returns true
+
+    val result = instance(celebStore=celebStore, administratorStore = adminStore, playConfig = Utils.properties("admin.tools.enabled" -> "full"))
+      .requireCelebrityUrlSlug { celebrity => "ok"  }
+    result should be("ok")
   }
 
   "requireCelebrityProductUrl" should "throw up if productUrlSlug is not provided" in {
     for (value <- List("", null)) {
-      implicit val request = FunctionalTest.newRequest()
+      implicit val (request, session) = newRequestAndMockSession
       request.params.put("productUrlSlug", value)
   
       val blockToCall = mock[Function1[Product, Any]]
@@ -156,7 +168,7 @@ class CelebrityAccountRequestFiltersTests extends EgraphsUnitTest with ClearsCac
   }
 
   /*it should "return 404-Not Found if the celebrity didn't have a product with the specified URL" in {
-    implicit val request = FunctionalTest.newRequest()
+    implicit val (request, session) = newRequestAndMockSession
     request.params.put("productUrlSlug", "Finals")
 
     val mockQueryFilter = mock[FilterOneTable[Product]]
@@ -177,7 +189,7 @@ class CelebrityAccountRequestFiltersTests extends EgraphsUnitTest with ClearsCac
   }
 
   it should "execute the provided callback if the celebrity had a matching product" in {
-    implicit val request = FunctionalTest.newRequest()
+    implicit val (request, session) = newRequestAndMockSession
     request.params.put("productUrlSlug", "Finals")
 
     val mockQueryFilter = mock[FilterOneTable[Product]]
@@ -200,13 +212,13 @@ class CelebrityAccountRequestFiltersTests extends EgraphsUnitTest with ClearsCac
   }*/
 
   "requireCelebrityAndProductUrlSlugs" should "delegate to requireCelebrityUrlSlug and requireCelebrityProductUrl" in {
-    object FailsCelebrityUrlSlug extends CelebrityAccountRequestFilters(null, null, null) {
-      override def requireCelebrityUrlSlug(continue: (Celebrity) => Any)(implicit request: Request) = {
+    object FailsCelebrityUrlSlug extends CelebrityAccountRequestFilters(null, null, null, null, null) {
+      override def requireCelebrityUrlSlug(continue: (Celebrity) => Any)(implicit request: Request, session: Session) = {
         "Stopped at requireCelebrityUrlSlug"
       }
     }
 
-    implicit val request = FunctionalTest.newRequest()
+    implicit val (request, session) = newRequestAndMockSession
     val result = FailsCelebrityUrlSlug.requireCelebrityAndProductUrlSlugs { (celeb, product) =>
       "Failed"
     }
@@ -217,17 +229,17 @@ class CelebrityAccountRequestFiltersTests extends EgraphsUnitTest with ClearsCac
   it should "secondarily delegate to requireCelebrityProductUrl" in {
     val celebrity = mock[Celebrity]
 
-    object FailsProductUrl extends CelebrityAccountRequestFilters(null, null, null) {
-      override def requireCelebrityUrlSlug(continue: (Celebrity) => Any)(implicit request: Request) = {
+    object FailsProductUrl extends CelebrityAccountRequestFilters(null, null, null, null, null) {
+      override def requireCelebrityUrlSlug(continue: (Celebrity) => Any)(implicit request: Request, session: Session) = {
         continue(celebrity)
       }
 
-      override def requireCelebrityProductUrl(celebrity: Celebrity)(continue: (Product) => Any)(implicit request: Request) = {
+      override def requireCelebrityProductUrl(celebrity: Celebrity)(continue: (Product) => Any)(implicit request: Request, session: Session) = {
         "Stopped at requireCelebrityProductUrl"
       }
     }
 
-    implicit val request = FunctionalTest.newRequest()
+    implicit val (request, session) = newRequestAndMockSession
     val result = FailsProductUrl.requireCelebrityAndProductUrlSlugs { (celeb, product) =>
       "Failed"
     }
@@ -238,22 +250,50 @@ class CelebrityAccountRequestFiltersTests extends EgraphsUnitTest with ClearsCac
   it should "execute the callback with the celebrity and product provided by its two delegated filters" in {
     val (celebrity, product) = (mock[Celebrity], mock[Product])
     
-    object PassesDelegatedFilters extends CelebrityAccountRequestFilters(null, null, null) {
-      override def requireCelebrityUrlSlug(continue: (Celebrity) => Any)(implicit request: Request) = {
+    object PassesDelegatedFilters extends CelebrityAccountRequestFilters(null, null, null, null, null) {
+      override def requireCelebrityUrlSlug(continue: (Celebrity) => Any)(implicit request: Request, session: Session) = {
         continue(celebrity)
       }
 
-      override def requireCelebrityProductUrl(celebrity: Celebrity)(continue: (Product) => Any)(implicit request: Request) = {
+      override def requireCelebrityProductUrl(celebrity: Celebrity)(continue: (Product) => Any)(implicit request: Request, session: Session) = {
         continue(product)
       }
     }
-    
-    implicit val request = FunctionalTest.newRequest()
+
+    implicit val (request, session) = newRequestAndMockSession
     val continueCallback = mock[Function2[Celebrity, Product, Any]]
     continueCallback.apply(celebrity, product) returns(new Ok)
     val result = PassesDelegatedFilters.requireCelebrityAndProductUrlSlugs(continueCallback)
 
     result.isInstanceOf[Ok] should be (true)
     there was one (continueCallback).apply(celebrity, product)
+  }
+
+  "isCelebrityViewable" should "return true if celebrity is unpublished, full admin tools are enabled, and admin is logged in" in {
+    implicit val (request, session) = newRequestAndMockSession
+    val (celebrity, _) = setupCelebrityMocks(publishedStatus = PublishedStatus.Unpublished)
+    val adminStore = mock[AdministratorStore]
+    adminStore.isAdmin(None) returns true
+
+    instance(administratorStore = adminStore, playConfig = Utils.properties("admin.tools.enabled" -> "full"))
+      .isCelebrityViewable(celebrity) should be(true)
+    instance(administratorStore = adminStore).isCelebrityViewable(celebrity) should be(false)
+  }
+
+  "isProductViewable" should "return true if celebrity is unpublished, full admin tools are enabled, and admin is logged in" in {
+    implicit val (request, session) = newRequestAndMockSession
+    val product = mock[Product]
+    product.publishedStatus returns PublishedStatus.Unpublished
+    val adminStore = mock[AdministratorStore]
+    adminStore.isAdmin(None) returns true
+
+    instance(administratorStore = adminStore, playConfig = Utils.properties("admin.tools.enabled" -> "full"))
+      .isProductViewable(product) should be(true)
+    instance(administratorStore = adminStore).isProductViewable(product) should be(false)
+  }
+
+  "isAdminToolsEnabled" should "return true if set to full, false otherwise" in {
+    instance(playConfig = Utils.properties("admin.tools.enabled" -> "full")).isAdminToolsFullyEnabled should be(true)
+    instance(playConfig = Utils.properties("admin.tools.enabled" -> "restricted")).isAdminToolsFullyEnabled should be(false)
   }
 }
