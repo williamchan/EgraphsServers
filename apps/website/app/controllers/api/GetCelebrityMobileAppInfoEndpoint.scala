@@ -6,20 +6,22 @@ import services.http.{ControllerMethod, CelebrityAccountRequestFilters}
 import services.blobs.Blobs
 import services.Time
 import Time.IntsToSeconds._
+import java.util.Properties
 
 private[controllers] trait GetCelebrityMobileAppInfoEndpoint { this: Controller =>
   protected def controllerMethod: ControllerMethod
   protected def celebFilters: CelebrityAccountRequestFilters
   protected def blobs: Blobs
+  protected def playConfig: Properties
 
-  // These values can be persisted when we have need to support more than one version of the iPad app.
-  private val version = "1_2_3_11"
-  private val s3Key = "ipad/1_2_3_11/Egraphs.ipa"
+  private val iPadBuildVersionProp = "ipad.buildversion"
 
   def getCelebrityMobileAppInfo = controllerMethod() {
     celebFilters.requireCelebrityAccount { (account, celebrity) =>
+      val iPadBuildVersion = playConfig.getProperty(iPadBuildVersionProp)
+      val s3Key = "ipad/" + iPadBuildVersion + "/Egraphs.ipa"
       val ipaUrl = blobs.getStaticResourceUrl(s3Key, 10.minutes)
-      val iPadAppInfo = Map("version" -> version, "ipaURL" -> ipaUrl)
+      val iPadAppInfo = Map("version" -> iPadBuildVersion, "ipaURL" -> ipaUrl)
       val mobileAppInfo = Map("ipad" -> iPadAppInfo)
       Serializer.SJSON.toJSON(mobileAppInfo)
     }
