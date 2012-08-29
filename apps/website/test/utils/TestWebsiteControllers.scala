@@ -3,7 +3,7 @@ package utils
 import com.google.inject.Inject
 import services.http._
 import forms.purchase.{PurchaseFormChecksFactory, FormReaders, PurchaseFormFactory}
-import services.mail.Mail
+import services.mail.TransactionalMail
 import services.payment.Payment
 import models._
 import services.db.DBSession
@@ -29,7 +29,7 @@ case class TestWebsiteControllers @Inject()(
   adminFilters: AdminRequestFilters,
   celebFilters: CelebrityAccountRequestFilters,
   customerFilters: CustomerRequestFilters,
-  mail: Mail,
+  mail: TransactionalMail,
   payment: Payment,
   orderQueryFilters: OrderQueryFilters,
   egraphQueryFilters: EgraphQueryFilters,

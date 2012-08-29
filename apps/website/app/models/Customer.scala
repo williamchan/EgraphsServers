@@ -7,7 +7,7 @@ import services.db.{KeyedCaseClass, Schema, SavesWithLongKey}
 import com.google.inject.{Provider, Inject}
 import exception.InsufficientInventoryException
 import org.apache.commons.mail.HtmlEmail
-import services.mail.Mail
+import services.mail.TransactionalMail
 import services.http.PlayConfig
 import java.util.Properties
 
@@ -16,7 +16,7 @@ case class CustomerServices @Inject() (accountStore: AccountStore,
                                        customerStore: CustomerStore,
                                        inventoryBatchStore: InventoryBatchStore,
                                        usernameHistoryStore: UsernameHistoryStore,
-                                       mail: Mail,
+                                       mail: TransactionalMail,
                                        @PlayConfig playConfig: Properties)
 
 /**
@@ -100,7 +100,7 @@ case class Customer(
 }
 
 object Customer {
-  def sendNewCustomerEmail(account: Account, verificationNeeded: Boolean = false, mail: Mail) {
+  def sendNewCustomerEmail(account: Account, verificationNeeded: Boolean = false, mail: TransactionalMail) {
     val email = new HtmlEmail()
     email.setFrom("noreply@egraphs.com")
     email.addReplyTo("noreply@egraphs.com")

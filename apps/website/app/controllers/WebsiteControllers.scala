@@ -2,7 +2,7 @@ package controllers
 
 import website._
 import services.blobs.Blobs
-import services.mail.Mail
+import services.mail.TransactionalMail
 import services.payment.Payment
 import play.mvc.{Router, Controller}
 import models._
@@ -61,7 +61,7 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val printOrderQueryFilters = instance[PrintOrderQueryFilters]
 
   override protected val blobs = instance[Blobs]
-  override protected val mail = instance[Mail]
+  override protected val mail = instance[TransactionalMail]
   override protected val payment = instance[Payment]
 
   override protected val accountStore = instance[AccountStore]

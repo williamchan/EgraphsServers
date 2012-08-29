@@ -4,7 +4,7 @@ import play.data.validation._
 import models._
 import enums.PublishedStatus
 import play.mvc.results.Redirect
-import services.mail.Mail
+import services.mail.TransactionalMail
 import controllers.WebsiteControllers
 import play.mvc.Controller
 import play.data.validation.Validation.ValidationResult
@@ -19,7 +19,7 @@ trait PostCelebrityAdminEndpoint {
 
   protected def postController: POSTControllerMethod
   protected def adminFilters: AdminRequestFilters
-  protected def mail: Mail
+  protected def mail: TransactionalMail
   protected def celebrityStore: CelebrityStore
   protected def accountStore: AccountStore
 

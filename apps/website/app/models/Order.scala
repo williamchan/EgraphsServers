@@ -9,7 +9,7 @@ import services.Finance.TypeConversions._
 import services._
 import blobs.AccessPolicy
 import com.google.inject._
-import mail.Mail
+import mail.TransactionalMail
 import payment.{Charge, Payment}
 import org.squeryl.Query
 import org.apache.commons.mail.{Email, HtmlEmail}
@@ -27,7 +27,7 @@ case class OrderServices @Inject() (
   inventoryStore: InventoryBatchStore,
   productStore: ProductStore,
   payment: Payment,
-  mail: Mail,
+  mail: TransactionalMail,
   cashTransactionServices: Provider[CashTransactionServices],
   egraphServices: Provider[EgraphServices]
 )

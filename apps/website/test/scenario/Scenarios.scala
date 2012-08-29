@@ -33,7 +33,7 @@ class Scenarios extends DeclaresScenarios {
   private val productPageCategory = "Product Page"
 
   private val schema = AppConfig.instance[Schema]
-  private val mail = AppConfig.instance[services.mail.Mail]
+  private val mail = AppConfig.instance[services.mail.TransactionalMail]
 
   private lazy val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
   private lazy val today = DateTime.now().toLocalDate.toDate
