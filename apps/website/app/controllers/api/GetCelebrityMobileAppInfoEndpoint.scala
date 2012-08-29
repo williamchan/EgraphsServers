@@ -19,7 +19,7 @@ private[controllers] trait GetCelebrityMobileAppInfoEndpoint { this: Controller 
   def getCelebrityMobileAppInfo = controllerMethod() {
     celebFilters.requireCelebrityAccount { (account, celebrity) =>
       val iPadBuildVersion = playConfig.getProperty(iPadBuildVersionProp)
-      val s3Key = "ipad/" + iPadBuildVersion + "/Egraphs.ipa"
+      val s3Key = "ipad/Egraphs_" + iPadBuildVersion + ".ipa"
       val ipaUrl = blobs.getStaticResourceUrl(s3Key, 10.minutes)
       val iPadAppInfo = Map("version" -> iPadBuildVersion, "ipaURL" -> ipaUrl)
       val mobileAppInfo = Map("ipad" -> iPadAppInfo)
