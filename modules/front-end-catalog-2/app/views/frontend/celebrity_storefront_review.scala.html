@@ -14,7 +14,7 @@
   implicit headerData: models.frontend.header.HeaderData, 
   footerData: models.frontend.footer.FooterData,
 	storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs,
-	session: play.mvc.Scope.Session
+	session: play.api.mvc.Session
 )
 
 @{/** The review order page in the purchase flow. This is also where they choose whether to
@@ -41,7 +41,8 @@
 @import views.frontend.tags.html.storefront_breadcrumbs_responsive
 @import views.frontend.tags.html.physical_preview_modal
 @import views.frontend.tags
-@import views.frontend.Utils.cdnAsset
+@{/*import views.frontend.Utils.cdnAsset*/}
+@{ if (play.Play.isProd()) serveFromCDN() }
 
 @baseBody = {
     <div id="content" class="top" role="main">
@@ -63,9 +64,9 @@
               <div class="preview-container @orientation">
                 <img class="preview" src="@productPreviewUrl" />
                 @if(orientation == "orientation-landscape") {
-    							<img class="frame" src='@cdnAsset("public/images/fpo-egraph.png")' alt="fpo-egraph" />
+    							<img class="frame" src='@routes.Assets.at("public/images/fpo-egraph.png")' alt="fpo-egraph" />
                 } else {
-                  <img class="frame" src='@cdnAsset("public/images/fpo-egraph-portrait.png")' alt="fpo-egraph" />
+                  <img class="frame" src='@routes.Assets.at("public/images/fpo-egraph-portrait.png")' alt="fpo-egraph" />
                 }
 
               </div>

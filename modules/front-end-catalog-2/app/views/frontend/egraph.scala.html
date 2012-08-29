@@ -14,7 +14,8 @@
   galleryLink: Option[String] = None
 )
 @import views.frontend.tags
-@import views.frontend.Utils.cdnAsset
+@{/*import views.frontend.Utils.cdnAsset*/}
+@{ if (play.Play.isProd()) serveFromCDN() }
 
 <!doctype html>
 
@@ -28,13 +29,13 @@
     <![endif]-->
 
     <!-- Styles go here  -->
-    <link href='@cdnAsset("public/stylesheets/egraph.less")'
+    <link href='@routes.Assets.at("public/stylesheets/egraph.less")'
           rel="stylesheet" 
           type="text/css">
-    <link href='@cdnAsset("public/soundmanager/360-player/360player.css")'
+    <link href='@routes.Assets.at("public/soundmanager/360-player/360player.css")'
           rel="stylesheet"
           type="text/css">
-    <link href='@cdnAsset("public/soundmanager/360-player/360player-visualization.css")'
+    <link href='@routes.Assets.at("public/soundmanager/360-player/360player-visualization.css")'
           rel="stylesheet" 
           type="text/css">
     @tags.html.analytics()
@@ -71,7 +72,7 @@
                   <!-- <div class="fx-glass-shine"></div> The shine on top of the glass -->
                 </div>
                 <div class="plaque">
-                  <img src='@cdnAsset("public/images/egraph_plaque.png")' alt="plaque" >
+                  <img src='@routes.Assets.at("public/images/egraph_plaque.png")' alt="plaque" >
                   <div class="plaque-content">
                     <div class="player" >
                       <div class="ui360 ui360-vis player-widget"><a href="@audioUrl"></a></div>
@@ -110,8 +111,8 @@
             </div>                        
             <div class="story-column-element">
               <a href="@galleryLink.getOrElse("/")" class="egraphs-logo">
-                <img class="logo-inactive" src='@cdnAsset("/public/images/egraphs_logo_inactive.png")' alt="Egraphs Logo">
-                <img class="logo-active" src='@cdnAsset("/public/images/egraphs_logo_active.png")' alt="Egraphs Logo">
+                <img class="logo-inactive" src='@routes.Assets.at("/public/images/egraphs_logo_inactive.png")' alt="Egraphs Logo">
+                <img class="logo-active" src='@routes.Assets.at("/public/images/egraphs_logo_active.png")' alt="Egraphs Logo">
               </a>
             </div>
             <div class="story-column-element separator"></div>
@@ -131,13 +132,13 @@
     </div>
     <!-- Scripting goes here -->
     <!-- soundmanager2 360-degree player -->
-    <script type="text/javascript" src='@cdnAsset("public/soundmanager/360-player/script/berniecode-animator.js")'></script>
+    <script type="text/javascript" src='@routes.Assets.at("public/soundmanager/360-player/script/berniecode-animator.js")'></script>
     <!-- special IE-only canvas fix -->
-    <!--[if IE]><script type="text/javascript" src='@cdnAsset("public/soundmanager/360-player/script/excanvas.js")'></script><![endif]-->
+    <!--[if IE]><script type="text/javascript" src='@routes.Assets.at("public/soundmanager/360-player/script/excanvas.js")'></script><![endif]-->
 
     <!-- Core soundmanager2 -->
-    <script type="text/javascript" src='@cdnAsset("public/soundmanager/script/soundmanager2-nodebug-jsmin.js")'></script>
-    <script type="text/javascript" src='@cdnAsset("public/soundmanager/360-player/script/360player.js")'></script>
+    <script type="text/javascript" src='@routes.Assets.at("public/soundmanager/script/soundmanager2-nodebug-jsmin.js")'></script>
+    <script type="text/javascript" src='@routes.Assets.at("public/soundmanager/360-player/script/360player.js")'></script>
     <script type="text/javascript">
       soundManager.url = '/public/soundmanager/swf/'; // path to directory containing SM2 SWF
 

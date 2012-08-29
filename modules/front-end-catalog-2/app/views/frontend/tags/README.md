@@ -11,7 +11,7 @@ Creates a `<form>` tag that protects against Cross-Site Request Forgery
 (CSRF) vulnerabilities by including a hidden `authenticityToken` html
 `<input>` tag that is tied to the current user's session. 
 
-It requires an implicit play.mvc.Scope.Session object, which can be provided
+It requires an implicit play.api.mvc.Session object, which can be provided
 by any Controller.
 
 Provide the usual form attributes in scala tuple syntax rather than
@@ -20,7 +20,7 @@ html syntax.
 Sample .scala.html template usage:
 
 ```html
-@()(implicit session: play.mvc.Scope.Session)
+@()(implicit session: play.api.mvc.Scope.Session)
 
 @import views.frontend.tags
 

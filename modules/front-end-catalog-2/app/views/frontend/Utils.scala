@@ -1,12 +1,14 @@
 package views.frontend
 import play.Play
+import java.io.File
+import controllers.Assets
 
 /**
  * Front-end utilities that otherwise had no home.
  */
 object Utils {
-  val cdnAssets = Play.application().configuration().getString("cdn.enabled")
-  val cdnUrl = Play.application().configuration() .getString("cloudfront.domain")
+  val cdnEnabled = Play.application().configuration().getString("cdn.enabled")
+  val cdnUrl = Play.application().configuration().getString("cloudfront.domain")
   /**
    * Formats a series of String / String tuples into an attribute string suitable for
    * use in an HTML tag. This is most useful when writing a wrapper around the creation
@@ -22,31 +24,33 @@ object Utils {
    * }}}
    */
   def formatAttributeTuplesToHtml(tuples: (String, String)*): String = {
-    val attributeStrings = for (val (name, value) <- tuples) yield {
+    val attributeStrings = for ((name, value) <- tuples) yield {
       name + " = \"" + value + "\""
     }
 
     attributeStrings.mkString(" ")
   }
 
-  /**
-   * Drop-in replacement for @asset. Use to take advantage of cloudfront on live.
-   * Paths are always absolute to root. Leading '/' is optional.
-   *
-   * @param path path relative to the application root. This should usually be "public/some-file"
-   * @return path to asset on the currently configured CDN.
-   */
-  def cdnAsset(path: String) : String = {
-    cdnAssets match {
-      case "true" =>
-        path(0) match {
-          case '/' => "https://" + cdnUrl + path
-          case _ =>  "https://" + cdnUrl + "/" + path
-        }
-
-      case _ => play.mvc.Router.reverse(play.Play.getVirtualFile(path))
-    }
-  }
+//  /**
+//   * Drop-in replacement for @asset. Use to take advantage of cloudfront on live.
+//   * Paths are always absolute to root. Leading '/' is optional.
+//   *
+//   * @param path relative to the application root. This should usually be "public/some-file"
+//   * @return path to asset on the currently configured CDN.
+//   */
+//  def cdnAsset(path: String) : String = {
+//    cdnEnabled match {
+//      case "true" =>
+//        path(0) match {
+//          case '/' => "https://" + cdnUrl + path
+//          case _ =>  "https://" + cdnUrl + "/" + path
+//        }
+//
+//      case _ =>
+//        val file = new File(path)
+//        Assets.at(file.getParent, file.getName)
+//    }
+//  }
 
   /**
    *  Returns a string for an angular.js binding

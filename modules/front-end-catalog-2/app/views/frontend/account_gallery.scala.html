@@ -1,5 +1,5 @@
 @(username: String, egraphs: List[models.frontend.egraphs.EgraphViewModel], controlRenderer: models.frontend.egraphs.GalleryControlRenderer)(
-  implicit session: play.mvc.Scope.Session,
+  implicit session: play.api.mvc.Session,
   headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData
 )
@@ -7,7 +7,6 @@
 @import models.frontend.egraphs._
 
 @init = {
-  Egraphs.page.authenticityToken = "@session.getAuthenticityToken";
 }
 
 @fulfilledEgraph(egraph: models.frontend.egraphs.FulfilledEgraphViewModel, index: Int) = {

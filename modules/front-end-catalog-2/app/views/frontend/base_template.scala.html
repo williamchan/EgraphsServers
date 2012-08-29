@@ -27,7 +27,8 @@
     footerData - extra implicit data necessary to render the footer.
 */}
 @import views.frontend.tags
-@import views.frontend.Utils.cdnAsset
+@{/*import views.frontend.Utils.cdnAsset*/}
+@{ if (play.Play.isProd()) serveFromCDN() }
 <!doctype html> 
 <!--[if lt IE 7 ]> <html class="ie lt-ie9 ie6 no-js" lang="en"> <![endif]-->
 <!--[if IE 7 ]>    <html class="ie lt-ie9 ie7 no-js" lang="en"> <![endif]-->
@@ -50,13 +51,13 @@
     <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
     <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png"> -->
     <link rel="shortcut icon" type="image/png" href='/public/images/favicon.png'>
-    <link href='@cdnAsset("public/stylesheets/main.less")' rel="stylesheet">
+    <link href='@routes.Assets.at("public/stylesheets/main.less")' rel="stylesheet">
 
     <!-- Front-load scripting assets that are necessary for attractive display -->
-		<script src='@cdnAsset("public/javascripts/libs/modernizr.custom.js")'></script>
-		<script src="https://use.typekit.com/ztt6ynw.js"></script>
+    <script src='@routes.Assets.at("public/javascripts/libs/modernizr.custom.js")'></script>
+    <script src="https://use.typekit.com/ztt6ynw.js"></script>
     <script>try{Typekit.load();}catch(e){}</script>
-    <script src='@cdnAsset("public/javascripts/libs/angular.js")'></script>
+    <script src='@routes.Assets.at("public/javascripts/libs/angular.js")'></script>
 
     <!-- Configure egraphs scripting main classes (these will automatically be loaded by main.js -->
     <script>
@@ -77,9 +78,9 @@
     @tags.html.site_footer(footerData)
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
-    <script>window.jQuery || document.write("<script src='@cdnAsset("public/javascripts/libs/jquery.js")'>\x3C/script>")</script>
-    <script data-main='@cdnAsset("public/javascripts/main.js")'
-            src='@cdnAsset("public/javascripts/require-1.0.2.js")'
+    <script>window.jQuery || document.write("<script src='@routes.Assets.at("public/javascripts/libs/jquery.js")'>\x3C/script>")</script>
+    <script data-main='@routes.Assets.at("public/javascripts/main.js")'
+            src='@routes.Assets.at("public/javascripts/require-1.0.2.js")'
             type="text/javascript" ></script>
       <!-- Email sign up modal -->
       <div class="modal signup hide fade" id="emailSignupForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"

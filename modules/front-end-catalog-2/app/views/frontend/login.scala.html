@@ -3,7 +3,7 @@
   fbAuthUrl: String
 )(implicit headerData: models.frontend.header.HeaderData, 
   footerData: models.frontend.footer.FooterData,  
-  session: play.mvc.Scope.Session
+  session: play.api.mvc.Session
 )
 @{/** The page used to sign in existing customers. It contains a three-column layout that allows
       existing customers to sign in, non-customers to create accounts, and social media users to

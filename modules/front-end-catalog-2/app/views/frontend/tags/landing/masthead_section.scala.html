@@ -1,6 +1,8 @@
-@(celebrityPublicName: Option[String] = None, mastheadImageUrl: String = views.frontend.Utils.cdnAsset("public/images/landing-masthead.jpg"), getStartedUrl: Option[String] = None)
+@(celebrityPublicName: Option[String] = None, mastheadImageUrl: String = "public/images/landing-masthead.jpg", getStartedUrl: Option[String] = None)
 
-<section id="masthead-home" role="banner" style="background-image: url(@mastheadImageUrl);">
+@{ if (play.Play.isProd()) serveFromCDN() }
+
+<section id="masthead-home" role="banner" style="background-image: url(@routes.Assets.at(mastheadImageUrl));">
 
   <div class="banner-gradient">
 

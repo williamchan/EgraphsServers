@@ -1,6 +1,7 @@
 @(celebrityPublicName: Option[String] = None, celebrityCasualName: Option[String] = None, celebrityIsMale: Boolean = true)
 
-@import views.frontend.Utils.cdnAsset
+@{/*import views.frontend.Utils.cdnAsset*/}
+@{ if (play.Play.isProd()) serveFromCDN() }
 
 <section id="landing-details">
 
@@ -25,7 +26,7 @@
 
       <figure>
 
-        <img src='@cdnAsset("public/images/fpo-egraph-diagram.jpg")' alt="fpo-egraph-diagram" class="scale" />
+        <img src='@routes.Assets.at("public/images/fpo-egraph-diagram.jpg")' alt="fpo-egraph-diagram" class="scale" />
 
         <figcaption class="signature">
 

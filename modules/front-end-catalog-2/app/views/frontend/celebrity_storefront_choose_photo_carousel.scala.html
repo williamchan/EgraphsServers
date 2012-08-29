@@ -5,7 +5,7 @@
   recentEgraphs: Iterable[models.frontend.storefront.ChoosePhotoRecentEgraph],
   partnerIcons: Iterable[models.frontend.storefront.ChoosePhotoPartnerIcon]
 )(
-  implicit session: play.mvc.Scope.Session,
+  implicit session: play.api.mvc.Session,
   headerData: models.frontend.header.HeaderData, 
   footerData: models.frontend.footer.FooterData,
   storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs

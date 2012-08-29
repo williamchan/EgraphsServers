@@ -15,7 +15,8 @@
 
 @import views.frontend.tags.html.storefront_breadcrumbs_responsive
 @import views.frontend.tags
-@import views.frontend.Utils.cdnAsset
+@{/*import views.frontend.Utils.cdnAsset*/}
+@{ if (play.Play.isProd()) serveFromCDN() }
 
 @baseBody = {
     <div id="content" class="top" role="main">
@@ -122,7 +123,7 @@
 	  		<div class="wrap clearfix">
 	  		
 	  			<figure>
-	  				<img src='@cdnAsset("public/images/fpo-egraph.png")' alt="fpo-egraph" />
+	  				<img src='@routes.Assets.at("public/images/fpo-egraph.png")' alt="fpo-egraph" />
 	  			</figure>
 	  			
 	  			<div>

@@ -1,10 +1,11 @@
 @(tableOfContents: List[models.frontend.contents.Section])(
-implicit session: play.mvc.Scope.Session,
+implicit session: play.api.mvc.Session,
 headerData: models.frontend.header.HeaderData,
 footerData: models.frontend.footer.FooterData
 )
 @import views.frontend.Utils
-@import views.frontend.Utils.cdnAsset
+@{/*import views.frontend.Utils.cdnAsset*/}
+@{ if (play.Play.isProd()) serveFromCDN() }
 @import views.frontend.tags.html.physical_preview_modal
 @import models.frontend.contents._
 
@@ -17,7 +18,7 @@ footerData: models.frontend.footer.FooterData
   <div id="main" class="inside-egraph statics">
     <div class="row-fluid">
       <div class="span12 masthead-static">
-        <img src='@cdnAsset("public/images/contact-us.jpg")'/>
+        <img src='@routes.Assets.at("public/images/contact-us.jpg")'/>
       </div>
     </div>
     @physical_preview_modal()
@@ -66,7 +67,7 @@ footerData: models.frontend.footer.FooterData
                 <div>
                   <figure>
                     <div>
-                    <img src='@cdnAsset("public/images/fpo-egraph-diagram.jpg")' alt="fpo-egraph-diagram" class="scale" />
+                    <img src='@routes.Assets.at("public/images/fpo-egraph-diagram.jpg")' alt="fpo-egraph-diagram" class="scale" />
                     </div>
                     <figcaption class="audio">
 
@@ -109,7 +110,7 @@ footerData: models.frontend.footer.FooterData
 							Here’s how we create the biometric fingerprint:
 							</p> 
               <div class="diagram">
-                <img src='@cdnAsset("public/images/voiceprint.png")'/>
+                <img src='@routes.Assets.at("public/images/voiceprint.png")'/>
               </div>
               <div class="callout">
                 <h3>Voiceprint</h3>
@@ -118,7 +119,7 @@ footerData: models.frontend.footer.FooterData
                 </p>
               </div>
               <div class="diagram">
-                <img src='@cdnAsset("public/images/signaturediagram.png")'/>
+                <img src='@routes.Assets.at("public/images/signaturediagram.png")'/>
               </div>
               <div class="callout">
                 <h3>Written signature profile</h3>

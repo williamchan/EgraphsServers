@@ -8,11 +8,13 @@ object ApplicationBuild extends Build {
   val appVersion = "2.0-SNAPSHOT"
 
   val appDependencies = Seq(
-//    "play" %% "scala" % "0.9.1",
+    //"crionics" %% "play2-authenticitytoken" % "1.0-SNAPSHOT", // need the resolver too
     "org.joda" % "joda-money" % "0.6"
   )
 
   val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
+    //resolvers += "Crionics Github Repository" at "http://orefalo.github.com/m2repo/releases/",
+
     organization := "egraphs"
   )
     /* Opps, this is all the work for website, not frontend, keeping here to not lose work.

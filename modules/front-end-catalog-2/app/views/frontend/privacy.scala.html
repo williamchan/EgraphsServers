@@ -1,18 +1,19 @@
 @()(
-implicit session: play.mvc.Scope.Session,
+implicit session: play.api.mvc.Session,
 headerData: models.frontend.header.HeaderData,
 footerData: models.frontend.footer.FooterData
 )
 @import views.frontend.Utils
 @import models.frontend.egraphs._
-@import views.frontend.Utils.cdnAsset
+@{/*import views.frontend.Utils.cdnAsset*/}
+@{ if (play.Play.isProd()) serveFromCDN() }
 @baseBody = {
 
 <section id="content" role="main">
 <div id="main" class="about-us">
 <div class="row-fluid">
   <div class="span12 masthead-static">
-    <img src='@cdnAsset("public/images/hellickson.jpg")'/>
+    <img src='@routes.Assets.at("public/images/hellickson.jpg")'/>
   </div>
 </div>
 

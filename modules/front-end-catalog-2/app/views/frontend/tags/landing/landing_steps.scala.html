@@ -1,6 +1,7 @@
 @(celebrityPublicName: Option[String] = None, celebrityCasualName: Option[String] = None, celebrityIsMale: Boolean = true)
 
-@import views.frontend.Utils.cdnAsset
+@{/*import views.frontend.Utils.cdnAsset*/}
+@{ if (play.Play.isProd()) serveFromCDN() }
 
 <section id="landing-steps">
 
@@ -26,7 +27,7 @@
 
       </div> <!-- end .instructions -->
 
-      <img src='@cdnAsset("public/images/macbook-air.png")' alt="macbook-air" />
+      <img src='@routes.Assets.at("public/images/macbook-air.png")' alt="macbook-air" />
 
     </li> <!-- end .step-1 -->
 
@@ -42,7 +43,7 @@
 
       </div> <!-- end .instructions -->
 
-      <img src='@cdnAsset("public/images/fpo-keyboard.png")' alt="keyboard" class="positioned" />
+      <img src='@routes.Assets.at("public/images/fpo-keyboard.png")' alt="keyboard" class="positioned" />
 
     </li> <!-- end .step-2 -->
 
@@ -60,7 +61,7 @@
 
       </div> <!-- end .instructions -->
 
-      <img src='@cdnAsset("public/images/bg-fpo-ipad.png")' alt="ipad" class="positioned" />
+      <img src='@routes.Assets.at("public/images/bg-fpo-ipad.png")' alt="ipad" class="positioned" />
 
     </li> <!-- end .step-3 -->
 
