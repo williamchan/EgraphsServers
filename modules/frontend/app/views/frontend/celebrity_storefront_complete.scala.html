@@ -75,11 +75,13 @@
 										<td>@model.totalPrice.formatPrecisely</td>
 									</tr>
 									<tr>
-										<th>Expected Digital Delivery:</th>
-										<td>@model.guaranteedDeliveryDate.formatDayAsPlainLanguage</td>
+                    <th><a href="@model.faqHowLongLink">Expected Digital Delivery:</a></th>
+										<td><a href="@model.faqHowLongLink">@model.expectedDeliveryDate.formatDayAsPlainLanguage</a></td>
 									</tr>
   							</table>
-  							
+                @if(model.hasPrintOrder) {
+                  <p>Your framed print is expected to arrive 3 weeks after your digital delivery.</p>
+                }
   						
   						</div>
 

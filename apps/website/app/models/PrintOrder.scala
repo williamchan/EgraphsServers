@@ -78,11 +78,11 @@ object PrintOrder {
 class PrintOrderStore @Inject() (schema: Schema) extends SavesWithLongKey[PrintOrder] with SavesCreatedUpdated[Long,PrintOrder] {
   import org.squeryl.PrimitiveTypeMode._
 
-  def findByOrderId(orderId: Long): Query[PrintOrder] = {
+  def findByOrderId(orderId: Long): List[PrintOrder] = {
     from(schema.printOrders)(printOrder =>
       where(printOrder.orderId === Some(orderId))
         select (printOrder)
-    )
+    ).toList
   }
 
   def findByFilter(filters: FilterOneTable[PrintOrder]*): Query[(PrintOrder, Order, Option[Egraph])] = {
