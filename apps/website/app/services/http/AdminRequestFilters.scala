@@ -19,11 +19,9 @@ class AdminRequestFilters @Inject()(adminStore: AdministratorStore,
   import SafePlayParams.Conversions._
 
   def requireAdministratorLogin(continue: (Administrator) => Any)(implicit session: Session, request: Request) = {
-    val adminIdOption = session.getLongOption(WebsiteControllers.adminIdKey)
-    val adminOption = adminIdOption match {
-      case None => None
-      case Some(adminId) => adminStore.findById(adminId)
-    }
+    val adminOption = session.getLongOption(WebsiteControllers.adminIdKey).flatMap(adminId =>
+      adminStore.findById(adminId)
+    )
     adminOption match {
       case None => {
         session.clear()
