@@ -22,17 +22,15 @@ class CelebrityStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
     results.map(result => result.id) should be (IndexedSeq(published.id))
   }
 
-  "getPublishedCelebrities" should "return the celebrities in alphabetical order" in {
-    // Create and persist a list of celebs whose randomly-generated names are prefixed by
-    // short strings "c", "Ac", and "ab", in that order. We'll be testing if they query out
-    // in the reverse order, which is what they should do if properly sorting on lower-cased
-    // publicName.
-    val celebs = for (namePrefix <- IndexedSeq("c", "Ac", "ab")) yield {
-      val celebWithDefaultName = TestData
+  "getPublishedCelebrities" should "return the celebrities in alphabetical order on roleDescription" in {
+    // Create and persist a list of celebs whose roleDescriptions are "c", "Ac", and "ab",
+    // in that order. We'll be testing if they query out in the reverse order, which is what they should do if
+    // properly sorting on lower-cased roleDescription.
+    val celebs = for (roleDescription <- IndexedSeq("c", "Ac", "ab")) yield {
+      val celeb = TestData
         .newSavedCelebrity().
         withPublishedStatus(PublishedStatus.Published)
-
-      celebWithDefaultName.copy(publicName=namePrefix + celebWithDefaultName.publicName).save()
+      celeb.copy(roleDescription = roleDescription).save()
     }
 
     // Run the test
