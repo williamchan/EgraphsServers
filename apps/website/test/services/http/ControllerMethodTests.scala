@@ -1,7 +1,5 @@
 package services.http
 
-import play.test.FunctionalTest
-import play.mvc.Http.Request
 import play.mvc.results.Forbidden
 import utils.{MockControllerMethod, EgraphsUnitTest}
 import play.mvc.Scope.Session
@@ -42,10 +40,6 @@ class ControllerMethodTests extends EgraphsUnitTest {
     (new POSTControllerMethod(controllerMethod, authenticityTokenFilterProvider),
      controllerMethod,
      authenticityTokenFilterProvider)
-  }
-
-  private def newRequestAndMockSession: (Request, Session) = {
-    (FunctionalTest.newRequest(), mock[play.mvc.Scope.Session])
   }
 
   private def fakeInjector(playId: String) = {

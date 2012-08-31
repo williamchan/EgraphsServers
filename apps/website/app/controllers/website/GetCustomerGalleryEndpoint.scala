@@ -1,7 +1,6 @@
 package controllers.website
 
 import services.http.{SafePlayParams, AccountRequestFilters, ControllerMethod}
-import services.Utils
 import play.mvc.Controller
 import models._
 import controllers.WebsiteControllers
