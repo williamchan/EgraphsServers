@@ -1,5 +1,7 @@
 @(title: String = "Default string", body: => Html, afterBodyJs: => Html = Html.empty)
 
+@import controllers._
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -10,7 +12,7 @@
     <meta name="author" content="">
 
     <!-- Le styles -->
-    <link href='@asset("public/stylesheets/main.less")' rel="stylesheet">
+    <link href='@routes.Assets.at("public/stylesheets/main.less")' rel="stylesheet">
 		<style>
 			body { padding-top: 40px; }
 		</style>

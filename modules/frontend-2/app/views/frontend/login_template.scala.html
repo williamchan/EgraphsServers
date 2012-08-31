@@ -35,8 +35,8 @@
       title, jsMain, headJs - See base_template
 */}
 
-@import views.frontend.tags.html.storefront_breadcrumbs_responsive
-@import views.frontend.tags
+@import views.html.frontend.tags
+@import views.html.frontend.tags.storefront_breadcrumbs_responsive
 @import models.frontend.forms.{Field, FormError}
 
 @baseBody = {
@@ -53,7 +53,7 @@
   				
   					<section class="span4">
   					
-  						@tags.html.safeForm(
+  						@tags.safeForm(
                 "action" -> loginForm.actionUrl, 
                 "method" -> "post", 
                 "class" -> "login-option"
@@ -64,9 +64,9 @@
   							<div class="clearfix">
   							
 	  							<fieldset>	  			
-                    @tags.html.bootstrap_text_input_field(labelText = "Email:", field = loginForm.email, inputType="email")
+                    @tags.bootstrap_text_input_field(labelText = "Email:", field = loginForm.email, inputType="email")
 
-                    @tags.html.bootstrap_text_input_field(
+                    @tags.bootstrap_text_input_field(
                       "Password:", 
                       loginForm.password,
                       inputType="password"
@@ -91,7 +91,7 @@
 								
   							</div>
 								
-								@tags.html.arrow_button(caption="Sign In", classes="button")					
+								@tags.arrow_button(caption="Sign In", classes="button")					
   				
   						} <!-- end safe form -->
   				
@@ -99,7 +99,7 @@
 
   					<section class="span4">
   					
-	  					@tags.html.safeForm(
+	  					@tags.safeForm(
                 "id" -> "new-account-form",
                 "action" -> newOwnerTargetUrl,
                 "method" -> "post",
@@ -110,7 +110,7 @@
 
 	  						<div class="clearfix">@newOwnerContent</div>
 								                
-							  @tags.html.arrow_button(caption="Continue", classes="button create-account")		
+							  @tags.arrow_button(caption="Continue", classes="button create-account")		
 
 							} <!-- end safe form -->			
   				
@@ -126,7 +126,7 @@
 	  				      @fbContent								
 	   						</div>					
 	  				    <a href="@fbAuthUrl">
-								  @tags.html.arrow_button(caption="Facebook", classes="button facebook")
+								  @tags.arrow_button(caption="Facebook", classes="button facebook")
                 </a>
 							
 							</div>

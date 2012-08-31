@@ -4,8 +4,8 @@
   footerData: models.frontend.footer.FooterData
 )
 
-@import views.frontend.tags
-@import views.frontend.tags.ng
+@import views.html.frontend.tags
+@import views.html.frontend.tags.ng
 
 @init = {
   Egraphs.page.user = {
@@ -41,30 +41,30 @@
           <h1 style="display: inline-block;">Account Settings</h1>
 
         </header>
-      @tags.html.safeForm("method" -> "POST", "action" -> "/account/settings"){
+      @tags.safeForm("method" -> "POST", "action" -> "/account/settings"){
         <section class="settings-group" id="personal-information">
           <h2>Personal Information</h2>
-          @tags.ng.html.form_namevalue(model = "user.fullname", field={form.fullname}, label="Name")
-          @tags.ng.html.form_namevalue(model = "user.username", field={form.username}, label="Username", helper="egraphs.com/account/{{user.username}}")
-          @tags.ng.html.form_email(model = "user.email", field={form.email}, label="Email")
-          @tags.ng.html.form_pwchange(model = "user", oldField=form.oldPassword, newField=form.newPassword,
+          @tags.ng.form_namevalue(model = "user.fullname", field={form.fullname}, label="Name")
+          @tags.ng.form_namevalue(model = "user.username", field={form.username}, label="Username", helper="egraphs.com/account/{{user.username}}")
+          @tags.ng.form_email(model = "user.email", field={form.email}, label="Email")
+          @tags.ng.form_pwchange(model = "user", oldField=form.oldPassword, newField=form.newPassword,
             confirmField=form.passwordConfirm)
-          @tags.ng.html.form_select(model = "user.gallery.visibility", name={form.galleryVisibility.name}, label = "Gallery Visibility",
+          @tags.ng.form_select(model = "user.gallery.visibility", name={form.galleryVisibility.name}, label = "Gallery Visibility",
           options = Map("public" -> "Public","private" -> "Private"), initValue={form.galleryVisibility.value.getOrElse("public")})
         </section>
         <section class="settings-group" id="shipping-address">
           <h2>Shipping Address</h2>
-          @tags.ng.html.form_address(model = "user.address", name="address", form=form)
+          @tags.ng.form_address(model = "user.address", name="address", form=form)
           <!--<a href="#" class="add-link"><p>+ Add Another Shipping Address</p></a>-->
         </section>
         <section class="settings-group" id="additional-settings">
           <h2>Additional Settings</h2>
-          @tags.ng.html.form_checkbox(model = "user.notices", name="notices", label = "Notices")
+          @tags.ng.form_checkbox(model = "user.notices", name="notices", label = "Notices")
         </section>
         <div class="row-fluid">
           <div class="span9"></div>
           <div class="span3 save-button">
-            @tags.html.arrow_button(caption="Save Changes")
+            @tags.arrow_button(caption="Save Changes")
           </div>
         </div>
         }

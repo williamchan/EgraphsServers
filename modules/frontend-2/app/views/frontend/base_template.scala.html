@@ -26,9 +26,9 @@
 
     footerData - extra implicit data necessary to render the footer.
 */}
-@import views.frontend.tags
-@{/*import views.frontend.Utils.cdnAsset*/}
-@{ if (play.Play.isProd()) serveFromCDN() }
+@import views.html.frontend.tags
+@import controllers._
+
 <!doctype html> 
 <!--[if lt IE 7 ]> <html class="ie lt-ie9 ie6 no-js" lang="en"> <![endif]-->
 <!--[if IE 7 ]>    <html class="ie lt-ie9 ie7 no-js" lang="en"> <![endif]-->
@@ -71,11 +71,11 @@
 
   <body>
     
-    @tags.html.site_header(headerData)
+    @tags.site_header(headerData)
     <!-- Begin base template body -->
     @body
     <!-- End base template body -->
-    @tags.html.site_footer(footerData)
+    @tags.site_footer(footerData)
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
     <script>window.jQuery || document.write("<script src='@routes.Assets.at("public/javascripts/libs/jquery.js")'>\x3C/script>")</script>

@@ -4,9 +4,8 @@ headerData: models.frontend.header.HeaderData,
 footerData: models.frontend.footer.FooterData
 )
 
-@import views.frontend.tags
-@import views.frontend.tags.ng
-
+@import views.html.frontend.tags
+@import views.html.frontend.tags.ng
 
 @baseBody = {
 <section id="content" class="top" role="main">
@@ -24,6 +23,5 @@ footerData: models.frontend.footer.FooterData
   </div>
 </section>
 }
-
 
 @base_template(title=header, jsMain = "pages/static", body=baseBody)

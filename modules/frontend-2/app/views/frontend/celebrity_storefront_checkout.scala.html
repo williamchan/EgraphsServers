@@ -22,11 +22,11 @@
 */}
 
 @import models.frontend.forms.{Field, FormError}
-@import views.frontend.tags.html.{storefront_breadcrumbs_responsive, bootstrap_text_input_field, bootstrap_input_field, safeForm}
-@import frontend.formatting.MoneyFormatting.Conversions._
-@import frontend.formatting.DateFormatting.Conversions._
+@import views.html.frontend.tags.{storefront_breadcrumbs_responsive, bootstrap_text_input_field, bootstrap_input_field, safeForm}
+@import _root_.frontend.formatting.MoneyFormatting.Conversions._
+@import _root_.frontend.formatting.DateFormatting.Conversions._
 
-@import views.frontend.tags
+@import views.html.frontend.tags
 
 @headJs = {
   Egraphs.page.checkout = {
@@ -57,7 +57,7 @@
               @safeForm("class" -> "main", "id" -> "checkout-form", "method" -> "post", "action" ->form.actionUrl) {
                 <div class="order-overview @orientation">
                     
-                    @tags.html.egraphPreview(
+                    @tags.egraphPreview(
                       productPreviewUrl,
                       orientation
                     )
@@ -85,7 +85,7 @@
                         <div class="input select control-group @shipping.state.ifError {error}">
                           <select data-placeholder="Choose a state..." id="@shipping.state.name" name="@shipping.state.name" class="chsn-select">
                             <option value></option>
-                            @tags.geo.html.usstates(selected=shipping.state.value.getOrElse(""))
+                            @tags.geo.usstates(selected=shipping.state.value.getOrElse(""))
                           </select>
                           @for(error <- shipping.city.error) {
                             <div class="alert alert-error @shipping.state.ifError {error}">
@@ -219,7 +219,7 @@
                 
                   <div class="clearfix">
                 
-                    @tags.html.arrow_button(caption="Finalize Order", classes="button right checkout-submit")
+                    @tags.arrow_button(caption="Finalize Order", classes="button right checkout-submit")
                   
                   </div>
                 
@@ -231,7 +231,7 @@
               
                 <div class="order-overview @orientation clearfix">
                     
-                    @tags.html.egraphPreview(
+                    @tags.egraphPreview(
                       productPreviewUrl,
                       orientation
                     )  
@@ -241,7 +241,7 @@
                       
                       @orderDetails
 
-                      @tags.html.storefront_price_summary(
+                      @tags.storefront_price_summary(
                         summary.basePrice,
                         summary.shipping,
                         summary.tax,
@@ -255,7 +255,7 @@
           
             </div> <!-- end .clearfix -->
             
-            @tags.html.credit_cards_footer()        
+            @tags.credit_cards_footer()        
           </div> <!-- end .col2 -->
         
         </section> <!-- end #checkout -->
@@ -266,7 +266,7 @@
 }
 
 @orderDetails = {
-  @tags.html.storefront_order_details(summary.celebrityName, summary.productName, summary.recipientName, summary.messageText)
+  @tags.storefront_order_details(summary.celebrityName, summary.productName, summary.recipientName, summary.messageText)
 }
 
 @base_celebrity_storefront_template(

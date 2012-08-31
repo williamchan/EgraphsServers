@@ -1,7 +1,7 @@
 @()
 
-@{/*import views.frontend.Utils.cdnAsset*/}
-@{ if (play.Play.isProd()) serveFromCDN() }
+@import controllers._
+
 @{/** The HTML for a modal-dialog that previews a framed physical egraph.
   
   The modal dialog has id "frame-preview" and is hidden by default. To invoke

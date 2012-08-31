@@ -7,10 +7,10 @@
 
 @{/** Celebrity landing page */}
 
-@import views.frontend.tags
+@import views.html.frontend.tags
 
 @baseBody = {
-  @tags.landing.html.masthead_section(Option(celebrityPublicName), landingPageImageUrl, Option(getStartedUrl))
+  @tags.landing.masthead_section(Option(celebrityPublicName), landingPageImageUrl, Option(getStartedUrl))
 
   <section id="content" role="main">
 
@@ -18,13 +18,13 @@
 
       <div class="container" id="celeb-landing">
 
-        @tags.landing.html.welcome_header(Option(celebrityPublicName), Option(celebrityCasualName), celebrityIsMale)
+        @tags.landing.welcome_header(Option(celebrityPublicName), Option(celebrityCasualName), celebrityIsMale)
 
-        @tags.landing.html.landing_steps(Option(celebrityPublicName), Option(celebrityCasualName), celebrityIsMale)
+        @tags.landing.landing_steps(Option(celebrityPublicName), Option(celebrityCasualName), celebrityIsMale)
 
-        @tags.landing.html.landing_details(Option(celebrityPublicName), Option(celebrityCasualName), celebrityIsMale)
+        @tags.landing.landing_details(Option(celebrityPublicName), Option(celebrityCasualName), celebrityIsMale)
 
-        @tags.landing.html.landing_more(None, Option(celebrityPublicName), Option(getStartedUrl))
+        @tags.landing.landing_more(None, Option(celebrityPublicName), Option(getStartedUrl))
 
         <p class="to-top"><a href="#top">Back to Top</a></p>
 

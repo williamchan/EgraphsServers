@@ -16,8 +16,8 @@
 
 */}
 
-@import views.frontend.tags.html.storefront_breadcrumbs_responsive
-@import views.frontend.tags
+@import views.html.frontend.tags.storefront_breadcrumbs_responsive
+@import views.html.frontend.tags
 @import models.frontend.forms.{Field, FormError}
 
 @headJs = {
@@ -46,10 +46,10 @@
   <div class="new-account-fields" @if(!registrationForm.hasErrors) {style="display: none"}>
     <fieldset>
       <span id="register-email-field">
-        @tags.html.bootstrap_text_input_field("Email Address:", registrationForm.email)
+        @tags.bootstrap_text_input_field("Email Address:", registrationForm.email)
       </span>
 
-      @tags.html.bootstrap_text_input_field(
+      @tags.bootstrap_text_input_field(
         "Password:", 
         registrationForm.password,
         inputType="password"

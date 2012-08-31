@@ -10,13 +10,13 @@
       model - This page's viewmodel.
 */}
 
-@import frontend.formatting.MoneyFormatting.Conversions._
-@import frontend.formatting.DateFormatting.Conversions._
+@import _root_.frontend.formatting.MoneyFormatting.Conversions._
+@import _root_.frontend.formatting.DateFormatting.Conversions._
 
-@import views.frontend.tags.html.storefront_breadcrumbs_responsive
-@import views.frontend.tags
-@{/*import views.frontend.Utils.cdnAsset*/}
-@{ if (play.Play.isProd()) serveFromCDN() }
+@import views.html.frontend.tags.storefront_breadcrumbs_responsive
+@import views.html.frontend.tags
+@import controllers._
+
 
 @baseBody = {
     <div id="content" class="top" role="main">
@@ -129,7 +129,7 @@
 	  			<div>
 	  				<p>Are you sure you want to cancel your order for @model.celebName's Egraph?</p>
             @{/** Un-Comment when we support cancelling.
-            @tags.html.safeForm("method" -> "POST", "action" -> model.cancelOrderUrl) {
+            @tags.safeForm("method" -> "POST", "action" -> model.cancelOrderUrl) {
 	  				  <button class="btn" data-toggle="button">Cancel Order</button>
             }*/}
 	  				<button class="btn" data-toggle="button" data-dismiss="modal">Do Not Cancel</button>

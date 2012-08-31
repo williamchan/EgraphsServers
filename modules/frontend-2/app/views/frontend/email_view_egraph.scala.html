@@ -6,7 +6,7 @@
   emailTwitterSrc: String
 )
 
-@import views.frontend.tags
+@import views.html.frontend.tags
 
 <html>
 	<head>
@@ -17,14 +17,14 @@
 				<td align="middle">
 					<table cellpadding="0" cellspacing="0" width="600px" align="middle" bgcolor="#fafafa" style="width: 600px; margin: 0 auto; background: #fafafa repeat-y 50% 0;">
 						<!--<tr>-->
-							<!--<td><img border="0" src='@asset("public/images/email-shim.gif")' width="520" height="40" /></td>-->
+							<!--<td><img border="0" src='@routes.Assets.at("public/images/email-shim.gif")' width="520" height="40" /></td>-->
 						<!--</tr>-->
 						<tr>
 							<td align="middle">
 								<table cellpadding="0" cellspacing="0" width="520px" style="width: 520px;">
 									<tr>
 										<td align="left" valign="top">
-                      @tags.email.html.email_header(emailLogoSrc, emailFacebookSrc, emailTwitterSrc)
+                      @tags.email.email_header(emailLogoSrc, emailFacebookSrc, emailTwitterSrc)
 
 											<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
                         Hi @recipientName,
@@ -55,7 +55,7 @@
                       </p>
 											
 											<!--<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">-->
-                        <!--<img border="0" src='@asset("public/images/email-fpo-signature.gif")' alt="@celebrityName" width="166" height="83" />-->
+                        <!--<img border="0" src='@routes.Assets.at("public/images/email-fpo-signature.gif")' alt="@celebrityName" width="166" height="83" />-->
                       <!--</p>-->
 											
 											<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
@@ -67,10 +67,10 @@
 							</td>
 						</tr>
 						<!--<tr>-->
-							<!--<td><img border="0" src='@asset("public/images/email-shim.gif")' width="520" height="40" /></td>-->
+							<!--<td><img border="0" src='@routes.Assets.at("public/images/email-shim.gif")' width="520" height="40" /></td>-->
 						<!--</tr>-->
 					</table>
-          @tags.email.html.email_footer()
+					@tags.email.email_footer()
 				</td>
 			</tr>
 		</table>

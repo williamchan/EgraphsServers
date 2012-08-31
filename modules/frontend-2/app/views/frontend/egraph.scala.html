@@ -13,9 +13,9 @@
   shareOnTwitterLink: String,
   galleryLink: Option[String] = None
 )
-@import views.frontend.tags
-@{/*import views.frontend.Utils.cdnAsset*/}
-@{ if (play.Play.isProd()) serveFromCDN() }
+@import views.html.frontend.tags
+@import controllers._
+
 
 <!doctype html>
 
@@ -25,7 +25,7 @@
     <title>@signerName egraph for @recipientName</title>
     <!-- svg shim for IE -->
     <!--[if lt IE 9]>
-      <script src="@asset("public/svgweb/src/svg.js")" type="text/javascript"></script>
+      <script src="@routes.Assets.at("public/svgweb/src/svg.js")" type="text/javascript"></script>
     <![endif]-->
 
     <!-- Styles go here  -->

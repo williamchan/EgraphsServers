@@ -13,9 +13,9 @@
 */}
 
 
-@import views.frontend.tags.html.storefront_breadcrumbs_responsive
-@import views.frontend.tags
-@import frontend.formatting.MoneyFormatting.Conversions._
+@import views.html.frontend.tags.storefront_breadcrumbs_responsive
+@import views.html.frontend.tags
+@import _root_.frontend.formatting.MoneyFormatting.Conversions._
 
 @headJs = {
   Egraphs.page.finalize = {
@@ -44,11 +44,11 @@
 					
 						<div class="finalize clearfix">
 					
-	    				@tags.html.safeForm("class" -> "main", "method" -> "POST", "action" -> model.purchaseUrl) {
+	    				@tags.safeForm("class" -> "main", "method" -> "POST", "action" -> model.purchaseUrl) {
 
 	    					<div class="order-overview @orientation">
 	    						  
-                    @tags.html.egraphPreview(
+                    @tags.egraphPreview(
                       productPreviewUrl,
                       orientation
                     )
@@ -130,7 +130,7 @@
 
 	    				  		<p>Click <strong>purchase</strong> to get @model.personalization.celebName started on your egraph. You will be charged <strong>@model.price.total.formatSimply</strong>.</p>
 	    				  	
- 	    				 			@tags.html.arrow_button(caption="Purchase", classes="button right")
+ 	    				 			@tags.arrow_button(caption="Purchase", classes="button right")
  	    				 			
 	    				  	</div>
 	    				  
@@ -142,7 +142,7 @@
 	    				
 	    					<div class="order-overview @orientation clearfix">
                     
-                    @tags.html.egraphPreview(
+                    @tags.egraphPreview(
                       productPreviewUrl,
                       orientation
                     )
@@ -153,7 +153,7 @@
 											
 											@orderDetails
 
-											@tags.html.storefront_price_summary(
+											@tags.storefront_price_summary(
 											  model.price.base,
 											  model.price.physicalGood,
 											  model.price.tax,
@@ -168,7 +168,7 @@
 	  			
 						</div> <!-- end .finalize -->
 						
-						@tags.html.credit_cards_footer()
+						@tags.credit_cards_footer()
   			
   				</div> <!-- end .col2 -->
   			
@@ -180,7 +180,7 @@
 }
 
 @orderDetails = {
-  @tags.html.storefront_order_details(
+  @tags.storefront_order_details(
   	model.personalization.celebName, 
     model.personalization.productTitle, 
     model.personalization.recipientName, 

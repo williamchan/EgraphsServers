@@ -11,7 +11,7 @@
 */}
 
 @import models.frontend.landing.CatalogStar
-@import views.frontend.tags
+@import views.html.frontend.tags
 
 @starsBlock(stars: Iterable[CatalogStar], clearFix: Boolean) = {
   @for(starRow <- stars.grouped(4).toList) {
@@ -61,7 +61,7 @@
 }
 
 @baseBody = {
-  @tags.landing.html.masthead_section(getStartedUrl=Some("#connect-with-your-star"))
+  @tags.landing.masthead_section(getStartedUrl=Some("#connect-with-your-star"))
 
   <section id="content" role="main">
 
@@ -74,13 +74,13 @@
           @starsBlock(stars.filter(star => star.isFeatured), clearFix=true)
         </footer> <!-- end #landing-stars -->
 
-        @tags.landing.html.welcome_header()
+        @tags.landing.welcome_header()
 
-        @tags.landing.html.landing_steps()
+        @tags.landing.landing_steps()
 
-        @tags.landing.html.landing_details()
+        @tags.landing.landing_details()
 
-        @tags.landing.html.landing_more(starsFooter = Some(starsFooter))
+        @tags.landing.landing_more(starsFooter = Some(starsFooter))
 
         <p class="to-top"><a href="#top">Back to Top</a></p>
 

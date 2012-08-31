@@ -21,9 +21,9 @@
      storefrontBreadcrumbs - see base_celebrity_storefront_template
 */}
 
-@import views.frontend.tags.html.storefront_breadcrumbs_responsive
-@import frontend.formatting.MoneyFormatting.Conversions._
-@import frontend.formatting.DateFormatting.Conversions._
+@import views.html.frontend.tags.storefront_breadcrumbs_responsive
+@import _root_.frontend.formatting.MoneyFormatting.Conversions._
+@import _root_.frontend.formatting.DateFormatting.Conversions._
 
 @productLink(product: models.frontend.storefront.ChoosePhotoTileProduct) = {
   @if(product.quantityRemaining > 0) {@product.targetUrl} else {/faq/#how-many}

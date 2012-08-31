@@ -1,7 +1,7 @@
 @(celebrityPublicName: Option[String] = None, celebrityCasualName: Option[String] = None, celebrityIsMale: Boolean = true)
 
-@{/*import views.frontend.Utils.cdnAsset*/}
-@{ if (play.Play.isProd()) serveFromCDN() }
+@import controllers._
+
 
 <section id="landing-details">
 

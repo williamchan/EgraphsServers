@@ -1,5 +1,8 @@
 @(emailLogoSrc: String = "", emailFacebookSrc: String = "", emailTwitterSrc: String = "")
 
+@import controllers._
+
+
 <table cellpadding="0" cellspacing="0" width="100%" style="width: 100%;">
   <tr>
     <td width="450" align="left" valign="top">
@@ -20,7 +23,7 @@
   </tr>
   <!--<tr>-->
     <!--<td colspan="3">-->
-      <!--<img border="0" src='@asset("public/images/email-rule.gif")' width="520" height="30" />-->
+      <!--<img border="0" src='@routes.Assets.at("public/images/email-rule.gif")' width="520" height="30" />-->
     <!--</td>-->
   <!--</tr>-->
 </table>

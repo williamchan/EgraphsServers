@@ -4,18 +4,39 @@ import PlayProject._
 
 object ApplicationBuild extends Build {
 
-  val appName = "front-end-catalog"
+  val appName = "frontend"
   val appVersion = "2.0-SNAPSHOT"
 
   val appDependencies = Seq(
     //"crionics" %% "play2-authenticitytoken" % "1.0-SNAPSHOT", // need the resolver too
-    "org.joda" % "joda-money" % "0.6"
+    "org.joda" % "joda-money" % "0.6",
+    "egraphs" %% "frontend-lib" % "1.0-SNAPSHOT"
   )
 
   val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
     //resolvers += "Crionics Github Repository" at "http://orefalo.github.com/m2repo/releases/",
 
-    organization := "egraphs"
+    organization := "egraphs",
+
+    // exclude anything created by the routes file from going into the jar so it doesn't conflict with the packages
+    // that pull this in as a dependency.
+    mappings in (Compile,packageBin) ~= { (ms: Seq[(File, String)]) =>
+      ms filterNot { case (file, toPath) =>
+        toPath == "routes" ||
+        toPath == "Routes.class" ||
+        toPath == "Routes$.class" ||
+        toPath == "Routes$$anonfun$routes$1.class" ||
+        toPath == "Routes$$anonfun$routes$1$$anonfun$apply$1.class" ||
+        toPath == "Routes$$anonfun$routes$1$$anonfun$apply$1$$anonfun$apply$2.class" ||
+        toPath == "controllers/javascript/ReverseAssets.class" ||
+        toPath == "controllers/ref/ReverseAssets.class" ||
+        toPath == "controllers/ref/ReverseAssets$$anonfun$at$1.class" ||
+        toPath == "controllers/ReverseAssets.class" ||
+        toPath == "controllers/routes.class" ||
+        toPath == "controllers/routes$javascript.class" ||
+        toPath == "controllers/routes$ref.class"
+      }
+    }
   )
     /* Opps, this is all the work for website, not frontend, keeping here to not lose work.
   val appDependencies = Seq(

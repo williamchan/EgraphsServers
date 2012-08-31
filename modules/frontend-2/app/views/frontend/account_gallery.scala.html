@@ -4,6 +4,7 @@
   footerData: models.frontend.footer.FooterData
 )
 @import views.frontend.Utils
+@import views.html.frontend.tags
 @import models.frontend.egraphs._
 
 @init = {
@@ -46,7 +47,7 @@
         </div>
         <div class="controls">
           @if(controlRenderer == OwnerGalleryControl){
-            @views.frontend.tags.html.toggle(styleclass="private",
+            @tags.toggle(styleclass="private",
               name="privacy",
               id=egraph.orderId.toString,
               checked = (egraph.publicStatus == "Public"))

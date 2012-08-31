@@ -32,7 +32,7 @@ object Utils {
   }
 
 //  /**
-//   * Drop-in replacement for @asset. Use to take advantage of cloudfront on live.
+//   * Drop-in replacement for @routes.Assets.at. Use to take advantage of cloudfront on live.
 //   * Paths are always absolute to root. Leading '/' is optional.
 //   *
 //   * @param path relative to the application root. This should usually be "public/some-file"

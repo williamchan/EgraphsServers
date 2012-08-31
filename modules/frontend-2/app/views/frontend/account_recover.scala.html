@@ -4,15 +4,14 @@ headerData: models.frontend.header.HeaderData,
 footerData: models.frontend.footer.FooterData
 )
 
-@import views.frontend.tags
-@import views.frontend.tags.ng
-
+@import views.html.frontend.tags
+@import views.html.frontend.tags.ng
 
 @baseBody = {
 <section ng-cloak id="content" class="top" role="main" ng-controller="Controller">
   <div id="main" class="sub">
     <div class="container" id="settings-page">
-      @tags.html.safeForm("method" -> "POST", "action" -> "/account/recover"){
+      @tags.safeForm("method" -> "POST", "action" -> "/account/recover"){
       <section class="settings-group" id="password-reset">
         <div class="row-settings row-fluid">
           <div class="span12">
@@ -29,7 +28,7 @@ footerData: models.frontend.footer.FooterData
       <div class="row-fluid">
         <div class="span9"></div>
         <div class="span3 save-button">
-          @tags.html.arrow_button(caption="Submit")
+          @tags.arrow_button(caption="Submit")
         </div>
       </div>
       }

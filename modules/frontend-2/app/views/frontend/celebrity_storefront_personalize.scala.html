@@ -26,12 +26,12 @@
       (the implicit parameters are documented in the base template from which they get used)
 */}
 
-@import views.frontend.tags.html.storefront_breadcrumbs_responsive
-@import views.frontend.tags
+@import views.html.frontend.tags.storefront_breadcrumbs_responsive
+@import views.html.frontend.tags
 @import models.frontend.storefront.PersonalizeMessageOption
 @import models.frontend.storefront.PersonalizeMessageOption.{SpecificMessage, CelebrityChoosesMessage, SignatureOnly}
-@import frontend.formatting.MoneyFormatting.Conversions._
-@import frontend.formatting.DateFormatting.Conversions._
+@import _root_.frontend.formatting.MoneyFormatting.Conversions._
+@import _root_.frontend.formatting.DateFormatting.Conversions._
 
 @headJs = {
   Egraphs.page.celeb = {name: "@orderSummary.celebrityName"};
@@ -58,10 +58,10 @@
 					
 						<div class="clearfix">
 					
-	    				@tags.html.safeForm("class" -> "main", "method" -> "post", "action" -> form.actionUrl)	{
+	    				@tags.safeForm("class" -> "main", "method" -> "post", "action" -> form.actionUrl)	{
 	
 								<div class="order-overview @orientation">
-								  @tags.html.egraphPreview(
+								  @tags.egraphPreview(
 								  	productPreviewUrl,
 								    orientation
 								  )
@@ -81,7 +81,7 @@
                           <a href="/faq#how-long">Expected Digital Delivery: @guaranteedDelivery.formatDayAsPlainLanguage</a>
                         </small>
 	      				      </label>
-	      				      @tags.html.bootstrap_input_field(form.isGift) {
+	      				      @tags.bootstrap_input_field(form.isGift) {
 	      				        <input id="gift" 
 	      				               type="checkbox"
 	      				               name="@form.isGift.name"
@@ -95,7 +95,7 @@
 	    				    <div class="field non-gift-only" style="@for(checked <- form.isGift if checked) {display: none;}">
 	      				    <div class="clearfix">
 	      				      <label class="instructions" for="your-name">Your Name:</label>
-	      				      @tags.html.bootstrap_input_field(form.recipientName) {
+	      				      @tags.bootstrap_input_field(form.recipientName) {
 	        				      <input id="your-name"	        				             
 	        				             type="text"
 	        				             name="@form.recipientName.name"
@@ -108,7 +108,7 @@
 	    				    <div class="field gift-only" style="@for(checked <- form.isGift if !checked) {display: none;}">
 	      				    <div class="clearfix">
 	      				      <label class="instructions" for="recipient-name">Gift Recipient's Name:</label>
-	      				      @tags.html.bootstrap_input_field(form.recipientName) {
+	      				      @tags.bootstrap_input_field(form.recipientName) {
 	        				      <input id="recipient-name"
 	        				             type="text"	        				             
 	        				             name="@form.recipientName.name"
@@ -122,7 +122,7 @@
 	    				    <div class="field last gift-only" style="@for(checked <- form.isGift if !checked) {display: none;}">
 	      				    <div class="clearfix">
 	      				      <label class="instructions" for="recipient-email">Gift Recipient's Email:</label>
-	      				      @tags.html.bootstrap_input_field(form.recipientEmail) {
+	      				      @tags.bootstrap_input_field(form.recipientEmail) {
 	      				        <input id="recipient-email" 
 	      				               type="text"
 	      				               name="@form.recipientEmail.name"
@@ -146,7 +146,7 @@
 	      				      	@orderSummary.celebrityName Should Write: 
 	      				      	<small>@writtenMessageCharacterLimit character limit.</small>
 	      				      	<small>All messages are subject to approval.</small></label>
-	                    @tags.html.bootstrap_input_field(form.messageText) {
+	                    @tags.bootstrap_input_field(form.messageText) {
 	                      <div id="message-options" class="btn-group" data-toggle="buttons-radio">
 	                        <button type="button"
 	                                value="SignatureWithMessage"
@@ -207,7 +207,7 @@
 	      				        <small>@messageToCelebrityCharacterLimit character limit.</small>
 	      				        <small>All messages are subject to approval.</small>
     				      		</label>
-	      				      @tags.html.bootstrap_input_field(form.noteToCelebrity) {
+	      				      @tags.bootstrap_input_field(form.noteToCelebrity) {
 	      				        <textarea maxlength="@messageToCelebrityCharacterLimit" id="your-message"
 	      				                  name="@form.noteToCelebrity.name"
 								                  rows="8"
@@ -224,7 +224,7 @@
 	    				  
 	    				  	<div class="clearfix">
 	    				  
-	    				 			@tags.html.arrow_button(caption="Review", classes="button right")
+	    				 			@tags.arrow_button(caption="Review", classes="button right")
 	    				 		
 	    				  	</div>
 	    				  
@@ -235,7 +235,7 @@
 	    				<aside>
 	    				
 	    					<div class="order-overview @orientation clearfix">
-	    						  @tags.html.egraphPreview(
+	    						  @tags.egraphPreview(
 	    						  	productPreviewUrl,
 	    						    orientation
 	    						  )
@@ -249,7 +249,7 @@
 		    				  			<h4 class="last">@orderSummary.productName</h4>
 		    				  		</div>
 		    				  		
-		    				  		@tags.html.storefront_price_summary(
+		    				  		@tags.storefront_price_summary(
 		    				  			orderSummary.subtotal,
 		    				  			orderSummary.shipping,
 		    				  			orderSummary.tax,

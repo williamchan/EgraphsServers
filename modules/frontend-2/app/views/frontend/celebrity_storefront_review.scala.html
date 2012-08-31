@@ -36,13 +36,12 @@
       actionUrl - the target at which to post the selected printing option.
 */}
 
-@import frontend.formatting.MoneyFormatting.Conversions._
-@import frontend.formatting.DateFormatting.Conversions._
-@import views.frontend.tags.html.storefront_breadcrumbs_responsive
-@import views.frontend.tags.html.physical_preview_modal
-@import views.frontend.tags
-@{/*import views.frontend.Utils.cdnAsset*/}
-@{ if (play.Play.isProd()) serveFromCDN() }
+@import _root_.frontend.formatting.MoneyFormatting.Conversions._
+@import _root_.frontend.formatting.DateFormatting.Conversions._
+@import views.html.frontend.tags.storefront_breadcrumbs_responsive
+@import views.html.frontend.tags.physical_preview_modal
+@import views.html.frontend.tags
+@import controllers._
 
 @baseBody = {
     <div id="content" class="top" role="main">
@@ -89,7 +88,7 @@
 						
 						</figure>
 	
-	  				@tags.html.safeForm("action" ->  actionUrl, "method" -> "post", "class" -> "wrap") {
+	  				@tags.safeForm("action" ->  actionUrl, "method" -> "post", "class" -> "wrap") {
 	  				
 	  					<div class="clearfix">
 

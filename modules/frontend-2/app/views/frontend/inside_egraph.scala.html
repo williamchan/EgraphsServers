@@ -3,14 +3,12 @@ implicit session: play.api.mvc.Session,
 headerData: models.frontend.header.HeaderData,
 footerData: models.frontend.footer.FooterData
 )
+
 @import views.frontend.Utils
-@{/*import views.frontend.Utils.cdnAsset*/}
-@{ if (play.Play.isProd()) serveFromCDN() }
-@import views.frontend.tags.html.physical_preview_modal
+
+@import views.html.frontend.tags.physical_preview_modal
 @import models.frontend.contents._
-
-
-
+@import controllers._
 
 @baseBody = {
 

@@ -5,8 +5,8 @@ footerData: models.frontend.footer.FooterData
 )
 @import views.frontend.Utils
 @import models.frontend.egraphs._
-@{/*import views.frontend.Utils.cdnAsset*/}
-@{ if (play.Play.isProd()) serveFromCDN() }
+@import controllers._
+
 @baseBody = {
 
 <section id="content" role="main">

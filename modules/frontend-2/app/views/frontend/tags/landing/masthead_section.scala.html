@@ -1,6 +1,6 @@
 @(celebrityPublicName: Option[String] = None, mastheadImageUrl: String = "public/images/landing-masthead.jpg", getStartedUrl: Option[String] = None)
 
-@{ if (play.Play.isProd()) serveFromCDN() }
+@import controllers._
 
 <section id="masthead-home" role="banner" style="background-image: url(@routes.Assets.at(mastheadImageUrl));">
 
