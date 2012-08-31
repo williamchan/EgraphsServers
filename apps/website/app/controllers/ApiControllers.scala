@@ -8,7 +8,6 @@ import akka.actor.ActorRef
 import models.{EnrollmentBatchStore, OrderQueryFilters, EnrollmentBatchServices, OrderStore}
 import services.blobs.Blobs
 import services.AppConfig._
-import models.EnrollmentBatchServices
 import java.util.Properties
 
 object ApiControllers extends Controller

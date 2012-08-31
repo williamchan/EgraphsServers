@@ -53,7 +53,7 @@ class BlobsTests extends EgraphsUnitTest
     queryParams(1)._1 should be("Expires")
     queryParams(1)._2.toLong should be(expires plusOrMinus 5)
     queryParams(2)._1 should be("Signature")
-    queryParams(2)._2.length should be > (30)
+    queryParams(2)._2.length should be > (0)
   }
 
   "RichBlob" should "convert properly" in {
