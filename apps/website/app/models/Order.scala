@@ -26,6 +26,7 @@ case class OrderServices @Inject() (
   celebrityStore: CelebrityStore,
   inventoryStore: InventoryBatchStore,
   productStore: ProductStore,
+  printOrderStore: PrintOrderStore,
   payment: Payment,
   mail: Mail,
   cashTransactionServices: Provider[CashTransactionServices],
