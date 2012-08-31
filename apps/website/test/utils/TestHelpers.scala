@@ -38,6 +38,25 @@ object TestHelpers {
   }
 
   /**
+   * @return the baseUrl and a list of the query parameters as field-value tuples
+   */
+  def splitUrl(url: String): (String, List[(String, String)]) = {
+    val urlAndQuery = url.split('?').toList
+    val urlRoot = urlAndQuery.head
+    val queryStringParams = urlAndQuery.tail.headOption match {
+      case Some(query) => {
+        query.split('&').toList.map(param => {
+          val fieldAndValue = param.split('=')
+          (fieldAndValue(0), fieldAndValue(1))
+        })
+      }
+      case None => List.empty[(String, String)]
+    }
+
+    (urlRoot, queryStringParams)
+  }
+
+  /**
    * Convenience method that starts the actor, executes the operation, and stops the actor.
    */
   def withActorUnderTest[ActorT <: Actor: Manifest, ResultT]

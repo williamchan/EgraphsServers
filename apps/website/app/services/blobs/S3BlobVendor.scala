@@ -6,10 +6,14 @@ import org.jclouds.aws.s3.AWSS3Client
 import org.jclouds.s3.domain.CannedAccessPolicy
 import services.logging.Logging
 import services.AppConfig
-import services.http.{HttpContentService}
+import services.http.HttpContentService
+import javax.crypto.Mac
+import javax.crypto.spec.SecretKeySpec
+import java.net.URLEncoder
+import play.libs.Codec
 
 /** [[services.blobs.Blobs.BlobProvider]] implementation backed by Amazon S3 */
-private[blobs] class S3BlobVendor(
+private[blobs] case class S3BlobVendor(
   s3id: String,
   s3secret: String
 ) extends BlobVendor with Logging {
@@ -68,6 +72,26 @@ private[blobs] class S3BlobVendor(
       application.conf: An "s3.secret" configuration must be provided.
       """
     )
+  }
+
+  /**
+   * Creates a signature for securely accessing an S3 location per the query string parameter specification as described
+   * in http://s3.amazonaws.com/doc/s3-developer-guide/RESTAuthentication.html.
+   *
+   * @param namespace S3 bucket name
+   * @param key S3 resource key
+   * @param expires expiration time in epoch time
+   * @param awsSecretKey AWS Secret Access Key
+   * @return signature to be used in authenticated REST request
+   */
+  private[blobs] def sign(namespace: String, key: String, expires: Long, awsSecretKey: String = s3secret): String = {
+    val msg = "GET\n\n\n" + expires + "\n/" + namespace + "/" + key
+    val mac = Mac.getInstance("HmacSHA1")
+    val keyBytes = awsSecretKey.getBytes("UTF8")
+    val signingKey = new SecretKeySpec(keyBytes, "HmacSHA1")
+    mac.init(signingKey)
+    val digest = mac.doFinal(msg.getBytes("UTF8"))
+    URLEncoder.encode(Codec.encodeBASE64(digest), "UTF-8")
   }
 
   //
