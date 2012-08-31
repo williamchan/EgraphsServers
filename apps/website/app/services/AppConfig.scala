@@ -5,7 +5,7 @@ import cache.CacheModule
 import db.DBModule
 import graphics.GraphicsModule
 import http.HttpModule
-import mail.{MailProvider, TransactionalMail}
+import mail.{BulkMail, BulkMailProvider, MailProvider, TransactionalMail}
 import models._
 import models.vbg._
 import models.xyzmo._
@@ -21,6 +21,8 @@ class AppConfig extends AbstractModule with ScalaModule {
   override def configure() {
     // Services
     bind[TransactionalMail].toProvider[MailProvider]
+    bind[BulkMail].toProvider[BulkMailProvider]
+
     install(DBModule)
     install(CacheModule)
     install(HttpModule)

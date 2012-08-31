@@ -17,7 +17,7 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
   protected def accountStore: AccountStore
   protected def customerStore: CustomerStore
   protected def accountRequestFilters: AccountRequestFilters
-  protected def mail: TransactionalMail
+  protected def transactionalMail: TransactionalMail
 
   def postRecoverAccount() = postController() {
     accountRequestFilters.requireValidAccountEmail(request.params.getOption("email").getOrElse("Nothing")) {
@@ -51,6 +51,6 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
         resetPasswordUrl = GetResetPasswordEndpoint.absoluteUrl(account.email, account.resetPasswordKey.get)
       ).toString().trim()
     )
-    mail.send(email)
+    transactionalMail.send(email)
   }
 }

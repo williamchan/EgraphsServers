@@ -16,7 +16,7 @@ trait PostBuyDemoProductEndpoint { this: Controller =>
 
   protected def dbSession: DBSession
   protected def celebFilters: CelebrityAccountRequestFilters
-  protected def mail: TransactionalMail
+  protected def transactionalMail: TransactionalMail
   protected def payment: Payment
   protected def accountStore: AccountStore
   protected def customerStore: CustomerStore
@@ -60,7 +60,7 @@ trait PostBuyDemoProductEndpoint { this: Controller =>
         totalAmountPaid = product.price,
         billingPostalCode = "55555",
         flash = flash,
-        mail = mail,
+        mail = transactionalMail,
         customerStore = customerStore,
         accountStore = accountStore,
         dbSession = dbSession,

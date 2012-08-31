@@ -3,7 +3,7 @@ package utils
 import com.google.inject.Inject
 import services.http._
 import forms.purchase.{PurchaseFormChecksFactory, FormReaders, PurchaseFormFactory}
-import services.mail.TransactionalMail
+import services.mail.{BulkMail, TransactionalMail}
 import services.payment.Payment
 import models._
 import services.db.DBSession
@@ -14,7 +14,7 @@ import forms._
 import play.mvc.Scope.{Session, Flash}
 import play.mvc.Http.Request
 import play.test.FunctionalTest
-import services.AppConfig
+import services.{Utils, AppConfig}
 import services.mvc.celebrity.CatalogStarsQuery
 import services.mvc.{OrderCompleteViewModelFactory, StorefrontBreadcrumbData}
 
@@ -29,7 +29,7 @@ case class TestWebsiteControllers @Inject()(
   adminFilters: AdminRequestFilters,
   celebFilters: CelebrityAccountRequestFilters,
   customerFilters: CustomerRequestFilters,
-  mail: TransactionalMail,
+  transactionalMail: TransactionalMail,
   payment: Payment,
   orderQueryFilters: OrderQueryFilters,
   egraphQueryFilters: EgraphQueryFilters,
@@ -47,7 +47,7 @@ case class TestWebsiteControllers @Inject()(
   fakeFlash: Flash = new Flash()
 )() extends Controller with AllWebsiteEndpoints {
   import AppConfig.instance
-  
+  val bulkMail = instance[BulkMail]
   val breadcrumbData = instance[StorefrontBreadcrumbData]
   val checkPurchaseField = instance[PurchaseFormChecksFactory]
   val purchaseFormFactory = instance[PurchaseFormFactory]

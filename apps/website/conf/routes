@@ -113,6 +113,7 @@ POST    /logout                                                     WebsiteContr
 GET     /orders/{<[0-9]+>orderId}/confirm/?                         WebsiteControllers.getOrderConfirmation
 POST    /orders/{<[0-9]+>orderId}/configure                         WebsiteControllers.postOrderPrivacy
 POST    /register                                                   WebsiteControllers.postRegisterConsumerEndpoint
+POST    /subscribe                                                  WebsiteControllers.postSubscribeEmail
 
 GET     /{celebrityUrlSlug}/?                                       WebsiteControllers.getCelebrityLanding
 GET     /{celebrityUrlSlug}/photos/?                                WebsiteControllers.getStorefrontChoosePhotoTiled

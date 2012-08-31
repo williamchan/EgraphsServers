@@ -84,6 +84,8 @@ class POSTControllerMethod @Inject()(
    *
    * @param doCsrfCheck true that we should check for an authenticity token before
    *     performing the operation
+   * @param openDatabase true that the a database connection should be managed
+   *    by this ControllerMethod instance.
    * @param operation the operation to perform
    * @param request the current request
    * @param session the current session
