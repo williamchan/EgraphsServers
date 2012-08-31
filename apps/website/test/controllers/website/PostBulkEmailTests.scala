@@ -1,15 +1,12 @@
 package controllers.website
 
 import controllers.WebsiteControllers
-import org.junit.Assert._
 import org.junit.Test
 import scala.collection.JavaConversions._
 import play.test.FunctionalTest
 import FunctionalTest._
-import services.db.TransactionSerializable
-import utils.TestData
 import sjson.json.Serializer
-import services.http.forms.EmailSubscriptionForm
+
 
 class PostBulkEmailTests extends EgraphsFunctionalTest {
   var url = WebsiteControllers.reverse(WebsiteControllers.postSubscribeEmail).url

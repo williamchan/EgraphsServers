@@ -10,6 +10,7 @@ import models.frontend.account.{AccountSettingsForm => AccountSettingsFormView}
 import services.mvc.ImplicitHeaderAndFooterData
 import controllers.WebsiteControllers
 
+
 private[controllers] trait GetAccountSettingsEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
 

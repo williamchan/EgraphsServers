@@ -1,5 +1,6 @@
 @(title: String, jsMain: String = "", headJs: => Html = Html.empty, body: => Html)(
-  implicit headerData: models.frontend.header.HeaderData,
+  implicit session: play.mvc.Scope.Session,
+  headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData)
 
 @{/**
@@ -93,6 +94,30 @@
     <script data-main='@cdnAsset("public/javascripts/main.js")'
             src='@cdnAsset("public/javascripts/require-1.0.2.js")'
             type="text/javascript" ></script>
+
+      <div class="modal hide fade" id="emailSignupForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+           aria-hidden="true">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 id="myModalLabel">Put yer emails here!</h3>
+        </div>
+        <div class="modal-body">
+
+          <p>nom nom nom emails</p>
+          @tags.html.safeForm("method" -> "POST", "action" -> "/subscribe") {
+          <div>
+          <input class=".input-medium" type="email" name="email" />
+          <input type="hidden" value="swoop" id="listId" name="listId"/>
+          </div>
+          <div>
+            @tags.html.arrow_button(caption="Hell Yea")
+            <a data-dismiss="modal" aria-hidden="true">Hell No</a>
+          </div>
+          }
+
+
+        </div>
+      </div>
   </body>
 </html>
 <!-- End base_template.scala.html -->

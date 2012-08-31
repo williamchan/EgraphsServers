@@ -1,6 +1,7 @@
 @(celebrityName: String, productName: String)(
-implicit headerData: models.frontend.header.HeaderData,
-footerData: models.frontend.footer.FooterData
+  implicit session: play.mvc.Scope.Session,
+  headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData
 )
 
 @baseBody = {

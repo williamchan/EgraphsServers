@@ -1,5 +1,5 @@
 /* Scripting for the base template page */
-define([], function() {
+define(["bootstrap/bootstrap-modal"], function() {
   var menuStatus = "closed";
 
   return {
@@ -36,6 +36,12 @@ define([], function() {
         $('.to-top a').click(function(e){
             $('html,body').animate({scrollTop: $($(this).attr('href')).offset().top},'slow');
             e.preventDefault();
+        });
+
+        // set modal to visible.
+        $(window).load(function(){
+            $('#emailSignupForm').modal({
+            });
         });
       });
     }
