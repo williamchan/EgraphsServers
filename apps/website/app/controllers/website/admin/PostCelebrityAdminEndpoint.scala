@@ -80,6 +80,7 @@ trait PostCelebrityAdminEndpoint {
         Validation.required("Public Name", publicName)
         Validation.required("Short Bio", bio)
         Validation.required("Organization", organization)
+        Validation.required("Role Description", roleDescription)
 
         Validation.isTrue("Public Name has maximum length of 128", publicName.length < 128)            // column width in database
         Validation.isTrue("Organization has maximum length of 128", organization.length < 128)         // column width in database
@@ -182,7 +183,7 @@ trait PostCelebrityAdminEndpoint {
       bio = bio,
       casualName = Utils.toOption(casualName),
       organization = organization,
-      roleDescription = Utils.toOption(roleDescription),
+      roleDescription = roleDescription,
       twitterUsername = Utils.toOption(twitterUsername)
     )
   }
