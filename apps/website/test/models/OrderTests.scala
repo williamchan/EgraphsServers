@@ -308,16 +308,15 @@ class OrderTests extends EgraphsUnitTest
     found.toSet should be(Set(pendingOrder))
   }
 
-  it should "only include orders that are rejected when composed with that filter" in {
+  it should "only include orders that are rejected when composed with those filters" in {
     val (will, _, celebrity, product) = newOrderStack
     will.buy(product).withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
     will.buy(product).withReviewStatus(OrderReviewStatus.PendingAdminReview).save()
-    val rejectedOrder1 = will.buy(product).withReviewStatus(OrderReviewStatus.RejectedByAdmin).save()
-    val rejectedOrder2 = will.buy(product).withReviewStatus(OrderReviewStatus.RejectedByCelebrity).save()
+    val orderRejectedByAdmin = will.buy(product).withReviewStatus(OrderReviewStatus.RejectedByAdmin).save()
+    val orderRejectedByCelebrity = will.buy(product).withReviewStatus(OrderReviewStatus.RejectedByCelebrity).save()
 
-    val found = orderStore.findByCelebrity(celebrity.id, orderQueryFilters.rejected)
-    found.toSeq.length should be(2)
-    found.toSet should be(Set(rejectedOrder1, rejectedOrder2))
+    orderStore.findByCelebrity(celebrity.id, orderQueryFilters.rejectedByAdmin).head should be(orderRejectedByAdmin)
+    orderStore.findByCelebrity(celebrity.id, orderQueryFilters.rejectedByCelebrity).head should be(orderRejectedByCelebrity)
   }
 
   "findByFilter" should "restrict by filter but not by celebrity" in {

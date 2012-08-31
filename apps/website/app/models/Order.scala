@@ -531,10 +531,18 @@ class OrderQueryFilters @Inject() (schema: Schema) {
     }
   }
 
-  def rejected: FilterOneTable[Order] = {
+  def rejectedByAdmin: FilterOneTable[Order] = {
     new FilterOneTable[Order] {
       override def test(order: Order) = {
-        (order._reviewStatus in Seq(OrderReviewStatus.RejectedByAdmin.name, OrderReviewStatus.RejectedByCelebrity.name))
+        (order._reviewStatus === OrderReviewStatus.RejectedByAdmin.name)
+      }
+    }
+  }
+
+  def rejectedByCelebrity: FilterOneTable[Order] = {
+    new FilterOneTable[Order] {
+      override def test(order: Order) = {
+        (order._reviewStatus === OrderReviewStatus.RejectedByCelebrity.name)
       }
     }
   }
