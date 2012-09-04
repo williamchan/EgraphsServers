@@ -12,9 +12,9 @@
 
           <h1>What if you could share a moment with @celebrityPublicName.getOrElse("your favorite star")?</h1>
 
-          @getStartedUrl.map { url => 
+          @getStartedUrl.map { url =>
             <p>
-              <a href="@url" class="button get-started">
+              <a id="get-started-button" href="@url" class="button get-started">
                 <strong>Get Started</strong><span>&raquo;</span>
               </a>
             </p>

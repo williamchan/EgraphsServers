@@ -8,6 +8,7 @@ function(social, Egraphs) {
   return {
     go: function() {
       social.populateCelebrityTweets(".recent-tweets .tweets", celebTwitterInfo);
+
       $('.flexslider').flexslider({
         slideshow: false,
         animation: "slide",
@@ -17,6 +18,9 @@ function(social, Egraphs) {
         prevText: "<span>Previous</span> &lt;",
         nextText: "<span>Next</span> &gt;"
 	    });
-    }    
+
+	    // Mixpanel events
+	    mixpanel.track_forms('.description form', 'Personalize clicked');
+    }
   };
 });

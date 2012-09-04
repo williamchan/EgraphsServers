@@ -62,6 +62,9 @@ function(forms, Egraphs) {
 
       forms.bindCounter("#egraph-message-text", "#egraph-message-count", Egraphs.page.egraphMessageLimit);
       forms.bindCounter("#your-message", "#your-message-count", Egraphs.page.yourMessageLimit);
+
+      // Mixpanel events
+      mixpanel.track_forms('.container form', 'Review clicked');
     }
   };
 });
