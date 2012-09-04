@@ -1,4 +1,4 @@
-@(stars:Iterable[models.frontend.landing.CatalogStar]
+@(stars:Iterable[models.frontend.landing.CatalogStar], signup:Boolean = false
 )(
   implicit session: play.mvc.Scope.Session,
   headerData: models.frontend.header.HeaderData,
@@ -54,6 +54,12 @@
   </footer>
 }
 
+@modalJs = {
+  @if(signup) {
+    Egraphs.page.modalOn = true;
+  }
+}
+
 @baseBody = {
   @tags.landing.html.masthead_section(getStartedUrl=Some("#connect-with-your-star"))
 
@@ -88,5 +94,6 @@
 @base_template(
   title="Share a moment with your favorite star",
   jsMain="pages/landing",
+  headJs=modalJs,
   body=baseBody
 )

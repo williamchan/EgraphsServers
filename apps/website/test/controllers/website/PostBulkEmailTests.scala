@@ -27,6 +27,36 @@ class PostBulkEmailTests extends EgraphsFunctionalTest {
   }
 
   @Test
+  def testEmailValidationInvalidEmail() {
+    val response = POST(url,getPostStrParams(email= "derp@schlerp", listId="scsdff"))
+    println(
+      response.out.toString)
+    assertStatus(200, response)
+    assertContentEquals(Serializer.SJSON.toJSON(
+      Map("errors" ->
+        Serializer.SJSON.toJSON(
+          Seq("Not an e-mail address.")
+        )
+      )
+    ).toString, response)
+  }
+
+  @Test
+  def testEmailValidationNoList() {
+    val response = POST(url,getPostStrParams(email= "derp@derp.com", listId=""))
+    println(
+      response.out.toString)
+    assertStatus(200, response)
+    assertContentEquals(Serializer.SJSON.toJSON(
+      Map("errors" ->
+        Serializer.SJSON.toJSON(
+          Seq("We're gonna need this")
+        )
+      )
+    ).toString, response)
+  }
+
+  @Test
   def testCorrectEmail() {
     val response = POST(url, getPostStrParams(email="customer@website.com", listId="2003421aassd"))
     assertStatus(200, response)

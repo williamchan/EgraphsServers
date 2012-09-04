@@ -38,11 +38,13 @@ define(["bootstrap/bootstrap-modal"], function() {
             e.preventDefault();
         });
 
-        // set modal to visible.
-        $(window).load(function(){
-            $('#emailSignupForm').modal({
-            });
-        });
+        // set modal to visible if toggled.
+        if(Egraphs.page.modalOn === true) {
+          $(window).load(function(){
+              $('#emailSignupForm').modal({
+              });
+          });
+        }
       });
     }
   };
