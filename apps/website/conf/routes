@@ -115,6 +115,7 @@ POST    /orders/{<[0-9]+>orderId}/configure                         WebsiteContr
 GET     /privacy/?                                                  WebsiteControllers.getPrivacy
 POST    /register                                                   WebsiteControllers.postRegisterConsumerEndpoint
 POST    /subscribe                                                  WebsiteControllers.postSubscribeEmail
+GET     /sweepstakes/insider                                        WebsiteControllers.getInsiderSweepstakes
 GET     /terms/?                                                    WebsiteControllers.getTerms
 
 GET     /{celebrityUrlSlug}/?                                       WebsiteControllers.getCelebrityLanding

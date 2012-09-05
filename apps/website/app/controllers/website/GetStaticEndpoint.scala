@@ -37,6 +37,10 @@ private[controllers] trait GetStaticEndpoint extends ImplicitHeaderAndFooterData
     views.frontend.html.privacy()
   }
 
+  def getInsiderSweepstakes = controllerMethod() {
+    views.frontend.html.sweepstakes_insider()
+  }
+
   def getTerms = controllerMethod() {
     views.frontend.html.terms()
   }

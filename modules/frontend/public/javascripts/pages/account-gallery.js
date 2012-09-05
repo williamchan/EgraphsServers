@@ -49,6 +49,10 @@ define(["services/forms", "Egraphs", "bootstrap/bootstrap-button"],
             });
           }
         });
+
+        // Mixpanel events
+        mixpanel.track_links('#galleryrows .facebook', 'Facebook share button clicked (gallery)');
+        mixpanel.track_links('#galleryrows .twitter', 'Tweet button clicked (gallery)');
       }
     };
   });

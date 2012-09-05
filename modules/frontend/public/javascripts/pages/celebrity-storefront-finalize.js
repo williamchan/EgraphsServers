@@ -20,6 +20,9 @@ function(forms, payment, Egraphs) {
           }
         });
       });
+
+      // Mixpanel events
+      mixpanel.track_forms('.container form', 'Purchase clicked');
     }
   };
 });
