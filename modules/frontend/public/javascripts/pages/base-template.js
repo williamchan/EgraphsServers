@@ -10,6 +10,8 @@ define(["bootstrap/bootstrap-modal"], function() {
      */
     go: function () {
       $(document).ready(function(){
+        var callout = $("#signup-callout");
+        var signupModal = $('#emailSignupForm');
         // highlight action on top menu
         $('#top .account').hover(function(){
           $(this).addClass('hover');
@@ -38,10 +40,29 @@ define(["bootstrap/bootstrap-modal"], function() {
             e.preventDefault();
         });
 
+        $("#signup-button").click(function () {
+          $.ajax({
+            url: '/subscribe',
+            data: $("#signup-form").serialize(),
+            type: 'post',
+            success: function(data) {
+              callout.fadeOut();
+              callout.text("Thanks!");
+              setTimeout(function() {signupModal.modal('toggle')}, 500);
+            },
+            error: function () {
+              callout.text("Connection error, try again later.");
+              setTimeout(function() {signupModal.modal('toggle')}, 800);
+            }
+
+          });
+          return false;
+        });
+
         // set modal to visible if toggled.
         if(Egraphs.page.modalOn === true) {
           $(window).load(function(){
-              $('#emailSignupForm').modal({
+              signupModal.modal({
               });
           });
         }

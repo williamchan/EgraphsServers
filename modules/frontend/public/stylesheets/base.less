@@ -15,6 +15,8 @@ a, a:link, a:visited {
 	}
 }
 
+
+
 .tooltip {
 	&.in {
 		.opacity(90);		
@@ -311,16 +313,22 @@ button  {
       font-size: 15px;
       font-weight: 400;
     }
-
+    a {
+      font-size: 14px;
+      line-height: .8em;
+      font-weight: normal;
+      color: @grayDark;
+      border-bottom: 1px dotted @grayDark;
+    }
     .modal-dismissal {
       color: @orange;
       float: none;
       right: 25px;
       bottom: 40px;
       position: absolute;
-      font-size: 14px;
-      text-decoration: underline;
-      font-weight: normal;
+      text-decoration: none;
+      border-bottom: 1px dotted @orange;
+
     }
   }
 
@@ -490,7 +498,10 @@ section[role=banner] {
 	
 	a { color: @grayLighter; }
 	a:hover{ color: @gray; }
-	
+
+	#email-link {
+      color: @orange;
+    }
 	nav {
 	
 		margin-bottom: 10px;
