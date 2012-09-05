@@ -1,6 +1,7 @@
 package controllers
 
-import play.mvc.Controller
+import play.api._
+import play.api.mvc._
 import models.frontend.storefront.OrderCompleteViewModel
 import java.util
 
@@ -11,8 +12,8 @@ object Complete extends Controller
   with DefaultHeaderAndFooterData
   with DefaultStorefrontBreadcrumbs
 {
-  def index = {
-    views.html.frontend.celebrity_storefront_complete(defaultOrderCompleteViewModel)
+  def index = Action {
+    Ok(views.html.frontend.celebrity_storefront_complete(defaultOrderCompleteViewModel))
   }
 
   def defaultOrderCompleteViewModel = {

@@ -2,12 +2,12 @@
   recipientName: String,
   frameCssClass: String,
   frameLayoutColumns: String,
-  productIconUrl: String,
+  productIcon: String,
   storyLayoutColumns: String,
   storyTitle: String,
   storyBody: String,
   audioUrl: String,
-  signedImageUrl: String,
+  signedImage: String,
   signedOnDate: String,  
   shareOnFacebookLink: String,
   shareOnTwitterLink: String,
@@ -66,7 +66,7 @@
             <div class="egraph">
               <div class="frame">
                 <div class="image-aperture">
-                  <iframe src="@signedImageUrl" class="signed-photo" alt="Signed photo"></iframe>
+                  <iframe src='@(routes.Assets.at("images/" + signedImage))' class="signed-photo" alt="Signed photo"></iframe>
                   <!-- <div class="fx-mat-glow"></div> The glow off the bottom edge of the matte -->
                   <div class="fx-mat-shadow"></div>               
                   <!-- <div class="fx-glass-shine"></div> The shine on top of the glass -->
@@ -89,7 +89,7 @@
                     <div class="product-icon-and-date-box">
                       <div class="product-icon-content">
                         <div class="product-icon-centered">
-                          <img src='@productIconUrl' />
+                          <img src='@(routes.Assets.at("images/" + productIcon))' />
                         </div>
                       </div>
                       <div class="signing-date">@signedOnDate</div>

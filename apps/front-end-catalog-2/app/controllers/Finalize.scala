@@ -1,9 +1,9 @@
 package controllers
 
-import play.api.mvc.Controller
+import play.api._
+import play.api.mvc._
 import org.joda.money.Money
 import models.frontend.storefront._
-import scala.Some
 
 /**
  * Permutations of the Checkout: Finalize.
@@ -13,20 +13,20 @@ object Finalize extends Controller
   with DefaultStorefrontBreadcrumbs
 {
 
-  def index = {
-    views.html.frontend.celebrity_storefront_finalize(
+  def index = Action {
+    Ok(views.html.frontend.celebrity_storefront_finalize(
       defaultFinalizeViewModel,
       productPreviewUrl= "http://placehold.it/454x288",
       orientation="orientation-landscape"
-    )
+    ))
   }
 
-  def portrait = {
-    views.html.frontend.celebrity_storefront_finalize(
+  def portrait = Action {
+    Ok(views.html.frontend.celebrity_storefront_finalize(
       defaultFinalizeViewModel,
       productPreviewUrl = "http://placehold.it/302x420",
       orientation="orientation-portrait"
-    )
+    ))
   }
   
   def defaultShippingModel = {

@@ -1,6 +1,7 @@
 package controllers
 
-import play.mvc.Controller
+import play.api._
+import play.api.mvc._
 
 import models.frontend.storefront._
 import java.text.SimpleDateFormat
@@ -20,68 +21,68 @@ object ChoosePhoto extends Controller
   val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
 
   /** Renders tiled-view with n products */
-  def withProducts(num: Int = 1) = {
+  def withProducts(num: Int = 1) = Action {
     val products = for(i <- 1 to num) yield sampleTile
-    ChoosePhotoDefaults().copy(products=products).renderTiles
+    Ok(ChoosePhotoDefaults().copy(products=products).renderTiles)
   }
 
   /** Renders tiled view with n recent egraphs */
-  def withRecentEgraphs(num: Int = 1) = {
+  def withRecentEgraphs(num: Int = 1) = Action {
     val recentEgraphs = for (i <- 1 to num) yield sampleEgraph
-    ChoosePhotoDefaults().copy(recentEgraphs=recentEgraphs).renderTiles
+    Ok(ChoosePhotoDefaults().copy(recentEgraphs=recentEgraphs).renderTiles)
   }
 
   /** Renders tiled view with n partner icons (e.g. MLB, Tampa Bay Rays, etc) */
-  def withPartnerIcons(num: Int=1) = {
+  def withPartnerIcons(num: Int=1) = Action {
     val icons = for (i <- 1 to num) yield samplePartnerIcon
-    ChoosePhotoDefaults().copy(partnerIcons=icons).renderTiles
+    Ok(ChoosePhotoDefaults().copy(partnerIcons=icons).renderTiles)
   }
 
-  def tilesWithSoldOut = {
+  def tilesWithSoldOut = Action {
     val products = Seq(
       sampleTile.copy(quantityRemaining = 0 )
     )
 
-    ChoosePhotoDefaults().copy(products=products).renderTiles
+    Ok(ChoosePhotoDefaults().copy(products=products).renderTiles)
   }
 
-  def carouselWithSoldOut = {
+  def carouselWithSoldOut = Action {
     val products = Seq(
       sampleCarouselProduct.copy(quantityRemaining = 0)
     )
 
-    ChoosePhotoDefaults().copy(carouselProducts=products).renderCarousel
+    Ok(ChoosePhotoDefaults().copy(carouselProducts=products).renderCarousel)
   }
 
 
   /** Renders tiled view of a celebrity that lacks a twitter handle */
-  def withoutTwitterHandle = {
+  def withoutTwitterHandle = Action {
     val defaults = ChoosePhotoDefaults()
-    ChoosePhotoDefaults().copy(
+    Ok(ChoosePhotoDefaults().copy(
       celeb=defaults.celeb.copy(twitterUsername=None)
-    ).renderTiles
+    ).renderTiles)
   }
 
   /** Renders one landscape product */
-  def landscape = {
-    ChoosePhotoDefaults().copy(products=List(sampleTile.copy(orientation=LandscapeOrientation))).renderTiles
+  def landscape = Action {
+    Ok(ChoosePhotoDefaults().copy(products=List(sampleTile.copy(orientation=LandscapeOrientation))).renderTiles)
   }
 
 
   /** Renders the choose photo page with a long bio */
-  def longBio = {
+  def longBio = Action {
     val longBio = (for(i <- 1 to 4) yield sampleBio).mkString("<br/><br/>")
-    ChoosePhotoDefaults().copy(celeb = sampleCeleb.copy(bio=longBio)).renderTiles
+    Ok(ChoosePhotoDefaults().copy(celeb = sampleCeleb.copy(bio=longBio)).renderTiles)
   }
 
   /** Renders the carousel with n products, initially focusing on a particular product */
-  def carousel(num: Int=3, focus: Int=1) = {
+  def carousel(num: Int=3, focus: Int=1) = Action {
     val carouselProducts = for (i <- 1 to num) yield sampleCarouselProduct
 
-    ChoosePhotoDefaults().copy(
+    Ok(ChoosePhotoDefaults().copy(
       carouselProducts=carouselProducts,
       firstCarouselIndex=focus - 1
-    ).renderCarousel
+    ).renderCarousel)
   }
 
   //

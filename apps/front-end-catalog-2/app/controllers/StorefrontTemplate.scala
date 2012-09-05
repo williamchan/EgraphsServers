@@ -1,33 +1,34 @@
 package controllers
 
 import models.frontend.storefront.{StorefrontBreadcrumb, StorefrontBreadcrumbs}
-import play.mvc.Controller
+import play.api._
+import play.api.mvc._
 
 object StorefrontTemplate extends Controller with DefaultHeaderAndFooterData {
   import StorefrontBreadcrumb.CrumbChoice._
 
-  def noneActiveOrComplete = {
+  def noneActiveOrComplete = Action {
     implicit val breadcrumbs = defaultBreadcrumbs
 
-    views.html.uses_storefront_template()
+    Ok(views.html.uses_storefront_template())
   }
 
-  def allComplete = {
+  def allComplete = Action {
     implicit val breadcrumbs = breadcrumbsWithAllComplete
 
-    views.html.uses_storefront_template()
+    Ok(views.html.uses_storefront_template())
   }
 
-  def allCompleteMiddleOneActive = {
+  def allCompleteMiddleOneActive = Action {
     implicit val breadcrumbs = breadcrumbsWithAllComplete.withActive(Review)
 
-    views.html.uses_storefront_template()
+    Ok(views.html.uses_storefront_template())
   }
 
-  def active(crumbIndex: Int) = {
+  def active(crumbIndex: Int) = Action {
     implicit val crumbs = defaultBreadcrumbs.withActive(crumbTypeFromIndex(crumbIndex))
 
-    views.html.uses_storefront_template()
+    Ok(views.html.uses_storefront_template())
   }
 
   val defaultBreadcrumbs = {

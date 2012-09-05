@@ -1,6 +1,7 @@
 package controllers
 
-import play.mvc.Controller
+import play.api._
+import play.api.mvc._
 import models.frontend.egraph.{LandscapeEgraphFrameViewModel, PortraitEgraphFrameViewModel}
 
 /**
@@ -11,15 +12,15 @@ object Egraph extends Controller with DefaultHeaderAndFooterData {
   //
   // Public members
   //
-  def landscape = {
+  def landscape = Action {
     val frame = LandscapeEgraphFrameViewModel
 
-    views.html.frontend.egraph(
+    Ok(views.html.frontend.egraph(
       "Herp Derpson",
       "Derp Herpson",
       frame.cssClass,
       frame.cssFrameColumnClasses,
-      "/public/images/egraph_default_plaque_icon.png",
+      "egraph_default_plaque_icon.png",
       frame.cssStoryColumnClasses,
       "Herp Derpson",
       """
@@ -29,22 +30,22 @@ object Egraph extends Controller with DefaultHeaderAndFooterData {
         he got a letter from Derp Herpson, and the rest, as they say, was history.
       """,
       "http://freshly-ground.com/data/audio/sm2/Adrian%20Glynn%20-%20Blue%20Belle%20Lament.mp3",
-      "/public/images/sample_landscape_egraph.svg",
+      "sample_landscape_egraph.svg",
       "May 10, 1983",
       shareOnFacebookLink="/shareOnFacebookLink",
       shareOnTwitterLink= "This is my test egraph"
-    )
+    ))
   }
 
-  def portrait = {
+  def portrait = Action  {
     val frame = PortraitEgraphFrameViewModel
 
-    views.html.frontend.egraph(
+    Ok(views.html.frontend.egraph(
       "Herp Derpson",
       "Derp Herpson",
       frame.cssClass,
       frame.cssFrameColumnClasses,
-      "/public/images/egraph_default_plaque_icon.png",
+      "egraph_default_plaque_icon.png",
       frame.cssStoryColumnClasses,
       "Herp Derpson",
       """
@@ -54,11 +55,11 @@ object Egraph extends Controller with DefaultHeaderAndFooterData {
         he got a letter from Derp Herpson, and the rest, as they say, was history.
       """,
       "http://freshly-ground.com/data/audio/sm2/Adrian%20Glynn%20-%20Blue%20Belle%20Lament.mp3",
-      "/public/images/sample_portrait_egraph.svg",
+      "sample_portrait_egraph.svg",
       "May 10, 1983",
       shareOnFacebookLink="/shareOnFacebookLink",
       shareOnTwitterLink= "This is my test egraph!"
-    )
+    ))
   }
 }
 

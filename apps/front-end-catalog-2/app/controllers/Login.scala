@@ -1,9 +1,9 @@
 package controllers
 
-import play.api.mvc.Controller
+import play.api._
+import play.api.mvc._
 import models.frontend.login_page.{AccountRegistrationFormViewModel, LoginFormViewModel}
 import models.frontend.forms.{FormError, Field}
-
 
 /**
  * Permutations of the Checkout: Login.
@@ -12,20 +12,20 @@ object Login extends Controller
   with DefaultHeaderAndFooterData
   with DefaultStorefrontBreadcrumbs
 {
-  def storefront(recipient: Option[String]) = {
-    LoginRenderArgs().copy(maybeGiftRecipient = recipient).renderCheckoutAsForm()
+  def storefront(recipient: Option[String]) = Action {
+    Ok(LoginRenderArgs().copy(maybeGiftRecipient = recipient).renderCheckoutAsForm())
   }
 
-  def index = {
-    LoginRenderArgs().renderLoginForm()
+  def index = Action {
+    Ok(LoginRenderArgs().renderLoginForm())
   }
 
-  def allErrorsLogin = {
-    allErrorsLoginRenderArgs.renderLoginForm()
+  def allErrorsLogin = Action {
+    Ok(allErrorsLoginRenderArgs.renderLoginForm())
   }
 
-  def allErrorsStorefront = {
-    allErrorsLoginRenderArgs.renderCheckoutAsForm()
+  def allErrorsStorefront = Action {
+    Ok(allErrorsLoginRenderArgs.renderCheckoutAsForm())
   }
 
   private def allErrorsLoginRenderArgs = {

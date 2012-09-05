@@ -1,6 +1,7 @@
 package controllers
 
-import play.api.mvc.Controller
+import play.api._
+import play.api.mvc._
 import play.api.templates.Html
 import models.frontend.header.{HeaderLoggedIn, HeaderNotLoggedIn, HeaderData}
 import models.frontend.footer.FooterData
@@ -9,19 +10,19 @@ import models.frontend.footer.FooterData
  * Permutations of the base template
  */
 object BaseTemplate extends Controller {
-  def notLoggedIn = {
+  def notLoggedIn = Action {
     implicit val headerData = defaultHeaderData
     implicit val footerData = defaultFooterData
 
-    views.html.frontend.base_template(
+    Ok(views.html.frontend.base_template(
       "Title",
       headJs=new Html("var thisShouldHaveBeenInjectedInTheHead = 1;"),
       body=new Html("<div>This is the body</div>"),
       jsMain="pages/base-template"
-    )
+    ))
   }
 
-  def loggedIn = {
+  def loggedIn = Action {
     val loggedInStatus = HeaderLoggedIn(
       name="Herp Derpson",
       profileUrl="/users/herpderpson1",
@@ -33,12 +34,12 @@ object BaseTemplate extends Controller {
     implicit val headerData = defaultHeaderData.copy(loggedInStatus=Right(loggedInStatus))
     implicit val footerData = defaultFooterData
 
-    views.html.frontend.base_template(
+    Ok(views.html.frontend.base_template(
       "Title",
       headJs=new Html("var thisShouldHaveBeenInjectedInTheHead = 1;"),
       body=new Html("<div>This is the body</div>"),
       jsMain="pages/base-template"
-    )
+    ))
   }
 
   val defaultFooterData = {

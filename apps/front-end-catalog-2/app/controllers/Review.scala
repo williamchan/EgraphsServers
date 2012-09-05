@@ -1,10 +1,11 @@
 package controllers
 
+import play.api._
+import play.api.mvc._
 import play.api.mvc.Controller
 import play.api.templates.Html
 import java.util
 import org.joda.money.{CurrencyUnit, Money}
-
 
 /**
  * Permutations of the Checkout: Review.
@@ -13,19 +14,19 @@ object Review extends Controller
   with DefaultHeaderAndFooterData
   with DefaultStorefrontBreadcrumbs
 {
-  def index = {
-    DefaultRenderer().render
+  def index = Action {
+    Ok(DefaultRenderer().render)
   }
 
-  def portrait = {
-    DefaultRenderer(
+  def portrait = Action {
+    Ok(DefaultRenderer(
       productPreviewUrl = "http://placehold.it/302x420",
       orientation="orientation-portrait"
-    ).render
+    ).render)
   }  
 
-  def withPrint = {
-    DefaultRenderer().copy(highQualityPrint=true).render
+  def withPrint = Action {
+    Ok(DefaultRenderer().copy(highQualityPrint=true).render)
   }
 
   case class DefaultRenderer(

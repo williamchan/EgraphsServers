@@ -1,10 +1,10 @@
 package controllers
 
-import play.api.mvc.Controller
+import play.api._
+import play.api.mvc._
 import models.frontend.storefront.{PersonalizeMessageOption, StorefrontOrderSummary, PersonalizeForm}
 import java.util
 import models.frontend.forms.FormError
-
 
 /**
  * Permutations of the Checkout: Personalize.
@@ -14,37 +14,37 @@ object Personalize extends Controller
   with DefaultStorefrontBreadcrumbs
 {
 
-  def index = {
-    render()
+  def index = Action {
+    Ok(render())
   }
 
-  def portrait = {
-    render(
+  def portrait = Action {
+    Ok(render(
       productPreviewUrl = "http://placehold.it/302x420",
       orientation="orientation-portrait"
-    )
+    ))
   }
 
-  def allErrors = {
-    render(personalizeForm=allErrorsPersonalizeForm)
+  def allErrors = Action {
+    Ok(render(personalizeForm=allErrorsPersonalizeForm))
   }
 
-  def lowCharacterLimit = {
-    render(writtenMessageCharacterLimit = 60)
+  def lowCharacterLimit = Action {
+    Ok(render(writtenMessageCharacterLimit = 60))
   }
 
-  def allPrePopulatedValues = {
+  def allPrePopulatedValues = Action {
     val default = defaultPersonalizeForm
     import default._
 
-    render(personalizeForm=default.copy(
+    Ok(render(personalizeForm=default.copy(
       isGift=isGift.copy(values=Some(true)),
       recipientName=recipientName.copy(values=Some("Erem Boto")),
       recipientEmail=recipientEmail.copy(values=Some("erem@egraphs.com")),
       messageOption=messageOption.copy(values=Some(PersonalizeMessageOption.CelebrityChoosesMessage)),
       messageText=messageText.copy(values=Some("Happy 30th birthday")),
       noteToCelebrity=noteToCelebrity.copy(values=Some("You're the best!"))
-    ))
+    )))
   }
 
   private def defaultPersonalizeForm = {

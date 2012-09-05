@@ -1,6 +1,7 @@
 package controllers
 
-import play.api.mvc.Controller
+import play.api._
+import play.api.mvc._
 import models.frontend.storefront.{CheckoutOrderSummary, CheckoutShippingAddressFormView, CheckoutBillingInfoView, CheckoutFormView}
 import org.joda.money.{CurrencyUnit, Money}
 import models.frontend.forms.Field
@@ -15,27 +16,27 @@ object Checkout extends Controller
   //
   // Public members
   //
-  def index = {
-    render()
+  def index = Action {
+    Ok(render())
   }
 
-  def portrait = {
-    render(
+  def portrait = Action {
+    Ok(render(
       productPreviewUrl = "http://placehold.it/302x420",
       orientation="orientation-portrait"
-    )
+    ))
   }
 
-  def allErrors = {
-    render(form=allErrorsCheckoutForm)
+  def allErrors = Action {
+    Ok(render(form=allErrorsCheckoutForm))
   }
 
-  def noShipping = {
-    render(form=defaultCheckoutForm.copy(shipping=None))
+  def noShipping = Action {
+    Ok(render(form=defaultCheckoutForm.copy(shipping=None)))
   }
 
-  def stripePayment = {
-    render(paymentJsModule = "stripe-payment")
+  def stripePayment = Action {
+    Ok(render(paymentJsModule = "stripe-payment"))
   }
 
   //

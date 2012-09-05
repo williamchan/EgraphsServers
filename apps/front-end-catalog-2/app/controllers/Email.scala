@@ -1,17 +1,19 @@
 package controllers
 
-import play.mvc.Controller
+import play.api._
+import play.api.mvc._
 
 /**
  * Permutations of Emails.
  */
 object Email extends Controller {
 
-  def order_confirmation = {
-    val emailLogoSrc = "../public/images/email-logo.jpg"
-    val emailFacebookSrc = "../public/images/email-facebook.jpg"
-    val emailTwitterSrc = "../public/images/email-twitter.jpg"
-    views.html.frontend.email_order_confirmation(
+  val emailLogoSrc = "email-logo.jpg"
+  val emailFacebookSrc = "email-facebook.jpg"
+  val emailTwitterSrc = "email-twitter.jpg"
+
+  def orderConfirmation = Action {
+    Ok(views.html.frontend.email_order_confirmation(
       buyerName = "Joshua Johnson",
       recipientName = "Carlos Pena",
       recipientEmail = "carlos@egraphs.com",
@@ -26,11 +28,11 @@ object Email extends Controller {
       emailLogoSrc = emailLogoSrc,
       emailFacebookSrc = emailFacebookSrc,
       emailTwitterSrc = emailTwitterSrc
-    )
+    ))
   }
 
-  def order_confirmation_text = {
-    views.frontend.html.email_order_confirmation_text(
+  def order_confirmation_text = Action {
+    Ok(views.html.frontend.email_order_confirmation_text(
       buyerName = "Joshua Johnson",
       recipientName = "Carlos Pena",
       recipientEmail = "carlos@egraphs.com",
@@ -42,44 +44,35 @@ object Email extends Controller {
       deliveredByDate = "June 19, 2012",
       faqHowLongLink = "https://www.egraphs.com/faq#how-long",
       hasPrintOrder = true
-    )
+    ))
   }
 
-  def verify = {
-    val emailLogoSrc = "../public/images/email-logo.jpg"
-    val emailFacebookSrc = "../public/images/email-facebook.jpg"
-    val emailTwitterSrc = "../public/images/email-twitter.jpg"
-    views.html.frontend.email_account_verification(
+  def verify = Action {
+    Ok(views.html.frontend.email_account_verification(
       "http://www.egraphs.com/word",
       emailLogoSrc = emailLogoSrc,
       emailFacebookSrc = emailFacebookSrc,
       emailTwitterSrc = emailTwitterSrc
-    )
+    ))
   }
 
-  def view_egraph = {
-    val emailLogoSrc = "../public/images/email-logo.jpg"
-    val emailFacebookSrc = "../public/images/email-facebook.jpg"
-    val emailTwitterSrc = "../public/images/email-twitter.jpg"
-    views.html.frontend.email_view_egraph(
+  def view_egraph = Action {
+    Ok(views.html.frontend.email_view_egraph(
       viewEgraphUrl = "https://www.egraphs.com/gallery/carlosdiaz/davidortiz1",
       celebrityName = "Big Papi",
       recipientName = "Carlos Pena",
       emailLogoSrc = emailLogoSrc,
       emailFacebookSrc = emailFacebookSrc,
       emailTwitterSrc = emailTwitterSrc
-    )
+    ))
   }
 
-  def confirm = {
-    val emailLogoSrc = "../public/images/email-logo.jpg"
-    val emailFacebookSrc = "../public/images/email-facebook.jpg"
-    val emailTwitterSrc = "../public/images/email-twitter.jpg"
-    views.html.frontend.email_account_confirmation(
+  def confirm = Action {
+    Ok(views.html.frontend.email_account_confirmation(
       emailLogoSrc = emailLogoSrc,
       emailFacebookSrc = emailFacebookSrc,
       emailTwitterSrc = emailTwitterSrc
-    )
+    ))
   }
 
   def mlb = {
