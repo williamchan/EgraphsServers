@@ -40,6 +40,9 @@
     @tags.html.analytics()
     <!-- Mixpanel events -->
     <script type="text/javascript">
+      mixpanel.track('Egraph viewed', {'url': window.location.href})
+    </script>
+    <script type="text/javascript">
       mixpanel.track_links('#egraph-page .facebook', 'Facebook share button clicked (egraph)')
     </script>
     <script type="text/javascript">
