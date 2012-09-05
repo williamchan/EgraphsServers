@@ -63,4 +63,17 @@ object Email extends Controller {
       emailTwitterSrc = emailTwitterSrc
     )
   }
+
+  def mlb = {
+    val emailLogoSrc = "../public/images/email-logo.jpg"
+    val emailFacebookSrc = "../public/images/email-facebook.jpg"
+    val emailTwitterSrc = "../public/images/email-twitter.jpg"
+    val egraphImageSrc = "../public/images/hamilton-egraph.png"
+    views.frontend.html.email_mlb(
+      emailLogoSrc = emailLogoSrc,
+      emailFacebookSrc = emailFacebookSrc,
+      emailTwitterSrc = emailTwitterSrc,
+      egraphImageSrc = egraphImageSrc
+    )
+  }
 }
