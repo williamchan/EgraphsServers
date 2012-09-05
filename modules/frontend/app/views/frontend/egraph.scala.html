@@ -37,7 +37,20 @@
     <link href='@cdnAsset("public/soundmanager/360-player/360player-visualization.css")'
           rel="stylesheet" 
           type="text/css">
-    @tags.html.analytics()      
+    @tags.html.analytics()
+    <!-- Mixpanel events -->
+    <script type="text/javascript">
+      mixpanel.track('Egraph viewed', {'url': window.location.href})
+    </script>
+    <script type="text/javascript">
+      mixpanel.track_links('#egraph-page .facebook', 'Facebook share button clicked (egraph)')
+    </script>
+    <script type="text/javascript">
+      mixpanel.track_links('#egraph-page .twitter', 'Tweet button clicked (egraph)');
+    </script>
+    <script type="text/javascript">
+      mixpanel.track_links('.egraphs-logo', 'Navigate home from egraph page')
+    </script>
   </head>
   <body>
     <!-- Body content -->
@@ -104,8 +117,8 @@
             <div class="story-column-element separator"></div>
             <div class="story-column-element social">              
               <ul class="clearfix">
-                <li><a href="@shareOnFacebookLink" class="facebook">Facebook</a></li>
-                <li><a href="@shareOnTwitterLink" class="twitter">Twitter</a></li>
+                <li><a href="@shareOnFacebookLink" class="facebook" target="_blank">Facebook</a></li>
+                <li><a href="@shareOnTwitterLink" class="twitter" target="_blank">Twitter</a></li>
                 <!-- <li><a href="#" class="addthis">AddThis</a></li> -->
               </ul>              
             </div>

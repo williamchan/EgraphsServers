@@ -8,6 +8,9 @@ function(forms, Egraphs) {
       	checkedLabel: 'YES', 
       	uncheckedLabel: 'NO'
       });
-    }    
+
+      // Mixpanel events
+      mixpanel.track_forms('.container form', 'Checkout clicked');
+    }
   };
 });
