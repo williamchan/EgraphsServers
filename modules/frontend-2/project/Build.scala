@@ -13,11 +13,22 @@ object ApplicationBuild extends Build {
     "egraphs" %% "frontend-lib" % "1.0-SNAPSHOT"
   )
 
+  // Only compile the bootstrap bootstrap.less file and any other *.less file in the stylesheets directory
+  def customLessEntryPoints(base: File): PathFinder = (
+    (
+        (base / "app" / "assets" / "stylesheets" * "*.less") ---
+        (base / "app" / "assets" / "stylesheets" * "_*.less") // exclude incomplete less files
+    ) +++
+    (base / "bootstrap" / "less" / "bootstrap" * "bootstrap.less") //twitter bootstrap
+  )
+
   val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
     //resolvers += "Crionics Github Repository" at "http://orefalo.github.com/m2repo/releases/",
 
     organization := "egraphs",
-    
+
+    lessEntryPoints <<= baseDirectory(customLessEntryPoints),
+
     // exclude anything created by the routes file from going into the jar so it doesn't conflict with the packages
     // that pull this in as a dependency.
     mappings in (Compile,packageBin) ~= { (ms: Seq[(File, String)]) =>
