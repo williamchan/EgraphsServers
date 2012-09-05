@@ -1,16 +1,14 @@
 package controllers.website.admin
 
 import models._
-import enums.EgraphState
+import models.enums._
 import play.mvc.Controller
 import services.AppConfig
 import services.blobs.Blobs
 import services.http.{AdminRequestFilters, ControllerMethod}
 import org.squeryl.Query
 import org.squeryl.PrimitiveTypeMode._
-import models.Egraph
 import services.db.Schema
-import controllers.website.admin.GetToolsAdminEndpoint.PrintOrderAddressChange
 
 /**
  * These are the Sheriff's tools to handle tasks that are not yet self-serve. If writing a one-time script, use "sheriff".
@@ -93,50 +91,6 @@ private[controllers] trait GetToolsAdminEndpoint {
           // Keep the rest of these actions commented out. With great power comes great responsibility...
           // at least until these actions are made self-serve for the Operations team.
           //
-//          case "change-shipping-addresses" =>
-//            val addressChanges = List[PrintOrderAddressChange](
-//              /*PrintOrderAddressChange(547, "Jenny Clifford, 129 Holmcrest Tr, Scarborough ON, M1C1V8, Canada"),
-//              PrintOrderAddressChange(589, "Alim Kotadia, 16 Edgebrook Point NW, Calgary, Alberta, T3A5J5, Canada"),
-//              PrintOrderAddressChange(647, "Corey Hoffarth, 91 elm street london ontario N5Z 2K4 Canada"),
-//              PrintOrderAddressChange(669, "Scott Rawlke, 2502 6th Ave, Cold Lake, Alberta, T9M 1M6 Canada")*/
-//            )
-//
-//            val printOrderStore = AppConfig.instance[PrintOrderStore]
-//            val orderStore = AppConfig.instance[OrderStore]
-//
-//            val addressChangeXml = for (
-//              addressChange <- addressChanges;
-//              order <- orderStore.findById(addressChange.orderId);
-//              printOrder <- printOrderStore.findByOrderId(order.id).headOption
-//            ) yield {
-//              val newPrintOrder = printOrder.copy(shippingAddress = addressChange.newAddress).save()
-//
-//              <tr>
-//                <td>{order.id}</td>
-//                <td>{printOrder.id}</td>
-//                <td>{printOrder.shippingAddress}</td>
-//                <td>{newPrintOrder.shippingAddress}</td>
-//              </tr>
-//            }
-//
-//            <html>
-//              <body>
-//                <h1>Performed the following changes</h1>
-//                <table>
-//                  <thead>
-//                    <tr>
-//                      <th>Order ID</th>
-//                      <th>Print Order ID</th>
-//                      <th>Old address</th>
-//                      <th>New address</th>
-//                    </tr>
-//                  </thead>
-//                  <tbody>
-//                    {addressChangeXml}
-//                  </tbody>
-//                </table>
-//              </body>
-//            </html>
 
 //          case "generate-large-egraph" =>
 //            import services.http.SafePlayParams.Conversions._
@@ -191,8 +145,4 @@ private[controllers] trait GetToolsAdminEndpoint {
       }
     }
   }
-}
-
-object GetToolsAdminEndpoint {
-  case class PrintOrderAddressChange(orderId: Long, newAddress: String)
 }
