@@ -4,7 +4,6 @@ import com.google.inject.Inject
 import services.db.Schema
 import java.io.File
 import org.squeryl.PrimitiveTypeMode._
-import models.enums.EgraphState
 import java.text.SimpleDateFormat
 import java.util.TimeZone
 

@@ -1,57 +1,70 @@
 package services.report
 
 import com.google.inject.Inject
-import models._
 import services.db.Schema
 import org.squeryl.PrimitiveTypeMode._
-import enums.EgraphState
-import org.squeryl.Query
 import java.io.File
 
-class PrintOrderReport @Inject() (schema: Schema) extends Report {
+class PrintOrderReport @Inject()(schema: Schema) extends Report {
 
   override val reportName = "physical-print-report"
 
-  /**
-   * Once the first batch of physical orders are fulfilled, this report should switch to selecting PrintOrder.
-   */
   def report(): File = {
-    import schema.{orders, egraphs, customers, accounts, products, celebrities}
-    val printOrders: Query[(Order, Account, Celebrity, Egraph)] =
-      from(orders, customers, accounts, products, celebrities, egraphs)((order, recipient, account, product, celebrity, egraph) =>
-        where(
-          // TODO: Once the first 49 print orders are fulfilled, rewrite to query PrintOrder table
-          order.amountPaidInCurrency === BigDecimal(95) and
-            recipient.id === order.recipientId and
-            order.productId === product.id and
-            account.customerId === recipient.id and
-            product.celebrityId === celebrity.id and
-            egraph.orderId === order.id and
-            (egraph._egraphState in Seq(EgraphState.Published.name, EgraphState.ApprovedByAdmin.name))
-        )
-          select(order, account, celebrity, egraph)
-          orderBy (order.id asc)
-      )
+    import schema.{printOrders, orders, egraphs, customers, products, celebrities}
+    val printOrderViews = join(printOrders, orders, customers, customers, products, celebrities, egraphs.leftOuter)(
+      (printOrder, order, buyer, recipient, product, celebrity, egraph) =>
+        select(printOrder, order, buyer, recipient, product, celebrity, egraph)
+          orderBy (printOrder.id asc)
+          on(printOrder.orderId === order.id, order.buyerId === buyer.id, order.recipientId === recipient.id, order.productId === product.id, product.celebrityId === celebrity.id, order.id === egraph.map(_.orderId))
+    )
 
-    val headerLine = tsvLine("orderId", "amount", "egraphid", "signedAt",
-      "recipientName", "recipientEmail", "recipientAddress", "celebrityPublicName", "celebrityId", "egraphstate")
+    val headerLine = tsvLine(
+      "printOrderId",
+      "isFulfilled",
+      "pngUrl",
+      "amount",
+      "shippingAddress",
+      "orderId",
+      "orderExpectedDate",
+      "productId",
+      "celebrityId",
+      "celebrityName",
+      "buyerId",
+      "buyerName",
+      "recipientId",
+      "recipientName",
+      "candidateEgraphId",
+      "candidateEgraphState",
+      "candidateEgraphSignedAt"
+    )
     val tsv = new StringBuilder(headerLine)
-    for (o <- printOrders) {
-      val order = o._1
-      val account = o._2
-      val celebrity = o._3
-      val egraph = o._4
+    for (printOrderView <- printOrderViews) {
+      val printOrder = printOrderView._1
+      val order = printOrderView._2
+      val buyer = printOrderView._3
+      val recipient = printOrderView._4
+      val product = printOrderView._5
+      val celebrity = printOrderView._6
+      val candidateEgraph = printOrderView._7
       tsv.append(tsvLine(
+        printOrder.id,
+        printOrder.isFulfilled.toString,
+        printOrder.pngUrl.getOrElse(""),
+        printOrder.amountPaidInCurrency,
+        printOrder.shippingAddress,
         order.id,
-        order.amountPaidInCurrency,
-        egraph.id,
-        egraph.getSignedAt,
-        order.recipientName,
-        account.email,
-        "", // This will come from ShippingInfo once the initial print orders are fulfilled
-        celebrity.publicName,
+        order.expectedDate.getOrElse(""),
+        product.id,
         celebrity.id,
-        egraph._egraphState)
+        celebrity.publicName,
+        buyer.id,
+        buyer.name,
+        recipient.id,
+        recipient.name,
+        candidateEgraph.map(_.id).getOrElse(""),
+        candidateEgraph.map(_._egraphState).getOrElse(""),
+        candidateEgraph.map(_.getSignedAt).getOrElse("")
+      )
       )
     }
     tsvFile(tsv)
