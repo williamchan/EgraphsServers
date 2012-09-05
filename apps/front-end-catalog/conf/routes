@@ -15,5 +15,7 @@ GET     /build                                  Build.index
 
 POST    /orders/{<[0-9]+>orderId}/configure     Account.privacy
 
+POST    /subscribe                              Account.subscribe
+
 # Catch all
 *       /{controller}/{action}                  {controller}.{action}
