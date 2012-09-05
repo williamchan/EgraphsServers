@@ -21,7 +21,8 @@ private[controllers] trait GetCelebrityOrdersAdminEndpoint {
     adminFilters.requireCelebrity {
       (celebrity, admin) =>
         val query = filter match {
-          case "rejected" => orderStore.findByCelebrity(celebrityId = celebrity.id, orderQueryFilters.rejected)
+          case "rejectedByAdmin" => orderStore.findByCelebrity(celebrityId = celebrity.id, orderQueryFilters.rejectedByAdmin)
+          case "rejectedByCelebrity" => orderStore.findByCelebrity(celebrityId = celebrity.id, orderQueryFilters.rejectedByCelebrity)
           case "signerActionable" => orderStore.findByCelebrity(celebrityId = celebrity.id, orderQueryFilters.actionableOnly: _*)
           case "all" => orderStore.findByCelebrity(celebrityId = celebrity.id)
           case _ => orderStore.findByCelebrity(celebrityId = celebrity.id, orderQueryFilters.pendingAdminReview)

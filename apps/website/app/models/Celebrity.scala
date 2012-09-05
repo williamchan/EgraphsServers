@@ -39,7 +39,7 @@ case class Celebrity(id: Long = 0,
                      casualName: Option[String] = None,                             // e.g. "David" instead of "David Price"
                      organization: String = "",                                     // e.g. "Major League Baseball"
                      bio: String = "",
-                     roleDescription: Option[String] = None,                        // e.g. "Pitcher, Red Sox"
+                     roleDescription: String = "",                                  // e.g. "Pitcher, Red Sox"
                      twitterUsername: Option[String] = None,
                      profilePhotoUpdated: Option[String] = None, // todo: rename to _profilePhotoKey
                      _enrollmentStatus: String = EnrollmentStatus.NotEnrolled.name,
@@ -403,7 +403,7 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
     from(schema.celebrities)(c =>
       where(c._publishedStatus === PublishedStatus.Published.name)
       select (c)
-      orderBy (lower(c.publicName))
+      orderBy (lower(c.roleDescription))
     )
   }
 

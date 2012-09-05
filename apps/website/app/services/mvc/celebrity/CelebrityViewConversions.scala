@@ -5,8 +5,6 @@ import models.frontend.storefront.{ChoosePhotoRecentEgraph, ChoosePhotoCelebrity
 import services.blobs.AccessPolicy
 import models.frontend.landing.CatalogStar
 import services.Utils
-import controllers.WebsiteControllers
-import WebsiteControllers.{reverse, getStorefrontChoosePhotoTiled}
 import services.mvc.OrderViewConversions
 
 /**
@@ -39,7 +37,7 @@ class CelebrityViewConversions(celeb: Celebrity) {
       name = celeb.publicName,
       profileUrl = profileUrl,
       organization = celeb.organization,
-      roleDescription = celeb.roleDescription.getOrElse(""),
+      roleDescription = celeb.roleDescription,
       bio = celeb.bio,
       twitterUsername = celeb.twitterUsername
     )
@@ -70,7 +68,7 @@ class CelebrityViewConversions(celeb: Celebrity) {
 
     CatalogStar(
       name = celeb.publicName,
-      secondaryText = celeb.roleDescription,
+      secondaryText = Option(celeb.roleDescription),
       imageUrl = mastheadImageUrl,
       storefrontUrl = choosePhotoUrl,
       hasInventoryRemaining = !purchaseableProducts.isEmpty,

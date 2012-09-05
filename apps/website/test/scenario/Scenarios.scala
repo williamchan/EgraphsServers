@@ -295,7 +295,9 @@ class Scenarios extends DeclaresScenarios {
         orderDate = "Jan 1, 2012",
         orderId = "1234",
         pricePaid = "$50.00",
-        deliveredyDate = "Jan 8, 2012",
+        deliveredByDate = "Jan 8, 2012",
+        faqHowLongLink = "/faq#how-long",
+        hasPrintOrder = true,
         emailLogoSrc = emailLogoSrc,
         emailFacebookSrc = emailFacebookSrc,
         emailTwitterSrc = emailTwitterSrc
@@ -310,7 +312,9 @@ class Scenarios extends DeclaresScenarios {
         orderDate = "Jan 1, 2012",
         orderId = "1234",
         pricePaid = "$50.00",
-        deliveredyDate = "Jan 8, 2012"
+        deliveredByDate = "Jan 8, 2012",
+        faqHowLongLink = "/faq#how-long",
+        hasPrintOrder = true
       )
       email.setTextMsg(textVersion.toString())
       mail.send(email)

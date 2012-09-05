@@ -32,6 +32,7 @@ class OrderCompleteViewModelFactoryTests extends EgraphsUnitTest {
     inventoryBatch.getExpectedDate returns expectedDate
 
     val order = mock[Order]
+    order.id returns 1
     order.amountPaid returns BigDecimal(100.00).toMoney()
     order.product returns product
     order.buyer returns buyer
@@ -39,6 +40,11 @@ class OrderCompleteViewModelFactoryTests extends EgraphsUnitTest {
     order.recipientName returns "Joe Recipient"
     order.recipient returns recipient
     order.inventoryBatch returns inventoryBatch
+    val orderServices = mock[OrderServices]
+    order.services returns orderServices
+    val printOrderStore = mock[PrintOrderStore]
+    orderServices.printOrderStore returns printOrderStore
+    printOrderStore.findByOrderId(1) returns List(mock[PrintOrder])
 
     // Generate the viewmodel from the domain models
     val viewModel = new OrderCompleteViewModelFactory().fromOrder(order)
@@ -47,13 +53,15 @@ class OrderCompleteViewModelFactoryTests extends EgraphsUnitTest {
     viewModel.buyerEmail should be (buyerAccount.email)
     viewModel.buyerName should be (buyer.name)
     viewModel.celebName should be (celeb.publicName)
-    viewModel.guaranteedDeliveryDate should be (expectedDate)
+    viewModel.expectedDeliveryDate should be (expectedDate)
     viewModel.orderDate should be (order.created)
     viewModel.orderNumber should be (order.id)
     viewModel.ownerEmail should be (recipientAccount.email)
     viewModel.ownerName should be (order.recipientName)
     viewModel.productName should be (product.name)
     viewModel.totalPrice should be (order.amountPaid)
+    viewModel.faqHowLongLink should include("/faq#how-long")
+    viewModel.hasPrintOrder should be(true)
   }
 
 }

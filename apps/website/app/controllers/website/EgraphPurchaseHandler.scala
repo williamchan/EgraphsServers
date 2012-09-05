@@ -4,7 +4,7 @@ import models._
 import enums._
 import play.mvc.Scope.Flash
 import services.mail.TransactionalMail
-import services.AppConfig
+import services.{Utils, AppConfig}
 import controllers.WebsiteControllers
 import services.payment.{Charge, Payment}
 import scala.Predef._
@@ -19,7 +19,6 @@ import org.apache.commons.mail.HtmlEmail
 import org.joda.money.Money
 import services.http.forms.purchase.CheckoutShippingForm
 import WebsiteControllers.{reverse, getOrderConfirmation}
-import scala.Some
 import models.Customer
 import models.CashTransaction
 import models.FailedPurchaseData
@@ -98,14 +97,14 @@ case class EgraphPurchaseHandler(
     val charge = try {
       payment.charge(totalAmountPaid, stripeTokenId, "Egraph Order from " + buyerEmail)
     } catch {
-      case stripeException: com.stripe.exception.InvalidRequestException => {
+      case stripeException: com.stripe.exception.StripeException => {
         val failedPurchaseData = saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = "Credit card issue: " + stripeException.getLocalizedMessage)
         return Left(PurchaseFailedStripeError(failedPurchaseData, stripeException))
       }
     }
 
     // Persist the Order. This is executed in its own database transaction.
-    val (order: Order, _: Customer, _: Customer, cashTransaction: CashTransaction) = try {
+    val (order: Order, _: Customer, _: Customer, cashTransaction: CashTransaction, maybePrintOrder: Option[PrintOrder]) = try {
       persistOrder(buyerEmail = buyerEmail,
         buyerName = buyerName,
         recipientEmail = recipientEmail,
@@ -139,7 +138,7 @@ case class EgraphPurchaseHandler(
     }
 
     // If the Stripe charge and Order persistence executed successfully, send a confirmation email and redirect to a confirmation page
-    sendOrderConfirmationEmail(buyerName = buyerName, buyerEmail = buyerEmail, recipientName = recipientName, recipientEmail = recipientEmail, celebrity, product, order, cashTransaction, mail)
+    sendOrderConfirmationEmail(buyerName = buyerName, buyerEmail = buyerEmail, recipientName = recipientName, recipientEmail = recipientEmail, celebrity, product, order, cashTransaction, maybePrintOrder, mail)
     flash.put("orderId", order.id)
 
     // Clear out the shopping cart and redirect
@@ -151,7 +150,7 @@ case class EgraphPurchaseHandler(
   sealed abstract class PurchaseFailed(val failedPurchaseData: FailedPurchaseData)
 
   // Our two failure cases for if the payment vendor failed or there was insufficient inventory
-  case class PurchaseFailedStripeError(override val failedPurchaseData: FailedPurchaseData, stripeException: com.stripe.exception.InvalidRequestException) extends PurchaseFailed(failedPurchaseData)
+  case class PurchaseFailedStripeError(override val failedPurchaseData: FailedPurchaseData, stripeException: com.stripe.exception.StripeException) extends PurchaseFailed(failedPurchaseData)
   case class PurchaseFailedInsufficientInventory(override val failedPurchaseData: FailedPurchaseData) extends PurchaseFailed(failedPurchaseData)
   case class PurchaseFailedError(override val failedPurchaseData: FailedPurchaseData) extends PurchaseFailed(failedPurchaseData)
 
@@ -173,7 +172,7 @@ case class EgraphPurchaseHandler(
                            writtenMessageRequest: WrittenMessageRequest,
                            isDemo: Boolean,
                            accountStore: AccountStore,
-                           celebrity: Celebrity): (Order, Customer, Customer, CashTransaction) = {
+                           celebrity: Celebrity): (Order, Customer, Customer, CashTransaction, Option[PrintOrder]) = {
     dbSession.connected(TransactionSerializable) {
       // Get buyer and recipient accounts and create customer face if necessary
       val buyer = customerStore.findOrCreateByEmail(buyerEmail, buyerName)
@@ -211,16 +210,19 @@ case class EgraphPurchaseHandler(
         billingPostalCode = Some(billingPostalCode)
       ).withCash(totalAmountPaid).withCashTransactionType(CashTransactionType.EgraphPurchase).save()
 
-      if (printingOption == PrintingOption.HighQualityPrint) {
+      val maybePrintOrder = if (printingOption == PrintingOption.HighQualityPrint) {
         val printOrder = PrintOrder(orderId = order.id, amountPaidInCurrency = PrintOrder.pricePerPrint, shippingAddress = shippingAddress.getOrElse("")).save() // update CashTransaction
         cashTransaction = cashTransaction.copy(printOrderId = Some(printOrder.id)).save()
+        Some(printOrder)
+      } else {
+        None
       }
 
       if (isDemo) {
         order = order.withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
       }
 
-      (order, buyer, recipient, cashTransaction)
+      (order, buyer, recipient, cashTransaction, maybePrintOrder)
     }
   }
 
@@ -238,6 +240,7 @@ case class EgraphPurchaseHandler(
                                          product: Product,
                                          order: Order,
                                          cashTransaction: CashTransaction,
+                                         maybePrintOrder: Option[PrintOrder],
                                          mail: TransactionalMail) {
     import services.Finance.TypeConversions._
     val email = new HtmlEmail()
@@ -250,6 +253,7 @@ case class EgraphPurchaseHandler(
     val emailLogoSrc = ""
     val emailFacebookSrc = ""
     val emailTwitterSrc = ""
+    val faqHowLongLink = Utils.absoluteUrl(Utils.lookupUrl("WebsiteControllers.getFAQ")) + "#how-long"
     val html = views.frontend.html.email_order_confirmation(
       buyerName = buyerName,
       recipientName = recipientName,
@@ -259,7 +263,9 @@ case class EgraphPurchaseHandler(
       orderDate = dateFormat.format(order.created),
       orderId = order.id.toString,
       pricePaid = cashTransaction.cash.formatSimply,
-      deliveredyDate = dateFormat.format(order.expectedDate.get), // all new Orders have expectedDate... will turn this into Date instead of Option[Date]
+      deliveredByDate = dateFormat.format(order.expectedDate.get), // all new Orders have expectedDate... will turn this into Date instead of Option[Date]
+      faqHowLongLink = faqHowLongLink,
+      hasPrintOrder = maybePrintOrder.isDefined,
       emailLogoSrc = emailLogoSrc,
       emailFacebookSrc = emailFacebookSrc,
       emailTwitterSrc = emailTwitterSrc
@@ -274,7 +280,9 @@ case class EgraphPurchaseHandler(
       orderDate = dateFormat.format(order.created),
       orderId = order.id.toString,
       pricePaid = cashTransaction.cash.formatSimply,
-      deliveredyDate = dateFormat.format(order.expectedDate.get)
+      deliveredByDate = dateFormat.format(order.expectedDate.get),
+      faqHowLongLink = faqHowLongLink,
+      hasPrintOrder = maybePrintOrder.isDefined
     ).toString())
     mail.send(email)
   }

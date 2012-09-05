@@ -47,6 +47,7 @@ object BaseTemplate extends Controller {
       faqLink="faq-link",
       termsOfUseLink="terms-of-use",
       privacyPolicyLink="privacy-policy",
+      careersPolicyLink="careers",
       egraphsFacebookLink="http://www.facebook.com/egraphs",
       egraphsTwitterLink="http://www.twitter.com/egraphs"
     )

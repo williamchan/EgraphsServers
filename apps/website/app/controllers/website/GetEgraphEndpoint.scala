@@ -144,7 +144,7 @@ object GetEgraphEndpoint {
       frameLayoutColumns = frame.cssFrameColumnClasses,
       productIconUrl = frameFittedIconUrl,
       storyLayoutColumns = frame.cssStoryColumnClasses,
-      storyTitle = story.title,
+      storyTitle = product.storyTitle,
       storyBody = story.body,
       audioUrl = egraph.assets.audioMp3Url,
       signedImageUrl = svgzImageUrl,

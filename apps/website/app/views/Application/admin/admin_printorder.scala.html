@@ -1,12 +1,14 @@
 @(printOrder: models.PrintOrder,
-order: models.Order,
-recipientEmail: String,
-egraph: Option[models.Egraph])(implicit session: play.mvc.Scope.Session)
+  order: models.Order,
+  recipientEmail: String,
+  egraph: Option[models.Egraph],
+  fields: (String) => String)(implicit session: play.mvc.Scope.Session)
 
 @import controllers.WebsiteControllers
 @import services.Finance.TypeConversions._
 @import services.Utils.lookupUrl
 @import views.Application.tags.html.authenticityToken
+@import views.Application.tags.html.formField
 @import views.Application.tags.html.valueRow
 @import views.Application.html.content_base
 
@@ -47,6 +49,18 @@ egraph: Option[models.Egraph])(implicit session: play.mvc.Scope.Session)
       </form>
     </div>
   }
+  <div class="form">
+    <form id="editAddress-form" method="POST" action='@postPrintOrder' enctype="application/x-www-form-urlencoded">
+      @authenticityToken()
+      <input name="printOrderId" type="hidden" value="@printOrder.id">
+      <input name="action" type="hidden" value="editAddress">
+      <div class="actions">
+        <h3>Shipping Address</h3>
+        @formField(id="shippingAddress", label="Shipping Address", inputType="text", width="span8", fields=fields)
+        <button type="submit" id="editAddress-button" class="btn primary fade in">Update</button>
+      </div>
+    </form>
+  </div>
 }
 
 @body = {

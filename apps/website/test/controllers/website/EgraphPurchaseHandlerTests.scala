@@ -7,7 +7,7 @@ import services.AppConfig
 import services.payment.StripeTestPayment
 import services.db.{DBSession, TransactionSerializable}
 import models.FailedPurchaseDataStore
-import models.{Product, PrintOrderStore, CashTransactionStore, Order, OrderStore}
+import models.{PrintOrderStore, CashTransactionStore, Order, OrderStore}
 import services.http.forms.purchase.CheckoutShippingForm
 import org.joda.money.{CurrencyUnit, Money}
 
@@ -67,7 +67,7 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheAndBlob
       val order = orderStore.get(orderFromHandler.id)
       order.amountPaidInCurrency should be(BigDecimal(50))
 
-      val printOrder = printOrderStore.findByOrderId(order.id).single
+      val printOrder = printOrderStore.findByOrderId(order.id).head
       printOrder.shippingAddress should be("Egraphs, 615 2nd Ave, 300, Seattle, WA 98102")
       printOrder.amountPaidInCurrency should be(BigDecimal(45))
 

@@ -44,7 +44,7 @@ class CelebrityTests extends EgraphsUnitTest
       apiKey = Some("apiKey"),
       publicName = TestData.generateFullname(),
       isFeatured = true,
-      roleDescription = Some("Pitcher, Tampa Bay Rays"),
+      roleDescription = "Pitcher, Tampa Bay Rays",
       profilePhotoUpdated = Some(Time.toBlobstoreFormat(Time.now))
     ).withPublishedStatus(PublishedStatus.Published)
   }

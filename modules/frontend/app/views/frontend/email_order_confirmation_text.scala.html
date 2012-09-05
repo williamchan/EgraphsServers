@@ -6,7 +6,9 @@
   orderDate: String,
   orderId: String,
   pricePaid: String,
-  deliveredyDate: String
+  deliveredByDate: String,
+  faqHowLongLink: String,
+  hasPrintOrder: Boolean
 )
 
 Egraphs | Order Confirmation
@@ -26,7 +28,11 @@ Celebrity: @celebrityName
 Image Name: @productName
 Order Number: @orderId
 Price: @pricePaid
-Expected Digital Delivery: @deliveredyDate
+Expected Digital Delivery: @deliveredByDate
+
+@if(hasPrintOrder) { Your framed print is expected to arrive 3 weeks after your digital delivery. }
+
+For more information on expected delivery dates, please see @faqHowLongLink
 
 Thank you,
 

@@ -5,6 +5,9 @@ import models._
 import com.google.inject.Inject
 import enums.PublishedStatus
 import play.mvc.results.{Forbidden, NotFound}
+import java.util.Properties
+import controllers.WebsiteControllers
+import play.mvc.Scope.Session
 
 /**
  * Functions that filter out whose callback parameters are only called when the egraphs
@@ -14,7 +17,10 @@ import play.mvc.results.{Forbidden, NotFound}
 class CelebrityAccountRequestFilters @Inject() (
   celebStore: CelebrityStore,
   accountFilters: AccountRequestFilters,
-  productFilters: ProductQueryFilters)
+  productFilters: ProductQueryFilters,
+  administratorStore: AdministratorStore,
+  @PlayConfig playConfig: Properties
+)
 {
   import SafePlayParams.Conversions._
 
@@ -89,7 +95,7 @@ class CelebrityAccountRequestFilters @Inject() (
    *
    * @return the return value of continue if the filter passed, otherwise `403-Forbidden`
    */
-  def requireCelebrityUrlSlug(continue: Celebrity => Any)(implicit request:Request) = {
+  def requireCelebrityUrlSlug(continue: Celebrity => Any)(implicit request:Request, session:Session) = {
     request.params.getOption("celebrityUrlSlug") match {
       case None =>
         throw new IllegalStateException(
@@ -104,7 +110,7 @@ class CelebrityAccountRequestFilters @Inject() (
           case None =>
             new NotFound("No celebrity with url \"" + celebrityUrlSlug + "\"")
 
-          case Some(celebrity) if celebrity.publishedStatus != PublishedStatus.Published =>
+          case Some(celebrity) if !isCelebrityViewable(celebrity) =>
             new NotFound(celebrity.publicName + "'s Egraphs profile is temporarily unavailable. Check back soon.")
 
           case Some(celebrity) =>
@@ -124,7 +130,7 @@ class CelebrityAccountRequestFilters @Inject() (
    *
    * @return the return value of `continue` if the filter passed, otherwise `404-NotFound`.
    */
-  def requireCelebrityProductUrl(celebrity: Celebrity)(continue: Product => Any)(implicit request:Request) = {
+  def requireCelebrityProductUrl(celebrity: Celebrity)(continue: Product => Any)(implicit request:Request, session:Session) = {
     request.params.getOption("productUrlSlug") match {
       case None =>
         throw new IllegalStateException(
@@ -139,7 +145,7 @@ class CelebrityAccountRequestFilters @Inject() (
           case None =>
             new NotFound(celebrity.publicName + " doesn't have any product with url " + productUrlSlug)
 
-          case Some(product) if product.publishedStatus != PublishedStatus.Published =>
+          case Some(product) if !isProductViewable(product) =>
             new NotFound(celebrity.publicName + " doesn't have any product with url " + productUrlSlug)
 
           case Some(product)  =>
@@ -159,11 +165,33 @@ class CelebrityAccountRequestFilters @Inject() (
    *
    * @return the return value of `continue` if the filter passed, otherwise `404-NotFound`
    */
-  def requireCelebrityAndProductUrlSlugs(continue: (Celebrity, Product) => Any)(implicit request: Request) = {
+  def requireCelebrityAndProductUrlSlugs(continue: (Celebrity, Product) => Any)(implicit request: Request, session: Session) = {
     requireCelebrityUrlSlug { celebrity =>
       requireCelebrityProductUrl(celebrity) { product =>
         continue(celebrity, product)
       }
     }
+  }
+
+  /**
+   * @return true either if Celebrity is Published or if full admin tools are enabled and admin is logged in, else false
+   */
+  protected[http] def isCelebrityViewable(celebrity: Celebrity)(implicit session: Session): Boolean = {
+    (celebrity.publishedStatus == PublishedStatus.Published) || (isAdminToolsFullyEnabled && isAdmin(session))
+  }
+
+  /**
+   * @return true either if Product is Published or if full admin tools are enabled and admin is logged in, else false
+   */
+  protected[http] def isProductViewable(product: Product)(implicit session: Session): Boolean = {
+    (product.publishedStatus == PublishedStatus.Published) || (isAdminToolsFullyEnabled && isAdmin(session))
+  }
+
+  protected[http] def isAdminToolsFullyEnabled: Boolean = {
+    playConfig.getProperty("admin.tools.enabled") == "full"
+  }
+
+  private def isAdmin(session: Session): Boolean = {
+    administratorStore.isAdmin(adminId = session.getLongOption(WebsiteControllers.adminIdKey))
   }
 }
