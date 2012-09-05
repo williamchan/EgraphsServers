@@ -46,13 +46,18 @@ define(["bootstrap/bootstrap-modal"], function() {
             data: $("#signup-form").serialize(),
             type: 'post',
             success: function(data) {
-              callout.fadeOut();
               callout.text("Thanks!");
-              setTimeout(function() {signupModal.modal('toggle')}, 500);
+              setTimeout(function() {
+                signupModal.modal('toggle');
+                callout.text('');
+              }, 800);
             },
             error: function () {
               callout.text("Connection error, try again later.");
-              setTimeout(function() {signupModal.modal('toggle')}, 800);
+              setTimeout(function() {
+                signupModal.modal('toggle');
+                callout.text('');
+              }, 800);
             }
 
           });
