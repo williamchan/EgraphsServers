@@ -8,12 +8,21 @@ import services.http.PlayConfig
 import java.util.Properties
 import play.libs.WS
 
-
+/**
+ * Trait for defining new bulk mail providers.
+ * Bulk mail services manage campaign style mailings like newsletters as opposed to
+ * transactional mailings like order confirmations
+ */
 trait BulkMail {
   def subscribeNew(listId: String, email: String)
   def checkConfiguration()
 }
 
+/**
+ * Helper class for configuring BulkMail implementations
+ * @param playConfig
+ * @param utils
+ */
 class BulkMailProvider @Inject()(@PlayConfig playConfig: Properties, utils: Utils) extends Provider[BulkMail]
 {
   def get() : BulkMail = {
@@ -25,6 +34,11 @@ class BulkMailProvider @Inject()(@PlayConfig playConfig: Properties, utils: Util
     }
   }
 }
+
+/**
+ * A MockMailer for testing purposes
+ * @param utils
+ */
 private[mail] case class MockBulkMail (utils: Utils) extends BulkMail
 {
   override def subscribeNew(listId: String, email: String) = {
@@ -33,6 +47,11 @@ private[mail] case class MockBulkMail (utils: Utils) extends BulkMail
   override def checkConfiguration() = {}
 }
 
+/**
+ * Currently a very simple wrapper around one function of the Mailchimp API.
+ * @param apikey
+ * @param datacenter
+ */
 private[mail] case class MailChimpBulkMail (apikey: String, datacenter: String) extends BulkMail
 {
   override def subscribeNew(listId: String, email: String) = {
@@ -68,5 +87,8 @@ private[mail] case class MailChimpBulkMail (apikey: String, datacenter: String) 
   }
 }
 
+/**
+ * Companion object for configuring MailChimpBulkMail
+ */
 private[mail] object MailChimpBulkMail
   extends MailChimpBulkMail(configuration.getProperty("mail.bulk.apikey"), configuration.getProperty("mail.bulk.datacenter"))
