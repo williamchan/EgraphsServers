@@ -1,12 +1,12 @@
-@(postWasAuthenticated: String)(implicit session: play.mvc.Scope.Session)
+@(postWasAuthenticated: String)(/* implicit session: play.api.mvc.Session */)
 
-@import views.frontend.tags
+@import views.html.frontend.tags
 
 <html>
   <body>
     <!-- Put in a safe form, specifying the form attributes with scala tuple syntax -->
     Authenticated? @postWasAuthenticated<br/>
-    @tags.html.safeForm("method" -> "POST", "action" -> "/SafeFormTestController/safeFormPOST") {
+    @tags.safeForm("method" -> "POST", "action" -> "/SafeFormTestController/safeFormPOST") {
       username: <input type="text" name="username" />
       password: <input type="password" name="password" />
       <input type="submit" value="Submit" />

@@ -1,6 +1,7 @@
 package controllers
 
-import play.mvc.Controller
+import play.api._
+import play.api.mvc._
 import models.frontend.landing.CatalogStar
 
 /**
@@ -12,38 +13,38 @@ object Landing extends Controller with DefaultHeaderAndFooterData {
    * Displays a permutation of the landing page with "catalog stars" counting
    * 0 <= n <= sampleStars.length
    **/
-  def featured_stars(count: Int) = {
+  def featured_stars(count: Int) = Action {
     val stars = sampleStars.zipWithIndex.map { case (star, index) =>
       star.copy(isFeatured = index < count)
     }
 
-    views.frontend.html.landing(stars)
+    Ok(views.html.frontend.landing(stars))
   }
 
-  def signup_on = {
+  def signup_on = Action {
     val stars = sampleStars.map(star => star.copy(hasInventoryRemaining = false))
-    views.frontend.html.landing(stars, signup=true)
+    Ok(views.frontend.html.landing(stars, signup=true))
   }
 
-  def featured_stars_with_no_inventory() = {
+  def featured_stars_with_no_inventory() = Action {
     val stars = sampleStars.map(star => star.copy(hasInventoryRemaining = false))
-    views.frontend.html.landing(stars)
+    Ok(views.html.frontend.landing(stars))
   }
 
-  def single_celebrity(publicName: String = "David Price",
-                       casualName: String = "David",
-                       isMale: Boolean = true) = {
-    views.frontend.html.celebrity_landing(
+  def single_celebrity(publicName: String,
+                       casualName: String,
+                       isMale: Boolean) = Action {
+    Ok(views.html.frontend.celebrity_landing(
       getStartedUrl = "/David-Price/photos",
       celebrityPublicName = publicName,
       celebrityCasualName = casualName,
       landingPageImageUrl = "/public/images/ortiz_masthead.jpg",
-      celebrityIsMale = isMale
+      celebrityIsMale = isMale)
     )
   }
 
   private def makeSampleStar(name: String, secondaryText: Option[String]): CatalogStar = {
-    import play.templates.JavaExtensions.slugify
+    import views.frontend.Utils.slugify
 
     CatalogStar(
       name,

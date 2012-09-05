@@ -1,6 +1,6 @@
 package controllers
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import models.frontend.storefront.{PersonalizeMessageOption, StorefrontOrderSummary, PersonalizeForm}
 import java.util
 import models.frontend.forms.FormError
@@ -92,7 +92,7 @@ object Personalize extends Controller
     productPreviewUrl: String = "http://placehold.it/454x288",
     orientation: String = "orientation-landscape"
   ) = {
-    views.frontend.html.celebrity_storefront_personalize(
+    views.html.frontend.celebrity_storefront_personalize(
       form=personalizeForm,
       guaranteedDelivery=guaranteedDelivery,
       writtenMessageCharacterLimit=writtenMessageCharacterLimit,

@@ -1,7 +1,7 @@
 package controllers
 
-import play.mvc.Controller
-import play.templates.Html
+import play.api.mvc.Controller
+import play.api.templates.Html
 import models.frontend.header.{HeaderLoggedIn, HeaderNotLoggedIn, HeaderData}
 import models.frontend.footer.FooterData
 
@@ -13,7 +13,7 @@ object BaseTemplate extends Controller {
     implicit val headerData = defaultHeaderData
     implicit val footerData = defaultFooterData
 
-    views.frontend.html.base_template(
+    views.html.frontend.base_template(
       "Title",
       headJs=new Html("var thisShouldHaveBeenInjectedInTheHead = 1;"),
       body=new Html("<div>This is the body</div>"),
@@ -33,7 +33,7 @@ object BaseTemplate extends Controller {
     implicit val headerData = defaultHeaderData.copy(loggedInStatus=Right(loggedInStatus))
     implicit val footerData = defaultFooterData
 
-    views.frontend.html.base_template(
+    views.html.frontend.base_template(
       "Title",
       headJs=new Html("var thisShouldHaveBeenInjectedInTheHead = 1;"),
       body=new Html("<div>This is the body</div>"),

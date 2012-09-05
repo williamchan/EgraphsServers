@@ -2,7 +2,7 @@ package models.frontend.storefront
 
 /**
  * ViewModel for the personalization information as presented on the finalize order page.
- * See [[views.frontend.html.celebrity_storefront_finalize]]
+ * See [[views.html.frontend.celebrity_storefront_finalize]]
  *
  * @param celebName the celebrity's public name. (e.g. David Price)
  * @param productTitle the product's title (e.g. "MLB Finals 2012")

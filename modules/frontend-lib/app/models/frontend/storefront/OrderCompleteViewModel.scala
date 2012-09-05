@@ -6,7 +6,7 @@ import org.joda.money.Money
 /**
  * Viewmodel for rendering the order complete page.
  *
- * See [[views.frontend.html.celebrity_storefront_complete]]
+ * See [[views.html.frontend.celebrity_storefront_complete]]
  *
  * @param orderDate the date the order was made
  * @param orderNumber the order number / id

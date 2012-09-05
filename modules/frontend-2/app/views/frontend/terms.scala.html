@@ -1,5 +1,6 @@
 @()(
-implicit session: play.api.mvc.Session,
+/* implicit session: play.api.mvc.Session */
+implicit
 headerData: models.frontend.header.HeaderData,
 footerData: models.frontend.footer.FooterData
 )
@@ -14,7 +15,7 @@ footerData: models.frontend.footer.FooterData
 <div id="main" class="about-us statics">
 <div class="row-fluid">
   <div class="span12 masthead-static">
-    <img src='@routes.Assets.at("public/images/kerry-wood.jpg")'/>
+    <img src='@routes.Assets.at("images/kerry-wood.jpg")'/>
   </div>
 </div>
 

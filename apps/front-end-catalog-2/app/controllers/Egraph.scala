@@ -14,7 +14,7 @@ object Egraph extends Controller with DefaultHeaderAndFooterData {
   def landscape = {
     val frame = LandscapeEgraphFrameViewModel
 
-    views.frontend.html.egraph(
+    views.html.frontend.egraph(
       "Herp Derpson",
       "Derp Herpson",
       frame.cssClass,
@@ -39,7 +39,7 @@ object Egraph extends Controller with DefaultHeaderAndFooterData {
   def portrait = {
     val frame = PortraitEgraphFrameViewModel
 
-    views.frontend.html.egraph(
+    views.html.frontend.egraph(
       "Herp Derpson",
       "Derp Herpson",
       frame.cssClass,

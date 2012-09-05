@@ -4,7 +4,7 @@ import org.joda.money.Money
 
 /**
  * ViewModel for the pricing information as presented on the FinalizeOrder page.
- * See [[views.frontend.html.celebrity_storefront_finalize]]
+ * See [[views.html.frontend.celebrity_storefront_finalize]]
  *
  * @param base the base price of the product.
  * @param physicalGood the price of ordering a physical good alongside the product.

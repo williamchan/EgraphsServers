@@ -3,7 +3,7 @@ package models.frontend.storefront
 /**
  * The aggregate ViewModel used to render the finalize page.
  *
- * See [[views.frontend.html.celebrity_storefront_finalize]]
+ * See [[views.html.frontend.celebrity_storefront_finalize]]
  *
  * @param billing the billing summary viewmodel
  * @param shipping the shipping summary viewmodel

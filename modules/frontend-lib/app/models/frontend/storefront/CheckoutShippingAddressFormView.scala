@@ -5,7 +5,7 @@ import models.frontend.forms.Field
 /**
  * Shipping form as rendered in the CheckoutScreen
  *
- * See [[views.frontend.html.celebrity_storefront_checkout]]
+ * See [[views.html.frontend.celebrity_storefront_checkout]]
  *
  * @param fullName name of the shipping recipient
  * @param email email address of the shipping recipient

@@ -3,12 +3,13 @@
 # ~~~~
 
 # Home page
-GET     /                                       controllers.Application.index
-#GET     /favicon.ico                            404
-GET     /build                                  controllers.Build.index
-POST    /orders/{<[0-9]+>orderId}/configure     controllers.Account.privacy
-# IDK how this line maps from Play 1.2.4 to 2.0
-#*       /{controller}/{action}                  {controller}.{action}
+GET     /                                                         controllers.Application.index
+#GET     /favicon.ico                                            404
+#GET     /build                                                  controllers.Build.index
+#POST    /orders/{<[0-9]+>orderId}/configure                     controllers.Account.privacy
+GET     /Landing/featured_stars                                   controllers.Landing.featured_stars(count:Int)
+GET     /Landing/featured_stars_with_no_inventory                 controllers.Landing.featured_stars_with_no_inventory()
+GET     /Landing/single_celebrity                                 controllers.Landing.single_celebrity(publicName:String ?= "David Price", casualName:String ?= "David", isMale: Boolean ?= true)
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file                           controllers.Assets.at(path="/public", file)
+GET     /assets/*file                                             controllers.Assets.at(path="/public", file)

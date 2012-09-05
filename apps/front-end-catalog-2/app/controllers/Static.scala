@@ -9,7 +9,7 @@ import models.frontend.contents.Section
 
 object Static extends Controller with DefaultHeaderAndFooterData {
   def simple_confirmation() = {
-    views.frontend.html.simple_confirmation("Account Verified",
+    views.html.frontend.simple_confirmation("Account Verified",
       """
       Your account is now verified. Continue on to the rest of the <a href="/">Egraph's</a> website.
       <br>
@@ -22,7 +22,7 @@ object Static extends Controller with DefaultHeaderAndFooterData {
   }
 
   def about() = {
-    views.frontend.html.about_us("/inside-an-egraph")
+    views.html.frontend.about_us("/inside-an-egraph")
   }
 
   def inside() = {
@@ -34,23 +34,23 @@ object Static extends Controller with DefaultHeaderAndFooterData {
       Section(title="What Can I Do With My Egraph", url="#do", subsection = None)
     )
 
-    views.frontend.html.inside_egraph(tableOfContents)
+    views.html.frontend.inside_egraph(tableOfContents)
   }
 
   def terms() = {
-    views.frontend.html.terms()
+    views.html.frontend.terms()
   }
 
   def contact() = {
-    views.frontend.html.contact()
+    views.html.frontend.contact()
   }
 
   def privacy() = {
-    views.frontend.html.privacy()
+    views.html.frontend.privacy()
   }
 
   def faq() = {
-    views.frontend.html.faq()
+    views.html.frontend.faq()
   }
 
   def careers() = {

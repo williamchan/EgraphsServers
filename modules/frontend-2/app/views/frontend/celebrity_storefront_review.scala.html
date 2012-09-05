@@ -13,8 +13,8 @@
 )(
   implicit headerData: models.frontend.header.HeaderData, 
   footerData: models.frontend.footer.FooterData,
-	storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs,
-	session: play.api.mvc.Session
+	storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs
+	/* session: play.api.mvc.Session */
 )
 
 @{/** The review order page in the purchase flow. This is also where they choose whether to
@@ -63,9 +63,9 @@
               <div class="preview-container @orientation">
                 <img class="preview" src="@productPreviewUrl" />
                 @if(orientation == "orientation-landscape") {
-    							<img class="frame" src='@routes.Assets.at("public/images/fpo-egraph.png")' alt="fpo-egraph" />
+    							<img class="frame" src='@routes.Assets.at("images/fpo-egraph.png")' alt="fpo-egraph" />
                 } else {
-                  <img class="frame" src='@routes.Assets.at("public/images/fpo-egraph-portrait.png")' alt="fpo-egraph" />
+                  <img class="frame" src='@routes.Assets.at("images/fpo-egraph-portrait.png")' alt="fpo-egraph" />
                 }
 
               </div>

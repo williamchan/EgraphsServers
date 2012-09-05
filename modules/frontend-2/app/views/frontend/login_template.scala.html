@@ -11,8 +11,8 @@
   fbAuthUrl: String,
   headJs: => Html = Html.empty
 )(implicit headerData: models.frontend.header.HeaderData, 
-  footerData: models.frontend.footer.FooterData,
-  session: play.api.mvc.Session
+  footerData: models.frontend.footer.FooterData
+  /* session: play.api.mvc.Session */
 )
 
 @{/** Base template for rendering permutations of the 3-column login page. See login.scala.html

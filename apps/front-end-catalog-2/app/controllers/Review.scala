@@ -1,7 +1,7 @@
 package controllers
 
-import play.mvc.Controller
-import play.templates.Html
+import play.api.mvc.Controller
+import play.api.templates.Html
 import java.util
 import org.joda.money.{CurrencyUnit, Money}
 
@@ -43,7 +43,7 @@ object Review extends Controller
     orientation:String = "orientation-landscape"
   ) {
     def render: Html = {
-      views.frontend.html.celebrity_storefront_review(
+      views.html.frontend.celebrity_storefront_review(
         celebrityName,
         productName,
         celebrityWillWrite,

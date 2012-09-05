@@ -1,6 +1,6 @@
 package controllers
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import models.frontend.storefront.{CheckoutOrderSummary, CheckoutShippingAddressFormView, CheckoutBillingInfoView, CheckoutFormView}
 import org.joda.money.{CurrencyUnit, Money}
 import models.frontend.forms.Field
@@ -118,7 +118,7 @@ object Checkout extends Controller
     productPreviewUrl: String = "http://placehold.it/454x288",
     orientation: String = "orientation-landscape"
   ) = {
-    views.frontend.html.celebrity_storefront_checkout(
+    views.html.frontend.celebrity_storefront_checkout(
       form=form,
       summary=summary,
       paymentJsModule=paymentJsModule,

@@ -5,7 +5,7 @@ import models.frontend.forms.{FormError, Field}
 /**
  * ViewModel for rendering the account registration form on the login page.
  *
- * See [[views.frontend.html.login]]
+ * See [[views.html.frontend.login]]
  *
  * @param email the email address as submitted
  * @param password the password as submitted

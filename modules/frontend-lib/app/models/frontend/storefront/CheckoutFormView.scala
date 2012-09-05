@@ -4,7 +4,7 @@ package models.frontend.storefront
  * View of the checkout screen's form. It is actually composed of
  * several different forms.
  *
- * See [[views.frontend.html.celebrity_storefront_checkout]]
+ * See [[views.html.frontend.celebrity_storefront_checkout]]
  *
  * @param actionUrl server target for the form
  * @param billing billing form

@@ -1,6 +1,6 @@
 package controllers
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import models.frontend.login_page.{AccountRegistrationFormViewModel, LoginFormViewModel}
 import models.frontend.forms.{FormError, Field}
 
@@ -55,11 +55,11 @@ object Login extends Controller
     fbAuthUrl: String = "fbAuthUrl"
   ) {
     def renderLoginForm() = {
-      views.frontend.html.login(loginForm, registrationForm, fbAuthUrl)
+      views.html.frontend.login(loginForm, registrationForm, fbAuthUrl)
     }
 
     def renderCheckoutAsForm() = {
-      views.frontend.html.celebrity_storefront_login(
+      views.html.frontend.celebrity_storefront_login(
         loginForm,
         newOwnerTargetUrl,
         celebrityName,

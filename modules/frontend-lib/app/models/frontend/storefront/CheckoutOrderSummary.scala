@@ -5,7 +5,7 @@ import org.joda.money.Money
 /**
  * Summary of the order as displated on the checkout screen.
  *
- * See [[views.frontend.html.celebrity_storefront_checkout]]
+ * See [[views.html.frontend.celebrity_storefront_checkout]]
  *
  * @param celebrityName name of the celebrity
  * @param productName name/title of the product

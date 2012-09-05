@@ -5,7 +5,7 @@ import models.frontend.forms.{FormError, Field}
 /**
  * The log-in form as seen on the login page.
  *
- * See [[views.frontend.html.login]]
+ * See [[views.html.frontend.login]]
  *
  * @param email the submitted email address
  * @param password the submitted password

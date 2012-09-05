@@ -12,7 +12,7 @@ object Complete extends Controller
   with DefaultStorefrontBreadcrumbs
 {
   def index = {
-    views.frontend.html.celebrity_storefront_complete(defaultOrderCompleteViewModel)
+    views.html.frontend.celebrity_storefront_complete(defaultOrderCompleteViewModel)
   }
 
   def defaultOrderCompleteViewModel = {

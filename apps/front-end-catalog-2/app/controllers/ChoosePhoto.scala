@@ -97,13 +97,13 @@ object ChoosePhoto extends Controller
     partnerIcons: Iterable[ChoosePhotoPartnerIcon] = List(samplePartnerIcon, samplePartnerIcon)
   ) {
     def renderTiles = {
-      views.frontend.html.celebrity_storefront_choose_photo_tiled(
+      views.html.frontend.celebrity_storefront_choose_photo_tiled(
         celeb, products, recentEgraphs, partnerIcons
       )
     }
 
     def renderCarousel = {
-      views.frontend.html.celebrity_storefront_choose_photo_carousel(
+      views.html.frontend.celebrity_storefront_choose_photo_carousel(
         celeb, carouselProducts, firstCarouselIndex, tiledViewLink, recentEgraphs, partnerIcons
       )
     }

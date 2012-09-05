@@ -4,7 +4,7 @@ import org.joda.money.Money
 
 /**
  * Order summary as seen on the Personalize page.
- * See [[views.frontend.html.celebrity_storefront_personalize.]]
+ * See [[views.html.frontend.celebrity_storefront_personalize.]]
  *
  * @param celebrityName name of the celebrity
  * @param productName name / title of the product

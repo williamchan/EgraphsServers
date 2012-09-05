@@ -17,7 +17,7 @@ object ApplicationBuild extends Build {
     //resolvers += "Crionics Github Repository" at "http://orefalo.github.com/m2repo/releases/",
 
     organization := "egraphs",
-
+    
     // exclude anything created by the routes file from going into the jar so it doesn't conflict with the packages
     // that pull this in as a dependency.
     mappings in (Compile,packageBin) ~= { (ms: Seq[(File, String)]) =>

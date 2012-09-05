@@ -4,7 +4,7 @@ package models.frontend.storefront
  * ViewModel for shipping information as provided on the
  * Finalize page.
  *
- * See [[views.frontend.html.celebrity_storefront_finalize]]
+ * See [[views.html.frontend.celebrity_storefront_finalize]]
  *
  * @param name the shipping recipient's name
  * @param email the shipping recipient's email address

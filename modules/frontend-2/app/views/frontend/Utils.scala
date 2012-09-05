@@ -2,6 +2,7 @@ package views.frontend
 import play.Play
 import java.io.File
 import controllers.Assets
+import scala.annotation.tailrec
 
 /**
  * Front-end utilities that otherwise had no home.
@@ -51,6 +52,28 @@ object Utils {
 //        Assets.at(file.getParent, file.getName)
 //    }
 //  }
+
+  /**
+   * Creates slug from string.
+   * source: https://github.com/julienrf/chooze/blob/master/app/util/Util.scala#L6
+   */
+  def slugify(str: String): String = {
+    import java.text.Normalizer
+    Normalizer.normalize(str, Normalizer.Form.NFD).replaceAll("[^\\w ]", "").replace(" ", "-").toLowerCase
+  }
+  
+  @tailrec
+  def generateUniqueSlug(slug: String, existingSlugs: Seq[String]): String = {
+    if (!(existingSlugs contains slug)) {
+      slug
+    } else {
+      val EndsWithNumber = "(.+-)([0-9]+)$".r
+      slug match {
+        case EndsWithNumber(s, n) => generateUniqueSlug(s + (n.toInt + 1), existingSlugs)
+        case s => generateUniqueSlug(s + "-2", existingSlugs)
+      }
+    }
+  }
 
   /**
    *  Returns a string for an angular.js binding

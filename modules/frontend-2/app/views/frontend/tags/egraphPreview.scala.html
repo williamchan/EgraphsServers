@@ -12,9 +12,9 @@
 <figure class="@orientation">  
   <img class="preview" src="@productPreviewUrl" />
   @if(orientation == "orientation-landscape") {
-    <img class="frame" src="/public/images/fpo-egraph.png" alt="fpo-egraph" />
+    <img class="frame" src="@routes.Assets.at("images/fpo-egraph.png")" alt="fpo-egraph" />
   } else {
-    <img class="frame" src="/public/images/fpo-egraph-portrait.png" alt="fpo-egraph" />      
+    <img class="frame" src="@routes.Assets.at("images/fpo-egraph-portrait.png")" alt="fpo-egraph" />      
   }
 
   <figcaption class="recipient-information">

@@ -11,7 +11,7 @@ object Email extends Controller {
     val emailLogoSrc = "../public/images/email-logo.jpg"
     val emailFacebookSrc = "../public/images/email-facebook.jpg"
     val emailTwitterSrc = "../public/images/email-twitter.jpg"
-    views.frontend.html.email_order_confirmation(
+    views.html.frontend.email_order_confirmation(
       buyerName = "Joshua Johnson",
       recipientName = "Carlos Pena",
       recipientEmail = "carlos@egraphs.com",
@@ -49,7 +49,7 @@ object Email extends Controller {
     val emailLogoSrc = "../public/images/email-logo.jpg"
     val emailFacebookSrc = "../public/images/email-facebook.jpg"
     val emailTwitterSrc = "../public/images/email-twitter.jpg"
-    views.frontend.html.email_account_verification(
+    views.html.frontend.email_account_verification(
       "http://www.egraphs.com/word",
       emailLogoSrc = emailLogoSrc,
       emailFacebookSrc = emailFacebookSrc,
@@ -61,7 +61,7 @@ object Email extends Controller {
     val emailLogoSrc = "../public/images/email-logo.jpg"
     val emailFacebookSrc = "../public/images/email-facebook.jpg"
     val emailTwitterSrc = "../public/images/email-twitter.jpg"
-    views.frontend.html.email_view_egraph(
+    views.html.frontend.email_view_egraph(
       viewEgraphUrl = "https://www.egraphs.com/gallery/carlosdiaz/davidortiz1",
       celebrityName = "Big Papi",
       recipientName = "Carlos Pena",
@@ -75,7 +75,7 @@ object Email extends Controller {
     val emailLogoSrc = "../public/images/email-logo.jpg"
     val emailFacebookSrc = "../public/images/email-facebook.jpg"
     val emailTwitterSrc = "../public/images/email-twitter.jpg"
-    views.frontend.html.email_account_confirmation(
+    views.html.frontend.email_account_confirmation(
       emailLogoSrc = emailLogoSrc,
       emailFacebookSrc = emailFacebookSrc,
       emailTwitterSrc = emailTwitterSrc

@@ -4,7 +4,7 @@ import models.frontend.forms.Field
 
 /**
  * View of the checkout screen's billing info form.
- * See [[views.frontend.html.celebrity_storefront_checkout]]
+ * See [[views.html.frontend.celebrity_storefront_checkout]]
  *
  * @param fullName the buyer's name
  * @param email the buyer's email

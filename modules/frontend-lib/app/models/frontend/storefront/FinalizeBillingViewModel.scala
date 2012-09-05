@@ -1,7 +1,7 @@
 package models.frontend.storefront
 
 /**
- * Billing info ViewModel as presented on [[views.frontend.html.celebrity_storefront_finalize]]
+ * Billing info ViewModel as presented on [[views.html.frontend.celebrity_storefront_finalize]]
  *
  * @param name the buyer's name
  * @param email the buyer's email address

@@ -4,7 +4,7 @@ import models.frontend.forms.Field
 
 /**
  * View model for the personalize form, as rendered here:
- * [[views.frontend.html.celebrity_storefront_personalize]]
+ * [[views.html.frontend.celebrity_storefront_personalize]]
  *
  *
  * @param actionUrl target for POSTing the form
