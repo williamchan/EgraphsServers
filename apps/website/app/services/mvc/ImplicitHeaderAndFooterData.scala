@@ -5,6 +5,7 @@ import models.frontend.footer.FooterData
 import services.http.EgraphsSession
 import models.{Customer, CustomerStore}
 import controllers.WebsiteControllers
+import services.mail.BulkMail
 
 /**
  * Provides implicit data necessary to render the header and footer of the website's
@@ -13,6 +14,7 @@ import controllers.WebsiteControllers
 trait ImplicitHeaderAndFooterData {
   protected def egraphsSessionFactory: () => EgraphsSession
   protected def customerStore: CustomerStore
+  protected def bulkMail: BulkMail
 
   implicit def siteHeaderData: HeaderData = {
     HeaderData(loggedInStatus=getHeaderLoggedInStatus)
@@ -21,7 +23,9 @@ trait ImplicitHeaderAndFooterData {
   implicit def siteFooterData: FooterData = {
     // TODO(erem): After integrating static pages then replace these hard links with
     // relative ones.
-    FooterData()
+    FooterData(
+    newsletterListId = bulkMail.newsletterListId
+    )
   }
 
   //

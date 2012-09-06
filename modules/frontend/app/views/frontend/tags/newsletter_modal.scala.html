@@ -1,4 +1,7 @@
-@()(implicit session: play.mvc.Scope.Session)
+@()(
+  implicit session: play.mvc.Scope.Session,
+  headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData)
 @import views.frontend.tags
 @import views.frontend.Utils.cdnAsset
 
@@ -20,7 +23,7 @@
     <div>
       <label>Email:</label>
       <input class="input-xlarge" type="email" name="email" />
-      <input type="hidden" value="70f32912bf" id="listId" name="listId"/>
+      <input type="hidden" value="@footerData.newsletterListId" id="listId" name="listId"/>
     </div>
     <div>
       <button id="signup-button" type="submit" class="button">

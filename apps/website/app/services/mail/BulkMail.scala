@@ -27,6 +27,8 @@ trait BulkMail {
    * TODO(sbilstein): Needs commments.
    */
   def checkConfiguration()
+
+  def newsletterListId : String
 }
 
 /**
@@ -56,6 +58,8 @@ private[mail] case class MockBulkMail (utils: Utils) extends BulkMail
     play.Logger.info("Subscribed " + email + " to email list: " + listId + "\n")
   }
   override def checkConfiguration() = {}
+
+  override def newsletterListId = "NotARealListId"
 }
 
 /**
@@ -63,7 +67,7 @@ private[mail] case class MockBulkMail (utils: Utils) extends BulkMail
  * @param apikey
  * @param datacenter
  */
-private[mail] case class MailChimpBulkMail (apikey: String, datacenter: String) extends BulkMail
+private[mail] case class MailChimpBulkMail (apikey: String, datacenter: String, newsletterListId: String) extends BulkMail
 {
   override def subscribeNew(listId: String, email: String) = {
   val url = "https://" + datacenter + ".api.mailchimp.com/1.3/"
@@ -94,7 +98,6 @@ private[mail] case class MailChimpBulkMail (apikey: String, datacenter: String) 
       """
     )
 
-
   }
 }
 
@@ -102,4 +105,8 @@ private[mail] case class MailChimpBulkMail (apikey: String, datacenter: String) 
  * Companion object for configuring MailChimpBulkMail
  */
 private[mail] object MailChimpBulkMail
-  extends MailChimpBulkMail(configuration.getProperty("mail.bulk.apikey"), configuration.getProperty("mail.bulk.datacenter"))
+  extends MailChimpBulkMail(
+    configuration.getProperty("mail.bulk.apikey"),
+    configuration.getProperty("mail.bulk.datacenter"),
+    configuration.getProperty("mail.bulk.newsletterid")
+  )
