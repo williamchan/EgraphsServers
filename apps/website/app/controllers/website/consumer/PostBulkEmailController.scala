@@ -1,9 +1,8 @@
 package controllers.website.consumer
 
 import play.mvc.Controller
-import services.http.{SafePlayParams, EgraphsSession, POSTControllerMethod}
+import services.http.POSTControllerMethod
 import services.mvc.ImplicitHeaderAndFooterData
-import services.db.{TransactionReadCommitted, TransactionSerializable, DBSession}
 import services.mail.BulkMail
 import services.http.forms.purchase.FormReaders
 import services.http.forms.Form
@@ -14,7 +13,6 @@ import sjson.json.Serializer
 
 private[controllers] trait PostBulkEmailController extends ImplicitHeaderAndFooterData {
   this: Controller =>
-  import SafePlayParams.Conversions._
 
   protected def postController: POSTControllerMethod
   protected def bulkMail: BulkMail

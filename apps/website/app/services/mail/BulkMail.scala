@@ -14,7 +14,18 @@ import play.libs.WS
  * transactional mailings like order confirmations
  */
 trait BulkMail {
+
+  /**
+   * TODO(sbilstein): Needs commments.
+   *
+   * @param listId
+   * @param email
+   */
   def subscribeNew(listId: String, email: String)
+
+  /**
+   * TODO(sbilstein): Needs commments.
+   */
   def checkConfiguration()
 }
 
