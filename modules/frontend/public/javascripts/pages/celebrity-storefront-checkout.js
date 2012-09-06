@@ -198,9 +198,6 @@ function(forms, payment, Egraphs) {
           }
         });
       });
-
-      // Mixpanel events
-      mixpanel.track_forms('.container form', 'Finalize Order clicked'); // not sure why this doesn't seem to work.
     }
   };
   
