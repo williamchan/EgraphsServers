@@ -100,6 +100,7 @@ class ImageUtilTests extends EgraphsUnitTest {
 
   "isLandscape" should "return true if landscape and false otherwise" in {
     Dimensions(width = 100, height = 1).isLandscape should be (true)
+    Dimensions(width = 100, height = 100).isLandscape should be (true)
     Dimensions(width = 1, height = 100).isLandscape should be (false)
   }
 }
