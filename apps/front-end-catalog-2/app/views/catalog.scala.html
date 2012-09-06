@@ -19,6 +19,7 @@
       In here you can find the catalog of all the different pages we render, in all their
       permutations.
     </p>
+	<img src='@routes.Assets.at("images/scary_clown.gif")' align='right'/>
     <p>
       Without further ado!
     </p>
@@ -43,28 +44,27 @@
     </ol>
     <h2>Account Settings</h2>
     <ol>
-      @catalogEntry("account/settings", "account settings")
-      @catalogEntry("account/errors", "account settings with errors")
+      @catalogEntry("Account/settings", "account settings")
+      @catalogEntry("Account/errors", "account settings with errors")
     </ol>
     <h2>Account gallery</h2>
     <ol>
       @for(number <- 0 until 6) {
-        @galleryEntry("account/gallery?user=leeroyjenkins&count=" + number)
+        @galleryEntry("Account/gallery?user=leeroyjenkins&count=" + number)
       }
     </ol>
     <h2>Account Verification</h2>
     <ol>
-      @catalogEntry("account/verify", "account verification")
-      @catalogEntry("account/reset", "password reset")
+      @catalogEntry("Account/verify", "account verification")
+      @catalogEntry("Account/reset", "password reset")
     </ol>
     <h2>Static pages</h2>
     <ol>
-      @catalogEntry("static/about", "about us")
-      @catalogEntry("static/inside", "Inside an Egraph")
-      @catalogEntry("static/faq", "FAQ")
-      @catalogEntry("static/privacy", "privacy")
-      @catalogEntry("static/terms", "terms")
-      @catalogEntry("static/careers", "careers")
+      @catalogEntry("Static/about", "about us")
+      @catalogEntry("Static/inside", "Inside an Egraph")
+      @catalogEntry("Static/faq", "FAQ")
+      @catalogEntry("Static/privacy", "privacy")
+      @catalogEntry("Static/terms", "terms")
     </ol>
     <h2>Storefront: Choose Photo Page (Celebrity info)</h2>
     <ol>

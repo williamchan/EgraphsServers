@@ -1,13 +1,16 @@
 package controllers
 
-import play.mvc.Controller
+import play.api._
+import play.api.mvc._
 import models.frontend.egraphs._
 import models.frontend.forms.FormError
 import models.frontend.egraphs.FulfilledEgraphViewModel
 import models.frontend.account.{AccountRecoverForm, AccountPasswordResetForm, AccountSettingsForm}
 import models.frontend.forms.Field
-import play.mvc.results.RenderJson
-import sjson.json.Serializer
+import play.api.mvc.Request
+import play.data.DynamicForm
+//import play.mvc.results.RenderJson
+//import sjson.json.Serializer
 
 /**
  * Test controller for viewing permutations of the account settings page.
@@ -19,114 +22,115 @@ object Account extends Controller with DefaultHeaderAndFooterData {
                         "owner" -> OwnerGalleryControl)
   val pendingThumbnails = Map("landscape" -> "http://placehold.it/230x185",
                         "portrait" -> "http://placehold.it/170x225")
-  val portraitPNG  = "http://localhost:9000/public/images/width-350px.png"
-  val landscapePNG = "http://localhost:9000/public/images/width-510px.png"
+  val portraitPNG  = "http://localhost:9000/assets/images/width-350px.png"
+  val landscapePNG = "http://localhost:9000/assets/images/width-510px.png"
   val fbAppId = "375687459147542"
   val fbAppSecret = "d38e551a2eb9b7c97fbb3bfb2896d426"
 
-  def settings() = {
+  def getSettings() = Action {
+    Ok(views.html.frontend.account_settings(AccountSettingsFormFactory.default))
+  }
+  
+  //You can test with this command:
+  //  curl -d "param1=value1&param2=value2,value3" localhost:9000/Account/settings
+  def postSettings() = Action {request =>
+    printPostRequestData(request)
+    //TODO: should i redirect them to the settings?
+    Ok(views.html.frontend.account_settings(AccountSettingsFormFactory.default))
+  }
+
+  def subscribe() = Action {request =>
     request.method match {
       case "POST" => {
-        println("POST data")
-        println(params.allSimple())
+        printPostRequestData(request)
+        Ok(Html("Subscribed = true"))
       }
       case _ => {
-        views.frontend.html.account_settings(AccountSettingsFormFactory.default)
+        Ok(Html("Not sure why you are here :("))
       }
     }
   }
 
-  def subscribe() = {
-    request.method match {
-      case "POST" => {
-        println("POST data")
-        println(params.allSimple())
-        Json(Serializer.SJSON.toJSON(Map("subscribed" -> true)))
-      }
-      case _ => {
-        Html("Not sure why you are here :(")
-      }
-    }
-  }
-
-  def errors() = {
-    views.frontend.html.account_settings(
+  def errors() = Action {
+    Ok(views.html.frontend.account_settings(
       AccountSettingsFormFactory.errors,
       List("derp", "herp", "dont ever ever ever ever")
-    )
+    ))
   }
 
-  def recover() = {
-    request.method match {
-      case "POST" => {
-        println("POST data")
-        println(params.allSimple())
-        views.frontend.html.simple_confirmation(
-          "Password Recovery",
-          """
-          <p>
-          Please check your email address for your account recovery information.
-          </p>
-          Thanks,
-          <br>
-          The team at Egraphs
-          """
+  def getRecovery() = Action {
+    Ok(views.html.frontend.account_recover(AccountRecoverForm(
+      email = Field(name="email")
+    )))
+  }
 
-        )
-      }
-      case _ => {
-        views.frontend.html.account_recover(AccountRecoverForm(
-          email = Field(name="email")
-        ))
-      }
-    }
+  def postRecovery() = Action { request =>
+    printPostRequestData(request)
+    Ok(views.html.frontend.simple_confirmation(
+      "Password Recovery",
+      """
+      <p>
+      Please check your email address for your account recovery information.
+      </p>
+      Thanks,
+      <br>
+      The team at Egraphs
+      """
+    ))
   }
-  def verify() = {
-    request.method match {
-      case "POST" => {
-        println("POST data")
-        println(params.allSimple())
-      }
-      case _ => {
-        views.frontend.html.simple_confirmation(
-          "Account Verified",
-          """
-          <p>
-          Your new password been confirmed. Continue on to the rest of the <a href="/">Egraph's</a> website.
-          </p>
-          Thanks,
-          <br>
-          The team at Egraphs
-          """
-        )
-      }
-    }
+
+  def getVerify() = Action {
+    Ok(views.html.frontend.account_recover(AccountRecoverForm(
+      email = Field(name="email")
+    )))
   }
-  def reset() = {
-    views.frontend.html.account_password_reset(
+
+  def postVerify() = Action { request =>
+    printPostRequestData(request)
+    Ok(views.html.frontend.simple_confirmation(
+      "Account Verified",
+      """
+      <p>
+      Your new password been confirmed. Continue on to the rest of the <a href="/">Egraph's</a> website.
+      </p>
+      Thanks,
+      <br>
+      The team at Egraphs
+      """
+    ))
+  }
+
+  def reset() = Action {
+    Ok(views.html.frontend.account_password_reset(
       AccountPasswordResetForm(
         newPassword = Field(name="newPassword"),
         passwordConfirm = Field(name="passwordConfirm"),
         email = Field(name="email", values=List("will@egraphs.com")),
         secretKey = Field(name="secretKey", values=List("SECRETSAUCE"))
       )
-    )
+    ))
   }
 
-  def gallery(user: String = "userdude", count: Int =  1, role: String = "other", pending: Int = 0) = {
+  def gallery(user: String, count: Int, role: String, pending: Int) = Action {
     val completed = makeEgraphs(user)
     val pending = makePendingEgraphs(user)
 
     val egraphs = pending ::: completed
 
-    views.frontend.html.account_gallery(user, egraphs, roles(role))
+    Ok(views.html.frontend.account_gallery(user, egraphs, roles(role)))
   }
 
-  //Basic controller for testing privacy toggles on the gallery pages
-  def privacy(orderId: String) = {
-    val status = request.params.get("privacyStatus")
-    println("privacy status: " + status)
-    new RenderJson(Serializer.SJSON.toJSON(Map("privacyStatus" -> status)))
+  //TODO: Myyk = I don't really get what this is even supposed to do
+//  //Basic controller for testing privacy toggles on the gallery pages
+//  def privacy(orderId: String) = {
+//    val status = request.params.get("privacyStatus")
+//    println("privacy status: " + status)
+//    new RenderJson(Serializer.SJSON.toJSON(Map("privacyStatus" -> status)))
+//  }
+
+  private def printPostRequestData(request: play.api.mvc.Request[play.api.mvc.AnyContent]) {
+    println("POST data")
+    request.body.asFormUrlEncoded.foreach(map => map.foreach(println))
   }
 
   private def makePendingEgraphs(user: String) : List[PendingEgraphViewModel] = {

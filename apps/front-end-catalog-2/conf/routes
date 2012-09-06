@@ -4,9 +4,23 @@
 
 # Home page
 GET     /                                                         controllers.Application.index
-#GET     /favicon.ico                                            404
-#GET     /build                                                  controllers.Build.index
-#POST    /orders/{<[0-9]+>orderId}/configure                     controllers.Account.privacy
+GET     /code_reuse_example                                       controllers.Application.code_reuse_example
+GET     /model_example                                            controllers.Application.model_example
+GET     /simple_example                                           controllers.Application.simple_example
+
+#GET     /build                                                    controllers.Build.index
+
+GET     /Account/gallery                                          controllers.Account.gallery(user: String ?= "userdude", count: Int ?=  1, role: String ?= "other", pending: Int ?= 0)
+GET     /Account/errors                                           controllers.Account.errors
+#POST    /orders/{<[0-9]+>orderId}/configure                       controllers.Account.privacy
+#GET     /Account/privacy                                          controllers.Account.privacy(orderId: String)
+GET     /Account/settings                                         controllers.Account.getSettings
+POST    /Account/settings                                         controllers.Account.postSettings
+GET     /Account/recovery                                         controllers.Account.getRecovery
+POST    /Account/recovery                                         controllers.Account.postRecovery
+GET     /Account/reset                                            controllers.Account.reset
+GET     /Account/verify                                           controllers.Account.getVerify
+POST    /Account/verify                                           controllers.Account.postVerify
 
 GET     /BaseTemplate/loggedIn                                    controllers.BaseTemplate.loggedIn
 GET     /BaseTemplate/notLoggedIn                                 controllers.BaseTemplate.notLoggedIn
@@ -62,11 +76,11 @@ GET     /Review/index                                             controllers.Re
 GET     /Review/portrait                                          controllers.Review.portrait
 GET     /Review/withPrint                                         controllers.Review.withPrint
 
-GET     /static/about                                             controllers.Static.about
-GET     /static/inside                                            controllers.Static.inside
-GET     /static/faq                                               controllers.Static.faq
-GET     /static/privacy                                           controllers.Static.privacy
-GET     /static/terms                                             controllers.Static.terms
+GET     /Static/about                                             controllers.Static.about
+GET     /Static/inside                                            controllers.Static.inside
+GET     /Static/faq                                               controllers.Static.faq
+GET     /Static/privacy                                           controllers.Static.privacy
+GET     /Static/terms                                             controllers.Static.terms
 
 GET     /StorefrontTemplate/noneActiveOrComplete                  controllers.StorefrontTemplate.noneActiveOrComplete
 GET     /StorefrontTemplate/active                                controllers.StorefrontTemplate.active(crumbIndex:Int)
