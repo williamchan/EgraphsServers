@@ -1,5 +1,6 @@
 @(model: models.frontend.storefront.OrderCompleteViewModel
-)(implicit headerData: models.frontend.header.HeaderData,
+)(implicit session: play.mvc.Scope.Session,
+  headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData  
 )
 
@@ -22,7 +23,6 @@
       <div id="main" class="sub">
       
         <section id="checkout" class="container">
-			
   				<header>	
   				  <h1>Order Complete</h1>
   				  <h2>@model.celebName | @model.productName</h2>  				

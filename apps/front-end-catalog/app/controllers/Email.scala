@@ -81,4 +81,8 @@ object Email extends Controller {
       emailTwitterSrc = emailTwitterSrc
     )
   }
+
+  def mlb = {
+    views.frontend.html.mlbmail()
+  }
 }

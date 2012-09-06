@@ -9,42 +9,42 @@ import services.Utils
 import services.http.PlayConfig
 import collection.mutable.ListBuffer
 
-/** Interface for sending e-mail. */
-trait Mail {
+/** Interface for sending transactional mails. Transactional mails are  */
+trait TransactionalMail {
   def send(mail: Email)
 }
 
 /**
- * Provides a Mail implementation given the play configuration
+ * Provides a TransactionalMail implementation given the play configuration
  *
  * @param playConfig the Play application's configuration properties
  * @param utils our application utils object
  */
-class MailProvider @Inject()(@PlayConfig playConfig: Properties, utils: Utils) extends Provider[Mail]
+class MailProvider @Inject()(@PlayConfig playConfig: Properties, utils: Utils) extends Provider[TransactionalMail]
 {
-  def get(): Mail = {
+  def get(): TransactionalMail = {
     val smtp = playConfig.getProperty("mail.smtp")
     val host = playConfig.getProperty("mail.smtp.host")
 
     (smtp, host) match {
       case ("mock", _) =>
-        new MockMail(utils)
+        new MockTransactionalMail(utils)
 
       case (_, "smtp.gmail.com") =>
         Gmail(utils.requiredConfigurationProperty("mail.smtp.user"),
               utils.requiredConfigurationProperty("mail.smtp.pass"))
 
       case _ =>
-        new PlayMailLib
+        new PlayTransactionalMailLib
     }
   }
 }
 
 /**
- * Implementation of the Mail library that always sends through Gmail, since as of
+ * Implementation of the TransactionalMail library that always sends through Gmail, since as of
  * 12/2011 Play can not successfully send mail through gmail.
  */
-private[mail] case class Gmail(user: String, password: String) extends Mail
+private[mail] case class Gmail(user: String, password: String) extends TransactionalMail
 {
   val host = "smtp.gmail.com"
 
@@ -77,10 +77,10 @@ private[mail] case class Gmail(user: String, password: String) extends Mail
 
 
 /**
- * Implementation of the Mail library that delegates to Play's behavior as configured in application.conf.
+ * Implementation of the TransactionalMail library that delegates to Play's behavior as configured in application.conf.
  * See http://www.playframework.org/documentation/1.2.4/configuration#mail for more info.
  */
-private[mail] class PlayMailLib extends Mail {
+private[mail] class PlayTransactionalMailLib extends TransactionalMail {
   override def send(mail: Email) = {
     play.libs.Mail.send(mail)
   }
@@ -88,9 +88,9 @@ private[mail] class PlayMailLib extends Mail {
 
 
 /**
- * Mock implementation of the Mail library. Heavily inspired by Play's implementation in Mail.Mock
+ * Mock implementation of the TransactionalMail library. Heavily inspired by Play's implementation in TransactionalMail.Mock
  */
-private[mail] class MockMail @Inject() (utils: Utils) extends Mail {
+private[mail] class MockTransactionalMail @Inject() (utils: Utils) extends TransactionalMail {
 
   override def send(email: Email) {
     import scala.collection.JavaConversions._

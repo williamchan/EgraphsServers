@@ -3,7 +3,7 @@ package controllers.website
 import models._
 import enums._
 import play.mvc.Scope.Flash
-import services.mail.Mail
+import services.mail.TransactionalMail
 import services.{Utils, AppConfig}
 import controllers.WebsiteControllers
 import services.payment.{Charge, Payment}
@@ -19,7 +19,6 @@ import org.apache.commons.mail.HtmlEmail
 import org.joda.money.Money
 import services.http.forms.purchase.CheckoutShippingForm
 import WebsiteControllers.{reverse, getOrderConfirmation}
-import scala.Some
 import models.Customer
 import models.CashTransaction
 import models.FailedPurchaseData
@@ -45,7 +44,7 @@ case class EgraphPurchaseHandler(
   shippingForm: Option[CheckoutShippingForm.Valid] = None,
   writtenMessageRequest: WrittenMessageRequest = WrittenMessageRequest.SpecificMessage,
   flash: Flash = Flash.current(),
-  mail: Mail = AppConfig.instance[Mail],
+  mail: TransactionalMail = AppConfig.instance[TransactionalMail],
   customerStore: CustomerStore = AppConfig.instance[CustomerStore],
   accountStore: AccountStore = AppConfig.instance[AccountStore],
   dbSession: DBSession = AppConfig.instance[DBSession],
@@ -242,7 +241,7 @@ case class EgraphPurchaseHandler(
                                          order: Order,
                                          cashTransaction: CashTransaction,
                                          maybePrintOrder: Option[PrintOrder],
-                                         mail: Mail) {
+                                         mail: TransactionalMail) {
     import services.Finance.TypeConversions._
     val email = new HtmlEmail()
     email.setFrom("noreply@egraphs.com", "Egraphs")

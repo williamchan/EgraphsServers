@@ -23,16 +23,28 @@ class FormChecks @Inject()(accountStore: AccountStore, customerStore: CustomerSt
    * Returns the provided string on the right if it contained at least one non-empty-stirng
    * value.
    */
-  def isPresent(toValidate: Iterable[String])
+  def isPresent(toValidate: Iterable[String], message: String = "Need some text here")
   : Either[ValueNotPresentFieldError, Iterable[String]] =
   {
-    FormChecks.isPresent(toValidate)
+    FormChecks.isPresent(toValidate, message)
   }
 
   def isSomeValue[T](toValidate: Iterable[T], message: String="Was not a value")
   : Either[FormError, T] =
   {
-    toValidate.headOption.map(value => Right(value)).getOrElse(error(message))
+
+    toValidate.headOption.map(value =>
+      value match {
+        case v:String => {
+          if (v.isEmpty) {
+           error(message)
+          } else {
+            Right(value)
+          }
+        }
+        case _ => Right(value)
+      }
+    ).getOrElse(error(message))
   }
 
   /**
@@ -186,7 +198,7 @@ class FormChecks @Inject()(accountStore: AccountStore, customerStore: CustomerSt
    */
   def isEmailAddress(toValidate: String, message: String="Valid email address required")
   : Either[FormError, String] = {
-    if (playValidation.email(toValidate).ok) {
+    if (!toValidate.isEmpty && playValidation.email(toValidate).ok ) {
       Right(toValidate)
     } else {
       error(message)

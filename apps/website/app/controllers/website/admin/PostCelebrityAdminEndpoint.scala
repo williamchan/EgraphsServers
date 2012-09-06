@@ -4,7 +4,7 @@ import play.data.validation._
 import models._
 import enums.PublishedStatus
 import play.mvc.results.Redirect
-import services.mail.Mail
+import services.mail.TransactionalMail
 import controllers.WebsiteControllers
 import play.mvc.Controller
 import play.data.validation.Validation.ValidationResult
@@ -19,7 +19,7 @@ trait PostCelebrityAdminEndpoint {
 
   protected def postController: POSTControllerMethod
   protected def adminFilters: AdminRequestFilters
-  protected def mail: Mail
+  protected def transactionalMail: TransactionalMail
   protected def celebrityStore: CelebrityStore
   protected def accountStore: AccountStore
 
@@ -163,7 +163,7 @@ trait PostCelebrityAdminEndpoint {
             email.addTo(celebrityEmail, publicName)
             email.setSubject("Egraphs Celebrity Account Created")
             email.setMsg(views.Application.email.html.celebrity_created_email(celebrity = savedCelebrity, email = celebrityEmail).toString().trim())
-            mail.send(email)
+            transactionalMail.send(email)
           }
           savedCelebrity.saveWithImageAssets(landingPageImageOption, logoImageImageOption)
 

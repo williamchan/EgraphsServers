@@ -8,6 +8,7 @@ import controllers.website.consumer.CelebrityLandingConsumerEndpoint
 import models.frontend.header.HeaderData
 import models.frontend.footer.FooterData
 import controllers.WebsiteControllers
+import play.mvc.Scope.Session
 
 private[controllers] trait GetCelebrityAdminEndpoint {
   this: Controller =>
@@ -24,7 +25,7 @@ private[controllers] trait GetCelebrityAdminEndpoint {
         case (Some(account), Some(celebrity)) =>
           action match {
             case Some("preview") => {
-              CelebrityLandingConsumerEndpoint.getCelebrityLandingHtml(celebrity)(HeaderData(), FooterData())
+              CelebrityLandingConsumerEndpoint.getCelebrityLandingHtml(celebrity)(HeaderData(), FooterData(), Session.current())
             }
 
             case _ => {

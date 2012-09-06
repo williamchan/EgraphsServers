@@ -16,6 +16,7 @@ trait AllConsumerEndpoints
   with GetStaticEndpoint
   with LogoutEndpoints
   with PostAccountSettingsEndpoint
+  with PostBulkEmailController
   with PostLoginEndpoint
   with PostOrderConfigureEndpoint
   with PostRecoverAccountEndpoint

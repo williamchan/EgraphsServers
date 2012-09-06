@@ -3,7 +3,7 @@ package controllers.website
 import play.mvc.Controller
 import services.db.{DBSession, TransactionSerializable}
 import models.{Customer, Account, CustomerStore, AccountStore}
-import services.mail.Mail
+import services.mail.TransactionalMail
 import org.apache.commons.mail.HtmlEmail
 import services.http.{SafePlayParams, AccountRequestFilters, POSTControllerMethod}
 import services.mvc.ImplicitHeaderAndFooterData
@@ -17,7 +17,7 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
   protected def accountStore: AccountStore
   protected def customerStore: CustomerStore
   protected def accountRequestFilters: AccountRequestFilters
-  protected def mail: Mail
+  protected def transactionalMail: TransactionalMail
 
   def postRecoverAccount() = postController() {
     accountRequestFilters.requireValidAccountEmail(request.params.getOption("email").getOrElse("Nothing")) {
@@ -51,6 +51,6 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
         resetPasswordUrl = GetResetPasswordEndpoint.absoluteUrl(account.email, account.resetPasswordKey.get)
       ).toString().trim()
     )
-    mail.send(email)
+    transactionalMail.send(email)
   }
 }

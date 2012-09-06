@@ -1,5 +1,6 @@
 @(title: String, headJs: => Html = Html.empty, jsMain: String = "", body: => Html)(
-  implicit headerData: models.frontend.header.HeaderData,
+  implicit session: play.mvc.Scope.Session,
+  headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData,
   storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs
 )
