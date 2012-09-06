@@ -319,21 +319,15 @@ button  {
       border-bottom: 1px dotted @grayDark;
     }
     .modal-dismissal {
-      color: @orange;
       float: none;
       right: 25px;
       bottom: 40px;
       position: absolute;
+      color: @orange;
       text-decoration: none;
       border-bottom: 1px dotted @orange;
-
     }
   }
-
-
-
-
-
 }
 
 .modal.egraphs {
@@ -630,7 +624,51 @@ section[role=banner] {
 
 @media (max-width: 767px) {
 
-	#bottom .social ul { float: none; }
+  #bottom .social ul { float: none; }
 
+  .modal.signup {
+	  width: inherit;
+	  left: 55%;
+	  padding-left: 0px;
+    br {
+      display: none;
+    }
+
+    form {
+      margin-bottom: 0px;
+    }
+    .modal-body {
+      .modal-dismissal {
+          float: none;
+          position: relative;
+          left: 45%;
+          bottom: -80%;
+      }
+
+      img {
+        position: relative;
+        display: none;
+      }
+
+      h2 {
+        font-size: 26px;
+        max-width: 100%;
+        line-height: inherit;
+      }
+
+      p {
+        font-size: 14px;
+        max-width: 100%;
+      }
+	}
+  }
 }
+
+@media (max-width: 480px) {
+    .modal.fade.in.signup {
+  	  top: 0%;
+      left: 10px;
+  	 }
+}
+
 
