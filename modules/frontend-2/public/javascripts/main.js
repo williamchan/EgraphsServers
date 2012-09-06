@@ -1,9 +1,9 @@
 // Configuration to look up correct urls to js files as opposed to relative
 // paths (require's default behavior)
 require.config({
-  baseUrl: "/public/javascripts",
+  baseUrl: "/assets/javascripts",
   paths: {
-    bootstrap: '/public/twitter-bootstrap/js'
+    bootstrap: '/assets/twitter-bootstrap/js'
   }
 });
 

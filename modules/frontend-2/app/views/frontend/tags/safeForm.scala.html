@@ -3,7 +3,7 @@
 @{/*import _root_.views.html.authtoken.authenticityToken*/}
 @import views.frontend.Utils
 
-<form name="form" @Utils.formatAttributeTuplesToHtml(attributeTuples: _*) >
+<form name="form" @Html(Utils.formatAttributeTuplesToHtml(attributeTuples: _*)) >
   @{/*authenticityToken()*/}
   @formContent
 </form>
