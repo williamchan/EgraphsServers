@@ -1,7 +1,7 @@
 @(model: models.frontend.storefront.OrderCompleteViewModel
-)(implicit session: play.mvc.Scope.Session,
-  headerData: models.frontend.header.HeaderData,
-  footerData: models.frontend.footer.FooterData  
+)(implicit headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData
+  @* session: play.mvc.Scope.Session, *@
 )
 
 @{/** Renders the Order Complete page in the celebrity storefront. This is the page displayed

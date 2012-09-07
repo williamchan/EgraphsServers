@@ -1,7 +1,7 @@
-@(celebrityName: String, productName: String, creditCardMsg: String)(
-  implicit session: play.mvc.Scope.Session,
-  headerData: models.frontend.header.HeaderData,
+@(celebrityName: String, productName: String, creditCardMsg: String
+)(implicit headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData
+  @* session: play.mvc.Scope.Session, *@
 )
 
 @baseBody = {

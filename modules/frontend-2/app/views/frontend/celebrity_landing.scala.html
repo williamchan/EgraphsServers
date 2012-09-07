@@ -1,8 +1,7 @@
 @(getStartedUrl: String, celebrityPublicName: String, celebrityCasualName: String, landingPageImageUrl: String, celebrityIsMale: Boolean = true
-)(
-  implicit session: play.mvc.Scope.Session,
-  headerData: models.frontend.header.HeaderData,
+)(implicit headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData
+  @* session: play.mvc.Scope.Session, *@
 )
 
 @{/** Celebrity landing page */}

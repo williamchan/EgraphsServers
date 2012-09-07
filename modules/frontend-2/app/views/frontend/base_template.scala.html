@@ -1,7 +1,8 @@
 @(title: String, jsMain: String = "", headJs: => Html = Html.empty, body: => Html)(
-  implicit session: play.mvc.Scope.Session,
-  headerData: models.frontend.header.HeaderData,
-  footerData: models.frontend.footer.FooterData)
+  implicit headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData
+  @* session: play.mvc.Scope.Session, *@
+  )
 
 @{/**
     Base template for the consumer website. It provides many hooks to customize
@@ -95,7 +96,7 @@
             </p>
           </div>
           <br>
-          <img src="@cdnAsset("public/images/modal-ipad.png")"/>
+          <img src='@routes.Assets.at("images/modal-ipad.png")'/>
 
           @tags.html.safeForm("id" ->"signup-form", "method" -> "POST", "action" -> "/subscribe") {
             <div>
