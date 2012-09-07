@@ -11,12 +11,13 @@ import play.libs.WS
 /**
  * Trait for defining new bulk mail providers.
  * Bulk mail services manage campaign style mailings like newsletters as opposed to
- * transactional mailings like order confirmations
+ * transactional mailings like order confirmations. BulkMail is NOT a replacement for transactional mail serrvices.
+ * See the wiki page:
  */
 trait BulkMail {
 
   /**
-   * TODO(sbilstein): Needs commments.
+   * Subscribes a user to the given mailing list. The id is a key associated with the underlying API.
    *
    * @param listId
    * @param email
@@ -24,9 +25,15 @@ trait BulkMail {
   def subscribeNew(listId: String, email: String)
 
   /**
-   * TODO(sbilstein): Needs commments.
+   * Throws exceptions if this implementation is not configured correctly.
+   * @return returns itself assuming the check passed.
    */
-  def checkConfiguration()
+  def checkConfiguration : BulkMail
+
+  /**
+   * Used to set the value of API calls such as subscribeNew
+   * @return ID of newsletter sign up mailing list.
+   */
 
   def newsletterListId : String
 }
@@ -40,11 +47,12 @@ class BulkMailProvider @Inject()(@PlayConfig playConfig: Properties, utils: Util
 {
   def get() : BulkMail = {
     //Inspect properties and return the proper BulkMail
-    if (configuration.getProperty("mail.bulk") == "mailchimp") {
+    val provider = if (configuration.getProperty("mail.bulk") == "mailchimp") {
       MailChimpBulkMail
     } else {
       new MockBulkMail(utils)
     }
+    provider.checkConfiguration
   }
 }
 
@@ -57,7 +65,7 @@ private[mail] case class MockBulkMail (utils: Utils) extends BulkMail
   override def subscribeNew(listId: String, email: String) = {
     play.Logger.info("Subscribed " + email + " to email list: " + listId + "\n")
   }
-  override def checkConfiguration() = {}
+  override def checkConfiguration() : BulkMail = { this }
 
   override def newsletterListId = "NotARealListId"
 }
@@ -84,7 +92,7 @@ private[mail] case class MailChimpBulkMail (apikey: String, datacenter: String, 
 
   }
 
-  override def checkConfiguration() = {
+  override def checkConfiguration() : BulkMail = {
     require(
       apikey != null,
       """
@@ -97,7 +105,7 @@ private[mail] case class MailChimpBulkMail (apikey: String, datacenter: String, 
       application.conf: A "mail.bulk.datacenter" configuration must be provided.
       """
     )
-
+    this
   }
 }
 

@@ -61,6 +61,7 @@ define(["bootstrap/bootstrap-modal"], function() {
             }
 
           });
+          mixpanel.track('Subscribed to newsletter');
           return false;
         });
 
