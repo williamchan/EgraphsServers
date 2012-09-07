@@ -54,7 +54,7 @@ object Static extends Controller with DefaultHeaderAndFooterData {
     Ok(views.html.frontend.faq())
   }
 
-  def careers() = {
-    views.frontend.html.careers()
+  def careers() = Action {
+    Ok(views.frontend.html.careers())
   }
 }
