@@ -31,7 +31,7 @@ object Email extends Controller {
     ))
   }
 
-  def order_confirmation_text = Action {
+  def orderConfirmationText = Action {
     Ok(views.html.frontend.email_order_confirmation_text(
       buyerName = "Joshua Johnson",
       recipientName = "Carlos Pena",
@@ -56,7 +56,7 @@ object Email extends Controller {
     ))
   }
 
-  def view_egraph = Action {
+  def viewEgraph = Action {
     Ok(views.html.frontend.email_view_egraph(
       viewEgraphUrl = "https://www.egraphs.com/gallery/carlosdiaz/davidortiz1",
       celebrityName = "Big Papi",

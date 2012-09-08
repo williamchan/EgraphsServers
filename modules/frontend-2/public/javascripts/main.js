@@ -3,7 +3,7 @@
 require.config({
   baseUrl: "/assets/javascripts",
   paths: {
-    bootstrap: '/assets/twitter-bootstrap/js'
+    bootstrap: '/assets/bootstrap/js'
   }
 });
 
