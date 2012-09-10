@@ -9,7 +9,8 @@ import java.util.Properties
 import play.libs.WS
 
 /**
- * Trait for defining new bulk mail providers.
+ * Trait that defines bulk mail providers (e.g. MailChimp, Constant Contact).
+ *
  * Bulk mail services manage campaign style mailings like newsletters as opposed to
  * transactional mailings like order confirmations. BulkMail is NOT a replacement for transactional mail services.
  * See the wiki page:  https://egraphs.atlassian.net/wiki/display/DEV/Email
@@ -19,28 +20,31 @@ trait BulkMail {
   /**
    * Subscribes a user to the given mailing list. The id is a key associated with the underlying API.
    *
-   * @param listId
-   * @param email
+   * @param listId the mailing list's newsletter ID as provided by the bulk mail service provider.
+   *   the value is probably located in application.conf with the key `mail.bulk.newsletterid`.
+   * @param email e-mail address of the individual subscribing to the mailing list.
    */
   def subscribeNew(listId: String, email: String)
 
   /**
    * Throws exceptions if this implementation is not configured correctly.
+   *
    * @return returns itself assuming the check passed.
    */
-  def checkConfiguration : BulkMail
+  def checkConfiguration() : BulkMail
 
   /**
    * Used to set the value of API calls such as subscribeNew
+   *
    * @return ID of newsletter sign up mailing list.
    */
-
   def newsletterListId : String
 }
 
 /**
  * Helper class for configuring BulkMail implementations
- * @param playConfig
+ *
+ * @param playConfig the map of application configuration values. See conf/application.conf for values.
  * @param utils
  */
 class BulkMailProvider @Inject()(@PlayConfig playConfig: Properties, utils: Utils) extends Provider[BulkMail]
@@ -52,12 +56,13 @@ class BulkMailProvider @Inject()(@PlayConfig playConfig: Properties, utils: Util
     } else {
       new MockBulkMail(utils)
     }
-    provider.checkConfiguration
+    provider.checkConfiguration()
   }
 }
 
 /**
- * A MockMailer for testing purposes
+ * A BulkMail implementation exclusively for testing and development.
+ *
  * @param utils
  */
 private[mail] case class MockBulkMail (utils: Utils) extends BulkMail
@@ -71,25 +76,28 @@ private[mail] case class MockBulkMail (utils: Utils) extends BulkMail
 }
 
 /**
- * Currently a very simple wrapper around one function of the Mailchimp API.
- * @param apikey
- * @param datacenter
+ * BulkMail implementation that interoperates with the MailChimp API.
+ *
+ * @param apikey the MailChimp API Key as found in application.conf and
+ *     [[https://us5.admin.mailchimp.com/account/api/ the mailchimp account page]]
+ * @param datacenter the MailChimp data center used by our account. The correct value for this
+ *     appears at the top of the browser when logged in to mailchimp.com and should be set
+ *     in the application config.
  */
 private[mail] case class MailChimpBulkMail (apikey: String, datacenter: String, newsletterListId: String) extends BulkMail
 {
   override def subscribeNew(listId: String, email: String) = {
-  val url = "https://" + datacenter + ".api.mailchimp.com/1.3/"
-  val responsePromise = WS.url(url).params(
-    Map(
-      "output" -> "json",
-      "apikey" -> apikey,
-      "method" -> "listSubscribe",
-      "id" -> listId,
-      "email_address" -> email,
-      "double_optin" -> "false"
-    )
-  ).getAsync()
-
+    val url = "https://" + datacenter + ".api.mailchimp.com/1.3/"
+    val responsePromise = WS.url(url).params(
+      Map(
+        "output" -> "json",
+        "apikey" -> apikey,
+        "method" -> "listSubscribe",
+        "id" -> listId,
+        "email_address" -> email,
+        "double_optin" -> "false"
+      )
+    ).getAsync()
   }
 
   override def checkConfiguration() : BulkMail = {

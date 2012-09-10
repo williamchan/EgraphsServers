@@ -6,7 +6,6 @@ import services.http.EgraphsSession
 import models.{Customer, CustomerStore}
 import controllers.WebsiteControllers
 import services.mail.BulkMail
-import play.mvc.Controller._
 
 /**
  * Provides implicit data necessary to render the header and footer of the website's
