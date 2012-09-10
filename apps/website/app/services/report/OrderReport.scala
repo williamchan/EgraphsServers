@@ -4,13 +4,10 @@ import com.google.inject.Inject
 import services.db.Schema
 import java.io.File
 import org.squeryl.PrimitiveTypeMode._
-import java.text.SimpleDateFormat
-import java.util.TimeZone
 
 class OrderReport @Inject()(schema: Schema) extends Report {
 
   override val reportName = "order-report"
-
 
   def report(): File = {
     import schema.{orders, customers, products, celebrities, egraphs}
@@ -40,12 +37,7 @@ class OrderReport @Inject()(schema: Schema) extends Report {
       "candidateegraphid",
       "candidateegraphstate"
     )
-    // TODO wow this java library sucks
-    val timeFormatter = new SimpleDateFormat("HH:mm:ss")
-    val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
 
-    timeFormatter.setTimeZone(TimeZone.getTimeZone("PST"))
-    dateFormatter.setTimeZone(TimeZone.getTimeZone("PST"))
     val tsv = new StringBuilder(headerLine)
     for (orderView <- orderViews) {
       val order = orderView._1
@@ -59,8 +51,8 @@ class OrderReport @Inject()(schema: Schema) extends Report {
         order.amountPaidInCurrency,
         order._paymentStatus,
         order._reviewStatus,
-        timeFormatter.format(order.created),
-        dateFormatter.format(order.created),
+        formatTime(order.created),
+        formatDate(order.created),
         order.expectedDate.getOrElse(""),
         product.id,
         celebrity.id,
