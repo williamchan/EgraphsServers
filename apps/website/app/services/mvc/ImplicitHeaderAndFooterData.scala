@@ -6,6 +6,7 @@ import services.http.EgraphsSession
 import models.{Customer, CustomerStore}
 import controllers.WebsiteControllers
 import services.mail.BulkMail
+import play.mvc.Controller._
 
 /**
  * Provides implicit data necessary to render the header and footer of the website's
@@ -21,10 +22,8 @@ trait ImplicitHeaderAndFooterData {
   }
 
   implicit def siteFooterData: FooterData = {
-    // TODO(erem): After integrating static pages then replace these hard links with
-    // relative ones.
     FooterData(
-    newsletterListId = bulkMail.newsletterListId
+      newsletterListId = bulkMail.newsletterListId
     )
   }
 

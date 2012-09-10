@@ -11,8 +11,8 @@ import play.libs.WS
 /**
  * Trait for defining new bulk mail providers.
  * Bulk mail services manage campaign style mailings like newsletters as opposed to
- * transactional mailings like order confirmations. BulkMail is NOT a replacement for transactional mail serrvices.
- * See the wiki page:
+ * transactional mailings like order confirmations. BulkMail is NOT a replacement for transactional mail services.
+ * See the wiki page:  https://egraphs.atlassian.net/wiki/display/DEV/Email
  */
 trait BulkMail {
 
