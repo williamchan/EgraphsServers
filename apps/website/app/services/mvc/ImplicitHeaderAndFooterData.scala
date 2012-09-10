@@ -23,6 +23,11 @@ trait ImplicitHeaderAndFooterData {
 
   implicit def siteFooterData: FooterData = {
     FooterData(
+      aboutUsLink = WebsiteControllers.reverse(WebsiteControllers.getAbout),
+      faqLink = WebsiteControllers.reverse(WebsiteControllers.getFAQ),
+      termsOfUseLink = WebsiteControllers.reverse(WebsiteControllers.getTerms),
+      privacyPolicyLink = WebsiteControllers.reverse(WebsiteControllers.getPrivacy),
+      careersPolicyLink = WebsiteControllers.reverse(WebsiteControllers.getCareers),
       newsletterListId = bulkMail.newsletterListId
     )
   }
