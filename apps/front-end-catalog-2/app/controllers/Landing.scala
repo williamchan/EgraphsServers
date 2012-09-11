@@ -13,7 +13,7 @@ object Landing extends Controller with DefaultHeaderAndFooterData {
    * Displays a permutation of the landing page with "catalog stars" counting
    * 0 <= n <= sampleStars.length
    **/
-  def featured_stars(count: Int) = Action {
+  def featuredStars(count: Int) = Action {
     val stars = sampleStars.zipWithIndex.map { case (star, index) =>
       star.copy(isFeatured = index < count)
     }
@@ -21,17 +21,17 @@ object Landing extends Controller with DefaultHeaderAndFooterData {
     Ok(views.html.frontend.landing(stars))
   }
 
-  def signup_on = Action {
+  def signupOn = Action {
     val stars = sampleStars.map(star => star.copy(hasInventoryRemaining = false))
-    Ok(views.frontend.html.landing(stars, signup=true))
+    Ok(views.html.frontend.landing(stars, signup=true))
   }
 
-  def featured_stars_with_no_inventory() = Action {
+  def featuredStarsWithNoInventory() = Action {
     val stars = sampleStars.map(star => star.copy(hasInventoryRemaining = false))
     Ok(views.html.frontend.landing(stars))
   }
 
-  def single_celebrity(publicName: String,
+  def singleCelebrity(publicName: String,
                        casualName: String,
                        isMale: Boolean) = Action {
     Ok(views.html.frontend.celebrity_landing(

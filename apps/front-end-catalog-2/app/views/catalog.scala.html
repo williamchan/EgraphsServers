@@ -35,11 +35,11 @@
       }
 
       @for(number <- 0 until 9) {
-        @landingEntry("featured_stars?count=" + number)
+        @landingEntry("featuredStars?count=" + number)
       }
-      @landingEntry("featured_stars?count=16")
-      @catalogEntry("Landing/featured_stars_with_no_inventory", "Featured stars -- no inventory")
-      @catalogEntry(href="Landing/signup_on", description="Landing page with modal")
+      @landingEntry("featuredStars?count=16")
+      @catalogEntry("Landing/featuredStarsWithNoInventory", "Featured stars -- no inventory")
+      @catalogEntry(href="Landing/signupOn", description="Landing page with modal")
 
     </ol>
     <h2>Account Settings</h2>
@@ -159,8 +159,8 @@
     </ol>
     <h2>Celebrity Landing Page</h2>
     <ol>
-      @catalogEntry("Landing/single_celebrity", "Celebrity landing - male")      
-      @catalogEntry("Landing/single_celebrity?publicName=Mia+Hamm&casualName=Mia&isMale=0", "Celebrity landing - female")
+      @catalogEntry("Landing/singleCelebrity", "Celebrity landing - male")      
+      @catalogEntry("Landing/singleCelebrity?publicName=Mia+Hamm&casualName=Mia&isMale=0", "Celebrity landing - female")
     </ol>
     <h2>Egraph Page</h2>
     <ol>

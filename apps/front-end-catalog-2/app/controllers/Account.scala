@@ -39,16 +39,13 @@ object Account extends Controller with DefaultHeaderAndFooterData {
     Ok(views.html.frontend.account_settings(AccountSettingsFormFactory.default))
   }
 
-  def subscribe() = Action {request =>
-    request.method match {
-      case "POST" => {
-        printPostRequestData(request)
-        Ok(Html("Subscribed = true"))
-      }
-      case _ => {
-        Ok(Html("Not sure why you are here :("))
-      }
-    }
+  def getSubscribe() = Action {request =>
+    Ok("Not sure why you are here :(")
+  }
+
+  def postSubscribe() = Action {request =>
+    printPostRequestData(request)
+    Ok("Subscribed = true")
   }
 
   def errors() = Action {

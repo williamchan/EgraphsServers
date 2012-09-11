@@ -16,6 +16,8 @@ GET     /Account/errors                                           controllers.Ac
 #GET     /Account/privacy                                          controllers.Account.privacy(orderId: String)
 GET     /Account/settings                                         controllers.Account.getSettings
 POST    /Account/settings                                         controllers.Account.postSettings
+GET     /Account/subscribe                                        controllers.Account.getSubscribe
+POST    /Account/subscribe                                        controllers.Account.postSubscribe
 GET     /Account/recovery                                         controllers.Account.getRecovery
 POST    /Account/recovery                                         controllers.Account.postRecovery
 GET     /Account/reset                                            controllers.Account.reset
@@ -47,6 +49,7 @@ GET     /Egraph/landscape                                         controllers.Eg
 GET     /Egraph/portrait                                          controllers.Egraph.portrait
 
 GET     /Email/confirm                                            controllers.Email.confirm
+GET     /Email/mlb                                                controllers.Email.mlb
 GET     /Email/orderConfirmation                                  controllers.Email.orderConfirmation
 GET     /Email/orderConfirmationText                              controllers.Email.orderConfirmationText
 GET     /Email/verify                                             controllers.Email.verify
@@ -59,9 +62,10 @@ GET     /Failed/purchase_error                                    controllers.Fa
 GET     /Finalize/index                                           controllers.Finalize.index
 GET     /Finalize/portrait                                        controllers.Finalize.portrait
 
-GET     /Landing/featured_stars                                   controllers.Landing.featured_stars(count:Int)
-GET     /Landing/featured_stars_with_no_inventory                 controllers.Landing.featured_stars_with_no_inventory
-GET     /Landing/single_celebrity                                 controllers.Landing.single_celebrity(publicName:String ?= "David Price", casualName:String ?= "David", isMale: Boolean ?= true)
+GET     /Landing/featuredStars                                    controllers.Landing.featuredStars(count:Int)
+GET     /Landing/featuredStarsWithNoInventory                     controllers.Landing.featuredStarsWithNoInventory
+GET     /Landing/signupOn                                         controllers.Landing.signupOn
+GET     /Landing/singleCelebrity                                  controllers.Landing.singleCelebrity(publicName:String ?= "David Price", casualName:String ?= "David", isMale: Boolean ?= true)
 
 GET     /Login/allErrorsLogin                                     controllers.Login.allErrorsLogin
 GET     /Login/allErrorsStorefront                                controllers.Login.allErrorsStorefront

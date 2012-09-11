@@ -98,7 +98,7 @@
           <br>
           <img src='@routes.Assets.at("images/modal-ipad.png")'/>
 
-          @tags.html.safeForm("id" ->"signup-form", "method" -> "POST", "action" -> "/subscribe") {
+          @tags.safeForm("id" ->"signup-form", "method" -> "POST", "action" -> "/subscribe") {
             <div>
               <label>Email:</label>
               <input class="input-xlarge" type="email" name="email" />

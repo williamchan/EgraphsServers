@@ -1,11 +1,10 @@
 @()(
-implicit session: play.mvc.Scope.Session,
-headerData: models.frontend.header.HeaderData,
+implicit headerData: models.frontend.header.HeaderData,
 footerData: models.frontend.footer.FooterData
+/* session: play.mvc.Scope.Session, */
 )
 @import views.frontend.Utils
 @import models.frontend.egraphs._
-@import views.frontend.Utils.cdnAsset
 
 @baseBody = {
 
@@ -13,8 +12,7 @@ footerData: models.frontend.footer.FooterData
   <div id="main" class="about-us statics">
     <div class="row-fluid">
       <div class="span12 masthead-static">
-
-        <img src='@cdnAsset("public/images/about-us.jpg")'/>
+        <img src='@routes.Assets.at("images/about-us.jpg")'/>
       </div>
     </div>
 
