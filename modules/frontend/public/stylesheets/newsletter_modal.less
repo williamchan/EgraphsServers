@@ -55,21 +55,33 @@
       font-size: 15px;
       font-weight: 400;
     }
-    a {
-      font-size: 14px;
-      line-height: .8em;
-      font-weight: normal;
-      color: @grayDark;
-      border-bottom: 1px dotted @grayDark;
+
+    div {
+      padding-top: 5px;
+
+      a {
+        font-size: 14px;
+        line-height: .8em;
+        font-weight: normal;
+        text-decoration: none;
+        color: @grayDark;
+        border-bottom: 1px dotted @grayDark;
+        padding-bottom: 1px;
+      }
+
+      a.modal-dismissal {
+        color: @orange;
+        text-decoration: none;
+        border-bottom: 1px dotted @orange;
+      }
     }
-    .modal-dismissal {
-      float: none;
-      right: 25px;
-      bottom: 40px;
-      position: absolute;
-      color: @orange;
-      text-decoration: none;
-      border-bottom: 1px dotted @orange;
+
+    #nothanks {
+      float: right;
+    }
+
+    #submit-email {
+      float: left;
     }
   }
 }
@@ -89,13 +101,6 @@
       margin-bottom: 0px;
     }
     .modal-body {
-      .modal-dismissal {
-          float: none;
-          position: relative;
-          left: 45%;
-          bottom: -80%;
-      }
-
       img {
         position: relative;
         display: none;
