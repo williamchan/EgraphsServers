@@ -66,6 +66,33 @@
           <button type="submit" id="editMessages-button" class="btn primary fade in">Edit Messages</button>
         </div>
       </form>
+
+      <form id="editMessages-form" method="POST" action='@postOrder' enctype="application/x-www-form-urlencoded">
+        @authenticityToken()
+        <div class="actions">
+        <h3>Refund (but not necessarily reject) this order? Be Careful.</h3>
+          <input name="orderId" type="hidden" value="@order.id">
+          <button type="submit" id="refund-button" class="btn primary fade in">Refund</button>
+        </div>
+      </form>
+      <form id="editMessages-form" method="POST" action='@postOrder' enctype="application/x-www-form-urlencoded">
+        @authenticityToken()
+        <div class="actions">
+          <h3>Refund this order? Be Careful.</h3>
+          <input name="orderId" type="hidden" value="@order.id">
+          <button type="submit" id="refund-button" class="btn primary fade in">Refund</button>
+        </div>
+      </form>
+      <form id="editMessages-form" method="POST" action='@postOrder' enctype="application/x-www-form-urlencoded">
+        @authenticityToken()
+        <div class="actions">
+          <h3>Refund this order? Be Careful.</h3>
+          <input name="orderId" type="hidden" value="@order.id">
+          <button type="submit" id="refund-button" class="btn primary fade in">Refund</button>
+        </div>
+      </form>
+      <!-- TODO unapprove to go back to pending status -->
+      <!-- TODO generate a png -->
     </div>
   }
 }
