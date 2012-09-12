@@ -51,6 +51,7 @@ case class EgraphPurchaseHandler(
   payment: Payment = AppConfig.instance[Payment],
   serverSessions: ServerSessionFactory = AppConfig.instance[ServerSessionFactory],
   isDemo: Boolean = false)
+  extends Logging
 {
 
   private val dateFormat = new SimpleDateFormat("MMMM dd, yyyy")
@@ -78,6 +79,7 @@ case class EgraphPurchaseHandler(
       (error) => error match {
         case stripeError: PurchaseFailedStripeError =>
           //Attempt Stripe charge. If a credit card-related error occurred, redirect to purchase screen.
+          play.Logger.error(stripeError.stripeException.getStackTraceString)
           return new Redirect(reverse(WebsiteControllers.getStorefrontCreditCardError(celebrity.urlSlug, product.urlSlug, stripeError.stripeException.getLocalizedMessage)).url)
         case _: PurchaseFailedInsufficientInventory =>
           //A redirect to the insufficient inventory page
