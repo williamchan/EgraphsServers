@@ -8,7 +8,7 @@ import utils.{TestConstants, TestData}
 import org.squeryl.PrimitiveTypeMode._
 import models._
 import controllers.WebsiteControllers
-import enums.{OrderReviewStatus, EgraphState, EnrollmentStatus, PublishedStatus}
+import enums._
 import play.libs.Codec
 import play.Play
 import services.{Utils, AppConfig}
@@ -17,6 +17,10 @@ import java.text.SimpleDateFormat
 import javax.imageio.ImageIO
 import controllers.website.GetAccountSettingsEndpoint
 import services.http.EgraphsSession
+import scala.Some
+import models.Administrator
+import models.InventoryBatch
+import models.Order
 
 /**
  * All scenarios supported by the API.
@@ -189,6 +193,7 @@ class Scenarios extends DeclaresScenarios {
           select (order)
       ).headOption.get
       firstOrder
+        .withPaymentStatus(PaymentStatus.Charged).save()
         .newEgraph
         .withAssets(TestConstants.signingAreaSignatureStr, Some(TestConstants.signingAreaMessageStr), Codec.decodeBASE64(TestConstants.voiceStr()))
         .save()
