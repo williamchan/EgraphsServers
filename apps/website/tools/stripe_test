@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+# Dead simple tool to verify if Stripe is up. Hits the API with a fake charge using our test key and
+# prints out the JSON response.
+#
+
+echo 'Charging a fake payment to Stripe...'
+
+curl https://api.stripe.com/v1/charges \
+   -u pvESi1GjhD9e8RFQQPfeH8mHZ2GIyqQV: \
+   -d amount=400 \
+   -d currency=usd \
+   -d "description=Charge for test@example.com" \
+   -d "card[number]=4242424242424242" \
+   -d "card[exp_month]=12" \
+   -d "card[exp_year]=2012" \
+   -d "card[cvc]=123"
