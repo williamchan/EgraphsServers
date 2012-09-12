@@ -75,7 +75,7 @@ object Email extends Controller {
     ))
   }
 
-  def mlb = Action {
+  def mlbStatic = Action {
     Redirect(routes.Assets.at("html/email_mlb_marketing_static.html"))
     //Ok(views.frontend.mlbmail())
   }

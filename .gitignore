@@ -3,7 +3,6 @@ logs
 out
 .out
 precompiled
-project
 target
 test-result
 tmp

@@ -33,7 +33,10 @@
 
 @headJs = {
   Egraphs.page.firstSlideInCarousel = @firstCarouselProductIndex;
-  Egraphs.page.productUrls = [@products.map(product => "\"" + product.carouselUrl + "\"").mkString(",")]
+  Egraphs.page.productUrls = [@{
+    val productUrls = products.map(product => play.api.templates.HtmlFormat.escape(product.carouselUrl).text)
+    Html(productUrls.mkString("\"", "\",\"", "\""))
+  }]
 }
 
 @photoSection = {
