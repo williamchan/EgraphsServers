@@ -147,15 +147,17 @@ trait PostCelebrityAdminEndpoint {
             celebrityId = celebrityId, celebrityEmail = celebrityEmail, celebrityPassword = celebrityPassword,
             publicName = publicName, publishedStatusString = publishedStatusString, bio = bio,
             casualName = casualName, organization = organization, roleDescription = roleDescription, twitterUsername = twitterUsername)
-
         } else {
           val savedCelebrity = celebrity.withPublishedStatus(publishedStatus).save()
+          
           // Celebrity must have been previously saved before saving with assets that live in blobstore
           if (profileImage.isDefined) savedCelebrity.saveWithProfilePhoto(profileImage.get)
 
           if (isCreate) {
             passwordValidationOrAccount.right.get.copy(celebrityId = Some(savedCelebrity.id)).save()
-            sendCelebrityWelcomeEmail(celebrity = savedCelebrity, celebrityEmail = celebrityEmail)
+           
+            sendCelebrityWelcomeEmail(celebrityName = savedCelebrity.publicName, 
+                                      celebrityEmail = celebrityEmail)
           }
           savedCelebrity.saveWithImageAssets(landingPageImageOption, logoImageImageOption)
 
@@ -207,29 +209,26 @@ trait PostCelebrityAdminEndpoint {
     }
   }
 
-  private def sendCelebrityWelcomeEmail(celebrity: Celebrity,
+  /**
+   * The celebrity welcome email includes their Egraphs username, as well as instructions
+   * on how to download the iPad app.  For it to be useful, the email should be viewed
+   * on the celebs iPad.
+   */
+  private def sendCelebrityWelcomeEmail(celebrityName: String,
                                         celebrityEmail: String) 
   {
     val email = new HtmlEmail()
-    
-    email.setFrom("noreply@egraphs.com", "Egraphs")
-    email.addTo(celebrityEmail, celebrity.publicName)
-    email.setSubject("Welcome to Egraphs")
 
     val html = views.frontend.html.celebrity_welcome_email(
-      celebrity = celebrity,
-      email = celebrityEmail
+      celebrityName = celebrityName,
+      celebrityEmail = celebrityEmail
     )
 
+    email.setFrom("noreply@egraphs.com", "Egraphs")
+    email.addTo(celebrityEmail, celebrityName)
+    email.setSubject("Welcome to Egraphs")
     email.setHtmlMsg(html.toString())
 
-    val text = views.frontend.html.celebrity_welcome_email_text(
-      celebrity = celebrity,
-      email = celebrityEmail
-    )
-
-    email.setTextMsg(text.toString())
-    
     mail.send(email)
   }
 }

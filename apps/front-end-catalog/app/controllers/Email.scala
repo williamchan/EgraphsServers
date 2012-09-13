@@ -90,8 +90,8 @@ object Email extends Controller {
     val publicName = "Rodney Strong"
     val email = "rstrong@fantastic.com"
     views.frontend.html.celebrity_welcome_email(
-      publicName = publicName,
-      email = email
+      celebrityName = publicName,
+      celebrityEmail = email
       )
   }
 }
