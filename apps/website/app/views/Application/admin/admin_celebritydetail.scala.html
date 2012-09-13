@@ -49,7 +49,7 @@
     <div class="span12 form-column">
       @for(presentCelebrity <- celebrity) {
         <form method="POST" action='@postSendCelebrityWelcomeEmailAdmin(presentCelebrity.id)'>
-            <input class="btn primary fade in" type="submit" value="Send Welcome Email"/>
+          <input class="btn primary fade in" type="submit" value="Send Welcome Email"/>
         </form>
       }
       <form id="admin-celebrity-detail" method="POST" action='@postCelebrity' enctype="multipart/form-data">
@@ -60,7 +60,6 @@
           <legend>Account Details</legend>
           @formField(id="celebrityEmail", label="E-mail address", inputType="text", editable=isCreate, width="span4", fields=fields)
           @formField(id="celebrityPassword", label="Password", inputType="text", editable=isCreate, width="span4", fields=fields)
-        </fieldset>
         </fieldset>
         <fieldset>
           <legend>Celebrity Details</legend>
