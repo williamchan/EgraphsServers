@@ -1,12 +1,15 @@
 package services.mail
 
-import play.Play.configuration
 import com.google.inject.{Inject, Provider}
 import services.Utils
 import collection.JavaConversions._
 import services.http.PlayConfig
 import java.util.Properties
 import play.libs.WS
+import com.google.gson.{Gson, JsonElement}
+import play.mvc.results._
+import org.specs2.internal.scalaz.concurrent.Promise
+import play.libs.WS.{HttpResponse, WSRequest}
 
 /**
  * Trait that defines bulk mail providers (e.g. MailChimp, Constant Contact).
@@ -24,13 +27,23 @@ trait BulkMail {
    *   the value is probably located in application.conf with the key `mail.bulk.newsletterid`.
    * @param email e-mail address of the individual subscribing to the mailing list.
    */
-  def subscribeNew(listId: String, email: String)
+  def subscribeNewAsync(listId: String, email: String)
 
   /**
    * Throws exceptions if this implementation is not configured correctly.
    *
    * @return returns itself assuming the check passed.
    */
+
+
+  /**
+   * List subscribers of the given list
+   * TODO(sbilstein): refactor this when moved to play2.0 to provide a typesafe list using
+   * the new JSON API.
+   * @param listId
+   */
+  def listMembers(listId: String) : String
+
   def checkConfiguration() : BulkMail
 
   /**
@@ -51,8 +64,12 @@ class BulkMailProvider @Inject()(@PlayConfig playConfig: Properties, utils: Util
 {
   def get() : BulkMail = {
     //Inspect properties and return the proper BulkMail
-    val provider = if (configuration.getProperty("mail.bulk") == "mailchimp") {
-      MailChimpBulkMail
+    val provider = if (playConfig.getProperty("mail.bulk") == "mailchimp") {
+      new MailChimpBulkMail(
+        apikey = playConfig.getProperty("mail.bulk.apikey"),
+        datacenter = playConfig.getProperty("mail.bulk.datacenter"),
+        newsletterListId = playConfig.getProperty("mail.bulk.newsletterid")
+      )
     } else {
       new MockBulkMail(utils)
     }
@@ -67,12 +84,16 @@ class BulkMailProvider @Inject()(@PlayConfig playConfig: Properties, utils: Util
  */
 private[mail] case class MockBulkMail (utils: Utils) extends BulkMail
 {
-  override def subscribeNew(listId: String, email: String) = {
+  override def subscribeNewAsync(listId: String, email: String) = {
     play.Logger.info("Subscribed " + email + " to email list: " + listId + "\n")
   }
   override def checkConfiguration() : BulkMail = { this }
 
   override def newsletterListId = "NotARealListId"
+
+  override def listMembers(listId: String) : String = {
+    new Gson().toJson(List("derp"))
+  }
 }
 
 /**
@@ -86,9 +107,20 @@ private[mail] case class MockBulkMail (utils: Utils) extends BulkMail
  */
 private[mail] case class MailChimpBulkMail (apikey: String, datacenter: String, newsletterListId: String) extends BulkMail
 {
-  override def subscribeNew(listId: String, email: String) = {
-    val url = "https://" + datacenter + ".api.mailchimp.com/1.3/"
-    val responsePromise = WS.url(url).params(
+  private def apiUrl = "https://" + datacenter + ".api.mailchimp.com/1.3/"
+
+
+  override def subscribeNewAsync(listId: String, email: String) = {
+    subscribe(listId, email).getAsync()
+  }
+
+
+  def subscribeNew(listId: String, email: String) : HttpResponse= {
+    subscribe(listId, email).get()
+  }
+
+  private def subscribe(listId: String, email: String) : WSRequest = {
+    WS.url(apiUrl).params(
       Map(
         "output" -> "json",
         "apikey" -> apikey,
@@ -97,8 +129,9 @@ private[mail] case class MailChimpBulkMail (apikey: String, datacenter: String, 
         "email_address" -> email,
         "double_optin" -> "false"
       )
-    ).getAsync()
+    )
   }
+
 
   override def checkConfiguration() : BulkMail = {
     require(
@@ -115,14 +148,14 @@ private[mail] case class MailChimpBulkMail (apikey: String, datacenter: String, 
     )
     this
   }
-}
 
-/**
- * Companion object for configuring MailChimpBulkMail
- */
-private[mail] object MailChimpBulkMail
-  extends MailChimpBulkMail(
-    configuration.getProperty("mail.bulk.apikey"),
-    configuration.getProperty("mail.bulk.datacenter"),
-    configuration.getProperty("mail.bulk.newsletterid")
-  )
+  override def listMembers(listId: String) : String = {
+    WS.url(apiUrl).params(Map(
+      "output" -> "json",
+      "apikey" -> apikey,
+      "method" -> "listMembers",
+      "id"     -> listId
+    )).get().getString
+
+  }
+}
