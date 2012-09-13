@@ -40,6 +40,12 @@ define(["bootstrap/bootstrap-modal"], function() {
             e.preventDefault();
         });
 
+        $("#email-link").click(function(e) {
+          signupModal.modal('toggle');
+          $('html,body').animate({scrollTop: $($(this).attr('href')).offset().top},'slow');
+          e.preventDefault();
+        });
+
         $("#signup-button").click(function () {
           $.ajax({
             url: '/subscribe',

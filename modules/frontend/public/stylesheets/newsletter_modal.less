@@ -1,6 +1,7 @@
 .modal.signup {
   background-color: @white;
   width: 610px;
+  margin: -250px 0 0 -310px;
   padding: 15px 0px 0px 40px;
   color: @grayDark;
 
@@ -89,9 +90,11 @@
 
 @media (max-width: 767px) {
 
-  .modal.signup {
-	  width: inherit;
-	  left: 55%;
+  #emailSignupForm {
+	  width: 70%;
+	  margin: -200px -35% 0 -35%;
+	  top: 50%;
+
 	  padding-left: 0px;
     br {
       display: none;
@@ -122,9 +125,19 @@
 
 
 @media (max-width: 480px) {
-    .modal.fade.in.signup {
-  	  top: 0%;
-      left: 10px;
+    #emailSignupForm  {
+  	  top: 10%;
+      left: 5%;
+      width: 90%;
+      margin: 0% 0% 0 0%;
+
+      h2 {
+        font-size: 12px;
+      }
+
+      p {
+        font-size: 10px;
+      }
   	 }
 }
 
