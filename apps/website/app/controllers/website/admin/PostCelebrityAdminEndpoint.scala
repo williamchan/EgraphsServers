@@ -154,16 +154,8 @@ trait PostCelebrityAdminEndpoint {
           if (profileImage.isDefined) savedCelebrity.saveWithProfilePhoto(profileImage.get)
 
           if (isCreate) {
-
             passwordValidationOrAccount.right.get.copy(celebrityId = Some(savedCelebrity.id)).save()
-
-            // Send the order email
-            val email = new HtmlEmail()
-            email.setFrom("noreply@egraphs.com", "Egraphs")
-            email.addTo(celebrityEmail, publicName)
-            email.setSubject("Egraphs Celebrity Account Created")
-            email.setMsg(views.Application.email.html.celebrity_created_email(celebrity = savedCelebrity, email = celebrityEmail).toString().trim())
-            transactionalMail.send(email)
+            sendCelebrityWelcomeEmail(celebrity = savedCelebrity, celebrityEmail = celebrityEmail)
           }
           savedCelebrity.saveWithImageAssets(landingPageImageOption, logoImageImageOption)
 
@@ -213,5 +205,31 @@ trait PostCelebrityAdminEndpoint {
     } else {
       WebsiteControllers.redirectWithValidationErrors(GetCelebrityAdminEndpoint.url(celebrityId = celebrityId))
     }
+  }
+
+  private def sendCelebrityWelcomeEmail(celebrity: Celebrity,
+                                        celebrityEmail: String) 
+  {
+    val email = new HtmlEmail()
+    
+    email.setFrom("noreply@egraphs.com", "Egraphs")
+    email.addTo(celebrityEmail, celebrity.publicName)
+    email.setSubject("Welcome to Egraphs")
+
+    val html = views.frontend.html.celebrity_welcome_email(
+      celebrity = celebrity,
+      email = celebrityEmail
+    )
+
+    email.setHtmlMsg(html.toString())
+
+    val text = views.frontend.html.celebrity_welcome_email_text(
+      celebrity = celebrity,
+      email = celebrityEmail
+    )
+
+    email.setTextMsg(text.toString())
+    
+    mail.send(email)
   }
 }

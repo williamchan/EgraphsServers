@@ -85,4 +85,13 @@ object Email extends Controller {
   def mlb = {
     views.frontend.html.mlbmail()
   }
+
+  def celebrity_welcome_email = {
+    val publicName = "Rodney Strong"
+    val email = "rstrong@fantastic.com"
+    views.frontend.html.celebrity_welcome_email(
+      publicName = publicName,
+      email = email
+      )
+  }
 }
