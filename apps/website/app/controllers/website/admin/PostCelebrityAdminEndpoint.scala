@@ -229,6 +229,6 @@ trait PostCelebrityAdminEndpoint {
     email.setSubject("Welcome to Egraphs")
     email.setHtmlMsg(html.toString())
 
-    mail.send(email)
+    transactionalMail.send(email)
   }
 }

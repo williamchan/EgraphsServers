@@ -20,6 +20,10 @@
 </script>
 }
 
+@postSendCelebrityWelcomeEmailAdmin(celebrityId: Long) = @{
+  lookupUrl("WebsiteControllers.postSendCelebrityWelcomeEmailAdmin", Map("celebrityId" -> celebrityId.asInstanceOf[AnyRef]))
+}
+
 @postCelebrity = @{
   lookupUrl("WebsiteControllers.postCelebrityAdmin")
 }
@@ -43,6 +47,11 @@
   </h1>
   <div class="form row">
     <div class="span12 form-column">
+      @for(presentCelebrity <- celebrity) {
+        <form method="POST" action='@postSendCelebrityWelcomeEmailAdmin(presentCelebrity.id)'>
+            <input class="btn primary fade in" type="submit" value="Send Welcome Email"/>
+        </form>
+      }
       <form id="admin-celebrity-detail" method="POST" action='@postCelebrity' enctype="multipart/form-data">
         <fieldset>
           @authenticityToken()
@@ -51,6 +60,7 @@
           <legend>Account Details</legend>
           @formField(id="celebrityEmail", label="E-mail address", inputType="text", editable=isCreate, width="span4", fields=fields)
           @formField(id="celebrityPassword", label="Password", inputType="text", editable=isCreate, width="span4", fields=fields)
+        </fieldset>
         </fieldset>
         <fieldset>
           <legend>Celebrity Details</legend>
@@ -65,6 +75,16 @@
           @formField(id="roleDescription", label="Role Description", inputType="text", width="span4", help=Some(roleHelp), fields=fields)
           @roleHelp = { e.g. "Pitcher, Tampa Bay Rays" }
 
+          <div class="clearfix">
+            <label for="bio">Short Bio</label>
+            <div class="input">
+              <textarea class="xlarge" id="bio" name="bio" rows="3">@fields("bio")</textarea>
+            </div>
+          </div>
+
+          @formField(id="twitterUsername", label="Twitter Username", inputType="text", width="span4", fields=fields)
+
+        </fieldset>
           <div class="clearfix">
             <label for="bio">Short Bio</label>
             <div class="input">
