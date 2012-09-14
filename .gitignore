@@ -6,6 +6,10 @@ target
 test-result
 tmp
 
+.classpath
+.project
+.settings/
+
 *.class
 *.DS_Store
 *.ipr
