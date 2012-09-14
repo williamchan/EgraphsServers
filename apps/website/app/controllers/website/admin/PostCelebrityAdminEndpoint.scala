@@ -155,10 +155,9 @@ trait PostCelebrityAdminEndpoint {
 
           if (isCreate) {
             passwordValidationOrAccount.right.get.copy(celebrityId = Some(savedCelebrity.id)).save()
-           
-            sendCelebrityWelcomeEmail(celebrityName = savedCelebrity.publicName, 
-                                      celebrityEmail = celebrityEmail)
+            savedCelebrity.sendWelcomeEmail()
           }
+          
           savedCelebrity.saveWithImageAssets(landingPageImageOption, logoImageImageOption)
 
           new Redirect(GetCelebrityAdminEndpoint.url(celebrityId = savedCelebrity.id).url + "?action=preview")
@@ -207,28 +206,5 @@ trait PostCelebrityAdminEndpoint {
     } else {
       WebsiteControllers.redirectWithValidationErrors(GetCelebrityAdminEndpoint.url(celebrityId = celebrityId))
     }
-  }
-
-  /**
-   * The celebrity welcome email includes their Egraphs username, as well as instructions
-   * on how to download the iPad app.  For it to be useful, the email should be viewed
-   * on the celebs iPad.
-   */
-  private def sendCelebrityWelcomeEmail(celebrityName: String,
-                                        celebrityEmail: String) 
-  {
-    val email = new HtmlEmail()
-
-    val html = views.frontend.html.celebrity_welcome_email(
-      celebrityName = celebrityName,
-      celebrityEmail = celebrityEmail
-    )
-
-    email.setFrom("noreply@egraphs.com", "Egraphs")
-    email.addTo(celebrityEmail, celebrityName)
-    email.setSubject("Welcome to Egraphs")
-    email.setHtmlMsg(html.toString())
-
-    transactionalMail.send(email)
   }
 }

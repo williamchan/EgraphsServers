@@ -26,26 +26,11 @@ trait PostSendCelebrityWelcomeEmailAdminEndpoint {
   def postSendCelebrityWelcomeEmailAdmin(celebrityId: Long) = postController() {
     adminFilters.requireAdministratorLogin { admin =>      
       val maybeSuccessfulRedirect = for (
-        celebrity <- celebrityStore.findById(celebrityId);
-        account <- accountStore.findByCelebrityId(celebrityId)
+        celebrity <- celebrityStore.findById(celebrityId)
       ) yield {
-        val email = new HtmlEmail()
-
-        val html = views.frontend.html.celebrity_welcome_email(
-          celebrityName = celebrity.publicName,
-          celebrityEmail = account.email
-        )
-
-        email.setFrom("noreply@egraphs.com", "Egraphs")
-        email.addTo(account.email, celebrity.publicName)
-        email.setSubject("Welcome to Egraphs")
-        email.setHtmlMsg(html.toString())
-
-        transactionalMail.send(email)
-  
+        celebrity.sendWelcomeEmail()
         WebsiteControllers.redirectWithValidationErrors(GetCelebrityAdminEndpoint.url(celebrityId = celebrityId))
       }
-
       maybeSuccessfulRedirect.getOrElse(NotFound("Celebrity with Id " + celebrityId + " not NotFound"))
     }
   }
