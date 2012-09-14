@@ -45,13 +45,15 @@
   <h1>
     @{if(isCreate) "Create" else "Update"} Celebrity
   </h1>
+  <div>
+  @for(presentCelebrity <- celebrity) {
+    <form method="POST" action='@postSendCelebrityWelcomeEmailAdmin(presentCelebrity.id)'> 
+      <input class="btn primary fade in" type="submit" value="Send Welcome Email"/>
+    </form>
+  }
+  </div>
   <div class="form row">
     <div class="span12 form-column">
-      @for(presentCelebrity <- celebrity) {
-        <form method="POST" action='@postSendCelebrityWelcomeEmailAdmin(presentCelebrity.id)'>
-          <input class="btn primary fade in" type="submit" value="Send Welcome Email"/>
-        </form>
-      }
       <form id="admin-celebrity-detail" method="POST" action='@postCelebrity' enctype="multipart/form-data">
         <fieldset>
           @authenticityToken()
