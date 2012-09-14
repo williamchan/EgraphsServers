@@ -42,7 +42,7 @@ private[controllers] trait PostBulkEmailController extends ImplicitHeaderAndFoot
           )
         )),
       validForm => {
-        bulkMail.subscribeNew(validForm.listId, validForm.email)
+        bulkMail.subscribeNewAsync(validForm.listId, validForm.email)
         new RenderJson(Serializer.SJSON.toJSON(Map("subscribed" -> true)))
       }
     )

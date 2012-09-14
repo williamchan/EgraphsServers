@@ -3,7 +3,7 @@ package services.mail
 import utils.EgraphsUnitTest
 import services.{AppConfig, Utils}
 
-class MailTests extends EgraphsUnitTest
+class TransactionalMailTests extends EgraphsUnitTest
 {
   val appUtils = AppConfig.instance[Utils]
 
