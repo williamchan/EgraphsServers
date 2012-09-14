@@ -1,6 +1,6 @@
 package controllers.website.nonproduction
 
-import play.mvc._
+import play.api.mvc._
 import services.AppConfig
 import services.http.ControllerMethod
 import services.logging.Logging
