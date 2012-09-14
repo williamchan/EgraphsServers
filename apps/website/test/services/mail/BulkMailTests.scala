@@ -5,13 +5,6 @@ import utils.EgraphsUnitTest
 import services.{Utils, AppConfig}
 import play.libs.WS
 
-/**
- * Created with IntelliJ IDEA.
- * User: sbilstein
- * Date: 9/13/12
- * Time: 10:23 AM
- * To change this template use File | Settings | File Templates.
- */
 class BulkMailTests extends EgraphsUnitTest {
 
   val appUtils = AppConfig.instance[Utils]
@@ -43,10 +36,10 @@ class BulkMailTests extends EgraphsUnitTest {
   private def MailchimpProvider : MailChimpBulkMail = {
 
     val playConfig = appUtils.properties(
-    "mail.bulk" -> "mailchimp",
-    "mail.bulk.apikey" -> "2719c3066cc820026cc9ef0f428f2cfa-us5",
-    "mail.bulk.datacenter" -> "us5",
-    "mail.bulk.newsletterid" -> "cfdd92a4f5"
+      "mail.bulk" -> "mailchimp",
+      "mail.bulk.apikey" -> "2719c3066cc820026cc9ef0f428f2cfa-us5",
+      "mail.bulk.datacenter" -> "us5",
+      "mail.bulk.newsletterid" -> "cfdd92a4f5"
     )
 
     val mail = new BulkMailProvider(playConfig, null).get()

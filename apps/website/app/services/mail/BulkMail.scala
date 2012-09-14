@@ -6,9 +6,7 @@ import collection.JavaConversions._
 import services.http.PlayConfig
 import java.util.Properties
 import play.libs.WS
-import com.google.gson.{Gson, JsonElement}
-import play.mvc.results._
-import org.specs2.internal.scalaz.concurrent.Promise
+import com.google.gson.Gson
 import play.libs.WS.{HttpResponse, WSRequest}
 
 /**
