@@ -70,6 +70,7 @@ object ApplicationBuild extends Build {
   //            org.scalatest % *
       //"play" % "cloudbees" % "0.2.2",
       //play" % "mockito" % "0.1",
+      "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
       //"com.googlecode.soundlibs" % "tritonus-share" % "0.3.7-1", // from our unmanaged dependency 0.3.6
       "xml-apis" % "xml-apis-ext" % "1.3.04",
       "xml-apis" % "xml-apis" % "1.3.04", // we might be getting pretty stale here
