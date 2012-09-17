@@ -10,7 +10,7 @@ import play.data.validation.Validation
 import controllers.website.EgraphPurchaseHandler
 import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters}
 import services.mail.TransactionalMail
-import play.mvc.Controller
+import play.api.mvc.Controller
 
 trait PostBuyDemoProductEndpoint { this: Controller =>
 

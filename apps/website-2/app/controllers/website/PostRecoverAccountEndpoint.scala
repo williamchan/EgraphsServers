@@ -1,6 +1,6 @@
 package controllers.website
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import services.db.{DBSession, TransactionSerializable}
 import models.{Customer, Account, CustomerStore, AccountStore}
 import services.mail.TransactionalMail
@@ -31,7 +31,7 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
 
         flash.put("email", request.params.getOption("email").getOrElse(""))
 
-        views.frontend.html.simple_confirmation(header = "Success", body ="Instructions for recovering your account have been sent to your email address.")
+        views.html.frontend.simple_confirmation(header = "Success", body ="Instructions for recovering your account have been sent to your email address.")
     }
   }
 
@@ -45,7 +45,7 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
     email.addTo(account.email)
     email.setSubject("Egraphs Password Recovery")
     email.setMsg(
-      views.Application.email.html.reset_password_email(
+      views.html.Application.email.reset_password_email(
         customerName = customer.name,
         email = account.email,
         resetPasswordUrl = GetResetPasswordEndpoint.absoluteUrl(account.email, account.resetPasswordKey.get)

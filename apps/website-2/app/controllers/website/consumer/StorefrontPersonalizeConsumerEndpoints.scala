@@ -1,7 +1,7 @@
 package controllers.website.consumer
 
 import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
-import play.mvc.Controller
+import play.api.mvc.Controller
 import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters, ControllerMethod}
 import services.http.forms.purchase.{PurchaseFormChecks, FormReaders, PersonalizeForm, PurchaseFormFactory}
 import services.mvc.FormConversions.personalizeFormToView
@@ -87,7 +87,7 @@ trait StorefrontPersonalizeConsumerEndpoints
 
         implicit def crumbs = breadcrumbData.crumbsForRequest(celeb.id, celebrityUrlSlug, Some(productUrlSlug))
 
-        views.frontend.html.celebrity_storefront_personalize(
+        views.html.frontend.celebrity_storefront_personalize(
           form=formView,
           guaranteedDelivery=nextInventoryBatch.getExpectedDate,
           writtenMessageCharacterLimit=PurchaseFormChecks.maxWrittenMessageChars,

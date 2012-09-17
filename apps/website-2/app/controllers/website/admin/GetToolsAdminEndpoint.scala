@@ -2,7 +2,7 @@ package controllers.website.admin
 
 import models._
 import models.enums._
-import play.mvc.Controller
+import play.api.mvc.Controller
 import services.AppConfig
 import services.blobs.Blobs
 import services.http.{AdminRequestFilters, ControllerMethod}
@@ -35,7 +35,7 @@ private[controllers] trait GetToolsAdminEndpoint {
 
       val actionOption = Option(params.get("action"))
       actionOption match {
-        case None => views.Application.admin.html.admin_tools()
+        case None => views.html.Application.admin.admin_tools()
         case Some(action) => action match {
           //
           // Write your one-time script here.

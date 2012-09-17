@@ -1,6 +1,6 @@
 package controllers.website
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import models.AccountStore
 import services.http.{SafePlayParams, AccountRequestFilters, POSTControllerMethod}
 import services.http.forms.{AccountPasswordResetFormFactory, Form}
@@ -32,7 +32,7 @@ private[controllers] trait PostResetPasswordEndpoint extends ImplicitHeaderAndFo
             Forbidden("The reset url you are using is incorrect or expired.")
           }
           validationOrAccount.right.get.emailVerify().save()
-          views.frontend.html.simple_confirmation(
+          views.html.frontend.simple_confirmation(
             header = "Password Reset",
             body = "You have successfully changed your password!"
           )

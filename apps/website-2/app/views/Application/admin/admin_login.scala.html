@@ -1,11 +1,11 @@
 @(errorFields: Option[List[String]]
-)(implicit session: play.mvc.Scope.Session)
+)(/* implicit session: play.mvc.Scope.Session */)
 
 @import controllers.WebsiteControllers
 @import services.Utils.lookupUrl
-@import views.Application.tags.html.authenticityToken
-@import views.Application.tags.html.errorMessage
-@import views.Application.html.content_base
+@import views.html.Application.tags.authenticityToken
+@import views.html.Application.tags.errorMessage
+@import views.html.Application.content_base
 
 @content_base(title="Admin - Login", body=body, head=head)
 
@@ -14,7 +14,7 @@ lookupUrl("WebsiteControllers.postLoginAdmin")
 }
 
 @head = {
-<script src='@asset("public/twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
+<script src='@routes.Assets.at("twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
 }
 
 @body = {

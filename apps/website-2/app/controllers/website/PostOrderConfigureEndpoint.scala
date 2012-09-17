@@ -3,7 +3,7 @@ package controllers.website
 import services.http.{CustomerRequestFilters, POSTControllerMethod}
 import models._
 import enums.PrivacyStatus
-import play.mvc.Controller
+import play.api.mvc.Controller
 import play.mvc.results.{RenderJson, Result}
 import services.http.SafePlayParams.Conversions._
 import sjson.json.Serializer

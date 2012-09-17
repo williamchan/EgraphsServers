@@ -1,6 +1,6 @@
 package controllers.website
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import services.http.{AccountRequestFilters, ControllerMethod}
 import services.Utils
 import models.{Account, AccountStore}
@@ -31,7 +31,7 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
         .asInstanceOf[List[Option[FormError]]].filter(e => e.isDefined).map(e => e.get.description)
 
         if (account.verifyResetPasswordKey(form.secretKey.value.getOrElse("")) == true) {
-          views.frontend.html.account_password_reset(form=form, displayableErrors=displayableErrors)
+          views.html.frontend.account_password_reset(form=form, displayableErrors=displayableErrors)
         } else {
          Forbidden("The password reset URL you used is either out of date or invalid.")
       }
@@ -42,7 +42,7 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
     accountRequestFilters.requireValidAccountEmail(request.params.getOption("email").getOrElse("Nothing")) { account =>
       if(account.verifyResetPasswordKey(request.params.getOption("secretKey").getOrElse(""))){
         account.emailVerify().save()
-        views.frontend.html.simple_confirmation("Account Verified", "Your account has been successfully verified.")
+        views.html.frontend.simple_confirmation("Account Verified", "Your account has been successfully verified.")
       } else {
         Forbidden("The password reset URL you used is either out of date or invalid.")
       }

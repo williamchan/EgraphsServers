@@ -1,6 +1,6 @@
 package services.http
 
-import play.mvc.Http.Request
+import play.api.mvc.{Action, AnyContent, Request}
 import services.logging.LoggingContext
 import com.google.inject.Inject
 import services.db.{TransactionIsolation, TransactionSerializable, DBSession}
@@ -37,7 +37,7 @@ class ControllerMethod @Inject()(logging: LoggingContext, db: DBSession, httpsFi
   def apply[A](openDatabase:Boolean=true,
                dbIsolation: TransactionIsolation = TransactionSerializable)
               (operation: => A)
-              (implicit request: Request): Any =
+              (implicit request:  Request[AnyContent]): Action[_] =
   {
     val redirectOrResult = httpsFilter {
       logging.withContext(request) {

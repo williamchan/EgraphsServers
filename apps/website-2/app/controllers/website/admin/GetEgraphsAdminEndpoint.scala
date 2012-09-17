@@ -1,6 +1,6 @@
 package controllers.website.admin
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import models._
 import vbg.VBGVerifySample
 import xyzmo.XyzmoVerifyUser
@@ -32,7 +32,7 @@ private[controllers] trait GetEgraphsAdminEndpoint {
       }
       val pagedQuery: (Iterable[(Egraph, Option[VBGVerifySample], Option[XyzmoVerifyUser])], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
       WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetEgraphsAdminEndpoint.url(), filter = Some(filter))
-      views.Application.admin.html.admin_egraphs(egraphAndResults = pagedQuery._1)
+      views.html.Application.admin.admin_egraphs(egraphAndResults = pagedQuery._1)
     }
   }
 }

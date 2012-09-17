@@ -1,6 +1,7 @@
 package controllers.website.admin
 
-import play.mvc.Controller
+import play.api.mvc.Action
+import play.api.mvc.Controller
 import services.http.{AdminRequestFilters, ControllerMethod}
 import models.{AccountStore, CelebrityStore}
 import play.mvc.results.NotFound
@@ -18,7 +19,7 @@ private[controllers] trait GetCelebrityAdminEndpoint {
   protected def accountStore: AccountStore
   protected def celebrityStore: CelebrityStore
 
-  def getCelebrityAdmin(celebrityId: Long, action: Option[String] = None) = controllerMethod() {
+  def getCelebrityAdmin(celebrityId: Long, action: Option[String] = None) = Action { controllerMethod() {
     adminFilters.requireAdministratorLogin { admin =>
 
       (accountStore.findByCelebrityId(celebrityId), celebrityStore.findById(celebrityId)) match {
@@ -46,12 +47,12 @@ private[controllers] trait GetCelebrityAdminEndpoint {
         case _ => new NotFound("No such celebrity")
       }
     }
-  }
+  }}
 }
 
 object GetCelebrityAdminEndpoint {
 
-  def url(celebrityId: Long) = {
-    WebsiteControllers.reverse(WebsiteControllers.getCelebrityAdmin(celebrityId))
+  def url(celebrityId: Long, action: Option[String] = None) = {
+    Redirect(controllers.routes.WebsiteControllers.getCelebrityAdmin(celebrityId, action))
   }
 }

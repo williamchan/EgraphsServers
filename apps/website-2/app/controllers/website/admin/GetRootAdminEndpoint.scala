@@ -1,6 +1,6 @@
 package controllers.website.admin
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import play.mvc.results.Redirect
 import services.http.{AdminRequestFilters, ControllerMethod}
 import controllers.WebsiteControllers

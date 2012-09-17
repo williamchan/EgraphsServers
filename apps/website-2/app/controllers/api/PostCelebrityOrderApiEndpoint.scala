@@ -1,6 +1,6 @@
 package controllers.api
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import sjson.json.Serializer
 import services.http.{ControllerMethod, OrderRequestFilters, CelebrityAccountRequestFilters}
 import services.db.DBSession

@@ -1,6 +1,6 @@
 package controllers.website.admin
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import services.http.{AdminRequestFilters, ControllerMethod}
 import models.{Egraph, OrderStore}
 import org.apache.commons.lang.StringEscapeUtils
@@ -29,7 +29,7 @@ private[controllers] trait GetOrderAdminEndpoint { this: Controller =>
             }
           }
 
-          views.Application.admin.html.admin_order(
+          views.html.Application.admin.admin_order(
             order = order,
             product = product,
             buyer = buyer,

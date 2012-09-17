@@ -1,6 +1,6 @@
 package controllers.website
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import services.http.{CustomerRequestFilters, ControllerMethod}
 import models.frontend.forms.{FormError, Field}
 import services.http.forms.AccountSettingsForm.Fields
@@ -31,7 +31,7 @@ private[controllers] trait GetAccountSettingsEndpoint extends ImplicitHeaderAndF
         form.galleryVisibility.error, form.notice_stars.error) ::: form.generalErrors.toList)
         .asInstanceOf[List[Option[FormError]]].filter(e => e.isDefined).map(e => e.get.description)
 
-      views.frontend.html.account_settings(form=form, displayableErrors)
+      views.html.frontend.account_settings(form=form, displayableErrors)
     }
   }
 

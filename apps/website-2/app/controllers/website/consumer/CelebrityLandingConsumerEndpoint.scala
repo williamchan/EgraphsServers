@@ -35,7 +35,7 @@ object CelebrityLandingConsumerEndpoint {
       .getSaved(AccessPolicy.Public)
       .url
     val publicName = celebrity.publicName
-    views.frontend.html.celebrity_landing(
+    views.html.frontend.celebrity_landing(
       getStartedUrl = WebsiteControllers.reverse(WebsiteControllers.getStorefrontChoosePhotoTiled(celebrity.urlSlug)).url,
       celebrityPublicName = publicName,
       celebrityCasualName = celebrity.casualName.getOrElse(publicName),

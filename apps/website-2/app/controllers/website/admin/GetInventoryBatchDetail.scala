@@ -32,7 +32,7 @@ object GetInventoryBatchDetail {
     }
 
     // Render the page
-    views.Application.admin.html.admin_inventorybatchdetail(
+    views.html.Application.admin.admin_inventorybatchdetail(
       isCreate = isCreate,
       celebrity = celebrity,
       errorFields = errorFields,

@@ -1,18 +1,18 @@
 @(isCreate: Boolean, celebrity: models.Celebrity, errorFields: Option[List[String]], fields: (String) => String, product: Option[models.Product] = None, isTestMode: Boolean = false
-)(implicit session: play.mvc.Scope.Session)
+)(/* implicit session: play.mvc.Scope.Session */)
 
 @import controllers.WebsiteControllers
 @import services.Utils.lookupUrl
-@import views.Application.tags.html.authenticityToken
-@import views.Application.tags.html.errorMessage
-@import views.Application.html.content_base
-@import views.Application.tags.html.formField
+@import views.html.Application.tags.authenticityToken
+@import views.html.Application.tags.errorMessage
+@import views.html.Application.content_base
+@import views.html.Application.tags.formField
 
 @content_base(title="Admin - Product Details", body=body, head=head)
 
 @head = {
-<script src='@asset("public/twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
-<script src='@asset("public/twitter-bootstrap-1.4.0/js/bootstrap-buttons.js")' type="text/javascript"></script>
+<script src='@routes.Assets.at("twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
+<script src='@routes.Assets.at("twitter-bootstrap-1.4.0/js/bootstrap-buttons.js")' type="text/javascript"></script>
 <!--TODO Rename JS file?-->
 <script type="text/javascript">
     require(["admin-celebritydetail-page"], function(pageScripts) {
@@ -90,8 +90,9 @@
         </fieldset>
         <fieldset>
           <legend>egraph presentation: media</legend>
+          
           @formField(id="productImage", label="Product Photo", inputType="file", width="span8", help=Some(photoHelp), fields=fields)
-          @photoHelp = { Must be JPG or PNG with minimum dimensions of 1024x1024. Will be cropped. }
+          @photoHelp = "Must be JPG or PNG with minimum dimensions of 1024x1024. Will be cropped."
 
           @formField(id="signingOriginX", label="Signing Origin X", inputType="text", width="span4", fields=fields)
           @formField(id="signingOriginY", label="Signing Origin Y", inputType="text", width="span4", fields=fields)

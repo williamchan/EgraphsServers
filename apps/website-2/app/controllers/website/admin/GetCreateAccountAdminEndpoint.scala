@@ -1,6 +1,6 @@
 package controllers.website.admin
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import services.http.{AdminRequestFilters, ControllerMethod}
 import models.{AccountStore, CelebrityStore}
 import controllers.WebsiteControllers
@@ -23,7 +23,7 @@ private[controllers] trait GetCreateAccountAdminEndpoint {
             Option(flash.get(paramName)).getOrElse("")
         }
       }
-      views.Application.admin.html.admin_accountdetail(isCreate = true, errorFields = errorFields, fields = fieldDefaults)
+      views.html.Application.admin.admin_accountdetail(isCreate = true, errorFields = errorFields, fields = fieldDefaults)
     }
   }
 }

@@ -3,7 +3,7 @@ package controllers.website
 import controllers.WebsiteControllers
 import java.util.Properties
 import models.{Account, Customer, CustomerStore, AccountStore}
-import play.mvc.Controller
+import play.api.mvc.Controller
 import play.mvc.results.Redirect
 import services.db.{TransactionSerializable, DBSession}
 import services.http.ControllerMethod

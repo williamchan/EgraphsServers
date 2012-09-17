@@ -1,10 +1,11 @@
 package controllers.website.admin
 
-import play.mvc.Controller
-import services.http.{AdminRequestFilters, ControllerMethod}
-import play.mvc.Router.ActionDefinition
 import models.AccountStore
-import controllers.WebsiteControllers
+import play.api.mvc.Action
+import play.api.mvc.Controller
+import play.api.mvc.Result
+import services.http.AdminRequestFilters
+import services.http.ControllerMethod
 
 private[controllers] trait GetAccountsAdminEndpoint {
   this: Controller =>
@@ -13,17 +14,20 @@ private[controllers] trait GetAccountsAdminEndpoint {
   protected def accountStore: AccountStore
   protected def controllerMethod: ControllerMethod
 
-  def getAccountsAdmin(email: String = "") = controllerMethod() {
-    adminFilters.requireAdministratorLogin { admin =>
-      val account = if (!email.isEmpty) accountStore.findByEmail(email) else None
-      views.Application.admin.html.admin_accounts(account = account)
+  def getAccountsAdmin(email: String = "") = Action { request =>
+    controllerMethod() {
+      adminFilters.requireAdministratorLogin { admin =>
+        val account = if (!email.isEmpty) accountStore.findByEmail(email) else None
+        Ok(views.html.Application.admin.admin_accounts(account = account))
+      }
     }
   }
 }
 
 object GetAccountsAdminEndpoint {
 
-  def url(): ActionDefinition = {
-    WebsiteControllers.reverse(WebsiteControllers.getAccountsAdmin())
+  def url() = {
+    controllers.routes.WebsiteControllers.getAccountsAdmin().url
+//    WebsiteControllers.reverse(WebsiteControllers.getAccountsAdmin())
   }
 }

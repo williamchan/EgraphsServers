@@ -1,6 +1,6 @@
 package controllers.website.consumer
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import controllers.website._
 
 /** All endpoints for the recent consumer website */

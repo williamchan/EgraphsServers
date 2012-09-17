@@ -1,6 +1,6 @@
 package controllers.website.admin
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import play.mvc.results.Redirect
 import controllers.WebsiteControllers
 import play.data.validation.Validation

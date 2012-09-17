@@ -117,22 +117,22 @@ object Customer {
       val verifyPasswordAction = Utils.lookupUrl("WebsiteControllers.getVerifyAccount",
         Map("email" -> account.email, "secretKey" -> account.resetPasswordKey.get))
       val verifyPasswordUrl = Utils.absoluteUrl(verifyPasswordAction)
-      email.setHtmlMsg(views.frontend.html.email_account_verification(
+      email.setHtmlMsg(views.html.frontend.email_account_verification(
         verifyPasswordUrl = verifyPasswordUrl,
         emailLogoSrc = emailLogoSrc,
         emailFacebookSrc = emailFacebookSrc,
         emailTwitterSrc = emailTwitterSrc
       ).toString()
       )
-      email.setTextMsg(views.frontend.html.email_account_verification_text(verifyPasswordUrl).toString())
+      email.setTextMsg(views.html.frontend.email_account_verification_text(verifyPasswordUrl).toString())
     } else {
-      email.setHtmlMsg(views.frontend.html.email_account_confirmation(
+      email.setHtmlMsg(views.html.frontend.email_account_confirmation(
         emailLogoSrc = emailLogoSrc,
         emailFacebookSrc = emailFacebookSrc,
         emailTwitterSrc = emailTwitterSrc
       ).toString()
       )
-      email.setTextMsg(views.frontend.html.email_account_confirmation_text.toString())
+      email.setTextMsg(views.html.frontend.email_account_confirmation_text.toString())
     }
 
     mail.send(email)

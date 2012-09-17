@@ -3,7 +3,7 @@ package controllers.website.admin
 import models._
 import play.mvc.results.Redirect
 import controllers.WebsiteControllers
-import play.mvc.Controller
+import play.api.mvc.Controller
 import play.data.validation._
 import services.http.{POSTControllerMethod, AdminRequestFilters}
 
@@ -77,6 +77,7 @@ trait PostAccountAdminEndpoint {
 
   private def redirectWithValidationErrors(accountId: Long,
                                            email: String): Redirect = {
+    val flash = play.mvc.Http.Context.current().flash()
     flash.put("accountId", accountId)
     flash.put("email", email)
     flash.put("password", "")

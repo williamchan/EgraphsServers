@@ -1,7 +1,7 @@
 package controllers
 
-import api._
-import play.mvc.Controller
+import controllers.api._
+import play.api.mvc.Controller
 import services.http.{PlayConfig, ControllerMethod, OrderRequestFilters, CelebrityAccountRequestFilters}
 import services.db.DBSession
 import akka.actor.ActorRef

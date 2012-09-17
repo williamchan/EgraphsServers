@@ -6,7 +6,7 @@ import enums.PublishedStatus
 import play.mvc.results.Redirect
 import services.mail.TransactionalMail
 import controllers.WebsiteControllers
-import play.mvc.Controller
+import play.api.mvc.Controller
 import play.data.validation.Validation.ValidationResult
 import services.blobs.Blobs.Conversions._
 import java.io.File
@@ -162,7 +162,7 @@ trait PostCelebrityAdminEndpoint {
             email.setFrom("noreply@egraphs.com", "Egraphs")
             email.addTo(celebrityEmail, publicName)
             email.setSubject("Egraphs Celebrity Account Created")
-            email.setMsg(views.Application.email.html.celebrity_created_email(celebrity = savedCelebrity, email = celebrityEmail).toString().trim())
+            email.setMsg(views.html.Application.email.celebrity_created_email(celebrity = savedCelebrity, email = celebrityEmail).toString().trim())
             transactionalMail.send(email)
           }
           savedCelebrity.saveWithImageAssets(landingPageImageOption, logoImageImageOption)
@@ -198,6 +198,7 @@ trait PostCelebrityAdminEndpoint {
                                            organization: String,
                                            roleDescription: String,
                                            twitterUsername: String): Redirect = {
+    val flash = play.mvc.Http.Context.current().flash()
     flash.put("celebrityId", celebrityId)
     flash.put("celebrityEmail", celebrityEmail)
     flash.put("celebrityPassword", celebrityPassword)

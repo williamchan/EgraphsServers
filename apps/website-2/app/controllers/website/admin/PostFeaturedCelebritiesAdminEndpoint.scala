@@ -1,7 +1,7 @@
 package controllers.website.admin
 
 import models._
-import play.mvc.Controller
+import play.api.mvc.Controller
 import services.http.{POSTControllerMethod, AdminRequestFilters}
 
 trait PostFeaturedCelebritiesAdminEndpoint {

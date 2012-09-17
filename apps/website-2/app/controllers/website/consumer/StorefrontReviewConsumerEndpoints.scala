@@ -1,7 +1,7 @@
 package controllers.website.consumer
 
 import services.http.{SafePlayParams, POSTControllerMethod, CelebrityAccountRequestFilters, ControllerMethod}
-import play.mvc.Controller
+import play.api.mvc.Controller
 
 import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
 import play.mvc.results.Redirect
@@ -75,7 +75,7 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
 
         implicit def crumbs = breadcrumbData.crumbsForRequest(celeb.id, celebrityUrlSlug, Some(productUrlSlug))
 
-        views.frontend.html.celebrity_storefront_review(
+        views.html.frontend.celebrity_storefront_review(
           celebrityName = celeb.publicName,
           productTitle = product.name,
           celebrityWillWrite = textCelebWillWrite,

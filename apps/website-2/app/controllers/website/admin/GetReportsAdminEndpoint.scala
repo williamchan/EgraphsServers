@@ -1,6 +1,6 @@
 package controllers.website.admin
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import play.mvc.results.RenderBinary
 import services.AppConfig
 import services.db.Schema
@@ -21,7 +21,7 @@ private[controllers] trait GetReportsAdminEndpoint {
       action match {
 
         case null => {
-          views.Application.admin.html.admin_reports()
+          views.html.Application.admin.admin_reports()
         }
 
         // Email lists

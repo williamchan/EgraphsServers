@@ -2,7 +2,7 @@
 label: String,
 inputType: String,
 width: String,
-help: Option[Html] = None,
+help: Option[String] = None,
 hasInputName: Boolean=true,
 editable: Boolean=true,
 fields: (String) => String)
@@ -30,7 +30,7 @@ fields: (String) => String)
   <div class="input">
     <input class="@width" id="@id" @nameAttribute @valueAttribute @typeAttribute @disabledAttribute>
     @help.map { htmlString =>
-      <span class="help-block">@htmlString</span>
+      <span class="help-block">@Html(htmlString)</span>
     }
   </div>
 </div>

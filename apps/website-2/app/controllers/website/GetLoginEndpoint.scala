@@ -1,6 +1,6 @@
 package controllers.website
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import services.Utils
 import services.http.ControllerMethod
 import services.social.Facebook
@@ -31,7 +31,7 @@ private[controllers] trait GetLoginEndpoint extends ImplicitHeaderAndFooterData 
     val fbOauthUrl = Facebook.getFbOauthUrl(fbAppId = facebookAppId, state = fbState)
 
     // Render
-    views.frontend.html.login(
+    views.html.frontend.login(
       loginForm=makeLoginFormView,
       registrationForm=makeRegisterFormView,
       fbAuthUrl=fbOauthUrl

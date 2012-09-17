@@ -1,6 +1,6 @@
 package controllers.website
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import services.http.ControllerMethod
 import services.mvc.ImplicitHeaderAndFooterData
 import models.frontend.contents.Section
@@ -10,15 +10,15 @@ private[controllers] trait GetStaticEndpoint extends ImplicitHeaderAndFooterData
   protected def controllerMethod: ControllerMethod
 
   def getAbout = controllerMethod() {
-    views.frontend.html.about_us(learnMoreUrl = WebsiteControllers.reverse(WebsiteControllers.getInsideEgraph).url)
+    views.html.frontend.about_us(learnMoreUrl = WebsiteControllers.reverse(WebsiteControllers.getInsideEgraph).url)
   }
 
   def getCareers = controllerMethod() {
-    views.frontend.html.careers()
+    views.html.frontend.careers()
   }
 
   def getFAQ = controllerMethod() {
-    views.frontend.html.faq()
+    views.html.frontend.faq()
   }
 
   def getInsideEgraph = controllerMethod() {
@@ -29,19 +29,19 @@ private[controllers] trait GetStaticEndpoint extends ImplicitHeaderAndFooterData
         Section(title="The biometric authentication process", url="#biometric", subsection = None),
         Section(title="Enjoying and sharing your egraph", url="#do", subsection = None)
       )
-    views.frontend.html.inside_egraph(tableOfContents)
+    views.html.frontend.inside_egraph(tableOfContents)
   }
 
 
   def getPrivacy = controllerMethod() {
-    views.frontend.html.privacy()
+    views.html.frontend.privacy()
   }
 
   def getInsiderSweepstakes = controllerMethod() {
-    views.frontend.html.sweepstakes_insider()
+    views.html.frontend.sweepstakes_insider()
   }
 
   def getTerms = controllerMethod() {
-    views.frontend.html.terms()
+    views.html.frontend.terms()
   }
 }

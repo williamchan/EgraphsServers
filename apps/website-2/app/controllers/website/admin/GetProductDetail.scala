@@ -30,7 +30,7 @@ object GetProductDetail {
     }
 
     // Render the page
-    views.Application.admin.html.admin_celebrityproductdetail(
+    views.html.Application.admin.admin_celebrityproductdetail(
       isCreate = isCreate,
       celebrity = celebrity,
       errorFields = errorFields,

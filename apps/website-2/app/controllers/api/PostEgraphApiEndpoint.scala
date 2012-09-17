@@ -1,6 +1,6 @@
 package controllers.api
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import sjson.json.Serializer
 import play.data.validation._
 import services.http.SafePlayParams.Conversions._

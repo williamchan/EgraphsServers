@@ -1,6 +1,6 @@
 package controllers.website
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 
 import models._
 import services.http.ControllerMethod
@@ -35,7 +35,7 @@ private[controllers] trait GetOrderConfirmationEndpoint extends ImplicitHeaderAn
       flashOrderId <- maybeOrderIdFromFlash if flashOrderId == orderId;
       order <- orderStore.findById(flashOrderId)
     ) yield {
-      views.frontend.html.celebrity_storefront_complete(
+      views.html.frontend.celebrity_storefront_complete(
         orderCompleteViewModelFactory.fromOrder(order)
       )
     }

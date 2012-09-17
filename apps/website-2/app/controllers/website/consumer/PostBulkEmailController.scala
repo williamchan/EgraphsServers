@@ -1,6 +1,6 @@
 package controllers.website.consumer
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import services.http.POSTControllerMethod
 import services.mvc.ImplicitHeaderAndFooterData
 import services.mail.BulkMail

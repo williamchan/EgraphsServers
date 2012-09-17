@@ -1,18 +1,18 @@
 @(isCreate: Boolean, errorFields: Option[List[String]], fields: (String) => String, celebrity: Option[models.Celebrity] = None
-)(implicit session: play.mvc.Scope.Session)
+)(/* implicit session: play.mvc.Scope.Session */)
 
 @import controllers.WebsiteControllers
 @import services.Utils.lookupUrl
-@import views.Application.tags.html.authenticityToken
-@import views.Application.tags.html.errorMessage
-@import views.Application.tags.html.formField
-@import views.Application.html.content_base
+@import views.html.Application.tags.authenticityToken
+@import views.html.Application.tags.errorMessage
+@import views.html.Application.tags.formField
+@import views.html.Application.content_base
 
 @content_base(title="Admin - Celebrity Details", body=body, head=head)
 
 @head = {
-<script src='@asset("public/twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
-<script src='@asset("public/twitter-bootstrap-1.4.0/js/bootstrap-buttons.js")' type="text/javascript"></script>
+<script src='@routes.Assets.at("twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
+<script src='@routes.Assets.at("twitter-bootstrap-1.4.0/js/bootstrap-buttons.js")' type="text/javascript"></script>
 <script type="text/javascript">
     require(["admin-celebritydetail-page"], function(pageScripts) {
       pageScripts.go();
@@ -57,13 +57,13 @@
           @formField(id="publicName", label="Public Name", inputType="text", width="span4", fields=fields)
 
           @formField(id="casualName", label="Casual Name", inputType="text", width="span4", help=Some(casualNameHelp), fields=fields)
-          @casualNameHelp = { e.g. "David" instead of "David Price" }
+          @casualNameHelp = "e.g. \"David\" instead of \"David Price\""
 
           @formField(id="organization", label="Organization", inputType="text", width="span4", help=Some(organizationHelp), fields=fields)
-          @organizationHelp = { e.g. "Major League Baseball" }
+          @organizationHelp = "e.g. \"Major League Baseball\""
 
           @formField(id="roleDescription", label="Role Description", inputType="text", width="span4", help=Some(roleHelp), fields=fields)
-          @roleHelp = { e.g. "Pitcher, Tampa Bay Rays" }
+          @roleHelp = "e.g. \"Pitcher, Tampa Bay Rays\""
 
           <div class="clearfix">
             <label for="bio">Short Bio</label>
@@ -78,13 +78,13 @@
         <fieldset>
           <legend>Images</legend>
           @formField(id="profileImage", label="Profile Photo", inputType="file", width="span8", help=Some(profileImageHelp), fields=fields)
-          @profileImageHelp = { Must be square dimensions of at least 100x100. }
+          @profileImageHelp = "Must be square dimensions of at least 100x100."
 
           @formField(id="landingPageImage", label="Landing Page Image", inputType="file", width="span8", help=Some(landingPageImageHelp), fields=fields)
-          @landingPageImageHelp = { Must be JPG at least 1500x556. Keep that 2.7 aspect ratio for best results. Should be center-balanced photo of celebrity. }
+          @landingPageImageHelp = "Must be JPG at least 1500x556. Keep that 2.7 aspect ratio for best results. Should be center-balanced photo of celebrity."
 
           @formField(id="logoImage", label="Team/Org Logo", inputType="file", width="span8", help=Some(logoImageHelp), fields=fields)
-          @logoImageHelp = { Must be PNP of square dimensions of at least 40x40. Logo of team or organization. }
+          @logoImageHelp = "Must be PNP of square dimensions of at least 40x40. Logo of team or organization."
 
         </fieldset>
         <fieldset>

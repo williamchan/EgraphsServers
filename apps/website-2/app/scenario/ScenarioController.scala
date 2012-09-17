@@ -1,6 +1,6 @@
 package controllers.website.nonproduction
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import scenario.Scenario
 import play.mvc.results.Result
 import services.http.ControllerMethod

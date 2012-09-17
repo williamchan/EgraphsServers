@@ -17,7 +17,7 @@ import services.Utils
  */
 class ProductViewConversions(product: Product) {
   /**
-   * Renders the [[models.Product]] as a tile for [[views.frontend.html.celebrity_storefront_choose_photo_tiled]]
+   * Renders the [[models.Product]] as a tile for [[views.html.frontend.celebrity_storefront_choose_photo_tiled]]
    * @param celebrityUrlSlug identifies the celebrity for use in generating a target url
    * @param quantityRemaining the remaining inventory before the product is "sold out".
    */
@@ -41,7 +41,7 @@ class ProductViewConversions(product: Product) {
   }
 
   /**
-   * Renders the [[models.Product]] as a tile for [[views.frontend.html.celebrity_storefront_choose_photo_carousel]]
+   * Renders the [[models.Product]] as a tile for [[views.html.frontend.celebrity_storefront_choose_photo_carousel]]
    *
    * @param celebUrlSlug identifies the celebrity for forming the link to post the product selection.
    */

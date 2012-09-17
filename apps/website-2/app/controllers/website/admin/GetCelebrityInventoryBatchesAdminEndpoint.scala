@@ -1,6 +1,6 @@
 package controllers.website.admin
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import models._
 import services.http.{ControllerMethod, AdminRequestFilters}
 import play.mvc.Router.ActionDefinition
@@ -26,7 +26,7 @@ private[controllers] trait GetCelebrityInventoryBatchesAdminEndpoint {
         }
         val pagedQuery: (Iterable[InventoryBatch], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
         WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebrityInventoryBatchesAdminEndpoint.url(celebrity), filter = Some(filter))
-        views.Application.admin.html.admin_inventorybatches(inventoryBatches = pagedQuery._1, celebrity = celebrity)
+        views.html.Application.admin.admin_inventorybatches(inventoryBatches = pagedQuery._1, celebrity = celebrity)
     }
   }
 }

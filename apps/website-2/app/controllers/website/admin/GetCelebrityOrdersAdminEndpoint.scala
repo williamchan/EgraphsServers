@@ -1,6 +1,6 @@
 package controllers.website.admin
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import models._
 import services.http.{ControllerMethod, AdminRequestFilters}
 import play.mvc.Router.ActionDefinition
@@ -29,7 +29,7 @@ private[controllers] trait GetCelebrityOrdersAdminEndpoint {
         }
         val pagedQuery: (Iterable[Order], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
         WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebrityOrdersAdminEndpoint.url(celebrity = celebrity), filter = Some(filter))
-        views.Application.admin.html.admin_orders(orders = pagedQuery._1, celebrity = Some(celebrity))
+        views.html.Application.admin.admin_orders(orders = pagedQuery._1, celebrity = Some(celebrity))
     }
   }
 }

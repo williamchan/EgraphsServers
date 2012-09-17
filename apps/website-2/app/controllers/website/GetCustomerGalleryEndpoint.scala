@@ -1,7 +1,7 @@
 package controllers.website
 
 import services.http.{SafePlayParams, AccountRequestFilters, ControllerMethod}
-import play.mvc.Controller
+import play.api.mvc.Controller
 import models._
 import controllers.WebsiteControllers
 import enums.{PrivacyStatus, EgraphState}
@@ -91,7 +91,7 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
           List()
         }
     }
-    views.frontend.html.account_gallery(customer.username, orders, galleryControl)
+    views.html.frontend.account_gallery(customer.username, orders, galleryControl)
   }
 
 }

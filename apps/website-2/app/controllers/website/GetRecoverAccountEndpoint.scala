@@ -1,6 +1,6 @@
 package controllers.website
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import services.Utils
 import services.http.ControllerMethod
 
@@ -28,7 +28,7 @@ private[controllers] trait GetRecoverAccountEndpoint extends ImplicitHeaderAndFo
       )
     }
 
-    views.frontend.html.account_recover(
+    views.html.frontend.account_recover(
       maybeFormData.getOrElse(
         AccountRecoverFormView(email = Field(name = Fields.Email.name, values = List("")))
       )

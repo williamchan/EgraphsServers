@@ -1,6 +1,6 @@
 package controllers.website.admin
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import services.Utils
 import models.Celebrity
 import services.http.{ControllerMethod, AdminRequestFilters}

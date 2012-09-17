@@ -1,6 +1,6 @@
 package services.http
 
-import play.libs.MimeTypes
+import play.api.libs.MimeTypes
 
 /**
  * Gives access to HTTP content header information for different file names.

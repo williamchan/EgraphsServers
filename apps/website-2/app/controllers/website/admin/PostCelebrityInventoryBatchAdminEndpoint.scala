@@ -2,7 +2,7 @@ package controllers.website.admin
 
 import play.mvc.results.Redirect
 import controllers.WebsiteControllers
-import play.mvc.Controller
+import play.api.mvc.Controller
 import models._
 import services.logging.Logging
 import java.util.Date

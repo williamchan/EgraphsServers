@@ -3,7 +3,7 @@ package controllers.website.admin
 import models._
 import enums.EgraphState
 import play.mvc.results.Redirect
-import play.mvc.Controller
+import play.api.mvc.Controller
 import services.http.{POSTControllerMethod, AdminRequestFilters}
 
 trait PostEgraphAdminEndpoint { this: Controller =>

@@ -1,12 +1,12 @@
 package controllers.website
 
 import services.blobs.Blobs
-import play.mvc.Controller
-import play.mvc.results.RenderBinary
+import play.api.mvc.Controller
+import play.api.mvc.results.RenderBinary
 import Blobs.Conversions._
 import services.http.ControllerMethod
-import play.libs.MimeTypes
-import play.mvc.Http.Response
+import play.api.libs.MimeTypes
+import play.api.mvc.Http.Response
 import services.logging.Logging
 
 /**

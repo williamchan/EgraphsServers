@@ -2,7 +2,7 @@ package controllers.website.admin
 
 import models._
 import play.mvc.results.Redirect
-import play.mvc.Controller
+import play.api.mvc.Controller
 import services.http.{POSTControllerMethod, AdminRequestFilters}
 
 trait PostPrintOrderAdminEndpoint { this: Controller =>

@@ -64,7 +64,7 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
 
       implicit def crumbs = breadcrumbData.crumbsForRequest(celebrity.id, celebrityUrlSlug, maybeProductUrlSlug)
 
-      views.frontend.html.celebrity_storefront_choose_photo_tiled(
+      views.html.frontend.celebrity_storefront_choose_photo_tiled(
         celeb=celebrity.asChoosePhotoView,
         products=productViews,
         recentEgraphs=celebrity.recentlyFulfilledEgraphChoosePhotoViews,
@@ -98,7 +98,7 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
 
           implicit def crumbs = breadcrumbData.crumbsForRequest(celeb.id, celebrityUrlSlug, Some(productUrlSlug))
 
-          views.frontend.html.celebrity_storefront_choose_photo_carousel(
+          views.html.frontend.celebrity_storefront_choose_photo_carousel(
             celeb = celeb.asChoosePhotoView,
             products = productViews,
             firstCarouselProductIndex=indexOfProductInProductList,

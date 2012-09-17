@@ -1,6 +1,6 @@
 package controllers.website.admin
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import services.http.{AdminRequestFilters, ControllerMethod}
 import models.EgraphStore
 import controllers.website.GetEgraphEndpoint
@@ -21,7 +21,7 @@ private[controllers] trait GetEgraphAdminEndpoint { this: Controller =>
           }
 
           case _ => {
-            views.Application.admin.html.admin_egraph(egraph = egraph, signatureResult = egraph.signatureResult, voiceResult = egraph.voiceResult)
+            views.html.Application.admin.admin_egraph(egraph = egraph, signatureResult = egraph.signatureResult, voiceResult = egraph.voiceResult)
           }
         }
     }

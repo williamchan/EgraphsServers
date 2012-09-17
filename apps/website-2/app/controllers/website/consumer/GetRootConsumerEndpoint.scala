@@ -1,6 +1,6 @@
 package controllers.website.consumer
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import services.http.ControllerMethod
 import services.mvc.{celebrity, ImplicitHeaderAndFooterData}
 import celebrity.CatalogStarsQuery
@@ -22,8 +22,8 @@ private[controllers] trait GetRootConsumerEndpoint extends ImplicitHeaderAndFoot
   //
   def getRootConsumerEndpoint = controllerMethod() {
     params.get("signup") match {
-      case "true" => views.frontend.html.landing(stars=catalogStarsQuery(), signup = true)
-      case _  =>  views.frontend.html.landing(stars=catalogStarsQuery(), signup = false)
+      case "true" => views.html.frontend.landing(stars=catalogStarsQuery(), signup = true)
+      case _  =>  views.html.frontend.landing(stars=catalogStarsQuery(), signup = false)
 
     }
   }

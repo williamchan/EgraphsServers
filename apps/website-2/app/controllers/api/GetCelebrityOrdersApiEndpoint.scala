@@ -1,7 +1,7 @@
 package controllers.api
 
 import models._
-import play.mvc.Controller
+import play.api.mvc.Controller
 import sjson.json.Serializer
 import services.http.{ControllerMethod, CelebrityAccountRequestFilters}
 

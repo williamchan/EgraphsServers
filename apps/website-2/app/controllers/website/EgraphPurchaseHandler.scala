@@ -1,7 +1,7 @@
 package controllers.website
 
 import models._
-import enums._
+import models.enums._
 import play.mvc.Scope.Flash
 import services.mail.TransactionalMail
 import services.{Utils, AppConfig}
@@ -254,7 +254,7 @@ case class EgraphPurchaseHandler(
     val emailFacebookSrc = ""
     val emailTwitterSrc = ""
     val faqHowLongLink = Utils.absoluteUrl(Utils.lookupUrl("WebsiteControllers.getFAQ")) + "#how-long"
-    val html = views.frontend.html.email_order_confirmation(
+    val html = views.html.frontend.email_order_confirmation(
       buyerName = buyerName,
       recipientName = recipientName,
       recipientEmail = recipientEmail,
@@ -271,7 +271,7 @@ case class EgraphPurchaseHandler(
       emailTwitterSrc = emailTwitterSrc
     )
     email.setHtmlMsg(html.toString())
-    email.setTextMsg(views.frontend.html.email_order_confirmation_text(
+    email.setTextMsg(views.html.frontend.email_order_confirmation_text(
       buyerName = buyerName,
       recipientName = recipientName,
       recipientEmail = recipientEmail,

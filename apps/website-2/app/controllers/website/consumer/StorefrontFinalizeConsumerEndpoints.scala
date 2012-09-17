@@ -1,7 +1,7 @@
 package controllers.website.consumer
 
 import services.http.{SafePlayParams, POSTControllerMethod, CelebrityAccountRequestFilters, ControllerMethod}
-import play.mvc.Controller
+import play.api.mvc.Controller
 
 import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
 import services.http.forms.purchase._
@@ -124,7 +124,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
 
         implicit def crumbs = breadcrumbData.crumbsForRequest(celeb.id, celebrityUrlSlug, Some(productUrlSlug))
 
-        views.frontend.html.celebrity_storefront_finalize(
+        views.html.frontend.celebrity_storefront_finalize(
           finalizeViewModel,
           productPreviewUrl=product.photoAtPurchasePreviewSize.getSaved(AccessPolicy.Public).url,
           orientation=product.frame.previewCssClass

@@ -1,7 +1,7 @@
 package controllers.website.consumer
 
 import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters, ControllerMethod}
-import play.mvc.Controller
+import play.api.mvc.Controller
 
 import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
 import services.http.forms.purchase._
@@ -112,7 +112,7 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
         implicit def crumbs = breadcrumbData.crumbsForRequest(celeb.id, celebrityUrlSlug, Some(productUrlSlug))
 
         // Now baby you've got a stew goin!
-        views.frontend.html.celebrity_storefront_checkout(
+        views.html.frontend.celebrity_storefront_checkout(
           form=checkoutFormView,
           summary=orderSummary,
           paymentJsModule=payment.browserModule,

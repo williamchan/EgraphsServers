@@ -1,7 +1,7 @@
 package controllers.api
 
 import sjson.json.Serializer
-import play.mvc.Controller
+import play.api.mvc.Controller
 import services.http.{ControllerMethod, CelebrityAccountRequestFilters}
 
 private[controllers] trait GetCelebrityProductsApiEndpoint { this: Controller =>

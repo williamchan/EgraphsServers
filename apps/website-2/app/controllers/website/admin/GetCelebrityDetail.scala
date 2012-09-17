@@ -26,7 +26,7 @@ object GetCelebrityDetail {
       }
     }
     // Render the page
-    views.Application.admin.html.admin_celebritydetail(isCreate = isCreate, errorFields = errorFields, fields = fieldDefaults, celebrity = celebrity)
+    views.html.Application.admin.admin_celebritydetail(isCreate = isCreate, errorFields = errorFields, fields = fieldDefaults, celebrity = celebrity)
   }
 
 }

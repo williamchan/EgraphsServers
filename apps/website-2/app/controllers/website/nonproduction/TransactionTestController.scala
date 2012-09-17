@@ -1,6 +1,6 @@
 package controllers.website.nonproduction
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import models.{AccountStore, Account}
 import services.AppConfig
 import services.http.ControllerMethod

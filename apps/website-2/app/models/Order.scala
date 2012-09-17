@@ -216,7 +216,7 @@ case class Order(
     val emailTwitterSrc = ""
     val viewEgraphAction = GetEgraphEndpoint.url(id)
     val viewEgraphUrl = Utils.absoluteUrl(viewEgraphAction)
-    val html = views.frontend.html.email_view_egraph(
+    val html = views.html.frontend.email_view_egraph(
       viewEgraphUrl = viewEgraphUrl,
       celebrityName = celebrity.publicName,
       recipientName = recipientName,
@@ -225,7 +225,7 @@ case class Order(
       emailTwitterSrc = emailTwitterSrc
     )
     email.setHtmlMsg(html.toString())
-    email.setTextMsg(views.frontend.html.email_view_egraph_text(viewEgraphUrl = viewEgraphUrl, celebrityName = celebrity.publicName, recipientName = recipientName).toString())
+    email.setTextMsg(views.html.frontend.email_view_egraph_text(viewEgraphUrl = viewEgraphUrl, celebrityName = celebrity.publicName, recipientName = recipientName).toString())
     email
   }
 

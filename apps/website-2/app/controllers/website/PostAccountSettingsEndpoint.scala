@@ -1,6 +1,6 @@
 package controllers.website
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import play.mvc.results.Redirect
 import models._
 import services.http.{CustomerRequestFilters, POSTControllerMethod}

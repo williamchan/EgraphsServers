@@ -1,6 +1,6 @@
 package controllers.website.admin
 
-import play.mvc.Controller
+import play.api.mvc.Controller
 import services.http.{AdminRequestFilters, ControllerMethod}
 import models._
 import scala.Some
@@ -30,7 +30,7 @@ private[controllers] trait GetPrintOrderAdminEndpoint { this: Controller =>
             }
           }
 
-          views.Application.admin.html.admin_printorder(
+          views.html.Application.admin.admin_printorder(
             printOrder = printOrder,
             order = order,
             recipientEmail = recipientEmail,
