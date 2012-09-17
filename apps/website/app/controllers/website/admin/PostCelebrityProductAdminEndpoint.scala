@@ -103,7 +103,6 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
       // All errors are accumulated. If we have no validation errors then parameters are golden and
       // we delegate creating the Product to the Celebrity.
       if (validationErrors.isEmpty) {
-        log("Request to create product \"" + productName + "\" for celebrity " + celebrity.publicName + " passed all filters.")
         val savedProduct = if (isCreate) {
           celebrity.addProduct(
             name = productName,
