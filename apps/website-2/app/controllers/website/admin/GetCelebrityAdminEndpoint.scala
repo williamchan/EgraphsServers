@@ -30,6 +30,7 @@ private[controllers] trait GetCelebrityAdminEndpoint {
             }
 
             case _ => {
+              val flash = play.mvc.Http.Context.current().flash()
               flash.put("celebrityId", celebrity.id)
               flash.put("celebrityEmail", account.email)
               flash.put("bio", celebrity.bio)
@@ -53,6 +54,7 @@ private[controllers] trait GetCelebrityAdminEndpoint {
 object GetCelebrityAdminEndpoint {
 
   def url(celebrityId: Long, action: Option[String] = None) = {
-    Redirect(controllers.routes.WebsiteControllers.getCelebrityAdmin(celebrityId, action))
+    controllers.routes.WebsiteControllers.getCelebrityAdmin(celebrityId, action).url
+//    Redirect(controllers.routes.WebsiteControllers.getCelebrityAdmin(celebrityId, action))
   }
 }

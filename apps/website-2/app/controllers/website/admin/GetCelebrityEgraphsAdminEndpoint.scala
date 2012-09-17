@@ -19,7 +19,7 @@ private[controllers] trait GetCelebrityEgraphsAdminEndpoint {
   protected def egraphStore: EgraphStore
   protected def egraphQueryFilters: EgraphQueryFilters
 
-  def getCelebrityEgraphsAdmin(filter: String = "pendingAdminReview", page: Int = 1) = controllerMethod() {
+  def getCelebrityEgraphsAdmin(celebrityId: Long, filter: String = "pendingAdminReview", page: Int = 1) = controllerMethod() {
     adminFilters.requireCelebrity {
       (celebrity, admin) =>
         val query = filter match {
@@ -42,6 +42,7 @@ private[controllers] trait GetCelebrityEgraphsAdminEndpoint {
 object GetCelebrityEgraphsAdminEndpoint {
 
   def url(celebrity: Celebrity): ActionDefinition = {
-    Utils.lookupUrl("WebsiteControllers.getCelebrityEgraphsAdmin", Map("celebrityId" -> celebrity.id.toString))
+    controllers.routes.WebsiteControllers.getCelebrityEgraphsAdmin(celebrity.id).url
+//    Utils.lookupUrl("WebsiteControllers.getCelebrityEgraphsAdmin", Map("celebrityId" -> celebrity.id.toString))
   }
 }
