@@ -10,6 +10,7 @@ object ApplicationBuild extends Build {
     val appDependencies = Seq(
       "egraphs" %% "frontend" % "2.0-SNAPSHOT",
       "egraphs" %% "frontend-lib" % "1.0-SNAPSHOT",
+      "egraphs" %% "website-dal" % "1.0-SNAPSHOT",
 
    // Application dependencies. Keep these in alphabetical order.
       "batik" % "batik-rasterizer" % "1.6",
