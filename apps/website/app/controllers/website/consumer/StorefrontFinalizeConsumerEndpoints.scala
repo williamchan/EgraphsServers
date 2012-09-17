@@ -1,6 +1,6 @@
 package controllers.website.consumer
 
-import services.http.{SafePlayParams, POSTControllerMethod, CelebrityAccountRequestFilters, ControllerMethod}
+import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters, ControllerMethod}
 import play.mvc.Controller
 
 import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
@@ -19,6 +19,7 @@ import services.db.{TransactionSerializable, DBSession}
 import services.http.forms.purchase.PurchaseForms.AllPurchaseForms
 import models.Celebrity
 import services.blobs.AccessPolicy
+import play.mvc.results.Redirect
 
 /**
  * Manages GET and POST of the Finalize page in the purchase flow.
@@ -57,7 +58,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
       // Get the purchase forms out of the server session
       val forms = purchaseFormFactory.formsForStorefront(celeb.id)
 
-      for (allPurchaseForms <- forms.allPurchaseFormsOrRedirect(celeb, product).right) yield {
+      for (allPurchaseForms <- forms.redirectOrAllPurchaseForms(celeb, product).right) yield {
         // Everything looks good for rendering the page! Unpack the purchase data.
         val AllPurchaseForms(
           formProductId,
@@ -142,17 +143,18 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
    *         a Redirect back to the form to handle errors.
    */
   def postStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug: String) = postController(openDatabase=false) {
-    // Get all the sweet, sweet purchase form data in a database transaction
+    // Get all the sweet, sweet purchase form data in a database transaction.
+    // redirectOrPurchaseData is of type: Either[Redirect, (Celebrity, Product, AllPurchaseForms, PurchaseForms)]
     val redirectOrPurchaseData = dbSession.connected(TransactionSerializable) {
       celebFilters.requireCelebrityAndProductUrlSlugs { (celeb, product) =>
-        val forms = purchaseFormFactory.formsForStorefront(celeb.id)
-        for (formData <- forms.allPurchaseFormsOrRedirect(celeb, product).right) yield {
+        val forms: PurchaseForms = purchaseFormFactory.formsForStorefront(celeb.id)
+        // Mapping over the Right of an Either leaves the Left intact. Here, the type of the map on the Right is a tuple.
+        for (formData <- forms.redirectOrAllPurchaseForms(celeb, product).right) yield {
           (celeb, product, formData, forms)
         }
       }
     }
-    // TODO: fix the type erasure that happens in our celebFilters so that a match like this
-    // isnt necessary.
+    // TODO: fix the type erasure that happens in our celebFilters so that a match like this isnt necessary.
     redirectOrPurchaseData match {
       case Right((celeb: Celebrity, product:models.Product, shippingForms: AllPurchaseForms, forms: PurchaseForms)) =>
         val AllPurchaseForms(productId, inventoryBatch, personalization, billing, shipping) = shippingForms
@@ -173,12 +175,8 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
           writtenMessageRequest=personalization.writtenMessageRequest
         ).execute()
 
-
-      case Left(result: play.mvc.Http.Response)  =>
-        result
-
-      case result: play.mvc.Http.Response =>
-        result
+      case Left(redirect: Redirect) =>
+        redirect
 
       case whoops =>
         throw new RuntimeException("This was not expected as a response to a purchase request: " + whoops)

@@ -48,11 +48,11 @@ trait StorefrontPersonalizeConsumerEndpoints
       for (
         // Make sure the submitted product ID matches the one in the session, otherwise redirect
         // to the Choose Photo screen
-        formProductId <- forms.matchProductIdOrRedirectToChoosePhoto(celeb, product).right;
+        formProductId <- forms.redirectToChoosePhotoOrMatchingProductId(celeb, product).right;
 
         // Get the next open inventory batch that an order would go into, and if there's no
         // inventory then redirect to the insufficient inventory page.
-        nextInventoryBatch <- forms.nextInventoryBatchOrRedirect(celebrityUrlSlug, product).right
+        nextInventoryBatch <- forms.redirectOrNextInventoryBatch(celebrityUrlSlug, product).right
       ) yield {
         val actionTarget = reverse(postStorefrontPersonalize(celebrityUrlSlug, productUrlSlug)).url
 
@@ -122,7 +122,7 @@ trait StorefrontPersonalizeConsumerEndpoints
       for (
         // Product ID in the url had to match the product currently being ordered,
         // or redirect to choose photo.
-        productId <- purchaseForms.matchProductIdOrRedirectToChoosePhoto(celeb, product).right;
+        productId <- purchaseForms.redirectToChoosePhotoOrMatchingProductId(celeb, product).right;
 
         // Form had to be valid, or redirect back to the form page.
         validated <- form.errorsOrValidatedForm.left.map { error =>
