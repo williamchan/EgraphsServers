@@ -14,7 +14,7 @@ import forms._
 import play.mvc.Scope.{Session, Flash}
 import play.mvc.Http.Request
 import play.test.FunctionalTest
-import services.{Utils, AppConfig}
+import services.AppConfig
 import services.mvc.celebrity.CatalogStarsQuery
 import services.mvc.{OrderCompleteViewModelFactory, StorefrontBreadcrumbData}
 
