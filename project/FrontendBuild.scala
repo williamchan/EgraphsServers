@@ -12,8 +12,7 @@ object FrontendBuild extends Build {
 
   val appDependencies = Seq(
     "crionics" %% "play2-authenticitytoken" % "1.0-SNAPSHOT",
-    "org.joda" % "joda-money" % "0.6",
-    "egraphs" %% "frontend-lib" % "1.0-SNAPSHOT"
+    "org.joda" % "joda-money" % "0.6"
   )
 
   // Only compile the bootstrap bootstrap.less file and any other *.less file in the stylesheets directory
