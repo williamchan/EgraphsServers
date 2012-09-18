@@ -1,6 +1,6 @@
 package services.http
 
-import play.api.mvc.{Action, AnyContent, Request}
+import play.api.mvc.{Result, AnyContent, Request}
 import services.logging.LoggingContext
 import com.google.inject.Inject
 import services.db.{TransactionIsolation, TransactionSerializable, DBSession}
@@ -36,7 +36,7 @@ class ControllerMethod @Inject()(logging: LoggingContext, db: DBSession, httpsFi
   def apply[A](openDatabase:Boolean=true,
                dbIsolation: TransactionIsolation = TransactionSerializable)
               (operation: => A)
-              (implicit request:  Request[AnyContent]): Action[_] =
+              (implicit request:  Request[AnyContent]): Result =
   {
     val redirectOrResult = httpsFilter {
       logging.withContext(request) {
@@ -95,7 +95,7 @@ class POSTControllerMethod @Inject()(
    */
   def apply[A](doCsrfCheck: Boolean=true, openDatabase: Boolean=true)
               (operation: => A)
-              (implicit request: Request[AnyContent]): Any =
+              (implicit request: Request[AnyContent]): Result =
   {
     controllerMethod() {
       authenticityTokenFilter(doCsrfCheck) {
@@ -129,7 +129,7 @@ class POSTApiControllerMethod @Inject()(postControllerMethod: POSTControllerMeth
    * @return the return value of the `operation` code block or the error state of
    *     postControllerMethod
    */
-  def apply[A](operation: => A)(implicit request: Request[AnyContent]): Any = {
+  def apply[A](operation: => A)(implicit request: Request[AnyContent]): Result = {
     postControllerMethod(doCsrfCheck=false) {
       operation
     }

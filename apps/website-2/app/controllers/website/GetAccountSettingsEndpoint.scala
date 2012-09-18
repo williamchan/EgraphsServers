@@ -1,6 +1,7 @@
 package controllers.website
 
-import play.api.mvc.Controller
+import play.api._
+import play.api.mvc._
 import services.http.{CustomerRequestFilters, ControllerMethod}
 import models.frontend.forms.{FormError, Field}
 import services.http.forms.AccountSettingsForm.Fields
@@ -20,24 +21,24 @@ private[controllers] trait GetAccountSettingsEndpoint extends ImplicitHeaderAndF
   protected def customerFilters: CustomerRequestFilters
   protected def accountSettingsForms: AccountSettingsFormFactory
 
-  def getAccountSettings = controllerMethod() {
-
-    customerFilters.requireCustomerLogin { (customer, account) =>
-      val form = makeFormView(customer, account)
-
-      val displayableErrors = (List(form.fullname.error, form.username.error, form.email.error,
-        form.oldPassword.error, form.newPassword.error, form.passwordConfirm.error,
-        form.addressLine1.error,form.addressLine2.error, form.city.error, form.state.error, form.postalCode.error,
-        form.galleryVisibility.error, form.notice_stars.error) ::: form.generalErrors.toList)
-        .asInstanceOf[List[Option[FormError]]].filter(e => e.isDefined).map(e => e.get.description)
-
-      views.html.frontend.account_settings(form=form, displayableErrors)
+  def getAccountSettings = Action { implicit request =>
+    controllerMethod() {
+      customerFilters.requireCustomerLogin { (customer, account) =>
+        val form = makeFormView(customer, account, request.flash)
+  
+        val displayableErrors = (List(form.fullname.error, form.username.error, form.email.error,
+          form.oldPassword.error, form.newPassword.error, form.passwordConfirm.error,
+          form.addressLine1.error,form.addressLine2.error, form.city.error, form.state.error, form.postalCode.error,
+          form.galleryVisibility.error, form.notice_stars.error) ::: form.generalErrors.toList)
+          .asInstanceOf[List[Option[FormError]]].filter(e => e.isDefined).map(e => e.get.description)
+  
+        Ok(views.html.frontend.account_settings(form=form, displayableErrors))
+      }
     }
   }
 
-  private def makeFormView(customer: Customer, account: Account): AccountSettingsFormView = {
+  private def makeFormView(customer: Customer, account: Account, flash: Flash): AccountSettingsFormView = {
     // Get form from flash if possible
-    val flash = play.mvc.Http.Context.current().flash()
     val maybeFormData = accountSettingsForms.getFormReader(customer, account).read(flash.asFormReadable).map { form =>
       val nonFieldSpecificErrors = form.fieldInspecificErrors.map(error => error.asViewError)
 

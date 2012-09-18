@@ -24,7 +24,7 @@ private[controllers] trait GetOrderConfirmationEndpoint extends ImplicitHeaderAn
   //
   // Controllers
   //
-  def getOrderConfirmation(orderId: Long) = Action { request =>
+  def getOrderConfirmation(orderId: Long) = Action { implicit request =>
     controllerMethod() {
       // Get order ID from flash scope -- it's OK to just read it
       // because it can only have been provided by our own code (in this case

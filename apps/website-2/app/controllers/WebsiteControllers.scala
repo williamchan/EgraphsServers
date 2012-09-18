@@ -3,9 +3,7 @@ package controllers
 import website._
 import play.api.mvc.Action
 import play.api.mvc.Controller
-import play.api.mvc.{Router, Controller}
-import play.api.mvc.Router.ActionDefinition
-import play.api.mvc.results.Redirect
+import play.api.mvc.Results.Redirect
 import services.blobs.Blobs
 import services.mail.{BulkMail, TransactionalMail}
 import services.payment.Payment
@@ -25,10 +23,10 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   import services.AppConfig.instance
   import services.AppConfig.annotatedInstance
 
-  /** Use EgraphsSession instead */
+  /** Use EgraphsSession.Key.AdminId.name instead */
   @Deprecated val adminIdKey: String = "admin"
 
-  /** Use EgraphsSession instead */
+  /** Use EgraphsSession.Key.CustomerId.name instead */
   @Deprecated val customerIdKey: String = "customer"
 
   // Provide endpoint dependencies

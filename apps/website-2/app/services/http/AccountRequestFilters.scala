@@ -1,10 +1,11 @@
 package services.http
 
-import play.mvc.{Before, Controller}
 import models._
 import play.api.mvc.Request
+import play.api.mvc.Result
+import play.api.mvc.Results.{NotFound, Forbidden}
+import play.api.mvc.Security
 import com.google.inject.Inject
-import play.mvc.results.{NotFound, Forbidden}
 
 /**
  * Provides functions whose callback parameters are only called when the egraphs database
@@ -22,13 +23,24 @@ class AccountRequestFilters @Inject() (accountStore: AccountStore, customerStore
    *
    * @return either Forbidden or the result of `continue`.
    */
-  def requireAuthenticatedAccount(continue: Account => Any)(implicit request: Request) = {
-    accountStore.authenticate(request.user, request.password) match {
-      case Right(theAccount) =>
-        continue(theAccount)
+  def requireAuthenticatedAccount(continue: Account => Result)(implicit request: Request[_]): Result = {
+    //TODO: PLAY20 migration: maybe we should do something more like this: http://www.playframework.org/documentation/2.0.3/ScalaSecurity
+    val maybeUsername = request.session.get(Security.username)
+    val maybePassword = request.session.get("password")
 
-      case Left(_: AccountAuthenticationError) =>
-        new Forbidden("Email/password information was incorrect.")
+    if (maybeUsername.isEmpty || maybePassword.isEmpty ) {
+      Forbidden("Username or password information was incorrect.")
+    } else {
+      val username = maybeUsername.get
+      val password = maybePassword.get
+
+      accountStore.authenticate(username, password) match {
+        case Right(theAccount) =>
+          continue(theAccount)
+  
+        case Left(_: AccountAuthenticationError) =>
+          Forbidden("Email/password information was incorrect.")
+      }
     }
   }
 
@@ -36,24 +48,24 @@ class AccountRequestFilters @Inject() (accountStore: AccountStore, customerStore
    * Validate that customer exists
    */
 
-  def requireValidCustomerId(customerId: Long)(continue: Customer => Any)(implicit request: Request) = {
+  def requireValidCustomerId(customerId: Long)(continue: Customer => Result)(implicit request: Request[_]): Result = {
     customerStore.findById(customerId) match {
       case Some(customer) => continue(customer)
-      case _ => new NotFound("Customer not found.")
+      case _ => NotFound("Customer not found.")
     }
   }
 
-  def requireValidCustomerUsername(username: String)(continue: Customer => Any)(implicit request: Request) = {
+  def requireValidCustomerUsername(username: String)(continue: Customer => Result)(implicit request: Request[_]): Result = {
     customerStore.findByUsername(username) match {
       case Some(customer) =>  continue(customer)
-      case _ => new NotFound("Customer not found.")
+      case _ => NotFound("Customer not found.")
     }
   }
 
-  def requireValidAccountEmail(email:String)(continue: Account => Any)(implicit request: Request) = {
+  def requireValidAccountEmail(email:String)(continue: Account => Result)(implicit request: Request[_]): Result = {
     accountStore.findByEmail(email) match {
       case Some(account) => continue(account)
-      case _ => new NotFound("Account not found.")
+      case _ => NotFound("Account not found.")
     }
   }
 

@@ -1,7 +1,8 @@
 package controllers.website
 
 import services.http.{SafePlayParams, AccountRequestFilters, ControllerMethod}
-import play.api.mvc.Controller
+import play.api._
+import play.api.mvc._
 import models._
 import controllers.WebsiteControllers
 import enums.{PrivacyStatus, EgraphState}
@@ -9,6 +10,7 @@ import models.frontend.egraphs._
 import scala.Some
 import services.mvc.ImplicitHeaderAndFooterData
 import models.GalleryOrderFactory
+import services.http.EgraphsSession
 
 /**
  * Controller for displaying customer galleries. Galleries serve as a "wall of egraphs".
@@ -32,27 +34,32 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
 
   import SafePlayParams.Conversions._
 
-  def getCustomerGalleryByUsername(username: String) = controllerMethod() {
-    accountRequestFilters.requireValidCustomerUsername(username) {
-      customer => serveCustomerGallery(customer)
+  def getCustomerGalleryByUsername(username: String) = Action { implicit request =>
+    controllerMethod() {
+      accountRequestFilters.requireValidCustomerUsername(username) {
+        customer => serveCustomerGallery(customer)
+      }
     }
   }
 
-  def getCustomerGalleryById(galleryCustomerId: Long) = controllerMethod() {
-    accountRequestFilters.requireValidCustomerId(galleryCustomerId){
-      customer => serveCustomerGallery(customer)
+  def getCustomerGalleryById(galleryCustomerId: Long) = Action { 
+    implicit request =>controllerMethod() {
+      accountRequestFilters.requireValidCustomerId(galleryCustomerId){
+        customer => serveCustomerGallery(customer)
+      }
     }
   }
 
-  def serveCustomerGallery(customer:Customer) : Any = {
+  def serveCustomerGallery(customer:Customer) = Action { request =>
     val galleryCustomerId = customer.id
     //If admin is true admin
+    val session = request.session
     val adminGalleryControlOption = for(
-      sessionAdminId <- session.getLongOption(WebsiteControllers.adminIdKey);
+      sessionAdminId <- session.get(EgraphsSession.Key.AdminId.name).map(adminId => adminId.toLong);
       adminOption   <- administratorStore.findById(sessionAdminId)) yield AdminGalleryControl
     //if customerId is the same as the gallery requested
     val sessionGalleryControlOption = for(
-      sessionCustomerId <- session.getLongOption(WebsiteControllers.customerIdKey);
+      sessionCustomerId <- session.get(EgraphsSession.Key.CustomerId.name).map(customerId => customerId.toLong);
       if (sessionCustomerId == galleryCustomerId)) yield OwnerGalleryControl
 
     //In priority order
@@ -91,7 +98,8 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
           List()
         }
     }
-    views.html.frontend.account_gallery(customer.username, orders, galleryControl)
+
+    Ok(views.html.frontend.account_gallery(customer.username, orders, galleryControl))
   }
 
 }

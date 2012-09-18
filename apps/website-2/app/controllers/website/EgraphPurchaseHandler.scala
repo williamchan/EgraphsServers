@@ -12,6 +12,7 @@ import sjson.json.Serializer
 import services.db.{DBSession, TransactionSerializable}
 import services.logging.Logging
 import exception.InsufficientInventoryException
+import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import services.http.ServerSessionFactory
 import java.text.SimpleDateFormat
@@ -71,10 +72,10 @@ case class EgraphPurchaseHandler(
    * Performs the purchase the purchase with error handling.
    * @return A Redirect to either an order confirmation page or some error page.
    */
-  def execute(): Redirect = {
+  def execute(): Result = {
     val errorOrOrder = performPurchase
 
-    val redirect: Redirect = errorOrOrder.fold(
+    val redirect: Result = errorOrOrder.fold(
       (error) => error match {
         case stripeError: PurchaseFailedStripeError =>
           //Attempt Stripe charge. If a credit card-related error occurred, redirect to purchase screen.

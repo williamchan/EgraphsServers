@@ -1,6 +1,7 @@
 package services.http
 
-import play.mvc.Http.Request
+import play.api.mvc.Result
+import play.api.mvc.Request
 import models._
 import com.google.inject.Inject
 import controllers.WebsiteControllers
@@ -11,16 +12,16 @@ class CustomerRequestFilters @Inject()(customerStore: CustomerStore) {
 
   import SafePlayParams.Conversions._
 
-  def requireCustomerLogin(continue: (Customer, Account) => Any)(implicit request: Request) = {
-    val customerIdOption = session.getLongOption(WebsiteControllers.customerIdKey)
+  def requireCustomerLogin(continue: (Customer, Account) => Result)(implicit request: Request[_]): Result = {
+    val session = request.session
+    val customerIdOption = session.get(EgraphsSession.Key.CustomerId.name).map(customerId => customerId.toLong)
     val customerOption = customerIdOption match {
       case None => None
       case Some(customerId) => customerStore.findById(customerId)
     }
     customerOption match {
       case None => {
-        session.clear()
-        new Redirect(GetLoginEndpoint.url().url)
+        Redirect(GetLoginEndpoint.url().url).withNewSession
       }
       case Some(customer) => continue(customer, customer.account)
     }
