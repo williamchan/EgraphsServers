@@ -2,8 +2,8 @@ package services.http
 
 import com.google.inject.Inject
 import java.util.Properties
-import play.mvc.Http.Request
-import play.mvc.results.Result
+import play.api.mvc.Results.Redirect
+import play.api.mvc.{AnyContent, Request}
 
 /**
  * Inspired by [play-framework] Forcing SSL connection:
@@ -12,10 +12,10 @@ import play.mvc.results.Result
 class HttpsFilter @Inject()(@PlayConfig playConfig: Properties) {
 
   def apply[A](operation: => A)
-              (implicit request: Request): Either[Result, A] = {
+              (implicit request: Request[AnyContent]): Either[Redirect, A] = {
 
     if (playConfig.getProperty(HttpsFilter.httpsOnlyProperty) == "true" && !request.secure.booleanValue()) {
-      Left(new play.mvc.results.Redirect("https://" + request.host + request.url))
+      Left(Redirect("https://" + request.host + request.uri))
     }
 
     else Right(operation)

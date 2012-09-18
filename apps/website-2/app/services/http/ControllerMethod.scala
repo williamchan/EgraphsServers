@@ -95,7 +95,7 @@ class POSTControllerMethod @Inject()(
    */
   def apply[A](doCsrfCheck: Boolean=true, openDatabase: Boolean=true)
               (operation: => A)
-              (implicit request: Request): Any =
+              (implicit request: Request[AnyContent]): Any =
   {
     controllerMethod() {
       authenticityTokenFilter(doCsrfCheck) {
@@ -129,7 +129,7 @@ class POSTApiControllerMethod @Inject()(postControllerMethod: POSTControllerMeth
    * @return the return value of the `operation` code block or the error state of
    *     postControllerMethod
    */
-  def apply[A](operation: => A)(implicit request: Request): Any = {
+  def apply[A](operation: => A)(implicit request: Request[AnyContent]): Any = {
     postControllerMethod(doCsrfCheck=false) {
       operation
     }
