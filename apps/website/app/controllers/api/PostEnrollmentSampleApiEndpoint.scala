@@ -7,12 +7,12 @@ import actors.ProcessEnrollmentBatchMessage
 import akka.actor.ActorRef
 import services.db.{DBSession, TransactionSerializable}
 import play.data.validation.Required
-import services.http.{HttpCodes, ControllerMethod, CelebrityAccountRequestFilters}
+import services.http.{WithoutDBConnection, POSTApiControllerMethod, HttpCodes, CelebrityAccountRequestFilters}
 
 private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
   protected def enrollmentBatchActor: ActorRef
   protected def dbSession: DBSession
-  protected def controllerMethod: ControllerMethod
+  protected def postApiController: POSTApiControllerMethod
   protected def enrollmentBatchServices: EnrollmentBatchServices
   protected def celebFilters: CelebrityAccountRequestFilters
   protected def enrollmentBatchStore: EnrollmentBatchStore
@@ -21,7 +21,7 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
                            @Required audio: String,
                            skipBiometrics: Boolean = false /*todo(wchan): remove skipBiometrics parameter*/) =
 
-    controllerMethod(openDatabase = false) {
+    postApiController(dbSettings = WithoutDBConnection) {
       // Get result of DB transaction that processes the request
       val transactionResult = dbSession.connected(TransactionSerializable) {
 

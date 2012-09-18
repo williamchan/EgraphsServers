@@ -3,7 +3,7 @@ package services.http
 import play.mvc.Http.Request
 import services.logging.LoggingContext
 import com.google.inject.Inject
-import services.db.{TransactionIsolation, TransactionSerializable, DBSession}
+import services.db.DBSession
 import play.mvc.Scope.Session
 
 /**
@@ -23,30 +23,27 @@ class ControllerMethod @Inject()(logging: LoggingContext, db: DBSession, httpsFi
    * Prepares and customizes controller method behavior. The first expression in
    * any controller methods in our codebase should be to call this function.
    *
-   * @param openDatabase true that a database connection should be managed
-   *                     by this ControllerMethod instance.
-   * @param dbIsolation the transaction isolation with which to connect to the
-   *                    database if openDatabase is true
-   * @param readOnly true that the database transaction is read-only if openDatabase is true
+   * @param dbSettings the ControllerDBSettings that specify whether a database connection coincides with the
+   *                   lifecycle of this controller method, as well as the transaction isolation level and
+   *                   whether the transaction is read-only.
    * @param operation the code block to execute after setting up the connection resources
    * @param request the request being served
    * @return the result of the `operation` code block.
    */
-  def apply[A](openDatabase:Boolean=true,
-               dbIsolation: TransactionIsolation = TransactionSerializable,
-               readOnly: Boolean = false)
+  def apply[A](dbSettings: ControllerDBSettings = WithDBConnection())
               (operation: => A)
               (implicit request: Request): Any =
   {
     val redirectOrResult = httpsFilter {
       logging.withContext(request) {
-        if (openDatabase) {
-          db.connected(dbIsolation, readOnly) {
-            operation
+        dbSettings match {
+          case WithoutDBConnection => operation
+          case dbSettings: WithDBConnection => {
+            db.connected(dbSettings.dbIsolation, dbSettings.readOnly) {
+              operation
+            }
           }
-        }
-        else {
-          operation
+          case _ => throw new UnsupportedOperationException("ControllerDBSettings must be specified for this controller.")
         }
       }
     }
@@ -78,26 +75,24 @@ class POSTControllerMethod @Inject()(
 ) {
 
   /**
-   * Performs an operation after ensuring that the post is protected by a
-   * CSRF token.
+   * Performs an operation after ensuring that the post is protected by a CSRF token.
    *
-   * @param doCsrfCheck true that we should check for an authenticity token before
-   *     performing the operation
-   * @param openDatabase true that the a database connection should be managed
-   *    by this ControllerMethod instance.
+   * @param doCsrfCheck true that we should check for an authenticity token before performing the operation
+   * @param dbSettings the ControllerDBSettings that specify whether a database connection coincides with the
+   *                   lifecycle of this controller method, as well as the transaction isolation level and
+   *                   whether the transaction is read-only.
    * @param operation the operation to perform
    * @param request the current request
    * @param session the current session
    * @tparam A return type of Operation
-   *
-   * @return either the return value of the `operation` code block or
-   *     a [[play.mvc.results.Forbidden]]
+   * @return either the return value of the `operation` code block or a [[play.mvc.results.Forbidden]]
    */
-  def apply[A](doCsrfCheck: Boolean=true, openDatabase: Boolean=true)
+  def apply[A](doCsrfCheck: Boolean=true,
+               dbSettings: ControllerDBSettings = WithDBConnection(readOnly = false))
               (operation: => A)
               (implicit request: Request, session: Session): Any =
   {
-    controllerMethod() {
+    controllerMethod(dbSettings = dbSettings) {
       authenticityTokenFilter(doCsrfCheck) {
         operation
       }.fold(forbidden => forbidden, result => result)
@@ -121,16 +116,19 @@ class POSTApiControllerMethod @Inject()(postControllerMethod: POSTControllerMeth
    * Performs an operation after ensuring an appropriate execution context for
    * a POST to the API.
    *
+   * @param dbSettings the ControllerDBSettings that specify whether a database connection coincides with the
+   *                   lifecycle of this controller method, as well as the transaction isolation level and
+   *                   whether the transaction is read-only.
    * @param operation operation to perform
    * @param request the current request
    * @param session the current session
    * @tparam A return type of `operation`
    *
-   * @return the return value of the `operation` code block or the error state of
-   *     postControllerMethod
+   * @return the return value of the `operation` code block or the error state of postControllerMethod
    */
-  def apply[A](operation: => A)(implicit request: Request, session: Session): Any = {
-    postControllerMethod(doCsrfCheck=false) {
+  def apply[A](dbSettings: ControllerDBSettings = WithDBConnection(readOnly = false))
+              (operation: => A)(implicit request: Request, session: Session): Any = {
+    postControllerMethod(doCsrfCheck=false, dbSettings=dbSettings) {
       operation
     }
   }

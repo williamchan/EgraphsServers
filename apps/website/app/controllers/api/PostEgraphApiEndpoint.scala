@@ -5,16 +5,16 @@ import sjson.json.Serializer
 import play.data.validation._
 import services.http.SafePlayParams.Conversions._
 import play.libs.Codec
-import services.http.{ControllerMethod, HttpCodes, OrderRequestFilters, CelebrityAccountRequestFilters}
+import services.http._
 import services.db.{TransactionSerializable, DBSession}
-import actors.ProcessEgraphMessage
 import akka.actor.ActorRef
 import services.Time
+import actors.ProcessEgraphMessage
 
 private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
   protected def egraphActor: ActorRef
   protected def dbSession: DBSession
-  protected def controllerMethod: ControllerMethod
+  protected def postApiController: POSTApiControllerMethod
   protected def celebFilters: CelebrityAccountRequestFilters
   protected def orderFilters: OrderRequestFilters
 
@@ -32,7 +32,7 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
     signedAt: String = "",
     skipBiometrics: Boolean = false /*todo(wchan): remove skipBiometrics parameter*/) =
   {
-    controllerMethod(openDatabase=false) {
+    postApiController(dbSettings = WithoutDBConnection) {
       // Get result of DB transaction that processes the request
       val transactionResult = dbSession.connected(TransactionSerializable) {
 
