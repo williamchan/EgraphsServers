@@ -18,7 +18,6 @@ object WebsiteBuild extends Build {
       "batik" % "batik-svggen" % "1.6",
       "com.google.inject" % "guice" % "2.0",
       "com.stripe" % "stripe-java" % "1.0.1",
-  //    "egraphs" % "redis" % "0.3",
       "junit-addons" % "junit-addons" % "1.4",
       "net.debasishg" %% "sjson" % "0.15" exclude("org.scala-lang", "scala-library"),  //from 0.12
   //        exclude:
@@ -73,6 +72,7 @@ object WebsiteBuild extends Build {
       //"play" % "cloudbees" % "0.2.2",
       //play" % "mockito" % "0.1",
       "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
+      "redis.clients" % "jedis" % "2.0.0",
       //"com.googlecode.soundlibs" % "tritonus-share" % "0.3.7-1", // from our unmanaged dependency 0.3.6
       "xml-apis" % "xml-apis-ext" % "1.3.04",
       "xml-apis" % "xml-apis" % "1.3.04", // we might be getting pretty stale here
