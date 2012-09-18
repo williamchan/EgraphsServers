@@ -7,7 +7,7 @@ import PlayProject._
  */
 object FrontendBuild extends Build {
 
-  val appName = "frontend"
+  val appName = "front-end"
   val appVersion = "2.0-SNAPSHOT"
 
   val appDependencies = Seq(

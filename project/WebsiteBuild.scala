@@ -2,16 +2,12 @@ import sbt._
 import Keys._
 import PlayProject._
 
-object ApplicationBuild extends Build {
+object WebsiteBuild extends Build {
 
     val appName         = "website"
     val appVersion      = "2.0-SNAPSHOT"
 
     val appDependencies = Seq(
-      "egraphs" %% "frontend" % "2.0-SNAPSHOT",
-      "egraphs" %% "frontend-lib" % "1.0-SNAPSHOT",
-      "egraphs" %% "website-dal" % "1.0-SNAPSHOT",
-
    // Application dependencies. Keep these in alphabetical order.
       "batik" % "batik-rasterizer" % "1.6",
       "batik" % "batik-svggen" % "1.6",
@@ -78,10 +74,15 @@ object ApplicationBuild extends Build {
       "xuggle" % "xuggle-xuggler" % "5.4"
     )
 
-    val main = PlayProject(appName, appVersion, appDependencies).settings(
+    val main = PlayProject(
+      appName,
+      appVersion,
+      appDependencies,
+      path = file(".") / "apps" / "website-2",
+      mainLang = SCALA
+    ).settings(
       organization := "egraphs",
 
-      resolvers += Resolver.url("xugglecode", url("http://xuggle.googlecode.com/svn/trunk/repo/share/java/"))(Resolver.mavenStylePatterns)
-    )
-
+      resolvers += "xugglecode" at "http://xuggle.googlecode.com/svn/trunk/repo/share/java"
+    ).dependsOn(FrontendBuild.main)
 }
