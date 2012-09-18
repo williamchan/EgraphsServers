@@ -23,11 +23,11 @@ class ControllerMethod @Inject()(logging: LoggingContext, db: DBSession, httpsFi
    * Prepares and customizes controller method behavior. The first expression in
    * any controller methods in our codebase should be to call this function.
    *
-   * @param openDatabase true that the a database connection should be managed
+   * @param openDatabase true that a database connection should be managed
    *                     by this ControllerMethod instance.
    * @param dbIsolation the transaction isolation with which to connect to the
    *                    database if openDatabase is true
-   * @param readOnly whether the database transaction is read-only
+   * @param readOnly true that the database transaction is read-only if openDatabase is true
    * @param operation the code block to execute after setting up the connection resources
    * @param request the request being served
    * @return the result of the `operation` code block.
