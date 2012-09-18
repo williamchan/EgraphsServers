@@ -2,7 +2,10 @@ import sbt._
 import Keys._
 import PlayProject._
 
-object ApplicationBuild extends Build {
+/**
+ * Builds the front-end Play 2.0 module. Provides the 'frontend' project to Play / SBT.
+ */
+object FrontendBuild extends Build {
 
   val appName = "frontend"
   val appVersion = "2.0-SNAPSHOT"
@@ -22,7 +25,13 @@ object ApplicationBuild extends Build {
     (base / "bootstrap" / "less" / "bootstrap" * "bootstrap.less") //twitter bootstrap
   )
 
-  val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
+  val main = PlayProject(
+    appName,
+    appVersion,
+    appDependencies,
+    path = file(".") / "modules" / "frontend-2",
+    mainLang = SCALA
+  ).settings(
     //resolvers += "Crionics Github Repository" at "http://orefalo.github.com/m2repo/releases/",
 
     organization := "egraphs",
