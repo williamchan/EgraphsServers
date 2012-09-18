@@ -135,6 +135,7 @@
   @valueRow(label="Recipient name",       value=recipient.name)
   @valueRow(label="Recipient email",      value=recipientEmail)
   @valueRow(label="Expected Date",        value=order.expectedDate)
+  @valueRow(label="Written Message Type", value=order._writtenMessageRequest)
   @valueRow(label="Privacy Status",       value=order.privacyStatus)
   @valueRow(label="Rejection Reason",     value=order.rejectionReason.getOrElse(""))
   @valueRow(label="Created",              value=order.created)
