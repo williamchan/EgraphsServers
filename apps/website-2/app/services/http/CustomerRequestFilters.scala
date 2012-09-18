@@ -4,7 +4,7 @@ import play.mvc.Http.Request
 import models._
 import com.google.inject.Inject
 import controllers.WebsiteControllers
-import play.mvc.results.Redirect
+import play.api.mvc.Results.Redirect
 import controllers.website.GetLoginEndpoint
 
 class CustomerRequestFilters @Inject()(customerStore: CustomerStore) {

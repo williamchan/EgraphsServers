@@ -4,7 +4,6 @@ import play.api.mvc.{Action, AnyContent, Request}
 import services.logging.LoggingContext
 import com.google.inject.Inject
 import services.db.{TransactionIsolation, TransactionSerializable, DBSession}
-import play.mvc.Scope.Session
 
 /**
  * Establishes an appropriate execution context for a request handler.
@@ -96,7 +95,7 @@ class POSTControllerMethod @Inject()(
    */
   def apply[A](doCsrfCheck: Boolean=true, openDatabase: Boolean=true)
               (operation: => A)
-              (implicit request: Request, session: Session): Any =
+              (implicit request: Request): Any =
   {
     controllerMethod() {
       authenticityTokenFilter(doCsrfCheck) {
@@ -130,7 +129,7 @@ class POSTApiControllerMethod @Inject()(postControllerMethod: POSTControllerMeth
    * @return the return value of the `operation` code block or the error state of
    *     postControllerMethod
    */
-  def apply[A](operation: => A)(implicit request: Request, session: Session): Any = {
+  def apply[A](operation: => A)(implicit request: Request): Any = {
     postControllerMethod(doCsrfCheck=false) {
       operation
     }

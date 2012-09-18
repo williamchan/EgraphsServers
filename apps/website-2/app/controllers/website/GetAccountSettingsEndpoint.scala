@@ -37,6 +37,7 @@ private[controllers] trait GetAccountSettingsEndpoint extends ImplicitHeaderAndF
 
   private def makeFormView(customer: Customer, account: Account): AccountSettingsFormView = {
     // Get form from flash if possible
+    val flash = play.mvc.Http.Context.current().flash()
     val maybeFormData = accountSettingsForms.getFormReader(customer, account).read(flash.asFormReadable).map { form =>
       val nonFieldSpecificErrors = form.fieldInspecificErrors.map(error => error.asViewError)
 
@@ -95,5 +96,8 @@ private[controllers] trait GetAccountSettingsEndpoint extends ImplicitHeaderAndF
 
 object GetAccountSettingsEndpoint {
 
-  def url() = WebsiteControllers.reverse(WebsiteControllers.getAccountSettings)
+  def url() = {
+    controllers.routes.WebsiteControllers.getAccountSettings().url
+//    WebsiteControllers.reverse(WebsiteControllers.getAccountSettings)
+  }
 }

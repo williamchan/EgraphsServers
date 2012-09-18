@@ -9,12 +9,20 @@ import org.squeryl.Query
 import java.io._
 import scala.Some
 import java.io.{Serializable, PrintWriter, StringWriter}
-import play.mvc.results.Redirect
+import play.api.mvc.Results.Redirect
 
 /**
  * Helpful utilities with no other place to call home
  */
 class Utils @Inject()(@PlayConfig() playConfig: util.Properties) {
+
+  //TODO: write test, this makes me sad to do. but everything is not compiling now, with 400+ compilation errors
+  /**
+   * @return The first value in the map if there is one, or returns the elseValue.
+   */
+  def getFromMapFirstInSeqOrElse[T](key: String, elseValue: T, map: Map[String, Seq[T]]): T  = {
+    queryString.get("secretKey").getOrElse(Seq(elseValue)).firstOption.getOrElse(elseValue)
+  }
 
   /**
    * Turns any Iterable into a map keyed by a provided function.

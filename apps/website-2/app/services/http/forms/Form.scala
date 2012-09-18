@@ -1,6 +1,6 @@
 package services.http.forms
 
-import play.mvc.results.Redirect
+import play.api.mvc.Results.Redirect
 import services.http.ServerSession
 import services.http.forms.Form.FormWriteable
 
@@ -100,11 +100,11 @@ trait Form[+ValidFormType] {
    * @param flash the current flash scope into which the form should be saved.
    * @return a Redirect result for Play to process
    */
-  def redirectThroughFlash(url: String)(implicit flash: play.mvc.Scope.Flash): Redirect = {
+  def redirectThroughFlash(url: String)(implicit flash: play.api.mvc.Flash): Redirect = {
     import Form.Conversions._
 
-    this.write(flash.asFormWriteable)
-    new Redirect(url)
+//    this.write(flash.asFormWriteable)
+    Redirect(url).flashing(this.write(flash))
   }
 
   //
@@ -345,6 +345,10 @@ object Form {
 
   type StringPuttable = { def put(key: String, value: String) }
 
+  type StringGettableAppendable = { def get(key: String): Option[String]; def +(kv: (String, String)) }
+
+  type StringAppendable = { def +(kv: (String, String)) }
+
   /**
    * FormWriteable that allows forms to write into any object that has a `def put(key: String, value: String)`
    * method. This includes most java map-like types including Play! scopes.
@@ -373,6 +377,27 @@ object Form {
     }
   }
 
+  class ImmutableMapWriteable[T <: StringAppendable](val puttable: T) extends FormWriteable[T]
+  {
+    // FormWriteable members
+    val written: T = {
+      puttable
+    }
+
+    def withData(toAdd: (String, Iterable[String])): ImmutableMapWriteable[T] = {
+      val (key, rawValues) = toAdd
+
+      // Replace instances of the serialization delimiter with something reasonable
+      val escapedValues = rawValues.map(eachValue =>
+        eachValue.replace(serializationDelimiter, "...")
+      )
+
+      puttable + (key, escapedValues.mkString(serializationDelimiter))
+      
+      //TODO: wtf, this is immutable...
+    }
+  }
+
   /**
    * FormWriteable that allows forms to write into a cache-backed ServerSession.
    */
@@ -398,16 +423,16 @@ object Form {
       }
     }
 
-    class FormCompatiblePlayFlashAndSession[T <: StringGettablePuttable](gettablePuttable: T) {
+    class FormCompatiblePlayFlashAndSession[T <: StringGettableAppendable](getabbleAppendable: T) {
       def asFormReadable: Form.Readable = {
         (key) => {
-          val valueOption = Option(gettablePuttable.get(key))
+          val valueOption = getabbleAppendable.get(key)
           valueOption.map(valueString => valueString.split(serializationDelimiter)).flatten
         }
       }
 
       def asFormWriteable: FormWriteable[T] = {
-        new MutableMapWriteable(gettablePuttable)
+        new ImmutableMapWriteable(getabbleAppendable)
       }
     }
 
@@ -422,10 +447,10 @@ object Form {
       }
     }
 
-    implicit def playFlashOrSessionToFormCompatible[T <: StringGettablePuttable](gettablePuttable: T)
+    implicit def playFlashOrSessionToFormCompatible[T <: StringGettableAppendable](gettableAppendable: T)
     :FormCompatiblePlayFlashAndSession[T] =
     {
-      new FormCompatiblePlayFlashAndSession(gettablePuttable)
+      new FormCompatiblePlayFlashAndSession(gettableAppendable)
     }
 
     //

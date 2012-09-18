@@ -29,6 +29,7 @@ private[controllers] trait GetOrderConfirmationEndpoint extends ImplicitHeaderAn
     // probably PostBuyProductEndpoint)
     import services.http.SafePlayParams.Conversions._
 
+    val flash = play.mvc.Http.Context.current().flash()
     val maybeOrderIdFromFlash = flash.getLongOption("orderId")
 
     val maybeHtml = for (

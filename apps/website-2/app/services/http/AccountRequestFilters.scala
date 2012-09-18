@@ -2,7 +2,7 @@ package services.http
 
 import play.mvc.{Before, Controller}
 import models._
-import play.mvc.Http.Request
+import play.api.mvc.Request
 import com.google.inject.Inject
 import play.mvc.results.{NotFound, Forbidden}
 

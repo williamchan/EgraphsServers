@@ -2,7 +2,7 @@ package controllers.website
 
 import models._
 import models.enums._
-import play.mvc.Scope.Flash
+import play.api.mvc.Flash
 import services.mail.TransactionalMail
 import services.{Utils, AppConfig}
 import controllers.WebsiteControllers
@@ -12,7 +12,7 @@ import sjson.json.Serializer
 import services.db.{DBSession, TransactionSerializable}
 import services.logging.Logging
 import exception.InsufficientInventoryException
-import play.mvc.results.Redirect
+import play.api.mvc.Results.Redirect
 import services.http.ServerSessionFactory
 import java.text.SimpleDateFormat
 import org.apache.commons.mail.HtmlEmail
@@ -43,7 +43,7 @@ case class EgraphPurchaseHandler(
   printingOption: PrintingOption = PrintingOption.DoNotPrint,
   shippingForm: Option[CheckoutShippingForm.Valid] = None,
   writtenMessageRequest: WrittenMessageRequest = WrittenMessageRequest.SpecificMessage,
-  flash: Flash = Flash.current(),
+  flash: Flash = play.mvc.Http.Context.current().flash(),
   mail: TransactionalMail = AppConfig.instance[TransactionalMail],
   customerStore: CustomerStore = AppConfig.instance[CustomerStore],
   accountStore: AccountStore = AppConfig.instance[AccountStore],
@@ -74,23 +74,24 @@ case class EgraphPurchaseHandler(
   def execute(): Redirect = {
     val errorOrOrder = performPurchase
 
-    val redirect = errorOrOrder.fold(
+    val redirect: Redirect = errorOrOrder.fold(
       (error) => error match {
         case stripeError: PurchaseFailedStripeError =>
           //Attempt Stripe charge. If a credit card-related error occurred, redirect to purchase screen.
-          return new Redirect(reverse(WebsiteControllers.getStorefrontCreditCardError(celebrity.urlSlug, product.urlSlug, stripeError.stripeException.getLocalizedMessage)).url)
+          Redirect(controllers.routes.WebsiteControllers.getStorefrontCreditCardError(celebrity.urlSlug, product.urlSlug, stripeError.stripeException.getLocalizedMessage))
         case _: PurchaseFailedInsufficientInventory =>
           //A redirect to the insufficient inventory page
-          new Redirect(reverse(WebsiteControllers.getStorefrontNoInventory(celebrity.urlSlug, product.urlSlug)).url)
+          Redirect(controllers.routes.WebsiteControllers.getStorefrontNoInventory(celebrity.urlSlug, product.urlSlug))
         case _: PurchaseFailedError =>
-          return new Redirect(reverse(WebsiteControllers.getStorefrontPurchaseError(celebrity.urlSlug, product.urlSlug)).url)
+          Redirect(controllers.routes.WebsiteControllers.getStorefrontPurchaseError(celebrity.urlSlug, product.urlSlug))
       },
       (successfulOrder) =>
         //A redirect to the order confirmation page
-        new Redirect(reverse(getOrderConfirmation(successfulOrder.id)).url)
+        Redirect(controllers.routes.WebsiteControllers.getOrderConfirmation(successfulOrder.id))
     )
 
-    redirect
+    val flash = play.mvc.Http.Context.current().flash()
+    redirect.flashing(flash + "orderId" -> order.id)
   }
 
   def performPurchase(): Either[PurchaseFailed, Order] = {
@@ -139,7 +140,6 @@ case class EgraphPurchaseHandler(
 
     // If the Stripe charge and Order persistence executed successfully, send a confirmation email and redirect to a confirmation page
     sendOrderConfirmationEmail(buyerName = buyerName, buyerEmail = buyerEmail, recipientName = recipientName, recipientEmail = recipientEmail, celebrity, product, order, cashTransaction, maybePrintOrder, mail)
-    flash.put("orderId", order.id)
 
     // Clear out the shopping cart and redirect
     serverSessions.celebrityStorefrontCart(celebrity.id).emptied.save()

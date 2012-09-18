@@ -9,7 +9,7 @@ import services.graphics.Handwriting
 import models._
 import controllers.WebsiteControllers
 import frontend.egraph.{LandscapeEgraphFrameViewModel, PortraitEgraphFrameViewModel}
-import play.mvc.results.Redirect
+import play.api.mvc.Results.Redirect
 import services.social.{Twitter, Facebook}
 import java.text.SimpleDateFormat
 import services.Utils
@@ -156,6 +156,7 @@ object GetEgraphEndpoint {
   }
 
   def url(orderId: Long): Router.ActionDefinition = {
-    Utils.lookupUrl("WebsiteControllers.getEgraph", Map("orderId" -> orderId.toString))
+    controllers.routes.WebsiteControllers.getEgraph(orderId).url
+//    Utils.lookupUrl("WebsiteControllers.getEgraph", Map("orderId" -> orderId.toString))
   }
 }

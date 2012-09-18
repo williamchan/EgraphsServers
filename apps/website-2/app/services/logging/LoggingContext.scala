@@ -1,10 +1,9 @@
 package services.logging
 
 import org.slf4j.MDC
-import play.mvc.Http.Request
+import play.api.mvc.{AnyContent, Request}
 import services.http.RequestInfo
 import play.Logger.info
-import play.mvc.Scope.{Flash, Session}
 import services.{Utils, Time}
 
 /**
@@ -34,7 +33,7 @@ class LoggingContext {
    * @param operation block of code that should execute within the request logging context
    * @return the result of the operation
    **/
-  def withContext[A](request: Request)(operation: => A): A = {
+  def withContext[A](request: Request[AnyContent])(operation: => A): A = {
     val requestInfo = new RequestInfo(request)
 
     // Prepare the context for any logs that occur after this point
@@ -78,7 +77,7 @@ class LoggingContext {
     }
   }
   
-  private def createRequestContext(request: Request, requestInfo: RequestInfo): String = {
+  private def createRequestContext(request: Request[AnyContent], requestInfo: RequestInfo): String = {
     try {
       new StringBuilder(request.actionMethod)
         .append("(")
@@ -95,7 +94,7 @@ class LoggingContext {
     }
   }
   
-  private def logRequestHeader(request: Request, requestInfo: RequestInfo) {
+  private def logRequestHeader(request: Request[AnyContent], requestInfo: RequestInfo) {
     try {
       val requestHeader = new StringBuilder("Serving IP ")
         .append(request.remoteAddress)
@@ -142,27 +141,27 @@ class LoggingContext {
     }
   }
 
-  private def logRequestDetails(req: Request) {
+  private def logRequestDetails(req: Request[AnyContent]) {
     import scala.collection.JavaConversions._
 
     info("  " + req.toString)
 
     info("  Request parameters:")
-    for ((param, value) <- req.params.all() if !(List("password", "body").contains(param.toLowerCase))) {
-      info("    \"" + param + "\" -> " + value.mkString(", "))
+    for ((param, values) <- req.queryString if !(List("password", "body").contains(param.toLowerCase))) {
+      info("    \"" + param + "\" -> " + values.mkString(", "))
     }
 
     info("  Session parameters:")
-    for ((param, value) <- Session.current().all()) {
+    for ((param, value) <- req.session.data) {
       info("    \"" + param + "\" -> " + value)
     }
 
     info("  Flash parameters:")
-    info("    " + Flash.current().toString)
+    info("    " + req.flash.toString)
 
     info("  Headers:")
-    for ((_, header) <- req.headers if header.name.toLowerCase != "authorization") {
-      info("    \"" + header.name + "\" -> " + header.values.mkString(", "))
+    for ((headerName, headerValues) <- req.headers.toMap if headerName.toLowerCase != "authorization") {
+      info("    \"" + headerName + "\" -> " + headerValues.mkString(", "))
     }
   }
 }

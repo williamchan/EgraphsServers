@@ -10,7 +10,7 @@ private[controllers] trait GetStaticEndpoint extends ImplicitHeaderAndFooterData
   protected def controllerMethod: ControllerMethod
 
   def getAbout = controllerMethod() {
-    views.html.frontend.about_us(learnMoreUrl = WebsiteControllers.reverse(WebsiteControllers.getInsideEgraph).url)
+    views.html.frontend.about_us(learnMoreUrl = controllers.routes.WebsiteControllers.getInsideEgraph().url)
   }
 
   def getCareers = controllerMethod() {

@@ -1,6 +1,7 @@
 package controllers.website
 
-import play.api.mvc.Controller
+import play.api._
+import play.api.mvc._
 import services.http.{AccountRequestFilters, ControllerMethod}
 import services.Utils
 import models.{Account, AccountStore}
@@ -22,35 +23,44 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
   protected def accountRequestFilters: AccountRequestFilters
   protected def accountPasswordResetForms: AccountPasswordResetFormFactory
 
-  def getResetPassword(email: String, secretKey: String) = controllerMethod() {
-    //flash takes precedence over url arg
-    accountRequestFilters.requireValidAccountEmail(flash.getOption("email").getOrElse(email)) { account =>
-      val form = makeFormView(account)
-
-      val displayableErrors = List(form.newPassword.error, form.passwordConfirm.error, form.email.error)
-        .asInstanceOf[List[Option[FormError]]].filter(e => e.isDefined).map(e => e.get.description)
-
-        if (account.verifyResetPasswordKey(form.secretKey.value.getOrElse("")) == true) {
-          views.html.frontend.account_password_reset(form=form, displayableErrors=displayableErrors)
-        } else {
-         Forbidden("The password reset URL you used is either out of date or invalid.")
+  def getResetPassword(email: String, secretKey: String) = Action { request =>
+    controllerMethod() {
+      //flash takes precedence over url arg
+      val flash = request.flash
+      val emailString: String = flash.get("email").getOrElse(email)
+      accountRequestFilters.requireValidAccountEmail(emailString) { account =>
+        val form = makeFormView(account)
+  
+        val displayableErrors = List(form.newPassword.error, form.passwordConfirm.error, form.email.error)
+          .asInstanceOf[List[Option[FormError]]].filter(e => e.isDefined).map(e => e.get.description)
+  
+          if (account.verifyResetPasswordKey(form.secretKey.value.getOrElse("")) == true) {
+            Ok(views.html.frontend.account_password_reset(form=form, displayableErrors=displayableErrors))
+          } else {
+            Forbidden("The password reset URL you used is either out of date or invalid.")
+        }
       }
     }
   }
 
-  def getVerifyAccount() =  controllerMethod() {
-    accountRequestFilters.requireValidAccountEmail(request.params.getOption("email").getOrElse("Nothing")) { account =>
-      if(account.verifyResetPasswordKey(request.params.getOption("secretKey").getOrElse(""))){
-        account.emailVerify().save()
-        views.html.frontend.simple_confirmation("Account Verified", "Your account has been successfully verified.")
-      } else {
-        Forbidden("The password reset URL you used is either out of date or invalid.")
+  def getVerifyAccount() = Action { request =>
+    controllerMethod() {
+      val email = Utils.getFromMapFirstInSeqOrElse("email", "Nothing", request.queryString)
+      accountRequestFilters.requireValidAccountEmail(email) { account =>
+        val resetPasswordKey = Utils.getFromMapFirstInSeqOrElse("secretKey", "", request.queryString)
+        if(account.verifyResetPasswordKey(resetPasswordKey)){
+          account.emailVerify().save()
+          Ok(views.html.frontend.simple_confirmation("Account Verified", "Your account has been successfully verified."))
+        } else {
+          Forbidden("The password reset URL you used is either out of date or invalid.")
+        }
       }
     }
   }
 
   private def makeFormView(account: Account) : AccountPasswordResetFormView = {
     //check flash for presence of secretKey and Email
+    val flash = play.mvc.Http.Context.current().flash()
     val maybeFormData = accountPasswordResetForms.getFormReader(account).read(flash.asFormReadable).map { form =>
       AccountPasswordResetFormView(
         form.secretKey.asViewField,
@@ -66,7 +76,7 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
       val secretKeyOption = params.getOption("secretKey")
 
       AccountPasswordResetFormView(
-        email= Field(name = Fields.Email.name, values = List(emailOption.getOrElse(""))),
+        email = Field(name = Fields.Email.name, values = List(emailOption.getOrElse(""))),
         secretKey = Field(name = Fields.SecretKey.name, values = List(secretKeyOption.getOrElse(""))),
         passwordConfirm = Field(name = Fields.PasswordConfirm.name, values = List("")),
         newPassword = Field[String](name = Fields.NewPassword.name, values = List(""))

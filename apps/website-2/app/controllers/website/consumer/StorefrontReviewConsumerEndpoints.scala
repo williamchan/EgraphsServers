@@ -4,7 +4,7 @@ import services.http.{SafePlayParams, POSTControllerMethod, CelebrityAccountRequ
 import play.api.mvc.Controller
 
 import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
-import play.mvc.results.Redirect
+import play.api.mvc.Results.Redirect
 import services.http.forms.purchase._
 import models.enums.{PrintingOption, WrittenMessageRequest}
 import PrintingOption.HighQualityPrint

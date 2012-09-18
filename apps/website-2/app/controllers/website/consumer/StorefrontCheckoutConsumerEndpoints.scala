@@ -10,7 +10,7 @@ import services.http.forms.Form.Conversions._
 import services.mvc.FormConversions.{checkoutBillingFormToViewConverter, checkoutShippingFormToViewConverter}
 import models.frontend.storefront.{CheckoutFormView, CheckoutOrderSummary, CheckoutBillingInfoView, CheckoutShippingAddressFormView}
 import services.payment.Payment
-import play.mvc.results.Redirect
+import play.api.mvc.Results.Redirect
 import controllers.WebsiteControllers
 import services.blobs.AccessPolicy
 

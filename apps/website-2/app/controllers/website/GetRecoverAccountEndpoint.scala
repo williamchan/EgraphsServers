@@ -22,6 +22,7 @@ private[controllers] trait GetRecoverAccountEndpoint extends ImplicitHeaderAndFo
   protected def accountRecoverForms: AccountRecoverFormFactory
 
   def getRecoverAccount = controllerMethod() {
+    val flash = play.mvc.Http.Context.current().flash()
     val maybeFormData = accountRecoverForms.getFormReader.read(flash.asFormReadable).map { form =>
       AccountRecoverFormView(
         form.email.asViewField
@@ -38,5 +39,8 @@ private[controllers] trait GetRecoverAccountEndpoint extends ImplicitHeaderAndFo
 
 object GetRecoverAccountEndpoint {
 
-  def url() = WebsiteControllers.reverse(WebsiteControllers.getRecoverAccount)
+  def url() = {
+      controllers.routes.WebsiteControllers.getRecoverAccount().url
+//    WebsiteControllers.reverse(WebsiteControllers.getRecoverAccount)
+  }
 }

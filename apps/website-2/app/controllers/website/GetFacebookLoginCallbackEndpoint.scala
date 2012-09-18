@@ -4,7 +4,7 @@ import controllers.WebsiteControllers
 import java.util.Properties
 import models.{Account, Customer, CustomerStore, AccountStore}
 import play.api.mvc.Controller
-import play.mvc.results.Redirect
+import play.api.mvc.Results.Redirect
 import services.db.{TransactionSerializable, DBSession}
 import services.http.ControllerMethod
 import services.Utils
@@ -102,7 +102,8 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
 
 object GetFacebookLoginCallbackEndpoint {
   def getCallbackUrl = {
-    val action = Utils.lookupUrl("WebsiteControllers.getFacebookLoginCallback")
+    val action = controllers.routes.WebsiteControllers.getFacebookLoginCallback().url
+//  val action = Utils.lookupUrl("WebsiteControllers.getFacebookLoginCallback")
     Utils.absoluteUrl(action)
   }
 }

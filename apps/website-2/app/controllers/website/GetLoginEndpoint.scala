@@ -1,6 +1,7 @@
 package controllers.website
 
-import play.api.mvc.Controller
+import play.api._
+import play.api.mvc._
 import services.Utils
 import services.http.ControllerMethod
 import services.social.Facebook
@@ -24,20 +25,21 @@ private[controllers] trait GetLoginEndpoint extends ImplicitHeaderAndFooterData 
   //
   // Controllers
   //
-  def getLogin = controllerMethod() {
-    // Save a new FB state ID into the session
-    val fbState = UUID.randomUUID().toString
-    session.put(Facebook._fbState, fbState)
-    val fbOauthUrl = Facebook.getFbOauthUrl(fbAppId = facebookAppId, state = fbState)
-
-    // Render
-    views.html.frontend.login(
-      loginForm=makeLoginFormView,
-      registrationForm=makeRegisterFormView,
-      fbAuthUrl=fbOauthUrl
-    )
+  def getLogin = Action { request =>
+    controllerMethod() {
+    
+      // Save a new FB state ID into the session
+      val fbState = UUID.randomUUID().toString
+      val fbOauthUrl = Facebook.getFbOauthUrl(fbAppId = facebookAppId, state = fbState)
+  
+      // Render
+      Ok(views.html.frontend.login(
+        loginForm=makeLoginFormView,
+        registrationForm=makeRegisterFormView,
+        fbAuthUrl=fbOauthUrl
+      )).withSession(request.session + (Facebook._fbState -> fbState))
+    }
   }
-
 
   //
   // Private members
@@ -46,6 +48,7 @@ private[controllers] trait GetLoginEndpoint extends ImplicitHeaderAndFooterData 
     import LoginFormViewConversions._
 
     // Get form from flash if possible
+    val flash = play.mvc.Http.Context.current().flash()
     val flashAsReadable = flash.asFormReadable
     val maybeFormFromFlash = formReaders.forCustomerLoginForm.read(flashAsReadable)
     val maybeFormViewModel = maybeFormFromFlash.map(form => form.asView)
@@ -59,6 +62,7 @@ private[controllers] trait GetLoginEndpoint extends ImplicitHeaderAndFooterData 
     import services.mvc.forms.AccountRegistrationFormViewConversions._
 
     // Get for form flash if possible
+    val flash = play.mvc.Http.Context.current().flash()
     val flashAsReadable = flash.asFormReadable
     val maybeFormFromFlash = formReaders.forRegistrationForm.read(flashAsReadable)
     val maybeFormViewModel = maybeFormFromFlash.map(form => form.asView)
@@ -69,6 +73,8 @@ private[controllers] trait GetLoginEndpoint extends ImplicitHeaderAndFooterData 
 }
 
 object GetLoginEndpoint {
-
-  def url() = WebsiteControllers.reverse(WebsiteControllers.getLogin)
+  def url() = {
+    controllers.routes.WebsiteControllers.getLogin().url
+//    WebsiteControllers.reverse(WebsiteControllers.getLogin)
+  }
 }

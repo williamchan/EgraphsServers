@@ -8,7 +8,7 @@ import services.http.forms.purchase.FormReaders
 import services.http.forms.Form
 import controllers.WebsiteControllers
 import services.db.{TransactionReadCommitted, TransactionSerializable, DBSession}
-import play.mvc.results.Redirect
+import play.api.mvc.Results.Redirect
 import scala.Some
 import services.logging.Logging
 import Form.Conversions._

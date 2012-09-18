@@ -1,7 +1,7 @@
 package controllers.website
 
 import play.api.mvc.Controller
-import play.mvc.results.Redirect
+import play.api.mvc.Results.Redirect
 import controllers.WebsiteControllers
 import models._
 import services.http.POSTControllerMethod

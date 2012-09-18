@@ -2,7 +2,7 @@ package services.http.forms.purchase
 
 import services.http.{ServerSessionFactory, ServerSession}
 import com.google.inject.Inject
-import play.mvc.results.Redirect
+import play.api.mvc.Results.Redirect
 import models.{PrintOrder, InventoryBatch, Celebrity, Product}
 import controllers.WebsiteControllers.{getStorefrontPersonalize, getStorefrontReview, reverse, getStorefrontChoosePhotoTiled, getStorefrontCheckout}
 import org.joda.money.{CurrencyUnit, Money}

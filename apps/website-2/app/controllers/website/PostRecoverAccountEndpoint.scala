@@ -29,6 +29,7 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
         }
         sendRecoveryPasswordEmail(accountWithResetPassKey, customer)
 
+        val flash = play.mvc.Http.Context.current().flash()
         flash.put("email", request.params.getOption("email").getOrElse(""))
 
         views.html.frontend.simple_confirmation(header = "Success", body ="Instructions for recovering your account have been sent to your email address.")

@@ -3,7 +3,7 @@ package controllers.website.consumer
 import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters, ControllerMethod}
 import play.mvc.{Router, Controller}
 import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
-import play.mvc.results.Redirect
+import play.api.mvc.Results.Redirect
 import services.http.forms.purchase.PurchaseFormFactory
 import services.Utils
 import controllers.WebsiteControllers.getStorefrontPersonalize

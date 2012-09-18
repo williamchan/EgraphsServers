@@ -19,7 +19,7 @@ object ApplicationBuild extends Build {
       "com.stripe" % "stripe-java" % "1.0.1",
   //    "egraphs" % "redis" % "0.3",
       "junit-addons" % "junit-addons" % "1.4",
-      "net.debasishg" %% "sjson" % "0.17" exclude("org.scala-lang", "scala-library"),  //from 0.12
+      "net.debasishg" %% "sjson" % "0.15" exclude("org.scala-lang", "scala-library"),  //from 0.12
   //        exclude:
   //            # Exclude scala because its included with play-scala
   //            org.scala-lang % scala-library 2.8.1
