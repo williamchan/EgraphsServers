@@ -9,7 +9,8 @@ import services.db.{TransactionSerializable, TransactionIsolation}
  */
 object MockControllerMethod extends ControllerMethod(null, null, null) {
   override def apply[A](openDatabase: Boolean = true,
-                        dbIsolation: TransactionIsolation = TransactionSerializable)
+                        dbIsolation: TransactionIsolation = TransactionSerializable,
+                        readOnly: Boolean = false)
                        (operation: => A)
                        (implicit request: Request): Any = {
     operation

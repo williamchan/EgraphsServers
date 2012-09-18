@@ -17,20 +17,23 @@ class DBSession @Inject() (connectionFactory: () => Connection) extends Logging 
 
   // Reference: http://www.postgresql.org/docs/9.1/static/transaction-iso.html
   private val errorStr40001 = "ERROR: could not serialize access due to read/write dependencies among transactions"
+  private val errorStr25006 = "ERROR: cannot execute INSERT in a read-only transaction"
 
   /**
    * Executes `continue` within a database transaction at the specified isolation level. Closes the transaction
    * and returns the connection to the pool (by closing it) before returning.
    *
    * @param isolation Transaction isolation level to use for this connection.
+   * @param readOnly whether the database transaction is read-only
    * @param continue code to execute when a connection is made with the specified isolation level
    * @tparam T the return value of `continue`
    * @return the return value of `continue`, after having closed the transaction and returned the connection
    *   to the pool.
    */
-  def connected[T](isolation: TransactionIsolation, numTries: Int = 25)(continue: => T): T = {
+  def connected[T](isolation: TransactionIsolation, readOnly: Boolean = false, numTries: Int = 25)(continue: => T): T = {
     log("Connecting to a DB Connection from the pool at isolation level: " + isolation)
     val connection = connect(isolation)
+    connection.setReadOnly(readOnly)
     val squerylSession = new Session(connection, DBAdapter.current)
 
     try {

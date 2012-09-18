@@ -14,7 +14,7 @@ class DBSessionTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with Logging
 {
-  def underTest: (DBSession, Connection) = {
+  private def underTest: (DBSession, Connection) = {
     val connection = mock[Connection]
     (new DBSession(() => connection), connection)
   }
@@ -114,6 +114,17 @@ class DBSessionTests extends EgraphsUnitTest
 
     thrown.getMessage should include ("40001") // Access due to concurrent update
  }
+
+  it should "respect readOnly transactions" in {
+    val dbSession = AppConfig.instance[DBSession]
+    val emailAddress = TestData.generateEmail("herpyderpson", "derp.org")
+    val thrown = evaluating {
+      dbSession.connected(TransactionSerializable, readOnly = true) {
+        Account(email = emailAddress).save()
+      }
+    } should produce[RuntimeException]
+    thrown.getMessage should include("25006") // Invalid write during read-only transaction
+  }
 }
 
 object DBSessionTestActors {
