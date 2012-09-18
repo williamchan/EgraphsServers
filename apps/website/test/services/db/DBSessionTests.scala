@@ -115,15 +115,34 @@ class DBSessionTests extends EgraphsUnitTest
     thrown.getMessage should include ("40001") // Access due to concurrent update
  }
 
-  it should "respect readOnly transactions" in {
+  it should "successfully persist data if the transaction is not readOnly" in {
     val dbSession = AppConfig.instance[DBSession]
     val emailAddress = TestData.generateEmail("herpyderpson", "derp.org")
-    val thrown = evaluating {
+    val account = dbSession.connected(TransactionSerializable, readOnly = false) {
+      Account(email = emailAddress).save()
+    }
+    account should not be (null)
+  }
+
+  it should "respect when a transaction is readOnly and throw an exception if a write is attempted" in {
+    val dbSession = AppConfig.instance[DBSession]
+    val emailAddress = TestData.generateEmail("herpyderpson", "derp.org")
+    val thrown1 = evaluating {
       dbSession.connected(TransactionSerializable, readOnly = true) {
         Account(email = emailAddress).save()
       }
     } should produce[RuntimeException]
-    thrown.getMessage should include("25006") // Invalid write during read-only transaction
+    thrown1.getMessage should include("Exception while executing statement : ERROR: cannot execute INSERT in a read-only transaction")
+
+    val account = dbSession.connected(TransactionSerializable, readOnly = false) {
+      Account(email = emailAddress).save()
+    }
+    val thrown2 = evaluating {
+      dbSession.connected(TransactionSerializable, readOnly = true) {
+        account.copy(email = "a" + emailAddress).save()
+      }
+    } should produce[RuntimeException]
+    thrown2.getMessage should include("Exception while executing statement : ERROR: cannot execute UPDATE in a read-only transaction")
   }
 }
 
