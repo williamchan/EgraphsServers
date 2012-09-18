@@ -103,8 +103,8 @@ trait Form[+ValidFormType] {
   def redirectThroughFlash(url: String)(implicit flash: play.api.mvc.Flash): Redirect = {
     import Form.Conversions._
 
-//    this.write(flash.asFormWriteable)
-    Redirect(url).flashing(this.write(flash))
+    val newFlash = this.write(flash.asFormWriteable).written
+    Redirect(url).flashing(newFlash)
   }
 
   //
@@ -325,7 +325,7 @@ object Form {
    */
   trait FormWriteable[T] {
     /**
-     * Returns an instance of the type being written, with all previously writte
+     * Returns an instance of the type being written, with all previously written
      * tuples applied.
      */
     def written: T
@@ -344,10 +344,6 @@ object Form {
   type StringGettablePuttable = { def get(key: String): String; def put(key: String, value: String) }
 
   type StringPuttable = { def put(key: String, value: String) }
-
-  type StringGettableAppendable = { def get(key: String): Option[String]; def +(kv: (String, String)) }
-
-  type StringAppendable = { def +(kv: (String, String)) }
 
   /**
    * FormWriteable that allows forms to write into any object that has a `def put(key: String, value: String)`
@@ -377,11 +373,11 @@ object Form {
     }
   }
 
-  class ImmutableMapWriteable[T <: StringAppendable](val puttable: T) extends FormWriteable[T]
+  case class ImmutableMapWriteable[T <: { def +(kv: (String, String)): T }](appendable: T) extends FormWriteable[T]
   {
     // FormWriteable members
     val written: T = {
-      puttable
+      appendable
     }
 
     def withData(toAdd: (String, Iterable[String])): ImmutableMapWriteable[T] = {
@@ -392,9 +388,8 @@ object Form {
         eachValue.replace(serializationDelimiter, "...")
       )
 
-      puttable + (key, escapedValues.mkString(serializationDelimiter))
-      
-      //TODO: wtf, this is immutable...
+      val newAppendable = appendable + (key, escapedValues.mkString(serializationDelimiter))
+      ImmutableMapWriteable(newAppendable)
     }
   }
 
@@ -423,7 +418,7 @@ object Form {
       }
     }
 
-    class FormCompatiblePlayFlashAndSession[T <: StringGettableAppendable](getabbleAppendable: T) {
+    class FormCompatiblePlayFlashAndSession[T <: { def get(key: String): Option[String]; def +(kv: (String, String)):T }](getabbleAppendable: T) {
       def asFormReadable: Form.Readable = {
         (key) => {
           val valueOption = getabbleAppendable.get(key)
@@ -432,7 +427,7 @@ object Form {
       }
 
       def asFormWriteable: FormWriteable[T] = {
-        new ImmutableMapWriteable(getabbleAppendable)
+        ImmutableMapWriteable(getabbleAppendable)
       }
     }
 
@@ -447,7 +442,7 @@ object Form {
       }
     }
 
-    implicit def playFlashOrSessionToFormCompatible[T <: StringGettableAppendable](gettableAppendable: T)
+    implicit def playFlashOrSessionToFormCompatible[T <: { def get(key: String): Option[String]; def +(kv: (String, String)):T }](gettableAppendable: T)
     :FormCompatiblePlayFlashAndSession[T] =
     {
       new FormCompatiblePlayFlashAndSession(gettableAppendable)
