@@ -36,6 +36,19 @@ object Account extends Controller with DefaultHeaderAndFooterData {
     }
   }
 
+  def subscribe() = {
+    request.method match {
+      case "POST" => {
+        println("POST data")
+        println(params.allSimple())
+        Json(Serializer.SJSON.toJSON(Map("subscribed" -> true)))
+      }
+      case _ => {
+        Html("Not sure why you are here :(")
+      }
+    }
+  }
+
   def errors() = {
     views.frontend.html.account_settings(
       AccountSettingsFormFactory.errors,

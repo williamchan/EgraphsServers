@@ -7,7 +7,7 @@ import play.mvc.Controller
  */
 object Email extends Controller {
 
-  def index = {
+  def order_confirmation = {
     val emailLogoSrc = "../public/images/email-logo.jpg"
     val emailFacebookSrc = "../public/images/email-facebook.jpg"
     val emailTwitterSrc = "../public/images/email-twitter.jpg"
@@ -20,10 +20,28 @@ object Email extends Controller {
       orderDate = "June 12, 2012",
       orderId = "2387354",
       pricePaid = "$50.00",
-      deliveredyDate = "June 19, 2012",
+      deliveredByDate = "June 19, 2012",
+      faqHowLongLink = "https://www.egraphs.com/faq#how-long",
+      hasPrintOrder = true,
       emailLogoSrc = emailLogoSrc,
       emailFacebookSrc = emailFacebookSrc,
       emailTwitterSrc = emailTwitterSrc
+    )
+  }
+
+  def order_confirmation_text = {
+    views.frontend.html.email_order_confirmation_text(
+      buyerName = "Joshua Johnson",
+      recipientName = "Carlos Pena",
+      recipientEmail = "carlos@egraphs.com",
+      celebrityName = "David Price",
+      productName = "First MLB Victory",
+      orderDate = "June 12, 2012",
+      orderId = "2387354",
+      pricePaid = "$50.00",
+      deliveredByDate = "June 19, 2012",
+      faqHowLongLink = "https://www.egraphs.com/faq#how-long",
+      hasPrintOrder = true
     )
   }
 
@@ -62,5 +80,9 @@ object Email extends Controller {
       emailFacebookSrc = emailFacebookSrc,
       emailTwitterSrc = emailTwitterSrc
     )
+  }
+
+  def mlb = {
+    views.frontend.html.mlbmail()
   }
 }

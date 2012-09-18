@@ -189,5 +189,5 @@ object ImageUtil extends ImageUtil {
 }
 
 case class Dimensions(width: Int, height: Int) {
-  def isLandscape: Boolean = width > height
+  def isLandscape: Boolean = width >=  height
 }

@@ -76,7 +76,10 @@
 	    				    <div class="field">
 	      				    <div class="clearfix">
 	      				      <label class="instructions" for="gift">
-	      				      	Is This a Gift? <small>Expected Digital Delivery: @guaranteedDelivery.formatDayAsPlainLanguage</small>
+	      				      	Is This a Gift?
+                        <small>
+                          <a href="/faq#how-long">Expected Digital Delivery: @guaranteedDelivery.formatDayAsPlainLanguage</a>
+                        </small>
 	      				      </label>
 	      				      @tags.html.bootstrap_input_field(form.isGift) {
 	      				        <input id="gift" 

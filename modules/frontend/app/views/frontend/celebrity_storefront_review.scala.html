@@ -43,8 +43,6 @@
 @import views.frontend.tags
 @import views.frontend.Utils.cdnAsset
 
-
-
 @baseBody = {
     <div id="content" class="top" role="main">
     
@@ -108,30 +106,29 @@
 		  				
 	  					<fieldset class="left">
 
-	  						<label>
-                                Would you like to order a high quality framed version of your egraph for an additional $45?
+                <label>
+                  Would you like to order a high quality framed version of your egraph for an additional $45?
+                </label>
 
+                <p>
+                  <input id="order-print"
+                         type="checkbox"
+                         name="@highQualityPrintParamName"
+                         value="yes" @if(highQualityPrint) {checked}>
+                  <small>
+                    <a data-toggle="modal" class="tip" href="#frame-preview" id="preview-shoutout">
+                      Take a look
+                    </a>
+                  </small>
+                </p>
+                Please allow 3 weeks after digital delivery for delivery of framed print.
 
-                              </label>
-	  						<p>
-                                <input id="order-print"
-	  						          type="checkbox" 
-	  						          name="@highQualityPrintParamName" 
-	  						          value="yes" @if(highQualityPrint) {checked}>
-                                <small>
-                                  <a data-toggle="modal" class="tip" href="#frame-preview" id="preview-shoutout">
-                                    Take a look
-                                  </a>
-                                </small>
-                              </p>
-
-
-	  					</fieldset>
+              </fieldset>
 	  					
 	  					<fieldset class="right">
-	  					
+
 	  						<p>Expected Digital Delivery:<br /> <strong>@guaranteedDelivery.formatDayAsPlainLanguage</strong></p>
-	  					
+
 	  						@tags.html.arrow_button(caption="Checkout", classes="button")
 	  					
 	  					</fieldset>

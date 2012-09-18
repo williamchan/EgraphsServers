@@ -220,7 +220,7 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
    * Returns the set of strings on the right if there was at least one of them.
    */
   def isPresent: Either[FormError, Iterable[String]] = {
-    check.isPresent(toValidate)
+    check.isPresent(toValidate = toValidate)
   }
 
   //

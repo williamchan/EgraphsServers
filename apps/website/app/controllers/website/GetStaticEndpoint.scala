@@ -4,7 +4,6 @@ import play.mvc.Controller
 import services.http.ControllerMethod
 import services.mvc.ImplicitHeaderAndFooterData
 import models.frontend.contents.Section
-import services.Utils
 import controllers.WebsiteControllers
 
 private[controllers] trait GetStaticEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
@@ -14,18 +13,13 @@ private[controllers] trait GetStaticEndpoint extends ImplicitHeaderAndFooterData
     views.frontend.html.about_us(learnMoreUrl = WebsiteControllers.reverse(WebsiteControllers.getInsideEgraph).url)
   }
 
+  def getCareers = controllerMethod() {
+    views.frontend.html.careers()
+  }
+
   def getFAQ = controllerMethod() {
     views.frontend.html.faq()
   }
-
-  def getTerms = controllerMethod() {
-    views.frontend.html.terms()
-  }
-
-  def getPrivacy = controllerMethod() {
-    views.frontend.html.privacy()
-  }
-
 
   def getInsideEgraph = controllerMethod() {
     val tableOfContents =
@@ -38,4 +32,16 @@ private[controllers] trait GetStaticEndpoint extends ImplicitHeaderAndFooterData
     views.frontend.html.inside_egraph(tableOfContents)
   }
 
+
+  def getPrivacy = controllerMethod() {
+    views.frontend.html.privacy()
+  }
+
+  def getInsiderSweepstakes = controllerMethod() {
+    views.frontend.html.sweepstakes_insider()
+  }
+
+  def getTerms = controllerMethod() {
+    views.frontend.html.terms()
+  }
 }

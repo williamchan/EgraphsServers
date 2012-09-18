@@ -1,5 +1,6 @@
 @(model: models.frontend.storefront.OrderCompleteViewModel
-)(implicit headerData: models.frontend.header.HeaderData,
+)(implicit session: play.mvc.Scope.Session,
+  headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData  
 )
 
@@ -22,7 +23,6 @@
       <div id="main" class="sub">
       
         <section id="checkout" class="container">
-			
   				<header>	
   				  <h1>Order Complete</h1>
   				  <h2>@model.celebName | @model.productName</h2>  				
@@ -75,11 +75,13 @@
 										<td>@model.totalPrice.formatPrecisely</td>
 									</tr>
 									<tr>
-										<th>Expected Digital Delivery:</th>
-										<td>@model.guaranteedDeliveryDate.formatDayAsPlainLanguage</td>
+                    <th><a href="@model.faqHowLongLink">Expected Digital Delivery:</a></th>
+										<td>@model.expectedDeliveryDate.formatDayAsPlainLanguage</td>
 									</tr>
   							</table>
-  							
+                @if(model.hasPrintOrder) {
+                  <p>Your framed print is expected to arrive 3 weeks after your digital delivery.</p>
+                }
   						
   						</div>
 

@@ -17,8 +17,10 @@ import org.joda.money.Money
  * @param celebName the celebrity' name being purchased from
  * @param productName the name of the photo that was purchased
  * @param totalPrice the total cost of the order
- * @param guaranteedDeliveryDate the date by which the egraph is guaranteedn
- *   to deliver. This can be found on the order's `inventoryBatch`
+ * @param expectedDeliveryDate the date by which the egraph is expected
+ *                             to deliver. This can be found on the order's `inventoryBatch`
+ * @param faqHowLongLink link to FAQ section on expected delivery dates
+ * @param hasPrintOrder whether a physical print was ordered
  */
 case class OrderCompleteViewModel (
   orderDate: Date,
@@ -30,5 +32,7 @@ case class OrderCompleteViewModel (
   celebName: String,
   productName: String,
   totalPrice: Money,
-  guaranteedDeliveryDate: Date
+  expectedDeliveryDate: Date,
+  faqHowLongLink: String,
+  hasPrintOrder: Boolean
 )

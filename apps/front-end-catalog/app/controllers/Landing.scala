@@ -20,6 +20,11 @@ object Landing extends Controller with DefaultHeaderAndFooterData {
     views.frontend.html.landing(stars)
   }
 
+  def signup_on = {
+    val stars = sampleStars.map(star => star.copy(hasInventoryRemaining = false))
+    views.frontend.html.landing(stars, signup=true)
+  }
+
   def featured_stars_with_no_inventory() = {
     val stars = sampleStars.map(star => star.copy(hasInventoryRemaining = false))
     views.frontend.html.landing(stars)

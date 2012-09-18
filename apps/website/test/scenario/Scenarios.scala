@@ -8,7 +8,7 @@ import utils.{TestConstants, TestData}
 import org.squeryl.PrimitiveTypeMode._
 import models._
 import controllers.WebsiteControllers
-import enums.{OrderReviewStatus, EgraphState, EnrollmentStatus, PublishedStatus}
+import enums._
 import play.libs.Codec
 import play.Play
 import services.{Utils, AppConfig}
@@ -17,6 +17,10 @@ import java.text.SimpleDateFormat
 import javax.imageio.ImageIO
 import controllers.website.GetAccountSettingsEndpoint
 import services.http.EgraphsSession
+import scala.Some
+import models.Administrator
+import models.InventoryBatch
+import models.Order
 
 /**
  * All scenarios supported by the API.
@@ -33,7 +37,7 @@ class Scenarios extends DeclaresScenarios {
   private val productPageCategory = "Product Page"
 
   private val schema = AppConfig.instance[Schema]
-  private val mail = AppConfig.instance[services.mail.Mail]
+  private val mail = AppConfig.instance[services.mail.TransactionalMail]
 
   private lazy val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
   private lazy val today = DateTime.now().toLocalDate.toDate
@@ -189,6 +193,7 @@ class Scenarios extends DeclaresScenarios {
           select (order)
       ).headOption.get
       firstOrder
+        .withPaymentStatus(PaymentStatus.Charged).save()
         .newEgraph
         .withAssets(TestConstants.signingAreaSignatureStr, Some(TestConstants.signingAreaMessageStr), Codec.decodeBASE64(TestConstants.voiceStr()))
         .save()
@@ -295,7 +300,9 @@ class Scenarios extends DeclaresScenarios {
         orderDate = "Jan 1, 2012",
         orderId = "1234",
         pricePaid = "$50.00",
-        deliveredyDate = "Jan 8, 2012",
+        deliveredByDate = "Jan 8, 2012",
+        faqHowLongLink = "/faq#how-long",
+        hasPrintOrder = true,
         emailLogoSrc = emailLogoSrc,
         emailFacebookSrc = emailFacebookSrc,
         emailTwitterSrc = emailTwitterSrc
@@ -310,7 +317,9 @@ class Scenarios extends DeclaresScenarios {
         orderDate = "Jan 1, 2012",
         orderId = "1234",
         pricePaid = "$50.00",
-        deliveredyDate = "Jan 8, 2012"
+        deliveredByDate = "Jan 8, 2012",
+        faqHowLongLink = "/faq#how-long",
+        hasPrintOrder = true
       )
       email.setTextMsg(textVersion.toString())
       mail.send(email)

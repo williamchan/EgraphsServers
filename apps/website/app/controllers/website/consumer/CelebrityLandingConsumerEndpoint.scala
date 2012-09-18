@@ -11,6 +11,7 @@ import models.frontend.header.HeaderData
 import models.frontend.footer.FooterData
 import play.templates.Html
 import controllers.WebsiteControllers
+import play.mvc.Scope.Session
 
 private[consumer] trait CelebrityLandingConsumerEndpoint
   extends ImplicitHeaderAndFooterData
@@ -28,7 +29,7 @@ private[consumer] trait CelebrityLandingConsumerEndpoint
 
 object CelebrityLandingConsumerEndpoint {
 
-  def getCelebrityLandingHtml(celebrity: Celebrity)(implicit headerData: HeaderData, footerData: FooterData): Html = {
+  def getCelebrityLandingHtml(celebrity: Celebrity)(implicit headerData: HeaderData, footerData: FooterData, session: Session): Html = {
     val landingPageImageUrl = celebrity.landingPageImage
       .withImageType(ImageAsset.Jpeg)
       .getSaved(AccessPolicy.Public)

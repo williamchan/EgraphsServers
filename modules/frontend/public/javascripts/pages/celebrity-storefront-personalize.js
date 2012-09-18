@@ -46,7 +46,7 @@ function(forms, Egraphs) {
       );
       forms.setDefaultText(
         "#your-message",
-        "Is there something you would like "+ celeb.name +" to know?"
+        "Is there something you would like "+ celeb.name +" to know? The more info you give, the more personal the egraph will be."
       );
       forms.setAlert('.alert');
       forms.setButton('.btn-group', 'toggle');
@@ -62,6 +62,9 @@ function(forms, Egraphs) {
 
       forms.bindCounter("#egraph-message-text", "#egraph-message-count", Egraphs.page.egraphMessageLimit);
       forms.bindCounter("#your-message", "#your-message-count", Egraphs.page.yourMessageLimit);
+
+      // Mixpanel events
+      mixpanel.track_forms('.container form', 'Review clicked');
     }
   };
 });

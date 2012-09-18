@@ -1,6 +1,7 @@
-@(stars:Iterable[models.frontend.landing.CatalogStar]
+@(stars:Iterable[models.frontend.landing.CatalogStar], signup:Boolean = false
 )(
-  implicit headerData: models.frontend.header.HeaderData, 
+  implicit session: play.mvc.Scope.Session,
+  headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData
 )
 
@@ -22,7 +23,7 @@
           <figure>
             @if(!star.hasInventoryRemaining) {
               <div class="ribbon simple">
-                <a class="soldout-tooltip" href="#" rel="tooltip" title="More available soon!">Sold out <span class="question">?</span>
+                <a class="soldout-tooltip" href="/faq#how-many" rel="tooltip" title="More available soon!">Sold out <span class="question">?</span>
                 </a>
               </div>
             }
@@ -46,11 +47,17 @@
 @starsFooter = {
   <footer>
     <div id="featured-stars" class="callout">
-      <h3>Our Stars</h3>
+      <h3>Our Stars (in alphabetical order by team name)</h3>
       <p>Browse one of their galleries to get started making your own egraph.</p>
     </div>
     @starsBlock(stars, clearFix=false)
   </footer>
+}
+
+@modalJs = {
+  @if(signup) {
+    Egraphs.page.modalOn = true;
+  }
 }
 
 @baseBody = {
@@ -87,5 +94,6 @@
 @base_template(
   title="Share a moment with your favorite star",
   jsMain="pages/landing",
+  headJs=modalJs,
   body=baseBody
 )

@@ -1,7 +1,10 @@
-# Makes Orders._printingOption nullable since this column is no longer used
+# Make Celebrity.roleDescription non-null
 
 # --- !Ups
-ALTER TABLE Orders ALTER COLUMN _printingOption DROP NOT NULL;
+
+UPDATE Celebrity SET roleDescription = '' WHERE roleDescription IS NULL;
+ALTER TABLE Celebrity ALTER COLUMN roleDescription SET NOT NULL;
 
 # --- !Downs
-ALTER TABLE Orders ALTER COLUMN _printingOption SET NOT NULL;
+
+ALTER TABLE Celebrity ALTER COLUMN roleDescription DROP NOT NULL;

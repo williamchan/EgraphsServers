@@ -109,6 +109,7 @@ class FormChecksTest extends EgraphsUnitTest {
   "isEmailAddress" should "yield an email address if syntactically valid email otherwise an error" in {
     check.isEmailAddress("erem@egraphs.com") should be (Right("erem@egraphs.com"))
     check.isEmailAddress("Herp derpson").isLeft should be (true)
+    check.isEmailAddress("").isLeft should be (true)
   }
 
   "isAlphaNumeric" should "yield string if it passes regex otherwise an error" in {
@@ -179,7 +180,12 @@ class FormChecksTest extends EgraphsUnitTest {
 
   "isTrue" should "fail out if false and continue chaining if true" in (pending)
 
-  "isSomeValue" should "return the value on the right if it was Some(value), otherwise a FormError" in (pending)
+  "isSomeValue" should "return the value on the right if it was Some(value), otherwise a FormError" in {
+    db.connected(TransactionSerializable) {
+      check.isSomeValue(toValidate = List(), message = "error").isLeft should be (true)
+      check.isSomeValue(toValidate = List(4), message = "error") should be (Right(4))
+    }
+  }
 
   "isBetweenInclusive" should "return values within its specified bounds on the right" in (pending)
 }

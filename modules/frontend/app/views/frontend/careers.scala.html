@@ -1,0 +1,115 @@
+@()(
+implicit session: play.mvc.Scope.Session,
+headerData: models.frontend.header.HeaderData,
+footerData: models.frontend.footer.FooterData
+)
+@import views.frontend.Utils
+@import models.frontend.egraphs._
+@import views.frontend.Utils.cdnAsset
+
+@baseBody = {
+
+<section id="content" role="main">
+  <div id="main" class="about-us statics">
+    <div class="row-fluid">
+      <div class="span12 masthead-static">
+        <img src='@cdnAsset("public/images/about-us.jpg")'/>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row-fluid">
+        <div class="span12">
+          <h1>Careers</h1>
+          <p>
+            Egraphs was founded in September 2011 with the goal of connecting stars and their fans on a deeper, more personal level. In July 2012, we launched <a href="https://www.egraphs.com">www.egraphs.com</a> and our first product, an egraph.  It's a shared moment between a star and fan that's captured forever - think of it as a next-generation autograph that includes both a personal handwritten note and voice message from the star to the fan. Egraphs are authenticated, shareable, enduring, and currently available from over 100 Major League Baseball players. We seek to change the way fans connect with their stars by building products with global potential. You can read about our launch in <a href="http://espn.go.com/blog/playbook/fandom/post/_/id/7783/egraphs-are-the-autographs-of-the-future">this ESPN article</a>.
+          </p>
+          <h2>
+            Website Software Engineer - Seattle, WA
+          </h2>
+          <p>
+            This is the startup firehose, the opportunity to tackle all the problems that a fast-growing software company faces while delivering delight to both our customers and our celebrity partners. Do you love making beautiful and responsive webpages? Do you want to design and implement the backend for a global marketplace with an eye for best practices? Do problems of scaling a cloud-based array of app servers and databases and caches excite you? This is what we work on, and we welcome you to find out more.
+          </p>
+          <p>
+            Our team includes alums from Stanford, CMU, and Rice, and our previous work experience includes building other startups as well as running large-scale services at top technology firms.
+          </p>
+          <p>Requirements:</p>
+          <ul>
+            <li>Computer Science degree or equivalent.</li>
+            <li>Fluency in at least one programming language.</li>
+            <li>Experience or interest in Scala and web development (HTML/CSS/Javascript) a plus.</li>
+            <li>Demonstrated love for building software.</li>
+            <li>Ability to self-manage. Our team process enables us to not have any formal management and this requires that all teammates be driven and empowered to do great work. </li>
+            <li>Ready for a fun and wild ride.</li>
+          </ul>
+          <p>
+            We seek engineers of all levels of experience. Whether you have years of experience or just an eagerness to learn all aspects of building a compelling web business, apply now at <a href="mailto:careers@@egraphs.com">careers@@egraphs.com</a>.
+          </p>
+          <h2>
+            iOS Software Engineer - Seattle, WA
+          </h2>
+          <p>
+            This is the startup firehose, the opportunity to tackle all the problems that a fast-growing software company faces while delivering delight to both our customers and our celebrity partners. Do you want to build apps that are used by your favorite sports and music heroes? Do you love making beautiful user interfaces with an eye for best practices? Do you want to build responsive apps that interact with RESTful APIs? This is what we work on, and we welcome you to find out more.
+          </p>
+          <p>
+            Our team includes alums from Stanford, CMU, and Rice, and our previous work experience includes building other startups as well as running large-scale services at top technology firms.
+          </p>
+          <p>Requirements:</p>
+          <ul>
+            <li>Computer Science degree or equivalent.</li>
+            <li>Must have at least one app on the store.</li>
+            <li>Fluency in Objective-C.</li>
+            <li>Up to date with ARC, modern Objective-C, and storyboarding.</li>
+            <li>A solid understanding of MVC design.</li>
+            <li>Experience with CoreData a plus.</li>
+            <li>Experience with OpenGL-ES a plus.</li>
+            <li>Demonstrated love for building software.</li>
+            <li>Ability to self-manage. Our team process enables us to not have any formal management and this requires that all teammates be driven and empowered to do great work.</li>
+            <li>Ready for a fun and wild ride.</li>
+          </ul>
+          <p>
+            We seek engineers of all levels of experience. Whether you have years of experience or just an eagerness to learn all aspects of building a compelling web business, apply now at <a href="mailto:careers@@egraphs.com">careers@@egraphs.com</a>. Please include a link to an app you have made.
+          </p>
+          <h2>
+            Marketing & Social Media Manager - Seattle, WA
+          </h2>
+          <p>
+            Do you love technology?  Are you into sports & entertainment?   Would you chomp at the bit to work at a recently launched start-up bringing those two worlds together? The Marketing team is responsible for communicating Egraphs to the world.  We create messages and campaigns for consumers and work closely with partners to develop programs that make Egraphs relevant across all categories of sports and entertainment.
+          </p>
+          <p>
+            The Marketing & Social Media Manager will work hand in hand with the Director of Marketing on advertising, product development, analytics and social media management.
+          </p>
+          <p>Key Responsibilities:</p>
+          <ul>
+            <li>Lead the development and execution of the company’s social media efforts.</li>
+            <li>Work closely with all areas of the business to plan and execute marketing initiatives.</li>
+            <li>Lead agencies to create new products and advertising.</li>
+            <li>Coordinate with business partners to plan and execute major programs.</li>
+            <li>Lead business analytics to drive product enhancements and innovation.</li>
+          </ul>
+          <p>Qualifications:</p>
+          <ul>
+            <li>Extremely driven and self-motivated.</li>
+            <li>Positive attitude; able to work through any challenge.</li>
+            <li>Smart, with incredible attention to detail.</li>
+            <li>Desire to work in a start-up environment.</li>
+            <li>Interest and knowledge in sports and entertainment strongly desired.</li>
+            <li>3+ years in marketing, product management, social media or advertising strongly desired.</li>
+            <li>BA/BS.</li>
+            <li>Ready for a fun and wild ride.</li>
+          </ul>
+          <p>
+            Please send resumes to <a href="mailto:careers@@egraphs.com">careers@@egraphs.com</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+}
+@base_template(
+title="Careers",
+jsMain="",
+body=baseBody
+)

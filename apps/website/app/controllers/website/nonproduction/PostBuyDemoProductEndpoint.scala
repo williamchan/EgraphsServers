@@ -9,14 +9,14 @@ import services.db.{DBSession, TransactionSerializable}
 import play.data.validation.Validation
 import controllers.website.EgraphPurchaseHandler
 import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters}
-import services.mail.Mail
+import services.mail.TransactionalMail
 import play.mvc.Controller
 
 trait PostBuyDemoProductEndpoint { this: Controller =>
 
   protected def dbSession: DBSession
   protected def celebFilters: CelebrityAccountRequestFilters
-  protected def mail: Mail
+  protected def transactionalMail: TransactionalMail
   protected def payment: Payment
   protected def accountStore: AccountStore
   protected def customerStore: CustomerStore
@@ -60,7 +60,7 @@ trait PostBuyDemoProductEndpoint { this: Controller =>
         totalAmountPaid = product.price,
         billingPostalCode = "55555",
         flash = flash,
-        mail = mail,
+        mail = transactionalMail,
         customerStore = customerStore,
         accountStore = accountStore,
         dbSession = dbSession,

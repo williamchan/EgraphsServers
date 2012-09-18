@@ -9,7 +9,7 @@ import services.Finance.TypeConversions._
 import services._
 import blobs.AccessPolicy
 import com.google.inject._
-import mail.Mail
+import mail.TransactionalMail
 import payment.{Charge, Payment}
 import org.squeryl.Query
 import org.apache.commons.mail.{Email, HtmlEmail}
@@ -26,8 +26,9 @@ case class OrderServices @Inject() (
   celebrityStore: CelebrityStore,
   inventoryStore: InventoryBatchStore,
   productStore: ProductStore,
+  printOrderStore: PrintOrderStore,
   payment: Payment,
-  mail: Mail,
+  mail: TransactionalMail,
   cashTransactionServices: Provider[CashTransactionServices],
   egraphServices: Provider[EgraphServices]
 )
@@ -507,10 +508,18 @@ class OrderQueryFilters @Inject() (schema: Schema) {
     }
   }
 
-  def rejected: FilterOneTable[Order] = {
+  def rejectedByAdmin: FilterOneTable[Order] = {
     new FilterOneTable[Order] {
       override def test(order: Order) = {
-        (order._reviewStatus in Seq(OrderReviewStatus.RejectedByAdmin.name, OrderReviewStatus.RejectedByCelebrity.name))
+        (order._reviewStatus === OrderReviewStatus.RejectedByAdmin.name)
+      }
+    }
+  }
+
+  def rejectedByCelebrity: FilterOneTable[Order] = {
+    new FilterOneTable[Order] {
+      override def test(order: Order) = {
+        (order._reviewStatus === OrderReviewStatus.RejectedByCelebrity.name)
       }
     }
   }

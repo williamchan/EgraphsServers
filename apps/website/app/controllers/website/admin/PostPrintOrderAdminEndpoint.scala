@@ -22,6 +22,11 @@ trait PostPrintOrderAdminEndpoint { this: Controller =>
           printOrder.copy(pngUrl = pngUrl).save()
           new Redirect(GetPrintOrderAdminEndpoint.url(printOrderId).url)
         }
+        case "editAddress" => {
+          val shippingAddress = params.get("shippingAddress")
+          printOrder.copy(shippingAddress = shippingAddress).save()
+          new Redirect(GetPrintOrderAdminEndpoint.url(printOrderId).url)
+        }
         case _ => Forbidden("Unsupported operation")
       }
     }

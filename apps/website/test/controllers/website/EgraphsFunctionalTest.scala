@@ -5,7 +5,7 @@ import play.mvc.Http.Response
 import play.test.FunctionalTest
 import FunctionalTest._
 import models.Account
-import org.junit.After
+import org.junit.Before
 import scala.collection.JavaConversions._
 import services.AppConfig
 import utils.TestData
@@ -16,7 +16,7 @@ import org.scalatest.matchers.ShouldMatchers
 import controllers.WebsiteControllers
 
 trait EgraphsFunctionalTest extends FunctionalTest
-  with CleanDatabaseAfterEachTest
+  with CleanDatabaseBeforeEachTest
   with ShouldMatchers
 {
 
@@ -59,8 +59,8 @@ trait EgraphsFunctionalTest extends FunctionalTest
   }
 }
 
-trait CleanDatabaseAfterEachTest { this: FunctionalTest =>
-  @After
+trait CleanDatabaseBeforeEachTest { this: FunctionalTest =>
+  @Before
   def cleanUpDatabase() {
     FunctionalTest.GET("/test/scenarios/clear")
   }

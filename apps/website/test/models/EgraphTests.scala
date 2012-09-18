@@ -195,7 +195,7 @@ class EgraphFrameTests extends EgraphsUnitTest {
   "An Egraph Frame" should "select the correct frame for landscape image dimensions" in {
     EgraphFrame.suggestedFrame(Dimensions(501,500)) should be (LandscapeEgraphFrame)
     EgraphFrame.suggestedFrame(Dimensions(500,501)) should be (PortraitEgraphFrame)
-    EgraphFrame.suggestedFrame(Dimensions(500,500)) should be (PortraitEgraphFrame)
+    EgraphFrame.suggestedFrame(Dimensions(500,500)) should be (LandscapeEgraphFrame)
   }
 
   it should "report the correct aspect ratio" in {

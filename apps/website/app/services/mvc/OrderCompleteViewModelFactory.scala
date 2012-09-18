@@ -3,6 +3,7 @@ package services.mvc
 import models.frontend.storefront.OrderCompleteViewModel
 import models.{InventoryBatch, Product, Account, Customer, Celebrity, Order}
 import com.google.inject.Inject
+import controllers.WebsiteControllers
 
 /**
  * Creates OrderCompleteViewModels for rendering the Order Complete page
@@ -18,6 +19,8 @@ class OrderCompleteViewModelFactory @Inject()() {
   def fromOrder(order: Order): OrderCompleteViewModel = {
     val product = order.product
     val buyer = order.buyer
+    order.services
+    val hasPrintOrder = order.services.printOrderStore.findByOrderId(order.id).headOption.isDefined
 
     this.fromModels(
       product.celebrity,
@@ -26,7 +29,8 @@ class OrderCompleteViewModelFactory @Inject()() {
       buyer.account,
       order.recipient.account,
       order,
-      order.inventoryBatch
+      order.inventoryBatch,
+      hasPrintOrder
     )
   }
 
@@ -45,6 +49,7 @@ class OrderCompleteViewModelFactory @Inject()() {
    * @param recipientAccount the account of the customer who will receive the product
    * @param order the order that represented the egraph purchase
    * @param inventoryBatch the inventory batch against which the order was made.
+   * @param hasPrintOrder whether a physical print was also ordered as part of this purchase
    *
    * @return a ViewModel that populates the order complete page.
    */
@@ -55,9 +60,11 @@ class OrderCompleteViewModelFactory @Inject()() {
     buyerAccount: Account,
     recipientAccount: Account,
     order: Order,
-    inventoryBatch: InventoryBatch
+    inventoryBatch: InventoryBatch,
+    hasPrintOrder: Boolean
   ): OrderCompleteViewModel =
   {
+    val faqHowLongLink = WebsiteControllers.reverse(WebsiteControllers.getFAQ).url + "#how-long"
     OrderCompleteViewModel (
       orderDate = order.created,
       orderNumber = order.id,
@@ -68,7 +75,9 @@ class OrderCompleteViewModelFactory @Inject()() {
       celebName = celeb.publicName,
       productName = product.name,
       totalPrice = order.amountPaid,
-      guaranteedDeliveryDate = inventoryBatch.getExpectedDate
+      expectedDeliveryDate = inventoryBatch.getExpectedDate,
+      faqHowLongLink = faqHowLongLink,
+      hasPrintOrder = hasPrintOrder
     )
   }
 }

@@ -6,7 +6,9 @@
   orderDate: String,
   orderId: String,
   pricePaid: String,
-  deliveredyDate: String,
+  deliveredByDate: String,
+  faqHowLongLink: String,
+  hasPrintOrder: Boolean,
   emailLogoSrc: String,
   emailFacebookSrc: String,
   emailTwitterSrc: String
@@ -150,18 +152,21 @@
 												<tr>
 													<th align="left">
 														<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; font-weight: normal; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
-                              Expected Digital Delivery:
+                              <a href="@faqHowLongLink">Expected Digital Delivery:</a>
                             </p>
 													</th>
 													<td>
 														<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
-                              @deliveredyDate
+                              @deliveredByDate
                             </p>
 												  </td>
 												</tr>
 											</table>
 											<!--<img border="0" src='@asset("public/images/email-rule-content.gif")' width="520" height="42" />-->
-											<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; font-weight: normal; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">Thank you,<br />
+                      @if(hasPrintOrder) {
+                        <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; font-weight: normal; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">Your framed print is expected to arrive 3 weeks after your digital delivery.</p>
+                      }
+                      <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; font-weight: normal; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">Thank you,<br />
                         The Egraphs Team
                       </p>
 										</td>

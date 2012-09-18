@@ -39,6 +39,12 @@ class FormReaders @Inject()(
     }
   }
 
+  def forEmailSubscriptionForm: ReadsForm[EmailSubscriptionForm] = {
+    newReaderWithConstructor { readable =>
+      new EmailSubscriptionForm(readable, formChecks)
+    }
+  }
+
   /**
    * @param shippingFormOption Provide a shipping form only if it should be
    *   used to grab information that wasn't provided to the billing form. e.g.

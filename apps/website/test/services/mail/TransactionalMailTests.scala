@@ -3,14 +3,14 @@ package services.mail
 import utils.EgraphsUnitTest
 import services.{AppConfig, Utils}
 
-class MailTests extends EgraphsUnitTest
+class TransactionalMailTests extends EgraphsUnitTest
 {
   val appUtils = AppConfig.instance[Utils]
 
   "MailProvider" should "provide the mock instance when mail.smtp value is 'mock'" in {
     val mail = new MailProvider(appUtils.properties("mail.smtp" -> "mock"), null).get()
 
-    mail.isInstanceOf[MockMail] should be(true)
+    mail.isInstanceOf[MockTransactionalMail] should be(true)
   }
 
   it should "provide the gmail instance when smtp value isn't mock and gmail host is provided" in {
@@ -33,6 +33,6 @@ class MailTests extends EgraphsUnitTest
   it should "otherwise delegate to Play mail implementation" in {
     val mail = new MailProvider(appUtils.properties("mail.smtp" -> "herp"), null).get()
 
-    mail.isInstanceOf[PlayMailLib] should be (true)
+    mail.isInstanceOf[PlayTransactionalMailLib] should be (true)
   }
 }

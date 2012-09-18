@@ -28,7 +28,9 @@ object Complete extends Controller
       celebName="{celebrity name}",
       productName="{product name}",
       totalPrice=BigDecimal(100.00).toMoney(),
-      guaranteedDeliveryDate=new util.Date()
+      expectedDeliveryDate=new util.Date(),
+      faqHowLongLink = "https://www.egraphs.com/faq#how-long",
+      hasPrintOrder = true
     )
   }
 

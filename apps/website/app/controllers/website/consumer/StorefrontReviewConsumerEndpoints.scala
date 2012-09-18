@@ -52,13 +52,13 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
 
       for (
         // Make sure the product ID in this URL matches the one in the form
-        formProductId <- forms.matchProductIdOrRedirectToChoosePhoto(celeb, product).right;
+        formProductId <- forms.redirectToChoosePhotoOrMatchingProductId(celeb, product).right;
 
         // Make sure there's inventory on the product
-        inventoryBatch <- forms.nextInventoryBatchOrRedirect(celebrityUrlSlug, product).right;
+        inventoryBatch <- forms.redirectOrNextInventoryBatch(celebrityUrlSlug, product).right;
 
         // Make sure we've got a valid personalize form in storage
-        validPersonalizeForm <- forms.validPersonalizeFormOrRedirectToPersonalizeForm(
+        validPersonalizeForm <- forms.redirectToPersonalizeFormOrValidPersonalizeForm(
                                   celebrityUrlSlug,
                                   productUrlSlug
                                 ).right
@@ -109,7 +109,7 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
       // Validate in a for comprehension
       for (
         // Product ID of the URL has to match the product stored in the session
-        productId <- forms.matchProductIdOrRedirectToChoosePhoto(celeb, product).right;
+        productId <- forms.redirectToChoosePhotoOrMatchingProductId(celeb, product).right;
 
         // User has to have posted a valid printing option. Which should be impossible to
         // screw up because it was a damned checkbox.
