@@ -32,7 +32,6 @@ object FrontendBuild extends Build {
     mainLang = SCALA
   ).settings(
     //resolvers += "Crionics Github Repository" at "http://orefalo.github.com/m2repo/releases/",
-
     organization := "egraphs",
 
     lessEntryPoints <<= baseDirectory(customLessEntryPoints),

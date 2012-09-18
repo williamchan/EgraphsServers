@@ -2,6 +2,11 @@ import sbt._
 import Keys._
 import PlayProject._
 
+/**
+ * Builds the main Egraphs website.
+ *
+ * This is available to Play / SBT as the project "website"
+ */
 object WebsiteBuild extends Build {
 
     val appName         = "website"
