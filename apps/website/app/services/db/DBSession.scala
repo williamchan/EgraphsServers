@@ -17,7 +17,6 @@ class DBSession @Inject() (connectionFactory: () => Connection) extends Logging 
 
   // Reference: http://www.postgresql.org/docs/9.1/static/transaction-iso.html
   private val errorStr40001 = "ERROR: could not serialize access due to read/write dependencies among transactions"
-  private val errorStr25006 = "ERROR: cannot execute INSERT in a read-only transaction"
 
   /**
    * Executes `continue` within a database transaction at the specified isolation level. Closes the transaction
