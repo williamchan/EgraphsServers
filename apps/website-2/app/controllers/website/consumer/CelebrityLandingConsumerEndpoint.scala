@@ -1,6 +1,7 @@
 package controllers.website.consumer
 
-import play.mvc.{Router, Controller}
+import play.api._
+import play.api.mvc._
 import services.http.{CelebrityAccountRequestFilters, ControllerMethod}
 import services.mvc.ImplicitHeaderAndFooterData
 import services.blobs.AccessPolicy
@@ -9,9 +10,8 @@ import models.ImageAsset
 import models.Celebrity
 import models.frontend.header.HeaderData
 import models.frontend.footer.FooterData
-import play.templates.Html
+import play.api.templates.Html
 import controllers.WebsiteControllers
-import play.mvc.Scope.Session
 
 private[consumer] trait CelebrityLandingConsumerEndpoint
   extends ImplicitHeaderAndFooterData
@@ -20,20 +20,23 @@ private[consumer] trait CelebrityLandingConsumerEndpoint
   protected def controllerMethod: ControllerMethod
   protected def celebFilters: CelebrityAccountRequestFilters
 
-  def getCelebrityLanding(celebrityUrlSlug: String) = controllerMethod() {
-    celebFilters.requireCelebrityUrlSlug { celebrity =>
-      CelebrityLandingConsumerEndpoint.getCelebrityLandingHtml(celebrity)
+  def getCelebrityLanding(celebrityUrlSlug: String) = Action { implicit request =>
+    controllerMethod() {
+      celebFilters.requireCelebrityUrlSlug { celebrity =>
+        Ok(CelebrityLandingConsumerEndpoint.getCelebrityLandingHtml(celebrity))
+      }
     }
   }
 }
 
 object CelebrityLandingConsumerEndpoint {
 
-  def getCelebrityLandingHtml(celebrity: Celebrity)(implicit headerData: HeaderData, footerData: FooterData, session: Session): Html = {
+  def getCelebrityLandingHtml(celebrity: Celebrity)(implicit headerData: HeaderData, footerData: FooterData): Html = {
     val landingPageImageUrl = celebrity.landingPageImage
       .withImageType(ImageAsset.Jpeg)
       .getSaved(AccessPolicy.Public)
       .url
+
     val publicName = celebrity.publicName
     views.html.frontend.celebrity_landing(
       getStartedUrl = WebsiteControllers.reverse(WebsiteControllers.getStorefrontChoosePhotoTiled(celebrity.urlSlug)).url,

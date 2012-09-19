@@ -5,6 +5,7 @@ import play.api.mvc.Results.Redirect
 import models._
 import services.http.{CustomerRequestFilters, POSTControllerMethod}
 import services.http.forms.{AccountSettingsForm, AccountSettingsFormFactory, Form}
+import play.api.mvc.Action
 
 private[controllers] trait PostAccountSettingsEndpoint { this: Controller =>
   import Form.Conversions._
@@ -14,19 +15,22 @@ private[controllers] trait PostAccountSettingsEndpoint { this: Controller =>
   protected def accountStore: AccountStore
   protected def accountSettingsForms: AccountSettingsFormFactory
 
-  def postAccountSettings() = postController() {
-    customerFilters.requireCustomerLogin { (customer, account) =>
-      // Read a AccountSettingsForm from the params
-      val nonValidatedForm = accountSettingsForms(params.asFormReadable, customer, account)
-
-      // Handle valid or error cases
-      nonValidatedForm.errorsOrValidatedForm match {
-        case Left(errors) =>
-          nonValidatedForm.redirectThroughFlash(GetAccountSettingsEndpoint.url().url)
-
-        case Right(validForm) =>
-          persist(validForm, customer, account)
-          new Redirect(GetAccountSettingsEndpoint.url().url)
+  def postAccountSettings() = Action { implicit request =>
+    postController() {
+      customerFilters.requireCustomerLogin { (customer, account) =>
+        // Read a AccountSettingsForm from the params
+        val params = request.queryString
+        val nonValidatedForm = accountSettingsForms(params.asFormReadable, customer, account)
+  
+        // Handle valid or error cases
+        nonValidatedForm.errorsOrValidatedForm match {
+          case Left(errors) =>
+            nonValidatedForm.redirectThroughFlash(GetAccountSettingsEndpoint.url().url)
+  
+          case Right(validForm) =>
+            persist(validForm, customer, account)
+            new Redirect(GetAccountSettingsEndpoint.url().url)
+        }
       }
     }
   }

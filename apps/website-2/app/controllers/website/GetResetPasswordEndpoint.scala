@@ -6,7 +6,6 @@ import services.http.{AccountRequestFilters, ControllerMethod}
 import services.Utils
 import models.{Account, AccountStore}
 import models.frontend.forms.{FormError, Field}
-import play.mvc.Router.ActionDefinition
 import models.frontend.account.{AccountPasswordResetForm => AccountPasswordResetFormView}
 import services.http.SafePlayParams.Conversions._
 import services.mvc.ImplicitHeaderAndFooterData
@@ -23,7 +22,7 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
   protected def accountRequestFilters: AccountRequestFilters
   protected def accountPasswordResetForms: AccountPasswordResetFormFactory
 
-  def getResetPassword(email: String, secretKey: String) = Action { request =>
+  def getResetPassword(email: String, secretKey: String) = Action { implicit request =>
     controllerMethod() {
       //flash takes precedence over url arg
       val flash = request.flash
@@ -43,7 +42,7 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
     }
   }
 
-  def getVerifyAccount() = Action { request =>
+  def getVerifyAccount() = Action { implicit request =>
     controllerMethod() {
       val email = Utils.getFromMapFirstInSeqOrElse("email", "Nothing", request.queryString)
       accountRequestFilters.requireValidAccountEmail(email) { account =>
@@ -58,9 +57,9 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
     }
   }
 
-  private def makeFormView(account: Account) : AccountPasswordResetFormView = {
+  private def makeFormView(account: Account)(implicit request: Request[_]) : AccountPasswordResetFormView = {
     //check flash for presence of secretKey and Email
-    val flash = play.mvc.Http.Context.current().flash()
+    val flash = request.flash
     val maybeFormData = accountPasswordResetForms.getFormReader(account).read(flash.asFormReadable).map { form =>
       AccountPasswordResetFormView(
         form.secretKey.asViewField,
@@ -72,12 +71,13 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
 
     //check url params for secret key and email
     maybeFormData.getOrElse {
-      val emailOption = params.getOption("email")
-      val secretKeyOption = params.getOption("secretKey")
+      val params = request.queryString
+      val emails = params.get("email").getOrElse(Seq(""))
+      val secretKeys = params.get("secretKey").getOrElse(Seq(""))
 
       AccountPasswordResetFormView(
-        email = Field(name = Fields.Email.name, values = List(emailOption.getOrElse(""))),
-        secretKey = Field(name = Fields.SecretKey.name, values = List(secretKeyOption.getOrElse(""))),
+        email = Field(name = Fields.Email.name, values = emails),
+        secretKey = Field(name = Fields.SecretKey.name, values = secretKeys),
         passwordConfirm = Field(name = Fields.PasswordConfirm.name, values = List("")),
         newPassword = Field[String](name = Fields.NewPassword.name, values = List(""))
       )
@@ -88,8 +88,9 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
 object GetResetPasswordEndpoint {
 
   def absoluteUrl(email: String, secretKey: String): String = {
-    val action = Utils.lookupUrl("WebsiteControllers.getResetPassword",
-      Map("email" -> email, "secretKey" -> secretKey))
+    val action = controllers.routes.WebsiteControllers.getResetPassword(email, secretKey).url
+//    val action = Utils.lookupUrl("WebsiteControllers.getResetPassword",
+//      Map("email" -> email, "secretKey" -> secretKey))
     Utils.absoluteUrl(action)
   }
 

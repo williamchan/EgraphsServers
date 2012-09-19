@@ -1,12 +1,14 @@
 package controllers.website
 
-import play.api.mvc.Controller
+import play.api._
+import play.api.mvc._
 import services.db.{DBSession, TransactionSerializable}
 import models.{Customer, Account, CustomerStore, AccountStore}
 import services.mail.TransactionalMail
 import org.apache.commons.mail.HtmlEmail
 import services.http.{SafePlayParams, AccountRequestFilters, POSTControllerMethod}
 import services.mvc.ImplicitHeaderAndFooterData
+import services.Utils
 
 private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
@@ -19,20 +21,21 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
   protected def accountRequestFilters: AccountRequestFilters
   protected def transactionalMail: TransactionalMail
 
-  def postRecoverAccount() = postController() {
-    accountRequestFilters.requireValidAccountEmail(request.params.getOption("email").getOrElse("Nothing")) {
-      account =>
-
+  def postRecoverAccount() = Action { implicit request =>
+    postController() {
+      val email = Utils.getFromMapFirstInSeqOrElse("email", "Nothing", request.queryString)
+      accountRequestFilters.requireValidAccountEmail(email) { account =>
         val (customer, accountWithResetPassKey) = dbSession.connected(TransactionSerializable) {
           val accountWithResetPassKey = account.withResetPasswordKey.save()
           (customerStore.get(account.customerId.get), accountWithResetPassKey)
         }
         sendRecoveryPasswordEmail(accountWithResetPassKey, customer)
 
-        val flash = play.mvc.Http.Context.current().flash()
-        flash.put("email", request.params.getOption("email").getOrElse(""))
+        val flashEmail = Utils.getFromMapFirstInSeqOrElse("email", "", request.queryString)
 
-        views.html.frontend.simple_confirmation(header = "Success", body ="Instructions for recovering your account have been sent to your email address.")
+        Ok(views.html.frontend.simple_confirmation(header = "Success", body ="Instructions for recovering your account have been sent to your email address.")
+        ).flashing("email" -> flashEmail)
+      }
     }
   }
 

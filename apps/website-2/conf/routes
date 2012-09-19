@@ -105,7 +105,7 @@
 #GET     /{<[0-9]+>orderId}/?                                        WebsiteControllers.getEgraph
 #GET     /facebooklogin/callback/?                                   WebsiteControllers.getFacebookLoginCallback
 #GET     /faq/?                                                      WebsiteControllers.getFAQ
-#GET     /inside-an-egraph/?                                         WebsiteControllers.getInsideEgraph
+GET     /inside-an-egraph                                           controllers.WebsiteControllers.getInsideEgraph
 #GET     /login/?                                                    WebsiteControllers.getLogin
 #POST    /login                                                      WebsiteControllers.postLogin
 #GET     /logout/?                                                   WebsiteControllers.getLogout

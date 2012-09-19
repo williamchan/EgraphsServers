@@ -21,7 +21,22 @@ class Utils @Inject()(@PlayConfig() playConfig: util.Properties) {
    * @return The first value in the map if there is one, or returns the elseValue.
    */
   def getFromMapFirstInSeqOrElse[T](key: String, elseValue: T, map: Map[String, Seq[T]]): T  = {
-    queryString.get("secretKey").getOrElse(Seq(elseValue)).firstOption.getOrElse(elseValue)
+    map.get("secretKey").getOrElse(Seq(elseValue)).headOption.getOrElse(elseValue)
+  }
+
+  /**
+   * @return The optionally the first value in a sequence if there is one. 
+   */
+  def getOptionFirstInSeq[T](optionSeq: Option[Seq[T]]): Option[T]  = {
+    optionSeq match {
+      case None => None
+      case Some(seq) => 
+        if(seq.isEmpty) {
+          None
+        } else {
+          Some(seq.head)
+        }
+    }
   }
 
   /**
