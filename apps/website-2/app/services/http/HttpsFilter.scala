@@ -12,8 +12,8 @@ import play.api.mvc.{AnyContent, Request}
  */
 class HttpsFilter @Inject()(@PlayConfig playConfig: Properties) {
 
-  def apply[A](operation: => A)
-              (implicit request: Request[AnyContent]): Either[Result, A] = {
+  def apply(operation: => Result)
+              (implicit request: Request[AnyContent]): Either[Result, Result] = {
 
     if (playConfig.getProperty(HttpsFilter.httpsOnlyProperty) == "true" && !request.secure.booleanValue()) {
       Left(Redirect("https://" + request.host + request.uri))

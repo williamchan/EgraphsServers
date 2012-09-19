@@ -1,6 +1,7 @@
 package controllers.website
 
-import play.api.mvc.Controller
+import play.api._
+import play.api.mvc._
 import services.Utils
 import services.http.ControllerMethod
 
@@ -21,19 +22,21 @@ private[controllers] trait GetRecoverAccountEndpoint extends ImplicitHeaderAndFo
   protected def controllerMethod: ControllerMethod
   protected def accountRecoverForms: AccountRecoverFormFactory
 
-  def getRecoverAccount = controllerMethod() {
-    val flash = play.mvc.Http.Context.current().flash()
-    val maybeFormData = accountRecoverForms.getFormReader.read(flash.asFormReadable).map { form =>
-      AccountRecoverFormView(
-        form.email.asViewField
-      )
+  def getRecoverAccount = Action { implicit request =>
+    controllerMethod() {
+      val flash = request.flash
+      val maybeFormData = accountRecoverForms.getFormReader.read(flash.asFormReadable).map { form =>
+        AccountRecoverFormView(
+          form.email.asViewField
+        )
+      }
+  
+      Ok(views.html.frontend.account_recover(
+        maybeFormData.getOrElse(
+          AccountRecoverFormView(email = Field(name = Fields.Email.name, values = List("")))
+        )
+      ))
     }
-
-    views.html.frontend.account_recover(
-      maybeFormData.getOrElse(
-        AccountRecoverFormView(email = Field(name = Fields.Email.name, values = List("")))
-      )
-    )
   }
 }
 

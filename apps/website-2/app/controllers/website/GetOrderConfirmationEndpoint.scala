@@ -38,9 +38,9 @@ private[controllers] trait GetOrderConfirmationEndpoint extends ImplicitHeaderAn
         flashOrderId <- maybeOrderIdFromFlash if flashOrderId == orderId;
         order <- orderStore.findById(flashOrderId)
       ) yield {
-        views.html.frontend.celebrity_storefront_complete(
+        Ok(views.html.frontend.celebrity_storefront_complete(
           orderCompleteViewModelFactory.fromOrder(order)
-        )
+        ))
       }
   
       maybeHtml.getOrElse(NotFound("Order confirmation has expired."))

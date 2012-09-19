@@ -35,7 +35,7 @@ class ControllerMethod @Inject()(logging: LoggingContext, db: DBSession, httpsFi
    */
   def apply[A](openDatabase:Boolean=true,
                dbIsolation: TransactionIsolation = TransactionSerializable)
-              (operation: => A)
+              (operation: => Result)
               (implicit request:  Request[AnyContent]): Result =
   {
     val redirectOrResult = httpsFilter {
@@ -52,13 +52,11 @@ class ControllerMethod @Inject()(logging: LoggingContext, db: DBSession, httpsFi
     }
 
     // Automatically unpack Either types
+    //TODO: PLAY20: might want to check to see if this is actually correct, this went from looking like
+    // and Either(Redirect, Either(Redirect, A)) I think to this.
     redirectOrResult.fold(
       error => error,
-      result => result match {
-        case Right(someResult) => someResult
-        case Left(someRedirect) => someRedirect
-        case _ => result
-      }
+      result => result
     )
   }
 }
