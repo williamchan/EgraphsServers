@@ -21,7 +21,7 @@ object OrderViewConversions {
       productTitle=product.name,
       ownersName=order.recipientName,
       imageUrl=egraph.image(product.photoImage).rasterized.scaledToWidth(340).getSavedUrl(AccessPolicy.Public),
-      url=WebsiteControllers.lookupGetEgraph(order.id).url
+      url=GetEgraphEndpoint.url(order.id)
     )
   }
 }

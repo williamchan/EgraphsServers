@@ -99,6 +99,5 @@ object GetAccountSettingsEndpoint {
 
   def url() = {
     controllers.routes.WebsiteControllers.getAccountSettings().url
-//    WebsiteControllers.reverse(WebsiteControllers.getAccountSettings)
   }
 }

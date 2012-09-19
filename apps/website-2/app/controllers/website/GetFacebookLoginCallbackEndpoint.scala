@@ -30,10 +30,10 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
    * and at https://developers.facebook.com/docs/reference/dialogs/oauth/
    */
   def getFacebookLoginCallback(state: String,
-                               code: Option[String] = None,
-                               error: Option[String] = None,
-                               error_reason: Option[String] = None,
-                               error_description: Option[String] = None) 
+                               code: Option[String],
+                               error: Option[String],
+                               error_reason: Option[String],
+                               error_description: Option[String]) 
   = Action { implicit request =>
     controllerMethod() {
 

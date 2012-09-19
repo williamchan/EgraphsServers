@@ -71,13 +71,6 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
     Redirect(controllers.routes.WebsiteControllers.getEgraph(orderId))
   }
 
-  //
-  // Other public members
-  //
-  def lookupGetEgraph(orderId: Long) = {
-    Redirect(controllers.routes.WebsiteControllers.getEgraph(orderId.toString))
-  }
-
   private def isViewable(order: Order)(implicit session: Session): Boolean = {
     val customerIdOption = session.get(EgraphsSession.Key.CustomerId.name).map(customerId => customerId.toLong)
     val adminIdOption = session.get(EgraphsSession.Key.AdminId.name).map(adminId => adminId.toLong)
