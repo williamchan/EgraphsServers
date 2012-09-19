@@ -5,6 +5,7 @@ import models.frontend.landing.CatalogStar
 import services.mvc.celebrity.UpdateCatalogStarsActor.UpdateCatalogStars
 import services.mvc.celebrity.CatalogStarsActor.GetCatalogStars
 
+
 /**
  * Defines the behavior of using two actors to keep a current cache of the
  * [[models.frontend.landing.CatalogStar]]s that should appear in the celebrity catalog, and to
@@ -24,7 +25,7 @@ private[celebrity] trait CatalogStarsQuerying {
    * @return the current set of stars for rendering in the celebrity catalog.
    */
   def apply(numUpdateAttempts: Int = 1): IndexedSeq[CatalogStar] = {
-    val maybeStars = (catalogStarActor !! GetCatalogStars).getOrElse {
+    val maybeStars = (catalogStarActor ask GetCatalogStars).getOrElse {
       error("Received no response from CatalogStarsActor. This is 100% programmer error")
 
       None
@@ -40,7 +41,7 @@ private[celebrity] trait CatalogStarsQuerying {
       // a response, then re-query from the CatalogStars actor.
       case None =>
         if (numUpdateAttempts > 0) {
-          catalogStarUpdateActor !! UpdateCatalogStars(catalogStarActor)
+          catalogStarUpdateActor ask UpdateCatalogStars(catalogStarActor)
 
           this.apply(numUpdateAttempts = numUpdateAttempts - 1)
         } else {

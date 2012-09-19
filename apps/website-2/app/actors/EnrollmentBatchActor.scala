@@ -12,17 +12,22 @@ import models.{CelebrityStore, EnrollmentBatch, EnrollmentBatchStore}
 import models.enums.EnrollmentStatus
 import services.http.PlayConfig
 import java.util.Properties
+import play.api.Play.current
+import play.api.libs.concurrent.Akka
+import akka.actor.Props
+
 
 object EnrollmentBatchActor {
-  val actor = actorOf(AppConfig.instance[EnrollmentBatchActor])
+  val actor = Akka.system.actorOf(Props(AppConfig.instance[EnrollmentBatchActor]))
 }
 
-case class EnrollmentBatchActor @Inject()(db: DBSession,
-                                     celebrityStore: CelebrityStore,
-                                     enrollmentBatchStore: EnrollmentBatchStore,
-                                     logging: LoggingContext,
-                                     @PlayConfig playConfig: Properties
-                                      ) extends Actor with Logging {
+case class EnrollmentBatchActor @Inject()(
+  db: DBSession,
+  celebrityStore: CelebrityStore,
+  enrollmentBatchStore: EnrollmentBatchStore,
+  logging: LoggingContext,
+  @PlayConfig playConfig: Properties
+) extends Actor with Logging {
   protected def receive = {
     case ProcessEnrollmentBatchMessage(id: Long) => {
       processEnrollmentBatch(enrollmentBatchId = id)

@@ -4,6 +4,10 @@ import akka.actor.Actor
 import Actor._
 import models.frontend.landing.CatalogStar
 import services.logging.Logging
+import play.api.Play.current
+import play.api.libs.concurrent.Akka
+import akka.actor.Props
+
 
 /**
  * You are probably looking for [[services.mvc.celebrity.CatalogStarsQuery]] instead of this.
@@ -27,7 +31,7 @@ private[celebrity] class CatalogStarsActor extends Actor with Logging {
 
   protected def receive = {
     case GetCatalogStars =>
-      self.channel ! maybeCelebs
+      sender ! maybeCelebs
 
     case SetCatalogStars(newCelebs) =>
       log("Setting " + newCelebs.length + " new landing page celebs")
@@ -36,7 +40,7 @@ private[celebrity] class CatalogStarsActor extends Actor with Logging {
 }
 
 private[mvc] object CatalogStarsActor {
-  val singleton = actorOf[CatalogStarsActor]
+  val singleton = Akka.system.actorOf(Props[CatalogStarsActor])
 
   //
   // Package members

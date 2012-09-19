@@ -2,6 +2,7 @@ package actors
 
 import akka.actor.Actor
 import Actor._
+import play.api.libs.concurrent.Akka
 import services.db.{DBSession, TransactionSerializable}
 import services.AppConfig
 import models.{EgraphQueryFilters, EgraphStore}
@@ -10,6 +11,10 @@ import services.logging.{Logging, LoggingContext}
 import models.enums.EgraphState
 import services.http.PlayConfig
 import java.util.Properties
+import play.api.Play.current
+import akka.actor.Props
+import play.api.libs.concurrent.Akka
+
 
 /**
  * Actor that performs most of the work of creating an egraph and running it through our biometrics
@@ -79,7 +84,7 @@ case class EgraphActor @Inject() (
 object EgraphActor {
   // Singleton instance of EgraphActor allows only one egraph to be fulfilled at a time.
   // TODO: remove this singleton instance, make all access to this actor go through actorOf.
-  val actor = actorOf(AppConfig.instance[EgraphActor])
+  val actor = Akka.system.actorOf(Props(AppConfig.instance[EgraphActor]))
 }
 
 // ====================
