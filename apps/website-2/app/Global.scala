@@ -1,10 +1,10 @@
 package bootstrap
 
-import play.jobs._
 import org.squeryl.{Session, SessionFactory}
 import io.Source
 import java.io.{File, PrintWriter}
 import play.Play
+import play.api.GlobalSettings
 import services.blobs.Blobs
 import services.payment.Payment
 import java.sql.Connection
@@ -14,13 +14,12 @@ import services.db.{TransactionSerializable, Schema, DBSession}
 import models.{AccountStore, Account, Administrator}
 import services.mvc.celebrity.{CatalogStarsActor, UpdateCatalogStarsActor}
 
-@OnApplicationStart
-class BootStrap extends Job with Logging {
+object Global extends GlobalSettings with Logging {
   val blobs = AppConfig.instance[Blobs]
   val payment = AppConfig.instance[Payment]
   val logging = AppConfig.instance[LoggingContext]
-
-  override def doJob() {
+  
+  override def onStart(app: Application) {
     logging.withTraceableContext("Bootstrap") {
       log("Bootstrapping application")
       // Initialize payment system
@@ -39,13 +38,11 @@ class BootStrap extends Job with Logging {
       blobs.init()
 
       // Some additional test-mode setup
-      if (Play.id == "test") {
+      
+      if (Play.application.isTest) {
         TestModeBootstrap.run()
       }
 
-      akka.actor.Scheduler.restart
-      actors.EgraphActor.actor.start()
-      actors.EnrollmentBatchActor.actor.start()
       services.mvc.MvcModule.init()
 
       log("Finished bootstrapping application")
