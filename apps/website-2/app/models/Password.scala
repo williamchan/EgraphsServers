@@ -1,12 +1,12 @@
 package models
 
 import java.security.SecureRandom
-import play.libs.Codec
+import play.api.libs.Codecs
 import java.math.BigInteger
 import java.util.Date
-import play.libs.Crypto
 import play.data.validation.Validation
-import play.data.validation.Validation.ValidationResult
+import org.postgresql.util.Base64
+import services.crypto.Crypto.SHA256
 
 case class Password (hash: String, salt: String) {
   /**
@@ -35,7 +35,7 @@ object Password {
 
   /** Returns a new, random number sized against our hash function's cipher. */
   def randomSaltNumber (): String = {
-    Codec.encodeBASE64(new BigInteger(256, random).toByteArray)
+    Base64.encodeBytes(new BigInteger(256, random).toByteArray)    
   }
 
   /**
@@ -74,11 +74,9 @@ object Password {
    *
    * @return result of the hash function iterated n times
    */
-  def hashNTimes(toHash: String, times: Int = 1): String = {
-    import Crypto.passwordHash
-    import Crypto.HashType.SHA256
-
-    (1 to times).foldLeft(toHash)((nthHash, _) => passwordHash(nthHash, SHA256))
+  def hashNTimes(toHash: String, times: Int = 1): String = {    
+    
+    (1 to times).foldLeft(toHash)((nthHash, _) => SHA256.hash(nthHash))
   }
 
   /**
