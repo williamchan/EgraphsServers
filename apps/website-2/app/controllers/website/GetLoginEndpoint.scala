@@ -25,12 +25,13 @@ private[controllers] trait GetLoginEndpoint extends ImplicitHeaderAndFooterData 
   //
   // Controllers
   //
-  def getLogin = Action { request =>
+  def getLogin = Action { implicit request =>
     controllerMethod() {
     
       // Save a new FB state ID into the session
       val fbState = UUID.randomUUID().toString
       val fbOauthUrl = Facebook.getFbOauthUrl(fbAppId = facebookAppId, state = fbState)
+      implicit val flash = request.flash
   
       // Render
       Ok(views.html.frontend.login(
@@ -44,11 +45,10 @@ private[controllers] trait GetLoginEndpoint extends ImplicitHeaderAndFooterData 
   //
   // Private members
   //
-  private def makeLoginFormView: LoginFormViewModel = {
+  private def makeLoginFormView(implicit flash: Flash): LoginFormViewModel = {
     import LoginFormViewConversions._
 
     // Get form from flash if possible
-    val flash = play.mvc.Http.Context.current().flash()
     val flashAsReadable = flash.asFormReadable
     val maybeFormFromFlash = formReaders.forCustomerLoginForm.read(flashAsReadable)
     val maybeFormViewModel = maybeFormFromFlash.map(form => form.asView)
@@ -58,11 +58,10 @@ private[controllers] trait GetLoginEndpoint extends ImplicitHeaderAndFooterData 
     maybeFormViewModel.getOrElse(LoginFormViewConversions.defaultView)
   }
 
-  private def makeRegisterFormView: AccountRegistrationFormViewModel = {
+  private def makeRegisterFormView(implicit flash: Flash): AccountRegistrationFormViewModel = {
     import services.mvc.forms.AccountRegistrationFormViewConversions._
 
     // Get for form flash if possible
-    val flash = play.mvc.Http.Context.current().flash()
     val flashAsReadable = flash.asFormReadable
     val maybeFormFromFlash = formReaders.forRegistrationForm.read(flashAsReadable)
     val maybeFormViewModel = maybeFormFromFlash.map(form => form.asView)

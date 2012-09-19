@@ -42,15 +42,15 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
     }
   }
 
-  def getCustomerGalleryById(galleryCustomerId: Long) = Action { 
-    implicit request =>controllerMethod() {
+  def getCustomerGalleryById(galleryCustomerId: Long) = Action { implicit request =>
+    controllerMethod() {
       accountRequestFilters.requireValidCustomerId(galleryCustomerId){
         customer => serveCustomerGallery(customer)
       }
     }
   }
 
-  def serveCustomerGallery(customer:Customer) = Action { request =>
+  def serveCustomerGallery(customer:Customer)(implicit request: Request[_]): Result = {
     val galleryCustomerId = customer.id
     //If admin is true admin
     val session = request.session

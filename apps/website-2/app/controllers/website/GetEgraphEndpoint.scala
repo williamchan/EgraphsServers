@@ -1,9 +1,10 @@
 package controllers.website
 
-import play.mvc.{Router, Controller}
+import play.api._
+import play.api.mvc._
 import services.blobs.AccessPolicy
 import services.http.ControllerMethod
-import play.templates.Html
+import play.api.templates.Html
 import services.http.SafePlayParams.Conversions.paramsToOptionalParams
 import services.graphics.Handwriting
 import models._
@@ -13,6 +14,7 @@ import play.api.mvc.Results.Redirect
 import services.social.{Twitter, Facebook}
 import java.text.SimpleDateFormat
 import services.Utils
+import services.http.EgraphsSession
 
 private[controllers] trait GetEgraphEndpoint { this: Controller =>
   //
@@ -31,50 +33,54 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
    * of the associated order, as several attempts to satisfy an egraph could have
    * been made before a successful one was signed.
    */
-  def getEgraph(orderId: String) = controllerMethod() {
-    // TODO: disable pen-width and shadow re-setting once we find a good value.
-    val params = request.params
-    val penWidth = params.getOption("penWidth").getOrElse("5.0").toDouble
-    val shadowX = params.getOption("shadowX").getOrElse("3.0").toDouble
-    val shadowY = params.getOption("shadowY").getOrElse("3.0").toDouble
-
-    // Get an order with provided ID
-    orderStore.findFulfilledWithId(orderId.toLong) match {
-      case Some(FulfilledOrder(order, egraph)) if isViewable(order) =>
-        val maybeCustomerId = session.getLongOption(WebsiteControllers.customerIdKey)
-        val maybeGalleryLink = maybeCustomerId.map { id =>
-          reverse(WebsiteControllers.getCustomerGalleryById(id)).url
-        }
-
-        GetEgraphEndpoint.html(
-          egraph = egraph,
-          order = order,
-          penWidth = penWidth,
-          shadowX = shadowX,
-          shadowY = shadowY,
-          facebookAppId = facebookAppId,
-          galleryLink = maybeGalleryLink
-        )
-      case Some(FulfilledOrder(order, egraph)) => Forbidden("This Egraph is private.")
-      case None => NotFound("No Egraph exists with the provided identifier.")
+  def getEgraph(orderId: String) = Action { implicit request =>
+    controllerMethod() {
+      // TODO: disable pen-width and shadow re-setting once we find a good value.
+      val params = request.queryString
+      
+      val penWidth = Utils.getFromMapFirstInSeqOrElse("penWidth", "5.0", params).toDouble
+      val shadowX = Utils.getFromMapFirstInSeqOrElse("shadowX", "3.0", params).toDouble
+      val shadowY = Utils.getFromMapFirstInSeqOrElse("shadowY", "3.0", params).toDouble
+  
+      // Get an order with provided ID
+      val session = request.session
+      orderStore.findFulfilledWithId(orderId.toLong) match {
+        case Some(FulfilledOrder(order, egraph)) if isViewable(order)(session) =>          
+          val maybeCustomerId = session.get(EgraphsSession.Key.CustomerId.name)
+          val maybeGalleryLink = maybeCustomerId.map { customerId =>
+            controllers.routes.WebsiteControllers.getCustomerGalleryById(customerId).url
+          }
+  
+          Ok(GetEgraphEndpoint.html(
+            egraph = egraph,
+            order = order,
+            penWidth = penWidth,
+            shadowX = shadowX,
+            shadowY = shadowY,
+            facebookAppId = facebookAppId,
+            galleryLink = maybeGalleryLink
+          ))
+        case Some(FulfilledOrder(order, egraph)) => Forbidden("This Egraph is private.")
+        case None => NotFound("No Egraph exists with the provided identifier.")
+      }
     }
   }
 
   /** Redirects the old egraph url /egraph/{orderId} to the current url */
-  def getEgraphRedirect(orderId: String) = {
-    new Redirect(reverse(getEgraph(orderId)).url)
+  def getEgraphRedirect(orderId: String): Result = {
+    Redirect(controllers.routes.WebsiteControllers.getEgraph(orderId))
   }
 
   //
   // Other public members
   //
   def lookupGetEgraph(orderId: Long) = {
-    reverse(this.getEgraph(orderId.toString))
+    Redirect(controllers.routes.WebsiteControllers.getEgraph(orderId.toString))
   }
 
-  private def isViewable(order: Order): Boolean = {
-    val customerIdOption = session.getLongOption(WebsiteControllers.customerIdKey)
-    val adminIdOption = session.getLongOption(WebsiteControllers.adminIdKey)
+  private def isViewable(order: Order)(implicit session: Session): Boolean = {
+    val customerIdOption = session.get(EgraphsSession.Key.CustomerId.name).map(customerId => customerId.toLong)
+    val adminIdOption = session.get(EgraphsSession.Key.AdminId.name).map(adminId => adminId.toLong)
 
     order.isPublic ||
       order.isBuyerOrRecipient(customerIdOption) ||
@@ -126,7 +132,7 @@ object GetEgraphEndpoint {
     val formattedSigningDate = new SimpleDateFormat("MMMM dd, yyyy").format(egraph.getSignedAt)
 
     // Social links
-    val thisPageAction = WebsiteControllers.reverse(WebsiteControllers.getEgraph(order.id.toString))
+    val thisPageAction = ""//controllers.routes.WebsiteControllers.getEgraph(order.id.toString).url
     val thisPageLink = Utils.absoluteUrl(thisPageAction)
 
     val facebookShareLink = Facebook.getEgraphShareLink(fbAppId = facebookAppId,
@@ -142,12 +148,12 @@ object GetEgraphEndpoint {
       recipientName = order.recipientName,
       frameCssClass = frame.cssClass,
       frameLayoutColumns = frame.cssFrameColumnClasses,
-      productIconUrl = frameFittedIconUrl,
+      productIcon = frameFittedIconUrl,
       storyLayoutColumns = frame.cssStoryColumnClasses,
       storyTitle = product.storyTitle,
       storyBody = story.body,
       audioUrl = egraph.assets.audioMp3Url,
-      signedImageUrl = svgzImageUrl,
+      signedImage = svgzImageUrl,
       signedOnDate = formattedSigningDate,
       shareOnFacebookLink = facebookShareLink,
       shareOnTwitterLink = twitterShareLink,
@@ -155,7 +161,7 @@ object GetEgraphEndpoint {
     )
   }
 
-  def url(orderId: Long): Router.ActionDefinition = {
+  def url(orderId: Long): String = {
     controllers.routes.WebsiteControllers.getEgraph(orderId).url
 //    Utils.lookupUrl("WebsiteControllers.getEgraph", Map("orderId" -> orderId.toString))
   }

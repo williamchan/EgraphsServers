@@ -3,13 +3,15 @@ package controllers.website
 import controllers.WebsiteControllers
 import java.util.Properties
 import models.{Account, Customer, CustomerStore, AccountStore}
-import play.api.mvc.Controller
+import play.api._
+import play.api.mvc._
 import play.api.mvc.Results.Redirect
 import services.db.{TransactionSerializable, DBSession}
 import services.http.ControllerMethod
 import services.Utils
 import services.social.Facebook
 import services.logging.Logging
+import services.http.EgraphsSession
 
 private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { this: Controller =>
 
@@ -31,31 +33,35 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
                                code: Option[String] = None,
                                error: Option[String] = None,
                                error_reason: Option[String] = None,
-                               error_description: Option[String] = None) = controllerMethod() {
+                               error_description: Option[String] = None) 
+  = Action { implicit request =>
+    controllerMethod() {
 
-    validateFacebookCallbackState(state)
-
-    code match {
-      case Some(fbCode) => {
-        val accessToken = Facebook.getFbAccessToken(code = fbCode, facebookAppId = facebookAppId, fbAppSecret = playConfig.getProperty(fbAppSecretKey))
-        val fbUserInfo = Facebook.getFbUserInfo(accessToken = accessToken)
-        val (customer, shouldSendWelcomeEmail) = dbSession.connected(TransactionSerializable) {
-          loginViaFacebook(registrationName = fbUserInfo(Facebook._name).toString, registrationEmail = fbUserInfo(Facebook._email).toString, user_id = fbUserInfo(Facebook._id).toString)
-        }
-        if (shouldSendWelcomeEmail) {
-          dbSession.connected(TransactionSerializable) {
-            val account = customer.account.withResetPasswordKey.save()
-            Customer.sendNewCustomerEmail(account = account, verificationNeeded = false, mail = customer.services.mail)
+      implicit val session = request.session
+      validateFacebookCallbackState(state)
+  
+      code match {
+        case Some(fbCode) => {
+          val accessToken = Facebook.getFbAccessToken(code = fbCode, facebookAppId = facebookAppId, fbAppSecret = playConfig.getProperty(fbAppSecretKey))
+          val fbUserInfo = Facebook.getFbUserInfo(accessToken = accessToken)
+          val (customer, shouldSendWelcomeEmail) = dbSession.connected(TransactionSerializable) {
+            loginViaFacebook(registrationName = fbUserInfo(Facebook._name).toString, registrationEmail = fbUserInfo(Facebook._email).toString, user_id = fbUserInfo(Facebook._id).toString)
           }
-        }
-        new Redirect(reverse(WebsiteControllers.getAccountSettings).url)
+          if (shouldSendWelcomeEmail) {
+            dbSession.connected(TransactionSerializable) {
+              val account = customer.account.withResetPasswordKey.save()
+              Customer.sendNewCustomerEmail(account = account, verificationNeeded = false, mail = customer.services.mail)
+            }
+          }
 
-      }
-      case _ => {
-        log("Facebook Oauth flow halted. error =  " + error.getOrElse("") +
-          ", error_reason = " + error_reason.getOrElse("") +
-          ", error_description = " + error_description.getOrElse(""))
-        new Redirect(reverse(WebsiteControllers.getLogin).url)
+          Redirect(controllers.routes.WebsiteControllers.getAccountSettings).withSession(session + (EgraphsSession.Key.CustomerId.name -> customer.id.toString))
+        }
+        case _ => {
+          log("Facebook Oauth flow halted. error =  " + error.getOrElse("") +
+            ", error_reason = " + error_reason.getOrElse("") +
+            ", error_description = " + error_description.getOrElse(""))
+          Redirect(controllers.routes.WebsiteControllers.getLogin)
+        }
       }
     }
   }
@@ -68,7 +74,7 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
    * @param user_id id of Facebook user. This is persisted to the Account.
    * @return Account and Customer as a tuple
    */
-  private def loginViaFacebook(registrationName: String, registrationEmail: String, user_id: String): (Customer, Boolean) = {
+  private def loginViaFacebook(registrationName: String, registrationEmail: String, user_id: String)(implicit session: Session): (Customer, Boolean) = {
     val accountOption = accountStore.findByEmail(registrationEmail)
     val account = accountOption match {
       case Some(a) => a.copy(fbUserId = Some(user_id)).save()
@@ -86,16 +92,19 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
       }
     }
 
-    session.put(WebsiteControllers.customerIdKey, customer.id.toString)
     (customer, shouldSendWelcomeEmail)
   }
 
   /**
    * @param state checked to be the same state parameter as in Facebook.getFbOauthUrl to guard against CSRF attacks.
    */
-  private def validateFacebookCallbackState(state: String) {
-    if (state != session.get(Facebook._fbState)) {
-      throw new RuntimeException("Facebook authentication failed to verify 'state' parameter")
+  private def validateFacebookCallbackState(state: String)(implicit session: Session) {
+    session.get(Facebook._fbState) match {
+      case None => throw new RuntimeException("There is no Facebook authentication state to verify against 'state' parameter")
+      case Some(fbState) =>
+        if (state != session.get(Facebook._fbState)) {
+          throw new RuntimeException("Facebook authentication failed to verify 'state' parameter")
+        }
     }
   }
 }
