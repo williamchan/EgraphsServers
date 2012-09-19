@@ -1,6 +1,5 @@
 package models
 
-import play.data.validation.Validation.ValidationResult
 import java.sql.Timestamp
 import services.db.{KeyedCaseClass, SavesWithLongKey, Schema}
 import com.google.inject.Inject
@@ -84,9 +83,9 @@ case class Account(
    * @return either a credential with the given password (right), or the erroneous validation
    *    result against the provided entity (left).
    */
-  def withPassword(newPassword: String): Either[ValidationResult, Account] = {
+  def withPassword(newPassword: String): Either[Password.PasswordError, Account] = {
     Password.validate(newPassword) match {
-      case Left(validationResult) => Left(validationResult)
+      case Left(passwordError) => Left(passwordError)
       case _ => {
         val password = Password(newPassword, id)
         Right(copy(passwordHash = Some(password.hash),

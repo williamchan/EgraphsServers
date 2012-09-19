@@ -1,15 +1,13 @@
 package services.http.forms
 
 import com.google.inject.Inject
-import play.data.validation.Validation
-import play.data.binding.types.DateBinder
 import java.text.{ParseException, SimpleDateFormat}
 import java.util.Date
-import play.libs.I18N
 import models._
 import scala.Right
 import scala.Some
 import scala.Left
+import java.util.regex.Pattern
 
 /**
  * A set of checks used by [[services.http.forms.Form]] to validate its
@@ -198,7 +196,7 @@ class FormChecks @Inject()(accountStore: AccountStore, customerStore: CustomerSt
    */
   def isEmailAddress(toValidate: String, message: String="Valid email address required")
   : Either[FormError, String] = {
-    if (!toValidate.isEmpty && playValidation.email(toValidate).ok ) {
+    if (!toValidate.isEmpty && emailPattern.matcher(toValidate).matches()) {
       Right(toValidate)
     } else {
       error(message)
@@ -304,6 +302,9 @@ class FormChecks @Inject()(accountStore: AccountStore, customerStore: CustomerSt
   private def error(message: String): Left[FormError, Nothing] = {
     Left(new SimpleFormError(message))
   }
+  
+  /** Email address regexp copied from Play 1.2.4 */
+  private val emailPattern = Pattern.compile("[\\w!#$%&'*+/=?^_`{|}~-]+(?:\\.[\\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\\w](?:[\\w-]*[\\w])?\\.)+[a-zA-Z0-9](?:[\\w-]*[\\w])?");
 }
 
 object FormChecks {

@@ -2,6 +2,8 @@ package services.http.forms.purchase
 
 import com.google.inject.Inject
 import services.http.forms._
+import controllers.website.consumer.PostBulkEmailController
+import controllers.website.nonproduction.PostBuyDemoProductEndpoint.PostBuyDemoForm
 
 /**
  * Provides readers for most of the HTTP form types we use.
@@ -42,6 +44,12 @@ class FormReaders @Inject()(
   def forEmailSubscriptionForm: ReadsForm[EmailSubscriptionForm] = {
     newReaderWithConstructor { readable =>
       new EmailSubscriptionForm(readable, formChecks)
+    }
+  }
+  
+  def forDemoPurchase: ReadsForm[PostBuyDemoForm] = {
+    newReaderWithConstructor { readable =>
+      new PostBuyDemoForm(readable, formChecks)
     }
   }
 

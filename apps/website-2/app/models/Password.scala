@@ -21,6 +21,10 @@ case class Password (hash: String, salt: String) {
 }
 
 object Password {
+  trait PasswordError
+  case object PasswordRequired extends PasswordError
+  case class PasswordTooLong(attempted: String) extends PasswordError
+  
   /**
    * The number of times to perform the hash function before arriving at the
    * final password. Should be an arbitrary number above 1000.
@@ -42,13 +46,15 @@ object Password {
    * @param password to validate
    * @return validation errors or the password
    */
-  def validate(password: String): Either[ValidationResult, String] = {
-    val existsCheck = Validation.required("password", password)
-    val lengthCheck = Validation.minSize("password", password, Account.minPasswordLength)
-    (existsCheck.ok, lengthCheck.ok) match {
-      case (false, _) => Left(existsCheck)
-      case (_, false) => Left(lengthCheck)
-      case (true, true) => Right(password)
+  def validate(password: String): Either[PasswordError, String] = {
+    if (password != null && password != "") {
+      if (password.length() >= Account.minPasswordLength) {
+        Right(password)
+      } else {
+        Left(PasswordTooLong(password))
+      }
+    } else {
+      Left(PasswordRequired)
     }
   }
 
