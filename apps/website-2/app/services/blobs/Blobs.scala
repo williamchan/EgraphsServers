@@ -1,6 +1,6 @@
 package services.blobs
 
-import play.Play.configuration
+import play.api.Play.current
 import org.jclouds.blobstore.{BlobStoreContext, BlobStore}
 import org.jclouds.io.Payload
 import java.io._
@@ -9,6 +9,10 @@ import services.logging.Logging
 import org.jclouds.blobstore.domain.Blob
 import services.Time
 import Time.IntsToSeconds._
+import play.api.Play.current
+import services.http.PlayConfig
+import services.AppConfig
+import java.util.Properties
 
 /**
  * Convenience methods for storing and loading large binary data: images,
@@ -182,6 +186,9 @@ class Blobs @Inject() (blobProvider: BlobVendor) extends Logging {
  */
 
 object Blobs {
+  /** Application configuration */
+  private[blobs] val configuration = AppConfig.annotatedInstance[PlayConfig, Properties]
+  
   /** Key for the blobstore in application config */
   private[blobs] val blobstoreConfigKey = "blobstore"
 
