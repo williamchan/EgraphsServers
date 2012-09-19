@@ -7,6 +7,7 @@ function () {
       $(".soldout-tooltip").tooltip({placement:"top"});
 
       // Mixpanel events
+      mixpanel.track('Home page viewed', {'query': window.location.search })
       mixpanel.track_links('#get-started-button', 'Get Started clicked');
       $(".celebrities figure>a").click(function() {
         mixpanel.track("Celebrity clicked");
