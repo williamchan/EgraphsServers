@@ -19,6 +19,7 @@ class PostSendCelebrityWelcomeEmail extends AdminFunctionalTest {
     createCeleb()
     val response = POST("/admin/celebrities/1/sendEmail")
     assertStatus(302, response)
+    assertEquals("[/admin/celebrities/1]", response.headers("Location").toString)
   }
 
   @Test
@@ -30,9 +31,13 @@ class PostSendCelebrityWelcomeEmail extends AdminFunctionalTest {
 
   @Test
   def testPostCelebritySendWelcomeEmailNoAdmin() {
+    createAndLoginAsAdmin()
     createCeleb()
+    logout()
     val response = POST("/admin/celebrities/1/sendEmail")
-    assertStatus(404, response)
+    assertStatus(302, response)
+    //redirect to admin screen
+    assertEquals("[/admin/login]", response.headers("Location").toString)
   }
 
 }
