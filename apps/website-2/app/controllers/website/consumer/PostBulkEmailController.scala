@@ -7,9 +7,7 @@ import services.mail.BulkMail
 import services.http.forms.purchase.FormReaders
 import services.http.forms.Form
 import Form.Conversions._
-import play.mvc.results.RenderJson
-import sjson.json.Serializer
-
+import play.api.libs.json.Json.toJson
 
 private[controllers] trait PostBulkEmailController extends ImplicitHeaderAndFooterData {
   this: Controller =>
@@ -32,18 +30,11 @@ private[controllers] trait PostBulkEmailController extends ImplicitHeaderAndFoot
     val subscriptionReader = formReaders.forEmailSubscriptionForm
     val subscriptionForm = subscriptionReader.instantiateAgainstReadable(formReadableParams)
     subscriptionForm.errorsOrValidatedForm.fold(
-      errors =>
-        new RenderJson(Serializer.SJSON.toJSON(
-          Map("errors" ->
-            Serializer.SJSON.toJSON(
-              errors.map( error =>
-                error.description).toSeq
-            )
-          )
-        )),
+      errors => Ok(toJson(Map("error" -> errors.map( error => error.description).toSeq)))
+      ,
       validForm => {
         bulkMail.subscribeNew(validForm.listId, validForm.email)
-        new RenderJson(Serializer.SJSON.toJSON(Map("subscribed" -> true)))
+        Ok(toJson(Map("subscribed" -> true)))
       }
     )
   }

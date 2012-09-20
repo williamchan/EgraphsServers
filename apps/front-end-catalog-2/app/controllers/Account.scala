@@ -2,6 +2,7 @@ package controllers
 
 import play.api._
 import play.api.mvc._
+import play.api.libs.json.Json.toJson
 import models.frontend.egraphs._
 import models.frontend.forms.FormError
 import models.frontend.egraphs.FulfilledEgraphViewModel
@@ -9,8 +10,6 @@ import models.frontend.account.{AccountRecoverForm, AccountPasswordResetForm, Ac
 import models.frontend.forms.Field
 import play.api.mvc.Request
 import play.data.DynamicForm
-//import play.mvc.results.RenderJson
-//import sjson.json.Serializer
 
 /**
  * Test controller for viewing permutations of the account settings page.
@@ -117,13 +116,11 @@ object Account extends Controller with DefaultHeaderAndFooterData {
     Ok(views.html.frontend.account_gallery(user, egraphs, roles(role)))
   }
 
-  //TODO: Myyk = I don't really get what this is even supposed to do
-//  //Basic controller for testing privacy toggles on the gallery pages
-//  def privacy(orderId: String) = {
-//    val status = request.params.get("privacyStatus")
-//    println("privacy status: " + status)
-//    new RenderJson(Serializer.SJSON.toJSON(Map("privacyStatus" -> status)))
-//  }
+  //Basic controller for testing privacy toggles on the gallery pages
+  def privacy(orderId: Long, status: String) = Action {
+    println("privacy status: " + status)
+    Ok(toJson(Map("privacyStatus" -> status)))
+  }
 
   private def printPostRequestData(request: play.api.mvc.Request[play.api.mvc.AnyContent]) {
     println("POST data")

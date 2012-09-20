@@ -12,8 +12,8 @@ GET     /simple_example                                           controllers.Ap
 
 GET     /Account/gallery                                          controllers.Account.gallery(user: String ?= "userdude", count: Int ?=  1, role: String ?= "other", pending: Int ?= 0)
 GET     /Account/errors                                           controllers.Account.errors
-#POST    /orders/{<[0-9]+>orderId}/configure                       controllers.Account.privacy
-#GET     /Account/privacy                                          controllers.Account.privacy(orderId: String)
+POST    /orders/:orderId/:status/configure                        controllers.Account.privacy(orderId: Long, status: String)
+GET     /Account/privacy                                          controllers.Account.privacy(orderId: Long, status: String)
 GET     /Account/settings                                         controllers.Account.getSettings
 POST    /Account/settings                                         controllers.Account.postSettings
 GET     /Account/subscribe                                        controllers.Account.getSubscribe

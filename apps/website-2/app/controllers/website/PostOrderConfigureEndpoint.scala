@@ -4,10 +4,10 @@ import services.http.{CustomerRequestFilters, POSTControllerMethod}
 import models._
 import enums.PrivacyStatus
 import play.api.mvc.Controller
-import play.mvc.results.RenderJson
 import services.http.SafePlayParams.Conversions._
 import sjson.json.Serializer
 import play.api.mvc._
+import play.api.libs.json.Json.toJson
 import services.Utils
 
 private[controllers] trait PostOrderConfigureEndpoint { this: Controller =>
@@ -37,8 +37,8 @@ private[controllers] trait PostOrderConfigureEndpoint { this: Controller =>
           }
   
           newPrivacyStatus match {
-            case Some(privacy) => new RenderJson(Serializer.SJSON.toJSON(Map("privacyStatus" -> privacy.name)))
-            case None => new RenderJson(Serializer.SJSON.toJSON(Map("error" -> true)))
+            case Some(privacy) => Ok(toJson(Map("privacyStatus" -> "privacy.name")))
+            case None => Ok(toJson(Map("error" -> true))) //TODO: PLAY20 should this be a BadRequest?
           }
   
         }
