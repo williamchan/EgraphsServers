@@ -147,24 +147,17 @@ trait PostCelebrityAdminEndpoint {
             celebrityId = celebrityId, celebrityEmail = celebrityEmail, celebrityPassword = celebrityPassword,
             publicName = publicName, publishedStatusString = publishedStatusString, bio = bio,
             casualName = casualName, organization = organization, roleDescription = roleDescription, twitterUsername = twitterUsername)
-
         } else {
           val savedCelebrity = celebrity.withPublishedStatus(publishedStatus).save()
+          
           // Celebrity must have been previously saved before saving with assets that live in blobstore
           if (profileImage.isDefined) savedCelebrity.saveWithProfilePhoto(profileImage.get)
 
           if (isCreate) {
-
             passwordValidationOrAccount.right.get.copy(celebrityId = Some(savedCelebrity.id)).save()
-
-            // Send the order email
-            val email = new HtmlEmail()
-            email.setFrom("noreply@egraphs.com", "Egraphs")
-            email.addTo(celebrityEmail, publicName)
-            email.setSubject("Egraphs Celebrity Account Created")
-            email.setMsg(views.Application.email.html.celebrity_created_email(celebrity = savedCelebrity, email = celebrityEmail).toString().trim())
-            transactionalMail.send(email)
+            savedCelebrity.sendWelcomeEmail()
           }
+          
           savedCelebrity.saveWithImageAssets(landingPageImageOption, logoImageImageOption)
 
           new Redirect(GetCelebrityAdminEndpoint.url(celebrityId = savedCelebrity.id).url + "?action=preview")

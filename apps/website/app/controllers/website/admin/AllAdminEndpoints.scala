@@ -32,6 +32,7 @@ trait AllAdminEndpoints
   with GetToolsAdminEndpoint
   with PostAccountAdminEndpoint
   with PostCelebrityAdminEndpoint
+  with PostSendCelebrityWelcomeEmailAdminEndpoint
   with PostCelebrityInventoryBatchAdminEndpoint
   with PostCelebrityProductAdminEndpoint
   with PostEgraphAdminEndpoint
