@@ -41,7 +41,7 @@ private[celebrity] class UpdateCatalogStarsActor @Inject()(
       val catalogStars = cache.cacheing(resultsCacheKey, updatePeriodSeconds) {
         // Due to cache miss, this instance must update from the database. Get all the stars and
         // their sold-out info.
-        db.connected(TransactionSerializable) {
+        db.connected(isolation = TransactionSerializable, readOnly = true) {
           log.info("Updating landing page celebrities")
 
           // Get the list of domain objects from the DB

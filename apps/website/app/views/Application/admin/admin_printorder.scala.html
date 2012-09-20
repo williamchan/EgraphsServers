@@ -1,6 +1,7 @@
 @(printOrder: models.PrintOrder,
   order: models.Order,
   recipientEmail: String,
+  buyerEmail: String,
   egraph: Option[models.Egraph],
   fields: (String) => String)(implicit session: play.mvc.Scope.Session)
 
@@ -86,6 +87,7 @@
   @valueRow(label="Requested Message",    value=order.requestedMessage)
   @valueRow(label="Expected Date",        value=order.expectedDate)
   @valueRow(label="Recipient Email",      value=recipientEmail)
+  @valueRow(label="Buyer Email",          value=buyerEmail)
   <hr/>
   <h2>Egraph Details</h2>
   @valueRow(label="Signed At",            value=egraph.map(_.getSignedAt))

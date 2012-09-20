@@ -23,26 +23,25 @@ class ControllerMethod @Inject()(logging: LoggingContext, db: DBSession, httpsFi
    * Prepares and customizes controller method behavior. The first expression in
    * any controller methods in our codebase should be to call this function.
    *
-   * @param openDatabase true that the a database connection should be managed
-   *    by this ControllerMethod instance.
+   * @param openDatabase true that a database connection should be managed
+   *                     by this ControllerMethod instance.
    * @param dbIsolation the transaction isolation with which to connect to the
-   *    database if openDatabase is true
-   * @param operation
-   *    the code block to execute after setting up the connection resources
-   * @param request
-   *    the request being served
-   *
+   *                    database if openDatabase is true
+   * @param readOnly true that the database transaction is read-only if openDatabase is true
+   * @param operation the code block to execute after setting up the connection resources
+   * @param request the request being served
    * @return the result of the `operation` code block.
    */
   def apply[A](openDatabase:Boolean=true,
-               dbIsolation: TransactionIsolation = TransactionSerializable)
+               dbIsolation: TransactionIsolation = TransactionSerializable,
+               readOnly: Boolean = false)
               (operation: => A)
               (implicit request: Request): Any =
   {
     val redirectOrResult = httpsFilter {
       logging.withContext(request) {
         if (openDatabase) {
-          db.connected(dbIsolation) {
+          db.connected(dbIsolation, readOnly) {
             operation
           }
         }

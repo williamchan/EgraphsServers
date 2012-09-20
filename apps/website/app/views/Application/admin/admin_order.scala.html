@@ -31,8 +31,8 @@
 }
 
 @reviewControls = {
-  @if(order.reviewStatus == models.enums.OrderReviewStatus.PendingAdminReview) {
-    <div class="form">
+  <div class="form">
+    @if(order.reviewStatus == models.enums.OrderReviewStatus.PendingAdminReview) {
       <form id="approve-form" method="POST" action='@postOrder' enctype="application/x-www-form-urlencoded">
         @authenticityToken()
         <input name="orderId" type="hidden" value="@order.id">
@@ -66,8 +66,46 @@
           <button type="submit" id="editMessages-button" class="btn primary fade in">Edit Messages</button>
         </div>
       </form>
-    </div>
-  }
+    }
+    @if(order.reviewStatus != models.enums.OrderReviewStatus.PendingAdminReview) {
+    <form id="pending-form" method="POST" action='@postOrder' enctype="application/x-www-form-urlencoded">
+      @authenticityToken()
+      <div class="actions">
+        <h3>Revert back to PendingAdminReview?</h3>
+        <input name="orderId" type="hidden" value="@order.id">
+        <input name="action" type="hidden" value="pending">
+        <button type="submit" id="pending-button" class="btn primary fade in">Revert</button>
+      </div>
+    </form>
+    }
+    @if(order.reviewStatus == models.enums.OrderReviewStatus.ApprovedByAdmin) {
+    <form id="generateImages-form" method="POST" action='@postOrder' enctype="application/x-www-form-urlencoded">
+      @authenticityToken()
+      <div class="actions">
+        <h3>Generate PNGs for printing</h3>
+        <input name="orderId" type="hidden" value="@order.id">
+        <input name="action" type="hidden" value="generateImages">
+        <button type="submit" id="generateImages-button" class="btn primary fade in">Generate PNGs?</button>
+      </div>
+    </form>
+    }
+    @if(order.paymentStatus == models.enums.PaymentStatus.Charged) {
+      <form id="refund-form" method="POST" action='@postOrder' enctype="application/x-www-form-urlencoded">
+        @authenticityToken()
+        <div class="actions">
+        <h3>Refund (but not reject) this order? Be Careful.</h3>
+          <input name="orderId" type="hidden" value="@order.id">
+          <input name="action" type="hidden" value="refund"><br>
+          <button type="submit" id="refund-button"
+                  onClick="if(confirm('Are you sure you want to refund order #@order.id?')) {
+                    return true;}
+                    else {return false;}"
+                  class="btn primary fade in">Refund</button>
+        </div>
+      </form>
+    }
+  </div>
+
 }
 
 @body = {
@@ -97,6 +135,7 @@
   @valueRow(label="Recipient name",       value=recipient.name)
   @valueRow(label="Recipient email",      value=recipientEmail)
   @valueRow(label="Expected Date",        value=order.expectedDate)
+  @valueRow(label="Written Message Type", value=order._writtenMessageRequest)
   @valueRow(label="Privacy Status",       value=order.privacyStatus)
   @valueRow(label="Rejection Reason",     value=order.rejectionReason.getOrElse(""))
   @valueRow(label="Created",              value=order.created)

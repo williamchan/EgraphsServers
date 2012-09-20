@@ -49,19 +49,19 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
 
       for (
         // Make sure the product ID matches
-        formProductId <- forms.matchProductIdOrRedirectToChoosePhoto(celeb, product).right;
+        formProductId <- forms.redirectToChoosePhotoOrMatchingProductId(celeb, product).right;
 
         // Make sure there's inventory
-        inventoryBatch <- forms.nextInventoryBatchOrRedirect(celebrityUrlSlug, product).right;
+        inventoryBatch <- forms.redirectOrNextInventoryBatch(celebrityUrlSlug, product).right;
 
         // Make sure we've got a personalize form in storage, or redirect to personalize
-        validPersonalizeForm <- forms.validPersonalizeFormOrRedirectToPersonalizeForm(
+        validPersonalizeForm <- forms.redirectToPersonalizeFormOrValidPersonalizeForm(
                                   celebrityUrlSlug,
                                   productUrlSlug
                                 ).right;
 
         // Make sure we've got a high-quality print option from the Review page, or redirect to it
-        highQualityPrint <- forms.printingOptionOrRedirectToReviewForm(
+        highQualityPrint <- forms.redirectToReviewFormOrPrintingOption(
                               celebrityUrlSlug,
                               productUrlSlug
                             ).right
@@ -140,19 +140,19 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
         // For-comprehend over a bunch of validations
         for (
           // Product ID in the url must match the product being ordered, or redirect to photo
-          productId <- forms.matchProductIdOrRedirectToChoosePhoto(celeb, product).right;
+          productId <- forms.redirectToChoosePhotoOrMatchingProductId(celeb, product).right;
 
           // There must be remaining inventory on the product
-          inventoryBatch <- forms.nextInventoryBatchOrRedirect(celebrityUrlSlug, product).right;
+          inventoryBatch <- forms.redirectOrNextInventoryBatch(celebrityUrlSlug, product).right;
 
           // Gotta have a valid personalize form in storage
-          validPersonalizeForm <- forms.validPersonalizeFormOrRedirectToPersonalizeForm(
+          validPersonalizeForm <- forms.redirectToPersonalizeFormOrValidPersonalizeForm(
                                     celebrityUrlSlug,
                                     productUrlSlug
                                   ).right;
 
           // And a printing option from the review page
-          printingOption <- forms.printingOptionOrRedirectToReviewForm(
+          printingOption <- forms.redirectToReviewFormOrPrintingOption(
                                 celebrityUrlSlug,
                                 productUrlSlug
                               ).right;
