@@ -19,7 +19,6 @@ import java.text.SimpleDateFormat
 import org.apache.commons.mail.HtmlEmail
 import org.joda.money.Money
 import services.http.forms.purchase.CheckoutShippingForm
-import WebsiteControllers.{reverse, getOrderConfirmation}
 import models.Customer
 import models.CashTransaction
 import models.FailedPurchaseData
@@ -41,10 +40,10 @@ case class EgraphPurchaseHandler(
   product: Product,
   totalAmountPaid: Money,
   billingPostalCode: String,
+  flash: Flash,
   printingOption: PrintingOption = PrintingOption.DoNotPrint,
   shippingForm: Option[CheckoutShippingForm.Valid] = None,
   writtenMessageRequest: WrittenMessageRequest = WrittenMessageRequest.SpecificMessage,
-  flash: Flash = play.mvc.Http.Context.current().flash(),
   mail: TransactionalMail = AppConfig.instance[TransactionalMail],
   customerStore: CustomerStore = AppConfig.instance[CustomerStore],
   accountStore: AccountStore = AppConfig.instance[AccountStore],
@@ -75,7 +74,7 @@ case class EgraphPurchaseHandler(
   def execute(): Result = {
     val errorOrOrder = performPurchase
 
-    val redirect: Result = errorOrOrder.fold(
+    errorOrOrder.fold(
       (error) => error match {
         case stripeError: PurchaseFailedStripeError =>
           //Attempt Stripe charge. If a credit card-related error occurred, redirect to purchase screen.
@@ -88,11 +87,8 @@ case class EgraphPurchaseHandler(
       },
       (successfulOrder) =>
         //A redirect to the order confirmation page
-        Redirect(controllers.routes.WebsiteControllers.getOrderConfirmation(successfulOrder.id))
+        Redirect(controllers.routes.WebsiteControllers.getOrderConfirmation(successfulOrder.id)).flashing(flash + ("orderId" -> successfulOrder.id.toString))
     )
-
-    val flash = play.mvc.Http.Context.current().flash()
-    redirect.flashing(flash + "orderId" -> order.id)
   }
 
   def performPurchase(): Either[PurchaseFailed, Order] = {
@@ -254,7 +250,7 @@ case class EgraphPurchaseHandler(
     val emailLogoSrc = ""
     val emailFacebookSrc = ""
     val emailTwitterSrc = ""
-    val faqHowLongLink = Utils.absoluteUrl(Utils.lookupUrl("WebsiteControllers.getFAQ")) + "#how-long"
+    val faqHowLongLink = Utils.absoluteUrl(controllers.routes.WebsiteControllers.WebsiteControllers.getFAQ.url) + "#how-long"
     val html = views.html.frontend.email_order_confirmation(
       buyerName = buyerName,
       recipientName = recipientName,

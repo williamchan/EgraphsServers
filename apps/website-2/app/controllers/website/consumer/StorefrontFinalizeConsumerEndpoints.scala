@@ -141,48 +141,50 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
    * @return a Redirect to the order complete page if successful, otherwise
    *         a Redirect back to the form to handle errors.
    */
-  def postStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug: String) = postController(openDatabase=false) {
-    // Get all the sweet, sweet purchase form data in a database transaction
-    val redirectOrPurchaseData = dbSession.connected(TransactionSerializable) {
-      celebFilters.requireCelebrityAndProductUrlSlugs { (celeb, product) =>
-        val forms = purchaseFormFactory.formsForStorefront(celeb.id)
-        for (formData <- forms.allPurchaseFormsOrRedirect(celeb, product).right) yield {
-          (celeb, product, formData, forms)
+  def postStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug: String) = Action { implicit request =>
+    postController(openDatabase=false) {
+      // Get all the sweet, sweet purchase form data in a database transaction
+      val redirectOrPurchaseData = dbSession.connected(TransactionSerializable) {
+        celebFilters.requireCelebrityAndProductUrlSlugs { (celeb, product) =>
+          val forms = purchaseFormFactory.formsForStorefront(celeb.id)
+          for (formData <- forms.allPurchaseFormsOrRedirect(celeb, product).right) yield {
+            (celeb, product, formData, forms)
+          }
         }
       }
-    }
-    // TODO: fix the type erasure that happens in our celebFilters so that a match like this
-    // isnt necessary.
-    redirectOrPurchaseData match {
-      case Right((celeb: Celebrity, product:models.Product, shippingForms: AllPurchaseForms, forms: PurchaseForms)) =>
-        val AllPurchaseForms(productId, inventoryBatch, personalization, billing, shipping) = shippingForms
-        EgraphPurchaseHandler(
-          recipientName=personalization.recipientName,
-          recipientEmail=personalization.recipientEmail.getOrElse(billing.email),
-          buyerName=billing.name,
-          buyerEmail=billing.email,
-          stripeTokenId=billing.paymentToken,
-          desiredText=personalization.writtenMessageText,
-          personalNote=personalization.noteToCelebriity,
-          celebrity=celeb,
-          product=product,
-          totalAmountPaid=forms.total(basePrice = product.price),
-          billingPostalCode=billing.postalCode,
-          printingOption=forms.highQualityPrint.getOrElse(PrintingOption.DoNotPrint),
-          shippingForm=shipping,
-          writtenMessageRequest=personalization.writtenMessageRequest
-        ).execute()
+      // TODO: fix the type erasure that happens in our celebFilters so that a match like this
+      // isnt necessary.
+      redirectOrPurchaseData match {
+        case Right((celeb: Celebrity, product:models.Product, shippingForms: AllPurchaseForms, forms: PurchaseForms)) =>
+          val AllPurchaseForms(productId, inventoryBatch, personalization, billing, shipping) = shippingForms
+          EgraphPurchaseHandler(
+            recipientName=personalization.recipientName,
+            recipientEmail=personalization.recipientEmail.getOrElse(billing.email),
+            buyerName=billing.name,
+            buyerEmail=billing.email,
+            stripeTokenId=billing.paymentToken,
+            desiredText=personalization.writtenMessageText,
+            personalNote=personalization.noteToCelebriity,
+            celebrity=celeb,
+            product=product,
+            totalAmountPaid=forms.total(basePrice = product.price),
+            billingPostalCode=billing.postalCode,
+            flash=request.flash,
+            printingOption=forms.highQualityPrint.getOrElse(PrintingOption.DoNotPrint),
+            shippingForm=shipping,
+            writtenMessageRequest=personalization.writtenMessageRequest
+          ).execute()
 
+        case Left(result: play.mvc.Http.Response) =>
+          result
 
-      case Left(result: play.mvc.Http.Response)  =>
-        result
+        case result: play.mvc.Http.Response =>
+          result
 
-      case result: play.mvc.Http.Response =>
-        result
+        case whoops =>
+          throw new RuntimeException("This was not expected as a response to a purchase request: " + whoops)
 
-      case whoops =>
-        throw new RuntimeException("This was not expected as a response to a purchase request: " + whoops)
-
+      }
     }
   }
 }

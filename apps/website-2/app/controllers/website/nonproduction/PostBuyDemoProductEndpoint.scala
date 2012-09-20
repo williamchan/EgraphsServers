@@ -69,7 +69,7 @@ import services.http.forms.purchase.FormReaders
         product = product,
         totalAmountPaid = product.price,
         billingPostalCode = "55555",
-        flash = flash,
+        flash = request.flash,
         mail = transactionalMail,
         customerStore = customerStore,
         accountStore = accountStore,
