@@ -17,12 +17,12 @@ class RequireValidCustomerId @Inject() (customerStore: CustomerStore) {
   
   def apply[A]
     (customerId: Long, parser: BodyParser[A] = parse.anyContent)
-    (operation: ValidCustomerRequest[A] => Result)  
+    (operation: CustomerRequest[A] => Result)  
     : Action[A] = 
   {
     Action(parser) { request =>
       customerStore.findById(customerId) match {
-        case Some(customer) => operation(ValidCustomerRequest(customer, request))
+        case Some(customer) => operation(CustomerRequest(customer, request))
         case None => NotFound("Customer not found")
       }
     }

@@ -5,7 +5,7 @@ import models.Customer
 import play.api.mvc.Request
 
 // TODO: PLAY20 migration. Comment this.
-case class ValidCustomerRequest[A] (
+case class CustomerRequest[A] (
   customer: Customer,
   private val request: Request[A]
 ) extends WrappedRequest(request)
