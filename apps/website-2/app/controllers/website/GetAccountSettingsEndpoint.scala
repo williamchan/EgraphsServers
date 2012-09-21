@@ -21,9 +21,9 @@ private[controllers] trait GetAccountSettingsEndpoint extends ImplicitHeaderAndF
   protected def customerFilters: CustomerRequestFilters
   protected def accountSettingsForms: AccountSettingsFormFactory
 
-  def getAccountSettings = Action { implicit request =>
-    controllerMethod() {
-      customerFilters.requireCustomerLogin { (customer, account) =>
+  def getAccountSettings = controllerMethod() {
+    RequireValidCustomerLogin { (customer, account) =>
+      Action { request =>
         val form = makeFormView(customer, account, request.flash)
   
         val displayableErrors = (List(form.fullname.error, form.username.error, form.email.error,

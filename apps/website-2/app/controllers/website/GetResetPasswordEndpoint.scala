@@ -2,7 +2,7 @@ package controllers.website
 
 import play.api._
 import play.api.mvc._
-import services.http.{AccountRequestFilters, ControllerMethod}
+import services.http.ControllerMethod
 import services.Utils
 import models.{Account, AccountStore}
 import models.frontend.forms.{FormError, Field}
@@ -11,6 +11,7 @@ import services.http.SafePlayParams.Conversions._
 import services.mvc.ImplicitHeaderAndFooterData
 import services.http.forms.AccountPasswordResetFormFactory
 import services.http.forms.AccountPasswordResetForm.Fields
+import services.http.filters.RequireValidAccountEmail
 
 private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
 
@@ -18,32 +19,27 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
   import services.http.forms.Form.Conversions._
 
   protected def controllerMethod: ControllerMethod
+  protected def requireValidAccountEmail: RequireValidAccountEmail
   protected def accountStore: AccountStore
-  protected def accountRequestFilters: AccountRequestFilters
   protected def accountPasswordResetForms: AccountPasswordResetFormFactory
 
-  def getResetPassword(email: String, secretKey: String) = Action { implicit request =>
-    controllerMethod() {
-      //flash takes precedence over url arg
-      val flash = request.flash
-      val emailString: String = flash.get("email").getOrElse(email)
-      accountRequestFilters.requireValidAccountEmail(emailString) { account =>
-        val form = makeFormView(account)
-  
-        val displayableErrors = List(form.newPassword.error, form.passwordConfirm.error, form.email.error)
-          .asInstanceOf[List[Option[FormError]]].filter(e => e.isDefined).map(e => e.get.description)
-  
-          if (account.verifyResetPasswordKey(form.secretKey.value.getOrElse("")) == true) {
-            Ok(views.html.frontend.account_password_reset(form=form, displayableErrors=displayableErrors))
-          } else {
-            Forbidden("The password reset URL you used is either out of date or invalid.")
-        }
+  def getResetPassword(email: String, secretKey: String) = controllerMethod() {
+    requireValidAccountEmail.inFlashOrRequest() { implicit request =>
+      val form = makeFormView(request.account)
+
+      val displayableErrors = List(form.newPassword.error, form.passwordConfirm.error, form.email.error)
+        .asInstanceOf[List[Option[FormError]]].filter(e => e.isDefined).map(e => e.get.description)
+
+        if (request.account.verifyResetPasswordKey(form.secretKey.value.getOrElse("")) == true) {
+          Ok(views.html.frontend.account_password_reset(form=form, displayableErrors=displayableErrors))
+        } else {
+          Forbidden("The password reset URL you used is either out of date or invalid.")
       }
     }
   }
 
-  def getVerifyAccount() = Action { implicit request =>
-    controllerMethod() {
+  def getVerifyAccount() = controllerMethod() { 
+    Action { request =>
       val email = Utils.getFromMapFirstInSeqOrElse("email", "Nothing", request.queryString)
       accountRequestFilters.requireValidAccountEmail(email) { account =>
         val resetPasswordKey = Utils.getFromMapFirstInSeqOrElse("secretKey", "", request.queryString)
