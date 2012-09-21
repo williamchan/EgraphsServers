@@ -8,6 +8,10 @@ import controllers.WebsiteControllers
 import play.mvc.results.{Redirect, Forbidden}
 import controllers.website.admin.GetLoginAdminEndpoint
 
+
+// TODO: PLAY20 migration. Delete this file. I have kept it around temporarily just in case
+// moving from using these functions to using composed lower-level filters doesn't work out
+// on migration.
 class AdminRequestFilters @Inject()(adminStore: AdministratorStore,
                                     celebStore: CelebrityStore,
                                     egraphStore: EgraphStore,
@@ -15,41 +19,6 @@ class AdminRequestFilters @Inject()(adminStore: AdministratorStore,
                                     printOrderStore: PrintOrderStore,
                                     accountFilters: AccountRequestFilters,
                                     productFilters: ProductQueryFilters) {
-
-  import SafePlayParams.Conversions._
-
-  def requireAdministratorLogin(continue: (Administrator) => Any)(implicit session: Session, request: Request) = {
-    val adminOption = session.getLongOption(WebsiteControllers.adminIdKey).flatMap(adminId =>
-      adminStore.findById(adminId)
-    )
-    adminOption match {
-      case None => {
-        session.clear()
-        new Redirect(GetLoginAdminEndpoint.url().url)
-      }
-      case Some(admin) => continue(admin)
-    }
-  }
-
-  def requireCelebrity(continue: (Celebrity, Administrator) => Any)(implicit session: Session, request: Request) = {
-    requireAdministratorLogin { admin =>
-      request.params.getOption("celebrityId") match {
-        case None =>
-          new Forbidden("Valid celebrity ID was required but not provided")
-
-        case Some(celebrityId) => {
-          celebStore.findById(celebrityId.toLong) match {
-            case None =>
-              new Forbidden("No celebrity was found with ID " + celebrityId)
-
-            case Some(celebrity) => {
-              continue(celebrity, admin)
-            }
-          }
-        }
-      }
-    }
-  }
 
   def requireOrder(continue: (Order, Administrator) => Any)(implicit session: Session, request: Request) = {
     requireAdministratorLogin { admin =>

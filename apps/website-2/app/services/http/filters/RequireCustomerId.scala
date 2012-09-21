@@ -1,5 +1,6 @@
-package services.http
+package services.http.filters
 
+import services.http.CustomerRequest
 import models.CustomerStore
 import com.google.inject.Inject
 import models.Account
@@ -13,7 +14,7 @@ import play.api.mvc.Results.NotFound
 import models.Customer
 
 // TODO: PLAY20 migration. Test and comment this summbitch
-class RequireValidCustomerId @Inject() (customerStore: CustomerStore) {
+class RequireCustomerId @Inject() (customerStore: CustomerStore) {
   
   def apply[A]
     (customerId: Long, parser: BodyParser[A] = parse.anyContent)

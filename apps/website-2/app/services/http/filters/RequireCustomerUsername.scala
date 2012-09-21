@@ -1,19 +1,17 @@
-package services.http
+package services.http.filters
+
+import com.google.inject.Inject
 
 import models.CustomerStore
-import com.google.inject.Inject
-import models.Account
-import play.api.mvc.WrappedRequest
 import play.api.mvc.Action
-import play.api.mvc.Request
 import play.api.mvc.BodyParser
 import play.api.mvc.BodyParsers.parse
 import play.api.mvc.Result
 import play.api.mvc.Results.NotFound
-import models.Customer
+import services.http.CustomerRequest
 
 // TODO: PLAY20 migration. Test and comment this summbitch
-class RequireValidCustomerUsername @Inject() (customerStore: CustomerStore) {
+class RequireCustomerUsername @Inject() (customerStore: CustomerStore) {
   
   def apply[A]
     (username: String, parser: BodyParser[A] = parse.anyContent)

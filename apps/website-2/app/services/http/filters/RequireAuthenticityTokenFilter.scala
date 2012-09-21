@@ -1,4 +1,4 @@
-package services.http
+package services.http.filters
 
 import play.api.mvc.Request
 import play.api.mvc.Results.Forbidden
