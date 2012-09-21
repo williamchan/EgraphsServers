@@ -3,7 +3,7 @@ package services.blobs
 import java.util.Properties
 import org.jclouds.filesystem.reference.FilesystemConstants
 import org.jclouds.blobstore.BlobStoreContextFactory
-import play.mvc.Http.Request
+import play.api.mvc.Request
 
 /**
  * [[services.blobs.BlobVendor]] implementation on the local system.

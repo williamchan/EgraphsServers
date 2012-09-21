@@ -1,6 +1,6 @@
 package services.http
 
-import play.mvc.Http.Request
+import play.api.mvc.Request
 import models._
 import com.google.inject.Inject
 import play.mvc.Scope.Session

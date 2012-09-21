@@ -2,7 +2,7 @@ package services.mvc
 
 import models.frontend.storefront.{StorefrontBreadcrumb, StorefrontBreadcrumbs}
 import services.http.forms.purchase.{PersonalizeForm, PurchaseForms, FormReaders, PurchaseFormFactory}
-import play.mvc.Http.Request
+import play.api.mvc.Request
 import play.mvc.Scope
 import com.google.inject.Inject
 import controllers.WebsiteControllers

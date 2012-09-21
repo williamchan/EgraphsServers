@@ -5,6 +5,9 @@ import play.api.mvc.{AnyContent, Request}
 import services.http.RequestInfo
 import play.Logger.info
 import services.{Utils, Time}
+import play.api.mvc.Action
+import controllers.routes
+import services.crypto.Crypto
 
 /**
  * Allows functions to be performed within a logging "Context", where
@@ -33,22 +36,24 @@ class LoggingContext {
    * @param operation block of code that should execute within the request logging context
    * @return the result of the operation
    **/
-  def withContext[A](request: Request[AnyContent])(operation: => A): A = {
-    val requestInfo = new RequestInfo(request)
-
-    // Prepare the context for any logs that occur after this point
-    val requestContext = createRequestContext(request, requestInfo)
-
-    withContext(requestContext) {
-      try {
-        logRequestHeader(request, requestInfo)
-        operation
-      }
-      catch {
-        case e: Exception =>
-          info("Exception raised during request. Request details follow. ")
-          logRequestDetails(request)
-          throw e
+  def withRequestContext[A](action: Action[A]): Action[A] = {
+    Action(action.parser) { request =>
+      val requestInfo = new RequestInfo(request)
+  
+      // Prepare the context for any logs that occur after this point
+      val requestContext = createRequestContext(request, requestInfo)
+  
+      withContext(requestContext) {
+        try {
+          logRequestHeader(request, requestInfo)
+          action(request)
+        }
+        catch {
+          case e: Exception =>
+            info("Exception raised during request. Request details follow. ")
+            logRequestDetails(request)
+            throw e
+        }
       }
     }
   }
@@ -68,7 +73,7 @@ class LoggingContext {
       .append(services.Random.string(10))
       .append(Time.now)
     
-    val id = play.libs.Crypto.passwordHash(idSeed.toString()).substring(0, 9)
+    val id = Crypto.MD5.hash(idSeed.toString()).substring(0, 9)
 
     val contextString = new StringBuilder(name).append("(").append(id).append(")").toString()
 
@@ -77,9 +82,9 @@ class LoggingContext {
     }
   }
   
-  private def createRequestContext(request: Request[AnyContent], requestInfo: RequestInfo): String = {
+  private def createRequestContext(request: Request[_], requestInfo: RequestInfo): String = {
     try {
-      new StringBuilder(request.actionMethod)
+      new StringBuilder()
         .append("(")
         .append(requestInfo.clientId)
         .append(".")
@@ -94,7 +99,7 @@ class LoggingContext {
     }
   }
   
-  private def logRequestHeader(request: Request[AnyContent], requestInfo: RequestInfo) {
+  private def logRequestHeader(request: Request[_], requestInfo: RequestInfo) {
     try {
       val requestHeader = new StringBuilder("Serving IP ")
         .append(request.remoteAddress)
@@ -103,10 +108,6 @@ class LoggingContext {
         .append(", ")
         .append("requestId=")
         .append(requestInfo.requestId)
-        .append(") with ")
-        .append(request.controller)
-        .append(".")
-        .append(request.actionMethod)
       
       info(requestHeader.toString())
     }
@@ -141,7 +142,7 @@ class LoggingContext {
     }
   }
 
-  private def logRequestDetails(req: Request[AnyContent]) {
+  private def logRequestDetails(req: Request[_]) {
     import scala.collection.JavaConversions._
 
     info("  " + req.toString)

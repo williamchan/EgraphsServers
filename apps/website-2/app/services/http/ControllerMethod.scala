@@ -4,6 +4,8 @@ import play.api.mvc.{Result, AnyContent, Request}
 import services.logging.LoggingContext
 import com.google.inject.Inject
 import services.db.{TransactionIsolation, TransactionSerializable, DBSession}
+import play.api.mvc.Action
+import play.api.mvc.Request
 
 /**
  * Establishes an appropriate execution context for a request handler.
@@ -35,29 +37,22 @@ class ControllerMethod @Inject()(logging: LoggingContext, db: DBSession, httpsFi
    */
   def apply[A](openDatabase:Boolean=true,
                dbIsolation: TransactionIsolation = TransactionSerializable)
-              (operation: => Result)
-              (implicit request:  Request[AnyContent]): Result =
+              (action: Action[A]): Action[A] =
   {
-    val redirectOrResult = httpsFilter {
-      logging.withContext(request) {
-        if (openDatabase) {
-          db.connected(dbIsolation) {
-            operation
+    httpsFilter {
+      logging.withRequestContext {
+        Action(action.parser) { request => 
+          if (openDatabase) {
+            db.connected(dbIsolation) {
+              action(request)
+            }
+          }
+          else {
+            action(request)
           }
         }
-        else {
-          operation
-        }
       }
-    }
-
-    // Automatically unpack Either types
-    //TODO: PLAY20: might want to check to see if this is actually correct, this went from looking like
-    // and Either(Redirect, Either(Redirect, A)) I think to this.
-    redirectOrResult.fold(
-      error => error,
-      result => result
-    )
+    }    
   }
 }
 
@@ -92,13 +87,14 @@ class POSTControllerMethod @Inject()(
    *     a [[play.mvc.results.Forbidden]]
    */
   def apply[A](doCsrfCheck: Boolean=true, openDatabase: Boolean=true)
-              (operation: => A)
-              (implicit request: Request[AnyContent]): Result =
+              (action: Action[A]): Action[A] =
   {
     controllerMethod() {
       authenticityTokenFilter(doCsrfCheck) {
-        operation
-      }.fold(forbidden => forbidden, result => result)
+        Action(action.parser) { request => 
+          action(request)
+        }
+      }
     }
   }
 }
@@ -127,9 +123,11 @@ class POSTApiControllerMethod @Inject()(postControllerMethod: POSTControllerMeth
    * @return the return value of the `operation` code block or the error state of
    *     postControllerMethod
    */
-  def apply[A](operation: => A)(implicit request: Request[AnyContent]): Result = {
+  def apply[A](action: Action[A]): Action[A] = {
     postControllerMethod(doCsrfCheck=false) {
-      operation
+      Action(action.parser) { request =>
+        action(request)
+      }
     }
   }
 }

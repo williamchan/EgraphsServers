@@ -7,15 +7,11 @@ package services.http
  */
 class SafePlayParams(rawParams: SafePlayParams.OptionParamable) {
 
-  /** See class definition */
+  // TODO: PLAY20 migration this method is no longer necessary.
+  /** Deprecated because Play 2.0's `get` method already returns an option. */  
+  @Deprecated
   def getOption(name: String): Option[String] = {
-    Option(rawParams.get(name)) match {
-      case None | Some("") =>
-        None
-
-      case someValue =>
-        someValue
-    }
+    rawParams.get(name)
   }
 
   def getLongOption(name: String): Option[Long] = {
@@ -31,7 +27,7 @@ class SafePlayParams(rawParams: SafePlayParams.OptionParamable) {
 }
 
 object SafePlayParams {
-  type OptionParamable = { def get(key: String): String }
+  type OptionParamable = { def get(key: String): Option[String] }
   object Conversions {
     implicit def paramsToOptionalParams(rawParams: OptionParamable): SafePlayParams = {
       new SafePlayParams(rawParams)

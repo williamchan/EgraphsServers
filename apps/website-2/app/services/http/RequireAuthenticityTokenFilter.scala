@@ -1,16 +1,19 @@
 package services.http
 
-import play.mvc.Scope.Session
-import play.mvc.Http.Request
-import play.mvc.results.{Forbidden}
+import play.api.mvc.Request
+import play.api.mvc.Results.Forbidden
 import com.google.inject.{Provider, Inject}
+import play.api.mvc.Action
+import play.api.data._
+import play.api.data.Forms._
+
 
 /**
- * Only executes its `operation` block if the request contains a valid authenticity token, as implemented
+ * Only executes its `action` block if the request contains a valid authenticity token, as implemented
  * by Play. Helps protect against CSRF.
  *
  * Easiest to use from a Controller since it already has implicit [[play.mvc.Scope.Session]] and
- * [[play.mvc.Http.Request]] values.
+ * [[play.api.mvc.Request]] values.
  *
  * Usage:
  * {{{
@@ -25,14 +28,14 @@ trait RequireAuthenticityTokenFilter {
 
   /**
    *
-   * @param operation the code block to execute if the request is verified as authentic
+   * @param action the code block to execute if the request is verified as authentic
    * @param session the current request's session
    * @param request the current request
-   * @tparam A return type of `operation`
-   * @return either the return value of the operation on the right, or a Forbidden on the left
+   * @tparam A return type of `action`
+   * @return either the return value of the action on the right, or a Forbidden on the left
    *     if no valid authenticity token was provided.
    */
-  def apply[A](operation: => A)(implicit session: Session, request: Request): Either[Forbidden, A]
+  def apply[A](action: Action[A]): Action[A]
 }
 
 
@@ -68,20 +71,23 @@ class RequireAuthenticityTokenFilterProvider @Inject()(@PlayId playId: String)
 
 /** Implementation that actually checks the response */
 private[http] class DoRequireAuthenticityToken @Inject() extends RequireAuthenticityTokenFilter {
-  override def apply[A](operation: => A)(implicit session: Session, request: Request) = {
-    if (request.params.get("authenticityToken") == session.getAuthenticityToken) {
-      Right(operation)
-    }
-    else {
-      Left(new Forbidden("Bad authenticity token"))
+  override def apply[A](action: Action[A]): Action[A] = {
+    Action(action.parser) { implicit request =>
+      // TODO: PLAY20 migration. Fix authenticity token implementation. Right now it doesn't
+      //   even test against the session. We may have to manually provide an authenticity token
+      //   for each session.
+      Form(single("authenticityToken" -> text)).bindFromRequest.fold(
+        errors => Forbidden("Bad authenticity token"),
+        token => action(request)
+      )
     }
   }
 }
 
 
-/** Implementation that just processes the `operation` */
+/** Implementation that just processes the `action` */
 private[http] class DontRequireAuthenticityToken @Inject() extends RequireAuthenticityTokenFilter {
-  override def apply[A](operation: => A)(implicit session: Session, request: Request) = {
-    Right(operation)
+  override def apply[A](action: Action[A]): Action[A] = {
+    action
   }
 }

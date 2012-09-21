@@ -23,31 +23,21 @@ class AccountRequestFilters @Inject() (accountStore: AccountStore, customerStore
    *
    * @return either Forbidden or the result of `continue`.
    */
-  def requireAuthenticatedAccount(continue: Account => Result)(implicit request: Request[_]): Result = {
+  def requireAuthenticatedAccount(continue: Account => Result): Result = {
     //TODO: PLAY20 migration: maybe we should do something more like this: http://www.playframework.org/documentation/2.0.3/ScalaSecurity
-    val maybeUsername = request.session.get(Security.username)
-    val maybePassword = request.session.get("password")
-
-    if (maybeUsername.isEmpty || maybePassword.isEmpty ) {
-      Forbidden("Username or password information was incorrect.")
-    } else {
-      val username = maybeUsername.get
-      val password = maybePassword.get
-
-      accountStore.authenticate(username, password) match {
-        case Right(theAccount) =>
-          continue(theAccount)
-  
-        case Left(_: AccountAuthenticationError) =>
-          Forbidden("Email/password information was incorrect.")
-      }
+    val maybeOperationResult = for (
+      credentials <- BasicAuth.Credentials(request);
+      account <- accountStore.authenticate(credentials.username, credentials.password).right.toOption
+    ) yield {
+      continue(account)
     }
-  }
 
-  /**
+    maybeOperationResult.getOrElse(Forbidden("Email/password information was incorrect."))    
+  }
+  
+  /** 
    * Validate that customer exists
    */
-
   def requireValidCustomerId(customerId: Long)(continue: Customer => Result)(implicit request: Request[_]): Result = {
     customerStore.findById(customerId) match {
       case Some(customer) => continue(customer)

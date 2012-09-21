@@ -1,13 +1,14 @@
 package services.http
 
-import play.mvc.Http.Request
+import play.api.mvc.Request
 import models._
 import com.google.inject.Inject
 import enums.PublishedStatus
-import play.mvc.results.{Forbidden, NotFound}
+import play.api.mvc.Results.{Forbidden, NotFound}
 import java.util.Properties
 import controllers.WebsiteControllers
-import play.mvc.Scope.Session
+import play.api.mvc.Session
+import play.api.mvc.Result
 
 /**
  * Functions that filter out whose callback parameters are only called when the egraphs
@@ -31,28 +32,27 @@ class CelebrityAccountRequestFilters @Inject() (
    * Calls the `continue` callback parameter if the filter passed, parameterized with the corresponding
    * Account and Celebrity.
    *
+   * @param celebrityId the ID of the celebrity as provided to the request. Eventually this will be
+   *        the actual ID, but right now it is always "me" as provided by the iPad.
    * @param continue function to call if the request passed the filter
    * @param request the request whose params should be checked by the filter
    *
    * @return the return value of `continue` if the filter passed, otherwise `403-Forbidden`.
    */
-  def requireCelebrityAccount(continue: (Account, Celebrity) => Any)(implicit request: Request) = {
+  def requireCelebrityAccount(celebrityId: String)(continue: (Account, Celebrity) => Result) = {
     accountFilters.requireAuthenticatedAccount { account =>
-      request.params.getOption("celebrityId") match {
-        case None =>
-          new Forbidden("Valid celebrity ID was required but not provided")
-
-        case Some("me") =>
+      celebrityId match {
+        case "me" =>
           account.celebrityId match {
             case None =>
-              new Forbidden("Valid celebrity ID was required but not provided.")
+              Forbidden("Valid celebrity ID was required but not provided.")
 
             case Some(accountCelebrityId) =>
               continue(account, celebStore.get(accountCelebrityId))
           }
 
-        case Some(celebrityId) =>
-          new Forbidden(
+        case celebrityId =>
+          Forbidden(
             "Unexpected request for celebrityId \""+celebrityId+"\". Only \"me\" is currently supported."
           )
       }
@@ -68,7 +68,7 @@ class CelebrityAccountRequestFilters @Inject() (
    *
    * @return either the result of continue or a new NotFound.
    */
-  def requireCelebrityId(request: Request)(continue: Celebrity => Any) = {
+  def requireCelebrityId(request: Request)(continue: Celebrity => Any) = {    
     val celebrityIdParamOption = request.params.getOption("celebrityId")
     val celebrityOption = celebrityIdParamOption.flatMap { celebrityIdParam =>
       celebStore.findById(celebrityIdParam.toLong)
@@ -95,27 +95,16 @@ class CelebrityAccountRequestFilters @Inject() (
    *
    * @return the return value of continue if the filter passed, otherwise `403-Forbidden`
    */
-  def requireCelebrityUrlSlug(continue: Celebrity => Any)(implicit request:Request, session:Session) = {
-    request.params.getOption("celebrityUrlSlug") match {
+  def requireCelebrityUrlSlug(celebrityUrlSlug: String, session: Session)(continue: Celebrity => Any) = {
+    celebStore.findByUrlSlug(celebrityUrlSlug) match {
       case None =>
-        throw new IllegalStateException(
-          """
-          celebrityUrlSlug parameter was not provided. This should never have happened since our routes are supposed
-          to ensure that it is present in the url that maps to this controller.
-          """
-        )
+        NotFound("No celebrity with url \"" + celebrityUrlSlug + "\"")
 
-      case Some(celebrityUrlSlug) =>
-        celebStore.findByUrlSlug(celebrityUrlSlug) match {
-          case None =>
-            new NotFound("No celebrity with url \"" + celebrityUrlSlug + "\"")
+      case Some(celebrity) if !isCelebrityViewable(celebrity, session) =>
+        NotFound(celebrity.publicName + "'s Egraphs profile is temporarily unavailable. Check back soon.")
 
-          case Some(celebrity) if !isCelebrityViewable(celebrity) =>
-            new NotFound(celebrity.publicName + "'s Egraphs profile is temporarily unavailable. Check back soon.")
-
-          case Some(celebrity) =>
-            continue(celebrity)
-        }
+      case Some(celebrity) =>
+        continue(celebrity)
     }
   }
 
@@ -130,27 +119,16 @@ class CelebrityAccountRequestFilters @Inject() (
    *
    * @return the return value of `continue` if the filter passed, otherwise `404-NotFound`.
    */
-  def requireCelebrityProductUrl(celebrity: Celebrity)(continue: Product => Any)(implicit request:Request, session:Session) = {
-    request.params.getOption("productUrlSlug") match {
+  def requireCelebrityProductUrl(celebrity: Celebrity, productUrlSlug: String, session: Session)(continue: Product => Any) = {
+    celebrity.products(productFilters.byUrlSlug(productUrlSlug)).headOption match {
       case None =>
-        throw new IllegalStateException(
-          """
-          productUrlSlug parameter not found. This should never have happened since our routes are supposed
-          to ensure that the parameter is present.
-          """
-        )
+        NotFound(celebrity.publicName + " doesn't have any product with url " + productUrlSlug)
 
-      case Some(productUrlSlug) =>
-        celebrity.products(productFilters.byUrlSlug(productUrlSlug)).headOption match {
-          case None =>
-            new NotFound(celebrity.publicName + " doesn't have any product with url " + productUrlSlug)
+      case Some(product) if !isProductViewable(product) =>
+        NotFound(celebrity.publicName + " doesn't have any product with url " + productUrlSlug)
 
-          case Some(product) if !isProductViewable(product) =>
-            new NotFound(celebrity.publicName + " doesn't have any product with url " + productUrlSlug)
-
-          case Some(product)  =>
-            continue(product)
-        }
+      case Some(product)  =>
+        continue(product)
     }
   }
 
@@ -165,9 +143,15 @@ class CelebrityAccountRequestFilters @Inject() (
    *
    * @return the return value of `continue` if the filter passed, otherwise `404-NotFound`
    */
-  def requireCelebrityAndProductUrlSlugs(continue: (Celebrity, Product) => Any)(implicit request: Request, session: Session) = {
-    requireCelebrityUrlSlug { celebrity =>
-      requireCelebrityProductUrl(celebrity) { product =>
+  def requireCelebrityAndProductUrlSlugs(
+      celebrityUrlSlug: String, 
+      productUrlSlug: String, 
+      session: Session
+  )(
+      continue: (Celebrity, Product) => Any
+  ) = {
+   requireCelebrityUrlSlug(celebrityUrlSlug, session) { celebrity =>
+      requireCelebrityProductUrl(celebrity, productUrlSlug, session) { product =>
         continue(celebrity, product)
       }
     }
@@ -176,14 +160,14 @@ class CelebrityAccountRequestFilters @Inject() (
   /**
    * @return true either if Celebrity is Published or if full admin tools are enabled and admin is logged in, else false
    */
-  protected[http] def isCelebrityViewable(celebrity: Celebrity)(implicit session: Session): Boolean = {
+  protected[http] def isCelebrityViewable(celebrity: Celebrity, session: Session): Boolean = {
     (celebrity.publishedStatus == PublishedStatus.Published) || (isAdminToolsFullyEnabled && isAdmin(session))
   }
 
   /**
    * @return true either if Product is Published or if full admin tools are enabled and admin is logged in, else false
    */
-  protected[http] def isProductViewable(product: Product)(implicit session: Session): Boolean = {
+  protected[http] def isProductViewable(product: Product, session:Session): Boolean = {
     (product.publishedStatus == PublishedStatus.Published) || (isAdminToolsFullyEnabled && isAdmin(session))
   }
 
@@ -191,7 +175,7 @@ class CelebrityAccountRequestFilters @Inject() (
     playConfig.getProperty("admin.tools.enabled") == "full"
   }
 
-  private def isAdmin(session: Session): Boolean = {
+  private def isAdmin(session: Session): Boolean = {   
     administratorStore.isAdmin(adminId = session.getLongOption(WebsiteControllers.adminIdKey))
   }
 }
