@@ -9,6 +9,7 @@ import services.http.{AdminRequestFilters, ControllerMethod}
 import org.squeryl.Query
 import org.squeryl.PrimitiveTypeMode._
 import services.db.Schema
+import services.http.SafePlayParams.Conversions._
 
 /**
  * These are the Sheriff's tools to handle tasks that are not yet self-serve. If writing a one-time script, use "sheriff".
@@ -87,6 +88,18 @@ private[controllers] trait GetToolsAdminEndpoint {
             "I gave all pending EnrollmentBatches a kick"
           }
 
+          case "check-enrollmentbatch-status" => {
+            val maybeCelebrityId = params.getLongOption("celebrityId")
+            maybeCelebrityId.map {celebrityId =>
+              val celebrity = celebrityStore.get(celebrityId)
+              enrollmentBatchStore.getOpenEnrollmentBatch(celebrity) match {
+                case None => "Celebrity with id " + celebrityId + " does not have any unused enrollment batches."
+                case Some(batch) => "Celebrity has an enrollmentbatch #" + batch.id + " with " +
+                  enrollmentBatchStore.countEnrollmentSamples(batch.id) + " enrollment samples."
+              }
+            }.getOrElse("")
+          }
+
           //
           // Keep the rest of these actions commented out. With great power comes great responsibility...
           // at least until these actions are made self-serve for the Operations team.
@@ -139,6 +152,13 @@ private[controllers] trait GetToolsAdminEndpoint {
 //              account.get.copy(administratorId = Some(administrator.id)).save()
 //            }
 //            "Admin created"
+//          }
+//          /**
+//           * Before enrollment can be attempted using an enrollment batch, the batch must be marked as complete.
+//           */
+//          case "mark-enrollmentbatch-complete" => {
+//            val enrollmentBatchId = params.get("enrollmentBatchId").toLong
+//            enrollmentBatchStore.get(enrollmentBatchId).copy(isBatchComplete = true).save()
 //          }
           case _ => "Not a valid action"
         }

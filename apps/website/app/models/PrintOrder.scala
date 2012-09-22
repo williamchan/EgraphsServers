@@ -89,7 +89,7 @@ class PrintOrderStore @Inject() (schema: Schema) extends SavesWithLongKey[PrintO
     join(schema.orders, schema.printOrders, schema.egraphs.leftOuter)((order, printOrder, egraph) =>
       where(FilterOneTable.reduceFilters(filters, printOrder))
         select(printOrder, order, egraph)
-        orderBy (printOrder.created asc)
+        orderBy (printOrder.id asc)
         on(printOrder.orderId === order.id, order.id === egraph.map(_.orderId) and (egraph.map(_._egraphState) in Seq(ApprovedByAdmin.name, Published.name)))
     )
   }
@@ -102,7 +102,7 @@ class PrintOrderStore @Inject() (schema: Schema) extends SavesWithLongKey[PrintO
     join(schema.orders, schema.printOrders, schema.egraphs)((order, printOrder, egraph) =>
       where(printOrder.isFulfilled === false and printOrder.pngUrl.isNull)
         select(printOrder, order, Option(egraph))
-        orderBy (printOrder.created asc)
+        orderBy (printOrder.id asc)
         on(printOrder.orderId === order.id, order.id === egraph.orderId and (egraph._egraphState in Seq(ApprovedByAdmin.name, Published.name)))
     )
   }

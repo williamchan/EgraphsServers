@@ -68,7 +68,7 @@ class InventoryBatchStore @Inject()(schema: Schema, orderStore: OrderStore, inve
           FilterOneTable.reduceFilters(filters, inventoryBatch)
       )
         select (inventoryBatch)
-        orderBy (inventoryBatch.created asc)
+        orderBy (inventoryBatch.id asc)
     )
   }
 

@@ -367,7 +367,7 @@ class OrderStore @Inject() (schema: Schema) extends SavesWithLongKey[Order] with
           FilterOneTable.reduceFilters(filters, order)
       )
         select (order)
-        orderBy (order.created asc)
+        orderBy (order.id asc)
     )
   }
 
@@ -389,7 +389,7 @@ class OrderStore @Inject() (schema: Schema) extends SavesWithLongKey[Order] with
           FilterOneTable.reduceFilters(filters, order)
       )
         select (order)
-        orderBy (order.created asc)
+        orderBy (order.id asc)
     )
   }
 
@@ -401,7 +401,7 @@ class OrderStore @Inject() (schema: Schema) extends SavesWithLongKey[Order] with
         FilterOneTable.reduceFilters(filters, order)
       )
         select (order)
-        orderBy (order.created asc)
+        orderBy (order.id asc)
     )
   }
 

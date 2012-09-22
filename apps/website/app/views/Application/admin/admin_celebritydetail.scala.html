@@ -20,6 +20,10 @@
 </script>
 }
 
+@postSendCelebrityWelcomeEmailAdmin(celebrityId: Long) = @{
+  lookupUrl("WebsiteControllers.postSendCelebrityWelcomeEmailAdmin", Map("celebrityId" -> celebrityId.asInstanceOf[AnyRef]))
+}
+
 @postCelebrity = @{
   lookupUrl("WebsiteControllers.postCelebrityAdmin")
 }
@@ -41,6 +45,13 @@
   <h1>
     @{if(isCreate) "Create" else "Update"} Celebrity
   </h1>
+  <div>
+  @for(presentCelebrity <- celebrity) {
+    <form method="POST" action='@postSendCelebrityWelcomeEmailAdmin(presentCelebrity.id)'> 
+      <input class="btn primary fade in" type="submit" value="Send Welcome Email"/>
+    </form>
+  }
+  </div>
   <div class="form row">
     <div class="span12 form-column">
       <form id="admin-celebrity-detail" method="POST" action='@postCelebrity' enctype="multipart/form-data">
@@ -64,7 +75,8 @@
 
           @formField(id="roleDescription", label="Role Description", inputType="text", width="span4", help=Some(roleHelp), fields=fields)
           @roleHelp = { e.g. "Pitcher, Tampa Bay Rays" }
-
+          
+        </fieldset>
           <div class="clearfix">
             <label for="bio">Short Bio</label>
             <div class="input">
