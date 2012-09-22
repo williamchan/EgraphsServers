@@ -10,6 +10,7 @@ import models.{Customer, Account}
 import models.frontend.account.{AccountSettingsForm => AccountSettingsFormView}
 import services.mvc.ImplicitHeaderAndFooterData
 import controllers.WebsiteControllers
+import services.http.filters.RequireCustomerId
 
 private[controllers] trait GetAccountSettingsEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
@@ -18,22 +19,22 @@ private[controllers] trait GetAccountSettingsEndpoint extends ImplicitHeaderAndF
   import services.http.forms.Form.Conversions._
 
   protected def controllerMethod: ControllerMethod
-  protected def customerFilters: CustomerRequestFilters
+  protected def requireCustomerId: RequireCustomerId
   protected def accountSettingsForms: AccountSettingsFormFactory
 
   def getAccountSettings = controllerMethod() {
-    RequireValidCustomerLogin { (customer, account) =>
-      Action { request =>
-        val form = makeFormView(customer, account, request.flash)
-  
-        val displayableErrors = (List(form.fullname.error, form.username.error, form.email.error,
-          form.oldPassword.error, form.newPassword.error, form.passwordConfirm.error,
-          form.addressLine1.error,form.addressLine2.error, form.city.error, form.state.error, form.postalCode.error,
-          form.galleryVisibility.error, form.notice_stars.error) ::: form.generalErrors.toList)
-          .asInstanceOf[List[Option[FormError]]].filter(e => e.isDefined).map(e => e.get.description)
-  
-        Ok(views.html.frontend.account_settings(form=form, displayableErrors))
-      }
+    requireCustomerId.inSession() { request =>
+      val customer = request.customer
+      val account = customer.account
+      val form = makeFormView(customer, account, request.flash)
+
+      val displayableErrors = (List(form.fullname.error, form.username.error, form.email.error,
+        form.oldPassword.error, form.newPassword.error, form.passwordConfirm.error,
+        form.addressLine1.error,form.addressLine2.error, form.city.error, form.state.error, form.postalCode.error,
+        form.galleryVisibility.error, form.notice_stars.error) ::: form.generalErrors.toList)
+        .asInstanceOf[List[Option[FormError]]].filter(e => e.isDefined).map(e => e.get.description)
+
+      Ok(views.html.frontend.account_settings(form=form, displayableErrors))
     }
   }
 

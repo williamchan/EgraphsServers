@@ -6,6 +6,7 @@ import com.google.inject.Inject
 import services.db.{TransactionIsolation, TransactionSerializable, DBSession}
 import play.api.mvc.Action
 import play.api.mvc.Request
+import services.http.filters.RequireAuthenticityTokenFilterProvider
 
 /**
  * Establishes an appropriate execution context for a request handler.

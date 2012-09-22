@@ -14,7 +14,6 @@ import play.api.mvc.Action
 import play.api.mvc.Result
 import services.http.AccountRequest
 
-
 // TODO: PLAY20 migration. Test and comment this summbitch.
 class RequireAccountEmail @Inject() (accountStore: AccountStore) {
   def apply[A](email: String, parser: BodyParser[A] = parse.anyContent)(operation: AccountRequest[A] => Result)

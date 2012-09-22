@@ -2,6 +2,10 @@ package controllers.website
 
 import play.api._
 import play.api.mvc._
+import play.api.data.Forms.tuple
+import play.api.data.Forms.text
+import play.api.data.Forms.email
+import play.api.data.Form
 import services.http.ControllerMethod
 import services.Utils
 import models.{Account, AccountStore}
@@ -11,7 +15,8 @@ import services.http.SafePlayParams.Conversions._
 import services.mvc.ImplicitHeaderAndFooterData
 import services.http.forms.AccountPasswordResetFormFactory
 import services.http.forms.AccountPasswordResetForm.Fields
-import services.http.filters.RequireValidAccountEmail
+import services.http.filters.RequireAccountEmail
+import services.http.filters.RequireResetPasswordSecret
 
 private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
 
@@ -19,12 +24,13 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
   import services.http.forms.Form.Conversions._
 
   protected def controllerMethod: ControllerMethod
-  protected def requireValidAccountEmail: RequireValidAccountEmail
+  protected def requireAccountEmail: RequireAccountEmail
+  protected def requireResetPasswordSecret: RequireResetPasswordSecret
   protected def accountStore: AccountStore
   protected def accountPasswordResetForms: AccountPasswordResetFormFactory
 
   def getResetPassword(email: String, secretKey: String) = controllerMethod() {
-    requireValidAccountEmail.inFlashOrRequest() { implicit request =>
+    requireAccountEmail.inFlashOrRequest() { implicit request =>
       val form = makeFormView(request.account)
 
       val displayableErrors = List(form.newPassword.error, form.passwordConfirm.error, form.email.error)
@@ -38,18 +44,17 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
     }
   }
 
-  def getVerifyAccount() = controllerMethod() { 
-    Action { request =>
-      val email = Utils.getFromMapFirstInSeqOrElse("email", "Nothing", request.queryString)
-      accountRequestFilters.requireValidAccountEmail(email) { account =>
-        val resetPasswordKey = Utils.getFromMapFirstInSeqOrElse("secretKey", "", request.queryString)
-        if(account.verifyResetPasswordKey(resetPasswordKey)){
+  def getVerifyAccount() = controllerMethod() {
+    requireAccountEmail.inRequest() { request =>
+      val account = request.account
+      val action = requireResetPasswordSecret(account) {
+        Action {
           account.emailVerify().save()
           Ok(views.html.frontend.simple_confirmation("Account Verified", "Your account has been successfully verified."))
-        } else {
-          Forbidden("The password reset URL you used is either out of date or invalid.")
         }
       }
+
+      action(request)
     }
   }
 
@@ -67,9 +72,18 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
 
     //check url params for secret key and email
     maybeFormData.getOrElse {
-      val params = request.queryString
-      val emails = params.get("email").getOrElse(Seq(""))
-      val secretKeys = params.get("secretKey").getOrElse(Seq(""))
+      val (emailString, secretKey) = Form(
+        tuple(
+          "email" -> email,
+          "secretKey" -> text
+        )
+      ).bindFromRequest.fold(
+        errors => ("", ""),
+        emailAndSecret => emailAndSecret
+      )
+           
+      val emails = Seq(emailString)
+      val secretKeys = Seq(secretKey)
 
       AccountPasswordResetFormView(
         email = Field(name = Fields.Email.name, values = emails),

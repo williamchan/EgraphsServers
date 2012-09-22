@@ -26,7 +26,7 @@ class RequireOrderIdOfCelebrity @Inject() (orderStore: OrderStore, orderQueryFil
    *
    * @return an Action that produces either NotFound or the result of `operation`.
    */
-  def apply[A](parser: BodyParser[A] = parse.anyContent)(celebrityId: Long)(operation: OrderRequest[A] => Result): Action[A] = {
+  def apply[A](celebrityId: Long, parser: BodyParser[A] = parse.anyContent)(operation: OrderRequest[A] => Result): Action[A] = {
     Action(parser) { implicit request =>
       Form(single("orderId" -> number)).bindFromRequest.fold(
         errors => NotFound("Order ID was required but not provided"),

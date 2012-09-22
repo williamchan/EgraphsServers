@@ -6,6 +6,6 @@ import play.api.mvc.Request
 
 // TODO: PLAY20 migration. Comment this
 case class OrderRequest[A](
-  account: Order,
+  order: Order,
   private val request: Request[A]
 ) extends WrappedRequest(request)

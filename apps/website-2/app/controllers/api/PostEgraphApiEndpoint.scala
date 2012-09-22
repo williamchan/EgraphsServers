@@ -24,6 +24,7 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
    * See [[https://egraphs.jira.com/wiki/display/DEV/API+Endpoints the json spec]] for more info
    * about the params.
    */
+  //TODO: PLAY20: take a look at PostCelebrityOrderApiEndpoint.postCelebrityOrder for some clues on how to do some of this, but there is more than that.
   def postEgraph(
     @Required signature: String,
     @Required audio: String,

@@ -26,40 +26,6 @@ class CelebrityAccountRequestFilters @Inject() (
   import SafePlayParams.Conversions._
 
   /**
-   * Filters out requests that didn't provide valid login/password credentials for an [[models.Account]]
-   * with a [[models.Celebrity]] face.
-   *
-   * Calls the `continue` callback parameter if the filter passed, parameterized with the corresponding
-   * Account and Celebrity.
-   *
-   * @param celebrityId the ID of the celebrity as provided to the request. Eventually this will be
-   *        the actual ID, but right now it is always "me" as provided by the iPad.
-   * @param continue function to call if the request passed the filter
-   * @param request the request whose params should be checked by the filter
-   *
-   * @return the return value of `continue` if the filter passed, otherwise `403-Forbidden`.
-   */
-  def requireCelebrityAccount(celebrityId: String)(continue: (Account, Celebrity) => Result) = {
-    accountFilters.requireAuthenticatedAccount { account =>
-      celebrityId match {
-        case "me" =>
-          account.celebrityId match {
-            case None =>
-              Forbidden("Valid celebrity ID was required but not provided.")
-
-            case Some(accountCelebrityId) =>
-              continue(account, celebStore.get(accountCelebrityId))
-          }
-
-        case celebrityId =>
-          Forbidden(
-            "Unexpected request for celebrityId \""+celebrityId+"\". Only \"me\" is currently supported."
-          )
-      }
-    }
-  }
-
-  /**
    * Requires that the request contain a "celebrityId" param that corresponds to
    * a celebrity that actually exists.
    * 
@@ -68,17 +34,18 @@ class CelebrityAccountRequestFilters @Inject() (
    *
    * @return either the result of continue or a new NotFound.
    */
-  def requireCelebrityId(request: Request)(continue: Celebrity => Any) = {    
-    val celebrityIdParamOption = request.params.getOption("celebrityId")
-    val celebrityOption = celebrityIdParamOption.flatMap { celebrityIdParam =>
-      celebStore.findById(celebrityIdParam.toLong)
-    }
-    
-    celebrityOption match {
-      case Some(celebrity) => continue(celebrity)
-      case None => new NotFound("No such celebrity")
-    }
-  }
+//  @deprecated("instead use RequireCelebrityId.inRequest")
+//  def requireCelebrityId(request: Request)(continue: Celebrity => Any) = {    
+//    val celebrityIdParamOption = request.params.getOption("celebrityId")
+//    val celebrityOption = celebrityIdParamOption.flatMap { celebrityIdParam =>
+//      celebStore.findById(celebrityIdParam.toLong)
+//    }
+//    
+//    celebrityOption match {
+//      case Some(celebrity) => continue(celebrity)
+//      case None => new NotFound("No such celebrity")
+//    }
+//  }
   
   /**
    * Prefer using celebrityUrlSlugOrNotFound

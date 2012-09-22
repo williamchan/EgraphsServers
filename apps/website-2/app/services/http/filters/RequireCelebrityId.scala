@@ -1,7 +1,6 @@
 package services.http.filters
 
 import com.google.inject.Inject
-
 import models.CelebrityStore
 import play.api.data.Form
 import play.api.data.Forms.longNumber
@@ -12,7 +11,7 @@ import play.api.mvc.BodyParsers.parse
 import play.api.mvc.Result
 import play.api.mvc.Results.NotFound
 import services.http.CelebrityRequest
-
+import models.Account
 
 // TODO: PLAY20 migration. Test and comment this summbitch.
 class RequireCelebrityId @Inject() (celebStore: CelebrityStore) {
@@ -41,7 +40,19 @@ class RequireCelebrityId @Inject() (celebStore: CelebrityStore) {
       )
     }
   }
-  
+
+  def inAccount[A](account: Account,parser: BodyParser[A] = parse.anyContent)(operation: CelebrityRequest[A] => Result)
+  : Action[A] = {
+    Action(parser) { implicit request =>
+      account.celebrityId match {
+        case None =>
+          noCelebIdResult
+        case Some(accountCelebrityId) =>
+          this.apply(accountCelebrityId, parser)(operation)(request)
+      }
+    }
+  }
+
   //
   // Private members
   //

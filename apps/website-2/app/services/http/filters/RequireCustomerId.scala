@@ -12,6 +12,9 @@ import play.api.mvc.BodyParsers.parse
 import play.api.mvc.Result
 import play.api.mvc.Results.NotFound
 import models.Customer
+import services.http.SafePlayParams.Conversions._
+import services.http.EgraphsSession
+import play.api.mvc.Results.Redirect
 
 // TODO: PLAY20 migration. Test and comment this summbitch
 class RequireCustomerId @Inject() (customerStore: CustomerStore) {
@@ -28,4 +31,20 @@ class RequireCustomerId @Inject() (customerStore: CustomerStore) {
       }
     }
   }
+
+  /** 
+   * If the customerId is in the session this implies they are logged in.
+   */
+  def inSession[A](parser: BodyParser[A] = parse.anyContent)(operation: CustomerRequest[A] => Result): Action[A] = 
+  {
+    Action(parser) { request =>
+      val maybeResult = request.session.getLongOption(EgraphsSession.Key.CustomerId.name).map { customerId =>
+        this.apply(customerId, parser)(operation)(request)
+      }
+      
+      maybeResult.getOrElse(notLoggedInResult)
+    }
+  }
+
+  private val notLoggedInResult = Redirect(controllers.routes.WebsiteControllers.getLogin).withNewSession
 }

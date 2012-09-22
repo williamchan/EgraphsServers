@@ -6,17 +6,21 @@ import sjson.json.Serializer
 import actors.ProcessEnrollmentBatchMessage
 import akka.actor.ActorRef
 import services.db.{DBSession, TransactionSerializable}
-import play.data.validation.Required
 import services.http.{HttpCodes, ControllerMethod, CelebrityAccountRequestFilters}
+import services.http.filters.RequireAuthenticatedAccount
+import services.http.filters.RequireCelebrityId
+//import play.data.validation.Constraints.Required
 
 private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
   protected def enrollmentBatchActor: ActorRef
   protected def dbSession: DBSession
   protected def controllerMethod: ControllerMethod
   protected def enrollmentBatchServices: EnrollmentBatchServices
-  protected def celebFilters: CelebrityAccountRequestFilters
+  protected def requireAuthenticatedAccount: RequireAuthenticatedAccount
+  protected def requireCelebrityId: RequireCelebrityId
   protected def enrollmentBatchStore: EnrollmentBatchStore
 
+  //TODO: PLAY20: take a look at PostCelebrityOrderApiEndpoint.postCelebrityOrder for some clues on how to do some of this, but there is more than that.
   def postEnrollmentSample(@Required signature: String,
                            @Required audio: String,
                            skipBiometrics: Boolean = false /*todo(wchan): remove skipBiometrics parameter*/) =
