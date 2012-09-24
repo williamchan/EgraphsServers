@@ -1,16 +1,17 @@
 package controllers.website
 
-import play.api._
+import models.frontend.account.{AccountSettingsForm => AccountSettingsFormView}
+import models.frontend.forms.Field
+import models.frontend.forms.FormError
+import models.Account
+import models.Customer
 import play.api.mvc._
-import services.http.{CustomerRequestFilters, ControllerMethod}
-import models.frontend.forms.{FormError, Field}
+import play.api._
+import services.http.filters.RequireCustomerId
 import services.http.forms.AccountSettingsForm.Fields
 import services.http.forms.AccountSettingsFormFactory
-import models.{Customer, Account}
-import models.frontend.account.{AccountSettingsForm => AccountSettingsFormView}
+import services.http.ControllerMethod
 import services.mvc.ImplicitHeaderAndFooterData
-import controllers.WebsiteControllers
-import services.http.filters.RequireCustomerId
 
 private[controllers] trait GetAccountSettingsEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>

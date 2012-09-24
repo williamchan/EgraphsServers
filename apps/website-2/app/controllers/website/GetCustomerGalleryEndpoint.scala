@@ -1,6 +1,6 @@
 package controllers.website
 
-import services.http.{SafePlayParams, AccountRequestFilters, ControllerMethod}
+import services.http.{SafePlayParams, ControllerMethod}
 import play.api._
 import play.api.mvc._
 import models._
@@ -11,6 +11,9 @@ import scala.Some
 import services.mvc.ImplicitHeaderAndFooterData
 import models.GalleryOrderFactory
 import services.http.EgraphsSession
+import services.http.filters.RequireCustomerUsername
+import services.http.filters.RequireCustomerId
+import services.http.CustomerRequest
 
 /**
  * Controller for displaying customer galleries. Galleries serve as a "wall of egraphs".
@@ -29,28 +32,26 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
   protected def customerStore: CustomerStore
   protected def administratorStore: AdministratorStore
   protected def orderStore: OrderStore
-  protected def accountRequestFilters: AccountRequestFilters
+  protected def requireCustomerUsername: RequireCustomerUsername
+  protected def requireCustomerId: RequireCustomerId
   protected def facebookAppId: String
 
   import SafePlayParams.Conversions._
 
-  def getCustomerGalleryByUsername(username: String) = Action { implicit request =>
-    controllerMethod() {
-      accountRequestFilters.requireValidCustomerUsername(username) {
-        customer => serveCustomerGallery(customer)
-      }
+  def getCustomerGalleryByUsername(username: String) = controllerMethod() {
+    requireCustomerUsername(username) { customerRequest => 
+      serveCustomerGallery(customerRequest)
     }
   }
 
-  def getCustomerGalleryById(galleryCustomerId: Long) = Action { implicit request =>
-    controllerMethod() {
-      accountRequestFilters.requireValidCustomerId(galleryCustomerId){
-        customer => serveCustomerGallery(customer)
-      }
+  def getCustomerGalleryById(galleryCustomerId: Long) = controllerMethod() {
+    requireCustomerId(galleryCustomerId){ customerRequest =>
+      serveCustomerGallery(customerRequest)
     }
   }
 
-  def serveCustomerGallery(customer:Customer)(implicit request: Request[_]): Result = {
+  def serveCustomerGallery[A](request: CustomerRequest[A]): Result = {
+    val customer = request.customer
     val galleryCustomerId = customer.id
     //If admin is true admin
     val session = request.session
