@@ -160,7 +160,11 @@ trait PostCelebrityAdminEndpoint {
           
           savedCelebrity.saveWithImageAssets(landingPageImageOption, logoImageImageOption)
 
-          new Redirect(GetCelebrityAdminEndpoint.url(celebrityId = savedCelebrity.id).url + "?action=preview")
+          new Redirect(
+            WebsiteControllers.reverse(WebsiteControllers.getCelebrityAdmin(
+              celebrityId = savedCelebrity.id, action = Option("preview"))
+            ).url
+          )
         }
       }
   }
@@ -204,7 +208,10 @@ trait PostCelebrityAdminEndpoint {
     if (celebrityId == 0) {
       WebsiteControllers.redirectWithValidationErrors(GetCreateCelebrityAdminEndpoint.url())
     } else {
-      WebsiteControllers.redirectWithValidationErrors(GetCelebrityAdminEndpoint.url(celebrityId = celebrityId))
+      WebsiteControllers.redirectWithValidationErrors(
+        WebsiteControllers.reverse(
+          WebsiteControllers.getCelebrityAdmin(celebrityId = celebrityId)
+      ))
     }
   }
 }

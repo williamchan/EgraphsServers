@@ -29,7 +29,9 @@ trait PostSendCelebrityWelcomeEmailAdminEndpoint {
         celebrity <- celebrityStore.findById(celebrityId)
       ) yield {
         celebrity.sendWelcomeEmail()
-        WebsiteControllers.redirectWithValidationErrors(GetCelebrityAdminEndpoint.url(celebrityId = celebrityId))
+        WebsiteControllers.redirectWithValidationErrors(
+          WebsiteControllers.reverse(WebsiteControllers.getCelebrityAdmin(celebrityId=celebrityId))
+        )
       }
       maybeSuccessfulRedirect.getOrElse(NotFound("Celebrity with Id " + celebrityId + " not NotFound"))
     }
