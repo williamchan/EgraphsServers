@@ -1,18 +1,11 @@
 package controllers.website.admin
 
-import play.data.validation._
 import models._
-import enums.PublishedStatus
-import play.mvc.results.Redirect
 import services.mail.TransactionalMail
 import controllers.WebsiteControllers
 import play.mvc.Controller
-import play.data.validation.Validation.ValidationResult
-import services.blobs.Blobs.Conversions._
-import java.io.File
-import services.{ImageUtil, Utils}
-import services.http.{POSTControllerMethod, AdminRequestFilters, CelebrityAccountRequestFilters}
-import org.apache.commons.mail.HtmlEmail
+import services.http.{POSTControllerMethod, AdminRequestFilters}
+
 
 trait PostSendCelebrityWelcomeEmailAdminEndpoint {
   this: Controller =>
