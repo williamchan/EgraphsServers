@@ -48,10 +48,3 @@ private[controllers] trait GetCelebrityAdminEndpoint {
     }
   }
 }
-
-object GetCelebrityAdminEndpoint {
-
-  def url(celebrityId: Long) = {
-    WebsiteControllers.reverse(WebsiteControllers.getCelebrityAdmin(celebrityId))
-  }
-}
