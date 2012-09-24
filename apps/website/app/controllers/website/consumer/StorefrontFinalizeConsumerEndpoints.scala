@@ -84,7 +84,6 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
         val maybeShippingViewModel = maybeShipping.map { shipping =>
           FinalizeShippingViewModel(
             name=shipping.name,
-            email=shipping.email,
             addressLine1 = shipping.addressLine1,
             addressLine2 = shipping.addressLine2,
             city = shipping.city,

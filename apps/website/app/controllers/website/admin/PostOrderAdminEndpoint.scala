@@ -6,8 +6,8 @@ import play.mvc.results.Redirect
 import play.mvc.Controller
 import services.http.{POSTControllerMethod, AdminRequestFilters}
 import services.http.SafePlayParams.Conversions._
-import controllers.WebsiteControllers._
 import controllers.WebsiteControllers
+import controllers.WebsiteControllers._
 
 trait PostOrderAdminEndpoint { this: Controller =>
 
@@ -26,9 +26,11 @@ trait PostOrderAdminEndpoint { this: Controller =>
           order.rejectByAdmin(admin, rejectionReason = Some(rejectionReason)).save()
           new Redirect(WebsiteControllers.reverse(getOrderAdmin(orderId)).url)
         case "editMessages" => {
+          val recipientName = params.getOption("recipientName")
           val messageToCelebrity = params.getOption("messageToCelebrity")
           val requestedMessage = params.getOption("requestedMessage")
           order.copy(messageToCelebrity = messageToCelebrity, requestedMessage = requestedMessage).save()
+          recipientName.map(name => order.copy(recipientName = name).save())
           new Redirect(WebsiteControllers.reverse(getOrderAdmin(orderId)).url)
         }
         case "refund" => {

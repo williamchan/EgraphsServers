@@ -36,11 +36,6 @@ case class OrderServices @Inject() (
 /**
  * Persistent entity representing the Orders made upon Products of our service
  */
-@Deprecated case class ShippingInfo(
-  _printingOption: String = PrintingOption.DoNotPrint.name,
-  shippingAddress: Option[String] = None
-)
-
 case class Order(
   id: Long = 0,
   productId: Long = 0,
@@ -53,14 +48,10 @@ case class Order(
   rejectionReason: Option[String] = None,
   _privacyStatus: String = PrivacyStatus.Public.name,
   _writtenMessageRequest: String = WrittenMessageRequest.SpecificMessage.name,
-  @Deprecated stripeCardTokenId: Option[String] = None,
-  @Deprecated stripeChargeId: Option[String] = None,
   amountPaidInCurrency: BigDecimal = 0,
-  @Deprecated billingPostalCode: Option[String] = None,
   messageToCelebrity: Option[String] = None,
   requestedMessage: Option[String] = None,
   expectedDate: Option[Date] = None,
-  @Deprecated shippingInfo: ShippingInfo = ShippingInfo(),
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: OrderServices = AppConfig.instance[OrderServices]
@@ -71,9 +62,6 @@ case class Order(
   with HasOrderReviewStatus[Order]
   with HasWrittenMessageRequest[Order]
 {
-  @Deprecated val _printingOption = shippingInfo._printingOption
-  @Deprecated val shippingAddress = shippingInfo.shippingAddress
-
   //
   // Public methods
   //
@@ -167,26 +155,20 @@ case class Order(
   def approveByAdmin(admin: Administrator): Order = {
     require(admin != null, "Must be approved by an Administrator")
     require(reviewStatus == OrderReviewStatus.PendingAdminReview, "Must be PendingAdminReview before approving by admin")
-    // TODO SER-98: How to keep _printingOption and shippingAddress intact without this hack?!
-    val omg = this.copy(shippingInfo = ShippingInfo(_printingOption = _printingOption, shippingAddress = shippingAddress))
-    omg.withReviewStatus(OrderReviewStatus.ApprovedByAdmin)
+    withReviewStatus(OrderReviewStatus.ApprovedByAdmin)
   }
 
   def rejectByAdmin(admin: Administrator, rejectionReason: Option[String] = None): Order = {
     require(admin != null, "Must be rejected by an Administrator")
     require(reviewStatus == OrderReviewStatus.PendingAdminReview, "Must be PendingAdminReview before rejecting by admin")
-    // TODO SER-98: How to keep _printingOption and shippingAddress intact without this hack?!
-    val omg = this.copy(shippingInfo = ShippingInfo(_printingOption = _printingOption, shippingAddress = shippingAddress))
-    omg.withReviewStatus(OrderReviewStatus.RejectedByAdmin).copy(rejectionReason = rejectionReason)
+    withReviewStatus(OrderReviewStatus.RejectedByAdmin).copy(rejectionReason = rejectionReason)
   }
 
   def rejectByCelebrity(celebrity: Celebrity, rejectionReason: Option[String] = None): Order = {
     require(celebrity != null, "Must be rejected by Celebrity associated with this Order")
     require(celebrity.id == product.celebrityId, "Must be rejected by Celebrity associated with this Order")
     require(reviewStatus == OrderReviewStatus.ApprovedByAdmin, "Must be ApprovedByAdmin before rejecting by celebrity")
-    // TODO SER-98: How to keep _printingOption and shippingAddress intact without this hack?!
-    val omg = this.copy(shippingInfo = ShippingInfo(_printingOption = _printingOption, shippingAddress = shippingAddress))
-    omg.withReviewStatus(OrderReviewStatus.RejectedByCelebrity).copy(rejectionReason = rejectionReason)
+    withReviewStatus(OrderReviewStatus.RejectedByCelebrity).copy(rejectionReason = rejectionReason)
   }
 
   def sendEgraphSignedMail() {
@@ -385,7 +367,7 @@ class OrderStore @Inject() (schema: Schema) extends SavesWithLongKey[Order] with
           FilterOneTable.reduceFilters(filters, order)
       )
         select (order)
-        orderBy (order.created asc)
+        orderBy (order.id asc)
     )
   }
 
@@ -407,7 +389,7 @@ class OrderStore @Inject() (schema: Schema) extends SavesWithLongKey[Order] with
           FilterOneTable.reduceFilters(filters, order)
       )
         select (order)
-        orderBy (order.created asc)
+        orderBy (order.id asc)
     )
   }
 
@@ -419,7 +401,7 @@ class OrderStore @Inject() (schema: Schema) extends SavesWithLongKey[Order] with
         FilterOneTable.reduceFilters(filters, order)
       )
         select (order)
-        orderBy (order.created asc)
+        orderBy (order.id asc)
     )
   }
 
@@ -470,17 +452,12 @@ class OrderStore @Inject() (schema: Schema) extends SavesWithLongKey[Order] with
       theOld.rejectionReason := theNew.rejectionReason,
       theOld._privacyStatus := theNew._privacyStatus,
       theOld._writtenMessageRequest := theNew._writtenMessageRequest,
-      theOld.stripeCardTokenId := theNew.stripeCardTokenId,
-      theOld.stripeChargeId := theNew.stripeChargeId,
       theOld.amountPaidInCurrency := theNew.amountPaidInCurrency,
       theOld.recipientId := theNew.recipientId,
       theOld.recipientName := theNew.recipientName,
       theOld.messageToCelebrity := theNew.messageToCelebrity,
       theOld.requestedMessage := theNew.requestedMessage,
       theOld.expectedDate := theNew.expectedDate,
-      theOld.billingPostalCode := theNew.billingPostalCode,
-      theOld._printingOption := theNew._printingOption,
-      theOld.shippingAddress := theNew.shippingAddress,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated
     )

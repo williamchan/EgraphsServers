@@ -125,7 +125,6 @@ object FormConversions {
     def asCheckoutPageView: CheckoutShippingAddressFormView = {
       CheckoutShippingAddressFormView(
         fullName = form.name.asViewField,
-        email = form.email.asViewField,
         address1 = form.address1.asViewField,
         address2 = form.address2.asViewField,
         city = form.city.asViewField,

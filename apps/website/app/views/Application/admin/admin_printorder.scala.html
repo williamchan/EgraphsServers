@@ -23,6 +23,10 @@
   lookupUrl("WebsiteControllers.postPrintOrderAdmin", Map("printOrderId" -> printOrder.id.toString))
 }
 
+@egraphPreviewUrl = @{
+  for (x <- egraph) yield (lookupUrl("WebsiteControllers.getEgraphAdmin", Map("egraphId" -> x.id.toString)) + "?action=preview")
+}
+
 @adminControls = {
   @if(!printOrder.isFulfilled && printOrder.pngUrl.isDefined) {
     <div class="form">
@@ -90,6 +94,7 @@
   @valueRow(label="Buyer Email",          value=buyerEmail)
   <hr/>
   <h2>Egraph Details</h2>
+  @valueRow(label="Egraph Id",            value=egraph.map(_.id), href=egraphPreviewUrl.getOrElse(""))
   @valueRow(label="Signed At",            value=egraph.map(_.getSignedAt))
   <hr/>
 </div>

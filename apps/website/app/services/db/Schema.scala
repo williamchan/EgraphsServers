@@ -98,8 +98,6 @@ class Schema @Inject()(
     declare(
       order.amountPaidInCurrency is monetaryDbType,
       columns(order._reviewStatus) are indexed,
-      order.billingPostalCode is dbType("varchar(20)"),
-      order.shippingAddress is dbType("varchar(255)"),
       order.messageToCelebrity is dbType("varchar(140)")
     )
   )

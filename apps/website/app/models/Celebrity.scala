@@ -11,7 +11,8 @@ import org.squeryl.Query
 import services._
 import java.awt.image.BufferedImage
 import models.Celebrity.CelebrityWithImage
-
+import services.mail.TransactionalMail
+import org.apache.commons.mail.HtmlEmail
 
 /**
  * Services used by each celebrity instance
@@ -25,7 +26,8 @@ case class CelebrityServices @Inject() (
   inventoryBatchQueryFilters: InventoryBatchQueryFilters,
   schema: Schema,
   productServices: Provider[ProductServices],
-  imageAssetServices: Provider[ImageAssetServices]
+  imageAssetServices: Provider[ImageAssetServices],
+  transactionalMail: TransactionalMail
 )
 
 
@@ -257,6 +259,27 @@ case class Celebrity(id: Long = 0,
     ).withPublishedStatus(publishedStatus)
 
     product.saveWithImageAssets(image, icon)
+  }
+
+  /**
+  * Sends a welcome email to the celebrities email address with their Egraphs username and a blanked
+  * out password field.  We aren't sending the password, it is just a bunch of *****.  The email
+  * includes a link to download the latest iPad app.
+  */
+  def sendWelcomeEmail() {
+    val email = new HtmlEmail()
+    val emailAddress = account.email
+    val html = views.frontend.html.celebrity_welcome_email(
+      celebrityName = publicName,
+      celebrityEmail = emailAddress
+    )
+
+    email.setFrom("noreply@egraphs.com", "Egraphs")
+    email.addTo(emailAddress, publicName)
+    email.setSubject("Welcome to Egraphs")
+    email.setHtmlMsg(html.toString())
+
+    services.transactionalMail.send(email)
   }
 
   //
