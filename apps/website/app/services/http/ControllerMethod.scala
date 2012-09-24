@@ -38,12 +38,7 @@ class ControllerMethod @Inject()(logging: LoggingContext, db: DBSession, httpsFi
       logging.withContext(request) {
         dbSettings match {
           case WithoutDBConnection => operation
-          case dbSettings: WithDBConnection => {
-            db.connected(dbSettings.dbIsolation, dbSettings.readOnly) {
-              operation
-            }
-          }
-          case _ => throw new UnsupportedOperationException("ControllerDBSettings must be specified for this controller.")
+          case WithDBConnection(dbIsolation, readOnly) => db.connected(dbIsolation, readOnly)(operation)
         }
       }
     }

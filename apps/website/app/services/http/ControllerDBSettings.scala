@@ -6,7 +6,7 @@ import services.db.{TransactionSerializable, TransactionIsolation}
  * Specifies whether a ControllerMethod has a default database transaction. In the case
  * when there is a default database transaction, this also specifies relevant settings.
  */
-trait ControllerDBSettings
+sealed trait ControllerDBSettings
 
 /**
  * Specifies that a ControllerMethod NOT open and persist a default database connection.
