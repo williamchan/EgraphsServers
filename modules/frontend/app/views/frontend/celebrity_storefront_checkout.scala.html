@@ -74,7 +74,6 @@
                     <h3>Where do you want to ship your Egraph?</h3>
                     
                     @bootstrap_text_input_field("Full Name: ", shipping.fullName)
-                    @bootstrap_text_input_field("Email:", shipping.email)
                     @bootstrap_text_input_field("Address:", shipping.address1)
                     @bootstrap_text_input_field("", shipping.address2)
                     @bootstrap_text_input_field("City:", shipping.city)
@@ -126,6 +125,8 @@
                 
                   <h3>Billing Information</h3>
 
+                  @bootstrap_text_input_field("Email:", form.billing.email)
+
                   @for(shipping <- form.shipping) {
                     <div class="field inline">
                       <input type="checkbox"
@@ -138,7 +139,6 @@
                   }
 
                   <div id="billing-info">
-                    @bootstrap_text_input_field("Email:", form.billing.email)
                     @bootstrap_text_input_field(
                       "Full name:",
                       form.billing.fullName,
@@ -179,7 +179,7 @@
                         </select>
                         <select id="card-exp-year" name="card-exp-year" class="inline chsn-select" data-placeholder="Year">
                           <option value></option>
-                          @for(year <- 2012 until 2020) {
+                          @for(year <- 2012 to 2020) {
                             <option value="@year">@year</option>
                           }
                         </select>

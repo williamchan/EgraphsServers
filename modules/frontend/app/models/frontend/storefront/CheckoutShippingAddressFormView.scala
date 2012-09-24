@@ -8,7 +8,6 @@ import models.frontend.forms.Field
  * See [[views.frontend.html.celebrity_storefront_checkout]]
  *
  * @param fullName name of the shipping recipient
- * @param email email address of the shipping recipient
  * @param address1 first address line of the shipping recipient
  * @param address2 second address line of the shipping recipient
  * @param city city for shipping
@@ -19,7 +18,6 @@ import models.frontend.forms.Field
  */
 case class CheckoutShippingAddressFormView(
   fullName: Field[String],
-  email: Field[String],
   address1: Field[String],
   address2: Field[String],
   city: Field[String],
@@ -31,7 +29,6 @@ case class CheckoutShippingAddressFormView(
 object CheckoutShippingAddressFormView {
   def empty(
     fullNameParam: String,
-    emailParam: String,
     address1Param: String,
     address2Param: String,
     cityParam: String,
@@ -41,7 +38,6 @@ object CheckoutShippingAddressFormView {
     ): CheckoutShippingAddressFormView = {
     CheckoutShippingAddressFormView(
       Field.empty(fullNameParam),
-      Field.empty(emailParam),
       Field.empty(address1Param),
       Field.empty(address2Param),
       Field.empty(cityParam),

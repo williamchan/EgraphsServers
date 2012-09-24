@@ -24,6 +24,7 @@ private[controllers] trait GetOrderAdminEndpoint { this: Controller =>
 
           val fieldDefaults: (String => String) = {
             (paramName: String) => paramName match {
+              case "recipientName" => StringEscapeUtils.escapeHtml(order.recipientName)
               case "messageToCelebrity" => StringEscapeUtils.escapeHtml(order.messageToCelebrity.getOrElse(""))
               case "requestedMessage" => StringEscapeUtils.escapeHtml(order.requestedMessage.getOrElse(""))
             }

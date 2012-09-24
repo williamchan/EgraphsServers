@@ -37,7 +37,6 @@ object Finalize extends Controller
   def defaultShippingModel = {
     FinalizeShippingViewModel(
       name="{shipping name}",
-      email="{shipping email}",
       addressLine1="{address 1}",
       addressLine2=Some("{address 2}"),
       city="{shipping city}",

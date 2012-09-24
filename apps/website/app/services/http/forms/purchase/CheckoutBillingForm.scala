@@ -44,9 +44,7 @@ class CheckoutBillingForm(
 
   /** Buyer's email, to be used for keying the account we create */
   val email = field(Params.Email).validatedBy { paramValues =>
-    delegateToShippingForm(shipping => shipping.email).getOrElse {
-      checkPurchaseField(paramValues).isEmail
-    }
+    checkPurchaseField(paramValues).isEmail
   }
 
   /** ZIP code */

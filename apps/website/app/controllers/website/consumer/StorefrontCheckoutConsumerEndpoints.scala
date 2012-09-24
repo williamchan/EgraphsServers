@@ -252,7 +252,6 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
     import CheckoutShippingForm.Params._
     CheckoutShippingAddressFormView.empty(
       Name,
-      Email,
       AddressLine1,
       AddressLine2,
       City,
