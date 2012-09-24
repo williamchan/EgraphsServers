@@ -79,7 +79,6 @@ object Checkout extends Controller
 
     val newShipping = defaultShippingForm.copy(
       fullName=defaultShippingForm.fullName.withError(error),
-      email=defaultShippingForm.email.withError(error),
       address1=defaultShippingForm.address1.withError(error),
       address2=defaultShippingForm.address2.withError(error),
       city=defaultShippingForm.city.withError(error),
@@ -97,7 +96,6 @@ object Checkout extends Controller
     CheckoutShippingAddressFormView.empty(
       "fullNameParam",
       "phoneParam",
-      "emailParam",
       "address1Param",
       "address2Param",
       "cityParam",

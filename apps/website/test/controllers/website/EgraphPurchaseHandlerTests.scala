@@ -53,8 +53,7 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheAndBlob
       addressLine2 = Some("300"),
       city = "Seattle",
       state = "WA",
-      postalCode = "98102",
-      email = ""
+      postalCode = "98102"
     )
 
     val orderFromHandler = executePurchaseHandler(
