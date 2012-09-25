@@ -21,7 +21,7 @@
 }
 
 @postSendCelebrityWelcomeEmailAdmin(celebrityId: Long) = @{
-  lookupUrl("WebsiteControllers.postSendCelebrityWelcomeEmailAdmin", Map("celebrityId" -> celebrityId.asInstanceOf[AnyRef]))
+  lookupUrl("WebsiteControllers.postSendCelebrityWelcomeEmailAdmin", Map("celebrityId" -> celebrityId.toString))
 }
 
 @postCelebrity = @{
@@ -47,7 +47,8 @@
   </h1>
   <div>
   @for(presentCelebrity <- celebrity) {
-    <form method="POST" action='@postSendCelebrityWelcomeEmailAdmin(presentCelebrity.id)'> 
+    <form method="POST" action='@postSendCelebrityWelcomeEmailAdmin(presentCelebrity.id)'>
+      @authenticityToken()
       <input class="btn primary fade in" type="submit" value="Send Welcome Email"/>
     </form>
   }

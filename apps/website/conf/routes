@@ -61,7 +61,7 @@ GET     /admin/accounts/create/?                                    WebsiteContr
 GET     /admin/accounts/{accountId}/?                               WebsiteControllers.getAccountAdmin
 GET     /admin/celebrities/?                                        WebsiteControllers.getCelebritiesAdmin
 POST    /admin/celebrities                                          WebsiteControllers.postCelebrityAdmin
-POST    /admin/celebrities/{celebrityId}/sendEmail/?                WebsiteControllers.postSendCelebrityWelcomeEmailAdmin
+POST    /admin/celebrities/{celebrityId}/sendEmail                  WebsiteControllers.postSendCelebrityWelcomeEmailAdmin
 GET     /admin/celebrities/create/?                                 WebsiteControllers.getCreateCelebrityAdmin
 POST    /admin/celebrities/featured                                 WebsiteControllers.postFeaturedCelebrities
 GET     /admin/celebrities/{celebrityId}/?                          WebsiteControllers.getCelebrityAdmin

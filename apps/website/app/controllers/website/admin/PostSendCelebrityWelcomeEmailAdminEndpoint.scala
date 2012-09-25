@@ -1,18 +1,11 @@
 package controllers.website.admin
 
-import play.data.validation._
 import models._
-import enums.PublishedStatus
-import play.mvc.results.Redirect
 import services.mail.TransactionalMail
 import controllers.WebsiteControllers
 import play.mvc.Controller
-import play.data.validation.Validation.ValidationResult
-import services.blobs.Blobs.Conversions._
-import java.io.File
-import services.{ImageUtil, Utils}
-import services.http.{POSTControllerMethod, AdminRequestFilters, CelebrityAccountRequestFilters}
-import org.apache.commons.mail.HtmlEmail
+import services.http.{POSTControllerMethod, AdminRequestFilters}
+
 
 trait PostSendCelebrityWelcomeEmailAdminEndpoint {
   this: Controller =>
@@ -29,7 +22,9 @@ trait PostSendCelebrityWelcomeEmailAdminEndpoint {
         celebrity <- celebrityStore.findById(celebrityId)
       ) yield {
         celebrity.sendWelcomeEmail()
-        WebsiteControllers.redirectWithValidationErrors(GetCelebrityAdminEndpoint.url(celebrityId = celebrityId))
+        WebsiteControllers.redirectWithValidationErrors(
+          WebsiteControllers.reverse(WebsiteControllers.getCelebrityAdmin(celebrityId=celebrityId))
+        )
       }
       maybeSuccessfulRedirect.getOrElse(NotFound("Celebrity with Id " + celebrityId + " not NotFound"))
     }
