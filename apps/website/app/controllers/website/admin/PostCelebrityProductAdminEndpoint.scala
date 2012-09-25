@@ -50,6 +50,10 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
       Validation.isTrue("Product name has maximum length of 128", productName.length < 128)                // column width in database
       Validation.isTrue("Product description has maximum length of 128", productDescription.length < 128)  // column width in database
 
+      // These validations assume that the product is landscape.
+      Validation.isTrue("Signing Origin X must be between 0 and 575", signingOriginX >= 0 && signingOriginX <= 575)
+      Validation.isTrue("Leave Signing Origin Y as 0 ", signingOriginY == 0)
+
       val productByUrlSlg = productStore.findByCelebrityAndUrlSlug(celebrity.id, Product.slugify(productName))
       val isUniqueUrlSlug = if (isCreate) {
         productByUrlSlg.isEmpty
