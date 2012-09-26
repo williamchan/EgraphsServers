@@ -17,6 +17,7 @@ import services.http.forms.AccountPasswordResetFormFactory
 import services.http.forms.AccountPasswordResetForm.Fields
 import services.http.filters.RequireAccountEmail
 import services.http.filters.RequireResetPasswordSecret
+import services.http.filters.HttpFilters
 
 private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
 
@@ -46,16 +47,13 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
   }
 
   def getVerifyAccount() = controllerMethod() {
-    httpFilters.requireAccountEmail.inRequest() { account =>
-      Action { request =>      
-      val action = requireResetPasswordSecret(account) {
+    httpFilters.requireAccountEmail.inRequest() { account =>      
+      httpFilters.requireResetPasswordSecret(account) {
         Action {
           account.emailVerify().save()
           Ok(views.html.frontend.simple_confirmation("Account Verified", "Your account has been successfully verified."))
         }
       }
-
-      action(request)
     }
   }
 

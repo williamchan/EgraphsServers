@@ -19,18 +19,20 @@ private[controllers] trait PostAccountSettingsEndpoint { this: Controller =>
   def postAccountSettings() = Action { implicit request =>
     postController() {
       httpFilters.requireCustomerLogin.inSession() { (customer, account) =>
-        // Read a AccountSettingsForm from the params
-        val params = request.queryString
-        val nonValidatedForm = accountSettingsForms(params.asFormReadable, customer, account)
-  
-        // Handle valid or error cases
-        nonValidatedForm.errorsOrValidatedForm match {
-          case Left(errors) =>
-            nonValidatedForm.redirectThroughFlash(GetAccountSettingsEndpoint.url().url)
-  
-          case Right(validForm) =>
-            persist(validForm, customer, account)
-            new Redirect(GetAccountSettingsEndpoint.url().url)
+        Action { request => 
+          // Read a AccountSettingsForm from the params
+          val params = request.queryString
+          val nonValidatedForm = accountSettingsForms(params.asFormReadable, customer, account)
+    
+          // Handle valid or error cases
+          nonValidatedForm.errorsOrValidatedForm match {
+            case Left(errors) =>
+              nonValidatedForm.redirectThroughFlash(GetAccountSettingsEndpoint.url().url)
+    
+            case Right(validForm) =>
+              persist(validForm, customer, account)
+              new Redirect(GetAccountSettingsEndpoint.url().url)
+          }
         }
       }
     }

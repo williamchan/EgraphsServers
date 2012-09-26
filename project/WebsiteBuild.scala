@@ -1,6 +1,7 @@
 import sbt._
 import Keys._
 import PlayProject._
+import com.typesafe.sbteclipse.core.EclipsePlugin.EclipseKeys
 
 /**
  * Builds the main Egraphs website.
@@ -27,6 +28,7 @@ object WebsiteBuild extends Build {
       "org.apache.axis2" % "axis2" % "1.6.2" , // from 1.6.1
       "org.apache.axis2" % "axis2-transport-http" % "1.6.2" intransitive(),
       "org.apache.axis2" % "axis2-transport-local" % "1.6.2" intransitive(),
+      "org.apache.commons" % "commons-email" % "1.2",
       "org.jclouds.api" % "filesystem" % "1.2.1" excludeAll(
           ExclusionRule(organization = "org.clojure")
       ),
@@ -87,6 +89,8 @@ object WebsiteBuild extends Build {
       mainLang = SCALA
     ).settings(
       organization := "egraphs",
+
+      EclipseKeys.skipParents := false,
 
       resolvers += "xugglecode" at "http://xuggle.googlecode.com/svn/trunk/repo/share/java"
     ).dependsOn(FrontendBuild.main)
