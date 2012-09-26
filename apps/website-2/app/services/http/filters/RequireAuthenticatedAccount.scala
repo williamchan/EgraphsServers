@@ -23,11 +23,11 @@ class RequireAuthenticatedAccount @Inject() (accountStore: AccountStore) {
    * 
    * Otherwise returns a Forbidden.
    *
-   * @param operation the operation to execute when the account is found.
+   * @param actionFactory returns the action to execute when the account is found.
    *
    * @return an Action that produces either Forbidden or the result of `operation`.
    */
-  def apply[A](parser: BodyParser[A] = parse.anyContent)(operation: AccountRequest[A] => Result)
+  def apply[A](parser: BodyParser[A] = parse.anyContent)(actionFactory: Account => Action[A])
   : Action[A] = 
   {
     Action(parser) { request =>
@@ -35,7 +35,7 @@ class RequireAuthenticatedAccount @Inject() (accountStore: AccountStore) {
         credentials <- BasicAuth.Credentials(request);
         account <- accountStore.authenticate(credentials.username, credentials.password).right.toOption
       ) yield {
-        operation(AccountRequest(account, request))
+        actionFactory(account).apply(request)
       }
       
       maybeResult.getOrElse(Forbidden("Email/password information was incorrect."))

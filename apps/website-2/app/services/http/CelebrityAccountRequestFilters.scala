@@ -48,34 +48,6 @@ class CelebrityAccountRequestFilters @Inject() (
 //  }
   
   /**
-   * Prefer using celebrityUrlSlugOrNotFound
-   *
-   * Filters out requests that didn't provide a valid `celebrityUrlSlug` parameter.
-   *
-   * Calls the `continue` callback parameter with the corresponding [[models.Celebrity]] if the filter
-   * passed.
-   *
-   *
-   *
-   * @param continue function to call if the request passed the filter
-   * @param request the request whose params should be checked by the filter
-   *
-   * @return the return value of continue if the filter passed, otherwise `403-Forbidden`
-   */
-  def requireCelebrityUrlSlug(celebrityUrlSlug: String, session: Session)(continue: Celebrity => Any) = {
-    celebStore.findByUrlSlug(celebrityUrlSlug) match {
-      case None =>
-        NotFound("No celebrity with url \"" + celebrityUrlSlug + "\"")
-
-      case Some(celebrity) if !isCelebrityViewable(celebrity, session) =>
-        NotFound(celebrity.publicName + "'s Egraphs profile is temporarily unavailable. Check back soon.")
-
-      case Some(celebrity) =>
-        continue(celebrity)
-    }
-  }
-
-  /**
    * Filters out requests that didn't provide a valid `productUrlSlug` parameter for the parameterized
    * [[models.Celebrity]].
    *
