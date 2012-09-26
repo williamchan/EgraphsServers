@@ -15,7 +15,7 @@ import services.blobs.AccessPolicy
 import com.google.inject.{Provider, Inject}
 import services._
 import org.squeryl.Query
-import org.squeryl.dsl.ManyToMany
+import org.squeryl.dsl.{GroupWithMeasures, ManyToMany}
 
 case class ProductServices @Inject() (
   store: ProductStore,
@@ -401,6 +401,40 @@ class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: Invent
 
   def products(inventoryBatch: InventoryBatch): Query[Product] with ManyToMany[Product, InventoryBatchProduct] = {
     schema.inventoryBatchProducts.left(inventoryBatch)
+  }
+
+  /**
+   * Gets this Celebrity's Products that can be purchased along with the quantity available of each Product.
+   * Excludes Products that are not available, such as those that are not in an active InventoryBatch based on
+   * startDate and endDate, as well as those that are sold out of quantity.
+   *
+   * This implementation is hopefully more performant than getting all active Products and then calculating the
+   * quantity available for each Product, but this assumption has yet to be tested.
+   *
+   * Note: The inventory remaining is a integer => it could be negative.
+   *
+   * @return a sequence of purchase-able Products along with the available quantity of each Product.
+   */
+  def getActiveProductIdsWithInventoryRemaining(): Seq[(Long, Int)] = {
+    import schema.{celebrities, inventoryBatches, orders}
+
+    val query: Query[GroupWithMeasures[Product3[Long,Long,Long],Int]] = join(celebrities, inventoryBatches, schema.products, orders.leftOuter)((celebrity, inventoryBatch, product, order) =>
+      where(
+        celebrity._publishedStatus === PublishedStatus.Published.name and
+          product._publishedStatus === PublishedStatus.Published.name and
+          (Time.now between(new Timestamp(inventoryBatch.startDate.getTime), new Timestamp(inventoryBatch.endDate.getTime)))
+      )
+        groupBy(celebrity.id, inventoryBatch.id, product.id)
+        compute(nvl(sum(order.map(o=>1)),0))
+        on(
+        celebrity.id === inventoryBatch.celebrityId,
+        celebrity.id === product.celebrityId,
+        inventoryBatch.id === order.map(_.inventoryBatchId)
+        )
+    )
+
+    val productWithQuantitiesRemaining = for (row <- query) yield (row.key._3, row.measures)
+    productWithQuantitiesRemaining.toSeq
   }
 
   //
