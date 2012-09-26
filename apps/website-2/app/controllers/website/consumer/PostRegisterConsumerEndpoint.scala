@@ -1,6 +1,9 @@
 package controllers.website.consumer
 
 import play.api.mvc.Controller
+import play.api.mvc.Action
+import play.api.mvc.Result
+import play.api.mvc.Results.{Ok, Redirect}
 import services.http.{EgraphsSession, POSTControllerMethod}
 import models._
 import services.mvc.ImplicitHeaderAndFooterData
@@ -12,6 +15,9 @@ import play.api.mvc.Results.Redirect
 import scala.Some
 import services.logging.Logging
 import Form.Conversions._
+import services.mail.TransactionalMail
+import play.api.mvc.Request
+import play.api.mvc.AnyContent
 
 /**
  * The POST target for creating a new account at egraphs.
@@ -28,46 +34,53 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
   protected def accountStore: AccountStore
   protected def customerStore: CustomerStore
   protected def dbSession: DBSession
+  protected def mail: TransactionalMail
   protected def egraphsSessionFactory: () => EgraphsSession
 
   //
   // Controllers
   //
   def postRegisterConsumerEndpoint = postController(openDatabase=false) {
-    for(
-      // Get either the account and customer or a redirect back to the sign-in page
-      accountAndCustomer <- redirectOrCreateAccountCustomerTuple().right
-    ) yield {
-      // OK We made it! The user is created. Unpack account and customer
-      val (account, customer) = accountAndCustomer
-
-      // Save the customer ID into the user's session
-      import EgraphsSession.Key
-      val egraphsSession = egraphsSessionFactory()
-
-      egraphsSession.withLong(Key.CustomerId -> customer.id).save()
-
-      // Shoot out a welcome email
-      dbSession.connected(TransactionReadCommitted) {
-        Customer.sendNewCustomerEmail(account = account, verificationNeeded = true, mail = customer.services.mail)
+    Action { request =>
+      val redirects = for(
+        // Get either the account and customer or a redirect back to the sign-in page
+        accountAndCustomer <- redirectOrCreateAccountCustomerTuple(request).right
+      ) yield {
+        // OK We made it! The user is created. Unpack account and customer
+        val (account, customer) = accountAndCustomer
+  
+        // Save the customer ID into the user's session
+        import EgraphsSession.Key
+        val egraphsSession = egraphsSessionFactory()
+  
+        egraphsSession.withLong(Key.CustomerId -> customer.id).save()
+  
+        // Shoot out a welcome email
+        dbSession.connected(TransactionReadCommitted) {
+          Customer.sendNewCustomerEmail(account = account, verificationNeeded = true, mail = customer.services.mail)
+        }
+  
+        Redirect(controllers.routes.WebsiteControllers.getAccountSettings())
       }
-
-      new Redirect(reverse(WebsiteControllers.getAccountSettings).url)
+      
+      redirects.fold(failure => failure, success => success)
     }
   }
 
   //
   // Private members
   //
-  private def redirectOrCreateAccountCustomerTuple(): Either[Redirect, (Account, Customer)] = {
+  private def redirectOrCreateAccountCustomerTuple(request: Request[AnyContent])
+  : Either[Result, (Account, Customer)] = 
+  {
     dbSession.connected(TransactionSerializable) {
-      val formReadableParams = params.asFormReadable
+      val formReadableParams = request.asFormReadable
       val registrationReader = formReaders.forRegistrationForm
       val registrationForm = registrationReader.instantiateAgainstReadable(formReadableParams)
 
       for (
         validForm <- registrationForm.errorsOrValidatedForm.left.map {errors =>
-                       val failRedirectUrl = reverse(WebsiteControllers.getLogin).url
+                       val failRedirectUrl = controllers.routes.WebsiteControllers.getLogin().url
                        registrationForm.redirectThroughFlash(failRedirectUrl)
                      }.right
       ) yield {

@@ -31,7 +31,7 @@ private[controllers] trait PostCelebrityOrderApiEndpoint { this: Controller =>
           httpFilters.requireOrderIdOfCelebrity(celebrity.id) { order =>            
             postCelebrityOrderResult(reviewStatus, rejectionReason, order, celebrity)
           }          
-        }        
+        }
       }
     }
   }

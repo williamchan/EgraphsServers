@@ -89,7 +89,7 @@ GET     /blob/files/:blobKey                                       controllers.W
 ## Consumer Website
 ##
 
-#GET     /?                                                          controllers.WebsiteControllers.getRootConsumerEndpoint
+GET     /                                                           controllers.WebsiteControllers.getRootConsumerEndpoint
 GET     /about/                                                     controllers.WebsiteControllers.getAbout
 GET     /account/settings/                                          controllers.WebsiteControllers.getAccountSettings
 POST    /account/settings                                           controllers.WebsiteControllers.postAccountSettings
@@ -106,39 +106,39 @@ GET     /:orderId/                                                  controllers.
 GET     /facebooklogin/callback/                                    controllers.WebsiteControllers.getFacebookLoginCallback(state: String, code: Option[String], error: Option[String], error_reason: Option[String], error_description: Option[String])
 GET     /faq/                                                       controllers.WebsiteControllers.getFAQ
 GET     /inside-an-egraph/                                          controllers.WebsiteControllers.getInsideEgraph
-#GET     /login/?                                                    controllers.WebsiteControllers.getLogin
+GET     /login                                                      controllers.WebsiteControllers.getLogin
 POST    /login                                                      controllers.WebsiteControllers.postLogin
 GET     /logout/                                                    controllers.WebsiteControllers.getLogout
 POST    /logout                                                     controllers.WebsiteControllers.postLogout
 GET     /orders/:orderId/confirm/                                   controllers.WebsiteControllers.getOrderConfirmation(orderId: Long)
 POST    /orders/:orderId/configure                                  controllers.WebsiteControllers.postOrderPrivacy(orderId: Long)
 GET     /privacy/                                                   controllers.WebsiteControllers.getPrivacy
-#POST    /register                                                   controllers.WebsiteControllers.postRegisterConsumerEndpoint
-#POST    /subscribe                                                  controllers.WebsiteControllers.postSubscribeEmail
+POST    /register                                                   controllers.WebsiteControllers.postRegisterConsumerEndpoint
+POST    /subscribe                                                  controllers.WebsiteControllers.postSubscribeEmail
 GET     /sweepstakes/insider                                        controllers.WebsiteControllers.getInsiderSweepstakes
 GET     /terms/                                                     controllers.WebsiteControllers.getTerms
 
-#GET     /{celebrityUrlSlug}/?                                       controllers.WebsiteControllers.getCelebrityLanding
-#GET     /{celebrityUrlSlug}/photos/?                                controllers.WebsiteControllers.getStorefrontChoosePhotoTiled
-#GET     /{celebrityUrlSlug}/photos/{productUrlSlug}/?               controllers.WebsiteControllers.getStorefrontChoosePhotoCarousel
-#POST    /{celebrityUrlSlug}/photos/{productUrlSlug}                 controllers.WebsiteControllers.postStorefrontChoosePhoto
-#GET     /{celebrityUrlSlug}/photos/{productUrlSlug}/personalize/?   controllers.WebsiteControllers.getStorefrontPersonalize
-#POST    /{celebrityUrlSlug}/photos/{productUrlSlug}/personalize     controllers.WebsiteControllers.postStorefrontPersonalize
-#GET     /{celebrityUrlSlug}/photos/{productUrlSlug}/review/?        controllers.WebsiteControllers.getStorefrontReview
-#POST    /{celebrityUrlSlug}/photos/{productUrlSlug}/review          controllers.WebsiteControllers.postStorefrontReview
-#GET     /{celebrityUrlSlug}/photos/{productUrlSlug}/checkout/?      controllers.WebsiteControllers.getStorefrontCheckout
-#POST    /{celebrityUrlSlug}/photos/{productUrlSlug}/checkout        controllers.WebsiteControllers.postStorefrontCheckout
-#GET     /{celebrityUrlSlug}/photos/{productUrlSlug}/finalize/?      controllers.WebsiteControllers.getStorefrontFinalize
-#POST    /{celebrityUrlSlug}/photos/{productUrlSlug}/finalize        controllers.WebsiteControllers.postStorefrontFinalize
-#GET     /{celebrityUrlSlug}/photos/{productUrlSlug}/cc-error/?      controllers.WebsiteControllers.getStorefrontCreditCardError
-#GET     /{celebrityUrlSlug}/photos/{productUrlSlug}/no-inventory/?  controllers.WebsiteControllers.getStorefrontNoInventory
-#GET     /{celebrityUrlSlug}/photos/{productUrlSlug}/purchase-error/? controllers.WebsiteControllers.getStorefrontPurchaseError
+GET     /{celebrityUrlSlug}/                                        controllers.WebsiteControllers.getCelebrityLanding
+GET     /{celebrityUrlSlug}/photos/                                 controllers.WebsiteControllers.getStorefrontChoosePhotoTiled
+GET     /{celebrityUrlSlug}/photos/{productUrlSlug}                 controllers.WebsiteControllers.getStorefrontChoosePhotoCarousel
+POST    /{celebrityUrlSlug}/photos/{productUrlSlug}                 controllers.WebsiteControllers.postStorefrontChoosePhoto
+GET     /{celebrityUrlSlug}/photos/{productUrlSlug}/personalize     controllers.WebsiteControllers.getStorefrontPersonalize
+POST    /{celebrityUrlSlug}/photos/{productUrlSlug}/personalize     controllers.WebsiteControllers.postStorefrontPersonalize
+GET     /{celebrityUrlSlug}/photos/{productUrlSlug}/review          controllers.WebsiteControllers.getStorefrontReview
+POST    /{celebrityUrlSlug}/photos/{productUrlSlug}/review          controllers.WebsiteControllers.postStorefrontReview
+GET     /{celebrityUrlSlug}/photos/{productUrlSlug}/checkout        controllers.WebsiteControllers.getStorefrontCheckout
+POST    /{celebrityUrlSlug}/photos/{productUrlSlug}/checkout        controllers.WebsiteControllers.postStorefrontCheckout
+GET     /{celebrityUrlSlug}/photos/{productUrlSlug}/finalize        controllers.WebsiteControllers.getStorefrontFinalize
+POST    /{celebrityUrlSlug}/photos/{productUrlSlug}/finalize        controllers.WebsiteControllers.postStorefrontFinalize
+GET     /{celebrityUrlSlug}/photos/{productUrlSlug}/cc-error        controllers.WebsiteControllers.getStorefrontCreditCardError
+GET     /{celebrityUrlSlug}/photos/{productUrlSlug}/no-inventory    controllers.WebsiteControllers.getStorefrontNoInventory
+GET     /{celebrityUrlSlug}/photos/{productUrlSlug}/purchase-error   controllers.WebsiteControllers.getStorefrontPurchaseError
 
 ##
 ## Admin Restricted Functionality - We want to keep certain admin functionality off customer-facing servers.
 ##
 #%{ if (play.configuration.getProperty('admin.tools.enabled') == 'full') }%
-#GET     /admin/printorders/?                                        controllers.WebsiteControllers.getPrintOrdersAdmin
-#GET     /admin/printorders/{printOrderId}/?                         controllers.WebsiteControllers.getPrintOrderAdmin
+#GET     /admin/printorders                                          controllers.WebsiteControllers.getPrintOrdersAdmin
+#GET     /admin/printorders/{printOrderId}                           controllers.WebsiteControllers.getPrintOrderAdmin
 #POST    /admin/printorders/{printOrderId}                           controllers.WebsiteControllers.postPrintOrderAdmin
 #POST    /{celebrityUrlSlug}/{productUrlSlug}/buy-demo               controllers.WebsiteControllers.postBuyDemoProduct

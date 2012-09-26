@@ -25,8 +25,8 @@ object WebsiteBuild extends Build {
   //            # Exclude scala because its included with play-scala
   //            org.scala-lang % scala-library 2.8.1
       "org.antlr" % "stringtemplate" % "4.0.2",
-      // "org.apache.axis2" % "axis2" % "1.6.2", // from 1.6.1
-      "org.apache.axis2" % "axis2-transport-http" % "1.6.1" intransitive(),
+      "org.apache.axis2" % "axis2" % "1.6.2", // from 1.6.1
+      "org.apache.axis2" % "axis2-transport-http" % "1.6.2" intransitive(),
       "org.apache.axis2" % "axis2-transport-local" % "1.6.2" intransitive(),
       "org.apache.commons" % "commons-email" % "1.2",
       "org.jclouds.api" % "filesystem" % "1.2.1" excludeAll(
@@ -44,10 +44,7 @@ object WebsiteBuild extends Build {
 /*      "org.specs2" %% "specs2" % "1.5" excludeAll(
           ExclusionRule(organization = "org.mockito"),
           ExclusionRule(organization = "org.scala-lang")
-      ),
-  //        exclude:
-  //            org.mockito % *
-  //            org.scala-lang % scala-library 2.8.1
+      ),*/
       "org.squeryl" %% "squeryl" % "0.9.5-2" excludeAll(
           // Exclude scala library, which is included with play
           ExclusionRule(organization = "org.scala-lang"),
@@ -60,19 +57,7 @@ object WebsiteBuild extends Build {
           // Exclude testing libs
           ExclusionRule(organization = "junit"),
           ExclusionRule(organization = "org.scalatest")
-      ),*/
-  //        exclude:
-  //            org.scala-lang % scala-library 2.8.1
-  //            net.sourceforge.jtds % *
-  //            postgresql % *
-  //            org.apache.derby % *
-  //            com.h2database % *
-  //            mysql % *
-  //            # Exclude testing libs
-  //            junit % *
-  //            org.scalatest % *
-      //"play" % "cloudbees" % "0.2.2",
-      //play" % "mockito" % "0.1",
+      ),
       "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
       "redis.clients" % "jedis" % "2.0.0",
       //"com.googlecode.soundlibs" % "tritonus-share" % "0.3.7-1", // from our unmanaged dependency 0.3.6

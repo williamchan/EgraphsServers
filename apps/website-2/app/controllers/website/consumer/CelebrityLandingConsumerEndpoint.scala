@@ -2,7 +2,7 @@ package controllers.website.consumer
 
 import play.api._
 import play.api.mvc._
-import services.http.{CelebrityAccountRequestFilters, ControllerMethod}
+import services.http.ControllerMethod
 import services.mvc.ImplicitHeaderAndFooterData
 import services.blobs.AccessPolicy
 import services.Utils
@@ -12,20 +12,21 @@ import models.frontend.header.HeaderData
 import models.frontend.footer.FooterData
 import play.api.templates.Html
 import controllers.WebsiteControllers
+import services.http.filters.HttpFilters
 
 private[consumer] trait CelebrityLandingConsumerEndpoint
   extends ImplicitHeaderAndFooterData
 { this: Controller =>
 
   protected def controllerMethod: ControllerMethod
-  protected def celebFilters: CelebrityAccountRequestFilters
+  protected def httpFilters: HttpFilters  
 
-  def getCelebrityLanding(celebrityUrlSlug: String) = Action { implicit request =>
-    controllerMethod() {
-      celebFilters.requireCelebrityUrlSlug { celebrity =>
+  def getCelebrityLanding(celebrityUrlSlug: String) = controllerMethod() {
+    httpFilters.requireCelebrityUrlSlug(celebrityUrlSlug) { celebrity =>
+      Action {
         Ok(CelebrityLandingConsumerEndpoint.getCelebrityLandingHtml(celebrity))
       }
-    }
+    }    
   }
 }
 
@@ -39,7 +40,7 @@ object CelebrityLandingConsumerEndpoint {
 
     val publicName = celebrity.publicName
     views.html.frontend.celebrity_landing(
-      getStartedUrl = WebsiteControllers.reverse(WebsiteControllers.getStorefrontChoosePhotoTiled(celebrity.urlSlug)).url,
+      getStartedUrl = controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled(celebrity.urlSlug).url,
       celebrityPublicName = publicName,
       celebrityCasualName = celebrity.casualName.getOrElse(publicName),
       landingPageImageUrl = landingPageImageUrl,
@@ -47,8 +48,8 @@ object CelebrityLandingConsumerEndpoint {
     )
   }
 
-  def url(celebrityUrlSlug: String): Router.ActionDefinition = {
-    WebsiteControllers.reverse(WebsiteControllers.getCelebrityLanding(celebrityUrlSlug))
+  def url(celebrityUrlSlug: String): Call = {
+    controllers.routes.WebsiteControllers.getCelebrityLanding(celebrityUrlSlug)
   }
 
 }

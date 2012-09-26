@@ -3,7 +3,6 @@ package services.mvc
 import models.frontend.storefront.{StorefrontBreadcrumb, StorefrontBreadcrumbs}
 import services.http.forms.purchase.{PersonalizeForm, PurchaseForms, FormReaders, PurchaseFormFactory}
 import play.api.mvc.Request
-import play.mvc.Scope
 import com.google.inject.Inject
 import controllers.WebsiteControllers
 import models.frontend.storefront.StorefrontBreadcrumb.CrumbChoice
@@ -25,7 +24,8 @@ class StorefrontBreadcrumbData @Inject()(purchaseFormFactory: PurchaseFormFactor
   import WebsiteControllers._
   import CrumbChoice._
 
-  def crumbsForRequest(celebrityId: Long, celebrityUrlSlug: String, maybeProductUrlSlug: Option[String])(implicit request: Request)
+  def crumbsForRequest(celebrityId: Long, celebrityUrlSlug: String, maybeProductUrlSlug: Option[String])
+  (implicit request: Request[AnyContent])
   : StorefrontBreadcrumbs = {
 
     val forms = purchaseFormFactory.formsForStorefront(celebrityId)

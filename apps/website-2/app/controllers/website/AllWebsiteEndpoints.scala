@@ -9,8 +9,8 @@ import play.api.mvc.Controller
  * All endpoints for the website (doesn't include the API)
  */
 trait AllWebsiteEndpoints
-//  extends GetRootConsumerEndpoint
-//  with AllConsumerEndpoints
+  extends GetRootConsumerEndpoint
+  with AllConsumerEndpoints
 //  with AllAdminEndpoints
 //  with PostBuyDemoProductEndpoint
 { this: Controller =>}

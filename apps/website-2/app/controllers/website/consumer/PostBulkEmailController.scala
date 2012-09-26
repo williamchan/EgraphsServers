@@ -8,6 +8,7 @@ import services.http.forms.purchase.FormReaders
 import services.http.forms.Form
 import Form.Conversions._
 import play.api.libs.json.Json.toJson
+import play.api.mvc.Action
 
 private[controllers] trait PostBulkEmailController extends ImplicitHeaderAndFooterData {
   this: Controller =>
@@ -22,20 +23,22 @@ private[controllers] trait PostBulkEmailController extends ImplicitHeaderAndFoot
    * @return
    */
   def postSubscribeEmail = postController(openDatabase = false) {
-    /**
-     * listSubscribe(string apikey, string id, string email_address, array merge_vars,
-     * string email_type, bool double_optin, bool update_existing, bool replace_interests, bool send_welcome)
-     */
-    val formReadableParams = params.asFormReadable
-    val subscriptionReader = formReaders.forEmailSubscriptionForm
-    val subscriptionForm = subscriptionReader.instantiateAgainstReadable(formReadableParams)
-    subscriptionForm.errorsOrValidatedForm.fold(
-      errors => Ok(toJson(Map("error" -> errors.map( error => error.description).toSeq)))
-      ,
-      validForm => {
-        bulkMail.subscribeNew(validForm.listId, validForm.email)
-        Ok(toJson(Map("subscribed" -> true)))
-      }
-    )
+    Action { request =>
+      /*
+       * listSubscribe(string apikey, string id, string email_address, array merge_vars,
+       * string email_type, bool double_optin, bool update_existing, bool replace_interests, bool send_welcome)
+       */
+      val formReadableParams = params.asFormReadable
+      val subscriptionReader = formReaders.forEmailSubscriptionForm
+      val subscriptionForm = subscriptionReader.instantiateAgainstReadable(formReadableParams)
+      subscriptionForm.errorsOrValidatedForm.fold(
+        errors => Ok(toJson(Map("error" -> errors.map( error => error.description).toSeq))),
+        
+        validForm => {
+          bulkMail.subscribeNew(validForm.listId, validForm.email)
+          Ok(toJson(Map("subscribed" -> true)))
+        }
+      )
+    }
   }
 }

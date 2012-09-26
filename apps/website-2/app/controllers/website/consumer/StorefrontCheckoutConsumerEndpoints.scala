@@ -1,8 +1,7 @@
 package controllers.website.consumer
 
-import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters, ControllerMethod}
+import services.http.{POSTControllerMethod, ControllerMethod}
 import play.api.mvc.Controller
-
 import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
 import services.http.forms.purchase._
 import models.enums.PrintingOption
@@ -11,8 +10,13 @@ import services.mvc.FormConversions.{checkoutBillingFormToViewConverter, checkou
 import models.frontend.storefront.{CheckoutFormView, CheckoutOrderSummary, CheckoutBillingInfoView, CheckoutShippingAddressFormView}
 import services.payment.Payment
 import play.api.mvc.Results.Redirect
+import play.api.mvc.Result
+import play.api.mvc.Request
 import controllers.WebsiteControllers
 import services.blobs.AccessPolicy
+import services.http.filters.HttpFilters
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
 
 /**
  * Endpoint for serving up the Checkout form
@@ -27,9 +31,10 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
   //
   protected def controllerMethod: ControllerMethod
   protected def postController: POSTControllerMethod
+  protected def httpFilters: HttpFilters
+  
   protected def purchaseFormFactory: PurchaseFormFactory
-  protected def formReaders: FormReaders
-  protected def celebFilters: CelebrityAccountRequestFilters
+  protected def formReaders: FormReaders  
   protected def checkPurchaseField: PurchaseFormChecksFactory
   protected def payment: Payment
   protected def breadcrumbData: StorefrontBreadcrumbData
@@ -44,83 +49,87 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
    *  @param productUrlSlug identifies the product being checked out.
    **/
   def getStorefrontCheckout(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod() {
-    celebFilters.requireCelebrityAndProductUrlSlugs { (celeb, product) =>
-      val forms = purchaseFormFactory.formsForStorefront(celeb.id)
-
-      for (
-        // Make sure the product ID matches
-        formProductId <- forms.matchProductIdOrRedirectToChoosePhoto(celeb, product).right;
-
-        // Make sure there's inventory
-        inventoryBatch <- forms.nextInventoryBatchOrRedirect(celebrityUrlSlug, product).right;
-
-        // Make sure we've got a personalize form in storage, or redirect to personalize
-        validPersonalizeForm <- forms.validPersonalizeFormOrRedirectToPersonalizeForm(
-                                  celebrityUrlSlug,
-                                  productUrlSlug
-                                ).right;
-
-        // Make sure we've got a high-quality print option from the Review page, or redirect to it
-        highQualityPrint <- forms.printingOptionOrRedirectToReviewForm(
-                              celebrityUrlSlug,
-                              productUrlSlug
-                            ).right
-      ) yield {
-        // View for the shipping form -- only show it if ordering a print.
-        val maybeShippingFormView = highQualityPrint match {
-          case PrintingOption.HighQualityPrint =>
-            val restoredOrDefaultShipping = forms.shippingForm(Some(flash)).map {
-              shipping => shipping.asCheckoutPageView
-            }.getOrElse {
-              defaultShippingView
-            }
-
-            Some(restoredOrDefaultShipping)
-
-          case PrintingOption.DoNotPrint =>
-            None
-        }
-
-        // View for the billing form.
-        val billingFormView = forms.billingForm(Some(flash)).map { billing =>
-          billing.asCheckoutPageView
-        }.getOrElse {
-          defaultBillingView
-        }
-
-        val orderSummary = CheckoutOrderSummary(
-          celebrityName=celeb.publicName,
-          productName=product.name,
-          recipientName=validPersonalizeForm.recipientName,
-          messageText=PurchaseForms.makeTextForCelebToWrite(
-            validPersonalizeForm.writtenMessageRequest,
-            validPersonalizeForm.writtenMessageText
-          ),
-          basePrice=product.price,
-          shipping=forms.shippingPrice,
-          tax=forms.tax,
-          total=forms.total(basePrice = product.price)
-        )
-
-        // Collect both the shipping form and billing form into a single viewmodel
-        val checkoutFormView = CheckoutFormView(
-          actionUrl=reverse(postStorefrontCheckout(celebrityUrlSlug, productUrlSlug)).url,
-          billing=billingFormView,
-          shipping=maybeShippingFormView
-        )
-
-        implicit def crumbs = breadcrumbData.crumbsForRequest(celeb.id, celebrityUrlSlug, Some(productUrlSlug))
-
-        // Now baby you've got a stew goin!
-        views.html.frontend.celebrity_storefront_checkout(
-          form=checkoutFormView,
-          summary=orderSummary,
-          paymentJsModule=payment.browserModule,
-          paymentPublicKey=payment.publishableKey,
-          productPreviewUrl=product.photoAtPurchasePreviewSize.getSaved(AccessPolicy.Public).url,
-          orientation=product.frame.previewCssClass
-        )
-      }
+    httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
+      Action { implicit request =>
+        val forms = purchaseFormFactory.formsForStorefront(celeb.id)
+  
+        for (
+          // Make sure the product ID matches
+          formProductId <- forms.matchProductIdOrRedirectToChoosePhoto(celeb, product).right;
+  
+          // Make sure there's inventory
+          inventoryBatch <- forms.nextInventoryBatchOrRedirect(celebrityUrlSlug, product).right;
+  
+          // Make sure we've got a personalize form in storage, or redirect to personalize
+          validPersonalizeForm <- forms.validPersonalizeFormOrRedirectToPersonalizeForm(
+                                    celebrityUrlSlug,
+                                    productUrlSlug
+                                  ).right;
+  
+          // Make sure we've got a high-quality print option from the Review page, or redirect to it
+          highQualityPrint <- forms.printingOptionOrRedirectToReviewForm(
+                                celebrityUrlSlug,
+                                productUrlSlug
+                              ).right
+        ) yield {
+          // View for the shipping form -- only show it if ordering a print.
+          val maybeShippingFormView = highQualityPrint match {
+            case PrintingOption.HighQualityPrint =>
+              val restoredOrDefaultShipping = forms.shippingForm(Some(request.flash)).map {
+                shipping => shipping.asCheckoutPageView
+              }.getOrElse {
+                defaultShippingView
+              }
+  
+              Some(restoredOrDefaultShipping)
+  
+            case PrintingOption.DoNotPrint =>
+              None
+          }
+  
+          // View for the billing form.
+          val billingFormView = forms.billingForm(Some(request.flash)).map { billing =>
+            billing.asCheckoutPageView
+          }.getOrElse {
+            defaultBillingView
+          }
+  
+          val orderSummary = CheckoutOrderSummary(
+            celebrityName=celeb.publicName,
+            productName=product.name,
+            recipientName=validPersonalizeForm.recipientName,
+            messageText=PurchaseForms.makeTextForCelebToWrite(
+              validPersonalizeForm.writtenMessageRequest,
+              validPersonalizeForm.writtenMessageText
+            ),
+            basePrice=product.price,
+            shipping=forms.shippingPrice,
+            tax=forms.tax,
+            total=forms.total(basePrice = product.price)
+          )
+  
+          // Collect both the shipping form and billing form into a single viewmodel
+          val checkoutFormView = CheckoutFormView(
+            actionUrl=reverse(postStorefrontCheckout(celebrityUrlSlug, productUrlSlug)).url,
+            billing=billingFormView,
+            shipping=maybeShippingFormView
+          )
+  
+          implicit def crumbs = breadcrumbData.crumbsForRequest(celeb.id, celebrityUrlSlug, Some(productUrlSlug))
+  
+          // Now baby you've got a stew goin!
+          Ok(
+            views.html.frontend.celebrity_storefront_checkout(
+              form=checkoutFormView,
+              summary=orderSummary,
+              paymentJsModule=payment.browserModule,
+              paymentPublicKey=payment.publishableKey,
+              productPreviewUrl=product.photoAtPurchasePreviewSize.getSaved(AccessPolicy.Public).url,
+              orientation=product.frame.previewCssClass
+            )
+          )
+        }.fold(redirect => redirect, ok => ok)
+      }      
     }
   }
 
@@ -133,12 +142,12 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
    * @return a redirect either to the finalize order page or back to this form to fix errors.
    */
   def postStorefrontCheckout(celebrityUrlSlug: String, productUrlSlug: String) = postController() {
-    celebFilters.requireCelebrityAndProductUrlSlugs {
-      (celeb, product) =>
+    httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
+      Action { implicit request =>
         val forms = purchaseFormFactory.formsForStorefront(celeb.id)
 
-        // For-comprehend over a bunch of validations
-        for (
+        // For-comprehend over a bunch of validations that produces success or failure redirects
+        val redirects = for (
           // Product ID in the url must match the product being ordered, or redirect to photo
           productId <- forms.matchProductIdOrRedirectToChoosePhoto(celeb, product).right;
 
@@ -182,10 +191,15 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
           formsWithShippingForm.getOrElse(forms).withForm(billingForm).save()
 
           // Redirect to Finalize screen.
-          import WebsiteControllers.getStorefrontFinalize
-
-          new Redirect(reverse(getStorefrontFinalize(celebrityUrlSlug, productUrlSlug)).url)
+          val finalizeRedirect = controllers.routes.WebsiteControllers.getStorefrontFinalize(
+            celebrityUrlSlug, productUrlSlug
+          ) 
+          
+          Redirect(finalizeRedirect)
         }
+        
+        redirects.fold(failureRedirect => failureRedirect, successRedirect => successRedirect)
+      }
     }
   }
 
@@ -196,11 +210,14 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
     printingOption: PrintingOption,
     celebrityUrlSlug: String,
     productUrlSlug: String
-  ): Either[Redirect, (Option[CheckoutShippingForm], Option[CheckoutShippingForm.Valid])] = {
+  )(
+    implicit request: Request[AnyContent]
+  ): Either[Result, (Option[CheckoutShippingForm], Option[CheckoutShippingForm.Valid])] = 
+  {
     printingOption match {
       case PrintingOption.HighQualityPrint =>
         val formReader = formReaders.forShippingForm
-        val shippingForm = formReader.instantiateAgainstReadable(params.asFormReadable)
+        val shippingForm = formReader.instantiateAgainstReadable(request.asFormReadable)
         val errorsOrValid = shippingForm.errorsOrValidatedForm
         val redirectOrValid = errorsOrValid.left.map { error =>
          redirectCheckoutFormsThroughFlash(celebrityUrlSlug, productUrlSlug)
@@ -217,9 +234,12 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
     maybeShippingForm: Option[CheckoutShippingForm],
     celebrityUrlSlug: String,
     productUrlSlug: String
-  ): Either[Redirect, (CheckoutBillingForm, CheckoutBillingForm.Valid)] = {
+  )(
+    implicit request: Request[AnyContent]
+  ): Either[Result, (CheckoutBillingForm, CheckoutBillingForm.Valid)] = 
+  {
     val billingFormReader = formReaders.forBillingForm(maybeShippingForm)
-    val billingForm = billingFormReader.instantiateAgainstReadable(params.asFormReadable)
+    val billingForm = billingFormReader.instantiateAgainstReadable(request.asFormReadable)
     val errorsOrValid = billingForm.errorsOrValidatedForm
 
     val redirectOrValid = errorsOrValid.left.map { _ =>
@@ -229,18 +249,24 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
     redirectOrValid.right.map(validForm => (billingForm, validForm))
   }
 
-  private def redirectCheckoutFormsThroughFlash(celebrityUrlSlug: String, productUrlSlug: String): Redirect = {
+  private def redirectCheckoutFormsThroughFlash(
+    celebrityUrlSlug: String, 
+    productUrlSlug: String
+  )(
+    implicit request: Request[AnyContent]
+  ): Result = 
+ {
     // Get readers for the shipping and billing forms
     val readers = List(formReaders.forShippingForm, formReaders.forBillingForm(None))
 
-    val paramFormReadable = params.asFormReadable
-    val formWriteableFlash = flash.asFormWriteable
+    val paramFormReadable = request.asFormReadable
+    val formWriteableFlash = request.flash.asFormWriteable
 
     for (formReader <- readers) {
       formReader.instantiateAgainstReadable(paramFormReadable).write(formWriteableFlash)
     }
 
-    new Redirect(reverse(getStorefrontCheckout(celebrityUrlSlug, productUrlSlug)).url)
+    Redirect(controllers.routes.WebsiteControllers.getStorefrontCheckout(celebrityUrlSlug, productUrlSlug))
   }
 
   private def defaultBillingView:CheckoutBillingInfoView = {

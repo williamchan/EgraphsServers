@@ -1,15 +1,17 @@
 package controllers.website.consumer
 
-import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters, ControllerMethod}
-import play.mvc.{Router, Controller}
+import services.http.{POSTControllerMethod, ControllerMethod}
+import play.api.mvc.Controller
 import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
-import play.api.mvc.Results.Redirect
+import play.api.mvc.Results.{Redirect, Ok}
 import services.http.forms.purchase.PurchaseFormFactory
 import services.Utils
-import controllers.WebsiteControllers.getStorefrontPersonalize
 import models.{ProductStore, Celebrity, Product}
 import controllers.WebsiteControllers
 import services.mvc.celebrity.CelebrityViewConversions
+import services.http.filters.HttpFilters
+import play.api.mvc.Call
+import play.api.mvc.Action
 
 /**
  * Manages GET and POST of celebrity photos in the purchase flow.
@@ -26,7 +28,7 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
   // Services
   //
   protected def controllerMethod: ControllerMethod
-  protected def celebFilters: CelebrityAccountRequestFilters
+  protected def httpFilters: HttpFilters  
   protected def postController: POSTControllerMethod
   protected def purchaseFormFactory: PurchaseFormFactory
   protected def facebookAppId: String
@@ -45,31 +47,34 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
    */
   def getStorefrontChoosePhotoTiled(celebrityUrlSlug: String) = controllerMethod()
   {
-    celebFilters.requireCelebrityUrlSlug { celebrity =>
-      val celebrityUrlSlug = celebrity.urlSlug
-
-      val productViews = for (product <- celebrity.productsInActiveInventoryBatches()) yield {
-        product.asChoosePhotoTileView(celebrityUrlSlug=celebrityUrlSlug)
+    httpFilters.requireCelebrityUrlSlug(celebrityUrlSlug) { celebrity =>
+      Action { implicit request =>
+        val celebrityUrlSlug = celebrity.urlSlug
+  
+        val productViews = for (product <- celebrity.productsInActiveInventoryBatches()) yield {
+          product.asChoosePhotoTileView(celebrityUrlSlug=celebrityUrlSlug)
+        }
+  
+        val forms = purchaseFormFactory.formsForStorefront(celebrity.id)
+  
+        val maybeProductUrlSlug = for (
+          productIdBeingOrdered <- forms.productId;
+          product <- productStore.findById(productIdBeingOrdered)
+        ) yield {
+          product.urlSlug
+        }
+  
+        implicit def crumbs = breadcrumbData.crumbsForRequest(celebrity.id, celebrityUrlSlug, maybeProductUrlSlug)(request)
+  
+        val html = views.html.frontend.celebrity_storefront_choose_photo_tiled(
+          celeb=celebrity.asChoosePhotoView,
+          products=productViews,
+          recentEgraphs=celebrity.recentlyFulfilledEgraphChoosePhotoViews,
+          partnerIcons=List()
+        )
+        
+        Ok(html)
       }
-
-      val forms = purchaseFormFactory.formsForStorefront(celebrity.id)
-
-      val maybeProductUrlSlug = for (
-        productIdBeingOrdered <- forms.productId;
-        product <- productStore.findById(productIdBeingOrdered)
-      ) yield {
-        product.urlSlug
-      }
-
-
-      implicit def crumbs = breadcrumbData.crumbsForRequest(celebrity.id, celebrityUrlSlug, maybeProductUrlSlug)
-
-      views.html.frontend.celebrity_storefront_choose_photo_tiled(
-        celeb=celebrity.asChoosePhotoView,
-        products=productViews,
-        recentEgraphs=celebrity.recentlyFulfilledEgraphChoosePhotoViews,
-        partnerIcons=List()
-      )
     }
   }
 
@@ -83,29 +88,31 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
    */
   def getStorefrontChoosePhotoCarousel(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod()
   {
-    celebFilters.requireCelebrityAndProductUrlSlugs{ (celeb, product) =>
-      val products = celeb.productsInActiveInventoryBatches().toSeq
-      val tiledViewLink = this.reverse(this.getStorefrontChoosePhotoTiled(celebrityUrlSlug)).url
-
-      products.findIndexOf(next => next.id == product.id) match {
-        case -1 =>
-          new Redirect(tiledViewLink)
-
-        case indexOfProductInProductList =>
-          val productViews = for (product <- products) yield {
-            product.asChoosePhotoCarouselView(celebUrlSlug=celeb.urlSlug, fbAppId = facebookAppId)
-          }
-
-          implicit def crumbs = breadcrumbData.crumbsForRequest(celeb.id, celebrityUrlSlug, Some(productUrlSlug))
-
-          views.html.frontend.celebrity_storefront_choose_photo_carousel(
-            celeb = celeb.asChoosePhotoView,
-            products = productViews,
-            firstCarouselProductIndex=indexOfProductInProductList,
-            tiledViewLink = tiledViewLink,
-            recentEgraphs = celeb.recentlyFulfilledEgraphChoosePhotoViews,
-            partnerIcons=List()
-          )
+    httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
+      Action { request =>
+        val products = celeb.productsInActiveInventoryBatches().toSeq
+        val tiledViewLink = controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled(celebrityUrlSlug).url
+  
+        products.findIndexOf(next => next.id == product.id) match {
+          case -1 =>
+            Redirect(tiledViewLink)
+  
+          case indexOfProductInProductList =>
+            val productViews = for (product <- products) yield {
+              product.asChoosePhotoCarouselView(celebUrlSlug=celeb.urlSlug, fbAppId = facebookAppId)
+            }
+  
+            implicit def crumbs = breadcrumbData.crumbsForRequest(celeb.id, celebrityUrlSlug, Some(productUrlSlug))(request)
+  
+            Ok(views.html.frontend.celebrity_storefront_choose_photo_carousel(
+              celeb = celeb.asChoosePhotoView,
+              products = productViews,
+              firstCarouselProductIndex=indexOfProductInProductList,
+              tiledViewLink = tiledViewLink,
+              recentEgraphs = celeb.recentlyFulfilledEgraphChoosePhotoViews,
+              partnerIcons=List()
+            ))
+        }
       }
     }
   }
@@ -118,26 +125,28 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
    * @return
    */
   def postStorefrontChoosePhoto(celebrityUrlSlug: String, productUrlSlug: String) = postController() {
-    celebFilters.requireCelebrityAndProductUrlSlugs { (celeb, product) =>
-      // Save the purchase forms with the new product ID
-      purchaseFormFactory.formsForStorefront(celeb.id).withProductId(product.id).save()
-
-      // Redirect either to a url specified by the POST params or to the Personalize page.
-      Utils.redirectToClientProvidedTarget(
-        urlIfNoTarget=reverse(getStorefrontPersonalize(celebrityUrlSlug, productUrlSlug)).url
-      )
+    httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
+      Action {
+        // Save the purchase forms with the new product ID
+        purchaseFormFactory.formsForStorefront(celeb.id).withProductId(product.id).save()
+  
+        // Redirect either to a url specified by the POST params or to the Personalize page.
+        Utils.redirectToClientProvidedTarget(
+          urlIfNoTarget=controllers.routes.WebsiteControllers.getStorefrontPersonalize(celebrityUrlSlug, productUrlSlug).url
+        )
+      }
     }
   }
 }
 
 object StorefrontChoosePhotoConsumerEndpoints {
 
-  def url(celebrity:Celebrity, product:Product): Router.ActionDefinition = {
+  def url(celebrity:Celebrity, product:Product): Call = {
     url(celebrity.urlSlug, product.urlSlug)
   }
 
-  def url(celebrityUrlSlug: String, productUrlSlug: String): Router.ActionDefinition = {
-    WebsiteControllers.reverse(WebsiteControllers.getStorefrontChoosePhotoCarousel(celebrityUrlSlug, productUrlSlug))
+  def url(celebrityUrlSlug: String, productUrlSlug: String): Call = {
+    controllers.routes.WebsiteControllers.getStorefrontChoosePhotoCarousel(celebrityUrlSlug, productUrlSlug)
   }
 }
 
