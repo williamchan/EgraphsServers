@@ -25,8 +25,8 @@ object WebsiteBuild extends Build {
   //            # Exclude scala because its included with play-scala
   //            org.scala-lang % scala-library 2.8.1
       "org.antlr" % "stringtemplate" % "4.0.2",
-      "org.apache.axis2" % "axis2" % "1.6.2" , // from 1.6.1
-      "org.apache.axis2" % "axis2-transport-http" % "1.6.2" intransitive(),
+      // "org.apache.axis2" % "axis2" % "1.6.2", // from 1.6.1
+      "org.apache.axis2" % "axis2-transport-http" % "1.6.1" intransitive(),
       "org.apache.axis2" % "axis2-transport-local" % "1.6.2" intransitive(),
       "org.apache.commons" % "commons-email" % "1.2",
       "org.jclouds.api" % "filesystem" % "1.2.1" excludeAll(
@@ -41,7 +41,7 @@ object WebsiteBuild extends Build {
   //            org.clojure % *
       "org.joda" % "joda-money" % "0.6",
       "joda-time" % "joda-time" % "2.1",
-      "org.specs2" %% "specs2" % "1.5" excludeAll(
+/*      "org.specs2" %% "specs2" % "1.5" excludeAll(
           ExclusionRule(organization = "org.mockito"),
           ExclusionRule(organization = "org.scala-lang")
       ),
@@ -60,7 +60,7 @@ object WebsiteBuild extends Build {
           // Exclude testing libs
           ExclusionRule(organization = "junit"),
           ExclusionRule(organization = "org.scalatest")
-      ),
+      ),*/
   //        exclude:
   //            org.scala-lang % scala-library 2.8.1
   //            net.sourceforge.jtds % *
