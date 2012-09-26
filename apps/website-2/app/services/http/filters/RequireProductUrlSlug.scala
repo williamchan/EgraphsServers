@@ -10,7 +10,6 @@ import play.api.mvc.BodyParser
 import play.api.mvc.BodyParsers.parse
 import play.api.mvc.Result
 import play.api.mvc.Results.NotFound
-import services.http.CelebrityRequest
 import models.Account
 import services.http.PlayConfig
 import models.Celebrity

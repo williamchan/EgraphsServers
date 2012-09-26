@@ -1,43 +1,37 @@
 package controllers.api
 
-import models.enums.OrderReviewStatus
 import models.Celebrity
 import models.Order
+import models.enums.OrderReviewStatus
 import play.api.mvc.Controller
 import play.api.mvc.Result
 import services.db.DBSession
-import services.http.filters.RequireAuthenticatedAccount
-import services.http.filters.RequireCelebrityId
-import services.http.filters.RequireOrderIdOfCelebrity
 import services.http.ControllerMethod
+import services.http.filters.HttpFilters
 import sjson.json.Serializer
 
 private[controllers] trait PostCelebrityOrderApiEndpoint { this: Controller =>
   protected def dbSession: DBSession
   protected def controllerMethod: ControllerMethod
-  protected def requireAuthenticatedAccount: RequireAuthenticatedAccount
-  protected def requireCelebrityId: RequireCelebrityId
-  protected def requireOrderIdOfCelebrity: RequireOrderIdOfCelebrity
+  protected def httpFilters: HttpFilters
 
   /**
-   * Updates an existing .
+   * Updates an existing Celebrity.
    *
    * See [[https://egraphs.jira.com/wiki/display/DEV/API+Endpoints the json spec]] for more info
    * about the params.
    */
-  def postCelebrityOrder(reviewStatus: Option[String] = None,
-    rejectionReason: Option[String] = None) = {
+  def postCelebrityOrder(
+    reviewStatus: Option[String] = None, 
+    rejectionReason: Option[String] = None) = 
+  {
     controllerMethod() {
-      requireAuthenticatedAccount() { accountRequest =>
-        val celebAction = requireCelebrityId.inAccount(accountRequest.account) { celebrityRequest =>
-          val celebrity = celebrityRequest.celeb
-          val orderAction = requireOrderIdOfCelebrity(celebrity.id) { orderRequest =>
-            val order = orderRequest.order
+      httpFilters.requireAuthenticatedAccount() { account =>
+        httpFilters.requireCelebrityId.inAccount(account) { celebrity =>          
+          httpFilters.requireOrderIdOfCelebrity(celebrity.id) { order =>            
             postCelebrityOrderResult(reviewStatus, rejectionReason, order, celebrity)
-          }
-          orderAction(celebrityRequest)
-        }
-        celebAction(accountRequest)
+          }          
+        }        
       }
     }
   }

@@ -1,30 +1,29 @@
 package controllers.api
 
-import play.api.mvc.Controller
-import sjson.json.Serializer
-import services.http.{ControllerMethod, CelebrityAccountRequestFilters}
-import services.http.filters.RequireAuthenticatedAccount
 import models.Celebrity
-import services.http.filters.RequireCelebrityId
+import play.api.mvc.Action
+import play.api.mvc.Controller
 import play.api.mvc.Result
+import services.http.ControllerMethod
+import services.http.filters.HttpFilters
+import sjson.json.Serializer
 
 private[controllers] trait GetCelebrityEnrollmentTemplateApiEndpoint { this: Controller =>
 
   protected def controllerMethod: ControllerMethod
-  protected def requireAuthenticatedAccount: RequireAuthenticatedAccount
-  protected def requireCelebrityId: RequireCelebrityId
+  protected def httpFilters: HttpFilters
   
   /**
    * Provides a single Celebrity's JSON representation for consumption by the API.
    *
    */
   def getCelebrityEnrollmentTemplate = controllerMethod() {
-    requireAuthenticatedAccount() { accountRequest =>
-      val action = requireCelebrityId.inAccount(accountRequest.account) { celebrityRequest =>
-        getCelebrityEnrollmentTemplateResult(celebrityRequest.celeb)
+    httpFilters.requireAuthenticatedAccount() { account =>
+      httpFilters.requireCelebrityId.inAccount(account) { celeb =>
+        Action {
+          getCelebrityEnrollmentTemplateResult(celeb)
+        }
       }
-
-      action(accountRequest)
     }
   }
   

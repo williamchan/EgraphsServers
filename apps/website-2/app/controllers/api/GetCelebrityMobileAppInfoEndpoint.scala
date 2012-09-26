@@ -1,19 +1,20 @@
 package controllers.api
 
-import play.api.mvc.Controller
-import sjson.json.Serializer
-import services.http.{ ControllerMethod, CelebrityAccountRequestFilters }
-import services.blobs.Blobs
-import services.Time
-import Time.IntsToSeconds._
 import java.util.Properties
+
+import play.api.mvc.Action
+import play.api.mvc.Controller
+import services.Time.IntsToSeconds.intsToSecondDurations
+import services.blobs.Blobs
+import services.http.ControllerMethod
+import services.http.filters.HttpFilters
 import services.http.filters.RequireAuthenticatedAccount
 import services.http.filters.RequireCelebrityId
-import play.api.mvc.Action
-import play.api.mvc.BodyParsers.parse
+import sjson.json.Serializer
 
 private[controllers] trait GetCelebrityMobileAppInfoEndpoint { this: Controller =>
   protected def controllerMethod: ControllerMethod
+  protected def httpFilters: HttpFilters
   protected def requireAuthenticatedAccount: RequireAuthenticatedAccount
   protected def requireCelebrityId: RequireCelebrityId
   protected def blobs: Blobs
@@ -22,10 +23,9 @@ private[controllers] trait GetCelebrityMobileAppInfoEndpoint { this: Controller 
   private val iPadBuildVersionProp = "ipad.buildversion"
 
   def getCelebrityMobileAppInfo = controllerMethod() {
-    requireAuthenticatedAccount() { account =>
-      requireCelebrityId.inAccount(account) { celebrity =>
-        Action { request =>
-          val herp = request
+    httpFilters.requireAuthenticatedAccount() { account =>
+      httpFilters.requireCelebrityId.inAccount(account) { celebrity =>
+        Action {
           val iPadBuildVersion = playConfig.getProperty(iPadBuildVersionProp)
           val s3Key = "ipad/Egraphs_" + iPadBuildVersion + ".ipa"
           val ipaUrl = blobs.getStaticResourceUrl(s3Key, 10.minutes)

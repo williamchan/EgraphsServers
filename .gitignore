@@ -9,6 +9,7 @@ tmp
 .classpath
 .project
 .settings/
+.target
 
 *.class
 *.DS_Store

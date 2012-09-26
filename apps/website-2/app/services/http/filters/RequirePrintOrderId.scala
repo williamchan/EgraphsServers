@@ -2,7 +2,7 @@ package services.http.filters
 
 import com.google.inject.Inject
 
-import models.PrintOrderStore
+import models.{PrintOrderStore, PrintOrder}
 import play.api.data.Form
 import play.api.data.Forms.longNumber
 import play.api.data.Forms.single
