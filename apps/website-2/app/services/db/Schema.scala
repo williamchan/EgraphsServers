@@ -9,7 +9,7 @@ import java.lang.IllegalStateException
 import java.io.{ByteArrayOutputStream, PrintWriter}
 import com.google.inject.{Inject, Injector}
 import java.sql.Connection
-import play.Play.configuration
+import play.api.Play.configuration
 import services.logging.Logging
 
 /**

@@ -2,7 +2,7 @@ package services
 
 import http.PlayConfig
 import play.mvc.Router
-import play.Play
+import play.api.Play
 import com.google.inject.Inject
 import java.util
 import org.squeryl.Query
@@ -184,7 +184,7 @@ class Utils @Inject()(@PlayConfig() playConfig: util.Properties) {
    * @return a valid path, or throw an exception
    */
   def asset(path: String): String = {
-    play.mvc.Router.reverse(play.Play.getVirtualFile(path))
+    play.mvc.Router.reverse(play.api.Play.getVirtualFile(path))
   }
 
   implicit def properties(pairs: (AnyRef, AnyRef)*): util.Properties = {

@@ -1,6 +1,6 @@
 package services.blobs
 
-import play.Play.configuration
+import play.api.Play.configuration
 import org.jclouds.blobstore.BlobStoreContextFactory
 import org.jclouds.aws.s3.AWSS3Client
 import org.jclouds.s3.domain.CannedAccessPolicy

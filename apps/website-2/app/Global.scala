@@ -3,7 +3,7 @@ package bootstrap
 import org.squeryl.{Session, SessionFactory}
 import io.Source
 import java.io.{File, PrintWriter}
-import play.Play
+import play.api.Play
 import play.api.GlobalSettings
 import services.blobs.Blobs
 import services.payment.Payment
@@ -13,6 +13,7 @@ import services.{AppConfig, Utils, TempFile}
 import services.db.{TransactionSerializable, Schema, DBSession}
 import models.{AccountStore, Account, Administrator}
 import services.mvc.celebrity.{CatalogStarsActor, UpdateCatalogStarsActor}
+import play.api.Play.current
 
 object Global extends GlobalSettings with Logging {
   val blobs = AppConfig.instance[Blobs]
@@ -38,7 +39,6 @@ object Global extends GlobalSettings with Logging {
       blobs.init()
 
       // Some additional test-mode setup
-      
       if (Play.application.isTest) {
         TestModeBootstrap.run()
       }

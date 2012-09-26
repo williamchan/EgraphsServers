@@ -2,7 +2,7 @@ package services.http
 
 import uk.me.lings.scalaguice.ScalaModule
 import com.google.inject.{AbstractModule}
-import play.Play
+import play.api.Play
 import java.util.Properties
 import play.mvc.Scope.Session
 

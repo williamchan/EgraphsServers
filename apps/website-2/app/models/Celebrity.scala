@@ -11,7 +11,7 @@ import org.squeryl.Query
 import services._
 import java.awt.image.BufferedImage
 import models.Celebrity.CelebrityWithImage
-
+import play.api.Play.current
 
 /**
  * Services used by each celebrity instance
@@ -295,21 +295,21 @@ case class Celebrity(id: Long = 0,
   }
 
   lazy val defaultProfile = ImageAsset(
-    play.Play.getFile("public/images/default_profile.jpg"),
+    play.api.Play.getFile("public/images/default_profile.jpg"),
     keyBase="defaults/celebrity",
     name="profilePhoto",
     imageType=ImageAsset.Png,
     services=services.imageAssetServices.get
   )
   lazy val defaultLandingPageImage = ImageAsset(
-    play.Play.getFile("public/images/1500x556_blank.jpg"),
+    play.api.Play.getFile("public/images/1500x556_blank.jpg"),
     keyBase="defaults/celebrity",
     name="landingPageImage",
     imageType=ImageAsset.Png,
     services=services.imageAssetServices.get
   )
   lazy val defaultLogoImage = ImageAsset(
-    play.Play.getFile("public/images/40x40_blank.jpg"),
+    play.api.Play.getFile("public/images/40x40_blank.jpg"),
     keyBase="defaults/celebrity",
     name="logoImage",
     imageType=ImageAsset.Png,

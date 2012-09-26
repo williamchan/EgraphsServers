@@ -1,6 +1,6 @@
 package services.mail
 
-import play.Play.configuration
+import play.api.Play.configuration
 import com.google.inject.{Inject, Provider}
 import services.Utils
 import collection.JavaConversions._

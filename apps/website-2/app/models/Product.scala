@@ -10,12 +10,13 @@ import services.Finance.TypeConversions._
 import models.Product.ProductWithPhoto
 import services.blobs.Blobs.Conversions._
 import java.awt.image.BufferedImage
-import play.Play
+import play.api.Play
 import services.blobs.AccessPolicy
 import com.google.inject.{Provider, Inject}
 import services._
 import org.squeryl.Query
 import org.squeryl.dsl.ManyToMany
+import play.api.Play.current
 
 case class ProductServices @Inject() (
   store: ProductStore,
