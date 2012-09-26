@@ -12,14 +12,14 @@ private[controllers] trait LogoutEndpoints {
   protected def controllerMethod: ControllerMethod
   protected def postController: POSTControllerMethod
 
-  def getLogout() = Action { implicit request =>
-    controllerMethod(openDatabase = false) {
+  def getLogout() = controllerMethod(openDatabase = false) {
+    Action {  
       logout()
     }
   }
 
-  def postLogout() = Action { implicit request => 
-    postController(openDatabase=false) {
+  def postLogout() = postController(openDatabase=false) {
+    Action {
       logout()
     }
   }

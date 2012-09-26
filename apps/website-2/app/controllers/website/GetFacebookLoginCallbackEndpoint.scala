@@ -34,33 +34,34 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
                                error: Option[String],
                                error_reason: Option[String],
                                error_description: Option[String]) 
-  = Action { implicit request =>
-    controllerMethod() {
-
-      implicit val session = request.session
-      validateFacebookCallbackState(state)
-  
-      code match {
-        case Some(fbCode) => {
-          val accessToken = Facebook.getFbAccessToken(code = fbCode, facebookAppId = facebookAppId, fbAppSecret = playConfig.getProperty(fbAppSecretKey))
-          val fbUserInfo = Facebook.getFbUserInfo(accessToken = accessToken)
-          val (customer, shouldSendWelcomeEmail) = dbSession.connected(TransactionSerializable) {
-            loginViaFacebook(registrationName = fbUserInfo(Facebook._name).toString, registrationEmail = fbUserInfo(Facebook._email).toString, user_id = fbUserInfo(Facebook._id).toString)
-          }
-          if (shouldSendWelcomeEmail) {
-            dbSession.connected(TransactionSerializable) {
-              val account = customer.account.withResetPasswordKey.save()
-              Customer.sendNewCustomerEmail(account = account, verificationNeeded = false, mail = customer.services.mail)
+  = {
+    controllerMethod() {  
+      Action { implicit request =>
+        implicit val session = request.session
+        validateFacebookCallbackState(state)
+    
+        code match {
+          case Some(fbCode) => {
+            val accessToken = Facebook.getFbAccessToken(code = fbCode, facebookAppId = facebookAppId, fbAppSecret = playConfig.getProperty(fbAppSecretKey))
+            val fbUserInfo = Facebook.getFbUserInfo(accessToken = accessToken)
+            val (customer, shouldSendWelcomeEmail) = dbSession.connected(TransactionSerializable) {
+              loginViaFacebook(registrationName = fbUserInfo(Facebook._name).toString, registrationEmail = fbUserInfo(Facebook._email).toString, user_id = fbUserInfo(Facebook._id).toString)
             }
+            if (shouldSendWelcomeEmail) {
+              dbSession.connected(TransactionSerializable) {
+                val account = customer.account.withResetPasswordKey.save()
+                Customer.sendNewCustomerEmail(account = account, verificationNeeded = false, mail = customer.services.mail)
+              }
+            }
+  
+            Redirect(controllers.routes.WebsiteControllers.getAccountSettings).withSession(session + (EgraphsSession.Key.CustomerId.name -> customer.id.toString))
           }
-
-          Redirect(controllers.routes.WebsiteControllers.getAccountSettings).withSession(session + (EgraphsSession.Key.CustomerId.name -> customer.id.toString))
-        }
-        case _ => {
-          log("Facebook Oauth flow halted. error =  " + error.getOrElse("") +
-            ", error_reason = " + error_reason.getOrElse("") +
-            ", error_description = " + error_description.getOrElse(""))
-          Redirect(controllers.routes.WebsiteControllers.getLogin)
+          case _ => {
+            log("Facebook Oauth flow halted. error =  " + error.getOrElse("") +
+              ", error_reason = " + error_reason.getOrElse("") +
+              ", error_description = " + error_description.getOrElse(""))
+            Redirect(controllers.routes.WebsiteControllers.getLogin)
+          }
         }
       }
     }

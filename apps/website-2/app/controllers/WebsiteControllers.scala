@@ -11,6 +11,7 @@ import models._
 import services.db.DBSession
 import services.social.FacebookAppId
 import services.http._
+import services.http.filters._
 import forms.{AccountRecoverFormFactory, AccountPasswordResetFormFactory, AccountSettingsFormFactory, CustomerLoginFormFactory}
 import forms.purchase.{PurchaseFormChecksFactory, FormReaders, PurchaseFormFactory}
 import java.util.Properties
@@ -51,10 +52,7 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val dbSession = instance[DBSession]
   override protected val controllerMethod = instance[ControllerMethod]
   override protected val postController = instance[POSTControllerMethod]
-  override protected val accountRequestFilters = instance[AccountRequestFilters]
-  override protected val adminFilters = instance[AdminRequestFilters]
-  override protected val celebFilters = instance[CelebrityAccountRequestFilters]
-  override protected val customerFilters = instance[CustomerRequestFilters]
+  override protected val httpFilters = instance[HttpFilters]
   override protected val egraphQueryFilters = instance[EgraphQueryFilters]
   override protected val inventoryBatchQueryFilters = instance[InventoryBatchQueryFilters]
   override protected val orderQueryFilters = instance[OrderQueryFilters]

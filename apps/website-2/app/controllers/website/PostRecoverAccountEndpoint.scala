@@ -6,9 +6,10 @@ import services.db.{DBSession, TransactionSerializable}
 import models.{Customer, Account, CustomerStore, AccountStore}
 import services.mail.TransactionalMail
 import org.apache.commons.mail.HtmlEmail
-import services.http.{SafePlayParams, AccountRequestFilters, POSTControllerMethod}
+import services.http.{SafePlayParams, POSTControllerMethod}
 import services.mvc.ImplicitHeaderAndFooterData
 import services.Utils
+import services.http.filters.HttpFilters
 
 private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
@@ -18,13 +19,12 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
   protected def postController: POSTControllerMethod
   protected def accountStore: AccountStore
   protected def customerStore: CustomerStore
-  protected def accountRequestFilters: AccountRequestFilters
+  protected def httpFilters: HttpFilters  
   protected def transactionalMail: TransactionalMail
 
-  def postRecoverAccount() = Action { implicit request =>
-    postController() {
-      val email = Utils.getFromMapFirstInSeqOrElse("email", "Nothing", request.queryString)
-      accountRequestFilters.requireValidAccountEmail(email) { account =>
+  def postRecoverAccount() = postController() {    
+    httpFilters.requireAccountEmail.inFlashOrRequest() { account =>
+      Action { request =>
         val (customer, accountWithResetPassKey) = dbSession.connected(TransactionSerializable) {
           val accountWithResetPassKey = account.withResetPasswordKey.save()
           (customerStore.get(account.customerId.get), accountWithResetPassKey)
@@ -33,7 +33,8 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
 
         val flashEmail = Utils.getFromMapFirstInSeqOrElse("email", "", request.queryString)
 
-        Ok(views.html.frontend.simple_confirmation(header = "Success", body ="Instructions for recovering your account have been sent to your email address.")
+        Ok(
+          views.html.frontend.simple_confirmation(header = "Success", body ="Instructions for recovering your account have been sent to your email address.")
         ).flashing("email" -> flashEmail)
       }
     }

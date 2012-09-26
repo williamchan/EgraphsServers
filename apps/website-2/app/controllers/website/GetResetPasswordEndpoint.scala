@@ -24,29 +24,30 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
   import services.http.forms.Form.Conversions._
 
   protected def controllerMethod: ControllerMethod
-  protected def requireAccountEmail: RequireAccountEmail
-  protected def requireResetPasswordSecret: RequireResetPasswordSecret
+  protected def httpFilters: HttpFilters
   protected def accountStore: AccountStore
   protected def accountPasswordResetForms: AccountPasswordResetFormFactory
 
   def getResetPassword(email: String, secretKey: String) = controllerMethod() {
-    requireAccountEmail.inFlashOrRequest() { implicit request =>
-      val form = makeFormView(request.account)
-
-      val displayableErrors = List(form.newPassword.error, form.passwordConfirm.error, form.email.error)
-        .asInstanceOf[List[Option[FormError]]].filter(e => e.isDefined).map(e => e.get.description)
-
-        if (request.account.verifyResetPasswordKey(form.secretKey.value.getOrElse("")) == true) {
-          Ok(views.html.frontend.account_password_reset(form=form, displayableErrors=displayableErrors))
-        } else {
-          Forbidden("The password reset URL you used is either out of date or invalid.")
+    httpFilters.requireAccountEmail.inFlashOrRequest() { account =>
+      Action { implicit request =>
+        val form = makeFormView(account)
+  
+        val displayableErrors = List(form.newPassword.error, form.passwordConfirm.error, form.email.error)
+          .asInstanceOf[List[Option[FormError]]].filter(e => e.isDefined).map(e => e.get.description)
+  
+          if (account.verifyResetPasswordKey(form.secretKey.value.getOrElse("")) == true) {
+            Ok(views.html.frontend.account_password_reset(form=form, displayableErrors=displayableErrors))
+          } else {
+            Forbidden("The password reset URL you used is either out of date or invalid.")
+        }
       }
     }
   }
 
   def getVerifyAccount() = controllerMethod() {
-    requireAccountEmail.inRequest() { request =>
-      val account = request.account
+    httpFilters.requireAccountEmail.inRequest() { account =>
+      Action { request =>      
       val action = requireResetPasswordSecret(account) {
         Action {
           account.emailVerify().save()

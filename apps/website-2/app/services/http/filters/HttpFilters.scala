@@ -11,6 +11,7 @@ class HttpFilters @Inject()(
   val requireCelebrityId: RequireCelebrityId,
   val requireCelebrityUrlSlug: RequireCelebrityUrlSlug,
   val requireCustomerId: RequireCustomerId,
+  val requireCustomerLogin: RequireCustomerLogin,
   val requireCustomerUsername: RequireCustomerUsername,
   val requireEgraphId: RequireEgraphId,
   val requireOrderIdOfCelebrity: RequireOrderIdOfCelebrity,

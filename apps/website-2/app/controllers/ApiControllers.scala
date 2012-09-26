@@ -2,13 +2,14 @@ package controllers
 
 import controllers.api._
 import play.api.mvc.Controller
-import services.http.{PlayConfig, ControllerMethod, OrderRequestFilters, CelebrityAccountRequestFilters}
+import services.http.{PlayConfig, ControllerMethod}
 import services.db.DBSession
 import akka.actor.ActorRef
 import models.{EnrollmentBatchStore, OrderQueryFilters, EnrollmentBatchServices, OrderStore}
 import services.blobs.Blobs
 import services.AppConfig._
 import java.util.Properties
+import services.http.filters.HttpFilters
 
 object ApiControllers extends Controller
   with GetCelebrityApiEndpoint
@@ -32,6 +33,5 @@ object ApiControllers extends Controller
   override protected def orderStore = instance[OrderStore]
   override protected def orderQueryFilters = instance[OrderQueryFilters]
   override protected def enrollmentBatchServices = instance[EnrollmentBatchServices]
-  override protected def celebFilters = instance[CelebrityAccountRequestFilters]
-  override protected def orderFilters = instance[OrderRequestFilters]
+  override protected def httpFilters = instance[HttpFilters]  
 }

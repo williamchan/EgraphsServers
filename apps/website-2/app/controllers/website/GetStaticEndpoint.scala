@@ -4,32 +4,30 @@ import play.api._
 import play.api.mvc._
 import services.http.ControllerMethod
 import services.mvc.ImplicitHeaderAndFooterData
-import models.frontend.contents.Section
-import controllers.WebsiteControllers
 
 private[controllers] trait GetStaticEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
   protected def controllerMethod: ControllerMethod
 
-  def getAbout = Action { implicit request =>
-    controllerMethod() {
+  def getAbout = controllerMethod() {
+    Action {
       Ok(views.html.frontend.about_us(learnMoreUrl = controllers.routes.WebsiteControllers.getInsideEgraph().url))
     }
   }
 
-  def getCareers = Action { implicit request =>
-    controllerMethod() {
+  def getCareers = controllerMethod() {
+    Action {
       Ok(views.html.frontend.careers())
     }
   }
 
-  def getFAQ = Action { implicit request =>
-    controllerMethod() {
+  def getFAQ = controllerMethod() {
+    Action {
       Ok(views.html.frontend.faq())
     }
-  }
+  }  
 
-  def getInsideEgraph = Action { implicit request =>
-    controllerMethod() {
+  def getInsideEgraph = controllerMethod() {
+    Action {
       val tableOfContents =
         List(
           Section(title="Introduction", url="#inside", subsection = None),
@@ -39,23 +37,23 @@ private[controllers] trait GetStaticEndpoint extends ImplicitHeaderAndFooterData
         )
       Ok(views.html.frontend.inside_egraph(tableOfContents))
     }
-  }
+  }  
 
-  def getPrivacy = Action { implicit request =>
-    controllerMethod() {
+  def getPrivacy = controllerMethod() {
+    Action {
       Ok(views.html.frontend.privacy())
     }
-  }
+  }  
 
-  def getInsiderSweepstakes = Action { implicit request =>
-    controllerMethod() {
+  def getInsiderSweepstakes = controllerMethod() {
+    Action {
       Ok(views.html.frontend.sweepstakes_insider())
     }
-  }
+  }  
 
-  def getTerms = Action { implicit request =>
-    controllerMethod() {
+  def getTerms = controllerMethod() {
+    Action {
       Ok(views.html.frontend.terms())
     }
-  }
+  }  
 }

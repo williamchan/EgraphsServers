@@ -3,10 +3,11 @@ package controllers.website
 import play.api._
 import play.api.mvc._
 import models.AccountStore
-import services.http.{SafePlayParams, AccountRequestFilters, POSTControllerMethod}
+import services.http.{SafePlayParams, POSTControllerMethod}
 import services.http.forms.{AccountPasswordResetFormFactory, Form}
 import services.mvc.ImplicitHeaderAndFooterData
 import services.Utils
+import services.http.filters.HttpFilters
 
 private[controllers] trait PostResetPasswordEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
 
@@ -14,14 +15,14 @@ private[controllers] trait PostResetPasswordEndpoint extends ImplicitHeaderAndFo
   import SafePlayParams.Conversions._
 
   protected def postController: POSTControllerMethod
+  protected def httpFilters: HttpFilters
+  
   protected def accountStore: AccountStore
   protected def accountPasswordResetForms: AccountPasswordResetFormFactory
-  protected def accountRequestFilters: AccountRequestFilters
 
-  def postResetPassword() = Action { implicit request =>
-    postController() {
-      val email = Utils.getFromMapFirstInSeqOrElse("email", "Nothing", request.queryString)
-      accountRequestFilters.requireValidAccountEmail(email) { account =>
+  def postResetPassword() = postController() {
+    httpFilters.requireAccountEmail.inRequest() { account =>
+      Action { request =>
         val params = request.queryString
         val nonValidatedForm = accountPasswordResetForms(params.asFormReadable, account)
   

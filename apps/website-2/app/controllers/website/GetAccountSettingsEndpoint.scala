@@ -12,6 +12,7 @@ import services.http.forms.AccountSettingsForm.Fields
 import services.http.forms.AccountSettingsFormFactory
 import services.http.ControllerMethod
 import services.mvc.ImplicitHeaderAndFooterData
+import services.http.filters.HttpFilters
 
 private[controllers] trait GetAccountSettingsEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
@@ -20,22 +21,23 @@ private[controllers] trait GetAccountSettingsEndpoint extends ImplicitHeaderAndF
   import services.http.forms.Form.Conversions._
 
   protected def controllerMethod: ControllerMethod
-  protected def requireCustomerId: RequireCustomerId
+  protected def httpFilters: HttpFilters  
   protected def accountSettingsForms: AccountSettingsFormFactory
 
   def getAccountSettings = controllerMethod() {
-    requireCustomerId.inSession() { request =>
-      val customer = request.customer
-      val account = customer.account
-      val form = makeFormView(customer, account, request.flash)
-
-      val displayableErrors = (List(form.fullname.error, form.username.error, form.email.error,
-        form.oldPassword.error, form.newPassword.error, form.passwordConfirm.error,
-        form.addressLine1.error,form.addressLine2.error, form.city.error, form.state.error, form.postalCode.error,
-        form.galleryVisibility.error, form.notice_stars.error) ::: form.generalErrors.toList)
-        .asInstanceOf[List[Option[FormError]]].filter(e => e.isDefined).map(e => e.get.description)
-
-      Ok(views.html.frontend.account_settings(form=form, displayableErrors))
+    httpFilters.requireCustomerId.inSession() { customer =>
+      Action { request =>        
+        val account = customer.account
+        val form = makeFormView(customer, account, request.flash)
+  
+        val displayableErrors = (List(form.fullname.error, form.username.error, form.email.error,
+          form.oldPassword.error, form.newPassword.error, form.passwordConfirm.error,
+          form.addressLine1.error,form.addressLine2.error, form.city.error, form.state.error, form.postalCode.error,
+          form.galleryVisibility.error, form.notice_stars.error) ::: form.generalErrors.toList)
+          .asInstanceOf[List[Option[FormError]]].filter(e => e.isDefined).map(e => e.get.description)
+  
+        Ok(views.html.frontend.account_settings(form=form, displayableErrors))
+      }
     }
   }
 
@@ -99,7 +101,7 @@ private[controllers] trait GetAccountSettingsEndpoint extends ImplicitHeaderAndF
 
 object GetAccountSettingsEndpoint {
 
-  def url() = {
+  def url() = {    
     controllers.routes.WebsiteControllers.getAccountSettings().url
   }
 }

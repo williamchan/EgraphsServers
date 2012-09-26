@@ -13,7 +13,7 @@ import models.GalleryOrderFactory
 import services.http.EgraphsSession
 import services.http.filters.RequireCustomerUsername
 import services.http.filters.RequireCustomerId
-import services.http.CustomerRequest
+import services.http.filters.HttpFilters
 
 /**
  * Controller for displaying customer galleries. Galleries serve as a "wall of egraphs".
@@ -25,33 +25,33 @@ import services.http.CustomerRequest
  * Others->Some user, logged in or not, should be able to see only fulfilled egraphs set as public by the Owner.
  *
  **/
-
-
 private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
   protected def controllerMethod: ControllerMethod
   protected def customerStore: CustomerStore
   protected def administratorStore: AdministratorStore
   protected def orderStore: OrderStore
-  protected def requireCustomerUsername: RequireCustomerUsername
-  protected def requireCustomerId: RequireCustomerId
+  protected def httpFilters: HttpFilters
   protected def facebookAppId: String
 
   import SafePlayParams.Conversions._
 
   def getCustomerGalleryByUsername(username: String) = controllerMethod() {
-    requireCustomerUsername(username) { customerRequest => 
-      serveCustomerGallery(customerRequest)
+    httpFilters.requireCustomerUsername(username) { customer => 
+      Action { request =>
+        serveCustomerGallery(customer, request)
+      }
     }
   }
 
   def getCustomerGalleryById(galleryCustomerId: Long) = controllerMethod() {
-    requireCustomerId(galleryCustomerId){ customerRequest =>
-      serveCustomerGallery(customerRequest)
+    httpFilters.requireCustomerId(galleryCustomerId) { customer =>
+      Action { request =>
+        serveCustomerGallery(customer, request)
+      }
     }
   }
 
-  def serveCustomerGallery[A](request: CustomerRequest[A]): Result = {
-    val customer = request.customer
+  def serveCustomerGallery[A](customer: Customer, request: Request[A]): Result = {    
     val galleryCustomerId = customer.id
     //If admin is true admin
     val session = request.session

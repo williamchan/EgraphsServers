@@ -3,7 +3,8 @@ package controllers.website
 import play.api.mvc.Controller
 import play.api.mvc.Results.Redirect
 import models._
-import services.http.{CustomerRequestFilters, POSTControllerMethod}
+import services.http.filters.HttpFilters
+import services.http.POSTControllerMethod
 import services.http.forms.{AccountSettingsForm, AccountSettingsFormFactory, Form}
 import play.api.mvc.Action
 
@@ -11,13 +12,13 @@ private[controllers] trait PostAccountSettingsEndpoint { this: Controller =>
   import Form.Conversions._
 
   protected def postController: POSTControllerMethod
-  protected def customerFilters: CustomerRequestFilters
+  protected def httpFilters: HttpFilters
   protected def accountStore: AccountStore
   protected def accountSettingsForms: AccountSettingsFormFactory
 
   def postAccountSettings() = Action { implicit request =>
     postController() {
-      customerFilters.requireCustomerLogin { (customer, account) =>
+      httpFilters.requireCustomerLogin.inSession() { (customer, account) =>
         // Read a AccountSettingsForm from the params
         val params = request.queryString
         val nonValidatedForm = accountSettingsForms(params.asFormReadable, customer, account)
