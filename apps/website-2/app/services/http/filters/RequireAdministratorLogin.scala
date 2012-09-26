@@ -1,33 +1,24 @@
 package services.http.filters
 
 import com.google.inject.Inject
-import models.Account
-import models.AccountStore
+import controllers.WebsiteControllers
+import models.AdministratorStore
 import play.api.mvc.Action
-import play.api.mvc.Results.{NotFound, Forbidden, Redirect}
-import play.api.mvc.AnyContent
 import play.api.mvc.BodyParser
 import play.api.mvc.BodyParsers.parse
-import play.api.mvc.Request
 import play.api.mvc.Result
 import play.api.mvc.Results.Forbidden
-import play.api.mvc.WrappedRequest
-import models.AdministratorStore
-import controllers.WebsiteControllers
-import services.http.SafePlayParams.Conversions._
 import services.http.AdminRequest
+import services.http.SafePlayParams.Conversions.paramsToOptionalParams
+import models.Administrator
 
 // TODO: PLAY20 migration. Test and comment this summbitch.
 class RequireAdministratorLogin @Inject() (adminStore: AdministratorStore) {  
-  def apply[A](adminId: Long, parser: BodyParser[A] = parse.anyContent)(operation: AdminRequest[A] => Result)
+  def apply[A](adminId: Long, parser: BodyParser[A] = parse.anyContent)(actionFactory: Administrator => Action[A])
   : Action[A] = 
   {
     Action(parser) { request =>     
-      val maybeResult = for (
-        admin <- adminStore.findById(adminId)
-      ) yield {
-        operation(AdminRequest(admin, request))
-      }
+      val maybeResult = adminStore.findById(adminId).map(admin => actionFactory(admin).apply(request))      
       
       // TODO: PLAY20 migration actually redirect this to the reverse-route of GetLoginAdminEndpoint
       //   instead of returning  a forbidden.
@@ -35,11 +26,11 @@ class RequireAdministratorLogin @Inject() (adminStore: AdministratorStore) {
     }
   } 
 
-  def inSession[A](parser: BodyParser[A] = parse.anyContent)(operation: AdminRequest[A] => Result)
+  def inSession[A](parser: BodyParser[A] = parse.anyContent)(actionFactory: Administrator => Action[A])
   : Action[A] = {
     Action(parser) { request =>
       val maybeResult = request.session.getLongOption(WebsiteControllers.adminIdKey).map { adminId =>
-        this.apply(adminId, parser)(operation)(request)
+        this.apply(adminId, parser)(actionFactory).apply(request)
       }
       
       maybeResult.getOrElse(noAdminAccessResult)

@@ -15,12 +15,12 @@ class RequireCustomerUsername @Inject() (customerStore: CustomerStore) {
   
   def apply[A]
     (username: String, parser: BodyParser[A] = parse.anyContent)
-    (operation: CustomerRequest[A] => Result)  
+    (actionFactory: Customer => Action[A])  
     : Action[A] = 
   {
     Action(parser) { request =>
       customerStore.findByUsername(username) match {
-        case Some(customer) => operation(CustomerRequest(customer, request))
+        case Some(customer) => actionFactory(customer).apply(request)
         case None => NotFound("Customer not found")
       }
     }

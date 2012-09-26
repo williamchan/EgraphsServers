@@ -21,12 +21,12 @@ class RequireCustomerId @Inject() (customerStore: CustomerStore) {
   
   def apply[A]
     (customerId: Long, parser: BodyParser[A] = parse.anyContent)
-    (operation: CustomerRequest[A] => Result)  
+    (actionFactory: Customer => Action[A])  
     : Action[A] = 
   {
     Action(parser) { request =>
       customerStore.findById(customerId) match {
-        case Some(customer) => operation(CustomerRequest(customer, request))
+        case Some(customer) => actionFactory(customer).apply(request)
         case None => NotFound("Customer not found")
       }
     }
@@ -35,11 +35,11 @@ class RequireCustomerId @Inject() (customerStore: CustomerStore) {
   /** 
    * If the customerId is in the session this implies they are logged in.
    */
-  def inSession[A](parser: BodyParser[A] = parse.anyContent)(operation: CustomerRequest[A] => Result): Action[A] = 
+  def inSession[A](parser: BodyParser[A] = parse.anyContent)(actionFactory: Customer => Action[A]): Action[A] = 
   {
     Action(parser) { request =>
       val maybeResult = request.session.getLongOption(EgraphsSession.Key.CustomerId.name).map { customerId =>
-        this.apply(customerId, parser)(operation)(request)
+        this.apply(customerId, parser)(actionFactory)(request)
       }
       
       maybeResult.getOrElse(notLoggedInResult)

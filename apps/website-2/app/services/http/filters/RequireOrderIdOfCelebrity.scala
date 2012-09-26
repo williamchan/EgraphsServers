@@ -22,11 +22,14 @@ class RequireOrderIdOfCelebrity @Inject() (orderStore: OrderStore, orderQueryFil
    * 
    * Otherwise returns a NotFound.
    *
-   * @param operation the operation to execute when the order id is found.
+   * @param actionFactory the actionFactory to execute when the order id is found.
    *
-   * @return an Action that produces either NotFound or the result of `operation`.
+   * @return an Action that produces either NotFound or the result of `actionFactory`.
    */
-  def apply[A](celebrityId: Long, parser: BodyParser[A] = parse.anyContent)(operation: OrderRequest[A] => Result): Action[A] = {
+  def apply[A](celebrityId: Long, parser: BodyParser[A] = parse.anyContent)
+  (actionFactory: Order => Action[A])
+  : Action[A] = 
+  {
     Action(parser) { implicit request =>
       Form(single("orderId" -> number)).bindFromRequest.fold(
         errors => NotFound("Order ID was required but not provided"),
@@ -36,7 +39,7 @@ class RequireOrderIdOfCelebrity @Inject() (orderStore: OrderStore, orderQueryFil
               NotFound("The celebrity has no such order")
   
             case Some(order) =>
-              operation(OrderRequest(order, request))
+              actionFactory(order).apply(request)
           }
         }
       )

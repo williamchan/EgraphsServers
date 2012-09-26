@@ -22,7 +22,8 @@ class RequireResetPasswordSecret @Inject() () {
           } else {
             Forbidden("The password reset URL you used is either out of date or invalid.")
           }
-        })
+        }
+      )
     }
   }
 }
