@@ -8,7 +8,6 @@ import play.api.mvc.BodyParser
 import play.api.mvc.BodyParsers.parse
 import play.api.mvc.Result
 import play.api.mvc.Results.Forbidden
-import services.http.AdminRequest
 import services.http.SafePlayParams.Conversions.paramsToOptionalParams
 import models.Administrator
 

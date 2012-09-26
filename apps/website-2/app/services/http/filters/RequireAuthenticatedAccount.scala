@@ -11,7 +11,6 @@ import play.api.mvc.WrappedRequest
 import play.api.mvc.Results.Forbidden
 import play.api.mvc.BodyParser
 import play.api.mvc.BodyParsers.parse
-import services.http.AccountRequest
 import services.http.BasicAuth
 
 // TODO: PLAY20 migration. Test and comment this summbitch.

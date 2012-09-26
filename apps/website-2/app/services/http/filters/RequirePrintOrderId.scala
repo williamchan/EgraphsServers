@@ -11,19 +11,17 @@ import play.api.mvc.BodyParser
 import play.api.mvc.BodyParsers.parse
 import play.api.mvc.Result
 import play.api.mvc.Results.NotFound
-import services.http.PrintOrderRequest
-
 
 // TODO: PLAY20 migration. Test and comment this summbitch.
 class RequirePrintOrderId @Inject() (printOrderStore: PrintOrderStore) {
-  def apply[A](printOrderId: Long, parser: BodyParser[A] = parse.anyContent)(operation: PrintOrderRequest[A] => Result)
+  def apply[A](printOrderId: Long, parser: BodyParser[A] = parse.anyContent)(actionFactory: PrintOrder => Action[A])
   : Action[A] = 
   {
     Action(parser) { request =>     
       val maybeResult = for (
         printOrder <- printOrderStore.findById(printOrderId)
       ) yield {
-        operation(PrintOrderRequest(printOrder, request))
+        actionFactory(printOrder).apply(request)
       }
       
       // TODO: PLAY20 migration actually redirect this to the reverse-route of GetLoginPrintOrderEndpoint
@@ -32,13 +30,13 @@ class RequirePrintOrderId @Inject() (printOrderStore: PrintOrderStore) {
     }
   } 
 
-  def inRequest[A](parser: BodyParser[A] = parse.anyContent)(operation: PrintOrderRequest[A] => Result)
+  def inRequest[A](parser: BodyParser[A] = parse.anyContent)(actionFactory: PrintOrder => Action[A])
   : Action[A] = 
   {
     Action(parser) { implicit request =>
       Form(single("printOrderId" -> longNumber)).bindFromRequest.fold(
         errors => noPrintOrderIdResult,
-        printOrderId => this.apply(printOrderId, parser)(operation)(request)
+        printOrderId => this.apply(printOrderId, parser)(actionFactory)(request)
       )
     }
   }

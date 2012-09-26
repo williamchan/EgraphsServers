@@ -12,7 +12,6 @@ import play.api.mvc.Results.NotFound
 import play.api.mvc.BodyParser
 import play.api.mvc.Action
 import play.api.mvc.Result
-import services.http.OrderRequest
 
 class RequireOrderIdOfCelebrity @Inject() (orderStore: OrderStore, orderQueryFilters: OrderQueryFilters) {
 
