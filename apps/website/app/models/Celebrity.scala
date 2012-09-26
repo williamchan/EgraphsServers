@@ -266,12 +266,11 @@ case class Celebrity(id: Long = 0,
   * out password field.  We aren't sending the password, it is just a bunch of *****.  The email
   * includes a link to download the latest iPad app.
   */
-  def sendWelcomeEmail() {
+  def sendWelcomeEmail(emailAddress: String) {
     val email = new HtmlEmail()
-    val emailAddress = account.email
     val html = views.frontend.html.celebrity_welcome_email(
       celebrityName = publicName,
-      celebrityEmail = emailAddress
+      celebrityEmail = account.email
     )
 
     email.setFrom("noreply@egraphs.com", "Egraphs")

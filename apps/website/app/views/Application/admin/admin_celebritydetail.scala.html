@@ -45,14 +45,6 @@
   <h1>
     @{if(isCreate) "Create" else "Update"} Celebrity
   </h1>
-  <div>
-  @for(presentCelebrity <- celebrity) {
-    <form method="POST" action='@postSendCelebrityWelcomeEmailAdmin(presentCelebrity.id)'>
-      @authenticityToken()
-      <input class="btn primary fade in" type="submit" value="Send Welcome Email"/>
-    </form>
-  }
-  </div>
   <div class="form row">
     <div class="span12 form-column">
       <form id="admin-celebrity-detail" method="POST" action='@postCelebrity' enctype="multipart/form-data">
@@ -110,6 +102,20 @@
           </div>
         </fieldset>
       </form>
+      <div>
+        @for(presentCelebrity <- celebrity) {
+        <form method="POST" action='@postSendCelebrityWelcomeEmailAdmin(presentCelebrity.id)'>
+          <fieldset>
+          @authenticityToken()
+          @formField(id="celebrityEmail", label="E-mail address", inputType="text",
+            help = Some( new Html("Specify the email address for the welcome letter.") ), width="span4", fields=fields)
+          <div class="actions">
+            <input class="btn primary fade in" type="submit" value="Send Welcome Email"/>
+          </div>
+          </fieldset>
+        </form>
+        }
+      </div>
       <div class="span2 profile-thumbnail" >
         <legend>Current Profile</legend>
         <img src="@profilePhoto">

@@ -16,12 +16,12 @@ trait PostSendCelebrityWelcomeEmailAdminEndpoint {
   protected def accountStore: AccountStore
   protected def transactionalMail: TransactionalMail
 
-  def postSendCelebrityWelcomeEmailAdmin(celebrityId: Long) = postController() {
+  def postSendCelebrityWelcomeEmailAdmin(celebrityId: Long, celebrityEmail: String) = postController() {
     adminFilters.requireAdministratorLogin { admin =>      
       val maybeSuccessfulRedirect = for (
         celebrity <- celebrityStore.findById(celebrityId)
       ) yield {
-        celebrity.sendWelcomeEmail()
+        celebrity.sendWelcomeEmail(celebrityEmail)
         WebsiteControllers.redirectWithValidationErrors(
           WebsiteControllers.reverse(WebsiteControllers.getCelebrityAdmin(celebrityId=celebrityId))
         )
@@ -29,4 +29,5 @@ trait PostSendCelebrityWelcomeEmailAdminEndpoint {
       maybeSuccessfulRedirect.getOrElse(NotFound("Celebrity with Id " + celebrityId + " not NotFound"))
     }
   }
+
 }
