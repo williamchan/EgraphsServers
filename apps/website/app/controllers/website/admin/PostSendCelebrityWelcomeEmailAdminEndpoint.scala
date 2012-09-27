@@ -5,6 +5,7 @@ import services.mail.TransactionalMail
 import controllers.WebsiteControllers
 import play.mvc.Controller
 import services.http.{POSTControllerMethod, AdminRequestFilters}
+import play.mvc.results.Redirect
 
 
 trait PostSendCelebrityWelcomeEmailAdminEndpoint {
@@ -21,10 +22,8 @@ trait PostSendCelebrityWelcomeEmailAdminEndpoint {
       val maybeSuccessfulRedirect = for (
         celebrity <- celebrityStore.findById(celebrityId)
       ) yield {
-        celebrity.sendWelcomeEmail(celebrityEmail)
-        WebsiteControllers.redirectWithValidationErrors(
-          WebsiteControllers.reverse(WebsiteControllers.getCelebrityAdmin(celebrityId=celebrityId))
-        )
+        celebrity.sendWelcomeEmail(celebrityEmail, bccEmail = Some(admin.account.email))
+        new Redirect(WebsiteControllers.reverse(WebsiteControllers.getCelebrityAdmin(celebrityId=celebrityId)).url)
       }
       maybeSuccessfulRedirect.getOrElse(NotFound("Celebrity with Id " + celebrityId + " not NotFound"))
     }

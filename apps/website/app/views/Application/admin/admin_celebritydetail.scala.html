@@ -104,6 +104,7 @@
       </form>
       <div>
         @for(presentCelebrity <- celebrity) {
+        <hr/>
         <form method="POST" action='@postSendCelebrityWelcomeEmailAdmin(presentCelebrity.id)'>
           <fieldset>
           @authenticityToken()
