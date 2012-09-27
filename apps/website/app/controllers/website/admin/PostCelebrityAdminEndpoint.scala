@@ -155,7 +155,7 @@ trait PostCelebrityAdminEndpoint {
 
           if (isCreate) {
             passwordValidationOrAccount.right.get.copy(celebrityId = Some(savedCelebrity.id)).save()
-            savedCelebrity.sendWelcomeEmail()
+            savedCelebrity.sendWelcomeEmail(savedCelebrity.account.email)
           }
           
           savedCelebrity.saveWithImageAssets(landingPageImageOption, logoImageImageOption)

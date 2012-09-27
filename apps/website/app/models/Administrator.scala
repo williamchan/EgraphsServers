@@ -30,6 +30,10 @@ case class Administrator(
   def save(): Administrator = {
     services.store.save(this)
   }
+
+  def account: Account = {
+    services.accountStore.findByAdministratorId(id).get
+  }
 }
 
 case class AdministratorServices @Inject()(store: AdministratorStore, accountStore: AccountStore)
