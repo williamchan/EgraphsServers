@@ -4,6 +4,7 @@ import models.frontend.storefront.OrderCompleteViewModel
 import models.{InventoryBatch, Product, Account, Customer, Celebrity, Order}
 import com.google.inject.Inject
 import controllers.WebsiteControllers
+import services.Utils
 
 /**
  * Creates OrderCompleteViewModels for rendering the Order Complete page
@@ -77,7 +78,8 @@ class OrderCompleteViewModelFactory @Inject()() {
       totalPrice = order.amountPaid,
       expectedDeliveryDate = inventoryBatch.getExpectedDate,
       faqHowLongLink = faqHowLongLink,
-      hasPrintOrder = hasPrintOrder
+      hasPrintOrder = hasPrintOrder,
+      withAffiliateMarketing = Utils.isLiveConsumerSite
     )
   }
 }

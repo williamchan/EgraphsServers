@@ -21,6 +21,7 @@ import org.joda.money.Money
  *                             to deliver. This can be found on the order's `inventoryBatch`
  * @param faqHowLongLink link to FAQ section on expected delivery dates
  * @param hasPrintOrder whether a physical print was ordered
+ * @param withAffiliateMarketing whether to notify affiliate marketing partners about this order
  */
 case class OrderCompleteViewModel (
   orderDate: Date,
@@ -34,5 +35,6 @@ case class OrderCompleteViewModel (
   totalPrice: Money,
   expectedDeliveryDate: Date,
   faqHowLongLink: String,
-  hasPrintOrder: Boolean
+  hasPrintOrder: Boolean,
+  withAffiliateMarketing: Boolean = false
 )
