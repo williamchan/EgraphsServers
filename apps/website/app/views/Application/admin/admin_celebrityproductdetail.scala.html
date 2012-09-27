@@ -97,7 +97,8 @@
           @formField(id="productImage", label="Product Photo", inputType="file", width="span8", help=Some(photoHelp), fields=fields)
           @photoHelp = { Must be JPG or PNG with minimum dimensions of 1024x1024. Will be cropped. }
 
-          @formField(id="signingOriginX", label="Signing Origin X", inputType="text", width="span4", fields=fields)
+          @formField(id="signingOriginX", label="Signing Origin X", inputType="text", width="span4", help=Some(signingOriginXHelp), fields=fields)
+          @signingOriginXHelp = { Between 0 and 575 }
           @{/** @formField(id="signingOriginY", label="Signing Origin Y", inputType="text", width="span4", fields=fields) */}
           <input id="signingOriginY" name="signingOriginY" type="hidden" value="0">
 

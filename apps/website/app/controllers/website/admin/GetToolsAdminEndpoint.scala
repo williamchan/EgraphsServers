@@ -5,7 +5,7 @@ import models.enums._
 import play.mvc.Controller
 import services.AppConfig
 import services.blobs.Blobs
-import services.http.{AdminRequestFilters, ControllerMethod}
+import services.http.{WithDBConnection, AdminRequestFilters, ControllerMethod}
 import org.squeryl.Query
 import org.squeryl.PrimitiveTypeMode._
 import services.db.Schema
@@ -31,7 +31,7 @@ private[controllers] trait GetToolsAdminEndpoint {
   private lazy val schema = AppConfig.instance[Schema]
   private lazy val enrollmentBatchStore = AppConfig.instance[EnrollmentBatchStore]
 
-  def getToolsAdmin = controllerMethod() {
+  def getToolsAdmin = controllerMethod(WithDBConnection(readOnly=false)) {
     adminFilters.requireAdministratorLogin {admin =>
 
       val actionOption = Option(params.get("action"))

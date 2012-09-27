@@ -3,7 +3,7 @@ package controllers.website.nonproduction
 import play.mvc.Controller
 import models.{AccountStore, Account}
 import services.AppConfig
-import services.http.ControllerMethod
+import services.http.{WithDBConnection, ControllerMethod}
 
 /**
  * Test controller used in [[controllers.DBTransactionTests]] to verify that Play does, in fact,
@@ -12,21 +12,21 @@ import services.http.ControllerMethod
 object TransactionTestController extends Controller {
   private val controllerMethod = AppConfig.instance[ControllerMethod]
 
-  def makeAccountAndThrowException() = controllerMethod() {
+  def makeAccountAndThrowException() = controllerMethod(WithDBConnection(readOnly=false)) {
     createSavedAccount()
     throw new RuntimeException(
       "Throwing this should cause the account not to persist"
     )
   }
 
-  def isStored = controllerMethod() {
+  def isStored = controllerMethod(WithDBConnection(readOnly=false)) {
     AppConfig.instance[AccountStore].findByEmail("erem@egraphs.com").headOption match {
       case None => "Nope"
       case _ => "Yep"
     }
   }
 
-  def makeAccount() = controllerMethod() {
+  def makeAccount() = controllerMethod(WithDBConnection(readOnly=false)) {
     createSavedAccount()
     Ok
   }

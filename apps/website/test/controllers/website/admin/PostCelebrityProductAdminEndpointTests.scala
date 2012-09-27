@@ -85,7 +85,7 @@ class PostCelebrityProductAdminEndpointTests extends AdminFunctionalTest {
                             productDescription: String =  "Evan Longoria, third baseman for the Rays is a standout player",
                             priceInCurrency: BigDecimal = Product.defaultPrice,
                             signingOriginX: Int = 100,
-                            signingOriginY: Int = 100,
+                            signingOriginY: Int = 0,
                             storyTitle: String = "Walk-off home run for a playoff spot",
                             storyText: String = "Earlier in the month, the Rays were facing a deficit of nine games in " +
                                                 "the wild card race to the Boston Red Sox.",

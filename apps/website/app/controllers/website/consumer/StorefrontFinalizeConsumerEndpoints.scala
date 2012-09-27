@@ -1,6 +1,6 @@
 package controllers.website.consumer
 
-import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters, ControllerMethod}
+import services.http.{WithoutDBConnection, POSTControllerMethod, CelebrityAccountRequestFilters, ControllerMethod}
 import play.mvc.Controller
 
 import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
@@ -141,7 +141,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
    * @return a Redirect to the order complete page if successful, otherwise
    *         a Redirect back to the form to handle errors.
    */
-  def postStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug: String) = postController(openDatabase=false) {
+  def postStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug: String) = postController(dbSettings = WithoutDBConnection) {
     // Get all the sweet, sweet purchase form data in a database transaction.
     // redirectOrPurchaseData is of type: Either[Redirect, (Celebrity, Product, AllPurchaseForms, PurchaseForms)]
     val redirectOrPurchaseData = dbSession.connected(TransactionSerializable) {

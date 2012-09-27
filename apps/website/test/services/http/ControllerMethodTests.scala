@@ -22,7 +22,7 @@ class ControllerMethodTests extends EgraphsUnitTest {
     session.getAuthenticityToken.returns("herp")
 
     (postController() { "=)" }) should be ("=)")
-    (postApiController { "=)" }) should be ("=)")
+    (postApiController() { "=)" }) should be ("=)")
 
     // Test: Forbidden should be returned if authenticity token is different as parameter
     // The POSTApiController should still work though
@@ -30,7 +30,7 @@ class ControllerMethodTests extends EgraphsUnitTest {
     session.getAuthenticityToken.returns("derp")
 
     (postController() { ">=(" }).asInstanceOf[AnyRef].getClass should be (classOf[Forbidden])
-    (postApiController { "=)" }) should be ("=)")
+    (postApiController() { "=)" }) should be ("=)")
   }
 
   def instanceWithDeps = {
