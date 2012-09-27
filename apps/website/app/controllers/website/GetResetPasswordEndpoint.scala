@@ -1,7 +1,7 @@
 package controllers.website
 
 import play.mvc.Controller
-import services.http.{AccountRequestFilters, ControllerMethod}
+import services.http.{WithDBConnection, AccountRequestFilters, ControllerMethod}
 import services.Utils
 import models.{Account, AccountStore}
 import models.frontend.forms.{FormError, Field}
@@ -38,7 +38,7 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
     }
   }
 
-  def getVerifyAccount() =  controllerMethod() {
+  def getVerifyAccount() =  controllerMethod(dbSettings = WithDBConnection(readOnly = false)) {
     accountRequestFilters.requireValidAccountEmail(request.params.getOption("email").getOrElse("Nothing")) { account =>
       if(account.verifyResetPasswordKey(request.params.getOption("secretKey").getOrElse(""))){
         account.emailVerify().save()
