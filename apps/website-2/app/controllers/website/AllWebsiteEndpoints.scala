@@ -2,7 +2,7 @@ package controllers.website
 
 import play.api.mvc.Controller
 //import admin.AllAdminEndpoints
-//import consumer.{GetRootConsumerEndpoint, AllConsumerEndpoints}
+import consumer.{GetRootConsumerEndpoint, AllConsumerEndpoints}
 //import controllers.website.nonproduction.PostBuyDemoProductEndpoint
 
 /**
