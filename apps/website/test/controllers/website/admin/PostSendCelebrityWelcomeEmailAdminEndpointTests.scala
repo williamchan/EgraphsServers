@@ -17,7 +17,7 @@ class PostSendCelebrityWelcomeEmail extends AdminFunctionalTest {
   def testPostCelebritySendWelcomeEmail() {
     createAndLoginAsAdmin()
     createCeleb()
-    val response = POST("/admin/celebrities/1/sendEmail")
+    val response = POST("/admin/celebrities/1/sendEmail", getPostStrParams("derp@derp.com"))
     assertStatus(302, response)
     assertEquals("[/admin/celebrities/1]", response.headers("Location").toString)
   }
@@ -25,7 +25,7 @@ class PostSendCelebrityWelcomeEmail extends AdminFunctionalTest {
   @Test
   def testPostCelebritySendWelcomeEmailNoCeleb() {
     createAndLoginAsAdmin()
-    val response = POST("/admin/celebrities/1/sendEmail")
+    val response = POST("/admin/celebrities/1/sendEmail", getPostStrParams("derp@derp.com"))
     assertStatus(404, response)
   }
 
@@ -34,10 +34,13 @@ class PostSendCelebrityWelcomeEmail extends AdminFunctionalTest {
     createAndLoginAsAdmin()
     createCeleb()
     logout()
-    val response = POST("/admin/celebrities/1/sendEmail")
+    val response = POST("/admin/celebrities/1/sendEmail", getPostStrParams("derp@derp.com"))
     assertStatus(302, response)
     //redirect to admin screen
     assertEquals("[/admin/login]", response.headers("Location").toString)
   }
 
+  private def getPostStrParams(celebrityEmail: String): Map[String, String] = {
+    Map[String, String]("celebrityEmail" -> celebrityEmail)
+  }
 }

@@ -8,7 +8,7 @@ import controllers.website.consumer.StorefrontChoosePhotoConsumerEndpoints
 import services.db.{DBSession, TransactionSerializable}
 import play.data.validation.Validation
 import controllers.website.EgraphPurchaseHandler
-import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters}
+import services.http.{WithoutDBConnection, POSTControllerMethod, CelebrityAccountRequestFilters}
 import services.mail.TransactionalMail
 import play.mvc.Controller
 
@@ -32,7 +32,7 @@ trait PostBuyDemoProductEndpoint { this: Controller =>
                          buyerEmail: String,
                          stripeTokenId: String = payment.testToken().id, // Will throw xception if payment is StripePayment. Must be StripeTestPayment or YesMaamPayment.
                          desiredText: Option[String],
-                         personalNote: Option[String]) = postController(openDatabase = false, doCsrfCheck = false) {
+                         personalNote: Option[String]) = postController(doCsrfCheck = false, WithoutDBConnection) {
 
     Logger.info("Receiving purchase order")
     val (celebrity: Celebrity, product: Product) = validateInputs(

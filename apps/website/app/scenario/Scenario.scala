@@ -19,7 +19,7 @@ import services.db.Schema
  * For how to register scenarios, create a class named Scenarios in the
  * tests directory, and register scenarios in it.
  *
- * For more, see [[scenarios.DeclaresScenarios]]
+ * For more, see [[scenario.scenarios.DeclaresScenarios]]
  */
 case class Scenario(name: String, category: String = "Uncategorized", description: String="", instructions: () => Any) {
   /** Slug used to identify the scenario in the URL */

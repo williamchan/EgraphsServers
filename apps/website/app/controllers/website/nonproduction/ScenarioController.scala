@@ -1,10 +1,10 @@
 package controllers.website.nonproduction
 
 import play.mvc.Controller
-import scenario.Scenario
 import play.mvc.results.Result
-import services.http.ControllerMethod
+import services.http.{WithDBConnection, ControllerMethod}
 import services.AppConfig
+import scenario.Scenario
 
 /**
  * Controller for all scenarios
@@ -16,7 +16,7 @@ object ScenarioController extends Controller {
    * Performs a code block only if the project's Scenarios library is available.
    *
    * @return the result of the code block if the project's Scenarios library
-   *   is available. 500 (Internal Error) and an informative response if not
+   *         is available. 500 (Internal Error) and an informative response if not
    */
   private def withRegisteredScenarios(task: => Any) = {
     try {
@@ -41,7 +41,7 @@ object ScenarioController extends Controller {
    *
    * @return 200 (Ok) if successful.
    */
-  def clear = controllerMethod() {
+  def clear = controllerMethod(dbSettings = WithDBConnection(readOnly = false)) {
     withRegisteredScenarios {
       Scenario.clearAll()
       "All scenarios cleared."
@@ -55,8 +55,9 @@ object ScenarioController extends Controller {
    */
   def list = controllerMethod() {
     withRegisteredScenarios {
-      val scenarios = Scenario.allCategories.toList.sortWith((a, b) => a._1 < b._1).map { case (category, catScenarios) =>
-        (category, catScenarios.toSeq.sortWith((a, b) => a.name < b.name))
+      val scenarios = Scenario.allCategories.toList.sortWith((a, b) => a._1 < b._1).map {
+        case (category, catScenarios) =>
+          (category, catScenarios.toSeq.sortWith((a, b) => a.name < b.name))
       }
       views.nonproduction.html.scenarios(scenarios)
     }
@@ -67,7 +68,7 @@ object ScenarioController extends Controller {
    *
    * @return 200 (Ok) and a useful human-readable message if successful.
    */
-  def scenario (urlSlug: String) = controllerMethod() {
+  def scenario(urlSlug: String) = controllerMethod(dbSettings = WithDBConnection(readOnly = false)) {
     withRegisteredScenarios {
       Scenario.withSlug(urlSlug) match {
         case Some(existingScenario) => {
@@ -86,7 +87,7 @@ object ScenarioController extends Controller {
 
         case None => {
           NotFound(
-            "No scenario was found with the name \"" + urlSlug + "\"."+
+            "No scenario was found with the name \"" + urlSlug + "\"." +
               "View available scenarios at " + reverse(this.list)
           )
         }

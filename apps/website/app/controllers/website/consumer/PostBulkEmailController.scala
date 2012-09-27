@@ -1,7 +1,7 @@
 package controllers.website.consumer
 
 import play.mvc.Controller
-import services.http.POSTControllerMethod
+import services.http.{WithoutDBConnection, POSTControllerMethod}
 import services.mvc.ImplicitHeaderAndFooterData
 import services.mail.BulkMail
 import services.http.forms.purchase.FormReaders
@@ -23,7 +23,7 @@ private[controllers] trait PostBulkEmailController extends ImplicitHeaderAndFoot
    *
    * @return
    */
-  def postSubscribeEmail = postController(openDatabase = false) {
+  def postSubscribeEmail = postController(dbSettings = WithoutDBConnection) {
     /**
      * listSubscribe(string apikey, string id, string email_address, array merge_vars,
      * string email_type, bool double_optin, bool update_existing, bool replace_interests, bool send_welcome)
