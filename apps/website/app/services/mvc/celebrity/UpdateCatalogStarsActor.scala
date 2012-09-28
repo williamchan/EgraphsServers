@@ -5,6 +5,7 @@ import akka.actor.Actor.actorOf
 import com.google.inject.Inject
 import services.AppConfig
 import java.util.concurrent.TimeUnit
+import java.util.Random
 import services.logging.Logging
 import services.db.{TransactionSerializable, DBSession}
 import services.cache.CacheFactory
@@ -29,14 +30,14 @@ private[celebrity] class UpdateCatalogStarsActor @Inject()(
   productStore: ProductStore
 ) extends Actor {
 
-  import UpdateCatalogStarsActor.{UpdateCatalogStars, resultsCacheKey}
+  import UpdateCatalogStarsActor.{UpdateCatalogStars, updatePeriodSeconds, resultsCacheKey}
 
   protected def receive = {
     case UpdateCatalogStars(recipientActor) => {
       // Get the stars from the cache preferentially. This reduces round-trips to the database in multi-instance
       // deployments because one instance can share the results from another.
       val cache = cacheFactory.applicationCache
-      val catalogStars = cache.cacheing(resultsCacheKey, DateTimeConstants.SECONDS_PER_DAY) {
+      val catalogStars = cache.cacheing(resultsCacheKey, updatePeriodSeconds) {
         // Due to cache miss, this instance must update from the database. Get all the stars and
         // their sold-out info.
         db.connected(isolation = TransactionSerializable, readOnly = true) {
@@ -72,7 +73,7 @@ private[mvc] object UpdateCatalogStarsActor extends Logging {
   // Package members
   //
   private[celebrity] val singleton = actorOf(AppConfig.instance[UpdateCatalogStarsActor])
-  private[celebrity] val updatePeriodSeconds = 30
+  private[celebrity] val updatePeriodSeconds = DateTimeConstants.MILLIS_PER_MINUTE
   private[celebrity] val resultsCacheKey = "catalog-stars"
   private[celebrity] case class UpdateCatalogStars(recipientActor: ActorRef)
 
@@ -80,12 +81,14 @@ private[mvc] object UpdateCatalogStarsActor extends Logging {
   // Private members
   //
   private def scheduleJob() = {
+    val random = new Random()
+    val delayJitter = random.nextInt() % 10 // this should make the update schedule a little more random, and if we are unlucky that all hosts update at once, they won't the next time.
     log("Scheduling landing page celebrity update for every " + updatePeriodSeconds + "s")
     akka.actor.Scheduler.schedule(
       receiver = this.singleton,
       message = UpdateCatalogStars(CatalogStarsActor.singleton),
       initialDelay = 10, // Delay first invocation for a bit to give the Redis plugin time to bootstrap
-      delay = updatePeriodSeconds,
+      delay = updatePeriodSeconds + delayJitter,
       timeUnit = TimeUnit.SECONDS
     )
   }
