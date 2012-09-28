@@ -132,6 +132,13 @@ class Utils @Inject()(@PlayConfig() playConfig: util.Properties) {
   }
 
   /**
+   * @return true if application.baseUrl is "https://www.egraphs.com/", and false otherwise
+   */
+  def isLiveConsumerSite: Boolean = {
+    requiredConfigurationProperty("application.baseUrl") == "https://www.egraphs.com/"
+  }
+
+  /**
    * Turns a set of (String -> Option) tuples into a map containing only the fields
    * whose Options contained some value. For example,
    * {{{

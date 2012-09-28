@@ -111,9 +111,27 @@
 
     	</div> <!-- end #main -->
 
-      <!-- For affiliate marketing. -->
-      <img src="https://shareasale.com/sale.cfm?amount=@model.totalPrice.getAmount&tracking=@model.orderNumber&transtype=sale&merchantID=43754" width="1" height="1">
-    
+      @{/** The following affiliate marketing code should only render if this is a real sale. */}
+      @if(model.withAffiliateMarketing) {
+        <!-- ShareASale. See https://www.shareasale.com/step3.pdf -->
+        <img src="https://shareasale.com/sale.cfm?amount=@model.totalPrice.getAmount&tracking=@model.orderNumber&transtype=sale&merchantID=43754" width="1" height="1">
+        <!-- Google Code for Sale Conversion Page. See https://support.google.com/adwords/bin/answer.py?hl=en&answer=1722054 -->
+        <script type="text/javascript">
+          /* <![CDATA[ */
+          var google_conversion_id = 1003544199;
+          var google_conversion_language = "en";
+          var google_conversion_format = "3";
+          var google_conversion_color = "ffffff";
+          var google_conversion_label = "XeHACNmU7QMQh73D3gM";
+          var google_conversion_value = 0;
+          /* ]]> */
+        </script>
+        <script type="text/javascript" src="https://www.googleadservices.com/pagead/conversion.js">
+        </script>
+        <noscript>
+          <img src="https://www.googleadservices.com/pagead/conversion/1003544199/?value=0&amp;label=XeHACNmU7QMQh73D3gM&amp;guid=ON&amp;script=0" height="1" width="1" style="border-style:none;" alt=""/>
+        </noscript>
+      }
     </div> <!-- end #content -->
     
 		<div class="modal egraphs hide" id="modal-content">

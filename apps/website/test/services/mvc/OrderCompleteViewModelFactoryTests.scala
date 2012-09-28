@@ -62,6 +62,7 @@ class OrderCompleteViewModelFactoryTests extends EgraphsUnitTest {
     viewModel.totalPrice should be (order.amountPaid)
     viewModel.faqHowLongLink should include("/faq#how-long")
     viewModel.hasPrintOrder should be(true)
+    viewModel.withAffiliateMarketing should be(false)
   }
 
 }

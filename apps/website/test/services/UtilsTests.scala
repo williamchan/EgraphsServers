@@ -74,6 +74,11 @@ class UtilsTests extends EgraphsUnitTest
     evaluating { Utils.requiredConfigurationProperty("herp") } should produce[IllegalArgumentException]
   }
 
+  "isLiveConsumerSite" should "return true when application.baseUrl is 'https://www.egraphs.com/', and false otherwise" in {
+    Utils.isLiveConsumerSite should be(false)
+    new Utils(Utils.properties("application.baseUrl" -> "https://www.egraphs.com/")).isLiveConsumerSite should be(true)
+  }
+
   "saveToFile" should "save bytes parameter to a file" in {
     val file = TempFile.named("helloworld.txt")
     try {
