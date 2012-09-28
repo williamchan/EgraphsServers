@@ -47,7 +47,7 @@ class CelebrityViewConversions(celeb: Celebrity) {
    * The celebrity as a CatalogStar. If some necessary data for the CatalogStar
    * were not available (e.g. publicName, storeFrontUrl) then it returns None.
    */
-  def asCatalogStar: CatalogStar = {
+  def asCatalogStar(productIdsAndInventoryRemainings: Set[(Long,Int)]): CatalogStar = {
     val mastheadImageUrl = celeb
       .landingPageImage
       .withImageType(ImageAsset.Jpeg)
@@ -55,8 +55,7 @@ class CelebrityViewConversions(celeb: Celebrity) {
       .getSaved(AccessPolicy.Public)
       .url
 
-    val activeProductsAndInventory = celeb.getActiveProductsWithInventoryRemaining()
-    val purchaseableProducts = activeProductsAndInventory.filter {
+    val purchaseableProductsIds = productIdsAndInventoryRemainings.filter {
       productAndCount =>
         productAndCount._2 > 0
     }
@@ -71,7 +70,7 @@ class CelebrityViewConversions(celeb: Celebrity) {
       secondaryText = Option(celeb.roleDescription),
       imageUrl = mastheadImageUrl,
       storefrontUrl = choosePhotoUrl,
-      hasInventoryRemaining = !purchaseableProducts.isEmpty,
+      hasInventoryRemaining = !purchaseableProductsIds.isEmpty,
       isFeatured = celeb.isFeatured
     )
   }

@@ -2,7 +2,7 @@ package services.mvc.celebrity
 
 import utils.{ClearsCacheAndBlobsAndValidationBefore, TestHelpers, EgraphsUnitTest}
 import services.db.DBSession
-import models.{Celebrity, CelebrityStore}
+import models.{Celebrity, ProductStore}
 import services.cache.{NamespacedCache, CacheFactory}
 import TestHelpers.withActorUnderTest
 import com.google.inject.Inject
@@ -30,20 +30,18 @@ class UpdateCatalogStarsActorTests extends EgraphsUnitTest with ClearsCacheAndBl
   "UpdateCatalogStarsActor" should "grab from the database if it finds nothing in the cache" in {
     // Set up so that cache produces no CatalogStars and the database produces a mock celebrity
     // that converts into our mock CatalogStar.
-    val deps = newDeps.withSpiedCache.withMockCelebrityStore.copy(viewConverting = mock[CelebrityViewConverting])
+    val deps = newDeps.withSpiedCache.withMockProductStore
 
     val mockCelebs = List(mock[Celebrity])
     val mockViewConverter = mock[CelebrityViewConversions]
-    val mockCatalogStars = IndexedSeq(mock[CatalogStar])
+    val mockCatalogStars = Set(mock[CatalogStar])
 
     deps.cache.get(anyString)(any[Manifest[IndexedSeq[CatalogStar]]]) returns None
-    deps.celebrityStore.getPublishedCelebrities returns mockCelebs
-    deps.viewConverting.celebrityAsCelebrityViewConversions(mockCelebs(0)) returns mockViewConverter
 
-    mockViewConverter.asCatalogStar returns mockCatalogStars(0)
+    deps.productStore.getCatalogStars() returns mockCatalogStars
 
     // Perform the test and check expectations
-    updateResultsForActorWithDepsShouldBe(Some(mockCatalogStars), deps)
+    updateResultsForActorWithDepsShouldBe(Some(mockCatalogStars.toIndexedSeq), deps)
     there was one(deps.cache).set(
       UpdateCatalogStarsActor.resultsCacheKey,
       mockCatalogStars,
@@ -74,7 +72,7 @@ class UpdateCatalogStarsActorTests extends EgraphsUnitTest with ClearsCacheAndBl
     (operation: (ActorRef, ActorRef) => ResultT)
   : ResultT = {
     lazy val actorInstance = new UpdateCatalogStarsActor(
-      deps.db, deps.cacheFactory, deps.celebrityStore, deps.viewConverting
+      deps.db, deps.cacheFactory, deps.productStore
     )
 
     withActorUnderTest(actorInstance) {
@@ -93,9 +91,8 @@ object UpdateCatalogStarsActorTests extends Mockito {
   private[UpdateCatalogStarsActorTests] case class Dependencies @Inject()(
     db: DBSession,
     cacheFactory: CacheFactory,
-    celebrityStore: CelebrityStore,
-    viewConverting: CelebrityViewConverting
-    ) {
+    productStore: ProductStore
+  ) {
     def withSpiedCache: Dependencies = {
       val mockCache = spy(cacheFactory.applicationCache)
       val mockCacheFactory = mock[CacheFactory]
@@ -104,8 +101,8 @@ object UpdateCatalogStarsActorTests extends Mockito {
       this.copy(cacheFactory = mockCacheFactory)
     }
 
-    def withMockCelebrityStore: Dependencies = {
-      this.copy(celebrityStore = mock[CelebrityStore])
+    def withMockProductStore: Dependencies = {
+      this.copy(productStore = mock[ProductStore])
     }
 
     def cache: NamespacedCache = {

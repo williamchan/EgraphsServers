@@ -2,6 +2,7 @@ package models
 
 import enums.PublishedStatus.EnumVal
 import enums.{PublishedStatus, HasPublishedStatus}
+import frontend.landing.CatalogStar
 import java.sql.Timestamp
 import services.db.{FilterOneTable, Schema, SavesWithLongKey, KeyedCaseClass}
 import play.templates.JavaExtensions
@@ -14,8 +15,10 @@ import play.Play
 import services.blobs.AccessPolicy
 import com.google.inject.{Provider, Inject}
 import services._
+import mvc.celebrity.CelebrityViewConversions
 import org.squeryl.Query
 import org.squeryl.dsl.{GroupWithMeasures, ManyToMany}
+import java.util.Date
 
 case class ProductServices @Inject() (
   store: ProductStore,
@@ -411,30 +414,61 @@ class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: Invent
    * This implementation is hopefully more performant than getting all active Products and then calculating the
    * quantity available for each Product, but this assumption has yet to be tested.
    *
-   * Note: The inventory remaining is a integer => it could be negative.
-   *
    * @return a sequence of purchase-able Products along with the available quantity of each Product.
    */
-  def getActiveProductIdsWithInventoryRemaining(): Seq[(Long, Int)] = {
+  def getCatalogStars(): Set[CatalogStar] = {
     import schema.{celebrities, inventoryBatches, orders}
 
-    val query: Query[GroupWithMeasures[Product3[Long,Long,Long],Int]] = join(celebrities, inventoryBatches, schema.products, orders.leftOuter)((celebrity, inventoryBatch, product, order) =>
+    // need to grab the minimal amount of a celebrity to construct one that can be used only within this fuction,
+    // since it is an incomplete view to get other values of use off of it.
+    val query: Query[GroupWithMeasures[Product7[Long,String,Option[String],String,Boolean,Long,Long],Int]] = join(celebrities, inventoryBatches, schema.products, orders.leftOuter)((celebrity, inventoryBatch, product, order) =>
       where(
         celebrity._publishedStatus === PublishedStatus.Published.name and
           product._publishedStatus === PublishedStatus.Published.name and
-          (Time.now between(new Timestamp(inventoryBatch.startDate.getTime), new Timestamp(inventoryBatch.endDate.getTime)))
+          ((new Date) between(inventoryBatch.startDate, inventoryBatch.endDate))
       )
-        groupBy(celebrity.id, inventoryBatch.id, product.id)
-        compute(nvl(sum(order.map(o=>1)),0))
-        on(
+      groupBy(
+        celebrity.id,
+        celebrity.publicName,
+        celebrity._landingPageImageKey,
+        celebrity.roleDescription,
+        celebrity.isFeatured,
+        inventoryBatch.id,
+        product.id
+      )
+      compute(nvl(sum(order.map(o=>1)),0))
+      on(
         celebrity.id === inventoryBatch.celebrityId,
         celebrity.id === product.celebrityId,
         inventoryBatch.id === order.map(_.inventoryBatchId)
-        )
+      )
     )
 
-    val productWithQuantitiesRemaining = for (row <- query) yield (row.key._3, row.measures)
-    productWithQuantitiesRemaining.toSeq
+    // transform that raw data into something we can use
+    val celebritiesAndProductIdsAndRemainingsInventories = for (row <- query) yield {
+      (
+        Celebrity(
+          id = row.key._1,
+          publicName = row.key._2,
+          _landingPageImageKey = row.key._3,
+          roleDescription = row.key._4,
+          isFeatured = row.key._5
+        ),
+        (row.key._7,row.measures.max(0)) //productId, quantity
+        // make sure we don't have negative quantities, since those will be returned
+      )
+    }
+
+    val tempMap = celebritiesAndProductIdsAndRemainingsInventories.groupBy(tuple => tuple._1)
+    val celebritiesToProducts: Map[Celebrity, Set[(Long,Int)]] = tempMap.mapValues(
+      entry => entry.map(tuple => tuple._2).toSet
+    )
+
+    val catalogStars = for((celebrity, productIdsAndRemainingsInventories) <- celebritiesToProducts) yield {
+      (new CelebrityViewConversions(celebrity)).asCatalogStar(productIdsAndRemainingsInventories)
+    }
+
+    catalogStars.toSet
   }
 
   //
