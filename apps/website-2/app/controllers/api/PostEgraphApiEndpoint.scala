@@ -1,23 +1,44 @@
 package controllers.api
 
-import play.api.mvc.Controller
-import sjson.json.Serializer
-import play.data.validation._
-import services.http.SafePlayParams.Conversions._
-import play.libs.Codec
-import services.http.{ControllerMethod, HttpCodes, OrderRequestFilters, CelebrityAccountRequestFilters}
-import services.db.{TransactionSerializable, DBSession}
+import org.postgresql.util.Base64
+
 import actors.ProcessEgraphMessage
 import akka.actor.ActorRef
+import akka.actor.actorRef2Scala
+import play.api.data.Form
+import play.api.data.Forms.boolean
+import play.api.data.Forms.mapping
+import play.api.data.Forms.nonEmptyText
+import play.api.data.Forms.of
+import play.api.data.Forms.optional
+import play.api.data.Forms.text
+import play.api.libs.json.Json.toJson
+import play.api.mvc.Action
+import play.api.mvc.Controller
 import services.Time
+import services.db.DBSession
+import services.db.TransactionSerializable
+import services.http.ControllerMethod
+import services.http.HttpCodes
+import services.http.filters.HttpFilters
+import services.http.forms.Play2FormFormatters.doubleFormat
 
 private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
   protected def egraphActor: ActorRef
   protected def dbSession: DBSession
   protected def controllerMethod: ControllerMethod
-  protected def celebFilters: CelebrityAccountRequestFilters
-  protected def orderFilters: OrderRequestFilters
-
+  protected def httpFilters: HttpFilters
+  
+  case class EgraphSubmission(
+    signature: String, 
+    message: Option[String], 
+    audio: String, 
+    latitude: Option[Double], 
+    longitude: Option[Double],
+    signedAt: String,
+    skipBiometrics: Option[Boolean]
+  )  
+  
   /**
    * Posts a signed egraph from a celebrity.
    *
@@ -25,57 +46,66 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
    * about the params.
    */
   //TODO: PLAY20: take a look at PostCelebrityOrderApiEndpoint.postCelebrityOrder for some clues on how to do some of this, but there is more than that.
-  def postEgraph(
-    @Required signature: String,
-    @Required audio: String,
-    latitude: Option[Double] = None,
-    longitude: Option[Double] = None,
-    signedAt: String = "",
-    skipBiometrics: Boolean = false /*todo(wchan): remove skipBiometrics parameter*/) =
-  {
+  def postEgraph() = {
     controllerMethod(openDatabase=false) {
-      // Get result of DB transaction that processes the request
-      val transactionResult = dbSession.connected(TransactionSerializable) {
-
-        celebFilters.requireCelebrityAccount {
-          (account, celebrity) =>
-            orderFilters.requireOrderIdOfCelebrity(celebrity.id) {
-              order =>
-
+      Action { implicit request =>        
+        val postForm = Form(
+          mapping(
+            "signature" -> nonEmptyText,
+            "message" -> optional(text),
+            "audio" -> nonEmptyText,
+            "latitude" -> optional(of[Double]),
+            "longitude" -> optional(of[Double]),            
+            "signedAt" -> text,
+            "skipBiometrics" -> optional(boolean)
+          )(EgraphSubmission.apply)(EgraphSubmission.unapply)
+        )
+        
+        postForm.bindFromRequest.fold(
+          formWithErrors => {
+            play.Logger.error("Dismissing the invalid postEgraph request: ")
+            play.Logger.info("\t" + formWithErrors.errors.mkString(", "))
+            new Status(HttpCodes.MalformedEgraph)
+          },
+          
+          validForm => {            
+            val failureOrSuccessResult = dbSession.connected(TransactionSerializable) {        
+              for (
+                account <- httpFilters.requireAuthenticatedAccount.asEither(request).right;            
+                celeb <- httpFilters.requireCelebrityId.asEitherInAccount(account).right;
+                order <- httpFilters.requireOrderIdOfCelebrity.asEither(celeb.id)(request).right
+              ) yield {
                 // validate signature for issue #104
-
-                if (validationErrors.isEmpty) {
-                  val message = request.params.getOption("message")
-
-                  val savedEgraph = order.newEgraph
-                    .copy(latitude = latitude, longitude = longitude, signedAt = Time.timestamp(signedAt, Time.ipadDateFormat))
-                    .withAssets(signature, message, Codec.decodeBASE64(audio))
-                    .save()
-                  val actorMessage = ProcessEgraphMessage(id = savedEgraph.id)
-                  val responseJson = Serializer.SJSON.toJSON(Map("id" -> savedEgraph.id))
-                  (actorMessage, responseJson)
-
-                }
-                else {
-                  play.Logger.info("Dismissing the invalid postEgraph request")
-                  if (Option(signature).isEmpty) play.Logger.info("Signature missing")
-                  if (Option(audio).isEmpty) play.Logger.info("Audio missing")
-                  play.Logger.info("ValidationErrors:" + validationErrors.map(pair => "" + pair._1 + " " + pair._2.message).mkString(". "))
-                  Error(HttpCodes.MalformedEgraph, "")
-                }
+                val message = validForm.message
+  
+                val savedEgraph = order.newEgraph
+                  .copy(
+                    latitude = validForm.latitude, 
+                    longitude = validForm.longitude, 
+                    signedAt = Time.timestamp(validForm.signedAt, Time.ipadDateFormat)
+                  )
+                  .withAssets(validForm.signature, validForm.message, Base64.decode(validForm.audio))
+                  .save()
+                val actorMessage = ProcessEgraphMessage(id = savedEgraph.id)
+                val successJsonResponse = Ok(toJson(Map("id" -> savedEgraph.id)))
+                
+                (actorMessage, successJsonResponse)
+              }
             }
-        }
-      }
-
-      // Route the result to an actor that performs further processing
-      transactionResult match {
-        case (message: ProcessEgraphMessage, json: String) =>
-          egraphActor ! message
-
-          json
-
-        case otherResult =>
-          otherResult
+      
+            // Route the result to an actor that performs further processing
+            failureOrSuccessResult.fold(
+              failureResult => failureResult,
+              
+              actorMessageAndSuccessResult => {
+                val (actorMessage, successResult) = actorMessageAndSuccessResult
+                egraphActor ! actorMessage
+                
+                successResult
+              }
+            )
+          }
+        )
       }
     }
   }

@@ -47,18 +47,24 @@ class RequireProductUrlSlug @Inject() (
   : Action[A] = 
   {
     Action(parser) { request =>
-      val maybeResult = for (
-        product <- celeb.products(productFilters.byUrlSlug(productUrlSlug)).headOption.toRight(
-                     left=productNotFoundResult(celeb.publicName, productUrlSlug)
-                   ).right;
-        viewableProduct <- notFoundOrViewableProduct(product, request.session).right
-      ) yield {
-        actionFactory(viewableProduct).apply(request)
-      }
-      
-      // TODO: PLAY20 migration actually redirect this to the reverse-route of GetLoginCelebEndpoint
-      //   instead of returning  a forbidden.
+      val maybeAction = this.asOperationResult(celeb, productUrlSlug, request.session)(actionFactory)
+      val maybeResult = maybeAction.right.map(action => action(request))
+
       maybeResult.fold(notFound => notFound, successfulResult => successfulResult)      
+    }
+  }
+  
+  def asOperationResult[A](celeb: Celebrity, productUrlSlug: String, session: Session)
+  (operation: Product => A)
+  : Either[Result, A] = 
+  {
+    for (
+      product <- celeb.products(productFilters.byUrlSlug(productUrlSlug)).headOption.toRight(
+                   left=productNotFoundResult(celeb.publicName, productUrlSlug)
+                 ).right;
+      viewableProduct <- notFoundOrViewableProduct(product, session).right
+    ) yield {
+      operation(viewableProduct)
     }
   }
   

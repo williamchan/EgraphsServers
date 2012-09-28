@@ -1,7 +1,6 @@
 package services.http.filters
 
 import com.google.inject.Inject
-
 import models.OrderQueryFilters
 import models.OrderStore
 import play.api.data.Forms.number
@@ -12,6 +11,8 @@ import play.api.mvc.Results.NotFound
 import play.api.mvc.BodyParser
 import play.api.mvc.Action
 import play.api.mvc.Result
+import models.Order
+import play.api.mvc.Request
 
 class RequireOrderIdOfCelebrity @Inject() (orderStore: OrderStore, orderQueryFilters: OrderQueryFilters) {
 
@@ -30,19 +31,24 @@ class RequireOrderIdOfCelebrity @Inject() (orderStore: OrderStore, orderQueryFil
   : Action[A] = 
   {
     Action(parser) { implicit request =>
-      Form(single("orderId" -> number)).bindFromRequest.fold(
-        errors => NotFound("Order ID was required but not provided"),
-        orderId => {
-          orderStore.findByCelebrity(celebrityId, orderQueryFilters.orderId(orderId)).headOption match {
-            case None =>
-              NotFound("The celebrity has no such order")
-  
-            case Some(order) =>
-              actionFactory(order).apply(request)
-          }
-        }
-      )
+      this.asEither(celebrityId).fold(notFound => notFound, order => actionFactory(order).apply(request))     
     }
+  }
+  
+  def asEither[A](celebrityId: Long)(implicit request: Request[A]): Either[Result, Order] = {
+    Form(single("orderId" -> number)).bindFromRequest.fold(
+      errors => Left(NotFound("Order ID was required but not provided")),
+      
+      orderId => {
+        orderStore.findByCelebrity(celebrityId, orderQueryFilters.orderId(orderId)).headOption match {
+          case None =>
+            Left(NotFound("The celebrity has no such order"))
+
+          case Some(order) =>
+            Right(order)
+        }
+      }
+    )    
   }
 
 }

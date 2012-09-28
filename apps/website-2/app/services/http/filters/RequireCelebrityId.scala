@@ -23,9 +23,10 @@ class RequireCelebrityId @Inject() (celebStore: CelebrityStore) {
     : Action[A] = 
   {
     Action(parser) { request =>
-      val maybeAction = celebStore.findById(celebId).map(celeb => actionFactory(celeb).apply(request))
+      val notFoundOrAction = this.asEither(celebId).right.map(celeb => actionFactory(celeb))
+      val notFoundOrResult = notFoundOrAction.right.map(action => action(request))
       
-      maybeAction.getOrElse(noCelebIdResult)
+      notFoundOrResult.fold(notFound => notFound, result => result)
     }
   }
   
@@ -56,8 +57,20 @@ class RequireCelebrityId @Inject() (celebStore: CelebrityStore) {
       maybeResult.getOrElse(noCelebIdResult)
     }
   }
-   
-
+  
+  def asEither(celebId: Long): Either[Result, Celebrity] = {
+    celebStore.findById(celebId).toRight(left=noCelebIdResult)
+  }
+  
+  def asEitherInAccount(account: Account): Either[Result, Celebrity] = {
+    for (
+      celebId <- account.celebrityId.toRight(left=noCelebIdResult).right;
+      celeb <- this.asEither(celebId).right
+    ) yield {
+      celeb
+    }
+  }
+  
   //
   // Private members
   //

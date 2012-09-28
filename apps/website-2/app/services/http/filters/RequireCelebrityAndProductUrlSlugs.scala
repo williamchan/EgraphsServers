@@ -28,7 +28,7 @@ class RequireCelebrityAndProductUrlSlugs @Inject() (
   requireProductUrlSlug: RequireProductUrlSlug
 ) {
   
-   def apply[A](celebrityUrlSlug: String, productUrlSlug: String, parser: BodyParser[A] = parse.anyContent)
+  def apply[A](celebrityUrlSlug: String, productUrlSlug: String, parser: BodyParser[A] = parse.anyContent)
   (actionFactory: (Celebrity, Product) => Action[A])
   : Action[A] = 
   {
@@ -40,36 +40,16 @@ class RequireCelebrityAndProductUrlSlugs @Inject() (
       }
     }
   }
-  
-  //
-  // Private members
-  //
-  private def productNotFoundResult(celebName: String, productUrlSlug: String): Result = {
-    NotFound(celebName + " doesn't have any product with url " + productUrlSlug) 
-  }
-  
-  private def notFoundOrViewableProduct(product: Product, session: Session)
-  : Either[Result, Product] = 
-  {
-    val productIsPublished = product.publishedStatus == PublishedStatus.Published
-    val viewerIsAdmin = isAdmin(session)
-    
-    if (productIsPublished || viewerIsAdmin) { 
-      Right(product)
-    } else {
-      Left(NotFound("No photo found with this url"))
-    }
-  }
    
-  private def isAdmin(session: Session): Boolean = {
-    val maybeIsAdmin = for (
-      adminId <- session.getLongOption(WebsiteControllers.adminIdKey);
-      admin <- adminStore.findById(adminId)
+  def asOperationResult[A](celebrityUrlSlug: String, productUrlSlug: String, session: Session)
+  (operation: (Celebrity, Product) => A)
+  : Either[Result, A] =
+  {
+    for (
+      celeb <- requireCelebrityUrlSlug.asOperationResult(celebrityUrlSlug, session)(celeb => celeb).right;
+      product <- requireProductUrlSlug.asOperationResult(celeb, productUrlSlug, session)(product => product).right
     ) yield {
-      true
+      operation(celeb, product)
     }
-    
-    maybeIsAdmin.getOrElse(false)
   }
-  
 }

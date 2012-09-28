@@ -12,6 +12,7 @@ import play.api.mvc.Results.Forbidden
 import play.api.mvc.BodyParser
 import play.api.mvc.BodyParsers.parse
 import services.http.BasicAuth
+import play.api.mvc.RequestHeader
 
 // TODO: PLAY20 migration. Test and comment this summbitch.
 class RequireAuthenticatedAccount @Inject() (accountStore: AccountStore) {  
@@ -30,14 +31,23 @@ class RequireAuthenticatedAccount @Inject() (accountStore: AccountStore) {
   : Action[A] = 
   {
     Action(parser) { request =>
-      val maybeResult = for (
-        credentials <- BasicAuth.Credentials(request);
-        account <- accountStore.authenticate(credentials.username, credentials.password).right.toOption
-      ) yield {
+      val forbiddenOrAccount = this.asEither(request)
+      val forbiddenOrResult = forbiddenOrAccount.right.map { account => 
         actionFactory(account).apply(request)
       }
       
-      maybeResult.getOrElse(Forbidden("Email/password information was incorrect."))
+      forbiddenOrResult.fold(forbidden => forbidden, result => result)      
     }
+  }
+  
+  def asEither(request: RequestHeader): Either[Result, Account] = {
+    val maybeResult = for (
+      credentials <- BasicAuth.Credentials(request);
+      account <- accountStore.authenticate(credentials.username, credentials.password).right.toOption
+    ) yield {
+      account
+    }
+    
+    maybeResult.toRight(left=Forbidden("Email/password information was incorrect."))
   }
 }

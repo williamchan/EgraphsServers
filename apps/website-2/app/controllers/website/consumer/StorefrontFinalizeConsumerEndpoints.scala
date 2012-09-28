@@ -146,48 +146,49 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
    */
   def postStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug: String) = postController(openDatabase=false) {
     Action { request =>
-      // Get all the sweet, sweet purchase form data in a database transaction
-      val redirectOrPurchaseData = dbSession.connected(TransactionSerializable) {
-        httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
-          val forms = purchaseFormFactory.formsForStorefront(celeb.id)
-          for (formData <- forms.allPurchaseFormsOrRedirect(celeb, product).right) yield {
-            (celeb, product, formData, forms)
-          }
+      // Get all the sweet, sweet purchase form data in a database transaction. We end up with a weird 
+      // Either[Result, Either[Result, (The purchase data)], but we'll unpack them later. If you're feeling
+      // Brave try to make this into a for comprehension inside of dbSession.connected.
+      val redirectOrRedirectOrPurchaseData = dbSession.connected(TransactionSerializable) {
+        httpFilters.requireCelebrityAndProductUrlSlugs.asOperationResult(celebrityUrlSlug, productUrlSlug, request.session) { 
+          (celeb, product) =>
+            val forms = purchaseFormFactory.formsForStorefront(celeb.id)
+            for (formData <- forms.allPurchaseFormsOrRedirect(celeb, product).right) yield {
+              (celeb, product, formData, forms)
+            }
         }
       }
       
-      // TODO: fix the type erasure that happens in our celebFilters so that a match like this
-      // isnt necessary.
-      redirectOrPurchaseData match {
-        case Right((celeb: Celebrity, product:models.Product, shippingForms: AllPurchaseForms, forms: PurchaseForms)) =>
-          val AllPurchaseForms(productId, inventoryBatch, personalization, billing, shipping) = shippingForms
-          EgraphPurchaseHandler(
-            recipientName=personalization.recipientName,
-            recipientEmail=personalization.recipientEmail.getOrElse(billing.email),
-            buyerName=billing.name,
-            buyerEmail=billing.email,
-            stripeTokenId=billing.paymentToken,
-            desiredText=personalization.writtenMessageText,
-            personalNote=personalization.noteToCelebriity,
-            celebrity=celeb,
-            product=product,
-            totalAmountPaid=forms.total(basePrice = product.price),
-            billingPostalCode=billing.postalCode,
-            flash=request.flash,
-            printingOption=forms.highQualityPrint.getOrElse(PrintingOption.DoNotPrint),
-            shippingForm=shipping,
-            writtenMessageRequest=personalization.writtenMessageRequest
-          ).execute()
+      val failureOrSuccessRedirects = for (
+        redirectOrPurchaseData <- redirectOrRedirectOrPurchaseData.right;
+        purchaseData <- redirectOrPurchaseData.right
+      ) yield {
+        val (celeb, product, shippingForms, forms) = purchaseData 
+        val AllPurchaseForms(productId, inventoryBatch, personalization, billing, shipping) = shippingForms
 
-        case Left(result: Result) =>
-          result
-
-        case result: Result =>
-          result
-
-        case whoops =>
-          throw new RuntimeException("This was not expected as a response to a purchase request: " + whoops)
+        EgraphPurchaseHandler(
+          recipientName=personalization.recipientName,
+          recipientEmail=personalization.recipientEmail.getOrElse(billing.email),
+          buyerName=billing.name,
+          buyerEmail=billing.email,
+          stripeTokenId=billing.paymentToken,
+          desiredText=personalization.writtenMessageText,
+          personalNote=personalization.noteToCelebriity,
+          celebrity=celeb,
+          product=product,
+          totalAmountPaid=forms.total(basePrice = product.price),
+          billingPostalCode=billing.postalCode,
+          flash=request.flash,
+          printingOption=forms.highQualityPrint.getOrElse(PrintingOption.DoNotPrint),
+          shippingForm=shipping,
+          writtenMessageRequest=personalization.writtenMessageRequest
+        ).execute()        
       }
+      
+      failureOrSuccessRedirects.fold(
+        failureRedirect => failureRedirect, 
+        successRedirect => successRedirect
+      )
     }  
   }
 }

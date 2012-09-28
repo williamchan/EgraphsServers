@@ -9,6 +9,7 @@ import services.db.DBSession
 import services.http.ControllerMethod
 import services.http.filters.HttpFilters
 import sjson.json.Serializer
+import play.api.mvc.Action
 
 private[controllers] trait PostCelebrityOrderApiEndpoint { this: Controller =>
   protected def dbSession: DBSession
@@ -28,9 +29,11 @@ private[controllers] trait PostCelebrityOrderApiEndpoint { this: Controller =>
     controllerMethod() {
       httpFilters.requireAuthenticatedAccount() { account =>
         httpFilters.requireCelebrityId.inAccount(account) { celebrity =>          
-          httpFilters.requireOrderIdOfCelebrity(celebrity.id) { order =>            
-            postCelebrityOrderResult(reviewStatus, rejectionReason, order, celebrity)
-          }          
+          httpFilters.requireOrderIdOfCelebrity(celebrity.id) { order =>
+            Action {
+              postCelebrityOrderResult(reviewStatus, rejectionReason, order, celebrity)
+            }
+          }
         }
       }
     }

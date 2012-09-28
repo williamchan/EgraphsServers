@@ -3,13 +3,14 @@ package services.http.forms.purchase
 import services.http.{ServerSessionFactory, ServerSession}
 import com.google.inject.Inject
 import play.api.mvc.Results.Redirect
+import play.api.mvc.Result
 import models.{PrintOrder, InventoryBatch, Celebrity, Product}
-import controllers.WebsiteControllers.{getStorefrontPersonalize, getStorefrontReview, reverse, getStorefrontChoosePhotoTiled, getStorefrontCheckout}
+import controllers.routes.WebsiteControllers.{getStorefrontPersonalize, getStorefrontReview, getStorefrontChoosePhotoTiled, getStorefrontCheckout}
 import org.joda.money.{CurrencyUnit, Money}
 import models.enums.{WrittenMessageRequest, PrintingOption}
 import services.http.forms.{Form, ReadsForm}
-import play.mvc.Scope.Flash
 import services.http.forms.purchase.PurchaseForms.AllPurchaseForms
+import play.api.mvc.Flash
 
 /**
  * Represents the cache-persisted forms in the purchase flow.
@@ -43,7 +44,7 @@ class PurchaseForms @Inject()(
    * @return either all the data on the right, or a Redirect to the page
    *   to get the data on the left.
    */
-  def allPurchaseFormsOrRedirect(celeb: Celebrity, product: Product) = {
+  def allPurchaseFormsOrRedirect(celeb: Celebrity, product: Product): Either[Result, AllPurchaseForms] = {
     val celebrityUrlSlug = celeb.urlSlug
     for (
       // Make sure the product ID in this URL matches the one in the form
@@ -229,7 +230,7 @@ class PurchaseForms @Inject()(
    * @param product the product to check for available inventory.
    */
   def nextInventoryBatchOrRedirect(celebrityUrlSlug: String, product: models.Product)
-  : Either[Redirect, InventoryBatch] =
+  : Either[Result, InventoryBatch] =
   {
     product.nextInventoryBatchToEnd.toRight(
       left=this.redirectToInsufficientInventoryPage(
@@ -248,12 +249,8 @@ class PurchaseForms @Inject()(
    * @param celebrityUrlSlug identifies the celebrity for the redirect
    * @param productUrlSlug identifies the product for the redirect
    */
-  def printingOptionOrRedirectToReviewForm(celebrityUrlSlug: String, productUrlSlug: String): Either[Redirect, PrintingOption] = {
-    highQualityPrint.toRight(left= {
-      val redirectAction = reverse(getStorefrontReview(celebrityUrlSlug, productUrlSlug)).url
-
-      new Redirect(redirectAction)
-    })
+  def printingOptionOrRedirectToReviewForm(celebrityUrlSlug: String, productUrlSlug: String): Either[Result, PrintingOption] = {
+    highQualityPrint.toRight(left=Redirect(getStorefrontReview(celebrityUrlSlug, productUrlSlug)))    
   }
 
   /**
@@ -264,7 +261,7 @@ class PurchaseForms @Inject()(
    * @param productUrlSlug identifies the product for the redirect
    */
   def validShippingFormOptionOrRedirectToCheckout(celebrityUrlSlug: String, productUrlSlug: String)
-  : Either[Redirect, Option[(CheckoutShippingForm, CheckoutShippingForm.Valid)]] = {
+  : Either[Result, Option[(CheckoutShippingForm, CheckoutShippingForm.Valid)]] = {
     for (
       printingOption <- this.printingOptionOrRedirectToReviewForm(celebrityUrlSlug, productUrlSlug).right;
       maybeShippingForms <- validShippingFormGivenPrintingOptionOrRedirect(
@@ -285,7 +282,7 @@ class PurchaseForms @Inject()(
    * @param productUrlSlug identifies the product for the redirect
    */
   def validCheckoutFormsOrRedirectToCheckout(celebrityUrlSlug: String, productUrlSlug: String)
-  : Either[Redirect, (CheckoutBillingForm.Valid, Option[CheckoutShippingForm.Valid])] = {
+  : Either[Result, (CheckoutBillingForm.Valid, Option[CheckoutShippingForm.Valid])] = {
     lazy val redirectToCheckout = this.redirectToCheckout(celebrityUrlSlug, productUrlSlug)
 
     for (
@@ -307,7 +304,7 @@ class PurchaseForms @Inject()(
    * @param celebrity the celebrity for the redirect
    * @param product the product for the redirect
    */
-  def matchProductIdOrRedirectToChoosePhoto(celebrity:Celebrity, product:Product): Either[Redirect, Long] = {
+  def matchProductIdOrRedirectToChoosePhoto(celebrity:Celebrity, product:Product): Either[Result, Long] = {
     lazy val thisChoosePhotoRedirect = choosePhotoRedirect(celebrity.urlSlug)
 
     // Redirect if either this form has no productId or the provided product Id didn't match
@@ -328,19 +325,14 @@ class PurchaseForms @Inject()(
    * @param productUrlSlug identifies the product for the redirect
    */
   def validPersonalizeFormOrRedirectToPersonalizeForm(celebrityUrlSlug: String, productUrlSlug: String)
-  : Either[Redirect, PersonalizeForm.Validated] = {
+  : Either[Result, PersonalizeForm.Validated] = {
     for (
       personalizeForm <- personalizeFormOrRedirectToPersonalizeForm(
         celebrityUrlSlug,
         productUrlSlug
       ).right;
       valid <-  personalizeForm.errorsOrValidatedForm.left.map { formError =>
-        val action = reverse(getStorefrontPersonalize(
-          celebrityUrlSlug,
-          productUrlSlug
-        ))
-
-        new Redirect(action.url)
+        Redirect(getStorefrontPersonalize(celebrityUrlSlug, productUrlSlug))
       }.right
     ) yield {
       valid
@@ -370,15 +362,15 @@ class PurchaseForms @Inject()(
     maybeFormFromFlash.orElse(reader.read(storefrontSession.asFormReadable))
   }
 
-  private def redirectToCheckout(celebrityUrlSlug: String, productUrlSlug: String): Redirect = {
-    new Redirect(reverse(getStorefrontCheckout(celebrityUrlSlug, productUrlSlug)).url)
+  private def redirectToCheckout(celebrityUrlSlug: String, productUrlSlug: String): Result = {
+    Redirect(getStorefrontCheckout(celebrityUrlSlug, productUrlSlug))
   }
 
   private def validShippingFormGivenPrintingOptionOrRedirect(
     printingOption: PrintingOption,
     celebrityUrlSlug: String,
     productUrlSlug: String
-    ): Either[Redirect, Option[(CheckoutShippingForm, CheckoutShippingForm.Valid)]] = {
+    ): Either[Result, Option[(CheckoutShippingForm, CheckoutShippingForm.Valid)]] = {
     val maybeShippingForm = shippingForm()
 
     printingOption match {
@@ -397,21 +389,20 @@ class PurchaseForms @Inject()(
     }
   }
 
-  private def redirectToInsufficientInventoryPage(celebrityUrlSlug: String, productUrlSlug: String) = {
+  private def redirectToInsufficientInventoryPage(celebrityUrlSlug: String, productUrlSlug: String): Result = {
     // TODO: Make this actually redirect to a page that shows insufficient inventory
-    new Redirect(reverse(getStorefrontChoosePhotoTiled(celebrityUrlSlug)).url)
+    Redirect(getStorefrontChoosePhotoTiled(celebrityUrlSlug))
   }
 
-  private def choosePhotoRedirect(celebrityUrlSlug: String): Redirect = {
-    new Redirect(reverse(getStorefrontChoosePhotoTiled(celebrityUrlSlug)).url)
+  private def choosePhotoRedirect(celebrityUrlSlug: String): Result = {
+    Redirect(getStorefrontChoosePhotoTiled(celebrityUrlSlug))
   }
 
   private def personalizeFormOrRedirectToPersonalizeForm(celebrityUrlSlug: String, productUrlSlug: String)
-  : Either[Redirect, PersonalizeForm] = {
+  : Either[Result, PersonalizeForm] = {
 
-    personalizeForm().toRight(left= {
-      val action = reverse(getStorefrontPersonalize(celebrityUrlSlug, productUrlSlug))
-      new Redirect(action.url)
+    personalizeForm().toRight(left= {      
+      Redirect(getStorefrontPersonalize(celebrityUrlSlug, productUrlSlug))
     })
   }
 

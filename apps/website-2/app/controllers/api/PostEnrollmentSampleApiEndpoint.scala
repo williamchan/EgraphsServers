@@ -1,76 +1,103 @@
 package controllers.api
 
-import models._
-import play.api.mvc.Controller
-import sjson.json.Serializer
 import actors.ProcessEnrollmentBatchMessage
 import akka.actor.ActorRef
-import services.db.{DBSession, TransactionSerializable}
-import services.http.{HttpCodes, ControllerMethod, CelebrityAccountRequestFilters}
-import services.http.filters.RequireAuthenticatedAccount
-import services.http.filters.RequireCelebrityId
-//import play.data.validation.Constraints.Required
+import models._
+import play.api.data.Form
+import play.api.data.Forms.boolean
+import play.api.data.Forms.mapping
+import play.api.data.Forms.nonEmptyText
+import play.api.data.Forms.of
+import play.api.data.Forms.optional
+import play.api.data.Forms.text
+import play.api.mvc.Controller
+import play.api.libs.json.Json
+import play.api.mvc.Result
+import services.db.DBSession
+import services.db.TransactionSerializable
+import services.http.ControllerMethod
+import services.http.filters.HttpFilters
+import play.api.mvc.Action
+import services.http.HttpCodes
 
 private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
+  import PostEnrollmentSampleApiEndpoint._
+  
   protected def enrollmentBatchActor: ActorRef
   protected def dbSession: DBSession
   protected def controllerMethod: ControllerMethod
+  protected def httpFilters: HttpFilters
   protected def enrollmentBatchServices: EnrollmentBatchServices
-  protected def requireAuthenticatedAccount: RequireAuthenticatedAccount
-  protected def requireCelebrityId: RequireCelebrityId
   protected def enrollmentBatchStore: EnrollmentBatchStore
 
   //TODO: PLAY20: take a look at PostCelebrityOrderApiEndpoint.postCelebrityOrder for some clues on how to do some of this, but there is more than that.
-  def postEnrollmentSample(@Required signature: String,
+  def postEnrollmentSample(/*@Required signature: String,
                            @Required audio: String,
-                           skipBiometrics: Boolean = false /*todo(wchan): remove skipBiometrics parameter*/) =
+                           skipBiometrics: Boolean = false /*todo(wchan): remove skipBiometrics parameter*/*/) =
 
     controllerMethod(openDatabase = false) {
-      // Get result of DB transaction that processes the request
-      val transactionResult = dbSession.connected(TransactionSerializable) {
-
-        celebFilters.requireCelebrityAccount {
-          (account, celebrity) =>
-
-            // validate signature for issue #104
-
-            if (validationErrors.isEmpty) {
-              val openEnrollmentBatch: Option[EnrollmentBatch] = enrollmentBatchStore.getOpenEnrollmentBatch(celebrity)
-
-              if (openEnrollmentBatch.isEmpty) {
-                val enrollmentBatch = EnrollmentBatch(celebrityId = celebrity.id, services = enrollmentBatchServices).save()
-                val addEnrollmentSampleResult = enrollmentBatch.addEnrollmentSample(signature, audio)
-                msgsFromAddEnrollmentSampleResult(addEnrollmentSampleResult)
-
-              } else if (!openEnrollmentBatch.get.isBatchComplete) {
-                val addEnrollmentSampleResult = openEnrollmentBatch.get.addEnrollmentSample(signature, audio)
-                msgsFromAddEnrollmentSampleResult(addEnrollmentSampleResult)
-
-              } else {
-                // TODO(wchan): Should we reject data if this situation ever arises?
-                Error("Open enrollment batch already exists and is awaiting enrollment attempt. No further enrollment samples required now.")
+      Action { implicit request =>
+        val postForm = Form(
+          mapping(
+            "signature" -> nonEmptyText,
+            "audio" -> nonEmptyText,
+            "skipBiometrics" -> optional(boolean)
+          )(EnrollmentSubmission.apply)(EnrollmentSubmission.unapply)
+        )
+        
+        postForm.bindFromRequest.fold(
+          formWithErrors => {
+            play.Logger.error("Dismissing the invalid postEnrollmentSample request")
+            play.Logger.info("\t" + formWithErrors.errors.mkString(", "))
+            new Status(HttpCodes.MalformedEgraph)
+          },
+          
+          submission => {
+            // Get result of DB transaction that processes the request
+            val signature = submission.signature
+            val audio = submission.audio
+            val forbiddenOrErrorOrSuccess = dbSession.connected(TransactionSerializable) {
+              for (
+                account <- httpFilters.requireAuthenticatedAccount.asEither(request).right;
+                celeb <- httpFilters.requireCelebrityId.asEitherInAccount(account).right
+              ) yield {
+                val openEnrollmentBatch = enrollmentBatchStore.getOpenEnrollmentBatch(celeb).getOrElse {
+                  EnrollmentBatch(celebrityId = celeb.id, services = enrollmentBatchServices).save()
+                }
+                
+                if (!openEnrollmentBatch.isBatchComplete) {
+                  val addEnrollmentSampleResult = openEnrollmentBatch.addEnrollmentSample(
+                    signature, 
+                    audio
+                  )
+                  Right(msgsFromAddEnrollmentSampleResult(addEnrollmentSampleResult))                  
+                } else {
+                  Left(InternalServerError("Open enrollment batch already exists and is awaiting enrollment attempt. No further enrollment samples required now."))                  
+                }
               }
-
-            } else {
-              play.Logger.info("Dismissing the invalid postEnrollmentSample request")
-              if (Option(signature).isEmpty) play.Logger.info("Signature missing")
-              if (Option(audio).isEmpty) play.Logger.info("Audio missing")
-              Error(HttpCodes.MalformedEgraph, "")
             }
-        }
-      }
-      transactionResult match {
-        case (message: Option[ProcessEnrollmentBatchMessage], json: String) =>
-          if (message.isDefined) enrollmentBatchActor ! message.get
-          json
+            
+            // Handle all the error cases, and in the success case shoot out a message to the actor
+            val results = for (
+              errorOrSuccess <- forbiddenOrErrorOrSuccess.right;
+              success <- errorOrSuccess.right
+            ) yield {
+              val (maybeActorMessage, successResult) = success
+              
+              maybeActorMessage.foreach(actorMessage => enrollmentBatchActor ! actorMessage)
+              
+              successResult
+            }
+            
+            results.fold(failure => failure, success => success)
+          }
+        )
 
-        case otherResult =>
-          otherResult
       }
     }
 
   private def msgsFromAddEnrollmentSampleResult(addEnrollmentSampleResult: (EnrollmentSample, Boolean, Int, Int)):
-  (Option[ProcessEnrollmentBatchMessage], String) = {
+  (Option[ProcessEnrollmentBatchMessage], Result) = {
 
     val isBatchComplete = addEnrollmentSampleResult._2
     val enrollmentBatchId = addEnrollmentSampleResult._1.enrollmentBatchId
@@ -81,15 +108,22 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
       None
     }
 
-    val json = Serializer.SJSON.toJSON(
-      Map("id" -> addEnrollmentSampleResult._1.id,
-        "batch_complete" -> isBatchComplete,
-        "numEnrollmentSamplesInBatch" -> addEnrollmentSampleResult._3,
-        "enrollmentBatchSize" -> addEnrollmentSampleResult._4,
-        "enrollmentBatchId" -> enrollmentBatchId
-      ))
-
-    (actorMessage, json)
+    // Do indirect hackery upon the Map because Play's json serializer can't serialize it
+    // whereas SJSON can.
+    val jsonMap = Map(
+      "id" -> addEnrollmentSampleResult._1.id,
+      "batch_complete" -> isBatchComplete,
+      "numEnrollmentSamplesInBatch" -> addEnrollmentSampleResult._3,
+      "enrollmentBatchSize" -> addEnrollmentSampleResult._4,
+      "enrollmentBatchId" -> enrollmentBatchId
+    )
+      
+    val jsonString = sjson.json.Serializer.SJSON.toJSON(jsonMap)
+    
+    (actorMessage, Ok(Json.parse(jsonString)))
   }
 }
 
+object PostEnrollmentSampleApiEndpoint {
+  case class EnrollmentSubmission(signature: String, audio: String, skipBiometrics: Option[Boolean])
+}
