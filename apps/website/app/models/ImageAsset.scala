@@ -134,7 +134,13 @@ class ImageAsset(
    * publicly available.
    */
   def url: String = {
-    services.blobs.getUrl(key)
+    try {
+      services.blobs.getUrl(key)
+    } catch {
+      case e: Exception =>
+        error("Exception thrown from ImageAsset.url on key " + key)
+        throw e
+    }
   }
 
   /**
