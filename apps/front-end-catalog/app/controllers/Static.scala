@@ -41,10 +41,6 @@ object Static extends Controller with DefaultHeaderAndFooterData {
     views.frontend.html.terms()
   }
 
-  def contact() = {
-    views.frontend.html.contact()
-  }
-
   def privacy() = {
     views.frontend.html.privacy()
   }
