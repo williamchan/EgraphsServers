@@ -126,12 +126,9 @@ class ProductTests extends EgraphsUnitTest
 
   "getCatalogStars" should "return only published celebrities" in {
     val publishedCelebrity1 = TestData.newSavedCelebrity()
-    val unpublishedCelebrity1 = TestData.newSavedCelebrity()
     val publishedCelebrity2 = TestData.newSavedCelebrity()
-    val unpublishedCelebrity2 = TestData.newSavedCelebrity()
-
-    unpublishedCelebrity1.withPublishedStatus(PublishedStatus.Unpublished).save()
-    unpublishedCelebrity2.withPublishedStatus(PublishedStatus.Unpublished).save()
+    val unpublishedCelebrity1 = TestData.newSavedCelebrity().withPublishedStatus(PublishedStatus.Unpublished).save()
+    val unpublishedCelebrity2 = TestData.newSavedCelebrity().withPublishedStatus(PublishedStatus.Unpublished).save()
 
     TestData.newSavedProduct(celebrity = Some(publishedCelebrity1))
     TestData.newSavedProduct(celebrity = Some(publishedCelebrity2))
@@ -150,13 +147,13 @@ class ProductTests extends EgraphsUnitTest
   "getCatalogStars" should "return only celebrities with published products" in {
     // create 4 different celebrities with products, 2 have unpublished products, all are published celebrities.
     val publishedProduct1 = TestData.newSavedProduct()
-    val unpublishedProduct1 = TestData.newSavedProduct().withPublishedStatus(PublishedStatus.Unpublished).save()
     val publishedProduct2 = TestData.newSavedProduct()
+    val unpublishedProduct1 = TestData.newSavedProduct().withPublishedStatus(PublishedStatus.Unpublished).save()
     val unpublishedProduct2 = TestData.newSavedProduct().withPublishedStatus(PublishedStatus.Unpublished).save()
 
     val catalogStars = store.getCatalogStars
 
-    val celebrityNamesInCatalogStars = catalogStars.filter(star => star.hasInventoryRemaining).map(star => star.name)
+    val celebrityNamesInCatalogStars = catalogStars.map(star => star.name)
     celebrityNamesInCatalogStars should contain (publishedProduct1.celebrity.publicName)
     celebrityNamesInCatalogStars should contain (publishedProduct2.celebrity.publicName)
     celebrityNamesInCatalogStars should not contain (unpublishedProduct1.celebrity.publicName)
@@ -167,7 +164,6 @@ class ProductTests extends EgraphsUnitTest
     // create 4 different celebrities with products, 2 have unpublished products, all are published celebrities.
     val availableProduct1 = TestData.newSavedProduct()
     val availableProduct2 = TestData.newSavedProduct()
-
     val unavailableProduct1 = TestData.newSavedProductWithoutInventoryBatch()
     val unavailableProduct2 = TestData.newSavedProductWithoutInventoryBatch()
 
@@ -180,7 +176,7 @@ class ProductTests extends EgraphsUnitTest
 
     val catalogStars = store.getCatalogStars
 
-    val celebrityNamesInCatalogStars = catalogStars.filter(star => star.hasInventoryRemaining).map(star => (star.name, star.hasInventoryRemaining))
+    val celebrityNamesInCatalogStars = catalogStars.map(star => (star.name, star.hasInventoryRemaining))
     celebrityNamesInCatalogStars should contain ((availableProduct1.celebrity.publicName, true))
     celebrityNamesInCatalogStars should contain ((availableProduct2.celebrity.publicName, true))
     celebrityNamesInCatalogStars should not contain ((unavailableProduct1.celebrity.publicName, false))
@@ -209,7 +205,7 @@ class ProductTests extends EgraphsUnitTest
 
     val catalogStars = store.getCatalogStars
 
-    val celebrityNamesInCatalogStars = catalogStars.filter(star => star.hasInventoryRemaining).map(star => (star.name, star.hasInventoryRemaining))
+    val celebrityNamesInCatalogStars = catalogStars.map(star => (star.name, star.hasInventoryRemaining))
     celebrityNamesInCatalogStars should contain ((availableProduct1.celebrity.publicName, true))
     celebrityNamesInCatalogStars should contain ((availableProduct2.celebrity.publicName, true))
     celebrityNamesInCatalogStars should not contain ((unavailableProduct1.celebrity.publicName, false))
