@@ -32,8 +32,8 @@ class RequireCelebrityId @Inject() (celebStore: CelebrityStore) {
   
   def inRequest[A](parser: BodyParser[A]=parse.anyContent)
     (actionFactory: Celebrity => Action[A])
-  : Action[_] = 
-  {    
+  : Action[A] =
+  {
     Action(parser) { implicit request =>
       Form(single("celebrityId" -> longNumber)).bindFromRequest.fold(
         errors => noCelebIdResult,

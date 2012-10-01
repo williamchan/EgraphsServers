@@ -23,12 +23,12 @@ private[controllers] trait PostCelebrityOrderApiEndpoint { this: Controller =>
    * about the params.
    */
   def postCelebrityOrder(
-    reviewStatus: Option[String] = None, 
-    rejectionReason: Option[String] = None) = 
+    reviewStatus: Option[String] = None,
+    rejectionReason: Option[String] = None) =
   {
     controllerMethod() {
       httpFilters.requireAuthenticatedAccount() { account =>
-        httpFilters.requireCelebrityId.inAccount(account) { celebrity =>          
+        httpFilters.requireCelebrityId.inAccount(account) { celebrity =>
           httpFilters.requireOrderIdOfCelebrity(celebrity.id) { order =>
             Action {
               postCelebrityOrderResult(reviewStatus, rejectionReason, order, celebrity)
