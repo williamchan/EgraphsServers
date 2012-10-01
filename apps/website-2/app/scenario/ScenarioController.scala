@@ -2,9 +2,11 @@ package controllers.website.nonproduction
 
 import play.api.mvc.Controller
 import scenario.Scenario
-import play.mvc.results.Result
+import play.api.mvc.Result
 import services.http.ControllerMethod
 import services.AppConfig
+import play.api.mvc.Action
+import play.api.mvc.BodyParser
 
 /**
  * Controller for all scenarios
@@ -18,20 +20,22 @@ object ScenarioController extends Controller {
    * @return the result of the code block if the project's Scenarios library
    *   is available. 500 (Internal Error) and an informative response if not
    */
-  private def withRegisteredScenarios(task: => Any) = {
-    try {
-      Scenario.scenarios
+  private def withRegisteredScenarios[A](parser: BodyParser[A] = parse.anyContent)(actionFactory: => Action[A])
+  : Action[A] = {
+    Action(parser) { request =>
+      try {
+        Scenario.scenarios
 
-      task
-    } catch {
-      case e: ClassNotFoundException =>
-        this.Error(
-          """
-          No scenarios available. Ensure a class named Scenarios that
-          extends DeclaresScenarios is on the classpath. See documentation on
-          trait DeclaresScenarios for more information.
-          """
-        )
+        actionFactory().apply(request)
+      } catch {
+        case e: ClassNotFoundException =>
+          InternalServerError(
+            """
+            No scenarios available. Ensure a class named Scenarios that
+            extends DeclaresScenarios is on the classpath. See documentation on
+            trait DeclaresScenarios for more information.
+            """)
+      }
     }
   }
 
@@ -43,8 +47,10 @@ object ScenarioController extends Controller {
    */
   def clear = controllerMethod() {
     withRegisteredScenarios {
-      Scenario.clearAll()
-      "All scenarios cleared."
+      Action {
+        Scenario.clearAll()
+        Ok("All scenarios cleared.")
+      }
     }
   }
 
@@ -55,10 +61,12 @@ object ScenarioController extends Controller {
    */
   def list = controllerMethod() {
     withRegisteredScenarios {
-      val scenarios = Scenario.allCategories.toList.sortWith((a, b) => a._1 < b._1).map { case (category, catScenarios) =>
-        (category, catScenarios.toSeq.sortWith((a, b) => a.name < b.name))
+      Action {
+        val scenarios = Scenario.allCategories.toList.sortWith((a, b) => a._1 < b._1).map { case (category, catScenarios) =>
+          (category, catScenarios.toSeq.sortWith((a, b) => a.name < b.name))
+        }
+        Ok(views.nonproduction.html.scenarios(scenarios))
       }
-      views.nonproduction.html.scenarios(scenarios)
     }
   }
 
@@ -69,26 +77,28 @@ object ScenarioController extends Controller {
    */
   def scenario (urlSlug: String) = controllerMethod() {
     withRegisteredScenarios {
-      Scenario.withSlug(urlSlug) match {
-        case Some(existingScenario) => {
-          existingScenario.play() match {
-            case aResult: Result =>
-              aResult
-            case _ =>
-              Html(
-                "Scenario <pre>"
-                  + urlSlug
-                  + "</pre> successfully replayed.<br/><br/>"
-                  + existingScenario.description
-              )
+      Action {
+        Scenario.withSlug(urlSlug) match {
+          case Some(existingScenario) => {
+            existingScenario.play() match {
+              case aResult: Result =>
+                aResult
+              case _ =>
+                Ok(Html(
+                  "Scenario <pre>"
+                    + urlSlug
+                    + "</pre> successfully replayed.<br/><br/>"
+                    + existingScenario.description
+                ))
+            }
           }
-        }
-
-        case None => {
-          NotFound(
-            "No scenario was found with the name \"" + urlSlug + "\"."+
-              "View available scenarios at " + reverse(this.list)
-          )
+  
+          case None => {
+            NotFound(
+              "No scenario was found with the name \"" + urlSlug + "\"."+
+                "View available scenarios at " + reverse(this.list)
+            )
+          }
         }
       }
     }
