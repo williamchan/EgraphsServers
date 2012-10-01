@@ -407,46 +407,46 @@ class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: Invent
   }
 
   /**
-   * Gets this Celebrity's Products that can be purchased along with the quantity available of each Product.
+   * Gets all published Celebrities that have purchase-able Products along with whether the Celebrity has inventory available.
    * Excludes Products that are not available, such as those that are not in an active InventoryBatch based on
    * startDate and endDate, as well as those that are sold out of quantity.
    *
    * This implementation is hopefully more performant than getting all active Products and then calculating the
    * quantity available for each Product, but this assumption has yet to be tested.
    *
-   * @return a sequence of purchase-able Products along with the available quantity of each Product.
+   * @return a set of Celebrities and whether the Celebrity has inventory available.
    */
   def getCatalogStars(): Set[CatalogStar] = {
     import schema.{celebrities, inventoryBatches, orders}
 
-    // need to grab the minimal amount of a celebrity to construct one that can be used only within this fuction,
-    // since it is an incomplete view to get other values of use off of it.
-    val query: Query[GroupWithMeasures[Product7[Long,String,Option[String],String,Boolean,Long,Long],Int]] = join(celebrities, inventoryBatches, schema.products, orders.leftOuter)((celebrity, inventoryBatch, product, order) =>
-      where(
-        celebrity._publishedStatus === PublishedStatus.Published.name and
-          product._publishedStatus === PublishedStatus.Published.name and
-          ((new Date) between(inventoryBatch.startDate, inventoryBatch.endDate))
+    val query: Query[GroupWithMeasures[Product7[Long, String, Option[String], String, Boolean, Long, Long], Int]] =
+      join(celebrities, inventoryBatches, schema.products, orders.leftOuter)((celebrity, inventoryBatch, product, order) =>
+        where(
+          celebrity._publishedStatus === PublishedStatus.Published.name and
+            product._publishedStatus === PublishedStatus.Published.name and
+            ((new Date) between(inventoryBatch.startDate, inventoryBatch.endDate))
+        )
+          groupBy(
+            celebrity.id,
+            celebrity.publicName,
+            celebrity._landingPageImageKey,
+            celebrity.roleDescription,
+            celebrity.isFeatured,
+            inventoryBatch.id,
+            product.id
+          )
+          compute (nvl(sum(order.map(o => 1)), 0))
+          on(
+            celebrity.id === inventoryBatch.celebrityId,
+            celebrity.id === product.celebrityId,
+            inventoryBatch.id === order.map(_.inventoryBatchId)
+          )
       )
-      groupBy(
-        celebrity.id,
-        celebrity.publicName,
-        celebrity._landingPageImageKey,
-        celebrity.roleDescription,
-        celebrity.isFeatured,
-        inventoryBatch.id,
-        product.id
-      )
-      compute(nvl(sum(order.map(o=>1)),0))
-      on(
-        celebrity.id === inventoryBatch.celebrityId,
-        celebrity.id === product.celebrityId,
-        inventoryBatch.id === order.map(_.inventoryBatchId)
-      )
-    )
 
     // transform that raw data into something we can use
-    val celebritiesAndProductIdsAndRemainingsInventories = for (row <- query) yield {
+    val celebritiesAndProductIdsAndRemainingInventories = for (row <- query) yield {
       (
+        // Using Celebrity to carry these values and also for its helper methods. Do not call save() on these Celebrities.
         Celebrity(
           id = row.key._1,
           publicName = row.key._2,
@@ -454,18 +454,18 @@ class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: Invent
           roleDescription = row.key._4,
           isFeatured = row.key._5
         ),
-        (row.key._7,row.measures.max(0)) //productId, quantity
-        // make sure we don't have negative quantities, since those will be returned
+        (row.key._7 /*productId*/, row.measures.max(0) /*quantityRemaining*/)
+        // max(O) will ensure that we don't have negative quantities
       )
     }
 
-    val tempMap = celebritiesAndProductIdsAndRemainingsInventories.groupBy(tuple => tuple._1)
+    val tempMap = celebritiesAndProductIdsAndRemainingInventories.groupBy(tuple => tuple._1)
     val celebritiesToProducts: Map[Celebrity, Set[(Long,Int)]] = tempMap.mapValues(
       entry => entry.map(tuple => tuple._2).toSet
     )
 
-    val catalogStars = for((celebrity, productIdsAndRemainingsInventories) <- celebritiesToProducts) yield {
-      (new CelebrityViewConversions(celebrity)).asCatalogStar(productIdsAndRemainingsInventories)
+    val catalogStars = for((celebrity, productIdsAndRemainingInventories) <- celebritiesToProducts) yield {
+      (new CelebrityViewConversions(celebrity)).asCatalogStar(productIdsAndRemainingInventories)
     }
 
     catalogStars.toSet

@@ -73,7 +73,7 @@ private[mvc] object UpdateCatalogStarsActor extends Logging {
   // Package members
   //
   private[celebrity] val singleton = actorOf(AppConfig.instance[UpdateCatalogStarsActor])
-  private[celebrity] val updatePeriodSeconds = DateTimeConstants.MILLIS_PER_MINUTE
+  private[celebrity] val updatePeriodSeconds = 5 * DateTimeConstants.SECONDS_PER_MINUTE
   private[celebrity] val resultsCacheKey = "catalog-stars"
   private[celebrity] case class UpdateCatalogStars(recipientActor: ActorRef)
 
