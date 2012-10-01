@@ -1,7 +1,7 @@
 package services
 
 import http.PlayConfig
-import play.mvc.Router
+import play.api.mvc.Results.{Redirect}
 import play.api.Play
 import com.google.inject.Inject
 import java.util
@@ -10,6 +10,8 @@ import java.io._
 import scala.Some
 import java.io.{Serializable, PrintWriter, StringWriter}
 import play.api.mvc.Results.Redirect
+import play.api.mvc.Result
+import play.api.mvc.Request
 
 /**
  * Helpful utilities with no other place to call home
@@ -37,6 +39,11 @@ class Utils @Inject()(@PlayConfig() playConfig: util.Properties) {
           Some(seq.head)
         }
     }
+  }
+  
+  // TODO: PLAY20 migration. Document
+  def slugify(toSlugify: String, lowercaseOnly:Boolean = true): String = {
+    
   }
 
   /**
@@ -86,51 +93,18 @@ class Utils @Inject()(@PlayConfig() playConfig: util.Properties) {
   }
 
   /**
-   * Returns the ActionDefinition for a controller method with a parameter map.
-   * For some reason, WebsiteControllers.reverse does not seem to work outside of a controller context.
-   * But, I am hopeful these URL-related helper methods will go away once we move to Play 2.0.
-   *
-   * For example, to redirect to Shaq's celebrity page:
-   * {{{
-   *   val actionDef = Utils.lookupUrl(
-   * "controllers.WebsiteControllers.getCelebrity",
-   * Map("celebrityUrlSlug" -> "Shaq")
-   * )
-   * redirect(actionDef.url)
-   * }}}
-   */
-  @Deprecated // Use WebsiteControllers.reverse instead.
-  def lookupUrl(controllerMethod: String, params: Map[String, AnyRef] = Map()): Router.ActionDefinition = {
-    import scala.collection.JavaConversions._
-
-    if (params == Map.empty) {
-      Router.reverse(controllerMethod)
-    } else {
-      Router.reverse(controllerMethod, params: Map[String, Object])
-    }
-  }
-
-  /**
-   * I am hopeful these URL-related helper methods will go away once we move to Play 2.0.
-   *
-   * @param action the controller action of interest
-   * @return the absolute URL associated with the action starting with the application's baseUrl, eg if the base url was
-   *         "https://www.egraphs.com/" and the action maps to "/login", then "https://www.egraphs.com/login" is returned
-   */
-  def absoluteUrl(action: Router.ActionDefinition): String = {
-    val baseUrl = requiredConfigurationProperty("application.baseUrl")
-    val relativeUrl = action.url
-    composeUrl(baseUrl, relativeUrl)
-  }
-
-  /**
    * Redirects to a targetUrl found in the request params. If that url could not be found, it redirects to
    * the URL in the argument.
    */
-  def redirectToClientProvidedTarget(urlIfNoTarget: String)(implicit params: play.mvc.Scope.Params): Redirect = {
+  def redirectToClientProvidedTarget(urlIfNoTarget: String)(implicit request: Request[_]): Result = {
     import services.http.SafePlayParams.Conversions._
-
-    new Redirect(params.getOption("targetUrl").getOrElse(urlIfNoTarget))
+    import play.api.data._
+    import play.api.data.Forms._
+    
+    val targetUrlForm = Form(single("targetUrl" -> text))
+    val redirectUrl = targetUrlForm.fold(noTargetUrl => urlIfNoTarget, targetUrl => targetUrl)
+    
+    Redirect(redirectUrl)
   }
 
   /**
@@ -184,7 +158,7 @@ class Utils @Inject()(@PlayConfig() playConfig: util.Properties) {
    * @return a valid path, or throw an exception
    */
   def asset(path: String): String = {
-    play.mvc.Router.reverse(play.api.Play.getVirtualFile(path))
+    controllers.routes.Assets.at(path).url
   }
 
   implicit def properties(pairs: (AnyRef, AnyRef)*): util.Properties = {

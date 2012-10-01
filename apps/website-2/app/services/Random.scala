@@ -1,6 +1,7 @@
 package services
 
 import java.security.SecureRandom
+import org.postgresql.util.Base64
 
 /**
  * Source for random data.
@@ -17,6 +18,6 @@ object Random {
     val bytes = new Array[Byte](byteCount)
     generator.nextBytes(bytes)
 
-    play.libs.Codec.encodeBASE64(bytes)
+    Base64.encodeBytes(bytes)
   }
 }

@@ -1,9 +1,9 @@
 package scenario
 
 import services.blobs.Blobs
-import play.templates.JavaExtensions
 import services.AppConfig
 import services.db.Schema
+import services.Utils
 
 /**
  * An executable scenario.
@@ -24,7 +24,7 @@ import services.db.Schema
 case class Scenario(name: String, category: String = "Uncategorized", description: String="", instructions: () => Any) {
   /** Slug used to identify the scenario in the URL */
   def urlSlug: String = {
-    JavaExtensions.slugify(name, false)
+    Utils.slugify(name, false)
   }
   
   def play() = {

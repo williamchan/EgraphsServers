@@ -3,7 +3,6 @@ package models
 import enums.{HasEnrollmentStatus, EnrollmentStatus, PublishedStatus, HasPublishedStatus}
 import java.sql.Timestamp
 import services.blobs.AccessPolicy
-import play.templates.JavaExtensions
 import services.db.{FilterOneTable, KeyedCaseClass, Schema, SavesWithLongKey}
 import services.blobs.Blobs.Conversions._
 import com.google.inject.{Provider, Inject}
@@ -59,7 +58,7 @@ case class Celebrity(id: Long = 0,
   // Additional DB columns
   //
   /**The slug used to access this Celebrity's page on the main site. */
-  val urlSlug: String = JavaExtensions.slugify(publicName, false) // Slugify without lower-casing
+  val urlSlug: String = Utils.slugify(publicName, false) // Slugify without lower-casing
 
   //
   // Public members

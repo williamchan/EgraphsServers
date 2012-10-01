@@ -1,6 +1,5 @@
 package services.http.filters
 
-import services.http.CustomerRequest
 import models.CustomerStore
 import com.google.inject.Inject
 import models.Account
@@ -46,5 +45,5 @@ class RequireCustomerId @Inject() (customerStore: CustomerStore) {
     }
   }
 
-  private val notLoggedInResult = Redirect(controllers.routes.WebsiteControllers.getLogin).withNewSession
+  private val notLoggedInResult = Redirect(controllers.routes.WebsiteControllers.getLogin()).withNewSession
 }

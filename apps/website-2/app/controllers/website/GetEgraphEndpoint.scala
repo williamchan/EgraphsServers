@@ -157,6 +157,5 @@ object GetEgraphEndpoint {
 
   def url(orderId: Long): String = {
     controllers.routes.WebsiteControllers.getEgraph(orderId).url
-//    Utils.lookupUrl("WebsiteControllers.getEgraph", Map("orderId" -> orderId.toString))
   }
 }

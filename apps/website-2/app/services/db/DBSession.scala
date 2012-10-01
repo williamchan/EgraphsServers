@@ -127,7 +127,6 @@ object DBSession {
    * you should not use this method where it is possible to use Squeryl's
    * `inTransaction` or `transaction` methods.
    *
-   * @see services.http.DBTransaction
    * @see test.utils.DBTransactionPerTest
    */
   def init() {

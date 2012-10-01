@@ -10,6 +10,8 @@ import org.apache.commons.mail.HtmlEmail
 import services.mail.TransactionalMail
 import services.http.PlayConfig
 import java.util.Properties
+import play.api.mvc.RequestHeader
+import controllers.routes.WebsiteControllers.getVerifyAccount
 
 /** Services used by each instance of Customer */
 case class CustomerServices @Inject() (accountStore: AccountStore,
@@ -100,7 +102,8 @@ case class Customer(
 }
 
 object Customer {
-  def sendNewCustomerEmail(account: Account, verificationNeeded: Boolean = false, mail: TransactionalMail) {
+  def sendNewCustomerEmail(account: Account, verificationNeeded: Boolean = false, mail: TransactionalMail)
+   (implicit request: RequestHeader){
     val email = new HtmlEmail()
     email.setFrom("noreply@egraphs.com")
     email.addReplyTo("noreply@egraphs.com")
@@ -114,16 +117,13 @@ object Customer {
     val emailTwitterSrc = ""
 
     if (verificationNeeded) {
-      val verifyPasswordAction = Utils.lookupUrl("WebsiteControllers.getVerifyAccount",
-        Map("email" -> account.email, "secretKey" -> account.resetPasswordKey.get))
-      val verifyPasswordUrl = Utils.absoluteUrl(verifyPasswordAction)
+      val verifyPasswordUrl = getVerifyAccount(account.email, account.resetPasswordKey.get).absoluteURL
       email.setHtmlMsg(views.html.frontend.email_account_verification(
         verifyPasswordUrl = verifyPasswordUrl,
         emailLogoSrc = emailLogoSrc,
         emailFacebookSrc = emailFacebookSrc,
         emailTwitterSrc = emailTwitterSrc
-      ).toString()
-      )
+      ).toString())
       email.setTextMsg(views.html.frontend.email_account_verification_text(verifyPasswordUrl).toString())
     } else {
       email.setHtmlMsg(views.html.frontend.email_account_confirmation(

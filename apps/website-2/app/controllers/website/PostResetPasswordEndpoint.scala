@@ -22,9 +22,9 @@ private[controllers] trait PostResetPasswordEndpoint extends ImplicitHeaderAndFo
 
   def postResetPassword() = postController() {
     httpFilters.requireAccountEmail.inRequest() { account =>
-      Action { request =>
+      Action { implicit request =>
         val params = request.queryString
-        val nonValidatedForm = accountPasswordResetForms(params.asFormReadable, account)
+        val nonValidatedForm = accountPasswordResetForms(request.asFormReadable, account)
   
         nonValidatedForm.errorsOrValidatedForm match {
           case Left(errors) => {

@@ -2,13 +2,13 @@ package services.http.filters
 
 import com.google.inject.Inject
 
-import models.CustomerStore
+import models.{Customer, CustomerStore}
 import play.api.mvc.Action
 import play.api.mvc.BodyParser
 import play.api.mvc.BodyParsers.parse
 import play.api.mvc.Result
 import play.api.mvc.Results.NotFound
-import services.http.CustomerRequest
+import models.Customer
 
 // TODO: PLAY20 migration. Test and comment this summbitch
 class RequireCustomerUsername @Inject() (customerStore: CustomerStore) {

@@ -43,5 +43,5 @@ class RequireCustomerLogin @Inject() (customerStore: CustomerStore) {
   //
   // Private members
   //
-  private val noCustomerAccessResult = Redirect(controllers.routes.WebsiteControllers.GetLoginEndpoint())
+  private val noCustomerAccessResult = Redirect(controllers.routes.WebsiteControllers.getLogin)
 }
