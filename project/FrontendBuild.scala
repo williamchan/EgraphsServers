@@ -11,7 +11,7 @@ object FrontendBuild extends Build {
   val appVersion = "2.0-SNAPSHOT"
 
   val appDependencies = Seq(
-    "crionics" %% "play2-authenticitytoken" % "1.0-SNAPSHOT",
+//    "crionics" %% "play2-authenticitytoken" % "1.0-SNAPSHOT",
     "org.joda" % "joda-money" % "0.6"
   )
 
