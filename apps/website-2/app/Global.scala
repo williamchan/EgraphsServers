@@ -39,7 +39,8 @@ object Global extends GlobalSettings with Logging {
       blobs.init()
 
       // Some additional test-mode setup
-      if (Play.application.isTest) {
+      val maybeAppId = Play.application.configuration.getString("application.id")
+      for (appId <- maybeAppId if appId == "test") {
         TestModeBootstrap.run()
       }
 
