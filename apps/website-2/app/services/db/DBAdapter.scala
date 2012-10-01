@@ -1,7 +1,7 @@
 package services.db
 
 import org.squeryl.internals.DatabaseAdapter
-import play.api.Play
+import play.Play
 import org.squeryl.adapters.{MySQLInnoDBAdapter, PostgreSqlAdapter, H2Adapter}
 import services.logging.Logging
 
@@ -15,7 +15,7 @@ object DBAdapter extends Logging {
   lazy val postgres = new PostgreSqlAdapter {override def quoteIdentifier(s: String) = s}
 
   def currentDbString = {
-    Play.configuration.getProperty("db")
+    Play.application().configuration().getString("db")
   }
 
   /**
@@ -23,14 +23,14 @@ object DBAdapter extends Logging {
    */
   def current: DatabaseAdapter = {
     try {
-      getForDbString(Play.configuration.getProperty("db.url"))
+      getForDbString(Play.application().configuration().getString("db.url"))
     }
     catch {
       case e: IllegalArgumentException =>
         log(
           "Found no property 'db.url' in application.conf while configuring Squeryl. Trying 'db'"
         )
-        getForDbString(Play.configuration.getProperty("db"))
+        getForDbString(currentDbString)
     }
   }
 

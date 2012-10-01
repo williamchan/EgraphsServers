@@ -8,19 +8,19 @@ import play.api.data._
 import play.api.data.Forms._
 import services.http.PlayId
 
-
 /**
  * Only executes its `action` block if the request contains a valid authenticity token, as implemented
  * by Play. Helps protect against CSRF.
  *
- * Easiest to use from a Controller since it already has implicit [[play.mvc.Scope.Session]] and
- * [[play.api.mvc.Request]] values.
- *
  * Usage:
  * {{{
  *   val requireAuthenticityToken = services.AppConfig.instance[RequireAuthenticityTokenFilter]
- *   val forbiddenOrResult = requireAuthenticityToken {
- *     println("The code in here is safe from CSRF")
+ *   
+ *   def someControllerMethod = requireAuthenticityToken {
+ *     Action {
+ *       println("The code in here is safe from CSRF")
+ *       Ok
+ *     }
  *   }
  * }}}
  *
