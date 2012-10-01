@@ -1,5 +1,6 @@
 package services.blobs
 
+import play.api.Play.current
 import play.api.Play.configuration
 import org.jclouds.blobstore.BlobStoreContextFactory
 import org.jclouds.aws.s3.AWSS3Client
@@ -10,7 +11,7 @@ import services.http.HttpContentService
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 import java.net.URLEncoder
-import play.libs.Codec
+import org.apache.commons.codec.binary.Base64.encodeBase64String
 
 /** [[services.blobs.Blobs.BlobProvider]] implementation backed by Amazon S3 */
 private[blobs] case class S3BlobVendor(
@@ -91,7 +92,7 @@ private[blobs] case class S3BlobVendor(
     val signingKey = new SecretKeySpec(keyBytes, "HmacSHA1")
     mac.init(signingKey)
     val digest = mac.doFinal(msg.getBytes("UTF8"))
-    URLEncoder.encode(Codec.encodeBASE64(digest), "UTF-8")
+    URLEncoder.encode(encodeBase64String(digest), "UTF-8")
   }
 
   //
@@ -107,4 +108,4 @@ private[blobs] case class S3BlobVendor(
 
 /** [[services.blobs.Blobs.BlobProvider]] implementation backed by Amazon S3 */
 private[blobs] object S3BlobVendor
-  extends S3BlobVendor(configuration.getProperty("s3.id"), configuration.getProperty("s3.secret"))
+  extends S3BlobVendor(configuration.getString("s3.id").get, configuration.getString("s3.secret").get)

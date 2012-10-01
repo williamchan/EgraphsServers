@@ -14,6 +14,7 @@ import services.db.{TransactionSerializable, Schema, DBSession}
 import models.{AccountStore, Account, Administrator}
 import services.mvc.celebrity.{CatalogStarsActor, UpdateCatalogStarsActor}
 import play.api.Play.current
+import play.api.Application
 
 object Global extends GlobalSettings with Logging {
   val blobs = AppConfig.instance[Blobs]

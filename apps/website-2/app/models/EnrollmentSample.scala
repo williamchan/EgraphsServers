@@ -2,7 +2,7 @@ package models
 
 import com.google.inject.Inject
 import java.sql.Timestamp
-import play.libs.Codec
+import org.apache.commons.codec.binary.Base64.decodeBase64
 import services.AppConfig
 import services.blobs.Blobs
 import services.db.{KeyedCaseClass, Schema, SavesWithLongKey}
@@ -33,7 +33,7 @@ case class EnrollmentSample(id: Long = 0,
   def save(signatureStr: String, voiceStr: String): EnrollmentSample = {
     val saved = services.store.save(this)
     services.blobs.put(EnrollmentSample.getSignatureJsonUrl(saved.id), signatureStr.getBytes)
-    services.blobs.put(EnrollmentSample.getWavUrl(saved.id), Codec.decodeBASE64(voiceStr))
+    services.blobs.put(EnrollmentSample.getWavUrl(saved.id), decodeBase64(voiceStr))
     saved
   }
 

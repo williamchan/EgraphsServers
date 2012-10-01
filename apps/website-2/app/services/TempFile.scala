@@ -1,6 +1,7 @@
 package services
 
 import java.io.File
+import play.api.Play.current
 
 /**
  * Provides temporary files from the project's tmp/ directory.
