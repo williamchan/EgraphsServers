@@ -29,8 +29,8 @@ trait PostOrderAdminEndpoint { this: Controller =>
           val recipientName = params.getOption("recipientName")
           val messageToCelebrity = params.getOption("messageToCelebrity")
           val requestedMessage = params.getOption("requestedMessage")
-          order.copy(messageToCelebrity = messageToCelebrity, requestedMessage = requestedMessage).save()
-          recipientName.map(name => order.copy(recipientName = name).save())
+          val orderWithMsgs = order.copy(messageToCelebrity = messageToCelebrity, requestedMessage = requestedMessage).save()
+          recipientName.map(name => orderWithMsgs.copy(recipientName = name).save())
           new Redirect(WebsiteControllers.reverse(getOrderAdmin(orderId)).url)
         }
         case "refund" => {
