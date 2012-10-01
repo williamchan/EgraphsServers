@@ -28,11 +28,11 @@ private[consumer] trait StorefrontFailedConsumerEndpoints
     }
   }
 
-  def getStorefrontCreditCardError(celebrityUrlSlug: String, productUrlSlug: String, creditCardMsg: String) = controllerMethod()
+  def getStorefrontCreditCardError(celebrityUrlSlug: String, productUrlSlug: String, creditCardMsg: Option[String]=None) = controllerMethod()
   {
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
       Action {
-        Ok(views.html.frontend.celebrity_storefront_creditcard_error(celeb.publicName, product.name, creditCardMsg))
+        Ok(views.html.frontend.celebrity_storefront_creditcard_error(celeb.publicName, product.name, creditCardMsg.getOrElse("")))
       }
     }
   }

@@ -16,20 +16,17 @@ private[controllers] trait PostOrderConfigureEndpoint { this: Controller =>
   protected def httpFilters: HttpFilters
   protected def orderStore: OrderStore
 
-  def postOrderPrivacy() = postController() {     
+  def postOrderPrivacy(orderId: Long) = postController() {
     httpFilters.requireCustomerLogin.inSession() { (customer, account) =>
       Action { request =>
         val params = request.queryString
-  
-        val orderIdOption = Utils.getOptionFirstInSeq(params.get("orderId"))
         val privacyStatusOption = Utils.getOptionFirstInSeq(params.get("privacyStatus"))
 
-        println("orderIdOption " + orderIdOption)
+        println("orderId " + orderId)
         println("privacyStatusOption" + privacyStatusOption)
         val newPrivacyStatus = for (
           privacyStatusString <- privacyStatusOption;
           privacyStatus <- PrivacyStatus(privacyStatusString);
-          orderId <- orderIdOption;
           order <- orderStore.findById(orderId.toLong);
           if order.recipient.id == customer.id
         ) yield {

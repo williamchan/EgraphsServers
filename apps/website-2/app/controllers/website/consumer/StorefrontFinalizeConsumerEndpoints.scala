@@ -53,7 +53,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
    * @return the web page, or a Redirect to earlier forms in the flow if their data
    *         was found to be lacking.
    */
-  def getStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug: String): Any = controllerMethod() {
+  def getStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug: String): Action[_] = controllerMethod() {
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
       Action { request =>
         // Get the purchase forms out of the server session
@@ -121,16 +121,16 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
             shipping=maybeShippingViewModel,
             personalization=personalizationViewModel,
             price=priceViewModel,
-            purchaseUrl=postStorefrontFinalize(celebrityUrlSlug, productUrlSlug).url
+            purchaseUrl=controllers.routes.WebsiteControllers.postStorefrontFinalize(celebrityUrlSlug, productUrlSlug).url
           )
   
           implicit def crumbs = breadcrumbData.crumbsForRequest(celeb.id, celebrityUrlSlug, Some(productUrlSlug))(request)
   
-          views.html.frontend.celebrity_storefront_finalize(
+          Ok(views.html.frontend.celebrity_storefront_finalize(
             finalizeViewModel,
             productPreviewUrl=product.photoAtPurchasePreviewSize.getSaved(AccessPolicy.Public).url,
             orientation=product.frame.previewCssClass
-          )
+          ))
         }
       }
     }

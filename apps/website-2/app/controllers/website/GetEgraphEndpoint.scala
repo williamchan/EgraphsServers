@@ -33,7 +33,7 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
    * of the associated order, as several attempts to satisfy an egraph could have
    * been made before a successful one was signed.
    */
-  def getEgraph(orderId: String) = controllerMethod() {
+  def getEgraph(orderId: Long) = controllerMethod() {
     Action { implicit request =>
       //TODO: PLAY20: from myyk, I did this wrong, these should be from a Form, I didn't know when I did this.  I would do now, but it is 6:30 on a Friday.
       // TODO: disable pen-width and shadow re-setting once we find a good value.
@@ -45,11 +45,11 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
   
       // Get an order with provided ID
       val session = request.session
-      orderStore.findFulfilledWithId(orderId.toLong) match {
+      orderStore.findFulfilledWithId(orderId) match {
         case Some(FulfilledOrder(order, egraph)) if isViewable(order)(session) =>          
           val maybeCustomerId = session.get(EgraphsSession.Key.CustomerId.name)
           val maybeGalleryLink = maybeCustomerId.map { customerId =>
-            controllers.routes.WebsiteControllers.getCustomerGalleryById(customerId).url
+            controllers.routes.WebsiteControllers.getCustomerGalleryById(customerId.toLong).url
           }
   
           Ok(GetEgraphEndpoint.html(
@@ -68,7 +68,7 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
   }
 
   /** Redirects the old egraph url /egraph/{orderId} to the current url */
-  def getEgraphRedirect(orderId: String): Result = {
+  def getEgraphRedirect(orderId: Long) = Action {
     Redirect(controllers.routes.WebsiteControllers.getEgraph(orderId))
   }
 
