@@ -179,8 +179,8 @@ class ProductTests extends EgraphsUnitTest
     val celebrityNamesInCatalogStars = catalogStars.map(star => (star.name, star.hasInventoryRemaining))
     celebrityNamesInCatalogStars should contain ((availableProduct1.celebrity.publicName, true))
     celebrityNamesInCatalogStars should contain ((availableProduct2.celebrity.publicName, true))
-    celebrityNamesInCatalogStars should not contain ((unavailableProduct1.celebrity.publicName, false))
-    celebrityNamesInCatalogStars should not contain ((unavailableProduct2.celebrity.publicName, false))
+    celebrityNamesInCatalogStars should contain ((unavailableProduct1.celebrity.publicName, false))
+    celebrityNamesInCatalogStars should contain ((unavailableProduct2.celebrity.publicName, false))
   }
 
   "getCatalogStars" should "show a celebrity has products available only if there is remaining inventory" in {

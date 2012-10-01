@@ -1,6 +1,6 @@
 package services.mvc.celebrity
 
-import models.{ImageAsset, Celebrity}
+import models.{ProductQuantities, ImageAsset, Celebrity}
 import models.frontend.storefront.{ChoosePhotoRecentEgraph, ChoosePhotoCelebrity}
 import services.blobs.AccessPolicy
 import models.frontend.landing.CatalogStar
@@ -47,7 +47,7 @@ class CelebrityViewConversions(celeb: Celebrity) {
    * The celebrity as a CatalogStar. If some necessary data for the CatalogStar
    * were not available (e.g. publicName, storeFrontUrl) then it returns None.
    */
-  def asCatalogStar(productIdsAndInventoryRemainings: Set[(Long,Int)]): CatalogStar = {
+  def asCatalogStar(productIdsAndInventoryRemainings: Set[ProductQuantities]): CatalogStar = {
     val mastheadImageUrl = celeb
       .landingPageImage
       .withImageType(ImageAsset.Jpeg)
@@ -57,7 +57,7 @@ class CelebrityViewConversions(celeb: Celebrity) {
 
     val purchaseableProductsIds = productIdsAndInventoryRemainings.filter {
       productAndCount =>
-        productAndCount._2 > 0
+        productAndCount.quantityRemaining > 0
     }
 
     val choosePhotoUrl = Utils.lookupUrl(

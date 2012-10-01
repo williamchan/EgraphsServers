@@ -419,12 +419,11 @@ class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: Invent
   def getCatalogStars(): Set[CatalogStar] = {
     import schema.{celebrities, inventoryBatches, orders}
 
-    val query: Query[GroupWithMeasures[Product7[Long, String, Option[String], String, Boolean, Long, Long], Int]] =
+    val query: Query[GroupWithMeasures[Product9[Long, String, Option[String], String, Boolean, Long, Date, Date, Long], Int]] =
       join(celebrities, inventoryBatches, schema.products, orders.leftOuter)((celebrity, inventoryBatch, product, order) =>
         where(
           celebrity._publishedStatus === PublishedStatus.Published.name and
-            product._publishedStatus === PublishedStatus.Published.name and
-            ((new Date) between(inventoryBatch.startDate, inventoryBatch.endDate))
+            product._publishedStatus === PublishedStatus.Published.name
         )
           groupBy(
             celebrity.id,
@@ -433,6 +432,8 @@ class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: Invent
             celebrity.roleDescription,
             celebrity.isFeatured,
             inventoryBatch.id,
+            inventoryBatch.startDate,
+            inventoryBatch.endDate,
             product.id
           )
           compute (nvl(sum(order.map(o => 1)), 0))
@@ -445,6 +446,9 @@ class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: Invent
 
     // transform that raw data into something we can use
     val celebritiesAndProductIdsAndRemainingInventories = for (row <- query) yield {
+      val ibStartDate = row.key._7
+      val ibEndDate = row.key._8
+      val productId = row.key._9
       (
         // Using Celebrity to carry these values and also for its helper methods. Do not call save() on these Celebrities.
         Celebrity(
@@ -454,17 +458,26 @@ class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: Invent
           roleDescription = row.key._4,
           isFeatured = row.key._5
         ),
-        (row.key._7 /*productId*/, row.measures.max(0) /*quantityRemaining*/)
         // max(O) will ensure that we don't have negative quantities
+        ProductQuantities(productId = productId, quantityRemaining = row.measures.max(0), ibStartDate = ibStartDate, ibEndDate = ibEndDate)
       )
     }
 
-    val tempMap = celebritiesAndProductIdsAndRemainingInventories.groupBy(tuple => tuple._1)
-    val celebritiesToProducts: Map[Celebrity, Set[(Long,Int)]] = tempMap.mapValues(
+    val tempCelebMap = celebritiesAndProductIdsAndRemainingInventories.groupBy(tuple => tuple._1)
+    val celebritiesToProductQuantities: Map[Celebrity, Set[ProductQuantities]] = tempCelebMap.mapValues(
       entry => entry.map(tuple => tuple._2).toSet
     )
 
-    val catalogStars = for((celebrity, productIdsAndRemainingInventories) <- celebritiesToProducts) yield {
+    // reduce quantities to 0 of products that are not available now by date
+    val now = new Date()
+    val celebritiesToProductQuantities2 = celebritiesToProductQuantities.mapValues(
+      value => value.map(productQuantity =>
+        if (productQuantity.ibStartDate.before(now) && productQuantity.ibEndDate.after(now)) productQuantity
+        else productQuantity.copy(quantityRemaining = 0)
+      )
+    )
+
+    val catalogStars = for((celebrity, productIdsAndRemainingInventories) <- celebritiesToProductQuantities2) yield {
       (new CelebrityViewConversions(celebrity)).asCatalogStar(productIdsAndRemainingInventories)
     }
 
@@ -507,6 +520,8 @@ class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: Invent
     toUpdate.copy(created=created, updated=updated)
   }
 }
+
+case class ProductQuantities(productId: Long, quantityRemaining: Int, ibStartDate: Date, ibEndDate: Date)
 
 class ProductQueryFilters {
   import org.squeryl.PrimitiveTypeMode._
