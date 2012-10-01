@@ -1,6 +1,7 @@
 package services.http
 
 import play.api.libs.MimeTypes
+import play.api.http.ContentTypeOf
 
 /**
  * Gives access to HTTP content header information for different file names.
@@ -12,9 +13,8 @@ class HttpContentService {
         SVGZContentHeaders
 
       case _ =>
-        val mimeType = playContentType(fileName)
-        val contentEncoding = Option(play.utils.HTTP.parseContentType(mimeType).encoding)
-        ContentHeaders(mimeType, contentEncoding)
+        val mimeType = MimeTypes.forFileName(fileName)
+        ContentHeaders(mimeType.getOrElse("application/octet-stream"), None)
     }
   }
 
@@ -22,19 +22,7 @@ class HttpContentService {
   // Private Methods
   //
   private def fileExtensionRegex = "^.*\\.([^.]+)$".r
-
-  private def playContentType(fileName: String) = {
-    try {
-      MimeTypes.getContentType(fileName)
-    }
-    catch {
-      // TODO: remove this ridiculous NPE check once Play fixes this problem:
-      // https://play.lighthouseapp.com/projects/57987-play-framework/tickets/1519-mimetypesgetcontenttype-nullpointerexception#ticket-1519-2
-      case npe: NullPointerException => MimeTypes.getMimeType(fileName)
-    }
-  }
 }
-
 
 /**
  * Encapsulates the Content-* HTTP headers for particular content.
@@ -47,4 +35,4 @@ case class ContentHeaders(contentType: String, contentEncoding: Option[String])
 
 /** ContentInfo specific for SVGZ files, which Play doesn't naturally handle well. */
 private[http] case object SVGZContentHeaders
-  extends ContentHeaders(MimeTypes.getContentType("a.svg"), Some("gzip"))
+  extends ContentHeaders("image/svg+xml", Some("gzip"))

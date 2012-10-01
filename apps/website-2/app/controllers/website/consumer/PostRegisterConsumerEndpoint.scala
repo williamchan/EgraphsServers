@@ -73,7 +73,7 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
   private def redirectOrCreateAccountCustomerTuple(request: Request[AnyContent])
   : Either[Result, (Account, Customer)] = 
   {
-    dbSession.connected(TransactionSerializable) {
+    dbSession.connected(TransactionSerializable) {      
       val formReadableParams = request.asFormReadable
       val registrationReader = formReaders.forRegistrationForm
       val registrationForm = registrationReader.instantiateAgainstReadable(formReadableParams)
