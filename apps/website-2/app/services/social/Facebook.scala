@@ -3,11 +3,13 @@ package services.social
 import com.google.inject.{Provider, Inject}
 import controllers.website.GetFacebookLoginCallbackEndpoint
 import java.util.Properties
-import play.libs.WS
+import play.api.libs.ws.WS
+import play.api.mvc.RequestHeader
 import services.http.PlayConfig
 import sjson.json.Serializer
 import models.FulfilledOrder
 import java.text.SimpleDateFormat
+import play.api.http.Status
 import controllers.routes.WebsiteControllers.getFacebookLoginCallback
 
 /**
@@ -42,7 +44,7 @@ object Facebook {
    * @param state see Facebook documentation
    * @return Facebook url at which to begin the Oauth flow
    */
-  def getFbOauthUrl(fbAppId: String, state: String): String = {
+  def getFbOauthUrl(fbAppId: String, state: String)(implicit request: RequestHeader): String = {
     val fbCallbackUrl = GetFacebookLoginCallbackEndpoint.getCallbackUrl
     "https://www.facebook.com/dialog/oauth?client_id=" + fbAppId +
       "&redirect_uri=" + fbCallbackUrl +
@@ -57,7 +59,10 @@ object Facebook {
    * @param fbAppSecret see Facebook documentation
    * @return an access token, which can be used to make calls to Facebook's API on behalf of a Facebook user
    */
-  def getFbAccessToken(code: String, facebookAppId: String, fbAppSecret: String): String = {
+  def getFbAccessToken(code: String, facebookAppId: String, fbAppSecret: String)
+  (implicit request: RequestHeader)
+  : String = 
+  {
     val fbCallbackUrl = GetFacebookLoginCallbackEndpoint.getCallbackUrl
     val fbOauthTokenUrlStr = "https://graph.facebook.com/oauth/access_token?" +
       "client_id=" + facebookAppId +
@@ -65,17 +70,20 @@ object Facebook {
       "&client_secret=" + fbAppSecret +
       "&code=" + code
 
-    val response = WS.url(fbOauthTokenUrlStr).get()
-    response.getStatus.intValue() match {
-      case play.mvc.OK => {
-        // expected String format is: "access_token=USER_ACESS_TOKEN&expires=NUMBER_OF_SECONDS_UNTIL_TOKEN_EXPIRES"
-        val responseStr = response.getString
-        val prefix = "access_token="
-        responseStr.substring(responseStr.indexOf(prefix) + prefix.length, responseStr.indexOf("&"))
+    val promisedResponse = WS.url(fbOauthTokenUrlStr).get()
+    val promisedAccessToken = promisedResponse.map { response =>
+      response.status match {
+        case Status.OK =>
+          // expected String format is: "access_token=USER_ACESS_TOKEN&expires=NUMBER_OF_SECONDS_UNTIL_TOKEN_EXPIRES"
+          val responseStr = response.body
+          val prefix = "access_token="
+          responseStr.substring(responseStr.indexOf(prefix) + prefix.length, responseStr.indexOf("&"))
 
+        case _ => throw new RuntimeException("Facebook authentication error encountered: " + response.body)
       }
-      case _ => throw new RuntimeException("Facebook authentication error encountered: " + response.getString)
     }
+
+    promisedAccessToken.await.fold(requestError => throw requestError, accessToken => accessToken)
   }
 
   /**
@@ -85,13 +93,15 @@ object Facebook {
   def getFbUserInfo(accessToken: String): Map[String, AnyRef] = {
     val fields = List(_id, _name, _email).mkString(",")
     val fbUserInfoUrlStr = "https://graph.facebook.com/me?fields=" + fields + "&access_token=" + accessToken
-    val response = WS.url(fbUserInfoUrlStr).get()
-    response.getStatus.intValue() match {
-      case play.mvc.OK => {
-        Serializer.SJSON.in[Map[String, AnyRef]](response.getString)
+    val promisedResponse = WS.url(fbUserInfoUrlStr).get()
+    val promisedJsonMap = promisedResponse.map { response =>
+      response.status match {
+        case Status.OK => Serializer.SJSON.in[Map[String, AnyRef]](response.body)
+        case _ => throw new RuntimeException("Facebook access error encountered: " + response.body)
       }
-      case _ => throw new RuntimeException("Facebook access error encountered: " + response.getString)
     }
+
+    promisedJsonMap.await.fold(requestError => throw requestError, jsonMap => jsonMap)
   }
 
   /**

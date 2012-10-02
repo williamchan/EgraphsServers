@@ -119,7 +119,7 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
 }
 
 object GetFacebookLoginCallbackEndpoint {
-  def getCallbackUrl(implicit request: RequestHeader) = {
+  def getCallbackUrl(implicit request: RequestHeader): String = {
     controllers.routes.WebsiteControllers.getFacebookLoginCallback().absoluteURL(secure=true)
   }
 }
