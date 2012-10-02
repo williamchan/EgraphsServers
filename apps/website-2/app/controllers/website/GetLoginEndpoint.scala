@@ -26,7 +26,7 @@ private[controllers] trait GetLoginEndpoint extends ImplicitHeaderAndFooterData 
   // Controllers
   //
   def getLogin = controllerMethod() {
-    Action { request =>
+    Action { implicit request =>
       // Save a new FB state ID into the session
       val fbState = UUID.randomUUID().toString
       val fbOauthUrl = Facebook.getFbOauthUrl(fbAppId = facebookAppId, state = fbState)

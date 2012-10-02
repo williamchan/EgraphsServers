@@ -11,11 +11,15 @@ import org.joda.time.{DateTimeConstants, DateMidnight, DateTime}
 object Time {
 
   val millisInDay = DateTimeConstants.MILLIS_PER_DAY
-  val ipadDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
+  
+  def ipadDateFormat = {
+    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS") 
+  }
+  
+  def ISO8601DatePattern = {
+    "'ISO8601:'yyyy-MM-dd'T'HH:mm:ssZ"
+  }
 
-  //
-  // Public members
-  //
   /** What should be the default timestamp for entities. Occurs at epoch 0 */
   def defaultTimestamp: Timestamp = {
     new Timestamp(0L)

@@ -21,9 +21,17 @@ case class Password (hash: String, salt: String) {
 }
 
 object Password {
-  trait PasswordError
-  case object PasswordRequired extends PasswordError
-  case class PasswordTooLong(attempted: String) extends PasswordError
+  trait PasswordError {
+    def message: String
+  }
+  
+  case object PasswordRequired extends PasswordError {
+    override val message = "Non-empty password is required"
+  }
+  
+  case class PasswordTooLong(attempted: String) extends PasswordError {
+    override val message = "Password must be at least " + Account.minPasswordLength + "characters"
+  } 
   
   /**
    * The number of times to perform the hash function before arriving at the

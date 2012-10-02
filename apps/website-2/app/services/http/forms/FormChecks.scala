@@ -8,6 +8,9 @@ import scala.Right
 import scala.Some
 import scala.Left
 import java.util.regex.Pattern
+import play.api.data.format.Formats
+import play.api.data.validation.Constraints
+import services.Time
 
 /**
  * A set of checks used by [[services.http.forms.Form]] to validate its
@@ -16,7 +19,8 @@ import java.util.regex.Pattern
  * @param accountStore the store for Accounts.
  */
 class FormChecks @Inject()(accountStore: AccountStore, customerStore: CustomerStore, productStore: ProductStore) {
-
+  import FormChecks._
+  
   /**
    * Returns the provided string on the right if it contained at least one non-empty-stirng
    * value.
@@ -116,8 +120,9 @@ class FormChecks @Inject()(accountStore: AccountStore, customerStore: CustomerSt
   def isDate(toValidate: String, message: String="Properly formatted date required")
   : Either[FormError, Date] =
   {
-    for (notI18nDate <- isDateWithFormat(I18N.getDateFormat, toValidate, message).left;
-         notAnyKnownDate <- isDateWithFormat(DateBinder.ISO8601, toValidate, message).left)
+    
+    for (notI18nDate <- isDateWithFormat("yyyy-MM-dd", toValidate, message).left;
+         notAnyKnownDate <- isDateWithFormat(Time.ISO8601DatePattern, toValidate, message).left)
       yield notAnyKnownDate
   }
 
@@ -209,14 +214,14 @@ class FormChecks @Inject()(accountStore: AccountStore, customerStore: CustomerSt
    */
   def isValidPassword(toValidate: String, message: String="")
   : Either[FormError, String] = {
-    Password.validate(toValidate).left.map(playValidation =>
-      new SimpleFormError(if (message == "") playValidation.error.message() else message)
-    )
+    Password.validate(toValidate).left.map { passwordError =>
+      new SimpleFormError(if (message == "") passwordError.message else message)
+    }
   }
 
   def isAlphaNumeric(toValidate: String, message: String="Must be alphanumeric")
-  : Either[FormError, String] = {
-    if (playValidation.`match`(toValidate, "[a-zA-Z0-9]*").ok) {
+  : Either[FormError, String] = {    
+    if (toValidate.matches("[a-zA-Z0-9]*")) {
       Right(toValidate)
     } else {
       Left(new SimpleFormError(message))
@@ -230,7 +235,7 @@ class FormChecks @Inject()(accountStore: AccountStore, customerStore: CustomerSt
   def isPhoneNumber(toValidate: String, message: String = "Valid phone number required")
   : Either[FormError, String] =
   {
-    if (playValidation.phone(toValidate).ok) {
+    if (toValidate.matches(phonePattern)) {
       Right(toValidate)
     } else {
       error(message)
@@ -295,10 +300,6 @@ class FormChecks @Inject()(accountStore: AccountStore, customerStore: CustomerSt
   //
   // Private members
   //
-  private def playValidation = {
-    Validation.current()
-  }
-
   private def error(message: String): Left[FormError, Nothing] = {
     Left(new SimpleFormError(message))
   }
@@ -308,6 +309,7 @@ class FormChecks @Inject()(accountStore: AccountStore, customerStore: CustomerSt
 }
 
 object FormChecks {
+
   /**
    * Returns the provided strings unaltered if there was at least one non-null
    * non-empty string in them.
@@ -327,4 +329,10 @@ object FormChecks {
         Right(strings)
     }
   }
+  
+  //
+  // Private members
+  // 
+  /** Phone regex copied from Play 1.2.4 code */
+  private[FormChecks] val phonePattern = "^([\\+][0-9]{1,3}([ \\.\\-]))?([\\(]{1}[0-9]{2,6}[\\)])?([0-9 \\.\\-/]{3,20})((x|ext|extension)[ ]?[0-9]{1,4})?$"
 }
