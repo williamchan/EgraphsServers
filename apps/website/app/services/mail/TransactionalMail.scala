@@ -8,6 +8,7 @@ import services.Utils
 
 import services.http.PlayConfig
 import collection.mutable.ListBuffer
+import services.logging.Logging
 
 /** Interface for sending transactional mails. Transactional mails are  */
 trait TransactionalMail {
@@ -44,12 +45,23 @@ class MailProvider @Inject()(@PlayConfig playConfig: Properties, utils: Utils) e
  * Implementation of the TransactionalMail library that always sends through Gmail, since as of
  * 12/2011 Play can not successfully send mail through gmail.
  */
-private[mail] case class Gmail(user: String, password: String) extends TransactionalMail
+private[mail] case class Gmail(user: String, password: String) extends TransactionalMail with Logging
 {
   val host = "smtp.gmail.com"
+  val numTries = 25
 
   def send(mail: Email) {
     play.Logger.info("Gmail: sending to " + mail.getToAddresses)
+    try {
+      for (i <- 1 until numTries) {
+        if (attemptSend(mail)) return
+      }
+    } catch {
+      case e: Exception => log(e.getLocalizedMessage)
+    }
+  }
+
+  private def attemptSend(mail: Email): Boolean = {
     import scala.collection.JavaConversions._
 
     // Prepare java mail sessions and transports
@@ -72,6 +84,7 @@ private[mail] case class Gmail(user: String, password: String) extends Transacti
     Utils.closing(transport) { transport =>
       transport.sendMessage(mimeMessage, mimeMessage.getAllRecipients)
     }
+    true
   }
 }
 
