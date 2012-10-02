@@ -8,6 +8,7 @@ import models.frontend.storefront.StorefrontBreadcrumb.CrumbChoice
 import CrumbChoice._
 import controllers.routes.WebsiteControllers.{
   getStorefrontChoosePhotoTiled,
+  getStorefrontChoosePhotoCarousel,
   getStorefrontPersonalize,
   getStorefrontReview,
   getStorefrontCheckout,
@@ -39,15 +40,7 @@ class StorefrontBreadcrumbData @Inject()(purchaseFormFactory: PurchaseFormFactor
 
     val (crumbUrls, currentCrumb) = maybeProductUrlSlug.map { productUrlSlug =>
       val crumbUrls = urls(forms, celebrityUrlSlug, productUrlSlug)
-      val maybeCurrentCrumb = request.actionMethod match {
-        case "getStorefrontChoosePhotoTiled" => Some(ChoosePhoto)
-        case "getStorefrontChoosePhotoCarousel" => Some(ChoosePhoto)
-        case "getStorefrontPersonalize" => Some(Personalize)
-        case "getStorefrontReview" => Some(Review)
-        case "getStorefrontCheckout" => Some(Checkout)
-        case "getStorefrontFinalize" => Some(Finalize)
-        case _ => None
-      }
+      val maybeCurrentCrumb = crumbForRequest(request.path, celebrityUrlSlug, maybeProductUrlSlug)
 
       (crumbUrls, maybeCurrentCrumb)
     }.getOrElse {
@@ -58,6 +51,30 @@ class StorefrontBreadcrumbData @Inject()(purchaseFormFactory: PurchaseFormFactor
 
     currentCrumb.map(crumb => crumbsWithUrls.withActive(crumb)).getOrElse {
       crumbsWithUrls
+    }
+  }
+  
+  def crumbForRequest(requestPath: String, celebrityUrlSlug: String, maybeProductUrlSlug: Option[String])
+  : Option[CrumbChoice] = 
+  {
+    if (requestPath == getStorefrontChoosePhotoTiled(celebrityUrlSlug).url) {
+      Some(ChoosePhoto)
+    } else {
+      maybeProductUrlSlug.flatMap { productUrlSlug =>
+        if (requestPath == getStorefrontChoosePhotoCarousel(celebrityUrlSlug, productUrlSlug).url) {
+          Some(ChoosePhoto)
+        } else if (requestPath == getStorefrontPersonalize(celebrityUrlSlug, productUrlSlug).url) {
+          Some(Personalize)
+        } else if (requestPath == getStorefrontReview(celebrityUrlSlug, productUrlSlug).url) {
+          Some(Review)
+        } else if (requestPath == getStorefrontCheckout(celebrityUrlSlug, productUrlSlug).url) {
+          Some(Checkout)
+        } else if (requestPath == getStorefrontFinalize(celebrityUrlSlug, productUrlSlug).url) {
+          Some(Finalize)
+        } else {
+          None
+        }
+      }
     }
   }
 
