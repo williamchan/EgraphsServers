@@ -53,30 +53,6 @@ class StorefrontBreadcrumbData @Inject()(purchaseFormFactory: PurchaseFormFactor
       crumbsWithUrls
     }
   }
-  
-  def crumbForRequest(requestPath: String, celebrityUrlSlug: String, maybeProductUrlSlug: Option[String])
-  : Option[CrumbChoice] = 
-  {
-    if (requestPath == getStorefrontChoosePhotoTiled(celebrityUrlSlug).url) {
-      Some(ChoosePhoto)
-    } else {
-      maybeProductUrlSlug.flatMap { productUrlSlug =>
-        if (requestPath == getStorefrontChoosePhotoCarousel(celebrityUrlSlug, productUrlSlug).url) {
-          Some(ChoosePhoto)
-        } else if (requestPath == getStorefrontPersonalize(celebrityUrlSlug, productUrlSlug).url) {
-          Some(Personalize)
-        } else if (requestPath == getStorefrontReview(celebrityUrlSlug, productUrlSlug).url) {
-          Some(Review)
-        } else if (requestPath == getStorefrontCheckout(celebrityUrlSlug, productUrlSlug).url) {
-          Some(Checkout)
-        } else if (requestPath == getStorefrontFinalize(celebrityUrlSlug, productUrlSlug).url) {
-          Some(Finalize)
-        } else {
-          None
-        }
-      }
-    }
-  }
 
   def urls(purchaseForms: PurchaseForms, celebrityUrlSlug: String, productUrlSlug: String) = {
     val choosePhoto = (ChoosePhoto -> getStorefrontChoosePhotoTiled(celebrityUrlSlug).url)
@@ -100,6 +76,33 @@ class StorefrontBreadcrumbData @Inject()(purchaseFormFactory: PurchaseFormFactor
     val crumbsAndUrls = choosePhoto :: maybeCrumbsAndUrls
 
     crumbsAndUrls.toMap.asInstanceOf[Map[CrumbChoice, String]]
+  }
+
+  //
+  // Private members
+  //
+  private def crumbForRequest(requestPath: String, celebrityUrlSlug: String, maybeProductUrlSlug: Option[String])
+  : Option[CrumbChoice] = 
+  {
+    if (requestPath == getStorefrontChoosePhotoTiled(celebrityUrlSlug).url) {
+      Some(ChoosePhoto)
+    } else {
+      maybeProductUrlSlug.flatMap { productUrlSlug =>
+        if (requestPath == getStorefrontChoosePhotoCarousel(celebrityUrlSlug, productUrlSlug).url) {
+          Some(ChoosePhoto)
+        } else if (requestPath == getStorefrontPersonalize(celebrityUrlSlug, productUrlSlug).url) {
+          Some(Personalize)
+        } else if (requestPath == getStorefrontReview(celebrityUrlSlug, productUrlSlug).url) {
+          Some(Review)
+        } else if (requestPath == getStorefrontCheckout(celebrityUrlSlug, productUrlSlug).url) {
+          Some(Checkout)
+        } else if (requestPath == getStorefrontFinalize(celebrityUrlSlug, productUrlSlug).url) {
+          Some(Finalize)
+        } else {
+          None
+        }
+      }
+    }
   }
 
 }
