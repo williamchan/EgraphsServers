@@ -2,6 +2,7 @@ package models
 
 import enums.PublishedStatus.EnumVal
 import enums.{PublishedStatus, HasPublishedStatus}
+import frontend.landing.CatalogStar
 import java.sql.Timestamp
 import services.db.{FilterOneTable, Schema, SavesWithLongKey, KeyedCaseClass}
 import play.templates.JavaExtensions
@@ -14,8 +15,10 @@ import play.Play
 import services.blobs.AccessPolicy
 import com.google.inject.{Provider, Inject}
 import services._
+import mvc.celebrity.CelebrityViewConversions
 import org.squeryl.Query
-import org.squeryl.dsl.ManyToMany
+import org.squeryl.dsl.{GroupWithMeasures, ManyToMany}
+import java.util.Date
 
 case class ProductServices @Inject() (
   store: ProductStore,
@@ -403,6 +406,81 @@ class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: Invent
     schema.inventoryBatchProducts.left(inventoryBatch)
   }
 
+  /**
+   * Gets all published Celebrities that have purchase-able Products along with whether the Celebrity has inventory available.
+   * Excludes Products that are not available, such as those that are not in an active InventoryBatch based on
+   * startDate and endDate, as well as those that are sold out of quantity.
+   *
+   * This implementation is hopefully more performant than getting all active Products and then calculating the
+   * quantity available for each Product, but this assumption has yet to be tested.
+   *
+   * @return a set of Celebrities and whether the Celebrity has inventory available.
+   */
+  def getCatalogStars(): Set[CatalogStar] = {
+    import schema.{celebrities, inventoryBatches, orders}
+
+    val query: Query[GroupWithMeasures[Product7[Long, String, Option[String], String, Boolean, Date, Date], Int]] =
+      join(celebrities, inventoryBatches, schema.products, orders.leftOuter)((celebrity, inventoryBatch, product, order) =>
+        where(
+          celebrity._publishedStatus === PublishedStatus.Published.name and
+            product._publishedStatus === PublishedStatus.Published.name
+        )
+          groupBy(
+            celebrity.id,
+            celebrity.publicName,
+            celebrity._landingPageImageKey,
+            celebrity.roleDescription,
+            celebrity.isFeatured,
+            inventoryBatch.startDate,
+            inventoryBatch.endDate
+          )
+          compute (nvl(sum(order.map(o => 1)), 0))
+          on(
+            celebrity.id === inventoryBatch.celebrityId,
+            celebrity.id === product.celebrityId,
+            inventoryBatch.id === order.map(_.inventoryBatchId)
+          )
+      )
+
+    // transform that raw data into something we can use
+    val celebritiesAndInventoryQuantities = for (row <- query) yield {
+      val ibStartDate = row.key._6
+      val ibEndDate = row.key._7
+      (
+        // Using Celebrity to carry these values and also for its helper methods. Do not call save() on these Celebrities.
+        Celebrity(
+          id = row.key._1,
+          publicName = row.key._2,
+          _landingPageImageKey = row.key._3,
+          roleDescription = row.key._4,
+          isFeatured = row.key._5
+        ),
+        // max(O) will ensure that we don't have negative quantities
+        InventoryQuantity(quantityRemaining = row.measures.max(0), ibStartDate = ibStartDate, ibEndDate = ibEndDate)
+      )
+    }
+
+    val tempCelebMap = celebritiesAndInventoryQuantities.groupBy(tuple => tuple._1)
+    val celebritiesToInventoryQuantities: Map[Celebrity, List[InventoryQuantity]] = tempCelebMap.mapValues(
+      entry => entry.map(tuple => tuple._2).toList
+    )
+
+    // reduce quantities to 0 of products that are not available now by date
+    val now = new Date()
+    val celebritiesToCurrentInventoryQuantities = celebritiesToInventoryQuantities.mapValues(
+      value => value.map(inventoryQuantity =>
+        if (inventoryQuantity.ibStartDate.before(now) && inventoryQuantity.ibEndDate.after(now)) inventoryQuantity
+        else inventoryQuantity.copy(quantityRemaining = 0)
+      )
+    )
+
+    val catalogStars = for((celebrity, inventoryQuantities) <- celebritiesToCurrentInventoryQuantities) yield {
+      (new CelebrityViewConversions(celebrity)).asCatalogStar(inventoryQuantities)
+    }
+
+    catalogStars.toSet
+  }
+
   //
   // SavesWithLongKey[Product] methods
   //
@@ -439,6 +517,8 @@ class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: Invent
     toUpdate.copy(created=created, updated=updated)
   }
 }
+
+case class InventoryQuantity(quantityRemaining: Int, ibStartDate: Date, ibEndDate: Date)
 
 class ProductQueryFilters {
   import org.squeryl.PrimitiveTypeMode._

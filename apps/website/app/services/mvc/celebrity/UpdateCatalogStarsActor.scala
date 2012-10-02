@@ -4,11 +4,13 @@ import akka.actor.{ActorRef, Actor}
 import akka.actor.Actor.actorOf
 import com.google.inject.Inject
 import services.AppConfig
-import models.CelebrityStore
 import java.util.concurrent.TimeUnit
+import java.util.Random
 import services.logging.Logging
 import services.db.{TransactionSerializable, DBSession}
 import services.cache.CacheFactory
+import org.joda.time.DateTimeConstants
+import models.ProductStore
 
 /**
  * You are probably looking for [[services.mvc.celebrity.CatalogStarsQuery]] instead of this.
@@ -20,17 +22,14 @@ import services.cache.CacheFactory
  *   should the cache lack them
  * @param cacheFactory cache connection that retrieves the CatalogStars as the first
  *   attempt before going to the DB.
- * @param celebrityStore gets us the published celebrities
- * @param viewConverting functionality to turn [[models.Celebrity]] instances into CatalogStars.
+ * @param productStore gets us the published celebrities
  */
 private[celebrity] class UpdateCatalogStarsActor @Inject()(
   db: DBSession,
   cacheFactory: CacheFactory,
-  celebrityStore: CelebrityStore,
-  viewConverting: CelebrityViewConverting
+  productStore: ProductStore
 ) extends Actor {
 
-  import viewConverting._
   import UpdateCatalogStarsActor.{UpdateCatalogStars, updatePeriodSeconds, resultsCacheKey}
 
   protected def receive = {
@@ -44,15 +43,10 @@ private[celebrity] class UpdateCatalogStarsActor @Inject()(
         db.connected(isolation = TransactionSerializable, readOnly = true) {
           log.info("Updating landing page celebrities")
 
-          // Get the list of domain objects from the DB
-          val publishedCelebs = celebrityStore.getPublishedCelebrities.toIndexedSeq
-
-          // Turn the domain objects into ViewModels (CatalogStars)
-          for (celeb <- publishedCelebs) yield {
-            celeb.asCatalogStar
-          }
+          // Get the list of catalog stars from the DB
+          productStore.getCatalogStars()
         }
-      }
+      }.toIndexedSeq
 
       // Send the celebs to an actor that will be in charge of serving them to
       // the landing page.
@@ -79,7 +73,7 @@ private[mvc] object UpdateCatalogStarsActor extends Logging {
   // Package members
   //
   private[celebrity] val singleton = actorOf(AppConfig.instance[UpdateCatalogStarsActor])
-  private[celebrity] val updatePeriodSeconds = 30
+  private[celebrity] val updatePeriodSeconds = 5 * DateTimeConstants.SECONDS_PER_MINUTE
   private[celebrity] val resultsCacheKey = "catalog-stars"
   private[celebrity] case class UpdateCatalogStars(recipientActor: ActorRef)
 
@@ -87,12 +81,14 @@ private[mvc] object UpdateCatalogStarsActor extends Logging {
   // Private members
   //
   private def scheduleJob() = {
+    val random = new Random()
+    val delayJitter = random.nextInt() % 10 // this should make the update schedule a little more random, and if we are unlucky that all hosts update at once, they won't the next time.
     log("Scheduling landing page celebrity update for every " + updatePeriodSeconds + "s")
     akka.actor.Scheduler.schedule(
       receiver = this.singleton,
       message = UpdateCatalogStars(CatalogStarsActor.singleton),
       initialDelay = 10, // Delay first invocation for a bit to give the Redis plugin time to bootstrap
-      delay = updatePeriodSeconds,
+      delay = updatePeriodSeconds + delayJitter,
       timeUnit = TimeUnit.SECONDS
     )
   }

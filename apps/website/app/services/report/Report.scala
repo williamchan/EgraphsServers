@@ -37,9 +37,14 @@ trait Report {
   protected def tsvFile(tsv: StringBuilder, reportName: String = reportName): File = {
     val file = File.createTempFile(reportName + "-" + Time.toBlobstoreFormat(Time.today), ".tsv")
     file.deleteOnExit()
+    //TODO: checkout automatic resource management: http://stackoverflow.com/questions/2207425/what-automatic-resource-management-alternatives-exists-for-scala
     val out = new FileOutputStream(file)
-    out.write(tsv.toString().getBytes)
-    out.close()
+    try {
+      out.write(tsv.toString().getBytes)
+    } catch {
+      case _ => out.close()
+    }
+
     file
   }
 

@@ -10,9 +10,11 @@ import com.google.inject.{Provider, Inject}
 import org.squeryl.Query
 import services._
 import java.awt.image.BufferedImage
-import models.Celebrity.CelebrityWithImage
 import services.mail.TransactionalMail
 import org.apache.commons.mail.HtmlEmail
+import scala.Some
+import models.Celebrity.CelebrityWithImage
+import services.Dimensions
 
 /**
  * Services used by each celebrity instance
@@ -79,52 +81,6 @@ case class Celebrity(id: Long = 0,
   /**Returns all of the celebrity's Products */
   def products(filters: FilterOneTable[Product]*): Query[Product] = {
     services.productStore.findByCelebrity(id, filters: _*)
-  }
-
-  /**
-   * Gets this Celebrity's Products that can be purchased along with the quantity available of each Product.
-   * Excludes Products that are not available, such as those that are not in an active InventoryBatch based on
-   * startDate and endDate, as well as those that are sold out of quantity.
-   *
-   * This implementation is hopefully more performant than getting all active Products and then calculating the
-   * quantity available for each Product, but this assumption has yet to be tested.
-   *
-   * This implementation executes 3 queries, the first for the InventoryBatches, the second to aid in calculating the
-   * quantity available to each InventoryBatch, and the third to get the Products and their InventoryBatch associations.
-   *
-   * @return a sequence of purchase-able Products along with the available quantity of each Product.
-   */
-  def getActiveProductsWithInventoryRemaining(): Seq[(Product, Int)] = {
-    // 1) query for active InventoryBatches
-    val activeIBs = services.inventoryBatchStore.findByCelebrity(id, services.inventoryBatchQueryFilters.activeOnly)
-    val inventoryBatches = Utils.toMap(activeIBs, key=(theIB: InventoryBatch) => theIB.id)
-    val inventoryBatchIds = inventoryBatches.keys.toList
-
-    // 2) calculate quantity remaining for each InventoryBatch
-    val inventoryBatchIdsAndOrderCounts: Map[Long, Int] =
-      Map(services.orderStore.countOrdersByInventoryBatch(inventoryBatchIds): _*)
-
-    val inventoryBatchIdsAndNumRemaining : Map[Long, Int] = inventoryBatchIds.map{ id =>
-        (id, inventoryBatches.get(id).get.numInventory - inventoryBatchIdsAndOrderCounts.get(id).getOrElse(0))
-      }.toMap
-
-    // 3) query for products and inventoryBatchProducts on inventoryBatchIds
-    val productsAndBatchAssociations: Query[(Product, Long)] =
-      services.productStore.getProductAndInventoryBatchAssociations(inventoryBatchIds)
-
-    val productsAndBatchIds = productsAndBatchAssociations.toMap.keySet.map(product =>
-      {
-       val ids =  for((p, id) <- productsAndBatchAssociations if p.id == product.id) yield Set(id)
-       (product, ids.reduceLeft((s1, s2) => s1 | s2 ))
-      }
-    ).toMap
-
-    // 4) for each product, sum quantity remaining for each associated batch
-    val productsWithInventoryRemaining: Map[Product, Int] = productsAndBatchIds.map(b => {
-      val totalNumRemainingForProduct = (for (batchId <- b._2) yield inventoryBatchIdsAndNumRemaining.get(batchId).getOrElse(0)).sum
-      (b._1, totalNumRemainingForProduct)
-    })
-    productsWithInventoryRemaining.toSeq
   }
 
   def productsInActiveInventoryBatches(): Seq[Product] = {

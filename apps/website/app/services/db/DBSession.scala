@@ -78,7 +78,7 @@ class DBSession @Inject() (connectionFactory: () => Connection) extends Logging 
   }
 
   private def rollbackAndThrow[T](e: scala.Exception, connection: Connection): Nothing = {
-    log("Rolling back changes to the DB due to a " + e.getClass.getName)
+    log("Rolling back changes to the DB due to an exception.", e)
     connection.rollback()
     throw e
   }

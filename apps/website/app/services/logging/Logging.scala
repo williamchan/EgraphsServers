@@ -1,19 +1,33 @@
 package services.logging
 
+import services.Utils
+
 /**
  * Provides any class that mixes it in with easy logging functionality.
  */
 trait Logging {
   import Logging._
 
-  /**Logs a message to INFO by default */
+  /** Logs a message to INFO by default */
   def log(message: => String) {
     play.Logger.info(annotateMessage(message))
+  }
+
+  /** Logs a message and stacktrace of exception to INFO by default */
+  def log(message: => String, throwable: Throwable) {
+    log(message)
+    Utils.logException(throwable)
   }
 
   /** Logs a message at ERROR log level */
   def error(message: => String) {
     play.Logger.error(annotateMessage(message))
+  }
+
+  /** Logs a message and stacktrace of exception at ERROR log level */
+  def error(message: => String, throwable: Throwable) {
+    error(message)
+    Utils.logException(throwable)
   }
 
   //

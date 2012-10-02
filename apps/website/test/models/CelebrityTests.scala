@@ -91,44 +91,6 @@ class CelebrityTests extends EgraphsUnitTest
     profilePhoto.renderFromMaster.asByteArray(ImageAsset.Png).length should be (imageAsset.renderFromMaster.asByteArray(ImageAsset.Png).length)
   }
 
-  "getActiveProductsWithInventoryRemaining" should "return Products with quantity remaining equal to numInventory if no orders exist" in {
-    val celebrity = TestData.newSavedCelebrity()
-    val product = TestData.newSavedProductWithoutInventoryBatch(celebrity = celebrity)
-    val inventoryBatch = TestData.newSavedInventoryBatch(celebrity = celebrity)
-    product.inventoryBatches.associate(inventoryBatch)
-
-    val productsWithInventoryRemaining = celebrity.getActiveProductsWithInventoryRemaining()
-    productsWithInventoryRemaining.toMap.get(product) should be(Some(inventoryBatch.numInventory))
-
-  }
-  /**
-   * Sample data: Product1 in IB1 and IB2, and Product 2 in IB2. All IBs have default numInventory of 50.
-   *              Placing one order against IB1 and two orders against IB2 should reduce the quantity available by 1 and 2, respectively.
-   *              So, because IB1 has available quantity of 49 and IB2 has available quantity of 48,
-   *              Product1 should have 97 quantity available and Product2 should have 48.
-   */
-  "getActiveProductsWithInventoryRemaining" should "return Products with quantity remaining" in {
-    val celebrity = TestData.newSavedCelebrity()
-    val customer = TestData.newSavedCustomer()
-    val product1 = TestData.newSavedProductWithoutInventoryBatch(celebrity = celebrity)
-    val product2 = TestData.newSavedProductWithoutInventoryBatch(celebrity = celebrity)
-    val product3 = TestData.newSavedProductWithoutInventoryBatch(celebrity = celebrity)
-    val inventoryBatch1 = TestData.newSavedInventoryBatch(celebrity = celebrity)
-    val inventoryBatch2 = TestData.newSavedInventoryBatch(celebrity = celebrity)
-    val inventoryBatch3 = TestData.newSavedInventoryBatch(celebrity = celebrity) // random InventoryBatch just for kicks
-    product1.inventoryBatches.associate(inventoryBatch1)
-    product1.inventoryBatches.associate(inventoryBatch2)
-    product2.inventoryBatches.associate(inventoryBatch2)
-    customer.buy(product1).save().copy(inventoryBatchId = inventoryBatch1.id).save()
-    customer.buy(product1).save().copy(inventoryBatchId = inventoryBatch2.id).save()
-    customer.buy(product2).save()
-
-    val productsWithInventoryRemaining = celebrity.getActiveProductsWithInventoryRemaining()
-    productsWithInventoryRemaining.toMap.get(product1) should be(Some(inventoryBatch1.numInventory + inventoryBatch2.numInventory - 3))
-    productsWithInventoryRemaining.toMap.get(product2) should be(Some(inventoryBatch2.numInventory - 2))
-    productsWithInventoryRemaining.toMap.get(product3) should be(None)
-  }
-
   "productsInActiveInventoryBatches" should "return Products associated with active InventoryBatches" in {
     val celebrity = TestData.newSavedCelebrity()
     celebrity.productsInActiveInventoryBatches().length should be(0)

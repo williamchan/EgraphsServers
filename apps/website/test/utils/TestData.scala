@@ -96,18 +96,28 @@ object TestData {
   }
 
   def newSavedProduct(celebrity: Option[Celebrity] = None): Product = {
-    var product = celebrity match {
-      case None => newProduct(newSavedCelebrity()).save()
-      case Some(c) => newProduct(c).save()
-    }
-    product = product.saveWithImageAssets(image = Some(product.defaultPhoto.renderFromMaster), icon = None)
-    val inventoryBatch = newSavedInventoryBatch(product.celebrity)
-    inventoryBatch.products.associate(product)
+    val product = newSavedProductWithoutInventoryBatch(celebrity)
+    newSavedInventoryBatch(product)
     product
   }
 
+  def newSavedProductWithoutInventoryBatch(celebrity: Option[Celebrity] = None): Product = {
+    val product = celebrity match {
+      case None => newProduct(newSavedCelebrity()).save()
+      case Some(c) => newProduct(c).save()
+    }
+    product.saveWithImageAssets(image = Some(product.defaultPhoto.renderFromMaster), icon = None)
+  }
+
+  @deprecated("Use with optional celebrity version")
   def newSavedProductWithoutInventoryBatch(celebrity: Celebrity): Product = {
     newProduct(celebrity).save()
+  }
+
+  def newSavedInventoryBatch(product: Product) : InventoryBatch = {
+    val inventoryBatch = newSavedInventoryBatch(product.celebrity)
+    inventoryBatch.products.associate(product)
+    inventoryBatch
   }
 
   def newSavedInventoryBatch(celebrity: Celebrity) : InventoryBatch = {
