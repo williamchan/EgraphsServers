@@ -160,7 +160,7 @@ class ProductTests extends EgraphsUnitTest
     celebrityNamesInCatalogStars should not contain (unpublishedProduct2.celebrity.publicName)
   }
 
-  "getCatalogStars" should "return only celebrities that have an inventory batch that is still available by date" in {
+  "getCatalogStars" should "return celebrities that lack inventory if they lack inventory batches active based on startDate and endDate" in {
     // create 4 different celebrities with products, 2 have unpublished products, all are published celebrities.
     val availableProduct1 = TestData.newSavedProduct()
     val availableProduct2 = TestData.newSavedProduct()
