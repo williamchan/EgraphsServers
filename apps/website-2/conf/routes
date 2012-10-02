@@ -97,13 +97,13 @@ GET     /account/recover/                                           controllers.
 POST    /account/recover                                            controllers.WebsiteControllers.postRecoverAccount
 GET     /account/reset/                                             controllers.WebsiteControllers.getResetPassword(email: String, secretKey: String)
 POST    /account/reset                                              controllers.WebsiteControllers.postResetPassword
-GET     /account/verify/                                            controllers.WebsiteControllers.getVerifyAccount
+GET     /account/verify/                                            controllers.WebsiteControllers.getVerifyAccount(email: String, resetKey: String)
 GET     /account/:galleryCustomerId/gallery/                        controllers.WebsiteControllers.getCustomerGalleryById(galleryCustomerId: Long)
 GET     /account/:username/                                         controllers.WebsiteControllers.getCustomerGalleryByUsername(username: String)
 GET     /careers/                                                   controllers.WebsiteControllers.getCareers
 GET     /egraph/:orderId/                                           controllers.WebsiteControllers.getEgraphRedirect(orderId: Long)
 GET     /:orderId/                                                  controllers.WebsiteControllers.getEgraph(orderId: Long)
-GET     /facebooklogin/callback/                                    controllers.WebsiteControllers.getFacebookLoginCallback(state: String, code: Option[String], error: Option[String], error_reason: Option[String], error_description: Option[String])
+GET     /facebooklogin/callback/                                    controllers.WebsiteControllers.getFacebookLoginCallback
 GET     /faq/                                                       controllers.WebsiteControllers.getFAQ
 GET     /inside-an-egraph/                                          controllers.WebsiteControllers.getInsideEgraph
 GET     /login                                                      controllers.WebsiteControllers.getLogin
@@ -130,7 +130,7 @@ GET     /:celebrityUrlSlug/photos/:productUrlSlug/checkout        controllers.We
 POST    /:celebrityUrlSlug/photos/:productUrlSlug/checkout        controllers.WebsiteControllers.postStorefrontCheckout(celebrityUrlSlug: String, productUrlSlug:String)
 GET     /:celebrityUrlSlug/photos/:productUrlSlug/finalize        controllers.WebsiteControllers.getStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug:String)
 POST    /:celebrityUrlSlug/photos/:productUrlSlug/finalize        controllers.WebsiteControllers.postStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug:String)
-GET     /:celebrityUrlSlug/photos/:productUrlSlug/cc-error        controllers.WebsiteControllers.getStorefrontCreditCardError(celebrityUrlSlug: String, productUrlSlug:String)
+GET     /:celebrityUrlSlug/photos/:productUrlSlug/cc-error        controllers.WebsiteControllers.getStorefrontCreditCardError(celebrityUrlSlug: String, productUrlSlug:String, creditCardMsg: Option[String] ?= None)
 GET     /:celebrityUrlSlug/photos/:productUrlSlug/no-inventory    controllers.WebsiteControllers.getStorefrontNoInventory(celebrityUrlSlug: String, productUrlSlug:String)
 GET     /:celebrityUrlSlug/photos/:productUrlSlug/purchase-error  controllers.WebsiteControllers.getStorefrontPurchaseError(celebrityUrlSlug: String, productUrlSlug:String)
 
