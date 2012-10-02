@@ -10,6 +10,7 @@ import services.http.{SafePlayParams, POSTControllerMethod}
 import services.mvc.ImplicitHeaderAndFooterData
 import services.Utils
 import services.http.filters.HttpFilters
+import controllers.routes.WebsiteControllers.getResetPassword
 
 private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
@@ -24,7 +25,7 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
 
   def postRecoverAccount() = postController() {    
     httpFilters.requireAccountEmail.inFlashOrRequest() { account =>
-      Action { request =>
+      Action { implicit request =>
         val (customer, accountWithResetPassKey) = dbSession.connected(TransactionSerializable) {
           val accountWithResetPassKey = account.withResetPasswordKey.save()
           (customerStore.get(account.customerId.get), accountWithResetPassKey)
@@ -43,7 +44,7 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
   /**
    * Sends an email so that the customer can reset password via the getResetPassword endpoint
    */
-  private def sendRecoveryPasswordEmail(account: Account, customer: Customer) {
+  private def sendRecoveryPasswordEmail(account: Account, customer: Customer)(implicit request: RequestHeader) {
     val email = new HtmlEmail()
     email.setFrom("support@egraphs.com")
     email.addReplyTo("support@egraphs.com")
@@ -53,7 +54,7 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
       views.html.Application.email.reset_password_email(
         customerName = customer.name,
         email = account.email,
-        resetPasswordUrl = GetResetPasswordEndpoint.absoluteUrl(account.email, account.resetPasswordKey.get)
+        resetPasswordUrl = getResetPassword(account.email, account.resetPasswordKey.get).absoluteURL(secure=true)
       ).toString().trim()
     )
     transactionalMail.send(email)

@@ -96,8 +96,8 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
 
 object GetResetPasswordEndpoint {
 
-  def absoluteUrl(email: String, secretKey: String): String = {
-    controllers.routes.WebsiteControllers.getResetPassword(email, secretKey).absoluteUrl(secure=true)
+  def absoluteUrl(email: String, secretKey: String)(implicit request: RequestHeader): String = {
+    controllers.routes.WebsiteControllers.getResetPassword(email, secretKey).absoluteURL(secure=true)
   }
 
   def redirectUrl: Call = {

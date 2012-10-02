@@ -2,7 +2,6 @@ package services.db
 
 import com.google.inject.Inject
 import java.sql.{SQLException, Connection}
-import play.exceptions.DatabaseException
 import org.squeryl.{Session, SessionFactory}
 import services.logging.Logging
 
@@ -87,14 +86,25 @@ class DBSession @Inject() (connectionFactory: () => Connection) extends Logging 
   }
 
   /**
-   * Retrieves a Connection from the datasource, which should be pooled. Formats and reports any errors.
+   * Retrieves a Connection from Play. It is not pooled, so we must manage it ourselves.
+   * Formats and reports any errors.
    *
    * @return a connection from the datasource.
    */
   private def connect(isolation: TransactionIsolation): Connection = {
-    try {
-      val connection = connectionFactory()
+    // Get the connection.
+    val connection = try {
+      connectionFactory()
+    } catch {
+      case sqlE: SQLException => {
+        val msg = "Failed to obtain a new connection (" + sqlE.getMessage + ")"
+        log(msg)
 
+        throw new RuntimeException(msg, sqlE)
+      }
+    }
+
+    try {
       // Configure the connection: (1) no auto-commit, (2) correct transaction isolation.
       if (connection.getAutoCommit) {
         connection.setAutoCommit(false)
@@ -103,15 +113,13 @@ class DBSession @Inject() (connectionFactory: () => Connection) extends Logging 
       if (connection.getTransactionIsolation != isolation.jdbcIsolationLevel) {
         connection.setTransactionIsolation(isolation.jdbcIsolationLevel)
       }
-      
+
       connection
     }
     catch {
-      case sqlE: SQLException => {
-        val msg = "Failed to obtain a new connection (" + sqlE.getMessage + ")"
-        log(msg)
-        throw new DatabaseException(msg, sqlE)
-      }
+      case e: Exception =>
+        connection.close()
+        throw e
     }
   }
 }

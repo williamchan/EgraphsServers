@@ -4,6 +4,7 @@ import play.api._
 import play.api.mvc._
 import services.http.ControllerMethod
 import services.mvc.ImplicitHeaderAndFooterData
+import models.frontend.contents.Section
 
 private[controllers] trait GetStaticEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
   protected def controllerMethod: ControllerMethod
@@ -24,7 +25,7 @@ private[controllers] trait GetStaticEndpoint extends ImplicitHeaderAndFooterData
     Action {
       Ok(views.html.frontend.faq())
     }
-  }  
+  }
 
   def getInsideEgraph = controllerMethod() {
     Action {

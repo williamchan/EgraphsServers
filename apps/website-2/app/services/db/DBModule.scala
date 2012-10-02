@@ -15,7 +15,7 @@ object DBModule extends AbstractModule with ScalaModule {
     // Connection factories: () => Connection
 
     // Non-annotated factory: gives a new connection from the pool
-    bind[() => Connection].toInstance(() => play.db.DB.datasource.getConnection)
+    bind[() => Connection].toInstance(() => play.db.DB.getConnection())
 
     // @CurrentTransaction factory: gives the one used in the current Squeryl session.
     // This will bork if there is no current session.

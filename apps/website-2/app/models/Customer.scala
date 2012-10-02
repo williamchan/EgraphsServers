@@ -117,7 +117,7 @@ object Customer {
     val emailTwitterSrc = ""
 
     if (verificationNeeded) {
-      val verifyPasswordUrl = getVerifyAccount(account.email, account.resetPasswordKey.get).absoluteURL
+      val verifyPasswordUrl = getVerifyAccount(account.email, account.resetPasswordKey.get).absoluteURL(secure=true)
       email.setHtmlMsg(views.html.frontend.email_account_verification(
         verifyPasswordUrl = verifyPasswordUrl,
         emailLogoSrc = emailLogoSrc,
