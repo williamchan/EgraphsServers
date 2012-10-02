@@ -10,7 +10,7 @@ import services.logging.Logging
 import services.db.{TransactionSerializable, DBSession}
 import services.cache.CacheFactory
 import org.joda.time.DateTimeConstants
-import models.ProductStore
+import models.{CelebrityStore, ProductStore}
 
 /**
  * You are probably looking for [[services.mvc.celebrity.CatalogStarsQuery]] instead of this.
@@ -22,14 +22,17 @@ import models.ProductStore
  *   should the cache lack them
  * @param cacheFactory cache connection that retrieves the CatalogStars as the first
  *   attempt before going to the DB.
- * @param productStore gets us the published celebrities
+ * @param celebrityStore gets us the published celebrities
+ * @param viewConverting functionality to turn [[models.Celebrity]] instances into CatalogStars.
  */
 private[celebrity] class UpdateCatalogStarsActor @Inject()(
   db: DBSession,
   cacheFactory: CacheFactory,
-  productStore: ProductStore
+  celebrityStore: CelebrityStore,
+  viewConverting: CelebrityViewConverting
 ) extends Actor {
 
+  import viewConverting._
   import UpdateCatalogStarsActor.{UpdateCatalogStars, updatePeriodSeconds, resultsCacheKey}
 
   protected def receive = {
@@ -43,10 +46,15 @@ private[celebrity] class UpdateCatalogStarsActor @Inject()(
         db.connected(isolation = TransactionSerializable, readOnly = true) {
           log.info("Updating landing page celebrities")
 
-          // Get the list of catalog stars from the DB
-          productStore.getCatalogStars()
+          // Get the list of domain objects from the DB
+          val publishedCelebs = celebrityStore.getPublishedCelebrities.toIndexedSeq
+
+          // Turn the domain objects into ViewModels (CatalogStars)
+          for (celeb <- publishedCelebs) yield {
+            celeb.asCatalogStar
+          }
         }
-      }.toIndexedSeq
+      }
 
       // Send the celebs to an actor that will be in charge of serving them to
       // the landing page.

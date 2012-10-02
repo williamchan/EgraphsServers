@@ -73,6 +73,36 @@ class CelebrityViewConversions(celeb: Celebrity) {
       isFeatured = celeb.isFeatured
     )
   }
+
+  @deprecated("This is the old version before SER-86. Bringing this back because the new version does not work yet.")
+  def asCatalogStar: CatalogStar = {
+    val mastheadImageUrl = celeb
+      .landingPageImage
+      .withImageType(ImageAsset.Jpeg)
+      .resizedWidth(440)
+      .getSaved(AccessPolicy.Public)
+      .url
+
+    val activeProductsAndInventory = celeb.getActiveProductsWithInventoryRemaining()
+    val purchaseableProducts = activeProductsAndInventory.filter {
+      productAndCount =>
+        productAndCount._2 > 0
+    }
+
+    val choosePhotoUrl = Utils.lookupUrl(
+      "WebsiteControllers.getStorefrontChoosePhotoTiled",
+      Map("celebrityUrlSlug" -> celeb.urlSlug)
+    ).url
+
+    CatalogStar(
+      name = celeb.publicName,
+      secondaryText = Option(celeb.roleDescription),
+      imageUrl = mastheadImageUrl,
+      storefrontUrl = choosePhotoUrl,
+      hasInventoryRemaining = !purchaseableProducts.isEmpty,
+      isFeatured = celeb.isFeatured
+    )
+  }
 }
 
 object CelebrityViewConversions extends CelebrityViewConverting {
