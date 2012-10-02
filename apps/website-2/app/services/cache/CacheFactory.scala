@@ -3,8 +3,9 @@ package services.cache
 import services.Utils
 import com.google.inject.Inject
 import services.logging.Logging
-import play.cache.EhCacheImpl
 import services.http.{PlayId, DeploymentTarget, HostInfo}
+import play.api.Play.current
+import play.api.cache.EhCachePlugin
 
 /**
  * Yields the configured [[services.cache.Cache]] implementation. See the documentation for
@@ -78,7 +79,7 @@ class CacheFactory @Inject()(
 
 
   private[cache] def inMemoryCache: Cache = {
-    new InMemoryCache(EhCacheImpl.getInstance())
+    new InMemoryCache()
   }
 
   private[cache] def redisCacheIfPossible(db: Int = JedisFactory.defaultRedisDb): Cache = {
