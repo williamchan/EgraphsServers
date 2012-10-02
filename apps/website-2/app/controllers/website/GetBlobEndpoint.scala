@@ -9,6 +9,7 @@ import services.http.ControllerMethod
 import services.logging.Logging
 import play.api.http.ContentTypeOf
 import play.api.libs.MimeTypes
+import play.api.libs.iteratee.Enumerator
 
 /**
  * Serves up all Blobs. Particularly useful when served through the file system
@@ -37,8 +38,11 @@ private[controllers] trait GetBlobEndpoint { this: Controller =>
           }
   
           log("Serving blob \"" + blobKey + "\" with content type \"" + contentType + "\"")
-          //TODO: need file here, not input stream
-          Ok.sendFile(data.asInputStream, blobKey, true).withHeaders(header).as(contentType.toString())
+          
+          implicit val responseContentType = contentType
+          val dataContent = Enumerator.fromStream(data.asInputStream)
+          
+          Ok.stream(dataContent).withHeaders(header)
         }
       }
     }
