@@ -3,6 +3,9 @@ package services.http.forms
 import play.api.mvc.Results.Redirect
 import services.http.ServerSession
 import services.http.forms.Form.FormWriteable
+import play.api.mvc.Result
+import play.api.mvc.Request
+import play.api.mvc.AnyContent
 
 /**
  * Abstraction of an HTTP form. Extend and use it to abstract parameter validation from domain logic.
@@ -100,7 +103,7 @@ trait Form[+ValidFormType] {
    * @param flash the current flash scope into which the form should be saved.
    * @return a Redirect result for Play to process
    */
-  def redirectThroughFlash(url: String)(implicit flash: play.api.mvc.Flash): Redirect = {
+  def redirectThroughFlash(url: String)(implicit flash: play.api.mvc.Flash): Result = {
     import Form.Conversions._
 
     val newFlash = this.write(flash.asFormWriteable).written
@@ -410,7 +413,7 @@ object Form {
     //
     // Conversion classes
     //
-    class FormCompatiblePlayParams(playParams: play.mvc.Scope.Params) {
+    class FormCompatibleRequest(request: Request[AnyContent]) {
       def asFormReadable: Form.Readable = {
         (key) => {
           Option(playParams.getAll(key)).flatten
@@ -457,10 +460,10 @@ object Form {
       new MutableMapWriteable(puttable)
     }
 
-    implicit def playParamsToFormCompatible(playParams: play.mvc.Scope.Params)
-    : FormCompatiblePlayParams =
+    implicit def playRequestToFormCompatible(request: Request[_])
+    : FormCompatibleRequest =
     {
-      new FormCompatiblePlayParams(playParams)
+      new FormCompatibleRequest(request)
     }
 
     implicit def serverSessionToFormCompatible(serverSession: ServerSession)

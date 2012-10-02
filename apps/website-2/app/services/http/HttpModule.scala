@@ -4,19 +4,21 @@ import uk.me.lings.scalaguice.ScalaModule
 import com.google.inject.{AbstractModule}
 import play.api.Play
 import java.util.Properties
-import play.mvc.Scope.Session
+import services.http.filters.{RequireAuthenticityTokenFilter, RequireAuthenticityTokenFilterProvider}
 
 /**
  * Installs Guice application bindings that relate to our http services
  */
 object HttpModule extends AbstractModule with ScalaModule {
   override def configure() {
-    bind[Properties].annotatedWith[PlayConfig].toInstance(Play.configuration)
+    bind[Properties].annotatedWith[PlayConfig].toInstance(PlayConfigurationProperties.properties)
     bind[() => Session].toInstance(() => Session.current())
     bind[() => ServerSession].to[ServerSessionFactory]
     bind[() => EgraphsSession].to[EgraphsSessionFactory]
 
-    bind[String].annotatedWith[PlayId].toInstance(Play.id)
+    bind[String].annotatedWith[PlayId].toInstance(
+      Play.current.configuration.getString("id").getOrElse("test")
+    )
     bind[RequireAuthenticityTokenFilter].toProvider[RequireAuthenticityTokenFilterProvider]
   }
 }

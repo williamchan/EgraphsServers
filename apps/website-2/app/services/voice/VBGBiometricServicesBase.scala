@@ -11,8 +11,8 @@ import models._
 import models.vbg._
 import org.w3c.dom.{Node, Document}
 import org.xml.sax.InputSource
-import play.libs.Codec
 import services.SampleRateConverter
+import org.apache.commons.codec.binary.Base64.encodeBase64String
 
 trait VBGBiometricServicesBase {
 
@@ -273,7 +273,7 @@ trait VBGBiometricServicesBase {
   final protected[voice] def convertWavTo8kHzBase64(wavBinary: Array[Byte]): String = {
     if (wavBinary.length == 0) return ""
     val wavBinary_8kHz: Array[Byte] = SampleRateConverter.convert(8000f, wavBinary)
-    Codec.encodeBASE64(wavBinary_8kHz)
+    encodeBase64String(wavBinary_8kHz)
   }
 
   // Referenced http://stackoverflow.com/questions/6381012/java-trouble-combining-more-than-2-wav-files

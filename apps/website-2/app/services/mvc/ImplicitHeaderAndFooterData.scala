@@ -4,7 +4,7 @@ import models.frontend.header.{HeaderNotLoggedIn, HeaderLoggedIn, HeaderData}
 import models.frontend.footer.FooterData
 import services.http.EgraphsSession
 import models.{Customer, CustomerStore}
-import controllers.WebsiteControllers
+import controllers.routes.WebsiteControllers.{getCustomerGalleryByUsername, getAccountSettings}
 
 /**
  * Provides implicit data necessary to render the header and footer of the website's
@@ -29,12 +29,12 @@ trait ImplicitHeaderAndFooterData {
   //
   private def getHeaderLoggedInStatus: Either[HeaderNotLoggedIn, HeaderLoggedIn] = {
     val headerLoggedInOption = getCustomerOption.map { customer =>
-      val url = WebsiteControllers.reverse(WebsiteControllers.getCustomerGalleryByUsername(customer.username)).url
+      val url = getCustomerGalleryByUsername(customer.username).url
 
       HeaderLoggedIn(
         name=customer.name,
         profileUrl="",
-        accountSettingsUrl=WebsiteControllers.reverse(WebsiteControllers.getAccountSettings).url,
+        accountSettingsUrl=getAccountSettings.url,
         galleryUrl=url,
         logoutUrl="/logout"
       )

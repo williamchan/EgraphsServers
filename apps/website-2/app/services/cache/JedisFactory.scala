@@ -2,7 +2,6 @@ package services.cache
 
 import com.google.inject.Inject
 import redis.clients.jedis.Jedis
-import play.modules.redis.RedisConnectionManager
 import services.Utils
 
 /**
@@ -12,7 +11,21 @@ import services.Utils
  */
 private[cache] class JedisFactory @Inject()() {
   def apply(db: Int = JedisFactory.defaultRedisDb): Option[Jedis] = {
-    val maybeJedis = try {
+    // Select the correct database index
+    maybeJedisConnection.map {
+      jedis =>
+        jedis.select(db)
+
+        jedis
+    }
+  }
+
+  //
+  // Private members
+  //
+  def maybeJedisConnection: Option[Jedis] = {
+    // TODO: PLAY20. Hey how about making this shit compile when you have a better Redis pool solution?
+    /*try  {
       Some(RedisConnectionManager.getRawConnection)
     } catch {
       case oops =>
@@ -20,15 +33,7 @@ private[cache] class JedisFactory @Inject()() {
         Utils.logException(oops)
 
         None
-    }
-
-    // Select the correct database index
-    maybeJedis.map {
-      jedis =>
-        jedis.select(db)
-
-        jedis
-    }
+    }*/
   }
 }
 

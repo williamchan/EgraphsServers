@@ -26,15 +26,15 @@ object LoginFormViewConversions {
   }
 
   def defaultView: LoginFormViewModel = {
-    import WebsiteControllers.{reverse, getRecoverAccount, postLogin}
+    import controllers.routes.WebsiteControllers.{getRecoverAccount, postLogin}
     import CustomerLoginForm.Fields
 
     LoginFormViewModel(
       email = Field(Fields.Email),
       password = Field(Fields.Password),
       generalErrors = List(),
-      actionUrl=reverse(postLogin).url,
-      forgotPasswordUrl=reverse(getRecoverAccount).url
+      actionUrl=postLogin.url,
+      forgotPasswordUrl=getRecoverAccount.url
     )
   }
 

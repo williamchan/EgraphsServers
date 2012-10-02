@@ -6,6 +6,7 @@ import services.blobs.AccessPolicy
 import models.frontend.landing.CatalogStar
 import services.Utils
 import services.mvc.OrderViewConversions
+import controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled
 
 /**
  * Converts Celebrities into various view models defined in the front-end module
@@ -61,10 +62,7 @@ class CelebrityViewConversions(celeb: Celebrity) {
         productAndCount._2 > 0
     }
 
-    val choosePhotoUrl = Utils.lookupUrl(
-      "WebsiteControllers.getStorefrontChoosePhotoTiled",
-      Map("celebrityUrlSlug" -> celeb.urlSlug)
-    ).url
+    val choosePhotoUrl = getStorefrontChoosePhotoTiled(celeb.urlSlug).url
 
     CatalogStar(
       name = celeb.publicName,

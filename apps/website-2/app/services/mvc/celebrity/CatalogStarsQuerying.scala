@@ -1,9 +1,12 @@
 package services.mvc.celebrity
 
 import akka.actor.ActorRef
+import akka.pattern.ask
 import models.frontend.landing.CatalogStar
 import services.mvc.celebrity.UpdateCatalogStarsActor.UpdateCatalogStars
 import services.mvc.celebrity.CatalogStarsActor.GetCatalogStars
+import akka.util.duration._
+import akka.util.Timeout
 
 
 /**
@@ -14,6 +17,8 @@ import services.mvc.celebrity.CatalogStarsActor.GetCatalogStars
 private[celebrity] trait CatalogStarsQuerying {
   protected def catalogStarActor: ActorRef
   protected def catalogStarUpdateActor: ActorRef
+  
+  val timeout = Timeout(5.seconds)
 
   /**
    * Grabs the current set of CatalogStars out of the cache actor, and updates
@@ -25,7 +30,7 @@ private[celebrity] trait CatalogStarsQuerying {
    * @return the current set of stars for rendering in the celebrity catalog.
    */
   def apply(numUpdateAttempts: Int = 1): IndexedSeq[CatalogStar] = {
-    val maybeStars = (catalogStarActor ask GetCatalogStars).getOrElse {
+    val maybeStars = catalogStarActor.ask(GetCatalogStars)(timeout).getOrElse {
       error("Received no response from CatalogStarsActor. This is 100% programmer error")
 
       None

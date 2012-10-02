@@ -24,13 +24,13 @@ object AccountRegistrationFormViewConversions {
 
   def defaultView: AccountRegistrationFormViewModel = {
     import AccountRegistrationForm.Params
-    import WebsiteControllers.{reverse, postRegisterConsumerEndpoint}
+    import controllers.routes.WebsiteControllers.{postRegisterConsumerEndpoint}
 
     AccountRegistrationFormViewModel(
       email=Field(Params.Email),
       password=Field(Params.Password),
       generalErrors=List(),
-      actionUrl=reverse(postRegisterConsumerEndpoint).url
+      actionUrl=postRegisterConsumerEndpoint.url
     )
   }
 

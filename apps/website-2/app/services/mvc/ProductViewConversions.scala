@@ -3,12 +3,13 @@ package services.mvc
 import services.blobs.AccessPolicy
 import models.frontend.storefront._
 import models.ImageAsset.Jpeg
-import controllers.WebsiteControllers.{reverse, getStorefrontChoosePhotoCarousel, postStorefrontChoosePhoto}
+import controllers.routes.WebsiteControllers.{getStorefrontChoosePhotoCarousel, postStorefrontChoosePhoto}
 import models.{Product, LandscapeEgraphFrame, EgraphFrame, PortraitEgraphFrame}
 import models.frontend.storefront.ChoosePhotoCarouselProduct
 import models.frontend.storefront.ProductOrientation
 import models.frontend.storefront.ChoosePhotoTileProduct
 import services.Utils
+import play.api.mvc.RequestHeader
 
 /**
  * Conversions to turn [[models.Product]]s into their view analogs.
@@ -25,10 +26,10 @@ class ProductViewConversions(product: Product) {
                             quantityRemaining: Int = product.remainingInventoryCount)
   : ChoosePhotoTileProduct =
   {
-    val carouselViewLink=reverse(getStorefrontChoosePhotoCarousel(
+    val carouselViewLink=getStorefrontChoosePhotoCarousel(
       celebrityUrlSlug,
       product.urlSlug
-    )).url
+    ).url
 
     ChoosePhotoTileProduct(
       name=product.name,
@@ -47,7 +48,7 @@ class ProductViewConversions(product: Product) {
    */
   def asChoosePhotoCarouselView(celebUrlSlug: String=product.celebrity.urlSlug,
                                 quantityRemaining: Int = product.remainingInventoryCount,
-                                fbAppId: String)
+                                fbAppId: String)(implicit request: RequestHeader)
   : ChoosePhotoCarouselProduct =
   {
     val imageWidth = product.frame match {
@@ -56,8 +57,8 @@ class ProductViewConversions(product: Product) {
     }
     val productThumbnailUrl = getProductThumbnailUrl(width=imageWidth)
 
-    val carouselViewRoute=reverse(getStorefrontChoosePhotoCarousel(celebUrlSlug, product.urlSlug))
-    val carouselViewLink = Utils.absoluteUrl(carouselViewRoute)
+    val carouselViewRoute = getStorefrontChoosePhotoCarousel(celebUrlSlug, product.urlSlug)
+    val carouselViewLink = carouselViewRoute.absoluteURL()
 
     val facebookShareLink = views.frontend.Utils.getFacebookShareLink(
       appId = fbAppId,
@@ -78,7 +79,7 @@ class ProductViewConversions(product: Product) {
       description=product.description,
       price=product.price,
       imageUrl=productThumbnailUrl,
-      personalizeLink=reverse(postStorefrontChoosePhoto(celebUrlSlug, product.urlSlug)).url,
+      personalizeLink=postStorefrontChoosePhoto(celebUrlSlug, product.urlSlug).url,
       orientation = orientationOfFrame(product.frame),
       carouselUrl=product.urlSlug,
       facebookShareLink=facebookShareLink,

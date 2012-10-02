@@ -3,7 +3,7 @@ package services.mvc
 import models.frontend.storefront.OrderCompleteViewModel
 import models.{InventoryBatch, Product, Account, Customer, Celebrity, Order}
 import com.google.inject.Inject
-import controllers.WebsiteControllers
+import controllers.routes.WebsiteControllers.getFAQ
 
 /**
  * Creates OrderCompleteViewModels for rendering the Order Complete page
@@ -64,7 +64,7 @@ class OrderCompleteViewModelFactory @Inject()() {
     hasPrintOrder: Boolean
   ): OrderCompleteViewModel =
   {
-    val faqHowLongLink = WebsiteControllers.reverse(WebsiteControllers.getFAQ).url + "#how-long"
+    val faqHowLongLink = getFAQ.url + "#how-long"
     OrderCompleteViewModel (
       orderDate = order.created,
       orderNumber = order.id,

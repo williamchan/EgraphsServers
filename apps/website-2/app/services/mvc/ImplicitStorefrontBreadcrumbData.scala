@@ -4,8 +4,16 @@ import models.frontend.storefront.{StorefrontBreadcrumb, StorefrontBreadcrumbs}
 import services.http.forms.purchase.{PersonalizeForm, PurchaseForms, FormReaders, PurchaseFormFactory}
 import play.api.mvc.Request
 import com.google.inject.Inject
-import controllers.WebsiteControllers
 import models.frontend.storefront.StorefrontBreadcrumb.CrumbChoice
+import CrumbChoice._
+import controllers.routes.WebsiteControllers.{
+  getStorefrontChoosePhotoTiled,
+  getStorefrontPersonalize,
+  getStorefrontReview,
+  getStorefrontCheckout,
+  getStorefrontFinalize
+}
+import play.api.mvc.AnyContent
 
 /**
  * Eventually this will carry information for populating the purchase
@@ -21,7 +29,6 @@ trait ImplicitStorefrontBreadcrumbData {
 }
 
 class StorefrontBreadcrumbData @Inject()(purchaseFormFactory: PurchaseFormFactory) {
-  import WebsiteControllers._
   import CrumbChoice._
 
   def crumbsForRequest(celebrityId: Long, celebrityUrlSlug: String, maybeProductUrlSlug: Option[String])
@@ -55,24 +62,22 @@ class StorefrontBreadcrumbData @Inject()(purchaseFormFactory: PurchaseFormFactor
   }
 
   def urls(purchaseForms: PurchaseForms, celebrityUrlSlug: String, productUrlSlug: String) = {
-    import CrumbChoice._
-
-    val choosePhoto = (ChoosePhoto -> reverse(getStorefrontChoosePhotoTiled(celebrityUrlSlug)).url)
+    val choosePhoto = (ChoosePhoto -> getStorefrontChoosePhotoTiled(celebrityUrlSlug).url)
 
     val maybePersonalizeUrl = purchaseForms.productId.map { _ =>
-      (Personalize -> reverse(getStorefrontPersonalize(celebrityUrlSlug, productUrlSlug)).url)
+      (Personalize -> getStorefrontPersonalize(celebrityUrlSlug, productUrlSlug).url)
     }
 
     val maybeReviewUrl = purchaseForms.personalizeForm().map { _:Any =>
-      (Review -> reverse(getStorefrontReview(celebrityUrlSlug, productUrlSlug)).url)
+      (Review -> getStorefrontReview(celebrityUrlSlug, productUrlSlug).url)
     }
 
     val maybeCheckoutUrl = purchaseForms.highQualityPrint.map { _ =>
-      (Checkout -> reverse(getStorefrontCheckout(celebrityUrlSlug, productUrlSlug)).url)
+      (Checkout -> getStorefrontCheckout(celebrityUrlSlug, productUrlSlug).url)
     }
 
     val maybeFinalizeUrl = purchaseForms.billingForm().map { _ =>
-      (Finalize -> reverse(getStorefrontFinalize(celebrityUrlSlug, productUrlSlug)).url)
+      (Finalize -> getStorefrontFinalize(celebrityUrlSlug, productUrlSlug).url)
     }
     val maybeCrumbsAndUrls = List(maybePersonalizeUrl, maybeReviewUrl, maybeCheckoutUrl, maybeFinalizeUrl).flatten
     val crumbsAndUrls = choosePhoto :: maybeCrumbsAndUrls

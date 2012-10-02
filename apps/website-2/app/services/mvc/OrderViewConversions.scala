@@ -3,7 +3,7 @@ package services.mvc
 import models.{Product, Egraph, Order}
 import models.frontend.storefront.ChoosePhotoRecentEgraph
 import services.blobs.AccessPolicy
-import controllers.WebsiteControllers
+import controllers.routes.WebsiteControllers.getEgraph
 
 /**
  * Implicit conversions to turn [[models.Order]]s into related view models.
@@ -21,7 +21,7 @@ object OrderViewConversions {
       productTitle=product.name,
       ownersName=order.recipientName,
       imageUrl=egraph.image(product.photoImage).rasterized.scaledToWidth(340).getSavedUrl(AccessPolicy.Public),
-      url=GetEgraphEndpoint.url(order.id)
+      url=getEgraph(order.id).url
     )
   }
 }
