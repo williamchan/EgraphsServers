@@ -46,7 +46,7 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
     }
   }
 
-  def getVerifyAccount() = controllerMethod() {
+  def getVerifyAccount(email: String, resetKey: String) = controllerMethod() {
     httpFilters.requireAccountEmail.inRequest() { account =>      
       httpFilters.requireResetPasswordSecret(account) {
         Action {

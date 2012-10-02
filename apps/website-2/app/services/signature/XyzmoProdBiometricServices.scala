@@ -1,6 +1,7 @@
 package services.signature
 
-import org.apache.log4j.Logger
+import org.slf4j.LoggerFactory
+import org.slf4j.Logger
 
 /**
  * IMPORTANT! -- Do not write tests for XyzmoProdBiometricServices or XyzmoBetaBiometricServices.
@@ -8,7 +9,6 @@ import org.apache.log4j.Logger
  * Instead, XyzmoTestBiometricServices exists for automated tests of live Xyzmo server.
  */
 object XyzmoProdBiometricServices extends XyzmoProdBiometricServicesBase {
-
-  protected val log: Logger = Logger.getLogger(XyzmoProdBiometricServices.getClass)
+  override protected val log = LoggerFactory.getLogger(XyzmoProdBiometricServices.getClass)
   override protected val _userIdPrefix: String = "prod"
 }

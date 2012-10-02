@@ -6,7 +6,7 @@ import com.xyzmo.wwww.biometricserver.WebServiceBiometricPartStub._
 import com.xyzmo.wwww.biometricserver.WebServiceUserAndProfileStub._
 import models.xyzmo._
 import org.apache.axis2.transport.http.{HTTPConstants, HttpTransportProperties}
-import org.apache.log4j.Logger
+import org.slf4j.Logger
 import models.{EnrollmentSample, Egraph, EnrollmentBatch}
 
 trait XyzmoBiometricServicesBase {

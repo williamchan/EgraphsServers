@@ -8,7 +8,7 @@ import controllers.website.consumer.StorefrontChoosePhotoConsumerEndpoints
 import services.db.{DBSession, TransactionSerializable}
 import play.data.validation.Validation
 import controllers.website.EgraphPurchaseHandler
-import services.http.{POSTControllerMethod, CelebrityAccountRequestFilters}
+import services.http.POSTControllerMethod
 import services.mail.TransactionalMail
 import play.api.mvc.Controller
 import services.http.forms.FormChecks

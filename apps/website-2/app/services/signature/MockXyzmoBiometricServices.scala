@@ -4,16 +4,16 @@ import com.xyzmo.wwww.biometricserver.WebServiceUserAndProfileStub.{Profile_Add_
 import com.xyzmo.wwww.biometricserver.WebServiceBiometricPartStub._
 import com.xyzmo.wwww.biometricserver.{WebServiceBiometricPartStub, WebServiceUserAndProfileStub}
 import models.xyzmo._
-import org.apache.log4j.Logger
+import org.slf4j.LoggerFactory
 import models.{Egraph, EnrollmentBatch}
 
 object MockXyzmoBiometricServices extends XyzmoBiometricServicesBase {
 
-  protected val log: Logger = Logger.getLogger(MockXyzmoBiometricServices.getClass)
-  protected val isBasicAuth: Boolean = false
-  protected val domain: String = ""
-  protected val host: String = ""
-  override protected val _userIdPrefix: String = "mock"
+  override protected val log = LoggerFactory.getLogger(MockXyzmoBiometricServices.getClass)
+  override protected val isBasicAuth = false
+  override protected val domain = ""
+  override protected val host = ""
+  override protected val _userIdPrefix = "mock"
 
   override protected[signature] def addUser(enrollmentBatch: EnrollmentBatch): XyzmoAddUser = {
     val resultBase = new WebServiceUserAndProfileStub.ResultBase

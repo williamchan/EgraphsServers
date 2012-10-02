@@ -12,6 +12,9 @@ import services.http.filters.{RequireAuthenticityTokenFilter, RequireAuthenticit
 object HttpModule extends AbstractModule with ScalaModule {
   override def configure() {
     bind[Properties].annotatedWith[PlayConfig].toInstance(PlayConfigurationProperties.properties)
+    // TODO: PLAY20 migration. You can no longer have session factories.
+    // replace everywhere that uses a session factory and make them take the
+    // session in their method signature. Same applies to flash =(
     bind[() => Session].toInstance(() => Session.current())
     bind[() => ServerSession].to[ServerSessionFactory]
     bind[() => EgraphsSession].to[EgraphsSessionFactory]

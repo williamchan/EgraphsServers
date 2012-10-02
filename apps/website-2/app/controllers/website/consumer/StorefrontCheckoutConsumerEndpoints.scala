@@ -110,7 +110,7 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
   
           // Collect both the shipping form and billing form into a single viewmodel
           val checkoutFormView = CheckoutFormView(
-            actionUrl=reverse(postStorefrontCheckout(celebrityUrlSlug, productUrlSlug)).url,
+            actionUrl=controllers.routes.WebsiteControllers.postStorefrontCheckout(celebrityUrlSlug, productUrlSlug).url,
             billing=billingFormView,
             shipping=maybeShippingFormView
           )
@@ -192,7 +192,8 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
 
           // Redirect to Finalize screen.
           val finalizeRedirect = controllers.routes.WebsiteControllers.getStorefrontFinalize(
-            celebrityUrlSlug, productUrlSlug
+            celebrityUrlSlug,
+            productUrlSlug
           ) 
           
           Redirect(finalizeRedirect)

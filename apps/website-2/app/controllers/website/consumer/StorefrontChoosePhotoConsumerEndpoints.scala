@@ -126,7 +126,7 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
    */
   def postStorefrontChoosePhoto(celebrityUrlSlug: String, productUrlSlug: String) = postController() {
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
-      Action {
+      Action { implicit request =>
         // Save the purchase forms with the new product ID
         purchaseFormFactory.formsForStorefront(celeb.id).withProductId(product.id).save()
   

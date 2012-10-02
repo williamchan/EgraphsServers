@@ -81,7 +81,7 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
       for (
         validForm <- registrationForm.errorsOrValidatedForm.left.map {errors =>
                        val failRedirectUrl = controllers.routes.WebsiteControllers.getLogin().url
-                       registrationForm.redirectThroughFlash(failRedirectUrl)
+                       registrationForm.redirectThroughFlash(failRedirectUrl)(request.flash)
                      }.right
       ) yield {
         // The form validation already told us we can add this fella to the DB

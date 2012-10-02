@@ -28,9 +28,9 @@ private[controllers] trait PostBulkEmailController extends ImplicitHeaderAndFoot
        * listSubscribe(string apikey, string id, string email_address, array merge_vars,
        * string email_type, bool double_optin, bool update_existing, bool replace_interests, bool send_welcome)
        */
-      val formReadableParams = params.asFormReadable
+      val formReadableRequest = request.asFormReadable
       val subscriptionReader = formReaders.forEmailSubscriptionForm
-      val subscriptionForm = subscriptionReader.instantiateAgainstReadable(formReadableParams)
+      val subscriptionForm = subscriptionReader.instantiateAgainstReadable(formReadableRequest)
       subscriptionForm.errorsOrValidatedForm.fold(
         errors => Ok(toJson(Map("error" -> errors.map( error => error.description).toSeq))),
         
