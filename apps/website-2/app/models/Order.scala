@@ -190,11 +190,6 @@ case class Order(
   }
 
   def sendEgraphSignedMail() {
-    val email = prepareEgraphsSignedEmail()
-    services.mail.send(email)
-  }
-
-  protected[models] def prepareEgraphsSignedEmail(): Email = {
     val celebrity = services.celebrityStore.findByOrderId(id).get
     val email = new HtmlEmail()
 
@@ -216,7 +211,7 @@ case class Order(
     val emailTwitterSrc = ""
     val viewEgraphAction = GetEgraphEndpoint.url(id)
     val viewEgraphUrl = Utils.absoluteUrl(viewEgraphAction)
-    val html = views.html.frontend.email_view_egraph(
+    val htmlMsg = views.html.frontend.email_view_egraph(
       viewEgraphUrl = viewEgraphUrl,
       celebrityName = celebrity.publicName,
       recipientName = recipientName,
@@ -224,9 +219,12 @@ case class Order(
       emailFacebookSrc = emailFacebookSrc,
       emailTwitterSrc = emailTwitterSrc
     )
-    email.setHtmlMsg(html.toString())
-    email.setTextMsg(views.html.frontend.email_view_egraph_text(viewEgraphUrl = viewEgraphUrl, celebrityName = celebrity.publicName, recipientName = recipientName).toString())
-    email
+    val textMsg = views.html.frontend.email_view_egraph_text(
+      viewEgraphUrl = viewEgraphUrl,
+      celebrityName = celebrity.publicName,
+      recipientName = recipientName
+    ).toString()
+    services.mail.send(email, Some(textMsg), Some(htmlMsg))
   }
 
   /**

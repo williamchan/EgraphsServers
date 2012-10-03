@@ -50,13 +50,11 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
     email.addReplyTo("support@egraphs.com")
     email.addTo(account.email)
     email.setSubject("Egraphs Password Recovery")
-    email.setMsg(
-      views.html.Application.email.reset_password_email(
+    val htmlMsg = views.html.Application.email.reset_password_email(
         customerName = customer.name,
         email = account.email,
         resetPasswordUrl = getResetPassword(account.email, account.resetPasswordKey.get).absoluteURL(secure=true)
-      ).toString().trim()
-    )
-    transactionalMail.send(email)
+      )
+    transactionalMail.send(email, html = Some(htmlMsg))
   }
 }

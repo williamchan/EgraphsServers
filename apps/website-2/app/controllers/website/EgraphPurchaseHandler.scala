@@ -168,8 +168,7 @@ case class EgraphPurchaseHandler(
       product, 
       order, 
       cashTransaction, 
-      maybePrintOrder.asInstanceOf[Option[PrintOrder]], 
-      mail
+      maybePrintOrder.asInstanceOf[Option[PrintOrder]]
     )
 
     // Clear out the shopping cart and redirect
@@ -282,8 +281,7 @@ case class EgraphPurchaseHandler(
     product: Product,
     order: Order,
     cashTransaction: CashTransaction,
-    maybePrintOrder: Option[PrintOrder],
-    mail: TransactionalMail
+    maybePrintOrder: Option[PrintOrder]
   )(implicit request: RequestHeader)
   {
     import services.Finance.TypeConversions._
@@ -298,7 +296,7 @@ case class EgraphPurchaseHandler(
     val emailFacebookSrc = ""
     val emailTwitterSrc = ""
     val faqHowLongLink = getFAQ().absoluteURL(secure=true) + "#how-long"
-    val html = views.html.frontend.email_order_confirmation(
+    val htmlMsg = views.html.frontend.email_order_confirmation(
       buyerName = buyerName,
       recipientName = recipientName,
       recipientEmail = recipientEmail,
@@ -314,8 +312,7 @@ case class EgraphPurchaseHandler(
       emailFacebookSrc = emailFacebookSrc,
       emailTwitterSrc = emailTwitterSrc
     )
-    email.setHtmlMsg(html.toString())
-    email.setTextMsg(views.html.frontend.email_order_confirmation_text(
+    val textMsg = views.html.frontend.email_order_confirmation_text(
       buyerName = buyerName,
       recipientName = recipientName,
       recipientEmail = recipientEmail,
@@ -327,8 +324,8 @@ case class EgraphPurchaseHandler(
       deliveredByDate = dateFormat.format(order.expectedDate.get),
       faqHowLongLink = faqHowLongLink,
       hasPrintOrder = maybePrintOrder.isDefined
-    ).toString())
-    mail.send(email)
+    ).toString()
+    mail.send(email, Some(textMsg), Some(htmlMsg))
   }
 }
 

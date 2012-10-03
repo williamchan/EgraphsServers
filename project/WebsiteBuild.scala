@@ -19,6 +19,7 @@ object WebsiteBuild extends Build {
       "batik" % "batik-svggen" % "1.6",
       "com.google.inject" % "guice" % "2.0",
       "com.stripe" % "stripe-java" % "1.0.1",
+      "com.typesafe" %% "play-plugins-mailer" % "2.0.4",
       "junit-addons" % "junit-addons" % "1.4",
       "net.debasishg" %% "sjson" % "0.15" exclude("org.scala-lang", "scala-library"),  //from 0.12
   //        exclude:

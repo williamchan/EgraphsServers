@@ -1,17 +1,43 @@
 package services.mail
 
+import play.api.Play.current
+import com.typesafe.plugin._
 import org.apache.commons.mail.Email
+import org.apache.commons.mail.HtmlEmail
 import java.util.Properties
 import javax.mail.Session
 import com.google.inject.{Inject, Provider}
 import services.Utils
-
 import services.http.PlayConfig
 import collection.mutable.ListBuffer
+import play.api.templates.Html
 
 /** Interface for sending transactional mails. Transactional mails are  */
 trait TransactionalMail {
-  def send(mail: Email)
+  def send(mail: HtmlEmail, text: Option[String] = None, html: Option[Html] = None)
+  
+  private[mail] def toMailerAPI(email: Email): MailerAPI = {
+    def addressStringsFromList(addressList: java.util.List[_]): Seq[String] = {
+      import scala.collection.JavaConversions._
+      for (addresses <- Option(addressList).toSeq; address <- addresses) yield address.toString
+    }
+
+    val replyToAddresses = addressStringsFromList(email.getReplyToAddresses)
+    val replyTo = if(replyToAddresses.isEmpty) {
+      ""
+    } else {
+      replyToAddresses(0)
+    }
+    
+    // Extract the content into the MailerAPI format
+    use[MailerPlugin].email
+    .setSubject(email.getSubject)
+    .addFrom(email.getFromAddress.getAddress)
+    .setReplyTo(replyTo)
+    .addRecipient(addressStringsFromList(email.getToAddresses): _*)
+    .addCc(addressStringsFromList(email.getCcAddresses): _*)
+    .addBcc(addressStringsFromList(email.getBccAddresses): _*)
+  }
 }
 
 /**
@@ -23,114 +49,23 @@ trait TransactionalMail {
 class MailProvider @Inject()(@PlayConfig playConfig: Properties, utils: Utils) extends Provider[TransactionalMail]
 {
   def get(): TransactionalMail = {
-    val smtp = playConfig.getProperty("mail.smtp")
-    val host = playConfig.getProperty("mail.smtp.host")
-
-    (smtp, host) match {
-      case ("mock", _) =>
-        new MockTransactionalMail(utils)
-
-      case (_, "smtp.gmail.com") =>
-        Gmail(utils.requiredConfigurationProperty("mail.smtp.user"),
-              utils.requiredConfigurationProperty("mail.smtp.pass"))
-
-      case _ =>
-        new PlayTransactionalMailLib
-    }
+    new DefaultTransactionalMail
   }
 }
 
 /**
- * Implementation of the TransactionalMail library that always sends through Gmail, since as of
- * 12/2011 Play can not successfully send mail through gmail.
+ * Implementation of the TransactionalMail library that delegates to TypeSafe's Play Plug-in behavior as configured in application.conf.
+ * See https://github.com/typesafehub/play-plugins/blob/master/mailer/README.md
  */
-private[mail] case class Gmail(user: String, password: String) extends TransactionalMail
-{
-  val host = "smtp.gmail.com"
-
-  def send(mail: Email) {
-    play.Logger.info("Gmail: sending to " + mail.getToAddresses)
-    import scala.collection.JavaConversions._
-
-    // Prepare java mail sessions and transports
-    val props = new Properties()
-    props.putAll(Map(
-      "mail.transport.protocol" -> "smtps",
-      "mail.smtps.host" -> host,
-      "mail.smtps.auth" -> "true"
-    ))
-
-    val session = Session.getDefaultInstance(props)
-    mail.setMailSession(session)
-    val transport = session.getTransport
-
-    // Prepare message
-    mail.buildMimeMessage()
-    val mimeMessage = mail.getMimeMessage
-
-    transport.connect(host, 465, user, password)
-    Utils.closing(transport) { transport =>
-      transport.sendMessage(mimeMessage, mimeMessage.getAllRecipients)
+private[mail] class DefaultTransactionalMail extends TransactionalMail {
+  override def send(mail: HtmlEmail, text: Option[String] = None, html: Option[Html] = None) {
+    val mailer = toMailerAPI(mail)
+    (text, html) match {
+      case (Some(text), Some(html)) => mailer.send(text, html.toString().trim())
+      case (Some(text), None) => mailer.send(text)
+      case (None, Some(html)) => mailer.sendHtml(html.toString().trim())
+      case _ => throw new IllegalStateException("We can't send an email without either text or html in the body.")
     }
   }
-}
+} 
 
-
-/**
- * Implementation of the TransactionalMail library that delegates to Play's behavior as configured in application.conf.
- * See http://www.playframework.org/documentation/1.2.4/configuration#mail for more info.
- */
-private[mail] class PlayTransactionalMailLib extends TransactionalMail {
-  override def send(mail: Email) = {
-    play.libs.Mail.send(mail)
-  }
-}
-
-
-/**
- * Mock implementation of the TransactionalMail library. Heavily inspired by Play's implementation in TransactionalMail.Mock
- */
-private[mail] class MockTransactionalMail @Inject() (utils: Utils) extends TransactionalMail {
-
-  override def send(email: Email) {
-    import scala.collection.JavaConversions._
-
-    // Set up to generate email text
-    val session = Session.getInstance(utils.properties("mail.smtp.host" -> "myfakesmtpserver.com"))
-    email.setMailSession(session)
-    email.buildMimeMessage()
-
-    val message = email.getMimeMessage
-    message.saveChanges()
-
-    // Extract the content
-    def addressStringsFromList(addressList: java.util.List[_]): Iterable[String] = {
-      for (addresses <- Option(addressList).toSeq; address <- addresses) yield address.toString
-    }
-    
-    val from = email.getFromAddress.getAddress
-    val replyTo = addressStringsFromList(email.getReplyToAddresses)
-    val toAddresses = addressStringsFromList(email.getToAddresses)
-    val ccs = addressStringsFromList(email.getCcAddresses)
-    val bccs = addressStringsFromList(email.getBccAddresses)        
-    val subject = email.getSubject
-    val body = play.libs.Mail.Mock.getContent(message)
-
-    // Print the content
-    var content = new ListBuffer[String]
-    
-    content += "New message sent via Mock Mailer"
-    content += "    From: " + from
-    content += "    ReplyTo: " + replyTo.mkString(",")
-    content += "    To: " + toAddresses.mkString(", ")
-    content += "    Cc: " + ccs.mkString(", ")
-    content += "    Bcc: " + bccs.mkString(", ")
-    content += "    Subject: " + subject
-    content += ""
-    content += body
-    
-    play.Logger.info(content.mkString("\n"))
-  }
-  
-  
-}

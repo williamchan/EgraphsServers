@@ -15,7 +15,6 @@ import play.api.mvc.Results.Redirect
 import scala.Some
 import services.logging.Logging
 import Form.Conversions._
-import services.mail.TransactionalMail
 import play.api.mvc.Request
 import play.api.mvc.AnyContent
 
@@ -34,7 +33,6 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
   protected def accountStore: AccountStore
   protected def customerStore: CustomerStore
   protected def dbSession: DBSession
-  protected def mail: TransactionalMail
   protected def egraphsSessionFactory: () => EgraphsSession
 
   //
