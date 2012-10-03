@@ -1,8 +1,4 @@
-@(verifyPasswordUrl: String,
-  emailLogoSrc: String,
-  emailFacebookSrc: String,
-  emailTwitterSrc: String
-)
+@(verifyPasswordUrl: String)
 
 @import views.frontend.tags
 
@@ -15,15 +11,15 @@
 			<tr>
 				<td align="middle">
 					<table cellpadding="0" cellspacing="0" width="600px" align="middle" bgcolor="#fafafa" style="width: 600px; margin: 0 auto; background: #fafafa repeat-y 50% 0;">
-						<!--<tr>-->
-							<!--<td><img border="0" src='@asset("public/images/email-shim.gif")' width="520" height="40" /></td>-->
-						<!--</tr>-->
+						<tr>
+							<td><img border="0" src="https://s3.amazonaws.com/egraphs-static-resources/public/images/email-shim.gif" width="520" height="40" /></td>
+						</tr>
 						<tr>
 							<td align="middle">
 								<table cellpadding="0" cellspacing="0" width="520px" style="width: 520px;">
 									<tr>
 										<td align="left" valign="top">
-                      @tags.email.html.email_header(emailLogoSrc, emailFacebookSrc, emailTwitterSrc)
+                      @tags.email.html.email_header()
 
 											<!--<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 32px; line-height: 40px; color: #444444; text-shadow: 0 1px 0 #ffffff; text-align: left; margin-top: 0; margin-bottom: 0;">-->
                         <!--Please verify your email-->
@@ -39,9 +35,9 @@
 								</table>
 							</td>
 						</tr>
-						<!--<tr>-->
-							<!--<td><img border="0" src='@asset("public/images/email-shim.gif")' width="520" height="40" /></td>-->
-						<!--</tr>-->
+						<tr>
+							<td><img border="0" src="https://s3.amazonaws.com/egraphs-static-resources/public/images/email-shim.gif" width="520" height="40" /></td>
+						</tr>
 					</table>
           @tags.email.html.email_footer()
 				</td>

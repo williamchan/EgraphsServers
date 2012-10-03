@@ -189,21 +189,12 @@ case class Order(
 
     email.addReplyTo("noreply@egraphs.com")
     email.setSubject("I just finished signing your Egraph")
-    //    val emailLogoSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-logo.jpg")))
-    //    val emailFacebookSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-facebook.jpg")))
-    //    val emailTwitterSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-twitter.jpg")))
-    val emailLogoSrc = ""
-    val emailFacebookSrc = ""
-    val emailTwitterSrc = ""
     val viewEgraphAction = GetEgraphEndpoint.url(id)
     val viewEgraphUrl = Utils.absoluteUrl(viewEgraphAction)
     val html = views.frontend.html.email_view_egraph(
       viewEgraphUrl = viewEgraphUrl,
       celebrityName = celebrity.publicName,
-      recipientName = recipientName,
-      emailLogoSrc = emailLogoSrc,
-      emailFacebookSrc = emailFacebookSrc,
-      emailTwitterSrc = emailTwitterSrc
+      recipientName = recipientName
     )
     email.setHtmlMsg(html.toString())
     email.setTextMsg(views.frontend.html.email_view_egraph_text(viewEgraphUrl = viewEgraphUrl, celebrityName = celebrity.publicName, recipientName = recipientName).toString())

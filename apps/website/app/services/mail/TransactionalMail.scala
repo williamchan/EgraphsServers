@@ -5,7 +5,6 @@ import java.util.Properties
 import javax.mail.Session
 import com.google.inject.{Inject, Provider}
 import services.Utils
-
 import services.http.PlayConfig
 import collection.mutable.ListBuffer
 import services.logging.Logging
@@ -31,9 +30,15 @@ class MailProvider @Inject()(@PlayConfig playConfig: Properties, utils: Utils) e
       case ("mock", _) =>
         new MockTransactionalMail(utils)
 
-      case (_, "smtp.gmail.com") =>
-        Gmail(utils.requiredConfigurationProperty("mail.smtp.user"),
-              utils.requiredConfigurationProperty("mail.smtp.pass"))
+      case ("gmail", "smtp.gmail.com") =>
+        TransactionalMailer(user = utils.requiredConfigurationProperty("mail.smtp.user"),
+          password = utils.requiredConfigurationProperty("mail.smtp.pass"),
+          host = "smtp.gmail.com")
+
+      case ("mandrill", "smtp.mandrillapp.com") =>
+        TransactionalMailer(user = utils.requiredConfigurationProperty("mail.smtp.user"),
+          password = utils.requiredConfigurationProperty("mail.smtp.pass"),
+          host = "smtp.mandrillapp.com")
 
       case _ =>
         new PlayTransactionalMailLib
@@ -41,17 +46,12 @@ class MailProvider @Inject()(@PlayConfig playConfig: Properties, utils: Utils) e
   }
 }
 
-/**
- * Implementation of the TransactionalMail library that always sends through Gmail, since as of
- * 12/2011 Play can not successfully send mail through gmail.
- */
-private[mail] case class Gmail(user: String, password: String) extends TransactionalMail with Logging
+private[mail] case class TransactionalMailer(user: String, password: String, host: String) extends TransactionalMail with Logging
 {
-  val host = "smtp.gmail.com"
-  val numTries = 25
+  val numTries = 5
 
   def send(mail: Email) {
-    play.Logger.info("Gmail: sending to " + mail.getToAddresses)
+    play.Logger.info("TransactionalMailer: sending to " + mail.getToAddresses)
     try {
       for (i <- 1 until numTries) {
         if (attemptSend(mail)) return

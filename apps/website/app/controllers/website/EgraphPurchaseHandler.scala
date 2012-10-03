@@ -249,12 +249,6 @@ case class EgraphPurchaseHandler(
     email.setFrom("noreply@egraphs.com", "Egraphs")
     email.addTo(buyerEmail, buyerName)
     email.setSubject("Order Confirmation")
-//    val emailLogoSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-logo.jpg")))
-//    val emailFacebookSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-facebook.jpg")))
-//    val emailTwitterSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-twitter.jpg")))
-    val emailLogoSrc = ""
-    val emailFacebookSrc = ""
-    val emailTwitterSrc = ""
     val faqHowLongLink = Utils.absoluteUrl(Utils.lookupUrl("WebsiteControllers.getFAQ")) + "#how-long"
     val html = views.frontend.html.email_order_confirmation(
       buyerName = buyerName,
@@ -267,10 +261,7 @@ case class EgraphPurchaseHandler(
       pricePaid = cashTransaction.cash.formatSimply,
       deliveredByDate = dateFormat.format(order.expectedDate.get), // all new Orders have expectedDate... will turn this into Date instead of Option[Date]
       faqHowLongLink = faqHowLongLink,
-      hasPrintOrder = maybePrintOrder.isDefined,
-      emailLogoSrc = emailLogoSrc,
-      emailFacebookSrc = emailFacebookSrc,
-      emailTwitterSrc = emailTwitterSrc
+      hasPrintOrder = maybePrintOrder.isDefined
     )
     email.setHtmlMsg(html.toString())
     email.setTextMsg(views.frontend.html.email_order_confirmation_text(
