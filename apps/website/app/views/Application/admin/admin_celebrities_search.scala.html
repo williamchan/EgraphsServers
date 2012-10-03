@@ -1,12 +1,11 @@
-@(celebrityListings: Iterable[models.CelebrityListing],
-  allCelebrities: Iterable[models.Celebrity]
+@(celebrityListings: Iterable[models.CelebrityListing]
 )(implicit flash:play.mvc.Scope.Flash, session: play.mvc.Scope.Session)
 
 @import controllers.WebsiteControllers
 @import services.Utils.lookupUrl
 @import views.Application.tags.html.authenticityToken
 @import views.Application.html.content_base
-@import views.Application.tags.html.pagination
+
 
 @content_base(title="Admin - Celebrities", body=body, head=head, navContent=navContent, onLoad=onBodyLoad)
 
@@ -48,27 +47,8 @@
 @body = {
 <div class="admin-content">
   <h1>
-    Celebrity administration
+    Celebrity Search Results
   </h1>
-  <h2>Featured</h2>
-  <form method="POST" action="@postFeaturedCelebrities">
-    @authenticityToken()
-    <div class="row">
-      <div class="span6">
-        <select data-placeholder="Choose celebrities to feature" name="celebIds" style="width:350px" multiple class="chzn-select">
-          @for(celeb <- allCelebrities) {
-            <option value="@celeb.id" @if(celeb.isFeatured){selected="selected"}>
-              @celeb.publicName
-            </option>
-          }
-        </select>
-      </div>
-      <div class="span2">
-        <input class="btn primary fade in" type="submit" value="Save"/>
-      </div>
-    </div>
-  </form>
-
   <form method="link" action="@getCreateCelebrity">
     <input class="btn primary fade in" type="submit" value="New Celebrity"/>
   </form>
@@ -76,7 +56,7 @@
     <input type="text" name="query"/>
     <input class="btn primary fade in" value="Search" type="submit"/>
   </form>
-  <h2>All @flash.get("TotalResultsStr")</h2>
+  <h2>All @celebrityListings.size</h2>
   <table>
     <tr>
       <th></th>
@@ -129,6 +109,5 @@
     </tr>
     }
   </table>
-  @pagination()
 </div>
 }

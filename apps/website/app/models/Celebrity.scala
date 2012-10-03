@@ -7,7 +7,7 @@ import play.templates.JavaExtensions
 import services.db.{FilterOneTable, KeyedCaseClass, Schema, SavesWithLongKey}
 import services.blobs.Blobs.Conversions._
 import com.google.inject.{Provider, Inject}
-import org.squeryl.Query
+import org.squeryl.{Session, Query}
 import services._
 import java.awt.image.BufferedImage
 import models.Celebrity.CelebrityWithImage
@@ -356,6 +356,17 @@ object Celebrity {
       CelebrityWithImage(saved, savedImage)
     }
   }
+  // Simplifying results for display
+  def celebrityAccountToListing(celebrity: Celebrity, account: Account) = {
+    new CelebrityListing(
+      id=celebrity.id,
+      email = account.email,
+      urlSlug = celebrity.urlSlug,
+      publicName = celebrity.publicName,
+      enrollmentStatus = celebrity.enrollmentStatus.toString,
+      publishedStatus = celebrity.publishedStatus.toString
+    )
+  }
 }
 
 class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebrity] with SavesCreatedUpdated[Long,Celebrity] {
@@ -397,6 +408,32 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
         )
         select(c)
     ).headOption
+  }
+
+  def findByTextQuery(query: String): Iterable[CelebrityListing] = {
+    import play.db.anorm._
+      val rowStream = SQL(
+        """
+          SELECT * FROM celebrity, account WHERE
+          (
+           to_tsvector('english', celebrity.publicname || ' ' || celebrity.roledescription)
+           @@
+           plainto_tsquery('english', {textQuery})
+          ) AND account.celebrityid = celebrity.id;
+        """
+      ).on("textQuery" -> query).apply()
+
+      for(row <- rowStream) yield {
+          new CelebrityListing(
+            id = row[Long]("celebrityid"),
+            publicName = row[String]("publicname"),
+            email = row[String]("email"),
+            urlSlug = row[String]("urlslug"),
+            enrollmentStatus = row[String]("_enrollmentStatus"),
+            publishedStatus = row[String]("_publishedStatus")
+        )
+      }
+
   }
 
   def getCelebrityAccounts: Query[(Celebrity, Account)] = {
@@ -484,3 +521,11 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
     toUpdate.copy(created = created, updated = updated)
   }
 }
+
+case class CelebrityListing(
+  id: Long,
+  email: String,
+  urlSlug: String,
+  publicName: String,
+  enrollmentStatus: String,
+  publishedStatus: String)
