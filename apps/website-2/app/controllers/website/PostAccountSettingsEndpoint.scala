@@ -7,6 +7,7 @@ import services.http.filters.HttpFilters
 import services.http.POSTControllerMethod
 import services.http.forms.{AccountSettingsForm, AccountSettingsFormFactory, Form}
 import play.api.mvc.Action
+import controllers.routes.WebsiteControllers.getAccountSettings
 
 private[controllers] trait PostAccountSettingsEndpoint { this: Controller =>
   import Form.Conversions._
@@ -16,23 +17,23 @@ private[controllers] trait PostAccountSettingsEndpoint { this: Controller =>
   protected def accountStore: AccountStore
   protected def accountSettingsForms: AccountSettingsFormFactory
 
-  def postAccountSettings() = Action { implicit request =>
-    postController() {
-      httpFilters.requireCustomerLogin.inSession() { (customer, account) =>
-        Action { request => 
-          // Read a AccountSettingsForm from the params
-          val params = request.queryString
-          val nonValidatedForm = accountSettingsForms(params.asFormReadable, customer, account)
-    
-          // Handle valid or error cases
-          nonValidatedForm.errorsOrValidatedForm match {
-            case Left(errors) =>
-              nonValidatedForm.redirectThroughFlash(GetAccountSettingsEndpoint.url().url)
-    
-            case Right(validForm) =>
-              persist(validForm, customer, account)
-              new Redirect(GetAccountSettingsEndpoint.url().url)
-          }
+  def postAccountSettings() = postController() {
+    httpFilters.requireCustomerLogin.inSession() { (customer, account) =>
+      Action { request =>
+        implicit val flash = request.flash
+
+        // Read a AccountSettingsForm from the params
+        val params = request.queryString
+        val nonValidatedForm = accountSettingsForms(request.asFormReadable, customer, account)
+
+        // Handle valid or error cases
+        nonValidatedForm.errorsOrValidatedForm match {
+          case Left(errors) =>
+            nonValidatedForm.redirectThroughFlash(getAccountSettings().url)
+
+          case Right(validForm) =>
+            persist(validForm, customer, account)
+            Redirect(getAccountSettings)
         }
       }
     }

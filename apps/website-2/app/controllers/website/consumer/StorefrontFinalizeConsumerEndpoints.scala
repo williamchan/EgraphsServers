@@ -59,7 +59,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
         // Get the purchase forms out of the server session
         val forms = purchaseFormFactory.formsForStorefront(celeb.id)
   
-        for (allPurchaseForms <- forms.allPurchaseFormsOrRedirect(celeb, product).right) yield {
+        val results = for (allPurchaseForms <- forms.allPurchaseFormsOrRedirect(celeb, product).right) yield {
           // Everything looks good for rendering the page! Unpack the purchase data.
           val AllPurchaseForms(
             formProductId,
@@ -132,6 +132,8 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
             orientation=product.frame.previewCssClass
           ))
         }
+        
+        results.fold(failure => failure, ok => ok)
       }
     }
   }
@@ -145,7 +147,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
    *         a Redirect back to the form to handle errors.
    */
   def postStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug: String) = postController(openDatabase=false) {
-    Action { request =>
+    Action { implicit request =>
       // Get all the sweet, sweet purchase form data in a database transaction. We end up with a weird 
       // Either[Result, Either[Result, (The purchase data)], but we'll unpack them later. If you're feeling
       // Brave try to make this into a for comprehension inside of dbSession.connected.

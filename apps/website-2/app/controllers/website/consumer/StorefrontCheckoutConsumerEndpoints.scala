@@ -53,7 +53,7 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
       Action { implicit request =>
         val forms = purchaseFormFactory.formsForStorefront(celeb.id)
   
-        for (
+        val results = for (
           // Make sure the product ID matches
           formProductId <- forms.matchProductIdOrRedirectToChoosePhoto(celeb, product).right;
   
@@ -128,8 +128,10 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
               orientation=product.frame.previewCssClass
             )
           )
-        }.fold(redirect => redirect, ok => ok)
-      }      
+        }
+
+        results.fold(failure => failure, ok => ok)
+      }
     }
   }
 

@@ -89,7 +89,7 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
   def getStorefrontChoosePhotoCarousel(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod()
   {
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
-      Action { request =>
+      Action { implicit request =>
         val products = celeb.productsInActiveInventoryBatches().toSeq
         val tiledViewLink = controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled(celebrityUrlSlug).url
   

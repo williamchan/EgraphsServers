@@ -15,6 +15,7 @@ import services.Utils
 import services.blobs.AccessPolicy
 import services.http.filters.HttpFilters
 import play.api.mvc.Action
+import controllers.routes.WebsiteControllers.{getStorefrontReview => reverseGetStorefrontReview}
 
 /**
  * Manages GET and POST of the Review page in the purchase flow.
@@ -108,7 +109,7 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
    */
   def postStorefrontReview(celebrityUrlSlug: String, productUrlSlug: String) = postController() {
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
-      Action { request => 
+      Action { implicit request => 
         // Get the purchase forms for this celeb's storefront out of the server session
         val forms = purchaseFormFactory.formsForStorefront(celeb.id)
         
@@ -120,9 +121,13 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
           productId <- forms.matchProductIdOrRedirectToChoosePhoto(celeb, product).right;
   
           // User has to have posted a valid printing option. Which should be impossible to
-          // screw up because it was a damned checkbox.
+          // screw up because it was a damned checkbox. But if they did screw it up they
+          // get a redirect.
           validPrintOption <- checkPurchaseField(Option(form.get(Params.HighQualityPrint)))
                                 .isPrintingOption
+                                .left.map { formError => 
+                                  Redirect(reverseGetStorefrontReview(celebrityUrlSlug, productUrlSlug))
+                                }
                                 .right
         ) yield {
           // Save this form into the server session

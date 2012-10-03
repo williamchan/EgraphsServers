@@ -7,6 +7,7 @@ import services.http.ControllerMethod
 import services.AppConfig
 import play.api.mvc.Action
 import play.api.mvc.BodyParser
+import play.api.templates.Html
 
 /**
  * Controller for all scenarios
@@ -20,13 +21,13 @@ object ScenarioController extends Controller {
    * @return the result of the code block if the project's Scenarios library
    *   is available. 500 (Internal Error) and an informative response if not
    */
-  private def withRegisteredScenarios[A](parser: BodyParser[A] = parse.anyContent)(actionFactory: => Action[A])
+  private def withRegisteredScenarios[A](action: Action[A])
   : Action[A] = {
-    Action(parser) { request =>
+    Action(action.parser) { request =>
       try {
         Scenario.scenarios
 
-        actionFactory().apply(request)
+        action(request)
       } catch {
         case e: ClassNotFoundException =>
           InternalServerError(
@@ -96,7 +97,7 @@ object ScenarioController extends Controller {
           case None => {
             NotFound(
               "No scenario was found with the name \"" + urlSlug + "\"."+
-                "View available scenarios at " + reverse(this.list)
+                "View available scenarios at " + controllers.routes.ScenarioController.list().url
             )
           }
         }

@@ -101,7 +101,7 @@ private[controllers] trait GetAccountSettingsEndpoint extends ImplicitHeaderAndF
 
 object GetAccountSettingsEndpoint {
 
-  def url() = {    
+  def url: String = {
     controllers.routes.WebsiteControllers.getAccountSettings().url
   }
 }

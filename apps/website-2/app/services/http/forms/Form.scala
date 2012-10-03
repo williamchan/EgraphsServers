@@ -414,11 +414,11 @@ object Form {
     // Conversion classes
     //
     class FormCompatibleRequest(request: Request[_]) {
-      /*def asFormReadable: Form.Readable = {
-        (key) => {
+      def asFormReadable: Form.Readable = {
+        /*(key) => {
           Option(playParams.getAll(key)).flatten
-        }
-      }*/
+        }*/
+      }
     }
 
     class FormCompatiblePlayFlashAndSession[T <: { def get(key: String): Option[String]; def +(kv: (String, String)):T }](getabbleAppendable: T) {

@@ -41,7 +41,7 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
   // Controllers
   //
   def postRegisterConsumerEndpoint = postController(openDatabase=false) {
-    Action { request =>
+    Action { implicit request =>
       val redirects = for(
         // Get either the account and customer or a redirect back to the sign-in page
         accountAndCustomer <- redirectOrCreateAccountCustomerTuple(request).right

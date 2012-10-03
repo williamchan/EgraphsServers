@@ -2,9 +2,7 @@ package controllers.website
 
 import play.api._
 import play.api.mvc._
-import play.api.data.Forms.tuple
-import play.api.data.Forms.text
-import play.api.data.Forms.email
+import play.api.data.Forms.{tuple, text, optional}
 import play.api.data.Form
 import services.http.ControllerMethod
 import services.Utils
@@ -71,22 +69,19 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
 
     //check url params for secret key and email
     maybeFormData.getOrElse {
-      val (emailString, secretKey) = Form(
+      val (maybeEmailString, maybeSecretKey) = Form(
         tuple(
-          "email" -> email,
-          "secretKey" -> text
+          "email" -> optional(text),
+          "secretKey" -> optional(text)
         )
       ).bindFromRequest.fold(
-        errors => ("", ""),
+        errors => (None, None),
         emailAndSecret => emailAndSecret
       )
-           
-      val emails = Seq(emailString)
-      val secretKeys = Seq(secretKey)
 
       AccountPasswordResetFormView(
-        email = Field(name = Fields.Email.name, values = emails),
-        secretKey = Field(name = Fields.SecretKey.name, values = secretKeys),
+        email = Field(name = Fields.Email.name, values = maybeEmailString),
+        secretKey = Field(name = Fields.SecretKey.name, values = maybeSecretKey),
         passwordConfirm = Field(name = Fields.PasswordConfirm.name, values = List("")),
         newPassword = Field[String](name = Fields.NewPassword.name, values = List(""))
       )
@@ -98,9 +93,5 @@ object GetResetPasswordEndpoint {
 
   def absoluteUrl(email: String, secretKey: String)(implicit request: RequestHeader): String = {
     controllers.routes.WebsiteControllers.getResetPassword(email, secretKey).absoluteURL(secure=true)
-  }
-
-  def redirectUrl: Call = {
-    controllers.routes.WebsiteControllers.getResetPassword(email, secretKey)
   }
 }

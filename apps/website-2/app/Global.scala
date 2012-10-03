@@ -45,8 +45,6 @@ object Global extends GlobalSettings with Logging {
         TestModeBootstrap.run()
       }
 
-      services.mvc.MvcModule.init()
-
       log("Finished bootstrapping application")
     }
   }

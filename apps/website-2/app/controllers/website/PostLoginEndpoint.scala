@@ -7,6 +7,7 @@ import models._
 import services.http.POSTControllerMethod
 import services.http.forms.{CustomerLoginFormFactory, Form}
 import play.api.mvc.Action
+import controllers.routes.WebsiteControllers.{getLogin, getCustomerGalleryById}
 
 private[controllers] trait PostLoginEndpoint { this: Controller =>
   import Form.Conversions._
@@ -19,16 +20,17 @@ private[controllers] trait PostLoginEndpoint { this: Controller =>
     Action { request =>
       // Read a CustomerLoginForm from the params
       val params = request.queryString
-      val nonValidatedForm = customerLoginForms(params.asFormReadable)
+      val nonValidatedForm = customerLoginForms(request.asFormReadable)
   
       // Handle valid or error cases
       nonValidatedForm.errorsOrValidatedForm match {
         case Left(errors) =>
-          nonValidatedForm.redirectThroughFlash(GetLoginEndpoint.url().url)
+          nonValidatedForm.redirectThroughFlash(getLogin().url)(request.flash)
   
-        case Right(validForm) =>
-          session.put(WebsiteControllers.customerIdKey, validForm.customerId)
-          new Redirect(reverse(WebsiteControllers.getCustomerGalleryById(validForm.customerId)).url)
+        case Right(validForm) =>          
+          Redirect(getCustomerGalleryById(validForm.customerId)).withSession(
+            request.session + (WebsiteControllers.customerIdKey -> validForm.customerId.toString)
+          )
       }
     }
   }

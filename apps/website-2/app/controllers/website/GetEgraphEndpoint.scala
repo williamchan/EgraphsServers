@@ -1,20 +1,29 @@
 package controllers.website
 
-import play.api._
-import play.api.mvc._
-import services.blobs.AccessPolicy
-import services.http.ControllerMethod
-import play.api.templates.Html
-import services.http.SafePlayParams.Conversions.paramsToOptionalParams
-import services.graphics.Handwriting
-import models._
-import controllers.WebsiteControllers
-import frontend.egraph.{LandscapeEgraphFrameViewModel, PortraitEgraphFrameViewModel}
-import play.api.mvc.Results.Redirect
-import services.social.{Twitter, Facebook}
 import java.text.SimpleDateFormat
+
+import models.AdministratorStore
+import models.Egraph
+import models.FulfilledOrder
+import models.LandscapeEgraphFrame
+import models.Order
+import models.OrderStore
+import models.PortraitEgraphFrame
+import models.Product
+import models.frontend.egraph.LandscapeEgraphFrameViewModel
+import models.frontend.egraph.PortraitEgraphFrameViewModel
+import play.api.mvc.Action
+import play.api.mvc.Controller
+import play.api.mvc.RequestHeader
+import play.api.mvc.Session
+import play.api.templates.Html
 import services.Utils
+import services.blobs.AccessPolicy
+import services.graphics.Handwriting
+import services.http.ControllerMethod
 import services.http.EgraphsSession
+import services.social.Facebook
+import services.social.Twitter
 
 private[controllers] trait GetEgraphEndpoint { this: Controller =>
   //
@@ -92,7 +101,10 @@ object GetEgraphEndpoint {
     shadowY: Double=Handwriting.defaultShadowOffsetY,
     facebookAppId: String = "",
     galleryLink: Option[String] = None
-  ): Html = {
+  )(
+    implicit request: RequestHeader
+  ): Html = 
+  {
     // Get related data model objects
     val product = order.product
     val celebrity = product.celebrity
@@ -126,8 +138,7 @@ object GetEgraphEndpoint {
     val formattedSigningDate = new SimpleDateFormat("MMMM dd, yyyy").format(egraph.getSignedAt)
 
     // Social links
-    val thisPageAction = ""//controllers.routes.WebsiteControllers.getEgraph(order.id.toString).url
-    val thisPageLink = Utils.absoluteUrl(thisPageAction)
+    val thisPageLink = controllers.routes.WebsiteControllers.getEgraph(order.id).absoluteURL(secure=true)
 
     val facebookShareLink = Facebook.getEgraphShareLink(fbAppId = facebookAppId,
       fulfilledOrder = FulfilledOrder(order = order, egraph = egraph),

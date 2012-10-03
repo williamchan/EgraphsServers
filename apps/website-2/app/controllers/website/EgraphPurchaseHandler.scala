@@ -3,6 +3,7 @@ package controllers.website
 import models._
 import models.enums._
 import play.api.mvc.Flash
+import play.api.mvc.RequestHeader
 import services.mail.TransactionalMail
 import services.{Utils, AppConfig}
 import controllers.WebsiteControllers
@@ -22,6 +23,7 @@ import services.http.forms.purchase.CheckoutShippingForm
 import models.Customer
 import models.CashTransaction
 import models.FailedPurchaseData
+import controllers.routes.WebsiteControllers.getFAQ
 
 /**
  * Performs the meat of the purchase controller's interaction with domain
@@ -50,7 +52,10 @@ case class EgraphPurchaseHandler(
   dbSession: DBSession = AppConfig.instance[DBSession],
   payment: Payment = AppConfig.instance[Payment],
   serverSessions: ServerSessionFactory = AppConfig.instance[ServerSessionFactory],
-  isDemo: Boolean = false)
+  isDemo: Boolean = false
+)(
+  implicit request: RequestHeader
+)
 {
 
   private val dateFormat = new SimpleDateFormat("MMMM dd, yyyy")
@@ -78,7 +83,13 @@ case class EgraphPurchaseHandler(
       (error) => error match {
         case stripeError: PurchaseFailedStripeError =>
           //Attempt Stripe charge. If a credit card-related error occurred, redirect to purchase screen.
-          Redirect(controllers.routes.WebsiteControllers.getStorefrontCreditCardError(celebrity.urlSlug, product.urlSlug, stripeError.stripeException.getLocalizedMessage))
+          Redirect(
+            controllers.routes.WebsiteControllers.getStorefrontCreditCardError(
+              celebrity.urlSlug, 
+              product.urlSlug, 
+              Some(stripeError.stripeException.getLocalizedMessage)
+            )
+          )
         case _: PurchaseFailedInsufficientInventory =>
           //A redirect to the insufficient inventory page
           Redirect(controllers.routes.WebsiteControllers.getStorefrontNoInventory(celebrity.urlSlug, product.urlSlug))
@@ -96,13 +107,17 @@ case class EgraphPurchaseHandler(
       payment.charge(totalAmountPaid, stripeTokenId, "Egraph Order from " + buyerEmail)
     } catch {
       case stripeException: com.stripe.exception.StripeException => {
-        val failedPurchaseData = saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = "Credit card issue: " + stripeException.getLocalizedMessage)
+        val failedPurchaseData = saveFailedPurchaseData(
+          dbSession = dbSession, 
+          purchaseData = purchaseData, 
+          errorDescription = "Credit card issue: " + stripeException.getLocalizedMessage
+        )
         return Left(PurchaseFailedStripeError(failedPurchaseData, stripeException))
       }
     }
 
     // Persist the Order. This is executed in its own database transaction.
-    val (order: Order, _: Customer, _: Customer, cashTransaction: CashTransaction, maybePrintOrder: Option[PrintOrder]) = try {
+    val (order: Order, _: Customer, _: Customer, cashTransaction: CashTransaction, maybePrintOrder: Option[_]) = try {
       persistOrder(buyerEmail = buyerEmail,
         buyerName = buyerName,
         recipientEmail = recipientEmail,
@@ -125,18 +140,37 @@ case class EgraphPurchaseHandler(
     } catch {
       case e: InsufficientInventoryException => {
         payment.refund(charge.id)
-        val failedPurchaseData = saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = e.getLocalizedMessage)
+        val failedPurchaseData = saveFailedPurchaseData(
+          dbSession = dbSession, 
+          purchaseData = purchaseData, 
+          errorDescription = e.getLocalizedMessage
+        )
         return Left(PurchaseFailedInsufficientInventory(failedPurchaseData))
       }
       case e: Exception => {
         payment.refund(charge.id)
-        val failedPurchaseData = saveFailedPurchaseData(dbSession = dbSession, purchaseData = purchaseData, errorDescription = e.getLocalizedMessage)
+        val failedPurchaseData = saveFailedPurchaseData(
+          dbSession = dbSession, 
+          purchaseData = purchaseData, 
+          errorDescription = e.getLocalizedMessage
+        )
         return Left(PurchaseFailedError(failedPurchaseData))
       }
     }
 
     // If the Stripe charge and Order persistence executed successfully, send a confirmation email and redirect to a confirmation page
-    sendOrderConfirmationEmail(buyerName = buyerName, buyerEmail = buyerEmail, recipientName = recipientName, recipientEmail = recipientEmail, celebrity, product, order, cashTransaction, maybePrintOrder, mail)
+    sendOrderConfirmationEmail(
+      buyerName = buyerName, 
+      buyerEmail = buyerEmail, 
+      recipientName = recipientName, 
+      recipientEmail = recipientEmail, 
+      celebrity, 
+      product, 
+      order, 
+      cashTransaction, 
+      maybePrintOrder.asInstanceOf[Option[PrintOrder]], 
+      mail
+    )
 
     // Clear out the shopping cart and redirect
     serverSessions.celebrityStorefrontCart(celebrity.id).emptied.save()
@@ -195,31 +229,41 @@ case class EgraphPurchaseHandler(
         }
         case _ => None
       }
-      var order = buyer.buy(product, recipient, recipientName = recipientName, messageToCelebrity = personalNote, requestedMessage = desiredText)
+      val order = buyer.buy(product, recipient, recipientName = recipientName, messageToCelebrity = personalNote, requestedMessage = desiredText)
         .copy(amountPaidInCurrency = product.priceInCurrency)
         .withWrittenMessageRequest(writtenMessageRequest)
         .withPaymentStatus(PaymentStatus.Charged)
         .save()
-      var cashTransaction = CashTransaction(accountId = buyer.account.id,
+      val cashTransaction = CashTransaction(accountId = buyer.account.id,
         orderId = Some(order.id),
         stripeCardTokenId = Some(stripeTokenId),
         stripeChargeId = Some(charge.id),
         billingPostalCode = Some(billingPostalCode)
       ).withCash(totalAmountPaid).withCashTransactionType(CashTransactionType.EgraphPurchase).save()
 
-      val maybePrintOrder = if (printingOption == PrintingOption.HighQualityPrint) {
+      val maybePrintOrderAndCash = if (printingOption == PrintingOption.HighQualityPrint) {
         val printOrder = PrintOrder(orderId = order.id, amountPaidInCurrency = PrintOrder.pricePerPrint, shippingAddress = shippingAddress.getOrElse("")).save() // update CashTransaction
-        cashTransaction = cashTransaction.copy(printOrderId = Some(printOrder.id)).save()
-        Some(printOrder)
+        val printOrderTransaction = cashTransaction.copy(printOrderId = Some(printOrder.id)).save()
+        Some((printOrder, printOrderTransaction))
       } else {
         None
       }
 
-      if (isDemo) {
-        order = order.withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
+      val finalOrder = if (isDemo) {
+        order.withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
+      } else {
+        order
       }
 
-      (order, buyer, recipient, cashTransaction, maybePrintOrder)
+      val finalCashTransaction = maybePrintOrderAndCash.map { printOrderAndCash => 
+        printOrderAndCash._2
+      }.getOrElse(cashTransaction)
+      
+      val maybePrintOrder = maybePrintOrderAndCash.map { printOrderAndCash => 
+        printOrderAndCash._1
+      }
+
+      (finalOrder, buyer, recipient, finalCashTransaction, maybePrintOrder)
     }
   }
 
@@ -229,16 +273,19 @@ case class EgraphPurchaseHandler(
     }
   }
 
-  private def sendOrderConfirmationEmail(buyerName: String,
-                                         buyerEmail: String,
-                                         recipientName: String,
-                                         recipientEmail: String,
-                                         celebrity: Celebrity,
-                                         product: Product,
-                                         order: Order,
-                                         cashTransaction: CashTransaction,
-                                         maybePrintOrder: Option[PrintOrder],
-                                         mail: TransactionalMail) {
+  private def sendOrderConfirmationEmail(
+    buyerName: String,
+    buyerEmail: String,
+    recipientName: String,
+    recipientEmail: String,
+    celebrity: Celebrity,
+    product: Product,
+    order: Order,
+    cashTransaction: CashTransaction,
+    maybePrintOrder: Option[PrintOrder],
+    mail: TransactionalMail
+  )(implicit request: RequestHeader)
+  {
     import services.Finance.TypeConversions._
     val email = new HtmlEmail()
     email.setFrom("noreply@egraphs.com", "Egraphs")
@@ -250,7 +297,7 @@ case class EgraphPurchaseHandler(
     val emailLogoSrc = ""
     val emailFacebookSrc = ""
     val emailTwitterSrc = ""
-    val faqHowLongLink = Utils.absoluteUrl(controllers.routes.WebsiteControllers.WebsiteControllers.getFAQ.url) + "#how-long"
+    val faqHowLongLink = getFAQ().absoluteURL(secure=true) + "#how-long"
     val html = views.html.frontend.email_order_confirmation(
       buyerName = buyerName,
       recipientName = recipientName,

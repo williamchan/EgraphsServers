@@ -12,6 +12,10 @@ import services.http.forms.Form.Conversions._
 import services.blobs.AccessPolicy
 import services.http.filters.HttpFilters
 import play.api.mvc.Action
+import controllers.routes.WebsiteControllers.{
+  getStorefrontReview, 
+  getStorefrontPersonalize => reverseGetStorefrontPersonalize
+}
 
 /**
  * Manages GET and POST of the egraph purchase personalization form.
@@ -115,8 +119,8 @@ trait StorefrontPersonalizeConsumerEndpoints
    */
   def postStorefrontPersonalize(celebrityUrlSlug: String, productUrlSlug: String) = postController() {    
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
-      Action { request =>
-        import controllers.routes.WebsiteControllers.getStorefrontReview
+      Action { implicit request =>
+        implicit val flash = request.flash
         
         // Get the set of purchase forms from the server session
         val purchaseForms = purchaseFormFactory.formsForStorefront(celeb.id)
@@ -133,15 +137,15 @@ trait StorefrontPersonalizeConsumerEndpoints
   
           // Form had to be valid, or redirect back to the form page.
           validated <- form.errorsOrValidatedForm.left.map { error =>
-                         val action = reverse(getStorefrontPersonalize(celebrityUrlSlug, productUrlSlug))
+                         val url = reverseGetStorefrontPersonalize(celebrityUrlSlug, productUrlSlug).url
   
-                         form.redirectThroughFlash(action.url)
+                         form.redirectThroughFlash(url)
                        }.right
         ) yield {
           // Everything looked good. Save the form into the cache and move on with life.
           purchaseForms.withForm(form).save()
   
-          val defaultNextUrl = reverse(getStorefrontReview(celebrityUrlSlug, productUrlSlug)).url
+          val defaultNextUrl = getStorefrontReview(celebrityUrlSlug, productUrlSlug).url
   
           Utils.redirectToClientProvidedTarget(urlIfNoTarget=defaultNextUrl)
         }
