@@ -7,14 +7,14 @@
 ###
 #%{ if (play.id == "test") }%
 
-#GET     /test/scenarios                          controllers.website.nonproduction.ScenarioController.list
-#GET     /test/scenarios/clear                    controllers.website.nonproduction.ScenarioController.clear
-#GET     /test/scenarios/{urlSlug}                controllers.website.nonproduction.ScenarioController.scenario
-#GET     /test/request-transaction/without-error  controllers.website.nonproduction.TransactionTestController.makeAccount
-#GET     /test/request-transaction/with-error     controllers.website.nonproduction.TransactionTestController.makeAccountAndThrowException
-#GET     /test/request-transaction/is-stored      controllers.website.nonproduction.TransactionTestController.isStored
-#GET     /test/log-stuff-then-die                 controllers.website.nonproduction.TestControllers.logStuffThenThrowException
-#GET     /test/throwError                         controllers.website.nonproduction.TestControllers.throwError
+GET     /test/scenarios                          controllers.website.nonproduction.ScenarioController.list
+GET     /test/scenarios/clear                    controllers.website.nonproduction.ScenarioController.clear
+GET     /test/scenarios/:urlSlug                 controllers.website.nonproduction.ScenarioController.scenario(urlSlug: String)
+#GET     /test/request-transaction/without-error controllers.website.nonproduction.TransactionTestController.makeAccount
+#GET     /test/request-transaction/with-error    controllers.website.nonproduction.TransactionTestController.makeAccountAndThrowException
+#GET     /test/request-transaction/is-stored     controllers.website.nonproduction.TransactionTestController.isStored
+#GET     /test/log-stuff-then-die                controllers.website.nonproduction.TestControllers.logStuffThenThrowException
+#GET     /test/throwError                        controllers.website.nonproduction.TestControllers.throwError
 
 ###
 ### Production routes
