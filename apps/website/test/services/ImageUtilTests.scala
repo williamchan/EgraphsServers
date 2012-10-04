@@ -28,9 +28,9 @@ class ImageUtilTests extends EgraphsUnitTest {
     val signatureImage: BufferedImage = imageUtil.createSignatureImage(
       TestConstants.signatureStr, Some(TestConstants.messageStr)
     )
-    val egraphImage: BufferedImage = imageUtil.createEgraphImage(signatureImage, photoImage, 0, 0)
+    val image: BufferedImage = imageUtil.createEgraphImage(signatureImage, photoImage, 0, 0)
     val combinedImageFile = Play.getFile("test/files/egraph.jpg")
-    ImageIO.write(egraphImage, "JPG", combinedImageFile)
+    ImageIO.write(image, "JPG", combinedImageFile)
     combinedImageFile.length should not be (0)
   }
 

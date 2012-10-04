@@ -8,6 +8,7 @@ import services.http.{POSTControllerMethod, AdminRequestFilters}
 import services.http.SafePlayParams.Conversions._
 import controllers.WebsiteControllers
 import controllers.WebsiteControllers._
+import services.print.{PrintManufacturingInfo, LandscapeFramedPrint}
 
 trait PostOrderAdminEndpoint { this: Controller =>
 
@@ -41,31 +42,35 @@ trait PostOrderAdminEndpoint { this: Controller =>
           order.withReviewStatus(OrderReviewStatus.PendingAdminReview).save()
           new Redirect(WebsiteControllers.reverse(getOrderAdmin(orderId)).url)
         }
+        // TODO(wchan): This should go away once there is exactly one PrintOrder record for every print order
         case "generateImages" => {
-              import services.http.SafePlayParams.Conversions._
-              val errorOrBlobUrl = for (
-                orderId <- params.getLongOption("orderId").toRight("orderId param required").right;
-                fulfilledOrder <- orderStore
-                                    .findFulfilledWithId(orderId)
-                                    .toRight("No fulfilled order with ID" + orderId + "found")
-                                    .right
-              ) yield {
-                val FulfilledOrder(order, egraph) = fulfilledOrder
-                val product = order.product
-                val productPhoto = product.photoImage
-                val targetWidth = {
-                  val masterWidth = productPhoto.getWidth
-                  if (masterWidth < PrintOrder.defaultPngWidth) masterWidth else PrintOrder.defaultPngWidth
-                }
+          val errorOrBlobUrl = for (
+            orderId <- params.getLongOption("orderId").toRight("orderId param required").right;
+            fulfilledOrder <- orderStore
+              .findFulfilledWithId(orderId)
+              .toRight("No fulfilled order with ID" + orderId + "found")
+              .right
+          ) yield {
+            val FulfilledOrder(order, egraph) = fulfilledOrder
+            val pngUrl = egraph.getSavedEgraphUrlAndImage(LandscapeFramedPrint.targetEgraphWidth)._1
+            val framedPrintImageUrl = egraph.getFramedPrintImageUrl
+            val csv = PrintManufacturingInfo.toCSVLine(buyerEmail = order.buyer.account.email,
+              shippingAddress = "",
+              partnerPhotoFile = egraph.framedPrintFilename)
+            <html>
+              <body>
+                <a href={pngUrl} target="_blank">{pngUrl}</a>
+                <br/>
+                <a href={framedPrintImageUrl} target="_blank">{framedPrintImageUrl}</a>
+                <br/>
+                {PrintManufacturingInfo.headerCSVLine}
+                <br/>
+                {csv}
+              </body>
+            </html>
+          }
 
-                egraph.image(productPhoto)
-                  .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
-                  .scaledToWidth(targetWidth)
-                  .rasterized
-                  .saveAndGetUrl(services.blobs.AccessPolicy.Public)
-              }
-
-              errorOrBlobUrl.fold(error => error, url => url)
+          errorOrBlobUrl.fold(error => error, url => url)
         }
         case _ => Forbidden("Unsupported operation")
       }

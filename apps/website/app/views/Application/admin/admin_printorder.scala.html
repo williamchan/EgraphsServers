@@ -28,7 +28,7 @@
 }
 
 @adminControls = {
-  @if(!printOrder.isFulfilled && printOrder.pngUrl.isDefined) {
+  @if(!printOrder.isFulfilled && egraph.isDefined) {
     <div class="form">
       <form id="fulfill-form" method="POST" action='@postPrintOrder' enctype="application/x-www-form-urlencoded">
         @authenticityToken()
@@ -41,6 +41,19 @@
       </form>
     </div>
   }
+  @if(egraph.isDefined) {
+  <div class="form">
+    <form id="framed-image-form" method="POST" action='@postPrintOrder' enctype="application/x-www-form-urlencoded">
+      @authenticityToken()
+      <input name="printOrderId" type="hidden" value="@printOrder.id">
+      <input name="action" type="hidden" value="generateFramedPrintImage">
+      <div class="actions">
+        <h3>Get framed print image URL... this takes a while</h3>
+        <button type="submit" id="framed-image-button" class="btn primary fade in">Create framed print image</button>
+      </div>
+    </form>
+  </div>
+  }
   @if(printOrder.pngUrl.isEmpty && egraph.isDefined) {
     <div class="form">
       <form id="png-form" method="POST" action='@postPrintOrder' enctype="application/x-www-form-urlencoded">
@@ -48,8 +61,8 @@
         <input name="printOrderId" type="hidden" value="@printOrder.id">
         <input name="action" type="hidden" value="generatePNG">
         <div class="actions">
-          <h3>Generate PNG... this takes a while</h3>
-          <button type="submit" id="png-button" class="btn primary fade in">Create PNG</button>
+          <h3>Generate PNG... useful if you need to manually assemble a framed print image</h3>
+          <button type="submit" id="png-button" class="btn primary fade in">Create PNG of egraph</button>
         </div>
       </form>
     </div>
@@ -62,7 +75,7 @@
       <div class="actions">
         <h3>Shipping Address</h3>
         @formField(id="shippingAddress", label="Shipping Address", inputType="text", width="span8", fields=fields)
-        <button type="submit" id="editAddress-button" class="btn primary fade in">Update</button>
+        <button type="submit" id="editAddress-button" class="btn primary fade in">Update Address</button>
       </div>
     </form>
   </div>
