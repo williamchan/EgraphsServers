@@ -29,7 +29,7 @@ case class OrderServices @Inject() (
   printOrderStore: PrintOrderStore,
   payment: Payment,
   mail: TransactionalMail,
-  cashTransactionServices: Provider[CashTransactionServices],
+  cashTransactionStore: CashTransactionStore,
   egraphServices: Provider[EgraphServices]
 )
 
@@ -121,8 +121,7 @@ case class Order(
   def refund(): (Order, Charge) = {
     // Do a bunch of validation to make sure we have everything to do this refund
     require(paymentStatus == PaymentStatus.Charged, "Refunding an Order requires that the Order be already Charged")
-    val cashTransactionService = services.cashTransactionServices.get()
-    val maybeCashTransaction = cashTransactionService.cashTransactionStore.findByOrderId(id).headOption
+    val maybeCashTransaction = services.cashTransactionStore.findByOrderId(id).headOption
 
     require(maybeCashTransaction.isDefined && maybeCashTransaction.get.stripeChargeId.isDefined, "Refunding an Order requires that the Order be already Charged")
     val cashTransaction = maybeCashTransaction.get
@@ -133,7 +132,7 @@ case class Order(
     val errorStringOrRefundedOrderAndCharge = for (
       customer <- maybeCustomer.toRight("There is no customer!").right
     ) yield {
-      doRefund(customer, stripeChargeId, cashTransactionService)
+      doRefund(customer, stripeChargeId)
     }
 
     errorStringOrRefundedOrderAndCharge.fold(
@@ -142,9 +141,9 @@ case class Order(
     )
   }
 
-  private def doRefund(buyer: Customer, stripeChargeId: String, cashTransactionService: CashTransactionServices): (Order, Charge) = {
+  private def doRefund(buyer: Customer, stripeChargeId: String): (Order, Charge) = {
     val refundedCharge = services.payment.refund(stripeChargeId)
-    CashTransaction(accountId = buyer.account.id, orderId = Some(id), services = cashTransactionService)
+    CashTransaction(accountId = buyer.account.id, orderId = Some(id))
       .withCash(amountPaid.negated())
       .withCashTransactionType(CashTransactionType.PurchaseRefund)
       .save()

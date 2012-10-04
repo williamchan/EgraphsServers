@@ -159,7 +159,7 @@ class OrderTests extends EgraphsUnitTest
     refundCharge.refunded should be(true)
 
     val cashTransactions = cashTransactionStore.findByOrderId(order.id)
-    cashTransactions.size should be(2)
+    cashTransactions.length should be(2)
     val purchaseTxn = cashTransactions.find(b => b.cashTransactionType == CashTransactionType.EgraphPurchase).head
     purchaseTxn.accountId should be(will.account.id)
     purchaseTxn.orderId should be(Some(order.id))

@@ -33,7 +33,7 @@ class OrderCompleteViewModelFactoryTests extends EgraphsUnitTest {
 
     val order = mock[Order]
     order.id returns 1
-    order.amountPaid returns BigDecimal(100.00).toMoney()
+    order.amountPaid returns BigDecimal(100.00).toMoney() // totalPrice should ignore this and instead use the value from CashTransaction
     order.product returns product
     order.buyer returns buyer
     order.created returns new Timestamp(new Date().getTime)
@@ -45,10 +45,14 @@ class OrderCompleteViewModelFactoryTests extends EgraphsUnitTest {
     val printOrderStore = mock[PrintOrderStore]
     orderServices.printOrderStore returns printOrderStore
     printOrderStore.findByOrderId(1) returns List(mock[PrintOrder])
+    val cashTransactionStore = mock[CashTransactionStore]
+    orderServices.cashTransactionStore returns cashTransactionStore
+    val cashTransaction = mock[CashTransaction]
+    cashTransactionStore.findByOrderId(1) returns List(cashTransaction)
+    cashTransaction.cash returns BigDecimal(200.00).toMoney()
 
     // Generate the viewmodel from the domain models
     val viewModel = new OrderCompleteViewModelFactory().fromOrder(order)
-
     // Check expectations
     viewModel.buyerEmail should be (buyerAccount.email)
     viewModel.buyerName should be (buyer.name)
@@ -59,7 +63,7 @@ class OrderCompleteViewModelFactoryTests extends EgraphsUnitTest {
     viewModel.ownerEmail should be (recipientAccount.email)
     viewModel.ownerName should be (order.recipientName)
     viewModel.productName should be (product.name)
-    viewModel.totalPrice should be (order.amountPaid)
+    viewModel.totalPrice should be (BigDecimal(200.00).toMoney())
     viewModel.faqHowLongLink should include("/faq#how-long")
     viewModel.hasPrintOrder should be(true)
     viewModel.withAffiliateMarketing should be(false)

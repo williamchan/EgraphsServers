@@ -1,10 +1,12 @@
 package services.mvc
 
-import models.frontend.storefront.OrderCompleteViewModel
-import models.{InventoryBatch, Product, Account, Customer, Celebrity, Order}
+import models._
 import com.google.inject.Inject
 import controllers.WebsiteControllers
+import frontend.storefront.OrderCompleteViewModel
 import services.Utils
+import models.InventoryBatch
+import models.Order
 
 /**
  * Creates OrderCompleteViewModels for rendering the Order Complete page
@@ -20,7 +22,7 @@ class OrderCompleteViewModelFactory @Inject()() {
   def fromOrder(order: Order): OrderCompleteViewModel = {
     val product = order.product
     val buyer = order.buyer
-    order.services
+    val cashTransaction = order.services.cashTransactionStore.findByOrderId(order.id).headOption
     val hasPrintOrder = order.services.printOrderStore.findByOrderId(order.id).headOption.isDefined
 
     this.fromModels(
@@ -31,6 +33,7 @@ class OrderCompleteViewModelFactory @Inject()() {
       order.recipient.account,
       order,
       order.inventoryBatch,
+      cashTransaction,
       hasPrintOrder
     )
   }
@@ -50,6 +53,7 @@ class OrderCompleteViewModelFactory @Inject()() {
    * @param recipientAccount the account of the customer who will receive the product
    * @param order the order that represented the egraph purchase
    * @param inventoryBatch the inventory batch against which the order was made.
+   * @param cashTransaction the associated cash transaction, if available.
    * @param hasPrintOrder whether a physical print was also ordered as part of this purchase
    *
    * @return a ViewModel that populates the order complete page.
@@ -62,10 +66,12 @@ class OrderCompleteViewModelFactory @Inject()() {
     recipientAccount: Account,
     order: Order,
     inventoryBatch: InventoryBatch,
+    cashTransaction: Option[CashTransaction],
     hasPrintOrder: Boolean
   ): OrderCompleteViewModel =
   {
     val faqHowLongLink = WebsiteControllers.reverse(WebsiteControllers.getFAQ).url + "#how-long"
+    val totalAmountPaid = cashTransaction.map(_.cash).getOrElse(order.amountPaid)
     OrderCompleteViewModel (
       orderDate = order.created,
       orderNumber = order.id,
@@ -75,7 +81,7 @@ class OrderCompleteViewModelFactory @Inject()() {
       ownerEmail = recipientAccount.email,
       celebName = celeb.publicName,
       productName = product.name,
-      totalPrice = order.amountPaid,
+      totalPrice = totalAmountPaid,
       expectedDeliveryDate = inventoryBatch.getExpectedDate,
       faqHowLongLink = faqHowLongLink,
       hasPrintOrder = hasPrintOrder,

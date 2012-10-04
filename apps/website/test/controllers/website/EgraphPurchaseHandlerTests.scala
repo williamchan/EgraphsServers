@@ -35,7 +35,7 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheAndBlob
       order.recipientName should be(recipientName)
       order.buyer.name should be(buyerName)
 
-      val cashTransaction = cashTransactionStore.findByOrderId(order.id).single
+      val cashTransaction = cashTransactionStore.findByOrderId(order.id).head
       cashTransaction.orderId should be(Some(order.id))
       cashTransaction.stripeCardTokenId should not be(None)
       cashTransaction.stripeChargeId should not be(None)
@@ -70,7 +70,7 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheAndBlob
       printOrder.shippingAddress should be("Egraphs, 615 2nd Ave, 300, Seattle, WA 98102")
       printOrder.amountPaidInCurrency should be(BigDecimal(45))
 
-      val cashTransaction = cashTransactionStore.findByOrderId(order.id).single
+      val cashTransaction = cashTransactionStore.findByOrderId(order.id).head
       cashTransaction.printOrderId should be(Some(printOrder.id))
       cashTransaction.amountInCurrency should be(BigDecimal(95))
     }
