@@ -96,7 +96,7 @@ trait XyzmoBiometricServicesBase {
       log.info("Profile_Add_v1 succeeded: profile for " + userId + " has been created successfully.")
     }
     else {
-      log.error("Error during Profile_Add_v1: " + xyzmoAddProfile.errorMsg.getOrElse(None))
+      log.error("Error during Profile_Add_v1: " + xyzmoAddProfile.errorMsg.getOrElse(""))
     }
     xyzmoAddProfile
   }
@@ -117,13 +117,13 @@ trait XyzmoBiometricServicesBase {
     val xyzmoEnrollDynamicProfile: XyzmoEnrollDynamicProfile = new XyzmoEnrollDynamicProfile(enrollmentBatchId = enrollmentBatch.id).withEnrollDynamicProfile_v1Response(enrollDynamicProfile_v1Response)
     if (xyzmoEnrollDynamicProfile.baseResult eq WebServiceBiometricPartStub.BaseResultEnum.ok.getValue) {
       val enrollResult = xyzmoEnrollDynamicProfile.enrollResult
-      log.info("EnrollDynamicProfile_v1: EnrollResult is " + enrollResult.getOrElse(None))
+      log.info("EnrollDynamicProfile_v1: EnrollResult is " + enrollResult.getOrElse(""))
       enrollResult.getOrElse(None) match {
         case "EnrollCompleted" => {
           log.info("EnrollDynamicProfile_v1: Profile " + xyzmoEnrollDynamicProfile.xyzmoProfileId.getOrElse(None) + " created; contains " + xyzmoEnrollDynamicProfile.nrEnrolled.getOrElse(None) + " signatures.")
         }
         case "EnrollRejected" => {
-          log.info(xyzmoEnrollDynamicProfile.rejectedSignaturesSummary.getOrElse(None))
+          log.info(xyzmoEnrollDynamicProfile.rejectedSignaturesSummary.getOrElse(""))
         }
         case "EnrollContinued:" => {
           // This should never happen.
