@@ -60,10 +60,18 @@ class Utils @Inject()(@PlayConfig() playConfig: util.Properties) {
         }
     }
   }
-  
+
   // TODO: PLAY20 migration. Document
-  def slugify(toSlugify: String, lowercaseOnly:Boolean = true): String = {
-    
+  def slugify(toSlugify: String, lowercaseOnly: Boolean = true): String = {
+    import java.text.Normalizer
+    // source: https://github.com/julienrf/chooze/blob/master/app/util/Util.scala#L6
+    val slug = Normalizer.normalize(toSlugify, Normalizer.Form.NFD).replaceAll("[^\\w ]", "").replace(" ", "-").toLowerCase
+
+    if (lowercaseOnly) {
+      slug.toLowerCase()
+    } else {
+      slug
+    }
   }
 
   /**
