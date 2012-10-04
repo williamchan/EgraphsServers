@@ -31,7 +31,7 @@ private[blobs] class FileSystemBlobVendor extends BlobVendor {
       None
     }
     else {
-      Some(urlBase + "/" + key)
+      Some(controllers.routes.WebsiteControllers.getBlob(key).url)
     }
   }
 
@@ -43,19 +43,9 @@ private[blobs] class FileSystemBlobVendor extends BlobVendor {
       blobStore.blobBuilder(key).payload(bytes).build()
     )
   }
+  
   override def checkConfiguration() {
     // No configuration necessary to use the file system as a blob store
-  }
-
-  //
-  // Private Members
-  //
-  private def urlBase = {
-    val serverUrl = Request.current() match {
-      case req: Request => req.getBase
-      case null => "http://localhost:9000"
-    }
-    serverUrl + "/blob/files"
   }
 }
 
