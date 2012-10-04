@@ -27,7 +27,7 @@ class TransactionalMailTests extends EgraphsUnitTest
     val mail = new MailProvider(playConfig, utils).get()
 
     // Check expectations
-    mail should be (Gmail("eboto", "herp"))
+    mail should be (TransactionalMailer("eboto", "herp", "smtp.gmail.com"))
   }
 
   it should "otherwise delegate to Play mail implementation" in {
