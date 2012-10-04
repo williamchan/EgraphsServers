@@ -3,6 +3,7 @@ package services
 import http.PlayConfig
 import play.api.mvc.Results.{Redirect}
 import play.api.Play
+import play.api.Play.current
 import com.google.inject.Inject
 import java.util
 import org.squeryl.Query

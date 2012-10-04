@@ -96,8 +96,8 @@ object ScenarioController extends Controller {
   
           case None => {
             NotFound(
-              "No scenario was found with the name \"" + urlSlug + "\"."+
-                "View available scenarios at " + controllers.routes.ScenarioController.list().url
+              "No scenario was found with the name \"" + urlSlug + "\"." +
+                "View available scenarios at " + controllers.website.nonproduction.routes.ScenarioController.list().url
             )
           }
         }

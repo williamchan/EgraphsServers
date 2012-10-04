@@ -5,7 +5,7 @@ import com.google.inject.Inject
 import scala.collection.immutable.Map
 import collection.{mutable, TraversableLike}
 import collection.mutable.ListBuffer
-import play.mvc.Scope.Session
+import play.api.mvc.Session
 import services.logging.Logging
 import services.{Namespacing, AppConfig, Time}
 
@@ -224,7 +224,7 @@ class ServerSession private[http] (
 
 
 case class ServerSessionServices @Inject() (
-  sessionFactory: () => play.mvc.Scope.Session,
+  sessionFactory: () => Session,
   cacheFactory: CacheFactory
 )
 

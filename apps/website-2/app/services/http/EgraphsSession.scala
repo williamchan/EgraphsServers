@@ -2,7 +2,7 @@ package services.http
 
 import com.google.inject.Inject
 import services.Utils
-import play.mvc.Scope.Session
+import play.api.mvc.Session
 
 /**
  * Wraps the play client-side session and the server-side session, limiting the key-set
@@ -169,7 +169,7 @@ object EgraphsSession {
 
 /** Services used by the EgraphsSession. */
 private[http] case class EgraphsSessionServices @Inject()(
-  playSessionFactory: () => play.mvc.Scope.Session
+  playSessionFactory: () => Session
 )
 
 /** Provisions an instance of EgraphsSession. Favor injecting () => EgraphsSession */
