@@ -16,7 +16,7 @@ class TransactionalMailTests extends EgraphsUnitTest
   it should "provide the gmail instance when smtp value isn't mock and gmail host is provided" in {
     // Set up
     val playConfig = appUtils.properties(
-      "mail.smtp" -> "real",
+      "mail.smtp" -> "gmail",
       "mail.smtp.host" -> "smtp.gmail.com",
       "mail.smtp.user" -> "eboto",
       "mail.smtp.pass" -> "herp"
