@@ -62,7 +62,6 @@ class CelebrityStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
   }
 
 
-    //
   // Private members
   //
   private def getPublishedCelebritiesWithIds(ids: Seq[Long]): IndexedSeq[Celebrity] = {

@@ -7,7 +7,7 @@ import play.templates.JavaExtensions
 import services.db.{FilterOneTable, KeyedCaseClass, Schema, SavesWithLongKey}
 import services.blobs.Blobs.Conversions._
 import com.google.inject.{Provider, Inject}
-import org.squeryl.{Session, Query}
+import org.squeryl.Query
 import services._
 import java.awt.image.BufferedImage
 import models.Celebrity.CelebrityWithImage
@@ -410,6 +410,13 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
     ).headOption
   }
 
+  /**
+   * Find using postgres text search on publicname and roledescription
+   * http://www.postgresql.org/docs/9.2/interactive/textsearch-controls.html
+   * Uses anorm because the return types are not supported by Squeryl.
+   * @param query text to match on
+   * @return matching celebs in CelebrityListing format
+   */
   def findByTextQuery(query: String): Iterable[CelebrityListing] = {
     import play.db.anorm._
       val rowStream = SQL(
@@ -521,6 +528,11 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
     toUpdate.copy(created = created, updated = updated)
   }
 }
+
+/**
+ * Simple class for representing celebrities in lists.
+ * TODO: Move into viewmodels when we refactor the admin panel.
+ **/
 
 case class CelebrityListing(
   id: Long,

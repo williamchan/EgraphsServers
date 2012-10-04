@@ -1,6 +1,6 @@
 package controllers.website.admin
 
-import models.{CelebrityListing, Celebrity, Account, CelebrityStore}
+import models.{Celebrity, Account, CelebrityStore}
 import play.mvc.Controller
 import services.http.{AdminRequestFilters, ControllerMethod}
 import services.Utils
@@ -28,8 +28,15 @@ private[controllers] trait GetCelebritiesAdminEndpoint {
       )
     }
   }
-  //todo call for search
-  def getCelebritiesBySearchAdmin(query: String, page: Int = 1) = controllerMethod() {
+
+  /**
+   * Return celebrities that match the text query. Full text search on  publicname and roledescription.
+   * See reference here: http://www.postgresql.org/docs/9.2/interactive/textsearch-controls.html
+   *
+   * @param query user inputted string
+   * @return CelebrityListings of matching result.
+   */
+  def getCelebritiesBySearchAdmin(query: String) = controllerMethod() {
     adminFilters.requireAdministratorLogin { admin =>
       val listings = celebrityStore.findByTextQuery(query)
       views.Application.admin.html.admin_celebrities_search(
