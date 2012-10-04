@@ -18,7 +18,7 @@ private[controllers] trait PostOrderConfigureEndpoint { this: Controller =>
 
   def postOrderPrivacy(orderId: Long) = postController() {
     httpFilters.requireCustomerLogin.inSession() { (customer, account) =>
-      Action { request =>
+      Action { implicit request =>
         val params = request.queryString
         val privacyStatusOption = Utils.getOptionFirstInSeq(params.get("privacyStatus"))
 

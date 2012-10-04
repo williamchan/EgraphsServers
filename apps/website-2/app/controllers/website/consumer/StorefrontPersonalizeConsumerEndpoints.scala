@@ -48,7 +48,7 @@ trait StorefrontPersonalizeConsumerEndpoints
    */
   def getStorefrontPersonalize(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod() {
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
-      Action { request =>
+      Action { implicit request =>
         // Get the purchase forms specific to this celebrity's storefront.
         val forms = purchaseFormFactory.formsForStorefront(celeb.id)(request.session)
   

@@ -19,7 +19,7 @@ private[controllers] trait PostAccountSettingsEndpoint { this: Controller =>
 
   def postAccountSettings() = postController() {
     httpFilters.requireCustomerLogin.inSession() { (customer, account) =>
-      Action { request =>
+      Action { implicit request =>
         implicit val flash = request.flash
 
         // Read a AccountSettingsForm from the params

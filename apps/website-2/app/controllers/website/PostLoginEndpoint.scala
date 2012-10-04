@@ -17,7 +17,7 @@ private[controllers] trait PostLoginEndpoint { this: Controller =>
   protected def customerLoginForms: CustomerLoginFormFactory
 
   def postLogin() = postController() {
-    Action { request =>
+    Action { implicit request =>
       // Read a CustomerLoginForm from the params
       val params = request.queryString
       val nonValidatedForm = customerLoginForms(request.asFormReadable)

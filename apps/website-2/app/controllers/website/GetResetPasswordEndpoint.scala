@@ -47,7 +47,7 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
   def getVerifyAccount(email: String, resetKey: String) = controllerMethod() {
     httpFilters.requireAccountEmail.inRequest() { account =>      
       httpFilters.requireResetPasswordSecret(account) {
-        Action {
+        Action { implicit request =>
           account.emailVerify().save()
           Ok(views.html.frontend.simple_confirmation("Account Verified", "Your account has been successfully verified."))
         }

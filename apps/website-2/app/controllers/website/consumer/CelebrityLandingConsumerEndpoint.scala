@@ -23,7 +23,7 @@ private[consumer] trait CelebrityLandingConsumerEndpoint
 
   def getCelebrityLanding(celebrityUrlSlug: String) = controllerMethod() {
     httpFilters.requireCelebrityUrlSlug(celebrityUrlSlug) { celebrity =>
-      Action {
+      Action { implicit request =>
         Ok(CelebrityLandingConsumerEndpoint.getCelebrityLandingHtml(celebrity))
       }
     }    

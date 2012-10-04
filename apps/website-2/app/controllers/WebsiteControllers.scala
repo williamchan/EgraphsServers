@@ -80,7 +80,7 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
 //   * @param permanent See http://www.playframework.org/documentation/api/1.2.4/play/mvc/Controller.html#redirect(java.lang.String, boolean)
 //   * @return a redirect
 //   */
-//  def redirectWithValidationErrors(redirectUrl: String, permanent: Option[Boolean] = None) = Action { request =>
+//  def redirectWithValidationErrors(redirectUrl: String, permanent: Option[Boolean] = None) = Action { implicit request =>
 //    // Redirect to redirectUrl, providing field errors via the flash scope.
 //    import scala.collection.JavaConversions._
 //    val fieldNames = validationErrors.map {

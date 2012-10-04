@@ -7,6 +7,7 @@ import collection.{mutable, TraversableLike}
 import collection.mutable.ListBuffer
 import play.api.mvc.Session
 import services.logging.Logging
+import services.http.EgraphsSession.Conversions._
 import services.{Namespacing, AppConfig, Time}
 import play.api.mvc.Session
 
@@ -204,7 +205,7 @@ class ServerSession private[http] (
   }
 
   private[http] def cacheKey: String = {
-    "session_" + session.get("id").getOrElse(
+    "session_" + session.id.getOrElse(
       throw new RuntimeException("Encountered request with no session ID")
     )
   }

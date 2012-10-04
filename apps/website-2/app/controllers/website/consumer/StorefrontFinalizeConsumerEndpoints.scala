@@ -55,7 +55,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
    */
   def getStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug: String): Action[_] = controllerMethod() {
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
-      Action { request =>
+      Action { implicit request =>
         // Get the purchase forms out of the server session
         val forms = purchaseFormFactory.formsForStorefront(celeb.id)(request.session)
   

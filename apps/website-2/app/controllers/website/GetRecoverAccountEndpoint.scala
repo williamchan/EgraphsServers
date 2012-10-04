@@ -23,7 +23,7 @@ private[controllers] trait GetRecoverAccountEndpoint extends ImplicitHeaderAndFo
   protected def accountRecoverForms: AccountRecoverFormFactory
 
   def getRecoverAccount = controllerMethod() {
-    Action { request =>
+    Action { implicit request =>
       val flash = request.flash
       val maybeFormData = accountRecoverForms.getFormReader.read(flash.asFormReadable).map { form =>
         AccountRecoverFormView(

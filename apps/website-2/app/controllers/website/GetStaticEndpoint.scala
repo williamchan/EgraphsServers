@@ -10,25 +10,25 @@ private[controllers] trait GetStaticEndpoint extends ImplicitHeaderAndFooterData
   protected def controllerMethod: ControllerMethod
 
   def getAbout = controllerMethod() {
-    Action {
+    Action { implicit request =>
       Ok(views.html.frontend.about_us(learnMoreUrl = controllers.routes.WebsiteControllers.getInsideEgraph().url))
     }
   }
 
   def getCareers = controllerMethod() {
-    Action {
+    Action { implicit request =>
       Ok(views.html.frontend.careers())
     }
   }
 
   def getFAQ = controllerMethod() {
-    Action {
+    Action { implicit request =>
       Ok(views.html.frontend.faq())
     }
   }
 
   def getInsideEgraph = controllerMethod() {
-    Action {
+    Action { implicit request =>
       val tableOfContents =
         List(
           Section(title="Introduction", url="#inside", subsection = None),
@@ -41,19 +41,19 @@ private[controllers] trait GetStaticEndpoint extends ImplicitHeaderAndFooterData
   }  
 
   def getPrivacy = controllerMethod() {
-    Action {
+    Action { implicit request =>
       Ok(views.html.frontend.privacy())
     }
   }  
 
   def getInsiderSweepstakes = controllerMethod() {
-    Action {
+    Action { implicit request =>
       Ok(views.html.frontend.sweepstakes_insider())
     }
   }  
 
   def getTerms = controllerMethod() {
-    Action {
+    Action { implicit request =>
       Ok(views.html.frontend.terms())
     }
   }  

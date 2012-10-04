@@ -7,6 +7,11 @@ import play.api.mvc.Session
 case class EgraphsSession(session: Session) {
   import EgraphsSession.Key
   
+  // We have to manually implement session id =(
+  def id: Option[String] = {
+    
+  }
+  
   def adminId: Option[Long] = {
     getLong(Key.AdminId.name)
   }

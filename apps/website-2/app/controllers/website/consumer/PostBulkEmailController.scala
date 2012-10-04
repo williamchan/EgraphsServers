@@ -23,7 +23,7 @@ private[controllers] trait PostBulkEmailController extends ImplicitHeaderAndFoot
    * @return
    */
   def postSubscribeEmail = postController(openDatabase = false) {
-    Action { request =>
+    Action { implicit request =>
       /*
        * listSubscribe(string apikey, string id, string email_address, array merge_vars,
        * string email_type, bool double_optin, bool update_existing, bool replace_interests, bool send_welcome)
