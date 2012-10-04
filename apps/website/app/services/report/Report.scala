@@ -24,13 +24,13 @@ trait Report {
   val timeFormatter = new SimpleDateFormat("HH:mm:ss")
   val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
 
-  protected def formatTime(date: Date) = {
-    timeFormatter.setTimeZone(TimeZone.getTimeZone("PST"))
+  protected def formatTime(date: Date, timeZone: String = "GMT") = {
+    timeFormatter.setTimeZone(TimeZone.getTimeZone(timeZone))
     timeFormatter.format(date)
   }
 
-  protected def formatDate(date: Date) = {
-    dateFormatter.setTimeZone(TimeZone.getTimeZone("PST"))
+  protected def formatDate(date: Date, timeZone: String = "GMT") = {
+    dateFormatter.setTimeZone(TimeZone.getTimeZone(timeZone))
     dateFormatter.format(date)
   }
 

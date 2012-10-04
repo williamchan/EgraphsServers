@@ -36,6 +36,11 @@ object Time {
   def currentMonthStart: DateTime = new DateMidnight().withDayOfMonth(1).toDateTime
 
   /**
+   * @return the very start of the current month
+   */
+  def weekStart(minusWeeks: Int = 0): DateTime = new DateMidnight().withDayOfWeek(DateTimeConstants.SUNDAY).minusWeeks(minusWeeks).toDateTime
+
+  /**
    * @return the very start of the previous month
    */
   def previousMonthStart: DateTime = currentMonthStart.minusMonths(1)

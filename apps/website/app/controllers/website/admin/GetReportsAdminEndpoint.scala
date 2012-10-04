@@ -58,6 +58,11 @@ private[controllers] trait GetReportsAdminEndpoint {
           new RenderBinary(report, report.getName)
         }
 
+        case "board-report" => {
+          val report = new BoardReport(schema).report()
+          new RenderBinary(report, report.getName)
+        }
+
         case _ => "Not a valid action"
       }
     }
