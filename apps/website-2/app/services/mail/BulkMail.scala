@@ -6,7 +6,7 @@ import services.Utils
 import collection.JavaConversions._
 import services.http.PlayConfig
 import java.util.Properties
-import play.libs.WS
+import play.api.libs.ws.WS
 
 /**
  * Trait for defining new bulk mail providers.
@@ -39,11 +39,16 @@ class BulkMailProvider @Inject()(@PlayConfig playConfig: Properties, utils: Util
   def get() : BulkMail = {
     //Inspect properties and return the proper BulkMail
     import play.api.Play.current
-    if (configuration.getProperty("mail.bulk") == "mailchimp") {
-      MailChimpBulkMail
-    } else {
-      new MockBulkMail(utils)
+
+    val maybeBulkMail = for {
+      bulkMailConfig <- configuration.getString("mail.bulk") if (bulkMailConfig == "mailchimp")
+      apikey <- configuration.getString("mail.bulk.apikey")
+      datacenter <- configuration.getString("mail.bulk.datacenter")
+    } yield {
+      MailChimpBulkMail(apikey, datacenter)
     }
+
+    maybeBulkMail.getOrElse(new MockBulkMail(utils))
   }
 }
 
@@ -67,18 +72,15 @@ private[mail] case class MockBulkMail (utils: Utils) extends BulkMail
 private[mail] case class MailChimpBulkMail (apikey: String, datacenter: String) extends BulkMail
 {
   override def subscribeNew(listId: String, email: String) = {
-  val url = "https://" + datacenter + ".api.mailchimp.com/1.3/"
-  val responsePromise = WS.url(url).params(
-    Map(
-      "output" -> "json",
-      "apikey" -> apikey,
-      "method" -> "listSubscribe",
-      "id" -> listId,
-      "email_address" -> email,
-      "double_optin" -> "false"
-    )
-  ).getAsync()
-
+    val url = "https://" + datacenter + ".api.mailchimp.com/1.3/"
+    val params = Map(
+        "output" -> Seq("json"),
+        "apikey" -> Seq(apikey),
+        "method" -> Seq("listSubscribe"),
+        "id" -> Seq(listId),
+        "email_address" -> Seq(email),
+        "double_optin" -> Seq("false"))
+    val responsePromise = WS.url(url).post(params)
   }
 
   override def checkConfiguration() = {
@@ -94,13 +96,5 @@ private[mail] case class MailChimpBulkMail (apikey: String, datacenter: String) 
       application.conf: A "mail.bulk.datacenter" configuration must be provided.
       """
     )
-
-
   }
 }
-
-/**
- * Companion object for configuring MailChimpBulkMail
- */
-private[mail] object MailChimpBulkMail
-  extends MailChimpBulkMail(configuration.getProperty("mail.bulk.apikey"), configuration.getProperty("mail.bulk.datacenter"))

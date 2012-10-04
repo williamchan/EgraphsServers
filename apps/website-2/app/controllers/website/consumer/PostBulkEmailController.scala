@@ -35,7 +35,8 @@ private[controllers] trait PostBulkEmailController extends ImplicitHeaderAndFoot
         errors => Ok(toJson(Map("error" -> errors.map( error => error.description).toSeq))),
         
         validForm => {
-          bulkMail.subscribeNew(validForm.listId, validForm.email)
+          bulkMail.subscribeNew(validForm.listId, validForm.email)  //TODO: We aren't doing anything if this fails, maybe we should do something 
+          //like store it somewhere that gets retried later since our bulk mailer service could be down..
           Ok(toJson(Map("subscribed" -> true)))
         }
       )
