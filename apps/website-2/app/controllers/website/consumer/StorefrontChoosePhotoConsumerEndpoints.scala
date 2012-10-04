@@ -55,7 +55,7 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
           product.asChoosePhotoTileView(celebrityUrlSlug=celebrityUrlSlug)
         }
   
-        val forms = purchaseFormFactory.formsForStorefront(celebrity.id)
+        val forms = purchaseFormFactory.formsForStorefront(celebrity.id)(request.session)
   
         val maybeProductUrlSlug = for (
           productIdBeingOrdered <- forms.productId;
@@ -128,7 +128,7 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
       Action { implicit request =>
         // Save the purchase forms with the new product ID
-        purchaseFormFactory.formsForStorefront(celeb.id).withProductId(product.id).save()
+        purchaseFormFactory.formsForStorefront(celeb.id)(request.session).withProductId(product.id).save()
   
         // Redirect either to a url specified by the POST params or to the Personalize page.
         Utils.redirectToClientProvidedTarget(

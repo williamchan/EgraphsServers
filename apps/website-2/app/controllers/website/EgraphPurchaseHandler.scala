@@ -172,7 +172,7 @@ case class EgraphPurchaseHandler(
     )
 
     // Clear out the shopping cart and redirect
-    serverSessions.celebrityStorefrontCart(celebrity.id).emptied.save()
+    serverSessions.celebrityStorefrontCart(celebrity.id)(request.session).emptied.save()
     Right(order)
   }
 

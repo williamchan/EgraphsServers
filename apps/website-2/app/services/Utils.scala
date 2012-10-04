@@ -13,6 +13,8 @@ import java.io.{Serializable, PrintWriter, StringWriter}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.Result
 import play.api.mvc.Request
+import play.api.Play.current
+import services.http.PlayConfigurationProperties
 
 /**
  * Helpful utilities with no other place to call home
@@ -228,7 +230,7 @@ class Utils @Inject()(@PlayConfig() playConfig: util.Properties) {
   }
 }
 
-object Utils extends Utils(Play.configuration) {
+object Utils extends Utils(PlayConfigurationProperties.properties) {
 
   /**DIY exhaustiveness-checking enum type. See https://gist.github.com/1057513 */
   trait Enum {

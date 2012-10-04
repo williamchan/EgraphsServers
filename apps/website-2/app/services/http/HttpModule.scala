@@ -15,8 +15,7 @@ object HttpModule extends AbstractModule with ScalaModule {
     // TODO: PLAY20 migration. You can no longer have session factories.
     // replace everywhere that uses a session factory and make them take the
     // session in their method signature. Same applies to flash =(
-    bind[() => Session].toInstance(() => Session.current())
-    bind[() => ServerSession].to[ServerSessionFactory]
+    bind[() => Session].toInstance(() => Session.current())    
     bind[() => EgraphsSession].to[EgraphsSessionFactory]
 
     bind[String].annotatedWith[PlayId].toInstance(

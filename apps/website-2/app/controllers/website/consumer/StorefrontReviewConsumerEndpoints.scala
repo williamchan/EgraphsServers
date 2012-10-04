@@ -51,7 +51,7 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
       Action { request =>
         // Get the purchase forms out of the server session
-        val forms = purchaseFormFactory.formsForStorefront(celeb.id)
+        val forms = purchaseFormFactory.formsForStorefront(celeb.id)(request.session)
   
         val redirectOrOk = for (
           // Make sure the product ID in this URL matches the one in the form
@@ -111,7 +111,7 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
       Action { implicit request => 
         // Get the purchase forms for this celeb's storefront out of the server session
-        val forms = purchaseFormFactory.formsForStorefront(celeb.id)
+        val forms = purchaseFormFactory.formsForStorefront(celeb.id)(request.session)
         
         val form = new play.data.DynamicForm().bindFromRequest()        
         

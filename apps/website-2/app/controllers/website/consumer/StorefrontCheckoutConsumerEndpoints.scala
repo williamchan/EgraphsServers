@@ -51,7 +51,7 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
   def getStorefrontCheckout(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod() {
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
       Action { implicit request =>
-        val forms = purchaseFormFactory.formsForStorefront(celeb.id)
+        val forms = purchaseFormFactory.formsForStorefront(celeb.id)(request.session)
   
         val results = for (
           // Make sure the product ID matches
@@ -146,7 +146,7 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
   def postStorefrontCheckout(celebrityUrlSlug: String, productUrlSlug: String) = postController() {
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
       Action { implicit request =>
-        val forms = purchaseFormFactory.formsForStorefront(celeb.id)
+        val forms = purchaseFormFactory.formsForStorefront(celeb.id)(request.session)
 
         // For-comprehend over a bunch of validations that produces success or failure redirects
         val redirects = for (

@@ -50,7 +50,7 @@ trait StorefrontPersonalizeConsumerEndpoints
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
       Action { request =>
         // Get the purchase forms specific to this celebrity's storefront.
-        val forms = purchaseFormFactory.formsForStorefront(celeb.id)
+        val forms = purchaseFormFactory.formsForStorefront(celeb.id)(request.session)
   
         val redirectOrOk = for (
           // Make sure the submitted product ID matches the one in the session, otherwise redirect
@@ -123,7 +123,7 @@ trait StorefrontPersonalizeConsumerEndpoints
         implicit val flash = request.flash
         
         // Get the set of purchase forms from the server session
-        val purchaseForms = purchaseFormFactory.formsForStorefront(celeb.id)
+        val purchaseForms = purchaseFormFactory.formsForStorefront(celeb.id)(request.session)
   
         // Read the Personalize form out of the parameters
         val formReader = formReaders.forPersonalizeForm

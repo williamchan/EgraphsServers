@@ -36,7 +36,7 @@ class StorefrontBreadcrumbData @Inject()(purchaseFormFactory: PurchaseFormFactor
   (implicit request: Request[AnyContent])
   : StorefrontBreadcrumbs = {
 
-    val forms = purchaseFormFactory.formsForStorefront(celebrityId)
+    val forms = purchaseFormFactory.formsForStorefront(celebrityId)(request.session)
 
     val (crumbUrls, currentCrumb) = maybeProductUrlSlug.map { productUrlSlug =>
       val crumbUrls = urls(forms, celebrityUrlSlug, productUrlSlug)

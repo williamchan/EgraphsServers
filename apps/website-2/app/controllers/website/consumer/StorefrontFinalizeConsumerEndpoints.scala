@@ -57,7 +57,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
       Action { request =>
         // Get the purchase forms out of the server session
-        val forms = purchaseFormFactory.formsForStorefront(celeb.id)
+        val forms = purchaseFormFactory.formsForStorefront(celeb.id)(request.session)
   
         val results = for (allPurchaseForms <- forms.allPurchaseFormsOrRedirect(celeb, product).right) yield {
           // Everything looks good for rendering the page! Unpack the purchase data.
@@ -154,7 +154,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
       val redirectOrRedirectOrPurchaseData = dbSession.connected(TransactionSerializable) {
         httpFilters.requireCelebrityAndProductUrlSlugs.asOperationResult(celebrityUrlSlug, productUrlSlug, request.session) { 
           (celeb, product) =>
-            val forms = purchaseFormFactory.formsForStorefront(celeb.id)
+            val forms = purchaseFormFactory.formsForStorefront(celeb.id)(request.session)
             for (formData <- forms.allPurchaseFormsOrRedirect(celeb, product).right) yield {
               (celeb, product, formData, forms)
             }

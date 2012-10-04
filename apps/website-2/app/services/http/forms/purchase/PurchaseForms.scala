@@ -446,10 +446,10 @@ class PurchaseFormFactory @Inject()(
   formReaders: FormReaders,
   serverSessions: ServerSessionFactory
 ) {
-  def formsForStorefront(celebrityId: Long) = {
+  def formsForStorefront(celebrityId: Long)(session: play.api.mvc.Session) = {
     new PurchaseForms(
       formReaders,
-      serverSessions.celebrityStorefrontCart(celebrityId)
+      serverSessions.celebrityStorefrontCart(celebrityId)(session)
     )
   }
 }

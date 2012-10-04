@@ -8,6 +8,7 @@ import collection.mutable.ListBuffer
 import play.api.mvc.Session
 import services.logging.Logging
 import services.{Namespacing, AppConfig, Time}
+import play.api.mvc.Session
 
 /**
  * Cache for a single user session. The cache is keyed by the session ID cookie provided
@@ -22,39 +23,40 @@ import services.{Namespacing, AppConfig, Time}
  * Usage:
  * {{{
  *   class MyClass @Inject() (sessionFactory: ServerSessionFactory) {
+ *     Action { request =>
+ *       private def session = {
+ *         sessionFactory(request.session)
+ *       }
  *
- *     private def session = {
- *       sessionFactory()
+ *       // Add customerId to the session
+ *       session.setting("customerId" -> 1).save()
+ *
+ *       // Set celebrityId and adminId
+ *       session.setting("celebrityId" -> 1, "adminId" -> 2).save()
+ *
+ *       // Get adminId
+ *       session[String]("adminId")  // should be Some(2)
+ *
+ *       // Delete adminId
+ *       session.removing("adminId").save()
+ *
+ *       // Delete celebrity and customer id
+ *       session.removing("celebrityId", "customerId").save()
+ *
+ *       // Create a folder called "shopping-cart"
+ *       val cart = session.namespaced("shopping-cart")
+ *
+ *       // Save the number of items into the cart.
+ *       // The absolute key becomes "shopping-cart/numItems"
+ *       cart.setting("numItems", 0).save()
+ *
+ *       // Clear the cart. This wouldn't delete anything outside of the cart.
+ *       cart.emptied.save()
+ *
+ *       // Clear out the entire session
+ *       session.emptied.save()
+ *
  *     }
- *
- *     // Add customerId to the session
- *     session.setting("customerId" -> 1).save()
- *
- *     // Set celebrityId and adminId
- *     session.setting("celebrityId" -> 1, "adminId" -> 2).save()
- *
- *     // Get adminId
- *     session[String]("adminId")  // should be Some(2)
- *
- *     // Delete adminId
- *     session.removing("adminId").save()
- *
- *     // Delete celebrity and customer id
- *     session.removing("celebrityId", "customerId").save()
- *
- *     // Create a folder called "shopping-cart"
- *     val cart = session.namespaced("shopping-cart")
- *
- *     // Save the number of items into the cart.
- *     // The absolute key becomes "shopping-cart/numItems"
- *     cart.setting("numItems", 0).save()
- *
- *     // Clear the cart. This wouldn't delete anything outside of the cart.
- *     cart.emptied.save()
- *
- *     // Clear out the entire session
- *     session.emptied.save()
- *
  *   }
  * }}}
  *
@@ -202,7 +204,9 @@ class ServerSession private[http] (
   }
 
   private[http] def cacheKey: String = {
-    "session_" + session.getId
+    "session_" + session.get("id").getOrElse(
+      throw new RuntimeException("Encountered request with no session ID")
+    )
   }
 
   private def appCache: Cache = {
@@ -260,14 +264,17 @@ object ServerSession extends Logging {
  *
  * @param sessionServices services needed for new instances of ServerSession
  */
-class ServerSessionFactory @Inject() (sessionServices:ServerSessionServices) extends (() => ServerSession) {
-  def apply(): ServerSession = {
-    new ServerSession(providedData=None, services=sessionServices)
+class ServerSessionFactory @Inject() (cacheFactory: CacheFactory) extends {
+
+  def apply(session: Session): ServerSession = {
+    val services = ServerSessionServices(() => session, cacheFactory)
+    
+    new ServerSession(providedData=None, services=services)
   }
 
   /** Returns the server-session namespace associated with this user's shopping cart */
-  def shoppingCart: ServerSession = {
-    this.apply().namespaced("cart")
+  def shoppingCart(session: Session): ServerSession = {
+    this.apply(session).namespaced("cart")
   }
 
   /**
@@ -277,7 +284,7 @@ class ServerSessionFactory @Inject() (sessionServices:ServerSessionServices) ext
    * @param celebrityId id of the celebrity whose storefront items in the user's
    *   cart we should access.
    */
-  def celebrityStorefrontCart(celebrityId: Long): ServerSession = {
-    this.shoppingCart.namespaced("celeb-" + celebrityId)
+  def celebrityStorefrontCart(celebrityId: Long)(session: Session): ServerSession = {
+    this.shoppingCart(session).namespaced("celeb-" + celebrityId)
   }
 }
