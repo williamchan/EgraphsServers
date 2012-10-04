@@ -38,6 +38,7 @@ class BulkMailProvider @Inject()(@PlayConfig playConfig: Properties, utils: Util
 {
   def get() : BulkMail = {
     //Inspect properties and return the proper BulkMail
+    import play.api.Play.current
     if (configuration.getProperty("mail.bulk") == "mailchimp") {
       MailChimpBulkMail
     } else {
