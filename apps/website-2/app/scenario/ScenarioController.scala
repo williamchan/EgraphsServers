@@ -66,7 +66,7 @@ object ScenarioController extends Controller {
         val scenarios = Scenario.allCategories.toList.sortWith((a, b) => a._1 < b._1).map { case (category, catScenarios) =>
           (category, catScenarios.toSeq.sortWith((a, b) => a.name < b.name))
         }
-        Ok(views.nonproduction.html.scenarios(scenarios))
+        Ok(views.html.nonproduction.scenarios(scenarios))
       }
     }
   }

@@ -18,6 +18,25 @@ import play.api.mvc.Request
  */
 class Utils @Inject()(@PlayConfig() playConfig: util.Properties) {
 
+  /**
+   * This implicit conversion converts a String option to a RichStringOption
+   */
+  implicit def stringOptionToRichStringOption(maybe: Option[String]): RichStringOption = RichStringOption(maybe) 
+
+  case class RichStringOption(maybe: Option[String]) {
+    /**
+     * Instead of the String.toBoolean throwing an exception if the lower-case value of
+     * the string is not exactly "true" or "false", this will be "true" only if there is a
+     * string value with a lower-case value of exactly "true" and false otherwise.
+     */
+    lazy val toBoolean: Boolean = { 
+      maybe match {
+        case Some(stringValue) => java.lang.Boolean.valueOf(stringValue)
+        case None => false
+      }
+    }
+  }
+
   //TODO: write test, this makes me sad to do. but everything is not compiling now, with 400+ compilation errors
   /**
    * @return The first value in the map if there is one, or returns the elseValue.

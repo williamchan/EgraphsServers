@@ -118,21 +118,21 @@ POST    /subscribe                                                  controllers.
 GET     /sweepstakes/insider                                        controllers.WebsiteControllers.getInsiderSweepstakes
 GET     /terms/                                                     controllers.WebsiteControllers.getTerms
 
-GET     /:celebrityUrlSlug                                        controllers.WebsiteControllers.getCelebrityLanding(celebrityUrlSlug: String)
-GET     /:celebrityUrlSlug/photos                                 controllers.WebsiteControllers.getStorefrontChoosePhotoTiled(celebrityUrlSlug: String)
-GET     /:celebrityUrlSlug/photos/:productUrlSlug                 controllers.WebsiteControllers.getStorefrontChoosePhotoCarousel(celebrityUrlSlug: String, productUrlSlug:String)
-POST    /:celebrityUrlSlug/photos/:productUrlSlug                 controllers.WebsiteControllers.postStorefrontChoosePhoto(celebrityUrlSlug: String, productUrlSlug:String)
-GET     /:celebrityUrlSlug/photos/:productUrlSlug/personalize     controllers.WebsiteControllers.getStorefrontPersonalize(celebrityUrlSlug: String, productUrlSlug:String)
-POST    /:celebrityUrlSlug/photos/:productUrlSlug/personalize     controllers.WebsiteControllers.postStorefrontPersonalize(celebrityUrlSlug: String, productUrlSlug:String)
-GET     /:celebrityUrlSlug/photos/:productUrlSlug/review          controllers.WebsiteControllers.getStorefrontReview(celebrityUrlSlug: String, productUrlSlug:String)
-POST    /:celebrityUrlSlug/photos/:productUrlSlug/review          controllers.WebsiteControllers.postStorefrontReview(celebrityUrlSlug: String, productUrlSlug:String)
-GET     /:celebrityUrlSlug/photos/:productUrlSlug/checkout        controllers.WebsiteControllers.getStorefrontCheckout(celebrityUrlSlug: String, productUrlSlug:String)
-POST    /:celebrityUrlSlug/photos/:productUrlSlug/checkout        controllers.WebsiteControllers.postStorefrontCheckout(celebrityUrlSlug: String, productUrlSlug:String)
-GET     /:celebrityUrlSlug/photos/:productUrlSlug/finalize        controllers.WebsiteControllers.getStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug:String)
-POST    /:celebrityUrlSlug/photos/:productUrlSlug/finalize        controllers.WebsiteControllers.postStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug:String)
-GET     /:celebrityUrlSlug/photos/:productUrlSlug/cc-error        controllers.WebsiteControllers.getStorefrontCreditCardError(celebrityUrlSlug: String, productUrlSlug:String, creditCardMsg: Option[String] ?= None)
-GET     /:celebrityUrlSlug/photos/:productUrlSlug/no-inventory    controllers.WebsiteControllers.getStorefrontNoInventory(celebrityUrlSlug: String, productUrlSlug:String)
-GET     /:celebrityUrlSlug/photos/:productUrlSlug/purchase-error  controllers.WebsiteControllers.getStorefrontPurchaseError(celebrityUrlSlug: String, productUrlSlug:String)
+GET     /:celebrityUrlSlug                                          controllers.WebsiteControllers.getCelebrityLanding(celebrityUrlSlug: String)
+GET     /:celebrityUrlSlug/photos                                   controllers.WebsiteControllers.getStorefrontChoosePhotoTiled(celebrityUrlSlug: String)
+GET     /:celebrityUrlSlug/photos/:productUrlSlug                   controllers.WebsiteControllers.getStorefrontChoosePhotoCarousel(celebrityUrlSlug: String, productUrlSlug:String)
+POST    /:celebrityUrlSlug/photos/:productUrlSlug                   controllers.WebsiteControllers.postStorefrontChoosePhoto(celebrityUrlSlug: String, productUrlSlug:String)
+GET     /:celebrityUrlSlug/photos/:productUrlSlug/personalize       controllers.WebsiteControllers.getStorefrontPersonalize(celebrityUrlSlug: String, productUrlSlug:String)
+POST    /:celebrityUrlSlug/photos/:productUrlSlug/personalize       controllers.WebsiteControllers.postStorefrontPersonalize(celebrityUrlSlug: String, productUrlSlug:String)
+GET     /:celebrityUrlSlug/photos/:productUrlSlug/review            controllers.WebsiteControllers.getStorefrontReview(celebrityUrlSlug: String, productUrlSlug:String)
+POST    /:celebrityUrlSlug/photos/:productUrlSlug/review            controllers.WebsiteControllers.postStorefrontReview(celebrityUrlSlug: String, productUrlSlug:String)
+GET     /:celebrityUrlSlug/photos/:productUrlSlug/checkout          controllers.WebsiteControllers.getStorefrontCheckout(celebrityUrlSlug: String, productUrlSlug:String)
+POST    /:celebrityUrlSlug/photos/:productUrlSlug/checkout          controllers.WebsiteControllers.postStorefrontCheckout(celebrityUrlSlug: String, productUrlSlug:String)
+GET     /:celebrityUrlSlug/photos/:productUrlSlug/finalize          controllers.WebsiteControllers.getStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug:String)
+POST    /:celebrityUrlSlug/photos/:productUrlSlug/finalize          controllers.WebsiteControllers.postStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug:String)
+GET     /:celebrityUrlSlug/photos/:productUrlSlug/cc-error          controllers.WebsiteControllers.getStorefrontCreditCardError(celebrityUrlSlug: String, productUrlSlug:String, creditCardMsg: Option[String] ?= None)
+GET     /:celebrityUrlSlug/photos/:productUrlSlug/no-inventory      controllers.WebsiteControllers.getStorefrontNoInventory(celebrityUrlSlug: String, productUrlSlug:String)
+GET     /:celebrityUrlSlug/photos/:productUrlSlug/purchase-error    controllers.WebsiteControllers.getStorefrontPurchaseError(celebrityUrlSlug: String, productUrlSlug:String)
 
 ##
 ## Admin Restricted Functionality - We want to keep certain admin functionality off customer-facing servers.
@@ -142,3 +142,5 @@ GET     /:celebrityUrlSlug/photos/:productUrlSlug/purchase-error  controllers.We
 #GET     /admin/printorders/{printOrderId}                           controllers.WebsiteControllers.getPrintOrderAdmin
 #POST    /admin/printorders/{printOrderId}                           controllers.WebsiteControllers.postPrintOrderAdmin
 #POST    /{celebrityUrlSlug}/{productUrlSlug}/buy-demo               controllers.WebsiteControllers.postBuyDemoProduct
+
+GET     /assets/*file                                               controllers.Assets.at(path="/public", file)

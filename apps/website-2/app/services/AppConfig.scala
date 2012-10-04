@@ -84,7 +84,7 @@ object AppConfig {
       Guice.createInjector(new AppConfig)
     }
     catch {
-      case e: Exception =>
+      case e =>
         e.printStackTrace()
         throw e
     }
