@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat
 import controllers.website.consumer.StorefrontChoosePhotoConsumerEndpoints
 import social.{Twitter, Facebook}
 import controllers.website.GetEgraphEndpoint
+import play.api.mvc.Request
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -189,7 +190,7 @@ case class Order(
     omg.withReviewStatus(OrderReviewStatus.RejectedByCelebrity).copy(rejectionReason = rejectionReason)
   }
 
-  def sendEgraphSignedMail() {
+  def sendEgraphSignedMail[A](implicit request: Request[A]) {
     val celebrity = services.celebrityStore.findByOrderId(id).get
     val email = new HtmlEmail()
 
@@ -209,8 +210,7 @@ case class Order(
     val emailLogoSrc = ""
     val emailFacebookSrc = ""
     val emailTwitterSrc = ""
-    val viewEgraphAction = GetEgraphEndpoint.url(id)
-    val viewEgraphUrl = Utils.absoluteUrl(viewEgraphAction)
+    val viewEgraphUrl = GetEgraphEndpoint.absoluteUrl(id)
     val htmlMsg = views.html.frontend.email_view_egraph(
       viewEgraphUrl = viewEgraphUrl,
       celebrityName = celebrity.publicName,
@@ -581,7 +581,7 @@ object GalleryOrderFactory {
     })
   }
 
-  def makeFulfilledEgraphViewModel(orders: Iterable[(Order, Option[Egraph])], fbAppId: String) :
+  def makeFulfilledEgraphViewModel[A](orders: Iterable[(Order, Option[Egraph])], fbAppId: String)(implicit request: Request[A]) :
     Iterable[Option[FulfilledEgraphViewModel]] = {
     for ((order:Order, optionEgraph:Option[Egraph]) <- orders) yield {
       optionEgraph.map( egraph => {
@@ -593,8 +593,7 @@ object GalleryOrderFactory {
           .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
           .scaledToWidth(product.frame.thumbnailWidthPixels)
         val thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Public)
-        val viewEgraphAction = GetEgraphEndpoint.url(order.id)
-        val viewEgraphUrl = Utils.absoluteUrl(viewEgraphAction)
+        val viewEgraphUrl = GetEgraphEndpoint.absoluteUrl(order.id)
 
         val facebookShareLink = Facebook.getEgraphShareLink(fbAppId = fbAppId,
           fulfilledOrder = FulfilledOrder(order = order, egraph = egraph),

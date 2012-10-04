@@ -14,6 +14,7 @@ import java.util.Properties
 import play.api.Play.current
 import akka.actor.Props
 import play.api.libs.concurrent.Akka
+import play.api.mvc.Request
 
 
 /**
@@ -33,8 +34,8 @@ case class EgraphActor @Inject() (
 ) extends Actor with Logging
 {
   protected def receive = {
-    case ProcessEgraphMessage(id: Long) => {
-      processEgraph(egraphId = id)
+    case ProcessEgraphMessage(egraphId, request) => {
+      processEgraph(egraphId, request)
     }
 
     case _ =>
@@ -48,7 +49,7 @@ case class EgraphActor @Inject() (
    *
    * @param egraphId id of the Egraph to process
    */
-  private def processEgraph(egraphId: Long) {
+  private def processEgraph[A](egraphId: Long, request: Request[A]) {
     playConfig.getProperty("biometrics.status") match {
       case "offline" =>
       case _ => {
@@ -71,7 +72,7 @@ case class EgraphActor @Inject() (
               // If admin review is turned off (eg to expedite demos), immediately publish regardless of biometric results
               if (playConfig.getProperty("adminreview.skip") == "true") {
                 val publishedEgraph = testedEgraph.withEgraphState(EgraphState.Published).save()
-                publishedEgraph.order.sendEgraphSignedMail()
+                publishedEgraph.order.sendEgraphSignedMail(request)
               }
             }
           }
@@ -92,4 +93,4 @@ object EgraphActor {
 // ====================
 sealed trait EgraphMessage
 
-case class ProcessEgraphMessage(id: Long) extends EgraphMessage
+case class ProcessEgraphMessage[A](egraphId: Long, request: Request[A]) extends EgraphMessage

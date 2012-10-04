@@ -1,7 +1,6 @@
 package controllers.website
 
 import java.text.SimpleDateFormat
-
 import models.AdministratorStore
 import models.Egraph
 import models.FulfilledOrder
@@ -168,5 +167,9 @@ object GetEgraphEndpoint {
 
   def url(orderId: Long): String = {
     controllers.routes.WebsiteControllers.getEgraph(orderId).url
+  }
+
+  def absoluteUrl(orderId: Long)(implicit requestHeader: RequestHeader): String = {
+    controllers.routes.WebsiteControllers.getEgraph(orderId).absoluteURL(true)(requestHeader)
   }
 }
