@@ -18,10 +18,29 @@ private[controllers] trait GetCelebritiesAdminEndpoint {
     adminFilters.requireAdministratorLogin { admin =>
       val query = celebrityStore.getCelebrityAccounts
       val pagedQuery: (Iterable[(Celebrity, Account)], Int, Option[Int]) = Utils.pagedQuery(select = query, page = page)
+      val listings = for((celebrity: Celebrity, account: Account) <- pagedQuery._1) yield {
+        Celebrity.celebrityAccountToListing(celebrity, account)
+      }
       WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebritiesAdminEndpoint.location)
       views.Application.admin.html.admin_celebrities(
-        celebrityAccounts = pagedQuery._1,
+        celebrityListings = listings,
         celebrityStore.getAll // for the Featured Stars chooser
+      )
+    }
+  }
+
+  /**
+   * Return celebrities that match the text query. Full text search on  publicname and roledescription.
+   * See reference here: http://www.postgresql.org/docs/9.2/interactive/textsearch-controls.html
+   *
+   * @param query user inputted string
+   * @return CelebrityListings of matching result.
+   */
+  def getCelebritiesBySearchAdmin(query: String) = controllerMethod() {
+    adminFilters.requireAdministratorLogin { admin =>
+      val listings = celebrityStore.findByTextQuery(query)
+      views.Application.admin.html.admin_celebrities_search(
+        celebrityListings = listings
       )
     }
   }

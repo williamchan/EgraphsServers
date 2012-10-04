@@ -60,6 +60,7 @@ POST    /admin/accounts                                             WebsiteContr
 GET     /admin/accounts/create/?                                    WebsiteControllers.getCreateAccountAdmin
 GET     /admin/accounts/{accountId}/?                               WebsiteControllers.getAccountAdmin
 GET     /admin/celebrities/?                                        WebsiteControllers.getCelebritiesAdmin
+GET     /admin/celebrities/search/?                                 WebsiteControllers.getCelebritiesBySearchAdmin
 POST    /admin/celebrities                                          WebsiteControllers.postCelebrityAdmin
 POST    /admin/celebrities/{celebrityId}/sendEmail                  WebsiteControllers.postSendCelebrityWelcomeEmailAdmin
 GET     /admin/celebrities/create/?                                 WebsiteControllers.getCreateCelebrityAdmin

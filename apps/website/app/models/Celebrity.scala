@@ -345,6 +345,17 @@ object Celebrity {
       CelebrityWithImage(saved, savedImage)
     }
   }
+  // Simplifying results for display
+  def celebrityAccountToListing(celebrity: Celebrity, account: Account) = {
+    new CelebrityListing(
+      id=celebrity.id,
+      email = account.email,
+      urlSlug = celebrity.urlSlug,
+      publicName = celebrity.publicName,
+      enrollmentStatus = celebrity.enrollmentStatus.toString,
+      publishedStatus = celebrity.publishedStatus.toString
+    )
+  }
 }
 
 class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebrity] with SavesCreatedUpdated[Long,Celebrity] {
@@ -386,6 +397,39 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
         )
         select(c)
     ).headOption
+  }
+
+  /**
+   * Find using postgres text search on publicname and roledescription
+   * http://www.postgresql.org/docs/9.2/interactive/textsearch-controls.html
+   * Uses anorm because the return types are not supported by Squeryl.
+   * @param query text to match on
+   * @return matching celebs in CelebrityListing format
+   */
+  def findByTextQuery(query: String): Iterable[CelebrityListing] = {
+    import play.db.anorm._
+      val rowStream = SQL(
+        """
+          SELECT * FROM celebrity, account WHERE
+          (
+           to_tsvector('english', celebrity.publicname || ' ' || celebrity.roledescription)
+           @@
+           plainto_tsquery('english', {textQuery})
+          ) AND account.celebrityid = celebrity.id;
+        """
+      ).on("textQuery" -> query).apply()
+
+      for(row <- rowStream) yield {
+          new CelebrityListing(
+            id = row[Long]("celebrityid"),
+            publicName = row[String]("publicname"),
+            email = row[String]("email"),
+            urlSlug = row[String]("urlslug"),
+            enrollmentStatus = row[String]("_enrollmentStatus"),
+            publishedStatus = row[String]("_publishedStatus")
+        )
+      }
+
   }
 
   def getCelebrityAccounts: Query[(Celebrity, Account)] = {
@@ -473,3 +517,16 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
     toUpdate.copy(created = created, updated = updated)
   }
 }
+
+/**
+ * Simple class for representing celebrities in lists.
+ * TODO: Move into viewmodels when we refactor the admin panel.
+ **/
+
+case class CelebrityListing(
+  id: Long,
+  email: String,
+  urlSlug: String,
+  publicName: String,
+  enrollmentStatus: String,
+  publishedStatus: String)
