@@ -61,7 +61,7 @@ class BoardReport @Inject()(schema: Schema) extends Report {
     val giftRatio = if (numOrders > 0) numGifts.toDouble / numOrders * 100 else 0
     val printRatio = if (numOrders > 0) numPrintOrders.toDouble / numOrders * 100 else 0
     tsvLine(
-      formatDate(weekStart) + " to " + formatDate(weekEnd),
+      formatDate(weekStart) + " week",
       numOrders,
       revenueOrders,
       avgDigitalRevenue,
