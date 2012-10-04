@@ -10,7 +10,7 @@ import models.frontend.egraphs._
 import scala.Some
 import services.mvc.ImplicitHeaderAndFooterData
 import models.GalleryOrderFactory
-import services.http.EgraphsSession
+import services.http.EgraphsSession.Conversions._
 import services.http.filters.RequireCustomerUsername
 import services.http.filters.RequireCustomerId
 import services.http.filters.HttpFilters
@@ -36,31 +36,31 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
   import SafePlayParams.Conversions._
 
   def getCustomerGalleryByUsername(username: String) = controllerMethod() {
-    httpFilters.requireCustomerUsername(username) { customer => 
-      Action { request =>
-        serveCustomerGallery(customer, request)
+    httpFilters.requireCustomerUsername(username) { customer =>
+      Action { implicit request =>
+        serveCustomerGallery(customer)
       }
     }
   }
 
   def getCustomerGalleryById(galleryCustomerId: Long) = controllerMethod() {
     httpFilters.requireCustomerId(galleryCustomerId) { customer =>
-      Action { request =>
-        serveCustomerGallery(customer, request)
+      Action { implicit request =>
+        serveCustomerGallery(customer)
       }
     }
   }
 
-  def serveCustomerGallery[A](customer: Customer, request: Request[A]): Result = {    
+  def serveCustomerGallery[A](customer: Customer)(implicit request: Request[A]): Result = {    
     val galleryCustomerId = customer.id
     //If admin is true admin
     val session = request.session
     val adminGalleryControlOption = for(
-      sessionAdminId <- session.get(EgraphsSession.Key.AdminId.name).map(adminId => adminId.toLong);
+      sessionAdminId <- session.adminId.map(adminId => adminId.toLong);
       adminOption   <- administratorStore.findById(sessionAdminId)) yield AdminGalleryControl
     //if customerId is the same as the gallery requested
     val sessionGalleryControlOption = for(
-      sessionCustomerId <- session.get(EgraphsSession.Key.CustomerId.name).map(customerId => customerId.toLong);
+      sessionCustomerId <- session.customerId.map(customerId => customerId.toLong);
       if (sessionCustomerId == galleryCustomerId)) yield OwnerGalleryControl
 
     //In priority order

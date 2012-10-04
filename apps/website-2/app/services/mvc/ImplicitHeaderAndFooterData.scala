@@ -2,20 +2,22 @@ package services.mvc
 
 import models.frontend.header.{HeaderNotLoggedIn, HeaderLoggedIn, HeaderData}
 import models.frontend.footer.FooterData
-import services.http.EgraphsSession
+import services.http.EgraphsSession.Conversions._
+import play.api.mvc.Session
 import models.{Customer, CustomerStore}
 import controllers.routes.WebsiteControllers.{getCustomerGalleryByUsername, getAccountSettings}
+import play.api.mvc.RequestHeader
+
 
 /**
  * Provides implicit data necessary to render the header and footer of the website's
  * base template. See front-end module `app/views/base_template.scala.html`
  */
 trait ImplicitHeaderAndFooterData {
-  protected def egraphsSessionFactory: () => EgraphsSession
   protected def customerStore: CustomerStore
 
-  implicit def siteHeaderData: HeaderData = {
-    HeaderData(loggedInStatus=getHeaderLoggedInStatus)
+  implicit def siteHeaderData(implicit request: RequestHeader): HeaderData = {
+    HeaderData(loggedInStatus=getHeaderLoggedInStatus(request.session))
   }
 
   implicit def siteFooterData: FooterData = {
@@ -27,8 +29,8 @@ trait ImplicitHeaderAndFooterData {
   //
   // Private methods
   //
-  private def getHeaderLoggedInStatus: Either[HeaderNotLoggedIn, HeaderLoggedIn] = {
-    val headerLoggedInOption = getCustomerOption.map { customer =>
+  private def getHeaderLoggedInStatus(session: Session): Either[HeaderNotLoggedIn, HeaderLoggedIn] = {
+    val headerLoggedInOption = getCustomerOption(session).map { customer =>
       val url = getCustomerGalleryByUsername(customer.username).url
 
       HeaderLoggedIn(
@@ -43,13 +45,10 @@ trait ImplicitHeaderAndFooterData {
     headerLoggedInOption.toRight(HeaderNotLoggedIn("/login"))
   }
 
-  private def egraphsSession: EgraphsSession = {
-    egraphsSessionFactory()
-  }
-
-  private def getCustomerOption: Option[Customer] = {
-    for (customerId <- egraphsSession.getLong(EgraphsSession.Key.CustomerId);
-         customer <- customerStore.findById(customerId)
+  private def getCustomerOption(session: Session): Option[Customer] = {
+    for (
+      customerId <- session.customerId;
+      customer <- customerStore.findById(customerId)
     ) yield {
       customer
     }

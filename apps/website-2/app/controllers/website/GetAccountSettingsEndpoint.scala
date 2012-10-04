@@ -26,7 +26,7 @@ private[controllers] trait GetAccountSettingsEndpoint extends ImplicitHeaderAndF
 
   def getAccountSettings = controllerMethod() {
     httpFilters.requireCustomerId.inSession() { customer =>
-      Action { request =>        
+      Action { implicit request =>
         val account = customer.account
         val form = makeFormView(customer, account, request.flash)
   

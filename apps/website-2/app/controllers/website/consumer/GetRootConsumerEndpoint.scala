@@ -32,4 +32,3 @@ private[controllers] trait GetRootConsumerEndpoint extends ImplicitHeaderAndFoot
     }
   }
 }
-

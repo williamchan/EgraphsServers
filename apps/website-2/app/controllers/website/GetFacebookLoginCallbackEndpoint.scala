@@ -11,7 +11,7 @@ import services.http.ControllerMethod
 import services.Utils
 import services.social.Facebook
 import services.logging.Logging
-import services.http.EgraphsSession
+import services.http.EgraphsSession.Conversions._
 import play.api.data._
 import play.api.data.Forms._
 
@@ -63,7 +63,9 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
             }
           }
 
-          Redirect(controllers.routes.WebsiteControllers.getAccountSettings).withSession(session + (EgraphsSession.Key.CustomerId.name -> customer.id.toString))
+          Redirect(controllers.routes.WebsiteControllers.getAccountSettings).withSession(
+            session.withCustomerId(customer.id)
+          )
         }
         case _ => {
           log("Facebook Oauth flow halted. error =  " + error.getOrElse("") +

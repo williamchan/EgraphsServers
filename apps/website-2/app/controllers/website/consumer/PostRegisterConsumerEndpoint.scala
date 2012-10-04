@@ -4,7 +4,7 @@ import play.api.mvc.Controller
 import play.api.mvc.Action
 import play.api.mvc.Result
 import play.api.mvc.Results.{Ok, Redirect}
-import services.http.{EgraphsSession, POSTControllerMethod}
+import services.http.POSTControllerMethod
 import models._
 import services.mvc.ImplicitHeaderAndFooterData
 import services.http.forms.purchase.FormReaders
@@ -17,6 +17,7 @@ import services.logging.Logging
 import Form.Conversions._
 import play.api.mvc.Request
 import play.api.mvc.AnyContent
+import services.http.EgraphsSession.Conversions._
 
 /**
  * The POST target for creating a new account at egraphs.
@@ -33,7 +34,6 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
   protected def accountStore: AccountStore
   protected def customerStore: CustomerStore
   protected def dbSession: DBSession
-  protected def egraphsSessionFactory: () => EgraphsSession
 
   //
   // Controllers
@@ -47,20 +47,16 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
         // OK We made it! The user is created. Unpack account and customer
         val (account, customer) = accountAndCustomer
   
-        // Save the customer ID into the user's session
-        import EgraphsSession.Key
-        val egraphsSession = egraphsSessionFactory()
-  
-        egraphsSession.withLong(Key.CustomerId -> customer.id).save()
-  
         // Shoot out a welcome email
         dbSession.connected(TransactionReadCommitted) {
           Customer.sendNewCustomerEmail(account = account, verificationNeeded = true, mail = customer.services.mail)
         }
-  
-        Redirect(controllers.routes.WebsiteControllers.getAccountSettings())
+
+        Redirect(controllers.routes.WebsiteControllers.getAccountSettings()).withSession(
+          request.session.withCustomerId(customer.id)
+        )
       }
-      
+
       redirects.fold(failure => failure, success => success)
     }
   }

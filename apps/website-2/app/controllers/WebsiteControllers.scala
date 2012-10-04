@@ -34,8 +34,6 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val playConfig = annotatedInstance[PlayConfig, Properties]
   override protected val facebookAppId = annotatedInstance[FacebookAppId, String]
 
-  override protected def egraphsSessionFactory: () => EgraphsSession = instance[() => EgraphsSession]
-
   override protected def breadcrumbData = instance[StorefrontBreadcrumbData]
   override protected def customerLoginForms = instance[CustomerLoginFormFactory]
   override protected def accountSettingsForms = instance[AccountSettingsFormFactory]

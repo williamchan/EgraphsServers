@@ -20,7 +20,7 @@ import services.Utils
 import services.blobs.AccessPolicy
 import services.graphics.Handwriting
 import services.http.ControllerMethod
-import services.http.EgraphsSession
+import services.http.EgraphsSession.Conversions._
 import services.social.Facebook
 import services.social.Twitter
 
@@ -55,7 +55,7 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
       val session = request.session
       orderStore.findFulfilledWithId(orderId) match {
         case Some(FulfilledOrder(order, egraph)) if isViewable(order)(session) =>          
-          val maybeCustomerId = session.get(EgraphsSession.Key.CustomerId.name)
+          val maybeCustomerId = session.customerId
           val maybeGalleryLink = maybeCustomerId.map { customerId =>
             controllers.routes.WebsiteControllers.getCustomerGalleryById(customerId.toLong).url
           }
@@ -81,8 +81,8 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
   }
 
   private def isViewable(order: Order)(implicit session: Session): Boolean = {
-    val customerIdOption = session.get(EgraphsSession.Key.CustomerId.name).map(customerId => customerId.toLong)
-    val adminIdOption = session.get(EgraphsSession.Key.AdminId.name).map(adminId => adminId.toLong)
+    val customerIdOption = session.customerId.map(customerId => customerId.toLong)
+    val adminIdOption = session.adminId.map(adminId => adminId.toLong)
 
     order.isPublic ||
       order.isBuyerOrRecipient(customerIdOption) ||
