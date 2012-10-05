@@ -17,9 +17,13 @@ object PlayConfigurationProperties {
     val props = new Properties()
 
     val config = Play.current.configuration
+    
     for (configKey <- config.keys) {
-      val configValue = config.getString(configKey).getOrElse(null)
-      props.put(configKey, configValue)
+      try {
+        config.getString(configKey).map(value => props.put(configKey, value.toString))
+      } catch {
+        case error =>
+      }    
     }
 
     props
