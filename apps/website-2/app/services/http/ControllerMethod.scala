@@ -7,6 +7,7 @@ import services.db.{TransactionIsolation, TransactionSerializable, DBSession}
 import play.api.mvc.Action
 import play.api.mvc.Request
 import services.http.filters.RequireAuthenticityTokenFilterProvider
+import filters.HttpFilters
 
 /**
  * Establishes an appropriate execution context for a request handler.
@@ -19,7 +20,7 @@ import services.http.filters.RequireAuthenticityTokenFilterProvider
  * @param db used to make a DB connection for the request where appropriate
  * @param httpsFilter used to ensure that the request occurs over SSL.
  */
-class ControllerMethod @Inject()(logging: LoggingContext, db: DBSession, httpsFilter: HttpsFilter) {
+class ControllerMethod @Inject()(logging: LoggingContext, db: DBSession, httpsFilter: HttpsFilter, httpFilters: HttpFilters) {
 
   /**
    * Prepares and customizes controller method behavior. The first expression in
@@ -42,14 +43,16 @@ class ControllerMethod @Inject()(logging: LoggingContext, db: DBSession, httpsFi
   {
     httpsFilter {
       logging.withRequestContext {
-        Action(action.parser) { request => 
-          if (openDatabase) {
-            db.connected(dbIsolation) {
+        httpFilters.requireSessionId {
+          Action(action.parser) { request => 
+            if (openDatabase) {
+              db.connected(dbIsolation) {
+                action(request)
+              }
+            }
+            else {
               action(request)
             }
-          }
-          else {
-            action(request)
           }
         }
       }

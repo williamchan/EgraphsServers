@@ -9,7 +9,7 @@ case class EgraphsSession(session: Session) {
   
   // We have to manually implement session id =(
   def id: Option[String] = {
-    
+    session.get(EgraphsSession.SESSION_ID_KEY)
   }
   
   def adminId: Option[Long] = {
@@ -38,6 +38,8 @@ case class EgraphsSession(session: Session) {
 }
 
 object EgraphsSession {
+  val SESSION_ID_KEY = "___ID"
+
   /**
    * Acceptable objects to use as keys on the EgraphsSession.
    */
