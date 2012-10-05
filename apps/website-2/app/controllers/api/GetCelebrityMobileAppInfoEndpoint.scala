@@ -15,8 +15,6 @@ import sjson.json.Serializer
 private[controllers] trait GetCelebrityMobileAppInfoEndpoint { this: Controller =>
   protected def controllerMethod: ControllerMethod
   protected def httpFilters: HttpFilters
-  protected def requireAuthenticatedAccount: RequireAuthenticatedAccount
-  protected def requireCelebrityId: RequireCelebrityId
   protected def blobs: Blobs
   protected def playConfig: Properties
 

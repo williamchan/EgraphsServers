@@ -33,8 +33,8 @@ private[celebrity] trait CatalogStarsQuerying {
     val futureStars = for(maybeStars <- catalogStarActor.ask(GetCatalogStars)(timeout)) yield {
       maybeStars match {
         // Some stars had already been cached. This should almost always be the case.
-        case Some(stars: IndexedSeq[CatalogStar]) =>
-          stars
+        case Some(stars: IndexedSeq[_]) =>
+          stars.asInstanceOf[IndexedSeq[CatalogStar]]
 
         // No stars had been cached. This will only happen right after an instance comes up.
         // We will instruct the update actor to provide some data immediately, block on receiving

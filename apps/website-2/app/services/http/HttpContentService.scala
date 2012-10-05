@@ -14,7 +14,7 @@ class HttpContentService {
 
       case _ =>
         val mimeType = MimeTypes.forFileName(fileName)
-        ContentHeaders(mimeType.getOrElse("application/octet-stream"), None)
+        new ContentHeaders(mimeType.getOrElse("application/octet-stream"), None)
     }
   }
 
@@ -30,7 +30,7 @@ class HttpContentService {
  * @param contentType Value for the "Content-Type" HTTP header for this content
  * @param contentEncoding Value for the "Content-Encoding" HTTP header for this content
  */
-case class ContentHeaders(contentType: String, contentEncoding: Option[String])
+class ContentHeaders(val contentType: String, val contentEncoding: Option[String])
 
 
 /** ContentInfo specific for SVGZ files, which Play doesn't naturally handle well. */

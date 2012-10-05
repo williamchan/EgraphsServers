@@ -6,6 +6,15 @@ import services.http.forms.Form.FormWriteable
 import play.api.mvc.Result
 import play.api.mvc.Request
 import play.api.mvc.AnyContent
+import play.api.data.FormUtils
+import play.api.libs.json.JsUndefined
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsArray
+import play.api.libs.json.JsNull
+import play.api.libs.json.JsString
+import play.api.libs.json.JsNumber
+import play.api.libs.json.JsValue
+import play.api.libs.json.JsBoolean
 
 /**
  * Abstraction of an HTTP form. Extend and use it to abstract parameter validation from domain logic.
@@ -415,9 +424,37 @@ object Form {
     //
     class FormCompatibleRequest(request: Request[_]) {
       def asFormReadable: Form.Readable = {
-        /*(key) => {
-          Option(playParams.getAll(key)).flatten
-        }*/
+        val bodyMap = request.body match {
+          case body: play.api.mvc.AnyContent if body.asFormUrlEncoded.isDefined => body.asFormUrlEncoded.get
+          case body: play.api.mvc.AnyContent if body.asMultipartFormData.isDefined => body.asMultipartFormData.get.asFormUrlEncoded
+          case body: play.api.mvc.AnyContent if body.asJson.isDefined => fromJson(js = body.asJson.get).mapValues(Seq(_))
+          case body: Map[_, _] => body.asInstanceOf[Map[String, Seq[String]]]
+          case body: play.api.mvc.MultipartFormData[_] => body.asFormUrlEncoded
+          case body: play.api.libs.json.JsValue => fromJson(js = body).mapValues(Seq(_))
+          case _ => Map.empty[String, Seq[String]]
+        }
+        
+        val bodyAndQueryStringMap = bodyMap ++ request.queryString
+        
+        (key) => bodyAndQueryStringMap.get(key).getOrElse(Seq())
+      }
+      
+      // This function was stolen bald-faced from Play's Form.scala, which chose
+      //   not to make this function public. Really it should've just made a 
+      //   non-type-safe version of the request as a form public...but how could
+      //   they have imagined that we had an identical and parallel form API.
+      private def fromJson(prefix: String = "", js: JsValue): Map[String, String] = js match {
+        case JsObject(fields) => {
+          fields.map { case (key, value) => fromJson(Option(prefix).filterNot(_.isEmpty).map(_ + ".").getOrElse("") + key, value) }.foldLeft(Map.empty[String, String])(_ ++ _)
+        }
+        case JsArray(values) => {
+          values.zipWithIndex.map { case (value, i) => fromJson(prefix + "[" + i + "]", value) }.foldLeft(Map.empty[String, String])(_ ++ _)
+        }
+        case JsNull => Map.empty
+        case JsUndefined(_) => Map.empty
+        case JsBoolean(value) => Map(prefix -> value.toString)
+        case JsNumber(value) => Map(prefix -> value.toString)
+        case JsString(value) => Map(prefix -> value.toString)
       }
     }
 

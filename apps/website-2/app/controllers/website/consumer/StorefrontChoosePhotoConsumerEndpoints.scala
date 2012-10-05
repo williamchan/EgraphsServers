@@ -93,7 +93,7 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
         val products = celeb.productsInActiveInventoryBatches().toSeq
         val tiledViewLink = controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled(celebrityUrlSlug).url
   
-        products.findIndexOf(next => next.id == product.id) match {
+        products.indexWhere(next => next.id == product.id) match {
           case -1 =>
             Redirect(tiledViewLink)
   

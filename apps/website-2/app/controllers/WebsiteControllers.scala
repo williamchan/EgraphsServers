@@ -51,10 +51,6 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val controllerMethod = instance[ControllerMethod]
   override protected val postController = instance[POSTControllerMethod]
   override protected val httpFilters = instance[HttpFilters]
-  override protected val egraphQueryFilters = instance[EgraphQueryFilters]
-  override protected val inventoryBatchQueryFilters = instance[InventoryBatchQueryFilters]
-  override protected val orderQueryFilters = instance[OrderQueryFilters]
-  override protected val printOrderQueryFilters = instance[PrintOrderQueryFilters]
 
   override protected val blobs = instance[Blobs]
   override protected val transactionalMail = instance[TransactionalMail]
@@ -65,10 +61,7 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val administratorStore = instance[AdministratorStore]
   override protected val celebrityStore = instance[CelebrityStore]
   override protected val customerStore = instance[CustomerStore]
-  override protected val egraphStore = instance[EgraphStore]
-  override protected val inventoryBatchStore = instance[InventoryBatchStore]
   override protected val orderStore = instance[OrderStore]
-  override protected val printOrderStore = instance[PrintOrderStore]
   override protected val productStore = instance[ProductStore]
 
   // TODO: PLAY20 migration. Replace all usage of the old validation system with either

@@ -583,7 +583,8 @@ object GalleryOrderFactory {
 
   def makeFulfilledEgraphViewModel[A](orders: Iterable[(Order, Option[Egraph])], fbAppId: String)(implicit request: Request[A]) :
     Iterable[Option[FulfilledEgraphViewModel]] = {
-    for ((order:Order, optionEgraph:Option[Egraph]) <- orders) yield {
+    for (orderAndEgraphOption <- orders) yield {
+      val (order, optionEgraph) = orderAndEgraphOption
       optionEgraph.map( egraph => {
         val product = order.product
         val celebrity = product.celebrity
@@ -620,7 +621,8 @@ object GalleryOrderFactory {
   }
 
   def makePendingEgraphViewModel(orders: Iterable[(Order, Option[Egraph])]) : Iterable[PendingEgraphViewModel] = {
-    for ((order:Order, optionEgraph:Option[Egraph]) <- orders) yield {
+    for (orderAndEgraphOption <- orders) yield {
+      val (order, optionEgraph) = orderAndEgraphOption
       val product = order.product
       val celebrity = product.celebrity
       val imageUrl = product.photo.resizedWidth(product.frame.pendingWidthPixels).getSaved(AccessPolicy.Public).url

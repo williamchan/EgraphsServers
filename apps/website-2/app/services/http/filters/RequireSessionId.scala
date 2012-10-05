@@ -37,7 +37,7 @@ class RequireSessionId @Inject() {
       case None => {
         val sessionId = createNewSessionId
         val newRequest = new WrappedRequest(request) {
-          override val session = request.session + (EgraphsSession.SESSION_ID_KEY -> sessionId)
+          override lazy val session = request.session + (EgraphsSession.SESSION_ID_KEY -> sessionId)
         }
         val result = action(newRequest)
         (result, sessionId)
