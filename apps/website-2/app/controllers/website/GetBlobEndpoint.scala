@@ -22,8 +22,13 @@ private[controllers] trait GetBlobEndpoint { this: Controller =>
 
   // TODO: Cache these results. This endpoint will become extremely expensive
   // if we launch this way.
-  def getBlob(blobKey: String) = controllerMethod(openDatabase=false) {
-    Action {
+  def getBlob(blobKey: String) = {
+    // This line protects us from an obscure compiler bug.
+    // Touch it if you want to have a bad time. (Scala 2.9.1)
+    val thisControllerMethod = controllerMethod
+    
+    thisControllerMethod(openDatabase=false) {
+      Action {
       blobs.get(blobKey) match {
         case None =>
           NotFound("No such blob found")
@@ -45,7 +50,8 @@ private[controllers] trait GetBlobEndpoint { this: Controller =>
           Ok.stream(dataContent).withHeaders(header)
         }
       }
-    }
+      }
+    } 
   }
 }
 
