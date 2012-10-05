@@ -2,7 +2,6 @@ package services.http.filters
 
 import com.google.inject.Inject
 import controllers.WebsiteControllers
-import models.AdministratorStore
 import play.api.mvc.Action
 import play.api.mvc.BodyParser
 import play.api.mvc.BodyParsers.parse
@@ -10,8 +9,10 @@ import play.api.mvc.Result
 import play.api.mvc.Results.Forbidden
 import services.http.SafePlayParams.Conversions.paramsToOptionalParams
 import models.Administrator
+import models.AdministratorStore
 import models.Account
 import models.AccountStore
+import services.http.EgraphsSession
 
 // TODO: PLAY20 migration. Test and comment this summbitch.
 class RequireAdministratorLogin @Inject() (adminStore: AdministratorStore, accountStore: AccountStore) {  
@@ -37,7 +38,7 @@ class RequireAdministratorLogin @Inject() (adminStore: AdministratorStore, accou
   def inSession[A](parser: BodyParser[A] = parse.anyContent)(actionFactory: (Administrator, Account) => Action[A])
   : Action[A] = {
     Action(parser) { request =>
-      val maybeResult = request.session.getLongOption(WebsiteControllers.adminIdKey).map { adminId =>
+      val maybeResult = request.session.getLongOption(EgraphsSession.Key.AdminId.name).map { adminId =>
         this.apply(adminId, parser)(actionFactory).apply(request)
       }
       

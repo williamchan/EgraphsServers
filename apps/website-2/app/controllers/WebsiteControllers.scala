@@ -24,12 +24,6 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   import services.AppConfig.instance
   import services.AppConfig.annotatedInstance
 
-  /** Use EgraphsSession.Key.AdminId.name instead */
-  @Deprecated val adminIdKey: String = "admin"
-
-  /** Use EgraphsSession.Key.CustomerId.name instead */
-  @Deprecated val customerIdKey: String = "customer"
-
   // Provide endpoint dependencies
   override protected val playConfig = annotatedInstance[PlayConfig, Properties]
   override protected val facebookAppId = annotatedInstance[FacebookAppId, String]

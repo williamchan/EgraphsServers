@@ -1,7 +1,6 @@
 package services.http.filters
 
 import com.google.inject.Inject
-import controllers.WebsiteControllers
 import models.CustomerStore
 import play.api.mvc.Action
 import play.api.mvc.BodyParser
@@ -11,6 +10,7 @@ import services.http.SafePlayParams.Conversions.paramsToOptionalParams
 import models.Customer
 import models.Account
 import play.api.mvc.Results.Redirect
+import services.http.EgraphsSession
 
 // TODO: PLAY20 migration. Test and comment this summbitch.
 class RequireCustomerLogin @Inject() (customerStore: CustomerStore) {  
@@ -32,7 +32,7 @@ class RequireCustomerLogin @Inject() (customerStore: CustomerStore) {
   def inSession[A](parser: BodyParser[A] = parse.anyContent)(actionFactory: (Customer, Account) => Action[A])
   : Action[A] = {
     Action(parser) { request =>
-      val maybeResult = request.session.getLongOption(WebsiteControllers.customerIdKey).map { customerId =>
+      val maybeResult = request.session.getLongOption(EgraphsSession.Key.CustomerId.name).map { customerId =>
         this.apply(customerId, parser)(actionFactory).apply(request)
       }
       

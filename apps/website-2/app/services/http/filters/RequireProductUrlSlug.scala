@@ -1,7 +1,6 @@
 package services.http.filters
 
 import com.google.inject.Inject
-import models.{CelebrityStore, Product}
 import play.api.data.Form
 import play.api.data.Forms.longNumber
 import play.api.data.Forms.single
@@ -10,17 +9,19 @@ import play.api.mvc.BodyParser
 import play.api.mvc.BodyParsers.parse
 import play.api.mvc.Result
 import play.api.mvc.Results.NotFound
-import models.Account
-import services.http.PlayConfig
-import models.Celebrity
-import java.util.Properties
 import play.api.mvc.Session
-import models.enums.PublishedStatus
-import services.http.SafePlayParams.Conversions._
-import models.AdministratorStore
+import java.util.Properties
 import controllers.WebsiteControllers
+import models.AdministratorStore
+import models.Account
+import models.Celebrity
+import models.CelebrityStore
+import models.Product
 import models.ProductQueryFilters
-
+import models.enums.PublishedStatus
+import services.http.EgraphsSession
+import services.http.PlayConfig
+import services.http.SafePlayParams.Conversions._
 
 // TODO: PLAY20 migration. Test and comment this summbitch.
 class RequireProductUrlSlug @Inject() (
@@ -90,7 +91,7 @@ class RequireProductUrlSlug @Inject() (
    
   private def isAdmin(session: Session): Boolean = {
     val maybeIsAdmin = for (
-      adminId <- session.getLongOption(WebsiteControllers.adminIdKey);
+      adminId <- session.getLongOption(EgraphsSession.Key.AdminId.name);
       admin <- adminStore.findById(adminId)
     ) yield {
       true

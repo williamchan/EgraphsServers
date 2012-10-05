@@ -1,16 +1,17 @@
 package controllers.website
 
+import play.api.mvc.Action
 import play.api.mvc.Controller
 import play.api.mvc.Results.Redirect
 import controllers.WebsiteControllers
-import models._
-import services.http.POSTControllerMethod
-import services.http.forms.{CustomerLoginFormFactory, Form}
-import play.api.mvc.Action
 import controllers.routes.WebsiteControllers.{getLogin, getCustomerGalleryById}
+import services.http.POSTControllerMethod
+import services.http.forms.CustomerLoginFormFactory
+import services.http.EgraphsSession
+import models._
 
 private[controllers] trait PostLoginEndpoint { this: Controller =>
-  import Form.Conversions._
+  import services.http.forms.Form.Conversions._
 
   protected def postController: POSTControllerMethod
   protected def accountStore: AccountStore
@@ -29,7 +30,7 @@ private[controllers] trait PostLoginEndpoint { this: Controller =>
   
         case Right(validForm) =>          
           Redirect(getCustomerGalleryById(validForm.customerId)).withSession(
-            request.session + (WebsiteControllers.customerIdKey -> validForm.customerId.toString)
+            request.session + (EgraphsSession.Key.CustomerId.name -> validForm.customerId.toString)
           )
       }
     }
