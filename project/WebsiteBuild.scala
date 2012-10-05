@@ -27,6 +27,7 @@ object WebsiteBuild extends Build {
   //            org.scala-lang % scala-library 2.8.1
       "org.antlr" % "stringtemplate" % "4.0.2",
       "org.apache.commons" % "commons-email" % "1.2",
+      "org.apache.commons" % "commons-lang3" % "3.1",
       "org.jclouds.api" % "filesystem" % "1.2.1" excludeAll(
           ExclusionRule(organization = "org.clojure")
       ),

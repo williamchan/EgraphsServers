@@ -15,7 +15,7 @@ import db.{FilterOneTable, Schema, KeyedCaseClass, SavesWithLongKey}
 import graphics.{RasterGraphicsSource, Handwriting, HandwritingPen, GraphicsSource}
 import java.text.SimpleDateFormat
 import com.google.inject.{Provider, Inject}
-import org.apache.commons.lang.StringEscapeUtils.escapeHtml
+import org.apache.commons.lang3.StringEscapeUtils.escapeHtml4
 import org.squeryl.Query
 import xyzmo.{XyzmoVerifyUserStore, XyzmoVerifyUser}
 import controllers.website.consumer.{StorefrontChoosePhotoConsumerEndpoints, CelebrityLandingConsumerEndpoint}
@@ -471,12 +471,12 @@ case class EgraphStory(
   //
   /** Returns the story title */
   def title: String = {
-    services.templateEngine.evaluate(escapeHtml(titleTemplate), templateParams)
+    services.templateEngine.evaluate(escapeHtml4(titleTemplate), templateParams)
   }
 
   /** Returns the body of the story */
   def body: String = {
-    services.templateEngine.evaluate(escapeHtml(bodyTemplate), templateParams)
+    services.templateEngine.evaluate(escapeHtml4(bodyTemplate), templateParams)
   }
 
   //
