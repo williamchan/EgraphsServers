@@ -3,40 +3,56 @@ package services.cache
 import com.google.inject.Inject
 import redis.clients.jedis.Jedis
 import services.Utils
+import redis.clients.jedis.JedisPool
+import play.api.Play.current
+import redis.clients.jedis.JedisPoolConfig
+import redis.clients.jedis.JedisCommands
 
 /**
  * Factory for the lowest-level Redis connection.
  *
  * Throws up everywhere if it can't connect to a redis connection.
  */
-private[cache] class JedisFactory @Inject()() {
-  def apply(db: Int = JedisFactory.defaultRedisDb): Option[Jedis] = {
-    // Select the correct database index
-    maybeJedisConnection.map {
-      jedis =>
-        jedis.select(db)
-
-        jedis
+private[cache] class JedisFactory (db: Int) {
+  import JedisFactory.jedisPool
+  
+  def connected[A](operation: Jedis => A): A = {
+    val jedis = jedisPool.getResource()
+    try {
+      jedis.select(JedisFactory.defaultRedisDb)
+      operation(jedis)
+    } finally {
+      jedisPool.returnResource(jedis)
     }
-  }
-
-  //
-  // Private members
-  //
-  def maybeJedisConnection: Option[Jedis] = {
-    // TODO: PLAY20. Hey how about making this shit compile when you have a better Redis pool solution?
-    /*try  {
-      Some(RedisConnectionManager.getRawConnection)
-    } catch {
-      case oops =>
-        error("Unable to connect to redis cache instance.")
-        Utils.logException(oops)
-
-        None
-    }*/
   }
 }
 
 object JedisFactory {
+  def startup() {
+    jedisPool
+  }
+  
+  def shutDown() {
+    jedisPool.destroy()
+  }
+  
+  //
+  // Private members
+  //
+  private lazy val jedisPool = {
+    val poolConfig = new JedisPoolConfig
+    
+    poolConfig.setTestOnBorrow(true)
+    poolConfig.setMaxActive(-1)
+    poolConfig.setMaxIdle(-1)
+    
+    new JedisPool(poolConfig, host, port, timeout, password)
+  }
+  
+  private lazy val config = current.configuration
+  private lazy val host = config.getString("redis.host").getOrElse("localhost")
+  private lazy val port = config.getInt("redis.port").getOrElse(6379)
+  private lazy val timeout = config.getInt("redis.timeout").getOrElse(2000)
+  private lazy val password = config.getString("redis.password").getOrElse(null)  
   private[cache] val defaultRedisDb = 5
 }

@@ -15,7 +15,7 @@ import redis.clients.jedis.Jedis
  * @param jedis the low-level Redis client, provided by
  *              [[play.modules.redis.RedisConnectionManager.getRawConnection]]
  */
-private[cache] class RedisCache @Inject()(jedis: Jedis) extends Cache {
+private[cache] class RedisCache @Inject()(pool: JedisFactory) extends Cache {
 
   import RedisCache._
   import Utils.closing
@@ -26,13 +26,13 @@ private[cache] class RedisCache @Inject()(jedis: Jedis) extends Cache {
   override def set[T](key: String, value: T, expirationSeconds: Int) {
     require(manifest.erasure.isInstanceOf[Serializable])
     val keyBytes = key.getBytes
-
-    jedis.setex(keyBytes, expirationSeconds, toByteArray(value))
+    
+    pool.connected(jedis => jedis.setex(keyBytes, expirationSeconds, toByteArray(value)))
   }
 
   override def get[T: Manifest](key: String): Option[T] = {
     require(manifest.erasure.isInstanceOf[Serializable])
-    val bytes = jedis.get(key.getBytes)
+    val bytes = pool.connected(jedis => jedis.get(key.getBytes))
 
     if (bytes == null) {
       None
@@ -42,11 +42,11 @@ private[cache] class RedisCache @Inject()(jedis: Jedis) extends Cache {
   }
 
   override def clear() {
-    jedis.flushDB()
+    pool.connected(jedis => jedis.flushDB())
   }
 
   override def delete(key: String) {
-    jedis.del(key)
+    pool.connected(jedis => jedis.del(key))
   }
 
   //

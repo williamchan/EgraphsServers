@@ -26,8 +26,7 @@ import play.api.cache.EhCachePlugin
 class CacheFactory @Inject()(
   utils: Utils,
   @PlayId playId: String,
-  hostInfo: HostInfo,
-  jedisFactory: JedisFactory
+  hostInfo: HostInfo
 )
 {
 
@@ -65,10 +64,10 @@ class CacheFactory @Inject()(
         inMemoryCache
 
       case List("redis", dbNumber) =>
-        redisCacheIfPossible(db = dbNumber.toInt)
+        redisCache(db = dbNumber.toInt)
 
       case List("redis") =>
-        redisCacheIfPossible()
+        redisCache()
 
       case unrecognized =>
         throw new IllegalArgumentException(
@@ -77,29 +76,15 @@ class CacheFactory @Inject()(
     }
   }
 
-
+  //
+  // Private members
+  //
   private[cache] def inMemoryCache: Cache = {
     new InMemoryCache()
   }
 
-  private[cache] def redisCacheIfPossible(db: Int = JedisFactory.defaultRedisDb): Cache = {
-    val maybeJedis = jedisFactory(db = db)
-    val maybeRedisCache = maybeJedis.map(jedis => new RedisCache(jedis))
-
-    maybeRedisCache.getOrElse {
-      log("Falling back to in-memory cache due to failure to acquire redis connection")
-
-      inMemoryCache
-    }
-  }
-
-  private[cache] def redisCacheOrBust(db: Int = JedisFactory.defaultRedisDb): Cache = {
-    jedisFactory(db).map(jedis => new RedisCache(jedis)).getOrElse {
-      throw new Exception(
-        "All we wanted was a redis cache implementation," +
-          " but now we want to watch the world burn."
-      )
-    }
+  private[cache] def redisCache(db: Int = JedisFactory.defaultRedisDb): Cache = {
+    new RedisCache(new JedisFactory(db))
   }
 }
 

@@ -20,7 +20,7 @@ object Global extends GlobalSettings with Logging {
   val blobs = AppConfig.instance[Blobs]
   val payment = AppConfig.instance[Payment]
   val logging = AppConfig.instance[LoggingContext]
-  
+
   override def onStart(app: Application) {
     logging.withTraceableContext("Bootstrap") {
       log("Bootstrapping application")
