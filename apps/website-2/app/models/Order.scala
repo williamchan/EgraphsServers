@@ -38,7 +38,7 @@ case class OrderServices @Inject() (
  * Persistent entity representing the Orders made upon Products of our service
  */
 @Deprecated case class ShippingInfo(
-  _printingOption: String = PrintingOption.DoNotPrint.name,
+  _printingOption: String = "",
   shippingAddress: Option[String] = None
 )
 
@@ -48,20 +48,20 @@ case class Order(
   inventoryBatchId: Long = 0,
   buyerId: Long = 0,
   recipientId: Long = 0,
-  recipientName: String = "",
-  _paymentStatus: String = PaymentStatus.NotCharged.name,
-  _reviewStatus: String = OrderReviewStatus.PendingAdminReview.name,
-  rejectionReason: Option[String] = None,
-  _privacyStatus: String = PrivacyStatus.Public.name,
-  _writtenMessageRequest: String = WrittenMessageRequest.SpecificMessage.name,
-  @Deprecated stripeCardTokenId: Option[String] = None,
-  @Deprecated stripeChargeId: Option[String] = None,
+  recipientName: String = "herpderp",
+  _paymentStatus: String = "",
+  _reviewStatus: String = "",
+  rejectionReason: Option[String] = Some(""),
+  _privacyStatus: String = "",
+  _writtenMessageRequest: String = "",
+  stripeCardTokenId: Option[String] = Some(""),
+  stripeChargeId: Option[String] = Some(""),
   amountPaidInCurrency: BigDecimal = 0,
-  @Deprecated billingPostalCode: Option[String] = None,
-  messageToCelebrity: Option[String] = None,
-  requestedMessage: Option[String] = None,
-  expectedDate: Option[Date] = None,
-  @Deprecated shippingInfo: ShippingInfo = ShippingInfo(),
+  billingPostalCode: Option[String] = Some(""),
+  messageToCelebrity: Option[String] = Some(""),
+  requestedMessage: Option[String] = Some(""),
+  expectedDate: Option[Date] = Some(new Date),
+  shippingInfo: ShippingInfo = ShippingInfo(),
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: OrderServices = AppConfig.instance[OrderServices]
@@ -72,8 +72,9 @@ case class Order(
   with HasOrderReviewStatus[Order]
   with HasWrittenMessageRequest[Order]
 {
-  @Deprecated val _printingOption = shippingInfo._printingOption
-  @Deprecated val shippingAddress = shippingInfo.shippingAddress
+
+  val _printingOption = if (shippingInfo != null) shippingInfo._printingOption else ""
+  val shippingAddress = if (shippingInfo != null) shippingInfo.shippingAddress else Some("")
 
   //
   // Public methods
