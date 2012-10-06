@@ -40,7 +40,7 @@ class CacheFactory @Inject()(
   // Private members
   //
   private[cache] val hostId: String = {
-    if (playId == DeploymentTarget.Test.name) {
+    if (playId == DeploymentTarget.Test) {
       // For test instances we don't want to collide namespaces with production ones
       // or with other test ones
       "test_" + hostInfo.userName + "_" + hostInfo.computerName + "_" + hostInfo.macAddress

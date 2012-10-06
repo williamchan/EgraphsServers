@@ -6,22 +6,12 @@ import services.Utils
  * Enumerates the different deployment targets we have. Prefer using these
  * enums over hard-coding the strings.
  */
-object DeploymentTarget extends Utils.Enum {
-  sealed trait EnumVal extends Value
+object DeploymentTarget {
+  val Test = "test"
 
-  val Test = new EnumVal {
-    val name = "test"
-  }
+  val Staging = "staging"
 
-  val Staging = new EnumVal {
-    val name = "staging"
-  }
+  val Demo = "demo"
 
-  val Demo = new EnumVal {
-    val name = "demo"
-  }
-
-  val Live = new EnumVal {
-    val name = "live"
-  }
+  val Live = "live"
 }

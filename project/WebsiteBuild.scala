@@ -45,8 +45,6 @@ object WebsiteBuild extends Build {
           ExclusionRule(organization = "org.scala-lang")
       ),*/
       "org.squeryl" %% "squeryl" % "0.9.5-2" excludeAll(
-          // Exclude scala library, which is included with play
-          ExclusionRule(organization = "org.scala-lang"),
           // Exclude DB-specific libs
           ExclusionRule(organization = "net.sourceforge.jtds"),
           ExclusionRule(organization = "postgresql"),

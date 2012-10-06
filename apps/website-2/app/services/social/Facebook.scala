@@ -12,22 +12,6 @@ import java.text.SimpleDateFormat
 import play.api.http.Status
 import controllers.routes.WebsiteControllers.getFacebookLoginCallback
 
-/**
- * Provides our Facebook App ID to Guice as an injectable string
- *
- * Usage:
- * {{{
- *   class MyClassThatUsesFacebook @Inject() (@FacebookAppId fbAppId: String) {
- *     // Do something with the string in here
- *   }
- * }}}
- */
-private[social] class FacebookAppIdProvider @Inject()(@PlayConfig playConfig: Properties) extends Provider[String] {
-  def get(): String = {
-    playConfig.getProperty("fb.appid")
-  }
-}
-
 object Facebook {
 
   // Facebook user properties
