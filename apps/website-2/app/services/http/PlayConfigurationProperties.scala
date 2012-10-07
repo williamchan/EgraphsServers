@@ -26,6 +26,7 @@ object PlayConfigurationProperties {
       }    
     }
 
+    println(props)
     props
   }
 }

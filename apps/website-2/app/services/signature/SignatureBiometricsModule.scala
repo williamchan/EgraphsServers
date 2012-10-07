@@ -3,6 +3,7 @@ package services.signature
 import uk.me.lings.scalaguice.ScalaModule
 import services.Utils
 import com.google.inject.{Inject, Provider, AbstractModule}
+import services.inject.InjectionProvider
 
 object SignatureBiometricsModule extends AbstractModule with ScalaModule {
   def configure() {
@@ -14,7 +15,7 @@ private[signature] class SignatureBiometricsProvider @Inject()(yesmaamImpl: Prov
                                                                xyzmoprodImpl: Provider[XyzmoProdSignatureBiometricService],
                                                                xyzmobetaImpl: Provider[XyzmoBetaSignatureBiometricService],
                                                                utils: Utils)
-  extends Provider[SignatureBiometricService] {
+  extends InjectionProvider[SignatureBiometricService] {
 
   override def get(): SignatureBiometricService = {
     utils.requiredConfigurationProperty("signature.vendor") match {

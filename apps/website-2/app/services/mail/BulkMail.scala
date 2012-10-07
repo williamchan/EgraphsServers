@@ -7,6 +7,7 @@ import collection.JavaConversions._
 import services.http.PlayConfig
 import java.util.Properties
 import play.api.libs.ws.WS
+import services.inject.InjectionProvider
 
 /**
  * Trait for defining new bulk mail providers.
@@ -34,7 +35,7 @@ trait BulkMail {
  * @param playConfig
  * @param utils
  */
-class BulkMailProvider @Inject()(@PlayConfig playConfig: Properties, utils: Utils) extends Provider[BulkMail]
+class BulkMailProvider @Inject()(@PlayConfig playConfig: Properties, utils: Utils) extends InjectionProvider[BulkMail]
 {
   def get() : BulkMail = {
     //Inspect properties and return the proper BulkMail

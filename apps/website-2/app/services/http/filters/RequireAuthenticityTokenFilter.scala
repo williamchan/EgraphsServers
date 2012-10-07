@@ -7,6 +7,7 @@ import play.api.mvc.Action
 import play.api.data._
 import play.api.data.Forms._
 import services.http.PlayId
+import services.inject.InjectionProvider
 
 /**
  * Only executes its `action` block if the request contains a valid authenticity token, as implemented
@@ -46,7 +47,7 @@ trait RequireAuthenticityTokenFilter {
  * @param playId the current play ID (e.g. test, staging, live, demo)
  */
 class RequireAuthenticityTokenFilterProvider @Inject()(@PlayId playId: String)
-  extends Provider[RequireAuthenticityTokenFilter]
+  extends InjectionProvider[RequireAuthenticityTokenFilter]
 {
   //
   // Public members

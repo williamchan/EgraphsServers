@@ -5,6 +5,7 @@ import models.BlobKeyStore
 import services.http.PlayConfig
 import java.util.Properties
 import services.cache.CacheFactory
+import services.inject.InjectionProvider
 
 /**
  * Provides the active BlobVendor to Guice, which is dictated by the "blobstore" value in
@@ -14,7 +15,7 @@ private[blobs] class BlobVendorProvider @Inject() (
   blobKeyStore: BlobKeyStore,
   cacheFactory: CacheFactory,
   @PlayConfig playConfig: Properties
-) extends Provider[BlobVendor]
+) extends InjectionProvider[BlobVendor]
 {
   private val blobstoreType = playConfig.getProperty(Blobs.blobstoreConfigKey)
   private val cloudfrontDomain = playConfig.getProperty("cloudfront.domain")

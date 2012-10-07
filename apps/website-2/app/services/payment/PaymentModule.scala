@@ -3,6 +3,7 @@ package services.payment
 import uk.me.lings.scalaguice.ScalaModule
 import services.Utils
 import com.google.inject.{Inject, Provider, AbstractModule}
+import services.inject.InjectionProvider
 
 /**
  * Payment service configuration
@@ -18,7 +19,7 @@ private[payment] class PaymentProvider @Inject()(
   stripeTestImpl: Provider[StripeTestPayment],
   yesmaamImpl: Provider[YesMaamPayment],
   utils: Utils
-) extends Provider[Payment]
+) extends InjectionProvider[Payment]
 {
   override def get(): Payment = {
     utils.requiredConfigurationProperty("payment.vendor") match {

@@ -11,6 +11,7 @@ import services.Utils
 import services.http.PlayConfig
 import collection.mutable.ListBuffer
 import play.api.templates.Html
+import services.inject.InjectionProvider
 
 /** Interface for sending transactional mails. Transactional mails are  */
 trait TransactionalMail {
@@ -46,7 +47,7 @@ trait TransactionalMail {
  * @param playConfig the Play application's configuration properties
  * @param utils our application utils object
  */
-class MailProvider @Inject()(@PlayConfig playConfig: Properties, utils: Utils) extends Provider[TransactionalMail]
+class MailProvider @Inject()(@PlayConfig playConfig: Properties, utils: Utils) extends InjectionProvider[TransactionalMail]
 {
   def get(): TransactionalMail = {
     new DefaultTransactionalMail
