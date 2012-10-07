@@ -317,12 +317,13 @@ case class Celebrity(id: Long = 0,
 }
 
 object Celebrity {
-  val defaultLandingPageImageDimensions = Dimensions(width = minLandingPageImageWidth, height = minLandingPageImageHeight)
-  val landingPageImageAspectRatio = minLandingPageImageWidth.toDouble / minLandingPageImageHeight
-  val defaultLogoDimensions = Dimensions(width = minLogoWidth, height = minLogoWidth)
   val minLandingPageImageWidth = 1500
   val minLandingPageImageHeight = 556
   val minLogoWidth = 40
+
+  val defaultLandingPageImageDimensions = Dimensions(width = minLandingPageImageWidth, height = minLandingPageImageHeight)
+  val landingPageImageAspectRatio = minLandingPageImageWidth.toDouble / minLandingPageImageHeight
+  val defaultLogoDimensions = Dimensions(width = minLogoWidth, height = minLogoWidth)
 
   // Similar to ProductWithPhoto
   case class CelebrityWithImage(celebrity: Celebrity, image: ImageAsset) {

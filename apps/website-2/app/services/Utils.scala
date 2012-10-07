@@ -237,7 +237,6 @@ object Utils extends Utils(AppConfig.instance[Configuration]) {
     //Adds an EnumVal to our storage, uses CCAS to make sure it's thread safe, returns the ordinal
     private final def addEnumVal(newVal: EnumVal): Int = {
       import _values.{get, compareAndSet => CAS}
-      require(this(newVal.name) == None)
 
       val oldVec = _values.get
       val newVec = oldVec :+ newVal
