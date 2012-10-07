@@ -1,6 +1,5 @@
 package services.blobs
 
-import play.api.Play.current
 import org.jclouds.blobstore.{BlobStoreContext, BlobStore}
 import org.jclouds.io.Payload
 import java.io._
@@ -9,10 +8,8 @@ import services.logging.Logging
 import org.jclouds.blobstore.domain.Blob
 import services.Time
 import Time.IntsToSeconds._
-import play.api.Play.current
-import services.http.PlayConfig
+import play.api.Configuration
 import services.AppConfig
-import java.util.Properties
 
 /**
  * Convenience methods for storing and loading large binary data: images,
@@ -26,7 +23,11 @@ import java.util.Properties
  *
  * To use, import Blobs.Conversions._ into whatever scope.
  */
-class Blobs @Inject() (blobProvider: BlobVendor) extends Logging {
+class Blobs @Inject() (
+  blobVendor: BlobVendor,
+  blobVendorProvider: BlobVendorProvider
+) extends Logging 
+{
   import Blobs._
 
   /**
@@ -36,14 +37,14 @@ class Blobs @Inject() (blobProvider: BlobVendor) extends Logging {
    * @return true that a blob with the given key exists
    */
   def exists(key: String): Boolean = {
-    blobProvider.exists(blobstoreNamespace, key)
+    blobVendor.exists(blobstoreNamespace, key)
   }
 
   /**
    * Retrieve the Blob at a given key.
    */
   def get(key: String): Option[Blob] = {
-    blobProvider.get(blobstoreNamespace, key)
+    blobVendor.get(blobstoreNamespace, key)
   }
 
   /**
@@ -52,7 +53,7 @@ class Blobs @Inject() (blobProvider: BlobVendor) extends Logging {
    */
   @Deprecated
   def getStaticResource(key: String) : Option[Blob] = {
-    val store: BlobStore = S3BlobVendor.context.getBlobStore
+    val store = s3.context.getBlobStore
     Option(store.getBlob(staticResourceBlobstoreNamespace, key))
   }
 
@@ -63,10 +64,10 @@ class Blobs @Inject() (blobProvider: BlobVendor) extends Logging {
    * the key does not point to any resource, ie passing in "IDoNotExist" as the key will still return a signed URL.
    */
   def getStaticResourceUrl(key: String, expirationSeconds: Int = 5.minutes): String = {
-    val expires = System.currentTimeMillis() / 1000 + expirationSeconds
-    val baseUrl = S3BlobVendor.context.getSigner.signGetBlob(staticResourceBlobstoreNamespace, key).getEndpoint
-    val signature = S3BlobVendor.sign(namespace = staticResourceBlobstoreNamespace, key = key, expires = expires)
-    baseUrl + "?" + "AWSAccessKeyId=" + S3BlobVendor.s3id + "&Expires=" + expires + "&Signature=" + signature
+    val expires = System.currentTimeMillis() / 1000 + expirationSeconds    
+    val baseUrl = s3.context.getSigner.signGetBlob(staticResourceBlobstoreNamespace, key).getEndpoint
+    val signature = s3.sign(namespace = staticResourceBlobstoreNamespace, key = key, expires = expires)
+    baseUrl + "?" + "AWSAccessKeyId=" + s3.s3id + "&Expires=" + expires + "&Signature=" + signature
   }
 
   /**
@@ -81,7 +82,7 @@ class Blobs @Inject() (blobProvider: BlobVendor) extends Logging {
    * the blob stored is publicly available.
    */
   def getUrlOption(key: String): Option[String] = {
-    blobProvider.urlOption(blobstoreNamespace, key)
+    blobVendor.urlOption(blobstoreNamespace, key)
   }
 
   /**
@@ -93,13 +94,13 @@ class Blobs @Inject() (blobProvider: BlobVendor) extends Logging {
    *   against Amazon S3.
    */
   def put(key: String, bytes: Array[Byte], access: AccessPolicy=AccessPolicy.Private) {
-    blobProvider.put(blobstoreNamespace, key, bytes, access)
+    blobVendor.put(blobstoreNamespace, key, bytes, access)
   }
 
   /** Delete the data at a certain key. */
   def delete(key: String) {
     // wchan: We don't need a delete method... Hopefully, we don't ever have to delete assets. But if we do, this method
-    // should use blobProvider and not blobStore directly.
+    // should use blobVendor and not blobStore directly.
     blobStore.removeBlob(blobstoreNamespace, key)
   }
 
@@ -108,14 +109,14 @@ class Blobs @Inject() (blobProvider: BlobVendor) extends Logging {
    * set to "yes" in application.conf.
    */
   def scrub() {
-    val applicationMode = configuration.get("application.mode")
+    val applicationMode = configuration.getString("application.mode")
     log("Checking application.mode before scrubbing blobstore. Must be in dev mode. Mode is: " + applicationMode)
-    if (applicationMode != "dev") {
+    if (applicationMode != Some("dev")) {
       throw new IllegalStateException("Cannot scrub blobstore unless in dev mode")
     }
 
-    configuration.get("blobstore.allowscrub") match {
-      case "yes" =>
+    configuration.getString("blobstore.allowscrub") match {
+      case Some("yes") =>
         blobStore.clearContainer(blobstoreNamespace)
 
       case _ =>
@@ -131,7 +132,7 @@ class Blobs @Inject() (blobProvider: BlobVendor) extends Logging {
    * jclouds api is needed.
    */
   def blobStore: BlobStore = {
-    blobProvider.context.getBlobStore
+    blobVendor.context.getBlobStore
   }
 
   /**
@@ -151,7 +152,7 @@ class Blobs @Inject() (blobProvider: BlobVendor) extends Logging {
    * jclouds api is needed.
    */
   def context: BlobStoreContext = {
-    blobProvider.context
+    blobVendor.context
   }
 
   /**
@@ -175,7 +176,14 @@ class Blobs @Inject() (blobProvider: BlobVendor) extends Logging {
       """
     )
 
-    blobProvider.checkConfiguration()
+    blobVendor.checkConfiguration()
+  }
+  
+  //
+  // Private members
+  //
+  private def s3: S3BlobVendor = {
+    blobVendorProvider.s3
   }
 }
 
@@ -187,19 +195,19 @@ class Blobs @Inject() (blobProvider: BlobVendor) extends Logging {
 
 object Blobs {
   /** Application configuration */
-  private[blobs] val configuration = AppConfig.annotatedInstance[PlayConfig, Properties]
+  private[blobs] val configuration = AppConfig.instance[Configuration]
   
-  /** Key for the blobstore in application config */
-  private[blobs] val blobstoreConfigKey = "blobstore"
+  /** Key for the blobstore vendor in application config */
+  private[blobs] val blobstoreConfigKey = "blobstore.vendor"
 
   /** Type of blobstore. See "blobstore" in application.conf */
-  private[blobs] val blobstoreType = configuration.getProperty(blobstoreConfigKey)
+  private[blobs] val blobstoreType = configuration.getString(blobstoreConfigKey).get
 
   /** Namespace of blobstore; equivalent to S3's bucket */
-  private[blobs] val blobstoreNamespace = configuration.getProperty("blobstore.namespace")
+  private[blobs] val blobstoreNamespace = configuration.getString("blobstore.namespace").get
 
   /** Namespace of blobstore that holds static resources; equivalent to S3's bucket */
-  private[blobs] val staticResourceBlobstoreNamespace = configuration.getProperty("staticresources.blobstore.namespace")
+  private[blobs] val staticResourceBlobstoreNamespace = configuration.getString("staticresources.blobstore.namespace").get
 
   /**
    * Gives Blobs access to RichPayload. Also allows more variance in inputs to put()

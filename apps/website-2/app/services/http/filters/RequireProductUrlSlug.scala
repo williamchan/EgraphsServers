@@ -10,7 +10,6 @@ import play.api.mvc.BodyParsers.parse
 import play.api.mvc.Result
 import play.api.mvc.Results.NotFound
 import play.api.mvc.Session
-import java.util.Properties
 import controllers.WebsiteControllers
 import models.AdministratorStore
 import models.Account
@@ -20,15 +19,12 @@ import models.Product
 import models.ProductQueryFilters
 import models.enums.PublishedStatus
 import services.http.EgraphsSession
-import services.http.PlayConfig
 import services.http.SafePlayParams.Conversions._
 
 // TODO: PLAY20 migration. Test and comment this summbitch.
 class RequireProductUrlSlug @Inject() (
-  productStore: CelebrityStore,
   productFilters: ProductQueryFilters,
-  adminStore: AdministratorStore,
-  @PlayConfig playConfig: Properties
+  adminStore: AdministratorStore
 ) {
   
  /** NOTE: this is old documentation from when the filter used to live on CelebrityAccountRequestFilters.

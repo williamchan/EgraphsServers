@@ -1,6 +1,5 @@
 package services
 
-import http.PlayConfig
 import play.api.mvc.Results.{Redirect}
 import play.api.Play
 import play.api.Play.current
@@ -14,12 +13,12 @@ import play.api.mvc.Results.Redirect
 import play.api.mvc.Result
 import play.api.mvc.Request
 import play.api.Play.current
-import services.http.PlayConfigurationProperties
+import play.api.Configuration
 
 /**
  * Helpful utilities with no other place to call home
  */
-class Utils @Inject()(@PlayConfig() playConfig: util.Properties) {
+class Utils @Inject()(playConfig: Configuration) {
 
   /**
    * This implicit conversion converts a String option to a RichStringOption
@@ -40,7 +39,7 @@ class Utils @Inject()(@PlayConfig() playConfig: util.Properties) {
     }
   }
 
-  //TODO: write test, this makes me sad to do. but everything is not compiling now, with 400+ compilation errors
+  //TODO: PLAY20 migration. write test, this makes me sad to do. but everything is not compiling now, with 400+ compilation errors
   /**
    * @return The first value in the map if there is one, or returns the elseValue.
    */
@@ -143,19 +142,13 @@ class Utils @Inject()(@PlayConfig() playConfig: util.Properties) {
    * Throws an IllegalArgumentException with a reasonable error message if it didn't exist.
    */
   def requiredConfigurationProperty(property: String): String = {
-    val theValue = playConfig.getProperty(property)
-    if (theValue == null) {
+    playConfig.getString(property).getOrElse {
       val errorMessage = "Property \"" + property +
         "\" in application.conf was required but not present."
 
       play.Logger.error(errorMessage)
       throw new IllegalArgumentException(errorMessage)
     }
-    else {
-      theValue
-    }
-
-    theValue
   }
 
   /**
@@ -230,7 +223,7 @@ class Utils @Inject()(@PlayConfig() playConfig: util.Properties) {
   }
 }
 
-object Utils extends Utils(PlayConfigurationProperties.properties) {
+object Utils extends Utils(AppConfig.instance[Configuration]) {
 
   /**DIY exhaustiveness-checking enum type. See https://gist.github.com/1057513 */
   trait Enum {

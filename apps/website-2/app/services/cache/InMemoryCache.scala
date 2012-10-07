@@ -41,7 +41,7 @@ private[cache] class InMemoryCache @Inject() extends Cache {
 private[cache] object InMemoryCache extends Logging {
   lazy val (manager, cache) = {
     val manager = CacheManager.create()
-    manager.addCache("play")
+    if (!manager.cacheExists("play")) manager.addCache("play")
     (manager, manager.getCache("play"))
   }
 }

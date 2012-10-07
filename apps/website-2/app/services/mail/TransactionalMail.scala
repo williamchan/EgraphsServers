@@ -4,11 +4,9 @@ import play.api.Play.current
 import com.typesafe.plugin._
 import org.apache.commons.mail.Email
 import org.apache.commons.mail.HtmlEmail
-import java.util.Properties
 import javax.mail.Session
 import com.google.inject.{Inject, Provider}
 import services.Utils
-import services.http.PlayConfig
 import collection.mutable.ListBuffer
 import play.api.templates.Html
 import services.inject.InjectionProvider
@@ -43,11 +41,8 @@ trait TransactionalMail {
 
 /**
  * Provides a TransactionalMail implementation given the play configuration
- *
- * @param playConfig the Play application's configuration properties
- * @param utils our application utils object
  */
-class MailProvider @Inject()(@PlayConfig playConfig: Properties, utils: Utils) extends InjectionProvider[TransactionalMail]
+class MailProvider @Inject() extends InjectionProvider[TransactionalMail]
 {
   def get(): TransactionalMail = {
     new DefaultTransactionalMail

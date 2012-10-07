@@ -4,16 +4,17 @@ import com.google.inject.Inject
 import redis.clients.jedis.Jedis
 import services.Utils
 import redis.clients.jedis.JedisPool
-import play.api.Play.current
 import redis.clients.jedis.JedisPoolConfig
 import redis.clients.jedis.JedisCommands
+import services.AppConfig
+import play.api.Configuration
 
 /**
  * Factory for the lowest-level Redis connection.
  *
  * Throws up everywhere if it can't connect to a redis connection.
  */
-private[cache] class JedisFactory (db: Int) {
+private[cache] class JedisFactory(db: Int) {
   import JedisFactory.jedisPool
   
   def connected[A](operation: Jedis => A): A = {
@@ -49,7 +50,7 @@ object JedisFactory {
     new JedisPool(poolConfig, host, port, timeout, password)
   }
   
-  private lazy val config = current.configuration
+  private lazy val config = AppConfig.instance[Configuration]
   private lazy val host = config.getString("redis.host").getOrElse("localhost")
   private lazy val port = config.getInt("redis.port").getOrElse(6379)
   private lazy val timeout = config.getInt("redis.timeout").getOrElse(2000)

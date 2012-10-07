@@ -16,13 +16,15 @@ import services._
 import org.squeryl.Query
 import org.squeryl.dsl.ManyToMany
 import play.api.Play.current
+import graphics.GraphicsSource
 
 case class ProductServices @Inject() (
   store: ProductStore,
   celebStore: CelebrityStore,
   orderStore: OrderStore,
   inventoryBatchStore: InventoryBatchStore,
-  imageAssetServices: Provider[ImageAssetServices]
+  imageAssetServices: Provider[ImageAssetServices],
+  graphicsSourceFactory: () => GraphicsSource
 )
 
 /**
@@ -178,7 +180,6 @@ case class Product(
   def signingAreaPreview(width: Int = 600): String = {
     import graphics.{Handwriting, HandwritingPen}
     val _photo = photo
-    val egraphServices: EgraphServices = AppConfig.instance[EgraphServices]
     val ingredients = () => {
       EgraphImageIngredients(
         signatureJson = Product.signingAreaSignatureStr,
@@ -191,7 +192,11 @@ case class Product(
       )
     }
 
-    val signingAreaPreviewImage = EgraphImage(ingredientFactory = ingredients, graphicsSource = egraphServices.graphicsSourceFactory.apply(), blobPath = _photo.key)
+    val signingAreaPreviewImage = EgraphImage(
+      ingredientFactory = ingredients, 
+      graphicsSource = services.graphicsSourceFactory(),
+      blobPath = _photo.key
+    )
     val rendered = signingAreaPreviewImage
       .withSigningOriginOffset(signingOriginX.toDouble, signingOriginY.toDouble)
       .scaledToWidth(width)

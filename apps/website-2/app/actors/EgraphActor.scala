@@ -9,13 +9,11 @@ import models.{EgraphQueryFilters, EgraphStore}
 import com.google.inject.Inject
 import services.logging.{Logging, LoggingContext}
 import models.enums.EgraphState
-import services.http.PlayConfig
-import java.util.Properties
 import play.api.Play.current
 import akka.actor.Props
 import play.api.libs.concurrent.Akka
+import play.api.Configuration
 import play.api.mvc.Request
-
 
 /**
  * Actor that performs most of the work of creating an egraph and running it through our biometrics
@@ -30,7 +28,7 @@ case class EgraphActor @Inject() (
   egraphStore: EgraphStore,
   egraphQueryFilters: EgraphQueryFilters,
   logging: LoggingContext,
-  @PlayConfig playConfig: Properties
+  playConfig: Configuration
 ) extends Actor with Logging
 {
   protected def receive = {
@@ -50,8 +48,8 @@ case class EgraphActor @Inject() (
    * @param egraphId id of the Egraph to process
    */
   private def processEgraph[A](egraphId: Long, request: Request[A]) {
-    playConfig.getProperty("biometrics.status") match {
-      case "offline" =>
+    playConfig.getString("biometrics.status") match {
+      case Some("offline") =>
       case _ => {
         logging.withTraceableContext("processEgraph[" + egraphId + "]") {
           db.connected(TransactionSerializable) {
@@ -70,7 +68,7 @@ case class EgraphActor @Inject() (
               egraph.assets.generateAndSaveMp3()
 
               // If admin review is turned off (eg to expedite demos), immediately publish regardless of biometric results
-              if (playConfig.getProperty("adminreview.skip") == "true") {
+              if (playConfig.getString("adminreview.skip") == Some("true")) {
                 val publishedEgraph = testedEgraph.withEgraphState(EgraphState.Published).save()
                 publishedEgraph.order.sendEgraphSignedMail(request)
               }

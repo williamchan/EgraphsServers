@@ -2,10 +2,8 @@ package services.social
 
 import com.google.inject.{Provider, Inject}
 import controllers.website.GetFacebookLoginCallbackEndpoint
-import java.util.Properties
 import play.api.libs.ws.WS
 import play.api.mvc.RequestHeader
-import services.http.PlayConfig
 import sjson.json.Serializer
 import models.FulfilledOrder
 import java.text.SimpleDateFormat

@@ -2,13 +2,12 @@ package controllers
 
 import controllers.api._
 import play.api.mvc.Controller
-import services.http.{PlayConfig, ControllerMethod}
+import services.http.ControllerMethod
 import services.db.DBSession
 import akka.actor.ActorRef
 import models.{EnrollmentBatchStore, OrderQueryFilters, EnrollmentBatchServices, OrderStore}
 import services.blobs.Blobs
 import services.AppConfig._
-import java.util.Properties
 import services.http.filters.HttpFilters
 
 object ApiControllers extends Controller
@@ -23,7 +22,7 @@ object ApiControllers extends Controller
 {
   import services.AppConfig.instance
 
-  override protected val playConfig = annotatedInstance[PlayConfig, Properties]
+  override protected val playConfig = instance[play.api.Configuration]
   override protected def egraphActor: ActorRef = actors.EgraphActor.actor
   override protected def enrollmentBatchActor: ActorRef = actors.EnrollmentBatchActor.actor
   override protected def dbSession: DBSession = instance[DBSession]

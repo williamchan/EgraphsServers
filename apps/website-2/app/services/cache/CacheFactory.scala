@@ -4,7 +4,6 @@ import services.Utils
 import com.google.inject.Inject
 import services.logging.Logging
 import services.http.{PlayId, DeploymentTarget, HostInfo}
-import play.api.Play.current
 import play.api.cache.EhCachePlugin
 
 /**

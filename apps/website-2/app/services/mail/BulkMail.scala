@@ -1,12 +1,9 @@
 package services.mail
 
-import play.api.Play.configuration
 import com.google.inject.{Inject, Provider}
-import services.Utils
 import collection.JavaConversions._
-import services.http.PlayConfig
-import java.util.Properties
 import play.api.libs.ws.WS
+import play.api.Configuration
 import services.inject.InjectionProvider
 
 /**
@@ -32,24 +29,23 @@ trait BulkMail {
 
 /**
  * Helper class for configuring BulkMail implementations
- * @param playConfig
- * @param utils
+ * @param playConfig 
  */
-class BulkMailProvider @Inject()(@PlayConfig playConfig: Properties, utils: Utils) extends InjectionProvider[BulkMail]
+class BulkMailProvider @Inject()(playConfig: Configuration) extends InjectionProvider[BulkMail]
 {
   def get() : BulkMail = {
-    //Inspect properties and return the proper BulkMail
+    //Inspect configuration and return the proper BulkMail
     import play.api.Play.current
 
     val maybeBulkMail = for {
-      bulkMailConfig <- configuration.getString("mail.bulk") if (bulkMailConfig == "mailchimp")
-      apikey <- configuration.getString("mail.bulk.apikey")
-      datacenter <- configuration.getString("mail.bulk.datacenter")
+      bulkMailConfig <- playConfig.getString("mail.bulk.vendor") if (bulkMailConfig == "mailchimp")
+      apikey <- playConfig.getString("mail.bulk.apikey")
+      datacenter <- playConfig.getString("mail.bulk.datacenter")
     } yield {
       MailChimpBulkMail(apikey, datacenter)
     }
 
-    maybeBulkMail.getOrElse(new MockBulkMail(utils))
+    maybeBulkMail.getOrElse(MockBulkMail)
   }
 }
 
@@ -57,7 +53,7 @@ class BulkMailProvider @Inject()(@PlayConfig playConfig: Properties, utils: Util
  * A MockMailer for testing purposes
  * @param utils
  */
-private[mail] case class MockBulkMail (utils: Utils) extends BulkMail
+private[mail] object MockBulkMail extends BulkMail
 {
   override def subscribeNew(listId: String, email: String) = {
     play.Logger.info("Subscribed " + email + " to email list: " + listId + "\n")

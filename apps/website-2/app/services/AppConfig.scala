@@ -96,10 +96,10 @@ object AppConfig {
 
   /**
    * Gets a class instance bound to a particular annotation. This can be useful for getting, for example,
-   * the particular Properties instance which is bound to PlayConfig, or our application's configuration.
+   * the particular String instance which is bound to FbAppId.
    *
-   * @tparam A the annotation type (e.g. PlayConfig)
-   * @tparam T the instance type (e.g. Properties)
+   * @tparam A the annotation type (e.g. FbAppId)
+   * @tparam T the instance type (e.g. String)
    *
    * @return the instance in question, if it had a matching binding. Otherwise throws
    *     an exception.

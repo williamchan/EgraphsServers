@@ -1,7 +1,6 @@
 package controllers.website
 
 import controllers.WebsiteControllers
-import java.util.Properties
 import models.{Account, Customer, CustomerStore, AccountStore}
 import play.api._
 import play.api.mvc._
@@ -21,7 +20,7 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
   protected def controllerMethod: ControllerMethod
   protected def accountStore: AccountStore
   protected def customerStore: CustomerStore
-  protected def playConfig: Properties
+  protected def playConfig: Configuration
   protected def facebookAppId: String
 
   private val fbAppSecretKey = "fb.appsecret"
@@ -51,7 +50,7 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
 
       code match {
         case Some(fbCode) => {
-          val accessToken = Facebook.getFbAccessToken(code = fbCode, facebookAppId = facebookAppId, fbAppSecret = playConfig.getProperty(fbAppSecretKey))
+          val accessToken = Facebook.getFbAccessToken(code = fbCode, facebookAppId = facebookAppId, fbAppSecret = playConfig.getString(fbAppSecretKey).get)
           val fbUserInfo = Facebook.getFbUserInfo(accessToken = accessToken)
           val (customer, shouldSendWelcomeEmail) = dbSession.connected(TransactionSerializable) {
             loginViaFacebook(registrationName = fbUserInfo(Facebook._name).toString, registrationEmail = fbUserInfo(Facebook._email).toString, user_id = fbUserInfo(Facebook._id).toString)

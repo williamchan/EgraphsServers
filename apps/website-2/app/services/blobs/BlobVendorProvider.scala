@@ -2,8 +2,7 @@ package services.blobs
 
 import com.google.inject.{Inject, Provider}
 import models.BlobKeyStore
-import services.http.PlayConfig
-import java.util.Properties
+import play.api.Configuration
 import services.cache.CacheFactory
 import services.inject.InjectionProvider
 
@@ -14,19 +13,19 @@ import services.inject.InjectionProvider
 private[blobs] class BlobVendorProvider @Inject() (
   blobKeyStore: BlobKeyStore,
   cacheFactory: CacheFactory,
-  @PlayConfig playConfig: Properties
+  playConfig: Configuration
 ) extends InjectionProvider[BlobVendor]
 {
-  private val blobstoreType = playConfig.getProperty(Blobs.blobstoreConfigKey)
-  private val cloudfrontDomain = playConfig.getProperty("cloudfront.domain")
-  private val cdnEnabled = playConfig.getProperty("cdn.enabled")
+  private val blobstoreType = playConfig.getString(Blobs.blobstoreConfigKey).get
+  private val cloudfrontDomain = playConfig.getString("cloudfront.domain").get
+  private val cdnEnabled = playConfig.getString("cdn.enabled").get
 
   def get() = {
     blobstoreType match {
       case "s3" =>
         cdnEnabled match {
-          case "true" => decorateCDN(decorateCache(S3BlobVendor))
-          case _      => decorateCache(S3BlobVendor)
+          case "true" => decorateCDN(decorateCache(s3))
+          case _      => decorateCache(s3)
         }
 
       case "filesystem" =>
@@ -38,7 +37,14 @@ private[blobs] class BlobVendorProvider @Inject() (
         )
     }
   }
+  
+  def s3: S3BlobVendor = {
+    S3BlobVendor(playConfig)
+  }
 
+  //
+  // Private members
+  //
   private def decorateCache(baseBlobVendor: BlobVendor): BlobVendor = {
     new CacheIndexedBlobVendor(cacheFactory, baseBlobVendor)
   }

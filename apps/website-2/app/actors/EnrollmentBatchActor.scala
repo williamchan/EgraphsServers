@@ -10,9 +10,8 @@ import services.signature.SignatureBiometricsError
 import services.voice.VoiceBiometricsError
 import models.{CelebrityStore, EnrollmentBatch, EnrollmentBatchStore}
 import models.enums.EnrollmentStatus
-import services.http.PlayConfig
-import java.util.Properties
 import play.api.Play.current
+import play.api.Configuration
 import play.api.libs.concurrent.Akka
 import akka.actor.Props
 
@@ -26,7 +25,7 @@ case class EnrollmentBatchActor @Inject()(
   celebrityStore: CelebrityStore,
   enrollmentBatchStore: EnrollmentBatchStore,
   logging: LoggingContext,
-  @PlayConfig playConfig: Properties
+  playConfig: Configuration
 ) extends Actor with Logging {
   protected def receive = {
     case ProcessEnrollmentBatchMessage(id: Long) => {
@@ -41,8 +40,8 @@ case class EnrollmentBatchActor @Inject()(
    * @param enrollmentBatchId
    */
   def processEnrollmentBatch(enrollmentBatchId: Long) {
-    playConfig.getProperty("biometrics.status") match {
-      case "offline" =>
+    playConfig.getString("biometrics.status") match {
+      case Some("offline") =>
       case _ => {
         logging.withTraceableContext("processEnrollmentBatch[" + enrollmentBatchId + "]") {
           db.connected(TransactionSerializable) {

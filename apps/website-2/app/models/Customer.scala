@@ -8,19 +8,20 @@ import com.google.inject.{Provider, Inject}
 import exception.InsufficientInventoryException
 import org.apache.commons.mail.HtmlEmail
 import services.mail.TransactionalMail
-import services.http.PlayConfig
-import java.util.Properties
 import play.api.mvc.RequestHeader
 import controllers.routes.WebsiteControllers.getVerifyAccount
 import play.api.templates.Html
+import play.api.Configuration
 
 /** Services used by each instance of Customer */
-case class CustomerServices @Inject() (accountStore: AccountStore,
-                                       customerStore: CustomerStore,
-                                       inventoryBatchStore: InventoryBatchStore,
-                                       usernameHistoryStore: UsernameHistoryStore,
-                                       mail: TransactionalMail,
-                                       @PlayConfig playConfig: Properties)
+case class CustomerServices @Inject() (
+  accountStore: AccountStore,
+  customerStore: CustomerStore,
+  inventoryBatchStore: InventoryBatchStore,
+  usernameHistoryStore: UsernameHistoryStore,
+  mail: TransactionalMail,
+  playConfig: Configuration
+)
 
 /**
  * Persistent entity representing customers who buy products from our service.
@@ -88,8 +89,8 @@ case class Customer(
     )
 
     // If admin review is turned off (eg to expedite demos), create the Order already approved
-    services.playConfig.getProperty("adminreview.skip") match {
-      case "true" => order.withReviewStatus(OrderReviewStatus.ApprovedByAdmin)
+    services.playConfig.getString("adminreview.skip") match {
+      case Some("true") => order.withReviewStatus(OrderReviewStatus.ApprovedByAdmin)
       case _ => order
     }
   }

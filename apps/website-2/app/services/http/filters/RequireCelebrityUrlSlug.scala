@@ -1,6 +1,5 @@
 package services.http.filters
 
-import java.util.Properties
 import com.google.inject.Inject
 import play.api.data.Form
 import play.api.data.Forms.longNumber
@@ -12,7 +11,6 @@ import play.api.mvc.Result
 import play.api.mvc.Results.NotFound
 import play.api.mvc.Session
 import services.http.SafePlayParams.Conversions._
-import services.http.PlayConfig
 import services.http.EgraphsSession
 import models.AdministratorStore
 import models.Account
@@ -24,8 +22,7 @@ import controllers.WebsiteControllers
 // TODO: PLAY20 migration. Test and comment this summbitch.
 class RequireCelebrityUrlSlug @Inject() (
   celebStore: CelebrityStore,
-  adminStore: AdministratorStore,
-  @PlayConfig playConfig: Properties
+  adminStore: AdministratorStore  
 ) {
   
   /** NOTE: These are the scaladocs for the old CelebrityAccountRequestFilters.requireCelebrityUrlSlug

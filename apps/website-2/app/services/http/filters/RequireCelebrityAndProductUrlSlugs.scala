@@ -11,9 +11,7 @@ import play.api.mvc.BodyParsers.parse
 import play.api.mvc.Result
 import play.api.mvc.Results.NotFound
 import models.Account
-import services.http.PlayConfig
 import models.Celebrity
-import java.util.Properties
 import play.api.mvc.Session
 import models.enums.PublishedStatus
 import services.http.SafePlayParams.Conversions._

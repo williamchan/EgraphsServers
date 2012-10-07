@@ -1,6 +1,7 @@
 package controllers
 
 import website._
+import play.api.Configuration
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import play.api.mvc.Results.Redirect
@@ -14,7 +15,6 @@ import services.http._
 import services.http.filters._
 import forms.{AccountRecoverFormFactory, AccountPasswordResetFormFactory, AccountSettingsFormFactory, CustomerLoginFormFactory}
 import forms.purchase.{PurchaseFormChecksFactory, FormReaders, PurchaseFormFactory}
-import java.util.Properties
 import services.Utils
 import services.mvc.celebrity.CatalogStarsQuery
 import services.mvc.{OrderCompleteViewModelFactory, StorefrontBreadcrumbData}
@@ -25,7 +25,7 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   import services.AppConfig.annotatedInstance
 
   // Provide endpoint dependencies
-  override protected val playConfig = annotatedInstance[PlayConfig, Properties]
+  override protected val playConfig = instance[Configuration]
   override protected val facebookAppId = annotatedInstance[FacebookAppId, String]
 
   override protected def breadcrumbData = instance[StorefrontBreadcrumbData]
