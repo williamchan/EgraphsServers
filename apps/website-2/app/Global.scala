@@ -36,8 +36,9 @@ object Global extends GlobalSettings with Logging {
         Session.create(connection, services.db.DBAdapter.current)
       })
 
-      // Initialize S3 or fs-based blobstore
+      // Initialize S3 or fs-based blobstore and cache
       blobs.init()
+      services.cache.JedisFactory.startup()
 
       // Some additional test-mode setup
       if (appId == "test") {
@@ -46,6 +47,10 @@ object Global extends GlobalSettings with Logging {
 
       log("Finished bootstrapping application")
     }
+  }
+  
+  override def onStop(app: Application) {
+    services.cache.JedisFactory.shutDown()
   }
 }
 

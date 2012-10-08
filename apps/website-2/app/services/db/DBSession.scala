@@ -152,11 +152,11 @@ object DBSession {
   }
 
   def commit() {
-    play.db.DB.getConnection.commit()
+    Session.currentSessionOption.map(session => session.connection.commit())
   }
 
   def rollback() {
-    play.db.DB.getConnection.rollback()
+    Session.currentSessionOption.map(session => session.connection.rollback())
   }
 }
 
