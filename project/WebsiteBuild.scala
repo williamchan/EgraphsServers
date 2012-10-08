@@ -18,8 +18,10 @@ object WebsiteBuild extends Build {
       "batik" % "batik-rasterizer" % "1.6",
       "batik" % "batik-svggen" % "1.6",
       "com.stripe" % "stripe-java" % "1.0.1",
-      "com.typesafe" %% "play-plugins-mailer" % "2.0.4",
-      "junit-addons" % "junit-addons" % "1.4",
+      "com.typesafe" %% "play-plugins-mailer" % "2.0.4" excludeAll(
+        ExclusionRule(organization="com.cedarsoft")
+      ),
+//      "junit-addons" % "junit-addons" % "1.4",
       "net.debasishg" %% "sjson" % "0.15" exclude("org.scala-lang", "scala-library"),  //from 0.12
   //        exclude:
   //            # Exclude scala because its included with play-scala
@@ -27,18 +29,17 @@ object WebsiteBuild extends Build {
       "org.antlr" % "stringtemplate" % "4.0.2",
       "org.apache.commons" % "commons-email" % "1.2",
       "org.apache.commons" % "commons-lang3" % "3.1",
-      "org.jclouds.api" % "filesystem" % "1.2.1" excludeAll(
-          ExclusionRule(organization = "org.clojure")
-      ),
+//      "org.jclouds.api" % "filesystem" % "1.5.1" excludeAll(
+//          ExclusionRule(organization = "org.clojure")
+//      ),
   //        exclude:
-  //            org.clojure % *
-      "org.jclouds.provider" % "aws-s3" % "1.2.1" excludeAll(
-          ExclusionRule(organization = "org.clojure")
-      ),
+  //            org.clojure % *      
+      "org.jclouds" % "jclouds-blobstore" % "1.4.2",
+      "org.jclouds.api" % "filesystem" % "1.4.2",
+      "org.jclouds.provider" % "aws-s3" % "1.4.2",
   //        exclude:
   //            org.clojure % *
       "org.joda" % "joda-money" % "0.6",
-      "joda-time" % "joda-time" % "2.1",
 /*      "org.specs2" %% "specs2" % "1.5" excludeAll(
           ExclusionRule(organization = "org.mockito"),
           ExclusionRule(organization = "org.scala-lang")
