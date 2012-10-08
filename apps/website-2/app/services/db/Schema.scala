@@ -270,7 +270,7 @@ class Schema @Inject()(
       throw new IllegalStateException("Cannot scrub database unless in dev mode")
     }
 
-    playConfig.getString("db.allowscrub") match {
+    playConfig.getString("db.default.allowscrub") match {
       case Some("yes") =>
         if (isInPlace) {
           dropSchema()
@@ -279,7 +279,7 @@ class Schema @Inject()(
 
       case _ =>
         throw new IllegalStateException(
-          """I'm just not going to scrub the DB unless "db.allowscrub" is
+          """I'm just not going to scrub the DB unless "db.default.allowscrub" is
           set to "yes" in application.conf. Sorry if you have a problem with that."""
         )
     }

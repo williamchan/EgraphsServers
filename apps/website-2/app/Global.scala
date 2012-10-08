@@ -1,5 +1,3 @@
-package bootstrap
-
 import org.squeryl.{Session, SessionFactory}
 import io.Source
 import java.io.{File, PrintWriter}
@@ -18,12 +16,12 @@ import services.http.PlayId
 
 
 object Global extends GlobalSettings with Logging {
-  val blobs = AppConfig.instance[Blobs]
-  val payment = AppConfig.instance[Payment]
-  val logging = AppConfig.instance[LoggingContext]
-  val appId = AppConfig.annotatedInstance[PlayId, String]
-
   override def onStart(app: Application) {
+    val blobs = AppConfig.instance[Blobs]
+    val payment = AppConfig.instance[Payment]
+    val logging = AppConfig.instance[LoggingContext]
+    val appId = AppConfig.annotatedInstance[PlayId, String]
+
     logging.withTraceableContext("Bootstrap") {
       log("Bootstrapping application")
       // Initialize payment system
