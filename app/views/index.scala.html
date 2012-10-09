@@ -1,7 +1,10 @@
 @(message: String)
 
-@main("Welcome to Play 2.0") {
+@main(title = "Monitoring") {
     
-    @play20.welcome(message)
+    <h1> Get requests over last hour: @message </h1>
+    
+    <p> If the average is anything less than 1, the site
+    	has been down at some point over the last hour. </p>
     
 }
