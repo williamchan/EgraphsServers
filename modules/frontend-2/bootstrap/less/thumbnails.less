@@ -1,8 +1,5 @@
-//
-// Thumbnails
-// --------------------------------------------------
-
-
+// THUMBNAILS
+// ----------
 // Note: `.thumbnails` and `.thumbnails > li` are overriden in responsive files
 
 // Make wrapper ul behave like the grid
@@ -27,11 +24,10 @@
 .thumbnail {
   display: block;
   padding: 4px;
-  line-height: @baseLineHeight;
+  line-height: 1;
   border: 1px solid #ddd;
   .border-radius(4px);
-  .box-shadow(0 1px 3px rgba(0,0,0,.055));
-  .transition(all .2s ease-in-out);
+  .box-shadow(0 1px 1px rgba(0,0,0,.075));
 }
 // Add a hover state for linked versions only
 a.thumbnail:hover {
@@ -48,5 +44,4 @@ a.thumbnail:hover {
 }
 .thumbnail .caption {
   padding: 9px;
-  color: @gray;
 }
