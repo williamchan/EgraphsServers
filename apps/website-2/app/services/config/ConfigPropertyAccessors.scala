@@ -1,5 +1,8 @@
 package services.config
 
+/** 
+ * Readable alternatives for the accessors built into [[play.api.Configuration]]
+ **/
 private[config] trait ConfigPropertyAccessors {
   protected def playConfig: play.api.Configuration
 

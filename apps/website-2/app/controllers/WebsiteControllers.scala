@@ -1,7 +1,6 @@
 package controllers
 
 import website._
-import play.api.Configuration
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import play.api.mvc.Results.Redirect
@@ -18,6 +17,7 @@ import forms.purchase.{PurchaseFormChecksFactory, FormReaders, PurchaseFormFacto
 import services.Utils
 import services.mvc.celebrity.CatalogStarsQuery
 import services.mvc.{OrderCompleteViewModelFactory, StorefrontBreadcrumbData}
+import services.config.ConfigFileProxy
 
 object WebsiteControllers extends Controller with AllWebsiteEndpoints
 {
@@ -25,7 +25,7 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   import services.AppConfig.annotatedInstance
 
   // Provide endpoint dependencies
-  override protected val playConfig = instance[Configuration]
+  override protected val config = instance[ConfigFileProxy]
   override protected val facebookAppId = annotatedInstance[FacebookAppId, String]
 
   override protected def breadcrumbData = instance[StorefrontBreadcrumbData]

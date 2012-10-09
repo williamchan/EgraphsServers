@@ -9,8 +9,8 @@ import services.http.HttpContentService
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 import java.net.URLEncoder
-import play.api.Configuration
 import org.apache.commons.codec.binary.Base64.encodeBase64String
+import services.config.ConfigFileProxy
 
 /** [[services.blobs.Blobs.BlobProvider]] implementation backed by Amazon S3 */
 private[blobs] case class S3BlobVendor(
@@ -107,8 +107,8 @@ private[blobs] case class S3BlobVendor(
 
 /** [[services.blobs.Blobs.BlobProvider]] implementation backed by Amazon S3 */
 private[blobs] object S3BlobVendor {
-  def apply(configuration: Configuration): S3BlobVendor = {
-    S3BlobVendor(configuration.getString("s3.id").get, configuration.getString("s3.secret").get)  
+  def apply(config: ConfigFileProxy): S3BlobVendor = {
+    S3BlobVendor(config.s3Id, config.s3Secret)
   }
 }
   

@@ -8,8 +8,8 @@ import services.logging.Logging
 import org.jclouds.blobstore.domain.Blob
 import services.Time
 import Time.IntsToSeconds._
-import play.api.Configuration
 import services.AppConfig
+import services.config.ConfigFileProxy
 
 /**
  * Convenience methods for storing and loading large binary data: images,
@@ -25,7 +25,8 @@ import services.AppConfig
  */
 class Blobs @Inject() (
   blobVendor: BlobVendor,
-  blobVendorProvider: BlobVendorProvider
+  blobVendorProvider: BlobVendorProvider,
+  config: ConfigFileProxy
 ) extends Logging 
 {
   import Blobs._
@@ -109,21 +110,19 @@ class Blobs @Inject() (
    * set to "yes" in application.conf.
    */
   def scrub() {
-    val applicationMode = configuration.getString("application.mode")
+    val applicationMode = config.applicationMode
     log("Checking application.mode before scrubbing blobstore. Must be in dev mode. Mode is: " + applicationMode)
-    if (applicationMode != Some("dev")) {
+    if (applicationMode != "dev") {
       throw new IllegalStateException("Cannot scrub blobstore unless in dev mode")
     }
 
-    configuration.getString("blobstore.allowscrub") match {
-      case Some("yes") =>
-        blobStore.clearContainer(blobstoreNamespace)
-
-      case _ =>
-        throw new IllegalStateException(
-          """I'm not going to scrub the blobstore unless "blobstore.allowscrub"
-          is set to "yes" in application.conf"""
-        )
+    if(config.blobstoreAllowScrub) {
+      blobStore.clearContainer(blobstoreNamespace)      
+    } else {
+      throw new IllegalStateException(
+        """I'm not going to scrub the blobstore unless "blobstore.allowscrub"
+        is set to "yes" in application.conf"""
+      )
     }
   }
 
@@ -195,19 +194,16 @@ class Blobs @Inject() (
 
 object Blobs {
   /** Application configuration */
-  private[blobs] val configuration = AppConfig.instance[Configuration]
-  
-  /** Key for the blobstore vendor in application config */
-  private[blobs] val blobstoreConfigKey = "blobstore.vendor"
+  private[blobs] val configuration = AppConfig.instance[ConfigFileProxy]
 
   /** Type of blobstore. See "blobstore" in application.conf */
-  private[blobs] val blobstoreType = configuration.getString(blobstoreConfigKey).get
+  private[blobs] val blobstoreType = configuration.blobstoreVendor
 
   /** Namespace of blobstore; equivalent to S3's bucket */
-  private[blobs] val blobstoreNamespace = configuration.getString("blobstore.namespace").get
+  private[blobs] val blobstoreNamespace = configuration.blobstoreNamespace
 
   /** Namespace of blobstore that holds static resources; equivalent to S3's bucket */
-  private[blobs] val staticResourceBlobstoreNamespace = configuration.getString("staticresources.blobstore.namespace").get
+  private[blobs] val staticResourceBlobstoreNamespace = configuration.staticResourcesBlobstoreNamespace
 
   /**
    * Gives Blobs access to RichPayload. Also allows more variance in inputs to put()

@@ -4,8 +4,14 @@ import com.stripe
 import org.joda.money.Money
 import scala.collection.JavaConversions._
 import services.Utils
+import services.config.ConfigFileProxy
 
 abstract class StripePaymentBase extends Payment {
+  //
+  // Abstract members
+  //
+  protected def config: ConfigFileProxy
+  
   //
   // Payment Methods
   //
@@ -26,7 +32,7 @@ abstract class StripePaymentBase extends Payment {
   }
 
   override def bootstrap() {
-    stripe.Stripe.apiKey = Utils.requiredConfigurationProperty("stripe.key.secret")
+    stripe.Stripe.apiKey = config.stripeKeySecret
   }
 
   override val browserModule: String = {
@@ -34,7 +40,7 @@ abstract class StripePaymentBase extends Payment {
   }
 
   override val publishableKey: String = {
-    Utils.requiredConfigurationProperty("stripe.key.publishable")
+    config.stripeKeyPublishable
   }
 }
 

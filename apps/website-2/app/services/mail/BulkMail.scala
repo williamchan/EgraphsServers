@@ -3,8 +3,8 @@ package services.mail
 import com.google.inject.{Inject, Provider}
 import collection.JavaConversions._
 import play.api.libs.ws.WS
-import play.api.Configuration
 import services.inject.InjectionProvider
+import services.config.ConfigFileProxy
 
 /**
  * Trait for defining new bulk mail providers.
@@ -31,21 +31,15 @@ trait BulkMail {
  * Helper class for configuring BulkMail implementations
  * @param playConfig 
  */
-class BulkMailProvider @Inject()(playConfig: Configuration) extends InjectionProvider[BulkMail]
+class BulkMailProvider @Inject()(config: ConfigFileProxy) extends InjectionProvider[BulkMail]
 {
   def get() : BulkMail = {
     //Inspect configuration and return the proper BulkMail
-    import play.api.Play.current
-
-    val maybeBulkMail = for {
-      bulkMailConfig <- playConfig.getString("mail.bulk.vendor") if (bulkMailConfig == "mailchimp")
-      apikey <- playConfig.getString("mail.bulk.apikey")
-      datacenter <- playConfig.getString("mail.bulk.datacenter")
-    } yield {
-      MailChimpBulkMail(apikey, datacenter)
+    if (config.mailBulkVendor == "mailchimp") {
+      MailChimpBulkMail(config.mailBulkApikey, config.mailBulkDatacenter)
+    } else {
+      MockBulkMail
     }
-
-    maybeBulkMail.getOrElse(MockBulkMail)
   }
 }
 

@@ -10,7 +10,7 @@ import java.io.{ByteArrayOutputStream, PrintWriter}
 import com.google.inject.{Inject, Injector}
 import java.sql.Connection
 import services.logging.Logging
-import play.api.Configuration
+import services.config.ConfigFileProxy
 
 /**
  * Egraphs Database schema
@@ -21,7 +21,7 @@ import play.api.Configuration
  */
 class Schema @Inject()(
   injector: Injector,
-  playConfig: Configuration,
+  config: ConfigFileProxy,
   @CurrentTransaction currentTxnConnectionFactory: () => Connection
 ) extends org.squeryl.Schema with Logging
 {
@@ -264,24 +264,22 @@ class Schema @Inject()(
   //
   /**Clears out the schema and recreates it. For God's sake don't do this in production. */
   def scrub() {
-    val applicationMode = playConfig.getString("application.mode")
+    val applicationMode = config.applicationMode
     log("Checking application.mode before scrubbing database. Must be in dev mode. Mode is: " + applicationMode)
     if (applicationMode != Some("dev")) {
       throw new IllegalStateException("Cannot scrub database unless in dev mode")
     }
 
-    playConfig.getString("db.default.allowscrub") match {
-      case Some("yes") =>
-        if (isInPlace) {
-          dropSchema()
-        }
-        create
-
-      case _ =>
-        throw new IllegalStateException(
-          """I'm just not going to scrub the DB unless "db.default.allowscrub" is
-          set to "yes" in application.conf. Sorry if you have a problem with that."""
-        )
+    if (config.dbDefaultAllowScrub) {
+      if (isInPlace) {
+        dropSchema()
+      }
+      create
+    } else {
+      throw new IllegalStateException(
+        """I'm just not going to scrub the DB unless "db.default.allowscrub" is
+        set to "yes" in application.conf. Sorry if you have a problem with that."""
+      )
     }
   }
 

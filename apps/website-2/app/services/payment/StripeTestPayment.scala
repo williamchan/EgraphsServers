@@ -1,11 +1,13 @@
 package services.payment
 
 import com.stripe
+import com.google.inject.Inject
+import services.config.ConfigFileProxy
 
 /**
  * Stripe-based implementation of [[services.Payment]] service using test account
  */
-class StripeTestPayment extends StripePaymentBase {
+class StripeTestPayment @Inject()(protected val config: ConfigFileProxy) extends StripePaymentBase {
 
   /**
    * Returns a fake stripe token

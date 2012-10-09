@@ -22,7 +22,7 @@ object ApiControllers extends Controller
 {
   import services.AppConfig.instance
 
-  override protected val playConfig = instance[play.api.Configuration]
+  override protected val config = instance[services.config.ConfigFileProxy]
   override protected def egraphActor: ActorRef = actors.EgraphActor.actor
   override protected def enrollmentBatchActor: ActorRef = actors.EnrollmentBatchActor.actor
   override protected def dbSession: DBSession = instance[DBSession]

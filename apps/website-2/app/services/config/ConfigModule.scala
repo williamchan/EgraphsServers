@@ -2,10 +2,6 @@ package services.config
 
 import com.google.inject.AbstractModule
 
-import play.api.Configuration
-import play.api.Play
-import services.http.filters.RequireAuthenticityTokenFilter
-import services.http.filters.RequireAuthenticityTokenFilterProvider
 import uk.me.lings.scalaguice.ScalaModule
 import services.inject.ClosureProviders
 import play.api.Play

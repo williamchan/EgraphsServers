@@ -4,6 +4,7 @@ import uk.me.lings.scalaguice.ScalaModule
 import services.Utils
 import com.google.inject.{Inject, Provider, AbstractModule}
 import services.inject.InjectionProvider
+import services.config.ConfigFileProxy
 
 object VoiceBiometricsModule extends AbstractModule with ScalaModule {
   def configure() {
@@ -15,11 +16,11 @@ private[voice] class VoiceBiometricsProvider @Inject()(yesmaamImpl: Provider[Yes
                                                        fsdevImpl: Provider[VBGDevFSVoiceBiometricService],
                                                        fsprodImpl: Provider[VBGProdFSVoiceBiometricService],
                                                        fsbetaImpl: Provider[VBGBetaFSVoiceBiometricService],
-                                                       utils: Utils)
+                                                       config: ConfigFileProxy)
   extends InjectionProvider[VoiceBiometricService] {
 
   override def get(): VoiceBiometricService = {
-    utils.requiredConfigurationProperty("voice.vendor") match {
+    config.voiceVendor match {
       case "yesmaam" =>
         yesmaamImpl.get()
 

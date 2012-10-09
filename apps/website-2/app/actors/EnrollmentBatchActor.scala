@@ -11,10 +11,9 @@ import services.voice.VoiceBiometricsError
 import models.{CelebrityStore, EnrollmentBatch, EnrollmentBatchStore}
 import models.enums.EnrollmentStatus
 import play.api.Play.current
-import play.api.Configuration
 import play.api.libs.concurrent.Akka
 import akka.actor.Props
-
+import services.config.ConfigFileProxy
 
 object EnrollmentBatchActor {
   val actor = Akka.system.actorOf(Props(AppConfig.instance[EnrollmentBatchActor]))
@@ -25,7 +24,7 @@ case class EnrollmentBatchActor @Inject()(
   celebrityStore: CelebrityStore,
   enrollmentBatchStore: EnrollmentBatchStore,
   logging: LoggingContext,
-  playConfig: Configuration
+  config: ConfigFileProxy
 ) extends Actor with Logging {
   protected def receive = {
     case ProcessEnrollmentBatchMessage(id: Long) => {
@@ -40,8 +39,8 @@ case class EnrollmentBatchActor @Inject()(
    * @param enrollmentBatchId
    */
   def processEnrollmentBatch(enrollmentBatchId: Long) {
-    playConfig.getString("biometrics.status") match {
-      case Some("offline") =>
+    config.biometricsStatus match {
+      case "offline" =>
       case _ => {
         logging.withTraceableContext("processEnrollmentBatch[" + enrollmentBatchId + "]") {
           db.connected(TransactionSerializable) {

@@ -9,12 +9,13 @@ import services.http.filters.HttpFilters
 import services.http.filters.RequireAuthenticatedAccount
 import services.http.filters.RequireCelebrityId
 import sjson.json.Serializer
+import services.config.ConfigFileProxy
 
 private[controllers] trait GetCelebrityMobileAppInfoEndpoint { this: Controller =>
   protected def controllerMethod: ControllerMethod
   protected def httpFilters: HttpFilters
   protected def blobs: Blobs
-  protected def playConfig: play.api.Configuration
+  protected def config: ConfigFileProxy
 
   private val iPadBuildVersionProp = "ipad.buildversion"
 
@@ -22,7 +23,7 @@ private[controllers] trait GetCelebrityMobileAppInfoEndpoint { this: Controller 
     httpFilters.requireAuthenticatedAccount() { account =>
       httpFilters.requireCelebrityId.inAccount(account) { celebrity =>
         Action {
-          val iPadBuildVersion = playConfig.getString(iPadBuildVersionProp).get
+          val iPadBuildVersion = config.ipadBuildVersion
           val s3Key = "ipad/Egraphs_" + iPadBuildVersion + ".ipa"
           val ipaUrl = blobs.getStaticResourceUrl(s3Key, 10.minutes)
           val iPadAppInfo = Map("version" -> iPadBuildVersion, "ipaURL" -> ipaUrl)

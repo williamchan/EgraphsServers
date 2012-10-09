@@ -13,12 +13,11 @@ import play.api.mvc.Results.Redirect
 import play.api.mvc.Result
 import play.api.mvc.Request
 import play.api.Play.current
-import play.api.Configuration
 
 /**
  * Helpful utilities with no other place to call home
  */
-class Utils @Inject()(playConfig: Configuration) {
+class Utils @Inject() {
 
   /**
    * This implicit conversion converts a String option to a RichStringOption
@@ -137,21 +136,6 @@ class Utils @Inject()(playConfig: Configuration) {
   }
 
   /**
-   * Returns a configuration property that must exist in application.conf.
-   *
-   * Throws an IllegalArgumentException with a reasonable error message if it didn't exist.
-   */
-  def requiredConfigurationProperty(property: String): String = {
-    playConfig.getString(property).getOrElse {
-      val errorMessage = "Property \"" + property +
-        "\" in application.conf was required but not present."
-
-      play.Logger.error(errorMessage)
-      throw new IllegalArgumentException(errorMessage)
-    }
-  }
-
-  /**
    * Turns a set of (String -> Option) tuples into a map containing only the fields
    * whose Options contained some value. For example,
    * {{{
@@ -223,7 +207,7 @@ class Utils @Inject()(playConfig: Configuration) {
   }
 }
 
-object Utils extends Utils(AppConfig.instance[Configuration]) {
+object Utils extends Utils {
 
   /**DIY exhaustiveness-checking enum type. See https://gist.github.com/1057513 */
   trait Enum {

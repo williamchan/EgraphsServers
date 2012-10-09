@@ -19,7 +19,7 @@ import services.inject.InjectionProvider
  * the live running application's mail Provider would first resolve to 
  * "gmail". And if that key had not been there, it would have returned mock.
  */
-class PlayConfigurationProvider @Inject()(@PlayId playId: String) 
+private[http] class PlayConfigurationProvider @Inject()(@PlayId playId: String) 
   extends InjectionProvider[Configuration] 
 {
   override def get(): Configuration = {

@@ -2,10 +2,10 @@ package services.db
 
 import org.squeryl.internals.DatabaseAdapter
 import play.Play
-import play.api.Configuration
 import org.squeryl.adapters.{MySQLInnoDBAdapter, PostgreSqlAdapter, H2Adapter}
 import services.logging.Logging
 import services.AppConfig
+import services.config.ConfigFileProxy
 
 /**
  * Provides various Squeryl database adapters based on what type of database we're
@@ -20,13 +20,7 @@ object DBAdapter extends Logging {
    * Returns a Squeryl DatabaseAdapter given current Play! database string
    */
   def current: DatabaseAdapter = {
-    val maybeAdapter = for (dbUrl <- config.getString("db.default.url")) yield getForDbString(dbUrl)
-    
-    maybeAdapter.getOrElse {
-      throw new IllegalArgumentException(
-        "Found no property 'db.default.url' in application.conf while configuring Squeryl."
-      )
-    }
+    getForDbString(config.dbDefaultUrl)
   }
 
   def getForDbString(dbString: String): DatabaseAdapter = {
@@ -43,5 +37,5 @@ object DBAdapter extends Logging {
   //
   // Private members
   //
-  val config = AppConfig.instance[Configuration]
+  val config = AppConfig.instance[ConfigFileProxy]
 }

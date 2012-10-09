@@ -4,6 +4,7 @@ import uk.me.lings.scalaguice.ScalaModule
 import services.Utils
 import com.google.inject.{Inject, Provider, AbstractModule}
 import services.inject.InjectionProvider
+import services.config.ConfigFileProxy
 
 object SignatureBiometricsModule extends AbstractModule with ScalaModule {
   def configure() {
@@ -14,11 +15,11 @@ object SignatureBiometricsModule extends AbstractModule with ScalaModule {
 private[signature] class SignatureBiometricsProvider @Inject()(yesmaamImpl: Provider[YesMaamSignatureBiometricService],
                                                                xyzmoprodImpl: Provider[XyzmoProdSignatureBiometricService],
                                                                xyzmobetaImpl: Provider[XyzmoBetaSignatureBiometricService],
-                                                               utils: Utils)
+                                                               config: ConfigFileProxy)
   extends InjectionProvider[SignatureBiometricService] {
 
   override def get(): SignatureBiometricService = {
-    utils.requiredConfigurationProperty("signature.vendor") match {
+    config.signatureVendor match {
       case "yesmaam" =>
         yesmaamImpl.get()
 

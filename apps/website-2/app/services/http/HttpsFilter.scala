@@ -4,15 +4,15 @@ import com.google.inject.Inject
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{AnyContent, Request}
-import play.api.Configuration
 import play.api.mvc.Action
 import play.api.mvc.Session
+import services.config.ConfigFileProxy
 
 /**
  * Inspired by [play-framework] Forcing SSL connection:
  * https://groups.google.com/forum/?fromgroups#!searchin/play-framework/force$20ssl/play-framework/e5qja-hdD3s/8U2s-XfVkKwJ
  */
-class HttpsFilter @Inject()(playConfig: Configuration) {
+class HttpsFilter @Inject()(config: ConfigFileProxy) {
 
   def apply[A](action: Action[A]): Action[A] = {
     Action(action.parser) { request =>

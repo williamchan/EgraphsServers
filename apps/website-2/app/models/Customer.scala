@@ -11,7 +11,7 @@ import services.mail.TransactionalMail
 import play.api.mvc.RequestHeader
 import controllers.routes.WebsiteControllers.getVerifyAccount
 import play.api.templates.Html
-import play.api.Configuration
+import services.config.ConfigFileProxy
 
 /** Services used by each instance of Customer */
 case class CustomerServices @Inject() (
@@ -20,7 +20,7 @@ case class CustomerServices @Inject() (
   inventoryBatchStore: InventoryBatchStore,
   usernameHistoryStore: UsernameHistoryStore,
   mail: TransactionalMail,
-  playConfig: Configuration
+  config: ConfigFileProxy
 )
 
 /**
@@ -89,9 +89,10 @@ case class Customer(
     )
 
     // If admin review is turned off (eg to expedite demos), create the Order already approved
-    services.playConfig.getString("adminreview.skip") match {
-      case Some("true") => order.withReviewStatus(OrderReviewStatus.ApprovedByAdmin)
-      case _ => order
+    if (services.config.adminreviewSkip) {
+      order.withReviewStatus(OrderReviewStatus.ApprovedByAdmin)
+    } else {
+      order
     }
   }
 

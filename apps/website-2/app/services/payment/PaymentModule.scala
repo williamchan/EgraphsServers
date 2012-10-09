@@ -4,6 +4,7 @@ import uk.me.lings.scalaguice.ScalaModule
 import services.Utils
 import com.google.inject.{Inject, Provider, AbstractModule}
 import services.inject.InjectionProvider
+import services.config.ConfigFileProxy
 
 /**
  * Payment service configuration
@@ -18,11 +19,11 @@ private[payment] class PaymentProvider @Inject()(
   stripeImpl: Provider[StripePayment],
   stripeTestImpl: Provider[StripeTestPayment],
   yesmaamImpl: Provider[YesMaamPayment],
-  utils: Utils
+  config: ConfigFileProxy
 ) extends InjectionProvider[Payment]
 {
   override def get(): Payment = {
-    utils.requiredConfigurationProperty("payment.vendor") match {
+    config.paymentVendor match {
       case "yesmaam" =>
         yesmaamImpl.get()
 

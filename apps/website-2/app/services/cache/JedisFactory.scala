@@ -7,8 +7,8 @@ import redis.clients.jedis.JedisPool
 import redis.clients.jedis.JedisPoolConfig
 import redis.clients.jedis.JedisCommands
 import services.AppConfig
-import play.api.Configuration
 import services.logging.Logging
+import services.config.ConfigFileProxy
 
 /**
  * Factory for the lowest-level Redis connection.
@@ -52,10 +52,10 @@ object JedisFactory extends Logging {
     new JedisPool(poolConfig, host, port, timeout, password)
   }
   
-  private lazy val config = AppConfig.instance[Configuration]
-  private lazy val host = config.getString("redis.host").getOrElse(throw new IllegalArgumentException("redis.host configuration required"))
-  private lazy val port = config.getInt("redis.port").getOrElse(6379)
-  private lazy val timeout = config.getInt("redis.timeout").getOrElse(2000)
-  private lazy val password = config.getString("redis.password").getOrElse(throw new IllegalArgumentException("Redis password required"))
+  private lazy val config = AppConfig.instance[ConfigFileProxy]
+  private lazy val host = config.redisHost
+  private lazy val port = config.redisPort
+  private lazy val password = config.redisPassword
+  private lazy val timeout = 2000
   private[cache] val defaultRedisDb = 5
 }

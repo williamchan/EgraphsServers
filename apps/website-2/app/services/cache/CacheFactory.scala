@@ -5,6 +5,7 @@ import com.google.inject.Inject
 import services.logging.Logging
 import services.http.{PlayId, DeploymentTarget, HostInfo}
 import play.api.cache.EhCachePlugin
+import services.config.ConfigFileProxy
 
 /**
  * Yields the configured [[services.cache.Cache]] implementation. See the documentation for
@@ -23,7 +24,7 @@ import play.api.cache.EhCachePlugin
  * - "memory": An in-memory implementation that delegates to Play's [[play.cache.EhCacheImpl]]
  **/
 class CacheFactory @Inject()(
-  utils: Utils,
+  config: ConfigFileProxy,
   @PlayId playId: String,
   hostInfo: HostInfo
 )
@@ -56,7 +57,7 @@ class CacheFactory @Inject()(
   }
 
   private[cache] def lowLevelCache: Cache = {
-    val appCacheValue = utils.requiredConfigurationProperty("application.cache")
+    val appCacheValue = config.applicationCache
 
     appCacheValue.split("\\.").toList match {
       case List("memory") =>

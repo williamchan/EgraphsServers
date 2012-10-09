@@ -2,9 +2,9 @@ package services.blobs
 
 import com.google.inject.{Inject, Provider}
 import models.BlobKeyStore
-import play.api.Configuration
 import services.cache.CacheFactory
 import services.inject.InjectionProvider
+import services.config.ConfigFileProxy
 
 /**
  * Provides the active BlobVendor to Guice, which is dictated by the "blobstore" value in
@@ -13,18 +13,19 @@ import services.inject.InjectionProvider
 private[blobs] class BlobVendorProvider @Inject() (
   blobKeyStore: BlobKeyStore,
   cacheFactory: CacheFactory,
-  playConfig: Configuration
+  config: ConfigFileProxy
 ) extends InjectionProvider[BlobVendor]
 {
-  private val blobstoreType = playConfig.getString(Blobs.blobstoreConfigKey).get
-  private val cloudfrontDomain = playConfig.getString("cloudfront.domain").get
-  private val cdnEnabled = playConfig.getString("cdn.enabled").get
+  private val blobstoreType = config.blobstoreVendor
+  private val cdnEnabled = config.cdnEnabled
+  private val maybeCdnDomain = config.cdn.map(cdnConfig => cdnConfig.cloudfrontDomain)
+  
 
   def get() = {
     blobstoreType match {
       case "s3" =>
-        cdnEnabled match {
-          case "true" => decorateCDN(decorateCache(s3))
+        (cdnEnabled, maybeCdnDomain) match {
+          case (true, Some(cdnDomain)) => decorateCDN(decorateCache(s3), cdnDomain)
           case _      => decorateCache(s3)
         }
 
@@ -39,7 +40,7 @@ private[blobs] class BlobVendorProvider @Inject() (
   }
   
   def s3: S3BlobVendor = {
-    S3BlobVendor(playConfig)
+    S3BlobVendor(config)
   }
 
   //
@@ -49,7 +50,7 @@ private[blobs] class BlobVendorProvider @Inject() (
     new CacheIndexedBlobVendor(cacheFactory, baseBlobVendor)
   }
 
-  private def decorateCDN(baseBlobVendor: BlobVendor): BlobVendor = {
-    new CloudfrontBlobVendor(cloudfrontDomain, baseBlobVendor)
+  private def decorateCDN(baseBlobVendor: BlobVendor, cdnDomain: String): BlobVendor = {
+    new CloudfrontBlobVendor(cdnDomain, baseBlobVendor)
   }
 }

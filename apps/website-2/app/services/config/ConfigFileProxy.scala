@@ -3,6 +3,10 @@ package services.config
 import play.api.Configuration
 import com.google.inject.Inject
 
+/**
+ * Proxies the running application.conf. Ensures that all necessary configuration values are present
+ * and exposes an easy api for accessing them.
+ **/
 class ConfigFileProxy @Inject() (protected val playConfig: Configuration) extends ConfigPropertyAccessors {
   val applicationName = string("application.name")
   val applicationId = string("application.id")
@@ -56,13 +60,13 @@ class ConfigFileProxy @Inject() (protected val playConfig: Configuration) extend
 
   val applicationCache = string("application.cache")
 
-  val adminreviewSkip = string("adminreview.skip")
+  val adminreviewSkip = boolean("adminreview.skip")
   val biometricsStatus = string("biometrics.status", "offline", "online")
   val signatureVendor = string("signature.vendor", "yesmaam", "xyzmoprod", "xyzmobeta")
   val voiceVendor = string("voice.vendor", "yesmaam", "fsprod", "fsbeta")
 
   val fbAppid = string("fb.appid")
   val fbAppsecret = string("fb.appsecret")
-  val ipadBuildversions = string("ipad.buildversion")
+  val ipadBuildVersion = string("ipad.buildversion")
   val attachmentsPath = string("attachments.path")
 }
