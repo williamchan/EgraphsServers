@@ -23,11 +23,10 @@ object Global extends GlobalSettings with Logging {
       val configProxy = AppConfig.instance[ConfigFileProxy]
       val blobs = AppConfig.instance[Blobs]
       val payment = AppConfig.instance[Payment]
-      
-      val appId = AppConfig.annotatedInstance[PlayId, String]
 
-    
+      log("Configuration is: " + configProxy.applicationId)
       log("Bootstrapping application")
+
       // Initialize payment system
       payment.bootstrap()
 
@@ -45,7 +44,7 @@ object Global extends GlobalSettings with Logging {
       services.cache.JedisFactory.startup()
 
       // Some additional test-mode setup
-      if (appId == "test") {
+      if (configProxy.applicationId == "test") {
         TestModeBootstrap.run()
       }
 
