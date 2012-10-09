@@ -5,6 +5,7 @@ import cache.CacheModule
 import db.DBModule
 import graphics.GraphicsModule
 import http.HttpModule
+import config.ConfigModule
 import mail.{BulkMail, BulkMailProvider, MailProvider, TransactionalMail}
 import models._
 import models.vbg._
@@ -33,6 +34,7 @@ class AppConfig extends AbstractModule with ScalaModule {
     install(GraphicsModule)
     install(SocialModule)
     install(MvcModule)
+    install(ConfigModule)
 
     // Model services
     bind[AccountServices].in[Singleton]

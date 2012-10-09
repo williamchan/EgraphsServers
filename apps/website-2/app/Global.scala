@@ -8,6 +8,7 @@ import services.blobs.Blobs
 import services.payment.Payment
 import java.sql.Connection
 import services.logging.{Logging, LoggingContext}
+import services.config.ConfigFileProxy
 import services.{AppConfig, Utils, TempFile}
 import services.db.{TransactionSerializable, Schema, DBSession}
 import models.{AccountStore, Account, Administrator}
@@ -17,12 +18,15 @@ import services.http.PlayId
 
 object Global extends GlobalSettings with Logging {
   override def onStart(app: Application) {
-    val blobs = AppConfig.instance[Blobs]
-    val payment = AppConfig.instance[Payment]
     val logging = AppConfig.instance[LoggingContext]
-    val appId = AppConfig.annotatedInstance[PlayId, String]
-
     logging.withTraceableContext("Bootstrap") {
+      val configProxy = AppConfig.instance[ConfigFileProxy]
+      val blobs = AppConfig.instance[Blobs]
+      val payment = AppConfig.instance[Payment]
+      
+      val appId = AppConfig.annotatedInstance[PlayId, String]
+
+    
       log("Bootstrapping application")
       // Initialize payment system
       payment.bootstrap()
