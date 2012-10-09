@@ -14,8 +14,7 @@ class ConfigFileProxy @Inject() (protected val playConfig: Configuration) extend
   val applicationSecret = string("application.secret")
   val applicationBaseUrl = string("application.baseUrl")
   val applicationHttpsOnly = boolean("application.httpsOnly")
-  val adminToolsEnabled = string("admin.tools.enabled", "full", "restricted")
-  val lessCssEternalCache = boolean("lesscss.eternalcache")
+  val adminToolsEnabled = string("admin.tools.enabled", "full", "restricted")  
   val paymentVendor = string("payment.vendor", "stripe", "stripetest", "yesmaam")
   val stripeKeyPublishable = string("stripe.key.publishable")
   val stripeKeySecret = string("stripe.key.secret")
@@ -39,6 +38,8 @@ class ConfigFileProxy @Inject() (protected val playConfig: Configuration) extend
   val dbDefaultPoolMaxSize = int("db.default.pool.maxSize")
   val dbDefaultPoolMinSize = int("db.default.pool.minSize")
   val dbDefaultPoolMaxIdleTimeExcessConnections = int("db.default.pool.maxIdleTimeExcessConnections")
+
+  val evolutionplugin = string("evolutionplugin", "enabled", "disabled")
 
   val smtpMock = boolean("smtp.mock")
   val smtpOption = if(smtpMock) None else Some(new AnyRef {
