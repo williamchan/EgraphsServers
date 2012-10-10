@@ -20,7 +20,7 @@ import scala.Some
 //
 //  //this returns the asset from the normal asset manager
 //  def at(path: String, file: String): Action[AnyContent] = Action { request =>
-//    val action = Assets.at(path, file)
+//    val action = RemoteAssets.at(path, file)
 //    val result = action.apply(request)
 //    val resultWithHeaders = result.asInstanceOf[ResultWithHeaders]
 //    resultWithHeaders.withHeaders(DATE -> df.print({ new java.util.Date }.getTime))

@@ -165,7 +165,7 @@ class Utils @Inject() {
    * @return a valid path, or throw an exception
    */
   def asset(path: String): String = {
-    controllers.routes.Assets.at(path).url
+    controllers.routes.RemoteAssets.at(path).url
   }
 
   implicit def properties(pairs: (AnyRef, AnyRef)*): util.Properties = {
