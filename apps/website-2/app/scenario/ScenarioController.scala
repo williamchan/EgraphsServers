@@ -8,12 +8,14 @@ import services.AppConfig
 import play.api.mvc.Action
 import play.api.mvc.BodyParser
 import play.api.templates.Html
+import services.http.filters.HttpFilters
 
 /**
  * Controller for all scenarios
  */
 object ScenarioController extends Controller {
   protected val controllerMethod = AppConfig.instance[ControllerMethod]
+  protected val filters = AppConfig.instance[HttpFilters]  
 
   /**
    * Performs a code block only if the project's Scenarios library is available.
@@ -46,11 +48,13 @@ object ScenarioController extends Controller {
    *
    * @return 200 (Ok) if successful.
    */
-  def clear = controllerMethod() {
-    withRegisteredScenarios {
-      Action {
-        Scenario.clearAll()
-        Ok("All scenarios cleared.")
+  def clear = filters.requireApplicationId.test {
+    controllerMethod() {
+      withRegisteredScenarios {
+        Action {
+          Scenario.clearAll()
+          Ok("All scenarios cleared.")
+        }
       }
     }
   }
@@ -60,13 +64,15 @@ object ScenarioController extends Controller {
    *
    * @return 200 (Ok) and the list if successful.
    */
-  def list = controllerMethod() {
-    withRegisteredScenarios {
-      Action {
-        val scenarios = Scenario.allCategories.toList.sortWith((a, b) => a._1 < b._1).map { case (category, catScenarios) =>
-          (category, catScenarios.toSeq.sortWith((a, b) => a.name < b.name))
+  def list = filters.requireApplicationId.test {
+    controllerMethod() {
+      withRegisteredScenarios {
+        Action {
+          val scenarios = Scenario.allCategories.toList.sortWith((a, b) => a._1 < b._1).map { case (category, catScenarios) =>
+            (category, catScenarios.toSeq.sortWith((a, b) => a.name < b.name))
+          }
+          Ok(views.html.nonproduction.scenarios(scenarios))
         }
-        Ok(views.html.nonproduction.scenarios(scenarios))
       }
     }
   }
@@ -76,29 +82,31 @@ object ScenarioController extends Controller {
    *
    * @return 200 (Ok) and a useful human-readable message if successful.
    */
-  def scenario (urlSlug: String) = controllerMethod() {
-    withRegisteredScenarios {
-      Action {
-        Scenario.withSlug(urlSlug) match {
-          case Some(existingScenario) => {
-            existingScenario.play() match {
-              case aResult: Result =>
-                aResult
-              case _ =>
-                Ok(Html(
-                  "Scenario <pre>"
-                    + urlSlug
-                    + "</pre> successfully replayed.<br/><br/>"
-                    + existingScenario.description
-                ))
+  def scenario (urlSlug: String) = filters.requireApplicationId.test { 
+    controllerMethod() {
+      withRegisteredScenarios {
+        Action {
+          Scenario.withSlug(urlSlug) match {
+            case Some(existingScenario) => {
+              existingScenario.play() match {
+                case aResult: Result =>
+                  aResult
+                case _ =>
+                  Ok(Html(
+                    "Scenario <pre>"
+                      + urlSlug
+                      + "</pre> successfully replayed.<br/><br/>"
+                      + existingScenario.description
+                  ))
+              }
             }
-          }
-  
-          case None => {
-            NotFound(
-              "No scenario was found with the name \"" + urlSlug + "\"."+
-                "View available scenarios at " + controllers.website.nonproduction.routes.ScenarioController.list().url
-            )
+    
+            case None => {
+              NotFound(
+                "No scenario was found with the name \"" + urlSlug + "\"."+
+                  "View available scenarios at " + controllers.website.nonproduction.routes.ScenarioController.list().url
+              )
+            }
           }
         }
       }

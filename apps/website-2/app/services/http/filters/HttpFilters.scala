@@ -6,6 +6,7 @@ import com.google.inject.Inject
 class HttpFilters @Inject()(
   val requireAccountEmail: RequireAccountEmail,
   val requireAdministratorLogin: RequireAdministratorLogin,
+  val requireApplicationId: RequireApplicationId,
   val requireAuthenticatedAccount: RequireAuthenticatedAccount,
   val requireAuthenticityTokenFilter: RequireAuthenticityTokenFilter,
   val requireCelebrityId: RequireCelebrityId,
