@@ -8,8 +8,7 @@ import scala.annotation.tailrec
  * Front-end utilities that otherwise had no home.
  */
 object Utils {
-  val cdnEnabled = Play.application().configuration().getString("cdn.enabled")
-  val cdnUrl = Play.application().configuration().getString("cloudfront.domain")
+
   /**
    * Formats a series of String / String tuples into an attribute string suitable for
    * use in an HTML tag. This is most useful when writing a wrapper around the creation
@@ -31,27 +30,6 @@ object Utils {
 
     attributeStrings.mkString(" ")
   }
-
-//  /**
-//   * Drop-in replacement for @routes.RemoteAssets.at. Use to take advantage of cloudfront on live.
-//   * Paths are always absolute to root. Leading '/' is optional.
-//   *
-//   * @param path relative to the application root. This should usually be "public/some-file"
-//   * @return path to asset on the currently configured CDN.
-//   */
-//  def cdnAsset(path: String) : String = {
-//    cdnEnabled match {
-//      case "true" =>
-//        path(0) match {
-//          case '/' => "https://" + cdnUrl + path
-//          case _ =>  "https://" + cdnUrl + "/" + path
-//        }
-//
-//      case _ =>
-//        val file = new File(path)
-//        RemoteAssets.at(file.getParent, file.getName)
-//    }
-//  }
 
   /**
    * Creates slug from string.

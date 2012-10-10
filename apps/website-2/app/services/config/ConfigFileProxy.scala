@@ -27,7 +27,7 @@ class ConfigFileProxy @Inject() (protected val playConfig: Configuration) extend
   val blobstoreAllowScrub = boolean("blobstore.allowscrub")
   val cdnEnabled = boolean("cdn.enabled")
   val cdn = if (!cdnEnabled) None else Some(new AnyRef {
-    val cloudfrontDomain = string("cloudfront.domain")
+    val cdnContentUrl = string("cdn.contenturl")
   })
   val dbDefaultAllowScrub = boolean("db.default.allowscrub")
   val dbDefaultUrl = string("db.default.url")
