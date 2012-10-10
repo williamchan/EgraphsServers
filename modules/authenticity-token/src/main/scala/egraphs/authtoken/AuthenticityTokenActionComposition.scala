@@ -1,37 +1,19 @@
 package egraphs.authtoken
 
 import egraphs.playutils.RichResult._
-
-import play.api.mvc.Action
-import play.api.data.Form
-import play.api.data.Forms.single
-import play.api.data.Forms.text
-import play.api.libs.Crypto
 import play.api.mvc.BodyParser
 import play.api.mvc.BodyParsers.parse
 import play.api.mvc.Results.{Forbidden}
 import play.api.mvc.RequestHeader
-import play.api.templates.{Html, HtmlFormat}
+import play.api.mvc.Action
+import play.api.data.Form
+import play.api.data.Forms.single
+import play.api.data.Forms.text
 
-class AuthenticityToken(private[authtoken] val value: String)
-
-object AuthenticityToken 
-  extends AuthenticityTokenActionComposition 
-  with AuthenticityTokenFormHelpers 
-{
-  //
-  // AuthenticityTokenActionComposition members
-  //
-  override protected def newAuthTokenString = {
-    Crypto.sign(java.util.UUID.randomUUID.toString)
-  }
-
-  //
-  // Private members
-  //
-  private[authtoken] val authTokenKey = "authenticityToken"  
-}
-
+/**
+ * A pair of action compositions that protect your POST methods against CSRF submissions
+ * and provide authenticity tokens to your templates.
+ */
 private [authtoken] trait AuthenticityTokenActionComposition {
   import AuthenticityToken.authTokenKey
 
@@ -114,23 +96,5 @@ private [authtoken] trait AuthenticityTokenActionComposition {
   //
   private def newAuthToken: AuthenticityToken = {
     new AuthenticityToken(newAuthTokenString)
-  }
-}
-
-private[authtoken] trait AuthenticityTokenFormHelpers {
-  import AuthenticityToken.authTokenKey
-
-  def safeForm(attributes: (String, String)*)(contents: => Html)(implicit token: AuthenticityToken): Html = {
-    val attributeStrings = for (nameValue <- attributes) yield {
-      nameValue._1 + "=\"" + nameValue._2+ "\""
-    }
-
-    val attributeHtml = HtmlFormat.escape(attributeStrings.mkString(" "))    
-
-    Html("<form ") + attributeHtml + Html(">") + hiddenInput + contents + Html("</form>")
-  }
-
-  def hiddenInput(implicit token: AuthenticityToken): Html = {
-    Html("<input type='hidden' name='" + authTokenKey + "'>" + token.value + "</input>")
   }
 }
