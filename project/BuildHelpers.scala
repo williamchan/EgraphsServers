@@ -20,7 +20,9 @@ object BuildHelpers {
       "play" %% "play-test" % PlayVersion.current % "test"
     ),
 
-    shellPrompt := playPrompt
+    shellPrompt := playPrompt,
+
+    commands ++= Seq(playCommand)
   )
 
   object ModuleProject {
