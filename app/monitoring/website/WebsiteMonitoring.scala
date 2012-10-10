@@ -1,50 +1,67 @@
 package monitoring.website
 
 import akka.actor._
-import play.libs.Akka
 import akka.util.duration._
+import akka.util.Timeout
+import akka.dispatch.Future
+import akka.dispatch.Await
+
 import scala.collection.mutable.HashMap
+import scala.collection.immutable.List
+
 import common.CloudWatchMetricPublisher
+import java.util.ArrayList
+import play.libs.Akka
 
 object WebsiteMonitoring {
-  
-  val map = new HashMap[String, String]
+
+  private var urlsAndNames = List[(String, String)]()
+  private var actors = List[ActorRef]()
 
   def init() = {
-    getURLs
-    scheduleJob
-  }
-  
-  private def getURLs = {
-    
-    // NOT CURRENTLY USED, ASK MYYK
-    
-    // add additional URLs here
-    map += "frontPageURL" -> "https://www.egraphs.com/"
-    map += "photoPageURL" -> "https://www.egraphs.com/Pedro-Martinez/photos"
-    map += "staticPageURL" -> "https://www.egraphs.com/about"
-    
+    getUrlsAndNames
+    scheduleWebsiteMonitoringJobs
   }
 
-  private def scheduleJob() = {
+  private def getUrlsAndNames = {
 
-    val frontPageURL = "https://www.egraphs.com/"
-    val photoPageURL = "https://www.egraphs.com/Pedro-Martinez/photos"
-    val staticPageURL = "https://www.egraphs.com/about"
+    // add new URL/actor name pairs to check here
+    urlsAndNames = List(("https://www.egraphs.com/", "frontPageAvailabilityActor"),
+      ("https://www.egraphs.com/Pedro-Martinez/photos", "photoPageAvailabilityActor"),
+      ("https://www.egraphs.com/about", "staticPageeAvailabilityActor"))
+  }
 
-    val myFrontPageActor = Akka.system.actorOf(
-      Props(new WebsiteAvailabilityActor(frontPageURL, new CloudWatchMetricPublisher)), 
-      name = "frontPageAvailabilityActor")
-    Akka.system.scheduler.schedule(0 seconds, 1 minute, myFrontPageActor, CheckStatus)
+  private def scheduleWebsiteMonitoringJobs = {
 
-    val myPhotoPageActor = Akka.system.actorOf(
-      Props(new WebsiteAvailabilityActor(photoPageURL, new CloudWatchMetricPublisher)), 
-      name = "photoPageAvailabilityActor")
-    Akka.system.scheduler.schedule(0 seconds, 1 minute, myPhotoPageActor, CheckStatus)
+    actors = for ((url, actorName) <- urlsAndNames) yield {
+      val myCurrentActor = Akka.system.actorOf(
+        Props(new WebsiteAvailabilityActor(url, new CloudWatchMetricPublisher)),
+        name = actorName)
+      Akka.system.scheduler.schedule(0 seconds, 1 minute, myCurrentActor, CheckStatus)
 
-    val myStaticPageActor = Akka.system.actorOf(
-      Props(new WebsiteAvailabilityActor(staticPageURL, new CloudWatchMetricPublisher)), 
-      name = "staticPageeAvailabilityActor")
-    Akka.system.scheduler.schedule(0 seconds, 1 minute, myStaticPageActor, CheckStatus)
+      myCurrentActor
+    }
+  }
+
+  def getActorInfo: HashMap[String, List[Int]] = {
+
+    var map = HashMap[String, List[Int]]()
+
+    import akka.pattern.{ ask, pipe }
+    case class Result(url: String, history: List[Int])
+
+    for ((actor) <- actors) yield {
+      implicit val timeout = Timeout(5 seconds)
+
+      val f: Future[Result] =
+        for {
+          url <- ask(actor, GetUrl).mapTo[String]
+          history <- ask(actor, GetHistory).mapTo[List[Int]]
+        } yield Result(url, history)
+
+      val result = Await.result(f, timeout.duration)
+      map += (result.url -> result.history)
+    }
+    return map
   }
 }

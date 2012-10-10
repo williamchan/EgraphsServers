@@ -8,13 +8,12 @@ import com.amazonaws.services.cloudwatch.model.Dimension
 import java.util.Date
 
 object WebsiteHistory {
-  
+
   private val ONE_HOUR_IN_MILLISECONDS = 3600000
-  private val THREE_MINUTES_IN_MILLISECONDS = 180000 
+  private val THREE_MINUTES_IN_MILLISECONDS = 180000
 
   def getHistory(cloudwatch: AmazonCloudWatch, lastMinutes: Int): GetMetricStatisticsResult = {
-    println("gettin' some history")
-    
+
     val getRequest = new GetMetricStatisticsRequest()
       .withStartTime(new Date(new Date().getTime() - ONE_HOUR_IN_MILLISECONDS))
       .withNamespace("SiteAvailability")
@@ -23,14 +22,7 @@ object WebsiteHistory {
       .withMetricName("SiteAvailability")
       .withStatistics("Average", "SampleCount")
       .withEndTime(new Date())
-      
-    val result = cloudwatch.getMetricStatistics(getRequest)
-    println("got some history question mark?")
-    println("result is " + result.toString)
-    
-    result
 
-
+    cloudwatch.getMetricStatistics(getRequest)
   }
-
 }

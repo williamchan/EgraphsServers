@@ -9,14 +9,18 @@ import common.MetricPublisher
 import collections.LimitedQueue
 
 case class CheckStatus()
+case class GetUrl()
+case class GetHistory()
 
 class WebsiteAvailabilityActor(url: String, pub: MetricPublisher) extends Actor with ActorLogging {
 
-  val history = new LimitedQueue[Int](60)
+  private val history = new LimitedQueue[Int](60)
 
   def receive() = {
 
     case CheckStatus => checkStatus
+    case GetUrl => sender ! url
+    case GetHistory => sender ! history.toList
     case _ => println("Cannot handle this message")
   }
 
