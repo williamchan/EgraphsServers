@@ -18,8 +18,7 @@ private[blobs] class BlobVendorProvider @Inject() (
 {
   private val blobstoreType = config.blobstoreVendor
   private val cdnEnabled = config.cdnEnabled
-  private val maybeCdnDomain = config.cdn.map(cdnConfig => cdnConfig.cloudfrontDomain)
-  
+  private val maybeCdnDomain = config.cdn.map(cdnConfig => cdnConfig.cdnContentUrl)
 
   def get() = {
     blobstoreType match {
