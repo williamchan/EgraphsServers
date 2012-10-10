@@ -143,3 +143,6 @@ GET     /:celebrityUrlSlug/photos/:productUrlSlug/purchase-error    controllers.
 #POST    /{celebrityUrlSlug}/{productUrlSlug}/buy-demo               controllers.WebsiteControllers.postBuyDemoProduct
 
 GET     /assets/*file                                               controllers.RemoteAssets.at(path="/public", file)
+
+# Redirect any requests with trailing slashes to the slash-less version.
+GET     $resourcePath<.*>/                                          controllers.SlayTrailingSlashesController.slayTrailingSlashes(resourcePath)
