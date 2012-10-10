@@ -34,7 +34,7 @@ private [authtoken] trait AuthenticityTokenActionComposition {
   def requireInSubmission[A](action: Action[A]): Action[A] = {
     Action(action.parser) { implicit request =>
       // Read the auth token from both the session and the request and make sure they match.
-      val maybeResult = for {
+      val maybeSafeResult = for {
         sessionToken <- request.session.get(authTokenKey)
         formToken <- Form(single(authTokenKey -> text)).bindFromRequest.apply(authTokenKey).value
         if (sessionToken == formToken)
@@ -43,7 +43,7 @@ private [authtoken] trait AuthenticityTokenActionComposition {
       }
 
       // Reset the auth token if any part of our checks failed.
-      maybeResult.getOrElse {
+      maybeSafeResult.getOrElse {
         Forbidden.withSession(request.session + (authTokenKey -> newAuthToken.value))
       }
     }

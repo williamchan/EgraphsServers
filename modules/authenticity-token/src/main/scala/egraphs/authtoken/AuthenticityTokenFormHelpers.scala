@@ -18,4 +18,3 @@ private[authtoken] trait AuthenticityTokenFormHelpers {
     Html("<input type=\"hidden\" name=\"" + authTokenKey + "\" value=\"" + token.value + "\" />")
   }
 }
-

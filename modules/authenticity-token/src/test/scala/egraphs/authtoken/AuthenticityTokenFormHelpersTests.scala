@@ -4,7 +4,7 @@ import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 import play.api.templates.Html
 
-class AuthenticityTokenFormHelpersSpec extends FlatSpec with ShouldMatchers {
+class AuthenticityTokenFormHelpersTests extends FlatSpec with ShouldMatchers {
   "AuthenticityToken.hiddenInput" should "inject a hidden input" in {
     implicit val token = new AuthenticityToken("test-token")
 
@@ -20,7 +20,6 @@ class AuthenticityTokenFormHelpersSpec extends FlatSpec with ShouldMatchers {
 
     formHtml.toString should be (
       """<form prop1="value1" prop2="value2"><input type="hidden" name="authenticityToken" value="token-secret" />content</form>"""      
-    )
-    println(formHtml)
+    )    
   }
 }

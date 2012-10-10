@@ -13,8 +13,12 @@ object BuildHelpers {
       "Typesafe Snapshots Repository" at "http://repo.typesafe.com/typesafe/snapshots/"
     ),
     
-    libraryDependencies += "play" % "play_2.9.1" % PlayVersion.current,    
-    libraryDependencies += "org.scalatest" %% "scalatest" % "1.8" % "test",
+    libraryDependencies ++= Seq(
+      "play" %% "play" % PlayVersion.current,    
+    
+      "org.scalatest" %% "scalatest" % "1.8" % "test",
+      "play" %% "play-test" % PlayVersion.current % "test"
+    ),
 
     shellPrompt := playPrompt
   )
