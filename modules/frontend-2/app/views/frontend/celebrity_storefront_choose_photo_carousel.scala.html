@@ -5,11 +5,10 @@
   recentEgraphs: Iterable[models.frontend.storefront.ChoosePhotoRecentEgraph],
   partnerIcons: Iterable[models.frontend.storefront.ChoosePhotoPartnerIcon]
 )(
-  /* implicit session: play.api.mvc.Session */
-  implicit
-  headerData: models.frontend.header.HeaderData, 
+  implicit headerData: models.frontend.header.HeaderData, 
   footerData: models.frontend.footer.FooterData,
-  storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs
+  storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs,
+  authToken: egraphs.authtoken.AuthenticityToken
 )
 
 @{/**
@@ -27,7 +26,8 @@
      storefrontBreadcrumbs - see base_celebrity_storefront_template
 */}
 
-@import views.html.frontend.tags.{storefront_breadcrumbs_responsive, safeForm}
+@import egraphs.authtoken.AuthenticityToken.safeForm
+@import views.html.frontend.tags.storefront_breadcrumbs_responsive
 @import _root_.frontend.formatting.MoneyFormatting.Conversions._
 @import _root_.frontend.formatting.DateFormatting.Conversions._
 
@@ -79,7 +79,7 @@
 
                       <p>
                         @if(product.quantityRemaining > 0){
-                          @safeForm("action" -> product.personalizeLink, "method" -> "POST") {
+                          @safeForm('action -> product.personalizeLink, 'method -> "POST") {
                             <button type="submit" class="button">
                               <strong>Personalize</strong><span>&raquo;</span>
                             </button>

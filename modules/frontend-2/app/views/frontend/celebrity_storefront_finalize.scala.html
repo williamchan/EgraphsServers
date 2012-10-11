@@ -4,15 +4,15 @@
 )(
   implicit headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData,
-  storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs
-  /* session: play.api.mvc.Session */
+  storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs,
+  authToken: egraphs.authtoken.AuthenticityToken
 )
 @{/** Renders the final page in the purchase flow.
 
       model - the ViewModel for rendering the page.
 */}
 
-
+@import egraphs.authtoken.AuthenticityToken.safeForm
 @import views.html.frontend.tags.storefront_breadcrumbs_responsive
 @import views.html.frontend.tags
 @import _root_.frontend.formatting.MoneyFormatting.Conversions._
@@ -44,7 +44,7 @@
 					
 						<div class="finalize clearfix">
 					
-	    				@tags.safeForm("class" -> "main", "method" -> "POST", "action" -> model.purchaseUrl) {
+	    				@safeForm('class -> "main", 'method -> "POST", 'action -> model.purchaseUrl) {
 
 	    					<div class="order-overview @orientation">
 	    						  

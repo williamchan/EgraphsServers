@@ -1,7 +1,7 @@
 @(model: models.frontend.storefront.OrderCompleteViewModel
 )(implicit headerData: models.frontend.header.HeaderData,
-  footerData: models.frontend.footer.FooterData
-  /* session: play.mvc.Scope.Session, */
+  footerData: models.frontend.footer.FooterData,
+  authToken: egraphs.authtoken.AuthenticityToken
 )
 
 @{/** Renders the Order Complete page in the celebrity storefront. This is the page displayed
@@ -10,6 +10,7 @@
       model - This page's viewmodel.
 */}
 
+@import egraphs.authtoken.AuthenticityToken.safeForm
 @import _root_.frontend.formatting.MoneyFormatting.Conversions._
 @import _root_.frontend.formatting.DateFormatting.Conversions._
 
@@ -129,7 +130,7 @@
 	  			<div>
 	  				<p>Are you sure you want to cancel your order for @model.celebName's Egraph?</p>
             @{/** Un-Comment when we support cancelling.
-            @tags.safeForm("method" -> "POST", "action" -> model.cancelOrderUrl) {
+            @safeForm('method -> "POST", 'action -> model.cancelOrderUrl) {
 	  				  <button class="btn" data-toggle="button">Cancel Order</button>
             }*/}
 	  				<button class="btn" data-toggle="button" data-dismiss="modal">Do Not Cancel</button>

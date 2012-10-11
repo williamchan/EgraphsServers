@@ -7,8 +7,8 @@
 )(
   implicit headerData: models.frontend.header.HeaderData, 
   footerData: models.frontend.footer.FooterData,
-  storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs
-  /* session: play.api.mvc.Session */
+  storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs,
+  authToken: egraphs.authtoken.AuthenticityToken
 )
 
 @{/** Renders the checkout page in the purchase flow.
@@ -21,8 +21,9 @@
       paymentPublicKey - the key used to identify our requests to our payment provider.
 */}
 
+@import egraphs.authtoken.AuthenticityToken.safeForm
 @import models.frontend.forms.{Field, FormError}
-@import views.html.frontend.tags.{storefront_breadcrumbs_responsive, bootstrap_text_input_field, bootstrap_input_field, safeForm}
+@import views.html.frontend.tags.{storefront_breadcrumbs_responsive, bootstrap_text_input_field, bootstrap_input_field}
 @import _root_.frontend.formatting.MoneyFormatting.Conversions._
 @import _root_.frontend.formatting.DateFormatting.Conversions._
 
@@ -54,7 +55,7 @@
           
             <div class="clearfix">
           
-              @safeForm("class" -> "main", "id" -> "checkout-form", "method" -> "post", "action" ->form.actionUrl) {
+              @safeForm('class -> "main", 'id -> "checkout-form", 'method -> "post", 'action -> form.actionUrl) {
                 <div class="order-overview @orientation">
                     
                     @tags.egraphPreview(

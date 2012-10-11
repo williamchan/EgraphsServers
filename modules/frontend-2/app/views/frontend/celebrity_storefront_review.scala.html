@@ -13,9 +13,11 @@
 )(
   implicit headerData: models.frontend.header.HeaderData, 
   footerData: models.frontend.footer.FooterData,
-	storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs
-	/* session: play.api.mvc.Session */
+	storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs,
+	authToken: egraphs.authtoken.AuthenticityToken
 )
+
+@import egraphs.authtoken.AuthenticityToken.safeForm
 
 @{/** The review order page in the purchase flow. This is also where they choose whether to
       buy a physical print or not.
@@ -88,7 +90,7 @@
 						
 						</figure>
 	
-	  				@tags.safeForm("action" ->  actionUrl, "method" -> "post", "class" -> "wrap") {
+	  				@safeForm('action ->  actionUrl, 'method -> "post", 'class -> "wrap") {
 	  				
 	  					<div class="clearfix">
 

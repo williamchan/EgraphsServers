@@ -1,10 +1,10 @@
 @(form:models.frontend.account.AccountRecoverForm, displayableErrors: List[String] = List())(
-/* implicit session: play.api.mvc.Session */
-implicit
+implicit authToken: egraphs.authtoken.AuthenticityToken,
 headerData: models.frontend.header.HeaderData,
 footerData: models.frontend.footer.FooterData
 )
 
+@import egraphs.authtoken.AuthenticityToken.safeForm
 @import views.html.frontend.tags
 @import views.html.frontend.tags.ng
 
@@ -12,7 +12,7 @@ footerData: models.frontend.footer.FooterData
 <section ng-cloak id="content" class="top" role="main" ng-controller="Controller">
   <div id="main" class="sub">
     <div class="container" id="settings-page">
-      @tags.safeForm("method" -> "POST", "action" -> "/account/recover"){
+      @safeForm('method -> "POST", 'action -> "/account/recover"){
       <section class="settings-group" id="password-reset">
         <div class="row-settings row-fluid">
           <div class="span12">

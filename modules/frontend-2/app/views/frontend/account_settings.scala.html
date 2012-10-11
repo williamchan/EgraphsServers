@@ -1,10 +1,10 @@
 @(form:models.frontend.account.AccountSettingsForm, displayableErrors: List[String] = List())(
-  /* implicit session: play.api.mvc.Session */
-  implicit
-  headerData: models.frontend.header.HeaderData, 
+  implicit authToken: egraphs.authtoken.AuthenticityToken,
+  headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData
 )
 
+@import egraphs.authtoken.AuthenticityToken.safeForm
 @import views.html.frontend.tags
 @import views.html.frontend.tags.ng
 
@@ -41,7 +41,7 @@
           <h1 style="display: inline-block;">Account Settings</h1>
 
         </header>
-      @tags.safeForm("method" -> "POST", "action" -> "/Account/settings"){
+      @safeForm('method -> "POST", 'action -> "/account/settings"){
         <section class="settings-group" id="personal-information">
           <h2>Personal Information</h2>
           @tags.ng.form_namevalue(model = "user.fullname", field={form.fullname}, label="Name")

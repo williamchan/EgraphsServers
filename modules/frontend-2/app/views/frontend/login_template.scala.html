@@ -10,12 +10,13 @@
   fbContent: => Html,
   fbAuthUrl: String,
   headJs: => Html = Html.empty
-)(implicit headerData: models.frontend.header.HeaderData, 
-  footerData: models.frontend.footer.FooterData
-  /* session: play.api.mvc.Session */
+)(
+  implicit headerData: models.frontend.header.HeaderData, 
+  footerData: models.frontend.footer.FooterData,
+  authToken: egraphs.authtoken.AuthenticityToken
 )
 
-@{/** Base template for rendering permutations of the 3-column login page. See login.scala.html
+@** Base template for rendering permutations of the 3-column login page. See login.scala.html
       for a good usage example.
 
       loginForm - the form for existing users to log in to our system.
@@ -33,8 +34,9 @@
           with Facebook.
 
       title, jsMain, headJs - See base_template
-*/}
+**@
 
+@import egraphs.authtoken.AuthenticityToken.safeForm
 @import views.html.frontend.tags
 @import views.html.frontend.tags.storefront_breadcrumbs_responsive
 @import models.frontend.forms.{Field, FormError}
@@ -53,10 +55,10 @@
   				
   					<section class="span4">
   					
-  						@tags.safeForm(
-                "action" -> loginForm.actionUrl, 
-                "method" -> "post", 
-                "class" -> "login-option"
+  						@safeForm(
+                'action -> loginForm.actionUrl, 
+                'method -> "post", 
+                'class -> "login-option"
                ) {
   						
   							<h2>@currentOwnerHeader</h2>
@@ -99,11 +101,11 @@
 
   					<section class="span4">
   					
-	  					@tags.safeForm(
-                "id" -> "new-account-form",
-                "action" -> newOwnerTargetUrl,
-                "method" -> "post",
-                "class" -> "login-option"
+	  					@safeForm(
+                'id -> "new-account-form",
+                'action -> newOwnerTargetUrl,
+                'method -> "post",
+                'class -> "login-option"
               ) {
 
 	  						<h2>@newOwnerHeader</h2>

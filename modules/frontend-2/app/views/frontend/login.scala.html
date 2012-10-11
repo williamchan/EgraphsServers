@@ -2,8 +2,8 @@
   registrationForm: models.frontend.login_page.AccountRegistrationFormViewModel,
   fbAuthUrl: String
 )(implicit headerData: models.frontend.header.HeaderData, 
-  footerData: models.frontend.footer.FooterData  
-  /* session: play.api.mvc.Session */
+  footerData: models.frontend.footer.FooterData,
+  authToken: egraphs.authtoken.AuthenticityToken
 )
 @{/** The page used to sign in existing customers. It contains a three-column layout that allows
       existing customers to sign in, non-customers to create accounts, and social media users to

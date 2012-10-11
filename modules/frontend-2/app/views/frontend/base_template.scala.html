@@ -1,8 +1,8 @@
 @(title: String, jsMain: String = "", headJs: => Html = Html.empty, body: => Html)(
   implicit headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData
-  /* session: play.mvc.Scope.Session, */
-  )
+  /*authToken: egraphs.authtoken.AuthenticityToken*/
+)
 
 @{/**
     Base template for the consumer website. It provides many hooks to customize
@@ -27,6 +27,8 @@
 
     footerData - extra implicit data necessary to render the footer.
 */}
+
+@import egraphs.authtoken.AuthenticityToken.safeForm
 @import views.html.frontend.tags
 @import controllers._
 
@@ -98,7 +100,7 @@
           <br>
           <img src='@RemoteAssets.at("images/modal-ipad.png")'/>
 
-          @tags.safeForm("id" ->"signup-form", "method" -> "POST", "action" -> "/subscribe") {
+          @*safeForm('id ->"signup-form", 'method -> "POST", 'action -> "/subscribe")*@ {
             <div>
               <label>Email:</label>
               <input class="input-xlarge" type="email" name="email" />
