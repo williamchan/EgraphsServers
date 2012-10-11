@@ -4,14 +4,12 @@ import play.api._
 import play.api.mvc._
 import models.frontend.login_page.{AccountRegistrationFormViewModel, LoginFormViewModel}
 import models.frontend.forms.{FormError, Field}
+import helpers.DefaultImplicitTemplateParameters
 
 /**
  * Permutations of the Checkout: Login.
  */
-object Login extends Controller
-  with DefaultHeaderAndFooterData
-  with DefaultStorefrontBreadcrumbs
-{
+object Login extends Controller with DefaultImplicitTemplateParameters {
   def storefront(recipient: Option[String]) = Action {
     Ok(LoginRenderArgs().copy(maybeGiftRecipient = recipient).renderCheckoutAsForm())
   }

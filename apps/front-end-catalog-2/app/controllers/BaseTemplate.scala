@@ -5,14 +5,18 @@ import play.api.mvc._
 import play.api.templates.Html
 import models.frontend.header.{HeaderLoggedIn, HeaderNotLoggedIn, HeaderData}
 import models.frontend.footer.FooterData
+import helpers.DefaultHeaderAndFooterData
+import helpers.DefaultImplicitTemplateParameters
+import helpers.DefaultAuthenticityToken
 
 /**
  * Permutations of the base template
  */
-object BaseTemplate extends Controller {
+object BaseTemplate extends Controller with DefaultAuthenticityToken
+{
   def notLoggedIn = Action {
-    implicit val headerData = defaultHeaderData
-    implicit val footerData = defaultFooterData
+    implicit val headerData = DefaultHeaderAndFooterData.defaultHeaderData
+    implicit val footerData = DefaultHeaderAndFooterData.defaultFooterData
 
     Ok(views.html.frontend.base_template(
       "Title",
@@ -31,8 +35,10 @@ object BaseTemplate extends Controller {
       "/logout"
     )
 
-    implicit val headerData = defaultHeaderData.copy(loggedInStatus=Right(loggedInStatus))
-    implicit val footerData = defaultFooterData
+    implicit val headerData = DefaultHeaderAndFooterData.defaultHeaderData.copy(
+      loggedInStatus=Right(loggedInStatus)
+    )
+    implicit val footerData = DefaultHeaderAndFooterData.defaultFooterData
 
     Ok(views.html.frontend.base_template(
       "Title",
@@ -42,35 +48,4 @@ object BaseTemplate extends Controller {
     ))
   }
 
-  val defaultFooterData = {
-    FooterData(
-      aboutUsLink="about-us",
-      faqLink="faq-link",
-      termsOfUseLink="terms-of-use",
-      privacyPolicyLink="privacy-policy",
-      careersPolicyLink="careers",
-      egraphsFacebookLink="http://www.facebook.com/egraphs",
-      egraphsTwitterLink="http://www.twitter.com/egraphs"
-    )
-  }
-
-  val defaultHeaderData = {
-    HeaderData(
-      loggedInStatus=Left(HeaderNotLoggedIn("/login-link")),
-      insideAnEgraphLink="inside-an-egraph",
-      egraphsFacebookLink="http://www.facebook.com/egraphs",
-      egraphsTwitterLink="http://www.twitter.com/egraphs"
-    )
-  }
-}
-
-/** Provides a controller with a default implicit def for HeaderData */
-trait DefaultHeaderAndFooterData {
-  implicit def headerData:HeaderData = {
-    BaseTemplate.defaultHeaderData
-  }
-
-  implicit def footerData:FooterData = {
-    BaseTemplate.defaultFooterData
-  }
 }

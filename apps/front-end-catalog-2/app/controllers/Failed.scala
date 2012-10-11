@@ -2,11 +2,9 @@ package controllers
 
 import play.api._
 import play.api.mvc._
+import helpers.DefaultImplicitTemplateParameters
 
-object Failed extends Controller
-with DefaultHeaderAndFooterData
-with DefaultStorefrontBreadcrumbs
-{
+object Failed extends Controller with DefaultImplicitTemplateParameters {
   def no_inventory = Action {
     Ok(views.html.frontend.celebrity_storefront_no_inventory(
       celebrityName = "{celebrity name}",

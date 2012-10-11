@@ -3,12 +3,13 @@ package controllers
 import play.api._
 import play.api.mvc._
 import models.frontend.contents.Section
+import helpers.DefaultImplicitTemplateParameters
 
 /**
  * Test controller for any generic static pages
  */
 
-object Static extends Controller with DefaultHeaderAndFooterData {
+object Static extends Controller with DefaultImplicitTemplateParameters {
   def simple_confirmation() = Action {
     Ok(views.html.frontend.simple_confirmation("Account Verified",
       """

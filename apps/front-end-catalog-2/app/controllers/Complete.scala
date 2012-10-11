@@ -4,14 +4,12 @@ import play.api._
 import play.api.mvc._
 import models.frontend.storefront.OrderCompleteViewModel
 import java.util
+import helpers.DefaultImplicitTemplateParameters
 
 /**
  * Permutations of the Checkout: Order Complete.
  */
-object Complete extends Controller
-  with DefaultHeaderAndFooterData
-  with DefaultStorefrontBreadcrumbs
-{
+object Complete extends Controller with DefaultImplicitTemplateParameters {
   def index = Action {
     Ok(views.html.frontend.celebrity_storefront_complete(defaultOrderCompleteViewModel))
   }

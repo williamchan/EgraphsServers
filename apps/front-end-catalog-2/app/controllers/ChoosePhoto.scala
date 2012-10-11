@@ -2,20 +2,17 @@ package controllers
 
 import play.api._
 import play.api.mvc._
-
 import models.frontend.storefront._
 import java.text.SimpleDateFormat
 import models.frontend.storefront.ChoosePhotoTileProduct
 import models.frontend.storefront.ChoosePhotoRecentEgraph
 import models.frontend.storefront.ChoosePhotoCelebrity
+import helpers.DefaultImplicitTemplateParameters
 
 /**
  * Permutations of the Celebrity Storefront: Choose Photo, tiled view.
  */
-object ChoosePhoto extends Controller
-  with DefaultHeaderAndFooterData
-  with DefaultStorefrontBreadcrumbs
-{
+object ChoosePhoto extends Controller with DefaultImplicitTemplateParameters {
   import frontend.formatting.MoneyFormatting.Conversions._
 
   val dateFormat = new SimpleDateFormat("yyyy-MM-dd")

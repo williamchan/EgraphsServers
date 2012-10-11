@@ -5,14 +5,12 @@ import play.api.mvc._
 import models.frontend.storefront.{PersonalizeMessageOption, StorefrontOrderSummary, PersonalizeForm}
 import java.util
 import models.frontend.forms.FormError
+import helpers.DefaultImplicitTemplateParameters
 
 /**
  * Permutations of the Checkout: Personalize.
  */
-object Personalize extends Controller
-  with DefaultHeaderAndFooterData
-  with DefaultStorefrontBreadcrumbs
-{
+object Personalize extends Controller with DefaultImplicitTemplateParameters {
 
   def index = Action {
     Ok(render())

@@ -4,14 +4,12 @@ import play.api._
 import play.api.mvc._
 import org.joda.money.Money
 import models.frontend.storefront._
+import helpers.DefaultImplicitTemplateParameters
 
 /**
  * Permutations of the Checkout: Finalize.
  */
-object Finalize extends Controller
-  with DefaultHeaderAndFooterData
-  with DefaultStorefrontBreadcrumbs
-{
+object Finalize extends Controller with DefaultImplicitTemplateParameters {
 
   def index = Action {
     Ok(views.html.frontend.celebrity_storefront_finalize(

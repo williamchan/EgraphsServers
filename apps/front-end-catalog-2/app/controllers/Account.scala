@@ -10,11 +10,12 @@ import models.frontend.account.{AccountRecoverForm, AccountPasswordResetForm, Ac
 import models.frontend.forms.Field
 import play.api.mvc.Request
 import play.data.DynamicForm
+import helpers.DefaultImplicitTemplateParameters
 
 /**
  * Test controller for viewing permutations of the account settings page.
  */
-object Account extends Controller with DefaultHeaderAndFooterData {
+object Account extends Controller with DefaultImplicitTemplateParameters {
 
   val roles = Map ("other" -> OtherGalleryControl,
                         "admin" -> AdminGalleryControl,

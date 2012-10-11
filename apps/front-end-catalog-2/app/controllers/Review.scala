@@ -6,13 +6,13 @@ import play.api.mvc.Controller
 import play.api.templates.Html
 import java.util
 import org.joda.money.{CurrencyUnit, Money}
+import helpers.DefaultImplicitTemplateParameters
 
 /**
  * Permutations of the Checkout: Review.
  */
 object Review extends Controller
-  with DefaultHeaderAndFooterData
-  with DefaultStorefrontBreadcrumbs
+  with DefaultImplicitTemplateParameters
 {
   def index = Action {
     Ok(DefaultRenderer().render)

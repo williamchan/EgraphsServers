@@ -3,11 +3,12 @@ package controllers
 import play.api._
 import play.api.mvc._
 import models.frontend.egraph.{LandscapeEgraphFrameViewModel, PortraitEgraphFrameViewModel}
+import helpers.DefaultImplicitTemplateParameters
 
 /**
  * Permutations of the Checkout: Checkout.
  */
-object Egraph extends Controller with DefaultHeaderAndFooterData {
+object Egraph extends Controller with DefaultImplicitTemplateParameters {
 
   //
   // Public members

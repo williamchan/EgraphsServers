@@ -3,8 +3,16 @@ package controllers
 import models.frontend.storefront.{StorefrontBreadcrumb, StorefrontBreadcrumbs}
 import play.api._
 import play.api.mvc._
+import helpers.DefaultImplicitTemplateParameters
+import helpers.DefaultAuthenticityToken
+import helpers.DefaultHeaderAndFooterData
 
-object StorefrontTemplate extends Controller with DefaultHeaderAndFooterData {
+object StorefrontTemplate 
+  extends Controller 
+  with DefaultHeaderAndFooterData 
+  with DefaultAuthenticityToken
+{
+
   import StorefrontBreadcrumb.CrumbChoice._
 
   def noneActiveOrComplete = Action {
@@ -60,12 +68,5 @@ object StorefrontTemplate extends Controller with DefaultHeaderAndFooterData {
     )
 
     lookup(crumbIndex)
-  }
-}
-
-
-trait DefaultStorefrontBreadcrumbs {
-  implicit val defaultBreadcrumbs = {
-    StorefrontTemplate.defaultBreadcrumbs
   }
 }

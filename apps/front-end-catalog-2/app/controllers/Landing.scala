@@ -3,11 +3,12 @@ package controllers
 import play.api._
 import play.api.mvc._
 import models.frontend.landing.CatalogStar
+import helpers.DefaultImplicitTemplateParameters
 
 /**
  * Permutations of the landing page
  */
-object Landing extends Controller with DefaultHeaderAndFooterData {
+object Landing extends Controller with DefaultImplicitTemplateParameters {
 
   /**
    * Displays a permutation of the landing page with "catalog stars" counting

@@ -5,14 +5,12 @@ import play.api.mvc._
 import models.frontend.storefront.{CheckoutOrderSummary, CheckoutShippingAddressFormView, CheckoutBillingInfoView, CheckoutFormView}
 import org.joda.money.{CurrencyUnit, Money}
 import models.frontend.forms.Field
+import helpers.DefaultImplicitTemplateParameters
 
 /**
  * Permutations of the Checkout: Checkout.
  */
-object Checkout extends Controller
-  with DefaultHeaderAndFooterData
-  with DefaultStorefrontBreadcrumbs
-{
+object Checkout extends Controller with DefaultImplicitTemplateParameters {
   //
   // Public members
   //
