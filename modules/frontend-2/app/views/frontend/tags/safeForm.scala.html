@@ -1,7 +1,0 @@
-@(attributeTuples: (String, String)*)(formContent: => Html)(/* implicit session: play.api.mvc.Session */)
-
-@import views.frontend.Utils
-
-<form name="form" @Html(Utils.formatAttributeTuplesToHtml(attributeTuples: _*)) >
-  @formContent
-</form>

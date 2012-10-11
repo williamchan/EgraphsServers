@@ -45,13 +45,12 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
   }
 
   private def makeSampleStar(name: String, secondaryText: Option[String]): CatalogStar = {
-    import views.frontend.Utils.slugify
 
     CatalogStar(
       name,
       secondaryText,
       sampleImageUrl,
-      "/" + slugify(name),
+      "/" + name,
       hasInventoryRemaining = true,
       isFeatured = false
     )

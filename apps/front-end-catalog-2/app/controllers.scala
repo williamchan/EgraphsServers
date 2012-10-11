@@ -18,74 +18,6 @@ object Application extends Controller {
     Ok(views.html.catalog())
   }
 
-//  def route(controllerName: String, actionName: String) = Action {
-//    try {
-//      val controller = Class.forName("controllers." + controllerName)
-//      val m = controller.getDeclaredMethods()
-//      for (i <- 0 until m.length) {
-//          println(m(i).toString())
-//      }
-//      val action = controller.getMethod(actionName)
-//      println(action)
-//    } catch {
-//      case e: Exception => println(e)
-//    }
-//
-//    Ok("You want to do: " + controllerName + " " + actionName)
-//  }
-//
-  
-  //#GET     /:controller/:action                    controllers.Application.route2(controller: String, action: String, user: Option[String], publicName: Option[String], casualName: Option[String], count: Option[Int], num: Option[Int], crumbIndex: Option[Int], focus: Option[Int])
-//  def route2(controllerName: String, actionName: String,
-//             user: Option[String],
-//             publicName: Option[String],
-//             casualName: Option[String],
-//             count: Option[Int],
-//             num: Option[Int],
-//             crumbIndex: Option[Int],
-//             focus: Option[Int]) = Action {
-//    var action: Method = null
-//    var parameters:List[Any] = List[Any]()
-//    val controller = Class.forName("controllers." + controllerName)
-//    try {
-//      if(user.isDefined) {
-//        parameters = user.get :: parameters 
-//      }
-//      if(count.isDefined) {
-//        parameters = count.get :: parameters
-//      }
-//
-//      val m = controller.getDeclaredMethods()
-//      for (i <- 0 until m.length) {
-//          println(m(i).toString())
-//      }
-//
-//      def classToType(clazz: Class[_]): Class[_] = {
-//        clazz.getName() match {
-//          case "java.lang.Integer" => Integer.TYPE 
-//          case _ => clazz
-//        }
-//      }
-//      
-//      val parameterTypes: Array[java.lang.Class[_]] = parameters.map(param => classToType(param.getClass())).toArray
-//      action = controller.getMethod(actionName, parameterTypes: _*)
-//      println(action)
-//    } catch {
-//      case e: Exception => println(e)
-//    }
-//
-//    //TODO: remove this and debug line
-//    if(action == null) {
-//      Ok("You want to do: " + controllerName + " " + actionName + " num = " + num + " METHOD = " + action)
-//    } else {
-//      val args: Array[Any] = parameters.toArray
-////      val controllerObj = controller.newInstance()
-////            println("\nDoing this\n" + action + " " + parameters + "  controller = " + controllerObj)
-//      val html = action.invoke(null, args)
-//      Ok(html.asInstanceOf[Html])
-//    }
-//  }
-
   /**
    * Shows a very simple template. Located at /Application/simple_example
    */
@@ -114,21 +46,3 @@ object Application extends Controller {
   }
 }
 
-
-/** Test controllers for the @safeForm tag. */
-object SafeFormTestController extends Controller {
-  import views.html
-
-  def safeFormGET = {
-    html.safeFormTest(postWasAuthenticated="Post not authenticated")
-  }
-
-  def safeFormPOST(authenticityToken: String) = {
-//    if (session.getAuthenticityToken != authenticityToken) {
-//      Forbidden
-//    }
-//    else {
-      html.safeFormTest(postWasAuthenticated="Post authenticated")
-//    }
-  }
-}

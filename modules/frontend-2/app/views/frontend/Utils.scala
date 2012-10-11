@@ -10,50 +10,6 @@ import scala.annotation.tailrec
 object Utils {
 
   /**
-   * Formats a series of String / String tuples into an attribute string suitable for
-   * use in an HTML tag. This is most useful when writing a wrapper around the creation
-   * of HTML tags, for example if making a @safeForm tag that always provides an authenticity
-   * token.
-   * 
-   * For example, if used in a template:
-   * {{{
-   *   <form @formatAttributeTuplesToHtml("method" -> "GET")>
-   *   
-   *   // renders as
-   *   <form method="GET">
-   * }}}
-   */
-  def formatAttributeTuplesToHtml(tuples: (String, String)*): String = {
-    val attributeStrings = for ((name, value) <- tuples) yield {
-      name + " = \"" + value + "\""
-    }
-
-    attributeStrings.mkString(" ")
-  }
-
-  /**
-   * Creates slug from string.
-   * source: https://github.com/julienrf/chooze/blob/master/app/util/Util.scala#L6
-   */
-  def slugify(str: String): String = {
-    import java.text.Normalizer
-    Normalizer.normalize(str, Normalizer.Form.NFD).replaceAll("[^\\w ]", "").replace(" ", "-").toLowerCase
-  }
-  
-  @tailrec
-  def generateUniqueSlug(slug: String, existingSlugs: Seq[String]): String = {
-    if (!(existingSlugs contains slug)) {
-      slug
-    } else {
-      val EndsWithNumber = "(.+-)([0-9]+)$".r
-      slug match {
-        case EndsWithNumber(s, n) => generateUniqueSlug(s + (n.toInt + 1), existingSlugs)
-        case s => generateUniqueSlug(s + "-2", existingSlugs)
-      }
-    }
-  }
-
-  /**
    *  Returns a string for an angular.js binding
    *
    **/
