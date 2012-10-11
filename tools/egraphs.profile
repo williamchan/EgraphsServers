@@ -40,8 +40,11 @@ export EG_MOD_FRONTEND=$EG_MODULES/frontend
 # Shortened convenience variables
 export eg=$EG_HOME
 export egw=$EG_APP_WEBSITE
+export egw2=$EG_APP_WEBSITE-2
 export egf=$EG_MOD_FRONTEND
+export egf2=$EG_MOD_FRONTEND-2
 export egc=$EG_APP_CATALOG
+export egf2=$EG_APP_CATALOG-2
 
 # Servers
 export eg_monitoring=ec2-50-16-114-74.compute-1.amazonaws.com
