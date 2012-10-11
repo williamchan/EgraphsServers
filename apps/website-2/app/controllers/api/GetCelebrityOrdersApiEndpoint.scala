@@ -28,8 +28,7 @@ private[controllers] trait GetCelebrityOrdersApiEndpoint { this: Controller =>
         Action {
           signerActionable match {
             case None | Some(false) =>
-              //TODO: PLAY20: Maybe this shouldn't be an InternalServerError, but I don't know how this would change the device code if it changed.
-              InternalServerError("Please pass in signerActionable=true")
+              BadRequest("Please pass in signerActionable=true")
   
             case _ => {
               val orders = orderStore.findByCelebrity(celeb.id, orderQueryFilters.actionableOnly: _*)

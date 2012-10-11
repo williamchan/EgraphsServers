@@ -25,10 +25,7 @@ class ConfigFileProxy @Inject() (protected val playConfig: Configuration) extend
   val s3Id = string("s3.id")
   val s3Secret = string("s3.secret")
   val blobstoreAllowScrub = boolean("blobstore.allowscrub")
-  val cdnEnabled = boolean("cdn.enabled")
-  val cdn = if (!cdnEnabled) None else Some(new AnyRef {
-    val cdnContentUrl = string("cdn.contenturl")
-  })
+  val cdnContentUrl = playConfig.getString("cdn.contenturl")
   val dbDefaultAllowScrub = boolean("db.default.allowscrub")
   val dbDefaultUrl = string("db.default.url")
   val dbDefaultDriver = string("db.default.driver")

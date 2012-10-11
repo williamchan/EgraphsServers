@@ -17,14 +17,13 @@ private[blobs] class BlobVendorProvider @Inject() (
 ) extends InjectionProvider[BlobVendor]
 {
   private val blobstoreType = config.blobstoreVendor
-  private val cdnEnabled = config.cdnEnabled
-  private val maybeCdnDomain = config.cdn.map(cdnConfig => cdnConfig.cdnContentUrl)
+  private val maybeCdnDomain = config.cdnContentUrl
 
   def get() = {
     blobstoreType match {
       case "s3" =>
-        (cdnEnabled, maybeCdnDomain) match {
-          case (true, Some(cdnDomain)) => decorateCDN(decorateCache(s3), cdnDomain)
+        maybeCdnDomain match {
+          case Some(cdnDomain) => decorateCDN(decorateCache(s3), cdnDomain)
           case _      => decorateCache(s3)
         }
 
