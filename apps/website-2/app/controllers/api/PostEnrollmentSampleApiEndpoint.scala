@@ -30,7 +30,6 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
   protected def enrollmentBatchServices: EnrollmentBatchServices
   protected def enrollmentBatchStore: EnrollmentBatchStore
 
-  //TODO: PLAY20: take a look at PostCelebrityOrderApiEndpoint.postCelebrityOrder for some clues on how to do some of this, but there is more than that.
   def postEnrollmentSample(/*@Required signature: String,
                            @Required audio: String,
                            skipBiometrics: Boolean = false /*todo(wchan): remove skipBiometrics parameter*/*/) =
