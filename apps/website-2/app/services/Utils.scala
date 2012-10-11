@@ -164,6 +164,7 @@ class Utils @Inject() {
    *
    * @return a valid path, or throw an exception
    */
+  @deprecated("this is balls", "don't use this balls")
   def asset(path: String): String = {
     controllers.routes.RemoteAssets.at(path).url
   }

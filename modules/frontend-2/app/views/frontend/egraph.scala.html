@@ -25,17 +25,17 @@
     <title>@signerName egraph for @recipientName</title>
     <!-- svg shim for IE -->
     <!--[if lt IE 9]>
-      <script src="@routes.RemoteAssets.at("svgweb/src/svg.js")" type="text/javascript"></script>
+      <script src="@RemoteAssets.at("svgweb/src/svg.js")" type="text/javascript"></script>
     <![endif]-->
 
     <!-- Styles go here  -->
-    <link href='@routes.RemoteAssets.at("stylesheets/egraph.css")'
+    <link href='@RemoteAssets.at("stylesheets/egraph.css")'
           rel="stylesheet" 
           type="text/css">
-    <link href='@routes.RemoteAssets.at("soundmanager/360-player/360player.css")'
+    <link href='@RemoteAssets.at("soundmanager/360-player/360player.css")'
           rel="stylesheet"
           type="text/css">
-    <link href='@routes.RemoteAssets.at("soundmanager/360-player/360player-visualization.css")'
+    <link href='@RemoteAssets.at("soundmanager/360-player/360player-visualization.css")'
           rel="stylesheet" 
           type="text/css">
     @tags.analytics()
@@ -66,13 +66,13 @@
             <div class="egraph">
               <div class="frame">
                 <div class="image-aperture">
-                  <iframe src='@(routes.RemoteAssets.at("images/" + signedImage))' class="signed-photo" alt="Signed photo"></iframe>
+                  <iframe src='@(RemoteAssets.at("images/" + signedImage))' class="signed-photo" alt="Signed photo"></iframe>
                   <!-- <div class="fx-mat-glow"></div> The glow off the bottom edge of the matte -->
                   <div class="fx-mat-shadow"></div>               
                   <!-- <div class="fx-glass-shine"></div> The shine on top of the glass -->
                 </div>
                 <div class="plaque">
-                  <img src='@routes.RemoteAssets.at("images/egraph_plaque.png")' alt="plaque" >
+                  <img src='@RemoteAssets.at("images/egraph_plaque.png")' alt="plaque" >
                   <div class="plaque-content">
                     <div class="player" >
                       <div class="ui360 ui360-vis player-widget"><a href="@audioUrl"></a></div>
@@ -89,7 +89,7 @@
                     <div class="product-icon-and-date-box">
                       <div class="product-icon-content">
                         <div class="product-icon-centered">
-                          <img src='@(routes.RemoteAssets.at("images/" + productIcon))' />
+                          <img src='@(RemoteAssets.at("images/" + productIcon))' />
                         </div>
                       </div>
                       <div class="signing-date">@signedOnDate</div>
@@ -111,8 +111,8 @@
             </div>                        
             <div class="story-column-element">
               <a href="@galleryLink.getOrElse("/")" class="egraphs-logo">
-                <img class="logo-inactive" src='@routes.RemoteAssets.at("images/egraphs_logo_inactive.png")' alt="Egraphs Logo">
-                <img class="logo-active" src='@routes.RemoteAssets.at("images/egraphs_logo_active.png")' alt="Egraphs Logo">
+                <img class="logo-inactive" src='@RemoteAssets.at("images/egraphs_logo_inactive.png")' alt="Egraphs Logo">
+                <img class="logo-active" src='@RemoteAssets.at("images/egraphs_logo_active.png")' alt="Egraphs Logo">
               </a>
             </div>
             <div class="story-column-element separator"></div>
@@ -132,13 +132,13 @@
     </div>
     <!-- Scripting goes here -->
     <!-- soundmanager2 360-degree player -->
-    <script type="text/javascript" src='@routes.RemoteAssets.at("soundmanager/360-player/script/berniecode-animator.js")'></script>
+    <script type="text/javascript" src='@RemoteAssets.at("soundmanager/360-player/script/berniecode-animator.js")'></script>
     <!-- special IE-only canvas fix -->
-    <!--[if IE]><script type="text/javascript" src='@routes.RemoteAssets.at("soundmanager/360-player/script/excanvas.js")'></script><![endif]-->
+    <!--[if IE]><script type="text/javascript" src='@RemoteAssets.at("soundmanager/360-player/script/excanvas.js")'></script><![endif]-->
 
     <!-- Core soundmanager2 -->
-    <script type="text/javascript" src='@routes.RemoteAssets.at("soundmanager/script/soundmanager2-nodebug-jsmin.js")'></script>
-    <script type="text/javascript" src='@routes.RemoteAssets.at("soundmanager/360-player/script/360player.js")'></script>
+    <script type="text/javascript" src='@RemoteAssets.at("soundmanager/script/soundmanager2-nodebug-jsmin.js")'></script>
+    <script type="text/javascript" src='@RemoteAssets.at("soundmanager/360-player/script/360player.js")'></script>
     <script type="text/javascript">
       soundManager.url = '/assets/soundmanager/swf/'; // path to directory containing SM2 SWF
 

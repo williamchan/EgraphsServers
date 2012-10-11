@@ -51,14 +51,14 @@
     <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
     <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
     <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png"> -->
-    <link rel="shortcut icon" type="image/png" href='@routes.RemoteAssets.at("images/favicon.png")'>
-    <link href='@routes.RemoteAssets.at("stylesheets/main.css")' rel="stylesheet">
+    <link rel="shortcut icon" type="image/png" href='@RemoteAssets.at("images/favicon.png")'>
+    <link href='@RemoteAssets.at("stylesheets/main.css")' rel="stylesheet">
 
     <!-- Front-load scripting assets that are necessary for attractive display -->
-    <script src='@routes.RemoteAssets.at("javascripts/libs/modernizr.custom.js")'></script>
+    <script src='@RemoteAssets.at("javascripts/libs/modernizr.custom.js")'></script>
     <script src="https://use.typekit.com/ztt6ynw.js"></script>
     <script>try{Typekit.load();}catch(e){}</script>
-    <script src='@routes.RemoteAssets.at("javascripts/libs/angular.js")'></script>
+    <script src='@RemoteAssets.at("javascripts/libs/angular.js")'></script>
 
     <!-- Configure egraphs scripting main classes (these will automatically be loaded by main.js -->
     <script>
@@ -79,9 +79,9 @@
     @tags.site_footer(footerData)
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
-    <script>window.jQuery || document.write("<script src='@routes.RemoteAssets.at("javascripts/libs/jquery.js")'>\x3C/script>")</script>
-    <script data-main='@routes.RemoteAssets.at("javascripts/main.js")'
-            src='@routes.RemoteAssets.at("javascripts/require-1.0.2.js")'
+    <script>window.jQuery || document.write("<script src='@RemoteAssets.at("javascripts/libs/jquery.js")'>\x3C/script>")</script>
+    <script data-main='@RemoteAssets.at("javascripts/main.js")'
+            src='@RemoteAssets.at("javascripts/require-1.0.2.js")'
             type="text/javascript" ></script>
       <!-- Email sign up modal -->
       <div class="modal signup hide fade" id="emailSignupForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
@@ -96,7 +96,7 @@
             </p>
           </div>
           <br>
-          <img src='@routes.RemoteAssets.at("images/modal-ipad.png")'/>
+          <img src='@RemoteAssets.at("images/modal-ipad.png")'/>
 
           @tags.safeForm("id" ->"signup-form", "method" -> "POST", "action" -> "/subscribe") {
             <div>
