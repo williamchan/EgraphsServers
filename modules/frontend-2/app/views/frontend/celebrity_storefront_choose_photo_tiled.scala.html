@@ -3,8 +3,8 @@
   recentEgraphs: Iterable[models.frontend.storefront.ChoosePhotoRecentEgraph],
   partnerIcons: Iterable[models.frontend.storefront.ChoosePhotoPartnerIcon]
 )(
-  /* implicit session: play.api.mvc.Session */
-  implicit headerData: models.frontend.header.HeaderData,
+  implicit authToken: egraphs.authtoken.AuthenticityToken,
+  headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData,
   storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs
 )

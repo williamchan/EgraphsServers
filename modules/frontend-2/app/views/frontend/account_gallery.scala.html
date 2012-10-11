@@ -1,9 +1,10 @@
-@(username: String, egraphs: List[models.frontend.egraphs.EgraphViewModel], controlRenderer: models.frontend.egraphs.GalleryControlRenderer)(
-  /* implicit session: play.api.mvc.Session */
-  implicit
+@(username: String, egraphs: List[models.frontend.egraphs.EgraphViewModel], 
+  controlRenderer: models.frontend.egraphs.GalleryControlRenderer
+)(implicit authToken: _root_.egraphs.authtoken.AuthenticityToken,
   headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData
 )
+
 @import views.frontend.Utils
 @import views.html.frontend.tags
 @import models.frontend.egraphs._

@@ -1,6 +1,5 @@
 @(header:String, body:String)(
-implicit
-/* implicit session: play.api.mvc.Session */
+implicit authToken: egraphs.authtoken.AuthenticityToken,
 headerData: models.frontend.header.HeaderData,
 footerData: models.frontend.footer.FooterData
 )

@@ -1,8 +1,8 @@
 @(stars:Iterable[models.frontend.landing.CatalogStar], signup:Boolean = false
 )(
   implicit headerData: models.frontend.header.HeaderData,
-  footerData: models.frontend.footer.FooterData
-  /* session: play.mvc.Scope.Session, */
+  footerData: models.frontend.footer.FooterData,
+  authToken: egraphs.authtoken.AuthenticityToken
 )
 
 @{/** Consumer landing page

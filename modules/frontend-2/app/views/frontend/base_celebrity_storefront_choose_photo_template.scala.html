@@ -7,7 +7,7 @@
   photoSection: => Html
 )(implicit headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData,
-  /* session: play.mvc.Scope.Session, */
+  authToken: egraphs.authtoken.AuthenticityToken,
   storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs
 )
 @{/**

@@ -1,6 +1,5 @@
 @(tableOfContents: List[models.frontend.contents.Section])(
-/* implicit session: play.api.mvc.Session */
-implicit
+implicit authToken: egraphs.authtoken.AuthenticityToken,
 headerData: models.frontend.header.HeaderData,
 footerData: models.frontend.footer.FooterData
 )

@@ -17,7 +17,7 @@ import services.http.forms.purchase.FormReaders
 
 // TODO: PLAY20 migration. Re-enable this and replace its usage of Play 1.0 form
 // validation.
-
+/*
 trait PostBuyDemoProductEndpoint { this: Controller =>
 
   protected def dbSession: DBSession
@@ -170,4 +170,4 @@ object PostBuyDemoProductEndpoint  {
       )
     }
   }
-}
+}*/

@@ -1,7 +1,7 @@
 @(title: String, jsMain: String = "", headJs: => Html = Html.empty, body: => Html)(
   implicit headerData: models.frontend.header.HeaderData,
-  footerData: models.frontend.footer.FooterData
-  /*authToken: egraphs.authtoken.AuthenticityToken*/
+  footerData: models.frontend.footer.FooterData,
+  authToken: egraphs.authtoken.AuthenticityToken
 )
 
 @{/**
@@ -100,7 +100,7 @@
           <br>
           <img src='@RemoteAssets.at("images/modal-ipad.png")'/>
 
-          @*safeForm('id ->"signup-form", 'method -> "POST", 'action -> "/subscribe")*@ {
+          @safeForm('id ->"signup-form", 'method -> "POST", 'action -> "/subscribe") {
             <div>
               <label>Email:</label>
               <input class="input-xlarge" type="email" name="email" />

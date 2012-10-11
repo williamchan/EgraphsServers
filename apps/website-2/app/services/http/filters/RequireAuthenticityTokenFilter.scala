@@ -8,6 +8,7 @@ import play.api.data._
 import play.api.data.Forms._
 import services.http.PlayId
 import services.inject.InjectionProvider
+import egraphs.authtoken.AuthenticityToken
 
 /**
  * Only executes its `action` block if the request contains a valid authenticity token, as implemented
@@ -74,15 +75,7 @@ class RequireAuthenticityTokenFilterProvider @Inject()(@PlayId playId: String)
 /** Implementation that actually checks the response */
 private[http] class DoRequireAuthenticityToken @Inject() extends RequireAuthenticityTokenFilter {
   override def apply[A](action: Action[A]): Action[A] = {
-    Action(action.parser) { implicit request =>
-      // TODO: PLAY20 migration. Fix authenticity token implementation. Right now it doesn't
-      //   even test against the session. We may have to manually provide an authenticity token
-      //   for each session.
-      Form(single("authenticityToken" -> text)).bindFromRequest.fold(
-        errors => Forbidden("Bad authenticity token"),
-        token => action(request)
-      )
-    }
+    AuthenticityToken.requireInSubmission(action)
   }
 }
 
