@@ -140,7 +140,7 @@ GET     /:celebrityUrlSlug/photos/:productUrlSlug/purchase-error    controllers.
 #GET     /admin/printorders                                          controllers.WebsiteControllers.getPrintOrdersAdmin
 #GET     /admin/printorders/{printOrderId}                           controllers.WebsiteControllers.getPrintOrderAdmin
 #POST    /admin/printorders/{printOrderId}                           controllers.WebsiteControllers.postPrintOrderAdmin
-#POST    /{celebrityUrlSlug}/{productUrlSlug}/buy-demo               controllers.WebsiteControllers.postBuyDemoProduct
+POST    /:celebrityUrlSlug}/:productUrlSlug/buy-demo                controllers.WebsiteControllers.postBuyDemoProduct(celebrityUrlSlug: String, productUrlSlug: String)
 
 GET     /assets/*file                                               controllers.RemoteAssets.at(path="/public", file)
 

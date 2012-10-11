@@ -45,12 +45,6 @@ class FormReaders @Inject()(
       new EmailSubscriptionForm(readable, formChecks)
     }
   }
-  
-//  def forDemoPurchase: ReadsForm[PostBuyDemoForm] = {
-//    newReaderWithConstructor { readable =>
-//      new PostBuyDemoForm(readable, formChecks)
-//    }
-//  }
 
   /**
    * @param shippingFormOption Provide a shipping form only if it should be
