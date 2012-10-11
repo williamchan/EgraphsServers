@@ -19,7 +19,7 @@ import java.text.SimpleDateFormat
 import controllers.website.consumer.StorefrontChoosePhotoConsumerEndpoints
 import social.{Twitter, Facebook}
 import controllers.website.GetEgraphEndpoint
-import play.api.mvc.Request
+import play.api.mvc.RequestHeader
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -190,7 +190,7 @@ case class Order(
     omg.withReviewStatus(OrderReviewStatus.RejectedByCelebrity).copy(rejectionReason = rejectionReason)
   }
 
-  def sendEgraphSignedMail[A](implicit request: Request[A]) {
+  def sendEgraphSignedMail[A](implicit request: RequestHeader) {
     val celebrity = services.celebrityStore.findByOrderId(id).get
     val email = new HtmlEmail()
 
@@ -581,7 +581,7 @@ object GalleryOrderFactory {
     })
   }
 
-  def makeFulfilledEgraphViewModel[A](orders: Iterable[(Order, Option[Egraph])], fbAppId: String)(implicit request: Request[A]) :
+  def makeFulfilledEgraphViewModel[A](orders: Iterable[(Order, Option[Egraph])], fbAppId: String)(implicit request: RequestHeader) :
     Iterable[Option[FulfilledEgraphViewModel]] = {
     for (orderAndEgraphOption <- orders) yield {
       val (order, optionEgraph) = orderAndEgraphOption

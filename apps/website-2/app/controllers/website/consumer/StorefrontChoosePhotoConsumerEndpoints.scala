@@ -45,8 +45,8 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
    * @param celebrityUrlSlug identifies the celebrity storefront to serve.
    * @return the web page.
    */
-  def getStorefrontChoosePhotoTiled(celebrityUrlSlug: String) = controllerMethod()
-  {
+  def getStorefrontChoosePhotoTiled(celebrityUrlSlug: String) = controllerMethod.withForm() 
+  { implicit authToken =>
     httpFilters.requireCelebrityUrlSlug(celebrityUrlSlug) { celebrity =>
       Action { implicit request =>
         val celebrityUrlSlug = celebrity.urlSlug
@@ -86,8 +86,8 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
    * @param productUrlSlug identifies the first product to display.
    * @return the web page.
    */
-  def getStorefrontChoosePhotoCarousel(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod()
-  {
+  def getStorefrontChoosePhotoCarousel(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod.withForm()
+  { implicit authToken =>
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
       Action { implicit request =>
         val products = celeb.productsInActiveInventoryBatches().toSeq

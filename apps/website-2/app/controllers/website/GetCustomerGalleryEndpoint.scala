@@ -14,6 +14,7 @@ import services.http.EgraphsSession.Conversions._
 import services.http.filters.RequireCustomerUsername
 import services.http.filters.RequireCustomerId
 import services.http.filters.HttpFilters
+import egraphs.authtoken.AuthenticityToken
 
 /**
  * Controller for displaying customer galleries. Galleries serve as a "wall of egraphs".
@@ -35,7 +36,8 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
 
   import SafePlayParams.Conversions._
 
-  def getCustomerGalleryByUsername(username: String) = controllerMethod() {
+  def getCustomerGalleryByUsername(username: String) = controllerMethod.withForm() 
+  { implicit authToken =>
     httpFilters.requireCustomerUsername(username) { customer =>
       Action { implicit request =>
         serveCustomerGallery(customer)
@@ -43,7 +45,8 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
     }
   }
 
-  def getCustomerGalleryById(galleryCustomerId: Long) = controllerMethod() {
+  def getCustomerGalleryById(galleryCustomerId: Long) = controllerMethod.withForm() 
+  { implicit authToken =>
     httpFilters.requireCustomerId(galleryCustomerId) { customer =>
       Action { implicit request =>
         serveCustomerGallery(customer)
@@ -51,7 +54,11 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
     }
   }
 
-  def serveCustomerGallery[A](customer: Customer)(implicit request: Request[A]): Result = {    
+  def serveCustomerGallery[A]
+    (customer: Customer)
+    (implicit request: RequestHeader, authToken: AuthenticityToken)
+  : Result = 
+  {    
     val galleryCustomerId = customer.id
     //If admin is true admin
     val session = request.session

@@ -46,7 +46,8 @@ trait StorefrontPersonalizeConsumerEndpoints
    * @return the web page, or a redirect if the product was not found in the user's server-
    *     side session cache.
    */
-  def getStorefrontPersonalize(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod() {
+  def getStorefrontPersonalize(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod.withForm() 
+  { implicit authToken =>
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
       Action { implicit request =>
         // Get the purchase forms specific to this celebrity's storefront.

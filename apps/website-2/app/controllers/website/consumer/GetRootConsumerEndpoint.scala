@@ -21,7 +21,7 @@ private[controllers] trait GetRootConsumerEndpoint extends ImplicitHeaderAndFoot
   //
   // Controllers
   //
-  def getRootConsumerEndpoint = controllerMethod() {
+  def getRootConsumerEndpoint = controllerMethod.withForm() { implicit authToken =>
     Action { implicit request =>
       val html = request.queryString.get("signup") match {
         case Some(Seq("true")) => views.html.frontend.landing(stars=catalogStarsQuery(), signup = true)

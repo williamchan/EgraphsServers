@@ -13,6 +13,7 @@ import models.frontend.footer.FooterData
 import play.api.templates.Html
 import controllers.WebsiteControllers
 import services.http.filters.HttpFilters
+import egraphs.authtoken.AuthenticityToken
 
 private[consumer] trait CelebrityLandingConsumerEndpoint
   extends ImplicitHeaderAndFooterData
@@ -21,18 +22,18 @@ private[consumer] trait CelebrityLandingConsumerEndpoint
   protected def controllerMethod: ControllerMethod
   protected def httpFilters: HttpFilters  
 
-  def getCelebrityLanding(celebrityUrlSlug: String) = controllerMethod() {
+  def getCelebrityLanding(celebrityUrlSlug: String) = controllerMethod.withForm() { implicit authToken =>
     httpFilters.requireCelebrityUrlSlug(celebrityUrlSlug) { celebrity =>
       Action { implicit request =>
         Ok(CelebrityLandingConsumerEndpoint.getCelebrityLandingHtml(celebrity))
       }
-    }    
+    }
   }
 }
 
 object CelebrityLandingConsumerEndpoint {
 
-  def getCelebrityLandingHtml(celebrity: Celebrity)(implicit headerData: HeaderData, footerData: FooterData): Html = {
+  def getCelebrityLandingHtml(celebrity: Celebrity)(implicit headerData: HeaderData, footerData: FooterData, authToken: AuthenticityToken): Html = {
     val landingPageImageUrl = celebrity.landingPageImage
       .withImageType(ImageAsset.Jpeg)
       .getSaved(AccessPolicy.Public)

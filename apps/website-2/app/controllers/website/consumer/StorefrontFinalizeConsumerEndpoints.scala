@@ -53,7 +53,8 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
    * @return the web page, or a Redirect to earlier forms in the flow if their data
    *         was found to be lacking.
    */
-  def getStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod() {
+  def getStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod.withForm() 
+  { implicit authToken =>
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
       Action { implicit request =>
         // Get the purchase forms out of the server session

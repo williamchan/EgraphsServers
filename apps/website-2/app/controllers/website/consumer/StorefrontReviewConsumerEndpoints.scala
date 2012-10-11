@@ -47,7 +47,9 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
    * @return the web page, or a Redirect to earlier forms in the flow if their data
    *   was found to be lacking.
    */
-  def getStorefrontReview(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod() {
+  def getStorefrontReview(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod.withForm() 
+  { implicit authToken =>
+
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
       Action { implicit request =>
         // Get the purchase forms out of the server session

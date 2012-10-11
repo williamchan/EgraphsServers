@@ -25,13 +25,13 @@ private[controllers] trait GetLoginEndpoint extends ImplicitHeaderAndFooterData 
   //
   // Controllers
   //
-  def getLogin = controllerMethod() {
+  def getLogin = controllerMethod.withForm() { implicit authToken =>
     Action { implicit request =>
       // Save a new FB state ID into the session
       val fbState = UUID.randomUUID().toString
       val fbOauthUrl = Facebook.getFbOauthUrl(fbAppId = facebookAppId, state = fbState)
       implicit val flash = request.flash
-  
+
       // Render
       Ok(views.html.frontend.login(
         loginForm=makeLoginFormView,

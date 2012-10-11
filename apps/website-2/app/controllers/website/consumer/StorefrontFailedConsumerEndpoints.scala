@@ -19,8 +19,8 @@ private[consumer] trait StorefrontFailedConsumerEndpoints
   //
   // Controllers
   //
-  def getStorefrontNoInventory(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod()
-  {
+  def getStorefrontNoInventory(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod.withForm()
+  { implicit authToken =>
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
       Action { implicit request =>
         Ok(views.html.frontend.celebrity_storefront_no_inventory(celeb.publicName, product.name))
@@ -28,8 +28,8 @@ private[consumer] trait StorefrontFailedConsumerEndpoints
     }
   }
 
-  def getStorefrontCreditCardError(celebrityUrlSlug: String, productUrlSlug: String, creditCardMsg: Option[String]=None) = controllerMethod()
-  {
+  def getStorefrontCreditCardError(celebrityUrlSlug: String, productUrlSlug: String, creditCardMsg: Option[String]=None) = controllerMethod.withForm()
+  { implicit authToken =>
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
       Action { implicit request =>
         Ok(views.html.frontend.celebrity_storefront_creditcard_error(celeb.publicName, product.name, creditCardMsg.getOrElse("")))
@@ -37,8 +37,8 @@ private[consumer] trait StorefrontFailedConsumerEndpoints
     }
   }
 
-  def getStorefrontPurchaseError(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod()
-  {
+  def getStorefrontPurchaseError(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod.withForm()
+  { implicit authToken =>
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
       Action { implicit request =>
         Ok(views.html.frontend.celebrity_storefront_purchase_error(celeb.publicName, product.name))

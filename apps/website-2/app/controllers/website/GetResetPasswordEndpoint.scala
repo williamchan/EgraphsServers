@@ -27,7 +27,8 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
   protected def accountStore: AccountStore
   protected def accountPasswordResetForms: AccountPasswordResetFormFactory
 
-  def getResetPassword(email: String, secretKey: String) = controllerMethod() {
+  def getResetPassword(email: String, secretKey: String) = controllerMethod.withForm() 
+  { implicit authToken =>
     httpFilters.requireAccountEmail.inFlashOrRequest() { account =>
       Action { implicit request =>
         val form = makeFormView(account)
@@ -44,7 +45,8 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
     }
   }
 
-  def getVerifyAccount(email: String, resetKey: String) = controllerMethod() {
+  def getVerifyAccount(email: String, resetKey: String) = controllerMethod.withForm() 
+  { implicit authToken =>
     httpFilters.requireAccountEmail.inRequest() { account =>      
       httpFilters.requireResetPasswordSecret(account) {
         Action { implicit request =>

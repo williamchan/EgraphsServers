@@ -22,7 +22,7 @@ private[controllers] trait GetRecoverAccountEndpoint extends ImplicitHeaderAndFo
   protected def controllerMethod: ControllerMethod
   protected def accountRecoverForms: AccountRecoverFormFactory
 
-  def getRecoverAccount = controllerMethod() {
+  def getRecoverAccount = controllerMethod.withForm() { implicit authToken =>
     Action { implicit request =>
       val flash = request.flash
       val maybeFormData = accountRecoverForms.getFormReader.read(flash.asFormReadable).map { form =>
@@ -44,6 +44,5 @@ object GetRecoverAccountEndpoint {
 
   def url() = {
       controllers.routes.WebsiteControllers.getRecoverAccount().url
-//    WebsiteControllers.reverse(WebsiteControllers.getRecoverAccount)
   }
 }

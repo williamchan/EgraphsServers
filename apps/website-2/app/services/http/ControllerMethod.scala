@@ -8,6 +8,9 @@ import play.api.mvc.Action
 import play.api.mvc.Request
 import services.http.filters.RequireAuthenticityTokenFilterProvider
 import filters.HttpFilters
+import play.api.mvc.BodyParsers.parse
+import egraphs.authtoken.AuthenticityToken
+import play.api.mvc.BodyParser
 
 /**
  * Establishes an appropriate execution context for a request handler.
@@ -37,8 +40,8 @@ class ControllerMethod @Inject()(logging: LoggingContext, db: DBSession, httpsFi
    *
    * @return the result of the `operation` code block.
    */
-  def apply[A](openDatabase:Boolean=true,
-               dbIsolation: TransactionIsolation = TransactionSerializable)
+  def apply[A](openDatabase:Boolean=defaultOpenDatabase,
+               dbIsolation: TransactionIsolation = defaultDbIsolation)
               (action: Action[A]): Action[A] =
   {
     httpsFilter {
@@ -56,8 +59,26 @@ class ControllerMethod @Inject()(logging: LoggingContext, db: DBSession, httpsFi
           }
         }
       }
-    }    
+    }
   }
+  
+  def withForm[A](
+    openDatabase:Boolean=defaultOpenDatabase,
+    dbIsolation: TransactionIsolation = defaultDbIsolation,
+    bodyParser: BodyParser[A] = parse.anyContent
+  )(
+    actionFactory: AuthenticityToken => Action[A]
+  ): Action[A] =
+  {
+    val action = AuthenticityToken.makeAvailable(bodyParser)(actionFactory)
+    this.apply(openDatabase, dbIsolation)(action)
+  }
+  
+  //
+  // Private members
+  //
+  private val defaultOpenDatabase = true
+  private val defaultDbIsolation=TransactionSerializable
 }
 
 
