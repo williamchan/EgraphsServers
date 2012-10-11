@@ -79,5 +79,5 @@ object WebsiteBuild extends Build {
         "xugglecode" at "http://xuggle.googlecode.com/svn/trunk/repo/share/java",
         "scala-guice" at "https://jenkins-codingwell.rhcloud.com/job/Scala-Guice/lastSuccessfulBuild/artifact/repo"
       )
-    ).dependsOn(FrontendBuild.main)
+    ).dependsOn(FrontendBuild.main, AuthenticityTokenBuild.main)
 }
