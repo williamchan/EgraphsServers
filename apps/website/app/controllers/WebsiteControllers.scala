@@ -6,6 +6,7 @@ import services.mail.{BulkMail, TransactionalMail}
 import services.payment.Payment
 import play.mvc.{Router, Controller}
 import models._
+import filters.{FilterValueStore, FilterStore}
 import play.mvc.Router.ActionDefinition
 import play.mvc.results.Redirect
 import services.db.DBSession
@@ -70,6 +71,8 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val celebrityStore = instance[CelebrityStore]
   override protected val customerStore = instance[CustomerStore]
   override protected val egraphStore = instance[EgraphStore]
+  override protected val filterStore = instance[FilterStore]
+  override protected val filterValueStore = instance[FilterValueStore]
   override protected val inventoryBatchStore = instance[InventoryBatchStore]
   override protected val orderStore = instance[OrderStore]
   override protected val printOrderStore = instance[PrintOrderStore]

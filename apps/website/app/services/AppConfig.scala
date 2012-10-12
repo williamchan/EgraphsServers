@@ -7,6 +7,7 @@ import graphics.GraphicsModule
 import http.HttpModule
 import mail.{BulkMail, BulkMailProvider, MailProvider, TransactionalMail}
 import models._
+import filters.FilterServices
 import models.vbg._
 import models.xyzmo._
 import mvc.MvcModule
@@ -46,6 +47,7 @@ class AppConfig extends AbstractModule with ScalaModule {
     bind[EnrollmentBatchServices].in[Singleton]
     bind[EnrollmentSampleServices].in[Singleton]
     bind[FailedPurchaseDataServices].in[Singleton]
+    bind[FilterServices].in[Singleton]
     bind[ImageAssetServices].in[Singleton]
     bind[InventoryBatchServices].in[Singleton]
     bind[InventoryBatchProductServices].in[Singleton]

@@ -3,6 +3,7 @@ package services.db
 import org.squeryl.PrimitiveTypeMode._
 import org.squeryl.{KeyedEntity, Table}
 import models._
+import models.filters._
 import models.vbg._
 import models.xyzmo._
 import java.lang.IllegalStateException
@@ -84,6 +85,12 @@ class Schema @Inject()(
 
   val failedPurchaseData = table[FailedPurchaseData]
   on(failedPurchaseData)(datum => declare( datum.purchaseData is dbType("varchar(1000)") ))
+
+  val filters = table[Filter]
+  on(filters) (filter => declare( filter.name is unique))
+  val filterValues = table[FilterValue]
+  on(filterValues) (filterValue => declare( filterValue.name is unique))
+
 
   val inventoryBatches = table[InventoryBatch]
   on(inventoryBatches)(inventoryBatch =>
@@ -392,6 +399,8 @@ class Schema @Inject()(
       factoryFor(enrollmentBatches) is EnrollmentBatch(services = injector.instance[EnrollmentBatchServices]),
       factoryFor(enrollmentSamples) is EnrollmentSample(services = injector.instance[EnrollmentSampleServices]),
       factoryFor(failedPurchaseData) is FailedPurchaseData(services = injector.instance[FailedPurchaseDataServices]),
+      factoryFor(filters) is Filter(services = injector.instance[FilterServices]),
+      factoryFor(filterValues) is FilterValue(services = injector.instance[FilterServices]),
       factoryFor(inventoryBatches) is InventoryBatch(services = injector.instance[InventoryBatchServices]),
       factoryFor(inventoryBatchProducts) is InventoryBatchProduct(services = injector.instance[InventoryBatchProductServices]),
       factoryFor(orders) is Order(services = injector.instance[OrderServices]),
