@@ -313,7 +313,7 @@ case class Product(
   ).getSaved(AccessPolicy.Public)
 
   lazy val defaultPhotoPortrait = ImageAsset(
-    Play.getFile("test/files/longoria/product-1.jpg"),
+    Play.getFile("test/files/kapler/product-1.jpg"),
     keyBase="defaults/product",
     name="photo",
     imageType=ImageAsset.Jpeg,

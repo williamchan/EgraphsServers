@@ -7,8 +7,8 @@ import services.{AppConfig, Time}
 import services.db.{FilterOneTable, SavesWithLongKey, Schema, KeyedCaseClass}
 import services.Finance.TypeConversions._
 import org.joda.money.Money
-import services.blobs.AccessPolicy
 import org.squeryl.Query
+import services.print.{PrintManufacturingInfo, LandscapeFramedPrint}
 
 case class PrintOrderServices @Inject() (store: PrintOrderStore,
                                          orderStore: OrderStore,
@@ -44,23 +44,30 @@ case class PrintOrder(id: Long = 0,
   }
 
   /**
-   * Generates a print-sized png from an associated published or approved Egraph, if one exists.
-   * @return url of generated image, if it was generated
+   * If an associated published or approved Egraph exists, generates a print-sized egraph image and returns its url.
+   * If the image was previously generated and stored, then the url is returned.
+   * @return url of print-sized image
    */
-  def generatePng(): Option[String] = {
-    val order = services.orderStore.get(orderId)
+  def getPngUrl: Option[String] = {
     services.egraphStore.findByOrder(orderId, services.egraphQueryFilters.publishedOrApproved).headOption.map {egraph =>
-      val product = order.product
-      val rawSignedImage = egraph.image(product.photoImage)
-      // targetWidth is either the default width, or the width of the master if necessary to avoid upscaling
-      val targetWidth = {
-        val masterWidth = product.photoImage.getWidth
-        if (masterWidth < PrintOrder.defaultPngWidth) masterWidth else PrintOrder.defaultPngWidth
-      }
-      val image = rawSignedImage
-        .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
-        .scaledToWidth(targetWidth)
-      image.rasterized.getSavedUrl(AccessPolicy.Public)
+      egraph.getSavedEgraphUrlAndImage(LandscapeFramedPrint.targetEgraphWidth)._1
+    }
+  }
+
+  /**
+   * If an associated published or approved Egraph exists, generates an assembled image for a framed print and returns
+   * its url. If the image was previously generated and stored, then the url is returned. Also, printing data as
+   * required by our printing partner is returned as comma-separated values.
+   * @return url of framed print image and CSV string according to our printing partner's spec
+   */
+  def getFramedPrintImageData: Option[(String, String)] = {
+    services.egraphStore.findByOrder(orderId, services.egraphQueryFilters.publishedOrApproved).headOption.map {egraph =>
+      val thisOrder = egraph.order
+      val imageUrl = egraph.getFramedPrintImageUrl
+      val csv = PrintManufacturingInfo.toCSVLine(buyerEmail = thisOrder.buyer.account.email,
+        shippingAddress = shippingAddress,
+        partnerPhotoFile = egraph.framedPrintFilename)
+      (imageUrl, csv)
     }
   }
 
@@ -72,7 +79,6 @@ case class PrintOrder(id: Long = 0,
 
 object PrintOrder {
   val pricePerPrint = BigDecimal(45)
-  val defaultPngWidth = 2446         // 2446 seems to work well for physical prints
 }
 
 class PrintOrderStore @Inject() (schema: Schema) extends SavesWithLongKey[PrintOrder] with SavesCreatedUpdated[Long,PrintOrder] {

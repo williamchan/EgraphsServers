@@ -4,6 +4,7 @@ import models._
 import play.mvc.results.Redirect
 import play.mvc.Controller
 import services.http.{POSTControllerMethod, AdminRequestFilters}
+import services.print.PrintManufacturingInfo
 
 trait PostPrintOrderAdminEndpoint { this: Controller =>
 
@@ -18,9 +19,21 @@ trait PostPrintOrderAdminEndpoint { this: Controller =>
           printOrder.copy(isFulfilled = true).save()
           new Redirect(GetPrintOrderAdminEndpoint.url(printOrderId).url)
         case "generatePNG" => {
-          val pngUrl = printOrder.generatePng()
-          printOrder.copy(pngUrl = pngUrl).save()
+          printOrder.copy(pngUrl = printOrder.getPngUrl).save()
           new Redirect(GetPrintOrderAdminEndpoint.url(printOrderId).url)
+        }
+        case "generateFramedPrintImage" => {
+          val framedPrintImageData = printOrder.getFramedPrintImageData.getOrElse(("", ""))
+          <html>
+            <body>
+              <a href={framedPrintImageData._1} target="_blank">{framedPrintImageData._1}</a>
+              <br/>
+              {PrintManufacturingInfo.headerCSVLine}
+              <br/>
+              {framedPrintImageData._2}
+            </body>
+          </html>
+
         }
         case "editAddress" => {
           val shippingAddress = params.get("shippingAddress")

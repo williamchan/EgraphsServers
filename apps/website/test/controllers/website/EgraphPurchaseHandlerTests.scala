@@ -67,7 +67,7 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheAndBlob
       order.amountPaidInCurrency should be(BigDecimal(50))
 
       val printOrder = printOrderStore.findByOrderId(order.id).head
-      printOrder.shippingAddress should be("Egraphs, 615 2nd Ave, 300, Seattle, WA 98102")
+      printOrder.shippingAddress should be("Egraphs,615 2nd Ave,300,Seattle,WA,98102")
       printOrder.amountPaidInCurrency should be(BigDecimal(45))
 
       val cashTransaction = cashTransactionStore.findByOrderId(order.id).head

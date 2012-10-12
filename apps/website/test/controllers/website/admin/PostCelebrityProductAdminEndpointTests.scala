@@ -19,7 +19,7 @@ import services.AppConfig._
 class PostCelebrityProductAdminEndpointTests extends AdminFunctionalTest {
   // Load images for creating products
   private val schema = instance[Schema]
-  private val profileImage = Play.getFile("test/files/longoria/product-1.jpg")
+  private val profileImage = Play.getFile("test/files/longoria/product-2.jpg")
   private val profileIcon  = Play.getFile("test/files/longoria/profile.jpg")
   @Test
   def testPostCelebrityProductCreatesProduct() = {

@@ -185,21 +185,6 @@ case class EgraphPurchaseHandler(
       }
 
       // Persist the Order with the Stripe charge info.
-      val shippingAddress = shippingForm match {
-        case Some(form) => {
-          val addressLine2Part = form.addressLine2 match {
-            case Some(s) => s + ", "
-            case None => ""
-          }
-          Some(form.name + ", " +
-            form.addressLine1 + ", " +
-            addressLine2Part +
-            form.city + ", " +
-            form.state + " " +
-            form.postalCode)
-        }
-        case _ => None
-      }
       var order = buyer.buy(product, recipient, recipientName = recipientName, messageToCelebrity = personalNote, requestedMessage = desiredText)
         .copy(amountPaidInCurrency = product.priceInCurrency)
         .withWrittenMessageRequest(writtenMessageRequest)
@@ -213,6 +198,17 @@ case class EgraphPurchaseHandler(
       ).withCash(totalAmountPaid).withCashTransactionType(CashTransactionType.EgraphPurchase).save()
 
       val maybePrintOrder = if (printingOption == PrintingOption.HighQualityPrint) {
+        val shippingAddress = for (validShippingForm <- shippingForm) yield {
+          // Our printing partner wants all address fields to be comma-separated, even if they are empty
+          List(
+            validShippingForm.name,
+            validShippingForm.addressLine1,
+            validShippingForm.addressLine2.getOrElse(""),
+            validShippingForm.city,
+            validShippingForm.state,
+            validShippingForm.postalCode
+          ).mkString(",")
+        }
         val printOrder = PrintOrder(orderId = order.id, amountPaidInCurrency = PrintOrder.pricePerPrint, shippingAddress = shippingAddress.getOrElse("")).save() // update CashTransaction
         cashTransaction = cashTransaction.copy(printOrderId = Some(printOrder.id)).save()
         Some(printOrder)

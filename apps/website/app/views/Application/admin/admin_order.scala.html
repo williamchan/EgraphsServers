@@ -83,10 +83,10 @@
     <form id="generateImages-form" method="POST" action='@postOrder' enctype="application/x-www-form-urlencoded">
       @authenticityToken()
       <div class="actions">
-        <h3>Generate PNGs for printing</h3>
+        <h3>Generate framed print JPG (and also PNG)</h3>
         <input name="orderId" type="hidden" value="@order.id">
         <input name="action" type="hidden" value="generateImages">
-        <button type="submit" id="generateImages-button" class="btn primary fade in">Generate PNGs?</button>
+        <button type="submit" id="generateImages-button" class="btn primary fade in">Generate JPG and PNG</button>
       </div>
     </form>
     }
