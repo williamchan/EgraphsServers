@@ -2,23 +2,24 @@ package controllers.website.admin
 
 import play.api.mvc.{Action,Controller}
 import play.api.mvc.Results.Redirect
-import services.http.{AdminRequestFilters, ControllerMethod}
+import services.http.ControllerMethod
 import models.{Password, AccountStore, CelebrityStore}
 import controllers.WebsiteControllers
+import services.http.filters.HttpFilters
 
 private[controllers] trait GetAccountAdminEndpoint {
   this: Controller =>
 
   protected def controllerMethod: ControllerMethod
-  protected def adminFilters: AdminRequestFilters
+  protected def httpFilters: HttpFilters
   protected def accountStore: AccountStore
   protected def celebrityStore: CelebrityStore
 
-  def getAccountAdmin(accountId: Long) = Action { request =>
-    controllerMethod() {
-      adminFilters.requireAdministratorLogin({ admin =>
-        val flash = play.mvc.Http.Context.current().flash()
-        val errorFields = Option(flash.get("errors")).map(errString => errString.split(',').toList)
+  def getAccountAdmin(accountId: Long) = controllerMethod.withForm() { implicit authToken =>
+    httpFilters.requireAdministratorLogin.inSession() { (admin, account) =>
+      Action { implicit request =>
+        val flash = request.flash
+        val errorFields = flash.get("errors").map(errString => errString.split(',').toList)
 
         val account = accountStore.get(accountId)
         val password = account.password match {
@@ -33,11 +34,12 @@ private[controllers] trait GetAccountAdminEndpoint {
               case "email" => account.email
               case "password" => password
               case _ =>
-                Option(flash.get(paramName)).getOrElse("")
+                flash.get(paramName).getOrElse("")
             }
         }
+        
         Ok(views.html.Application.admin.admin_accountdetail(isCreate = false, errorFields = errorFields, fields = fieldDefaults))
-      })
+      }
     }
   }
 }
@@ -46,6 +48,5 @@ object GetAccountAdminEndpoint {
 
   def url(accountId: Long) = {
     controllers.routes.WebsiteControllers.getAccountAdmin(accountId).url
-//    WebsiteControllers.reverse(WebsiteControllers.getAccountAdmin(accountId))
   }
 }

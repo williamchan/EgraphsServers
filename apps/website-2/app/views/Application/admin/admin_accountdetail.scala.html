@@ -1,9 +1,8 @@
 @(isCreate: Boolean, errorFields: Option[List[String]], fields: (String) => String
-)(/* implicit session: play.mvc.Scope.Session */)
+)(implicit authToken: egraphs.authtoken.AuthenticityToken)
 
 @import controllers.WebsiteControllers
-@import services.Utils.lookupUrl
-@import views.html.Application.tags.authenticityToken
+@import egraphs.authtoken.AuthenticityToken.safeForm
 @import views.html.Application.tags.errorMessage
 @import views.html.Application.tags.formField
 @import views.html.Application.content_base
@@ -15,7 +14,7 @@
 }
 
 @postAccount = @{
-  lookupUrl("WebsiteControllers.postAccountAdmin")
+  routes.WebsiteControllers.postAccountAdmin
 }
 
 @body = {
@@ -25,9 +24,8 @@
   </h1>
   <div class="form row">
     <div class="span12 form-column">
-      <form id="account-form" method="POST" action='@postAccount' enctype="multipart/form-data">
+      @safeForm('id -> "account-form", 'method -> "POST", 'action -> postAccount.url, 'enctype -> "multipart/form-data") {
         <fieldset>
-          @authenticityToken()
           <input id="accountId" name="accountId" type="hidden" value="@fields("accountId")">
           <legend>Account Details</legend>
 
@@ -41,7 +39,7 @@
             @errorMessage(errorFields)
           </div>
         </fieldset>
-      </form>
+      }
     </div>
   </div>
 </div>
