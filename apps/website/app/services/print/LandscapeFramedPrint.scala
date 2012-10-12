@@ -1,42 +1,43 @@
 package services.print
 
-import javax.imageio.{IIOImage, ImageWriteParam, ImageIO}
+import javax.imageio.ImageIO
 import java.awt.geom.Rectangle2D
 import java.awt.image.BufferedImage
-import java.io.File
 import java.util.Date
 import java.awt.{Font, Color, RenderingHints}
-import javax.imageio.stream.FileImageOutputStream
 
 object LandscapeFramedPrint {
 
   val targetEgraphWidth = 2324
   val targetLogoWidth = 60
 
-  def main(args: Array[String]) {
-    val orderId = 899
-    val egraphImage = ImageIO.read(new File("/Users/willchan83/Desktop/test/" + orderId + ".png"))
-    val assembledImage = LandscapeFramedPrint().assemble(
-      orderNumber = orderId.toString,
-      egraphImage = egraphImage,
-      teamLogoImage = ImageIO.read(new File("/Users/willchan83/Desktop/test/teamlogo.png")),
-      recipientName = "Eric Feeny Mohammed Albaraq",
-      celebFullName = "David Price Maria Alvarez Vibi",
-      celebCasualName = "David",
-      productName = "Super Baller",
-      signedAtDate = new Date(),
-      egraphUrl = "https://www.egraphs.com/" + orderId)
-
-    val file = new File("/Users/willchan83/Desktop/test/test.jpg")
-    val iter = ImageIO.getImageWritersByFormatName("jpg")
-    val writer = iter.next()
-    val iwp = writer.getDefaultWriteParam
-    iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT)
-    iwp.setCompressionQuality(1.0f)
-    val ios = new FileImageOutputStream(file)
-    writer.setOutput(ios)
-    writer.write(null, new IIOImage(assembledImage, null, null), iwp)
-  }
+//  def main(args: Array[String]) {
+//  import javax.imageio.{IIOImage, ImageWriteParam}
+//  import java.io.File
+//  import javax.imageio.stream.FileImageOutputStream
+//    val orderId = 899
+//    val egraphImage = ImageIO.read(new File("/Users/willchan83/Desktop/test/" + orderId + ".png"))
+//    val assembledImage = LandscapeFramedPrint().assemble(
+//      orderNumber = orderId.toString,
+//      egraphImage = egraphImage,
+//      teamLogoImage = ImageIO.read(new File("/Users/willchan83/Desktop/test/teamlogo.png")),
+//      recipientName = "Eric Feeny Mohammed Albaraq",
+//      celebFullName = "David Price Maria Alvarez Vibi",
+//      celebCasualName = "David",
+//      productName = "Super Baller",
+//      signedAtDate = new Date(),
+//      egraphUrl = "https://www.egraphs.com/" + orderId)
+//
+//    val file = new File("/Users/willchan83/Desktop/test/test.jpg")
+//    val iter = ImageIO.getImageWritersByFormatName("jpg")
+//    val writer = iter.next()
+//    val iwp = writer.getDefaultWriteParam
+//    iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT)
+//    iwp.setCompressionQuality(1.0f)
+//    val ios = new FileImageOutputStream(file)
+//    writer.setOutput(ios)
+//    writer.write(null, new IIOImage(assembledImage, null, null), iwp)
+//  }
 }
 
 case class LandscapeFramedPrint() {
