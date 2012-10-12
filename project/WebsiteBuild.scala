@@ -2,6 +2,7 @@ import sbt._
 import Keys._
 import PlayProject._
 import com.typesafe.sbteclipse.core.EclipsePlugin.EclipseKeys
+import cloudbees.Plugin._
 
 /**
  * Builds the main Egraphs website.
@@ -79,5 +80,7 @@ object WebsiteBuild extends Build {
         "xugglecode" at "http://xuggle.googlecode.com/svn/trunk/repo/share/java",
         "scala-guice" at "https://jenkins-codingwell.rhcloud.com/job/Scala-Guice/lastSuccessfulBuild/artifact/repo"
       )
-    ).dependsOn(FrontendBuild.main, AuthenticityTokenBuild.main, PlayUtilsBuild.main)
+    )
+    .settings(cloudBeesSettings: _*)
+    .dependsOn(FrontendBuild.main, AuthenticityTokenBuild.main, PlayUtilsBuild.main)
 }
