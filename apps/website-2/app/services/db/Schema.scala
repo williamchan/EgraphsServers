@@ -265,8 +265,8 @@ class Schema @Inject()(
   /**Clears out the schema and recreates it. For God's sake don't do this in production. */
   def scrub() {
     val applicationMode = config.applicationMode
-    log("Checking application.mode before scrubbing database. Must be in dev mode. Mode is: " + applicationMode)
-    if (applicationMode != Some("dev")) {
+    log("Checking application.mode before scrubbing database. Must be in dev mode. Mode is: " + applicationMode)    
+    if (applicationMode != "dev") {
       throw new IllegalStateException("Cannot scrub database unless in dev mode")
     }
 
