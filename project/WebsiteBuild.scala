@@ -62,7 +62,9 @@ object WebsiteBuild extends Build {
       // "uk.me.lings" %% "scala-guice" % "3.0.1-SNAPSHOT",
       "xml-apis" % "xml-apis-ext" % "1.3.04",
       "xml-apis" % "xml-apis" % "1.3.04", // we might be getting pretty stale here
-      "xuggle" % "xuggle-xuggler" % "5.4"
+      "xuggle" % "xuggle-xuggler" % "5.4",
+
+      "org.scalatest" %% "scalatest" % "1.8" % "test"
     )
     
     val main = PlayProject(
