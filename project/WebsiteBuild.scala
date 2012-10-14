@@ -59,7 +59,7 @@ object WebsiteBuild extends Build {
       "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
       "redis.clients" % "jedis" % "2.0.0",
       //"com.googlecode.soundlibs" % "tritonus-share" % "0.3.7-1", // from our unmanaged dependency 0.3.6
-      "uk.me.lings" %% "scala-guice" % "3.0.1-SNAPSHOT",
+      // "uk.me.lings" %% "scala-guice" % "3.0.1-SNAPSHOT",
       "xml-apis" % "xml-apis-ext" % "1.3.04",
       "xml-apis" % "xml-apis" % "1.3.04", // we might be getting pretty stale here
       "xuggle" % "xuggle-xuggler" % "5.4"
