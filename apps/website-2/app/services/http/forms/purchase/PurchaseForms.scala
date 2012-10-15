@@ -18,7 +18,7 @@ import play.api.mvc.Flash
  * See the controllers in [[controllers.website.consumer]] for usage.
  *
  * @param formReaders readers for grabbing the different forms out of the session
- *     or flash when nevessary.
+ *     or flash when necessary.
  * @param storefrontSession a `ServerSession` namespaced to a particular celebrity's storefront.
  */
 class PurchaseForms @Inject()(
@@ -44,23 +44,23 @@ class PurchaseForms @Inject()(
    * @return either all the data on the right, or a Redirect to the page
    *   to get the data on the left.
    */
-  def allPurchaseFormsOrRedirect(celeb: Celebrity, product: Product): Either[Result, AllPurchaseForms] = {
+  def redirectOrAllPurchaseForms(celeb: Celebrity, product: Product): Either[Result, AllPurchaseForms] = {
     val celebrityUrlSlug = celeb.urlSlug
     for (
       // Make sure the product ID in this URL matches the one in the form
-      productId <- matchProductIdOrRedirectToChoosePhoto(celeb, product).right;
+      productId <- redirectToChoosePhotoOrMatchingProductId(celeb, product).right;
   
       // Make sure there's inventory on the product
-      inventoryBatch <- nextInventoryBatchOrRedirect(celebrityUrlSlug, product).right;
+      inventoryBatch <- redirectOrNextInventoryBatch(celebrityUrlSlug, product).right;
   
       // Make sure we've got a valid personalize form in storage
-      validPersonalizeForm <- validPersonalizeFormOrRedirectToPersonalizeForm(
+      validPersonalizeForm <- redirectToPersonalizeFormOrValidPersonalizeForm(
         celebrityUrlSlug,
         product.urlSlug
       ).right;
   
       // Make sure we've got valid personalize forms.
-      validCheckoutForms <- validCheckoutFormsOrRedirectToCheckout(
+      validCheckoutForms <- redirectToCheckoutOrValidCheckoutForms(
         celebrityUrlSlug,
         product.urlSlug
       ).right
@@ -229,7 +229,7 @@ class PurchaseForms @Inject()(
    * @param celebrityUrlSlug identifies the celebrity, for the redirect.
    * @param product the product to check for available inventory.
    */
-  def nextInventoryBatchOrRedirect(celebrityUrlSlug: String, product: models.Product)
+  def redirectOrNextInventoryBatch(celebrityUrlSlug: String, product: models.Product)
   : Either[Result, InventoryBatch] =
   {
     product.nextInventoryBatchToEnd.toRight(
@@ -249,7 +249,7 @@ class PurchaseForms @Inject()(
    * @param celebrityUrlSlug identifies the celebrity for the redirect
    * @param productUrlSlug identifies the product for the redirect
    */
-  def printingOptionOrRedirectToReviewForm(celebrityUrlSlug: String, productUrlSlug: String): Either[Result, PrintingOption] = {
+  def redirectToReviewFormOrPrintingOption(celebrityUrlSlug: String, productUrlSlug: String): Either[Result, PrintingOption] = {
     highQualityPrint.toRight(left=Redirect(getStorefrontReview(celebrityUrlSlug, productUrlSlug)))    
   }
 
@@ -260,10 +260,10 @@ class PurchaseForms @Inject()(
    * @param celebrityUrlSlug identifies the celebrity for the redirect
    * @param productUrlSlug identifies the product for the redirect
    */
-  def validShippingFormOptionOrRedirectToCheckout(celebrityUrlSlug: String, productUrlSlug: String)
+  def redirectToCheckoutOrValidShippingFormOption(celebrityUrlSlug: String, productUrlSlug: String)
   : Either[Result, Option[(CheckoutShippingForm, CheckoutShippingForm.Valid)]] = {
     for (
-      printingOption <- this.printingOptionOrRedirectToReviewForm(celebrityUrlSlug, productUrlSlug).right;
+      printingOption <- this.redirectToReviewFormOrPrintingOption(celebrityUrlSlug, productUrlSlug).right;
       maybeShippingForms <- validShippingFormGivenPrintingOptionOrRedirect(
                               printingOption,
                               celebrityUrlSlug,
@@ -281,7 +281,7 @@ class PurchaseForms @Inject()(
    * @param celebrityUrlSlug identifies the celebrity for the redirect
    * @param productUrlSlug identifies the product for the redirect
    */
-  def validCheckoutFormsOrRedirectToCheckout(celebrityUrlSlug: String, productUrlSlug: String)
+  def redirectToCheckoutOrValidCheckoutForms(celebrityUrlSlug: String, productUrlSlug: String)
   : Either[Result, (CheckoutBillingForm.Valid, Option[CheckoutShippingForm.Valid])] = {
     lazy val redirectToCheckout = this.redirectToCheckout(celebrityUrlSlug, productUrlSlug)
 
@@ -290,7 +290,7 @@ class PurchaseForms @Inject()(
 
       validBillingForm <- billingForm.errorsOrValidatedForm.left.map(errors => redirectToCheckout).right;
 
-      maybeShippingForms <- validShippingFormOptionOrRedirectToCheckout(celebrityUrlSlug, productUrlSlug).right
+      maybeShippingForms <- redirectToCheckoutOrValidShippingFormOption(celebrityUrlSlug, productUrlSlug).right
     ) yield {
       (validBillingForm, maybeShippingForms.map(forms => forms._2))
     }
@@ -304,7 +304,7 @@ class PurchaseForms @Inject()(
    * @param celebrity the celebrity for the redirect
    * @param product the product for the redirect
    */
-  def matchProductIdOrRedirectToChoosePhoto(celebrity:Celebrity, product:Product): Either[Result, Long] = {
+  def redirectToChoosePhotoOrMatchingProductId(celebrity:Celebrity, product:Product): Either[Result, Long] = {
     lazy val thisChoosePhotoRedirect = choosePhotoRedirect(celebrity.urlSlug)
 
     // Redirect if either this form has no productId or the provided product Id didn't match
@@ -324,10 +324,10 @@ class PurchaseForms @Inject()(
    * @param celebrityUrlSlug identifies the celebrity for the redirect
    * @param productUrlSlug identifies the product for the redirect
    */
-  def validPersonalizeFormOrRedirectToPersonalizeForm(celebrityUrlSlug: String, productUrlSlug: String)
+  def redirectToPersonalizeFormOrValidPersonalizeForm(celebrityUrlSlug: String, productUrlSlug: String)
   : Either[Result, PersonalizeForm.Validated] = {
     for (
-      personalizeForm <- personalizeFormOrRedirectToPersonalizeForm(
+      personalizeForm <- redirectToPersonalizeFormOrPersonalizeForm(
         celebrityUrlSlug,
         productUrlSlug
       ).right;
@@ -398,7 +398,7 @@ class PurchaseForms @Inject()(
     Redirect(getStorefrontChoosePhotoTiled(celebrityUrlSlug))
   }
 
-  private def personalizeFormOrRedirectToPersonalizeForm(celebrityUrlSlug: String, productUrlSlug: String)
+  private def redirectToPersonalizeFormOrPersonalizeForm(celebrityUrlSlug: String, productUrlSlug: String)
   : Either[Result, PersonalizeForm] = {
 
     personalizeForm().toRight(left= {      

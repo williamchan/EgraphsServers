@@ -1,4 +1,4 @@
-@(emailLogoSrc: String = "", emailFacebookSrc: String = "", emailTwitterSrc: String = "")
+@()
 
 @import controllers._
 
@@ -7,23 +7,18 @@
   <tr>
     <td width="450" align="left" valign="top">
       <a style="color: #ff5124; text-decoration: none; border: none; outline: none;" href="https://www.egraphs.com">
-        <img src='@(RemoteAssets.at("images/" + emailLogoSrc))'/>
+        <img src="https://s3.amazonaws.com/egraphs-static-resources/public/images/email-logo.jpg"/>
       </a>
     </td>
     <td width="40px" valign="top">
       <a style="color: #ff5124; text-decoration: none; border: none; outline: none;" href="http://www.facebook.com/egraphs">
-        <img src='@(RemoteAssets.at("images/" + emailFacebookSrc))'/>
+        <img src="https://s3.amazonaws.com/egraphs-static-resources/public/images/email-facebook.jpg"/>
       </a>
     </td>
     <td width="30px" valign="top">
       <a style="color: #ff5124; text-decoration: none; border: none; outline: none;" href="http://www.twitter.com/egraphs">
-        <img src='@(RemoteAssets.at("images/" + emailTwitterSrc))'/>
+        <img src="https://s3.amazonaws.com/egraphs-static-resources/public/images/email-twitter.jpg"/>
       </a>
     </td>
   </tr>
-  <!--<tr>-->
-    <!--<td colspan="3">-->
-      <!--<img border="0" src='@RemoteAssets.at("images/email-rule.gif")' width="520" height="30" />-->
-    <!--</td>-->
-  <!--</tr>-->
 </table>

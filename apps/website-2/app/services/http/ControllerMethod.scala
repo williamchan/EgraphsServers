@@ -5,12 +5,14 @@ import services.logging.LoggingContext
 import com.google.inject.Inject
 import services.db.{TransactionIsolation, TransactionSerializable, DBSession}
 import play.api.mvc.Action
-import play.api.mvc.Request
 import services.http.filters.RequireAuthenticityTokenFilterProvider
 import filters.HttpFilters
+import play.api.mvc.BodyParser
 import play.api.mvc.BodyParsers.parse
 import egraphs.authtoken.AuthenticityToken
-import play.api.mvc.BodyParser
+import services.db.DBSession
+import services.http._
+import services.db.{TransactionIsolation, TransactionSerializable, DBSession}
 
 /**
  * Establishes an appropriate execution context for a request handler.
@@ -29,32 +31,23 @@ class ControllerMethod @Inject()(logging: LoggingContext, db: DBSession, httpsFi
    * Prepares and customizes controller method behavior. The first expression in
    * any controller methods in our codebase should be to call this function.
    *
-   * @param openDatabase true that the a database connection should be managed
-   *    by this ControllerMethod instance.
-   * @param dbIsolation the transaction isolation with which to connect to the
-   *    database if openDatabase is true
-   * @param operation
-   *    the code block to execute after setting up the connection resources
-   * @param request
-   *    the request being served
-   *
+   * @param dbSettings the ControllerDBSettings that specify whether a database connection coincides with the
+   *                   lifecycle of this controller method, as well as the transaction isolation level and
+   *                   whether the transaction is read-only.
+   * @param operation the code block to execute after setting up the connection resources
+   * @param request the request being served
    * @return the result of the `operation` code block.
    */
-  def apply[A](openDatabase:Boolean=defaultOpenDatabase,
-               dbIsolation: TransactionIsolation = defaultDbIsolation)
+  def apply[A](dbSettings: ControllerDBSettings = WithDBConnection())
               (action: Action[A]): Action[A] =
   {
     httpsFilter {
       logging.withRequestContext {
         httpFilters.requireSessionId {
           Action(action.parser) { request => 
-            if (openDatabase) {
-              db.connected(dbIsolation) {
-                action(request)
-              }
-            }
-            else {
-              action(request)
+            dbSettings match {
+              case WithoutDBConnection => action(request)
+              case WithDBConnection(dbIsolation, readOnly) => db.connected(dbIsolation) { action(request) }
             }
           }
         }
@@ -63,22 +56,15 @@ class ControllerMethod @Inject()(logging: LoggingContext, db: DBSession, httpsFi
   }
   
   def withForm[A](
-    openDatabase:Boolean=defaultOpenDatabase,
-    dbIsolation: TransactionIsolation = defaultDbIsolation,
+    dbSettings: ControllerDBSettings = WithDBConnection(readOnly = false),
     bodyParser: BodyParser[A] = parse.anyContent
   )(
     actionFactory: AuthenticityToken => Action[A]
   ): Action[A] =
   {
     val action = AuthenticityToken.makeAvailable(bodyParser)(actionFactory)
-    this.apply(openDatabase, dbIsolation)(action)
-  }
-  
-  //
-  // Private members
-  //
-  private val defaultOpenDatabase = true
-  private val defaultDbIsolation=TransactionSerializable
+    this.apply(dbSettings)(action)
+  }  
 }
 
 
@@ -96,25 +82,23 @@ class POSTControllerMethod @Inject()(
 ) {
 
   /**
-   * Performs an operation after ensuring that the post is protected by a
-   * CSRF token.
+   * Performs an operation after ensuring that the post is protected by a CSRF token.
    *
-   * @param doCsrfCheck true that we should check for an authenticity token before
-   *     performing the operation
-   * @param openDatabase true that the a database connection should be managed
-   *    by this ControllerMethod instance.
+   * @param doCsrfCheck true that we should check for an authenticity token before performing the operation
+   * @param dbSettings the ControllerDBSettings that specify whether a database connection coincides with the
+   *                   lifecycle of this controller method, as well as the transaction isolation level and
+   *                   whether the transaction is read-only.
    * @param operation the operation to perform
    * @param request the current request
    * @param session the current session
    * @tparam A return type of Operation
-   *
-   * @return either the return value of the `operation` code block or
-   *     a [[play.mvc.results.Forbidden]]
+   * @return either the return value of the `operation` code block or a [[play.mvc.results.Forbidden]]
    */
-  def apply[A](doCsrfCheck: Boolean=true, openDatabase: Boolean=true)
-              (action: Action[A]): Action[A] =
+  def apply[A](doCsrfCheck: Boolean=true,
+               dbSettings: ControllerDBSettings = WithDBConnection(readOnly = false))
+                             (action: Action[A]): Action[A] =
   {
-    controllerMethod() {
+    controllerMethod(dbSettings = dbSettings) {
       authenticityTokenFilter(doCsrfCheck) {
         Action(action.parser) { request => 
           action(request)
@@ -140,16 +124,19 @@ class POSTApiControllerMethod @Inject()(postControllerMethod: POSTControllerMeth
    * Performs an operation after ensuring an appropriate execution context for
    * a POST to the API.
    *
+   * @param dbSettings the ControllerDBSettings that specify whether a database connection coincides with the
+   *                   lifecycle of this controller method, as well as the transaction isolation level and
+   *                   whether the transaction is read-only.
    * @param operation operation to perform
    * @param request the current request
    * @param session the current session
    * @tparam A return type of `operation`
    *
-   * @return the return value of the `operation` code block or the error state of
-   *     postControllerMethod
+   * @return the return value of the `operation` code block or the error state of postControllerMethod
    */
-  def apply[A](action: Action[A]): Action[A] = {
-    postControllerMethod(doCsrfCheck=false) {
+  def apply[A](dbSettings: ControllerDBSettings = WithDBConnection(readOnly = false))
+              (action: Action[A]): Action[A] = {
+    postControllerMethod(doCsrfCheck=false, dbSettings=dbSettings) {
       Action(action.parser) { request =>
         action(request)
       }

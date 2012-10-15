@@ -22,6 +22,7 @@ private[controllers] trait GetPrintOrderAdminEndpoint { this: Controller =>
         case Some(printOrder) => {
           val order = orderStore.get(printOrder.orderId)
           val recipientEmail = order.recipient.account.email
+          val buyerEmail = order.buyer.account.email
           val egraph = egraphStore.findByOrder(printOrder.orderId, egraphQueryFilters.publishedOrApproved).headOption
 
           val fieldDefaults: (String => String) = {
@@ -34,6 +35,7 @@ private[controllers] trait GetPrintOrderAdminEndpoint { this: Controller =>
             printOrder = printOrder,
             order = order,
             recipientEmail = recipientEmail,
+            buyerEmail = buyerEmail,
             egraph = egraph,
             fields = fieldDefaults)
         }

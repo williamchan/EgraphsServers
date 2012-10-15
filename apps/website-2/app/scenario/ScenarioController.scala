@@ -3,7 +3,7 @@ package controllers.website.nonproduction
 import play.api.mvc.Controller
 import scenario.Scenario
 import play.api.mvc.Result
-import services.http.ControllerMethod
+import services.http.{ControllerMethod, WithDBConnection}
 import services.AppConfig
 import play.api.mvc.Action
 import play.api.mvc.BodyParser
@@ -49,7 +49,7 @@ object ScenarioController extends Controller {
    * @return 200 (Ok) if successful.
    */
   def clear = filters.requireApplicationId.test {
-    controllerMethod() {
+    controllerMethod(dbSettings = WithDBConnection(readOnly = false)) {
       withRegisteredScenarios {
         Action {
           Scenario.clearAll()
@@ -83,7 +83,7 @@ object ScenarioController extends Controller {
    * @return 200 (Ok) and a useful human-readable message if successful.
    */
   def scenario (urlSlug: String) = filters.requireApplicationId.test { 
-    controllerMethod() {
+    controllerMethod(dbSettings = WithDBConnection(readOnly = false)) {
       withRegisteredScenarios {
         Action {
           Scenario.withSlug(urlSlug) match {

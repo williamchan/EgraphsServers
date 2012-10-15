@@ -1,7 +1,7 @@
 package controllers.website.consumer
 
 import play.api.mvc.Controller
-import services.http.POSTControllerMethod
+import services.http.{POSTControllerMethod, WithoutDBConnection}
 import services.mvc.ImplicitHeaderAndFooterData
 import services.mail.BulkMail
 import services.http.forms.purchase.FormReaders
@@ -22,7 +22,7 @@ private[controllers] trait PostBulkEmailController extends ImplicitHeaderAndFoot
    *
    * @return
    */
-  def postSubscribeEmail = postController(openDatabase = false) {
+  def postSubscribeEmail = postController(dbSettings = WithoutDBConnection) {
     Action { implicit request =>
       /*
        * listSubscribe(string apikey, string id, string email_address, array merge_vars,
@@ -35,7 +35,7 @@ private[controllers] trait PostBulkEmailController extends ImplicitHeaderAndFoot
         errors => Ok(toJson(Map("error" -> errors.map( error => error.description).toSeq))),
         
         validForm => {
-          bulkMail.subscribeNew(validForm.listId, validForm.email)  //TODO: We aren't doing anything if this fails, maybe we should do something 
+          bulkMail.subscribeNewAsync(validForm.listId, validForm.email)  //TODO: We aren't doing anything if this fails, maybe we should do something 
           //like store it somewhere that gets retried later since our bulk mailer service could be down..
           Ok(toJson(Map("subscribed" -> true)))
         }

@@ -70,6 +70,7 @@ GET      /admin/accounts/$accountId<[0-9]+>                          controllers
 #GET     /admin/celebrities/{celebrityId}/products                 controllers.WebsiteControllers.getCelebrityProductsAdmin
 #POST    /admin/celebrities/{celebrityId}/products                   controllers.WebsiteControllers.postCelebrityProductAdmin
 #GET     /admin/celebrities/{celebrityId}/products/create          controllers.WebsiteControllers.getCreateCelebrityProductAdmin
+#POST    /admin/celebrities/{celebrityId}/sendEmail/?                WebsiteControllers.postSendCelebrityWelcomeEmailAdmin
 #GET     /admin/egraphs                                            controllers.WebsiteControllers.getEgraphsAdmin
 #GET     /admin/egraphs/{egraphId}                                 controllers.WebsiteControllers.getEgraphAdmin
 #POST    /admin/egraphs/{egraphId}                                   controllers.WebsiteControllers.postEgraphAdmin

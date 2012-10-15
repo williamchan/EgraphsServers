@@ -10,6 +10,7 @@ import services.blobs.Blobs.Conversions._
 import ImageUtil.Conversions._
 import services.blobs.AccessPolicy
 import com.google.inject.Inject
+import services.logging.Logging
 
 case class ImageAssetServices @Inject() (blobs: Blobs, images: ImageUtil)
 
@@ -134,7 +135,13 @@ class ImageAsset(
    * publicly available.
    */
   def url: String = {
-    services.blobs.getUrl(key)
+    try {
+      services.blobs.getUrl(key)
+    } catch {
+      case e: Exception =>
+        error("Exception thrown from ImageAsset.url on key " + key)
+        throw e
+    }
   }
 
   /**
@@ -178,7 +185,7 @@ class ImageAsset(
   }
 }
 
-object ImageAsset {
+object ImageAsset extends Logging {
   /**
    * Creates a new [[models.ImageAsset]] with [[models.ImageAsset.MasterResolution]] out of the provided data.
    * See [[models.ImageAsset]] constructor for description of these arguments.

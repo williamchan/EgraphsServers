@@ -23,7 +23,8 @@ class PostSecurityTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValid
       () => endpoints.postOrderAdmin(0),
       () => endpoints.postEgraphAdmin(0),
       () => endpoints.postCelebrityInventoryBatchAdmin(0, 0, null, null),
-      () => endpoints.postResetPassword()
+      () => endpoints.postResetPassword(),
+      () => endpoints.postSendCelebrityWelcomeEmailAdmin(null)
     )
 
     for (endpointInvocation <- endpointInvocationsThatRequireTokens) {

@@ -1,9 +1,6 @@
 @(viewEgraphUrl: String,
   celebrityName: String,
-  recipientName: String,
-  emailLogoSrc: String,
-  emailFacebookSrc: String,
-  emailTwitterSrc: String
+  recipientName: String
 )
 
 @import views.html.frontend.tags
@@ -16,15 +13,15 @@
 		<table cellpadding="0" cellspacing="0" width="100%" bgcolor="#f0f0f0" style="width: 100%; background: #f0f0f0;">
 				<td align="middle">
 					<table cellpadding="0" cellspacing="0" width="600px" align="middle" bgcolor="#fafafa" style="width: 600px; margin: 0 auto; background: #fafafa repeat-y 50% 0;">
-						<!--<tr>-->
-							<!--<td><img border="0" src='@RemoteAssets.at("images/email-shim.gif")' width="520" height="40" /></td>-->
-						<!--</tr>-->
+						<tr>
+							<td><img border="0" src="https://s3.amazonaws.com/egraphs-static-resources/public/images/email-shim.gif" width="520" height="40" /></td>
+						</tr>
 						<tr>
 							<td align="middle">
 								<table cellpadding="0" cellspacing="0" width="520px" style="width: 520px;">
 									<tr>
 										<td align="left" valign="top">
-                      @tags.email.email_header(emailLogoSrc, emailFacebookSrc, emailTwitterSrc)
+                      @tags.email.email_header()
 
 											<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
                         Hi @recipientName,
@@ -53,11 +50,6 @@
                       <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
                         @celebrityName
                       </p>
-											
-											<!--<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">-->
-                        <!--<img border="0" src='@RemoteAssets.at("images/email-fpo-signature.gif")' alt="@celebrityName" width="166" height="83" />-->
-                      <!--</p>-->
-											
 											<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
                         <a href="@viewEgraphUrl" class=""><strong>View your Egraph</strong> <span>&raquo;</span></a>
                       </p>
@@ -66,9 +58,9 @@
 								</table>
 							</td>
 						</tr>
-						<!--<tr>-->
-							<!--<td><img border="0" src='@RemoteAssets.at("images/email-shim.gif")' width="520" height="40" /></td>-->
-						<!--</tr>-->
+						<tr>
+							<td><img border="0" src="https://s3.amazonaws.com/egraphs-static-resources/public/images/email-shim.gif" width="520" height="40" /></td>
+						</tr>
 					</table>
 					@tags.email.email_footer()
 				</td>

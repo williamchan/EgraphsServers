@@ -20,6 +20,10 @@
 </script>
 }
 
+@postSendCelebrityWelcomeEmailAdmin(celebrityId: Long) = @{
+  lookupUrl("WebsiteControllers.postSendCelebrityWelcomeEmailAdmin", Map("celebrityId" -> celebrityId.toString))
+}
+
 @postCelebrity = @{
   lookupUrl("WebsiteControllers.postCelebrityAdmin")
 }
@@ -65,6 +69,7 @@
           @formField(id="roleDescription", label="Role Description", inputType="text", width="span4", help=Some(roleHelp), fields=fields)
           @roleHelp = "e.g. \"Pitcher, Tampa Bay Rays\""
 
+        </fieldset>
           <div class="clearfix">
             <label for="bio">Short Bio</label>
             <div class="input">
@@ -97,6 +102,21 @@
           </div>
         </fieldset>
       </form>
+      <div>
+        @for(presentCelebrity <- celebrity) {
+        <hr/>
+        <form method="POST" action='@postSendCelebrityWelcomeEmailAdmin(presentCelebrity.id)'>
+          <fieldset>
+          @authenticityToken()
+          @formField(id="celebrityEmail", label="E-mail address", inputType="text",
+            help = Some( new Html("Specify the email address for the welcome letter.") ), width="span4", fields=fields)
+          <div class="actions">
+            <input class="btn primary fade in" type="submit" value="Send Welcome Email"/>
+          </div>
+          </fieldset>
+        </form>
+        }
+      </div>
       <div class="span2 profile-thumbnail" >
         <legend>Current Profile</legend>
         <img src="@profilePhoto">

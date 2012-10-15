@@ -3,7 +3,7 @@ package services.mail
 import utils.EgraphsUnitTest
 import services.{AppConfig, Utils}
 
-class MailTests extends EgraphsUnitTest
+class TransactionalMailTests extends EgraphsUnitTest
 {
   val appUtils = AppConfig.instance[Utils]
 
@@ -16,7 +16,7 @@ class MailTests extends EgraphsUnitTest
   it should "provide the gmail instance when smtp value isn't mock and gmail host is provided" in {
     // Set up
     val playConfig = appUtils.properties(
-      "mail.smtp" -> "real",
+      "mail.smtp" -> "gmail",
       "mail.smtp.host" -> "smtp.gmail.com",
       "mail.smtp.user" -> "eboto",
       "mail.smtp.pass" -> "herp"
@@ -27,7 +27,7 @@ class MailTests extends EgraphsUnitTest
     val mail = new MailProvider(playConfig, utils).get()
 
     // Check expectations
-    mail should be (Gmail("eboto", "herp"))
+    mail should be (TransactionalMailer("eboto", "herp", "smtp.gmail.com"))
   }
 
   it should "otherwise delegate to Play mail implementation" in {

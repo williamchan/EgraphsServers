@@ -7,7 +7,8 @@ import play.api.mvc.Session
 import models.{Customer, CustomerStore}
 import controllers.routes.WebsiteControllers.{getCustomerGalleryByUsername, getAccountSettings}
 import play.api.mvc.RequestHeader
-
+import controllers.WebsiteControllers
+import services.mail.BulkMail
 
 /**
  * Provides implicit data necessary to render the header and footer of the website's
@@ -15,15 +16,21 @@ import play.api.mvc.RequestHeader
  */
 trait ImplicitHeaderAndFooterData {
   protected def customerStore: CustomerStore
+  protected def bulkMail: BulkMail
 
   implicit def siteHeaderData(implicit request: RequestHeader): HeaderData = {
     HeaderData(loggedInStatus=getHeaderLoggedInStatus(request.session))
   }
 
   implicit def siteFooterData: FooterData = {
-    // TODO(erem): After integrating static pages then replace these hard links with
-    // relative ones.
-    FooterData()
+    FooterData(
+      aboutUsLink = controllers.routes.WebsiteControllers.getAbout.url,
+      faqLink = controllers.routes.WebsiteControllers.getFAQ.url,
+      termsOfUseLink = controllers.routes.WebsiteControllers.getTerms.url,
+      privacyPolicyLink = controllers.routes.WebsiteControllers.getPrivacy.url,
+      careersPolicyLink = controllers.routes.WebsiteControllers.getCareers.url,
+      newsletterListId = bulkMail.newsletterListId
+    )
   }
 
   //

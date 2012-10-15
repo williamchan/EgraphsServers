@@ -3,8 +3,8 @@ package services.mvc.celebrity
 import akka.actor.{ActorRef, Actor}
 import com.google.inject.Inject
 import services.AppConfig
-import models.CelebrityStore
 import java.util.concurrent.TimeUnit
+import java.util.Random
 import services.logging.Logging
 import services.db.{TransactionSerializable, DBSession}
 import services.cache.CacheFactory
@@ -12,6 +12,8 @@ import play.api.Play.current
 import akka.actor.Props
 import play.api.libs.concurrent.Akka
 import akka.util.duration._
+import org.joda.time.DateTimeConstants
+import models.{CelebrityStore, ProductStore}
 
 /**
  * You are probably looking for [[services.mvc.celebrity.CatalogStarsQuery]] instead of this.
@@ -44,7 +46,7 @@ private[celebrity] class UpdateCatalogStarsActor @Inject()(
       val catalogStars = cache.cacheing(resultsCacheKey, updatePeriodSeconds) {
         // Due to cache miss, this instance must update from the database. Get all the stars and
         // their sold-out info.
-        db.connected(TransactionSerializable) {
+        db.connected(isolation = TransactionSerializable, readOnly = true) {
           log("Updating landing page celebrities")
 
           // Get the list of domain objects from the DB
@@ -83,7 +85,7 @@ private[mvc] object UpdateCatalogStarsActor extends Logging {
   private[celebrity] val singleton = {
     Akka.system.actorOf(Props(AppConfig.instance[UpdateCatalogStarsActor])) 
   }
-  private[celebrity] val updatePeriodSeconds = 30
+  private[celebrity] val updatePeriodSeconds = 5 * DateTimeConstants.SECONDS_PER_MINUTE
   private[celebrity] val resultsCacheKey = "catalog-stars"
   private[celebrity] case class UpdateCatalogStars(recipientActor: ActorRef)
 
@@ -91,6 +93,8 @@ private[mvc] object UpdateCatalogStarsActor extends Logging {
   // Private members
   //
   private def scheduleJob() = {
+    val random = new Random()
+    val delayJitter = random.nextInt() % 10 // this should make the update schedule a little more random, and if we are unlucky that all hosts update at once, they won't the next time.
     log("Scheduling landing page celebrity update for every " + updatePeriodSeconds + "s")
     Akka.system.scheduler.schedule(
       10 seconds,

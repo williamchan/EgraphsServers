@@ -1,6 +1,6 @@
 package controllers.website.consumer
 
-import services.http.{SafePlayParams, POSTControllerMethod, ControllerMethod}
+import services.http.{SafePlayParams, POSTControllerMethod, ControllerMethod, WithoutDBConnection}
 import services.http.filters.HttpFilters
 import play.api.mvc.Controller
 import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
@@ -60,7 +60,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
         // Get the purchase forms out of the server session
         val forms = purchaseFormFactory.formsForStorefront(celeb.id)(request.session)
   
-        val results = for (allPurchaseForms <- forms.allPurchaseFormsOrRedirect(celeb, product).right) yield {
+        val results = for (allPurchaseForms <- forms.redirectOrAllPurchaseForms(celeb, product).right) yield {
           // Everything looks good for rendering the page! Unpack the purchase data.
           val AllPurchaseForms(
             formProductId,
@@ -86,7 +86,6 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
           val maybeShippingViewModel = maybeShipping.map { shipping =>
             FinalizeShippingViewModel(
               name=shipping.name,
-              email=shipping.email,
               addressLine1 = shipping.addressLine1,
               addressLine2 = shipping.addressLine2,
               city = shipping.city,
@@ -147,7 +146,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
    * @return a Redirect to the order complete page if successful, otherwise
    *         a Redirect back to the form to handle errors.
    */
-  def postStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug: String) = postController(openDatabase=false) {
+  def postStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug: String) = postController(dbSettings = WithoutDBConnection) {
     Action { implicit request =>
       // Get all the sweet, sweet purchase form data in a database transaction. We end up with a weird 
       // Either[Result, Either[Result, (The purchase data)], but we'll unpack them later. If you're feeling
@@ -156,7 +155,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
         httpFilters.requireCelebrityAndProductUrlSlugs.asOperationResult(celebrityUrlSlug, productUrlSlug, request.session) { 
           (celeb, product) =>
             val forms = purchaseFormFactory.formsForStorefront(celeb.id)(request.session)
-            for (formData <- forms.allPurchaseFormsOrRedirect(celeb, product).right) yield {
+            for (formData <- forms.redirectOrAllPurchaseForms(celeb, product).right) yield {
               (celeb, product, formData, forms)
             }
         }

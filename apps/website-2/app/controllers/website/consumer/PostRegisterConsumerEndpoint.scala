@@ -5,6 +5,7 @@ import play.api.mvc.Action
 import play.api.mvc.Result
 import play.api.mvc.Results.{Ok, Redirect}
 import services.http.POSTControllerMethod
+import services.http.{WithoutDBConnection, EgraphsSession, POSTControllerMethod}
 import models._
 import services.mvc.ImplicitHeaderAndFooterData
 import services.http.forms.purchase.FormReaders
@@ -38,7 +39,7 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
   //
   // Controllers
   //
-  def postRegisterConsumerEndpoint = postController(openDatabase=false) {
+  def postRegisterConsumerEndpoint = postController(dbSettings = WithoutDBConnection) {
     Action { implicit request =>
       val redirects = for(
         // Get either the account and customer or a redirect back to the sign-in page

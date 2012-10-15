@@ -37,14 +37,19 @@ class NamespacedCache (val namespace: String="", cache: Cache) extends Cache wit
   // Cache members
   //
   def set[T](key: String, value: T, expirationSeconds: Int) {
-    log("SET " + key + " -> " + value)
+//    log("SET " + key + " -> " + value)
     cache.set(applyNamespace(key), value, expirationSeconds)
   }
 
   def get[T: Manifest](key: String): Option[T] = {
-    val value = cache.get[T](applyNamespace(key))
-    log("GET " + key + " -> " + value)
-
+    val value = try {
+      cache.get[T](applyNamespace(key))
+      //    log("GET " + key + " -> " + value)
+    } catch {
+      case e: Exception =>
+        error("Exception thrown from ImageAsset.url on key " + key)
+        throw e
+    }
     value
   }
 

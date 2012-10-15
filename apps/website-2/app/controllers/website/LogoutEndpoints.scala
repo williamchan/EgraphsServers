@@ -3,7 +3,7 @@ package controllers.website
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import play.api.mvc.Results.Redirect
-import services.http.{ControllerMethod, POSTControllerMethod}
+import services.http.{ControllerMethod, POSTControllerMethod, WithoutDBConnection}
 import play.api.mvc.Result
 
 private[controllers] trait LogoutEndpoints {
@@ -12,14 +12,14 @@ private[controllers] trait LogoutEndpoints {
   protected def controllerMethod: ControllerMethod
   protected def postController: POSTControllerMethod
 
-  def getLogout() = controllerMethod(openDatabase = false) {
+  def getLogout() = controllerMethod(dbSettings = WithoutDBConnection) {
     Action {  
       logout()
     }
   }
 
-  def postLogout() = postController(openDatabase=false) {
-    Action {
+  def postLogout() = postController(dbSettings = WithoutDBConnection) {
+    Action {  
       logout()
     }
   }

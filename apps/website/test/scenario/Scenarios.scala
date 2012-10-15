@@ -8,7 +8,7 @@ import utils.{TestConstants, TestData}
 import org.squeryl.PrimitiveTypeMode._
 import models._
 import controllers.WebsiteControllers
-import enums.{OrderReviewStatus, EgraphState, EnrollmentStatus, PublishedStatus}
+import enums._
 import play.libs.Codec
 import play.Play
 import services.{Utils, AppConfig}
@@ -17,6 +17,10 @@ import java.text.SimpleDateFormat
 import javax.imageio.ImageIO
 import controllers.website.GetAccountSettingsEndpoint
 import services.http.EgraphsSession
+import scala.Some
+import models.Administrator
+import models.InventoryBatch
+import models.Order
 
 /**
  * All scenarios supported by the API.
@@ -189,6 +193,7 @@ class Scenarios extends DeclaresScenarios {
           select (order)
       ).headOption.get
       firstOrder
+        .withPaymentStatus(PaymentStatus.Charged).save()
         .newEgraph
         .withAssets(TestConstants.signingAreaSignatureStr, Some(TestConstants.signingAreaMessageStr), Codec.decodeBASE64(TestConstants.voiceStr()))
         .save()
@@ -257,16 +262,8 @@ class Scenarios extends DeclaresScenarios {
       email.addReplyTo("noreply@egraphs.com")
       email.addTo("will@egraphs.com")
       email.setSubject("Welcome to Egraphs!")
-      val emailLogoSrc = "cid:" + email.embed(Play.getFile(Utils.asset("public/images/email-logo.jpg")))
-      val emailFacebookSrc = "cid:" + email.embed(Play.getFile(Utils.asset("public/images/email-facebook.jpg")))
-      val emailTwitterSrc = "cid:" + email.embed(Play.getFile(Utils.asset("public/images/email-twitter.jpg")))
       val verifyPasswordUrl = "https://www.google.com"
-      val html = views.frontend.html.email_account_verification(
-        verifyPasswordUrl = verifyPasswordUrl,
-        emailLogoSrc = emailLogoSrc,
-        emailFacebookSrc = emailFacebookSrc,
-        emailTwitterSrc = emailTwitterSrc
-      )
+      val html = views.frontend.html.email_account_verification(verifyPasswordUrl = verifyPasswordUrl)
       email.setHtmlMsg(html.toString())
       val textVersion = views.frontend.html.email_account_verification_text(verifyPasswordUrl)
       email.setTextMsg(textVersion.toString())
@@ -283,9 +280,6 @@ class Scenarios extends DeclaresScenarios {
       email.setFrom("noreply@egraphs.com", "Egraphs")
       email.addTo("will@egraphs.com")
       email.setSubject("Order Confirmation")
-      val emailLogoSrc = "cid:" + email.embed(Play.getFile(Utils.asset("public/images/email-logo.jpg")))
-      val emailFacebookSrc = "cid:" + email.embed(Play.getFile(Utils.asset("public/images/email-facebook.jpg")))
-      val emailTwitterSrc = "cid:" + email.embed(Play.getFile(Utils.asset("public/images/email-twitter.jpg")))
       val html = views.frontend.html.email_order_confirmation(
         buyerName = "Will Chan",
         recipientName = "Andrew Smith",
@@ -297,10 +291,7 @@ class Scenarios extends DeclaresScenarios {
         pricePaid = "$50.00",
         deliveredByDate = "Jan 8, 2012",
         faqHowLongLink = "/faq#how-long",
-        hasPrintOrder = true,
-        emailLogoSrc = emailLogoSrc,
-        emailFacebookSrc = emailFacebookSrc,
-        emailTwitterSrc = emailTwitterSrc
+        hasPrintOrder = true
       )
       email.setHtmlMsg(html.toString())
       val textVersion = views.frontend.html.email_order_confirmation_text(
@@ -331,17 +322,11 @@ class Scenarios extends DeclaresScenarios {
       email.addTo("will@egraphs.com")
       email.addReplyTo("noreply@egraphs.com")
       email.setSubject("I just finished signing your Egraph")
-      val emailLogoSrc = "cid:" + email.embed(Play.getFile(Utils.asset("public/images/email-logo.jpg")))
-      val emailFacebookSrc = "cid:" + email.embed(Play.getFile(Utils.asset("public/images/email-facebook.jpg")))
-      val emailTwitterSrc = "cid:" + email.embed(Play.getFile(Utils.asset("public/images/email-twitter.jpg")))
       val viewEgraphUrl = "http://www.google.com"
       val html = views.frontend.html.email_view_egraph(
         viewEgraphUrl = viewEgraphUrl,
         celebrityName = "Celebrity Jane",
-        recipientName = "Will Chan",
-        emailLogoSrc = emailLogoSrc,
-        emailFacebookSrc = emailFacebookSrc,
-        emailTwitterSrc = emailTwitterSrc
+        recipientName = "Will Chan"
       )
       email.setHtmlMsg(html.toString())
       val textVersion = views.frontend.html.email_view_egraph_text(viewEgraphUrl = viewEgraphUrl, celebrityName = "Celebrity Jane", recipientName = "Will Chan")

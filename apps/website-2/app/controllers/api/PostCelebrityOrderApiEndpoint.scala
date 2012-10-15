@@ -6,14 +6,14 @@ import models.enums.OrderReviewStatus
 import play.api.mvc.Controller
 import play.api.mvc.Result
 import services.db.DBSession
-import services.http.ControllerMethod
+import services.http.{WithoutDBConnection, POSTApiControllerMethod}
 import services.http.filters.HttpFilters
 import sjson.json.Serializer
 import play.api.mvc.Action
 
 private[controllers] trait PostCelebrityOrderApiEndpoint { this: Controller =>
   protected def dbSession: DBSession
-  protected def controllerMethod: ControllerMethod
+  protected def postApiController: POSTApiControllerMethod
   protected def httpFilters: HttpFilters
 
   /**
@@ -26,7 +26,7 @@ private[controllers] trait PostCelebrityOrderApiEndpoint { this: Controller =>
     reviewStatus: Option[String] = None,
     rejectionReason: Option[String] = None) =
   {
-    controllerMethod() {
+    postApiController(dbSettings = WithoutDBConnection) {
       httpFilters.requireAuthenticatedAccount() { account =>
         httpFilters.requireCelebrityId.inAccount(account) { celebrity =>
           httpFilters.requireOrderIdOfCelebrity(celebrity.id) { order =>

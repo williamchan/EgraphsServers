@@ -30,18 +30,13 @@ case class OrderServices @Inject() (
   printOrderStore: PrintOrderStore,
   payment: Payment,
   mail: TransactionalMail,
-  cashTransactionServices: Provider[CashTransactionServices],
+  cashTransactionStore: CashTransactionStore,
   egraphServices: Provider[EgraphServices]
 )
 
 /**
  * Persistent entity representing the Orders made upon Products of our service
  */
-@Deprecated case class ShippingInfo(
-  _printingOption: String = PrintingOption.DoNotPrint.name,
-  shippingAddress: Option[String] = None
-)
-
 case class Order(
   id: Long = 0,
   productId: Long = 0,
@@ -54,14 +49,10 @@ case class Order(
   rejectionReason: Option[String] = None,
   _privacyStatus: String = PrivacyStatus.Public.name,
   _writtenMessageRequest: String = WrittenMessageRequest.SpecificMessage.name,
-  @Deprecated stripeCardTokenId: Option[String] = None,
-  @Deprecated stripeChargeId: Option[String] = None,
   amountPaidInCurrency: BigDecimal = 0,
-  @Deprecated billingPostalCode: Option[String] = None,
   messageToCelebrity: Option[String] = None,
   requestedMessage: Option[String] = None,
   expectedDate: Option[Date] = None,
-  @Deprecated shippingInfo: ShippingInfo = ShippingInfo(),
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: OrderServices = AppConfig.instance[OrderServices]
@@ -72,9 +63,6 @@ case class Order(
   with HasOrderReviewStatus[Order]
   with HasWrittenMessageRequest[Order]
 {
-  @Deprecated val _printingOption = if (shippingInfo != null) shippingInfo._printingOption else ""
-  @Deprecated val shippingAddress = if (shippingInfo != null) shippingInfo.shippingAddress else None
-
   //
   // Public methods
   //
@@ -134,8 +122,7 @@ case class Order(
   def refund(): (Order, Charge) = {
     // Do a bunch of validation to make sure we have everything to do this refund
     require(paymentStatus == PaymentStatus.Charged, "Refunding an Order requires that the Order be already Charged")
-    val cashTransactionService = services.cashTransactionServices.get()
-    val maybeCashTransaction = cashTransactionService.cashTransactionStore.findByOrderId(id).headOption
+    val maybeCashTransaction = services.cashTransactionStore.findByOrderId(id).headOption
 
     require(maybeCashTransaction.isDefined && maybeCashTransaction.get.stripeChargeId.isDefined, "Refunding an Order requires that the Order be already Charged")
     val cashTransaction = maybeCashTransaction.get
@@ -146,7 +133,7 @@ case class Order(
     val errorStringOrRefundedOrderAndCharge = for (
       customer <- maybeCustomer.toRight("There is no customer!").right
     ) yield {
-      doRefund(customer, stripeChargeId, cashTransactionService)
+      doRefund(customer, stripeChargeId)
     }
 
     errorStringOrRefundedOrderAndCharge.fold(
@@ -155,9 +142,9 @@ case class Order(
     )
   }
 
-  private def doRefund(buyer: Customer, stripeChargeId: String, cashTransactionService: CashTransactionServices): (Order, Charge) = {
+  private def doRefund(buyer: Customer, stripeChargeId: String): (Order, Charge) = {
     val refundedCharge = services.payment.refund(stripeChargeId)
-    CashTransaction(accountId = buyer.account.id, orderId = Some(id), services = cashTransactionService)
+    CashTransaction(accountId = buyer.account.id, orderId = Some(id))
       .withCash(amountPaid.negated())
       .withCashTransactionType(CashTransactionType.PurchaseRefund)
       .save()
@@ -168,26 +155,20 @@ case class Order(
   def approveByAdmin(admin: Administrator): Order = {
     require(admin != null, "Must be approved by an Administrator")
     require(reviewStatus == OrderReviewStatus.PendingAdminReview, "Must be PendingAdminReview before approving by admin")
-    // TODO SER-98: How to keep _printingOption and shippingAddress intact without this hack?!
-    val omg = this.copy(shippingInfo = ShippingInfo(_printingOption = _printingOption, shippingAddress = shippingAddress))
-    omg.withReviewStatus(OrderReviewStatus.ApprovedByAdmin)
+    withReviewStatus(OrderReviewStatus.ApprovedByAdmin)
   }
 
   def rejectByAdmin(admin: Administrator, rejectionReason: Option[String] = None): Order = {
     require(admin != null, "Must be rejected by an Administrator")
     require(reviewStatus == OrderReviewStatus.PendingAdminReview, "Must be PendingAdminReview before rejecting by admin")
-    // TODO SER-98: How to keep _printingOption and shippingAddress intact without this hack?!
-    val omg = this.copy(shippingInfo = ShippingInfo(_printingOption = _printingOption, shippingAddress = shippingAddress))
-    omg.withReviewStatus(OrderReviewStatus.RejectedByAdmin).copy(rejectionReason = rejectionReason)
+    withReviewStatus(OrderReviewStatus.RejectedByAdmin).copy(rejectionReason = rejectionReason)
   }
 
   def rejectByCelebrity(celebrity: Celebrity, rejectionReason: Option[String] = None): Order = {
     require(celebrity != null, "Must be rejected by Celebrity associated with this Order")
     require(celebrity.id == product.celebrityId, "Must be rejected by Celebrity associated with this Order")
     require(reviewStatus == OrderReviewStatus.ApprovedByAdmin, "Must be ApprovedByAdmin before rejecting by celebrity")
-    // TODO SER-98: How to keep _printingOption and shippingAddress intact without this hack?!
-    val omg = this.copy(shippingInfo = ShippingInfo(_printingOption = _printingOption, shippingAddress = shippingAddress))
-    omg.withReviewStatus(OrderReviewStatus.RejectedByCelebrity).copy(rejectionReason = rejectionReason)
+    withReviewStatus(OrderReviewStatus.RejectedByCelebrity).copy(rejectionReason = rejectionReason)
   }
 
   def sendEgraphSignedMail[A](implicit request: RequestHeader) {
@@ -204,20 +185,11 @@ case class Order(
 
     email.addReplyTo("noreply@egraphs.com")
     email.setSubject("I just finished signing your Egraph")
-    //    val emailLogoSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-logo.jpg")))
-    //    val emailFacebookSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-facebook.jpg")))
-    //    val emailTwitterSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-twitter.jpg")))
-    val emailLogoSrc = ""
-    val emailFacebookSrc = ""
-    val emailTwitterSrc = ""
     val viewEgraphUrl = GetEgraphEndpoint.absoluteUrl(id)
     val htmlMsg = views.html.frontend.email_view_egraph(
       viewEgraphUrl = viewEgraphUrl,
       celebrityName = celebrity.publicName,
-      recipientName = recipientName,
-      emailLogoSrc = emailLogoSrc,
-      emailFacebookSrc = emailFacebookSrc,
-      emailTwitterSrc = emailTwitterSrc
+      recipientName = recipientName
     )
     val textMsg = views.html.frontend.email_view_egraph_text(
       viewEgraphUrl = viewEgraphUrl,
@@ -383,7 +355,7 @@ class OrderStore @Inject() (schema: Schema) extends SavesWithLongKey[Order] with
           FilterOneTable.reduceFilters(filters, order)
       )
         select (order)
-        orderBy (order.created asc)
+        orderBy (order.id asc)
     )
   }
 
@@ -405,7 +377,7 @@ class OrderStore @Inject() (schema: Schema) extends SavesWithLongKey[Order] with
           FilterOneTable.reduceFilters(filters, order)
       )
         select (order)
-        orderBy (order.created asc)
+        orderBy (order.id asc)
     )
   }
 
@@ -417,7 +389,7 @@ class OrderStore @Inject() (schema: Schema) extends SavesWithLongKey[Order] with
         FilterOneTable.reduceFilters(filters, order)
       )
         select (order)
-        orderBy (order.created asc)
+        orderBy (order.id asc)
     )
   }
 
@@ -468,17 +440,12 @@ class OrderStore @Inject() (schema: Schema) extends SavesWithLongKey[Order] with
       theOld.rejectionReason := theNew.rejectionReason,
       theOld._privacyStatus := theNew._privacyStatus,
       theOld._writtenMessageRequest := theNew._writtenMessageRequest,
-      theOld.stripeCardTokenId := theNew.stripeCardTokenId,
-      theOld.stripeChargeId := theNew.stripeChargeId,
       theOld.amountPaidInCurrency := theNew.amountPaidInCurrency,
       theOld.recipientId := theNew.recipientId,
       theOld.recipientName := theNew.recipientName,
       theOld.messageToCelebrity := theNew.messageToCelebrity,
       theOld.requestedMessage := theNew.requestedMessage,
       theOld.expectedDate := theNew.expectedDate,
-      theOld.billingPostalCode := theNew.billingPostalCode,
-      theOld._printingOption := theNew._printingOption,
-      theOld.shippingAddress := theNew.shippingAddress,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated
     )

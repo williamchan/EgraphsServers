@@ -112,29 +112,14 @@ object Customer {
     email.addReplyTo("noreply@egraphs.com")
     email.addTo(account.email)
     email.setSubject("Welcome to Egraphs!")
-    //    val emailLogoSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-logo.jpg")))
-    //    val emailFacebookSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-facebook.jpg")))
-    //    val emailTwitterSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-twitter.jpg")))
-    val emailLogoSrc = ""
-    val emailFacebookSrc = ""
-    val emailTwitterSrc = ""
 
     val (textMsg: String, htmlMsg: Html) = if (verificationNeeded) {
       val verifyPasswordUrl = getVerifyAccount(account.email, account.resetPasswordKey.get).absoluteURL(secure=true)
-      val html = views.html.frontend.email_account_verification(
-        verifyPasswordUrl = verifyPasswordUrl,
-        emailLogoSrc = emailLogoSrc,
-        emailFacebookSrc = emailFacebookSrc,
-        emailTwitterSrc = emailTwitterSrc
-      )
+      val html = views.html.frontend.email_account_verification(verifyPasswordUrl = verifyPasswordUrl)
       val text = views.html.frontend.email_account_verification_text(verifyPasswordUrl).toString()
       (text, html)
     } else {
-      val html = views.html.frontend.email_account_confirmation(
-        emailLogoSrc = emailLogoSrc,
-        emailFacebookSrc = emailFacebookSrc,
-        emailTwitterSrc = emailTwitterSrc
-      )
+      val html = views.html.frontend.email_account_confirmation()
       val text = views.html.frontend.email_account_confirmation_text.toString()
       (text, html)
     }

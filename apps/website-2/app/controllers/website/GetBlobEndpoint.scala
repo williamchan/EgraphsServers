@@ -5,7 +5,7 @@ import play.api.mvc._
 import play.api.mvc.Results._
 import services.blobs.Blobs.Conversions._
 import services.blobs.Blobs
-import services.http.ControllerMethod
+import services.http.{ControllerMethod, WithoutDBConnection}
 import services.logging.Logging
 import play.api.http.ContentTypeOf
 import play.api.libs.MimeTypes
@@ -27,7 +27,7 @@ private[controllers] trait GetBlobEndpoint { this: Controller =>
     // Touch it if you want to have a bad time. (Scala 2.9.1)
     val thisControllerMethod = controllerMethod
     
-    thisControllerMethod(openDatabase=false) {
+    thisControllerMethod(dbSettings = WithoutDBConnection) {
       Action {
       blobs.get(blobKey) match {
         case None =>

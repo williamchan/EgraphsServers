@@ -29,10 +29,11 @@
     <tr>
       <th></th>
       <th>Id</th>
+      <th>Order Id</th>
       <th>Product</th>
       <th>Fulfilled?</th>
       <th>Has PNG?</th>
-      <th>Egraph ready?</th>
+      <th>Egraph Id</th>
     </tr>
     @printOrderDate.map { case (printOrder, order, egraphOption) =>
     <tr>
@@ -42,10 +43,11 @@
         </a>
       </td>
       <td>@printOrder.id</td>
+      <td>@order.id</td>
       <td>@order.productId</td>
       <td>@printOrder.isFulfilled</td>
       <td>@printOrder.pngUrl.isDefined</td>
-      <td>@egraphOption.isDefined</td>
+      <td>@egraphOption.map(_.id)</td>
     </tr>
     }
   </table>

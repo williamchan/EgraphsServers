@@ -7,6 +7,7 @@ import services.http.ControllerMethod
 import play.api.mvc.Action
 import play.api.mvc.Results.Ok
 import services.http.filters.HttpFilters
+import services.http.WithDBConnection
 
 /**
  * Test controller used in [[controllers.DBTransactionTests]] to verify that Play does, in fact,
@@ -17,7 +18,7 @@ object TransactionTestController extends Controller {
   private val filters = AppConfig.instance[HttpFilters]
 
   def makeAccountAndThrowException() = filters.requireApplicationId.test {
-    controllerMethod() {
+    controllerMethod(WithDBConnection(readOnly=false)) {
       Action {
         createSavedAccount()
         throw new RuntimeException(
@@ -30,7 +31,7 @@ object TransactionTestController extends Controller {
   }
 
   def isStored = filters.requireApplicationId.test {
-    controllerMethod() {
+    controllerMethod(WithDBConnection(readOnly=false)) {
       Action {
         Ok(AppConfig.instance[AccountStore].findByEmail("erem@egraphs.com").headOption match {
           case None => "Nope"
@@ -41,7 +42,7 @@ object TransactionTestController extends Controller {
   }
 
   def makeAccount() = filters.requireApplicationId.test {
-    controllerMethod() {
+    controllerMethod(WithDBConnection(readOnly=false)) {
       Action {
         createSavedAccount()
         

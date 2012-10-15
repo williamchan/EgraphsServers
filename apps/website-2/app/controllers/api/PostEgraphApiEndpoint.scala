@@ -18,7 +18,7 @@ import play.api.mvc.Controller
 import services.Time
 import services.db.DBSession
 import services.db.TransactionSerializable
-import services.http.ControllerMethod
+import services.http.{WithoutDBConnection, POSTApiControllerMethod}
 import services.http.HttpCodes
 import services.http.filters.HttpFilters
 import services.http.forms.Play2FormFormatters.doubleFormat
@@ -26,7 +26,7 @@ import services.http.forms.Play2FormFormatters.doubleFormat
 private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
   protected def egraphActor: ActorRef
   protected def dbSession: DBSession
-  protected def controllerMethod: ControllerMethod
+  protected def postApiController: POSTApiControllerMethod
   protected def httpFilters: HttpFilters
   
   case class EgraphSubmission(
@@ -46,7 +46,7 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
    * about the params.
    */
   def postEgraph() = {
-    controllerMethod(openDatabase=false) {
+    postApiController(dbSettings = WithoutDBConnection) {
       Action { implicit request =>        
         val postForm = Form(
           mapping(

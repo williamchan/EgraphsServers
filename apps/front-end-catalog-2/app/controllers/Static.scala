@@ -43,10 +43,6 @@ object Static extends Controller with DefaultImplicitTemplateParameters {
     Ok(views.html.frontend.terms())
   }
 
-  def contact() = Action {
-    Ok(views.html.frontend.contact())
-  }
-
   def privacy() = Action {
     Ok(views.html.frontend.privacy())
   }

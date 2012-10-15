@@ -55,6 +55,5 @@ object GetCelebrityAdminEndpoint {
 
   def url(celebrityId: Long, action: Option[String] = None) = {
     controllers.routes.WebsiteControllers.getCelebrityAdmin(celebrityId, action).url
-//    Redirect(controllers.routes.WebsiteControllers.getCelebrityAdmin(celebrityId, action))
   }
 }

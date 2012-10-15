@@ -1,6 +1,6 @@
 package services.mvc.celebrity
 
-import models.{ImageAsset, Celebrity}
+import models.{InventoryQuantity, ImageAsset, Celebrity}
 import models.frontend.storefront.{ChoosePhotoRecentEgraph, ChoosePhotoCelebrity}
 import services.blobs.AccessPolicy
 import models.frontend.landing.CatalogStar
@@ -48,6 +48,31 @@ class CelebrityViewConversions(celeb: Celebrity) {
    * The celebrity as a CatalogStar. If some necessary data for the CatalogStar
    * were not available (e.g. publicName, storeFrontUrl) then it returns None.
    */
+  def asCatalogStar(inventoryQuantities: Seq[InventoryQuantity]): CatalogStar = {
+    val mastheadImageUrl = celeb
+      .landingPageImage
+      .withImageType(ImageAsset.Jpeg)
+      .resizedWidth(440)
+      .getSaved(AccessPolicy.Public)
+      .url
+
+    val purchaseableProductsIds = inventoryQuantities.filter {
+      productAndCount => productAndCount.quantityRemaining > 0
+    }
+    
+    val choosePhotoUrl = controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled(celebrityUrlSlug = celeb.urlSlug).url
+
+    CatalogStar(
+      name = celeb.publicName,
+      secondaryText = Option(celeb.roleDescription),
+      imageUrl = mastheadImageUrl,
+      storefrontUrl = choosePhotoUrl,
+      hasInventoryRemaining = !purchaseableProductsIds.isEmpty,
+      isFeatured = celeb.isFeatured
+    )
+  }
+
+  @deprecated("This is the old version before SER-86. Bringing this back because the new version does not work yet.", "")
   def asCatalogStar: CatalogStar = {
     val mastheadImageUrl = celeb
       .landingPageImage

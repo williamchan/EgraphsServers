@@ -8,7 +8,7 @@ import controllers.website.consumer.StorefrontChoosePhotoConsumerEndpoints
 import services.db.{DBSession, TransactionSerializable}
 import play.data.validation.Validation
 import controllers.website.EgraphPurchaseHandler
-import services.http.POSTControllerMethod
+import services.http.{POSTControllerMethod, WithoutDBConnection}
 import services.mail.TransactionalMail
 import play.api.mvc.Controller
 import services.http.forms.FormChecks
@@ -48,7 +48,7 @@ trait PostBuyDemoProductEndpoint { this: Controller =>
    * an order specified only in domain relevant terms (recipient, buyer, etc)
    */
   def postBuyDemoProduct(celebrityUrlSlug: String,
-                         productUrlSlug: String) = postController(openDatabase = false, doCsrfCheck = false) {
+                         productUrlSlug: String) = postController(doCsrfCheck = false, WithoutDBConnection) {
 
     Logger.info("Receiving purchase order")
     httpFilters.requireApplicationId.test {

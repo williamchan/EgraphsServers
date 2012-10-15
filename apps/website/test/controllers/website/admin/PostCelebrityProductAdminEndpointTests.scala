@@ -19,7 +19,7 @@ import services.AppConfig._
 class PostCelebrityProductAdminEndpointTests extends AdminFunctionalTest {
   // Load images for creating products
   private val schema = instance[Schema]
-  private val profileImage = Play.getFile("test/files/longoria/product-1.jpg")
+  private val profileImage = Play.getFile("test/files/longoria/product-2.jpg")
   private val profileIcon  = Play.getFile("test/files/longoria/profile.jpg")
   @Test
   def testPostCelebrityProductCreatesProduct() = {
@@ -85,7 +85,7 @@ class PostCelebrityProductAdminEndpointTests extends AdminFunctionalTest {
                             productDescription: String =  "Evan Longoria, third baseman for the Rays is a standout player",
                             priceInCurrency: BigDecimal = Product.defaultPrice,
                             signingOriginX: Int = 100,
-                            signingOriginY: Int = 100,
+                            signingOriginY: Int = 0,
                             storyTitle: String = "Walk-off home run for a playoff spot",
                             storyText: String = "Earlier in the month, the Rays were facing a deficit of nine games in " +
                                                 "the wild card race to the Boston Red Sox.",

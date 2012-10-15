@@ -24,37 +24,42 @@ private[controllers] trait GetReportsAdminEndpoint {
           views.html.Application.admin.admin_reports()
         }
 
-        // Email lists
         case "email-list-report" => {
           val report = new EmailListReport(schema).report()
           new RenderBinary(report, report.getName)
         }
 
-        // Inventory Batches
         case "inventory-batch-report" => {
           val report = new InventoryBatchReport(schema).report()
           new RenderBinary(report, report.getName)
         }
 
-        // Order Report
         case "order-report" => {
           val report = new OrderReport(schema).report()
           new RenderBinary(report, report.getName)
         }
 
-        // Physical Print Report
         case "physical-print-report" => {
           val report = new PrintOrderReport(schema).report()
           new RenderBinary(report, report.getName)
         }
 
-        // Monthly Celebrity Payment Reports
         case "monthly-celebrity-order-report" => {
           val report = new MonthlyCelebrityOrderReport(schema).report()
           new RenderBinary(report, report.getName)
         }
         case "monthly-celebrity-print-order-report" => {
           val report = new MonthlyCelebrityPrintOrderReport(schema).report()
+          new RenderBinary(report, report.getName)
+        }
+
+        case "sales-tax-report" => {
+          val report = new SalesTaxReport(schema).report()
+          new RenderBinary(report, report.getName)
+        }
+
+        case "board-report" => {
+          val report = new BoardReport(schema).report()
           new RenderBinary(report, report.getName)
         }
 

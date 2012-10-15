@@ -7,7 +7,6 @@ package models.frontend.storefront
  * See [[views.html.frontend.celebrity_storefront_finalize]]
  *
  * @param name the shipping recipient's name
- * @param email the shipping recipient's email address
  * @param addressLine1 first line of the shipping recipient's address
  * @param addressLine2 optional second line of the address
  * @param city the city being shipped to (e.g. Florence)
@@ -17,7 +16,6 @@ package models.frontend.storefront
  */
 case class FinalizeShippingViewModel (
   name: String,
-  email: String,
   addressLine1: String,
   addressLine2: Option[String],
   city: String,

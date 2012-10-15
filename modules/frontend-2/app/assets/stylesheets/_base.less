@@ -1,6 +1,7 @@
 // The base stylesheet for Egraphs.
 
-@import "_site_header.less";
+@import "site_header.less";
+@import "site_footer.less";
 
 /* !Globals */
 
@@ -254,88 +255,6 @@ button  {
 
 /* Modal Overrides */
 
-.modal.signup {
-  background-color: @white;
-  width: 610px;
-  padding: 15px 0px 0px 40px;
-  color: @grayDark;
-
-  .modal-body {
-    .close {
-      .opacity(75);
-      float: none;
-      position: absolute;
-      right: 15px;
-      top: 0px;
-      font-weight: 100;
-      font-size: 40px;
-      line-height: 1em;
-      color: @orange;
-      &:hover { .opacity(100); }
-    }
-
-    h2 {
-     font-size: 43px;
-     font-weight: 200;
-     max-width: 70%;
-     .bold {
-      font-weight: bold;
-     }
-    }
-
-    p {
-      font-weight: bold;
-      font-size: 20px;
-      max-width: 60%;
-    }
-
-    img {
-      position: absolute;
-      float: none;
-      right: 35px;
-      bottom: 55px;
-      z-index: -1;
-    }
-
-    input {
-      box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.5);
-      -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.5);
-      -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.5);
-      border-radius: 0px;
-      background-color: @grayVeryLight;
-    }
-
-    label {
-      color: @grayLight;
-      text-transform: uppercase;
-      font-size: 15px;
-      font-weight: 400;
-    }
-    a {
-      font-size: 14px;
-      line-height: .8em;
-      font-weight: normal;
-      color: @grayDark;
-      border-bottom: 1px dotted @grayDark;
-    }
-    .modal-dismissal {
-      color: @orange;
-      float: none;
-      right: 25px;
-      bottom: 40px;
-      position: absolute;
-      text-decoration: none;
-      border-bottom: 1px dotted @orange;
-
-    }
-  }
-
-
-
-
-
-}
-
 .modal.egraphs {
 
 	width: 890px;
@@ -487,72 +406,6 @@ section[role=banner] {
 	
 }
 
-/* !Bottom */
-
-#bottom {
-
-	padding-top: 40px;
-	padding-bottom: 40px;
-	
-	a { color: @grayLighter; }
-	a:hover{ color: @gray; }
-
-	#email-link {
-      color: @orange;
-    }
-	nav {
-	
-		margin-bottom: 10px;
-	
-		ol {
-			
-			list-style: none;
-			margin: 0;
-			padding: 0;
-			
-			li { 
-				font-size: 12px;
-				line-height: 1em;
-				margin-bottom: .5em;
-			}
-			
-		}
-	
-	}
-	
-	p small {
-		font-size: 12px;
-		line-height: 1em;
-		color: @grayLighter;
-	}
-	
-	.social {
-		
-		ul {
-			float: right;
-			padding: 0;		
-			margin: 0;
-			list-style: none;
-			
-			li {
-				
-				float: left;
-				margin-left: 10px; 
-				
-				a {
-					.social-sprite(30px);
-					display: block;
-				}
-			}
-			
-			li:first-child { margin-left: 0; }
-		
-		}
-	
-	}	
-
-}
-
 /* !Media Queries */
 
 
@@ -577,60 +430,5 @@ section[role=banner] {
 }
 
 
-@media (min-width: 1024px) {
-	
-	#bottom {
-	
-		.row {
-		
-			margin: 0 -40px;
 
-			[class*=span] { 
-				margin: 0; 
-				width: auto;
-			}
-		
-		}
-	
-	}
-
-}
-
-@media (min-width: 979px) {
-
-	#bottom {
-			
-		nav ol {
-			
-			li {
-				float: left;
-				padding-right: 10px;
-				border-right: 1px solid @grayLighter;
-				margin-right: 10px;
-				margin-bottom: 0;
-			}
-
-			li:last-child { 
-				padding-right: 0;
-				border-right: none;
-				margin-right: 0;
-			}
-		
-		}
-		
-		.social {
-			
-			float: right;
-			
-		}	
-	
-	} // end #bottom
-
-}
-
-@media (max-width: 767px) {
-
-	#bottom .social ul { float: none; }
-
-}
 

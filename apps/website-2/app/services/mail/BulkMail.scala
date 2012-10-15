@@ -2,79 +2,125 @@ package services.mail
 
 import com.google.inject.{Inject, Provider}
 import collection.JavaConversions._
-import play.api.libs.ws.WS
 import services.inject.InjectionProvider
 import services.config.ConfigFileProxy
+import java.util.Properties
+import com.google.gson.Gson
+import play.api.libs.ws.WS
+import play.api.libs.ws.WS.{WSRequest, WSRequestHolder}
 
 /**
- * Trait for defining new bulk mail providers.
+ * Trait that defines bulk mail providers (e.g. MailChimp, Constant Contact).
+ *
  * Bulk mail services manage campaign style mailings like newsletters as opposed to
- * transactional mailings like order confirmations
+ * transactional mailings like order confirmations. BulkMail is NOT a replacement for transactional mail services.
+ * See the wiki page:  https://egraphs.atlassian.net/wiki/display/DEV/Email
  */
 trait BulkMail {
 
   /**
-   * TODO(sbilstein): Needs commments.
+   * Subscribes a user to the given mailing list. The id is a key associated with the underlying API.
    *
-   * @param listId
-   * @param email
+   * @param listId the mailing list's newsletter ID as provided by the bulk mail service provider.
+   *   the value is probably located in application.conf with the key `mail.bulk.newsletterid`.
+   * @param email e-mail address of the individual subscribing to the mailing list.
    */
-  def subscribeNew(listId: String, email: String)
+  def subscribeNewAsync(listId: String, email: String)
 
   /**
-   * TODO(sbilstein): Needs commments.
+   * Throws exceptions if this implementation is not configured correctly.
+   *
+   * @return returns itself assuming the check passed.
    */
-  def checkConfiguration()
+  def checkConfiguration() : BulkMail
+
+  /**
+   * List subscribers of the given list
+   * TODO(sbilstein): refactor this when moved to play2.0 to provide a typesafe list using
+   * the new JSON API.
+   * @param listId
+   */
+  def listMembers(listId: String) : String
+
+  /**
+   * Used to set the value of API calls such as subscribeNew
+   *
+   * @return ID of newsletter sign up mailing list.
+   */
+  def newsletterListId : String
 }
 
 /**
  * Helper class for configuring BulkMail implementations
- * @param playConfig 
+ *
+ * @param playConfig the map of application configuration values. See conf/application.conf for values.
  */
 class BulkMailProvider @Inject()(config: ConfigFileProxy) extends InjectionProvider[BulkMail]
 {
   def get() : BulkMail = {
     //Inspect configuration and return the proper BulkMail
-    if (config.mailBulkVendor == "mailchimp") {
-      MailChimpBulkMail(config.mailBulkApikey, config.mailBulkDatacenter)
+    val provider = if (config.mailBulkVendor == "mailchimp") {
+      MailChimpBulkMail(
+        apikey = config.mailBulkApikey,
+        datacenter = config.mailBulkDatacenter,
+        newsletterListId = config.mailBulkNewsletterId
+      )
     } else {
       MockBulkMail
     }
+    provider.checkConfiguration()
   }
 }
 
 /**
- * A MockMailer for testing purposes
+ * A BulkMail implementation exclusively for testing and development.
+ *
  * @param utils
  */
 private[mail] object MockBulkMail extends BulkMail
 {
-  override def subscribeNew(listId: String, email: String) = {
+  override def subscribeNewAsync(listId: String, email: String) = {
     play.Logger.info("Subscribed " + email + " to email list: " + listId + "\n")
   }
-  override def checkConfiguration() = {}
+  override def checkConfiguration() : BulkMail = { this }
+
+  override def newsletterListId = "NotARealListId"
+
+  override def listMembers(listId: String) : String = {
+    new Gson().toJson(List("derp"))
+  }
 }
 
 /**
- * Currently a very simple wrapper around one function of the Mailchimp API.
- * @param apikey
- * @param datacenter
+ * BulkMail implementation that interoperates with the MailChimp API.
+ *
+ * @param apikey the MailChimp API Key as found in application.conf and
+ *     [[https://us5.admin.mailchimp.com/account/api/ the mailchimp account page]]
+ * @param datacenter the MailChimp data center used by our account. The correct value for this
+ *     appears at the top of the browser when logged in to mailchimp.com and should be set
+ *     in the application config.
  */
-private[mail] case class MailChimpBulkMail (apikey: String, datacenter: String) extends BulkMail
+private[mail] case class MailChimpBulkMail (apikey: String, datacenter: String, newsletterListId: String) extends BulkMail
 {
-  override def subscribeNew(listId: String, email: String) = {
-    val url = "https://" + datacenter + ".api.mailchimp.com/1.3/"
-    val params = Map(
-        "output" -> Seq("json"),
-        "apikey" -> Seq(apikey),
-        "method" -> Seq("listSubscribe"),
-        "id" -> Seq(listId),
-        "email_address" -> Seq(email),
-        "double_optin" -> Seq("false"))
-    val responsePromise = WS.url(url).post(params)
+  private def apiUrl = "https://" + datacenter + ".api.mailchimp.com/1.3/"
+
+
+  override def subscribeNewAsync(listId: String, email: String) = {
+    subscribe(listId, email).get
   }
 
-  override def checkConfiguration() = {
+  private def subscribe(listId: String, email: String) : WSRequestHolder = {
+    WS.url(apiUrl).withQueryString(
+    	("output", "json"),
+        ("apikey", apikey),
+        ("method", "listSubscribe"),
+        ("id", listId),
+        ("email_address", email),
+        ("double_optin", "false")
+    )
+  }
+
+  override def checkConfiguration() : BulkMail = {
     require(
       apikey != null,
       """
@@ -87,5 +133,15 @@ private[mail] case class MailChimpBulkMail (apikey: String, datacenter: String) 
       application.conf: A "mail.bulk.datacenter" configuration must be provided.
       """
     )
+    this
+  }
+
+  override def listMembers(listId: String) : String = {
+    WS.url(apiUrl).withQueryString(
+        ("output", "json"),
+        ("apikey", apikey),
+        ("method", "listMembers"),
+        ("id", listId)
+    ).get.toString()
   }
 }

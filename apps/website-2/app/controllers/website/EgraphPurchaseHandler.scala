@@ -213,22 +213,7 @@ case class EgraphPurchaseHandler(
       }
 
       // Persist the Order with the Stripe charge info.
-      val shippingAddress = shippingForm match {
-        case Some(form) => {
-          val addressLine2Part = form.addressLine2 match {
-            case Some(s) => s + ", "
-            case None => ""
-          }
-          Some(form.name + ", " +
-            form.addressLine1 + ", " +
-            addressLine2Part +
-            form.city + ", " +
-            form.state + " " +
-            form.postalCode)
-        }
-        case _ => None
-      }
-      val order = buyer.buy(product, recipient, recipientName = recipientName, messageToCelebrity = personalNote, requestedMessage = desiredText)
+      var order = buyer.buy(product, recipient, recipientName = recipientName, messageToCelebrity = personalNote, requestedMessage = desiredText)
         .copy(amountPaidInCurrency = product.priceInCurrency)
         .withWrittenMessageRequest(writtenMessageRequest)
         .withPaymentStatus(PaymentStatus.Charged)
@@ -241,6 +226,17 @@ case class EgraphPurchaseHandler(
       ).withCash(totalAmountPaid).withCashTransactionType(CashTransactionType.EgraphPurchase).save()
 
       val maybePrintOrderAndCash = if (printingOption == PrintingOption.HighQualityPrint) {
+        val shippingAddress = for (validShippingForm <- shippingForm) yield {
+          // Our printing partner wants all address fields to be comma-separated, even if they are empty
+          List(
+            validShippingForm.name,
+            validShippingForm.addressLine1,
+            validShippingForm.addressLine2.getOrElse(""),
+            validShippingForm.city,
+            validShippingForm.state,
+            validShippingForm.postalCode
+          ).mkString(",")
+        }
         val printOrder = PrintOrder(orderId = order.id, amountPaidInCurrency = PrintOrder.pricePerPrint, shippingAddress = shippingAddress.getOrElse("")).save() // update CashTransaction
         val printOrderTransaction = cashTransaction.copy(printOrderId = Some(printOrder.id)).save()
         Some((printOrder, printOrderTransaction))
@@ -289,12 +285,6 @@ case class EgraphPurchaseHandler(
     email.setFrom("noreply@egraphs.com", "Egraphs")
     email.addTo(buyerEmail, buyerName)
     email.setSubject("Order Confirmation")
-//    val emailLogoSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-logo.jpg")))
-//    val emailFacebookSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-facebook.jpg")))
-//    val emailTwitterSrc = "cid:"+email.embed(Play.getFile(Utils.asset("public/images/email-twitter.jpg")))
-    val emailLogoSrc = ""
-    val emailFacebookSrc = ""
-    val emailTwitterSrc = ""
     val faqHowLongLink = getFAQ().absoluteURL(secure=true) + "#how-long"
     val htmlMsg = views.html.frontend.email_order_confirmation(
       buyerName = buyerName,
@@ -307,10 +297,7 @@ case class EgraphPurchaseHandler(
       pricePaid = cashTransaction.cash.formatSimply,
       deliveredByDate = dateFormat.format(order.expectedDate.get), // all new Orders have expectedDate... will turn this into Date instead of Option[Date]
       faqHowLongLink = faqHowLongLink,
-      hasPrintOrder = maybePrintOrder.isDefined,
-      emailLogoSrc = emailLogoSrc,
-      emailFacebookSrc = emailFacebookSrc,
-      emailTwitterSrc = emailTwitterSrc
+      hasPrintOrder = maybePrintOrder.isDefined
     )
     val textMsg = views.html.frontend.email_order_confirmation_text(
       buyerName = buyerName,

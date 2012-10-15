@@ -17,8 +17,13 @@ import java.text.SimpleDateFormat
 import com.google.inject.{Provider, Inject}
 import org.apache.commons.lang3.StringEscapeUtils.escapeHtml4
 import org.squeryl.Query
+import print.LandscapeFramedPrint
 import xyzmo.{XyzmoVerifyUserStore, XyzmoVerifyUser}
 import controllers.website.consumer.{StorefrontChoosePhotoConsumerEndpoints, CelebrityLandingConsumerEndpoint}
+import java.util.Date
+import java.io.ByteArrayOutputStream
+import javax.imageio.{IIOImage, ImageWriteParam, ImageIO}
+import javax.imageio.stream.MemoryCacheImageOutputStream
 
 /**
  * Vital services for an Egraph to perform its necessary functionality
@@ -79,6 +84,8 @@ case class Egraph(
   import EgraphState._
 
   private lazy val blobKeyBase = "egraphs/" + id
+  private def framedPrintBlobKey = blobKeyBase + "/framed-print/" + framedPrintFilename
+  def framedPrintFilename = "order" + orderId + ".jpg"
 
   //
   // Public methods
@@ -186,6 +193,67 @@ case class Egraph(
         signingOriginY = product.signingOriginY
       )
     }
+  }
+
+  /**
+   * @return url of assembled JPG for physical prints, if it was successfully or previously generated
+   */
+  def getFramedPrintImageUrl: String = {
+    services.blobs.getUrlOption(framedPrintBlobKey) match {
+      case Some(url) => url
+      case None => {
+        val thisOrder = order
+        val product = thisOrder.product
+        val celebrity = product.celebrity
+        val egraphImage = getSavedEgraphUrlAndImage(LandscapeFramedPrint.targetEgraphWidth)._2
+
+        val framedPrintImage = LandscapeFramedPrint().assemble(
+          orderNumber = orderId.toString,
+          egraphImage = egraphImage(),
+          teamLogoImage = product.icon.renderFromMaster,
+          recipientName = thisOrder.recipientName,
+          celebFullName = celebrity.publicName,
+          celebCasualName = celebrity.casualName.getOrElse(celebrity.publicName),
+          productName = product.name,
+          signedAtDate = new Date(getSignedAt.getTime),
+          egraphUrl = "https://www.egraphs.com/" + orderId
+        )
+
+        // The following code is needed to set compression quality to 1 on the created JPG for print quality.
+        // TODO(wchan): Refactor into ImageUtil.Conversions._
+        val writer = ImageIO.getImageWritersByFormatName(ImageAsset.Jpeg.extension).next()
+        val iwp = writer.getDefaultWriteParam
+        iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT)
+        iwp.setCompressionQuality(1.0f)
+        val bytesOut = new ByteArrayOutputStream()
+        val ios = new MemoryCacheImageOutputStream(bytesOut)
+        writer.setOutput(ios)
+        writer.write(null, new IIOImage(framedPrintImage, null, null), iwp)
+
+        services.blobs.put(key = framedPrintBlobKey, bytes = bytesOut.toByteArray, AccessPolicy.Public)
+        services.blobs.getUrl(framedPrintBlobKey)
+      }
+    }
+  }
+
+  /**
+   * @param width the desired width of the egraph image. If this width is larger than the width of the master egraph
+   *              image, then the master egraph image's width will be used instead.
+   * @return url of the egraph image in PNG format, along with the image data
+   */
+  def getSavedEgraphUrlAndImage(width: Int): (String, () => BufferedImage) = {
+    val product = order.product
+    val rawSignedImage = image(product.photoImage)
+    // targetWidth is either the default width, or the width of the master if necessary to avoid upscaling
+    val targetWidth = {
+      val masterWidth = product.photoImage.getWidth
+      if (masterWidth < width) masterWidth else width
+    }
+    val egraphImage = rawSignedImage
+      .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
+      .scaledToWidth(targetWidth)
+      .rasterized
+    (egraphImage.getSavedUrl(AccessPolicy.Public), () => egraphImage.transformAndRender.graphicsSource.asInstanceOf[RasterGraphicsSource].image)
   }
 
   /**

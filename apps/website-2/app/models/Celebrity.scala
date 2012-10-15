@@ -9,8 +9,11 @@ import com.google.inject.{Provider, Inject}
 import org.squeryl.Query
 import services._
 import java.awt.image.BufferedImage
+import services.mail.TransactionalMail
+import org.apache.commons.mail.HtmlEmail
 import models.Celebrity.CelebrityWithImage
 import play.api.Play.current
+import services.Dimensions
 
 /**
  * Services used by each celebrity instance
@@ -24,7 +27,8 @@ case class CelebrityServices @Inject() (
   inventoryBatchQueryFilters: InventoryBatchQueryFilters,
   schema: Schema,
   productServices: Provider[ProductServices],
-  imageAssetServices: Provider[ImageAssetServices]
+  imageAssetServices: Provider[ImageAssetServices],
+  transactionalMail: TransactionalMail
 )
 
 
@@ -78,19 +82,11 @@ case class Celebrity(id: Long = 0,
     services.productStore.findByCelebrity(id, filters: _*)
   }
 
-  /**
-   * Gets this Celebrity's Products that can be purchased along with the quantity available of each Product.
-   * Excludes Products that are not available, such as those that are not in an active InventoryBatch based on
-   * startDate and endDate, as well as those that are sold out of quantity.
-   *
-   * This implementation is hopefully more performant than getting all active Products and then calculating the
-   * quantity available for each Product, but this assumption has yet to be tested.
-   *
-   * This implementation executes 3 queries, the first for the InventoryBatches, the second to aid in calculating the
-   * quantity available to each InventoryBatch, and the third to get the Products and their InventoryBatch associations.
-   *
-   * @return a sequence of purchase-able Products along with the available quantity of each Product.
-   */
+  def productsInActiveInventoryBatches(): Seq[Product] = {
+    services.productStore.findActiveProductsByCelebrity(id).toSeq
+  }
+
+  @deprecated("This is still here because SER-86 does not work yet.", "")
   def getActiveProductsWithInventoryRemaining(): Seq[(Product, Int)] = {
     // 1) query for active InventoryBatches
     val activeIBs = services.inventoryBatchStore.findByCelebrity(id, services.inventoryBatchQueryFilters.activeOnly)
@@ -102,18 +98,18 @@ case class Celebrity(id: Long = 0,
       Map(services.orderStore.countOrdersByInventoryBatch(inventoryBatchIds): _*)
 
     val inventoryBatchIdsAndNumRemaining : Map[Long, Int] = inventoryBatchIds.map{ id =>
-        (id, inventoryBatches.get(id).get.numInventory - inventoryBatchIdsAndOrderCounts.get(id).getOrElse(0))
-      }.toMap
+      (id, inventoryBatches.get(id).get.numInventory - inventoryBatchIdsAndOrderCounts.get(id).getOrElse(0))
+    }.toMap
 
     // 3) query for products and inventoryBatchProducts on inventoryBatchIds
     val productsAndBatchAssociations: Query[(Product, Long)] =
       services.productStore.getProductAndInventoryBatchAssociations(inventoryBatchIds)
 
     val productsAndBatchIds = productsAndBatchAssociations.toMap.keySet.map(product =>
-      {
-       val ids =  for((p, id) <- productsAndBatchAssociations if p.id == product.id) yield Set(id)
-       (product, ids.reduceLeft((s1, s2) => s1 | s2 ))
-      }
+    {
+      val ids =  for((p, id) <- productsAndBatchAssociations if p.id == product.id) yield Set(id)
+      (product, ids.reduceLeft((s1, s2) => s1 | s2 ))
+    }
     ).toMap
 
     // 4) for each product, sum quantity remaining for each associated batch
@@ -122,10 +118,6 @@ case class Celebrity(id: Long = 0,
       (b._1, totalNumRemainingForProduct)
     })
     productsWithInventoryRemaining.toSeq
-  }
-
-  def productsInActiveInventoryBatches(): Seq[Product] = {
-    services.productStore.findActiveProductsByCelebrity(id).toSeq
   }
 
   /**
@@ -258,6 +250,27 @@ case class Celebrity(id: Long = 0,
     product.saveWithImageAssets(image, icon)
   }
 
+  /**
+  * Sends a welcome email to the celebrities email address with their Egraphs username and a blanked
+  * out password field.  We aren't sending the password, it is just a bunch of *****.  The email
+  * includes a link to download the latest iPad app.
+  */
+  def sendWelcomeEmail(emailAddress: String, bccEmail: Option[String] = None) {
+    val email = new HtmlEmail()
+    val html = views.html.frontend.celebrity_welcome_email(
+      celebrityName = publicName,
+      celebrityEmail = account.email
+    )
+
+    email.setFrom("noreply@egraphs.com", "Egraphs")
+    email.addTo(emailAddress, publicName)
+    bccEmail.map(bcc => email.addBcc(bcc))
+    email.setSubject("Welcome to Egraphs")
+    email.setHtmlMsg(html.toString())
+
+    services.transactionalMail.send(email)
+  }
+
   //
   // KeyedCaseClass[Long] methods
   //
@@ -333,6 +346,17 @@ object Celebrity {
       CelebrityWithImage(saved, savedImage)
     }
   }
+  // Simplifying results for display
+  def celebrityAccountToListing(celebrity: Celebrity, account: Account) = {
+    new CelebrityListing(
+      id=celebrity.id,
+      email = account.email,
+      urlSlug = celebrity.urlSlug,
+      publicName = celebrity.publicName,
+      enrollmentStatus = celebrity.enrollmentStatus.toString,
+      publishedStatus = celebrity.publishedStatus.toString
+    )
+  }
 }
 
 class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebrity] with SavesCreatedUpdated[Long,Celebrity] {
@@ -374,6 +398,39 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
         )
         select(c)
     ).headOption
+  }
+
+  /**
+   * Find using postgres text search on publicname and roledescription
+   * http://www.postgresql.org/docs/9.2/interactive/textsearch-controls.html
+   * Uses anorm because the return types are not supported by Squeryl.
+   * @param query text to match on
+   * @return matching celebs in CelebrityListing format
+   */
+  def findByTextQuery(query: String): Iterable[CelebrityListing] = {
+    import anorm._
+    import anorm.SqlParser._
+	val rowStream = SQL(
+	  """
+	    SELECT * FROM celebrity, account WHERE
+	    (
+	      to_tsvector('english', celebrity.publicname || ' ' || celebrity.roledescription)
+	      @@
+	      plainto_tsquery('english', {textQuery})
+	    ) AND account.celebrityid = celebrity.id;
+	  """
+	).on("textQuery" -> query).apply()(connection = schema.getTxnConnectionFactory)
+	for(row <- rowStream) yield {
+	  new CelebrityListing(
+	      id = row[Long]("celebrityid"),
+	      publicName = row[String]("publicname"),
+	      email = row[String]("email"),
+	      urlSlug = row[String]("urlslug"),
+	      enrollmentStatus = row[String]("_enrollmentStatus"),
+	      publishedStatus = row[String]("_publishedStatus")
+	  )
+	}
+
   }
 
   def getCelebrityAccounts: Query[(Celebrity, Account)] = {
@@ -461,3 +518,16 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
     toUpdate.copy(created = created, updated = updated)
   }
 }
+
+/**
+ * Simple class for representing celebrities in lists.
+ * TODO: Move into viewmodels when we refactor the admin panel.
+ **/
+
+case class CelebrityListing(
+  id: Long,
+  email: String,
+  urlSlug: String,
+  publicName: String,
+  enrollmentStatus: String,
+  publishedStatus: String)

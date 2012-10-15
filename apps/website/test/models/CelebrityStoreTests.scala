@@ -41,7 +41,23 @@ class CelebrityStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
     results.map(result => result.id) should be (celebs.map(celeb => celeb.id).reverse)
   }
 
-  //
+  // This test ensures that queries return results but makes no guarantees on the quality of search results
+  "findByTextQuery" should "return celebrities matching the text query" in {
+    val celeb = TestData.newSavedCelebrity().withPublishedStatus(PublishedStatus.Published)
+    val results = instanceUnderTest.findByTextQuery(celeb.publicName)
+
+    results.isEmpty should be(false)
+  }
+
+  // This test ensures that queries return results but makes no guarantees on the quality of search results
+  "findByTextQuery" should "return 0 celebrities matching the empty string" in {
+    TestData.newSavedCelebrity().withPublishedStatus(PublishedStatus.Published)
+    val results = instanceUnderTest.findByTextQuery("")
+
+    results.isEmpty should be(true)
+  }
+
+
   // Private members
   //
   private def getPublishedCelebritiesWithIds(ids: Seq[Long]): IndexedSeq[Celebrity] = {

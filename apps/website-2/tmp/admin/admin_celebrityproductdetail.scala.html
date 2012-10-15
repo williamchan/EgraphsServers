@@ -18,6 +18,10 @@
     require(["admin-celebritydetail-page"], function(pageScripts) {
     pageScripts.go();
     })
+    function confirmPost() {
+      if (@isCreate) return true;
+      else return confirm("Updating this product will also change all associated egraphs! Are you sure you want to save these changes?");
+    }
 </script>
 }
 
@@ -44,7 +48,7 @@
   </h1>
   <div class="form row">
     <div class="span12 form-column">
-      <form id="product-form" method="POST" action='@postProduct' enctype="multipart/form-data">
+      <form id="product-form" method="POST" action='@postProduct' onsubmit="return confirmPost()" enctype="multipart/form-data">
         <fieldset>
           @authenticityToken()
           <input id="productId" name="productId" type="hidden" value="@fields("productId")">
@@ -94,8 +98,10 @@
           @formField(id="productImage", label="Product Photo", inputType="file", width="span8", help=Some(photoHelp), fields=fields)
           @photoHelp = "Must be JPG or PNG with minimum dimensions of 1024x1024. Will be cropped."
 
-          @formField(id="signingOriginX", label="Signing Origin X", inputType="text", width="span4", fields=fields)
-          @formField(id="signingOriginY", label="Signing Origin Y", inputType="text", width="span4", fields=fields)
+          @formField(id="signingOriginX", label="Signing Origin X", inputType="text", width="span4", help=Some(signingOriginXHelp), fields=fields)
+          @signingOriginXHelp = { Between 0 and 575 }
+          @{/** @formField(id="signingOriginY", label="Signing Origin Y", inputType="text", width="span4", fields=fields) */}
+          <input id="signingOriginY" name="signingOriginY" type="hidden" value="0">
 
           @formField(
             id="productIcon",

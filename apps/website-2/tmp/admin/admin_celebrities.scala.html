@@ -1,4 +1,4 @@
-@(celebrityAccounts: Iterable[(models.Celebrity, models.Account)],
+@(celebrityListings: Iterable[models.CelebrityListing],
   allCelebrities: Iterable[models.Celebrity]
 )(implicit flash:play.mvc.Scope.Flash, session: play.mvc.Scope.Session)
 
@@ -20,6 +20,10 @@
 
 @postFeaturedCelebrities = @{
   lookupUrl("WebsiteControllers.postFeaturedCelebrities")
+}
+
+@getCelebritiesBySearchAdmin = @{
+  lookupUrl("WebsiteControllers.getCelebritiesBySearchAdmin")
 }
 
 @head = {
@@ -64,10 +68,15 @@
       </div>
     </div>
   </form>
-  <h2>All @flash.get("TotalResultsStr")</h2>
+
   <form method="link" action="@getCreateCelebrity">
     <input class="btn primary fade in" type="submit" value="New Celebrity"/>
   </form>
+  <form method="GET" action="@getCelebritiesBySearchAdmin">
+    <input type="text" name="query"/>
+    <input class="btn primary fade in" value="Search" type="submit"/>
+  </form>
+  <h2>All @flash.get("TotalResultsStr")</h2>
   <table>
     <tr>
       <th></th>
@@ -81,39 +90,39 @@
       <th>Egraphs</th>
       <th>Inventory</th>
     </tr>
-    @celebrityAccounts.map { case (celebrity, account) =>
+    @celebrityListings.map { case celebrityListing =>
     <tr>
       <td>
-        <a class="preview-link" href="/admin/celebrities/@celebrity.id">
+        <a class="preview-link" href="/admin/celebrities/@celebrityListing.id">
           Details
         </a>
       </td>
-      <td>@celebrity.id</td>
-      <td>@account.email</td>
+      <td>@celebrityListing.id</td>
+      <td>@celebrityListing.email</td>
       <td>
-        <a class="preview-link" href="/@celebrity.urlSlug">
-          @celebrity.publicName
+        <a class="preview-link" href="/@celebrityListing.urlSlug">
+          @celebrityListing.publicName
         </a>
       </td>
-      <td>@celebrity.enrollmentStatus</td>
-      <td>@celebrity.publishedStatus</td>
+      <td>@celebrityListing.enrollmentStatus</td>
+      <td>@celebrityListing.publishedStatus</td>
       <td>
-        <a class="preview-link" href="/admin/celebrities/@celebrity.id/products">
+        <a class="preview-link" href="/admin/celebrities/@celebrityListing.id/products">
         Products
         </a>
       </td>
       <td>
-        <a class="preview-link" href="/admin/celebrities/@celebrity.id/orders?filter=pendingAdminReview">
+        <a class="preview-link" href="/admin/celebrities/@celebrityListing.id/orders?filter=pendingAdminReview">
           Orders
         </a>
       </td>
       <td>
-        <a class="preview-link" href="/admin/celebrities/@celebrity.id/egraphs">
+        <a class="preview-link" href="/admin/celebrities/@celebrityListing.id/egraphs">
           Egraphs
         </a>
       </td>
       <td>
-        <a class="preview-link" href="/admin/celebrities/@celebrity.id/inventorybatches">
+        <a class="preview-link" href="/admin/celebrities/@celebrityListing.id/inventorybatches">
           Inventory
         </a>
       </td>

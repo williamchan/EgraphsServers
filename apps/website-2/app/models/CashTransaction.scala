@@ -7,6 +7,7 @@ import services.Time
 import com.google.inject.Inject
 import services.AppConfig
 import services.db.{Schema, SavesWithLongKey, KeyedCaseClass}
+import services.Finance.TypeConversions._
 import org.squeryl.PrimitiveTypeMode._
 import org.squeryl.Query
 
@@ -51,7 +52,7 @@ case class CashTransaction(
 
   /** Return the [[org.joda.money.Money]] representation of the object. */
   def cash: Money = {
-    Money.of(CurrencyUnit.USD, amountInCurrency.bigDecimal)
+    amountInCurrency.toMoney()
   }
 
   /** Returns the transaction with a new cash amount */
@@ -74,11 +75,11 @@ case class CashTransaction(
 
 class CashTransactionStore @Inject() (schema: Schema) extends SavesWithLongKey[CashTransaction] with SavesCreatedUpdated[Long,CashTransaction] {
 
-  def findByOrderId(orderId: Long): Query[CashTransaction] = {
+  def findByOrderId(orderId: Long): List[CashTransaction] = {
     from(schema.cashTransactions)(txn =>
       where(txn.orderId === Some(orderId))
         select (txn)
-    )
+    ).toList
   }
 
   def findByPrintOrderId(printOrderId: Long): Query[CashTransaction] = {

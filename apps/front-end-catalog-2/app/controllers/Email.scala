@@ -8,10 +8,6 @@ import play.api.mvc._
  */
 object Email extends Controller {
 
-  val emailLogoSrc = "email-logo.jpg"
-  val emailFacebookSrc = "email-facebook.jpg"
-  val emailTwitterSrc = "email-twitter.jpg"
-
   def orderConfirmation = Action {
     Ok(views.html.frontend.email_order_confirmation(
       buyerName = "Joshua Johnson",
@@ -24,10 +20,7 @@ object Email extends Controller {
       pricePaid = "$50.00",
       deliveredByDate = "June 19, 2012",
       faqHowLongLink = "https://www.egraphs.com/faq#how-long",
-      hasPrintOrder = true,
-      emailLogoSrc = emailLogoSrc,
-      emailFacebookSrc = emailFacebookSrc,
-      emailTwitterSrc = emailTwitterSrc
+      hasPrintOrder = true
     ))
   }
 
@@ -48,35 +41,32 @@ object Email extends Controller {
   }
 
   def verify = Action {
-    Ok(views.html.frontend.email_account_verification(
-      "http://www.egraphs.com/word",
-      emailLogoSrc = emailLogoSrc,
-      emailFacebookSrc = emailFacebookSrc,
-      emailTwitterSrc = emailTwitterSrc
-    ))
+    Ok(views.html.frontend.email_account_verification("http://www.egraphs.com/word"))
   }
 
   def viewEgraph = Action {
     Ok(views.html.frontend.email_view_egraph(
       viewEgraphUrl = "https://www.egraphs.com/gallery/carlosdiaz/davidortiz1",
       celebrityName = "Big Papi",
-      recipientName = "Carlos Pena",
-      emailLogoSrc = emailLogoSrc,
-      emailFacebookSrc = emailFacebookSrc,
-      emailTwitterSrc = emailTwitterSrc
+      recipientName = "Carlos Pena"
     ))
   }
 
   def confirm = Action {
-    Ok(views.html.frontend.email_account_confirmation(
-      emailLogoSrc = emailLogoSrc,
-      emailFacebookSrc = emailFacebookSrc,
-      emailTwitterSrc = emailTwitterSrc
-    ))
+    Ok(views.html.frontend.email_account_confirmation())
   }
 
-  def mlbStatic = Action {
-    Redirect(routes.RemoteAssets.at("html/email_mlb_marketing_static.html"))
-    //Ok(views.frontend.mlbmail())
-  }
+//  def mlbStatic = Action {
+////    Redirect(routes.RemoteAssets.at("html/email_mlb_marketing_static.html"))
+//    Ok(views.frontend.mlbmail())
+//  }
+//
+//  def celebrity_welcome_email = {
+//    val publicName = "Rodney Strong"
+//    val email = "rstrong@fantastic.com"
+//    Ok(views.frontend.html.celebrity_welcome_email(
+//      celebrityName = publicName,
+//      celebrityEmail = email
+//      ))
+//  }
 }

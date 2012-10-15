@@ -28,6 +28,11 @@ class Schema @Inject()(
 
   import uk.me.lings.scalaguice.InjectorExtensions._
 
+  // Putting this here because Celebrity.findByTextQuery needs it, but this feels wrong.
+  def getTxnConnectionFactory = {
+    currentTxnConnectionFactory()
+  }
+
   //
   // table declarations -- please keep these alphabetized
   //
@@ -99,8 +104,6 @@ class Schema @Inject()(
     declare(
       order.amountPaidInCurrency is monetaryDbType,
       columns(order._reviewStatus) are indexed,
-      order.billingPostalCode is dbType("varchar(20)"),
-      order.shippingAddress is dbType("varchar(255)"),
       order.messageToCelebrity is dbType("varchar(140)")
     )
   )

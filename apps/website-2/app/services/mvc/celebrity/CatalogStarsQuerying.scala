@@ -8,13 +8,14 @@ import services.mvc.celebrity.CatalogStarsActor.GetCatalogStars
 import akka.util.duration._
 import akka.util.Timeout
 import akka.dispatch.Await
+import services.logging.Logging
 
 /**
  * Defines the behavior of using two actors to keep a current cache of the
  * [[models.frontend.landing.CatalogStar]]s that should appear in the celebrity catalog, and to
  * query that cache.
  */
-private[celebrity] trait CatalogStarsQuerying {
+private[celebrity] trait CatalogStarsQuerying extends Logging {
   protected def catalogStarActor: ActorRef
   protected def catalogStarUpdateActor: ActorRef
   
@@ -47,7 +48,8 @@ private[celebrity] trait CatalogStarsQuerying {
   
             this.apply(numUpdateAttempts = numUpdateAttempts - 1)
           } else {
-            throw new Exception("Repeatedly failed to get landing page celebrities.")
+            log("Repeatedly failed to get landing page celebrities.")
+            IndexedSeq.empty[CatalogStar]
           }
   
         // wtf why would it give us something besides an IndexedSeq[CatalogStar]?

@@ -3,9 +3,10 @@ package controllers
 import controllers.api._
 import play.api.mvc.Controller
 import services.http.ControllerMethod
+import services.http.POSTApiControllerMethod
 import services.db.DBSession
 import akka.actor.ActorRef
-import models.{EnrollmentBatchStore, OrderQueryFilters, EnrollmentBatchServices, OrderStore}
+import models.{EnrollmentBatchStore, EnrollmentBatchServices, OrderQueryFilters, OrderStore}
 import services.blobs.Blobs
 import services.AppConfig._
 import services.http.filters.HttpFilters
@@ -27,6 +28,7 @@ object ApiControllers extends Controller
   override protected def enrollmentBatchActor: ActorRef = actors.EnrollmentBatchActor.actor
   override protected def dbSession: DBSession = instance[DBSession]
   override protected def controllerMethod = instance[ControllerMethod]
+  override protected def postApiController = instance[POSTApiControllerMethod]
   override protected def blobs = instance[Blobs]
   override protected def enrollmentBatchStore = instance[EnrollmentBatchStore]
   override protected def orderStore = instance[OrderStore]

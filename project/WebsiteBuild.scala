@@ -18,6 +18,8 @@ object WebsiteBuild extends Build {
    // Application dependencies. Keep these in alphabetical order.
       "batik" % "batik-rasterizer" % "1.6",
       "batik" % "batik-svggen" % "1.6",
+      "com.google.zxing" % "core" % "2.0",
+      "com.google.zxing" % "javase" % "2.0",
       "com.stripe" % "stripe-java" % "1.0.1",
       "com.typesafe" %% "play-plugins-mailer" % "2.0.4" excludeAll(
         ExclusionRule(organization="com.cedarsoft")

@@ -15,7 +15,7 @@ import play.api.libs.json.Json
 import play.api.mvc.Result
 import services.db.DBSession
 import services.db.TransactionSerializable
-import services.http.ControllerMethod
+import services.http.{WithoutDBConnection, POSTApiControllerMethod}
 import services.http.filters.HttpFilters
 import play.api.mvc.Action
 import services.http.HttpCodes
@@ -25,7 +25,7 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
   
   protected def enrollmentBatchActor: ActorRef
   protected def dbSession: DBSession
-  protected def controllerMethod: ControllerMethod
+  protected def postApiController: POSTApiControllerMethod
   protected def httpFilters: HttpFilters
   protected def enrollmentBatchServices: EnrollmentBatchServices
   protected def enrollmentBatchStore: EnrollmentBatchStore
@@ -34,7 +34,7 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
                            @Required audio: String,
                            skipBiometrics: Boolean = false /*todo(wchan): remove skipBiometrics parameter*/*/) =
 
-    controllerMethod(openDatabase = false) {
+    postApiController(dbSettings = WithoutDBConnection) {
       Action { implicit request =>
         val postForm = Form(
           mapping(

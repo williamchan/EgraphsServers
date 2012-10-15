@@ -71,7 +71,7 @@ class UpdateCatalogStarsActorTests extends EgraphsUnitTest with ClearsCacheAndBl
 
   private def withUpdateCatalogStarsActorAndRecipient[ResultT]
   (deps: Dependencies = newDeps)
-    (operation: (ActorRef, ActorRef) => ResultT)
+  (operation: (ActorRef, ActorRef) => ResultT)
   : ResultT = {
     lazy val actorInstance = new UpdateCatalogStarsActor(
       deps.db, deps.cacheFactory, deps.celebrityStore, deps.viewConverting
@@ -91,11 +91,11 @@ class UpdateCatalogStarsActorTests extends EgraphsUnitTest with ClearsCacheAndBl
 object UpdateCatalogStarsActorTests extends Mockito {
 
   private[UpdateCatalogStarsActorTests] case class Dependencies @Inject()(
-    db: DBSession,
-    cacheFactory: CacheFactory,
-    celebrityStore: CelebrityStore,
-    viewConverting: CelebrityViewConverting
-    ) {
+                                                                           db: DBSession,
+                                                                           cacheFactory: CacheFactory,
+                                                                           celebrityStore: CelebrityStore,
+                                                                           viewConverting: CelebrityViewConverting
+                                                                           ) {
     def withSpiedCache: Dependencies = {
       val mockCache = spy(cacheFactory.applicationCache)
       val mockCacheFactory = mock[CacheFactory]

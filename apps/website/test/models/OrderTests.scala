@@ -126,43 +126,6 @@ class OrderTests extends EgraphsUnitTest
     rejectedOrder.rejectionReason.get should be ("It made me cry")
   }
 
-  "approveByAdmin" should "not overwrite shipping info" in {
-    val order = newEntity.copy(shippingInfo = ShippingInfo(shippingAddress = Some("My Home"), _printingOption = PrintingOption.HighQualityPrint.name)).save()
-    val reloadedOrder = orderStore.get(order.id)
-    reloadedOrder._printingOption should be(PrintingOption.HighQualityPrint.name)
-    reloadedOrder.shippingAddress should be(Some("My Home"))
-    reloadedOrder.shippingInfo should be(ShippingInfo()) // Why is this true?!?!?!?!?!?!
-    reloadedOrder.approveByAdmin(Administrator().save()).save()
-
-    val adminedOrder = orderStore.get(order.id)
-    adminedOrder._printingOption should be(PrintingOption.HighQualityPrint.name)
-    adminedOrder.shippingAddress should be(Some("My Home"))
-  }
-
-  "rejectByAdmin" should "not overwrite shipping info" in {
-    val order = newEntity.copy(shippingInfo = ShippingInfo(shippingAddress = Some("My Home"), _printingOption = PrintingOption.HighQualityPrint.name)).save()
-    val reloadedOrder = orderStore.get(order.id)
-    reloadedOrder._printingOption should be(PrintingOption.HighQualityPrint.name)
-    reloadedOrder.shippingAddress should be(Some("My Home"))
-    reloadedOrder.rejectByAdmin(Administrator().save()).save()
-
-    val adminedOrder = orderStore.get(order.id)
-    adminedOrder._printingOption should be(PrintingOption.HighQualityPrint.name)
-    adminedOrder.shippingAddress should be(Some("My Home"))
-  }
-
-  "rejectByCelebrity" should "not overwrite shipping info" in {
-    val order = newEntity.withReviewStatus(OrderReviewStatus.ApprovedByAdmin).copy(shippingInfo = ShippingInfo(shippingAddress = Some("My Home"), _printingOption = PrintingOption.HighQualityPrint.name)).save()
-    val reloadedOrder = orderStore.get(order.id)
-    reloadedOrder._printingOption should be(PrintingOption.HighQualityPrint.name)
-    reloadedOrder.shippingAddress should be(Some("My Home"))
-    reloadedOrder.rejectByCelebrity(order.product.celebrity, Some("It made me cry")).save()
-
-    val adminedOrder = orderStore.get(order.id)
-    adminedOrder._printingOption should be(PrintingOption.HighQualityPrint.name)
-    adminedOrder.shippingAddress should be(Some("My Home"))
-  }
-
   "withChargeInfo" should "set the PaymentStatus, store stripe info, and create an associated CashTransaction" in {
     val (will, _, _, product) = newOrderStack
     val order = will.buy(product).withPaymentStatus(PaymentStatus.Charged).save()
@@ -196,7 +159,7 @@ class OrderTests extends EgraphsUnitTest
     refundCharge.refunded should be(true)
 
     val cashTransactions = cashTransactionStore.findByOrderId(order.id)
-    cashTransactions.size should be(2)
+    cashTransactions.length should be(2)
     val purchaseTxn = cashTransactions.find(b => b.cashTransactionType == CashTransactionType.EgraphPurchase).head
     purchaseTxn.accountId should be(will.account.id)
     purchaseTxn.orderId should be(Some(order.id))
