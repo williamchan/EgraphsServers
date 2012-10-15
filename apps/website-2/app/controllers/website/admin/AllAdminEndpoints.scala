@@ -6,11 +6,11 @@ import play.api.mvc.Controller
  * All the endpoints associated with the admin console
  */
 trait AllAdminEndpoints
-//  extends GetRootAdminEndpoint
-  extends GetAccountAdminEndpoint
+  extends GetRootAdminEndpoint
+  with GetAccountAdminEndpoint
   with PostAccountAdminEndpoint
 //  with GetAccountsAdminEndpoint
-//  with GetCelebritiesAdminEndpoint
+  with GetCelebritiesAdminEndpoint
 //  with GetCelebrityAdminEndpoint
 //  with GetCelebrityEgraphsAdminEndpoint
 //  with GetCelebrityInventoryBatchesAdminEndpoint
@@ -22,7 +22,7 @@ trait AllAdminEndpoints
 //  with GetEgraphAdminEndpoint
 //  with GetEgraphsAdminEndpoint
 //  with GetInventoryBatchAdminEndpoint
-//  with GetLoginAdminEndpoint
+  with GetLoginAdminEndpoint
 //  with GetOrderAdminEndpoint
 //  with GetOrdersAdminEndpoint
 //  with GetPrintOrderAdminEndpoint
@@ -34,8 +34,8 @@ trait AllAdminEndpoints
 //  with PostCelebrityInventoryBatchAdminEndpoint
 //  with PostCelebrityProductAdminEndpoint
 //  with PostEgraphAdminEndpoint
-//  with PostLoginAdminEndpoint
+  with PostLoginAdminEndpoint
 //  with PostOrderAdminEndpoint
 //  with PostPrintOrderAdminEndpoint
-//  with PostFeaturedCelebritiesAdminEndpoint
+  with PostFeaturedCelebritiesAdminEndpoint
 { this: Controller => }

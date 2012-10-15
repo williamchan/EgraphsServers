@@ -1,6 +1,6 @@
 package controllers.website.admin
 
-import play.api.mvc.{Action,Controller}
+import play.api.mvc.{Action, Controller}
 import play.api.mvc.Results.Redirect
 import services.http.ControllerMethod
 import models.{Password, AccountStore, CelebrityStore}

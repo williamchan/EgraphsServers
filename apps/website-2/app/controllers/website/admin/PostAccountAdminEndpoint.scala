@@ -4,7 +4,6 @@ import models._
 import play.api.mvc.Results.{Ok, Redirect}
 import controllers.WebsiteControllers
 import play.api.mvc.Controller
-import play.data.validation._
 import services.http.POSTControllerMethod
 import services.http.filters.HttpFilters
 import play.api.mvc.Action
@@ -75,63 +74,4 @@ trait PostAccountAdminEndpoint {
       Password.validate(password).fold(error => Invalid("Invalid password"), valid => Valid)
     }
   }
-      /*val isCreate = (accountId == 0)
-      validate(isCreate = isCreate, accountId = accountId, email = email, password = password)
-
-      if (!validationErrors.isEmpty) {
-        redirectWithValidationErrors(accountId, email)
-
-      } else {
-        if (isCreate) {
-          Account(email = email).withPassword(password).right.get.save()
-
-        } else {
-          val preexistingAccount = accountStore.get(accountId)
-          if (isUpdatingPassword(preexistingAccount, password)) {
-            preexistingAccount.copy(email = email).withPassword(password).right.get.save()
-          } else {
-            preexistingAccount.copy(email = email).save()
-          }
-        }
-        new Redirect(WebsiteControllers.reverse(WebsiteControllers.getAccountsAdmin(email)).url)
-      }
-    }*/
-
-    
-  
-
-  /*private def isUpdatingPassword(account: Account, password: String): Boolean = {
-    !(password.isEmpty || (account.password.isDefined && password == account.password.get.hash))
-  }
-
-  private def validate(isCreate: Boolean, accountId: Long, email: String, password: String) {
-    Validation.required("Email", email)
-    Validation.email("Email", email)
-    Validation.required("Password", password)
-
-    val accountByEmail = accountStore.findByEmail(email)
-
-       val preexistingAccount = accountStore.get(accountId)
-
-      val isEmailUnique = accountByEmail.isEmpty || accountByEmail.get.id == accountId
-      Validation.isTrue("An account with that email address already exists", isEmailUnique)
-
-      if (isUpdatingPassword(preexistingAccount, password)) {
-        val passwordValidationOrAccount = preexistingAccount.withPassword(password)
-        if (passwordValidationOrAccount.isLeft) Validation.addError("Password", passwordValidationOrAccount.left.get.error.toString)
-      }
-  }
-
-  private def redirectWithValidationErrors(accountId: Long,
-                                           email: String): Redirect = {
-    val flash = play.mvc.Http.Context.current().flash()
-    flash.put("accountId", accountId)
-    flash.put("email", email)
-    flash.put("password", "")
-    if (accountId == 0) {
-      WebsiteControllers.redirectWithValidationErrors(GetCreateAccountAdminEndpoint.url())
-    } else {
-      WebsiteControllers.redirectWithValidationErrors(GetAccountAdminEndpoint.url(accountId = accountId))
-    }
-  }*/
 }

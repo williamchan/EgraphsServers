@@ -89,69 +89,66 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
 //        }
 //    }
 //  }*/
-//
-//  /**
-//   * Updates the flash scope with pagination data used by pagination.scala.html
-//   */
-//  def updateFlashScopeWithPagingData[A](pagedQuery: (Iterable[A], Int, Option[Int]),
-//                                        baseUrl: ActionDefinition,
-//                                        filter: Option[String] = None) {
-//    val curPage = pagedQuery._2
-//    val totalResults = pagedQuery._3
-//
-//    val showPaging = totalResults.isDefined && totalResults.get > Utils.defaultPageLength
-//    val flash = play.mvc.Http.Context.current().flash()
-//    flash.put("ShowPaging", showPaging)
-//    val totalResultsStr = if (totalResults.isDefined) ("- " + totalResults.get + " results") else ""
-//    flash.put("TotalResultsStr", totalResultsStr)
-//
-//    if (showPaging) {
-//      val showFirst: Boolean = curPage > 2
-//      flash.put("ShowFirst", showFirst)
-//      if (showFirst) flash.put("FirstUrl", withPageQuery(baseUrl, 1, filter)) else flash.remove("FirstUrl")
-//
-//      val showPrev: Boolean = curPage > 1
-//      flash.put("ShowPrev", showPrev)
-//      if (showPrev) flash.put("PrevUrl", withPageQuery(baseUrl, curPage - 1, filter)) else flash.remove("PrevUrl")
-//
-//      val totalNumPages = if (totalResults.get % Utils.defaultPageLength > 0) {
-//        totalResults.get / Utils.defaultPageLength + 1
-//      } else {
-//        totalResults.get / Utils.defaultPageLength
-//      }
-//
-//      val showNext: Boolean = curPage < totalNumPages
-//      flash.put("ShowNext", showNext)
-//      if (showNext) flash.put("NextUrl", withPageQuery(baseUrl, curPage + 1, filter)) else flash.remove("NextUrl")
-//
-//      val showLast: Boolean = curPage < totalNumPages
-//      flash.put("ShowLast", showLast)
-//      if (showLast) flash.put("LastUrl", withPageQuery(baseUrl, totalNumPages, filter)) else flash.remove("LastUrl")
-//    }
-//  }
-//
-//  /**
-//   * Appends URL with query parameters
-//   *
-//   * @param url the URL to which to append query parameters
-//   * @param page the page index (as in pagination)
-//   * @param filter the "filter" parameter
-//   * @return url with query parameters appended
-//   */
-//  private def withPageQuery(url: ActionDefinition,
-//                            page: Int,
-//                            filter: Option[String]): String = {
-//    val urlStr = url.url
-//
-//    val filterStr = filter match {
-//      case Some(f) => "&filter=" + f
-//      case None => ""
-//    }
-//
-//    if (urlStr.contains('?')) {
-//      urlStr + "page=" + page + filterStr
-//    } else {
-//      urlStr + "?page=" + page + filterStr
-//    }
-//  }
+
+  /**
+   * Updates the flash scope with pagination data used by pagination.scala.html
+   */
+  def updateFlashScopeWithPagingData[A](pagedQuery: (Iterable[A], Int, Option[Int]),
+                                        baseUrl: String,
+                                        filter: Option[String] = None) {
+    val curPage = pagedQuery._2
+    val totalResults = pagedQuery._3
+
+    val showPaging = totalResults.isDefined && totalResults.get > Utils.defaultPageLength
+    val flash = play.mvc.Http.Context.current().flash
+    flash.put("ShowPaging", showPaging.toString)
+    val totalResultsStr = if (totalResults.isDefined) ("- " + totalResults.get + " results") else ""
+    flash.put("TotalResultsStr", totalResultsStr)
+
+    if (showPaging) {
+      val showFirst: Boolean = curPage > 2
+      flash.put("ShowFirst", showFirst.toString)
+      if (showFirst) flash.put("FirstUrl", withPageQuery(baseUrl, 1, filter)) else flash.remove("FirstUrl")
+
+      val showPrev: Boolean = curPage > 1
+      flash.put("ShowPrev", showPrev.toString)
+      if (showPrev) flash.put("PrevUrl", withPageQuery(baseUrl, curPage - 1, filter)) else flash.remove("PrevUrl")
+
+      val totalNumPages = if (totalResults.get % Utils.defaultPageLength > 0) {
+        totalResults.get / Utils.defaultPageLength + 1
+      } else {
+        totalResults.get / Utils.defaultPageLength
+      }
+
+      val showNext: Boolean = curPage < totalNumPages
+      flash.put("ShowNext", showNext.toString)
+      if (showNext) flash.put("NextUrl", withPageQuery(baseUrl, curPage + 1, filter)) else flash.remove("NextUrl")
+
+      val showLast: Boolean = curPage < totalNumPages
+      flash.put("ShowLast", showLast.toString)
+      if (showLast) flash.put("LastUrl", withPageQuery(baseUrl, totalNumPages, filter)) else flash.remove("LastUrl")
+    }
+  }
+
+  /**
+   * Appends URL with query parameters
+   *
+   * @param url the URL to which to append query parameters
+   * @param page the page index (as in pagination)
+   * @param filter the "filter" parameter
+   * @return url with query parameters appended
+   */
+  private def withPageQuery(url: String,
+                            page: Int,
+                            filter: Option[String]): String = {
+    val filterStr = filter match {
+      case Some(f) => "&filter=" + f
+      case None => ""
+    }
+    if (url.contains('?')) {
+      url + "page=" + page + filterStr
+    } else {
+      url + "?page=" + page + filterStr
+    }
+  }
 }

@@ -1,0 +1,112 @@
+@(celebrityListings: Iterable[models.CelebrityListing]
+)(implicit authToken: egraphs.authtoken.AuthenticityToken)
+
+@import controllers.WebsiteControllers
+@import egraphs.authtoken.AuthenticityToken.safeForm
+@import views.html.Application.content_base
+
+@content_base(title="Admin - Celebrities", body=body, head=head, navContent=navContent, onLoad=onBodyLoad)
+
+@getCelebritiesAdmin = @{
+	routes.WebsiteControllers.getCelebritiesAdmin
+}
+
+@{/** @getCreateCelebrity = @{
+	routes.WebsiteControllers.getCreateCelebrityAdmin
+}*/}
+
+@postLogout = @{
+	routes.WebsiteControllers.postLogout
+}
+
+@getCelebritiesBySearchAdmin = @{
+	routes.WebsiteControllers.getCelebritiesBySearchAdmin
+}
+
+@head = {
+<link rel="stylesheet" href='@RemoteAssets.at("chosen/chosen.css")' >
+<script src='@RemoteAssets.at("twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
+<script src='@RemoteAssets.at("chosen/chosen.jquery.min.js")' type="text/javascript"></script>
+}
+
+@onBodyLoad = {
+  $('.chzn-select').chosen();
+}
+
+@navContent = {
+	@safeForm('id -> "logout-form", 'method -> "POST", 'action -> postLogout.url, 'enctype -> "multipart/form-data") {
+    <div>
+      <button type="submit" id="logout-button" class="btn fade in">Logout</button>
+    </div>
+  }
+}
+
+@body = {
+<div class="admin-content">
+  <h1>
+    Celebrity Search Results
+  </h1>
+  @{/**<form method="link" action="@getCreateCelebrity">
+    <input class="btn primary fade in" type="submit" value="New Celebrity"/>
+  </form>*/}
+  <form method="GET" action="@getCelebritiesBySearchAdmin">
+    <input type="text" name="query"/>
+    <input class="btn primary fade in" value="Search" type="submit"/>
+  </form>
+  <h2>All @celebrityListings.size</h2>
+
+  <table>
+    <tr>
+      <th></th>
+      <th>Id</th>
+      <th>Email</th>
+      <th>Public Name</th>
+      <th>Enrolled?</th>
+      <th>Published?</th>
+      <th>Products</th>
+      <th>Orders</th>
+      <th>Egraphs</th>
+      <th>Inventory</th>
+    </tr>
+    @celebrityListings.map { case celebrityListing =>
+    <tr>
+      <td>
+        <a class="preview-link" href="/admin/celebrities/@celebrityListing.id">
+          Details
+        </a>
+      </td>
+      <td>@celebrityListing.id</td>
+      <td>@celebrityListing.email</td>
+      <td>
+        <a class="preview-link" href="/@celebrityListing.urlSlug">
+          @celebrityListing.publicName
+        </a>
+      </td>
+      <td>@celebrityListing.enrollmentStatus</td>
+      <td>@celebrityListing.publishedStatus</td>
+      <td>
+        <a class="preview-link" href="/admin/celebrities/@celebrityListing.id/products">
+        Products
+        </a>
+      </td>
+      <td>
+        <a class="preview-link" href="/admin/celebrities/@celebrityListing.id/orders?filter=pendingAdminReview">
+          Orders
+        </a>
+      </td>
+      <td>
+        <a class="preview-link" href="/admin/celebrities/@celebrityListing.id/egraphs">
+          Egraphs
+        </a>
+      </td>
+      <td>
+        <a class="preview-link" href="/admin/celebrities/@celebrityListing.id/inventorybatches">
+          Inventory
+        </a>
+      </td>
+    </tr>
+    }
+  </table>
+  <a href="@getCelebritiesAdmin.url">View all celebrities</a>
+</div>
+}

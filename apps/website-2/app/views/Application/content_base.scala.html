@@ -4,18 +4,7 @@
   navContent: => Html = Html.empty,
   body:   => Html = Html.empty)
 
-@base(title=title, head=localHead, onLoad=onLoad, body=localBody, navContent=navContent)
-
-@localHead = {
-  <style type="text/css">
-    body {
-      background-color:black;
-      background-image:url(@RemoteAssets.at("/images/background_gradient1.jpg"));
-      background-repeat:repeat;
-    }
-  </style>
-  @head
-}
+@base(title=title, onLoad=onLoad, body=localBody, navContent=navContent)
 
 @localBody = {
   <div class="content-base">
