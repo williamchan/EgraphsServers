@@ -4,21 +4,24 @@ import java.io.{File, FileInputStream}
 import services.blobs.Blobs
 import play.Play
 import services.AppConfig
+import java.io.File
 import org.jclouds.blobstore.domain.Blob
 import akka.actor.{Actor, ActorRef}
-import akka.actor.Actor.actorOf
+import play.api.libs.concurrent.Akka
+import play.api.Application
 
 object TestHelpers {
 
-  private val blobs = AppConfig.instance[Blobs]
+  private lazy val blobs = AppConfig.instance[Blobs]
 
   def putPublicImageOnBlobStore() {
     import Blobs.Conversions._
-    blobs.put("a/b/derp.jpg", Play.getFile("./test/files/derp.jpg"))
+    blobs.put("a/b/derp.jpg", new File("./test/files/derp.jpg"))
   }
 
   def fileAsBytes(filename: String): Array[Byte] = {
-    Blobs.Conversions.fileToByteArray(Play.getFile(filename))
+    val file = EgraphsUnitTest.resourceFile(filename)
+    Blobs.Conversions.fileToByteArray(file)
   }
 
   def getStringFromFile(file: File): String = {
@@ -59,34 +62,36 @@ object TestHelpers {
   /**
    * Convenience method that starts the actor, executes the operation, and stops the actor.
    */
-  def withActorUnderTest[ActorT <: Actor: Manifest, ResultT]
-  (actorInstance: => ActorT)(operation: ActorRef => ResultT): ResultT =
-  {
-    val actor = actorOf(actorInstance).start()
-
-    executeOperationThenStop(actor)(operation)
-  }
+//  def withActorUnderTest[ActorT <: Actor: Manifest, ResultT]
+//  (actorInstance: => ActorT)(operation: ActorRef => ResultT)(implicit app: Application): ResultT =
+//  {
+//    val actor = Akka.system.actorOf(actorInstance).start()
+//
+//    executeOperationThenStop(actor)(operation)
+//  }
+// TODO: PLAY20 migration. Either delete or uncomment this function
 
   /**
    * Convenience method that starts the actor, executes the operation, and stops the actor.
    */
-  def withActorUnderTest[ActorT <: Actor: Manifest, ResultT]
-  (operation: ActorRef => ResultT): ResultT =
-  {
-    val actor = actorOf[ActorT].start()
+//  def withActorUnderTest[ActorT <: Actor: Manifest, ResultT]
+//  (operation: ActorRef => ResultT): ResultT =
+//  {
+//    val actor = Akka.system.actorOf[ActorT].start()
+//
+//    executeOperationThenStop(actor)(operation)
+//  }
+// TODO: PLAY20 migration. Either delete or uncomment this function.
 
-    executeOperationThenStop(actor)(operation)
-  }
-
-  private[this] def executeOperationThenStop[ActorT <: Actor: Manifest, ResultT]
-  (actor: ActorRef)(operation: ActorRef => ResultT): ResultT =
-  {
-    try {
-      operation(actor)
-    }
-    finally {
-      actor.stop()
-    }
-  }
-
+//  private[this] def executeOperationThenStop[ActorT <: Actor: Manifest, ResultT]
+//  (actor: ActorRef)(operation: ActorRef => ResultT): ResultT =
+//  {
+//    try {
+//      operation(actor)
+//    }
+//    finally {
+//      actor.stop()
+//    }
+//  }
+// TODO: PLAY20 migration. Either delete or uncomment this function.
 }

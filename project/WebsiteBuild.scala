@@ -61,20 +61,28 @@ object WebsiteBuild extends Build {
       "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
       "redis.clients" % "jedis" % "2.0.0",
       //"com.googlecode.soundlibs" % "tritonus-share" % "0.3.7-1", // from our unmanaged dependency 0.3.6
-      "uk.me.lings" %% "scala-guice" % "3.0.1-SNAPSHOT",
+      // "uk.me.lings" %% "scala-guice" % "3.0.1-SNAPSHOT",
       "xml-apis" % "xml-apis-ext" % "1.3.04",
       "xml-apis" % "xml-apis" % "1.3.04", // we might be getting pretty stale here
-      "xuggle" % "xuggle-xuggler" % "5.4"
+      "xuggle" % "xuggle-xuggler" % "5.4",
+
+      "org.scalatest" %% "scalatest" % "1.8" % "test"
     )
     
+    val websiteBaseDir = file(".") / "apps" / "website-2"
+
     val main = PlayProject(
       appName,
       appVersion,
       appDependencies,
-      path = file(".") / "apps" / "website-2",
+      path = websiteBaseDir,
       mainLang = SCALA
     ).settings(
       organization := "egraphs",
+
+      testOptions in Test := Nil,
+
+      resourceDirectory in Test := websiteBaseDir / "test" / "resources",
 
       EclipseKeys.skipParents := false,
 
