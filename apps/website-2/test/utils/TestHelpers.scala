@@ -20,7 +20,8 @@ object TestHelpers {
   }
 
   def fileAsBytes(filename: String): Array[Byte] = {
-    Blobs.Conversions.fileToByteArray(new File(filename))
+    val file = EgraphsUnitTest.resourceFile(filename)
+    Blobs.Conversions.fileToByteArray(file)
   }
 
   def getStringFromFile(file: File): String = {

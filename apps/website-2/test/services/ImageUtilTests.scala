@@ -73,7 +73,7 @@ class ImageUtilTests extends EgraphsUnitTest {
   }
   */
   it should "resize PNG images correctly" in new TestApplication {
-    val image = ImageIO.read(resourceFile("image.png"))
+    val image = ImageIO.read(resourceFile("image.jpg"))
     val scaled = imageUtil.getScaledInstance(image, 100, 100)
     (scaled.getWidth, scaled.getHeight) should be((100, 100))
   }
@@ -89,7 +89,7 @@ class ImageUtilTests extends EgraphsUnitTest {
   }
 
   "crop" should "crop image to specified dimensions" in new TestApplication {
-    val originalImage: BufferedImage = ImageIO.read(resourceFile("image.png"))
+    val originalImage: BufferedImage = ImageIO.read(resourceFile("image.jpg"))
     val croppedImage: BufferedImage = ImageUtil.crop(originalImage, Dimensions(200, 200))
     croppedImage.getWidth should be(200)
     croppedImage.getHeight should be(200)
