@@ -6,7 +6,7 @@ import akka.util.Timeout
 import akka.dispatch.Future
 import akka.dispatch.Await
 
-import scala.collection.mutable.HashMap
+import scala.collection.immutable.HashMap
 import scala.collection.immutable.List
 
 import common.CloudWatchMetricPublisher

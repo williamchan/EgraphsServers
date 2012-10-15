@@ -4,20 +4,38 @@ import history.WebsiteHistory
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import monitoring.website.WebsiteMonitoring
+//import com.codahale.jerkson.Json
+import play.api.libs.json._
 
 object Application extends Controller {
 
-  def index = Action {
+  def index = Action { request =>
+    println("request from address is " + request.remoteAddress.toString())
+    //request.body.
 
-    val cloudwatch = utilities.Utilities.getCloudWatchClient
-    val result = WebsiteHistory.getHistory(cloudwatch, 60)
-    // send history to html page in a convenient way
-    
-    // manually built history provides higher data granularity
     val historyMap = WebsiteMonitoring.getActorInfo
-    println("default to String for historyMap is " + historyMap)
 
-    Ok(views.html.index(result.toString))
+    val urls = utilities.Utilities.getUrls(historyMap)
+    val dataPoints = utilities.Utilities.getRecentHistory(historyMap)
+
+    val urlsAndDataPoints = (urls, dataPoints).zipped.toList
+
+    Ok(views.html.index(urlsAndDataPoints))
   }
 
+  def getMetrics = Action {
+
+    val historyMap = WebsiteMonitoring.getActorInfo
+    val jsonIterable = historyMap.map { case (url, data) =>
+      Json.toJson(Map(
+        "source" -> Json.toJson(url),
+        "dataPoints" -> Json.toJson(data)
+      ))
+    }
+    
+    val jsonSeq = jsonIterable.toSeq
+    val responseJson = Json.toJson(Map("metrics" -> jsonSeq))
+    
+    Ok(responseJson)
+  }
 }

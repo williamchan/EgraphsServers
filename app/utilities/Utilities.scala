@@ -3,6 +3,7 @@ package utilities
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.services.cloudwatch.AmazonCloudWatchClient
+import scala.collection.immutable.HashMap
 
 object Utilities {
 
@@ -15,6 +16,15 @@ object Utilities {
     cloudwatch.setEndpoint("monitoring.us-east-1.amazonaws.com")
 
     cloudwatch
+
+  }
+
+  def getUrls(historyMap: HashMap[String, List[Int]]): List[String] = {
+    historyMap.keySet.toList
+  }
+
+  def getRecentHistory(historyMap: HashMap[String, List[Int]]): List[List[Int]] = {
+    historyMap.values.toList
 
   }
 }
