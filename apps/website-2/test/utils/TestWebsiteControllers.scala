@@ -7,16 +7,19 @@ import services.mail.{BulkMail, TransactionalMail}
 import services.payment.Payment
 import models._
 import services.db.DBSession
-import play.mvc.Controller
+import play.api.mvc.Controller
 import controllers.website.AllWebsiteEndpoints
 import java.util.Properties
 import forms._
-import play.mvc.Scope.{Session, Flash}
-import play.mvc.Http.Request
-import play.test.FunctionalTest
-import services.AppConfig
+import services.{Utils, AppConfig}
 import services.mvc.celebrity.CatalogStarsQuery
 import services.mvc.{OrderCompleteViewModelFactory, StorefrontBreadcrumbData}
+import services.http.filters.HttpFilters
+import play.api.test.FakeRequest
+import play.api.mvc.Request
+import play.api.mvc.AnyContent
+import services.config.ConfigFileProxy
+import services.blobs.Blobs
 
 /**
  * Injectable version of AllWebsiteEndpoints with configurable session, flash,
@@ -25,40 +28,37 @@ import services.mvc.{OrderCompleteViewModelFactory, StorefrontBreadcrumbData}
 case class TestWebsiteControllers @Inject()(
   controllerMethod: ControllerMethod,
   postController: POSTControllerMethod,
-  accountRequestFilters: AccountRequestFilters,
-  adminFilters: AdminRequestFilters,
-  celebFilters: CelebrityAccountRequestFilters,
-  customerFilters: CustomerRequestFilters,
+  httpFilters: HttpFilters,
   transactionalMail: TransactionalMail,
   payment: Payment,
   orderQueryFilters: OrderQueryFilters,
   egraphQueryFilters: EgraphQueryFilters,
   inventoryBatchQueryFilters: InventoryBatchQueryFilters,
   dbSession: DBSession,
-  @PlayConfig playConfig: Properties,
   facebookAppId: String,
+  accountStore: AccountStore,
+  administratorStore: AdministratorStore,
+  celebrityStore: CelebrityStore,
+  customerStore: CustomerStore,
+  config: ConfigFileProxy,
+  orderStore: OrderStore,
+  productStore: ProductStore,
   customerLoginForms: CustomerLoginFormFactory,
-  accountSettingsForms: AccountSettingsFormFactory,
-  accountPasswordResetForms: AccountPasswordResetFormFactory,
-  accountRecoverForms: AccountRecoverFormFactory,
   egraphsSessionFactory: () => EgraphsSession,
-  fakeRequest: Request = FunctionalTest.newRequest(),
-  fakeSession: Session = new Session(),
-  fakeFlash: Flash = new Flash()
+  fakeRequest: Request[AnyContent] = FakeRequest()
 )() extends Controller with AllWebsiteEndpoints {
   import AppConfig.instance
-  val bulkMail = instance[BulkMail]
-  val breadcrumbData = instance[StorefrontBreadcrumbData]
-  val checkPurchaseField = instance[PurchaseFormChecksFactory]
-  val purchaseFormFactory = instance[PurchaseFormFactory]
-  val formReaders = instance[FormReaders]
-  val formChecks = instance[FormChecks]
-  override def request = fakeRequest
-  override def params = request.params
-  override def session = fakeSession
-  override def flash = fakeFlash
-  override def printOrderStore = instance[PrintOrderStore]
-  override def printOrderQueryFilters = instance[PrintOrderQueryFilters]
+  
+  override def accountSettingsForms = instance[AccountSettingsFormFactory]
+  override def accountPasswordResetForms = instance[AccountPasswordResetFormFactory]
+  override def accountRecoverForms = instance[AccountRecoverFormFactory]
+  override def blobs = instance[Blobs]
+  override def bulkMail = instance[BulkMail]
+  override def breadcrumbData = instance[StorefrontBreadcrumbData]
+  override def checkPurchaseField = instance[PurchaseFormChecksFactory]
+  override def purchaseFormFactory = instance[PurchaseFormFactory]
+  override def formReaders = instance[FormReaders]  
+
   override def catalogStarsQuery = instance[CatalogStarsQuery]
   override def orderCompleteViewModelFactory = instance[OrderCompleteViewModelFactory]
 }

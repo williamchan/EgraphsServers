@@ -7,23 +7,29 @@ class StripePaymentTests extends EgraphsUnitTest
 {
   import services.Finance.TypeConversions._
 
-  private val payment = AppConfig.instance[StripeTestPayment]
+  private def payment = {
+    val payment = AppConfig.instance[StripeTestPayment]
+    
+    payment.bootstrap()
+    
+    payment
+  }
+  
   private val amount: BigDecimal = 60
-  payment.bootstrap()
 
-  "charge" should "successfully charge a token" in {
+  "charge" should "successfully charge a token" in new TestApplication {
     val charge = payment.charge(amount.toMoney(), payment.testToken().id,
       "services.payment..StripePaymentTests, \"charge should successfully charge a token\". Looks like it worked.")
     charge.id should not be (null)
   }
 
-  "charge" should "successfully work if amount is in smaller than penny increments" in {
+  "charge" should "successfully work if amount is in smaller than penny increments" in new TestApplication {
     val charge = payment.charge(BigDecimal(10.12345).toMoney(), payment.testToken().id,
       "services.payment..StripePaymentTests, \"charge should successfully charge a token\". Looks like it worked.")
     charge.id should not be (null)
   }
 
-  "charge" should "throw if double-charging a token" in {
+  "charge" should "throw if double-charging a token" in new TestApplication {
     val token = payment.testToken()
     val charge = payment.charge(amount.toMoney(), token.id,
       "services.payment..StripePaymentTests, \"Test double-charging with token\".")
@@ -37,7 +43,7 @@ class StripePaymentTests extends EgraphsUnitTest
     exception.getLocalizedMessage should include ("You cannot use a stripe token more than once")
   }
 
-  "refund" should "successfully refund a charge" in {
+  "refund" should "successfully refund a charge" in new TestApplication {
     val charge = payment.charge(amount.toMoney(), payment.testToken().id,
       "services.payment..StripePaymentTests, \"This charge should be refunded\".")
     charge.refunded should be(false)
@@ -47,7 +53,7 @@ class StripePaymentTests extends EgraphsUnitTest
     refundedCharge.refunded should be(true)
   }
 
-  "refund" should "throw exception if charge does not exist" in {
+  "refund" should "throw exception if charge does not exist" in new TestApplication {
     val exception = intercept[com.stripe.exception.InvalidRequestException] {
       payment.refund("doesnotexist")
       fail("Should have thrown exception")
@@ -55,7 +61,7 @@ class StripePaymentTests extends EgraphsUnitTest
     exception.getLocalizedMessage should include ("No such charge")
   }
 
-  "refund" should "throw exception if called on a charge that has already been refunded" in {
+  "refund" should "throw exception if called on a charge that has already been refunded" in new TestApplication {
     val charge = payment.charge(amount.toMoney(), payment.testToken().id,
       "services.payment..StripePaymentTests, \"This charge should be refunded\".")
     charge.refunded should be(false)
@@ -71,11 +77,11 @@ class StripePaymentTests extends EgraphsUnitTest
     exception.getLocalizedMessage should include ("has already been refunded")
   }
 
-  "testToken" should "throw exception when called from live implementation" in {
+  "testToken" should "throw exception when called from live implementation" in new TestApplication {
     intercept[UnsupportedOperationException] {AppConfig.instance[StripePayment].testToken()}
   }
 
-  "isTest" should "be false for live implementation, true for others" in {
+  "isTest" should "be false for live implementation, true for others" in new TestApplication {
     AppConfig.instance[StripePayment].isTest should be (false)
     AppConfig.instance[StripeTestPayment].isTest should be (true)
     AppConfig.instance[YesMaamPayment].isTest should be (true)

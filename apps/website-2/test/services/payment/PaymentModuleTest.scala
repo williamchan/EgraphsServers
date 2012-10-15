@@ -3,55 +3,56 @@ package services.payment
 import utils.EgraphsUnitTest
 import services.inject.ClosureProviders
 import services.{AppConfig, Utils}
+import services.config.ConfigFileProxy
 
 class PaymentModuleTest extends EgraphsUnitTest with ClosureProviders {
 
   "PaymentProvider" should "return the stripe implementation when 'stripe' is set in application.conf" in {
-    val (underTest, _, _, _, utils) = paymentProviderAndDeps
+    val (underTest, _, _, _, config) = paymentProviderAndDeps
 
-    utils.requiredConfigurationProperty(any) returns "stripe"
+    config.paymentVendor returns "stripe"
     underTest.get().isInstanceOf[StripePayment] should be (true)
   }
 
-  "PaymentProvider" should "return the stripetest implementation when 'stripetest' is set in application.conf" in {
-    val (underTest, _, _, _, utils) = paymentProviderAndDeps
+  it should "return the stripetest implementation when 'stripetest' is set in application.conf" in {
+    val (underTest, _, _, _, config) = paymentProviderAndDeps
 
-    utils.requiredConfigurationProperty(any) returns "stripetest"
+    config.paymentVendor returns "stripetest"
     underTest.get().isInstanceOf[StripeTestPayment] should be (true)
   }
 
   it should "return the yes maam implementation when 'yesmaam' is set in application.conf" in {
-    val (underTest, _, _, _, utils) = paymentProviderAndDeps
+    val (underTest, _, _, _, config) = paymentProviderAndDeps
 
-    utils.requiredConfigurationProperty(any) returns "yesmaam"
+    config.paymentVendor returns "yesmaam"
     underTest.get().isInstanceOf[YesMaamPayment] should be (true)
   }
 
   it should "throw an IllegalArgumentException when application.conf sets an unrecognizable setting" in {
-    val (underTest, _, _, _, utils) = paymentProviderAndDeps
+    val (underTest, _, _, _, config) = paymentProviderAndDeps
 
-    utils.requiredConfigurationProperty(any) returns "herp"
+    config.paymentVendor returns "herp"
     evaluating {
       underTest.get()
     } should produce[IllegalArgumentException]
   }
 
-  "AppConfig" should "be able to give us a Payment implementation" in {
+  "AppConfig" should "be able to give us a Payment implementation" in new TestApplication {
     // If this throws an exception then it broke.
-    AppConfig.instance[Payment]
+    AppConfig.instance[Payment] should not be (null)
   }
 
-  def paymentProviderAndDeps = {
+  private def paymentProviderAndDeps = {
     val stripeImpl = mock[StripePayment]
     val stripeTestImpl = mock[StripeTestPayment]
     val yesMaamImpl = mock[YesMaamPayment]
-    val utils = mock[Utils]
+    val configFileProxy = mock[ConfigFileProxy]
 
-    (new PaymentProvider(stripeImpl, stripeTestImpl, yesMaamImpl, utils),
+    (new PaymentProvider(stripeImpl, stripeTestImpl, yesMaamImpl, configFileProxy),
       stripeImpl,
       stripeTestImpl,
       yesMaamImpl,
-      utils
-      )
+      configFileProxy
+    )
   }
 }

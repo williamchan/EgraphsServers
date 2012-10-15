@@ -10,11 +10,12 @@ import services.cache.CacheFactory
  * Mix this trait in to your Suite class to make sure that Play Validation
  * and all blob and cache data are scrubbed in between test runs.
  */
-trait ClearsCacheAndBlobsAndValidationBefore extends BeforeAndAfterEach { this: Suite =>
+trait ClearsCacheAndBlobsAndValidationBefore extends BeforeAndAfterEach { this: Suite with EgraphsUnitTest =>
   override def beforeEach() {
     super.beforeEach()
-    Validation.clear()
-    AppConfig.instance[Blobs].scrub()
-    AppConfig.instance[CacheFactory].applicationCache.clear()
+    new TestApplication {
+      AppConfig.instance[Blobs].scrub()
+      AppConfig.instance[CacheFactory].applicationCache.clear()
+    }
   }
 }

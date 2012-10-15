@@ -22,15 +22,15 @@ class SocialTests extends EgraphsUnitTest
   }
 
   "Twitter" should "return getEgraphShareLink" in {
-    var celebrity = TestData.newSavedCelebrity()
-    var link = Twitter.getEgraphShareLink(celebrity = celebrity, viewEgraphUrl = "myegraph")
+    val celebrity = TestData.newSavedCelebrity()
+    val link = Twitter.getEgraphShareLink(celebrity = celebrity, viewEgraphUrl = "myegraph")
     link should include("url=myegraph")
     link should include("text=Check out this choice egraph from " + celebrity.publicName)
 
-    celebrity = celebrity.copy(twitterUsername = Some("egraphceleb")).save()
-    link = Twitter.getEgraphShareLink(celebrity = celebrity, viewEgraphUrl = "myegraph")
-    link should include("url=myegraph")
-    link should include("text=Hey @egraphceleb this is one choice egraph you made.")
+    val twitterCeleb = celebrity.copy(twitterUsername = Some("egraphceleb")).save()
+    val twitterLink = Twitter.getEgraphShareLink(celebrity = twitterCeleb, viewEgraphUrl = "myegraph")
+    twitterLink should include("url=myegraph")
+    twitterLink should include("text=Hey @egraphceleb this is one choice egraph you made.")
   }
 
 }

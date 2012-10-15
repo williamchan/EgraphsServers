@@ -6,7 +6,7 @@ import java.text.SimpleDateFormat
 import org.joda.time.DateTime
 import models._
 import enums.{EgraphState, PublishedStatus}
-import play.libs.Codec
+import org.apache.commons.codec.binary.Base64
 import org.apache.commons.lang.RandomStringUtils
 
 /**
@@ -140,7 +140,7 @@ object TestData {
   def newFulfilledOrder(customer: Customer) : (Order, Egraph) = {
     val order = customer.buy(TestData.newSavedProduct()).save()
     (order, order.newEgraph
-      .withAssets(TestConstants.signingAreaSignatureStr, Some(TestConstants.signingAreaMessageStr), Codec.decodeBASE64(TestConstants.voiceStr()))
+      .withAssets(TestConstants.signingAreaSignatureStr, Some(TestConstants.signingAreaMessageStr), Base64.decodeBase64(TestConstants.voiceStr()))
       .save()
       .withYesMaamBiometricServices
       .verifyBiometrics
@@ -161,7 +161,7 @@ object TestData {
 
   def newSavedEgraphWithRealAudio(): Egraph = {
     newSavedOrder().newEgraph
-      .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), Codec.decodeBASE64(TestConstants.voiceStr()))
+      .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), Base64.decodeBase64(TestConstants.voiceStr()))
       .save()
   }
 

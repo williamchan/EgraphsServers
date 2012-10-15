@@ -20,6 +20,7 @@ import play.api.Play.current
 import graphics.GraphicsSource
 import org.squeryl.dsl.{GroupWithMeasures, ManyToMany}
 import java.util.Date
+import ImageUtil.Conversions._
 
 case class ProductServices @Inject() (
   store: ProductStore,
@@ -81,7 +82,7 @@ case class Product(
    * depending on the image.
    */
   def saveWithImageAssets(image: Option[BufferedImage], icon: Option[BufferedImage]): Product = {
-    import ImageUtil.Conversions._
+    
 
     // Prepare the product photo, cropped to the suggested frame
     val product = image match {
@@ -310,7 +311,7 @@ case class Product(
   }
 
   lazy val defaultPhoto = ImageAsset(
-      Play.getFile("test/files/longoria/product-2.jpg"),
+      new BufferedImage(2160, 1440, BufferedImage.TYPE_INT_RGB).asByteArray(ImageAsset.Jpeg),
       keyBase="defaults/product",
       name="photo",
       imageType=ImageAsset.Jpeg,
@@ -318,7 +319,7 @@ case class Product(
   ).getSaved(AccessPolicy.Public)
 
   lazy val defaultPhotoPortrait = ImageAsset(
-    Play.getFile("test/files/kapler/product-1.jpg"),
+    new BufferedImage(1440, 2160, BufferedImage.TYPE_INT_RGB).asByteArray(ImageAsset.Jpeg),
     keyBase="defaults/product",
     name="photo",
     imageType=ImageAsset.Jpeg,
