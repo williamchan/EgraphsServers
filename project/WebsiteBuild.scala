@@ -67,14 +67,20 @@ object WebsiteBuild extends Build {
       "org.scalatest" %% "scalatest" % "1.8" % "test"
     )
     
+    val websiteBaseDir = file(".") / "apps" / "website-2"
+
     val main = PlayProject(
       appName,
       appVersion,
       appDependencies,
-      path = file(".") / "apps" / "website-2",
+      path = websiteBaseDir,
       mainLang = SCALA
     ).settings(
       organization := "egraphs",
+
+      testOptions in Test := Nil,
+
+      resourceDirectory in Test := websiteBaseDir / "test" / "resources",
 
       EclipseKeys.skipParents := false,
 

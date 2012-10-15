@@ -8,7 +8,7 @@ import play.api.Play.current
  */
 object TempFile {
   // Statically ensure that the path for temporary files exists.
-  val dirPath = play.api.Play.getFile("tmp/files")
+  val dirPath = new File("tmp/files")
   dirPath.mkdirs()
 
 
