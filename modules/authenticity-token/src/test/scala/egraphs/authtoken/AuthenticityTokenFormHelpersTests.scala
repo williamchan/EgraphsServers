@@ -3,7 +3,10 @@ package egraphs.authtoken
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 import play.api.templates.Html
+import org.scalatest.junit.JUnitRunner
+import org.junit.runner.RunWith
 
+@RunWith(classOf[JUnitRunner])
 class AuthenticityTokenFormHelpersTests extends FlatSpec with ShouldMatchers {
   "AuthenticityToken.hiddenInput" should "inject a hidden input" in {
     implicit val token = new AuthenticityToken("test-token")

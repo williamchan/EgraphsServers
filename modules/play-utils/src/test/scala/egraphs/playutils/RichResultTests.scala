@@ -11,7 +11,10 @@ import org.specs2.mock.Mockito
 import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
 import play.api.mvc.WrappedRequest
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
+@RunWith(classOf[JUnitRunner])
 class RichResultTests extends FlatSpec with ShouldMatchers {
   "addingToSession" should "add to the result if the result already had a SET_COOKIE value" in {
     runningCookieCompatibleApp {

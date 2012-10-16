@@ -2,11 +2,10 @@ package egraphs.authtoken
 
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
-import play.api.templates.Html
+import org.scalatest.junit.JUnitRunner
+import org.junit.runner.RunWith
 
-import play.api.test._
-import play.api.test.Helpers._
-
+@RunWith(classOf[JUnitRunner])
 class AuthenticityTokenActionCompositionTests extends FlatSpec with ShouldMatchers {
   "AuthenticityToken.makeAvailable" should "make a newly generated authenticity token available if none was in the session" in (pending)
   it should "make the existing token available if it was found in the session" in (pending)
