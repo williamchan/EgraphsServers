@@ -2,14 +2,16 @@ package utils
 
 import services.http.{WithDBConnection, ControllerDBSettings, ControllerMethod}
 import play.mvc.Http.Request
+import play.api.mvc.Action
 
 /**
  * Mocks out the interface of ControllerMethod, but does nothing except execute the operation
  */
-object MockControllerMethod extends ControllerMethod(null, null, null) {
+object MockControllerMethod extends ControllerMethod(null, null, null, null) {
+  
   override def apply[A](dbSettings: ControllerDBSettings = WithDBConnection())
-                       (operation: => A)
-                       (implicit request: Request): Any = {
-    operation
+              (action: Action[A]): Action[A] =
+  {
+    action
   }
 }

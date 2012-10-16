@@ -1,6 +1,6 @@
 package utils
 
-class TestBeforeAndAfterClosuresFlat extends EgraphsUnitTest
+class BeforeAndAfterClosuresFlatTests extends EgraphsUnitTest
   with BeforeAndAfterClosures
 {
   var beforeExecutionCount = 0
@@ -42,7 +42,7 @@ trait IncrementsExecutionCounts { this: BeforeAndAfterClosures =>
   }
 }
 
-class TestBeforeAndAfterClosuresMixedIn extends EgraphsUnitTest
+class BeforeAndAfterClosuresMixedInTests extends EgraphsUnitTest
   with BeforeAndAfterClosures
   with IncrementsExecutionCounts
 {
