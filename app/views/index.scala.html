@@ -1,25 +1,65 @@
 @(urlsAndDataPoints: List[(String,List[Int])])
 
 @main(title = "Monitoring") {
-    
-    <ul>
-       @urlsAndDataPoints.map { urlAndDataPoint =>
-           <h1> Recent GET requests to @urlAndDataPoint._1: </h1>
-           <p> @urlAndDataPoint._2.mkString(", ") </p>
+
+	<ul>
+       @urlsAndDataPoints.map { urlAndDataPoints =>
+         <li>
+           <h1> Recent GET requests to @urlAndDataPoints._1: </h1>
+           <p> @urlAndDataPoints._2.mkString(", ") </p>
            <div id="placeholder" style="width:600px;height:300px;"></div>
-       }
+         </li>
+		}	
+	</ul>
 
 	<script type="text/javascript">
 	$(function () {
-
-    	var data = [@{
-      		val points = urlsAndDataPoints.head._2
-      		Html((0 to points.length).zip(points)
-      			.map(point => "[" + point._1 + "," + point._2 + "]").mkString(","))}];
-    
-    	$.plot($("#placeholder"), [ data ]);
+		Egraphs.drawGraph(0); // after, also could pass color?
 	});
-	</script>
-       
-    </ul>  
+
+	var Egraphs = Egraphs || {}
+
+	Egraphs.drawGraph = function (index) {
+		var options = {
+			lines: { show: true },
+			points: { show: true },
+			xaxis: { tickDecimals: 0, tickSize: 1 },
+			yaxis: { min: 0.0, max: 1.2 }
+		};
+		var placeholder = $("#placeholder");
+		var data = [];
+
+		$.plot(placeholder, data, options);
+
+		function updateGraph() {
+
+			function onDataReceived(series) {
+
+				var newData = series.metrics[index].dataPoints;
+				var newDataTransformed = new Array(newData.length);
+
+				for (var i=0; i<newData.length; i++) {
+					newDataTransformed[i] = new Array(i+1, newData[i]);
+				}
+				
+				//var newPlaceholder = "placeholder-" + series.metrics[index].sourceName;
+
+				$.plot(placeholder, [ newDataTransformed ], options);
+
+			};
+
+			$.ajax({
+				url: "/metrics",
+				method: 'GET',
+				dataType: 'json',
+				success: onDataReceived
+			});
+		};
+
+		updateGraph;
+		setInterval(updateGraph, 10000);
+		//setInterval(updateGraph, 60000);	
+	};
+
+	</script>  
 }

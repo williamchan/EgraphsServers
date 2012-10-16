@@ -4,7 +4,6 @@ import history.WebsiteHistory
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import monitoring.website.WebsiteMonitoring
-//import com.codahale.jerkson.Json
 import play.api.libs.json._
 
 object Application extends Controller {
@@ -28,7 +27,7 @@ object Application extends Controller {
     val historyMap = WebsiteMonitoring.getActorInfo
     val jsonIterable = historyMap.map { case (url, data) =>
       Json.toJson(Map(
-        "source" -> Json.toJson(url),
+        "sourceName" -> Json.toJson(url),
         "dataPoints" -> Json.toJson(data)
       ))
     }
