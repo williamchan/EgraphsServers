@@ -37,8 +37,8 @@ class EgraphActorTests extends EgraphsUnitTest
       egraph1.egraphState should be(EgraphState.AwaitingVerification)
       egraph2.egraphState should be(EgraphState.AwaitingVerification)
 
-      Await.result(egraphActor ask ProcessEgraphMessage(egraph1.id, FakeRequest()), 1 second)
-      Await.result(egraphActor ask ProcessEgraphMessage(egraph2.id, FakeRequest()), 1 second)
+      Await.result(egraphActor ask ProcessEgraphMessage(egraph1.id, FakeRequest()), 10 second)
+      Await.result(egraphActor ask ProcessEgraphMessage(egraph2.id, FakeRequest()), 10 second)
 
       db.connected(TransactionSerializable) {
         egraphStore.get(egraph1.id).egraphState should be(EgraphState.PassedBiometrics)
@@ -52,7 +52,7 @@ class EgraphActorTests extends EgraphsUnitTest
       import services.blobs.Blobs.Conversions._
       val egraph = db.connected(TransactionSerializable) { TestData.newSavedEgraphWithRealAudio() }
 
-      Await.result(egraphActor ask ProcessEgraphMessage(egraph.id, FakeRequest()), 1 second)
+      Await.result(egraphActor ask ProcessEgraphMessage(egraph.id, FakeRequest()), 10 second)
       
       egraph.assets.audioMp3.asByteArray.length should be > (0)
     }

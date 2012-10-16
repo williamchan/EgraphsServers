@@ -6,10 +6,11 @@ import java.awt.geom.{Ellipse2D, Path2D}
 import play.Play
 import javax.imageio.ImageIO
 import utils.EgraphsUnitTest
+import java.io.File
 
 class BezierCubicTests extends EgraphsUnitTest {
 
-  it should "evaluate to the correct x and y coordinates" in {
+  "BezierCubic" should "evaluate to the correct x and y coordinates" in {
     val bezier = BezierCubic(
       0d, 0d,
       0d, 4d,
@@ -23,7 +24,7 @@ class BezierCubicTests extends EgraphsUnitTest {
     bezier(1) should be(Point(4, 0))
   }
 
-  "BezierCubic" should "derive correct sub-curves" in {
+  it should "derive correct sub-curves" in {
     import java.awt.Color
 
     val orig = BezierCubic(
@@ -67,7 +68,7 @@ class BezierCubicTests extends EgraphsUnitTest {
 
     g.dispose()
 
-    ImageIO.write(image, "PNG", Play.getFile("/tmp/files/curvetest.png"))
+    // ImageIO.write(image, "PNG", new File("/tmp/files/curvetest.png"))
 
     // Check to make sure calculations make sense
     firstHalf(1.0) should be (orig(0.5))
