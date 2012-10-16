@@ -2,26 +2,26 @@ package services.db
 
 import org.scalatest.matchers.ShouldMatchers
 import org.squeryl.adapters.{MySQLAdapter, PostgreSqlAdapter, H2Adapter}
-import play.test.UnitFlatSpec
+import utils.EgraphsUnitTest
 
-class DBAdapterTests extends UnitFlatSpec with ShouldMatchers {
+class DBAdapterTests extends EgraphsUnitTest {
 
-  "DBAdapter" should "be h2 for string 'mem'" in {
+  "DBAdapter" should "be h2 for string 'mem'" in new EgraphsTestApplication {
     DBAdapter.getForDbString("mem") should be theSameInstanceAs (DBAdapter.h2)
   }
 
-  it should "be mysql for mysql url" in {
+  it should "be mysql for mysql url" in new EgraphsTestApplication {
     val adapter = DBAdapter.getForDbString("mysql://herp.derp")
     adapter should be theSameInstanceAs (DBAdapter.mysql)
   }
 
-  it should "be postgres for postgres url" in {
+  it should "be postgres for postgres url" in new EgraphsTestApplication {
     val adapter = DBAdapter.getForDbString("postgresql://herp:derp/schmerp")
 
     adapter should be theSameInstanceAs (DBAdapter.postgres)
   }
 
-  it should "otherwise throw an illegal argument exception" in {
+  it should "otherwise throw an illegal argument exception" in new EgraphsTestApplication {
     evaluating { DBAdapter.getForDbString("oracle://dur") } should produce [IllegalArgumentException]
   }
 

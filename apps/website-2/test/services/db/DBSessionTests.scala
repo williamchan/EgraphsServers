@@ -19,8 +19,8 @@ class DBSessionTests extends EgraphsUnitTest
     (new DBSession(() => connection), connection)
   }
 
-  "A call to DBSession.connected" should "return the 'continue' value, commit, and close" in {
-    val (dbSession, connection) = underTest    
+  "A call to DBSession.connected" should "return the 'continue' value, commit, and close" in new EgraphsTestApplication {
+    val (dbSession, connection) = underTest
 
     val returned = dbSession.connected(TransactionSerializable) { 12345 }
 
@@ -31,7 +31,7 @@ class DBSessionTests extends EgraphsUnitTest
     there was no (connection).rollback()
   }
 
-  it should "rollback and close when an exception is thrown by the continue block" in {
+  it should "rollback and close when an exception is thrown by the continue block" in new EgraphsTestApplication {
     val (dbSession, connection) = underTest
     
     evaluating { 
@@ -43,7 +43,7 @@ class DBSessionTests extends EgraphsUnitTest
     there was no (connection).commit()
   }
 
-  it should "rollback and close when committing throws an exception" in {
+  it should "rollback and close when committing throws an exception" in new EgraphsTestApplication {
     val (dbSession, connection) = underTest
 
     connection.commit() throws new RuntimeException()
@@ -57,7 +57,7 @@ class DBSessionTests extends EgraphsUnitTest
     there was one (connection).close()
   }
 
-  it should "set the correct transaction isolation level to the database" in {
+  it should "set the correct transaction isolation level to the database" in new EgraphsTestApplication {
     val (dbSession, connection) = underTest
     
     dbSession.connected(TransactionSerializable) { "Hello World" }
@@ -65,7 +65,7 @@ class DBSessionTests extends EgraphsUnitTest
     there was one (connection).setTransactionIsolation(TransactionSerializable.jdbcIsolationLevel)
   }
 
-  it should "Save and recall an Account correctly both within and between transactions" in {
+  it should "Save and recall an Account correctly both within and between transactions" in new EgraphsTestApplication {
     val dbSession = AppConfig.instance[DBSession]
 
     val emailAddress = TestData.generateEmail("herpyderpson", "derp.org")
@@ -85,7 +85,7 @@ class DBSessionTests extends EgraphsUnitTest
     }
   }
 
-  it should "respect Serializable constraints" in {
+  it should "respect Serializable constraints" in new EgraphsTestApplication {
     val dbSession = AppConfig.instance[DBSession]
     val accountStore = AppConfig.instance[AccountStore]
 
@@ -115,7 +115,7 @@ class DBSessionTests extends EgraphsUnitTest
     thrown.getMessage should include ("40001") // Access due to concurrent update
  }
 
-  it should "successfully persist data if the transaction is not readOnly" in {
+  it should "successfully persist data if the transaction is not readOnly" in new EgraphsTestApplication {
     val dbSession = AppConfig.instance[DBSession]
     val emailAddress = TestData.generateEmail("herpyderpson", "derp.org")
     val account = dbSession.connected(TransactionSerializable, readOnly = false) {
@@ -124,7 +124,7 @@ class DBSessionTests extends EgraphsUnitTest
     account should not be (null)
   }
 
-  it should "respect when a transaction is readOnly and throw an exception if a write is attempted" in {
+  it should "respect when a transaction is readOnly and throw an exception if a write is attempted" in new EgraphsTestApplication {
     val dbSession = AppConfig.instance[DBSession]
     val emailAddress = TestData.generateEmail("herpyderpson", "derp.org")
     val thrown1 = evaluating {
@@ -143,34 +143,5 @@ class DBSessionTests extends EgraphsUnitTest
       }
     } should produce[RuntimeException]
     thrown2.getMessage should include("Exception while executing statement : ERROR: cannot execute UPDATE in a read-only transaction")
-  }
-}
-
-object DBSessionTestActors {
-  case class SetAccountEmail(accountId: Long, email:String)
-
-  class SerializableTestActor extends Actor with Logging {
-    self.dispatcher = Dispatchers.newExecutorBasedEventDrivenDispatcher("serializabletest")
-      .withNewThreadPoolWithLinkedBlockingQueueWithCapacity(100)
-      .setCorePoolSize(1)
-      .setMaxPoolSize(1)
-      .setKeepAliveTimeInMillis(60000)
-      .setRejectionPolicy(new CallerRunsPolicy)
-      .build
-
-    val myDbSession = AppConfig.instance[DBSession]
-    val myAccountStore = AppConfig.instance[AccountStore]
-
-    def receive = {
-      case SetAccountEmail(accountId, email) => {
-        log("Worker thread: received message.")
-        myDbSession.connected(TransactionSerializable) {
-          println("Connection is "+Session.currentSession.connection)
-          myAccountStore.get(accountId).copy(email=email).save()
-        }
-        log("Worker thread: committed.")
-        self.reply("done")
-      }
-    }
   }
 }
