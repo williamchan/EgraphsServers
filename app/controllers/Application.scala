@@ -27,9 +27,9 @@ object Application extends Controller {
     val metrics = WebsiteMonitoring.getMetrics
     val jsonIterable = metrics.map { case EgraphsMetric(name, description, values) =>
       Json.toJson(Map(
-        "sourceName" -> Json.toJson(name),
+        "name" -> Json.toJson(name),
         "description" -> Json.toJson(description),
-        "dataPoints" -> Json.toJson(values.toArray)
+        "values" -> Json.toJson(values.toArray)
       ))
     }
     

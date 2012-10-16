@@ -20,7 +20,7 @@ class WebsiteAvailabilityActor(url: String, friendlyName: String, pub: MetricPub
   def receive() = {
 
     case CheckStatus => checkStatus
-    case GetMetric => sender ! EgraphsMetric(url, friendlyName, history.toIndexedSeq)
+    case GetMetric => sender ! EgraphsMetric(friendlyName, url, history.toIndexedSeq)
     case _ => println("Cannot handle this message")
   }
 
