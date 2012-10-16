@@ -1,12 +1,12 @@
-@(urlsAndDataPoints: List[(String,List[Int])])
+@(metrics: List[collections.EgraphsMetric[Int]])
 
 @main(title = "Monitoring") {
 
 	<ul>
-       @urlsAndDataPoints.map { urlAndDataPoints =>
+       @metrics.map { case collections.EgraphsMetric(name, description, values) =>
          <li>
-           <h1> Recent GET requests to @urlAndDataPoints._1: </h1>
-           <p> @urlAndDataPoints._2.mkString(", ") </p>
+           <h1> Recent GET requests to @name: </h1>
+           <p> @values.mkString(", ") </p>
            <div id="placeholder" style="width:600px;height:300px;"></div>
          </li>
 		}	
@@ -14,7 +14,7 @@
 
 	<script type="text/javascript">
 	$(function () {
-		Egraphs.drawGraph(0); // after, also could pass color?
+		Egraphs.drawGraph(0);
 	});
 
 	var Egraphs = Egraphs || {}

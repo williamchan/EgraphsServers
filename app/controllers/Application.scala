@@ -5,34 +5,35 @@ import play.api.mvc.Action
 import play.api.mvc.Controller
 import monitoring.website.WebsiteMonitoring
 import play.api.libs.json._
+import collections.EgraphsMetric
 
 object Application extends Controller {
 
   def index = Action { request =>
-    println("request from address is " + request.remoteAddress.toString())
-    //request.body.
 
-    val historyMap = WebsiteMonitoring.getActorInfo
+    val metrics = WebsiteMonitoring.getMetrics
 
-    val urls = utilities.Utilities.getUrls(historyMap)
-    val dataPoints = utilities.Utilities.getRecentHistory(historyMap)
+//    val names = utilities.Utilities.getNames(metrics)
+//    val urls = utilities.Utilities.getDescriptions(metrics)
+//    val dataPoints = utilities.Utilities.getValues(metrics)
+//
+//    val urlsAndDataPoints = (urls, dataPoints).zipped.toList
 
-    val urlsAndDataPoints = (urls, dataPoints).zipped.toList
-
-    Ok(views.html.index(urlsAndDataPoints))
+    Ok(views.html.index(metrics))
   }
 
   def getMetrics = Action {
 
-    val historyMap = WebsiteMonitoring.getActorInfo
-    val jsonIterable = historyMap.map { case (url, data) =>
+    val metrics = WebsiteMonitoring.getMetrics
+    val jsonIterable = metrics.map { case EgraphsMetric(name, description, values) =>
       Json.toJson(Map(
-        "sourceName" -> Json.toJson(url),
-        "dataPoints" -> Json.toJson(data)
+        "sourceName" -> Json.toJson(name),
+        "description" -> Json.toJson(description),
+        "dataPoints" -> Json.toJson(values.toArray)
       ))
     }
     
-    val jsonSeq = jsonIterable.toSeq
+    val jsonSeq = jsonIterable
     val responseJson = Json.toJson(Map("metrics" -> jsonSeq))
     
     Ok(responseJson)

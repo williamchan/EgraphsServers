@@ -7,20 +7,20 @@ import java.util.Date
 import com.amazonaws.services.cloudwatch.model._
 import common.MetricPublisher
 import collections.LimitedQueue
+import collections.EgraphsMetric
 
 case class CheckStatus()
-case class GetUrl()
-case class GetHistory()
+case class GetMetric()
 
-class WebsiteAvailabilityActor(url: String, pub: MetricPublisher) extends Actor with ActorLogging {
+class WebsiteAvailabilityActor(url: String, friendlyName: String, pub: MetricPublisher) 
+		extends Actor with ActorLogging {
 
   private val history = new LimitedQueue[Int](60)
 
   def receive() = {
 
     case CheckStatus => checkStatus
-    case GetUrl => sender ! url
-    case GetHistory => sender ! history.toList
+    case GetMetric => sender ! EgraphsMetric(url, friendlyName, history.toIndexedSeq)
     case _ => println("Cannot handle this message")
   }
 
