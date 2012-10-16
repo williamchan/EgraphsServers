@@ -29,11 +29,18 @@ trait DateShouldMatchers { this: ShouldMatchers =>
    * </code>
    */
   class TimeUnitCount(value: Long) {
-    val milliseconds = value
+    val millisecond = milliseconds
+
     lazy val seconds = value * DateTimeConstants.MILLIS_PER_SECOND
     lazy val minutes = value * DateTimeConstants.MILLIS_PER_MINUTE
     lazy val hours = value * DateTimeConstants.MILLIS_PER_HOUR
     lazy val days = value * DateTimeConstants.MILLIS_PER_DAY
+
+    lazy val milliseconds = value
+    lazy val second = seconds
+    lazy val minute = minutes
+    lazy val hour = hours
+    lazy val day = days
   }
 
   /**
