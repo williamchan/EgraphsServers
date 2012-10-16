@@ -2,15 +2,15 @@ package utils
 
 import org.scalatest.matchers.ShouldMatchers
 import org.squeryl.KeyedEntity
-import play.test.UnitFlatSpec
+import org.scalatest.FlatSpec
 import org.apache.commons.lang.RandomStringUtils
 
-trait SavingEntityIdLongTests[T <: KeyedEntity[Long]] extends SavingEntityTests[Long, T] { this: UnitFlatSpec with ShouldMatchers =>
+trait SavingEntityIdLongTests[T <: KeyedEntity[Long]] extends SavingEntityTests[Long, T] { this: FlatSpec with ShouldMatchers =>
   def newIdValue = 0L
   def improbableIdValue = Integer.MAX_VALUE
 }
 
-trait SavingEntityIdStringTests[T <: KeyedEntity[String]] extends SavingEntityTests[String, T] { this: UnitFlatSpec with ShouldMatchers =>
+trait SavingEntityIdStringTests[T <: KeyedEntity[String]] extends SavingEntityTests[String, T] { this: FlatSpec with ShouldMatchers =>
   val newIdValue = RandomStringUtils.randomAlphanumeric(30)
   def improbableIdValue = RandomStringUtils.randomAlphanumeric(30)
 }
@@ -20,7 +20,7 @@ trait SavingEntityIdStringTests[T <: KeyedEntity[String]] extends SavingEntityTe
  *
  * Ensures that basic CRUD works properly.
  */
-trait SavingEntityTests[KeyT, T <: KeyedEntity[KeyT]] { this: UnitFlatSpec with ShouldMatchers =>
+trait SavingEntityTests[KeyT, T <: KeyedEntity[KeyT]] { this: FlatSpec with ShouldMatchers =>
   //
   // Abstract Methods
   //

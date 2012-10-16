@@ -2,8 +2,8 @@ package utils
 
 import models.HasCreatedUpdated
 import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.FlatSpec
 import org.squeryl.KeyedEntity
-import play.test.UnitFlatSpec
 import services.Time.{defaultTimestamp, now}
 
 /**
@@ -11,7 +11,7 @@ import services.Time.{defaultTimestamp, now}
  * and SavesCreatedUpdated to ensure that the behavior is correct
  */
 trait CreatedUpdatedEntityTests[KeyT, T <: HasCreatedUpdated with KeyedEntity[KeyT]] {
-  this: UnitFlatSpec with ShouldMatchers with SavingEntityTests[KeyT, T] =>
+  this: FlatSpec with ShouldMatchers with DateShouldMatchers with SavingEntityTests[KeyT, T] =>
 
   //
   // Test cases
@@ -27,7 +27,7 @@ trait CreatedUpdatedEntityTests[KeyT, T <: HasCreatedUpdated with KeyedEntity[Ke
     val saved = saveEntity(newEntity)
     val restored = restoreEntity(saved.id).get
 
-    saved.created.getTime should be (now.getTime plusOrMinus 100)
+    saved.created.getTime should be (now.getTime plusOrMinus (100 milliseconds))
     saved.created should be (saved.updated)
 
     saved.created should be (restored.created)
@@ -37,7 +37,7 @@ trait CreatedUpdatedEntityTests[KeyT, T <: HasCreatedUpdated with KeyedEntity[Ke
   "An updated instance" should "have only the 'updated' field altered" in {
     // Set up
     val inserted = saveEntity(newEntity)
-    val sleepDuration = 1L
+    val sleepDuration = 1 millisecond
 
     Thread.sleep(sleepDuration)
 
