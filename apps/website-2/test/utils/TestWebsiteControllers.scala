@@ -20,6 +20,7 @@ import play.api.mvc.Request
 import play.api.mvc.AnyContent
 import services.config.ConfigFileProxy
 import services.blobs.Blobs
+import services.db.Schema
 
 /**
  * Injectable version of AllWebsiteEndpoints with configurable session, flash,
@@ -49,6 +50,10 @@ case class TestWebsiteControllers @Inject()(
 )() extends Controller with AllWebsiteEndpoints {
   import AppConfig.instance
   
+  override def enrollmentBatchStore = instance[EnrollmentBatchStore]
+  override def schema = instance[Schema]
+  override def inventoryBatchStore = instance[InventoryBatchStore]
+  override def egraphStore = instance[EgraphStore]  
   override def accountSettingsForms = instance[AccountSettingsFormFactory]
   override def accountPasswordResetForms = instance[AccountPasswordResetFormFactory]
   override def accountRecoverForms = instance[AccountRecoverFormFactory]

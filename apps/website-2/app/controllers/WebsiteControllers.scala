@@ -17,6 +17,7 @@ import forms.purchase.{PurchaseFormChecksFactory, FormReaders, PurchaseFormFacto
 import services.mvc.celebrity.CatalogStarsQuery
 import services.mvc.{OrderCompleteViewModelFactory, StorefrontBreadcrumbData}
 import services.config.ConfigFileProxy
+import services.db.Schema
 
 object WebsiteControllers extends Controller with AllWebsiteEndpoints
 {
@@ -49,7 +50,11 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val transactionalMail = instance[TransactionalMail]
   override protected val bulkMail = instance[BulkMail]
   override protected val payment = instance[Payment]
+  override protected def schema = instance[Schema]
 
+  override protected def enrollmentBatchStore = instance[EnrollmentBatchStore]
+  override protected def inventoryBatchStore = instance[InventoryBatchStore]
+  override protected def egraphStore = instance[EgraphStore]
   override protected val accountStore = instance[AccountStore]
   override protected val administratorStore = instance[AdministratorStore]
   override protected val celebrityStore = instance[CelebrityStore]

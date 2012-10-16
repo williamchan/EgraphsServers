@@ -20,20 +20,26 @@ import play.api.data.Forms._
 private[controllers] trait GetToolsAdminEndpoint {
   this: Controller =>
 
+  //
+  // Injected services
+  //
   protected def controllerMethod: ControllerMethod
   protected def httpFilters: HttpFilters
-  protected def blobs = AppConfig.instance[Blobs]
-  protected def accountStore = AppConfig.instance[AccountStore]
-  protected def administratorStore = AppConfig.instance[AdministratorStore]
-  protected def celebrityStore = AppConfig.instance[CelebrityStore]
-  protected def customerStore = AppConfig.instance[CustomerStore]
-  protected def egraphStore = AppConfig.instance[EgraphStore]
-  protected def inventoryBatchStore = AppConfig.instance[InventoryBatchStore]
-  protected def productStore = AppConfig.instance[ProductStore]
-  protected def orderStore = AppConfig.instance[OrderStore]
-  private lazy val schema = AppConfig.instance[Schema]
-  private lazy val enrollmentBatchStore = AppConfig.instance[EnrollmentBatchStore]
+  protected def blobs: Blobs
+  protected def accountStore: AccountStore
+  protected def administratorStore: AdministratorStore
+  protected def celebrityStore: CelebrityStore
+  protected def customerStore: CustomerStore
+  protected def egraphStore: EgraphStore
+  protected def inventoryBatchStore: InventoryBatchStore
+  protected def productStore: ProductStore
+  protected def orderStore: OrderStore
+  protected def schema: Schema
+  protected def enrollmentBatchStore: EnrollmentBatchStore
 
+  //
+  // Controllers
+  //
   def getToolsAdmin = controllerMethod(WithDBConnection(readOnly=false)) {
     httpFilters.requireAdministratorLogin.inSession() { (admin, account) =>
       Action { implicit request =>

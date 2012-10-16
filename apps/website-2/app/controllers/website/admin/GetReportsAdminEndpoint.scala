@@ -12,10 +12,16 @@ import play.api.data.Forms._
 private[controllers] trait GetReportsAdminEndpoint {
   this: Controller =>
 
+  // 
+  // Injected services
+  //
   protected def controllerMethod: ControllerMethod
   protected def httpFilters: HttpFilters
-  private lazy val schema = AppConfig.instance[Schema]
-
+  protected def schema: Schema
+  
+  //
+  // Controllers
+  //
   def getReportsAdmin = controllerMethod() {
     httpFilters.requireAdministratorLogin.inSession() { (admin, account) =>
       Action { implicit request =>
