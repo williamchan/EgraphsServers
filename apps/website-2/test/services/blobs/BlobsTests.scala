@@ -10,19 +10,20 @@ class BlobsTests extends EgraphsUnitTest
   with DBTransactionPerTest
 {
   import Blobs.Conversions._
-  val blobs = AppConfig.instance[Blobs]
 
-  "Blobs" should "put and get data" in {
+  def blobs = AppConfig.instance[Blobs]
+
+  "Blobs" should "put and get data" in new EgraphsTestApplication {
     blobs.put("myKey", "I herp then I derp")
 
     blobs.get("myKey").get.asString should be ("I herp then I derp")
   }
 
-  it should "not find data that don't exist" in {
+  it should "not find data that don't exist" in new EgraphsTestApplication {
     blobs.get("herp") should be (None)
   }
 
-  it should "have the most recent version of the blob" in {
+  it should "have the most recent version of the blob" in new EgraphsTestApplication {
     val key = "myKey"
 
     blobs.put(key, "herp")
@@ -31,7 +32,7 @@ class BlobsTests extends EgraphsUnitTest
     blobs.get("myKey").get.asString should be ("derp")
   }
 
-  it should "delete properly" in {
+  it should "delete properly" in new EgraphsTestApplication {
     val key = "myKey"
 
     blobs.put(key, "herp")
@@ -40,7 +41,7 @@ class BlobsTests extends EgraphsUnitTest
     blobs.get("myKey") should be (None)
   }
 
-  "getStaticResourceUrl" should "return short-term signed URL to static S3 resource" in {
+  "getStaticResourceUrl" should "return short-term signed URL to static S3 resource" in new EgraphsTestApplication {
     val expirationSeconds = 5.minutes
     val signedUrl = blobs.getStaticResourceUrl(key = "derp", expirationSeconds = 5.minutes)
     val expires = System.currentTimeMillis() / 1000 + expirationSeconds
@@ -56,7 +57,7 @@ class BlobsTests extends EgraphsUnitTest
     queryParams(2)._2.length should be > (0)
   }
 
-  "RichBlob" should "convert properly" in {
+  "RichBlob" should "convert properly" in new EgraphsTestApplication {
     val data = Array('h', 'e', 'r', 'p').map(theChar => theChar.toByte)
 
     blobs.put("herp", data)

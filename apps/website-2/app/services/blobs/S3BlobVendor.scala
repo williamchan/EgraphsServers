@@ -8,8 +8,7 @@ import services.AppConfig
 import services.http.HttpContentService
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
-import java.net.URLEncoder
-import org.apache.commons.codec.binary.Base64.encodeBase64String
+import egraphs.playutils.Encodings.{Base64, URL}
 import services.config.ConfigFileProxy
 
 /** [[services.blobs.Blobs.BlobProvider]] implementation backed by Amazon S3 */
@@ -91,7 +90,7 @@ private[blobs] case class S3BlobVendor(
     val signingKey = new SecretKeySpec(keyBytes, "HmacSHA1")
     mac.init(signingKey)
     val digest = mac.doFinal(msg.getBytes("UTF8"))
-    URLEncoder.encode(encodeBase64String(digest), "UTF-8")
+    URL.encode(Base64.encode(digest))
   }
 
   //
