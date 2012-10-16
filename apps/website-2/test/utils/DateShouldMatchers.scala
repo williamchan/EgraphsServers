@@ -2,6 +2,7 @@ package utils
 
 import java.util.Date
 import org.scalatest.matchers.ShouldMatchers
+import org.joda.time.DateTimeConstants
 
 /**
  * Provides ShouldMatcher support for Dates, with some additional utility functions.
@@ -22,17 +23,17 @@ trait DateShouldMatchers { this: ShouldMatchers =>
    *
    * For example:
    * <code>
-   *   10.milliseconds // 10
-   *   10.seconds      // 10000
+   *   10 milliseconds // 10
+   *   10 seconds      // 10000
    *   // etc...
    * </code>
    */
-  class TimeUnitCount(value:Long) {
+  class TimeUnitCount(value: Long) {
     val milliseconds = value
-    lazy val seconds = milliseconds * 1000L
-    lazy val minutes = seconds * 60L
-    lazy val hours   = minutes * 60L
-    lazy val days    = hours * 24L
+    lazy val seconds = value * DateTimeConstants.MILLIS_PER_SECOND
+    lazy val minutes = value * DateTimeConstants.MILLIS_PER_MINUTE
+    lazy val hours = value * DateTimeConstants.MILLIS_PER_HOUR
+    lazy val days = value * DateTimeConstants.MILLIS_PER_DAY
   }
 
   /**
@@ -44,7 +45,7 @@ trait DateShouldMatchers { this: ShouldMatchers =>
    * </code>
    */
   def aboutNow: LongTolerance = {
-    (now plusOrMinus 500.milliseconds)
+    (now plusOrMinus (500 milliseconds))
   }
 
   /**
@@ -69,7 +70,7 @@ trait DateShouldMatchers { this: ShouldMatchers =>
   }
 
   /** Returns the current moment in time. A convenience method around <code>new Date</code> */
-  def now:Date = {
+  def now: Date = {
     new Date
   }
 }
