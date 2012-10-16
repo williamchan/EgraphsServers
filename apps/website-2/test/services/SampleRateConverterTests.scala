@@ -7,7 +7,7 @@ import utils.EgraphsUnitTest
 
 class SampleRateConverterTests extends EgraphsUnitTest {  
 
-  it should "downsample 44kHz WAV to 8kHz WAV" in new TestApplication {
+  it should "downsample 44kHz WAV to 8kHz WAV" in new EgraphsTestApplication {
     val sourceFile: File = resourceFile("44khz.wav")
     val targetFile: File = resourceFile("8khz.wav")
 
@@ -34,7 +34,7 @@ class SampleRateConverterTests extends EgraphsUnitTest {
     targetFormat.getSampleSizeInBits should be(16)
   }
 
-  it should "not change 8kHz WAV when converting it to 8kHz WAV" in new TestApplication {
+  it should "not change 8kHz WAV when converting it to 8kHz WAV" in new EgraphsTestApplication {
     val sourceFile: File = resourceFile("8khz.wav")
 
     val sourceFormat: AudioFormat = AudioSystem.getAudioInputStream(sourceFile).getFormat

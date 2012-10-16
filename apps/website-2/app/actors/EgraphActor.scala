@@ -12,8 +12,8 @@ import models.enums.EgraphState
 import play.api.Play.current
 import akka.actor.Props
 import play.api.libs.concurrent.Akka
-import play.api.mvc.Request
 import services.config.ConfigFileProxy
+import play.api.mvc.RequestHeader
 
 /**
  * Actor that performs most of the work of creating an egraph and running it through our biometrics
@@ -32,8 +32,9 @@ case class EgraphActor @Inject() (
 ) extends Actor with Logging
 {
   protected def receive = {
-    case ProcessEgraphMessage(egraphId, request) => {
-      processEgraph(egraphId, request)
+    case ProcessEgraphMessage(egraphId, requestHeader) => {
+      processEgraph(egraphId, requestHeader)
+      sender ! "Success"
     }
 
     case _ =>
@@ -47,7 +48,7 @@ case class EgraphActor @Inject() (
    *
    * @param egraphId id of the Egraph to process
    */
-  private def processEgraph[A](egraphId: Long, request: Request[A]) {
+  private def processEgraph[A](egraphId: Long, requestHeader: RequestHeader) {
     config.biometricsStatus match {
       case "offline" =>
       case _ => {
@@ -70,7 +71,7 @@ case class EgraphActor @Inject() (
               // If admin review is turned off (eg to expedite demos), immediately publish regardless of biometric results
               if (config.adminreviewSkip) {
                 val publishedEgraph = testedEgraph.withEgraphState(EgraphState.Published).save()
-                publishedEgraph.order.sendEgraphSignedMail(request)
+                publishedEgraph.order.sendEgraphSignedMail(requestHeader)
               }
             }
           }
@@ -91,4 +92,4 @@ object EgraphActor {
 // ====================
 sealed trait EgraphMessage
 
-case class ProcessEgraphMessage[A](egraphId: Long, request: Request[A]) extends EgraphMessage
+case class ProcessEgraphMessage[A](egraphId: Long, requestHeader: RequestHeader) extends EgraphMessage

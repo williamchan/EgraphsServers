@@ -9,6 +9,7 @@ import org.jclouds.blobstore.domain.Blob
 import akka.actor.{Actor, ActorRef}
 import play.api.libs.concurrent.Akka
 import play.api.Application
+import akka.actor.Props
 
 object TestHelpers {
 
@@ -62,36 +63,15 @@ object TestHelpers {
   /**
    * Convenience method that starts the actor, executes the operation, and stops the actor.
    */
-//  def withActorUnderTest[ActorT <: Actor: Manifest, ResultT]
-//  (actorInstance: => ActorT)(operation: ActorRef => ResultT)(implicit app: Application): ResultT =
-//  {
-//    val actor = Akka.system.actorOf(actorInstance).start()
-//
-//    executeOperationThenStop(actor)(operation)
-//  }
-// TODO: PLAY20 migration. Either delete or uncomment this function
+  def withActorUnderTest[ActorT <: Actor, ResultT]
+  (actorInstance: => ActorT)(testcase: ActorRef => ResultT)(implicit app: Application) : ResultT =
+  {
+    val actor = Akka.system.actorOf(Props(actorInstance))
 
-  /**
-   * Convenience method that starts the actor, executes the operation, and stops the actor.
-   */
-//  def withActorUnderTest[ActorT <: Actor: Manifest, ResultT]
-//  (operation: ActorRef => ResultT): ResultT =
-//  {
-//    val actor = Akka.system.actorOf[ActorT].start()
-//
-//    executeOperationThenStop(actor)(operation)
-//  }
-// TODO: PLAY20 migration. Either delete or uncomment this function.
-
-//  private[this] def executeOperationThenStop[ActorT <: Actor: Manifest, ResultT]
-//  (actor: ActorRef)(operation: ActorRef => ResultT): ResultT =
-//  {
-//    try {
-//      operation(actor)
-//    }
-//    finally {
-//      actor.stop()
-//    }
-//  }
-// TODO: PLAY20 migration. Either delete or uncomment this function.
+    try {
+      testcase(actor)
+    } finally {
+      Akka.system.stop(actor)
+    }
+  }
 }

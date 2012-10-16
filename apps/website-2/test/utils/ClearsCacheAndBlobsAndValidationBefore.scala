@@ -13,7 +13,7 @@ import services.cache.CacheFactory
 trait ClearsCacheAndBlobsAndValidationBefore extends BeforeAndAfterEach { this: Suite with EgraphsUnitTest =>
   override def beforeEach() {
     super.beforeEach()
-    new TestApplication {
+    new EgraphsTestApplication {
       AppConfig.instance[Blobs].scrub()
       AppConfig.instance[CacheFactory].applicationCache.clear()
     }

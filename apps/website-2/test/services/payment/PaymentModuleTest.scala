@@ -37,7 +37,7 @@ class PaymentModuleTest extends EgraphsUnitTest with ClosureProviders {
     } should produce[IllegalArgumentException]
   }
 
-  "AppConfig" should "be able to give us a Payment implementation" in new TestApplication {
+  "AppConfig" should "be able to give us a Payment implementation" in new EgraphsTestApplication {
     // If this throws an exception then it broke.
     AppConfig.instance[Payment] should not be (null)
   }

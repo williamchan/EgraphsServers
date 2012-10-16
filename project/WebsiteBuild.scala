@@ -66,6 +66,8 @@ object WebsiteBuild extends Build {
       "xml-apis" % "xml-apis" % "1.3.04", // we might be getting pretty stale here
       "xuggle" % "xuggle-xuggler" % "5.4",
 
+      // Test dependencies
+      "com.typesafe.akka" % "akka-testkit" % "2.0.2" % "test",
       "org.scalatest" %% "scalatest" % "1.8" % "test"
     )
     

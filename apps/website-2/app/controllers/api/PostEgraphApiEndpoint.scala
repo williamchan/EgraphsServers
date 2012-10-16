@@ -85,7 +85,7 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
                   )
                   .withAssets(validForm.signature, validForm.message, Base64.decode(validForm.audio))
                   .save()
-                val actorMessage = ProcessEgraphMessage(egraphId = savedEgraph.id, request = request)
+                val actorMessage = ProcessEgraphMessage(egraphId = savedEgraph.id, requestHeader = request)
                 val successJsonResponse = Ok(toJson(Map("id" -> savedEgraph.id)))
                 
                 (actorMessage, successJsonResponse)

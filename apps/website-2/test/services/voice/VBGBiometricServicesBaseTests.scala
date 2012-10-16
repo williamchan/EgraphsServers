@@ -24,7 +24,7 @@ class VBGBiometricServicesBaseTests extends EgraphsUnitTest
 
   implicit private def blobs = services.AppConfig.instance[Blobs]
 
-  "enroll" should "call saveCombinedWavToBlobStore" in new TestApplication {
+  "enroll" should "call saveCombinedWavToBlobStore" in new EgraphsTestApplication {
     val celebrity = TestData.newSavedCelebrity()
     val enrollmentBatch = EnrollmentBatch(celebrityId = celebrity.id).save()
     val voiceStr = TestConstants.voiceStr()
@@ -43,7 +43,7 @@ class VBGBiometricServicesBaseTests extends EgraphsUnitTest
     MockVBGBiometricServices.convertWavTo8kHzBase64(new Array[Byte](0)) should be("")
   }
 
-  "stitchWAVs" should "stitch multiple WAVs together" in new TestApplication {
+  "stitchWAVs" should "stitch multiple WAVs together" in new EgraphsTestApplication {
     val filename = "44khz.wav"
     val targetFile = "stitched_3x.wav"
     val resultFile = resourceFile(targetFile)
@@ -53,7 +53,7 @@ class VBGBiometricServicesBaseTests extends EgraphsUnitTest
     resourceFile(targetFile).length() should be(921166)
   }
 
-  "stitchWAVs" should "handle base cases" in new TestApplication {
+  "stitchWAVs" should "handle base cases" in new EgraphsTestApplication {
     MockVBGBiometricServices.stitchWAVs(List()) should be(None)
 
     val filename = "44khz.wav"
@@ -110,7 +110,7 @@ class VBGBiometricServicesBaseTests extends EgraphsUnitTest
   }
 
   private def getVoiceSampleBinary(filename: String): Array[Byte] = {
-    val file = new TestApplication {
+    val file = new EgraphsTestApplication {
       val file = resourceFile(filename) 
     }.file
     Blobs.Conversions.fileToByteArray(file)

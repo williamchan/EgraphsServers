@@ -72,13 +72,13 @@ class ImageUtilTests extends EgraphsUnitTest {
     combinedImageFile.length should be(138807)
   }
   */
-  it should "resize PNG images correctly" in new TestApplication {
+  it should "resize PNG images correctly" in new EgraphsTestApplication {
     val image = ImageIO.read(resourceFile("image.jpg"))
     val scaled = imageUtil.getScaledInstance(image, 100, 100)
     (scaled.getWidth, scaled.getHeight) should be((100, 100))
   }
 
-  "getDimensions" should "return width and height of image" in new TestApplication {
+  "getDimensions" should "return width and height of image" in new EgraphsTestApplication {
     val dimensions = ImageUtil.getDimensions(resourceFile("image.jpg")).get
     dimensions.width should be(307)
     dimensions.height should be(299)
@@ -88,7 +88,7 @@ class ImageUtilTests extends EgraphsUnitTest {
     ImageUtil.getDimensions(resourceFile("8khz.wav")) should be(None) // Not an image file*/
   }
 
-  "crop" should "crop image to specified dimensions" in new TestApplication {
+  "crop" should "crop image to specified dimensions" in new EgraphsTestApplication {
     val originalImage: BufferedImage = ImageIO.read(resourceFile("image.jpg"))
     val croppedImage: BufferedImage = ImageUtil.crop(originalImage, Dimensions(200, 200))
     croppedImage.getWidth should be(200)

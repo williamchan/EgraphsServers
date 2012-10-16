@@ -27,10 +27,8 @@ case class EnrollmentBatchActor @Inject()(
   config: ConfigFileProxy
 ) extends Actor with Logging {
   protected def receive = {
-    case ProcessEnrollmentBatchMessage(id: Long) => {
+    case ProcessEnrollmentBatchMessage(id: Long) =>
       processEnrollmentBatch(enrollmentBatchId = id)
-    }
-
     case _ =>
   }
 
@@ -45,11 +43,13 @@ case class EnrollmentBatchActor @Inject()(
         logging.withTraceableContext("processEnrollmentBatch[" + enrollmentBatchId + "]") {
           db.connected(TransactionSerializable) {
             enrollmentBatchStore.findById(enrollmentBatchId) match {
-              case None => throw new Exception("EnrollmentBatchActor could not find EnrollmentBatch " + enrollmentBatchId.toString)
-              case Some(enrollmentBatch) if (!enrollmentBatch.isBatchComplete || enrollmentBatch.isSuccessfulEnrollment.isDefined) => {
+              case None =>
+                throw new Exception("EnrollmentBatchActor could not find EnrollmentBatch " + enrollmentBatchId.toString)
+              case Some(enrollmentBatch) if (!enrollmentBatch.isBatchComplete || enrollmentBatch.isSuccessfulEnrollment.isDefined) =>
                 throw new Exception("EnrollmentBatchActor did not find EnrollmentBatch in an enrollment state: " + enrollmentBatchId.toString)
-              }
-              case Some(enrollmentBatch) => attemptEnrollment(enrollmentBatch)
+              case Some(enrollmentBatch) =>
+                attemptEnrollment(enrollmentBatch)
+                sender ! "It worked!"
             }
           }
         }
@@ -59,6 +59,7 @@ case class EnrollmentBatchActor @Inject()(
 
   private def attemptEnrollment(enrollmentBatch: EnrollmentBatch): Any = {
     val signatureEnrollmentResult: Either[SignatureBiometricsError, Boolean] = enrollmentBatch.enrollSignature
+    // TODO: PLAY20 change this to for-comprehension
     val isSuccessfulSignatureEnrollment: Boolean = if (signatureEnrollmentResult.isRight) {
       signatureEnrollmentResult.right.get
     } else {

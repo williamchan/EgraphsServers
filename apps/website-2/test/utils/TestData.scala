@@ -109,7 +109,7 @@ object TestData {
     product.saveWithImageAssets(image = Some(product.defaultPhoto.renderFromMaster), icon = None)
   }
 
-  @deprecated("Use with optional celebrity version")
+  @deprecated("Use with optional celebrity version because that encapsulates all this functionality and more.", "9f7497d3 2012-09-27")
   def newSavedProductWithoutInventoryBatch(celebrity: Celebrity): Product = {
     newProduct(celebrity).save()
   }
