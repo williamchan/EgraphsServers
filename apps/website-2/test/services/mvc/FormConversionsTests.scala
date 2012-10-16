@@ -3,6 +3,10 @@ package services.mvc
 import utils.EgraphsUnitTest
 import services.http.forms.{SimpleFormError, FormError, FormField}
 
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+
+@RunWith(classOf[JUnitRunner])
 class FormConversionsTests extends EgraphsUnitTest {
   import FormConversions._
 
