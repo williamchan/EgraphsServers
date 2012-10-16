@@ -67,6 +67,7 @@ class Schema @Inject()(
       celebrity.bio is dbType("text")
     )
   )
+  val celebrityFilterValues = table[CelebrityFilterValue]
 
   val customers = table[Customer]
   on(customers)(customer => declare(customer.username is unique))
@@ -90,6 +91,7 @@ class Schema @Inject()(
   on(filters) (filter => declare( filter.name is unique))
   val filterValues = table[FilterValue]
   on(filterValues) (filterValue => declare( filterValue.name is unique))
+  val filterValueRelationships = table[FilterValueRelationship]
 
 
   val inventoryBatches = table[InventoryBatch]
@@ -394,6 +396,7 @@ class Schema @Inject()(
       factoryFor(blobKeys) is BlobKey(services = injector.instance[BlobKeyServices]),
       factoryFor(cashTransactions) is CashTransaction(services = injector.instance[CashTransactionServices]),
       factoryFor(celebrities) is Celebrity(services = injector.instance[CelebrityServices]),
+      factoryFor(celebrityFilterValues) is CelebrityFilterValue(services = injector.instance[FilterServices]),
       factoryFor(customers) is Customer(services = injector.instance[CustomerServices]),
       factoryFor(egraphs) is Egraph(services = injector.instance[EgraphServices]),
       factoryFor(enrollmentBatches) is EnrollmentBatch(services = injector.instance[EnrollmentBatchServices]),
@@ -401,6 +404,7 @@ class Schema @Inject()(
       factoryFor(failedPurchaseData) is FailedPurchaseData(services = injector.instance[FailedPurchaseDataServices]),
       factoryFor(filters) is Filter(services = injector.instance[FilterServices]),
       factoryFor(filterValues) is FilterValue(services = injector.instance[FilterServices]),
+      factoryFor(filterValueRelationships) is FilterValueRelationship(services = injector.instance[FilterServices]),
       factoryFor(inventoryBatches) is InventoryBatch(services = injector.instance[InventoryBatchServices]),
       factoryFor(inventoryBatchProducts) is InventoryBatchProduct(services = injector.instance[InventoryBatchProductServices]),
       factoryFor(orders) is Order(services = injector.instance[OrderServices]),

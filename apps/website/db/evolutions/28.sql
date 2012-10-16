@@ -21,13 +21,17 @@ create table FilterValues(
 create table FilterValueRelationships(
   id bigint primary key not null,
   filterId bigint references Filters,
-  filterValueId bigint references FilterValues
+  filterValueId bigint references FilterValues,
+  updated timestamp not null,
+  created timestamp not null
 );
 
 create table CelebrityFilterValues(
   id bigint primary key not null,
   celebrityId bigint references Celebrity,
-  filterValueId bigint references FilterValues
+  filterValueId bigint references FilterValues,
+  updated timestamp not null,
+  created timestamp not null
 );
 
 -- !Downs

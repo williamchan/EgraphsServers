@@ -29,10 +29,6 @@ case class FilterValue(
   override def unapplied = FilterValue.unapply(this)
 }
 
-object FilterValue {
-  val derp = "derp"
-}
-
 class FilterValueStore @Inject() (
   schema: Schema,
   filterServices: Provider[FilterServices]

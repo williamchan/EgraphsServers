@@ -6,7 +6,7 @@ import forms.purchase.{PurchaseFormChecksFactory, FormReaders, PurchaseFormFacto
 import services.mail.{BulkMail, TransactionalMail}
 import services.payment.Payment
 import models._
-import filters.{FilterValueStore, FilterStore}
+import filters.{CelebrityFilterValueStore, FilterValueStore, FilterStore}
 import services.db.DBSession
 import play.mvc.Controller
 import controllers.website.AllWebsiteEndpoints
@@ -62,6 +62,7 @@ case class TestWebsiteControllers @Inject()(
   override def printOrderQueryFilters = instance[PrintOrderQueryFilters]
   override def catalogStarsQuery = instance[CatalogStarsQuery]
   override def orderCompleteViewModelFactory = instance[OrderCompleteViewModelFactory]
+//  override def celebrityFilterValueStore = instance[CelebrityFilterValueStore]
   override def filterStore = instance[FilterStore]
   override def filterValueStore = instance[FilterValueStore]
 

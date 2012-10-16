@@ -1,8 +1,6 @@
-package models
+package models.filters
 
-import filters.{FilterValueStore, FilterValue}
 import utils._
-import services.http.DBTransaction
 import services.AppConfig
 
 class FilterValueTests  extends EgraphsUnitTest

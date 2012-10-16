@@ -9,8 +9,10 @@ import models.{SavesCreatedUpdated, HasCreatedUpdated, CelebrityStore}
 
 
 case class FilterServices @Inject() (
+  celebrityFilterValueStore: CelebrityFilterValueStore,
   filterStore: FilterStore,
   filterValueStore: FilterValueStore,
+  filterValueRelationshipStore: FilterValueRelationshipStore,
   celebrityStore: CelebrityStore,
   schema: Schema
 )
@@ -59,10 +61,6 @@ case class Filter(
   //
   override def unapplied = Filter.unapply(this)
 
-}
-
-object Filter {
-  val derp = "derp"
 }
 
 class FilterStore @Inject() (
