@@ -1,7 +1,10 @@
 package services
 
 import utils.EgraphsUnitTest
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
+@RunWith(classOf[JUnitRunner])
 class TemplateEngineTests extends EgraphsUnitTest {
   
   "TemplateEngine" should "return the same string given an empty template" in {

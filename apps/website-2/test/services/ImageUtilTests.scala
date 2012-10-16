@@ -5,11 +5,13 @@ import java.awt.image.BufferedImage
 import java.io.File
 import play.api.Play
 import utils.EgraphsUnitTest
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
 import play.api.test._
 import play.api.test.Helpers._
 
-
+@RunWith(classOf[JUnitRunner])
 class ImageUtilTests extends EgraphsUnitTest {
   def imageUtil = AppConfig.instance[ImageUtil]
 

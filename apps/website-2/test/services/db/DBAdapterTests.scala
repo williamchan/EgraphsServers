@@ -3,7 +3,10 @@ package services.db
 import org.scalatest.matchers.ShouldMatchers
 import org.squeryl.adapters.{MySQLAdapter, PostgreSqlAdapter, H2Adapter}
 import utils.EgraphsUnitTest
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
+@RunWith(classOf[JUnitRunner])
 class DBAdapterTests extends EgraphsUnitTest {
 
   "DBAdapter" should "be h2 for string 'mem'" in new EgraphsTestApplication {

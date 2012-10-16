@@ -9,7 +9,10 @@ import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy
 import services.logging.Logging
 import services.AppConfig
 import java.sql.Connection
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
+@RunWith(classOf[JUnitRunner])
 class DBSessionTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with Logging

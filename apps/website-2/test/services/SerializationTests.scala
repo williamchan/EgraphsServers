@@ -1,7 +1,10 @@
 package services
 
 import utils.EgraphsUnitTest
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
+@RunWith(classOf[JUnitRunner])
 class SerializationTests extends EgraphsUnitTest {
   import services.Utils.makeOptionalFieldMap
 

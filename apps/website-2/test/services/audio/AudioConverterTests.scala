@@ -2,7 +2,10 @@ package services.audio
 
 import utils.{EgraphsUnitTest, TestHelpers}
 import services.TempFile
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
+@RunWith(classOf[JUnitRunner])
 class AudioConverterTests extends EgraphsUnitTest {
 
   private val tempFilesId = "AudioConverterTests"

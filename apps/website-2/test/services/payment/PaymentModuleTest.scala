@@ -5,6 +5,10 @@ import services.inject.ClosureProviders
 import services.{AppConfig, Utils}
 import services.config.ConfigFileProxy
 
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+
+@RunWith(classOf[JUnitRunner])
 class PaymentModuleTest extends EgraphsUnitTest with ClosureProviders {
 
   "PaymentProvider" should "return the stripe implementation when 'stripe' is set in application.conf" in {

@@ -2,7 +2,10 @@ package services.payment
 
 import utils.EgraphsUnitTest
 import services.Finance
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
+@RunWith(classOf[JUnitRunner])
 class YesMaamPaymentTests extends EgraphsUnitTest {
   import Finance.TypeConversions._
 

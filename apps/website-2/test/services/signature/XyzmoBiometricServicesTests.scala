@@ -5,12 +5,15 @@ import models.xyzmo._
 import play.Play
 import utils._
 import com.xyzmo.wwww.biometricserver.{WebServiceBiometricPartStub, WebServiceUserAndProfileStub}
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
 /**
  * IMPORTANT! -- Do not write tests for XyzmoProdBiometricServices or XyzmoBetaBiometricServices.
  * They will clobber live data because we use Celebrity IDs as userIds on Xyzmo.
  * Instead, XyzmoTestBiometricServices exists for automated tests of live Xyzmo server.
  */
+@RunWith(classOf[JUnitRunner])
 class XyzmoBiometricServicesTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with DBTransactionPerTest

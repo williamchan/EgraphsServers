@@ -4,7 +4,10 @@ import java.io.FileOutputStream
 import org.apache.commons.io.IOUtils
 import java.awt.BasicStroke
 import utils.{TestConstants, EgraphsUnitTest}
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
+@RunWith(classOf[JUnitRunner])
 class HandwritingTests extends EgraphsUnitTest {
 
   "Handwriting" should "import test samples without exception" in {

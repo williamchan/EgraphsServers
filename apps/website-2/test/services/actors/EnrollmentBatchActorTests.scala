@@ -17,7 +17,10 @@ import akka.util.Timeout
 import akka.util.duration._
 import utils.TestHelpers.withActorUnderTest
 import akka.dispatch.Await
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
+@RunWith(classOf[JUnitRunner])
 class EnrollmentBatchActorTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
 {

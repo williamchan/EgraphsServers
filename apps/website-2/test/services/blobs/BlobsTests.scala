@@ -5,6 +5,10 @@ import services.AppConfig
 import services.Time
 import Time.IntsToSeconds._
 
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+
+@RunWith(classOf[JUnitRunner])
 class BlobsTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with DBTransactionPerTest

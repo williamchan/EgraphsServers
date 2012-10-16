@@ -2,7 +2,10 @@ package services
 
 import org.joda.money.CurrencyUnit
 import utils.EgraphsUnitTest
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
+@RunWith(classOf[JUnitRunner])
 class FinanceTests extends EgraphsUnitTest {
   import Finance.TypeConversions._
 

@@ -3,7 +3,10 @@ package services.blobs
 import utils.{ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest}
 import services.AppConfig
 import services.config.ConfigFileProxy
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
+@RunWith(classOf[JUnitRunner])
 class S3BlobVendorTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValidationBefore {
   "S3BlobVendor" should "not return bad URLs" in {
     withTestBucket { blobVendor =>

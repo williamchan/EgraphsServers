@@ -3,7 +3,10 @@ package services.blobs
 import utils.{EgraphsUnitTest, ClearsCacheAndBlobsAndValidationBefore}
 import play.Play._
 import services.AppConfig
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
+@RunWith(classOf[JUnitRunner])
 class CloudfrontBlobVendorTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValidationBefore {
   private def cloudfrontDomain = "egraphs-test.edge.egraphs.com"
 

@@ -3,7 +3,10 @@ package services
 import java.sql.Date
 import org.joda.time.DateTime
 import utils.EgraphsUnitTest
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
+@RunWith(classOf[JUnitRunner])
 class TimeTests extends EgraphsUnitTest {
 
   "currentMonthStart" should "return DateTime that is the first of this month" in {

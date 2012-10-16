@@ -20,7 +20,10 @@ import akka.dispatch.Await
 import models.EgraphQueryFilters
 import services.logging.LoggingContext
 import models.EgraphStore
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
+@RunWith(classOf[JUnitRunner])
 class EgraphActorTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with BeforeAndAfterAll {

@@ -2,7 +2,10 @@ package services
 
 import utils._
 import controllers.WebsiteControllers
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
+@RunWith(classOf[JUnitRunner])
 class UtilsTests extends EgraphsUnitTest
 {
   class Closeable {

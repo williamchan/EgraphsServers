@@ -4,7 +4,10 @@ import blobs.Blobs
 import javax.sound.sampled.{AudioSystem, AudioFormat}
 import java.io._
 import utils.EgraphsUnitTest
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
+@RunWith(classOf[JUnitRunner])
 class SampleRateConverterTests extends EgraphsUnitTest {  
 
   it should "downsample 44kHz WAV to 8kHz WAV" in new EgraphsTestApplication {

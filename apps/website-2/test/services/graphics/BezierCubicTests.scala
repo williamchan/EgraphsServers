@@ -7,7 +7,10 @@ import play.Play
 import javax.imageio.ImageIO
 import utils.EgraphsUnitTest
 import java.io.File
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
+@RunWith(classOf[JUnitRunner])
 class BezierCubicTests extends EgraphsUnitTest {
 
   "BezierCubic" should "evaluate to the correct x and y coordinates" in {
