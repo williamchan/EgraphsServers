@@ -67,7 +67,7 @@ private [authtoken] trait AuthenticityTokenActionComposition {
     (parser: BodyParser[A] = parse.anyContent)
     (actionFactory: AuthenticityToken => Action[A]): Action[A] = 
   {
-    Action(parser) { request =>
+    Action(parser) { implicit request =>
       val maybeToken = for (sessionToken <- request.session.get(authTokenKey)) yield {
         new AuthenticityToken(sessionToken)
       }
@@ -77,11 +77,11 @@ private [authtoken] trait AuthenticityTokenActionComposition {
       val result = actionFactory(token).apply(request)
 
       // Put the token we just generated in the session if there wasn't already
-      // a token there.      
+      // a token there.
       if (maybeToken.isDefined) {
         result
       } else {
-        result.withSession(result.session + (authTokenKey -> token.value))
+        result.addingToSession(authTokenKey -> token.value)
       }
     }
   }

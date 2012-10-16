@@ -5,7 +5,7 @@ import com.google.inject.Inject
 import play.api.mvc.Request
 import play.api.mvc.Action
 import play.api.mvc.PlainResult
-import services.http.ResultUtils.resultToRichResult
+import egraphs.playutils.RichResult.resultToRichResult
 import play.api.mvc.WrappedRequest
 import services.http.EgraphsSession
 
@@ -15,10 +15,10 @@ import services.http.EgraphsSession
  */
 class RequireSessionId @Inject() {
   def apply[A](action: Action[A]): Action[A] = {
-    Action(action.parser) { request =>
+    Action(action.parser) { implicit request =>
       val (result, sessionId) = getResultAndSessionIdFromRequest(request, action)
       result match {
-        case result: PlainResult => result.withSession(result.session + (EgraphsSession.SESSION_ID_KEY -> sessionId))
+        case result: PlainResult => result.addingToSession(EgraphsSession.SESSION_ID_KEY -> sessionId)
         case other => other
       }
     }
