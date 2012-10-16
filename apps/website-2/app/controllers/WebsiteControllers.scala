@@ -14,7 +14,6 @@ import services.http._
 import services.http.filters._
 import forms.{AccountRecoverFormFactory, AccountPasswordResetFormFactory, AccountSettingsFormFactory, CustomerLoginFormFactory}
 import forms.purchase.{PurchaseFormChecksFactory, FormReaders, PurchaseFormFactory}
-import services.Utils
 import services.mvc.celebrity.CatalogStarsQuery
 import services.mvc.{OrderCompleteViewModelFactory, StorefrontBreadcrumbData}
 import services.config.ConfigFileProxy
@@ -57,98 +56,4 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val customerStore = instance[CustomerStore]
   override protected val orderStore = instance[OrderStore]
   override protected val productStore = instance[ProductStore]
-
-  // TODO: PLAY20 migration. Replace all usage of the old validation system with either
-  // our forms api or the Play 2.0 forms api.
-//  /**
-//   * Redirects with validation errors populated to flash scope.
-//   *
-//   * @param redirectUrl target URL
-//   * @param permanent See http://www.playframework.org/documentation/api/1.2.4/play/mvc/Controller.html#redirect(java.lang.String, boolean)
-//   * @return a redirect
-//   */
-//  def redirectWithValidationErrors(redirectUrl: String, permanent: Option[Boolean] = None) = Action { implicit request =>
-//    // Redirect to redirectUrl, providing field errors via the flash scope.
-//    import scala.collection.JavaConversions._
-//    val fieldNames = validationErrors.map {
-//      case (fieldName, _) => fieldName
-//    }
-//    val errorString = fieldNames.mkString(",")
-//    val flash = play.mvc.Http.Context.current().flash()
-//    flash += ("errors" -> errorString)
-//    params.allSimple().foreach {
-//      param => flash += param
-//    }
-//
-//    permanent match {
-//      case None => Redirect(redirectUrl)
-//      case Some(perm) =>
-//        perm match {
-//          case true => MovedPermanently(redirectUrl, perm)
-//          case false => Redirect(redirectUrl)
-//        }
-//    }
-//  }*/
-
-  /**
-   * Updates the flash scope with pagination data used by pagination.scala.html
-   */
-  def updateFlashScopeWithPagingData[A](pagedQuery: (Iterable[A], Int, Option[Int]),
-                                        baseUrl: String,
-                                        filter: Option[String] = None) {
-    val curPage = pagedQuery._2
-    val totalResults = pagedQuery._3
-
-    val showPaging = totalResults.isDefined && totalResults.get > Utils.defaultPageLength
-    val flash = play.mvc.Http.Context.current().flash
-    flash.put("ShowPaging", showPaging.toString)
-    val totalResultsStr = if (totalResults.isDefined) ("- " + totalResults.get + " results") else ""
-    flash.put("TotalResultsStr", totalResultsStr)
-
-    if (showPaging) {
-      val showFirst: Boolean = curPage > 2
-      flash.put("ShowFirst", showFirst.toString)
-      if (showFirst) flash.put("FirstUrl", withPageQuery(baseUrl, 1, filter)) else flash.remove("FirstUrl")
-
-      val showPrev: Boolean = curPage > 1
-      flash.put("ShowPrev", showPrev.toString)
-      if (showPrev) flash.put("PrevUrl", withPageQuery(baseUrl, curPage - 1, filter)) else flash.remove("PrevUrl")
-
-      val totalNumPages = if (totalResults.get % Utils.defaultPageLength > 0) {
-        totalResults.get / Utils.defaultPageLength + 1
-      } else {
-        totalResults.get / Utils.defaultPageLength
-      }
-
-      val showNext: Boolean = curPage < totalNumPages
-      flash.put("ShowNext", showNext.toString)
-      if (showNext) flash.put("NextUrl", withPageQuery(baseUrl, curPage + 1, filter)) else flash.remove("NextUrl")
-
-      val showLast: Boolean = curPage < totalNumPages
-      flash.put("ShowLast", showLast.toString)
-      if (showLast) flash.put("LastUrl", withPageQuery(baseUrl, totalNumPages, filter)) else flash.remove("LastUrl")
-    }
-  }
-
-  /**
-   * Appends URL with query parameters
-   *
-   * @param url the URL to which to append query parameters
-   * @param page the page index (as in pagination)
-   * @param filter the "filter" parameter
-   * @return url with query parameters appended
-   */
-  private def withPageQuery(url: String,
-                            page: Int,
-                            filter: Option[String]): String = {
-    val filterStr = filter match {
-      case Some(f) => "&filter=" + f
-      case None => ""
-    }
-    if (url.contains('?')) {
-      url + "page=" + page + filterStr
-    } else {
-      url + "?page=" + page + filterStr
-    }
-  }
 }

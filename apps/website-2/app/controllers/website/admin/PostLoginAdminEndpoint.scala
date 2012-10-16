@@ -11,6 +11,7 @@ import play.api.data.validation.Constraints._
 import play.api.data.validation.Constraint
 import play.api.data.validation.Valid
 import play.api.data.validation.Invalid
+import services.http.EgraphsSession._
 
 private[controllers] trait PostLoginAdminEndpoint {
   this: Controller =>
@@ -34,7 +35,7 @@ private[controllers] trait PostLoginAdminEndpoint {
         
       loginForm.bindFromRequest.fold(
           formWithErrors => {
-            Redirect(controllers.routes.WebsiteControllers.getLoginAdmin.url).flashing("errors" -> formWithErrors.errors.head.message.toString())
+            Redirect(controllers.routes.WebsiteControllers.getLoginAdmin).flashing("errors" -> formWithErrors.errors.head.message.toString())
           },
           validForm => {
             Redirect(controllers.routes.WebsiteControllers.getCelebritiesAdmin().url).withSession(

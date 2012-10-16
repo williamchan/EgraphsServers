@@ -1,13 +1,13 @@
-@()(implicit flash: play.api.mvc.Flash)
+@()(implicit paginationInfo: controllers.PaginationInfo)
 
 <div class="pagination">
   @import services.Utils.stringOptionToRichStringOption
-  @if(flash.get("ShowPaging").toBoolean) {
+  @if(paginationInfo.showPaging) {
   <ul>
-    <li @if( !flash.get("ShowFirst").toBoolean ) {class="disabled"}><a href="@flash.get("FirstUrl")">First</a></li>
-    <li @if( !flash.get("ShowPrev" ).toBoolean ) {class="disabled"}><a href="@flash.get("PrevUrl")">Prev</a></li>
-    <li @if( !flash.get("ShowNext" ).toBoolean ) {class="disabled"}><a href="@flash.get("NextUrl")">Next</a></li>
-    <li @if( !flash.get("ShowLast" ).toBoolean ) {class="disabled"}><a href="@flash.get("LastUrl")">Last</a></li>
+    <li @if( paginationInfo.firstUrl.isEmpty ) {class="disabled"}><a href=@paginationInfo.firstUrl.getOrElse("")>First</a></li>
+    <li @if( paginationInfo.prevUrl.isEmpty )  {class="disabled"}><a href=@paginationInfo.prevUrl.getOrElse("")>Prev</a></li>
+    <li @if( paginationInfo.nextUrl.isEmpty )  {class="disabled"}><a href=@paginationInfo.nextUrl.getOrElse("")>Next</a></li>
+    <li @if( paginationInfo.lastUrl.isEmpty )  {class="disabled"}><a href=@paginationInfo.lastUrl.getOrElse("")>Last</a></li>
   </ul>
   }
 </div>

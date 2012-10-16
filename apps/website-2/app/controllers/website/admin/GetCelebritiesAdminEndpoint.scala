@@ -10,6 +10,7 @@ import services.http.filters.HttpFilters
 import play.api.mvc.Action
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
+import controllers.PaginationInfoFactory
 
 private[controllers] trait GetCelebritiesAdminEndpoint {
   this: Controller =>
@@ -26,8 +27,7 @@ private[controllers] trait GetCelebritiesAdminEndpoint {
         val listings = for((celebrity: Celebrity, account: Account) <- pagedQuery._1) yield {
           Celebrity.celebrityAccountToListing(celebrity, account)
         }
-        implicit val flash = request.flash
-//        WebsiteControllers.updateFlashScopeWithPagingData(pagedQuery = pagedQuery, baseUrl = GetCelebritiesAdminEndpoint.location)
+        implicit val paginationInfo = PaginationInfoFactory.create(pagedQuery = pagedQuery, baseUrl = GetCelebritiesAdminEndpoint.location)
         Ok(views.html.Application.admin.admin_celebrities(
           celebrityListings = listings,
           allCelebrities = celebrityStore.getAll

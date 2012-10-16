@@ -1,6 +1,6 @@
 @(celebrityListings: Iterable[models.CelebrityListing],
   allCelebrities: Iterable[models.Celebrity]
-)(implicit authToken: egraphs.authtoken.AuthenticityToken, flash: play.api.mvc.Flash)
+)(implicit authToken: egraphs.authtoken.AuthenticityToken, paginationInfo: controllers.PaginationInfo)
 
 @import controllers.WebsiteControllers
 @import egraphs.authtoken.AuthenticityToken.safeForm
@@ -73,7 +73,7 @@
     <input type="text" name="query"/>
     <input class="btn primary fade in" value="Search" type="submit"/>
   </form>
-  <h2>All @flash.get("TotalResultsStr")</h2>
+  <h2>All @paginationInfo.totalResultsStr</h2>
   <table>
     <tr>
       <th></th>

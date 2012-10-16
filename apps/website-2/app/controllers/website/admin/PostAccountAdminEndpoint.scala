@@ -42,12 +42,14 @@ trait PostAccountAdminEndpoint {
         )
         
         changeAccountForm.bindFromRequest.fold(
-          errors => Ok("herpderp"),
-          form => {
-            val account = form.accountById.get
-            account.copy(email = form.email).withPassword(form.password).right.get.save()
+          formWithErrors => {
+            Redirect(controllers.routes.WebsiteControllers.getAccountAdmin(formWithErrors.get.accountId)).flashing("errors" -> formWithErrors.errors.head.message.toString())
+          },
+          validForm => {
+            val account = validForm.accountById.get
+            account.copy(email = validForm.email).withPassword(validForm.password).right.get.save()
 
-            Redirect(controllers.routes.WebsiteControllers.getAccountAdmin(form.accountId))
+            Redirect(controllers.routes.WebsiteControllers.getAccountAdmin(validForm.accountId))
           }
         )
       }
