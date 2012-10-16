@@ -1,8 +1,9 @@
-@(printOrderDate: Iterable[(models.PrintOrder, models.Order, Option[models.Egraph])])(implicit flash:play.mvc.Scope.Flash)
+@(printOrderDate: Iterable[(models.PrintOrder, models.Order, Option[models.Egraph])]
+)(implicit paginationInfo: controllers.PaginationInfo)
 
 @import controllers.WebsiteControllers
-@import views.html.Application.tags.pagination
 @import views.html.Application.content_base
+@import views.html.Application.tags.pagination
 
 @content_base(title="Admin - Print Orders", body=body, head=head)
 
@@ -13,7 +14,7 @@
 @body = {
 <div class="admin-content">
   <h1>
-    Print Orders @flash.get("TotalResultsStr")
+    Print Orders @paginationInfo.totalResultsStr
   </h1>
   <div>
     <h2>Filters:</h2>

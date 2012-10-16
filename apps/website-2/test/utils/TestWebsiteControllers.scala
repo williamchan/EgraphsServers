@@ -43,6 +43,7 @@ case class TestWebsiteControllers @Inject()(
   customerStore: CustomerStore,
   config: ConfigFileProxy,
   orderStore: OrderStore,
+  printOrderStore: PrintOrderStore,
   productStore: ProductStore,
   customerLoginForms: CustomerLoginFormFactory,
   egraphsSessionFactory: () => EgraphsSession,

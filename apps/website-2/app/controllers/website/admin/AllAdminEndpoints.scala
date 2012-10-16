@@ -12,21 +12,21 @@ trait AllAdminEndpoints
   with GetAccountsAdminEndpoint
   with GetCelebritiesAdminEndpoint
 //  with GetCelebrityAdminEndpoint
-//  with GetCelebrityEgraphsAdminEndpoint
-//  with GetCelebrityInventoryBatchesAdminEndpoint
-//  with GetCelebrityOrdersAdminEndpoint
-//  with GetCelebrityProductsAdminEndpoint
+  with GetCelebrityEgraphsAdminEndpoint
+  with GetCelebrityInventoryBatchesAdminEndpoint
+  with GetCelebrityOrdersAdminEndpoint
+  with GetCelebrityProductsAdminEndpoint
 //  with GetCreateCelebrityAdminEndpoint
 //  with GetCreateCelebrityInventoryBatchAdminEndpoint
 //  with GetCreateCelebrityProductAdminEndpoint
 //  with GetEgraphAdminEndpoint
-//  with GetEgraphsAdminEndpoint
+  with GetEgraphsAdminEndpoint
 //  with GetInventoryBatchAdminEndpoint
   with GetLoginAdminEndpoint
 //  with GetOrderAdminEndpoint
-//  with GetOrdersAdminEndpoint
+  with GetOrdersAdminEndpoint
 //  with GetPrintOrderAdminEndpoint
-//  with GetPrintOrdersAdminEndpoint
+  with GetPrintOrdersAdminEndpoint
 //  with GetProductAdminEndpoint
   with GetReportsAdminEndpoint
   with GetToolsAdminEndpoint

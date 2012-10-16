@@ -1,18 +1,16 @@
-@(celebrity:models.Celebrity,
-  products: Iterable[models.Product]
-)(implicit flash:play.mvc.Scope.Flash)
+@(celebrity:models.Celebrity, products: Iterable[models.Product]
+)(implicit paginationInfo: controllers.PaginationInfo)
 
 @import controllers.WebsiteControllers
-@import services.Finance.TypeConversions._
-@import services.Utils.lookupUrl
-@import views.html.Application.tags.pagination
 @import views.html.Application.content_base
+@import views.html.Application.tags.pagination
+@import services.Finance.TypeConversions._
 
 @content_base(title="Admin - Products", body=body, head=head)
 
-@getCreateCelebrityProduct = @{
+@{/** @getCreateCelebrityProduct = @{
   lookupUrl("WebsiteControllers.getCreateCelebrityProductAdmin", Map("celebrityId" -> celebrity.id.toString))
-}
+}*/}
 
 @head = {
 <script src='@RemoteAssets.at("twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
@@ -21,11 +19,11 @@
 @body = {
 <div class="admin-content">
   <h1>
-    @celebrity.publicName's Products @flash.get("TotalResultsStr")
+    @celebrity.publicName's Products @paginationInfo.totalResultsStr
   </h1>
-  <form method="link" action="@getCreateCelebrityProduct">
+  @{/** <form method="link" action="@getCreateCelebrityProduct">
     <input class="btn primary fade in" type="submit" value="New Product"/>
-  </form>
+  </form>*/}
   <table>
     <tr>
       <th></th>

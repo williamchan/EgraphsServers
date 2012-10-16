@@ -1,9 +1,9 @@
 @(egraphAndResults: Iterable[(models.Egraph, Option[models.vbg.VBGVerifySample], Option[models.xyzmo.XyzmoVerifyUser])], celebrity: Option[models.Celebrity] = None
-)(implicit flash:play.mvc.Scope.Flash)
+)(implicit paginationInfo: controllers.PaginationInfo)
 
 @import controllers.WebsiteControllers
-@import views.html.Application.tags.pagination
 @import views.html.Application.content_base
+@import views.html.Application.tags.pagination
 
 @content_base(title="Admin - All Egraphs", body=body, head=head)
 
@@ -18,7 +18,7 @@
 @body = {
 <div class="admin-content">
   <h1>
-    @headline @flash.get("TotalResultsStr")
+    @headline @paginationInfo.totalResultsStr
   </h1>
   <div>
     <h2>Filters:</h2>

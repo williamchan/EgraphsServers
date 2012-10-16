@@ -2,7 +2,6 @@ package controllers.website.admin
 
 import models.{Celebrity, Account, CelebrityStore}
 import controllers.WebsiteControllers
-import play.data.validation._
 import play.api.mvc.{Action, Controller}
 import play.api.mvc.Results.{Ok, Redirect}
 import services.http.ControllerMethod
