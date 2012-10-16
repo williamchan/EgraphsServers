@@ -1,18 +1,17 @@
 @(account: Option[(models.Account)])
 
 @import controllers.WebsiteControllers
-@import services.Utils.lookupUrl
 @import views.html.Application.content_base
 
 @content_base(title="Admin - Accounts", body=body, head=head)
 
 @getAccounts = @{
-  lookupUrl("WebsiteControllers.getAccountsAdmin")
+	routes.WebsiteControllers.getAccountsAdmin
 }
 
-@getCreateAccount = @{
-lookupUrl("WebsiteControllers.getCreateAccountAdmin")
-}
+@{/**@getCreateAccount = @{
+	routes.WebsiteControllers.getCreateAccountAdmin
+}*/}
 
 @head = {
 <script src='@RemoteAssets.at("twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
@@ -20,9 +19,11 @@ lookupUrl("WebsiteControllers.getCreateAccountAdmin")
 
 @body = {
 <div class="admin-content">
+	@{/**
   <form method="link" action="@getCreateAccount">
     <input class="btn primary fade in" type="submit" value="New Account"/>
   </form>
+  */}
   <h2>Search for Account by email</h2>
   <div class="clearfix">
     <form method="link" action="@getAccounts">

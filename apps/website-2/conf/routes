@@ -54,36 +54,36 @@ GET     /blob/files/*blobKey                                       controllers.W
 ## Admin
 ##
 GET      /admin                                                    controllers.WebsiteControllers.getRootAdmin
-#GET     /admin/accounts                                           controllers.WebsiteControllers.getAccountsAdmin
+GET      /admin/accounts                                           controllers.WebsiteControllers.getAccountsAdmin
 POST     /admin/accounts                                           controllers.WebsiteControllers.postAccountAdmin
-GET      /admin/accounts/$accountId<[0-9]+>                          controllers.WebsiteControllers.getAccountAdmin(accountId: Long)
+GET      /admin/accounts/$accountId<[0-9]+>                        controllers.WebsiteControllers.getAccountAdmin(accountId: Long)
 GET      /admin/celebrities                                        controllers.WebsiteControllers.getCelebritiesAdmin(page: Int = 1)
-#POST    /admin/celebrities                                          controllers.WebsiteControllers.postCelebrityAdmin
+#POST    /admin/celebrities                                        controllers.WebsiteControllers.postCelebrityAdmin
 GET      /admin/celebrities/search                                 controllers.WebsiteControllers.getCelebritiesBySearchAdmin
 #GET     /admin/celebrities/create                                 controllers.WebsiteControllers.getCreateCelebrityAdmin
 POST     /admin/celebrities/featured                               controllers.WebsiteControllers.postFeaturedCelebrities
 #GET     /admin/celebrities/{celebrityId}                          controllers.WebsiteControllers.getCelebrityAdmin
 #GET     /admin/celebrities/{celebrityId}/egraphs                  controllers.WebsiteControllers.getCelebrityEgraphsAdmin
 #GET     /admin/celebrities/{celebrityId}/inventorybatches         controllers.WebsiteControllers.getCelebrityInventoryBatchesAdmin
-#POST    /admin/celebrities/{celebrityId}/inventorybatches           controllers.WebsiteControllers.postCelebrityInventoryBatchAdmin
+#POST    /admin/celebrities/{celebrityId}/inventorybatches         controllers.WebsiteControllers.postCelebrityInventoryBatchAdmin
 #GET     /admin/celebrities/{celebrityId}/inventorybatches/create  controllers.WebsiteControllers.getCreateCelebrityInventoryBatchAdmin
 #GET     /admin/celebrities/{celebrityId}/orders                   controllers.WebsiteControllers.getCelebrityOrdersAdmin
 #GET     /admin/celebrities/{celebrityId}/products                 controllers.WebsiteControllers.getCelebrityProductsAdmin
-#POST    /admin/celebrities/{celebrityId}/products                   controllers.WebsiteControllers.postCelebrityProductAdmin
+#POST    /admin/celebrities/{celebrityId}/products                 controllers.WebsiteControllers.postCelebrityProductAdmin
 #GET     /admin/celebrities/{celebrityId}/products/create          controllers.WebsiteControllers.getCreateCelebrityProductAdmin
 #POST    /admin/celebrities/{celebrityId}/sendEmail                controllers.WebsiteControllers.postSendCelebrityWelcomeEmailAdmin
 #GET     /admin/egraphs                                            controllers.WebsiteControllers.getEgraphsAdmin
 #GET     /admin/egraphs/{egraphId}                                 controllers.WebsiteControllers.getEgraphAdmin
-#POST    /admin/egraphs/{egraphId}                                   controllers.WebsiteControllers.postEgraphAdmin
+#POST    /admin/egraphs/{egraphId}                                 controllers.WebsiteControllers.postEgraphAdmin
 #GET     /admin/inventorybatches/{inventoryBatchId}                controllers.WebsiteControllers.getInventoryBatchAdmin
 GET      /admin/login                                              controllers.WebsiteControllers.getLoginAdmin
 POST     /admin/login                                              controllers.WebsiteControllers.postLoginAdmin
 #GET     /admin/orders                                             controllers.WebsiteControllers.getOrdersAdmin
 #GET     /admin/orders/{orderId}                                   controllers.WebsiteControllers.getOrderAdmin
-#POST    /admin/orders/{orderId}                                     controllers.WebsiteControllers.postOrderAdmin
+#POST    /admin/orders/{orderId}                                   controllers.WebsiteControllers.postOrderAdmin
 #GET     /admin/products/{productId}                               controllers.WebsiteControllers.getProductAdmin
-#GET     /admin/reports                                            controllers.WebsiteControllers.getReportsAdmin
-#GET     /admin/tools                                              controllers.WebsiteControllers.getToolsAdmin
+GET      /admin/reports                                            controllers.WebsiteControllers.getReportsAdmin
+GET      /admin/tools                                              controllers.WebsiteControllers.getToolsAdmin
 
 ##
 ## Consumer Website

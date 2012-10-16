@@ -9,7 +9,7 @@ trait AllAdminEndpoints
   extends GetRootAdminEndpoint
   with GetAccountAdminEndpoint
   with PostAccountAdminEndpoint
-//  with GetAccountsAdminEndpoint
+  with GetAccountsAdminEndpoint
   with GetCelebritiesAdminEndpoint
 //  with GetCelebrityAdminEndpoint
 //  with GetCelebrityEgraphsAdminEndpoint
@@ -28,8 +28,8 @@ trait AllAdminEndpoints
 //  with GetPrintOrderAdminEndpoint
 //  with GetPrintOrdersAdminEndpoint
 //  with GetProductAdminEndpoint
-//  with GetReportsAdminEndpoint
-//  with GetToolsAdminEndpoint
+  with GetReportsAdminEndpoint
+  with GetToolsAdminEndpoint
 //  with PostCelebrityAdminEndpoint
 //  with PostCelebrityInventoryBatchAdminEndpoint
 //  with PostCelebrityProductAdminEndpoint

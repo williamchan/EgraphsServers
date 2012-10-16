@@ -48,8 +48,7 @@ trait PostAccountAdminEndpoint {
           validForm => {
             val account = validForm.accountById.get
             account.copy(email = validForm.email).withPassword(validForm.password).right.get.save()
-
-            Redirect(controllers.routes.WebsiteControllers.getAccountAdmin(validForm.accountId))
+            Redirect(controllers.routes.WebsiteControllers.getAccountsAdmin)
           }
         )
       }

@@ -1,16 +1,14 @@
 package controllers.website.admin
 
 import models.{Celebrity, Account, CelebrityStore}
-import play.api.mvc.Results.{Ok, Redirect}
 import controllers.WebsiteControllers
-import play.api.mvc.Controller
 import play.data.validation._
+import play.api.mvc.{Action, Controller}
+import play.api.mvc.Results.{Ok, Redirect}
 import services.http.ControllerMethod
 import services.http.filters.HttpFilters
-import play.api.mvc.Action
-import play.api.mvc.Result
-import play.api.mvc.Results.Redirect
 import controllers.PaginationInfoFactory
+
 
 private[controllers] trait GetCelebritiesAdminEndpoint {
   this: Controller =>
