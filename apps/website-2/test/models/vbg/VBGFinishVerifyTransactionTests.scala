@@ -8,14 +8,15 @@ class VBGFinishVerifyTransactionTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityIdLongTests[VBGFinishVerifyTransaction]
   with CreatedUpdatedEntityTests[Long, VBGFinishVerifyTransaction]
+  with DateShouldMatchers
   with DBTransactionPerTest {
   //
   // SavingEntityTests[VBGFinishVerifyTransaction] methods
   //
 
-  val store = AppConfig.instance[VBGFinishVerifyTransactionStore]
+  def store = AppConfig.instance[VBGFinishVerifyTransactionStore]
 
-  "getErrorCode" should "return errorCode" in {
+  "getErrorCode" should "return errorCode" in new EgraphsTestApplication {
     val vbgBase = new VBGFinishVerifyTransaction(errorCode = "50500")
     vbgBase.getErrorCode should be(vbgBase.errorCode)
   }

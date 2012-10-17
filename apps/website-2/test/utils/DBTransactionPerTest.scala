@@ -16,7 +16,7 @@ trait DBTransactionPerTest extends BeforeAndAfterEach { this: Suite with Egraphs
   }
 
   override def afterEach() {
-    DBSession.commit()
+    try DBSession.commit() finally DBSession.close()
     super.afterEach()
   }
 

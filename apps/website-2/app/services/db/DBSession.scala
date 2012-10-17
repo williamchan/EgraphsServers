@@ -154,11 +154,18 @@ object DBSession {
   }
 
   def commit() {
-    Session.currentSessionOption.map(session => session.connection.commit())
+    for (session <- Session.currentSessionOption) session.connection.commit()
   }
 
   def rollback() {
-    Session.currentSessionOption.map(session => session.connection.rollback())
+    for (session <- Session.currentSessionOption) session.connection.rollback()
+  }
+  
+  def close() {
+    for (session <- Session.currentSessionOption) {
+      session.unbindFromCurrentThread
+      session.close
+    }
   }
 }
 

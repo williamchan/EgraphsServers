@@ -8,19 +8,20 @@ class VBGVerifySampleTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityIdLongTests[VBGVerifySample]
   with CreatedUpdatedEntityTests[Long, VBGVerifySample]
+  with DateShouldMatchers
   with DBTransactionPerTest {
   //
   // SavingEntityTests[VBGVerifySample] methods
   //
 
-  val store = AppConfig.instance[VBGVerifySampleStore]
+  def store = AppConfig.instance[VBGVerifySampleStore]
 
-  "getErrorCode" should "return errorCode" in {
+  "getErrorCode" should "return errorCode" in new EgraphsTestApplication {
     val vbgBase = new VBGVerifySample(errorCode = "50500")
     vbgBase.getErrorCode should be(vbgBase.errorCode)
   }
 
-  "findByEgraph" should "return VBGVerifySample" in {
+  "findByEgraph" should "return VBGVerifySample" in new EgraphsTestApplication {
     val egraph = Egraph(orderId = TestData.newSavedOrder().id).save()
     store.findByEgraph(egraph) should be(None)
 

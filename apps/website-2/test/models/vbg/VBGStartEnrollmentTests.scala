@@ -8,14 +8,15 @@ class VBGStartEnrollmentTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityIdLongTests[VBGStartEnrollment]
   with CreatedUpdatedEntityTests[Long, VBGStartEnrollment]
+  with DateShouldMatchers
   with DBTransactionPerTest {
   //
   // SavingEntityTests[VBGStartEnrollment] methods
   //
 
-  val store = AppConfig.instance[VBGStartEnrollmentStore]
+  def store = AppConfig.instance[VBGStartEnrollmentStore]
 
-  "getErrorCode" should "return errorCode" in {
+  "getErrorCode" should "return errorCode" in new EgraphsTestApplication {
     val vbgBase = new VBGStartEnrollment(errorCode = "50500")
     vbgBase.getErrorCode should be (vbgBase.errorCode)
   }

@@ -8,14 +8,15 @@ class VBGStartVerificationTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityIdLongTests[VBGStartVerification]
   with CreatedUpdatedEntityTests[Long, VBGStartVerification]
+  with DateShouldMatchers
   with DBTransactionPerTest {
   //
   // SavingEntityTests[VBGStartVerification] methods
   //
 
-  val store = AppConfig.instance[VBGStartVerificationStore]
+  def store = AppConfig.instance[VBGStartVerificationStore]
 
-  "getErrorCode" should "return errorCode" in {
+  "getErrorCode" should "return errorCode" in new EgraphsTestApplication {
     val vbgBase = new VBGStartVerification(errorCode = "50500")
     vbgBase.getErrorCode should be (vbgBase.errorCode)
   }

@@ -35,32 +35,10 @@
     <script src="http://code.angularjs.org/angular-1.0.1.min.js"></script>
     <script type="text/javascript">
       function BuyDemoController ($scope) {
-        /////////////////////////// 
-        // BEGIN CONFIGURATION   //
-        ///////////////////////////
-
-        // heading - text that the header should say: e.g. "Sony Music".
         $scope.heading = "Easy-Peezy Egraph Purchaser";
 
-        // domain - the protocol, domain, and port containing the non-production instance of the
-        //     Egraphs software. e.g. "http://localhost:9000"
         $scope.domain = "https://beta.egraphs.com";
-        
-        // celebs - an array of Celebrity objects. A Celebrity object has three properties:
-        //     name: The celebrity name that should be presented to the person opening the application.
-        //         e.g. "David Ortiz"
-        //
-        //     urlSlug: The portion of the url that identifies this celebrity on the target instance
-        //         of the Egraphs software. You can harvest this from the URL of the "Choose Photo"
-        //         page. e.g. "David-Ortiz"
-        //
-        //     products: An array of Product objects. A Product has two properties:
-        //         name: The product name that should be presented to the person running the application
-        //             e.g. "2012 All-Star Game"
-        //
-        //         urlSlug: The portion of the url that identifies this celebrity on the target
-        //             instance of the Egraphs software. You can harvest this from the URL of the
-        //              "Personalize" page. e.g. "2012-All-Star-Game"        
+  
         $scope.celebs = [
           { name: "Kate Odell", 
             urlSlug: "Kate-Odell",
@@ -86,9 +64,6 @@
           personalNote: "I'm your biggest fan!"
         };
 
-        ///////////////////////////
-        //   END CONFIGURATION   //
-        ///////////////////////////
         $scope.celeb = $scope.celebs[0];
         $scope.product = $scope.celeb.products[0];
 
