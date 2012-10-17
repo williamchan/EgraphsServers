@@ -4,6 +4,7 @@ import PlayProject._
 import com.typesafe.sbteclipse.core.EclipsePlugin.EclipseKeys
 import cloudbees.Plugin._
 
+
 /**
  * Builds the main Egraphs website.
  *
@@ -73,6 +74,8 @@ object WebsiteBuild extends Build {
     
     val websiteBaseDir = file(".") / "apps" / "website-2"
 
+    val sep = java.io.File.separator
+
     val main = PlayProject(
       appName,
       appVersion,
@@ -87,6 +90,8 @@ object WebsiteBuild extends Build {
       resourceDirectory in Test := websiteBaseDir / "test" / "resources",
 
       EclipseKeys.skipParents := false,
+
+      EclipseKeys.classpathTransformerFactories += BuildHelpers.playEclipseClasspathAdditions,
 
       resolvers ++= Seq(
         "xugglecode" at "http://xuggle.googlecode.com/svn/trunk/repo/share/java",

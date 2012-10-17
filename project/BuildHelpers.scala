@@ -25,6 +25,31 @@ object BuildHelpers {
     commands ++= Seq(playCommand)
   )
 
+  /** Adds conf/ to the generated classpath. */
+  def playEclipseClasspathAdditions = {
+    import com.typesafe.sbteclipse.core._
+    import com.typesafe.sbteclipse.core.EclipsePlugin._
+    import com.typesafe.sbteclipse.core.Validation
+    import scala.xml._
+    import scala.xml.transform.RewriteRule
+    
+    new EclipseTransformerFactory[RewriteRule] {
+      override def createTransformer(ref: ProjectRef, state: State): Validation[RewriteRule] = {
+        setting(crossTarget in ref, state) map { ct =>
+          new RewriteRule {
+            override def transform(node: Node): Seq[Node] = node match {
+              case elem if (elem.label == "classpath") =>
+                val newChild = elem.child ++ <classpathentry path="conf" kind="src"></classpathentry>                  
+                Elem(elem.prefix, "classpath", elem.attributes, elem.scope, newChild: _*)
+             case other =>
+                other  
+            }
+          }
+        }
+      }
+    }
+  }
+
   object ModuleProject {
     def apply(name: String, settings: Seq[Setting[_]] = Seq.empty[Setting[_]]): Project = {      
       Project(
