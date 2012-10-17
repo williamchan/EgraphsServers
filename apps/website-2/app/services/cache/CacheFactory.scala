@@ -29,7 +29,6 @@ class CacheFactory @Inject()(
   hostInfo: HostInfo
 )
 {
-
   import CacheFactory._
 
   def applicationCache: NamespacedCache = {

@@ -21,7 +21,7 @@ private[cache] class JedisFactory(db: Int) {
   def connected[A](operation: Jedis => A): A = {
     val jedis = jedisPool.getResource()
     try {
-      jedis.select(JedisFactory.defaultRedisDb)
+      jedis.select(db)
       operation(jedis)
     } finally {
       jedisPool.returnResource(jedis)

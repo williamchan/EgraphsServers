@@ -1,14 +1,20 @@
 package services.cache
 
-import utils.{TestData, TestAppConfig, EgraphsUnitTest}
+import java.util
 import uk.me.lings.scalaguice.ScalaModule
 import com.google.inject.AbstractModule
-import services.http.{PlayId, DeploymentTarget, HostInfo, PlayConfig}
+
+import utils.{TestData, TestAppConfig, EgraphsUnitTest}
+import services.http.{PlayId, DeploymentTarget, HostInfo}
 import services.AppConfig
-import java.util
+import services.config.ConfigFileProxy
 import services.http.DeploymentTarget._
 import scala.Some
 
+import org.specs2.mock.Mockito
+import org.scalatest.junit.JUnitRunner
+import org.junit.runner.RunWith
+  
 trait CacheTests { this: EgraphsUnitTest =>
   def cacheInstance: Cache
 
@@ -77,18 +83,15 @@ trait CacheTests { this: EgraphsUnitTest =>
   }
 }
 
+@RunWith(classOf[JUnitRunner])
 class InMemoryCacheTests extends EgraphsUnitTest with CacheTests {
-  def cacheInstance: Cache = {
+  override def cacheInstance: Cache = {
     AppConfig.instance[CacheFactory].inMemoryCache
   }
 }
 
-
+@RunWith(classOf[JUnitRunner])
 class RedisCacheTests extends EgraphsUnitTest {
-  def cacheInstance: Cache = {
-    AppConfig.instance[CacheFactory].redisCacheOrBust()
-  }
-
   // This test looks weird, but basically our one request gets one Jedis instance
   // from the redis plug-in. A Jedis is the low-level redis connection that handles pooling
   // for us. The result is that every time we get a new cacheFromAppCacheWithCacheSetting
@@ -100,8 +103,8 @@ class RedisCacheTests extends EgraphsUnitTest {
 
     // Set up
     val (key, db1Value, db2Value) = (TestData.makeTestCacheKey, "herp", "derp")
-    def firstDb = lowLevelCacheWithPlaySettings("redis.12")
-    def secondDb = lowLevelCacheWithPlaySettings("redis.13")
+    val firstDb = lowLevelCacheWithPlaySettings("redis.12")
+    val secondDb = lowLevelCacheWithPlaySettings("redis.13")
 
     // Run test
     firstDb.set(key, db1Value, 5)
@@ -113,7 +116,7 @@ class RedisCacheTests extends EgraphsUnitTest {
   }
 }
 
-
+@RunWith(classOf[JUnitRunner])
 class CacheFactoryTests extends EgraphsUnitTest {
   import CacheFactoryTests._
 
@@ -126,9 +129,9 @@ class CacheFactoryTests extends EgraphsUnitTest {
   }
 
   "hostId" should "be the application id when in staging, demo, live" in {
-    for (playId <- List(Staging, Demo, Live).map(_.name)) {
-      val appConfig = appConfigWithCacheSetting("redis", playId)
-      appConfig.instance[CacheFactory].hostId should be (playId)
+    for (playId <- List(Staging, Demo, Live)) {
+      val cacheFactory = cacheFactoryWithMocks("redis", playId)
+      cacheFactory.hostId should be (playId)
     }
   }
 
@@ -136,32 +139,31 @@ class CacheFactoryTests extends EgraphsUnitTest {
     val hostInfo = AppConfig.instance[HostInfo]
     val hostId = AppConfig.instance[CacheFactory].hostId
 
-    hostId should include (Test.name)
+    hostId should include (Test)
     hostId should include (hostInfo.macAddress)
     hostId should include (hostInfo.userName)
     hostId should include (hostInfo.computerName)
   }
 }
 
-object CacheFactoryTests {
+object CacheFactoryTests extends Mockito {
   private[cache] def lowLevelCacheWithPlaySettings(
     cacheConfig: String,
-    playId: String=DeploymentTarget.Test.name
+    playId: String = DeploymentTarget.Test
   ): Cache =
   {
-    val factory = appConfigWithCacheSetting(cacheConfig, playId).instance[CacheFactory]
-    factory.lowLevelCache
+    cacheFactoryWithMocks(cacheConfig, playId).lowLevelCache
   }
+  
+  private def cacheFactoryWithMocks(cacheConfig: String, playId: String): CacheFactory = {
+    val mockConfig = mock[ConfigFileProxy]
+    mockConfig.applicationCache returns cacheConfig
 
-  private def appConfigWithCacheSetting(cacheConfig: String, playId: String): TestAppConfig = {
-    new TestAppConfig(new AbstractModule with ScalaModule {
-      def configure() {
-        val props = new util.Properties()
-        props.put("application.cache", cacheConfig)
-        bind[util.Properties].annotatedWith[PlayConfig].toInstance(props)
-        bind[String].annotatedWith[PlayId].toInstance(playId)
-      }
-    })
+    val mockHostInfo = mock[HostInfo]
+    mockHostInfo.userName returns "SnoopDogg"
+    mockHostInfo.computerName returns "DaDawgHizzle"
+    mockHostInfo.macAddress returns "SnoopDoggDontFuckinNeedDat"
+    
+    new CacheFactory(mockConfig, playId, mockHostInfo)
   }
-
 }
