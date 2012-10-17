@@ -21,9 +21,8 @@
 }
 
 @postInventoryBatch = @{
-  null
+  routes.WebsiteControllers.postCelebrityInventoryBatchAdmin(celebrityId = celebrity.id)
 }
-@** routes.WebsiteControllers.postCelebrityInventoryBatchAdmin(celebrityId = celebrity.id) *@
 
 @body = {
 <div class="admin-content">
@@ -33,7 +32,7 @@
   @views.html.Application.tags.valueRow(label="Remaining Inventory", value=remainingInventory.getOrElse(""))
   <div class="form row">
     <div class="span12 form-column">
-      @safeForm('id -> "inventorybatch-form", 'method -> "POST", 'action -> "postInventoryBatch.url") {
+      @safeForm('id -> "inventorybatch-form", 'method -> "POST", 'action -> postInventoryBatch.url) {
         <fieldset>
           <input id="inventoryBatchId" name="inventoryBatchId" type="hidden" value="@fields("inventoryBatchId")">
           <legend>Inventory Batch Details</legend>

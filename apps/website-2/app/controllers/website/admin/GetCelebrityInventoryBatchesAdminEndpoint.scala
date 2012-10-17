@@ -39,7 +39,7 @@ private[controllers] trait GetCelebrityInventoryBatchesAdminEndpoint {
 
 object GetCelebrityInventoryBatchesAdminEndpoint {
 
-  def url(celebrity: Celebrity) = {
-    controllers.routes.WebsiteControllers.getCelebrityInventoryBatchesAdmin(celebrityId = celebrity.id).url
+  def url(celebrityId: Long) = {
+    controllers.routes.WebsiteControllers.getCelebrityInventoryBatchesAdmin(celebrityId = celebrityId).url
   }
 }

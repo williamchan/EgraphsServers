@@ -29,7 +29,6 @@
   for (x <- egraph) yield (routes.WebsiteControllers.getEgraphAdmin(egraphId = x.id).url + "?action=preview")
 }
 
-
 @adminControls = {
   @if(!printOrder.isFulfilled && egraph.isDefined) {
     <div class="form">
