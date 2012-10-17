@@ -1,24 +1,24 @@
 package controllers.website.admin
 
 import models.Celebrity
-import play.mvc.Scope.{Session, Flash}
-import play.templates.Html
+import play.api.mvc.Results.Ok
 
 object GetInventoryBatchDetail {
 
-  def getCelebrityInventoryBatchDetail(celebrity: Celebrity,
-                                       inventoryBatch: Option[models.InventoryBatch] = None)(implicit flash: Flash, session: Session): Html = {
+  def getCelebrityInventoryBatchDetail(celebrity: Celebrity, inventoryBatch: Option[models.InventoryBatch] = None
+      )(implicit authToken: egraphs.authtoken.AuthenticityToken, flash: play.api.mvc.Flash): play.api.mvc.Result = {
+    
     val isCreate = inventoryBatch.isEmpty
 
-    val errorFields = Option(flash.get("errors")).map(errString => errString.split(',').toList)
+    val errorFields = flash.get("errors").map(errString => errString.split(',').toList)
+
     val fieldDefaults: (String => String) = {
       (paramName: String) => paramName match {
-        case "inventoryBatchId" => flash.get("inventoryBatchId")
-        case "numInventory" => flash.get("numInventory")
-        case "startDate" => flash.get("startDate")
-        case "endDate" => flash.get("endDate")
-        case _ =>
-          Option(flash.get(paramName)).getOrElse("")
+        case "inventoryBatchId" => flash.get("inventoryBatchId").getOrElse("")
+        case "numInventory" => flash.get("numInventory").getOrElse("")
+        case "startDate" => flash.get("startDate").getOrElse("")
+        case "endDate" => flash.get("endDate").getOrElse("")
+        case _ => flash.get(paramName).getOrElse("")
       }
     }
 
@@ -31,8 +31,7 @@ object GetInventoryBatchDetail {
       ps.sortWith((tuple1, tuple2) => tuple1._1.id < tuple2._1.id)
     }
 
-    // Render the page
-    views.html.Application.admin.admin_inventorybatchdetail(
+    Ok(views.html.Application.admin.admin_inventorybatchdetail(
       isCreate = isCreate,
       celebrity = celebrity,
       errorFields = errorFields,
@@ -40,7 +39,7 @@ object GetInventoryBatchDetail {
       inventoryBatch = inventoryBatch,
       products = products,
       remainingInventory = inventoryBatch.map(ib => ib.getRemainingInventory)
-    )
+    ))
   }
 
 }

@@ -1,12 +1,11 @@
 @(isCreate: Boolean, celebrity: models.Celebrity, errorFields: Option[List[String]], fields: (String) => String, product: Option[models.Product] = None, isTestMode: Boolean = false
-)(/* implicit session: play.mvc.Scope.Session */)
+)(implicit authToken: egraphs.authtoken.AuthenticityToken)
 
 @import controllers.WebsiteControllers
-@import services.Utils.lookupUrl
-@import views.html.Application.tags.authenticityToken
+@import egraphs.authtoken.AuthenticityToken.safeForm
 @import views.html.Application.tags.errorMessage
-@import views.html.Application.content_base
 @import views.html.Application.tags.formField
+@import views.html.Application.content_base
 
 @content_base(title="Admin - Product Details", body=body, head=head)
 
@@ -26,8 +25,9 @@
 }
 
 @postProduct = @{
-  lookupUrl("WebsiteControllers.postCelebrityProductAdmin", Map("celebrityId" -> celebrity.id.toString))
+  null
 }
+@** routes.WebsiteControllers.postCelebrityProductAdmin(celebrityId = celebrity.id) *@
 
 @productPhoto = {
   @product.map(p => p.photo.resizedWidth(600).getSaved(services.blobs.AccessPolicy.Public).url).getOrElse("")
@@ -48,9 +48,8 @@
   </h1>
   <div class="form row">
     <div class="span12 form-column">
-      <form id="product-form" method="POST" action='@postProduct' onsubmit="return confirmPost()" enctype="multipart/form-data">
+      @safeForm('id -> "product-detail", 'method -> "POST", 'action -> "postProduct.url", 'onsubmit -> "return confirmPost()", 'enctype -> "multipart/form-data") {
         <fieldset>
-          @authenticityToken()
           <input id="productId" name="productId" type="hidden" value="@fields("productId")">
           <input id="publishedStatus" name="publishedStatusString" type="hidden" value="@fields("publishedStatusString")">
           <legend>Product Details</legend>
@@ -68,7 +67,7 @@
             label="Product Description",
             inputType="text",
             width="span4",
-            help=Some(Html("Will be displayed on the product's page.")),
+            help=Some("Will be displayed on the product's page."),
             fields=fields
           )
 
@@ -86,7 +85,7 @@
               label="Override inventory?",
               inputType="checkbox",
               width="checkbox",
-              help=Some(Html("Demo'ers should leave this unchecked")),
+              help=Some("Demo'ers should leave this unchecked"),
               fields=fields
             )
           }
@@ -95,11 +94,9 @@
         <fieldset>
           <legend>egraph presentation: media</legend>
           
-          @formField(id="productImage", label="Product Photo", inputType="file", width="span8", help=Some(photoHelp), fields=fields)
-          @photoHelp = "Must be JPG or PNG with minimum dimensions of 1024x1024. Will be cropped."
+          @formField(id="productImage", label="Product Photo", inputType="file", width="span8", help=Some("Must be JPG or PNG with minimum dimensions of 1024x1024. Will be cropped."), fields=fields)
 
-          @formField(id="signingOriginX", label="Signing Origin X", inputType="text", width="span4", help=Some(signingOriginXHelp), fields=fields)
-          @signingOriginXHelp = { Between 0 and 575 }
+          @formField(id="signingOriginX", label="Signing Origin X", inputType="text", width="span4", help=Some("Between 0 and 575"), fields=fields)
           @{/** @formField(id="signingOriginY", label="Signing Origin Y", inputType="text", width="span4", fields=fields) */}
           <input id="signingOriginY" name="signingOriginY" type="hidden" value="0">
 
@@ -108,7 +105,7 @@
             label="Product Plaque Icon",
             inputType="file",
             width="span8",
-            help=Some(Html("Must be transparent PNG with square dimensions. Will be cropped.")),
+            help=Some("Must be transparent PNG with square dimensions. Will be cropped."),
             fields=fields
           )
         </fieldset>
@@ -119,7 +116,7 @@
             label="Title",
             inputType="text",
             width="span4",
-            help=Some(Html("e.g. <em>The Story</em>")),
+            help=Some("e.g. <em>The Story</em>"),
             fields=fields
           )
 
@@ -139,7 +136,7 @@
             @errorMessage(errorFields)
           </div>
         </fieldset>
-      </form>
+      }
       <div class="span2 profile-thumbnail" >
         <legend>Current Photo</legend>
         <img src="@productPhoto">

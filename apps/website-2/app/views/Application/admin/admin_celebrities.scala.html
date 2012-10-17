@@ -36,7 +36,7 @@
 }
 
 @navContent = {
-	@safeForm('id -> "logout-form", 'method -> "POST", 'action -> postLogout.url, 'enctype -> "multipart/form-data") {
+	@safeForm('id -> "logout-form", 'method -> "POST", 'action -> postLogout.url) {
     <div>
       <button type="submit" id="logout-button" class="btn fade in">Logout</button>
     </div>
@@ -49,12 +49,12 @@
     Celebrity administration
   </h1>
   <h2>Featured</h2>
-  @safeForm('id -> "postFeaturedCelebrities-form", 'method -> "POST", 'action -> postFeaturedCelebrities.url, 'enctype -> "multipart/form-data") {
+  @safeForm('id -> "postFeaturedCelebrities-form", 'method -> "POST", 'action -> postFeaturedCelebrities.url) {
     <div class="row">
       <div class="span6">
         <select data-placeholder="Choose celebrities to feature" name="celebIds" style="width:350px" multiple class="chzn-select">
           @for(celeb <- allCelebrities) {
-            <option value="@celeb.id.toString" @if(celeb.isFeatured){selected="selected"}>
+            <option name=@{"celebIds[" + (celeb.id-1) + "]"} value="@celeb.id" @if(celeb.isFeatured){selected="selected"}>
               @celeb.publicName
             </option>
           }

@@ -7,7 +7,8 @@ import play.api.mvc.Results.{Ok, Redirect}
 import services.http.ControllerMethod
 import services.http.filters.HttpFilters
 import controllers.PaginationInfoFactory
-
+import play.api.data._
+import play.api.data.Forms._
 
 private[controllers] trait GetCelebritiesAdminEndpoint {
   this: Controller =>
@@ -43,8 +44,7 @@ private[controllers] trait GetCelebritiesAdminEndpoint {
   def getCelebritiesBySearchAdmin = controllerMethod.withForm() { implicit authToken =>
     httpFilters.requireAdministratorLogin.inSession() { (admin, account) =>
       Action { implicit request =>
-        //TODO(play2 wchan)
-        val query = ""
+        val query = Form(single("query" -> text)).bindFromRequest.fold(hasErrors => "", success => success)
         val listings = celebrityStore.findByTextQuery(query)
         Ok(views.html.Application.admin.admin_celebrities_search(celebrityListings = listings))
       }

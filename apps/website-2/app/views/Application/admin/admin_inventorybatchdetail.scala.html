@@ -5,15 +5,14 @@
   inventoryBatch: Option[models.InventoryBatch] = None,
   products : Iterable[(models.Product, Boolean)],
   remainingInventory: Option[Int] = None
-)(/* implicit session: play.mvc.Scope.Session */)
+)(implicit authToken: egraphs.authtoken.AuthenticityToken)
 
 @import controllers.WebsiteControllers
 @import services.Finance.TypeConversions._
-@import services.Utils.lookupUrl
-@import views.html.Application.tags.authenticityToken
+@import egraphs.authtoken.AuthenticityToken.safeForm
 @import views.html.Application.tags.errorMessage
-@import views.html.Application.content_base
 @import views.html.Application.tags.formField
+@import views.html.Application.content_base
 
 @content_base(title="Admin - Inventory Batch Details", body=body, head=head)
 
@@ -22,8 +21,9 @@
 }
 
 @postInventoryBatch = @{
-  lookupUrl("WebsiteControllers.postCelebrityInventoryBatchAdmin", Map("celebrityId" -> celebrity.id.toString))
+  null
 }
+@** routes.WebsiteControllers.postCelebrityInventoryBatchAdmin(celebrityId = celebrity.id) *@
 
 @body = {
 <div class="admin-content">
@@ -33,9 +33,8 @@
   @views.html.Application.tags.valueRow(label="Remaining Inventory", value=remainingInventory.getOrElse(""))
   <div class="form row">
     <div class="span12 form-column">
-      <form id="inventorybatch-form" method="POST" action='@postInventoryBatch' enctype="multipart/form-data">
+      @safeForm('id -> "inventorybatch-form", 'method -> "POST", 'action -> "postInventoryBatch.url") {
         <fieldset>
-          @authenticityToken()
           <input id="inventoryBatchId" name="inventoryBatchId" type="hidden" value="@fields("inventoryBatchId")">
           <legend>Inventory Batch Details</legend>
 
@@ -52,7 +51,7 @@
             label="Start Date",
             inputType="text",
             width="span4",
-            help=Some(Html("yyyy-mm-dd")),
+            help=Some("yyyy-mm-dd"),
             fields=fields
           )
 
@@ -61,7 +60,7 @@
             label="End Date",
             inputType="text",
             width="span4",
-            help=Some(Html("yyyy-mm-dd")),
+            help=Some("yyyy-mm-dd"),
             fields=fields
           )
         </fieldset>
@@ -90,7 +89,7 @@
             @errorMessage(errorFields)
           </div>
         </fieldset>
-      </form>
+      }
     </div>
   </div>
 </div>

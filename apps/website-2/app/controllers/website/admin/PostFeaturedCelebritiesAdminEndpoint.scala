@@ -24,9 +24,8 @@ trait PostFeaturedCelebritiesAdminEndpoint {
   def postFeaturedCelebrities = postController() {
     httpFilters.requireAdministratorLogin.inSession() { (admin, account) =>
       Action { implicit request =>
-        //TODO(play2 wchan)
-//        celebrityStore.updateFeaturedCelebrities(celebIds)
-        celebrityStore.updateFeaturedCelebrities(List.empty[Long])
+        val celebIds = for (celebId <- request.body.asFormUrlEncoded.get("celebIds")) yield celebId.toLong
+        celebrityStore.updateFeaturedCelebrities(celebIds)
         Redirect(GetCelebritiesAdminEndpoint.location)
       }
     }

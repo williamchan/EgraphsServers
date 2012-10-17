@@ -1,9 +1,8 @@
 @(isCreate: Boolean, errorFields: Option[List[String]], fields: (String) => String, celebrity: Option[models.Celebrity] = None
-)(/* implicit session: play.mvc.Scope.Session */)
+)(implicit authToken: egraphs.authtoken.AuthenticityToken)
 
 @import controllers.WebsiteControllers
-@import services.Utils.lookupUrl
-@import views.html.Application.tags.authenticityToken
+@import egraphs.authtoken.AuthenticityToken.safeForm
 @import views.html.Application.tags.errorMessage
 @import views.html.Application.tags.formField
 @import views.html.Application.content_base
@@ -21,12 +20,17 @@
 }
 
 @postSendCelebrityWelcomeEmailAdmin(celebrityId: Long) = @{
-  lookupUrl("WebsiteControllers.postSendCelebrityWelcomeEmailAdmin", Map("celebrityId" -> celebrityId.toString))
+	null
 }
 
 @postCelebrity = @{
-  lookupUrl("WebsiteControllers.postCelebrityAdmin")
+	null
 }
+
+@**
+routes.WebsiteControllers.postSendCelebrityWelcomeEmailAdmin(celebrityId = celebrityId)
+routes.WebsiteControllers.postCelebrityAdmin
+*@
 
 @profilePhoto = {
   @celebrity.map(c => c.profilePhoto.resizedWidth(80).getSaved(services.blobs.AccessPolicy.Public).url).getOrElse("")
@@ -47,9 +51,8 @@
   </h1>
   <div class="form row">
     <div class="span12 form-column">
-      <form id="admin-celebrity-detail" method="POST" action='@postCelebrity' enctype="multipart/form-data">
+    	@safeForm('id -> "admin-celebrity-detail", 'method -> "POST", 'action -> "postCelebrity.url", 'enctype -> "multipart/form-data") {
         <fieldset>
-          @authenticityToken()
           <input id="celebrityId" name="celebrityId" type="hidden" value="@fields("celebrityId")">
           <input id="publishedStatus" name="publishedStatusString" type="hidden" value="@fields("publishedStatusString")">
           <legend>Account Details</legend>
@@ -60,14 +63,11 @@
           <legend>Celebrity Details</legend>
           @formField(id="publicName", label="Public Name", inputType="text", width="span4", fields=fields)
 
-          @formField(id="casualName", label="Casual Name", inputType="text", width="span4", help=Some(casualNameHelp), fields=fields)
-          @casualNameHelp = "e.g. \"David\" instead of \"David Price\""
+          @formField(id="casualName", label="Casual Name", inputType="text", width="span4", help=Some("e.g. \"David\" instead of \"David Price\""), fields=fields)
 
-          @formField(id="organization", label="Organization", inputType="text", width="span4", help=Some(organizationHelp), fields=fields)
-          @organizationHelp = "e.g. \"Major League Baseball\""
-
-          @formField(id="roleDescription", label="Role Description", inputType="text", width="span4", help=Some(roleHelp), fields=fields)
-          @roleHelp = "e.g. \"Pitcher, Tampa Bay Rays\""
+          @formField(id="organization", label="Organization", inputType="text", width="span4", help=Some("e.g. \"Major League Baseball\""), fields=fields)
+          
+          @formField(id="roleDescription", label="Role Description", inputType="text", width="span4", help=Some("e.g. \"Pitcher, Tampa Bay Rays\""), fields=fields)
 
         </fieldset>
           <div class="clearfix">
@@ -82,14 +82,11 @@
         </fieldset>
         <fieldset>
           <legend>Images</legend>
-          @formField(id="profileImage", label="Profile Photo", inputType="file", width="span8", help=Some(profileImageHelp), fields=fields)
-          @profileImageHelp = "Must be square dimensions of at least 100x100."
+          @formField(id="profileImage", label="Profile Photo", inputType="file", width="span8", help=Some("Must be square dimensions of at least 100x100."), fields=fields)
 
-          @formField(id="landingPageImage", label="Landing Page Image", inputType="file", width="span8", help=Some(landingPageImageHelp), fields=fields)
-          @landingPageImageHelp = "Must be JPG at least 1500x556. Keep that 2.7 aspect ratio for best results. Should be center-balanced photo of celebrity."
+          @formField(id="landingPageImage", label="Landing Page Image", inputType="file", width="span8", help=Some("Must be JPG at least 1500x556. Keep that 2.7 aspect ratio for best results. Should be center-balanced photo of celebrity."), fields=fields)
 
-          @formField(id="logoImage", label="Team/Org Logo", inputType="file", width="span8", help=Some(logoImageHelp), fields=fields)
-          @logoImageHelp = "Must be PNP of square dimensions of at least 40x40. Logo of team or organization."
+          @formField(id="logoImage", label="Team/Org Logo", inputType="file", width="span8", help=Some("Must be PNP of square dimensions of at least 40x40. Logo of team or organization."), fields=fields)
 
         </fieldset>
         <fieldset>
@@ -101,20 +98,19 @@
             @errorMessage(errorFields)
           </div>
         </fieldset>
-      </form>
+      }
       <div>
         @for(presentCelebrity <- celebrity) {
-        <hr/>
-        <form method="POST" action='@postSendCelebrityWelcomeEmailAdmin(presentCelebrity.id)'>
-          <fieldset>
-          @authenticityToken()
-          @formField(id="celebrityEmail", label="E-mail address", inputType="text",
-            help = Some( new Html("Specify the email address for the welcome letter.") ), width="span4", fields=fields)
-          <div class="actions">
-            <input class="btn primary fade in" type="submit" value="Send Welcome Email"/>
-          </div>
-          </fieldset>
-        </form>
+	        <hr/>
+	        @safeForm('id -> "postSendCelebrityWelcomeEmail", 'method -> "POST", 'action -> "postSendCelebrityWelcomeEmailAdmin(presentCelebrity.id).url") {
+	          <fieldset>
+	          @formField(id="celebrityEmail", label="E-mail address", inputType="text",
+	            help = Some("Specify the email address for the welcome letter."), width="span4", fields=fields)
+	          <div class="actions">
+	            <input class="btn primary fade in" type="submit" value="Send Welcome Email"/>
+	          </div>
+	          </fieldset>
+	        }
         }
       </div>
       <div class="span2 profile-thumbnail" >
