@@ -20,7 +20,7 @@ private[controllers] trait GetCelebrityInventoryBatchesAdminEndpoint {
   private def inventoryBatchQueryFilters = instance[InventoryBatchQueryFilters]
 
   def getCelebrityInventoryBatchesAdmin(celebrityId: Long, filter: String = "all", page: Int = 1) = controllerMethod() {
-    httpFilters.requireAdministratorLogin.inSession() { (admin, account) =>
+    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       httpFilters.requireCelebrityId(celebrityId) { (celebrity) =>
         Action { implicit request =>
           val query = filter match {

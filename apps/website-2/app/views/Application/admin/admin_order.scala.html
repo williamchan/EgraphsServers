@@ -6,12 +6,13 @@
   recipientEmail: String,
   celebrityName: String,
   fulfillingEgraph: Option[models.Egraph],
-  fields: (String) => String)(/* implicit session: play.mvc.Scope.Session */)
+  fields: (String) => String
+)(implicit authToken: egraphs.authtoken.AuthenticityToken)
 
 @import controllers.WebsiteControllers
 @import services.Finance.TypeConversions._
-@import services.Utils.lookupUrl
-@import views.html.Application.tags.authenticityToken
+@import egraphs.authtoken.AuthenticityToken.safeForm
+@import views.html.Application.tags.errorMessage
 @import views.html.Application.tags.formField
 @import views.html.Application.tags.valueRow
 @import views.html.Application.content_base
@@ -23,27 +24,26 @@
 }
 
 @postOrder = @{
-  lookupUrl("WebsiteControllers.postOrderAdmin", Map("orderId" -> order.id.toString))
+  null
 }
+@** routes.WebsiteControllers.postOrderAdmin(orderId = order.id) *@
 
 @productUrl() = @{
-  lookupUrl("WebsiteControllers.getProductAdmin", Map("productId" -> order.productId.toString))
+  routes.WebsiteControllers.getProductAdmin(productId = order.productId)
 }
 
 @reviewControls = {
   <div class="form">
     @if(order.reviewStatus == models.enums.OrderReviewStatus.PendingAdminReview) {
-      <form id="approve-form" method="POST" action='@postOrder' enctype="application/x-www-form-urlencoded">
-        @authenticityToken()
+      @safeForm('id -> "approve-form", 'method -> "POST", 'action -> "postOrder.url") {
         <input name="orderId" type="hidden" value="@order.id">
         <input name="action" type="hidden" value="approve">
         <div class="actions">
           <h3>Approve so that Celebrity can fulfill</h3>
           <button type="submit" id="approve-button" class="btn primary fade in">Approve</button>
         </div>
-      </form>
-      <form id="reject-form" method="POST" action='@postOrder' enctype="application/x-www-form-urlencoded">
-        @authenticityToken()
+      }
+      @safeForm('id -> "reject-form", 'method -> "POST", 'action -> "postOrder.url") {
         <input name="orderId" type="hidden" value="@order.id">
         <input name="action" type="hidden" value="reject">
         <div class="actions">
@@ -54,9 +54,8 @@
           </div>
           <button type="submit" id="reject-button" class="btn primary fade in">Reject</button>
         </div>
-      </form>
-      <form id="editMessages-form" method="POST" action='@postOrder' enctype="application/x-www-form-urlencoded">
-        @authenticityToken()
+      }
+      @safeForm('id -> "editMessages-form", 'method -> "POST", 'action -> "postOrder.url") {
         <input name="orderId" type="hidden" value="@order.id">
         <input name="action" type="hidden" value="editMessages">
         <div class="actions">
@@ -66,33 +65,30 @@
           @formField(id="requestedMessage"  , label="Requested Message"   , inputType="text", width="span8", fields=fields)
           <button type="submit" id="editMessages-button" class="btn primary fade in">Edit Messages</button>
         </div>
-      </form>
+      }
     }
     @if(order.reviewStatus != models.enums.OrderReviewStatus.PendingAdminReview) {
-    <form id="pending-form" method="POST" action='@postOrder' enctype="application/x-www-form-urlencoded">
-      @authenticityToken()
+    @safeForm('id -> "pending-form", 'method -> "POST", 'action -> "postOrder.url") {
       <div class="actions">
         <h3>Revert back to PendingAdminReview?</h3>
         <input name="orderId" type="hidden" value="@order.id">
         <input name="action" type="hidden" value="pending">
         <button type="submit" id="pending-button" class="btn primary fade in">Revert</button>
       </div>
-    </form>
+    }
     }
     @if(order.reviewStatus == models.enums.OrderReviewStatus.ApprovedByAdmin) {
-    <form id="generateImages-form" method="POST" action='@postOrder' enctype="application/x-www-form-urlencoded">
-      @authenticityToken()
+    @safeForm('id -> "generateImages-form", 'method -> "POST", 'action -> "postOrder.url") {
       <div class="actions">
         <h3>Generate framed print JPG (and also PNG)</h3>
         <input name="orderId" type="hidden" value="@order.id">
         <input name="action" type="hidden" value="generateImages">
         <button type="submit" id="generateImages-button" class="btn primary fade in">Generate JPG and PNG</button>
       </div>
-    </form>
+    }
     }
     @if(order.paymentStatus == models.enums.PaymentStatus.Charged) {
-      <form id="refund-form" method="POST" action='@postOrder' enctype="application/x-www-form-urlencoded">
-        @authenticityToken()
+      @safeForm('id -> "refund-form", 'method -> "POST", 'action -> "postOrder.url") {
         <div class="actions">
         <h3>Refund (but not reject) this order? Be Careful.</h3>
           <input name="orderId" type="hidden" value="@order.id">
@@ -103,7 +99,7 @@
                     else {return false;}"
                   class="btn primary fade in">Refund</button>
         </div>
-      </form>
+      }
     }
   </div>
 
@@ -117,7 +113,6 @@
   <h2>Admin Review</h2>
   @valueRow(label="Review Status",        value=order.reviewStatus)
   @valueRow(label="Recipient Name",       value=order.recipientName)
-  @{/** Avoid repeating these values. */}
   @if(order.reviewStatus != models.enums.OrderReviewStatus.PendingAdminReview) {
     @valueRow(label="Message To Celebrity", value=order.messageToCelebrity)
     @valueRow(label="Requested Message",    value=order.requestedMessage)

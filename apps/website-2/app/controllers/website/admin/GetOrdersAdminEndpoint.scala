@@ -20,7 +20,7 @@ private[controllers] trait GetOrdersAdminEndpoint {
   private def orderQueryFilters = instance[OrderQueryFilters]
 
   def getOrdersAdmin(filter: String = "pendingAdminReview", page: Int = 1) = controllerMethod() {
-    httpFilters.requireAdministratorLogin.inSession() { (admin, account) =>
+    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       Action { implicit request =>
         val query = filter match {
           case "rejectedByAdmin" => orderStore.findByFilter(orderQueryFilters.rejectedByAdmin)

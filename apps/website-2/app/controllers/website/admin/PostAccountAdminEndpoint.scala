@@ -30,7 +30,7 @@ trait PostAccountAdminEndpoint {
    * For updating an existing Account.
    */
   def postAccountAdmin = postController() {
-    httpFilters.requireAdministratorLogin.inSession() { (admin, account) =>
+    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       Action { implicit request =>
         val changeAccountForm = Form(
           mapping(

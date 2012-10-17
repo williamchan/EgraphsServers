@@ -16,7 +16,7 @@ private[controllers] trait GetAccountAdminEndpoint {
   protected def celebrityStore: CelebrityStore
 
   def getAccountAdmin(accountId: Long) = controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireAdministratorLogin.inSession() { (admin, account) =>
+    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       Action { implicit request =>
         val flash = request.flash
         val errorFields = flash.get("errors").map(errString => errString.split(',').toList)

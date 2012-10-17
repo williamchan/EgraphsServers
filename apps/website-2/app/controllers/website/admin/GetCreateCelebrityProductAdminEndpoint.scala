@@ -15,7 +15,7 @@ private[controllers] trait GetCreateCelebrityProductAdminEndpoint {
   protected def httpFilters: HttpFilters
 
   def getCreateCelebrityProductAdmin(celebrityId: Long) = controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireAdministratorLogin.inSession() { (admin, account) =>
+    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       httpFilters.requireCelebrityId(celebrityId) { implicit celebrity =>
         Action { implicit request =>
           implicit val flash = request.flash

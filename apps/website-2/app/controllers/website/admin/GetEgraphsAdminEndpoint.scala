@@ -22,7 +22,7 @@ private[controllers] trait GetEgraphsAdminEndpoint {
   private def egraphQueryFilters = instance[EgraphQueryFilters]
 
   def getEgraphsAdmin(filter: String = "pendingAdminReview", page: Int = 1) = controllerMethod() {
-    httpFilters.requireAdministratorLogin.inSession() { (admin, account) =>
+    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       Action { implicit request =>
         val query = filter match {
           case "passedBiometrics" => egraphStore.getEgraphsAndResults(egraphQueryFilters.passedBiometrics)

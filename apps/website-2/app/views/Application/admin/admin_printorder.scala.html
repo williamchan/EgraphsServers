@@ -3,12 +3,13 @@
   recipientEmail: String,
   buyerEmail: String,
   egraph: Option[models.Egraph],
-  fields: (String) => String)(/* implicit session: play.mvc.Scope.Session */)
+  fields: (String) => String
+)(implicit authToken: egraphs.authtoken.AuthenticityToken)
 
 @import controllers.WebsiteControllers
 @import services.Finance.TypeConversions._
-@import services.Utils.lookupUrl
-@import views.html.Application.tags.authenticityToken
+@import egraphs.authtoken.AuthenticityToken.safeForm
+@import views.html.Application.tags.errorMessage
 @import views.html.Application.tags.formField
 @import views.html.Application.tags.valueRow
 @import views.html.Application.content_base
@@ -20,56 +21,54 @@
 }
 
 @postPrintOrder = @{
-  lookupUrl("WebsiteControllers.postPrintOrderAdmin", Map("printOrderId" -> printOrder.id.toString))
+  null
 }
+@** routes.WebsiteControllers.postPrintOrderAdmin(printOrderId = printOrder.id) *@
 
 @egraphPreviewUrl = @{
-  for (x <- egraph) yield (lookupUrl("WebsiteControllers.getEgraphAdmin", Map("egraphId" -> x.id.toString)) + "?action=preview")
+  for (x <- egraph) yield (routes.WebsiteControllers.getEgraphAdmin(egraphId = x.id).url + "?action=preview")
 }
+
 
 @adminControls = {
   @if(!printOrder.isFulfilled && egraph.isDefined) {
     <div class="form">
-      <form id="fulfill-form" method="POST" action='@postPrintOrder' enctype="application/x-www-form-urlencoded">
-        @authenticityToken()
+      @safeForm('id -> "fulfill-form", 'method -> "POST", 'action -> "postPrintOrder.url") {
         <input name="printOrderId" type="hidden" value="@printOrder.id">
         <input name="action" type="hidden" value="markFulfilled">
         <div class="actions">
           <h3>Mark this PrintOrder as shipped</h3>
           <button type="submit" id="fulfill-button" class="btn primary fade in">Mark Fulfilled</button>
         </div>
-      </form>
+      }
     </div>
   }
   @if(egraph.isDefined) {
   <div class="form">
-    <form id="framed-image-form" method="POST" action='@postPrintOrder' enctype="application/x-www-form-urlencoded">
-      @authenticityToken()
+    @safeForm('id -> "framed-image-form", 'method -> "POST", 'action -> "postPrintOrder.url") {
       <input name="printOrderId" type="hidden" value="@printOrder.id">
       <input name="action" type="hidden" value="generateFramedPrintImage">
       <div class="actions">
         <h3>Get framed print image URL... this takes a while</h3>
         <button type="submit" id="framed-image-button" class="btn primary fade in">Create framed print image</button>
       </div>
-    </form>
+    }
   </div>
   }
   @if(printOrder.pngUrl.isEmpty && egraph.isDefined) {
     <div class="form">
-      <form id="png-form" method="POST" action='@postPrintOrder' enctype="application/x-www-form-urlencoded">
-        @authenticityToken()
+      @safeForm('id -> "png-form", 'method -> "POST", 'action -> "postPrintOrder.url") {
         <input name="printOrderId" type="hidden" value="@printOrder.id">
         <input name="action" type="hidden" value="generatePNG">
         <div class="actions">
           <h3>Generate PNG... useful if you need to manually assemble a framed print image</h3>
           <button type="submit" id="png-button" class="btn primary fade in">Create PNG of egraph</button>
         </div>
-      </form>
+      }
     </div>
   }
   <div class="form">
-    <form id="editAddress-form" method="POST" action='@postPrintOrder' enctype="application/x-www-form-urlencoded">
-      @authenticityToken()
+    @safeForm('id -> "editAddress-form", 'method -> "POST", 'action -> "postPrintOrder.url") {
       <input name="printOrderId" type="hidden" value="@printOrder.id">
       <input name="action" type="hidden" value="editAddress">
       <div class="actions">
@@ -77,7 +76,7 @@
         @formField(id="shippingAddress", label="Shipping Address", inputType="text", width="span8", fields=fields)
         <button type="submit" id="editAddress-button" class="btn primary fade in">Update Address</button>
       </div>
-    </form>
+    }
   </div>
 }
 

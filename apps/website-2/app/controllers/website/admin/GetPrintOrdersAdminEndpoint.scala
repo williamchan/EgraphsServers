@@ -19,7 +19,7 @@ private[controllers] trait GetPrintOrdersAdminEndpoint {
   private def printOrderQueryFilters = instance[PrintOrderQueryFilters]
     
   def getPrintOrdersAdmin(filter: String = "unfulfilled", page: Int = 1) = controllerMethod() {
-    httpFilters.requireAdministratorLogin.inSession() { (admin, account) =>
+    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       Action { implicit request =>
         val query = filter match {
           case "unfulfilled" => printOrderStore.findByFilter(printOrderQueryFilters.unfulfilled)

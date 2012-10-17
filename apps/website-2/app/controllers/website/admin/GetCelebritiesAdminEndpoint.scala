@@ -18,7 +18,7 @@ private[controllers] trait GetCelebritiesAdminEndpoint {
   protected def controllerMethod: ControllerMethod
 
   def getCelebritiesAdmin(page: Int = 1) = controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireAdministratorLogin.inSession() { (admin, account) =>
+    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       Action { implicit request =>
         val query = celebrityStore.getCelebrityAccounts
         val pagedQuery: (Iterable[(Celebrity, Account)], Int, Option[Int]) = services.Utils.pagedQuery(select = query, page = page)
@@ -42,7 +42,7 @@ private[controllers] trait GetCelebritiesAdminEndpoint {
    * @return CelebrityListings of matching result.
    */
   def getCelebritiesBySearchAdmin = controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireAdministratorLogin.inSession() { (admin, account) =>
+    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       Action { implicit request =>
         val query = Form(single("query" -> text)).bindFromRequest.fold(hasErrors => "", success => success)
         val listings = celebrityStore.findByTextQuery(query)

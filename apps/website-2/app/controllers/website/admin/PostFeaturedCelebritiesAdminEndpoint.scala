@@ -22,7 +22,7 @@ trait PostFeaturedCelebritiesAdminEndpoint {
    * @return a Redirect to the celebrities admin endpoint.
    */
   def postFeaturedCelebrities = postController() {
-    httpFilters.requireAdministratorLogin.inSession() { (admin, account) =>
+    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       Action { implicit request =>
         val celebIds = for (celebId <- request.body.asFormUrlEncoded.get("celebIds")) yield celebId.toLong
         celebrityStore.updateFeaturedCelebrities(celebIds)

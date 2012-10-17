@@ -15,7 +15,7 @@ private[controllers] trait GetRootAdminEndpoint {
 
   def getRootAdmin = controllerMethod() {
     controllerMethod() {
-      httpFilters.requireAdministratorLogin.inSession() { (admin, account) =>
+      httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
         Action { implicit request =>
           Redirect(GetCelebritiesAdminEndpoint.location)
         }

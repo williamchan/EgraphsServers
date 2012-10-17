@@ -41,7 +41,7 @@ private[controllers] trait GetToolsAdminEndpoint {
   // Controllers
   //
   def getToolsAdmin = controllerMethod(WithDBConnection(readOnly=false)) {
-    httpFilters.requireAdministratorLogin.inSession() { (admin, account) =>
+    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       Action { implicit request =>
         val action: String = Form("action" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm)
         action match {

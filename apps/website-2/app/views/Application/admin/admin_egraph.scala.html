@@ -1,9 +1,9 @@
 @(egraph: models.Egraph, voiceResult: Option[models.vbg.VBGVerifySample], signatureResult: Option[models.xyzmo.XyzmoVerifyUser]
-)(/* implicit session: play.mvc.Scope.Session */)
+)(implicit authToken: egraphs.authtoken.AuthenticityToken)
 
 @import controllers.WebsiteControllers
-@import services.Utils.lookupUrl
-@import views.html.Application.tags.authenticityToken
+@import egraphs.authtoken.AuthenticityToken.safeForm
+@import views.html.Application.tags.errorMessage
 @import views.html.Application.tags.formField
 @import views.html.Application.tags.valueRow
 @import views.html.Application.content_base
@@ -17,32 +17,31 @@
 @order = @{egraph.order}
 
 @postEgraph = @{
-  lookupUrl("WebsiteControllers.postEgraphAdmin", Map("egraphId" -> egraph.id.toString))
+  null
 }
+@** routes.WebsiteControllers.postEgraphAdmin(egraphId = egraph.id) *@
 
 @approveControls = {
 <div class="form">
   @if(egraph.isApprovable) {
-  <form id="approve-form" method="POST" action='@postEgraph' enctype="application/x-www-form-urlencoded">
-    @authenticityToken()
+  @safeForm('id -> "approve-form", 'method -> "POST", 'action -> "postEgraph.url") {
     <input name="egraphId" type="hidden" value="@egraph.id">
     <input name="egraphState" type="hidden" value="@models.enums.EgraphState.ApprovedByAdmin">
     <div class="actions">
       <h3>Mark verified for content and authenticity</h3>
       <button type="submit" id="approve-button" class="btn primary fade in">Approve Egraph</button>
     </div>
-  </form>
+  }
   }
   @if(egraph.isRejectable) {
-  <form id="reject-form" method="POST" action='@postEgraph' enctype="application/x-www-form-urlencoded">
-    @authenticityToken()
+  @safeForm('id -> "reject-form", 'method -> "POST", 'action -> "postEgraph.url") {
     <input name="egraphId" type="hidden" value="@egraph.id">
     <input name="egraphState" type="hidden" value="@models.enums.EgraphState.RejectedByAdmin">
     <div class="actions">
       <h3>Reject due to questionable content or authenticity</h3>
       <button type="submit" id="reject-button" class="btn primary fade in">Reject Egraph</button>
     </div>
-  </form>
+  }
   }
 </div>
 }
@@ -50,15 +49,14 @@
 @publishControls = {
 @if(egraph.isPublishable) {
 <div class="form">
-  <form id="publish-form" method="POST" action='@postEgraph' enctype="application/x-www-form-urlencoded">
-    @authenticityToken()
+  @safeForm('id -> "publish-form", 'method -> "POST", 'action -> "postEgraph.url") {
     <input name="egraphId" type="hidden" value="@egraph.id">
     <input name="egraphState" type="hidden" value="@models.enums.EgraphState.Published">
     <div class="actions">
       <h3>Publish this Egraph. Also sends email to recipient.</h3>
       <button type="submit" id="publish-button" class="btn primary fade in">Publish Egraph</button>
     </div>
-  </form>
+  }
 </div>
 }
 }

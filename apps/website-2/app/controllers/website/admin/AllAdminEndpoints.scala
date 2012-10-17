@@ -19,13 +19,13 @@ trait AllAdminEndpoints
   with GetCreateCelebrityAdminEndpoint
   with GetCreateCelebrityInventoryBatchAdminEndpoint
   with GetCreateCelebrityProductAdminEndpoint
-//  with GetEgraphAdminEndpoint
+  with GetEgraphAdminEndpoint
   with GetEgraphsAdminEndpoint
   with GetInventoryBatchAdminEndpoint
   with GetLoginAdminEndpoint
-//  with GetOrderAdminEndpoint
+  with GetOrderAdminEndpoint
   with GetOrdersAdminEndpoint
-//  with GetPrintOrderAdminEndpoint
+  with GetPrintOrderAdminEndpoint
   with GetPrintOrdersAdminEndpoint
   with GetProductAdminEndpoint
   with GetReportsAdminEndpoint
@@ -37,5 +37,6 @@ trait AllAdminEndpoints
   with PostLoginAdminEndpoint
 //  with PostOrderAdminEndpoint
 //  with PostPrintOrderAdminEndpoint
+  with PostSendCelebrityWelcomeEmailAdminEndpoint
   with PostFeaturedCelebritiesAdminEndpoint
 { this: Controller => }

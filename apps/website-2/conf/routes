@@ -71,16 +71,16 @@ GET      /admin/celebrities/$celebrityId<[0-9]+>/orders                   contro
 GET      /admin/celebrities/$celebrityId<[0-9]+>/products                 controllers.WebsiteControllers.getCelebrityProductsAdmin(celebrityId: Long, page: Int = 1)
 #POST    /admin/celebrities/$celebrityId<[0-9]+>/products                 controllers.WebsiteControllers.postCelebrityProductAdmin(celebrityId: Long)
 GET      /admin/celebrities/$celebrityId<[0-9]+>/products/create          controllers.WebsiteControllers.getCreateCelebrityProductAdmin(celebrityId: Long)
-#POST    /admin/celebrities/$celebrityId<[0-9]+>/sendEmail                controllers.WebsiteControllers.postSendCelebrityWelcomeEmailAdmin(celebrityId: Long)
+POST     /admin/celebrities/$celebrityId<[0-9]+>/sendEmail                controllers.WebsiteControllers.postSendCelebrityWelcomeEmailAdmin(celebrityId: Long)
 GET      /admin/egraphs                                            				controllers.WebsiteControllers.getEgraphsAdmin(filter: String = "pendingAdminReview", page: Int = 1)
-#GET     /admin/egraphs/$egraphId<[0-9]+>                                 controllers.WebsiteControllers.getEgraphAdmin(egraphId: Long)
+GET      /admin/egraphs/$egraphId<[0-9]+>                                 controllers.WebsiteControllers.getEgraphAdmin(egraphId: Long)
 #POST    /admin/egraphs/$egraphId<[0-9]+>                                 controllers.WebsiteControllers.postEgraphAdmin(egraphId: Long)
 GET      /admin/inventorybatches/$inventoryBatchId<[0-9]+>                controllers.WebsiteControllers.getInventoryBatchAdmin(inventoryBatchId: Long)
 GET      /admin/login                                              				controllers.WebsiteControllers.getLoginAdmin
 POST     /admin/login                                              				controllers.WebsiteControllers.postLoginAdmin
 GET      /admin/orders                                             				controllers.WebsiteControllers.getOrdersAdmin(filter: String = "pendingAdminReview", page: Int = 1)
-#GET     /admin/orders/$orderId<[0-9]+>                                   controllers.WebsiteControllers.getOrderAdmin
-#POST    /admin/orders/$orderId<[0-9]+>                                   controllers.WebsiteControllers.postOrderAdmin
+GET      /admin/orders/$orderId<[0-9]+>                                   controllers.WebsiteControllers.getOrderAdmin(orderId: Long)
+#POST    /admin/orders/$orderId<[0-9]+>                                   controllers.WebsiteControllers.postOrderAdmin(orderId: Long)
 GET      /admin/products/$productId<[0-9]+>                               controllers.WebsiteControllers.getProductAdmin(productId: Long)
 GET      /admin/reports                                            				controllers.WebsiteControllers.getReportsAdmin
 GET      /admin/tools                                              				controllers.WebsiteControllers.getToolsAdmin
@@ -139,7 +139,7 @@ GET     /:celebrityUrlSlug/photos/:productUrlSlug/purchase-error    controllers.
 ##
 #%{ if (play.configuration.getProperty('admin.tools.enabled') == 'full') }%
 GET     /admin/printorders                                          controllers.WebsiteControllers.getPrintOrdersAdmin(filter: String = "unfulfilled", page: Int = 1)
-#GET     /admin/printorders/{printOrderId}                           controllers.WebsiteControllers.getPrintOrderAdmin(printOrderId: Long)
+GET     /admin/printorders/{printOrderId}                           controllers.WebsiteControllers.getPrintOrderAdmin(printOrderId: Long)
 #POST    /admin/printorders/{printOrderId}                           controllers.WebsiteControllers.postPrintOrderAdmin(printOrderId: Long)
 POST    /:celebrityUrlSlug}/:productUrlSlug/buy-demo                controllers.WebsiteControllers.postBuyDemoProduct(celebrityUrlSlug: String, productUrlSlug: String)
 

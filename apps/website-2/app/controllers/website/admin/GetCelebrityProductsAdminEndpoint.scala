@@ -17,7 +17,7 @@ private[controllers] trait GetCelebrityProductsAdminEndpoint {
   protected def httpFilters: HttpFilters
 
   def getCelebrityProductsAdmin(celebrityId: Long, page: Int = 1) = controllerMethod() {
-    httpFilters.requireAdministratorLogin.inSession() { (admin, account) =>
+    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       httpFilters.requireCelebrityId(celebrityId) { (celebrity) =>
         Action { implicit request =>
           val query = celebrity.products()

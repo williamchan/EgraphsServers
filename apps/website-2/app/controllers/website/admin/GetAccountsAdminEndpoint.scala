@@ -16,7 +16,7 @@ private[controllers] trait GetAccountsAdminEndpoint {
   protected def controllerMethod: ControllerMethod
 
   def getAccountsAdmin = controllerMethod() {
-    httpFilters.requireAdministratorLogin.inSession() { (admin, account) =>
+    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       Action { implicit request =>
         val email: String = Form("email" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm)
         val account = if (!email.isEmpty) accountStore.findByEmail(email) else None

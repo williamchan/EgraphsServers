@@ -22,7 +22,7 @@ private[controllers] trait GetCelebrityEgraphsAdminEndpoint {
   private def egraphQueryFilters = instance[EgraphQueryFilters]
 
   def getCelebrityEgraphsAdmin(celebrityId: Long, filter: String = "pendingAdminReview", page: Int = 1) = controllerMethod() {
-    httpFilters.requireAdministratorLogin.inSession() { (admin, account) =>
+    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       httpFilters.requireCelebrityId(celebrityId) { (celebrity) =>
         Action { implicit request =>
           val query = filter match {
