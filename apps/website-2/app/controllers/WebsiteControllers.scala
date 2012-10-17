@@ -5,7 +5,7 @@ import play.api.mvc.Action
 import play.api.mvc.Controller
 import play.api.mvc.Results.Redirect
 import services.blobs.Blobs
-import services.mail.{BulkMail, TransactionalMail}
+import services.mail.{BulkMailList, TransactionalMail}
 import services.payment.Payment
 import models._
 import services.db.DBSession
@@ -48,7 +48,7 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
 
   override protected val blobs = instance[Blobs]
   override protected val transactionalMail = instance[TransactionalMail]
-  override protected val bulkMail = instance[BulkMail]
+  override protected val bulkMailList = instance[BulkMailList]
   override protected val payment = instance[Payment]
   override protected def schema = instance[Schema]
 

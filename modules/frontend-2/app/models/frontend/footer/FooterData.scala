@@ -1,7 +1,7 @@
 package models.frontend.footer
 
 /**
- * Data needed to fgormat the footer
+ * Data needed to format the footer
  *
  * @param aboutUsLink link to the "about us" page
  * @param faqLink link to the "faq" page
@@ -18,6 +18,5 @@ case class FooterData(
   privacyPolicyLink: String="/privacy",
   careersPolicyLink: String="/careers",
   egraphsTwitterLink: String = "http://www.twitter.com/egraphs",
-  egraphsFacebookLink: String = "http://www.facebook.com/egraphs",
-  newsletterListId: String = "cfdd92a4f5"
+  egraphsFacebookLink: String = "http://www.facebook.com/egraphs"
 )

@@ -1,7 +1,9 @@
 package services.mail
 
 import play.api.Play.current
-import com.typesafe.plugin._
+import com.typesafe.plugin.use
+import com.typesafe.plugin.MailerAPI
+import com.typesafe.plugin.MailerPlugin
 import org.apache.commons.mail.Email
 import org.apache.commons.mail.HtmlEmail
 import javax.mail.Session
@@ -14,6 +16,7 @@ import services.inject.InjectionProvider
 /** Interface for sending transactional mails. Transactional mails are  */
 trait TransactionalMail {
   def send(mail: HtmlEmail, text: Option[String] = None, html: Option[Html] = None)
+  protected def newEmail: MailerAPI
   
   private[mail] def toMailerAPI(email: Email): MailerAPI = {
     def addressStringsFromList(addressList: java.util.List[_]): Seq[String] = {
@@ -29,7 +32,7 @@ trait TransactionalMail {
     }
     
     // Extract the content into the MailerAPI format
-    use[MailerPlugin].email
+    newEmail
     .setSubject(email.getSubject)
     .addFrom(email.getFromAddress.getAddress)
     .setReplyTo(replyTo)
@@ -63,5 +66,7 @@ private[mail] class DefaultTransactionalMail extends TransactionalMail {
       case _ => throw new IllegalStateException("We can't send an email without either text or html in the body.")
     }
   }
+
+  override protected def newEmail: MailerAPI = use[MailerPlugin].email
 } 
 

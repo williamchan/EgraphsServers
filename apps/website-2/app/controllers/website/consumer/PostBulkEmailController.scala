@@ -3,7 +3,7 @@ package controllers.website.consumer
 import play.api.mvc.Controller
 import services.http.{POSTControllerMethod, WithoutDBConnection}
 import services.mvc.ImplicitHeaderAndFooterData
-import services.mail.BulkMail
+import services.mail.BulkMailList
 import services.http.forms.purchase.FormReaders
 import services.http.forms.Form
 import Form.Conversions._
@@ -14,11 +14,11 @@ private[controllers] trait PostBulkEmailController extends ImplicitHeaderAndFoot
   this: Controller =>
 
   protected def postController: POSTControllerMethod
-  protected def bulkMail: BulkMail
+  protected def bulkMailList: BulkMailList
   protected def formReaders: FormReaders
 
   /**
-   * Subscribe an email address to our bulkmail provider
+   * Subscribe an email address to our bulkmail list
    *
    * @return
    */
@@ -35,7 +35,7 @@ private[controllers] trait PostBulkEmailController extends ImplicitHeaderAndFoot
         errors => Ok(toJson(Map("error" -> errors.map( error => error.description).toSeq))),
         
         validForm => {
-          bulkMail.subscribeNewAsync(validForm.listId, validForm.email)  //TODO: We aren't doing anything if this fails, maybe we should do something 
+          bulkMailList.subscribeNewAsync(validForm.email)  //TODO: We aren't doing anything if this fails, maybe we should do something 
           //like store it somewhere that gets retried later since our bulk mailer service could be down..
           Ok(toJson(Map("subscribed" -> true)))
         }

@@ -3,7 +3,7 @@ package utils
 import com.google.inject.Inject
 import services.http._
 import forms.purchase.{PurchaseFormChecksFactory, FormReaders, PurchaseFormFactory}
-import services.mail.{BulkMail, TransactionalMail}
+import services.mail.{BulkMailList, TransactionalMail}
 import services.payment.Payment
 import models._
 import services.db.DBSession
@@ -59,7 +59,7 @@ case class TestWebsiteControllers @Inject()(
   override def accountPasswordResetForms = instance[AccountPasswordResetFormFactory]
   override def accountRecoverForms = instance[AccountRecoverFormFactory]
   override def blobs = instance[Blobs]
-  override def bulkMail = instance[BulkMail]
+  override def bulkMailList = instance[BulkMailList]
   override def breadcrumbData = instance[StorefrontBreadcrumbData]
   override def checkPurchaseField = instance[PurchaseFormChecksFactory]
   override def purchaseFormFactory = instance[PurchaseFormFactory]

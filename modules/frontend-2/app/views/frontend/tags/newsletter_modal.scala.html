@@ -1,4 +1,4 @@
-@(newsletterListId: String)(implicit authToken: egraphs.authtoken.AuthenticityToken)
+@(implicit authToken: egraphs.authtoken.AuthenticityToken)
 
 @import egraphs.authtoken.AuthenticityToken.safeForm
 @import views.html.frontend.tags
@@ -6,7 +6,6 @@
 
 @{/**
    Renders a modal that allows a user to signup for the Egraphs Insider mailing list.
-   newsletterListId - unique id of the mailing list this form is subscribing users to.
 */}
 
 <div class="modal signup hide fade" id="emailSignupForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -25,7 +24,6 @@
       <div>
         <label>Email:</label>
         <input class="input-xlarge" type="email" name="email" />
-        <input type="hidden" value="@newsletterListId" id="listId" name="listId"/>
       </div>
     <div>
       <button id="signup-button" type="submit" class="button">
