@@ -9,14 +9,15 @@ class XyzmoVerifyUserTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityIdLongTests[XyzmoVerifyUser]
   with CreatedUpdatedEntityTests[Long, XyzmoVerifyUser]
+  with DateShouldMatchers
   with DBTransactionPerTest {
   //
   // SavingEntityTests[XyzmoVerifyUser] methods
   //
 
-  val store = AppConfig.instance[XyzmoVerifyUserStore]
+  def store = AppConfig.instance[XyzmoVerifyUserStore]
 
-  "withVerifyUserBySignatureDynamicToDynamic_v1Response" should "populate base fields" in {
+  "withVerifyUserBySignatureDynamicToDynamic_v1Response" should "populate base fields" in new EgraphsTestApplication {
     val verifyUserBySignatureDynamicToDynamic_v1Response = new WebServiceBiometricPartStub.VerifyUserBySignatureDynamicToDynamic_v1Response
     val verifyResultInfo_v1 = new WebServiceBiometricPartStub.VerifyResultInfo_v1
     verifyUserBySignatureDynamicToDynamic_v1Response.setVerifyUserBySignatureDynamicToDynamic_v1Result(verifyResultInfo_v1)
@@ -34,7 +35,7 @@ class XyzmoVerifyUserTests extends EgraphsUnitTest
     xyzmoVerifyUser.score should be(None)
   }
 
-  "withVerifyUserBySignatureDynamicToDynamic_v1Response" should "populate isMatch and score" in {
+  "withVerifyUserBySignatureDynamicToDynamic_v1Response" should "populate isMatch and score" in new EgraphsTestApplication {
     val verifyUserBySignatureDynamicToDynamic_v1Response = new WebServiceBiometricPartStub.VerifyUserBySignatureDynamicToDynamic_v1Response
     val verifyResultInfo_v1 = new WebServiceBiometricPartStub.VerifyResultInfo_v1
     verifyUserBySignatureDynamicToDynamic_v1Response.setVerifyUserBySignatureDynamicToDynamic_v1Result(verifyResultInfo_v1)
@@ -55,7 +56,7 @@ class XyzmoVerifyUserTests extends EgraphsUnitTest
     xyzmoVerifyUser.score.get should be(100)
   }
 
-  "findByEgraph" should "return VBGVerifySample" in {
+  "findByEgraph" should "return VBGVerifySample" in new EgraphsTestApplication {
     val egraph = Egraph(orderId = TestData.newSavedOrder().id).save()
     store.findByEgraph(egraph) should be(None)
 

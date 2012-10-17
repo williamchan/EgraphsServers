@@ -9,14 +9,15 @@ class XyzmoAddUserTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityIdLongTests[XyzmoAddUser]
   with CreatedUpdatedEntityTests[Long, XyzmoAddUser]
+  with DateShouldMatchers
   with DBTransactionPerTest {
   //
   // SavingEntityTests[XyzmoAddUser] methods
   //
 
-  val store = AppConfig.instance[XyzmoAddUserStore]
+  def store = AppConfig.instance[XyzmoAddUserStore]
 
-  "withResultBase" should "populate base fields" in {
+  "withResultBase" should "populate base fields" in new EgraphsTestApplication {
     val resultBase = new WebServiceUserAndProfileStub.ResultBase
     resultBase.setBaseResult(WebServiceUserAndProfileStub.BaseResultEnum.failed)
     val errorInfo = new WebServiceUserAndProfileStub.ErrorInfo

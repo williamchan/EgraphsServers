@@ -9,14 +9,15 @@ class XyzmoEnrollDynamicProfileTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityIdLongTests[XyzmoEnrollDynamicProfile]
   with CreatedUpdatedEntityTests[Long, XyzmoEnrollDynamicProfile]
+  with DateShouldMatchers
   with DBTransactionPerTest {
   //
   // SavingEntityTests[XyzmoEnrollDynamicProfile] methods
   //
 
-  val store = AppConfig.instance[XyzmoEnrollDynamicProfileStore]
+  def store = AppConfig.instance[XyzmoEnrollDynamicProfileStore]
 
-  "withVerifyUserBySignatureDynamicToDynamic_v1Response" should "populate base fields" in {
+  "withVerifyUserBySignatureDynamicToDynamic_v1Response" should "populate base fields" in new EgraphsTestApplication {
     val enrollDynamicProfile_v1Response = new WebServiceBiometricPartStub.EnrollDynamicProfile_v1Response
     val enrollResultInfo_v1 = new WebServiceBiometricPartStub.EnrollResultInfo_v1
     enrollDynamicProfile_v1Response.setEnrollDynamicProfile_v1Result(enrollResultInfo_v1)
@@ -39,7 +40,7 @@ class XyzmoEnrollDynamicProfileTests extends EgraphsUnitTest
     xyzmoEnrollDynamicProfile.isProfileAlreadyEnrolled should be(false)
   }
 
-  "withVerifyUserBySignatureDynamicToDynamic_v1Response" should "populate result fields" in {
+  "withVerifyUserBySignatureDynamicToDynamic_v1Response" should "populate result fields" in new EgraphsTestApplication {
     val enrollDynamicProfile_v1Response = new WebServiceBiometricPartStub.EnrollDynamicProfile_v1Response
     val enrollResultInfo_v1 = new WebServiceBiometricPartStub.EnrollResultInfo_v1
     enrollDynamicProfile_v1Response.setEnrollDynamicProfile_v1Result(enrollResultInfo_v1)
@@ -67,15 +68,15 @@ class XyzmoEnrollDynamicProfileTests extends EgraphsUnitTest
     xyzmoEnrollDynamicProfile.isProfileAlreadyEnrolled should be(false)
   }
 
-  "withVerifyUserBySignatureDynamicToDynamic_v1Response" should "populate enrollmentSampleIds" in {
+  "withVerifyUserBySignatureDynamicToDynamic_v1Response" should "populate enrollmentSampleIds" in new EgraphsTestApplication {
     // todo(wchan): write this test
   }
 
-  "withVerifyUserBySignatureDynamicToDynamic_v1Response" should "populate rejectedSignaturesSummary" in {
+  "withVerifyUserBySignatureDynamicToDynamic_v1Response" should "populate rejectedSignaturesSummary" in new EgraphsTestApplication {
     // todo(wchan): write this test
   }
 
-  "findByEgraph" should "return VBGVerifySample" in {
+  "findByEgraph" should "return VBGVerifySample" in new EgraphsTestApplication {
     val enrollmentBatch = EnrollmentBatch(celebrityId = TestData.newSavedCelebrity().id).save()
     store.findByEnrollmentBatch(enrollmentBatch) should be(None)
 

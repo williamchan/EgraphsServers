@@ -9,14 +9,15 @@ class XyzmoAddProfileTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityIdLongTests[XyzmoAddProfile]
   with CreatedUpdatedEntityTests[Long, XyzmoAddProfile]
+  with DateShouldMatchers
   with DBTransactionPerTest {
   //
   // SavingEntityTests[XyzmoAddProfile] methods
   //
 
-  val store = AppConfig.instance[XyzmoAddProfileStore]
+  def store = AppConfig.instance[XyzmoAddProfileStore]
 
-  "withProfile_Add_v1Response" should "populate base fields" in {
+  "withProfile_Add_v1Response" should "populate base fields" in new EgraphsTestApplication {
     val profile_Add_v1Response = new WebServiceUserAndProfileStub.Profile_Add_v1Response
     val profileInfoResult_v1 = new WebServiceUserAndProfileStub.ProfileInfoResult_v1
     profile_Add_v1Response.setProfile_Add_v1Result(profileInfoResult_v1)
@@ -33,7 +34,7 @@ class XyzmoAddProfileTests extends EgraphsUnitTest
     xyzmoAddProfile.xyzmoProfileId should be(None)
   }
 
-  "withProfile_Add_v1Response" should "populate xyzmoProfileId" in {
+  "withProfile_Add_v1Response" should "populate xyzmoProfileId" in new EgraphsTestApplication {
     val profile_Add_v1Response = new WebServiceUserAndProfileStub.Profile_Add_v1Response
     val profileInfoResult_v1 = new WebServiceUserAndProfileStub.ProfileInfoResult_v1
     profile_Add_v1Response.setProfile_Add_v1Result(profileInfoResult_v1)

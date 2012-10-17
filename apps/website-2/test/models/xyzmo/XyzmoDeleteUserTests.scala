@@ -9,14 +9,15 @@ class XyzmoDeleteUserTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityIdLongTests[XyzmoDeleteUser]
   with CreatedUpdatedEntityTests[Long, XyzmoDeleteUser]
+  with DateShouldMatchers
   with DBTransactionPerTest {
   //
   // SavingEntityTests[XyzmoDeleteUser] methods
   //
 
-  val store = AppConfig.instance[XyzmoDeleteUserStore]
+  def store = AppConfig.instance[XyzmoDeleteUserStore]
 
-  "withResultBase" should "populate base fields" in {
+  "withResultBase" should "populate base fields" in new EgraphsTestApplication {
     val resultBase = new WebServiceUserAndProfileStub.ResultBase
     resultBase.setBaseResult(WebServiceUserAndProfileStub.BaseResultEnum.failed)
     val errorInfo = new WebServiceUserAndProfileStub.ErrorInfo
