@@ -20,15 +20,13 @@
 }
 
 @postSendCelebrityWelcomeEmailAdmin(celebrityId: Long) = @{
-	null
+	routes.WebsiteControllers.postSendCelebrityWelcomeEmailAdmin(celebrityId = celebrityId)
 }
 
 @postCelebrity = @{
 	null
 }
-
 @**
-routes.WebsiteControllers.postSendCelebrityWelcomeEmailAdmin(celebrityId = celebrityId)
 routes.WebsiteControllers.postCelebrityAdmin
 *@
 
@@ -102,7 +100,7 @@ routes.WebsiteControllers.postCelebrityAdmin
       <div>
         @for(presentCelebrity <- celebrity) {
 	        <hr/>
-	        @safeForm('id -> "postSendCelebrityWelcomeEmail", 'method -> "POST", 'action -> "postSendCelebrityWelcomeEmailAdmin(presentCelebrity.id).url") {
+	        @safeForm('id -> "postSendCelebrityWelcomeEmail", 'method -> "POST", 'action -> postSendCelebrityWelcomeEmailAdmin(presentCelebrity.id).url) {
 	          <fieldset>
 	          @formField(id="celebrityEmail", label="E-mail address", inputType="text",
 	            help = Some("Specify the email address for the welcome letter."), width="span4", fields=fields)

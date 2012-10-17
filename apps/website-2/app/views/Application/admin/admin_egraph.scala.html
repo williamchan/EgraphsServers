@@ -17,14 +17,13 @@
 @order = @{egraph.order}
 
 @postEgraph = @{
-  null
+  routes.WebsiteControllers.postEgraphAdmin(egraphId = egraph.id)
 }
-@** routes.WebsiteControllers.postEgraphAdmin(egraphId = egraph.id) *@
 
 @approveControls = {
 <div class="form">
   @if(egraph.isApprovable) {
-  @safeForm('id -> "approve-form", 'method -> "POST", 'action -> "postEgraph.url") {
+  @safeForm('id -> "approve-form", 'method -> "POST", 'action -> postEgraph.url) {
     <input name="egraphId" type="hidden" value="@egraph.id">
     <input name="egraphState" type="hidden" value="@models.enums.EgraphState.ApprovedByAdmin">
     <div class="actions">
@@ -34,7 +33,7 @@
   }
   }
   @if(egraph.isRejectable) {
-  @safeForm('id -> "reject-form", 'method -> "POST", 'action -> "postEgraph.url") {
+  @safeForm('id -> "reject-form", 'method -> "POST", 'action -> postEgraph.url) {
     <input name="egraphId" type="hidden" value="@egraph.id">
     <input name="egraphState" type="hidden" value="@models.enums.EgraphState.RejectedByAdmin">
     <div class="actions">
@@ -49,7 +48,7 @@
 @publishControls = {
 @if(egraph.isPublishable) {
 <div class="form">
-  @safeForm('id -> "publish-form", 'method -> "POST", 'action -> "postEgraph.url") {
+  @safeForm('id -> "publish-form", 'method -> "POST", 'action -> postEgraph.url) {
     <input name="egraphId" type="hidden" value="@egraph.id">
     <input name="egraphState" type="hidden" value="@models.enums.EgraphState.Published">
     <div class="actions">

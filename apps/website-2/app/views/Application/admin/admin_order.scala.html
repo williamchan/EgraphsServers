@@ -24,9 +24,8 @@
 }
 
 @postOrder = @{
-  null
+  routes.WebsiteControllers.postOrderAdmin(orderId = order.id)
 }
-@** routes.WebsiteControllers.postOrderAdmin(orderId = order.id) *@
 
 @productUrl() = @{
   routes.WebsiteControllers.getProductAdmin(productId = order.productId)
@@ -35,7 +34,7 @@
 @reviewControls = {
   <div class="form">
     @if(order.reviewStatus == models.enums.OrderReviewStatus.PendingAdminReview) {
-      @safeForm('id -> "approve-form", 'method -> "POST", 'action -> "postOrder.url") {
+      @safeForm('id -> "approve-form", 'method -> "POST", 'action -> postOrder.url) {
         <input name="orderId" type="hidden" value="@order.id">
         <input name="action" type="hidden" value="approve">
         <div class="actions">
@@ -43,7 +42,7 @@
           <button type="submit" id="approve-button" class="btn primary fade in">Approve</button>
         </div>
       }
-      @safeForm('id -> "reject-form", 'method -> "POST", 'action -> "postOrder.url") {
+      @safeForm('id -> "reject-form", 'method -> "POST", 'action -> postOrder.url) {
         <input name="orderId" type="hidden" value="@order.id">
         <input name="action" type="hidden" value="reject">
         <div class="actions">
@@ -55,7 +54,7 @@
           <button type="submit" id="reject-button" class="btn primary fade in">Reject</button>
         </div>
       }
-      @safeForm('id -> "editMessages-form", 'method -> "POST", 'action -> "postOrder.url") {
+      @safeForm('id -> "editMessages-form", 'method -> "POST", 'action -> postOrder.url) {
         <input name="orderId" type="hidden" value="@order.id">
         <input name="action" type="hidden" value="editMessages">
         <div class="actions">
@@ -68,7 +67,7 @@
       }
     }
     @if(order.reviewStatus != models.enums.OrderReviewStatus.PendingAdminReview) {
-    @safeForm('id -> "pending-form", 'method -> "POST", 'action -> "postOrder.url") {
+    @safeForm('id -> "pending-form", 'method -> "POST", 'action -> postOrder.url) {
       <div class="actions">
         <h3>Revert back to PendingAdminReview?</h3>
         <input name="orderId" type="hidden" value="@order.id">
@@ -78,7 +77,7 @@
     }
     }
     @if(order.reviewStatus == models.enums.OrderReviewStatus.ApprovedByAdmin) {
-    @safeForm('id -> "generateImages-form", 'method -> "POST", 'action -> "postOrder.url") {
+    @safeForm('id -> "generateImages-form", 'method -> "POST", 'action -> postOrder.url) {
       <div class="actions">
         <h3>Generate framed print JPG (and also PNG)</h3>
         <input name="orderId" type="hidden" value="@order.id">
@@ -88,7 +87,7 @@
     }
     }
     @if(order.paymentStatus == models.enums.PaymentStatus.Charged) {
-      @safeForm('id -> "refund-form", 'method -> "POST", 'action -> "postOrder.url") {
+      @safeForm('id -> "refund-form", 'method -> "POST", 'action -> postOrder.url) {
         <div class="actions">
         <h3>Refund (but not reject) this order? Be Careful.</h3>
           <input name="orderId" type="hidden" value="@order.id">

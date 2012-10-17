@@ -33,10 +33,10 @@ trait AllAdminEndpoints
 //  with PostCelebrityAdminEndpoint
   with PostCelebrityInventoryBatchAdminEndpoint
 //  with PostCelebrityProductAdminEndpoint
-//  with PostEgraphAdminEndpoint
+  with PostEgraphAdminEndpoint
   with PostLoginAdminEndpoint
-//  with PostOrderAdminEndpoint
-//  with PostPrintOrderAdminEndpoint
+  with PostOrderAdminEndpoint
+  with PostPrintOrderAdminEndpoint
   with PostSendCelebrityWelcomeEmailAdminEndpoint
   with PostFeaturedCelebritiesAdminEndpoint
 { this: Controller => }

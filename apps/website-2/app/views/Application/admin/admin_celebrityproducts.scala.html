@@ -8,9 +8,9 @@
 
 @content_base(title="Admin - Products", body=body, head=head)
 
-@{/** @getCreateCelebrityProduct = @{
-  lookupUrl("WebsiteControllers.getCreateCelebrityProductAdmin", Map("celebrityId" -> celebrity.id.toString))
-}*/}
+@getCreateCelebrityProduct = @{
+  routes.WebsiteControllers.getCreateCelebrityProductAdmin(celebrityId = celebrity.id)
+}
 
 @head = {
 <script src='@RemoteAssets.at("twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
@@ -21,9 +21,9 @@
   <h1>
     @celebrity.publicName's Products @paginationInfo.totalResultsStr
   </h1>
-  @{/** <form method="link" action="@getCreateCelebrityProduct">
+  <form method="link" action="@getCreateCelebrityProduct">
     <input class="btn primary fade in" type="submit" value="New Product"/>
-  </form>*/}
+  </form>
   <table>
     <tr>
       <th></th>
