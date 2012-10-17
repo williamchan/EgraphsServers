@@ -10,13 +10,13 @@ class OrderReport @Inject()(schema: Schema) extends Report {
   override val reportName = "order-report"
 
   def report(): File = {
-    import schema.{orders, customers, products, celebrities, egraphs}
+    import schema.{orders, customers, accounts, products, celebrities, egraphs}
 
-    val orderViews = join(orders, customers, customers, products, celebrities, egraphs.leftOuter)(
-      (order, buyer, recipient, product, celebrity, egraph) =>
-        select(order, buyer, recipient, product, celebrity, egraph)
+    val orderViews = join(orders, customers, accounts, customers, products, celebrities, egraphs.leftOuter)(
+      (order, buyer, buyerAccount, recipient, product, celebrity, egraph) =>
+        select(order, buyer, buyerAccount, recipient, product, celebrity, egraph)
           orderBy (order.id asc)
-          on(order.buyerId === buyer.id, order.recipientId === recipient.id, order.productId === product.id, product.celebrityId === celebrity.id, order.id === egraph.map(_.orderId))
+          on(order.buyerId === buyer.id, buyer.id === buyerAccount.customerId, order.recipientId === recipient.id, order.productId === product.id, product.celebrityId === celebrity.id, order.id === egraph.map(_.orderId))
     )
 
     val headerLine = tsvLine(
@@ -32,6 +32,7 @@ class OrderReport @Inject()(schema: Schema) extends Report {
       "celebrityName",
       "buyerid",
       "buyername",
+      "buyeremail",
       "recipientid",
       "recipientname",
       "candidateegraphid",
@@ -42,10 +43,11 @@ class OrderReport @Inject()(schema: Schema) extends Report {
     for (orderView <- orderViews) {
       val order = orderView._1
       val buyer = orderView._2
-      val recipient = orderView._3
-      val product = orderView._4
-      val celebrity = orderView._5
-      val candidateEgraph = orderView._6
+      val buyerAccount = orderView._3
+      val recipient = orderView._4
+      val product = orderView._5
+      val celebrity = orderView._6
+      val candidateEgraph = orderView._7
       tsv.append(tsvLine(
         order.id,
         order.amountPaidInCurrency,
@@ -59,6 +61,7 @@ class OrderReport @Inject()(schema: Schema) extends Report {
         celebrity.publicName,
         buyer.id,
         buyer.name,
+        buyerAccount.email,
         recipient.id,
         recipient.name,
         candidateEgraph.map(_.id).getOrElse(""),

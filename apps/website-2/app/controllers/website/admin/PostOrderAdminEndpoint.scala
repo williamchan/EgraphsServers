@@ -22,6 +22,10 @@ trait PostOrderAdminEndpoint { this: Controller =>
   protected def postController: POSTControllerMethod
   protected def httpFilters: HttpFilters
   protected def orderStore: OrderStore
+  protected def egraphStore: EgraphStore
+  
+  import services.AppConfig.instance
+  private def egraphQueryFilters = instance[EgraphQueryFilters]
 
   def postOrderAdmin(orderId: Long) = postController() {
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
@@ -57,28 +61,27 @@ trait PostOrderAdminEndpoint { this: Controller =>
               }
               // TODO(wchan): This should go away once there is exactly one PrintOrder record for every print order
               case "generateImages" => {
-                val errorOrBlobUrl = for (
-                	fulfilledOrder <- orderStore.findFulfilledWithId(orderId).toRight("No fulfilled order with ID" + orderId + "found").right
-                ) yield {
-                  val FulfilledOrder(order, egraph) = fulfilledOrder
-                  val pngUrl = egraph.getSavedEgraphUrlAndImage(LandscapeFramedPrint.targetEgraphWidth)._1
-                  val framedPrintImageUrl = egraph.getFramedPrintImageUrl
-                  val csv = PrintManufacturingInfo.toCSVLine(buyerEmail = order.buyer.account.email,
-                  	shippingAddress = "",
-                  	partnerPhotoFile = egraph.framedPrintFilename)
-                  <html>
-                    <body>
-                      <a href={pngUrl} target="_blank">{pngUrl}</a>
-                      <br/>
-                      <a href={framedPrintImageUrl} target="_blank">{framedPrintImageUrl}</a>
-                      <br/>
-                      {PrintManufacturingInfo.headerCSVLine}
-                      <br/>
-                      {csv}
-                    </body>
-                  </html>
-                }
-                errorOrBlobUrl.fold(error => InternalServerError(error), url => Ok(url))
+                Ok(egraphStore.findByOrder(orderId, egraphQueryFilters.publishedOrApproved).headOption match {
+                  case None => <html><body>A published or approved egraph is required.</body></html>
+                  case Some(egraph) => {
+                    val pngUrl = egraph.getSavedEgraphUrlAndImage(LandscapeFramedPrint.targetEgraphWidth)._1
+                    val framedPrintImageUrl = egraph.getFramedPrintImageUrl
+                    val csv = PrintManufacturingInfo.toCSVLine(buyerEmail = order.buyer.account.email,
+                    	shippingAddress = "",
+                    	partnerPhotoFile = egraph.framedPrintFilename)
+                    <html>
+                      <body>
+                        <a href={pngUrl} target="_blank">{pngUrl}</a>
+                        <br/>
+                        <a href={framedPrintImageUrl} target="_blank">{framedPrintImageUrl}</a>
+                        <br/>
+                        {PrintManufacturingInfo.headerCSVLine}
+                        <br/>
+                        {csv}
+                      </body>
+                    </html>
+                  }
+                })
               }
               case _ => Forbidden("Unsupported operation")
             }
