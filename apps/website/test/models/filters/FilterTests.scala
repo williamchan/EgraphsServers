@@ -1,8 +1,6 @@
 package models.filters
 
-import models.filters._
 import utils._
-import services.http.DBTransaction
 import services.AppConfig
 
 
@@ -49,17 +47,22 @@ class FilterTests extends EgraphsUnitTest
     exception.getLocalizedMessage should include("Filter: publicname must be specified")
   }
 
-//  "Filter" should "return all associated FilterValues" in {
-//
-//    val filter = newEntity
-//    val filterValue = generateFilterValue
-//
-//    val filterWithAssociatedValue = filter.include(filterValue).save()
-//
-//    assert(filterWithAssociatedValue.filterValues.contrains(filterValue))
-//  }
+  "Filter" should "return an associated value" in {
+    val filter = TestData.newSavedFilter
+    val filterValue = TestData.newSavedFilterValue(filter.id)
+    val filterValues = filter.filterValues
+    filterValues.exists(fv => fv.id == filterValue.id) should be (true)
+  }
 
-  private def generateFilterValue : FilterValue =
-    new FilterValue(name = TestData.generateUsername(), publicname = TestData.generateUsername())
+  "Filter" should "return all associated values" in {
+    val filter = TestData.newSavedFilter
+    val newFilterValues = for ( i <- 0 until 10) yield TestData.newSavedFilterValue(filter.id)
+    val retrievedFilterValues = filter.filterValues
 
+    retrievedFilterValues.size should be (newFilterValues.size)
+
+    newFilterValues.map(fv =>
+      retrievedFilterValues.exists(rfv => rfv.id == fv.id) should be (true)
+    )
+  }
 }

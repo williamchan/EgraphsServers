@@ -34,6 +34,10 @@ create table CelebrityFilterValues(
   created timestamp not null
 );
 
+create unique index idxabb31213 on FilterValueRelationship (filterId,filterValueId);
+
+
+
 -- !Downs
 
 DROP TABLE CelebrityFilterValues;

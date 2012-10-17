@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat
 import org.joda.time.DateTime
 import models._
 import enums.{EgraphState, PublishedStatus}
+import filters.{FilterValue, Filter}
 import play.libs.Codec
 import org.apache.commons.lang.RandomStringUtils
 
@@ -89,6 +90,14 @@ object TestData {
     acct.copy(celebrityId = Some(celeb.id)).save()
 
     celeb
+  }
+
+  def newSavedFilter : Filter = {
+    Filter(name = TestData.generateUsername(), publicname = TestData.generateUsername()).save()
+  }
+
+  def newSavedFilterValue(filterId: Long) : FilterValue = {
+    FilterValue(name = TestData.generateUsername(), publicname = TestData.generateUsername(), filterId = filterId).save()
   }
 
   private def newProduct(celebrity: Celebrity): Product = {

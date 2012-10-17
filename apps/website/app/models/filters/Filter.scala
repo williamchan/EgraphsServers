@@ -5,7 +5,9 @@ import com.google.inject.{Provider, Inject}
 import db.{Schema, KeyedCaseClass, SavesWithLongKey}
 import java.sql.Timestamp
 import services.Time
-import models.{SavesCreatedUpdated, HasCreatedUpdated, CelebrityStore}
+import models._
+import org.squeryl.Query
+import org.squeryl.dsl.ManyToMany
 
 
 case class FilterServices @Inject() (
@@ -48,13 +50,9 @@ case class Filter(
     services.filterStore.save(this)
   }
 
-  def include(filterValue: FilterValue) : Filter = {
-    this
+  def filterValues : Query[FilterValue] = {
+    services.filterValueStore.findByFilterId(id)
   }
-
-//  def filterValues : List[FilterValue] = {
-//    services.filterValueStore.findByFilterId(id)
-//  }
 
   //
   // KeyedCaseClass[Long] methods
@@ -70,6 +68,10 @@ class FilterStore @Inject() (
   with SavesCreatedUpdated[Long,Filter]
 {
   import org.squeryl.PrimitiveTypeMode._
+
+  def filters(filterValue: FilterValue): Query[Filter] with ManyToMany[Filter, FilterValueRelationship] = {
+    schema.filterValueRelationships.left(filterValue)
+  }
 
   //
   // SavesWithLongKey[Filter] methods

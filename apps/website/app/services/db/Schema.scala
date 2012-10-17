@@ -67,7 +67,13 @@ class Schema @Inject()(
       celebrity.bio is dbType("text")
     )
   )
+
   val celebrityFilterValues = table[CelebrityFilterValue]
+  on(celebrityFilterValues) (celebrityFilterValue =>
+    declare(
+      columns(celebrityFilterValue.celebrityId, celebrityFilterValue.filterValueId) are unique
+    )
+  )
 
   val customers = table[Customer]
   on(customers)(customer => declare(customer.username is unique))
@@ -91,7 +97,9 @@ class Schema @Inject()(
   on(filters) (filter => declare( filter.name is unique))
   val filterValues = table[FilterValue]
   on(filterValues) (filterValue => declare( filterValue.name is unique))
-  val filterValueRelationships = table[FilterValueRelationship]
+
+  val filterValueRelationships =
+    manyToManyRelation(filterValues, filters).via[FilterValueRelationship]((fv,f,fvr) => (fvr.filterValueId === fv.id, fvr.filterId === f.id))
 
 
   val inventoryBatches = table[InventoryBatch]

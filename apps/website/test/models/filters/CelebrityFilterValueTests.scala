@@ -2,6 +2,7 @@ package models.filters
 
 import utils._
 import services.AppConfig
+import models.Celebrity
 
 
 class CelebrityFilterValueTests extends EgraphsUnitTest
@@ -36,6 +37,7 @@ class CelebrityFilterValueTests extends EgraphsUnitTest
       filterValueId = filterValue.id
     )
   }
+
   //
   // Test cases
   //
@@ -44,5 +46,24 @@ class CelebrityFilterValueTests extends EgraphsUnitTest
     val exception = intercept[IllegalArgumentException] {CelebrityFilterValue().save()}
     exception.getLocalizedMessage should include("CelebrityFilterValue: celebrity id must be specified")
   }
+
+  "CelebrityFilterValue" should "require a filter value id" in {
+    val exception = intercept[IllegalArgumentException] {CelebrityFilterValue(celebrityId = 5).save()}
+    exception.getLocalizedMessage should include("CelebrityFilterValue: filter value id must be specified")
+  }
+
+  "CelebrityFilterValue" should "return all filterValues associated with a celebrity" in {
+
+  }
+}
+
+object FilterData {
+
+//  def generateTaggedCelebrity : (Celebrity, Filter, FilterValue, FilterValueRelationship, CelebrityFilterValue) = {
+//    val celeb = TestData.newSavedCelebrity()
+//    val filter = Filter
+//
+//  }
+
 
 }
