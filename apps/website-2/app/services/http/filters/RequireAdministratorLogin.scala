@@ -6,12 +6,9 @@ import play.api.mvc.Action
 import play.api.mvc.BodyParser
 import play.api.mvc.BodyParsers.parse
 import play.api.mvc.Result
-import play.api.mvc.Results.Forbidden
+import play.api.mvc.Results.{Forbidden, Redirect}
 import services.http.SafePlayParams.Conversions.paramsToOptionalParams
-import models.Administrator
-import models.AdministratorStore
-import models.Account
-import models.AccountStore
+import models._
 import services.http.EgraphsSession
 
 // TODO: PLAY20 migration. Test and comment this summbitch.
@@ -29,9 +26,7 @@ class RequireAdministratorLogin @Inject() (adminStore: AdministratorStore, accou
         actionFactory(admin, account).apply(request)      
       }
       
-      // TODO: PLAY20 migration actually redirect this to the reverse-route of GetLoginAdminEndpoint
-      //   instead of returning  a forbidden.
-      maybeResult.getOrElse(noAdminAccessResult)
+      maybeResult.getOrElse(Redirect(controllers.website.admin.GetLoginAdminEndpoint.url()))
     }
   } 
 
@@ -42,12 +37,7 @@ class RequireAdministratorLogin @Inject() (adminStore: AdministratorStore, accou
         this.apply(adminId, parser)(actionFactory).apply(request)
       }
       
-      maybeResult.getOrElse(noAdminAccessResult)
+      maybeResult.getOrElse(Redirect(controllers.website.admin.GetLoginAdminEndpoint.url()))
     }
   }
-  
-  //
-  // Private members
-  //
-  private val noAdminAccessResult = Forbidden("This feature requires admin access")
 }
