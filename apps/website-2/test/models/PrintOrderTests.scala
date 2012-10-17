@@ -10,6 +10,7 @@ class PrintOrderTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityIdLongTests[PrintOrder]
   with CreatedUpdatedEntityTests[Long, PrintOrder]
+  with DateShouldMatchers
   with DBTransactionPerTest {
 
   private val store = AppConfig.instance[PrintOrderStore]

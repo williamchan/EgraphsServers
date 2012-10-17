@@ -8,9 +8,10 @@ class CashTransactionTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityIdLongTests[CashTransaction]
   with CreatedUpdatedEntityTests[Long, CashTransaction]
+  with DateShouldMatchers
   with DBTransactionPerTest
 {
-  val store = AppConfig.instance[CashTransactionStore]
+  def store = AppConfig.instance[CashTransactionStore]
 
   //
   // SavingEntityTests[CashTransaction] methods
@@ -38,12 +39,12 @@ class CashTransactionTests extends EgraphsUnitTest
   // Test cases
   //
 
-  "CashTransaction" should "require certain fields" in {
+  "CashTransaction" should "require certain fields" in new EgraphsTestApplication {
     val exception = intercept[IllegalArgumentException] {CashTransaction().save()}
     exception.getLocalizedMessage should include("CashTransaction: type must be specified")
   }
 
-  "A CashTransaction" should "have the correct cash value and currency type" in {
+  "A CashTransaction" should "have the correct cash value and currency type" in new EgraphsTestApplication {
     val amount: BigDecimal = 20.19
     val transaction = CashTransaction(amountInCurrency=amount)
 

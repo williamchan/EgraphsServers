@@ -1,6 +1,6 @@
 package models
 
-import play.libs.Codec
+import egraphs.playutils.Encodings.Base64
 import utils._
 import services.AppConfig
 import services.blobs.Blobs
@@ -11,12 +11,13 @@ class EnrollmentSampleTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityIdLongTests[EnrollmentSample]
   with CreatedUpdatedEntityTests[Long, EnrollmentSample]
+  with DateShouldMatchers
   with DBTransactionPerTest {
   //
   // SavingEntityTests[EnrollmentSample] methods
   //
 
-  val store = AppConfig.instance[EnrollmentSampleStore]
+  private def store = AppConfig.instance[EnrollmentSampleStore]
 
   def newEntity = {
     val celebrity = TestData.newSavedCelebrity()
@@ -40,23 +41,23 @@ class EnrollmentSampleTests extends EgraphsUnitTest
     )
   }
 
-  "save" should "save signatureStr and voiceStr to Blobstore" in {
+  "save" should "save signatureStr and voiceStr to Blobstore" in new EgraphsTestApplication {
     val signatureStr = TestConstants.shortWritingStr
     val voiceStr = TestConstants.fakeAudioStr()
     val saved = newEntity.save(signatureStr = signatureStr, voiceStr = voiceStr)
 
     saved.getSignatureJson should be(signatureStr)
-    Codec.encodeBASE64(saved.getWav) should be (voiceStr)
+    Base64.encode(saved.getWav) should be (voiceStr)
   }
   
-  "getSignatureJson and getWav" should "handle edge cases gracefully" in {
+  "getSignatureJson and getWav" should "handle edge cases gracefully" in new EgraphsTestApplication {
     val saved = newEntity.save()
     saved.getSignatureJson should be("")
     saved.getWav should be (new Array[Byte](0))
   }
 
-  "putSignatureXml" should "save to blobstore at SignatureXmlURL" in {
-    val xyzmoSignatureDataContainer = TestHelpers.getStringFromFile(Play.getFile("test/files/xyzmo_signature1.xml"))
+  "putSignatureXml" should "save to blobstore at SignatureXmlURL" in new EgraphsTestApplication {
+    val xyzmoSignatureDataContainer = TestHelpers.getStringFromFile(resourceFile("xyzmo_signature1.xml"))
 
     val saved = newEntity.save()
     saved.putSignatureXml(xyzmoSignatureDataContainer = xyzmoSignatureDataContainer)

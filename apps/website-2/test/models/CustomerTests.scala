@@ -4,15 +4,17 @@ import enums.OrderReviewStatus
 import utils._
 import services.{Utils, Time, AppConfig}
 import exception.InsufficientInventoryException
+import services.config.ConfigFileProxy
 
 class CustomerTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityIdLongTests[Customer]
   with CreatedUpdatedEntityTests[Long, Customer]
+  with DateShouldMatchers
   with DBTransactionPerTest
 {
-  val customerStore = AppConfig.instance[CustomerStore]
-  val usernameHistoryStore = AppConfig.instance[UsernameHistoryStore]
+  def customerStore = AppConfig.instance[CustomerStore]
+  def usernameHistoryStore = AppConfig.instance[UsernameHistoryStore]
 
   //
   // SavingEntityTests[Account] methods
@@ -38,12 +40,12 @@ class CustomerTests extends EgraphsUnitTest
   //
   // Test cases
   //
-  "Customer" should "require certain fields" in {
+  "Customer" should "require certain fields" in new EgraphsTestApplication {
     val exception = intercept[IllegalArgumentException] {Customer().save()}
     exception.getLocalizedMessage should include("Customer: name must be specified")
   }
 
-  "A customer" should "produce Orders that are properly configured" in {
+  "A customer" should "produce Orders that are properly configured" in new EgraphsTestApplication {
     val (buyer, recipient, product) = savedBuyerRecipientAndProduct()
 
     val order = buyer.buy(product, recipient=recipient)
@@ -54,33 +56,34 @@ class CustomerTests extends EgraphsUnitTest
     order.amountPaid should be (product.price)
   }
 
-  it should "make itself the recipient if no recipient is specified" in {
+  it should "make itself the recipient if no recipient is specified" in new EgraphsTestApplication {
     val (buyer, _, product) = savedBuyerRecipientAndProduct()
 
     buyer.buy(product).recipientId should be (buyer.id)
   }
 
-  "buy" should "set inventoryBatchId on the Order" in {
+  "buy" should "set inventoryBatchId on the Order" in new EgraphsTestApplication {
     val (buyer, recipient, product) = savedBuyerRecipientAndProduct()
 
     val order = buyer.buy(product, recipient = recipient).save()
     order.inventoryBatchId should be(product.inventoryBatches.head.id)
   }
 
-  "buy" should "create an order whose approval status depends on play config's adminreview.skip" in {
+  "buy" should "create an order whose approval status depends on play config's adminreview.skip" in new EgraphsTestApplication {
     // Set up
     val (buyer, recipient, product) = savedBuyerRecipientAndProduct()
-
-    val buyerWithAdminSkip = buyer.copy(
-      services=buyer.services.copy(playConfig=Utils.properties("adminreview.skip" -> "true"))
-    )
+    
+    val mockConfig = mock[ConfigFileProxy]
+    mockConfig.adminreviewSkip returns true
+    
+    val buyerWithAdminSkip = buyer.copy(services=buyer.services.copy(config=mockConfig))
 
     // Run tests
     buyer.buy(product, recipient=recipient).reviewStatus should be (OrderReviewStatus.PendingAdminReview)
     buyerWithAdminSkip.buy(product, recipient=recipient).reviewStatus should be (OrderReviewStatus.ApprovedByAdmin)
   }
 
-  "buy" should "throw InsufficientInventoryException if no inventory is available" in {
+  "buy" should "throw InsufficientInventoryException if no inventory is available" in new EgraphsTestApplication {
     val (buyer, recipient, product) = savedBuyerRecipientAndProduct()
 
     val inventoryBatch = product.inventoryBatches.head.copy(numInventory = 1).save()
@@ -106,7 +109,7 @@ class CustomerTests extends EgraphsUnitTest
     (TestData.newSavedCustomer(), TestData.newSavedCustomer(), TestData.newSavedProduct())
   }
 
-  "findOrCreateByEmail" should "find or create as appropriate" in {
+  "findOrCreateByEmail" should "find or create as appropriate" in new EgraphsTestApplication {
     val (customer, account) = createCustomerWithFindOrCreateByEmail()
 
     val updatedAcct = account.services.accountStore.get(account.id)
@@ -114,7 +117,7 @@ class CustomerTests extends EgraphsUnitTest
     customerStore.findOrCreateByEmail(account.email, "joe fan") should be(customer)
   }
 
-  "findOrCreateByEmail" should "create an username when it creates." in {
+  "findOrCreateByEmail" should "create an username when it creates." in new EgraphsTestApplication {
     val (customer, _) = createCustomerWithFindOrCreateByEmail()
     usernameHistoryStore.findCurrentByCustomer(customer) should not be (None)
   }

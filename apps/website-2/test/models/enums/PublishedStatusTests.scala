@@ -1,7 +1,7 @@
 package models.enums
 
-import play.test.UnitFlatSpec
-import org.scalatest.matchers.ShouldMatchers
+
+import utils.EgraphsUnitTest
 import PublishedStatus._
 
 /**
@@ -9,7 +9,7 @@ import PublishedStatus._
  * @tparam T
  */
 trait HasPublishedStatusTests[T <: HasPublishedStatus[T]] {
-  this: UnitFlatSpec with ShouldMatchers =>
+  this: EgraphsUnitTest =>
 
   def newPublishableEntity: T
 

@@ -13,6 +13,7 @@ class ProductTests extends EgraphsUnitTest
   with SavingEntityIdLongTests[Product]
   with CreatedUpdatedEntityTests[Long, Product]
   with DBTransactionPerTest
+  with DateShouldMatchers
   with HasPublishedStatusTests[Product]
 {
   val store = AppConfig.instance[ProductStore]

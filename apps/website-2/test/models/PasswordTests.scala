@@ -1,17 +1,10 @@
 package models
 
-import play.data.validation.Validation
-import play.libs.Codec
 import utils.EgraphsUnitTest
+import egraphs.playutils.Encodings.Base64
 import org.scalatest.BeforeAndAfterEach
 
-class PasswordTests extends EgraphsUnitTest
-  with BeforeAndAfterEach
-{
-
-  override def beforeEach() {
-    Validation.clear()
-  }
+class PasswordTests extends EgraphsUnitTest {
 
   "A Password" should "recognize the correct password" in {
     Password("derp", 0).is("derp") should be (true)
@@ -31,7 +24,7 @@ class PasswordTests extends EgraphsUnitTest
     for (i <- 1 to 100) {
       val password = Password("derp", 0)
       List(password.hash, password.salt).foreach { string =>
-        Codec.decodeBASE64(string).length should be (32)
+        Base64.decode(string).length should be (32)
       }
     }
   }
@@ -39,17 +32,14 @@ class PasswordTests extends EgraphsUnitTest
   "The n-times hashing function" should "hash n times" in {
     // Set up
     import Password.hashNTimes
-    import play.libs.Crypto.passwordHash
-    import play.libs.Crypto.HashType.SHA256
+    import services.crypto.Crypto.SHA256
 
     val password = "derp"
 
     // Run tests and check expectations
     hashNTimes(password, times=0) should be (password)
-    hashNTimes(password, times=1) should be (passwordHash(password, SHA256))
-    hashNTimes(password, times=2) should be (
-      passwordHash(passwordHash(password, SHA256), SHA256)
-    )
+    hashNTimes(password, times=1) should be (SHA256.hash(password))
+    hashNTimes(password, times=2) should be (SHA256.hash(SHA256.hash(password)))    
   }
 }
 

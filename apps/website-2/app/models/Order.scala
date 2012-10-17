@@ -20,6 +20,7 @@ import controllers.website.consumer.StorefrontChoosePhotoConsumerEndpoints
 import social.{Twitter, Facebook}
 import controllers.website.GetEgraphEndpoint
 import play.api.mvc.RequestHeader
+import play.api.templates.Html
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -172,6 +173,14 @@ case class Order(
   }
 
   def sendEgraphSignedMail[A](implicit request: RequestHeader) {
+    val (email, htmlMsg, textMsg) = prepareEgraphSignedEmail
+    services.mail.send(email, Some(textMsg), Some(htmlMsg))
+  }
+  
+  // This function exists only for testing the e-mail
+  def prepareEgraphSignedEmail(implicit request: RequestHeader)
+  : (HtmlEmail, Html, String)  = 
+  {
     val celebrity = services.celebrityStore.findByOrderId(id).get
     val email = new HtmlEmail()
 
@@ -196,7 +205,8 @@ case class Order(
       celebrityName = celebrity.publicName,
       recipientName = recipientName
     ).toString()
-    services.mail.send(email, Some(textMsg), Some(htmlMsg))
+    
+    (email, htmlMsg, textMsg)
   }
 
   /**

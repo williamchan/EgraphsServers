@@ -17,7 +17,7 @@ object TestHelpers {
 
   def putPublicImageOnBlobStore() {
     import Blobs.Conversions._
-    blobs.put("a/b/derp.jpg", new File("./test/files/derp.jpg"))
+    blobs.put("a/b/derp.jpg", EgraphsUnitTest.resourceFile("derp.jpg"))
   }
 
   def fileAsBytes(filename: String): Array[Byte] = {

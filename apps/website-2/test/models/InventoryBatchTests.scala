@@ -6,9 +6,12 @@ import services.AppConfig
 class InventoryBatchTests extends EgraphsUnitTest
   with SavingEntityIdLongTests[InventoryBatch]
   with CreatedUpdatedEntityTests[Long, InventoryBatch]
-  with DBTransactionPerTest {
-  private val inventoryBatchStore = AppConfig.instance[InventoryBatchStore]
-  private val inventoryBatchQueryFilters = AppConfig.instance[InventoryBatchQueryFilters]
+  with DateShouldMatchers
+  with DBTransactionPerTest 
+{
+
+  private def inventoryBatchStore = AppConfig.instance[InventoryBatchStore]
+  private def inventoryBatchQueryFilters = AppConfig.instance[InventoryBatchQueryFilters]
 
   //
   // SavingEntityTests[InventoryBatch] methods
@@ -34,11 +37,11 @@ class InventoryBatchTests extends EgraphsUnitTest
   //
   // Test cases
   //
-  "getExpectedDate" should "return a Date 7 days after endDate" in {
-    newEntity.getExpectedDate should be(TestData.jan_08_2012)
+  "getExpectedDate" should "return a Date 7 days after endDate" in new EgraphsTestApplication {
+    newEntity.getExpectedDate.getTime should be(TestData.jan_08_2012.getTime)
   }
 
-  "findByCelebrity" should "filter by activeOnly when composed with filter" in {
+  "findByCelebrity" should "filter by activeOnly when composed with filter" in new EgraphsTestApplication {
     val celebrity = TestData.newSavedCelebrity()
 
     var inventoryBatch = TestData.newSavedInventoryBatch(celebrity = celebrity)
@@ -54,7 +57,7 @@ class InventoryBatchTests extends EgraphsUnitTest
     inventoryBatchStore.findByCelebrity(celebrityId = celebrity.id, inventoryBatchQueryFilters.activeOnly).toSeq.length should be(0)
   }
 
-  "InventoryBatch" should "associate and dissociate with Products" in {
+  "InventoryBatch" should "associate and dissociate with Products" in new EgraphsTestApplication {
     val celebrity = TestData.newSavedCelebrity()
     val inventoryBatch = TestData.newSavedInventoryBatch(celebrity = celebrity)
 
@@ -76,7 +79,7 @@ class InventoryBatchTests extends EgraphsUnitTest
     inventoryBatch.products.toSeq.length should be(0)
   }
 
-  "InventoryBatchProducts" should "be unique on inventoryBatchId and productId" in {
+  "InventoryBatchProducts" should "be unique on inventoryBatchId and productId" in new EgraphsTestApplication {
     val celebrity = TestData.newSavedCelebrity()
     val inventoryBatch = TestData.newSavedInventoryBatch(celebrity = celebrity)
     val product = TestData.newSavedProductWithoutInventoryBatch(celebrity = celebrity)
@@ -92,7 +95,7 @@ class InventoryBatchTests extends EgraphsUnitTest
     psqlException.getLocalizedMessage should startWith("ERROR: duplicate key value violates unique constraint \"idxd8791317\"")
   }
 
-  "getActiveInventoryBatches" should "return InventoryBatches with active startDate-endDate periods" in {
+  "getActiveInventoryBatches" should "return InventoryBatches with active startDate-endDate periods" in new EgraphsTestApplication {
     val celebrity = TestData.newSavedCelebrity()
     val product = TestData.newSavedProductWithoutInventoryBatch(celebrity)
     val inventoryBatch1 = InventoryBatch(celebrityId = celebrity.id, numInventory = 50, startDate = TestData.today, endDate = TestData.tomorrow).save()
@@ -111,7 +114,7 @@ class InventoryBatchTests extends EgraphsUnitTest
     inventoryBatchStore.getActiveInventoryBatches(product).toSet should be(Set(inventoryBatch1, inventoryBatch2))
   }
 
-  "selectAvailableInventoryBatch" should "return inventoryBatch with earliest endDate that has available inventory" in {
+  "selectAvailableInventoryBatch" should "return inventoryBatch with earliest endDate that has available inventory" in new EgraphsTestApplication {
     val celebrity = TestData.newSavedCelebrity()
     val ib1 = TestData.newSavedInventoryBatch(celebrity).copy(numInventory = 0, endDate = TestData.tomorrow).save()
     val ib2 = TestData.newSavedInventoryBatch(celebrity).copy(numInventory = 1, endDate = TestData.twoDaysHence).save()

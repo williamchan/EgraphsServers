@@ -10,9 +10,9 @@ class EgraphImageTests extends EgraphsUnitTest
   with DBTransactionPerTest
 {
 
-  private val blobs = AppConfig.instance[Blobs]
+  private def blobs = AppConfig.instance[Blobs]
 
-  "saveAndGetUrl" should "save Egraph image at url with handwriting rendered on product photo" in {
+  "saveAndGetUrl" should "save Egraph image at url with handwriting rendered on product photo" in new EgraphsTestApplication {
     val product = TestData.newSavedProduct()
     val order = TestData.newSavedOrder(Some(product))
     val egraph = order.newEgraph.withAssets(TestConstants.signatureStr, Some(TestConstants.messageStr), TestConstants.fakeAudio).save()
@@ -22,10 +22,10 @@ class EgraphImageTests extends EgraphsUnitTest
     val frameFittedImageUrl = frameFittedImage.saveAndGetUrl(AccessPolicy.Public)
     val blobKey = TestHelpers.getBlobKeyFromTestBlobUrl(frameFittedImageUrl)
 
-    blobs.get(blobKey).get.asByteArray.length should be(59933) // If this breaks, check the rendered image
+    blobs.get(blobKey).get.asByteArray.length should be(11331) // If this breaks, check the rendered image
   }
 
-  "saveAndGetUrl" should "use signing origin offsets" in {
+  "saveAndGetUrl" should "use signing origin offsets" in new EgraphsTestApplication {
     val product = TestData.newSavedProduct()
     val order = TestData.newSavedOrder(Some(product))
     val egraph = order.newEgraph.withAssets(TestConstants.signatureStr, Some(TestConstants.messageStr), TestConstants.fakeAudio).save()
@@ -37,11 +37,11 @@ class EgraphImageTests extends EgraphsUnitTest
     val frameFittedImageUrl = frameFittedImage.saveAndGetUrl(AccessPolicy.Public)
     val blobKey = TestHelpers.getBlobKeyFromTestBlobUrl(frameFittedImageUrl)
 
-    blobs.get(blobKey).get.asByteArray.length should be(59975) // If this breaks, check the rendered image
+    blobs.get(blobKey).get.asByteArray.length should be(11381) // If this breaks, check the rendered image
   }
 
 //  TODO: single-point strokes are not being rendered, see issue #120
-//  "saveAndGetUrl" should "render single-point stroke" in {
+//  "saveAndGetUrl" should "render single-point stroke" in new EgraphsTestApplication {
 //    val product = TestData.newSavedProduct()
 //    val order = TestData.newSavedOrder(Some(product))
 //    val stroke = "{\"x\":[[67]],\"y\":[[198]],\"t\":[[324217524]]}"
@@ -55,7 +55,7 @@ class EgraphImageTests extends EgraphsUnitTest
 //    blobs.get(blobKey).get.asByteArray.length should be(49252) // If this breaks, check the rendered image
 //  }
 
-  "saveAndGetUrl" should "render two-point stroke" in {
+  "saveAndGetUrl" should "render two-point stroke" in new EgraphsTestApplication {
     val product = TestData.newSavedProduct()
     val order = TestData.newSavedOrder(Some(product))
     val stroke = "{\"x\":[[67,80]],\"y\":[[198,220]],\"t\":[[324217524,341077816]]}"
@@ -65,11 +65,11 @@ class EgraphImageTests extends EgraphsUnitTest
     val frameFittedImage = rawSignedImage.scaledToWidth(LandscapeEgraphFrame.imageWidthPixels)
     val frameFittedImageUrl = frameFittedImage.saveAndGetUrl(AccessPolicy.Public)
     val blobKey = TestHelpers.getBlobKeyFromTestBlobUrl(frameFittedImageUrl)
-
-    blobs.get(blobKey).get.asByteArray.length should be(49270) // If this breaks, check the rendered image
+    
+    blobs.get(blobKey).get.asByteArray.length should be(1284) // If this breaks, check the rendered image
   }
 
-  "saveAndGetUrl" should "render three-point stroke" in {
+  "saveAndGetUrl" should "render three-point stroke" in new EgraphsTestApplication {
     val product = TestData.newSavedProduct()
     val order = TestData.newSavedOrder(Some(product))
     val stroke = "{\"x\":[[67,80,95]],\"y\":[[198,220,250]],\"t\":[[324217524,341077816,356683482]]}"
@@ -80,7 +80,7 @@ class EgraphImageTests extends EgraphsUnitTest
     val frameFittedImageUrl = frameFittedImage.saveAndGetUrl(AccessPolicy.Public)
     val blobKey = TestHelpers.getBlobKeyFromTestBlobUrl(frameFittedImageUrl)
 
-    blobs.get(blobKey).get.asByteArray.length should be(49292) // If this breaks, check the rendered image
+    blobs.get(blobKey).get.asByteArray.length should be(1302) // If this breaks, check the rendered image
   }
 
 }

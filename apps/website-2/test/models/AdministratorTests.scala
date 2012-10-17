@@ -9,9 +9,10 @@ class AdministratorTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityIdLongTests[Administrator]
   with CreatedUpdatedEntityTests[Long, Administrator]
+  with DateShouldMatchers
   with DBTransactionPerTest
 {
-  val adminStore = AppConfig.instance[AdministratorStore]
+  def adminStore = AppConfig.instance[AdministratorStore]
 
   //
   // SavingEntityTests[Account] methods
@@ -38,14 +39,14 @@ class AdministratorTests extends EgraphsUnitTest
   // Test cases
   //
 
-  "isAdmin" should "return true if id exists for Administrator, false otherwise" in {
+  "isAdmin" should "return true if id exists for Administrator, false otherwise" in new EgraphsTestApplication {
     val administrator = Administrator().save()
     adminStore.isAdmin(Some(administrator.id)) should be(true)
     adminStore.isAdmin(Some(Long.MaxValue)) should be(false)
     adminStore.isAdmin(None) should be(false)
   }
 
-  "authenticate" should "return Administrator with correct credentials, else return None" in {
+  "authenticate" should "return Administrator with correct credentials, else return None" in new EgraphsTestApplication {
     val pw = TestData.defaultPassword
     val acct = Account(email = "customer-" + Time.toBlobstoreFormat(Time.now) + "@egraphs.com").withPassword(pw).right.get.save()
     adminStore.authenticate(email = acct.email, passwordAttempt = pw) should be(None)
@@ -57,7 +58,7 @@ class AdministratorTests extends EgraphsUnitTest
     adminStore.authenticate(email = "wrongemail@egraphs.com", passwordAttempt = pw) should be(None)
   }
 
-  "findByEmail" should "find Administrator by email" in {
+  "findByEmail" should "find Administrator by email" in new EgraphsTestApplication {
     val acct = Account(email = "customer-" + Time.toBlobstoreFormat(Time.now) + "@egraphs.com").save()
     adminStore.findByEmail(acct.email) should be(None)
 

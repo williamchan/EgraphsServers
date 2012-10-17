@@ -11,7 +11,7 @@ trait SavingEntityIdLongTests[T <: KeyedEntity[Long]] extends SavingEntityTests[
 }
 
 trait SavingEntityIdStringTests[T <: KeyedEntity[String]] extends SavingEntityTests[String, T] { this: FlatSpec with ShouldMatchers =>
-  val newIdValue = RandomStringUtils.randomAlphanumeric(30)
+  lazy val newIdValue = RandomStringUtils.randomAlphanumeric(30)
   def improbableIdValue = RandomStringUtils.randomAlphanumeric(30)
 }
 

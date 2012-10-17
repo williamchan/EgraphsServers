@@ -31,12 +31,12 @@ class ImageUtilTests extends EgraphsUnitTest {
   }
 
   it should "overlay Andrew's signature on a JPG" in {
-    val photoImage: BufferedImage = ImageIO.read(new File("test/files/longoria/product-2.jpg"))
+    val photoImage: BufferedImage = ImageIO.read(resourceFile(longoria/product-2.jpg"))
     val signatureImage: BufferedImage = imageUtil.createSignatureImage(
       TestConstants.signatureStr, Some(TestConstants.messageStr)
     )
     val image: BufferedImage = imageUtil.createEgraphImage(signatureImage, photoImage, 0, 0)
-    val combinedImageFile = Play.getFile("test/files/egraph.jpg")
+    val combinedImageFile = resourceFile("egraph.jpg")
     ImageIO.write(image, "JPG", combinedImageFile)
     combinedImageFile.length should not be (0)
   }
@@ -44,7 +44,7 @@ class ImageUtilTests extends EgraphsUnitTest {
   "createSignatureImage" should "draw a single-point stroke" in {
     val capture = "{\n   \"x\": [[67.000000]],\n   \"y\": [[198.000000]],\n   \"t\": [[13331445844472]]\n}"
     val signatureImage: BufferedImage = imageUtil.createSignatureImage(capture, None)
-    val imageFile = new File("test/files/single-point-stroke.jpg")
+    val imageFile = resourceFile(single-point-stroke.jpg")
     ImageIO.write(signatureImage, "JPG", imageFile)
     imageFile.length should be(7477)
   }
@@ -52,7 +52,7 @@ class ImageUtilTests extends EgraphsUnitTest {
   "createSignatureImage" should "draw a two-point stroke" in {
     val capture = "{\n   \"x\": [[67.000000,95.148125]],\n   \"y\": [[198.000000,208.518494]],\n   \"t\": [[13331445844472,13331448640856]]\n}"
     val signatureImage: BufferedImage = imageUtil.createSignatureImage(capture, None)
-    val imageFile = new File("test/files/two-point-stroke.jpg")
+    val imageFile = resourceFile(two-point-stroke.jpg")
     ImageIO.write(signatureImage, "JPG", imageFile)
     imageFile.length should be(8367)
   }
@@ -60,16 +60,16 @@ class ImageUtilTests extends EgraphsUnitTest {
   "createSignatureImage" should "draw a three-point stroke" in {
     val capture = "{\n   \"x\": [[67.000000,95.148125,121.414230]],\n   \"y\": [[198.000000,208.518494,226.561005]],\n   \"t\": [[13331445844472,13331448640856,13331448883353]]\n}"
     val signatureImage: BufferedImage = imageUtil.createSignatureImage(capture, None)
-    val imageFile = Play.getFile("test/files/three-point-stroke.jpg")
+    val imageFile = resourceFile("three-point-stroke.jpg")
     ImageIO.write(signatureImage, "JPG", imageFile)
     imageFile.length should be(9239)
   }
 
   it should "overlay PNG images correctly" in {
-    val image: BufferedImage = ImageIO.read(Play.getFile("test/files/image.png"))
-    val overlay: BufferedImage = ImageIO.read(Play.getFile("test/files/overlay.png"))
+    val image: BufferedImage = ImageIO.read(Play.getFile("image.png"))
+    val overlay: BufferedImage = ImageIO.read(Play.getFile("overlay.png"))
     val combinedImage = imageUtil.createEgraphImage(overlay, image, 0, 0)
-    val combinedImageFile: File = Play.getFile("test/files/combinedImage.png")
+    val combinedImageFile: File = resourceFile("combinedImage.png")
     ImageIO.write(combinedImage, "PNG", combinedImageFile)
     combinedImageFile.length should be(138807)
   }

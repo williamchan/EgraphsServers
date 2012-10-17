@@ -4,18 +4,18 @@ import enums.OrderReviewStatus
 import utils._
 import services.{Utils, Time, AppConfig}
 import exception.InsufficientInventoryException
-import play.test.UnitFlatSpec
 import org.scalatest.matchers.ShouldMatchers
 import scala.None
 
 class UsernameTests extends EgraphsUnitTest
-with ClearsCacheAndBlobsAndValidationBefore
-with SavingEntityIdStringTests[Username]
-with CreatedUpdatedEntityTests[String, Username]
-with DBTransactionPerTest
+  with ClearsCacheAndBlobsAndValidationBefore
+  with SavingEntityIdStringTests[Username]
+  with CreatedUpdatedEntityTests[String, Username]
+  with DateShouldMatchers
+  with DBTransactionPerTest
 {
-  val usernameHistoryStore = AppConfig.instance[UsernameHistoryStore]
-  val customerStore = AppConfig.instance[CustomerStore]
+  private def usernameHistoryStore = AppConfig.instance[UsernameHistoryStore]
+  private def customerStore = AppConfig.instance[CustomerStore]
 
   //
   // SavingEntityTests[Account] methods
@@ -42,12 +42,12 @@ with DBTransactionPerTest
   //
   // Test cases
   //
-  "Username" should "require certain fields" in {
+  "Username" should "require certain fields" in new EgraphsTestApplication {
     val exception = intercept[RuntimeException] {Username().save()}
     exception.getLocalizedMessage should include("ERROR: insert or update on table \"usernames\" violates foreign key constraint")
   }
 
-  "Multiple Usernames" should "be able to belong to a customer" in {
+  "Multiple Usernames" should "be able to belong to a customer" in new EgraphsTestApplication {
     val customer = TestData.newSavedCustomer()
     val usernameHistory = usernameHistoryStore.findAllByCustomer(customer)
     usernameHistory.length should be (1)
@@ -59,7 +59,7 @@ with DBTransactionPerTest
     usernameHistoryAfter.length should be (2)
   }
 
-  "There" should "be only one permanent Username for a Customer" in {
+  "There" should "be only one permanent Username for a Customer" in new EgraphsTestApplication {
     val customer = TestData.newSavedCustomer()
     val usernameHistory = usernameHistoryStore.findAllByCustomer(customer)
     usernameHistory.length should be (1)
@@ -70,7 +70,7 @@ with DBTransactionPerTest
     exception.getLocalizedMessage should include("There can only be one permanent username")
   }
 
-  "Username" should "not be the current username for a customer if it is removed" in {
+  "Username" should "not be the current username for a customer if it is removed" in new EgraphsTestApplication {
     val customer = TestData.newSavedCustomer()
     val usernameHistory = usernameHistoryStore.findAllByCustomer(customer)
     usernameHistory.length should be (1)

@@ -6,11 +6,13 @@ import services.AppConfig
 import org.joda.money.CurrencyUnit
 import services.payment.{Charge, NiceCharge}
 import javax.mail.internet.InternetAddress
+import play.api.test.FakeRequest
 
 class OrderTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityIdLongTests[Order]
   with CreatedUpdatedEntityTests[Long, Order]
+  with DateShouldMatchers
   with DBTransactionPerTest
 {
   private val orderStore = AppConfig.instance[OrderStore]
@@ -51,27 +53,27 @@ class OrderTests extends EgraphsUnitTest
   // Test cases
   //
 
-  "Order" should "require certain fields" in {
+  "Order" should "require certain fields" in new EgraphsTestApplication {
     val exception = intercept[IllegalArgumentException] {Order().save()}
     exception.getLocalizedMessage should include ("Order: recipientName must be specified")
   }
 
-  "An order" should "create Egraphs that are properly configured" in {
+  "An order" should "create Egraphs that are properly configured" in new EgraphsTestApplication {
     val egraph = Order(id=100L).newEgraph
 
     egraph.orderId should be (100L)
     egraph.egraphState should be (EgraphState.AwaitingVerification)
   }
 
-  it should "start out not charged" in {
+  it should "start out not charged" in new EgraphsTestApplication {
     Order().paymentStatus should be (PaymentStatus.NotCharged)
   }
 
-  it should "update payment state correctly" in {
+  it should "update payment state correctly" in new EgraphsTestApplication {
     Order().withPaymentStatus(PaymentStatus.Charged).paymentStatus should be (PaymentStatus.Charged)
   }
 
-  "renderedForApi" should "serialize the correct Map for the API" in {
+  "renderedForApi" should "serialize the correct Map for the API" in new EgraphsTestApplication {
     val order = newEntity.copy(requestedMessage = Some("requestedMessage"), messageToCelebrity = Some("messageToCelebrity")).save()
     val buyer = order.buyer
 
@@ -92,7 +94,7 @@ class OrderTests extends EgraphsUnitTest
     rendered.contains("product") should be(true)
   }
 
-  "approveByAdmin" should "change reviewStatus to ApprovedByAdmin" in {
+  "approveByAdmin" should "change reviewStatus to ApprovedByAdmin" in new EgraphsTestApplication {
     val order = newEntity.save()
     order.reviewStatus should be (OrderReviewStatus.PendingAdminReview)
     intercept[IllegalArgumentException] {order.approveByAdmin(null)}
@@ -100,7 +102,7 @@ class OrderTests extends EgraphsUnitTest
     order.approveByAdmin(admin).save().reviewStatus should be (OrderReviewStatus.ApprovedByAdmin)
   }
 
-  "rejectByAdmin" should "change reviewStatus to RejectedByAdmin" in {
+  "rejectByAdmin" should "change reviewStatus to RejectedByAdmin" in new EgraphsTestApplication {
     val order = newEntity.save()
     order.reviewStatus should be (OrderReviewStatus.PendingAdminReview)
     order.rejectionReason should be (None)
@@ -112,7 +114,7 @@ class OrderTests extends EgraphsUnitTest
     rejectedOrder.rejectionReason.get should be ("It made me cry")
   }
 
-  "rejectByCelebrity" should "change reviewStatus to RejectedByCelebrity" in {
+  "rejectByCelebrity" should "change reviewStatus to RejectedByCelebrity" in new EgraphsTestApplication {
     val order = newEntity.withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
     order.reviewStatus should be (OrderReviewStatus.ApprovedByAdmin)
     order.rejectionReason should be (None)
@@ -126,7 +128,7 @@ class OrderTests extends EgraphsUnitTest
     rejectedOrder.rejectionReason.get should be ("It made me cry")
   }
 
-  "withChargeInfo" should "set the PaymentStatus, store stripe info, and create an associated CashTransaction" in {
+  "withChargeInfo" should "set the PaymentStatus, store stripe info, and create an associated CashTransaction" in new EgraphsTestApplication {
     val (will, _, _, product) = newOrderStack
     val order = will.buy(product).withPaymentStatus(PaymentStatus.Charged).save()
     CashTransaction(accountId = will.account.id, orderId = Some(order.id), stripeCardTokenId = Some("mytoken"), stripeChargeId = Some(NiceCharge.id),billingPostalCode = Some("55555"))
@@ -148,7 +150,7 @@ class OrderTests extends EgraphsUnitTest
 
   }
 
-  "refund" should "refund the Stripe charge, change the PaymentStatus to Refunded, and create a refund CashTransaction" in {
+  "refund" should "refund the Stripe charge, change the PaymentStatus to Refunded, and create a refund CashTransaction" in new EgraphsTestApplication {
     val (will, _, _, product) = newOrderStack
     val order = will.buy(product).withPaymentStatus(PaymentStatus.Charged).save()
     CashTransaction(accountId = will.account.id, orderId = Some(order.id), stripeCardTokenId = Some("mytoken"), stripeChargeId = Some(NiceCharge.id),billingPostalCode = Some("55555"))
@@ -172,15 +174,16 @@ class OrderTests extends EgraphsUnitTest
     refundTxn.currencyCode should be(CurrencyUnit.USD.getCode)
   }
 
-  "prepareEgraphsSignedEmail" should "not use celebrity's email" in {
+  "prepareEgraphsSignedEmail" should "not use celebrity's email" in new EgraphsTestApplication {
     val celebrity = TestData.newSavedCelebrity()
     val order = TestData.newSavedOrder(product = Some(TestData.newSavedProduct(celebrity = Some(celebrity))))
-    val email = order.prepareEgraphsSignedEmail()
+    implicit val request = FakeRequest()
+    val (email, _, _) = order.prepareEgraphSignedEmail
     email.getFromAddress.getAddress should not be (celebrity.account.email)
     email.getReplyToAddresses.get(0).asInstanceOf[InternetAddress].getAddress should be("noreply@egraphs.com")
   }
 
-  "findByCelebrity" should "find all of a Celebrity's orders by default" in {
+  "findByCelebrity" should "find all of a Celebrity's orders by default" in new EgraphsTestApplication {
 
     val (will, _, celebrity, product) = newOrderStack
 
@@ -196,7 +199,7 @@ class OrderTests extends EgraphsUnitTest
     allCelebOrders.toSet should be (Set(firstOrder, secondOrder, thirdOrder))
   }
 
-  it should "not find any other Celebrity's orders" in {
+  it should "not find any other Celebrity's orders" in new EgraphsTestApplication {
     val (will, _, celebrity, product) = newOrderStack
     val (_, _ , _, otherCelebrityProduct) = newOrderStack
 
@@ -209,7 +212,7 @@ class OrderTests extends EgraphsUnitTest
     celebOrders.head should be (celebOrder)
   }
 
-  it should "only find a particular Order when composed with OrderIdFilter" in {
+  it should "only find a particular Order when composed with OrderIdFilter" in new EgraphsTestApplication {
     val (will, _, celebrity, product) = newOrderStack
 
     val firstOrder = will.buy(product).save()
@@ -221,7 +224,7 @@ class OrderTests extends EgraphsUnitTest
     found.head should be (firstOrder)
   }
 
-  it should "exclude orders that have reviewStatus of PendingAdminReview, RejectedByAdmin, or RejectedByCelebrity when composed with ActionableFilter" in {
+  it should "exclude orders that have reviewStatus of PendingAdminReview, RejectedByAdmin, or RejectedByCelebrity when composed with ActionableFilter" in new EgraphsTestApplication {
     val (will, _, celebrity, product) = newOrderStack
     val actionableOrder = will.buy(product).withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
     will.buy(product).withReviewStatus(OrderReviewStatus.PendingAdminReview).save()
@@ -233,7 +236,7 @@ class OrderTests extends EgraphsUnitTest
     found.toSet should be(Set(actionableOrder))
   }
 
-  it should "exclude orders that have Published or reviewable Egraphs when composed with ActionableFilter" in {
+  it should "exclude orders that have Published or reviewable Egraphs when composed with ActionableFilter" in new EgraphsTestApplication {
     val (will, _, celebrity, product) = newOrderStack
     val admin = Administrator().save()
 
@@ -259,7 +262,7 @@ class OrderTests extends EgraphsUnitTest
     ))
   }
 
-  it should "only include orders that are pendingAdminReview when composed with that filter" in {
+  it should "only include orders that are pendingAdminReview when composed with that filter" in new EgraphsTestApplication {
     val (will, _, celebrity, product) = newOrderStack
     will.buy(product).withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
     val pendingOrder = will.buy(product).withReviewStatus(OrderReviewStatus.PendingAdminReview).save()
@@ -271,7 +274,7 @@ class OrderTests extends EgraphsUnitTest
     found.toSet should be(Set(pendingOrder))
   }
 
-  it should "only include orders that are rejected when composed with those filters" in {
+  it should "only include orders that are rejected when composed with those filters" in new EgraphsTestApplication {
     val (will, _, celebrity, product) = newOrderStack
     will.buy(product).withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
     will.buy(product).withReviewStatus(OrderReviewStatus.PendingAdminReview).save()
@@ -282,7 +285,7 @@ class OrderTests extends EgraphsUnitTest
     orderStore.findByCelebrity(celebrity.id, orderQueryFilters.rejectedByCelebrity).head should be(orderRejectedByCelebrity)
   }
 
-  "findByFilter" should "restrict by filter but not by celebrity" in {
+  "findByFilter" should "restrict by filter but not by celebrity" in new EgraphsTestApplication {
     //This test will not be able to be run in parallel with other tests as written.
     val numfound = orderStore.findByFilter().toSeq.length
 
@@ -296,7 +299,7 @@ class OrderTests extends EgraphsUnitTest
     newOrders should be(2)
   }
 
-  "countOrders" should "return count of orders made against InventoryBatches" in {
+  "countOrders" should "return count of orders made against InventoryBatches" in new EgraphsTestApplication {
     val celebrity = TestData.newSavedCelebrity()
     val customer = TestData.newSavedCustomer()
     val product1 = TestData.newSavedProductWithoutInventoryBatch(celebrity = celebrity)
@@ -313,7 +316,7 @@ class OrderTests extends EgraphsUnitTest
     orderStore.countOrders(inventoryBatchIds) should be(3)
   }
 
-  "countOrdersByInventoryBatch" should "return tuples of inventoryBatch's id and orders placed against that batch" in {
+  "countOrdersByInventoryBatch" should "return tuples of inventoryBatch's id and orders placed against that batch" in new EgraphsTestApplication {
     val celebrity = TestData.newSavedCelebrity()
     val customer = TestData.newSavedCustomer()
     val product1 = TestData.newSavedProductWithoutInventoryBatch(celebrity = celebrity)
@@ -340,7 +343,7 @@ class OrderTests extends EgraphsUnitTest
     resultForInventoryBatch2.get._2 should be(1)
   }
 
-  "isBuyerOrRecipient" should "return true if customer is either buy or recipient" in {
+  "isBuyerOrRecipient" should "return true if customer is either buy or recipient" in new EgraphsTestApplication {
     val buyer = TestData.newSavedCustomer()
     val recipient = TestData.newSavedCustomer()
     val anotherCustomer = TestData.newSavedCustomer()
@@ -352,7 +355,7 @@ class OrderTests extends EgraphsUnitTest
     order.isBuyerOrRecipient(None) should be(false)
   }
 
-  "findByCustomerId" should "return orders with the customer as intended recipient" in {
+  "findByCustomerId" should "return orders with the customer as intended recipient" in new EgraphsTestApplication {
     val buyer = TestData.newSavedCustomer()
     val recipient = TestData.newSavedCustomer()
 
@@ -370,7 +373,7 @@ class OrderTests extends EgraphsUnitTest
 
   }
 
-  "getEgraphsandOrders" should "returns orders and their associated egraphs" in {
+  "getEgraphsandOrders" should "returns orders and their associated egraphs" in new EgraphsTestApplication {
     val (buyer, recipient, celebrity, product) = newOrderStack
     val admin = Administrator().save()
     celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
@@ -390,7 +393,7 @@ class OrderTests extends EgraphsUnitTest
     queriedEgraph.id should be (egraph.id)
   }
 
-  "filterPendingOrders" should "return filtered results with user displayable egraphs" in {
+  "filterPendingOrders" should "return filtered results with user displayable egraphs" in new EgraphsTestApplication {
     val (buyer, recipient, celebrity, product) = newOrderStack
     val admin = Administrator().save()
     celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
@@ -412,7 +415,7 @@ class OrderTests extends EgraphsUnitTest
     queriedEgraph.id should be (egraph.id)
   }
 
-  "GalleryOrderFactory" should "create PendingEgraphViewModels from orders" in {
+  "GalleryOrderFactory" should "create PendingEgraphViewModels from orders" in new EgraphsTestApplication {
     val (buyer, recipient, celebrity, product) = newOrderStack
     val admin = Administrator().save()
     celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
@@ -431,7 +434,7 @@ class OrderTests extends EgraphsUnitTest
     orderIds should contain (order2.id)
   }
 
-  "redactedName" should "redact properly" in {
+  "redactedName" should "redact properly" in new EgraphsTestApplication {
     Order(recipientName="Herp Derpson-Schiller").redactedRecipientName should be ("Herp D.S.")
     Order(recipientName="Herp").redactedRecipientName should be ("Herp")
     Order(recipientName="Herp Derpson bin-Hoffberger").redactedRecipientName should be ("Herp D.b.H.")
@@ -443,7 +446,7 @@ class OrderTests extends EgraphsUnitTest
   }
 
 
-  "GalleryOrderFactory" should "create FulfilledEgraphViewModels from orders" in  {
+  "GalleryOrderFactory" should "create FulfilledEgraphViewModels from orders" in new EgraphsTestApplication {
     val (buyer, recipient, celebrity, product) = newOrderStack
     val admin = Administrator().save()
     celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
@@ -454,8 +457,8 @@ class OrderTests extends EgraphsUnitTest
 
     val results = List((order, Option(egraph)), (order, None))
 
-
-    val fulfilledViews = GalleryOrderFactory.makeFulfilledEgraphViewModel(results, "fakeappid")
+    implicit val request = FakeRequest()
+    val fulfilledViews = GalleryOrderFactory.makeFulfilledEgraphViewModel(results, "fakeappid")(request)
     //create an egraph
 
     fulfilledViews.size should be (2)

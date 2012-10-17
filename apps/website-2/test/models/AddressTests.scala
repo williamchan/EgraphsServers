@@ -7,9 +7,10 @@ class AddressTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityIdLongTests[Address]
   with CreatedUpdatedEntityTests[Long, Address]
+  with DateShouldMatchers
   with DBTransactionPerTest {
 
-  private val addressStore = AppConfig.instance[AddressStore]
+  private def addressStore = AppConfig.instance[AddressStore]
 
   //
   // SavingEntityTests[Address] methods

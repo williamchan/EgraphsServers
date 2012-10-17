@@ -1,6 +1,6 @@
 package models
 
-import services.AppConfig.instance
+import services.AppConfig
 import utils._
 import org.apache.commons.lang.RandomStringUtils
 
@@ -8,12 +8,13 @@ class BlobKeyTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityIdLongTests[BlobKey]
   with CreatedUpdatedEntityTests[Long, BlobKey]
+  with DateShouldMatchers
   with DBTransactionPerTest
 {
 
   def randomKey = RandomStringUtils.randomAlphanumeric(50)
 
-  def store = instance[BlobKeyStore]
+  def store = AppConfig.instance[BlobKeyStore]
 
   //
   // SavingEntityTests[BlobKey] methods
@@ -37,7 +38,7 @@ class BlobKeyTests extends EgraphsUnitTest
     )
   }
 
-  "key" should "be unique" in {
+  "key" should "be unique" in new EgraphsTestApplication {
     val saved = BlobKey(key = randomKey, url = "www.egraphs.com").save()
     // TODO - refactor this and other tests with this pattern for checking PSQLException
     val exception = intercept[RuntimeException] {
@@ -48,7 +49,7 @@ class BlobKeyTests extends EgraphsUnitTest
     psqlException.getLocalizedMessage should startWith("ERROR: duplicate key value violates unique constraint \"idx1810041f\"")
   }
 
-  "findByKey" should "find by Key!" in {
+  "findByKey" should "find by Key!" in new EgraphsTestApplication {
     val testKey = randomKey
     store.findByKey(testKey) should be(None)
     val blobKey = BlobKey(key = testKey, url = "www.egraphs.com").save()

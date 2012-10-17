@@ -10,10 +10,11 @@ class EgraphTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityIdLongTests[Egraph]
   with CreatedUpdatedEntityTests[Long, Egraph]
+  with DateShouldMatchers
   with DBTransactionPerTest
 {
-  private val store = AppConfig.instance[EgraphStore]
-  private val egraphQueryFilters = AppConfig.instance[EgraphQueryFilters]
+  private def store = AppConfig.instance[EgraphStore]
+  private def egraphQueryFilters = AppConfig.instance[EgraphQueryFilters]
 
   //
   // SavingEntityTests[Egraph] methods
@@ -39,13 +40,13 @@ class EgraphTests extends EgraphsUnitTest
   //
   // Test cases
   //
-  "An Egraph" should "update its state when withEgraphState is called" in {
+  "An Egraph" should "update its state when withEgraphState is called" in new EgraphsTestApplication {
     val egraph = Egraph().withEgraphState(EgraphState.FailedBiometrics)
 
     egraph.egraphState should be (EgraphState.FailedBiometrics)
   }
 
-  "approve" should "change state to ApprovedByAdmin" in {
+  "approve" should "change state to ApprovedByAdmin" in new EgraphsTestApplication {
     val admin = Administrator().save()
     Egraph().withEgraphState(EgraphState.PassedBiometrics).approve(admin).egraphState should be(EgraphState.ApprovedByAdmin)
     Egraph().withEgraphState(EgraphState.FailedBiometrics).approve(admin).egraphState should be(EgraphState.ApprovedByAdmin)
@@ -55,7 +56,7 @@ class EgraphTests extends EgraphsUnitTest
     intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.RejectedByAdmin).approve(admin)}
   }
 
-  "reject" should "change state to RejectedByAdmin" in {
+  "reject" should "change state to RejectedByAdmin" in new EgraphsTestApplication {
     val admin = Administrator().save()
     Egraph().withEgraphState(EgraphState.PassedBiometrics).reject(admin).egraphState should be(EgraphState.RejectedByAdmin)
     Egraph().withEgraphState(EgraphState.FailedBiometrics).reject(admin).egraphState should be(EgraphState.RejectedByAdmin)
@@ -65,7 +66,7 @@ class EgraphTests extends EgraphsUnitTest
     intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.RejectedByAdmin).reject(admin)}
   }
 
-  "publish" should "change state to Published" in {
+  "publish" should "change state to Published" in new EgraphsTestApplication {
     val admin = Administrator().save()
     TestData.newSavedEgraph().withEgraphState(EgraphState.ApprovedByAdmin).publish(admin).egraphState should be(EgraphState.Published)
     intercept[IllegalArgumentException] {TestData.newSavedEgraph().withEgraphState(EgraphState.PassedBiometrics).publish(null)}
@@ -75,7 +76,7 @@ class EgraphTests extends EgraphsUnitTest
     intercept[IllegalArgumentException] {TestData.newSavedEgraph().withEgraphState(EgraphState.PassedBiometrics).publish(admin)}
   }
 
-  "publish" should "fail if there is another non-rejected Egraph" in {
+  "publish" should "fail if there is another non-rejected Egraph" in new EgraphsTestApplication {
     val admin = Administrator().save()
     val order = TestData.newSavedOrder()
     Egraph().copy(orderId = order.id).save()
@@ -83,7 +84,7 @@ class EgraphTests extends EgraphsUnitTest
     intercept[IllegalArgumentException] {egraph.publish(admin)}
   }
 
-  "getSignedAt" should "return signedAt timestamp if it exists, otherwise created" in {
+  "getSignedAt" should "return signedAt timestamp if it exists, otherwise created" in new EgraphsTestApplication {
     var egraph = TestData.newSavedEgraph().copy(signedAt = Time.timestamp("2012-07-12 15:11:22.987", Time.ipadDateFormat)).save()
     egraph.signedAt should not be(None)
     egraph.signedAt should not be(Some(egraph.created))
@@ -92,7 +93,7 @@ class EgraphTests extends EgraphsUnitTest
     egraph.signedAt should be(None)
   }
 
-  "image" should "return EgraphImage with correctly configured ingredientFactory" in {
+  "image" should "return EgraphImage with correctly configured ingredientFactory" in new EgraphsTestApplication {
     val egraph = newEntity.withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.fakeAudioStr()).save()
     val egraphImage: EgraphImage = egraph.image()
     val ingredientFactory = egraphImage.ingredientFactory.apply() // This throws NPEs if signature, message, pen, or photo are uninitialized
@@ -102,7 +103,7 @@ class EgraphTests extends EgraphsUnitTest
     ingredientFactory.signingOriginY should be(0)
   }
 
-  "An Egraph" should "save and recover signature and audio data from the blobstore" in {
+  "An Egraph" should "save and recover signature and audio data from the blobstore" in new EgraphsTestApplication {
     val egraph = TestData.newSavedOrder()
       .newEgraph
       .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.fakeAudio)
@@ -112,25 +113,25 @@ class EgraphTests extends EgraphsUnitTest
     egraph.assets.audioWav.asByteArray should be (TestConstants.fakeAudio)
   }
 
-  "generateAndSaveMp3" should "store mp3 asset" in {
+  "generateAndSaveMp3" should "store mp3 asset" in new EgraphsTestApplication {
     val egraph = TestData.newSavedEgraphWithRealAudio()
     intercept[NoSuchElementException] { egraph.assets.audioMp3 }
     egraph.assets.generateAndSaveMp3()
     egraph.assets.audioMp3.asByteArray.length should be > (0)
   }
 
-  "audioMp3Url" should "lazily create mp3 asset" in {
+  "audioMp3Url" should "lazily create mp3 asset" in new EgraphsTestApplication {
     val egraph = TestData.newSavedEgraphWithRealAudio()
     intercept[NoSuchElementException] { egraph.assets.audioMp3 }
     egraph.assets.audioMp3Url.endsWith("audio.mp3") should be(true)
     egraph.assets.audioMp3.asByteArray.length should be > (0)
   }
 
-  "An Egraph" should "throw an exception if assets are accessed on an unsaved Egraph" in {
+  "An Egraph" should "throw an exception if assets are accessed on an unsaved Egraph" in new EgraphsTestApplication {
     evaluating { TestData.newSavedOrder().newEgraph.assets } should produce [IllegalArgumentException]
   }
 
-  "An Egraph Story" should "render all values correctly in the title" in {
+  "An Egraph Story" should "render all values correctly in the title" in new EgraphsTestApplication {
     val storyTemplate = EgraphStoryField.values.foldLeft("") { (accum, field) =>
       accum + "{" + field.name + "}"
     }
@@ -149,7 +150,7 @@ class EgraphTests extends EgraphsUnitTest
     story.body should be ("Herpy Derpson<a href='/Herpy-Derpson' >Erem RecipientNBA Finals 2012<a href='/Herpy-Derpson/photos/NBA-Finals-2012' >February 10, 2012February 10, 2011</a>")
   }
 
-  "getEgraphsAndResults" should "filter queries based on EgraphQueryFilters" in {
+  "getEgraphsAndResults" should "filter queries based on EgraphQueryFilters" in new EgraphsTestApplication {
     val passedBiometrics = TestData.newSavedOrder().newEgraph.withEgraphState(EgraphState.PassedBiometrics).save()
     val failedBiometrics = TestData.newSavedOrder().newEgraph.withEgraphState(EgraphState.FailedBiometrics).save()
     val approvedByAdmin = TestData.newSavedOrder().newEgraph.withEgraphState(EgraphState.ApprovedByAdmin).save()
@@ -170,7 +171,7 @@ class EgraphTests extends EgraphsUnitTest
     pendingAdminReview should contain(approvedByAdmin)
   }
 
-  "getCelebrityEgraphsAndResults" should "filter queries based on EgraphQueryFilters" in {
+  "getCelebrityEgraphsAndResults" should "filter queries based on EgraphQueryFilters" in new EgraphsTestApplication {
     val celebrity = TestData.newSavedCelebrity()
     val product = Some(TestData.newSavedProduct(Some(celebrity)))
 
