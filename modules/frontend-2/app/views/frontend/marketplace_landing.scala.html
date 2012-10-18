@@ -1,0 +1,222 @@
+@()(
+implicit session: play.mvc.Scope.Session,
+headerData: models.frontend.header.HeaderData,
+footerData: models.frontend.footer.FooterData
+)
+@import views.frontend.Utils
+@import models.frontend.egraphs._
+@baseBody = {
+
+<section id="content" class="marketplace" role="main">
+  
+  <div id="main">
+  
+    <div class="row-fluid">
+    
+      <div class="span12 masthead" role="masthead">
+      
+        <form action="#" method="get">
+            <input name="q" type="search" placeholder="Find Your Star">
+        </form>
+      
+        <img src='/public/images/masthead-marketplace.jpg'/>
+      
+      </div>
+      
+    </div>
+
+    <div class="content container clearfix">
+    
+      <div class="row-fluid">
+
+        <aside class="nav span3">
+        
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        
+        </aside>
+
+        <div class="main span9">
+
+          <ul class="top-verticals-nav">
+              <li><a href="#"><img src='/public/images/icon-logo-mlb.png' width="33" height="17"> <span>MLB</span></a></li>
+              <li><a href="#"><img src='/public/images/icon-logo-nba.png' width="12" height="27"> <span>NBA</span></a></li>
+              <li><a href="#"><img src='/public/images/icon-logo-monster-jam.png' width="31" height="25"> <span>Monster Jam</span></a></li>          
+          </ul> <!-- end .top-verticals-nav -->
+          
+          <aside class="view-options clearfix">
+          
+            <div class="sort-by">
+            
+              <h2>Sort By:</h2>
+              
+              <ol>
+                <li><a href="#" class="active">Recently Added</a></li>
+                <li><a href="#">Most Popular</a></li>
+                <li><a href="#">Price (Low to High)</a></li>
+                <li><a href="#">Price (High to Low)</a></li>
+                <li><a href="#">Alphabetical (A&dash;Z)</a></li>
+                <li><a href="#">Alphabetical (Z&dash;A)</a></li>
+              </ol>
+              
+              <form class="picker">
+                
+                <select class="chsn-select">
+                  <option selected>Recently Added</option>
+                  <option>Most Popular</option>
+                  <option>Price (Low to High)</option>
+                  <option>Price (High to Low)</option>
+                  <option>Alphabetical (A&dash;Z)</option>
+                  <option>Alphabetical (Z&dash;A)</option>               
+                </select>
+              
+              </form>
+            
+            </div> <!-- end .sort-by -->
+            
+            <div class="view-as">
+              
+              <h2>View As:</h2>
+              
+              <ul>
+                <li class="grid active"><a href="#grid"><span>Grid</span> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i></a></li>
+                <li class="list"><a href="#list"><span>List</span> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i></a></li>
+              </ul>
+            
+            </div>
+          
+          </aside> <!-- end .view-options -->
+          
+          <div class="verticals">
+
+            <section class="clearfix">
+            
+              <h1><a href="#" title="View all for: Vertical">Vertical</a></h1>
+            
+              <div class="clearfix">
+                
+                <article>
+                
+                  <figure>
+                    <a href="#"><img src="http://placehold.it/220x115" alt="FPO image"></a>
+                  </figure>
+                
+                  <hgroup>            
+                    <h2><a href="#" title="View celeb: Celeb Name">Celeb Name</a></h2> 
+                    <h3><a href="#" title="View: Celeb Category / Team">Celeb Category / Team</a></h3>
+                  </hgroup>
+                  
+                  <p><a href="#">$50&ndash;75</a></p>
+                
+                </article>
+    
+                <article>
+                
+                  <figure>            
+                    <a href="#" class="ribbon"><em>Sold Out</em></a>                   
+                    <a href="#"><img src="http://placehold.it/220x115" alt="FPO image"></a>
+                  </figure>
+                
+                  <hgroup>            
+                    <h2><a href="#" title="View celeb: Celeb Name">Celeb Name</a></h2> 
+                    <h3><a href="#" title="View: Celeb Category / Team">Celeb Category / Team</a></h3>
+                  </hgroup>
+                  
+                  <p><a href="#">$50&ndash;75</a></p>
+                
+                </article>
+    
+                <article>
+                
+                  <figure>
+                    <a href="#"><img src="http://placehold.it/220x115" alt="FPO image"></a>
+                  </figure>
+                
+                  <hgroup>            
+                    <h2><a href="#" title="View celeb: Celeb Name">Celeb Name</a></h2> 
+                    <h3><a href="#" title="View: Celeb Category / Team">Celeb Category / Team</a></h3>
+                  </hgroup>
+                  
+                  <p><a href="#">$50&ndash;75</a></p>
+                
+                </article>
+              
+              </div>
+ 
+              <p class="see-all"><em><a href="#" class="clearfix"><b>See All</b> <i><span>&darr;</span></i></a></em> </p> 
+              
+            </section> <!-- end section (vertical) -->
+          
+            <section>
+            
+              <h1><a href="#" title="View all for: Vertical">Vertical</a></h1>
+              
+              <div class="clearfix">
+              
+                <article>
+                
+                  <figure>
+                    <a href="#"><img src="http://placehold.it/220x115" alt="FPO image"></a>
+                  </figure>
+                
+                  <hgroup>            
+                    <h2><a href="#" title="View celeb: Celeb Name">Celeb Name</a></h2> 
+                    <h3><a href="#" title="View: Celeb Category / Team">Celeb Category / Team</a></h3>
+                  </hgroup>
+                  
+                  <p><a href="#">$50&ndash;75</a></p>
+                
+                </article>
+    
+                <article>
+                
+                  <figure>
+                    <a href="#"><img src="http://placehold.it/220x115" alt="FPO image"></a>
+                  </figure>
+                
+                  <hgroup>            
+                    <h2><a href="#" title="View celeb: Celeb Name">Celeb Name</a></h2> 
+                    <h3><a href="#" title="View: Celeb Category / Team">Celeb Category / Team</a></h3>
+                  </hgroup>
+                  
+                  <p><a href="#">$50&ndash;75</a></p>
+                
+                </article>
+    
+                <article>
+                
+                  <figure>
+                    <a href="#"><img src="http://placehold.it/220x115" alt="FPO image"></a>
+                  </figure>
+                
+                  <hgroup>            
+                    <h2><a href="#" title="View celeb: Celeb Name">Celeb Name</a></h2> 
+                    <h3><a href="#" title="View: Celeb Category / Team">Celeb Category / Team</a></h3>
+                  </hgroup>
+                  
+                  <p><a href="#">$50&ndash;75</a></p>
+                
+                </article>
+              
+              </div>
+              
+              <p class="see-all"><em><a href="#" class="clearfix"><b>See All</b> <i><span>&darr;</span></i></a></em> </p> 
+              
+            </section> <!-- end section (vertical) -->
+
+          </div> <!-- end .verticals -->
+
+        </div>
+       
+      </div>
+    
+      <p class="to-top"><a href="#top">Back to Top</a></p>
+        
+    </div> <!-- end .content -->
+        
+  </div> <!-- end #main -->
+  
+</section>
+
+}
+
+@base_template(title="Marketplace", jsMain = "pages/marketplace", body=baseBody)
