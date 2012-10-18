@@ -72,6 +72,8 @@ GET     /Login/allErrorsStorefront                                controllers.Lo
 GET     /Login/index                                              controllers.Login.index
 GET     /Login/storefront                                         controllers.Login.storefront(recipient:Option[String])
 
+GET     /Marketplace/index                                        controllers.Marketplace.index   
+
 GET     /Personalize/allErrors                                    controllers.Personalize.allErrors
 GET     /Personalize/index                                        controllers.Personalize.index
 GET     /Personalize/portrait                                     controllers.Personalize.portrait
