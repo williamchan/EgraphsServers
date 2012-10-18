@@ -4,16 +4,15 @@ import akka.actor._
 import play.api.libs.ws._
 import play.api.libs.concurrent.Promise
 import java.util.Date
-import com.amazonaws.services.cloudwatch.model._
-import common.MetricPublisher
+import common.CloudWatchMetricPublisher
 import collections.LimitedQueue
 import collections.EgraphsMetric
 
 case class CheckStatus()
 case class GetMetric()
 
-class WebsiteAvailabilityActor(url: String, friendlyName: String, pub: MetricPublisher) 
-		extends Actor with ActorLogging {
+class WebsiteAvailabilityActor(url: String, friendlyName: String, pub: CloudWatchMetricPublisher)
+  extends Actor with ActorLogging {
 
   private val history = new LimitedQueue[Int](60)
 
@@ -44,11 +43,7 @@ class WebsiteAvailabilityActor(url: String, friendlyName: String, pub: MetricPub
   }
 
   def awsActions(namespace: String, value: Int) = {
-    val cloudwatch = utilities.Utilities.getCloudWatchClient
-    val datum = pub.formatMetricDatum(namespace, value)
-
-    // REMOVE AFTER TESTING!
-    println("send to cloudwatch")
-    pub.sendData(cloudwatch, datum, namespace)
+    play.Logger.info("Send value: " + value + " to cloudwatch metric: " + namespace)
+    val datum = pub.sendData(namespace, value)
   }
 }

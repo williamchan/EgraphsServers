@@ -3,3 +3,7 @@ h1 {
     background: #CAE7EC;
     font-size: 24px;
 }
+
+ul {
+	list-style-type: none;
+}

@@ -17,7 +17,7 @@ object WebsiteHistory {
     val getRequest = new GetMetricStatisticsRequest()
       .withStartTime(new Date(new Date().getTime() - ONE_HOUR_IN_MILLISECONDS))
       .withNamespace("SiteAvailability")
-      .withPeriod(60 * lastMinutes) // i suppose this is the number of minutes?
+      .withPeriod(60 * lastMinutes)
       .withDimensions(new Dimension().withName("Availability").withValue("m1.small"))
       .withMetricName("SiteAvailability")
       .withStatistics("Average", "SampleCount")

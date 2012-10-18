@@ -9,12 +9,12 @@ import com.amazonaws.auth._
 
 import java.util.Date
 
-class CloudWatchMetricPublisher extends MetricPublisher {
+class CloudWatchMetricPublisher(val cloudwatch: AmazonCloudWatch) {
 
-  override def formatMetricDatum(namespace: String, value: Int): MetricDatum = {
+  private def formatMetricDatum(namespace: String, value: Int): MetricDatum = {
 
-    new MetricDatum().
-      withDimensions(new Dimension()
+    new MetricDatum()
+      .withDimensions(new Dimension()
         .withName("Availability")
         .withValue("m1.small"))
       .withMetricName(namespace)
@@ -23,10 +23,9 @@ class CloudWatchMetricPublisher extends MetricPublisher {
       .withValue(value)
   }
 
-  def sendData(cloudwatch: AmazonCloudWatch, datum: MetricDatum, namespace: String) = {
-
-    val request = new PutMetricDataRequest().withNamespace(namespace).withMetricData(datum)
+  def sendData(namespace: String, value: Int) = {
+	val datum = formatMetricDatum(namespace, value)
+    val request = new PutMetricDataRequest().withNamespace(datum.getMetricName).withMetricData(datum)
     cloudwatch.putMetricData(request)
-
   }
 }
