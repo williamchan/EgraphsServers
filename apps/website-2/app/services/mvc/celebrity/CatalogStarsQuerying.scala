@@ -60,6 +60,14 @@ private[celebrity] trait CatalogStarsQuerying extends Logging {
       }
     }
     
-    Await.result(futureStars, 5.minutes)
+    // TODO: PLAY20 migration.... There must be a nicer way to use Await.result without having to catch exceptions.
+    try {
+      Await.result(futureStars, 5.minutes) // this throws [AskTimeoutException: Timed out]
+    } catch {
+      case e: Exception => {
+        log("CatalogStarsQuerying threw exception: " + e.getLocalizedMessage())
+        IndexedSeq.empty[CatalogStar]
+      }
+    }
   }
 }
