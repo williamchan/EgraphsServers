@@ -1,57 +1,75 @@
-#content div.about-us {
+#content {
 
-  div.masthead-static {
-    background: @grayDarker;
-    margin: 0 auto;
+  div#main.about-us {
 
-    img {
-      max-width: 100%;
+    border-top: none;
+    padding-top: 0;
+  
+    div.masthead-static {
+      background: @grayDarker;
+      margin: 0 auto;
+  
+      img {
+        max-width: 100%;
+      }
     }
-  }
-
-  h1 {
-    font-weight: 100;
-    font-size: 40px;
-  }
-
-  .container .row-fluid:first-child {
-    border-bottom : 1px solid @tableBorder;
-    padding: 0px 0 25px 0;
-  }
-
-  .container .row-fluid {
-    margin-top: 25px;
-
-    p, a, ol, ul, li {
-      font-size: 14px;
+  
+    h1 {
+      font-weight: 100;
+      font-size: 40px;
     }
+  
+    .container .row-fluid:first-child {
+      border-bottom : 1px solid @tableBorder;
+      padding: 0px 0 25px 0;
+    }
+  
+    .container .row-fluid {
+      margin-top: 25px;
+  
+      p, a, ol, ul, li {
+        font-size: 14px;
+      }
+    }
+    
+    .lede {
+      font-weight: bold;
+      color: @headingsColor;
+      font-size: 15px;
+      padding-top: 25px;
+    }
+  
   }
-  .lede {
-    font-weight: bold;
-    color: @headingsColor;
-    font-size: 15px;
-    padding-top: 25px;
-  }
+  
 }
 
 @media (max-width: 1080px) {
-  #content div.statics {
-    padding-top: 0px !important;
+  #content {
+  
+    div.statics {
+      padding-top: 0px !important;
+    }
+  
   }
 }
 
 @media (max-width:480px) {
-  #content div.about-us {
-    h1 {
-      font-size: 30px;
-      line-height: 1.25em;
-      margin-bottom: .25em;
-    }
+  #content {
+    div#main.about-us {
+      
+      h1 {
+        font-size: 30px;
+        line-height: 1.25em;
+        margin-bottom: .25em;
+      }
+  
+      p, a {
+        font-size: 16px;
+        line-height: 1.5em;
+      }
 
-    p, a {
-      font-size: 16px;
-      line-height: 1.5em;
     }
-
+  
   }
+  
 }
