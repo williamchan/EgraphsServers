@@ -12,3 +12,10 @@ dist
 /.classpath
 /.project
 /RUNNING_PID
+
+.cache
+.settings/
+.target/
+.worksheet/
+bin
+
