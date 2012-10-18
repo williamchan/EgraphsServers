@@ -1,5 +1,6 @@
 #
 # Runs the front-end test server on the port you specify.
+# Assumes that this file is in the project root.
 #
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -11,9 +12,9 @@ read -e \
      PORT
 PORT=${PORT:-$DEFAULT_PORT}
 
-# Run play
 echo "Launching the front-end test server. Hold tight..."
-cd $SCRIPT_DIR
 
-play dependencies
-play test --http.port=$PORT
+# Move to the build root
+cd $SCRIPT_DIR/../..
+
+play2 "project front-end-catalog" "run $PORT"
