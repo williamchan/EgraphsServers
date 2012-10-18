@@ -24,11 +24,8 @@
 }
 
 @postCelebrity = @{
-	null
+	routes.WebsiteControllers.postCelebrityAdmin
 }
-@**
-routes.WebsiteControllers.postCelebrityAdmin
-*@
 
 @profilePhoto = {
   @celebrity.map(c => c.profilePhoto.resizedWidth(80).getSaved(services.blobs.AccessPolicy.Public).url).getOrElse("")
@@ -49,7 +46,7 @@ routes.WebsiteControllers.postCelebrityAdmin
   </h1>
   <div class="form row">
     <div class="span12 form-column">
-    	@safeForm('id -> "admin-celebrity-detail", 'method -> "POST", 'action -> "postCelebrity.url", 'enctype -> "multipart/form-data") {
+    	@safeForm('id -> "admin-celebrity-detail", 'method -> "POST", 'action -> postCelebrity.url, 'enctype -> "multipart/form-data") {
         <fieldset>
           <input id="celebrityId" name="celebrityId" type="hidden" value="@fields("celebrityId")">
           <input id="publishedStatus" name="publishedStatusString" type="hidden" value="@fields("publishedStatusString")">

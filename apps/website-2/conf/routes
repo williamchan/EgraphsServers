@@ -58,7 +58,7 @@ GET      /admin/accounts                                           				controlle
 POST     /admin/accounts                                           				controllers.WebsiteControllers.postAccountAdmin
 GET      /admin/accounts/$accountId<[0-9]+>                        				controllers.WebsiteControllers.getAccountAdmin(accountId: Long)
 GET      /admin/celebrities                                        				controllers.WebsiteControllers.getCelebritiesAdmin(page: Int = 1)
-#POST    /admin/celebrities                                        				controllers.WebsiteControllers.postCelebrityAdmin
+POST     /admin/celebrities                                        				controllers.WebsiteControllers.postCelebrityAdmin
 GET      /admin/celebrities/search                                 				controllers.WebsiteControllers.getCelebritiesBySearchAdmin
 GET      /admin/celebrities/create                                 				controllers.WebsiteControllers.getCreateCelebrityAdmin
 POST     /admin/celebrities/featured                               				controllers.WebsiteControllers.postFeaturedCelebrities
@@ -69,7 +69,7 @@ POST     /admin/celebrities/$celebrityId<[0-9]+>/inventorybatches         contro
 GET      /admin/celebrities/$celebrityId<[0-9]+>/inventorybatches/create  controllers.WebsiteControllers.getCreateCelebrityInventoryBatchAdmin(celebrityId: Long)
 GET      /admin/celebrities/$celebrityId<[0-9]+>/orders                   controllers.WebsiteControllers.getCelebrityOrdersAdmin(celebrityId: Long, filter: String = "pendingAdminReview", page: Int = 1)
 GET      /admin/celebrities/$celebrityId<[0-9]+>/products                 controllers.WebsiteControllers.getCelebrityProductsAdmin(celebrityId: Long, page: Int = 1)
-#POST    /admin/celebrities/$celebrityId<[0-9]+>/products                 controllers.WebsiteControllers.postCelebrityProductAdmin(celebrityId: Long)
+POST     /admin/celebrities/$celebrityId<[0-9]+>/products                 controllers.WebsiteControllers.postCelebrityProductAdmin(celebrityId: Long)
 GET      /admin/celebrities/$celebrityId<[0-9]+>/products/create          controllers.WebsiteControllers.getCreateCelebrityProductAdmin(celebrityId: Long)
 POST     /admin/celebrities/$celebrityId<[0-9]+>/sendEmail                controllers.WebsiteControllers.postSendCelebrityWelcomeEmailAdmin(celebrityId: Long)
 GET      /admin/egraphs                                            				controllers.WebsiteControllers.getEgraphsAdmin(filter: String = "pendingAdminReview", page: Int = 1)

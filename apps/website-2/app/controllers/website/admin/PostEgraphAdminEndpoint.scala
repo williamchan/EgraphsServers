@@ -26,7 +26,7 @@ trait PostEgraphAdminEndpoint { this: Controller =>
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       httpFilters.requireEgraphId(egraphId) { egraph =>
 	    Action { implicit request =>
-	      val egraphStateParam = Form(single("egraphState" -> text)).bindFromRequest.apply("egraphState").value.getOrElse("")
+	      val egraphStateParam = Form("egraphState" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm)
 		  EgraphState.apply(egraphStateParam) match {
 		    case None => Forbidden("Not a valid egraph state")
 		    case Some(EgraphState.ApprovedByAdmin) => {

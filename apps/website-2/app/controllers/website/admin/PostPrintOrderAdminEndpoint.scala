@@ -28,7 +28,7 @@ trait PostPrintOrderAdminEndpoint { this: Controller =>
         printOrderStore.findById(printOrderId) match {
           case None => NotFound("No print order with that id")
           case Some(printOrder) => {
-            val action = Form(single("action" -> text)).bindFromRequest.apply("action").value.getOrElse("")
+            val action = Form("action" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm)
             action match {
               case "markFulfilled" =>
 	          	printOrder.copy(isFulfilled = true).save()

@@ -30,9 +30,9 @@ trait AllAdminEndpoints
   with GetProductAdminEndpoint
   with GetReportsAdminEndpoint
   with GetToolsAdminEndpoint
-//  with PostCelebrityAdminEndpoint
+  with PostCelebrityAdminEndpoint
   with PostCelebrityInventoryBatchAdminEndpoint
-//  with PostCelebrityProductAdminEndpoint
+  with PostCelebrityProductAdminEndpoint
   with PostEgraphAdminEndpoint
   with PostLoginAdminEndpoint
   with PostOrderAdminEndpoint

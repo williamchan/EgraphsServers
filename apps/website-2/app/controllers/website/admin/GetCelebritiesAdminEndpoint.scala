@@ -44,7 +44,7 @@ private[controllers] trait GetCelebritiesAdminEndpoint {
   def getCelebritiesBySearchAdmin = controllerMethod.withForm() { implicit authToken =>
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       Action { implicit request =>
-        val query = Form(single("query" -> text)).bindFromRequest.fold(hasErrors => "", success => success)
+        val query = Form("query" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm)
         val listings = celebrityStore.findByTextQuery(query)
         Ok(views.html.Application.admin.admin_celebrities_search(celebrityListings = listings))
       }

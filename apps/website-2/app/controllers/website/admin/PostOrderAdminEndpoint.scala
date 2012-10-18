@@ -33,7 +33,7 @@ trait PostOrderAdminEndpoint { this: Controller =>
         orderStore.findById(orderId) match {
           case None => NotFound("No order with that id")
           case Some(order) => {
-            val action = Form(single("action" -> text)).bindFromRequest.apply("action").value.getOrElse("")
+            val action = Form("action" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm)
             action match {
               case "approve" =>
               	order.approveByAdmin(admin).save()
