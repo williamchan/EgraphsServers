@@ -4,8 +4,9 @@ import java.sql.Timestamp
 import services.{AppConfig, Time}
 import services.db.{SavesWithLongKey, Schema, KeyedCaseClass}
 import com.google.inject.{Inject, Provider}
-import models.{HasCreatedUpdated, SavesCreatedUpdated}
+import models.{Celebrity, HasCreatedUpdated, SavesCreatedUpdated}
 import org.squeryl.Query
+import org.squeryl.dsl.ManyToMany
 
 /**
  * Represents specific values of a filter. For example, for the Vertical Filter,
@@ -33,10 +34,7 @@ case class FilterValue(
    * Filters owned by the FilterValue
    */
   lazy val filters = services.filterStore.filters(this)
-
-  def associateFilter(filterId: Long) = {
-
-  }
+  lazy val celebrities = services.celebrityStore.celebrities(this)
 
   def save(): FilterValue = {
     require(!name.isEmpty, "FilterValue: name must be specified")
@@ -70,6 +68,10 @@ class FilterValueStore @Inject() (
        where(fv.filterId === filterId)
        select(fv)
     )
+  }
+
+  def filterValues(celebrity: Celebrity): Query[FilterValue] with ManyToMany[FilterValue, CelebrityFilterValue] = {
+    schema.celebrityFilterValues.left(celebrity)
   }
 
   //

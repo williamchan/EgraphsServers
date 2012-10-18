@@ -6,23 +6,27 @@ import models.{SavesCreatedUpdated, HasCreatedUpdated}
 import java.sql.Timestamp
 import com.google.inject.{Provider, Inject}
 
+/**
+ * Mapping between celebrities and their tagged filtervalues
+ *
+ * @param id
+ * @param celebrityId
+ * @param filterValueId
+ * @param services
+ */
 
 case class CelebrityFilterValue (
   id: Long = 0L,
   celebrityId: Long = 0l,
   filterValueId: Long = 0L,
-  created: Timestamp = Time.defaultTimestamp,
-  updated: Timestamp = Time.defaultTimestamp,
   services: FilterServices = AppConfig.instance[FilterServices]
-) extends KeyedCaseClass[Long] with HasCreatedUpdated
+) extends KeyedCaseClass[Long]
 {
   //
   // Public methods
   //
 
   def save(): CelebrityFilterValue = {
-    require(celebrityId != 0, "CelebrityFilterValue: celebrity id must be specified")
-    require(filterValueId != 0, "CelebrityFilterValue: filter value id must be specified")
     services.celebrityFilterValueStore.save(this)
   }
 
@@ -36,7 +40,6 @@ class CelebrityFilterValueStore @Inject() (
   schema: Schema,
   filterServices: Provider[FilterServices]
 ) extends SavesWithLongKey[CelebrityFilterValue]
-  with SavesCreatedUpdated[Long, CelebrityFilterValue]
 {
   import org.squeryl.PrimitiveTypeMode._
 
@@ -48,16 +51,7 @@ class CelebrityFilterValueStore @Inject() (
   override def defineUpdate(theOld: CelebrityFilterValue, theNew: CelebrityFilterValue) = {
     updateIs(
       theOld.celebrityId := theNew.celebrityId,
-      theOld.filterValueId := theNew.filterValueId,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated
+      theOld.filterValueId := theNew.filterValueId
     )
-  }
-
-  //
-  // SavesCreatedUpdated[Long,FilterValue] methods
-  //
-  override def withCreatedUpdated(toUpdate: CelebrityFilterValue, created: Timestamp, updated: Timestamp) = {
-    toUpdate.copy(created = created, updated = updated)
   }
 }

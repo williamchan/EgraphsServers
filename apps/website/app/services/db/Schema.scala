@@ -68,13 +68,6 @@ class Schema @Inject()(
     )
   )
 
-  val celebrityFilterValues = table[CelebrityFilterValue]
-  on(celebrityFilterValues) (celebrityFilterValue =>
-    declare(
-      columns(celebrityFilterValue.celebrityId, celebrityFilterValue.filterValueId) are unique
-    )
-  )
-
   val customers = table[Customer]
   on(customers)(customer => declare(customer.username is unique))
 
@@ -173,6 +166,11 @@ class Schema @Inject()(
   //
   // manyToManyRelation declarations -- please keep these alphabetized
   //
+
+  val celebrityFilterValues =
+    manyToManyRelation(celebrities, filterValues).via[CelebrityFilterValue]((c, fv, cfv) =>
+      (cfv.celebrityId === c.id, cfv.filterValueId === fv.id)
+    )
 
   val inventoryBatchProducts = manyToManyRelation(inventoryBatches, products)
     .via[InventoryBatchProduct]((inventoryBatch, product, join) => (join.inventoryBatchId === inventoryBatch.id, join.productId === product.id))

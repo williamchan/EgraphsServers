@@ -82,12 +82,12 @@ class FilterValueTests  extends EgraphsUnitTest
         filterValue.filters.exists(f => f.id == cf.id)
       )
     }
-//
-//
-//
-//    "FilterValue" should "return associated celebrities" in {
-//
-//    }
 
+    "FilterValue" should "return associated celebrities" in {
+      val filterValue = TestData.newSavedFilterValue(TestData.newSavedFilter.id)
+      val celebrity = TestData.newSavedCelebrity()
 
+      celebrity.filterValues.associate(filterValue)
+      filterValue.celebrities.exists(c => c.id == celebrity.id ) should be (true)
+    }
 }
