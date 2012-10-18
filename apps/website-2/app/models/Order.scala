@@ -109,7 +109,6 @@ case class Order(
     val lastNamesRedacted = if (lastNames.isEmpty) {
       ""
     } else {
-      println(lastNames)
       lastNames.map(theName => theName(0)).mkString(" ", ".", ".")
     }
 
