@@ -86,7 +86,7 @@ class CelebrityTests extends EgraphsUnitTest
       (false, Unpublished, false)
     )
 
-    val celebs = for (val (featured, published, _) <- featuredPublishedShouldBeInResults) yield {
+    val celebs = for ((featured, published, _) <- featuredPublishedShouldBeInResults) yield {
       TestData.newSavedCelebrity()
         .copy(isFeatured=featured)
         .withPublishedStatus(published)
@@ -96,7 +96,7 @@ class CelebrityTests extends EgraphsUnitTest
     val results = store.getFeaturedPublishedCelebrities.toList
 
     // Execute the test on the data table featuredPublishedShouldBeInResults
-    for ( val (celeb, i) <- celebs.zipWithIndex) {
+    for ((celeb, i) <- celebs.zipWithIndex) {
       val shouldBeInResults = featuredPublishedShouldBeInResults(i)._3
       if (shouldBeInResults) results should contain (celeb) else results should not contain (celeb)
     }
