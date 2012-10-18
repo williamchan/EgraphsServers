@@ -1,7 +1,8 @@
 @()(
-implicit session: play.mvc.Scope.Session,
-headerData: models.frontend.header.HeaderData,
-footerData: models.frontend.footer.FooterData
+  implicit
+  headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData,
+  authToken: egraphs.authtoken.AuthenticityToken
 )
 @import views.frontend.Utils
 @import models.frontend.egraphs._
@@ -19,7 +20,7 @@ footerData: models.frontend.footer.FooterData
             <input name="q" type="search" placeholder="Find Your Star">
         </form>
       
-        <img src='/public/images/masthead-marketplace.jpg'/>
+        <img src='@RemoteAssets.at("images/masthead-marketplace.jpg")'/>
       
       </div>
       
@@ -38,9 +39,9 @@ footerData: models.frontend.footer.FooterData
         <div class="main span9">
 
           <ul class="top-verticals-nav">
-              <li><a href="#"><img src='/public/images/icon-logo-mlb.png' width="33" height="17"> <span>MLB</span></a></li>
-              <li><a href="#"><img src='/public/images/icon-logo-nba.png' width="12" height="27"> <span>NBA</span></a></li>
-              <li><a href="#"><img src='/public/images/icon-logo-monster-jam.png' width="31" height="25"> <span>Monster Jam</span></a></li>          
+              <li><a href="#"><img src='@RemoteAssets.at("images/icon-logo-mlb.png")' width="33" height="17"> <span>MLB</span></a></li>
+              <li><a href="#"><img src='@RemoteAssets.at("images/icon-logo-nba.png")' width="12" height="27"> <span>NBA</span></a></li>
+              <li><a href="#"><img src='@RemoteAssets.at("images/icon-logo-monster-jam.png")' width="31" height="25"> <span>Monster Jam</span></a></li>          
           </ul> <!-- end .top-verticals-nav -->
           
           <aside class="view-options clearfix">

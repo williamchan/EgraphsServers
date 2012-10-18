@@ -1,16 +1,17 @@
 package controllers
 
-import play.mvc.Controller
+import play.api.mvc.Action
+import play.api.mvc.Controller
 import models.frontend.contents.Section
+import helpers.DefaultImplicitTemplateParameters
 
 /**
  * Marketplace controller
  */
+object Marketplace extends Controller with DefaultImplicitTemplateParameters {
 
-object Marketplace extends Controller with DefaultHeaderAndFooterData {
-
-  def index() = {
-    views.frontend.html.marketplace_landing()
+  def index() = Action {
+    Ok(views.html.frontend.marketplace_landing())
   }
   
 }
