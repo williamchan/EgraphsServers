@@ -11,7 +11,7 @@ case class EgraphsSession(session: Session) {
   def id: Option[String] = {
     session.get(EgraphsSession.SESSION_ID_KEY)
   }
-  
+
   def adminId: Option[Long] = {
     getLong(Key.AdminId.name)
   }

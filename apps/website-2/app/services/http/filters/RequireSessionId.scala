@@ -8,6 +8,7 @@ import play.api.mvc.PlainResult
 import egraphs.playutils.RichResult.resultToRichResult
 import play.api.mvc.WrappedRequest
 import services.http.EgraphsSession
+import services.http.EgraphsSession.Conversions._
 
 /**
  * This filter will ensure that there is a session id for the given request. It will create a new
@@ -29,7 +30,7 @@ class RequireSessionId @Inject() {
    * new session id will be created.
    */
   private def getResultAndSessionIdFromRequest[A](request: Request[A], action: Action[A]) = {
-    request.session.get(EgraphsSession.SESSION_ID_KEY) match {
+    request.session.id match {
       case Some(sessionId) => {
         val result = action(request)
         (result, sessionId)
