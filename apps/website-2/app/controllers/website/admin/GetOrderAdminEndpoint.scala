@@ -6,7 +6,7 @@ import services.http.ControllerMethod
 import controllers.WebsiteControllers
 import services.http.filters.HttpFilters
 import models.{Egraph, OrderStore}
-import org.apache.commons.lang.StringEscapeUtils
+import org.apache.commons.lang3.StringEscapeUtils
 
 private[controllers] trait GetOrderAdminEndpoint { this: Controller =>
 
@@ -27,9 +27,9 @@ private[controllers] trait GetOrderAdminEndpoint { this: Controller =>
             
             val fieldDefaults: (String => String) = {
               (paramName: String) => paramName match {
-              	case "recipientName" => StringEscapeUtils.escapeHtml(order.recipientName)
-              	case "messageToCelebrity" => StringEscapeUtils.escapeHtml(order.messageToCelebrity.getOrElse(""))
-              	case "requestedMessage" => StringEscapeUtils.escapeHtml(order.requestedMessage.getOrElse(""))
+              	case "recipientName" => StringEscapeUtils.escapeHtml4(order.recipientName)
+              	case "messageToCelebrity" => StringEscapeUtils.escapeHtml4(order.messageToCelebrity.getOrElse(""))
+              	case "requestedMessage" => StringEscapeUtils.escapeHtml4(order.requestedMessage.getOrElse(""))
               }
             }
 

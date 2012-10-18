@@ -6,7 +6,7 @@ import services.http.ControllerMethod
 import controllers.WebsiteControllers
 import services.http.filters.HttpFilters
 import models._
-import org.apache.commons.lang.StringEscapeUtils
+import org.apache.commons.lang3.StringEscapeUtils
 
 private[controllers] trait GetPrintOrderAdminEndpoint { this: Controller =>
 
@@ -31,7 +31,7 @@ private[controllers] trait GetPrintOrderAdminEndpoint { this: Controller =>
 
             val fieldDefaults: (String => String) = {
               (paramName: String) => paramName match {
-                case "shippingAddress" => StringEscapeUtils.escapeHtml(printOrder.shippingAddress)
+                case "shippingAddress" => StringEscapeUtils.escapeHtml4(printOrder.shippingAddress)
               }
             }
 

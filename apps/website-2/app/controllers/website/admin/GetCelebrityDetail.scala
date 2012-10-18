@@ -2,7 +2,7 @@ package controllers.website.admin
 
 import models.Celebrity
 import models.enums.PublishedStatus
-import org.apache.commons.lang.StringEscapeUtils
+import org.apache.commons.lang3.StringEscapeUtils
 import play.api.mvc.Results.Ok
 
 object GetCelebrityDetail {
@@ -16,13 +16,13 @@ object GetCelebrityDetail {
       (paramName: String) => paramName match {
         case "celebrityId" => flash.get("celebrityId").getOrElse("")
         case "celebrityEmail" => flash.get("celebrityEmail").getOrElse("")
-        case "bio" => StringEscapeUtils.escapeHtml(flash.get("bio").getOrElse(""))
-        case "casualName" => StringEscapeUtils.escapeHtml(flash.get("casualName").getOrElse(""))
-        case "organization" => StringEscapeUtils.escapeHtml(flash.get("organization").getOrElse(""))
-        case "publicName" => StringEscapeUtils.escapeHtml(flash.get("publicName").getOrElse(""))
+        case "bio" => StringEscapeUtils.escapeHtml4(flash.get("bio").getOrElse(""))
+        case "casualName" => StringEscapeUtils.escapeHtml4(flash.get("casualName").getOrElse(""))
+        case "organization" => StringEscapeUtils.escapeHtml4(flash.get("organization").getOrElse(""))
+        case "publicName" => StringEscapeUtils.escapeHtml4(flash.get("publicName").getOrElse(""))
         case "publishedStatusString" => flash.get("publishedStatusString").getOrElse(PublishedStatus.Unpublished.toString)
-        case "roleDescription" => StringEscapeUtils.escapeHtml(flash.get("roleDescription").getOrElse(""))
-        case "twitterUsername" => StringEscapeUtils.escapeHtml(flash.get("twitterUsername").getOrElse(""))
+        case "roleDescription" => StringEscapeUtils.escapeHtml4(flash.get("roleDescription").getOrElse(""))
+        case "twitterUsername" => StringEscapeUtils.escapeHtml4(flash.get("twitterUsername").getOrElse(""))
         case _ => flash.get(paramName).getOrElse("")
       }
     }

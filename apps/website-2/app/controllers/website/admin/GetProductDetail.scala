@@ -3,7 +3,7 @@ package controllers.website.admin
 import play.Play
 import models.enums.PublishedStatus
 import models.{Product, Celebrity}
-import org.apache.commons.lang.StringEscapeUtils
+import org.apache.commons.lang3.StringEscapeUtils
 import play.api.mvc.Results.Ok
 
 object GetProductDetail {
@@ -16,8 +16,8 @@ object GetProductDetail {
     val fieldDefaults: (String => String) = {
       (paramName: String) => paramName match {
         case "productId" => flash.get("productId").getOrElse("")
-        case "productName" => StringEscapeUtils.escapeHtml(flash.get("productName").getOrElse(""))
-        case "productDescription" => StringEscapeUtils.escapeHtml(flash.get("productDescription").getOrElse(""))
+        case "productName" => StringEscapeUtils.escapeHtml4(flash.get("productName").getOrElse(""))
+        case "productDescription" => StringEscapeUtils.escapeHtml4(flash.get("productDescription").getOrElse(""))
         case "priceInCurrency" => flash.get("priceInCurrency").getOrElse("%.2f" format Product.defaultPrice)
         case "storyTitle" => if (isCreate) "The Story" else flash.get("storyTitle").getOrElse("")
         case "storyText" => {
