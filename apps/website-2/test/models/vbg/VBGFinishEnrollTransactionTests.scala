@@ -3,7 +3,10 @@ package models.vbg
 import utils._
 import services.AppConfig
 import models.{EnrollmentBatch, Celebrity}
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
+@RunWith(classOf[JUnitRunner])
 class VBGFinishEnrollTransactionTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityIdLongTests[VBGFinishEnrollTransaction]
