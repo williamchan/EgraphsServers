@@ -5,6 +5,8 @@ import play.api.mvc.Controller
 import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
 import play.api.mvc.Results.Redirect
 import services.http.forms.purchase._
+import play.api.data.Form
+import play.api.data.Forms.{text, single, optional}
 import models.enums.{PrintingOption, WrittenMessageRequest}
 import PrintingOption.HighQualityPrint
 import PrintOptionForm.Params
@@ -115,7 +117,7 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
         // Get the purchase forms for this celeb's storefront out of the server session
         val forms = purchaseFormFactory.formsForStorefront(celeb.id)(request.session)
         
-        val form = new play.data.DynamicForm().bindFromRequest()        
+        val maybePrintingOption = Form(single(Params.HighQualityPrint -> optional(text))).bindFromRequest.get
         
         // Validate in a for comprehension
         val failureOrSuccessRedirect = for (
@@ -125,7 +127,7 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
           // User has to have posted a valid printing option. Which should be impossible to
           // screw up because it was a damned checkbox. But if they did screw it up they
           // get a redirect.
-          validPrintOption <- checkPurchaseField(Option(form.get(Params.HighQualityPrint)))
+          validPrintOption <- checkPurchaseField(maybePrintingOption)
                                 .isPrintingOption
                                 .left.map { formError => 
                                   Redirect(reverseGetStorefrontReview(celebrityUrlSlug, productUrlSlug))

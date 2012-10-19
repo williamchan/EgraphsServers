@@ -18,7 +18,6 @@ import play.api.data.validation.Invalid
 import java.io.File
 import services.logging.Logging
 import services.{ImageUtil, Utils}
-import play.Play
 import java.text.SimpleDateFormat
 import services.http.SafePlayParams.Conversions._
 import services.Dimensions
@@ -215,7 +214,7 @@ trait PostCelebrityAdminEndpoint {
 //                                           organization: String,
 //                                           roleDescription: String,
 //                                           twitterUsername: String): Redirect = {
-//    val flash = play.mvc.Http.Context.current().flash()
+//    val flash = play.api.mvc.Http.Context.current().flash()
 //    flash.put("celebrityId", celebrityId)
 //    flash.put("celebrityEmail", celebrityEmail)
 //    flash.put("celebrityPassword", celebrityPassword)

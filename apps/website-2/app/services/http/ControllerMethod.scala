@@ -92,7 +92,7 @@ class POSTControllerMethod @Inject()(
    * @param request the current request
    * @param session the current session
    * @tparam A return type of Operation
-   * @return either the return value of the `operation` code block or a [[play.mvc.results.Forbidden]]
+   * @return either the return value of the `operation` code block or a [[play.api.mvc.Results.Forbidden]]
    */
   def apply[A](doCsrfCheck: Boolean=true,
                dbSettings: ControllerDBSettings = WithDBConnection(readOnly = false))

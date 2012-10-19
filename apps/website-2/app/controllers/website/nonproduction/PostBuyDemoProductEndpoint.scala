@@ -6,7 +6,6 @@ import models.{CustomerStore, AccountStore, Celebrity, Product}
 import controllers.WebsiteControllers
 import controllers.website.consumer.StorefrontChoosePhotoConsumerEndpoints
 import services.db.{DBSession, TransactionSerializable}
-import play.data.validation.Validation
 import controllers.website.EgraphPurchaseHandler
 import services.http.{POSTControllerMethod, WithoutDBConnection}
 import services.mail.TransactionalMail
