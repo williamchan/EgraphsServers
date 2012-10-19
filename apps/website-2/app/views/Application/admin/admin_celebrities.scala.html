@@ -52,11 +52,11 @@
       <h1>
         Celebrity Administration
       </h1>
-      <section class="settings-group">
-        <h2>Featured</h2>
+      <section>
+        <h2>Featured Celebrities</h2>
         @safeForm('id -> "postFeaturedCelebrities-form", 'method -> "POST", 'action -> postFeaturedCelebrities.url) {
           <div class="row-fluid">
-            <div class="span6">
+            <div class="span5">
               <select data-placeholder="Choose celebrities to feature" name="celebIds" style="width:350px" multiple class="chzn-select">
                 @for(celeb <- allCelebrities) {
                   <option name=@{"celebIds[" + (celeb.id-1) + "]"} value="@celeb.id" @if(celeb.isFeatured){selected="selected"}>
@@ -65,31 +65,39 @@
                 }
               </select>
             </div>
-          </div>
-          <div class="row-fluid">  
-            <div class="span12">
-            
-              @tags.arrow_button(caption="Save")
+            <div class="span7">
+              @tags.arrow_button(caption="Save")  
             </div>
           </div>
         } 
       </section>
-          
-      <form method="link" action="@getCreateCelebrity">
-        @tags.arrow_button(caption="New Celebrity")
-      </form>
-      <form method="GET" action="@getCelebritiesBySearchAdmin">
-        @tags.ng.form_input(label="Search for celebrities", name = "query")
-        @tags.arrow_button(caption="Go")
-      </form>
+      <section>
+        <div class="row-fluid">
+          <div class="span12">
+            <form method="link" action="@getCreateCelebrity">
+              @tags.arrow_button(caption="Create New Celebrity")
+            </form>
+          </div>
+        </div>  
+      </section>
+      <div class="row-fluid">      
+        <form method="GET" class="form-search" action="@getCelebritiesBySearchAdmin">
+          <div class="span3"> 
+            <input type="text" class="input-large search-query" name="query" placeholder="Search for celebrities...">
+          </div>  
+          <div class="span9">  
+            @tags.arrow_button(caption="Go")
+          </div>
+        </form>
+      </div>  
       <h2>All @paginationInfo.totalResultsStr</h2>
-      <table class="table table-hover">
+      <table class="table table-hover table-condensed">
         <thead>
           <tr>
             <th></th>
             <th>Id</th>
+            <th>Public Name</th>  
             <th>Email</th>
-            <th>Public Name</th>
             <th>Enrolled?</th>
             <th>Published?</th>
             <th>Products</th>
@@ -106,12 +114,12 @@
             </a>
           </td>
           <td>@celebrityListing.id</td>
-          <td>@celebrityListing.email</td>
-          <td>
+          <td class="truncate">
             <a class="preview-link" href="/@celebrityListing.urlSlug">
               @celebrityListing.publicName
             </a>
           </td>
+          <td>@celebrityListing.email</td>
           <td>@celebrityListing.enrollmentStatus</td>
           <td>@celebrityListing.publishedStatus</td>
           <td>
