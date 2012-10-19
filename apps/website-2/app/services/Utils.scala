@@ -275,7 +275,7 @@ object Utils extends Utils {
   def logException(e: Throwable) {
     val stringWriter = new StringWriter()
     e.printStackTrace(new PrintWriter(stringWriter))
-    play.Logger.error("Fatal error: " + e.getClass + ": " + e.getMessage)
-    stringWriter.toString.split("\n").foreach(line => play.Logger.info(line))
+    play.api.Logger.error("Fatal error: " + e.getClass + ": " + e.getMessage)
+    stringWriter.toString.split("\n").foreach(line => play.api.Logger.info(line))
   }
 }

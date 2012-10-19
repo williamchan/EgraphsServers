@@ -1,7 +1,7 @@
 package controllers.website.nonproduction
 
 import services.payment.Payment
-import play.Logger
+import play.api.Logger
 import models.{CustomerStore, AccountStore, Celebrity, Product}
 import controllers.WebsiteControllers
 import controllers.website.consumer.StorefrontChoosePhotoConsumerEndpoints

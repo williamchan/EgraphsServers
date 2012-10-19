@@ -3,7 +3,7 @@ package services.logging
 import org.slf4j.MDC
 import play.api.mvc.{AnyContent, Request}
 import services.http.RequestInfo
-import play.Logger.info
+import play.api.Logger.info
 import services.{Utils, Time}
 import play.api.mvc.Action
 import controllers.routes
@@ -94,7 +94,7 @@ class LoggingContext {
     }
     catch {
       case e: Exception => 
-        play.Logger.error("[LoggingContext] Failed to generate request context string due to " + e.getClass.getName)
+        play.api.Logger.error("[LoggingContext] Failed to generate request context string due to " + e.getClass.getName)
         "<Unidentifiable request context>"
     }
   }
@@ -113,7 +113,7 @@ class LoggingContext {
     }
     catch {
       case e: Exception =>
-        play.Logger.error("[LoggingContext] Failed to generate request header due to " + e.getClass.getName)
+        play.api.Logger.error("[LoggingContext] Failed to generate request header due to " + e.getClass.getName)
     }
   }
 

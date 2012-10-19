@@ -62,8 +62,8 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
         
         postForm.bindFromRequest.fold(
           formWithErrors => {
-            play.Logger.error("Dismissing the invalid postEgraph request: ")
-            play.Logger.info("\t" + formWithErrors.errors.mkString(", "))
+            play.api.Logger.error("Dismissing the invalid postEgraph request: ")
+            play.api.Logger.info("\t" + formWithErrors.errors.mkString(", "))
             new Status(HttpCodes.MalformedEgraph)
           },
           

@@ -10,7 +10,7 @@ trait Logging {
 
   /** Logs a message to INFO by default */
   def log(message: => String) {
-    play.Logger.info(annotateMessage(message))
+    play.api.Logger.info(annotateMessage(message))
   }
 
   /** Logs a message and stacktrace of exception to INFO by default */
@@ -21,7 +21,7 @@ trait Logging {
 
   /** Logs a message at ERROR log level */
   def error(message: => String) {
-    play.Logger.error(annotateMessage(message))
+    play.api.Logger.error(annotateMessage(message))
   }
 
   /** Logs a message and stacktrace of exception at ERROR log level */

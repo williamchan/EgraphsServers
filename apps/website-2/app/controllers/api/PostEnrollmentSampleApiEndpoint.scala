@@ -46,8 +46,8 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
         
         postForm.bindFromRequest.fold(
           formWithErrors => {
-            play.Logger.error("Dismissing the invalid postEnrollmentSample request")
-            play.Logger.info("\t" + formWithErrors.errors.mkString(", "))
+            play.api.Logger.error("Dismissing the invalid postEnrollmentSample request")
+            play.api.Logger.info("\t" + formWithErrors.errors.mkString(", "))
             new Status(HttpCodes.MalformedEgraph)
           },
           

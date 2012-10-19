@@ -89,7 +89,7 @@ class BulkMailListProvider @Inject()(config: ConfigFileProxy) extends InjectionP
 private[mail] object StubBulkMailList extends BulkMailList
 {
   override def subscribeNewAsync(email: String) : Promise[Response] = {
-    play.Logger.info("Subscribed " + email + " to email list: " + newsletterListId + "\n")
+    play.api.Logger.info("Subscribed " + email + " to email list: " + newsletterListId + "\n")
     Promise()
   }
   override def checkConfiguration : BulkMailList = { this }
