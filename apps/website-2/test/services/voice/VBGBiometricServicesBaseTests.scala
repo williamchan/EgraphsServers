@@ -2,7 +2,7 @@ package services.voice
 
 import models._
 import utils._
-import play.Play
+import play.api.Play
 import services.blobs.Blobs
 import org.apache.commons.codec.binary.Base64
 import javax.sound.sampled.{AudioInputStream, AudioFileFormat, AudioSystem}

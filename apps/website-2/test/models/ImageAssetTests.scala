@@ -4,7 +4,7 @@ import utils.{ClearsCacheAndBlobsAndValidationBefore, DBTransactionPerTest, Egra
 import java.io.FileOutputStream
 import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
-import play.Play
+import play.api.Play
 import services.{ImageUtil, TempFile, AppConfig}
 import services.blobs.AccessPolicy.Private
 

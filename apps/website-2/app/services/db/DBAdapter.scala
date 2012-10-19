@@ -1,7 +1,7 @@
 package services.db
 
 import org.squeryl.internals.DatabaseAdapter
-import play.Play
+import play.api.Play
 import org.squeryl.adapters.{MySQLInnoDBAdapter, PostgreSqlAdapter, H2Adapter}
 import services.logging.Logging
 import services.AppConfig

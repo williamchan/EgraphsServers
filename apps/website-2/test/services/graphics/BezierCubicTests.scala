@@ -3,7 +3,7 @@ package services.graphics
 import java.awt.{Graphics2D, RenderingHints, BasicStroke}
 import java.awt.image.BufferedImage
 import java.awt.geom.{Ellipse2D, Path2D}
-import play.Play
+import play.api.Play
 import javax.imageio.ImageIO
 import utils.EgraphsUnitTest
 import java.io.File

@@ -1,7 +1,7 @@
 package services.blobs
 
 import utils.{EgraphsUnitTest, ClearsCacheAndBlobsAndValidationBefore}
-import play.Play._
+import play.api.Play._
 import services.AppConfig
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner

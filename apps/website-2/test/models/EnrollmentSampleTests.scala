@@ -5,7 +5,7 @@ import utils._
 import services.AppConfig
 import services.blobs.Blobs
 import Blobs.Conversions._
-import play.Play
+import play.api.Play
 
 class EnrollmentSampleTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore

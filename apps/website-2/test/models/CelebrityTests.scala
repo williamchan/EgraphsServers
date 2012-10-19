@@ -5,7 +5,7 @@ import javax.imageio.ImageIO
 import services.Time
 import services.ImageUtil.Conversions._
 import services.AppConfig
-import play.Play
+import play.api.Play
 import utils._
 
 class CelebrityTests extends EgraphsUnitTest

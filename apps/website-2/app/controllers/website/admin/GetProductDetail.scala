@@ -1,6 +1,7 @@
 package controllers.website.admin
 
-import play.Play
+import play.api.Play
+import Play.current
 import models.enums.PublishedStatus
 import models.{Product, Celebrity}
 import org.apache.commons.lang3.StringEscapeUtils
@@ -35,6 +36,6 @@ object GetProductDetail {
       errorFields = errorFields,
       fields = fieldDefaults,
       product = product,
-      isTestMode = !Play.isProd()))
+      isTestMode = !Play.isProd))
   }
 }

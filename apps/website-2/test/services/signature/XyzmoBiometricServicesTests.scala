@@ -2,7 +2,7 @@ package services.signature
 
 import models._
 import models.xyzmo._
-import play.Play
+import play.api.Play
 import utils._
 import com.xyzmo.wwww.biometricserver.{WebServiceBiometricPartStub, WebServiceUserAndProfileStub}
 import org.junit.runner.RunWith

@@ -2,7 +2,7 @@ package utils
 
 import java.io.{File, FileInputStream}
 import services.blobs.Blobs
-import play.Play
+import play.api.Play
 import services.AppConfig
 import java.io.File
 import org.jclouds.blobstore.domain.Blob

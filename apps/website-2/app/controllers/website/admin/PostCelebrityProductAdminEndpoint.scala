@@ -18,7 +18,7 @@ import play.api.data.validation.Invalid
 import java.io.File
 import services.logging.Logging
 import services.ImageUtil
-import play.Play
+import play.api.Play
 import java.text.SimpleDateFormat
 import services.http.SafePlayParams.Conversions._
 import services.Dimensions
