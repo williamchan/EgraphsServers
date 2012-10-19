@@ -14,7 +14,7 @@ import play.api.mvc.BodyParsers.parse
 import services.http.BasicAuth
 import play.api.mvc.RequestHeader
 
-// TODO: PLAY20 migration. Test and comment this summbitch.
+// TODO: PLAY20 migration. Comment this summbitch.
 class RequireAuthenticatedAccount @Inject() (accountStore: AccountStore) {  
 
   /**
