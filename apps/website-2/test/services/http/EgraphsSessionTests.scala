@@ -4,7 +4,6 @@ import services.http.EgraphsSession.Conversions._
 import services.AppConfig
 import utils.EgraphsUnitTest
 import play.api.mvc.Session
-import play.test.FakeRequest
 import org.apache.commons.lang3.RandomStringUtils
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
