@@ -11,7 +11,7 @@ import helpers.DefaultImplicitTemplateParameters
 object Marketplace extends Controller with DefaultImplicitTemplateParameters {
 
   def index() = Action {
-    Ok(views.html.frontend.marketplace_landing())
+    Ok(views.html.frontend.marketplace_landing("Mlb"))
   }
   
 }
