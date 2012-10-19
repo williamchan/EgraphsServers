@@ -4,7 +4,10 @@ import scala.collection.JavaConversions._
 import services.AppConfig
 import AccountAuthenticationError._
 import utils._
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
+@RunWith(classOf[JUnitRunner])
 class AccountTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with DBTransactionPerTest
@@ -16,16 +19,16 @@ class AccountTests extends EgraphsUnitTest
   //
   // Test methods
   //
-  "Account" should "require certain fields" in new EgraphsTestApplication {
+  "An Account" should "require certain fields" in new EgraphsTestApplication {
     val exception = intercept[IllegalArgumentException] {Account().save()}
     exception.getLocalizedMessage should include("Account: email must be specified")
   }
 
-  "An Account" should "start without a password" in new EgraphsTestApplication {
+  it should "start without a password" in new EgraphsTestApplication {
     Account().password should be(None)
   }
 
-  "An Account" should "start without email verification" in new EgraphsTestApplication {
+  it should "start without email verification" in new EgraphsTestApplication {
     Account().emailVerified should be(false)
   }
 
