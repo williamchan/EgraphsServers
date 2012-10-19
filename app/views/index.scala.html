@@ -1,88 +1,91 @@
-@(metrics: List[collections.EgraphsMetric[Int]])
-
 @main(title = "Monitoring") {
-  
-  <table>
-    <tr>
-         @metrics.map { case collections.EgraphsMetric(name, description, values) =>
-           <td>
-             <h1 id="header-@name"> Recent GET requests to @name: </h1>
-             <div id="placeholder-@name" style="width:90%;height:300px;"></div>
-           </td>
-     } 
-   </tr>
-   
-   <tr>
-     
-     <td>
-       <img id="purr" src="http://cvcl.mit.edu/hybrid/cat2.jpg" onclick=test() alt="cat" height="300" width="90%"> 
-     </td>
-     
-     <td>
-       <img src="http://1.bp.blogspot.com/-1uQRYMklACU/ToQ6aL-5uUI/AAAAAAAAAgQ/9_u0922cL14/s1600/cute-puppy-dog-wallpapers.jpg" alt="dog" height="300" width="90%"> 
-     </td>
-     
-     <td>
-       <img src="http://24.media.tumblr.com/N36RfdeSZmoh6bmvNq5VdirZo1_400.jpg" alt="hamster" height="300" width="90%"> 
-     </td>
-       
-    </tr>
-   
-   
-  </table>
-
-	<script type="text/javascript">
-	$(function () {
-		Egraphs.drawGraph(0);
-		Egraphs.drawGraph(1);
-		Egraphs.drawGraph(2);
+ 
+  <script type="text/javascript">
+  $(function () {
+		Egraphs.displayPage();
 	});
+  
+  var Egraphs = Egraphs || {}
+  
+  Egraphs.displayPage = function () {
+    
+    ajaxRequest(producePageStructure);
+  
+    function producePageStructure(series) {
+      var metrics = series.metrics.length;
+      var temp;
 
-	var Egraphs = Egraphs || {}
+      var table = document.createElement('table');
+      document.getElementsByTagName('body')[0].appendChild(table);
 
-	Egraphs.drawGraph = function (index) {
-	  
-	  // set up graph display options
-	  var options = {
-			lines: { show: true },
-			points: { show: true },
-			xaxis: { tickDecimals: 0, tickSize: 5 },
-			yaxis: { min: 0.0, max: 1.2 }
-		};
-		
-		// initial load
-    window.onload = updateGraph;
-
-		function updateGraph() {
-
-			function onDataReceived(series) {
-
-        // transform data into graphable points
-				var newData = series.metrics[index].values;
-				var newDataTransformed = new Array(newData.length);
-				for (var i=0; i<newData.length; i++) {
-					newDataTransformed[i] = new Array(i+1, newData[i]);
-				}
-				
-				var pageName = series.metrics[index].name;
-        var placeholder = $("#placeholder-" + pageName);
+      for (var i=0; i<metrics; i++) {
+        if (i % 3 == 0) {
+          var tr = document.createElement('tr');
+          document.getElementsByTagName('table')[0].appendChild(tr);
+        }
+        var td = document.createElement('td');
+        document.getElementsByTagName('tr')[Math.floor(i/3)].appendChild(td);  
+        temp = document.createElement('h1');
+        temp.className = 'metrics';
+        temp.innerHTML = "Recent GET requests to " + series.metrics[i].name + ":";
+        document.getElementsByTagName('td')[i].appendChild(temp);
         
-				$.plot(placeholder, [ newDataTransformed ], options);
-			};
-			ajaxRequest(onDataReceived);
+        var placeholder = document.createElement('div');
+        placeholder.id = "placeholder-" + series.metrics[i].name; 
+        placeholder.style.width = "90%";
+        placeholder.style.height = "300px";
+        document.getElementsByTagName('td')[i].appendChild(placeholder);
+        
+        // take care of initial graph drawing
+        updateGraph(series.metrics[i]);
+      };
+      
+      // all metrics update every minute
+      //setInterval(generateAjaxRequest, 10000);
+      setInterval(generateAjaxRequest, 60000);
+    }; 
+ 
+    // helper functions   
+    function generateAjaxRequest () {
+      ajaxRequest(updateAllGraphs);
+    };
+ 
+    function ajaxRequest (myFunction) {
+	    $.ajax({
+			  url: "/metrics",
+			  method: 'GET',
+			  dataType: 'json',
+			  success: myFunction
+		  });
+	  };
+	  
+	  function updateAllGraphs (series) {
+	    for (var k=0; k<series.metrics.length; k++) {
+	      updateGraph(series.metrics[k]);
+	    };
+	  };
+      
+    function updateGraph (metric) {
+      // set up graph display options
+  	  var options = {
+  			lines: { show: true },
+  			points: { show: true },
+  			xaxis: { tickDecimals: 0, tickSize: 5 },
+  			yaxis: { min: 0.0, max: 1.2 }
+  		};
+        
+      // transform data into graphable points
+  		var newData = metric.values;
+  		var newDataTransformed = new Array(newData.length);
+  		for (var j=0; j<newData.length; j++) {
+  			newDataTransformed[j] = new Array(j+1, newData[j]);
+  		}
+  		
+  		var pageName = metric.name;
+  		var placeholder = $("#placeholder-" + pageName);
+
+  		$.plot(placeholder, [ newDataTransformed ], options);
 		};
-		
-		setInterval(updateGraph, 10000);
-		//setInterval(updateGraph, 60000);	
-	};
-	
-	function ajaxRequest (myFunction) {
-	  $.ajax({
-			url: "/metrics",
-			method: 'GET',
-			dataType: 'json',
-			success: myFunction
-		});
-	}
-	</script>  
+ }
+ </script>  
 }

@@ -10,8 +10,7 @@ import collections.EgraphsMetric
 object Application extends Controller {
 
   def index = Action { request =>
-    val metrics = WebsiteMonitoring.getMetrics
-    Ok(views.html.index(metrics))
+    Ok(views.html.index())
   }
 
   def getMetrics = Action {

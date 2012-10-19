@@ -32,9 +32,9 @@ object WebsiteMonitoring {
       val myCurrentActor = Akka.system.actorOf(
         Props(new WebsiteAvailabilityActor(url, friendlyName, new CloudWatchMetricPublisher(cloudwatch))),
         name = actorName)
-
-      // CHANGE BACK TO 1 MINUTE AFTER TESTING  
-      Akka.system.scheduler.schedule(0 seconds, 10 seconds, myCurrentActor, CheckStatus)
+ 
+      //Akka.system.scheduler.schedule(0 seconds, 10 seconds, myCurrentActor, CheckStatus)
+      Akka.system.scheduler.schedule(0 seconds, 60 seconds, myCurrentActor, CheckStatus)
 
       myCurrentActor
     }

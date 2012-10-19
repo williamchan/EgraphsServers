@@ -2,6 +2,7 @@ import cloudbees.Plugin._
 import sbt._
 import Keys._
 import PlayProject._
+import cloudbees.Plugin._
 
 object ApplicationBuild extends Build {
 
