@@ -32,7 +32,7 @@ object Global extends GlobalSettings with Logging {
 
       // Initialize Squeryl persistence
       SessionFactory.concreteFactory = Some(() => {
-        val connection = play.db.DB.getConnection
+        val connection = play.api.db.DB.getConnection()(app)
         if (connection.getTransactionIsolation != Connection.TRANSACTION_SERIALIZABLE) {
           connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
         }

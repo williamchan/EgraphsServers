@@ -12,8 +12,7 @@ import redis.clients.jedis.Jedis
  * a Cache instance by injecting a CacheFactory into your class and using its
  * applicationCache instance.
  *
- * @param jedis the low-level Redis client, provided by
- *              [[play.modules.redis.RedisConnectionManager.getRawConnection]]
+ * @param jedis the low-level Redis client.
  */
 private[cache] class RedisCache @Inject()(pool: JedisFactory) extends Cache {
 

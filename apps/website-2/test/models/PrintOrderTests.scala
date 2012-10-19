@@ -13,7 +13,7 @@ class PrintOrderTests extends EgraphsUnitTest
   with DateShouldMatchers
   with DBTransactionPerTest {
 
-  private val store = AppConfig.instance[PrintOrderStore]
+  private def store = AppConfig.instance[PrintOrderStore]
 
   override def newEntity = {
     val order = TestData.newSavedOrder()
@@ -32,7 +32,7 @@ class PrintOrderTests extends EgraphsUnitTest
     toTransform.copy(pngUrl = Some("myUrl"))
   }
 
-  "getPngUrl" should "return URL that points to PNG" in {
+  "getPngUrl" should "return URL that points to PNG" in new EgraphsTestApplication {
     var egraph = TestData.newSavedEgraph()
     val order = egraph.order
     val printOrder = PrintOrder(orderId = order.id).save()
@@ -41,10 +41,10 @@ class PrintOrderTests extends EgraphsUnitTest
     egraph = egraph.withEgraphState(EgraphState.ApprovedByAdmin).save()
     val pngUrl: Option[String] = printOrder.getPngUrl
     pngUrl.get should endWith("blob/files/egraphs/" + egraph.id + "/image/signing-origin-offset-0x0_global-width-2160px-v1.png")
-    TestHelpers.getBlobFromTestBlobUrl(pngUrl.get).get.asByteArray.length should be(6458576)
+    TestHelpers.getBlobFromTestBlobUrl(pngUrl.get).get.asByteArray.length should be(13863)
   }
 
-  "getFramedPrintImageData" should "return URL that points to framed-print sized image" in {
+  "getFramedPrintImageData" should "return URL that points to framed-print sized image" in new EgraphsTestApplication {
     var egraph = TestData.newSavedEgraph()
     val order = egraph.order
     val printOrder = PrintOrder(orderId = order.id).save()

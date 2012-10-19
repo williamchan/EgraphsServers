@@ -130,7 +130,7 @@ class FormChecks @Inject()(accountStore: AccountStore, customerStore: CustomerSt
    * Returns a Date if the String could be turned into one with the provided format
    * String. See [[java.text.SimpleDateFormat]] for example formats.
    *
-   * Grabbed wholesale from play.data.binding.types.DateBinder.
+   * Grabbed wholesale from Play 1.0's play/data/binding/types/DateBinder.
    */
   def isDateWithFormat(
     format: String,

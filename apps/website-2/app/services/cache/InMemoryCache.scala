@@ -10,7 +10,7 @@ import net.sf.ehcache.Element;
  * instance by injecting a CacheFactory into your class and grabbing
  * its applicationCache property.
  *
- * @param cache the EhCacheImpl from play.
+ * @param cache the EhCacheImpl from play
  */
 private[cache] class InMemoryCache @Inject() extends Cache {
   import InMemoryCache.cache

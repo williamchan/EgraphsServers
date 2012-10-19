@@ -1,7 +1,6 @@
 package utils
 
 import org.specs2.mock.Mockito
-import play.mvc.Http.Request
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 import play.api.mvc.Session

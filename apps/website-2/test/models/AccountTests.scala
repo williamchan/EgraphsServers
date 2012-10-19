@@ -1,6 +1,5 @@
 package models
 
-import play.data.validation.Validation
 import scala.collection.JavaConversions._
 import services.AppConfig
 import AccountAuthenticationError._

@@ -1,7 +1,6 @@
 package utils
 
 import services.http.{WithDBConnection, ControllerDBSettings, ControllerMethod}
-import play.mvc.Http.Request
 import play.api.mvc.Action
 
 /**

@@ -2,6 +2,8 @@ package services.db
 
 import uk.me.lings.scalaguice.ScalaModule
 import java.sql.Connection
+import play.api.db.DB
+import play.api.Play
 import com.google.inject.{Singleton, AbstractModule}
 import org.squeryl.Session
 
@@ -15,7 +17,7 @@ object DBModule extends AbstractModule with ScalaModule {
     // Connection factories: () => Connection
 
     // Non-annotated factory: gives a new connection from the pool
-    bind[() => Connection].toInstance(() => play.db.DB.getConnection())
+    bind[() => Connection].toInstance(() => DB.getConnection()(Play.current))
 
     // @CurrentTransaction factory: gives the one used in the current Squeryl session.
     // This will bork if there is no current session.

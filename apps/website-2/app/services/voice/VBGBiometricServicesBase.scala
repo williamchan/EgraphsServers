@@ -2,7 +2,7 @@ package services.voice
 
 import java.io._
 import java.io.{ByteArrayInputStream, SequenceInputStream}
-import java.net.{URLEncoder, URL}
+import java.net.URL
 import java.util.Hashtable
 import javax.net.ssl.HttpsURLConnection
 import javax.sound.sampled.{AudioInputStream, AudioSystem}
@@ -12,7 +12,8 @@ import models.vbg._
 import org.w3c.dom.{Node, Document}
 import org.xml.sax.InputSource
 import services.SampleRateConverter
-import org.apache.commons.codec.binary.Base64.encodeBase64String
+import egraphs.playutils.Encodings
+import Encodings.Base64
 
 trait VBGBiometricServicesBase {
 
@@ -273,7 +274,7 @@ trait VBGBiometricServicesBase {
   final protected[voice] def convertWavTo8kHzBase64(wavBinary: Array[Byte]): String = {
     if (wavBinary.length == 0) return ""
     val wavBinary_8kHz: Array[Byte] = SampleRateConverter.convert(8000f, wavBinary)
-    encodeBase64String(wavBinary_8kHz)
+    Base64.encode(wavBinary_8kHz)
   }
 
   // Referenced http://stackoverflow.com/questions/6381012/java-trouble-combining-more-than-2-wav-files
@@ -400,7 +401,7 @@ private class VBGRequest {
 
     var xml: String = buildXMLRequest
     // Make sure to encode the output stream for any weird characters
-    xml = URLEncoder.encode(xml, "UTF-8")
+    xml = Encodings.URL.encode(xml)
     val httpConn: HttpsURLConnection = url.openConnection.asInstanceOf[HttpsURLConnection]
     httpConn.setRequestMethod("POST")
     httpConn.setRequestProperty("Content-Length", String.valueOf(xml.length))

@@ -83,7 +83,7 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
    * screen.
    *
    * @param celebrityUrlSlug identifies the celebrity whose storefront to serve.
-   * @param productUrlSlug identifies the first product to display.
+   * @param productUrlSlug identifies the first product to display
    * @return the web page.
    */
   def getStorefrontChoosePhotoCarousel(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod.withForm()

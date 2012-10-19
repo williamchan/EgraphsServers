@@ -4,8 +4,8 @@
 //
 //import java.util.Properties
 //import models.Account
-//import play.mvc.Http.Request
-//import play.test.FunctionalTest
+//import play.api.mvc.Http.Request
+//import play.api.test.FunctionalTest
 //
 ///**
 // * Common functionality required when writing functional tests against

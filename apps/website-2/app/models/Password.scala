@@ -4,7 +4,6 @@ import java.security.SecureRandom
 import play.api.libs.Codecs
 import java.math.BigInteger
 import java.util.Date
-import play.data.validation.Validation
 import org.postgresql.util.Base64
 import services.crypto.Crypto.SHA256
 

@@ -21,7 +21,7 @@ import services.config.ConfigFileProxy
  * - "redis.1", "redis.2", etc: A Redis cache implementation against a specific database index 0 - 15
  *       on our hosted distributed cache.
  *
- * - "memory": An in-memory implementation that delegates to Play's [[play.cache.EhCacheImpl]]
+ * - "memory": An in-memory implementation that delegates to Play's in-memory cache
  **/
 class CacheFactory @Inject()(
   config: ConfigFileProxy,
