@@ -6,7 +6,6 @@
 
 @import controllers.WebsiteControllers
 @import egraphs.authtoken.AuthenticityToken.safeForm
-@import views.html.Application.content_base
 @import views.html.Application.tags.pagination
 @import views.html.frontend.tags
 @import views.html.frontend.tags.ng
@@ -26,23 +25,6 @@
 
 @getCelebritiesBySearchAdmin = @{
 	routes.WebsiteControllers.getCelebritiesBySearchAdmin
-}
-
-@head = {
-<link rel="stylesheet" href='@RemoteAssets.at("chosen/chosen.css")' >
-<script src='@RemoteAssets.at("twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
-<script src='@RemoteAssets.at("chosen/chosen.jquery.min.js")' type="text/javascript"></script>
-}
-
-@onBodyLoad = {
-  $('.chzn-select').chosen();
-}
-
-@navContent = {
-	@safeForm('id -> "logout-form", 'method -> "POST", 'action -> postLogout.url) {  
-    @tags.arrow_button(caption="Logout")    
-    
-  }
 }
 
 @body = {
