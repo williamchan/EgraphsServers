@@ -31,8 +31,10 @@ trait PostCelebrityInventoryBatchAdminEndpoint extends Logging {
       httpFilters.requireCelebrityId(celebrityId) { celebrity =>
         Action { implicit request =>
           
+          val inventoryBatchId = Form("inventoryBatchId" -> longNumber).bindFromRequest.fold(formWithErrors => 0L, validForm => validForm)
+          val isCreate = (inventoryBatchId == 0)
+
           val form = Form(tuple(
-              "inventoryBatchId" -> longNumber,
               "numInventory" -> number, // TODO: verify this is non-negative
               "startDate" -> date,
               "endDate" -> date
@@ -41,14 +43,12 @@ trait PostCelebrityInventoryBatchAdminEndpoint extends Logging {
             val badData = hasErrors.value.get
             Redirect(controllers.routes.WebsiteControllers.postCelebrityInventoryBatchAdmin(celebrityId)).
             flashing("errors" -> hasErrors.errors.head.message.toString(),
-                "inventoryBatchId" -> badData._1.toString, "numInventory" -> badData._2.toString, "startDate" -> badData._3.toString, "endDate" -> badData._4.toString)
+                "inventoryBatchId" -> inventoryBatchId.toString, "numInventory" -> badData._1.toString, "startDate" -> badData._2.toString, "endDate" -> badData._3.toString)
 
           }, success => {
-            val inventoryBatchId = success._1
-            val numInventory = success._2
-            val startDate = success._3
-            val endDate = success._4
-            val isCreate = (inventoryBatchId == 0)
+            val numInventory = success._1
+            val startDate = success._2
+            val endDate = success._3
 
             // Need to get the select prod #s, which are not currently handled by the form
             val rawFormData = request.body.asFormUrlEncoded.get

@@ -11,20 +11,24 @@ import services.logging.Logging
 import play.api.mvc.Action
 import play.api.data._
 import play.api.data.Forms._
+import play.api.data.format.Formats._
 import play.api.data.validation.Constraints._
 import play.api.data.validation.Constraint
 import play.api.data.validation.Valid
 import play.api.data.validation.Invalid
 import java.io.File
 import services.logging.Logging
-import services.{ImageUtil, Utils}
 import java.text.SimpleDateFormat
 import services.http.SafePlayParams.Conversions._
-import services.Dimensions
+import play.api.mvc.MultipartFormData
+import java.awt.image.BufferedImage
+import services.{Dimensions, ImageUtil, Utils}
 import services.mail.TransactionalMail
 import services.blobs.Blobs.Conversions._
 import org.apache.commons.mail.HtmlEmail
 
+
+// TODO(wchan): This code has become frankenstein. I'm so sorry.
 trait PostCelebrityAdminEndpoint {
   this: Controller =>
 
@@ -33,17 +37,8 @@ trait PostCelebrityAdminEndpoint {
   protected def transactionalMail: TransactionalMail
   protected def celebrityStore: CelebrityStore
   protected def accountStore: AccountStore
-
-  /**
-   * This code has become Frankenstein. Refactor to use services.http.forms.Form
-   *
-   * First validates inputs, and either redirects with error messages or creates a Celebrity.
-   *
-   * @return a redirect either to the Create Celebrity page with form errors or to
-   *         the created Celebrity's page.
-   */
-  /*
-     celebrityId: Long = 0,
+  
+  case class PostCelebrityForm(
      celebrityEmail: String,
      celebrityPassword: String,
      publicName: String,
@@ -52,186 +47,197 @@ trait PostCelebrityAdminEndpoint {
      casualName: String,
      organization: String,
      roleDescription: String,
-     twitterUsername: String,
-     profileImage: Option[File] = None,
-     landingPageImage: Option[File] = None,
-     logoImage: Option[File] = None
-   */
+     twitterUsername: String
+  )
+
   def postCelebrityAdmin = postController() {
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
-      Action { implicit request =>
+    httpFilters.requireAdministratorLogin.inSession(parser = parse.multipartFormData) { (admin, adminAccount) =>
+      Action(parse.multipartFormData) { implicit request =>
         
-        Ok
+        val celebrityId = Form("celebrityId" -> longNumber).bindFromRequest.fold(formWithErrors => 0L, validForm => validForm)
+        val profileImageFile = request.body.file("profileImage").map(_.ref.file)
+      	val landingPageImageFile = request.body.file("landingPageImage").map(_.ref.file)
+      	val logoImageFile = request.body.file("logoImage").map(_.ref.file)
+      	val profileImageOption = if (profileImageFile.isDefined) ImageUtil.parseImage(profileImageFile.get) else None
+      	val landingPageImageOption = if (landingPageImageFile.isDefined) ImageUtil.parseImage(landingPageImageFile.get) else None
+      	val logoImageOption = if (logoImageFile.isDefined) ImageUtil.parseImage(logoImageFile.get) else None
+      	val isCreate = (celebrityId == 0)
+      	
+      	val form = Form(mapping(
+              "celebrityEmail" -> email.verifying(nonEmpty),
+              "celebrityPassword" -> text,
+              "publicName" -> nonEmptyText(maxLength = 128),
+              "publishedStatusString" -> nonEmptyText.verifying(isCelebrityPublishedStatus),
+              "bio" -> nonEmptyText,
+              "casualName" -> text,
+              "organization" -> nonEmptyText(maxLength = 128),
+              "roleDescription" -> nonEmptyText(maxLength = 128),
+              "twitterUsername" -> text
+          )(PostCelebrityForm.apply)(PostCelebrityForm.unapply)
+            .verifying(
+                isUniqueEmail(isCreate, celebrityId),
+                isPasswordValid(isCreate, celebrityId),
+                isUniqueUrlSlug(isCreate, celebrityId),
+                profileImageIsValid(profileImageFile),
+                landingPageImageIsValid(landingPageImageOption),
+                logoImageIsValid(logoImageOption)
+      		)
+          )
         
-//        val isCreate = (celebrityId == 0)
-//        val tmp = if (isCreate) new Celebrity() else celebrityStore.get(celebrityId)
-//
-//        val celebrity = celebrityWithValues(tmp, publicName = publicName,
-//          bio = bio, casualName = casualName, organization = organization, roleDescription = roleDescription, twitterUsername = twitterUsername)
-//        val celebrityUrlSlug = celebrity.urlSlug
-//
-//        // Account validation, including email and password validations and extant account validations
-//        val preexistingAccount: Option[Account] = if (isCreate) accountStore.findByEmail(celebrityEmail) else accountStore.findByCelebrityId(celebrityId)
-//        val passwordValidationOrAccount: Either[ValidationResult, Account] = if (preexistingAccount.isDefined) {
-//          Right(preexistingAccount.get)
-//        } else {
-//          new Account(email = celebrityEmail).withPassword(celebrityPassword)
-//        }
-//
-//        if (isCreate) {
-//          Validation.required("E-mail address", celebrityEmail)
-//          Validation.email("E-mail address", celebrityEmail)
-//          Validation.required("Password", celebrityPassword)
-//          if (preexistingAccount.isDefined) {
-//            val isUniqueEmail = preexistingAccount.get.celebrityId.isEmpty
-//            Validation.isTrue("Celebrity with e-mail address already exists", isUniqueEmail)
-//            if (isUniqueEmail && preexistingAccount.get.password.isDefined) {
-//              Validation.isTrue("A non-celebrity account with that e-mail already exists. Provide the correct password to turn this account into a celebrity account",
-//                preexistingAccount.get.password.get.is(celebrityPassword))
-//            }
-//          }
-//          if (passwordValidationOrAccount.isLeft) {
-//            Validation.addError("Password", passwordValidationOrAccount.left.get.error.toString)
-//          }
-//        }
-//
-//        Validation.required("Public Name", publicName)
-//        Validation.required("Short Bio", bio)
-//        Validation.required("Organization", organization)
-//        Validation.required("Role Description", roleDescription)
-//
-//        Validation.isTrue("Public Name has maximum length of 128", publicName.length < 128)            // column width in database
-//        Validation.isTrue("Organization has maximum length of 128", organization.length < 128)         // column width in database
-//        Validation.isTrue("Role Description has maximum length of 128", roleDescription.length < 128)  // column width in database
-//
-//        // Name validations
-////        if (celebrityUrlSlug.isDefined) {
-//          val celebrityByUrlSlug = celebrityStore.findByUrlSlug(celebrityUrlSlug)
-//          val isUniqueUrlSlug = if (isCreate) {
-//            celebrityByUrlSlug.isEmpty
-//          } else {
-//            celebrityByUrlSlug.isEmpty || (celebrityByUrlSlug.isDefined && celebrityByUrlSlug.get.id == celebrityId)
-//          }
-//          Validation.isTrue("Celebrity with same website name exists. Provide different public name", isUniqueUrlSlug)
-////        }
-//
-//        // Profile image validations
-//        if (profileImage.isDefined) {
-//          val dimensions = ImageUtil.getDimensions(profileImage.get)
-//          if (dimensions.isEmpty) {
-//            Validation.addError("Profile Photo", "No image found for Profile Photo")
-//          }
-//        }
-//
-//        // landingPageImage validations and prepare to persist landingPageImage file
-//        val landingPageImageOption = landingPageImage match {
-//          case None => None
-//          case Some(imageFile) => {
-//            val parsedImage = ImageUtil.parseImage(imageFile)
-//            parsedImage.map(image => {
-//              val (width, height) = (image.getWidth, image.getHeight)
-//              Validation.isTrue("Landing Page Image must be at least " + Celebrity.minLandingPageImageWidth + " in width and " + Celebrity.minLandingPageImageHeight + " in height - resolution was " + width + "x" + height,
-//                width >= Celebrity.minLandingPageImageWidth && height >= Celebrity.minLandingPageImageHeight)
-//            })
-//            parsedImage
-//          }
-//        }
-//
-//        // logo validations and prepare to persist logo file
-//        val logoImageImageOption = logoImage match {
-//          case None => None
-//          case Some(imageFile) => {
-//            val parsedImage = ImageUtil.parseImage(imageFile)
-//            parsedImage.map(image => {
-//              val (width, height) = (image.getWidth, image.getHeight)
-//              Validation.isTrue("Logo Image must be at least " + Celebrity.minLogoWidth + " in width and " + Celebrity.minLogoWidth + " in height - resolution was " + width + "x" + height,
-//                width >= Celebrity.minLogoWidth && height >= Celebrity.minLogoWidth)
-//              Validation.isTrue("Logo Image must be square. Resolution was " + width + "x" + height, width == height)
-//            })
-//            parsedImage
-//          }
-//        }
-//
-//        // publishedStatusString validations
-//        val publishedStatus = PublishedStatus(publishedStatusString) match {
-//          case Some(providedStatus) => providedStatus
-//          case None =>
-//            Validation.addError("Error setting celebrity's published status, please contact support", "")
-//            PublishedStatus.Unpublished
-//        }
-//
-//        if (!validationErrors.isEmpty) {
-//          redirectWithValidationErrors(
-//            celebrityId = celebrityId, celebrityEmail = celebrityEmail, celebrityPassword = celebrityPassword,
-//            publicName = publicName, publishedStatusString = publishedStatusString, bio = bio,
-//            casualName = casualName, organization = organization, roleDescription = roleDescription, twitterUsername = twitterUsername)
-//        } else {
-//          val savedCelebrity = celebrity.withPublishedStatus(publishedStatus).save()
-//          
-//          // Celebrity must have been previously saved before saving with assets that live in blobstore
-//          if (profileImage.isDefined) savedCelebrity.saveWithProfilePhoto(profileImage.get)
-//
-//          if (isCreate) {
-//            passwordValidationOrAccount.right.get.copy(celebrityId = Some(savedCelebrity.id)).save()
-//            savedCelebrity.sendWelcomeEmail(savedCelebrity.account.email)
-//          }
-//          
-//          savedCelebrity.saveWithImageAssets(landingPageImageOption, logoImageImageOption)
-//
-//          new Redirect(
-//            WebsiteControllers.reverse(WebsiteControllers.getCelebrityAdmin(
-//              celebrityId = savedCelebrity.id, action = Option("preview"))
-//            ).url
-//          )
-//        }
+        form.bindFromRequest.fold(
+            formWithErrors => {
+              println("formWithErrors")
+              
+              val errors = formWithErrors.errors.head.message.toString
+              val url = if (isCreate) GetCreateCelebrityAdminEndpoint.url() else GetCelebrityAdminEndpoint.url(celebrityId = celebrityId)
+              println("errors " + formWithErrors.errors.mkString(", "))
+              Redirect(url)
+              // TODO: PLAY20 migration: Is there ANY way to get the values from a formWithErrors?
+//              Redirect(url).flashing(
+//                "errors" -> errors,
+//		            "celebrityId" -> celebrityId.toString,
+//		            "celebrityEmail" -> Form("celebrityEmail" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm),
+//		            "celebrityPassword" -> Form("celebrityPassword" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm),
+//		            "publicName" -> Form("publicName" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm),
+//		            "publishedStatusString" -> Form("publishedStatusString" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm),
+//		            "bio" -> Form("casualName" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm),
+//		            "casualName" -> Form("casualName" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm),
+//		            "organization" -> Form("roleDescription" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm),
+//		            "roleDescription" -> Form("roleDescription" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm),
+//		            "twitterUsername" -> Form("twitterUsername" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm)
+//              )
+            },
+            validForm => {
+              println("validForm")
+              
+              val publishedStatus = PublishedStatus(validForm.publishedStatusString).getOrElse(PublishedStatus.Unpublished)
+              val tmp = if (isCreate) Celebrity() else celebrityStore.get(celebrityId)
+              val savedCelebrity = tmp.copy(
+                  publicName = validForm.publicName,
+                  bio = validForm.bio,
+                  casualName = Utils.toOption(validForm.casualName),
+                  organization = validForm.organization,
+                  roleDescription = validForm.roleDescription,
+                  twitterUsername = Utils.toOption(validForm.twitterUsername))
+                  .withPublishedStatus(publishedStatus).save()
+              
+              // Celebrity must have been previously saved before saving with assets that live in blobstore
+              profileImageFile.map(f => savedCelebrity.saveWithProfilePhoto(f))
+              savedCelebrity.saveWithImageAssets(landingPageImageOption, logoImageOption)
+              
+              if (isCreate) {
+                new Account(celebrityId = Some(savedCelebrity.id), email = validForm.celebrityEmail).withPassword(validForm.celebrityPassword).right.get.save
+	            savedCelebrity.sendWelcomeEmail(savedCelebrity.account.email)
+	          }
+              
+              Redirect(GetCelebrityAdminEndpoint.url(celebrityId = savedCelebrity.id) + "?action=preview")
+            }
+          )
       }
   	}
   }
-
-  private def celebrityWithValues(celebrity: Celebrity,
-                                  publicName: String,
-                                  bio: String,
-                                  casualName: String,
-                                  organization: String,
-                                  roleDescription: String,
-                                  twitterUsername: String): Celebrity = {
-    celebrity.copy(publicName = publicName,
-      bio = bio,
-      casualName = Utils.toOption(casualName),
-      organization = organization,
-      roleDescription = roleDescription,
-      twitterUsername = Utils.toOption(twitterUsername)
-    )
+  
+  private def isUniqueEmail(isCreate: Boolean, celebrityId: Long): Constraint[PostCelebrityForm] = {
+    Constraint { form: PostCelebrityForm =>
+      if (isCreate) {
+        val preexistingAccount: Option[Account] = if (isCreate) accountStore.findByEmail(form.celebrityEmail) else accountStore.findByCelebrityId(celebrityId)
+        if (preexistingAccount.isDefined) {
+          val isUniqueEmail = preexistingAccount.get.celebrityId.isEmpty
+          if (isUniqueEmail) Valid else Invalid("Celebrity with e-mail address already exists")
+        } else {
+          Valid
+        }
+      } else {
+        Valid
+      }
+    }
+  }
+  
+  private def isPasswordValid(isCreate: Boolean, celebrityId: Long): Constraint[PostCelebrityForm] = {
+    Constraint { form: PostCelebrityForm =>
+      if (isCreate) {
+        val preexistingAccount: Option[Account] = if (isCreate) accountStore.findByEmail(form.celebrityEmail) else accountStore.findByCelebrityId(celebrityId)
+        val passwordValidationOrAccount: Either[Password.PasswordError, Account] = if (preexistingAccount.isDefined) {
+          Right(preexistingAccount.get)
+        } else {
+          new Account(email = form.celebrityEmail).withPassword(form.celebrityPassword)
+        }
+        if (passwordValidationOrAccount.isRight) Valid else Invalid("Password is invalid")
+      } else {
+        Valid
+      }
+    }
+  }
+  
+  private def isUniqueUrlSlug(isCreate: Boolean, celebrityId: Long): Constraint[PostCelebrityForm] = {
+    Constraint { form: PostCelebrityForm =>
+      val celebrityUrlSlug = Celebrity(publicName = form.publicName).urlSlug
+      val celebrityByUrlSlug = celebrityStore.findByUrlSlug(celebrityUrlSlug)
+      val isUniqueUrlSlug = if (isCreate) {
+        celebrityByUrlSlug.isEmpty
+      } else {
+        celebrityByUrlSlug.isEmpty || (celebrityByUrlSlug.isDefined && celebrityByUrlSlug.get.id == celebrityId)
+      }
+      if (isUniqueUrlSlug) Valid else Invalid("Celebrity with same website name exists. Provide different public name")
+    }
   }
 
-//  private def redirectWithValidationErrors(celebrityId: Long,
-//                                           celebrityEmail: String,
-//                                           celebrityPassword: String,
-//                                           publicName: String,
-//                                           publishedStatusString: String,
-//                                           bio: String,
-//                                           casualName: String,
-//                                           organization: String,
-//                                           roleDescription: String,
-//                                           twitterUsername: String): Redirect = {
-//    val flash = play.api.mvc.Http.Context.current().flash()
-//    flash.put("celebrityId", celebrityId)
-//    flash.put("celebrityEmail", celebrityEmail)
-//    flash.put("celebrityPassword", celebrityPassword)
-//    flash.put("publicName", publicName)
-//    flash.put("publishedStatusString", publishedStatusString)
-//    flash.put("bio", bio)
-//    flash.put("casualName", casualName)
-//    flash.put("organization", organization)
-//    flash.put("roleDescription", roleDescription)
-//    flash.put("twitterUsername", twitterUsername)
-//    if (celebrityId == 0) {
-//      WebsiteControllers.redirectWithValidationErrors(GetCreateCelebrityAdminEndpoint.url())
-//    } else {
-//      WebsiteControllers.redirectWithValidationErrors(
-//        WebsiteControllers.reverse(
-//          WebsiteControllers.getCelebrityAdmin(celebrityId = celebrityId)
-//      ))
-//    }
-//  }
+  private def profileImageIsValid(profileImageFile: Option[File]): Constraint[PostCelebrityForm] = {
+    Constraint { form: PostCelebrityForm =>
+      if (profileImageFile.isDefined) {
+        val dimensions = ImageUtil.getDimensions(profileImageFile.get)
+        if (dimensions.isEmpty) {
+          Invalid("No image found for Profile Photo")
+        } else {
+          Valid
+        }
+      } else {
+        Valid
+      }
+    }
+  }
+  
+  private def landingPageImageIsValid(landingPageImageOption: Option[BufferedImage]): Constraint[PostCelebrityForm] = {
+    Constraint { form: PostCelebrityForm =>
+      if (landingPageImageOption.isDefined) {
+        val landingPageImage = landingPageImageOption.get
+        val (width, height) = (landingPageImage.getWidth, landingPageImage.getHeight)
+        if (width >= Celebrity.minLandingPageImageWidth && height >= Celebrity.minLandingPageImageHeight) {
+          Valid
+        } else {
+          Invalid("Landing Page Image must be at least " + Celebrity.minLandingPageImageWidth + " in width and " + Celebrity.minLandingPageImageHeight + " in height - resolution was " + width + "x" + height)
+        }
+      } else {
+        Valid
+      }
+    }
+  }
+  
+  private def logoImageIsValid(logoImageOption: Option[BufferedImage]): Constraint[PostCelebrityForm] = {
+    Constraint { form: PostCelebrityForm =>
+      if (logoImageOption.isDefined) {
+        val logoImage = logoImageOption.get
+        val (width, height) = (logoImage.getWidth, logoImage.getHeight)
+        val isMinWidth = (width >= Celebrity.minLogoWidth && height >= Celebrity.minLogoWidth)
+        val isSquare = (width == height)
+        if (isMinWidth && isSquare) {
+          Valid
+        } else {
+          Invalid("Logo Image must be square and at least " + Celebrity.minLogoWidth + " on a side. Resolution was " + width + "x" + height)
+        }
+      } else {
+        Valid
+      }
+    }
+  }
+
+  // TODO: redundant with isProductPublishedStatus
+  def isCelebrityPublishedStatus: Constraint[String] = {
+    Constraint { s: String =>
+      PublishedStatus(s) match {
+        case Some(providedStatus) => Valid
+        case None => Invalid("Error setting product's published status, please contact support")
+      }
+    }
+  }
 }
