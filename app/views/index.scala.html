@@ -3,16 +3,32 @@
 @main(title = "Monitoring") {
   
   <table>
-  <ul>
+    <tr>
          @metrics.map { case collections.EgraphsMetric(name, description, values) =>
-           <li>
-             <h1> Recent GET requests to @name: </h1>
-             <p> @values.mkString(", ") </p>
-
-             <div id="placeholder-@name" style="width:33%;height:300px;"></div>
-           </li>
+           <td>
+             <h1 id="header-@name"> Recent GET requests to @name: </h1>
+             <div id="placeholder-@name" style="width:90%;height:300px;"></div>
+           </td>
      } 
-  </ul>
+   </tr>
+   
+   <tr>
+     
+     <td>
+       <img id="purr" src="http://cvcl.mit.edu/hybrid/cat2.jpg" onclick=test() alt="cat" height="300" width="90%"> 
+     </td>
+     
+     <td>
+       <img src="http://1.bp.blogspot.com/-1uQRYMklACU/ToQ6aL-5uUI/AAAAAAAAAgQ/9_u0922cL14/s1600/cute-puppy-dog-wallpapers.jpg" alt="dog" height="300" width="90%"> 
+     </td>
+     
+     <td>
+       <img src="http://24.media.tumblr.com/N36RfdeSZmoh6bmvNq5VdirZo1_400.jpg" alt="hamster" height="300" width="90%"> 
+     </td>
+       
+    </tr>
+   
+   
   </table>
 
 	<script type="text/javascript">
@@ -33,14 +49,17 @@
 			xaxis: { tickDecimals: 0, tickSize: 5 },
 			yaxis: { min: 0.0, max: 1.2 }
 		};
+		
+		// initial load
+    window.onload = updateGraph;
 
 		function updateGraph() {
 
 			function onDataReceived(series) {
 
+        // transform data into graphable points
 				var newData = series.metrics[index].values;
 				var newDataTransformed = new Array(newData.length);
-
 				for (var i=0; i<newData.length; i++) {
 					newDataTransformed[i] = new Array(i+1, newData[i]);
 				}
@@ -50,19 +69,20 @@
         
 				$.plot(placeholder, [ newDataTransformed ], options);
 			};
-
-			$.ajax({
-				url: "/metrics",
-				method: 'GET',
-				dataType: 'json',
-				success: onDataReceived
-			});
+			ajaxRequest(onDataReceived);
 		};
 		
-		updateGraph;
 		setInterval(updateGraph, 10000);
 		//setInterval(updateGraph, 60000);	
 	};
-
+	
+	function ajaxRequest (myFunction) {
+	  $.ajax({
+			url: "/metrics",
+			method: 'GET',
+			dataType: 'json',
+			success: myFunction
+		});
+	}
 	</script>  
 }

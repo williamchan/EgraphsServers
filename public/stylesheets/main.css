@@ -1,9 +1,10 @@
 h1 {
     padding: 10px 30px;
     background: #CAE7EC;
-    font-size: 24px;
+    font-size: 20px;
 }
 
-ul {
-	list-style-type: none;
+td {
+	padding: 0px 20px 10px;
 }
+
