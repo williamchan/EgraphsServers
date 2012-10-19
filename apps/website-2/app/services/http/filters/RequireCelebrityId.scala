@@ -15,7 +15,7 @@ import play.api.libs.iteratee.{Done, Input}
 import play.api.mvc.RequestHeader
 import play.api.mvc.Request
 
-// TODO: PLAY20 migration. Test and comment this summbitch.
+// TODO: PLAY20 migration. Comment this summbitch.
 class RequireCelebrityId @Inject() (celebStore: CelebrityStore) {
 
   def apply[A](celebId: Long, parser: BodyParser[A]=parse.anyContent)
@@ -75,4 +75,4 @@ class RequireCelebrityId @Inject() (celebStore: CelebrityStore) {
   // Private members
   //
   private val noCelebIdResult = NotFound("Valid celebrity ID was required but not provided")
-  }
+}

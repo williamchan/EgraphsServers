@@ -30,7 +30,7 @@ class RequireAuthenticatedAccountTests extends EgraphsUnitTest {
     val credentials = BasicAuth.Credentials(userEmail, password)
     val request = FakeRequest().withHeaders(credentials.toHeader)
 
-    // Set up the mock operation to be performed on the authenicated account
+    // Set up the mock operation to be performed on the authenticated account
     val accountAction = mock[Action[AnyContent]]
     val blockToExecute = mock[Account => Action[AnyContent]]
     blockToExecute(account) returns accountAction
