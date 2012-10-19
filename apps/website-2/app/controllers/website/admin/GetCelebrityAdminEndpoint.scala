@@ -8,10 +8,9 @@ import services.http.filters.HttpFilters
 import play.api.mvc.{Action, Controller}
 import play.api.mvc.Results.{Ok, Redirect, NotFound}
 import controllers.website.consumer.CelebrityLandingConsumerEndpoint
-import models.frontend.header.HeaderData
-import models.frontend.footer.FooterData
+import services.mvc.{celebrity, ImplicitHeaderAndFooterData}
 
-private[controllers] trait GetCelebrityAdminEndpoint {
+private[controllers] trait GetCelebrityAdminEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
 
   protected def controllerMethod: ControllerMethod
@@ -26,8 +25,6 @@ private[controllers] trait GetCelebrityAdminEndpoint {
           case (Some(account), Some(celebrity)) =>
             // TODO(play2): I had a hard time getting url parameter and query parameters working together. Will figure out later.
             if (request.queryString.get("action").getOrElse("").toString.contains("preview")) {
-              implicit val headerData = HeaderData()
-              implicit val footerData = FooterData()
               Ok(CelebrityLandingConsumerEndpoint.getCelebrityLandingHtml(celebrity))
             } else {
               implicit val flash = request.flash + 

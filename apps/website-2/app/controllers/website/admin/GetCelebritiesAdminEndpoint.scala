@@ -9,8 +9,9 @@ import services.http.filters.HttpFilters
 import controllers.PaginationInfoFactory
 import play.api.data._
 import play.api.data.Forms._
+import services.mvc.{celebrity, ImplicitHeaderAndFooterData}
 
-private[controllers] trait GetCelebritiesAdminEndpoint {
+private[controllers] trait GetCelebritiesAdminEndpoint extends ImplicitHeaderAndFooterData  {
   this: Controller =>
 
   protected def httpFilters: HttpFilters
