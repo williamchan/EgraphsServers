@@ -65,8 +65,12 @@ class RichResult(result: Result) {
   // Private members
   //
   private def sessionFromPlainResult(plainResult: PlainResult): Option[Session] = {
-    val maybeCookieString: Option[String] = plainResult.header.headers.get(SET_COOKIE)
-    maybeCookieString.map(cookies => Session.decodeFromCookie(Cookies.decode(cookies).find(_.name == Session.COOKIE_NAME)))
+    for (
+      setCookieString <- plainResult.header.headers.get(SET_COOKIE);
+      sessionCookie <- Cookies.decode(setCookieString).find(_.name == Session.COOKIE_NAME)
+    ) yield {
+      Session.decodeFromCookie(Some(sessionCookie))
+    }
   }
 }
 

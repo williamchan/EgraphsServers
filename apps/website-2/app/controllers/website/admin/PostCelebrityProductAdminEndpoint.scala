@@ -79,7 +79,7 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
             formWithErrors => {
               val errors = formWithErrors.errors.head.message.toString
               val url = if (isCreate) GetCreateCelebrityProductAdminEndpoint.url(celebrity = celebrity) else GetProductAdminEndpoint.url(productId = productId)
-              Redirect(url)
+              Redirect(url).flashing("errors" -> formWithErrors.errors.mkString(", "))
               // TODO: PLAY20 migration: Is there ANY way to get the values from a formWithErrors?
 //              Redirect(url).flashing(
 //                "errors" -> errors,

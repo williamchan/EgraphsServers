@@ -86,12 +86,10 @@ trait PostCelebrityAdminEndpoint {
         
         form.bindFromRequest.fold(
             formWithErrors => {
-              println("formWithErrors")
-              
               val errors = formWithErrors.errors.head.message.toString
               val url = if (isCreate) GetCreateCelebrityAdminEndpoint.url() else GetCelebrityAdminEndpoint.url(celebrityId = celebrityId)
-              println("errors " + formWithErrors.errors.mkString(", "))
-              Redirect(url)
+              Redirect(url).flashing("errors" -> formWithErrors.errors.mkString(", "))
+              
               // TODO: PLAY20 migration: Is there ANY way to get the values from a formWithErrors?
 //              Redirect(url).flashing(
 //                "errors" -> errors,
@@ -160,7 +158,7 @@ trait PostCelebrityAdminEndpoint {
         val passwordValidationOrAccount: Either[Password.PasswordError, Account] = if (preexistingAccount.isDefined) {
           Right(preexistingAccount.get)
         } else {
-          new Account(email = form.celebrityEmail).withPassword(form.celebrityPassword)
+          Account(email = form.celebrityEmail).withPassword(form.celebrityPassword)
         }
         if (passwordValidationOrAccount.isRight) Valid else Invalid("Password is invalid")
       } else {
