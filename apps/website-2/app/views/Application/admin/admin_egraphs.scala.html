@@ -1,66 +1,75 @@
 @(egraphAndResults: Iterable[(models.Egraph, Option[models.vbg.VBGVerifySample], Option[models.xyzmo.XyzmoVerifyUser])], celebrity: Option[models.Celebrity] = None
-)(implicit paginationInfo: controllers.PaginationInfo)
+)(implicit authToken: egraphs.authtoken.AuthenticityToken,
+  paginationInfo: controllers.PaginationInfo, 
+  headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData)
+
 
 @import controllers.WebsiteControllers
-@import views.html.Application.content_base
+@import egraphs.authtoken.AuthenticityToken.safeForm
 @import views.html.Application.tags.pagination
+@import views.html.frontend.tags
+@import views.html.frontend.base_template
 
-@content_base(title="Admin - All Egraphs", body=body, head=head)
-
-@head = {
-<script src='@RemoteAssets.at("twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
-}
 
 @headline = {
   @if(celebrity.isDefined) {@celebrity.get.publicName's Egraphs} else {Egraphs}
 }
 
 @body = {
-<div class="admin-content">
-  <h1>
-    @headline @paginationInfo.totalResultsStr
-  </h1>
-  <div>
-    <h2>Filters:</h2>
-    <ul class="span16">
-      <li><a href="?filter=pendingAdminReview">Pending Admin Review</a></li>
-      <li><a href="?filter=passedBiometrics">Pass Biometrics</a></li>
-      <li><a href="?filter=failedBiometrics">Failed Biometrics</a></li>
-      <li><a href="?filter=approvedByAdmin">Approved by Admin</a></li>
-      <li><a href="?filter=rejectedByAdmin">Rejected by Admin</a></li>
-      <li><a href="?filter=awaitingVerification">Awaiting Verification</a></li>
-      <li><a href="?filter=published">Published</a></li>
-      <li><a href="?filter=all">All</a></li>
-    </ul>
+<section id="content" class="top" role="main">
+  <div id="main" class="sub">
+    <div class="container" id="celebrity-admin">
+      <h1>
+        @headline @paginationInfo.totalResultsStr
+      </h1>
+      <section>
+        <h2>Filters:</h2>
+        <ul class="span16">
+          <li><a href="?filter=pendingAdminReview">Pending Admin Review</a></li>
+          <li><a href="?filter=passedBiometrics">Pass Biometrics</a></li>
+          <li><a href="?filter=failedBiometrics">Failed Biometrics</a></li>
+          <li><a href="?filter=approvedByAdmin">Approved by Admin</a></li>
+          <li><a href="?filter=rejectedByAdmin">Rejected by Admin</a></li>
+          <li><a href="?filter=awaitingVerification">Awaiting Verification</a></li>
+          <li><a href="?filter=published">Published</a></li>
+          <li><a href="?filter=all">All</a></li>
+        </ul>
+      </section>    
+      <table class="table table-hover table-condensed">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Id</th>
+            <th>State</th>
+            <th>Order Id</th>
+            <th>Signature Result</th>
+            <th>Voice Result</th>
+            <th>Voice Code</th>
+            <th>Voice TxnId</th>
+          </tr>
+        </thead>
+        @egraphAndResults.map { case (egraph, vbgVerifySample, xyzmoVerifyUser) =>
+        <tr>
+          <td>
+            <a class="preview-link" href="/admin/egraphs/@egraph.id">
+              Details
+            </a>
+          </td>
+          <td>@egraph.id</td>
+          <td>@egraph.egraphState</td>
+          <td>@egraph.orderId</td>
+          <td>@if(xyzmoVerifyUser.isDefined) {@xyzmoVerifyUser.get.resultStr} else {}</td>
+          <td>@if(vbgVerifySample.isDefined) {@vbgVerifySample.get.resultStr} else {}</td>
+          <td>@if(vbgVerifySample.isDefined) {@vbgVerifySample.get.errorCode} else {}</td>
+          <td>@if(vbgVerifySample.isDefined) {@vbgVerifySample.get.vbgTransactionId} else {}</td>
+        </tr>
+        }
+      </table>
+      @pagination()
   </div>
-  <table>
-    <tr>
-      <th></th>
-      <th>Id</th>
-      <th>State</th>
-      <th>Order Id</th>
-      <th>Signature Result</th>
-      <th>Voice Result</th>
-      <th>Voice Code</th>
-      <th>Voice TxnId</th>
-    </tr>
-    @egraphAndResults.map { case (egraph, vbgVerifySample, xyzmoVerifyUser) =>
-    <tr>
-      <td>
-        <a class="preview-link" href="/admin/egraphs/@egraph.id">
-          Details
-        </a>
-      </td>
-      <td>@egraph.id</td>
-      <td>@egraph.egraphState</td>
-      <td>@egraph.orderId</td>
-      <td>@if(xyzmoVerifyUser.isDefined) {@xyzmoVerifyUser.get.resultStr} else {}</td>
-      <td>@if(vbgVerifySample.isDefined) {@vbgVerifySample.get.resultStr} else {}</td>
-      <td>@if(vbgVerifySample.isDefined) {@vbgVerifySample.get.errorCode} else {}</td>
-      <td>@if(vbgVerifySample.isDefined) {@vbgVerifySample.get.vbgTransactionId} else {}</td>
-    </tr>
-    }
-  </table>
-  @pagination()
-</div>
+ </div>
+</section>  
 }
+
+@base_template(title="Admin - Egraphs", body=body, jsMain="pages/admin/celebrity")
