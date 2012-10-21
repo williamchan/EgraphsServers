@@ -8,8 +8,9 @@ import play.api.mvc.Results.{Ok, Redirect}
 import services.http.ControllerMethod
 import services.http.filters.HttpFilters
 import controllers.PaginationInfoFactory
+import services.mvc.{celebrity, ImplicitHeaderAndFooterData}
 
-private[controllers] trait GetCelebrityOrdersAdminEndpoint {
+private[controllers] trait GetCelebrityOrdersAdminEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
 
   protected def controllerMethod: ControllerMethod
@@ -19,7 +20,7 @@ private[controllers] trait GetCelebrityOrdersAdminEndpoint {
   import services.AppConfig.instance
   private def orderQueryFilters = instance[OrderQueryFilters]
 
-  def getCelebrityOrdersAdmin(celebrityId: Long, filter: String = "pendingAdminReview", page: Int = 1) = controllerMethod() {
+  def getCelebrityOrdersAdmin(celebrityId: Long, filter: String = "pendingAdminReview", page: Int = 1) = controllerMethod.withForm() { implicit authToken =>
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       httpFilters.requireCelebrityId(celebrityId) { (celebrity) =>
         Action { implicit request =>

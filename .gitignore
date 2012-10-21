@@ -27,3 +27,26 @@ apps/website/eGraphsServers.ipr
 
 RUNNING_PID
 .cache
+apps/website-2/public/styles/admin-celebritydetail.css
+
+apps/website-2/public/twitter-bootstrap-1.4.0/styles/bootstrap.css
+
+apps/website-2/public/styles/responsive.css
+
+apps/website-2/public/styles/egraphs_variables.css
+
+apps/website-2/public/styles/create_celebrity_product.css
+
+apps/website/public/styles/main.css
+
+apps/website/public/styles/responsive.css
+
+modules/frontend-2/app/assets/stylesheets/egraph.css
+
+modules/frontend-2/public/bootstrap/less/bootstrap.css
+
+modules/frontend-2/public/bootstrap/less/responsive.css
+
+modules/frontend/public/stylesheets/egraph.css
+
+modules/frontend/public/stylesheets/main.css

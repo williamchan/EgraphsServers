@@ -6,10 +6,11 @@ import controllers.WebsiteControllers
 import play.api.mvc.{Action, Controller}
 import play.api.mvc.Results.{Ok, Redirect}
 import services.http.ControllerMethod
+import services.mvc.{celebrity, ImplicitHeaderAndFooterData}
 import services.http.filters.HttpFilters
 import controllers.PaginationInfoFactory
 
-private[controllers] trait GetOrdersAdminEndpoint {
+private[controllers] trait GetOrdersAdminEndpoint extends ImplicitHeaderAndFooterData  {
   this: Controller =>
 
   protected def controllerMethod: ControllerMethod
@@ -19,7 +20,8 @@ private[controllers] trait GetOrdersAdminEndpoint {
   import services.AppConfig.instance
   private def orderQueryFilters = instance[OrderQueryFilters]
 
-  def getOrdersAdmin(filter: String = "pendingAdminReview", page: Int = 1) = controllerMethod() {
+  def getOrdersAdmin(filter: String = "pendingAdminReview", page: Int = 1) = controllerMethod.withForm() 
+  { implicit authToken => 
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       Action { implicit request =>
         val query = filter match {
