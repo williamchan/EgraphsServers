@@ -7,8 +7,9 @@ import play.api.mvc.Results.{Ok, Redirect}
 import services.http.ControllerMethod
 import services.http.filters.HttpFilters
 import controllers.PaginationInfoFactory
+import services.mvc.ImplicitHeaderAndFooterData
 
-private[controllers] trait GetPrintOrdersAdminEndpoint {
+private[controllers] trait GetPrintOrdersAdminEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
 
   protected def controllerMethod: ControllerMethod

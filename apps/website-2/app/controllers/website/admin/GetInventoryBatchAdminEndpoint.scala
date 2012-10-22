@@ -7,8 +7,9 @@ import services.http.ControllerMethod
 import services.http.filters.HttpFilters
 import play.api.mvc.{Action, Controller}
 import play.api.mvc.Results.{Ok, Redirect, NotFound}
+import services.mvc.ImplicitHeaderAndFooterData
 
-private[controllers] trait GetInventoryBatchAdminEndpoint {
+private[controllers] trait GetInventoryBatchAdminEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
 
   protected def controllerMethod: ControllerMethod

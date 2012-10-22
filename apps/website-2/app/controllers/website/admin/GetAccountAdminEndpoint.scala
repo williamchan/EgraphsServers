@@ -6,8 +6,9 @@ import services.http.ControllerMethod
 import models.{Password, AccountStore, CelebrityStore}
 import controllers.WebsiteControllers
 import services.http.filters.HttpFilters
+import services.mvc.ImplicitHeaderAndFooterData
 
-private[controllers] trait GetAccountAdminEndpoint {
+private[controllers] trait GetAccountAdminEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
 
   protected def controllerMethod: ControllerMethod

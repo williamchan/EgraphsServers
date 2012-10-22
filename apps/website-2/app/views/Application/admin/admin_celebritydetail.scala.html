@@ -1,13 +1,16 @@
 @(isCreate: Boolean, errorFields: Option[List[String]], fields: (String) => String, celebrity: Option[models.Celebrity] = None
-)(implicit authToken: egraphs.authtoken.AuthenticityToken)
+)(implicit authToken: egraphs.authtoken.AuthenticityToken,
+  headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData)
 
 @import controllers.WebsiteControllers
 @import egraphs.authtoken.AuthenticityToken.safeForm
 @import views.html.Application.tags.errorMessage
 @import views.html.Application.tags.formField
-@import views.html.Application.content_base
+@import views.html.frontend.tags
+@import views.html.frontend.tags.ng
+@import views.html.frontend.base_template
 
-@content_base(title="Admin - Celebrity Details", body=body, head=head)
 
 @head = {
 <script src='@RemoteAssets.at("twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
@@ -40,83 +43,118 @@
 }
 
 @body = {
-<div class="admin-content">
-  <h1>
-    @{if(isCreate) "Create" else "Update"} Celebrity
-  </h1>
-  <div class="form row">
-    <div class="span12 form-column">
-    	@safeForm('id -> "admin-celebrity-detail", 'method -> "POST", 'action -> postCelebrity.url, 'enctype -> "multipart/form-data") {
-        <fieldset>
-          <input id="celebrityId" name="celebrityId" type="hidden" value="@fields("celebrityId")">
-          <input id="publishedStatus" name="publishedStatusString" type="hidden" value="@fields("publishedStatusString")">
-          <legend>Account Details</legend>
-          @formField(id="celebrityEmail", label="E-mail address", inputType="text", editable=isCreate, width="span4", fields=fields)
-          @formField(id="celebrityPassword", label="Password", inputType="text", editable=isCreate, width="span4", fields=fields)
-        </fieldset>
-        <fieldset>
-          <legend>Celebrity Details</legend>
-          @formField(id="publicName", label="Public Name", inputType="text", width="span4", fields=fields)
-
-          @formField(id="casualName", label="Casual Name", inputType="text", width="span4", help=Some("e.g. \"David\" instead of \"David Price\""), fields=fields)
-
-          @formField(id="organization", label="Organization", inputType="text", width="span4", help=Some("e.g. \"Major League Baseball\""), fields=fields)
-          
-          @formField(id="roleDescription", label="Role Description", inputType="text", width="span4", help=Some("e.g. \"Pitcher, Tampa Bay Rays\""), fields=fields)
-
-        </fieldset>
-          <div class="clearfix">
-            <label for="bio">Short Bio</label>
-            <div class="input">
-              <textarea class="xlarge" id="bio" name="bio" rows="3">@fields("bio")</textarea>
-            </div>
+<section id="content" class="top" role="main">
+  <div id="main" class="sub">
+    <div class="container" id="celebrity-admin">      
+      <h2>
+        @{if(isCreate) "Create" else "Update"} Celebrity
+      </h2>
+      	@safeForm('id -> "admin-celebrity-detail", 'method -> "POST", 'action -> postCelebrity.url, 'enctype -> "multipart/form-data") {
+        <div class="row-fluid">
+          <div class="span12">
+            <fieldset>
+              <input id="celebrityId" name="celebrityId" type="hidden" value="@fields("celebrityId")">
+              <input id="publishedStatus" name="publishedStatusString" type="hidden" value="@fields("publishedStatusString")">
+              <legend>Account Details</legend>
+              @formField(id="celebrityEmail", label="E-mail address", inputType="text", editable=isCreate, width="span4", fields=fields)
+              @formField(id="celebrityPassword", label="Password", inputType="text", editable=isCreate, width="span4", fields=fields)
+            </fieldset>
           </div>
+        </div>
+        <div class="row-fluid">
+          <div class="span12">
+            <fieldset>
+              <legend>Celebrity Details</legend>
+              @formField(id="publicName", label="Public Name", inputType="text", width="span4", fields=fields)
 
-          @formField(id="twitterUsername", label="Twitter Username", inputType="text", width="span4", fields=fields)
+              @formField(id="casualName", label="Casual Name", inputType="text", width="span4", help=Some("e.g. \"David\" instead of \"David Price\""), fields=fields)
 
-        </fieldset>
-        <fieldset>
-          <legend>Images</legend>
-          @formField(id="profileImage", label="Profile Photo", inputType="file", width="span8", help=Some("Must be square dimensions of at least 100x100."), fields=fields)
+              @formField(id="organization", label="Organization", inputType="text", width="span4", help=Some("e.g. \"Major League Baseball\""), fields=fields)
+              
+              @formField(id="roleDescription", label="Role Description", inputType="text", width="span4", help=Some("e.g. \"Pitcher, Tampa Bay Rays\""), fields=fields)
 
-          @formField(id="landingPageImage", label="Landing Page Image", inputType="file", width="span8", help=Some("Must be JPG at least 1500x556. Keep that 2.7 aspect ratio for best results. Should be center-balanced photo of celebrity."), fields=fields)
-
-          @formField(id="logoImage", label="Team/Org Logo", inputType="file", width="span8", help=Some("Must be PNP of square dimensions of at least 40x40. Logo of team or organization."), fields=fields)
-
-        </fieldset>
-        <fieldset>
-          <legend>Publish</legend>
-          <button class="btn toggle" data-toggle="toggle" id="publish-button" type="button">Published</button>
-          <div class="actions">
-            <button type="submit" id="submit-button" class="btn primary fade in">Save</button>
-            <button type="reset" id="reset-button" class="btn primary fade in">Reset</button>
-            @errorMessage(errorFields)
+            </fieldset>
           </div>
-        </fieldset>
-      }
-      <div>
-        @for(presentCelebrity <- celebrity) {
-	        <hr/>
-	        @safeForm('id -> "postSendCelebrityWelcomeEmail", 'method -> "POST", 'action -> postSendCelebrityWelcomeEmailAdmin(presentCelebrity.id).url) {
-	          <fieldset>
-	          @formField(id="celebrityEmail", label="E-mail address", inputType="text",
-	            help = Some("Specify the email address for the welcome letter."), width="span4", fields=fields)
-	          <div class="actions">
-	            <input class="btn primary fade in" type="submit" value="Send Welcome Email"/>
-	          </div>
-	          </fieldset>
-	        }
-        }
+        </div>      
+        <div class="row-fluid">
+          <div class="span12">    
+              <div class="clearfix">
+                <label for="bio">Short Bio</label>
+                <div class="input">
+                  <textarea class="xlarge" id="bio" name="bio" rows="3">@fields("bio")</textarea>
+                </div>
+              </div>
+
+              @formField(id="twitterUsername", label="Twitter Username", inputType="text", width="span4", fields=fields)
+
+            </fieldset>
+          </div>
+        </div>
+        <div class="row-fluid">
+          <div class="span12">    
+            <fieldset>
+              <legend>Images</legend>
+              @formField(id="profileImage", label="Profile Photo", inputType="file", width="span8", help=Some("Must be square dimensions of at least 100x100."), fields=fields)
+
+              @formField(id="landingPageImage", label="Landing Page Image", inputType="file", width="span8", help=Some("Must be JPG at least 1500x556. Keep that 2.7 aspect ratio for best results. Should be center-balanced photo of celebrity."), fields=fields)
+
+              @formField(id="logoImage", label="Team/Org Logo", inputType="file", width="span8", help=Some("Must be PNP of square dimensions of at least 40x40. Logo of team or organization."), fields=fields)
+
+            </fieldset>
+          </div>
+        </div>  
+        <div class="row-fluid">
+          <div class="span12">
+            <fieldset>
+              <legend>Publish</legend>
+              <button class="btn btn-block toggle" data-toggle="toggle" id="publish-button" type="button">Published</button>
+                @errorMessage(errorFields)
+            </fieldset>
+          </div>
+        </div>
+        <div class="row-fluid">
+          <div class="span12">
+              @tags.arrow_button(caption="Save")  
+              <button type="reset" class="button">
+              <strong><em>Reset</em></strong><span>&raquo;</span>
+            </button>     
+          </div>
+        </div> 
+          }
+
+      <div class="row-fluid">
+        <div class="span12">   
+          @for(presentCelebrity <- celebrity) {
+  	        <hr/>
+  	        @safeForm('id -> "postSendCelebrityWelcomeEmail", 'method -> "POST", 'action -> postSendCelebrityWelcomeEmailAdmin(presentCelebrity.id).url) {
+  	          <fieldset>
+  	          @formField(id="celebrityEmail", label="E-mail address", inputType="text",
+  	            help = Some("Specify the email address for the welcome letter."), width="span4", fields=fields)
+  	          <div class="actions">
+  	            <input class="btn primary fade in" type="submit" value="Send Welcome Email"/>
+  	          </div>
+  	          </fieldset>
+  	        }
+          }
+        </div>
+      </div>  
+      <div class="row-fluid">
+        <div class="span2 profile-thumbnail" >
+          <legend>Current Profile</legend>
+          <img src="@profilePhoto">
+        </div>
       </div>
-      <div class="span2 profile-thumbnail" >
-        <legend>Current Profile</legend>
-        <img src="@profilePhoto">
-        <legend>Current Landing Page Image</legend>
-        <img src="@landingPageImage">
-        <legend>Current Logo</legend>
-        <img src="@logoImage">
+      <div class="row-fluid">
+        <div class="span12">    
+          <legend>Current Landing Page Image</legend>
+          <img src="@landingPageImage">
+          <legend>Current Logo</legend>
+          <img src="@logoImage">
+        </div>  
       </div>
-    </div>
+    </div>    
   </div>
-</div>
+</section>
 }
+
+@base_template(title="Admin - Celebrity Details", body=body, jsMain="pages/admin/celebritydetail")

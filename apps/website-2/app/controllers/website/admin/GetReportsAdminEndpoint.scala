@@ -8,8 +8,9 @@ import services.http.filters.HttpFilters
 import services.report._
 import play.api.data._
 import play.api.data.Forms._
+import services.mvc.ImplicitHeaderAndFooterData
 
-private[controllers] trait GetReportsAdminEndpoint {
+private[controllers] trait GetReportsAdminEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
 
   // 

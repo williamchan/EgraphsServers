@@ -8,15 +8,16 @@ import play.api.mvc.Results.{Ok, Redirect}
 import services.http.ControllerMethod
 import services.http.filters.HttpFilters
 import controllers.PaginationInfoFactory
+import services.mvc.ImplicitHeaderAndFooterData
 
-private[controllers] trait GetCelebrityProductsAdminEndpoint {
+private[controllers] trait GetCelebrityProductsAdminEndpoint extends ImplicitHeaderAndFooterData {
 
   this: Controller =>
 
   protected def controllerMethod: ControllerMethod
   protected def httpFilters: HttpFilters
 
-  def getCelebrityProductsAdmin(celebrityId: Long, page: Int = 1) = controllerMethod() {
+  def getCelebrityProductsAdmin(celebrityId: Long, page: Int = 1) = controllerMethod.withForm() { implicit authToken =>
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       httpFilters.requireCelebrityId(celebrityId) { (celebrity) =>
         Action { implicit request =>

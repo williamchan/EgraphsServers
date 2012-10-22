@@ -7,8 +7,9 @@ import controllers.WebsiteControllers
 import services.http.filters.HttpFilters
 import models._
 import org.apache.commons.lang3.StringEscapeUtils
+import services.mvc.ImplicitHeaderAndFooterData
 
-private[controllers] trait GetPrintOrderAdminEndpoint { this: Controller =>
+private[controllers] trait GetPrintOrderAdminEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
 
   protected def controllerMethod: ControllerMethod
   protected def httpFilters: HttpFilters

@@ -1,6 +1,7 @@
 @(celebrityListings: Iterable[models.CelebrityListing],
   allCelebrities: Iterable[models.Celebrity]
-)(implicit authToken: egraphs.authtoken.AuthenticityToken,    paginationInfo: controllers.PaginationInfo, 
+)(implicit authToken: egraphs.authtoken.AuthenticityToken,
+  paginationInfo: controllers.PaginationInfo, 
   headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData)
 

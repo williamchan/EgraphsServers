@@ -13,11 +13,12 @@ import services.db.Schema
 import services.http.SafePlayParams.Conversions._
 import play.api.data._
 import play.api.data.Forms._
+import services.mvc.ImplicitHeaderAndFooterData
 
 /**
  * These are the Sheriff's tools to handle tasks that are not yet self-serve. If writing a one-time script, use "sheriff".
  */
-private[controllers] trait GetToolsAdminEndpoint {
+private[controllers] trait GetToolsAdminEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
 
   //

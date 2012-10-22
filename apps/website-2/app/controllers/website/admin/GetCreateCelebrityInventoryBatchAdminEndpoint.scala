@@ -9,8 +9,9 @@ import play.api.mvc.{Action, Controller}
 import play.api.mvc.Results.{Ok, Redirect}
 import org.joda.time.DateTime
 import java.text.SimpleDateFormat
+import services.mvc.ImplicitHeaderAndFooterData
 
-private[controllers] trait GetCreateCelebrityInventoryBatchAdminEndpoint {
+private[controllers] trait GetCreateCelebrityInventoryBatchAdminEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
 
   protected def controllerMethod: ControllerMethod

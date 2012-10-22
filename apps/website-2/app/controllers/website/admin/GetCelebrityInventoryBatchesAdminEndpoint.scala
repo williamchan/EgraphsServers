@@ -8,8 +8,9 @@ import play.api.mvc.Results.{Ok, Redirect}
 import services.http.ControllerMethod
 import services.http.filters.HttpFilters
 import controllers.PaginationInfoFactory
+import services.mvc.ImplicitHeaderAndFooterData
 
-private[controllers] trait GetCelebrityInventoryBatchesAdminEndpoint {
+private[controllers] trait GetCelebrityInventoryBatchesAdminEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
 
   protected def controllerMethod: ControllerMethod

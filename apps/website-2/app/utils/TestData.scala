@@ -7,7 +7,7 @@ import org.joda.time.DateTime
 import models._
 import enums.{EgraphState, PublishedStatus}
 import egraphs.playutils.Encodings.Base64
-import org.apache.commons.lang.RandomStringUtils
+import org.apache.commons.lang3.RandomStringUtils
 
 /**
  * Renders saved copies of domain objects that satisfy all relational integrity

@@ -5,8 +5,9 @@ import services.http.ControllerMethod
 import controllers.WebsiteControllers
 import play.api.mvc.{Action, Controller}
 import play.api.mvc.Results.{Ok, Redirect}
+import services.mvc.ImplicitHeaderAndFooterData
 
-private[controllers] trait GetLoginAdminEndpoint {
+private[controllers] trait GetLoginAdminEndpoint  extends ImplicitHeaderAndFooterData {
   this: Controller =>
 
   protected def controllerMethod: ControllerMethod

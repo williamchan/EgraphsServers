@@ -7,8 +7,9 @@ import controllers.WebsiteControllers
 import services.http.filters.HttpFilters
 import models.EgraphStore
 import controllers.website.GetEgraphEndpoint
+import services.mvc.ImplicitHeaderAndFooterData
 
-private[controllers] trait GetEgraphAdminEndpoint { this: Controller =>
+private[controllers] trait GetEgraphAdminEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
 
   protected def controllerMethod: ControllerMethod
   protected def httpFilters: HttpFilters

@@ -1,7 +1,8 @@
 /* Scripting for the celebrity detail page */
-define([], function() {
+define(["Egraphs", "bootstrap/bootstrap-alert", "bootstrap/bootstrap-button", "libs/chosen/chosen.jquery.min", "services/forms"], function() {
 
   return {
+
     /**
      * Executes all the scripts for the admin-celebritydetail page.
 
@@ -39,7 +40,7 @@ define([], function() {
 
         publishButton.button("toggle");
         return false;
-      })
+      });
     }
   };
 });

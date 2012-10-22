@@ -8,7 +8,10 @@ import play.api.mvc.Results.Ok
 object GetCelebrityDetail {
 
   def getCelebrityDetail(isCreate: Boolean, celebrity: Option[Celebrity] = None
-    )(implicit authToken: egraphs.authtoken.AuthenticityToken, flash: play.api.mvc.Flash): play.api.mvc.Result = {
+    )(implicit authToken: egraphs.authtoken.AuthenticityToken,
+               headerData: models.frontend.header.HeaderData,
+               footerData: models.frontend.footer.FooterData, 
+               flash: play.api.mvc.Flash): play.api.mvc.Result = {
     
     val errorFields = flash.get("errors").map(errString => errString.split(',').toList)
 

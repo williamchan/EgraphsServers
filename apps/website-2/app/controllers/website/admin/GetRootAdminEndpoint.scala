@@ -6,8 +6,9 @@ import services.http.filters.HttpFilters
 import play.api.mvc.Action
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
+import services.mvc.ImplicitHeaderAndFooterData
 
-private[controllers] trait GetRootAdminEndpoint {
+private[controllers] trait GetRootAdminEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
 
   protected def controllerMethod: ControllerMethod
