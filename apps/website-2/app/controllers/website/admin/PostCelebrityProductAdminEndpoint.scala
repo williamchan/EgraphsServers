@@ -77,22 +77,23 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
 
           form.bindFromRequest.fold(
             formWithErrors => {
-              val errors = formWithErrors.errors.head.message.toString
+              val data = formWithErrors.data
+              val errors = for (error <- formWithErrors.errors) yield {
+                error.key + ": " + error.message + ". Found: " + error.args.toString
+              }
               val url = if (isCreate) GetCreateCelebrityProductAdminEndpoint.url(celebrity = celebrity) else GetProductAdminEndpoint.url(productId = productId)
-              Redirect(url).flashing("errors" -> formWithErrors.errors.mkString(", "))
-              // TODO: PLAY20 migration: Is there ANY way to get the values from a formWithErrors?
-//              Redirect(url).flashing(
-//                "errors" -> errors,
-//		        "productId" -> productId.toString,
-//		        "productName" -> Form("productName" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm),
-//		        "productDescription" -> Form("productDescription" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm),
-//		        "priceInCurrency" -> Form("priceInCurrency" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm),
-//		        "signingOriginX" -> Form("signingOriginX" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm),
-//		        "signingOriginY" -> Form("signingOriginY" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm),
-//		        "storyTitle" -> Form("storyTitle" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm),
-//		        "storyText" -> Form("storyText" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm),
-//		        "publishedStatusString" -> Form("publishedStatusString" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm)
-//              )
+              Redirect(url).flashing(
+                ("errors" -> errors.mkString(", ")), 
+		        ("productId" -> productId.toString), 
+		        ("productName" -> data.get("productName").getOrElse("")), 
+		        ("productDescription" -> data.get("productDescription").getOrElse("")), 
+		        ("priceInCurrency" -> data.get("priceInCurrency").getOrElse("")), 
+		        ("signingOriginX" -> data.get("signingOriginX").getOrElse("")), 
+		        ("signingOriginY" -> data.get("signingOriginY").getOrElse("")), 
+		        ("storyTitle" -> data.get("storyTitle").getOrElse("")), 
+		        ("storyText" -> data.get("storyText").getOrElse("")), 
+		        ("publishedStatusString" -> data.get("publishedStatusString").getOrElse(""))
+              )
             },
             validForm => {
               val publishedStatus = PublishedStatus(validForm.publishedStatusString).getOrElse(PublishedStatus.Unpublished)
