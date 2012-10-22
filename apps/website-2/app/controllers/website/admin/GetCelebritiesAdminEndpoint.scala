@@ -18,9 +18,13 @@ private[controllers] trait GetCelebritiesAdminEndpoint extends ImplicitHeaderAnd
   protected def celebrityStore: CelebrityStore
   protected def controllerMethod: ControllerMethod
 
-  def getCelebritiesAdmin(page: Int = 1) = controllerMethod.withForm() { implicit authToken =>
+  def getCelebritiesAdmin = controllerMethod.withForm() { implicit authToken =>
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       Action { implicit request =>
+        
+        // get query parameters
+        val page: Int = Form("page" -> number).bindFromRequest.fold(formWithErrors => 1, validForm => validForm)
+        
         val query = celebrityStore.getCelebrityAccounts
         val pagedQuery: (Iterable[(Celebrity, Account)], Int, Option[Int]) = services.Utils.pagedQuery(select = query, page = page)
         val listings = for((celebrity: Celebrity, account: Account) <- pagedQuery._1) yield {
@@ -56,6 +60,6 @@ private[controllers] trait GetCelebritiesAdminEndpoint extends ImplicitHeaderAnd
 object GetCelebritiesAdminEndpoint {
 
   def location = {
-    controllers.routes.WebsiteControllers.getCelebritiesAdmin().url
+    controllers.routes.WebsiteControllers.getCelebritiesAdmin.url
   }
 }

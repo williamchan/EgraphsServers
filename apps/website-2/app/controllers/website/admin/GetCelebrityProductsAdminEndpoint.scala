@@ -1,8 +1,9 @@
 package controllers.website.admin
 
-import play.api.mvc.Controller
 import models._
 import controllers.WebsiteControllers
+import play.api.data._
+import play.api.data.Forms._
 import play.api.mvc.{Action, Controller}
 import play.api.mvc.Results.{Ok, Redirect}
 import services.http.ControllerMethod
@@ -16,10 +17,14 @@ private[controllers] trait GetCelebrityProductsAdminEndpoint {
   protected def controllerMethod: ControllerMethod
   protected def httpFilters: HttpFilters
 
-  def getCelebrityProductsAdmin(celebrityId: Long, page: Int = 1) = controllerMethod() {
+  def getCelebrityProductsAdmin(celebrityId: Long) = controllerMethod() {
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       httpFilters.requireCelebrityId(celebrityId) { (celebrity) =>
         Action { implicit request =>
+          
+          // get query parameters
+          val page: Int = Form("page" -> number).bindFromRequest.fold(formWithErrors => 1, validForm => validForm)
+          
           val query = celebrity.products()
           val pagedQuery: (Iterable[Product], Int, Option[Int]) = services.Utils.pagedQuery(select = query, page = page)
           implicit val paginationInfo = PaginationInfoFactory.create(pagedQuery = pagedQuery, baseUrl = GetOrdersAdminEndpoint.url)

@@ -1,8 +1,9 @@
 package controllers.website.admin
 
-import play.api.mvc.Controller
 import models._
 import controllers.WebsiteControllers
+import play.api.data._
+import play.api.data.Forms._
 import play.api.mvc.{Action, Controller}
 import play.api.mvc.Results.{Ok, Redirect}
 import services.http.ControllerMethod
@@ -19,10 +20,15 @@ private[controllers] trait GetCelebrityInventoryBatchesAdminEndpoint {
   import services.AppConfig.instance
   private def inventoryBatchQueryFilters = instance[InventoryBatchQueryFilters]
 
-  def getCelebrityInventoryBatchesAdmin(celebrityId: Long, filter: String = "all", page: Int = 1) = controllerMethod() {
+  def getCelebrityInventoryBatchesAdmin(celebrityId: Long) = controllerMethod() {
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       httpFilters.requireCelebrityId(celebrityId) { (celebrity) =>
         Action { implicit request =>
+          
+          // get query parameters
+          val page: Int = Form("page" -> number).bindFromRequest.fold(formWithErrors => 1, validForm => validForm)
+          val filter: String = Form("filter" -> text).bindFromRequest.fold(formWithErrors => "all", validForm => validForm)
+          
           val query = filter match {
             case "activeOnly" => inventoryBatchStore.findByCelebrity(celebrity.id, inventoryBatchQueryFilters.activeOnly)
             case "all" => inventoryBatchStore.findByCelebrity(celebrity.id)

@@ -2,6 +2,8 @@ package controllers.website.admin
 
 import models._
 import controllers.WebsiteControllers
+import play.api.data._
+import play.api.data.Forms._
 import play.api.mvc.{Action, Controller}
 import play.api.mvc.Results.{Ok, Redirect}
 import services.http.ControllerMethod
@@ -18,9 +20,14 @@ private[controllers] trait GetPrintOrdersAdminEndpoint {
   import services.AppConfig.instance
   private def printOrderQueryFilters = instance[PrintOrderQueryFilters]
     
-  def getPrintOrdersAdmin(filter: String = "unfulfilled", page: Int = 1) = controllerMethod() {
+  def getPrintOrdersAdmin = controllerMethod() {
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       Action { implicit request =>
+        
+        // get query parameters
+        val page: Int = Form("page" -> number).bindFromRequest.fold(formWithErrors => 1, validForm => validForm)
+        val filter: String = Form("filter" -> text).bindFromRequest.fold(formWithErrors => "unfulfilled", validForm => validForm)
+        
         val query = filter match {
           case "unfulfilled" => printOrderStore.findByFilter(printOrderQueryFilters.unfulfilled)
           case "hasEgraphButLacksPng" => printOrderStore.findHasEgraphButLacksPng()
@@ -40,6 +47,6 @@ private[controllers] trait GetPrintOrdersAdminEndpoint {
 object GetPrintOrdersAdminEndpoint {
 
   def url() = {
-    controllers.routes.WebsiteControllers.getPrintOrdersAdmin().url
+    controllers.routes.WebsiteControllers.getPrintOrdersAdmin.url
   }
 }

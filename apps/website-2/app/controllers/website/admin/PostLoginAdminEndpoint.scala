@@ -38,7 +38,7 @@ private[controllers] trait PostLoginAdminEndpoint {
             Redirect(controllers.routes.WebsiteControllers.getLoginAdmin).flashing("errors" -> formWithErrors.errors.head.message.toString())
           },
           validForm => {
-            Redirect(controllers.routes.WebsiteControllers.getCelebritiesAdmin().url).withSession(
+            Redirect(controllers.routes.WebsiteControllers.getCelebritiesAdmin.url).withSession(
                 request.session + (EgraphsSession.Key.AdminId.name -> validForm.authenticatedAdminLogin.get.id.toString))
           }
       )
