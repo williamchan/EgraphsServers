@@ -5,10 +5,10 @@ import models.enums._
 import play.api.mvc.Flash
 import play.api.mvc.RequestHeader
 import services.mail.TransactionalMail
+import services.mvc.OrderConfirmationEmail
 import services.{Utils, AppConfig}
 import controllers.WebsiteControllers
 import services.payment.{Charge, Payment}
-import scala.Predef._
 import sjson.json.Serializer
 import services.db.{DBSession, TransactionSerializable}
 import services.logging.Logging
@@ -16,6 +16,7 @@ import exception.InsufficientInventoryException
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import services.http.ServerSessionFactory
+import java.util.Date
 import java.text.SimpleDateFormat
 import org.apache.commons.mail.HtmlEmail
 import org.joda.money.Money
@@ -57,9 +58,6 @@ case class EgraphPurchaseHandler(
   implicit request: RequestHeader
 )
 {
-
-  private val dateFormat = new SimpleDateFormat("MMMM dd, yyyy")
-
   private def purchaseData: String = Serializer.SJSON.toJSON(Map(
     "recipientName" -> recipientName,
     "recipientEmail" -> recipientEmail,
@@ -159,17 +157,21 @@ case class EgraphPurchaseHandler(
     }
 
     // If the Stripe charge and Order persistence executed successfully, send a confirmation email and redirect to a confirmation page
-    sendOrderConfirmationEmail(
-      buyerName = buyerName, 
-      buyerEmail = buyerEmail, 
-      recipientName = recipientName, 
-      recipientEmail = recipientEmail, 
-      celebrity, 
-      product, 
-      order, 
-      cashTransaction, 
-      maybePrintOrder.asInstanceOf[Option[PrintOrder]]
-    )
+    OrderConfirmationEmail(
+      buyerName,
+      buyerEmail,
+      recipientName,
+      recipientEmail,
+      celebrity.publicName,
+      product.name,
+      order.id,
+      order.created,
+      order.expectedDate.get,
+      cashTransaction.cash,
+      getFAQ().absoluteURL(secure=true) + "#how-long",
+      maybePrintOrder.isDefined,
+      mail
+    ).send()
 
     // Clear out the shopping cart and redirect
     serverSessions.celebrityStorefrontCart(celebrity.id)(request.session).emptied.save()
@@ -266,53 +268,6 @@ case class EgraphPurchaseHandler(
     dbSession.connected(TransactionSerializable) {
       FailedPurchaseData(purchaseData = purchaseData, errorDescription = errorDescription.take(128 /*128 is the column width*/)).save()
     }
-  }
-
-  private def sendOrderConfirmationEmail(
-    buyerName: String,
-    buyerEmail: String,
-    recipientName: String,
-    recipientEmail: String,
-    celebrity: Celebrity,
-    product: Product,
-    order: Order,
-    cashTransaction: CashTransaction,
-    maybePrintOrder: Option[PrintOrder]
-  )(implicit request: RequestHeader)
-  {
-    import services.Finance.TypeConversions._
-    val email = new HtmlEmail()
-    email.setFrom("noreply@egraphs.com", "Egraphs")
-    email.addTo(buyerEmail, buyerName)
-    email.setSubject("Order Confirmation")
-    val faqHowLongLink = getFAQ().absoluteURL(secure=true) + "#how-long"
-    val htmlMsg = views.html.frontend.email_order_confirmation(
-      buyerName = buyerName,
-      recipientName = recipientName,
-      recipientEmail = recipientEmail,
-      celebrityName = celebrity.publicName,
-      productName = product.name,
-      orderDate = dateFormat.format(order.created),
-      orderId = order.id.toString,
-      pricePaid = cashTransaction.cash.formatSimply,
-      deliveredByDate = dateFormat.format(order.expectedDate.get), // all new Orders have expectedDate... will turn this into Date instead of Option[Date]
-      faqHowLongLink = faqHowLongLink,
-      hasPrintOrder = maybePrintOrder.isDefined
-    )
-    val textMsg = views.html.frontend.email_order_confirmation_text(
-      buyerName = buyerName,
-      recipientName = recipientName,
-      recipientEmail = recipientEmail,
-      celebrityName = celebrity.publicName,
-      productName = product.name,
-      orderDate = dateFormat.format(order.created),
-      orderId = order.id.toString,
-      pricePaid = cashTransaction.cash.formatSimply,
-      deliveredByDate = dateFormat.format(order.expectedDate.get),
-      faqHowLongLink = faqHowLongLink,
-      hasPrintOrder = maybePrintOrder.isDefined
-    ).toString()
-    mail.send(email, Some(textMsg), Some(htmlMsg))
   }
 }
 

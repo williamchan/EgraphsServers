@@ -6,11 +6,11 @@ import com.typesafe.plugin.MailerAPI
 import com.typesafe.plugin.MailerPlugin
 import org.apache.commons.mail.Email
 import org.apache.commons.mail.HtmlEmail
-import javax.mail.Session
 import com.google.inject.{Inject, Provider}
 import services.Utils
 import collection.mutable.ListBuffer
 import play.api.templates.Html
+import scala.collection.JavaConversions._
 import services.inject.InjectionProvider
 
 /** Interface for sending transactional mails. Transactional mails are  */
@@ -25,20 +25,17 @@ trait TransactionalMail {
     }
 
     val replyToAddresses = addressStringsFromList(email.getReplyToAddresses)
-    val replyTo = if(replyToAddresses.isEmpty) {
-      ""
-    } else {
-      replyToAddresses(0)
-    }
-    
+    val maybeReplyTo = replyToAddresses.headOption
+
     // Extract the content into the MailerAPI format
-    newEmail
-    .setSubject(email.getSubject)
-    .addFrom(email.getFromAddress.getAddress)
-    .setReplyTo(replyTo)
-    .addRecipient(addressStringsFromList(email.getToAddresses): _*)
-    .addCc(addressStringsFromList(email.getCcAddresses): _*)
-    .addBcc(addressStringsFromList(email.getBccAddresses): _*)
+    val maybeRepliableEmail = maybeReplyTo.map(address => newEmail.setReplyTo(address))
+
+    maybeRepliableEmail.getOrElse(newEmail)
+      .setSubject(email.getSubject)
+      .addFrom(email.getFromAddress.getAddress)
+      .addRecipient(addressStringsFromList(email.getToAddresses): _*)
+      .addCc(addressStringsFromList(email.getCcAddresses): _*)
+      .addBcc(addressStringsFromList(email.getBccAddresses): _*)
   }
 }
 
