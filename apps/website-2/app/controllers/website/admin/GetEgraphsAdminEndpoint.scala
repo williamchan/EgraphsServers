@@ -1,17 +1,17 @@
 package controllers.website.admin
 
-import play.api.mvc.Controller
 import models._
 import vbg.VBGVerifySample
 import xyzmo.XyzmoVerifyUser
 import controllers.WebsiteControllers
+import play.api.data._
+import play.api.data.Forms._
 import play.api.mvc.{Action, Controller}
 import play.api.mvc.Results.{Ok, Redirect}
 import services.http.ControllerMethod
 import services.http.filters.HttpFilters
 import controllers.PaginationInfoFactory
 import services.mvc.{celebrity, ImplicitHeaderAndFooterData}
-
 
 private[controllers] trait GetEgraphsAdminEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
@@ -23,9 +23,14 @@ private[controllers] trait GetEgraphsAdminEndpoint extends ImplicitHeaderAndFoot
   import services.AppConfig.instance
   private def egraphQueryFilters = instance[EgraphQueryFilters]
 
-  def getEgraphsAdmin(filter: String = "pendingAdminReview", page: Int = 1) = controllerMethod.withForm() { implicit authToken =>
+  def getEgraphsAdmin = controllerMethod.withForm() { implicit authToken =>
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       Action { implicit request =>
+        
+        // get query parameters
+        val page: Int = Form("page" -> number).bindFromRequest.fold(formWithErrors => 1, validForm => validForm)
+        val filter: String = Form("filter" -> text).bindFromRequest.fold(formWithErrors => "pendingAdminReview", validForm => validForm)
+        
         val query = filter match {
           case "passedBiometrics" => egraphStore.getEgraphsAndResults(egraphQueryFilters.passedBiometrics)
           case "failedBiometrics" => egraphStore.getEgraphsAndResults(egraphQueryFilters.failedBiometrics)
@@ -47,6 +52,6 @@ private[controllers] trait GetEgraphsAdminEndpoint extends ImplicitHeaderAndFoot
 object GetEgraphsAdminEndpoint {
 
   def url() = {
-    controllers.routes.WebsiteControllers.getEgraphsAdmin().url
+    controllers.routes.WebsiteControllers.getEgraphsAdmin.url
   }
 }

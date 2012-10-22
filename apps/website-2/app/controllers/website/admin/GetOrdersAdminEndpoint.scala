@@ -1,8 +1,9 @@
 package controllers.website.admin
 
-import play.api.mvc.Controller
 import models._
 import controllers.WebsiteControllers
+import play.api.data._
+import play.api.data.Forms._
 import play.api.mvc.{Action, Controller}
 import play.api.mvc.Results.{Ok, Redirect}
 import services.http.ControllerMethod
@@ -20,10 +21,15 @@ private[controllers] trait GetOrdersAdminEndpoint extends ImplicitHeaderAndFoote
   import services.AppConfig.instance
   private def orderQueryFilters = instance[OrderQueryFilters]
 
-  def getOrdersAdmin(filter: String = "pendingAdminReview", page: Int = 1) = controllerMethod.withForm() 
+  def getOrdersAdmin = controllerMethod.withForm() 
   { implicit authToken => 
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       Action { implicit request =>
+        
+        // get query parameters
+        val page: Int = Form("page" -> number).bindFromRequest.fold(formWithErrors => 1, validForm => validForm)
+        val filter: String = Form("filter" -> text).bindFromRequest.fold(formWithErrors => "pendingAdminReview", validForm => validForm)
+        
         val query = filter match {
           case "rejectedByAdmin" => orderStore.findByFilter(orderQueryFilters.rejectedByAdmin)
           case "rejectedByCelebrity" => orderStore.findByFilter(orderQueryFilters.rejectedByCelebrity)
@@ -42,6 +48,6 @@ private[controllers] trait GetOrdersAdminEndpoint extends ImplicitHeaderAndFoote
 object GetOrdersAdminEndpoint {
 
   def url() = {
-    controllers.routes.WebsiteControllers.getOrdersAdmin().url
+    controllers.routes.WebsiteControllers.getOrdersAdmin.url
   }
 }
