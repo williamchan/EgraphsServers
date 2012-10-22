@@ -93,16 +93,16 @@ trait PostCelebrityAdminEndpoint {
               val url = if (isCreate) GetCreateCelebrityAdminEndpoint.url() else GetCelebrityAdminEndpoint.url(celebrityId = celebrityId)
               Redirect(url).flashing(
                 ("errors" -> errors.mkString(", ")), 
-		            ("celebrityId" -> celebrityId.toString), 
-		            ("celebrityEmail" -> data.get("celebrityEmail").getOrElse("")), 
-		            ("celebrityPassword" -> data.get("celebrityPassword").getOrElse("")), 
-		            ("publicName" -> data.get("publicName").getOrElse("")), 
-		            ("publishedStatusString" -> data.get("publishedStatusString").getOrElse("")), 
-		            ("bio" -> data.get("casualName").getOrElse("")), 
-		            ("casualName" -> data.get("casualName").getOrElse("")), 
-		            ("organization" -> data.get("roleDescription").getOrElse("")), 
-		            ("roleDescription" -> data.get("roleDescription").getOrElse("")), 
-		            ("twitterUsername" -> data.get("twitterUsername").getOrElse(""))
+		        ("celebrityId" -> celebrityId.toString), 
+		        ("celebrityEmail" -> data.get("celebrityEmail").getOrElse("")), 
+		        ("celebrityPassword" -> data.get("celebrityPassword").getOrElse("")), 
+		        ("publicName" -> data.get("publicName").getOrElse("")), 
+		        ("publishedStatusString" -> data.get("publishedStatusString").getOrElse("")), 
+		        ("bio" -> data.get("casualName").getOrElse("")), 
+		        ("casualName" -> data.get("casualName").getOrElse("")), 
+		        ("organization" -> data.get("roleDescription").getOrElse("")), 
+		        ("roleDescription" -> data.get("roleDescription").getOrElse("")), 
+		        ("twitterUsername" -> data.get("twitterUsername").getOrElse(""))
               )
             },
             validForm => {

@@ -23,9 +23,7 @@ class RequireCustomerLogin @Inject() (customerStore: CustomerStore) {
         actionFactory(customer, customer.account).apply(request)     
       }
       
-      // TODO: PLAY20 migration actually redirect this to the reverse-route of GetLoginCustomerEndpoint
-      //   instead of returning  a forbidden.
-      maybeResult.getOrElse(noCustomerAccessResult)
+      maybeResult.getOrElse(Redirect(controllers.website.GetLoginEndpoint.url()))
     }
   }
 
@@ -36,12 +34,7 @@ class RequireCustomerLogin @Inject() (customerStore: CustomerStore) {
         this.apply(customerId, parser)(actionFactory).apply(request)
       }
       
-      maybeResult.getOrElse(noCustomerAccessResult)
+      maybeResult.getOrElse(Redirect(controllers.website.GetLoginEndpoint.url()))
     }
   }
-  
-  //
-  // Private members
-  //
-  private val noCustomerAccessResult = Redirect(controllers.routes.WebsiteControllers.getLogin)
 }

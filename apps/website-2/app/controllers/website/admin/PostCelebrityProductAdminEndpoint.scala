@@ -79,7 +79,7 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
             formWithErrors => {
               val data = formWithErrors.data
               val errors = for (error <- formWithErrors.errors) yield {
-                error.key + ": " + error.message + ". Found: " + error.args.toString
+                error.key + ": " + error.message
               }
               val url = if (isCreate) GetCreateCelebrityProductAdminEndpoint.url(celebrity = celebrity) else GetProductAdminEndpoint.url(productId = productId)
               Redirect(url).flashing(
