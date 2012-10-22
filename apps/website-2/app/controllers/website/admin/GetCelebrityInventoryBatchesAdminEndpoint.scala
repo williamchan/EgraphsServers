@@ -21,7 +21,7 @@ private[controllers] trait GetCelebrityInventoryBatchesAdminEndpoint extends Imp
   import services.AppConfig.instance
   private def inventoryBatchQueryFilters = instance[InventoryBatchQueryFilters]
 
-  def getCelebrityInventoryBatchesAdmin(celebrityId: Long) = controllerMethod() {
+  def getCelebrityInventoryBatchesAdmin(celebrityId: Long) = controllerMethod.withForm() { implicit authToken => 
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       httpFilters.requireCelebrityId(celebrityId) { (celebrity) =>
         Action { implicit request =>
