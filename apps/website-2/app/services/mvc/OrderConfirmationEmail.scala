@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat
 import org.apache.commons.mail.{Email, HtmlEmail}
 import play.api.mvc.RequestHeader
 import services.mail.TransactionalMail
+import services.logging.Logging
 
 case class OrderConfirmationEmail(
   buyerName: String,
@@ -22,6 +23,8 @@ case class OrderConfirmationEmail(
   hasPrintOrder: Boolean,
   mailService: TransactionalMail
 ) {
+  import OrderConfirmationEmail.log
+  
   private val dateFormat = new SimpleDateFormat("MMMM dd, yyyy")
   import services.Finance.TypeConversions._
 
@@ -58,7 +61,9 @@ case class OrderConfirmationEmail(
       hasPrintOrder = hasPrintOrder
     ).toString()
     
-    println("Sending order confirmation: " + this)
+    log("Sending order confirmation mail to : " + buyerName + " for order ID " + orderId)
     mailService.send(mail, Some(textMsg), Some(htmlMsg))
   }
 }
+
+object OrderConfirmationEmail extends Logging

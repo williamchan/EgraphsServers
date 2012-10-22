@@ -12,6 +12,7 @@ import collection.mutable.ListBuffer
 import play.api.templates.Html
 import scala.collection.JavaConversions._
 import services.inject.InjectionProvider
+import play.api.libs.concurrent.Akka
 
 /** Interface for sending transactional mails. Transactional mails are  */
 trait TransactionalMail {
@@ -56,12 +57,14 @@ class MailProvider @Inject() extends InjectionProvider[TransactionalMail]
 private[mail] class DefaultTransactionalMail extends TransactionalMail {
   override def send(mail: HtmlEmail, text: Option[String] = None, html: Option[Html] = None) {
     val mailer = toMailerAPI(mail)
-    (text, html) match {
+    def performSendMail = (text, html) match {
       case (Some(text), Some(html)) => mailer.send(text, html.toString().trim())
       case (Some(text), None) => mailer.send(text)
       case (None, Some(html)) => mailer.sendHtml(html.toString().trim())
       case _ => throw new IllegalStateException("We can't send an email without either text or html in the body.")
     }
+    
+    Akka.future(performSendMail)
   }
 
   override protected def newEmail: MailerAPI = use[MailerPlugin].email
