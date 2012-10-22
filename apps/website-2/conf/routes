@@ -138,8 +138,8 @@ GET     /:celebrityUrlSlug/photos/:productUrlSlug/purchase-error    controllers.
 ##
 #%{ if (play.configuration.getProperty('admin.tools.enabled') == 'full') }%
 GET     /admin/printorders                                          controllers.WebsiteControllers.getPrintOrdersAdmin
-GET     /admin/printorders/{printOrderId}                           controllers.WebsiteControllers.getPrintOrderAdmin(printOrderId: Long)
-POST    /admin/printorders/{printOrderId}                           controllers.WebsiteControllers.postPrintOrderAdmin(printOrderId: Long)
+GET     /admin/printorders/$printOrderId<[0-9]+>                    controllers.WebsiteControllers.getPrintOrderAdmin(printOrderId: Long)
+POST    /admin/printorders/$printOrderId<[0-9]+>                    controllers.WebsiteControllers.postPrintOrderAdmin(printOrderId: Long)
 POST    /:celebrityUrlSlug}/:productUrlSlug/buy-demo                controllers.WebsiteControllers.postBuyDemoProduct(celebrityUrlSlug: String, productUrlSlug: String)
 
 GET     /assets/*file                                               controllers.RemoteAssets.at(path="/public", file)
