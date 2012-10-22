@@ -3,6 +3,7 @@ package scenario
 import services.blobs.Blobs
 import services.AppConfig
 import services.db.Schema
+import services.cache.CacheFactory
 import services.Utils
 
 /**
@@ -39,17 +40,12 @@ case class Scenario(name: String, category: String = "Uncategorized", descriptio
 }
 
 object Scenario {
-  /**
-   * Lazy evaluator for the Scenarios library, which should live with the test
-   * code.
-   *
-   * Doing it this way ensures that we don't waste any memory loading scenarios
-   * until the first scenario request comes in, which should only be in a test
-   * environment.
-   */
-  lazy val scenarios = Class.forName("scenario.Scenarios").newInstance()
+  lazy val scenarios = {
+    new scenario.Scenarios
+  }
   lazy val blobs = AppConfig.instance[Blobs]
   lazy val schema = AppConfig.instance[Schema]
+  lazy val cacheFactory = AppConfig.instance[CacheFactory]
 
   /** All registered scenarios, indexed by name */
   var all = Map[String, Scenario]()
@@ -78,7 +74,7 @@ object Scenario {
   }
 
   /** Adds a scenario to the list of registered scenarios */
-  def add(scenario: Scenario) {
+  def add(scenario: Scenario) {    
     all += (scenario.urlSlug -> scenario)
     
     allCategories += (scenario.category -> (scenario :: allCategories.get(scenario.category).getOrElse(List.empty[Scenario])))
@@ -91,6 +87,7 @@ object Scenario {
   def clearAll() {
     schema.scrub()
     blobs.scrub()
+    cacheFactory.applicationCache.clear()
   }
 
   /**

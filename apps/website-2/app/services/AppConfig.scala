@@ -17,6 +17,7 @@ import social.SocialModule
 import voice.VoiceBiometricsModule
 import uk.me.lings.scalaguice.{InjectorExtensions, ScalaModule}
 import com.google.inject.{Injector, Singleton, Guice, AbstractModule}
+import services.logging.Logging
 
 class AppConfig extends AbstractModule with ScalaModule {
   override def configure() {
@@ -72,7 +73,7 @@ class AppConfig extends AbstractModule with ScalaModule {
 /**
  * Accessor to the application's dependency injector.
  */
-object AppConfig {
+object AppConfig extends Logging {
 
   import InjectorExtensions._
   import uk.me.lings.scalaguice.typeLiteral
@@ -82,14 +83,19 @@ object AppConfig {
     // Put a try-catch on making injector and print the error because Guice
     // exceptions get turned into UnexpectedExceptions by Play, making them
     // almost impossible to catch.
-    try {
-      Guice.createInjector(new AppConfig)
+    val (createdInjector, timing) = Time.stopwatch {
+      try {
+        Guice.createInjector(new AppConfig)
+      }
+      catch {
+        case e =>
+          e.printStackTrace()
+          throw e
+      }
     }
-    catch {
-      case e =>
-        e.printStackTrace()
-        throw e
-    }
+    
+    log(timing + " seconds to create dependency injector.")
+    createdInjector
   }
 
   def instance[T: Manifest] = {

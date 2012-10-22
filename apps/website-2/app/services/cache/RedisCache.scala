@@ -6,6 +6,7 @@ import scala.Some
 import services.Utils
 import com.google.inject.Inject
 import redis.clients.jedis.Jedis
+import services.config.ConfigFileProxy
 
 /**
  * Cache implementation based on connection to our Redis server. Prefer getting
@@ -14,7 +15,7 @@ import redis.clients.jedis.Jedis
  *
  * @param jedis the low-level Redis client.
  */
-private[cache] class RedisCache @Inject()(pool: JedisFactory) extends Cache {
+private[cache] class RedisCache @Inject()(pool: JedisFactory, config: ConfigFileProxy) extends Cache {
 
   import RedisCache._
   import Utils.closing
@@ -41,6 +42,8 @@ private[cache] class RedisCache @Inject()(pool: JedisFactory) extends Cache {
   }
 
   override def clear() {
+    require(config.applicationMode == "dev", "Application mode must be dev to scrub the cache.")
+
     pool.connected(jedis => jedis.flushDB())
   }
 

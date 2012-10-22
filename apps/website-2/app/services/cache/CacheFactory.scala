@@ -83,7 +83,7 @@ class CacheFactory @Inject()(
   }
 
   private[cache] def redisCache(db: Int = JedisFactory.defaultRedisDb): Cache = {
-    new RedisCache(new JedisFactory(db))
+    new RedisCache(new JedisFactory(db), config)
   }
 }
 

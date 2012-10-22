@@ -30,7 +30,7 @@ private[cache] class InMemoryCache @Inject() extends Cache {
   }
 
   override def clear() {
-    cache.removeAll()
+    cache.removeAll() 
   }
 
   override def delete(key: String) {

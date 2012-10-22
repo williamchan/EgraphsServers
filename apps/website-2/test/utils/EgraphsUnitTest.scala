@@ -5,6 +5,7 @@ import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 import play.api.mvc.Session
 import com.typesafe.config.ConfigFactory
+import play.api.Play
 import play.api.test.FakeRequest
 import play.api.Configuration
 import play.api.test.FakeApplication
@@ -12,6 +13,7 @@ import play.api.Application
 import play.api.test._
 import play.api.test.Helpers._
 import java.io.File
+import services.logging.Logging
 
 /**
  * Convenience method provides most generally used traits for a scalatest
@@ -31,19 +33,19 @@ trait EgraphsUnitTest extends FlatSpec
   }
 }
 
-object EgraphsUnitTest {
+object EgraphsUnitTest extends Logging {
   private val classLoader = this.getClass.getClassLoader
   private lazy val typesafeConfig = ConfigFactory.load("local.conf")
   private lazy val playConfig = Configuration(typesafeConfig)
 
-  // TODO: PLAY20 migration: this may have state management conditions when running multiple tests
-  lazy val app: Application = {
-    val theApp = new FakeApplication(path=resourceFile("local.conf").getParentFile) {
-      override def configuration = playConfig
+  def app: Application = {
+    // Only start the app if it wasn't already running
+    Play.maybeApplication.filter(runningApp => runningApp == testApp).getOrElse {
+      log("Starting the test app with root in " + testApp.path) 
+      Play.start(testApp)
+
+      testApp
     }
-    
-    play.api.Play.start(theApp)
-    theApp
   }
   
   def resourceFile(resource: String): File = {
@@ -51,5 +53,26 @@ object EgraphsUnitTest {
       case null => new File("")
       case someUrl => new File(someUrl.getFile)
     }
+  }
+  
+  private lazy val testApp = {
+    new FakeApplication(path=appRoot) {
+      override def configuration = playConfig
+    }
+  }
+  
+  private lazy val appRoot: File = {
+    def recursivelyFindProjectRoot(classpathFile: File): File = {
+      if (new File(classpathFile, "conf").exists()) {
+        classpathFile 
+      } else {
+        recursivelyFindProjectRoot(classpathFile.getParentFile)
+      }
+    }
+
+    val root = recursivelyFindProjectRoot(resourceFile("local.conf"))
+        
+    
+    root
   }
 }

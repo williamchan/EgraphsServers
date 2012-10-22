@@ -9,46 +9,46 @@ import services.payment.Payment
 import java.sql.Connection
 import services.logging.{Logging, LoggingContext}
 import services.config.ConfigFileProxy
-import services.{AppConfig, Utils, TempFile}
+import services.{AppConfig, Utils, TempFile, Time}
 import services.db.{TransactionSerializable, Schema, DBSession}
 import models.{AccountStore, Account, Administrator}
 import services.mvc.celebrity.{CatalogStarsActor, UpdateCatalogStarsActor}
 import services.http.PlayId
 
-
 object Global extends GlobalSettings with Logging {
   override def onStart(app: Application) {
     val logging = AppConfig.instance[LoggingContext]
     logging.withTraceableContext("Bootstrap") {
-      val configProxy = AppConfig.instance[ConfigFileProxy]
-      val blobs = AppConfig.instance[Blobs]
-      val payment = AppConfig.instance[Payment]
+      val (_, secondsToBootstrap) = Time.stopwatch {
+        val configProxy = AppConfig.instance[ConfigFileProxy]
+        val blobs = AppConfig.instance[Blobs]
+        val payment = AppConfig.instance[Payment]
 
-      log("Configuration is: " + configProxy.applicationId)
-      log("Bootstrapping application")
+        log("Configuration is: " + configProxy.applicationId)
+        log("Bootstrapping application")
 
-      // Initialize payment system
-      payment.bootstrap()
+        // Initialize payment system
+        payment.bootstrap()
 
-      // Initialize Squeryl persistence
-      SessionFactory.concreteFactory = Some(() => {
-        val connection = play.api.db.DB.getConnection()(app)
-        if (connection.getTransactionIsolation != Connection.TRANSACTION_SERIALIZABLE) {
-          connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
+        // Initialize Squeryl persistence
+        SessionFactory.concreteFactory = Some(() => {
+          val connection = play.api.db.DB.getConnection()(app)
+          if (connection.getTransactionIsolation != Connection.TRANSACTION_SERIALIZABLE) {
+            connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
+          }
+          Session.create(connection, services.db.DBAdapter.current)
+        })
+
+        // Initialize S3 or fs-based blobstore and cache
+        blobs.init()
+        services.cache.JedisFactory.startup()
+
+        // Some additional test-mode setup
+        if (configProxy.applicationId == "test") {
+          TestModeBootstrap.run()
         }
-        Session.create(connection, services.db.DBAdapter.current)
-      })
-
-      // Initialize S3 or fs-based blobstore and cache
-      blobs.init()
-      services.cache.JedisFactory.startup()
-
-      // Some additional test-mode setup
-      if (configProxy.applicationId == "test") {
-        TestModeBootstrap.run()
       }
-
-      log("Finished bootstrapping application")
+      log("Finished bootstrapping application in " + secondsToBootstrap + "s")
     }
   }
   

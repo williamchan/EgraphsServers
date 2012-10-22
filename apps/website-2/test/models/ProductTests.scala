@@ -16,7 +16,7 @@ class ProductTests extends EgraphsUnitTest
   with DateShouldMatchers
   with HasPublishedStatusTests[Product]
 {
-  val store = AppConfig.instance[ProductStore]
+  private def store = AppConfig.instance[ProductStore]
 
   //
   // HasPublishedStatusTests[Product]
@@ -56,7 +56,7 @@ class ProductTests extends EgraphsUnitTest
   // Test cases
   //
 
-  "Product" should "require certain fields" in {
+  "Product" should "require certain fields" in new EgraphsTestApplication {
     var exception = intercept[IllegalArgumentException] {Product().save()}
     exception.getLocalizedMessage should include ("Product: name must be specified")
     exception = intercept[IllegalArgumentException] {Product(name = "name").save()}
@@ -67,7 +67,7 @@ class ProductTests extends EgraphsUnitTest
     exception.getLocalizedMessage should include ("Product: storyText must be specified")
   }
 
-  "saveWithImageAssets" should "set signingScaleH and signingScaleW" in {
+  "saveWithImageAssets" should "set signingScaleH and signingScaleW" in new EgraphsTestApplication {
     var product = TestData.newSavedProduct().saveWithImageAssets(image = Some(new BufferedImage(/*width*/3000, /*height*/2000, BufferedImage.TYPE_INT_ARGB)), icon = None)
     product.signingScaleW should be(Product.defaultLandscapeSigningScale.width)
     product.signingScaleH should be(Product.defaultLandscapeSigningScale.height)
@@ -77,7 +77,7 @@ class ProductTests extends EgraphsUnitTest
     product.signingScaleH should be(Product.defaultPortraitSigningScale.height)
   }
 
-  "renderedForApi" should "serialize the correct Map for the API" in {
+  "renderedForApi" should "serialize the correct Map for the API" in new EgraphsTestApplication {
     val product = TestData.newSavedProduct().copy(name = "Herp Derp", signingOriginX = 50, signingOriginY = 60).save()
 
     val rendered = product.renderedForApi
@@ -96,7 +96,7 @@ class ProductTests extends EgraphsUnitTest
     rendered.contains("updated") should be(true)
   }
 
-  "findByCelebrityAndUrlSlug" should "return Product with matching name and celebrityId" in {
+  "findByCelebrityAndUrlSlug" should "return Product with matching name and celebrityId" in new EgraphsTestApplication {
     val celebrity = TestData.newSavedCelebrity()
     val product = TestData.newSavedProduct(celebrity = Some(celebrity)).copy(name = "Herp Derp").save()
 
@@ -105,7 +105,7 @@ class ProductTests extends EgraphsUnitTest
     store.findByCelebrityAndUrlSlug(celebrityId = celebrity.id, slug = "Herp") should be(None)
   }
 
-  "getRemainingInventoryAndActiveInventoryBatches" should "return total inventory in active InventoryBatches minus the number of relevant Orders" in {
+  "getRemainingInventoryAndActiveInventoryBatches" should "return total inventory in active InventoryBatches minus the number of relevant Orders" in new EgraphsTestApplication {
     val celebrity = TestData.newSavedCelebrity()
     val customer = TestData.newSavedCustomer()
     val product1 = TestData.newSavedProductWithoutInventoryBatch(celebrity = celebrity)
@@ -125,7 +125,7 @@ class ProductTests extends EgraphsUnitTest
     product2.getRemainingInventoryAndActiveInventoryBatches() should be ((97, List(inventoryBatch1, inventoryBatch2))) // product1 is in both inventoryBatch1 and inventoryBatch1, which have 3 purchases total
   }
 
-  "getCatalogStars" should "return only published celebrities" in {
+  "getCatalogStars" should "return only published celebrities" in new EgraphsTestApplication {
     val publishedCelebrity1 = TestData.newSavedCelebrity()
     val publishedCelebrity2 = TestData.newSavedCelebrity()
     val unpublishedCelebrity1 = TestData.newSavedCelebrity().withPublishedStatus(PublishedStatus.Unpublished).save()
@@ -145,7 +145,7 @@ class ProductTests extends EgraphsUnitTest
     celebrityNamesInCatalogStars should not contain (unpublishedCelebrity2.publicName)
   }
 
-  "getCatalogStars" should "return only celebrities with published products" in {
+  "getCatalogStars" should "return only celebrities with published products" in new EgraphsTestApplication {
     // create 4 different celebrities with products, 2 have unpublished products, all are published celebrities.
     val publishedProduct1 = TestData.newSavedProduct()
     val publishedProduct2 = TestData.newSavedProduct()
@@ -161,7 +161,7 @@ class ProductTests extends EgraphsUnitTest
     celebrityNamesInCatalogStars should not contain (unpublishedProduct2.celebrity.publicName)
   }
 
-  "getCatalogStars" should "return celebrities that lack inventory if they lack inventory batches active based on startDate and endDate" in {
+  "getCatalogStars" should "return celebrities that lack inventory if they lack inventory batches active based on startDate and endDate" in new EgraphsTestApplication {
     // create 4 different celebrities with products, 2 have unpublished products, all are published celebrities.
     val availableProduct1 = TestData.newSavedProduct()
     val availableProduct2 = TestData.newSavedProduct()
@@ -184,7 +184,8 @@ class ProductTests extends EgraphsUnitTest
     celebrityNamesInCatalogStars should contain ((unavailableProduct2.celebrity.publicName, false))
   }
 
-  "getCatalogStars" should "show a celebrity has products available only if there is remaining inventory" in {
+  "getCatalogStars" should "show a celebrity has products available only if there is remaining inventory" in new EgraphsTestApplication {
+    AppConfig.instance[services.cache.CacheFactory].applicationCache.clear()
     // these two already have inventory by default
     val availableProduct1 = TestData.newSavedProduct()
     val availableProduct2 = TestData.newSavedProduct()

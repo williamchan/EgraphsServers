@@ -11,7 +11,7 @@ class AudioConverterTests extends EgraphsUnitTest {
   private val tempFilesId = "AudioConverterTests"
 
   "convertWavToMp3" should "return byte array of mp3 that is much smaller, and also leave no temp files" in new EgraphsTestApplication {
-    val wav = TestHelpers.fileAsBytes("44khz.wav")
+    val wav = TestHelpers.fileAsBytes("test/resources/44khz.wav")
     val mp3 = AudioConverter.convertWavToMp3(sourceAudio = wav, tempFilesId = tempFilesId)
     mp3.length should be > (0)
     mp3.length should be < (wav.length / 10)
