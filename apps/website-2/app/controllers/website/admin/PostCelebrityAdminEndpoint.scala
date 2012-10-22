@@ -86,24 +86,24 @@ trait PostCelebrityAdminEndpoint {
         
         form.bindFromRequest.fold(
             formWithErrors => {
-              val errors = formWithErrors.errors.head.message.toString
+              val data = formWithErrors.data
+              val errors = for (error <- formWithErrors.errors) yield {
+                error.key + ": " + error.message
+              }
               val url = if (isCreate) GetCreateCelebrityAdminEndpoint.url() else GetCelebrityAdminEndpoint.url(celebrityId = celebrityId)
-              Redirect(url).flashing("errors" -> formWithErrors.errors.mkString(", "))
-              
-              // TODO: PLAY20 migration: Is there ANY way to get the values from a formWithErrors?
-//              Redirect(url).flashing(
-//                "errors" -> errors,
-//		            "celebrityId" -> celebrityId.toString,
-//		            "celebrityEmail" -> Form("celebrityEmail" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm),
-//		            "celebrityPassword" -> Form("celebrityPassword" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm),
-//		            "publicName" -> Form("publicName" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm),
-//		            "publishedStatusString" -> Form("publishedStatusString" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm),
-//		            "bio" -> Form("casualName" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm),
-//		            "casualName" -> Form("casualName" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm),
-//		            "organization" -> Form("roleDescription" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm),
-//		            "roleDescription" -> Form("roleDescription" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm),
-//		            "twitterUsername" -> Form("twitterUsername" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm)
-//              )
+              Redirect(url).flashing(
+                ("errors" -> errors.mkString(", ")), 
+		            ("celebrityId" -> celebrityId.toString), 
+		            ("celebrityEmail" -> data.get("celebrityEmail").getOrElse("")), 
+		            ("celebrityPassword" -> data.get("celebrityPassword").getOrElse("")), 
+		            ("publicName" -> data.get("publicName").getOrElse("")), 
+		            ("publishedStatusString" -> data.get("publishedStatusString").getOrElse("")), 
+		            ("bio" -> data.get("casualName").getOrElse("")), 
+		            ("casualName" -> data.get("casualName").getOrElse("")), 
+		            ("organization" -> data.get("roleDescription").getOrElse("")), 
+		            ("roleDescription" -> data.get("roleDescription").getOrElse("")), 
+		            ("twitterUsername" -> data.get("twitterUsername").getOrElse(""))
+              )
             },
             validForm => {
               println("validForm")
