@@ -30,70 +30,66 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
   protected def enrollmentBatchServices: EnrollmentBatchServices
   protected def enrollmentBatchStore: EnrollmentBatchStore
 
-  def postEnrollmentSample(/*@Required signature: String,
-                           @Required audio: String,
-                           skipBiometrics: Boolean = false /*todo(wchan): remove skipBiometrics parameter*/*/) =
-
-    postApiController(dbSettings = WithoutDBConnection) {
-      Action { implicit request =>
-        val postForm = Form(
-          mapping(
-            "signature" -> nonEmptyText,
-            "audio" -> nonEmptyText,
-            "skipBiometrics" -> optional(boolean)
-          )(EnrollmentSubmission.apply)(EnrollmentSubmission.unapply)
-        )
+  def postEnrollmentSample = postApiController(dbSettings = WithoutDBConnection) {
+    Action { implicit request =>
+      val postForm = Form(
+        mapping(
+          "signature" -> nonEmptyText,
+          "audio" -> nonEmptyText,
+          "skipBiometrics" -> optional(boolean)
+        )(EnrollmentSubmission.apply)(EnrollmentSubmission.unapply)
+      )
+      
+      postForm.bindFromRequest.fold(
+        formWithErrors => {
+          play.api.Logger.error("Dismissing the invalid postEnrollmentSample request")
+          play.api.Logger.info("\t" + formWithErrors.errors.mkString(", "))
+          new Status(HttpCodes.MalformedEgraph)
+        },
         
-        postForm.bindFromRequest.fold(
-          formWithErrors => {
-            play.api.Logger.error("Dismissing the invalid postEnrollmentSample request")
-            play.api.Logger.info("\t" + formWithErrors.errors.mkString(", "))
-            new Status(HttpCodes.MalformedEgraph)
-          },
-          
-          submission => {
-            // Get result of DB transaction that processes the request
-            val signature = submission.signature
-            val audio = submission.audio
-            val forbiddenOrErrorOrSuccess = dbSession.connected(TransactionSerializable) {
-              for (
-                account <- httpFilters.requireAuthenticatedAccount.asEither(request).right;
-                celeb <- httpFilters.requireCelebrityId.asEitherInAccount(account).right
-              ) yield {
-                val openEnrollmentBatch = enrollmentBatchStore.getOpenEnrollmentBatch(celeb).getOrElse {
-                  EnrollmentBatch(celebrityId = celeb.id, services = enrollmentBatchServices).save()
-                }
-                
-                if (!openEnrollmentBatch.isBatchComplete) {
-                  val addEnrollmentSampleResult = openEnrollmentBatch.addEnrollmentSample(
-                    signature, 
-                    audio
-                  )
-                  Right(msgsFromAddEnrollmentSampleResult(addEnrollmentSampleResult))                  
-                } else {
-                  Left(InternalServerError("Open enrollment batch already exists and is awaiting enrollment attempt. No further enrollment samples required now."))                  
-                }
+        submission => {
+          // Get result of DB transaction that processes the request
+          val signature = submission.signature
+          val audio = submission.audio
+          val forbiddenOrErrorOrSuccess = dbSession.connected(TransactionSerializable) {
+            for (
+              account <- httpFilters.requireAuthenticatedAccount.asEither(request).right;
+              celeb <- httpFilters.requireCelebrityId.asEitherInAccount(account).right
+            ) yield {
+              val openEnrollmentBatch = enrollmentBatchStore.getOpenEnrollmentBatch(celeb).getOrElse {
+                EnrollmentBatch(celebrityId = celeb.id, services = enrollmentBatchServices).save()
+              }
+              
+              if (!openEnrollmentBatch.isBatchComplete) {
+                val addEnrollmentSampleResult = openEnrollmentBatch.addEnrollmentSample(
+                  signature, 
+                  audio
+                )
+                Right(msgsFromAddEnrollmentSampleResult(addEnrollmentSampleResult))                  
+              } else {
+                Left(InternalServerError("Open enrollment batch already exists and is awaiting enrollment attempt. No further enrollment samples required now."))                  
               }
             }
-            
-            // Handle all the error cases, and in the success case shoot out a message to the actor
-            val results = for (
-              errorOrSuccess <- forbiddenOrErrorOrSuccess.right;
-              success <- errorOrSuccess.right
-            ) yield {
-              val (maybeActorMessage, successResult) = success
-              
-              maybeActorMessage.foreach(actorMessage => enrollmentBatchActor ! actorMessage)
-              
-              successResult
-            }
-            
-            results.fold(failure => failure, success => success)
           }
-        )
+          
+          // Handle all the error cases, and in the success case shoot out a message to the actor
+          val results = for (
+            errorOrSuccess <- forbiddenOrErrorOrSuccess.right;
+            success <- errorOrSuccess.right
+          ) yield {
+            val (maybeActorMessage, successResult) = success
+            
+            maybeActorMessage.foreach(actorMessage => enrollmentBatchActor ! actorMessage)
+            
+            successResult
+          }
+          
+          results.fold(failure => failure, success => success)
+        }
+      )
 
-      }
     }
+  }
 
   private def msgsFromAddEnrollmentSampleResult(addEnrollmentSampleResult: (EnrollmentSample, Boolean, Int, Int)):
   (Option[ProcessEnrollmentBatchMessage], Result) = {

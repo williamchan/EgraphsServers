@@ -5,6 +5,9 @@ import models.Order
 import models.enums.OrderReviewStatus
 import play.api.mvc.Controller
 import play.api.mvc.Result
+import play.api.data._
+import Forms._
+import play.api.data.format.Formats._
 import services.db.DBSession
 import services.http.{WithoutDBConnection, POSTApiControllerMethod}
 import services.http.filters.HttpFilters
@@ -22,17 +25,20 @@ private[controllers] trait PostCelebrityOrderApiEndpoint { this: Controller =>
    * See [[https://egraphs.jira.com/wiki/display/DEV/API+Endpoints the json spec]] for more info
    * about the params.
    */
-  def postCelebrityOrder(
-    reviewStatus: Option[String] = None,
-    rejectionReason: Option[String] = None) =
-  {
-    postApiController(dbSettings = WithoutDBConnection) {
-      httpFilters.requireAuthenticatedAccount() { account =>
-        httpFilters.requireCelebrityId.inAccount(account) { celebrity =>
-          httpFilters.requireOrderIdOfCelebrity(celebrity.id) { order =>
-            Action {
-              postCelebrityOrderResult(reviewStatus, rejectionReason, order, celebrity)
-            }
+  def postCelebrityOrder(orderId: Long) = postApiController() {
+    httpFilters.requireAuthenticatedAccount() { account =>
+      httpFilters.requireCelebrityId.inAccount(account) { celebrity =>
+        httpFilters.requireOrderIdOfCelebrity(orderId, celebrity.id) { order =>
+          Action { implicit request =>
+            val form = Form(tuple("reviewStatus" -> optional(text), "rejectionReason" -> optional(text)))
+
+            form.bindFromRequest.fold(
+              errors => BadRequest,
+              reviewStatusAndRejectionReason => {
+                val (reviewStatus, rejectionReason) = reviewStatusAndRejectionReason
+                postCelebrityOrderResult(reviewStatus, rejectionReason, order, celebrity)
+              }
+            )
           }
         }
       }

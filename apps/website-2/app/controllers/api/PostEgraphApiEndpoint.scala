@@ -45,7 +45,7 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
    * See [[https://egraphs.jira.com/wiki/display/DEV/API+Endpoints the json spec]] for more info
    * about the params.
    */
-  def postEgraph() = {
+  def postEgraph(orderId: Long) = {
     postApiController(dbSettings = WithoutDBConnection) {
       Action { implicit request =>        
         val postForm = Form(
@@ -72,7 +72,7 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
               for (
                 account <- httpFilters.requireAuthenticatedAccount.asEither(request).right;            
                 celeb <- httpFilters.requireCelebrityId.asEitherInAccount(account).right;
-                order <- httpFilters.requireOrderIdOfCelebrity.asEither(celeb.id)(request).right
+                order <- httpFilters.requireOrderIdOfCelebrity.asEither(orderId, celeb.id).right
               ) yield {
                 // validate signature for issue #104
                 val message = validForm.message

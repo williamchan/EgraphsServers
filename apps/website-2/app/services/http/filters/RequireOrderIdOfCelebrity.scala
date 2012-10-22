@@ -26,29 +26,19 @@ class RequireOrderIdOfCelebrity @Inject() (orderStore: OrderStore, orderQueryFil
    *
    * @return an Action that produces either NotFound or the result of `actionFactory`.
    */
-  def apply[A](celebrityId: Long, parser: BodyParser[A] = parse.anyContent)
+  def apply[A](orderId: Long, celebrityId: Long, parser: BodyParser[A] = parse.anyContent)
   (actionFactory: Order => Action[A])
   : Action[A] = 
   {
     Action(parser) { implicit request =>
-      this.asEither(celebrityId).fold(notFound => notFound, order => actionFactory(order).apply(request))     
+      this.asEither(orderId, celebrityId).fold(notFound => notFound, order => actionFactory(order).apply(request))
     }
   }
   
-  def asEither[A](celebrityId: Long)(implicit request: Request[A]): Either[Result, Order] = {
-    Form(single("orderId" -> number)).bindFromRequest.fold(
-      errors => Left(NotFound("Order ID was required but not provided")),
-      
-      orderId => {
-        orderStore.findByCelebrity(celebrityId, orderQueryFilters.orderId(orderId)).headOption match {
-          case None =>
-            Left(NotFound("The celebrity has no such order"))
-
-          case Some(order) =>
-            Right(order)
-        }
-      }
-    )    
+  def asEither[A](orderId: Long, celebrityId: Long)(implicit request: Request[A]): Either[Result, Order] = {
+    orderStore.findByCelebrity(celebrityId, orderQueryFilters.orderId(orderId)).headOption match {
+      case None => Left(NotFound("The celebrity has no such order"))
+      case Some(order) => Right(order)
+    }
   }
-
 }

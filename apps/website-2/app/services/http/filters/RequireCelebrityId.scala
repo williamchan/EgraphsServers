@@ -9,7 +9,7 @@ import play.api.mvc.Action
 import play.api.mvc.BodyParser
 import play.api.mvc.BodyParsers.parse
 import play.api.mvc.Result
-import play.api.mvc.Results.NotFound
+import play.api.mvc.Results.Forbidden
 import models.{Account, Celebrity}
 import play.api.libs.iteratee.{Done, Input}
 import play.api.mvc.RequestHeader
@@ -74,5 +74,5 @@ class RequireCelebrityId @Inject() (celebStore: CelebrityStore) {
   //
   // Private members
   //
-  private val noCelebIdResult = NotFound("Valid celebrity ID was required but not provided")
+  private val noCelebIdResult = Forbidden("Valid celebrity account credentials were required but not provided")
 }

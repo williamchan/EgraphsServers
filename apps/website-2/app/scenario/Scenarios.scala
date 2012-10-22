@@ -168,7 +168,8 @@ class Scenarios extends DeclaresScenarios {
      programmatically later on if we want to log in as him]
   """, {
     () =>
-      TestData.newSavedCustomer().copy(name = "Erem Boto").save()
+      val customer = TestData.newSavedCustomer().copy(name = "Erem Boto").save()
+      customer.account.withPassword(TestData.defaultPassword).right.get.save()
   }
   )
 
