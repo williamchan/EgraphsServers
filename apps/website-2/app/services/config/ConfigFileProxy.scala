@@ -37,6 +37,12 @@ class ConfigFileProxy @Inject() (protected val playConfig: Configuration) extend
   val dbDefaultPoolMaxIdleTimeExcessConnections = int("db.default.pool.maxIdleTimeExcessConnections")
 
   val evolutionplugin = string("evolutionplugin", "enabled", "disabled")
+  
+  val cloudBeesApplicationId = if (applicationMode == "prod") { string("cloudbees.applicationId") }
+  val cloudBeesApiKey = string("bees.api.key")
+  val cloudBeesApiSecret = string("bees.api.secret")
+  val cloudBeesApiDomain = string("bees.api.domain")
+  val cloudBeesProjectAppDomain = string("bees.project.app.domain")
 
   val smtpMock = boolean("smtp.mock")
   val smtpOption = if(smtpMock) None else Some(new AnyRef {
