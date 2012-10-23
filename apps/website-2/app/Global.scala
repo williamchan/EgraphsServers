@@ -1,9 +1,10 @@
 import org.squeryl.{Session, SessionFactory}
 import io.Source
 import java.io.{File, PrintWriter}
-import play.api.Application
-import play.api.Play
-import play.api.GlobalSettings
+import play.api.{Application, GlobalSettings, Play}
+import play.api.mvc.{Result, RequestHeader}
+import play.api.mvc.Results._
+import play.api.Play.current
 import services.blobs.Blobs
 import services.payment.Payment
 import java.sql.Connection
@@ -54,6 +55,31 @@ object Global extends GlobalSettings with Logging {
   
   override def onStop(app: Application) {
     services.cache.JedisFactory.shutDown()
+  }
+  
+  /**
+   * Egraphs error page for 400
+   */
+  override def onBadRequest(request: RequestHeader, error: String): Result = {
+    BadRequest(views.html.frontend.errors.bad_request())
+  }
+  
+  /**
+   * Egraphs error page for 500
+   */
+  override def onError(request: RequestHeader, ex: Throwable): Result = {
+    if (Play.isProd) {
+      InternalServerError(views.html.frontend.errors.error())
+    } else {
+      super.onError(request, ex)
+    }
+  }
+  
+  /**
+   * Egraphs error page for 404
+   */
+  override def onHandlerNotFound(request: RequestHeader): Result = {
+    NotFound(views.html.frontend.errors.not_found())
   }
 }
 

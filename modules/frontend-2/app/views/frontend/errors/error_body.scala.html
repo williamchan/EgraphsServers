@@ -1,12 +1,14 @@
+@(msg: String)
+
 <body>
 <!-- Begin site_header.scala.html -->
 <header id="top" role="navigation">
   <div class="container">
     <div class="row">
-      <div class="logo span3">
+      <div class="logo span">
         <h1><a href="/" title="Egraphs">Egraphs</a></h1>
       </div>
-      <div class="explore span3">
+      <div class="navbar-item">
         <p><a href="/inside-an-egraph">Inside an Egraph</a></p>
       </div> <!-- end .explore -->
       <div class="span6">
@@ -19,7 +21,6 @@
       </div>
     </div>
   </div>
-
 </header> <!-- end #top -->
 <!-- End site_header.scala.html -->
 
@@ -29,7 +30,7 @@
     <div class="container">
       <section>
         <header>
-          <h3>${_arg}</h3>
+          <h3>@msg</h3>
         </header>
       </section>
     </div>

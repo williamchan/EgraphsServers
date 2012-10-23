@@ -36,7 +36,7 @@ object TestControllers extends Controller with Logging {
         error match {
           case "403" => Forbidden("")
           case "404" => NotFound("")
-          case _ => InternalServerError
+          case _ => throw new Exception("blargh")
         }
       }
     }
