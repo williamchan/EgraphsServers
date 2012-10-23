@@ -2,10 +2,11 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
+GET /favicon.ico controllers.Assets.at(path="/public", file="/images/favicon.ico")
+
 ###
 ### Test routes
 ###
-
 GET     /test/scenarios                          controllers.website.nonproduction.ScenarioController.list
 GET     /test/scenarios/clear                    controllers.website.nonproduction.ScenarioController.clear
 GET     /test/scenarios/:urlSlug                 controllers.website.nonproduction.ScenarioController.scenario(urlSlug: String)
