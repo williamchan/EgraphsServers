@@ -1,6 +1,7 @@
 package models
 
 import enums.{HasEnrollmentStatus, EnrollmentStatus, PublishedStatus, HasPublishedStatus}
+import filters.{FilterServices, CelebrityFilterValue, FilterValue, FilterValueStore}
 import java.sql.Timestamp
 import services.blobs.AccessPolicy
 import services.db.{FilterOneTable, KeyedCaseClass, Schema, SavesWithLongKey}
@@ -14,6 +15,7 @@ import org.apache.commons.mail.HtmlEmail
 import models.Celebrity.CelebrityWithImage
 import play.api.Play.current
 import services.Dimensions
+import org.squeryl.dsl.ManyToMany
 
 /**
  * Services used by each celebrity instance
@@ -21,6 +23,7 @@ import services.Dimensions
 case class CelebrityServices @Inject() (
   store: CelebrityStore,
   accountStore: AccountStore,
+  filterServices: FilterServices,
   productStore: ProductStore,
   orderStore: OrderStore,
   inventoryBatchStore: InventoryBatchStore,
@@ -58,6 +61,13 @@ case class Celebrity(id: Long = 0,
   with HasPublishedStatus[Celebrity]
   with HasEnrollmentStatus[Celebrity]
 {
+
+  /**
+   * FilterValues celebrity is associated with
+   */
+
+  lazy val filterValues = services.filterServices.filterValueStore.filterValues(this)
+
   //
   // Additional DB columns
   //
@@ -365,6 +375,11 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
   //
   // Public Methods
   //
+
+  def celebrities(filterValue: FilterValue) : Query[Celebrity] with ManyToMany[Celebrity, CelebrityFilterValue] = {
+    schema.celebrityFilterValues.right(filterValue)
+  }
+
   def findByUrlSlug(slug: String): Option[Celebrity] = {
     if (slug.isEmpty) return None
 
