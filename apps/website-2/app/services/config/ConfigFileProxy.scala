@@ -7,7 +7,7 @@ import com.google.inject.Inject
  * Proxies the running application.conf. Ensures that all necessary configuration values are present
  * and exposes an easy api for accessing them.
  **/
-class ConfigFileProxy @Inject() (protected val playConfig: Configuration) extends ConfigPropertyAccessors {
+class ConfigFileProxy @Inject() (protected val playConfig: Configuration) extends ConfigPropertyAccessors {  
   val applicationName = string("application.name")
   val applicationId = string("application.id")
   val applicationMode = string("application.mode", "dev", "prod")
@@ -74,4 +74,5 @@ class ConfigFileProxy @Inject() (protected val playConfig: Configuration) extend
   val ipadBuildVersion = string("ipad.buildversion")
   val attachmentsPath = string("attachments.path")
   val parsersTextMaxlength = string("parsers.text.maxLength")
+  val allowDemoPurchase = boolean("allowDemoPurchase")
 }

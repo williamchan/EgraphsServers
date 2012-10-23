@@ -20,8 +20,10 @@ import play.api.mvc.Result
 import play.api.mvc.Request
 import play.api.data.{Form => PlayForm}
 import play.api.data.Forms._
+import services.config.ConfigFileProxy
 
 trait PostBuyDemoProductEndpoint { this: Controller =>
+  import PostBuyDemoProductEndpoint.log
 
   protected def dbSession: DBSession
   protected def httpFilters: HttpFilters
@@ -31,6 +33,7 @@ trait PostBuyDemoProductEndpoint { this: Controller =>
   protected def customerStore: CustomerStore
   protected def postController: POSTControllerMethod  
   protected def formReaders: FormReaders
+  protected def config: ConfigFileProxy
 
   case class DemoPurchase(
     recipientName: String,
@@ -49,40 +52,42 @@ trait PostBuyDemoProductEndpoint { this: Controller =>
   def postBuyDemoProduct(celebrityUrlSlug: String,
                          productUrlSlug: String) = postController(doCsrfCheck = false, WithoutDBConnection) {
 
-    Logger.info("Receiving purchase order")
-    httpFilters.requireApplicationId.test {
-      Action { implicit request =>
+    log("Receiving demo purchase order")
+    Action { implicit request =>
+      if (!config.allowDemoPurchase) {
+        NotFound
+      } else {
         val errorResultOrData = validateInputs(
           celebrityUrlSlug: String,
           productUrlSlug: String
         )
-        
+
         errorResultOrData.fold(
           errorResult => errorResult,
-          
+
           data => {
             val (celebrity: Celebrity, product: Product, buyDemoData: DemoPurchase) = data
-  
+
             Logger.info("No validation errors")
             val purchaseHandler: EgraphPurchaseHandler = EgraphPurchaseHandler(
               recipientName = buyDemoData.recipientName,
               recipientEmail = buyDemoData.recipientEmail,
               buyerName = buyDemoData.buyerName,
               buyerEmail = buyDemoData.buyerEmail,
-              stripeTokenId = buyDemoData.stripeTokenId.get, // this must always be set, and it should be
-              desiredText = buyDemoData.desiredText,
-              personalNote = buyDemoData.personalNote,
-              celebrity = celebrity,
-              product = product,
-              totalAmountPaid = product.price,
-              billingPostalCode = "55555",
-              flash = request.flash,
-              mail = transactionalMail,
-              customerStore = customerStore,
-              accountStore = accountStore,
-              dbSession = dbSession,
-              payment = payment,
-              isDemo = true
+            stripeTokenId = buyDemoData.stripeTokenId.get, // this must always be set, and it should be
+            desiredText = buyDemoData.desiredText,
+            personalNote = buyDemoData.personalNote,
+            celebrity = celebrity,
+            product = product,
+            totalAmountPaid = product.price,
+            billingPostalCode = "55555",
+            flash = request.flash,
+            mail = transactionalMail,
+            customerStore = customerStore,
+            accountStore = accountStore,
+            dbSession = dbSession,
+            payment = payment,
+            isDemo = true
             )
             purchaseHandler.execute()
           }
@@ -131,3 +136,5 @@ trait PostBuyDemoProductEndpoint { this: Controller =>
     }
   }
 }
+
+object PostBuyDemoProductEndpoint extends services.logging.Logging
