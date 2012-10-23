@@ -46,12 +46,12 @@ class RequireCelebrityIdTests extends EgraphsUnitTest with DBTransactionPerTest 
     errorOrCelebrity should be (Right(celebrity))
   }
 
-  it should "contain a NotFound on the left if there is no celebrity found" in new EgraphsTestApplication {
+  it should "contain a Forbidden on the left if there is no celebrity ID found" in new EgraphsTestApplication {
     val celebrityIdFilter = newRequireCelebrityId // this filter is what we are trying to test
     
     val errorOrCelebrity = celebrityIdFilter.asEither(badCelebrityId)
     errorOrCelebrity.isLeft should be (true)
-    status(errorOrCelebrity.fold(error => error, celeb => Ok)) should be (NOT_FOUND) 
+    status(errorOrCelebrity.fold(error => error, celeb => Ok)) should be (FORBIDDEN)
   }
 
   "asEitherInAccount" should "find the celebrity if it is in the db and it should be on the right" in new EgraphsTestApplication {
@@ -62,21 +62,21 @@ class RequireCelebrityIdTests extends EgraphsUnitTest with DBTransactionPerTest 
     errorOrCelebrity should be (Right(celebrity))
   }
 
-  it should "contain a NotFound on the left if there is no celebrity found in that account" in new EgraphsTestApplication {
+  it should "contain a Forbidden on the left if there is no celebrity ID found in that account" in new EgraphsTestApplication {
     val account = TestData.newSavedAccount()
     val celebrityIdFilter = newRequireCelebrityId // this filter is what we are trying to test
     
     val errorOrCelebrity = celebrityIdFilter.asEitherInAccount(account)
     errorOrCelebrity.isLeft should be (true)
-    status(errorOrCelebrity.fold(error => error, celeb => Ok)) should be (NOT_FOUND)
+    status(errorOrCelebrity.fold(error => error, celeb => Ok)) should be (FORBIDDEN)
   }
 
-  it should "contain a NotFound on the left if there is no account found" in new EgraphsTestApplication {
+  it should "contain a Forbidden on the left if there is no account found" in new EgraphsTestApplication {
     val celebrityIdFilter = newRequireCelebrityId // this filter is what we are trying to test
     
     val errorOrCelebrity = celebrityIdFilter.asEitherInAccount(badAccount)
     errorOrCelebrity.isLeft should be (true)
-    status(errorOrCelebrity.fold(error => error, celeb => Ok)) should be (NOT_FOUND)
+    status(errorOrCelebrity.fold(error => error, celeb => Ok)) should be (FORBIDDEN)
   }
 
   "apply" should "execute the provided block if a matching celebrity account was found" in new EgraphsTestApplication {
@@ -190,7 +190,7 @@ class RequireCelebrityIdTests extends EgraphsUnitTest with DBTransactionPerTest 
       testOperation,
       verification = (result, blockToExecute) => {
         there was no(blockToExecute).apply(any)
-        status(result) should be (NOT_FOUND)
+        status(result) should be (FORBIDDEN)
       }
     )
   }
