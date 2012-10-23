@@ -12,7 +12,7 @@ import play.api.mvc.Results.BadRequest
  * Similar to Filter, except that RequestFilter cares about whether or not the key found
  * in a request has the data required.
  */
-trait RequestFilter[-KeyT, +RequiredT] { this: Filter[KeyT, RequiredT] =>
+trait RequestFilter[KeyT, +RequiredT] { this: Filter[KeyT, RequiredT] =>
   // with this form we can get data from the request that will be used to get the result.  
   protected def form: Form[KeyT]
 

@@ -15,11 +15,11 @@ import play.api.mvc.Result
  * So a filter that requires a celebrity from an account may have the definition:
  *   RequiredCelebrity extends Filter[Account, Celebrity]
  */
-trait Filter[-KeyT, +RequiredT] {
+trait Filter[KeyT, +RequiredT] {
   // this is a function that takes a value and maps it to an option of T
   // for example:
   //    override def filter[String, Account] = accountStore.findByEmail(email)
-  protected def filter(value: KeyT): Either[Result, RequiredT]
+  def filter(value: KeyT): Either[Result, RequiredT]
 
   def apply[A](key: KeyT, parser: BodyParser[A] = parse.anyContent)(actionFactory: RequiredT => Action[A]): Action[A] = {
     Action(parser) { request =>
