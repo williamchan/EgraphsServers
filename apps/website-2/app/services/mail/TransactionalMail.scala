@@ -64,7 +64,7 @@ private[mail] class DefaultTransactionalMail extends TransactionalMail {
       case _ => throw new IllegalStateException("We can't send an email without either text or html in the body.")
     }
     
-    Akka.future(performSendMail)
+    performSendMail
   }
 
   override protected def newEmail: MailerAPI = use[MailerPlugin].email
