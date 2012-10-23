@@ -2,14 +2,18 @@ package models.filters
 
 import utils._
 import services.AppConfig
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
-
+@RunWith(classOf[JUnitRunner])
 class FilterTests extends EgraphsUnitTest
+ with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityIdLongTests[Filter]
   with CreatedUpdatedEntityTests[Long, Filter]
+  with DateShouldMatchers
   with DBTransactionPerTest
 {
-  val filterStore = AppConfig.instance[FilterStore]
+  def filterStore = AppConfig.instance[FilterStore]
 
   //
   // SavingEntityTests[Filter]
@@ -37,24 +41,24 @@ class FilterTests extends EgraphsUnitTest
   // Test cases
   //
 
-  "Filter" should "require a name" in {
+  "Filter" should "require a name" in new EgraphsTestApplication {
     val exception = intercept[IllegalArgumentException] {Filter(publicname = "herp").save()}
     exception.getLocalizedMessage should include("Filter: name must be specified")
   }
 
-  "Filter" should "require a publicname" in {
+  "Filter" should "require a publicname" in new EgraphsTestApplication {
     val exception = intercept[IllegalArgumentException] {Filter(name = "herp").save()}
     exception.getLocalizedMessage should include("Filter: publicname must be specified")
   }
 
-  "Filter" should "return an associated value" in {
+  "Filter" should "return an associated value" in new EgraphsTestApplication {
     val filter = TestData.newSavedFilter
     val filterValue = TestData.newSavedFilterValue(filter.id)
     val filterValues = filter.filterValues
     filterValues.exists(fv => fv.id == filterValue.id) should be (true)
   }
 
-  "Filter" should "return all associated values" in {
+  "Filter" should "return all associated values" in new EgraphsTestApplication {
     val filter = TestData.newSavedFilter
     val newFilterValues = for ( i <- 0 until 10) yield TestData.newSavedFilterValue(filter.id)
     val retrievedFilterValues = filter.filterValues

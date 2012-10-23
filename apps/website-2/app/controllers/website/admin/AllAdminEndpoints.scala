@@ -21,7 +21,6 @@ trait AllAdminEndpoints
   with GetCreateCelebrityProductAdminEndpoint
   with GetEgraphAdminEndpoint
   with GetEgraphsAdminEndpoint
-  with GetFilterAdminEndpoint
   with GetInventoryBatchAdminEndpoint
   with GetLoginAdminEndpoint
   with GetOrderAdminEndpoint

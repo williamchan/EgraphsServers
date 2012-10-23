@@ -2,13 +2,18 @@ package models.filters
 
 import utils._
 import services.AppConfig
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
+@RunWith(classOf[JUnitRunner])
 class FilterValueTests  extends EgraphsUnitTest
+  with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityIdLongTests[FilterValue]
   with CreatedUpdatedEntityTests[Long, FilterValue]
+  with DateShouldMatchers
   with DBTransactionPerTest
 {
-  val filterValueStore = AppConfig.instance[FilterValueStore]
+  def filterValueStore = AppConfig.instance[FilterValueStore]
 
   //
   // SavingEntityTests[FilterValue]
@@ -36,17 +41,17 @@ class FilterValueTests  extends EgraphsUnitTest
     // Test cases
     //
 
-    "FilterValue" should "require a name" in {
+    "FilterValue" should "require a name" in new EgraphsTestApplication {
       val exception = intercept[IllegalArgumentException] {FilterValue().save()}
       exception.getLocalizedMessage should include("FilterValue: name must be specified")
     }
 
-    "FilterValue" should "require a publicname" in {
+    "FilterValue" should "require a publicname" in new EgraphsTestApplication {
       val exception = intercept[IllegalArgumentException] {FilterValue(name = "derp").save()}
       exception.getLocalizedMessage should include("FilterValue: publicname must be specified")
     }
 
-    "FilterValue" should "not have duplicate names" in {
+    "FilterValue" should "not have duplicate names" in new EgraphsTestApplication {
 
       val filterValue = TestData.newSavedFilterValue(TestData.newSavedFilter.id)
       val exception = intercept[RuntimeException] {
@@ -55,13 +60,13 @@ class FilterValueTests  extends EgraphsUnitTest
       exception.getLocalizedMessage should include("ERROR: duplicate key value violates unique constraint ")
     }
 
-    "FilterValue" should "allow duplicate publicnames" in {
+    "FilterValue" should "allow duplicate publicnames" in new EgraphsTestApplication {
       val filterValue = TestData.newSavedFilterValue(TestData.newSavedFilter.id)
       val filterValue2 = FilterValue(name=TestData.generateFullname(), publicname = filterValue.publicname, filterId = TestData.newSavedFilter.id).save()
       filterValue2.publicname should be (filterValue.publicname)
     }
 
-    "FilterValue" should "return a child filter" in {
+    "FilterValue" should "return a child filter" in new EgraphsTestApplication {
       val filterValue = TestData.newSavedFilterValue(TestData.newSavedFilter.id)
       val childFilter = TestData.newSavedFilter
 
@@ -71,7 +76,7 @@ class FilterValueTests  extends EgraphsUnitTest
 
     }
 
-    "FilterValue" should "return many child filters" in {
+    "FilterValue" should "return many child filters" in new EgraphsTestApplication {
       val filterValue = TestData.newSavedFilterValue(TestData.newSavedFilter.id)
       val childFilters = for ( i <- 0 until 10) yield TestData.newSavedFilter
       childFilters.map(cf => filterValue.filters.associate(cf))
@@ -83,7 +88,7 @@ class FilterValueTests  extends EgraphsUnitTest
       )
     }
 
-    "FilterValue" should "return associated celebrities" in {
+    "FilterValue" should "return associated celebrities" in new EgraphsTestApplication {
       val filterValue = TestData.newSavedFilterValue(TestData.newSavedFilter.id)
       val celebrity = TestData.newSavedCelebrity()
 
