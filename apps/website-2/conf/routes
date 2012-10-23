@@ -2,8 +2,6 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-GET /favicon.ico controllers.Assets.at(path="/public", file="/images/favicon.ico")
-
 ###
 ### Test routes
 ###
@@ -33,8 +31,8 @@ GET     /blob/files/*blobKey                                       controllers.W
 
 # Map static resources from the /app/public folder to the /public path
 #GET     /public/                                staticDir:public
-#GET     /favicon.ico                            staticFile:/public/images/favicon.ico
-#GET     /documents/CelebrityAgreement           staticFile:/public/documents/CelebrityAgreement.pdf
+GET     /favicon.ico                            controllers.Assets.at(path="/public", file="/images/favicon.ico")
+GET     /documents/CelebrityAgreement           controllers.Assets.at(path="/public", file="/documents/CelebrityAgreement.pdf")
 
 
 ##
