@@ -18,6 +18,8 @@ import voice.VoiceBiometricsModule
 import uk.me.lings.scalaguice.{InjectorExtensions, ScalaModule}
 import com.google.inject.{Injector, Singleton, Guice, AbstractModule}
 import services.logging.Logging
+import com.google.inject.Stage
+import services.config.ConfigFileProxy
 
 class AppConfig extends AbstractModule with ScalaModule {
   override def configure() {
@@ -85,7 +87,13 @@ object AppConfig extends Logging {
     // almost impossible to catch.
     val (createdInjector, timing) = Time.stopwatch {
       try {
-        Guice.createInjector(new AppConfig)
+        import play.api.Play
+        val stage = if (new ConfigFileProxy(Play.current.configuration).applicationMode == "dev") {
+          Stage.DEVELOPMENT
+        } else {
+          Stage.PRODUCTION
+        }
+        Guice.createInjector(stage, new AppConfig)
       }
       catch {
         case e =>
