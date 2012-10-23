@@ -2,7 +2,6 @@ package services.blobs
 
 import utils.{ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest}
 import services.AppConfig
-import services.config.ConfigFileProxy
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
@@ -31,8 +30,6 @@ class S3BlobVendorTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValid
   // Private members
   //
   def withTestBucket[A](operation: S3BlobVendor => A): A = {    
-    val blobVendor = new S3BlobVendor(config.s3Id, config.s3Secret)
-
     val blobStore = blobVendor.context.getBlobStore
 
     if (!blobStore.containerExists(bucket)) {
@@ -48,6 +45,5 @@ class S3BlobVendorTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValid
   // Private members
   //
   val bucket = "egraphs-unit-test"
-  def blobVendor = new S3BlobVendor(config.s3Id, config.s3Secret)
-  def config = AppConfig.instance[ConfigFileProxy]
+  def blobVendor = AppConfig.instance[S3BlobVendor]
 }

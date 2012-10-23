@@ -73,4 +73,5 @@ class ConfigFileProxy @Inject() (protected val playConfig: Configuration) extend
   val fbAppsecret = string("fb.appsecret")
   val ipadBuildVersion = string("ipad.buildversion")
   val attachmentsPath = string("attachments.path")
+  val parsersTextMaxlength = string("parsers.text.maxLength")
 }

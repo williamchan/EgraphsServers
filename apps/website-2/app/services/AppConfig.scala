@@ -87,14 +87,14 @@ object AppConfig extends Logging {
     // almost impossible to catch.
     val (createdInjector, timing) = Time.stopwatch {
       try {
-        Guice.createInjector(new AppConfig)
-//        import play.api.Play
-//        val stage = if (new ConfigFileProxy(Play.current.configuration).applicationMode == "dev") {
-//          Stage.DEVELOPMENT
-//        } else {
-//          Stage.PRODUCTION
-//        }
-//        Guice.createInjector(stage, new AppConfig)
+        import play.api.Play
+        val stage = if (new ConfigFileProxy(Play.current.configuration).applicationMode == "dev") {
+          Stage.DEVELOPMENT
+        } else {
+          Stage.PRODUCTION
+        }
+        
+        Guice.createInjector(stage, new AppConfig)
       }
       catch {
         case e =>

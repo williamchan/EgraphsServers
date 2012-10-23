@@ -4,20 +4,21 @@ import org.jclouds.blobstore.BlobStoreContextFactory
 import org.jclouds.aws.s3.AWSS3Client
 import org.jclouds.s3.domain.CannedAccessPolicy
 import services.logging.Logging
-import services.AppConfig
+import services.config.ConfigFileProxy
 import services.http.HttpContentService
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 import egraphs.playutils.Encodings.{Base64, URL}
 import services.config.ConfigFileProxy
+import com.google.inject.Inject
 
 /** [[services.blobs.Blobs.BlobProvider]] implementation backed by Amazon S3 */
-private[blobs] case class S3BlobVendor(
-  s3id: String,
-  s3secret: String
+private[blobs] case class S3BlobVendor @Inject() (
+  config: ConfigFileProxy,
+  httpContent: HttpContentService
 ) extends BlobVendor with Logging {
-
-  val httpContent = AppConfig.instance[HttpContentService]
+  val s3id = config.s3Id
+  val s3secret = config.s3Secret
 
   //
   // BlobVendor members
@@ -103,11 +104,3 @@ private[blobs] case class S3BlobVendor(
     }
   }
 }
-
-/** [[services.blobs.Blobs.BlobProvider]] implementation backed by Amazon S3 */
-private[blobs] object S3BlobVendor {
-  def apply(config: ConfigFileProxy): S3BlobVendor = {
-    S3BlobVendor(config.s3Id, config.s3Secret)
-  }
-}
-  

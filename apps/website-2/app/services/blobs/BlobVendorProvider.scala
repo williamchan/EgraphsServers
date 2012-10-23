@@ -13,7 +13,8 @@ import services.config.ConfigFileProxy
 private[blobs] class BlobVendorProvider @Inject() (
   blobKeyStore: BlobKeyStore,
   cacheFactory: CacheFactory,
-  config: ConfigFileProxy
+  config: ConfigFileProxy,
+  val s3: S3BlobVendor
 ) extends InjectionProvider[BlobVendor]
 {
   private val blobstoreType = config.blobstoreVendor
@@ -37,10 +38,6 @@ private[blobs] class BlobVendorProvider @Inject() (
     }
   }
   
-  def s3: S3BlobVendor = {
-    S3BlobVendor(config)
-  }
-
   //
   // Private members
   //
