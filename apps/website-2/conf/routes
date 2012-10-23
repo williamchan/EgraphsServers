@@ -139,7 +139,7 @@ GET     /:celebrityUrlSlug/photos/:productUrlSlug/purchase-error    controllers.
 GET     /admin/printorders                                          controllers.WebsiteControllers.getPrintOrdersAdmin
 GET     /admin/printorders/$printOrderId<[0-9]+>                    controllers.WebsiteControllers.getPrintOrderAdmin(printOrderId: Long)
 POST    /admin/printorders/$printOrderId<[0-9]+>                    controllers.WebsiteControllers.postPrintOrderAdmin(printOrderId: Long)
-POST    /:celebrityUrlSlug}/:productUrlSlug/buy-demo                controllers.WebsiteControllers.postBuyDemoProduct(celebrityUrlSlug: String, productUrlSlug: String)
+POST    /:celebrityUrlSlug/:productUrlSlug/buy-demo                controllers.WebsiteControllers.postBuyDemoProduct(celebrityUrlSlug: String, productUrlSlug: String)
 
 GET     /assets/*file                                               controllers.RemoteAssets.at(path="/public", file)
 
