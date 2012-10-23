@@ -64,6 +64,7 @@ private[mail] class DefaultTransactionalMail extends TransactionalMail {
       case _ => throw new IllegalStateException("We can't send an email without either text or html in the body.")
     }
     
+    // Figure out why using Akka.future(performSendMail) fails, as per https://egraphs.atlassian.net/browse/SER-421
     performSendMail
   }
 
