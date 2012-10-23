@@ -17,9 +17,7 @@ private[controllers] trait GetOrdersAdminEndpoint extends ImplicitHeaderAndFoote
   protected def controllerMethod: ControllerMethod
   protected def httpFilters: HttpFilters
   protected def orderStore: OrderStore
-  
-  import services.AppConfig.instance
-  private def orderQueryFilters = instance[OrderQueryFilters]
+  protected def orderQueryFilters: OrderQueryFilters
 
   def getOrdersAdmin = controllerMethod.withForm() 
   { implicit authToken => 

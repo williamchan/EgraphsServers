@@ -17,9 +17,7 @@ private[controllers] trait GetCelebrityOrdersAdminEndpoint extends ImplicitHeade
   protected def controllerMethod: ControllerMethod
   protected def httpFilters: HttpFilters
   protected def orderStore: OrderStore
-  
-  import services.AppConfig.instance
-  private def orderQueryFilters = instance[OrderQueryFilters]
+  protected def orderQueryFilters: OrderQueryFilters
 
   def getCelebrityOrdersAdmin(celebrityId: Long) = controllerMethod.withForm() { implicit authToken =>
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>

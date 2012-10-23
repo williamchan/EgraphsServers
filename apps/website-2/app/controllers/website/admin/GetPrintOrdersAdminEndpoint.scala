@@ -17,9 +17,7 @@ private[controllers] trait GetPrintOrdersAdminEndpoint extends ImplicitHeaderAnd
   protected def controllerMethod: ControllerMethod
   protected def httpFilters: HttpFilters
   protected def printOrderStore: PrintOrderStore
-
-  import services.AppConfig.instance
-  private def printOrderQueryFilters = instance[PrintOrderQueryFilters]
+  protected def printOrderQueryFilters: PrintOrderQueryFilters
     
   def getPrintOrdersAdmin = controllerMethod.withForm() { implicit authToken =>
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>

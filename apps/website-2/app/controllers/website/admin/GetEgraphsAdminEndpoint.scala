@@ -19,9 +19,7 @@ private[controllers] trait GetEgraphsAdminEndpoint extends ImplicitHeaderAndFoot
   protected def controllerMethod: ControllerMethod
   protected def httpFilters: HttpFilters
   protected def egraphStore: EgraphStore
-  
-  import services.AppConfig.instance
-  private def egraphQueryFilters = instance[EgraphQueryFilters]
+  protected def egraphQueryFilters: EgraphQueryFilters
 
   def getEgraphsAdmin = controllerMethod.withForm() { implicit authToken =>
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>

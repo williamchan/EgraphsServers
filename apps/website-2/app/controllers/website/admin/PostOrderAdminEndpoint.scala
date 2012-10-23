@@ -23,9 +23,7 @@ trait PostOrderAdminEndpoint { this: Controller =>
   protected def httpFilters: HttpFilters
   protected def orderStore: OrderStore
   protected def egraphStore: EgraphStore
-  
-  import services.AppConfig.instance
-  private def egraphQueryFilters = instance[EgraphQueryFilters]
+  protected def egraphQueryFilters: EgraphQueryFilters
 
   def postOrderAdmin(orderId: Long) = postController() {
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>

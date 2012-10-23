@@ -1,8 +1,7 @@
 package controllers
 
 import website._
-import play.api.mvc.Action
-import play.api.mvc.Controller
+import play.api.mvc.{Action, Controller}
 import play.api.mvc.Results.Redirect
 import services.blobs.Blobs
 import services.mail.{BulkMailList, TransactionalMail}
@@ -62,4 +61,9 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val orderStore = instance[OrderStore]
   override protected val printOrderStore = instance[PrintOrderStore]
   override protected val productStore = instance[ProductStore]
+  
+  override protected val egraphQueryFilters = instance[EgraphQueryFilters]
+  override protected val inventoryBatchQueryFilters = instance[InventoryBatchQueryFilters]
+  override protected val orderQueryFilters = instance[OrderQueryFilters]
+  override protected val printOrderQueryFilters = instance[PrintOrderQueryFilters]
 }

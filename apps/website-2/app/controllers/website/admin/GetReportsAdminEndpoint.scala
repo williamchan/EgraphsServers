@@ -1,7 +1,6 @@
 package controllers.website.admin
 
 import play.api.mvc.{Action, Controller}
-import services.AppConfig
 import services.db.Schema
 import services.http.ControllerMethod
 import services.http.filters.HttpFilters
