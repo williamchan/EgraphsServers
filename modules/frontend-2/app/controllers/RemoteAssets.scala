@@ -26,14 +26,14 @@ object RemoteAssets extends Controller {
     resultWithHeaders.withHeaders(DATE -> df.print({new java.util.Date}.getTime))
   }
  
-  def at(file: String) = {
+  def at(file: String): Call = {
     val secure = Play.configuration.getString("cdn.secure").getOrElse("true").toBoolean // default is secure
     val httpOrHttps = if(secure) "https://" else "http://"
 
     val maybeContentUrl = Play.configuration.getString("cdn.contenturl")
     maybeContentUrl match {
       case Some(contentUrl) => {
-        httpOrHttps + contentUrl + controllers.routes.RemoteAssets.at(file).url
+        new Call("GET", httpOrHttps + contentUrl + controllers.routes.RemoteAssets.at(file).url)
       }
       case None => controllers.routes.RemoteAssets.at(file)
     }

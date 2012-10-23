@@ -67,7 +67,7 @@
             <div class="egraph">
               <div class="frame">
                 <div class="image-aperture">
-                  <iframe src='@(RemoteAssets.at("images/" + signedImage))' class="signed-photo" alt="Signed photo"></iframe>
+                  <iframe src='@signedImage' class="signed-photo" alt="Signed photo"></iframe>
                   <!-- <div class="fx-mat-glow"></div> The glow off the bottom edge of the matte -->
                   <div class="fx-mat-shadow"></div>               
                   <!-- <div class="fx-glass-shine"></div> The shine on top of the glass -->
@@ -90,7 +90,7 @@
                     <div class="product-icon-and-date-box">
                       <div class="product-icon-content">
                         <div class="product-icon-centered">
-                          <img src='@(RemoteAssets.at("images/" + productIcon))' />
+                          <img src='@productIcon' />
                         </div>
                       </div>
                       <div class="signing-date">@signedOnDate</div>
