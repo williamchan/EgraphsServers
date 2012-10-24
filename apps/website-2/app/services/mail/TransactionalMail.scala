@@ -29,11 +29,11 @@ trait TransactionalMail {
     val maybeReplyTo = replyToAddresses.headOption
 
     // Extract the content into the MailerAPI format
-    val maybeRepliableEmail = maybeReplyTo.map(address => newEmail.setReplyTo(address))
+    val maybeRepliableEmail = maybeReplyTo.map(address => newEmail.setReplyTo(address.toString))
 
     maybeRepliableEmail.getOrElse(newEmail)
       .setSubject(email.getSubject)
-      .addFrom(email.getFromAddress.getAddress)
+      .addFrom(email.getFromAddress.toString)
       .addRecipient(addressStringsFromList(email.getToAddresses): _*)
       .addCc(addressStringsFromList(email.getCcAddresses): _*)
       .addBcc(addressStringsFromList(email.getBccAddresses): _*)
