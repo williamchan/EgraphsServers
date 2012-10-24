@@ -4,7 +4,6 @@ import PlayProject._
 import com.typesafe.sbteclipse.core.EclipsePlugin.EclipseKeys
 import cloudbees.Plugin._
 
-
 /**
  * Builds the main Egraphs website.
  *
@@ -69,7 +68,8 @@ object WebsiteBuild extends Build {
 
       // Test dependencies
       "com.typesafe.akka" % "akka-testkit" % "2.0.2" % "test",
-      "org.scalatest" %% "scalatest" % "1.8" % "test"
+      "org.scalatest" %% "scalatest" % "1.8" % "test",
+      "org.scalamock" %% "scalamock-scalatest-support" % "2.4" % "test"
     )
     
     val websiteBaseDir = file(".") / "apps" / "website-2"

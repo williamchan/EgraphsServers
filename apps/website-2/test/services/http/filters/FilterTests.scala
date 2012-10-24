@@ -1,19 +1,25 @@
 package services.http.filters
 
 import org.junit.runner.RunWith
+import org.scalamock.scalatest.MockFactory
+import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.junit.JUnitRunner
-import utils.EgraphsUnitTest
-import play.api.mvc.Result
+import org.scalatest.FlatSpec
 import play.api.mvc.Results.NotFound
 import play.api.mvc.Results.Ok
+import play.api.mvc.Request
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
+import play.api.mvc.Result
+import play.api.test.Helpers.NOT_FOUND
+import play.api.test.Helpers.OK
+import play.api.test.Helpers.status
 import play.api.test.FakeRequest
 
 @RunWith(classOf[JUnitRunner])
-class FilterTests extends EgraphsUnitTest {
+class FilterTests extends FlatSpec with ShouldMatchers with MockFactory {
 
-  def notFound = NotFound("Boolean not provided but should have been.")
+  val notFound = NotFound("Boolean not provided but should have been.") // Note: this must be a val for assertions to work on equals
 
   /**
    * This simple implementation of a Filter allows us to filter strings that are representations of booleans.
@@ -40,19 +46,42 @@ class FilterTests extends EgraphsUnitTest {
     // Setup
     val filter = new TestableFilter()
 
-    val request = FakeRequest()
+    val (request, resultFromAction, actionFactory) = setupMocks(1)
 
-    val expectedResult =  Ok(true.toString)
-    val mockAction = mock[Action[AnyContent]]
-    val actionFactory = mock[Boolean => Action[AnyContent]]
-    actionFactory(any) returns mockAction
-    mockAction(request) returns expectedResult
-
+    // Test
     val action = filter("true")(actionFactory)
     val result = action(request)
 
-    result should be(expectedResult)
-    filter.filter("true") should be(Right(true))
-    filter.filter("false") should be(Right(false))
+    // Verify
+    status(result) should be(OK)
+    result should be(resultFromAction)
+  }
+
+  "apply" should "should not execute the code in a action from the actionFactory if the requirement is not found" in {
+    // Setup
+    val filter = new TestableFilter()
+
+    val (request, resultFromAction, actionFactory) = setupMocks(0)
+
+    // Test
+    val action = filter("I should not pattern match")(actionFactory)
+    val result = action(request)
+
+    // Verify
+    status(result) should be(NOT_FOUND)
+    result should be(notFound)
+  }
+
+  private def setupMocks(expectedNumberOfCallsToActionFactory: Int): (Request[AnyContent], Result, Boolean => Action[AnyContent]) = {
+    val request = FakeRequest()
+
+    val resultFromAction = Ok(true.toString)
+    val action = Action {
+      resultFromAction
+    }
+    val actionFactory = mockFunction[Boolean, Action[AnyContent]]
+    actionFactory expects (true) returning action repeat(expectedNumberOfCallsToActionFactory)
+
+    (request, resultFromAction, actionFactory)
   }
 }
