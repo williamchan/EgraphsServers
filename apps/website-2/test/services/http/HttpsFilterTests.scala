@@ -1,37 +1,48 @@
 package services.http
 
-import scala.Either
-import play.api.mvc.Result
+import play.api.mvc._
+import play.api.mvc.Results._
+import play.api.test.FakeRequest
 import utils.EgraphsUnitTest
+import services.config.ConfigFileProxy
 
-//TODO: PLAY20: this should probably be deleted along with HttpsFilters.scala 
+//TODO: PLAY20 - having trouble getting the logic in HttpsFilter to actually execute in these tests
 class HttpsFilterTests extends EgraphsUnitTest {
 
+  "HttpsFilter" should "redirect insecure http requests to https when httpsOnly is true" in (pending)
+
+  "HttpsFilter" should "serve https requests" in (pending)
+
+  "HttpsFilter" should "serve http requests when httpsOnly is false" in (pending)
+  
 //  "HttpsFilter" should "redirect insecure http requests to https when httpsOnly is true" in {
-//    implicit val request = FunctionalTestUtils.createRequest(secure = false)
-//    val playConfig = FunctionalTestUtils.createProperties(HttpsFilter.httpsOnlyProperty, "true")
-//
-//    val result: Either[Result, Any] = new HttpsFilter(playConfig).apply(1)
-//    result.isLeft should be(true)
-//    result.left.get.asInstanceOf[Redirect].url should be ("https://www.egraphs.com/")
+//    val request: Request[AnyContent] = FakeRequest("GET", "www.egraphs.com").withHeaders("x-forwarded-proto" -> "http")
+//    val mockConfig = mock[ConfigFileProxy]
+//    mockConfig.applicationHttpsOnly returns true
+//    
+//    val httpsFilter = new HttpsFilter(mockConfig)
+//    val action = httpsFilter(Action { request => Ok } )
+//    println("action " + action)
 //  }
 //
 //  "HttpsFilter" should "serve https requests" in {
-//    implicit val request = FunctionalTestUtils.createRequest(secure = true)
-//    val playConfig = FunctionalTestUtils.createProperties(HttpsFilter.httpsOnlyProperty, "true")
+//    val request: Request[AnyContent] = FakeRequest("GET", "www.egraphs.com").withHeaders("x-forwarded-proto" -> "https")
+//    val mockConfig = mock[ConfigFileProxy]
+//    mockConfig.applicationHttpsOnly returns true
 //
-//    val result: Either[Result, Any] = new HttpsFilter(playConfig).apply(1)
-//    result.isRight should be(true)
-//    result.right.get should be(1)
+//    val httpsFilter = new HttpsFilter(mockConfig)
+//    val action = httpsFilter(Action { request => Ok } )
+//    println("action " + action)
 //  }
 //
 //  "HttpsFilter" should "serve http requests when httpsOnly is false" in {
-//    implicit val request = FunctionalTestUtils.createRequest(secure = false)
-//    val playConfig = FunctionalTestUtils.createProperties(HttpsFilter.httpsOnlyProperty, "false")
-//
-//    val result: Either[Result, Any] = new HttpsFilter(playConfig).apply(1)
-//    result.isRight should be(true)
-//    result.right.get should be(1)
+//    val request: Request[AnyContent] = FakeRequest("GET", "www.egraphs.com").withHeaders("x-forwarded-proto" -> "http")
+//    val mockConfig = mock[ConfigFileProxy]
+//    mockConfig.applicationHttpsOnly returns false
+//    
+//    val httpsFilter = new HttpsFilter(mockConfig)
+//    val action = httpsFilter(Action { request => Ok } )
+//    println("action " + action)
 //  }
 
 }

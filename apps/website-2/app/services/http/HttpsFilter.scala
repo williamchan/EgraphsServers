@@ -9,26 +9,18 @@ import play.api.mvc.Session
 import services.config.ConfigFileProxy
 
 /**
- * Inspired by [play-framework] Forcing SSL connection:
- * https://groups.google.com/forum/?fromgroups#!searchin/play-framework/force$20ssl/play-framework/e5qja-hdD3s/8U2s-XfVkKwJ
+ * Inspired by [play-framework] thread:
+ * https://groups.google.com/forum/#!topic/play-framework/11zbMtNI3A8
  */
 class HttpsFilter @Inject()(config: ConfigFileProxy) {
 
   def apply[A](action: Action[A]): Action[A] = {
     Action(action.parser) { request =>
-      // TODO: PLAY20 migration. Fix this broken implementation -- right now there is no known way to
-      //   actually redirect https. http://stackoverflow.com/questions/12522390/how-do-i-find-out-if-my-request-was-made-over-http-or-https-in-play-2-0
-      action(request)
-      /* Uncomment this once we know how to reliably perform this redirect.
-        if (playConfig.getProperty(HttpsFilter.httpsOnlyProperty) == "true" && !request.secure.booleanValue()) {
+      if (config.applicationHttpsOnly && (request.headers.get("x-forwarded-proto").getOrElse("") != "https")) {
         Redirect("https://" + request.host + request.uri)
       } else {
         action(request)
-      }*/
+      }
     }
   }
-}
-
-object HttpsFilter {
-  val httpsOnlyProperty = "application.httpsOnly"
 }
