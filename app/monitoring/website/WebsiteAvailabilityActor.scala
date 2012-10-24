@@ -7,12 +7,13 @@ import java.util.Date
 import common.CloudWatchMetricPublisher
 import collections.LimitedQueue
 import collections.EgraphsMetric
+import monitoring.ActorUtilities
+import common.MonitoringMessages.CheckStatus
+import common.MonitoringMessages.GetMetric
 
-case class CheckStatus()
-case class GetMetric()
-
-class WebsiteAvailabilityActor(url: String, friendlyName: String, pub: CloudWatchMetricPublisher)
-  extends Actor with ActorLogging {
+class WebsiteAvailabilityActor(url: String, friendlyName: String,
+  val publisher: CloudWatchMetricPublisher)
+  extends Actor with ActorUtilities with ActorLogging {
 
   private val history = new LimitedQueue[Int](60)
 
@@ -40,10 +41,5 @@ class WebsiteAvailabilityActor(url: String, friendlyName: String, pub: CloudWatc
     // add to history
     history.enqueue(webResponseTransformed)
     webResponseTransformed
-  }
-
-  def awsActions(namespace: String, value: Int) = {
-    play.Logger.info("Send value: " + value + " to cloudwatch metric: " + namespace)
-    val datum = pub.sendData(namespace, value)
   }
 }

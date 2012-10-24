@@ -1,4 +1,4 @@
-@main(title = "SiteMonitoring") {
+@main(title = "DBMonitoring") {
  
   <script type="text/javascript">
   $(function () {
@@ -27,7 +27,7 @@
         document.getElementsByTagName('tr')[Math.floor(i/3)].appendChild(td);  
         temp = document.createElement('h1');
         temp.className = 'metrics';
-        temp.innerHTML = "Recent GET requests to " + series.metrics[i].name + ":";
+        temp.innerHTML = "Number of connections to " + series.metrics[i].name + " database:";
         document.getElementsByTagName('td')[i].appendChild(temp);
         
         var placeholder = document.createElement('div');
@@ -41,8 +41,8 @@
       };
       
       // all metrics update every minute
-      //setInterval(generateAjaxRequest, 10000);
-      setInterval(generateAjaxRequest, 60000);
+      setInterval(generateAjaxRequest, 10000);
+      //setInterval(generateAjaxRequest, 60000);
     }; 
  
     // helper functions   
@@ -52,7 +52,7 @@
  
     function ajaxRequest (myFunction) {
 	    $.ajax({
-			  url: "/metrics",
+			  url: "/db",
 			  method: 'GET',
 			  dataType: 'json',
 			  success: myFunction
@@ -71,7 +71,7 @@
   			lines: { show: true },
   			points: { show: true },
   			xaxis: { tickDecimals: 0, tickSize: 5 },
-  			yaxis: { min: 0.0, max: 1.2 }
+  			yaxis: { min: 0.0 }
   		};
         
       // transform data into graphable points

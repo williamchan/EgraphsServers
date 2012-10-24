@@ -1,21 +1,21 @@
 package monitoring.website
 
-import play.api.libs.concurrent.Akka
-import play.api.Play.current
-import scala.collection.immutable.List
-import com.amazonaws.services.cloudwatch.AmazonCloudWatch
-import common.CloudWatchMetricPublisher
-import collections.EgraphsMetric
-import akka.actor._
-import akka.util.Timeout
-import akka.dispatch.Await
-import akka.dispatch.Future
-import akka.util.duration._
-import org.scalatest._
+import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 import org.specs2.mock.Mockito
-import play.api.test.Helpers.running
+
+import akka.actor.Props
+import akka.dispatch.Await
+import akka.pattern.ask
+import akka.util.Timeout
+import akka.util.duration.intToDurationInt
+import collections.EgraphsMetric
+import common.CloudWatchMetricPublisher
+import play.api.Play.current
+import play.api.libs.concurrent.Akka
 import play.api.test.FakeApplication
+import play.api.test.Helpers.running
+import monitoring.AvailabilityActor
 
 class WebsiteAvailabilityActorTest extends FlatSpec with ShouldMatchers with Mockito {
 
@@ -23,9 +23,10 @@ class WebsiteAvailabilityActorTest extends FlatSpec with ShouldMatchers with Moc
     
     val res = running(FakeApplication()) {
       val metPub = mock[CloudWatchMetricPublisher]
+      val availabilityActor = new AvailabilityActor(metPub)
 
       val myTestActor = Akka.system.actorOf(
-        Props(new WebsiteAvailabilityActor("http://isitchristmas.com/", "christmasTest", metPub)),
+        Props(new WebsiteAvailabilityActor("http://isitchristmas.com/", "christmasTest", availabilityActor)),
         name = "testActor")
 
       import akka.pattern.{ ask, pipe }

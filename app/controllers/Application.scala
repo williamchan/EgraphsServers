@@ -1,11 +1,10 @@
 package controllers
 
-import history.WebsiteHistory
+import common.Egraphs
+import monitoring.database.DBMonitor
+import play.api.libs.json.Json
 import play.api.mvc.Action
 import play.api.mvc.Controller
-import monitoring.website.WebsiteMonitoring
-import play.api.libs.json._
-import collections.EgraphsMetric
 
 object Application extends Controller {
 
@@ -14,9 +13,23 @@ object Application extends Controller {
   }
 
   def getMetrics = Action {
-    val metrics = WebsiteMonitoring.getMetrics
+    val metrics = Egraphs.websiteMonitor.getMetrics
     val jsonIterable = metrics.map(metric => metric.toJson)
     val responseJson = Json.toJson(Map("metrics" -> jsonIterable))
     Ok(responseJson)
   }
+  
+  def getDBAvailability = Action {
+    val dbMetrics = Egraphs.dbMonitor.getMetrics
+    val jsonIterable = dbMetrics.map(metric => metric.toJson)
+    val responseJson = Json.toJson(Map("metrics" -> jsonIterable))
+    Ok(responseJson)
+  }
+  
+  def love = Action {
+    Ok(views.html.db())
+  }
+  
+  // testing purposes only
+  def ok = Action{Ok}
 }
