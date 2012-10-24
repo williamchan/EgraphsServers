@@ -1,0 +1,84 @@
+@(learnMoreUrl: String)(
+implicit authToken: egraphs.authtoken.AuthenticityToken,
+headerData: models.frontend.header.HeaderData,
+footerData: models.frontend.footer.FooterData
+)
+@import views.frontend.Utils
+@import models.frontend.egraphs._
+@import controllers._
+
+@baseBody = {
+
+<section id="content" role="main">
+  <div id="main" class="about-us statics">
+    <div class="row-fluid">
+      <div class="span12 masthead-static">
+        <img src='@RemoteAssets.at("images/about-us.jpg")'/>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row-fluid">
+        <div class="span12">
+          <h1>About Us</h1>
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span12">
+          <span class="lede">
+            First and foremost: we are all fans.
+          </span>
+          <div class="row-fluid">
+            <div class="span6">
+              <p>
+                Perhaps you drive hundreds of miles to watch your favorite baseball player play.  Maybe you enjoy standing in the cold rain to cheer on your favorite football team.  Perhaps you linger outside a stage door just to get a glimpse of your favorite actor or musician.  We at Egraphs have all done that.
+              </p>
+							<p>
+								We are a team of people with varied backgrounds–a neurobiologist, an applied mathematician, an iPhone software developer with a film background, a consumer marketing specialist, and a recently-retired Major League baseball player to name a few.
+							</p>
+							<p>
+								The one thing that unites all of us:  We are fans.
+							</p>
+            </div>
+            <div class="span6">
+              <p>
+               There’s a star out there that each of us would “cross the Sahara” to connect with on a personal level.  We believe everyone out there has that same wish, and it’s that wish which inspired the creation of the egraph.  
+              </p>
+							<p>
+               Our goal at Egraphs is to provide a convenient and trusted way for stars and fans to interact.  It starts with the egraph – an authenticated personalized voice and written message from the star to the fan that can be shared with the world.  
+              </p>
+              <p>
+                <a href="@learnMoreUrl">Want to learn more?</a>
+              </p>
+              <p>
+                To request your favorite star, email <a href="mailto:requests@@egraphs.com">requests@@egraphs.com</a>
+              </p>
+              <p>
+                For media inquiries, email <a href="mailto:media@@egraphs.com">media@@egraphs.com</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span12 lede">
+          Sincerely,<br>
+          The Egraphs Team
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span12">
+        <img src='@RemoteAssets.at("images/signatures.png")'/>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+}
+@base_template(
+title="About Us",
+jsMain="",
+body=baseBody
+)

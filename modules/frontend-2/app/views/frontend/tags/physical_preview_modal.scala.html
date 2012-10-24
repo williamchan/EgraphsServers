@@ -1,0 +1,34 @@
+@()
+
+@import controllers._
+
+@{/** The HTML for a modal-dialog that previews a framed physical egraph.
+  
+  The modal dialog has id "frame-preview" and is hidden by default. To invoke
+  it properly, do the following: 
+  
+  1. set some other link text in the page to : 
+    <a data-toggle="modal" class="tip" href="#frame-preview" id="preview-shoutout">
+      my link text
+    </a>
+
+  2. Additionally_ ensure that the page's scripts have imported the module 
+     bootstrap/bootstrap-modal.js
+*/}
+
+<div class="modal hide" id="frame-preview">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">×</button>
+    <h3>Example Framed Egraph</h3>
+  </div>
+  <div class="modal-body">
+    <img src='@RemoteAssets.at("images/physical-preview.jpg")' alt="fpo-egraph-diagram" class="scale" />
+  </div>
+  <div class="modal-description">
+    Your framed egraph contains a high quality print, certificate of authenticity, and custom cut mat inside of
+    a 10” X 14” frame.
+  </div>
+  <div class="modal-footer">
+    <button data-dismiss="modal" class="button"><strong><em>Close</em></strong><span>&raquo;</span></button>
+  </div>
+</div>

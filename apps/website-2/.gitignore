@@ -1,0 +1,12 @@
+logs
+project/target
+target
+tmp
+.history
+dist
+.classpath
+.project
+.settings/
+.idea/
+.idea_modules/
+bin/

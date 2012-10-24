@@ -1,0 +1,99 @@
+@(isCreate: Boolean,
+  celebrity: models.Celebrity,
+  errorFields: Option[List[String]],
+  fields: (String) => String,
+  inventoryBatch: Option[models.InventoryBatch] = None,
+  products : Iterable[(models.Product, Boolean)],
+  remainingInventory: Option[Int] = None
+)(implicit authToken: egraphs.authtoken.AuthenticityToken,
+  headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData)
+
+@import controllers.WebsiteControllers
+@import services.Finance.TypeConversions._
+@import egraphs.authtoken.AuthenticityToken.safeForm
+@import views.html.Application.tags.errorMessage
+@import views.html.Application.tags.formField
+@import views.html.frontend.tags
+@import views.html.frontend.tags.ng
+@import views.html.frontend.base_template
+
+
+@postInventoryBatch = @{
+  routes.WebsiteControllers.postCelebrityInventoryBatchAdmin(celebrityId = celebrity.id)
+}
+
+@body = {
+<section id="content" class="top" role="main">
+  <div id="main" class="sub">
+    <div class="container" id="celebrity-admin">
+      <h1>
+        @celebrity.publicName - @{if(isCreate) "Create" else "Update"} Inventory Batch
+      </h1>
+      @views.html.Application.tags.valueRow(label="Remaining Inventory", value=remainingInventory.getOrElse(""))
+      <div class="row-fluid">
+        <div class="span12">
+          @safeForm('id -> "inventorybatch-form", 'method -> "POST", 'action -> postInventoryBatch.url) {
+            <fieldset>
+              <input id="inventoryBatchId" name="inventoryBatchId" type="hidden" value="@fields("inventoryBatchId")">
+              <legend>Inventory Batch Details</legend>
+
+              @formField(
+                id="numInventory",
+                label="Inventory Amount",
+                inputType="text",
+                width="span4",
+                fields=fields
+              )
+
+              @formField(
+                id="startDate",
+                label="Start Date",
+                inputType="text",
+                width="span4",
+                help=Some("yyyy-mm-dd"),
+                fields=fields
+              )
+
+              @formField(
+                id="endDate",
+                label="End Date",
+                inputType="text",
+                width="span4",
+                help=Some("yyyy-mm-dd"),
+                fields=fields
+              )
+            </fieldset>
+            <h2>Associated Products</h2>
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <td>Associate?</td>
+                  <td>Id</td>
+                  <td>Name</td>
+                  <td>Price</td>
+                </tr>
+              </thead>
+              @products.map { case (product, isAssociated) =>
+              <tr>
+                <td><input type="checkbox" name="@("prod" + product.id)" value="checked" @if(isAssociated){checked="true"} /></td>
+                <td>@product.id</td>
+                <td>@product.name</td>
+                <td>@product.price.formatSimply</td>
+              </tr>
+              }
+            </table>
+            <div class="actions">
+              <button type="submit" id="submit-button" class="btn primary fade in">Save</button>
+              <button type="reset" id="reset-button" class="btn primary fade in">Reset</button>
+              @errorMessage(errorFields)
+            </div>
+          }
+        </div>
+      </div>
+    </div>    
+  </div>
+</section>
+}
+
+@base_template(title="Admin - Inventory Batch Details", body=body)

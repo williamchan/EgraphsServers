@@ -1,0 +1,81 @@
+@(celeb: models.frontend.storefront.ChoosePhotoCelebrity,
+  products: Iterable[models.frontend.storefront.ChoosePhotoTileProduct],
+  recentEgraphs: Iterable[models.frontend.storefront.ChoosePhotoRecentEgraph],
+  partnerIcons: Iterable[models.frontend.storefront.ChoosePhotoPartnerIcon]
+)(
+  implicit authToken: egraphs.authtoken.AuthenticityToken,
+  headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData,
+  storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs
+)
+
+@{/**
+     Renders the Choose Photo page with the products tiled.
+
+     celeb - Viewmodel for the celebrity whose catalog is being rendered
+     products - List of viewmodel for the products being sold.
+     recentEgraphs - Viewmodels for recently sold egraphs
+     partnerIcons - viewmodels for partner organizations
+
+     headerData & footerData - see base_template.scala.html
+     storefrontBreadcrumbs - see base_celebrity_storefront_template
+*/}
+
+@import views.html.frontend.tags.storefront_breadcrumbs_responsive
+@import _root_.frontend.formatting.MoneyFormatting.Conversions._
+@import _root_.frontend.formatting.DateFormatting.Conversions._
+
+@productLink(product: models.frontend.storefront.ChoosePhotoTileProduct) = {
+  @if(product.quantityRemaining > 0) {@product.targetUrl} else {/faq/#how-many}
+}
+
+@photoSection = {
+  <section class="wrapper" role="main">
+
+    <div class="container">
+
+      <div class="grid inner clearfix">
+
+        @storefront_breadcrumbs_responsive(storefrontBreadcrumbs)
+
+        <!-- List all the products -->
+        @for((product, productNum) <- products.zipWithIndex) {
+
+          <article>            
+            <div class="thumb">              
+              <a class="glowborder" href="@productLink(product)">
+                <img src="@product.imageUrl" alt="@product.name" />                
+              </a>
+              
+            </div>            
+
+            <h2><a href="@productLink(product)">@product.name &raquo;</a></h2>
+
+            <p class="series">
+              @if(product.quantityRemaining > 0){ Available } else { 
+                <a href="/faq#how-many">Sold Out!</a>
+              }
+            </p>
+
+            <p class="price">@product.price.formatSimply</p>
+
+            <div class="@product.orientation.tileClass">@product.orientation.tileClass</div>
+
+          </article>
+        }
+
+      </div> <!-- end .grid -->
+
+    </div> <!-- end .container -->
+
+  </section> <!-- end .wrapper -->
+}
+
+@base_celebrity_storefront_choose_photo_template(
+  title="Choose a photo",
+  jsMain="pages/celebrity-storefront-tiled",
+  celeb=celeb,
+  recentEgraphs=recentEgraphs,
+  partnerIcons=partnerIcons,
+  photoSection=photoSection
+)

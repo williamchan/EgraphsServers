@@ -1,0 +1,69 @@
+@(inventoryBatches: Iterable[models.InventoryBatch], celebrity: models.Celebrity
+)(implicit paginationInfo: controllers.PaginationInfo,
+  authToken: egraphs.authtoken.AuthenticityToken,
+  headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData)
+
+@import controllers.WebsiteControllers
+@import views.html.Application.content_base
+@import views.html.Application.tags.pagination
+@import views.html.frontend.tags
+@import views.html.frontend.tags.ng
+@import views.html.frontend.base_template
+
+@getCreateCelebrityInventoryBatch = @{
+	routes.WebsiteControllers.getCreateCelebrityInventoryBatchAdmin(celebrityId = celebrity.id)
+}
+
+@headline = {
+  @celebrity.publicName's Inventory Batches
+}
+
+@body = {
+<section id="content" class="top" role="main">
+  <div id="main" class="sub">
+    <div class="container" id="celebrity-admin">
+      <h1>
+        @headline @paginationInfo.totalResultsStr
+      </h1>
+      <form method="link" action="@getCreateCelebrityInventoryBatch">
+        <input class="btn primary fade in" type="submit" value="New Inventory Batch"/>
+      </form>
+      <div>
+        <h2>Filters:</h2>
+        <ul class="span16">
+          <li><a href="?filter=activeOnly">Active Only</a></li>
+          <li><a href="?filter=all">All</a></li>
+        </ul>
+      </div>
+      <table class="table table-hover table-condensed">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Id</th>
+            <th>Inventory Amount</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+          </tr>
+        </thead>  
+        @inventoryBatches.map { (inventoryBatch) =>
+        <tr>
+          <td>
+            <a class="preview-link" href="/admin/inventorybatches/@inventoryBatch.id">
+              Details
+            </a>
+          </td>
+          <td>@inventoryBatch.id</td>
+          <td>@inventoryBatch.numInventory</td>
+          <td>@inventoryBatch.startDate</td>
+          <td>@inventoryBatch.endDate</td>
+        </tr>
+        }
+      </table>
+      @pagination()
+    </div>
+  </div>
+</div>    
+}
+
+@base_template(title="Admin - Inventory Batches", body=body)

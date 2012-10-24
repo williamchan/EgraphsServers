@@ -1,8 +1,0 @@
-@(attributeTuples: (String, String)*)(formContent: => Html)(implicit session: play.mvc.Scope.Session)
-
-@import views.frontend.Utils
-
-<form name="form" @Utils.formatAttributeTuplesToHtml(attributeTuples: _*) >
-  <input name="authenticityToken" type="hidden" value="@session.getAuthenticityToken" />
-  @formContent
-</form>

@@ -1,0 +1,48 @@
+@(implicit authToken: egraphs.authtoken.AuthenticityToken)
+
+@import egraphs.authtoken.AuthenticityToken.safeForm
+@import views.html.frontend.tags
+@import controllers._
+
+@{/**
+   Renders a modal that allows a user to signup for the Egraphs Insider mailing list.
+*/}
+
+<div class="modal signup hide fade" id="emailSignupForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-body">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <div>
+      <h2><span class="bold">Sign Up</span> for Egraphs Insider Newsletter</h2>
+      <p>
+        Get great deals, learn about new stars and be entered to win an iPad.
+      </p>
+    </div>
+    <br>
+    <img src='@RemoteAssets.at("images/modal-ipad.png")'/>
+
+    @safeForm('id ->"signup-form", 'method -> "POST", 'action -> "/subscribe") {
+      <div>
+        <label>Email:</label>
+        <input class="input-xlarge" type="email" name="email" />
+      </div>
+    <div>
+      <button id="signup-button" type="submit" class="button">
+        <strong><em>Submit</em></strong>
+        <span>&raquo;</span>
+      </button>
+      <small>
+          <span id="signup-callout">
+
+          </span>
+      </small><br>
+      <small>
+          <a href="/sweepstakes/insider">
+            View contest details
+          </a>
+      </small>
+      <a data-dismiss="modal" class="modal-dismissal" aria-hidden="true">No Thanks</a>
+    </div>
+    }
+  </div>
+</div>
+      

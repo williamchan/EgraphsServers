@@ -1,0 +1,44 @@
+@(celebrityName: String, productName: String
+)(implicit headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData,
+  authToken: egraphs.authtoken.AuthenticityToken
+)
+
+@baseBody = {
+<div id="content" class="top" role="main">
+
+  <div id="main" class="sub">
+
+    <section id="checkout" class="container">
+
+      <header>
+        <h1>Could not place your order</h1>
+        <h2>@celebrityName | @productName</h2>
+      </header>
+
+      <div class="failed clearfix">
+
+        <div class="purchase-error">
+
+          <h2>There was an issue with your purchase</h2>
+
+          <p>
+            Your card was not charged. Please try again or get in touch with us. We would love to hear from you at <a href="mailto:support@@egraphs.com">support@@egraphs.com</a>.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </div>
+
+</div>
+
+}
+
+@base_template(
+title="Order Failed",
+body=baseBody
+)

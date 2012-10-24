@@ -1,0 +1,434 @@
+// The base stylesheet for Egraphs.
+
+@import "_site_header.less";
+@import "_site_footer.less";
+
+/* !Globals */
+
+/* !Links */
+
+a, a:link, a:visited {
+	.transitions(color 0.25s ease);
+	&:hover { text-decoration: none; }
+	&.tip { 
+		font-size: 90%;
+		text-decoration: underline; 
+	}
+}
+
+.tooltip {
+	&.in {
+		.opacity(90);		
+	}
+
+	&.top .tooltip-arrow {
+		border-top:5px solid white;
+	}
+
+	.tooltip-inner {
+		color:@orange;
+		background-color:white;
+		font-weight:400;		
+	}
+}
+
+// A type of link appropriate for presenting a captioned image.
+// Mix this in on the highest parent container that wishes to have its
+// hover trigger the glowed around contained a.glowborder
+.glowborder-link-container() {
+	a.glowborder {
+		display: block;
+		padding: 4px;
+		border: 1px solid lighten(@orange, 10%);		
+		@transition: border .2s linear, box-shadow .2s linear;
+		.transition(@transition);
+		
+		img {
+			display: block;
+		}
+  }
+
+  a { color: @orange; }
+
+	&:hover a.glowborder {
+		.box-shadow(0px 0px 6px @orange);
+		border-color: @orange;
+	}
+
+}
+
+/* !Ribbons */
+div.ribbon {	
+	position: absolute;
+	font-size: 0.9em;
+	line-height:1.95em;
+	bottom:11px;
+	font-weight: 400;
+	padding-left:21px;
+	padding-right:10px;	
+	text-align:center;	
+	margin-left: -12px;
+	color: white;
+	// background-color: lighten(@orange, 10%);
+	.gradientBar(lighten(@orange, 10%), darken(@orange, 7%));
+	text-shadow: 0px 1px 0px #333;
+	.box-shadow(0px 1px 3px #1a1a1a);
+
+  &:before, &:after {
+		content: ' ';
+		position: absolute;
+		width: 0;
+		height: 0;
+  }
+
+	&:before
+	{
+		width: 30px;
+		left: -30px;
+		top: 12px;
+		border-width: 20px 10px;
+		border-style: solid;
+		border-color: #999 #999 #999 transparent;
+	}
+
+	&.simple:before
+	{
+		// The simple ribbon has no fancy tattering on the right side
+		display: none;
+	}
+
+	&.flag:before
+	{
+		// The fancy tattered right-side of a flag-view
+		width: 0px;
+		left: auto;
+		right: -2px;
+		top: 0px;
+		border-color: transparent #fff transparent transparent;
+	}
+
+	&:after
+	{
+		// The folded-back portion of the ribbon
+		@foldedPartOfRibbonColor: darken(@orange, 20%);
+		left: 0px;
+		top: 100%;
+		border-width: 3px 6px;
+		border-style: solid;
+		border-color: @foldedPartOfRibbonColor @foldedPartOfRibbonColor transparent transparent;
+	}
+} // end ribbons
+
+/* !Buttons */
+
+button  {
+  margin: 0px;
+  padding: 0px;
+  border: 0px;
+}
+
+
+.button {
+	
+	.inline-block;
+	padding-left: 4px;
+	background: url(/assets/images/bg-button-left.png) no-repeat 0 0;
+	height: 35px;
+	overflow: hidden;
+
+	strong {
+		display: block;
+		float: left;
+		font-weight: 600;
+		font-size: 16px;
+		letter-spacing: .1em;
+		line-height: 32px;
+		color: @white;
+		text-shadow: 0 -1px -1px @grayDark; 
+		height: 35px;
+		background: url(/assets/images/bg-button-mid.png) repeat-x 0 0;
+		padding-left: 25px;
+		padding-right: 25px;
+		
+		em { font-style: normal; }
+		
+	}
+
+	span {
+		display: block;
+		float: left;
+		width: 14px;
+		height: 35px;
+		background: url(/assets/images/bg-button-right.png) no-repeat 0 0;
+		text-indent: -9999px;
+		overflow: hidden;
+	}
+	
+	&:hover {
+	
+		background-position: 0 100%;
+		
+		strong, span { background-position: 0 100%; }
+	
+	}	
+	
+	&.facebook {
+		
+		padding-left: 22px;
+		background-image: url(/assets/images/bg-button-left-facebook.png);
+		
+		strong {
+			background-image: url(/assets/images/bg-button-mid-facebook.png);	
+			em {
+				display: block;
+				width: 65px;
+				height: 13px;
+				margin-top: 8px;
+				text-indent: -9999px;
+				overflow: hidden;
+				background: url(/assets/images/logotype-facebook.png) no-repeat 0 50%;
+			}		
+		}
+		
+		span { background-image: url(/assets/images/bg-button-right-facebook.png); }	
+		
+	}
+}
+
+.social {
+
+//    float: right;
+
+    > ul {
+
+        padding: 20px 0 0 40px;
+        margin: 0;
+        list-style: none;
+
+        li {
+
+            float: left;
+            margin-left: 10px;
+
+            a {
+            	.social-sprite(30px);
+            	display:block;
+            }
+        }
+
+        li:first-child { margin-left: 0; }
+
+    }
+
+}
+
+.to-top {
+	
+	float: right;
+	padding: 0;
+	margin: 0;
+	font-size: 14px;
+	line-height: 1em;
+	
+	a {
+		color: @grayLighter;
+		display: block;
+		margin: 0 5px -40px 0;
+		padding: 0 20px;
+		line-height: 40px;
+		height: 40px;
+		.border-radius-top(5px);
+		.box-shadow(0px 0 5px rgba(0, 0, 0, .25));	
+	}
+	
+	a:hover { color: @orange; }
+	
+}
+
+/* Misc. Utils */
+
+.left { float: left; }
+.right { float: right; }
+
+.align-left { text-align: left; }
+.align-right { text-align: right; }
+
+/* Modal Overrides */
+
+.modal.egraphs {
+
+	width: 890px;
+	margin-left: -485px;	
+	margin-top: -295px;
+	padding: 15px 40px;
+	background-color: @offWhite; 
+	
+	.modal-header {
+	
+		position: relative;
+		padding: 20px 0px;
+		border-bottom-color: lighten(@gray, 50%);
+		
+		h2 {
+			font-size: 40px;
+			line-height: 1em;
+			font-weight: 100;
+			margin-bottom: 0;
+		}
+	
+		.close {
+		
+			.opacity(75);
+			float: none;
+			position: absolute;
+			right: -28px;
+			top: -10px;
+			font-weight: 100;
+			font-size: 40px;
+			line-height: 1em;
+			color: @orange;
+			
+			&:hover { .opacity(100); }
+			
+		}
+	
+	}
+	
+	.modal-body {
+	
+		max-height: 650px;
+		padding: 40px 0;
+		border-top: 1px solid @white;		
+		
+		.wrap {
+		
+			width: 94%;
+			margin: 0 auto;
+			
+			figure {
+				margin: 0;
+				padding: 0;
+				float: left;
+				width: 60%;
+			}
+			
+			> div {
+				
+				float: right;
+				width: 35%;
+				padding: 60px 0;
+				
+				> .btn { margin-right: 10px; }
+				
+				.btn { margin-bottom: 20px; }
+				
+			}
+			
+		}
+		
+	}
+	
+}
+
+#frame-preview {
+  h3 {
+    font-size: 18px;
+    text-transform: none;
+  }
+  div.modal-description {
+    font-size: 12px;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-left: 25px;
+    line-height: 1.5;
+  }
+}
+
+/* !Top */
+
+
+/* !Banner */
+
+section[role=banner] {
+	position: relative;
+	z-index: 0;
+}
+
+/* !Content */
+
+#content {
+
+	position: relative;
+	background: @contentBackground;
+	.box-shadow(0 -8px 8px -8px rgba(0, 0, 0, .5));
+	
+	#main {
+
+		.box-shadow(0px 0px 8px rgba(0, 0, 0, .5));
+
+		background: rgb(239,239,239); /* Old browsers */
+		background: -moz-linear-gradient(top,  rgba(239,239,239,1) 0%, rgba(255,255,255,1) 100%); /* FF3.6+ */
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(239,239,239,1)), color-stop(100%,rgba(255,255,255,1))); /* Chrome,Safari4+ */
+		background: -webkit-linear-gradient(top,  rgba(239,239,239,1) 0%,rgba(255,255,255,1) 100%); /* Chrome10+,Safari5.1+ */
+		background: -o-linear-gradient(top,  rgba(239,239,239,1) 0%,rgba(255,255,255,1) 100%); /* Opera 11.10+ */
+		background: -ms-linear-gradient(top,  rgba(239,239,239,1) 0%,rgba(255,255,255,1) 100%); /* IE10+ */
+		background: linear-gradient(top,  rgba(239,239,239,1) 0%,rgba(255,255,255,1) 100%); /* W3C */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#efefef', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */	
+
+		border-top: 8px solid @white;
+		padding-top: 40px;
+		padding-bottom: 40px;			
+		position: relative;		
+	
+	
+		> .container {
+				position: relative;
+		}
+
+		&.sub { 
+			padding-top: 20px;
+			border-top: none; 
+			background: @offWhite;
+		}
+	
+	}
+	
+	&.top {
+		
+		.box-shadow(0px 0px 4px rgba(0, 0, 0, .25));
+		
+		#main {
+			.box-shadow(0px 4px 8px rgba(0, 0, 0, .25));
+			top: auto;
+		}
+		
+	}
+	
+}
+
+/* !Media Queries */
+
+
+@media (min-width: 1080px) {
+
+	#content {
+
+		padding-bottom: 40px;
+		margin-bottom: 0;
+		
+		#main {
+
+			max-width: 1020px;			
+			top: -46px;
+			margin-left: auto;
+			margin-right: auto;
+		
+		}
+
+	}	
+
+}
+
+
+
+

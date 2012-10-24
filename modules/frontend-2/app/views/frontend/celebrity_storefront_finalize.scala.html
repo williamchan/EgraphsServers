@@ -1,0 +1,185 @@
+@(model: models.frontend.storefront.FinalizeViewModel,
+  productPreviewUrl: String,
+  orientation: String = "orientation-landscape"
+)(
+  implicit headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData,
+  storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs,
+  authToken: egraphs.authtoken.AuthenticityToken
+)
+@{/** Renders the final page in the purchase flow.
+
+      model - the ViewModel for rendering the page.
+*/}
+
+@import egraphs.authtoken.AuthenticityToken.safeForm
+@import views.html.frontend.tags.storefront_breadcrumbs_responsive
+@import views.html.frontend.tags
+@import _root_.frontend.formatting.MoneyFormatting.Conversions._
+
+@headJs = {
+  Egraphs.page.finalize = {
+    paymentJsModule: "@model.billing.paymentJsModule",
+    paymentToken: "@model.billing.paymentToken",
+    paymentApiKey: "@model.billing.paymentApiKey"
+  }
+}
+
+
+@baseBody = {
+    <div id="content" class="top" role="main">
+    
+      <div id="main" class="sub">
+      
+        <section id="checkout" class="container" >
+          
+          @storefront_breadcrumbs_responsive(storefrontBreadcrumbs)			
+          
+  				<header>	
+  				  <h1>Finalize Order</h1>
+  				  <h2>@model.personalization.celebName | @model.personalization.productTitle</h2> 
+  				</header>
+  				  				
+					<div class="col2">
+					
+						<div class="finalize clearfix">
+					
+	    				@safeForm('class -> "main", 'method -> "POST", 'action -> model.purchaseUrl) {
+
+	    					<div class="order-overview @orientation">
+	    						  
+                    @tags.egraphPreview(
+                      productPreviewUrl,
+                      orientation
+                    )
+	    						  <div class="order-summary">
+		    				  		@orderDetails		    				  	
+		    				  	</div>
+	    						  
+	    					</div> <!-- end .order-overview -->
+	    					
+	    					@for(shipping <- model.shipping) {
+		    				  <fieldset>
+		    				  
+			    					<h3>Shipping Information</h3>
+
+			    					<div class="field clearfix">
+
+			    				  	<div class="left">
+		    				  		  <address>
+		    				  		    <strong>@shipping.name</strong><br />
+			    				  			@shipping.addressLine1<br />
+			    				  			@for(line2 <- shipping.addressLine2) {@line2<br />}
+			    				  			@shipping.city, @shipping.state, @shipping.postalCode<br />
+			    				  		</address>
+
+			    				  	  <ul>			    				  	    
+			    				  	    
+			    				  	  </ul>
+
+			    				  	</div>
+			    					</div>
+
+	    				  		<p><a href="@shipping.editUrl">Edit</a></p>
+
+		    				  </fieldset>
+	    				  }
+	
+	    				  <fieldset class="last">
+	    				  
+	    				  	<h3>Billing Information</h3>
+
+	    				  	<div class="field clearfix">
+
+		    				  	<div class="left">
+		    				  		<ul>
+		    				  			<li><strong>@model.billing.name</strong></li>
+												<li class="credit-card">Loading payment info...</li>
+												<li>@model.billing.postalCode</li>
+		    				  		</ul>
+		    				  	</div>
+		    				  
+		    				  	<div class="right">
+											<ul>
+												<li>@model.billing.email</li>
+											</ul>
+		    				  	</div>	
+
+	    				  	</div>    				  	
+
+  				  		  <p><a href="@model.billing.editUrl">Edit</a></p>
+
+	    				  	
+	    				  </fieldset>
+	    				  
+	    				  <fieldset class="submit">
+	    				  
+	    				  	<div class="clearfix">
+
+	    				  		<p>Click <strong>purchase</strong> to get @model.personalization.celebName started on your egraph. You will be charged <strong>@model.price.total.formatSimply</strong>.</p>
+	    				  	
+ 	    				 			@tags.arrow_button(caption="Purchase", classes="button right")
+ 	    				 			
+	    				  	</div>
+	    				  
+	    				  </fieldset>
+	    				  
+	    				} <!-- end .main -->
+	    				
+	    				<aside>
+	    				
+	    					<div class="order-overview @orientation clearfix">
+                    
+                    @tags.egraphPreview(
+                      productPreviewUrl,
+                      orientation
+                    )
+	
+		    				  	<div class="order-summary">
+		    				  	
+		    				  		<h2>Summary</h2>
+											
+											@orderDetails
+
+											@tags.storefront_price_summary(
+											  model.price.base,
+											  model.price.physicalGood,
+											  model.price.tax,
+											  model.price.total
+											)
+     		    				  	
+		    				  	</div>
+		    				  
+	    					</div> <!-- end .order-overview -->
+	    				
+	    				</aside>
+	  			
+						</div> <!-- end .finalize -->
+						
+						@tags.credit_cards_footer()
+  			
+  				</div> <!-- end .col2 -->
+  			
+        </section> <!-- end #checkout -->
+
+    	</div> <!-- end #main -->
+    
+    </div> <!-- end #content -->
+}
+
+@orderDetails = {
+  @tags.storefront_order_details(
+  	model.personalization.celebName, 
+    model.personalization.productTitle, 
+    model.personalization.recipientName, 
+    model.personalization.messageText,
+    Some(model.personalization.editUrl)
+  )
+}
+
+@base_celebrity_storefront_template(
+  title="Finalize Order",
+  jsMain="pages/celebrity-storefront-finalize",
+  headJs=headJs,
+  body=baseBody
+)

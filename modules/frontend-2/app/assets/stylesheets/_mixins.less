@@ -1,0 +1,125 @@
+// Various mixins
+
+.inline-block {
+	display:-moz-inline-stack;
+	display:inline-block;
+	zoom:1;
+	*display:inline;
+}
+
+.gradient-white {
+	background: -moz-linear-gradient(top,  rgba(255,255,255,0.5) 0%, rgba(255,255,255,1) 50%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0.5)), color-stop(50%,rgba(255,255,255,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  rgba(255,255,255,0.5) 0%,rgba(255,255,255,1) 50%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  rgba(255,255,255,0.5) 0%,rgba(255,255,255,1) 50%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  rgba(255,255,255,0.5) 0%,rgba(255,255,255,1) 50%); /* IE10+ */
+	background: linear-gradient(top,  rgba(255,255,255,0.5) 0%,rgba(255,255,255,1) 50%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#80ffffff', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */
+}
+
+//.box-shadow(@x, @y, @blur, @color) {
+.box-shadow(@arguments) {
+  box-shadow: @arguments;
+  -webkit-box-shadow: @arguments;
+  -moz-box-shadow: @arguments;
+}
+
+.border-radius-top(@arguments) {
+	-webkit-border-top-left-radius: @arguments;
+	-webkit-border-top-right-radius: @arguments;
+	-moz-border-radius-topleft: @arguments;
+	-moz-border-radius-topright: @arguments;
+	border-top-left-radius: @arguments;
+	border-top-right-radius: @arguments;
+}
+
+.border-radius-bottom(@arguments) {
+	-webkit-border-bottom-left-radius: @arguments;
+	-webkit-border-bottom-right-radius: @arguments;
+	-moz-border-radius-bottomleft: @arguments;
+	-moz-border-radius-bottomright: @arguments;
+	border-bottom-left-radius: @arguments;
+	border-bottom-right-radius: @arguments;
+}
+
+.transitions(@arguments) {
+	-moz-transition: @arguments;
+	-webkit-transition: @arguments;
+	-o-transition: @arguments;
+	transition: @arguments;
+}
+
+//
+// Renders correctly-scaled social buttons as a sprite represented by bg-sprite-social-icons.png.
+//
+// Params:
+//   cellEdgeLength -- the intended size of one edge of the button.
+//
+.social-sprite(@cellEdgeLength) {
+  @spriteColumns: 3;
+  @spriteRows: 3;
+  @facebookX: 0%;
+  @twitterX: 50%;
+  @defaultY: 0%;
+  @hoverY: 50%;
+
+  display: inline-block;
+  width: @cellEdgeLength;
+  height: @cellEdgeLength;
+  position: relative;  
+  text-indent: -9999px;
+  overflow: hidden;
+  background: url(/assets/images/bg-sprite-social-icons.png) no-repeat;
+  background-size: percentage(@spriteColumns) percentage(@spriteRows);
+
+  &.facebook {
+    background-position: @facebookX @defaultY;
+    &:hover { background-position: @facebookX @hoverY; }
+  }
+
+  &.twitter {
+    background-position: @twitterX @defaultY;
+    &:hover { background-position: @twitterX @hoverY; }
+  }
+}
+
+
+.marker {
+  
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  color: @white;
+  font-size: 14px;
+  line-height: 1.5em;
+  
+  span { display: none; }
+  
+}
+
+.marker-left {
+	.marker;
+	padding-left: 8px;
+  background: url(/assets/images/bg-icon-marker-left.png) no-repeat 0 0;	
+}
+
+.marker-right {
+	.marker;
+	text-align: right;
+	padding-right: 10px;
+  background: url(/assets/images/bg-icon-marker-right.png) no-repeat 100% 0;
+}
+
+@landscapeFrameSize: 555px;
+.landscape-egraph-preview-ratios {
+  left:9.5%;
+  top:8.52%;
+  width:81.88%;
+}
+
+@portraitFrameSize: 400px;
+.portrait-egraph-preview-ratios {
+  left:11.62%;
+  top:6.57%;
+  width:77.1%;              
+}

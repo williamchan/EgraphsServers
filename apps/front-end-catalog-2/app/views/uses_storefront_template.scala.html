@@ -1,0 +1,27 @@
+@()(implicit headerData: models.frontend.header.HeaderData,
+  authToken: egraphs.authtoken.AuthenticityToken,
+  footerData: models.frontend.footer.FooterData,
+  storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs
+)
+@import views.html.frontend.tags.storefront_breadcrumbs_responsive
+@import views.html.frontend.base_celebrity_storefront_template
+
+@baseBody = {
+  <div id="content" class="top" role="main">
+    <div id="main" class="sub">
+      <section id="checkout" class="container" >
+        @storefront_breadcrumbs_responsive(storefrontBreadcrumbs)
+
+        <header>
+          <h1>This is the header </h1>
+        </header>
+      </section>
+    </div>      
+  </div>
+}
+
+@base_celebrity_storefront_template(
+  title="Test storefront page",
+  jsMain="",
+  body=baseBody
+)

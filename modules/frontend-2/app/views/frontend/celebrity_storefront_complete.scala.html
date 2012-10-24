@@ -1,0 +1,170 @@
+@(model: models.frontend.storefront.OrderCompleteViewModel
+)(implicit headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData,
+  authToken: egraphs.authtoken.AuthenticityToken
+)
+
+@{/** Renders the Order Complete page in the celebrity storefront. This is the page displayed
+      after a purchase has been processed.
+
+      model - This page's viewmodel.
+*/}
+
+@import egraphs.authtoken.AuthenticityToken.safeForm
+@import _root_.frontend.formatting.MoneyFormatting.Conversions._
+@import _root_.frontend.formatting.DateFormatting.Conversions._
+
+@import views.html.frontend.tags.storefront_breadcrumbs_responsive
+@import views.html.frontend.tags
+@import controllers._
+
+
+@baseBody = {
+    <div id="content" class="top" role="main">
+    
+      <div id="main" class="sub">
+      
+        <section id="checkout" class="container">
+  				<header>	
+  				  <h1>Order Complete</h1>
+  				  <h2>@model.celebName | @model.productName</h2>  				
+  				</header>
+
+  				<div class="complete clearfix">
+  				
+  					<div class="congrats">
+  					
+  						<h2>Now it's @model.celebName's Turn</h2>
+  					
+  						<p>Congratulations! We just booked you a slice of time on @model.celebName's schedule to complete your order. For now, just sit back and relax. @model.celebName will send you an email as soon as he's done creating your egraph, so look forward to hearing from him!</p>
+  						
+  						<p><small><a href="/faq#create" class="tip">What happens now?</a></small></p>
+  						  				
+  					</div>
+
+  					<div class="row">
+  					
+  						<div class="span6">
+  						  							
+  							<table>
+  								<caption>Order Details</caption>
+									<tr>
+										<th>Egraph Order Date:</th>
+										<td>@model.orderDate.formatDayAsPlainLanguage</td>
+									</tr>
+									<tr>
+										<th>Egraph Purchased by:</th>
+										<td>@model.buyerName</td>
+									</tr>
+									<tr>
+										<th>Egraph Owner:</th>
+										<td>@model.ownerName</td>
+									</tr>
+									<tr>
+										<th>Owner's Email:</th>
+										<td>@model.ownerEmail</td>
+									</tr>
+									<tr>
+										<th>Celebrity:</th>
+										<td>@model.celebName</td>
+									</tr>
+									<tr>
+										<th>Order Number:</th>
+										<td>@model.orderNumber</td>
+									</tr>
+									<tr>
+										<th>Price:</th>
+										<td>@model.totalPrice.formatPrecisely</td>
+									</tr>
+									<tr>
+                    <th><a href="@model.faqHowLongLink">Expected Digital Delivery:</a></th>
+										<td>@model.expectedDeliveryDate.formatDayAsPlainLanguage</td>
+									</tr>
+  							</table>
+                @if(model.hasPrintOrder) {
+                  <p>Your framed print is expected to arrive 3 weeks after your digital delivery.</p>
+                }
+  						
+  						</div>
+
+  						<div class="span6">
+  						
+  							<h3>Order Changes</h3>
+  							
+  							<p>To make changes to your order, please contact egraphs support at 
+                  <a href="mailto:support@@egraphs.com">support@@egraphs.com</a>
+                </p>
+  							
+  							<ul>
+  								@{/** Re-enable this when we support order cancellation and modification.
+                    <li><a href="#">Modify Order</a></li>
+                  
+  								<li><a href="#modal-content" data-toggle="modal">Cancel Order</a></li>
+                  */}
+  							</ul>
+  						
+  						</div>
+  						  				
+  					</div>
+  				
+  				</div> <!-- end .complete -->
+  			
+        </section> <!-- end #checkout -->
+
+    	</div> <!-- end #main -->
+
+      @{/** The following affiliate marketing code should only render if this is a real sale. */}
+      @if(model.withAffiliateMarketing) {
+        <!-- ShareASale. See https://www.shareasale.com/step3.pdf -->
+        <img src="https://shareasale.com/sale.cfm?amount=@model.totalPrice.getAmount&tracking=@model.orderNumber&transtype=sale&merchantID=43754" width="1" height="1">
+        <!-- Google Code for Sale Conversion Page. See https://support.google.com/adwords/bin/answer.py?hl=en&answer=1722054 -->
+        <script type="text/javascript">
+          /* <![CDATA[ */
+          var google_conversion_id = 1003544199;
+          var google_conversion_language = "en";
+          var google_conversion_format = "3";
+          var google_conversion_color = "ffffff";
+          var google_conversion_label = "XeHACNmU7QMQh73D3gM";
+          var google_conversion_value = 0;
+          /* ]]> */
+        </script>
+        <script type="text/javascript" src="https://www.googleadservices.com/pagead/conversion.js">
+        </script>
+        <noscript>
+          <img src="https://www.googleadservices.com/pagead/conversion/1003544199/?value=0&amp;label=XeHACNmU7QMQh73D3gM&amp;guid=ON&amp;script=0" height="1" width="1" style="border-style:none;" alt=""/>
+        </noscript>
+      }
+    </div> <!-- end #content -->
+    
+		<div class="modal egraphs hide" id="modal-content">
+		  <div class="modal-header">
+		    <button type="button" class="close" data-dismiss="modal">×</button>
+		    <h2>Cancel Order Confirmation</h2>
+		  </div>
+		  <div class="modal-body">
+	  		<div class="wrap clearfix">
+	  		
+	  			<figure>
+	  				<img src='@RemoteAssets.at("images/fpo-egraph.png")' alt="fpo-egraph" />
+	  			</figure>
+	  			
+	  			<div>
+	  				<p>Are you sure you want to cancel your order for @model.celebName's Egraph?</p>
+            @{/** Un-Comment when we support cancelling.
+            @safeForm('method -> "POST", 'action -> model.cancelOrderUrl) {
+	  				  <button class="btn" data-toggle="button">Cancel Order</button>
+            }*/}
+	  				<button class="btn" data-toggle="button" data-dismiss="modal">Do Not Cancel</button>
+	  			</div>
+	  			
+	  		</div>		    
+		  </div>
+		</div>
+    
+}
+
+@base_template(
+  title="Order Complete",
+  jsMain="pages/celebrity-storefront-complete",
+  body=baseBody
+)

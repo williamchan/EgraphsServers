@@ -1,0 +1,30 @@
+@(products: Seq[models.frontend.ExampleFrontendProduct])
+
+<!doctype html>
+<html>
+  <head>
+    <title>@products.length products</title>
+    <link rel="stylesheet" href='@RemoteAssets.at("stylesheets/main.min.css")'>
+  </head>
+  <body>
+    <p>
+      This template demonstrates passing in a sequence of ExampleFrontendProduct types. We can
+      print the entire list (which calls the Seq's toString method): @products
+    </p>
+    <p>
+      We can iterate through the products.
+      <ul>
+        @for(product <- products) {
+          <li>@product.name</li>
+        }
+      </ul>
+    </p>
+    <p>
+      <em>
+        You should generally avoid using Frontend model objects here
+        in the front end; primitive types like String and Int are way
+        more versatile
+      </em>
+    </p>
+  </body>
+</html>

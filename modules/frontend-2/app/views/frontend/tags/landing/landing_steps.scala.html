@@ -1,0 +1,70 @@
+@(celebrityPublicName: Option[String] = None, celebrityCasualName: Option[String] = None, celebrityIsMale: Boolean = true)
+
+@import controllers._
+
+
+<section id="landing-steps">
+
+  <ol>
+
+    <li class="step-1 clearfix">
+
+      <div class="instructions">
+
+        <h2>
+          <strong>1.</strong> Select
+          @{
+          celebrityPublicName match {
+              case None => "a photo of your favorite star"
+              case Some(name) => "a photo of " + name
+            }
+          }
+        </h2>
+
+        <p>
+					Since this is your egraph, you get to choose a professional-grade photo from @celebrityCasualName.getOrElse("your star")’s gallery.  This photo becomes the backdrop for your egraph. 
+        </p>
+
+      </div> <!-- end .instructions -->
+
+      <img src='@RemoteAssets.at("images/macbook-air.png")' alt="macbook-air" />
+
+    </li> <!-- end .step-1 -->
+
+    <li class="step-2 clearfix">
+
+      <div class="instructions">
+
+        <h2><strong>2.</strong> Write @views.frontend.Utils.himOrHer(celebrityIsMale) a note</h2>
+
+        <p>
+					Tell @celebrityPublicName.getOrElse("your favorite star") whatever you want him to know — maybe he has inspired you, or perhaps you like the same band.  Ask him to write a memorable note on your egraph. Maybe it’s for you or maybe you’re sending it as a gift for a friend. Either way, you’re guaranteed that @celebrityCasualName.getOrElse("your star") will read and respond to your message personally.
+        </p>
+
+      </div> <!-- end .instructions -->
+
+      <img src='@RemoteAssets.at("images/fpo-keyboard.png")' alt="keyboard" class="positioned" />
+
+    </li> <!-- end .step-2 -->
+
+    <li class="step-3 clearfix">
+
+      <div class="instructions">
+
+        <h2><strong>3.</strong> Hear back directly from @celebrityCasualName.getOrElse("your favorite star")</h2>
+
+        <p>
+					The next time he logs into his Egraphs app, @celebrityCasualName.getOrElse("your star") will take the time to hand-write a response and record a personalized audio message just for you.  His signature and voice are verified by our technology so you know it’s really him.
+				</p>
+
+        <p><small><a href="/inside-an-egraph#biometric">Learn more about Egraphs’ biometric authentication process &raquo;</a></small></p>
+
+      </div> <!-- end .instructions -->
+
+      <img src='@RemoteAssets.at("images/bg-fpo-ipad.png")' alt="ipad" class="positioned" />
+
+    </li> <!-- end .step-3 -->
+
+  </ol>
+
+</section> <!-- end #landing-steps -->

@@ -1,0 +1,43 @@
+@(getStartedUrl: String, celebrityPublicName: String, celebrityCasualName: String, landingPageImageUrl: String, celebrityIsMale: Boolean = true
+)(implicit headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData,
+  authToken: egraphs.authtoken.AuthenticityToken
+)
+
+@{/** Celebrity landing page */}
+
+@import views.html.frontend.tags
+
+@baseBody = {
+  @tags.landing.masthead_section(Option(celebrityPublicName), landingPageImageUrl, Option(getStartedUrl))
+
+  <section id="content" role="main">
+
+    <div id="main">
+
+      <div class="container" id="celeb-landing">
+
+        @tags.landing.welcome_header(Option(celebrityPublicName), Option(celebrityCasualName), celebrityIsMale)
+
+        @tags.landing.landing_steps(Option(celebrityPublicName), Option(celebrityCasualName), celebrityIsMale)
+
+        @tags.landing.landing_details(Option(celebrityPublicName), Option(celebrityCasualName), celebrityIsMale)
+
+        @tags.landing.landing_more(None, Option(celebrityPublicName), Option(getStartedUrl))
+
+        <p class="to-top"><a href="#top">Back to Top</a></p>
+
+      </div>
+      <!-- end .container -->
+
+    </div>
+    <!-- end #main -->
+
+  </section> <!-- end #content -->
+}
+
+@base_template(
+  title="What if you could share a moment with " + celebrityPublicName + "?",
+  jsMain="pages/landing",
+  body=baseBody
+)

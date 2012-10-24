@@ -1,12 +1,15 @@
-lib
 logs
 out
 .out
 precompiled
-project
 target
 test-result
 tmp
+
+.classpath
+.project
+.settings/
+.target
 
 *.class
 *.DS_Store
@@ -17,7 +20,13 @@ tmp
 *.ser
 *.pyc
 *.sublime-workspace
+*.sublime-project
 
 apps/website/war/WEB-INF/cloudbees-web.xml
 
 apps/website/eGraphsServers.ipr
+
+RUNNING_PID
+.cache
+.tags
+.tags_sorted_by_file

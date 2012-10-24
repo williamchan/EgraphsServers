@@ -1,0 +1,464 @@
+// The Egraphs checkout stylesheet (form elements & page layouts related to the checkout flow)
+
+#checkout {
+  
+	#card-exp-year {
+		min-width:70px;
+	}
+
+  header {
+  
+    padding-bottom: 20px;
+    border-bottom: 1px solid lighten(@gray, 50%);  
+   
+    h1 {
+      font-weight: 100;
+      font-size: 40px;
+      line-height: 1.125em;
+      margin-bottom: 0;
+    }
+    
+    h2 {
+    
+      color: @grayLight;
+      font-weight: 300;
+      font-size: 22px;
+      line-height: 1.25em;
+      margin-bottom: 0;
+    
+    }
+    
+  }
+  
+  .instructions {
+
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1.25em;  
+    padding: 6px 0;  
+            
+    small {
+      display: block;
+      font-weight: 400;
+      text-transform: none;
+      font-style: italic;
+      font-size: 12px;
+      line-height: 1.125em;
+      color: @gray;
+    }
+
+  }
+  
+  .iPhoneCheckContainer label {
+    font-size: 14px;
+    font-weight: 600;
+    font-family: @sansFontFamily;
+  }
+  
+  input[type=text], input[type=email], textarea, select {    
+    width: 97%;
+    font-size: 14px;
+    line-height: 1.125em;
+    
+    &.inline { 
+    	width: auto; 
+    	margin-right: 10px;
+    }
+    
+  }
+
+  .field.state select {
+  	// Make sure the select field doesn't get too big
+  	width:220px;
+  }
+
+  .input.select.error {
+  	// Style the chosen select boxes	
+  	@errorBorder: 1px solid @errorText;
+
+  	.chzn-container a, {
+  		border:@errorBorder;
+  	}
+
+  	.chzn-drop {
+  		border-right: @errorBorder;
+  		border-left: @errorBorder;
+  		border-bottom: @errorBorder;
+  	}
+
+  	.alert {
+  		// Make the error boxes for Chosen select boxes appear properly
+  		margin-top:10px;
+  	}
+  }
+
+	.btn-group {
+	  margin-bottom:15px;
+	}
+	
+	.btn-custom-radio {
+	   width: 33.3333%;
+	   .buttonBackground(lighten(@gray, 45%), lighten(@gray, 60%));
+	   text-transform:uppercase;
+	   font-size:0.75em;
+	   line-height:1.3em;
+	   padding-top:5px;
+	   padding-bottom:5px;
+	   color: lighten(@gray, 10%);
+	   font-weight: 400;
+	   text-shadow: 0px 1px 0px white;
+	
+	   &.active,
+	   &:active {
+	     .gradientBar(@orange, lighten(@orange, 10%));
+	     *background-color: @orange;
+	     .reset-filter();
+	     font-weight:600;
+	     color:white;
+	     text-shadow: 0px -1px 0px black;
+	   }
+	
+	}
+
+	.col2 { // 2 column layout (used in many of the checkout page permutations)
+	
+	  > div { border-bottom: 1px solid lighten(@gray, 50%); }
+	  
+	  .main {
+	
+	    float: left;
+	    width: 60%;
+	
+	    margin: 0;
+	    padding: 0;
+	
+			fieldset {
+			
+			  position: relative;      
+			  border-top: 1px solid @white;
+			  border-bottom: 1px solid lighten(@gray, 50%);  
+			  border-right: 1px solid lighten(@gray, 50%); 
+			  padding: 40px 0 20px 0;
+			  
+			  &.submit {
+			  
+			  	border-top: none;
+			  	border-bottom: none;
+			  	padding-bottom: 80px;
+
+			  	> div {
+			  	
+			    	padding-right: 40px;	
+			    	
+			    	p { 
+			    		float: left;
+			    		width: 60%;
+				    	font-size: 14px;
+				    	line-height: 1.25em;
+				    	margin-bottom: 20px;
+			    	}
+			    	
+			  	}
+			  	
+			  }
+
+			  &.audio .content {
+			  	font-style: italic;
+			  	font-weight:300;
+			  	color:gray;
+			  	font-size:14px;
+			  }
+			  
+			  h3 {
+			  	text-transform: uppercase;
+				  font-weight: 600;
+				  font-size: 18px;
+				  line-height: 1.125em;
+				  margin-top: -20px;
+				  margin-bottom: 20px;
+			  }
+			
+				legend {
+					display: block;
+					width: auto;
+					position: absolute;
+					left: 0;
+					top: 0;
+					font-size: 14px;
+					line-height: 1.5em;
+					border: none;
+
+					div {
+						display: inline-block;
+						float: left;
+					}
+
+					.letter {												
+						text-align: center;
+						margin: 0;	
+						background: @orange;
+						padding: 0 6px;
+						color: @white;
+						font-weight: 600;
+						margin-right:5px;
+					}
+
+					.text {
+						font-weight:300;
+						color: gray;
+					}
+				}
+			  
+			  .field {
+			    
+			    margin-bottom: 10px;
+			    
+			    &.add-bottom { margin-bottom: 40px; }		    
+			    &.last { margin-bottom: 0; }
+			    
+			    &.inline { 
+			    
+			    	margin-bottom: 20px;
+			    	
+			    	label { display: inline; } 
+			    	
+			    }
+			   
+			    > div {
+			    
+			      padding-right: 40px;
+			      margin-bottom: 0;
+			    
+			      .instructions {
+			      
+			        float: left;
+			        width: 30%;
+			        
+			      }
+			      
+			      .input {
+			      
+			        float: right;
+			        width: 65%;           
+			        
+			      }
+			    
+			    }
+			    
+			  } // end .field
+			
+			} // end fieldset    
+	  
+	  } // end .main
+	  
+	  aside {
+	  
+	    float: right;
+	    width: 40%;
+	    border-top: 1px solid @white;
+	    
+	  }
+	  
+	} // end .col2
+
+  footer {
+	 
+	  border-top: 1px solid @white;
+	  padding-top: 40px;
+	  color: @grayLight;
+		text-shadow: 0 1px 0 @white;
+	  
+	  p {
+		  float: left;
+		  font-weight: 600;
+		  font-size: 16px;
+		  line-height: 60px;
+		  margin-right: 40px;
+		  margin-bottom: 0;
+		  
+		  a.logo-digicert {
+			  
+			  .inline-block;
+			  position:relative;
+			  top:7px;
+			  width: 80px;
+			  height: 49px;
+			  background: url("https://seal.digicert.com/seals/cascade/?s=NfsCeNoj,3,s,www.digicert.com") no-repeat 0 0;
+			  text-indent: -9999px;
+			  overflow: hidden;
+			  margin-left: 10px;
+			  
+			  &:hover { .opacity(75); }
+			  
+		  }
+		  
+	  }
+	  
+	  ul {
+		  
+		  float: left;
+		  list-style: none;
+		  margin: 0 0 0 -20px;
+		  padding: 0;
+		  
+		  li {
+			  
+			  float: left;
+			  margin-right: 10px;
+			  width: 45px;
+			  height: 60px;
+			  text-indent: -9999px;
+			  overflow: hidden;
+			  background: url(/assets/images/bg-credit-cards.png) no-repeat 0 50%;
+			  
+			  &:last-child { margin-right: 0; }
+			  
+			  &.mastercard { background-position: -45px 50%; }
+			  &.amex { background-position: -90px 50%; }
+			  &.discover { background-position: 100% 50%; }
+			  
+		  }
+		  
+	  }
+	 
+  }
+  
+} // end #checkout
+
+@media (max-width: 979px) {
+
+	#checkout {
+
+		.btn-custom-radio {
+			font-size: .5em;
+			font-weight: 400;
+		}
+	
+	}
+
+}
+
+@media (max-width: 767px) {
+
+	#checkout {
+
+		.col2 {
+			
+			.main {
+				
+				float: none;
+				width: auto;
+				
+				fieldset {
+				
+					border-right: none;
+					
+					.field > div { padding-right: 0; }
+					
+					&.submit {
+					
+						padding-top: 0;
+						border-top: 1px solid lighten(@gray, 50%);
+						padding-bottom: 50px;
+					
+						> div { 
+						
+							padding-top: 20px;
+							border-top: 1px solid @white;						
+							padding-right: 0; 
+						
+							.right { float: none; }
+						
+							p { 
+								float: none;
+								width: auto;
+								margin-bottom: 20px;
+							}
+						
+						}
+					}
+				
+				}
+				
+			}
+			
+			aside {
+				
+				float: none;
+				width: auto;
+				border-top: none;
+				padding-top: 0;
+				
+			}
+			
+		} // end .col2
+
+		footer p {
+			clear: left;
+		}
+
+	} // end #checkout
+
+}
+
+@media (max-width: 480px) {
+
+	#checkout {
+	
+		header {
+			
+			h1 {
+				font-weight: 600;
+				font-size: 26px;
+				line-height: 1.25em;
+				text-shadow: 0 1px 0 @white;
+			}
+			
+			h2 {
+				font-size: 18px;
+				line-height: 1em;
+			}
+			
+		}
+	
+		.col2 {			
+
+			.main fieldset .field > div { 
+							
+				.instructions {
+        
+          float: none;
+          width: auto;
+          padding: 0;
+          margin-bottom: 10px;
+          
+        }
+        
+        .input {
+        
+          float: none;
+          width: auto;           
+          
+        }
+			
+			}
+			
+		}
+
+		footer {
+			
+			ul { 
+				
+				clear: left; 
+				margin: 0;
+				
+				li { height: 25px; }
+				
+			}
+			
+		}
+	
+	} // end #checkout
+
+}

@@ -1,0 +1,5 @@
+Our build system is specified as a Play 2 / SBT "Project" at the base of this repository. It specifies build files for each source project in our organization.
+
+Play 2.0.3 refuses to launch sbt without a conf/application.conf file present, which makes the repository base look crufty (why do we have "conf" at the root level of our repo?? The repo isn't even a website!) but thankfully Play 2.1 allows for us to omit this directory. 
+
+We should be able to delete this entire directory when we move to Play 2.1.

@@ -1,0 +1,27 @@
+@(header:String, body:String)(
+implicit authToken: egraphs.authtoken.AuthenticityToken,
+headerData: models.frontend.header.HeaderData,
+footerData: models.frontend.footer.FooterData
+)
+
+@import views.html.frontend.tags
+@import views.html.frontend.tags.ng
+
+@baseBody = {
+<section id="content" class="top" role="main">
+  <div id="main" class="sub">
+    <div class="container" id="settings-page">
+      <header id="settings-top">
+        <h1>@header</h1>
+      </header>
+      <section>
+        <div>
+          @Html(body)
+        </div>
+      </section>
+    </div>
+  </div>
+</section>
+}
+
+@base_template(title=header, jsMain = "pages/static", body=baseBody)

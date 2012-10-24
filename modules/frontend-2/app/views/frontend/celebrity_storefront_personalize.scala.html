@@ -1,0 +1,298 @@
+@(form: models.frontend.storefront.PersonalizeForm,
+  writtenMessageCharacterLimit:Int,
+  messageToCelebrityCharacterLimit:Int,
+  guaranteedDelivery: java.util.Date,
+  orderSummary: models.frontend.storefront.StorefrontOrderSummary,
+  productPreviewUrl: String,
+  orientation: String
+)(
+  // Implicit parameter list
+	implicit headerData: models.frontend.header.HeaderData, 
+  footerData: models.frontend.footer.FooterData,
+  storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs,
+  authToken: egraphs.authtoken.AuthenticityToken
+)
+
+@{/** Renders the personalize page in the celebrity storefront.
+
+      writtenMessageCharacterLimit - the maximum number of characters to
+        request for the celebrity to write.
+      messageToCelebrityCharacterLimit - the maximum number of characters
+        a customer can write to a celebrity.
+      form - the models.frontend.storefront.PersonalizeForm to render
+      guaranteedDelivery - the date by which the digital product is guaranteed to be delivered
+      orderSummary - brief summary for the order up until this point.
+
+      (the implicit parameters are documented in the base template from which they get used)
+*/}
+
+@import egraphs.authtoken.AuthenticityToken.safeForm
+@import views.html.frontend.tags.storefront_breadcrumbs_responsive
+@import views.html.frontend.tags
+@import models.frontend.storefront.PersonalizeMessageOption
+@import models.frontend.storefront.PersonalizeMessageOption.{SpecificMessage, CelebrityChoosesMessage, SignatureOnly}
+@import _root_.frontend.formatting.MoneyFormatting.Conversions._
+@import _root_.frontend.formatting.DateFormatting.Conversions._
+
+@headJs = {
+  Egraphs.page.celeb = {name: "@orderSummary.celebrityName"};
+  Egraphs.page.isGift = @form.isGift.value.getOrElse(false);
+	Egraphs.page.egraphMessageLimit = @writtenMessageCharacterLimit;
+  Egraphs.page.yourMessageLimit = @messageToCelebrityCharacterLimit;
+}
+
+@baseBody = {
+    <div id="content" class="top" role="main">
+    
+      <div id="main" class="sub">
+      
+        <section id="checkout" class="container" >
+		
+				 @storefront_breadcrumbs_responsive(storefrontBreadcrumbs)
+				 		
+  				<header>	
+  				  <h1>Personalize Your Egraph</h1>
+  				  <h2>@orderSummary.celebrityName | @orderSummary.productName</h2> 
+  				</header>
+  				  				
+					<div class="col2">
+					
+						<div class="clearfix">
+					
+	    				@safeForm('class -> "main", 'method -> "post", 'action -> form.actionUrl)	{
+	
+								<div class="order-overview @orientation">
+								  @tags.egraphPreview(
+								  	productPreviewUrl,
+								    orientation
+								  )
+								</div>				
+	    				  <fieldset>
+
+	    				    <legend>
+	    				    	<div class="letter">A</div>
+	    				    	<div class="text">Recipient</div>
+	    				    </legend>
+	    				  
+	    				    <div class="field">
+	      				    <div class="clearfix">
+	      				      <label class="instructions" for="gift">
+	      				      	Is This a Gift?
+                        <small>
+                          <a href="/faq#how-long">Expected Digital Delivery: @guaranteedDelivery.formatDayAsPlainLanguage</a>
+                        </small>
+	      				      </label>
+	      				      @tags.bootstrap_input_field(form.isGift) {
+	      				        <input id="gift" 
+	      				               type="checkbox"
+	      				               name="@form.isGift.name"
+	      				               value="yes"
+	      				               @for(checked <- form.isGift if checked) {checked}>
+	      				        <p><small><a href="/faq#gift" target="_blank" class="tip">How does gifting work?</a></small></p>
+	      				      }
+	      				    </div>
+	    				    </div> <!-- end .field -->
+
+	    				    <div class="field non-gift-only" style="@for(checked <- form.isGift if checked) {display: none;}">
+	      				    <div class="clearfix">
+	      				      <label class="instructions" for="your-name">Your Name:</label>
+	      				      @tags.bootstrap_input_field(form.recipientName) {
+	        				      <input id="your-name"	        				             
+	        				             type="text"
+	        				             name="@form.recipientName.name"
+	        				             value="@form.recipientName.value"
+                               @for(checked <- form.isGift if checked) {disabled}>
+                     	}
+	      				    </div>
+	    				    </div> <!-- end .field -->
+	    				    
+	    				    <div class="field gift-only" style="@for(checked <- form.isGift if !checked) {display: none;}">
+	      				    <div class="clearfix">
+	      				      <label class="instructions" for="recipient-name">Gift Recipient's Name:</label>
+	      				      @tags.bootstrap_input_field(form.recipientName) {
+	        				      <input id="recipient-name"
+	        				             type="text"	        				             
+	        				             name="@form.recipientName.name"
+	        				             value="@form.recipientName.value"
+	        				             @for(checked <- form.isGift if !checked) {disabled}
+	        				             @if(form.isGift.value.isEmpty) {disabled}>
+	      				      }
+	      				    </div>
+	    				    </div> <!-- end .field -->
+	    				    
+	    				    <div class="field last gift-only" style="@for(checked <- form.isGift if !checked) {display: none;}">
+	      				    <div class="clearfix">
+	      				      <label class="instructions" for="recipient-email">Gift Recipient's Email:</label>
+	      				      @tags.bootstrap_input_field(form.recipientEmail) {
+	      				        <input id="recipient-email" 
+	      				               type="text"
+	      				               name="@form.recipientEmail.name"
+	      				               value="@form.recipientEmail.value">
+	      				      }
+	      				    </div>
+	    				    </div> <!-- end .field -->
+	    				  
+	    				  </fieldset> <!-- End Egraph Recipient Fields -->
+	
+	    				  <fieldset>
+	
+	    				    <legend>
+	    				    	<div class="letter">B</div>
+	    				    	<div class="text">Written Message</div>
+	    				    </legend>
+	    				  
+	    				    <div class="field last">
+	      				    <div class="clearfix">
+	      				      <label class="instructions">
+	      				      	@orderSummary.celebrityName Should Write: 
+	      				      	<small>@writtenMessageCharacterLimit character limit.</small>
+	      				      	<small>All messages are subject to approval.</small></label>
+	                    @tags.bootstrap_input_field(form.messageText) {
+	                      <div id="message-options" class="btn-group" data-toggle="buttons-radio">
+	                        <button type="button"
+	                                value="SignatureWithMessage"
+	                                class="btn btn-primary btn-custom-radio @ifSpecificMessageOrDefault {active}">
+	                        	A specific<br /> message
+	                        </button>
+	                        <button type="button" 
+	                                value="CelebrityChoosesMessage" 
+	                                class="btn btn-primary btn-custom-radio @if(form.messageOption.value == Some(CelebrityChoosesMessage)) {active}">
+                          	Anything he<br /> wants
+                        	</button>
+	                        <button type="button"
+	                                value="SignatureOnly"
+	                                class="btn btn-primary btn-custom-radio @if(form.messageOption.value == Some(SignatureOnly)) {active}">
+                        		Signature<br /> only
+	                        </button>
+	                      </div>
+	      				        <div id="egraph-message"
+	      				             style="@ifNotSpecificMessageOrDefault {display:none}">
+	      				          <textarea id="egraph-message-text"
+	      				                    name="@form.messageText.name"
+	      				                    rows="8"
+	      				                    cols="1"
+                                            maxlength="@writtenMessageCharacterLimit">@form.messageText.value</textarea>
+                                  <p class="character-count"><small id="egraph-message-count">@writtenMessageCharacterLimit</small><small> left</small></p>
+	      				          <p class="align-right"><small><a href="/inside-an-egraph#biometric" target="_blank" class="tip">How do I know it's really him?</a></small>
+                                  </p>
+
+                                  </div>
+	      				        <input type="hidden"
+	      				               id="message-type"
+	      				               name="@form.messageOption.name"
+	      				               value="@for(value <- form.messageOption) {@value.paramValue}">
+	      				      }
+	      				    </div>
+	    				    </div> <!-- end .field -->
+    				    </fieldset> <!-- end Egraph Message fields -->
+
+	    				  <fieldset class="audio">
+	
+	    				    <legend>
+	    				    	<div class="letter">C</div>
+	    				    	<div class="text">Audio Message</div>
+	    				    </legend>	    				    
+
+	    				    <div class="content last">
+	    				    	@orderSummary.celebrityName will record an audio message for you.
+	    				    </div>
+	    				          				  
+	    				  </fieldset>
+
+	    				  <fieldset class="last">
+	    				  
+	    				    <div class="field last">
+	      				    <div class="clearfix">
+	      				      <label class="instructions" for="your-message">
+	      				        Your Note to @orderSummary.celebrityName:
+	      				        <small>@messageToCelebrityCharacterLimit character limit.</small>
+	      				        <small>All messages are subject to approval.</small>
+    				      		</label>
+	      				      @tags.bootstrap_input_field(form.noteToCelebrity) {
+	      				        <textarea maxlength="@messageToCelebrityCharacterLimit" id="your-message"
+	      				                  name="@form.noteToCelebrity.name"
+								                  rows="8"
+	      				                  cols="1">@form.noteToCelebrity.value</textarea>
+                                <p class="character-count"><small id="your-message-count">@messageToCelebrityCharacterLimit</small><small> left</small></p>
+	      				      }
+	      				    </div>
+
+	    				    </div> <!-- end .field -->     				    
+	    				  
+	    				  </fieldset>
+	    				  
+	    				  <fieldset class="submit">
+	    				  
+	    				  	<div class="clearfix">
+	    				  
+	    				 			@tags.arrow_button(caption="Review", classes="button right")
+	    				 		
+	    				  	</div>
+	    				  
+	    				  </fieldset>
+	    				  
+	    				} <!-- end form.main -->
+	    				
+	    				<aside>
+	    				
+	    					<div class="order-overview @orientation clearfix">
+	    						  @tags.egraphPreview(
+	    						  	productPreviewUrl,
+	    						    orientation
+	    						  )
+
+		    				  	<div class="order-summary">
+		    				  	
+		    				  		<h2>Summary</h2>
+		    				  		
+		    				  		<div class="celebrity-information">
+		    				  			<h3>@orderSummary.celebrityName</h3>
+		    				  			<h4 class="last">@orderSummary.productName</h4>
+		    				  		</div>
+		    				  		
+		    				  		@tags.storefront_price_summary(
+		    				  			orderSummary.subtotal,
+		    				  			orderSummary.shipping,
+		    				  			orderSummary.tax,
+		    				  			orderSummary.total
+		    				  		)
+	    				  		</div> <!-- end .order-summary -->
+	    					</div> <!-- end .order-overview -->
+	    				
+	    				</aside>
+	  			
+						</div> <!-- end .clearfix -->
+						
+  				</div> <!-- end .col2 -->
+  			
+        </section> <!-- end #checkout -->
+
+    	</div> <!-- end #main -->
+    
+    </div> <!-- end #content -->
+}
+
+@ifSpecificMessageOrDefault(html: => Html) = {
+	@{
+		val specificMessageSet = Set(Some(SpecificMessage: PersonalizeMessageOption), None)
+		if(specificMessageSet.contains(form.messageOption.value)) {
+			html
+		}
+	}
+}
+
+@ifNotSpecificMessageOrDefault(html: => Html) = {
+	@{
+		val specificMessageSet = Set(Some(SpecificMessage: PersonalizeMessageOption), None)
+		if(!specificMessageSet.contains(form.messageOption.value)) {
+			html
+		}
+	}
+}
+
+@base_celebrity_storefront_template(
+  title="Personalize",
+  jsMain="pages/celebrity-storefront-personalize",
+  headJs=headJs,
+  body=baseBody
+)

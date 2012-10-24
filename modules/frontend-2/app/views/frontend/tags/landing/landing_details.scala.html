@@ -1,0 +1,55 @@
+@(celebrityPublicName: Option[String] = None, celebrityCasualName: Option[String] = None, celebrityIsMale: Boolean = true)
+
+@import controllers._
+
+
+<section id="landing-details">
+
+  <header>
+
+    <div class="wrap">
+
+      <h1>It's your egraph &ndash; ready to be shared!</h1>
+
+      <p>
+				Your interaction with @celebrityPublicName.getOrElse("your favorite star") is a rare and unique experience that deserves to be enjoyed and shared. As soon as @celebrityPublicName.getOrElse("your favorite star") finishes his reply, he sends the completed egraph back to our servers for verification. Upon authentication, the egraph is delivered to you or your gift recipient. Enjoy it. Share it with friends and family. It’s yours to keep forever.
+	
+			<p><small><a href="/inside-an-egraph#do">What can I do with my egraph? &raquo;</a></small></p>
+
+    </div> <!-- end .wrap -->
+
+  </header>
+
+  <div class="content">
+
+    <div class="wrap clearfix">
+
+      <figure>
+
+        <img src='@RemoteAssets.at("images/fpo-egraph-diagram.jpg")' alt="fpo-egraph-diagram" class="scale" />
+
+        <figcaption class="signature">
+
+          <p>A personalized message and hand-written signature from your star <span>&raquo;</span></p>
+
+        </figcaption> <!-- end .signature -->
+
+        <figcaption class="audio">
+
+          <p>The audio recording from your star <span>&raquo;</span></p>
+
+        </figcaption> <!-- end .audio -->
+
+        <figcaption class="name">
+
+          <p>Your name or gift recipient’s name <span>&raquo;</span></p>
+
+        </figcaption> <!-- end .name -->
+
+      </figure>
+
+    </div> <!-- end .wrap -->
+
+  </div> <!-- end .content -->
+
+</section> <!-- end #landing-details -->

@@ -1,0 +1,44 @@
+// The main Egraphs stylesheet.
+
+// Import bootstrap. It will automatically use the variables.less found in our directory.
+@import "_bootstrap.less";
+
+// Import bootstrap responsive
+@import "_bootstrap-responsive.less";
+
+// Responsive Overrides
+@import "_responsive-overrides.less";
+
+// Mixins
+@import "_mixins.less";
+
+// Base Styles
+@import "_base.less";
+
+// Plugin default styles (above pages for overriding as needed)
+@import "../../../public/javascripts/libs/flexslider/styles.less";
+@import "/assets/javascripts/libs/chosen/chosen.css"; // needs to be in /assets since it is downloaded by client
+@import "../../../public/javascripts/libs/iphonecheckboxes/styles.less";
+
+// Boostrap Module Overrides
+@import "_modal.less";
+
+// Styles for each page/section
+@import "_landing_page.less";
+@import "_about_us.less";
+@import "_account_settings.less";
+@import "_account_gallery.less";
+@import "_account_password_reset.less";
+@import "_careers.less";
+@import "_celebrity_storefront.less";
+@import "_celebrity_storefront_checkout.less";
+@import "_celebrity_storefront_personalize.less";
+@import "_celebrity_storefront_review.less";
+@import "_celebrity_storefront_login.less";
+@import "_celebrity_storefront_finalize.less";
+@import "_celebrity_storefront_complete.less";
+@import "_celebrity_storefront_failed.less";
+@import "_inside_egraph.less";
+
+// Admin styles
+@import "admin/_celebrity.less";
