@@ -3,19 +3,93 @@
 # ~~~~
 
 # Home page
-GET     /                                       Application.index
+GET     /                                                         controllers.Application.index
+GET     /code_reuse_example                                       controllers.Application.code_reuse_example
+GET     /model_example                                            controllers.Application.model_example
+GET     /simple_example                                           controllers.Application.simple_example
 
-# Ignore favicon requests
-GET     /favicon.ico                            404
+#GET     /build                                                    controllers.Build.index
 
-# Map static resources from the /app/public folder to the /public path
-GET     /public/                                staticDir:public
+GET     /Account/gallery                                          controllers.Account.gallery(user: String ?= "userdude", count: Int ?=  1, role: String ?= "other", pending: Int ?= 0)
+GET     /Account/errors                                           controllers.Account.errors
+POST    /orders/:orderId/:status/configure                        controllers.Account.privacy(orderId: Long, status: String)
+GET     /Account/privacy                                          controllers.Account.privacy(orderId: Long, status: String)
+GET     /Account/settings                                         controllers.Account.getSettings
+POST    /Account/settings                                         controllers.Account.postSettings
+GET     /Account/subscribe                                        controllers.Account.getSubscribe
+POST    /Account/subscribe                                        controllers.Account.postSubscribe
+GET     /Account/recovery                                         controllers.Account.getRecovery
+POST    /Account/recovery                                         controllers.Account.postRecovery
+GET     /Account/reset                                            controllers.Account.reset
+GET     /Account/verify                                           controllers.Account.getVerify
+POST    /Account/verify                                           controllers.Account.postVerify
 
-GET     /build                                  Build.index
+GET     /BaseTemplate/loggedIn                                    controllers.BaseTemplate.loggedIn
+GET     /BaseTemplate/notLoggedIn                                 controllers.BaseTemplate.notLoggedIn
 
-POST    /orders/{<[0-9]+>orderId}/configure     Account.privacy
+GET     /Build/index                                              controllers.Build.index
 
-POST    /subscribe                              Account.subscribe
+GET     /Checkout/allErrors                                       controllers.Checkout.allErrors
+GET     /Checkout/index                                           controllers.Checkout.index
+GET     /Checkout/noShipping                                      controllers.Checkout.noShipping
+GET     /Checkout/portrait                                        controllers.Checkout.portrait
 
-# Catch all
-*       /{controller}/{action}                  {controller}.{action}
+GET     /ChoosePhoto/carousel                                     controllers.ChoosePhoto.carousel(num:Int, focus:Int)
+GET     /ChoosePhoto/carouselWithSoldOut                          controllers.ChoosePhoto.carouselWithSoldOut
+GET     /ChoosePhoto/landscape                                    controllers.ChoosePhoto.landscape
+GET     /ChoosePhoto/longBio                                      controllers.ChoosePhoto.longBio
+GET     /ChoosePhoto/tilesWithSoldOut                             controllers.ChoosePhoto.tilesWithSoldOut
+GET     /ChoosePhoto/withPartnerIcons                             controllers.ChoosePhoto.withPartnerIcons(num:Int)
+GET     /ChoosePhoto/withProducts                                 controllers.ChoosePhoto.withProducts(num:Int)
+GET     /ChoosePhoto/withRecentEgraphs                            controllers.ChoosePhoto.withRecentEgraphs(num:Int)
+
+GET     /Complete/index                                           controllers.Complete.index
+
+GET     /Egraph/landscape                                         controllers.Egraph.landscape
+GET     /Egraph/portrait                                          controllers.Egraph.portrait
+
+GET     /Email/confirm                                            controllers.Email.confirm
+# GET     /Email/mlbStatic                                          controllers.Email.mlbStatic
+GET     /Email/orderConfirmation                                  controllers.Email.orderConfirmation
+GET     /Email/orderConfirmationText                              controllers.Email.orderConfirmationText
+GET     /Email/verify                                             controllers.Email.verify
+GET     /Email/viewEgraph                                         controllers.Email.viewEgraph
+
+GET     /Failed/creditcard_error                                  controllers.Failed.creditcard_error
+GET     /Failed/no_inventory                                      controllers.Failed.no_inventory
+GET     /Failed/purchase_error                                    controllers.Failed.purchase_error
+
+GET     /Finalize/index                                           controllers.Finalize.index
+GET     /Finalize/portrait                                        controllers.Finalize.portrait
+
+GET     /Landing/featuredStars                                    controllers.Landing.featuredStars(count:Int)
+GET     /Landing/featuredStarsWithNoInventory                     controllers.Landing.featuredStarsWithNoInventory
+GET     /Landing/signupOn                                         controllers.Landing.signupOn
+GET     /Landing/singleCelebrity                                  controllers.Landing.singleCelebrity(publicName:String ?= "David Price", casualName:String ?= "David", isMale: Boolean ?= true)
+
+GET     /Login/allErrorsLogin                                     controllers.Login.allErrorsLogin
+GET     /Login/allErrorsStorefront                                controllers.Login.allErrorsStorefront
+GET     /Login/index                                              controllers.Login.index
+GET     /Login/storefront                                         controllers.Login.storefront(recipient:Option[String])
+
+GET     /Personalize/allErrors                                    controllers.Personalize.allErrors
+GET     /Personalize/index                                        controllers.Personalize.index
+GET     /Personalize/portrait                                     controllers.Personalize.portrait
+
+GET     /Review/index                                             controllers.Review.index
+GET     /Review/portrait                                          controllers.Review.portrait
+GET     /Review/withPrint                                         controllers.Review.withPrint
+
+GET     /Static/about                                             controllers.Static.about
+GET     /Static/careers                                           controllers.Static.careers
+GET     /Static/inside                                            controllers.Static.inside
+GET     /Static/faq                                               controllers.Static.faq
+GET     /Static/privacy                                           controllers.Static.privacy
+GET     /Static/terms                                             controllers.Static.terms
+
+GET     /StorefrontTemplate/noneActiveOrComplete                  controllers.StorefrontTemplate.noneActiveOrComplete
+GET     /StorefrontTemplate/active                                controllers.StorefrontTemplate.active(crumbIndex:Int)
+GET     /StorefrontTemplate/allCompleteMiddleOneActive            controllers.StorefrontTemplate.allCompleteMiddleOneActive
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file                                             controllers.RemoteAssets.at(path="/public", file)

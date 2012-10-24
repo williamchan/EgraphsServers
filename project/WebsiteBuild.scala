@@ -47,7 +47,7 @@ object WebsiteBuild extends Build {
           ExclusionRule(organization = "org.mockito"),
           ExclusionRule(organization = "org.scala-lang")
       ),*/
-      "org.squeryl" %% "squeryl" % "0.9.5-2" excludeAll(
+      "org.squeryl" %% "squeryl" % "0.9.5" excludeAll(
           // Exclude DB-specific libs
           ExclusionRule(organization = "net.sourceforge.jtds"),
           ExclusionRule(organization = "postgresql"),
@@ -72,7 +72,7 @@ object WebsiteBuild extends Build {
       "org.scalamock" %% "scalamock-scalatest-support" % "2.4" % "test"
     )
     
-    val websiteBaseDir = file(".") / "apps" / "website-2"
+    val websiteBaseDir = file(".") / "apps" / "website"
 
     val sep = java.io.File.separator
 

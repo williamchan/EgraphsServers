@@ -2,36 +2,44 @@ package controllers.website.admin
 
 import models._
 import services.mail.TransactionalMail
+import play.api.mvc.{Action, Controller}
+import play.api.mvc.Results.{Ok, Redirect}
 import controllers.WebsiteControllers
-import play.mvc.Controller
-import services.http.{CelebrityAccountRequestFilters, POSTControllerMethod, AdminRequestFilters}
-import play.mvc.results.Redirect
-import play.data.validation.Validation
-
+import models.{Administrator, AdministratorStore}
+import services.http.{EgraphsSession, POSTControllerMethod}
+import services.http.filters.HttpFilters
+import play.api.data._
+import play.api.data.Forms._
+import play.api.data.validation.Constraints._
+import play.api.data.validation.Constraint
+import play.api.data.validation.Valid
+import play.api.data.validation.Invalid
+import services.http.EgraphsSession._
 
 trait PostSendCelebrityWelcomeEmailAdminEndpoint {
   this: Controller =>
 
   protected def postController: POSTControllerMethod
-  protected def adminFilters: AdminRequestFilters
-  protected def celebFilters: CelebrityAccountRequestFilters
+  protected def httpFilters: HttpFilters
   protected def celebrityStore: CelebrityStore
   protected def accountStore: AccountStore
   protected def transactionalMail: TransactionalMail
 
-  def postSendCelebrityWelcomeEmailAdmin(celebrityEmail: String) = postController() {
-    adminFilters.requireAdministratorLogin { admin =>
-      celebFilters.requireCelebrityId(request) { celebrity =>
-        Validation.required("E-mail address", celebrityEmail)
-        Validation.email("E-mail address", celebrityEmail)
-        if (validationErrors.isEmpty) {
-          celebrity.sendWelcomeEmail(celebrityEmail, bccEmail = Some(admin.account.email))
-          new Redirect(WebsiteControllers.reverse(WebsiteControllers.getCelebrityAdmin(celebrityId = celebrity.id)).url)
-        } else {
-          WebsiteControllers.redirectWithValidationErrors(WebsiteControllers.reverse(WebsiteControllers.getCelebrityAdmin(celebrityId = celebrity.id)))
+  def postSendCelebrityWelcomeEmailAdmin(celebrityId: Long) = postController() {
+    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+      httpFilters.requireCelebrityId(celebrityId) { celebrity =>
+        Action { implicit request => 
+          val emailForm = Form(single("celebrityEmail" -> email.verifying(nonEmpty)))
+          emailForm.bindFromRequest.fold(
+              formWithErrors => {
+                Redirect(controllers.routes.WebsiteControllers.getCelebrityAdmin(celebrityId = celebrityId)).flashing("errors" -> formWithErrors.errors.head.message.toString())
+              },
+              validForm => {
+                celebrity.sendWelcomeEmail(validForm, bccEmail = Some(adminAccount.email))
+                Redirect(controllers.routes.WebsiteControllers.getCelebrityAdmin(celebrityId = celebrityId))
+              })
         }
       }
     }
   }
-
 }
