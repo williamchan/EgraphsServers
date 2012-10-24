@@ -26,7 +26,7 @@ class FilterTests extends FlatSpec with ShouldMatchers with MockFactory {
    * This is just for testing Filter.
    */
   class TestableFilter extends Filter[String, Boolean] {
-    def filter(value: String): Either[Result, Boolean] = value match {
+    override def filter(value: String): Either[Result, Boolean] = value match {
       case "true" => Right(true)
       case "false" => Right(false)
       case _ => Left(notFound)
@@ -42,7 +42,7 @@ class FilterTests extends FlatSpec with ShouldMatchers with MockFactory {
     filter.filter("false") should be(Right(false))
   }
 
-  "apply" should "should execute the code in a action from the actionFactory only if the requirement is found" in {
+  "apply" should "should execute the code in an action from the actionFactory only if the requirement is found" in {
     // Setup
     val filter = new TestableFilter()
 
@@ -57,7 +57,7 @@ class FilterTests extends FlatSpec with ShouldMatchers with MockFactory {
     result should be(resultFromAction)
   }
 
-  "apply" should "should not execute the code in a action from the actionFactory if the requirement is not found" in {
+  "apply" should "should not execute the code in an action from the actionFactory if the requirement is not found" in {
     // Setup
     val filter = new TestableFilter()
 
@@ -72,6 +72,7 @@ class FilterTests extends FlatSpec with ShouldMatchers with MockFactory {
     result should be(notFound)
   }
 
+  // Setup mock actionFactory to return an action that would return a 200 OK with the work "true" in it
   private def setupMocks(expectedNumberOfCallsToActionFactory: Int): (Request[AnyContent], Result, Boolean => Action[AnyContent]) = {
     val request = FakeRequest()
 
@@ -80,7 +81,7 @@ class FilterTests extends FlatSpec with ShouldMatchers with MockFactory {
       resultFromAction
     }
     val actionFactory = mockFunction[Boolean, Action[AnyContent]]
-    actionFactory expects (true) returning action repeat(expectedNumberOfCallsToActionFactory)
+    actionFactory expects (true) returning action repeat (expectedNumberOfCallsToActionFactory)
 
     (request, resultFromAction, actionFactory)
   }
