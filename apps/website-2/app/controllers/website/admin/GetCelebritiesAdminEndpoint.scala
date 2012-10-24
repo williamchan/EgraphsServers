@@ -21,25 +21,6 @@ private[controllers] trait GetCelebritiesAdminEndpoint extends ImplicitHeaderAnd
   def getCelebritiesAdmin = controllerMethod.withForm() { implicit authToken =>
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       Action { implicit request =>
-        
-        println("request.headers " + request.headers)
-        println("request.path " + request.path)
-        println("request.method " + request.method)
-        println("request.queryString " + request.queryString)
-        println("request.remoteAddress " + request.remoteAddress)
-        println("request.uri " + request.uri)
-        
-        println("request.accept " + request.accept)
-        println("request.acceptLanguages " + request.acceptLanguages)
-        println("request.charset " + request.charset)
-        println("request.contentType " + request.contentType)
-        println("request.cookies " + request.cookies)
-        println("request.domain " + request.domain)
-        println("request.host " + request.host)
-        println("request.rawQueryString " + request.rawQueryString)
-        println("request.session " + request.session)
-        println("request.body " + request.body)
-        
         // get query parameters
         val page: Int = Form("page" -> number).bindFromRequest.fold(formWithErrors => 1, validForm => validForm)
         

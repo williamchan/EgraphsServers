@@ -59,27 +59,17 @@ trait PostOrderAdminEndpoint { this: Controller =>
               }
               // TODO(wchan): This should go away once there is exactly one PrintOrder record for every print order
               case "generateImages" => {
-                Ok(egraphStore.findByOrder(orderId, egraphQueryFilters.publishedOrApproved).headOption match {
-                  case None => <html><body>A published or approved egraph is required.</body></html>
+                egraphStore.findByOrder(orderId, egraphQueryFilters.publishedOrApproved).headOption match {
+                  case None => Ok(<html><body>A published or approved egraph is required.</body></html>)
                   case Some(egraph) => {
                     val pngUrl = egraph.getSavedEgraphUrlAndImage(LandscapeFramedPrint.targetEgraphWidth)._1
                     val framedPrintImageUrl = egraph.getFramedPrintImageUrl
                     val csv = PrintManufacturingInfo.toCSVLine(buyerEmail = order.buyer.account.email,
                     	shippingAddress = "",
                     	partnerPhotoFile = egraph.framedPrintFilename)
-                    <html>
-                      <body>
-                        <a href={pngUrl} target="_blank">{pngUrl}</a>
-                        <br/>
-                        <a href={framedPrintImageUrl} target="_blank">{framedPrintImageUrl}</a>
-                        <br/>
-                        {PrintManufacturingInfo.headerCSVLine}
-                        <br/>
-                        {csv}
-                      </body>
-                    </html>
+                    Ok(views.html.Application.admin.admin_printinfo(framedPrintImageUrl, PrintManufacturingInfo.headerCSVLine, csv, Some(pngUrl)))
                   }
-                })
+                }
               }
               case _ => Forbidden("Unsupported operation")
             }

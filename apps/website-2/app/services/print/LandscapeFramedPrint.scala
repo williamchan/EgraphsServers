@@ -233,6 +233,6 @@ case class LandscapeFramedPrint() {
   }
 
   private def certificateBackgroundImage: BufferedImage = {
-    ImageIO.read(play.api.Play.getFile("public/images/landscape-framed-print-cert.png"))
+    ImageIO.read(current.resourceAsStream("images/landscape-framed-print-cert.png").get)
   }
 }

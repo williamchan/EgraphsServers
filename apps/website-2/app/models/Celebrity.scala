@@ -10,6 +10,7 @@ import org.squeryl.Query
 import services._
 import java.awt.image.BufferedImage
 import services.mail.TransactionalMail
+import org.apache.commons.io.IOUtils
 import org.apache.commons.mail.HtmlEmail
 import models.Celebrity.CelebrityWithImage
 import play.api.Play.current
@@ -307,21 +308,21 @@ case class Celebrity(id: Long = 0,
   }
 
   lazy val defaultProfile = ImageAsset(
-    play.api.Play.getFile("public/images/default_profile.jpg"),
+    IOUtils.toByteArray(current.resourceAsStream("images/default_profile.jpg").get),
     keyBase="defaults/celebrity",
     name="profilePhoto",
     imageType=ImageAsset.Png,
     services=services.imageAssetServices.get
   )
   lazy val defaultLandingPageImage = ImageAsset(
-    play.api.Play.getFile("public/images/1500x556_blank.jpg"),
+    IOUtils.toByteArray(current.resourceAsStream("images/1500x556_blank.jpg").get),
     keyBase="defaults/celebrity",
     name="landingPageImage",
     imageType=ImageAsset.Png,
     services=services.imageAssetServices.get
   )
   lazy val defaultLogoImage = ImageAsset(
-    play.api.Play.getFile("public/images/40x40_blank.jpg"),
+    IOUtils.toByteArray(current.resourceAsStream("images/40x40_blank.jpg").get),
     keyBase="defaults/celebrity",
     name="logoImage",
     imageType=ImageAsset.Png,

@@ -5,6 +5,7 @@ import enums.{PublishedStatus, HasPublishedStatus}
 import frontend.landing.CatalogStar
 import java.sql.Timestamp
 import services.db.{FilterOneTable, Schema, SavesWithLongKey, KeyedCaseClass}
+import org.apache.commons.io.IOUtils
 import org.joda.money.Money
 import services.Finance.TypeConversions._
 import models.Product.ProductWithPhoto
@@ -327,7 +328,7 @@ case class Product(
   ).getSaved(AccessPolicy.Public)
 
   lazy val defaultIcon = ImageAsset(
-    Play.getFile("public/images/egraph_default_plaque_icon.png"),
+    IOUtils.toByteArray(current.resourceAsStream("images/egraph_default_plaque_icon.png").get),
     keyBase="defaults/product",
     name="photo_icon",
     imageType=ImageAsset.Png,

@@ -145,7 +145,7 @@ class Scenarios extends DeclaresScenarios {
         description = "In classic form, Wizzle dominated the competition and left mouths agape.",
         priceInCurrency = 70,
         storyTitle = "The story and the glory",
-        image = Some(Product().defaultPhotoPortrait.renderFromMaster),
+        image = Some(Product().defaultPhoto.renderFromMaster),
         icon = iconImage,
         storyText = """
            {signer_link}{signer_name}{end_link} was born on top. On {date_signed}
