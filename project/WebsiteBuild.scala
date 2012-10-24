@@ -89,6 +89,8 @@ object WebsiteBuild extends Build {
 
       resourceDirectory in Test := websiteBaseDir / "test" / "resources",
 
+      unmanagedResourceDirectories in Compile += websiteBaseDir / "resources",
+
       EclipseKeys.skipParents := false,
 
       EclipseKeys.classpathTransformerFactories += BuildHelpers.playEclipseClasspathAdditions,
