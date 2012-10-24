@@ -14,10 +14,15 @@ import services.{AppConfig, Utils, TempFile, Time}
 import services.db.{TransactionSerializable, Schema, DBSession}
 import models.{AccountStore, Account, Administrator}
 import services.mvc.celebrity.{CatalogStarsActor, UpdateCatalogStarsActor}
-import services.http.PlayId
+import services.http.{PlayId, SSLConfig}
+import javax.net.ssl.{SSLContext, TrustManagerFactory}
+import java.security.KeyStore
 
 object Global extends GlobalSettings with Logging {
+  
   override def onStart(app: Application) {
+    SSLConfig.enableCustomTrustore()
+    
     val logging = AppConfig.instance[LoggingContext]
     logging.withTraceableContext("Bootstrap") {
       val (_, secondsToBootstrap) = Time.stopwatch {
@@ -55,6 +60,7 @@ object Global extends GlobalSettings with Logging {
   
   override def onStop(app: Application) {
     services.cache.JedisFactory.shutDown()
+    SSLConfig.disableCustomTrustore()
   }
   
   /**
