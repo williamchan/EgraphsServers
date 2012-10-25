@@ -51,19 +51,24 @@ define(["bootstrap/bootstrap-modal"], function() {
             url: '/subscribe',
             data: $("#signup-form").serialize(),
             type: 'post',
-            success: function(data) {
-              callout.text("Thanks!");
-              setTimeout(function() {
-                signupModal.modal('toggle');
-                callout.text('');
-              }, 800);
-            },
-            error: function () {
-              callout.text("Connection error, try again later.");
-              setTimeout(function() {
-                signupModal.modal('toggle');
-                callout.text('');
-              }, 800);
+            statusCode : {
+              200: function(data) {
+                callout.text("Thanks!");
+                setTimeout(function() {
+                  signupModal.modal('toggle');
+                  callout.text('');
+                }, 800);
+              },
+              400: function () {
+                callout.text("That's not an email address =/");
+              },
+              500: function () {
+                callout.text("Connection error, try again later.");
+                setTimeout(function() {
+                  signupModal.modal('toggle');
+                  callout.text('');
+                }, 800);
+              },
             }
 
           });
