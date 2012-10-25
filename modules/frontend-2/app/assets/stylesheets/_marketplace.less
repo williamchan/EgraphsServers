@@ -143,6 +143,11 @@
 	              .gradientBar(#efefef, lighten(#ccc, 5%));                
 	            }
 	            
+	            &.active {
+	             .box-shadow(inset 0 0 5px @gray);
+  	            .gradientBar(darken(#efefef, 10%), darken(#ccc, 10%));
+	            }
+	            
 	            span, img { 
 	              .inline-block;
 	              vertical-align: middle; 
