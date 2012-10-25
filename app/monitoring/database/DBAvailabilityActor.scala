@@ -30,21 +30,34 @@ class DBAvailabilityActor(database: String, friendlyName: String,
   def checkStatus = {
 
     val dbConnections = sendDBQuery
-    awsActions("DBAvailability", dbConnections)
+    awsActions("DBAvailability." + database, dbConnections)
   }
 
+  
+  /*
+   * If the database is down, CloudWatch will not receive data, given the current
+   * implementation. As a result, it is appropriate to alarm in both the situation
+   * "no data" and if the number of connections drops below a certain threshold.
+   */
   def sendDBQuery: Int = {
 
-    DB.withConnection(database) { implicit conn =>
-      conn.setReadOnly(true)
+    try {
 
-      val result = SQL("select count(*) from pg_stat_activity").apply().head
-      val count = result[Long]("count")
-      play.Logger.info("Number of DB connections on " + database + " is " + count)
+      DB.withConnection(database) { implicit conn =>
+        conn.setReadOnly(true)
 
-      // add to history
-      history.enqueue(count.toInt)
-      count.toInt
+        val result = SQL("select count(*) from pg_stat_activity").apply().head
+        val count = result[Long]("count")
+
+        // add to history
+        history.enqueue(count.toInt)
+        count.toInt
+      }
+    } catch {
+      case _ => {
+        history.enqueue(0)
+        0
+      }
     }
   }
 }

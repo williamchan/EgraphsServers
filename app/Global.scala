@@ -8,7 +8,4 @@ object Global extends GlobalSettings {
     val websiteMonitor = Egraphs.websiteMonitor
     val dbMonitor = Egraphs.dbMonitor
   }
-
-  // cloudWatchClient will come back here after dependency injection refactor
-
 }

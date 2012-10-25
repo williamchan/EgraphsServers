@@ -5,10 +5,11 @@ import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.cloudwatch.AmazonCloudWatchClient
 import monitoring.website.WebsiteMonitor
 import monitoring.database.DBMonitor
+import collections.MetricSource
 
 object Egraphs {
 
-  val websiteMonitor = new WebsiteMonitor(cloudWatchClient, 60, urlsAndNames)
+  val websiteMonitor = new WebsiteMonitor(cloudWatchClient, 10, urlsAndNames)
   val dbMonitor = new DBMonitor(cloudWatchClient, 10, dbNames)
 
   private def cloudWatchClient: AmazonCloudWatch = {
@@ -22,15 +23,15 @@ object Egraphs {
     cloudwatch
   }
 
-  private def urlsAndNames: List[(String, String, String)] = {
+  private def urlsAndNames: List[MetricSource] = {
     // add new URL/actor/friendly name pairs to check here
-    List(("https://www.egraphs.com/", "frontPageAvailabilityActor", "frontPage"),
-      ("https://www.egraphs.com/Pedro-Martinez/photos", "photoPageAvailabilityActor", "photoPage"),
-      ("https://www.egraphs.com/about", "staticPageAvailabilityActor", "staticPage"))
+    List(MetricSource("https://www.egraphs.com/", "frontPageAvailabilityActor", "frontPage"),
+      MetricSource("https://www.egraphs.com/Pedro-Martinez/photos", "photoPageAvailabilityActor", "photoPage"),
+      MetricSource("https://www.egraphs.com/about", "staticPageAvailabilityActor", "staticPage"))
   }
 
-  private def dbNames: List[(String, String, String)] = {
-    List(("default", "liveDBAvailabilityActor", "live"),
-      ("replica", "replicaDBAvailabilityActor", "replica"))
+  private def dbNames: List[MetricSource] = {
+    List(MetricSource("default", "liveDBAvailabilityActor", "live"),
+      MetricSource("replica", "replicaDBAvailabilityActor", "replica"))
   }
 }

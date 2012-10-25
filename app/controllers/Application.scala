@@ -9,27 +9,39 @@ import play.api.mvc.Controller
 object Application extends Controller {
 
   def index = Action { request =>
-    Ok(views.html.index())
+    Ok(views.html.index("Monitoring"))
+  }
+  
+  def websiteAvailability = Action {
+    Ok(views.html.website("WebsiteAvailability"))    
   }
 
-  def getMetrics = Action {
+  def dbAvailability = Action {
+    Ok(views.html.db("DBAvailability"))
+  }
+  
+  def cacheAvailability = Action {
+    Ok(views.html.cache("CacheAvailability"))
+  }
+
+  def websiteMetrics = Action {
     val metrics = Egraphs.websiteMonitor.getMetrics
     val jsonIterable = metrics.map(metric => metric.toJson)
     val responseJson = Json.toJson(Map("metrics" -> jsonIterable))
     Ok(responseJson)
   }
-  
-  def getDBAvailability = Action {
+
+  def dbMetrics = Action {
     val dbMetrics = Egraphs.dbMonitor.getMetrics
     val jsonIterable = dbMetrics.map(metric => metric.toJson)
     val responseJson = Json.toJson(Map("metrics" -> jsonIterable))
     Ok(responseJson)
   }
-  
-  def love = Action {
-    Ok(views.html.db())
+
+  def cacheMetrics = Action {
+    Ok("To Do")
   }
-  
+
   // testing purposes only
-  def ok = Action{Ok}
+  def ok = Action { Ok }
 }

@@ -15,15 +15,14 @@ import play.api.libs.concurrent.Akka
 import monitoring.ActorUtilities
 import monitoring.Monitor
 import common.MonitoringMessages.CheckStatus
+import collections.MetricSource
 
 class DBMonitor(val cloudwatch: AmazonCloudWatch,
-  val interval: Int, val databases: List[(String, String, String)])
+  val interval: Int, val dbsAndNames: List[MetricSource])
   extends Monitor {
 
-  //private val actors: List[ActorRef] = scheduleDBMonitoringJobs
-
   override def scheduleMonitoringJobs: List[ActorRef] = {
-    val actors = for ((database, actorName, friendlyName) <- databases) yield {
+    val actors = for (MetricSource(database, actorName, friendlyName) <- dbsAndNames) yield {
       val myCurrentActor = Akka.system.actorOf(
         Props(new DBAvailabilityActor(
           database,

@@ -15,15 +15,14 @@ import play.api.libs.concurrent.Akka
 import monitoring.ActorUtilities
 import monitoring.Monitor
 import common.MonitoringMessages.CheckStatus
+import collections.MetricSource
 
 class WebsiteMonitor(val cloudwatch: AmazonCloudWatch,
-  val interval: Int, val urlsAndNames: List[(String, String, String)])
+  val interval: Int, val urlsAndNames: List[MetricSource])
   extends Monitor {
 
-  //private val actors: List[ActorRef] = scheduleWebsiteMonitoringJobs
-
   override def scheduleMonitoringJobs: List[ActorRef] = {
-    val actors = for ((url, actorName, friendlyName) <- urlsAndNames) yield {
+    val actors = for (MetricSource(url, actorName, friendlyName) <- urlsAndNames) yield {
       val myCurrentActor = Akka.system.actorOf(
         Props(new WebsiteAvailabilityActor(
           url,
@@ -36,18 +35,4 @@ class WebsiteMonitor(val cloudwatch: AmazonCloudWatch,
     }
     actors
   }
-
-//  def getMetrics: List[EgraphsMetric[Int]] = {
-//
-//    import akka.pattern.{ ask, pipe }
-//    val futureMetrics = for (actor <- actors) yield {
-//      implicit val timeout = Timeout(5 seconds)
-//
-//      for {
-//        metric <- ask(actor, GetMetric).mapTo[EgraphsMetric[Int]]
-//      } yield metric
-//    }
-//
-//    for (futureMetric <- futureMetrics) yield Await.result(futureMetric, 5 seconds)
-//  }
 }

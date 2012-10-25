@@ -1,9 +1,8 @@
-package monitoring.website
+package monitoring.db
 
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 import org.specs2.mock.Mockito
-
 import akka.actor.Props
 import akka.dispatch.Await
 import akka.pattern.ask
@@ -16,17 +15,18 @@ import play.api.Play.current
 import play.api.libs.concurrent.Akka
 import play.api.test.FakeApplication
 import play.api.test.Helpers.running
+import monitoring.database.DBAvailabilityActor
 
-class WebsiteAvailabilityActorTest extends FlatSpec with ShouldMatchers with Mockito {
+class DBAvailabilityActorTest extends FlatSpec with ShouldMatchers with Mockito {
 
-  "A WebsiteAvailabilityActor" should "receive an EgraphsMetric on a GetMetric request" in {
+  "A DBAvailabilityActor" should "receive an EgraphsMetric on a GetMetric request" in {
 
     val res = running(FakeApplication()) {
       val metPublisher = mock[CloudWatchMetricPublisher]
 
       val myTestActor = Akka.system.actorOf(
-        Props(new WebsiteAvailabilityActor("http://isitchristmas.com/",
-          "christmasTest",
+        Props(new DBAvailabilityActor("testDB",
+          "friendlyTest",
           metPublisher)),
         name = "testActor")
 
@@ -35,8 +35,8 @@ class WebsiteAvailabilityActorTest extends FlatSpec with ShouldMatchers with Moc
       val futureMetric = ask(myTestActor, GetMetric).mapTo[EgraphsMetric[Int]]
       val metric = Await.result(futureMetric, 5 seconds)
 
-      metric.name should equal("christmasTest")
-      metric.description should equal("http://isitchristmas.com/")
+      metric.name should equal("friendlyTest")
+      metric.description should equal("testDB")
       metric.values should have length (0)
     }
   }
