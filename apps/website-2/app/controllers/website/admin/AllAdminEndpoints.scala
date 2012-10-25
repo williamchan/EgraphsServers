@@ -22,7 +22,9 @@ trait AllAdminEndpoints
   with GetEgraphAdminEndpoint
   with GetEgraphsAdminEndpoint
   with GetFilterAdminEndpoint
+  with GetFilterValueAdminEndpoint
   with PostFilterAdminEndpoint
+  with PostFilterValueAdminEndpoint
   with GetFiltersAdminEndpoint
   with GetInventoryBatchAdminEndpoint
   with GetLoginAdminEndpoint

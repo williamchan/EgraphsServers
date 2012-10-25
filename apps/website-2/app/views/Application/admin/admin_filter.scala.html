@@ -1,4 +1,8 @@
-@(filter: models.filters.Filter, fields: (String) => String, errorFields: Option[List[String]] = None, filterValues: Iterable[models.filters.FilterValue])(implicit authToken: egraphs.authtoken.AuthenticityToken,
+@(filter: models.filters.Filter,
+  errorFields: Option[List[String]] = None,
+  filterValues: Iterable[models.filters.FilterValue],
+  filterValueErrorFields: Option[List[String]] = None
+  )(implicit authToken: egraphs.authtoken.AuthenticityToken,
   headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData)
 
@@ -33,25 +37,38 @@
           </div>  
         }
         @errorMessage(errorFields)
-        <h2>
-          Filter Values
-        </h2>  
-        <table class="table table-hover table-condensed">
-          <thead>
-            <tr>
-              <th>id</td>
-              <th>name</th>
-              <th>publicname</th>
-            </tr>
-          </thead>  
-          @filterValues.map { fv =>
-            <tr>
-              <td>@fv.id</td>
-              <td>@fv.name</td>
-              <td>@fv.publicName</td>
-            </tr>  
+        @if(filter.id != 0) {
+          <h2>
+            Filter Values
+          </h2>  
+          @errorMessage(filterValueErrorFields)
+          <h3>Create a value</h3>
+          @safeForm('method -> "POST", 'action -> routes.WebsiteControllers.postFilterValueAdmin.url, 'enctype -> "multipart/form-data", 'class -> "form-inline"){
+            <label>Name</label>
+            <input type="hidden" name="filterValueId" value="0">  
+            <input type="hidden" name="filterId" value="@filter.id">
+            <input type="text" name="name">
+            <label>PublicName</label>
+            <input type="text" name="publicName"> 
+            <button class="btn btn-primary" type="submit">Save</button> 
           }
-        </table>
+          <table class="table table-hover table-condensed">
+            <thead>
+              <tr>
+                <th>id</td>
+                <th>name</th>
+                <th>publicname</th>
+              </tr>
+            </thead>  
+            @filterValues.map { fv =>
+              <tr>
+                <td>@fv.id</td>
+                <td>@fv.name</td>
+                <td>@fv.publicName</td>
+              </tr>  
+            }
+          </table>
+        }  
         <a href="@routes.WebsiteControllers.getFiltersAdmin.url">Back to all filters</a>
     </div>
   </div>

@@ -76,7 +76,10 @@ POST     /admin/egraphs/$egraphId<[0-9]+>                                 contro
 GET      /admin/filters                                                   controllers.WebsiteControllers.getFiltersAdmin 
 GET      /admin/filters/$filterId<[0-9]+>                                 controllers.WebsiteControllers.getFilterAdmin(filterId: Long)
 GET      /admin/filters/create                                            controllers.WebsiteControllers.getCreateFilterAdmin
-POST     /admin/filters/												                          controllers.WebsiteControllers.postFilterAdmin
+POST     /admin/filters/                                                  controllers.WebsiteControllers.postFilterAdmin
+GET      /admin/filtervalues/$filterValueId<[0-9]+>                       controllers.WebsiteControllers.getFilterValueAdmin(filterValueId: Long)
+GET      /admin/filters/$filterId<[0-9]>/filtervalues/create              controllers.WebsiteControllers.getCreateFilterValueAdmin(filterId: Long) 
+POST     /admin/filtervalues/                                             controllers.WebsiteControllers.postFilterValueAdmin
 GET      /admin/inventorybatches/$inventoryBatchId<[0-9]+>                controllers.WebsiteControllers.getInventoryBatchAdmin(inventoryBatchId: Long)
 GET      /admin/login                                                     controllers.WebsiteControllers.getLoginAdmin
 POST     /admin/login                                                     controllers.WebsiteControllers.postLoginAdmin

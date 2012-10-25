@@ -29,66 +29,66 @@ import services.blobs.Blobs.Conversions._
 import org.apache.commons.mail.HtmlEmail
 import play.api.mvc._
 
-
-trait PostFilterAdminEndpoint {
+trait PostFilterValueAdminEndpoint {
   this: Controller =>
-
   protected def postController: POSTControllerMethod
   protected def httpFilters: HttpFilters
   protected def filterStore: FilterStore
+  protected def filterValueStore: FilterValueStore
   
-  case class PostFilterForm(
-     name: String,
-     publicName: String
+  case class PostFilterValueForm(
+	  name: String,
+	  publicName: String,
+	  filterId : Long
   )
-
-  def postFilterAdmin = postController() {
-    httpFilters.requireAdministratorLogin.inSession(parser = parse.multipartFormData) { (admin, adminAccount) =>
+  
+  def postFilterValueAdmin = postController() {
+	httpFilters.requireAdministratorLogin.inSession(parser = parse.multipartFormData) { (admin, adminAccount) =>
       Action(parse.multipartFormData) { implicit request =>
-        
+        val filterValueId = Form("filterValueId" -> longNumber).bindFromRequest.fold(formWithErrors => 0L, validForm => validForm)
         val filterId = Form("filterId" -> longNumber).bindFromRequest.fold(formWithErrors => 0L, validForm => validForm)
-      	val isCreate = (filterId == 0)
-      	
-      	val form = Form(mapping(
-          "name" -> nonEmptyText(maxLength = 128),
-          "publicName" -> nonEmptyText(maxLength = 128)
-        )(PostFilterForm.apply)(PostFilterForm.unapply).verifying(isUniqueName(filterId))
-        )
+        val isCreate = (filterValueId == 0)
         
+        val form = Form(mapping(
+          "name" -> nonEmptyText(maxLength = 128),
+          "publicName" -> nonEmptyText(maxLength = 128),
+          "filterId" -> longNumber)(PostFilterValueForm.apply)(PostFilterValueForm.unapply).verifying(isUniqueName(filterValueId)))
+     
         form.bindFromRequest.fold(
           formWithErrors => {
             val data = formWithErrors.data
             val errors = for (error <- formWithErrors.errors) yield {
               error.key + ": " + error.message
             }
-            val url = if(isCreate) controllers.routes.WebsiteControllers.getCreateFilterAdmin.url else controllers.routes.WebsiteControllers.getFilterAdmin(filterId).url
+            val url = if(isCreate) controllers.routes.WebsiteControllers.getCreateFilterValueAdmin(filterId).url else controllers.routes.WebsiteControllers.getFilterValueAdmin(filterValueId).url
             Redirect(url).flashing(
               ("errors" -> errors.mkString(", ")), 
-  		        ("filterId" -> filterId.toString), 
+  		        ("filterValueId" -> filterValueId.toString),
   		        ("publicName" -> data.get("publicName").getOrElse("")), 
   		        ("name" -> data.get("name").getOrElse(""))
             )
           },
           validForm => {
             println("validForm")          
-            val tmp = if (isCreate) Filter() else filterStore.get(filterId)
-            val savedFilter = tmp.copy(
+            val tmp = if (isCreate) FilterValue() else filterValueStore.get(filterValueId)
+            val savedFilterValue = tmp.copy(
                 publicName = validForm.publicName,
-                name = validForm.name).save()
-            Redirect(controllers.routes.WebsiteControllers.getFilterAdmin(savedFilter.id).url)
+                name = validForm.name,
+                filterId = validForm.filterId).save()
+            Redirect(controllers.routes.WebsiteControllers.getFilterValueAdmin(savedFilterValue.id).url)
           }
         )
       }
-  	}
+	}  
   }
-  
-  private def isUniqueName(filterId: Long): Constraint[PostFilterForm] = {
-    Constraint { form: PostFilterForm => 
-      filterStore.findByName(form.name) match {
+	
+    private def isUniqueName(filterValueId: Long): Constraint[PostFilterValueForm] = {
+    Constraint { form: PostFilterValueForm => 
+      filterValueStore.findByName(form.name) match {
         case None => Valid
-        case Some(filter) if(filter.id == filterId) => Valid
+        case Some(filterValue) if(filterValue.id == filterValueId) => Valid
         case _ => Invalid("Name must be unique")
       }
     }  
-  }    
+  }    	
 }

@@ -9,32 +9,33 @@ import play.api.mvc.{Action, Controller, Request}
 import play.api.mvc.Results.{Ok, Redirect, NotFound}
 import services.mvc.ImplicitHeaderAndFooterData
 
-private[controllers] trait GetFilterAdminEndpoint extends ImplicitHeaderAndFooterData {
+private[controllers] trait GetFilterValueAdminEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
 
   protected def controllerMethod: ControllerMethod
   protected def httpFilters: HttpFilters
   protected def filterStore: FilterStore
+  protected def filterValueStore: FilterValueStore
 
-  def getFilterAdmin(filterId: Long) = controllerMethod.withForm() { implicit authToken =>
+  def getFilterValueAdmin(filterValueId: Long) = controllerMethod.withForm() { implicit authToken =>
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       Action { implicit request =>
-        filterStore.findById(filterId) match {
-          case Some(filter) => {
-             Ok(views.html.Application.admin.admin_filter(filter=filter, errorFields = errorFields, filterValues = filter.filterValues))
+        filterValueStore.findById(filterValueId) match {
+          case Some(filterValue) => {
+             Ok(views.html.Application.admin.admin_filtervalue(filterValue=filterValue, errorFields = errorFields))
           }
-          case _ => NotFound("No such filter")
+          case _ => NotFound("No such filter value")
         }
       }
     }
   }
   
-  def getCreateFilterAdmin() = controllerMethod.withForm() {
+  def getCreateFilterValueAdmin(filterId: Long) = controllerMethod.withForm() {
     implicit authToken =>
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       Action { implicit request =>
-        val tempFilter = Filter(name=flash.get("name").getOrElse(""), publicName=flash.get("publicName").getOrElse(""))
-        Ok(views.html.Application.admin.admin_filter(filter = tempFilter, errorFields = errorFields, filterValues = List()))
+        val tempFilterValue = FilterValue(name=flash.get("name").getOrElse(""), publicName=flash.get("publicName").getOrElse(""), filterId=filterId)
+        Ok(views.html.Application.admin.admin_filtervalue(filterValue = tempFilterValue, errorFields = errorFields))
       }
     }
   }

@@ -69,6 +69,14 @@ class FilterValueStore @Inject() (
        select(fv)
     )
   }
+  
+  def findByName(name: String) : Option[FilterValue] = {
+    from(schema.filterValues)( filterValue =>
+      where(filterValue.name === name)
+      	select(filterValue)
+      ).headOption
+  }
+ 
 
   def filterValues(celebrity: Celebrity): Query[FilterValue] with ManyToMany[FilterValue, CelebrityFilterValue] = {
     schema.celebrityFilterValues.left(celebrity)
