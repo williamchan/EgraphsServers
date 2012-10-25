@@ -15,6 +15,7 @@ import org.apache.commons.mail.HtmlEmail
 import models.Celebrity.CelebrityWithImage
 import play.api.Play.current
 import services.Dimensions
+import views.html.frontend.{celebrity_welcome_email, celebrity_welcome_email_text}
 
 /**
  * Services used by each celebrity instance
@@ -256,20 +257,19 @@ case class Celebrity(id: Long = 0,
   * out password field.  We aren't sending the password, it is just a bunch of *****.  The email
   * includes a link to download the latest iPad app.
   */
-  def sendWelcomeEmail(emailAddress: String, bccEmail: Option[String] = None) {
+  def sendWelcomeEmail(toAddress: String, bccEmail: Option[String] = None) {
     val email = new HtmlEmail()
-    val html = views.html.frontend.celebrity_welcome_email(
-      celebrityName = publicName,
-      celebrityEmail = account.email
-    )
 
     email.setFrom("noreply@egraphs.com", "Egraphs")
-    email.addTo(emailAddress, publicName)
+    email.addTo(toAddress, publicName)
     bccEmail.map(bcc => email.addBcc(bcc))
     email.setSubject("Welcome to Egraphs")
-    email.setHtmlMsg(html.toString())
 
-    services.transactionalMail.send(email)
+    services.transactionalMail.send(
+      email, 
+      text=Some(celebrity_welcome_email_text(publicName, toAddress).toString), 
+      html=Some(celebrity_welcome_email(publicName, toAddress))
+    )
   }
 
   //
