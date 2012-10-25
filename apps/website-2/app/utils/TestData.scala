@@ -95,11 +95,11 @@ object TestData {
   }
 
   def newSavedFilter : Filter = {
-    Filter(name = TestData.generateUsername(), publicname = TestData.generateUsername()).save()
+    Filter(name = TestData.generateUsername(), publicName = TestData.generateUsername()).save()
   }
 
   def newSavedFilterValue(filterId: Long) : FilterValue = {
-    FilterValue(name = TestData.generateUsername(), publicname = TestData.generateUsername(), filterId = filterId).save()
+    FilterValue(name = TestData.generateUsername(), publicName = TestData.generateUsername(), filterId = filterId).save()
   }
 
   private def newProduct(celebrity: Celebrity): Product = {

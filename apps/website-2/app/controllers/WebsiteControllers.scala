@@ -7,6 +7,7 @@ import services.blobs.Blobs
 import services.mail.{BulkMailList, TransactionalMail}
 import services.payment.Payment
 import models._
+import models.filters._
 import services.db.DBSession
 import services.social.FacebookAppId
 import services.http._
@@ -58,6 +59,7 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val administratorStore = instance[AdministratorStore]
   override protected val celebrityStore = instance[CelebrityStore]
   override protected val customerStore = instance[CustomerStore]
+  override protected def filterStore = instance[FilterStore]
   override protected val orderStore = instance[OrderStore]
   override protected val printOrderStore = instance[PrintOrderStore]
   override protected val productStore = instance[ProductStore]

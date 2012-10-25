@@ -24,7 +24,7 @@ case class FilterValue(
   id: Long = 0L,
   filterId: Long = 0L,
   name: String = "",
-  publicname: String = "",
+  publicName: String = "",
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: FilterServices = AppConfig.instance[FilterServices]
@@ -38,7 +38,7 @@ case class FilterValue(
 
   def save(): FilterValue = {
     require(!name.isEmpty, "FilterValue: name must be specified")
-    require(!publicname.isEmpty, "FilterValue: publicname must be specified")
+    require(!publicName.isEmpty, "FilterValue: publicName must be specified")
     require(filterId != 0, "FilterValue: filterId must be provided")
     services.filterValueStore.save(this)
   }
@@ -81,7 +81,7 @@ class FilterValueStore @Inject() (
 
   override def defineUpdate(theOld: FilterValue, theNew: FilterValue) = {
     updateIs(
-      theOld.publicname := theNew.publicname,
+      theOld.publicName := theNew.publicName,
       theOld.name := theNew.name,
       theOld.filterId := theNew.filterId,
       theOld.created := theNew.created,

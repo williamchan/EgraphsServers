@@ -20,7 +20,7 @@ class FilterTests extends EgraphsUnitTest
   //
 
   override def newEntity = {
-    Filter(name = TestData.generateUsername(), publicname = TestData.generateUsername())
+    Filter(name = TestData.generateUsername(), publicName = TestData.generateUsername())
   }
 
   override def saveEntity(toSave: Filter) = {
@@ -42,13 +42,13 @@ class FilterTests extends EgraphsUnitTest
   //
 
   "Filter" should "require a name" in new EgraphsTestApplication {
-    val exception = intercept[IllegalArgumentException] {Filter(publicname = "herp").save()}
+    val exception = intercept[IllegalArgumentException] {Filter(publicName = "herp").save()}
     exception.getLocalizedMessage should include("Filter: name must be specified")
   }
 
-  "Filter" should "require a publicname" in new EgraphsTestApplication {
+  "Filter" should "require a publicName" in new EgraphsTestApplication {
     val exception = intercept[IllegalArgumentException] {Filter(name = "herp").save()}
-    exception.getLocalizedMessage should include("Filter: publicname must be specified")
+    exception.getLocalizedMessage should include("Filter: publicName must be specified")
   }
 
   "Filter" should "return an associated value" in new EgraphsTestApplication {

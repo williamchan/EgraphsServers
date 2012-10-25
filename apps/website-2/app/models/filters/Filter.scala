@@ -34,7 +34,7 @@ case class FilterServices @Inject() (
 case class Filter(
   id: Long = 0L,
   name: String = "",
-  publicname: String = "",
+  publicName: String = "",
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: FilterServices = AppConfig.instance[FilterServices]
@@ -46,7 +46,7 @@ case class Filter(
 
   def save(): Filter = {
     require(!name.isEmpty, "Filter: name must be specified")
-    require(!publicname.isEmpty, "Filter: publicname must be specified")
+    require(!publicName.isEmpty, "Filter: publicName must be specified")
     services.filterStore.save(this)
   }
 
@@ -73,6 +73,20 @@ class FilterStore @Inject() (
     schema.filterValueRelationships.left(filterValue)
   }
 
+  def getFilters: Query[Filter] = {
+    from(schema.filters)(
+      f =>
+      select(f)
+    )
+  }
+  
+  def findByName(name: String) : Option[Filter] = {
+    from(schema.filters)( filter =>
+      where(filter.name === name)
+      	select(filter)
+      ).headOption
+  }
+ 
   //
   // SavesWithLongKey[Filter] methods
   //
@@ -80,7 +94,7 @@ class FilterStore @Inject() (
 
   override def defineUpdate(theOld: Filter, theNew: Filter) = {
     updateIs(
-      theOld.publicname := theNew.publicname,
+      theOld.publicName := theNew.publicName,
       theOld.name := theNew.name,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated

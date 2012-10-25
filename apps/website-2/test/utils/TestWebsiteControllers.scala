@@ -6,6 +6,7 @@ import forms.purchase.{PurchaseFormChecksFactory, FormReaders, PurchaseFormFacto
 import services.mail.{BulkMailList, TransactionalMail}
 import services.payment.Payment
 import models._
+import models.filters._
 import services.db.DBSession
 import play.api.mvc.Controller
 import controllers.website.AllWebsiteEndpoints
@@ -66,6 +67,7 @@ case class TestWebsiteControllers @Inject()(
   override def orderCompleteViewModelFactory = instance[OrderCompleteViewModelFactory]
   
   override def egraphQueryFilters = instance[EgraphQueryFilters]
+  override def filterStore = instance[FilterStore]
   override def inventoryBatchQueryFilters = instance[InventoryBatchQueryFilters]
   override def orderQueryFilters = instance[OrderQueryFilters]
   override def printOrderQueryFilters = instance[PrintOrderQueryFilters]
