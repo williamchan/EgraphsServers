@@ -1,10 +1,7 @@
 package controllers.website.consumer
 
-import play.api.mvc.Controller
-import play.api.mvc.Action
-import play.api.mvc.Result
+import play.api.mvc.{Action, Controller, Result}
 import play.api.mvc.Results.{Ok, Redirect}
-import services.http.POSTControllerMethod
 import services.http.{WithoutDBConnection, EgraphsSession, POSTControllerMethod}
 import models._
 import services.mvc.ImplicitHeaderAndFooterData
@@ -13,11 +10,11 @@ import services.http.forms.Form
 import controllers.WebsiteControllers
 import services.db.{TransactionReadCommitted, TransactionSerializable, DBSession}
 import play.api.mvc.Results.Redirect
-import scala.Some
-import services.logging.Logging
 import Form.Conversions._
 import play.api.mvc.Request
 import play.api.mvc.AnyContent
+import services.ConsumerApplication
+import services.logging.Logging
 import services.http.EgraphsSession.Conversions._
 
 /**
@@ -35,6 +32,7 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
   protected def accountStore: AccountStore
   protected def customerStore: CustomerStore
   protected def dbSession: DBSession
+  protected def consumerApp: ConsumerApplication
 
   //
   // Controllers
@@ -50,7 +48,12 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
   
         // Shoot out a welcome email
         dbSession.connected(TransactionReadCommitted) {
-          Customer.sendNewCustomerEmail(account = account, verificationNeeded = true, mail = customer.services.mail)
+          Customer.sendNewCustomerEmail(
+            account = account, 
+            verificationNeeded = true, 
+            mail = customer.services.mail, 
+            consumerApp = consumerApp
+           )
         }
 
         Redirect(controllers.routes.WebsiteControllers.getAccountSettings()).withSession(

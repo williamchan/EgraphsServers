@@ -27,13 +27,10 @@ trait PostBuyDemoProductEndpoint { this: Controller =>
 
   protected def dbSession: DBSession
   protected def httpFilters: HttpFilters
-  protected def transactionalMail: TransactionalMail
-  protected def payment: Payment
-  protected def accountStore: AccountStore
-  protected def customerStore: CustomerStore
   protected def postController: POSTControllerMethod  
   protected def formReaders: FormReaders
   protected def config: ConfigFileProxy
+  protected def payment: Payment
 
   case class DemoPurchase(
     recipientName: String,
@@ -74,20 +71,15 @@ trait PostBuyDemoProductEndpoint { this: Controller =>
               recipientEmail = buyDemoData.recipientEmail,
               buyerName = buyDemoData.buyerName,
               buyerEmail = buyDemoData.buyerEmail,
-            stripeTokenId = buyDemoData.stripeTokenId.get, // this must always be set, and it should be
-            desiredText = buyDemoData.desiredText,
-            personalNote = buyDemoData.personalNote,
-            celebrity = celebrity,
-            product = product,
-            totalAmountPaid = product.price,
-            billingPostalCode = "55555",
-            flash = request.flash,
-            mail = transactionalMail,
-            customerStore = customerStore,
-            accountStore = accountStore,
-            dbSession = dbSession,
-            payment = payment,
-            isDemo = true
+              stripeTokenId = buyDemoData.stripeTokenId.get, // this must always be set, and it should be
+              desiredText = buyDemoData.desiredText,
+              personalNote = buyDemoData.personalNote,
+              celebrity = celebrity,
+              product = product,
+              totalAmountPaid = product.price,
+              billingPostalCode = "55555",
+              flash = request.flash,
+              isDemo = true
             )
             purchaseHandler.execute()
           }

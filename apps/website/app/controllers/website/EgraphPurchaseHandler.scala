@@ -1,12 +1,11 @@
 package controllers.website
 
+import com.google.inject._
 import models._
 import models.enums._
-import play.api.mvc.Flash
-import play.api.mvc.RequestHeader
+import play.api.mvc._
 import services.mail.TransactionalMail
 import services.mvc.OrderConfirmationEmail
-import services.{Utils, AppConfig}
 import controllers.WebsiteControllers
 import services.payment.{Charge, Payment}
 import sjson.json.Serializer
@@ -21,10 +20,18 @@ import java.text.SimpleDateFormat
 import org.apache.commons.mail.HtmlEmail
 import org.joda.money.Money
 import services.http.forms.purchase.CheckoutShippingForm
-import models.Customer
-import models.CashTransaction
-import models.FailedPurchaseData
 import controllers.routes.WebsiteControllers.getFAQ
+import services._
+
+case class EgraphPurchaseHandlerServices @Inject() (
+  mail: TransactionalMail,
+  customerStore: CustomerStore,
+  accountStore: AccountStore,
+  dbSession: DBSession,
+  payment: Payment,
+  serverSessions: ServerSessionFactory,
+  consumerApp: ConsumerApplication
+)
 
 /**
  * Performs the meat of the purchase controller's interaction with domain
@@ -47,12 +54,7 @@ case class EgraphPurchaseHandler(
   printingOption: PrintingOption = PrintingOption.DoNotPrint,
   shippingForm: Option[CheckoutShippingForm.Valid] = None,
   writtenMessageRequest: WrittenMessageRequest = WrittenMessageRequest.SpecificMessage,
-  mail: TransactionalMail = AppConfig.instance[TransactionalMail],
-  customerStore: CustomerStore = AppConfig.instance[CustomerStore],
-  accountStore: AccountStore = AppConfig.instance[AccountStore],
-  dbSession: DBSession = AppConfig.instance[DBSession],
-  payment: Payment = AppConfig.instance[Payment],
-  serverSessions: ServerSessionFactory = AppConfig.instance[ServerSessionFactory],
+  services: EgraphPurchaseHandlerServices = AppConfig.instance[EgraphPurchaseHandlerServices],
   isDemo: Boolean = false
 )(
   implicit request: RequestHeader
@@ -102,11 +104,10 @@ case class EgraphPurchaseHandler(
 
   def performPurchase(): Either[PurchaseFailed, Order] = {
     val charge = try {
-      payment.charge(totalAmountPaid, stripeTokenId, "Egraph Order from " + buyerEmail)
+      services.payment.charge(totalAmountPaid, stripeTokenId, "Egraph Order from " + buyerEmail)
     } catch {
       case stripeException: com.stripe.exception.StripeException => {
         val failedPurchaseData = saveFailedPurchaseData(
-          dbSession = dbSession, 
           purchaseData = purchaseData, 
           errorDescription = "Credit card issue: " + stripeException.getLocalizedMessage
         )
@@ -131,24 +132,19 @@ case class EgraphPurchaseHandler(
         isDemo = isDemo,
         charge = charge,
         celebrity = celebrity,
-        product = product,
-        dbSession = dbSession,
-        accountStore = accountStore,
-        customerStore = customerStore)
+        product = product)
     } catch {
       case e: InsufficientInventoryException => {
-        payment.refund(charge.id)
+        services.payment.refund(charge.id)
         val failedPurchaseData = saveFailedPurchaseData(
-          dbSession = dbSession, 
           purchaseData = purchaseData, 
           errorDescription = e.getLocalizedMessage
         )
         return Left(PurchaseFailedInsufficientInventory(failedPurchaseData))
       }
       case e: Exception => {
-        payment.refund(charge.id)
+        services.payment.refund(charge.id)
         val failedPurchaseData = saveFailedPurchaseData(
-          dbSession = dbSession, 
           purchaseData = purchaseData, 
           errorDescription = e.getLocalizedMessage
         )
@@ -168,13 +164,13 @@ case class EgraphPurchaseHandler(
       order.created,
       order.expectedDate.get,
       cashTransaction.cash,
-      getFAQ().absoluteURL(secure=true) + "#how-long",
+      services.consumerApp.absoluteUrl(getFAQ().url + "#how-long"),
       maybePrintOrder.isDefined,
-      mail
+      services.mail
     ).send()
 
     // Clear out the shopping cart and redirect
-    serverSessions.celebrityStorefrontCart(celebrity.id)(request.session).emptied.save()
+    services.serverSessions.celebrityStorefrontCart(celebrity.id)(request.session).emptied.save()
     Right(order)
   }
 
@@ -186,9 +182,7 @@ case class EgraphPurchaseHandler(
   case class PurchaseFailedInsufficientInventory(override val failedPurchaseData: FailedPurchaseData) extends PurchaseFailed(failedPurchaseData)
   case class PurchaseFailedError(override val failedPurchaseData: FailedPurchaseData) extends PurchaseFailed(failedPurchaseData)
 
-  private def persistOrder(dbSession: DBSession,
-                           customerStore: CustomerStore,
-                           buyerEmail: String,
+  private def persistOrder(buyerEmail: String,
                            buyerName: String,
                            recipientEmail: String,
                            product: Product,
@@ -203,19 +197,18 @@ case class EgraphPurchaseHandler(
                            shippingForm: Option[CheckoutShippingForm.Valid],
                            writtenMessageRequest: WrittenMessageRequest,
                            isDemo: Boolean,
-                           accountStore: AccountStore,
                            celebrity: Celebrity): (Order, Customer, Customer, CashTransaction, Option[PrintOrder]) = {
-    dbSession.connected(TransactionSerializable) {
+    services.dbSession.connected(TransactionSerializable) {
       // Get buyer and recipient accounts and create customer face if necessary
-      val buyer = customerStore.findOrCreateByEmail(buyerEmail, buyerName)
+      val buyer = services.customerStore.findOrCreateByEmail(buyerEmail, buyerName)
       val recipient = if (buyerEmail == recipientEmail) {
         buyer
       } else {
-        customerStore.findOrCreateByEmail(recipientEmail, recipientName)
+        services.customerStore.findOrCreateByEmail(recipientEmail, recipientName)
       }
 
       // Persist the Order with the Stripe charge info.
-      var order = buyer.buy(product, recipient, recipientName = recipientName, messageToCelebrity = personalNote, requestedMessage = desiredText)
+      val order = buyer.buy(product, recipient, recipientName = recipientName, messageToCelebrity = personalNote, requestedMessage = desiredText)
         .copy(amountPaidInCurrency = product.priceInCurrency)
         .withWrittenMessageRequest(writtenMessageRequest)
         .withPaymentStatus(PaymentStatus.Charged)
@@ -264,8 +257,8 @@ case class EgraphPurchaseHandler(
     }
   }
 
-  private def saveFailedPurchaseData(dbSession: DBSession, purchaseData: String, errorDescription: String): FailedPurchaseData =  {
-    dbSession.connected(TransactionSerializable) {
+  private def saveFailedPurchaseData(purchaseData: String, errorDescription: String): FailedPurchaseData =  {
+    services.dbSession.connected(TransactionSerializable) {
       FailedPurchaseData(purchaseData = purchaseData, errorDescription = errorDescription.take(128 /*128 is the column width*/)).save()
     }
   }

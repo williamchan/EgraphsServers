@@ -8,7 +8,7 @@ import services.mail.TransactionalMail
 import org.apache.commons.mail.HtmlEmail
 import services.http.{SafePlayParams, POSTControllerMethod}
 import services.mvc.ImplicitHeaderAndFooterData
-import services.Utils
+import services.{ConsumerApplication, Utils}
 import services.http.filters.HttpFilters
 import controllers.routes.WebsiteControllers.getResetPassword
 import egraphs.authtoken.AuthenticityToken
@@ -23,6 +23,7 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
   protected def customerStore: CustomerStore
   protected def httpFilters: HttpFilters  
   protected def transactionalMail: TransactionalMail
+  protected def consumerApp: ConsumerApplication
 
   def postRecoverAccount() = postController() {
     AuthenticityToken.makeAvailable() { implicit authToken =>
@@ -53,10 +54,11 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
     email.addReplyTo("support@egraphs.com")
     email.addTo(account.email)
     email.setSubject("Egraphs Password Recovery")
+    val resetPasswordUrl = consumerApp.absoluteUrl(getResetPassword(account.email, account.resetPasswordKey.get).url)
     val htmlMsg = views.html.Application.email.reset_password_email(
         customerName = customer.name,
         email = account.email,
-        resetPasswordUrl = getResetPassword(account.email, account.resetPasswordKey.get).absoluteURL(secure=true)
+        resetPasswordUrl = resetPasswordUrl
       )
     transactionalMail.send(email, html = Some(htmlMsg))
   }

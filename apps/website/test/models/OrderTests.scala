@@ -2,7 +2,7 @@ package models
 
 import enums._
 import utils._
-import services.AppConfig
+import services.{AppConfig, ConsumerApplication}
 import org.joda.money.CurrencyUnit
 import services.payment.{Charge, NiceCharge}
 import javax.mail.internet.InternetAddress
@@ -18,6 +18,7 @@ class OrderTests extends EgraphsUnitTest
   private val orderStore = AppConfig.instance[OrderStore]
   private val orderQueryFilters = AppConfig.instance[OrderQueryFilters]
   private val cashTransactionStore = AppConfig.instance[CashTransactionStore]
+  private val consumerApp = AppConfig.instance[ConsumerApplication]
 
   //
   // SavingEntityTests[Order] methods
@@ -458,7 +459,7 @@ class OrderTests extends EgraphsUnitTest
     val results = List((order, Option(egraph)), (order, None))
 
     implicit val request = FakeRequest()
-    val fulfilledViews = GalleryOrderFactory.makeFulfilledEgraphViewModel(results, "fakeappid")(request)
+    val fulfilledViews = GalleryOrderFactory.makeFulfilledEgraphViewModel(results, "fakeappid", consumerApp)(request)
     //create an egraph
 
     fulfilledViews.size should be (2)

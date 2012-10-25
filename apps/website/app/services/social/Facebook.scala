@@ -24,10 +24,10 @@ object Facebook {
    * Facebook documentation: https://developers.facebook.com/docs/authentication/server-side/
    * @param fbAppId see Facebook documentation
    * @param state see Facebook documentation
+   * @param fbCallbackUrl see Facebook documentation
    * @return Facebook url at which to begin the Oauth flow
    */
-  def getFbOauthUrl(fbAppId: String, state: String)(implicit request: RequestHeader): String = {
-    val fbCallbackUrl = GetFacebookLoginCallbackEndpoint.getCallbackUrl
+  def getFbOauthUrl(fbAppId: String, state: String, fbCallbackUrl: String)(implicit request: RequestHeader): String = {
     "https://www.facebook.com/dialog/oauth?client_id=" + fbAppId +
       "&redirect_uri=" + fbCallbackUrl +
       "&scope=email" +
@@ -39,13 +39,13 @@ object Facebook {
    * @param code see Facebook documentation
    * @param facebookAppId see Facebook documentation
    * @param fbAppSecret see Facebook documentation
+   * @param fbCallbackUrl see Facebook documentation
    * @return an access token, which can be used to make calls to Facebook's API on behalf of a Facebook user
    */
-  def getFbAccessToken(code: String, facebookAppId: String, fbAppSecret: String)
+  def getFbAccessToken(code: String, facebookAppId: String, fbAppSecret: String, fbCallbackUrl: String)
   (implicit request: RequestHeader)
   : String = 
   {
-    val fbCallbackUrl = GetFacebookLoginCallbackEndpoint.getCallbackUrl
     val fbOauthTokenUrlStr = "https://graph.facebook.com/oauth/access_token?" +
       "client_id=" + facebookAppId +
       "&redirect_uri=" + fbCallbackUrl +

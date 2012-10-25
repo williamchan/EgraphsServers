@@ -7,7 +7,7 @@ import play.api.mvc._
 import play.api.mvc.Results.Redirect
 import services.db.{TransactionSerializable, DBSession}
 import services.http.ControllerMethod
-import services.Utils
+import services.ConsumerApplication
 import services.social.Facebook
 import services.logging.Logging
 import services.config.ConfigFileProxy
@@ -23,6 +23,7 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
   protected def customerStore: CustomerStore
   protected def config: ConfigFileProxy
   protected def facebookAppId: String
+  protected def consumerApp: ConsumerApplication
 
   private val fbAppSecretKey = "fb.appsecret"
 
@@ -51,15 +52,23 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
 
       code match {
         case Some(fbCode) => {
-          val accessToken = Facebook.getFbAccessToken(code = fbCode, facebookAppId = facebookAppId, fbAppSecret = config.fbAppsecret)
+          val fbCallbackUrl = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getFacebookLoginCallback().url)
+          val accessToken = Facebook.getFbAccessToken(code = fbCode, facebookAppId = facebookAppId, 
+              fbAppSecret = config.fbAppsecret, fbCallbackUrl = fbCallbackUrl)
           val fbUserInfo = Facebook.getFbUserInfo(accessToken = accessToken)
           val (customer, shouldSendWelcomeEmail) = dbSession.connected(TransactionSerializable) {
-            loginViaFacebook(registrationName = fbUserInfo(Facebook._name).toString, registrationEmail = fbUserInfo(Facebook._email).toString, user_id = fbUserInfo(Facebook._id).toString)
+            loginViaFacebook(registrationName = fbUserInfo(Facebook._name).toString, 
+                registrationEmail = fbUserInfo(Facebook._email).toString, user_id = fbUserInfo(Facebook._id).toString)
           }
           if (shouldSendWelcomeEmail) {
             dbSession.connected(TransactionSerializable) {
               val account = customer.account.withResetPasswordKey.save()
-              Customer.sendNewCustomerEmail(account = account, verificationNeeded = false, mail = customer.services.mail)
+              Customer.sendNewCustomerEmail(
+                account = account, 
+                verificationNeeded = false, 
+                mail = customer.services.mail,
+                consumerApp = consumerApp
+              )
             }
           }
 
@@ -117,11 +126,5 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
           throw new RuntimeException("Facebook authentication failed to verify 'state' parameter")
         }
     }
-  }
-}
-
-object GetFacebookLoginCallbackEndpoint {
-  def getCallbackUrl(implicit request: RequestHeader): String = {
-    controllers.routes.WebsiteControllers.getFacebookLoginCallback().absoluteURL(secure=true)
   }
 }

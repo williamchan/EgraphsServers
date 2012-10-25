@@ -11,6 +11,7 @@ import services.mail.TransactionalMail
 import play.api.mvc.RequestHeader
 import controllers.routes.WebsiteControllers.getVerifyAccount
 import play.api.templates.Html
+import services.ConsumerApplication
 import services.config.ConfigFileProxy
 
 /** Services used by each instance of Customer */
@@ -105,8 +106,13 @@ case class Customer(
 }
 
 object Customer {
-  def sendNewCustomerEmail(account: Account, verificationNeeded: Boolean = false, mail: TransactionalMail)
-   (implicit request: RequestHeader){
+  def sendNewCustomerEmail(
+      account: Account, 
+      verificationNeeded: Boolean = false, 
+      mail: TransactionalMail, 
+      consumerApp: ConsumerApplication
+  )(implicit request: RequestHeader)
+  {
     val email = new HtmlEmail()
     email.setFrom("noreply@egraphs.com")
     email.addReplyTo("noreply@egraphs.com")
@@ -114,7 +120,7 @@ object Customer {
     email.setSubject("Welcome to Egraphs!")
 
     val (textMsg: String, htmlMsg: Html) = if (verificationNeeded) {
-      val verifyPasswordUrl = getVerifyAccount(account.email, account.resetPasswordKey.get).absoluteURL(secure=true)
+      val verifyPasswordUrl = consumerApp.absoluteUrl(getVerifyAccount(account.email, account.resetPasswordKey.get).url)
       val html = views.html.frontend.email_account_verification(verifyPasswordUrl = verifyPasswordUrl)
       val text = views.html.frontend.email_account_verification_text(verifyPasswordUrl).toString()
       (text, html)

@@ -2,7 +2,7 @@ package controllers.website
 
 import play.api._
 import play.api.mvc._
-import services.Utils
+import services.ConsumerApplication
 import services.http.ControllerMethod
 import services.social.Facebook
 import java.util.UUID
@@ -21,6 +21,7 @@ private[controllers] trait GetLoginEndpoint extends ImplicitHeaderAndFooterData 
   protected def facebookAppId: String
   protected def controllerMethod: ControllerMethod
   protected def formReaders: FormReaders
+  protected def consumerApp: ConsumerApplication
 
   //
   // Controllers
@@ -29,7 +30,8 @@ private[controllers] trait GetLoginEndpoint extends ImplicitHeaderAndFooterData 
     Action { implicit request =>
       // Save a new FB state ID into the session
       val fbState = UUID.randomUUID().toString
-      val fbOauthUrl = Facebook.getFbOauthUrl(fbAppId = facebookAppId, state = fbState)
+      val fbCallbackUrl = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getFacebookLoginCallback().url)
+      val fbOauthUrl = Facebook.getFbOauthUrl(fbAppId = facebookAppId, state = fbState, fbCallbackUrl = fbCallbackUrl)
       implicit val flash = request.flash
 
       // Render

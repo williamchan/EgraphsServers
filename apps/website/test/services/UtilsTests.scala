@@ -4,6 +4,7 @@ import utils._
 import controllers.WebsiteControllers
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
+import services.config.ConfigFileProxy
 
 @RunWith(classOf[JUnitRunner])
 class UtilsTests extends EgraphsUnitTest
@@ -49,14 +50,6 @@ class UtilsTests extends EgraphsUnitTest
 
     evaluating { throwsExceptionMidUsage } should produce [IllegalStateException]
     closeable.closed should be (true)
-  }
-
-
-  "composeUrl" should "include just one slash when joining a base URL to a relative URL" in {
-    Utils.composeUrl("https://www.egraphs.com/", "/login") should be("https://www.egraphs.com/login")
-    Utils.composeUrl("https://www.egraphs.com/", "login")  should be("https://www.egraphs.com/login")
-    Utils.composeUrl("https://www.egraphs.com" , "/login") should be("https://www.egraphs.com/login")
-    Utils.composeUrl("https://www.egraphs.com" , "login")  should be("https://www.egraphs.com/login")
   }
 
   "saveToFile" should "save bytes parameter to a file" in {

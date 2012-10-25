@@ -3,12 +3,13 @@ package services.blobs
 import utils.EgraphsUnitTest
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
+import services.AppConfig
 
 @RunWith(classOf[JUnitRunner])
 class FileSystemBlobVendorTests extends EgraphsUnitTest {
   import Blobs.Conversions._
 
-  val underTest = FileSystemBlobVendor
+  private val underTest = AppConfig.instance[FileSystemBlobVendor]
 
   val blobStore = underTest.context.getBlobStore
 

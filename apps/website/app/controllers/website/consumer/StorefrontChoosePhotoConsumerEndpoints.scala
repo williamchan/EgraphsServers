@@ -5,7 +5,7 @@ import play.api.mvc.Controller
 import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
 import play.api.mvc.Results.{Redirect, Ok}
 import services.http.forms.purchase.PurchaseFormFactory
-import services.Utils
+import services.{ConsumerApplication, Utils}
 import models.{ProductStore, Celebrity, Product}
 import controllers.WebsiteControllers
 import services.mvc.celebrity.CelebrityViewConversions
@@ -34,6 +34,7 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
   protected def facebookAppId: String
   protected def breadcrumbData: StorefrontBreadcrumbData
   protected def productStore: ProductStore
+  protected def consumerApp: ConsumerApplication
 
   //
   // Controllers
@@ -99,7 +100,7 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
   
           case indexOfProductInProductList =>
             val productViews = for (product <- products) yield {
-              product.asChoosePhotoCarouselView(celebUrlSlug=celeb.urlSlug, fbAppId = facebookAppId)
+              product.asChoosePhotoCarouselView(celebUrlSlug=celeb.urlSlug, fbAppId = facebookAppId, consumerApp = consumerApp)
             }
   
             implicit def crumbs = breadcrumbData.crumbsForRequest(celeb.id, celebrityUrlSlug, Some(productUrlSlug))(request)

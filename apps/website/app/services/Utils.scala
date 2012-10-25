@@ -7,7 +7,6 @@ import com.google.inject.Inject
 import java.util
 import org.squeryl.Query
 import java.io._
-import scala.Some
 import java.io.{Serializable, PrintWriter, StringWriter}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.Result
@@ -184,25 +183,6 @@ class Utils @Inject() {
     val out = new FileOutputStream(file)
     out.write(bytes)
     out.close()
-  }
-
-  /**
-   * Why am I writing this? Because the application.baseUrl config parameter seems to have a trailing "/" in all of the
-   * Play examples while a url from ActionDefinitions has a leading "/". So, I wanted to make sure that we are using
-   * application.baseUrl correctly and also correctly composing absolute Urls.
-   *
-   * I am hopeful these URL-related helper methods will go away once we move to Play 2.0.
-   *
-   * @param baseUrl eg "https://www.egraphs.com/"
-   * @param relativeUrl eg "/login"
-   * @return the concatenated full Url
-   */
-  private[services] def composeUrl(baseUrl: String, relativeUrl: String): String = {
-    (baseUrl.endsWith("/"), relativeUrl.startsWith("/")) match {
-      case (true, true) => baseUrl + relativeUrl.substring(1)
-      case (true, false) | (false, true) => baseUrl + relativeUrl
-      case (false, false) => baseUrl + "/" + relativeUrl
-    }
   }
 }
 

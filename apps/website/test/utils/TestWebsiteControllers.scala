@@ -11,7 +11,7 @@ import play.api.mvc.Controller
 import controllers.website.AllWebsiteEndpoints
 import java.util.Properties
 import forms._
-import services.{Utils, AppConfig}
+import services.{AppConfig, ConsumerApplication, Utils}
 import services.mvc.celebrity.CatalogStarsQuery
 import services.mvc.{OrderCompleteViewModelFactory, StorefrontBreadcrumbData}
 import services.http.filters.HttpFilters
@@ -67,5 +67,6 @@ case class TestWebsiteControllers @Inject()(
 
   override def catalogStarsQuery = instance[CatalogStarsQuery]
   override def orderCompleteViewModelFactory = instance[OrderCompleteViewModelFactory]
-  override def printOrderQueryFilters = instance[PrintOrderQueryFilters]  
+  override def printOrderQueryFilters = instance[PrintOrderQueryFilters]
+  override def consumerApp = instance[ConsumerApplication]
 }

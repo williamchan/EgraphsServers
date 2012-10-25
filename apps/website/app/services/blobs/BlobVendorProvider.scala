@@ -2,6 +2,7 @@ package services.blobs
 
 import com.google.inject.{Inject, Provider}
 import models.BlobKeyStore
+import services._
 import services.cache.CacheFactory
 import services.inject.InjectionProvider
 import services.config.ConfigFileProxy
@@ -14,7 +15,8 @@ private[blobs] class BlobVendorProvider @Inject() (
   blobKeyStore: BlobKeyStore,
   cacheFactory: CacheFactory,
   config: ConfigFileProxy,
-  val s3: S3BlobVendor
+  val s3: S3BlobVendor,
+  consumerApp: ConsumerApplication
 ) extends InjectionProvider[BlobVendor]
 {
   private val blobstoreType = config.blobstoreVendor
@@ -29,7 +31,7 @@ private[blobs] class BlobVendorProvider @Inject() (
         }
 
       case "filesystem" =>
-        decorateCache(FileSystemBlobVendor)
+        decorateCache(new FileSystemBlobVendor(consumerApp))
 
       case unknownType =>
         throw new IllegalStateException(

@@ -1,19 +1,17 @@
 package controllers.website
 
-import services.http.{SafePlayParams, ControllerMethod}
 import play.api._
 import play.api.mvc._
 import models._
 import controllers.WebsiteControllers
 import enums.{PrivacyStatus, EgraphState}
 import models.frontend.egraphs._
-import scala.Some
 import services.mvc.ImplicitHeaderAndFooterData
 import models.GalleryOrderFactory
+import services.ConsumerApplication
+import services.http.{SafePlayParams, ControllerMethod}
 import services.http.EgraphsSession.Conversions._
-import services.http.filters.RequireCustomerUsername
-import services.http.filters.RequireCustomerId
-import services.http.filters.HttpFilters
+import services.http.filters._
 import egraphs.authtoken.AuthenticityToken
 
 /**
@@ -27,12 +25,14 @@ import egraphs.authtoken.AuthenticityToken
  *
  **/
 private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
+
   protected def controllerMethod: ControllerMethod
   protected def customerStore: CustomerStore
   protected def administratorStore: AdministratorStore
   protected def orderStore: OrderStore
   protected def httpFilters: HttpFilters
   protected def facebookAppId: String
+  protected def consumerApp: ConsumerApplication
 
   import SafePlayParams.Conversions._
 
@@ -95,13 +95,13 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
     val orders:List[EgraphViewModel] = galleryControl match {
       case AdminGalleryControl | OwnerGalleryControl =>
         GalleryOrderFactory.makePendingEgraphViewModel(pendingOrders).toList ++
-          GalleryOrderFactory.makeFulfilledEgraphViewModel(fulfilledOrders, facebookAppId).flatten.toList
+          GalleryOrderFactory.makeFulfilledEgraphViewModel(fulfilledOrders, facebookAppId, consumerApp).flatten.toList
       case _ =>
         if (customer.isGalleryVisible){
           GalleryOrderFactory.makeFulfilledEgraphViewModel(fulfilledOrders.filter(
-            orderAndOption => {
-              orderAndOption._1.privacyStatus == PrivacyStatus.Public
-            }), facebookAppId).flatten.toList
+            orderAndOption => {orderAndOption._1.privacyStatus == PrivacyStatus.Public}), 
+            facebookAppId,
+            consumerApp).flatten.toList
         } else {
           List()
         }

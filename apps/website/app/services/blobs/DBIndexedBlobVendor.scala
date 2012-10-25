@@ -3,7 +3,7 @@ package services.blobs
 import com.google.inject.Inject
 import models.{BlobKey, BlobKeyStore}
 import services.logging.Logging
-import services.Utils
+import services._
 import org.jclouds.blobstore.domain.Blob
 
 /**
@@ -13,8 +13,12 @@ import org.jclouds.blobstore.domain.Blob
  * @param blobKeyStore store for a [[models.BlobKey]]
  * @param blobVendorDelegate vendor to which which this class delegates the actual blob management.
  */
-class DBIndexedBlobVendor @Inject()(blobKeyStore: BlobKeyStore, protected val blobVendorDelegate: BlobVendor)
-  extends FileSystemBlobVendor
+class DBIndexedBlobVendor @Inject()(
+  blobKeyStore: BlobKeyStore, 
+  protected val blobVendorDelegate: BlobVendor, 
+  consumerApp: ConsumerApplication
+)
+  extends FileSystemBlobVendor(consumerApp)
   with BlobVendorComposition
 {
 

@@ -1,12 +1,14 @@
 package controllers
 
+import models._
 import website._
 import play.api.mvc.{Action, Controller}
 import play.api.mvc.Results.Redirect
 import services.blobs.Blobs
 import services.mail.{BulkMailList, TransactionalMail}
 import services.payment.Payment
-import models._
+import services.ConsumerApplication
+import services.blobs.Blobs
 import services.db.DBSession
 import services.social.FacebookAppId
 import services.http._
@@ -25,6 +27,7 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
 
   // Provide endpoint dependencies
   override protected val config = instance[ConfigFileProxy]
+  override protected val consumerApp = instance[ConsumerApplication]
   override protected val facebookAppId = annotatedInstance[FacebookAppId, String]
 
   override protected def breadcrumbData = instance[StorefrontBreadcrumbData]

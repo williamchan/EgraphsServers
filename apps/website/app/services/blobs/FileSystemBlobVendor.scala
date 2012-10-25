@@ -1,14 +1,16 @@
 package services.blobs
 
+import com.google.inject.Inject
 import java.util.Properties
 import org.jclouds.filesystem.reference.FilesystemConstants
 import org.jclouds.blobstore.BlobStoreContextFactory
 import play.api.mvc.Request
+import services._
 
 /**
  * [[services.blobs.BlobVendor]] implementation on the local system.
  */
-private[blobs] class FileSystemBlobVendor extends BlobVendor {
+private[blobs] class FileSystemBlobVendor @Inject() (consumerApp: ConsumerApplication) extends BlobVendor {
   //
   // BlobVendor members
   //
@@ -31,7 +33,7 @@ private[blobs] class FileSystemBlobVendor extends BlobVendor {
       None
     }
     else {
-      Some(controllers.routes.WebsiteControllers.getBlob(key).url)
+      Some(consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getBlob(key).url))
     }
   }
 
@@ -48,5 +50,3 @@ private[blobs] class FileSystemBlobVendor extends BlobVendor {
     // No configuration necessary to use the file system as a blob store
   }
 }
-
-private[blobs] object FileSystemBlobVendor extends FileSystemBlobVendor()

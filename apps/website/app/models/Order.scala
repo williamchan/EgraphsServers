@@ -32,7 +32,8 @@ case class OrderServices @Inject() (
   payment: Payment,
   mail: TransactionalMail,
   cashTransactionStore: CashTransactionStore,
-  egraphServices: Provider[EgraphServices]
+  egraphServices: Provider[EgraphServices],
+  consumerApp: ConsumerApplication
 )
 
 /**
@@ -193,7 +194,7 @@ case class Order(
 
     email.addReplyTo("noreply@egraphs.com")
     email.setSubject("I just finished signing your Egraph")
-    val viewEgraphUrl = GetEgraphEndpoint.absoluteUrl(id)
+    val viewEgraphUrl = services.consumerApp.absoluteUrl(GetEgraphEndpoint.url(id))
     val htmlMsg = views.html.frontend.email_view_egraph(
       viewEgraphUrl = viewEgraphUrl,
       celebrityName = celebrity.publicName,
@@ -557,8 +558,12 @@ object GalleryOrderFactory {
     })
   }
 
-  def makeFulfilledEgraphViewModel[A](orders: Iterable[(Order, Option[Egraph])], fbAppId: String)(implicit request: RequestHeader) :
-    Iterable[Option[FulfilledEgraphViewModel]] = {
+  def makeFulfilledEgraphViewModel[A](
+      orders: Iterable[(Order, Option[Egraph])], 
+      fbAppId: String,
+      consumerApp: ConsumerApplication
+      )(implicit request: RequestHeader): Iterable[Option[FulfilledEgraphViewModel]] = 
+  {
     for (orderAndEgraphOption <- orders) yield {
       val (order, optionEgraph) = orderAndEgraphOption
       optionEgraph.map( egraph => {
@@ -570,7 +575,7 @@ object GalleryOrderFactory {
           .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
           .scaledToWidth(product.frame.thumbnailWidthPixels)
         val thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Public)
-        val viewEgraphUrl = GetEgraphEndpoint.absoluteUrl(order.id)
+        val viewEgraphUrl = consumerApp.absoluteUrl(GetEgraphEndpoint.url(order.id))
 
         val facebookShareLink = Facebook.getEgraphShareLink(fbAppId = fbAppId,
           fulfilledOrder = FulfilledOrder(order = order, egraph = egraph),

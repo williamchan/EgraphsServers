@@ -8,7 +8,7 @@ import models.{Product, LandscapeEgraphFrame, EgraphFrame, PortraitEgraphFrame}
 import models.frontend.storefront.ChoosePhotoCarouselProduct
 import models.frontend.storefront.ProductOrientation
 import models.frontend.storefront.ChoosePhotoTileProduct
-import services.Utils
+import services.ConsumerApplication
 import play.api.mvc.RequestHeader
 
 /**
@@ -48,7 +48,8 @@ class ProductViewConversions(product: Product) {
    */
   def asChoosePhotoCarouselView(celebUrlSlug: String=product.celebrity.urlSlug,
                                 quantityRemaining: Int = product.remainingInventoryCount,
-                                fbAppId: String)(implicit request: RequestHeader)
+                                fbAppId: String,
+                                consumerApp: ConsumerApplication)(implicit request: RequestHeader)
   : ChoosePhotoCarouselProduct =
   {
     val imageWidth = product.frame match {
@@ -56,9 +57,7 @@ class ProductViewConversions(product: Product) {
       case LandscapeEgraphFrame => 575
     }
     val productThumbnailUrl = getProductThumbnailUrl(width=imageWidth)
-
-    val carouselViewRoute = getStorefrontChoosePhotoCarousel(celebUrlSlug, product.urlSlug)
-    val carouselViewLink = carouselViewRoute.absoluteURL()
+    val carouselViewLink = consumerApp.absoluteUrl(getStorefrontChoosePhotoCarousel(celebUrlSlug, product.urlSlug).url)
 
     val facebookShareLink = views.frontend.Utils.getFacebookShareLink(
       appId = fbAppId,

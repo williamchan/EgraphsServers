@@ -16,7 +16,7 @@ import play.api.mvc.Controller
 import play.api.mvc.RequestHeader
 import play.api.mvc.Session
 import play.api.templates.Html
-import services.Utils
+import services._
 import services.blobs.AccessPolicy
 import services.graphics.Handwriting
 import services.http.ControllerMethod
@@ -32,6 +32,7 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
   protected def orderStore: OrderStore
   protected def controllerMethod: ControllerMethod
   protected def facebookAppId: String
+  protected def consumerApp: ConsumerApplication
 
   //
   // Controllers
@@ -67,7 +68,8 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
             shadowX = shadowX,
             shadowY = shadowY,
             facebookAppId = facebookAppId,
-            galleryLink = maybeGalleryLink
+            galleryLink = maybeGalleryLink,
+            consumerApp = consumerApp
           ))
         case Some(FulfilledOrder(order, egraph)) => Forbidden("This Egraph is private.")
         case None => NotFound("No Egraph exists with the provided identifier.")
@@ -99,7 +101,8 @@ object GetEgraphEndpoint {
     shadowX: Double=Handwriting.defaultShadowOffsetX,
     shadowY: Double=Handwriting.defaultShadowOffsetY,
     facebookAppId: String = "",
-    galleryLink: Option[String] = None
+    galleryLink: Option[String] = None,
+    consumerApp: ConsumerApplication
   )(
     implicit request: RequestHeader
   ): Html = 
@@ -137,7 +140,7 @@ object GetEgraphEndpoint {
     val formattedSigningDate = new SimpleDateFormat("MMMM dd, yyyy").format(egraph.getSignedAt)
 
     // Social links
-    val thisPageLink = controllers.routes.WebsiteControllers.getEgraph(order.id).absoluteURL(secure=true)
+    val thisPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
 
     val facebookShareLink = Facebook.getEgraphShareLink(fbAppId = facebookAppId,
       fulfilledOrder = FulfilledOrder(order = order, egraph = egraph),
@@ -167,9 +170,5 @@ object GetEgraphEndpoint {
 
   def url(orderId: Long): String = {
     controllers.routes.WebsiteControllers.getEgraph(orderId).url
-  }
-
-  def absoluteUrl(orderId: Long)(implicit requestHeader: RequestHeader): String = {
-    controllers.routes.WebsiteControllers.getEgraph(orderId).absoluteURL(true)(requestHeader)
   }
 }
