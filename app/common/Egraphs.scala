@@ -3,14 +3,18 @@ package common
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.cloudwatch.AmazonCloudWatchClient
-import monitoring.website.WebsiteMonitor
-import monitoring.database.DBMonitor
+
 import collections.MetricSource
+import factory.DBActorFactory
+import factory.WebsiteActorFactory
+import monitoring.database.DBMonitor
+import monitoring.website.WebsiteMonitor
 
 object Egraphs {
 
-  val websiteMonitor = new WebsiteMonitor(cloudWatchClient, 10, urlsAndNames)
-  val dbMonitor = new DBMonitor(cloudWatchClient, 10, dbNames)
+  val websiteMonitor = new WebsiteMonitor(cloudWatchClient, 10,
+    urlsAndNames, new WebsiteActorFactory)
+  val dbMonitor = new DBMonitor(cloudWatchClient, 10, dbNames, new DBActorFactory)
 
   private def cloudWatchClient: AmazonCloudWatch = {
 

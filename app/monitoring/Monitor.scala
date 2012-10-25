@@ -14,12 +14,23 @@ import play.api.Play.current
 import play.api.libs.concurrent.Akka
 import common.MonitoringMessages.CheckStatus
 import common.MonitoringMessages.GetMetric
+import collections.MetricSource
+import factory.ActorFactory
 
 trait Monitor {
 
-  protected val actors: List[ActorRef] = scheduleMonitoringJobs
+  protected val actors: List[ActorRef]
 
-  protected def scheduleMonitoringJobs: List[ActorRef]
+  def scheduleMonitoringJobs(actorFactory: ActorFactory, actorInfos: List[MetricSource],
+    cloudwatch: AmazonCloudWatch, interval: Int): List[ActorRef] = {
+
+    val actors = for (actorInfo <- actorInfos) yield {
+      val myCurrentActor = actorFactory.getInstance(actorInfo, cloudwatch)
+      Akka.system.scheduler.schedule(0 seconds, interval seconds, myCurrentActor, CheckStatus)
+      myCurrentActor
+    }
+    actors
+  }
 
   def getMetrics: List[EgraphsMetric[Int]] = {
     import akka.pattern.{ ask, pipe }

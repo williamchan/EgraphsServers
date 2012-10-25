@@ -33,7 +33,6 @@ class DBAvailabilityActor(database: String, friendlyName: String,
     awsActions("DBAvailability." + database, dbConnections)
   }
 
-  
   /*
    * If the database is down, CloudWatch will not receive data, given the current
    * implementation. As a result, it is appropriate to alarm in both the situation

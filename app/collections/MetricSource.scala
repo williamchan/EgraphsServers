@@ -3,4 +3,4 @@ package collections
 /*
  * To simplify Actor creation
  */
-case class MetricSource(name: String, actorName: String, friendlyName: String)
+case class MetricSource(val name: String, val actorName: String, val friendlyName: String)

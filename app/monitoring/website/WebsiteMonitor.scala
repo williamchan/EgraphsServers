@@ -16,23 +16,13 @@ import monitoring.ActorUtilities
 import monitoring.Monitor
 import common.MonitoringMessages.CheckStatus
 import collections.MetricSource
+import factory.WebsiteActorFactory
+import factory.ActorFactory
 
 class WebsiteMonitor(val cloudwatch: AmazonCloudWatch,
-  val interval: Int, val urlsAndNames: List[MetricSource])
-  extends Monitor {
-
-  override def scheduleMonitoringJobs: List[ActorRef] = {
-    val actors = for (MetricSource(url, actorName, friendlyName) <- urlsAndNames) yield {
-      val myCurrentActor = Akka.system.actorOf(
-        Props(new WebsiteAvailabilityActor(
-          url,
-          friendlyName,
-          new CloudWatchMetricPublisher(cloudwatch))),
-        name = actorName)
-
-      Akka.system.scheduler.schedule(0 seconds, interval seconds, myCurrentActor, CheckStatus)
-      myCurrentActor
-    }
-    actors
-  }
+  val interval: Int, val actorInfos: List[MetricSource], 
+  val actorFactory: WebsiteActorFactory) extends Monitor {
+  
+  protected val actors: List[ActorRef] = scheduleMonitoringJobs(actorFactory, 
+      actorInfos, cloudwatch, interval)
 }

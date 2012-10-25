@@ -16,23 +16,12 @@ import monitoring.ActorUtilities
 import monitoring.Monitor
 import common.MonitoringMessages.CheckStatus
 import collections.MetricSource
+import factory.DBActorFactory
 
 class DBMonitor(val cloudwatch: AmazonCloudWatch,
-  val interval: Int, val dbsAndNames: List[MetricSource])
+  val interval: Int, val actorInfos: List[MetricSource], val actorFactory: DBActorFactory)
   extends Monitor {
 
-  override def scheduleMonitoringJobs: List[ActorRef] = {
-    val actors = for (MetricSource(database, actorName, friendlyName) <- dbsAndNames) yield {
-      val myCurrentActor = Akka.system.actorOf(
-        Props(new DBAvailabilityActor(
-          database,
-          friendlyName,
-          new CloudWatchMetricPublisher(cloudwatch))),
-        name = actorName)
-
-      Akka.system.scheduler.schedule(0 seconds, interval seconds, myCurrentActor, CheckStatus)
-      myCurrentActor
-    }
-    actors
-  }
+  protected val actors: List[ActorRef] = scheduleMonitoringJobs(actorFactory, 
+      actorInfos, cloudwatch, interval)
 }
