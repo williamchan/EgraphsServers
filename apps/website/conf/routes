@@ -31,8 +31,8 @@ GET     /blob/files/*blobKey                                       controllers.W
 
 # Map static resources from the /app/public folder to the /public path
 #GET     /public/                                staticDir:public
-GET     /favicon.ico                            controllers.Assets.at(path="/public", file="/images/favicon.ico")
-GET     /documents/CelebrityAgreement           controllers.Assets.at(path="/public", file="/documents/CelebrityAgreement.pdf")
+GET     /favicon.ico                            controllers.Assets.at(path="/public", file="images/favicon.ico")
+GET     /documents/CelebrityAgreement           controllers.Assets.at(path="/public", file="documents/CelebrityAgreement.pdf")
 
 
 ##
