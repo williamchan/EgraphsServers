@@ -267,8 +267,8 @@ case class Celebrity(id: Long = 0,
 
     services.transactionalMail.send(
       email, 
-      text=Some(celebrity_welcome_email_text(publicName, toAddress).toString), 
-      html=Some(celebrity_welcome_email(publicName, toAddress))
+      text=Some(celebrity_welcome_email_text(publicName, account.email).toString), 
+      html=Some(celebrity_welcome_email(publicName, account.email))
     )
   }
 
