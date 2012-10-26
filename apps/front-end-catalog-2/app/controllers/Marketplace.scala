@@ -17,5 +17,9 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
   def mlb() = Action {
     Ok(views.html.frontend.marketplace_mlb())
   }
+
+  def mlb_team() = Action {
+    Ok(views.html.frontend.marketplace_mlb_team())
+  }
   
 }
