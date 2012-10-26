@@ -6,7 +6,6 @@ import com.google.inject.{Provider, Inject}
 import play.api.mvc.Action
 import play.api.data._
 import play.api.data.Forms._
-import services.http.PlayId
 import services.inject.InjectionProvider
 import egraphs.authtoken.AuthenticityToken
 
@@ -47,17 +46,16 @@ trait RequireAuthenticityTokenFilter {
  *
  * @param playId the current play ID (e.g. test, staging, live, demo)
  */
-class RequireAuthenticityTokenFilterProvider @Inject()(@PlayId playId: String)
+class RequireAuthenticityTokenFilterProvider @Inject()()
   extends InjectionProvider[RequireAuthenticityTokenFilter]
 {
   //
   // Public members
   //
   def apply(doCheck: Boolean = true): RequireAuthenticityTokenFilter = {
-    // Only ever check if both (1) we're not in test mode and (2) doCheck is true
-    (playId, doCheck) match {
-      case ("test", _) | (_, false) => new DontRequireAuthenticityToken
-      case (_, true) => new DoRequireAuthenticityToken
+    doCheck match {
+      case false => new DontRequireAuthenticityToken
+      case true => new DoRequireAuthenticityToken
     }
   }
 
