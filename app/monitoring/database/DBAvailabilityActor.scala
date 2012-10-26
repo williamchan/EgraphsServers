@@ -55,7 +55,8 @@ class DBAvailabilityActor(database: String, friendlyName: String,
     } catch {
       case _ => {
         history.enqueue(0)
-        0
+        play.Logger.info("Database " + database + " failed to connect")
+        return 0
       }
     }
   }

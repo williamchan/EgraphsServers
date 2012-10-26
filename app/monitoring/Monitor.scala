@@ -26,7 +26,7 @@ trait Monitor {
 
     val actors = for (actorInfo <- actorInfos) yield {
       val myCurrentActor = actorFactory.getInstance(actorInfo, cloudwatch)
-      Akka.system.scheduler.schedule(0 seconds, interval seconds, myCurrentActor, CheckStatus)
+      Akka.system.scheduler.schedule(2 seconds, interval seconds, myCurrentActor, CheckStatus)
       myCurrentActor
     }
     actors

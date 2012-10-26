@@ -5,6 +5,7 @@ import monitoring.database.DBMonitor
 import play.api.libs.json.Json
 import play.api.mvc.Action
 import play.api.mvc.Controller
+import monitoring.cache.CacheMonitor
 
 object Application extends Controller {
 
@@ -39,7 +40,10 @@ object Application extends Controller {
   }
 
   def cacheMetrics = Action {
-    Ok("To Do")
+    val cacheMetrics = Egraphs.cacheMonitor.getMetrics
+    val jsonIterable = cacheMetrics.map(metric => metric.toJson)
+    val responseJson = Json.toJson(Map("metrics" -> jsonIterable))
+    Ok(responseJson)
   }
 
   // testing purposes only

@@ -12,8 +12,8 @@ object ApplicationBuild extends Build {
     val appDependencies = Seq(
         
         "com.amazonaws" % "aws-java-sdk" % "1.3.22",
-        
         "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
+        "redis.clients" % "jedis" % "2.0.0",
         
         "org.mockito" % "mockito-all" % "1.9.0" % "test",
         "org.scalatest" %% "scalatest" % "1.8" % "test",

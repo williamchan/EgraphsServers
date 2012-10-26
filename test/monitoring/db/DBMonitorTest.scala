@@ -8,6 +8,7 @@ import play.api.test.FakeApplication
 import play.api.test.Helpers.running
 import collections.MetricSource
 import monitoring.database.DBMonitor
+import factory.DBActorFactory
 
 class DBMonitorTest extends FlatSpec with ShouldMatchers with Mockito {
 
@@ -21,7 +22,7 @@ class DBMonitorTest extends FlatSpec with ShouldMatchers with Mockito {
         MetricSource("db4", "test4AvailabilityActor", "test4"),
         MetricSource("db5", "test5AvailabilityActor", "test5"))
 
-      val monitor = new DBMonitor(cloudwatch, 10, dbsAndNames)
+      val monitor = new DBMonitor(cloudwatch, 10, dbsAndNames, new DBActorFactory)
       val resultMetrics = monitor.getMetrics
 
       resultMetrics should have length (5)

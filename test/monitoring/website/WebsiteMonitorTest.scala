@@ -7,6 +7,7 @@ import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import play.api.test.FakeApplication
 import play.api.test.Helpers.running
 import collections.MetricSource
+import factory.WebsiteActorFactory
 
 class WebsiteMonitorTest extends FlatSpec with ShouldMatchers with Mockito {
 
@@ -20,7 +21,7 @@ class WebsiteMonitorTest extends FlatSpec with ShouldMatchers with Mockito {
         MetricSource("https://www.test4.com/", "test4AvailabilityActor", "test4"),
         MetricSource("https://www.test5.com/", "test5AvailabilityActor", "test5"))
 
-      val monitor = new WebsiteMonitor(cloudwatch, 10, urlsAndNames)
+      val monitor = new WebsiteMonitor(cloudwatch, 10, urlsAndNames, new WebsiteActorFactory)
       val resultMetrics = monitor.getMetrics
 
       resultMetrics should have length (5)
