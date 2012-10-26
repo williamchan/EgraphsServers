@@ -2,7 +2,7 @@ package egraphs.authtoken
 
 import play.api.libs.Crypto
 
-class AuthenticityToken(private[authtoken] val value: String)
+class AuthenticityToken(val value: String)
 
 object AuthenticityToken 
   extends AuthenticityTokenActionComposition 

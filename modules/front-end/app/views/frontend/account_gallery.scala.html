@@ -10,6 +10,7 @@
 @import models.frontend.egraphs._
 
 @init = {
+  Egraphs.page.authenticityToken = "@authToken.value";
 }
 
 @fulfilledEgraph(egraph: models.frontend.egraphs.FulfilledEgraphViewModel, index: Int) = {
