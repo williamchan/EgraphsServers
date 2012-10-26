@@ -76,12 +76,20 @@
           list-style: none;
           margin: 0;
           padding: 0;
+          font-size: .75em;
+          line-height: 1.25em;
           
-          li {
-
-            font-size: .75em;
+          li {   
+                 
             line-height: 1.25em;
-            margin-bottom: .25em;
+            margin-bottom: 0;
+            
+            ol {
+            
+              font-size: 1em;
+              padding-left: 1em;
+              
+            }
 
             a {
               color: @grayLight;
@@ -93,7 +101,7 @@
               }
               
               &.active {
-                font-weight: 600;
+                font-weight: 800;
                 color: @orange;
               }
               
@@ -103,6 +111,14 @@
           
         }
         
+	    } // end .nav
+	    
+	    .mobile-nav {
+  	    
+  	    display: none;
+  	    margin-bottom: 20px;
+  	    margin-left: 2%;
+  	    
 	    }
 	    
 	    .main {
@@ -144,8 +160,10 @@
 	            }
 	            
 	            &.active {
-	             .box-shadow(inset 0 0 5px @gray);
-  	            .gradientBar(darken(#efefef, 10%), darken(#ccc, 10%));
+                border-color: #c5c5c5;
+                .box-shadow(inset 0 2px 2px @grayLighter);
+                .gradientBar(darken(@grayVeryLight, 10%), darken(@grayVeryLight, 25%));
+                color: @grayDarker;
 	            }
 	            
 	            span, img { 
@@ -275,6 +293,10 @@
 	                  margin-bottom: 1px;
 	                  background: @grayLighter;
 	                }
+
+  	              &:hover i {
+  	                background: @orange;
+  	              }
 	                
 	              }
 	              
@@ -296,6 +318,10 @@
 	                  &:nth-child(6) { width: 20px; }
 	                  
 	                }
+
+  	              &:hover i {
+  	                background: @orange;
+  	              }
 	                
 	              }
 	 
@@ -339,6 +365,13 @@
 	            line-height: 1.25em;
 	            margin-bottom: .675em; 
 	          }
+
+	          hr {
+  	          height: 2px;
+  	          border: none;
+  	          background: url(../images/bg-rule-vertical.png) repeat-x 0 50%;
+  	          margin-bottom: 20px;
+	          }
 	          
 	          .see-all {
 	          
@@ -354,7 +387,7 @@
 	              color: @grayLight;
 	              text-shadow: 0 1px 0 @white;
 	              font-style: normal;
-	              font-size: .95em;
+	              font-size: .8125em;
 	              background: @offWhite;
 	              padding: 0 15px;
 	                          
@@ -544,16 +577,48 @@
     
 }
 
+@media (max-width: 767px) {
+
+  #content.marketplace {
+  
+    #main {
+    
+      .content  {
+      
+        .nav { display: none; }
+        
+        .mobile-nav { display: block; }
+      
+      }
+    
+    }
+  
+  }
+
+}
+
 @media (max-width: 720px) {
 	
 	#content.marketplace {
 	
 		#main {
 		
-			.masthead form {
-				
-				width: 80%;
-				
+			.masthead {
+			
+			 background: transparent;
+			 padding: 25px 20px 20px 20px;
+			 margin-bottom: 0;
+			
+			 img { display: none; }
+  			
+  			form {
+  			
+  			 margin: 0;
+  			 width: auto;
+  			 position: static;
+  				
+  			}
+			
 			}
 		
 			.content {
@@ -597,6 +662,8 @@
 						}
 					
 					}
+
+					.mobile-nav { margin-left: 0; }
 					
 					.view-options .sort-by { margin-left: 0; }
 					
@@ -638,9 +705,22 @@
       background-size: 23px 23px;    
     }
    
-    .content .main .verticals section article figure a.ribbon {
-      background-image: url(../images/bg-marketplace-soldout-2x.png);
-      background-size: 100%;
+    .content .main {
+    
+      .verticals section {
+
+        .see-all em a i span { 
+            background: url(/assets/images/bg-top-account-arrow-ios.png) no-repeat 100% 50%; 
+            background-size: 9px 5px;          
+        }
+        
+        article figure a.ribbon {
+          background-image: url(../images/bg-marketplace-soldout-2x.png);
+          background-size: 100%;
+        }
+      
+      }
+    
     }
     
   }
