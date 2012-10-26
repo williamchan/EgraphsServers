@@ -4,9 +4,11 @@ package utils
 
 import play.api.test.FakeRequest
 import play.api.mvc.{AnyContent, Call}
+import play.api.Play
 import play.api.test.Helpers._
-
+import play.api.Configuration
 import services.http.BasicAuth
+import play.api.test.FakeApplication
 
 //import java.util.Properties
 //import models.Account
@@ -84,5 +86,29 @@ object FunctionalTestUtils {
 
   def routeName(call: Call): String = {
     call.method + " " + call.url
+  }
+  
+  trait NonProductionEndpointTests { this: EgraphsUnitTest =>
+    import play.api.test.Helpers._
+    protected def routeUnderTest: Call
+    
+    private def nonTestApplication: FakeApplication = {
+      val normalTestConfig = EgraphsUnitTest.testApp.configuration  
+      val configWithNonTestAppId = normalTestConfig ++ Configuration.from(Map("application.id" -> "not-test"))
+      new FakeApplication(path=EgraphsUnitTest.testApp.path) {
+        override def configuration = configWithNonTestAppId
+      }
+    }
+    
+    routeName(routeUnderTest) + ", as a test-only endpoint, " should "be available during test mode" in new EgraphsTestApplication {
+      val Some(result) = routeAndCall(FakeRequest(routeUnderTest.method, routeUnderTest.url))
+      status(result) should not be (NOT_FOUND)
+      // println("Content is -- " + contentAsString(result))
+    }
+
+    // TODO: Implement this method once controllers are injectable...Until then it will be impossible
+    // to configure the app with a different ConfigFileProxy.
+    // of our app will inhibit being able to create a controller with a different ConfigFileProxy
+    it should "be unavailable outside of test mode" in (pending)
   }
 }

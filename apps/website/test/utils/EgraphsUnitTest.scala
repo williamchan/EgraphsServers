@@ -28,7 +28,7 @@ trait EgraphsUnitTest extends FlatSpec
   }
   
   trait EgraphsTestApplication {
-    implicit val app: Application = EgraphsUnitTest.app
+    implicit val app: Application = EgraphsUnitTest.runApp()
     def resourceFile(resource: String): File = EgraphsUnitTest.resourceFile(resource)
   }
 }
@@ -36,9 +36,9 @@ trait EgraphsUnitTest extends FlatSpec
 object EgraphsUnitTest extends Logging {
   private val classLoader = this.getClass.getClassLoader
   private lazy val typesafeConfig = ConfigFactory.load("local.conf")
-  private lazy val playConfig = Configuration(typesafeConfig)
+  private val playConfig = Configuration(typesafeConfig)
 
-  def app: Application = {
+  def runApp(): Application = {
     // Only start the app if it wasn't already running
     Play.maybeApplication.filter(runningApp => runningApp == testApp).getOrElse {
       log("Starting the test app with root in " + testApp.path) 
@@ -55,7 +55,7 @@ object EgraphsUnitTest extends Logging {
     }
   }
   
-  private lazy val testApp = {
+  lazy val testApp = {
     new FakeApplication(path=appRoot) {
       override def configuration = playConfig
     }
