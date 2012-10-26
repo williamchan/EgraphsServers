@@ -160,7 +160,6 @@ class CelebrityTests extends EgraphsUnitTest
     celeb.filterValues.size should be (2)
     celeb.filterValues.exists(fv => fv.id == filterValue1.id) should be (true)
     celeb.filterValues.exists(fv => fv.id == filterValue2.id) should be (true)
-
   }
 
   //

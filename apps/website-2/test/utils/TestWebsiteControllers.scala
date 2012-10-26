@@ -68,6 +68,7 @@ case class TestWebsiteControllers @Inject()(
   
   override def egraphQueryFilters = instance[EgraphQueryFilters]
   override def filterStore = instance[FilterStore]
+  override def filterValueStore = instance[FilterValueStore]
   override def inventoryBatchQueryFilters = instance[InventoryBatchQueryFilters]
   override def orderQueryFilters = instance[OrderQueryFilters]
   override def printOrderQueryFilters = instance[PrintOrderQueryFilters]

@@ -95,4 +95,9 @@ class FilterValueTests  extends EgraphsUnitTest
       celebrity.filterValues.associate(filterValue)
       filterValue.celebrities.exists(c => c.id == celebrity.id ) should be (true)
     }
+    "FilterStore" should "return by name" in new EgraphsTestApplication {
+      val filterValue = TestData.newSavedFilterValue(TestData.newSavedFilter.id)
+      val retrieved = filterValueStore.findByName(filterValue.name).headOption.get
+      retrieved.id should be (filterValue.id)
+    }
 }

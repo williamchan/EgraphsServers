@@ -69,4 +69,10 @@ class FilterTests extends EgraphsUnitTest
       retrievedFilterValues.exists(rfv => rfv.id == fv.id) should be (true)
     )
   }
+  
+  "FilterStore" should "return by name" in new EgraphsTestApplication {
+    val filter = TestData.newSavedFilter
+    val retrieved = filterStore.findByName(filter.name).headOption.get
+    retrieved.id should be (filter.id)
+  }
 }
