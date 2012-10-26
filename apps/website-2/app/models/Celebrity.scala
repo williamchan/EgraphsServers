@@ -414,7 +414,21 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
         select(c)
     ).headOption
   }
-
+  /**
+   * Find by filterValue
+   */
+  
+  def findByFilterValueId(filterValueId : Long) : Query[Celebrity] = {
+   from(schema.celebrityFilterValues, schema.celebrities)(
+     (cfv, c) =>
+       where(
+         cfv.id === filterValueId and  
+         c.id === cfv.celebrityId
+       ) select(c)
+   )
+   
+  }
+  
   /**
    * Find using postgres text search on publicname and roledescription
    * http://www.postgresql.org/docs/9.2/interactive/textsearch-controls.html

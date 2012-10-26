@@ -56,6 +56,44 @@ class CelebrityStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
 
     results.isEmpty should be(true)
   }
+  
+  "find by filter value" should "return celebrities associated with a particular fitler value" in {
+ 
+    val filter = TestData.newSavedFilter
+    val filterValueA = TestData.newSavedFilterValue(filter.id)
+    val filterValueB = TestData.newSavedFilterValue(filter.id)
+
+    val celebsTaggedWithA = for ( i <- 0 until 10) yield {
+     TestData.newSavedCelebrity()
+     	.withPublishedStatus(PublishedStatus.Published)
+     	.save()
+    }
+    
+    val celebsTaggedWithB = for ( i <- 0 until 10) yield {
+     TestData.newSavedCelebrity()
+     	.withPublishedStatus(PublishedStatus.Published)
+     	.save()
+    }
+    
+    celebsTaggedWithA.map(celeb => celeb.filterValues.associate(filterValueA))
+    celebsTaggedWithB.map(celeb => celeb.filterValues.associate(filterValueB))
+  
+    val retrievedFilterValuesA = instanceUnderTest.findByFilterValueId(filterValueA.id)
+    val retrievedFilterValuesB = instanceUnderTest.findByFilterValueId(filterValueB.id)
+    
+    // Returns the set associated with the filter
+    retrievedFilterValuesA.map(celeb => celebsTaggedWithA.exists(c => celeb.id == c.id) should be(true))
+    retrievedFilterValuesB.map(celeb => celebsTaggedWithB.exists(c => celeb.id == c.id) should be(true))
+
+    // And the set is exclusive of the other filter
+    retrievedFilterValuesA.map(celeb => celebsTaggedWithB.exists(c => celeb.id == c.id) should be(false))
+    retrievedFilterValuesB.map(celeb => celebsTaggedWithA.exists(c => celeb.id == c.id) should be(false))    
+  }
+  
+//  "find by filter multiple filter values" should "return celebrities associated with all those filter values" in {
+//    
+//  }
+  
 
 
   // Private members
