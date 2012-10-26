@@ -57,17 +57,11 @@ abstract class GalleryControlRenderer {
 object AdminGalleryControl extends GalleryControlRenderer{
   override def render(id: Long, status:String) = {
     val ns =
-    <ul>
-      <li>
-        <a href={"/" +id } >View Full Egraph</a>
-      </li>
-      <li>
-        <a href="#">Download</a>
-      </li>
-      <li>
-        <a href="#">Order Prints</a>
-      </li>
-    </ul>
+      <ul>
+        <li>
+          <a href={"/" +id } >View Full Egraph</a>
+        </li>
+      </ul>
 
     ns
   }
@@ -88,11 +82,12 @@ object OwnerGalleryControl extends GalleryControlRenderer{
 
 object OtherGalleryControl extends GalleryControlRenderer{
   override def render(id: Long, status:String) = {
-    val ns = <ul>
-      <li>
-        <a href={"/" +id }>View Full Egraph</a>
-      </li>
-    </ul>
+    val ns = 
+      <ul>
+        <li>
+          <a href={"/" +id }>View Full Egraph</a>
+        </li>
+      </ul>
 
     ns
   }
