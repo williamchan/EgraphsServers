@@ -1,0 +1,12 @@
+@(framedPrintImageUrl: String, csvHeaders: String, csvLine: String, pngUrl: Option[String] = None)
+
+<html>
+  <body>
+    @pngUrl.map {url => 
+      <p><a href=@url target="_blank">PNG url</a></p>
+    }
+    <p><a href=@framedPrintImageUrl target="_blank">@framedPrintImageUrl</a></p>
+    <p>@csvHeaders</p>
+    <p>@csvLine</p>
+  <body>
+<html>

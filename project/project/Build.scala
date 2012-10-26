@@ -5,5 +5,5 @@ import sbt.Keys._
 object Build extends Build {
   override lazy val projects = Seq(root)
   lazy val root = Project("plugins", file(".")) dependsOn( cloudbeesPlugin )
-  lazy val cloudbeesPlugin = uri("git://github.com/ChazInc/sbt-cloudbees-play-plugin.git#play-config-driven-deployment")
+  lazy val cloudbeesPlugin = uri("git://github.com/ChazInc/sbt-cloudbees-play-plugin.git#config-tab-complete")
 }

@@ -1,58 +1,69 @@
 package controllers.api
 
-import org.junit.Assert._
-import org.junit.Test
-import play.test.FunctionalTest
 import sjson.json.Serializer
-import utils.FunctionalTestUtils.{willChanRequest, runScenarios}
 import scenario.Scenarios
+import utils.FunctionalTestUtils.{
+  willChanRequest, 
+  runFreshScenarios, 
+  routeName, 
+  runWillChanScenariosThroughOrder
+}
+import utils.TestConstants
+import play.api.test.Helpers._
+import utils.EgraphsUnitTest
+import controllers.routes.ApiControllers.getCelebrityOrders
+import services.Utils
+import services.AppConfig
+import services.config.ConfigFileProxy
+import services.db.{DBSession, TransactionSerializable}
+
 import models._
 import enums.EgraphState
-import services.AppConfig
-import services.db.TransactionSerializable
-import utils.{FunctionalTestUtils, TestConstants}
-import controllers.website.EgraphsFunctionalTest
+// import utils.{FunctionalTestUtils, TestConstants}
 
-class GetCelebrityOrdersApiEndpointTests extends EgraphsFunctionalTest {
+class GetCelebrityOrdersApiEndpointTests 
+  extends EgraphsUnitTest 
+  with ProtectedCelebrityResourceTests
+{
+  protected def routeUnderTest = getCelebrityOrders()
+  private def orderStore = AppConfig.instance[OrderStore]
+  private def db = AppConfig.instance[DBSession]
 
-  import FunctionalTest._
-
-  private val orderStore = AppConfig.instance[OrderStore]
-
-  @Test
-  def testGetCelebrityOrders() {
-    FunctionalTestUtils.runWillChanScenariosThroughOrder()
+  routeName(routeUnderTest) should "get the list of celebrity orders" in new EgraphsTestApplication {
+    runWillChanScenariosThroughOrder()
 
     // Assemble the request
-    val req = willChanRequest
+    val url = getCelebrityOrders(signerActionable=Some(true)).url
+    val req = willChanRequest.copy(method=GET, uri=url)
 
     // Execute the request
-    val response = GET(req, TestConstants.ApiRoot + "/celebrities/me/orders?signerActionable=true")
-    assertIsOk(response)
+    val Some(result) = routeAndCall(req)
+    
+    status(result) should be (OK)
 
-    val json = Serializer.SJSON.in[List[Map[String, Any]]](getContent(response))
-
+    val json = Serializer.SJSON.in[List[Map[String, Any]]](contentAsString(result))
     val firstOrderJson = json(0)
     val secondOrderJson = json(1)
 
     // Just check the ids -- the rest is covered by unit tests
-    assertEquals(BigDecimal(1L), firstOrderJson("id"))
-    assertEquals(BigDecimal(2L), secondOrderJson("id"))
+    firstOrderJson("id") should be (BigDecimal(1L))
+    secondOrderJson("id") should be (BigDecimal(2L))
   }
 
-  @Test
-  def testGetCelebrityOrdersRequiresSignerActionableParameter() {
-    runScenarios(
+  it should  "require the signerActionable query parameter" in new EgraphsTestApplication {
+    runFreshScenarios(
       "Will-Chan-is-a-celebrity"
     )
 
-    val response = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/orders")
-    assertStatus(500, response)
+    val url = getCelebrityOrders(signerActionable=None).url
+    val Some(result) = routeAndCall(willChanRequest.copy(method=GET, uri=url))
+    
+    status(result) should be (BAD_REQUEST)
   }
+  
 
-  @Test
-  def testGetOrdersFiltersOutOrdersWithEgraphWithAwaitingVerificationState() {
-    FunctionalTestUtils.runWillChanScenariosThroughOrder()
+  it should "filter out orders with egraphs that have been fulfilled but await biometric verification" in new EgraphsTestApplication {    
+    runWillChanScenariosThroughOrder()
 
     db.connected(TransactionSerializable) {
       val celebrityId = Scenarios.getWillCelebrityAccount.id
@@ -60,15 +71,16 @@ class GetCelebrityOrdersApiEndpointTests extends EgraphsFunctionalTest {
       Egraph(orderId = allCelebOrders.toSeq.head.id).withEgraphState(EgraphState.AwaitingVerification).save()
     }
 
-    val response = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/orders?signerActionable=true")
-    assertIsOk(response)
-    val json = Serializer.SJSON.in[List[Map[String, Any]]](getContent(response))
-    assertEquals(json.length, 1)
+    val url = getCelebrityOrders(signerActionable=Some(true)).url
+    val Some(result) = routeAndCall(willChanRequest.copy(method=GET, uri=url))
+    status(result) should be (OK)
+    
+    val json = Serializer.SJSON.in[List[Map[String, Any]]](contentAsString(result))
+    json.length should be (1)
   }
 
-  @Test
-  def testGetOrdersFiltersOutOrdersWithEgraphWithPublishedState() {
-    FunctionalTestUtils.runWillChanScenariosThroughOrder()
+  it should "filter out orders with Egraphs that have already been published" in {
+    runWillChanScenariosThroughOrder()
 
     db.connected(TransactionSerializable) {
       val celebrityId = Scenarios.getWillCelebrityAccount.id
@@ -76,15 +88,16 @@ class GetCelebrityOrdersApiEndpointTests extends EgraphsFunctionalTest {
       Egraph(orderId = allCelebOrders.toSeq.head.id).withEgraphState(EgraphState.Published).save()
     }
 
-    val response = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/orders?signerActionable=true")
-    assertIsOk(response)
-    val json = Serializer.SJSON.in[List[Map[String, Any]]](getContent(response))
-    assertEquals(json.length, 1)
+    val url = getCelebrityOrders(signerActionable=Some(true)).url
+    val Some(result) = routeAndCall(willChanRequest.copy(method=GET, uri=url))
+    status(result) should be (OK)
+
+    val json = Serializer.SJSON.in[List[Map[String, Any]]](contentAsString(result))
+    json.length should be (1)
   }
 
-  @Test
-  def testGetOrdersIncludesOrdersWithRejectedEgraphs() {
-    FunctionalTestUtils.runWillChanScenariosThroughOrder()
+  it should "include orders with with egraphs that were rejected" in {
+    runWillChanScenariosThroughOrder()
 
     db.connected(TransactionSerializable) {
       val celebrityId = Scenarios.getWillCelebrityAccount.id
@@ -92,9 +105,11 @@ class GetCelebrityOrdersApiEndpointTests extends EgraphsFunctionalTest {
       Egraph(orderId = allCelebOrders.toSeq.head.id).withEgraphState(EgraphState.RejectedByAdmin).save()
     }
 
-    val response = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/orders?signerActionable=true")
-    assertIsOk(response)
-    val json = Serializer.SJSON.in[List[Map[String, Any]]](getContent(response))
-    assertEquals(json.length, 2)
+    val url = getCelebrityOrders(signerActionable=Some(true)).url
+    val Some(result) = routeAndCall(willChanRequest.copy(method=GET, uri=url))
+    status(result) should be (OK)
+
+    val json = Serializer.SJSON.in[List[Map[String, Any]]](contentAsString(result))
+    json.length should be (2)
   }
 }

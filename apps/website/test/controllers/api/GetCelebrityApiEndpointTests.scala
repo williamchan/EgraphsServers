@@ -1,96 +1,46 @@
 package controllers.api
 
-import play.mvc.Http.Request
-import play.mvc.Controller
-import play.mvc.results.Forbidden
+import play.api.mvc.Request
+import play.api.mvc.Controller
+import play.api.test.Helpers._
 import services.Time
-import org.junit.Assert._
-import org.junit.Test
-import play.test.FunctionalTest
 import sjson.json.Serializer
-import utils.FunctionalTestUtils.{willChanRequest, runScenario}
+import utils.FunctionalTestUtils.{runFreshScenarios, willChanRequest, routeName}
 import models._
 import enums.EnrollmentStatus
-import services.http.CelebrityAccountRequestFilters
+import services.http.BasicAuth
 import utils.{ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest, MockControllerMethod, TestConstants}
-import controllers.website.EgraphsFunctionalTest
+import play.api.test.FakeRequest
+import controllers.routes.ApiControllers.getCelebrity
 
-class GetCelebrityApiEndpointTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValidationBefore {
+class GetCelebrityApiEndpointTests 
+  extends EgraphsUnitTest 
+  with ClearsCacheAndBlobsAndValidationBefore 
+  with ProtectedCelebrityResourceTests
+{
+  override protected def routeUnderTest = getCelebrity
 
-  private def testController(reqFilters: CelebrityAccountRequestFilters): GetCelebrityApiEndpoint = {
-    new Controller with GetCelebrityApiEndpoint {
-      override def controllerMethod = MockControllerMethod
-      override def celebFilters = reqFilters
-    }
-  }
-
-  "GetCelebrityApiEndpoint" should "serialize celebrity json when filters passed" in {
-    implicit val request = mock[Request]
-    val account = mock[Account]
-    val celeb = mock[Celebrity]
-    val mockFilters = mock[CelebrityAccountRequestFilters]
-
-    mockFilters.requireCelebrityAccount(any)(any) answers { case Array(callback: Function2[Account, Celebrity, Any], req) =>
-      callback(account, celeb)
-    }
-
-    celeb.renderedForApi returns (Map("celebrityKeys" -> "celebrityValues"))
-
-    testController(mockFilters).getCelebrity.asInstanceOf[String] should be ("""{"celebrityKeys":"celebrityValues"}""")
-  }
-  
-  it should "respect the requireCelebrityAccount filter" in {
-    implicit val request = mock[Request]
-    val mockFilters = mock[CelebrityAccountRequestFilters]
-    val filterResult = new Forbidden("failed the filter")
-    
-    mockFilters.requireCelebrityAccount(any)(any) returns (filterResult)
-    
-    testController(mockFilters).getCelebrity should be (filterResult)
-  }
-}
-
-class GetCelebrityApiEndpointFunctionalTests extends EgraphsFunctionalTest {
-
-  import FunctionalTest._
-
-  @Test
-  def testGettingACelebrity() {
+  routeName(routeUnderTest) should "get a Celebrity" in new EgraphsTestApplication {
     // Set up the scenario
-    runScenario("Will-Chan-is-a-celebrity")
+    runFreshScenarios("Will-Chan-is-a-celebrity")
 
     // Execute the request
-    val response = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me")
+    val Some(result) = routeAndCall(willChanRequest.copy(method=GET, uri=TestConstants.ApiRoot + "/celebrities/me"))
 
     // Test expectations
-    assertIsOk(response)
+    status(result) should be (OK)
 
-    val json = Serializer.SJSON.in[Map[String, AnyRef]](getContent(response))
+    val json = Serializer.SJSON.in[Map[String, AnyRef]](contentAsString(result))
 
-    assertNotNull(json("id"))
-    assertEquals("Wizzle", json("publicName"))
-    assertEquals("Wizzle", json("urlSlug"))
-    assertEquals(EnrollmentStatus.NotEnrolled.name, json("enrollmentStatus"))
+    json("id") should not be (null)
+    json("publicName") should be ("Wizzle")
+    json("urlSlug") should be ("Wizzle")
+    json("enrollmentStatus") should be (EnrollmentStatus.NotEnrolled.name)
 
     // These conversions will fail if they're not Longs
     Time.fromApiFormat(json("created").toString)
     Time.fromApiFormat(json("updated").toString)
 
-    assertEquals(6, json.size)
-  }
-
-  @Test
-  def testGettingACelebrityWithIncorrectCredentialsFails() {
-    // Set up the scenario
-    runScenario("Will-Chan-is-a-celebrity")
-
-    // Assemble the request
-    val req = newRequest()
-    req.user = "wchan83@egraphs.com"
-    req.password = "wrongwrongwrong"
-
-    // Execute the request
-    val response = GET(req, TestConstants.ApiRoot + "/celebrities/me")
-    assertEquals(403, response.status)
+    json.size should be (6)
   }
 }

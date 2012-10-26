@@ -35,7 +35,7 @@ export EG_APP_WEBSITE=$EG_APPS/website
 export EG_APP_CATALOG=$EG_APPS/front-end-catalog
 
 export EG_MODULES=$EG_HOME/modules
-export EG_MOD_FRONTEND=$EG_MODULES/frontend
+export EG_MOD_FRONTEND=$EG_MODULES/front-end
 
 # Shortened convenience variables
 export eg=$EG_HOME

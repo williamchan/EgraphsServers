@@ -1,29 +1,36 @@
 package controllers.api
 
-import org.junit.Assert._
-import org.junit.Test
-import play.test.FunctionalTest
 import sjson.json.Serializer
-import utils.FunctionalTestUtils.{willChanRequest, runScenario}
+import utils.FunctionalTestUtils.{willChanRequest, runFreshScenarios, routeName}
 import utils.TestConstants
-import controllers.website.EgraphsFunctionalTest
+import play.api.test.Helpers._
+import utils.EgraphsUnitTest
+import controllers.routes.ApiControllers.getCelebrityMobileAppInfo
 import services.Utils
+import services.AppConfig
+import services.config.ConfigFileProxy
 
-class GetCelebrityMobileAppInfoEndpointTests extends EgraphsFunctionalTest {
-  import FunctionalTest._
+class GetCelebrityMobileAppInfoEndpointTests
+  extends EgraphsUnitTest 
+  with ProtectedCelebrityResourceTests
+{
+  protected override def routeUnderTest = getCelebrityMobileAppInfo
 
-  @Test
-  def testRouteReturnsSignedRequestToAppArchive() {
-    runScenario("Will-Chan-is-a-celebrity")
-    val expectedVersion = Utils.requiredConfigurationProperty("ipad.buildversion")
-
-    val response = GET(willChanRequest, TestConstants.ApiRoot + "/celebrities/me/mobileappinfo")
-    assertIsOk(response)
-    val json = Serializer.SJSON.in[Map[String, Map[String, String]]](getContent(response))
+  protected def config = AppConfig.instance[ConfigFileProxy]
+  routeName(routeUnderTest) should "return signed request to iPad app archive" in {
+    
+    runFreshScenarios("Will-Chan-is-a-celebrity")
+    
+    val expectedVersion = config.ipadBuildVersion
+    val Some(result) = routeAndCall(willChanRequest.copy(method=GET, uri=getCelebrityMobileAppInfo.url))
+    
+    status(result) should be (OK)
+    val json = Serializer.SJSON.in[Map[String, Map[String, String]]](contentAsString(result))
     val ipadJson = json("ipad")
-    assertEquals(expectedVersion, ipadJson("version"))
+    
+    ipadJson("version") should be (expectedVersion)
     val ipaUrl = ipadJson("ipaURL")
-    assertEquals(true, ipaUrl.startsWith("https://egraphs-static-resources.s3.amazonaws.com/ipad/Egraphs_" + expectedVersion + ".ipa?"))
+    ipaUrl.takeWhile(nextChar => nextChar != '?') should be ("https://egraphs-static-resources.s3.amazonaws.com/ipad/Egraphs_" + expectedVersion + ".ipa")
   }
 
 }

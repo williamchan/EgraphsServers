@@ -1,0 +1,36 @@
+@(celebrityPublicName: Option[String] = None,
+  mastheadImageUrl: String, 
+  getStartedUrl: Option[String] = None
+)
+
+@import controllers._
+
+<section id="masthead-home" role="banner" style="background-image: url(@mastheadImageUrl);">
+
+  <div class="banner-gradient">
+
+    <div class="container">
+
+      <div class="row">
+
+        <div class="span6 header-parent">
+
+          <h1>What if you could share a moment with @celebrityPublicName.getOrElse("your favorite star")?</h1>
+
+          @getStartedUrl.map { url =>
+            <p>
+              <a id="get-started-button" href="@url" class="button get-started">
+                <strong>Get Started</strong><span>&raquo;</span>
+              </a>
+            </p>
+          }
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section> <!-- end #masthead-home -->
