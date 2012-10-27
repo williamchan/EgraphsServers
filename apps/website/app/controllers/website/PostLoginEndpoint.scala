@@ -20,7 +20,6 @@ private[controllers] trait PostLoginEndpoint { this: Controller =>
   def postLogin() = postController() {
     Action { implicit request =>
       // Read a CustomerLoginForm from the params
-      val params = request.queryString
       val nonValidatedForm = customerLoginForms(request.asFormReadable)
   
       // Handle valid or error cases
