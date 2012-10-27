@@ -26,10 +26,14 @@ object Complete extends Controller with DefaultImplicitTemplateParameters {
       ownerEmail="{owner email}",
       celebName="{celebrity name}",
       productName="{product name}",
+      productId=1L,
       totalPrice=BigDecimal(100.00).toMoney(),
+      digitalPrice=BigDecimal(70.00).toMoney(),
+      printPrice=BigDecimal(30.00).toMoney(),
       expectedDeliveryDate=new util.Date(),
       faqHowLongLink = "https://www.egraphs.com/faq#how-long",
-      hasPrintOrder = true
+      hasPrintOrder = true,
+      withAffiliateMarketing = false
     )
   }
 

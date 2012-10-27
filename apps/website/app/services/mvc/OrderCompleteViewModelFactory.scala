@@ -4,9 +4,7 @@ import models._
 import com.google.inject.Inject
 import controllers.routes.WebsiteControllers.getFAQ
 import frontend.storefront.OrderCompleteViewModel
-import services.Utils
-import models.InventoryBatch
-import models.Order
+import org.joda.money.{CurrencyUnit, Money}
 import services.config.ConfigFileProxy
 
 /**
@@ -24,7 +22,7 @@ class OrderCompleteViewModelFactory @Inject()(config: ConfigFileProxy) {
     val product = order.product
     val buyer = order.buyer
     val cashTransaction = order.services.cashTransactionStore.findByOrderId(order.id).headOption
-    val hasPrintOrder = order.services.printOrderStore.findByOrderId(order.id).headOption.isDefined
+    val maybePrintOrder = order.services.printOrderStore.findByOrderId(order.id).headOption
 
     this.fromModels(
       product.celebrity,
@@ -35,7 +33,7 @@ class OrderCompleteViewModelFactory @Inject()(config: ConfigFileProxy) {
       order,
       order.inventoryBatch,
       cashTransaction,
-      hasPrintOrder
+      maybePrintOrder
     )
   }
 
@@ -55,7 +53,7 @@ class OrderCompleteViewModelFactory @Inject()(config: ConfigFileProxy) {
    * @param order the order that represented the egraph purchase
    * @param inventoryBatch the inventory batch against which the order was made.
    * @param cashTransaction the associated cash transaction, if available.
-   * @param hasPrintOrder whether a physical print was also ordered as part of this purchase
+   * @param maybePrintOrder a PrintOrder associated this purchase, if avaailble
    *
    * @return a ViewModel that populates the order complete page.
    */
@@ -68,12 +66,14 @@ class OrderCompleteViewModelFactory @Inject()(config: ConfigFileProxy) {
     order: Order,
     inventoryBatch: InventoryBatch,
     cashTransaction: Option[CashTransaction],
-    hasPrintOrder: Boolean
+    maybePrintOrder: Option[PrintOrder]
   ): OrderCompleteViewModel =
   {
     val faqHowLongLink = getFAQ.url + "#how-long"
     val totalAmountPaid = cashTransaction.map(_.cash).getOrElse(order.amountPaid)
     val isLiveConsumerSite = (config.applicationBaseUrl == "https://www.egraphs.com/")
+    val printPrice = maybePrintOrder.map(_.amountPaid).getOrElse(Money.zero(CurrencyUnit.USD))
+    
     OrderCompleteViewModel (
       orderDate = order.created,
       orderNumber = order.id,
@@ -83,10 +83,13 @@ class OrderCompleteViewModelFactory @Inject()(config: ConfigFileProxy) {
       ownerEmail = recipientAccount.email,
       celebName = celeb.publicName,
       productName = product.name,
-      totalPrice = totalAmountPaid,
+      productId = product.id,
       expectedDeliveryDate = inventoryBatch.getExpectedDate,
       faqHowLongLink = faqHowLongLink,
-      hasPrintOrder = hasPrintOrder,
+      totalPrice = totalAmountPaid,
+      digitalPrice = product.price,
+      printPrice = printPrice,
+      hasPrintOrder = maybePrintOrder.isDefined,
       withAffiliateMarketing = isLiveConsumerSite
     )
   }

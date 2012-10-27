@@ -133,6 +133,33 @@
         <noscript>
           <img src="https://www.googleadservices.com/pagead/conversion/1003544199/?value=0&amp;label=XeHACNmU7QMQh73D3gM&amp;guid=ON&amp;script=0" height="1" width="1" style="border-style:none;" alt=""/>
         </noscript>
+        <!-- Google Analytics code for Ecommerce Tracking. See https://developers.google.com/analytics/devguides/collection/gajs/gaTrackingEcommerce -->
+        <script type="text/javascript">
+          _gaq.push(['_addTrans',
+            '@model.orderNumber',             // order ID - required
+            'Egraphs',                        // affiliation or store name
+            '@model.totalPrice.getAmount'     // total - required
+          ]);
+          _gaq.push(['_addItem',
+            '@model.orderNumber',             // order ID - required
+            '@model.productId',               // SKU/code - required
+            '@model.productName',             // product name
+            '',                               // category or variation
+            '@model.digitalPrice.getAmount',  // unit price - required
+            '1'                               // quantity - required
+          ]);
+          if (@model.hasPrintOrder) {
+            _gaq.push(['_addItem',
+              '@model.orderNumber',           // order ID - required
+              'framedprint',                  // SKU/code - required
+              'Framed Print',                 // product name
+              '',                             // category or variation
+              '@model.printPrice.getAmount',  // unit price - required
+              '1'                             // quantity - required
+            ]);
+          }
+          _gaq.push(['_trackTrans']);         //submits transaction to the Analytics servers
+        </script>
       }
     </div> <!-- end #content -->
     
