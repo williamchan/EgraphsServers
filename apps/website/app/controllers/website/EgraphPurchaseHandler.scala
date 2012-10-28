@@ -60,6 +60,8 @@ case class EgraphPurchaseHandler(
   implicit request: RequestHeader
 )
 {
+  import EgraphPurchaseHandler._
+  
   private def purchaseData: String = Serializer.SJSON.toJSON(Map(
     "recipientName" -> recipientName,
     "recipientEmail" -> recipientEmail,
@@ -174,14 +176,6 @@ case class EgraphPurchaseHandler(
     Right(order)
   }
 
-  // Failure base type
-  sealed abstract class PurchaseFailed(val failedPurchaseData: FailedPurchaseData)
-
-  // Our two failure cases for if the payment vendor failed or there was insufficient inventory
-  case class PurchaseFailedStripeError(override val failedPurchaseData: FailedPurchaseData, stripeException: com.stripe.exception.StripeException) extends PurchaseFailed(failedPurchaseData)
-  case class PurchaseFailedInsufficientInventory(override val failedPurchaseData: FailedPurchaseData) extends PurchaseFailed(failedPurchaseData)
-  case class PurchaseFailedError(override val failedPurchaseData: FailedPurchaseData) extends PurchaseFailed(failedPurchaseData)
-
   private def persistOrder(buyerEmail: String,
                            buyerName: String,
                            recipientEmail: String,
@@ -264,4 +258,13 @@ case class EgraphPurchaseHandler(
   }
 }
 
-object EgraphPurchaseHandler extends Logging
+object EgraphPurchaseHandler extends Logging {
+    // Failure base type
+  sealed abstract class PurchaseFailed(val failedPurchaseData: FailedPurchaseData)
+
+  // Our two failure cases for if the payment vendor failed or there was insufficient inventory
+  case class PurchaseFailedStripeError(override val failedPurchaseData: FailedPurchaseData, stripeException: com.stripe.exception.StripeException) extends PurchaseFailed(failedPurchaseData)
+  case class PurchaseFailedInsufficientInventory(override val failedPurchaseData: FailedPurchaseData) extends PurchaseFailed(failedPurchaseData)
+  case class PurchaseFailedError(override val failedPurchaseData: FailedPurchaseData) extends PurchaseFailed(failedPurchaseData)
+
+}
