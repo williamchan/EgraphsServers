@@ -16,21 +16,21 @@ case class EgraphsSession(session: Session) {
     getLong(Key.AdminId.name)
   }
   
-  def withAdminId(id: Long): EgraphsSession = {
-    copy(session = session + (Key.AdminId.name -> id.toString))
+  def withAdminId(id: Long): Session = {
+    session + (Key.AdminId.name -> id.toString)
   }
   
   def customerId: Option[Long] = {
     getLong(Key.CustomerId.name)
   }
   
-  def withCustomerId(id: Long): EgraphsSession = {
-    copy(session = session + (Key.CustomerId.name -> id.toString))
+  def withCustomerId(id: Long): Session = {
+    session + (Key.CustomerId.name -> id.toString)
   }
 
   def getLong(key: String): Option[Long] = {
     try {
-      session.get(key).map(value => value.toLong)      
+      session.get(key).map(value => value.toLong)
     } catch {
       case _: NumberFormatException => None
     }

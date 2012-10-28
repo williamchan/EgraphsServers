@@ -44,14 +44,6 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
    */
   def getEgraph(orderId: Long) = controllerMethod() {
     Action { implicit request =>
-      //TODO: PLAY20: from myyk, I did this wrong, these should be from a Form, I didn't know when I did this.  I would do now, but it is 6:30 on a Friday.
-      // TODO: disable pen-width and shadow re-setting once we find a good value.
-      val params = request.queryString
-      
-      val penWidth = Utils.getFromMapFirstInSeqOrElse("penWidth", "5.0", params).toDouble
-      val shadowX = Utils.getFromMapFirstInSeqOrElse("shadowX", "3.0", params).toDouble
-      val shadowY = Utils.getFromMapFirstInSeqOrElse("shadowY", "3.0", params).toDouble
-  
       // Get an order with provided ID
       val session = request.session
       orderStore.findFulfilledWithId(orderId) match {
@@ -64,9 +56,6 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
           Ok(GetEgraphEndpoint.html(
             egraph = egraph,
             order = order,
-            penWidth = penWidth,
-            shadowX = shadowX,
-            shadowY = shadowY,
             facebookAppId = facebookAppId,
             galleryLink = maybeGalleryLink,
             consumerApp = consumerApp

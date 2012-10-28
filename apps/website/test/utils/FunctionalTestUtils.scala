@@ -9,6 +9,8 @@ import play.api.test.Helpers._
 import play.api.Configuration
 import services.http.BasicAuth
 import play.api.test.FakeApplication
+import services.http.EgraphsSession
+import EgraphsSession.Conversions._
 
 //import java.util.Properties
 //import models.Account
@@ -34,6 +36,10 @@ object FunctionalTestUtils {
     val auth = BasicAuth.Credentials("wchan83@egraphs.com", TestData.defaultPassword)
     
     FakeRequest().withHeaders(auth.toHeader)
+  }
+  
+  def requestWithCustomerId(id: Long): FakeRequest[AnyContent] = {
+    FakeRequest().withSession(EgraphsSession.Key.CustomerId.name -> id.toString)
   }
 
   def requestWithCredentials(user: String, password: String): FakeRequest[AnyContent] = {
@@ -110,5 +116,22 @@ object FunctionalTestUtils {
     // to configure the app with a different ConfigFileProxy.
     // of our app will inhibit being able to create a controller with a different ConfigFileProxy
     it should "be unavailable outside of test mode" in (pending)
+  }
+  
+  
+  class DomainRequest(request: FakeRequest[AnyContent]) {
+    def withCustomer(customerId: Long): FakeRequest[AnyContent] = {
+      request.withSession(request.session.withCustomerId(customerId).data.toSeq: _*)
+    }
+    
+    def withAdmin(adminId: Long): FakeRequest[AnyContent] = {
+      request.withSession(request.session.withAdminId(adminId).data.toSeq: _*)
+    }
+  }
+  
+  object Conversions {
+    implicit def fakeRequestToDomainRequest(fakeRequest: FakeRequest[AnyContent]) = {
+      new DomainRequest(fakeRequest)
+    }
   }
 }
