@@ -106,7 +106,7 @@ trait StorefrontPersonalizeConsumerEndpoints
           ))
         }
         
-        redirectOrOk.fold(failure => failure, success => success)
+        redirectOrOk.merge
       }
     }
   }
@@ -151,7 +151,7 @@ trait StorefrontPersonalizeConsumerEndpoints
           Utils.redirectToClientProvidedTarget(urlIfNoTarget=defaultNextUrl)
         }
         
-        failureOrSuccessRedirect.fold(failure => failure, success => success)
+        failureOrSuccessRedirect.merge
       }
     }
   }

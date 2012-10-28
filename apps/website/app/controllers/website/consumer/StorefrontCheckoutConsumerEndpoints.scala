@@ -131,7 +131,7 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
             )
           }
   
-          results.fold(failure => failure, ok => ok)
+          results.merge
         }
       }
     }
@@ -203,7 +203,7 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
           Redirect(finalizeRedirect)
         }
         
-        redirects.fold(failureRedirect => failureRedirect, successRedirect => successRedirect)
+        redirects.merge
       }
     }
   }

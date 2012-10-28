@@ -61,7 +61,7 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
         )
       }
 
-      redirects.fold(failure => failure, success => success)
+      redirects.merge
     }
   }
 

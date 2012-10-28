@@ -133,7 +133,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
           ))
         }
         
-        results.fold(failure => failure, ok => ok)
+        results.merge
       }
     }
   }
@@ -187,10 +187,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
         ).execute()        
       }
       
-      failureOrSuccessRedirects.fold(
-        failureRedirect => failureRedirect, 
-        successRedirect => successRedirect
-      )
-    }  
+      failureOrSuccessRedirects.merge
+    }
   }
 }

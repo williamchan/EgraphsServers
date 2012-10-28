@@ -84,7 +84,7 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
             successResult
           }
           
-          results.fold(failure => failure, success => success)
+          results.merge
         }
       )
 

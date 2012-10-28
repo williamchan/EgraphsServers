@@ -98,7 +98,7 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
           ))
         }
         
-        redirectOrOk.fold(failureRedirect => failureRedirect, ok => ok)
+        redirectOrOk.merge
       }
     }
   }
@@ -144,7 +144,7 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
           Utils.redirectToClientProvidedTarget(urlIfNoTarget=defaultNextUrl)
         }
         
-        failureOrSuccessRedirect.fold(failureRedirect => failureRedirect, successRedirect => successRedirect)
+        failureOrSuccessRedirect.merge
       }
     }
   }
