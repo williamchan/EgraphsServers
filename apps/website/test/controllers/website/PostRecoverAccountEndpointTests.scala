@@ -11,10 +11,13 @@ import controllers.routes.WebsiteControllers.postRecoverAccount
 import utils.EgraphsUnitTest
 import services.AppConfig
 import services.db.DBSession
+import utils.CsrfProtectedResourceTests
 
-class PostRecoverAccountEndpointTests extends EgraphsUnitTest {
+class PostRecoverAccountEndpointTests extends EgraphsUnitTest with CsrfProtectedResourceTests {
   
   private def db = AppConfig.instance[DBSession]
+  
+  override protected def routeUnderTest = postRecoverAccount 
 
   routeName(postRecoverAccount()) should "validate email addresses" in new EgraphsTestApplication {
     val Some(result) = routeAndCall(
@@ -40,7 +43,6 @@ class PostRecoverAccountEndpointTests extends EgraphsUnitTest {
     val Some(flash) = result.flash
     
     status(result) should be (OK)
-    println(result.flash)
     flash.get("errors") should be (None)
   }
 }

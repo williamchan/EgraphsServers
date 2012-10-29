@@ -17,11 +17,14 @@ import models.Order
 import services.db.DBSession
 import play.api.mvc.Result
 import play.api.mvc.AnyContent
+import utils.CsrfProtectedResourceTests
 
 
-class PostOrderConfigureEndpointTests extends EgraphsUnitTest {
+class PostOrderConfigureEndpointTests extends EgraphsUnitTest with CsrfProtectedResourceTests {
   private def orderStore = AppConfig.instance[OrderStore]
   private def db = AppConfig.instance[DBSession]
+  
+  override protected def routeUnderTest = postOrderPrivacy(1L)
 
   routeName(postOrderPrivacy(1L)) should "change privacy status of order when requested by owner and no one else" in new EgraphsTestApplication {
     val (order, recipient, stranger) = db.connected(TransactionSerializable) {

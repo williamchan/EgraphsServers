@@ -12,6 +12,8 @@ import play.api.mvc.Action
 import services.http.forms.CustomerLoginFormFactory
 import play.api.mvc.Controller
 import play.api.mvc.Results._
+import utils.FunctionalTestUtils.routeName
+import utils.FunctionalTestUtils.Conversions._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import play.api.mvc.AnyContent
@@ -20,32 +22,34 @@ import play.api.test.FakeRequest
 import utils.TestData
 import services.http.forms.CustomerLoginForm
 import services.http.forms.FormError
-import controllers.routes.WebsiteControllers.getLogin
+import controllers.routes.WebsiteControllers.{getLogin, postLogin}
 import play.api.test.Helpers._
 import services.db.TransactionSerializable
 import egraphs.playutils.RichResult._
 import services.http.forms.CustomerLoginForm.Fields
 import services.http.EgraphsSession.Conversions._
+import utils.CsrfProtectedResourceTests
 
 
 @RunWith(classOf[JUnitRunner])
-class LoginTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValidationBefore {
+class LoginTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValidationBefore with CsrfProtectedResourceTests {
   import Form.Conversions._
   private def db = AppConfig.instance[DBSession]
+  
+  override protected def routeUnderTest = postLogin()
 
-  "postLogin" should "redirect to login with form information when passwords don't match" in new EgraphsTestApplication {
+  routeName(routeUnderTest) should "redirect to login with form information when passwords don't match" in new EgraphsTestApplication {
     val request = FakeRequest().withFormUrlEncodedBody(
       Fields.Email -> "idontexist@egraphs.com", Fields.Password -> TestData.defaultPassword
-    )
+    ).withAuthToken
     
+    val result = controllers.WebsiteControllers.postLogin().apply(request)
+
+    status(result) should be (SEE_OTHER)
+    redirectLocation(result) should be (Some(getLogin().url))
+
     db.connected(TransactionSerializable) {
-      val result = new MockLoginController().postLogin().apply(request)
-
-      status(result) should be (SEE_OTHER)
-      redirectLocation(result) should be (Some(getLogin().url))
-
       val customerFormOption = AppConfig.instance[CustomerLoginFormFactory].read(result.flash.get.asFormReadable)
-      println(result.flash)
       customerFormOption match {
         case Some(form) =>
           form.email.value should be (Some("idontexist@egraphs.com"))
@@ -66,10 +70,10 @@ class LoginTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValidationBe
     }
     
 
-    val result = new MockLoginController().postLogin().apply(
+    val result = controllers.WebsiteControllers.postLogin().apply(
       FakeRequest().withFormUrlEncodedBody(
         Fields.Email -> account.email, Fields.Password -> password
-      )
+      ).withAuthToken
     )
     val maybeResultCustomerId = result.session.flatMap(session => session.customerId)
 

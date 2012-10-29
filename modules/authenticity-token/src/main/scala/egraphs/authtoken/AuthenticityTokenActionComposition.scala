@@ -46,7 +46,8 @@ private [authtoken] trait AuthenticityTokenActionComposition {
       // Reset the auth token if any part of our checks failed.
       maybeSafeResult.getOrElse {
         logInvalidAttempt(request)
-        Forbidden.withSession(request.session + (authTokenKey -> newAuthToken.value))
+        Forbidden("Invalid authenticity token; someone may be trying to hack your connection to egraphs.com")
+          .withSession(request.session + (authTokenKey -> newAuthToken.value))
       }
     }
   }

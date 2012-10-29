@@ -13,6 +13,7 @@ import controllers.routes.WebsiteControllers.{postResetPassword, getResetPasswor
 import services.AppConfig
 import services.http.forms.AccountPasswordResetForm.Fields
 import utils.FunctionalTestUtils.Conversions._
+import utils.FunctionalTestUtils.routeName
 import services.db.DBSession
 import play.api.mvc.Controller
 import com.google.inject.Inject
@@ -22,14 +23,16 @@ import services.http.forms.AccountPasswordResetFormFactory
 import utils.Stubs
 import services.mvc.ImplicitHeaderAndFooterData
 import models.Account
+import utils.CsrfProtectedResourceTests
 
-class PostResetPasswordEndpointTests extends EgraphsUnitTest {
+class PostResetPasswordEndpointTests extends EgraphsUnitTest with CsrfProtectedResourceTests {
   import controllers.WebsiteControllers
-
-  // private val url = WebsiteControllers.reverse(WebsiteControllers.postResetPassword())
+  
+  override protected def routeUnderTest = postResetPassword
+  
   private def db = AppConfig.instance[DBSession]
   
-  "postResetPassword" should "set a new password when the new one and its confirmation match and it meets the strength requirement" in new EgraphsTestApplication {
+  routeName(routeUnderTest) should "set a new password when the new one and its confirmation match and it meets the strength requirement" in new EgraphsTestApplication {
     val result = performPostResetPassword(accountWithResetPasswordKey)("password", "password")
 
     status(result) should be (OK)
