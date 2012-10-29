@@ -11,6 +11,8 @@ import services.http.BasicAuth
 import play.api.test.FakeApplication
 import services.http.EgraphsSession
 import EgraphsSession.Conversions._
+import play.api.mvc.Call
+import play.api.mvc.AnyContentAsFormUrlEncoded
 
 //import java.util.Properties
 //import models.Account
@@ -109,7 +111,6 @@ object FunctionalTestUtils {
     routeName(routeUnderTest) + ", as a test-only endpoint, " should "be available during test mode" in new EgraphsTestApplication {
       val Some(result) = routeAndCall(FakeRequest(routeUnderTest.method, routeUnderTest.url))
       status(result) should not be (NOT_FOUND)
-      // println("Content is -- " + contentAsString(result))
     }
 
     // TODO: Implement this method once controllers are injectable...Until then it will be impossible
@@ -119,18 +120,33 @@ object FunctionalTestUtils {
   }
   
   
-  class DomainRequest(request: FakeRequest[AnyContent]) {
-    def withCustomer(customerId: Long): FakeRequest[AnyContent] = {
+  class DomainRequest[T <: AnyContent](request: FakeRequest[T]) {
+    def toRoute(route: Call): FakeRequest[T] = {
+      request.copy(method=route.method, uri=route.url)
+    }
+    
+    def withCustomer(customerId: Long): FakeRequest[T] = {
       request.withSession(request.session.withCustomerId(customerId).data.toSeq: _*)
     }
     
-    def withAdmin(adminId: Long): FakeRequest[AnyContent] = {
+    def withAdmin(adminId: Long): FakeRequest[T] = {
       request.withSession(request.session.withAdminId(adminId).data.toSeq: _*)
+    }
+    
+    def withAuthToken: FakeRequest[AnyContentAsFormUrlEncoded] = {
+      val authToken = "fake-auth-token"
+      val existingBody = request.body.asFormUrlEncoded.getOrElse(Map())
+      val newBody = existingBody + ("authenticityToken" -> Seq(authToken))
+      val newBodySingleValues = newBody.map(kv => (kv._1, kv._2.head))
+      val newSession = request.session + ("authenticityToken" -> authToken)
+      request
+        .withSession(newSession.data.toSeq:_*)
+        .withFormUrlEncodedBody(newBodySingleValues.toSeq: _*)
     }
   }
   
   object Conversions {
-    implicit def fakeRequestToDomainRequest(fakeRequest: FakeRequest[AnyContent]) = {
+    implicit def fakeRequestToDomainRequest[T <: AnyContent](fakeRequest: FakeRequest[T]) = {
       new DomainRequest(fakeRequest)
     }
   }

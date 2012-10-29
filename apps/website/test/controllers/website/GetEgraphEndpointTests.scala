@@ -1,6 +1,5 @@
 package controllers.website
 
-import org.junit.Test
 import play.api.test.Helpers._
 import play.api.test._
 import play.api.mvc.Result

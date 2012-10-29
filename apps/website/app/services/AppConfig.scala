@@ -88,6 +88,7 @@ object AppConfig extends Logging {
     val (createdInjector, timing) = Time.stopwatch {
       try {
         import play.api.Play
+
         val stage = if (new ConfigFileProxy(Play.current.configuration).applicationMode == "dev") {
           Stage.DEVELOPMENT
         } else {
@@ -102,8 +103,7 @@ object AppConfig extends Logging {
           throw e
       }
     }
-    
-    log(timing + " seconds to create dependency injector.")
+
     createdInjector
   }
 
