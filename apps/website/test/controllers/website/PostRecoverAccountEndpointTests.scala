@@ -1,34 +1,48 @@
 package controllers.website
 
-import org.junit.Assert._
-import org.junit.Test
-import scala.collection.JavaConversions._
-import play.test.FunctionalTest
-import FunctionalTest._
+import play.api.test._
+import play.api.test.Helpers._
+import egraphs.playutils.RichResult._
+import utils.FunctionalTestUtils.routeName
+import utils.FunctionalTestUtils.Conversions._
 import services.db.TransactionSerializable
 import utils.TestData
-import controllers.WebsiteControllers
+import controllers.routes.WebsiteControllers.postRecoverAccount
+import utils.EgraphsUnitTest
+import services.AppConfig
+import services.db.DBSession
+import utils.CsrfProtectedResourceTests
 
-class PostRecoverAccountEndpointTests extends EgraphsFunctionalTest {
-  val url = WebsiteControllers.reverse(WebsiteControllers.postRecoverAccount()).url
-  @Test
-  def testEmailValidation() {
-    val response = POST(url, getPostStrParams(email = ""))
-    assertStatus(404, response)
+class PostRecoverAccountEndpointTests extends EgraphsUnitTest with CsrfProtectedResourceTests {
+  
+  private def db = AppConfig.instance[DBSession]
+  
+  override protected def routeUnderTest = postRecoverAccount 
+
+  routeName(postRecoverAccount()) should "validate email addresses" in new EgraphsTestApplication {
+    val Some(result) = routeAndCall(
+      FakeRequest().toRoute(postRecoverAccount).withFormUrlEncodedBody("email" -> "").withAuthToken
+    )
+    
+    status(result) should be (NOT_FOUND)
   }
 
-  @Test
-  def testRecoverAccountSetsResetPasswordKey() {
+  it should "set the account's 'reset password' key" in new EgraphsTestApplication {
     val account = db.connected(TransactionSerializable) {
       val customer = TestData.newSavedCustomer()
       customer.account
     }
 
-    val response = POST(url, getPostStrParams(email = account.email))
-    assertFalse(getPlayFlashCookie(response).contains("error"))
-  }
-
-  private def getPostStrParams(email: String): Map[String, String] = {
-    Map[String, String]("email" -> email)
+    val Some(result) = routeAndCall(
+      FakeRequest()
+        .toRoute(postRecoverAccount)
+        .withFormUrlEncodedBody("email" -> account.email)
+        .withAuthToken
+    )
+    
+    val Some(flash) = result.flash
+    
+    status(result) should be (OK)
+    flash.get("errors") should be (None)
   }
 }

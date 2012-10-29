@@ -1,6 +1,0 @@
-self: egraphs -> redis 0.3
-
-require:
-    - play
-    - redis.clients -> jedis 2.0.0
-    - org.antlr -> stringtemplate 3.2.1

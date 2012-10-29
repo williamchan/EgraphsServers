@@ -4,6 +4,8 @@ import play.api.mvc.{Session, Result, PlainResult, Cookies}
 import play.api.http.HeaderNames.SET_COOKIE
 import play.api.mvc.AsyncResult
 import play.api.mvc.RequestHeader
+import play.api.mvc.CookieBaker
+import play.api.mvc.Flash
 
 /**
  * "Pimp-my-library" of Play's PlainResult type. Gives direct access to
@@ -29,11 +31,8 @@ class RichResult(result: Result) {
    * 
    * Throws an exception if this was not a PlainResult.
    */
-  val session: Option[Session] = {    
-    result match {
-      case result: PlainResult => sessionFromPlainResult(result)
-      case other => throw new RuntimeException("Can not access session of a non-PlainResult.")
-    }
+  lazy val session: Option[Session] = {
+    bakeCookieFromPlainResult(this.plainResult, baker=Session)
   }
 
   /**
@@ -41,12 +40,19 @@ class RichResult(result: Result) {
    * into it. Otherwise throws an exception.
    */
   def withSession(session: Session): Result = {
-    result match {
-      case plainResult: PlainResult => plainResult.withSession(session)
-      case other => throw new RuntimeException("Can not write session of a non-PlainResult.")
-    }
+    this.plainResult.withSession(session)
   }
   
+  /**
+   * Returns the [[play.api.mvc.Result]]'s flash as represented in its
+   * SET_COOKIE header, if it had one. Otherwise returns None.
+   * 
+   * Throws an exception if this was not a PlainResult.
+   */
+  lazy val flash: Option[Flash] = {
+    bakeCookieFromPlainResult(this.plainResult, baker=Flash)
+  }
+
   /**
    * Adds additional data to the session. Appends to the SET_COOKIE header if one already
    * existed in the result for the session cookie. Otherwise, grabs the existing session
@@ -64,14 +70,21 @@ class RichResult(result: Result) {
   //
   // Private members
   //
-  private def sessionFromPlainResult(plainResult: PlainResult): Option[Session] = {
+  private def bakeCookieFromPlainResult[T <: AnyRef](result: PlainResult, baker: CookieBaker[T]): Option[T] = {
     for (
-      setCookieString <- plainResult.header.headers.get(SET_COOKIE);
-      sessionCookie <- Cookies.decode(setCookieString).find(_.name == Session.COOKIE_NAME)
+      setCookieString <- result.header.headers.get(SET_COOKIE);
+      cookie <- Cookies.decode(setCookieString).find(_.name == baker.COOKIE_NAME)
     ) yield {
-      Session.decodeFromCookie(Some(sessionCookie))
+      baker.decodeFromCookie(Some(cookie))
     }
   }
+  
+  private lazy val plainResult:PlainResult = {
+    result match {
+      case plainResult: PlainResult => plainResult
+      case other => throw new RuntimeException("Can not access flash of a non-PlainResult.")
+    }
+  } 
 }
 
 object RichResult {

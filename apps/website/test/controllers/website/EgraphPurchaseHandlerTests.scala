@@ -10,25 +10,35 @@ import models.FailedPurchaseDataStore
 import models.{PrintOrderStore, CashTransactionStore, Order, OrderStore}
 import services.http.forms.purchase.CheckoutShippingForm
 import org.joda.money.{CurrencyUnit, Money}
+import play.api.test.FakeRequest
+import com.stripe.Stripe
+import services.http.EgraphsSession
+import models.Celebrity
+import models.Product
+import models.Order
 
 class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValidationBefore {
 
-  private val db = AppConfig.instance[DBSession]
-  private val orderStore = AppConfig.instance[OrderStore]
-  private val cashTransactionStore = AppConfig.instance[CashTransactionStore]
-  private val printOrderStore = AppConfig.instance[PrintOrderStore]
-  private val failedPurchaseDataStore = AppConfig.instance[FailedPurchaseDataStore]
+  private def db = AppConfig.instance[DBSession]
+  private def orderStore = AppConfig.instance[OrderStore]
+  private def cashTransactionStore = AppConfig.instance[CashTransactionStore]
+  private def printOrderStore = AppConfig.instance[PrintOrderStore]
+  private def failedPurchaseDataStore = AppConfig.instance[FailedPurchaseDataStore]
 
-  private val payment = AppConfig.instance[StripeTestPayment]
-  payment.bootstrap()
+  private def payment = {
+    val instance = AppConfig.instance[StripeTestPayment]
+    instance.bootstrap()
+    
+    instance
+  }
 
   private val recipientName = "My Recipient"
   private val recipientEmail = TestData.generateEmail(prefix = "recipient")
   private val buyerName = "My Buyer"
   private val buyerEmail = TestData.generateEmail(prefix = "buyer")
 
-  it should "create Order and CashTransaction for a digital-only purchase" in {
-    val orderFromHandler = executePurchaseHandler()
+  "An EgraphPurchaseHAndler" should "create Order and CashTransaction for a digital-only purchase" in new EgraphsTestApplication {    
+    val Right(orderFromHandler) = executePurchaseHandler()
     db.connected(TransactionSerializable) {
       val order = orderStore.get(orderFromHandler.id)
       order.amountPaidInCurrency should be(BigDecimal(50))
@@ -46,7 +56,7 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheAndBlob
     }
   }
 
-  it should "create Order and PrintOrder and CashTransaction with totalAmountPaid if PrintingOption is HighQualityPrint" in {
+  it should "create Order and PrintOrder and CashTransaction with totalAmountPaid if PrintingOption is HighQualityPrint" in new EgraphsTestApplication {
     val shippingForm = CheckoutShippingForm.Valid(
       name = "Egraphs",
       addressLine1 = "615 2nd Ave",
@@ -56,7 +66,7 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheAndBlob
       postalCode = "98102"
     )
 
-    val orderFromHandler = executePurchaseHandler(
+    val Right(orderFromHandler) = executePurchaseHandler(
       totalAmountPaid = BigDecimal(95).toMoney(),
       printingOption = PrintingOption.HighQualityPrint,
       shippingForm = Some(shippingForm)
@@ -77,29 +87,19 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheAndBlob
   }
 
   it should "fail to save order when there is insufficient inventory" in {
-    val (celebrity, product) = db.connected(TransactionSerializable) {
+    val celebAndProduct = db.connected(TransactionSerializable) {
       val product = TestData.newSavedProduct().copy(priceInCurrency = BigDecimal(50))
       product.inventoryBatches.head.copy(numInventory = 0).save()
       (product.celebrity, product)
     }
-
-    val purchaseHandler: EgraphPurchaseHandler = EgraphPurchaseHandler(
-      recipientName = recipientName,
-      recipientEmail = recipientEmail,
-      buyerName = buyerName,
-      buyerEmail = buyerEmail,
-      stripeTokenId = payment.testToken().id,
-      desiredText = None,
-      personalNote = None,
-      celebrity = celebrity,
-      product = product,
+    
+    val result = executePurchaseHandler(
       totalAmountPaid = BigDecimal(50).toMoney(),
-      billingPostalCode = "55555",
       printingOption = PrintingOption.DoNotPrint,
       shippingForm = None,
-      writtenMessageRequest = WrittenMessageRequest.SpecificMessage
+      celebrityAndProduct = Some(celebAndProduct)
     )
-    val result = purchaseHandler.performPurchase()
+
     val failedPurchaseDataFromHandler = result.fold(
       error => error.failedPurchaseData,
       order => throw new Exception("Purchase should have failed, thus there should be no order.")
@@ -112,18 +112,25 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheAndBlob
       failedPurchaseData.purchaseData should include(recipientEmail)
       failedPurchaseData.purchaseData should include(buyerName)
       failedPurchaseData.purchaseData should include(buyerEmail)
-      failedPurchaseData.purchaseData should include("\"productId\":" + product.id)
+      failedPurchaseData.purchaseData should include("\"productId\":" + celebAndProduct._2.id)
     }
   }
 
-  private def executePurchaseHandler(totalAmountPaid: Money = BigDecimal(50).toMoney(),
-                                     printingOption: PrintingOption = PrintingOption.DoNotPrint,
-                                     shippingForm: Option[CheckoutShippingForm.Valid] = None): Order =
+  private def executePurchaseHandler(
+    totalAmountPaid: Money = BigDecimal(50).toMoney(),
+    printingOption: PrintingOption = PrintingOption.DoNotPrint,
+    shippingForm: Option[CheckoutShippingForm.Valid] = None,
+    celebrityAndProduct: Option[(Celebrity, Product)] = None
+  ): Either[EgraphPurchaseHandler.PurchaseFailed, Order] =
   {
-    val (celebrity, product) = db.connected(TransactionSerializable) {
-      val product = TestData.newSavedProduct()
-      (product.celebrity, product)
+    val (celebrity, product) = celebrityAndProduct.getOrElse {
+      db.connected(TransactionSerializable) {
+        val product = TestData.newSavedProduct()
+        (product.celebrity, product)
+      }
     }
+    
+    val req = FakeRequest().withSession(EgraphsSession.SESSION_ID_KEY -> "12345")
 
     val purchaseHandler = EgraphPurchaseHandler(
       recipientName = recipientName,
@@ -137,15 +144,12 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheAndBlob
       product = product,
       totalAmountPaid = totalAmountPaid,
       billingPostalCode = "55555",
+      flash = req.flash,
       printingOption = printingOption,
       shippingForm = shippingForm,
       writtenMessageRequest = WrittenMessageRequest.SpecificMessage
-    )
+    )(req)
 
-    val result = purchaseHandler.performPurchase()
-    result.fold(
-      error => throw new Exception("Performing purchase failed. " + error),
-      order => order
-    )
+    purchaseHandler.performPurchase()
   }
 }

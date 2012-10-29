@@ -1,55 +1,73 @@
 package controllers.website
 
-import admin.AdminFunctionalTest
-import org.junit.Test
-import play.test.FunctionalTest
-import FunctionalTest._
+import play.api.test.Helpers._
+import play.api.test._
+import play.api.mvc.Result
 import services.db.TransactionSerializable
 import utils.{TestConstants, TestData}
 import models.enums.{EgraphState, OrderReviewStatus, PrivacyStatus}
-import play.libs.Codec
+import services.AppConfig
+import services.db.DBSession
+import utils.EgraphsUnitTest
+import utils.FunctionalTestUtils.requestWithCustomerId
+import egraphs.playutils.Encodings.Base64
+import controllers.routes.WebsiteControllers.getEgraph
+import services.http.EgraphsSession
+import utils.FunctionalTestUtils
+import FunctionalTestUtils.Conversions._
 
-class GetEgraphEndpointTests extends AdminFunctionalTest {
-
-  @Test
-  def testPrivateEgraphsAreOnlyViewableByBuyerAndRecipientAndAdmin() {
-    val (orderId: String, buyerAcct, recipientAcct, anotherAcct) = db.connected(TransactionSerializable) {
+class GetEgraphEndpointTests extends EgraphsUnitTest {
+  
+  private def db = AppConfig.instance[DBSession]
+  
+  "A private egraph" should "only be viewable by buyer, recipient, and admin" in new EgraphsTestApplication {
+    val (orderId, buyer, recipient, anotherCustomer, admin) = db.connected(TransactionSerializable) {
       val buyer = TestData.newSavedCustomer()
       val recipient = TestData.newSavedCustomer()
       val anotherCustomer = TestData.newSavedCustomer()
+      val admin = TestData.newSavedAdministrator()
       val order = buyer.buy(TestData.newSavedProduct(), recipient = recipient)
         .withPrivacyStatus(PrivacyStatus.Private)
         .withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
       order.newEgraph.withEgraphState(EgraphState.Published)
-        .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), Codec.decodeBASE64(TestConstants.voiceStr())).save()
-      (order.id.toString, buyer.account, recipient.account, anotherCustomer.account)
+        .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), Base64.decode(TestConstants.voiceStr())).save()
+      (order.id, buyer, recipient, anotherCustomer, admin)
     }
-
+	
+    val requestAsCustomer: Option[Long] => Result = egraphRequestAsCustomer(orderId, _)
+    
     // anonymous users and random customers are redirected away
-    assertStatus(403, GET("/" + orderId))
-    login(anotherAcct)
-    assertStatus(403, GET("/" + orderId))
-
+    status(requestAsCustomer(None)) should be (FORBIDDEN)
+    status(requestAsCustomer(Some(anotherCustomer.id))) should be (FORBIDDEN)
+    
     // buyer, recipient, and admins are able to view this egraph
-    login(buyerAcct)
-    assertIsOk(GET("/" + orderId))
-    login(recipientAcct)
-    assertIsOk(GET("/" + orderId))
-    createAndLoginAsAdmin()
-    assertIsOk(GET("/" + orderId))
+    status(requestAsCustomer(Some(buyer.id))) should be (OK)
+    status(requestAsCustomer(Some(recipient.id))) should be (OK)
+    
+    val adminReq = FakeRequest(GET, getEgraph(orderId).url).withAdmin(admin.id)
+    status(routeAndCall(adminReq).get) should be (OK)
   }
-
-  @Test
-  def testPublicEgraphsAreViewableByAll() {
-    val orderId: String = db.connected(TransactionSerializable) {
+  
+  "A public egraph" should "be viewable by all" in new EgraphsTestApplication {
+    val orderId: Long = db.connected(TransactionSerializable) {
       val buyer = TestData.newSavedCustomer()
       val order = buyer.buy(TestData.newSavedProduct())
         .withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
       order.newEgraph.withEgraphState(EgraphState.Published)
-        .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), Codec.decodeBASE64(TestConstants.voiceStr())).save()
-      order.id.toString
+        .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), Base64.decode(TestConstants.voiceStr())).save()
+      order.id
     }
-
-    assertIsOk(GET("/" + orderId))
+   
+    val Some(result) = routeAndCall(FakeRequest(GET, getEgraph(orderId).url))
+    
+    status(result) should be (OK)
   }
+  
+  private def egraphRequestAsCustomer(orderId: Long, customerId: Option[Long]): Result = {
+    val req = customerId.map(id => FakeRequest().withCustomer(id)).getOrElse(FakeRequest())
+    
+    routeAndCall(req.copy(method=GET, uri=getEgraph(orderId).url)).get
+  }
+
+  
 }

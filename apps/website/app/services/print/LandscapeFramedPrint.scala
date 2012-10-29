@@ -5,6 +5,7 @@ import java.awt.geom.Rectangle2D
 import java.awt.image.BufferedImage
 import java.util.Date
 import java.awt.{Font, Color, RenderingHints}
+import play.api.Play.current
 
 object LandscapeFramedPrint {
 
@@ -232,6 +233,6 @@ case class LandscapeFramedPrint() {
   }
 
   private def certificateBackgroundImage: BufferedImage = {
-    ImageIO.read(play.Play.getFile("public/images/landscape-framed-print-cert.png"))
+    ImageIO.read(current.resourceAsStream("images/landscape-framed-print-cert.png").get)
   }
 }

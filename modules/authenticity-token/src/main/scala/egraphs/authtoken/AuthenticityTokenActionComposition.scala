@@ -9,6 +9,7 @@ import play.api.mvc.Action
 import play.api.data.Form
 import play.api.data.Forms.single
 import play.api.data.Forms.text
+import play.api.mvc.Request
 
 /**
  * A pair of action compositions that protect your POST methods against CSRF submissions
@@ -36,7 +37,7 @@ private [authtoken] trait AuthenticityTokenActionComposition {
       // Read the auth token from both the session and the request and make sure they match.
       val maybeSafeResult = for {
         sessionToken <- request.session.get(authTokenKey)
-        formToken <- Form(single(authTokenKey -> text)).bindFromRequest.apply(authTokenKey).value
+        formToken <- authTokenFromRequest(request)
         if (sessionToken == formToken)
       } yield {
         action(request)
@@ -44,7 +45,9 @@ private [authtoken] trait AuthenticityTokenActionComposition {
 
       // Reset the auth token if any part of our checks failed.
       maybeSafeResult.getOrElse {
-        Forbidden.withSession(request.session + (authTokenKey -> newAuthToken.value))
+        logInvalidAttempt(request)
+        Forbidden("Invalid authenticity token; someone may be trying to hack your connection to egraphs.com")
+          .withSession(request.session + (authTokenKey -> newAuthToken.value))
       }
     }
   }
@@ -71,11 +74,8 @@ private [authtoken] trait AuthenticityTokenActionComposition {
       val maybeToken = for (sessionToken <- request.session.get(authTokenKey)) yield {
         new AuthenticityToken(sessionToken)
       }
-
       val token = maybeToken.getOrElse(newAuthToken)
-
       val result = actionFactory(token).apply(request)
-
       // Put the token we just generated in the session if there wasn't already
       // a token there.
       if (maybeToken.isDefined) {
@@ -96,5 +96,16 @@ private [authtoken] trait AuthenticityTokenActionComposition {
   //
   private def newAuthToken: AuthenticityToken = {
     new AuthenticityToken(newAuthTokenString)
+  }
+  
+  private def logInvalidAttempt(request: Request[_]) {
+    play.api.Logger.info(
+      "Invalid authenticity token \"" + authTokenFromRequest(request).getOrElse("") + "\" during request to " + request.uri +
+      " from client " + request.remoteAddress + ". Expected \"" + request.session.get(authTokenKey).getOrElse("") + "\"."
+    )    
+  }
+  
+  private def authTokenFromRequest(request: Request[_]): Option[String] = {
+    Form(single(authTokenKey -> text)).bindFromRequest()(request).apply(authTokenKey).value
   }
 }

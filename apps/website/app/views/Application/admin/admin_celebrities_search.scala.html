@@ -1,111 +1,113 @@
 @(celebrityListings: Iterable[models.CelebrityListing]
-)(implicit flash:play.mvc.Scope.Flash, session: play.mvc.Scope.Session)
+)(implicit authToken: egraphs.authtoken.AuthenticityToken, 
+  headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData)
 
 @import controllers.WebsiteControllers
-@import services.Utils.lookupUrl
-@import views.Application.tags.html.authenticityToken
-@import views.Application.html.content_base
+@import egraphs.authtoken.AuthenticityToken.safeForm
+@import views.html.frontend.tags
+@import views.html.frontend.tags.ng
+@import views.html.frontend.base_template
 
-
-@content_base(title="Admin - Celebrities", body=body, head=head, navContent=navContent, onLoad=onBodyLoad)
+@getCelebritiesAdmin = @{
+	routes.WebsiteControllers.getCelebritiesAdmin
+}
 
 @getCreateCelebrity = @{
-  lookupUrl("WebsiteControllers.getCreateCelebrityAdmin")
+	routes.WebsiteControllers.getCreateCelebrityAdmin
 }
 
 @postLogout = @{
-  lookupUrl("WebsiteControllers.postLogout")
+	routes.WebsiteControllers.postLogout
 }
 
 @getCelebritiesBySearchAdmin = @{
-  lookupUrl("WebsiteControllers.getCelebritiesBySearchAdmin")
+	routes.WebsiteControllers.getCelebritiesBySearchAdmin
 }
 
 @head = {
-<link rel="stylesheet" href='@asset("public/chosen/chosen.css")' >
-<script src='@asset("public/twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
-<script src='@asset("public/chosen/chosen.jquery.min.js")' type="text/javascript"></script>
-}
-
-@onBodyLoad = {
-  $('.chzn-select').chosen();
-}
-
-@navContent = {
-  <form id="logout" class="pull-right" method="POST" action='@postLogout' enctype="application/x-www-form-urlencoded">
-    @authenticityToken()
-    <div>
-      <button type="submit" id="logout-button" class="btn fade in">Logout</button>
-    </div>
-  </form>
+<link rel="stylesheet" href='@RemoteAssets.at("chosen/chosen.css")' >
+<script src='@RemoteAssets.at("twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>
+<script src='@RemoteAssets.at("chosen/chosen.jquery.min.js")' type="text/javascript"></script>
 }
 
 @body = {
-<div class="admin-content">
-  <h1>
-    Celebrity Search Results
-  </h1>
-  <form method="link" action="@getCreateCelebrity">
-    <input class="btn primary fade in" type="submit" value="New Celebrity"/>
-  </form>
-  <form method="GET" action="@getCelebritiesBySearchAdmin">
-    <input type="text" name="query"/>
-    <input class="btn primary fade in" value="Search" type="submit"/>
-  </form>
-  <h2>All @celebrityListings.size</h2>
+<section id="content" class="top" role="main">
+  <div id="main" class="sub">
+    <div class="container" id="celebrity-admin">
 
-  <table>
-    <tr>
-      <th></th>
-      <th>Id</th>
-      <th>Email</th>
-      <th>Public Name</th>
-      <th>Enrolled?</th>
-      <th>Published?</th>
-      <th>Products</th>
-      <th>Orders</th>
-      <th>Egraphs</th>
-      <th>Inventory</th>
-    </tr>
-    @celebrityListings.map { case celebrityListing =>
-    <tr>
-      <td>
-        <a class="preview-link" href="/admin/celebrities/@celebrityListing.id">
-          Details
-        </a>
-      </td>
-      <td>@celebrityListing.id</td>
-      <td>@celebrityListing.email</td>
-      <td>
-        <a class="preview-link" href="/@celebrityListing.urlSlug">
-          @celebrityListing.publicName
-        </a>
-      </td>
-      <td>@celebrityListing.enrollmentStatus</td>
-      <td>@celebrityListing.publishedStatus</td>
-      <td>
-        <a class="preview-link" href="/admin/celebrities/@celebrityListing.id/products">
-        Products
-        </a>
-      </td>
-      <td>
-        <a class="preview-link" href="/admin/celebrities/@celebrityListing.id/orders?filter=pendingAdminReview">
-          Orders
-        </a>
-      </td>
-      <td>
-        <a class="preview-link" href="/admin/celebrities/@celebrityListing.id/egraphs">
-          Egraphs
-        </a>
-      </td>
-      <td>
-        <a class="preview-link" href="/admin/celebrities/@celebrityListing.id/inventorybatches">
-          Inventory
-        </a>
-      </td>
-    </tr>
-    }
-  </table>
-  <a href="@lookupUrl("WebsiteControllers.getCelebritiesAdmin")">View all celebrities</a>
-</div>
+        <h1>
+          Celebrity Search Results
+        </h1>
+        <div class="row-fluid">      
+          <form method="GET" class="form-search" action="@getCelebritiesBySearchAdmin">
+            <div class="span3"> 
+              <input type="text" class="input-large search-query" name="query" placeholder="Search for celebrities...">
+            </div>  
+            <div class="span9">  
+              @tags.arrow_button(caption="Go")
+            </div>
+          </form>
+        </div>
+        <h2>All @celebrityListings.size</h2>      
+        <table class="table table-hover table-condensed">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Id</th>
+              <th>Public Name</th>    
+              <th>Email</th>
+              <th>Enrolled?</th>
+              <th>Published?</th>
+              <th>Products</th>
+              <th>Orders</th>
+              <th>Egraphs</th>
+              <th>Inventory</th>
+            </tr>
+          </thead>  
+          @celebrityListings.map { case celebrityListing =>
+          <tr>
+            <td>
+              <a class="preview-link" href="/admin/celebrities/@celebrityListing.id">
+                Details
+              </a>
+            </td>
+            <td>@celebrityListing.id</td>
+            <td class="truncate">
+              <a class="preview-link" href="/@celebrityListing.urlSlug">
+                @celebrityListing.publicName
+              </a>
+            </td>
+            <td>@celebrityListing.email</td>
+            <td>@celebrityListing.enrollmentStatus</td>
+            <td>@celebrityListing.publishedStatus</td>
+            <td>
+              <a class="preview-link" href="/admin/celebrities/@celebrityListing.id/products">
+              Products
+              </a>
+            </td>
+            <td>
+              <a class="preview-link" href="/admin/celebrities/@celebrityListing.id/orders?filter=pendingAdminReview">
+                Orders
+              </a>
+            </td>
+            <td>
+              <a class="preview-link" href="/admin/celebrities/@celebrityListing.id/egraphs">
+                Egraphs
+              </a>
+            </td>
+            <td>
+              <a class="preview-link" href="/admin/celebrities/@celebrityListing.id/inventorybatches">
+                Inventory
+              </a>
+            </td>
+          </tr>
+          }
+        </table>
+        <a href="@getCelebritiesAdmin.url">View all celebrities</a>
+    </div>
+  </div> 
+</section>
 }
+
+@base_template(title="Admin - Celebrity Search Results", body=body, jsMain="")

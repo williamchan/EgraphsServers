@@ -1,26 +1,34 @@
 package controllers.website
 
-import admin.AdminFunctionalTest
 import org.junit.Test
-import play.test.FunctionalTest
-import FunctionalTest._
+import play.api.test._
+import play.api.test.Helpers._
 import services.db.TransactionSerializable
 import utils.TestData
+import utils.FunctionalTestUtils.routeName
+import utils.FunctionalTestUtils.Conversions._
+import controllers.routes.WebsiteControllers.{getCustomerGalleryByUsername, getCustomerGalleryById}
+import utils.EgraphsUnitTest
+import services.AppConfig
+import services.db.DBSession
 
-class GetCustomerGalleryEndpointTests extends AdminFunctionalTest{
+class GetCustomerGalleryEndpointTests extends EgraphsUnitTest {
 
-  @Test
-  def testRetrievesGalleryOfCustomer() {
+  def db = AppConfig.instance[DBSession]
+  
+  routeName(getCustomerGalleryById(1L)) should "serve a customer gallery page" in new EgraphsTestApplication {
     val userId = db.connected(TransactionSerializable) {
       TestData.newSavedCustomer().id
     }
-    assertIsOk(GET("/account/" + userId + "/gallery"))
+    val Some(result) = routeAndCall(FakeRequest().toRoute(getCustomerGalleryById(userId)))
+    status(result) should be (OK)
   }
-  @Test
-  def testRetrievesGalleryOfCustomerByUsername() {
+  
+  routeName(getCustomerGalleryByUsername("username")) should "serve a customer gallery page" in new EgraphsTestApplication {
     val username = db.connected(TransactionSerializable) {
       TestData.newSavedCustomer().username
     }
-    assertIsOk(GET("/account/" + username))
+    val Some(result) = routeAndCall(FakeRequest().toRoute(getCustomerGalleryByUsername(username)))
+    status(result) should be (OK)
   }
 }

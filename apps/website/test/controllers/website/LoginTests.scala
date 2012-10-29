@@ -1,87 +1,93 @@
 package controllers.website
 
-import org.junit.Assert._
-import org.junit.Test
-import scala.collection.JavaConversions._
-import play.test.FunctionalTest
-import FunctionalTest._
+import models.AccountStore
+import utils.ClearsCacheAndBlobsAndValidationBefore
+import utils.EgraphsUnitTest
+import services.http.forms.Form
+import services.http.forms.Form.Conversions._
+import services.http.POSTControllerMethod
+import services.db.DBSession
 import services.AppConfig
-import services.db.{DBSession, TransactionSerializable}
-import utils.{ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest, TestWebsiteControllers, TestData}
-import services.http.forms.{Form, CustomerLoginFormFactory, CustomerLoginForm}
-import CustomerLoginForm.Fields
-import play.mvc.results.Redirect
-import controllers.WebsiteControllers
+import play.api.mvc.Action
+import services.http.forms.CustomerLoginFormFactory
+import play.api.mvc.Controller
+import play.api.mvc.Results._
+import utils.FunctionalTestUtils.routeName
+import utils.FunctionalTestUtils.Conversions._
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+import play.api.mvc.AnyContent
+import utils.Stubs
+import play.api.test.FakeRequest
+import utils.TestData
+import services.http.forms.CustomerLoginForm
+import services.http.forms.FormError
+import controllers.routes.WebsiteControllers.{getLogin, postLogin}
+import play.api.test.Helpers._
+import services.db.TransactionSerializable
+import egraphs.playutils.RichResult._
+import services.http.forms.CustomerLoginForm.Fields
+import services.http.EgraphsSession.Conversions._
+import utils.CsrfProtectedResourceTests
 
 
-class LoginFunctionalTests extends EgraphsFunctionalTest {
-  @Test
-  def testLoginEndpointServesCorrectRoute() {
-    val response = POST("/login", getPostStrParams(email = "", password = ""))
-    assertStatus(302, response)
-
-    val flashCookie = getPlayFlashCookie(response)
-    assertTrue(flashCookie.contains("CustomerLoginForm:true"))
-  }
-
-  private def getPostStrParams(email: String, password: String): Map[String, String] = {
-    Map[String, String](Fields.Email -> email, Fields.Password -> password)
-  }
-}
-
-
-class LoginUnitTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValidationBefore {
+@RunWith(classOf[JUnitRunner])
+class LoginTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValidationBefore with CsrfProtectedResourceTests {
   import Form.Conversions._
-  private val db = AppConfig.instance[DBSession]
+  private def db = AppConfig.instance[DBSession]
+  
+  override protected def routeUnderTest = postLogin()
 
-  "postLogin" should "redirect to login with form information when passwords don't match" in {
-    val controller = testControllers(email="idontexist@egraphs.com", password=TestData.defaultPassword)
+  routeName(routeUnderTest) should "redirect to login with form information when passwords don't match" in new EgraphsTestApplication {
+    val request = FakeRequest().withFormUrlEncodedBody(
+      Fields.Email -> "idontexist@egraphs.com", Fields.Password -> TestData.defaultPassword
+    ).withAuthToken
+    
+    val result = controllers.WebsiteControllers.postLogin().apply(request)
 
-    controller.postLogin() match {
-      case redirect: Redirect => db.connected(TransactionSerializable) {
-        redirect.url should be ("/login")
-        val customerFormOption = AppConfig.instance[CustomerLoginFormFactory].read(controller.flash.asFormReadable)
+    status(result) should be (SEE_OTHER)
+    redirectLocation(result) should be (Some(getLogin().url))
 
-        customerFormOption match {
-          case Some(form) =>
-            form.email.value should be (Some("idontexist@egraphs.com"))
-            form.password.value should be (Some(TestData.defaultPassword))
-            
-          case None =>
-            fail("There should have been serialized form in the flash")
-        }
+    db.connected(TransactionSerializable) {
+      val customerFormOption = AppConfig.instance[CustomerLoginFormFactory].read(result.flash.get.asFormReadable)
+      customerFormOption match {
+        case Some(form) =>
+          form.email.value should be (Some("idontexist@egraphs.com"))
+          form.password.value should be (Some(TestData.defaultPassword))
+
+        case None =>
+          fail("There should have been serialized form in the flash")
       }
-
-      case _ =>
-        fail("login should have produced a Redirect")
     }
   }
 
-  "postLogin" should "add customer ID to session when passwords do match" in {
+  it should "add customer ID to session when passwords do match" in new EgraphsTestApplication {
     // Set up
     val password = "this is teh password"
     val account = db.connected(TransactionSerializable) {
       val customer = TestData.newSavedCustomer()
       customer.account.withPassword(password).right.get.save()
     }
+    
 
-    val controller = testControllers(email=account.email, password=password)
-
-    controller.postLogin()
+    val result = controllers.WebsiteControllers.postLogin().apply(
+      FakeRequest().withFormUrlEncodedBody(
+        Fields.Email -> account.email, Fields.Password -> password
+      ).withAuthToken
+    )
+    val maybeResultCustomerId = result.session.flatMap(session => session.customerId)
 
     // Check expectations
-    AppConfig.instance[CustomerLoginFormFactory].read(controller.flash.asFormReadable) should be (
-      None
-    )
-
-    controller.session.get(WebsiteControllers.customerIdKey) should be (account.customerId.get.toString)
+    status(result) should be (SEE_OTHER)
+    redirectLocation(result) should not be (Some(getLogin().url))
+    maybeResultCustomerId should be (account.customerId)
   }
 
-  private def testControllers(email: String, password:String): TestWebsiteControllers = {
-    val controllers = TestData.newControllers
-    controllers.params.put(Fields.Email, email)
-    controllers.params.put(Fields.Password, password)
-
-    controllers
+  private class MockLoginController extends Controller with PostLoginEndpoint {
+    override val postController = Stubs.postControllerMethod
+    override val accountStore = AppConfig.instance[AccountStore]
+    override val customerLoginForms = AppConfig.instance[CustomerLoginFormFactory]
   }
+
+
 }

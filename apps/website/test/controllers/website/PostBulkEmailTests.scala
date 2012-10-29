@@ -1,71 +1,46 @@
 package controllers.website
 
-import controllers.WebsiteControllers
-import org.junit.Test
-import scala.collection.JavaConversions._
-import play.test.FunctionalTest
-import FunctionalTest._
+
+import play.api.test._
+import play.api.test.Helpers._
+import egraphs.playutils.RichResult._
+import utils.FunctionalTestUtils.routeName
+import utils.FunctionalTestUtils.Conversions._
+import controllers.routes.WebsiteControllers.postSubscribeEmail
 import sjson.json.Serializer
+import utils.EgraphsUnitTest
+import utils.CsrfProtectedResourceTests
 
 
-class PostBulkEmailTests extends EgraphsFunctionalTest {
-  var url = WebsiteControllers.reverse(WebsiteControllers.postSubscribeEmail).url
-
-  @Test
-  def testEmailValidation() {
-    val response = POST(url,getPostStrParams(email= "", listId=""))
-    println(
-    response.out.toString)
-    assertStatus(200, response)
-    assertContentEquals(Serializer.SJSON.toJSON(
-      Map("errors" ->
-        Serializer.SJSON.toJSON(
-          Seq("We're gonna need this", "We're gonna need this")
-        )
-      )
-    ).toString, response)
+class PostBulkEmailTests extends EgraphsUnitTest with CsrfProtectedResourceTests {
+  override protected def routeUnderTest = postSubscribeEmail
+  
+  routeName(postSubscribeEmail) should "reject empty email addresses" in new EgraphsTestApplication {
+    val result = performRequest(email="")
+    
+    status(result) should be (BAD_REQUEST)
+    contentAsString(result) should be ("We're gonna need a valid email address")
   }
 
-  @Test
-  def testEmailValidationInvalidEmail() {
-    val response = POST(url,getPostStrParams(email= "derp@schlerp", listId="scsdff"))
-    println(
-      response.out.toString)
-    assertStatus(200, response)
-    assertContentEquals(Serializer.SJSON.toJSON(
-      Map("errors" ->
-        Serializer.SJSON.toJSON(
-          Seq("Not an e-mail address.")
-        )
-      )
-    ).toString, response)
+  it should "reject invalid email addresses" in new EgraphsTestApplication {
+    val result = performRequest(email="derp@schlerp")
+    
+    status(result) should be (BAD_REQUEST)
+    contentAsString(result) should be ("We're gonna need a valid email address")
   }
 
-  @Test
-  def testEmailValidationNoList() {
-    val response = POST(url,getPostStrParams(email= "derp@derp.com", listId=""))
-    println(
-      response.out.toString)
-    assertStatus(200, response)
-    assertContentEquals(Serializer.SJSON.toJSON(
-      Map("errors" ->
-        Serializer.SJSON.toJSON(
-          Seq("We're gonna need this")
-        )
-      )
-    ).toString, response)
+  it should "accept requests with a valid e-mail address" in new EgraphsTestApplication {
+    val result = performRequest(email="customer@website.com")
+    status(result) should be (200)
+    contentAsString(result) should be ("subscribed")
   }
-
-  @Test
-  def testCorrectEmail() {
-    val response = POST(url, getPostStrParams(email="customer@website.com", listId="2003421aassd"))
-    assertStatus(200, response)
-    assertContentEquals(Serializer.SJSON.toJSON(Map("subscribed" -> true)).toString, response)
-
-  }
-
-
-  private def getPostStrParams(email: String, listId: String): Map[String, String] = {
-    Map[String, String]("email" -> email, "listId" -> listId)
+  
+  //
+  // Private members
+  //
+  private def performRequest(email: String): play.api.mvc.Result = {
+    controllers.WebsiteControllers.postSubscribeEmail(
+      FakeRequest().withFormUrlEncodedBody("email" -> email).withAuthToken
+    )
   }
 }

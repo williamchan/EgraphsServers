@@ -13,6 +13,7 @@ import play.api.test.FakeRequest
 import play.api.mvc.WrappedRequest
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
+import play.api.mvc.Result
 
 @RunWith(classOf[JUnitRunner])
 class RichResultTests extends FlatSpec with ShouldMatchers {
@@ -66,10 +67,20 @@ class RichResultTests extends FlatSpec with ShouldMatchers {
     }
   }
 
-  it should "return None if no SET_COOKIE header had yet been set" in {
+  it should "return None if no SET_COOKIE header for the session cookie had yet been set" in {
     Ok.session should be (None)
   }
   
+  "session" should "return None if a SET_COOKIE header existed that didn't include the session cookie" in {
+    runningCookieCompatibleApp {
+      Ok.flashing("key" -> "value").session should be (None)
+    }
+  }
+  
+  "flash" should "return Some(value) if it existed in a SET_COOKIE header" in {
+    Ok.flashing("key" -> "value").flash.map(_.data.toList) should be (Some(List("key" -> "value")))
+  }
+
   //
   // Private members
   //
@@ -80,5 +91,4 @@ class RichResultTests extends FlatSpec with ShouldMatchers {
   def runningCookieCompatibleApp(operation: => Any) = {
     running(FakeApplication(additionalConfiguration=Map("application.secret" -> "herp")))(operation)
   }
-
 }
