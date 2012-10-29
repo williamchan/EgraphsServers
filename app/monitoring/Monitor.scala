@@ -21,6 +21,11 @@ trait Monitor {
 
   protected val actors: List[ActorRef]
 
+  /**
+   * Note: The Akka scheduler was running into deadlock issues due to multiple ClassLoaders
+   * trying to access the same resource. By giving the scheduler a 2-second delay, we avoid
+   * such problems, in Akka.system.schedule.schedule(2 seconds ...)
+   */
   def scheduleMonitoringJobs(actorFactory: ActorFactory, actorInfos: List[MetricSource],
     cloudwatch: AmazonCloudWatch, interval: Int): List[ActorRef] = {
 
@@ -32,6 +37,9 @@ trait Monitor {
     actors
   }
 
+  /**
+   * Gets recent metrics from a particular actor.
+   */
   def getMetrics: List[EgraphsMetric[Int]] = {
     import akka.pattern.{ ask, pipe }
     val futureMetrics = for (actor <- actors) yield {

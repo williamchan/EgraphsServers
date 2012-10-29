@@ -12,6 +12,7 @@ import akka.util.duration.intToDurationInt
 import collections.EgraphsMetric
 import common.CloudWatchMetricPublisher
 import common.MonitoringMessages.GetMetric
+import common.MonitoringMessages.CheckStatus
 import play.api.Play.current
 import play.api.libs.concurrent.Akka
 import play.api.test.FakeApplication
@@ -25,19 +26,19 @@ class WebsiteAvailabilityActorTest extends FlatSpec with ShouldMatchers with Moc
       val metPublisher = mock[CloudWatchMetricPublisher]
 
       val myTestActor = Akka.system.actorOf(
-        Props(new WebsiteAvailabilityActor("http://isitchristmas.com/",
-          "christmasTest",
+        Props(new WebsiteAvailabilityActor("https://www.google.com/",
+          "googleTest",
           metPublisher)),
         name = "testActor")
 
       import akka.pattern.{ ask, pipe }
       implicit val timeout = Timeout(5 seconds)
-      val futureMetric = ask(myTestActor, GetMetric).mapTo[EgraphsMetric[Int]]
-      val metric = Await.result(futureMetric, 5 seconds)
+      val futureEmptyMetric = ask(myTestActor, GetMetric).mapTo[EgraphsMetric[Int]]
+      val emptyMetric = Await.result(futureEmptyMetric, 5 seconds)
 
-      metric.name should equal("christmasTest")
-      metric.description should equal("http://isitchristmas.com/")
-      metric.values should have length (0)
+      emptyMetric.name should equal("googleTest")
+      emptyMetric.description should equal("https://www.google.com/")
+      emptyMetric.values should have length (0)
     }
   }
 }

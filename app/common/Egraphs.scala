@@ -29,16 +29,19 @@ object Egraphs {
     cloudwatch
   }
 
+  /**
+   * Depending on your metric of interest, create additional MetricSource objects below
+   */
+  
   private def urlsAndNames: List[MetricSource] = {
-    // add new URL/actor/friendly name pairs to check here
     List(MetricSource("https://www.egraphs.com/", "frontPageAvailabilityActor", "frontPage"),
       MetricSource("https://www.egraphs.com/Pedro-Martinez/photos", "photoPageAvailabilityActor", "photoPage"),
       MetricSource("https://www.egraphs.com/about", "staticPageAvailabilityActor", "staticPage"))
   }
 
   private def dbNames: List[MetricSource] = {
-    List(MetricSource("default", "liveDBAvailabilityActor", "live"),
-      MetricSource("replica", "replicaDBAvailabilityActor", "replica"))
+    List(MetricSource("pgpool", "pgpoolDBAvailabilityActor", "pgpool"),
+      MetricSource("live", "liveDBAvailabilityActor", "live"))
   }
   
   private def cacheNames: List[MetricSource] = {

@@ -12,7 +12,7 @@ import factory.DBActorFactory
 
 class DBMonitorTest extends FlatSpec with ShouldMatchers with Mockito {
 
-  "A DBMonitor" should "return the same number of URLs given at construction time" in {
+  "A DBMonitor" should "return the same number of database MetricSources given at construction time" in {
 
     val res = running(FakeApplication()) {
       val cloudwatch = mock[AmazonCloudWatch]

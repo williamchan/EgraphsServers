@@ -48,7 +48,6 @@ class DBAvailabilityActor(database: String, friendlyName: String,
         val result = SQL("select count(*) from pg_stat_activity").apply().head
         val count = result[Long]("count")
 
-        // add to history
         history.enqueue(count.toInt)
         count.toInt
       }

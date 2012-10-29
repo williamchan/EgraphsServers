@@ -1,6 +1,6 @@
 package collections
 
-/*
- * To simplify Actor creation
+/**
+ * To simplify actor creation
  */
 case class MetricSource(val name: String, val actorName: String, val friendlyName: String)

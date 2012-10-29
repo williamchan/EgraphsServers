@@ -30,35 +30,20 @@ class WebsiteAvailabilityActor(url: String, friendlyName: String,
     awsActions("SiteAvailability", webResponse)
   }
 
-  /** TODO: Indicate failure to Cloudwatch on timeout */
   def sendGetRequest: Int = {
 
-    val promisedResponse: Promise[Response] = WS.url(url).get()
-    val webResponse = promisedResponse.await(5000).get.status
-
-    /** 1 indicates site is currently available, 0 indicates unavailability */
-    val webResponseTransformed = if (webResponse == 200) 1 else 0
-
-    /** add to history */
-    history.enqueue(webResponseTransformed)
-    webResponseTransformed
-
-    //    val promisedResponse: Promise[Response] = WS.url(url).get()
-    //    val promisedMetricValue: Promise[Int] = promisedResponse.map {
-    //      case 200 => 1
-    //      case _ => 0
-    //    }
-    //    
-    //    val metricValue = promisedResponse.await(5000).fold(
-    //        error => 0,
-    //        redeemedMetricValue => redeemedMetricValue
-    //     )
-
-    //    try {
-    //      val webResponse = promisedReponse.await(5000).get.status
-    //    } catch {
-    //      /** consider a 5-second timeout to mean site is unavailable */
-    //      case ex: java.util.concurrent.TimeoutException => return 0
-    //    }
+    val promisedResponse = WS.url(url).get()
+    val promisedMetricValue: Promise[Int] = promisedResponse.map { response => 
+      if (response.status == 200) 1
+      else 0
+    }
+    
+    val metricValue: Int = promisedMetricValue.await(5000).fold(
+        error => 0,
+        redeemedMetricValue => redeemedMetricValue
+     )
+     
+     history.enqueue(metricValue)
+     metricValue
   }
 }

@@ -7,6 +7,13 @@ import com.amazonaws.services.cloudwatch.model.Dimension
 
 import java.util.Date
 
+/**
+ * Example of how to pull aggregate data from CloudWatch.
+ * Not currently used in the monitoring service.
+ * 
+ * @author stephaniesmallman
+ *
+ */
 object WebsiteHistory {
 
   private val ONE_HOUR_IN_MILLISECONDS = 3600000

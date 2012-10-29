@@ -45,7 +45,4 @@ object Application extends Controller {
     val responseJson = Json.toJson(Map("metrics" -> jsonIterable))
     Ok(responseJson)
   }
-
-  // testing purposes only
-  def ok = Action { Ok }
 }
