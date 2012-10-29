@@ -10,8 +10,11 @@ import play.api.data.Forms._
 import services.http.POSTControllerMethod
 import services.http.filters.HttpFilters
 import sjson.json.Serializer
+import play.api.mvc.Results.{BadRequest, NotFound, Forbidden}
 
 private[controllers] trait PostOrderConfigureEndpoint { this: Controller =>
+  import PostOrderConfigureEndpoint.{errorMalformed, errorOrderNotFound, errorNotOwner}
+  
   protected def postController: POSTControllerMethod
   protected def httpFilters: HttpFilters
   protected def orderStore: OrderStore
@@ -20,18 +23,31 @@ private[controllers] trait PostOrderConfigureEndpoint { this: Controller =>
     httpFilters.requireCustomerLogin.inSession() { (customer, account) =>
       Action { implicit request =>
         val privacyStatusString = Form("privacyStatus" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm)
-        val newPrivacyStatus = for (
-          privacyStatus <- PrivacyStatus(privacyStatusString);
-          order <- orderStore.findById(orderId.toLong);
-          if order.recipient.id == customer.id
+        val httpResults = for (
+          privacyStatus <- PrivacyStatus(privacyStatusString).toRight(left=errorMalformed).right;
+          order <- orderStore.findById(orderId.toLong).toRight(left=errorOrderNotFound).right;
+          _ <- forbiddenOrOwnsOrder(customer, order).right
         ) yield {
           order.withPrivacyStatus(privacyStatus).save().privacyStatus
+          Ok(toJson(Map("privacyStatus" -> privacyStatus.name)))
         }
-        newPrivacyStatus match {
-          case Some(privacy) => Ok(toJson(Map("privacyStatus" -> privacy.name)))
-          case None => Ok(toJson(Map("error" -> true))) //TODO: PLAY20 should this be a BadRequest?
-        }
+        
+        httpResults.merge
       }
     }
-  }  
+  }
+  
+  //
+  // Private members
+  //
+  private def forbiddenOrOwnsOrder(customer: Customer, order: Order): Either[Result, Unit] = {
+    if (order.recipient.id == customer.id) Right() else Left(errorNotOwner)
+  }
+}
+
+
+private[controllers] object PostOrderConfigureEndpoint {
+  val errorMalformed = BadRequest("Malformed privacy status")
+  val errorOrderNotFound = NotFound("Egraph not found")
+  val errorNotOwner = Forbidden("Only the egraph owner may alter its settings.")
 }
