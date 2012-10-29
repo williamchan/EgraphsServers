@@ -7,13 +7,10 @@ import play.api.mvc.Results.Redirect
 import services.blobs.Blobs
 import services.mail.{BulkMailList, TransactionalMail}
 import services.payment.Payment
-<<<<<<< HEAD:apps/website-2/app/controllers/WebsiteControllers.scala
 import models._
 import models.filters._
-=======
 import services.ConsumerApplication
 import services.blobs.Blobs
->>>>>>> master:apps/website/app/controllers/WebsiteControllers.scala
 import services.db.DBSession
 import services.social.FacebookAppId
 import services.http._
