@@ -12,11 +12,12 @@ import monitoring.cache.CacheMonitor
 import factory.CacheActorFactory
 
 object Egraphs {
+  private val INTERVAL = 60
 
-  val websiteMonitor = new WebsiteMonitor(cloudWatchClient, 60,
+  val websiteMonitor = new WebsiteMonitor(cloudWatchClient, INTERVAL,
     urlsAndNames, new WebsiteActorFactory)
-  val dbMonitor = new DBMonitor(cloudWatchClient, 60, dbNames, new DBActorFactory)
-  val cacheMonitor = new CacheMonitor(cloudWatchClient, 60, cacheNames, new CacheActorFactory)
+  val dbMonitor = new DBMonitor(cloudWatchClient, INTERVAL, dbNames, new DBActorFactory)
+  val cacheMonitor = new CacheMonitor(cloudWatchClient, INTERVAL, cacheNames, new CacheActorFactory)
 
   private def cloudWatchClient: AmazonCloudWatch = {
 
