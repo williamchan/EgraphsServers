@@ -14,7 +14,6 @@ import services.mvc.ImplicitHeaderAndFooterData
 import services.http.forms.AccountPasswordResetFormFactory
 import services.http.forms.AccountPasswordResetForm.Fields
 import services.http.filters.RequireAccountEmail
-import services.http.filters.RequireResetPasswordSecret
 import services.http.filters.HttpFilters
 
 private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
@@ -45,13 +44,16 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
     }
   }
 
+  // TODO
   def getVerifyAccount(email: String, resetKey: String) = controllerMethod.withForm() 
   { implicit authToken =>
-    httpFilters.requireAccountEmail.inRequest() { account =>      
-      httpFilters.requireResetPasswordSecret(account) {
-        Action { implicit request =>
+    httpFilters.requireAccountEmail(email) { account =>
+      Action { implicit request =>
+        if (account.verifyResetPasswordKey(resetKey)) {
           account.emailVerify().save()
           Ok(views.html.frontend.simple_confirmation("Account Verified", "Your account has been successfully verified."))
+        } else {
+          Forbidden("The password reset URL you used is either out of date or invalid.")
         }
       }
     }
