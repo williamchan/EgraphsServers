@@ -43,6 +43,10 @@ object FunctionalTestUtils {
   def requestWithCustomerId(id: Long): FakeRequest[AnyContent] = {
     FakeRequest().withSession(EgraphsSession.Key.CustomerId.name -> id.toString)
   }
+  
+  def requestWithAdminId(id: Long): FakeRequest[AnyContent] = {
+    FakeRequest().withSession(EgraphsSession.Key.AdminId.name -> id.toString)
+  }
 
   def requestWithCredentials(user: String, password: String): FakeRequest[AnyContent] = {
     val auth = BasicAuth.Credentials(user, password)
