@@ -90,9 +90,21 @@ class CelebrityStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
     retrievedFilterValuesB.map(celeb => celebsTaggedWithA.exists(c => celeb.id == c.id) should be(false))    
   }
   
-//  "find by filter multiple filter values" should "return celebrities associated with all those filter values" in {
-//    
-//  }
+  "find by filter multiple filter values" should "return celebrities associated with all those filter values" in {
+    val filter = TestData.newSavedFilter
+    val filterValueA = TestData.newSavedFilterValue(filter.id)
+    val filterValueB = TestData.newSavedFilterValue(filter.id)
+    val filterValueC = TestData.newSavedFilterValue(filter.id)
+    val filterValueD = TestData.newSavedFilterValue(filter.id)
+    
+    val celebA = TestData.newSavedCelebrity().withPublishedStatus(PublishedStatus.Published).save()
+    val celebAB = TestData.newSavedCelebrity().withPublishedStatus(PublishedStatus.Published).save()
+    val celebABC = TestData.newSavedCelebrity().withPublishedStatus(PublishedStatus.Published).save()
+    val celebABCD = TestData.newSavedCelebrity().withPublishedStatus(PublishedStatus.Published).save()
+    
+    instanceUnderTest.findByFilterValueId(filterValueA.id).union(instanceUnderTest.findByFilterValueId(filterValueB.id)).exists(c => celebAB.id == c.id) should be (true)
+        
+  }
   
 
 

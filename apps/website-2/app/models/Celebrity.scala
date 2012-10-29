@@ -414,10 +414,10 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
         select(c)
     ).headOption
   }
+ 
   /**
-   * Find by filterValue
+   * Find celebrities associated with a particular filterValue
    */
-  
   def findByFilterValueId(filterValueId : Long) : Query[Celebrity] = {
    from(schema.celebrityFilterValues, schema.celebrities)(
      (cfv, c) =>
@@ -425,9 +425,29 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
          cfv.id === filterValueId and  
          c.id === cfv.celebrityId
        ) select(c)
-   )
-   
+   ) 
   }
+  
+//  def findByFilterValueIdsIntersection(ids: List[Long]) : Query[Celebrity] = {
+//    
+//    /**
+//     * Searching for values that are in the same Filter, the IDs should be ORed
+//     * Searching for values that are in different should be and Filter A ( v1 or v2 or v3) AND Filter B ( v1, v2, v3)
+//     */
+//    val derp = from(schema.celebrityFilterValues, schema.celebrities)(
+//	  (cfv, c) => 
+//	    where (
+//	      cfv.id === filterValueId and
+//	      c.id === cfv.celebrityId
+//	    ) select(c)
+//	  )
+//  
+//	  
+//  }
+  
+  /**
+   * Convert filterValues to a hashtable
+   */
   
   /**
    * Find using postgres text search on publicname and roledescription
