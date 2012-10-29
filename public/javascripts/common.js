@@ -13,8 +13,7 @@ Egraphs.displayPage = function (headerTitle, metricsUrl) {
     var metrics = series.metrics.length;
     for (var i=0; i<metrics; i++) {
       // all metrics update every minute
-      setInterval(generateAjaxRequest, 10000);
-      //setInterval(generateAjaxRequest, 60000);        
+      setInterval(generateAjaxRequest, 60000);        
     };
   }; 
 
