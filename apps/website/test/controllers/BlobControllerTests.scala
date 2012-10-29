@@ -15,13 +15,18 @@ import play.api.libs.concurrent.Promise
 import play.api.libs.iteratee.Input
 import play.api.mvc.ChunkedResult
 import play.api.mvc.Call
+import play.api.test.FakeRequest$
 
 class BlobControllersTests extends EgraphsUnitTest with NonProductionEndpointTests {
-  def routeUnderTest: Call = getBlob("a/b/derp.jpg")
+  override def routeUnderTest: Call = getBlob("a/b/derp.jpg")
+  
+  override def successfulRequest = {
+    TestHelpers.putPublicImageOnBlobStore()
+    
+    FakeRequest(routeUnderTest.method, routeUnderTest.url)
+  }
   
   routeName(routeUnderTest) should "make transmit the blob's data" in new EgraphsTestApplication {
-    TestHelpers.putPublicImageOnBlobStore()
-
     val Some(result) = routeAndCall(FakeRequest(GET, getBlob("a/b/derp.jpg").url))
     
     status(result) should be (OK)

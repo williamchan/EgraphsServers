@@ -99,6 +99,9 @@ object FunctionalTestUtils {
   trait NonProductionEndpointTests { this: EgraphsUnitTest =>
     import play.api.test.Helpers._
     protected def routeUnderTest: Call
+    protected def successfulRequest: FakeRequest[AnyContent] = {
+      FakeRequest(routeUnderTest.method, routeUnderTest.url)
+    }
     
     private def nonTestApplication: FakeApplication = {
       val normalTestConfig = EgraphsUnitTest.testApp.configuration  
@@ -109,7 +112,7 @@ object FunctionalTestUtils {
     }
     
     routeName(routeUnderTest) + ", as a test-only endpoint, " should "be available during test mode" in new EgraphsTestApplication {
-      val Some(result) = routeAndCall(FakeRequest(routeUnderTest.method, routeUnderTest.url))
+      val Some(result) = routeAndCall(successfulRequest)
       status(result) should not be (NOT_FOUND)
     }
 
