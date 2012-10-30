@@ -89,7 +89,7 @@ trait PostBuyDemoProductEndpoint { this: Controller =>
     }
   }
 
-  def validateInputs[A](celebrityUrlSlug: String, productUrlSlug: String)(implicit request: Request[AnyContent]) : Either[Result, (Celebrity, Product, DemoPurchase)] = {
+  def validateInputs(celebrityUrlSlug: String, productUrlSlug: String)(implicit request: Request[AnyContent]) : Either[Result, (Celebrity, Product, DemoPurchase)] = {
     dbSession.connected(TransactionSerializable) {
       val resultOrResultOrData = httpFilters.requireCelebrityAndProductUrlSlugs.asOperationalResult(celebrityUrlSlug, productUrlSlug) { (celebrity, product) =>
         PlayForm(

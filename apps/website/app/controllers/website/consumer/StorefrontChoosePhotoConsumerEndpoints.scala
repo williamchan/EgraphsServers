@@ -48,33 +48,35 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
    */
   def getStorefrontChoosePhotoTiled(celebrityUrlSlug: String) = controllerMethod.withForm() 
   { implicit authToken =>
-    httpFilters.requireCelebrityUrlSlug(celebrityUrlSlug) { celebrity =>
-      Action { implicit request =>
-        val celebrityUrlSlug = celebrity.urlSlug
-  
-        val productViews = for (product <- celebrity.productsInActiveInventoryBatches()) yield {
-          product.asChoosePhotoTileView(celebrityUrlSlug=celebrityUrlSlug)
+    httpFilters.requireCelebrityUrlSlug(celebrityUrlSlug) { maybeUnpublishedcelebrity =>
+      httpFilters.requireAdministratorLogin.inSessionOrUseOtherFilter(maybeUnpublishedcelebrity)(otherFilter = httpFilters.requireCelebrityPublished.filter(maybeUnpublishedcelebrity)) { celebrity =>
+
+        Action { implicit request =>
+          val celebrityUrlSlug = celebrity.urlSlug
+
+          val productViews = for (product <- celebrity.productsInActiveInventoryBatches()) yield {
+            product.asChoosePhotoTileView(celebrityUrlSlug = celebrityUrlSlug)
+          }
+
+          val forms = purchaseFormFactory.formsForStorefront(celebrity.id)(request.session)
+
+          val maybeProductUrlSlug = for (
+            productIdBeingOrdered <- forms.productId;
+            product <- productStore.findById(productIdBeingOrdered)
+          ) yield {
+            product.urlSlug
+          }
+
+          implicit def crumbs = breadcrumbData.crumbsForRequest(celebrity.id, celebrityUrlSlug, maybeProductUrlSlug)(request)
+
+          val html = views.html.frontend.celebrity_storefront_choose_photo_tiled(
+            celeb = celebrity.asChoosePhotoView,
+            products = productViews,
+            recentEgraphs = celebrity.recentlyFulfilledEgraphChoosePhotoViews,
+            partnerIcons = List())
+
+          Ok(html)
         }
-  
-        val forms = purchaseFormFactory.formsForStorefront(celebrity.id)(request.session)
-  
-        val maybeProductUrlSlug = for (
-          productIdBeingOrdered <- forms.productId;
-          product <- productStore.findById(productIdBeingOrdered)
-        ) yield {
-          product.urlSlug
-        }
-  
-        implicit def crumbs = breadcrumbData.crumbsForRequest(celebrity.id, celebrityUrlSlug, maybeProductUrlSlug)(request)
-  
-        val html = views.html.frontend.celebrity_storefront_choose_photo_tiled(
-          celeb=celebrity.asChoosePhotoView,
-          products=productViews,
-          recentEgraphs=celebrity.recentlyFulfilledEgraphChoosePhotoViews,
-          partnerIcons=List()
-        )
-        
-        Ok(html)
       }
     }
   }
