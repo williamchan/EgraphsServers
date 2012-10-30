@@ -2,7 +2,7 @@
 define(["Egraphs", "bootstrap/bootstrap-alert", "bootstrap/bootstrap-button", "libs/chosen/chosen.jquery.min", "services/forms"], function() {
 
   var confirmPost = function() {
-    confirm("Updating this product will also change all associated egraphs! Are you sure you want to save these changes?");
+    return confirm("Updating this product will also change all associated egraphs! Are you sure you want to save these changes?");
   };
 
   return {
