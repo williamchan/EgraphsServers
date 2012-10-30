@@ -14,16 +14,16 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
     Ok(views.html.frontend.marketplace_landing())
   }
 
-  def index_list() = Action {
-    Ok(views.html.frontend.marketplace_landing_list())
-  }
-
   def mlb() = Action {
     Ok(views.html.frontend.marketplace_mlb())
   }
 
-  def mlb_team() = Action {
-    Ok(views.html.frontend.marketplace_mlb_team())
+  def mlb_list() = Action {
+    Ok(views.html.frontend.marketplace_mlb_list())
+  }
+
+  def mlb_teams() = Action {
+    Ok(views.html.frontend.marketplace_mlb_teams())
   }
   
 }

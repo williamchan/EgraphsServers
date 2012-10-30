@@ -1,0 +1,213 @@
+@()(
+  implicit
+  headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData,
+  authToken: egraphs.authtoken.AuthenticityToken
+)
+@import views.frontend.Utils
+@import models.frontend.egraphs._
+@baseBody = {
+
+<section id="content" class="marketplace" role="main">
+  
+  <div id="main">
+  
+    <div class="row-fluid">
+    
+      <div class="span12 masthead" role="masthead">
+      
+        <form action="#" method="get">
+            <input name="q" type="search" placeholder="Find Your Star">
+        </form>
+      
+        <img src='@RemoteAssets.at("images/masthead-marketplace.jpg")'/>
+      
+      </div>
+      
+    </div>
+
+    <div class="content container clearfix">
+    
+      <div class="row-fluid">
+
+        <aside class="nav span3">
+        
+          <h2>Major League Baseball</h2>
+          
+          <ol>
+            <li><a href="#">Team</a></li>
+            <li><a href="#">Position</a></li>
+            <li><a href="#">Achievements</a></li>
+          </ol>
+        
+        </aside>
+
+        <div class="main span9">
+
+          <ul class="top-verticals-nav">
+              <li><a href="#"><img src='@RemoteAssets.at("images/icon-logo-mlb.png")' width="33" height="17"> <span>MLB</span></a></li>
+              <li><a href="#"><img src='@RemoteAssets.at("images/icon-logo-nba.png")' width="12" height="27"> <span>NBA</span></a></li>
+              <li><a href="#"><img src='@RemoteAssets.at("images/icon-logo-monster-jam.png")' width="31" height="25"> <span>Monster Jam</span></a></li>          
+          </ul> <!-- end .top-verticals-nav -->
+
+          <aside class="mobile-nav">
+          
+            <select class="chsn-select">
+              <optgroup label="Categories">
+                <option>Major League Baseball</option>
+                <option>National Basketball Association</option>
+                <option>Monster Jam</option>
+              </optgroup>              
+            </select>
+            
+          </aside> <!-- end .mobile-nav -->
+          
+          <aside class="view-options clearfix">
+          
+            <div class="sort-by">
+            
+              <h2>Sort By:</h2>
+              
+              <ol>
+                <li><a href="#">Recently Added</a></li>
+                <li><a href="#">Most Popular</a></li>
+                <li><a href="#">Price (Low to High)</a></li>
+                <li><a href="#">Price (High to Low)</a></li>
+                <li><a href="#" class="active">Alphabetical (A&dash;Z)</a></li>
+                <li><a href="#">Alphabetical (Z&dash;A)</a></li>
+              </ol>
+              
+              <form class="picker">
+                
+                <select class="chsn-select">
+                  <option selected>Recently Added</option>
+                  <option>Most Popular</option>
+                  <option>Price (Low to High)</option>
+                  <option>Price (High to Low)</option>
+                  <option>Alphabetical (A&dash;Z)</option>
+                  <option>Alphabetical (Z&dash;A)</option>               
+                </select>
+              
+              </form>
+            
+            </div> <!-- end .sort-by -->
+            
+            <div class="view-as">
+              
+              <h2>View As:</h2>
+              
+              <ul>
+                <li class="grid"><a href="#grid"><span>Grid</span> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i></a></li>
+                <li class="list active"><a href="#list"><span>List</span> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i></a></li>
+              </ul>
+            
+            </div>
+          
+          </aside> <!-- end .view-options -->
+          
+          <aside class="alpha-list">
+          
+            <h2>A&ndash;Z</h2>
+            
+            <ol>
+            	<li><a href="#" title="">A</a></li>
+            	<li><a href="#" title="">B</a></li>
+            	<li><a href="#" title="">C</a></li>
+            	<li><a href="#" title="" class="active">D</a></li>
+            	<li><a href="#" title="">E</a></li>
+            	<li><a href="#" title="">F</a></li>
+            	<li><a href="#" title="">G</a></li>
+            	<li><a href="#" title="">H</a></li>
+            	<li><a href="#" title="">I</a></li>
+            	<li><a href="#" title="">J</a></li>
+            	<li><a href="#" title="">K</a></li>
+            	<li><a href="#" title="">L</a></li>
+            	<li><a href="#" title="">M</a></li>
+            	<li><a href="#" title="">N</a></li>
+            	<li><a href="#" title="">O</a></li>
+            	<li><a href="#" title="">P</a></li>
+            	<li><a href="#" title="">Q</a></li>
+            	<li><a href="#" title="">R</a></li>
+            	<li><a href="#" title="">S</a></li>
+            	<li><a href="#" title="">T</a></li>
+            	<li><a href="#" title="">U</a></li>
+            	<li><a href="#" title="">V</a></li>
+            	<li><a href="#" title="">W</a></li>
+            	<li><a href="#" title="">X</a></li>
+            	<li><a href="#" title="">Y</a></li>
+            	<li><a href="#" title="">Z</a></li>
+            </ol>
+          
+          </aside> <!-- end .alpha-list -->
+          
+          <div class="verticals list">
+
+            <table cellpadding="0" cellspacing="0">
+
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Team</th>
+                  <th>Position</th>
+                  <th>Tags</th>
+                </tr>
+              </thead>
+            
+              <tbody>
+                <tr>
+                  <td><strong><a href="#">Celebrity Name &raquo;</a></strong></td>
+                  <td><a href="#">Team Name</a></td>
+                  <td><a href="#">Position</a></td>
+                  <td><a href="#" title="">Tag 1</a>, <a href="#" title="">Tag 2</a>, <a href="#" title="">Tag 3</a>, <a href="#" title="">Tag 4</a>, <a href="#" title="">Tag 5</a>&hellip;</td>
+                </tr>
+                
+                <tr>
+                  <td><strong><a href="#">Celebrity Name &raquo;</a></strong></td>
+                  <td><a href="#">Team Name</a></td>
+                  <td><a href="#">Position</a></td>
+                  <td><a href="#" title="">Tag 1</a>, <a href="#" title="">Tag 2</a>, <a href="#" title="">Tag 3</a>, <a href="#" title="">Tag 4</a>, <a href="#" title="">Tag 5</a>&hellip;</td>
+                </tr>
+                
+                <tr>
+                  <td><strong><a href="#">Celebrity Name &raquo;</a></strong></td>
+                  <td><a href="#">Team Name</a></td>
+                  <td><a href="#">Position</a></td>
+                  <td><a href="#" title="">Tag 1</a>, <a href="#" title="">Tag 2</a>, <a href="#" title="">Tag 3</a>, <a href="#" title="">Tag 4</a>, <a href="#" title="">Tag 5</a>&hellip;</td>
+                </tr>
+                
+                <tr>
+                  <td><strong><a href="#">Celebrity Name &raquo;</a></strong></td>
+                  <td><a href="#">Team Name</a></td>
+                  <td><a href="#">Position</a></td>
+                  <td><a href="#" title="">Tag 1</a>, <a href="#" title="">Tag 2</a>, <a href="#" title="">Tag 3</a>, <a href="#" title="">Tag 4</a>, <a href="#" title="">Tag 5</a>&hellip;</td>
+                </tr>
+                
+                <tr>
+                  <td><strong><a href="#">Celebrity Name &raquo;</a></strong></td>
+                  <td><a href="#">Team Name</a></td>
+                  <td><a href="#">Position</a></td>
+                  <td><a href="#" title="">Tag 1</a>, <a href="#" title="">Tag 2</a>, <a href="#" title="">Tag 3</a>, <a href="#" title="">Tag 4</a>, <a href="#" title="">Tag 5</a>&hellip;</td>
+                </tr>
+              </tbody>
+            
+            </table>
+            
+            <p class="see-more"><em><a href="#" class="clearfix"><b>Load More</b> <i><span>&darr;</span></i></a></em> </p>
+
+          </div> <!-- end .verticals.list -->
+
+        </div>
+       
+      </div>
+    
+      <p class="to-top"><a href="#top">Back to Top</a></p>
+        
+    </div> <!-- end .content -->
+        
+  </div> <!-- end #main -->
+  
+</section>
+
+}
+
+@base_template(title="Marketplace", jsMain = "pages/marketplace", body=baseBody)
