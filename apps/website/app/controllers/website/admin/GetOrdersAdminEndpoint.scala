@@ -21,7 +21,7 @@ private[controllers] trait GetOrdersAdminEndpoint extends ImplicitHeaderAndFoote
 
   def getOrdersAdmin = controllerMethod.withForm() 
   { implicit authToken => 
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       Action { implicit request =>
         
         // get query parameters

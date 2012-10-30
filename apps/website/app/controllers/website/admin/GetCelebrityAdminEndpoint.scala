@@ -19,7 +19,7 @@ private[controllers] trait GetCelebrityAdminEndpoint extends ImplicitHeaderAndFo
   protected def celebrityStore: CelebrityStore
 
   def getCelebrityAdmin(celebrityId: Long) = controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       Action { implicit request =>
         (accountStore.findByCelebrityId(celebrityId), celebrityStore.findById(celebrityId)) match {
           case (Some(account), Some(celebrity)) =>

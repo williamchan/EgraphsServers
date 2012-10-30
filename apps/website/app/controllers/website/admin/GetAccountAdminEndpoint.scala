@@ -17,7 +17,7 @@ private[controllers] trait GetAccountAdminEndpoint extends ImplicitHeaderAndFoot
   protected def celebrityStore: CelebrityStore
 
   def getAccountAdmin(accountId: Long) = controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       Action { implicit request =>
         val flash = request.flash
         val errorFields = flash.get("errors").map(errString => errString.split(',').toList)

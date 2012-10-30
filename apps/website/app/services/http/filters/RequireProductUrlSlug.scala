@@ -19,81 +19,23 @@ import models.Product
 import models.ProductQueryFilters
 import models.enums.PublishedStatus
 import services.http.EgraphsSession
-import services.http.SafePlayParams.Conversions._
 
-// TODO: PLAY20 migration. Test and comment this summbitch.
-class RequireProductUrlSlug @Inject() (
-  productFilters: ProductQueryFilters,
-  adminStore: AdministratorStore
-) {
-  
- /** NOTE: this is old documentation from when the filter used to live on CelebrityAccountRequestFilters.
-   * Filters out requests that didn't provide a valid `productUrlSlug` parameter for the parameterized
-   * [[models.Celebrity]].
-   *
-   * Calls the `continue` callback parameter with the corresponding [[models.Product]] if the filter passed.
-   *
-   * @param continue function to call if the request passed the filter
-   * @param request the request whose params should be checked by the filter
-   *
-   * @return the return value of `continue` if the filter passed, otherwise `404-NotFound`.
-   */
+/**
+ * Filter for taking a product url slug and a celebrity and returning a product if the former
+ * were deemed valid, otherwise `404-NotFound`.
+ */
+class RequireProductUrlSlug @Inject() (productFilters: ProductQueryFilters) extends Filter[(String, Celebrity), Product] {
 
-  def apply[A](celeb: Celebrity, productUrlSlug: String, parser: BodyParser[A] = parse.anyContent)
-  (actionFactory: Product => Action[A])
-  : Action[A] = 
-  {
-    Action(parser) { request =>
-      val maybeAction = this.asOperationResult(celeb, productUrlSlug, request.session)(actionFactory)
-      val maybeResult = maybeAction.right.map(action => action(request))
+  override def filter(urlSlugAndCelebrity: (String, Celebrity)): Either[Result, Product] = {
+    val (urlSlug, celebrity) = urlSlugAndCelebrity
 
-      maybeResult.fold(notFound => notFound, successfulResult => successfulResult)      
+    celebrity.products(productFilters.byUrlSlug(urlSlug)).headOption match {
+      case None => Left(productNotFoundResult(celebrity.publicName, urlSlug))
+      case Some(product) => Right(product)
     }
   }
-  
-  def asOperationResult[A](celeb: Celebrity, productUrlSlug: String, session: Session)
-  (operation: Product => A)
-  : Either[Result, A] = 
-  {
-    for (
-      product <- celeb.products(productFilters.byUrlSlug(productUrlSlug)).headOption.toRight(
-                   left=productNotFoundResult(celeb.publicName, productUrlSlug)
-                 ).right;
-      viewableProduct <- notFoundOrViewableProduct(product, session).right
-    ) yield {
-      operation(viewableProduct)
-    }
-  }
-  
-  //
-  // Private members
-  //
+
   private def productNotFoundResult(celebName: String, productUrlSlug: String): Result = {
-    NotFound(celebName + " doesn't have any product with url " + productUrlSlug) 
+    NotFound(celebName + " doesn't have any product with url " + productUrlSlug)
   }
-  
-  private def notFoundOrViewableProduct(product: Product, session: Session)
-  : Either[Result, Product] = 
-  {
-    val productIsPublished = product.publishedStatus == PublishedStatus.Published
-    val viewerIsAdmin = isAdmin(session)
-    
-    if (productIsPublished || viewerIsAdmin) { 
-      Right(product)
-    } else {
-      Left(NotFound("No photo found with this url"))
-    }
-  }
-   
-  private def isAdmin(session: Session): Boolean = {
-    val maybeIsAdmin = for (
-      adminId <- session.getLongOption(EgraphsSession.Key.AdminId.name);
-      admin <- adminStore.findById(adminId)
-    ) yield {
-      true
-    }
-    
-    maybeIsAdmin.getOrElse(false)
-  }
-  
 }

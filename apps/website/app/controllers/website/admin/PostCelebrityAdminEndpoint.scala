@@ -37,7 +37,7 @@ trait PostCelebrityAdminEndpoint {
   protected def accountStore: AccountStore
   
   def postCreateCelebrityAdmin = postController() {
-    httpFilters.requireAdministratorLogin.inSession(parser = parse.multipartFormData) { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession(parser = parse.multipartFormData) { case (admin, adminAccount) =>
       Action(parse.multipartFormData) { implicit request =>
         
         val (profileImageFile, landingPageImageFile, logoImageFile, profileImageOption, landingPageImageOption, logoImageOption) = getUploadedImages(request.body)
@@ -106,7 +106,7 @@ trait PostCelebrityAdminEndpoint {
   }
   
   def postCelebrityAdmin(celebrityId: Long) = postController() {
-    httpFilters.requireAdministratorLogin.inSession(parser = parse.multipartFormData) { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession(parser = parse.multipartFormData) { case (admin, adminAccount) =>
       httpFilters.requireCelebrityId(celebrityId, parser = parse.multipartFormData) { (celeb) =>
         Action(parse.multipartFormData) { implicit request =>
 	      

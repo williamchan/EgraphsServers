@@ -1,43 +1,42 @@
 package services.http.filters
 
 import com.google.inject.Inject
-import controllers.WebsiteControllers
-import play.api.mvc.Action
-import play.api.mvc.BodyParser
-import play.api.mvc.BodyParsers.parse
+import RequireAdministratorLogin.AdministratorAccount
+import models.Account
+import models.AccountStore
+import models.Administrator
+import play.api.data.Forms.longNumber
+import play.api.data.Forms.single
+import play.api.data.Form
+import play.api.mvc.Results.Redirect
 import play.api.mvc.Result
-import play.api.mvc.Results.{Forbidden, Redirect}
-import services.http.SafePlayParams.Conversions.paramsToOptionalParams
-import models._
+import services.db.Saves
 import services.http.EgraphsSession
+import models.AdministratorStore
 
-// TODO: PLAY20 migration. Test and comment this summbitch.
-class RequireAdministratorLogin @Inject() (adminStore: AdministratorStore, accountStore: AccountStore) {  
-  
-  def apply[A](adminId: Long, parser: BodyParser[A] = parse.anyContent)
-  (actionFactory: (Administrator, Account) => Action[A])
-  : Action[A] = 
-  {
-    Action(parser) { request =>     
-      val maybeResult = for (
-        admin <- adminStore.findById(adminId);
-        account <- accountStore.findByAdministratorId(adminId)
-      ) yield {
-        actionFactory(admin, account).apply(request)      
-      }
-      
-      maybeResult.getOrElse(Redirect(controllers.website.admin.GetLoginAdminEndpoint.url()))
-    }
-  } 
+object RequireAdministratorLogin {
+  type AdministratorAccount = (Administrator, Account)
+}
 
-  def inSession[A](parser: BodyParser[A] = parse.anyContent)(actionFactory: (Administrator, Account) => Action[A])
-  : Action[A] = {
-    Action(parser) { request =>
-      val maybeResult = request.session.getLongOption(EgraphsSession.Key.AdminId.name).map { adminId =>
-        this.apply(adminId, parser)(actionFactory).apply(request)
-      }
-      
-      maybeResult.getOrElse(Redirect(controllers.website.admin.GetLoginAdminEndpoint.url()))
+class RequireAdministratorLogin @Inject() (adminStore: AdministratorStore, accountStore: AccountStore)
+  extends Filter[Long, AdministratorAccount] with RequestFilter[Long, AdministratorAccount] {
+  val redirectToLogin = Redirect(controllers.website.admin.GetLoginAdminEndpoint.url())
+
+  override protected def badRequest(formWithErrors: Form[Long]): Result = redirectToLogin
+
+  override def filter(adminId: Long): Either[Result, AdministratorAccount] = {
+    for (
+      admin <- adminStore.findById(adminId).toRight(left = redirectToLogin).right;
+      account <- accountStore.findByAdministratorId(adminId).toRight(left = redirectToLogin).right
+    ) yield {
+      (admin, account)
     }
   }
+
+  override val form: Form[Long] = Form(
+    single(
+      EgraphsSession.Key.AdminId.name -> longNumber)
+    verifying ("Invalid adminId", {
+      case adminId => adminId > 0
+    }: Long => Boolean))
 }

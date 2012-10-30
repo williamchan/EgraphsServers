@@ -152,7 +152,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
       // Either[Result, Either[Result, (The purchase data)], but we'll unpack them later. If you're feeling
       // Brave try to make this into a for comprehension inside of dbSession.connected.
       val redirectOrRedirectOrPurchaseData = dbSession.connected(TransactionSerializable) {
-        httpFilters.requireCelebrityAndProductUrlSlugs.asOperationResult(celebrityUrlSlug, productUrlSlug, request.session) { 
+        httpFilters.requireCelebrityAndProductUrlSlugs.asOperationalResult(celebrityUrlSlug, productUrlSlug) { 
           (celeb, product) =>
             val forms = purchaseFormFactory.formsForStorefront(celeb.id)(request.session)
             for (formData <- forms.redirectOrAllPurchaseForms(celeb, product).right) yield {
