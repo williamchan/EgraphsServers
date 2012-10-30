@@ -13,5 +13,3 @@ create unique index idx1810041f on BlobKey (key);
 
 # --- !Downs
 
-DROP sequence s_BlobKey_id;
-DROP TABLE BlobKey;

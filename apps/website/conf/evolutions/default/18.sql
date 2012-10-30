@@ -7,5 +7,3 @@ ALTER TABLE Account ALTER COLUMN emailVerified SET NOT NULL;
 
 # --- !Downs
 
-ALTER TABLE Account DROP COLUMN emailVerified;
-

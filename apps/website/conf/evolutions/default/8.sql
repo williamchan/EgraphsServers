@@ -11,5 +11,3 @@ ALTER TABLE product ALTER COLUMN _publishedStatus SET NOT NULL;
 
 # --- !Downs
 
-ALTER TABLE product DROP COLUMN _publishedStatus;
-ALTER TABLE celebrity DROP COLUMN _publishedStatus;

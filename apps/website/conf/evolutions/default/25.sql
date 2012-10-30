@@ -17,6 +17,3 @@ alter table Usernames add constraint UsernamesFK11 foreign key (customerId) refe
 
 # --- !Downs
 
-DROP index idx54400800;
-
-DROP TABLE Usernames;

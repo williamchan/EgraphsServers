@@ -12,5 +12,3 @@ create sequence s_FailedPurchaseData_id;
 
 # --- !Downs
 
-DROP sequence s_FailedPurchaseData_id;
-DROP TABLE FailedPurchaseData;

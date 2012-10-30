@@ -6,5 +6,3 @@ ALTER TABLE account ADD COLUMN fbUserId varchar(128);
 
 # --- !Downs
 
-ALTER TABLE account DROP COLUMN fbUserId;
-ALTER TABLE account DROP COLUMN resetPasswordKey;
