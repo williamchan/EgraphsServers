@@ -31,7 +31,7 @@ private[controllers] trait GetProductAdminEndpoint extends ImplicitHeaderAndFoot
           	("storyTitle" -> product.storyTitle) + 
           	("storyText" -> product.storyText) + 
           	("publishedStatusString" -> product.publishedStatus.toString)
-          GetProductDetail.getCelebrityProductDetail(celebrity = product.celebrity, isCreate = false, product = Option(product))
+          GetProductDetail.getCelebrityProductDetail(celebrity = product.celebrity, product = Option(product))
       	}
       }
     }
