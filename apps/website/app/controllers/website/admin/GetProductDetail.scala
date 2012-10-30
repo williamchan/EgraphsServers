@@ -9,12 +9,13 @@ import play.api.mvc.Results.Ok
 
 object GetProductDetail {
 
-  def getCelebrityProductDetail(celebrity: Celebrity, isCreate: Boolean, product: Option[models.Product] = None
+  def getCelebrityProductDetail(celebrity: Celebrity, product: Option[models.Product] = None
       )(implicit authToken: egraphs.authtoken.AuthenticityToken,
                  headerData: models.frontend.header.HeaderData, 
                  footerData: models.frontend.footer.FooterData, 
                  flash: play.api.mvc.Flash): play.api.mvc.Result = {
     
+    val isCreate = product.isEmpty
     val errorFields = flash.get("errors").map(errString => errString.split(',').toList)
     
     val fieldDefaults: (String => String) = {

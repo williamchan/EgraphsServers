@@ -7,7 +7,7 @@ import play.api.mvc.Results.Ok
 
 object GetCelebrityDetail {
 
-  def getCelebrityDetail(isCreate: Boolean, celebrity: Option[Celebrity] = None
+  def getCelebrityDetail(celebrity: Option[Celebrity] = None
     )(implicit authToken: egraphs.authtoken.AuthenticityToken,
                headerData: models.frontend.header.HeaderData,
                footerData: models.frontend.footer.FooterData, 
@@ -29,7 +29,7 @@ object GetCelebrityDetail {
         case _ => flash.get(paramName).getOrElse("")
       }
     }
-    Ok(views.html.Application.admin.admin_celebritydetail(isCreate = isCreate, errorFields = errorFields, fields = fieldDefaults, celebrity = celebrity))
+    Ok(views.html.Application.admin.admin_celebritydetail(isCreate = celebrity.isDefined, errorFields = errorFields, fields = fieldDefaults, celebrity = celebrity))
   }
 
 }

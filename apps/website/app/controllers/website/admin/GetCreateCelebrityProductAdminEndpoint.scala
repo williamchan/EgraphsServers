@@ -20,7 +20,7 @@ private[controllers] trait GetCreateCelebrityProductAdminEndpoint extends Implic
       httpFilters.requireCelebrityId(celebrityId) { implicit celebrity =>
         Action { implicit request =>
           implicit val flash = request.flash + ("signingOriginX" -> "0")
-          GetProductDetail.getCelebrityProductDetail(celebrity = celebrity, isCreate = true)
+          GetProductDetail.getCelebrityProductDetail(celebrity = celebrity)
         }
       }
     }

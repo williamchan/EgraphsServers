@@ -37,7 +37,7 @@ private[controllers] trait GetCelebrityAdminEndpoint extends ImplicitHeaderAndFo
               ("twitterUsername" -> celebrity.twitterUsername.getOrElse("")) + 
               ("publicName" -> celebrity.publicName) + 
               ("publishedStatusString" -> celebrity.publishedStatus.toString)
-              GetCelebrityDetail.getCelebrityDetail(isCreate = false, celebrity = Some(celebrity))
+              GetCelebrityDetail.getCelebrityDetail(celebrity = Some(celebrity))
             }
           case _ => NotFound("No such celebrity")
         }
