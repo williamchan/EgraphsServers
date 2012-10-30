@@ -31,8 +31,8 @@ trait AllAdminEndpoints
   with GetReportsAdminEndpoint
   with GetToolsAdminEndpoint
   with PostCelebrityAdminEndpoint
-  with PostCelebrityInventoryBatchAdminEndpoint
-  with PostCelebrityProductAdminEndpoint
+  with PostInventoryBatchAdminEndpoint
+  with PostProductAdminEndpoint
   with PostEgraphAdminEndpoint
   with PostLoginAdminEndpoint
   with PostOrderAdminEndpoint

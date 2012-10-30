@@ -21,7 +21,7 @@ private[controllers] trait GetCreateCelebrityAdminEndpoint extends ImplicitHeade
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       Action { implicit request =>
         implicit val flash = request.flash
-        GetCelebrityDetail.getCelebrityDetail(isCreate = true)
+        GetCelebrityDetail.getCelebrityDetail()
       }
     }
   }
