@@ -108,6 +108,7 @@ class LoggingContext {
         .append(", ")
         .append("requestId=")
         .append(requestInfo.requestId)
+        .append(")")
       
       info(requestHeader.toString())
     }

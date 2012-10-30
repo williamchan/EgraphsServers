@@ -24,6 +24,7 @@ object Global extends GlobalSettings with Logging {
     SSLConfig.enableCustomTrustore()
     
     val logging = AppConfig.instance[LoggingContext]
+    logging.bootstrap()
     logging.withTraceableContext("Bootstrap") {
       val (_, secondsToBootstrap) = Time.stopwatch {
         val configProxy = AppConfig.instance[ConfigFileProxy]
@@ -34,6 +35,7 @@ object Global extends GlobalSettings with Logging {
         log("Bootstrapping application")
 
         // Initialize payment system
+        
         payment.bootstrap()
 
         // Initialize Squeryl persistence

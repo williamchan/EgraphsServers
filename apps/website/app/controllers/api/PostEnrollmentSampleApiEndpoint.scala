@@ -19,6 +19,8 @@ import services.http.{WithoutDBConnection, POSTApiControllerMethod}
 import services.http.filters.HttpFilters
 import play.api.mvc.Action
 import services.http.HttpCodes
+import services.logging.Logging
+import services.http.BasicAuth
 
 private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
   import PostEnrollmentSampleApiEndpoint._
@@ -32,6 +34,10 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
 
   def postEnrollmentSample = postApiController(dbSettings = WithoutDBConnection) {
     Action { implicit request =>
+      val credentials = BasicAuth.Credentials(request).getOrElse {
+        throw new RuntimeException("Accidentally ended up inside postEnrollmentSample sans credentials")
+      }
+      
       val postForm = Form(
         mapping(
           "signature" -> nonEmptyText,
@@ -39,11 +45,13 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
           "skipBiometrics" -> optional(boolean)
         )(EnrollmentSubmission.apply)(EnrollmentSubmission.unapply)
       )
-      
+
       postForm.bindFromRequest.fold(
         formWithErrors => {
-          play.api.Logger.error("Dismissing the invalid postEnrollmentSample request")
-          play.api.Logger.info("\t" + formWithErrors.errors.mkString(", "))
+          error("Enrollment sample upload by " + credentials.username + " was malformed")
+          log("Dismissing the invalid postEnrollmentSample request")
+          log("\t" + formWithErrors.errors.mkString(", "))
+          
           new Status(HttpCodes.MalformedEgraph)
         },
         
@@ -57,6 +65,7 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
               celeb <- httpFilters.requireCelebrityId.asEitherInAccount(account).right
             ) yield {
               val openEnrollmentBatch = enrollmentBatchStore.getOpenEnrollmentBatch(celeb).getOrElse {
+                log("Creating new enrollment batch for celebrity " + credentials.username)
                 EnrollmentBatch(celebrityId = celeb.id, services = enrollmentBatchServices).save()
               }
               
@@ -65,8 +74,10 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
                   signature, 
                   audio
                 )
-                Right(msgsFromAddEnrollmentSampleResult(addEnrollmentSampleResult))                  
+                Right(msgsFromAddEnrollmentSampleResult(addEnrollmentSampleResult))
               } else {
+                log("Rejecting enrollment sample for " + credentials.username + 
+                    " pending complete enrollment of existing batch.")
                 Left(InternalServerError("Open enrollment batch already exists and is awaiting enrollment attempt. No further enrollment samples required now."))                  
               }
             }
@@ -79,7 +90,11 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
           ) yield {
             val (maybeActorMessage, successResult) = success
             
-            maybeActorMessage.foreach(actorMessage => enrollmentBatchActor ! actorMessage)
+            maybeActorMessage.foreach { actorMessage =>
+              log("Sending complete enrollment batch " + actorMessage.id + " for " + 
+                  credentials.username + " to biometrics for enrollment")
+              enrollmentBatchActor ! actorMessage
+            }
             
             successResult
           }
@@ -119,6 +134,6 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
   }
 }
 
-object PostEnrollmentSampleApiEndpoint {
+object PostEnrollmentSampleApiEndpoint extends Logging {
   case class EnrollmentSubmission(signature: String, audio: String, skipBiometrics: Option[Boolean])
 }
