@@ -19,7 +19,7 @@ private[controllers] trait GetCreateCelebrityProductAdminEndpoint extends Implic
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       httpFilters.requireCelebrityId(celebrityId) { implicit celebrity =>
         Action { implicit request =>
-          implicit val flash = request.flash
+          implicit val flash = request.flash + ("signingOriginX" -> "0")
           GetProductDetail.getCelebrityProductDetail(celebrity = celebrity, isCreate = true)
         }
       }

@@ -27,7 +27,10 @@
 }
 
 @postCelebrity = @{
-	routes.WebsiteControllers.postCelebrityAdmin
+  celebrity match {
+    case Some(c) => routes.WebsiteControllers.postCelebrityAdmin(c.id)
+    case None => routes.WebsiteControllers.postCreateCelebrityAdmin
+  }
 }
 
 @profilePhoto = {

@@ -27,8 +27,6 @@ import services.mail.TransactionalMail
 import services.blobs.Blobs.Conversions._
 import org.apache.commons.mail.HtmlEmail
 
-
-// TODO(wchan): This code has become frankenstein. I'm so sorry.
 trait PostCelebrityAdminEndpoint {
   this: Controller =>
 
@@ -38,30 +36,11 @@ trait PostCelebrityAdminEndpoint {
   protected def celebrityStore: CelebrityStore
   protected def accountStore: AccountStore
   
-  case class PostCelebrityForm(
-     celebrityEmail: String,
-     celebrityPassword: String,
-     publicName: String,
-     publishedStatusString: String,
-     bio: String,
-     casualName: String,
-     organization: String,
-     roleDescription: String,
-     twitterUsername: String
-  )
-
-  def postCelebrityAdmin = postController() {
+  def postCreateCelebrityAdmin = postController() {
     httpFilters.requireAdministratorLogin.inSession(parser = parse.multipartFormData) { (admin, adminAccount) =>
       Action(parse.multipartFormData) { implicit request =>
         
-        val celebrityId = Form("celebrityId" -> longNumber).bindFromRequest.fold(formWithErrors => 0L, validForm => validForm)
-        val profileImageFile = request.body.file("profileImage").map(_.ref.file)
-      	val landingPageImageFile = request.body.file("landingPageImage").map(_.ref.file)
-      	val logoImageFile = request.body.file("logoImage").map(_.ref.file)
-      	val profileImageOption = if (profileImageFile.isDefined) ImageUtil.parseImage(profileImageFile.get) else None
-      	val landingPageImageOption = if (landingPageImageFile.isDefined) ImageUtil.parseImage(landingPageImageFile.get) else None
-      	val logoImageOption = if (logoImageFile.isDefined) ImageUtil.parseImage(logoImageFile.get) else None
-      	val isCreate = (celebrityId == 0)
+        val (profileImageFile, landingPageImageFile, logoImageFile, profileImageOption, landingPageImageOption, logoImageOption) = getUploadedImages(request.body)
       	
       	val form = Form(mapping(
               "celebrityEmail" -> email.verifying(nonEmpty),
@@ -73,11 +52,11 @@ trait PostCelebrityAdminEndpoint {
               "organization" -> nonEmptyText(maxLength = 128),
               "roleDescription" -> nonEmptyText(maxLength = 128),
               "twitterUsername" -> text
-          )(PostCelebrityForm.apply)(PostCelebrityForm.unapply)
+          )(PostCreateCelebrityForm.apply)(PostCreateCelebrityForm.unapply)
             .verifying(
-                isUniqueEmail(isCreate, celebrityId),
-                isPasswordValid(isCreate, celebrityId),
-                isUniqueUrlSlug(isCreate, celebrityId),
+                isUniqueEmail,
+                isPasswordValid,
+                isUniqueUrlSlug(),
                 profileImageIsValid(profileImageFile),
                 landingPageImageIsValid(landingPageImageOption),
                 logoImageIsValid(logoImageOption)
@@ -87,13 +66,10 @@ trait PostCelebrityAdminEndpoint {
         form.bindFromRequest.fold(
             formWithErrors => {
               val data = formWithErrors.data
-              val errors = for (error <- formWithErrors.errors) yield {
-                error.key + ": " + error.message
-              }
-              val url = if (isCreate) GetCreateCelebrityAdminEndpoint.url() else GetCelebrityAdminEndpoint.url(celebrityId = celebrityId)
+              val errors = for (error <- formWithErrors.errors) yield { error.key + ": " + error.message }
+              val url = GetCreateCelebrityAdminEndpoint.url()
               Redirect(url).flashing(
                 ("errors" -> errors.mkString(", ")), 
-		        ("celebrityId" -> celebrityId.toString), 
 		        ("celebrityEmail" -> data.get("celebrityEmail").getOrElse("")), 
 		        ("celebrityPassword" -> data.get("celebrityPassword").getOrElse("")), 
 		        ("publicName" -> data.get("publicName").getOrElse("")), 
@@ -106,11 +82,8 @@ trait PostCelebrityAdminEndpoint {
               )
             },
             validForm => {
-              println("validForm")
-              
               val publishedStatus = PublishedStatus(validForm.publishedStatusString).getOrElse(PublishedStatus.Unpublished)
-              val tmp = if (isCreate) Celebrity() else celebrityStore.get(celebrityId)
-              val savedCelebrity = tmp.copy(
+              val savedCelebrity = Celebrity().copy(
                   publicName = validForm.publicName,
                   bio = validForm.bio,
                   casualName = Utils.toOption(validForm.casualName),
@@ -119,62 +92,153 @@ trait PostCelebrityAdminEndpoint {
                   twitterUsername = Utils.toOption(validForm.twitterUsername))
                   .withPublishedStatus(publishedStatus).save()
               
-              // Celebrity must have been previously saved before saving with assets that live in blobstore
-              profileImageFile.map(f => savedCelebrity.saveWithProfilePhoto(f))
-              savedCelebrity.saveWithImageAssets(landingPageImageOption, logoImageOption)
+              val savedWithImages = savedCelebrity.saveWithImageAssets(landingPageImageOption, logoImageOption)
+              profileImageFile.map(f => savedWithImages.saveWithProfilePhoto(f))
               
-              if (isCreate) {
-                new Account(celebrityId = Some(savedCelebrity.id), email = validForm.celebrityEmail).withPassword(validForm.celebrityPassword).right.get.save
-	            savedCelebrity.sendWelcomeEmail(savedCelebrity.account.email)
-	          }
+              Account(celebrityId = Some(savedWithImages.id), email = validForm.celebrityEmail).withPassword(validForm.celebrityPassword).right.get.save
+	          savedWithImages.sendWelcomeEmail(savedWithImages.account.email)
               
-              Redirect(GetCelebrityAdminEndpoint.url(celebrityId = savedCelebrity.id) + "?action=preview")
+              Redirect(GetCelebrityAdminEndpoint.url(celebrityId = savedWithImages.id) + "?action=preview")
             }
           )
       }
   	}
   }
   
-  private def isUniqueEmail(isCreate: Boolean, celebrityId: Long): Constraint[PostCelebrityForm] = {
-    Constraint { form: PostCelebrityForm =>
-      if (isCreate) {
-        val preexistingAccount: Option[Account] = if (isCreate) accountStore.findByEmail(form.celebrityEmail) else accountStore.findByCelebrityId(celebrityId)
-        if (preexistingAccount.isDefined) {
-          val isUniqueEmail = preexistingAccount.get.celebrityId.isEmpty
-          if (isUniqueEmail) Valid else Invalid("Celebrity with e-mail address already exists")
-        } else {
-          Valid
-        }
-      } else {
-        Valid
+  def postCelebrityAdmin(celebrityId: Long) = postController() {
+    httpFilters.requireAdministratorLogin.inSession(parser = parse.multipartFormData) { (admin, adminAccount) =>
+      httpFilters.requireCelebrityId(celebrityId, parser = parse.multipartFormData) { (celeb) =>
+        Action(parse.multipartFormData) { implicit request =>
+	      
+          val (profileImageFile, landingPageImageFile, logoImageFile, profileImageOption, landingPageImageOption, logoImageOption) = getUploadedImages(request.body)
+	      	
+	      val form = Form(mapping(
+	            "publicName" -> nonEmptyText(maxLength = 128),
+	            "publishedStatusString" -> nonEmptyText.verifying(isCelebrityPublishedStatus),
+	            "bio" -> nonEmptyText,
+	            "casualName" -> text,
+	            "organization" -> nonEmptyText(maxLength = 128),
+	            "roleDescription" -> nonEmptyText(maxLength = 128),
+	            "twitterUsername" -> text
+	        )(PostUpdateCelebrityForm.apply)(PostUpdateCelebrityForm.unapply)
+	          .verifying(
+	              isUniqueUrlSlug(Some(celebrityId)),
+	              profileImageIsValid(profileImageFile),
+	              landingPageImageIsValid(landingPageImageOption),
+	              logoImageIsValid(logoImageOption)
+	      	)
+	      )
+	        
+	      form.bindFromRequest.fold(
+	          formWithErrors => {
+	            val data = formWithErrors.data
+	            val errors = for (error <- formWithErrors.errors) yield { error.key + ": " + error.message }
+	            val url = GetCelebrityAdminEndpoint.url(celebrityId = celebrityId)
+	            Redirect(url).flashing(
+	              ("errors" -> errors.mkString(", ")), 
+			      ("celebrityEmail" -> data.get("celebrityEmail").getOrElse("")), 
+			      ("celebrityPassword" -> data.get("celebrityPassword").getOrElse("")), 
+			      ("publicName" -> data.get("publicName").getOrElse("")), 
+			      ("publishedStatusString" -> data.get("publishedStatusString").getOrElse("")), 
+			      ("bio" -> data.get("casualName").getOrElse("")), 
+			      ("casualName" -> data.get("casualName").getOrElse("")), 
+			      ("organization" -> data.get("roleDescription").getOrElse("")), 
+			      ("roleDescription" -> data.get("roleDescription").getOrElse("")), 
+			      ("twitterUsername" -> data.get("twitterUsername").getOrElse(""))
+	            )
+	          },
+	          validForm => {
+	            val publishedStatus = PublishedStatus(validForm.publishedStatusString).getOrElse(PublishedStatus.Unpublished)
+	            val savedCelebrity = celeb.copy(
+	                publicName = validForm.publicName,
+	                bio = validForm.bio,
+	                casualName = Utils.toOption(validForm.casualName),
+	                organization = validForm.organization,
+	                roleDescription = validForm.roleDescription,
+	                twitterUsername = Utils.toOption(validForm.twitterUsername))
+	                .withPublishedStatus(publishedStatus).save()
+	              
+	            val savedWithImages = savedCelebrity.saveWithImageAssets(landingPageImageOption, logoImageOption)
+	            profileImageFile.map(f => savedWithImages.saveWithProfilePhoto(f))
+	              
+	            Redirect(GetCelebrityAdminEndpoint.url(celebrityId = savedWithImages.id) + "?action=preview")
+	          }
+	        )
+	      }
+      }
+  	}
+  }
+  
+  private trait PostCelebrityForm {
+     val publicName: String
+     val publishedStatusString: String
+     val bio: String
+     val casualName: String
+     val organization: String
+     val roleDescription: String
+     val twitterUsername: String
+  }
+  
+  private case class PostUpdateCelebrityForm(
+     publicName: String,
+     publishedStatusString: String,
+     bio: String,
+     casualName: String,
+     organization: String,
+     roleDescription: String,
+     twitterUsername: String
+  ) extends PostCelebrityForm
+  
+  private case class PostCreateCelebrityForm(
+     celebrityEmail: String,
+     celebrityPassword: String,
+     publicName: String,
+     publishedStatusString: String,
+     bio: String,
+     casualName: String,
+     organization: String,
+     roleDescription: String,
+     twitterUsername: String
+  ) extends PostCelebrityForm
+  
+  private def getUploadedImages(body: MultipartFormData[play.api.libs.Files.TemporaryFile])
+  : (Option[File], Option[File], Option[File], Option[BufferedImage], Option[BufferedImage], Option[BufferedImage]) = 
+  {
+    val profileImageFile = body.file("profileImage").map(_.ref.file)
+    val landingPageImageFile = body.file("landingPageImage").map(_.ref.file)
+    val logoImageFile = body.file("logoImage").map(_.ref.file)
+    val profileImageOption = if (profileImageFile.isDefined) ImageUtil.parseImage(profileImageFile.get) else None
+    val landingPageImageOption = if (landingPageImageFile.isDefined) ImageUtil.parseImage(landingPageImageFile.get) else None
+    val logoImageOption = if (logoImageFile.isDefined) ImageUtil.parseImage(logoImageFile.get) else None
+    (profileImageFile, landingPageImageFile, logoImageFile, profileImageOption, landingPageImageOption, logoImageOption)
+  }
+  
+  private def isUniqueEmail: Constraint[PostCreateCelebrityForm] = {
+    Constraint { form: PostCreateCelebrityForm =>
+      accountStore.findByEmail(form.celebrityEmail) match {
+        case Some(preexistingAccount) if (preexistingAccount.celebrityId.isDefined) => Invalid("Celebrity with e-mail address already exists")
+        case _ => Valid
       }
     }
   }
   
-  private def isPasswordValid(isCreate: Boolean, celebrityId: Long): Constraint[PostCelebrityForm] = {
-    Constraint { form: PostCelebrityForm =>
-      if (isCreate) {
-        val preexistingAccount: Option[Account] = if (isCreate) accountStore.findByEmail(form.celebrityEmail) else accountStore.findByCelebrityId(celebrityId)
-        val passwordValidationOrAccount: Either[Password.PasswordError, Account] = if (preexistingAccount.isDefined) {
-          Right(preexistingAccount.get)
-        } else {
-          Account(email = form.celebrityEmail).withPassword(form.celebrityPassword)
-        }
-        if (passwordValidationOrAccount.isRight) Valid else Invalid("Password is invalid")
-      } else {
-        Valid
-      }
+  private def isPasswordValid: Constraint[PostCreateCelebrityForm] = {
+    Constraint { form: PostCreateCelebrityForm =>
+      val passwordValidationOrAccount = Account(email = form.celebrityEmail).withPassword(form.celebrityPassword)
+      if (passwordValidationOrAccount.isRight) Valid else Invalid("Password is invalid")
     }
   }
   
-  private def isUniqueUrlSlug(isCreate: Boolean, celebrityId: Long): Constraint[PostCelebrityForm] = {
+  private def isUniqueUrlSlug(celebrityId: Option[Long] = None): Constraint[PostCelebrityForm] = {
     Constraint { form: PostCelebrityForm =>
+      val isCreate = celebrityId.isEmpty
+      
       val celebrityUrlSlug = Celebrity(publicName = form.publicName).urlSlug
       val celebrityByUrlSlug = celebrityStore.findByUrlSlug(celebrityUrlSlug)
       val isUniqueUrlSlug = if (isCreate) {
         celebrityByUrlSlug.isEmpty
       } else {
-        celebrityByUrlSlug.isEmpty || (celebrityByUrlSlug.isDefined && celebrityByUrlSlug.get.id == celebrityId)
+        celebrityByUrlSlug.isEmpty || (celebrityByUrlSlug.isDefined && celebrityId == Some(celebrityByUrlSlug.get.id))
       }
       if (isUniqueUrlSlug) Valid else Invalid("Celebrity with same website name exists. Provide different public name")
     }
@@ -182,39 +246,28 @@ trait PostCelebrityAdminEndpoint {
 
   private def profileImageIsValid(profileImageFile: Option[File]): Constraint[PostCelebrityForm] = {
     Constraint { form: PostCelebrityForm =>
-      if (profileImageFile.isDefined) {
-        val dimensions = ImageUtil.getDimensions(profileImageFile.get)
-        if (dimensions.isEmpty) {
-          Invalid("No image found for Profile Photo")
-        } else {
-          Valid
-        }
-      } else {
-        Valid
-      }
+      profileImageFile.map{ f =>
+        if (ImageUtil.getDimensions(f).isEmpty) Invalid("No image found for Profile Photo") else Valid
+      }.getOrElse(Valid)
     }
   }
   
   private def landingPageImageIsValid(landingPageImageOption: Option[BufferedImage]): Constraint[PostCelebrityForm] = {
     Constraint { form: PostCelebrityForm =>
-      if (landingPageImageOption.isDefined) {
-        val landingPageImage = landingPageImageOption.get
+      landingPageImageOption.map { landingPageImage =>
         val (width, height) = (landingPageImage.getWidth, landingPageImage.getHeight)
         if (width >= Celebrity.minLandingPageImageWidth && height >= Celebrity.minLandingPageImageHeight) {
           Valid
         } else {
           Invalid("Landing Page Image must be at least " + Celebrity.minLandingPageImageWidth + " in width and " + Celebrity.minLandingPageImageHeight + " in height - resolution was " + width + "x" + height)
         }
-      } else {
-        Valid
-      }
+      }.getOrElse(Valid)
     }
   }
   
   private def logoImageIsValid(logoImageOption: Option[BufferedImage]): Constraint[PostCelebrityForm] = {
     Constraint { form: PostCelebrityForm =>
-      if (logoImageOption.isDefined) {
-        val logoImage = logoImageOption.get
+      logoImageOption.map { logoImage =>
         val (width, height) = (logoImage.getWidth, logoImage.getHeight)
         val isMinWidth = (width >= Celebrity.minLogoWidth && height >= Celebrity.minLogoWidth)
         val isSquare = (width == height)
@@ -223,14 +276,11 @@ trait PostCelebrityAdminEndpoint {
         } else {
           Invalid("Logo Image must be square and at least " + Celebrity.minLogoWidth + " on a side. Resolution was " + width + "x" + height)
         }
-      } else {
-        Valid
-      }
+      }.getOrElse(Valid)
     }
   }
 
-  // TODO: redundant with isProductPublishedStatus
-  def isCelebrityPublishedStatus: Constraint[String] = {
+  private def isCelebrityPublishedStatus: Constraint[String] = {
     Constraint { s: String =>
       PublishedStatus(s) match {
         case Some(providedStatus) => Valid
