@@ -8,6 +8,6 @@ import com.google.inject.{Singleton, AbstractModule}
  */
 object SocialModule extends AbstractModule with ScalaModule {
   def configure() {
-    bind[String].annotatedWith[FacebookAppId].toProvider[FacebookAppIdProvider]
+    bind[String].annotatedWith[FacebookAppId].toProvider[FacebookAppIdProvider].in[Singleton]
   }
 }
