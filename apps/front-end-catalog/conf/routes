@@ -72,8 +72,9 @@ GET     /Login/allErrorsStorefront                                controllers.Lo
 GET     /Login/index                                              controllers.Login.index
 GET     /Login/storefront                                         controllers.Login.storefront(recipient:Option[String])
 
-GET     /Marketplace/index                                        controllers.Marketplace.index  
-GET     /Marketplace/mlb                                          controllers.Marketplace.mlb 
+GET     /Marketplace/index                                        controllers.Marketplace.index 
+GET     /Marketplace/list                                         controllers.Marketplace.index_list  
+GET     /Marketplace/mlb                                          controllers.Marketplace.mlb  
 GET     /Marketplace/mlb/team                                     controllers.Marketplace.mlb_team   
 
 GET     /Personalize/allErrors                                    controllers.Personalize.allErrors
