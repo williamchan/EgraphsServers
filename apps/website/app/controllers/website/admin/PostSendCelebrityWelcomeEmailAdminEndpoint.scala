@@ -34,8 +34,8 @@ trait PostSendCelebrityWelcomeEmailAdminEndpoint {
               formWithErrors => {
                 Redirect(controllers.routes.WebsiteControllers.getCelebrityAdmin(celebrityId = celebrityId)).flashing("errors" -> formWithErrors.errors.head.message.toString())
               },
-              validForm => {
-                celebrity.sendWelcomeEmail(validForm, bccEmail = Some(adminAccount.email))
+              emailAddress => {
+                celebrity.sendWelcomeEmail(emailAddress, bccEmail = Some(adminAccount.email))
                 Redirect(controllers.routes.WebsiteControllers.getCelebrityAdmin(celebrityId = celebrityId))
               })
         }

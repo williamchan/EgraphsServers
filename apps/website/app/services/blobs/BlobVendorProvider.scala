@@ -12,7 +12,6 @@ import services.config.ConfigFileProxy
  * application.conf
  */
 private[blobs] class BlobVendorProvider @Inject() (
-  blobKeyStore: BlobKeyStore,
   cacheFactory: CacheFactory,
   config: ConfigFileProxy,
   val s3: S3BlobVendor,
