@@ -69,7 +69,7 @@ object TestData {
     }
 
     val admin = Administrator().save()
-    account.copy(administratorId = Some(admin.id))
+    account.copy(administratorId = Some(admin.id)).save() 
     admin
   }
   

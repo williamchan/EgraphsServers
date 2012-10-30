@@ -30,12 +30,16 @@ private[controllers] trait GetFilterValueAdminEndpoint extends ImplicitHeaderAnd
     }
   }
   
-  def getCreateFilterValueAdmin(filterId: Long) = controllerMethod.withForm() {
-    implicit authToken =>
+  def getCreateFilterValueAdmin(filterId: Long) = controllerMethod.withForm() { implicit authToken =>
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       Action { implicit request =>
-        val tempFilterValue = FilterValue(name=flash.get("name").getOrElse(""), publicName=flash.get("publicName").getOrElse(""), filterId=filterId)
-        Ok(views.html.Application.admin.admin_filtervalue(filterValue = tempFilterValue, errorFields = errorFields))
+        filterStore.findById(filterId) match {
+          case Some(filter) => { 
+            val tempFilterValue = FilterValue(name=flash.get("name").getOrElse(""), publicName=flash.get("publicName").getOrElse(""), filterId=filterId)
+            Ok(views.html.Application.admin.admin_filtervalue(filterValue = tempFilterValue, errorFields = errorFields))
+          }
+          case _ => NotFound("No such filter")
+        }
       }
     }
   }

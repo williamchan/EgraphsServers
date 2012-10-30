@@ -9,7 +9,6 @@ import services.http.POSTControllerMethod
 import services.http.filters.HttpFilters
 import services.http.SafePlayParams.Conversions._
 import services.logging.Logging
-import play.api.mvc.Action
 import play.api.data._
 import play.api.data.Forms._
 import play.api.data.format.Formats._
@@ -31,7 +30,7 @@ import play.api.mvc._
 
 
 trait PostFilterAdminEndpoint {
-  this: Controller =>
+  this: Controller =>    
 
   protected def postController: POSTControllerMethod
   protected def httpFilters: HttpFilters
@@ -43,8 +42,9 @@ trait PostFilterAdminEndpoint {
   )
 
   def postFilterAdmin = postController() {
-    httpFilters.requireAdministratorLogin.inSession(parser = parse.multipartFormData) { (admin, adminAccount) =>
-      Action(parse.multipartFormData) { implicit request =>
+    httpFilters.requireAdministratorLogin.inSession() 
+    { (admin, adminAccount) =>
+      Action { implicit request =>
         
         val filterId = Form("filterId" -> longNumber).bindFromRequest.fold(formWithErrors => 0L, validForm => validForm)
       	val isCreate = (filterId == 0)
@@ -62,7 +62,7 @@ trait PostFilterAdminEndpoint {
               error.key + ": " + error.message
             }
             val url = if(isCreate) controllers.routes.WebsiteControllers.getCreateFilterAdmin.url else controllers.routes.WebsiteControllers.getFilterAdmin(filterId).url
-            Redirect(url).flashing(
+            Redirect(url, BAD_REQUEST).flashing(
               ("errors" -> errors.mkString(", ")), 
   		        ("filterId" -> filterId.toString), 
   		        ("publicName" -> data.get("publicName").getOrElse("")), 
@@ -75,7 +75,7 @@ trait PostFilterAdminEndpoint {
             val savedFilter = tmp.copy(
                 publicName = validForm.publicName,
                 name = validForm.name).save()
-            Redirect(controllers.routes.WebsiteControllers.getFilterAdmin(savedFilter.id).url)
+            Redirect(controllers.routes.WebsiteControllers.getFilterAdmin(savedFilter.id).url, CREATED)
           }
         )
       }
