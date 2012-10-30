@@ -424,33 +424,45 @@
 
   	        }
   	        
-  	        td {
-
-    	        background: lighten(@gray, 55%);
-              border-bottom: 1px solid @white;
-              padding: 1em 2%;
-  	        
-              a {
+  	        tr {
               
-                color: @grayLight;
+              td {
+              
+                background: lighten(@gray, 55%);
+                border-bottom: 1px solid @white;
+                padding: 1em 2%;
                 
-                &:hover { color: @black; }
-                
-              }
-              
-              strong {
-              
                 a {
-                  
-                  color: @orange;
+                
+                  color: @grayLight;
                   
                   &:hover { color: @black; }
                   
                 }
+                
+                strong {
+                
+                  a {
+                    
+                    color: @orange;
+                    
+                    &:hover { color: @black; }
+                    
+                  }
+                
+                }
+              
+              }
+ 	        
+              &.hover {
+                
+                td {
+                 background: lighten(@gray, 57%);
+                }
               
               }
 
-    	     }
+            }
   	        
 	        }
         
