@@ -34,7 +34,7 @@ private[controllers] trait GetCelebrityInventoryBatchesAdminEndpoint extends Imp
             case _ => inventoryBatchStore.findByCelebrity(celebrity.id)
           }
           val pagedQuery: (Iterable[InventoryBatch], Int, Option[Int]) = services.Utils.pagedQuery(select = query, page = page)
-          implicit val paginationInfo = PaginationInfoFactory.create(pagedQuery = pagedQuery, baseUrl = GetCelebrityInventoryBatchesAdminEndpoint.url(celebrity), filter = Option(filter))
+          implicit val paginationInfo = PaginationInfoFactory.create(pagedQuery = pagedQuery, baseUrl = GetCelebrityInventoryBatchesAdminEndpoint.url(celebrity.id), filter = Option(filter))
           Ok(views.html.Application.admin.admin_inventorybatches(inventoryBatches = pagedQuery._1, celebrity = celebrity))
         }
       }
