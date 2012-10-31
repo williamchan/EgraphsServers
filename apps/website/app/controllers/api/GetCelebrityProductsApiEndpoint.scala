@@ -16,7 +16,7 @@ private[controllers] trait GetCelebrityProductsApiEndpoint { this: Controller =>
    * See the [[https://egraphs.jira.com/wiki/display/DEV/API+Endpoints#APIEndpoints-Products%C2%A0Products product json spec]]
    */
   def getCelebrityProducts = controllerMethod() {
-    httpFilters.requireAuthenticatedAccount() { account =>
+    httpFilters.requireAuthenticatedAccount.inRequest() { account =>
       httpFilters.requireCelebrityId.inAccount(account) { celeb =>
         Action {
           val productMaps = celeb.products().map(product => product.renderedForApi)
