@@ -60,7 +60,7 @@ private[controllers] trait GetEgraphEndpoint { this: Controller =>
             galleryLink = maybeGalleryLink,
             consumerApp = consumerApp
           ))
-        case Some(FulfilledOrder(order, egraph)) => Forbidden("This Egraph is private.")
+        case Some(FulfilledOrder(order, egraph)) => Forbidden(views.html.frontend.errors.forbidden())
         case None => NotFound("No Egraph exists with the provided identifier.")
       }
     }
