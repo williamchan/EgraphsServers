@@ -91,7 +91,7 @@ object WebsiteBuild extends Build {
 
       unmanagedResourceDirectories in Compile += websiteBaseDir / "resources",
 
-      CloudBees.jvmProps := "-Dlogging.resource=prod-logger.xml",
+      CloudBees.jvmProps := "-Dlogger.resource=prod-logger.xml",
 
       EclipseKeys.skipParents := false,
 
