@@ -7,6 +7,7 @@ import services.AppConfig
 import utils._
 import java.awt.image.BufferedImage
 import org.joda.time.DateTimeConstants
+import play.api.Play
 
 class ProductTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
@@ -125,9 +126,18 @@ class ProductTests extends EgraphsUnitTest
     product2.getRemainingInventoryAndActiveInventoryBatches() should be ((97, List(inventoryBatch1, inventoryBatch2))) // product1 is in both inventoryBatch1 and inventoryBatch1, which have 3 purchases total
   }
 
+  //TODO: This test is totally boned, please fix it.
   "getCatalogStars" should "return only published celebrities" in new EgraphsTestApplication {
-    val publishedCelebrity1 = TestData.newSavedCelebrity()
-    val publishedCelebrity2 = TestData.newSavedCelebrity()
+    import services.blobs.Blobs.Conversions._
+    try {
+      val publishedCelebrity1 = TestData.newSavedCelebrity() .withLandingPageImage(Play.getFile("test/resources/ortiz_masthead.jpg")).save().celebrity
+      val publishedCelebrity2 = TestData.newSavedCelebrity() .withLandingPageImage(Play.getFile("test/resources/ortiz_masthead.jpg")).save().celebrity
+    } catch {
+      case e => e.printStackTrace()
+    }
+
+    val publishedCelebrity1 = TestData.newSavedCelebrity() .withLandingPageImage(Play.getFile("test/resources/ortiz_masthead.jpg")).save().celebrity
+    val publishedCelebrity2 = TestData.newSavedCelebrity() .withLandingPageImage(Play.getFile("test/resources/ortiz_masthead.jpg")).save().celebrity
     val unpublishedCelebrity1 = TestData.newSavedCelebrity().withPublishedStatus(PublishedStatus.Unpublished).save()
     val unpublishedCelebrity2 = TestData.newSavedCelebrity().withPublishedStatus(PublishedStatus.Unpublished).save()
 
@@ -136,6 +146,12 @@ class ProductTests extends EgraphsUnitTest
     TestData.newSavedProduct(celebrity = Some(unpublishedCelebrity1))
     TestData.newSavedProduct(celebrity = Some(unpublishedCelebrity2))
 
+    try {
+      store.getCatalogStars
+    } catch {
+      case e => e.printStackTrace()
+    }
+    
     val catalogStars = store.getCatalogStars
 
     val celebrityNamesInCatalogStars = catalogStars.map(star => star.name)

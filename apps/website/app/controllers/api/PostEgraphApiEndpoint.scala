@@ -71,7 +71,7 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
             val failureOrSuccessResult = dbSession.connected(TransactionSerializable) {        
               for (
                 account <- httpFilters.requireAuthenticatedAccount.filter(request).right;            
-                celeb <- httpFilters.requireCelebrityId.asEitherInAccount(account).right;
+                celeb <- httpFilters.requireCelebrityId.filterInAccount(account).right;
                 order <- httpFilters.requireOrderIdOfCelebrity.asEither(orderId, celeb.id).right
               ) yield {
                 // validate signature for issue #104

@@ -35,7 +35,7 @@ trait PostProductAdminEndpoint extends Logging {
 
   def postCreateProductAdmin(celebrityId: Long) = postController() {
     httpFilters.requireAdministratorLogin.inSession(parser = parse.multipartFormData) { case (admin, adminAccount) =>
-      httpFilters.requireCelebrityId(celebId = celebrityId, parser = parse.multipartFormData) { celebrity =>
+      httpFilters.requireCelebrityId(celebrityId, parse.multipartFormData) { celebrity =>
       	Action(parse.multipartFormData) { implicit request =>
       	  
       	  val createWithoutInventory = Form("createWithoutInventory" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm)

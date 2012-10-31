@@ -62,7 +62,7 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
           val forbiddenOrErrorOrSuccess = dbSession.connected(TransactionSerializable) {
             for (
               account <- httpFilters.requireAuthenticatedAccount.filter(request).right;
-              celeb <- httpFilters.requireCelebrityId.asEitherInAccount(account).right
+              celeb <- httpFilters.requireCelebrityId.filterInAccount(account).right
             ) yield {
               val openEnrollmentBatch = enrollmentBatchStore.getOpenEnrollmentBatch(celeb).getOrElse {
                 log("Creating new enrollment batch for celebrity " + credentials.username)
