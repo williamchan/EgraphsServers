@@ -48,7 +48,7 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
 
       postForm.bindFromRequest.fold(
         formWithErrors => {
-          error("Enrollment sample upload by " + credentials.username + " was malformed")
+          error("Enrollment sample from " + credentials.username + " was malformed")
           log("Dismissing the invalid postEnrollmentSample request")
           log("\t" + formWithErrors.errors.mkString(", "))
           
@@ -70,6 +70,7 @@ private[controllers] trait PostEnrollmentSampleApiEndpoint { this: Controller =>
               }
               
               if (!openEnrollmentBatch.isBatchComplete) {
+                log("Adding enrollment sample to batchId=" + openEnrollmentBatch.id + " for " + credentials.username)
                 val addEnrollmentSampleResult = openEnrollmentBatch.addEnrollmentSample(
                   signature, 
                   audio
