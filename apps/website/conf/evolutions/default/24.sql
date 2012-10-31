@@ -22,14 +22,3 @@ ALTER TABLE CashTransaction RENAME COLUMN typeString TO _cashTransactionType;
 
 # --- !Downs
 
-ALTER TABLE CashTransaction RENAME COLUMN _cashTransactionType TO typeString;
-
-ALTER TABLE CashTransaction DROP COLUMN stripeCardTokenId;
-ALTER TABLE CashTransaction DROP COLUMN stripeChargeId;
-ALTER TABLE CashTransaction DROP COLUMN printOrderId;
-ALTER TABLE CashTransaction DROP COLUMN billingPostalCode;
-
-DROP index idx632308aa;
-
-ALTER TABLE PrintOrder DROP COLUMN pngUrl;
-ALTER TABLE PrintOrder DROP COLUMN amountPaidInCurrency;

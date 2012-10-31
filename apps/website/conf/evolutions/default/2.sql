@@ -7,5 +7,3 @@ CREATE INDEX idx4b0107b3 ON orders (reviewStatus);
 ALTER TABLE orders ADD COLUMN rejectionReason varchar(128);
 
 # --- !Downs
-ALTER TABLE orders DROP COLUMN rejectionReason;
-ALTER TABLE orders DROP COLUMN reviewStatus;

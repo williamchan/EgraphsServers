@@ -7,4 +7,3 @@ ALTER TABLE orders ALTER COLUMN _orderType SET NOT NULL;
 
 # --- !Downs
 
-ALTER TABLE orders DROP COLUMN _orderType;

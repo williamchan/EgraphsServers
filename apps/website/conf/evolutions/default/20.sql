@@ -10,7 +10,3 @@ UPDATE Orders SET _printingOption = 'DoNotPrint';
 ALTER TABLE Orders ALTER COLUMN _printingOption SET NOT NULL;
 
 # --- !Downs
-
-ALTER TABLE Orders DROP COLUMN _printingOption;
-ALTER TABLE Orders DROP COLUMN shippingAddress;
-ALTER TABLE Orders DROP COLUMN billingPostalCode;

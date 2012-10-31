@@ -14,6 +14,3 @@ create sequence s_PrintOrder_id;
 alter table PrintOrder add constraint PrintOrderFK10 foreign key (orderId) references Orders(id) on delete cascade;
 
 # --- !Downs
-
-DROP sequence s_PrintOrder_id;
-DROP TABLE PrintOrder;

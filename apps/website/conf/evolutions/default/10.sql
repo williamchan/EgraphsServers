@@ -11,8 +11,3 @@ CREATE index idx512107dd on celebrity (isFeatured);
 
 # --- !Downs
 
-DROP index idx512107dd;
-
-ALTER TABLE celebrity DROP COLUMN roleDescription;
-ALTER TABLE celebrity DROP COLUMN isFeatured;
-

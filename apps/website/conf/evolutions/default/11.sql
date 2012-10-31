@@ -16,17 +16,3 @@ ALTER TABLE orders RENAME COLUMN reviewStatus TO _reviewStatus;
 ALTER TABLE administrator ALTER COLUMN _role SET NOT NULL;
 
 # --- !Downs
-
-ALTER TABLE administrator ALTER COLUMN _role DROP NOT NULL;
-
-ALTER TABLE orders RENAME COLUMN _reviewStatus TO reviewStatus;
-ALTER TABLE orders RENAME COLUMN _paymentStatus TO paymentStateString;
-ALTER TABLE orders RENAME COLUMN _egraphState TO stateValue;
-ALTER TABLE celebrity RENAME COLUMN _enrollmentStatus TO enrollmentStatusValue;
-ALTER TABLE administrator RENAME COLUMN _role TO role;
-
-ALTER TABLE orders DROP COLUMN _privacyStatus;
-
-ALTER TABLE celebrity ADD COLUMN isLeftHanded boolean;
-ALTER TABLE celebrity SET isLeftHanded = true;
-ALTER TABLE celebrity ALTER COLUMN isLeftHanded SET NOT NULL;

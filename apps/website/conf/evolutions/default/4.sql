@@ -7,6 +7,3 @@ alter table Orders add constraint OrdersFK13 foreign key (inventoryBatchId) refe
 
 # --- !Downs
 
-alter table Orders drop constraint OrdersFK13;
-
-ALTER TABLE orders ALTER COLUMN inventoryBatchId DROP NOT NULL;

@@ -6,5 +6,3 @@ ALTER TABLE egraph ADD COLUMN longitude double precision;
 
 # --- !Downs
 
-ALTER TABLE egraph DROP COLUMN longitude;
-ALTER TABLE egraph DROP COLUMN latitude;

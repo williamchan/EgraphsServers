@@ -4,4 +4,3 @@
 ALTER TABLE Orders ALTER COLUMN _printingOption DROP NOT NULL;
 
 # --- !Downs
-ALTER TABLE Orders ALTER COLUMN _printingOption SET NOT NULL;

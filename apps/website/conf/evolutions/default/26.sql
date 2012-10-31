@@ -7,4 +7,3 @@ ALTER TABLE Celebrity ALTER COLUMN roleDescription SET NOT NULL;
 
 # --- !Downs
 
-ALTER TABLE Celebrity ALTER COLUMN roleDescription DROP NOT NULL;
