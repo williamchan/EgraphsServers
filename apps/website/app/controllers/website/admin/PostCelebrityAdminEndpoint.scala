@@ -82,6 +82,7 @@ trait PostCelebrityAdminEndpoint {
               )
             },
             validForm => {
+              // Save Celebrity
               val publishedStatus = PublishedStatus(validForm.publishedStatusString).getOrElse(PublishedStatus.Unpublished)
               val savedCelebrity = Celebrity().copy(
                   publicName = validForm.publicName,
@@ -92,11 +93,15 @@ trait PostCelebrityAdminEndpoint {
                   twitterUsername = Utils.toOption(validForm.twitterUsername))
                   .withPublishedStatus(publishedStatus).save()
               
+              // Save Celebrity image assets
               val savedWithImages = savedCelebrity.saveWithImageAssets(landingPageImageOption, logoImageOption)
               profileImageFile.map(f => savedWithImages.saveWithProfilePhoto(f))
               
-              Account(celebrityId = Some(savedWithImages.id), email = validForm.celebrityEmail).withPassword(validForm.celebrityPassword).right.get.save
-	          savedWithImages.sendWelcomeEmail(savedWithImages.account.email)
+              // Save Account
+              val acct = accountStore.findByEmail(validForm.celebrityEmail).getOrElse(Account(email = validForm.celebrityEmail))
+              val savedAccount = acct.copy(celebrityId = Some(savedWithImages.id)).withPassword(validForm.celebrityPassword).right.get.save()
+              
+              savedWithImages.sendWelcomeEmail(savedAccount.email)
               
               Redirect(GetCelebrityAdminEndpoint.url(celebrityId = savedWithImages.id) + "?action=preview")
             }
