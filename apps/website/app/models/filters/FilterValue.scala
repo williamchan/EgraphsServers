@@ -49,6 +49,15 @@ case class FilterValue(
   override def unapplied = FilterValue.unapply(this)
 }
 
+case class FilterValueFilterViewModel(
+    filterValueId: Long,
+    filterValueName: String,
+    filterValuePublicname: String,
+    filterId: Long,
+    filterName: String,
+    filterPublicname: String 
+)
+
 class FilterValueStore @Inject() (
   schema: Schema,
   filterServices: Provider[FilterServices]
@@ -67,6 +76,15 @@ class FilterValueStore @Inject() (
       (fv) =>
        where(fv.filterId === filterId)
        select(fv)
+    )
+  }
+  /**
+   * Return tuples of FilterValues and their Filters
+   */
+  def findFilterValueFilterViewModel : Query[(FilterValue, Filter)]  = {
+    join(schema.filterValues, schema.filters)((filterValue, filter) =>
+      select(filterValue, filter)
+      on(filterValue.filterId === filter.id)
     )
   }
   

@@ -43,7 +43,7 @@ trait PostFilterValueAdminEndpoint {
   )
   
   def postFilterValueAdmin = postController() {
-	httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+	  httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       Action { implicit request =>
         val filterValueId = Form("filterValueId" -> longNumber).bindFromRequest.fold(formWithErrors => 0L, validForm => validForm)
         val filterId = Form("filterId" -> longNumber).bindFromRequest.fold(formWithErrors => 0L, validForm => validForm)
@@ -53,8 +53,7 @@ trait PostFilterValueAdminEndpoint {
           "name" -> nonEmptyText(maxLength = 128),
           "publicName" -> nonEmptyText(maxLength = 128),
           "filterId" -> longNumber)(PostFilterValueForm.apply)(PostFilterValueForm.unapply)
-          .verifying(isUniqueName(filterValueId)))
-     
+          .verifying(isUniqueName(filterValueId)))  
         form.bindFromRequest.fold(
           formWithErrors => {
             val data = formWithErrors.data
@@ -62,7 +61,7 @@ trait PostFilterValueAdminEndpoint {
               error.key + ": " + error.message
             }
             val url = if(isCreate) controllers.routes.WebsiteControllers.getCreateFilterValueAdmin(filterId).url else controllers.routes.WebsiteControllers.getFilterValueAdmin(filterValueId).url
-            Redirect(url, BAD_REQUEST).flashing(
+            Redirect(url, SEE_OTHER).flashing( 
               ("errors" -> errors.mkString(", ")), 
   		        ("filterValueId" -> filterValueId.toString),
   		        ("publicName" -> data.get("publicName").getOrElse("")), 
@@ -70,20 +69,20 @@ trait PostFilterValueAdminEndpoint {
             )
           },
           validForm => {
-            println("validForm")          
             val tmp = if (isCreate) FilterValue() else filterValueStore.get(filterValueId)
             val savedFilterValue = tmp.copy(
                 publicName = validForm.publicName,
                 name = validForm.name,
-                filterId = validForm.filterId).save()
-            Redirect(controllers.routes.WebsiteControllers.getFilterValueAdmin(savedFilterValue.id).url, CREATED)
+                filterId = validForm.filterId)
+                .save()
+            Redirect(controllers.routes.WebsiteControllers.getFilterValueAdmin(savedFilterValue.id).url, FOUND)
           }
         )
       }
-	}  
+	  }  
   }
 	
-    private def isUniqueName(filterValueId: Long): Constraint[PostFilterValueForm] = {
+  private def isUniqueName(filterValueId: Long): Constraint[PostFilterValueForm] = {
     Constraint { form: PostFilterValueForm => 
       filterValueStore.findByName(form.name) match {
         case None => Valid

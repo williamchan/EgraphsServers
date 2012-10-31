@@ -62,7 +62,7 @@ trait PostFilterAdminEndpoint {
               error.key + ": " + error.message
             }
             val url = if(isCreate) controllers.routes.WebsiteControllers.getCreateFilterAdmin.url else controllers.routes.WebsiteControllers.getFilterAdmin(filterId).url
-            Redirect(url, BAD_REQUEST).flashing(
+            Redirect(url, SEE_OTHER).flashing(
               ("errors" -> errors.mkString(", ")), 
   		        ("filterId" -> filterId.toString), 
   		        ("publicName" -> data.get("publicName").getOrElse("")), 
@@ -75,7 +75,7 @@ trait PostFilterAdminEndpoint {
             val savedFilter = tmp.copy(
                 publicName = validForm.publicName,
                 name = validForm.name).save()
-            Redirect(controllers.routes.WebsiteControllers.getFilterAdmin(savedFilter.id).url, CREATED)
+            Redirect(controllers.routes.WebsiteControllers.getFilterAdmin(savedFilter.id).url, FOUND)
           }
         )
       }

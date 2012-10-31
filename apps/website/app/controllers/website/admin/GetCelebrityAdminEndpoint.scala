@@ -1,7 +1,8 @@
 package controllers.website.admin
 
 import play.api.mvc.Controller
-import models.{AccountStore, CelebrityStore}
+import models.{AccountStore, CelebrityStore, Celebrity}
+import models.enums.PublishedStatus
 import controllers.WebsiteControllers
 import services.http.ControllerMethod
 import services.http.filters.HttpFilters
@@ -9,6 +10,7 @@ import play.api.mvc.{Action, Controller}
 import play.api.mvc.Results.{Ok, Redirect, NotFound}
 import controllers.website.consumer.CelebrityLandingConsumerEndpoint
 import services.mvc.{celebrity, ImplicitHeaderAndFooterData}
+import org.apache.commons.lang3.StringEscapeUtils
 
 private[controllers] trait GetCelebrityAdminEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
@@ -37,18 +39,47 @@ private[controllers] trait GetCelebrityAdminEndpoint extends ImplicitHeaderAndFo
               ("twitterUsername" -> celebrity.twitterUsername.getOrElse("")) + 
               ("publicName" -> celebrity.publicName) + 
               ("publishedStatusString" -> celebrity.publishedStatus.toString)
-              GetCelebrityDetail.getCelebrityDetail(isCreate = false, celebrity = Some(celebrity))
+
+              val (errorFields, fieldDefaults) = getCelebrityDetail(isCreate = false, celebrity = Some(celebrity))
+              Ok(views.html.Application.admin.admin_celebritydetail(isCreate = false, errorFields = errorFields, fields = fieldDefaults, celebrity = Option(celebrity)))
             }
           case _ => NotFound("No such celebrity")
         }
       }
     }
   }
-}
 
-object GetCelebrityAdminEndpoint {
+  def getCreateCelebrityAdmin = controllerMethod.withForm() { implicit authToken =>
+    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+      Action { implicit request =>
+        implicit val flash = request.flash
+        val (errorFields, fieldDefaults) = getCelebrityDetail(isCreate = true)
+        Ok(views.html.Application.admin.admin_celebritydetail(isCreate = true, errorFields = errorFields, fields = fieldDefaults, celebrity = None))
+      }
+    }
+  }
 
-  def url(celebrityId: Long) = {
-    controllers.routes.WebsiteControllers.getCelebrityAdmin(celebrityId).url
+  private def getCelebrityDetail(isCreate: Boolean, celebrity: Option[Celebrity] = None
+    )(implicit flash: play.api.mvc.Flash): (Option[List[String]], (String) => String) = {
+    
+    val errorFields = flash.get("errors").map(errString => errString.split(',').toList)
+
+    val fieldDefaults: (String => String) = {
+      (paramName: String) => paramName match {
+        case "celebrityId" => flash.get("celebrityId").getOrElse("")
+        case "celebrityEmail" => flash.get("celebrityEmail").getOrElse("")
+        case "bio" => StringEscapeUtils.escapeHtml4(flash.get("bio").getOrElse(""))
+        case "casualName" => StringEscapeUtils.escapeHtml4(flash.get("casualName").getOrElse(""))
+        case "organization" => StringEscapeUtils.escapeHtml4(flash.get("organization").getOrElse(""))
+        case "publicName" => StringEscapeUtils.escapeHtml4(flash.get("publicName").getOrElse(""))
+        case "publishedStatusString" => flash.get("publishedStatusString").getOrElse(PublishedStatus.Unpublished.toString)
+        case "roleDescription" => StringEscapeUtils.escapeHtml4(flash.get("roleDescription").getOrElse(""))
+        case "twitterUsername" => StringEscapeUtils.escapeHtml4(flash.get("twitterUsername").getOrElse(""))
+        case _ => flash.get(paramName).getOrElse("")
+      }
+    } 
+
+    (errorFields, fieldDefaults)
   }
 }
+
