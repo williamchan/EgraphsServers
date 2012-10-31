@@ -1,7 +1,7 @@
 package models
 
 import enums.{HasEnrollmentStatus, EnrollmentStatus, PublishedStatus, HasPublishedStatus}
-import filters.{FilterServices, CelebrityFilterValue, FilterValue, FilterValueStore}
+import filters._
 import java.sql.Timestamp
 import services.blobs.AccessPolicy
 import services.db.{FilterOneTable, KeyedCaseClass, Schema, SavesWithLongKey}
@@ -69,6 +69,8 @@ case class Celebrity(id: Long = 0,
    */
 
   lazy val filterValues = services.filterServices.filterValueStore.filterValues(this)
+  
+  lazy val filterValueAndFilterPairs : Query[(FilterValue, Filter)] = services.filterServices.filterValueStore.filterValueFilterPairs(this)
 
   //
   // Additional DB columns
@@ -376,7 +378,7 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
   //
   // Public Methods
   //
-
+  
   def celebrities(filterValue: FilterValue) : Query[Celebrity] with ManyToMany[Celebrity, CelebrityFilterValue] = {
     schema.celebrityFilterValues.right(filterValue)
   }

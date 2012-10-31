@@ -66,6 +66,7 @@ GET      /admin/celebrities/$celebrityId<[0-9]+>/orders                   contro
 GET      /admin/celebrities/$celebrityId<[0-9]+>/products                 controllers.WebsiteControllers.getCelebrityProductsAdmin(celebrityId: Long)
 POST     /admin/celebrities/$celebrityId<[0-9]+>/products                 controllers.WebsiteControllers.postCelebrityProductAdmin(celebrityId: Long)
 GET      /admin/celebrities/$celebrityId<[0-9]+>/products/create          controllers.WebsiteControllers.getCreateCelebrityProductAdmin(celebrityId: Long)
+POST     /admin/celebrities/$celebrityId<[0-9]+>/filtervalues             controllers.WebsiteControllers.postCelebrityFilterValueAdmin(celebrityId: Long)
 POST     /admin/celebrities/$celebrityId<[0-9]+>/sendEmail                controllers.WebsiteControllers.postSendCelebrityWelcomeEmailAdmin(celebrityId: Long)
 GET      /admin/egraphs                                                   controllers.WebsiteControllers.getEgraphsAdmin
 GET      /admin/egraphs/$egraphId<[0-9]+>                                 controllers.WebsiteControllers.getEgraphAdmin(egraphId: Long)

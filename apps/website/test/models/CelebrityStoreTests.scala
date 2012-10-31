@@ -105,8 +105,6 @@ class CelebrityStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
     instanceUnderTest.findByFilterValueId(filterValueA.id).union(instanceUnderTest.findByFilterValueId(filterValueB.id)).exists(c => celebAB.id == c.id) should be (true)
         
   }
-  
-
 
   // Private members
   //

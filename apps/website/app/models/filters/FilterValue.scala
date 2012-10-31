@@ -81,6 +81,13 @@ class FilterValueStore @Inject() (
   def filterValues(celebrity: Celebrity): Query[FilterValue] with ManyToMany[FilterValue, CelebrityFilterValue] = {
     schema.celebrityFilterValues.left(celebrity)
   }
+  
+  def filterValueFilterPairs(celebrity: Celebrity): Query[(FilterValue, Filter)] = {
+    from(schema.filterValues, schema.filters, schema.celebrityFilterValues)((fv, f, cfv) =>
+      where(cfv.celebrityId === celebrity.id and fv.id === cfv.filterValueId and f.id === fv.filterId)
+      select((fv, f))
+    )
+  }
 
   //
   // SavesWithLongKey[FilterValue] methods

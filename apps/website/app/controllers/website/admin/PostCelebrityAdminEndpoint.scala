@@ -106,8 +106,6 @@ trait PostCelebrityAdminEndpoint {
               )
             },
             validForm => {
-              println("validForm")
-              
               val publishedStatus = PublishedStatus(validForm.publishedStatusString).getOrElse(PublishedStatus.Unpublished)
               val tmp = if (isCreate) Celebrity() else celebrityStore.get(celebrityId)
               val savedCelebrity = tmp.copy(

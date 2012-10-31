@@ -17,17 +17,17 @@ class PostFilterAdminEndpointTests extends EgraphsUnitTest with CsrfProtectedRes
   override protected def routeUnderTest = postFilterAdmin
   override protected def db = AppConfig.instance[DBSession]
 
-  routeName(postFilterAdmin) should "reject empty names" in new EgraphsTestApplication {
+  routeName(routeUnderTest) should "reject empty names" in new EgraphsTestApplication {
     val result = performRequest(filterId = "0" , name = "", publicname=TestData.generateUsername(), adminId=admin.id)
     status(result) should be (BAD_REQUEST)
   }
   
-  routeName(postFilterAdmin) should "reject empty publicnames" in new EgraphsTestApplication {
+  it should "reject empty publicnames" in new EgraphsTestApplication {
     val result = performRequest(filterId = "0" , name=TestData.generateUsername(), publicname="", adminId=admin.id)
     status(result) should be (BAD_REQUEST)
   }
   
-  routeName(postFilterAdmin) should "sucessfully create new filters" in new EgraphsTestApplication {
+  it should "sucessfully create new filters" in new EgraphsTestApplication {
     val result = performRequest(filterId = "0" , name=TestData.generateUsername(), publicname=TestData.generateUsername(), adminId=admin.id)
     status(result) should be (CREATED)
   }

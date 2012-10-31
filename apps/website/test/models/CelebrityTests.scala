@@ -114,6 +114,21 @@ class CelebrityTests extends EgraphsUnitTest
     featuredStateOfCelebWhen(celebWasFeatured=false, includeCelebInNewFeaturedCelebs=true) should be (true)
   }
   
+  "find pairs of filters and filter values" should "return the pairs associated with the celeb" in {
+    val filterA = TestData.newSavedFilter
+    val filterValueA = TestData.newSavedFilterValue(filterA.id)
+    
+    val filterB = TestData.newSavedFilter
+    val filterValueB = TestData.newSavedFilterValue(filterB.id)
+    
+    val celeb = TestData.newSavedCelebrity().save()
+    celeb.filterValues.associate(filterValueA)
+    celeb.filterValues.associate(filterValueB)
+    val pairs = celeb.filterValueAndFilterPairs
+    
+    pairs.size should be(2)
+  }
+  
 
   //
   //  HasPublishedStatus[Celebrity] methods

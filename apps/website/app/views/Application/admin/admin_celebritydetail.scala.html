@@ -147,23 +147,36 @@
         <div class="span12">    
 	        <h2> Filter Values </h2>
 		      <table class="table table-hover table-condensed">
-		      <thead>
-		        <tr>
-		          <th>id</td>
-		          <th>name</th>
-		          <th>publicname</th>
-		        </tr>
-			  </thead>  
-		        @celeb.filterValues.map { fv =>
-		          <tr>
-		            <td>@fv.id</td>
-		            <td>@fv.name</td>
-		            <td>@fv.publicName</td>
-		          </tr>  
-		        }
-	      </table>
-	      }
-	  </div>    
+  		      <thead>
+  		        <tr>
+  		          <th>id</td>
+  		          <th>name</th>
+  		          <th>publicname</th>
+  		          <th>filter name</th>
+  		          <th>filter publicname</th>
+  		          <th>Remove?</th>
+  		        </tr>
+  			    </thead>  
+  		        @celeb.filterValueAndFilterPairs.map { fvf =>
+  		          <tr>
+  		            <td>@fvf._1.id</td>
+  		            <td>@fvf._1.name</td>
+  		            <td>@fvf._1.publicName</td>
+  		            <td>@fvf._2.name</td>
+  		            <td>@fvf._2.publicName</td>
+  		            <td><button class="btn btn-danger">Remove</button></td>
+  		          </tr>  
+  		      }
+	        </table>
+        </div>      
+	    }
+	    <button type="button" class="btn" data-toggle="collapse" data-target="#filtervalueform">
+        Associate a new filter value
+      </button>
+      @safeForm('class-> "collapse out", 'id -> "filtervalueform", 'method -> "POST",
+                'action -> "#") {
+        DERPSCHLERP          
+      }
     </div>    
   </div>
 </section>

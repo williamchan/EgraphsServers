@@ -52,7 +52,8 @@ trait PostFilterValueAdminEndpoint {
         val form = Form(mapping(
           "name" -> nonEmptyText(maxLength = 128),
           "publicName" -> nonEmptyText(maxLength = 128),
-          "filterId" -> longNumber)(PostFilterValueForm.apply)(PostFilterValueForm.unapply).verifying(isUniqueName(filterValueId)))
+          "filterId" -> longNumber)(PostFilterValueForm.apply)(PostFilterValueForm.unapply)
+          .verifying(isUniqueName(filterValueId)))
      
         form.bindFromRequest.fold(
           formWithErrors => {
