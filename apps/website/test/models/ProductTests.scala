@@ -108,8 +108,8 @@ class ProductTests extends EgraphsUnitTest
   "getRemainingInventoryAndActiveInventoryBatches" should "return total inventory in active InventoryBatches minus the number of relevant Orders" in new EgraphsTestApplication {
     val celebrity = TestData.newSavedCelebrity()
     val customer = TestData.newSavedCustomer()
-    val product1 = TestData.newSavedProductWithoutInventoryBatch(celebrity = celebrity)
-    val product2 = TestData.newSavedProductWithoutInventoryBatch(celebrity = celebrity)
+    val product1 = TestData.newSavedProductWithoutInventoryBatch(Some(celebrity))
+    val product2 = TestData.newSavedProductWithoutInventoryBatch(Some(celebrity))
     product1.getRemainingInventoryAndActiveInventoryBatches() should be ((0, List.empty[InventoryBatch]))
     product2.getRemainingInventoryAndActiveInventoryBatches() should be ((0, List.empty[InventoryBatch]))
 
@@ -145,7 +145,7 @@ class ProductTests extends EgraphsUnitTest
     celebrityNamesInCatalogStars should not contain (unpublishedCelebrity2.publicName)
   }
 
-  "getCatalogStars" should "return only celebrities with published products" in new EgraphsTestApplication {
+  it should "return only celebrities with published products" in new EgraphsTestApplication {
     // create 4 different celebrities with products, 2 have unpublished products, all are published celebrities.
     val publishedProduct1 = TestData.newSavedProduct()
     val publishedProduct2 = TestData.newSavedProduct()
@@ -161,7 +161,7 @@ class ProductTests extends EgraphsUnitTest
     celebrityNamesInCatalogStars should not contain (unpublishedProduct2.celebrity.publicName)
   }
 
-  "getCatalogStars" should "return celebrities that lack inventory if they lack inventory batches active based on startDate and endDate" in new EgraphsTestApplication {
+  it should "return celebrities that lack inventory if they lack inventory batches active based on startDate and endDate" in new EgraphsTestApplication {
     // create 4 different celebrities with products, 2 have unpublished products, all are published celebrities.
     val availableProduct1 = TestData.newSavedProduct()
     val availableProduct2 = TestData.newSavedProduct()
@@ -184,7 +184,7 @@ class ProductTests extends EgraphsUnitTest
     celebrityNamesInCatalogStars should contain ((unavailableProduct2.celebrity.publicName, false))
   }
 
-  "getCatalogStars" should "show a celebrity has products available only if there is remaining inventory" in new EgraphsTestApplication {
+  it should "show a celebrity has products available only if there is remaining inventory" in new EgraphsTestApplication {
     AppConfig.instance[services.cache.CacheFactory].applicationCache.clear()
     // these two already have inventory by default
     val availableProduct1 = TestData.newSavedProduct()

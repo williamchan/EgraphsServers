@@ -21,7 +21,7 @@ class PostRecoverAccountEndpointTests extends EgraphsUnitTest with CsrfProtected
 
   routeName(postRecoverAccount()) should "validate email addresses" in new EgraphsTestApplication {
     val Some(result) = routeAndCall(
-      FakeRequest().toRoute(postRecoverAccount).withFormUrlEncodedBody("email" -> "").withAuthToken
+      FakeRequest().toRoute(postRecoverAccount).withFormUrlEncodedBody("email" -> "gnuggets@gangstaville.com").withAuthToken
     )
     
     status(result) should be (NOT_FOUND)
