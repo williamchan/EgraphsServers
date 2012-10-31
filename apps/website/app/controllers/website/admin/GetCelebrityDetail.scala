@@ -29,7 +29,7 @@ object GetCelebrityDetail {
         case _ => flash.get(paramName).getOrElse("")
       }
     }
-    Ok(views.html.Application.admin.admin_celebritydetail(isCreate = celebrity.isDefined, errorFields = errorFields, fields = fieldDefaults, celebrity = celebrity))
+    Ok(views.html.Application.admin.admin_celebritydetail(isCreate = celebrity.isEmpty, errorFields = errorFields, fields = fieldDefaults, celebrity = celebrity))
   }
 
 }
