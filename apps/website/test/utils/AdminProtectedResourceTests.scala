@@ -7,6 +7,7 @@ import utils.FunctionalTestUtils.Conversions._
 import play.api.mvc.Controller
 import org.scalatest.FlatSpec
 import play.api.mvc.Call
+import controllers.routes.WebsiteControllers.getLoginAdmin
 import services.db.{DBSession, TransactionSerializable}
 import models._
 
@@ -16,14 +17,13 @@ trait AdminProtectedResourceTests { this: EgraphsUnitTest =>
   
   routeName(routeUnderTest) + ", as an admin authenticated resource, " should "fail due to lack of an admin id in the session" in new EgraphsTestApplication {
     val Some(result) = routeAndCall(FakeRequest().toRoute(routeUnderTest).withAuthToken)
-    
     status(result) should be (SEE_OTHER)
-
+    headers(result)("Location") should be (getLoginAdmin.url)
   }
   
-  it should "not throw an error if there is an admin id in the session" in new EgraphsTestApplication {
+  it should "not redirect to the login page session" in new EgraphsTestApplication {
     val Some(result) = routeAndCall(FakeRequest().toRoute(routeUnderTest).withAdmin(admin.id).withAuthToken)
-    status(result) should not be (SEE_OTHER)    
+    redirectLocation(result) should not be (Some(getLoginAdmin.url))
   }
   
   def admin : Administrator = {

@@ -19,17 +19,17 @@ class PostFilterValueAdminEndpointTests extends EgraphsUnitTest with CsrfProtect
 
   routeName(postFilterValueAdmin) should "reject empty names" in new EgraphsTestApplication {
     val result = performRequest(filterId = newFilterId.toString, filterValueId = "0", name = "", publicname=TestData.generateUsername(), adminId=admin.id)
-    status(result) should be (BAD_REQUEST)
+    status(result) should be (SEE_OTHER)
   }
   
   routeName(postFilterValueAdmin) should "reject empty publicnames" in new EgraphsTestApplication {
     val result = performRequest(filterId = newFilterId.toString, filterValueId = "0", name=TestData.generateUsername(), publicname="", adminId=admin.id)
-    status(result) should be (BAD_REQUEST)
+    status(result) should be (SEE_OTHER)
   }
   
   routeName(postFilterValueAdmin) should "sucessfully create new filter value for a preexisting filter" in new EgraphsTestApplication {
     val result = performRequest(filterId = newFilterId.toString, filterValueId = "0", name=TestData.generateUsername(), publicname=TestData.generateUsername(), adminId=admin.id)
-    status(result) should be (CREATED)
+    status(result) should be (FOUND)
   }
   
   private def performRequest(filterId: String, filterValueId: String, name: String, publicname: String, adminId: Long): play.api.mvc.Result = {

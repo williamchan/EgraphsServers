@@ -25,6 +25,7 @@ import java.awt.image.BufferedImage
 import services.{Dimensions, ImageUtil, Utils}
 import services.mail.TransactionalMail
 import services.blobs.Blobs.Conversions._
+import controllers.routes.WebsiteControllers.{getCreateCelebrityAdmin, getCelebrityAdmin}
 import org.apache.commons.mail.HtmlEmail
 
 
@@ -90,7 +91,7 @@ trait PostCelebrityAdminEndpoint {
               val errors = for (error <- formWithErrors.errors) yield {
                 error.key + ": " + error.message
               }
-              val url = if (isCreate) GetCreateCelebrityAdminEndpoint.url() else GetCelebrityAdminEndpoint.url(celebrityId = celebrityId)
+              val url = if (isCreate) getCreateCelebrityAdmin.url else getCelebrityAdmin(celebrityId = celebrityId).url
               Redirect(url).flashing(
                 ("errors" -> errors.mkString(", ")), 
 		        ("celebrityId" -> celebrityId.toString), 
@@ -124,9 +125,8 @@ trait PostCelebrityAdminEndpoint {
               if (isCreate) {
                 new Account(celebrityId = Some(savedCelebrity.id), email = validForm.celebrityEmail).withPassword(validForm.celebrityPassword).right.get.save
 	            savedCelebrity.sendWelcomeEmail(savedCelebrity.account.email)
-	          }
-              
-              Redirect(GetCelebrityAdminEndpoint.url(celebrityId = savedCelebrity.id) + "?action=preview")
+	            }
+              Redirect(getCelebrityAdmin(celebrityId = celebrityId).url + "?action=preview")
             }
           )
       }
