@@ -32,12 +32,12 @@ class RequireCelebrityAndProductUrlSlugsTest extends EgraphsUnitTest with DBTran
     val celebrity = TestData.newSavedCelebrity()
     val product = TestData.newSavedProductWithoutInventoryBatch(Some(celebrity))
 
-    val authenticatedAccountFilter = AppConfig.instance[RequireCelebrityAndProductUrlSlugs] // this is what we are trying to test
+    val filter = AppConfig.instance[RequireCelebrityAndProductUrlSlugs] // this is what we are trying to test
 
     implicit val request = FakeRequest()
 
     intercept[ThisTestPassedException] {
-      authenticatedAccountFilter(celebrity.urlSlug, product.urlSlug) {
+      filter(celebrity.urlSlug, product.urlSlug) {
         (celeb, prod) => throw new ThisTestPassedException
       }(request)
     }
@@ -49,12 +49,12 @@ class RequireCelebrityAndProductUrlSlugsTest extends EgraphsUnitTest with DBTran
     val product = TestData.newSavedProductWithoutInventoryBatch(Some(celebrity))
     val admin = TestData.newSavedAdministrator()
 
-    val authenticatedAccountFilter = AppConfig.instance[RequireCelebrityAndProductUrlSlugs] // this is what we are trying to test
+    val filter = AppConfig.instance[RequireCelebrityAndProductUrlSlugs] // this is what we are trying to test
 
     implicit val request = FakeRequest().withSession((EgraphsSession.Key.AdminId.name, admin.id.toString))
 
     intercept[ThisTestPassedException] {
-      authenticatedAccountFilter(celebrity.urlSlug, product.urlSlug) {
+      filter(celebrity.urlSlug, product.urlSlug) {
         (celeb, prod) => throw new ThisTestPassedException
       }(request)
     }
@@ -66,12 +66,12 @@ class RequireCelebrityAndProductUrlSlugsTest extends EgraphsUnitTest with DBTran
     val product = TestData.newSavedProductWithoutInventoryBatch(Some(celebrity)).withPublishedStatus(PublishedStatus.Unpublished).save()
     val admin = TestData.newSavedAdministrator()
 
-    val authenticatedAccountFilter = AppConfig.instance[RequireCelebrityAndProductUrlSlugs] // this is what we are trying to test
+    val filter = AppConfig.instance[RequireCelebrityAndProductUrlSlugs] // this is what we are trying to test
 
     implicit val request = FakeRequest().withSession((EgraphsSession.Key.AdminId.name, admin.id.toString))
 
     intercept[ThisTestPassedException] {
-      authenticatedAccountFilter(celebrity.urlSlug, product.urlSlug) {
+      filter(celebrity.urlSlug, product.urlSlug) {
         (celeb, prod) => throw new ThisTestPassedException
       }(request)
     }
@@ -82,11 +82,11 @@ class RequireCelebrityAndProductUrlSlugsTest extends EgraphsUnitTest with DBTran
     val celebrity = TestData.newSavedCelebrity().withPublishedStatus(PublishedStatus.Unpublished).save()
     val product = TestData.newSavedProductWithoutInventoryBatch(Some(celebrity)).withPublishedStatus(PublishedStatus.Unpublished).save()
 
-    val authenticatedAccountFilter = AppConfig.instance[RequireCelebrityAndProductUrlSlugs] // this is what we are trying to test
+    val filter = AppConfig.instance[RequireCelebrityAndProductUrlSlugs] // this is what we are trying to test
 
     implicit val request = FakeRequest()
 
-    val result = authenticatedAccountFilter(celebrity.urlSlug, product.urlSlug) {
+    val result = filter(celebrity.urlSlug, product.urlSlug) {
       (celeb, prod) => fail()
     }(request)
 
@@ -99,12 +99,12 @@ class RequireCelebrityAndProductUrlSlugsTest extends EgraphsUnitTest with DBTran
     val productUrl = RandomStringUtils.random(20)
     val admin = TestData.newSavedAdministrator()
 
-    val authenticatedAccountFilter = AppConfig.instance[RequireCelebrityAndProductUrlSlugs] // this is what we are trying to test
+    val filter = AppConfig.instance[RequireCelebrityAndProductUrlSlugs] // this is what we are trying to test
 
     // should no execute actionFactory even though request has valid admin
     implicit val request = FakeRequest().withSession((EgraphsSession.Key.AdminId.name, admin.id.toString))
 
-    val result = authenticatedAccountFilter(celebrityUrl, productUrl) {
+    val result = filter(celebrityUrl, productUrl) {
       (celeb, prod) => fail()
     }(request)
 
@@ -116,11 +116,11 @@ class RequireCelebrityAndProductUrlSlugsTest extends EgraphsUnitTest with DBTran
     val celebrity = TestData.newSavedCelebrity()
     val product = TestData.newSavedProductWithoutInventoryBatch(Some(celebrity))
 
-    val authenticatedAccountFilter = AppConfig.instance[RequireCelebrityAndProductUrlSlugs] // this is what we are trying to test
+    val filter = AppConfig.instance[RequireCelebrityAndProductUrlSlugs] // this is what we are trying to test
 
     implicit val request = FakeRequest()
 
-    val errorOrCelebrityAndProduct = authenticatedAccountFilter.filter(celebrity.urlSlug, product.urlSlug)(request)
+    val errorOrCelebrityAndProduct = filter.filter(celebrity.urlSlug, product.urlSlug)(request)
 
     errorOrCelebrityAndProduct should be(Right(celebrity, product))
   }
@@ -131,11 +131,11 @@ class RequireCelebrityAndProductUrlSlugsTest extends EgraphsUnitTest with DBTran
     val product = TestData.newSavedProductWithoutInventoryBatch(Some(celebrity))
     val admin = TestData.newSavedAdministrator()
 
-    val authenticatedAccountFilter = AppConfig.instance[RequireCelebrityAndProductUrlSlugs] // this is what we are trying to test
+    val filter = AppConfig.instance[RequireCelebrityAndProductUrlSlugs] // this is what we are trying to test
 
     implicit val request = FakeRequest().withSession((EgraphsSession.Key.AdminId.name, admin.id.toString))
 
-    val errorOrCelebrityAndProduct = authenticatedAccountFilter.filter(celebrity.urlSlug, product.urlSlug)(request)
+    val errorOrCelebrityAndProduct = filter.filter(celebrity.urlSlug, product.urlSlug)(request)
 
     errorOrCelebrityAndProduct should be(Right(celebrity, product))
   }
@@ -146,11 +146,11 @@ class RequireCelebrityAndProductUrlSlugsTest extends EgraphsUnitTest with DBTran
     val product = TestData.newSavedProductWithoutInventoryBatch(Some(celebrity)).withPublishedStatus(PublishedStatus.Unpublished).save()
     val admin = TestData.newSavedAdministrator()
 
-    val authenticatedAccountFilter = AppConfig.instance[RequireCelebrityAndProductUrlSlugs] // this is what we are trying to test
+    val filter = AppConfig.instance[RequireCelebrityAndProductUrlSlugs] // this is what we are trying to test
 
     implicit val request = FakeRequest().withSession((EgraphsSession.Key.AdminId.name, admin.id.toString))
 
-    val errorOrCelebrityAndProduct = authenticatedAccountFilter.filter(celebrity.urlSlug, product.urlSlug)(request)
+    val errorOrCelebrityAndProduct = filter.filter(celebrity.urlSlug, product.urlSlug)(request)
 
     errorOrCelebrityAndProduct should be(Right(celebrity, product))
   }
@@ -160,11 +160,11 @@ class RequireCelebrityAndProductUrlSlugsTest extends EgraphsUnitTest with DBTran
     val celebrity = TestData.newSavedCelebrity().withPublishedStatus(PublishedStatus.Unpublished).save()
     val product = TestData.newSavedProductWithoutInventoryBatch(Some(celebrity)).withPublishedStatus(PublishedStatus.Unpublished).save()
 
-    val authenticatedAccountFilter = AppConfig.instance[RequireCelebrityAndProductUrlSlugs] // this is what we are trying to test
+    val filter = AppConfig.instance[RequireCelebrityAndProductUrlSlugs] // this is what we are trying to test
 
     implicit val request = FakeRequest()
 
-    val errorOrCelebrityAndProduct = authenticatedAccountFilter.filter(celebrity.urlSlug, product.urlSlug)(request)
+    val errorOrCelebrityAndProduct = filter.filter(celebrity.urlSlug, product.urlSlug)(request)
     val result = errorOrCelebrityAndProduct.toErrorOrOkResult
 
     status(result) should not be(Ok)
@@ -176,12 +176,12 @@ class RequireCelebrityAndProductUrlSlugsTest extends EgraphsUnitTest with DBTran
     val productUrl = RandomStringUtils.random(20)
     val admin = TestData.newSavedAdministrator()
 
-    val authenticatedAccountFilter = AppConfig.instance[RequireCelebrityAndProductUrlSlugs] // this is what we are trying to test
+    val filter = AppConfig.instance[RequireCelebrityAndProductUrlSlugs] // this is what we are trying to test
 
     // should pass checks even though request has valid admin
     implicit val request = FakeRequest().withSession((EgraphsSession.Key.AdminId.name, admin.id.toString))
 
-    val errorOrCelebrityAndProduct = authenticatedAccountFilter.filter(celebrityUrl, productUrl)(request)
+    val errorOrCelebrityAndProduct = filter.filter(celebrityUrl, productUrl)(request)
     val result = errorOrCelebrityAndProduct.toErrorOrOkResult
 
     status(result) should not be (OK)

@@ -14,54 +14,39 @@ import models.enums.PublishedStatus
 import models.ProductQueryFilters
 import services.db.FilterOneTable
 import org.squeryl.Query
+import services.AppConfig
+import utils.TestData
+import utils.DBTransactionPerTest
+import org.apache.commons.lang3.RandomStringUtils
 
 @RunWith(classOf[JUnitRunner]) //If you ever have to look at this.  Maybe rewrite as an integration test for readability.
-class RequireProductUrlSlugTests extends EgraphsUnitTest {
+class RequireProductUrlSlugTests extends EgraphsUnitTest with DBTransactionPerTest {
   val goodUrlSlug = "goodSlug"
   val badUrlSlug = "badSlug"
 
   val productWithUrlSlug = Product(services = null).withPublishedStatus(PublishedStatus.Published)
 
   "filter" should "allow products slugs that are associated with a product" in {
-    val (filter, celebrity) = filterWithMocksAndCelebrity
-    val errorOrProduct = filter.filter(goodUrlSlug, celebrity)
+    val celebrity = TestData.newSavedCelebrity()
+    val product = TestData.newSavedProduct(Some(celebrity))
 
-    errorOrProduct should be(Right(productWithUrlSlug))
+    val errorOrProduct = filter.filter(product.urlSlug, celebrity)
+
+    errorOrProduct should be(Right(product))
   }
 
   it should "not allow products slugs that are not associated with a product" in {
-    val (filter, celebrity) = filterWithMocksAndCelebrity
-    val errorOrProduct = filter.filter(badUrlSlug, celebrity)
+    val celebrity = TestData.newSavedCelebrity()
+    val productSlug = RandomStringUtils.random(20)
+
+    val errorOrProduct = filter.filter(productSlug, celebrity)
 
     val result = errorOrProduct.toErrorOrOkResult
 
     status(result) should be(NOT_FOUND)
   }
 
-  private def filterWithMocksAndCelebrity: (RequireProductUrlSlug, Celebrity) = {
-    val (productQueryFilters, celebrity) = mockProductQueryFiltersAndCelebrity
-    (new RequireProductUrlSlug(productQueryFilters), celebrity)
-  }
-
-  private def mockProductQueryFiltersAndCelebrity = {
-    val productQueryFilters = mock[ProductQueryFilters]
-
-    val goodResponse = mock[FilterOneTable[Product]]
-    val badResponse = mock[FilterOneTable[Product]]
-
-    productQueryFilters.byUrlSlug(goodUrlSlug) returns goodResponse // Some(productWithUrlSlug)
-    productQueryFilters.byUrlSlug(badUrlSlug) returns badResponse // None
-
-    val goodQuery = mock[Query[Product]]
-    goodQuery.headOption returns Some(productWithUrlSlug)
-
-    val badQuery = mock[Query[Product]]
-    badQuery.headOption returns None
-
-    val celebrity = mock[Celebrity]
-    celebrity.products(goodResponse) returns goodQuery
-    celebrity.products(badResponse) returns badQuery
-
-    (productQueryFilters, celebrity)
+  private def filter: RequireProductUrlSlug = {
+    AppConfig.instance[RequireProductUrlSlug] 
   }
 }
