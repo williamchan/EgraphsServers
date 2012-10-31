@@ -101,9 +101,14 @@ class LoggingContext {
   
   private def logRequestHeader(request: Request[_], requestInfo: RequestInfo) {
     try {
-      val requestHeader = new StringBuilder("Serving IP ")
+      val requestHeader = new StringBuilder("Serving \"")
+        .append(request.method)
+        .append(" ")
+        .append(request.uri)
+        .append(" \"")
+        .append("to IP ")
         .append(request.remoteAddress)
-        .append("(id=")
+        .append(" (id=")
         .append(requestInfo.clientId)
         .append(", ")
         .append("requestId=")
