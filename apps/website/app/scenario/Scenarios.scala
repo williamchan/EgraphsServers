@@ -8,7 +8,6 @@ import org.squeryl.PrimitiveTypeMode._
 import models._
 import play.api.mvc.Results.Redirect
 import controllers.WebsiteControllers
-import utils.TestConstants
 import enums._
 import services.{Utils, AppConfig}
 import org.joda.time.DateTime

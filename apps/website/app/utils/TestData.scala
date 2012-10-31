@@ -25,8 +25,6 @@ object TestData {
   lazy val threeDaysHence = new DateTime().plusDays(3).toLocalDate.toDate
   lazy val sevenDaysHence = new DateTime().plusDays(7).toLocalDate.toDate
 
-
-
   val random = new Random
 
   def getTimeInBlobstoreFormat: String = Time.toBlobstoreFormat(Time.now)

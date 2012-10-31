@@ -303,7 +303,7 @@ case class Celebrity(id: Long = 0,
    * their keys. This value can not be determined if the entity has not yet been saved.
    */
   private def keyBase = {
-    require(id > 0, "Can not determine blobstore key when no id exists yet for this entity in the relational database")
+    require(id > 0, "Cannot determine blobstore key when no id exists yet for this entity in the relational database")
     "celebrity/" + id
   }
 
