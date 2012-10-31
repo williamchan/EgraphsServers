@@ -105,7 +105,7 @@ class LoggingContext {
         .append(request.method)
         .append(" ")
         .append(request.uri)
-        .append(" \"")
+        .append("\" ")
         .append("to IP ")
         .append(request.remoteAddress)
         .append(" (id=")
