@@ -31,7 +31,9 @@ class RequireCelebrityId @Inject() (celebStore: CelebrityStore) extends Filter[L
         case celebrityId => celebrityId > 0
       }: Long => Boolean))
 
-  override protected def badRequest(formWithErrors: Form[Long]): Result = noCelebIdResult
+  override protected def formFailedResult[A, S >: Source](formWithErrors: Form[Long], source: S)(implicit request: Request[A]): Result = {
+    noCelebIdResult
+  }
 
   def inAccount[A](account: Account, parser: BodyParser[A] = parse.anyContent)(actionFactory: Celebrity => Action[A]): Action[A] = {
     Action(parser) { implicit request =>

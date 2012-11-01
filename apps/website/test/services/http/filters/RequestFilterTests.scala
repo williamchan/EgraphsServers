@@ -171,11 +171,13 @@ class RequestFilterTests extends EgraphsUnitTest with MockFactory {
       })
   }
 
-  "badRequest" should "be able to be able to be overriden to Redirect" in {
+  "formFailedResult" should "be able to be able to be overriden to Redirect" in {
     import play.api.mvc.Results.Redirect
 
     val filter = new TestableRequestFilter() {
-      override protected def badRequest(formWithErrors: Form[String]): Result = Redirect("www.egraphs.com")
+      override protected def formFailedResult[A, S >: Source](formWithErrors: Form[String], source: S)(implicit request: Request[A]): Result = {
+        Redirect("www.egraphs.com")
+      }
     }
 
     val cookie = Cookie(validFormKey, "true")

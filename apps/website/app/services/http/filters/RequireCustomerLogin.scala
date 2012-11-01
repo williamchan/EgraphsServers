@@ -9,6 +9,7 @@ import play.api.data.Forms.longNumber
 import play.api.data.Forms.single
 import play.api.data.Form
 import play.api.mvc.Results.Redirect
+import play.api.mvc.Request
 import play.api.mvc.Result
 import services.http.filters.RequireCustomerLogin.CustomerAccount
 import services.http.EgraphsSession
@@ -24,7 +25,12 @@ class RequireCustomerLogin @Inject() (customerStore: CustomerStore) extends Filt
 
   private val redirectToLogin = Redirect(controllers.website.GetLoginEndpoint.url())
 
-  override protected def badRequest(formWithErrors: Form[Long]): Result = redirectToLogin
+  override protected def formFailedResult[A, S >: Source](formWithErrors: Form[Long], source: S)(implicit request: Request[A]): Result = {
+    source match {
+      case SessionSource => redirectToLogin.withSession(request.session - EgraphsSession.Key.CustomerId.name)
+      case _ => redirectToLogin
+    }
+  }
 
   override def filter(customerId: Long): Either[Result, CustomerAccount] = {
     val maybeCustomerAccount = customerStore.findById(customerId).map(customer => (customer, customer.account))

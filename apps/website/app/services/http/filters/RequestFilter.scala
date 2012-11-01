@@ -11,6 +11,11 @@ import play.api.mvc.Session
 import play.api.mvc.Result
 import play.api.mvc.Request
 
+sealed trait Source
+case class RequestSource() extends Source
+case class FlashSource() extends Source
+case class SessionSource() extends Source
+
 /**
  * Similar to Filter, except that RequestFilter cares about whether or not the key found
  * in a request has the data required.
@@ -19,57 +24,69 @@ trait RequestFilter[KeyT, RequiredT] { this: Filter[KeyT, RequiredT] =>
   // with this form we can get data from the request that will be used to get the result.  
   protected def form: Form[KeyT]
 
-  protected def badRequest(formWithErrors: Form[KeyT]): Result = BadRequest(formatError(formWithErrors)) // override this if you want a redirect instead
+  // override this if you want a redirect instead or change the result by modifying session or something
+  protected def formFailedResult[A, S >: Source](formWithErrors: Form[KeyT], source: S)(implicit request: Request[A]): Result = BadRequest(formatError(formWithErrors))
 
   private def formatError(formWithErrors: Form[_]): String = {
     formWithErrors.errors.map(error => error.key + ": " + error.message).mkString(", ")
   }
 
-  // The bindForm should return a form with the parameters bound to it.
-  private def inForm[A](parser: BodyParser[A])(actionFactory: RequiredT => Action[A])(bindForm: Request[A] => Form[KeyT]): Action[A] = {
-    Action(parser) { request =>
-      bindForm(request).fold(
-        formWithErrors => badRequest(formWithErrors),
-
-        key => this.apply(key, parser)(actionFactory)(request))
+  private def bindForm[A, S >: Source](source: S)(implicit request: Request[A]): Form[KeyT] = {
+    source match {
+      case RequestSource =>
+        form.bindFromRequest()
+      case SessionSource =>
+        val sessionMap = Session.serialize(request.session)
+        form.bind(sessionMap)
+      case FlashSource =>
+        val flashMap = Flash.serialize(request.flash)
+        form.bind(flashMap)
     }
   }
 
+  private def filterInSource[A, S >: Source](source: S, parser: BodyParser[A] = parse.anyContent)(implicit request: Request[A]): Either[Result, RequiredT] = {
+    bindForm(source).fold(
+      formWithErrors => Left(formFailedResult(formWithErrors, source)),
+
+      key => this.filter(key))
+  }
+
   def filterInRequest[A](parser: BodyParser[A] = parse.anyContent)(implicit request: Request[A]): Either[Result, RequiredT] = {
-    form.bindFromRequest().fold(
-      formWithErrors => Left(badRequest(formWithErrors)),
-
-      key => this.filter(key))
+    filterInSource(RequestSource, parser)
   }
-  
+
   def filterInSession[A](parser: BodyParser[A] = parse.anyContent)(implicit request: Request[A]): Either[Result, RequiredT] = {
-    val sessionMap = Session.serialize(request.session)
-    form.bind(sessionMap).fold(
-      formWithErrors => Left(badRequest(formWithErrors)),
-
-      key => this.filter(key))
+    filterInSource(SessionSource, parser)
   }
 
-  def inRequest[A](parser: BodyParser[A] = parse.anyContent)(actionFactory: RequiredT => Action[A]): Action[A] = {
+  def filterInFlash[A](parser: BodyParser[A] = parse.anyContent)(implicit request: Request[A]): Either[Result, RequiredT] = {
+    filterInSource(FlashSource, parser)
+  }
+
+  private def inSource[A, S >: Source](source: S, parser: BodyParser[A] = parse.anyContent)(actionFactory: RequiredT => Action[A]): Action[A] = {
     Action(parser) { implicit request =>
-      filterInRequest(parser).fold(
+      filterInSource(source, parser).fold(
         error => error,
         required => actionFactory(required)(request))
     }
   }
+  
+  def inRequest[A](parser: BodyParser[A] = parse.anyContent)(actionFactory: RequiredT => Action[A]): Action[A] = {
+    inSource(RequestSource, parser)(actionFactory)
+  }
 
   def inSession[A](parser: BodyParser[A] = parse.anyContent)(actionFactory: RequiredT => Action[A]): Action[A] = {
-    inForm(parser)(actionFactory) { implicit request =>
-      val sessionMap = Session.serialize(request.session)
-      form.bind(sessionMap)
-    }
+    inSource(SessionSource, parser)(actionFactory)
+  }
+
+  def inFlash[A](parser: BodyParser[A] = parse.anyContent)(actionFactory: RequiredT => Action[A]): Action[A] = {
+    inSource(FlashSource, parser)(actionFactory)
   }
 
   def inFlashOrRequest[A](parser: BodyParser[A] = parse.anyContent)(actionFactory: RequiredT => Action[A]): Action[A] = {
-    Action(parser) { request =>
+    Action(parser) { implicit request =>
       // flash takes precedence over request args
-      val flashMap = Flash.serialize(request.flash)
-      val maybeKey = form.bind(flashMap).fold(
+      val maybeKey = bindForm(FlashSource).fold(
         errors => None,
         key => Some(key))
 

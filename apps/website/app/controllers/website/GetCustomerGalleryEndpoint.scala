@@ -47,7 +47,7 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
 
   def getCustomerGalleryById(galleryCustomerId: Long) = controllerMethod.withForm() 
   { implicit authToken =>
-    httpFilters.requireCustomerId(galleryCustomerId) { customer =>
+    httpFilters.requireCustomerLogin(galleryCustomerId) { case (customer, account )=>
       Action { implicit request =>
         serveCustomerGallery(customer)
       }
