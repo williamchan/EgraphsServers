@@ -3,6 +3,7 @@ package controllers.website.admin
 import play.api.mvc.Controller
 import models.{AccountStore, CelebrityStore, Celebrity}
 import models.enums.PublishedStatus
+import models.filters._
 import controllers.WebsiteControllers
 import services.http.ControllerMethod
 import services.http.filters.HttpFilters
@@ -19,6 +20,7 @@ private[controllers] trait GetCelebrityAdminEndpoint extends ImplicitHeaderAndFo
   protected def httpFilters: HttpFilters
   protected def accountStore: AccountStore
   protected def celebrityStore: CelebrityStore
+  protected def filterValueStore: FilterValueStore  
 
   def getCelebrityAdmin(celebrityId: Long) = controllerMethod.withForm() { implicit authToken =>
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
@@ -41,7 +43,15 @@ private[controllers] trait GetCelebrityAdminEndpoint extends ImplicitHeaderAndFo
               ("publishedStatusString" -> celebrity.publishedStatus.toString)
 
               val (errorFields, fieldDefaults) = getCelebrityDetail(isCreate = false, celebrity = Some(celebrity))
-              Ok(views.html.Application.admin.admin_celebritydetail(isCreate = false, errorFields = errorFields, fields = fieldDefaults, celebrity = Option(celebrity)))
+
+              val celebFilterValueIds = (for(filterValue <- celebrity.filterValues) yield { filterValue.id }).toSet
+
+              Ok(views.html.Application.admin.admin_celebritydetail(
+                isCreate = false, errorFields = errorFields,
+                fields = fieldDefaults,
+                celebrity = Option(celebrity),
+                currentFilterValueIds = celebFilterValueIds,
+                filterValueFilters = filterValueStore.findFilterValueFilterViewModel))
             }
           case _ => NotFound("No such celebrity")
         }
@@ -54,7 +64,13 @@ private[controllers] trait GetCelebrityAdminEndpoint extends ImplicitHeaderAndFo
       Action { implicit request =>
         implicit val flash = request.flash
         val (errorFields, fieldDefaults) = getCelebrityDetail(isCreate = true)
-        Ok(views.html.Application.admin.admin_celebritydetail(isCreate = true, errorFields = errorFields, fields = fieldDefaults, celebrity = None))
+        Ok(views.html.Application.admin.admin_celebritydetail(
+          isCreate = true, errorFields = errorFields,
+          fields = fieldDefaults,
+          celebrity = None,
+          currentFilterValueIds = Set[Long](),
+          filterValueFilters = List[(FilterValue, Filter)]())
+        )
       }
     }
   }

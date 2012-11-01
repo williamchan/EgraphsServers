@@ -430,28 +430,7 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
        ) select(c)
    ) 
   }
-  
-//  def findByFilterValueIdsIntersection(ids: List[Long]) : Query[Celebrity] = {
-//    
-//    /**
-//     * Searching for values that are in the same Filter, the IDs should be ORed
-//     * Searching for values that are in different should be and Filter A ( v1 or v2 or v3) AND Filter B ( v1, v2, v3)
-//     */
-//    val derp = from(schema.celebrityFilterValues, schema.celebrities)(
-//	  (cfv, c) => 
-//	    where (
-//	      cfv.id === filterValueId and
-//	      c.id === cfv.celebrityId
-//	    ) select(c)
-//	  )
-//  
-//	  
-//  }
-  
-  /**
-   * Convert filterValues to a hashtable
-   */
-  
+   
   /**
    * Find using postgres text search on publicname and roledescription
    * http://www.postgresql.org/docs/9.2/interactive/textsearch-controls.html
@@ -534,6 +513,27 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
     update(schema.celebrities)(c =>
       where(c.id in safeNewFeaturedCelebIds)
         set (c.isFeatured := true)
+    )
+  }
+
+  /**
+   * Update a celebrity's associated filter values
+   **/
+
+  def updateFilterValues(celebrity: Celebrity, filterValueIds: Iterable[Long]) {
+    // TODO: find where the source of null was and remove it; we should not have null checks in this code.
+    val safeNewFilterValueIds = if (filterValueIds != null)filterValueIds else List.empty[Long]
+    //remove old records
+    celebrity.filterValues.dissociateAll
+
+    // Add records for the new values
+    val newCelebrityFilterValues  = for (filterValueId <- safeNewFilterValueIds) yield 
+    { 
+      CelebrityFilterValue(celebrityId = celebrity.id, filterValueId = filterValueId)
+    }
+
+    schema.celebrityFilterValues.insert(
+       newCelebrityFilterValues
     )
   }
 

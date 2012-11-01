@@ -75,7 +75,7 @@ trait PostFilterValueAdminEndpoint {
                 name = validForm.name,
                 filterId = validForm.filterId)
                 .save()
-            Redirect(controllers.routes.WebsiteControllers.getFilterValueAdmin(savedFilterValue.id).url, FOUND)
+            Redirect(controllers.routes.WebsiteControllers.getFilterAdmin(savedFilterValue.filterId).url, FOUND)
           }
         )
       }

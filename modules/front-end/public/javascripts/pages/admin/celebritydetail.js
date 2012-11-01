@@ -41,6 +41,8 @@ define(["Egraphs", "bootstrap/bootstrap-alert", "bootstrap/bootstrap-button", "b
         publishButton.button("toggle");
         return false;
       });
+
+      $('.chzn-select').chosen();    
     }
   };
 });

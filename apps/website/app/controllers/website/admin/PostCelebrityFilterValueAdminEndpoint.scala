@@ -45,32 +45,23 @@ trait PostCelebrityFilterValueAdminEndpoint {
   def postCelebrityFilterValueAdmin(celebrityId: Long) = postController() {
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       Action { implicit request =>
-        val form = Form(mapping(
-          "filterValueId" -> longNumber
-        )(CelebrityFilterValueForm.apply)(CelebrityFilterValueForm.unapply)
-        .verifying(
-          isValidFilterValueId
-        ))
         
-        form.bindFromRequest.fold(
-          formWithErrors => {
-            Redirect(controllers.routes.WebsiteControllers.getCelebritiesAdmin.url, BAD_REQUEST)
-          },
-          validForm => {
-            celebrityStore.findById(celebrityId) match {
-              case Some(celebrity) => {
-                filterValueStore.findById(validForm.filterValueId) match {
-                  case Some(filterValue) => {
-                    celebrity.filterValues.associate(filterValue)
-                    Redirect(controllers.routes.WebsiteControllers.getCelebritiesAdmin.url, CREATED)
-                  }
-                  case _ => Redirect(controllers.routes.WebsiteControllers.getCelebritiesAdmin.url, BAD_REQUEST)   
-                }
-              }  
-              case _ =>  Redirect(controllers.routes.WebsiteControllers.getCelebritiesAdmin.url, BAD_REQUEST)   
-            }      
+        val filterValueIds = request.body.asFormUrlEncoded match {
+          case Some(params) if(params.contains("filterValueIds")) => {
+            for(filterValueId <- params("filterValueIds")) yield {
+              filterValueId.toLong
+            }
           }
-        )     
+          case _ => List[Long]()
+        }
+
+        celebrityStore.findById(celebrityId) match {
+        case Some(celebrity) => {
+              celebrityStore.updateFilterValues(celebrity = celebrity, filterValueIds = filterValueIds) 
+              Redirect(controllers.routes.WebsiteControllers.getCelebrityAdmin(celebrity.id).url, FOUND)
+            }
+            case _ => Redirect(controllers.routes.WebsiteControllers.getCelebritiesAdmin.url, SEE_OTHER)   
+          }
       }
     }  
   }
