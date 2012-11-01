@@ -111,9 +111,8 @@ object TestData {
     product.saveWithImageAssets(image = Some(product.defaultPhoto.renderFromMaster), icon = None)
   }
 
-  @deprecated("Use with optional celebrity version because that encapsulates all this functionality and more.", "9f7497d3 2012-09-27")
   def newSavedProductWithoutInventoryBatch(celebrity: Celebrity): Product = {
-    newProduct(celebrity).save()
+    newSavedProductWithoutInventoryBatch(Some(celebrity))
   }
 
   def newSavedInventoryBatch(product: Product) : InventoryBatch = {
@@ -125,7 +124,15 @@ object TestData {
   def newSavedInventoryBatch(celebrity: Celebrity) : InventoryBatch = {
     InventoryBatch(celebrityId = celebrity.id, numInventory = 50, startDate = TestData.today, endDate = TestData.sevenDaysHence).save()
   }
-
+  
+  def newSavedOrderStack(): (Customer, Customer, Celebrity, Product) = {
+    val buyer  = TestData.newSavedCustomer()
+    val recipient = TestData.newSavedCustomer()
+    val celebrity = TestData.newSavedCelebrity()
+    val product = TestData.newSavedProduct(celebrity = Some(celebrity))
+    (buyer, recipient, celebrity, product)
+  }
+  
   def newSavedOrder(product: Option[Product] = None): Order = {
     val customer = TestData.newSavedCustomer()
     product match {

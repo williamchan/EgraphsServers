@@ -369,12 +369,20 @@ class OrderStore @Inject() (schema: Schema) extends SavesWithLongKey[Order] with
     )
   }
 
-  def getEgraphsAndOrders(recipientId: Long) : Query[(Order, Option[Egraph])] = {
+  /**
+   * Retrieves the list of Orders and Egraphs that are candidates for presentation on the
+   * user's gallery page. These are any orders that have not been rejected by an admin
+   * and their adjoining egraphs (regardless of the adjoining egraph state)
+   */
+  def galleryOrdersWithEgraphs(recipientId: Long) : Query[(Order, Option[Egraph])] = {
     join(schema.orders, schema.egraphs.leftOuter) (
       (order, egraph) =>
-        where(order.recipientId === recipientId)
-          select(order, egraph)
-          on(order.id === egraph.map(_.orderId))
+        where(
+          (order.recipientId === recipientId)
+          and not (order._reviewStatus === OrderReviewStatus.RejectedByAdmin.name)
+        )
+        select(order, egraph)
+        on(order.id === egraph.map(_.orderId))
     )
   }
 
@@ -419,15 +427,14 @@ class OrderStore @Inject() (schema: Schema) extends SavesWithLongKey[Order] with
 
   /**
    * To calculate the remaining inventory available in an InventoryBatch, the number of Orders that have been placed
-   * against that InventoryBatch must be known. This method returns the total number of Orders placed againsts each
+   * against that InventoryBatch must be known. This method returns the total number of Orders placed against each
    * InventoryBatch of interest.
    *
    * @return tuples of (inventoryBatchId, orderCount)
    */
   def countOrdersByInventoryBatch(inventoryBatchIds: Seq[Long]): Seq[(Long, Int)] = {
-    import org.squeryl.PrimitiveTypeMode
     import org.squeryl.dsl.GroupWithMeasures
-    val query: Query[GroupWithMeasures[PrimitiveTypeMode.LongType, PrimitiveTypeMode.LongType]] = from(schema.orders)(order =>
+    val query: Query[GroupWithMeasures[LongType, LongType]] = from(schema.orders)(order =>
       where(order.inventoryBatchId in inventoryBatchIds)
         groupBy (order.inventoryBatchId)
         compute (count)
@@ -542,6 +549,7 @@ object GalleryOrderFactory {
   /**
    * Helper function for filtering out rejected egraphs to create a list of pending orders and optional
    * associated egraphs.
+   * 
    * @param ordersAndEgraphs list of orders and associated egraphs
    * @return list of orders and egraphs that can be considered pending to a user. There can be more than one
    * egraph associated with a particular order.
