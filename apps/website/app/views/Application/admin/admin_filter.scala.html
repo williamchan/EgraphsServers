@@ -27,8 +27,10 @@
           <label>Name</label>  
           <input type="hidden" name="filterId" value="@filter.id">
           <input type="text" name="name" value="@filter.name">
+          <span class="help-block">The name should be easy to search for like "League" or "NBA Position"</span>
           <label>PublicName</label>
-          <input type="text" name="publicName" value="@filter.publicName"> 
+          <input type="text" name="publicName" value="@filter.publicName">
+          <span class="help-block">Pick a name to be displayed publicly, like "Team" or "Instrument"</span>
           <div>   
             <button type="reset" class="btn">
               Reset
@@ -43,7 +45,7 @@
           </h2>  
           @errorMessage(filterValueErrorFields)
           <h3>Create a value</h3>
-          @safeForm('method -> "POST", 'action -> routes.WebsiteControllers.postFilterValueAdmin.url, 'enctype -> "multipart/form-data", 'class -> "form-inline"){
+          @safeForm('method -> "POST", 'action -> routes.WebsiteControllers.postFilterValueAdmin.url, 'enctype -> "multipart/form-data"){
             <label>Name</label>
             <input type="hidden" name="filterValueId" value="0">  
             <input type="hidden" name="filterId" value="@filter.id">
@@ -63,7 +65,11 @@
             </thead>  
             @filterValues.map { fv =>
               <tr>
-                <td>@fv.id</td>
+                <td>
+                  <a href="@routes.WebsiteControllers.getFilterValueAdmin(fv.id)">
+                    @fv.id
+                  </a>  
+                </td>
                 <td>@fv.name</td>
                 <td>@fv.publicName</td>
               </tr>  

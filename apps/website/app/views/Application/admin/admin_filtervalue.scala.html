@@ -1,5 +1,7 @@
 @(filterValue: models.filters.FilterValue,
-  errorFields: Option[List[String]] = None
+  errorFields: Option[List[String]] = None,
+  filters: Iterable[models.filters.Filter],
+  currentFilterIds: Set[Long]
   )(implicit authToken: egraphs.authtoken.AuthenticityToken,
   headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData)
@@ -16,20 +18,28 @@
 <section id="content" class="top" role="main">
   <div id="main" class="sub">
     <div class="container" id="celebrity-admin">
-        @safeForm('method -> "POST", 'action -> routes.WebsiteControllers.postFilterValueAdmin.url, 'enctype -> "multipart/form-data") {
+        @safeForm('method -> "POST", 'action -> routes.WebsiteControllers.postFilterValueAdmin.url) {
           @if(filterValue.id == 0) {
             <legend>New Filter Value</legend>
             <h4>For parent Filter:<a href="@routes.WebsiteControllers.getFilterAdmin(filterValue.filterId).url" target="_blank">@filterValue.filterId</a></h3>
           } else {
             <legend>Filter Value @filterValue.id Details</legend>
             <h4>Parent Filter: <a href="@routes.WebsiteControllers.getFilterAdmin(filterValue.filterId).url">@filterValue.filterId</a></h3>
+              <select data-placeholder="Select filters to be associated with the FilterValue" name="filterIds" style="width:350px" multiple class="chzn-select">
+                @for(filter <- filters) {
+                  <option name=@{"filterIds[" + (filter.id-1) + "]"} value="@filter.id" @if(currentFilterIds.contains(filter.id)){selected="selected"}> 
+                  @filter.publicName | @filter.name 
+                  </option>
+                }  
+              </select>
           }
           <label>Name</label>  
           <input type="hidden" name="filterValueId" value="@filterValue.id">
           <input type="hidden" name="filterId" value="@filterValue.filterId">
           <input type="text" name="name" value="@filterValue.name">
           <label>PublicName</label>
-          <input type="text" name="publicName" value="@filterValue.publicName"> 
+          <input type="text" name="publicName" value="@filterValue.publicName">           
+            <span class="help-block">Pick a name to be displayed publicly, like "Major League Baseball" or "Boston Red Sox"</span>
           <div>   
             <button type="reset" class="btn">
               Reset
@@ -43,4 +53,4 @@
 </section>    
 }
 
-@base_template(title="Admin - Filter Value", body=body)
+@base_template(title="Admin - Filter Value", body=body,  jsMain="pages/admin/filtervalue")

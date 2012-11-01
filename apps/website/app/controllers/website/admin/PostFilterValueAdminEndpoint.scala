@@ -70,12 +70,22 @@ trait PostFilterValueAdminEndpoint {
           },
           validForm => {
             val tmp = if (isCreate) FilterValue() else filterValueStore.get(filterValueId)
+            val filterIds = request.body.asFormUrlEncoded match {
+              case Some(params) if(params.contains("filterIds")) => {
+                for(filterValueId <- params("filterIds")) yield {
+                  filterValueId.toLong
+                }
+              }
+              case _ => List[Long]()
+            }
+
             val savedFilterValue = tmp.copy(
                 publicName = validForm.publicName,
                 name = validForm.name,
                 filterId = validForm.filterId)
                 .save()
-            Redirect(controllers.routes.WebsiteControllers.getFilterAdmin(savedFilterValue.filterId).url, FOUND)
+            filterValueStore.updateFilters(savedFilterValue, filterIds)
+            Redirect(controllers.routes.WebsiteControllers.getFilterValueAdmin(savedFilterValue.id).url, FOUND)
           }
         )
       }

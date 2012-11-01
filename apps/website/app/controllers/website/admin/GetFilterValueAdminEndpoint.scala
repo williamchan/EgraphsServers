@@ -22,7 +22,9 @@ private[controllers] trait GetFilterValueAdminEndpoint extends ImplicitHeaderAnd
       Action { implicit request =>
         filterValueStore.findById(filterValueId) match {
           case Some(filterValue) => {
-             Ok(views.html.Application.admin.admin_filtervalue(filterValue=filterValue, errorFields = errorFields))
+
+             val currentFilterIds =  (for(filter <- filterValue.filters) yield { filter.id }).toSet
+             Ok(views.html.Application.admin.admin_filtervalue(filterValue=filterValue, errorFields = errorFields, filters = filterStore.getFilters, currentFilterIds=currentFilterIds))
           }
           case _ => NotFound("No such filter value")
         }
@@ -36,7 +38,7 @@ private[controllers] trait GetFilterValueAdminEndpoint extends ImplicitHeaderAnd
         filterStore.findById(filterId) match {
           case Some(filter) => { 
             val tempFilterValue = FilterValue(name=flash.get("name").getOrElse(""), publicName=flash.get("publicName").getOrElse(""), filterId=filterId)
-            Ok(views.html.Application.admin.admin_filtervalue(filterValue = tempFilterValue, errorFields = errorFields))
+            Ok(views.html.Application.admin.admin_filtervalue(filterValue = tempFilterValue, errorFields = errorFields, filters = filterStore.getFilters, currentFilterIds=Set[Long]()))
           }
           case _ => NotFound("No such filter")
         }
