@@ -41,9 +41,7 @@ private[controllers] trait GetCelebrityAdminEndpoint extends ImplicitHeaderAndFo
               ("twitterUsername" -> celebrity.twitterUsername.getOrElse("")) + 
               ("publicName" -> celebrity.publicName) + 
               ("publishedStatusString" -> celebrity.publishedStatus.toString)
-
               val (errorFields, fieldDefaults) = getCelebrityDetail(isCreate = false, celebrity = Some(celebrity))
-
               val celebFilterValueIds = (for(filterValue <- celebrity.filterValues) yield { filterValue.id }).toSet
 
               Ok(views.html.Application.admin.admin_celebritydetail(

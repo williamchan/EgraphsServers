@@ -22,9 +22,8 @@ case class FilterServices @Inject() (
 /**
  * Class representing a filter (like League, Team, Instrument for the celebrity marketplace.
  *
- *
  * @param id
- * @param name Unique name to simplify management for Admininstrators
+ * @param name Unique name to simplify management for Administrators
  * @param publicname Publicly facing name displayed in the marketplace to users
  * @param created
  * @param updated
@@ -68,18 +67,26 @@ class FilterStore @Inject() (
   with SavesCreatedUpdated[Long,Filter]
 {
   import org.squeryl.PrimitiveTypeMode._
-
+  
+  /**
+   * Returns child Filters
+   */
   def filters(filterValue: FilterValue): Query[Filter] with ManyToMany[Filter, FilterValueRelationship] = {
     schema.filterValueRelationships.left(filterValue)
   }
 
+  /**
+   * Returns all filters
+   */
   def getFilters: Query[Filter] = {
     from(schema.filters)(
       f =>
       select(f)
     )
   }
-  
+  /**
+   * Find a filter by name
+   */
   def findByName(name: String) : Option[Filter] = {
     from(schema.filters)( filter =>
       where(filter.name === name)

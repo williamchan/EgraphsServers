@@ -26,7 +26,9 @@ import services.blobs.Blobs.Conversions._
 import org.apache.commons.mail.HtmlEmail
 
 /**
- * Controller for managing FilterValues associated with a celebrity
+ * This controller associates celebrities with FilterValues i.e. "tags" the associated celeb.
+ * It destructively dissociates a celeb from all of its filtervalues and applys a new list from
+ * the caller.
  */
 trait PostCelebrityFilterValueAdminEndpoint {
   this: Controller => 

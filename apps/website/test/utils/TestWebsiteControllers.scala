@@ -65,7 +65,6 @@ case class TestWebsiteControllers @Inject()(
 
   override def catalogStarsQuery = instance[CatalogStarsQuery]
   override def orderCompleteViewModelFactory = instance[OrderCompleteViewModelFactory]
-  
   override def egraphQueryFilters = instance[EgraphQueryFilters]
   override def filterStore = instance[FilterStore]
   override def filterValueStore = instance[FilterValueStore]

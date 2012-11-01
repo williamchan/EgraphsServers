@@ -24,7 +24,7 @@ class PostCelebrityFilterValueAdminEndpointTests extends EgraphsUnitTest with Cs
     val result = performRequest(filterValueIds = List(fv.id) , celebrityId = 0L, adminId=admin.id)
     status(result) should be (SEE_OTHER)
   }
-//TODO(sbilstein) Fix this test  
+
  it should "sucessfully create new mappings between celebrities and filter values" in new EgraphsTestApplication {
    val (fv, c) = newFilterValueCeleb
    val result = performRequest(filterValueIds = List(fv.id), celebrityId = c.id, adminId=admin.id)

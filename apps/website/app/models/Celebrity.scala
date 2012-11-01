@@ -65,7 +65,7 @@ case class Celebrity(id: Long = 0,
 {
 
   /**
-   * FilterValues celebrity is associated with
+   * FilterValues celebrity is tagged withs
    */
 
   lazy val filterValues = services.filterServices.filterValueStore.filterValues(this)
@@ -378,7 +378,9 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
   //
   // Public Methods
   //
-  
+  /**
+   * Returns all celebrities associated with the provided FilterValue.
+   */
   def celebrities(filterValue: FilterValue) : Query[Celebrity] with ManyToMany[Celebrity, CelebrityFilterValue] = {
     schema.celebrityFilterValues.right(filterValue)
   }
@@ -419,7 +421,7 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
   }
  
   /**
-   * Find celebrities associated with a particular filterValue
+   * Find celebrities tagged with a particular filterValue by id.
    */
   def findByFilterValueId(filterValueId : Long) : Query[Celebrity] = {
    from(schema.celebrityFilterValues, schema.celebrities)(
@@ -441,27 +443,27 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
   def findByTextQuery(query: String): Iterable[CelebrityListing] = {
     import anorm._
     import anorm.SqlParser._
-	val rowStream = SQL(
-	  """
-	    SELECT * FROM celebrity, account WHERE
-	    (
-	      to_tsvector('english', celebrity.publicname || ' ' || celebrity.roledescription)
-	      @@
-	      plainto_tsquery('english', {textQuery})
-	    ) AND account.celebrityid = celebrity.id;
-	  """
-	).on("textQuery" -> query).apply()(connection = schema.getTxnConnectionFactory)
-	for(row <- rowStream) yield {
-	  new CelebrityListing(
-	      id = row[Long]("celebrityid"),
-	      publicName = row[String]("publicname"),
-	      email = row[String]("email"),
-	      urlSlug = row[String]("urlslug"),
-	      enrollmentStatus = row[String]("_enrollmentStatus"),
-	      publishedStatus = row[String]("_publishedStatus")
-	  )
-	}
-
+  	val rowStream = SQL(
+  	  """
+  	    SELECT * FROM celebrity, account WHERE
+  	    (
+  	      to_tsvector('english', celebrity.publicname || ' ' || celebrity.roledescription)
+  	      @@
+  	      plainto_tsquery('english', {textQuery})
+  	    ) AND account.celebrityid = celebrity.id;
+  	  """
+  	).on("textQuery" -> query).apply()(connection = schema.getTxnConnectionFactory)
+  	
+  	for(row <- rowStream) yield {
+  	  new CelebrityListing(
+  	      id = row[Long]("celebrityid"),
+  	      publicName = row[String]("publicname"),
+  	      email = row[String]("email"),
+  	      urlSlug = row[String]("urlslug"),
+  	      enrollmentStatus = row[String]("_enrollmentStatus"),
+  	      publishedStatus = row[String]("_publishedStatus")
+  	  )
+  	}
   }
 
   def getCelebrityAccounts: Query[(Celebrity, Account)] = {

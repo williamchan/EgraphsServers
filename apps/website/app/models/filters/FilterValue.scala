@@ -88,6 +88,9 @@ class FilterValueStore @Inject() (
     )
   }
   
+  /**
+   * Find a FilterValue by name
+   */
   def findByName(name: String) : Option[FilterValue] = {
     from(schema.filterValues)( filterValue =>
       where(filterValue.name === name)
@@ -100,6 +103,9 @@ class FilterValueStore @Inject() (
     schema.celebrityFilterValues.left(celebrity)
   }
   
+  /**
+   * Find FilterValue pairs of a given celebrity. 
+   */
   def filterValueFilterPairs(celebrity: Celebrity): Query[(FilterValue, Filter)] = {
     from(schema.filterValues, schema.filters, schema.celebrityFilterValues)((fv, f, cfv) =>
       where(cfv.celebrityId === celebrity.id and fv.id === cfv.filterValueId and f.id === fv.filterId)
@@ -107,7 +113,7 @@ class FilterValueStore @Inject() (
     )
   }
   /**
-   *  Updates filters owned by a fitler value.  
+   *  Updates filters owned by a given FilterValue.  
    **/
 
   def updateFilters(filterValue: FilterValue, filterIds: Iterable[Long]) = {

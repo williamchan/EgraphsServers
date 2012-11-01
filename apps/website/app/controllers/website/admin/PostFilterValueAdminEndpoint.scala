@@ -28,7 +28,13 @@ import services.mail.TransactionalMail
 import services.blobs.Blobs.Conversions._
 import org.apache.commons.mail.HtmlEmail
 import play.api.mvc._
-
+/**
+ * This controller manages the associations filter values have with filters as well as basic data
+ * around the filter value object in the database.
+ * FilterValues have one parent Filter; this controller allows the user to set the children Filters
+ * of a FilterValue. 
+ * 
+ */
 trait PostFilterValueAdminEndpoint {
   this: Controller =>
   protected def postController: POSTControllerMethod
