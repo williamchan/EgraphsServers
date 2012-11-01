@@ -72,7 +72,7 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
               for (
                 account <- httpFilters.requireAuthenticatedAccount.filter(request).right;            
                 celeb <- httpFilters.requireCelebrityId.filterInAccount(account).right;
-                order <- httpFilters.requireOrderIdOfCelebrity.asEither(orderId, celeb.id).right
+                order <- httpFilters.requireOrderIdOfCelebrity.filter(orderId, celeb.id).right
               ) yield {
                 // validate signature for issue #104
                 val message = validForm.message

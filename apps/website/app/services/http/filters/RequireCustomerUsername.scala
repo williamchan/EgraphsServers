@@ -6,7 +6,6 @@ import models.Customer
 import models.CustomerStore
 import play.api.mvc.Results.NotFound
 import play.api.mvc.Result
-import services.http.filters.Filter
 
 /**
  * Filter for requiring a customer username with an customer existing in the customer store to be provided.
