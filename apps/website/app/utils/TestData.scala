@@ -175,4 +175,21 @@ object TestData {
       .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), Base64.decode(TestConstants.voiceStr()))
       .save()
   }
+  /**
+   *  Convert an iterable and key into a map with the same key for every value.
+   *  Helpful when writing functional tests. 
+   *  Example Usage:
+   *  
+   * controllers.postSomeStuff(id)(
+   *    val multipleValues = List(1,2,3)
+   *    FakeRequest().withFormUrlEncodedBody(
+   *      toFormUrlSeq("keyForMultipleValues", multipleValues):_*
+   *    ).withAuthToken
+   *  )
+   *
+   **/
+
+  def toFormUrlSeq[A >: Any](key: String, values: Iterable[A], stringConverter: A => String = (a: A) => a.toString) : Seq[(String, String)] = {
+    values.map(value => (key -> stringConverter(value))).toSeq
+  }
 }
