@@ -161,6 +161,17 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
     // Return the validation or Right(None) [meaning that there was no string]
     maybeErrorOrValidNote.getOrElse(Right(None))
   }
+  
+  def isOptionalValidCouponCode: Either[FormError, Option[models.Coupon]] = {
+    // If there was a string, make sure it's valid
+    val maybeCode = toValidate.headOption.filter(code => code != "")
+    val maybeErrorOrValidCoupon = maybeCode.map { code =>
+      for (coupon <- check.isValidCouponCode(code, notValidCouponErrorString).right) yield { Option(coupon) }
+    }
+
+    // Return the validation or Right(None) [meaning that there was no string]
+    maybeErrorOrValidCoupon.getOrElse(Right(None))
+  }
 
   /**
    * Return the payment token on the right if it existed. Later on we could add
@@ -231,6 +242,7 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
 object PurchaseFormChecks {
   private[purchase] val requiredError = "Required field"
   private[purchase] val nameLengthErrorString = "Must be between 2 and 30 characters"
+  private[purchase] val notValidCouponErrorString = "Not a valid promotion code"
 
   /** The maximum number of characters a written message request can contain */
   val minWrittenMessageChars = 5

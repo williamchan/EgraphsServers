@@ -80,7 +80,8 @@ trait StorefrontPersonalizeConsumerEndpoints
               recipientEmailParam=Params.RecipientEmail,
               messageOptionParam = Params.WrittenMessageRequest,
               messageTextParam = Params.WrittenMessageRequestText,
-              noteToCelebrityParam = Params.NoteToCelebrity
+              noteToCelebrityParam = Params.NoteToCelebrity,
+              couponParam = Params.Coupon
             )
           }
   
@@ -139,13 +140,15 @@ trait StorefrontPersonalizeConsumerEndpoints
           // Form had to be valid, or redirect back to the form page.
           validated <- form.errorsOrValidatedForm.left.map { error =>
                          val url = reverseGetStorefrontPersonalize(celebrityUrlSlug, productUrlSlug).url
-  
                          form.redirectThroughFlash(url)
                        }.right
         ) yield {
           // Everything looked good. Save the form into the cache and move on with life.
-          purchaseForms.withForm(form).save()
-  
+          validated.coupon match {
+            case Some(c) => purchaseForms.withForm(form).withCouponId(c.id).save()
+            case None => purchaseForms.withForm(form).save()
+          }
+
           val defaultNextUrl = getStorefrontReview(celebrityUrlSlug, productUrlSlug).url
   
           Utils.redirectToClientProvidedTarget(urlIfNoTarget=defaultNextUrl)

@@ -15,6 +15,7 @@ import org.joda.money.Money
  * @param basePrice the base price of the product
  * @param shipping cost of shipping
  * @param tax cost in tax
+ * @param discount
  * @param total total cost of the purchase.
  */
 case class CheckoutOrderSummary(
@@ -25,5 +26,6 @@ case class CheckoutOrderSummary(
   basePrice: Money,
   shipping: Option[Money],
   tax: Option[Money],
+  discount: Option[Money],
   total: Money
 )

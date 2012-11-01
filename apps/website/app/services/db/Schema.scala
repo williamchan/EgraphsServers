@@ -73,6 +73,8 @@ class Schema @Inject()(
       celebrity.bio is dbType("text")
     )
   )
+  
+  val coupons = table[Coupon]
 
   val customers = table[Customer]
   on(customers)(customer => declare(customer.username is unique))
@@ -406,6 +408,7 @@ class Schema @Inject()(
       factoryFor(cashTransactions) is CashTransaction(services = injector.instance[CashTransactionServices]),
       factoryFor(celebrities) is Celebrity(services = injector.instance[CelebrityServices]),
       factoryFor(celebrityFilterValues) is CelebrityFilterValue(services = injector.instance[FilterServices]),
+      factoryFor(coupons) is Coupon(services = injector.instance[CouponServices]),
       factoryFor(customers) is Customer(services = injector.instance[CustomerServices]),
       factoryFor(egraphs) is Egraph(services = injector.instance[EgraphServices]),
       factoryFor(enrollmentBatches) is EnrollmentBatch(services = injector.instance[EnrollmentBatchServices]),

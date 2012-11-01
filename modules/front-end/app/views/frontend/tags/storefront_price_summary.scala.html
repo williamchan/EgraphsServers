@@ -1,5 +1,6 @@
 @(basePrice: org.joda.money.Money, 
   maybePhysicalGood: Option[org.joda.money.Money], 
+  maybeDiscount: Option[org.joda.money.Money], 
   maybeTax: Option[org.joda.money.Money], 
   total: org.joda.money.Money
 )
@@ -9,6 +10,7 @@
         baseprice - the base price of a product
         maybePhysicalGood - the price of ordering the physical good, if a
             physical good is part of the order.
+        maybeDiscount - discounts, if applicable.        
         maybeTax - the cost of taxes, if applicable.
         total - the total cost.
 */}
@@ -25,6 +27,12 @@
       <tr>
         <th>High-quality print</th>
         <td>@physicalGood.formatPrecisely</td>
+      </tr>
+    }
+    @for(discountAmount <- maybeDiscount) {
+      <tr>
+        <th>Discount</th>
+        <td>-@discountAmount.formatPrecisely</td>
       </tr>
     }
     @for(taxPrice <- maybeTax) {

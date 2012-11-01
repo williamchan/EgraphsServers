@@ -13,11 +13,12 @@ object ModelModule extends AbstractModule with ScalaModule {
   override def configure() {
     bind[AccountServices].in[Singleton]
     bind[AddressServices].in[Singleton]
+    bind[AdministratorServices].in[Singleton]
     bind[BlobKeyServices].in[Singleton]
     bind[CashTransactionServices].in[Singleton]
     bind[CustomerServices].in[Singleton]
     bind[CelebrityServices].in[Singleton]
-    bind[AdministratorServices].in[Singleton]
+    bind[CouponServices].in[Singleton]
     bind[EgraphServices].in[Singleton]
     bind[EnrollmentBatchServices].in[Singleton]
     bind[EnrollmentSampleServices].in[Singleton]

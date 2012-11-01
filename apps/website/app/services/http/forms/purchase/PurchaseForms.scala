@@ -2,9 +2,10 @@ package services.http.forms.purchase
 
 import services.http.{ServerSessionFactory, ServerSession}
 import com.google.inject.Inject
+import frontend.formatting.MoneyFormatting.Conversions._
 import play.api.mvc.Results.Redirect
 import play.api.mvc.Result
-import models.{PrintOrder, InventoryBatch, Celebrity, Product}
+import models.{PrintOrder, InventoryBatch, Celebrity, Product, Coupon}
 import controllers.routes.WebsiteControllers.{getStorefrontPersonalize, getStorefrontReview, getStorefrontChoosePhotoTiled, getStorefrontCheckout}
 import org.joda.money.{CurrencyUnit, Money}
 import models.enums.{WrittenMessageRequest, PrintingOption}
@@ -32,6 +33,10 @@ class PurchaseForms @Inject()(
   /** The  ID of the [[models.Product]] being purchased from the storefront */
   def productId: Option[Long] = {
     storefrontSession[Long](Key.ProductId)
+  }
+  
+  def couponId: Option[Long] = {
+    storefrontSession[Long](Key.CouponId)
   }
 
   /**
@@ -77,13 +82,16 @@ class PurchaseForms @Inject()(
   def withProductId(productId: Long): PurchaseForms = {
     this.withSession(storefrontSession.setting(Key.ProductId -> productId))
   }
+  
+  def withCouponId(couponId: Long): PurchaseForms = {
+    this.withSession(storefrontSession.setting(Key.CouponId -> couponId))
+  }
 
   /**
    * The current cost of shipping the physical print (or possibly for the full physical
    * print). This will be None if no physical print has been ordered.
    **/
   def shippingPrice: Option[Money] = {
-    import frontend.formatting.MoneyFormatting.Conversions._
     this.highQualityPrint match {
       case Some(PrintingOption.HighQualityPrint) => Some(PrintOrder.pricePerPrint.toMoney())
       case _ => None
@@ -96,6 +104,19 @@ class PurchaseForms @Inject()(
   def tax: Option[Money] = {
     None
   }
+  
+  def subtotal(basePrice: Money): Money = {
+    val zero = Money.zero(CurrencyUnit.USD)
+    basePrice.plus(shippingPrice.getOrElse(zero))
+  }
+  
+  /**
+   * The discount applied to the purchase. None if not applicable.
+   */
+  def discount(basePrice: Money, coupon: Option[Coupon] = None): Option[Money] = {
+    val _subtotal = subtotal(basePrice)
+    coupon.map(_.calculateDiscount(_subtotal.getAmount).toMoney(CurrencyUnit.USD))
+  }
 
   /**
    * The full cost of the purchase. This is the cost of the product plust
@@ -104,12 +125,13 @@ class PurchaseForms @Inject()(
    * @param basePrice the price of the product
    * @return the full price.
    */
-  def total(basePrice: Money): Money = {
+  def total(basePrice: Money, coupon: Option[Coupon] = None): Money = {
     val zero = Money.zero(CurrencyUnit.USD)
+    val _subtotal = subtotal(basePrice)
 
-    basePrice
-      .plus(shippingPrice.getOrElse(zero))
+    _subtotal
       .plus(tax.getOrElse(zero))
+      .minus(discount(_subtotal, coupon).getOrElse(zero))
   }
 
   /**
@@ -412,6 +434,7 @@ object PurchaseForms {
   object Key {
     val ProductId = "productId"
     val HighQualityPrint = "order.review.highQualityPrint"
+    val CouponId = "couponId"
   }
 
   /**

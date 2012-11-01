@@ -49,6 +49,7 @@ object Checkout extends Controller with DefaultImplicitTemplateParameters {
       basePrice=Money.zero(CurrencyUnit.USD),
       shipping=None,
       tax=None,
+      discount=None,
       total=Money.zero(CurrencyUnit.USD)
     )
   }

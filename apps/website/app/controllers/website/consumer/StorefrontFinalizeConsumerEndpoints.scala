@@ -17,7 +17,7 @@ import models.frontend.storefront.FinalizeShippingViewModel
 import controllers.website.EgraphPurchaseHandler
 import services.db.{TransactionSerializable, DBSession}
 import services.http.forms.purchase.PurchaseForms.AllPurchaseForms
-import models.Celebrity
+import models.{Celebrity, CouponStore}
 import services.blobs.AccessPolicy
 import play.api.mvc.Action
 
@@ -41,6 +41,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
   protected def payment: Payment
   protected def dbSession: DBSession
   protected def breadcrumbData: StorefrontBreadcrumbData
+  protected def couponStore: CouponStore
 
   //
   // Controllers
@@ -107,12 +108,15 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
             editUrl = getStorefrontPersonalize(celebrityUrlSlug, productUrlSlug).url
           )
   
+          val maybeCoupon = forms.couponId.map(id => couponStore.findById(id)).getOrElse(None)
+          
           // Create the pricing viewmodel
           val priceViewModel = FinalizePriceViewModel(
              base=product.price,
              physicalGood=forms.shippingPrice,
              tax=forms.tax,
-             total=forms.total(basePrice = product.price)
+             discount=forms.discount(basePrice = product.price, maybeCoupon),
+             total=forms.total(basePrice = product.price, maybeCoupon)
           )
   
           // Create the final viewmodel
@@ -167,7 +171,11 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
       ) yield {
         val (celeb, product, shippingForms, forms) = purchaseData 
         val AllPurchaseForms(productId, inventoryBatch, personalization, billing, shipping) = shippingForms
-
+        
+        val maybeCoupon = dbSession.connected(TransactionSerializable) {
+          forms.couponId.map(id => couponStore.findById(id)).getOrElse(None)
+        }
+        
         EgraphPurchaseHandler(
           recipientName=personalization.recipientName,
           recipientEmail=personalization.recipientEmail.getOrElse(billing.email),
@@ -178,7 +186,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
           personalNote=personalization.noteToCelebriity,
           celebrity=celeb,
           product=product,
-          totalAmountPaid=forms.total(basePrice = product.price),
+          totalAmountPaid=forms.total(basePrice = product.price, maybeCoupon),
           billingPostalCode=billing.postalCode,
           flash=request.flash,
           printingOption=forms.highQualityPrint.getOrElse(PrintingOption.DoNotPrint),

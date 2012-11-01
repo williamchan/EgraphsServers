@@ -87,6 +87,7 @@ class OrderCompleteViewModelFactory @Inject()(config: ConfigFileProxy) {
       expectedDeliveryDate = inventoryBatch.getExpectedDate,
       faqHowLongLink = faqHowLongLink,
       totalPrice = totalAmountPaid,
+      discount = None,
       digitalPrice = product.price,
       printPrice = printPrice,
       hasPrintOrder = maybePrintOrder.isDefined,

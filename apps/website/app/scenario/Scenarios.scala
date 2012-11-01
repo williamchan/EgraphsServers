@@ -88,6 +88,17 @@ class Scenarios extends DeclaresScenarios {
       Scenarios.approveAllOrders()
   }
   )
+  
+  toScenarios add Scenario(
+  "Create Coupon with code 'mycoupon'",
+  adminCategory,
+  """
+    Create Coupon with code 'mycoupon' for $10 off
+  """, {
+    () =>
+      Coupon(code = "mycoupon", discountAmount = 10).save()
+  }
+  )
 
   //
   // apiCategory
