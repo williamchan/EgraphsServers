@@ -1,0 +1,19 @@
+@()
+
+<!doctype html>
+<html>
+  <head>
+    <title>Test Video Uploader</title>
+  </head>
+  <body>
+    <h1> Test Video Uploader </h1>
+
+      @helper.form(action = routes.ApiControllers.postVideoEnrollment, 'enctype -> "multipart/form-data") {
+
+        <input type="file" name="video">
+        <input type="submit" name="submit"> 
+
+      }
+
+  </body>
+</html>
