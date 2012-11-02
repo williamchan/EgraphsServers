@@ -81,7 +81,7 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
 
 
     //get orders
-    val ordersAndEgraphs = orderStore.getEgraphsAndOrders(galleryCustomerId).toList
+    val ordersAndEgraphs = orderStore.galleryOrdersWithEgraphs(galleryCustomerId).toList
 
     val pendingOrders = GalleryOrderFactory.filterPendingOrders(ordersAndEgraphs)
 
