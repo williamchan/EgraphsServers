@@ -30,7 +30,7 @@ class OrderStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
 
   }
 
-  "getEgraphsAndOrders" should "return orders and their associated egraphs" in new EgraphsTestApplication {
+  "galleryOrdersWithEgraphs" should "return orders and their associated egraphs" in new EgraphsTestApplication {
     val (buyer, recipient, celebrity, product) = TestData.newSavedOrderStack()
     val admin = Administrator().save()
     celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
