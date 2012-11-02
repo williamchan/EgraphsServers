@@ -107,13 +107,11 @@ class FilterValueStore @Inject() (
    **/
 
   def updateFilters(filterValue: FilterValue, filterIds: Iterable[Long]) = {
-    // TODO: find where the source of null was and remove it; we should not have null checks in this code.
-    val safeNewFilterIds = if (filterIds != null)filterIds else List.empty[Long]
     //remove old records
     filterValue.filters.dissociateAll
 
     // Add records for the new values
-    val newFilterValueRelationships  = for (filterId <- safeNewFilterIds) yield 
+    val newFilterValueRelationships  = for (filterId <- filterIds) yield 
     { 
       FilterValueRelationship(filterId = filterId , filterValueId = filterValue.id)
     }

@@ -502,18 +502,15 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
   }
 
   def updateFeaturedCelebrities(newFeaturedCelebIds: Iterable[Long]) {
-    // newFeaturedCelebIds can apparently be null
-    // TODO: find where the source of null was and remove it; we should not have null checks in this code.
-    val safeNewFeaturedCelebIds = if (newFeaturedCelebIds != null) newFeaturedCelebIds else List.empty[Long]
     // First update those gentlemen that are no longer featured
     update(schema.celebrities)(c =>
-      where(c.isFeatured === true and (c.id notIn safeNewFeaturedCelebIds))
+      where(c.isFeatured === true and (c.id notIn newFeaturedCelebIds))
         set (c.isFeatured := false)
     )
 
     // Now lets feature the real stars here!
     update(schema.celebrities)(c =>
-      where(c.id in safeNewFeaturedCelebIds)
+      where(c.id in newFeaturedCelebIds)
         set (c.isFeatured := true)
     )
   }
@@ -523,13 +520,11 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
    **/
 
   def updateFilterValues(celebrity: Celebrity, filterValueIds: Iterable[Long]) {
-    // TODO: find where the source of null was and remove it; we should not have null checks in this code.
-    val safeNewFilterValueIds = if (filterValueIds != null)filterValueIds else List.empty[Long]
     //remove old records
     celebrity.filterValues.dissociateAll
 
     // Add records for the new values
-    val newCelebrityFilterValues  = for (filterValueId <- safeNewFilterValueIds) yield 
+    val newCelebrityFilterValues  = for (filterValueId <- filterValueIds) yield 
     { 
       CelebrityFilterValue(celebrityId = celebrity.id, filterValueId = filterValueId)
     }

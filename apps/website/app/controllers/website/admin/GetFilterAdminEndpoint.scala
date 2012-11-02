@@ -33,6 +33,7 @@ private[controllers] trait GetFilterAdminEndpoint extends ImplicitHeaderAndFoote
     implicit authToken =>
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       Action { implicit request =>
+        // Temporary filter that does not get saved to the database. Used to store field values and render the template. 
         val tempFilter = Filter(name=flash.get("name").getOrElse(""), publicName=flash.get("publicName").getOrElse(""))
         Ok(views.html.Application.admin.admin_filter(filter = tempFilter, errorFields = errorFields, filterValues = List()))
       }

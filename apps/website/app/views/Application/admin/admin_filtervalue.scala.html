@@ -25,13 +25,17 @@
           } else {
             <legend>Filter Value @filterValue.id Details</legend>
             <h4>Parent Filter: <a href="@routes.WebsiteControllers.getFilterAdmin(filterValue.filterId).url">@filterValue.filterId</a></h3>
-              <select data-placeholder="Select filters to be associated with the FilterValue" name="filterIds" style="width:350px" multiple class="chzn-select">
+              <legend>Child Filters</legend>
+              <select data-placeholder="Select filters to be associated with the FilterValue" name="filterIds" style="width:500px" multiple class="chzn-select">
                 @for(filter <- filters) {
                   <option name=@{"filterIds[" + (filter.id-1) + "]"} value="@filter.id" @if(currentFilterIds.contains(filter.id)){selected="selected"}> 
                   @filter.publicName | @filter.name 
                   </option>
                 }  
               </select>
+              <span class="help-block">
+               Select child filters of this value. This means that these filters will be displayed on the marketplace when celebrities are being filtered by this value. For example, the Filter Value "Major League Baseball" will have child filters such as MLB Team (publicname: Team) or MLB Position (publicname: Position)
+              </span>
           }
           <label>Name</label>  
           <input type="hidden" name="filterValueId" value="@filterValue.id">

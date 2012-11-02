@@ -155,7 +155,9 @@
         @safeForm('id -> "filtervalueform", 'method -> "POST", 'action -> postCelebrityFilterValueAdmin(presentCelebrity.id).url) {
           <div class="row-fluid">
             <div class="span5">
-              <select data-placeholder="Select FilterValues to associate with a celeb" name="filterValueIds" style="width:350px" multiple class="chzn-select">
+            <legend>Associated Filter Values</legend>
+            <span class="help-block">Filter Values are annotated like this:<br> Public Name | Name <- Filter Public Name | Filter Name</block>
+              <select data-placeholder="Select FilterValues to associate with a celeb" name="filterValueIds" style="width:500px" multiple class="chzn-select">
                 @for((filterValue, filter) <- filterValueFilters) {
                   <option name=@{"filterValueIds[" + (filterValue.id-1) + "]"} value="@filterValue.id" @if(currentFilterValueIds.contains(filterValue.id)){selected="selected"} >
                     @filterValue.publicName | @filterValue.name  <- @filter.publicName | @filter.name 

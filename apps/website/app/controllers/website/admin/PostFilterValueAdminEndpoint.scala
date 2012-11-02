@@ -77,8 +77,8 @@ trait PostFilterValueAdminEndpoint {
             val tmp = if (isCreate) FilterValue() else filterValueStore.get(filterValueId)
             val filterIds = request.body.asFormUrlEncoded match {
               case Some(params) if(params.contains("filterIds")) => {
-                for(filterValueId <- params("filterIds")) yield {
-                  filterValueId.toLong
+                for(filterId <- params("filterIds")) yield {
+                  filterId.toLong
                 }
               }
               case _ => List[Long]()
