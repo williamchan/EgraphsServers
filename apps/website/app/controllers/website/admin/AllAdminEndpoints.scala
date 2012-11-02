@@ -16,11 +16,13 @@ trait AllAdminEndpoints
   with GetCelebrityInventoryBatchesAdminEndpoint
   with GetCelebrityOrdersAdminEndpoint
   with GetCelebrityProductsAdminEndpoint
-  with GetCreateCelebrityAdminEndpoint
   with GetCreateCelebrityInventoryBatchAdminEndpoint
   with GetCreateCelebrityProductAdminEndpoint
   with GetEgraphAdminEndpoint
   with GetEgraphsAdminEndpoint
+  with GetFilterAdminEndpoint
+  with GetFiltersAdminEndpoint
+  with GetFilterValueAdminEndpoint
   with GetInventoryBatchAdminEndpoint
   with GetLoginAdminEndpoint
   with GetOrderAdminEndpoint
@@ -31,12 +33,15 @@ trait AllAdminEndpoints
   with GetReportsAdminEndpoint
   with GetToolsAdminEndpoint
   with PostCelebrityAdminEndpoint
-  with PostInventoryBatchAdminEndpoint
-  with PostProductAdminEndpoint
+  with PostCelebrityFilterValueAdminEndpoint
   with PostEgraphAdminEndpoint
+  with PostFeaturedCelebritiesAdminEndpoint
+  with PostFilterAdminEndpoint
+  with PostFilterValueAdminEndpoint
+  with PostInventoryBatchAdminEndpoint
   with PostLoginAdminEndpoint
   with PostOrderAdminEndpoint
   with PostPrintOrderAdminEndpoint
+  with PostProductAdminEndpoint
   with PostSendCelebrityWelcomeEmailAdminEndpoint
-  with PostFeaturedCelebritiesAdminEndpoint
 { this: Controller => }

@@ -28,8 +28,8 @@ class AdminLoginTests extends EgraphsUnitTest {
     }
     
     val req = FakeRequest().withAdmin(admin.id)
-    val u = WebsiteControllers.getCelebritiesAdmin().url
-    status(routeAndCall(req.copy(method=GET, uri=u)).get) should be(OK)
+    val url = WebsiteControllers.getCelebritiesAdmin().url
+    status(routeAndCall(req.copy(method=GET, uri=url)).get) should be(OK)
 
 //    assertStatus(302, GET(WebsiteControllers.reverse(WebsiteControllers.getCelebritiesAdmin()).url))
 //    assertStatus(302, GET(Utils.lookupUrl("WebsiteControllers.getCelebrityEgraphsAdmin", celebrityIdMap).url))

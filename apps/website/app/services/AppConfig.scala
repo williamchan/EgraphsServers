@@ -35,6 +35,7 @@ class AppConfig extends AbstractModule with ScalaModule {
     install(SocialModule)
     install(MvcModule)
     install(ConfigModule)
+
     install(models.ModelModule)
   }
 }

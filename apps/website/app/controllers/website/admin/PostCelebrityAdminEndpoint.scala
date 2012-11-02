@@ -25,6 +25,7 @@ import java.awt.image.BufferedImage
 import services.{Dimensions, ImageUtil, Utils}
 import services.mail.TransactionalMail
 import services.blobs.Blobs.Conversions._
+import controllers.routes.WebsiteControllers.{getCreateCelebrityAdmin, getCelebrityAdmin}
 import org.apache.commons.mail.HtmlEmail
 
 trait PostCelebrityAdminEndpoint {
@@ -67,7 +68,7 @@ trait PostCelebrityAdminEndpoint {
             formWithErrors => {
               val data = formWithErrors.data
               val errors = for (error <- formWithErrors.errors) yield { error.key + ": " + error.message }
-              val url = GetCreateCelebrityAdminEndpoint.url()
+              val url = getCreateCelebrityAdmin.url
               Redirect(url).flashing(
                 ("errors" -> errors.mkString(", ")), 
 		        ("celebrityEmail" -> data.get("celebrityEmail").getOrElse("")), 
@@ -103,7 +104,7 @@ trait PostCelebrityAdminEndpoint {
               
               savedWithImages.sendWelcomeEmail(savedAccount.email)
               
-              Redirect(GetCelebrityAdminEndpoint.url(celebrityId = savedWithImages.id) + "?action=preview")
+              Redirect(getCelebrityAdmin(celebrityId = savedWithImages.id).url + "?action=preview")
             }
           )
       }
@@ -138,7 +139,7 @@ trait PostCelebrityAdminEndpoint {
 	          formWithErrors => {
 	            val data = formWithErrors.data
 	            val errors = for (error <- formWithErrors.errors) yield { error.key + ": " + error.message }
-	            val url = GetCelebrityAdminEndpoint.url(celebrityId = celebrityId)
+	            val url = getCelebrityAdmin(celebrityId = celebrityId).url
 	            Redirect(url).flashing(
 	              ("errors" -> errors.mkString(", ")), 
 			      ("celebrityEmail" -> data.get("celebrityEmail").getOrElse("")), 
@@ -166,7 +167,7 @@ trait PostCelebrityAdminEndpoint {
 	            val savedWithImages = savedCelebrity.saveWithImageAssets(landingPageImageOption, logoImageOption)
 	            profileImageFile.map(f => savedWithImages.saveWithProfilePhoto(f))
 	              
-	            Redirect(GetCelebrityAdminEndpoint.url(celebrityId = savedWithImages.id) + "?action=preview")
+	            Redirect(getCelebrityAdmin(celebrityId = savedWithImages.id).url + "?action=preview")
 	          }
 	        )
 	      }
