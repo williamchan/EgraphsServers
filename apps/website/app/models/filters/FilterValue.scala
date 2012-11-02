@@ -39,7 +39,6 @@ case class FilterValue(
   def save(): FilterValue = {
     require(!name.isEmpty, "FilterValue: name must be specified")
     require(!publicName.isEmpty, "FilterValue: publicName must be specified")
-    require(filterId != 0, "FilterValue: filterId must be provided")
     services.filterValueStore.save(this)
   }
 

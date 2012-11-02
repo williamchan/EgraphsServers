@@ -21,10 +21,8 @@ trait AllAdminEndpoints
   with GetEgraphAdminEndpoint
   with GetEgraphsAdminEndpoint
   with GetFilterAdminEndpoint
-  with GetFilterValueAdminEndpoint
-  with PostFilterAdminEndpoint
-  with PostFilterValueAdminEndpoint
   with GetFiltersAdminEndpoint
+  with GetFilterValueAdminEndpoint
   with GetInventoryBatchAdminEndpoint
   with GetLoginAdminEndpoint
   with GetOrderAdminEndpoint
@@ -36,12 +34,14 @@ trait AllAdminEndpoints
   with GetToolsAdminEndpoint
   with PostCelebrityAdminEndpoint
   with PostCelebrityFilterValueAdminEndpoint
-  with PostInventoryBatchAdminEndpoint
-  with PostProductAdminEndpoint
   with PostEgraphAdminEndpoint
+  with PostFeaturedCelebritiesAdminEndpoint
+  with PostFilterAdminEndpoint
+  with PostFilterValueAdminEndpoint
+  with PostInventoryBatchAdminEndpoint
   with PostLoginAdminEndpoint
   with PostOrderAdminEndpoint
   with PostPrintOrderAdminEndpoint
+  with PostProductAdminEndpoint
   with PostSendCelebrityWelcomeEmailAdminEndpoint
-  with PostFeaturedCelebritiesAdminEndpoint
 { this: Controller => }

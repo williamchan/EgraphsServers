@@ -70,7 +70,6 @@ trait PostFilterAdminEndpoint {
             )
           },
           validForm => {
-            println("validForm")          
             val tmp = if (isCreate) Filter() else filterStore.get(filterId)
             val savedFilter = tmp.copy(
                 publicName = validForm.publicName,

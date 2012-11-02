@@ -44,8 +44,7 @@ trait PostFilterValueAdminEndpoint {
   
   case class PostFilterValueForm(
 	  name: String,
-	  publicName: String,
-	  filterId : Long
+	  publicName: String
   )
   
   def postFilterValueAdmin = postController() {
@@ -57,8 +56,8 @@ trait PostFilterValueAdminEndpoint {
         
         val form = Form(mapping(
           "name" -> nonEmptyText(maxLength = 128),
-          "publicName" -> nonEmptyText(maxLength = 128),
-          "filterId" -> longNumber)(PostFilterValueForm.apply)(PostFilterValueForm.unapply)
+          "publicName" -> nonEmptyText(maxLength = 128)
+        )(PostFilterValueForm.apply)(PostFilterValueForm.unapply)
           .verifying(isUniqueName(filterValueId)))  
         form.bindFromRequest.fold(
           formWithErrors => {
@@ -88,7 +87,7 @@ trait PostFilterValueAdminEndpoint {
             val savedFilterValue = tmp.copy(
                 publicName = validForm.publicName,
                 name = validForm.name,
-                filterId = validForm.filterId)
+                filterId = filterId)
                 .save()
             filterValueStore.updateFilters(savedFilterValue, filterIds)
             Redirect(controllers.routes.WebsiteControllers.getFilterValueAdmin(savedFilterValue.id).url, FOUND)

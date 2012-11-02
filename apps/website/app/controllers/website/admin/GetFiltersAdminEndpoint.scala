@@ -24,7 +24,8 @@ private[controllers] trait GetFiltersAdminEndpoint extends ImplicitHeaderAndFoot
         val page: Int = Form("page" -> number).bindFromRequest.fold(formWithErrors => 1, validForm => validForm)
         val query = filterStore.getFilters
         val pagedQuery: (Iterable[Filter], Int, Option[Int]) = services.Utils.pagedQuery(select=query, page = page)
-        implicit val paginationInfo = PaginationInfoFactory.create(pagedQuery = pagedQuery, baseUrl = "")
+        implicit val paginationInfo = PaginationInfoFactory.create(pagedQuery = pagedQuery, 
+            baseUrl = controllers.routes.WebsiteControllers.getFiltersAdmin.url)
         Ok(views.html.Application.admin.admin_filters(filters=pagedQuery._1))
       }
     }
