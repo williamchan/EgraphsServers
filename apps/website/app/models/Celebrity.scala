@@ -1,6 +1,7 @@
 package models
 
 import enums.{HasEnrollmentStatus, EnrollmentStatus, PublishedStatus, HasPublishedStatus}
+import filters._
 import java.sql.Timestamp
 import services.blobs.AccessPolicy
 import services.db.{FilterOneTable, KeyedCaseClass, Schema, SavesWithLongKey}
@@ -15,6 +16,7 @@ import org.apache.commons.mail.HtmlEmail
 import models.Celebrity.CelebrityWithImage
 import play.api.Play.current
 import services.Dimensions
+import org.squeryl.dsl.ManyToMany
 import views.html.frontend.{celebrity_welcome_email, celebrity_welcome_email_text}
 
 /**
@@ -23,6 +25,7 @@ import views.html.frontend.{celebrity_welcome_email, celebrity_welcome_email_tex
 case class CelebrityServices @Inject() (
   store: CelebrityStore,
   accountStore: AccountStore,
+  filterServices: FilterServices,
   productStore: ProductStore,
   orderStore: OrderStore,
   inventoryBatchStore: InventoryBatchStore,
@@ -60,6 +63,15 @@ case class Celebrity(id: Long = 0,
   with HasPublishedStatus[Celebrity]
   with HasEnrollmentStatus[Celebrity]
 {
+
+  /**
+   * FilterValues celebrity is tagged withs
+   */
+
+  lazy val filterValues = services.filterServices.filterValueStore.filterValues(this)
+  
+  lazy val filterValueAndFilterPairs : Query[(FilterValue, Filter)] = services.filterServices.filterValueStore.filterValueFilterPairs(this)
+
   //
   // Additional DB columns
   //
@@ -366,6 +378,13 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
   //
   // Public Methods
   //
+  /**
+   * Returns all celebrities associated with the provided FilterValue.
+   */
+  def celebrities(filterValue: FilterValue) : Query[Celebrity] with ManyToMany[Celebrity, CelebrityFilterValue] = {
+    schema.celebrityFilterValues.right(filterValue)
+  }
+
   def findByUrlSlug(slug: String): Option[Celebrity] = {
     if (slug.isEmpty) return None
 
@@ -400,7 +419,20 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
         select(c)
     ).headOption
   }
-
+ 
+  /**
+   * Find celebrities tagged with a particular filterValue by id.
+   */
+  def findByFilterValueId(filterValueId : Long) : Query[Celebrity] = {
+   from(schema.celebrityFilterValues, schema.celebrities)(
+     (cfv, c) =>
+       where(
+         cfv.filterValueId === filterValueId and  
+         c.id === cfv.celebrityId
+       ) select(c)
+   ) 
+  }
+   
   /**
    * Find using postgres text search on publicname and roledescription
    * http://www.postgresql.org/docs/9.2/interactive/textsearch-controls.html
@@ -411,27 +443,27 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
   def findByTextQuery(query: String): Iterable[CelebrityListing] = {
     import anorm._
     import anorm.SqlParser._
-	val rowStream = SQL(
-	  """
-	    SELECT * FROM celebrity, account WHERE
-	    (
-	      to_tsvector('english', celebrity.publicname || ' ' || celebrity.roledescription)
-	      @@
-	      plainto_tsquery('english', {textQuery})
-	    ) AND account.celebrityid = celebrity.id;
-	  """
-	).on("textQuery" -> query).apply()(connection = schema.getTxnConnectionFactory)
-	for(row <- rowStream) yield {
-	  new CelebrityListing(
-	      id = row[Long]("celebrityid"),
-	      publicName = row[String]("publicname"),
-	      email = row[String]("email"),
-	      urlSlug = row[String]("urlslug"),
-	      enrollmentStatus = row[String]("_enrollmentStatus"),
-	      publishedStatus = row[String]("_publishedStatus")
-	  )
-	}
-
+  	val rowStream = SQL(
+  	  """
+  	    SELECT * FROM celebrity, account WHERE
+  	    (
+  	      to_tsvector('english', celebrity.publicname || ' ' || celebrity.roledescription)
+  	      @@
+  	      plainto_tsquery('english', {textQuery})
+  	    ) AND account.celebrityid = celebrity.id;
+  	  """
+  	).on("textQuery" -> query).apply()(connection = schema.getTxnConnectionFactory)
+  	
+  	for(row <- rowStream) yield {
+  	  new CelebrityListing(
+  	      id = row[Long]("celebrityid"),
+  	      publicName = row[String]("publicname"),
+  	      email = row[String]("email"),
+  	      urlSlug = row[String]("urlslug"),
+  	      enrollmentStatus = row[String]("_enrollmentStatus"),
+  	      publishedStatus = row[String]("_publishedStatus")
+  	  )
+  	}
   }
 
   def getCelebrityAccounts: Query[(Celebrity, Account)] = {
@@ -470,19 +502,35 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
   }
 
   def updateFeaturedCelebrities(newFeaturedCelebIds: Iterable[Long]) {
-    // newFeaturedCelebIds can apparently be null
-    // TODO: find where the source of null was and remove it; we should not have null checks in this code.
-    val safeNewFeaturedCelebIds = if (newFeaturedCelebIds != null) newFeaturedCelebIds else List.empty[Long]
     // First update those gentlemen that are no longer featured
     update(schema.celebrities)(c =>
-      where(c.isFeatured === true and (c.id notIn safeNewFeaturedCelebIds))
+      where(c.isFeatured === true and (c.id notIn newFeaturedCelebIds))
         set (c.isFeatured := false)
     )
 
     // Now lets feature the real stars here!
     update(schema.celebrities)(c =>
-      where(c.id in safeNewFeaturedCelebIds)
+      where(c.id in newFeaturedCelebIds)
         set (c.isFeatured := true)
+    )
+  }
+
+  /**
+   * Update a celebrity's associated filter values
+   **/
+
+  def updateFilterValues(celebrity: Celebrity, filterValueIds: Iterable[Long]) {
+    //remove old records
+    celebrity.filterValues.dissociateAll
+
+    // Add records for the new values
+    val newCelebrityFilterValues  = for (filterValueId <- filterValueIds) yield 
+    { 
+      CelebrityFilterValue(celebrityId = celebrity.id, filterValueId = filterValueId)
+    }
+
+    schema.celebrityFilterValues.insert(
+       newCelebrityFilterValues
     )
   }
 

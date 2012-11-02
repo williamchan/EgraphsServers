@@ -48,7 +48,7 @@ POST    /api/1.0/celebrities/me/orders/$orderId<[0-9]+>/egraphs controllers.ApiC
 ##
 ## Admin
 ##
-GET      /admin                                                    				controllers.WebsiteControllers.getRootAdmin
+GET      /admin                                                           controllers.WebsiteControllers.getRootAdmin
 GET      /admin/accounts                                           				controllers.WebsiteControllers.getAccountsAdmin
 POST     /admin/accounts                                           				controllers.WebsiteControllers.postAccountAdmin
 GET      /admin/accounts/$accountId<[0-9]+>                        				controllers.WebsiteControllers.getAccountAdmin(accountId: Long)
@@ -60,6 +60,7 @@ POST     /admin/celebrities/featured                               				controlle
 GET      /admin/celebrities/$celebrityId<[0-9]+>                          controllers.WebsiteControllers.getCelebrityAdmin(celebrityId: Long)
 POST     /admin/celebrities/$celebrityId<[0-9]+>                          controllers.WebsiteControllers.postCelebrityAdmin(celebrityId: Long)
 GET      /admin/celebrities/$celebrityId<[0-9]+>/egraphs                  controllers.WebsiteControllers.getCelebrityEgraphsAdmin(celebrityId: Long)
+POST     /admin/celebrities/$celebrityId<[0-9]+>/filtervalues             controllers.WebsiteControllers.postCelebrityFilterValueAdmin(celebrityId: Long)
 GET      /admin/celebrities/$celebrityId<[0-9]+>/inventorybatches         controllers.WebsiteControllers.getCelebrityInventoryBatchesAdmin(celebrityId: Long)
 POST     /admin/celebrities/$celebrityId<[0-9]+>/inventorybatches         controllers.WebsiteControllers.postCreateInventoryBatchAdmin(celebrityId: Long)
 GET      /admin/celebrities/$celebrityId<[0-9]+>/inventorybatches/create  controllers.WebsiteControllers.getCreateCelebrityInventoryBatchAdmin(celebrityId: Long)
@@ -68,9 +69,16 @@ GET      /admin/celebrities/$celebrityId<[0-9]+>/products                 contro
 POST     /admin/celebrities/$celebrityId<[0-9]+>/products                 controllers.WebsiteControllers.postCreateProductAdmin(celebrityId: Long)
 GET      /admin/celebrities/$celebrityId<[0-9]+>/products/create          controllers.WebsiteControllers.getCreateCelebrityProductAdmin(celebrityId: Long)
 POST     /admin/celebrities/$celebrityId<[0-9]+>/sendEmail                controllers.WebsiteControllers.postSendCelebrityWelcomeEmailAdmin(celebrityId: Long)
-GET      /admin/egraphs                                            				controllers.WebsiteControllers.getEgraphsAdmin
+GET      /admin/egraphs                                                   controllers.WebsiteControllers.getEgraphsAdmin
 GET      /admin/egraphs/$egraphId<[0-9]+>                                 controllers.WebsiteControllers.getEgraphAdmin(egraphId: Long)
 POST     /admin/egraphs/$egraphId<[0-9]+>                                 controllers.WebsiteControllers.postEgraphAdmin(egraphId: Long)
+GET      /admin/filters                                                   controllers.WebsiteControllers.getFiltersAdmin 
+GET      /admin/filters/$filterId<[0-9]+>                                 controllers.WebsiteControllers.getFilterAdmin(filterId: Long)
+GET      /admin/filters/create                                            controllers.WebsiteControllers.getCreateFilterAdmin
+POST     /admin/filters                                                   controllers.WebsiteControllers.postFilterAdmin
+GET      /admin/filtervalues/$filterValueId<[0-9]+>                       controllers.WebsiteControllers.getFilterValueAdmin(filterValueId: Long)
+GET      /admin/filters/$filterId<[0-9]>/filtervalues/create              controllers.WebsiteControllers.getCreateFilterValueAdmin(filterId: Long) 
+POST     /admin/filtervalues                                              controllers.WebsiteControllers.postFilterValueAdmin
 GET      /admin/inventorybatches/$inventoryBatchId<[0-9]+>                controllers.WebsiteControllers.getInventoryBatchAdmin(inventoryBatchId: Long)
 POST     /admin/inventorybatches/$inventoryBatchId<[0-9]+>                controllers.WebsiteControllers.postInventoryBatchAdmin(inventoryBatchId: Long)
 GET      /admin/login                                              				controllers.WebsiteControllers.getLoginAdmin

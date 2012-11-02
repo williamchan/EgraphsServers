@@ -8,6 +8,7 @@ import models._
 import enums.{EgraphState, PublishedStatus}
 import egraphs.playutils.Encodings.Base64
 import org.apache.commons.lang3.RandomStringUtils
+import filters.{FilterValue, Filter}
 
 /**
  * Renders saved copies of domain objects that satisfy all relational integrity
@@ -68,7 +69,7 @@ object TestData {
     }
 
     val admin = Administrator().save()
-    account.copy(administratorId = Some(admin.id))
+    account.copy(administratorId = Some(admin.id)).save() 
     admin
   }
   
@@ -91,6 +92,14 @@ object TestData {
     acct.copy(celebrityId = Some(celeb.id)).save()
 
     celeb
+  }
+
+  def newSavedFilter : Filter = {
+    Filter(name = TestData.generateUsername(), publicName = TestData.generateUsername()).save()
+  }
+
+  def newSavedFilterValue(filterId: Long) : FilterValue = {
+    FilterValue(name = TestData.generateUsername(), publicName = TestData.generateUsername(), filterId = filterId).save()
   }
 
   private def newProduct(celebrity: Celebrity): Product = {
@@ -172,5 +181,22 @@ object TestData {
     newSavedOrder().newEgraph
       .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), Base64.decode(TestConstants.voiceStr()))
       .save()
+  }
+  /**
+   *  Convert an iterable and key into a map with the same key for every value.
+   *  Helpful when writing functional tests. 
+   *  Example Usage:
+   *  
+   * controllers.postSomeStuff(id)(
+   *    val multipleValues = List(1,2,3)
+   *    FakeRequest().withFormUrlEncodedBody(
+   *      toFormUrlSeq("keyForMultipleValues", multipleValues):_*
+   *    ).withAuthToken
+   *  )
+   *
+   **/
+
+  def toFormUrlSeq[A >: Any](key: String, values: Iterable[A], stringConverter: A => String = (a: A) => a.toString) : Seq[(String, String)] = {
+    values.map(value => (key -> stringConverter(value))).toSeq
   }
 }

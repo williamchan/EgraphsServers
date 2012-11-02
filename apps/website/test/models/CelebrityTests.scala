@@ -114,6 +114,21 @@ class CelebrityTests extends EgraphsUnitTest
     featuredStateOfCelebWhen(celebWasFeatured=false, includeCelebInNewFeaturedCelebs=true) should be (true)
   }
   
+  "find pairs of filters and filter values" should "return the pairs associated with the celeb" in {
+    val filterA = TestData.newSavedFilter
+    val filterValueA = TestData.newSavedFilterValue(filterA.id)
+    
+    val filterB = TestData.newSavedFilter
+    val filterValueB = TestData.newSavedFilterValue(filterB.id)
+    
+    val celeb = TestData.newSavedCelebrity().save()
+    celeb.filterValues.associate(filterValueA)
+    celeb.filterValues.associate(filterValueB)
+    val pairs = celeb.filterValueAndFilterPairs
+    
+    pairs.size should be(2)
+  }
+  
 
   //
   //  HasPublishedStatus[Celebrity] methods
@@ -147,9 +162,25 @@ class CelebrityTests extends EgraphsUnitTest
     ).withPublishedStatus(PublishedStatus.Published)
   }
 
+  it should "return all associated filterValues" in {
+    val celeb = TestData.newSavedCelebrity()
+    val filter1 = TestData.newSavedFilter
+    val filter2 = TestData.newSavedFilter
+    val filterValue1 = TestData.newSavedFilterValue(filter1.id)
+    val filterValue2 = TestData.newSavedFilterValue(filter2.id)
+
+    celeb.filterValues.associate(filterValue1)
+    celeb.filterValues.associate(filterValue2)
+
+    celeb.filterValues.size should be (2)
+    celeb.filterValues.exists(fv => fv.id == filterValue1.id) should be (true)
+    celeb.filterValues.exists(fv => fv.id == filterValue2.id) should be (true)
+  }
+
   //
   // Private methods
   //
+
   private def featuredStateOfCelebWhen(
     celebWasFeatured: Boolean,
     includeCelebInNewFeaturedCelebs: Boolean): Boolean =
