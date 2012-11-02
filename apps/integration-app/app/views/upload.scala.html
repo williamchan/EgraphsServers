@@ -1,0 +1,11 @@
+@main("File Upload") {
+
+  @helper.form(action = routes.Application.upload, 'enctype -> "multipart/form-data") {
+
+    <input type="file" name="video">
+    <input type="submit" name="submit"> 
+  }  
+}
+
+
+
