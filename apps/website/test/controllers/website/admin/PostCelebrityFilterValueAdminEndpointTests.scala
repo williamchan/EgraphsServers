@@ -29,6 +29,9 @@ class PostCelebrityFilterValueAdminEndpointTests extends EgraphsUnitTest with Cs
    val (fv, c) = newFilterValueCeleb
    val result = performRequest(filterValueIds = List(fv.id), celebrityId = c.id, adminId=admin.id)
    status(result) should be (FOUND)
+   db.connected(TransactionSerializable) {
+     c.filterValues should contain(fv)
+   }
  }
   
   private def performRequest(filterValueIds: Iterable[Long], celebrityId: Long, adminId: Long): play.api.mvc.Result = {

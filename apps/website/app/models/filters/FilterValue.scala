@@ -49,15 +49,6 @@ case class FilterValue(
   override def unapplied = FilterValue.unapply(this)
 }
 
-case class FilterValueFilterViewModel(
-    filterValueId: Long,
-    filterValueName: String,
-    filterValuePublicname: String,
-    filterId: Long,
-    filterName: String,
-    filterPublicname: String 
-)
-
 class FilterValueStore @Inject() (
   schema: Schema,
   filterServices: Provider[FilterServices]

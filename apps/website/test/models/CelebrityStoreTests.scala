@@ -57,7 +57,7 @@ class CelebrityStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
     results.isEmpty should be(true)
   }
   
-  "find by filter value" should "return celebrities associated with a particular fitler value" in {
+  "find by filter value" should "return celebrities associated with a particular filter value" in {
  
     val filter = TestData.newSavedFilter
     val filterValueA = TestData.newSavedFilterValue(filter.id)
