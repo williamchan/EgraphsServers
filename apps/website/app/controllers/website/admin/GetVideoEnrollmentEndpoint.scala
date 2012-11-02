@@ -8,7 +8,7 @@ private[controllers] trait GetVideoEnrollmentEndpoint extends ImplicitHeaderAndF
   this: Controller =>
 
   def getVideoEnrollment = Action {
-    Ok(views.html.Application.admin.admin_videoenrollment())
+    Ok(views.html.Application.admin.admin_videoasset())
   }
 
 

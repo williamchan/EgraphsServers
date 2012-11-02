@@ -22,7 +22,7 @@ object ApiControllers extends Controller
   with PostCelebrityOrderApiEndpoint
   with PostEgraphApiEndpoint
   with PostEnrollmentSampleApiEndpoint
-  with PostVideoEnrollmentApiEndpoint
+  with PostVideoAssetApiEndpoint
 {
   import services.AppConfig.instance
 
