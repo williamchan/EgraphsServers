@@ -101,7 +101,9 @@ object WebsiteBuild extends Build {
         "scala-guice" at "https://jenkins-codingwell.rhcloud.com/job/Scala-Guice/lastSuccessfulBuild/artifact/repo"
       ),
 
-      CloudBees.jvmProps := "-Dlogger.resource=prod-logger.xml"
+      CloudBees.jvmProps := "-Dlogger.resource=prod-logger.xml",
+
+      CloudBees.deployParams := Map("jvmPermSize" -> "200")
     )
     .dependsOn(FrontendBuild.main, AuthenticityTokenBuild.main, PlayUtilsBuild.main)
 }
