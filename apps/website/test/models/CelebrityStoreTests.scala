@@ -57,7 +57,7 @@ class CelebrityStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
     results.isEmpty should be(true)
   }
   
-  "find by filter value" should "return celebrities associated with a particular filter value" in {
+  "find by filter value" should "return celebrities associated with a particular filter value" in new EgraphsTestApplication {
  
     val filter = TestData.newSavedFilter
     val filterValueA = TestData.newSavedFilterValue(filter.id)
@@ -82,28 +82,13 @@ class CelebrityStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
     val retrievedFilterValuesB = instanceUnderTest.findByFilterValueId(filterValueB.id)
     
     // Returns the set associated with the filter
-    retrievedFilterValuesA.map(celeb => celebsTaggedWithA.exists(c => celeb.id == c.id) should be(true))
-    retrievedFilterValuesB.map(celeb => celebsTaggedWithB.exists(c => celeb.id == c.id) should be(true))
+    retrievedFilterValuesA.map(celeb => celebsTaggedWithA should contain(celeb))
+    
+   retrievedFilterValuesB.map(celeb => celebsTaggedWithB should contain(celeb))
 
     // And the set is exclusive of the other filter
     retrievedFilterValuesA.map(celeb => celebsTaggedWithB.exists(c => celeb.id == c.id) should be(false))
     retrievedFilterValuesB.map(celeb => celebsTaggedWithA.exists(c => celeb.id == c.id) should be(false))    
-  }
-  
-  "find by filter multiple filter values" should "return celebrities associated with all those filter values" in {
-    val filter = TestData.newSavedFilter
-    val filterValueA = TestData.newSavedFilterValue(filter.id)
-    val filterValueB = TestData.newSavedFilterValue(filter.id)
-    val filterValueC = TestData.newSavedFilterValue(filter.id)
-    val filterValueD = TestData.newSavedFilterValue(filter.id)
-    
-    val celebA = TestData.newSavedCelebrity().withPublishedStatus(PublishedStatus.Published).save()
-    val celebAB = TestData.newSavedCelebrity().withPublishedStatus(PublishedStatus.Published).save()
-    val celebABC = TestData.newSavedCelebrity().withPublishedStatus(PublishedStatus.Published).save()
-    val celebABCD = TestData.newSavedCelebrity().withPublishedStatus(PublishedStatus.Published).save()
-    
-    instanceUnderTest.findByFilterValueId(filterValueA.id).union(instanceUnderTest.findByFilterValueId(filterValueB.id)).exists(c => celebAB.id == c.id) should be (true)
-        
   }
 
   // Private members

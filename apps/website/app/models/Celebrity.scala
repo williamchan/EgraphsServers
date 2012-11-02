@@ -427,7 +427,7 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
    from(schema.celebrityFilterValues, schema.celebrities)(
      (cfv, c) =>
        where(
-         cfv.id === filterValueId and  
+         cfv.filterValueId === filterValueId and  
          c.id === cfv.celebrityId
        ) select(c)
    ) 
