@@ -82,7 +82,8 @@ object WebsiteBuild extends Build {
       appDependencies,
       path = websiteBaseDir,
       mainLang = SCALA
-    ).settings(
+    ).settings(cloudBeesSettings: _*)
+    .settings(
       organization := "egraphs",
 
       testOptions in Test := Nil,
@@ -98,8 +99,11 @@ object WebsiteBuild extends Build {
       resolvers ++= Seq(
         "xugglecode" at "http://xuggle.googlecode.com/svn/trunk/repo/share/java",
         "scala-guice" at "https://jenkins-codingwell.rhcloud.com/job/Scala-Guice/lastSuccessfulBuild/artifact/repo"
-      )
+      ),
+
+      CloudBees.jvmProps := "-Dlogger.resource=prod-logger.xml",
+
+      CloudBees.deployParams := Map("jvmPermSize" -> "200")
     )
-    .settings(cloudBeesSettings: _*)
     .dependsOn(FrontendBuild.main, AuthenticityTokenBuild.main, PlayUtilsBuild.main)
 }

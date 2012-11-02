@@ -2,13 +2,13 @@ package services.voice
 
 import uk.me.lings.scalaguice.ScalaModule
 import services.Utils
-import com.google.inject.{Inject, Provider, AbstractModule}
+import com.google.inject.{Inject, Provider, AbstractModule, Singleton}
 import services.inject.InjectionProvider
 import services.config.ConfigFileProxy
 
 object VoiceBiometricsModule extends AbstractModule with ScalaModule {
   def configure() {
-    bind[VoiceBiometricService].toProvider[VoiceBiometricsProvider]
+    bind[VoiceBiometricService].toProvider[VoiceBiometricsProvider].in[Singleton]
   }
 }
 

@@ -6,5 +6,3 @@ ALTER TABLE orders DROP COLUMN transactionId;
 
 # --- !Downs
 
-ALTER TABLE orders ADD COLUMN transactionId bigint;
-ALTER TABLE cashtransaction DROP COLUMN orderId;

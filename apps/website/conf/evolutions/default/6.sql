@@ -24,9 +24,3 @@ ALTER TABLE product ALTER COLUMN signingAreaH SET NOT NULL;
 
 # --- !Downs
 
-ALTER TABLE product DROP COLUMN signingAreaW;
-ALTER TABLE product DROP COLUMN signingAreaH;
-ALTER TABLE product DROP COLUMN signingScaleW;
-ALTER TABLE product DROP COLUMN signingScaleH;
-ALTER TABLE product DROP COLUMN signingOriginX;
-ALTER TABLE product DROP COLUMN signingOriginY;

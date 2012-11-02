@@ -36,7 +36,7 @@ private[controllers] trait GetPrintOrdersAdminEndpoint extends ImplicitHeaderAnd
           case _ => printOrderStore.findByFilter(printOrderQueryFilters.unfulfilled)
         }
         val pagedQuery: (Iterable[(PrintOrder, Order, Option[Egraph])], Int, Option[Int]) = services.Utils.pagedQuery(select = query, page = page)
-        implicit val paginationInfo = PaginationInfoFactory.create(pagedQuery = pagedQuery, baseUrl = GetOrdersAdminEndpoint.url)
+        implicit val paginationInfo = PaginationInfoFactory.create(pagedQuery = pagedQuery, baseUrl = GetPrintOrdersAdminEndpoint.url, filter = Option(filter))
         Ok(views.html.Application.admin.admin_printorders(printOrderDate = pagedQuery._1))
       }
     }

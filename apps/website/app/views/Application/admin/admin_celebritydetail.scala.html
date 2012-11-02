@@ -22,8 +22,11 @@
 }
 
 @postCelebrity = @{
-	routes.WebsiteControllers.postCelebrityAdmin
-} 
+  celebrity match {
+    case Some(c) => routes.WebsiteControllers.postCelebrityAdmin(c.id)
+    case None => routes.WebsiteControllers.postCreateCelebrityAdmin
+  }
+}
 
 @profilePhoto = {
   @celebrity.map(c => c.profilePhoto.resizedWidth(80).getSaved(services.blobs.AccessPolicy.Public).url).getOrElse("")

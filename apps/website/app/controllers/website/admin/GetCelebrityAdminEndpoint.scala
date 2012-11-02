@@ -41,11 +41,12 @@ private[controllers] trait GetCelebrityAdminEndpoint extends ImplicitHeaderAndFo
               ("twitterUsername" -> celebrity.twitterUsername.getOrElse("")) + 
               ("publicName" -> celebrity.publicName) + 
               ("publishedStatusString" -> celebrity.publishedStatus.toString)
-              val (errorFields, fieldDefaults) = getCelebrityDetail(isCreate = false, celebrity = Some(celebrity))
+              val (errorFields, fieldDefaults) = getCelebrityDetail(celebrity = Some(celebrity))
               val celebFilterValueIds = (for(filterValue <- celebrity.filterValues) yield { filterValue.id }).toSet
 
               Ok(views.html.Application.admin.admin_celebritydetail(
-                isCreate = false, errorFields = errorFields,
+                isCreate = false,
+                errorFields = errorFields,
                 fields = fieldDefaults,
                 celebrity = Option(celebrity),
                 currentFilterValueIds = celebFilterValueIds,
@@ -61,7 +62,7 @@ private[controllers] trait GetCelebrityAdminEndpoint extends ImplicitHeaderAndFo
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
       Action { implicit request =>
         implicit val flash = request.flash
-        val (errorFields, fieldDefaults) = getCelebrityDetail(isCreate = true)
+        val (errorFields, fieldDefaults) = getCelebrityDetail()
         Ok(views.html.Application.admin.admin_celebritydetail(
           isCreate = true, errorFields = errorFields,
           fields = fieldDefaults,
@@ -73,7 +74,7 @@ private[controllers] trait GetCelebrityAdminEndpoint extends ImplicitHeaderAndFo
     }
   }
 
-  private def getCelebrityDetail(isCreate: Boolean, celebrity: Option[Celebrity] = None
+  private def getCelebrityDetail(celebrity: Option[Celebrity] = None
     )(implicit flash: play.api.mvc.Flash): (Option[List[String]], (String) => String) = {
     
     val errorFields = flash.get("errors").map(errString => errString.split(',').toList)

@@ -2,13 +2,13 @@ package services.signature
 
 import uk.me.lings.scalaguice.ScalaModule
 import services.Utils
-import com.google.inject.{Inject, Provider, AbstractModule}
+import com.google.inject.{Inject, Provider, AbstractModule, Singleton}
 import services.inject.InjectionProvider
 import services.config.ConfigFileProxy
 
 object SignatureBiometricsModule extends AbstractModule with ScalaModule {
   def configure() {
-    bind[SignatureBiometricService].toProvider[SignatureBiometricsProvider]
+    bind[SignatureBiometricService].toProvider[SignatureBiometricsProvider].in[Singleton]
   }
 }
 

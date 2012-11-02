@@ -4,5 +4,3 @@
 ALTER TABLE Orders ALTER COLUMN messageToCelebrity TYPE varchar(140);
 
 # --- !Downs
-
-ALTER TABLE Orders ALTER COLUMN messageToCelebrity TYPE varchar(128);

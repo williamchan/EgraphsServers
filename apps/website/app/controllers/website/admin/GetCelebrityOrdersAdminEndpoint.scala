@@ -36,7 +36,7 @@ private[controllers] trait GetCelebrityOrdersAdminEndpoint extends ImplicitHeade
           	case _ => orderStore.findByCelebrity(celebrityId = celebrity.id, orderQueryFilters.pendingAdminReview)
           }
           val pagedQuery: (Iterable[Order], Int, Option[Int]) = services.Utils.pagedQuery(select = query, page = page)
-          implicit val paginationInfo = PaginationInfoFactory.create(pagedQuery = pagedQuery, baseUrl = GetOrdersAdminEndpoint.url)
+          implicit val paginationInfo = PaginationInfoFactory.create(pagedQuery = pagedQuery, baseUrl = GetCelebrityOrdersAdminEndpoint.url(celebrity), filter = Option(filter))
           Ok(views.html.Application.admin.admin_orders(orders = pagedQuery._1, celebrity = Some(celebrity)))
       	}
       }

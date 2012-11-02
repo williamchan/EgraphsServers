@@ -49,22 +49,23 @@ POST    /api/1.0/celebrities/me/orders/$orderId<[0-9]+>/egraphs controllers.ApiC
 ## Admin
 ##
 GET      /admin                                                           controllers.WebsiteControllers.getRootAdmin
-GET      /admin/accounts                                                  controllers.WebsiteControllers.getAccountsAdmin
-POST     /admin/accounts                                                  controllers.WebsiteControllers.postAccountAdmin
-GET      /admin/accounts/$accountId<[0-9]+>                               controllers.WebsiteControllers.getAccountAdmin(accountId: Long)
-GET      /admin/celebrities                                               controllers.WebsiteControllers.getCelebritiesAdmin
-POST     /admin/celebrities                                               controllers.WebsiteControllers.postCelebrityAdmin
-GET      /admin/celebrities/search                                        controllers.WebsiteControllers.getCelebritiesBySearchAdmin
-GET      /admin/celebrities/create                                        controllers.WebsiteControllers.getCreateCelebrityAdmin
-POST     /admin/celebrities/featured                                      controllers.WebsiteControllers.postFeaturedCelebrities
+GET      /admin/accounts                                           				controllers.WebsiteControllers.getAccountsAdmin
+POST     /admin/accounts                                           				controllers.WebsiteControllers.postAccountAdmin
+GET      /admin/accounts/$accountId<[0-9]+>                        				controllers.WebsiteControllers.getAccountAdmin(accountId: Long)
+GET      /admin/celebrities                                        				controllers.WebsiteControllers.getCelebritiesAdmin
+POST     /admin/celebrities                                        				controllers.WebsiteControllers.postCreateCelebrityAdmin
+GET      /admin/celebrities/search                                 				controllers.WebsiteControllers.getCelebritiesBySearchAdmin
+GET      /admin/celebrities/create                                 				controllers.WebsiteControllers.getCreateCelebrityAdmin
+POST     /admin/celebrities/featured                               				controllers.WebsiteControllers.postFeaturedCelebrities
 GET      /admin/celebrities/$celebrityId<[0-9]+>                          controllers.WebsiteControllers.getCelebrityAdmin(celebrityId: Long)
+POST     /admin/celebrities/$celebrityId<[0-9]+>                          controllers.WebsiteControllers.postCelebrityAdmin(celebrityId: Long)
 GET      /admin/celebrities/$celebrityId<[0-9]+>/egraphs                  controllers.WebsiteControllers.getCelebrityEgraphsAdmin(celebrityId: Long)
 GET      /admin/celebrities/$celebrityId<[0-9]+>/inventorybatches         controllers.WebsiteControllers.getCelebrityInventoryBatchesAdmin(celebrityId: Long)
-POST     /admin/celebrities/$celebrityId<[0-9]+>/inventorybatches         controllers.WebsiteControllers.postCelebrityInventoryBatchAdmin(celebrityId: Long)
+POST     /admin/celebrities/$celebrityId<[0-9]+>/inventorybatches         controllers.WebsiteControllers.postCreateInventoryBatchAdmin(celebrityId: Long)
 GET      /admin/celebrities/$celebrityId<[0-9]+>/inventorybatches/create  controllers.WebsiteControllers.getCreateCelebrityInventoryBatchAdmin(celebrityId: Long)
 GET      /admin/celebrities/$celebrityId<[0-9]+>/orders                   controllers.WebsiteControllers.getCelebrityOrdersAdmin(celebrityId: Long)
 GET      /admin/celebrities/$celebrityId<[0-9]+>/products                 controllers.WebsiteControllers.getCelebrityProductsAdmin(celebrityId: Long)
-POST     /admin/celebrities/$celebrityId<[0-9]+>/products                 controllers.WebsiteControllers.postCelebrityProductAdmin(celebrityId: Long)
+POST     /admin/celebrities/$celebrityId<[0-9]+>/products                 controllers.WebsiteControllers.postCreateProductAdmin(celebrityId: Long)
 GET      /admin/celebrities/$celebrityId<[0-9]+>/products/create          controllers.WebsiteControllers.getCreateCelebrityProductAdmin(celebrityId: Long)
 POST     /admin/celebrities/$celebrityId<[0-9]+>/filtervalues             controllers.WebsiteControllers.postCelebrityFilterValueAdmin(celebrityId: Long)
 POST     /admin/celebrities/$celebrityId<[0-9]+>/sendEmail                controllers.WebsiteControllers.postSendCelebrityWelcomeEmailAdmin(celebrityId: Long)
@@ -74,19 +75,21 @@ POST     /admin/egraphs/$egraphId<[0-9]+>                                 contro
 GET      /admin/filters                                                   controllers.WebsiteControllers.getFiltersAdmin 
 GET      /admin/filters/$filterId<[0-9]+>                                 controllers.WebsiteControllers.getFilterAdmin(filterId: Long)
 GET      /admin/filters/create                                            controllers.WebsiteControllers.getCreateFilterAdmin
-POST     /admin/filters/                                                  controllers.WebsiteControllers.postFilterAdmin
+POST     /admin/filters                                                   controllers.WebsiteControllers.postFilterAdmin
 GET      /admin/filtervalues/$filterValueId<[0-9]+>                       controllers.WebsiteControllers.getFilterValueAdmin(filterValueId: Long)
 GET      /admin/filters/$filterId<[0-9]>/filtervalues/create              controllers.WebsiteControllers.getCreateFilterValueAdmin(filterId: Long) 
-POST     /admin/filtervalues/                                             controllers.WebsiteControllers.postFilterValueAdmin
+POST     /admin/filtervalues                                              controllers.WebsiteControllers.postFilterValueAdmin
 GET      /admin/inventorybatches/$inventoryBatchId<[0-9]+>                controllers.WebsiteControllers.getInventoryBatchAdmin(inventoryBatchId: Long)
-GET      /admin/login                                                     controllers.WebsiteControllers.getLoginAdmin
-POST     /admin/login                                                     controllers.WebsiteControllers.postLoginAdmin
-GET      /admin/orders                                                    controllers.WebsiteControllers.getOrdersAdmin
+POST     /admin/inventorybatches/$inventoryBatchId<[0-9]+>                controllers.WebsiteControllers.postInventoryBatchAdmin(inventoryBatchId: Long)
+GET      /admin/login                                              				controllers.WebsiteControllers.getLoginAdmin
+POST     /admin/login                                              				controllers.WebsiteControllers.postLoginAdmin
+GET      /admin/orders                                             				controllers.WebsiteControllers.getOrdersAdmin
 GET      /admin/orders/$orderId<[0-9]+>                                   controllers.WebsiteControllers.getOrderAdmin(orderId: Long)
 POST     /admin/orders/$orderId<[0-9]+>                                   controllers.WebsiteControllers.postOrderAdmin(orderId: Long)
 GET      /admin/products/$productId<[0-9]+>                               controllers.WebsiteControllers.getProductAdmin(productId: Long)
-GET      /admin/reports                                                   controllers.WebsiteControllers.getReportsAdmin
-GET      /admin/tools                                                     controllers.WebsiteControllers.getToolsAdmin
+POST     /admin/products/$productId<[0-9]+>                               controllers.WebsiteControllers.postProductAdmin(productId: Long)
+GET      /admin/reports                                            				controllers.WebsiteControllers.getReportsAdmin
+GET      /admin/tools                                              				controllers.WebsiteControllers.getToolsAdmin
 
 ##
 ## Consumer Website

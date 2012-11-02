@@ -28,7 +28,7 @@ private[controllers] trait GetCelebrityProductsAdminEndpoint extends ImplicitHea
           
           val query = celebrity.products()
           val pagedQuery: (Iterable[Product], Int, Option[Int]) = services.Utils.pagedQuery(select = query, page = page)
-          implicit val paginationInfo = PaginationInfoFactory.create(pagedQuery = pagedQuery, baseUrl = GetOrdersAdminEndpoint.url)
+          implicit val paginationInfo = PaginationInfoFactory.create(pagedQuery = pagedQuery, baseUrl = GetCelebrityProductsAdminEndpoint.url(celebrity))
           Ok(views.html.Application.admin.admin_celebrityproducts(celebrity = celebrity, products = pagedQuery._1))
         }
       }

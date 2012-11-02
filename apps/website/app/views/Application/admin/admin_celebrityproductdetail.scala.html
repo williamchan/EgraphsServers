@@ -12,7 +12,10 @@
 @import views.html.frontend.base_template
 
 @postProduct = @{
-  routes.WebsiteControllers.postCelebrityProductAdmin(celebrityId = celebrity.id)
+  product match {
+    case Some(p) => routes.WebsiteControllers.postProductAdmin(productId = p.id)
+    case None => routes.WebsiteControllers.postCreateProductAdmin(celebrityId = celebrity.id)
+  }
 }
 
 @productPhoto = {

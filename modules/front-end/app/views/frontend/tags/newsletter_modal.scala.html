@@ -14,11 +14,11 @@
     <div>
       <h2><span class="bold">Sign Up</span> for Egraphs Insider Newsletter</h2>
       <p>
-        Get great deals, learn about new stars and be entered to win an iPad.
+        Get great deals and be the first to know about new sports and entertainment stars on Egraphs
       </p>
     </div>
     <br>
-    <img src='@RemoteAssets.at("images/modal-ipad.png")'/>
+    <img src='@RemoteAssets.at("images/modal-egraph.jpg")'/>
 
     @safeForm('id ->"signup-form", 'method -> "POST", 'action -> "/subscribe") {
       <div>
@@ -30,16 +30,7 @@
         <strong><em>Submit</em></strong>
         <span>&raquo;</span>
       </button>
-      <small>
-          <span id="signup-callout">
-
-          </span>
-      </small><br>
-      <small>
-          <a href="/sweepstakes/insider">
-            View contest details
-          </a>
-      </small>
+      <br>
       <a data-dismiss="modal" class="modal-dismissal" aria-hidden="true">No Thanks</a>
     </div>
     }

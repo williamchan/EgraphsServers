@@ -32,11 +32,3 @@ ALTER TABLE customer ALTER COLUMN notice_stars SET NOT NULL;
 
 # --- !Downs
 
-ALTER TABLE customer DROP COLUMN notice_stars;
-ALTER TABLE customer DROP COLUMN isGalleryVisible;
-ALTER TABLE customer DROP COLUMN username;
-
-drop sequence s_Address_id;
-DROP TABLE Address;
-
-ALTER TABLE orders DROP COLUMN expectedDate;

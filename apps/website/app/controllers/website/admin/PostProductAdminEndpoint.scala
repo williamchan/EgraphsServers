@@ -25,8 +25,7 @@ import services.Dimensions
 import play.api.mvc.MultipartFormData
 import java.awt.image.BufferedImage
 
-// TODO(wchan): This code has become frankenstein. I'm so sorry.
-trait PostCelebrityProductAdminEndpoint extends Logging {
+trait PostProductAdminEndpoint extends Logging {
   this: Controller =>
 
   protected def postController: POSTControllerMethod
@@ -34,30 +33,14 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
   protected def celebrityStore: CelebrityStore
   protected def productStore: ProductStore
 
-  case class PostProductForm(
-    productName: String,
-    productDescription: String,
-    priceInCurrency: String,
-    signingOriginX: Int,
-    signingOriginY: Int,
-    storyTitle: String,
-    storyText: String,
-    publishedStatusString: String
-  )
-
-  def postCelebrityProductAdmin(celebrityId: Long) = postController() {
+  def postCreateProductAdmin(celebrityId: Long) = postController() {
     httpFilters.requireAdministratorLogin.inSession(parser = parse.multipartFormData) { (admin, adminAccount) =>
       httpFilters.requireCelebrityId(celebId = celebrityId, parser = parse.multipartFormData) { celebrity =>
       	Action(parse.multipartFormData) { implicit request =>
       	  
-      	  val productId = Form("productId" -> longNumber).bindFromRequest.fold(formWithErrors => 0L, validForm => validForm)
       	  val createWithoutInventory = Form("createWithoutInventory" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm)
-      	  val productImageFile = request.body.file("productImage").map(_.ref.file)
-      	  val productIconFile = request.body.file("productIcon").map(_.ref.file)
-      	  val productImageOption = if (productImageFile.isDefined) ImageUtil.parseImage(productImageFile.get) else None
-      	  val productIconOption = if (productIconFile.isDefined) ImageUtil.parseImage(productIconFile.get) else None
-      	  val isCreate = (productId == 0)
-
+      	  
+      	  val (productImageFile, productIconFile, productImageOption, productIconOption) = getUploadedImages(request.body)
       	  val form = Form(mapping(
               "productName" -> nonEmptyText(maxLength = 128),        // 128 is the database column width
               "productDescription" -> nonEmptyText(maxLength = 128), // 128 is the database column width
@@ -69,22 +52,19 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
               "publishedStatusString" -> nonEmptyText.verifying(isProductPublishedStatus)
           )(PostProductForm.apply)(PostProductForm.unapply)
             .verifying(
-                productNameIsUnique(celebrity, productId),
-                productImageIsRequiredForCreate(isCreate, productImageFile),
-                productImageIsValid(productImageOption, isCreate, productImageFile),
+                productNameIsUnique(celebrity),
+                productImageIsRequiredForCreate(productImageFile),
+                productImageIsValid(productImageOption = productImageOption, productImageFile = productImageFile, isCreate = true),
                 productIconIsValid(productIconOption, productIconFile))
           )
 
           form.bindFromRequest.fold(
             formWithErrors => {
               val data = formWithErrors.data
-              val errors = for (error <- formWithErrors.errors) yield {
-                error.key + ": " + error.message
-              }
-              val url = if (isCreate) GetCreateCelebrityProductAdminEndpoint.url(celebrity = celebrity) else GetProductAdminEndpoint.url(productId = productId)
+              val errors = for (error <- formWithErrors.errors) yield { error.key + ": " + error.message }
+              val url = GetCreateCelebrityProductAdminEndpoint.url(celebrity = celebrity)
               Redirect(url).flashing(
                 ("errors" -> errors.mkString(", ")), 
-		        ("productId" -> productId.toString), 
 		        ("productName" -> data.get("productName").getOrElse("")), 
 		        ("productDescription" -> data.get("productDescription").getOrElse("")), 
 		        ("priceInCurrency" -> data.get("priceInCurrency").getOrElse("")), 
@@ -97,8 +77,7 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
             },
             validForm => {
               val publishedStatus = PublishedStatus(validForm.publishedStatusString).getOrElse(PublishedStatus.Unpublished)
-              val savedProduct = if (isCreate) {
-		          celebrity.addProduct(
+              val savedProduct = celebrity.addProduct(
 		            name = validForm.productName,
 		            description = validForm.productDescription,
 		            priceInCurrency = BigDecimal(validForm.priceInCurrency.toDouble),
@@ -108,9 +87,61 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
 		            storyText = validForm.storyText,
 		            publishedStatus = publishedStatus
 		          ).copy(signingOriginX = validForm.signingOriginX, signingOriginY = validForm.signingOriginY)
-	          } else {
-		          val product = productStore.get(productId)
-		          product.copy(
+		          
+              maybeCreateInventoryBatchForDemoMode(savedProduct, createWithoutInventory)
+              Redirect(controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled(celebrity.urlSlug).url)
+            }
+          )
+      	}
+      }
+    }
+  }
+  
+  def postProductAdmin(productId: Long) = postController() {
+    httpFilters.requireAdministratorLogin.inSession(parser = parse.multipartFormData) { (admin, adminAccount) =>
+      httpFilters.requireProductId(productId, parser = parse.multipartFormData) { product =>
+      	Action(parse.multipartFormData) { implicit request =>
+      	  
+      	  val celebrity = product.celebrity
+      	  val createWithoutInventory = Form("createWithoutInventory" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm)
+
+      	  val (productImageFile, productIconFile, productImageOption, productIconOption) = getUploadedImages(request.body)
+      	  val form = Form(mapping(
+              "productName" -> nonEmptyText(maxLength = 128),        // 128 is the database column width
+              "productDescription" -> nonEmptyText(maxLength = 128), // 128 is the database column width
+              "priceInCurrency" -> nonEmptyText.verifying(isDouble),
+              "signingOriginX" -> number(min = 0, max = 575), // These validations assume that the product is landscape.
+              "signingOriginY" -> number(min = 0, max = 0),   // These validations assume that the product is landscape.
+              "storyTitle" -> nonEmptyText,
+              "storyText" -> nonEmptyText,
+              "publishedStatusString" -> nonEmptyText.verifying(isProductPublishedStatus)
+          )(PostProductForm.apply)(PostProductForm.unapply)
+            .verifying(
+                productNameIsUnique(celebrity, Some(productId)),
+                productImageIsValid(productImageOption = productImageOption, productImageFile = productImageFile, isCreate = false),
+                productIconIsValid(productIconOption, productIconFile))
+          )
+
+          form.bindFromRequest.fold(
+            formWithErrors => {
+              val data = formWithErrors.data
+              val errors = for (error <- formWithErrors.errors) yield { error.key + ": " + error.message }
+              val url = GetProductAdminEndpoint.url(productId = productId)
+              Redirect(url).flashing(
+                ("errors" -> errors.mkString(", ")), 
+		        ("productName" -> data.get("productName").getOrElse("")), 
+		        ("productDescription" -> data.get("productDescription").getOrElse("")), 
+		        ("priceInCurrency" -> data.get("priceInCurrency").getOrElse("")), 
+		        ("signingOriginX" -> data.get("signingOriginX").getOrElse("")), 
+		        ("signingOriginY" -> data.get("signingOriginY").getOrElse("")), 
+		        ("storyTitle" -> data.get("storyTitle").getOrElse("")), 
+		        ("storyText" -> data.get("storyText").getOrElse("")), 
+		        ("publishedStatusString" -> data.get("publishedStatusString").getOrElse(""))
+              )
+            },
+            validForm => {
+              val publishedStatus = PublishedStatus(validForm.publishedStatusString).getOrElse(PublishedStatus.Unpublished)
+              val savedProduct = product.copy(
 		            name = validForm.productName,
 		            description = validForm.productDescription,
 		            priceInCurrency = BigDecimal(validForm.priceInCurrency.toDouble),
@@ -119,8 +150,6 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
 		            storyTitle = validForm.storyTitle,
 		            storyText = validForm.storyText
 		          ).withPublishedStatus(publishedStatus).saveWithImageAssets(image = productImageOption, icon = productIconOption)
-	          }
-              maybeCreateInventoryBatchForDemoMode(savedProduct, isCreate, createWithoutInventory)
               Redirect(controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled(celebrity.urlSlug).url)
             }
           )
@@ -128,12 +157,33 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
       }
     }
   }
+  
+  case class PostProductForm(
+    productName: String,
+    productDescription: String,
+    priceInCurrency: String,
+    signingOriginX: Int,
+    signingOriginY: Int,
+    storyTitle: String,
+    storyText: String,
+    publishedStatusString: String
+  )
+  
+  private def getUploadedImages(body: MultipartFormData[play.api.libs.Files.TemporaryFile])
+  : (Option[File], Option[File], Option[BufferedImage], Option[BufferedImage]) = 
+  {
+    val productImageFile = body.file("productImage").map(_.ref.file)
+    val productIconFile = body.file("productIcon").map(_.ref.file)
+    val productImageOption = if (productImageFile.isDefined) ImageUtil.parseImage(productImageFile.get) else None
+    val productIconOption = if (productIconFile.isDefined) ImageUtil.parseImage(productIconFile.get) else None
+    (productImageFile, productIconFile, productImageOption, productIconOption)
+  }
 
   /**
    * This is here so that demo'ers don't need to worry about setting up an InventoryBatch for demo Products before making orders.
    */
-  private def maybeCreateInventoryBatchForDemoMode(product: Product, isCreate: Boolean, createWithoutInventory: String) {
-    if (isCreate && createWithoutInventory.isEmpty && !Play.isProd(Play.current)) {
+  private def maybeCreateInventoryBatchForDemoMode(product: Product, createWithoutInventory: String) {
+    if (createWithoutInventory.isEmpty && !Play.isProd(Play.current)) {
       val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
       val jan_01_2012 = dateFormat.parse("2012-01-01")
       val future = dateFormat.parse("2020-01-01")
@@ -142,30 +192,26 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
     }
   }
 
-  private def productNameIsUnique(celebrity: Celebrity, productId: Long): Constraint[PostProductForm] = {
+  private def productNameIsUnique(celebrity: Celebrity, productId: Option[Long] = None): Constraint[PostProductForm] = {
     Constraint { form: PostProductForm =>
       val productByUrlSlg = productStore.findByCelebrityAndUrlSlug(celebrity.id, Product.slugify(form.productName))
-      val isCreate = (productId == 0)
+      val isCreate = (productId.isEmpty)
       val isUniqueUrlSlug = if (isCreate) {
         productByUrlSlg.isEmpty
       } else {
-        productByUrlSlg.isEmpty || (productByUrlSlg.isDefined && productByUrlSlg.get.id == productId)
+        productByUrlSlg.isEmpty || (productByUrlSlg.isDefined && productId == Some(productByUrlSlg.get.id))
       }
       if (isUniqueUrlSlug) Valid else Invalid("Celebrity already has a product with name: " + form.productName)
     }
   }
 
-  private def productImageIsRequiredForCreate(isCreate: Boolean, productImageFile: Option[File]): Constraint[PostProductForm] = {
+  private def productImageIsRequiredForCreate(productImageFile: Option[File]): Constraint[PostProductForm] = {
     Constraint { form: PostProductForm =>
-      if (isCreate) {
-        if (productImageFile.isDefined) Valid else Invalid("Product image is required")
-      } else {
-        Valid
-      }
+      if (productImageFile.isDefined) Valid else Invalid("Product image is required")
     }
   }
 
-  private def productImageIsValid(productImageOption: Option[BufferedImage], isCreate: Boolean, productImageFile: Option[File]): Constraint[PostProductForm] = {
+  private def productImageIsValid(productImageOption: Option[BufferedImage], productImageFile: Option[File], isCreate: Boolean): Constraint[PostProductForm] = {
     Constraint { form: PostProductForm =>
       val isProductImageValid = (isCreate && !productImageOption.isEmpty) || (!isCreate && (productImageFile.isEmpty || !productImageOption.isEmpty))
       if (isProductImageValid) {
@@ -207,7 +253,6 @@ trait PostCelebrityProductAdminEndpoint extends Logging {
     }
   }
 
-  // TODO: redundant with isCelebrityPublishedStatus
   private def isProductPublishedStatus: Constraint[String] = {
     Constraint { s: String =>
       PublishedStatus(s) match {

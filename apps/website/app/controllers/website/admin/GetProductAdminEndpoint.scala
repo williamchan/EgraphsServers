@@ -18,20 +18,21 @@ private[controllers] trait GetProductAdminEndpoint extends ImplicitHeaderAndFoot
 
   def getProductAdmin(productId: Long) = controllerMethod.withForm() { implicit authToken =>
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
-      Action { implicit request =>
-        // TODO: Would be nice to have a preview mode for this.
-        val product = productStore.get(productId)
-        implicit val flash = request.flash + 
-        ("productId" -> product.id.toString) + 
-        ("productName" -> product.name) + 
-        ("productDescription" -> product.description) + 
-        ("priceInCurrency" -> ("%.2f" format product.priceInCurrency)) + 
-        ("signingOriginX" -> product.signingOriginX.toString) + 
-        ("signingOriginY" -> product.signingOriginY.toString) + 
-        ("storyTitle" -> product.storyTitle) + 
-        ("storyText" -> product.storyText) + 
-        ("publishedStatusString" -> product.publishedStatus.toString)
-        GetProductDetail.getCelebrityProductDetail(celebrity = product.celebrity, isCreate = false, product = Option(product))
+      httpFilters.requireProductId(productId) { product =>
+        Action { implicit request =>
+          // TODO: Would be nice to have a preview mode for this.
+          implicit val flash = request.flash + 
+          	("productId" -> product.id.toString) + 
+          	("productName" -> product.name) + 
+          	("productDescription" -> product.description) + 
+          	("priceInCurrency" -> ("%.2f" format product.priceInCurrency)) + 
+          	("signingOriginX" -> product.signingOriginX.toString) + 
+          	("signingOriginY" -> product.signingOriginY.toString) + 
+          	("storyTitle" -> product.storyTitle) + 
+          	("storyText" -> product.storyText) + 
+          	("publishedStatusString" -> product.publishedStatus.toString)
+          GetProductDetail.getCelebrityProductDetail(celebrity = product.celebrity, product = Option(product))
+      	}
       }
     }
   }

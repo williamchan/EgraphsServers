@@ -29,6 +29,3 @@ create unique index idxd8791317 on InventoryBatchProduct (inventoryBatchId,produ
 
 # --- !Downs
 
-ALTER TABLE orders DROP COLUMN inventoryBatchId;
-DROP TABLE InventoryBatchProduct;
-DROP TABLE InventoryBatch;

@@ -18,14 +18,15 @@ private[controllers] trait GetInventoryBatchAdminEndpoint extends ImplicitHeader
 
   def getInventoryBatchAdmin(inventoryBatchId: Long) = controllerMethod.withForm() { implicit authToken =>
     httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
-      Action { implicit request =>
-        val inventoryBatch = inventoryBatchStore.get(inventoryBatchId)
-        implicit val flash = request.flash + 
-        ("inventoryBatchId" -> inventoryBatch.id.toString) + 
-        ("numInventory" -> inventoryBatch.numInventory.toString) + 
-        ("startDate" -> inventoryBatch.startDate.toString) + 
-        ("endDate" -> inventoryBatch.endDate.toString)
-        GetInventoryBatchDetail.getCelebrityInventoryBatchDetail(celebrity = inventoryBatch.celebrity, inventoryBatch = Option(inventoryBatch))
+      httpFilters.requireInventoryBatchId(inventoryBatchId) { inventoryBatch =>
+        Action { implicit request =>
+          implicit val flash = request.flash + 
+          	("inventoryBatchId" -> inventoryBatch.id.toString) + 
+          	("numInventory" -> inventoryBatch.numInventory.toString) + 
+          	("startDate" -> inventoryBatch.startDate.toString) + 
+          	("endDate" -> inventoryBatch.endDate.toString)
+          GetInventoryBatchDetail.getCelebrityInventoryBatchDetail(celebrity = inventoryBatch.celebrity, inventoryBatch = Option(inventoryBatch))
+        }
       }
     }
   }

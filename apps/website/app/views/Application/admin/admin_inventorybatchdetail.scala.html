@@ -20,7 +20,11 @@
 
 
 @postInventoryBatch = @{
-  routes.WebsiteControllers.postCelebrityInventoryBatchAdmin(celebrityId = celebrity.id)
+  inventoryBatch match {
+    case Some(ib) => routes.WebsiteControllers.postInventoryBatchAdmin(inventoryBatchId = ib.id)
+    case None => routes.WebsiteControllers.postCreateInventoryBatchAdmin(celebrityId = celebrity.id)
+  }
+  
 }
 
 @body = {
