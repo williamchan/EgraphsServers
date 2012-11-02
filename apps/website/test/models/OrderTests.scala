@@ -261,7 +261,6 @@ class OrderTests extends EgraphsUnitTest
     TestData.newSavedEgraph(Some(order)).withEgraphState(EgraphState.RejectedByAdmin).save()
     TestData.newSavedEgraph(Some(order)).withEgraphState(EgraphState.Published).save()
 
-
     val results = GalleryOrderFactory.filterPendingOrders(orderStore.galleryOrdersWithEgraphs(recipient.id).toList)
 
     results.size should be (1)
