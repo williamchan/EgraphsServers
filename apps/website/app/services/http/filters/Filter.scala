@@ -14,11 +14,18 @@ import play.api.mvc.Result
  */
 //TODO: RequiredT Should be covarient, but idk why it won't work that way.
 trait Filter[KeyT, RequiredT] {
-  // this is a function that takes a value and maps it to an option of T
-  // for example:
-  //    override def filter[String, Account] = accountStore.findByEmail(email)
+  /** a function that takes a value and maps it to an Either[[[play.api.mvc.Result]], RequiredT]
+   * for example:
+   * {{{
+   *  override def filter[String, Account] = accountStore.findByEmail(email).toRight(left=NotFound)
+   * }}}
+   */
   def filter(value: KeyT): Either[Result, RequiredT]
 
+  /**
+   * Composes a provided action `actionFactory` with the filter. actionFactory will never be 
+   * executed if the filter does not pass.
+   */
   def apply[A](key: KeyT, parser: BodyParser[A] = parse.anyContent)(actionFactory: RequiredT => Action[A]): Action[A] = {
     filterResultToAction(filter(key), parser, actionFactory)
   }
