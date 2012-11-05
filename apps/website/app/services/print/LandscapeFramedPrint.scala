@@ -9,19 +9,19 @@ import play.api.Play.current
 
 object LandscapeFramedPrint {
 
-  val targetEgraphWidth = 2324
+  val targetEgraphWidth = 2150
   val targetLogoWidth = 60
 
 //  def main(args: Array[String]) {
-//  import javax.imageio.{IIOImage, ImageWriteParam}
-//  import java.io.File
-//  import javax.imageio.stream.FileImageOutputStream
+//    import javax.imageio.{IIOImage, ImageWriteParam}
+//    import java.io.File
+//    import javax.imageio.stream.FileImageOutputStream
 //    val orderId = 899
-//    val egraphImage = ImageIO.read(new File("/Users/willchan83/Desktop/test/" + orderId + ".png"))
+//    val egraphImage = ImageIO.read(new File("/Users/willchan83/Desktop/framed_print_images/" + orderId + ".png"))
 //    val assembledImage = LandscapeFramedPrint().assemble(
 //      orderNumber = orderId.toString,
 //      egraphImage = egraphImage,
-//      teamLogoImage = ImageIO.read(new File("/Users/willchan83/Desktop/test/teamlogo.png")),
+//      teamLogoImage = ImageIO.read(new File("/Users/willchan83/Desktop/framed_print_images/teamlogo.png")),
 //      recipientName = "Eric Feeny Mohammed Albaraq",
 //      celebFullName = "David Price Maria Alvarez Vibi",
 //      celebCasualName = "David",
@@ -29,7 +29,7 @@ object LandscapeFramedPrint {
 //      signedAtDate = new Date(),
 //      egraphUrl = "https://www.egraphs.com/" + orderId)
 //
-//    val file = new File("/Users/willchan83/Desktop/test/test.jpg")
+//    val file = new File("/Users/willchan83/Desktop/framed_print_images/test.jpg")
 //    val iter = ImageIO.getImageWritersByFormatName("jpg")
 //    val writer = iter.next()
 //    val iwp = writer.getDefaultWriteParam
@@ -45,10 +45,15 @@ case class LandscapeFramedPrint() {
 
   val width = 3600
   val height = 2400
+  val sideMargin = 188
+  val egraphX = sideMargin
 
-  val widthBetweenEgraphAndCert = 100
-  val certW = 1000
-  val certBannerWidth = 200
+  val widthBetweenEgraphAndCert = 150
+  val certW = 924
+  val certBannerWidth = 114
+    val certX = 3600 - sideMargin - certW
+  val certWritableX = certX + certBannerWidth
+  val certWritableWidth = certW - certBannerWidth
 
   def assemble(orderNumber: String,
                egraphImage: BufferedImage,
@@ -63,15 +68,9 @@ case class LandscapeFramedPrint() {
     val scaledEgraphImage = getScaledImage(image = egraphImage, targetWidth = LandscapeFramedPrint.targetEgraphWidth)
     val scaledLogoImage = getScaledImage(image = teamLogoImage, targetWidth = LandscapeFramedPrint.targetLogoWidth)
 
-    val egraphX = (width - scaledEgraphImage.getWidth - certW - widthBetweenEgraphAndCert) / 2
-    val certX = egraphX + scaledEgraphImage.getWidth + widthBetweenEgraphAndCert
-
     val certH = scaledEgraphImage.getHeight
     val egraphY = (height - scaledEgraphImage.getHeight) / 2
     val certY = egraphY
-
-    val certWritableX = certX + certBannerWidth
-    val certWritableWidth = certW - certBannerWidth
 
     var x: Int = 0
     var y: Int = 0
@@ -105,7 +104,7 @@ case class LandscapeFramedPrint() {
       fontRec = centuryGothicFont.getStringBounds(celebFullNameCaps, frc)
       x = certWritableX + ((certWritableWidth - fontRec.getWidth) / 2).toInt
     }
-    y = certY + 425
+    y = certY + 375
     g2.drawString(celebFullNameCaps, x, y)
 
     //draw recipientName
@@ -123,7 +122,7 @@ case class LandscapeFramedPrint() {
       fontRec = centuryGothicFont.getStringBounds(recipientNameCaps, frc)
       x = certWritableX + ((certWritableWidth - fontRec.getWidth) / 2).toInt
     }
-    y = certY + 400 + 185
+    y = certY + 350 + 185
     g2.drawString(recipientNameCaps, x, y)
 
     //draw this egraph created by
@@ -132,12 +131,12 @@ case class LandscapeFramedPrint() {
     frc = g2.getFontRenderContext
     fontRec = calistoMTFont.getStringBounds("this egraph created by:", frc)
     x = certWritableX + ((certWritableWidth - fontRec.getWidth) / 2).toInt
-    y = certY + 350
+    y = certY + 300
     g2.drawString("this egraph created by:", x, y)
     //for:
     fontRec = calistoMTFont.getStringBounds("for:", frc)
     x = certWritableX + ((certWritableWidth - fontRec.getWidth) / 2).toInt
-    y = certY + 350 + 150
+    y = certY + 300 + 150
     g2.drawString("for:", x, y)
 
     //draw date
@@ -145,7 +144,7 @@ case class LandscapeFramedPrint() {
     g2.setFont(calistoMTFont)
     fontRec = calistoMTFont.getStringBounds(signedAtDate.toString, frc)
     x = certWritableX + ((certWritableWidth - fontRec.getWidth) / 2).toInt
-    y = certY + 400 + 225 + 50
+    y = certY + 350 + 225 + 50
     g2.drawString(signedAtDate.toString, x, y)
 
     //add QR code
@@ -160,7 +159,7 @@ case class LandscapeFramedPrint() {
     frc = g2.getFontRenderContext
     fontRec = calistoMTFont.getStringBounds("Egraph# " + orderNumber, frc)
     x = certWritableX + ((certWritableWidth - fontRec.getWidth) / 2).toInt
-    y = certY + 1000
+    y = certY + 950
     g2.drawString("Egraph# " + orderNumber, x, y)
 
     //draw image name
@@ -170,42 +169,42 @@ case class LandscapeFramedPrint() {
     } else {
       val breakCharIndex = productName.substring(productNameLength / 2).findIndexOf(_ == ' ') + (productNameLength / 2)
       val s = productName.splitAt(breakCharIndex + 1)
-      List(s._1, s._2)
+      List(s._1.trim, s._2.trim)
     }
     fontRec = calistoMTFont.getStringBounds(productNameLines.head, frc)
     x = certWritableX + ((certWritableWidth - fontRec.getWidth) / 2).toInt
-    y = certY + 1000 + 75
+    y = certY + 950 + 75
     g2.drawString(productNameLines.head, x, y)
     if (productNameLines.tail.headOption.isDefined) {
       val productNameLine2 = productNameLines.tail.head
       fontRec = calistoMTFont.getStringBounds(productNameLine2, frc)
       x = certWritableX + ((certWritableWidth - fontRec.getWidth) / 2).toInt
-      y = certY + 1000 + 75 + (fontRec.getHeight).toInt
+      y = certY + 950 + 75 + (fontRec.getHeight).toInt
       g2.drawString(productNameLine2, x, y)
     }
 
     //draw snap the QR code for additional authentication information and a special audio message from
-    var snap = "Snap the QR code for a personalized "
+    var snap = "Snap the QR code for a personalized"
     calistoMTFont = calistoMTFont.deriveFont(Font.PLAIN, 35.toFloat)
     g2.setFont(calistoMTFont)
     fontRec = calistoMTFont.getStringBounds(snap, frc)
     x = certWritableX + ((certWritableWidth - fontRec.getWidth) / 2).toInt
-    y = certY + 1200
+    y = certY + 1125
     g2.drawString(snap, x, y)
     snap = "audio message from "
-    y = certY + 1200 + fontRec.getHeight.toInt //add previous height before resetting
+    y = certY + 1125 + fontRec.getHeight.toInt //add previous height before resetting
     fontRec = calistoMTFont.getStringBounds(snap + celebCasualName, frc)
     x = certWritableX + ((certWritableWidth - fontRec.getWidth) / 2).toInt
     g2.drawString(snap + celebCasualName, x, y)
 
     //draw www.egraphs.com/
-    y = certY + 1200 + (2 * fontRec.getHeight).toInt //add previous height before resetting
+    y = certY + 1125 + (2 * fontRec.getHeight).toInt //add previous height before resetting
     fontRec = calistoMTFont.getStringBounds("www.egraphs.com/" + orderNumber, frc)
     x = certWritableX + ((certWritableWidth - fontRec.getWidth) / 2).toInt
     g2.drawString("www.egraphs.com/" + orderNumber, x, y)
 
     //draw MLB logos
-    g2.drawImage(scaledLogoImage, certX + 670, certY + 1350, null)
+    g2.drawImage(scaledLogoImage, certWritableX + 475, certY + 1267, null)
 
     //done with graphics as assembly is the final action
     g2.dispose()
