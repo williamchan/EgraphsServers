@@ -23,13 +23,13 @@ class AdminLoginTests extends EgraphsUnitTest {
   private def db = AppConfig.instance[DBSession]
 
   "Admin console" should "should be protected by admin login" in new EgraphsTestApplication {
-    val z = db.connected(TransactionSerializable) {
+    val (admin, celebrity) = db.connected(TransactionSerializable) {
       (TestData.newSavedAdministrator(), TestData.newSavedCelebrity())
     }
     
-    val req = FakeRequest().withAdmin(z._1.id)
-    val u = WebsiteControllers.getCelebritiesAdmin ().url
-    status(routeAndCall(req.copy(method=GET, uri=u)).get) should be(OK)
+    val req = FakeRequest().withAdmin(admin.id)
+    val url = WebsiteControllers.getCelebritiesAdmin().url
+    status(routeAndCall(req.copy(method=GET, uri=url)).get) should be(OK)
 
 //    assertStatus(302, GET(WebsiteControllers.reverse(WebsiteControllers.getCelebritiesAdmin()).url))
 //    assertStatus(302, GET(Utils.lookupUrl("WebsiteControllers.getCelebrityEgraphsAdmin", celebrityIdMap).url))

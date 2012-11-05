@@ -26,8 +26,6 @@ object TestData {
   lazy val threeDaysHence = new DateTime().plusDays(3).toLocalDate.toDate
   lazy val sevenDaysHence = new DateTime().plusDays(7).toLocalDate.toDate
 
-
-
   val random = new Random
 
   def getTimeInBlobstoreFormat: String = Time.toBlobstoreFormat(Time.now)
@@ -69,7 +67,7 @@ object TestData {
     }
 
     val admin = Administrator().save()
-    account.copy(administratorId = Some(admin.id)).save() 
+    account.copy(administratorId = Some(admin.id)).save()
     admin
   }
   

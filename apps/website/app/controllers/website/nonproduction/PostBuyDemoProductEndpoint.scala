@@ -21,6 +21,7 @@ import play.api.mvc.Request
 import play.api.data.{Form => PlayForm}
 import play.api.data.Forms._
 import services.config.ConfigFileProxy
+import play.api.mvc.AnyContent
 
 trait PostBuyDemoProductEndpoint { this: Controller =>
   import PostBuyDemoProductEndpoint.log
@@ -88,9 +89,9 @@ trait PostBuyDemoProductEndpoint { this: Controller =>
     }
   }
 
-  def validateInputs[A](celebrityUrlSlug: String, productUrlSlug: String)(implicit request: Request[A]) : Either[Result, (Celebrity, Product, DemoPurchase)] = {
+  def validateInputs(celebrityUrlSlug: String, productUrlSlug: String)(implicit request: Request[AnyContent]) : Either[Result, (Celebrity, Product, DemoPurchase)] = {
     dbSession.connected(TransactionSerializable) {
-      val resultOrResultOrData = httpFilters.requireCelebrityAndProductUrlSlugs.asOperationResult(celebrityUrlSlug, productUrlSlug, request.session) { (celebrity, product) =>
+      val resultOrResultOrData = httpFilters.requireCelebrityAndProductUrlSlugs.asOperationalResult(celebrityUrlSlug, productUrlSlug) { (celebrity, product) =>
         PlayForm(
           mapping(
             "recipientName" -> text,

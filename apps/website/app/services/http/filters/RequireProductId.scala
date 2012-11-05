@@ -1,46 +1,34 @@
 package services.http.filters
 
 import com.google.inject.Inject
-import models.{Product, ProductStore}
-import play.api.data.Form
+
+import models.Product
+import models.ProductStore
 import play.api.data.Forms.longNumber
 import play.api.data.Forms.single
-import play.api.mvc.Action
-import play.api.mvc.BodyParser
-import play.api.mvc.BodyParsers.parse
-import play.api.mvc.Result
+import play.api.data.Form
 import play.api.mvc.Results.NotFound
+import play.api.mvc.Request
+import play.api.mvc.Result
 
-// TODO: PLAY20 migration. Comment this summbitch.
-class RequireProductId @Inject() (productStore: ProductStore) {
-
-  def apply[A](productId: Long, parser: BodyParser[A] = parse.anyContent)(actionFactory: Product => Action[A])
-  : Action[A] = 
-  {
-    Action(parser) { request =>     
-      val maybeResult = for (
-        product <- productStore.findById(productId)
-      ) yield {
-        actionFactory(product).apply(request)
-      }
-      
-      maybeResult.getOrElse(noProductIdResult)
-    }
-  } 
-
-  def inRequest[A](parser: BodyParser[A] = parse.anyContent)(actionFactory: Product => Action[A])
-  : Action[A] = 
-  {
-    Action(parser) { implicit request =>
-      Form(single("productId" -> longNumber)).bindFromRequest.fold(
-        errors => noProductIdResult,
-        productId => this.apply(productId, parser)(actionFactory)(request)
-      )
-    }
+/**
+ * Filter only where there is a product id that is known.
+ */
+class RequireProductId @Inject() (productStore: ProductStore) extends Filter[Long, Product] with RequestFilter[Long, Product] {
+  override protected def formFailedResult[A, S >: Source](formWithErrors: Form[Long], source: S)(implicit request: Request[A]): Result = {
+    noProductIdResult
   }
-  
-  //
-  // Private members
-  //
+
+  override def filter(productId: Long): Either[Result, Product] = {
+    productStore.findById(productId).toRight(left = noProductIdResult)
+  }
+
+  override val form: Form[Long] = Form(
+    single(
+      "productId" -> longNumber)
+      verifying ("Invalid productId", {
+        case productId => productId > 0
+      }: Long => Boolean))
+
   private val noProductIdResult = NotFound("Valid Product ID was required but not provided")
 }

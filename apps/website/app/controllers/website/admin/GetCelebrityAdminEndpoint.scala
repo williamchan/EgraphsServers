@@ -23,7 +23,7 @@ private[controllers] trait GetCelebrityAdminEndpoint extends ImplicitHeaderAndFo
   protected def filterValueStore: FilterValueStore  
 
   def getCelebrityAdmin(celebrityId: Long) = controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       Action { implicit request =>
         (accountStore.findByCelebrityId(celebrityId), celebrityStore.findById(celebrityId)) match {
           case (Some(account), Some(celebrity)) =>
@@ -59,7 +59,7 @@ private[controllers] trait GetCelebrityAdminEndpoint extends ImplicitHeaderAndFo
   }
 
   def getCreateCelebrityAdmin = controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       Action { implicit request =>
         implicit val flash = request.flash
         val (errorFields, fieldDefaults) = getCelebrityDetail()

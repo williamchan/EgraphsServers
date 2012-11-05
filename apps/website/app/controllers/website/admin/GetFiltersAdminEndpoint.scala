@@ -19,7 +19,7 @@ private[controllers] trait GetFiltersAdminEndpoint extends ImplicitHeaderAndFoot
   protected def filterStore: FilterStore  
 
   def getFiltersAdmin = controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       Action { implicit request =>
         val page: Int = Form("page" -> number).bindFromRequest.fold(formWithErrors => 1, validForm => validForm)
         val query = filterStore.getFilters

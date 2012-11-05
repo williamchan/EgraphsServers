@@ -23,7 +23,7 @@ private[controllers] trait GetCelebrityEgraphsAdminEndpoint extends ImplicitHead
   protected def egraphQueryFilters: EgraphQueryFilters
 
   def getCelebrityEgraphsAdmin(celebrityId: Long) = controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       httpFilters.requireCelebrityId(celebrityId) { (celebrity) =>
         Action { implicit request =>
           

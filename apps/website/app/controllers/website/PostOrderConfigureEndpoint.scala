@@ -20,7 +20,7 @@ private[controllers] trait PostOrderConfigureEndpoint { this: Controller =>
   protected def orderStore: OrderStore
 
   def postOrderPrivacy(orderId: Long) = postController() {
-    httpFilters.requireCustomerLogin.inSession() { (customer, account) =>
+    httpFilters.requireCustomerLogin.inSession() { case (customer, account) =>
       Action { implicit request =>
         val privacyStatusString = Form("privacyStatus" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm)
         val httpResults = for (

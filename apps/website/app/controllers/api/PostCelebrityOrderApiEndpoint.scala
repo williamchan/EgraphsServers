@@ -26,9 +26,9 @@ private[controllers] trait PostCelebrityOrderApiEndpoint { this: Controller =>
    * about the params.
    */
   def postCelebrityOrder(orderId: Long) = postApiController() {
-    httpFilters.requireAuthenticatedAccount() { account =>
+    httpFilters.requireAuthenticatedAccount.inRequest() { account =>
       httpFilters.requireCelebrityId.inAccount(account) { celebrity =>
-        httpFilters.requireOrderIdOfCelebrity(orderId, celebrity.id) { order =>
+        httpFilters.requireOrderIdOfCelebrity((orderId, celebrity.id)) { order =>
           Action { implicit request =>
             val form = Form(tuple("reviewStatus" -> optional(text), "rejectionReason" -> optional(text)))
 

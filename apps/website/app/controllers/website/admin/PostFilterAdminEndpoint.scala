@@ -42,10 +42,8 @@ trait PostFilterAdminEndpoint {
   )
 
   def postFilterAdmin = postController() {
-    httpFilters.requireAdministratorLogin.inSession() 
-    { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       Action { implicit request =>
-        
         val filterId = Form("filterId" -> longNumber).bindFromRequest.fold(formWithErrors => 0L, validForm => validForm)
       	val isCreate = (filterId == 0)
       	

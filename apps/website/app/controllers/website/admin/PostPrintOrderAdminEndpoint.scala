@@ -23,7 +23,7 @@ trait PostPrintOrderAdminEndpoint { this: Controller =>
   protected def printOrderStore: PrintOrderStore
 
   def postPrintOrderAdmin(printOrderId: Long) = postController() {
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       Action { implicit request =>
         printOrderStore.findById(printOrderId) match {
           case None => NotFound("No print order with that id")

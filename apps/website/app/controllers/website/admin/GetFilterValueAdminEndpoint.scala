@@ -18,7 +18,7 @@ private[controllers] trait GetFilterValueAdminEndpoint extends ImplicitHeaderAnd
   protected def filterValueStore: FilterValueStore
 
   def getFilterValueAdmin(filterValueId: Long) = controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       Action { implicit request =>
         filterValueStore.findById(filterValueId) match {
           case Some(filterValue) => {
@@ -33,7 +33,7 @@ private[controllers] trait GetFilterValueAdminEndpoint extends ImplicitHeaderAnd
   }
   
   def getCreateFilterValueAdmin(filterId: Long) = controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       Action { implicit request =>
         filterStore.findById(filterId) match {
           case Some(filter) => { 

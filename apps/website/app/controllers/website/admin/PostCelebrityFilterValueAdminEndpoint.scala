@@ -45,7 +45,7 @@ trait PostCelebrityFilterValueAdminEndpoint {
   )
 
   def postCelebrityFilterValueAdmin(celebrityId: Long) = postController() {
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       Action { implicit request =>
         
         val filterValueIds = request.body.asFormUrlEncoded match {

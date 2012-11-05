@@ -26,7 +26,7 @@ trait PostOrderAdminEndpoint { this: Controller =>
   protected def egraphQueryFilters: EgraphQueryFilters
 
   def postOrderAdmin(orderId: Long) = postController() {
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       Action { implicit request =>
         orderStore.findById(orderId) match {
           case None => NotFound("No order with that id")

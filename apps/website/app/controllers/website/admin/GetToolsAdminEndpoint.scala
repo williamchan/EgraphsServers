@@ -41,7 +41,7 @@ private[controllers] trait GetToolsAdminEndpoint extends ImplicitHeaderAndFooter
   // Controllers
   //
   def getToolsAdmin = controllerMethod(WithDBConnection(readOnly=false)) {
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       Action { implicit request =>
         val action: String = Form("action" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm)
         action match {

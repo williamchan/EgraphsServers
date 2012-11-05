@@ -17,7 +17,7 @@ private[controllers] trait GetFilterAdminEndpoint extends ImplicitHeaderAndFoote
   protected def filterStore: FilterStore
 
   def getFilterAdmin(filterId: Long) = controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       Action { implicit request =>
         filterStore.findById(filterId) match {
           case Some(filter) => {
@@ -31,7 +31,7 @@ private[controllers] trait GetFilterAdminEndpoint extends ImplicitHeaderAndFoote
   
   def getCreateFilterAdmin() = controllerMethod.withForm() {
     implicit authToken =>
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       Action { implicit request =>
         // Temporary filter that does not get saved to the database. Used to store field values and render the template. 
         val tempFilter = Filter(name=flash.get("name").getOrElse(""), publicName=flash.get("publicName").getOrElse(""))

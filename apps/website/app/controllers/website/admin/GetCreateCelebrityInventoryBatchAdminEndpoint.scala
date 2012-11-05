@@ -18,7 +18,7 @@ private[controllers] trait GetCreateCelebrityInventoryBatchAdminEndpoint extends
   protected def httpFilters: HttpFilters
 
   def getCreateCelebrityInventoryBatchAdmin(celebrityId: Long) = controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       httpFilters.requireCelebrityId(celebrityId) { implicit celebrity =>
         Action { implicit request =>
           val dateFormat = new SimpleDateFormat("yyyy-MM-dd")

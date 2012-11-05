@@ -19,7 +19,7 @@ private[controllers] trait GetPrintOrderAdminEndpoint extends ImplicitHeaderAndF
   protected def egraphQueryFilters: EgraphQueryFilters
 
   def getPrintOrderAdmin(printOrderId: Long) = controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       Action { implicit request =>
         printOrderStore.findById(printOrderId) match {
           case Some(printOrder) => {

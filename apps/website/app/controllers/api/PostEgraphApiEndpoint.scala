@@ -70,9 +70,9 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
           validForm => {            
             val failureOrSuccessResult = dbSession.connected(TransactionSerializable) {        
               for (
-                account <- httpFilters.requireAuthenticatedAccount.asEither(request).right;            
-                celeb <- httpFilters.requireCelebrityId.asEitherInAccount(account).right;
-                order <- httpFilters.requireOrderIdOfCelebrity.asEither(orderId, celeb.id).right
+                account <- httpFilters.requireAuthenticatedAccount.filter(request).right;            
+                celeb <- httpFilters.requireCelebrityId.filterInAccount(account).right;
+                order <- httpFilters.requireOrderIdOfCelebrity.filter(orderId, celeb.id).right
               ) yield {
                 // validate signature for issue #104
                 val message = validForm.message
