@@ -1,7 +1,7 @@
 package controllers.website.admin
 
 import models._
-import models.filters._
+import models.categories._
 import enums.PublishedStatus
 import controllers.WebsiteControllers
 import play.api.mvc.Controller
@@ -26,11 +26,11 @@ import services.blobs.Blobs.Conversions._
 import org.apache.commons.mail.HtmlEmail
 
 /**
- * This controller associates celebrities with FilterValues i.e. "tags" the associated celeb.
- * It destructively dissociates a celeb from all of its filtervalues and applys a new list from
+ * This controller associates celebrities with CategoryValues i.e. "tags" the associated celeb.
+ * It destructively dissociates a celeb from all of its categoryvalues and applys a new list from
  * the caller.
  */
-trait PostCelebrityFilterValueAdminEndpoint {
+trait PostCelebrityCategoryValueAdminEndpoint {
   this: Controller => 
   
   protected def postController: POSTControllerMethod
@@ -38,20 +38,20 @@ trait PostCelebrityFilterValueAdminEndpoint {
   protected def transactionalMail: TransactionalMail
   protected def celebrityStore: CelebrityStore
   protected def accountStore: AccountStore
-  protected def filterValueStore: FilterValueStore
+  protected def categoryValueStore: CategoryValueStore
   
-  case class CelebrityFilterValueForm(
-      filterValueId: Long
+  case class CelebrityCategoryValueForm(
+      categoryValueId: Long
   )
 
-  def postCelebrityFilterValueAdmin(celebrityId: Long) = postController() {
+  def postCelebrityCategoryValueAdmin(celebrityId: Long) = postController() {
     httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       Action { implicit request =>
         
-        val filterValueIds = request.body.asFormUrlEncoded match {
-          case Some(params) if(params.contains("filterValueIds")) => {
-            for(filterValueId <- params("filterValueIds")) yield {
-              filterValueId.toLong
+        val categoryValueIds = request.body.asFormUrlEncoded match {
+          case Some(params) if(params.contains("categoryValueIds")) => {
+            for(categoryValueId <- params("categoryValueIds")) yield {
+              categoryValueId.toLong
             }
           }
           case _ => List[Long]()
@@ -59,7 +59,7 @@ trait PostCelebrityFilterValueAdminEndpoint {
 
         celebrityStore.findById(celebrityId) match {
         case Some(celebrity) => {
-              celebrityStore.updateFilterValues(celebrity = celebrity, filterValueIds = filterValueIds) 
+              celebrityStore.updateCategoryValues(celebrity = celebrity, categoryValueIds = categoryValueIds) 
               Redirect(controllers.routes.WebsiteControllers.getCelebrityAdmin(celebrity.id).url, FOUND)
             }
             case _ => Redirect(controllers.routes.WebsiteControllers.getCelebritiesAdmin.url, SEE_OTHER)   
@@ -68,11 +68,11 @@ trait PostCelebrityFilterValueAdminEndpoint {
     }  
   }
 
-  private def isValidFilterValueId: Constraint[CelebrityFilterValueForm] = {
-    Constraint { form: CelebrityFilterValueForm => 
-      filterValueStore.findById(form.filterValueId) match {
-        case Some(filterValue) => Valid
-        case _ => Invalid("Filter Value ID is incorrect ")
+  private def isValidCategoryValueId: Constraint[CelebrityCategoryValueForm] = {
+    Constraint { form: CelebrityCategoryValueForm => 
+      categoryValueStore.findById(form.categoryValueId) match {
+        case Some(categoryValue) => Valid
+        case _ => Invalid("Category Value ID is incorrect ")
       }
     }    
   }

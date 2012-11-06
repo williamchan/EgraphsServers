@@ -8,25 +8,25 @@ import play.api.data._
 import play.api.data.Forms._
 import services.http.filters.HttpFilters
 import services.mvc.ImplicitHeaderAndFooterData
-import models.filters._
+import models.categories._
 import controllers.PaginationInfoFactory
 
-private[controllers] trait GetFiltersAdminEndpoint extends ImplicitHeaderAndFooterData {
+private[controllers] trait GetCategoriesAdminEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
 
   protected def controllerMethod: ControllerMethod
   protected def httpFilters: HttpFilters
-  protected def filterStore: FilterStore  
+  protected def categoryStore: CategoryStore  
 
-  def getFiltersAdmin = controllerMethod.withForm() { implicit authToken =>
+  def getCategoriesAdmin = controllerMethod.withForm() { implicit authToken =>
     httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       Action { implicit request =>
         val page: Int = Form("page" -> number).bindFromRequest.fold(formWithErrors => 1, validForm => validForm)
-        val query = filterStore.getFilters
-        val pagedQuery: (Iterable[Filter], Int, Option[Int]) = services.Utils.pagedQuery(select=query, page = page)
+        val query = categoryStore.getCategories
+        val pagedQuery: (Iterable[Category], Int, Option[Int]) = services.Utils.pagedQuery(select=query, page = page)
         implicit val paginationInfo = PaginationInfoFactory.create(pagedQuery = pagedQuery, 
-            baseUrl = controllers.routes.WebsiteControllers.getFiltersAdmin.url)
-        Ok(views.html.Application.admin.admin_filters(filters=pagedQuery._1))
+            baseUrl = controllers.routes.WebsiteControllers.getCategoriesAdmin.url)
+        Ok(views.html.Application.admin.admin_categories(categories=pagedQuery._1))
       }
     }
   }

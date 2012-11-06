@@ -8,7 +8,7 @@ import models._
 import enums.{EgraphState, PublishedStatus}
 import egraphs.playutils.Encodings.Base64
 import org.apache.commons.lang3.RandomStringUtils
-import filters.{FilterValue, Filter}
+import categories.{Category, CategoryValue}
 
 /**
  * Renders saved copies of domain objects that satisfy all relational integrity
@@ -92,12 +92,12 @@ object TestData {
     celeb
   }
 
-  def newSavedFilter : Filter = {
-    Filter(name = TestData.generateUsername(), publicName = TestData.generateUsername()).save()
+  def newSavedCategory: Category = {
+    Category(name = TestData.generateUsername(), publicName = TestData.generateUsername()).save()
   }
 
-  def newSavedFilterValue(filterId: Long) : FilterValue = {
-    FilterValue(name = TestData.generateUsername(), publicName = TestData.generateUsername(), filterId = filterId).save()
+  def newSavedCategoryValue(categoryId: Long) : CategoryValue = {
+    CategoryValue(name = TestData.generateUsername(), publicName = TestData.generateUsername(), categoryId = categoryId).save()
   }
 
   private def newProduct(celebrity: Celebrity): Product = {

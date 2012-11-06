@@ -114,17 +114,17 @@ class CelebrityTests extends EgraphsUnitTest
     featuredStateOfCelebWhen(celebWasFeatured=false, includeCelebInNewFeaturedCelebs=true) should be (true)
   }
   
-  "find pairs of filters and filter values" should "return the pairs associated with the celeb" in {
-    val filterA = TestData.newSavedFilter
-    val filterValueA = TestData.newSavedFilterValue(filterA.id)
+  "find pairs of categories and CategoryValues" should "return the pairs associated with the celeb" in {
+    val categoryA = TestData.newSavedCategory
+    val categoryValueA = TestData.newSavedCategoryValue(categoryA.id)
     
-    val filterB = TestData.newSavedFilter
-    val filterValueB = TestData.newSavedFilterValue(filterB.id)
+    val categoryB = TestData.newSavedCategory
+    val categoryValueB = TestData.newSavedCategoryValue(categoryB.id)
     
     val celeb = TestData.newSavedCelebrity().save()
-    celeb.filterValues.associate(filterValueA)
-    celeb.filterValues.associate(filterValueB)
-    val pairs = celeb.filterValueAndFilterPairs
+    celeb.categoryValues.associate(categoryValueA)
+    celeb.categoryValues.associate(categoryValueB)
+    val pairs = celeb.categoryValueAndCategoryPairs
     
     pairs.size should be(2)
   }
@@ -162,19 +162,19 @@ class CelebrityTests extends EgraphsUnitTest
     ).withPublishedStatus(PublishedStatus.Published)
   }
 
-  it should "return all associated filterValues" in {
+  it should "return all associated CategoryValues" in {
     val celeb = TestData.newSavedCelebrity()
-    val filter1 = TestData.newSavedFilter
-    val filter2 = TestData.newSavedFilter
-    val filterValue1 = TestData.newSavedFilterValue(filter1.id)
-    val filterValue2 = TestData.newSavedFilterValue(filter2.id)
+    val category1 = TestData.newSavedCategory
+    val category2 = TestData.newSavedCategory
+    val categoryValue1 = TestData.newSavedCategoryValue(category1.id)
+    val categoryValue2 = TestData.newSavedCategoryValue(category2.id)
 
-    celeb.filterValues.associate(filterValue1)
-    celeb.filterValues.associate(filterValue2)
+    celeb.categoryValues.associate(categoryValue1)
+    celeb.categoryValues.associate(categoryValue2)
 
-    celeb.filterValues.size should be (2)
-    celeb.filterValues.exists(fv => fv.id == filterValue1.id) should be (true)
-    celeb.filterValues.exists(fv => fv.id == filterValue2.id) should be (true)
+    celeb.categoryValues.size should be (2)
+    celeb.categoryValues.exists(cv => cv.id == categoryValue1.id) should be (true)
+    celeb.categoryValues.exists(cv => cv.id == categoryValue2.id) should be (true)
   }
 
   //

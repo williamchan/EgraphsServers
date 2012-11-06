@@ -1,4 +1,4 @@
-@(filters: Iterable[models.filters.Filter] = None)(implicit authToken: egraphs.authtoken.AuthenticityToken,
+@(categories: Iterable[models.categories.Category] = None)(implicit authToken: egraphs.authtoken.AuthenticityToken,
   paginationInfo: controllers.PaginationInfo,
   headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData)
@@ -17,14 +17,14 @@
   <div id="main" class="sub">
     <div class="container" id="celebrity-admin">
       <h1>
-        Filters @paginationInfo.totalResultsStr
+        Categories @paginationInfo.totalResultsStr
       </h1>
 	  <div class="row-fluid">
 	  	<div class="span12">
-	  	  <h3>Create a filter</h3>
-	      @safeForm('method -> "POST", 'action -> routes.WebsiteControllers.postFilterAdmin.url, 'enctype -> "multipart/form-data", 'class -> "form-inline"){
+	  	  <h3>Create a category</h3>
+	      @safeForm('method -> "POST", 'action -> routes.WebsiteControllers.postCategoryAdmin.url, 'enctype -> "multipart/form-data", 'class -> "form-inline"){
       	  <label>Name</label>  
-          <input type="hidden" name="filterId" value="0">
+          <input type="hidden" name="categoryId" value="0">
           <input type="text" name="name">
           <span class="help-block">The name should be easy to search for like "MLB" or "NBA Position"</span>
           <label>PublicName</label>
@@ -42,11 +42,11 @@
               <th>PublicName</th>
             </tr>
           </thead>
-        @filters.map { (filter)  =>
+        @categories.map { (category)  =>
           <tr>
-            <td><a href="@routes.WebsiteControllers.getFilterAdmin(filter.id)">@filter.id</a></td>
-            <td>@filter.name</td>
-            <td>@filter.publicName</td>
+            <td><a href="@routes.WebsiteControllers.getCategoryAdmin(category.id)">@category.id</a></td>
+            <td>@category.name</td>
+            <td>@category.publicName</td>
           </tr> 
         }
       </table>  
@@ -56,4 +56,4 @@
 </section>    
 }
 
-@base_template(title="Admin - Filters", body=body)
+@base_template(title="Admin - Categories", body=body)
