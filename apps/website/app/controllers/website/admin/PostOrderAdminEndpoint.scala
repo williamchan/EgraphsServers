@@ -15,7 +15,7 @@ import play.api.data.validation.Constraints._
 import play.api.data.validation.Constraint
 import play.api.data.validation.Valid
 import play.api.data.validation.Invalid
-import services.print.{PrintManufacturingInfo, LandscapeFramedPrint}
+import services.print.{ PrintManufacturingInfo, LandscapeFramedPrint }
 
 trait PostOrderAdminEndpoint { this: Controller =>
 
@@ -34,12 +34,12 @@ trait PostOrderAdminEndpoint { this: Controller =>
             val action = Form("action" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm)
             action match {
               case "approve" =>
-              	order.approveByAdmin(admin).save()
-              	Redirect(GetOrderAdminEndpoint.url(orderId))
+                order.approveByAdmin(admin).save()
+                Redirect(GetOrderAdminEndpoint.url(orderId))
               case "reject" =>
                 val rejectionReason = Form(single("rejectionReason" -> text)).bindFromRequest.apply("rejectionReason").value
-              	order.rejectByAdmin(admin, rejectionReason = rejectionReason).save()
-              	Redirect(GetOrderAdminEndpoint.url(orderId))
+                order.rejectByAdmin(admin, rejectionReason = rejectionReason).save()
+                Redirect(GetOrderAdminEndpoint.url(orderId))
               case "editMessages" => {
                 val msgs = Form(tuple("recipientName" -> text, "messageToCelebrity" -> text, "requestedMessage" -> text)).bindFromRequest.value.get
                 val recipientName = Option(msgs._1)
@@ -65,8 +65,8 @@ trait PostOrderAdminEndpoint { this: Controller =>
                     val pngUrl = egraph.getSavedEgraphUrlAndImage(LandscapeFramedPrint.targetEgraphWidth)._1
                     val framedPrintImageUrl = egraph.getFramedPrintImageUrl
                     val csv = PrintManufacturingInfo.toCSVLine(buyerEmail = order.buyer.account.email,
-                    	shippingAddress = "",
-                    	partnerPhotoFile = egraph.framedPrintFilename)
+                      shippingAddress = "",
+                      partnerPhotoFile = egraph.framedPrintFilename)
                     Ok(views.html.Application.admin.admin_printinfo(framedPrintImageUrl, PrintManufacturingInfo.headerCSVLine, csv, Some(pngUrl)))
                   }
                 }

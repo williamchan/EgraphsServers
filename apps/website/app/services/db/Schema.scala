@@ -138,6 +138,11 @@ class Schema @Inject()(
       usernameHistory.customerId is indexed
     )
   )
+  
+  // make new table here?
+  val videoAssets = table[VideoAsset]
+  val videoCelebrityAssets = table[VideoCelebrityAsset]
+
 
   // ugh, why did I make so many biometrics tables?
   val vbgAudioCheckTable = table[VBGAudioCheck]
@@ -204,7 +209,12 @@ class Schema @Inject()(
     .via((celebrity, product) => celebrity.id === product.celebrityId)
   val celebrityToInventoryBatches = oneToManyRelation(celebrities, inventoryBatches)
     .via((celebrity, inventoryBatch) => celebrity.id === inventoryBatch.celebrityId)
-
+  
+/** I don't really know what I'm doing here */
+  val celebrityToVideoCelebrityAssets = oneToManyRelation(celebrities, videoCelebrityAssets)
+    .via((celebrity, videoCelebrityAsset) => celebrity.id === videoCelebrityAsset.celebrityId)
+  // maybe foreignKeyDeclaration?
+    
   val customerToUsernameHistory = oneToManyRelation(customers, usernameHistories)
     .via((customer, usernameHistory) => customer.id === usernameHistory.customerId)
   customerToUsernameHistory.foreignKeyDeclaration.constrainReference(onDelete cascade)

@@ -10,8 +10,9 @@
 
       @helper.form(action = routes.ApiControllers.postVideoAsset, 'enctype -> "multipart/form-data") {
 
-        <input type="file" name="video">
-        <input type="submit" name="submit"> 
+        <input type="file" name="video" />
+        <input type="text" name="celebrityId" />
+        <input type="submit" name="submit" /> 
 
       }
 
