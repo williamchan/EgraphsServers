@@ -69,6 +69,7 @@ object Global extends GlobalSettings with Logging {
    * Egraphs error page for 400
    */
   override def onBadRequest(request: RequestHeader, error: String): Result = {
+    log("400 error: " + request + " from request " + error)
     BadRequest(views.html.frontend.errors.bad_request())
   }
   
@@ -77,6 +78,7 @@ object Global extends GlobalSettings with Logging {
    */
   override def onError(request: RequestHeader, ex: Throwable): Result = {
     if (Play.isProd) {
+      log("500 error: " + request + " from request " + ex.getStackTraceString)
       InternalServerError(views.html.frontend.errors.error())
     } else {
       super.onError(request, ex)
