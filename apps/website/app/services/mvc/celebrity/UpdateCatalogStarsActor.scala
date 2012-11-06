@@ -85,7 +85,7 @@ private[mvc] object UpdateCatalogStarsActor extends Logging {
   private[celebrity] val singleton = {
     Akka.system.actorOf(Props(AppConfig.instance[UpdateCatalogStarsActor])) 
   }
-  private[celebrity] val updatePeriodSeconds = 5 * DateTimeConstants.SECONDS_PER_MINUTE
+  private[celebrity] val updatePeriodSeconds = 8 * DateTimeConstants.SECONDS_PER_MINUTE
   private[celebrity] val resultsCacheKey = "catalog-stars"
   private[celebrity] case class UpdateCatalogStars(recipientActor: ActorRef)
 
