@@ -70,7 +70,7 @@ class CategoryValueTests  extends EgraphsUnitTest
       val childCategory = TestData.newSavedCategory
 
       categoryValue.categories.associate(childCategory)
-      categoryValue.categories.exists(f => f.id == childCategory.id) should be (true)
+      categoryValue.categories.exists(c => c.id == childCategory.id) should be (true)
 
     }
 
@@ -82,7 +82,7 @@ class CategoryValueTests  extends EgraphsUnitTest
       categoryValue.categories.size should be (childCategories.size)
 
       childCategories.map(cf =>
-        categoryValue.categories.exists(f => f.id == cf.id)
+        categoryValue.categories.exists(c => c.id == cf.id)
       )
     }
 

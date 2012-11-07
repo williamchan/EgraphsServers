@@ -63,9 +63,9 @@ class CategoryValueStore @Inject() (
    */
   def findByCategoryId(categoryId: Long) : Query[CategoryValue] = {
     from(schema.categoryValues)(
-      (fv) =>
-       where(fv.categoryId === categoryId)
-       select(fv)
+      (categoryValue) =>
+       where(categoryValue.categoryId === categoryId)
+       select(categoryValue)
     )
   }
   /**
