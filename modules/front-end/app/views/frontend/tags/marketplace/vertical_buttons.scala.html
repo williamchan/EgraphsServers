@@ -1,0 +1,9 @@
+@(verticalViewModels: Iterable[models.frontend.marketplace.VerticalViewModel])
+@import views.frontend.Utils
+@import models.frontend.egraphs._
+<ul class="top-verticals-nav">
+@for(vertical <- verticalViewModels) {
+     <li><a @if(vertical.active){class="active"} data-verticalname=@vertical.verticalName href="#"><img src='@RemoteAssets.at(vertical.iconUrl)' width="33" height="17"> <span>@vertical.shortName</span></a></li>
+  
+}
+</ul> <!-- end .top-verticals-nav -->

@@ -1,4 +1,7 @@
-@()(
+@(verticalViewModels: Iterable[models.frontend.marketplace.VerticalViewModel],
+  results: Iterable[models.frontend.marketplace.ResultSetViewModel],
+  categoryViewModels: Iterable[models.frontend.marketplace.CategoryViewModel] = List[models.frontend.marketplace.CategoryViewModel]()
+)(
   implicit
   headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData,
@@ -6,6 +9,20 @@
 )
 @import views.frontend.Utils
 @import models.frontend.egraphs._
+@import play.api.libs.json._
+
+
+@init = {
+@*** 
+Translates a map of categories and their categoryvalues into a JsonObject that can be easily converted to a URL query arguments using $.param(Egraphs.page.categories)
+***@
+ Egraphs.page.categories = @Html(
+  Json.toJson(categoryViewModels.foldLeft[Map[String, JsValue]](Map())(
+    (a, b) => a ++ b.asMap
+  )).toString
+ )
+
+}
 @baseBody = {
 
 <section id="content" class="marketplace" role="main">
@@ -35,209 +52,31 @@
           <h2>Categories</h2>
           
           <ol>
-            <li><a href="#">Major League Baseball</a></li>
-            <li><a href="#">National Basketball Association</a></li>
-            <li><a href="#">Monster Jam</a></li>
+          @for(vertical <- verticalViewModels) {
+            <li><a href="#">@vertical.publicName</a></li>
+            }
           </ol>
         
         </aside>
-
         <div class="main span9">
-
-          <ul class="top-verticals-nav">
-              <li><a href="#"><img src='@RemoteAssets.at("images/icon-logo-mlb.png")' width="33" height="17"> <span>MLB</span></a></li>
-              <li><a href="#"><img src='@RemoteAssets.at("images/icon-logo-nba.png")' width="12" height="27"> <span>NBA</span></a></li>
-              <li><a href="#"><img src='@RemoteAssets.at("images/icon-logo-monster-jam.png")' width="31" height="25"> <span>Monster Jam</span></a></li>          
-          </ul> <!-- end .top-verticals-nav -->
-
+          @tags.marketplace.vertical_buttons(verticalViewModels)
+          
           <aside class="mobile-nav">
           
             <select class="chsn-select">
-              <optgroup label="Categories">
-                <option>Major League Baseball</option>
-                <option>National Basketball Association</option>
-                <option>Monster Jam</option>
+              <optgroup label="Categories" name="categories">
+              @for(vertical <- verticalViewModels) {
+                <option value="@vertical.verticalName">@vertical.publicName</option>
+              }  
               </optgroup>              
             </select>
             
           </aside> <!-- end .mobile-nav -->
           
-          <aside class="view-options clearfix">
+          @tags.marketplace.view_options()
+          @tags.marketplace.result_set(results)
           
-            <div class="sort-by">
-            
-              <h2>Sort By:</h2>
-              
-              <ol>
-                <li><a href="#" class="active">Recently Added</a></li>
-                <li><a href="#">Most Popular</a></li>
-                <li><a href="#">Price (Low to High)</a></li>
-                <li><a href="#">Price (High to Low)</a></li>
-                <li><a href="#">Alphabetical (A&dash;Z)</a></li>
-                <li><a href="#">Alphabetical (Z&dash;A)</a></li>
-              </ol>
-              
-              <form class="picker">
-                
-                <select class="chsn-select">
-                  <option selected>Recently Added</option>
-                  <option>Most Popular</option>
-                  <option>Price (Low to High)</option>
-                  <option>Price (High to Low)</option>
-                  <option>Alphabetical (A&dash;Z)</option>
-                  <option>Alphabetical (Z&dash;A)</option>               
-                </select>
-              
-              </form>
-            
-            </div> <!-- end .sort-by -->
-            
-            <div class="view-as">
-              
-              <h2>View As:</h2>
-              
-              <ul>
-                <li class="grid active"><a href="#grid"><span>Grid</span> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i></a></li>
-                <li class="list"><a href="#list"><span>List</span> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i></a></li>
-              </ul>
-            
-            </div>
           
-          </aside> <!-- end .view-options -->
-          
-          <div class="verticals">
-
-            <section class="clearfix">
-            
-              <h1><a href="#" title="View all for: Vertical">Vertical</a></h1>
-            
-              <div class="clearfix">
-                
-                <article>
-                
-                  <figure>
-                    <a href="#"><img src="http://placehold.it/660x350&amp;text=Celeb+Photo+2x+(Retina)" alt="FPO image"></a>
-                  </figure>
-                
-                  <hgroup>            
-                    <h2><a href="#" title="View celeb: Celeb Name">Celeb Name</a></h2> 
-                    <h3><a href="#" title="View: Celeb Category / Team">Celeb Category / Team</a></h3>
-                  </hgroup>
-                  
-                  <p><a href="#">$50&ndash;75</a></p>
-                
-                </article>
-
-                <article>
-                
-                  <figure>
-                    <a href="#"><img src="http://placehold.it/660x350&amp;text=Celeb+Photo+2x+(Retina)" alt="FPO image"></a>
-                  </figure>
-                
-                  <hgroup>            
-                    <h2><a href="#" title="View celeb: Celeb Name">Celeb Name</a></h2> 
-                    <h3><a href="#" title="View: Celeb Category / Team">Celeb Category / Team</a></h3>
-                  </hgroup>
-                  
-                  <p><a href="#">$50&ndash;75</a></p>
-                
-                </article>
-    
-                <article>
-                
-                  <figure>            
-                    <a href="#" class="ribbon"><em>Sold Out</em></a>                   
-                    <a href="#"><img src="http://placehold.it/660x350&amp;text=Celeb+Photo+2x+(Retina)" alt="FPO image"></a>
-                  </figure>
-                
-                  <hgroup>            
-                    <h2><a href="#" title="View celeb: Celeb Name">Celeb Name</a></h2> 
-                    <h3><a href="#" title="View: Celeb Category / Team">Celeb Category / Team</a></h3>
-                  </hgroup>
-                  
-                  <p><a href="#">$50&ndash;75</a></p>
-                
-                </article>
-    
-                <article>
-                
-                  <figure>
-                    <a href="#"><img src="http://placehold.it/660x350&amp;text=Celeb+Photo+2x+(Retina)" alt="FPO image"></a>
-                  </figure>
-                
-                  <hgroup>            
-                    <h2><a href="#" title="View celeb: Celeb Name">Celeb Name</a></h2> 
-                    <h3><a href="#" title="View: Celeb Category / Team">Celeb Category / Team</a></h3>
-                  </hgroup>
-                  
-                  <p><a href="#">$50&ndash;75</a></p>
-                
-                </article>
-              
-              </div>
- 
-              <p class="see-more"><em><a href="#" class="clearfix"><b>See All</b> <i><span>&darr;</span></i></a></em> </p> 
-              
-            </section> <!-- end section (vertical) -->
-          
-            <section>
-            
-              <h1><a href="#" title="View all for: Vertical">Vertical</a></h1>
-              
-              <div class="clearfix">
-              
-                <article>
-                
-                  <figure>
-                    <a href="#"><img src="http://placehold.it/660x350&amp;text=Celeb+Photo+2x+(Retina)" alt="FPO image"></a>
-                  </figure>
-                
-                  <hgroup>            
-                    <h2><a href="#" title="View celeb: Celeb Name">Celeb Name</a></h2> 
-                    <h3><a href="#" title="View: Celeb Category / Team">Celeb Category / Team</a></h3>
-                  </hgroup>
-                  
-                  <p><a href="#">$50&ndash;75</a></p>
-                
-                </article>
-    
-                <article>
-                
-                  <figure>
-                    <a href="#"><img src="http://placehold.it/660x350&amp;text=Celeb+Photo+2x+(Retina)" alt="FPO image"></a>
-                  </figure>
-                
-                  <hgroup>            
-                    <h2><a href="#" title="View celeb: Celeb Name">Celeb Name</a></h2> 
-                    <h3><a href="#" title="View: Celeb Category / Team">Celeb Category / Team</a></h3>
-                  </hgroup>
-                  
-                  <p><a href="#">$50&ndash;75</a></p>
-                
-                </article>
-    
-                <article>
-                
-                  <figure>
-                    <a href="#"><img src="http://placehold.it/660x350&amp;text=Celeb+Photo+2x+(Retina)" alt="FPO image"></a>
-                  </figure>
-                
-                  <hgroup>            
-                    <h2><a href="#" title="View celeb: Celeb Name">Celeb Name</a></h2> 
-                    <h3><a href="#" title="View: Celeb Category / Team">Celeb Category / Team</a></h3>
-                  </hgroup>
-                  
-                  <p><a href="#">$50&ndash;75</a></p>
-                
-                </article>
-              
-              </div>
-              
-              <p class="see-more"><em><a href="#" class="clearfix"><b>See All</b> <i><span>&darr;</span></i></a></em> </p> 
-              
-            </section> <!-- end section (vertical) -->
-
-          </div> <!-- end .verticals -->
 
         </div>
        
@@ -253,4 +92,4 @@
 
 }
 
-@base_template(title="Marketplace", jsMain = "pages/marketplace", body=baseBody)
+@base_template(title="Marketplace", jsMain = "pages/marketplace", headJs = init, body=baseBody)

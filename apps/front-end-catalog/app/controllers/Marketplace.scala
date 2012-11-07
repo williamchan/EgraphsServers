@@ -3,15 +3,18 @@ package controllers
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import models.frontend.contents.Section
+import models.frontend.marketplace._
 import helpers.DefaultImplicitTemplateParameters
+import scala.util.Random
 
 /**
  * Marketplace controller
  */
 object Marketplace extends Controller with DefaultImplicitTemplateParameters {
+  val coinflip = Random
 
   def index() = Action {
-    Ok(views.html.frontend.marketplace_landing())
+    Ok(views.html.frontend.marketplace_landing(verticalSet, resultSet, categoryViewModels))
   }
 
   def mlb() = Action {
@@ -23,7 +26,75 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
   }
 
   def mlb_teams() = Action {
-    Ok(views.html.frontend.marketplace_mlb_teams())
+    Ok(views.html.frontend.marketplace_mlb_teams(verticalSet, resultSet, categoryViewModels))
   }
   
+  def categorySet : Iterable[CategoryViewModel] = {
+    val categoryNames = List("Team", "Position").zipWithIndex
+    val categoryValueNames = List("Category1", "Category2", "Category3", "Category4").zipWithIndex
+    
+    for((fname: String, id: Int) <- categoryNames) yield {
+      CategoryViewModel(
+        id = id,
+        publicName = fname,  
+        for((fvname: String, id: Int) <- categoryValueNames) yield {
+          CategoryValueViewModel(id = id, publicName = fvname, active = coinflip.nextBoolean)
+        }
+      )
+    }
+  }
+  
+  def verticalSet : Iterable[VerticalViewModel] = {
+    List(
+        VerticalViewModel(verticalName="mlb",  publicName = "Major League Baseball", shortName="MLB", iconUrl = "images/icon-logo-mlb.png", active = true),
+        VerticalViewModel(verticalName="nba", publicName = "National Basketball Association", shortName="NBA",iconUrl = "images/icon-logo-nba.png"),
+        VerticalViewModel(verticalName="mj", publicName = "Monster Jam", shortName="Monster Jam", iconUrl = "images/icon-logo-monster-jam.png")
+    ).toSet
+  }
+  
+  def resultSet : Iterable[ResultSetViewModel] = {
+    List(ResultSetViewModel(subtitle = Option("Herpson"), celebrities = celebViewModels(3)),
+         ResultSetViewModel(subtitle = Option("Derpson"), celebrities = celebViewModels(5)),
+         ResultSetViewModel(subtitle = Option("Perpson"), celebrities = celebViewModels(9))
+    )
+  }
+  
+  def celebViewModels(quantity : Int) : Iterable[CelebrityViewModel] = {
+    for(i <- 0.until(quantity)) yield {
+      CelebrityViewModel(
+        id = i,
+        publicName =  "Herp Derpson",
+        photoUrl = "images/660x350.gif",
+        soldout = coinflip.nextBoolean,
+        minPrice =  45,
+        maxPrice = 90,
+        subtitle = "Boston Red Sox"
+      )
+    }
+  }
+  
+  def categoryViewModels : Iterable[CategoryViewModel] = {
+    List(
+        CategoryViewModel(
+            id = 1, 
+            publicName = "Team", 
+            categoryValues = List(
+              CategoryValueViewModel(id = 2, publicName = "Boston Red Sox", active = true),
+              CategoryValueViewModel(id = 3, publicName = "Miami Marlins", active = false),
+              CategoryValueViewModel(id = 4, publicName = "New York Yankees", active = false)
+            )
+        ),
+        CategoryViewModel(
+            id = 2, 
+            publicName = "Position", 
+            categoryValues = List(
+              CategoryValueViewModel(id = 5, publicName = "Pitcher", active = false),
+              CategoryValueViewModel(id = 6, publicName = "Shortstop", active = true),
+              CategoryValueViewModel(id = 7, publicName = "Catcher", active = false)
+            )
+        )
+    )
+  }
+
 }
+

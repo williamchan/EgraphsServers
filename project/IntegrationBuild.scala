@@ -5,7 +5,7 @@ import PlayProject._
 /**
  * Testing out making a simple integration app.
  */
-object FrontendCatalogBuild extends Build {
+object IntegrationBuild extends Build {
 
     val appName         = "integration-app"
     val appVersion      = "2.0-SNAPSHOT"

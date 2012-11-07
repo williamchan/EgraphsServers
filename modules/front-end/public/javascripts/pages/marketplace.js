@@ -1,5 +1,10 @@
 define(["libs/chosen/chosen.jquery.min"], function (Egraphs) {
   return {
+    applyFilter: function(filterId, filterValue) {
+      Egraphs.page.categories["c" + filterId].push(filterValue);
+      window.location.href = window.location.href+"?"+$.param(Egraphs.page.filters);   
+    },
+
     go: function () {
      $(document).ready(function() {
 

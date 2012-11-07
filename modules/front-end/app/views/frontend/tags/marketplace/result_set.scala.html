@@ -1,0 +1,35 @@
+@(results: Iterable[models.frontend.marketplace.ResultSetViewModel])
+
+<div class="verticals">
+  @for(resultSet <- results) {
+    <section class="clearfix">
+
+      <h1><a href="#" title="View all for: @resultSet.subtitle">@resultSet.subtitle</a></h1>
+
+      <div class="clearfix">
+        @for(celebrity <- resultSet.celebrities) {
+          <article>            
+            <figure>
+              @if(celebrity.soldout) {
+                <a href="#" class="ribbon"><em>Sold Out</em></a>     
+              }
+                <a href="#"><img src="@RemoteAssets.at(celebrity.photoUrl)" alt="FPO image"></a>
+            </figure>
+              
+            <hgroup>            
+              <h2><a href="#" title="View celeb: Celeb Name">@celebrity.publicName</a></h2> 
+              <h3><a href="#" title="View: Celeb Category / Team">@celebrity.subtitle</a></h3>
+            </hgroup>
+              
+            <p><a href="#">$@celebrity.minPrice&ndash;@celebrity.maxPrice</a></p>
+              
+          </article>
+        }
+            
+        </div>
+ 
+      <p class="see-more"><em><a href="#" class="clearfix"><b>See All</b> <i><span>&darr;</span></i></a></em> </p> 
+            
+      </section> <!-- end section (vertical) -->
+  }
+</div> <!-- end .verticals -->

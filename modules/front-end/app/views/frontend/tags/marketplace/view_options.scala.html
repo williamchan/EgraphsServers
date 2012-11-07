@@ -1,0 +1,45 @@
+@()
+@import views.frontend.Utils
+@import models.frontend.egraphs._
+
+ <aside class="view-options clearfix">
+  <div class="sort-by">
+  
+    <h2>Sort By:</h2>
+    
+    <ol>
+      <li><a href="#" class="active">Recently Added</a></li>
+      <li><a href="#">Most Popular</a></li>
+      <li><a href="#">Price (Low to High)</a></li>
+      <li><a href="#">Price (High to Low)</a></li>
+      <li><a href="#">Alphabetical (A&dash;Z)</a></li>
+      <li><a href="#">Alphabetical (Z&dash;A)</a></li>
+    </ol>
+    
+    <form class="picker">
+      
+      <select class="chsn-select">
+        <option selected>Recently Added</option>
+        <option>Most Popular</option>
+        <option>Price (Low to High)</option>
+        <option>Price (High to Low)</option>
+        <option>Alphabetical (A&dash;Z)</option>
+        <option>Alphabetical (Z&dash;A)</option>               
+      </select>
+    
+    </form>
+  
+  </div> <!-- end .sort-by -->
+  
+  <div class="view-as">
+    
+    <h2>View As:</h2>
+    
+    <ul>
+      <li class="grid active"><a href="#grid"><span>Grid</span> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i></a></li>
+      <li class="list"><a href="#list"><span>List</span> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i></a></li>
+    </ul>
+  
+  </div>
+
+</aside> <!-- end .view-options -->

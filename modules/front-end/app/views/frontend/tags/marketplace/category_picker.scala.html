@@ -1,0 +1,13 @@
+@(categoryViewModels: Iterable[models.frontend.marketplace.CategoryViewModel])
+<h2>Major League Baseball</h2>
+          
+<ol>
+  @for(category <- categoryViewModels) {
+    <li class="active"> @category.publicName 
+        <ol>
+        @for(categoryValue <- category.categoryValues) {
+          <li><a href="#" @if(categoryValue.active){class="active"} title="">@categoryValue.publicName</a></li>
+          }
+        </ol>  
+    </li>
+  }

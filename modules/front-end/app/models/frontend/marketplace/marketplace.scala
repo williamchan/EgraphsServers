@@ -1,0 +1,49 @@
+package models.frontend.marketplace
+
+import play.api.libs.json._
+
+
+case class CelebrityViewModel(
+    id: Long  = 0,
+    publicName: String,
+    photoUrl: String,
+    soldout: Boolean,
+    minPrice: Int,
+    maxPrice: Int, 
+    subtitle: String
+  ) 
+
+ case class CategoryViewModel(
+  id: Long = 0,
+  publicName: String,
+  categoryValues: Seq[CategoryValueViewModel]
+) {
+  def asMap : Map[String, JsValue] = {
+      Map(
+         "c" + id.toString -> 
+          Json.toJson(categoryValues.map( fv => 
+            Json.toJson(fv.id)  
+          ).toSeq)
+      )
+  }
+}
+
+case class CategoryValueViewModel(
+  id: Long= 0,
+  publicName: String, 
+  active: Boolean
+) 
+
+
+case class VerticalViewModel(
+  verticalName: String, 
+  publicName: String,
+  shortName: String,
+  iconUrl: String,
+  active: Boolean = false
+)
+
+case class ResultSetViewModel(
+    subtitle: Option[String],
+    celebrities: Iterable[CelebrityViewModel] = List()
+)
