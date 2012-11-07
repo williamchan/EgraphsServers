@@ -18,14 +18,18 @@ case class CelebrityViewModel(
   publicName: String,
   categoryValues: Seq[CategoryValueViewModel]
 ) {
-  def asMap : Map[String, JsValue] = {
+  def asActiveMap : Map[String, JsValue] = {
       Map(
          "c" + id.toString -> 
-          Json.toJson(categoryValues.map( fv => 
+          Json.toJson(categoryValues.filter(cv => cv.active).map( fv => 
             Json.toJson(fv.id)  
           ).toSeq)
       )
   }
+  
+  def active : Boolean = {
+    categoryValues.exists(cv => cv.active == true)
+  } 
 }
 
 case class CategoryValueViewModel(

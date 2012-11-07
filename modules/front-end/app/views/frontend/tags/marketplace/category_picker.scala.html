@@ -3,10 +3,11 @@
           
 <ol>
   @for(category <- categoryViewModels) {
-    <li class="active"> @category.publicName 
+    <li>
+     <a href="" @if(category.active){class="active"} data-category="@category.id">@category.publicName</a> 
         <ol>
         @for(categoryValue <- category.categoryValues) {
-          <li><a href="#" @if(categoryValue.active){class="active"} title="">@categoryValue.publicName</a></li>
+          <li><a class="cv-link @if(categoryValue.active){active}" title="" data-category="@category.id" data-categoryvalue="@categoryValue.id">@categoryValue.publicName</a></li>
           }
         </ol>  
     </li>

@@ -14,19 +14,20 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
   val coinflip = Random
 
   def index() = Action {
-    Ok(views.html.frontend.marketplace_landing(verticalSet, resultSet, categoryViewModels))
+    Ok(views.html.frontend.marketplace_landing("derp",verticalSet, resultSet, categoryViewModels))
   }
 
+  
+  def mlb_teams() = Action {
+    Ok(views.html.frontend.marketplace_mlb_teams("http://localhost:9000/Marketplace/mlb/teams", verticalSet, resultSet, categoryViewModels))
+  }
+  
   def mlb() = Action {
     Ok(views.html.frontend.marketplace_mlb())
   }
 
   def mlb_list() = Action {
     Ok(views.html.frontend.marketplace_mlb_list())
-  }
-
-  def mlb_teams() = Action {
-    Ok(views.html.frontend.marketplace_mlb_teams(verticalSet, resultSet, categoryViewModels))
   }
   
   def categorySet : Iterable[CategoryViewModel] = {

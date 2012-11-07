@@ -1,10 +1,5 @@
 define(["libs/chosen/chosen.jquery.min"], function (Egraphs) {
   return {
-    applyFilter: function(filterId, filterValue) {
-      Egraphs.page.categories["c" + filterId].push(filterValue);
-      window.location.href = window.location.href+"?"+$.param(Egraphs.page.filters);   
-    },
-
     go: function () {
      $(document).ready(function() {
 
@@ -16,7 +11,24 @@ define(["libs/chosen/chosen.jquery.min"], function (Egraphs) {
         }, function() {
           $(this).removeClass('hover'); 
         });
+        /**
+         * Binds all links with class cv-link to refresh the page with the specified category value
+         * as a further refinement to the query. 
+        **/  
+        $(".cv-link").click(function(e){
+          var link = $(this);
+          var catId = link.attr("data-category");
+          var catVal = link.attr("data-categoryvalue");  
+          var categories = window.Egraphs.page.categories
+          
+          categories["c" + catId].push(catVal);
+          window.location.href = window.Egraphs.page.queryUrl + "?" + $.param(categories);
+          e.preventDefault();  
+        });  
 
+        /**
+         *  TODO: Further refinement functions such as a Vertical. 
+         **/ 
       });
     }
   }
