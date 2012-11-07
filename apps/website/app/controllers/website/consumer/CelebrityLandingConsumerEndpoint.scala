@@ -23,9 +23,11 @@ private[consumer] trait CelebrityLandingConsumerEndpoint
   protected def httpFilters: HttpFilters  
 
   def getCelebrityLanding(celebrityUrlSlug: String) = controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireCelebrityUrlSlug(celebrityUrlSlug) { celebrity =>
-      Action { implicit request =>
-        Ok(CelebrityLandingConsumerEndpoint.getCelebrityLandingHtml(celebrity))
+    httpFilters.requireCelebrityUrlSlug(celebrityUrlSlug) { maybeUnpublishedcelebrity =>
+      httpFilters.requireAdministratorLogin.inSessionOrUseOtherFilter(maybeUnpublishedcelebrity)(otherFilter = httpFilters.requireCelebrityPublished.filter(maybeUnpublishedcelebrity)) { celebrity =>
+        Action { implicit request =>
+          Ok(CelebrityLandingConsumerEndpoint.getCelebrityLandingHtml(celebrity))
+        }
       }
     }
   }

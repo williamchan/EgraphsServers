@@ -16,7 +16,7 @@ private[controllers] trait GetRootAdminEndpoint extends ImplicitHeaderAndFooterD
 
   def getRootAdmin = controllerMethod() {
     controllerMethod() {
-      httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+      httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
         Action { implicit request =>
           Redirect(GetCelebritiesAdminEndpoint.location)
         }

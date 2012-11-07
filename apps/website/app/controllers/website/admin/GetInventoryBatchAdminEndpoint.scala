@@ -17,7 +17,7 @@ private[controllers] trait GetInventoryBatchAdminEndpoint extends ImplicitHeader
   protected def inventoryBatchStore: InventoryBatchStore
 
   def getInventoryBatchAdmin(inventoryBatchId: Long) = controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       httpFilters.requireInventoryBatchId(inventoryBatchId) { inventoryBatch =>
         Action { implicit request =>
           implicit val flash = request.flash + 

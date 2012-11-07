@@ -26,7 +26,7 @@ trait PostSendCelebrityWelcomeEmailAdminEndpoint {
   protected def transactionalMail: TransactionalMail
 
   def postSendCelebrityWelcomeEmailAdmin(celebrityId: Long) = postController() {
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       httpFilters.requireCelebrityId(celebrityId) { celebrity =>
         Action { implicit request => 
           val emailForm = Form(single("celebrityEmail" -> email.verifying(nonEmpty)))

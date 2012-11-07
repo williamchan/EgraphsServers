@@ -20,7 +20,7 @@ private[controllers] trait GetCelebrityOrdersAdminEndpoint extends ImplicitHeade
   protected def orderQueryFilters: OrderQueryFilters
 
   def getCelebrityOrdersAdmin(celebrityId: Long) = controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       httpFilters.requireCelebrityId(celebrityId) { (celebrity) =>
         Action { implicit request =>
           

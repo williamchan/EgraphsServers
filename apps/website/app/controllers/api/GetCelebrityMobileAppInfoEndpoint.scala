@@ -20,7 +20,7 @@ private[controllers] trait GetCelebrityMobileAppInfoEndpoint { this: Controller 
   private val iPadBuildVersionProp = "ipad.buildversion"
 
   def getCelebrityMobileAppInfo = controllerMethod() {
-    httpFilters.requireAuthenticatedAccount() { account =>
+    httpFilters.requireAuthenticatedAccount.inRequest() { account =>
       httpFilters.requireCelebrityId.inAccount(account) { celebrity =>
         Action {
           val iPadBuildVersion = config.ipadBuildVersion

@@ -19,7 +19,7 @@ private[celebrity] trait CatalogStarsQuerying extends Logging {
   protected def catalogStarActor: ActorRef
   protected def catalogStarUpdateActor: ActorRef
   
-  val timeout = Timeout(5.seconds)
+  val timeout = Timeout(10.seconds)
 
   /**
    * Grabs the current set of CatalogStars out of the cache actor, and updates
@@ -44,7 +44,7 @@ private[celebrity] trait CatalogStarsQuerying extends Logging {
           if (numUpdateAttempts > 0) {
             val futureOK = catalogStarUpdateActor.ask(UpdateCatalogStars(catalogStarActor))(timeout)
   
-            Await.result(futureOK, 5.minutes)
+            Await.result(futureOK, 10.minutes)
   
             this.apply(numUpdateAttempts = numUpdateAttempts - 1)
           } else {
@@ -62,7 +62,7 @@ private[celebrity] trait CatalogStarsQuerying extends Logging {
     
     // TODO: PLAY20 migration.... There must be a nicer way to use Await.result without having to catch exceptions.
     try {
-      Await.result(futureStars, 5.minutes) // this throws [AskTimeoutException: Timed out]
+      Await.result(futureStars, 10.minutes) // this throws [AskTimeoutException: Timed out]
     } catch {
       case e: Exception => {
         log("CatalogStarsQuerying threw exception: " + e.getLocalizedMessage())

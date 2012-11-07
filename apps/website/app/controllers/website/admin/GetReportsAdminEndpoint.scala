@@ -23,7 +23,7 @@ private[controllers] trait GetReportsAdminEndpoint extends ImplicitHeaderAndFoot
   // Controllers
   //
   def getReportsAdmin = controllerMethod() {
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       Action { implicit request =>
         val action: String = Form("action" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm)
 	    action match {

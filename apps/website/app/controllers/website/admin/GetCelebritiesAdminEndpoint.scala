@@ -19,7 +19,7 @@ private[controllers] trait GetCelebritiesAdminEndpoint extends ImplicitHeaderAnd
   protected def controllerMethod: ControllerMethod
 
   def getCelebritiesAdmin = controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       Action { implicit request =>
         // get query parameters
         val page: Int = Form("page" -> number).bindFromRequest.fold(formWithErrors => 1, validForm => validForm)
@@ -46,7 +46,7 @@ private[controllers] trait GetCelebritiesAdminEndpoint extends ImplicitHeaderAnd
    * @return CelebrityListings of matching result.
    */
   def getCelebritiesBySearchAdmin = controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       Action { implicit request =>
         val query = Form("query" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm)
         val listings = celebrityStore.findByTextQuery(query)

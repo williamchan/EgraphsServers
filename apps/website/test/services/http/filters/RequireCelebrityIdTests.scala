@@ -1,29 +1,23 @@
 package services.http.filters
 
-import models.CelebrityServices
+import org.scalatest.junit.JUnitRunner
+import org.junit.runner.RunWith
+import models.Account
 import models.Celebrity
 import models.CelebrityStore
-import models.enums.PublishedStatus
-import play.mvc.Http.Request
-import utils.{ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest}
-import java.util.Properties
-import services.Utils
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+import play.api.mvc.Results.Ok
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
-import play.api.mvc.Results._
+import play.api.mvc.Result
+import play.api.test.Helpers.FORBIDDEN
+import play.api.test.Helpers.OK
+import play.api.test.Helpers.status
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import org.mockito.Mockito.doReturn
-import services.db.Saves
-import services.db.SavesWithLongKey
+import services.http.filters.FilterTestUtil.EitherErrorOrSuccess2RichErrorOrSuccess
 import services.AppConfig
 import utils.DBTransactionPerTest
+import utils.EgraphsUnitTest
 import utils.TestData
-import play.api.mvc.Cookie
-import play.api.mvc.Result
-import models.Account
 
 @RunWith(classOf[JUnitRunner])
 class RequireCelebrityIdTests extends EgraphsUnitTest with DBTransactionPerTest {
@@ -38,27 +32,46 @@ class RequireCelebrityIdTests extends EgraphsUnitTest with DBTransactionPerTest 
   private def requestWithCelebrity(celebrityId: Long) = FakeRequest().withFormUrlEncodedBody(("celebrityId", celebrityId.toString))
   private def requestWithBadCelebrity = requestWithCelebrity(badCelebrityId) 
 
-  "asEither" should "find the celebrity if it is in the db and it should be on the right" in new EgraphsTestApplication {
+  "filter" should "find the celebrity if it is in the db and it should be on the right" in {
+    val celebrity = TestData.newSavedCelebrity()
+    val errorOrAccount = newRequireCelebrityId.filter(celebrity.id)
+
+    errorOrAccount should be(Right(celebrity))
+  }
+
+  it should "contain a Forbidden on the left if there is no celebrity ID found" in {
+    val errorOrAccount = newRequireCelebrityId.filter(badCelebrityId)
+    val result = errorOrAccount.toErrorOrOkResult
+
+    status(result) should be(FORBIDDEN)
+  }
+
+  "form" should "require an celebrityId" in {
+    val celebrity = TestData.newSavedCelebrity()
+    val boundForm = newRequireCelebrityId.form.bind(Map("celebrityId" -> celebrity.id.toString))
+
+    boundForm.value should be(Some(celebrity.id))
+  }
+
+  it should "fail if it does not have an celebrityId" in {
+    val boundForm = newRequireCelebrityId.form.bind(Map.empty[String, String])
+
+    boundForm.value should be(None)
+  }
+
+  it should "fail if the celebrityId is not a positive number" in {
+    val negativeAdminId = newRequireCelebrityId.form.bind(Map("celebrityId" -> -999L.toString))
+    val zeroAdminId = newRequireCelebrityId.form.bind(Map("celebrityId" -> 0.toString))
+
+    negativeAdminId.value should be(None)
+    zeroAdminId.value should be(None)
+  }
+
+  "filterInAccount" should "find the celebrity if it is in the db and it should be on the right" in new EgraphsTestApplication {
     val celebrity = TestData.newSavedCelebrity()
     val celebrityIdFilter = newRequireCelebrityId // this filter is what we are trying to test
     
-    val errorOrCelebrity = celebrityIdFilter.asEither(celebrity.id)
-    errorOrCelebrity should be (Right(celebrity))
-  }
-
-  it should "contain a Forbidden on the left if there is no celebrity ID found" in new EgraphsTestApplication {
-    val celebrityIdFilter = newRequireCelebrityId // this filter is what we are trying to test
-    
-    val errorOrCelebrity = celebrityIdFilter.asEither(badCelebrityId)
-    errorOrCelebrity.isLeft should be (true)
-    status(errorOrCelebrity.fold(error => error, celeb => Ok)) should be (FORBIDDEN)
-  }
-
-  "asEitherInAccount" should "find the celebrity if it is in the db and it should be on the right" in new EgraphsTestApplication {
-    val celebrity = TestData.newSavedCelebrity()
-    val celebrityIdFilter = newRequireCelebrityId // this filter is what we are trying to test
-    
-    val errorOrCelebrity = celebrityIdFilter.asEitherInAccount(celebrity.account)
+    val errorOrCelebrity = celebrityIdFilter.filterInAccount(celebrity.account)
     errorOrCelebrity should be (Right(celebrity))
   }
 
@@ -66,7 +79,7 @@ class RequireCelebrityIdTests extends EgraphsUnitTest with DBTransactionPerTest 
     val account = TestData.newSavedAccount()
     val celebrityIdFilter = newRequireCelebrityId // this filter is what we are trying to test
     
-    val errorOrCelebrity = celebrityIdFilter.asEitherInAccount(account)
+    val errorOrCelebrity = celebrityIdFilter.filterInAccount(account)
     errorOrCelebrity.isLeft should be (true)
     status(errorOrCelebrity.fold(error => error, celeb => Ok)) should be (FORBIDDEN)
   }
@@ -74,64 +87,9 @@ class RequireCelebrityIdTests extends EgraphsUnitTest with DBTransactionPerTest 
   it should "contain a Forbidden on the left if there is no account found" in new EgraphsTestApplication {
     val celebrityIdFilter = newRequireCelebrityId // this filter is what we are trying to test
     
-    val errorOrCelebrity = celebrityIdFilter.asEitherInAccount(badAccount)
+    val errorOrCelebrity = celebrityIdFilter.filterInAccount(badAccount)
     errorOrCelebrity.isLeft should be (true)
     status(errorOrCelebrity.fold(error => error, celeb => Ok)) should be (FORBIDDEN)
-  }
-
-  "apply" should "execute the provided block if a matching celebrity account was found" in new EgraphsTestApplication {
-    // Set up the mock operation to be performed on the authenticated account
-    val celebrity = TestData.newSavedCelebrity()
-    happyCelebrityFoundTest(celebrity)(
-      testOperation = (filter, blockToExecute) => filter(celebrity.id)(blockToExecute)
-    )
-  }
-
-  it should "be fine even if there is a bad celebrity in the request since that isn't being validated here" in new EgraphsTestApplication {
-    // Set up the mock operation to be performed on the authenticated account
-    val celebrity = TestData.newSavedCelebrity()
-    happyCelebrityFoundTest(celebrity, requestWithBadCelebrity)(
-      testOperation = (filter, blockToExecute) => filter(celebrity.id)(blockToExecute)
-    )
-  }
-
-  it should "not execute the provided block if there was no celebrity in request" in new EgraphsTestApplication {
-    noCelebrityFoundTest()(
-      testOperation = (filter, blockToExecute) => filter(badCelebrityId)(blockToExecute)
-    )
-  }
-
-  it should "not execute the provided block if there was no matching celebrity account" in new EgraphsTestApplication {
-    noCelebrityFoundTest()(
-      testOperation = (filter, blockToExecute) => filter(badCelebrityId)(blockToExecute)
-    )
-  }
-
-  "inRequest" should "execute the provided block if a matching celebrity account was found in the request" in new EgraphsTestApplication {
-    // Our request needs a celebrity id so that it should execute the body.
-    val celebrity = TestData.newSavedCelebrity()
-    val request = requestWithCelebrity(celebrity.id)
-
-    happyCelebrityFoundTest(celebrity, request)(
-      testOperation = (filter, blockToExecute) => filter.inRequest()(blockToExecute)
-    )
-  }
-
-  it should "not execute the provided block if a bad celebrity id was found in the request" in new EgraphsTestApplication {
-    // Our request needs a bad celebrity Id
-    val request = requestWithBadCelebrity
-
-    noCelebrityFoundTest(request)(
-      testOperation = (filter, blockToExecute) => filter.inRequest()(blockToExecute)
-    )
-  }
-
-  it should "not execute the provided block if a no celebrity id was found in the request" in new EgraphsTestApplication {
-    val request = FakeRequest()
-    
-    noCelebrityFoundTest(request)(
-      testOperation = (filter, blockToExecute) => filter.inRequest()(blockToExecute)
-    )
   }
 
   "inAccount" should "execute the provided block if a matching celebrity account was found in the db" in new EgraphsTestApplication {

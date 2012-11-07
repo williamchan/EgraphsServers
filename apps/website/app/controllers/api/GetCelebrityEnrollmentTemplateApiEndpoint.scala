@@ -18,7 +18,7 @@ private[controllers] trait GetCelebrityEnrollmentTemplateApiEndpoint { this: Con
    *
    */
   def getCelebrityEnrollmentTemplate = controllerMethod() {
-    httpFilters.requireAuthenticatedAccount() { account =>
+    httpFilters.requireAuthenticatedAccount.inRequest() { account =>
       httpFilters.requireCelebrityId.inAccount(account) { celeb =>
         Action {
           getCelebrityEnrollmentTemplateResult(celeb)

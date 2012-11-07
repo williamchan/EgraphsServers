@@ -10,6 +10,9 @@ trait AllAdminEndpoints
   with GetAccountAdminEndpoint
   with PostAccountAdminEndpoint
   with GetAccountsAdminEndpoint
+  with GetCategoryAdminEndpoint
+  with GetCategoriesAdminEndpoint
+  with GetCategoryValueAdminEndpoint
   with GetCelebritiesAdminEndpoint
   with GetCelebrityAdminEndpoint
   with GetCelebrityEgraphsAdminEndpoint
@@ -20,9 +23,6 @@ trait AllAdminEndpoints
   with GetCreateCelebrityProductAdminEndpoint
   with GetEgraphAdminEndpoint
   with GetEgraphsAdminEndpoint
-  with GetFilterAdminEndpoint
-  with GetFiltersAdminEndpoint
-  with GetFilterValueAdminEndpoint
   with GetInventoryBatchAdminEndpoint
   with GetLoginAdminEndpoint
   with GetOrderAdminEndpoint
@@ -32,12 +32,12 @@ trait AllAdminEndpoints
   with GetProductAdminEndpoint
   with GetReportsAdminEndpoint
   with GetToolsAdminEndpoint
+  with PostCategoryAdminEndpoint
+  with PostCategoryValueAdminEndpoint
   with PostCelebrityAdminEndpoint
-  with PostCelebrityFilterValueAdminEndpoint
+  with PostCelebrityCategoryValueAdminEndpoint
   with PostEgraphAdminEndpoint
   with PostFeaturedCelebritiesAdminEndpoint
-  with PostFilterAdminEndpoint
-  with PostFilterValueAdminEndpoint
   with PostInventoryBatchAdminEndpoint
   with PostLoginAdminEndpoint
   with PostOrderAdminEndpoint
