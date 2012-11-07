@@ -139,11 +139,20 @@ class Schema @Inject()(
     )
   )
   
-  // make new table here?
   val videoAssets = table[VideoAsset]
-  val videoCelebrityAssets = table[VideoCelebrityAsset]
-
-
+  on(videoAssets)(videoAsset =>
+    declare(
+      videoAsset.url is dbType("varchar(255)")
+    )
+  )
+  
+  val videoAssetsCelebrity = table[VideoAssetCelebrity]
+  on(videoAssetsCelebrity)(videoAssetCelebrity =>
+    declare(
+      columns(videoAssetCelebrity.videoId) are unique  
+    )
+  )
+  
   // ugh, why did I make so many biometrics tables?
   val vbgAudioCheckTable = table[VBGAudioCheck]
   val vbgEnrollUserTable = table[VBGEnrollUser]
@@ -210,10 +219,8 @@ class Schema @Inject()(
   val celebrityToInventoryBatches = oneToManyRelation(celebrities, inventoryBatches)
     .via((celebrity, inventoryBatch) => celebrity.id === inventoryBatch.celebrityId)
   
-/** I don't really know what I'm doing here */
-  val celebrityToVideoCelebrityAssets = oneToManyRelation(celebrities, videoCelebrityAssets)
-    .via((celebrity, videoCelebrityAsset) => celebrity.id === videoCelebrityAsset.celebrityId)
-  // maybe foreignKeyDeclaration?
+  val celebrityToVideoAssetsCelebrity = oneToManyRelation(celebrities, videoAssetsCelebrity)
+    .via((celebrity, videoAssetCelebrity) => celebrity.id === videoAssetCelebrity.celebrityId)
     
   val customerToUsernameHistory = oneToManyRelation(customers, usernameHistories)
     .via((customer, usernameHistory) => customer.id === usernameHistory.customerId)

@@ -21,14 +21,11 @@ private[controllers] trait PostVideoAssetApiEndpoint { this: Controller =>
   def postVideoAsset = Action(parse.multipartFormData) { request =>
 
     // get celebrity ID out of post request 
-    val body = request.body.dataParts.get("celebrityId")
-    val maybeCelebrityId = body match {
-      case Some(body) => body(0)
+    val maybeCelebrityId = request.body.dataParts.get("celebrityId")
+    val celebrityId = maybeCelebrityId match {
+      case Some(maybeCelebrityId) => maybeCelebrityId(0)
       case None => ""
     }
-
-    // remove after testing, probably
-    play.Logger.info("celebrityId is " + maybeCelebrityId)
 
     request.body.file("video").map { resource =>
       import java.io.File
@@ -37,42 +34,44 @@ private[controllers] trait PostVideoAssetApiEndpoint { this: Controller =>
       val tempFile = new File(directory + filename)
       resource.ref.moveTo(tempFile)
 
-      val maybeFileLocation = putFile(filename, tempFile)
-      maybeFileLocation match {
-        case Some(maybeFileLocation) => play.Logger.info("File location is " + maybeFileLocation)
-        case None => play.Logger.info("Oops, couldn't file the file!")
+      val maybeFileLocation = putFile(celebrityId, filename, tempFile)
+      val fileLocation = maybeFileLocation match {
+        case Some(maybeFileLocation) => maybeFileLocation
+        case None => "File not found"
       }
 
       // add row to videoasset table
       // add row to celebvideoasset table
-      
-      val jsonIterable = Json.toJson(Map(
-          "bytes" -> Json.toJson(tempFile.length),
-          "url" -> Json.toJson(maybeFileLocation)))
-      
-      val responseJson = Json.toJson(Map("video" -> jsonIterable))
+      // make sure to not send responseJson unless db update goes through
+
+      val responseJson = getJson(celebrityId, tempFile, fileLocation)
 
       // file only needed for bytes computation
       tempFile.delete()
       Ok(responseJson)
 
     }.getOrElse {
-      //Redirect(routes.Application.error)
-      Ok("error happened")
+      BadRequest("Something went wrong with your request. Please try again.")
     }
   }
 
-  private def putFile(filename: String, file: File): Option[String] = {
+  private def putFile(celebrityId: String, filename: String, file: File): Option[String] = {
 
-    val videoKey = "videos/" + filename
+    val videoKey = "videos/" + celebrityId + "/" + filename
     val source = Source.fromFile(file, "ISO-8859-1")
     val byteArray = source.map(_.toByte).toArray
     source.close()
 
     blob.put(key = videoKey, bytes = byteArray, access = AccessPolicy.Public)
     blob.getUrlOption(key = videoKey)
-    
-    // HOW TO FIND FILE IN S3
-    //http://s3.amazonaws.com/YOUR-BUCKET-NAME/YOUR-FILE-NAME
+  }
+
+  private def getJson(celebrityId: String, tempFile: java.io.File, maybeFileLocation: String) = {
+    val jsonIterable = Json.toJson(Map(
+      "celebrityId" -> Json.toJson(celebrityId),
+      "bytes" -> Json.toJson(tempFile.length),
+      "url" -> Json.toJson(maybeFileLocation)))
+
+    Json.toJson(Map("video" -> jsonIterable))
   }
 }
