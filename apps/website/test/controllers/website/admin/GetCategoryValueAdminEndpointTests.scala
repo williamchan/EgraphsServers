@@ -9,7 +9,7 @@ import utils._
 import utils.FunctionalTestUtils.routeName
 import utils.FunctionalTestUtils.Conversions._
 import controllers.website._
-import controllers.routes.WebsiteControllers.{getFilterValueAdmin, getCreateFilterValueAdmin}
+import controllers.routes.WebsiteControllers.{getCategoryValueAdmin, getCreateCategoryValueAdmin}
 import utils.EgraphsUnitTest
 import services.AppConfig
 import services.db.DBSession
@@ -18,10 +18,10 @@ import play.api.test.Helpers$
 
 class GetFilterValueAdminEndpointTests extends EgraphsUnitTest with AdminProtectedResourceTests {
   override def db = AppConfig.instance[DBSession]
-  override def routeUnderTest = getCreateFilterValueAdmin(1L) 
+  override def routeUnderTest = getCreateCategoryValueAdmin(1L) 
 }
 
 class GetCreateFilterValueAdminEndpointTests extends EgraphsUnitTest with AdminProtectedResourceTests {
   override def db = AppConfig.instance[DBSession]
-  override def routeUnderTest = getFilterValueAdmin(1L) 
+  override def routeUnderTest = getCategoryValueAdmin(1L) 
 }

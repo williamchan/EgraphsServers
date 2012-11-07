@@ -1,7 +1,7 @@
 package controllers.website.admin
 
 import models._
-import models.filters._
+import models.categories._
 import enums.PublishedStatus
 import controllers.WebsiteControllers
 import play.api.mvc.Controller
@@ -29,28 +29,28 @@ import org.apache.commons.mail.HtmlEmail
 import play.api.mvc._
 
 
-trait PostFilterAdminEndpoint {
+trait PostCategoryAdminEndpoint {
   this: Controller =>    
 
   protected def postController: POSTControllerMethod
   protected def httpFilters: HttpFilters
-  protected def filterStore: FilterStore
+  protected def categoryStore: CategoryStore
   
-  case class PostFilterForm(
+  case class PostCategoryForm(
      name: String,
      publicName: String
   )
 
-  def postFilterAdmin = postController() {
+  def postCategoryAdmin = postController() {
     httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       Action { implicit request =>
-        val filterId = Form("filterId" -> longNumber).bindFromRequest.fold(formWithErrors => 0L, validForm => validForm)
-      	val isCreate = (filterId == 0)
+        val categoryId = Form("categoryId" -> longNumber).bindFromRequest.fold(formWithErrors => 0L, validForm => validForm)
+      	val isCreate = (categoryId == 0)
       	
       	val form = Form(mapping(
           "name" -> nonEmptyText(maxLength = 128),
           "publicName" -> nonEmptyText(maxLength = 128)
-        )(PostFilterForm.apply)(PostFilterForm.unapply).verifying(isUniqueName(filterId))
+        )(PostCategoryForm.apply)(PostCategoryForm.unapply).verifying(isUniqueName(categoryId))
         )
         
         form.bindFromRequest.fold(
@@ -59,31 +59,31 @@ trait PostFilterAdminEndpoint {
             val errors = for (error <- formWithErrors.errors) yield {
               error.key + ": " + error.message
             }
-            val url = if(isCreate) controllers.routes.WebsiteControllers.getCreateFilterAdmin.url else controllers.routes.WebsiteControllers.getFilterAdmin(filterId).url
+            val url = if(isCreate) controllers.routes.WebsiteControllers.getCreateCategoryAdmin.url else controllers.routes.WebsiteControllers.getCategoryAdmin(categoryId).url
             Redirect(url, SEE_OTHER).flashing(
               ("errors" -> errors.mkString(", ")), 
-  		        ("filterId" -> filterId.toString), 
+  		        ("categoryId" -> categoryId.toString), 
   		        ("publicName" -> data.get("publicName").getOrElse("")), 
   		        ("name" -> data.get("name").getOrElse(""))
             )
           },
           validForm => {
-            val tmp = if (isCreate) Filter() else filterStore.get(filterId)
-            val savedFilter = tmp.copy(
+            val tmp = if (isCreate) Category() else categoryStore.get(categoryId)
+            val savedCategory = tmp.copy(
                 publicName = validForm.publicName,
                 name = validForm.name).save()
-            Redirect(controllers.routes.WebsiteControllers.getFilterAdmin(savedFilter.id).url, FOUND)
+            Redirect(controllers.routes.WebsiteControllers.getCategoryAdmin(savedCategory.id).url, FOUND)
           }
         )
       }
   	}
   }
   
-  private def isUniqueName(filterId: Long): Constraint[PostFilterForm] = {
-    Constraint { form: PostFilterForm => 
-      filterStore.findByName(form.name) match {
+  private def isUniqueName(categoryId: Long): Constraint[PostCategoryForm] = {
+    Constraint { form: PostCategoryForm => 
+      categoryStore.findByName(form.name) match {
         case None => Valid
-        case Some(filter) if(filter.id == filterId) => Valid
+        case Some(category) if(category.id == categoryId) => Valid
         case _ => Invalid("Name must be unique")
       }
     }  

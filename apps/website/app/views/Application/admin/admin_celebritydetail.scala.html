@@ -2,14 +2,14 @@
   errorFields: Option[List[String]], 
   fields: (String) => String,
   celebrity: Option[models.Celebrity] = None,
-  currentFilterValueIds: Set[Long],
-  filterValueFilters: Iterable[(models.filters.FilterValue, models.filters.Filter)]
+  currentCategoryValueIds: Set[Long],
+  categoryValueCategories: Iterable[(models.categories.CategoryValue, models.categories.Category)]
 )(implicit authToken: egraphs.authtoken.AuthenticityToken,
   headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData)
 
 @import controllers.WebsiteControllers
-@import routes.WebsiteControllers.postCelebrityFilterValueAdmin
+@import routes.WebsiteControllers.postCelebrityCategoryValueAdmin
 @import egraphs.authtoken.AuthenticityToken.safeForm
 @import views.html.Application.tags.errorMessage
 @import views.html.Application.tags.formField
@@ -152,15 +152,15 @@
         </div>  
       </div>
       @for(presentCelebrity <- celebrity) {   
-        @safeForm('id -> "filtervalueform", 'method -> "POST", 'action -> postCelebrityFilterValueAdmin(presentCelebrity.id).url) {
+        @safeForm('id -> "categoryvalueform", 'method -> "POST", 'action -> postCelebrityCategoryValueAdmin(presentCelebrity.id).url) {
           <div class="row-fluid">
             <div class="span5">
-            <legend>Associated Filter Values</legend>
-            <span class="help-block">Filter Values are annotated like this:<br> Public Name | Name <- Filter Public Name | Filter Name</block>
-              <select data-placeholder="Select FilterValues to associate with a celeb" name="filterValueIds" style="width:500px" multiple class="chzn-select">
-                @for((filterValue, filter) <- filterValueFilters) {
-                  <option name=@{"filterValueIds[" + (filterValue.id-1) + "]"} value="@filterValue.id" @if(currentFilterValueIds.contains(filterValue.id)){selected="selected"} >
-                    @filterValue.publicName | @filterValue.name  <- @filter.publicName | @filter.name 
+            <legend>Associated Category Values</legend>
+            <span class="help-block">Category Values are annotated like this:<br> Public Name | Name <- Category Public Name | Category Name</block>
+              <select data-placeholder="Select CategoryValues to associate with a celeb" name="categoryValueIds" style="width:500px" multiple class="chzn-select">
+                @for((categoryValue, category) <- categoryValueCategories) {
+                  <option name=@{"categoryValueIds[" + (categoryValue.id-1) + "]"} value="@categoryValue.id" @if(currentCategoryValueIds.contains(categoryValue.id)){selected="selected"} >
+                    @categoryValue.publicName | @categoryValue.name  <- @category.publicName | @category.name 
                   </option>
                 }
               </select>

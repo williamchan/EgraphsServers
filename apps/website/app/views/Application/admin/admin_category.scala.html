@@ -1,7 +1,7 @@
-@(filter: models.filters.Filter,
+@(category: models.categories.Category,
   errorFields: Option[List[String]] = None,
-  filterValues: Iterable[models.filters.FilterValue],
-  filterValueErrorFields: Option[List[String]] = None
+  categoryValues: Iterable[models.categories.CategoryValue],
+  categoryValueErrorFields: Option[List[String]] = None
   )(implicit authToken: egraphs.authtoken.AuthenticityToken,
   headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData)
@@ -18,18 +18,18 @@
 <section id="content" class="top" role="main">
   <div id="main" class="sub">
     <div class="container" id="celebrity-admin">
-        @safeForm('method -> "POST", 'action -> routes.WebsiteControllers.postFilterAdmin.url, 'enctype -> "multipart/form-data") {
-          @if(filter.id == 0) {
-            <legend>New Filter</legend>
+        @safeForm('method -> "POST", 'action -> routes.WebsiteControllers.postCategoryAdmin.url, 'enctype -> "multipart/form-data") {
+          @if(category.id == 0) {
+            <legend>New Category</legend>
           } else {
-            <legend>Filter @filter.id Details</legend>
+            <legend>Category @category.id Details</legend>
           }
           <label>Name</label>  
-          <input type="hidden" name="filterId" value="@filter.id">
-          <input type="text" name="name" value="@filter.name">
+          <input type="hidden" name="categoryId" value="@category.id">
+          <input type="text" name="name" value="@category.name">
           <span class="help-block">The name should be easy to search for like "League" or "NBA Position"</span>
           <label>PublicName</label>
-          <input type="text" name="publicName" value="@filter.publicName">
+          <input type="text" name="publicName" value="@category.publicName">
           <span class="help-block">Pick a name to be displayed publicly, like "Team" or "Instrument"</span>
           <div>   
             <button type="reset" class="btn">
@@ -39,16 +39,16 @@
           </div>  
         }
         @errorMessage(errorFields)
-        @if(filter.id != 0) {
+        @if(category.id != 0) {
           <h2>
-            Filter Values
+            Category Values
           </h2>  
-          @errorMessage(filterValueErrorFields)
+          @errorMessage(categoryValueErrorFields)
           <h3>Create a value</h3>
-          @safeForm('method -> "POST", 'action -> routes.WebsiteControllers.postFilterValueAdmin.url, 'enctype -> "multipart/form-data"){
+          @safeForm('method -> "POST", 'action -> routes.WebsiteControllers.postCategoryValueAdmin.url, 'enctype -> "multipart/form-data"){
             <label>Name</label>
-            <input type="hidden" name="filterValueId" value="0">  
-            <input type="hidden" name="filterId" value="@filter.id">
+            <input type="hidden" name="categoryValueId" value="0">  
+            <input type="hidden" name="categoryId" value="@category.id">
             <input type="text" name="name">
             <label>PublicName</label>
             <input type="text" name="publicName"> 
@@ -63,10 +63,10 @@
                 <th>publicname</th>
               </tr>
             </thead>  
-            @filterValues.map { fv =>
+            @categoryValues.map { fv =>
               <tr>
                 <td>
-                  <a href="@routes.WebsiteControllers.getFilterValueAdmin(fv.id)">
+                  <a href="@routes.WebsiteControllers.getCategoryValueAdmin(fv.id)">
                     @fv.id
                   </a>  
                 </td>
@@ -76,10 +76,10 @@
             }
           </table>
         }  
-        <a href="@routes.WebsiteControllers.getFiltersAdmin.url">Back to all filters</a>
+        <a href="@routes.WebsiteControllers.getCategoriesAdmin.url">Back to all categories</a>
     </div>
   </div>
 </section>    
 }
 
-@base_template(title="Admin - Filter", body=body)
+@base_template(title="Admin - Category", body=body)

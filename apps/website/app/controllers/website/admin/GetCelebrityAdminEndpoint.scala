@@ -3,7 +3,7 @@ package controllers.website.admin
 import play.api.mvc.Controller
 import models.{AccountStore, CelebrityStore, Celebrity}
 import models.enums.PublishedStatus
-import models.filters._
+import models.categories._
 import controllers.WebsiteControllers
 import services.http.ControllerMethod
 import services.http.filters.HttpFilters
@@ -20,7 +20,7 @@ private[controllers] trait GetCelebrityAdminEndpoint extends ImplicitHeaderAndFo
   protected def httpFilters: HttpFilters
   protected def accountStore: AccountStore
   protected def celebrityStore: CelebrityStore
-  protected def filterValueStore: FilterValueStore  
+  protected def categoryValueStore: CategoryValueStore  
 
   def getCelebrityAdmin(celebrityId: Long) = controllerMethod.withForm() { implicit authToken =>
     httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
@@ -42,15 +42,15 @@ private[controllers] trait GetCelebrityAdminEndpoint extends ImplicitHeaderAndFo
               ("publicName" -> celebrity.publicName) + 
               ("publishedStatusString" -> celebrity.publishedStatus.toString)
               val (errorFields, fieldDefaults) = getCelebrityDetail(celebrity = Some(celebrity))
-              val celebFilterValueIds = (for(filterValue <- celebrity.filterValues) yield { filterValue.id }).toSet
+              val celebCategoryValueIds = (for(filterValue <- celebrity.categoryValues) yield { filterValue.id }).toSet
 
               Ok(views.html.Application.admin.admin_celebritydetail(
                 isCreate = false,
                 errorFields = errorFields,
                 fields = fieldDefaults,
                 celebrity = Option(celebrity),
-                currentFilterValueIds = celebFilterValueIds,
-                filterValueFilters = filterValueStore.findFilterValueFilterViewModel))
+                currentCategoryValueIds = celebCategoryValueIds,
+                categoryValueCategories = categoryValueStore.findCategoryValueCategoryViewModel))
             }
           case _ => NotFound("No such celebrity")
         }
@@ -67,8 +67,8 @@ private[controllers] trait GetCelebrityAdminEndpoint extends ImplicitHeaderAndFo
           isCreate = true, errorFields = errorFields,
           fields = fieldDefaults,
           celebrity = None,
-          currentFilterValueIds = Set[Long](),
-          filterValueFilters = List[(FilterValue, Filter)]())
+          currentCategoryValueIds = Set[Long](),
+          categoryValueCategories = List[(CategoryValue, Category)]())
         )
       }
     }
