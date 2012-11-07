@@ -65,7 +65,7 @@ private[celebrity] trait CatalogStarsQuerying extends Logging {
       Await.result(futureStars, 10.minutes) // this throws [AskTimeoutException: Timed out]
     } catch {
       case e: Exception => {
-        log("CatalogStarsQuerying threw exception: " + e.getLocalizedMessage())
+        log("CatalogStarsQuerying threw exception: " + e.getStackTraceString)
         IndexedSeq.empty[CatalogStar]
       }
     }
