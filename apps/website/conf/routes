@@ -31,11 +31,10 @@ GET     /blob/files/*blobKey                                       controllers.W
 GET     /favicon.ico                            controllers.Assets.at(path="/public", file="images/favicon.ico")
 GET     /documents/CelebrityAgreement           controllers.Assets.at(path="/public", file="documents/CelebrityAgreement.pdf")
 
-
 ##
 ## API
 ##
-
+GET     /api/1.0/client                                         controllers.ApiControllers.getIOSClient(redirectToItmsLink: Boolean ?= false)
 GET     /api/1.0/celebrities/me                                 controllers.ApiControllers.getCelebrity
 GET     /api/1.0/celebrities/me/enrollmenttemplate              controllers.ApiControllers.getCelebrityEnrollmentTemplate
 GET     /api/1.0/celebrities/me/mobileappinfo                   controllers.ApiControllers.getCelebrityMobileAppInfo

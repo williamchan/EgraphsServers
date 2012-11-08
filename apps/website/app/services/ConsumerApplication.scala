@@ -2,9 +2,20 @@ package services
 
 import com.google.inject.Inject
 import services.config.ConfigFileProxy
+import play.api.mvc.Call
 
 class ConsumerApplication @Inject()(config: ConfigFileProxy) {
 
+  /**
+   * Returns an absolute link to the consumer application's getIOSClient endpoint. See docs for
+   * [[controllers.api.GetIOSClientEndpoint#getIosClient]].
+   */
+  def getIOSClient(redirectToItmsLink: Boolean): Call = {
+    val relativeUrl = controllers.routes.ApiControllers.getIOSClient(redirectToItmsLink).url
+    
+    new Call("GET", absoluteUrl(relativeUrl)) 
+  }
+  
   /**
    * DO NOT USE play.api.mvc.Http.absoluteURL because it ignores application.baseUrl. We do not want emails directing
    * consumers to admin.egraphs.com.

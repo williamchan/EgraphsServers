@@ -25,6 +25,7 @@ import views.html.frontend.{celebrity_welcome_email, celebrity_welcome_email_tex
 case class CelebrityServices @Inject() (
   store: CelebrityStore,
   accountStore: AccountStore,
+  consumerApp: ConsumerApplication,
   categoryServices: CategoryServices,
   productStore: ProductStore,
   orderStore: OrderStore,
@@ -276,11 +277,12 @@ case class Celebrity(id: Long = 0,
     email.addTo(toAddress, publicName)
     bccEmail.map(bcc => email.addBcc(bcc))
     email.setSubject("Welcome to Egraphs")
-
+    
+    val appDownloadLink = services.consumerApp.getIOSClient(redirectToItmsLink=true).url
     services.transactionalMail.send(
       email, 
       text=Some(celebrity_welcome_email_text(publicName, account.email).toString), 
-      html=Some(celebrity_welcome_email(publicName, account.email))
+      html=Some(celebrity_welcome_email(publicName, account.email, appDownloadLink)) 
     )
   }
 

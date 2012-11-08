@@ -65,7 +65,8 @@ object Email extends Controller {
     val email = "rstrong@fantastic.com"
     Ok(views.html.frontend.celebrity_welcome_email(
       celebrityName = publicName,
-      celebrityEmail = email
+      celebrityEmail = email,
+      appPlistUrl = "//path/to/app"
     ))
   }
 }
