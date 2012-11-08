@@ -17,6 +17,9 @@ import play.api.Play
  * Fingerprinted assets will change like this:
  *   original      = foo.jpg
  *   fingerprinted = foo-fp-1231343451234.jpg
+ * 
+ * We got some inspiration from ruby on rails, but the solution was a bit obvious.
+ * http://guides.rubyonrails.org/asset_pipeline.html#what-is-fingerprinting-and-why-should-i-care
  */
 trait FingerprintedAssets extends AssetProvider { this: Controller =>
   import java.net.URL
