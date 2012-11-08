@@ -80,7 +80,7 @@ class POSTControllerMethod @Inject()(
   controllerMethod: ControllerMethod,
   authenticityTokenFilter: RequireAuthenticityTokenFilterProvider
 ) {
-println("POSTControllerMethod constructor")
+
   /**
    * Performs an operation after ensuring that the post is protected by a CSRF token.
    *
@@ -98,11 +98,8 @@ println("POSTControllerMethod constructor")
                dbSettings: ControllerDBSettings = WithDBConnection(readOnly = false))
                              (action: Action[A]): Action[A] =
   {
-    println("POSTControllerMethod.apply entered")
     controllerMethod(dbSettings = dbSettings) {
-      println("controllerMethod(dbSettings = dbSettings) {")
       authenticityTokenFilter(doCsrfCheck) {
-        println("authenticityTokenFilter(doCsrfCheck) {")
         action
       }
     }
