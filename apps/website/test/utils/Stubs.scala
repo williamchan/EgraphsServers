@@ -25,8 +25,8 @@ object Stubs extends Mockito {
       {
         Action(action.parser) { request =>
           dbSettings match {
-            case conn @ WithDBConnection(dbIsolation, readOnly) =>
-              db.connected(dbIsolation)(action(request))
+            case conn @ WithDBConnection(dbIsolation, isReadOnly) =>
+              db.connected(dbIsolation, isReadOnly)(action(request))
             case WithoutDBConnection =>
               action(request)
           }

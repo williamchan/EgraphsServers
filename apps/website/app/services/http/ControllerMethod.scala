@@ -47,7 +47,7 @@ class ControllerMethod @Inject()(logging: LoggingContext, db: DBSession, httpsFi
           Action(action.parser) { request => 
             dbSettings match {
               case WithoutDBConnection => action(request)
-              case WithDBConnection(dbIsolation, readOnly) => db.connected(dbIsolation) { action(request) }
+              case WithDBConnection(dbIsolation, isReadOnly) => db.connected(dbIsolation, isReadOnly) { action(request) }
             }
           }
         }
@@ -80,7 +80,7 @@ class POSTControllerMethod @Inject()(
   controllerMethod: ControllerMethod,
   authenticityTokenFilter: RequireAuthenticityTokenFilterProvider
 ) {
-
+println("POSTControllerMethod constructor")
   /**
    * Performs an operation after ensuring that the post is protected by a CSRF token.
    *
@@ -98,11 +98,12 @@ class POSTControllerMethod @Inject()(
                dbSettings: ControllerDBSettings = WithDBConnection(readOnly = false))
                              (action: Action[A]): Action[A] =
   {
+    println("POSTControllerMethod.apply entered")
     controllerMethod(dbSettings = dbSettings) {
+      println("controllerMethod(dbSettings = dbSettings) {")
       authenticityTokenFilter(doCsrfCheck) {
-        Action(action.parser) { request => 
-          action(request)
-        }
+        println("authenticityTokenFilter(doCsrfCheck) {")
+        action
       }
     }
   }
@@ -137,9 +138,7 @@ class POSTApiControllerMethod @Inject()(postControllerMethod: POSTControllerMeth
   def apply[A](dbSettings: ControllerDBSettings = WithDBConnection(readOnly = false))
               (action: Action[A]): Action[A] = {
     postControllerMethod(doCsrfCheck=false, dbSettings=dbSettings) {
-      Action(action.parser) { request =>
-        action(request)
-      }
+      action
     }
   }
 }
