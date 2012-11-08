@@ -21,6 +21,7 @@ import services.http.HttpCodes
 import services.db.{DBSession, TransactionSerializable}
 import Blobs.Conversions._
 import models.EgraphStore
+import utils.TestData
 
 class PostEgraphApiEndpointTests extends EgraphsUnitTest with ProtectedCelebrityResourceTests {
   private def blobs = AppConfig.instance[Blobs]
@@ -44,8 +45,11 @@ class PostEgraphApiEndpointTests extends EgraphsUnitTest with ProtectedCelebrity
     Some(anyContentRequest)
   }
 
+  "postEgraph" should "accept a well-formed egraph as its first submission" in new EgraphsTestApplication {
+    val egraph = db.connected(TransactionSerializable) {
+      TestData.newSavedEgraph()
+    }
 
-  routeName(postEgraph(1L)) should "accept a well-formed egraph as its first submission" in new EgraphsTestApplication {
     runWillChanScenariosThroughOrder()
     
     val ordersList = getWillChanOrdersJson
@@ -63,18 +67,18 @@ class PostEgraphApiEndpointTests extends EgraphsUnitTest with ProtectedCelebrity
     
     code should be (OK)
 
-    egraphId should be (1L)
+    egraphId should be (egraph.id)
 
     val signatureBlob = blobs.get("egraphs/" + egraphId + "/signature.json").get.asString
     signatureBlob should be (TestConstants.shortWritingStr)
 
     db.connected(TransactionSerializable) {
-      val egraph = egraphStore.get(egraphId)
-      egraph.latitude should be (Some(37.7821120598956))
-      egraph.longitude should be (Some(-122.400612831116))
-      egraph.signedAt should be (Time.timestamp("2012-07-12 15:11:22.987", Time.ipadDateFormat))
-      egraph.assets.signature should be (TestConstants.shortWritingStr)
-      egraph.assets.message should be (None)
+      val foundEgraph = egraphStore.get(egraphId)
+      foundEgraph.latitude should be (Some(37.7821120598956))
+      foundEgraph.longitude should be (Some(-122.400612831116))
+      foundEgraph.signedAt should be (Time.timestamp("2012-07-12 15:11:22.987", Time.ipadDateFormat))
+      foundEgraph.assets.signature should be (TestConstants.shortWritingStr)
+      foundEgraph.assets.message should be (None)
     }
   }
 

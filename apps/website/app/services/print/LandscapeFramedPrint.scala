@@ -167,7 +167,7 @@ case class LandscapeFramedPrint() {
     val productNameLines = if (productNameLength < 50) {
       List(productName)
     } else {
-      val breakCharIndex = productName.substring(productNameLength / 2).findIndexOf(_ == ' ') + (productNameLength / 2)
+      val breakCharIndex = productName.substring(productNameLength / 2).indexWhere(_ == ' ') + (productNameLength / 2)
       val s = productName.splitAt(breakCharIndex + 1)
       List(s._1.trim, s._2.trim)
     }

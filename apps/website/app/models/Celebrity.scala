@@ -386,12 +386,12 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
   }
 
   def findByUrlSlug(slug: String): Option[Celebrity] = {
-    if (slug.isEmpty) return None
-
-    from(schema.celebrities)(celebrity =>
-      where(celebrity.urlSlug === slug)
-        select (celebrity)
-    ).headOption
+    if (slug.isEmpty) None
+    else {
+      from(schema.celebrities)(celebrity =>
+        where(celebrity.urlSlug === slug)
+          select (celebrity)).headOption
+    }
   }
 
   // TODO(erem): Test this one
