@@ -33,7 +33,7 @@ class FilterTests extends FlatSpec with ShouldMatchers with MockFactory {
     }
   }
 
-  "filter" should "should give the happy case on the right and sad on the left" in {
+  "filter" should "give the happy case on the right and sad on the left" in {
     // Setup
     val filter = new TestableFilter()
 
@@ -42,7 +42,7 @@ class FilterTests extends FlatSpec with ShouldMatchers with MockFactory {
     filter.filter("false") should be(Right(false))
   }
 
-  "apply" should "should execute the code in an action from the actionFactory only if the requirement is found" in {
+  "apply" should "execute the code in an action from the actionFactory only if the requirement is found" in {
     // Setup
     val filter = new TestableFilter()
 
@@ -57,7 +57,7 @@ class FilterTests extends FlatSpec with ShouldMatchers with MockFactory {
     result should be(resultFromAction)
   }
 
-  "apply" should "should not execute the code in an action from the actionFactory if the requirement is not found" in {
+  it should "not execute the code in an action from the actionFactory if the requirement is not found" in {
     // Setup
     val filter = new TestableFilter()
 
@@ -70,6 +70,20 @@ class FilterTests extends FlatSpec with ShouldMatchers with MockFactory {
     // Verify
     status(result) should be(NOT_FOUND)
     result should be(notFound)
+  }
+
+  it should "not execute the filter code in gererating an action" in {
+    // Setup
+    val filter = new Filter[String, Boolean] {
+      override def filter(value: String): Either[Result, Boolean] = value match {
+        case _ => throw new Exception("test should not run the filter code")
+      }
+    }
+
+    // Test
+    val action = filter("I should not pattern match") { someBoolean =>
+      Action { Ok }
+    }
   }
 
   // Setup mock actionFactory to return an action that would return a 200 OK with the work "true" in it
