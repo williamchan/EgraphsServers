@@ -72,7 +72,7 @@ class FilterTests extends FlatSpec with ShouldMatchers with MockFactory {
     result should be(notFound)
   }
 
-  it should "not execute the filter code in gererating an action" in {
+  it should "not execute the filter code while creating an action (but rather while evaluating it)" in {
     // Setup
     val filter = new Filter[String, Boolean] {
       override def filter(value: String): Either[Result, Boolean] = value match {
