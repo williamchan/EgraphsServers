@@ -17,8 +17,7 @@ import utils.DBTransactionPerTest
 @RunWith(classOf[JUnitRunner])
 class OrderCompleteViewModelFactoryTests extends EgraphsUnitTest with DBTransactionPerTest {
   
-  "fromOrders" should "use the correct model data" in new EgraphsTestApplication {    
-    // Set up domain models as stubs / spies / mocks
+  "fromOrder" should "use the correct model data" in new EgraphsTestApplication {    
     val order = TestData.newSavedOrder()
     val buyer = order.buyer
     val recipient = order.recipient
@@ -27,47 +26,10 @@ class OrderCompleteViewModelFactoryTests extends EgraphsUnitTest with DBTransact
     val buyerAccount = buyer.account
     val product = order.product
     val celeb = product.celebrity
-    val cashTransaction = order.services.cashTransactionStore.findByOrderId(order.id).headOption
+    val cashTransaction = CashTransaction(orderId = Some(order.id), accountId = order.buyer.account.id,
+        amountInCurrency = product.priceInCurrency).withCashTransactionType(CashTransactionType.EgraphPurchase).save()
 
-/*    val product = smartMock[Product]
-    product.celebrity returns celeb
-
-    val buyerAccount = Account(email="joebuyer@egraphs.com")
-    val buyer = smartMock[Customer]
-    buyer.name returns "Joe Buyer"
-    buyer.account returns buyerAccount
-
-    val recipient = smartMock[Customer]
-    val recipientAccount = Account(email="joerecipient@egraphs.com")
-    recipient.account returns recipientAccount
-
-    val inventoryBatch = smartMock[InventoryBatch]
-    val expectedDate = new util.Date()
-    inventoryBatch.getExpectedDate returns expectedDate
-
-    val order = smartMock[Order]
-    order.id returns 1
-    order.amountPaid returns BigDecimal(100.00).toMoney() // totalPrice should ignore this and instead use the value from CashTransaction
-    order.product returns product
-    order.buyer returns buyer
-    order.created returns new Timestamp(new Date().getTime)
-    order.recipientName returns "Joe Recipient"
-    order.recipient returns recipient
-    order.inventoryBatch returns inventoryBatch
-    val orderServices = smartMock[OrderServices]
-    order.services returns orderServices
-    val printOrderStore = smartMock[PrintOrderStore]
-    orderServices.printOrderStore returns printOrderStore
-    printOrderStore.findByOrderId(1) returns List(mock[PrintOrder])
-    val cashTransactionStore = smartMock[CashTransactionStore]
-    orderServices.cashTransactionStore returns cashTransactionStore
-    val cashTransaction = smartMock[CashTransaction]
-    cashTransactionStore.findByOrderId(1) returns List(cashTransaction)
-    cashTransaction.cash returns BigDecimal(200.00).toMoney()*/
-
-    // Generate the viewmodel from the domain models
     val viewModel = new OrderCompleteViewModelFactory(smartMock[ConfigFileProxy]).fromOrder(order)
-    // Check expectations
     viewModel.buyerEmail should be (buyerAccount.email)
     viewModel.buyerName should be (buyer.name)
     viewModel.celebName should be (celeb.publicName)
@@ -86,18 +48,27 @@ class OrderCompleteViewModelFactoryTests extends EgraphsUnitTest with DBTransact
     viewModel.withAffiliateMarketing should be(false)
   }
   
-  "fromOrders" should "set printPrice and hasPrintOrder when there is an associated PrintOrder" in new EgraphsTestApplication {    
-    // Set up domain models as stubs / spies / mocks
+  "fromOrder" should "set printPrice and hasPrintOrder when there is an associated PrintOrder" in new EgraphsTestApplication {    
     val order = TestData.newSavedOrder()
     val product = order.product
     val printOrder = PrintOrder(orderId = order.id).save()
     val cashTransaction = CashTransaction(orderId = Some(order.id), accountId = order.buyer.account.id,
         amountInCurrency = BigDecimal(200)).withCashTransactionType(CashTransactionType.EgraphPurchase).save()
 
-    // Generate the viewmodel from the domain models
     val viewModel = new OrderCompleteViewModelFactory(smartMock[ConfigFileProxy]).fromOrder(order)
-    // Check expectations
     viewModel.totalPrice should be (cashTransaction.cash)
+    viewModel.digitalPrice should be (product.price)
+    viewModel.printPrice should be (printOrder.amountPaid)
+    viewModel.hasPrintOrder should be(true)
+  }
+  
+  "fromOrder" should "set totalPrice to zero if no associated CashTransaction was provided" in new EgraphsTestApplication {    
+    val order = TestData.newSavedOrder()
+    val product = order.product
+    val printOrder = PrintOrder(orderId = order.id).save()
+
+    val viewModel = new OrderCompleteViewModelFactory(smartMock[ConfigFileProxy]).fromOrder(order)
+    viewModel.totalPrice should be (Money.zero(CurrencyUnit.USD))
     viewModel.digitalPrice should be (product.price)
     viewModel.printPrice should be (printOrder.amountPaid)
     viewModel.hasPrintOrder should be(true)

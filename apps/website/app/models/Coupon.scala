@@ -17,11 +17,12 @@ case class Coupon(id: Long = 0,
                   name: String = "",
                   code: String = Coupon.generateCode,
                   startDate: Date = Time.today,
-                  endDate: Date = new DateTime().plusYears(1).toDate,
+                  endDate: Date = new DateTime().plusYears(10).toDate,
                   discountAmount: BigDecimal = 5,
                   _couponType: String = CouponType.Promotion.name,
                   _discountType: String = CouponDiscountType.Flat.name,
                   _usageType: String = CouponUsageType.OneUse.name,
+                  isActive: Boolean = true,
 //                  restrictions: String = "",
 //                  corporateGroupId: Option[Long] = None,
                   created: Timestamp = Time.defaultTimestamp,
@@ -34,25 +35,43 @@ case class Coupon(id: Long = 0,
   with HasCouponUsageType[Coupon]
   {
   
-//  def useOn(order: Order) {
-//    // if couponType == Prepaid and the price is less than calculateDiscount, then issue a new prepaid coupon with the remainder.
-//  }
+  /**
+   * Marks this coupon as used. Does nothing if this coupon is unlimited-use.
+   */
+  def use(): Coupon = {
+    usageType match {
+      case CouponUsageType.Unlimited => this
+      case _ => copy(isActive = false)
+      // TODO: another case for prepaid to issue new coupon for remaining balance
+    }
+  }
   
+  /**
+   * @return the discount amount. If the discount amount would otherwise be greater than the preCouponAmount, then preCouponAmount is returned.
+   */
   def calculateDiscount(preCouponAmount: BigDecimal): BigDecimal = {
     discountType match {
       case CouponDiscountType.Flat => {
         discountAmount.min(preCouponAmount)
       }
-      case CouponDiscountType.Percentage => {
+      case _ => {
         (discountAmount / 100) * preCouponAmount
       }
     }
   }
   
+  /**
+   * Returns true if usage of this coupon should result in an amount being invoiced to a corporate account.
+   * (to be implemented: corporate account)
+   */
   def shouldChargeRemainder: Boolean = {
     couponType != CouponType.Invoiceable
   }
   
+  /**
+   * @return the amount that should be invoiced to the corporate account.
+   * (to be implemented: corporate account)
+   */
   def calculateInvoiceAmount(preCouponAmount: BigDecimal): BigDecimal = {
     if (couponType == CouponType.Invoiceable) {
       calculateDiscount(preCouponAmount)
@@ -70,13 +89,11 @@ case class Coupon(id: Long = 0,
       case CouponDiscountType.Flat => {
         require(discountAmount > 0, "For flat coupons, discount amount must be greater than 0.")
       }
-      case CouponDiscountType.Percentage => {
+      case _ => {
         require(discountAmount > 0, "For percentage coupons, discount amount must be between 0 and 100.")
         require(discountAmount <= 100, "For percentage coupons, discount amount must be between 0 and 100.")
       }
     }
-    // if _usageType is one-use, ensure only one is active with this code
-    // if _usageType is unlimited, ensure only one is active with this code
     
     services.store.save(this)
   }
@@ -104,7 +121,12 @@ object Coupon {
   def generateCode: String = Random.alphanumeric.take(defaultCodeLength).mkString
 }
 
-class CouponStore @Inject()(schema: Schema) extends SavesWithLongKey[Coupon] with SavesCreatedUpdated[Long,Coupon] {
+class CouponStore @Inject()(schema: Schema, 
+    couponQueryFilters: CouponQueryFilters, 
+    cashTransactionStore: CashTransactionStore) 
+  extends SavesWithLongKey[Coupon] 
+  with SavesCreatedUpdated[Long,Coupon] 
+{
   import org.squeryl.PrimitiveTypeMode._
 
   //
@@ -118,6 +140,16 @@ class CouponStore @Inject()(schema: Schema) extends SavesWithLongKey[Coupon] wit
     ).toSeq
   }
 
+  def findValid(code: String): Option[Coupon] = {
+    findByCode(code, couponQueryFilters.activeByDate, couponQueryFilters.activeByFlag).headOption match {
+      case None => None
+      case Some(coupon) => {
+        // TODO: apply restrictions
+        Some(coupon)
+      }
+    }
+  }
+  
   //
   // SavesWithLongKey[Coupon] methods
   //
@@ -133,6 +165,7 @@ class CouponStore @Inject()(schema: Schema) extends SavesWithLongKey[Coupon] wit
       theOld._discountType := theNew._discountType,
       theOld._usageType := theNew._usageType,
       theOld._couponType := theNew._couponType,
+      theOld.isActive := theNew.isActive,
 //      theOld.restrictions := theNew.restrictions,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated
@@ -150,6 +183,14 @@ class CouponStore @Inject()(schema: Schema) extends SavesWithLongKey[Coupon] wit
 class CouponQueryFilters @Inject() (schema: Schema) {
   import org.squeryl.PrimitiveTypeMode._
 
+  def activeByFlag: FilterOneTable[Coupon] = {
+    new FilterOneTable[Coupon] {
+      override def test(coupon: Coupon) = {
+        coupon.isActive === true
+      }
+    }
+  }
+  
   def activeByDate: FilterOneTable[Coupon] = {
     new FilterOneTable[Coupon] {
       override def test(coupon: Coupon) = {

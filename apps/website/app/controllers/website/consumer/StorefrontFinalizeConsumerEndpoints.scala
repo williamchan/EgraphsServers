@@ -78,7 +78,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
             name=billing.name,
             email=billing.email,
             postalCode=billing.postalCode,
-            paymentToken=billing.paymentToken,
+            paymentToken=billing.paymentToken.getOrElse(""),
             paymentApiKey = payment.publishableKey,
             paymentJsModule = payment.browserModule,
             editUrl=checkoutUrl
@@ -187,6 +187,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
           celebrity=celeb,
           product=product,
           totalAmountPaid=forms.total(basePrice = product.price, maybeCoupon),
+          coupon=maybeCoupon,
           billingPostalCode=billing.postalCode,
           flash=request.flash,
           printingOption=forms.highQualityPrint.getOrElse(PrintingOption.DoNotPrint),

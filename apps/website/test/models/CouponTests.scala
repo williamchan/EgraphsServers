@@ -53,6 +53,11 @@ class CouponTests extends EgraphsUnitTest
     exception1.getLocalizedMessage should include("For percentage coupons, discount amount must be between 0 and 100")
   }
   
+  "use" should "set isActive to false for one-use coupons" in {
+    Coupon().withUsageType(CouponUsageType.OneUse).use.isActive should be(false)
+    Coupon().withUsageType(CouponUsageType.Unlimited).use.isActive should be(true)
+  }
+  
   "calculateDiscount" should "calculate flat discounts" in {
     val coupon10 = Coupon(discountAmount = 10).withDiscountType(CouponDiscountType.Flat).save()
     coupon10.calculateDiscount(50) should be(10)
@@ -70,7 +75,7 @@ class CouponTests extends EgraphsUnitTest
   }
   
   "calculateInvoiceAmount" should "return discount amount if coupon type is invoiceable" in (pending)
-
+  
   "findByCode" should "filter by code" in {
     val coupon = newEntity.save()
     store.findByCode(coupon.code).toList should be(List(coupon))
@@ -79,8 +84,21 @@ class CouponTests extends EgraphsUnitTest
   "findByCode" should "filter by date when activeByDate is applied" in {
     val coupon = newEntity.save()
     val code = coupon.code
-    /*expired coupon*/ Coupon(code = code, startDate = TestData.jan_01_2012, endDate = TestData.jan_08_2012).save()
-    /*future coupon */ Coupon(code = code, startDate = TestData.tomorrow, endDate = TestData.twoDaysHence).save()
+    /*expired coupon*/ Coupon(code = code, startDate = TestData.jan_01_2012, endDate = TestData.jan_08_2012, isActive = false).save()
+    /*future coupon */ Coupon(code = code, startDate = TestData.tomorrow, endDate = TestData.twoDaysHence, isActive = false).save()
     store.findByCode(coupon.code, couponQueryFilters.activeByDate).toList should be(List(coupon))
   }
+  
+  "findValid" should "return a coupon matching code that are active by date and flag" in {
+    val coupon = newEntity.save()
+    val code = "mycode"
+    /*inactive coupon*/ Coupon(code = code, isActive = false).save()
+    /*expired coupon*/ Coupon(code = code, startDate = TestData.jan_01_2012, endDate = TestData.jan_08_2012).save()
+    /*future coupon */ Coupon(code = code, startDate = TestData.tomorrow, endDate = TestData.twoDaysHence).save()
+    store.findValid(coupon.code) should be(Some(coupon))
+    
+    coupon.copy(isActive = false).save()
+    store.findValid(coupon.code) should be(None)
+  }
 }
+

@@ -120,7 +120,7 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
     import WrittenMessageRequest._
 
     messageRequest match {
-      // There are no messages for signature only or for when the celebrity choosesn
+      // There are no messages for signature only or for when the celebrity chooses
       case CelebrityChoosesMessage | SignatureOnly =>
         Right(None)
 
@@ -242,7 +242,7 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
 object PurchaseFormChecks {
   private[purchase] val requiredError = "Required field"
   private[purchase] val nameLengthErrorString = "Must be between 2 and 30 characters"
-  private[purchase] val notValidCouponErrorString = "Not a valid promotion code"
+  private[purchase] val notValidCouponErrorString = "Not a valid code"
 
   /** The maximum number of characters a written message request can contain */
   val minWrittenMessageChars = 5

@@ -141,6 +141,8 @@ function(forms, payment, Egraphs) {
     this.bind = function() {
       $form.submit(function(event) {
         try {
+          if (checkout.totalAmount == 0) { return false; }
+          
           var expiration = expiryDates();
           var tokenParams = {
             number: cardNumber(),

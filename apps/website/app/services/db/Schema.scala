@@ -80,6 +80,7 @@ class Schema @Inject()(
   )
   
   val coupons = table[Coupon]
+  on(coupons)(coupon => declare(coupon.code is indexed))
 
   val customers = table[Customer]
   on(customers)(customer => declare(customer.username is unique))
@@ -198,7 +199,7 @@ class Schema @Inject()(
     .via((account, address) => account.id === address.accountId)
   val accountToTransaction = oneToManyRelation(accounts, cashTransactions)
     .via((account, cashTransaction) => account.id === cashTransaction.accountId)
-
+    
   val celebrityToEnrollmentBatches = oneToManyRelation(celebrities, enrollmentBatches)
     .via((celebrity, enrollmentBatch) => celebrity.id === enrollmentBatch.celebrityId)
   celebrityToEnrollmentBatches.foreignKeyDeclaration.constrainReference(onDelete cascade)

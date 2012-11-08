@@ -183,11 +183,10 @@ class FormChecks @Inject()(accountStore: AccountStore, customerStore: CustomerSt
   }
   
   def isValidCouponCode(code: String, message: String="Not a valid coupon code"): Either[FormError, Coupon] = {
-    couponStore.findByCode(code).headOption.map(coupon => Right(coupon)).getOrElse {
+    couponStore.findValid(code).map(coupon => Right(coupon)).getOrElse {
       error(message)
     }
   }
-
 
   /**
    * Returns the customer ID if the provided account had a customer face

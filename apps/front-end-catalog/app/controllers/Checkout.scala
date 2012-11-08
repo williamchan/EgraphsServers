@@ -1,5 +1,6 @@
 package controllers
 
+import java.math.RoundingMode
 import play.api._
 import play.api.mvc._
 import models.frontend.storefront.{CheckoutOrderSummary, CheckoutShippingAddressFormView, CheckoutBillingInfoView, CheckoutFormView}
@@ -11,6 +12,12 @@ import helpers.DefaultImplicitTemplateParameters
  * Permutations of the Checkout: Checkout.
  */
 object Checkout extends Controller with DefaultImplicitTemplateParameters {
+  
+  val zeroDollars = Money.zero(CurrencyUnit.USD)
+  val tenDollars = Money.of(CurrencyUnit.USD, 10, RoundingMode.HALF_EVEN)
+  val fortyDollars = Money.of(CurrencyUnit.USD, 40, RoundingMode.HALF_EVEN)
+  val fiftyDollars = Money.of(CurrencyUnit.USD, 50, RoundingMode.HALF_EVEN)
+  
   //
   // Public members
   //
@@ -36,6 +43,16 @@ object Checkout extends Controller with DefaultImplicitTemplateParameters {
   def stripePayment = Action {
     Ok(render(paymentJsModule = "stripe-payment"))
   }
+  
+  def partialDiscount = Action {
+    val discounted = defaultOrderSummary.copy(discount=Some(tenDollars), total=fortyDollars)
+    Ok(render(form=defaultCheckoutForm.copy(shipping=None), summary=discounted))
+  }
+  
+  def fullDiscount = Action {
+    val discounted = defaultOrderSummary.copy(discount=Some(fiftyDollars), total=zeroDollars)
+    Ok(render(form=defaultCheckoutForm.copy(shipping=None), summary=discounted))
+  }
 
   //
   // Private members
@@ -46,11 +63,11 @@ object Checkout extends Controller with DefaultImplicitTemplateParameters {
       productName="{product name}",
       recipientName="{recipient name}",
       messageText="{message text}",
-      basePrice=Money.zero(CurrencyUnit.USD),
+      basePrice=fiftyDollars,
       shipping=None,
       tax=None,
       discount=None,
-      total=Money.zero(CurrencyUnit.USD)
+      total=fiftyDollars
     )
   }
 

@@ -53,7 +53,8 @@ object Personalize extends Controller with DefaultImplicitTemplateParameters {
       "recipientEmailParam",
       "messageOptionsParam",
       "messageTextParam",
-      "noteToCelebrityParam"
+      "noteToCelebrityParam",
+      "couponParam"
     )
   }
 
