@@ -23,7 +23,7 @@ trait PostEgraphAdminEndpoint { this: Controller =>
   protected def egraphStore: EgraphStore
 
   def postEgraphAdmin(egraphId: Long) = postController() {
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       httpFilters.requireEgraphId(egraphId) { egraph =>
 	    Action { implicit request =>
 	      val egraphStateParam = Form("egraphState" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm)

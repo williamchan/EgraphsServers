@@ -18,7 +18,7 @@ private[controllers] trait GetEgraphAdminEndpoint extends ImplicitHeaderAndFoote
   protected def consumerApp: ConsumerApplication
 
   def getEgraphAdmin(egraphId: Long, action: Option[String] = None) = controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       httpFilters.requireEgraphId(egraphId) { egraph =>
       	Action { implicit request =>
       	  // TODO(play2): I had a hard time getting url parameter and query parameters working together. Will figure out later.

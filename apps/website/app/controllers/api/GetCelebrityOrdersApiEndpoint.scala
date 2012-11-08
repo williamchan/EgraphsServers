@@ -23,7 +23,7 @@ private[controllers] trait GetCelebrityOrdersApiEndpoint { this: Controller =>
    *   be returned are the ones that the celebrity needs to sign.
    */
   def getCelebrityOrders(signerActionable: Option[Boolean]) = controllerMethod() {
-    httpFilters.requireAuthenticatedAccount() { account =>
+    httpFilters.requireAuthenticatedAccount.inRequest() { account =>
       httpFilters.requireCelebrityId.inAccount(account) { celeb =>
         Action {
           signerActionable match {

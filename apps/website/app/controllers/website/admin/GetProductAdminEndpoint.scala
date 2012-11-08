@@ -17,7 +17,7 @@ private[controllers] trait GetProductAdminEndpoint extends ImplicitHeaderAndFoot
   protected def productStore: ProductStore
 
   def getProductAdmin(productId: Long) = controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       httpFilters.requireProductId(productId) { product =>
         Action { implicit request =>
           // TODO: Would be nice to have a preview mode for this.

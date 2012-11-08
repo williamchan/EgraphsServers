@@ -39,7 +39,7 @@ class RequireAuthenticatedAccountTests extends EgraphsUnitTest {
     val authenticatedAccountFilter = new RequireAuthenticatedAccount(accountStore) // this is what we are trying to test
     
     // Execute test
-    val result = authenticatedAccountFilter()(blockToExecute)(request)
+    val result = authenticatedAccountFilter.inRequest()(blockToExecute)(request)
     
     // Check expectations
     there was one(blockToExecute).apply(account)
@@ -57,7 +57,7 @@ class RequireAuthenticatedAccountTests extends EgraphsUnitTest {
     val request = FakeRequest()
 
     // Execute test
-    val result = authenticatedAccountFilter()(blockToExecute)(request)
+    val result = authenticatedAccountFilter.inRequest()(blockToExecute)(request)
     
     // Check expectations
     status(result) should be (FORBIDDEN)
@@ -80,7 +80,7 @@ class RequireAuthenticatedAccountTests extends EgraphsUnitTest {
     request.withHeaders(credentials.toHeader)
 
     // Execute test
-    val result = authenticatedAccountFilter()(blockToExecute)(request)
+    val result = authenticatedAccountFilter.inRequest()(blockToExecute)(request)
     
     // Check expectations
     status(result) should be (FORBIDDEN)

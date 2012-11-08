@@ -7,7 +7,6 @@ import models.Account
 import models.Customer
 import play.api.mvc._
 import play.api._
-import services.http.filters.RequireCustomerId
 import services.http.forms.AccountSettingsForm.Fields
 import services.http.forms.AccountSettingsFormFactory
 import services.http.ControllerMethod
@@ -25,9 +24,8 @@ private[controllers] trait GetAccountSettingsEndpoint extends ImplicitHeaderAndF
   protected def accountSettingsForms: AccountSettingsFormFactory
 
   def getAccountSettings = controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireCustomerId.inSession() { customer =>
+    httpFilters.requireCustomerLogin.inSession() { case (customer, account) =>
       Action { implicit request =>
-        val account = customer.account
         val form = makeFormView(customer, account, request.flash)
   
         val displayableErrors = (List(form.fullname.error, form.username.error, form.email.error,

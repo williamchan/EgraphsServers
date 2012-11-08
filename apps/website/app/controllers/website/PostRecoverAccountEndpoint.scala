@@ -29,11 +29,10 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
     AuthenticityToken.makeAvailable() { implicit authToken =>
       httpFilters.requireAccountEmail.inFlashOrRequest() { account =>
         Action { implicit request =>
-          val (customer, accountWithResetPassKey) = dbSession.connected(TransactionSerializable) {
-            val accountWithResetPassKey = account.withResetPasswordKey.save()
-            (customerStore.get(account.customerId.get), accountWithResetPassKey)
+          val accountWithResetPassKey = dbSession.connected(TransactionSerializable) {
+            account.withResetPasswordKey.save()
           }
-          sendRecoveryPasswordEmail(accountWithResetPassKey, customer)
+          sendRecoveryPasswordEmail(accountWithResetPassKey)
   
           val flashEmail = Utils.getFromMapFirstInSeqOrElse("email", "", request.queryString)
           
@@ -49,7 +48,7 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
   /**
    * Sends an email so that the customer can reset password via the getResetPassword endpoint
    */
-  private def sendRecoveryPasswordEmail(account: Account, customer: Customer)(implicit request: RequestHeader) {
+  private def sendRecoveryPasswordEmail(account: Account)(implicit request: RequestHeader) {
     val email = new HtmlEmail()
     email.setFrom("support@egraphs.com")
     email.addReplyTo("support@egraphs.com")
@@ -57,7 +56,6 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
     email.setSubject("Egraphs Password Recovery")
     val resetPasswordUrl = consumerApp.absoluteUrl(getResetPassword(account.email, account.resetPasswordKey.get).url)
     val htmlMsg = views.html.Application.email.reset_password_email(
-        customerName = customer.name,
         email = account.email,
         resetPasswordUrl = resetPasswordUrl
       )

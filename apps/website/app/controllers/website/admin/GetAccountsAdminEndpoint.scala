@@ -17,7 +17,7 @@ private[controllers] trait GetAccountsAdminEndpoint extends ImplicitHeaderAndFoo
   protected def controllerMethod: ControllerMethod
 
   def getAccountsAdmin = controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       Action { implicit request =>
         val email: String = Form("email" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm)
         val account = if (!email.isEmpty) accountStore.findByEmail(email) else None

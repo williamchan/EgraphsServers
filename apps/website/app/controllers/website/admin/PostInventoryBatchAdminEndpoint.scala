@@ -26,7 +26,7 @@ trait PostInventoryBatchAdminEndpoint extends Logging {
   protected def inventoryBatchStore: InventoryBatchStore
   
   def postCreateInventoryBatchAdmin(celebrityId: Long) = postController() {
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       httpFilters.requireCelebrityId(celebrityId) { celebrity =>
         Action { implicit request =>
           
@@ -61,7 +61,7 @@ trait PostInventoryBatchAdminEndpoint extends Logging {
   }
   
   def postInventoryBatchAdmin(inventoryBatchId: Long) = postController() {
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       httpFilters.requireInventoryBatchId(inventoryBatchId) { inventoryBatch =>
         Action { implicit request =>
           

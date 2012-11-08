@@ -3,7 +3,7 @@ package services.db
 import org.squeryl.PrimitiveTypeMode._
 import org.squeryl.{KeyedEntity, Table}
 import models._
-import models.filters._
+import models.categories._
 import models.vbg._
 import models.xyzmo._
 import java.lang.IllegalStateException
@@ -65,6 +65,11 @@ class Schema @Inject()(
     cashTransaction.billingPostalCode is dbType("varchar(20)"))
   )
 
+  val categories = table[Category]
+  on(categories) (category => declare( category.name is unique))
+  val categoryValues = table[CategoryValue]
+  on(categoryValues) (categoryValue => declare( categoryValue.name is unique))
+  
   val celebrities = table[Celebrity]
   on(celebrities)(celebrity =>
     declare(
@@ -93,11 +98,6 @@ class Schema @Inject()(
 
   val failedPurchaseData = table[FailedPurchaseData]
   on(failedPurchaseData)(datum => declare( datum.purchaseData is dbType("varchar(1000)") ))
-
-  val filters = table[Filter]
-  on(filters) (filter => declare( filter.name is unique))
-  val filterValues = table[FilterValue]
-  on(filterValues) (filterValue => declare( filterValue.name is unique))
 
   val inventoryBatches = table[InventoryBatch]
   on(inventoryBatches)(inventoryBatch =>
@@ -171,13 +171,13 @@ class Schema @Inject()(
   // manyToManyRelation declarations -- please keep these alphabetized
   //
 
-  val celebrityFilterValues =
-    manyToManyRelation(celebrities, filterValues).via[CelebrityFilterValue]((c, fv, cfv) =>
-      (cfv.celebrityId === c.id, cfv.filterValueId === fv.id)
+  val categoryValueRelationships =
+    manyToManyRelation(categoryValues, categories).via[CategoryValueRelationship]((cv,c,cvr) => (cvr.categoryValueId === cv.id, cvr.categoryId === c.id))
+  
+  val celebrityCategoryValues =
+    manyToManyRelation(celebrities, categoryValues).via[CelebrityCategoryValue]((c, cv, ccv) =>
+      (ccv.celebrityId === c.id, ccv.categoryValueId === cv.id)
     )
-
-  val filterValueRelationships =
-    manyToManyRelation(filterValues, filters).via[FilterValueRelationship]((fv,f,fvr) => (fvr.filterValueId === fv.id, fvr.filterId === f.id))
     
   val inventoryBatchProducts = manyToManyRelation(inventoryBatches, products)
     .via[InventoryBatchProduct]((inventoryBatch, product, join) => (join.inventoryBatchId === inventoryBatch.id, join.productId === product.id))
@@ -407,16 +407,16 @@ class Schema @Inject()(
       factoryFor(blobKeys) is BlobKey(services = injector.instance[BlobKeyServices]),
       factoryFor(cashTransactions) is CashTransaction(services = injector.instance[CashTransactionServices]),
       factoryFor(celebrities) is Celebrity(services = injector.instance[CelebrityServices]),
-      factoryFor(celebrityFilterValues) is CelebrityFilterValue(services = injector.instance[FilterServices]),
+      factoryFor(celebrityCategoryValues) is CelebrityCategoryValue(services = injector.instance[CategoryServices]),
       factoryFor(coupons) is Coupon(services = injector.instance[CouponServices]),
       factoryFor(customers) is Customer(services = injector.instance[CustomerServices]),
       factoryFor(egraphs) is Egraph(services = injector.instance[EgraphServices]),
       factoryFor(enrollmentBatches) is EnrollmentBatch(services = injector.instance[EnrollmentBatchServices]),
       factoryFor(enrollmentSamples) is EnrollmentSample(services = injector.instance[EnrollmentSampleServices]),
       factoryFor(failedPurchaseData) is FailedPurchaseData(services = injector.instance[FailedPurchaseDataServices]),
-      factoryFor(filters) is Filter(services = injector.instance[FilterServices]),
-      factoryFor(filterValues) is FilterValue(services = injector.instance[FilterServices]),
-      factoryFor(filterValueRelationships) is FilterValueRelationship(services = injector.instance[FilterServices]),
+      factoryFor(categories) is Category(services = injector.instance[CategoryServices]),
+      factoryFor(categoryValues) is CategoryValue(services = injector.instance[CategoryServices]),
+      factoryFor(categoryValueRelationships) is CategoryValueRelationship(services = injector.instance[CategoryServices]),
       factoryFor(inventoryBatches) is InventoryBatch(services = injector.instance[InventoryBatchServices]),
       factoryFor(inventoryBatchProducts) is InventoryBatchProduct(services = injector.instance[InventoryBatchProductServices]),
       factoryFor(orders) is Order(services = injector.instance[OrderServices]),

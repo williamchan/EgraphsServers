@@ -15,12 +15,14 @@ import play.api.mvc.Result
 import play.api.test.Helpers.BAD_REQUEST
 import play.api.test.Helpers.NOT_FOUND
 import play.api.test.Helpers.OK
+import play.api.test.Helpers.SEE_OTHER
 import play.api.test.Helpers.status
 import play.api.test.FakeRequest
 import utils.EgraphsUnitTest
 import play.api.libs.json.Json
 import play.api.mvc.Session
 import play.api.mvc.Cookie
+import play.api.mvc.Results
 
 @RunWith(classOf[JUnitRunner])
 class RequestFilterTests extends EgraphsUnitTest with MockFactory {
@@ -121,6 +123,26 @@ class RequestFilterTests extends EgraphsUnitTest with MockFactory {
       })
   }
 
+  "inSession" should "should execute the code in an action from the actionFactory if the requirement is found in the session" in {
+    val request = FakeRequest().withSession((validFormKey, "true"))
+
+    happyTest(request) { filter =>
+      filter.inSession()
+    }
+  }
+
+  it should "should not execute the code in an action from the actionFactory if the requirement is not found in the session" in {
+    val request = FakeRequest().withSession(("someOtherKey", "true"))
+
+    filteredOutTest(request)(
+      testOperation = { filter =>
+        filter.inSession()
+      },
+      verification = { result =>
+        status(result) should be(BAD_REQUEST)
+      })
+  }
+
   "inRequestOrFlash" should "should execute the code in an action from the actionFactory if the requirement is found in the request form url" in {
     val request = FakeRequest().withFormUrlEncodedBody((validFormKey, "true"))
 
@@ -147,6 +169,26 @@ class RequestFilterTests extends EgraphsUnitTest with MockFactory {
       verification = { result =>
         status(result) should be(BAD_REQUEST)
       })
+  }
+
+  "formFailedResult" should "be able to be able to be overriden to Redirect" in {
+    import play.api.mvc.Results.Redirect
+
+    val filter = new TestableRequestFilter() {
+      override protected def formFailedResult[A, S >: Source](formWithErrors: Form[String], source: S)(implicit request: Request[A]): Result = {
+        Redirect("www.egraphs.com")
+      }
+    }
+
+    val cookie = Cookie(validFormKey, "true")
+    val request = FakeRequest().withCookies(cookie)
+
+    val (resultFromAction, actionFactory) = setupMocks(expectedNumberOfCallsToActionFactory = 0)
+
+    val action = filter.inRequest()(actionFactory)
+    val result = action(request)
+
+    status(result) should be(SEE_OTHER) // SEE_OTHER is equivalent to code: 301 returned by Redirect
   }
 
   def happyTest(request: Request[AnyContent])(testOperation: RequestFilter[_, Boolean] => (Boolean => Action[AnyContent]) => Action[AnyContent]) = {

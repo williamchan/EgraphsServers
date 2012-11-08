@@ -16,7 +16,7 @@ private[controllers] trait GetCelebrityApiEndpoint { this: Controller =>
    * See [[https://egraphs.jira.com/wiki/display/DEV/API+Endpoints#APIEndpoints-Celebrities%C2%A0Celebrities the json spec]].
    */
   def getCelebrity = controllerMethod() {
-    httpFilters.requireAuthenticatedAccount() { account =>
+    httpFilters.requireAuthenticatedAccount.inRequest() { account =>
       httpFilters.requireCelebrityId.inAccount(account) { celeb =>
         Action {
           Ok(Serializer.SJSON.toJSON(celeb.renderedForApi))

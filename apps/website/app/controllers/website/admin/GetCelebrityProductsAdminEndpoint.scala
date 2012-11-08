@@ -19,7 +19,7 @@ private[controllers] trait GetCelebrityProductsAdminEndpoint extends ImplicitHea
   protected def httpFilters: HttpFilters
 
   def getCelebrityProductsAdmin(celebrityId: Long, page: Int = 1) = controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireAdministratorLogin.inSession() { (admin, adminAccount) =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       httpFilters.requireCelebrityId(celebrityId) { (celebrity) =>
         Action { implicit request =>
           
