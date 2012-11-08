@@ -163,7 +163,7 @@ class Utils @Inject() {
    */
   @deprecated("this is balls", "don't use this balls")
   def asset(path: String): String = {
-    controllers.routes.RemoteAssets.at(path).url
+    controllers.routes.EgraphsAssets.at(path).url
   }
 
   implicit def properties(pairs: (AnyRef, AnyRef)*): util.Properties = {
