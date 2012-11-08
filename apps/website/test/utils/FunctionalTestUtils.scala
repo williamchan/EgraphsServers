@@ -13,6 +13,10 @@ import services.http.EgraphsSession
 import EgraphsSession.Conversions._
 import play.api.mvc.Call
 import play.api.mvc.AnyContentAsFormUrlEncoded
+import play.api.mvc.ChunkedResult
+import play.api.libs.iteratee.Iteratee
+import play.api.libs.concurrent.Promise
+import play.api.mvc.Result
 
 //import java.util.Properties
 //import models.Account
@@ -95,6 +99,27 @@ object FunctionalTestUtils {
       "Deliver-All-Orders-to-Celebrities"
     )
   }
+  
+  /** 
+   * Returns the contents of a ChunkedResult[Array[Byte]] as a vector of bytes. Throws
+   * an exception otherwise.
+   **/
+  def chunkedContent(result: Result): IndexedSeq[Byte] =  {
+    result match {
+      case chunkedResult: ChunkedResult[_] =>
+        val chunkedByteResult = chunkedResult.asInstanceOf[ChunkedResult[Array[Byte]]]
+        var bytesVec = Vector.empty[Byte]
+        val countIteratee = Iteratee.fold[Array[Byte], Unit](0) { (_, bytes) => bytesVec = bytesVec ++ bytes }
+        val promisedIteratee = chunkedByteResult.chunks(countIteratee).asInstanceOf[Promise[Iteratee[Array[Byte], Unit]]]
+        
+        promisedIteratee.await(5000).get.run.await(5000).get
+    
+        bytesVec
+        
+      case _ =>
+        throw new Exception("Couldn't get chunked content from result of type " + result.getClass)
+    }
+  }  
 
   def routeName(call: Call): String = {
     call.method + " " + call.url

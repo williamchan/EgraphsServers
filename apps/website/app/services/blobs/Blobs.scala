@@ -50,9 +50,9 @@ class Blobs @Inject() (
 
   /**
    * Retrieve the Blob at a given key from the static resources blobstore. Always attempts to access Amazon S3.
-   * Delete this method after Play 2.0. Use getStaticResourceUrl instead.
+   * Only use this method if you intend on using the bytes here on the server. Otherwise, for example if you intend 
+   * a browser to be downloading the file, use getStaticResourceUrl.
    */
-  @Deprecated
   def getStaticResource(key: String) : Option[Blob] = {
     val store = s3.context.getBlobStore
     Option(store.getBlob(staticResourceBlobstoreNamespace, key))

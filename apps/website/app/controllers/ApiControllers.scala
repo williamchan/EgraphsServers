@@ -10,8 +10,10 @@ import models.{EnrollmentBatchStore, EnrollmentBatchServices, OrderQueryFilters,
 import services.blobs.Blobs
 import services.AppConfig._
 import services.http.filters.HttpFilters
+import services.ConsumerApplication
 
 object ApiControllers extends Controller
+  with GetIOSClientEndpoint
   with GetCelebrityApiEndpoint
   with GetCelebrityEnrollmentTemplateApiEndpoint
   with GetCelebrityMobileAppInfoEndpoint
@@ -23,6 +25,7 @@ object ApiControllers extends Controller
 {
   import services.AppConfig.instance
 
+  override protected val consumerApp = instance[ConsumerApplication]
   override protected val config = instance[services.config.ConfigFileProxy]
   override protected def egraphActor: ActorRef = actors.EgraphActor.actor
   override protected def enrollmentBatchActor: ActorRef = actors.EnrollmentBatchActor.actor
