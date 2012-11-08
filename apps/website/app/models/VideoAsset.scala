@@ -5,16 +5,21 @@ import services.{ AppConfig, Time }
 import services.db.{ FilterOneTable, KeyedCaseClass, Schema, SavesWithLongKey }
 import org.squeryl.Query
 import com.google.inject.Inject
+import enums.{ HasVideoStatus }
+import models.enums.VideoStatus
 
 case class VideoAssetServices @Inject() (store: VideoAssetStore)
 
-case class VideoAsset(id: Long = 0,
+case class VideoAsset(
+  id: Long = 0,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   url: String,
+  _videoStatus: String = VideoStatus.Unprocessed.name,
   services: VideoAssetServices = AppConfig.instance[VideoAssetServices])
   extends KeyedCaseClass[Long]
-  with HasCreatedUpdated {
+  with HasCreatedUpdated
+  with HasVideoStatus[VideoAsset] {
 
   //
   // Public members
@@ -27,22 +32,20 @@ case class VideoAsset(id: Long = 0,
   // KeyedCaseClass[Long] methods
   //
   override def unapplied = VideoAsset.unapply(this)
-}
 
+  //
+  // VideoStatus[VideoAsset] methods
+  //
+  override def withVideoStatus(status: VideoStatus.EnumVal) = {
+    this.copy(_videoStatus = status.name)
+  }
+
+}
 
 class VideoAssetStore @Inject() (schema: Schema)
   extends SavesWithLongKey[VideoAsset] with SavesCreatedUpdated[Long, VideoAsset] {
-  
+
   import org.squeryl.PrimitiveTypeMode._
-
-  //
-  // Public methods
-  //
-
-  /** I think I'd use this in the CelebVideoAsset to do the join? */
-  def findByVideoAsset(id: Long): Query[VideoAsset] = {
-    from(schema.videoAssets)((videoAsset) => where(videoAsset.id === id) select (videoAsset))
-  }
 
   //
   // SavesWithLongKey[Address] methods
@@ -54,7 +57,8 @@ class VideoAssetStore @Inject() (schema: Schema)
       theOld.id := theNew.id,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated,
-      theOld.url := theNew.url)
+      theOld.url := theNew.url,
+      theOld._videoStatus := theNew._videoStatus)
   }
 
   //

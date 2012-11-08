@@ -1,61 +1,62 @@
 package controllers.api
 
-import services.db.DBSession
-import play.api._
-import play.api.mvc._
-import play.api.libs.Files.TemporaryFile
-import play.api.libs.json.Json
 import java.io.File
-import services.blobs.Blobs
-import services.AppConfig
 import scala.io.Source
+import models.VideoAsset
+import models.VideoAssetCelebrity
+import play.api.libs.json.Json
+import play.api.mvc.Controller
+import play.api.mvc.Action
 import services.blobs.AccessPolicy
-import play.api.data.Forms._
-import play.api.mvc.MultipartFormData.FilePart
+import services.blobs.Blobs
+import services.http.filters.HttpFilters
+import services.http.POSTApiControllerMethod
+import services.AppConfig
+import models.VideoAsset
+import models.VideoAssetCelebrity
 
 private[controllers] trait PostVideoAssetApiEndpoint { this: Controller =>
-  protected def dbSession: DBSession
+  //protected def dbSession: DBSession
+  protected def postApiController: POSTApiControllerMethod
+  protected def httpFilters: HttpFilters
 
   private val blob: Blobs = AppConfig.instance[Blobs]
 
-  def postVideoAsset = Action(parse.multipartFormData) { request =>
+  def postVideoAsset = postApiController() {
+    httpFilters.requireCelebrityId.inRequest(parse.multipartFormData) { celebrity =>
+      Action(parse.multipartFormData) { request =>
 
-    // get celebrity ID out of post request 
-    val maybeCelebrityId = request.body.dataParts.get("celebrityId")
-    val celebrityId = maybeCelebrityId match {
-      case Some(maybeCelebrityId) => maybeCelebrityId(0)
-      case None => ""
-    }
+        val celebrityId = celebrity.id
+        play.Logger.info("Celebrity id is " + celebrityId)
 
-    request.body.file("video").map { resource =>
-      import java.io.File
-      val filename = resource.filename
-      val directory = "/tmp/"
-      val tempFile = new File(directory + filename)
-      resource.ref.moveTo(tempFile)
+        request.body.file("video").map { resource =>
+          import java.io.File
+          val filename = resource.filename
+          val directory = "/tmp/"
+          val tempFile = new File(directory + filename)
+          resource.ref.moveTo(tempFile)
 
-      val maybeFileLocation = putFile(celebrityId, filename, tempFile)
-      val fileLocation = maybeFileLocation match {
-        case Some(maybeFileLocation) => maybeFileLocation
-        case None => "File not found"
+          val maybeFileLocation = putFile(celebrityId, filename, tempFile)
+          val fileLocation = maybeFileLocation match {
+            case Some(maybeFileLocation) => maybeFileLocation
+            case None => "File not found"
+          }
+
+          persist(celebrityId, fileLocation)
+          val responseJson = getJson(celebrityId, tempFile, fileLocation)
+
+          // file only needed for bytes computation
+          tempFile.delete()
+          Ok(responseJson)
+
+        }.getOrElse {
+          BadRequest("Something went wrong with your request. Please try again.")
+        }
       }
-
-      // add row to videoasset table
-      // add row to celebvideoasset table
-      // make sure to not send responseJson unless db update goes through
-
-      val responseJson = getJson(celebrityId, tempFile, fileLocation)
-
-      // file only needed for bytes computation
-      tempFile.delete()
-      Ok(responseJson)
-
-    }.getOrElse {
-      BadRequest("Something went wrong with your request. Please try again.")
     }
   }
 
-  private def putFile(celebrityId: String, filename: String, file: File): Option[String] = {
+  private def putFile(celebrityId: Long, filename: String, file: File): Option[String] = {
 
     val videoKey = "videos/" + celebrityId + "/" + filename
     val source = Source.fromFile(file, "ISO-8859-1")
@@ -66,12 +67,24 @@ private[controllers] trait PostVideoAssetApiEndpoint { this: Controller =>
     blob.getUrlOption(key = videoKey)
   }
 
-  private def getJson(celebrityId: String, tempFile: java.io.File, maybeFileLocation: String) = {
+  private def getJson(celebrityId: Long, tempFile: java.io.File, maybeFileLocation: String) = {
     val jsonIterable = Json.toJson(Map(
       "celebrityId" -> Json.toJson(celebrityId),
       "bytes" -> Json.toJson(tempFile.length),
       "url" -> Json.toJson(maybeFileLocation)))
 
     Json.toJson(Map("video" -> jsonIterable))
+  }
+
+  private def persist(celebrityId: Long, fileLocation: String) = {
+    // add row to videoAssets table
+    val videoAsset = VideoAsset(url = fileLocation).save()
+    val videoId = videoAsset.id
+
+    // add row to videoAssetsCelebrity table
+    val videoAssetCelebrity = VideoAssetCelebrity(
+      celebrityId = celebrityId,
+      videoId = videoId)
+    videoAssetCelebrity.save()
   }
 }

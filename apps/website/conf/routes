@@ -91,7 +91,8 @@ POST     /admin/orders/$orderId<[0-9]+>                                   contro
 GET      /admin/products/$productId<[0-9]+>                               controllers.WebsiteControllers.getProductAdmin(productId: Long)
 POST     /admin/products/$productId<[0-9]+>                               controllers.WebsiteControllers.postProductAdmin(productId: Long)
 GET      /admin/reports                                            				controllers.WebsiteControllers.getReportsAdmin
-GET      /admin/tools                                              				controllers.WebsiteControllers.getToolsAdmin											
+GET      /admin/tools                                              				controllers.WebsiteControllers.getToolsAdmin
+GET      /admin/unprocessedVideos                                         controllers.WebsiteControllers.getUnprocessedVideos											
 GET      /admin/videoUploader                                             controllers.WebsiteControllers.getVideoEnrollment	
 
 ##

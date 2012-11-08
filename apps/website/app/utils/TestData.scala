@@ -180,6 +180,11 @@ object TestData {
       .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), Base64.decode(TestConstants.voiceStr()))
       .save()
   }
+
+  def newSavedVideoAsset(): VideoAsset = {
+    VideoAsset(url = "http://www.testUrl.com").save()
+  }
+   
   /**
    *  Convert an iterable and key into a map with the same key for every value.
    *  Helpful when writing functional tests. 
