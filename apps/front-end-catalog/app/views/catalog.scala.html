@@ -1,5 +1,6 @@
 @()
-@{/** Catalogs the permutations of every page we render. */}
+
+@** Catalogs the permutations of every page we render. *@
 
 @catalogEntry(href: String, description: String) = {<li><a href="@href">@description</a></li>}
 @galleryEntry(href: String) = {
@@ -173,10 +174,8 @@
       @catalogEntry("Email/orderConfirmationText", "Order Confirmation text-only")
       @catalogEntry("Email/viewEgraph", "View Egraph")
       @catalogEntry("Email/confirm", "Account Confirmation")
-      @{/** 
       @catalogEntry("Email/mlbStatic", "MLB Static")
       @catalogEntry("Email/celebrity_welcome_email", "Celebrity Welcome Email")
-      */}
     </ol>
   </body>
 </html>
