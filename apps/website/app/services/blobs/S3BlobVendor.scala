@@ -19,6 +19,7 @@ private[blobs] case class S3BlobVendor @Inject() (
 ) extends BlobVendor with Logging {
   val s3id = config.s3Id
   val s3secret = config.s3Secret
+  val cacheControlValue = "max-age" + config.immutableAssetsCacheControlInSeconds
 
   //
   // BlobVendor members
@@ -57,8 +58,7 @@ private[blobs] case class S3BlobVendor @Inject() (
 
     // Since we will not be changing content in these blobs we will want any clients (also the CDN)
     // to cache these for a long time
-    metadata.setCacheControl("max-age=31536000") // 1 year
-    //TODO: Let's turn share the value used in the Fingerprinting assets by putting this into the config.
+    metadata.setCacheControl(cacheControlValue)
 
     // Ship it off
     s3.putObject(namespace, s3Object, withAcl(s3ConstantForAccessPolicy(access)))

@@ -34,6 +34,10 @@ trait FingerprintedAssets extends AssetProvider { this: Controller =>
 
   def defaultPath: String
 
+  val cacheControlMaxAgeInSeconds: Int
+
+  lazy val cacheControlMaxAge = "max-age=" + cacheControlMaxAgeInSeconds
+
   /**
    * This will find files that were fingerprinted.  If the file is found with the fingerprint
    * striped out of its name and the checksum matches the checksum in the fingerprint.  Otherwise
@@ -63,7 +67,7 @@ trait FingerprintedAssets extends AssetProvider { this: Controller =>
               val action = super.at(path, originalFilename)
               val result = action.apply(request)
               val resultWithHeaders = result.asInstanceOf[ResultWithHeaders]
-              resultWithHeaders.withHeaders(CACHE_CONTROL -> "max-age=31536000")
+              resultWithHeaders.withHeaders(CACHE_CONTROL -> cacheControlMaxAge)
             }
           }
         })

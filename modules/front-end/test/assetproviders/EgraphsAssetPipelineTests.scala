@@ -30,5 +30,6 @@ class EgraphsAssetPipelineTests extends FlatSpec with ShouldMatchers {
     override def assetReverseRoute(file: String) = new Call("GET", "/fake-assets/" + file)
     override def defaultPath = "/public"
     override def remoteContentUrl = Some("https://mycdn.com")
+    override val cacheControlMaxAgeInSeconds = 10
   }
 }
