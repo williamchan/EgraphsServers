@@ -54,7 +54,7 @@ trait FingerprintedAssets extends AssetProvider { this: Controller =>
           val checksum = fingerprint.replace(fingerprintConstant, "").replace("." + extension, "")
           // if the checksum doesn't match don't serve that version
           if (getChecksum(url).toString != checksum) {
-            println("expected checksum = " + checksum + " other was = " + getChecksum(url))
+            Logger.info("expected checksum = " + checksum + " other was = " + getChecksum(url))
             super.at(path, file)
           } else {
             Action { request =>

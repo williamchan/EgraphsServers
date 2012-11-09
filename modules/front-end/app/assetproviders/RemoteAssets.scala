@@ -16,6 +16,11 @@ import play.api.Play
 
 // Inspired by http://www.jamesward.com/2012/08/08/edge-caching-with-play2-heroku-cloudfront
 trait RemoteAssets extends AssetProvider { this: Controller =>
+  /** 
+   * This application's content URL with protocol. For example, "https://souefusfisu.cloudfront.net"
+   */
+  protected def remoteContentUrl: Option[String]
+
   private val timeZoneCode = "GMT"
 
   private val df: DateTimeFormatter =
@@ -29,17 +34,12 @@ trait RemoteAssets extends AssetProvider { this: Controller =>
   }
 
   abstract override def at(file: String): Call = {
-    val secure = Play.configuration.getString("cdn.secure").getOrElse("true").toBoolean // default is secure
-    val httpOrHttps = if (secure) "https://" else "http://"
-
-    val maybeContentUrl = Play.configuration.getString("cdn.contenturl")
-    maybeContentUrl match {
+    remoteContentUrl match {
       case Some(contentUrl) => {
-        new Call("GET", httpOrHttps + contentUrl + this.assetReverseRoute(file).url)
+        new Call("GET", contentUrl + this.assetReverseRoute(file).url)
       }
+
       case None => this.assetReverseRoute(file)
     }
   }
 }
-
-
