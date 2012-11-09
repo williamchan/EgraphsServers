@@ -292,6 +292,9 @@ class Schema @Inject()(
         dropSchema()
       }
       create
+      createMaterializedViewFunctions()
+      createCelebrityMaterializedView()
+      
     } else {
       throw new IllegalStateException(
         """I'm just not going to scrub the DB unless "db.default.allowscrub" is
@@ -300,6 +303,146 @@ class Schema @Inject()(
     }
   }
 
+  /**
+   * Create table and functions for materialized views. 
+   * See references:
+   *  Using Jonathan Gardner's MV implementation. http://tech.jonathangardner.net/wiki/PostgreSQL/Materialized_Views
+   *  StackOverflow reference:  http://stackoverflow.com/questions/13281152/postgres-text-search-against-a-derived-ts-vector  
+   */
+  private def createMaterializedViewFunctions() {
+    DBAdapter.current match {
+      case DBAdapter.postgres => {
+        val conn = currentTxnConnectionFactory()
+        conn.prepareStatement(
+        """
+        CREATE TABLE matviews (
+          mv_name NAME NOT NULL PRIMARY KEY,
+          v_name NAME NOT NULL,
+          last_refresh TIMESTAMP WITH TIME ZONE
+        );    
+        """    
+        ).execute()
+        // Create Function
+        conn.prepareStatement(
+          """
+          CREATE OR REPLACE FUNCTION create_matview(NAME, NAME)
+           RETURNS VOID
+           SECURITY DEFINER
+           LANGUAGE plpgsql AS '
+           DECLARE
+               matview ALIAS FOR $1;
+               view_name ALIAS FOR $2;
+               entry matviews%ROWTYPE;
+           BEGIN
+               SELECT * INTO entry FROM matviews WHERE mv_name = matview;
+           
+               IF FOUND THEN
+                   RAISE EXCEPTION ''Materialized view ''''%'''' already exists.'',
+                     matview;
+               END IF;
+               EXECUTE ''REVOKE ALL ON '' || view_name || '' FROM PUBLIC''; 
+               EXECUTE ''GRANT SELECT ON '' || view_name || '' TO PUBLIC'';
+               EXECUTE ''CREATE TABLE '' || matview || '' AS SELECT * FROM '' || view_name;
+               EXECUTE ''REVOKE ALL ON '' || matview || '' FROM PUBLIC'';
+               EXECUTE ''GRANT SELECT ON '' || matview || '' TO PUBLIC'';
+               INSERT INTO matviews (mv_name, v_name, last_refresh)
+                 VALUES (matview, view_name, CURRENT_TIMESTAMP); 
+               RETURN;
+           END
+           ';
+         """
+        ).execute()
+        // Drop function
+        conn.prepareStatement(
+        """
+        CREATE OR REPLACE FUNCTION drop_matview(NAME) RETURNS VOID
+         SECURITY DEFINER
+         LANGUAGE plpgsql AS '
+         DECLARE
+             matview ALIAS FOR $1;
+             entry matviews%ROWTYPE;
+         BEGIN
+         
+             SELECT * INTO entry FROM matviews WHERE mv_name = matview;
+         
+             IF NOT FOUND THEN
+                 RAISE EXCEPTION ''Materialized view % does not exist.'', matview;
+             END IF;
+         
+             EXECUTE ''DROP TABLE '' || matview;
+             DELETE FROM matviews WHERE mv_name=matview;
+         
+             RETURN;
+         END
+         ';    
+        """    
+        ).execute()
+        // Refresh function
+        conn.prepareStatement(
+          """
+           CREATE OR REPLACE FUNCTION refresh_matview(name) RETURNS VOID
+             SECURITY DEFINER
+             LANGUAGE plpgsql AS '
+             DECLARE 
+                 matview ALIAS FOR $1;
+                 entry matviews%ROWTYPE;
+             BEGIN
+             
+                 SELECT * INTO entry FROM matviews WHERE mv_name = matview;
+             
+                 IF NOT FOUND THEN
+                     RAISE EXCEPTION ''Materialized view % does not exist.'', matview;
+                END IF;
+            
+                EXECUTE ''DELETE FROM '' || matview;
+                EXECUTE ''INSERT INTO '' || matview
+                    || '' SELECT * FROM '' || entry.v_name;
+            
+                UPDATE matviews
+                    SET last_refresh=CURRENT_TIMESTAMP
+                    WHERE mv_name=matview;
+            
+                RETURN;
+            END
+            ';
+          """
+        ).execute()
+      }
+     case _ =>drop
+    }
+  }
+  
+  private def createCelebrityMaterializedView() {
+     DBAdapter.current match {
+      case DBAdapter.postgres => {
+        val conn = currentTxnConnectionFactory()
+        // Create view
+        conn.prepareStatement(
+        """    
+          CREATE VIEW celebrity_categories_v AS
+          SELECT c.id, to_tsvector(c.publicname || ' ' || string_agg(cv.publicname, ' '))
+          FROM categoryvalue cv, celebritycategoryvalue ccv, celebrity c 
+          WHERE ccv.categoryvalueid = cv.id AND c.id = ccv.celebrityid
+          GROUP BY c.id;    
+        """
+        ).execute()
+        
+        conn.prepareStatement(
+        """
+        SELECT create_matview('celebrity_categories_mv', 'celebrity_categories_v');
+        """
+        ).execute()
+        
+        conn.prepareStatement(
+        """
+        CREATE INDEX celebrity_category_search_idx ON celebrity_categories_mv USING gin(to_tsvector);
+        """    
+        ).execute()
+      } 
+      case _ => drop  
+    }  
+  }
+  
   /**Drops the public schema of the database. This requires specific syntax for some providers. */
   private def dropSchema() {
     DBAdapter.current match {

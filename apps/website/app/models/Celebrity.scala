@@ -18,6 +18,8 @@ import play.api.Play.current
 import services.Dimensions
 import org.squeryl.dsl.ManyToMany
 import views.html.frontend.{celebrity_welcome_email, celebrity_welcome_email_text}
+import anorm._
+import anorm.SqlParser._
 
 /**
  * Services used by each celebrity instance
@@ -441,8 +443,6 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
    * @return matching celebs in CelebrityListing format
    */
   def findByTextQuery(query: String): Iterable[CelebrityListing] = {
-    import anorm._
-    import anorm.SqlParser._
   	val rowStream = SQL(
   	  """
   	    SELECT * FROM celebrity, account WHERE
@@ -464,6 +464,48 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
   	      publishedStatus = row[String]("_publishedStatus")
   	  )
   	}
+  }
+  
+  def rebuildSearchIndex {
+    SQL(
+    """
+        DROP INDEX celebrity_category_search_idx;
+    """
+        ).execute()(connection=schema.getTxnConnectionFactory)     
+    SQL(
+    """    
+        SELECT refresh_matview('celebrity_categories_mv');
+    """
+        ).execute()(connection=schema.getTxnConnectionFactory)
+    SQL(
+    """    
+        CREATE INDEX celebrity_category_search_idx ON celebrity_categories_mv USING gin(to_tsvector);
+    """
+    ).execute()(connection=schema.getTxnConnectionFactory)
+  }
+  
+  def search(query: String, refinements: Map[Long, Iterable[Long]] = Map[Long, Iterable[Long]]()): Iterable[CelebrityListing] = {
+    val rowStream = SQL(
+      """
+        SELECT * FROM celebrity c, celebrity_categories_mv mv WHERE
+        (
+          mv.to_tsvector
+          @@
+          plainto_tsquery('english', {textQuery})
+        ) and mv.id = c.id
+      """
+    ).on("textQuery" -> query).apply()(connection = schema.getTxnConnectionFactory)
+    
+    for(row <- rowStream) yield {
+      new CelebrityListing(
+          id = row[Long]("celebrity.id"),
+          publicName = row[String]("celebrity.publicname"),
+          email = "",
+          urlSlug = row[String]("celebrity.urlslug"),
+          enrollmentStatus = row[String]("celebrity._enrollmentStatus"),
+          publishedStatus = row[String]("celebrity._publishedStatus")
+      )
+    }
   }
 
   def getCelebrityAccounts: Query[(Celebrity, Account)] = {

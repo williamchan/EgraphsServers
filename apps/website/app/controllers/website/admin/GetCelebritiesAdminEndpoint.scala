@@ -49,10 +49,20 @@ private[controllers] trait GetCelebritiesAdminEndpoint extends ImplicitHeaderAnd
     httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       Action { implicit request =>
         val query = Form("query" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm)
-        val listings = celebrityStore.findByTextQuery(query)
+        val listings = celebrityStore.search(query=query)
         Ok(views.html.Application.admin.admin_celebrities_search(celebrityListings = listings))
       }
     }
+  }
+  
+  def getRebuildSearchIndex = controllerMethod.withForm() { implicit authToken =>
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
+      Action { implicit request =>
+        celebrityStore.rebuildSearchIndex
+        Ok("Index has been rebuilt.")
+      }
+    }
+    
   }
 }
 

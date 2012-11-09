@@ -9,6 +9,7 @@ trait AllConsumerEndpoints
   with GetAccountSettingsEndpoint
   with GetCustomerGalleryEndpoint
   with GetEgraphEndpoint
+  with GetMarketplaceEndpoint
   with GetOrderConfirmationEndpoint
   with GetLoginEndpoint
   with GetRecoverAccountEndpoint
