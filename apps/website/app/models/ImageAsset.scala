@@ -210,7 +210,10 @@ object ImageAsset extends Logging {
       keyBase,
       name,
       services.blobs.get(masterKey) match {
-        case None => throw new IllegalStateException("Master data located at \""+masterKey+"\" unavailable in blobstore.")
+        case None => {
+          Celebrity().defaultLandingPageImage.renderFromMaster.asByteArray(imageType)
+//          throw new IllegalStateException("Master data located at \""+masterKey+"\" unavailable in blobstore.")
+        }
         case Some(blob) => blob.asByteArray
       },
       imageType,

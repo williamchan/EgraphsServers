@@ -17,6 +17,7 @@ import services.http.{SafePlayParams, ControllerMethod}
 import services.http.EgraphsSession.Conversions._
 import services.http.filters._
 import egraphs.authtoken.AuthenticityToken
+import services.mvc.celebrity.CelebrityViewConversions
 
 /**
  * Controller for serving the celebrity marketplace
@@ -24,6 +25,8 @@ import egraphs.authtoken.AuthenticityToken
 
 private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
   protected def controllerMethod : ControllerMethod
+  protected def celebrityStore : CelebrityStore  
+  import CelebrityViewConversions._
   
   import SafePlayParams.Conversions._
   val queryUrl = controllers.routes.WebsiteControllers.getMarketplaceResultPage.url
@@ -34,6 +37,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
      //Map Vertical to specific landing page.
        Ok(views.html.frontend.marketplace_landing(
          queryUrl = queryUrl.toString,
+         marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage.url,
          verticalViewModels = List[VerticalViewModel](),
          results = List[ResultSetViewModel](),
          categoryViewModels = List[CategoryViewModel]()
@@ -56,11 +60,20 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       }      
       // 3) No results, send garbage
       // 4) Error in data, same as no results but with error message
+      val celebrities = 
+        (queryOption match {
+          case Some(query) => celebrityStore.search(query)
+          case _ => List()
+        }).map( celebrity =>
+           celebrity.asMarketplaceCelebrity
+          ) 
+        
       
        Ok(views.html.frontend.marketplace_results(
          queryUrl = queryUrl.toString,
+         marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage.url,
          verticalViewModels = List[VerticalViewModel](),
-         results = List[ResultSetViewModel](),
+         results = List(ResultSetViewModel(subtitle=Option("Derp"), celebrities)),
          categoryViewModels = List[CategoryViewModel]()
        ))
     }

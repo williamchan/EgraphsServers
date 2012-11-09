@@ -13,7 +13,7 @@
               @if(celebrity.soldout) {
                 <a href="#" class="ribbon"><em>Sold Out</em></a>     
               }
-                <a href="#"><img src="@RemoteAssets.at(celebrity.photoUrl)" alt="FPO image"></a>
+                <a href="#"><img src="@celebrity.photoUrl" alt="FPO image"></a>
             </figure>
               
             <hgroup>            
@@ -21,7 +21,18 @@
               <h3><a href="#" title="View: Celeb Category / Team">@celebrity.subtitle</a></h3>
             </hgroup>
               
-            <p><a href="#">$@celebrity.minPrice&ndash;@celebrity.maxPrice</a></p>
+            <p>
+              <a href="#">
+                @{
+                  celebrity.minPrice match {
+                    case min:Int if (min > 0 && min == celebrity.maxPrice) => "$" + min
+                    case min:Int if (min != celebrity.maxPrice) => "$" + min + "-" + celebrity.maxPrice
+                    case 0 => ""
+                  }
+                }
+           
+              </a>
+            </p>
               
           </article>
         }

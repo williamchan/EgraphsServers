@@ -14,12 +14,12 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
   val coinflip = Random
 
   def index() = Action {
-    Ok(views.html.frontend.marketplace_landing("derp",verticalSet, resultSet, categoryViewModels))
+    Ok(views.html.frontend.marketplace_landing("derp", "exampleQuery", verticalSet, resultSet, categoryViewModels))
   }
 
   
   def results() = Action {
-    Ok(views.html.frontend.marketplace_results("http://localhost:9000/Marketplace/mlb/results", verticalSet, resultSet, categoryViewModels))
+    Ok(views.html.frontend.marketplace_results("http://localhost:9000/Marketplace/mlb/results", "exampleQuery", verticalSet, resultSet, categoryViewModels))
   }
   
   def mlb() = Action {
@@ -60,9 +60,9 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
     )
   }
   
-  def celebViewModels(quantity : Int) : Iterable[CelebrityViewModel] = {
+  def celebViewModels(quantity : Int) : Iterable[MarketplaceCelebrity] = {
     for(i <- 0.until(quantity)) yield {
-      CelebrityViewModel(
+      MarketplaceCelebrity(
         id = i,
         publicName =  "Herp Derpson",
         photoUrl = "images/660x350.gif",

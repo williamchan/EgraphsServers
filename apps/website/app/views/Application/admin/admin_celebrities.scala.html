@@ -1,4 +1,4 @@
-@(celebrityListings: Iterable[models.CelebrityListing],
+@(celebrityAccounts: Iterable[(models.Celebrity, models.Account)],
   allCelebrities: Iterable[models.Celebrity]
 )(implicit authToken: egraphs.authtoken.AuthenticityToken,
   paginationInfo: controllers.PaginationInfo, 
@@ -98,39 +98,39 @@
             <th>Inventory</th>
           </tr>
         </thead>  
-        @celebrityListings.map { case celebrityListing =>
+       @celebrityAccounts.map { case (celebrity, account) =>
         <tr>
           <td>
-            <a class="preview-link" href="/admin/celebrities/@celebrityListing.id">
+            <a class="preview-link" href="/admin/celebrities/@celebrity.id">
               Details
             </a>
           </td>
-          <td>@celebrityListing.id</td>
+          <td>@celebrity.id</td>
           <td class="truncate">
-            <a class="preview-link" href="/@celebrityListing.urlSlug">
-              @celebrityListing.publicName
+            <a class="preview-link" href="/@celebrity.urlSlug">
+              @celebrity.publicName
             </a>
           </td>
-          <td>@celebrityListing.email</td>
-          <td>@celebrityListing.enrollmentStatus</td>
-          <td>@celebrityListing.publishedStatus</td>
+          <td>@account.email</td>
+          <td>@celebrity.enrollmentStatus</td>
+          <td>@celebrity.publishedStatus</td>
           <td>
-            <a class="preview-link" href="/admin/celebrities/@celebrityListing.id/products">
+            <a class="preview-link" href="/admin/celebrities/@celebrity.id/products">
             Products
             </a>
           </td>
           <td>
-            <a class="preview-link" href="/admin/celebrities/@celebrityListing.id/orders?filter=pendingAdminReview">
+            <a class="preview-link" href="/admin/celebrities/@celebrity.id/orders?filter=pendingAdminReview">
               Orders
             </a>
           </td>
           <td>
-            <a class="preview-link" href="/admin/celebrities/@celebrityListing.id/egraphs">
+            <a class="preview-link" href="/admin/celebrities/@celebrity.id/egraphs">
               Egraphs
             </a>
           </td>
           <td>
-            <a class="preview-link" href="/admin/celebrities/@celebrityListing.id/inventorybatches">
+            <a class="preview-link" href="/admin/celebrities/@celebrity.id/inventorybatches">
               Inventory
             </a>
           </td>

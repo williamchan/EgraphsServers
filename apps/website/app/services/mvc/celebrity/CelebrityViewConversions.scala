@@ -2,6 +2,7 @@ package services.mvc.celebrity
 
 import models.{InventoryQuantity, ImageAsset, Celebrity}
 import models.frontend.storefront.{ChoosePhotoRecentEgraph, ChoosePhotoCelebrity}
+import models.frontend.marketplace.MarketplaceCelebrity
 import services.blobs.AccessPolicy
 import models.frontend.landing.CatalogStar
 import services.Utils
@@ -43,6 +44,37 @@ class CelebrityViewConversions(celeb: Celebrity) {
       twitterUsername = celeb.twitterUsername
     )
   }
+  
+  def asMarketplaceCelebrity : MarketplaceCelebrity = {
+    val imageUrl  = celeb
+      .landingPageImage
+      .withImageType(ImageAsset.Jpeg)
+      .resizedWidth(660)
+      .getSaved(AccessPolicy.Public)
+      .url
+    
+    //TODO need a more efficient way of determining these
+    val activeProducts = celeb.productsInActiveInventoryBatches()
+    val purchaseableProducts = activeProducts.filter {
+      product =>
+        product.remainingInventoryCount > 0
+    }  
+    
+    val prices = activeProducts.map(product => product.priceInCurrency)
+    val maxmin: (Int, Int) = prices.isEmpty match {
+      case true => (0 ,0)
+      case _ => (prices.max.intValue(), prices.min.intValue())
+    }  
+    MarketplaceCelebrity(
+      id = celeb.id,
+      publicName = celeb.publicName,
+      photoUrl = imageUrl,
+      soldout = purchaseableProducts.isEmpty,
+      minPrice = maxmin._2,
+      maxPrice = maxmin._1,
+      subtitle = celeb.roleDescription
+    )
+  }
 
   /**
    * The celebrity as a CatalogStar. If some necessary data for the CatalogStar
@@ -53,8 +85,7 @@ class CelebrityViewConversions(celeb: Celebrity) {
       .landingPageImage
       .withImageType(ImageAsset.Jpeg)
       .resizedWidth(440)
-      .getSaved(AccessPolicy.Public)
-      .url
+      .getSaved(AccessPolicy.Public).url
 
     val purchaseableProductsIds = inventoryQuantities.filter {
       productAndCount => productAndCount.quantityRemaining > 0

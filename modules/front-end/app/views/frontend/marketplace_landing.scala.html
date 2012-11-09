@@ -1,4 +1,5 @@
 @(queryUrl : String, 
+  marketplaceRoute: String,
   verticalViewModels: Iterable[models.frontend.marketplace.VerticalViewModel],
   results: Iterable[models.frontend.marketplace.ResultSetViewModel],
   categoryViewModels: Iterable[models.frontend.marketplace.CategoryViewModel] = List[models.frontend.marketplace.CategoryViewModel]()
@@ -23,7 +24,6 @@ Translates a map of categories and their categoryvalues into a JsonObject that c
   )).toString
  );
  Egraphs.page.queryUrl = @queryUrl;
-
 }
 @baseBody = {
 
@@ -35,8 +35,8 @@ Translates a map of categories and their categoryvalues into a JsonObject that c
     
       <div class="span12 masthead" role="masthead">
       
-        <form action="#" method="get">
-            <input name="q" type="search" placeholder="Find Your Star">
+        <form action="@marketplaceRoute" method="get">
+            <input name="query" type="search" placeholder="Find Your Star">
         </form>
       
         <img src='@RemoteAssets.at("images/masthead-marketplace.jpg")'/>

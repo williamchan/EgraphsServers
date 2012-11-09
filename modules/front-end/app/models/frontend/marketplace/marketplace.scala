@@ -3,7 +3,7 @@ package models.frontend.marketplace
 import play.api.libs.json._
 
 
-case class CelebrityViewModel(
+case class MarketplaceCelebrity(
     id: Long  = 0,
     publicName: String,
     photoUrl: String,
@@ -49,5 +49,5 @@ case class VerticalViewModel(
 
 case class ResultSetViewModel(
     subtitle: Option[String],
-    celebrities: Iterable[CelebrityViewModel] = List()
+    celebrities: Iterable[MarketplaceCelebrity] = List()
 )

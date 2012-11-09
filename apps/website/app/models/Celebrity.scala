@@ -361,17 +361,6 @@ object Celebrity {
       CelebrityWithImage(saved, savedImage)
     }
   }
-  // Simplifying results for display
-  def celebrityAccountToListing(celebrity: Celebrity, account: Account) = {
-    new CelebrityListing(
-      id=celebrity.id,
-      email = account.email,
-      urlSlug = celebrity.urlSlug,
-      publicName = celebrity.publicName,
-      enrollmentStatus = celebrity.enrollmentStatus.toString,
-      publishedStatus = celebrity.publishedStatus.toString
-    )
-  }
 }
 
 class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebrity] with SavesCreatedUpdated[Long,Celebrity] {
@@ -435,36 +424,6 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
    ) 
   }
    
-  /**
-   * Find using postgres text search on publicname and roledescription
-   * http://www.postgresql.org/docs/9.2/interactive/textsearch-controls.html
-   * Uses anorm because the return types are not supported by Squeryl.
-   * @param query text to match on
-   * @return matching celebs in CelebrityListing format
-   */
-  def findByTextQuery(query: String): Iterable[CelebrityListing] = {
-  	val rowStream = SQL(
-  	  """
-  	    SELECT * FROM celebrity, account WHERE
-  	    (
-  	      to_tsvector('english', celebrity.publicname || ' ' || celebrity.roledescription)
-  	      @@
-  	      plainto_tsquery('english', {textQuery})
-  	    ) AND account.celebrityid = celebrity.id;
-  	  """
-  	).on("textQuery" -> query).apply()(connection = schema.getTxnConnectionFactory)
-  	
-  	for(row <- rowStream) yield {
-  	  new CelebrityListing(
-  	      id = row[Long]("celebrityid"),
-  	      publicName = row[String]("publicname"),
-  	      email = row[String]("email"),
-  	      urlSlug = row[String]("urlslug"),
-  	      enrollmentStatus = row[String]("_enrollmentStatus"),
-  	      publishedStatus = row[String]("_publishedStatus")
-  	  )
-  	}
-  }
   
   def rebuildSearchIndex {
     SQL(
@@ -483,27 +442,52 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
     """
     ).execute()(connection=schema.getTxnConnectionFactory)
   }
+  /**
+   * Full text search on tags. 
+   * TODO(sbilstein) Implement refinements 
+   */
   
-  def search(query: String, refinements: Map[Long, Iterable[Long]] = Map[Long, Iterable[Long]]()): Iterable[CelebrityListing] = {
+  def search(query: String, refinements: Map[Long, Iterable[Long]] = Map[Long, Iterable[Long]]()): Iterable[Celebrity] = {
+//     """
+//      SELECT c.publicname publicname, c._landingpageImageKey _landingpageImageKey, c.id celebrityid,
+//        c.roledescription roledescription, 
+//        c._enrollmentStatus _enrollmentStatus, c._publishedStatus _publishedStatus, 
+//        min(p.priceincurrency) minprice, max(p.priceincurrency) maxprice 
+//      FROM celebrity c
+//      LEFT JOIN product p
+//      on p.celebrityid = c.id, celebrity_categories_mv mv WHERE
+//        (
+//          mv.to_tsvector
+//          @@
+//          plainto_tsquery('english', {textQuery})
+//        ) and mv.id = c.id
+//      GROUP BY c.id;
+//
+//      """
     val rowStream = SQL(
       """
-        SELECT * FROM celebrity c, celebrity_categories_mv mv WHERE
+      SELECT c.publicname publicname, c._landingpageImageKey _landingpageImageKey, c.id celebrityid,
+        c.roledescription roledescription, 
+        c._enrollmentStatus _enrollmentStatus, c._publishedStatus _publishedStatus
+      FROM celebrity c, celebrity_categories_mv mv WHERE
         (
           mv.to_tsvector
           @@
           plainto_tsquery('english', {textQuery})
         ) and mv.id = c.id
+      GROUP BY c.id;
+
       """
     ).on("textQuery" -> query).apply()(connection = schema.getTxnConnectionFactory)
     
-    for(row <- rowStream) yield {
-      new CelebrityListing(
-          id = row[Long]("celebrity.id"),
-          publicName = row[String]("celebrity.publicname"),
-          email = "",
-          urlSlug = row[String]("celebrity.urlslug"),
-          enrollmentStatus = row[String]("celebrity._enrollmentStatus"),
-          publishedStatus = row[String]("celebrity._publishedStatus")
+    for( row <- rowStream) yield {
+      Celebrity(
+        id = row[Long]("celebrityid"),
+         publicName = row[String]("publicname"),
+         roleDescription = row[String]("roledescription"),                                 
+         _enrollmentStatus = row[String]("_enrollmentStatus"),
+         _publishedStatus = row[String]("_publishedStatus"),
+         _landingPageImageKey = row[Option[String]]("_landingpageImageKey")
       )
     }
   }
@@ -616,9 +600,7 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
  **/
 
 case class CelebrityListing(
-  id: Long,
-  email: String,
-  urlSlug: String,
-  publicName: String,
-  enrollmentStatus: String,
-  publishedStatus: String)
+    minPrice: Int,
+    maxPrice: Int,
+    soldout: Boolean
+)
