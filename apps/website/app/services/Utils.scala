@@ -150,22 +150,6 @@ class Utils @Inject() {
     )
   }
 
-  /**
-   * Returns valid file asset relative URLs on the Play application's path
-   * given a putative one.
-   *
-   * Throws an exception if the path could not be resolved to an actual file.
-   * For example, Utils.asset("public/javascripts/jquery1.5.2") may succeed,
-   * whereas any misspelling thereof would fail.
-   * @param path the path to check for validity
-   *
-   * @return a valid path, or throw an exception
-   */
-  @deprecated("this is balls", "don't use this balls")
-  def asset(path: String): String = {
-    controllers.routes.EgraphsAssets.at(path).url
-  }
-
   implicit def properties(pairs: (AnyRef, AnyRef)*): util.Properties = {
     val props = new util.Properties
 
