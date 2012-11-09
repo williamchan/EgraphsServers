@@ -7,6 +7,7 @@ import org.squeryl.Query
 import com.google.inject.Inject
 import enums.{ HasVideoStatus }
 import models.enums.VideoStatus
+import com.google.inject.Provider
 
 case class VideoAssetServices @Inject() (store: VideoAssetStore)
 
@@ -14,7 +15,7 @@ case class VideoAsset(
   id: Long = 0,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
-  url: String,
+  url: String = "",
   _videoStatus: String = VideoStatus.Unprocessed.name,
   services: VideoAssetServices = AppConfig.instance[VideoAssetServices])
   extends KeyedCaseClass[Long]

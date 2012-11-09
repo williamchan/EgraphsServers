@@ -9,6 +9,7 @@ import enums.{EgraphState, PublishedStatus}
 import egraphs.playutils.Encodings.Base64
 import org.apache.commons.lang3.RandomStringUtils
 import categories.{Category, CategoryValue}
+import models.enums.VideoStatus
 
 /**
  * Renders saved copies of domain objects that satisfy all relational integrity
@@ -182,7 +183,14 @@ object TestData {
   }
 
   def newSavedVideoAsset(): VideoAsset = {
-    VideoAsset(url = "http://www.testUrl.com").save()
+    VideoAsset(url = "http://www.testUrl.com", _videoStatus = VideoStatus.Approved.name).save()
+  }
+  
+  // delete this if it never gets called
+  def newSavedVideoAssetCelebrity(): VideoAssetCelebrity = {
+    val videoAssetId = newSavedVideoAsset().id
+    val celebrityId = newSavedCelebrity().id
+    VideoAssetCelebrity(videoId = videoAssetId, celebrityId = celebrityId).save()
   }
    
   /**

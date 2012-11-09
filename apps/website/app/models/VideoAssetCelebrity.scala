@@ -11,7 +11,8 @@ import com.google.inject.Inject
 
 case class VideoAssetCelebrityServices @Inject() (store: VideoAssetCelebrityStore)
 
-case class VideoAssetCelebrity(id: Long = 0,
+case class VideoAssetCelebrity(
+  id: Long = 0,
   celebrityId: Long = 0,
   videoId: Long = 0,
   services: VideoAssetCelebrityServices = AppConfig.instance[VideoAssetCelebrityServices])

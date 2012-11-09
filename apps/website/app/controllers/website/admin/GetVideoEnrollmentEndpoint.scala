@@ -14,34 +14,29 @@ import services.db.Schema
 private[controllers] trait GetVideoEnrollmentEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
 
-  protected val controllerMethod = AppConfig.instance[ControllerMethod]
-  protected val filters = AppConfig.instance[HttpFilters]
+  protected def controllerMethod: ControllerMethod
+  protected def httpFilters: HttpFilters    
   protected def schema: Schema
 
   def getVideoEnrollment = Action {
     Ok(views.html.Application.admin.admin_videoasset())
   }
+  
+  def getUnprocessedVideos = controllerMethod(WithDBConnection(readOnly=true)) {
+    Action { implicit request =>
 
-  def getUnprocessedVideos = filters.requireApplicationId.test {
-    controllerMethod(dbSettings = WithDBConnection(readOnly = true)) {
-      Action {
+    val videosAwaitingProcessing: Query[(String)] = from(schema.videoAssets)(
+      s => where(s._videoStatus === "Unprocessed") select (s.url))
 
-        // get all unprocessed videos
-        //        val videosAwaitingProcessing: Query[(VideoAsset)] = from(schema.videoAssets)(
-        //          s => where(s._videoStatus === "Unprocessed") select (s))
+    val list = videosAwaitingProcessing.toList
 
-        val videosAwaitingProcessing: Query[(String)] = from(schema.videoAssets)(
-          s => where(s._videoStatus === "Unprocessed") select (s.url))
+    // remove this after testing, probably
+    for (video <- list) {
+      play.Logger.info("Video to process: " + video)
+    }
 
-        val list = videosAwaitingProcessing.toList
+    Ok(views.html.Application.admin.admin_unprocessedvideos(list))
 
-        for (video <- list) {
-          play.Logger.info("Video to process: " + video)
-        }
-
-        Ok(views.html.Application.admin.admin_unprocessedvideos(list))
-
-      }
     }
   }
 }

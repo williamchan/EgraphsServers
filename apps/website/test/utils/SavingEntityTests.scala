@@ -65,8 +65,8 @@ trait SavingEntityTests[KeyT, T <: KeyedEntity[KeyT]] { this: FlatSpec with Shou
     val inserted = saveEntity(newEntity)
     val updated = saveEntity(transformEntity(inserted))
     val updatedRestored = restoreEntity(updated.id).get
-
-    updated should not be (inserted)
+    
+    updated should not be (inserted)    
     updatedRestored should be (updated)
     updatedRestored should not be (inserted)
   }

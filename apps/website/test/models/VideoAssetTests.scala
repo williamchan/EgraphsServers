@@ -37,16 +37,16 @@ class VideoAssetTests extends EgraphsUnitTest
   //
   // Test cases
   //
-  "videoAsset" should "return the associated VideoAsset" in {
+  "A VideoAsset" should "return its associated url" in {
     val videoAsset = TestData.newSavedVideoAsset()
     val myVideoAsset = VideoAsset(url = videoAsset.url).save()
     myVideoAsset.url should be(videoAsset.url)
   }
   
-  "videoAsset" should "update its status" in {
+  "A VideoAsset" should "update its status" in {
     val videoAsset = TestData.newSavedVideoAsset()
-    videoAsset._videoStatus should be("Unprocessed")
-    videoAsset.withVideoStatus(VideoStatus.Approved)
-    videoAsset._videoStatus should be ("Approved")
+    videoAsset._videoStatus should be("Approved")
+    val updatedVideoAsset = videoAsset.withVideoStatus(VideoStatus.Rejected).save()
+    updatedVideoAsset._videoStatus should be("Rejected")
   }
 }
