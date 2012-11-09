@@ -47,16 +47,17 @@ trait FingerprintedAssets extends AssetProvider { this: Controller =>
       val (originalBaseFilename, fingerprint) = file.splitAt(file.lastIndexOf(fingerprintConstant))
       val originalFilename = originalBaseFilename + "." + extension
 
-      defaultUrl(originalFilename) match {
-        case None =>
+      val originalOrFingerprinted = originalOrFingerprint(originalFilename)
+
+      originalOrFingerprinted.fold(
+        originalFilename => {
           Logger.info("Could not find asset at " + originalFilename + " for file =" + file + " in path = " + path)
-          super.at(path, file)
-        case Some(url) =>
-          val checksum = fingerprint.replace(fingerprintConstant, "").replace("." + extension, "")
-          // if the checksum doesn't match don't serve that version
-          if (getChecksum(url).toString != checksum) {
-            Logger.info("expected checksum = " + checksum + " other was = " + getChecksum(url))
-            super.at(path, file)
+          super.at(path, file) // maybe another asset provider knows what to do with this 
+        },
+        fingerprintedFilename => {
+          if (fingerprintedFilename != file) {
+            Logger.info("expected checksum = " + file + " but we a file with a different checksum = " + fingerprintedFilename)
+            super.at(path, file) // again, this asset provider doesn't have this asset
           } else {
             Action { request =>
               val action = super.at(path, originalFilename)
@@ -65,19 +66,34 @@ trait FingerprintedAssets extends AssetProvider { this: Controller =>
               resultWithHeaders.withHeaders(CACHE_CONTROL -> "max-age=31536000")
             }
           }
-      }
+        })
     }
   }
 
   abstract override def at(file: String): Call = {
-    if (fileToFingerprinted.containsKey(file)) {
-      super.at(fileToFingerprinted.get(file))
+    val originalOrFingerprinted = originalOrFingerprint(file)
+
+    originalOrFingerprinted.fold({
+      originalFilename => super.at(originalFilename)
+    }, {
+      fingerprintedFilename => super.at(fingerprintedFilename)
+    })
+  }
+
+  /**
+   * If there the original file exists and can be fingerprinted or has been fingerprinted the
+   * fingerprinted filename is on the Right, otherwise the originalFilename is on the Left.
+   */
+  private def originalOrFingerprint(originalFilename: String): Either[String, String] = {
+    if (fileToFingerprinted.contains(originalFilename)) {
+      Right(fileToFingerprinted.get(originalFilename))
     } else {
-      defaultUrl(file) match {
-        case None => super.at(file)
+      defaultUrl(originalFilename) match {
+        case None =>
+          Left(originalFilename)
         case Some(url) =>
-          val fingerprintedFilename = fingerprintFile(file, url)
-          super.at(fingerprintedFilename)
+          val fingerprintedFilename = fingerprintFile(originalFilename, url)
+          Right(fingerprintedFilename)
       }
     }
   }
