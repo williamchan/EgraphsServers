@@ -6,6 +6,6 @@ import play.api.mvc.Result
 import play.api.mvc.AnyContent
 
 abstract class ToyBoxAuthenticator extends Controller {
-    def login: Action[AnyContent]
-    def authenticate: Action[AnyContent]
+  def login: Action[AnyContent]
+  def authenticate: Action[AnyContent]
 }
