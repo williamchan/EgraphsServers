@@ -1,5 +1,6 @@
 package assetproviders
 
+import assetproviders.ResultWithHeaders.ResultWithHeaders
 import java.io.File
 import java.net.URL
 import java.util.concurrent.ConcurrentHashMap
@@ -56,7 +57,12 @@ trait FingerprintedAssets extends AssetProvider { this: Controller =>
             println("expected checksum = " + checksum + " other was = " + getChecksum(url))
             super.at(path, file)
           } else {
-            super.at(path, originalFilename)
+            Action { request =>
+              val action = super.at(path, originalFilename)
+              val result = action.apply(request)
+              val resultWithHeaders = result.asInstanceOf[ResultWithHeaders]
+              resultWithHeaders.withHeaders(CACHE_CONTROL -> "max-age=31536000")
+            }
           }
       }
     }

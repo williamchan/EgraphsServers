@@ -11,6 +11,10 @@ import play.api.mvc.Call
  * to mix and combine various AssetProviders to add additional functionality.
  */
 trait AssetProvider { this: Controller =>
+  /**
+   * This is to be implemented by the concrete class and is supposed to be a
+   * call to the reverse router for the at(path, file) call.
+   */
   protected def assetReverseRoute(file: String): Call
 
   /**
@@ -24,4 +28,9 @@ trait AssetProvider { this: Controller =>
    * a Call that enables them to get the external URL of the asset.
    */
   def at(file: String): Call
+}
+
+object ResultWithHeaders {
+  import play.api.mvc.Result
+  type ResultWithHeaders = Result { def withHeaders(headers: (String, String)*): Result }
 }

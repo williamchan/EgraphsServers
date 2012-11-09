@@ -1,5 +1,7 @@
 package assetproviders
 
+import assetproviders.ResultWithHeaders.ResultWithHeaders
+
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 import org.joda.time.DateTimeZone
@@ -18,8 +20,6 @@ trait RemoteAssets extends AssetProvider { this: Controller =>
 
   private val df: DateTimeFormatter =
     DateTimeFormat.forPattern("EEE, dd MMM yyyy HH:mm:ss '" + timeZoneCode + "'").withLocale(java.util.Locale.ENGLISH).withZone(DateTimeZone.forID(timeZoneCode))
-
-  type ResultWithHeaders = Result { def withHeaders(headers: (String, String)*): Result }
 
   abstract override def at(path: String, file: String): Action[AnyContent] = Action { request =>
     val action = super.at(path, file)
