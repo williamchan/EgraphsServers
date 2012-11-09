@@ -18,8 +18,8 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
   }
 
   
-  def mlb_teams() = Action {
-    Ok(views.html.frontend.marketplace_mlb_teams("http://localhost:9000/Marketplace/mlb/teams", verticalSet, resultSet, categoryViewModels))
+  def results() = Action {
+    Ok(views.html.frontend.marketplace_results("http://localhost:9000/Marketplace/mlb/results", verticalSet, resultSet, categoryViewModels))
   }
   
   def mlb() = Action {

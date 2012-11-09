@@ -75,7 +75,7 @@ GET     /Login/storefront                                         controllers.Lo
 GET     /Marketplace/index                                        controllers.Marketplace.index 
 GET     /Marketplace/mlb                                          controllers.Marketplace.mlb  
 GET     /Marketplace/mlb/list                                     controllers.Marketplace.mlb_list  
-GET     /Marketplace/mlb/teams                                    controllers.Marketplace.mlb_teams   
+GET     /Marketplace/results                                  controllers.Marketplace.results 
 
 GET     /Personalize/allErrors                                    controllers.Personalize.allErrors
 GET     /Personalize/index                                        controllers.Personalize.index
