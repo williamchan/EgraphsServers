@@ -71,6 +71,8 @@ POST     /admin/celebrities/$celebrityId<[0-9]+>/sendEmail                contro
 GET      /admin/egraphs                                                   controllers.WebsiteControllers.getEgraphsAdmin
 GET      /admin/egraphs/$egraphId<[0-9]+>                                 controllers.WebsiteControllers.getEgraphAdmin(egraphId: Long)
 POST     /admin/egraphs/$egraphId<[0-9]+>                                 controllers.WebsiteControllers.postEgraphAdmin(egraphId: Long)
+GET      /admin/freegraphs/create                                         controllers.WebsiteControllers.getCreateFreegraphAdmin
+POST     /admin/freegraphs/create                                         controllers.WebsiteControllers.postFreegraphAdmin
 GET      /admin/categories                                                controllers.WebsiteControllers.getCategoriesAdmin 
 POST     /admin/categories                                                controllers.WebsiteControllers.postCategoryAdmin
 GET      /admin/categories/create                                         controllers.WebsiteControllers.getCreateCategoryAdmin
