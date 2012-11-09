@@ -14,7 +14,8 @@ import play.api.Play
 import play.api.Logger
 
 /**
- * Fingerprinted assets will change like this:
+ * Pipelines fingerprinting for your static assets, which allows you to improve site
+ * performance by setting very long cache expiries. Assets are fingerprinted like this:
  *   original      = foo.jpg
  *   fingerprinted = foo-fp-1231343451234.jpg
  *

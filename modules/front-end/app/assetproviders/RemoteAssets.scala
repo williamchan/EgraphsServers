@@ -14,7 +14,13 @@ import play.api.mvc.AnyContent
 import play.api.mvc.Call
 import play.api.Play
 
-// Inspired by http://www.jamesward.com/2012/08/08/edge-caching-with-play2-heroku-cloudfront
+/** 
+ * Pipelines CDN access for static files. Mix this trait in and provide remoteContentUrl to
+ * have all calls from your views to your assets automatically resolve to a url with the
+ * correct domain.
+ *
+ * Inspired by http://www.jamesward.com/2012/08/08/edge-caching-with-play2-heroku-cloudfront
+ */
 trait RemoteAssets extends AssetProvider { this: Controller =>
   /** 
    * This application's content URL with protocol. For example, "https://souefusfisu.cloudfront.net"
