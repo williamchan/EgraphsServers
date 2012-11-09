@@ -3,62 +3,80 @@ package assetproviders
 import java.io.File
 import java.net.URL
 import java.util.concurrent.ConcurrentHashMap
-
 import com.google.common.io.Files
-
 import play.api.Play.current
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import play.api.mvc.AnyContent
 import play.api.mvc.Call
 import play.api.Play
+import play.api.Logger
 
 /**
  * Fingerprinted assets will change like this:
  *   original      = foo.jpg
  *   fingerprinted = foo-fp-1231343451234.jpg
- * 
+ *
+ * Where '-fp-1231343451234' is the 'fingerprint' and '1231343451234' is a checksum of
+ * the file contents.
+ *
  * We got some inspiration from ruby on rails, but the solution was a bit obvious.
  * http://guides.rubyonrails.org/asset_pipeline.html#what-is-fingerprinting-and-why-should-i-care
  */
 trait FingerprintedAssets extends AssetProvider { this: Controller =>
   import java.net.URL
 
-  val useFingerprinting = true // this should be a config look up instead
-  val fileToFingerprinted = new ConcurrentHashMap[String, String]()
+  private val fileToFingerprinted = new ConcurrentHashMap[String, String]()
 
-  val fingerprintConstant = "-fp-"
+  private val fingerprintConstant = "-fp-"
 
+  def defaultPath: String
+
+  /**
+   * This will find files that were fingerprinted.  If the file is found with the fingerprint
+   * striped out of its name and the checksum matches the checksum in the fingerprint.  Otherwise
+   * it will just return whatever the super.at(path, file) returns.
+   */
   abstract override def at(path: String, file: String): Action[AnyContent] = {
-    if (!useFingerprinting) {
+    val (baseFilename, extension) = splitFilename(file)
+    if (!baseFilename.contains(fingerprintConstant)) { // this may not have been fingerprinted, we should fall back to without fingerprinting
       super.at(path, file)
     } else {
-      val (baseFilename, extension) = splitFilename(file)
-      if (!baseFilename.contains(fingerprintConstant)) { // this may not have been fingerprinted, we should fall back to without fingerprinting
-        super.at(path, file)
-      } else {
-        val originalBaseFilename = removeAfterLastOccurrence(file, fingerprintConstant)
-        super.at(path, originalBaseFilename + "." + extension)
+      val (originalBaseFilename, fingerprint) = file.splitAt(file.lastIndexOf(fingerprintConstant))
+      val originalFilename = originalBaseFilename + "." + extension
+
+      defaultUrl(originalFilename) match {
+        case None =>
+          Logger.info("Could not find asset at " + originalFilename + " for file =" + file + " in path = " + path)
+          super.at(path, file)
+        case Some(url) =>
+          val checksum = fingerprint.replace(fingerprintConstant, "").replace("." + extension, "")
+          // if the checksum doesn't match don't serve that version
+          if (getChecksum(url).toString != checksum) {
+            println("expected checksum = " + checksum + " other was = " + getChecksum(url))
+            super.at(path, file)
+          } else {
+            super.at(path, originalFilename)
+          }
       }
     }
   }
 
   abstract override def at(file: String): Call = {
-    if (!useFingerprinting) {
-      super.at(file)
+    if (fileToFingerprinted.containsKey(file)) {
+      super.at(fileToFingerprinted.get(file))
     } else {
-      if (fileToFingerprinted.containsKey(file)) {
-        super.at(fileToFingerprinted.get(file))
-      } else {
-        //TODO doing this with adding the "/public/" isn't a great idea, but it works for just now.
-        Play.resource("/public/" + file) match {
-          case None => super.at(file)
-          case Some(url) =>
-            val fingerprintedFilename = fingerprintFile(file, url)
-            super.at(fingerprintedFilename)
-        }
+      defaultUrl(file) match {
+        case None => super.at(file)
+        case Some(url) =>
+          val fingerprintedFilename = fingerprintFile(file, url)
+          super.at(fingerprintedFilename)
       }
     }
+  }
+
+  private def defaultUrl(file: String) = {
+    Play.resource(defaultPath + "/" + file)
   }
 
   // Updates the fileToFingerprinted map with the fingerprinted file

@@ -11,7 +11,10 @@ object FrontendBuild extends Build {
   val appVersion = "2.0-SNAPSHOT"
 
   val appDependencies = Seq(
-    "org.joda" % "joda-money" % "0.6"
+    "org.joda" % "joda-money" % "0.6",
+
+    // Test dependencies
+    "org.scalatest" %% "scalatest" % "1.8" % "test"
   )
 
   // Only compile the bootstrap bootstrap.less file and any other *.less file in the stylesheets directory
@@ -53,6 +56,7 @@ object FrontendBuild extends Build {
         toPath == "controllers/routes$javascript.class" ||
         toPath == "controllers/routes$ref.class"
       }
-    }
+    },
+    testOptions in Test := Nil
   ).dependsOn(AuthenticityTokenBuild.main)
 }

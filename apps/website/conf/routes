@@ -148,7 +148,7 @@ GET     /admin/printorders/$printOrderId<[0-9]+>                    controllers.
 POST    /admin/printorders/$printOrderId<[0-9]+>                    controllers.WebsiteControllers.postPrintOrderAdmin(printOrderId: Long)
 POST    /:celebrityUrlSlug/:productUrlSlug/buy-demo                controllers.WebsiteControllers.postBuyDemoProduct(celebrityUrlSlug: String, productUrlSlug: String)
 
-GET     /assets/*file                                               controllers.EgraphsAssets.at(path="/public", file)
+GET     /assets/*file                                               controllers.EgraphsAssets.at(path=controllers.EgraphsAssets.defaultPath, file)
 
 # Redirect any requests with trailing slashes to the slash-less version.
 GET     $resourcePath<.*>/                                          controllers.SlayTrailingSlashesController.slayTrailingSlashes(resourcePath)

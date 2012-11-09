@@ -8,4 +8,6 @@ import assetproviders.PlayAssets
 /* This is the concrete one we use */
 object EgraphsAssets extends Controller with PlayAssets with RemoteAssets with FingerprintedAssets {
   override def assetReverseRoute(file: String) = controllers.routes.EgraphsAssets.at(file)
+
+  override def defaultPath = "/public"
 }
