@@ -39,7 +39,7 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
       getStartedUrl = "/David-Price/photos",
       celebrityPublicName = publicName,
       celebrityCasualName = casualName,
-      landingPageImageUrl = "images/ortiz_masthead.jpg",
+      landingPageImageUrl = EgraphsAssets.at("images/ortiz_masthead.jpg").url,
       celebrityIsMale = isMale)
     )
   }
