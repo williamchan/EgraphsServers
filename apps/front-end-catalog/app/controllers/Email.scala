@@ -57,7 +57,7 @@ object Email extends Controller {
   }
 
   def mlbStatic = Action {
-    Redirect(routes.RemoteAssets.at("html/email_mlb_marketing_static.html"))
+    Redirect(routes.EgraphsAssets.at("html/email_mlb_marketing_static.html"))
   }
   
   def celebrity_welcome_email = Action {

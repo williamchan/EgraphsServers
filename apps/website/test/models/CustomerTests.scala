@@ -1,11 +1,20 @@
 package models
 
+import org.scalatest.junit.JUnitRunner
+import org.junit.runner.RunWith
 import enums.OrderReviewStatus
-import utils._
-import services.{Utils, Time, AppConfig}
 import exception.InsufficientInventoryException
 import services.config.ConfigFileProxy
+import services.AppConfig
+import utils.ClearsCacheAndBlobsAndValidationBefore
+import utils.CreatedUpdatedEntityTests
+import utils.DBTransactionPerTest
+import utils.DateShouldMatchers
+import utils.EgraphsUnitTest
+import utils.SavingEntityIdLongTests
+import utils.TestData
 
+@RunWith(classOf[JUnitRunner])
 class CustomerTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with SavingEntityIdLongTests[Customer]

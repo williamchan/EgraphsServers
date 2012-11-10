@@ -94,4 +94,4 @@ GET     /StorefrontTemplate/active                                controllers.St
 GET     /StorefrontTemplate/allCompleteMiddleOneActive            controllers.StorefrontTemplate.allCompleteMiddleOneActive
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file                                             controllers.RemoteAssets.at(path="/public", file)
+GET     /assets/*file                                             controllers.EgraphsAssets.at(path=controllers.EgraphsAssets.defaultPath, file)
