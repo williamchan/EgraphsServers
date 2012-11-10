@@ -6,10 +6,14 @@
 
 @{/** Celebrity landing page */}
 
+@celebrityMastheadMessage = @{
+  "What if you could share a moment with " + celebrityPublicName + "?"
+}
+
 @import views.html.frontend.tags
 
 @baseBody = {
-  @tags.landing.masthead_section(Option(celebrityPublicName), landingPageImageUrl, Option(getStartedUrl))
+  @tags.landing.masthead_section(Option(celebrityMastheadMessage), landingPageImageUrl, Option(getStartedUrl))
 
   <section id="content" role="main">
 
@@ -37,7 +41,7 @@
 }
 
 @base_template(
-  title="What if you could share a moment with " + celebrityPublicName + "?",
+  title=celebrityMastheadMessage,
   jsMain="pages/landing",
   body=baseBody
 )
