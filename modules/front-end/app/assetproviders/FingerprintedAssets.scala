@@ -12,6 +12,9 @@ import play.api.mvc.AnyContent
 import play.api.mvc.Call
 import play.api.Play
 import play.api.Logger
+import com.google.common.io.ByteStreams
+import com.google.common.io.InputSupplier
+import java.io.InputStream
 
 /**
  * Pipelines fingerprinting for your static assets, which allows you to improve site
@@ -117,8 +120,14 @@ trait FingerprintedAssets extends AssetProvider { this: Controller =>
   }
 
   private def getChecksum(url: URL): Long = {
-    val asset = new File(url.getFile())
-    Files.getChecksum(asset, new java.util.zip.CRC32)
+    val assetStream = url.openStream()
+    val inputSupplier = new InputSupplier[InputStream]() {
+      override def getInput(): InputStream = {
+        assetStream
+      }
+    }
+
+    ByteStreams.getChecksum(inputSupplier, new java.util.zip.CRC32)
   }
 
   private def splitFilename(filename: String): (String, String) = {
