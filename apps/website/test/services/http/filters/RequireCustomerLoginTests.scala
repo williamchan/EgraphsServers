@@ -10,7 +10,6 @@ import play.api.test.Helpers.status
 import utils.EgraphsUnitTest
 import org.scalatest.junit.JUnitRunner
 import services.http.filters.FilterTestUtil._
-import models.CustomerStore
 import models.Customer
 import models.CustomerStore
 import services.AppConfig

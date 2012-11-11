@@ -8,7 +8,6 @@ import play.api.mvc.Controller
 trait AllAdminEndpoints
   extends GetRootAdminEndpoint
   with GetAccountAdminEndpoint
-  with PostAccountAdminEndpoint
   with GetAccountsAdminEndpoint
   with GetCategoryAdminEndpoint
   with GetCategoriesAdminEndpoint
@@ -16,6 +15,7 @@ trait AllAdminEndpoints
   with GetCelebritiesAdminEndpoint
   with GetCelebrityAdminEndpoint
   with GetCelebrityEgraphsAdminEndpoint
+  with GetCreateFreegraphAdminEndpoint
   with GetCelebrityInventoryBatchesAdminEndpoint
   with GetCelebrityOrdersAdminEndpoint
   with GetCelebrityProductsAdminEndpoint
@@ -32,12 +32,14 @@ trait AllAdminEndpoints
   with GetProductAdminEndpoint
   with GetReportsAdminEndpoint
   with GetToolsAdminEndpoint
+  with PostAccountAdminEndpoint
   with PostCategoryAdminEndpoint
   with PostCategoryValueAdminEndpoint
   with PostCelebrityAdminEndpoint
   with PostCelebrityCategoryValueAdminEndpoint
   with PostEgraphAdminEndpoint
   with PostFeaturedCelebritiesAdminEndpoint
+  with PostFreegraphAdminEndpoint
   with PostInventoryBatchAdminEndpoint
   with PostLoginAdminEndpoint
   with PostOrderAdminEndpoint
