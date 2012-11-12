@@ -45,7 +45,7 @@ class CelebrityViewConversions(celeb: Celebrity) {
     )
   }
   
-  def asMarketplaceCelebrity : MarketplaceCelebrity = {
+  def asMarketplaceCelebrity(minPrice: Int, maxPrice: Int, soldout: Boolean) : MarketplaceCelebrity = {
     val imageUrl  = celeb
       .landingPageImage
       .withImageType(ImageAsset.Jpeg)
@@ -53,7 +53,8 @@ class CelebrityViewConversions(celeb: Celebrity) {
       .getSaved(AccessPolicy.Public)
       .url
     
-    //TODO need a more efficient way of determining these
+    // TODO need a more efficient way of determining these (minPrice, maxPrice, soldout)
+    //  
     val activeProducts = celeb.productsInActiveInventoryBatches()
     val purchaseableProducts = activeProducts.filter {
       product =>
@@ -69,6 +70,7 @@ class CelebrityViewConversions(celeb: Celebrity) {
       id = celeb.id,
       publicName = celeb.publicName,
       photoUrl = imageUrl,
+      storefrontUrl = controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled(celebrityUrlSlug = celeb.urlSlug).url,
       soldout = purchaseableProducts.isEmpty,
       minPrice = maxmin._2,
       maxPrice = maxmin._1,

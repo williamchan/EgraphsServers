@@ -51,29 +51,55 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       // Determine what search options, if any, have been appended
       val verticalOption = Form("vertical" -> nonEmptyText).bindFromRequest.fold(formWithErrors => None, validForm => Some(validForm))
       val queryOption = Form("query" -> nonEmptyText).bindFromRequest.fold(formWithErrors => None, validForm => Some(validForm))
-      
+
       val categoryAndCategoryValues  = for((key, set) <- request.queryString) yield {
         categoryRegex findFirstIn key match {
           case Some(categoryRegex(id)) => (id, set)
           case None => None
         }
-      }      
-      // 3) No results, send garbage
+      }  
+      
+      /**
+       * The set of refinements has the following schema:
+       * Set[CategoryId, Iterable[CategoryValueId]]
+       * This can be viewed as a mapping of categories to selected tags.
+       * 
+       * The refinements should be processed like this:
+       * 
+       * (CategoryValueId OR CategoryValueId) AND (CatgeoryValueId OR CategoryValueId OR CategoryValueId) AND ...
+       * for each set of CategoryValueIds through the CelebrityCategoryValues table that defines how celebrities are tagged.
+       * 
+       * A real world example:
+       * A user is looking at results that have the CategoryValue "Boston Red Sox" selected (as part of Category "Teams")
+       * She decides she wants to see only pitchers and clicks Pitchers in the Category "Positions"
+       * Server recieves a request that is processed with categoryAndCategoryValues that looks like this (with the implementation being numerical ids, not strings
+       *  ["Team" -> ["Boston Red Sox"], "Position" -> ["Pitcher"]]
+       *  
+       * User then decides they are also interested in third basemen, the next request will look like this and show any boston pitcher or third basemen
+       * ["Team" -> ["Boston Red Sox"], "Position" -> ["Pitcher", "Third Basemen"]]
+       * 
+       * User decides she doesn't care about boston, next request looks like this and should return all pitchers and third basemen
+       * ["Position" -> ["Pitcher", "Third Basemen"]]
+       * 
+       */
+      // 3) No results, send something
       // 4) Error in data, same as no results but with error message
       val celebrities = 
         (queryOption match {
-          case Some(query) => celebrityStore.search(query)
+          case Some(query) => celebrityStore.marketplaceSearch(query)
           case _ => List()
-        }).map( celebrity =>
-           celebrity.asMarketplaceCelebrity
-          ) 
+        }) 
         
+      val subtitle = queryOption match {
+        case Some(query) => "Results for " + query + "..."
+        case None => "Results" //todo something meaningful
+      }
       
        Ok(views.html.frontend.marketplace_results(
          queryUrl = queryUrl.toString,
          marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage.url,
          verticalViewModels = List[VerticalViewModel](),
-         results = List(ResultSetViewModel(subtitle=Option("Derp"), celebrities)),
+         results = List(ResultSetViewModel(subtitle=Option(subtitle), celebrities)),
          categoryViewModels = List[CategoryViewModel]()
        ))
     }

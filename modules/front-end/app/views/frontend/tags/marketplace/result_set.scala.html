@@ -13,16 +13,16 @@
               @if(celebrity.soldout) {
                 <a href="#" class="ribbon"><em>Sold Out</em></a>     
               }
-                <a href="#"><img src="@celebrity.photoUrl" alt="FPO image"></a>
+                <a href="@celebrity.storefrontUrl"><img src="@celebrity.photoUrl" alt="FPO image"></a>
             </figure>
               
             <hgroup>            
-              <h2><a href="#" title="View celeb: Celeb Name">@celebrity.publicName</a></h2> 
+              <h2><a href="@celebrity.storefrontUrl" title="View celeb: @celebrity.publicName">@celebrity.publicName</a></h2> 
               <h3><a href="#" title="View: Celeb Category / Team">@celebrity.subtitle</a></h3>
             </hgroup>
               
             <p>
-              <a href="#">
+              <a href="@celebrity.storefrontUrl">
                 @{
                   celebrity.minPrice match {
                     case min:Int if (min > 0 && min == celebrity.maxPrice) => "$" + min

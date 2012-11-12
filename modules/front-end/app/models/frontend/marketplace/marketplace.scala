@@ -7,6 +7,7 @@ case class MarketplaceCelebrity(
     id: Long  = 0,
     publicName: String,
     photoUrl: String,
+    storefrontUrl: String,
     soldout: Boolean,
     minPrice: Int,
     maxPrice: Int, 

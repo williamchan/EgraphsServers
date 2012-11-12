@@ -20,6 +20,8 @@ import org.squeryl.dsl.ManyToMany
 import views.html.frontend.{celebrity_welcome_email, celebrity_welcome_email_text}
 import anorm._
 import anorm.SqlParser._
+import services.mvc.celebrity.CelebrityViewConversions
+import models.frontend.marketplace.MarketplaceCelebrity
 
 /**
  * Services used by each celebrity instance
@@ -365,7 +367,7 @@ object Celebrity {
 
 class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebrity] with SavesCreatedUpdated[Long,Celebrity] {
   import org.squeryl.PrimitiveTypeMode._
-
+  import CelebrityViewConversions._
   //
   // Public Methods
   //
@@ -443,27 +445,11 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
     ).execute()(connection=schema.getTxnConnectionFactory)
   }
   /**
-   * Full text search on tags. 
+   * Full text search on tags, this version is called by the admin controller. 
    * TODO(sbilstein) Implement refinements 
    */
   
   def search(query: String, refinements: Map[Long, Iterable[Long]] = Map[Long, Iterable[Long]]()): Iterable[Celebrity] = {
-//     """
-//      SELECT c.publicname publicname, c._landingpageImageKey _landingpageImageKey, c.id celebrityid,
-//        c.roledescription roledescription, 
-//        c._enrollmentStatus _enrollmentStatus, c._publishedStatus _publishedStatus, 
-//        min(p.priceincurrency) minprice, max(p.priceincurrency) maxprice 
-//      FROM celebrity c
-//      LEFT JOIN product p
-//      on p.celebrityid = c.id, celebrity_categories_mv mv WHERE
-//        (
-//          mv.to_tsvector
-//          @@
-//          plainto_tsquery('english', {textQuery})
-//        ) and mv.id = c.id
-//      GROUP BY c.id;
-//
-//      """
     val rowStream = SQL(
       """
       SELECT c.publicname publicname, c._landingpageImageKey _landingpageImageKey, c.id celebrityid,
@@ -491,6 +477,48 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
       )
     }
   }
+  /**
+   * This function is a dupe of the above function. We will probably want to think of a good way to abstract the search if we want to retain a
+   * useful admin text search. 
+   * TODO: implement refinements, pass in real data for sold out, minPrice, and maxPrice.
+   * Currently the view conversion is doing another DB query to fill in that data for each celebrity, would be great if we could do it all in one trip. 
+   * Set[Categoryid, Iterable[CategoryValueId]]
+   * in each set (OR CategoryValueIds) And (OR CategoryValueIds)
+   * 
+   *  (pitcher or 2nd baseman) and (red sox or yankees)
+   */
+  def marketplaceSearch(query: String, refinements: Map[Long, Iterable[Long]] = Map[Long, Iterable[Long]]()): Iterable[MarketplaceCelebrity] = {
+    val rowStream = SQL(
+      """
+      SELECT c.publicname publicname, c._landingpageImageKey _landingpageImageKey, c.id celebrityid,
+        c.roledescription roledescription, 
+        c._enrollmentStatus _enrollmentStatus, c._publishedStatus _publishedStatus
+      FROM celebrity c, celebrity_categories_mv mv WHERE
+        (
+          mv.to_tsvector
+          @@
+          plainto_tsquery('english', {textQuery})
+        ) and mv.id = c.id
+      GROUP BY c.id;
+      """
+    ).on("textQuery" -> query).apply()(connection = schema.getTxnConnectionFactory)
+    
+     for( row <- rowStream) yield {
+      Celebrity(
+        id = row[Long]("celebrityid"),
+         publicName = row[String]("publicname"),
+         roleDescription = row[String]("roledescription"),                                 
+         _enrollmentStatus = row[String]("_enrollmentStatus"),
+         _publishedStatus = row[String]("_publishedStatus"),
+         _landingPageImageKey = row[Option[String]]("_landingpageImageKey")
+      ).asMarketplaceCelebrity(
+        soldout = true,
+        minPrice = 0,
+        maxPrice = 100
+      )
+    }
+  }
+  
 
   def getCelebrityAccounts: Query[(Celebrity, Account)] = {
     val celebrityAccounts: Query[(Celebrity, Account)] = from(schema.celebrities, schema.accounts)(
