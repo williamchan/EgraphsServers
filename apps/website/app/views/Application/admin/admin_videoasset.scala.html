@@ -1,11 +1,23 @@
 @()
 
-<!doctype html>
+<!DOCTYPE HTML SYSTEM>
 <html>
   <head>
     <title>Test Video Uploader</title>
   </head>
   <body>
+	
+    <div class="topbar">
+      <div class="fill">
+        <div class="container">
+          <a class="brand" href="/">
+            <img src='/assets/images/egraphs_admin_logo.jpg' alt="logo" />
+          </a>
+          
+        </div>
+      </div>
+    </div>	
+	
     <h1> Test Video Uploader </h1>
 
       @helper.form(action = routes.ApiControllers.postVideoAsset, 'enctype -> "multipart/form-data") {

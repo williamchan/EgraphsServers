@@ -88,6 +88,7 @@ POST     /admin/login                                              				controlle
 GET      /admin/orders                                             				controllers.WebsiteControllers.getOrdersAdmin
 GET      /admin/orders/$orderId<[0-9]+>                                   controllers.WebsiteControllers.getOrderAdmin(orderId: Long)
 POST     /admin/orders/$orderId<[0-9]+>                                   controllers.WebsiteControllers.postOrderAdmin(orderId: Long)
+POST     /admin/processVideo                                              controllers.WebsiteControllers.postProcessVideo(action: String, url: String)
 GET      /admin/products/$productId<[0-9]+>                               controllers.WebsiteControllers.getProductAdmin(productId: Long)
 POST     /admin/products/$productId<[0-9]+>                               controllers.WebsiteControllers.postProductAdmin(productId: Long)
 GET      /admin/reports                                            				controllers.WebsiteControllers.getReportsAdmin

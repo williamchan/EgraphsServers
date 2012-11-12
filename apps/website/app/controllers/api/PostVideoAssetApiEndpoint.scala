@@ -16,7 +16,6 @@ import models.VideoAsset
 import models.VideoAssetCelebrity
 
 private[controllers] trait PostVideoAssetApiEndpoint { this: Controller =>
-  //protected def dbSession: DBSession
   protected def postApiController: POSTApiControllerMethod
   protected def httpFilters: HttpFilters
 

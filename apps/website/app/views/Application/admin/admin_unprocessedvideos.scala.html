@@ -1,11 +1,54 @@
 @(videos: List[String])
 
-<!doctype html>
+<!DOCTYPE HTML>
 <html>
   <head>
     <title>Unprocessed Videos</title>
   </head>
   <body>
-    <h1> Unprocessed Videos </h1>  
+	
+    <div class="topbar">
+      <div class="fill">
+        <div class="container">
+          <a class="brand" href="/">
+            <img src='/assets/images/egraphs_admin_logo.jpg' alt="logo">
+          </a>
+          
+        </div>
+      </div>
+    </div>	
+	
+	
+    <h1> Unprocessed Videos </h1> 
+
+    <div class="videos">
+        @videos.map { video =>
+	
+	        <div class="video" style="margin: 20px; float: left;">
+
+              <video width="540" height="340" controls>
+                <source src='@video' type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+              </video>
+                            
+              <table>
+                <tr>
+                  <td>
+                    @helper.form(action = routes.WebsiteControllers.postProcessVideo("Approved", video)) {
+                      <input type="submit" name="Approve" value="Approve" style="margin: 10px;">
+                    }
+                  </td>
+
+                  <td>
+                    @helper.form(action = routes.WebsiteControllers.postProcessVideo("Rejected", video)) {
+                      <input type="submit" name="Reject" value="Reject" style="margin: 10px;">
+                    }
+                  </td>
+                </tr>
+              </table>
+
+          </div>
+        }
+    </div>
+
   </body>
 </html>

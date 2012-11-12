@@ -45,6 +45,7 @@ trait AllAdminEndpoints
   with PostLoginAdminEndpoint
   with PostOrderAdminEndpoint
   with PostPrintOrderAdminEndpoint
+  with PostProcessVideoAdminEndpoint
   with PostProductAdminEndpoint
   with PostSendCelebrityWelcomeEmailAdminEndpoint
 { this: Controller => }

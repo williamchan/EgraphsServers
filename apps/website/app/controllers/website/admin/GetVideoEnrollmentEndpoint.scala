@@ -36,7 +36,6 @@ private[controllers] trait GetVideoEnrollmentEndpoint extends ImplicitHeaderAndF
     }
 
     Ok(views.html.Application.admin.admin_unprocessedvideos(list))
-
     }
   }
 }
