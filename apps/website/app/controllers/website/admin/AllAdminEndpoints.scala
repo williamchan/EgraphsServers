@@ -15,6 +15,8 @@ trait AllAdminEndpoints
   with GetCelebritiesAdminEndpoint
   with GetCelebrityAdminEndpoint
   with GetCelebrityEgraphsAdminEndpoint
+  with GetCouponAdminEndpoint
+  with GetCouponsAdminEndpoint
   with GetCreateFreegraphAdminEndpoint
   with GetCelebrityInventoryBatchesAdminEndpoint
   with GetCelebrityOrdersAdminEndpoint
@@ -37,6 +39,7 @@ trait AllAdminEndpoints
   with PostCategoryValueAdminEndpoint
   with PostCelebrityAdminEndpoint
   with PostCelebrityCategoryValueAdminEndpoint
+  with PostCouponAdminEndpoint
   with PostEgraphAdminEndpoint
   with PostFeaturedCelebritiesAdminEndpoint
   with PostFreegraphAdminEndpoint

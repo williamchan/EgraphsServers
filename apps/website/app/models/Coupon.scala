@@ -5,7 +5,7 @@ import enums._
 import java.sql.Timestamp
 import java.util.Date
 import org.joda.money.Money
-import org.joda.time.DateTime
+import org.joda.time.DateMidnight
 import org.squeryl.Query
 import services.{AppConfig, Time}
 import services.db.{FilterOneTable, KeyedCaseClass, Schema, SavesWithLongKey}
@@ -16,14 +16,14 @@ case class CouponServices @Inject()(store: CouponStore)
 case class Coupon(id: Long = 0,
                   name: String = "",
                   code: String = Coupon.generateCode,
-                  startDate: Date = Time.today,
-                  endDate: Date = new DateTime().plusYears(10).toDate,
+                  startDate: Timestamp = new Timestamp(new DateMidnight().getMillis),
+                  endDate: Timestamp = new Timestamp(new DateMidnight().plusYears(10).getMillis),
                   discountAmount: BigDecimal = 5,
                   _couponType: String = CouponType.Promotion.name,
                   _discountType: String = CouponDiscountType.Flat.name,
                   _usageType: String = CouponUsageType.OneUse.name,
                   isActive: Boolean = true,
-//                  restrictions: String = "",
+                  restrictions: String = "{}",
 //                  corporateGroupId: Option[Long] = None,
                   created: Timestamp = Time.defaultTimestamp,
                   updated: Timestamp = Time.defaultTimestamp,
@@ -60,25 +60,25 @@ case class Coupon(id: Long = 0,
     }
   }
   
-  /**
-   * Returns true if usage of this coupon should result in an amount being invoiced to a corporate account.
-   * (to be implemented: corporate account)
-   */
-  def shouldChargeRemainder: Boolean = {
-    couponType != CouponType.Invoiceable
-  }
-  
-  /**
-   * @return the amount that should be invoiced to the corporate account.
-   * (to be implemented: corporate account)
-   */
-  def calculateInvoiceAmount(preCouponAmount: BigDecimal): BigDecimal = {
-    if (couponType == CouponType.Invoiceable) {
-      calculateDiscount(preCouponAmount)
-    } else {
-      0
-    }
-  }
+//  /**
+//   * Returns true if usage of this coupon should result in an amount being invoiced to a corporate account.
+//   * (to be implemented: corporate account)
+//   */
+//  def shouldChargeRemainder: Boolean = {
+//    couponType != CouponType.Invoiceable
+//  }
+//  
+//  /**
+//   * @return the amount that should be invoiced to the corporate account.
+//   * (to be implemented: corporate account)
+//   */
+//  def calculateInvoiceAmount(preCouponAmount: BigDecimal): BigDecimal = {
+//    if (couponType == CouponType.Invoiceable) {
+//      calculateDiscount(preCouponAmount)
+//    } else {
+//      0
+//    }
+//  }
   
   //
   // Public methods
@@ -89,9 +89,13 @@ case class Coupon(id: Long = 0,
       case CouponDiscountType.Flat => {
         require(discountAmount > 0, "For flat coupons, discount amount must be greater than 0.")
       }
+      case CouponDiscountType.Percentage if (usageType == CouponUsageType.Unlimited) => {
+        require(discountAmount > 0, "Discount percentage amount must be between 0 and 25 for unlimited use coupons.")
+        require(discountAmount <= 25, "Discount percentage amount must be between 0 and 25 for unlimited use coupons.")
+      }
       case _ => {
-        require(discountAmount > 0, "For percentage coupons, discount amount must be between 0 and 100.")
-        require(discountAmount <= 100, "For percentage coupons, discount amount must be between 0 and 100.")
+        require(discountAmount > 0, "Discount percentage amount must be between 0 and 100.")
+        require(discountAmount <= 100, "Discount percentage amount must be between 0 and 100.")
       }
     }
     
@@ -118,7 +122,7 @@ case class Coupon(id: Long = 0,
 
 object Coupon {
   protected[models] val defaultCodeLength = 12
-  def generateCode: String = Random.alphanumeric.take(defaultCodeLength).mkString
+  def generateCode: String = Random.alphanumeric.take(defaultCodeLength).mkString.toLowerCase
 }
 
 class CouponStore @Inject()(schema: Schema, 
@@ -133,11 +137,20 @@ class CouponStore @Inject()(schema: Schema,
   // Public methods
   //
   
-  def findByCode(code: String, filters: FilterOneTable[Coupon]*): Seq[Coupon] = {
+  def findByFilter(filters: FilterOneTable[Coupon]*): Query[Coupon] = {
     from(schema.coupons)(coupon =>
-      where(coupon.code === code and FilterOneTable.reduceFilters(filters, coupon))
+      where(FilterOneTable.reduceFilters(filters, coupon))
       select(coupon)
-    ).toSeq
+      orderBy (coupon.id desc)
+    )
+  }
+  
+  def findByCode(code: String, filters: FilterOneTable[Coupon]*): Query[Coupon] = {
+    from(schema.coupons)(coupon =>
+      where(coupon.code === code.toLowerCase and FilterOneTable.reduceFilters(filters, coupon))
+      select(coupon)
+      orderBy (coupon.id desc)
+    )
   }
 
   def findValid(code: String): Option[Coupon] = {
@@ -166,10 +179,16 @@ class CouponStore @Inject()(schema: Schema,
       theOld._usageType := theNew._usageType,
       theOld._couponType := theNew._couponType,
       theOld.isActive := theNew.isActive,
-//      theOld.restrictions := theNew.restrictions,
+      theOld.restrictions := theNew.restrictions,
       theOld.created := theNew.created,
       theOld.updated := theNew.updated
     )
+  }
+  
+  beforeInsertOrUpdate(withCodeInLowerCase)
+
+  private def withCodeInLowerCase(toUpdate: Coupon): Coupon = {
+    toUpdate.copy(code = toUpdate.code.trim.toLowerCase)
   }
 
   //
@@ -199,4 +218,19 @@ class CouponQueryFilters @Inject() (schema: Schema) {
     }
   }
   
+  def oneUse: FilterOneTable[Coupon] = {
+    new FilterOneTable[Coupon] {
+      override def test(coupon: Coupon) = {
+        (coupon._usageType === CouponUsageType.OneUse.name)
+      }
+    }
+  }
+  
+  def unlimited: FilterOneTable[Coupon] = {
+    new FilterOneTable[Coupon] {
+      override def test(coupon: Coupon) = {
+        (coupon._usageType === CouponUsageType.Unlimited.name)
+      }
+    }
+  }
 }

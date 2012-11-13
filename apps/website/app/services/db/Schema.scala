@@ -80,7 +80,13 @@ class Schema @Inject()(
   )
   
   val coupons = table[Coupon]
-  on(coupons)(coupon => declare(coupon.code is indexed))
+  on(coupons)(coupon => 
+    declare(
+      columns(coupon.code, coupon.startDate, coupon.endDate, coupon.isActive) are indexed,
+      columns(coupon._usageType, coupon.startDate, coupon.endDate, coupon.isActive) are indexed,
+      coupon.restrictions is dbType("varchar(255)")
+    )
+  )
 
   val customers = table[Customer]
   on(customers)(customer => declare(customer.username is unique))

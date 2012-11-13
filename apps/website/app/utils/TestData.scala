@@ -1,14 +1,16 @@
 package utils
 
 import services.{AppConfig, Time}
-import util.Random
+import java.sql.Timestamp
 import java.text.SimpleDateFormat
+import java.util.Date
 import org.joda.time.DateTime
 import models._
 import enums.{EgraphState, PublishedStatus}
 import egraphs.playutils.Encodings.Base64
 import org.apache.commons.lang3.RandomStringUtils
 import categories.{Category, CategoryValue}
+import util.Random
 
 /**
  * Renders saved copies of domain objects that satisfy all relational integrity
@@ -25,7 +27,7 @@ object TestData {
   lazy val twoDaysHence = new DateTime().plusDays(2).toLocalDate.toDate
   lazy val threeDaysHence = new DateTime().plusDays(3).toLocalDate.toDate
   lazy val sevenDaysHence = new DateTime().plusDays(7).toLocalDate.toDate
-
+  
   val random = new Random
 
   def getTimeInBlobstoreFormat: String = Time.toBlobstoreFormat(Time.now)

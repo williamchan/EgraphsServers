@@ -1,0 +1,19 @@
+@(name: String,
+label: String,
+selected: String,
+optionList: List[String],
+help: Option[String] = None)
+
+<div class="clearfix">
+  <label>@label</label>
+  <div class="input">
+    <select name="@name" size="1" >
+      @for(optionVal <- optionList) {
+        <option value="@optionVal" @if(optionVal == selected) {selected="selected"} else {}>@optionVal</option>
+      }
+    </select>
+    @help.map { htmlString =>
+      <span class="help-block">@Html(htmlString)</span>
+    }
+  </div>
+</div>

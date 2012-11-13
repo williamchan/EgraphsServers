@@ -89,15 +89,18 @@ class Scenarios extends DeclaresScenarios {
   )
   
   toScenarios add Scenario(
-  "Create Coupon with code 'mycoupon'",
+  "Coupon with code 'oneuse'",
   adminCategory,
-  """
-    Create Coupon with code 'mycoupon' for $10 off
-  """, {
-    () =>
-      Coupon(code = "mycoupon", discountAmount = 10).save()
-  }
-  )
+  """Creates coupon with code 'oneuse' for $100 off""", {
+    () => Coupon(code = "oneuse", discountAmount = 100).withUsageType(CouponUsageType.OneUse).save()
+  })
+  
+  toScenarios add Scenario(
+  "Coupon with code 'unlimited'",
+  adminCategory,
+  """Creates coupon with code 'mycoupon' for $10 off""", {
+    () => Coupon(code = "unlimited", discountAmount = 10).withUsageType(CouponUsageType.Unlimited).save()
+  })
 
   //
   // apiCategory

@@ -8,12 +8,12 @@ object CouponType extends Utils.Enum {
   val Promotion = new EnumVal {
     val name = "Promotion"
   }
-  val Prepaid = new EnumVal {
-    val name = "Prepaid"
-  }
-  val Invoiceable = new EnumVal {
-    val name = "Invoiceable"
-  }
+//  val Prepaid = new EnumVal {
+//    val name = "Prepaid"
+//  }
+//  val Invoiceable = new EnumVal {
+//    val name = "Invoiceable"
+//  }
 //  val CelebrityFreeGiveaway = new EnumVal {
 //    val name = "CelebrityFreeGiveaway"
 //  }
