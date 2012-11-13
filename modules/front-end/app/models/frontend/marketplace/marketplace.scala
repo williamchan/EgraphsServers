@@ -17,7 +17,7 @@ case class MarketplaceCelebrity(
  case class CategoryViewModel(
   id: Long = 0,
   publicName: String,
-  categoryValues: Seq[CategoryValueViewModel]
+  categoryValues: Iterable[CategoryValueViewModel]
 ) {
   def asActiveMap : Map[String, JsValue] = {
       Map(
@@ -45,7 +45,8 @@ case class VerticalViewModel(
   publicName: String,
   shortName: String,
   iconUrl: String,
-  active: Boolean = false
+  active: Boolean = false,
+  id: Long
 )
 
 case class ResultSetViewModel(
