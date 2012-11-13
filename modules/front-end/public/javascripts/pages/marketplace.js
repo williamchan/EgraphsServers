@@ -17,12 +17,21 @@ define(["libs/chosen/chosen.jquery.min"], function (Egraphs) {
         **/  
         $(".cv-link").click(function(e){
           var link = $(this);
-          var catId = link.attr("data-category");
-          var catVal = link.attr("data-categoryvalue");  
-          var categories = window.Egraphs.page.categories
-          
-          categories["c" + catId].push(catVal);
-          window.location.href = window.Egraphs.page.queryUrl + "?" + $.param(categories);
+          var category = window.Egraphs.page.categories["c" + link.attr("data-category")];          
+          console.log(category);
+          var catVal = parseInt(link.attr("data-categoryvalue"));  
+          console.log(catVal);  
+
+          if($.inArray(catVal, category) > -1) {
+            var idx = $.inArray(catVal, category);
+            category.splice(idx, 1);
+            console.log("splice");
+          } else {
+            console.log("push");
+            category.push(catVal);
+          }
+          window.location.href = window.Egraphs.page.queryUrl + "?" + $.param(window.Egraphs.page.categories)+ 
+            "&" + $.param({ "query" : window.Egraphs.page.query});
           e.preventDefault();  
         });  
 

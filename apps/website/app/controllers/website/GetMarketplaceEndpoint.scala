@@ -40,9 +40,10 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
     Action { implicit request =>
      //Map Vertical to specific landing page.
        Ok(views.html.frontend.marketplace_landing(
-         queryUrl = queryUrl.toString,
+         //TODO Fix this queryUrl thing
+           queryUrl = "",
          marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage.url,
-         verticalViewModels = getVerticals,
+         verticalViewModels = getVerticals(),
          results = List[ResultSetViewModel](),
          categoryViewModels = List[CategoryViewModel]()
        ))
@@ -86,20 +87,16 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
           (id.toLong, set.map( arg => arg.toLong))
         }
       
-      
       val activeCategoryValues = categoryAndCategoryValues.foldLeft[Set[Long]](Set[Long]())((set, ccv) => set ++ ccv._2.toSet[Long])
       
-      val celebrities = 
+      val (subtitle, celebrities) = 
         (queryOption match {
-          case Some(query) => celebrityStore.marketplaceSearch(query, categoryAndCategoryValues)
-          case _ => List()
-        }) 
-        
-      val subtitle = queryOption match {
-        case Some(query) => "Results for " + query + "..."
-        case None => "Results" 
-      }
-      
+          case Some(query) => ("Results for \"" + query + "\"...", celebrityStore.marketplaceSearch(query, categoryAndCategoryValues))
+          case _ => activeCategoryValues.isEmpty match {
+            case false => ("Results", celebrityStore.marketplaceSearch("*", categoryAndCategoryValues))
+            case true => ("Featured Celebrities" , celebrityStore.getFeaturedPublishedCelebrities.map(c => c.asMarketplaceCelebrity(100,100, true)))
+          }
+        })  
       val categoryViewModels = 
        categoryValueStore.findById(4).map( categoryValue => 
          categoryValue.categories.map ( c =>
@@ -120,16 +117,16 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
            
             
        Ok(views.html.frontend.marketplace_results(
-         queryUrl = queryUrl.toString,
+         query = queryOption.getOrElse(""),
          marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage.url,
-         verticalViewModels = getVerticals,
+         verticalViewModels = getVerticals(activeCategoryValues),
          results = List(ResultSetViewModel(subtitle=Option(subtitle), celebrities)),
          categoryViewModels = categoryViewModels
        ))
     }
   }
   
-  private def getVerticals : List[VerticalViewModel] = {
+  private def getVerticals(activeCategoryValues: Set[Long] = Set()) : List[VerticalViewModel] = {
     val verticalMlb = categoryValueStore.findById(4).get
     List(
       VerticalViewModel(
