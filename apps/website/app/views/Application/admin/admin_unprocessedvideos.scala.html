@@ -1,54 +1,47 @@
-@(videos: List[String])
+@(videos: List[String])(implicit authToken: egraphs.authtoken.AuthenticityToken,
+  headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData)
+  
+@import egraphs.authtoken.AuthenticityToken.safeForm
+@import views.html.frontend.base_template  
 
-<!DOCTYPE HTML>
-<html>
-  <head>
-    <title>Unprocessed Videos</title>
-  </head>
-  <body>
-	
-    <div class="topbar">
-      <div class="fill">
-        <div class="container">
-          <a class="brand" href="/">
-            <img src='/assets/images/egraphs_admin_logo.jpg' alt="logo">
-          </a>
-          
-        </div>
-      </div>
-    </div>	
-	
-	
-    <h1> Unprocessed Videos </h1> 
+@body = {
+<section id="content" class="top" role="main">
+  <div id="main" class="sub">
+    <div class="container" id="celebrity-admin">
+      <h1> Unprocessed Videos </h1> 
 
-    <div class="videos">
-        @videos.map { video =>
+      <div class="videos">
+          @videos.map { video =>
 	
-	        <div class="video" style="margin: 20px; float: left;">
+	          <div class="video" style="margin: 20px; float: left;">
 
-              <video width="540" height="340" controls>
-                <source src='@video' type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
-              </video>
+                <video width="540" height="340" controls>
+                  <source src='@video' type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+                </video>
                             
-              <table>
-                <tr>
-                  <td>
-                    @helper.form(action = routes.WebsiteControllers.postProcessVideo("Approved", video)) {
-                      <input type="submit" name="Approve" value="Approve" style="margin: 10px;">
-                    }
-                  </td>
+                <table>
+                  <tr>
+                    <td>
+                      @helper.form(action = routes.WebsiteControllers.postProcessVideo("Approved", video)) {
+                        <input type="submit" name="Approve" value="Approve" style="margin: 10px;">
+                      }
+                    </td>
 
-                  <td>
-                    @helper.form(action = routes.WebsiteControllers.postProcessVideo("Rejected", video)) {
-                      <input type="submit" name="Reject" value="Reject" style="margin: 10px;">
-                    }
-                  </td>
-                </tr>
-              </table>
+                    <td>
+                      @helper.form(action = routes.WebsiteControllers.postProcessVideo("Rejected", video)) {
+                        <input type="submit" name="Reject" value="Reject" style="margin: 10px;">
+                      }
+                    </td>
+                  </tr>
+                </table>
 
-          </div>
-        }
+            </div>
+          }
+      </div>
     </div>
+  </div>
+</section>
+}
 
-  </body>
-</html>
+@base_template(title="Admin - Unprocessed Videos", body=body, jsMain="pages/admin/celebrity")

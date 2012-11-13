@@ -1,32 +1,25 @@
-@()
+@()(implicit authToken: egraphs.authtoken.AuthenticityToken,
+  headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData)
+  
+@import egraphs.authtoken.AuthenticityToken.safeForm 
+@import views.html.frontend.base_template 
 
-<!DOCTYPE HTML SYSTEM>
-<html>
-  <head>
-    <title>Test Video Uploader</title>
-  </head>
-  <body>
-	
-    <div class="topbar">
-      <div class="fill">
-        <div class="container">
-          <a class="brand" href="/">
-            <img src='/assets/images/egraphs_admin_logo.jpg' alt="logo" />
-          </a>
-          
-        </div>
-      </div>
-    </div>	
-	
-    <h1> Test Video Uploader </h1>
+@body = {
+<section id="content" class="top" role="main">
+  <div id="main" class="sub">
+    <div class="container" id="celebrity-admin">	
+      <h1> Test Video Uploader </h1>
 
-      @helper.form(action = routes.ApiControllers.postVideoAsset, 'enctype -> "multipart/form-data") {
+        @helper.form(action = routes.ApiControllers.postVideoAsset, 'enctype -> "multipart/form-data") {
 
-        <input type="file" name="video" />
-        <input type="text" name="celebrityId" />
-        <input type="submit" name="submit" /> 
+          <input type="file" name="video" />
+          <input type="text" name="celebrityId" />
+          <input type="submit" name="submit" /> 
+        }
+    </div>
+  </div>
+</section>
+}
 
-      }
-
-  </body>
-</html>
+@base_template(title="Admin - Video Uploader", body=body,  jsMain="pages/admin/celebrity")

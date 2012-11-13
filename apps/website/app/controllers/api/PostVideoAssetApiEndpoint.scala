@@ -22,36 +22,38 @@ private[controllers] trait PostVideoAssetApiEndpoint { this: Controller =>
   private val blob: Blobs = AppConfig.instance[Blobs]
 
   def postVideoAsset = postApiController() {
-    httpFilters.requireCelebrityId.inRequest(parse.multipartFormData) { celebrity =>
-      Action(parse.multipartFormData) { request =>
+    httpFilters.requireAdministratorLogin.inSession(parser = parse.multipartFormData) {
+      case (admin, adminAccount) =>
+        httpFilters.requireCelebrityId.inRequest(parse.multipartFormData) { celebrity =>
+          Action(parse.multipartFormData) { request =>
 
-        val celebrityId = celebrity.id
-        play.Logger.info("Celebrity id is " + celebrityId)
+            val celebrityId = celebrity.id
 
-        request.body.file("video").map { resource =>
-          import java.io.File
-          val filename = resource.filename
-          val directory = "/tmp/"
-          val tempFile = new File(directory + filename)
-          resource.ref.moveTo(tempFile)
+            request.body.file("video").map { resource =>
+              import java.io.File
+              val filename = resource.filename
+              val directory = "/tmp/"
+              val tempFile = new File(directory + filename)
+              resource.ref.moveTo(tempFile)
 
-          val maybeFileLocation = putFile(celebrityId, filename, tempFile)
-          val fileLocation = maybeFileLocation match {
-            case Some(maybeFileLocation) => maybeFileLocation
-            case None => "File not found"
+              val maybeFileLocation = putFile(celebrityId, filename, tempFile)
+              val fileLocation = maybeFileLocation match {
+                case Some(maybeFileLocation) => maybeFileLocation
+                case None => "File not found"
+              }
+
+              persist(celebrityId, fileLocation)
+              val responseJson = getJson(celebrityId, tempFile, fileLocation)
+
+              // file only needed for bytes computation
+              tempFile.delete()
+              Ok(responseJson)
+
+            }.getOrElse {
+              BadRequest("Something went wrong with your request. Please try again.")
+            }
           }
-
-          persist(celebrityId, fileLocation)
-          val responseJson = getJson(celebrityId, tempFile, fileLocation)
-
-          // file only needed for bytes computation
-          tempFile.delete()
-          Ok(responseJson)
-
-        }.getOrElse {
-          BadRequest("Something went wrong with your request. Please try again.")
         }
-      }
     }
   }
 

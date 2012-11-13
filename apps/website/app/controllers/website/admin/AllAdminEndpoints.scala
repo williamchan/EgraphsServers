@@ -32,7 +32,7 @@ trait AllAdminEndpoints
   with GetProductAdminEndpoint
   with GetReportsAdminEndpoint
   with GetToolsAdminEndpoint
-  with GetVideoEnrollmentEndpoint
+  with GetVideoEnrollmentAdminEndpoint
   with PostAccountAdminEndpoint
   with PostCategoryAdminEndpoint
   with PostCategoryValueAdminEndpoint

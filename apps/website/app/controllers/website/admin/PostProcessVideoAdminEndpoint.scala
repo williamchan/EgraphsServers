@@ -16,12 +16,14 @@ trait PostProcessVideoAdminEndpoint {
   protected def schema: Schema
 
   def postProcessVideo(action: String, url: String) = controllerMethod(WithDBConnection(readOnly = false)) {
-    Action { request =>
-      
-      val videoStatusUpdated = update(schema.videoAssets)(
-          s => where(s.url === url) set(s._videoStatus := action))
+    controllerMethod.withForm() { implicit authToken =>
+      Action { request =>
 
-      Redirect(controllers.routes.WebsiteControllers.getUnprocessedVideos)
+        val videoStatusUpdated = update(schema.videoAssets)(
+          s => where(s.url === url) set (s._videoStatus := action))
+
+        Redirect(controllers.routes.WebsiteControllers.getUnprocessedVideosAdmin)
+      }
     }
   }
 }
