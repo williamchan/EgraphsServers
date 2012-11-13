@@ -39,6 +39,11 @@ case class CategoryValueViewModel(
   active: Boolean
 ) 
 
+case class SortOptionViewModel(
+  name: String,
+  display: String,
+  active: Boolean
+)
 
 case class VerticalViewModel(
   verticalName: String, 

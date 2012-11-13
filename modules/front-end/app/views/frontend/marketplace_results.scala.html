@@ -1,8 +1,10 @@
 @(query : String,
   marketplaceRoute: String,
-verticalViewModels: Iterable[models.frontend.marketplace.VerticalViewModel], 
-results: Iterable[models.frontend.marketplace.ResultSetViewModel], 
-categoryViewModels: Iterable[models.frontend.marketplace.CategoryViewModel] = List[models.frontend.marketplace.CategoryViewModel]())(
+  verticalViewModels: Iterable[models.frontend.marketplace.VerticalViewModel], 
+  results: Iterable[models.frontend.marketplace.ResultSetViewModel], 
+  categoryViewModels: Iterable[models.frontend.marketplace.CategoryViewModel] = List[models.frontend.marketplace.CategoryViewModel](),
+  sortOptions: Iterable[models.frontend.marketplace.SortOptionViewModel]
+  )(
   implicit
   headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData,
@@ -23,6 +25,7 @@ Translates a map of categories and their categoryvalues into a JsonObject that c
  );
  Egraphs.page.queryUrl = "@marketplaceRoute";
  Egraphs.page.query = "@query";
+ Egraphs.page.sort = "@sortOptions.filter(v => v.active).headOption.map(v => v.name)";
 }
 
 @baseBody = {
@@ -80,7 +83,7 @@ Translates a map of categories and their categoryvalues into a JsonObject that c
             
           </aside> <!-- end .mobile-nav -->
         
-          @tags.marketplace.view_options()
+          @tags.marketplace.view_options(sortOptions)
           @tags.marketplace.result_set(results)
 
         </div>

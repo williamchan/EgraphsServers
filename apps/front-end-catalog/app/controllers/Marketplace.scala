@@ -14,12 +14,19 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
   val coinflip = Random
 
   def index() = Action {
-    Ok(views.html.frontend.marketplace_landing("derp", "exampleQuery", verticalSet, resultSet, categoryViewModels))
+    Ok(views.html.frontend.marketplace_landing("derp", "exampleQuery", verticalSet, resultSet, categoryViewModels, sortOptions))
   }
 
   
   def results() = Action {
-    Ok(views.html.frontend.marketplace_results("http://localhost:9000/Marketplace/mlb/results", "exampleQuery", verticalSet, resultSet, categoryViewModels))
+    Ok(views.html.frontend.marketplace_results( 
+       query= "exampleQuery", 
+       marketplaceRoute = "http://localhost:9000/Marketplace/mlb/results",
+       verticalSet, 
+       resultSet, 
+       categoryViewModels,
+       sortOptions
+    ))
   }
   
   def mlb() = Action {
@@ -47,9 +54,9 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
   
   def verticalSet : Iterable[VerticalViewModel] = {
     List(
-        VerticalViewModel(verticalName="mlb",  publicName = "Major League Baseball", shortName="MLB", iconUrl = "images/icon-logo-mlb.png", active = true),
-        VerticalViewModel(verticalName="nba", publicName = "National Basketball Association", shortName="NBA",iconUrl = "images/icon-logo-nba.png"),
-        VerticalViewModel(verticalName="mj", publicName = "Monster Jam", shortName="Monster Jam", iconUrl = "images/icon-logo-monster-jam.png")
+        VerticalViewModel(id = 1, verticalName="mlb",  publicName = "Major League Baseball", shortName="MLB", iconUrl = "images/icon-logo-mlb.png", active = true),
+        VerticalViewModel(id = 2, verticalName="nba", publicName = "National Basketball Association", shortName="NBA",iconUrl = "images/icon-logo-nba.png"),
+        VerticalViewModel(id = 3,verticalName="mj", publicName = "Monster Jam", shortName="Monster Jam", iconUrl = "images/icon-logo-monster-jam.png")
     ).toSet
   }
   
@@ -95,6 +102,41 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
               CategoryValueViewModel(id = 7, publicName = "Catcher", active = false)
             )
         )
+    )
+  }
+
+  def sortOptions : List[SortOptionViewModel] = {
+    List(
+      SortOptionViewModel(
+        name = "recently-added",
+        display = "Recently Added",
+        active = false
+      ),
+      SortOptionViewModel(
+        name = "most-popular",
+        display = "Most Popular",
+        active = false
+      ),
+      SortOptionViewModel(
+        name = "price-low-to-hi",
+        display = "Price (Low to High)",
+        active = true
+      ),
+      SortOptionViewModel(
+        name = "price-high-to-low",
+        display = "Price (High to Low)",
+        active = false
+      ),
+      SortOptionViewModel(
+        name = "alphabetical-a-z",
+        display = "Alphabetical (A-Z)",
+         active = false
+      ),
+      SortOptionViewModel(
+        name = "alphabetical-z-a",
+        display = "Alphabetical (Z-A)",
+        active = false
+      )
     )
   }
 

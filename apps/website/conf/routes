@@ -117,8 +117,8 @@ GET     /login                                                      controllers.
 POST    /login                                                      controllers.WebsiteControllers.postLogin
 GET     /logout                                                     controllers.WebsiteControllers.getLogout
 POST    /logout                                                     controllers.WebsiteControllers.postLogout
-GET     /market                                                     controllers.WebsiteControllers.getMarketplaceResultPage
-GET     /market/:verticalname                                       controllers.WebsiteControllers.getMarketplaceVerticalPage(verticalname: String)
+GET     /celebrities                                                controllers.WebsiteControllers.getMarketplaceResultPage
+GET     /celebrities/:verticalname                                  controllers.WebsiteControllers.getMarketplaceVerticalPage(verticalname: String)
 GET     /orders/$orderId<[0-9]+>/confirm                            controllers.WebsiteControllers.getOrderConfirmation(orderId: Long)
 POST    /orders/$orderId<[0-9]+>/configure                          controllers.WebsiteControllers.postOrderPrivacy(orderId: Long)
 GET     /privacy                                                    controllers.WebsiteControllers.getPrivacy
