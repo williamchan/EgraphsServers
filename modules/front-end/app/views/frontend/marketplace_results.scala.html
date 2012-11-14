@@ -39,7 +39,7 @@ Translates a map of categories and their categoryvalues into a JsonObject that c
       <div class="span12 masthead" role="masthead">
       
         <form action="@marketplaceRoute" method="get">
-            <input name="query" type="search" placeholder="Find Your Star" value="@query">
+            <input name="query" id="celebrity-searchbox" type="search" placeholder="Find Your Star" value="@query" autofocus>
         </form>
       
         <img src='@RemoteAssets.at("images/masthead-marketplace.jpg")'/>
@@ -60,28 +60,7 @@ Translates a map of categories and their categoryvalues into a JsonObject that c
         <div class="main span9">
 
           @tags.marketplace.vertical_buttons(verticalViewModels)
-          <aside class="mobile-nav">
-          
-            <select class="chsn-select">
-              <optgroup label="Teams">
-                <option>Team Name</option>
-                <option>Team Name</option>
-                <option>Team Name</option>
-                <option>Team Name</option>
-                <option>Team Name</option>
-                <option>Team Name</option>
-                <option>Team Name</option>
-                <option>Team Name</option>
-                <option>Team Name</option>
-                <option>Team Name</option>
-                <option>Team Name</option>
-                <option>Team Name</option>
-              </optgroup>  
-              <option>Position</option>
-              <option>Achievements</option>            
-            </select>
-            
-          </aside> <!-- end .mobile-nav -->
+          @tags.marketplace.category_picker_mobile(categoryViewModels) 
         
           @tags.marketplace.view_options(sortOptions)
           @tags.marketplace.result_set(results)

@@ -83,7 +83,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       
       val (subtitle, celebrities) = 
         (queryOption match {
-          case Some(query) => ("Results for \"" + query + "\"...", celebrityStore.marketplaceSearch(query, categoryAndCategoryValues))
+          case Some(query) => ("Showing Results for \"" + query + "\"...", celebrityStore.marketplaceSearch(query, categoryAndCategoryValues))
           case _ => activeCategoryValues.isEmpty match {
             case false => ("Results", celebrityStore.marketplaceSearch("*", categoryAndCategoryValues))
             case true => ("Featured Celebrities" , celebrityStore.getFeaturedPublishedCelebrities.map(c => c.asMarketplaceCelebrity(100,100, true)))
