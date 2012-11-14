@@ -68,6 +68,7 @@ class CategoryValueStore @Inject() (
        select(categoryValue)
     )
   }
+
   /**
    * Return tuples of CategoryValues and their Categories
    */
@@ -87,7 +88,6 @@ class CategoryValueStore @Inject() (
       	select(categoryValue)
       ).headOption
   }
- 
 
   def categoryValues(celebrity: Celebrity): Query[CategoryValue] with ManyToMany[CategoryValue, CelebrityCategoryValue] = {
     schema.celebrityCategoryValues.left(celebrity)
@@ -102,10 +102,10 @@ class CategoryValueStore @Inject() (
       select((fv, f))
     )
   }
+
   /**
    *  Updates categories owned by a given CategoryValue.  
    **/
-
   def updateCategories(categoryValue: CategoryValue, categoryIds: Iterable[Long]) = {
     //remove old records
     categoryValue.categories.dissociateAll
