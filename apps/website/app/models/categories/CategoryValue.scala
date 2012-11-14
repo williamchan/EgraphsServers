@@ -57,7 +57,20 @@ class CategoryValueStore @Inject() (
   import org.squeryl.PrimitiveTypeMode._
 
   /**
-   * Return CategoryValues that are tags of the specified category
+   * Return all CategoryValues.
+   * @param categoryId
+   * @return
+   */
+  def all() : Query[CategoryValue] = {
+    from(schema.categoryValues)(
+      (categoryValue) =>
+       where(1 === 1)
+       select(categoryValue)
+    )
+  }
+
+  /**
+   * Return CategoryValues that are tags of the specified category.
    * @param categoryId
    * @return
    */
@@ -70,7 +83,7 @@ class CategoryValueStore @Inject() (
   }
 
   /**
-   * Return tuples of CategoryValues and their Categories
+   * Return tuples of CategoryValues and their Categories.
    */
   def findCategoryValueCategoryViewModel : Query[(CategoryValue, Category)]  = {
     join(schema.categoryValues, schema.categories)((categoryValue, category) =>
@@ -80,7 +93,7 @@ class CategoryValueStore @Inject() (
   }
   
   /**
-   * Find a CategoryValue by name
+   * Find a CategoryValue by name.
    */
   def findByName(name: String) : Option[CategoryValue] = {
     from(schema.categoryValues)( categoryValue =>

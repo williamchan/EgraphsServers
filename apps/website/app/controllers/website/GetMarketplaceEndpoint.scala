@@ -96,49 +96,46 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         case _ => false
       }  
 
-                
-      val categoryViewModels = 
-       categoryValueStore.findById(4).map( categoryValue => 
-         categoryValue.categories.map ( c =>
-           CategoryViewModel(
-             id = c.id,
-             publicName = c.publicName,
-             categoryValues = c.categoryValues.map ( cv =>
-               CategoryValueViewModel(
-                 publicName = cv.publicName,
-                 id  = cv.id,
-                 active = activeCategoryValues.contains(cv.id)
-               )
-             )
-           )
-         )  
-       ).getOrElse(List())
-         
-           
-            
-       Ok(views.html.frontend.marketplace_results(
-         query = queryOption.getOrElse(""),
-         viewAsList = viewAsList,
-         marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage.url,
-         verticalViewModels = getVerticals(activeCategoryValues),
-         results = List(ResultSetViewModel(subtitle=Option(subtitle), celebrities)),
-         categoryViewModels = categoryViewModels,
-         sortOptions = sortOptionViewModels(sortOption.getOrElse(""))
-       ))
+      val categoryValues = categoryValueStore.all().toList
+
+      val categoryViewModels = for {
+        categoryValue <- categoryValues
+        category <- categoryValue.categories
+      } yield {
+        CategoryViewModel(
+          id = category.id,
+          publicName = category.publicName,
+          categoryValues = category.categoryValues.map(cv =>
+            CategoryValueViewModel(
+              publicName = cv.publicName,
+              id = cv.id,
+              active = activeCategoryValues.contains(cv.id))))
+      }
+
+      Ok(views.html.frontend.marketplace_results(
+        query = queryOption.getOrElse(""),
+        viewAsList = viewAsList,
+        marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage.url,
+        verticalViewModels = getVerticals(activeCategoryValues),
+        results = List(ResultSetViewModel(subtitle = Option(subtitle), celebrities)),
+        categoryViewModels = categoryViewModels,
+        sortOptions = sortOptionViewModels(sortOption.getOrElse(""))
+      ))
     }
   }
   
   private def getVerticals(activeCategoryValues: Set[Long] = Set()) : List[VerticalViewModel] = {
-    val verticalMlb = categoryValueStore.findById(4).get
-    List(
-      VerticalViewModel(
-       verticalName = "Major-League-Baseball",
-       publicName = verticalMlb.publicName,
-       shortName = "MLB",
-       iconUrl = "images/icon-logo-mlb.png",
-       id = 4,
-       active =  true
-      )    
-    )
+    val categoryValues = categoryValueStore.all().toList
+//    List(
+//      VerticalViewModel(
+//       verticalName = "Major-League-Baseball",
+//       publicName = verticalMlb.publicName,
+//       shortName = "MLB",
+//       iconUrl = "images/icon-logo-mlb.png",
+//       id = 4,
+//       active =  true
+//      )
+//    )
+    List()
   }
 }
