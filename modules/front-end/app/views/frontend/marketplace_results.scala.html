@@ -65,8 +65,10 @@ Translates a map of categories and their categoryvalues into a JsonObject that c
           @tags.marketplace.category_picker_mobile(categoryViewModels) 
         
           @tags.marketplace.view_options(sortOptions, viewAsList)
-
-          @tags.marketplace.navigation_pills(categoryViewModels, query)
+          @if(categoryViewModels.exists(c => c.active == true) || query.length > 0){
+            @tags.marketplace.navigation_pills(categoryViewModels, query)
+          }
+          
 
           @if(viewAsList) {
             @tags.marketplace.result_set_list(results)

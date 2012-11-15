@@ -4,7 +4,7 @@
 <ol>
   @for(category <- categoryViewModels) {
     <li>
-     <a href="" @if(category.active){class="active"} data-category="@category.id">@category.publicName</a> 
+     <a @if(category.active){class="active"} data-category="@category.id">@category.publicName</a> 
         <ol>
         @for(categoryValue <- category.categoryValues) {
           <li><a class="cv-link @if(categoryValue.active){active}" title="" data-category="@category.id" data-categoryvalue="@categoryValue.id">

@@ -29,6 +29,11 @@ define(["libs/chosen/chosen.jquery.min"], function (Egraphs) {
           $(this).removeClass('hover');
         });
 
+        $("#remove-query").click( function(e) {
+          window.Egraphs.page.query = "";
+          reloadPage();
+        });
+
         /**
          * Binding for selecting different sort orders for results from the mobile selector
          **/
@@ -98,7 +103,7 @@ define(["libs/chosen/chosen.jquery.min"], function (Egraphs) {
           );
           reloadPage();
         });
-        
+
         /**
          * Binds all links with class cv-link to refresh the page with the specified category value
          * as a further refinement to the query.
