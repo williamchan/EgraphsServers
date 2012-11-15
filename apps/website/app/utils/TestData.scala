@@ -1,9 +1,7 @@
 package utils
 
 import services.{AppConfig, Time}
-import java.sql.Timestamp
 import java.text.SimpleDateFormat
-import java.util.Date
 import org.joda.time.DateTime
 import models._
 import enums.{EgraphState, PublishedStatus}

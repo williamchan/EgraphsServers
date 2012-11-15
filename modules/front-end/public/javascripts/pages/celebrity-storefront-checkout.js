@@ -141,6 +141,7 @@ function(forms, payment, Egraphs) {
     this.bind = function() {
       $form.submit(function(event) {
         try {
+          // If there is nothing to charge, then skip creation of Stripe token.
           if (checkout.totalAmount == 0) { return false; }
           
           var expiration = expiryDates();

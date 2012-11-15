@@ -18,7 +18,7 @@ import services.Time
  *
  * @param accountStore the store for Accounts.
  */
-class FormChecks @Inject()(accountStore: AccountStore, customerStore: CustomerStore, productStore: ProductStore, couponStore: CouponStore) {
+class FormChecks @Inject()(accountStore: AccountStore, couponStore: CouponStore, customerStore: CustomerStore, productStore: ProductStore) {
   import FormChecks._
   
   /**

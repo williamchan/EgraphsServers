@@ -60,7 +60,7 @@ private[controllers] trait GetCouponAdminEndpoint extends ImplicitHeaderAndFoote
       }
     }
     
-    val isCreate = (coupon.id == 0)
+	val isCreate = (coupon.id == 0)
 	Ok(views.html.Application.admin.admin_coupondetail(
 	  isCreate = isCreate,
 	  errorFields = errorFields,

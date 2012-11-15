@@ -24,7 +24,6 @@ case class Coupon(id: Long = 0,
                   _usageType: String = CouponUsageType.OneUse.name,
                   isActive: Boolean = true,
                   restrictions: String = "{}",
-//                  corporateGroupId: Option[Long] = None,
                   created: Timestamp = Time.defaultTimestamp,
                   updated: Timestamp = Time.defaultTimestamp,
                   services: CouponServices = AppConfig.instance[CouponServices])
@@ -60,14 +59,6 @@ case class Coupon(id: Long = 0,
     }
   }
   
-//  /**
-//   * Returns true if usage of this coupon should result in an amount being invoiced to a corporate account.
-//   * (to be implemented: corporate account)
-//   */
-//  def shouldChargeRemainder: Boolean = {
-//    couponType != CouponType.Invoiceable
-//  }
-//  
 //  /**
 //   * @return the amount that should be invoiced to the corporate account.
 //   * (to be implemented: corporate account)
@@ -107,17 +98,11 @@ case class Coupon(id: Long = 0,
   //
   override def unapplied = Coupon.unapply(this)
   
-  override def withCouponType(value: CouponType.EnumVal) = {
-    this.copy(_couponType = value.name)
-  }
+  override def withCouponType(value: CouponType.EnumVal) = this.copy(_couponType = value.name)
   
-  override def withDiscountType(value: CouponDiscountType.EnumVal) = {
-    this.copy(_discountType = value.name)
-  }
+  override def withDiscountType(value: CouponDiscountType.EnumVal) = this.copy(_discountType = value.name)
   
-  override def withUsageType(value: CouponUsageType.EnumVal) = {
-    this.copy(_usageType = value.name)
-  }
+  override def withUsageType(value: CouponUsageType.EnumVal) = this.copy(_usageType = value.name)
 }
 
 object Coupon {

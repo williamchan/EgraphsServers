@@ -85,5 +85,8 @@ object CheckoutBillingForm {
     val PostalCode = "order.billing.postalCode"
   }
 
+  /**
+   * @paymentToken Stripe payment token. Can be None if no credit card charge is necessary but total amount is zero.
+   */
   case class Valid(paymentToken: Option[String], name: String, email: String, postalCode: String)
 }

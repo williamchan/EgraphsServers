@@ -48,7 +48,6 @@
                 <th>Amount</th>
                 <th>Usages</th>
                 <th>Type</th>
-                <th>Active?</th>
               </tr>
             </thead>  
             @coupons.map { coupon =>
@@ -64,7 +63,6 @@
               <td>@coupon.discountAmount.intValue()</td>
               <td>@coupon.usageType</td>
               <td>@coupon.couponType</td>
-              <td>@coupon.isActive</td>
             </tr>
             }
           </table>

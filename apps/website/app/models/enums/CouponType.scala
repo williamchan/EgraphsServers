@@ -14,9 +14,6 @@ object CouponType extends Utils.Enum {
 //  val Invoiceable = new EnumVal {
 //    val name = "Invoiceable"
 //  }
-//  val CelebrityFreeGiveaway = new EnumVal {
-//    val name = "CelebrityFreeGiveaway"
-//  }
 }
 
 trait HasCouponType[T] {

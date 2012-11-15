@@ -111,10 +111,10 @@ case class EgraphPurchaseHandler(
 
   def performPurchase(): Either[PurchaseFailed, Order] = {
     val charge = try {
-      if (totalAmountPaid.isZero()) {
+      if (totalAmountPaid.isZero) {
         None
       } else {
-        // We want this to throw if stripeTokenId is None
+        // We want this to throw if stripeTokenId is None when the amount to charge is non-zero
         Some(services.payment.charge(totalAmountPaid, stripeTokenId.get, "Egraph Order from " + buyerEmail))
       }
     } catch {
@@ -128,6 +128,8 @@ case class EgraphPurchaseHandler(
     }
 
     // Persist the Order. This is executed in its own database transaction.
+    // cashTransaction can be None if the order was free (due to coupons).
+    // maybePrintOrder can be Some if printingOption is "HighQualityPrint".
     val (order: Order, _: Customer, _: Customer, cashTransaction: Option[_], maybePrintOrder: Option[_]) = try {
       persistOrder(buyerEmail = buyerEmail,
         buyerName = buyerName,
