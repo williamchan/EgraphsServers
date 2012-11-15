@@ -525,8 +525,8 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
      c._enrollmentStatus = 'Enrolled' AND
      c._publishedStatus = 'Published' AND
      p._publishedStatus = 'Published' AND
-     ib.startdate < sysdate AND
-     ib.enddate > sysdate AND
+     ib.startdate < now() AND
+     ib.enddate > now() AND
      mv.to_tsvector @@ plainto_tsquery('english', {textQuery})
     ORDER BY is_order ASC
     
