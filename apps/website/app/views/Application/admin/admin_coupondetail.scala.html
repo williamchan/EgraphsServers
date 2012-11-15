@@ -94,6 +94,8 @@
                 selected=coupon.usageType.name,
                 optionList=models.enums.CouponUsageType.asStrList
               )
+
+              <input id="restrictions" name="restrictions" type="hidden" value="@coupon.restrictions">
               @{/**
               <div class="clearfix">
                 <label for="restrictions">Restrictions</label>

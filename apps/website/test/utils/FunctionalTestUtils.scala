@@ -119,10 +119,14 @@ object FunctionalTestUtils {
       case _ =>
         throw new Exception("Couldn't get chunked content from result of type " + result.getClass)
     }
-  }  
+  }
 
   def routeName(call: Call): String = {
     call.method + " " + call.url
+  }
+  
+  def extractId(location: String): Long = {
+    location.substring(location.lastIndexOf("/") + 1).toLong
   }
   
   trait NonProductionEndpointTests { this: EgraphsUnitTest =>
