@@ -488,33 +488,70 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
    *  (pitcher or 2nd baseman) and (red sox or yankees)
    */
   def marketplaceSearch(query: String, refinements: Map[Long, Iterable[Long]] = Map[Long, Iterable[Long]]()): Iterable[MarketplaceCelebrity] = {
-    val rowStream = SQL(
-      """
-      SELECT c.publicname publicname, c._landingpageImageKey _landingpageImageKey, c.id celebrityid,
-        c.roledescription roledescription, 
-        c._enrollmentStatus _enrollmentStatus, c._publishedStatus _publishedStatus
-      FROM celebrity c, celebrity_categories_mv mv WHERE
-        (
-          mv.to_tsvector
-          @@
-          plainto_tsquery('english', {textQuery})
-        ) and mv.id = c.id
-      GROUP BY c.id;
-      """
-    ).on("textQuery" -> query).apply()(connection = schema.getTxnConnectionFactory)
+
+    // Note we could make this fast probably.  We should see how performance is affected if we don't have to
+    // join across all celebrities since we can filter some with the text search first.
+    val queryString = """
+    SELECT
+     stuff.celeb_id AS celebrityid,
+     stuff.celeb_publicname AS publicname,
+     stuff.celeb_roledescription AS roledescription,
+     stuff.celeb_landingpageImageKey AS _landingpageImageKey,
+     min(stuff.product_priceincurrency) AS minProductPrice,
+     max(stuff.product_priceincurrency) AS maxProductPrice,
+     stuff.inventorybatch_id,
+     sum(stuff.is_order) AS inventory_sold,
+     stuff.inventory_total,
+     stuff.inventory_total - sum(stuff.is_order) AS inventoryAvailable
+    FROM (
     
-     for( row <- rowStream) yield {
+    SELECT
+     c.id AS celeb_id,
+     c.publicname AS celeb_publicname,
+     c.roledescription AS celeb_roledescription,
+     c._landingpageImageKey AS celeb_landingpageImageKey,
+     p.id AS product_id,
+     p.priceincurrency AS product_priceincurrency,
+     ib.id AS inventorybatch_id,
+     coalesce(o.id - o.id + 1, 0) AS is_order,
+     ib.numInventory AS inventory_total
+    FROM
+     celebrity c INNER JOIN product p ON (p.celebrityid = c.id)
+                 INNER JOIN inventorybatch ib ON (ib.celebrityid = c.id)
+                 INNER JOIN celebrity_categories_mv mv ON (mv.id = c.id)
+                 LEFT OUTER JOIN orders o ON (o.inventorybatchid = ib.id AND
+                                              o.productid = p.id)
+    WHERE
+     c._enrollmentStatus = 'Enrolled' AND
+     c._publishedStatus = 'Published' AND
+     p._publishedStatus = 'Published' AND
+     ib.startdate < sysdate AND
+     ib.enddate > sysdate AND
+     mv.to_tsvector @@ plainto_tsquery('english', {textQuery})
+    ORDER BY is_order ASC
+    
+    ) AS stuff
+    GROUP BY celeb_id, celeb_publicname, celeb_roledescription, celeb_landingpageImageKey, inventorybatch_id, inventory_total
+    ORDER BY celeb_id;
+    """
+
+    val rowStream = SQL(
+      queryString
+    ).on("textQuery" -> query).apply()(connection = schema.getTxnConnectionFactory)
+
+    for (row <- rowStream) yield {
+      import java.math.BigDecimal
       Celebrity(
         id = row[Long]("celebrityid"),
-         publicName = row[String]("publicname"),
-         roleDescription = row[String]("roledescription"),                                 
-         _enrollmentStatus = row[String]("_enrollmentStatus"),
-         _publishedStatus = row[String]("_publishedStatus"),
-         _landingPageImageKey = row[Option[String]]("_landingpageImageKey")
+        publicName = row[String]("publicname"),
+        roleDescription = row[String]("roledescription"),
+        _enrollmentStatus = EnrollmentStatus.Enrolled.name,
+        _publishedStatus = PublishedStatus.Published.name,
+        _landingPageImageKey = row[Option[String]]("_landingpageImageKey")
       ).asMarketplaceCelebrity(
-        soldout = true,
-        minPrice = 0,
-        maxPrice = 100
+        soldout = row[BigDecimal]("inventoryAvailable").intValue() > 0,
+        minPrice = row[BigDecimal]("minProductPrice").intValue(),
+        maxPrice = row[BigDecimal]("maxProductPrice").intValue()
       )
     }
   }

@@ -97,6 +97,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       }  
 
       val categoryValues = categoryValueStore.all().toList
+      //TODO: Note that this still needs to be filtered.
 
       val categoryViewModels = for {
         categoryValue <- categoryValues

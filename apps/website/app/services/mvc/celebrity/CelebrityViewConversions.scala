@@ -52,28 +52,15 @@ class CelebrityViewConversions(celeb: Celebrity) {
       .resizedWidth(660)
       .getSaved(AccessPolicy.Public)
       .url
-    
-    // TODO need a more efficient way of determining these (minPrice, maxPrice, soldout)
-    //  
-    val activeProducts = celeb.productsInActiveInventoryBatches()
-    val purchaseableProducts = activeProducts.filter {
-      product =>
-        product.remainingInventoryCount > 0
-    }  
-    
-    val prices = activeProducts.map(product => product.priceInCurrency)
-    val maxmin: (Int, Int) = prices.isEmpty match {
-      case true => (0 ,0)
-      case _ => (prices.max.intValue(), prices.min.intValue())
-    }  
+
     MarketplaceCelebrity(
       id = celeb.id,
       publicName = celeb.publicName,
       photoUrl = imageUrl,
       storefrontUrl = controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled(celebrityUrlSlug = celeb.urlSlug).url,
-      soldout = purchaseableProducts.isEmpty,
-      minPrice = maxmin._2,
-      maxPrice = maxmin._1,
+      soldout = soldout,
+      minPrice = minPrice,
+      maxPrice = maxPrice,
       subtitle = celeb.roleDescription
     )
   }
