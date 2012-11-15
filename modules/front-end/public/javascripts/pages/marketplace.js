@@ -1,32 +1,45 @@
 define(["libs/chosen/chosen.jquery.min"], function (Egraphs) {
   return {
     go: function () {
+      /**
+       * The aim of most of the functions below is to retain the state of a search in the url bar.
+       * If a user clicks list view, we want to reload the same results for whatever they were looking at before
+       * in a list view. Likewise, if a user selects a new filter, we want all the previous selections to remain enabled.
+       * The same idea applies to removing a filter or any other changes, with the exception of the search box, since the previous
+       * settings may not be applicable and give a confusing set of results.
+       **/
      $(document).ready(function() {
-
-        // Function for reconstructing Url
+        /**
+         * Reconstructs url from any changes to data model.
+         * Used to retain state across reloads.
+         **/
         var reloadPage = function() {
           window.location.href =
             window.Egraphs.page.queryUrl + "?" +
             $.param({ "query" : window.Egraphs.page.query, "sort" : window.Egraphs.page.sort, "view" : window.Egraphs.page.view}) + "&" +
             $.param(window.Egraphs.page.categories);
         };
-
-        // Enable chosen.js style selectors
-        $(".chsn-select").chosen({no_results_text: "No results matched"});
-
+        
+        /**
+         * Hover effect on list view
+         **/
         $(".verticals tbody tr").hover(function() {
           $(this).addClass('hover');
         }, function() {
           $(this).removeClass('hover');
         });
 
-        // Mobile Sorting
+        /**
+         * Binding for selecting different sort orders for results from the mobile selector
+         **/
         $("#sort-select").change(function(e) {
           window.Egraphs.page.sort = $(this).val();
           reloadPage();
         });
 
-        // Link based sorting
+        /**
+         * Same as above but for large, link-based view
+         **/
         $(".sort-link").click(function(e) {
           var selectedValue = $(this).attr("data-value");
           if(selectedValue !== window.Egraphs.page.sort) {
@@ -37,17 +50,25 @@ define(["libs/chosen/chosen.jquery.min"], function (Egraphs) {
           reloadPage();
         });
 
+        /**
+         * Switch to list view
+         **/
         $("#list-view-link").click(function(e) {
           window.Egraphs.page.view = "list";
           reloadPage();
         });
 
+        /**
+         * Switch to grid view
+         **/
         $("#grid-view-link").click(function(e) {
           window.Egraphs.page.view = "";
           reloadPage();
         });
 
-        // Remove CategoryValue from Array if already present, otherwise push it on.
+        /**
+         * Helper for updating the currently selected CategoryValues
+         **/
         var updateCategories = function(catVal, category) {
           if($.inArray(catVal, category) > -1) {
             var idx = $.inArray(catVal, category);
@@ -56,7 +77,11 @@ define(["libs/chosen/chosen.jquery.min"], function (Egraphs) {
             category.push(catVal);
           }
         };
-
+        
+        /**
+         * Binds apply filters link to processing the multiple select widget visible on resolutions < 720px.
+         * Unlike the categories on the larger view, a user can select more than one at a time.
+         **/
         $("#apply-filters").click(function(e) {
           // Clear out previous category values
           var categories = window.Egraphs.page.categories;
@@ -71,7 +96,6 @@ define(["libs/chosen/chosen.jquery.min"], function (Egraphs) {
               updateCategories(catVal, category);
             }
           );
-          
           reloadPage();
         });
 
