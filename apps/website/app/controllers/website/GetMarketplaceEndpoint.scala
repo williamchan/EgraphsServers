@@ -37,7 +37,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
   val categoryRegex = new scala.util.matching.Regex("""c([0-9]+)""", "id")
   
   val sortFunctions = 
-    Map("recently-added" -> "Recently Added",
+    Seq("recently-added" -> "Recently Added",
         "most-popular" -> "Most Popular",
         "price-low-to-hi" -> "Price (Low to High)",
         "price-high-to-low" -> "Price (High to Low)",

@@ -1,13 +1,16 @@
 @(categoryViewModels: Iterable[models.frontend.marketplace.CategoryViewModel])
  <aside class="mobile-nav">        
-  <select id="category-select" class="chsn-select">
+  <h2>Filter By:</h2>
+  <select id="category-select" multiple>
   @for(category <- categoryViewModels) {
-    <optgroup label="@category.publicName" data-category="@category.id">
+    <optgroup multiple label="@category.publicName">
     @for(categoryValue <- category.categoryValues) {
-      <option @if(categoryValue.active){selected} value="@categoryValue.id">@categoryValue.publicName</option>
+      <option @if(categoryValue.active){selected}  data-category="@category.id" value="@categoryValue.id">@categoryValue.publicName</option>
     }
     </optgroup>  
   }
-  </select>        
+  </select>
+  <br>
+  <a id="apply-filters">Apply Filters</a>        
 </aside> <!-- end .mobile-nav -->
 
