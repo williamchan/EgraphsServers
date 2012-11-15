@@ -35,7 +35,8 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
 
   val queryUrl = controllers.routes.WebsiteControllers.getMarketplaceResultPage.url
   val categoryRegex = new scala.util.matching.Regex("""c([0-9]+)""", "id")
-  
+
+  //TODO: These strings and every reference to them should instead use an Enum.
   val sortFunctions = 
     Map("recently-added" -> "Recently Added",
         "most-popular" -> "Most Popular",
@@ -44,12 +45,13 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         "alphabetical-a-z"  -> "Alphabetical (A-Z)",
         "alphabetical-z-a" -> "Alphabetical (Z-A)"
     )
+
   private def sortOptionViewModels(selected: String = "") : Iterable[SortOptionViewModel] = {
-    sortFunctions.map( (sortFunction) => 
+    sortFunctions.map( sortFunction => 
       SortOptionViewModel(name = sortFunction._1, display = sortFunction._2, active = (sortFunction._1 == selected))
     )
   }  
-  
+
   def getMarketplaceVerticalPage(verticalname: String) =  controllerMethod.withForm() { implicit authToken =>
     Action { implicit request =>
      //Map Vertical to specific landing page.
@@ -80,21 +82,23 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
           (id.toLong, set.map( arg => arg.toLong))
         }
       
-      val activeCategoryValues = categoryAndCategoryValues.foldLeft[Set[Long]](Set[Long]())((set, ccv) => set ++ ccv._2.toSet[Long])
-      
+      val activeCategoryValues = {for{
+        (category, categoryValues) <- categoryAndCategoryValues
+        categoryValue <- categoryValues
+      } yield { categoryValue }}.toSet
+     
       val (subtitle, celebrities) = 
         (queryOption match {
           case Some(query) => ("Showing Results for \"" + query + "\"...", celebrityStore.marketplaceSearch(query, categoryAndCategoryValues))
-          case _ => activeCategoryValues.isEmpty match {
-            case false => ("Results", celebrityStore.marketplaceSearch("*", categoryAndCategoryValues))
-            case true => ("Featured Celebrities" , celebrityStore.getFeaturedPublishedCelebrities.map(c => c.asMarketplaceCelebrity(100,100, true)))
-          }
+          case _ =>
+            if(activeCategoryValues.isEmpty) {
+              ("Results", celebrityStore.marketplaceSearch("*", categoryAndCategoryValues))
+            } else {
+              ("Featured Celebrities" , celebrityStore.getFeaturedPublishedCelebrities.map(c => c.asMarketplaceCelebrity(100,100, true)))
+            }
         })
 
-      val viewAsList = viewOption match {
-        case Some(view) if(view == "list") => true
-        case _ => false
-      }  
+      val viewAsList = viewOption == Some("list")
 
       val categoryValues = categoryValueStore.all().toList
       //TODO: Note that this still needs to be filtered.

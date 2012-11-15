@@ -487,6 +487,7 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
    * 
    *  (pitcher or 2nd baseman) and (red sox or yankees)
    */
+  //TODO: Add a parameter for how to sort in here.
   def marketplaceSearch(query: String, refinements: Map[Long, Iterable[Long]] = Map[Long, Iterable[Long]]()): Iterable[MarketplaceCelebrity] = {
 
     // Note we could make this fast probably.  We should see how performance is affected if we don't have to
