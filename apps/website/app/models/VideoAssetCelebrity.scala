@@ -1,13 +1,16 @@
 package models
 
-import services._
-import db._
+import org.squeryl.PrimitiveTypeMode.from
+import org.squeryl.PrimitiveTypeMode.long2ScalarLong
+import org.squeryl.PrimitiveTypeMode.optionLong2ScalarLong
+import org.squeryl.PrimitiveTypeMode.where
+
 import com.google.inject.Inject
-import java.sql.Timestamp
+
 import services.{ AppConfig, Time }
-import services.db.{ FilterOneTable, KeyedCaseClass, Schema, SavesWithLongKey }
-import org.squeryl.Query
-import com.google.inject.Inject
+import services.db.KeyedCaseClass
+import services.db.SavesWithLongKey
+import services.db.Schema
 
 case class VideoAssetCelebrityServices @Inject() (store: VideoAssetCelebrityStore)
 
@@ -34,6 +37,16 @@ case class VideoAssetCelebrity(
 
 class VideoAssetCelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[VideoAssetCelebrity] {
   import org.squeryl.PrimitiveTypeMode._
+
+  def getCelebrityByVideoId(videoId: Long): Option[Celebrity] = {
+    val celebrityId = from(schema.videoAssetsCelebrity)(videoAssetCelebrity =>
+      where(videoAssetCelebrity.videoId === videoId)
+        select (videoAssetCelebrity.celebrityId)).headOption
+
+    from(schema.celebrities)(celebrity =>
+      where(celebrity.id === celebrityId)
+        select (celebrity)).headOption
+  }
 
   //
   // Saves methods

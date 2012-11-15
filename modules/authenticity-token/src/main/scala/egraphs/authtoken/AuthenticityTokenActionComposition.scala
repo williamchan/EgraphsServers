@@ -37,7 +37,7 @@ private [authtoken] trait AuthenticityTokenActionComposition {
       // Read the auth token from both the session and the request and make sure they match.
       val maybeSafeResult = for {
         sessionToken <- request.session.get(authTokenKey)
-        formToken <- authTokenFromRequest(request)
+        formToken <- authTokenFromRequest(request)  
         if (sessionToken == formToken)
       } yield {
         action(request)

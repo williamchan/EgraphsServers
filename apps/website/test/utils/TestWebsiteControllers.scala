@@ -43,6 +43,8 @@ case class TestWebsiteControllers @Inject()(
   orderStore: OrderStore,
   printOrderStore: PrintOrderStore,
   productStore: ProductStore,
+  videoAssetCelebrityStore: VideoAssetCelebrityStore,
+  videoAssetStore: VideoAssetStore,
   customerLoginForms: CustomerLoginFormFactory,
   egraphsSessionFactory: () => EgraphsSession,
   fakeRequest: Request[AnyContent] = FakeRequest()

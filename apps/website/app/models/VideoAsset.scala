@@ -1,13 +1,22 @@
 package models
 
 import java.sql.Timestamp
-import services.{ AppConfig, Time }
-import services.db.{ FilterOneTable, KeyedCaseClass, Schema, SavesWithLongKey }
-import org.squeryl.Query
+
+import org.squeryl.PrimitiveTypeMode.from
+import org.squeryl.PrimitiveTypeMode.long2ScalarLong
+import org.squeryl.PrimitiveTypeMode.string2ScalarString
+import org.squeryl.PrimitiveTypeMode.timestamp2ScalarTimestamp
+import org.squeryl.PrimitiveTypeMode.where
+
 import com.google.inject.Inject
-import enums.{ HasVideoStatus }
+
+import enums.HasVideoStatus
+import models.enums.HasVideoStatus
 import models.enums.VideoStatus
-import com.google.inject.Provider
+import services.{ AppConfig, Time }
+import services.db.KeyedCaseClass
+import services.db.SavesWithLongKey
+import services.db.Schema
 
 case class VideoAssetServices @Inject() (store: VideoAssetStore)
 
@@ -47,6 +56,15 @@ class VideoAssetStore @Inject() (schema: Schema)
   extends SavesWithLongKey[VideoAsset] with SavesCreatedUpdated[Long, VideoAsset] {
 
   import org.squeryl.PrimitiveTypeMode._
+
+  def getVideosWithStatus(status: VideoStatus.EnumVal): List[VideoAsset] = {
+
+    val queryResult = from(schema.videoAssets)(videoAsset =>
+      where(videoAsset._videoStatus === status.name)
+        select (videoAsset))
+
+    queryResult.toList
+  }
 
   //
   // SavesWithLongKey[Address] methods

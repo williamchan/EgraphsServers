@@ -45,8 +45,8 @@ class VideoAssetTests extends EgraphsUnitTest
   
   "A VideoAsset" should "update its status" in {
     val videoAsset = TestData.newSavedVideoAsset()
-    videoAsset._videoStatus should be("Approved")
+    videoAsset.videoStatus.name should be(VideoStatus.Unprocessed.name)
     val updatedVideoAsset = videoAsset.withVideoStatus(VideoStatus.Rejected).save()
-    updatedVideoAsset._videoStatus should be("Rejected")
+    updatedVideoAsset.videoStatus.name should be(VideoStatus.Rejected.name)
   }
 }

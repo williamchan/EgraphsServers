@@ -1,9 +1,12 @@
-@(videos: List[String])(implicit authToken: egraphs.authtoken.AuthenticityToken,
+@(videosAndPublicNames: List[(VideoAsset, String)])(
+  implicit authToken: egraphs.authtoken.AuthenticityToken,
   headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData)
   
 @import egraphs.authtoken.AuthenticityToken.safeForm
-@import views.html.frontend.base_template  
+@import views.html.frontend.base_template
+@import models.enums.VideoStatus  
+@import controllers.WebsiteControllers
 
 @body = {
 <section id="content" class="top" role="main">
@@ -12,25 +15,41 @@
       <h1> Unprocessed Videos </h1> 
 
       <div class="videos">
-          @videos.map { video =>
+          @videosAndPublicNames.map { case (video, publicName) =>
 	
 	          <div class="video" style="margin: 20px; float: left;">
+	          
+	            <p> @publicName </p>
 
                 <video width="540" height="340" controls>
-                  <source src='@video' type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+                  <source src='@video.url' type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
                 </video>
                             
                 <table>
                   <tr>
                     <td>
-                      @helper.form(action = routes.WebsiteControllers.postProcessVideo("Approved", video)) {
-                        <input type="submit" name="Approve" value="Approve" style="margin: 10px;">
+                      @safeForm('id -> "approve-video-form", 'method -> "POST", 'action -> (
+                          routes.WebsiteControllers.postProcessVideo(
+                          action = VideoStatus.Approved.name, id = video.id)).url) {
+                        
+                        <fieldset>
+                          <div class="actions">
+                            <button type="submit" id="submit-approve-button" class="btn primary fade in">Approve</button>  
+                          </div>
+                        </fieldset>
                       }
                     </td>
 
                     <td>
-                      @helper.form(action = routes.WebsiteControllers.postProcessVideo("Rejected", video)) {
-                        <input type="submit" name="Reject" value="Reject" style="margin: 10px;">
+                      @safeForm('id -> "reject-video-form", 'method -> "POST", 'action -> (
+                          routes.WebsiteControllers.postProcessVideo(
+                          action = VideoStatus.Rejected.name, id = video.id)).url) {
+                        
+                        <fieldset>
+                          <div class="actions">
+                            <button type="submit" id="submit-reject-button" class="btn primary fade in">Reject</button>  
+                          </div>
+                        </fieldset>
                       }
                     </td>
                   </tr>

@@ -21,39 +21,41 @@ private[controllers] trait PostVideoAssetApiEndpoint { this: Controller =>
 
   private val blob: Blobs = AppConfig.instance[Blobs]
 
+  /**
+   * Posts a video asset from a celebrity.
+   */
   def postVideoAsset = postApiController() {
-    httpFilters.requireAdministratorLogin.inSession(parser = parse.multipartFormData) {
-      case (admin, adminAccount) =>
-        httpFilters.requireCelebrityId.inRequest(parse.multipartFormData) { celebrity =>
-          Action(parse.multipartFormData) { request =>
+    httpFilters.requireCelebrityId.inRequest(parse.multipartFormData) { celebrity =>
+      Action(parse.multipartFormData) { request =>
 
-            val celebrityId = celebrity.id
+        val celebrityId = celebrity.id
 
-            request.body.file("video").map { resource =>
-              import java.io.File
-              val filename = resource.filename
-              val directory = "/tmp/"
-              val tempFile = new File(directory + filename)
-              resource.ref.moveTo(tempFile)
+        request.body.file("video").map { resource =>
 
-              val maybeFileLocation = putFile(celebrityId, filename, tempFile)
-              val fileLocation = maybeFileLocation match {
-                case Some(maybeFileLocation) => maybeFileLocation
-                case None => "File not found"
-              }
+          import java.io.File
+          val filename = resource.filename
+          val directory = "/tmp/"
+          val tempFile = new File(directory + filename)
 
-              persist(celebrityId, fileLocation)
-              val responseJson = getJson(celebrityId, tempFile, fileLocation)
+          resource.ref.moveTo(tempFile)
 
-              // file only needed for bytes computation
-              tempFile.delete()
-              Ok(responseJson)
-
-            }.getOrElse {
-              BadRequest("Something went wrong with your request. Please try again.")
-            }
+          val maybeFileLocation = putFile(celebrityId, filename, tempFile)
+          val fileLocation = maybeFileLocation match {
+            case Some(maybeFileLocation) => maybeFileLocation
+            case None => "File not found"
           }
+
+          persist(celebrityId, fileLocation)
+          val responseJson = getJson(celebrityId, tempFile, fileLocation)
+
+          // file only needed for bytes computation
+          tempFile.delete()
+          Ok(responseJson)
+
+        }.getOrElse {
+          BadRequest("Something went wrong with your request. Please try again.")
         }
+      }
     }
   }
 

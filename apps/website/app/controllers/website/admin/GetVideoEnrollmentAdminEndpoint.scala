@@ -10,6 +10,11 @@ import org.squeryl.PrimitiveTypeMode._
 import org.squeryl.Query
 import models.VideoAsset
 import services.db.Schema
+import models.enums.VideoStatus
+import models.VideoAssetStore
+import models.VideoAssetCelebrityStore
+import models.CelebrityStore
+import models.Celebrity
 
 private[controllers] trait GetVideoEnrollmentAdminEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
@@ -17,6 +22,8 @@ private[controllers] trait GetVideoEnrollmentAdminEndpoint extends ImplicitHeade
   protected def controllerMethod: ControllerMethod
   protected def httpFilters: HttpFilters
   protected def schema: Schema
+  protected def videoAssetStore: VideoAssetStore
+  protected def videoAssetCelebrityStore: VideoAssetCelebrityStore
 
   def getVideoEnrollmentAdmin =
     controllerMethod.withForm() { implicit authToken =>
@@ -34,11 +41,20 @@ private[controllers] trait GetVideoEnrollmentAdminEndpoint extends ImplicitHeade
         case (admin, adminAccount) =>
           Action { implicit request =>
 
-            val videosAwaitingProcessing: Query[(String)] = from(schema.videoAssets)(
-              s => where(s._videoStatus === "Unprocessed") select (s.url))
+            val videos = videoAssetStore.getVideosWithStatus(VideoStatus.Unprocessed)
 
-            val list = videosAwaitingProcessing.toList
-            Ok(views.html.Application.admin.admin_unprocessedvideos(list))
+            val videosAndPublicNames: List[(VideoAsset, String)] = for (video <- videos) yield {
+              val maybeCelebrity: Option[Celebrity] = videoAssetCelebrityStore.getCelebrityByVideoId(video.id)
+              val maybePublicName = maybeCelebrity.map(_.publicName)
+
+              val publicName = maybePublicName match {
+                case None => ""
+                case Some(maybePublicName) => maybePublicName
+              }
+
+              (video, publicName)
+            }
+            Ok(views.html.Application.admin.admin_unprocessedvideos(videosAndPublicNames))
           }
       }
     }
