@@ -6,9 +6,10 @@ define(["libs/chosen/chosen.jquery.min"], function (Egraphs) {
         // Function for reconstructing Url
 
         var reloadPage = function() {
-          window.location.href = window.Egraphs.page.queryUrl + "?" + 
-            $.param({ "query" : window.Egraphs.page.query, "sort" : window.Egraphs.page.sort}) + "&" +
-            $.param(window.Egraphs.page.categories);
+          window.location.href = 
+            window.Egraphs.page.queryUrl + "?" + 
+            $.param({ "query" : window.Egraphs.page.query, "sort" : window.Egraphs.page.sort, "view" : window.Egraphs.page.view}) + "&" +
+            $.param(window.Egraphs.page.categories); 
         };      
 
         // Enable chosen.js style selectors
@@ -34,6 +35,16 @@ define(["libs/chosen/chosen.jquery.min"], function (Egraphs) {
           } else {
             window.Egraphs.page.sort = "";
           }
+          reloadPage();
+        });
+
+        $("#list-view-link").click(function(e) {
+          window.Egraphs.page.view = "list";
+          reloadPage();
+        });
+
+        $("#grid-view-link").click(function(e) {   
+          window.Egraphs.page.view = "";
           reloadPage();
         });
 

@@ -27,6 +27,7 @@ Translates a map of categories and their categoryvalues into a JsonObject that c
  Egraphs.page.queryUrl = "@marketplaceRoute";
  Egraphs.page.query = "@query";
  Egraphs.page.sort = "@sortOptions.filter(v => v.active).headOption.map(v => v.name)";
+ Egraphs.page.view = @if(viewAsList){"list"} else {""};
 }
 
 @baseBody = {
