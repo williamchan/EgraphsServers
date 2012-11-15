@@ -1,0 +1,68 @@
+@(results: Iterable[models.frontend.marketplace.ResultSetViewModel])
+
+ <aside class="alpha-list">
+
+  <h2>A&ndash;Z</h2>
+  
+  <ol>
+    <li><a href="#" title="">A</a></li>
+    <li><a href="#" title="">B</a></li>
+    <li><a href="#" title="">C</a></li>
+    <li><a href="#" title="" class="active">D</a></li>
+    <li><a href="#" title="">E</a></li>
+    <li><a href="#" title="">F</a></li>
+    <li><a href="#" title="">G</a></li>
+    <li><a href="#" title="">H</a></li>
+    <li><a href="#" title="">I</a></li>
+    <li><a href="#" title="">J</a></li>
+    <li><a href="#" title="">K</a></li>
+    <li><a href="#" title="">L</a></li>
+    <li><a href="#" title="">M</a></li>
+    <li><a href="#" title="">N</a></li>
+    <li><a href="#" title="">O</a></li>
+    <li><a href="#" title="">P</a></li>
+    <li><a href="#" title="">Q</a></li>
+    <li><a href="#" title="">R</a></li>
+    <li><a href="#" title="">S</a></li>
+    <li><a href="#" title="">T</a></li>
+    <li><a href="#" title="">U</a></li>
+    <li><a href="#" title="">V</a></li>
+    <li><a href="#" title="">W</a></li>
+    <li><a href="#" title="">X</a></li>
+    <li><a href="#" title="">Y</a></li>
+    <li><a href="#" title="">Z</a></li>
+  </ol>
+
+</aside> <!-- end .alpha-list -->
+
+<div class="verticals list">
+
+  <table cellpadding="0" cellspacing="0">
+
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Price Range</th>
+        <th>Available?</th>
+      </tr>
+    </thead>
+  
+    <tbody>
+    @for(resultSet <- results) {    
+      @for(celebrity <- resultSet.celebrities) {  
+        <tr>
+          <td><strong><a href="#">@celebrity.publicName &raquo;</a></strong></td>
+          <td><a href="#">Team Name</a></td>
+          <td><a href="#">Position</a></td>
+          <td><a href="#" title="">Tag 1</a>, <a href="#" title="">Tag 2</a>, <a href="#" title="">Tag 3</a>, <a href="#" title="">Tag 4</a>, <a href="#" title="">Tag 5</a>&hellip;</td>
+        </tr>
+      }  
+    }  
+    </tbody>
+  
+  </table>
+  
+  <p class="see-more"><em><a href="#" class="clearfix"><b>Load More</b> <i><span>&darr;</span></i></a></em> </p>
+
+</div> <!-- end .verticals.list -->

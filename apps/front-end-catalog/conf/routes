@@ -49,7 +49,7 @@ GET     /Egraph/landscape                                         controllers.Eg
 GET     /Egraph/portrait                                          controllers.Egraph.portrait
 
 GET     /Email/confirm                                            controllers.Email.confirm
-# GET     /Email/mlbStatic                                          controllers.Email.mlbStatic
+# GET     /Email/mlbStatic                                        controllers.Email.mlbStatic
 GET     /Email/orderConfirmation                                  controllers.Email.orderConfirmation
 GET     /Email/orderConfirmationText                              controllers.Email.orderConfirmationText
 GET     /Email/verify                                             controllers.Email.verify
@@ -75,7 +75,7 @@ GET     /Login/storefront                                         controllers.Lo
 GET     /Marketplace/index                                        controllers.Marketplace.index 
 GET     /Marketplace/mlb                                          controllers.Marketplace.mlb  
 GET     /Marketplace/mlb/list                                     controllers.Marketplace.mlb_list  
-GET     /Marketplace/results                                  controllers.Marketplace.results 
+GET     /Marketplace/results                                      controllers.Marketplace.results 
 
 GET     /Personalize/allErrors                                    controllers.Personalize.allErrors
 GET     /Personalize/index                                        controllers.Personalize.index

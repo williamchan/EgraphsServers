@@ -72,6 +72,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       val verticalOption = Form("vertical" -> nonEmptyText).bindFromRequest.fold(formWithErrors => None, validForm => Some(validForm))
       val queryOption = Form("query" -> nonEmptyText).bindFromRequest.fold(formWithErrors => None, validForm => Some(validForm))
       val sortOption = Form("sort" -> nonEmptyText).bindFromRequest.fold(formWithErrors => None, validForm => Some(validForm))
+      val viewOption = Form("view" -> nonEmptyText).bindFromRequest.fold(formWithErrors => None, validForm => Some(validForm))
 
       val categoryAndCategoryValues = 
         for((key, set) <- request.queryString; categoryRegex(id) <- categoryRegex findFirstIn key) yield {
@@ -89,6 +90,12 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
             case true => ("Featured Celebrities" , celebrityStore.getFeaturedPublishedCelebrities.map(c => c.asMarketplaceCelebrity(100,100, true)))
           }
         })
+
+      val viewAsList = viewOption match {
+        case Some(view) if(view == "list") => true
+        case _ => false
+      }  
+
                 
       val categoryViewModels = 
        categoryValueStore.findById(4).map( categoryValue => 
@@ -111,6 +118,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
             
        Ok(views.html.frontend.marketplace_results(
          query = queryOption.getOrElse(""),
+         viewAsList = viewAsList,
          marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage.url,
          verticalViewModels = getVerticals(activeCategoryValues),
          results = List(ResultSetViewModel(subtitle=Option(subtitle), celebrities)),

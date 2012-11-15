@@ -59,7 +59,6 @@ private[controllers] trait GetCelebritiesAdminEndpoint extends ImplicitHeaderAnd
         Ok("Index has been rebuilt.")
       }
     }
-    
   }
 }
 

@@ -20,7 +20,8 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
   
   def results() = Action {
     Ok(views.html.frontend.marketplace_results( 
-       query= "exampleQuery", 
+       query= "exampleQuery",
+       viewAsList = false, 
        marketplaceRoute = "http://localhost:9000/Marketplace/mlb/results",
        verticalSet, 
        resultSet, 
@@ -34,7 +35,15 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
   }
 
   def mlb_list() = Action {
-    Ok(views.html.frontend.marketplace_mlb_list())
+    Ok(views.html.frontend.marketplace_results( 
+       query= "exampleQuery",
+       viewAsList = true, 
+       marketplaceRoute = "http://localhost:9000/Marketplace/mlb/results",
+       verticalSet, 
+       resultSet, 
+       categoryViewModels,
+       sortOptions
+    ))
   }
   
   def categorySet : Iterable[CategoryViewModel] = {

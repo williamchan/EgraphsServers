@@ -1,4 +1,5 @@
 @(query : String,
+  viewAsList: Boolean = false,
   marketplaceRoute: String,
   verticalViewModels: Iterable[models.frontend.marketplace.VerticalViewModel], 
   results: Iterable[models.frontend.marketplace.ResultSetViewModel], 
@@ -62,9 +63,12 @@ Translates a map of categories and their categoryvalues into a JsonObject that c
           @tags.marketplace.vertical_buttons(verticalViewModels)
           @tags.marketplace.category_picker_mobile(categoryViewModels) 
         
-          @tags.marketplace.view_options(sortOptions)
-          @tags.marketplace.result_set(results)
-
+          @tags.marketplace.view_options(sortOptions, viewAsList)
+          @if(viewAsList) {
+            @tags.marketplace.result_set_list(results)
+          } else {
+            @tags.marketplace.result_set(results)
+          }  
         </div>
        
       </div>

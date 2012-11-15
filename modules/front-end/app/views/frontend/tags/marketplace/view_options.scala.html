@@ -1,4 +1,4 @@
-@(sortOptions: Iterable[models.frontend.marketplace.SortOptionViewModel])
+@(sortOptions: Iterable[models.frontend.marketplace.SortOptionViewModel], viewAsList: Boolean)
 
 @import views.frontend.Utils
 @import models.frontend.egraphs._
@@ -31,8 +31,8 @@
     <h2>View As:</h2>
     
     <ul>
-      <li class="grid active"><a href="#grid"><span>Grid</span> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i></a></li>
-      <li class="list"><a href="#list"><span>List</span> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i></a></li>
+      <li class="grid @if(!viewAsList){active}"><a href="#grid"><span>Grid</span> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i></a></li>
+      <li class="list @if(viewAsList){active}"><a href="#list"><span>List</span> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i></a></li>
     </ul>
   
   </div>
