@@ -279,12 +279,14 @@ class Schema @Inject()(
   //
   // Public methods
   //
-  /**Clears out the schema and recreates it. For God's sake don't do this in production. */
+  /** Clears out the schema and recreates it. For God's sake don't do this in production. */
   def scrub() {
     val applicationMode = config.applicationMode
-    log("Checking application.mode before scrubbing database. Must be in dev mode. Mode is: " + applicationMode)    
-    if (applicationMode != "dev") {
-      throw new IllegalStateException("Cannot scrub database unless in dev mode")
+    log("Checking application.mode before scrubbing database. Must be in dev mode. Mode is: " + applicationMode)
+    if (applicationMode != "dev" ||
+        config.applicationId != "test" ||
+        config.dbDefaultUrl != "jdbc:postgresql://localhost/egraphs") {
+      throw new IllegalStateException("Cannot scrub database unless in dev mode, application is test, and database is local")
     }
 
     if (config.dbDefaultAllowScrub) {

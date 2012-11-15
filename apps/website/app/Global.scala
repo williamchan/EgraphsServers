@@ -52,7 +52,10 @@ object Global extends GlobalSettings with Logging {
         services.cache.JedisFactory.startup()
 
         // Some additional test-mode setup
-        if (configProxy.applicationId == "test") {
+        if (configProxy.applicationId == "test" &&
+            configProxy.applicationMode == "dev" &&
+            configProxy.dbDefaultUrl == "jdbc:postgresql://localhost/egraphs" &&
+            configProxy.blobstoreVendor == "filesystem") {
           TestModeBootstrap.run()
         }
       }

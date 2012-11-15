@@ -105,15 +105,14 @@ class Blobs @Inject() (
     blobStore.removeBlob(blobstoreNamespace, key)
   }
 
-  /**
-   * Clears the entire Blobstore. Only runs if "blobstore.allowscrub" is
-   * set to "yes" in application.conf.
-   */
+  /** Clears the entire Blobstore. For God's sake don't do this in production. */
   def scrub() {
     val applicationMode = config.applicationMode
     log("Checking application.mode before scrubbing blobstore. Must be in dev mode. Mode is: " + applicationMode)
-    if (applicationMode != "dev") {
-      throw new IllegalStateException("Cannot scrub blobstore unless in dev mode")
+    if (applicationMode != "dev" ||
+        config.applicationId != "test" ||
+        config.blobstoreVendor != "filesystem") {
+      throw new IllegalStateException("Cannot scrub blobstore unless in dev mode, application is test, and blobstore is filesystem")
     }
 
     if(config.blobstoreAllowScrub) {
