@@ -83,10 +83,13 @@
             line-height: 1.5em; 
                  
             a {
-
               color: @grayLight;
               
               &:hover { color: @orange; }
+
+              &.category {
+                font-weight: 800;
+              }
               
               &.active {
                 font-weight: 800;
@@ -126,6 +129,14 @@
                     visibility: hidden;  
                     background: lighten(@gray, 45%);
                     .border-radius(5px 0 0 5px);    
+                  }
+
+                  &.condensed {
+                    display: none;
+                  }
+
+                  &.show-all {
+                    font-weight: 800;
                   }
   
                   &.active {
@@ -476,6 +487,8 @@
     	        cursor: default;
       	      float: left;
       	      margin-right: 1.75em;
+              margin-botton: 3px;
+              margin-top: 3px;
       	      &:last-child { margin-right: 0; }
     
               a {

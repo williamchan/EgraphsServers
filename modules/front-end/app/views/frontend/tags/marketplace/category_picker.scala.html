@@ -4,17 +4,21 @@
 <ol>
   @for(category <- categoryViewModels) {
     <li>
-     <a @if(category.active){class="active"} data-category="@category.id">@category.publicName</a> 
+     <a class="category" @if(category.active){class="active"} data-category="@category.id">@category.publicName</a> 
         <ol>
         @for((categoryValue, idx) <- category.categoryValues.zipWithIndex) {
-          <li><a class="cv-link @if(categoryValue.active){active} else { @if(idx > 9){hide}} " title="" data-category="@category.id" data-categoryvalue="@categoryValue.id">
-          @if(categoryValue.active){<i>&times;</i> <span>@categoryValue.publicName</span> } else {
-            @categoryValue.publicName    
+          <li>
+            <a class="cv-link @if(categoryValue.active){active} else{ @if(idx > 7){condensed}} " title="" data-category="@category.id" data-categoryvalue="@categoryValue.id">
+            @if(categoryValue.active){<i>&times;</i> <span>@categoryValue.publicName</span> } else {
+              @categoryValue.publicName    
+            }
+            </a>
+          </li>
           }
-          </a></li>
+          @if(category.categoryValues.size > 10){
+          <li><a class="show-all">Show all&hellip;</a></li>
           }
         </ol>  
     </li>
-    @if(category.categoryValues.size > 10){Derp}
   }
 </ol>  

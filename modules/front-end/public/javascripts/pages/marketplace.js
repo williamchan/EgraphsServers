@@ -117,6 +117,14 @@ define(["libs/chosen/chosen.jquery.min"], function (Egraphs) {
             reloadPage();
           }
         );
+
+        $(".show-all").click(function(e){
+          $(this).parent().siblings().children().each(function() {
+            $(this).removeClass("condensed");
+          });
+          $(this).parent().addClass("condensed");
+        });
+
       });
     }
   };
