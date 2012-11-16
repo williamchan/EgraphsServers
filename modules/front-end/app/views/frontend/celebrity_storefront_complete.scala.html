@@ -4,11 +4,11 @@
   authToken: egraphs.authtoken.AuthenticityToken
 )
 
-@{/** Renders the Order Complete page in the celebrity storefront. This is the page displayed
+@**   Renders the Order Complete page in the celebrity storefront. This is the page displayed
       after a purchase has been processed.
 
       model - This page's viewmodel.
-*/}
+*@
 
 @import egraphs.authtoken.AuthenticityToken.safeForm
 @import _root_.frontend.formatting.MoneyFormatting.Conversions._
@@ -96,11 +96,11 @@
                 </p>
   							
   							<ul>
-  								@{/** Re-enable this when we support order cancellation and modification.
+  								@**   Re-enable this when we support order cancellation and modification.
                     <li><a href="#">Modify Order</a></li>
                   
   								<li><a href="#modal-content" data-toggle="modal">Cancel Order</a></li>
-                  */}
+                  *@
   							</ul>
   						
   						</div>
@@ -113,7 +113,7 @@
 
     	</div> <!-- end #main -->
 
-      @{/** The following affiliate marketing code should only render if this is a real sale. */}
+      @**   The following affiliate marketing code should only render if this is a real sale. *@
       @if(model.withAffiliateMarketing) {
         <!-- ShareASale. See https://www.shareasale.com/step3.pdf -->
         <img src="https://shareasale.com/sale.cfm?amount=@model.totalPrice.getAmount&tracking=@model.orderNumber&transtype=sale&merchantID=43754" width="1" height="1">
@@ -177,10 +177,10 @@
 	  			
 	  			<div>
 	  				<p>Are you sure you want to cancel your order for @model.celebName's Egraph?</p>
-            @{/** Un-Comment when we support cancelling.
+            @**   Un-Comment when we support cancelling.
             @safeForm('method -> "POST", 'action -> model.cancelOrderUrl) {
 	  				  <button class="btn" data-toggle="button">Cancel Order</button>
-            }*/}
+            }*@
 	  				<button class="btn" data-toggle="button" data-dismiss="modal">Do Not Cancel</button>
 	  			</div>
 	  			

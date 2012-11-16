@@ -18,7 +18,7 @@ import services.Time
  *
  * @param accountStore the store for Accounts.
  */
-class FormChecks @Inject()(accountStore: AccountStore, customerStore: CustomerStore, productStore: ProductStore) {
+class FormChecks @Inject()(accountStore: AccountStore, couponStore: CouponStore, customerStore: CustomerStore, productStore: ProductStore) {
   import FormChecks._
   
   /**
@@ -181,7 +181,12 @@ class FormChecks @Inject()(accountStore: AccountStore, customerStore: CustomerSt
       error(message)
     }
   }
-
+  
+  def isValidCouponCode(code: String, message: String="Not a valid coupon code"): Either[FormError, Coupon] = {
+    couponStore.findValid(code).map(coupon => Right(coupon)).getOrElse {
+      error(message)
+    }
+  }
 
   /**
    * Returns the customer ID if the provided account had a customer face

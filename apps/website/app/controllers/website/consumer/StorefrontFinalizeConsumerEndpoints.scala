@@ -17,7 +17,7 @@ import models.frontend.storefront.FinalizeShippingViewModel
 import controllers.website.EgraphPurchaseHandler
 import services.db.{TransactionSerializable, DBSession}
 import services.http.forms.purchase.PurchaseForms.AllPurchaseForms
-import models.Celebrity
+import models.{Celebrity, CouponStore}
 import services.blobs.AccessPolicy
 import play.api.mvc.Action
 
@@ -41,6 +41,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
   protected def payment: Payment
   protected def dbSession: DBSession
   protected def breadcrumbData: StorefrontBreadcrumbData
+  protected def couponStore: CouponStore
 
   //
   // Controllers
@@ -69,7 +70,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
             billing,
             maybeShipping
           ) = allPurchaseForms
-  
+          
           // Create the checkout viewmodels
           val checkoutUrl = getStorefrontCheckout(celebrityUrlSlug, productUrlSlug).url
   
@@ -106,13 +107,16 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
             ),
             editUrl = getStorefrontPersonalize(celebrityUrlSlug, productUrlSlug).url
           )
+          
+          val maybeCoupon = forms.coupon
   
           // Create the pricing viewmodel
           val priceViewModel = FinalizePriceViewModel(
              base=product.price,
              physicalGood=forms.shippingPrice,
              tax=forms.tax,
-             total=forms.total(basePrice = product.price)
+             discount=forms.discount(basePrice = product.price, maybeCoupon),
+             total=forms.total(basePrice = product.price, maybeCoupon)
           )
   
           // Create the final viewmodel
@@ -156,7 +160,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
           (celeb, product) =>
             val forms = purchaseFormFactory.formsForStorefront(celeb.id)(request.session)
             for (formData <- forms.redirectOrAllPurchaseForms(celeb, product).right) yield {
-              (celeb, product, formData, forms)
+              (celeb, product, forms.coupon, formData, forms)
             }
         }
       }
@@ -165,9 +169,9 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
         redirectOrPurchaseData <- redirectOrRedirectOrPurchaseData.right;
         purchaseData <- redirectOrPurchaseData.right
       ) yield {
-        val (celeb, product, shippingForms, forms) = purchaseData 
+        val (celeb, product, maybeCoupon, shippingForms, forms) = purchaseData 
         val AllPurchaseForms(productId, inventoryBatch, personalization, billing, shipping) = shippingForms
-
+        
         EgraphPurchaseHandler(
           recipientName=personalization.recipientName,
           recipientEmail=personalization.recipientEmail.getOrElse(billing.email),
@@ -175,10 +179,11 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
           buyerEmail=billing.email,
           stripeTokenId=billing.paymentToken,
           desiredText=personalization.writtenMessageText,
-          personalNote=personalization.noteToCelebriity,
+          personalNote=personalization.noteToCelebrity,
           celebrity=celeb,
           product=product,
-          totalAmountPaid=forms.total(basePrice = product.price),
+          totalAmountPaid=forms.total(basePrice = product.price, maybeCoupon),
+          coupon=maybeCoupon,
           billingPostalCode=billing.postalCode,
           flash=request.flash,
           printingOption=forms.highQualityPrint.getOrElse(PrintingOption.DoNotPrint),

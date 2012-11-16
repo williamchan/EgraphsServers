@@ -33,6 +33,8 @@ GET     /Checkout/allErrors                                       controllers.Ch
 GET     /Checkout/index                                           controllers.Checkout.index
 GET     /Checkout/noShipping                                      controllers.Checkout.noShipping
 GET     /Checkout/portrait                                        controllers.Checkout.portrait
+GET     /Checkout/partialDiscount                                 controllers.Checkout.partialDiscount
+GET     /Checkout/fullDiscount                                    controllers.Checkout.fullDiscount
 
 GET     /ChoosePhoto/carousel                                     controllers.ChoosePhoto.carousel(num:Int, focus:Int)
 GET     /ChoosePhoto/carouselWithSoldOut                          controllers.ChoosePhoto.carouselWithSoldOut

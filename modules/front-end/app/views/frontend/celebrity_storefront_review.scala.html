@@ -19,7 +19,7 @@
 
 @import egraphs.authtoken.AuthenticityToken.safeForm
 
-@{/** The review order page in the purchase flow. This is also where they choose whether to
+@**   The review order page in the purchase flow. This is also where they choose whether to
       buy a physical print or not.
 
       celebrityName - the name of the celebrity
@@ -36,7 +36,7 @@
       highQualityPrint - whether to check or not to check the print option check
           box by default
       actionUrl - the target at which to post the selected printing option.
-*/}
+*@
 
 @import _root_.frontend.formatting.MoneyFormatting.Conversions._
 @import _root_.frontend.formatting.DateFormatting.Conversions._
@@ -46,104 +46,76 @@
 @import controllers._
 
 @baseBody = {
-    <div id="content" class="top" role="main">
-    
-      <div id="main" class="sub">
-      
-        <section id="checkout" class="container">
+  <div id="content" class="top" role="main">
+    <div id="main" class="sub">
+      <section id="checkout" class="container">
 			
-				 @storefront_breadcrumbs_responsive(storefrontBreadcrumbs)
+      @storefront_breadcrumbs_responsive(storefrontBreadcrumbs)
 				 		
-  				<header>	
-  				  <h1>Review Order</h1>
-  				  <h2>@celebrityName | @productTitle</h2>
-  				</header>
-                @physical_preview_modal()
-  				<div class="review clearfix">
+  		<header>	
+  			<h1>Review Order</h1>
+  			<h2>@celebrityName | @productTitle</h2>
+  		</header>
 
-	  				<figure>
-              <div class="preview-container @orientation">
-                <img class="preview" src="@productPreviewUrl" />
-                @if(orientation == "orientation-landscape") {
-    							<img class="frame" src='@EgraphsAssets.at("images/fpo-egraph.png")' alt="fpo-egraph" />
-                } else {
-                  <img class="frame" src='@EgraphsAssets.at("images/fpo-egraph-portrait.png")' alt="fpo-egraph" />
-                }
+      @physical_preview_modal()
+  		
+      <div class="review clearfix">
+	  		<figure>
+          <div class="preview-container @orientation">
+            <img class="preview" src="@productPreviewUrl" />
+            @if(orientation == "orientation-landscape") {
+    					<img class="frame" src='@EgraphsAssets.at("images/fpo-egraph.png")' alt="fpo-egraph" />
+            } else {
+              <img class="frame" src='@EgraphsAssets.at("images/fpo-egraph-portrait.png")' alt="fpo-egraph" />
+            }
+          </div>
 
-              </div>
-						
-							<figcaption class="egraph-message left">
-							
-								<h2><strong>A.</strong> @celebrityName will write <span>&raquo;</span></h2>
-								
-								<p>@celebrityWillWrite</p>
-							
-							</figcaption>
+					<figcaption class="egraph-message left">
+						<h2><strong>A.</strong> @celebrityName will write <span>&raquo;</span></h2>
+						<p>@celebrityWillWrite</p>
+					</figcaption>
 
-							<figcaption class="recipient-name right">
-							
-								<h2><strong>B.</strong> Recipient's Name <span>&raquo;</span></h2>
-								
-								<p>@recipientName</p>
-							
-							</figcaption>
-						
-						</figure>
+					<figcaption class="recipient-name right">
+						<h2><strong>B.</strong> Recipient's Name <span>&raquo;</span></h2>
+						<p>@recipientName</p>
+					</figcaption>
+				</figure>
 	
-	  				@safeForm('action ->  actionUrl, 'method -> "post", 'class -> "wrap") {
-	  				
-	  					<div class="clearfix">
-
-			  				<p class="price right">@basePrice.formatSimply</p>
-	  				
-			  				<div class="left">
-			  				
-			  					<h2>Your message to @celebrityName:</h2>
-			  				
-			  					<p>@noteToCelebrity.getOrElse {<i>None provided</i>}</p>
-			  				
-			  				</div>
+	  		@safeForm('action ->  actionUrl, 'method -> "post", 'class -> "wrap") {
+	  			<div class="clearfix">
+        		@**    <p class="price right">@basePrice.formatSimply</p> *@
+			  		<div class="left">
+              <h2>Your message to @celebrityName:</h2>
+              <p>@noteToCelebrity.getOrElse {<i>None provided</i>}</p>
+			  	  </div>
+		  		</div>
 		  				
-	  					</div>
-		  				
-	  					<fieldset class="left">
+	  			<fieldset class="left">
+            <label>Would you like to order a high quality framed version of your egraph for an additional $45?</label>
+            <p>
+              <input id="order-print"
+                     type="checkbox"
+                     name="@highQualityPrintParamName"
+                     value="yes" @if(highQualityPrint) {checked}>
+              <small>
+                <a data-toggle="modal" class="tip" href="#frame-preview" id="preview-shoutout">
+                  Take a look
+                </a>
+              </small>
+            </p>
+            Please allow 3 weeks after digital delivery for delivery of framed print.
+          </fieldset>
 
-                <label>
-                  Would you like to order a high quality framed version of your egraph for an additional $45?
-                </label>
+	  			<fieldset class="right">
+      			<p>Expected Digital Delivery:<br /> <strong>@guaranteedDelivery.formatDayAsPlainLanguage</strong></p>
+	  				@tags.arrow_button(caption="Checkout", classes="button")
+	  			</fieldset>
 
-                <p>
-                  <input id="order-print"
-                         type="checkbox"
-                         name="@highQualityPrintParamName"
-                         value="yes" @if(highQualityPrint) {checked}>
-                  <small>
-                    <a data-toggle="modal" class="tip" href="#frame-preview" id="preview-shoutout">
-                      Take a look
-                    </a>
-                  </small>
-                </p>
-                Please allow 3 weeks after digital delivery for delivery of framed print.
-
-              </fieldset>
-	  					
-	  					<fieldset class="right">
-
-	  						<p>Expected Digital Delivery:<br /> <strong>@guaranteedDelivery.formatDayAsPlainLanguage</strong></p>
-
-	  						@tags.arrow_button(caption="Checkout", classes="button")
-	  					
-	  					</fieldset>
-						
-	  				} <!-- end .wrap -->
-
-  				</div> <!-- end .review -->
- 			
-        </section> <!-- end #checkout -->
-
-    	</div> <!-- end #main -->
-    
-    </div> <!-- end #content -->
+	  		} <!-- end .wrap -->
+  			</div> <!-- end .review -->
+      </section> <!-- end #checkout -->
+    </div> <!-- end #main -->
+  </div> <!-- end #content -->
 }
 
 @base_celebrity_storefront_template(
