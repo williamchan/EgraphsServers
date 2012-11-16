@@ -114,7 +114,7 @@ class PurchaseForms @Inject()(
    */
   def discount(basePrice: Money, coupon: Option[Coupon] = None): Option[Money] = {
     val _subtotal = subtotal(basePrice)
-    coupon.map(_.calculateDiscount(_subtotal.getAmount).toMoney(CurrencyUnit.USD))
+    coupon.map(_.calculateDiscount(_subtotal))
   }
 
   /**

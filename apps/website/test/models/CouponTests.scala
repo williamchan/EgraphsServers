@@ -4,8 +4,10 @@ import enums.CouponType._
 import enums.CouponDiscountType._
 import enums.CouponUsageType._
 import java.sql.Timestamp
+import org.joda.money.{CurrencyUnit, Money}
 import utils._
 import services.AppConfig
+import services.Finance.TypeConversions._
 
 class CouponTests extends EgraphsUnitTest
   with SavingEntityIdLongTests[Coupon]
@@ -85,19 +87,25 @@ class CouponTests extends EgraphsUnitTest
   }
   
   "calculateDiscount" should "calculate flat discounts" in {
+    val tenDollars = BigDecimal(10).toMoney(CurrencyUnit.USD)
+    val fiftyDollars = BigDecimal(50).toMoney(CurrencyUnit.USD)
+    
     val coupon10 = Coupon(discountAmount = 10).withDiscountType(Flat).save()
-    coupon10.calculateDiscount(50) should be(10)
+    coupon10.calculateDiscount(fiftyDollars) should be(tenDollars)
     
     val coupon100 = Coupon(discountAmount = 100).withDiscountType(Flat).save()
-    coupon100.calculateDiscount(50) should be(50)
+    coupon100.calculateDiscount(fiftyDollars) should be(fiftyDollars)
   }
 
   "calculateDiscount" should "calculate percentage discounts" in {
+    val fiveDollars = BigDecimal(5).toMoney(CurrencyUnit.USD)
+    val fiftyDollars = BigDecimal(50).toMoney(CurrencyUnit.USD)
+    
     val coupon10 = Coupon(discountAmount = 10).withDiscountType(Percentage).save()
-    coupon10.calculateDiscount(50) should be(5)
+    coupon10.calculateDiscount(fiftyDollars) should be(fiveDollars)
     
     val coupon100 = Coupon(discountAmount = 100).withDiscountType(Percentage).save()
-    coupon100.calculateDiscount(50) should be(50)
+    coupon100.calculateDiscount(fiftyDollars) should be(fiftyDollars)
   }
   
   "calculateInvoiceAmount" should "return discount amount if coupon type is invoiceable" in (pending)

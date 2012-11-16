@@ -4,11 +4,12 @@ import com.google.inject.Inject
 import enums._
 import java.sql.Timestamp
 import java.util.Date
-import org.joda.money.Money
+import org.joda.money.{CurrencyUnit, Money}
 import org.joda.time.DateMidnight
 import org.squeryl.Query
 import services.{AppConfig, Time}
 import services.db.{FilterOneTable, KeyedCaseClass, Schema, SavesWithLongKey}
+import services.Finance.TypeConversions._
 import util.Random
 
 case class CouponServices @Inject()(store: CouponStore)
@@ -48,13 +49,13 @@ case class Coupon(id: Long = 0,
   /**
    * @return the discount amount. If the discount amount would otherwise be greater than the preCouponAmount, then preCouponAmount is returned.
    */
-  def calculateDiscount(preCouponAmount: BigDecimal): BigDecimal = {
+  def calculateDiscount(preCouponAmount: Money): Money = {
     discountType match {
       case CouponDiscountType.Flat => {
-        discountAmount.min(preCouponAmount)
+        discountAmount.min(preCouponAmount.getAmount).toMoney(CurrencyUnit.USD)
       }
       case _ => {
-        (discountAmount / 100) * preCouponAmount
+        ((discountAmount / 100) * preCouponAmount.getAmount).toMoney(CurrencyUnit.USD)
       }
     }
   }
