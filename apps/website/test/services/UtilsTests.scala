@@ -89,7 +89,7 @@ class UtilsTests extends EgraphsUnitTest
 //  }
 
   "Enum" should "find Values for strings in its apply method" in {
-    object TestEnum extends Utils.Enum {
+    object TestEnum extends Enum {
       case class EnumVal(name: String) extends Value
 
       val Value1 = EnumVal("Value1")
@@ -104,7 +104,7 @@ class UtilsTests extends EgraphsUnitTest
   // TODO: PLAY20 migration. Make enums actually disallow duplicate value entries.
   "Enum" should "not allow duplicate value entries" in (pending) /*{
     evaluating {
-      object TestEnum extends Utils.Enum {
+      object TestEnum extends Enum {
         case class EnumVal(name: String) extends Value
 
         val Value1 = EnumVal("Value1")

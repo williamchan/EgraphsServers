@@ -1,8 +1,8 @@
 package models.enums
 
-import services.Utils
+import egraphs.playutils.Enum
 
-object PaymentStatus extends Utils.Enum {
+object PaymentStatus extends Enum {
   sealed trait EnumVal extends Value
 
   val NotCharged = new EnumVal {

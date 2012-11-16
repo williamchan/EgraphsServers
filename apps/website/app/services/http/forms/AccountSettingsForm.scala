@@ -3,6 +3,7 @@ package services.http.forms
 import com.google.inject.Inject
 import services.Utils
 import models.{Password, Customer, Account}
+import egraphs.playutils.Enum
 
 /**
  * Define the fields (and validations thereof) for the form transmitted by this endpoint
@@ -126,7 +127,7 @@ class AccountSettingsForm(val paramsMap: Form.Readable, check: FormChecks, custo
 }
 
 object AccountSettingsForm {
-  object Fields extends Utils.Enum {
+  object Fields extends Enum {
     sealed case class EnumVal(name: String) extends Value
 
     // Strings need to match up with param names.

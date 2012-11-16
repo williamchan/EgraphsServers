@@ -1,8 +1,8 @@
 package models.enums
 
-import services.Utils
+import egraphs.playutils.Enum
 
-object EgraphState extends Utils.Enum {
+object EgraphState extends Enum {
   sealed trait EnumVal extends Value
 
   val AwaitingVerification = new EnumVal {

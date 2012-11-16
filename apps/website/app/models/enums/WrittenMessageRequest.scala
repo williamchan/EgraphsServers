@@ -1,6 +1,6 @@
 package models.enums
 
-import services.Utils
+import egraphs.playutils.Enum
 
 /**
  * Encodes the choice by the buyer of an egraph whether to request a specific
@@ -9,7 +9,7 @@ import services.Utils
  */
 sealed abstract class WrittenMessageRequest(val name: String)
 
-object WrittenMessageRequest extends Utils.Enum {
+object WrittenMessageRequest extends Enum {
   sealed abstract class EnumVal(name: String) extends WrittenMessageRequest(name) with Value
 
   val SpecificMessage = new EnumVal("SignatureWithMessage") {}
