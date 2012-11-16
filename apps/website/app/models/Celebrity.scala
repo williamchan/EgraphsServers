@@ -488,7 +488,7 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
    * 
    *  (pitcher or 2nd baseman) and (red sox or yankees)
    */
-  def marketplaceSearch(query: String, refinements: Map[Long, Iterable[Long]] = Map[Long, Iterable[Long]](), sortType: CelebritySortingTypes.EnumVal = CelebritySortingTypes.MostPopular)
+  def marketplaceSearch(queryOption: Option[String], refinements: Map[Long, Iterable[Long]] = Map[Long, Iterable[Long]](), sortType: CelebritySortingTypes.EnumVal = CelebritySortingTypes.MostPopular)
   : Iterable[MarketplaceCelebrity] = {
 
     // Note we could make this fast probably.  We should see how performance is affected if we don't have to
@@ -539,36 +539,47 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
      c._publishedStatus = 'Published' AND
      p._publishedStatus = 'Published' AND
      ib.startdate < now() AND
-     ib.enddate > now() AND
-     mv.to_tsvector @@ plainto_tsquery('english', {textQuery})
+     ib.enddate > now() """
+  val queryTextMatching =      """ AND mv.to_tsvector @@ plainto_tsquery('english', {textQuery}) """
+  val queryGrouping = """ 
     ORDER BY is_order ASC
     ) AS stuff
-    GROUP BY celeb_id, celeb_publicname, celeb_roledescription, celeb_landingpageImageKey, inventorybatch_id, inventory_total
-  ) AS stuff2
-  GROUP BY celebrityid, publicname, roledescription, _landingpageImageKey
-  """
+      GROUP BY celeb_id, celeb_publicname, celeb_roledescription, celeb_landingpageImageKey, inventorybatch_id, inventory_total
+    ) AS stuff2
+    GROUP BY celebrityid, publicname, roledescription, _landingpageImageKey
+    """
 
     import CelebritySortingTypes._
 
-    val sortedQueryString = {
+    val queryResultOrdering = {
       sortType match {
         case RecentlyAdded => 
           // this may not be 100% accurate, but gives a gauge of when then have been added to our systems,
           // to do better would have to include their publish date along with when their products were published to
           // figure this out, and we don't have all that in our database now.
-          queryString + "ORDER BY celebrityid DESC"
-        case MostPopular => queryString + "ORDER BY inventory_sold DESC"
-        case PriceAscending => queryString + "ORDER BY minProductPrice ASC"
-        case PriceDecending => queryString + "ORDER BY maxProductPrice DESC"
-        case Alphabetical => queryString + "ORDER BY publicname ASC"
-        case ReverseAlphabetical => queryString + "ORDER BY publicname DESC"
-        case _ => queryString + "ORDER BY celeb_id ASC"
+         "ORDER BY celebrityid DESC"
+        case MostPopular => "ORDER BY inventory_sold DESC"
+        case PriceAscending => "ORDER BY minProductPrice ASC"
+        case PriceDecending => "ORDER BY maxProductPrice DESC"
+        case Alphabetical => "ORDER BY publicname ASC"
+        case ReverseAlphabetical => "ORDER BY publicname DESC"
+        case _ =>  "ORDER BY celeb_id ASC"
       }
     } + ";"
       
-    val rowStream = SQL(
-      sortedQueryString
-    ).on("textQuery" -> query).apply()(connection = schema.getTxnConnectionFactory)
+    val finalQuery = queryOption match {
+      case Some(query) => {
+        SQL(
+          queryString + queryTextMatching + queryGrouping + queryResultOrdering
+        ).on("textQuery" -> query)
+      }
+      case None => { 
+        SQL(
+          queryString + queryGrouping + queryResultOrdering
+        )
+      }
+    }  
+    val rowStream  = finalQuery.apply()(connection = schema.getTxnConnectionFactory)
 
     for (row <- rowStream) yield {
       import java.math.BigDecimal

@@ -71,10 +71,10 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
      
       val (subtitle, celebrities) = 
         (queryOption match {
-          case Some(query) => ("Showing Results for \"" + query + "\"...", celebrityStore.marketplaceSearch(query, categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostPopular)))
+          case Some(query) => ("Showing Results for \"" + query + "\"...", celebrityStore.marketplaceSearch(queryOption, categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostPopular)))
           case _ =>
             if(!activeCategoryValues.isEmpty) {
-              ("Results", celebrityStore.marketplaceSearch("*", categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostPopular)))
+              ("Results", celebrityStore.marketplaceSearch(queryOption, categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostPopular)))
             } else {
               //TODO when refinements are implemented we can do this using tags instead.  
               ("Featured Celebrities" , celebrityStore.getFeaturedPublishedCelebrities.map{c => 
@@ -84,10 +84,15 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
                   productAndCount => productAndCount._2 > 0
                 }
                 val prices = purchaseableProducts.map(p => p._1.priceInCurrency.toInt)
-                c.asMarketplaceCelebrity(prices.min, prices.max, purchaseableProducts.isEmpty)
+                val (min, max) = prices.isEmpty match {
+                  case true => (0,0)
+                  case false => (prices.filter(p => p > 0).min, prices.max) 
+                }
+                c.asMarketplaceCelebrity(min, max, purchaseableProducts.isEmpty)
               })
             }
         })
+
 
       val viewAsList = viewOption == Some("list")
 
