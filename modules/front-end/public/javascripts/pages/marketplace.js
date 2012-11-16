@@ -122,7 +122,7 @@ define(["libs/chosen/chosen.jquery.min"], function (Egraphs) {
           $(this).parent().siblings().children().each(function() {
             $(this).removeClass("condensed");
           });
-          $(this).parent().addClass("condensed");
+          $(this).addClass("condensed");
         });
 
       });
