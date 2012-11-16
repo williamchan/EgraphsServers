@@ -36,21 +36,16 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
   val queryUrl = controllers.routes.WebsiteControllers.getMarketplaceResultPage.url
   val categoryRegex = new scala.util.matching.Regex("""c([0-9]+)""", "id")
 
-  //TODO: These strings and every reference to them should instead use an Enum.
-  val sortFunctions = 
-    Map("recently-added" -> "Recently Added",
-        "most-popular" -> "Most Popular",
-        "price-low-to-hi" -> "Price (Low to High)",
-        "price-high-to-low" -> "Price (High to Low)",
-        "alphabetical-a-z"  -> "Alphabetical (A-Z)",
-        "alphabetical-z-a" -> "Alphabetical (Z-A)"
-    )
-
   private def sortOptionViewModels(selected: String = "") : Iterable[SortOptionViewModel] = {
-    sortFunctions.map( sortFunction => 
-      SortOptionViewModel(name = sortFunction._1, display = sortFunction._2, active = (sortFunction._1 == selected))
-    )
-  }  
+    for {
+      sortingType <- CelebritySortingTypes.values
+    } yield {
+      SortOptionViewModel(
+        name = sortingType.name,
+        display = sortingType.displayName,
+        active = (sortingType.name == selected))
+    }
+  }
 
   def getMarketplaceVerticalPage(verticalname: String) =  controllerMethod.withForm() { implicit authToken =>
     Action { implicit request =>
