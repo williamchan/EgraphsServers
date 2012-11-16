@@ -7,7 +7,6 @@ import models.frontend.marketplace._
 import helpers.DefaultImplicitTemplateParameters
 import scala.util.Random
 import models.frontend.marketplace.CelebritySortingTypes
-import models.frontend.marketplace.CelebritySortingTypes
 
 /**
  * Marketplace controller
@@ -15,11 +14,6 @@ import models.frontend.marketplace.CelebritySortingTypes
 object Marketplace extends Controller with DefaultImplicitTemplateParameters {
   val coinflip = Random
 
-  def index() = Action {
-    Ok(views.html.frontend.marketplace_landing("derp", "exampleQuery", verticalSet, resultSet, categoryViewModels, sortOptions))
-  }
-
-  
   def results() = Action {
     Ok(views.html.frontend.marketplace_results( 
        query= "exampleQuery",
@@ -32,11 +26,7 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
     ))
   }
   
-  def mlb() = Action {
-    Ok(views.html.frontend.marketplace_mlb())
-  }
-
-  def mlb_list() = Action {
+  def results_list() = Action {
     Ok(views.html.frontend.marketplace_results( 
        query= "exampleQuery",
        viewAsList = true, 
@@ -47,6 +37,16 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
        sortOptions
     ))
   }
+  
+  def index() = Action {
+    Ok(views.html.frontend.marketplace_landing("derp", "exampleQuery", verticalSet, resultSet, categoryViewModels, sortOptions))
+  }
+  
+  def mlb() = Action {
+    Ok(views.html.frontend.marketplace_mlb())
+  }
+
+
   
   def categorySet : Iterable[CategoryViewModel] = {
     val categoryNames = List("Team", "Position").zipWithIndex

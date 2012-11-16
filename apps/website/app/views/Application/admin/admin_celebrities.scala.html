@@ -79,7 +79,10 @@
       </div>  
       <div class="row-fluid">
         <form method="GET" action="@getRebuildIndex">
-          @tags.arrow_button(caption="Rebuild Search Index")
+          <button class="btn btn-primary" type="submit">Rebuild Search Index</button> 
+          <span class="help-block">
+            You should rebuild the search index after you are done making changes to celebrities. Please message the sheriff's office if something goes wrong :)
+          </span>
         </form>  
       </div>
       <h2>All @paginationInfo.totalResultsStr</h2>
