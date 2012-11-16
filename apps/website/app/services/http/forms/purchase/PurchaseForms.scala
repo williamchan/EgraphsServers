@@ -112,25 +112,23 @@ class PurchaseForms @Inject()(
   /**
    * The discount applied to the purchase. None if not applicable.
    */
-  def discount(basePrice: Money, coupon: Option[Coupon] = None): Option[Money] = {
-    val _subtotal = subtotal(basePrice)
-    coupon.map(_.calculateDiscount(_subtotal))
+  def discount(subtotal: Money, coupon: Option[Coupon] = None): Option[Money] = {
+    coupon.map(_.calculateDiscount(subtotal))
   }
 
   /**
    * The full cost of the purchase. This is the cost of the product plust
    * shipping and tax.
    *
-   * @param basePrice the price of the product
-   * @return the full price.
+   * @param subtotal the total of all items
+   * @param discount the total of all discounts
+   * @return the final price.
    */
-  def total(basePrice: Money, coupon: Option[Coupon] = None): Money = {
+  def total(subtotal: Money, discount: Option[Money] = None): Money = {
     val zero = Money.zero(CurrencyUnit.USD)
-    val _subtotal = subtotal(basePrice)
-
-    _subtotal
+    subtotal
       .plus(tax.getOrElse(zero))
-      .minus(discount(_subtotal, coupon).getOrElse(zero))
+      .minus(discount.getOrElse(zero))
   }
 
   /**

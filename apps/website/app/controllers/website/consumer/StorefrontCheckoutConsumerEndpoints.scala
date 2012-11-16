@@ -98,6 +98,8 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
             }
             
             val maybeCoupon = forms.coupon
+            val subtotal = forms.subtotal(product.price)
+            val discount = forms.discount(subtotal = subtotal, maybeCoupon)
             
             val orderSummary = CheckoutOrderSummary(
               celebrityName=celeb.publicName,
@@ -110,8 +112,8 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
               basePrice=product.price,
               shipping=forms.shippingPrice,
               tax=forms.tax,
-              discount=forms.discount(basePrice = product.price, maybeCoupon),
-              total=forms.total(basePrice = product.price, maybeCoupon)
+              discount=discount,
+              total=forms.total(subtotal = subtotal, discount = discount)
             )
     
             // Collect both the shipping form and billing form into a single viewmodel
