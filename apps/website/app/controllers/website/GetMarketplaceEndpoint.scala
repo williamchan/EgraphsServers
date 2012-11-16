@@ -73,11 +73,19 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         (queryOption match {
           case Some(query) => ("Showing Results for \"" + query + "\"...", celebrityStore.marketplaceSearch(query, categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostPopular)))
           case _ =>
-            if(activeCategoryValues.isEmpty) {
+            if(!activeCategoryValues.isEmpty) {
               ("Results", celebrityStore.marketplaceSearch("*", categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostPopular)))
             } else {
-              //TODO make sure this value is not hardcoded!
-              ("Featured Celebrities" , celebrityStore.getFeaturedPublishedCelebrities.map(c => c.asMarketplaceCelebrity(100,100, true)))
+              //TODO when refinements are implemented we can do this using tags instead.  
+              ("Featured Celebrities" , celebrityStore.getFeaturedPublishedCelebrities.map{c => 
+
+                val activeProductsAndInventory = c.getActiveProductsWithInventoryRemaining()
+                val purchaseableProducts = activeProductsAndInventory.filter {
+                  productAndCount => productAndCount._2 > 0
+                }
+                val prices = purchaseableProducts.map(p => p._1.priceInCurrency.toInt)
+                c.asMarketplaceCelebrity(prices.min, prices.max, purchaseableProducts.isEmpty)
+              })
             }
         })
 
