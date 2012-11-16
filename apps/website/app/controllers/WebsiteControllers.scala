@@ -1,14 +1,13 @@
 package controllers
 
 import models._
+import models.categories._
 import website._
 import play.api.mvc.{Action, Controller}
 import play.api.mvc.Results.Redirect
 import services.blobs.Blobs
 import services.mail.{BulkMailList, TransactionalMail}
 import services.payment.Payment
-import models._
-import models.filters._
 import services.ConsumerApplication
 import services.blobs.Blobs
 import services.db.DBSession
@@ -56,19 +55,21 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val payment = instance[Payment]
   override protected val schema = instance[Schema]
 
-  override protected val enrollmentBatchStore = instance[EnrollmentBatchStore]
-  override protected val inventoryBatchStore = instance[InventoryBatchStore]
-  override protected val egraphStore = instance[EgraphStore]
   override protected val accountStore = instance[AccountStore]
   override protected val administratorStore = instance[AdministratorStore]
+  override protected def categoryStore = instance[CategoryStore]
+  override protected def categoryValueStore = instance[CategoryValueStore]
   override protected val celebrityStore = instance[CelebrityStore]
+  override protected val couponStore = instance[CouponStore]
   override protected val customerStore = instance[CustomerStore]
-  override protected def filterStore = instance[FilterStore]
-  override protected def filterValueStore = instance[FilterValueStore]
+  override protected val egraphStore = instance[EgraphStore]
+  override protected val enrollmentBatchStore = instance[EnrollmentBatchStore]
+  override protected val inventoryBatchStore = instance[InventoryBatchStore]
   override protected val orderStore = instance[OrderStore]
   override protected val printOrderStore = instance[PrintOrderStore]
   override protected val productStore = instance[ProductStore]
   
+  override protected val couponQueryFilters = instance[CouponQueryFilters]
   override protected val egraphQueryFilters = instance[EgraphQueryFilters]
   override protected val inventoryBatchQueryFilters = instance[InventoryBatchQueryFilters]
   override protected val orderQueryFilters = instance[OrderQueryFilters]

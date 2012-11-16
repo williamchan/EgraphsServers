@@ -31,11 +31,10 @@ GET     /blob/files/*blobKey                                       controllers.W
 GET     /favicon.ico                            controllers.Assets.at(path="/public", file="images/favicon.ico")
 GET     /documents/CelebrityAgreement           controllers.Assets.at(path="/public", file="documents/CelebrityAgreement.pdf")
 
-
 ##
 ## API
 ##
-
+GET     /api/1.0/client                                         controllers.ApiControllers.getIOSClient(redirectToItmsLink: Boolean ?= false)
 GET     /api/1.0/celebrities/me                                 controllers.ApiControllers.getCelebrity
 GET     /api/1.0/celebrities/me/enrollmenttemplate              controllers.ApiControllers.getCelebrityEnrollmentTemplate
 GET     /api/1.0/celebrities/me/mobileappinfo                   controllers.ApiControllers.getCelebrityMobileAppInfo
@@ -60,7 +59,7 @@ POST     /admin/celebrities/featured                               				controlle
 GET      /admin/celebrities/$celebrityId<[0-9]+>                          controllers.WebsiteControllers.getCelebrityAdmin(celebrityId: Long)
 POST     /admin/celebrities/$celebrityId<[0-9]+>                          controllers.WebsiteControllers.postCelebrityAdmin(celebrityId: Long)
 GET      /admin/celebrities/$celebrityId<[0-9]+>/egraphs                  controllers.WebsiteControllers.getCelebrityEgraphsAdmin(celebrityId: Long)
-POST     /admin/celebrities/$celebrityId<[0-9]+>/filtervalues             controllers.WebsiteControllers.postCelebrityFilterValueAdmin(celebrityId: Long)
+POST     /admin/celebrities/$celebrityId<[0-9]+>/categoryvalues           controllers.WebsiteControllers.postCelebrityCategoryValueAdmin(celebrityId: Long)
 GET      /admin/celebrities/$celebrityId<[0-9]+>/inventorybatches         controllers.WebsiteControllers.getCelebrityInventoryBatchesAdmin(celebrityId: Long)
 POST     /admin/celebrities/$celebrityId<[0-9]+>/inventorybatches         controllers.WebsiteControllers.postCreateInventoryBatchAdmin(celebrityId: Long)
 GET      /admin/celebrities/$celebrityId<[0-9]+>/inventorybatches/create  controllers.WebsiteControllers.getCreateCelebrityInventoryBatchAdmin(celebrityId: Long)
@@ -72,13 +71,20 @@ POST     /admin/celebrities/$celebrityId<[0-9]+>/sendEmail                contro
 GET      /admin/egraphs                                                   controllers.WebsiteControllers.getEgraphsAdmin
 GET      /admin/egraphs/$egraphId<[0-9]+>                                 controllers.WebsiteControllers.getEgraphAdmin(egraphId: Long)
 POST     /admin/egraphs/$egraphId<[0-9]+>                                 controllers.WebsiteControllers.postEgraphAdmin(egraphId: Long)
-GET      /admin/filters                                                   controllers.WebsiteControllers.getFiltersAdmin 
-GET      /admin/filters/$filterId<[0-9]+>                                 controllers.WebsiteControllers.getFilterAdmin(filterId: Long)
-GET      /admin/filters/create                                            controllers.WebsiteControllers.getCreateFilterAdmin
-POST     /admin/filters                                                   controllers.WebsiteControllers.postFilterAdmin
-GET      /admin/filtervalues/$filterValueId<[0-9]+>                       controllers.WebsiteControllers.getFilterValueAdmin(filterValueId: Long)
-GET      /admin/filters/$filterId<[0-9]>/filtervalues/create              controllers.WebsiteControllers.getCreateFilterValueAdmin(filterId: Long) 
-POST     /admin/filtervalues                                              controllers.WebsiteControllers.postFilterValueAdmin
+GET      /admin/freegraphs/create                                         controllers.WebsiteControllers.getCreateFreegraphAdmin
+POST     /admin/freegraphs/create                                         controllers.WebsiteControllers.postFreegraphAdmin
+GET      /admin/categories                                                controllers.WebsiteControllers.getCategoriesAdmin
+POST     /admin/categories                                                controllers.WebsiteControllers.postCategoryAdmin
+GET      /admin/categories/create                                         controllers.WebsiteControllers.getCreateCategoryAdmin
+GET      /admin/categories/$categoryId<[0-9]+>                            controllers.WebsiteControllers.getCategoryAdmin(categoryId: Long)
+GET      /admin/categories/$categoryId<[0-9]>/categoryvalues/create       controllers.WebsiteControllers.getCreateCategoryValueAdmin(categoryId: Long)
+POST     /admin/categoryvalues                                            controllers.WebsiteControllers.postCategoryValueAdmin
+GET      /admin/coupons                                                   controllers.WebsiteControllers.getCouponsAdmin
+POST     /admin/coupons                                                   controllers.WebsiteControllers.postCreateCouponAdmin
+GET      /admin/coupons/create                                            controllers.WebsiteControllers.getCreateCouponAdmin
+GET      /admin/coupons/$couponId<[0-9]+>                                 controllers.WebsiteControllers.getCouponAdmin(couponId: Long)
+POST     /admin/coupons/$couponId<[0-9]+>                                 controllers.WebsiteControllers.postCouponAdmin(couponId: Long)
+GET      /admin/categoryvalues/$categoryValueId<[0-9]+>                   controllers.WebsiteControllers.getCategoryValueAdmin(categoryValueId: Long)
 GET      /admin/inventorybatches/$inventoryBatchId<[0-9]+>                controllers.WebsiteControllers.getInventoryBatchAdmin(inventoryBatchId: Long)
 POST     /admin/inventorybatches/$inventoryBatchId<[0-9]+>                controllers.WebsiteControllers.postInventoryBatchAdmin(inventoryBatchId: Long)
 GET      /admin/login                                              				controllers.WebsiteControllers.getLoginAdmin
@@ -149,7 +155,7 @@ GET     /admin/printorders/$printOrderId<[0-9]+>                    controllers.
 POST    /admin/printorders/$printOrderId<[0-9]+>                    controllers.WebsiteControllers.postPrintOrderAdmin(printOrderId: Long)
 POST    /:celebrityUrlSlug/:productUrlSlug/buy-demo                controllers.WebsiteControllers.postBuyDemoProduct(celebrityUrlSlug: String, productUrlSlug: String)
 
-GET     /assets/*file                                               controllers.RemoteAssets.at(path="/public", file)
+GET     /assets/*file                                               controllers.EgraphsAssets.at(path=controllers.EgraphsAssets.defaultPath, file)
 
 # Redirect any requests with trailing slashes to the slash-less version.
 GET     $resourcePath<.*>/                                          controllers.SlayTrailingSlashesController.slayTrailingSlashes(resourcePath)

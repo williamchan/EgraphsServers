@@ -1,10 +1,10 @@
 package models
 
 import com.google.inject.{Singleton, AbstractModule}
-import models.filters.FilterServices
-import uk.me.lings.scalaguice.ScalaModule
+import models.categories.CategoryServices
 import vbg._
 import xyzmo._
+import uk.me.lings.scalaguice.ScalaModule
 
 /**
  * Guice bindings for all model services.
@@ -13,16 +13,17 @@ object ModelModule extends AbstractModule with ScalaModule {
   override def configure() {
     bind[AccountServices].in[Singleton]
     bind[AddressServices].in[Singleton]
+    bind[AdministratorServices].in[Singleton]
     bind[BlobKeyServices].in[Singleton]
     bind[CashTransactionServices].in[Singleton]
+    bind[CategoryServices].in[Singleton]
     bind[CustomerServices].in[Singleton]
     bind[CelebrityServices].in[Singleton]
-    bind[AdministratorServices].in[Singleton]
+    bind[CouponServices].in[Singleton]
     bind[EgraphServices].in[Singleton]
     bind[EnrollmentBatchServices].in[Singleton]
     bind[EnrollmentSampleServices].in[Singleton]
     bind[FailedPurchaseDataServices].in[Singleton]
-    bind[FilterServices].in[Singleton]
     bind[ImageAssetServices].in[Singleton]
     bind[InventoryBatchServices].in[Singleton]
     bind[InventoryBatchProductServices].in[Singleton]

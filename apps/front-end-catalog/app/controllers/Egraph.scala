@@ -21,7 +21,7 @@ object Egraph extends Controller with DefaultImplicitTemplateParameters {
       "Derp Herpson",
       frame.cssClass,
       frame.cssFrameColumnClasses,
-      RemoteAssets.at("images/egraph_default_plaque_icon.png").url,
+      EgraphsAssets.at("images/egraph_default_plaque_icon.png").url,
       frame.cssStoryColumnClasses,
       "Herp Derpson",
       """
@@ -31,7 +31,7 @@ object Egraph extends Controller with DefaultImplicitTemplateParameters {
         he got a letter from Derp Herpson, and the rest, as they say, was history.
       """,
       "http://freshly-ground.com/data/audio/sm2/Adrian%20Glynn%20-%20Blue%20Belle%20Lament.mp3",
-      RemoteAssets.at("images/sample_landscape_egraph.svg").url,
+      EgraphsAssets.at("images/sample_landscape_egraph.svg").url,
       "May 10, 1983",
       shareOnFacebookLink="/shareOnFacebookLink",
       shareOnTwitterLink= "This is my test egraph"
@@ -46,7 +46,7 @@ object Egraph extends Controller with DefaultImplicitTemplateParameters {
       "Derp Herpson",
       frame.cssClass,
       frame.cssFrameColumnClasses,
-      RemoteAssets.at("images/egraph_default_plaque_icon.png").url,
+      EgraphsAssets.at("images/egraph_default_plaque_icon.png").url,
       frame.cssStoryColumnClasses,
       "Herp Derpson",
       """
@@ -56,7 +56,7 @@ object Egraph extends Controller with DefaultImplicitTemplateParameters {
         he got a letter from Derp Herpson, and the rest, as they say, was history.
       """,
       "http://freshly-ground.com/data/audio/sm2/Adrian%20Glynn%20-%20Blue%20Belle%20Lament.mp3",
-      RemoteAssets.at("images/sample_portrait_egraph.svg").url,
+      EgraphsAssets.at("images/sample_portrait_egraph.svg").url,
       "May 10, 1983",
       shareOnFacebookLink="/shareOnFacebookLink",
       shareOnTwitterLink= "This is my test egraph!"

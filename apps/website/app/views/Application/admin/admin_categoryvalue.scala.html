@@ -1,0 +1,60 @@
+@(categoryValue: models.categories.CategoryValue,
+  errorFields: Option[List[String]] = None,
+  categories: Iterable[models.categories.Category],
+  currentCategoryIds: Set[Long]
+  )(implicit authToken: egraphs.authtoken.AuthenticityToken,
+  headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData)
+
+@import controllers.WebsiteControllers
+@import egraphs.authtoken.AuthenticityToken.safeForm
+@import views.html.frontend.tags
+@import views.html.frontend.tags.ng
+@import views.html.frontend.base_template
+@import views.html.Application.tags.errorMessage
+
+
+@body = {
+<section id="content" class="top" role="main">
+  <div id="main" class="sub">
+    <div class="container" id="celebrity-admin">
+        @safeForm('method -> "POST", 'action -> routes.WebsiteControllers.postCategoryValueAdmin.url) {
+          @if(categoryValue.id == 0) {
+            <legend>New Category Value</legend>
+            <h4>For parent Category:<a href="@routes.WebsiteControllers.getCategoryAdmin(categoryValue.categoryId).url" target="_blank">@categoryValue.categoryId</a></h3>
+          } else {
+            <legend>Category Value @categoryValue.id Details</legend>
+            <h4>Parent Category: <a href="@routes.WebsiteControllers.getCategoryAdmin(categoryValue.categoryId).url">@categoryValue.categoryId</a></h3>
+              <legend>Child Categories</legend>
+              <select data-placeholder="Select categories to be associated with the CategoryValue" name="categoryIds" style="width:500px" multiple class="chzn-select">
+                @for(category <- categories) {
+                  <option name=@{"categoryIds[" + (category.id-1) + "]"} value="@category.id" @if(currentCategoryIds.contains(category.id)){selected="selected"}> 
+                  @category.publicName | @category.name 
+                  </option>
+                }  
+              </select>
+              <span class="help-block">
+               Select child categories of this value. This means that these categories will be displayed on the marketplace when celebrities are being categoryed by this value. For example, the Category Value "Major League Baseball" will have child categories such as MLB Team (publicname: Team) or MLB Position (publicname: Position)
+              </span>
+          }
+          <label>Name</label>  
+          <input type="hidden" name="categoryValueId" value="@categoryValue.id">
+          <input type="hidden" name="categoryId" value="@categoryValue.categoryId">
+          <input type="text" name="name" value="@categoryValue.name">
+          <label>PublicName</label>
+          <input type="text" name="publicName" value="@categoryValue.publicName">           
+            <span class="help-block">Pick a name to be displayed publicly, like "Major League Baseball" or "Boston Red Sox"</span>
+          <div>   
+            <button type="reset" class="btn">
+              Reset
+            </button>
+            @tags.arrow_button(caption="Save")  
+          </div>  
+        }
+        @errorMessage(errorFields) 
+    </div>
+  </div>
+</section>    
+}
+
+@base_template(title="Admin - Category Value", body=body,  jsMain="pages/admin/categoryvalue")

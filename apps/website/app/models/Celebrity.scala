@@ -1,7 +1,7 @@
 package models
 
 import enums.{HasEnrollmentStatus, EnrollmentStatus, PublishedStatus, HasPublishedStatus}
-import filters._
+import categories._
 import java.sql.Timestamp
 import services.blobs.AccessPolicy
 import services.db.{FilterOneTable, KeyedCaseClass, Schema, SavesWithLongKey}
@@ -25,7 +25,8 @@ import views.html.frontend.{celebrity_welcome_email, celebrity_welcome_email_tex
 case class CelebrityServices @Inject() (
   store: CelebrityStore,
   accountStore: AccountStore,
-  filterServices: FilterServices,
+  consumerApp: ConsumerApplication,
+  categoryServices: CategoryServices,
   productStore: ProductStore,
   orderStore: OrderStore,
   inventoryBatchStore: InventoryBatchStore,
@@ -68,9 +69,9 @@ case class Celebrity(id: Long = 0,
    * FilterValues celebrity is tagged withs
    */
 
-  lazy val filterValues = services.filterServices.filterValueStore.filterValues(this)
+  lazy val categoryValues = services.categoryServices.categoryValueStore.categoryValues(this)
   
-  lazy val filterValueAndFilterPairs : Query[(FilterValue, Filter)] = services.filterServices.filterValueStore.filterValueFilterPairs(this)
+  lazy val categoryValueAndCategoryPairs : Query[(CategoryValue, Category)] = services.categoryServices.categoryValueStore.categoryValueCategoryPairs(this)
 
   //
   // Additional DB columns
@@ -276,11 +277,12 @@ case class Celebrity(id: Long = 0,
     email.addTo(toAddress, publicName)
     bccEmail.map(bcc => email.addBcc(bcc))
     email.setSubject("Welcome to Egraphs")
-
+    
+    val appDownloadLink = services.consumerApp.getIOSClient(redirectToItmsLink=true).url
     services.transactionalMail.send(
       email, 
       text=Some(celebrity_welcome_email_text(publicName, account.email).toString), 
-      html=Some(celebrity_welcome_email(publicName, account.email))
+      html=Some(celebrity_welcome_email(publicName, account.email, appDownloadLink)) 
     )
   }
 
@@ -379,19 +381,19 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
   // Public Methods
   //
   /**
-   * Returns all celebrities associated with the provided FilterValue.
+   * Returns all celebrities associated with the provided CategoryValue.
    */
-  def celebrities(filterValue: FilterValue) : Query[Celebrity] with ManyToMany[Celebrity, CelebrityFilterValue] = {
-    schema.celebrityFilterValues.right(filterValue)
+  def celebrities(categoryValue: CategoryValue) : Query[Celebrity] with ManyToMany[Celebrity, CelebrityCategoryValue] = {
+    schema.celebrityCategoryValues.right(categoryValue)
   }
 
   def findByUrlSlug(slug: String): Option[Celebrity] = {
-    if (slug.isEmpty) return None
-
-    from(schema.celebrities)(celebrity =>
-      where(celebrity.urlSlug === slug)
-        select (celebrity)
-    ).headOption
+    if (slug.isEmpty) None
+    else {
+      from(schema.celebrities)(celebrity =>
+        where(celebrity.urlSlug === slug)
+          select (celebrity)).headOption
+    }
   }
 
   // TODO(erem): Test this one
@@ -423,11 +425,11 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
   /**
    * Find celebrities tagged with a particular filterValue by id.
    */
-  def findByFilterValueId(filterValueId : Long) : Query[Celebrity] = {
-   from(schema.celebrityFilterValues, schema.celebrities)(
+  def findByCategoryValueId(categoryValueId : Long) : Query[Celebrity] = {
+   from(schema.celebrityCategoryValues, schema.celebrities)(
      (cfv, c) =>
        where(
-         cfv.filterValueId === filterValueId and  
+         cfv.categoryValueId === categoryValueId and  
          c.id === cfv.celebrityId
        ) select(c)
    ) 
@@ -519,18 +521,18 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
    * Update a celebrity's associated filter values
    **/
 
-  def updateFilterValues(celebrity: Celebrity, filterValueIds: Iterable[Long]) {
+  def updateCategoryValues(celebrity: Celebrity, categoryValueIds: Iterable[Long]) {
     //remove old records
-    celebrity.filterValues.dissociateAll
+    celebrity.categoryValues.dissociateAll
 
     // Add records for the new values
-    val newCelebrityFilterValues  = for (filterValueId <- filterValueIds) yield 
+    val newCelebrityCategoryValues  = for (categoryValueId <- categoryValueIds) yield 
     { 
-      CelebrityFilterValue(celebrityId = celebrity.id, filterValueId = filterValueId)
+      CelebrityCategoryValue(celebrityId = celebrity.id, categoryValueId = categoryValueId)
     }
 
-    schema.celebrityFilterValues.insert(
-       newCelebrityFilterValues
+    schema.celebrityCategoryValues.insert(
+       newCelebrityCategoryValues
     )
   }
 

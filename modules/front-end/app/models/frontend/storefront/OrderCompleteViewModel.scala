@@ -21,6 +21,7 @@ import org.joda.money.Money
  *                             to deliver. This can be found on the order's `inventoryBatch`
  * @param faqHowLongLink link to FAQ section on expected delivery dates
  * @param totalPrice the total cost of the purchase
+ * @param discount discount amount
  * @param digitalPrice the cost of the digital egraph
  * @param printPrice the cost of the print order, or zero if there is no associated print order
  * @param hasPrintOrder whether a physical print was ordered
@@ -39,6 +40,7 @@ case class OrderCompleteViewModel (
   expectedDeliveryDate: Date,
   faqHowLongLink: String,
   totalPrice: Money,
+  discount: Option[Money],
   digitalPrice: Money,
   printPrice: Money,
   hasPrintOrder: Boolean,

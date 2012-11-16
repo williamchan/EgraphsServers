@@ -1,0 +1,129 @@
+@(isCreate: Boolean,
+  errorFields: Option[List[String]],
+  fields: (String) => String,
+  coupon: models.Coupon
+)(implicit authToken: egraphs.authtoken.AuthenticityToken,
+  headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData)
+
+@import controllers.WebsiteControllers
+@import services.Finance.TypeConversions._
+@import egraphs.authtoken.AuthenticityToken.safeForm
+@import views.html.Application.tags.errorMessage
+@import views.html.Application.tags.formField
+@import views.html.Application.tags.formOption
+@import views.html.Application.tags.valueRow
+@import views.html.frontend.tags
+@import views.html.frontend.base_template
+
+
+@postCoupon = @{
+  isCreate match {
+    case false => routes.WebsiteControllers.postCouponAdmin(couponId = coupon.id)
+    case true => routes.WebsiteControllers.postCreateCouponAdmin
+  }
+}
+
+@body = {
+<section id="content" class="top" role="main">
+  <div id="main" class="sub">
+    <div class="container" id="celebrity-admin">
+      <h1>
+        @{if(isCreate) "Create" else "Update"} Coupon
+      </h1>
+      <div class="row-fluid">
+        <div class="span12">
+          @safeForm('id -> "coupon-form", 'method -> "POST", 'action -> postCoupon.url) {
+            <fieldset>
+              <input id="couponId" name="couponId" type="hidden" value="@fields("couponId")">
+
+              @formField(
+                id="name",
+                label="Name",
+                inputType="text",
+                width="span4",
+                fields=fields
+              )
+              @formField(
+                id="code",
+                label="Code",
+                inputType="text",
+                width="span4",
+                fields=fields
+              )
+              @formField(
+                id="startDate",
+                label="Start Date",
+                inputType="text",
+                width="span4",
+                help=Some("yyyy-MM-dd HH:mm in PST"),
+                fields=fields
+              )
+              @formField(
+                id="endDate",
+                label="End Date",
+                inputType="text",
+                width="span4",
+                help=Some("yyyy-MM-dd HH:mm in PST"),
+                fields=fields
+              )
+              @formField(
+                id="discountAmount",
+                label="Discount Amount",
+                inputType="text",
+                width="span4",
+                help=Some("eg, 5 for $5 discount, or 5 for 5% discount"),
+                fields=fields
+              )
+              @formOption(
+                name="discountTypeString",
+                label="Discount Type",
+                selected=coupon.discountType.name,
+                optionList=models.enums.CouponDiscountType.asStrList
+              )
+              @formOption(
+                name="couponTypeString",
+                label="Type",
+                selected=coupon.couponType.name,
+                optionList=models.enums.CouponType.asStrList
+              )
+              @formOption(
+                name="usageTypeString",
+                label="Usage",
+                selected=coupon.usageType.name,
+                optionList=models.enums.CouponUsageType.asStrList
+              )
+
+              <input id="restrictions" name="restrictions" type="hidden" value="@coupon.restrictions">
+              @** 
+              <div class="clearfix">
+                <label for="restrictions">Restrictions</label>
+                <div class="input">
+                  <textarea class="xlarge" id="restrictions" name="restrictions" rows="3">@coupon.restrictions</textarea>
+                  <span class="help-block">Must be in JSON format, ie: {"celebrityIds" : [1,2,3]}</span>
+                </div>
+              </div>
+              *@
+              
+            </fieldset>
+            <hr/>
+            <div class="actions">
+              @tags.arrow_button(caption="Save")  
+              <button type="reset" class="button">
+                <strong><em>Reset</em></strong><span>&raquo;</span>
+              </button>     
+              @errorMessage(errorFields)
+            </div>
+          }
+        </div>
+
+      </div>
+      @if(coupon.usageType == models.enums.CouponUsageType.OneUse) {
+        @valueRow(label="Has this coupon been used?", value={!coupon.isActive})
+      }
+    </div>    
+  </div>
+</section>
+}
+
+@base_template(title="Admin - Coupon Details", body=body)

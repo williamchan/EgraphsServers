@@ -56,17 +56,17 @@ object Email extends Controller {
     Ok(views.html.frontend.email_account_confirmation())
   }
 
-//  def mlbStatic = Action {
-////    Redirect(routes.RemoteAssets.at("html/email_mlb_marketing_static.html"))
-//    Ok(views.frontend.mlbmail())
-//  }
-//
-//  def celebrity_welcome_email = {
-//    val publicName = "Rodney Strong"
-//    val email = "rstrong@fantastic.com"
-//    Ok(views.frontend.html.celebrity_welcome_email(
-//      celebrityName = publicName,
-//      celebrityEmail = email
-//      ))
-//  }
+  def mlbStatic = Action {
+    Redirect(routes.EgraphsAssets.at("html/email_mlb_marketing_static.html"))
+  }
+  
+  def celebrity_welcome_email = Action {
+    val publicName = "Rodney Strong"
+    val email = "rstrong@fantastic.com"
+    Ok(views.html.frontend.celebrity_welcome_email(
+      celebrityName = publicName,
+      celebrityEmail = email,
+      appPlistUrl = "//path/to/app"
+    ))
+  }
 }

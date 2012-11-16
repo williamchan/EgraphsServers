@@ -4,6 +4,7 @@ import enums.EgraphState
 import utils._
 import services.AppConfig
 import services.blobs.Blobs
+import services.print.LandscapeFramedPrint
 import Blobs.Conversions._
 
 class PrintOrderTests extends EgraphsUnitTest
@@ -40,8 +41,9 @@ class PrintOrderTests extends EgraphsUnitTest
 
     egraph = egraph.withEgraphState(EgraphState.ApprovedByAdmin).save()
     val pngUrl: Option[String] = printOrder.getPngUrl
-    pngUrl.get should endWith("blob/files/egraphs/" + egraph.id + "/image/signing-origin-offset-0x0_global-width-2160px-v1.png")
-    TestHelpers.getBlobFromTestBlobUrl(pngUrl.get).get.asByteArray.length should be(13863)
+    pngUrl.get should endWith("blob/files/egraphs/" + egraph.id + "/image/signing-origin-offset-0x0_global-width-" + 
+        LandscapeFramedPrint.targetEgraphWidth  + "px-v1.png")
+    TestHelpers.getBlobFromTestBlobUrl(pngUrl.get).get.asByteArray.length should be(13737)
   }
 
   "getFramedPrintImageData" should "return URL that points to framed-print sized image" in new EgraphsTestApplication {

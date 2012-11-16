@@ -3,7 +3,7 @@ package controllers.website.admin
 import play.api.mvc.Controller
 import models.{AccountStore, CelebrityStore, Celebrity}
 import models.enums.PublishedStatus
-import models.filters._
+import models.categories._
 import controllers.WebsiteControllers
 import services.http.ControllerMethod
 import services.http.filters.HttpFilters
@@ -20,7 +20,7 @@ private[controllers] trait GetCelebrityAdminEndpoint extends ImplicitHeaderAndFo
   protected def httpFilters: HttpFilters
   protected def accountStore: AccountStore
   protected def celebrityStore: CelebrityStore
-  protected def filterValueStore: FilterValueStore  
+  protected def categoryValueStore: CategoryValueStore  
 
   def getCelebrityAdmin(celebrityId: Long) = controllerMethod.withForm() { implicit authToken =>
     httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
@@ -42,15 +42,15 @@ private[controllers] trait GetCelebrityAdminEndpoint extends ImplicitHeaderAndFo
               ("publicName" -> celebrity.publicName) + 
               ("publishedStatusString" -> celebrity.publishedStatus.toString)
               val (errorFields, fieldDefaults) = getCelebrityDetail(celebrity = Some(celebrity))
-              val celebFilterValueIds = (for(filterValue <- celebrity.filterValues) yield { filterValue.id }).toSet
+              val celebCategoryValueIds = (for(filterValue <- celebrity.categoryValues) yield { filterValue.id }).toSet
 
               Ok(views.html.Application.admin.admin_celebritydetail(
                 isCreate = false,
                 errorFields = errorFields,
                 fields = fieldDefaults,
                 celebrity = Option(celebrity),
-                currentFilterValueIds = celebFilterValueIds,
-                filterValueFilters = filterValueStore.findFilterValueFilterViewModel))
+                currentCategoryValueIds = celebCategoryValueIds,
+                categoryValueCategories = categoryValueStore.findCategoryValueCategoryViewModel))
             }
           case _ => NotFound("No such celebrity")
         }
@@ -67,8 +67,8 @@ private[controllers] trait GetCelebrityAdminEndpoint extends ImplicitHeaderAndFo
           isCreate = true, errorFields = errorFields,
           fields = fieldDefaults,
           celebrity = None,
-          currentFilterValueIds = Set[Long](),
-          filterValueFilters = List[(FilterValue, Filter)]())
+          currentCategoryValueIds = Set[Long](),
+          categoryValueCategories = List[(CategoryValue, Category)]())
         )
       }
     }
@@ -83,13 +83,13 @@ private[controllers] trait GetCelebrityAdminEndpoint extends ImplicitHeaderAndFo
       (paramName: String) => paramName match {
         case "celebrityId" => flash.get("celebrityId").getOrElse("")
         case "celebrityEmail" => flash.get("celebrityEmail").getOrElse("")
-        case "bio" => StringEscapeUtils.escapeHtml4(flash.get("bio").getOrElse(""))
-        case "casualName" => StringEscapeUtils.escapeHtml4(flash.get("casualName").getOrElse(""))
-        case "organization" => StringEscapeUtils.escapeHtml4(flash.get("organization").getOrElse(""))
-        case "publicName" => StringEscapeUtils.escapeHtml4(flash.get("publicName").getOrElse(""))
+        case "bio" => (flash.get("bio").getOrElse(""))
+        case "casualName" => flash.get("casualName").getOrElse("")
+        case "organization" => flash.get("organization").getOrElse("")
+        case "publicName" => flash.get("publicName").getOrElse("")
         case "publishedStatusString" => flash.get("publishedStatusString").getOrElse(PublishedStatus.Unpublished.toString)
-        case "roleDescription" => StringEscapeUtils.escapeHtml4(flash.get("roleDescription").getOrElse(""))
-        case "twitterUsername" => StringEscapeUtils.escapeHtml4(flash.get("twitterUsername").getOrElse(""))
+        case "roleDescription" => flash.get("roleDescription").getOrElse("")
+        case "twitterUsername" => flash.get("twitterUsername").getOrElse("")
         case _ => flash.get(paramName).getOrElse("")
       }
     } 

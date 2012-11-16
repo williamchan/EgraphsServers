@@ -6,7 +6,7 @@ import forms.purchase.{PurchaseFormChecksFactory, FormReaders, PurchaseFormFacto
 import services.mail.{BulkMailList, TransactionalMail}
 import services.payment.Payment
 import models._
-import models.filters._
+import models.categories._
 import services.db.DBSession
 import play.api.mvc.Controller
 import controllers.website.AllWebsiteEndpoints
@@ -52,7 +52,8 @@ case class TestWebsiteControllers @Inject()(
   override def enrollmentBatchStore = instance[EnrollmentBatchStore]
   override def schema = instance[Schema]
   override def inventoryBatchStore = instance[InventoryBatchStore]
-  override def egraphStore = instance[EgraphStore]  
+  override def egraphStore = instance[EgraphStore]
+  override def couponStore = instance[CouponStore]  
   override def accountSettingsForms = instance[AccountSettingsFormFactory]
   override def accountPasswordResetForms = instance[AccountPasswordResetFormFactory]
   override def accountRecoverForms = instance[AccountRecoverFormFactory]
@@ -66,8 +67,9 @@ case class TestWebsiteControllers @Inject()(
   override def catalogStarsQuery = instance[CatalogStarsQuery]
   override def orderCompleteViewModelFactory = instance[OrderCompleteViewModelFactory]
   override def egraphQueryFilters = instance[EgraphQueryFilters]
-  override def filterStore = instance[FilterStore]
-  override def filterValueStore = instance[FilterValueStore]
+  override def categoryStore = instance[CategoryStore]
+  override def categoryValueStore = instance[CategoryValueStore]
+  override def couponQueryFilters = instance[CouponQueryFilters]
   override def inventoryBatchQueryFilters = instance[InventoryBatchQueryFilters]
   override def orderQueryFilters = instance[OrderQueryFilters]
   override def printOrderQueryFilters = instance[PrintOrderQueryFilters]

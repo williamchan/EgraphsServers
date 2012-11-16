@@ -87,7 +87,7 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
             productTitle = product.name,
             celebrityWillWrite = textCelebWillWrite,
             recipientName = validPersonalizeForm.recipientName,
-            noteToCelebrity = validPersonalizeForm.noteToCelebriity,
+            noteToCelebrity = validPersonalizeForm.noteToCelebrity,
             basePrice = product.price,
             guaranteedDelivery = inventoryBatch.getExpectedDate,
             highQualityPrintParamName = Params.HighQualityPrint,
