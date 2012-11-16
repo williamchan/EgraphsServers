@@ -495,6 +495,17 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
     // join across all celebrities since we can filter some with the text search first.
     val queryString = """
     SELECT
+     stuff2.celebrityid,
+     stuff2.publicname,
+     stuff2.roledescription,
+     stuff2._landingpageImageKey,
+     min(stuff2.minProductPrice) AS minProductPrice,
+     max(stuff2.maxProductPrice) AS maxProductPrice,
+     sum(stuff2.inventory_sold) AS inventory_sold,
+     sum(stuff2.inventory_total) AS inventory_total,
+     sum(stuff2.inventoryAvailable) AS inventoryAvailable
+    FROM (
+    SELECT
      stuff.celeb_id AS celebrityid,
      stuff.celeb_publicname AS publicname,
      stuff.celeb_roledescription AS roledescription,
@@ -506,7 +517,7 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
      stuff.inventory_total,
      stuff.inventory_total - sum(stuff.is_order) AS inventoryAvailable
     FROM (
-    
+
     SELECT
      c.id AS celeb_id,
      c.publicname AS celeb_publicname,
@@ -531,14 +542,32 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
      ib.enddate > now() AND
      mv.to_tsvector @@ plainto_tsquery('english', {textQuery})
     ORDER BY is_order ASC
-    
     ) AS stuff
     GROUP BY celeb_id, celeb_publicname, celeb_roledescription, celeb_landingpageImageKey, inventorybatch_id, inventory_total
-    ORDER BY celeb_id;
-    """
+  ) AS stuff2
+  GROUP BY celebrityid, publicname, roledescription, _landingpageImageKey
+  """
 
+    import CelebritySortingTypes._
+
+    val sortedQueryString = {
+      sortType match {
+        case RecentlyAdded => 
+          // this may not be 100% accurate, but gives a gauge of when then have been added to our systems,
+          // to do better would have to include their publish date along with when their products were published to
+          // figure this out, and we don't have all that in our database now.
+          queryString + "ORDER BY celebrityid DESC"
+        case MostPopular => queryString + "ORDER BY inventory_sold DESC"
+        case PriceAscending => queryString + "ORDER BY minProductPrice ASC"
+        case PriceDecending => queryString + "ORDER BY maxProductPrice DESC"
+        case Alphabetical => queryString + "ORDER BY publicname ASC"
+        case ReverseAlphabetical => queryString + "ORDER BY publicname DESC"
+        case _ => queryString + "ORDER BY celeb_id ASC"
+      }
+    } + ";"
+      
     val rowStream = SQL(
-      queryString
+      sortedQueryString
     ).on("textQuery" -> query).apply()(connection = schema.getTxnConnectionFactory)
 
     for (row <- rowStream) yield {
