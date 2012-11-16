@@ -42,17 +42,19 @@ class CelebrityStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
   }
 
   // This test ensures that queries return results but makes no guarantees on the quality of search results
-  "findByTextQuery" should "return celebrities matching the text query" in {
+  "search" should "return celebrities matching the text query" in {
     val celeb = TestData.newSavedCelebrity().withPublishedStatus(PublishedStatus.Published)
-    val results = instanceUnderTest.findByTextQuery(celeb.publicName)
+    instanceUnderTest.rebuildSearchIndex
+    val results = instanceUnderTest.search(celeb.publicName)
 
     results.isEmpty should be(false)
   }
 
   // This test ensures that queries return results but makes no guarantees on the quality of search results
-  "findByTextQuery" should "return 0 celebrities matching the empty string" in {
+  it should "return 0 celebrities matching the empty string" in {
     TestData.newSavedCelebrity().withPublishedStatus(PublishedStatus.Published)
-    val results = instanceUnderTest.findByTextQuery("")
+    instanceUnderTest.rebuildSearchIndex
+    val results = instanceUnderTest.search("")
 
     results.isEmpty should be(true)
   }

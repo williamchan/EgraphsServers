@@ -127,6 +127,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
   
   private def getVerticals(activeCategoryValues: Set[Long] = Set()) : List[VerticalViewModel] = {
     val categoryValues = categoryValueStore.all().toList
+// TODO manage these verticals properly.     
 //    List(
 //      VerticalViewModel(
 //       verticalName = "Major-League-Baseball",
