@@ -9,11 +9,16 @@ create table VideoAsset (
     created timestamp not null
   );
 create sequence s_VideoAsset_id;
+
 create table VideoAssetCelebrity (
     videoId bigint not null,
     id bigint primary key not null,
     celebrityId bigint not null
   );
 create sequence s_VideoAssetCelebrity_id;
+create unique index idx93d20a8c on VideoAssetCelebrity (videoId);
+
+alter table VideoAssetCelebrity add constraint VideoAssetCelebrityFK7 foreign key (videoId) references VideoAsset(id);
+alter table VideoAssetCelebrity add constraint VideoAssetCelebrityFK8 foreign key (celebrityId) references Celebrity(id);
 
 # --- !Downs

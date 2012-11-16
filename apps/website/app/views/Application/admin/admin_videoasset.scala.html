@@ -3,6 +3,7 @@
   footerData: models.frontend.footer.FooterData)
   
 @import views.html.frontend.base_template 
+@import egraphs.authtoken.AuthenticityToken.safeForm
 
 @body = {
 <section id="content" class="top" role="main">
@@ -10,12 +11,17 @@
     <div class="container" id="celebrity-admin">	
       <h1> Test Video Uploader </h1>
 
-        @helper.form(action = routes.ApiControllers.postVideoAsset, 'enctype -> "multipart/form-data") {
+        @safeForm('id -> "upload-video-form", 'method -> "POST", 'action -> (routes.WebsiteControllers.postVideoAsset).url, 'enctype -> "multipart/form-data") {
 
-          <input type="file" name="video" />
-          <input type="text" name="celebrityId" />
-          <input type="submit" name="submit" /> 
-        }
+          <fieldset>
+            <button type="file" id="select-file-button" name="video" class="btn primary fade in">Choose File</button>
+            <input type="text" name="celebrityId" />
+            
+            <div class="actions">
+              <button type="submit" id="submit-video-button" class="btn primary fade in">Submit</button>
+            </div>
+          </fieldset> 
+        }        
     </div>
   </div>
 </section>

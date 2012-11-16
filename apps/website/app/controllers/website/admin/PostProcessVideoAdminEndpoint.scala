@@ -26,12 +26,12 @@ trait PostProcessVideoAdminEndpoint {
 
           val maybeVideoStatus = VideoStatus(action)
           maybeVideoStatus match {
-            case None => BadRequest("Unknown action")
+            case None => BadRequest("Unknown action: " + action)
             case Some(maybeVideoStatus) => {
 
               val maybeVideoAsset = videoAssetStore.findById(id)
               maybeVideoAsset match {
-                case None => BadRequest("The video asset with given ID was not found.")
+                case None => BadRequest("The video asset with ID " + id + " was not found.")
                 case Some(videoAsset) => {
                   videoAsset.withVideoStatus(maybeVideoStatus).save()
                   Redirect(controllers.routes.WebsiteControllers.getUnprocessedVideosAdmin)

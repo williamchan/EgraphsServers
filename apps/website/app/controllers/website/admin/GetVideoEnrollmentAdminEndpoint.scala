@@ -43,18 +43,18 @@ private[controllers] trait GetVideoEnrollmentAdminEndpoint extends ImplicitHeade
 
             val videos = videoAssetStore.getVideosWithStatus(VideoStatus.Unprocessed)
 
-            val videosAndPublicNames: List[(VideoAsset, String)] = for (video <- videos) yield {
+            val maybeVideosAndPublicNames: List[(VideoAsset, Option[String])] = for (video <- videos) yield {
               val maybeCelebrity: Option[Celebrity] = videoAssetCelebrityStore.getCelebrityByVideoId(video.id)
               val maybePublicName = maybeCelebrity.map(_.publicName)
-
-              val publicName = maybePublicName match {
-                case None => ""
-                case Some(maybePublicName) => maybePublicName
-              }
-
-              (video, publicName)
+              (video, maybePublicName)
             }
-            Ok(views.html.Application.admin.admin_unprocessedvideos(videosAndPublicNames))
+
+            if (maybeVideosAndPublicNames.exists { case (_, maybePublicName) => maybePublicName.isEmpty })
+              InternalServerError("There was at least one video with no associated celebrity public name")
+            else {
+              val videosAndPublicNames = maybeVideosAndPublicNames.map { case (video, maybePublicName) => (video, maybePublicName.get) }
+              Ok(views.html.Application.admin.admin_unprocessedvideos(videosAndPublicNames))
+            }
           }
       }
     }
