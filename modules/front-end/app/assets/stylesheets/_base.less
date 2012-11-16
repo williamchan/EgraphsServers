@@ -119,6 +119,26 @@ div.ribbon {
 	}
 } // end ribbons
 
+/* Pagination (overrides) */
+
+.pagination {
+
+  font-size: .875em;
+  text-align: center;
+  
+  a {
+  
+    color: @gray;
+    line-height: 2em;
+    
+    &:hover { color: @orange; }
+    
+  }
+  
+  .disabled a, .active a { color: @grayLighter; }
+    
+}
+
 /* !Buttons */
 
 button  {

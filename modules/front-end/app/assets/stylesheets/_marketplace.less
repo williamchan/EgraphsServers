@@ -60,7 +60,7 @@
 	    
 	    .nav {
 	    
-  	    margin-top: 10px;
+  	    // margin-top: 10px;
 
   	    h2 {
           text-transform: uppercase;
@@ -76,33 +76,92 @@
           list-style: none;
           margin: 0;
           padding: 0;
-          font-size: .75em;
-          line-height: 1.25em;
           
           li {   
+ 
+            font-size: .75em;
+            line-height: 1.5em; 
                  
-            line-height: 1.25em;
-            margin-bottom: 0;
-            
-            ol {
-            
-              font-size: 1em;
-              padding-left: 1em;
-              
-            }
-
             a {
               color: @grayLight;
-              border-bottom: 1px solid transparent;
               
-              &:hover {
-                color: @orange;
-                border-bottom-color: lighten(@orange, 30%);
+              &:hover { color: @orange; }
+
+              &.category {
+                font-weight: 800;
               }
               
               &.active {
                 font-weight: 800;
                 color: @orange;
+              }
+              
+            }
+            
+            ol {
+              
+              li {
+                
+                font-size: 1em;
+                line-height: 1.5em;
+              
+                a {
+                  
+                  cursor:pointer;
+                  display: block;                
+                  padding-left: .5em;
+                  .clearfix();
+
+                  span {
+                    display: block;
+                    float: left;
+                    padding: .25em 1em;
+                  }
+                  
+                  i {            
+                    display: block;
+                    float: left;
+                    width: 1.5em;
+                    text-align: center;
+                    font-style: normal;
+                    font-weight: 800;
+                    padding: .25em;
+                    visibility: hidden;  
+                    background: lighten(@gray, 45%);
+                    .border-radius(5px 0 0 5px);    
+                  }
+
+                  &.condensed {
+                    display: none;
+                  }
+
+                  &.show-all {
+                    font-weight: 800;
+                  }
+  
+                  &.active {
+                  
+                    margin-left: -2.5em;
+                    padding-left: 0;
+                  
+                    color: @gray;
+                    text-shadow: 0 1px 0 @white;
+
+                    &:hover {
+    
+                      span {
+                        background: lighten(@gray, 50%);
+                        .border-radius(0 5px 5px 0);
+                      }
+                      
+                      i { visibility: visible; }
+                    
+                    }
+
+                  }
+  
+                }
+              
               }
               
             }
@@ -118,12 +177,22 @@
   	    display: none;
   	    margin-bottom: 20px;
   	    margin-left: 2%;
+
+        h2 {
+          text-transform: uppercase;
+          font-size: .75em;
+          line-height: 1.25em;
+          font-weight: 600;
+          margin-bottom: .5em;
+          color: @gray;
+        }
   	    
 	    }
 	    
 	    .main {
 	      
 	      .top-verticals-nav {
+	       
 	        display: none;
 	        float: left;
 	        width: 98%;
@@ -228,6 +297,8 @@
 	              }
 	              
 	              a {
+
+                  cursor:pointer;
 	
 	                color: @grayLight;
 	                
@@ -281,7 +352,9 @@
 	              }
 	              
 	              &.grid a {
-	                                
+
+                  cursor:pointer;
+
 	                i {
 	                  display: block;
 	                  float: left;
@@ -301,6 +374,8 @@
 	              }
 	              
 	              &.list a {
+
+                  cursor:pointer;
 	              
 	                margin-top: 1px;
 	                
@@ -389,6 +464,73 @@
   	   
   	        	      
 	      } // end .alpha-list
+	      
+	      .filters {
+
+  	      font-weight: 600;
+  	      text-shadow: 0 1px 0 @white;
+  	      text-transform: uppercase;
+  	      font-size: .75em;
+  	      line-height: 1em;
+	        border-top: 1px solid @white;
+	        padding: .75em 0; 
+  	      border-bottom: 1px solid lighten(@gray, 50%);	   
+  	      
+  	      ol {
+  	      
+    	      .clearfix();
+    	      padding: 0 2%;
+    	      margin: 0;
+    	      list-style: none;
+    	    
+    	      li {
+    	        cursor: default;
+      	      float: left;
+      	      margin-right: 1.75em;
+              margin-botton: 3px;
+              margin-top: 3px;
+      	      &:last-child { margin-right: 0; }
+    
+              a {
+                
+                cursor:pointer;
+                color: @black;
+                &:hover { color: @orange; }
+                
+              }
+      	      
+      	      span {
+
+        	      .inline-block;
+        	      position: relative;
+        	      padding: .25em 0 .25em .75em;
+        	      background: lighten(@gray, 50%);
+        	      
+        	      i {      	      
+        	       padding-left: .5em;
+        	       font-style: normal;       
+        	      }
+        	      
+                &:after {
+                  content: ' ';
+                  position: absolute;
+                  width: 0;
+                  height: 0;
+                  right: -2em;
+                  top: 0;
+                  border-width: 1.25em 1em;
+                  border-style: solid;
+                  border-color: transparent transparent transparent lighten(@gray, 50%);
+                }
+
+      	      }
+      	      
+    	      }
+    	      
+  	      }     
+	        
+	         	      
+	      } // end .filters
 	 
 	      .verticals {
 	      
@@ -709,6 +851,8 @@
         .nav { display: none; }
         
         .mobile-nav { display: block; }
+
+        .filters { display: none; }
       
       }
     

@@ -47,23 +47,9 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         active = (Some(sortingType) == selectedSortingType))
     }
   }
-
-  def getMarketplaceVerticalPage(verticalname: String) =  controllerMethod.withForm() { implicit authToken =>
-    Action { implicit request =>
-     //Map Vertical to specific landing page.
-       Ok(views.html.frontend.marketplace_landing(
-         //TODO Fix this queryUrl thing 
-           queryUrl = "",
-         marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage.url,
-         verticalViewModels = getVerticals(),
-         results = List[ResultSetViewModel](),
-         categoryViewModels = List[CategoryViewModel](),
-         sortOptions = sortOptionViewModels() 
-       ))
-      
-    }
-  }
-
+  /**
+   * Serves up marketplace results page. If there are no query arguments, featured celebs are served. 
+   **/
   def getMarketplaceResultPage = controllerMethod.withForm() { implicit AuthToken => 
     Action { implicit request =>
       // Determine what search options, if any, have been appended
@@ -87,17 +73,27 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         (queryOption match {
           case Some(query) => ("Showing Results for \"" + query + "\"...", celebrityStore.marketplaceSearch(queryOption, categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostPopular)))
           case _ =>
-            if(activeCategoryValues.isEmpty) {
+            if(!activeCategoryValues.isEmpty) {
               ("Results", celebrityStore.marketplaceSearch(queryOption, categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostPopular)))
             } else {
-              ("Featured Celebrities" , celebrityStore.getFeaturedPublishedCelebrities.map(c => c.asMarketplaceCelebrity(100,100, true)))
+              //TODO when refinements are implemented we can do this using tags instead.  
+              ("Featured Celebrities" , celebrityStore.getFeaturedPublishedCelebrities.map{c => 
+
+                val activeProductsAndInventory = c.getActiveProductsWithInventoryRemaining()
+                val purchaseableProducts = activeProductsAndInventory.filter {
+                  productAndCount => productAndCount._2 > 0
+                }
+                val prices = purchaseableProducts.map(p => p._1.priceInCurrency.toInt)
+                c.asMarketplaceCelebrity(prices.min, prices.max, purchaseableProducts.isEmpty)
+              })
             }
         })
 
       val viewAsList = viewOption == Some("list")
 
+      //HACK As long as no CategoryValues have children Categories, this call ca be used to display
+      // only baseball categories. This NEEDS to be fixed if we want to support multiple verticals. 
       val categoryValues = categoryValueStore.all().toList
-      //TODO: Note that this still needs to be filtered.
 
       val categoryViewModels = for {
         categoryValue <- categoryValues
@@ -106,11 +102,14 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         CategoryViewModel(
           id = category.id,
           publicName = category.publicName,
-          categoryValues = category.categoryValues.map(cv =>
+          categoryValues = category.categoryValues.map( cv =>
             CategoryValueViewModel(
               publicName = cv.publicName,
               id = cv.id,
-              active = activeCategoryValues.contains(cv.id))))
+              active = activeCategoryValues.contains(cv.id)
+            )
+          )
+        )
       }
 
       Ok(views.html.frontend.marketplace_results(
@@ -127,16 +126,23 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
   
   private def getVerticals(activeCategoryValues: Set[Long] = Set()) : List[VerticalViewModel] = {
     val categoryValues = categoryValueStore.all().toList
-//    List(
-//      VerticalViewModel(
-//       verticalName = "Major-League-Baseball",
-//       publicName = verticalMlb.publicName,
-//       shortName = "MLB",
-//       iconUrl = "images/icon-logo-mlb.png",
-//       id = 4,
-//       active =  true
-//      )
-//    )
+// TODO manage these verticals properly.     
     List()
   }
+
+    // TODO implement landing pages for verticals. 
+  // def getMarketplaceVerticalPage(verticalname: String) =  controllerMethod.withForm() { implicit authToken =>
+  //   Action { implicit request =>
+  //    //Map Vertical to specific landing page.
+  //      Ok(views.html.frontend.marketplace_landing(
+  //        //TODO Fix this queryUrl thing 
+  //          queryUrl = "",
+  //        marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage.url,
+  //        verticalViewModels = getVerticals(),
+  //        results = List[ResultSetViewModel](),
+  //        categoryViewModels = List[CategoryViewModel](),
+  //        sortOptions = sortOptionViewModels() 
+  //      ))     
+  //   }
+  // }
 }

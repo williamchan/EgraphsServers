@@ -1,0 +1,3 @@
+VERSION: 3c4f99056f78b7def9b4e3d982e89d9bf9d5ddee
+DEPLOYED ON: Thu Nov 15 15:46:28 PST 2012
+BY: Siegfried Bilstein, with all the love and support of the Egraphs team <3.

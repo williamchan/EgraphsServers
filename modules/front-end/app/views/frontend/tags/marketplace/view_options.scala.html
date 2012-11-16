@@ -16,7 +16,7 @@
     
     <form class="picker">
       
-      <select class="chsn-select" id="sort-select">
+      <select id="sort-select">
       @for(sortOption <- sortOptions) {     
         <option @if(sortOption.active){selected} value="@sortOption.name">@sortOption.display</option>
       }  
