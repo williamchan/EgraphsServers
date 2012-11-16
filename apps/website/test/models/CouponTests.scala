@@ -44,7 +44,14 @@ class CouponTests extends EgraphsUnitTest
   }
   
   "save" should "save lower-cased code" in {
-    Coupon(code = "LOWERCASE").save().code should be("lowercase")
+    val code = Coupon.generateCode
+    Coupon(code = code.toUpperCase).save().code should be(code.toLowerCase)
+  }
+  
+  "save" should "throw exception if a valid coupon with the same code already exists" in {
+    val code = Coupon().save().code
+    val exception = intercept[IllegalArgumentException] {Coupon(code = code).save()}
+    exception.getLocalizedMessage should include("A valid coupon with that code already exists")
   }
   
   "save" should "throw exception if discountType is Flat but discountAmount is not greater than 0" in {

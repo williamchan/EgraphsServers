@@ -19,7 +19,7 @@
 
 @import egraphs.authtoken.AuthenticityToken.safeForm
 
-@{/** The review order page in the purchase flow. This is also where they choose whether to
+@**   The review order page in the purchase flow. This is also where they choose whether to
       buy a physical print or not.
 
       celebrityName - the name of the celebrity
@@ -36,7 +36,7 @@
       highQualityPrint - whether to check or not to check the print option check
           box by default
       actionUrl - the target at which to post the selected printing option.
-*/}
+*@
 
 @import _root_.frontend.formatting.MoneyFormatting.Conversions._
 @import _root_.frontend.formatting.DateFormatting.Conversions._
@@ -83,7 +83,7 @@
 	
 	  		@safeForm('action ->  actionUrl, 'method -> "post", 'class -> "wrap") {
 	  			<div class="clearfix">
-        		@{/**  <p class="price right">@basePrice.formatSimply</p> */}
+        		@**    <p class="price right">@basePrice.formatSimply</p> *@
 			  		<div class="left">
               <h2>Your message to @celebrityName:</h2>
               <p>@noteToCelebrity.getOrElse {<i>None provided</i>}</p>

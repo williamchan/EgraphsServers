@@ -79,7 +79,8 @@ object Personalize extends Controller with DefaultImplicitTemplateParameters {
       recipientName=default.recipientName.copy(error=error),
       recipientEmail=default.recipientEmail.copy(error=error),
       messageText=default.messageText.copy(error=error),
-      noteToCelebrity=default.noteToCelebrity.copy(error=error)
+      noteToCelebrity=default.noteToCelebrity.copy(error=error),
+      coupon=default.coupon.copy(error=error)
     )
   }
 

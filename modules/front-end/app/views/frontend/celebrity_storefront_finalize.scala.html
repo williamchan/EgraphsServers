@@ -7,10 +7,10 @@
   storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs,
   authToken: egraphs.authtoken.AuthenticityToken
 )
-@{/** Renders the final page in the purchase flow.
+@**   Renders the final page in the purchase flow.
 
       model - the ViewModel for rendering the page.
-*/}
+*@
 
 @import egraphs.authtoken.AuthenticityToken.safeForm
 @import views.html.frontend.tags.storefront_breadcrumbs_responsive
@@ -22,7 +22,7 @@
     paymentJsModule: "@model.billing.paymentJsModule",
     paymentToken: "@model.billing.paymentToken",
     paymentApiKey: "@model.billing.paymentApiKey",
-    totalAmount: "@model.price.total.getAmount"
+    totalAmount: @model.price.total.getAmount
   }
 }
 

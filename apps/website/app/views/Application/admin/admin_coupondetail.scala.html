@@ -14,7 +14,6 @@
 @import views.html.Application.tags.formOption
 @import views.html.Application.tags.valueRow
 @import views.html.frontend.tags
-@import views.html.frontend.tags.ng
 @import views.html.frontend.base_template
 
 
@@ -96,7 +95,7 @@
               )
 
               <input id="restrictions" name="restrictions" type="hidden" value="@coupon.restrictions">
-              @{/**
+              @** 
               <div class="clearfix">
                 <label for="restrictions">Restrictions</label>
                 <div class="input">
@@ -104,7 +103,7 @@
                   <span class="help-block">Must be in JSON format, ie: {"celebrityIds" : [1,2,3]}</span>
                 </div>
               </div>
-              **/}
+              *@
               
             </fieldset>
             <hr/>

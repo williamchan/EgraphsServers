@@ -27,7 +27,7 @@ private[controllers] trait GetCouponAdminEndpoint extends ImplicitHeaderAndFoote
         couponStore.findById(couponId) match {
           case Some(coupon) =>
             getCouponDetailHtml(coupon)
-          case _ => NotFound("No such coupon")
+          case None => NotFound("No such coupon")
         }
       }
     }
@@ -41,7 +41,7 @@ private[controllers] trait GetCouponAdminEndpoint extends ImplicitHeaderAndFoote
     }
   }
   
-  private def getCouponDetailHtml(coupon: Coupon)(implicit request: Request[AnyContent], authToken: AuthenticityToken): Result = {
+  private def getCouponDetailHtml(coupon: Coupon)(implicit request: RequestHeader, authToken: AuthenticityToken): Result = {
 	val errorFields = flash.get("errors").map(errString => errString.split(',').toList)
 
     val fieldDefaults: (String => String) = {

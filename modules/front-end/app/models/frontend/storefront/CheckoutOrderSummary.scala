@@ -15,7 +15,7 @@ import org.joda.money.Money
  * @param basePrice the base price of the product
  * @param shipping cost of shipping
  * @param tax cost in tax
- * @param discount
+ * @param discount reduction to total as positive money
  * @param total total cost of the purchase.
  */
 case class CheckoutOrderSummary(

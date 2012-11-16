@@ -25,27 +25,23 @@ private[controllers] trait GetCouponsAdminEndpoint extends ImplicitHeaderAndFoot
       Action { implicit request =>
         
         // get query parameters
-        val page: Int = Form("page" -> number).bindFromRequest.fold(formWithErrors => 1, validForm => validForm)
-        val filter: String = Form("filter" -> text).bindFromRequest.fold(formWithErrors => "unlimitedActive", validForm => validForm)
+        val page = Form("page" -> number).bindFromRequest.fold(formWithErrors => 1, validForm => validForm)
+        val filter = Form("filter" -> text).bindFromRequest.fold(formWithErrors => "unlimitedActive", validForm => validForm)
         
         val query = filter match {
-          case "oneUseActive" => couponStore.findByFilter(couponQueryFilters.oneUse, couponQueryFilters.activeByDate, couponQueryFilters.activeByFlag)
-          case "unlimitedActive" => couponStore.findByFilter(couponQueryFilters.unlimited, couponQueryFilters.activeByDate, couponQueryFilters.activeByFlag)
+          case "oneUseActive" => couponStore.findByFilter(
+              couponQueryFilters.oneUse, couponQueryFilters.activeByDate, couponQueryFilters.activeByFlag)
+          case "unlimitedActive" => couponStore.findByFilter(
+              couponQueryFilters.unlimited, couponQueryFilters.activeByDate, couponQueryFilters.activeByFlag)
           case "all" => couponStore.findByFilter()
           case _ => couponStore.findByFilter(couponQueryFilters.unlimited)
         }
         
         val pagedQuery: (Iterable[Coupon], Int, Option[Int]) = services.Utils.pagedQuery(select = query, page = page)
-        implicit val paginationInfo = PaginationInfoFactory.create(pagedQuery = pagedQuery, baseUrl = GetCouponsAdminEndpoint.url, filter = Option(filter))
+        implicit val paginationInfo = PaginationInfoFactory.create(
+            pagedQuery = pagedQuery, baseUrl = controllers.routes.WebsiteControllers.getCouponsAdmin.url, filter = Option(filter))
         Ok(views.html.Application.admin.admin_coupons(coupons = pagedQuery._1))
       }
     }
-  }
-}
-
-object GetCouponsAdminEndpoint {
-
-  def url() = {
-    controllers.routes.WebsiteControllers.getCouponsAdmin.url
   }
 }

@@ -114,7 +114,7 @@ object PersonalizeForm {
     recipientEmail: Option[String],
     writtenMessageRequest: WrittenMessageRequest,
     writtenMessageText: Option[String],
-    noteToCelebriity: Option[String],
+    noteToCelebrity: Option[String],
     coupon: Option[models.Coupon]
   )
 }

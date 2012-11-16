@@ -142,21 +142,24 @@ function(forms, payment, Egraphs) {
       $form.submit(function(event) {
         try {
           // If there is nothing to charge, then skip creation of Stripe token.
-          if (checkout.totalAmount == 0) { return false; }
-          
-          var expiration = expiryDates();
-          var tokenParams = {
-            number: cardNumber(),
-            cvc: cardCvc(),
-            exp_month: parseInt(expiration[0], 10),
-            exp_year: parseInt(expiration[1], 10)
-          };
-          
-          paymentModule.createToken(tokenParams, paymentResponseHandler);
-          
-          // Stop the form form submitting
-          return false;
-        } finally {
+          if (checkout.totalAmount === 0) {
+            return true; 
+          }
+          else {
+            var expiration = expiryDates();
+            var tokenParams = {
+              number: cardNumber(),
+              cvc: cardCvc(),
+              exp_month: parseInt(expiration[0], 10),
+              exp_year: parseInt(expiration[1], 10)
+            };
+            
+            paymentModule.createToken(tokenParams, paymentResponseHandler);
+            
+            // Stop the form form submitting
+            return false;
+          }
+        } catch (exception) {
           return false;
         }
       });

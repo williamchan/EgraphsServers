@@ -23,7 +23,7 @@ case class Coupon(id: Long = 0,
                   _discountType: String = CouponDiscountType.Flat.name,
                   _usageType: String = CouponUsageType.OneUse.name,
                   isActive: Boolean = true,
-                  restrictions: String = "{}",
+                  restrictions: String = "{}", // SER-508
                   created: Timestamp = Time.defaultTimestamp,
                   updated: Timestamp = Time.defaultTimestamp,
                   services: CouponServices = AppConfig.instance[CouponServices])
@@ -59,6 +59,7 @@ case class Coupon(id: Long = 0,
     }
   }
   
+//  SER-508
 //  /**
 //   * @return the amount that should be invoiced to the corporate account.
 //   * (to be implemented: corporate account)
@@ -71,9 +72,6 @@ case class Coupon(id: Long = 0,
 //    }
 //  }
   
-  //
-  // Public methods
-  //
   /**Persists by conveniently delegating to companion object's save method. */
   def save(): Coupon = {
     discountType match {
@@ -90,12 +88,15 @@ case class Coupon(id: Long = 0,
       }
     }
     
+    if (isActive) {
+      services.store.findValid(code).foreach(existingCoupon =>
+        require(existingCoupon.id == id, "A valid coupon with that code already exists.")
+      )
+    }
+    
     services.store.save(this)
   }
 
-  //
-  // KeyedCaseClass[Long] methods
-  //
   override def unapplied = Coupon.unapply(this)
   
   override def withCouponType(value: CouponType.EnumVal) = this.copy(_couponType = value.name)

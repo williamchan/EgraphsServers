@@ -43,7 +43,7 @@ object Finalize extends Controller with DefaultImplicitTemplateParameters {
     FinalizeBillingViewModel (
       name="{billing name}",
       email="{email}",
-      paymentToken="{paymentToken}",
+      paymentToken=Some("{paymentToken}"),
       postalCode="{billing postal code}",
       paymentJsModule="yes-maam-payment",
       paymentApiKey=Checkout.testStripeKey,

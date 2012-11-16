@@ -144,10 +144,7 @@ trait StorefrontPersonalizeConsumerEndpoints
                        }.right
         ) yield {
           // Everything looked good. Save the form into the cache and move on with life.
-          validated.coupon match {
-            case Some(c) => purchaseForms.withForm(form).withCouponId(c.id).save()
-            case None => purchaseForms.withForm(form).save()
-          }
+          purchaseForms.withForm(form).save()
 
           val defaultNextUrl = getStorefrontReview(celebrityUrlSlug, productUrlSlug).url
   

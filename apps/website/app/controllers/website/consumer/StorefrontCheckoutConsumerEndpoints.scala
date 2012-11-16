@@ -97,7 +97,7 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
               defaultBillingView
             }
             
-            val maybeCoupon = forms.couponId.map(id => couponStore.findById(id)).getOrElse(None)
+            val maybeCoupon = forms.coupon
             
             val orderSummary = CheckoutOrderSummary(
               celebrityName=celeb.publicName,

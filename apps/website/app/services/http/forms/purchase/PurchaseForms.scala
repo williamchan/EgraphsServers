@@ -35,8 +35,11 @@ class PurchaseForms @Inject()(
     storefrontSession[Long](Key.ProductId)
   }
   
-  def couponId: Option[Long] = {
-    storefrontSession[Long](Key.CouponId)
+  def coupon: Option[Coupon] = {
+    for (personalizeForm <- this.personalizeForm(None);
+    	 maybeCoupon <- personalizeForm.coupon.value;
+    	 coupon <- maybeCoupon
+    ) yield coupon
   }
 
   /**
@@ -83,10 +86,6 @@ class PurchaseForms @Inject()(
     this.withSession(storefrontSession.setting(Key.ProductId -> productId))
   }
   
-  def withCouponId(couponId: Long): PurchaseForms = {
-    this.withSession(storefrontSession.setting(Key.CouponId -> couponId))
-  }
-
   /**
    * The current cost of shipping the physical print (or possibly for the full physical
    * print). This will be None if no physical print has been ordered.
@@ -434,7 +433,6 @@ object PurchaseForms {
   object Key {
     val ProductId = "productId"
     val HighQualityPrint = "order.review.highQualityPrint"
-    val CouponId = "couponId"
   }
 
   /**

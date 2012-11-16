@@ -9,7 +9,7 @@ function(forms, payment, Egraphs) {
         
         // Populate the credit card field
         var $ccElem = $('.credit-card');
-        if (thisPage.totalAmount == 0) {
+        if (thisPage.totalAmount === 0) {
           $ccElem.text("No charge!");
 
         } else {

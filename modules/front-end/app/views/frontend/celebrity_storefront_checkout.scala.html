@@ -11,7 +11,7 @@
   authToken: egraphs.authtoken.AuthenticityToken
 )
 
-@{/** Renders the checkout page in the purchase flow. If the amount is zero due to discounts, then the credit card fields are hidden.
+@**   Renders the checkout page in the purchase flow. If the amount is zero due to discounts, then the credit card fields are hidden.
 
       form - the checkout form to render
       summary - an order summary for rendering
@@ -19,7 +19,7 @@
         in production this will always be Stripe, but for testing we sometimes use the
         yes-maam implementation. See payment.js for how this gets routed.
       paymentPublicKey - the key used to identify our requests to our payment provider.
-*/}
+*@
 
 @import egraphs.authtoken.AuthenticityToken.safeForm
 @import models.frontend.forms.{Field, FormError}
@@ -33,8 +33,8 @@
   Egraphs.page.checkout = {
     paymentJsModule: "@paymentJsModule",
     paymentApiKey: "@paymentPublicKey",
-    buyerPostalCodeFieldName: "@form.billing.postalCode.name"
-    totalAmount: "@summary.total.getAmount"
+    buyerPostalCodeFieldName: "@form.billing.postalCode.name",
+    totalAmount: @summary.total.getAmount
   }
 }
 
@@ -105,7 +105,7 @@
                        size=Some(10)                       
                     )
 
-                    @{/** Disable shipping type until we support it.
+                    @**  Disable shipping type until we support it.
                     <div class="field">
                       <div class="clearfix">
                         <label class="instructions" for="shipping-method">Shipping Method:</label>
@@ -118,7 +118,8 @@
                           <p><small>Estimated arrival is based on the delivery date of the digital Egraph. You will be notified when the printed Egraph has been shipped. <a href="#">Questions?</a></small></p>
                         </div>
                       </div>
-                    </div> <!-- end .field -->*/}
+                    </div> <!-- end .field -->
+                    *@
                                 
                   </fieldset>
                 }
@@ -202,7 +203,7 @@
                         <div class="input card-cvc">
                           <p>
                             <input id="card-cvc" type="text" name="card-cvc" class="inline" size="4">
-                            @{/** <small><a href="#" class="tip">What's this?</a></small> */}
+                            @**   <small><a href="#" class="tip">What's this?</a></small> *@
                             <div class="alert alert-error hidden">
                               <button type="button" class="close" data-dismiss="alert">&times;</button>
                               <span class="error-message"></span>

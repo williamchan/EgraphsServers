@@ -53,20 +53,15 @@ trait PostCouponAdminEndpoint extends Logging {
           val url = controllers.routes.WebsiteControllers.getCreateCouponAdmin.url
           Redirect(url).flashing(("errors" -> errors.mkString(", ")))
 	    }, validForm => {
-	      // enums have already been validated to exist
-	      val couponType = CouponType(validForm.couponTypeString).get
-	      val discountType = CouponDiscountType(validForm.discountTypeString).get
-	      val usageType = CouponUsageType(validForm.usageTypeString).get
-	      val startDateTimestamp = new Timestamp(dateFormat.parse(validForm.startDate).getTime + eightHours)
-	      val endDateTimestamp = new Timestamp(dateFormat.parse(validForm.endDate).getTime + eightHours)
 	      val coupon = Coupon(
 	          name = validForm.name,
 	          code = validForm.code,
-	          startDate = startDateTimestamp,
-	          endDate = endDateTimestamp,
+	          startDate = validForm.startDateTimestamp,
+	          endDate = validForm.endDateTimestamp,
 	          discountAmount = validForm.discountAmount,
 	          restrictions = validForm.restrictions
-	      ).withCouponType(couponType).withDiscountType(discountType).withUsageType(usageType).save()
+	      ).withCouponType(validForm.couponType).withDiscountType(validForm.discountType).withUsageType(validForm.usageType)
+	      .save()
 	      
           Redirect(controllers.routes.WebsiteControllers.getCouponAdmin(coupon.id).url)
         })
@@ -100,20 +95,15 @@ trait PostCouponAdminEndpoint extends Logging {
               val url = controllers.routes.WebsiteControllers.getCouponAdmin(couponId).url
               Redirect(url).flashing(("errors" -> errors.mkString(", ")))
 	        }, validForm => {
-	          // enums have already been validated to exist
-		      val couponType = CouponType(validForm.couponTypeString).get
-		      val discountType = CouponDiscountType(validForm.discountTypeString).get
-		      val usageType = CouponUsageType(validForm.usageTypeString).get
-		      val startDateTimestamp = new Timestamp(dateFormat.parse(validForm.startDate).getTime + eightHours)
-		      val endDateTimestamp = new Timestamp(dateFormat.parse(validForm.endDate).getTime + eightHours)
 		      coupon.copy(
 		          name = validForm.name,
 		          code = validForm.code,
-		          startDate = startDateTimestamp,
-		          endDate = endDateTimestamp,
+		          startDate = validForm.startDateTimestamp,
+		          endDate = validForm.endDateTimestamp,
 		          discountAmount = validForm.discountAmount,
 		          restrictions = validForm.restrictions
-		      ).withCouponType(couponType).withDiscountType(discountType).withUsageType(usageType).save()
+		      ).withCouponType(validForm.couponType).withDiscountType(validForm.discountType).withUsageType(validForm.usageType)
+		      .save()
 		      
               Redirect(controllers.routes.WebsiteControllers.getCouponAdmin(couponId).url)
             })
@@ -133,7 +123,13 @@ trait PostCouponAdminEndpoint extends Logging {
       discountTypeString: String,
       usageTypeString: String,
       restrictions: String
-  )
+  ) {
+    lazy val couponType = CouponType(couponTypeString).get
+    lazy val discountType = CouponDiscountType(discountTypeString).get
+    lazy val usageType = CouponUsageType(usageTypeString).get
+    lazy val startDateTimestamp = new Timestamp(dateFormat.parse(startDate).getTime + eightHours)
+    lazy val endDateTimestamp = new Timestamp(dateFormat.parse(endDate).getTime + eightHours)
+  }
   
   private def codeIsUnique(couponId: Option[Long] = None): Constraint[PostCouponForm] = {
     Constraint { form: PostCouponForm =>
