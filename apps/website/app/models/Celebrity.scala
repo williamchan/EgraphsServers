@@ -540,7 +540,15 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
      p._publishedStatus = 'Published' AND
      ib.startdate < now() AND
      ib.enddate > now() """
-  val queryTextMatching =      """ AND mv.to_tsvector @@ plainto_tsquery('english', {textQuery}) """
+  
+  val queryTextMatching = """ AND mv.to_tsvector @@ plainto_tsquery('english', {textQuery}) """
+
+  val queryRefinements =  refinements.foldLeft("")((query, refinement) => {
+      query + """ AND EXISTS ( SELECT c.id FROM celebritycategoryvalue ccv WHERE """ +
+      refinement._2.foldLeft("")((acc, cvId) => acc + " ccv.categoryvalueid = " + cvId + " AND ") +
+      """ ccv.celebrityid = c.id ) """
+    }) 
+  
   val queryGrouping = """ 
     ORDER BY is_order ASC
     ) AS stuff
@@ -566,16 +574,16 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
         case _ =>  "ORDER BY celeb_id ASC"
       }
     } + ";"
-      
+
     val finalQuery = queryOption match {
       case Some(query) => {
         SQL(
-          queryString + queryTextMatching + queryGrouping + queryResultOrdering
+          queryString + queryTextMatching + queryRefinements + queryGrouping + queryResultOrdering
         ).on("textQuery" -> query)
       }
       case None => { 
         SQL(
-          queryString + queryGrouping + queryResultOrdering
+          queryString + queryRefinements + queryGrouping + queryResultOrdering
         )
       }
     }  
