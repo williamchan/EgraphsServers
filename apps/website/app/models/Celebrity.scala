@@ -193,6 +193,7 @@ case class Celebrity(id: Long = 0,
       image=ImageAsset(imageData, keyBase, newImageKey, ImageAsset.Png, services.imageAssetServices.get)
     ).save()
   }
+
   def landingPageImage: ImageAsset = {
     _landingPageImageKey.flatMap(theKey => Some(ImageAsset(keyBase, theKey, ImageAsset.Png, services=services.imageAssetServices.get))) match {
       case Some(imageAsset) => imageAsset
@@ -207,6 +208,7 @@ case class Celebrity(id: Long = 0,
       image=ImageAsset(imageData, keyBase, newImageKey, ImageAsset.Png, services.imageAssetServices.get)
     ).save()
   }
+
   def logoImage: ImageAsset = {
     _logoImageKey.flatMap(theKey => Some(ImageAsset(keyBase, theKey, ImageAsset.Png, services=services.imageAssetServices.get))) match {
       case Some(imageAsset) => imageAsset
@@ -445,11 +447,11 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
     """
     ).execute()(connection=schema.getTxnConnectionFactory)
   }
+
   /**
    * Full text search on tags, this version is called by the admin controller. 
    * TODO(sbilstein) Implement refinements 
    */
-  
   def search(query: String, refinements: Map[Long, Iterable[Long]] = Map[Long, Iterable[Long]]()): Iterable[Celebrity] = {
     val rowStream = SQL(
       """
@@ -478,6 +480,7 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
       )
     }
   }
+
   /**
    * This function is a dupe of the above function. We will probably want to think of a good way to abstract the search if we want to retain a
    * useful admin text search. 
@@ -488,7 +491,8 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
    * 
    *  (pitcher or 2nd baseman) and (red sox or yankees)
    */
-  def marketplaceSearch(queryOption: Option[String], refinements: Map[Long, Iterable[Long]] = Map[Long, Iterable[Long]](), sortType: CelebritySortingTypes.EnumVal = CelebritySortingTypes.MostPopular)
+
+  def marketplaceSearch(maybeQuery: Option[String] = None, refinements: Map[Long, Iterable[Long]] = Map[Long, Iterable[Long]](), sortType: CelebritySortingTypes.EnumVal = CelebritySortingTypes.MostPopular)
   : Iterable[MarketplaceCelebrity] = {
 
     // Note we could make this fast probably.  We should see how performance is affected if we don't have to
@@ -531,7 +535,13 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
     FROM
      celebrity c INNER JOIN product p ON (p.celebrityid = c.id)
                  INNER JOIN inventorybatch ib ON (ib.celebrityid = c.id)
-                 INNER JOIN celebrity_categories_mv mv ON (mv.id = c.id)
+    """ +
+     (
+       if(maybeQuery.isDefined)
+"""             INNER JOIN celebrity_categories_mv mv ON (mv.id = c.id) """
+       else " "
+     ) + 
+    """
                  LEFT OUTER JOIN orders o ON (o.inventorybatchid = ib.id AND
                                               o.productid = p.id)
     WHERE
@@ -575,7 +585,7 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
       }
     } + ";"
 
-    val finalQuery = queryOption match {
+    val finalQuery = maybeQuery match {
       case Some(query) => {
         SQL(
           queryString + queryTextMatching + queryRefinements + queryGrouping + queryResultOrdering
@@ -586,9 +596,10 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
           queryString + queryRefinements + queryGrouping + queryResultOrdering
         )
       }
-    }  
-    val rowStream  = finalQuery.apply()(connection = schema.getTxnConnectionFactory)
+    }
 
+    val rowStream  = finalQuery.apply()(connection = schema.getTxnConnectionFactory)
+    
     for (row <- rowStream) yield {
       import java.math.BigDecimal
       Celebrity(
