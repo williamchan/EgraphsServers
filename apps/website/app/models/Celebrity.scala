@@ -22,6 +22,7 @@ import anorm._
 import anorm.SqlParser._
 import services.mvc.celebrity.CelebrityViewConversions
 import models.frontend.marketplace.MarketplaceCelebrity
+import models.frontend.marketplace.CelebritySortingTypes
 
 /**
  * Services used by each celebrity instance
@@ -487,8 +488,8 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
    * 
    *  (pitcher or 2nd baseman) and (red sox or yankees)
    */
-  //TODO: Add a parameter for how to sort in here.
-  def marketplaceSearch(query: String, refinements: Map[Long, Iterable[Long]] = Map[Long, Iterable[Long]]()): Iterable[MarketplaceCelebrity] = {
+  def marketplaceSearch(query: String, refinements: Map[Long, Iterable[Long]] = Map[Long, Iterable[Long]](), sortType: CelebritySortingTypes.EnumVal = CelebritySortingTypes.MostPopular)
+  : Iterable[MarketplaceCelebrity] = {
 
     // Note we could make this fast probably.  We should see how performance is affected if we don't have to
     // join across all celebrities since we can filter some with the text search first.

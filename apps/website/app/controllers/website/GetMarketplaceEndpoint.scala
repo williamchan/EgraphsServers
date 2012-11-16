@@ -69,7 +69,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       // Determine what search options, if any, have been appended
       val verticalOption = Form("vertical" -> nonEmptyText).bindFromRequest.fold(formWithErrors => None, validForm => Some(validForm))
       val queryOption = Form("query" -> nonEmptyText).bindFromRequest.fold(formWithErrors => None, validForm => Some(validForm))
-      val sortOption = Form("sort" -> nonEmptyText).bindFromRequest.fold(formWithErrors => None, sortOption => CelebritySortingTypes(sortOption))
+      val maybeSortType = Form("sort" -> nonEmptyText).bindFromRequest.fold(formWithErrors => None, sortOption => CelebritySortingTypes(sortOption))
       val viewOption = Form("view" -> nonEmptyText).bindFromRequest.fold(formWithErrors => None, validForm => Some(validForm))
 
       val categoryAndCategoryValues = 
@@ -85,10 +85,10 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
      
       val (subtitle, celebrities) = 
         (queryOption match {
-          case Some(query) => ("Showing Results for \"" + query + "\"...", celebrityStore.marketplaceSearch(query, categoryAndCategoryValues))
+          case Some(query) => ("Showing Results for \"" + query + "\"...", celebrityStore.marketplaceSearch(query, categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostPopular)))
           case _ =>
             if(activeCategoryValues.isEmpty) {
-              ("Results", celebrityStore.marketplaceSearch("*", categoryAndCategoryValues))
+              ("Results", celebrityStore.marketplaceSearch("*", categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostPopular)))
             } else {
               ("Featured Celebrities" , celebrityStore.getFeaturedPublishedCelebrities.map(c => c.asMarketplaceCelebrity(100,100, true)))
             }
@@ -120,7 +120,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         verticalViewModels = getVerticals(activeCategoryValues),
         results = List(ResultSetViewModel(subtitle = Option(subtitle), celebrities)),
         categoryViewModels = categoryViewModels,
-        sortOptions = sortOptionViewModels(sortOption)
+        sortOptions = sortOptionViewModels(maybeSortType)
       ))
     }
   }
