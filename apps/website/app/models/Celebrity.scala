@@ -551,7 +551,7 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
         _publishedStatus = PublishedStatus.Published.name,
         _landingPageImageKey = row[Option[String]]("_landingpageImageKey")
       ).asMarketplaceCelebrity(
-        soldout = row[BigDecimal]("inventoryAvailable").intValue() > 0,
+        soldout = row[BigDecimal]("inventoryAvailable").intValue() <= 0,
         minPrice = row[BigDecimal]("minProductPrice").intValue(),
         maxPrice = row[BigDecimal]("maxProductPrice").intValue()
       )
