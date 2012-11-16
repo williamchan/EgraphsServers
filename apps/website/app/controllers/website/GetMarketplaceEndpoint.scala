@@ -20,6 +20,7 @@ import services.http.filters._
 import egraphs.authtoken.AuthenticityToken
 import services.mvc.celebrity.CelebrityViewConversions
 import models.frontend.marketplace._
+import models.frontend.marketplace.CelebritySortingTypes
 
 /**
  * Controller for serving the celebrity marketplace
@@ -36,14 +37,14 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
   val queryUrl = controllers.routes.WebsiteControllers.getMarketplaceResultPage.url
   val categoryRegex = new scala.util.matching.Regex("""c([0-9]+)""", "id")
 
-  private def sortOptionViewModels(selected: String = "") : Iterable[SortOptionViewModel] = {
+  private def sortOptionViewModels(selectedSortingType: Option[CelebritySortingTypes.EnumVal] = None) : Iterable[SortOptionViewModel] = {
     for {
       sortingType <- CelebritySortingTypes.values
     } yield {
       SortOptionViewModel(
         name = sortingType.name,
         display = sortingType.displayName,
-        active = (sortingType.name == selected))
+        active = (Some(sortingType) == selectedSortingType))
     }
   }
 
@@ -68,7 +69,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       // Determine what search options, if any, have been appended
       val verticalOption = Form("vertical" -> nonEmptyText).bindFromRequest.fold(formWithErrors => None, validForm => Some(validForm))
       val queryOption = Form("query" -> nonEmptyText).bindFromRequest.fold(formWithErrors => None, validForm => Some(validForm))
-      val sortOption = Form("sort" -> nonEmptyText).bindFromRequest.fold(formWithErrors => None, validForm => Some(validForm))
+      val sortOption = Form("sort" -> nonEmptyText).bindFromRequest.fold(formWithErrors => None, sortOption => CelebritySortingTypes(sortOption))
       val viewOption = Form("view" -> nonEmptyText).bindFromRequest.fold(formWithErrors => None, validForm => Some(validForm))
 
       val categoryAndCategoryValues = 
@@ -119,7 +120,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         verticalViewModels = getVerticals(activeCategoryValues),
         results = List(ResultSetViewModel(subtitle = Option(subtitle), celebrities)),
         categoryViewModels = categoryViewModels,
-        sortOptions = sortOptionViewModels(sortOption.getOrElse(""))
+        sortOptions = sortOptionViewModels(sortOption)
       ))
     }
   }
