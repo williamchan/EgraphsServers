@@ -6,6 +6,8 @@ import models.frontend.contents.Section
 import models.frontend.marketplace._
 import helpers.DefaultImplicitTemplateParameters
 import scala.util.Random
+import models.frontend.marketplace.CelebritySortingTypes
+import models.frontend.marketplace.CelebritySortingTypes
 
 /**
  * Marketplace controller
@@ -114,40 +116,15 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
     )
   }
 
-  def sortOptions : List[SortOptionViewModel] = {
-    List(
+  def sortOptions: Iterable[SortOptionViewModel] = {
+    for {
+      sortingType <- CelebritySortingTypes.values
+    } yield {
       SortOptionViewModel(
-        name = "recently-added",
-        display = "Recently Added",
-        active = false
-      ),
-      SortOptionViewModel(
-        name = "most-popular",
-        display = "Most Popular",
-        active = false
-      ),
-      SortOptionViewModel(
-        name = "price-low-to-hi",
-        display = "Price (Low to High)",
-        active = true
-      ),
-      SortOptionViewModel(
-        name = "price-high-to-low",
-        display = "Price (High to Low)",
-        active = false
-      ),
-      SortOptionViewModel(
-        name = "alphabetical-a-z",
-        display = "Alphabetical (A-Z)",
-         active = false
-      ),
-      SortOptionViewModel(
-        name = "alphabetical-z-a",
-        display = "Alphabetical (Z-A)",
-        active = false
-      )
-    )
+        name = sortingType.name,
+        display = sortingType.displayName,
+        active = (sortingType == CelebritySortingTypes.PriceAscending))
+    }
   }
-
 }
 

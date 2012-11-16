@@ -10,6 +10,7 @@ import services.voice.{VoiceBiometricsError, YesMaamVoiceBiometricService, Voice
 import vbg.{VBGVerifySampleStore, VBGVerifySample}
 import services.signature.{SignatureBiometricsError, YesMaamSignatureBiometricService, SignatureBiometricService}
 import services._
+import egraphs.playutils.Enum
 import audio.AudioConverter
 import db.{FilterOneTable, Schema, KeyedCaseClass, SavesWithLongKey}
 import graphics.{RasterGraphicsSource, Handwriting, HandwritingPen, GraphicsSource}
@@ -473,7 +474,7 @@ case class EgraphStoryServices @Inject() (templateEngine: TemplateEngine)
  * }}}
  *
  */
-object EgraphStoryField extends Utils.Enum {
+object EgraphStoryField extends Enum {
   sealed trait EnumVal extends Value
 
   /** Public name of the celebrity */

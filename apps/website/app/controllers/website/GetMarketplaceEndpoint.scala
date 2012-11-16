@@ -20,6 +20,7 @@ import services.http.filters._
 import egraphs.authtoken.AuthenticityToken
 import services.mvc.celebrity.CelebrityViewConversions
 import models.frontend.marketplace._
+import models.frontend.marketplace.CelebritySortingTypes
 
 /**
  * Controller for serving the celebrity marketplace
@@ -35,21 +36,18 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
 
   val queryUrl = controllers.routes.WebsiteControllers.getMarketplaceResultPage.url
   val categoryRegex = new scala.util.matching.Regex("""c([0-9]+)""", "id")
-  
-  val sortFunctions = 
-    Seq("recently-added" -> "Recently Added",
-        "most-popular" -> "Most Popular",
-        "price-low-to-hi" -> "Price (Low to High)",
-        "price-high-to-low" -> "Price (High to Low)",
-        "alphabetical-a-z"  -> "Alphabetical (A-Z)",
-        "alphabetical-z-a" -> "Alphabetical (Z-A)"
-    )
-  private def sortOptionViewModels(selected: String = "") : Iterable[SortOptionViewModel] = {
-    sortFunctions.map( (sortFunction) => 
-      SortOptionViewModel(name = sortFunction._1, display = sortFunction._2, active = (sortFunction._1 == selected))
-    )
-  }  
-  
+
+  private def sortOptionViewModels(selectedSortingType: Option[CelebritySortingTypes.EnumVal] = None) : Iterable[SortOptionViewModel] = {
+    for {
+      sortingType <- CelebritySortingTypes.values
+    } yield {
+      SortOptionViewModel(
+        name = sortingType.name,
+        display = sortingType.displayName,
+        active = (Some(sortingType) == selectedSortingType))
+    }
+  }
+
   def getMarketplaceVerticalPage(verticalname: String) =  controllerMethod.withForm() { implicit authToken =>
     Action { implicit request =>
      //Map Vertical to specific landing page.
@@ -71,7 +69,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       // Determine what search options, if any, have been appended
       val verticalOption = Form("vertical" -> nonEmptyText).bindFromRequest.fold(formWithErrors => None, validForm => Some(validForm))
       val queryOption = Form("query" -> nonEmptyText).bindFromRequest.fold(formWithErrors => None, validForm => Some(validForm))
-      val sortOption = Form("sort" -> nonEmptyText).bindFromRequest.fold(formWithErrors => None, validForm => Some(validForm))
+      val maybeSortType = Form("sort" -> nonEmptyText).bindFromRequest.fold(formWithErrors => None, sortOption => CelebritySortingTypes(sortOption))
       val viewOption = Form("view" -> nonEmptyText).bindFromRequest.fold(formWithErrors => None, validForm => Some(validForm))
 
       val categoryAndCategoryValues = 
@@ -80,21 +78,23 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
           (id.toLong, set.map( arg => arg.toLong))
         }
       
-      val activeCategoryValues = categoryAndCategoryValues.foldLeft[Set[Long]](Set[Long]())((set, ccv) => set ++ ccv._2.toSet[Long])
-      
+      val activeCategoryValues = {for{
+        (category, categoryValues) <- categoryAndCategoryValues
+        categoryValue <- categoryValues
+      } yield { categoryValue }}.toSet
+     
       val (subtitle, celebrities) = 
         (queryOption match {
-          case Some(query) => ("Showing Results for \"" + query + "\"...", celebrityStore.marketplaceSearch(query, categoryAndCategoryValues))
-          case _ => activeCategoryValues.isEmpty match {
-            case false => ("Results", celebrityStore.marketplaceSearch("*", categoryAndCategoryValues))
-            case true => ("Featured Celebrities" , celebrityStore.getFeaturedPublishedCelebrities.map(c => c.asMarketplaceCelebrity(100,100, true)))
-          }
+          case Some(query) => ("Showing Results for \"" + query + "\"...", celebrityStore.marketplaceSearch(query, categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostPopular)))
+          case _ =>
+            if(activeCategoryValues.isEmpty) {
+              ("Results", celebrityStore.marketplaceSearch("*", categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostPopular)))
+            } else {
+              ("Featured Celebrities" , celebrityStore.getFeaturedPublishedCelebrities.map(c => c.asMarketplaceCelebrity(100,100, true)))
+            }
         })
 
-      val viewAsList = viewOption match {
-        case Some(view) if(view == "list") => true
-        case _ => false
-      }  
+      val viewAsList = viewOption == Some("list")
 
       val categoryValues = categoryValueStore.all().toList
       //TODO: Note that this still needs to be filtered.
@@ -120,7 +120,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         verticalViewModels = getVerticals(activeCategoryValues),
         results = List(ResultSetViewModel(subtitle = Option(subtitle), celebrities)),
         categoryViewModels = categoryViewModels,
-        sortOptions = sortOptionViewModels(sortOption.getOrElse(""))
+        sortOptions = sortOptionViewModels(maybeSortType)
       ))
     }
   }
