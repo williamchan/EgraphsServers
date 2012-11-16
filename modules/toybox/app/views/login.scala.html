@@ -1,0 +1,10 @@
+@(postLogin: Call, loginForm: Form[(String, String)])
+@import helper._
+
+@main("Login") {
+	@form(postLogin) {
+    @inputText(loginForm("username"))
+    @inputText(loginForm("password"))
+		<input type="submit" value="Sign In">
+	}
+}
