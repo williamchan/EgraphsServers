@@ -3,6 +3,7 @@ package controllers.website.consumer
 import play.api._
 import play.api.mvc.Action
 import play.api.mvc.Controller
+import play.api.Play.current
 import models._
 import models.frontend.marketplace._
 import play.api.data._
@@ -21,6 +22,9 @@ import egraphs.authtoken.AuthenticityToken
 import services.mvc.celebrity.CelebrityViewConversions
 import models.frontend.marketplace._
 import models.frontend.marketplace.CelebritySortingTypes
+import play.api.libs.concurrent.Akka
+import services.db.TransactionSerializable
+import services.db.DBSession
 
 /**
  * Controller for serving the celebrity marketplace
@@ -30,6 +34,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
   protected def controllerMethod : ControllerMethod
   protected def celebrityStore : CelebrityStore  
   protected def categoryValueStore: CategoryValueStore
+  protected def dbSession: DBSession
   
   import CelebrityViewConversions._
   import SafePlayParams.Conversions._
@@ -68,31 +73,33 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         (category, categoryValues) <- categoryAndCategoryValues
         categoryValue <- categoryValues
       } yield { categoryValue }}.toSet
-     
-      val (subtitle, celebrities) = 
+
+      val (subtitle, celebrities) = dbSession.connected(TransactionSerializable) {
         (queryOption match {
-          case Some(query) => ("Showing Results for \"" + query + "\"...", celebrityStore.marketplaceSearch(queryOption, categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostPopular)))
+          case Some(query) =>
+            ("Showing Results for \"" + query + "\"...", celebrityStore.marketplaceSearch(queryOption, categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostPopular)))
           case _ =>
-            if(!activeCategoryValues.isEmpty) {
+            if (!activeCategoryValues.isEmpty) {
               ("Results", celebrityStore.marketplaceSearch(queryOption, categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostPopular)))
             } else {
               //TODO when refinements are implemented we can do this using tags instead.  
-              ("Featured Celebrities" , celebrityStore.getFeaturedPublishedCelebrities.map{c => 
-
-                // val activeProductsAndInventory = c.getActiveProductsWithInventoryRemaining()
-                // val purchaseableProducts = activeProductsAndInventory.filter {
-                //   productAndCount => productAndCount._2 > 0
-                // }
-                // val prices = purchaseableProducts.map(p => p._1.priceInCurrency.toInt)
-                // val (min, max) = prices.isEmpty match {
-                //   case true => (0,0)
-                //   case false => (prices.filter(p => p > 0).min, prices.max) 
-                // }
-                c.asMarketplaceCelebrity(0, 0, false)
+              ("Featured Celebrities", celebrityStore.getFeaturedPublishedCelebrities.map { c =>
+                dbSession.connected(TransactionSerializable) {
+                  val activeProductsAndInventory = c.getActiveProductsWithInventoryRemaining()
+                  val purchaseableProducts = activeProductsAndInventory.filter {
+                    case (product, count) => count > 0
+                  }
+                  val prices = purchaseableProducts.map(p => p._1.priceInCurrency.toInt)
+                  val (min, max) = prices.isEmpty match {
+                    case true => (0, 0)
+                    case false => (prices.filter(p => p > 0).min, prices.max)
+                  }
+                  c.asMarketplaceCelebrity(min, max, purchaseableProducts.isEmpty)
+                }
               })
             }
         })
-
+      }
 
       val viewAsList = viewOption == Some("list")
 
@@ -124,8 +131,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         verticalViewModels = getVerticals(activeCategoryValues),
         results = List(ResultSetViewModel(subtitle = Option(subtitle), celebrities)),
         categoryViewModels = categoryViewModels,
-        sortOptions = sortOptionViewModels(maybeSortType)
-      ))
+        sortOptions = sortOptionViewModels(maybeSortType)))
     }
   }
   
