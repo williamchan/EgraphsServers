@@ -16,7 +16,7 @@ import models.VideoAsset
 
 class PostProcessVideoAdminEndpointTests extends EgraphsUnitTest with AdminProtectedResourceTests {
   override protected def db = AppConfig.instance[DBSession]
-  override protected def routeUnderTest = controllers.routes.WebsiteControllers.postProcessVideo(VideoStatus.Approved.name, 1L)
+  override protected def routeUnderTest = controllers.routes.WebsiteControllers.postProcessVideoAdmin(VideoStatus.Approved.name, 1L)
 
   it should "update a video's status" in new EgraphsTestApplication {
 
@@ -28,7 +28,7 @@ class PostProcessVideoAdminEndpointTests extends EgraphsUnitTest with AdminProte
 
     videoAsset._videoStatus should be(VideoStatus.Unprocessed.name)
 
-    val Some(result) = routeAndCall(FakeRequest(POST, controllers.routes.WebsiteControllers.postProcessVideo(
+    val Some(result) = routeAndCall(FakeRequest(POST, controllers.routes.WebsiteControllers.postProcessVideoAdmin(
       VideoStatus.Approved.name, videoAsset.id).url).withAdmin(admin.id).withAuthToken)
     status(result) should be(SEE_OTHER)
 

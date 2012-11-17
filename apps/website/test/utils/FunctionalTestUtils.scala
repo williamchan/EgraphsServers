@@ -3,7 +3,7 @@
 package utils
 
 import play.api.test.FakeRequest
-import play.api.mvc.{AnyContent, Call}
+import play.api.mvc.{ AnyContent, Call }
 import play.api.Play
 import play.api.test.Helpers._
 import play.api.Configuration
@@ -28,26 +28,26 @@ import play.api.mvc.Result
  * controller methods.
  */
 object FunctionalTestUtils {
-//  /**
-//   * Makes an account identified by wchan83@egraphs.com/derp
-//   */
-//  def willChanAccount: Account = {
-//    Account(email = "wchan83@egraphs.com").withPassword(TestData.defaultPassword).right.get
-//  }
-//
-//  /**
-//   * Makes an API request verified by the credentials from `willChanAccount`
-//   */
+  //  /**
+  //   * Makes an account identified by wchan83@egraphs.com/derp
+  //   */
+  //  def willChanAccount: Account = {
+  //    Account(email = "wchan83@egraphs.com").withPassword(TestData.defaultPassword).right.get
+  //  }
+  //
+  //  /**
+  //   * Makes an API request verified by the credentials from `willChanAccount`
+  //   */
   def willChanRequest: FakeRequest[AnyContent] = {
     val auth = BasicAuth.Credentials("wchan83@egraphs.com", TestData.defaultPassword)
-    
+
     FakeRequest().withHeaders(auth.toHeader)
   }
-  
+
   def requestWithCustomerId(id: Long): FakeRequest[AnyContent] = {
     FakeRequest().withSession(EgraphsSession.Key.CustomerId.name -> id.toString)
   }
-  
+
   def requestWithAdminId(id: Long): FakeRequest[AnyContent] = {
     FakeRequest().withSession(EgraphsSession.Key.AdminId.name -> id.toString)
   }
@@ -57,24 +57,24 @@ object FunctionalTestUtils {
 
     FakeRequest().withHeaders(auth.toHeader)
   }
-//
-//  def createRequest(host: String = "www.egraphs.com", url: String = "/", secure: Boolean = false): Request = {
-//    val request = FunctionalTest.newRequest()
-//    request.host = host
-//    request.url = url
-//    request.secure = secure
-//    request
-//  }
-//
-//  def createProperties(propName: String, propValue: String): Properties = {
-//    val playConfig = new Properties
-//    playConfig.setProperty(propName, propValue)
-//    playConfig
-//  }
-//
+  //
+  //  def createRequest(host: String = "www.egraphs.com", url: String = "/", secure: Boolean = false): Request = {
+  //    val request = FunctionalTest.newRequest()
+  //    request.host = host
+  //    request.url = url
+  //    request.secure = secure
+  //    request
+  //  }
+  //
+  //  def createProperties(propName: String, propValue: String): Properties = {
+  //    val playConfig = new Properties
+  //    playConfig.setProperty(propName, propValue)
+  //    playConfig
+  //  }
+  //
   def runScenarios(names: String*) {
     names.foreach { name =>
-        runScenario(name)
+      runScenario(name)
     }
   }
 
@@ -96,50 +96,53 @@ object FunctionalTestUtils {
       "Will-has-two-products",
       "Erem-is-a-customer",
       "Erem-buys-Wills-two-products-twice-each",
-      "Deliver-All-Orders-to-Celebrities"
-    )
+      "Deliver-All-Orders-to-Celebrities")
   }
-  
-  /** 
+
+  /**
    * Returns the contents of a ChunkedResult[Array[Byte]] as a vector of bytes. Throws
    * an exception otherwise.
-   **/
-  def chunkedContent(result: Result): IndexedSeq[Byte] =  {
+   */
+  def chunkedContent(result: Result): IndexedSeq[Byte] = {
     result match {
       case chunkedResult: ChunkedResult[_] =>
         val chunkedByteResult = chunkedResult.asInstanceOf[ChunkedResult[Array[Byte]]]
         var bytesVec = Vector.empty[Byte]
         val countIteratee = Iteratee.fold[Array[Byte], Unit](0) { (_, bytes) => bytesVec = bytesVec ++ bytes }
         val promisedIteratee = chunkedByteResult.chunks(countIteratee).asInstanceOf[Promise[Iteratee[Array[Byte], Unit]]]
-        
+
         promisedIteratee.await(5000).get.run.await(5000).get
-    
+
         bytesVec
-        
+
       case _ =>
         throw new Exception("Couldn't get chunked content from result of type " + result.getClass)
     }
-  }  
+  }
 
   def routeName(call: Call): String = {
     call.method + " " + call.url
   }
-  
+
+  def extractId(location: String): Long = {
+    location.substring(location.lastIndexOf("/") + 1).toLong
+  }
+
   trait NonProductionEndpointTests { this: EgraphsUnitTest =>
     import play.api.test.Helpers._
     protected def routeUnderTest: Call
     protected def successfulRequest: FakeRequest[AnyContent] = {
       FakeRequest(routeUnderTest.method, routeUnderTest.url)
     }
-    
+
     private def nonTestApplication: FakeApplication = {
-      val normalTestConfig = EgraphsUnitTest.testApp.configuration  
+      val normalTestConfig = EgraphsUnitTest.testApp.configuration
       val configWithNonTestAppId = normalTestConfig ++ Configuration.from(Map("application.id" -> "not-test"))
-      new FakeApplication(path=EgraphsUnitTest.testApp.path) {
+      new FakeApplication(path = EgraphsUnitTest.testApp.path) {
         override def configuration = configWithNonTestAppId
       }
     }
-    
+
     routeName(routeUnderTest) + ", as a test-only endpoint, " should "be available during test mode" in new EgraphsTestApplication {
       val Some(result) = routeAndCall(successfulRequest)
       status(result) should not be (NOT_FOUND)
@@ -150,36 +153,51 @@ object FunctionalTestUtils {
     // of our app will inhibit being able to create a controller with a different ConfigFileProxy
     it should "be unavailable outside of test mode" in (pending)
   }
-  
-  
-  class DomainRequest[T <: AnyContent](request: FakeRequest[T]) {
+
+  trait DomainRequestBase[T] {
+    def request: FakeRequest[T]
+    def requestWithAuthTokenInBody: FakeRequest[T]
+
+    val authToken = "fake-auth-token"
+
     def toRoute(route: Call): FakeRequest[T] = {
-      request.copy(method=route.method, uri=route.url)
+      request.copy(method = route.method, uri = route.url)
     }
-    
+
     def withCustomer(customerId: Long): FakeRequest[T] = {
       request.withSession(request.session.withCustomerId(customerId).data.toSeq: _*)
     }
-    
+
     def withAdmin(adminId: Long): FakeRequest[T] = {
       request.withSession(request.session.withAdminId(adminId).data.toSeq: _*)
     }
-    
-    def withAuthToken: FakeRequest[AnyContentAsFormUrlEncoded] = {
-      val authToken = "fake-auth-token"
-      val existingBody = request.body.asFormUrlEncoded.getOrElse(Map())
+
+    def withAuthToken: FakeRequest[T] = {
+      val newSession = request.session + ("authenticityToken" -> authToken)
+
+      requestWithAuthTokenInBody.withSession(newSession.data.toSeq: _*)
+    }
+
+  }
+
+  class DomainRequest[T <: AnyContent](override val request: FakeRequest[T]) extends DomainRequestBase[T] {
+    override def requestWithAuthTokenInBody: FakeRequest[AnyContent] = {
+      val formUrlEncodedRequest = request.asInstanceOf[FakeRequest[AnyContentAsFormUrlEncoded]]
+      val existingBody = formUrlEncodedRequest.body.asFormUrlEncoded.getOrElse(Map())
       val newBody = existingBody + ("authenticityToken" -> Seq(authToken))
       val newBodySingleValues = newBody.map(kv => (kv._1, kv._2.head))
-      val newSession = request.session + ("authenticityToken" -> authToken)
-      request
-        .withSession(newSession.data.toSeq:_*)
-        .withFormUrlEncodedBody(newBodySingleValues.toSeq: _*)
+
+      request.withFormUrlEncodedBody(newBodySingleValues.toSeq: _*).asInstanceOf[FakeRequest[AnyContent]]
     }
   }
   
+  // MultiPartDomainRequest
+
   object Conversions {
-    implicit def fakeRequestToDomainRequest[T <: AnyContent](fakeRequest: FakeRequest[T]) = {
+    implicit def fakeAnyContentRequestToDomainRequest[T <: AnyContent](fakeRequest: FakeRequest[T]) = {
       new DomainRequest(fakeRequest)
     }
+    
+    // write another one here
   }
 }

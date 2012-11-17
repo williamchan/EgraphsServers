@@ -73,12 +73,17 @@ GET      /admin/egraphs/$egraphId<[0-9]+>                                 contro
 POST     /admin/egraphs/$egraphId<[0-9]+>                                 controllers.WebsiteControllers.postEgraphAdmin(egraphId: Long)
 GET      /admin/freegraphs/create                                         controllers.WebsiteControllers.getCreateFreegraphAdmin
 POST     /admin/freegraphs/create                                         controllers.WebsiteControllers.postFreegraphAdmin
-GET      /admin/categories                                                controllers.WebsiteControllers.getCategoriesAdmin 
+GET      /admin/categories                                                controllers.WebsiteControllers.getCategoriesAdmin
 POST     /admin/categories                                                controllers.WebsiteControllers.postCategoryAdmin
 GET      /admin/categories/create                                         controllers.WebsiteControllers.getCreateCategoryAdmin
 GET      /admin/categories/$categoryId<[0-9]+>                            controllers.WebsiteControllers.getCategoryAdmin(categoryId: Long)
-GET      /admin/categories/$categoryId<[0-9]>/categoryvalues/create       controllers.WebsiteControllers.getCreateCategoryValueAdmin(categoryId: Long) 
+GET      /admin/categories/$categoryId<[0-9]>/categoryvalues/create       controllers.WebsiteControllers.getCreateCategoryValueAdmin(categoryId: Long)
 POST     /admin/categoryvalues                                            controllers.WebsiteControllers.postCategoryValueAdmin
+GET      /admin/coupons                                                   controllers.WebsiteControllers.getCouponsAdmin
+POST     /admin/coupons                                                   controllers.WebsiteControllers.postCreateCouponAdmin
+GET      /admin/coupons/create                                            controllers.WebsiteControllers.getCreateCouponAdmin
+GET      /admin/coupons/$couponId<[0-9]+>                                 controllers.WebsiteControllers.getCouponAdmin(couponId: Long)
+POST     /admin/coupons/$couponId<[0-9]+>                                 controllers.WebsiteControllers.postCouponAdmin(couponId: Long)
 GET      /admin/categoryvalues/$categoryValueId<[0-9]+>                   controllers.WebsiteControllers.getCategoryValueAdmin(categoryValueId: Long)
 GET      /admin/inventorybatches/$inventoryBatchId<[0-9]+>                controllers.WebsiteControllers.getInventoryBatchAdmin(inventoryBatchId: Long)
 POST     /admin/inventorybatches/$inventoryBatchId<[0-9]+>                controllers.WebsiteControllers.postInventoryBatchAdmin(inventoryBatchId: Long)
@@ -87,14 +92,15 @@ POST     /admin/login                                              				controlle
 GET      /admin/orders                                             				controllers.WebsiteControllers.getOrdersAdmin
 GET      /admin/orders/$orderId<[0-9]+>                                   controllers.WebsiteControllers.getOrderAdmin(orderId: Long)
 POST     /admin/orders/$orderId<[0-9]+>                                   controllers.WebsiteControllers.postOrderAdmin(orderId: Long)
-POST     /admin/processVideo                                              controllers.WebsiteControllers.postProcessVideo(action: String, id: Long)
 GET      /admin/products/$productId<[0-9]+>                               controllers.WebsiteControllers.getProductAdmin(productId: Long)
 POST     /admin/products/$productId<[0-9]+>                               controllers.WebsiteControllers.postProductAdmin(productId: Long)
 GET      /admin/reports                                            				controllers.WebsiteControllers.getReportsAdmin
 GET      /admin/tools                                              				controllers.WebsiteControllers.getToolsAdmin
-GET      /admin/unprocessedvideos                                         controllers.WebsiteControllers.getUnprocessedVideosAdmin											
-GET      /admin/videouploader                                             controllers.WebsiteControllers.getVideoEnrollmentAdmin
-POST     /admin/videoAsset                                                controllers.WebsiteControllers.postVideoAsset
+GET      /admin/videoasset                                                controllers.WebsiteControllers.getVideoAssetAdmin
+POST     /admin/videoasset                                                controllers.WebsiteControllers.postVideoAssetAdmin
+GET      /admin/videoassets                                               controllers.WebsiteControllers.getVideoAssetsAdmin
+GET      /admin/videoassets/:status                                       controllers.WebsiteControllers.getVideoAssetsWithStatusAdmin(status: String)
+POST     /admin/videoassets/$id<[0-9]+>                                   controllers.WebsiteControllers.postProcessVideoAdmin(action: String, id: Long)											
 
 ##
 ## Consumer Website

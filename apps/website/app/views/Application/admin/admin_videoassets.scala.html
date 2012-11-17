@@ -1,4 +1,4 @@
-@(videosAndPublicNames: List[(VideoAsset, String)])(
+@(videosAndPublicNames: List[(VideoAsset, String)], status: String)(
   implicit authToken: egraphs.authtoken.AuthenticityToken,
   headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData)
@@ -12,7 +12,48 @@
 <section id="content" class="top" role="main">
   <div id="main" class="sub">
     <div class="container" id="celebrity-admin">
-      <h1> Unprocessed Videos </h1> 
+      
+      <table>
+        <tr>
+          <td>
+            @safeForm('id -> "see-unprocessed-form", 'method -> "GET", 'action -> (routes.WebsiteControllers.getVideoAssetsWithStatusAdmin(VideoStatus.Unprocessed.name)).url) {
+
+              <fieldset>
+                <input name="status" type="hidden" value="@VideoStatus.Unprocessed.name">
+                <div class="actions">
+                  <button type="submit" id="see-unprocessed-button" class="btn primary fade in">Unprocessed</button>
+                </div>
+              </fieldset> 
+            } 
+          </td>
+
+          <td>
+            @safeForm('id -> "see-approved-form", 'method -> "GET", 'action -> (routes.WebsiteControllers.getVideoAssetsWithStatusAdmin(VideoStatus.Approved.name)).url) {
+
+              <fieldset>
+                <input name="status" type="hidden" value="@VideoStatus.Approved.name">
+                <div class="actions">
+                  <button type="submit" id="see-approved-button" class="btn primary fade in">Approved</button>
+                </div>
+              </fieldset> 
+            } 
+          </td>
+                    
+          <td>
+            @safeForm('id -> "see-rejected-form", 'method -> "GET", 'action -> (routes.WebsiteControllers.getVideoAssetsWithStatusAdmin(VideoStatus.Rejected.name)).url) {
+
+              <fieldset>
+                <input name="status" type="hidden" value="@VideoStatus.Rejected.name">
+                <div class="actions">
+                  <button type="submit" id="see-rejected-button" class="btn primary fade in">Rejected</button>
+                </div>
+              </fieldset> 
+            } 
+          </td>
+        </tr>
+      </table> 
+
+      <h1> @status Videos </h1>
 
       <div class="videos">
           @videosAndPublicNames.map { case (video, publicName) =>
@@ -29,7 +70,7 @@
                   <tr>
                     <td>
                       @safeForm('id -> "approve-video-form", 'method -> "POST", 'action -> (
-                          routes.WebsiteControllers.postProcessVideo(
+                          routes.WebsiteControllers.postProcessVideoAdmin(
                           action = VideoStatus.Approved.name, id = video.id)).url) {
                         
                         <fieldset>
@@ -42,7 +83,7 @@
 
                     <td>
                       @safeForm('id -> "reject-video-form", 'method -> "POST", 'action -> (
-                          routes.WebsiteControllers.postProcessVideo(
+                          routes.WebsiteControllers.postProcessVideoAdmin(
                           action = VideoStatus.Rejected.name, id = video.id)).url) {
                         
                         <fieldset>

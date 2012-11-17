@@ -1,4 +1,4 @@
-package controllers.api
+package controllers.website.admin
 
 import utils.EgraphsUnitTest
 import services.AppConfig
@@ -13,17 +13,18 @@ import models.VideoAssetStore
 import models.enums.VideoStatus
 import utils.FunctionalTestUtils.Conversions._
 import utils.FunctionalTestUtils
+import utils.FunctionalTestUtils.DomainRequest
 import models.VideoAsset
 import play.api.http.HeaderNames
 import play.api.mvc.MultipartFormData
 import play.api.mvc.MultipartFormData.FilePart
 import play.api.libs.Files.TemporaryFile
-import controllers.routes.ApiControllers.postVideoAsset
+import controllers.routes.WebsiteControllers.postVideoAssetAdmin
 import java.io.File
 import services.blobs.Blobs
 
-class PostVideoAssetApiEndpointTests extends EgraphsUnitTest with ProtectedCelebrityResourceTests {
-  protected override def routeUnderTest = postVideoAsset
+class PostVideoAssetAdminEndpointTests extends EgraphsUnitTest with AdminProtectedResourceTests {
+  protected override def routeUnderTest = postVideoAssetAdmin
   protected def db = AppConfig.instance[DBSession]
 
   it should "accept multipartFormData, respond with OK, and verify file creation in the blobstore" in new EgraphsTestApplication {
@@ -44,8 +45,11 @@ class PostVideoAssetApiEndpointTests extends EgraphsUnitTest with ProtectedCeleb
     val fakeVideoFile = Seq(fakeVideoPart)
     val postBody = MultipartFormData[TemporaryFile](nonFiles, fakeVideoFile, Seq(), Seq())
 
-    val Some(result) = routeAndCall(FakeRequest(POST, "/api/1.0/celebrities/me/uploadVideo",
-      FakeHeaders(Map(HeaderNames.CONTENT_TYPE -> Seq("multipart/form-data"))), postBody))
+    val Some(result) = routeAndCall(new DomainRequest(FakeRequest(POST, "/admin/videoasset",
+      FakeHeaders(Map(HeaderNames.CONTENT_TYPE -> Seq("multipart/form-data"))), postBody)).withAdmin(admin.id))
+      
+//    val Some(result) = routeAndCall(FakeRequest(POST, controllers.routes.WebsiteControllers.postProcessVideoAdmin(
+//      VideoStatus.Approved.name, videoAsset.id).url).withAdmin(admin.id).withAuthToken)      
 
     status(result) should be(OK)
 

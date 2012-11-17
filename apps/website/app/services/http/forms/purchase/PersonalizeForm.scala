@@ -69,6 +69,10 @@ class PersonalizeForm(
   val noteToCelebrity = field(Params.NoteToCelebrity).validatedBy { paramValues =>
     checkField(paramValues).isOptionalNoteToCelebrity
   }
+  
+  val coupon = field(Params.Coupon).validatedBy { paramValues =>
+    checkField(paramValues).isOptionalValidCouponCode
+  }
 
   //
   // Form[ValidatedPersonalizeForm] members
@@ -80,7 +84,8 @@ class PersonalizeForm(
       recipientEmail.value.get,
       writtenMessageRequest.value.get,
       writtenMessageRequestText.value.get,
-      noteToCelebrity.value.get
+      noteToCelebrity.value.get,
+      coupon.value.get
     )
   }
 }
@@ -92,6 +97,7 @@ object PersonalizeForm {
     val RecipientName = "order.personalize.recipient.name"
     val RecipientEmail = "order.personalize.recipient.email"
     val WrittenMessageRequest = "order.personalize.message.choice"
+    val Coupon = "order.personalize.coupon.text"
     val WrittenMessageRequestText = "order.personalize.message.text"
     val NoteToCelebrity = "order.personalize.note_to_celeb"
   }
@@ -108,6 +114,7 @@ object PersonalizeForm {
     recipientEmail: Option[String],
     writtenMessageRequest: WrittenMessageRequest,
     writtenMessageText: Option[String],
-    noteToCelebriity: Option[String]
+    noteToCelebrity: Option[String],
+    coupon: Option[models.Coupon]
   )
 }

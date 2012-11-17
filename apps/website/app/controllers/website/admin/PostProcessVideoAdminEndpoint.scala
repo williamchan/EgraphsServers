@@ -19,7 +19,7 @@ trait PostProcessVideoAdminEndpoint {
   protected def videoAssetStore: VideoAssetStore
   protected def schema: Schema
 
-  def postProcessVideo(action: String, id: Long) = postController() {
+  def postProcessVideoAdmin(action: String, id: Long) = postController() {
     httpFilters.requireAdministratorLogin.inSession() {
       case (admin, adminAccount) =>
         Action { implicit request =>
@@ -34,7 +34,7 @@ trait PostProcessVideoAdminEndpoint {
                 case None => BadRequest("The video asset with ID " + id + " was not found.")
                 case Some(videoAsset) => {
                   videoAsset.withVideoStatus(maybeVideoStatus).save()
-                  Redirect(controllers.routes.WebsiteControllers.getUnprocessedVideosAdmin)
+                  Redirect(controllers.routes.WebsiteControllers.getVideoAssetsWithStatusAdmin(action))
                 }
               }
             }

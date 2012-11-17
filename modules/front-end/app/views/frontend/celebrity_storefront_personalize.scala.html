@@ -13,7 +13,7 @@
   authToken: egraphs.authtoken.AuthenticityToken
 )
 
-@{/** Renders the personalize page in the celebrity storefront.
+@**   Renders the personalize page in the celebrity storefront.
 
       writtenMessageCharacterLimit - the maximum number of characters to
         request for the celebrity to write.
@@ -24,7 +24,7 @@
       orderSummary - brief summary for the order up until this point.
 
       (the implicit parameters are documented in the base template from which they get used)
-*/}
+*@
 
 @import egraphs.authtoken.AuthenticityToken.safeForm
 @import views.html.frontend.tags.storefront_breadcrumbs_responsive
@@ -220,7 +220,22 @@
 	    				    </div> <!-- end .field -->     				    
 	    				  
 	    				  </fieldset>
-	    				  
+
+	    				  <fieldset>
+	    				    <div class="field">
+	      				    <div class="clearfix">
+	      				      <label class="instructions" for="coupon-code">Redeem Code:
+	      				      	<small>If you have a code to redeem, please enter it here.</small></label>
+	      				      	@tags.bootstrap_input_field(form.coupon) {
+	        				      <input id="coupon-code"
+	        				             type="text"
+	        				             name="@form.coupon.name"
+	        				             value="@form.coupon.value">
+	        				    }
+	      				    </div>
+	    				    </div>
+	    				  </fieldset> <!-- End coupon code -->
+
 	    				  <fieldset class="submit">
 	    				  
 	    				  	<div class="clearfix">
@@ -253,6 +268,7 @@
 		    				  		@tags.storefront_price_summary(
 		    				  			orderSummary.subtotal,
 		    				  			orderSummary.shipping,
+		    				  			None,
 		    				  			orderSummary.tax,
 		    				  			orderSummary.total
 		    				  		)

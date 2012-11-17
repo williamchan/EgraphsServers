@@ -23,7 +23,8 @@ case class PersonalizeForm (
   recipientEmail: Field[String],
   messageOption: Field[PersonalizeMessageOption],
   messageText: Field[String],
-  noteToCelebrity: Field[String]
+  noteToCelebrity: Field[String],
+  coupon: Field[String]
 )
 
 object PersonalizeForm {
@@ -38,7 +39,8 @@ object PersonalizeForm {
     recipientEmailParam: String,
     messageOptionParam: String,
     messageTextParam: String,
-    noteToCelebrityParam: String
+    noteToCelebrityParam: String,
+    couponParam: String
   ): PersonalizeForm =
   {
     import PersonalizeMessageOption.SpecificMessage
@@ -49,7 +51,8 @@ object PersonalizeForm {
       recipientEmail= Field(recipientEmailParam, None),
       messageOption=Field(messageOptionParam, Some(SpecificMessage)),
       messageText=Field(messageTextParam, None),
-      noteToCelebrity=Field(noteToCelebrityParam, None)
+      noteToCelebrity=Field(noteToCelebrityParam, None),
+      coupon=Field(couponParam, None)
     )
   }
 }

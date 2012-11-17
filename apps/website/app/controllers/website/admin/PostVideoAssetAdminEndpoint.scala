@@ -23,12 +23,12 @@ private[controllers] trait PostVideoAssetAdminEndpoint { this: Controller =>
   /**
    * Posts a video asset from a celebrity.
    */
-  def postVideoAsset = postController() {
+  def postVideoAssetAdmin = postController() {
     httpFilters.requireAdministratorLogin.inSession(parser = parse.multipartFormData) {
       case (admin, adminAccount) =>
         httpFilters.requireCelebrityId.inRequest(parse.multipartFormData) { celebrity =>
           Action(parse.multipartFormData) { request =>
-
+            
             request.body.file("video").map { resource =>
 
               val filename = resource.filename

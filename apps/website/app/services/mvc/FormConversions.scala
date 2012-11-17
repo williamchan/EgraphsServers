@@ -86,7 +86,8 @@ object FormConversions {
         recipientEmail = form.recipientEmail.asViewField,
         messageOption = messageOptionField,
         messageText = form.writtenMessageRequestText.asViewField,
-        noteToCelebrity = form.noteToCelebrity.asViewField
+        noteToCelebrity = form.noteToCelebrity.asViewField,
+        coupon = form.coupon.asViewField
       )
     }
 

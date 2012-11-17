@@ -69,6 +69,13 @@ class Schema @Inject() (
       celebrity.urlSlug is unique,
       celebrity.isFeatured is indexed,
       celebrity.bio is dbType("text")))
+  
+  val coupons = table[Coupon]
+  on(coupons)(coupon => 
+    declare(
+      columns(coupon.code, coupon.startDate, coupon.endDate, coupon.isActive) are indexed,
+      columns(coupon._usageType, coupon.startDate, coupon.endDate, coupon.isActive) are indexed,
+      coupon.restrictions is dbType("varchar(255)")))
 
   val customers = table[Customer]
   on(customers)(customer => declare(customer.username is unique))
@@ -181,7 +188,7 @@ class Schema @Inject() (
     .via((account, address) => account.id === address.accountId)
   val accountToTransaction = oneToManyRelation(accounts, cashTransactions)
     .via((account, cashTransaction) => account.id === cashTransaction.accountId)
-
+    
   val celebrityToEnrollmentBatches = oneToManyRelation(celebrities, enrollmentBatches)
     .via((celebrity, enrollmentBatch) => celebrity.id === enrollmentBatch.celebrityId)
   celebrityToEnrollmentBatches.foreignKeyDeclaration.constrainReference(onDelete cascade)
@@ -387,6 +394,7 @@ class Schema @Inject() (
       factoryFor(cashTransactions) is CashTransaction(services = injector.instance[CashTransactionServices]),
       factoryFor(celebrities) is Celebrity(services = injector.instance[CelebrityServices]),
       factoryFor(celebrityCategoryValues) is CelebrityCategoryValue(services = injector.instance[CategoryServices]),
+      factoryFor(coupons) is Coupon(services = injector.instance[CouponServices]),
       factoryFor(customers) is Customer(services = injector.instance[CustomerServices]),
       factoryFor(egraphs) is Egraph(services = injector.instance[EgraphServices]),
       factoryFor(enrollmentBatches) is EnrollmentBatch(services = injector.instance[EnrollmentBatchServices]),

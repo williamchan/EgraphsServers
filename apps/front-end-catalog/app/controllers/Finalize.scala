@@ -43,7 +43,7 @@ object Finalize extends Controller with DefaultImplicitTemplateParameters {
     FinalizeBillingViewModel (
       name="{billing name}",
       email="{email}",
-      paymentToken="{paymentToken}",
+      paymentToken=Some("{paymentToken}"),
       postalCode="{billing postal code}",
       paymentJsModule="yes-maam-payment",
       paymentApiKey=Checkout.testStripeKey,
@@ -68,7 +68,8 @@ object Finalize extends Controller with DefaultImplicitTemplateParameters {
       base= BigDecimal(1.11).toMoney(),
       physicalGood= Some(BigDecimal(2.22).toMoney()),
       tax= Some(BigDecimal(3.33).toMoney()),
-      total= BigDecimal(4.00).toMoney()
+      discount= Some(BigDecimal(1.00).toMoney()),
+      total= BigDecimal(3.00).toMoney()
     )
   }
   

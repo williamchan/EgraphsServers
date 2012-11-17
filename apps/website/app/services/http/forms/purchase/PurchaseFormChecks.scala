@@ -120,7 +120,7 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
     import WrittenMessageRequest._
 
     messageRequest match {
-      // There are no messages for signature only or for when the celebrity choosesn
+      // There are no messages for signature only or for when the celebrity chooses
       case CelebrityChoosesMessage | SignatureOnly =>
         Right(None)
 
@@ -160,6 +160,17 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
 
     // Return the validation or Right(None) [meaning that there was no string]
     maybeErrorOrValidNote.getOrElse(Right(None))
+  }
+  
+  def isOptionalValidCouponCode: Either[FormError, Option[models.Coupon]] = {
+    // If there was a string, make sure it's valid
+    val maybeCode = toValidate.headOption.filter(code => code != "")
+    val maybeErrorOrValidCoupon = maybeCode.map { code =>
+      for (coupon <- check.isValidCouponCode(code, notValidCouponErrorString).right) yield { Option(coupon) }
+    }
+
+    // Return the validation or Right(None) [meaning that there was no string]
+    maybeErrorOrValidCoupon.getOrElse(Right(None))
   }
 
   /**
@@ -231,6 +242,7 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
 object PurchaseFormChecks {
   private[purchase] val requiredError = "Required field"
   private[purchase] val nameLengthErrorString = "Must be between 2 and 30 characters"
+  private[purchase] val notValidCouponErrorString = "Not a valid code"
 
   /** The maximum number of characters a written message request can contain */
   val minWrittenMessageChars = 5
