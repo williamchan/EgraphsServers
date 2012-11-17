@@ -552,13 +552,13 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
      ib.enddate > now() """
   
   val queryTextMatching = """ AND mv.to_tsvector @@ plainto_tsquery('english', {textQuery}) """
-
+  //TODO make this OR duh
   val queryRefinements =  refinements.foldLeft("")((query, refinement) => {
-      query + """ AND EXISTS ( SELECT c.id FROM celebritycategoryvalue ccv WHERE """ +
-      refinement._2.foldLeft("")((acc, cvId) => acc + " ccv.categoryvalueid = " + cvId + " AND ") +
-      """ ccv.celebrityid = c.id ) """
+      query + """ AND EXISTS ( SELECT c.id FROM celebritycategoryvalue ccv WHERE ccv.categoryvalueid IN """ + 
+      "(" + refinement._2.foldLeft("")((acc, id) => if(id != refinement._2.head) {acc + "," + id.toString} else { id.toString}) + ")" +
+      """ AND ccv.celebrityid = c.id ) """
     }) 
-  
+  println(queryRefinements)
   val queryGrouping = """ 
     ORDER BY is_order ASC
     ) AS stuff
