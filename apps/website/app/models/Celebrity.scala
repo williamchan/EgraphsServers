@@ -23,6 +23,12 @@ import anorm.SqlParser._
 import services.mvc.celebrity.CelebrityViewConversions
 import models.frontend.marketplace.MarketplaceCelebrity
 import models.frontend.marketplace.CelebritySortingTypes
+import play.api.libs.concurrent.Promise
+import models.frontend.marketplace.MarketplaceCelebrity
+import play.api.libs.concurrent.Akka
+import services.db.DBSession
+import services.db.TransactionSerializable
+import org.joda.time.DateTimeConstants
 
 /**
  * Services used by each celebrity instance
@@ -368,7 +374,7 @@ object Celebrity {
   }
 }
 
-class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebrity] with SavesCreatedUpdated[Long,Celebrity] {
+class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends SavesWithLongKey[Celebrity] with SavesCreatedUpdated[Long,Celebrity] {
   import org.squeryl.PrimitiveTypeMode._
   import CelebrityViewConversions._
   //
@@ -599,22 +605,25 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
     }
 
     val rowStream  = finalQuery.apply()(connection = schema.getTxnConnectionFactory)
-    
-    for (row <- rowStream) yield {
-      import java.math.BigDecimal
-      Celebrity(
-        id = row[Long]("celebrityid"),
-        publicName = row[String]("publicname"),
-        roleDescription = row[String]("roledescription"),
-        _enrollmentStatus = EnrollmentStatus.Enrolled.name,
-        _publishedStatus = PublishedStatus.Published.name,
-        _landingPageImageKey = row[Option[String]]("_landingpageImageKey")
-      ).asMarketplaceCelebrity(
-        soldout = row[BigDecimal]("inventoryAvailable").intValue() <= 0,
-        minPrice = row[BigDecimal]("minProductPrice").intValue(),
-        maxPrice = row[BigDecimal]("maxProductPrice").intValue()
-      )
+
+    val marketplaceCelebrities = for (row <- rowStream) yield {
+      Akka.future {
+        import java.math.BigDecimal
+        Celebrity(
+          id = row[Long]("celebrityid"),
+          publicName = row[String]("publicname"),
+          roleDescription = row[String]("roledescription"),
+          _enrollmentStatus = EnrollmentStatus.Enrolled.name,
+          _publishedStatus = PublishedStatus.Published.name,
+          _landingPageImageKey = row[Option[String]]("_landingpageImageKey"))
+        .asMarketplaceCelebrity(
+          soldout = row[BigDecimal]("inventoryAvailable").intValue() <= 0,
+          minPrice = row[BigDecimal]("minProductPrice").intValue(),
+          maxPrice = row[BigDecimal]("maxProductPrice").intValue())
+      }
     }
+
+    Promise.sequence(marketplaceCelebrities).await(10 * DateTimeConstants.MILLIS_PER_SECOND).get
   }
   
 
