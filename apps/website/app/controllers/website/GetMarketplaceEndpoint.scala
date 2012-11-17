@@ -79,16 +79,16 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
               //TODO when refinements are implemented we can do this using tags instead.  
               ("Featured Celebrities" , celebrityStore.getFeaturedPublishedCelebrities.map{c => 
 
-                val activeProductsAndInventory = c.getActiveProductsWithInventoryRemaining()
-                val purchaseableProducts = activeProductsAndInventory.filter {
-                  productAndCount => productAndCount._2 > 0
-                }
-                val prices = purchaseableProducts.map(p => p._1.priceInCurrency.toInt)
-                val (min, max) = prices.isEmpty match {
-                  case true => (0,0)
-                  case false => (prices.filter(p => p > 0).min, prices.max) 
-                }
-                c.asMarketplaceCelebrity(min, max, purchaseableProducts.isEmpty)
+                // val activeProductsAndInventory = c.getActiveProductsWithInventoryRemaining()
+                // val purchaseableProducts = activeProductsAndInventory.filter {
+                //   productAndCount => productAndCount._2 > 0
+                // }
+                // val prices = purchaseableProducts.map(p => p._1.priceInCurrency.toInt)
+                // val (min, max) = prices.isEmpty match {
+                //   case true => (0,0)
+                //   case false => (prices.filter(p => p > 0).min, prices.max) 
+                // }
+                c.asMarketplaceCelebrity(0, 0, false)
               })
             }
         })
