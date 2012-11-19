@@ -607,7 +607,7 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends Sa
     val rowStream  = finalQuery.apply()(connection = schema.getTxnConnectionFactory)
 
     val marketplaceCelebrities = for (row <- rowStream) yield {
-      Akka.future {
+      //Akka.future {
         import java.math.BigDecimal
         Celebrity(
           id = row[Long]("celebrityid"),
@@ -621,9 +621,11 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends Sa
           minPrice = row[BigDecimal]("minProductPrice").intValue(),
           maxPrice = row[BigDecimal]("maxProductPrice").intValue())
       }
-    }
+    //}
 
-    Promise.sequence(marketplaceCelebrities).await(10 * DateTimeConstants.MILLIS_PER_SECOND).get
+
+    //Promise.sequence(marketplaceCelebrities).await(10 * DateTimeConstants.MILLIS_PER_SECOND).get
+    marketplaceCelebrities
   }
   
 

@@ -7,7 +7,12 @@ import services.blobs.AccessPolicy
 import models.frontend.landing.CatalogStar
 import services.Utils
 import services.mvc.OrderViewConversions
+import services.mvc.celebrity._
+import services.AppConfig
 import controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled
+import com.google.inject.{Provider, Inject}
+
+
 
 /**
  * Converts Celebrities into various view models defined in the front-end module
@@ -15,6 +20,7 @@ import controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled
  * @param celeb the celebrity to convert.
  */
 class CelebrityViewConversions(celeb: Celebrity) {
+  private def catalogStarsQuery = AppConfig.instance[CatalogStarsQuery]
 
   /**
    * The celebrity's "Recent Egraphs" views as seen in the Choose Photo pages.
@@ -46,17 +52,14 @@ class CelebrityViewConversions(celeb: Celebrity) {
   }
   
   def asMarketplaceCelebrity(minPrice: Int, maxPrice: Int, soldout: Boolean) : MarketplaceCelebrity = {
-    val imageUrl  = celeb
-      .landingPageImage
-      .withImageType(ImageAsset.Jpeg)
-      .resizedWidth(660)
-      .getSaved(AccessPolicy.Public)
-      .url
-
+    val photoUrl = catalogStarsQuery().filter(c => c.id == celeb.id).headOption match {
+      case Some(celeb) => celeb.marketplaceImageUrl
+      case None => ""
+    }
     MarketplaceCelebrity(
       id = celeb.id,
       publicName = celeb.publicName,
-      photoUrl = imageUrl,
+      photoUrl = photoUrl,
       storefrontUrl = controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled(celebrityUrlSlug = celeb.urlSlug).url,
       soldout = soldout,
       minPrice = minPrice,
@@ -76,6 +79,12 @@ class CelebrityViewConversions(celeb: Celebrity) {
       .resizedWidth(440)
       .getSaved(AccessPolicy.Public).url
 
+    val marketplaceImageUrl = celeb
+      .landingPageImage
+      .withImageType(ImageAsset.Jpeg)
+      .resizedWidth(660)
+      .getSaved(AccessPolicy.Public).url
+
     val purchaseableProductsIds = inventoryQuantities.filter {
       productAndCount => productAndCount.quantityRemaining > 0
     }
@@ -86,6 +95,7 @@ class CelebrityViewConversions(celeb: Celebrity) {
       name = celeb.publicName,
       secondaryText = Option(celeb.roleDescription),
       imageUrl = mastheadImageUrl,
+      marketplaceImageUrl = marketplaceImageUrl,
       storefrontUrl = choosePhotoUrl,
       hasInventoryRemaining = !purchaseableProductsIds.isEmpty,
       isFeatured = celeb.isFeatured,
@@ -107,7 +117,7 @@ class CelebrityViewConversions(celeb: Celebrity) {
     val marketplaceImageUrl = celeb
       .landingPageImage
       .withImageType(ImageAsset.Jpeg)
-      .resizedWidth(440)
+      .resizedWidth(660)
       .getSaved(AccessPolicy.Public).url
 
     val activeProductsAndInventory = celeb.getActiveProductsWithInventoryRemaining()
@@ -127,6 +137,7 @@ class CelebrityViewConversions(celeb: Celebrity) {
       name = celeb.publicName,
       secondaryText = Option(celeb.roleDescription),
       imageUrl = mastheadImageUrl,
+      marketplaceImageUrl = marketplaceImageUrl,
       storefrontUrl = choosePhotoUrl,
       hasInventoryRemaining = !purchaseableProducts.isEmpty,
       isFeatured = celeb.isFeatured,

@@ -94,7 +94,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
                   MarketplaceCelebrity(
                       id = c.id,
                       publicName = c.name,
-                      photoUrl = c.imageUrl,
+                      photoUrl = c.marketplaceImageUrl,
                       storefrontUrl = c.storefrontUrl,
                       soldout = !c.hasInventoryRemaining,
                       minPrice = c.minPrice,
@@ -109,7 +109,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
 
       val viewAsList = viewOption == Some("list")
 
-      //HACK As long as no CategoryValues have children Categories, this call ca be used to display
+      //HACK As long as no CategoryValues have children Categories, this call can be used to display
       // only baseball categories. This NEEDS to be fixed if we want to support multiple verticals. 
       val categoryValues = categoryValueStore.all().toList
 

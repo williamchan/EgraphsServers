@@ -16,6 +16,7 @@ case class CatalogStar(
   name: String,
   secondaryText: Option[String],
   imageUrl: String,
+  marketplaceImageUrl: String,
   storefrontUrl: String,
   hasInventoryRemaining: Boolean,
   isFeatured: Boolean,
