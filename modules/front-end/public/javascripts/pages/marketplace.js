@@ -118,6 +118,12 @@ define(["libs/chosen/chosen.jquery.min"], function (Egraphs) {
           }
         );
 
+        $(".clear-all").click(function(e) {
+          var category = window.Egraphs.page.categories["c" + $(this).attr("data-category")];
+          category.length = 0;
+          reloadPage();
+        }
+        );
         $(".show-all").click(function(e){
           $(this).parent().siblings().children().each(function() {
             $(this).removeClass("condensed");

@@ -4,7 +4,8 @@
 <ol>
   @for(category <- categoryViewModels) {
     <li>
-     <a class="category" @if(category.active){class="active"} data-category="@category.id">@category.publicName</a> 
+     <a class="category" data-category="@category.id">@category.publicName</a> 
+      @if(category.active){<a data-category="@category.id" class="clear-all">(Clear All)</a>}
         <ol>
         @for((categoryValue, idx) <- category.categoryValues.zipWithIndex) {
           <li>

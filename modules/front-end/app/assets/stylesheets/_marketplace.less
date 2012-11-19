@@ -87,8 +87,6 @@
 
               cursor: default;
               
-              //&:hover { color: @orange; }
-
               &.category {
                 font-weight: 800;
               }
@@ -98,6 +96,11 @@
               //  color: @orange;
               //}
               
+            }
+
+            a.clear-all {
+              cursor: pointer;
+              &:hover { color: @orange; }
             }
             
             ol {
@@ -628,6 +631,9 @@
 	            font-size: 20px;
 	            line-height: 1.25em;
 	            margin-bottom: .675em; 
+              cursor: default;  
+              color: @orange;
+
 	          }
 
 	          hr {
