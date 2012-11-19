@@ -29,6 +29,8 @@ trait PostCouponAdminEndpoint extends Logging {
   protected def httpFilters: HttpFilters
   protected def couponStore: CouponStore
   private def dateFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm")
+  // TODO SER-504: Hack to make startDate and endDate PST.
+  private def eightHoursInMillis = 28800000 // AWS servers think they're in GMT regardless of region
   
   def postCreateCouponAdmin = postController() {
     httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
@@ -90,8 +92,8 @@ trait PostCouponAdminEndpoint extends Logging {
     lazy val couponType = CouponType(couponTypeString).get
     lazy val discountType = CouponDiscountType(discountTypeString).get
     lazy val usageType = CouponUsageType(usageTypeString).get
-    lazy val startDateTimestamp = new Timestamp(dateFormat.parse(startDate).getTime)
-    lazy val endDateTimestamp = new Timestamp(dateFormat.parse(endDate).getTime)
+    lazy val startDateTimestamp = new Timestamp(dateFormat.parse(startDate).getTime + eightHoursInMillis)
+    lazy val endDateTimestamp = new Timestamp(dateFormat.parse(endDate).getTime + eightHoursInMillis)
 
     /** 
      * Configures a provided coupon or, by default, a new Coupon with the values
