@@ -84,17 +84,19 @@
                  
             a {
               color: @grayLight;
+
+              cursor: default;
               
-              &:hover { color: @orange; }
+              //&:hover { color: @orange; }
 
               &.category {
                 font-weight: 800;
               }
               
-              &.active {
-                font-weight: 800;
-                color: @orange;
-              }
+              //&.active {
+              //  font-weight: 800;
+              //  color: @orange;
+              //}
               
             }
             
@@ -105,7 +107,7 @@
                 font-size: 1em;
                 line-height: 1.5em;
               
-                a {
+                a.cv-link, a.show-all {
                   
                   cursor:pointer;
                   display: block;                
@@ -138,6 +140,10 @@
                   &.show-all {
                     font-weight: 800;
                   }
+
+                  &:hover {
+                      color: @orange;    
+                  }
   
                   &.active {
                   
@@ -147,16 +153,12 @@
                     color: @gray;
                     text-shadow: 0 1px 0 @white;
 
-                    &:hover {
-    
-                      span {
-                        background: lighten(@gray, 50%);
-                        .border-radius(0 5px 5px 0);
-                      }
-                      
-                      i { visibility: visible; }
-                    
+                    span {
+                      background: lighten(@gray, 50%);
+                      .border-radius(0 5px 5px 0);
                     }
+                    
+                    i { visibility: visible; }
 
                   }
   

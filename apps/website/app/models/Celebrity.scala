@@ -564,7 +564,7 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends Sa
       "(" + refinement._2.foldLeft("")((acc, id) => if(id != refinement._2.head) {acc + "," + id.toString} else { id.toString}) + ")" +
       """ AND ccv.celebrityid = c.id ) """
     }) 
-  println(queryRefinements)
+
   val queryGrouping = """ 
     ORDER BY is_order ASC
     ) AS stuff
@@ -577,12 +577,12 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends Sa
 
     val queryResultOrdering = {
       sortType match {
-        // case RecentlyAdded => 
-          // this may not be 100% accurate, but gives a gauge of when then have been added to our systems,
-          // to do better would have to include their publish date along with when their products were published to
-          // figure this out, and we don't have all that in our database now.
-         // "ORDER BY celebrityid DESC"
-        // case MostPopular => "ORDER BY inventory_sold DESC"
+      // case RecentlyAdded => 
+      // this may not be 100% accurate, but gives a gauge of when then have been added to our systems,
+      // to do better would have to include their publish date along with when their products were published to
+      // figure this out, and we don't have all that in our database now.
+      // "ORDER BY celebrityid DESC"
+      // case MostPopular => "ORDER BY inventory_sold DESC"
         case PriceAscending => "ORDER BY minProductPrice ASC"
         case PriceDecending => "ORDER BY maxProductPrice DESC"
         case Alphabetical => "ORDER BY publicname ASC"
