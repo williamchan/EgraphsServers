@@ -7,14 +7,19 @@ object CelebritySortingTypes extends Enum {
     def displayName: String
   }
 
-  val RecentlyAdded = new EnumVal {
-    val name = "RecentlyAdded"
-    val displayName ="Recently Added" 
+  // val RecentlyAdded = new EnumVal {
+  //   val name = "RecentlyAdded"
+  //   val displayName ="Recently Added" 
+  // }
+  // val MostPopular = new EnumVal {
+  //   val name = "MostPopular"
+  //   val displayName ="Most Popular"
+  // }
+  val MostRelevant = new EnumVal {
+    val name = "MostRelevant"
+    val displayName ="Most Relevant"
   }
-  val MostPopular = new EnumVal {
-    val name = "MostPopular"
-    val displayName ="Most Popular"
-  }
+
   val PriceAscending = new EnumVal {
     val name = "PriceAscending"
     val displayName ="Price (Low to High)"
@@ -27,8 +32,8 @@ object CelebritySortingTypes extends Enum {
     val name = "Alphabetical"
     val displayName ="Alphabetical (A-Z)"
   }
-  val ReverseAlphabetical = new EnumVal {
-    val name = "ReverseAlphabetical"
-    val displayName ="Alphabetical (Z-A)"
-  }
+  // val ReverseAlphabetical = new EnumVal {
+  //   val name = "ReverseAlphabetical"
+  //   val displayName ="Alphabetical (Z-A)"
+  // }
 }

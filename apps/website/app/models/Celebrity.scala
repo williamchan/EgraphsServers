@@ -498,7 +498,7 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends Sa
    *  (pitcher or 2nd baseman) and (red sox or yankees)
    */
 
-  def marketplaceSearch(maybeQuery: Option[String] = None, refinements: Map[Long, Iterable[Long]] = Map[Long, Iterable[Long]](), sortType: CelebritySortingTypes.EnumVal = CelebritySortingTypes.MostPopular)
+  def marketplaceSearch(maybeQuery: Option[String] = None, refinements: Map[Long, Iterable[Long]] = Map[Long, Iterable[Long]](), sortType: CelebritySortingTypes.EnumVal = CelebritySortingTypes.MostRelevant)
   : Iterable[MarketplaceCelebrity] = {
 
     // Note we could make this fast probably.  We should see how performance is affected if we don't have to
@@ -577,17 +577,17 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends Sa
 
     val queryResultOrdering = {
       sortType match {
-        case RecentlyAdded => 
+        // case RecentlyAdded => 
           // this may not be 100% accurate, but gives a gauge of when then have been added to our systems,
           // to do better would have to include their publish date along with when their products were published to
           // figure this out, and we don't have all that in our database now.
-         "ORDER BY celebrityid DESC"
-        case MostPopular => "ORDER BY inventory_sold DESC"
+         // "ORDER BY celebrityid DESC"
+        // case MostPopular => "ORDER BY inventory_sold DESC"
         case PriceAscending => "ORDER BY minProductPrice ASC"
         case PriceDecending => "ORDER BY maxProductPrice DESC"
         case Alphabetical => "ORDER BY publicname ASC"
-        case ReverseAlphabetical => "ORDER BY publicname DESC"
-        case _ =>  "ORDER BY celeb_id ASC"
+        // case ReverseAlphabetical => "ORDER BY publicname DESC"
+        case _ =>  ""
       }
     } + ";"
 

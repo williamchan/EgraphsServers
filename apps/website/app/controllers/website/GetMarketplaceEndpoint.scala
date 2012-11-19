@@ -77,13 +77,18 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       val (subtitle, celebrities) = dbSession.connected(TransactionSerializable) {
         (queryOption match {
           case Some(query) =>
-            ("Showing Results for \"" + query + "\"...", celebrityStore.marketplaceSearch(queryOption, categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostPopular)))
+            val results  = celebrityStore.marketplaceSearch(queryOption, categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostRelevant))
+            val subtitle = results.size match {
+              case 1 => "Showing 1 Result for \"" + query + "\"..."
+              case _ =>  "Showing " + results.size + " Results for \"" + query + "\"..."
+            }
+            (subtitle, results)
           case _ =>
             if (!activeCategoryValues.isEmpty) {
-              ("Results", celebrityStore.marketplaceSearch(queryOption, categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostPopular)))
+              ("Results", celebrityStore.marketplaceSearch(queryOption, categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostRelevant)))
             } else {
               //TODO when refinements are implemented we can do this using tags instead.  
-              ("Featured Celebrities", celebrityStore.getFeaturedPublishedCelebrities.map { c =>
+              ("Featured Stars", celebrityStore.getFeaturedPublishedCelebrities.map { c =>
                 dbSession.connected(TransactionSerializable) {
                   val activeProductsAndInventory = c.getActiveProductsWithInventoryRemaining()
                   val purchaseableProducts = activeProductsAndInventory.filter {
