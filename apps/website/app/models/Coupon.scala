@@ -200,7 +200,7 @@ class CouponQueryFilters @Inject() (schema: Schema) {
   def activeByDate: FilterOneTable[Coupon] = {
     new FilterOneTable[Coupon] {
       override def test(coupon: Coupon) = {
-        Time.today between(coupon.startDate, coupon.endDate)
+        Time.now between(coupon.startDate, coupon.endDate)
       }
     }
   }
