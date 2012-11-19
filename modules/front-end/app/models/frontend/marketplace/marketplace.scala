@@ -11,7 +11,7 @@ case class MarketplaceCelebrity(
     soldout: Boolean,
     minPrice: Int,
     maxPrice: Int, 
-    subtitle: String
+    secondaryText: String
   ) 
 
  case class CategoryViewModel(

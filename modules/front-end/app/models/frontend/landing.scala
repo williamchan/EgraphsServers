@@ -12,10 +12,13 @@ package models.frontend.landing
  * @param isFeatured true that the celebrity should appear under "Featured Stars"
  */
 case class CatalogStar(
+  id: Long, 
   name: String,
   secondaryText: Option[String],
   imageUrl: String,
   storefrontUrl: String,
   hasInventoryRemaining: Boolean,
-  isFeatured: Boolean
+  isFeatured: Boolean,
+  minPrice: Int,
+  maxPrice: Int
 )

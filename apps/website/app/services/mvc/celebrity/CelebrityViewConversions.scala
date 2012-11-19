@@ -61,7 +61,7 @@ class CelebrityViewConversions(celeb: Celebrity) {
       soldout = soldout,
       minPrice = minPrice,
       maxPrice = maxPrice,
-      subtitle = celeb.roleDescription
+      secondaryText = celeb.roleDescription
     )
   }
 
@@ -88,7 +88,10 @@ class CelebrityViewConversions(celeb: Celebrity) {
       imageUrl = mastheadImageUrl,
       storefrontUrl = choosePhotoUrl,
       hasInventoryRemaining = !purchaseableProductsIds.isEmpty,
-      isFeatured = celeb.isFeatured
+      isFeatured = celeb.isFeatured,
+      minPrice = 0,
+      maxPrice = 0,
+      id = celeb.id
     )
   }
 
@@ -101,12 +104,23 @@ class CelebrityViewConversions(celeb: Celebrity) {
       .getSaved(AccessPolicy.Public)
       .url
 
+    val marketplaceImageUrl = celeb
+      .landingPageImage
+      .withImageType(ImageAsset.Jpeg)
+      .resizedWidth(440)
+      .getSaved(AccessPolicy.Public).url
+
     val activeProductsAndInventory = celeb.getActiveProductsWithInventoryRemaining()
     val purchaseableProducts = activeProductsAndInventory.filter {
       productAndCount =>
         productAndCount._2 > 0
     }
-
+    val prices = purchaseableProducts.map(p => p._1.priceInCurrency.toInt)
+    val (min, max) = prices.isEmpty match {
+      case true => (0, 0)
+      case false => (prices.filter(p => p > 0).min, prices.max)
+    }
+      // marketplaceImageUrl = marketplaceImageUrl
     val choosePhotoUrl = getStorefrontChoosePhotoTiled(celeb.urlSlug).url
 
     CatalogStar(
@@ -115,7 +129,10 @@ class CelebrityViewConversions(celeb: Celebrity) {
       imageUrl = mastheadImageUrl,
       storefrontUrl = choosePhotoUrl,
       hasInventoryRemaining = !purchaseableProducts.isEmpty,
-      isFeatured = celeb.isFeatured
+      isFeatured = celeb.isFeatured,
+      minPrice = min, 
+      maxPrice = max,
+      id = celeb.id
     )
   }
 }

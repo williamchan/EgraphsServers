@@ -12,7 +12,7 @@ import controllers.WebsiteControllers
 import enums.{PrivacyStatus, EgraphState}
 import models.frontend.egraphs._
 import models.categories._
-import services.mvc.ImplicitHeaderAndFooterData
+import services.mvc.{celebrity, ImplicitHeaderAndFooterData}
 import models.GalleryOrderFactory
 import services.ConsumerApplication
 import services.http.{SafePlayParams, ControllerMethod}
@@ -25,6 +25,7 @@ import models.frontend.marketplace.CelebritySortingTypes
 import play.api.libs.concurrent.Akka
 import services.db.TransactionSerializable
 import services.db.DBSession
+import celebrity.CatalogStarsQuery
 
 /**
  * Controller for serving the celebrity marketplace
@@ -34,6 +35,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
   protected def controllerMethod : ControllerMethod
   protected def celebrityStore : CelebrityStore  
   protected def categoryValueStore: CategoryValueStore
+  protected def catalogStarsQuery: CatalogStarsQuery
   protected def dbSession: DBSession
   
   import CelebrityViewConversions._
@@ -41,7 +43,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
 
   val queryUrl = controllers.routes.WebsiteControllers.getMarketplaceResultPage.url
   val categoryRegex = new scala.util.matching.Regex("""c([0-9]+)""", "id")
-
+  
   private def sortOptionViewModels(selectedSortingType: Option[CelebritySortingTypes.EnumVal] = None) : Iterable[SortOptionViewModel] = {
     for {
       sortingType <- CelebritySortingTypes.values
@@ -75,36 +77,35 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       } yield { categoryValue }}.toSet
 
       val (subtitle, celebrities) = dbSession.connected(TransactionSerializable) {
-        (queryOption match {
+        queryOption match {
           case Some(query) =>
             val results  = celebrityStore.marketplaceSearch(queryOption, categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostRelevant))
-            val subtitle = results.size match {
+            val text = results.size match {
               case 1 => "Showing 1 Result for \"" + query + "\"..."
               case _ =>  "Showing " + results.size + " Results for \"" + query + "\"..."
             }
-            (subtitle, results)
+            (text, results)
           case _ =>
             if (!activeCategoryValues.isEmpty) {
               ("Results", celebrityStore.marketplaceSearch(queryOption, categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostRelevant)))
             } else {
               //TODO when refinements are implemented we can do this using tags instead.  
-              ("Featured Stars", celebrityStore.getFeaturedPublishedCelebrities.map { c =>
-                dbSession.connected(TransactionSerializable) {
-                  val activeProductsAndInventory = c.getActiveProductsWithInventoryRemaining()
-                  val purchaseableProducts = activeProductsAndInventory.filter {
-                    case (product, count) => count > 0
-                  }
-                  val prices = purchaseableProducts.map(p => p._1.priceInCurrency.toInt)
-                  val (min, max) = prices.isEmpty match {
-                    case true => (0, 0)
-                    case false => (prices.filter(p => p > 0).min, prices.max)
-                  }
-                  c.asMarketplaceCelebrity(min, max, purchaseableProducts.isEmpty)
-                }
-              })
+              ("Featured Stars", catalogStarsQuery().filter(star => star.isFeatured).map(c => 
+                  MarketplaceCelebrity(
+                      id = c.id,
+                      publicName = c.name,
+                      photoUrl = c.imageUrl,
+                      storefrontUrl = c.storefrontUrl,
+                      soldout = !c.hasInventoryRemaining,
+                      minPrice = c.minPrice,
+                      maxPrice = c.maxPrice, 
+                      secondaryText = c.secondaryText.getOrElse("")
+                  )
+                )
+              )
             }
-        })
-      }
+          }
+        }
 
       val viewAsList = viewOption == Some("list")
 
