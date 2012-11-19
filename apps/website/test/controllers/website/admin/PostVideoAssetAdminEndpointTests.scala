@@ -13,7 +13,7 @@ import models.VideoAssetStore
 import models.enums.VideoStatus
 import utils.FunctionalTestUtils.Conversions._
 import utils.FunctionalTestUtils
-import utils.FunctionalTestUtils.DomainRequest
+import utils.FunctionalTestUtils.MultipartDomainRequest
 import models.VideoAsset
 import play.api.http.HeaderNames
 import play.api.mvc.MultipartFormData
@@ -45,11 +45,8 @@ class PostVideoAssetAdminEndpointTests extends EgraphsUnitTest with AdminProtect
     val fakeVideoFile = Seq(fakeVideoPart)
     val postBody = MultipartFormData[TemporaryFile](nonFiles, fakeVideoFile, Seq(), Seq())
 
-    val Some(result) = routeAndCall(new DomainRequest(FakeRequest(POST, "/admin/videoasset",
-      FakeHeaders(Map(HeaderNames.CONTENT_TYPE -> Seq("multipart/form-data"))), postBody)).withAdmin(admin.id))
-      
-//    val Some(result) = routeAndCall(FakeRequest(POST, controllers.routes.WebsiteControllers.postProcessVideoAdmin(
-//      VideoStatus.Approved.name, videoAsset.id).url).withAdmin(admin.id).withAuthToken)      
+    val Some(result) = routeAndCall(new MultipartDomainRequest(FakeRequest(POST, "/admin/videoasset",
+      FakeHeaders(Map(HeaderNames.CONTENT_TYPE -> Seq("multipart/form-data"))), postBody)).withAdmin(admin.id).withAuthToken)     
 
     status(result) should be(OK)
 

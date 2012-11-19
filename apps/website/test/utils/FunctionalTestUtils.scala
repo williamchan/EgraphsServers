@@ -17,6 +17,8 @@ import play.api.mvc.ChunkedResult
 import play.api.libs.iteratee.Iteratee
 import play.api.libs.concurrent.Promise
 import play.api.mvc.Result
+import play.api.mvc.MultipartFormData
+import play.api.libs.Files.TemporaryFile
 
 //import java.util.Properties
 //import models.Account
@@ -174,30 +176,71 @@ object FunctionalTestUtils {
 
     def withAuthToken: FakeRequest[T] = {
       val newSession = request.session + ("authenticityToken" -> authToken)
-
       requestWithAuthTokenInBody.withSession(newSession.data.toSeq: _*)
     }
 
   }
 
   class DomainRequest[T <: AnyContent](override val request: FakeRequest[T]) extends DomainRequestBase[T] {
-    override def requestWithAuthTokenInBody: FakeRequest[AnyContent] = {
+    override def requestWithAuthTokenInBody: FakeRequest[T] = {
       val formUrlEncodedRequest = request.asInstanceOf[FakeRequest[AnyContentAsFormUrlEncoded]]
       val existingBody = formUrlEncodedRequest.body.asFormUrlEncoded.getOrElse(Map())
       val newBody = existingBody + ("authenticityToken" -> Seq(authToken))
       val newBodySingleValues = newBody.map(kv => (kv._1, kv._2.head))
 
-      request.withFormUrlEncodedBody(newBodySingleValues.toSeq: _*).asInstanceOf[FakeRequest[AnyContent]]
+      request.withFormUrlEncodedBody(newBodySingleValues.toSeq: _*).asInstanceOf[FakeRequest[T]]
     }
   }
-  
-  // MultiPartDomainRequest
+
+  class MultipartDomainRequest[T](override val request: FakeRequest[T]) extends DomainRequestBase[T] {
+    override def requestWithAuthTokenInBody: FakeRequest[T] = {
+      var multipartEncodedRequest = request.asInstanceOf[FakeRequest[MultipartFormData[TemporaryFile]]]
+      val existingDataParts = multipartEncodedRequest.body.dataParts
+      val existingFiles = multipartEncodedRequest.body.files
+      val newDataParts = existingDataParts + ("authenticityToken" -> Seq(authToken))
+      //val newDataPartsSingleValues = newDataParts.map(kv => (kv._1, kv._2.head))
+      
+
+      //request.asInstanceOf[FakeRequest[MultipartFormData[T]]].body.dataParts = newDataParts 
+      //request.asInstanceOf[FakeRequest[T]]
+      //request.withFormUrlEncodedBody(newDataPartsSingleValues.toSeq: _*).asInstanceOf[FakeRequest[T]]
+
+      //val putBody = MultipartFormData[TemporaryFile](newDataParts, Seq(), Seq(), Seq())
+// if (maybeVideosAndPublicNames.exists { case (_, maybePublicName) => maybePublicName.isEmpty })
+            //request.map(FakeRequest(dataParts => newDataParts))
+      println("request body looks like: " + request.body)
+      println("***********")
+      
+      // make a new MultipartFormData guy
+      // copy old contents 
+      // add addition
+      // return whole thing?
+      
+      //request.body
+//      Foo(a,b, c)
+//      someFoo match {
+//        case Foo(x, y, _) => new Foo(x, y, bar)
+//      }
+      
+     val newRequest = MultipartFormData[TemporaryFile](newDataParts, existingFiles, Seq(), Seq())
+      
+      //val newMultipart = MultipartFormData[TemporaryFile]
+      
+      //(request.map { case part => newDataParts }).asInstanceOf[FakeRequest[T]]
+      
+     
+     newRequest.asInstanceOf[FakeRequest[T]]
+     
+    }
+  }
 
   object Conversions {
     implicit def fakeAnyContentRequestToDomainRequest[T <: AnyContent](fakeRequest: FakeRequest[T]) = {
       new DomainRequest(fakeRequest)
     }
-    
-    // write another one here
+
+    implicit def fakeMultipartContentRequestToDomainRequest[T](fakeRequest: FakeRequest[T]) = {
+      new MultipartDomainRequest(fakeRequest)
+    }
   }
 }
