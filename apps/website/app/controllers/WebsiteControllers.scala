@@ -68,6 +68,8 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val orderStore = instance[OrderStore]
   override protected val printOrderStore = instance[PrintOrderStore]
   override protected val productStore = instance[ProductStore]
+  override protected val videoAssetStore = instance[VideoAssetStore]
+  override protected val videoAssetCelebrityStore = instance[VideoAssetCelebrityStore]
   
   override protected val couponQueryFilters = instance[CouponQueryFilters]
   override protected val egraphQueryFilters = instance[EgraphQueryFilters]

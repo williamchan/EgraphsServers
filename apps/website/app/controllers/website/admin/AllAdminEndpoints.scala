@@ -34,6 +34,7 @@ trait AllAdminEndpoints
   with GetProductAdminEndpoint
   with GetReportsAdminEndpoint
   with GetToolsAdminEndpoint
+  with GetVideoAssetAdminEndpoint
   with PostAccountAdminEndpoint
   with PostCategoryAdminEndpoint
   with PostCategoryValueAdminEndpoint
@@ -47,6 +48,8 @@ trait AllAdminEndpoints
   with PostLoginAdminEndpoint
   with PostOrderAdminEndpoint
   with PostPrintOrderAdminEndpoint
+  with PostProcessVideoAdminEndpoint
   with PostProductAdminEndpoint
   with PostSendCelebrityWelcomeEmailAdminEndpoint
+  with PostVideoAssetAdminEndpoint
 { this: Controller => }

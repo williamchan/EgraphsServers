@@ -8,6 +8,7 @@ import enums.{EgraphState, PublishedStatus}
 import egraphs.playutils.Encodings.Base64
 import org.apache.commons.lang3.RandomStringUtils
 import categories.{Category, CategoryValue}
+import models.enums.VideoStatus
 import util.Random
 
 /**
@@ -180,6 +181,18 @@ object TestData {
       .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), Base64.decode(TestConstants.voiceStr()))
       .save()
   }
+
+  def newSavedVideoAsset(): VideoAsset = {
+    VideoAsset(url = "http://www.testUrl.com", _videoStatus = VideoStatus.Unprocessed.name).save()
+  }
+  
+  // delete this if it never gets called
+  def newSavedVideoAssetCelebrity(): VideoAssetCelebrity = {
+    val videoAssetId = newSavedVideoAsset().id
+    val celebrityId = newSavedCelebrity().id
+    VideoAssetCelebrity(videoId = videoAssetId, celebrityId = celebrityId).save()
+  }
+   
   /**
    *  Convert an iterable and key into a map with the same key for every value.
    *  Helpful when writing functional tests. 

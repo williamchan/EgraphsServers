@@ -1,14 +1,14 @@
 package services.db
 
 import org.squeryl.PrimitiveTypeMode._
-import org.squeryl.{KeyedEntity, Table}
+import org.squeryl.{ KeyedEntity, Table }
 import models._
 import models.categories._
 import models.vbg._
 import models.xyzmo._
 import java.lang.IllegalStateException
-import java.io.{ByteArrayOutputStream, PrintWriter}
-import com.google.inject.{Inject, Injector}
+import java.io.{ ByteArrayOutputStream, PrintWriter }
+import com.google.inject.{ Inject, Injector }
 import java.sql.Connection
 import services.logging.Logging
 import services.config.ConfigFileProxy
@@ -20,12 +20,10 @@ import services.config.ConfigFileProxy
  *
  * NOTE: The order of declaration matters. Cannot reference tables before they have been declared.
  */
-class Schema @Inject()(
+class Schema @Inject() (
   injector: Injector,
   config: ConfigFileProxy,
-  @CurrentTransaction currentTxnConnectionFactory: () => Connection
-) extends org.squeryl.Schema with Logging
-{
+  @CurrentTransaction currentTxnConnectionFactory: () => Connection) extends org.squeryl.Schema with Logging {
 
   import uk.me.lings.scalaguice.InjectorExtensions._
 
@@ -45,9 +43,7 @@ class Schema @Inject()(
   on(addresses)(address =>
     declare(
       address._state is dbType("varchar(2)"),
-      address.postalCode is dbType("varchar(20)")
-    )
-  )
+      address.postalCode is dbType("varchar(20)")))
 
   val administrators = table[Administrator]
 
@@ -55,38 +51,31 @@ class Schema @Inject()(
   on(blobKeys)(blobKey =>
     declare(
       blobKey.key is unique,
-      blobKey.url is dbType("varchar(255)")
-    )
-  )
+      blobKey.url is dbType("varchar(255)")))
 
   val cashTransactions = table[CashTransaction]
   on(cashTransactions)(cashTransaction => declare(
     cashTransaction.amountInCurrency is monetaryDbType,
-    cashTransaction.billingPostalCode is dbType("varchar(20)"))
-  )
+    cashTransaction.billingPostalCode is dbType("varchar(20)")))
 
   val categories = table[Category]
-  on(categories) (category => declare( category.name is unique))
+  on(categories)(category => declare(category.name is unique))
   val categoryValues = table[CategoryValue]
-  on(categoryValues) (categoryValue => declare( categoryValue.name is unique))
-  
+  on(categoryValues)(categoryValue => declare(categoryValue.name is unique))
+
   val celebrities = table[Celebrity]
   on(celebrities)(celebrity =>
     declare(
       celebrity.urlSlug is unique,
       celebrity.isFeatured is indexed,
-      celebrity.bio is dbType("text")
-    )
-  )
+      celebrity.bio is dbType("text")))
   
   val coupons = table[Coupon]
   on(coupons)(coupon => 
     declare(
       columns(coupon.code, coupon.startDate, coupon.endDate, coupon.isActive) are indexed,
       columns(coupon._usageType, coupon.startDate, coupon.endDate, coupon.isActive) are indexed,
-      coupon.restrictions is dbType("varchar(255)")
-    )
-  )
+      coupon.restrictions is dbType("varchar(255)")))
 
   val customers = table[Customer]
   on(customers)(customer => declare(customer.username is unique))
@@ -97,56 +86,50 @@ class Schema @Inject()(
   val enrollmentBatches = table[EnrollmentBatch]
   on(enrollmentBatches)(enrollmentBatch =>
     declare(
-      columns(enrollmentBatch.celebrityId, enrollmentBatch.isBatchComplete, enrollmentBatch.isSuccessfulEnrollment) are indexed
-    )
-  )
+      columns(enrollmentBatch.celebrityId, enrollmentBatch.isBatchComplete, enrollmentBatch.isSuccessfulEnrollment) are indexed))
 
   val enrollmentSamples = table[EnrollmentSample]
 
   val failedPurchaseData = table[FailedPurchaseData]
-  on(failedPurchaseData)(datum => declare( datum.purchaseData is dbType("varchar(1000)") ))
+  on(failedPurchaseData)(datum => declare(datum.purchaseData is dbType("varchar(1000)")))
 
   val inventoryBatches = table[InventoryBatch]
   on(inventoryBatches)(inventoryBatch =>
     declare(
       columns(inventoryBatch.startDate, inventoryBatch.endDate) are indexed,
-      columns(inventoryBatch.celebrityId, inventoryBatch.startDate, inventoryBatch.endDate) are indexed
-    )
-  )
+      columns(inventoryBatch.celebrityId, inventoryBatch.startDate, inventoryBatch.endDate) are indexed))
 
   val orders = table[Order]("Orders")
   on(orders)(order =>
     declare(
       order.amountPaidInCurrency is monetaryDbType,
       columns(order._reviewStatus) are indexed,
-      order.messageToCelebrity is dbType("varchar(140)")
-    )
-  )
+      order.messageToCelebrity is dbType("varchar(140)")))
 
   val printOrders = table[PrintOrder]
   on(printOrders)(printOrder => declare(
     printOrder.amountPaidInCurrency is monetaryDbType,
     printOrder.isFulfilled is indexed,
     printOrder.pngUrl is dbType("varchar(255)"),
-    printOrder.shippingAddress is dbType("varchar(255)"))
-  )
+    printOrder.shippingAddress is dbType("varchar(255)")))
 
   val products = table[Product]
   on(products)(product =>
     declare(
       product.priceInCurrency is monetaryDbType,
       product.storyText is dbType("text"),
-      columns(product.celebrityId, product.urlSlug) are unique
-    )
-  )
+      columns(product.celebrityId, product.urlSlug) are unique))
 
   val usernameHistories = table[Username]("Usernames")
   on(usernameHistories)(usernameHistory =>
     declare(
       usernameHistory.id is dbType("varchar(255)"),
-      usernameHistory.customerId is indexed
-    )
-  )
+      usernameHistory.customerId is indexed))
+
+  val videoAssets = table[VideoAsset]
+  on(videoAssets)(videoAsset =>
+    declare(
+      videoAsset.url is dbType("varchar(255)")))
 
   // ugh, why did I make so many biometrics tables?
   val vbgAudioCheckTable = table[VBGAudioCheck]
@@ -167,32 +150,32 @@ class Schema @Inject()(
     declare(
       xyzmoEnrollDynamicProfile.errorMsg is dbType("varchar(255)"),
       xyzmoEnrollDynamicProfile.rejectedSignaturesSummary is dbType("varchar(255)"),
-      xyzmoEnrollDynamicProfile.enrollmentSampleIds is dbType("varchar(255)")
-    )
-  )
+      xyzmoEnrollDynamicProfile.enrollmentSampleIds is dbType("varchar(255)")))
   val xyzmoVerifyUserTable = table[XyzmoVerifyUser]
   on(xyzmoVerifyUserTable)(xyzmoVerifyUser => declare(xyzmoVerifyUser.errorMsg is dbType("varchar(255)")))
-
 
   //
   // manyToManyRelation declarations -- please keep these alphabetized
   //
 
   val categoryValueRelationships =
-    manyToManyRelation(categoryValues, categories).via[CategoryValueRelationship]((cv,c,cvr) => (cvr.categoryValueId === cv.id, cvr.categoryId === c.id))
-  
+    manyToManyRelation(categoryValues, categories).via[CategoryValueRelationship]((cv, c, cvr) => (cvr.categoryValueId === cv.id, cvr.categoryId === c.id))
+
   val celebrityCategoryValues =
     manyToManyRelation(celebrities, categoryValues).via[CelebrityCategoryValue]((c, cv, ccv) =>
-      (ccv.celebrityId === c.id, ccv.categoryValueId === cv.id)
-    )
-    
+      (ccv.celebrityId === c.id, ccv.categoryValueId === cv.id))
+
   val inventoryBatchProducts = manyToManyRelation(inventoryBatches, products)
     .via[InventoryBatchProduct]((inventoryBatch, product, join) => (join.inventoryBatchId === inventoryBatch.id, join.productId === product.id))
   on(inventoryBatchProducts)(inventoryBatchProduct =>
     declare(
-      columns(inventoryBatchProduct.inventoryBatchId, inventoryBatchProduct.productId) are unique
-    )
-  )
+      columns(inventoryBatchProduct.inventoryBatchId, inventoryBatchProduct.productId) are unique))
+
+  val videoAssetsCelebrity = manyToManyRelation(videoAssets, celebrities)
+    .via[VideoAssetCelebrity]((videoAsset, celebrity, join) => (join.videoId === videoAsset.id, join.celebrityId === celebrity.id))
+  on(videoAssetsCelebrity)(videoAssetCelebrity =>
+    declare(
+      columns(videoAssetCelebrity.videoId) are unique))
 
   //
   // oneToManyRelation declarations -- please keep these organized
@@ -244,7 +227,6 @@ class Schema @Inject()(
     .via((product, order) => product.id === order.productId)
   productToOrders.foreignKeyDeclaration.constrainReference(onDelete cascade)
 
-
   // ugh, why did I make so many biometrics tables?
   val enrollmentBatchToVBGAudioCheckTable = oneToManyRelation(enrollmentBatches, vbgAudioCheckTable)
     .via((enrollmentBatch, vbgAudioCheck) => enrollmentBatch.id === vbgAudioCheck.enrollmentBatchId)
@@ -284,7 +266,6 @@ class Schema @Inject()(
     .via((egraph, xyzmoVerifyUser) => egraph.id === xyzmoVerifyUser.egraphId)
   egraphToXyzmoVerifyUserTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
 
-
   //
   // Public methods
   //
@@ -293,8 +274,8 @@ class Schema @Inject()(
     val applicationMode = config.applicationMode
     log("Checking application.mode before scrubbing database. Must be in dev mode. Mode is: " + applicationMode)
     if (applicationMode != "dev" ||
-        config.applicationId != "test" ||
-        config.dbDefaultUrl != "jdbc:postgresql://localhost/egraphs") {
+      config.applicationId != "test" ||
+      config.dbDefaultUrl != "jdbc:postgresql://localhost/egraphs") {
       throw new IllegalStateException("Cannot scrub database unless in dev mode, application is test, and database is local")
     }
 
@@ -306,8 +287,7 @@ class Schema @Inject()(
     } else {
       throw new IllegalStateException(
         """I'm just not going to scrub the DB unless "db.default.allowscrub" is
-        set to "yes" in application.conf. Sorry if you have a problem with that."""
-      )
+        set to "yes" in application.conf. Sorry if you have a problem with that.""")
     }
   }
 
@@ -357,21 +337,18 @@ class Schema @Inject()(
 
     try {
       from(celebrities)(celeb =>
-        select(celeb.id)
-      ).headOption
+        select(celeb.id)).headOption
 
       log("Existing egraphs schema was detected")
       true
-    }
-    catch {
+    } catch {
       case e: RuntimeException if e.getMessage.toLowerCase.contains("celebrity") =>
         log("No egraphs schema was detected")
         false
 
       case otherErrors =>
         throw otherErrors
-    }
-    finally {
+    } finally {
       conn.rollback(savepoint)
     }
   }
@@ -388,7 +365,7 @@ class Schema @Inject()(
    *   the provided table's id field
    *
    */
-  private def oneAccountPerRowOn[T <: KeyedEntity[Long]] (table: Table[T], foreignKey: Account => Option[Long]): OneToManyRelationImpl[T, Account] = {
+  private def oneAccountPerRowOn[T <: KeyedEntity[Long]](table: Table[T], foreignKey: Account => Option[Long]): OneToManyRelationImpl[T, Account] = {
     val relation = oneToManyRelation(table, accounts)
       .via((row, account) => row.id === foreignKey(account))
 
@@ -438,11 +415,12 @@ class Schema @Inject()(
       factoryFor(vbgStartEnrollmentTable) is VBGStartEnrollment(services = injector.instance[VBGStartEnrollmentServices]),
       factoryFor(vbgStartVerificationTable) is VBGStartVerification(services = injector.instance[VBGStartVerificationServices]),
       factoryFor(vbgVerifySampleTable) is VBGVerifySample(services = injector.instance[VBGVerifySampleServices]),
+      factoryFor(videoAssets) is VideoAsset(services = injector.instance[VideoAssetServices]),
+      factoryFor(videoAssetsCelebrity) is VideoAssetCelebrity(services = injector.instance[VideoAssetCelebrityServices]),
       factoryFor(xyzmoAddProfileTable) is XyzmoAddProfile(services = injector.instance[XyzmoAddProfileServices]),
       factoryFor(xyzmoAddUserTable) is XyzmoAddUser(services = injector.instance[XyzmoAddUserServices]),
       factoryFor(xyzmoDeleteUserTable) is XyzmoDeleteUser(services = injector.instance[XyzmoDeleteUserServices]),
       factoryFor(xyzmoEnrollDynamicProfileTable) is XyzmoEnrollDynamicProfile(services = injector.instance[XyzmoEnrollDynamicProfileServices]),
-      factoryFor(xyzmoVerifyUserTable) is XyzmoVerifyUser(services = injector.instance[XyzmoVerifyUserServices])
-    )
+      factoryFor(xyzmoVerifyUserTable) is XyzmoVerifyUser(services = injector.instance[XyzmoVerifyUserServices]))
   }
 }
