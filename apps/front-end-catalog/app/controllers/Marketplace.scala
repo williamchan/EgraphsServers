@@ -82,13 +82,13 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
     for(i <- 0.until(quantity)) yield {
       MarketplaceCelebrity(
         id = i,
-        storefrontUrl = "#",
         publicName =  "Herp Derpson",
-        photoUrl = "images/660x350.gif",
+        photoUrl = "http://placehold.it/660x350",
+        storefrontUrl = "#",
         soldout = coinflip.nextBoolean,
-        minPrice =  45,
+        minPrice = 45,
         maxPrice = 90,
-        subtitle = "Boston Red Sox"
+        secondaryText = "Boston Red Sox"
       )
     }
   }
