@@ -107,7 +107,8 @@ trait TBPlugin { this: TBRoutes with TBConfig =>
             !req.path.startsWith(loginAssetsPath)     // request is not for login asset
             
           if (needsAuthentication) redirectToLogin(req)
-          else                     super.onRouteRequest(req)          }
+          else                     super.onRouteRequest(req)
+        }
       }
     }
 
