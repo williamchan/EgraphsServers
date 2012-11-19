@@ -76,7 +76,7 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
       MarketplaceCelebrity(
         id = i,
         publicName = "Herp Derpson",
-        photoUrl = "http://placehold.it/660x350",
+        photoUrl = RemoteAssets.at("images/660x350.gif").url,
         storefrontUrl = "#",
         soldout = coinflip.nextBoolean,
         minPrice = 45,
