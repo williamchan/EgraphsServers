@@ -21,8 +21,6 @@ private[controllers] trait GetCouponAdminEndpoint extends ImplicitHeaderAndFoote
   protected def httpFilters: HttpFilters
   protected def couponStore: CouponStore
   private def dateFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm")
-  // TODO SER-504: Hack to make startDate and endDate PST.
-  private def eightHoursInMillis = 28800000 // AWS servers think they're in GMT regardless of region
 
   def getCouponAdmin(couponId: Long) = controllerMethod.withForm() { implicit authToken =>
     httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
@@ -52,8 +50,8 @@ private[controllers] trait GetCouponAdminEndpoint extends ImplicitHeaderAndFoote
         case "couponId" => coupon.id.toString
         case "name" => coupon.name
         case "code" => coupon.code
-        case "startDate" => dateFormat.format(coupon.startDate.getTime - eightHoursInMillis)
-        case "endDate" => dateFormat.format(coupon.endDate.getTime - eightHoursInMillis)
+        case "startDate" => dateFormat.format(coupon.startDate.getTime)
+        case "endDate" => dateFormat.format(coupon.endDate.getTime)
         case "discountAmount" => coupon.discountAmount.toInt.toString
         
         case _ => flash.get(paramName).getOrElse("")
