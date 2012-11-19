@@ -3,7 +3,7 @@ package controllers.website.admin
 import controllers.WebsiteControllers
 import java.sql.Timestamp
 import java.text.{ParseException, SimpleDateFormat}
-import java.util.{Date, TimeZone}
+import java.util.TimeZone
 import models._
 import models.enums.{CouponType, CouponDiscountType, CouponUsageType}
 import play.api.mvc.Results.{Ok, Redirect}
@@ -30,7 +30,7 @@ trait PostCouponAdminEndpoint extends Logging {
   protected def couponStore: CouponStore
   private def dateFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm")
   // TODO SER-504: Hack to make startDate and endDate PST.
-  private def localOffsetFromUtc = TimeZone.getDefault.getRawOffset
+  private def eightHoursInMillis = 28800000 // AWS servers think they're in GMT regardless of region
   
   def postCreateCouponAdmin = postController() {
     httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
@@ -92,8 +92,8 @@ trait PostCouponAdminEndpoint extends Logging {
     lazy val couponType = CouponType(couponTypeString).get
     lazy val discountType = CouponDiscountType(discountTypeString).get
     lazy val usageType = CouponUsageType(usageTypeString).get
-    lazy val startDateTimestamp = new Timestamp(dateFormat.parse(startDate).getTime - localOffsetFromUtc)
-    lazy val endDateTimestamp = new Timestamp(dateFormat.parse(endDate).getTime - localOffsetFromUtc)
+    lazy val startDateTimestamp = new Timestamp(dateFormat.parse(startDate).getTime + eightHoursInMillis)
+    lazy val endDateTimestamp = new Timestamp(dateFormat.parse(endDate).getTime + eightHoursInMillis)
 
     /** 
      * Configures a provided coupon or, by default, a new Coupon with the values

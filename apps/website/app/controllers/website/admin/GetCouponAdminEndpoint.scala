@@ -2,6 +2,7 @@ package controllers.website.admin
 
 import egraphs.authtoken.AuthenticityToken
 import java.text.SimpleDateFormat
+import java.util.TimeZone
 import models.{Coupon, CouponStore}
 import models.enums.PublishedStatus
 import models.categories._
@@ -20,6 +21,8 @@ private[controllers] trait GetCouponAdminEndpoint extends ImplicitHeaderAndFoote
   protected def httpFilters: HttpFilters
   protected def couponStore: CouponStore
   private def dateFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm")
+  // TODO SER-504: Hack to make startDate and endDate PST.
+  private def eightHoursInMillis = 28800000 // AWS servers think they're in GMT regardless of region
 
   def getCouponAdmin(couponId: Long) = controllerMethod.withForm() { implicit authToken =>
     httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
@@ -49,12 +52,9 @@ private[controllers] trait GetCouponAdminEndpoint extends ImplicitHeaderAndFoote
         case "couponId" => coupon.id.toString
         case "name" => coupon.name
         case "code" => coupon.code
-        case "startDate" => dateFormat.format(coupon.startDate)
-        case "endDate" => dateFormat.format(coupon.endDate)
+        case "startDate" => dateFormat.format(coupon.startDate.getTime - eightHoursInMillis)
+        case "endDate" => dateFormat.format(coupon.endDate.getTime - eightHoursInMillis)
         case "discountAmount" => coupon.discountAmount.toInt.toString
-        case "couponTypeString" => coupon.couponType.toString
-        case "discountTypeString" => coupon.discountType.toString
-        case "usageTypeString" => coupon.usageType.toString
         
         case _ => flash.get(paramName).getOrElse("")
       }

@@ -109,14 +109,16 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
           )
           
           val maybeCoupon = forms.coupon
+          val subtotal = forms.subtotal(product.price)
+          val discount = forms.discount(subtotal = subtotal, maybeCoupon)
   
           // Create the pricing viewmodel
           val priceViewModel = FinalizePriceViewModel(
              base=product.price,
              physicalGood=forms.shippingPrice,
              tax=forms.tax,
-             discount=forms.discount(basePrice = product.price, maybeCoupon),
-             total=forms.total(basePrice = product.price, maybeCoupon)
+             discount=discount,
+             total=forms.total(subtotal = subtotal, discount = discount)
           )
   
           // Create the final viewmodel
@@ -172,6 +174,9 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
         val (celeb, product, maybeCoupon, shippingForms, forms) = purchaseData 
         val AllPurchaseForms(productId, inventoryBatch, personalization, billing, shipping) = shippingForms
         
+        val subtotal = forms.subtotal(product.price)
+        val discount = forms.discount(subtotal = subtotal, maybeCoupon)
+        
         EgraphPurchaseHandler(
           recipientName=personalization.recipientName,
           recipientEmail=personalization.recipientEmail.getOrElse(billing.email),
@@ -182,7 +187,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
           personalNote=personalization.noteToCelebrity,
           celebrity=celeb,
           product=product,
-          totalAmountPaid=forms.total(basePrice = product.price, maybeCoupon),
+          totalAmountPaid=forms.total(subtotal = subtotal, discount = discount),
           coupon=maybeCoupon,
           billingPostalCode=billing.postalCode,
           flash=request.flash,

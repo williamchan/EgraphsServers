@@ -91,7 +91,7 @@ trait StorefrontPersonalizeConsumerEndpoints
             subtotal = product.price,
             shipping = forms.shippingPrice,
             tax = forms.tax,
-            total = forms.total(basePrice=product.price)
+            total = forms.total(subtotal=forms.subtotal(product.price))
           )
   
           implicit def crumbs = breadcrumbData.crumbsForRequest(celeb.id, celebrityUrlSlug, Some(productUrlSlug))(request)
