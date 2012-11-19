@@ -91,18 +91,17 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
             } else {
               //TODO when refinements are implemented we can do this using tags instead.  
               ("Featured Stars", catalogStarsQuery().filter(star => star.isFeatured).map(c => 
-                  MarketplaceCelebrity(
-                      id = c.id,
-                      publicName = c.name,
-                      photoUrl = c.marketplaceImageUrl,
-                      storefrontUrl = c.storefrontUrl,
-                      soldout = !c.hasInventoryRemaining,
-                      minPrice = c.minPrice,
-                      maxPrice = c.maxPrice, 
-                      secondaryText = c.secondaryText.getOrElse("")
-                  )
+                MarketplaceCelebrity(
+                  id = c.id,
+                  publicName = c.name,
+                  photoUrl = c.marketplaceImageUrl,
+                  storefrontUrl = c.storefrontUrl,
+                  soldout = !c.hasInventoryRemaining,
+                  minPrice = c.minPrice,
+                  maxPrice = c.maxPrice, 
+                  secondaryText = c.secondaryText.getOrElse("")
                 )
-              )
+              ))
             }
           }
         }
