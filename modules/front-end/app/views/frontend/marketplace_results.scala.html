@@ -14,9 +14,13 @@
 @import views.frontend.Utils
 @import models.frontend.egraphs._
 @import play.api.libs.json._
-
+@**
+  Page for displaying marketplace results. 
+  Vertical buttons are currently hidden. Will be used in the future, when we have multiple verticals.
+**@
 @init = {
 @*** 
+
 Translates a map of categories and their categoryvalues into a JsonObject that can be easily converted to a URL query arguments using $.param(Egraphs.page.categories)
 ***@
  Egraphs.page.categories = @Html(

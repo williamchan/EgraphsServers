@@ -25,6 +25,7 @@ tmp
 apps/website/war/WEB-INF/cloudbees-web.xml
 
 apps/website/eGraphsServers.ipr
+apps/website/public/VERSION.txt
 
 RUNNING_PID
 .cache

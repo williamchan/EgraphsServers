@@ -438,13 +438,21 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends Sa
    ) 
   }
    
-  
+  /**
+   * Rebuilds the GiN index representing celebrities in the database. 
+   * The index is used to make full text search fast.  
+   * What is a GiN Index? It is this: http://www.postgresql.org/docs/9.0/static/textsearch-indexes.html
+   * An intermediate step of this process is refreshing the materialized view that the GiN index references.
+   * What is a materialized view? It is this: http://tech.jonathangardner.net/wiki/PostgreSQL/Materialized_Views
+   **/
   def rebuildSearchIndex {
+    // Drop the index
     SQL(
     """
         DROP INDEX celebrity_category_search_idx;
     """
         ).execute()(connection=schema.getTxnConnectionFactory)     
+    // Refresh the materialized view
     SQL(
     """    
         SELECT refresh_matview('celebrity_categories_mv');

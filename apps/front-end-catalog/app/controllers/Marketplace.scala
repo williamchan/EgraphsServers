@@ -18,7 +18,7 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
     Ok(views.html.frontend.marketplace_results(
       query = "exampleQuery",
       viewAsList = false,
-      marketplaceRoute = controllers.routes.Marketplace.mlb.url,
+      marketplaceRoute = controllers.routes.Marketplace.results.url,
       verticalSet,
       resultSet,
       categoryViewModels,
@@ -48,12 +48,12 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
     val categoryNames = List("Team", "Position").zipWithIndex
     val categoryValueNames = List("Category1", "Category2", "Category3", "Category4").zipWithIndex
 
-    for ((fname: String, id: Int) <- categoryNames) yield {
+    for ((cname: String, id: Int) <- categoryNames) yield {
       CategoryViewModel(
         id = id,
-        publicName = fname,
-        for ((fvname: String, id: Int) <- categoryValueNames) yield {
-          CategoryValueViewModel(id = id, publicName = fvname, active = coinflip.nextBoolean)
+        publicName = cname,
+        for ((cvname: String, id: Int) <- categoryValueNames) yield {
+          CategoryValueViewModel(id = id, publicName = cvname, active = coinflip.nextBoolean)
         })
     }
   }

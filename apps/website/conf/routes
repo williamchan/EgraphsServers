@@ -54,7 +54,7 @@ GET      /admin/accounts/$accountId<[0-9]+>                               contro
 GET      /admin/celebrities                                               controllers.WebsiteControllers.getCelebritiesAdmin
 POST     /admin/celebrities                                               controllers.WebsiteControllers.postCreateCelebrityAdmin
 GET      /admin/celebrities/search                                        controllers.WebsiteControllers.getCelebritiesBySearchAdmin
-GET      /admin/celebrities/search/rebuild                                controllers.WebsiteControllers.getRebuildSearchIndex
+POST      /admin/celebrities/search/rebuild                               controllers.WebsiteControllers.postRebuildSearchIndex
 GET      /admin/celebrities/create                                        controllers.WebsiteControllers.getCreateCelebrityAdmin
 POST     /admin/celebrities/featured                                      controllers.WebsiteControllers.postFeaturedCelebrities
 GET      /admin/celebrities/$celebrityId<[0-9]+>                          controllers.WebsiteControllers.getCelebrityAdmin(celebrityId: Long)

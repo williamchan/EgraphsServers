@@ -51,19 +51,9 @@ private[controllers] trait GetCelebritiesAdminEndpoint extends ImplicitHeaderAnd
       }
     }
   }
-  
-  def getRebuildSearchIndex = controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
-      Action { implicit request =>
-        celebrityStore.rebuildSearchIndex
-        Ok("Index has been rebuilt.")
-      }
-    }
-  }
 }
 
 object GetCelebritiesAdminEndpoint {
-
   def location = {
     controllers.routes.WebsiteControllers.getCelebritiesAdmin.url
   }
