@@ -82,8 +82,13 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
 
       val categoryAndCategoryValues = 
         for((key, set) <- request.queryString; categoryRegex(id) <- categoryRegex findFirstIn key) yield {
-          //TODO ensure this set can become a long
-          (id.toLong, set.map( arg => arg.toLong))
+          (id.toLong, set.map( arg => 
+            try { 
+              arg.toLong 
+            } catch {
+              case _ => throw new Exception("Invalid category arguments passed.")
+            }
+          ))
         }
       
       val activeCategoryValues = {for{
@@ -123,7 +128,6 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       
       //HACK As long as no CategoryValues have children Categories, this call can be used to display
       // only baseball categories. This NEEDS to be fixed if we want to support multiple verticals.
-      //TODO: This block is slow as fuck, fix it
       val categoryViewModels = for {
         categoryValue <- categoryValueStore.all().toList
         category <- categoryValue.categories
@@ -157,20 +161,6 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
 // TODO manage these verticals properly.     
     List()
   }
-
-    // TODO implement landing pages for verticals. 
-  // def getMarketplaceVerticalPage(verticalname: String) =  controllerMethod.withForm() { implicit authToken =>
-  //   Action { implicit request =>
-  //    //Map Vertical to specific landing page.
-  //      Ok(views.html.frontend.marketplace_landing(
-  //        //TODO Fix this queryUrl thing 
-  //          queryUrl = "",
-  //        marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage.url,
-  //        verticalViewModels = getVerticals(),
-  //        results = List[ResultSetViewModel](),
-  //        categoryViewModels = List[CategoryViewModel](),
-  //        sortOptions = sortOptionViewModels() 
-  //      ))     
-  //   }
-  // }
+  // TODO implement landing pages for verticals. 
+  // def getMarketplaceVerticalPage(verticalname: String) 
 }
