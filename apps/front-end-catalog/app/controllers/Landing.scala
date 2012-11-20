@@ -60,7 +60,7 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
   }
 
   private val sampleImageUrl = "http://placehold.it/440x157"
-  private val sampleMarketplaceImageUrl = RemoteAssets.at("images/660x350.gif").url
+  private val sampleMarketplaceImageUrl = EgraphsAssets.at("images/660x350.gif").url
 
   private val sampleStars = Seq(
     makeSampleStar(1, "David Price", Some("Tampa Bay Rays")),

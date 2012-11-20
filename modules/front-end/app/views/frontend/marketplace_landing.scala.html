@@ -57,7 +57,7 @@ Translates a map of categories and their categoryvalues into a JsonObject that c
           <ol>
           @for(vertical <- verticalViewModels) {
             <li><a href="#">@vertical.publicName</a></li>
-            }
+          }
           </ol>
         
         </aside>
@@ -75,11 +75,9 @@ Translates a map of categories and their categoryvalues into a JsonObject that c
             </select>
             
           </aside> <!-- end .mobile-nav -->
-          //TODO redo view as list stuff. 
+          @** TODO redo view as list stuff. *@
           @tags.marketplace.view_options(sortOptions, false)
           @tags.marketplace.result_set(results)
-          
-          
 
         </div>
        
