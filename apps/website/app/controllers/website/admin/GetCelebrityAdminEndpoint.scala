@@ -83,13 +83,13 @@ private[controllers] trait GetCelebrityAdminEndpoint extends ImplicitHeaderAndFo
       (paramName: String) => paramName match {
         case "celebrityId" => flash.get("celebrityId").getOrElse("")
         case "celebrityEmail" => flash.get("celebrityEmail").getOrElse("")
-        case "bio" => StringEscapeUtils.escapeHtml4(flash.get("bio").getOrElse(""))
-        case "casualName" => StringEscapeUtils.escapeHtml4(flash.get("casualName").getOrElse(""))
-        case "organization" => StringEscapeUtils.escapeHtml4(flash.get("organization").getOrElse(""))
-        case "publicName" => StringEscapeUtils.escapeHtml4(flash.get("publicName").getOrElse(""))
+        case "bio" => (flash.get("bio").getOrElse(""))
+        case "casualName" => flash.get("casualName").getOrElse("")
+        case "organization" => flash.get("organization").getOrElse("")
+        case "publicName" => flash.get("publicName").getOrElse("")
         case "publishedStatusString" => flash.get("publishedStatusString").getOrElse(PublishedStatus.Unpublished.toString)
-        case "roleDescription" => StringEscapeUtils.escapeHtml4(flash.get("roleDescription").getOrElse(""))
-        case "twitterUsername" => StringEscapeUtils.escapeHtml4(flash.get("twitterUsername").getOrElse(""))
+        case "roleDescription" => flash.get("roleDescription").getOrElse("")
+        case "twitterUsername" => flash.get("twitterUsername").getOrElse("")
         case _ => flash.get(paramName).getOrElse("")
       }
     } 

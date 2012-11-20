@@ -31,8 +31,10 @@ class CheckoutBillingForm(
   import CheckoutBillingForm.Params
 
   /** Stripe token */
-  val paymentToken = field(Params.PaymentToken).validatedBy { paramValues =>
-    checkPurchaseField(paramValues).isPaymentToken
+  val paymentToken = new OptionalField[String](Params.PaymentToken) {
+    def validateIfPresent = {
+      checkPurchaseField(List(stringToValidate)).isPaymentToken
+    }
   }
 
   /** Name of the buyer, to be used for creating an account */
@@ -83,5 +85,8 @@ object CheckoutBillingForm {
     val PostalCode = "order.billing.postalCode"
   }
 
-  case class Valid(paymentToken: String, name: String, email: String, postalCode: String)
+  /**
+   * @paymentToken Stripe payment token. Can be None if no credit card charge is necessary but total amount is zero.
+   */
+  case class Valid(paymentToken: Option[String], name: String, email: String, postalCode: String)
 }

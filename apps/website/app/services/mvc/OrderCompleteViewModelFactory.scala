@@ -53,7 +53,7 @@ class OrderCompleteViewModelFactory @Inject()(config: ConfigFileProxy) {
    * @param order the order that represented the egraph purchase
    * @param inventoryBatch the inventory batch against which the order was made.
    * @param cashTransaction the associated cash transaction, if available.
-   * @param maybePrintOrder a PrintOrder associated this purchase, if avaailble
+   * @param maybePrintOrder a PrintOrder associated this purchase, if available.
    *
    * @return a ViewModel that populates the order complete page.
    */
@@ -70,7 +70,7 @@ class OrderCompleteViewModelFactory @Inject()(config: ConfigFileProxy) {
   ): OrderCompleteViewModel =
   {
     val faqHowLongLink = getFAQ.url + "#how-long"
-    val totalAmountPaid = cashTransaction.map(_.cash).getOrElse(order.amountPaid)
+    val totalAmountPaid = cashTransaction.map(_.cash).getOrElse(Money.zero(CurrencyUnit.USD))
     val isLiveConsumerSite = (config.applicationBaseUrl == "https://www.egraphs.com/")
     val printPrice = maybePrintOrder.map(_.amountPaid).getOrElse(Money.zero(CurrencyUnit.USD))
     
@@ -87,6 +87,7 @@ class OrderCompleteViewModelFactory @Inject()(config: ConfigFileProxy) {
       expectedDeliveryDate = inventoryBatch.getExpectedDate,
       faqHowLongLink = faqHowLongLink,
       totalPrice = totalAmountPaid,
+      discount = None,
       digitalPrice = product.price,
       printPrice = printPrice,
       hasPrintOrder = maybePrintOrder.isDefined,

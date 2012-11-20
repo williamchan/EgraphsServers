@@ -1,27 +1,25 @@
 package controllers.website
 
-import utils.{ClearsCacheAndBlobsAndValidationBefore, TestData, EgraphsUnitTest}
-import models.enums.{CashTransactionType, PrintingOption, WrittenMessageRequest}
-import services.Finance.TypeConversions._
-import services.AppConfig
-import services.payment.StripeTestPayment
-import services.db.{DBSession, TransactionSerializable}
-import models.FailedPurchaseDataStore
-import models.{PrintOrderStore, CashTransactionStore, Order, OrderStore}
-import services.http.forms.purchase.CheckoutShippingForm
+import com.stripe.Stripe
+import models._
+import models.enums._
 import org.joda.money.{CurrencyUnit, Money}
 import play.api.test.FakeRequest
-import com.stripe.Stripe
+import services.AppConfig
+import services.db.{DBSession, TransactionSerializable}
+import services.Finance.TypeConversions._
+import services.payment.StripeTestPayment
+import models.FailedPurchaseDataStore
 import services.http.EgraphsSession
-import models.Celebrity
-import models.Product
-import models.Order
+import services.http.forms.purchase.CheckoutShippingForm
+import utils.{ClearsCacheAndBlobsAndValidationBefore, TestData, EgraphsUnitTest}
 
 class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValidationBefore {
 
   private def db = AppConfig.instance[DBSession]
   private def orderStore = AppConfig.instance[OrderStore]
   private def cashTransactionStore = AppConfig.instance[CashTransactionStore]
+  private def couponStore = AppConfig.instance[CouponStore]
   private def printOrderStore = AppConfig.instance[PrintOrderStore]
   private def failedPurchaseDataStore = AppConfig.instance[FailedPurchaseDataStore]
 
@@ -37,7 +35,7 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheAndBlob
   private val buyerName = "My Buyer"
   private val buyerEmail = TestData.generateEmail(prefix = "buyer")
 
-  "An EgraphPurchaseHAndler" should "create Order and CashTransaction for a digital-only purchase" in new EgraphsTestApplication {    
+  "An EgraphPurchaseHAndler" should "create Order and CashTransaction for a digital-only purchase" in new EgraphsTestApplication {
     val Right(orderFromHandler) = executePurchaseHandler()
     db.connected(TransactionSerializable) {
       val order = orderStore.get(orderFromHandler.id)
@@ -115,12 +113,51 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheAndBlob
       failedPurchaseData.purchaseData should include("\"productId\":" + celebAndProduct._2.id)
     }
   }
+  
+  /**
+   * EgraphPurchaseHandler charges totalAmountPaid. The coupon should have already been applied by the time 
+   * totalAmountPaid is specified.
+   */
+  it should "charge totalAmountPaid and correctly mark one-use coupon as used" in new EgraphsTestApplication {
+    val coupon = db.connected(TransactionSerializable) { Coupon(discountAmount = BigDecimal(10)).save() }
+    val Right(orderFromHandler) = executePurchaseHandler(coupon = Some(coupon), totalAmountPaid = BigDecimal(40).toMoney())
+    db.connected(TransactionSerializable) {
+      val order = orderStore.get(orderFromHandler.id)
+      order.amountPaidInCurrency should be(BigDecimal(50))
+
+      val cashTransaction = cashTransactionStore.findByOrderId(order.id).head
+      cashTransaction.orderId should be(Some(order.id))
+      cashTransaction.amountInCurrency should be(BigDecimal(40))
+      
+      couponStore.findByCode(coupon.code).head.isActive should be(false)
+    }
+  }
+  
+  it should "not create a CashTransaction if totalAmountPaid was zero" in new EgraphsTestApplication {
+    val coupon = db.connected(TransactionSerializable) { Coupon(discountAmount = BigDecimal(50)).save() }
+    val Right(orderFromHandler) = executePurchaseHandler(coupon = Some(coupon), totalAmountPaid = BigDecimal(0).toMoney(), 
+        stripeTokenId = None)
+    db.connected(TransactionSerializable) {
+      val order = orderStore.get(orderFromHandler.id)
+      order.amountPaidInCurrency should be(BigDecimal(50))
+
+      cashTransactionStore.findByOrderId(order.id).headOption should be(None)
+    }
+  }
+  
+  it should "throw exception if totalAmountPaid was positive but no stripeTokenId was specified" in new EgraphsTestApplication {
+    intercept[Exception] { executePurchaseHandler(stripeTokenId = None) }
+  }
+  
+  // ======================================================= private helpers
 
   private def executePurchaseHandler(
     totalAmountPaid: Money = BigDecimal(50).toMoney(),
     printingOption: PrintingOption = PrintingOption.DoNotPrint,
     shippingForm: Option[CheckoutShippingForm.Valid] = None,
-    celebrityAndProduct: Option[(Celebrity, Product)] = None
+    celebrityAndProduct: Option[(Celebrity, Product)] = None,
+    stripeTokenId: Option[String] = Some(payment.testToken().id),
+    coupon: Option[Coupon] = None
   ): Either[EgraphPurchaseHandler.PurchaseFailed, Order] =
   {
     val (celebrity, product) = celebrityAndProduct.getOrElse {
@@ -137,12 +174,13 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheAndBlob
       recipientEmail = recipientEmail,
       buyerName = buyerName,
       buyerEmail = buyerEmail,
-      stripeTokenId = payment.testToken().id,
+      stripeTokenId = stripeTokenId,
       desiredText = None,
       personalNote = None,
       celebrity = celebrity,
       product = product,
       totalAmountPaid = totalAmountPaid,
+      coupon = coupon,
       billingPostalCode = "55555",
       flash = req.flash,
       printingOption = printingOption,

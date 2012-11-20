@@ -4,6 +4,7 @@ import play.api.mvc.BodyParsers.parse
 import play.api.mvc.BodyParser
 import play.api.mvc.Action
 import play.api.mvc.Result
+import play.api.Logger
 
 /**
  * Classes that implement this Filter trait guarantee that any operation it is given to execute is only
@@ -30,10 +31,13 @@ trait Filter[KeyT, RequiredT] {
     filterResultToAction(filter(key), parser, actionFactory)
   }
 
-  private def filterResultToAction[A](filterResult: Either[Result, RequiredT], parser: BodyParser[A], actionFactory: (RequiredT) => Action[A]): Action[A] = {
+  private def filterResultToAction[A](filterResult: => Either[Result, RequiredT], parser: BodyParser[A], actionFactory: (RequiredT) => Action[A]): Action[A] = {
     Action(parser) { request =>
       filterResult.fold(
-        error => error,
+        error => {
+          Logger.info("Filter check failed in " + this)
+          error
+        },
         required => actionFactory(required).apply(request))
     }
   }

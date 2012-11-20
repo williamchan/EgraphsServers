@@ -4,6 +4,7 @@ import services.http.{POSTControllerMethod, ControllerMethod}
 import play.api.mvc.Controller
 import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
 import services.http.forms.purchase._
+import models.CouponStore
 import models.enums.PrintingOption
 import services.http.forms.Form.Conversions._
 import services.mvc.FormConversions.{checkoutBillingFormToViewConverter, checkoutShippingFormToViewConverter}
@@ -38,6 +39,7 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
   protected def checkPurchaseField: PurchaseFormChecksFactory
   protected def payment: Payment
   protected def breadcrumbData: StorefrontBreadcrumbData
+  protected def couponStore: CouponStore
 
   //
   // Controllers
@@ -94,7 +96,11 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
             }.getOrElse {
               defaultBillingView
             }
-    
+            
+            val maybeCoupon = forms.coupon
+            val subtotal = forms.subtotal(product.price)
+            val discount = forms.discount(subtotal = subtotal, maybeCoupon)
+            
             val orderSummary = CheckoutOrderSummary(
               celebrityName=celeb.publicName,
               productName=product.name,
@@ -106,7 +112,8 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
               basePrice=product.price,
               shipping=forms.shippingPrice,
               tax=forms.tax,
-              total=forms.total(basePrice = product.price)
+              discount=discount,
+              total=forms.total(subtotal = subtotal, discount = discount)
             )
     
             // Collect both the shipping form and billing form into a single viewmodel

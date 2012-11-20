@@ -122,9 +122,7 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
     session.get(Facebook._fbState) match {
       case None => throw new RuntimeException("There is no Facebook authentication state to verify against 'state' parameter")
       case Some(fbState) =>
-        if (state != session.get(Facebook._fbState)) {
-          throw new RuntimeException("Facebook authentication failed to verify 'state' parameter")
-        }
+        if (state != fbState) throw new RuntimeException("Facebook authentication failed to verify 'state' parameter")
     }
   }
 }

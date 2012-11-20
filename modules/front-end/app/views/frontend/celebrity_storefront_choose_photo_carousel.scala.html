@@ -11,7 +11,7 @@
   authToken: egraphs.authtoken.AuthenticityToken
 )
 
-@{/**
+@**  
     Renders the Choose Photo page in Carousel view.
 
     celeb - the celebrity viewmodel to be rendered
@@ -24,7 +24,7 @@
 
      headerData & footerData - see base_template.scala.html
      storefrontBreadcrumbs - see base_celebrity_storefront_template
-*/}
+*@
 
 @import egraphs.authtoken.AuthenticityToken.safeForm
 @import views.html.frontend.tags.storefront_breadcrumbs_responsive
@@ -53,7 +53,7 @@
           <ul class="slides">
 
             <!-- Iterate through the products -->
-            @{/* TODO: make this and the tile view do something reasonable with zero products */}
+            @**   TODO: make this and the tile view do something reasonable with zero products *@
             @for((product, index) <- products.zipWithIndex) {
               <li>
 

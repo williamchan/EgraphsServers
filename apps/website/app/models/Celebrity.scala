@@ -37,6 +37,7 @@ import models.frontend.landing.CatalogStar
 case class CelebrityServices @Inject() (
   store: CelebrityStore,
   accountStore: AccountStore,
+  consumerApp: ConsumerApplication,
   categoryServices: CategoryServices,
   productStore: ProductStore,
   orderStore: OrderStore,
@@ -290,11 +291,12 @@ case class Celebrity(id: Long = 0,
     email.addTo(toAddress, publicName)
     bccEmail.map(bcc => email.addBcc(bcc))
     email.setSubject("Welcome to Egraphs")
-
+    
+    val appDownloadLink = services.consumerApp.getIOSClient(redirectToItmsLink=true).url
     services.transactionalMail.send(
       email, 
       text=Some(celebrity_welcome_email_text(publicName, account.email).toString), 
-      html=Some(celebrity_welcome_email(publicName, account.email))
+      html=Some(celebrity_welcome_email(publicName, account.email, appDownloadLink)) 
     )
   }
 
@@ -389,12 +391,12 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends Sa
   }
 
   def findByUrlSlug(slug: String): Option[Celebrity] = {
-    if (slug.isEmpty) return None
-
-    from(schema.celebrities)(celebrity =>
-      where(celebrity.urlSlug === slug)
-        select (celebrity)
-    ).headOption
+    if (slug.isEmpty) None
+    else {
+      from(schema.celebrities)(celebrity =>
+        where(celebrity.urlSlug === slug)
+          select (celebrity)).headOption
+    }
   }
 
   // TODO(erem): Test this one

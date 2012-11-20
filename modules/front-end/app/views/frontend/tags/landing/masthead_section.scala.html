@@ -1,4 +1,4 @@
-@(celebrityPublicName: Option[String] = None,
+@(mastheadMessage: Option[String] = None,
   mastheadImageUrl: String, 
   getStartedUrl: Option[String] = None
 )
@@ -15,7 +15,7 @@
 
         <div class="span6 header-parent">
 
-          <h1>What if you could share a moment with @celebrityPublicName.getOrElse("a World Series champion")?</h1>
+          <h1>@mastheadMessage.getOrElse("Give the gift of an MLB star this holiday season.")</h1>
 
           @getStartedUrl.map { url =>
             <p>

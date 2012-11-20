@@ -1,9 +1,9 @@
 @(footerData: models.frontend.footer.FooterData)
-@{/**
+@**  
     Renders the site footer.
 
     footerData - the data necessary to render the links in the footer.
-*/}
+*@
 <!-- Begin site_footer.scala.html -->
 <footer id="bottom" class="container" role="contentinfo">
   
@@ -19,7 +19,7 @@
 	      <li><a href="@footerData.faqLink">FAQ</a></li>
 	      <li><a href="@footerData.termsOfUseLink">Terms of Use</a></li>
 	      <li><a href="@footerData.privacyPolicyLink">Privacy Policy</a></li>
-        <li><a href="@footerData.careersPolicyLink">Careers</a></li>
+        @** <li><a href="@footerData.careersPolicyLink">Careers</a></li> *@
         <li><a href="#emailSignupForm" role="button" id="email-link">Sign up for our newsletter</a></li>
 	    </ol>	
 

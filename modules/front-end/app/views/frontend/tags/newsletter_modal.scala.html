@@ -4,9 +4,9 @@
 @import views.html.frontend.tags
 @import controllers._
 
-@{/**
+@**  
    Renders a modal that allows a user to signup for the Egraphs Insider mailing list.
-*/}
+*@
 
 <div class="modal signup hide fade" id="emailSignupForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-body">
@@ -18,7 +18,7 @@
       </p>
     </div>
     <br>
-    <img src='@RemoteAssets.at("images/modal-egraph.jpg")'/>
+    <img src='@EgraphsAssets.at("images/modal-egraph.jpg")'/>
 
     @safeForm('id ->"signup-form", 'method -> "POST", 'action -> "/subscribe") {
       <div>

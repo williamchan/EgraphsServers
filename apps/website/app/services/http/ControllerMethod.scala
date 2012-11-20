@@ -47,7 +47,7 @@ class ControllerMethod @Inject()(logging: LoggingContext, db: DBSession, httpsFi
           Action(action.parser) { request => 
             dbSettings match {
               case WithoutDBConnection => action(request)
-              case WithDBConnection(dbIsolation, readOnly) => db.connected(dbIsolation) { action(request) }
+              case WithDBConnection(dbIsolation, isReadOnly) => db.connected(dbIsolation, isReadOnly) { action(request) }
             }
           }
         }
@@ -100,9 +100,7 @@ class POSTControllerMethod @Inject()(
   {
     controllerMethod(dbSettings = dbSettings) {
       authenticityTokenFilter(doCsrfCheck) {
-        Action(action.parser) { request => 
-          action(request)
-        }
+        action
       }
     }
   }
@@ -137,9 +135,7 @@ class POSTApiControllerMethod @Inject()(postControllerMethod: POSTControllerMeth
   def apply[A](dbSettings: ControllerDBSettings = WithDBConnection(readOnly = false))
               (action: Action[A]): Action[A] = {
     postControllerMethod(doCsrfCheck=false, dbSettings=dbSettings) {
-      Action(action.parser) { request =>
-        action(request)
-      }
+      action
     }
   }
 }

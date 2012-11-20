@@ -182,7 +182,7 @@ object Account extends Controller with DefaultImplicitTemplateParameters {
         signedTimestamp = "Nov 12th 2012 @ 4:30 PM",
         facebookShareLink = views.frontend.Utils.getFacebookShareLink(
           appId=fbAppId,
-          picUrl = "http://www.egraphs.com/public/images/logo.png",
+          picUrl = EgraphsAssets.at("/images/logo.png").url,
           name = "Chris Bosh",
           caption = "Winning the finals",
           description = "The story of this photo",

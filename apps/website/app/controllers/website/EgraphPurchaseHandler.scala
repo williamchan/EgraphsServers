@@ -27,6 +27,7 @@ case class EgraphPurchaseHandlerServices @Inject() (
   mail: TransactionalMail,
   customerStore: CustomerStore,
   accountStore: AccountStore,
+  cashTransactionStore: CashTransactionStore,
   dbSession: DBSession,
   payment: Payment,
   serverSessions: ServerSessionFactory,
@@ -36,6 +37,9 @@ case class EgraphPurchaseHandlerServices @Inject() (
 /**
  * Performs the meat of the purchase controller's interaction with domain
  * objects. Having it as a separate case class makes it more testable.
+ * 
+ * @param totalAmountPaid the amount to charge the credit card. All discounts should already be figured into totalAmountPaid
+ * @coupon coupon applied, if any
  */
 // TODO(erem): Refactor this class to be injected
 case class EgraphPurchaseHandler(
@@ -43,13 +47,14 @@ case class EgraphPurchaseHandler(
   recipientEmail: String,
   buyerName: String,
   buyerEmail: String,
-  stripeTokenId: String,
+  stripeTokenId: Option[String],
   desiredText: Option[String],
   personalNote: Option[String],
   celebrity: Celebrity,
   product: Product,
   totalAmountPaid: Money,
   billingPostalCode: String,
+  coupon: Option[Coupon] = None,
   flash: Flash,
   printingOption: PrintingOption = PrintingOption.DoNotPrint,
   shippingForm: Option[CheckoutShippingForm.Valid] = None,
@@ -67,7 +72,7 @@ case class EgraphPurchaseHandler(
     "recipientEmail" -> recipientEmail,
     "buyerName" -> buyerName,
     "buyerEmail" -> buyerEmail,
-    "stripeTokenId" -> stripeTokenId,
+    "stripeTokenId" -> stripeTokenId.getOrElse(""),
     "desiredText" -> desiredText.getOrElse(""),
     "personalNote" -> personalNote.getOrElse(""),
     "productId" -> product.id,
@@ -106,7 +111,12 @@ case class EgraphPurchaseHandler(
 
   def performPurchase(): Either[PurchaseFailed, Order] = {
     val charge = try {
-      services.payment.charge(totalAmountPaid, stripeTokenId, "Egraph Order from " + buyerEmail)
+      if (totalAmountPaid.isZero) {
+        None
+      } else {
+        // We want this to throw if stripeTokenId is None when the amount to charge is non-zero
+        Some(services.payment.charge(totalAmountPaid, stripeTokenId.get, "Egraph Order from " + buyerEmail))
+      }
     } catch {
       case stripeException: com.stripe.exception.StripeException => {
         val failedPurchaseData = saveFailedPurchaseData(
@@ -118,7 +128,9 @@ case class EgraphPurchaseHandler(
     }
 
     // Persist the Order. This is executed in its own database transaction.
-    val (order: Order, _: Customer, _: Customer, cashTransaction: CashTransaction, maybePrintOrder: Option[_]) = try {
+    // cashTransaction can be None if the order was free (due to coupons).
+    // maybePrintOrder can be Some if printingOption is "HighQualityPrint".
+    val (order: Order, _: Customer, _: Customer, cashTransaction: Option[_], maybePrintOrder: Option[_]) = try {
       persistOrder(buyerEmail = buyerEmail,
         buyerName = buyerName,
         recipientEmail = recipientEmail,
@@ -128,6 +140,7 @@ case class EgraphPurchaseHandler(
         stripeTokenId = stripeTokenId,
         totalAmountPaid = totalAmountPaid,
         billingPostalCode = billingPostalCode,
+        coupon = coupon,
         printingOption = printingOption,
         shippingForm = shippingForm,
         writtenMessageRequest = writtenMessageRequest,
@@ -137,7 +150,7 @@ case class EgraphPurchaseHandler(
         product = product)
     } catch {
       case e: InsufficientInventoryException => {
-        services.payment.refund(charge.id)
+        charge.map(c => services.payment.refund(c.id))
         val failedPurchaseData = saveFailedPurchaseData(
           purchaseData = purchaseData, 
           errorDescription = e.getLocalizedMessage
@@ -145,7 +158,7 @@ case class EgraphPurchaseHandler(
         return Left(PurchaseFailedInsufficientInventory(failedPurchaseData))
       }
       case e: Exception => {
-        services.payment.refund(charge.id)
+        charge.map(c => services.payment.refund(c.id))
         val failedPurchaseData = saveFailedPurchaseData(
           purchaseData = purchaseData, 
           errorDescription = e.getLocalizedMessage
@@ -165,7 +178,7 @@ case class EgraphPurchaseHandler(
       order.id,
       order.created,
       order.expectedDate.get,
-      cashTransaction.cash,
+      totalAmountPaid,
       services.consumerApp.absoluteUrl(getFAQ().url + "#how-long"),
       maybePrintOrder.isDefined,
       services.mail
@@ -183,15 +196,16 @@ case class EgraphPurchaseHandler(
                            recipientName: String,
                            personalNote: Option[String],
                            desiredText: Option[String],
-                           stripeTokenId: String,
-                           charge: Charge,
+                           stripeTokenId: Option[String],
+                           charge: Option[Charge],
                            totalAmountPaid: Money,
                            billingPostalCode: String,
+                           coupon: Option[Coupon],
                            printingOption: PrintingOption,
                            shippingForm: Option[CheckoutShippingForm.Valid],
                            writtenMessageRequest: WrittenMessageRequest,
                            isDemo: Boolean,
-                           celebrity: Celebrity): (Order, Customer, Customer, CashTransaction, Option[PrintOrder]) = {
+                           celebrity: Celebrity): (Order, Customer, Customer, Option[CashTransaction], Option[PrintOrder]) = {
     services.dbSession.connected(TransactionSerializable) {
       // Get buyer and recipient accounts and create customer face if necessary
       val buyer = services.customerStore.findOrCreateByEmail(buyerEmail, buyerName)
@@ -207,14 +221,15 @@ case class EgraphPurchaseHandler(
         .withWrittenMessageRequest(writtenMessageRequest)
         .withPaymentStatus(PaymentStatus.Charged)
         .save()
-      val cashTransaction = CashTransaction(accountId = buyer.account.id,
-        orderId = Some(order.id),
-        stripeCardTokenId = Some(stripeTokenId),
-        stripeChargeId = Some(charge.id),
-        billingPostalCode = Some(billingPostalCode)
-      ).withCash(totalAmountPaid).withCashTransactionType(CashTransactionType.EgraphPurchase).save()
-
-      val maybePrintOrderAndCash = if (printingOption == PrintingOption.HighQualityPrint) {
+      val maybeCashTransaction = charge.map{ c =>
+	      CashTransaction(accountId = buyer.account.id,
+	      orderId = Some(order.id),
+	      stripeCardTokenId = stripeTokenId,
+	      stripeChargeId = Some(c.id),
+	      billingPostalCode = Some(billingPostalCode)
+	    ).withCash(totalAmountPaid).withCashTransactionType(CashTransactionType.EgraphPurchase).save()
+      }
+      val maybePrintOrder = if (printingOption == PrintingOption.HighQualityPrint) {
         val shippingAddress = for (validShippingForm <- shippingForm) yield {
           // Our printing partner wants all address fields to be comma-separated, even if they are empty
           List(
@@ -227,11 +242,16 @@ case class EgraphPurchaseHandler(
           ).mkString(",")
         }
         val printOrder = PrintOrder(orderId = order.id, amountPaidInCurrency = PrintOrder.pricePerPrint, shippingAddress = shippingAddress.getOrElse("")).save() // update CashTransaction
-        val printOrderTransaction = cashTransaction.copy(printOrderId = Some(printOrder.id)).save()
-        Some((printOrder, printOrderTransaction))
+        
+        maybeCashTransaction match {
+          case None => None
+          case Some(cashTxn) => cashTxn.copy(printOrderId = Some(printOrder.id)).save()
+        }
+        Some(printOrder)
       } else {
         None
       }
+      coupon.map(_.use().save())
 
       val finalOrder = if (isDemo) {
         order.withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
@@ -239,12 +259,9 @@ case class EgraphPurchaseHandler(
         order
       }
 
-      val finalCashTransaction = maybePrintOrderAndCash.map { printOrderAndCash => 
-        printOrderAndCash._2
-      }.getOrElse(cashTransaction)
-      
-      val maybePrintOrder = maybePrintOrderAndCash.map { printOrderAndCash => 
-        printOrderAndCash._1
+      val finalCashTransaction = maybeCashTransaction match {
+        case None => None
+        case Some(cashTxn) => services.cashTransactionStore.findById(cashTxn.id)
       }
 
       (finalOrder, buyer, recipient, finalCashTransaction, maybePrintOrder)

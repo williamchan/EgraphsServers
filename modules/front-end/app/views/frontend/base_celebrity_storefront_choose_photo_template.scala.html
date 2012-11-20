@@ -10,7 +10,7 @@
   authToken: egraphs.authtoken.AuthenticityToken,
   storefrontBreadcrumbs: models.frontend.storefront.StorefrontBreadcrumbs
 )
-@{/**
+@**  
   Base template for the two permutations of the "Choose photo" page in the celebrity
   storefront (tiled and carousel). See base_celebrity_storefront_choose_photo_tiled.scala.html.
 
@@ -24,7 +24,7 @@
 
   headerData & footerData - see base_template.scala.html
   storefrontBreadcrumbs - see base_celebrity_storefront_template
-*/}
+*@
 
 @import _root_.frontend.formatting.DateFormatting.Conversions._
 
@@ -61,7 +61,7 @@
 
           </header>
 
-          @{/** TODO: re-enable this if we do celebrity-level availability
+          @**   TODO: re-enable this if we do celebrity-level availability
 
             <footer class="product-availability">
 
@@ -69,7 +69,7 @@
 
             <p>Quantity Available: <strong>@celeb.quantityAvailable</strong></p>
 
-          </footer> <!-- end .product-availability --> */}
+          </footer> <!-- end .product-availability --> *@
 
         </div> <!-- end .top -->
 
