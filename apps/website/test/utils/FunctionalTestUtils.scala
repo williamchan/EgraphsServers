@@ -206,7 +206,7 @@ object FunctionalTestUtils {
   class MultipartDomainRequest[T](override val request: FakeRequest[T]) extends DomainRequestBase[T] {
     override def requestWithAuthTokenInBody: FakeRequest[T] = {
 
-      var multipartEncodedRequest = request.asInstanceOf[FakeRequest[MultipartFormData[TemporaryFile]]]
+      val multipartEncodedRequest = request.asInstanceOf[FakeRequest[MultipartFormData[TemporaryFile]]]
 
       val existingDataParts = multipartEncodedRequest.body.dataParts
       val existingFiles = multipartEncodedRequest.body.files
