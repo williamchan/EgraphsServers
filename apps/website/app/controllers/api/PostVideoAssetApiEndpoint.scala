@@ -1,4 +1,4 @@
-package controllers.website.admin
+package controllers.api
 
 import java.io.File
 import scala.io.Source
@@ -11,46 +11,43 @@ import play.api.mvc.Action
 import services.blobs.AccessPolicy
 import services.blobs.Blobs
 import services.http.filters.HttpFilters
-import services.http.POSTControllerMethod
+import services.http.POSTApiControllerMethod
 import services.AppConfig
 import services.TempFile
 
-private[controllers] trait PostVideoAssetAdminEndpoint { this: Controller =>
-  protected def postController: POSTControllerMethod
+private[controllers] trait PostVideoAssetApiEndpoint { this: Controller =>
+  protected def postApiController: POSTApiControllerMethod
   protected def httpFilters: HttpFilters
   protected def blobs: Blobs
 
   /**
    * Posts a video asset from a celebrity.
    */
-  def postVideoAssetAdmin = postController() {
-    httpFilters.requireAdministratorLogin.inSession(parser = parse.multipartFormData) {
-      case (admin, adminAccount) =>
-        httpFilters.requireCelebrityId.inRequest(parse.multipartFormData) { celebrity =>
-          Action(parse.multipartFormData) { request =>
-            
-            request.body.file("video").map { resource =>
+  def postVideoAsset = postApiController() {
+    httpFilters.requireCelebrityId.inRequest(parse.multipartFormData) { celebrity =>
+      Action(parse.multipartFormData) { request =>
 
-              val filename = resource.filename
-              val tempFile = TempFile.named(filename)
+        request.body.file("video").map { resource =>
 
-              resource.ref.moveTo(tempFile, true)
+          val filename = resource.filename
+          val tempFile = TempFile.named(filename)
 
-              val maybeFileLocation = putFile(celebrity, filename, tempFile)
-              maybeFileLocation match {
-                case Some(maybeFileLocation) => {
-                  persist(celebrity, maybeFileLocation)
-                  val responseJson = getJson(celebrity, tempFile, maybeFileLocation)
-                  Ok(responseJson)
-                }
-                case None => InternalServerError("The video was not found")
-              }
+          resource.ref.moveTo(tempFile, true)
 
-            }.getOrElse {
-              BadRequest("Something went wrong with your request. Please try again.")
+          val maybeFileLocation = putFile(celebrity, filename, tempFile)
+          maybeFileLocation match {
+            case Some(maybeFileLocation) => {
+              persist(celebrity, maybeFileLocation)
+              val responseJson = getJson(celebrity, tempFile, maybeFileLocation)
+              Ok(responseJson)
             }
+            case None => InternalServerError("The video was not found")
           }
+
+        }.getOrElse {
+          BadRequest("Something went wrong with your request. Please try again.")
         }
+      }
     }
   }
 

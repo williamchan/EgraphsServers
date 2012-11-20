@@ -1,4 +1,4 @@
-package controllers.website.admin
+package controllers.api
 
 import utils.EgraphsUnitTest
 import services.AppConfig
@@ -19,12 +19,12 @@ import play.api.http.HeaderNames
 import play.api.mvc.MultipartFormData
 import play.api.mvc.MultipartFormData.FilePart
 import play.api.libs.Files.TemporaryFile
-import controllers.routes.WebsiteControllers.postVideoAssetAdmin
+import controllers.routes.ApiControllers.postVideoAsset
 import java.io.File
 import services.blobs.Blobs
 
-class PostVideoAssetAdminEndpointTests extends EgraphsUnitTest with AdminProtectedResourceTests {
-  protected override def routeUnderTest = postVideoAssetAdmin
+class PostVideoAssetApiEndpointTests extends EgraphsUnitTest with ProtectedCelebrityResourceTests {
+  protected override def routeUnderTest = postVideoAsset
   protected def db = AppConfig.instance[DBSession]
 
   it should "accept multipartFormData, respond with OK, and verify file creation in the blobstore" in new EgraphsTestApplication {
@@ -45,8 +45,8 @@ class PostVideoAssetAdminEndpointTests extends EgraphsUnitTest with AdminProtect
     val fakeVideoFile = Seq(fakeVideoPart)
     val postBody = MultipartFormData[TemporaryFile](nonFiles, fakeVideoFile, Seq(), Seq())
 
-    val Some(result) = routeAndCall(new MultipartDomainRequest(FakeRequest(POST, "/admin/videoasset",
-      FakeHeaders(Map(HeaderNames.CONTENT_TYPE -> Seq("multipart/form-data"))), postBody)).withAdmin(admin.id).withAuthToken)     
+    val Some(result) = routeAndCall(FakeRequest(POST, "/api/1.0/celebrities/me/videoasset",
+      FakeHeaders(Map(HeaderNames.CONTENT_TYPE -> Seq("multipart/form-data"))), postBody))     
 
     status(result) should be(OK)
 
