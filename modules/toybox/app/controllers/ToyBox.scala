@@ -4,203 +4,212 @@ import play.api.GlobalSettings
 import play.api.Configuration
 import play.api.Plugin
 import play.api.Play
+import play.api.mvc._
+import play.api.mvc.Results._
+import play.api.libs.Crypto
 import play.api.data.Forms._
 import play.api.data.{Form, Forms}
 import play.api.data.format.Formats._
-import play.api.mvc._
-import play.api.mvc.Results._
 
+import ToyBoxConfigKeys._
 
-/**
- * ToyBox. This is the only type needed to add privacy to your app. To use it:
- *   1. Mix it into an object in the application
- *   2. Route the ToyBox controllers as desired in routes file
- *   3. Implement abstract methods (optionally, may override components)
- *   4. Enable the plugin located at [your ToyBox object].plugin
+/** ToyBox allows the locking down of Play 2.0 applications 
+ *
  */
+trait ToyBox extends ToyBoxBase with ToyBoxController with GlobalSettings {
 
-// TODO: is there any reason not to just extend them all instead of self typing?
-trait ToyBox extends TBPlugin with TBController with TBConfig with TBRoutes {
-}
+  // Routes
+  val defaultRoutePath = "/toybox/login"
+ 
+  def maybeGetLoginRoute:  Option[Call] 
+ 
+  def maybePostLoginRoute: Option[Call]
+ 
+  lazy val getLoginRoute  = maybeGetLoginRoute.getOrElse(new Call("GET", defaultRoutePath))
+ 
+  lazy val postLoginRoute = maybePostLoginRoute.getOrElse(new Call("POST", defaultRoutePath))
 
-trait TBRoutes {
-  /**
-   * Route to the getLogin method of the ToyBoxController
-   * ex: controllers.routes.[YourToyBoxObject].Controllers.getLogin
-   */
-  def getLoginRoute: Call
+ 
 
-  /**
-   * Route to the postLogin method of the ToyBoxController
-   * ex: controllers.routes.[YourToyBoxObject].Controllers.postLogin
-   */
-  def postLoginRoute: Call
-}
+  // General ToyBox configuration
+  lazy val config = Play.current.configuration.getConfig("toybox").getOrElse(
+    throw new Exception("ToyBox subconfiguration not present."))
 
-trait TBConfig {
-  /**
-   * Name of authentication cookie
-   */
-  def authenticatedCookie: String = 
-    Play.current.configuration.getString("toybox-authenticatedCookie").getOrElse(
-      "toybox-authenticated")
+  lazy val authUsername = config.getString(usrKey).getOrElse("")
 
-  def initialRequestCookie: String = 
-    Play.current.configuration.getString("toybox-initialRequestCookie").getOrElse(
-      "toybox-initialRequest")
-  def isPrivate: Boolean = 
-    Play.current.configuration.getBoolean("toybox-isPrivate").getOrElse(true)
-  def authenticationTimeout: Int = // 20 minute default
-    Play.current.configuration.getInt("toybox-authenticationTimeout").getOrElse(20*60) 
-  def actualUsername: String
-  def actualPassword: String
-}
+  lazy val authPassword = config.getString(pwdKey).getOrElse(throw new Exception("No password configured."))
 
-/**
- * This trait handles requests to the application. To extend its functionality,
- * override tbPlugin value with an implementation of ToyBoxPlugin.
- */
-trait TBPlugin { this: TBRoutes with TBConfig =>
-  val tbPlugin: ToyBoxPlugin = DefaultTBPlugin
-  val verbose = false
+  lazy val isPrivate    = config.getBoolean(privateKey).getOrElse(true)
 
-  abstract class ToyBoxPlugin extends GlobalSettings {
-    val loginAssetsPath = "/assets/public/toybox-assets"
+  lazy val publicPaths: Seq[String] = 
+    Seq( // TODO: possibly pull extra paths from config
+      getLoginRoute.url, 
+      postLoginRoute.url, 
+      "/assets/toybox"
+    ) 
 
-    override def onRouteRequest(req: RequestHeader): Option[Handler] = { 
-      if (verbose) {
-        println("""request received: """ + req)
-        println("""method:           """ + req.method)
-        println("""uri:              """ + req.uri)
-        println("""remote address:   """ + req.remoteAddress)
-      }
 
-      req.cookies.get(authenticatedCookie) match {
-        // request is from authenticated user
-        case Some(Cookie(name, value, _, path, domain, secure, httpOnly)) => {
-          
-          // Helper for renewing authenticated cookie on PlainResults
-          def tryRenewingAuthentication(result: Result): Result = result match {
-            case plainResult: PlainResult => 
-              plainResult.withCookies( 
-                new Cookie(name, value, authenticationTimeout,  path, domain, secure, httpOnly)
-              )
-            case _ => result
-          }
-          
-          // compose default handler to renew authentication if possible
-          super.onRouteRequest(req) match {
-            // Actions and Cached handlers may be used to renew authentication
-            case Some(action: Action[AnyContent]) => Some( Action { implicit request =>
-               tryRenewingAuthentication( action(request) )
-            })
+  // Cookie configuration
+  lazy val initialRequestCookieName = config.getString(initRequestKey).getOrElse("toybox-initial-request")
 
-            // Other handlers currently cannot set cookies, to return as is
-            case defaultMaybeHandler => defaultMaybeHandler
-          }
-        }
+  lazy val authCookieName = config.getString(authCookieKey).getOrElse("toybox-authenticated")
 
-        // No authentication cookie present in request, so redirect to login as needed
-        case None => {
-          val needsAuthentication = isPrivate &&      // app is in private mode
-            req.path != getLoginRoute.url &&          // request is not for login page
-            !req.path.startsWith(loginAssetsPath)     // request is not for login asset
-            
-          if (needsAuthentication) redirectToLogin(req)
-          else                     super.onRouteRequest(req)
-        }
-      }
-    }
+  lazy val authTimeout    = config.getInt(authTimeoutKey).getOrElse(40*60)  // 40 minute default
 
-    def redirectToLogin(req: RequestHeader): Option[Handler]
-    def isAuthenticated(req: RequestHeader): Boolean
-  }
+  lazy val authPath       = config.getString(authPathKey).getOrElse("/")
 
-  object DefaultTBPlugin extends ToyBoxPlugin {
-    def redirectToLogin(req: RequestHeader) = {
-      Some(Action {
-        Redirect(getLoginRoute).withCookies(makeInitialRequestCookie(req))
-      }) // login
-    }
+  lazy val authDomain     = config.getString(authDomainKey)
 
-    def isAuthenticated(req: RequestHeader): Boolean = {
-      // make sure req is not null and it has the cookie
-      req != null && req.cookies != null && 
-        req.cookies.get(authenticatedCookie) != None   
-    }
 
-    /**
-     *
-     */
-    private def makeInitialRequestCookie(req: RequestHeader): Cookie = {
-      // TODO: should path be something betterer?
-      new Cookie(initialRequestCookie, req.method+req.path, -1, "/", None,  false, false)
-    }
-  }
-}
-
-// IN PROGRESS
-trait TBController { this: TBRoutes with TBConfig =>
-  val tbController: ToyBoxController = DefaultTBController
-
-  abstract class ToyBoxController extends Controller {
-    def getLogin: Action[AnyContent]
-    def postLogin: Action[AnyContent]
-  }
-
-  object DefaultTBController extends ToyBoxController {
-    val loginForm = Form(
-      tuple( 
-        "username" -> Forms.of[String],             // not necessarily required
-        "password" -> nonEmptyText                  // must be non-empty
-      )
+  // Login Form
+  val loginForm = Form( 
+    tuple( 
+      "username" -> text,
+      "password" -> text
     )
+  )
 
-    def getLogin = Action {
-      // This is the default login page, takes the route to POST form submission to
-      // 
-      Ok(views.html.login(postLoginRoute, loginForm))
+
+
+  // ToyBoxController methods
+  def getLogin: Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.login(postLoginRoute, loginForm))
+  }
+
+
+  def postLogin: Action[AnyContent] = Action { implicit request =>
+    loginForm.bindFromRequest.fold(
+      formErrors   => BadRequest(views.html.login(postLoginRoute, formErrors)),
+
+      loginAttempt =>
+        if (checkLoginAttempt(loginAttempt)) 
+          Redirect(
+            parseInitialRequestCookie(request)
+          ).withCookies(
+            makeAuthCookie(request)
+          ).discardingCookies(
+            initialRequestCookieName
+          )
+        else
+          BadRequest(views.html.login(postLoginRoute, loginForm, loginAttempt._1))
+    )
+  }
+
+
+  /** Matches a given username/password pair against the configured credentials */
+  protected def checkLoginAttempt(usrPwdPair: (String, String)) = {
+    // might want to ignore username if it's not configured (== ""), but not today... not today...
+    usrPwdPair == (authUsername, authPassword)
+  }
+
+  
+
+
+
+
+  // GlobalSettings methods
+
+  /** Redirects unauthorized requests for private resources. 
+   *  Authorized requests for private resources are handled different from 
+   *  public resource requests because the authorization status is stored in
+   *  a signed cookie that needs to be renewed periodically. 
+   *
+   *  TODO: catch log-in page request in the case where the maybe-endpoint-routes
+   *  are not properly configured and manually serve the log-in page.
+   */
+  override def onRouteRequest(request: RequestHeader): Option[Handler] = {
+    def isPublicResourceRequest = publicPaths.exists(request.path.startsWith(_))
+    def isAuthorized = !isPrivate || hasAuthCookie(request) 
+
+    if (isPublicResourceRequest) normalRouteRequestHandler(request)
+    else if (isAuthorized)       handleAuthorized(request)
+    else                         redirectToLogin(request)
+  }
+
+
+/** Method pointing to the parent's onRouteRequtest method. Used to make testing easier. */
+  protected def normalRouteRequestHandler: RequestHeader => Option[Handler] = super.onRouteRequest
+
+
+  /** Handler for authorized requests to private resources. Sets a new authentication
+   *  Cookie to keep it from expiring while the user is active.
+   */
+  protected def handleAuthorized(request: RequestHeader): Option[Handler] = {
+    normalRouteRequestHandler(request) match {
+      case Some(action: Action[AnyContent]) => Some(addAuthentication(action))
+      case other => other
     }
+  }
 
-    def postLogin = Action { implicit request =>
-      loginForm.bindFromRequest.fold(
-        // login failed due to form submission errors
 
-        // BadRequest(route.to.login(postLoginRoute, formErrors))
-        formErrors => BadRequest(views.html.login(postLoginRoute, formErrors)),
+  /** Generates a redirect to the log-in page and sets a Cookie containing the method
+   *  and path of the request received for later redirection, if none already exists.
+   */
+  protected def redirectToLogin(request: RequestHeader): Option[Handler] = Some( 
+    Action {
+      request.cookies.get(initialRequestCookieName) match {
+      case Some(cookie: Cookie) => Redirect(getLoginRoute)
+      case None => Redirect(getLoginRoute).withCookies( 
+          makeInitialRequestCookie(request)) 
+      }
+    })
 
-        // return the desired page or login page with failure message
-        loginAttempt => {
-          if (checkCredentials(loginAttempt)){
-              // success
-              // TODO: pull destination from a cookie
-              Redirect(parseInitialRequestCookie(request)).withCookies(
-                new Cookie(authenticatedCookie, "what should i be?", authenticationTimeout,
-                  "/", None, false, false)
-              )
-          } else {
-              // failure
-              // TODO: add errors; should look like
-              // val loginErrors: Form[(String, String)] = ...
-              // BadRequest(route.to.login(postLoginRoute, loginErrors))
-              BadRequest(views.html.login(postLoginRoute, loginForm))
-          }
-        }
-      )
+
+  /** Checks for presence and authenticity of an authentication Cookie in a request */
+  protected def hasAuthCookie(request: RequestHeader): Boolean = {
+    request.cookies.get(authCookieName) match {
+      // TODO: check that the value is legitimate
+      case Some(Cookie(_, value, _, _, _, _, _)) => value == Crypto.sign(request.remoteAddress)
+      case None                                  => false
     }
+  }
 
-    private def checkCredentials(usrPwdPair: (String, String)) = {
-      usrPwdPair._1 == actualUsername && usrPwdPair._2 == actualPassword
+
+  /** Simple helper for adding an authentication Cookie to an action 
+   *  Tried to parametrized the Action type, but couldn't get it to work...
+   */
+  protected def addAuthentication(action: Action[AnyContent]): Action[AnyContent] = Action { 
+    implicit request => action(request) match {
+      case plainResult: PlainResult => plainResult.withCookies(makeAuthCookie(request))
+      case result: Result => result
     }
+  }
 
-    private def parseInitialRequestCookie(req: Request[_]): Call = 
-      req.cookies.get(initialRequestCookie) match {
+
+
+
+
+
+  /** Creates an authentiticy Cookie for a given request */
+  protected def makeAuthCookie(request: RequestHeader): Cookie = {
+    val signedValue = { Crypto.sign(request.remoteAddress) }
+    new Cookie(authCookieName, signedValue, authTimeout, authPath, authDomain, false, false)
+  }
+
+
+  /** Checks authentication cookie value against signed IP address */
+  protected def checkAuthCookieValue(sig: String): Boolean = {
+    val uuid = sig.takeWhile(_ != '=')
+    val signedUuid = sig.dropWhile(_ != '=').tail
+    Crypto.sign(uuid) == signedUuid
+  }
+
+
+  /** Creates a Cookie holding the method and path of the given request */
+  protected def makeInitialRequestCookie(request: RequestHeader): Cookie = {
+    new Cookie(initialRequestCookieName, request.method + request.path, -1, "/", None, false, true)
+  }
+
+
+  /** Reads the method and path of the initial request Cookie if it's present. 
+   *  Otherwise, the returned Call is a GET to the application root.
+   */
+  protected def parseInitialRequestCookie(request: Request[_]): Call = {
+    request.cookies.get(initialRequestCookieName) match {
       case Some(Cookie(_, value, _, _, _, _, _)) =>
-          val method = value.takeWhile(_ != '/')
-          val dest = value.stripPrefix(method)
-          new Call(method, dest)
+        new Call(value.takeWhile(_ != '/'), 
+                 value.dropWhile(_ != '/'))
       case _ => new Call("GET", "/")
-
     }
   }
 }
