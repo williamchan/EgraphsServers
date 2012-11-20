@@ -60,10 +60,25 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
   def getMarketplaceResultPage = controllerMethod.withForm() { implicit AuthToken => 
     Action { implicit request =>
       // Determine what search options, if any, have been appended
-      val verticalOption = Form("vertical" -> nonEmptyText).bindFromRequest.fold(formWithErrors => None, validForm => Some(validForm))
-      val queryOption = Form("query" -> nonEmptyText).bindFromRequest.fold(formWithErrors => None, validForm => Some(validForm))
-      val maybeSortType = Form("sort" -> nonEmptyText).bindFromRequest.fold(formWithErrors => None, sortOption => CelebritySortingTypes(sortOption))
-      val viewOption = Form("view" -> nonEmptyText).bindFromRequest.fold(formWithErrors => None, validForm => Some(validForm))
+      val marketplaceResultPageForm = Form(
+        tuple(
+          "vertical" -> optional(nonEmptyText),
+          "query" -> optional(nonEmptyText),
+          "sort" -> optional(nonEmptyText),
+          "view" -> optional(nonEmptyText))
+        )
+
+      val (verticalIdOption, queryOption, sortOption, viewOption) = marketplaceResultPageForm.bindFromRequest.fold(
+        formWithErrors => throw new Exception("This shouldn't be possible")
+        ,{
+          case (verticalIdOption, queryOption, sortOption, viewOption) =>
+            (verticalIdOption, queryOption, sortOption, viewOption)
+        })
+
+      val maybeSortType = sortOption match {
+        case Some(sort) => CelebritySortingTypes(sort)
+        case _ => None
+      }
 
       val categoryAndCategoryValues = 
         for((key, set) <- request.queryString; categoryRegex(id) <- categoryRegex findFirstIn key) yield {
@@ -79,10 +94,10 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       val (subtitle, celebrities) = dbSession.connected(TransactionSerializable) {
         queryOption match {
           case Some(query) =>
-            val results  = celebrityStore.marketplaceSearch(queryOption, categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostRelevant))
+            val results = celebrityStore.marketplaceSearch(queryOption, categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostRelevant))
             val text = results.size match {
               case 1 => "Showing 1 Result for \"" + query + "\"..."
-              case _ =>  "Showing " + results.size + " Results for \"" + query + "\"..."
+              case _ => "Showing " + results.size + " Results for \"" + query + "\"..."
             }
             (text, results)
           case _ =>
@@ -90,7 +105,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
               ("Results", celebrityStore.marketplaceSearch(queryOption, categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostRelevant)))
             } else {
               //TODO when refinements are implemented we can do this using tags instead.  
-              ("Featured Stars", catalogStarsQuery().filter(star => star.isFeatured).map(c => 
+              ("Featured Stars", catalogStarsQuery().filter(star => star.isFeatured).map(c =>
                 MarketplaceCelebrity(
                   id = c.id,
                   publicName = c.name,
@@ -98,24 +113,24 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
                   storefrontUrl = c.storefrontUrl,
                   soldout = !c.hasInventoryRemaining,
                   minPrice = c.minPrice,
-                  maxPrice = c.maxPrice, 
-                  secondaryText = c.secondaryText.getOrElse("")
-                )
-              ))
+                  maxPrice = c.maxPrice,
+                  secondaryText = c.secondaryText.getOrElse(""))))
             }
-          }
         }
+      }
 
-      val viewAsList = viewOption == Some("list")
+      val viewAsList = viewOption == Some("list") // "list" should be a part of an Enum
 
+      println("~~~~~~~~~~~~~~~~~~~~~~~~~" + verticalIdOption)
+      
       //HACK As long as no CategoryValues have children Categories, this call can be used to display
-      // only baseball categories. This NEEDS to be fixed if we want to support multiple verticals. 
-      val categoryValues = categoryValueStore.all().toList
-
+      // only baseball categories. This NEEDS to be fixed if we want to support multiple verticals.
+      //TODO: This block is slow as fuck, fix it
       val categoryViewModels = for {
-        categoryValue <- categoryValues
+        categoryValue <- categoryValueStore.all().toList
         category <- categoryValue.categories
       } yield {
+        println(categoryValue + "~~~~~~~~~~~~~~" + category)
         CategoryViewModel(
           id = category.id,
           publicName = category.publicName,

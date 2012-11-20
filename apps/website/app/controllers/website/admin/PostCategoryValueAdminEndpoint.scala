@@ -83,8 +83,8 @@ trait PostCategoryValueAdminEndpoint {
             }
 
             val savedCategoryValue = tmp.copy(
-                publicName = validForm.publicName,
-                name = validForm.name,
+                publicName = validForm.publicName.trim,
+                name = validForm.name.trim,
                 categoryId = categoryId)
                 .save()
             categoryValueStore.updateCategories(savedCategoryValue, categoryIds)
