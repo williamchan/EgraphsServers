@@ -6,7 +6,6 @@ object CelebritySortingTypes extends Enum {
   sealed trait EnumVal extends Value {
     def displayName: String
   }
-
   // val RecentlyAdded = new EnumVal {
   //   val name = "RecentlyAdded"
   //   val displayName ="Recently Added" 

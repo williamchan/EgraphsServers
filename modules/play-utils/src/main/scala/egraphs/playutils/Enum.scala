@@ -19,6 +19,8 @@ trait Enum {
   }
 
   def values: Vector[EnumVal] = _values.get //Here you can get all the enums that exist for this type
+
+  def asStrList: List[String] = values.map(_.name).toList
   /**
    * Returns an Option[EnumVal] if the Enum has a corresponding mapping form string to enumval
    * @param name String name of enum

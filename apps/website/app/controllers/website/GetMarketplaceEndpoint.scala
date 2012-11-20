@@ -120,8 +120,6 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       }
 
       val viewAsList = viewOption == Some("list") // "list" should be a part of an Enum
-
-      println("~~~~~~~~~~~~~~~~~~~~~~~~~" + verticalIdOption)
       
       //HACK As long as no CategoryValues have children Categories, this call can be used to display
       // only baseball categories. This NEEDS to be fixed if we want to support multiple verticals.
@@ -130,7 +128,6 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         categoryValue <- categoryValueStore.all().toList
         category <- categoryValue.categories
       } yield {
-        println(categoryValue + "~~~~~~~~~~~~~~" + category)
         CategoryViewModel(
           id = category.id,
           publicName = category.publicName,
