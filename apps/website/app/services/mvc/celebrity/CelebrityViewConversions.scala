@@ -72,78 +72,32 @@ class CelebrityViewConversions(celeb: Celebrity) {
    * The celebrity as a CatalogStar. If some necessary data for the CatalogStar
    * were not available (e.g. publicName, storeFrontUrl) then it returns None.
    */
-  def asCatalogStar(inventoryQuantities: Seq[InventoryQuantity]): CatalogStar = {
+  def asCatalogStar(minPrice: Int, maxPrice: Int, soldout: Boolean): CatalogStar = {
     val mastheadImageUrl = celeb
       .landingPageImage
       .withImageType(ImageAsset.Jpeg)
       .resizedWidth(440)
-      .getSaved(AccessPolicy.Public).url
+      .getSaved(AccessPolicy.Public).url  // expensive call
 
     val marketplaceImageUrl = celeb
       .landingPageImage
       .withImageType(ImageAsset.Jpeg)
       .resizedWidth(660)
-      .getSaved(AccessPolicy.Public).url
+      .getSaved(AccessPolicy.Public).url // expensive call
 
-    val purchaseableProductsIds = inventoryQuantities.filter {
-      productAndCount => productAndCount.quantityRemaining > 0
-    }
-    
     val choosePhotoUrl = controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled(celebrityUrlSlug = celeb.urlSlug).url
 
     CatalogStar(
+      id = celeb.id,
       name = celeb.publicName,
       secondaryText = Option(celeb.roleDescription),
       imageUrl = mastheadImageUrl,
       marketplaceImageUrl = marketplaceImageUrl,
       storefrontUrl = choosePhotoUrl,
-      hasInventoryRemaining = !purchaseableProductsIds.isEmpty,
+      hasInventoryRemaining = !soldout,
       isFeatured = celeb.isFeatured,
-      minPrice = 0,
-      maxPrice = 0,
-      id = celeb.id
-    )
-  }
-
-  @deprecated("This is the old version before SER-86. Bringing this back because the new version does not work yet.", "")
-  def asCatalogStar: CatalogStar = {
-    val mastheadImageUrl = celeb
-      .landingPageImage
-      .withImageType(ImageAsset.Jpeg)
-      .resizedWidth(440)
-      .getSaved(AccessPolicy.Public)
-      .url
-
-    val marketplaceImageUrl = celeb
-      .landingPageImage
-      .withImageType(ImageAsset.Jpeg)
-      .resizedWidth(660)
-      .getSaved(AccessPolicy.Public).url
-
-    val activeProductsAndInventory = celeb.getActiveProductsWithInventoryRemaining()
-    val purchaseableProducts = activeProductsAndInventory.filter {
-      productAndCount =>
-        productAndCount._2 > 0
-    }
-    val prices = purchaseableProducts.map(p => p._1.priceInCurrency.toInt)
-    val (min, max) = prices.isEmpty match {
-      case true => (0, 0)
-      case false => (prices.filter(p => p > 0).min, prices.max)
-    }
-      // marketplaceImageUrl = marketplaceImageUrl
-    val choosePhotoUrl = getStorefrontChoosePhotoTiled(celeb.urlSlug).url
-
-    CatalogStar(
-      name = celeb.publicName,
-      secondaryText = Option(celeb.roleDescription),
-      imageUrl = mastheadImageUrl,
-      marketplaceImageUrl = marketplaceImageUrl,
-      storefrontUrl = choosePhotoUrl,
-      hasInventoryRemaining = !purchaseableProducts.isEmpty,
-      isFeatured = celeb.isFeatured,
-      minPrice = min, 
-      maxPrice = max,
-      id = celeb.id
+      minPrice = minPrice,
+      maxPrice = maxPrice
     )
   }
 }

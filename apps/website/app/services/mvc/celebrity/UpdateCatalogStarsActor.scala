@@ -48,16 +48,9 @@ private[celebrity] class UpdateCatalogStarsActor @Inject()(
         // their sold-out info.
         db.connected(isolation = TransactionSerializable, readOnly = true) {
           log("Updating landing page celebrities")
-
-          // Get the list of domain objects from the DB
-          val publishedCelebs = celebrityStore.getPublishedCelebrities.toIndexedSeq
-
-          // Turn the domain objects into ViewModels (CatalogStars)
-          for (celeb <- publishedCelebs) yield {
-            celeb.asCatalogStar
-          }
+          celebrityStore.getCatalogStars
         }
-      }
+      }.toIndexedSeq
 
       // Send the celebs to an actor that will be in charge of serving them to
       // the landing page.
@@ -71,7 +64,6 @@ private[celebrity] class UpdateCatalogStarsActor @Inject()(
     }
   }
 }
-
 
 private[mvc] object UpdateCatalogStarsActor extends Logging {
 

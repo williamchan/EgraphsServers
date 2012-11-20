@@ -29,6 +29,7 @@ import play.api.libs.concurrent.Akka
 import services.db.DBSession
 import services.db.TransactionSerializable
 import org.joda.time.DateTimeConstants
+import models.frontend.landing.CatalogStar
 
 /**
  * Services used by each celebrity instance
@@ -487,20 +488,10 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends Sa
     }
   }
 
-  /**
-   * This function is a dupe of the above function. We will probably want to think of a good way to abstract the search if we want to retain a
-   * useful admin text search. 
-   * TODO: implement refinements, pass in real data for sold out, minPrice, and maxPrice.
-   * Currently the view conversion is doing another DB query to fill in that data for each celebrity, would be great if we could do it all in one trip. 
-   * Set[Categoryid, Iterable[CategoryValueId]]
-   * in each set (OR CategoryValueIds) And (OR CategoryValueIds)
-   * 
-   *  (pitcher or 2nd baseman) and (red sox or yankees)
-   */
+  private case class CelebrityProductSummary(inventoryAvailable: Int, minProductPrice: Int, maxProductPrice: Int)
 
-  def marketplaceSearch(maybeQuery: Option[String] = None, refinements: Map[Long, Iterable[Long]] = Map[Long, Iterable[Long]](), sortType: CelebritySortingTypes.EnumVal = CelebritySortingTypes.MostRelevant)
-  : Iterable[MarketplaceCelebrity] = {
-
+  private def publishedSearch(maybeQuery: Option[String] = None, refinements: Map[Long, Iterable[Long]] = Map[Long, Iterable[Long]](), sortType: CelebritySortingTypes.EnumVal = CelebritySortingTypes.MostRelevant)
+  : Iterable[(Celebrity, CelebrityProductSummary)] = {
     // Note we could make this fast probably.  We should see how performance is affected if we don't have to
     // join across all celebrities since we can filter some with the text search first.
     val queryString = """
@@ -509,6 +500,7 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends Sa
      stuff2.publicname,
      stuff2.roledescription,
      stuff2._landingpageImageKey,
+     stuff2.isfeatured,
      min(stuff2.minProductPrice) AS minProductPrice,
      max(stuff2.maxProductPrice) AS maxProductPrice,
      sum(stuff2.inventory_sold) AS inventory_sold,
@@ -520,6 +512,7 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends Sa
      stuff.celeb_publicname AS publicname,
      stuff.celeb_roledescription AS roledescription,
      stuff.celeb_landingpageImageKey AS _landingpageImageKey,
+     stuff.celeb_isfeatured AS isfeatured,
      min(stuff.product_priceincurrency) AS minProductPrice,
      max(stuff.product_priceincurrency) AS maxProductPrice,
      stuff.inventorybatch_id,
@@ -533,6 +526,7 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends Sa
      c.publicname AS celeb_publicname,
      c.roledescription AS celeb_roledescription,
      c._landingpageImageKey AS celeb_landingpageImageKey,
+     c.isfeatured AS celeb_isfeatured,
      p.id AS product_id,
      p.priceincurrency AS product_priceincurrency,
      ib.id AS inventorybatch_id,
@@ -568,9 +562,9 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends Sa
   val queryGrouping = """ 
     ORDER BY is_order ASC
     ) AS stuff
-      GROUP BY celeb_id, celeb_publicname, celeb_roledescription, celeb_landingpageImageKey, inventorybatch_id, inventory_total
+      GROUP BY celeb_id, celeb_publicname, celeb_roledescription, celeb_landingpageImageKey, celeb_isfeatured, inventorybatch_id, inventory_total
     ) AS stuff2
-    GROUP BY celebrityid, publicname, roledescription, _landingpageImageKey
+    GROUP BY celebrityid, publicname, roledescription, _landingpageImageKey, isfeatured
     """
 
     import CelebritySortingTypes._
@@ -587,7 +581,7 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends Sa
         case PriceDecending => "ORDER BY maxProductPrice DESC"
         case Alphabetical => "ORDER BY publicname ASC"
         // case ReverseAlphabetical => "ORDER BY publicname DESC"
-        case _ =>  ""
+        case MostRelevant =>  ""
       }
     } + ";"
 
@@ -604,30 +598,65 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends Sa
       }
     }
 
-    val rowStream  = finalQuery.apply()(connection = schema.getTxnConnectionFactory)
-
-    val marketplaceCelebrities = for (row <- rowStream) yield {
-      //Akka.future {
-        import java.math.BigDecimal
-        Celebrity(
-          id = row[Long]("celebrityid"),
-          publicName = row[String]("publicname"),
-          roleDescription = row[String]("roledescription"),
-          _enrollmentStatus = EnrollmentStatus.Enrolled.name,
-          _publishedStatus = PublishedStatus.Published.name,
-          _landingPageImageKey = row[Option[String]]("_landingpageImageKey"))
-        .asMarketplaceCelebrity(
-          soldout = row[BigDecimal]("inventoryAvailable").intValue() <= 0,
-          minPrice = row[BigDecimal]("minProductPrice").intValue(),
-          maxPrice = row[BigDecimal]("maxProductPrice").intValue())
-      }
-    //}
-
-
-    //Promise.sequence(marketplaceCelebrities).await(10 * DateTimeConstants.MILLIS_PER_SECOND).get
-    marketplaceCelebrities
+    val rowStream = finalQuery.apply()(connection = schema.getTxnConnectionFactory)
+    for (row <- rowStream) yield {
+      import java.math.BigDecimal
+      val celebrity = Celebrity(
+        id = row[Long]("celebrityid"),
+        publicName = row[String]("publicname"),
+        roleDescription = row[String]("roledescription"),
+        _enrollmentStatus = EnrollmentStatus.Enrolled.name,
+        _publishedStatus = PublishedStatus.Published.name,
+        _landingPageImageKey = row[Option[String]]("_landingpageImageKey"),
+        isFeatured = row[Boolean]("isfeatured") // This should go away
+      )
+      val productSummary = CelebrityProductSummary(
+        row[BigDecimal]("inventoryAvailable").intValue(),
+        row[BigDecimal]("minProductPrice").intValue(),
+        row[BigDecimal]("maxProductPrice").intValue())
+      (celebrity, productSummary)
+    }
   }
-  
+
+  /**
+   * This function is a dupe of the above function. We will probably want to think of a good way to abstract the search if we want to retain a
+   * useful admin text search. 
+   * 
+   * Currently the view conversion is doing another DB query to fill in that data for each celebrity, would be great if we could do it all in one trip. 
+   * Set[Categoryid, Iterable[CategoryValueId]]
+   * in each set (OR CategoryValueIds) And (OR CategoryValueIds)
+   * 
+   *  (pitcher or 2nd baseman) and (red sox or yankees)
+   */
+  def marketplaceSearch(maybeQuery: Option[String] = None, refinements: Map[Long, Iterable[Long]] = Map[Long, Iterable[Long]](), sortType: CelebritySortingTypes.EnumVal = CelebritySortingTypes.MostRelevant)
+  : Iterable[MarketplaceCelebrity] = {
+
+    val celebrityAndSummaries = publishedSearch(maybeQuery, refinements, sortType)
+    for (celebrityAndSummary <- celebrityAndSummaries) yield {
+      val (celebrity, summary) = celebrityAndSummary
+      import java.math.BigDecimal
+      celebrity.asMarketplaceCelebrity(
+        soldout = summary.inventoryAvailable <= 0,
+        minPrice = summary.minProductPrice,
+        maxPrice = summary.maxProductPrice
+      )
+    }
+  }
+
+  def getCatalogStars: Iterable[CatalogStar] = {
+    val celebrityAndSummaries = publishedSearch()
+    val catalogStarFutures = for (celebrityAndSummary <- celebrityAndSummaries) yield {
+      Akka.future {
+        val (celebrity, summary) = celebrityAndSummary
+        celebrity.asCatalogStar(
+          soldout = summary.inventoryAvailable <= 0,
+          minPrice = summary.minProductPrice,
+          maxPrice = summary.maxProductPrice)
+      }
+    }
+
+    Promise.sequence(catalogStarFutures).await(DateTimeConstants.MILLIS_PER_MINUTE).get.toIndexedSeq
+  }
 
   def getCelebrityAccounts: Query[(Celebrity, Account)] = {
     val celebrityAccounts: Query[(Celebrity, Account)] = from(schema.celebrities, schema.accounts)(
