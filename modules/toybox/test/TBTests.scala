@@ -17,93 +17,72 @@ import org.scalatest.junit.JUnitRunner
 
 import java.lang.ExceptionInInitializerError
 
-
+/** Tests implementation of the methods of the ToyBoxBase trait */
 @RunWith(classOf[JUnitRunner])
-class TBPluginTests extends FlatSpec with ShouldMatchers {
+class ToyBoxTests extends FlatSpec with ShouldMatchers {
   running (fakeApp) {
-    val maybeUnauthResult = routeRequestToMaybeResult(unauthenticatedRequest)
-    val maybeAuthResult   = routeRequestToMaybeResult(authenticatedRequest)
+    // run some requests through the mock ToyBox's onRouteRequest
+    val unauthResult = routeRequestToSimpleResult(blankGetRequest)
+    val authResult   = routeRequestToSimpleResult(authenticated(blankGetRequest))
 
-    "TBPlugin" should "redirect unauthenticated requests to login" in {
-      val unauthResult = maybeUnauthResult.getOrElse(
-        fail("Unauthenticated request failed instead of getting redirected to login.")
-      )
-      
+    "A TBPlugin" should "redirect unauthenticated requests to login" in {
       // verify that unauthenticated request was redirected to log-in
       redirectLocation(unauthResult) match {
-        case Some(loc: String) => 
-          assert(loc === FakeToyBox.getLoginRoute.url, "Request was redirected, but not to login.")
-        case _ => 
+        case Some(loc: String) =>  
+          assert(loc === FakeToyBox.getLoginRoute.url, 
+            "Request was redirected, but not to login.")
+        case None => 
           fail("Request was not redirected at all.")
       }
     }
 
-    // TODO: check values of the cookie?? is it worth it?
-    it should "store initial request URL in designated cookie" in {
-      maybeUnauthResult match {
-        case Some(simpleResult: SimpleResult[_]) =>
-          assert(resultSetsCookie(simpleResult, FakeToyBox.initialRequestCookie))
-        case _ => 
-          fail("Unauthenticated request did not receive a SimpleResult")
-      }
+    it should "store initial request URL in designated cookie (only for unauthorized requests)" in {
+      // check initial request cookie is set on unauthorized request
+      assert(resultSetsCookie(unauthResult, FakeToyBox.initialRequestCookieName),
+        "Result for unauthorized initial request doesn't set the initial request cookie.")
+
+      // check initial request cookie is NOT set on authorized request
+      assert(!resultSetsCookie(authResult, FakeToyBox.initialRequestCookieName),
+        "Result for authorized initial request sets the initial request cookie.")
     }
 
-    // ******************************************************************************* //
-    // This test passes as of 11/15/12 when mocking the default handler, but I'm
-    // currently not aware of a simple uniform way to do this (I tested by modifying
-    // the source of ToyBoxPlugin)
-
-    // Solutions: We could clutter the API by abstracting out super.onRouteRequest so
-    // it's easily mockable, or I think a mock router needs to be set up.
-    // ******************************************************************************* //
-
-    it should "not block requests for the login page or its assets" in (pending) /*{
+    it should "not block requests for the login page or its assets" in {
       // get login page
-      routeRequestToMaybeResult(getLoginRequest) match {
-        case Some(result: Result) =>
-          assert(status(result) != SEE_OTHER, "Login page request was blocked.")
-        case _ => fail("Login page request received no result.")
-      }
+      val pageResult = routeRequestToSimpleResult(getLoginRequest)
+      assert(status(pageResult) != SEE_OTHER, "Login page request was blocked.")
       
       // get login asset
-      routeRequestToMaybeResult(getLoginAssetRequest) match {
-        case Some(result: Result) =>
-          assert(status(result) != SEE_OTHER, "Login asset request was blocked.")
-        case _ => fail("Login asset request received no result.")
-      }
-    }*/
+      val assetResult = routeRequestToSimpleResult(getLoginAssetRequest)
+      assert(status(assetResult) != SEE_OTHER, "Login asset request was blocked.")
+    }
 
-    it should "pass authenticated requests" in (pending) /*{
-      maybeAuthResult match {
-        case Some(result: Result) => 
-          assert(status(result) === OK, "Authenticated request received a " + status(result))
-        case None => 
-          fail("no result for authenticated request?!")
-      }
-    }*/
+    it should "pass authenticated requests" in {
+      assert(status(authResult) === OK, 
+        "Authenticated request received a " + status(authResult))
+    }
 
-    it should "renew authentication cookie for authenticated requests" in (pending) /*{
-      maybeAuthResult match {
-        case Some(result: Result) =>
-          assert(resultSetsCookie(result, FakeToyBox.authenticatedCookie),
-            "Result for authenticated request does not renew cookie.")
-        case _ => 
-          fail("Unexpected result or handler for authenticated request.")
-      }
-    }*/
+    it should "renew authentication cookie for authenticated requests" in {
+      assert(resultSetsCookie(authResult, FakeToyBox.authCookieName),
+        "Result for authenticated request does not renew cookie.")
+    }
   }
 }
 
-class TBControllerTests extends FlatSpec with ShouldMatchers {
+/** Tests the implementation of the methods of the ToyBoxController trait */
+@RunWith(classOf[JUnitRunner])
+class ToyBoxControllerTests extends FlatSpec with ShouldMatchers {
   running (fakeApp) {
-    val getLoginResult             = FakeToyBox.tbController.getLogin(getLoginRequest)
-    val failLoginWithoutInitResult = tryLogin(failLoginWithoutInitRequest)
-    val succLoginWithoutInitResult = tryLogin(succLoginWithoutInitRequest)
-    val failLoginWithInitResult    = tryLogin(failLoginWithInitRequest)
-    val succLoginWithInitResult    = tryLogin(succLoginWithInitRequest)
+    // results for some various requests to login endpoints
+    val getLoginResult             = FakeToyBox.getLogin(getLoginRequest)
+    val failLoginWithoutInitResult = tryLogin(failPostLogin)
+    val succLoginWithoutInitResult = tryLogin(succPostLogin)
+    val failLoginWithInitResult    = tryLogin(withInit(failPostLogin))
+    val succLoginWithInitResult    = tryLogin(withInit(succPostLogin))
 
-    "TBController" should "return a 200 OK with an HTML resource on GET" in {
-      assert(status(getLoginResult) === OK)
+    "A ToyBoxController" should "return a 200 OK with a valid HTML resource (such as login page) on GET" in {
+      assert(status(getLoginResult) === OK, 
+        "Login page request should receive an OK. Received " + status(getLoginResult) + ".")
+      
       contentType(getLoginResult) match {
         case Some(contentType: String) => 
           assert(contentType.startsWith("text/html"), "Response returning unexpected resource type.")
@@ -130,34 +109,21 @@ class TBControllerTests extends FlatSpec with ShouldMatchers {
 
     it should """add an "authenticated" cookie ONLY to successful POST responses""" in {
       // successful logins
-      assert(resultSetsCookie(succLoginWithInitResult, FakeToyBox.authenticatedCookie),
+      assert(resultSetsCookie(succLoginWithInitResult, FakeToyBox.authCookieName),
         """Successful login result does not set an "authenticated" cookie.""")
-      assert(resultSetsCookie(succLoginWithoutInitResult, FakeToyBox.authenticatedCookie),
+      assert(resultSetsCookie(succLoginWithoutInitResult, FakeToyBox.authCookieName),
         """Successful login result does not set an "authenticated" cookie (without saved initial request).""")
 
       // failed logins
-      assert(!resultSetsCookie(failLoginWithInitResult, FakeToyBox.authenticatedCookie),
+      assert(!resultSetsCookie(failLoginWithInitResult, FakeToyBox.authCookieName),
         """Failed login result sets an "authenticated" cookie.""")
-      assert(!resultSetsCookie(failLoginWithoutInitResult, FakeToyBox.authenticatedCookie),
+      assert(!resultSetsCookie(failLoginWithoutInitResult, FakeToyBox.authCookieName),
         """Failed login result sets an "authenticated" cookie (without saved initial request).""") 
     }
     
-    // TODO - test with form errors
     it should "remain on the login page on failed POST" in {
       assert(status(failLoginWithoutInitResult) === BAD_REQUEST)
       assert(status(failLoginWithInitResult)    === BAD_REQUEST)
     }
-
-    // TODO: consider testing the errors of login failure?
-
-    // Verified that you can set multiple cookies at once
-    /*"cookies" should "be cookies" in {
-      failLoginWithoutInitResult match {
-        case res: PlainResult =>
-          val resWithTwoCookies = res.withCookies(authCookie, initCookie)
-          println("setting two cookies looks like: " + resWithTwoCookies.header.headers(
-            play.api.http.HeaderNames.SET_COOKIE))
-      }
-    }*/
   }
 }

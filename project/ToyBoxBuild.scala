@@ -13,7 +13,12 @@ object ToyBoxBuild extends Build {
 
   // From squeryl.org/getting-started.html
     
-  val appDependencies = Seq()
+  val appDependencies = Seq(
+    "play" %% "play" % PlayVersion.current,    
+  
+    "org.scalatest" %% "scalatest" % "1.8" % "test",
+    "play" %% "play-test" % PlayVersion.current % "test"
+  )
 
   val main = PlayProject(
     appName, 
@@ -27,17 +32,10 @@ object ToyBoxBuild extends Build {
       "Typesafe Releases Repository" at "http://repo.typesafe.com/typesafe/releases/",
       "Typesafe Snapshots Repository" at "http://repo.typesafe.com/typesafe/snapshots/"
     ),
-    
-    libraryDependencies ++= Seq(
-      "play" %% "play" % PlayVersion.current,    
-    
-      "org.scalatest" %% "scalatest" % "1.8" % "test",
-      "play" %% "play-test" % PlayVersion.current % "test"
-    ),
 
     shellPrompt := playPrompt,
-
+    testOptions in Test := Nil,
     commands ++= Seq(playCommand)
-  )
+  ).dependsOn(PlayUtilsBuild.main)
 
 }
