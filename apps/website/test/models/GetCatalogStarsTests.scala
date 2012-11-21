@@ -9,11 +9,10 @@ import org.joda.time.DateTimeConstants
 import play.api.Play
 import services.db.Schema
 
-class ProductStoreTests extends EgraphsUnitTest
+class GetCatalogStarsTests extends EgraphsUnitTest
   with DBTransactionPerTest
   with DateShouldMatchers
 {
-  private def store = AppConfig.instance[ProductStore]
   private def celebrityStore = AppConfig.instance[CelebrityStore]
   
   override def beforeEach() {
@@ -22,7 +21,7 @@ class ProductStoreTests extends EgraphsUnitTest
     new EgraphsTestApplication { AppConfig.instance[Schema].scrub() }
   }
 
-  "getCatalogStars" should "return only published celebrities" in new EgraphsTestApplication {
+  "getCatalogStars" should "return only published and enrolled celebrities" in new EgraphsTestApplication {
     val publishedCelebrity1 = TestData.newSavedCelebrity()
     val publishedCelebrity2 = TestData.newSavedCelebrity()
     val unpublishedCelebrity1 = TestData.newSavedCelebrity().withPublishedStatus(PublishedStatus.Unpublished).save()

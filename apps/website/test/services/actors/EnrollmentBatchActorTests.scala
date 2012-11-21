@@ -29,7 +29,7 @@ class EnrollmentBatchActorTests extends EgraphsUnitTest
   it should "use EnrollmentBatch to enroll Celebrity" in new EgraphsTestApplication {
     withActorUnderTest(AppConfig.instance[EnrollmentBatchActor]) { enrollmentBatchActor =>
       val (celebrity, enrollmentBatch) = AppConfig.instance[DBSession].connected(TransactionSerializable) {
-        val celebrity = TestData.newSavedCelebrity()
+        val celebrity = TestData.newSavedCelebrity().withEnrollmentStatus(EnrollmentStatus.NotEnrolled).save()
         val enrollmentBatch = EnrollmentBatch(celebrityId = celebrity.id, isBatchComplete = true).save()
         (celebrity, enrollmentBatch)
       }
