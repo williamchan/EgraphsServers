@@ -411,10 +411,13 @@ class Schema @Inject() (
         conn.prepareStatement(
         """    
           CREATE VIEW celebrity_categories_v AS
-          SELECT c.id, to_tsvector(c.publicname || ' ' || string_agg(cv.publicname, ' '))
-          FROM categoryvalue cv, celebritycategoryvalue ccv, celebrity c 
-          WHERE ccv.categoryvalueid = cv.id AND c.id = ccv.celebrityid
-          GROUP BY c.id;    
+          SELECT c.id, to_tsvector(c.publicname || ' ' || c.roledescription || ' ' || COALESCE(string_agg(cv.publicname, ' '), ' '))
+          FROM celebrity c
+          LEFT JOIN celebritycategoryvalue ccv 
+          ON c.id = ccv.celebrityid
+          LEFT JOIN categoryvalue cv
+          ON cv.id = ccv.categoryvalueid
+          GROUP BY c.id;   
         """
         ).execute()
         
