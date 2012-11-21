@@ -84,8 +84,9 @@ case class Egraph(
   import EgraphState._
 
   private lazy val blobKeyBase = "egraphs/" + id
-  private def framedPrintBlobKey = blobKeyBase + "/framed-print/" + framedPrintFilename
-  def framedPrintFilename = "order" + orderId + ".jpg"
+  private def framedPrintVersion = "v" + LandscapeFramedPrint.currentVersion
+  private def framedPrintBlobKey = blobKeyBase + "/framed-print/" + framedPrintVersion + "/" + framedPrintFilename
+  def framedPrintFilename = "order" + orderId + ".jpg" // this cannot change it is linked to printer specifications
 
   //
   // Public methods
