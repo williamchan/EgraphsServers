@@ -13,8 +13,15 @@ import play.api.data.format.Formats._
 
 import ToyBoxConfigKeys._
 
-/** ToyBox allows the locking down of Play 2.0 applications 
- *
+/** ToyBox provides a simple way to lock down of Play 2.0 applications. 
+ *  To use ToyBox in an application:
+ *    0) Make sure the Global object of your project, if it exists, is in a package
+ *    1) Mix ToyBox into your Global object
+ *      1.5) Call super.onRouteRequest from your implementation of onRouteRequest
+ *           if it's been overridden
+ *    2) Add routes to your Global.getLogin and Global.postLogin
+ *    3) Add abstract members of ToyBox to your Global object
+ *    4) Configure through application.conf (see ToyBoxBase.scala for details)
  */
 trait ToyBox extends ToyBoxBase with ToyBoxController with GlobalSettings {
 
@@ -68,6 +75,9 @@ trait ToyBox extends ToyBoxBase with ToyBoxController with GlobalSettings {
       "password" -> text
     )
   )
+
+
+
 
 
 

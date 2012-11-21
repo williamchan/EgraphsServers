@@ -30,14 +30,31 @@ trait ToyBoxController extends Controller { this: ToyBox =>
   def postLogin: Action[AnyContent]
 }
 
-/** Store of keys for querying configuration */
+/** Store of keys for querying configuration 
+ */
 object ToyBoxConfigKeys {
+  /** Key for username (String) of ToyBox login */
   val usrKey         = "username"
+
+  /** Key for password of (String) ToyBox login */
   val pwdKey         = "password"
+
+  /** Key for flag (Boolean) to turn ToyBox privacy on or off */
   val privateKey     = "is-private"
+
+  /** Key for name of cookie (String) in which the initial requests 
+   *  method and path will be stored */
   val initRequestKey = "initial-request-cookie"
+
+  /** Key for name of authentication cookie (String) */
   val authCookieKey  = "auth-cookie"
+
+  /** Key for setting authentication timeout (Integer) in seconds */
   val authTimeoutKey = "auth-timeout"
+
+  /** Key for setting authentication cookie path (String) */
   val authPathKey    = "auth-path"
+
+  /** Key for setting authentication cookie domain (String) */
   val authDomainKey  = "auth-domain"
 }
