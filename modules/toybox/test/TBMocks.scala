@@ -11,7 +11,7 @@ import controllers.ToyBoxConfigKeys._
 
 object TBMocks {
   val loginPath = "/login"
-  val loginAssetsPath = "/assets/public/toybox-assets"
+  val loginAssetsPath = "/assets/toybox-assets"
 
   val fakeApp = new FakeApplication(
     additionalConfiguration = Map(

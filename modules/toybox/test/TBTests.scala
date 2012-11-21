@@ -25,7 +25,7 @@ class ToyBoxTests extends FlatSpec with ShouldMatchers {
     val unauthResult = routeRequestToSimpleResult(blankGetRequest)
     val authResult   = routeRequestToSimpleResult(authenticated(blankGetRequest))
 
-    "A TBPlugin" should "redirect unauthenticated requests to login" in {
+    "A ToyBox" should "redirect unauthenticated requests to login" in {
       // verify that unauthenticated request was redirected to log-in
       redirectLocation(unauthResult) match {
         case Some(loc: String) =>  
