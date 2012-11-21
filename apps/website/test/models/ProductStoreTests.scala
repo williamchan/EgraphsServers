@@ -14,6 +14,7 @@ class ProductStoreTests extends EgraphsUnitTest
   with DateShouldMatchers
 {
   private def store = AppConfig.instance[ProductStore]
+  private def celebrityStore = AppConfig.instance[CelebrityStore]
   
   override def beforeEach() {
     super.beforeEach()
@@ -32,7 +33,7 @@ class ProductStoreTests extends EgraphsUnitTest
     TestData.newSavedProduct(celebrity = Some(unpublishedCelebrity1))
     TestData.newSavedProduct(celebrity = Some(unpublishedCelebrity2))
 
-    val catalogStars = store.getCatalogStars
+    val catalogStars = celebrityStore.getCatalogStars
 
     val celebrityNamesInCatalogStars = catalogStars.map(star => star.name)
     celebrityNamesInCatalogStars should contain (publishedCelebrity1.publicName)
@@ -48,7 +49,7 @@ class ProductStoreTests extends EgraphsUnitTest
     val unpublishedProduct1 = TestData.newSavedProduct().withPublishedStatus(PublishedStatus.Unpublished).save()
     val unpublishedProduct2 = TestData.newSavedProduct().withPublishedStatus(PublishedStatus.Unpublished).save()
 
-    val catalogStars = store.getCatalogStars
+    val catalogStars = celebrityStore.getCatalogStars
 
     val celebrityNamesInCatalogStars = catalogStars.map(star => star.name)
     celebrityNamesInCatalogStars should contain (publishedProduct1.celebrity.publicName)
@@ -71,7 +72,7 @@ class ProductStoreTests extends EgraphsUnitTest
     // starts in half an hour
     TestData.newSavedInventoryBatch(unavailableProduct2).copy(startDate = new Date(System.currentTimeMillis() + hour/2), endDate = new Date(System.currentTimeMillis() + hour)).save()
 
-    val catalogStars = store.getCatalogStars
+    val catalogStars = celebrityStore.getCatalogStars
 
     val celebrityNamesInCatalogStars = catalogStars.map(star => (star.name, star.hasInventoryRemaining))
     celebrityNamesInCatalogStars should contain ((availableProduct1.celebrity.publicName, true))
@@ -101,7 +102,7 @@ class ProductStoreTests extends EgraphsUnitTest
       TestData.newSavedOrder(Some(unavailableProduct2))
     }
 
-    val catalogStars = store.getCatalogStars
+    val catalogStars = celebrityStore.getCatalogStars
 
     val celebrityNamesInCatalogStars = catalogStars.map(star => (star.name, star.hasInventoryRemaining))
     celebrityNamesInCatalogStars should contain ((availableProduct1.celebrity.publicName, true))

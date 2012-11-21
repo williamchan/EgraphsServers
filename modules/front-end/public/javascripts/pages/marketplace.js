@@ -20,15 +20,6 @@ define(["libs/chosen/chosen.jquery.min"], function (Egraphs) {
             $.param(window.Egraphs.page.categories);
         };
         
-        /**
-         * Hover effect on list view
-         **/
-        $(".verticals tbody tr").hover(function() {
-          $(this).addClass('hover');
-        }, function() {
-          $(this).removeClass('hover');
-        });
-
         $("#remove-query").click( function(e) {
           window.Egraphs.page.query = "";
           reloadPage();
@@ -90,9 +81,9 @@ define(["libs/chosen/chosen.jquery.min"], function (Egraphs) {
         $("#apply-filters").click(function(e) {
           // Clear out previous category values
           var categories = window.Egraphs.page.categories;
-          for(var cat in categories) {
-            categories[cat].length = 0;
-          }
+          $.each(categories, function(cat) {
+            cat.length = 0;
+          });
           // Apply new selections
           $("option:selected", "#category-select").each(
             function(index) {

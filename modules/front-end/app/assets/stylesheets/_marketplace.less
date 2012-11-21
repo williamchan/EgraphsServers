@@ -59,8 +59,6 @@
 	  .content {
 	    
 	    .nav {
-	    
-  	    // margin-top: 10px;
 
   	    h2 {
           text-transform: uppercase;
@@ -584,7 +582,7 @@
                 
                   color: @grayLight;
                   
-                  &:hover { color: @black; }
+                  &:hover { color: @blue; }
                   
                 }
                 
@@ -594,7 +592,7 @@
                     
                     color: @orange;
                     
-                    &:hover { color: @black; }
+                    &:hover { color: @blue; }
                     
                   }
                 
@@ -602,7 +600,7 @@
               
               }
  	        
-              &.hover {
+              &:hover {
                 
                 td {
                  background: lighten(@gray, 57%);
@@ -819,6 +817,9 @@
     #main {
     
       .content {
+        .nav{ 
+          padding-left: 10px;
+        }
       
         .main {
               

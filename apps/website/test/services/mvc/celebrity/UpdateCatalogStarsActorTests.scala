@@ -48,7 +48,7 @@ class UpdateCatalogStarsActorTests extends EgraphsUnitTest with ClearsCacheAndBl
     deps.celebrityStore.getPublishedCelebrities returns mockCelebs
     deps.viewConverting.celebrityAsCelebrityViewConversions(mockCelebs(0)) returns mockViewConverter
 
-    mockViewConverter.asCatalogStar returns mockCatalogStars(0)
+    mockViewConverter.asCatalogStar(0, 0, false) returns mockCatalogStars(0)
 
     // Perform the test and check expectations
     updateResultsForActorWithDepsShouldBe(mockCatalogStars, deps)

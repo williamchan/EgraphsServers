@@ -5,6 +5,7 @@ import controllers.WebsiteControllers
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import services.config.ConfigFileProxy
+import egraphs.playutils.Enum
 
 @RunWith(classOf[JUnitRunner])
 class UtilsTests extends EgraphsUnitTest
