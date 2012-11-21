@@ -12,33 +12,8 @@ object LandscapeFramedPrint {
   val targetEgraphWidth = 2150
   val targetLogoWidth = 60
 
-//  def main(args: Array[String]) {
-//    import javax.imageio.{IIOImage, ImageWriteParam}
-//    import java.io.File
-//    import javax.imageio.stream.FileImageOutputStream
-//    val orderId = 899
-//    val egraphImage = ImageIO.read(new File("/Users/willchan83/Desktop/framed_print_images/" + orderId + ".png"))
-//    val assembledImage = LandscapeFramedPrint().assemble(
-//      orderNumber = orderId.toString,
-//      egraphImage = egraphImage,
-//      teamLogoImage = ImageIO.read(new File("/Users/willchan83/Desktop/framed_print_images/teamlogo.png")),
-//      recipientName = "Eric Feeny Mohammed Albaraq",
-//      celebFullName = "David Price Maria Alvarez Vibi",
-//      celebCasualName = "David",
-//      productName = "Super Baller",
-//      signedAtDate = new Date(),
-//      egraphUrl = "https://www.egraphs.com/" + orderId)
-//
-//    val file = new File("/Users/willchan83/Desktop/framed_print_images/test.jpg")
-//    val iter = ImageIO.getImageWritersByFormatName("jpg")
-//    val writer = iter.next()
-//    val iwp = writer.getDefaultWriteParam
-//    iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT)
-//    iwp.setCompressionQuality(1.0f)
-//    val ios = new FileImageOutputStream(file)
-//    writer.setOutput(ios)
-//    writer.write(null, new IIOImage(assembledImage, null, null), iwp)
-//  }
+  // This number must version any time there is a breaking change to the images.
+  val currentVersion = 2
 }
 
 case class LandscapeFramedPrint() {
@@ -51,7 +26,7 @@ case class LandscapeFramedPrint() {
   val widthBetweenEgraphAndCert = 150
   val certW = 924
   val certBannerWidth = 114
-    val certX = 3600 - sideMargin - certW
+  val certX = 3600 - sideMargin - certW
   val certWritableX = certX + certBannerWidth
   val certWritableWidth = certW - certBannerWidth
 
