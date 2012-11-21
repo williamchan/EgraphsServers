@@ -85,7 +85,8 @@ case class Egraph(
 
   private lazy val blobKeyBase = "egraphs/" + id
   private def framedPrintBlobKey = blobKeyBase + "/framed-print/" + framedPrintFilename
-  def framedPrintFilename = "order" + orderId + ".jpg"
+  private val framedPrintVersion = "-v" + LandscapeFramedPrint.currentVersion
+  def framedPrintFilename = "order" + orderId + framedPrintVersion + ".jpg"
 
   //
   // Public methods
