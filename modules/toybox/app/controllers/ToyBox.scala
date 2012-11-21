@@ -13,7 +13,7 @@ import play.api.data.format.Formats._
 
 import ToyBoxConfigKeys._
 
-/** ToyBox provides a simple way to lock down of Play 2.0 applications. 
+/** ToyBox provides a simple way to lock down Play 2.0 applications. 
  *  To use ToyBox in an application:
  *    0) Make sure the Global object of your project, if it exists, is in a package
  *    1) Mix ToyBox into your Global object
