@@ -1,4 +1,5 @@
-@(postLogin: Call, loginForm: Form[(String, String)], previousUsername: String = "")
+@(postLogin: Call, loginForm: Form[(String, String)], previousUsername: String = "", 
+  errorMessage: String = "")
 @import helper._
 @import helper.twitterBootstrap._
 
@@ -10,7 +11,7 @@
   <head><title>ToyBox Log-In</title>
     <link rel="stylesheet" media="screen" href="/assets/toybox-assets/stylesheets/bootstrap.css">
     <link rel="stylesheet" media="screen" href="/assets/toybox-assets/stylesheets/main.css">
-    <script src="/assets/toybox-assets/javascripts/jquery-1.7.1.min.js" type="text/javascript"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
   </head>
 
   <body>
@@ -36,8 +37,10 @@
 
             @form(postLogin) {
               <fieldset>
+                <legend>@errorMessage</legend>
                 @inputText(loginForm("username"), '_label -> "Username")
-                @inputPassword(loginForm("password"), '_label -> "Password")
+                @inputPassword(loginForm("password"), '_label -> "Password", 
+                  'value -> previousUsername)
               </fieldset>
 
               <div class="actions">

@@ -1,0 +1,18 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                           controllers.Application.index
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)
+
+
+
+
+
+
+# Required ToyBox routes
+GET	/login	controllers.MyToyBox.getLogin
+POST	/login	controllers.MyToyBox.postLogin

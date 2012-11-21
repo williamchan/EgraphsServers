@@ -101,7 +101,12 @@ trait ToyBox extends ToyBoxBase with ToyBoxController with GlobalSettings {
             initialRequestCookieName
           )
         else
-          BadRequest(views.html.login(postLoginRoute, loginForm, loginAttempt._1))
+          BadRequest(views.html.login(
+            postLoginRoute, 
+            loginForm, 
+            previousUsername = loginAttempt._1,
+            errorMessage = "Invalid username/password, please try again"
+          ))
     )
   }
 
