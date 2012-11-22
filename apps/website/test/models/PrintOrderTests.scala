@@ -54,7 +54,7 @@ class PrintOrderTests extends EgraphsUnitTest
 
     egraph = egraph.withEgraphState(EgraphState.ApprovedByAdmin).save()
     val imageUrl = printOrder.getFramedPrintImageData.get._1
-    imageUrl should endWith("blob/files/egraphs/" + egraph.id + "/framed-print/" + egraph.framedPrintFilename)
+    imageUrl should endWith(egraph.framedPrintFilename)
     TestHelpers.getBlobFromTestBlobUrl(imageUrl).get.asByteArray.length should be > (500000)
   }
 }

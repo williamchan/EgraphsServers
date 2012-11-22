@@ -9,19 +9,13 @@ import org.joda.time.DateTimeConstants
 import play.api.Play
 import services.db.Schema
 
-class ProductStoreTests extends EgraphsUnitTest
+class GetCatalogStarsTests extends EgraphsUnitTest
   with DBTransactionPerTest
   with DateShouldMatchers
 {
-  private def store = AppConfig.instance[ProductStore]
-  
-  override def beforeEach() {
-    super.beforeEach()
-    // We want a clean database before calling getCatalogStars
-    new EgraphsTestApplication { AppConfig.instance[Schema].scrub() }
-  }
+  private def celebrityStore = AppConfig.instance[CelebrityStore]
 
-  "getCatalogStars" should "return only published celebrities" in new EgraphsTestApplication {
+  "getCatalogStars" should "return only published and enrolled celebrities" in new EgraphsTestApplication {
     val publishedCelebrity1 = TestData.newSavedCelebrity()
     val publishedCelebrity2 = TestData.newSavedCelebrity()
     val unpublishedCelebrity1 = TestData.newSavedCelebrity().withPublishedStatus(PublishedStatus.Unpublished).save()
@@ -32,7 +26,7 @@ class ProductStoreTests extends EgraphsUnitTest
     TestData.newSavedProduct(celebrity = Some(unpublishedCelebrity1))
     TestData.newSavedProduct(celebrity = Some(unpublishedCelebrity2))
 
-    val catalogStars = store.getCatalogStars
+    val catalogStars = celebrityStore.getCatalogStars
 
     val celebrityNamesInCatalogStars = catalogStars.map(star => star.name)
     celebrityNamesInCatalogStars should contain (publishedCelebrity1.publicName)
@@ -48,7 +42,7 @@ class ProductStoreTests extends EgraphsUnitTest
     val unpublishedProduct1 = TestData.newSavedProduct().withPublishedStatus(PublishedStatus.Unpublished).save()
     val unpublishedProduct2 = TestData.newSavedProduct().withPublishedStatus(PublishedStatus.Unpublished).save()
 
-    val catalogStars = store.getCatalogStars
+    val catalogStars = celebrityStore.getCatalogStars
 
     val celebrityNamesInCatalogStars = catalogStars.map(star => star.name)
     celebrityNamesInCatalogStars should contain (publishedProduct1.celebrity.publicName)
@@ -71,7 +65,7 @@ class ProductStoreTests extends EgraphsUnitTest
     // starts in half an hour
     TestData.newSavedInventoryBatch(unavailableProduct2).copy(startDate = new Date(System.currentTimeMillis() + hour/2), endDate = new Date(System.currentTimeMillis() + hour)).save()
 
-    val catalogStars = store.getCatalogStars
+    val catalogStars = celebrityStore.getCatalogStars
 
     val celebrityNamesInCatalogStars = catalogStars.map(star => (star.name, star.hasInventoryRemaining))
     celebrityNamesInCatalogStars should contain ((availableProduct1.celebrity.publicName, true))
@@ -93,7 +87,7 @@ class ProductStoreTests extends EgraphsUnitTest
     val unavailableProduct3 = TestData.newSavedProductWithoutInventoryBatch()
     TestData.newSavedInventoryBatch(unavailableProduct1).copy(numInventory = startingInventory).save()
     TestData.newSavedInventoryBatch(unavailableProduct2).copy(numInventory = startingInventory).save()
-    TestData.newSavedInventoryBatch(unavailableProduct2).copy(numInventory = 0).save()
+    TestData.newSavedInventoryBatch(unavailableProduct3).copy(numInventory = 0).save()
 
     // we will also be testing when we have an inventoryBatch of quantity 0
     for (i <- 1 to startingInventory) {
@@ -101,13 +95,13 @@ class ProductStoreTests extends EgraphsUnitTest
       TestData.newSavedOrder(Some(unavailableProduct2))
     }
 
-    val catalogStars = store.getCatalogStars
+    val catalogStars = celebrityStore.getCatalogStars
 
     val celebrityNamesInCatalogStars = catalogStars.map(star => (star.name, star.hasInventoryRemaining))
     celebrityNamesInCatalogStars should contain ((availableProduct1.celebrity.publicName, true))
     celebrityNamesInCatalogStars should contain ((availableProduct2.celebrity.publicName, true))
-    celebrityNamesInCatalogStars should not contain ((unavailableProduct1.celebrity.publicName, false))
-    celebrityNamesInCatalogStars should not contain ((unavailableProduct2.celebrity.publicName, false))
-    celebrityNamesInCatalogStars should not contain ((unavailableProduct3.celebrity.publicName, false))
+    celebrityNamesInCatalogStars should contain ((unavailableProduct1.celebrity.publicName, false))
+    celebrityNamesInCatalogStars should contain ((unavailableProduct2.celebrity.publicName, false))
+    celebrityNamesInCatalogStars should contain ((unavailableProduct3.celebrity.publicName, false))
   }
 }

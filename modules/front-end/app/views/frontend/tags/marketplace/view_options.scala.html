@@ -1,0 +1,40 @@
+@(sortOptions: Iterable[models.frontend.marketplace.SortOptionViewModel], viewAsList: Boolean)
+
+@import views.frontend.Utils
+@import models.frontend.egraphs._
+
+ <aside class="view-options clearfix">
+  <div class="sort-by">
+  
+    <h2>Sort By:</h2>
+    
+    <ol>
+    @for(sortOption <- sortOptions) {
+      <li><a class="sort-link @if(sortOption.active){active}" data-value="@sortOption.name">@sortOption.display</a></li>
+    }
+    </ol>
+    
+    <form class="picker">
+      
+      <select id="sort-select">
+      @for(sortOption <- sortOptions) {     
+        <option @if(sortOption.active){selected} value="@sortOption.name">@sortOption.display</option>
+      }  
+      </select>
+    
+    </form>
+  
+  </div> <!-- end .sort-by -->
+  
+  <div class="view-as">
+    
+    <h2>View As:</h2>
+    
+    <ul>
+      <li class="grid @if(!viewAsList){active}"><a id="grid-view-link"><span>Grid</span> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i></a></li>
+      <li class="list @if(viewAsList){active}"><a id="list-view-link"><span>List</span> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i> <i> </i></a></li>
+    </ul>
+  
+  </div>
+
+</aside> <!-- end .view-options -->
