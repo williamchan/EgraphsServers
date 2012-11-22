@@ -35,6 +35,16 @@ class RequireAuthenticatedAccount @Inject() (accountStore: AccountStore)
 
   // we couldn't use RequestFilter here since this does't use a form, though it does need a request.
   def inRequest[A](parser: BodyParser[A] = parse.anyContent)(actionFactory: Account => Action[A]): Action[A] = {
+    inRequestHelper(parser)(actionFactory)
+  }
+
+  // use this when dealing with multipartFormData
+  //   for example: httpFilters.requireAuthenticatedAccount.inMultipartRequest() { account =>
+  def inMultipartRequest[A](parser: BodyParser[A] = parse.multipartFormData)(actionFactory: Account => Action[A]): Action[A] = {
+    inRequestHelper(parser)(actionFactory)
+  }
+
+  def inRequestHelper[A](parser: BodyParser[A])(actionFactory: Account => Action[A]): Action[A] = {
     Action(parser) { request =>
       val forbiddenOrAccount = this.filter(request)
       val forbiddenOrResult = forbiddenOrAccount.right.map { account =>

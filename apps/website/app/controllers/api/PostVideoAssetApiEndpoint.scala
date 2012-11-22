@@ -24,28 +24,30 @@ private[controllers] trait PostVideoAssetApiEndpoint { this: Controller =>
    * Posts a video asset from a celebrity.
    */
   def postVideoAsset = postApiController() {
-    httpFilters.requireCelebrityId.inRequest(parse.multipartFormData) { celebrity =>
-      Action(parse.multipartFormData) { request =>
+    httpFilters.requireAuthenticatedAccount.inMultipartRequest() { account =>
+      httpFilters.requireCelebrityId.inRequest(parse.multipartFormData) { celebrity =>
+        Action(parse.multipartFormData) { request =>
 
-        request.body.file("video").map { resource =>
+          request.body.file("video").map { resource =>
 
-          val filename = resource.filename
-          val tempFile = TempFile.named(filename)
+            val filename = resource.filename
+            val tempFile = TempFile.named(filename)
 
-          resource.ref.moveTo(tempFile, true)
+            resource.ref.moveTo(tempFile, true)
 
-          val maybeFileLocation = putFile(celebrity, filename, tempFile)
-          maybeFileLocation match {
-            case Some(maybeFileLocation) => {
-              persist(celebrity, maybeFileLocation)
-              val responseJson = getJson(celebrity, tempFile, maybeFileLocation)
-              Ok(responseJson)
+            val maybeFileLocation = putFile(celebrity, filename, tempFile)
+            maybeFileLocation match {
+              case Some(maybeFileLocation) => {
+                persist(celebrity, maybeFileLocation)
+                val responseJson = getJson(celebrity, tempFile, maybeFileLocation)
+                Ok(responseJson)
+              }
+              case None => InternalServerError("The video was not found")
             }
-            case None => InternalServerError("The video was not found")
-          }
 
-        }.getOrElse {
-          BadRequest("Something went wrong with your request. Please try again.")
+          }.getOrElse {
+            BadRequest("Something went wrong with your request. Please try again.")
+          }
         }
       }
     }
