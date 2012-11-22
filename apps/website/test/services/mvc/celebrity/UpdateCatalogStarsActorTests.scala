@@ -20,8 +20,8 @@ import akka.util.duration._
 import akka.util.Timeout
 
 @RunWith(classOf[JUnitRunner])
-class UpdateCatalogStarsActorTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValidationBefore {
-  implicit val timeout: Timeout = 5.seconds
+class UpdateCatalogStarsActorTests extends EgraphsUnitTest {
+  implicit val timeout: Timeout = 5 seconds
 
   import UpdateCatalogStarsActorTests.Dependencies
 
@@ -35,20 +35,15 @@ class UpdateCatalogStarsActorTests extends EgraphsUnitTest with ClearsCacheAndBl
     updateResultsForActorWithDepsShouldBe(mockStars, deps)
   }
 
-  "UpdateCatalogStarsActor" should "grab from the database if it finds nothing in the cache" in new EgraphsTestApplication {
+  it should "grab from the database if it finds nothing in the cache" in new EgraphsTestApplication {
     // Set up so that cache produces no CatalogStars and the database produces a mock celebrity
     // that converts into our mock CatalogStar.
     val deps = newDeps.withSpiedCache.withMockCelebrityStore.copy(viewConverting = mock[CelebrityViewConverting])
 
-    val mockCelebs = List(mock[Celebrity])
-    val mockViewConverter = mock[CelebrityViewConversions]
     val mockCatalogStars = IndexedSeq(mock[CatalogStar])
 
     deps.cache.get(anyString)(any[Manifest[IndexedSeq[CatalogStar]]]) returns None
-    deps.celebrityStore.getPublishedCelebrities returns mockCelebs
-    deps.viewConverting.celebrityAsCelebrityViewConversions(mockCelebs(0)) returns mockViewConverter
-
-    mockViewConverter.asCatalogStar(0, 0, false) returns mockCatalogStars(0)
+    deps.celebrityStore.getCatalogStars returns mockCatalogStars
 
     // Perform the test and check expectations
     updateResultsForActorWithDepsShouldBe(mockCatalogStars, deps)
@@ -59,7 +54,6 @@ class UpdateCatalogStarsActorTests extends EgraphsUnitTest with ClearsCacheAndBl
     )
   }
 
-
   //
   // Private members
   //
@@ -69,9 +63,9 @@ class UpdateCatalogStarsActorTests extends EgraphsUnitTest with ClearsCacheAndBl
   {
     withUpdateCatalogStarsActorAndRecipient(deps) {
       (actor, recipient) =>
-        Await.result(actor ask UpdateCatalogStars(recipient), 5.seconds)
+        Await.result(actor ask UpdateCatalogStars(recipient), 5 seconds)
 
-        Await.result((recipient ask GetCatalogStars), 5.seconds) should be(Some(stars))
+        Await.result((recipient ask GetCatalogStars), 5 seconds) should be(Some(stars))
     }
   }
 
@@ -120,5 +114,4 @@ object UpdateCatalogStarsActorTests extends Mockito {
       cacheFactory.applicationCache
     }
   }
-
 }

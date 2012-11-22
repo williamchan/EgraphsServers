@@ -43,15 +43,21 @@ private[celebrity] class UpdateCatalogStarsActor @Inject()(
       // Get the stars from the cache preferentially. This reduces round-trips to the database in multi-instance
       // deployments because one instance can share the results from another.
       val cache = cacheFactory.applicationCache
-      val catalogStars = cache.cacheing(resultsCacheKey, updatePeriodSeconds) {
+      val tempCatalogStars = cache.cacheing(resultsCacheKey, updatePeriodSeconds) {
         // Due to cache miss, this instance must update from the database. Get all the stars and
         // their sold-out info.
         db.connected(isolation = TransactionSerializable, readOnly = true) {
           log("Updating landing page celebrities")
           celebrityStore.getCatalogStars
         }
-      }.toIndexedSeq
+      }
 
+      val catalogStars = if (tempCatalogStars == null || tempCatalogStars.isEmpty) {
+        IndexedSeq()
+      } else {
+        tempCatalogStars.toIndexedSeq
+      }
+      
       // Send the celebs to an actor that will be in charge of serving them to
       // the landing page.
       
