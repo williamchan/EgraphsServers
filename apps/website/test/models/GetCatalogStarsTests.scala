@@ -14,12 +14,6 @@ class GetCatalogStarsTests extends EgraphsUnitTest
   with DateShouldMatchers
 {
   private def celebrityStore = AppConfig.instance[CelebrityStore]
-  
-  override def beforeEach() {
-    super.beforeEach()
-    // We want a clean database before calling getCatalogStars
-    new EgraphsTestApplication { AppConfig.instance[Schema].scrub() }
-  }
 
   "getCatalogStars" should "return only published and enrolled celebrities" in new EgraphsTestApplication {
     val publishedCelebrity1 = TestData.newSavedCelebrity()
@@ -93,7 +87,7 @@ class GetCatalogStarsTests extends EgraphsUnitTest
     val unavailableProduct3 = TestData.newSavedProductWithoutInventoryBatch()
     TestData.newSavedInventoryBatch(unavailableProduct1).copy(numInventory = startingInventory).save()
     TestData.newSavedInventoryBatch(unavailableProduct2).copy(numInventory = startingInventory).save()
-    TestData.newSavedInventoryBatch(unavailableProduct2).copy(numInventory = 0).save()
+    TestData.newSavedInventoryBatch(unavailableProduct3).copy(numInventory = 0).save()
 
     // we will also be testing when we have an inventoryBatch of quantity 0
     for (i <- 1 to startingInventory) {
@@ -106,8 +100,8 @@ class GetCatalogStarsTests extends EgraphsUnitTest
     val celebrityNamesInCatalogStars = catalogStars.map(star => (star.name, star.hasInventoryRemaining))
     celebrityNamesInCatalogStars should contain ((availableProduct1.celebrity.publicName, true))
     celebrityNamesInCatalogStars should contain ((availableProduct2.celebrity.publicName, true))
-    celebrityNamesInCatalogStars should not contain ((unavailableProduct1.celebrity.publicName, false))
-    celebrityNamesInCatalogStars should not contain ((unavailableProduct2.celebrity.publicName, false))
-    celebrityNamesInCatalogStars should not contain ((unavailableProduct3.celebrity.publicName, false))
+    celebrityNamesInCatalogStars should contain ((unavailableProduct1.celebrity.publicName, false))
+    celebrityNamesInCatalogStars should contain ((unavailableProduct2.celebrity.publicName, false))
+    celebrityNamesInCatalogStars should contain ((unavailableProduct3.celebrity.publicName, false))
   }
 }

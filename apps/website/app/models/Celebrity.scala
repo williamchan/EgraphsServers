@@ -541,7 +541,9 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends Sa
      p.priceincurrency AS product_priceincurrency,
      ib.id AS inventorybatch_id,
      coalesce(o.id - o.id + 1, 0) AS is_order,
-     ib.numInventory AS inventory_total
+     CASE WHEN ib.startdate < now() AND ib.enddate > now() THEN ib.numInventory
+          ELSE 0
+     END AS inventory_total
     FROM
      celebrity c INNER JOIN product p ON (p.celebrityid = c.id)
                  INNER JOIN inventorybatch ib ON (ib.celebrityid = c.id)
@@ -557,9 +559,8 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends Sa
     WHERE
      c._enrollmentStatus = 'Enrolled' AND
      c._publishedStatus = 'Published' AND
-     p._publishedStatus = 'Published' AND
-     ib.startdate < now() AND
-     ib.enddate > now() """
+     p._publishedStatus = 'Published'
+  """
   
   val queryTextMatching = """ AND mv.to_tsvector @@ plainto_tsquery('english', {textQuery}) """
   //TODO make this OR duh
