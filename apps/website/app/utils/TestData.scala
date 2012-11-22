@@ -4,7 +4,7 @@ import services.{AppConfig, Time}
 import java.text.SimpleDateFormat
 import org.joda.time.DateTime
 import models._
-import enums.{EgraphState, PublishedStatus}
+import enums.{EgraphState, EnrollmentStatus, PublishedStatus}
 import egraphs.playutils.Encodings.Base64
 import org.apache.commons.lang3.RandomStringUtils
 import categories.{Category, CategoryValue}
@@ -86,7 +86,10 @@ object TestData {
     val fullName = generateFullname()
     val email = generateEmail(fullName.replaceAll(" ", "."))
     val acct = Account(email = email).save()
-    val celeb = Celebrity(publicName = fullName).withPublishedStatus(PublishedStatus.Published).save()
+    val celeb = Celebrity(publicName = fullName)
+    	.withPublishedStatus(PublishedStatus.Published)
+    	.withEnrollmentStatus(EnrollmentStatus.Enrolled)
+    	.save()
 
     acct.copy(celebrityId = Some(celeb.id)).save()
 

@@ -1,12 +1,12 @@
 package models.enums
 
-import services.Utils
+import egraphs.playutils.Enum
 
 /**
  * Enum for describing whether an object is Published or Unpublished, i.e. when an
  * admin is not ready to release a celeb or product to the public
  */
-object PublishedStatus extends Utils.Enum {
+object PublishedStatus extends Enum {
   sealed trait EnumVal extends Value
 
   val Published = new EnumVal {

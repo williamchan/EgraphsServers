@@ -1,0 +1,12 @@
+@(verticalViewModels: Iterable[models.frontend.marketplace.VerticalViewModel])
+@**
+  Buttons on top bar of marketplace page that represent toggling between verticals. 
+**@
+@import views.frontend.Utils
+@import models.frontend.egraphs._
+<ul class="top-verticals-nav">
+@for(vertical <- verticalViewModels) {
+     <li><a @if(vertical.active){class="active"} data-verticalname=@vertical.verticalName href="#"><img src='@EgraphsAssets.at(vertical.iconUrl)' width="33" height="17"> <span>@vertical.shortName</span></a></li>
+  
+}
+</ul> <!-- end .top-verticals-nav -->

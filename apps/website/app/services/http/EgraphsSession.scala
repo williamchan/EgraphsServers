@@ -3,6 +3,7 @@ package services.http
 import com.google.inject.Inject
 import services.Utils
 import play.api.mvc.Session
+import egraphs.playutils.Enum
 
 case class EgraphsSession(session: Session) {
   import EgraphsSession.Key
@@ -45,7 +46,7 @@ object EgraphsSession {
    */
   sealed abstract class Key { def name: String }
 
-  object Key extends Utils.Enum {
+  object Key extends Enum {
     abstract class EnumVal(val name: String) extends Key with Value
 
     val AdminId = new EnumVal("admin") {}

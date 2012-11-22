@@ -52,4 +52,5 @@ trait AllAdminEndpoints
   with PostProductAdminEndpoint
   with PostSendCelebrityWelcomeEmailAdminEndpoint
   with PostVideoAssetAdminEndpoint
+  with PostRebuildSearchIndexAdminEndpoint
 { this: Controller => }

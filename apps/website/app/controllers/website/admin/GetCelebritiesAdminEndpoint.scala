@@ -23,16 +23,13 @@ private[controllers] trait GetCelebritiesAdminEndpoint extends ImplicitHeaderAnd
       Action { implicit request =>
         // get query parameters
         val page: Int = Form("page" -> number).bindFromRequest.fold(formWithErrors => 1, validForm => validForm)
-        
+
         val query = celebrityStore.getCelebrityAccounts
         val pagedQuery: (Iterable[(Celebrity, Account)], Int, Option[Int]) = services.Utils.pagedQuery(select = query, page = page)
-        val listings = for((celebrity: Celebrity, account: Account) <- pagedQuery._1) yield {
-          Celebrity.celebrityAccountToListing(celebrity, account)
-        }
         implicit val paginationInfo = PaginationInfoFactory.create(pagedQuery = pagedQuery, baseUrl = GetCelebritiesAdminEndpoint.location)
         Ok(views.html.Application.admin.admin_celebrities(
-          celebrityListings = listings,
-          allCelebrities = celebrityStore.getAll
+          celebrityAccounts = pagedQuery._1,
+          celebrityStore.getAll // for the Featured Stars chooser
         ))
       }
     }
@@ -49,15 +46,14 @@ private[controllers] trait GetCelebritiesAdminEndpoint extends ImplicitHeaderAnd
     httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       Action { implicit request =>
         val query = Form("query" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm)
-        val listings = celebrityStore.findByTextQuery(query)
-        Ok(views.html.Application.admin.admin_celebrities_search(celebrityListings = listings))
+        val listings = celebrityStore.search(query=query)
+        Ok(views.html.Application.admin.admin_celebrities_search(celebrityListings = listings, query = query))
       }
     }
   }
 }
 
 object GetCelebritiesAdminEndpoint {
-
   def location = {
     controllers.routes.WebsiteControllers.getCelebritiesAdmin.url
   }
