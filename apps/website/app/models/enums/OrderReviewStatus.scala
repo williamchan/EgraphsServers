@@ -1,8 +1,8 @@
 package models.enums
 
-import services.Utils
+import egraphs.playutils.Enum
 
-object OrderReviewStatus extends Utils.Enum {
+object OrderReviewStatus extends Enum {
   sealed trait EnumVal extends Value
 
   val PendingAdminReview = new EnumVal {

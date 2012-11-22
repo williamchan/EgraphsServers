@@ -1,6 +1,6 @@
 package services.voice
 
-import services.Utils.Enum
+import egraphs.playutils.Enum
 
 /**
  * Error codes from the VBG Voice Biometrics API. See `Dropbox/Development/voice biometrics`

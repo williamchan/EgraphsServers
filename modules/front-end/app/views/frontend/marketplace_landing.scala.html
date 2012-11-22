@@ -1,0 +1,98 @@
+@(queryUrl : String, 
+  marketplaceRoute: String,
+  verticalViewModels: Iterable[models.frontend.marketplace.VerticalViewModel],
+  results: Iterable[models.frontend.marketplace.ResultSetViewModel],
+  categoryViewModels: Iterable[models.frontend.marketplace.CategoryViewModel] = List[models.frontend.marketplace.CategoryViewModel](),
+  sortOptions: Iterable[models.frontend.marketplace.SortOptionViewModel]   
+)(
+  implicit
+  headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData,
+  authToken: egraphs.authtoken.AuthenticityToken
+)
+@import views.frontend.Utils
+@import models.frontend.egraphs._
+@import play.api.libs.json._
+@***
+Unused template for marketplace. Retaining for future marketplace features. 
+***@
+
+@init = {
+@*** 
+Translates a map of categories and their categoryvalues into a JsonObject that can be easily converted to a URL query arguments using $.param(Egraphs.page.categories)
+***@
+ Egraphs.page.categories = @Html(
+  Json.toJson(categoryViewModels.foldLeft[Map[String, JsValue]](Map())(
+    (a, b) => a ++ b.asActiveMap
+  )).toString
+ );
+ Egraphs.page.queryUrl = @queryUrl;
+}
+@baseBody = {
+
+<section id="content" class="marketplace" role="main">
+  
+  <div id="main">
+  
+    <div class="row-fluid">
+    
+      <div class="span12 masthead" role="masthead">
+      
+        <form action="@marketplaceRoute" method="get">
+            <input name="query" type="search" placeholder="Find Your Star">
+        </form>
+      
+        <img src='@EgraphsAssets.at("images/masthead-marketplace.jpg")'/>
+      
+      </div>
+      
+    </div>
+
+    <div class="content container clearfix">
+    
+      <div class="row-fluid">
+
+        <aside class="nav span3">
+        
+          <h2>Categories</h2>
+          
+          <ol>
+          @for(vertical <- verticalViewModels) {
+            <li><a href="#">@vertical.publicName</a></li>
+          }
+          </ol>
+        
+        </aside>
+        <div class="main span9">
+          @tags.marketplace.vertical_buttons(verticalViewModels)
+          
+          <aside class="mobile-nav">
+          
+            <select class="chsn-select">
+              <optgroup label="Categories" name="categories">
+              @for(vertical <- verticalViewModels) {
+                <option value="@vertical.verticalName">@vertical.publicName</option>
+              }  
+              </optgroup>              
+            </select>
+            
+          </aside> <!-- end .mobile-nav -->
+          @** TODO redo view as list stuff. *@
+          @tags.marketplace.view_options(sortOptions, false)
+          @tags.marketplace.result_set(results)
+
+        </div>
+       
+      </div>
+    
+      <p class="to-top"><a href="#top">Back to Top</a></p>
+        
+    </div> <!-- end .content -->
+        
+  </div> <!-- end #main -->
+  
+</section>
+
+}
+
+@base_template(title="Marketplace", jsMain = "pages/marketplace", headJs = init, body=baseBody)

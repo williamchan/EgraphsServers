@@ -37,7 +37,7 @@ class EnrollmentBatchTests extends EgraphsUnitTest
   }
 
   "addEnrollmentSample" should "add EnrollmentSample" in new EgraphsTestApplication {
-    val enrollmentBatch = EnrollmentBatch(celebrityId = TestData.newSavedCelebrity().id).save()
+    val enrollmentBatch = EnrollmentBatch(celebrityId = unenrolledCelebrity.id).save()
     enrollmentBatch.getNumEnrollmentSamples should be(0)
 
     enrollmentBatch.addEnrollmentSample(signatureStr = TestConstants.shortWritingStr, voiceStr = TestConstants.fakeAudioStr())
@@ -48,7 +48,7 @@ class EnrollmentBatchTests extends EgraphsUnitTest
   }
 
   "addEnrollmentSample" should "add complete EnrollmentBatch when # of samples reaches batchSize" in new EgraphsTestApplication {
-    val celeb = TestData.newSavedCelebrity()
+    val celeb = unenrolledCelebrity()
     celeb.enrollmentStatus should be(EnrollmentStatus.NotEnrolled)
 
     var enrollmentBatch = EnrollmentBatch(celebrityId = celeb.id).save()
@@ -67,7 +67,7 @@ class EnrollmentBatchTests extends EgraphsUnitTest
   }
 
   "getEnrollmentSamples" should "return list of EnrollmentSamples" in new EgraphsTestApplication {
-    val celeb = TestData.newSavedCelebrity()
+    val celeb = unenrolledCelebrity()
     celeb.enrollmentStatus should be(EnrollmentStatus.NotEnrolled)
 
     val enrollmentBatch = EnrollmentBatch(celebrityId = celeb.id).save()
@@ -81,11 +81,11 @@ class EnrollmentBatchTests extends EgraphsUnitTest
   "getEnrollmentBatchesPending" should "return batches with true isBatchComplete and null isSuccessfulEnrollment" in new EgraphsTestApplication {
     val initialPendingEnrollmentBatchesSize = store.getEnrollmentBatchesPending().size
 
-    val pendingBatch = EnrollmentBatch(celebrityId = TestData.newSavedCelebrity().id, isBatchComplete = true, isSuccessfulEnrollment = None).save()
-    EnrollmentBatch(celebrityId = TestData.newSavedCelebrity().id, isBatchComplete = true, isSuccessfulEnrollment = Some(false)).save()
-    EnrollmentBatch(celebrityId = TestData.newSavedCelebrity().id, isBatchComplete = true, isSuccessfulEnrollment = Some(true)).save()
-    EnrollmentBatch(celebrityId = TestData.newSavedCelebrity().id, isBatchComplete = false, isSuccessfulEnrollment = Some(false)).save()
-    EnrollmentBatch(celebrityId = TestData.newSavedCelebrity().id, isBatchComplete = false, isSuccessfulEnrollment = Some(true)).save()
+    val pendingBatch = EnrollmentBatch(celebrityId = unenrolledCelebrity().id, isBatchComplete = true, isSuccessfulEnrollment = None).save()
+    EnrollmentBatch(celebrityId = unenrolledCelebrity().id, isBatchComplete = true, isSuccessfulEnrollment = Some(false)).save()
+    EnrollmentBatch(celebrityId = unenrolledCelebrity().id, isBatchComplete = true, isSuccessfulEnrollment = Some(true)).save()
+    EnrollmentBatch(celebrityId = unenrolledCelebrity().id, isBatchComplete = false, isSuccessfulEnrollment = Some(false)).save()
+    EnrollmentBatch(celebrityId = unenrolledCelebrity().id, isBatchComplete = false, isSuccessfulEnrollment = Some(true)).save()
 
     val pendingEnrollmentBatches = store.getEnrollmentBatchesPending()
     pendingEnrollmentBatches.length should be > (initialPendingEnrollmentBatchesSize)
@@ -93,10 +93,12 @@ class EnrollmentBatchTests extends EgraphsUnitTest
   }
 
   "getOpenEnrollmentBatch" should "return the open EnrollmentBatch" in new EgraphsTestApplication {
-    val celebrity = TestData.newSavedCelebrity()
+    val celebrity = unenrolledCelebrity()
     val batch = EnrollmentBatch(celebrityId = celebrity.id).save()
     val result = store.getOpenEnrollmentBatch(celebrity)
     result.get should be (batch)
   }
+  
+  private def unenrolledCelebrity() = TestData.newSavedCelebrity().withEnrollmentStatus(EnrollmentStatus.NotEnrolled).save()
 
 }

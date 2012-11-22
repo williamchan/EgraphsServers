@@ -10,6 +10,7 @@ import services.voice.{VoiceBiometricsError, YesMaamVoiceBiometricService, Voice
 import vbg.{VBGVerifySampleStore, VBGVerifySample}
 import services.signature.{SignatureBiometricsError, YesMaamSignatureBiometricService, SignatureBiometricService}
 import services._
+import egraphs.playutils.Enum
 import audio.AudioConverter
 import db.{FilterOneTable, Schema, KeyedCaseClass, SavesWithLongKey}
 import graphics.{RasterGraphicsSource, Handwriting, HandwritingPen, GraphicsSource}
@@ -84,8 +85,9 @@ case class Egraph(
   import EgraphState._
 
   private lazy val blobKeyBase = "egraphs/" + id
-  private def framedPrintBlobKey = blobKeyBase + "/framed-print/" + framedPrintFilename
-  def framedPrintFilename = "order" + orderId + ".jpg"
+  private def framedPrintVersion = "v" + LandscapeFramedPrint.currentVersion
+  private def framedPrintBlobKey = blobKeyBase + "/framed-print/" + framedPrintVersion + "/" + framedPrintFilename
+  def framedPrintFilename = "order" + orderId + ".jpg" // this cannot change it is linked to printer specifications
 
   //
   // Public methods
@@ -473,7 +475,7 @@ case class EgraphStoryServices @Inject() (templateEngine: TemplateEngine)
  * }}}
  *
  */
-object EgraphStoryField extends Utils.Enum {
+object EgraphStoryField extends Enum {
   sealed trait EnumVal extends Value
 
   /** Public name of the celebrity */

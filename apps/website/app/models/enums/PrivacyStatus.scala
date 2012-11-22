@@ -1,8 +1,8 @@
 package models.enums
 
-import services.Utils
+import egraphs.playutils.Enum
 
-object PrivacyStatus extends Utils.Enum {
+object PrivacyStatus extends Enum {
   sealed trait EnumVal extends Value
 
   val Private = new EnumVal {

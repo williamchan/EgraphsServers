@@ -56,7 +56,6 @@ object FrontendBuild extends Build {
         toPath == "controllers/routes$javascript.class" ||
         toPath == "controllers/routes$ref.class"
       }
-    },
-    testOptions in Test := Nil
-  ).dependsOn(AuthenticityTokenBuild.main)
+    }
+  ).dependsOn(AuthenticityTokenBuild.main, PlayUtilsBuild.main)
 }

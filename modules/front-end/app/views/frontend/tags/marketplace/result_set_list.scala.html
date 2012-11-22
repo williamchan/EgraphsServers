@@ -1,0 +1,49 @@
+@(results: Iterable[models.frontend.marketplace.ResultSetViewModel])
+
+<div class="verticals list">
+
+  <table cellpadding="0" cellspacing="0">
+
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Price Range</th>
+        <th>Available?</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+  
+    <tbody>
+    @for(resultSet <- results) {    
+      @for(celebrity <- resultSet.celebrities) {  
+        <tr>
+          <td><strong><a href="@celebrity.storefrontUrl">@celebrity.publicName &raquo;</a></strong></td>
+          <td>
+          @{
+            celebrity.minPrice match {
+              case min:Int if (min > 0 && min == celebrity.maxPrice) => "$" + min
+              case min:Int if (min != celebrity.maxPrice) => "$" + min + "-" + celebrity.maxPrice
+              case 0 => ""
+            }
+          }
+          </td>
+          <td>
+          @if(celebrity.soldout) { 
+            <a href="#">Sold Out!</a> 
+          } else { 
+            <a href="@celebrity.storefrontUrl">
+            <strong>
+              Available
+            </strong>
+            </a>
+          }
+          </td>
+          <td>
+            @celebrity.secondaryText
+          </td>
+        </tr>
+      }  
+    }  
+    </tbody>
+  </table>
+</div> <!-- end .verticals.list -->

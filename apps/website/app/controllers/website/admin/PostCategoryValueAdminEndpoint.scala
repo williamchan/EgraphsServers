@@ -83,12 +83,12 @@ trait PostCategoryValueAdminEndpoint {
             }
 
             val savedCategoryValue = tmp.copy(
-                publicName = validForm.publicName,
-                name = validForm.name,
+                publicName = validForm.publicName.trim,
+                name = validForm.name.trim,
                 categoryId = categoryId)
                 .save()
             categoryValueStore.updateCategories(savedCategoryValue, categoryIds)
-            Redirect(controllers.routes.WebsiteControllers.getCategoryValueAdmin(savedCategoryValue.id).url, FOUND)
+            Redirect(controllers.routes.WebsiteControllers.getCategoryAdmin(categoryId).url, FOUND)
           }
         )
       }
