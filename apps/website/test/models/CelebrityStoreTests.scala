@@ -180,12 +180,11 @@ class CelebrityStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
     instanceUnderTest.getPublishedCelebrities.toIndexedSeq.filter(celeb => ids.contains(celeb.id))
   }
 
-   private def newSearchableCeleb : Celebrity = {
+  private def newSearchableCeleb : Celebrity = {
     val (customer, customer1, celebrity, product) = TestData.newSavedOrderStack()
     product.withPublishedStatus(PublishedStatus.Published).save()
     celebrity.withPublishedStatus(PublishedStatus.Published).withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
-
-   }
+  }
 
   private def instanceUnderTest: CelebrityStore = {
     AppConfig.instance[CelebrityStore]
