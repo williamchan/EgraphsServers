@@ -554,7 +554,7 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends Sa
        else " "
      ) + 
     """
-                 LEFT OUTER JOIN orders o ON (o.inventorybatchid = ib.id AND
+                 LEFT OUTER JOIN orders o ON (o.inventorybatchid = ib.id AND ib.startdate < now() AND ib.enddate > now() AND
                                               o.productid = p.id)
     WHERE
      c._enrollmentStatus = 'Enrolled' AND
