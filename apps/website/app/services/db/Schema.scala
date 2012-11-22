@@ -3,6 +3,7 @@ package services.db
 import org.squeryl.PrimitiveTypeMode._
 import org.squeryl.{ KeyedEntity, Table }
 import models._
+import checkout.LineItemTypeEntity
 import models.categories._
 import models.vbg._
 import models.xyzmo._
@@ -108,6 +109,9 @@ class Schema @Inject() (
     declare(
       columns(inventoryBatch.startDate, inventoryBatch.endDate) are indexed,
       columns(inventoryBatch.celebrityId, inventoryBatch.startDate, inventoryBatch.endDate) are indexed))
+
+  val lineItemTypes = table[LineItemTypeEntity]
+  // TODO(SER-499): Index declarations
 
   val orders = table[Order]("Orders")
   on(orders)(order =>
@@ -264,6 +268,7 @@ class Schema @Inject() (
     .via((enrollmentBatch, xyzmoEnrollDynamicProfile) => enrollmentBatch.id === xyzmoEnrollDynamicProfile.enrollmentBatchId)
   val egraphToXyzmoVerifyUserTable = oneToManyRelation(egraphs, xyzmoVerifyUserTable)
     .via((egraph, xyzmoVerifyUser) => egraph.id === xyzmoVerifyUser.egraphId)
+
 
   //
   // Public methods

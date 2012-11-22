@@ -83,7 +83,7 @@ trait SavesWithStringKey[T <: KeyedEntity[String]] extends Saves[String, T] {
   }
 }
 
-trait Saves[KeyT, T <: KeyedEntity[KeyT]] {
+trait Saves[KeyT, T <: KeyedEntity[KeyT]] extends InsertAndUpdateHooks[T] {
 
   //
   // Abstract members
@@ -181,42 +181,9 @@ trait Saves[KeyT, T <: KeyedEntity[KeyT]] {
 
   protected def keysEqual(id: KeyT, otherId: KeyT): LogicalBoolean
 
-  /**
-   * Hook to provide an entity transform that will be applied before inserting or updating any
-   * new object.
-   *
-   * See class documentation for usage.
-   */
-  final def beforeInsertOrUpdate(transform: (T) => T) {
-    beforeInsert(transform)
-    beforeUpdate(transform)
-  }
-
-  /**
-   * Hook to provide an entity transform that will be applied before inserting any
-   * new object.
-   *
-   * See class documentation for usage.
-   */
-  final def beforeInsert(transform: (T) => T) {
-    preInsertTransforms = preInsertTransforms ++ Vector(transform)
-  }
-
-  /**
-   * Hook to provide a transform to apply before updating any new object.
-   *
-   * See class documentation for usage.
-   */
-  final def beforeUpdate(transform: (T) => T) {
-    preUpdateTransforms = preUpdateTransforms ++ Vector(transform)
-  }
-
   //
   // Private API
   //
-  private var preInsertTransforms = Vector.empty[(T) => T]
-  private var preUpdateTransforms = Vector.empty[(T) => T]
-
   protected def insert(toInsert: T): T = {
     table.insert(performTransforms(preInsertTransforms, toInsert))
   }
