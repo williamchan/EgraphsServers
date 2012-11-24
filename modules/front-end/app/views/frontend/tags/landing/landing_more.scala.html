@@ -1,4 +1,4 @@
-@(starsFooter: Option[Html] = None, celebrityPublicName: Option[String] = None, getStartedUrl: Option[String] = None)
+@(celebrityPublicName: Option[String] = None, getStartedUrl: Option[String] = None)
 
 <section id="landing-more">
 
@@ -16,7 +16,5 @@
     @getStartedUrl.map { url => <p><a href="@url" class="button"><strong>Get Started</strong> <span>&raquo;</span></a></p> }
 
   </header>
-
-  @starsFooter.getOrElse("")
 
 </section> <!-- end #landing-more -->

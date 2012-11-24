@@ -44,16 +44,6 @@
   }
 }
 
-@starsFooter = {
-  <footer>
-    <div id="featured-stars" class="callout">
-      <h3>Our Stars (in alphabetical order by team name)</h3>
-      <p>Browse one of their galleries to get started making your own egraph.</p>
-    </div>
-    @starsBlock(stars, clearFix=false)
-  </footer>
-}
-
 @modalJs = {
   @if(signup) {
     Egraphs.page.modalOn = true;
@@ -84,7 +74,7 @@
 
         @tags.landing.landing_details()
 
-        @tags.landing.landing_more(starsFooter = Some(starsFooter))
+        @tags.landing.landing_more(None, Some("/stars"))
 
         <p class="to-top"><a href="#top">Back to Top</a></p>
 
