@@ -1,15 +1,14 @@
 package services.mvc.celebrity
 
 import akka.actor.ActorRef
-import akka.pattern.ask
-import models.frontend.landing.CatalogStar
-import services.mvc.celebrity.UpdateCatalogStarsActor.UpdateCatalogStars
-import akka.util.duration._
-import akka.util.Timeout
-import akka.dispatch.Await
 import akka.agent.Agent
-import services.logging.Logging
+import akka.dispatch.Await
+import akka.pattern.ask
+import akka.util.duration.intToDurationInt
+import akka.util.Timeout
 import models.frontend.landing.CatalogStar
+import services.logging.Logging
+import services.mvc.celebrity.UpdateCatalogStarsActor.UpdateCatalogStars
 
 /**
  * Defines the behavior of using two actors to keep a current cache of the
@@ -18,7 +17,6 @@ import models.frontend.landing.CatalogStar
  */
 private[celebrity] trait CatalogStarsQuerying extends Logging {
   //TODO: RENAME THIS TO AGENT
-  protected def catalogStarActor: Agent[IndexedSeq[CatalogStar]]
   protected def catalogStarUpdateActor: ActorRef
   
   val timeout = Timeout(30 seconds)
@@ -33,7 +31,7 @@ private[celebrity] trait CatalogStarsQuerying extends Logging {
    * @return the current set of stars for rendering in the celebrity catalog.
    */
   def apply(numUpdateAttemptsLeft: Int = 1): IndexedSeq[CatalogStar] = {
-    val stars = CatalogStarsActor.singleton.get
+    val stars = CatalogStarsAgent.singleton.get
     // No stars had been cached. This will only happen right after an instance comes up.
     // We will instruct the update actor to provide some data immediately, block on receiving
     // a response, then re-query from the CatalogStars actor.
@@ -55,7 +53,7 @@ private[celebrity] trait CatalogStarsQuerying extends Logging {
     val futureOK = catalogStarUpdateActor.ask(UpdateCatalogStars)(timeout)
 
     Await.result(futureOK, 1 minutes)
-    val newStars = CatalogStarsActor.singleton.get
+    val newStars = CatalogStarsAgent.singleton.get
     if (newStars.isEmpty) {
       this.apply(numUpdateAttemptsLeft - 1)
     } else {

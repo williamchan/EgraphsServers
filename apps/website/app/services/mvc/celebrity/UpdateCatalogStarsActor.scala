@@ -62,7 +62,7 @@ private[celebrity] class UpdateCatalogStarsActor @Inject()(
       // the landing page.
       
       log("Transmitting " + catalogStars.length + " stars to the agent.")
-      val catalogStarsAgent = CatalogStarsActor.singleton
+      val catalogStarsAgent = CatalogStarsAgent.singleton
       catalogStarsAgent send catalogStars
       catalogStarsAgent.await(10 seconds)
 

@@ -12,8 +12,6 @@ import services.AppConfig
 import controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled
 import com.google.inject.{Provider, Inject}
 
-
-
 /**
  * Converts Celebrities into various view models defined in the front-end module
  *
