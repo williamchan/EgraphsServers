@@ -3,11 +3,12 @@ package services
 import java.awt.image.BufferedImage
 import com.google.inject.Inject
 
-import javax.imageio.stream.ImageInputStream
-import javax.imageio.{ImageReader, ImageIO}
+import javax.imageio.stream.{MemoryCacheImageOutputStream, ImageInputStream}
+import javax.imageio.{IIOImage, ImageWriteParam, ImageReader, ImageIO}
 import java.awt._
 import java.io.{File, ByteArrayInputStream, ByteArrayOutputStream}
 import models.ImageAsset
+import models.ImageAsset.ImageType
 
 @Inject() class ImageUtil {
   import ImageUtil._
@@ -89,6 +90,34 @@ import models.ImageAsset
 
     ret
   }
+  /**
+   * @return
+   */
+
+
+  /**
+   * Scales image to target width, keeping the original aspect ratio the same. Can also upscale.
+   *
+   * @param img the original image to be scaled
+   * @param targetWidth the desired width of the scaled instance,
+   *    in pixels
+   * @return img scaled to targetWidth with original aspect ratio preserved
+   */
+  def getScaledImage(img: BufferedImage, targetWidth: Int): BufferedImage = {
+    if (targetWidth != img.getWidth) {
+      val scale = targetWidth.toFloat / img.getWidth
+      val newW = (scale * img.getWidth).toInt
+      val newH = (scale * img.getHeight).toInt
+      val scaledImage = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB)
+      val g2ScaledImage = scaledImage.createGraphics()
+      g2ScaledImage.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR)
+      g2ScaledImage.drawImage(img, 0, 0, newW, newH, null)
+      g2ScaledImage.dispose()
+      scaledImage
+    } else {
+      img
+    }
+  }
 }
 
 object ImageUtil extends ImageUtil {
@@ -145,6 +174,29 @@ object ImageUtil extends ImageUtil {
     val g: Graphics = croppedImage.getGraphics
     g.drawImage(originalImage, 0, 0, null)
     croppedImage
+  }
+
+  /**
+   * @param image image to translate to byte array
+   * @param targetFormat eg, png or jpg
+   * @param compressionMode a param specified in javax.imageio.ImageWriteParam
+   * @param compressionQuality a param specified in javax.imageio.ImageWriteParam
+   * @return a byte array representation of the image
+   */
+  def getBytes(image: BufferedImage,
+               targetFormat: ImageType = ImageAsset.Jpeg,
+               compressionMode: Int = ImageWriteParam.MODE_EXPLICIT,
+               compressionQuality: Float = 1.0f
+              ): Array[Byte] = {
+    val writer = ImageIO.getImageWritersByFormatName(targetFormat.extension).next()
+    val iwp = writer.getDefaultWriteParam
+    iwp.setCompressionMode(compressionMode)
+    iwp.setCompressionQuality(compressionQuality)
+    val bytesOut = new ByteArrayOutputStream()
+    val ios = new MemoryCacheImageOutputStream(bytesOut)
+    writer.setOutput(ios)
+    writer.write(null, new IIOImage(image, null, null), iwp)
+    bytesOut.toByteArray
   }
 
   /**

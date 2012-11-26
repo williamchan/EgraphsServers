@@ -69,7 +69,13 @@ trait PostOrderAdminEndpoint { this: Controller =>
                     val csv = PrintManufacturingInfo.toCSVLine(buyerEmail = order.buyer.account.email,
                       shippingAddress = "",
                       partnerPhotoFile = egraph.framedPrintFilename)
-                    Ok(views.html.Application.admin.admin_printinfo(framedPrintImageUrl, PrintManufacturingInfo.headerCSVLine, csv, Some(pngUrl)))
+                    Ok(views.html.Application.admin.admin_printinfo(
+                      framedPrintImageUrl,
+                      PrintManufacturingInfo.headerCSVLine,
+                      csv,
+                      Some(pngUrl),
+                      Some(egraph.getStandaloneCertificateUrl)
+                    ))
                   }
                 }
               }

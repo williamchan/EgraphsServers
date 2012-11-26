@@ -71,6 +71,15 @@ case class PrintOrder(id: Long = 0,
     }
   }
 
+  /**
+   * @return url to a read-to-print image of the certificate of authenticity
+   */
+  def getStandaloneCertificateUrl: Option[String] = {
+    services.egraphStore.findByOrder(orderId, services.egraphQueryFilters.publishedOrApproved).headOption.map {egraph =>
+      egraph.getStandaloneCertificateUrl
+    }
+  }
+
   //
   // KeyedCaseClass[Long] methods
   //
