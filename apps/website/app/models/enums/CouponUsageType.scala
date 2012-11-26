@@ -1,8 +1,9 @@
 package models.enums
 
 import services.Utils
+import egraphs.playutils.Enum
 
-object CouponUsageType extends Utils.Enum {
+object CouponUsageType extends Enum {
   sealed trait EnumVal extends Value
 
   val OneUse = new EnumVal {

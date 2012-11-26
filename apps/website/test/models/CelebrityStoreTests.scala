@@ -1,6 +1,6 @@
 package models
 
-import enums.PublishedStatus
+import enums.{PublishedStatus, EnrollmentStatus}
 import utils.{DBTransactionPerTest, TestData, EgraphsUnitTest}
 import services.AppConfig
 
@@ -42,21 +42,104 @@ class CelebrityStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
   }
 
   // This test ensures that queries return results but makes no guarantees on the quality of search results
-  "findByTextQuery" should "return celebrities matching the text query" in {
-    val celeb = TestData.newSavedCelebrity().withPublishedStatus(PublishedStatus.Published)
-    val results = instanceUnderTest.findByTextQuery(celeb.publicName)
-
+  "search" should "return celebrities matching the text query" in {
+    val celeb = newSearchableCeleb
+    instanceUnderTest.rebuildSearchIndex
+    val results = instanceUnderTest.marketplaceSearch(Some(celeb.publicName))
     results.isEmpty should be(false)
   }
 
   // This test ensures that queries return results but makes no guarantees on the quality of search results
-  "findByTextQuery" should "return 0 celebrities matching the empty string" in {
-    TestData.newSavedCelebrity().withPublishedStatus(PublishedStatus.Published)
-    val results = instanceUnderTest.findByTextQuery("")
+  it should "return 0 celebrities matching the empty string" in {
+    val celeb = newSearchableCeleb
+    instanceUnderTest.rebuildSearchIndex
+    val results = instanceUnderTest.marketplaceSearch(Some(""))
 
     results.isEmpty should be(true)
   }
+
+  it should "actually rebuild the search index" in {
+    val celeb = newSearchableCeleb
+    val results = instanceUnderTest.marketplaceSearch(Some(celeb.publicName))
+    results.isEmpty should be(true)
+
+    instanceUnderTest.rebuildSearchIndex
+    val results1 = instanceUnderTest.marketplaceSearch(Some(celeb.publicName))
+    results1.isEmpty should be(false)
+  }
   
+  it should "find celebs tagged with a specific value" in {
+    val category = TestData.newSavedCategory
+    val categoryValueA = TestData.newSavedCategoryValue(category.id)
+    val celeb = newSearchableCeleb
+    celeb.categoryValues.associate(categoryValueA)
+
+    instanceUnderTest.rebuildSearchIndex
+    val results1 = instanceUnderTest.marketplaceSearch(Some(categoryValueA.publicName))
+    results1.isEmpty should be(false)
+  }
+
+  it should "find celebs tagged with two values" in {
+    val category = TestData.newSavedCategory
+    val categoryValueA = TestData.newSavedCategoryValue(category.id)
+    val categoryValueB = TestData.newSavedCategoryValue(category.id)
+    val celeb = newSearchableCeleb
+    celeb.categoryValues.associate(categoryValueA)
+    celeb.categoryValues.associate(categoryValueB)
+
+    instanceUnderTest.rebuildSearchIndex
+    val results1 = instanceUnderTest.marketplaceSearch(Some(categoryValueA.publicName + " " + categoryValueB.publicName))
+    results1.isEmpty should be(false)
+  }
+
+  it should "find celebs of a certain category through refinements" in {
+        val category = TestData.newSavedCategory
+    val categoryValueA = TestData.newSavedCategoryValue(category.id)
+    val celeb = newSearchableCeleb
+    celeb.categoryValues.associate(categoryValueA)
+
+    instanceUnderTest.rebuildSearchIndex
+    val results1 = instanceUnderTest.marketplaceSearch(maybeQuery = None, refinements = Map (category.id -> Set(categoryValueA.id)))
+    results1.isEmpty should be(false)
+  }
+
+  it should "find celebs of a certain category through multiple refinements in the same category (OR search)" in {
+    val category = TestData.newSavedCategory
+    
+    val categoryValueA = TestData.newSavedCategoryValue(category.id)
+    val celebA = newSearchableCeleb
+    celebA.categoryValues.associate(categoryValueA)
+
+    val categoryValueB = TestData.newSavedCategoryValue(category.id)
+    val celebB = newSearchableCeleb
+    celebB.categoryValues.associate(categoryValueB)
+
+    instanceUnderTest.rebuildSearchIndex
+    val results1 = instanceUnderTest.marketplaceSearch(maybeQuery = None, refinements = Map (category.id -> Set(categoryValueA.id, categoryValueB.id)))
+    results1.size should be(2)
+  }
+
+  it should "find celebs of a certain category through multiple refinements in different categories (AND search)" in {
+    val category = TestData.newSavedCategory
+    
+    val categoryValueA = TestData.newSavedCategoryValue(category.id)
+    val celebA = newSearchableCeleb
+    celebA.categoryValues.associate(categoryValueA)
+
+    val categoryB = TestData.newSavedCategory
+    val categoryValueB = TestData.newSavedCategoryValue(categoryB.id)
+    val celebAB = newSearchableCeleb
+    celebAB.categoryValues.associate(categoryValueB)
+    celebAB.categoryValues.associate(categoryValueA)
+
+    instanceUnderTest.rebuildSearchIndex
+    val results1 = instanceUnderTest.marketplaceSearch(maybeQuery = None, refinements = 
+      Map (category.id -> Set(categoryValueA.id), 
+           categoryB.id -> Set(categoryValueB.id)
+      ))
+    results1.size should be(1)
+  }
+
   "find by category value" should "return celebrities associated with a particular CategoryValue" in new EgraphsTestApplication {
  
     val category = TestData.newSavedCategory
@@ -95,6 +178,12 @@ class CelebrityStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
   //
   private def getPublishedCelebritiesWithIds(ids: Seq[Long]): IndexedSeq[Celebrity] = {
     instanceUnderTest.getPublishedCelebrities.toIndexedSeq.filter(celeb => ids.contains(celeb.id))
+  }
+
+  private def newSearchableCeleb : Celebrity = {
+    val (customer, customer1, celebrity, product) = TestData.newSavedOrderStack()
+    product.withPublishedStatus(PublishedStatus.Published).save()
+    celebrity.withPublishedStatus(PublishedStatus.Published).withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
   }
 
   private def instanceUnderTest: CelebrityStore = {

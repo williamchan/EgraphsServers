@@ -1,0 +1,95 @@
+@(query : String,
+  viewAsList: Boolean = false,
+  marketplaceRoute: String,
+  verticalViewModels: Iterable[models.frontend.marketplace.VerticalViewModel], 
+  results: Iterable[models.frontend.marketplace.ResultSetViewModel], 
+  categoryViewModels: Iterable[models.frontend.marketplace.CategoryViewModel] = List[models.frontend.marketplace.CategoryViewModel](),
+  sortOptions: Iterable[models.frontend.marketplace.SortOptionViewModel]
+  )(
+  implicit
+  headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData,
+  authToken: egraphs.authtoken.AuthenticityToken
+)
+@import views.frontend.Utils
+@import models.frontend.egraphs._
+@import play.api.libs.json._
+@**
+  Page for displaying marketplace results. 
+  Vertical buttons are currently hidden. Will be used in the future, when we have multiple verticals.
+**@
+@init = {
+@*** 
+
+Translates a map of categories and their categoryvalues into a JsonObject that can be easily converted to a URL query arguments using $.param(Egraphs.page.categories)
+***@
+ Egraphs.page.categories = @Html(
+  Json.toJson(categoryViewModels.foldLeft[Map[String, JsValue]](Map())(
+    (a, b) => a ++ b.asActiveMap
+  )).toString
+ );
+ Egraphs.page.queryUrl = "@marketplaceRoute";
+ Egraphs.page.query = "@query";
+ Egraphs.page.sort = "@sortOptions.filter(v => v.active).headOption.map(v => v.name)";
+ Egraphs.page.view = @if(viewAsList){"list"} else {""};
+}
+
+@baseBody = {
+
+<section id="content" class="marketplace mlb" role="main">
+  
+  <div id="main">
+  
+    <div class="row-fluid">
+    
+      <div class="span12 masthead" role="masthead">
+      
+        <form action="@marketplaceRoute" method="get">
+            <input name="query" id="celebrity-searchbox" type="search" placeholder="Find Your Star" value="@query" autofocus>
+        </form>
+      
+        <img src='@EgraphsAssets.at("images/contact-us.jpg")'/>
+      
+      </div>
+      
+    </div>
+
+    <div class="content container clearfix">
+    
+      <div class="row-fluid">
+
+        <aside class="nav span3">
+          @tags.marketplace.category_picker(categoryViewModels)
+        
+        </aside>
+
+        <div class="main span9">
+
+          @tags.marketplace.vertical_buttons(verticalViewModels)
+          @tags.marketplace.category_picker_mobile(categoryViewModels) 
+        
+          @tags.marketplace.view_options(sortOptions, viewAsList)
+          @if(categoryViewModels.exists(c => c.active == true) || query.length > 0){
+            @tags.marketplace.navigation_pills(categoryViewModels, query)
+          }
+          
+
+          @if(viewAsList) {
+            @tags.marketplace.result_set_list(results)
+          } else {
+            @tags.marketplace.result_set(results)
+          }
+        </div>
+      </div>
+    
+      <p class="to-top"><a href="#top">Back to Top</a></p>
+        
+    </div> <!-- end .content -->
+        
+  </div> <!-- end #main -->
+  
+</section>
+
+}
+
+@base_template(title="Stars", jsMain = "pages/marketplace", headJs = init, body=baseBody)

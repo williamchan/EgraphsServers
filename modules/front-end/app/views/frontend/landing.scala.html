@@ -44,16 +44,6 @@
   }
 }
 
-@starsFooter = {
-  <footer>
-    <div id="featured-stars" class="callout">
-      <h3>Our Stars (in alphabetical order by team name)</h3>
-      <p>Browse one of their galleries to get started making your own egraph.</p>
-    </div>
-    @starsBlock(stars, clearFix=false)
-  </footer>
-}
-
 @modalJs = {
   @if(signup) {
     Egraphs.page.modalOn = true;
@@ -61,10 +51,12 @@
 }
 
 @baseBody = {
+  <h3 style="color:red;text-align:center;line-height:22px;margin-top:5px;margin-bottom:2px;">CYBER MONDAY SALE: 15% off all players! CODE: mlb</h3>
+
   @tags.landing.masthead_section(
     mastheadMessage=None,
     mastheadImageUrl=EgraphsAssets.at("images/landing-masthead.jpg").url,
-    getStartedUrl=Some("#connect-with-your-star")
+    getStartedUrl=Some("/stars")
   )
 
   <section id="content" role="main">
@@ -84,7 +76,7 @@
 
         @tags.landing.landing_details()
 
-        @tags.landing.landing_more(starsFooter = Some(starsFooter))
+        @tags.landing.landing_more(None, Some("/stars"))
 
         <p class="to-top"><a href="#top">Back to Top</a></p>
 

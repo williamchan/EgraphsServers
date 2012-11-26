@@ -53,7 +53,6 @@ GET     /Egraph/portrait                                          controllers.Eg
 GET     /Email/confirm                                            controllers.Email.confirm
 GET     /Email/mlbStatic                                          controllers.Email.mlbStatic
 GET     /Email/celebrity_welcome_email                            controllers.Email.celebrity_welcome_email
-
 GET     /Email/orderConfirmation                                  controllers.Email.orderConfirmation
 GET     /Email/orderConfirmationText                              controllers.Email.orderConfirmationText
 GET     /Email/verify                                             controllers.Email.verify
@@ -75,6 +74,11 @@ GET     /Login/allErrorsLogin                                     controllers.Lo
 GET     /Login/allErrorsStorefront                                controllers.Login.allErrorsStorefront
 GET     /Login/index                                              controllers.Login.index
 GET     /Login/storefront                                         controllers.Login.storefront(recipient:Option[String])
+
+GET     /Marketplace/index                                        controllers.Marketplace.index 
+GET     /Marketplace/mlb                                          controllers.Marketplace.mlb  
+GET     /Marketplace/results/list                                 controllers.Marketplace.results_list  
+GET     /Marketplace/results                                      controllers.Marketplace.results 
 
 GET     /Personalize/allErrors                                    controllers.Personalize.allErrors
 GET     /Personalize/index                                        controllers.Personalize.index

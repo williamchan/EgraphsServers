@@ -1,8 +1,8 @@
 package models.enums
 
-import services.Utils
+import egraphs.playutils.Enum
 
-object AdminRole extends Utils.Enum {
+object AdminRole extends Enum {
   sealed trait EnumVal extends Value
 
   val Superuser = new EnumVal {

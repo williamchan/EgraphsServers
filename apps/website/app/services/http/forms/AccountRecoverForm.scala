@@ -3,6 +3,7 @@ package  services.http.forms
 import services.Utils
 
 import com.google.inject.Inject
+import egraphs.playutils.Enum
 
 class AccountRecoverForm(val paramsMap: Form.Readable, check: FormChecks) extends Form[AccountRecoverForm.Validated]
 {
@@ -22,7 +23,7 @@ class AccountRecoverForm(val paramsMap: Form.Readable, check: FormChecks) extend
 }
 
 object AccountRecoverForm {
-  object Fields extends Utils.Enum {
+  object Fields extends Enum {
     sealed case class EnumVal(name: String) extends Value
     val Email = EnumVal("email")
   }

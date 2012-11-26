@@ -18,6 +18,18 @@ import play.api.Play.current
 import services.Dimensions
 import org.squeryl.dsl.ManyToMany
 import views.html.frontend.{celebrity_welcome_email, celebrity_welcome_email_text}
+import anorm._
+import anorm.SqlParser._
+import services.mvc.celebrity.CelebrityViewConversions
+import models.frontend.marketplace.MarketplaceCelebrity
+import models.frontend.marketplace.CelebritySortingTypes
+import play.api.libs.concurrent.Promise
+import models.frontend.marketplace.MarketplaceCelebrity
+import play.api.libs.concurrent.Akka
+import services.db.DBSession
+import services.db.TransactionSerializable
+import org.joda.time.DateTimeConstants
+import models.frontend.landing.CatalogStar
 
 /**
  * Services used by each celebrity instance
@@ -189,6 +201,7 @@ case class Celebrity(id: Long = 0,
       image=ImageAsset(imageData, keyBase, newImageKey, ImageAsset.Png, services.imageAssetServices.get)
     ).save()
   }
+
   def landingPageImage: ImageAsset = {
     _landingPageImageKey.flatMap(theKey => Some(ImageAsset(keyBase, theKey, ImageAsset.Png, services=services.imageAssetServices.get))) match {
       case Some(imageAsset) => imageAsset
@@ -203,6 +216,7 @@ case class Celebrity(id: Long = 0,
       image=ImageAsset(imageData, keyBase, newImageKey, ImageAsset.Png, services.imageAssetServices.get)
     ).save()
   }
+
   def logoImage: ImageAsset = {
     _logoImageKey.flatMap(theKey => Some(ImageAsset(keyBase, theKey, ImageAsset.Png, services=services.imageAssetServices.get))) match {
       case Some(imageAsset) => imageAsset
@@ -361,22 +375,11 @@ object Celebrity {
       CelebrityWithImage(saved, savedImage)
     }
   }
-  // Simplifying results for display
-  def celebrityAccountToListing(celebrity: Celebrity, account: Account) = {
-    new CelebrityListing(
-      id=celebrity.id,
-      email = account.email,
-      urlSlug = celebrity.urlSlug,
-      publicName = celebrity.publicName,
-      enrollmentStatus = celebrity.enrollmentStatus.toString,
-      publishedStatus = celebrity.publishedStatus.toString
-    )
-  }
 }
 
-class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebrity] with SavesCreatedUpdated[Long,Celebrity] {
+class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends SavesWithLongKey[Celebrity] with SavesCreatedUpdated[Long,Celebrity] {
   import org.squeryl.PrimitiveTypeMode._
-
+  import CelebrityViewConversions._
   //
   // Public Methods
   //
@@ -436,36 +439,234 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
   }
    
   /**
-   * Find using postgres text search on publicname and roledescription
-   * http://www.postgresql.org/docs/9.2/interactive/textsearch-controls.html
-   * Uses anorm because the return types are not supported by Squeryl.
-   * @param query text to match on
-   * @return matching celebs in CelebrityListing format
+   * Rebuilds the GiN index representing celebrities in the database. 
+   * The index is used to make full text search fast.  
+   * What is a GiN Index? It is this: http://www.postgresql.org/docs/9.0/static/textsearch-indexes.html
+   * An intermediate step of this process is refreshing the materialized view that the GiN index references.
+   * What is a materialized view? It is this: http://tech.jonathangardner.net/wiki/PostgreSQL/Materialized_Views
+   **/
+  def rebuildSearchIndex {
+    // Drop the index
+    SQL(
+    """
+        DROP INDEX celebrity_category_search_idx;
+    """
+        ).execute()(connection=schema.getTxnConnectionFactory)     
+    // Refresh the materialized view
+    SQL(
+    """    
+        SELECT refresh_matview('celebrity_categories_mv');
+    """
+        ).execute()(connection=schema.getTxnConnectionFactory)
+    SQL(
+    """    
+        CREATE INDEX celebrity_category_search_idx ON celebrity_categories_mv USING gin(to_tsvector);
+    """
+    ).execute()(connection=schema.getTxnConnectionFactory)
+  }
+
+  /**
+   * Full text search on tags, this version is called by the admin controller. 
+   * TODO(sbilstein) Implement refinements 
    */
-  def findByTextQuery(query: String): Iterable[CelebrityListing] = {
-    import anorm._
-    import anorm.SqlParser._
-  	val rowStream = SQL(
-  	  """
-  	    SELECT * FROM celebrity, account WHERE
-  	    (
-  	      to_tsvector('english', celebrity.publicname || ' ' || celebrity.roledescription)
-  	      @@
-  	      plainto_tsquery('english', {textQuery})
-  	    ) AND account.celebrityid = celebrity.id;
-  	  """
-  	).on("textQuery" -> query).apply()(connection = schema.getTxnConnectionFactory)
-  	
-  	for(row <- rowStream) yield {
-  	  new CelebrityListing(
-  	      id = row[Long]("celebrityid"),
-  	      publicName = row[String]("publicname"),
-  	      email = row[String]("email"),
-  	      urlSlug = row[String]("urlslug"),
-  	      enrollmentStatus = row[String]("_enrollmentStatus"),
-  	      publishedStatus = row[String]("_publishedStatus")
-  	  )
-  	}
+  def search(query: String, refinements: Map[Long, Iterable[Long]] = Map[Long, Iterable[Long]]()): Iterable[Celebrity] = {
+    val rowStream = SQL(
+      """
+      SELECT c.publicname publicname, c._landingpageImageKey _landingpageImageKey, c.id celebrityid,
+        c.roledescription roledescription, 
+        c._enrollmentStatus _enrollmentStatus, c._publishedStatus _publishedStatus
+      FROM celebrity c, celebrity_categories_mv mv WHERE
+        (
+          mv.to_tsvector
+          @@
+          plainto_tsquery('english', {textQuery})
+        ) and mv.id = c.id
+      GROUP BY c.id;
+
+      """
+    ).on("textQuery" -> query).apply()(connection = schema.getTxnConnectionFactory)
+    
+    for( row <- rowStream) yield {
+      Celebrity(
+        id = row[Long]("celebrityid"),
+         publicName = row[String]("publicname"),
+         roleDescription = row[String]("roledescription"),                                 
+         _enrollmentStatus = row[String]("_enrollmentStatus"),
+         _publishedStatus = row[String]("_publishedStatus"),
+         _landingPageImageKey = row[Option[String]]("_landingpageImageKey")
+      )
+    }
+  }
+
+  private case class CelebrityProductSummary(inventoryAvailable: Int, minProductPrice: Int, maxProductPrice: Int)
+
+  private def publishedSearch(maybeQuery: Option[String] = None, refinements: Map[Long, Iterable[Long]] = Map[Long, Iterable[Long]](), sortType: CelebritySortingTypes.EnumVal = CelebritySortingTypes.MostRelevant)
+  : Iterable[(Celebrity, CelebrityProductSummary)] = {
+    // Note we could make this fast probably.  We should see how performance is affected if we don't have to
+    // join across all celebrities since we can filter some with the text search first.
+    val queryString = """
+    SELECT
+     stuff2.celebrityid,
+     stuff2.publicname,
+     stuff2.roledescription,
+     stuff2._landingpageImageKey,
+     stuff2.isfeatured,
+     min(stuff2.minProductPrice) AS minProductPrice,
+     max(stuff2.maxProductPrice) AS maxProductPrice,
+     sum(stuff2.inventory_sold) AS inventory_sold,
+     sum(stuff2.inventory_total) AS inventory_total,
+     sum(stuff2.inventoryAvailable) AS inventoryAvailable
+    FROM (
+    SELECT
+     stuff.celeb_id AS celebrityid,
+     stuff.celeb_publicname AS publicname,
+     stuff.celeb_roledescription AS roledescription,
+     stuff.celeb_landingpageImageKey AS _landingpageImageKey,
+     stuff.celeb_isfeatured AS isfeatured,
+     min(stuff.product_priceincurrency) AS minProductPrice,
+     max(stuff.product_priceincurrency) AS maxProductPrice,
+     stuff.inventorybatch_id,
+     sum(stuff.is_order) AS inventory_sold,
+     stuff.inventory_total,
+     stuff.inventory_total - sum(stuff.is_order) AS inventoryAvailable
+    FROM (
+
+    SELECT
+     c.id AS celeb_id,
+     c.publicname AS celeb_publicname,
+     c.roledescription AS celeb_roledescription,
+     c._landingpageImageKey AS celeb_landingpageImageKey,
+     c.isfeatured AS celeb_isfeatured,
+     p.id AS product_id,
+     p.priceincurrency AS product_priceincurrency,
+     ib.id AS inventorybatch_id,
+     coalesce(o.id - o.id + 1, 0) AS is_order,
+     CASE WHEN ib.startdate < now() AND ib.enddate > now() THEN ib.numInventory
+          ELSE 0
+     END AS inventory_total
+    FROM
+     celebrity c INNER JOIN product p ON (p.celebrityid = c.id)
+                 INNER JOIN inventorybatch ib ON (ib.celebrityid = c.id)
+    """ +
+     (
+       if(maybeQuery.isDefined)
+"""             INNER JOIN celebrity_categories_mv mv ON (mv.id = c.id) """
+       else " "
+     ) + 
+    """
+                 LEFT OUTER JOIN orders o ON (o.inventorybatchid = ib.id AND ib.startdate < now() AND ib.enddate > now() AND
+                                              o.productid = p.id)
+    WHERE
+     c._enrollmentStatus = 'Enrolled' AND
+     c._publishedStatus = 'Published' AND
+     p._publishedStatus = 'Published'
+  """
+  
+  val queryTextMatching = """ AND mv.to_tsvector @@ plainto_tsquery('english', {textQuery}) """
+  //TODO make this OR duh
+  val queryRefinements =  refinements.foldLeft("")((query, refinement) => {
+      query + """ AND EXISTS ( SELECT c.id FROM celebritycategoryvalue ccv WHERE ccv.categoryvalueid IN """ + 
+      "(" + refinement._2.foldLeft("")((acc, id) => if(id != refinement._2.head) {acc + "," + id.toString} else { id.toString}) + ")" +
+      """ AND ccv.celebrityid = c.id ) """
+    }) 
+
+  val queryGrouping = """ 
+    ORDER BY is_order ASC
+    ) AS stuff
+      GROUP BY celeb_id, celeb_publicname, celeb_roledescription, celeb_landingpageImageKey, celeb_isfeatured, inventorybatch_id, inventory_total
+    ) AS stuff2
+    GROUP BY celebrityid, publicname, roledescription, _landingpageImageKey, isfeatured
+    """
+
+    import CelebritySortingTypes._
+
+    val queryResultOrdering = {
+      sortType match {
+      // case RecentlyAdded => 
+      // this may not be 100% accurate, but gives a gauge of when then have been added to our systems,
+      // to do better would have to include their publish date along with when their products were published to
+      // figure this out, and we don't have all that in our database now.
+      // "ORDER BY celebrityid DESC"
+      // case MostPopular => "ORDER BY inventory_sold DESC"
+        case PriceAscending => "ORDER BY minProductPrice ASC"
+        case PriceDecending => "ORDER BY maxProductPrice DESC"
+        case Alphabetical => "ORDER BY publicname ASC"
+        // case ReverseAlphabetical => "ORDER BY publicname DESC"
+        case MostRelevant =>  ""
+      }
+    } + ";"
+
+    val finalQuery = maybeQuery match {
+      case Some(query) => {
+        SQL(
+          queryString + queryTextMatching + queryRefinements + queryGrouping + queryResultOrdering
+        ).on("textQuery" -> query)
+      }
+      case None => { 
+        SQL(
+          queryString + queryRefinements + queryGrouping + queryResultOrdering
+        )
+      }
+    }
+
+    val rowStream = finalQuery.apply()(connection = schema.getTxnConnectionFactory)
+    for (row <- rowStream) yield {
+      import java.math.BigDecimal
+      val celebrity = Celebrity(
+        id = row[Long]("celebrityid"),
+        publicName = row[String]("publicname"),
+        roleDescription = row[String]("roledescription"),
+        _enrollmentStatus = EnrollmentStatus.Enrolled.name,
+        _publishedStatus = PublishedStatus.Published.name,
+        _landingPageImageKey = row[Option[String]]("_landingpageImageKey"),
+        isFeatured = row[Boolean]("isfeatured") // This should go away
+      )
+      val productSummary = CelebrityProductSummary(
+        row[BigDecimal]("inventoryAvailable").intValue(),
+        row[BigDecimal]("minProductPrice").intValue(),
+        row[BigDecimal]("maxProductPrice").intValue())
+      (celebrity, productSummary)
+    }
+  }
+
+  /**
+   * This function is a dupe of the above function. We will probably want to think of a good way to abstract the search if we want to retain a
+   * useful admin text search. 
+   * 
+   * Currently the view conversion is doing another DB query to fill in that data for each celebrity, would be great if we could do it all in one trip. 
+   * Set[Categoryid, Iterable[CategoryValueId]]
+   * in each set (OR CategoryValueIds) And (OR CategoryValueIds)
+   * 
+   *  (pitcher or 2nd baseman) and (red sox or yankees)
+   */
+  def marketplaceSearch(maybeQuery: Option[String] = None, refinements: Map[Long, Iterable[Long]] = Map[Long, Iterable[Long]](), sortType: CelebritySortingTypes.EnumVal = CelebritySortingTypes.MostRelevant)
+  : Iterable[MarketplaceCelebrity] = {
+
+    val celebrityAndSummaries = publishedSearch(maybeQuery, refinements, sortType)
+    for (celebrityAndSummary <- celebrityAndSummaries) yield {
+      val (celebrity, summary) = celebrityAndSummary
+      import java.math.BigDecimal
+      celebrity.asMarketplaceCelebrity(
+        soldout = summary.inventoryAvailable <= 0,
+        minPrice = summary.minProductPrice,
+        maxPrice = summary.maxProductPrice
+      )
+    }
+  }
+
+  def getCatalogStars: Iterable[CatalogStar] = {
+    val celebrityAndSummaries = publishedSearch()
+    val catalogStarFutures = for (celebrityAndSummary <- celebrityAndSummaries) yield {
+      Akka.future {
+        val (celebrity, summary) = celebrityAndSummary
+        celebrity.asCatalogStar(
+          soldout = summary.inventoryAvailable <= 0,
+          minPrice = summary.minProductPrice,
+          maxPrice = summary.maxProductPrice)
+      }
+    }
+
+    Promise.sequence(catalogStarFutures).await(DateTimeConstants.MILLIS_PER_MINUTE).get.toIndexedSeq
   }
 
   def getCelebrityAccounts: Query[(Celebrity, Account)] = {
@@ -576,9 +777,7 @@ class CelebrityStore @Inject() (schema: Schema) extends SavesWithLongKey[Celebri
  **/
 
 case class CelebrityListing(
-  id: Long,
-  email: String,
-  urlSlug: String,
-  publicName: String,
-  enrollmentStatus: String,
-  publishedStatus: String)
+    minPrice: Int,
+    maxPrice: Int,
+    soldout: Boolean
+)
