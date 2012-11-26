@@ -119,8 +119,8 @@ private object TestModeBootstrap extends Logging {
           """Detected either lack of database schema or change thereof.
           (You can view the current schema at """ + schemaFile.getAbsolutePath + ")"
         )
-        // createNewSchema()
-        // blobs.scrub()
+         createNewSchema()
+//         blobs.scrub()
       }
     }
   }

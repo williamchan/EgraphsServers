@@ -50,7 +50,6 @@ trait AllAdminEndpoints
   with PostPrintOrderAdminEndpoint
   with PostProcessVideoAdminEndpoint
   with PostProductAdminEndpoint
+  with PostRebuildSearchIndexAdminEndpoint  
   with PostSendCelebrityWelcomeEmailAdminEndpoint
-  with PostVideoAssetAdminEndpoint
-  with PostRebuildSearchIndexAdminEndpoint
 { this: Controller => }
