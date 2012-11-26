@@ -118,7 +118,7 @@ class CategoryValueStore @Inject() (
 
   /**
    *  Updates categories owned by a given CategoryValue.  
-   **/
+   */
   def updateCategories(categoryValue: CategoryValue, categoryIds: Iterable[Long]) = {
     //remove old records
     categoryValue.categories.dissociateAll
