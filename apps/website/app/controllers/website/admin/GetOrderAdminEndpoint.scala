@@ -28,9 +28,10 @@ private[controllers] trait GetOrderAdminEndpoint extends ImplicitHeaderAndFooter
             
             val fieldDefaults: (String => String) = {
               (paramName: String) => paramName match {
-              	case "recipientName" => StringEscapeUtils.escapeHtml4(order.recipientName)
-              	case "messageToCelebrity" => StringEscapeUtils.escapeHtml4(order.messageToCelebrity.getOrElse(""))
-              	case "requestedMessage" => StringEscapeUtils.escapeHtml4(order.requestedMessage.getOrElse(""))
+                case "recipientName" => StringEscapeUtils.escapeHtml4(order.recipientName)
+                case "messageToCelebrity" => StringEscapeUtils.escapeHtml4(order.messageToCelebrity.getOrElse(""))
+                case "requestedMessage" => StringEscapeUtils.escapeHtml4(order.requestedMessage.getOrElse(""))
+                case "newRecipientEmail" => StringEscapeUtils.escapeHtml4(order.requestedMessage.getOrElse(""))
               }
             }
 
