@@ -1,8 +1,9 @@
 package models.enums
 
 import services.Utils
+import egraphs.playutils.Enum
 
-object VideoStatus extends Utils.Enum {
+object VideoStatus extends Enum {
   sealed trait EnumVal extends Value
 
   val Unprocessed = new EnumVal {

@@ -19,7 +19,7 @@ private[celebrity] trait CatalogStarsQuerying extends Logging {
   protected def catalogStarActor: ActorRef
   protected def catalogStarUpdateActor: ActorRef
   
-  val timeout = Timeout(10.seconds)
+  val timeout = Timeout(30.seconds)
 
   /**
    * Grabs the current set of CatalogStars out of the cache actor, and updates

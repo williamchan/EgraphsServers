@@ -13,5 +13,5 @@ case class HeaderData(
   insideAnEgraphLink: String = "/inside-an-egraph",
   egraphsTwitterLink: String = "http://www.twitter.com/egraphs",
   egraphsFacebookLink: String = "http://www.facebook.com/egraphs",
-  ourStarsLink: String = "/#connect-with-your-star"
+  ourStarsLink: String = "/stars"
 )

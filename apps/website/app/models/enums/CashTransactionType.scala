@@ -1,11 +1,11 @@
 package models.enums
 
-import services.Utils
+import egraphs.playutils.Enum
 
 /**
  * The type of the CashTransaction. :-)
  */
-object CashTransactionType extends Utils.Enum {
+object CashTransactionType extends Enum {
   sealed trait EnumVal extends Value
 
   val EgraphPurchase = new EnumVal {val name = "EgraphPurchase"}

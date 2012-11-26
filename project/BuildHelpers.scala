@@ -55,7 +55,7 @@ object BuildHelpers {
       Project(
         id=name,
         base=file("modules") / name,
-        settings=defaultModuleSettings ++ settings
+        settings=defaultModuleSettings ++ org.sbtidea.SbtIdeaPlugin.ideaSettings ++ settings
       )
     }
   }

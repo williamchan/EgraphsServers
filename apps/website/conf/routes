@@ -8,8 +8,8 @@
 GET     /test/scenarios                          controllers.website.nonproduction.ScenarioController.list
 GET     /test/scenarios/clear                    controllers.website.nonproduction.ScenarioController.clear
 GET     /test/scenarios/:urlSlug                 controllers.website.nonproduction.ScenarioController.scenario(urlSlug: String)
-GET     /test/log-stuff-then-die                controllers.website.nonproduction.TestControllers.logStuffThenThrowException
-GET     /test/throwError                        controllers.website.nonproduction.TestControllers.throwError(error: String)
+GET     /test/log-stuff-then-die                 controllers.website.nonproduction.TestControllers.logStuffThenThrowException
+GET     /test/throwError                         controllers.website.nonproduction.TestControllers.throwError(error: String)
 
 ###
 ### Production routes
@@ -29,6 +29,8 @@ GET     /blob/files/*blobKey                                       controllers.W
 # Map static resources from the /app/public folder to the /public path
 #GET     /public/                                staticDir:public
 GET     /favicon.ico                            controllers.Assets.at(path="/public", file="images/favicon.ico")
+GET     /robots.txt                             controllers.Assets.at(path="/public", file="robots.txt")
+GET     /sitemap.txt                            controllers.Assets.at(path="/public", file="sitemap.txt")
 GET     /documents/CelebrityAgreement           controllers.Assets.at(path="/public", file="documents/CelebrityAgreement.pdf")
 
 ##
@@ -48,14 +50,15 @@ POST    /api/1.0/celebrities/me/orders/$orderId<[0-9]+>/egraphs controllers.ApiC
 ## Admin
 ##
 GET      /admin                                                           controllers.WebsiteControllers.getRootAdmin
-GET      /admin/accounts                                           				controllers.WebsiteControllers.getAccountsAdmin
-POST     /admin/accounts                                           				controllers.WebsiteControllers.postAccountAdmin
-GET      /admin/accounts/$accountId<[0-9]+>                        				controllers.WebsiteControllers.getAccountAdmin(accountId: Long)
-GET      /admin/celebrities                                        				controllers.WebsiteControllers.getCelebritiesAdmin
-POST     /admin/celebrities                                        				controllers.WebsiteControllers.postCreateCelebrityAdmin
-GET      /admin/celebrities/search                                 				controllers.WebsiteControllers.getCelebritiesBySearchAdmin
-GET      /admin/celebrities/create                                 				controllers.WebsiteControllers.getCreateCelebrityAdmin
-POST     /admin/celebrities/featured                               				controllers.WebsiteControllers.postFeaturedCelebrities
+GET      /admin/accounts                                                  controllers.WebsiteControllers.getAccountsAdmin
+POST     /admin/accounts                                                  controllers.WebsiteControllers.postAccountAdmin
+GET      /admin/accounts/$accountId<[0-9]+>                               controllers.WebsiteControllers.getAccountAdmin(accountId: Long)
+GET      /admin/celebrities                                               controllers.WebsiteControllers.getCelebritiesAdmin
+POST     /admin/celebrities                                               controllers.WebsiteControllers.postCreateCelebrityAdmin
+GET      /admin/celebrities/search                                        controllers.WebsiteControllers.getCelebritiesBySearchAdmin
+POST      /admin/celebrities/search/rebuild                               controllers.WebsiteControllers.postRebuildSearchIndex
+GET      /admin/celebrities/create                                        controllers.WebsiteControllers.getCreateCelebrityAdmin
+POST     /admin/celebrities/featured                                      controllers.WebsiteControllers.postFeaturedCelebrities
 GET      /admin/celebrities/$celebrityId<[0-9]+>                          controllers.WebsiteControllers.getCelebrityAdmin(celebrityId: Long)
 POST     /admin/celebrities/$celebrityId<[0-9]+>                          controllers.WebsiteControllers.postCelebrityAdmin(celebrityId: Long)
 GET      /admin/celebrities/$celebrityId<[0-9]+>/egraphs                  controllers.WebsiteControllers.getCelebrityEgraphsAdmin(celebrityId: Long)
@@ -87,9 +90,9 @@ POST     /admin/coupons/$couponId<[0-9]+>                                 contro
 GET      /admin/categoryvalues/$categoryValueId<[0-9]+>                   controllers.WebsiteControllers.getCategoryValueAdmin(categoryValueId: Long)
 GET      /admin/inventorybatches/$inventoryBatchId<[0-9]+>                controllers.WebsiteControllers.getInventoryBatchAdmin(inventoryBatchId: Long)
 POST     /admin/inventorybatches/$inventoryBatchId<[0-9]+>                controllers.WebsiteControllers.postInventoryBatchAdmin(inventoryBatchId: Long)
-GET      /admin/login                                              				controllers.WebsiteControllers.getLoginAdmin
-POST     /admin/login                                              				controllers.WebsiteControllers.postLoginAdmin
-GET      /admin/orders                                             				controllers.WebsiteControllers.getOrdersAdmin
+GET      /admin/login                                                     controllers.WebsiteControllers.getLoginAdmin
+POST     /admin/login                                                     controllers.WebsiteControllers.postLoginAdmin
+GET      /admin/orders                                                    controllers.WebsiteControllers.getOrdersAdmin
 GET      /admin/orders/$orderId<[0-9]+>                                   controllers.WebsiteControllers.getOrderAdmin(orderId: Long)
 POST     /admin/orders/$orderId<[0-9]+>                                   controllers.WebsiteControllers.postOrderAdmin(orderId: Long)
 GET      /admin/products/$productId<[0-9]+>                               controllers.WebsiteControllers.getProductAdmin(productId: Long)
@@ -127,6 +130,8 @@ GET     /login                                                      controllers.
 POST    /login                                                      controllers.WebsiteControllers.postLogin
 GET     /logout                                                     controllers.WebsiteControllers.getLogout
 POST    /logout                                                     controllers.WebsiteControllers.postLogout
+GET     /stars                                                      controllers.WebsiteControllers.getMarketplaceResultPage
+##GET     /celebrities/:verticalname                                  controllers.WebsiteControllers.getMarketplaceVerticalPage(verticalname: String)
 GET     /orders/$orderId<[0-9]+>/confirm                            controllers.WebsiteControllers.getOrderConfirmation(orderId: Long)
 POST    /orders/$orderId<[0-9]+>/configure                          controllers.WebsiteControllers.postOrderPrivacy(orderId: Long)
 GET     /privacy                                                    controllers.WebsiteControllers.getPrivacy
@@ -158,7 +163,7 @@ GET     /:celebrityUrlSlug/photos/:productUrlSlug/purchase-error    controllers.
 GET     /admin/printorders                                          controllers.WebsiteControllers.getPrintOrdersAdmin
 GET     /admin/printorders/$printOrderId<[0-9]+>                    controllers.WebsiteControllers.getPrintOrderAdmin(printOrderId: Long)
 POST    /admin/printorders/$printOrderId<[0-9]+>                    controllers.WebsiteControllers.postPrintOrderAdmin(printOrderId: Long)
-POST    /:celebrityUrlSlug/:productUrlSlug/buy-demo                controllers.WebsiteControllers.postBuyDemoProduct(celebrityUrlSlug: String, productUrlSlug: String)
+POST    /:celebrityUrlSlug/:productUrlSlug/buy-demo                 controllers.WebsiteControllers.postBuyDemoProduct(celebrityUrlSlug: String, productUrlSlug: String)
 
 GET     /assets/*file                                               controllers.EgraphsAssets.at(path=controllers.EgraphsAssets.defaultPath, file)
 
