@@ -24,7 +24,7 @@ private[controllers] trait PostVideoAssetApiEndpoint { this: Controller =>
    * Posts a video asset from a celebrity.
    */
   def postVideoAsset = postApiController() {
-    httpFilters.requireAuthenticatedAccount.inMultipartRequest() { account =>
+    httpFilters.requireAuthenticatedAccount.inRequest(parse.multipartFormData) { account =>
       httpFilters.requireCelebrityId.inRequest(parse.multipartFormData) { celebrity =>
         Action(parse.multipartFormData) { request =>
 
