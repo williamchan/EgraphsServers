@@ -36,14 +36,14 @@ private[celebrity] class UpdateCatalogStarsActor @Inject()(
 ) extends Actor with Logging {
 
   import viewConverting._
-  import UpdateCatalogStarsActor.{UpdateCatalogStars, updatePeriodSeconds, resultsCacheKey}
+  import UpdateCatalogStarsActor.{UpdateCatalogStars, updatePeriod, resultsCacheKey}
 
   protected def receive = {
-    case UpdateCatalogStars(recipientActor) => {
+    case UpdateCatalogStars => {
       // Get the stars from the cache preferentially. This reduces round-trips to the database in multi-instance
       // deployments because one instance can share the results from another.
       val cache = cacheFactory.applicationCache
-      val tempCatalogStars = cache.cacheing(resultsCacheKey, updatePeriodSeconds) {
+      val tempCatalogStars = cache.cacheing(resultsCacheKey, updatePeriod.toSeconds.toInt) {
         // Due to cache miss, this instance must update from the database. Get all the stars and
         // their sold-out info.
         db.connected(isolation = TransactionSerializable, readOnly = true) {
@@ -61,17 +61,19 @@ private[celebrity] class UpdateCatalogStarsActor @Inject()(
       // Send the celebs to an actor that will be in charge of serving them to
       // the landing page.
       
-      log("Transmitting " + catalogStars.length + " stars to the serving actor " + recipientActor)
-      recipientActor ! CatalogStarsActor.SetCatalogStars(catalogStars)
+      log("Transmitting " + catalogStars.length + " stars to the agent.")
+      val catalogStarsAgent = CatalogStarsActor.singleton
+      catalogStarsAgent send catalogStars
+      catalogStarsAgent.await(10 seconds)
 
       // Send back completion. This is mostly so that the tests won't sit there waiting forever
       // for a response.
-      sender ! "Done"
+      sender ! catalogStarsAgent.get
     }
   }
 }
 
-private[mvc] object UpdateCatalogStarsActor extends Logging {
+object UpdateCatalogStarsActor extends Logging {
 
   def init() = {
     scheduleJob()
@@ -83,22 +85,23 @@ private[mvc] object UpdateCatalogStarsActor extends Logging {
   private[celebrity] val singleton = {
     Akka.system.actorOf(Props(AppConfig.instance[UpdateCatalogStarsActor])) 
   }
-  private[celebrity] val updatePeriodSeconds = 10 * DateTimeConstants.SECONDS_PER_MINUTE
+  private[celebrity] val updatePeriod = 10 minutes
   private[celebrity] val resultsCacheKey = "catalog-stars"
-  private[celebrity] case class UpdateCatalogStars(recipientActor: ActorRef)
+  private[celebrity] case class UpdateCatalogStars()
 
   //
   // Private members
   //
   private def scheduleJob() = {
     val random = new Random()
-    val delayJitter = random.nextInt() % 10 // this should make the update schedule a little more random, and if we are unlucky that all hosts update at once, they won't the next time.
-    log("Scheduling landing page celebrity update for every " + updatePeriodSeconds + "s")
+    val delayJitter = random.nextInt() % 10 seconds // this should make the update schedule a little more random, and if we are unlucky that all hosts update at once, they won't the next time.
+    val jitteredUpdatePeriod = updatePeriod + delayJitter
+    log("Scheduling landing page celebrity update for every " + jitteredUpdatePeriod.toSeconds + " seconds.")
     Akka.system.scheduler.schedule(
       10 seconds,
-      updatePeriodSeconds seconds,
+      jitteredUpdatePeriod,
       this.singleton,
-      UpdateCatalogStars(CatalogStarsActor.singleton)
+      UpdateCatalogStars
     )
   }
 }

@@ -7,8 +7,9 @@ import services.logging.Logging
 import play.api.Play.current
 import play.api.libs.concurrent.Akka
 import akka.actor.Props
+import akka.agent.Agent
 
-
+//TODO: update this comment as best as possible
 /**
  * You are probably looking for [[services.mvc.celebrity.CatalogStarsQuery]] instead of this.
  *
@@ -23,44 +24,9 @@ import akka.actor.Props
  *   CatalogStarsActor.SetCatalogStars
  *      Returns nothing, but sets the celeb catalog.
  */
-private[celebrity] class CatalogStarsActor extends Actor with Logging {
 
-  import CatalogStarsActor._
 
-  private var maybeCelebs: Option[IndexedSeq[CatalogStar]] = None
-
-  protected def receive = {
-    case GetCatalogStars =>
-      sender ! maybeCelebs
-
-    case SetCatalogStars(newCelebs) =>
-      log("Setting " + newCelebs.length + " new landing page celebs")
-      maybeCelebs = Some(newCelebs)
-  }
-}
-
-private[mvc] object CatalogStarsActor {
-  val singleton = Akka.system.actorOf(Props[CatalogStarsActor])
-
-  //
-  // Package members
-  //
-  private[celebrity] sealed trait CatalogStarsActorMessage
-
-  /**
-   * Message that returns the cached [[models.frontend.landing.CatalogStar]]s. See
-   * class documentation for how it's used.
-   */
-  private[celebrity] case object GetCatalogStars extends CatalogStarsActorMessage
-
-  /**
-   * Message that sets new [[models.frontend.landing.CatalogStar]]s in the cache. See
-   * class documentation for how it's used. Primarily this is issued by
-   * [[services.mvc.celebrity.UpdateCatalogStarsActor]]
-   *
-   * @param newCelebs the stars that should be set into the cache.
-   */
-  private[celebrity] case class SetCatalogStars(newCelebs: IndexedSeq[CatalogStar])
-    extends CatalogStarsActorMessage
-
+//TODO: rename to CatalogStarsAgent
+object CatalogStarsActor {
+  val singleton = Agent(IndexedSeq.empty[CatalogStar])(Akka.system)
 }

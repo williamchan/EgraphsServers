@@ -35,7 +35,6 @@ object Global extends GlobalSettings with Logging {
         log("Bootstrapping application")
 
         // Initialize payment system
-        
         payment.bootstrap()
 
         // Initialize Squeryl persistence
@@ -58,6 +57,9 @@ object Global extends GlobalSettings with Logging {
             configProxy.blobstoreVendor == "filesystem") {
           TestModeBootstrap.run()
         }
+
+        // Schedule catalog stars updating
+        UpdateCatalogStarsActor.init()
       }
       log("Finished bootstrapping application in " + secondsToBootstrap + "s")
     }
@@ -66,6 +68,7 @@ object Global extends GlobalSettings with Logging {
   override def onStop(app: Application) {
     services.cache.JedisFactory.shutDown()
     SSLConfig.disableCustomTrustore()
+    CatalogStarsActor.singleton.close()
   }
   
   /**

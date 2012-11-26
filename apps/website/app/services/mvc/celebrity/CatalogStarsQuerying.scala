@@ -4,11 +4,12 @@ import akka.actor.ActorRef
 import akka.pattern.ask
 import models.frontend.landing.CatalogStar
 import services.mvc.celebrity.UpdateCatalogStarsActor.UpdateCatalogStars
-import services.mvc.celebrity.CatalogStarsActor.GetCatalogStars
 import akka.util.duration._
 import akka.util.Timeout
 import akka.dispatch.Await
+import akka.agent.Agent
 import services.logging.Logging
+import models.frontend.landing.CatalogStar
 
 /**
  * Defines the behavior of using two actors to keep a current cache of the
@@ -16,10 +17,11 @@ import services.logging.Logging
  * query that cache.
  */
 private[celebrity] trait CatalogStarsQuerying extends Logging {
-  protected def catalogStarActor: ActorRef
+  //TODO: RENAME THIS TO AGENT
+  protected def catalogStarActor: Agent[IndexedSeq[CatalogStar]]
   protected def catalogStarUpdateActor: ActorRef
   
-  val timeout = Timeout(30.seconds)
+  val timeout = Timeout(30 seconds)
 
   /**
    * Grabs the current set of CatalogStars out of the cache actor, and updates
@@ -30,45 +32,34 @@ private[celebrity] trait CatalogStarsQuerying extends Logging {
    *
    * @return the current set of stars for rendering in the celebrity catalog.
    */
-  def apply(numUpdateAttempts: Int = 1): IndexedSeq[CatalogStar] = {
-    val futureStars = for(maybeStars <- catalogStarActor.ask(GetCatalogStars)(timeout)) yield {
-      maybeStars match {
-        // Some stars had already been cached. This should almost always be the case.
-        case Some(stars: IndexedSeq[_]) => {
-          stars.asInstanceOf[IndexedSeq[CatalogStar]]
-        }
-
-        // No stars had been cached. This will only happen right after an instance comes up.
-        // We will instruct the update actor to provide some data immediately, block on receiving
-        // a response, then re-query from the CatalogStars actor.
-        case None =>
-          if (numUpdateAttempts > 0) {
-            val futureOK = catalogStarUpdateActor.ask(UpdateCatalogStars(catalogStarActor))(timeout)
-  
-            Await.result(futureOK, 10.minutes)
-  
-            this.apply(numUpdateAttempts = numUpdateAttempts - 1)
-          } else {
-            log("Repeatedly failed to get landing page celebrities.")
-            IndexedSeq.empty[CatalogStar]
-          }
-  
-        // wtf why would it give us something besides an IndexedSeq[CatalogStar]?
-        case Some(otherType) =>
-          throw new Exception(
-            "Unexpected response from CatalogStarsActor: " + otherType
-          )
-      }
-    }
-    
-    // TODO: PLAY20 migration.... There must be a nicer way to use Await.result without having to catch exceptions.
-    try {
-      Await.result(futureStars, 10.minutes) // this throws [AskTimeoutException: Timed out]
-    } catch {
-      case e: Exception => {
-        log("CatalogStarsQuerying threw exception: " + e.getStackTraceString)
+  def apply(numUpdateAttemptsLeft: Int = 1): IndexedSeq[CatalogStar] = {
+    val stars = CatalogStarsActor.singleton.get
+    // No stars had been cached. This will only happen right after an instance comes up.
+    // We will instruct the update actor to provide some data immediately, block on receiving
+    // a response, then re-query from the CatalogStars actor.
+    if (stars.isEmpty) {
+      if (shouldStopAttempting(numUpdateAttemptsLeft)) {
+        log("Repeatedly failed to get landing page celebrities.")
         IndexedSeq.empty[CatalogStar]
+      } else {
+        getUpdatedCatalogStars(numUpdateAttemptsLeft)
       }
+    } else {
+      stars
+    }
+  }
+
+  private def shouldStopAttempting(numUpdateAttemptsLeft: Int) = (numUpdateAttemptsLeft <= 0)
+
+  private def getUpdatedCatalogStars(numUpdateAttemptsLeft: Int): IndexedSeq[CatalogStar] = {
+    val futureOK = catalogStarUpdateActor.ask(UpdateCatalogStars)(timeout)
+
+    Await.result(futureOK, 1 minutes)
+    val newStars = CatalogStarsActor.singleton.get
+    if (newStars.isEmpty) {
+      this.apply(numUpdateAttemptsLeft - 1)
+    } else {
+      newStars
     }
   }
 }
