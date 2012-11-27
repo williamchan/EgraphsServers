@@ -13,10 +13,7 @@ object ToyBoxSampleBuild extends Build {
 
   // From squeryl.org/getting-started.html
     
-  val appDependencies = Seq(
-    "play" %% "play" % PlayVersion.current,    
-    "play" %% "play-test" % PlayVersion.current % "test"
-  )
+  val appDependencies = Seq()
 
   val main = PlayProject(
     appName, 
