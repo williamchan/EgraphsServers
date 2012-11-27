@@ -9,40 +9,48 @@ import play.api.test._
 import controllers._
 import controllers.ToyBoxConfigKeys._
 
-object TBMocks {
+object TBFakes {
   val loginPath = "/login"
-  val loginAssetsPath = "/assets/toybox-assets"
+  val loginAssetsPath = "/assets/toybox-assets/"
+
+  val correctUsername = "foo"
+  val incorrectUsername = "fOoOo"
+  val correctPassword = "bar"
+  val incorrectPassword = "bArRr"
 
   val fakeApp = new FakeApplication(
     additionalConfiguration = Map(
-      usrKey         -> "username",
-      pwdKey         -> "password",
+      userKey -> correctUsername,
+      passwordKey -> correctPassword,
       initRequestKey -> "toybox-initialRequest",
-      authCookieKey  -> "toybox-authenticated",
-      authTimeoutKey -> (19*60 toString)
+      authCookieKey -> "toybox-authenticated",
+      authTimeoutInSecondsKey -> (19*60 toString)
     )
   )
 
 
-  // Mock ToyBox
+  // Fake ToyBox
   object FakeToyBox extends ToyBox {
     val maybeGetLoginRoute  = Some(new Call("GET", loginPath))
     val maybePostLoginRoute = Some(new Call("POST", loginPath))
+    val maybeAssetsRoute = Some( { file: String =>
+      new Call("GET", loginAssetsPath + file)
+    })
 
-    // mocking up a subconfiguration is tedious, overriding config base/root is 
+    // fakeing up a subconfiguration is tedious, overriding config base/root is 
     // virtually the same since there are no other unexpected configurations present 
     override lazy val config = fakeApp.configuration
     override def normalRouteRequestHandler: RequestHeader => Option[Handler] = {
       (request: RequestHeader) => Some(Action{Ok("fake normal route request")})
     }
 
-    // expose cookies making methods for mocking requests
+    // expose cookies making methods for fakeing requests
     def authCookie(req: RequestHeader)        = makeAuthCookie(req)
     def initRequestCookie(req: RequestHeader) = makeInitialRequestCookie(req)
   }
 
 
-  // Mock requests
+  // Fake requests
   val requestedPath    = "/foobar"
   val blankGetRequest  = FakeRequest("GET", requestedPath)
   val blankPostRequest = FakeRequest("POST", requestedPath)
@@ -50,17 +58,23 @@ object TBMocks {
   val getLoginAssetRequest = FakeRequest("GET", loginAssetsPath + "/someAsset")
   val getLoginRequest = FakeRequest("GET", FakeToyBox.getLoginRoute.url)
   val blankPostLogin  = FakeRequest("POST", loginPath)
-  val succPostLogin   = blankPostLogin.withFormUrlEncodedBody("username" -> "username", "password" -> "password")
-  val failPostLogin   = blankPostLogin.withFormUrlEncodedBody("username" -> "wrongusername", "password" -> "wrongpassword")
+  val succPostLogin   = blankPostLogin.withFormUrlEncodedBody(
+    "username" -> correctUsername, 
+    "password" -> correctPassword
+  )
+  val failPostLogin   = blankPostLogin.withFormUrlEncodedBody(
+    "username" -> incorrectUsername, 
+    "password" -> incorrectPassword
+  )
 
 
-  // Mock cookies
+  // Fake cookies
   def authCookie = FakeToyBox.authCookie(blankPostRequest)
   def initCookie = FakeToyBox.initRequestCookie(blankGetRequest)
   def initCookiePath = initCookie.value.dropWhile(_ != '/') // path of initial request, not cookie.path
 
 
-  // Helpers for adding mock cookies to requests
+  // Helpers for adding fake cookies to requests
   def authenticated(req: FakeRequest[AnyContent]) = req.withCookies(authCookie)
   def withInit[T <: AnyContent](req: FakeRequest[T]): FakeRequest[T] = 
     req.withCookies(initCookie)
