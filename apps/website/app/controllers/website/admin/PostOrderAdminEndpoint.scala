@@ -86,7 +86,7 @@ trait PostOrderAdminEndpoint { this: Controller =>
                     }
 
                     maybeOk.getOrElse(BadRequest(
-                      Html("<html><body>Provided email" + newRecipientEmail + " doesn't correspond to a customer account.</body></html>")
+                      Html("<html><body>Provided email " + newRecipientEmail + " doesn't correspond to a customer account.</body></html>")
                     ))
                   }
                 )
