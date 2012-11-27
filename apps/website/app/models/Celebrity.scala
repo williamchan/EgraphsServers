@@ -295,8 +295,8 @@ case class Celebrity(id: Long = 0,
     val appDownloadLink = services.consumerApp.getIOSClient(redirectToItmsLink=true).url
     services.transactionalMail.send(
       email, 
-      text=Some(celebrity_welcome_email_text(publicName, account.email).toString), 
-      html=Some(celebrity_welcome_email(publicName, account.email, appDownloadLink)) 
+      text=Some(celebrity_welcome_email_text(publicName, account.email, appDownloadLink).toString),
+      html=Some(celebrity_welcome_email(publicName, account.email, appDownloadLink))
     )
   }
 
