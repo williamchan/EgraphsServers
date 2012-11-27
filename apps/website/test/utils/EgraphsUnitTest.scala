@@ -37,11 +37,13 @@ trait EgraphsUnitTest extends FlatSpec
    * This will allow you to use an agent in an operation from the provided factory that
    * will be closed when the operation is done.
    */
-  def withAgent[T, O](agentFactory: => Agent[T])(operation: Agent[T] => O) {
+  def withAgent[T, O](agentFactory: => Agent[T])(operation: Agent[T] => O): O = {
     val agent = agentFactory
     try {
+      println("AHHHHHHHHHHHHHHHhh  4 " + agent())
       operation(agent)
     } finally {
+      println("Agent closing ")
       agent.close()
     }
   }

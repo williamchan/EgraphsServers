@@ -31,11 +31,20 @@ private[celebrity] trait CatalogStarsQuerying extends Logging {
    * @return the current set of stars for rendering in the celebrity catalog.
    */
   def apply(numUpdateAttemptsLeft: Int = 1): IndexedSeq[CatalogStar] = {
+    println("AHHHHHHHHHHHHHHHhh  8 ")
+
+    import akka.util.Timeout
+
+    implicit val timeout = Timeout(5 seconds)
+    val result = catalogStarAgent.await
+    println("AHHHHHHHHHHHHHHHhh  8.1 " + result)
     val stars = catalogStarAgent.get
+    println("AHHHHHHHHHHHHHHHhh  9")
     // No stars had been cached. This will only happen right after an instance comes up.
     // We will instruct the update actor to provide some data immediately, block on receiving
     // a response, then re-query from the CatalogStars actor.
     if (stars.isEmpty) {
+      println("AHHHHHHHHHHHHHHHhh  10.1")
       if (shouldStopAttempting(numUpdateAttemptsLeft)) {
         log("Repeatedly failed to get landing page celebrities.")
         IndexedSeq.empty[CatalogStar]
@@ -43,6 +52,7 @@ private[celebrity] trait CatalogStarsQuerying extends Logging {
         getUpdatedCatalogStars(numUpdateAttemptsLeft)
       }
     } else {
+      println("AHHHHHHHHHHHHHHHhh  10.2")
       stars
     }
   }
