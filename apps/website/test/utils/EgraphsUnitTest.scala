@@ -14,6 +14,7 @@ import play.api.test._
 import play.api.test.Helpers._
 import java.io.File
 import services.logging.Logging
+import services.mvc.celebrity.CatalogStarsTestUtil
 
 /**
  * Convenience method provides most generally used traits for a scalatest
@@ -71,8 +72,7 @@ object EgraphsUnitTest extends Logging {
     }
 
     val root = recursivelyFindProjectRoot(resourceFile("local.conf"))
-        
-    
+
     root
   }
 }
