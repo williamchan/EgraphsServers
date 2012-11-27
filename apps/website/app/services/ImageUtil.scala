@@ -90,10 +90,6 @@ import models.ImageAsset.ImageType
 
     ret
   }
-  /**
-   * @return
-   */
-
 
   /**
    * Scales image to target width, keeping the original aspect ratio the same. Can also upscale.

@@ -86,7 +86,7 @@ case class Egraph(
   private def framedPrintBlobKey = blobKeyBase + "/framed-print/" + framedPrintVersion + "/" + framedPrintFilename
   def framedPrintFilename = "order" + orderId + ".jpg" // this cannot change it is linked to printer specifications
 
-  private def standaloneCertPrintVersion = "v" + LandscapeFramedPrint.currentVersion
+  private def standaloneCertPrintVersion = "v" + StandaloneCertificatePrint.currentVersion
   private def standaloneCertPrintBlobKey = blobKeyBase + "/certificate/" + standaloneCertPrintVersion + "/" + standaloneCertPrintFilename
   def standaloneCertPrintFilename = "order" + orderId + "-cert.jpg"
 
