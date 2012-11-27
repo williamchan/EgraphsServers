@@ -1,19 +1,23 @@
 package services.mvc.celebrity
 
-import akka.actor.{ActorRef, Actor}
-import com.google.inject.Inject
-import services.AppConfig
-import java.util.concurrent.TimeUnit
 import java.util.Random
-import services.logging.Logging
-import services.db.{TransactionSerializable, DBSession}
-import services.cache.CacheFactory
-import play.api.Play.current
+
+import com.google.inject.Inject
+
+import akka.actor.Actor
+import akka.actor.ActorRef
 import akka.actor.Props
-import play.api.libs.concurrent.Akka
+import akka.agent.Agent
 import akka.util.duration._
-import org.joda.time.DateTimeConstants
-import models.{CelebrityStore, ProductStore}
+import models.CelebrityStore
+import models.frontend.landing.CatalogStar
+import play.api.Play.current
+import play.api.libs.concurrent.Akka
+import services.cache.CacheFactory
+import services.db.DBSession
+import services.db.TransactionSerializable
+import services.logging.Logging
+import services.AppConfig
 
 /**
  * You are probably looking for [[services.mvc.celebrity.CatalogStarsQuery]] instead of this.
@@ -39,7 +43,7 @@ private[celebrity] class UpdateCatalogStarsActor @Inject()(
   import UpdateCatalogStarsActor.{UpdateCatalogStars, updatePeriod, resultsCacheKey}
 
   protected def receive = {
-    case UpdateCatalogStars => {
+    case UpdateCatalogStars(catalogStarsAgent) => {
       // Get the stars from the cache preferentially. This reduces round-trips to the database in multi-instance
       // deployments because one instance can share the results from another.
       val cache = cacheFactory.applicationCache
@@ -62,7 +66,6 @@ private[celebrity] class UpdateCatalogStarsActor @Inject()(
       // the landing page.
       
       log("Transmitting " + catalogStars.length + " stars to the agent.")
-      val catalogStarsAgent = CatalogStarsAgent.singleton
       catalogStarsAgent send catalogStars
       catalogStarsAgent.await(10 seconds)
 
@@ -83,11 +86,11 @@ object UpdateCatalogStarsActor extends Logging {
   // Package members
   //
   private[celebrity] val singleton = {
-    Akka.system.actorOf(Props(AppConfig.instance[UpdateCatalogStarsActor])) 
+    Akka.system.actorOf(Props(AppConfig.instance[UpdateCatalogStarsActor]))
   }
-  private[celebrity] val updatePeriod = 10 minutes
+  private[celebrity] val updatePeriod = 2 minutes
   private[celebrity] val resultsCacheKey = "catalog-stars"
-  private[celebrity] case class UpdateCatalogStars()
+  private[celebrity] case class UpdateCatalogStars(catalogStarsAgent: Agent[IndexedSeq[CatalogStar]])
 
   //
   // Private members

@@ -1,26 +1,30 @@
 package services.mvc.celebrity
 
-import utils.{ClearsCacheAndBlobsAndValidationBefore, TestHelpers, EgraphsUnitTest}
-import services.db.DBSession
-import models.{Celebrity, CelebrityStore}
-import services.cache.{NamespacedCache, CacheFactory}
-import TestHelpers.withActorUnderTest
-import com.google.inject.Inject
-import services.AppConfig
-import akka.actor.ActorRef
-import models.frontend.landing.CatalogStar
-import org.specs2.mock.Mockito
-import services.mvc.celebrity.UpdateCatalogStarsActor.UpdateCatalogStars
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import akka.pattern.ask
+import org.specs2.mock.Mockito
+import com.google.inject.Inject
+import akka.actor.ActorRef
+import akka.agent.Agent
 import akka.dispatch.Await
+import akka.pattern.ask
 import akka.util.duration._
 import akka.util.Timeout
-import utils.CatalogStarsAgentClearedBeforeTests
+import models.frontend.landing.CatalogStar
+import models.CelebrityStore
+import services.cache.CacheFactory
+import services.cache.NamespacedCache
+import services.db.DBSession
+import services.mvc.celebrity.UpdateCatalogStarsActor.UpdateCatalogStars
+import services.AppConfig
+import utils.TestHelpers.withActorUnderTest
+import utils.ClearsCacheAndBlobsAndValidationBefore
+import utils.EgraphsUnitTest
+import utils.TestHelpers
+import play.api.libs.concurrent.Akka
 
 @RunWith(classOf[JUnitRunner])
-class UpdateCatalogStarsActorTests extends EgraphsUnitTest with CatalogStarsAgentClearedBeforeTests {
+class UpdateCatalogStarsActorTests extends EgraphsUnitTest {
   implicit val timeout: Timeout = 5 seconds
 
   import UpdateCatalogStarsActorTests.Dependencies
@@ -63,9 +67,11 @@ class UpdateCatalogStarsActorTests extends EgraphsUnitTest with CatalogStarsAgen
   {
     withUpdateCatalogStarsActorAndRecipient(deps) {
       (actor) =>
-        Await.result(actor ask UpdateCatalogStars, 5 seconds)
+        withAgent(Agent(IndexedSeq.empty[CatalogStar])(Akka.system)) { catalogStarsAgent =>
+          Await.result(actor ask UpdateCatalogStars(catalogStarsAgent), 5 seconds)
 
-        CatalogStarsAgent.singleton.get should be(stars)
+          catalogStarsAgent.get should be(stars)
+        }
     }
   }
 

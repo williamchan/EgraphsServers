@@ -16,10 +16,10 @@ import services.mvc.celebrity.UpdateCatalogStarsActor.UpdateCatalogStars
  * query that cache.
  */
 private[celebrity] trait CatalogStarsQuerying extends Logging {
-  //TODO: RENAME THIS TO AGENT
+  protected def catalogStarAgent: Agent[IndexedSeq[CatalogStar]]
   protected def catalogStarUpdateActor: ActorRef
-  
-  val timeout = Timeout(30 seconds)
+
+  implicit val timeout = Timeout(30 seconds)
 
   /**
    * Grabs the current set of CatalogStars out of the cache actor, and updates
@@ -31,7 +31,7 @@ private[celebrity] trait CatalogStarsQuerying extends Logging {
    * @return the current set of stars for rendering in the celebrity catalog.
    */
   def apply(numUpdateAttemptsLeft: Int = 1): IndexedSeq[CatalogStar] = {
-    val stars = CatalogStarsAgent.singleton.get
+    val stars = catalogStarAgent.get
     // No stars had been cached. This will only happen right after an instance comes up.
     // We will instruct the update actor to provide some data immediately, block on receiving
     // a response, then re-query from the CatalogStars actor.
@@ -50,10 +50,10 @@ private[celebrity] trait CatalogStarsQuerying extends Logging {
   private def shouldStopAttempting(numUpdateAttemptsLeft: Int) = (numUpdateAttemptsLeft <= 0)
 
   private def getUpdatedCatalogStars(numUpdateAttemptsLeft: Int): IndexedSeq[CatalogStar] = {
-    val futureOK = catalogStarUpdateActor.ask(UpdateCatalogStars)(timeout)
+    val futureOK = catalogStarUpdateActor ask UpdateCatalogStars(catalogStarAgent)
 
     Await.result(futureOK, 1 minutes)
-    val newStars = CatalogStarsAgent.singleton.get
+    val newStars = catalogStarAgent.get
     if (newStars.isEmpty) {
       this.apply(numUpdateAttemptsLeft - 1)
     } else {
