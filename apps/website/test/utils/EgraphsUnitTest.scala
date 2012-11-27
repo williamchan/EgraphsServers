@@ -40,10 +40,8 @@ trait EgraphsUnitTest extends FlatSpec
   def withAgent[T, O](agentFactory: => Agent[T])(operation: Agent[T] => O): O = {
     val agent = agentFactory
     try {
-      println("AHHHHHHHHHHHHHHHhh  4 " + agent())
       operation(agent)
     } finally {
-      println("Agent closing ")
       agent.close()
     }
   }
