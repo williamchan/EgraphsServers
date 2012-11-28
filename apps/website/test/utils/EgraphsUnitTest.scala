@@ -3,6 +3,7 @@ package utils
 import org.specs2.mock.Mockito
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
+import akka.agent.Agent
 import play.api.mvc.Session
 import com.typesafe.config.ConfigFactory
 import play.api.Play
@@ -30,6 +31,19 @@ trait EgraphsUnitTest extends FlatSpec
   trait EgraphsTestApplication {
     implicit val app: Application = EgraphsUnitTest.runApp()
     def resourceFile(resource: String): File = EgraphsUnitTest.resourceFile(resource)
+  }
+
+  /**
+   * This will allow you to use an agent in an operation from the provided factory that
+   * will be closed when the operation is done.
+   */
+  def withAgent[T, O](agentFactory: => Agent[T])(operation: Agent[T] => O): O = {
+    val agent = agentFactory
+    try {
+      operation(agent)
+    } finally {
+      agent.close()
+    }
   }
 }
 
@@ -71,8 +85,7 @@ object EgraphsUnitTest extends Logging {
     }
 
     val root = recursivelyFindProjectRoot(resourceFile("local.conf"))
-        
-    
+
     root
   }
 }
