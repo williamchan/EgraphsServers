@@ -192,6 +192,7 @@ object ImageUtil extends ImageUtil {
     val ios = new MemoryCacheImageOutputStream(bytesOut)
     writer.setOutput(ios)
     writer.write(null, new IIOImage(image, null, null), iwp)
+    ios.close()
     bytesOut.toByteArray
   }
 
@@ -215,6 +216,7 @@ object ImageUtil extends ImageUtil {
       def asByteArray(imageType: ImageAsset.ImageType) = {
         val bytesOut = new ByteArrayOutputStream()
         ImageIO.write(img, imageType.extension, bytesOut)
+        bytesOut.close()
         bytesOut.toByteArray
       }
     }
