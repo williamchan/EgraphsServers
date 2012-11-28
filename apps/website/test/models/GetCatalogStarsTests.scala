@@ -1,13 +1,10 @@
 package models
 
-import enums.{PublishedStatus, HasPublishedStatusTests}
+import enums.PublishedStatus
 import java.util.Date
-import services.Time
 import services.AppConfig
 import utils._
 import org.joda.time.DateTimeConstants
-import play.api.Play
-import services.db.Schema
 
 class GetCatalogStarsTests extends EgraphsUnitTest
   with DBTransactionPerTest
@@ -103,5 +100,28 @@ class GetCatalogStarsTests extends EgraphsUnitTest
     celebrityNamesInCatalogStars should contain ((unavailableProduct1.celebrity.publicName, false))
     celebrityNamesInCatalogStars should contain ((unavailableProduct2.celebrity.publicName, false))
     celebrityNamesInCatalogStars should contain ((unavailableProduct3.celebrity.publicName, false))
+  }
+
+  it should "show whether a celebrity has inventory based on current inventory batches" in new EgraphsTestApplication {
+    // Celebrity with current inventory batch, and previous inventory batch with full orders
+    val celebrity = TestData.newSavedCelebrity()
+    val product = TestData.newSavedProductWithoutInventoryBatch(celebrity = Some(celebrity))
+
+    // Create a completed used inventory batch that is in the past
+    val pastIB = TestData.newSavedInventoryBatch(product).copy(numInventory = 5).save()
+    for (i <- 0 until pastIB.numInventory) {
+      TestData.newSavedOrder(Some(product))
+    }
+    pastIB.copy(startDate = TestData.jan_01_2012, endDate = TestData.feb_01_2012).save()
+
+    // Create a current, partially used inventory batch
+    TestData.newSavedInventoryBatch(product).copy(numInventory = 2).save()
+    TestData.newSavedOrder(Some(product))
+
+    celebrityStore.getCatalogStars.find(star => star.id == celebrity.id).get.hasInventoryRemaining should be(true)
+
+    // Now making that current inventory batch fully used
+    TestData.newSavedOrder(Some(product))
+    celebrityStore.getCatalogStars.find(star => star.id == celebrity.id).get.hasInventoryRemaining should be(false)
   }
 }
