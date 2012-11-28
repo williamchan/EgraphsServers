@@ -1,14 +1,15 @@
 package services.mvc.celebrity
 
 import java.util.Random
-
 import com.google.inject.Inject
-
 import akka.actor.Actor
 import akka.actor.ActorRef
 import akka.actor.Props
 import akka.agent.Agent
+import akka.dispatch.Await
 import akka.util.duration._
+import akka.util.Timeout
+import akka.pattern.ask
 import models.CelebrityStore
 import models.frontend.landing.CatalogStar
 import play.api.Play.current
@@ -92,19 +93,24 @@ object UpdateCatalogStarsActor extends Logging {
   private[celebrity] val resultsCacheKey = "catalog-stars"
   private[celebrity] case class UpdateCatalogStars(catalogStarsAgent: Agent[IndexedSeq[CatalogStar]])
 
+  implicit val timeout: Timeout = 2 minutes
+
   //
   // Private members
   //
   private def scheduleJob() = {
+    //run once then schedule    
+    Await.result(this.singleton ask UpdateCatalogStars(CatalogStarsAgent.singleton), 2 minutes)
+
     val random = new Random()
     val delayJitter = random.nextInt() % 10 seconds // this should make the update schedule a little more random, and if we are unlucky that all hosts update at once, they won't the next time.
     val jitteredUpdatePeriod = updatePeriod + delayJitter
     log("Scheduling landing page celebrity update for every " + jitteredUpdatePeriod.toSeconds + " seconds.")
     Akka.system.scheduler.schedule(
-      10 seconds,
+      jitteredUpdatePeriod,
       jitteredUpdatePeriod,
       this.singleton,
-      UpdateCatalogStars
+      UpdateCatalogStars(CatalogStarsAgent.singleton)
     )
   }
 }
