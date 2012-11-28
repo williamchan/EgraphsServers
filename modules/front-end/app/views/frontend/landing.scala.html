@@ -7,7 +7,7 @@
 
 @**   Consumer landing page
 
-      stars - the list of all publicly-discoverable celebrities.
+      stars - the list of all featured stars celebrities.
 *@
 
 @import models.frontend.landing.CatalogStar
@@ -65,7 +65,7 @@
 
         <footer id="landing-stars">
           <h3><a href="#featured-stars">Featured Stars <span>+</span></a></h3>
-          @starsBlock(stars.filter(star => star.isFeatured), clearFix=true)
+          @starsBlock(stars, clearFix=true)
         </footer> <!-- end #landing-stars -->
 
         @tags.landing.welcome_header()
