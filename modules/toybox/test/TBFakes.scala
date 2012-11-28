@@ -10,8 +10,8 @@ import controllers._
 import controllers.ToyBoxConfigKeys._
 
 object TBFakes {
-  val loginPath = "/login"
-  val loginAssetsPath = "/assets/toybox-assets/"
+  val loginPath = "/path/to/login"
+  val assetsPath = "/path/to/assets/"
 
   val correctUsername = "foo"
   val incorrectUsername = "fOoOo"
@@ -34,7 +34,7 @@ object TBFakes {
     val maybeGetLoginRoute  = Some(new Call("GET", loginPath))
     val maybePostLoginRoute = Some(new Call("POST", loginPath))
     val maybeAssetsRoute = Some( { file: String =>
-      new Call("GET", loginAssetsPath + file)
+      new Call("GET", assetsPath + file)
     })
 
     // fakeing up a subconfiguration is tedious, overriding config base/root is 
@@ -55,7 +55,8 @@ object TBFakes {
   val blankGetRequest  = FakeRequest("GET", requestedPath)
   val blankPostRequest = FakeRequest("POST", requestedPath)
 
-  val getLoginAssetRequest = FakeRequest("GET", loginAssetsPath + "/someAsset")
+  val getLoginAssetRequest = FakeRequest("GET", 
+    assetsPath + FakeToyBox.toyboxAssetsDirectory + "/someAsset")
   val getLoginRequest = FakeRequest("GET", FakeToyBox.getLoginRoute.url)
   val blankPostLogin  = FakeRequest("POST", loginPath)
   val succPostLogin   = blankPostLogin.withFormUrlEncodedBody(

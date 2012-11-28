@@ -34,7 +34,8 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
 
   // Routes
   val defaultLoginPath = "/toybox/login"
-  val defaultAssetsPath = "/assets/toybox-assets/"
+  val defaultAssetsPath = "/assets/"
+  val toyboxAssetsDirectory = "toybox-assets/"
   lazy val getLoginRoute  = maybeGetLoginRoute.getOrElse(new Call("GET", defaultLoginPath))
   lazy val postLoginRoute = maybePostLoginRoute.getOrElse(new Call("POST", defaultLoginPath))
   lazy val assetsRoute = maybeAssetsRoute.getOrElse({ (file: String) => 
@@ -63,7 +64,8 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
       { (request: RequestHeader) => request.method.toLowerCase == "post" && 
           request.path.startsWith(postLoginRoute.url) }, 
 
-      { (request: RequestHeader) => request.path.startsWith("/assets/toybox-assets") }
+      { (request: RequestHeader) => 
+        request.path.startsWith(assetsRoute(toyboxAssetsDirectory).url) }
     )
 
   
