@@ -1,22 +1,34 @@
-import org.squeryl.{Session, SessionFactory}
-import io.Source
-import java.io.{File, PrintWriter}
-import play.api.{Application, GlobalSettings, Play}
-import play.api.mvc.{Result, RequestHeader}
-import play.api.mvc.Results._
-import play.api.Play.current
-import services.blobs.Blobs
-import services.payment.Payment
+import java.io.File
+import java.io.PrintWriter
 import java.sql.Connection
-import services.logging.{Logging, LoggingContext}
+import scala.io.Source
+import org.squeryl.Session
+import org.squeryl.SessionFactory
+import models.Account
+import models.AccountStore
+import models.Administrator
+import play.api.Play.current
+import play.api.mvc.Results._
+import play.api.mvc.RequestHeader
+import play.api.mvc.Result
+import play.api.Application
+import play.api.GlobalSettings
+import play.api.Play
+import services.blobs.Blobs
 import services.config.ConfigFileProxy
-import services.{AppConfig, Utils, TempFile, Time}
-import services.db.{TransactionSerializable, Schema, DBSession}
-import models.{AccountStore, Account, Administrator}
-import services.mvc.celebrity.{CatalogStarsActor, UpdateCatalogStarsActor}
-import services.http.{PlayId, SSLConfig}
-import javax.net.ssl.{SSLContext, TrustManagerFactory}
-import java.security.KeyStore
+import services.db.DBSession
+import services.db.Schema
+import services.db.TransactionSerializable
+import services.http.SSLConfig
+import services.logging.Logging
+import services.logging.LoggingContext
+import services.mvc.celebrity.UpdateCatalogStarsActor
+import services.payment.Payment
+import services.AppConfig
+import services.TempFile
+import services.Time
+import services.Utils
+import services.mvc.celebrity.CatalogStarsAgent
 
 object Global extends GlobalSettings with Logging {
   
@@ -35,7 +47,6 @@ object Global extends GlobalSettings with Logging {
         log("Bootstrapping application")
 
         // Initialize payment system
-        
         payment.bootstrap()
 
         // Initialize Squeryl persistence
@@ -58,6 +69,9 @@ object Global extends GlobalSettings with Logging {
             configProxy.blobstoreVendor == "filesystem") {
           TestModeBootstrap.run()
         }
+
+        // Schedule catalog stars updating
+        UpdateCatalogStarsActor.init()
       }
       log("Finished bootstrapping application in " + secondsToBootstrap + "s")
     }
@@ -66,6 +80,7 @@ object Global extends GlobalSettings with Logging {
   override def onStop(app: Application) {
     services.cache.JedisFactory.shutDown()
     SSLConfig.disableCustomTrustore()
+    CatalogStarsAgent.singleton.close()
   }
   
   /**
