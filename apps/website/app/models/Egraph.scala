@@ -18,13 +18,10 @@ import java.text.SimpleDateFormat
 import com.google.inject.{Provider, Inject}
 import org.apache.commons.lang3.StringEscapeUtils.escapeHtml4
 import org.squeryl.Query
-import print.LandscapeFramedPrint
+import print.{StandaloneCertificatePrint, LandscapeFramedPrint}
 import xyzmo.{XyzmoVerifyUserStore, XyzmoVerifyUser}
 import controllers.website.consumer.{StorefrontChoosePhotoConsumerEndpoints, CelebrityLandingConsumerEndpoint}
 import java.util.Date
-import java.io.ByteArrayOutputStream
-import javax.imageio.{IIOImage, ImageWriteParam, ImageIO}
-import javax.imageio.stream.MemoryCacheImageOutputStream
 
 /**
  * Vital services for an Egraph to perform its necessary functionality
@@ -88,6 +85,10 @@ case class Egraph(
   private def framedPrintVersion = "v" + LandscapeFramedPrint.currentVersion
   private def framedPrintBlobKey = blobKeyBase + "/framed-print/" + framedPrintVersion + "/" + framedPrintFilename
   def framedPrintFilename = "order" + orderId + ".jpg" // this cannot change it is linked to printer specifications
+
+  private def standaloneCertPrintVersion = "v" + StandaloneCertificatePrint.currentVersion
+  private def standaloneCertPrintBlobKey = blobKeyBase + "/certificate/" + standaloneCertPrintVersion + "/" + standaloneCertPrintFilename
+  def standaloneCertPrintFilename = "order" + orderId + "-cert.jpg"
 
   //
   // Public methods
@@ -221,19 +222,36 @@ case class Egraph(
           egraphUrl = "https://www.egraphs.com/" + orderId
         )
 
-        // The following code is needed to set compression quality to 1 on the created JPG for print quality.
-        // TODO(wchan): Refactor into ImageUtil.Conversions._
-        val writer = ImageIO.getImageWritersByFormatName(ImageAsset.Jpeg.extension).next()
-        val iwp = writer.getDefaultWriteParam
-        iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT)
-        iwp.setCompressionQuality(1.0f)
-        val bytesOut = new ByteArrayOutputStream()
-        val ios = new MemoryCacheImageOutputStream(bytesOut)
-        writer.setOutput(ios)
-        writer.write(null, new IIOImage(framedPrintImage, null, null), iwp)
-
-        services.blobs.put(key = framedPrintBlobKey, bytes = bytesOut.toByteArray, AccessPolicy.Public)
+        services.blobs.put(key = framedPrintBlobKey, bytes = ImageUtil.getBytes(framedPrintImage), AccessPolicy.Public)
         services.blobs.getUrl(framedPrintBlobKey)
+      }
+    }
+  }
+
+  /**
+   * @return url of stand-alone certificate of authenticity JPG, if it was successfully or previously generated
+   */
+  def getStandaloneCertificateUrl: String = {
+    services.blobs.getUrlOption(standaloneCertPrintBlobKey) match {
+      case Some(url) => url
+      case None => {
+        val thisOrder = order
+        val product = thisOrder.product
+        val celebrity = product.celebrity
+
+        val standaloneCertImage = StandaloneCertificatePrint().assemble(
+          orderNumber = orderId.toString,
+          teamLogoImage = product.icon.renderFromMaster,
+          recipientName = thisOrder.recipientName,
+          celebFullName = celebrity.publicName,
+          celebCasualName = celebrity.casualName.getOrElse(celebrity.publicName),
+          productName = product.name,
+          signedAtDate = new Date(getSignedAt.getTime),
+          egraphUrl = "https://www.egraphs.com/" + orderId
+        )
+
+        services.blobs.put(key = standaloneCertPrintBlobKey, bytes = ImageUtil.getBytes(standaloneCertImage), AccessPolicy.Public)
+        services.blobs.getUrl(standaloneCertPrintBlobKey)
       }
     }
   }
