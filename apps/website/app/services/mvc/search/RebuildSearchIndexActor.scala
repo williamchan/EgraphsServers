@@ -50,16 +50,16 @@ object RebuildSearchIndexActor extends Logging {
     Akka.system.actorOf(Props(AppConfig.instance[RebuildSearchIndexActor]))
   }
 
-  private val updatePeriod = 1 minutes
+  private val updatePeriod = 10 minutes
 
-  private implicit val timeout: Timeout = 1 minutes
+  private implicit val timeout: Timeout = 10 minutes
 
   //
   // Private members
   //
   private def scheduleJob() = {
     val random = new Random()
-    val delayJitter = random.nextInt() % 10 seconds // this should make the update schedule a little more random, and if we are unlucky that all hosts update at once, they won't the next time.
+    val delayJitter = random.nextInt() % 1 minute // this should make the update schedule a little more random, and if we are unlucky that all hosts update at once, they won't the next time.
     val jitteredUpdatePeriod = updatePeriod + delayJitter
     log("Scheduling landing page celebrity update for every " + jitteredUpdatePeriod.toSeconds + " seconds.")
     Akka.system.scheduler.schedule(
