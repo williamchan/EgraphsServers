@@ -29,6 +29,7 @@ import services.TempFile
 import services.Time
 import services.Utils
 import services.mvc.celebrity.CatalogStarsAgent
+import services.mvc.search.RebuildSearchIndexActor
 
 object Global extends GlobalSettings with Logging {
   
@@ -72,6 +73,11 @@ object Global extends GlobalSettings with Logging {
 
         // Schedule catalog stars updating
         UpdateCatalogStarsActor.init()
+
+        // Schedule search index rebuilding
+        if (configProxy.adminToolsEnabled == "full") {
+          RebuildSearchIndexActor.init()
+        }
       }
       log("Finished bootstrapping application in " + secondsToBootstrap + "s")
     }
