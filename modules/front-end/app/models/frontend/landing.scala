@@ -14,12 +14,15 @@ package models.frontend.landing
 case class CatalogStar(
   id: Long, 
   name: String,
-  secondaryText: Option[String],
+  secondaryText: String,
+  organization: String,
   imageUrl: String,
   marketplaceImageUrl: String,
   storefrontUrl: String,
-  hasInventoryRemaining: Boolean,
+  inventoryRemaining: Int,
   isFeatured: Boolean,
   minPrice: Int,
   maxPrice: Int
-)
+) {
+  def hasInventoryRemaining: Boolean = (inventoryRemaining > 0)
+}
