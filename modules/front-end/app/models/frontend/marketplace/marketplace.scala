@@ -24,11 +24,13 @@ case class MarketplaceCelebrity(
     publicName: String,
     photoUrl: String,
     storefrontUrl: String,
-    soldout: Boolean,
+    inventoryRemaining: Int,
     minPrice: Int,
     maxPrice: Int, 
     secondaryText: String
-  ) 
+  ) {
+  def soldout: Boolean = (inventoryRemaining <= 0)
+}
 
 /**
  * Represents a category and the values that are user-selectable for filtering.
