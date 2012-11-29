@@ -1,8 +1,53 @@
 define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min"], function (Egraphs) {
-  
-  var Controller = function ($scope) {
+  /**
+   * Define controller for marketplace
+   * @param $scope Global Angular Scope
+   */
+  var marketplaceCtrl = function ($scope) {
     $scope.results = angular.copy(Egraphs.page.results);
+
+    $scope.loadCelebrities = function() {
+      //load data
+    };
   };
+
+  /**
+   * Define a angular module for the marketplace
+   */
+  var marketplaceModule = angular.module('marketplace', []);
+
+  /**
+   * Filter for producing a price range string from a celebrity object.
+   * $45-90 if two different prices (non-zero)
+   * $90 if minimum price is zero
+   * "" if the prices are both zero
+   */
+  marketplaceModule.filter('priceRange', function() {
+    return function(celebrity) {
+      if(celebrity.minPrice === celebrity.maxPrice && celebrity.minPrice > 0) {
+        return "$" + celebrity.minPrice;
+      } else if(celebrity.minPrice != celebrity.maxPrice) {
+        return "$" + celebrity.minPrice + "-" + celebrity.maxPrice;
+      } else {
+        return "";
+      }
+    };
+  });
+  /**
+   * Directive for binding an element to scroll event.
+   * Inspired by
+   * http://specificidea.com/collection_items/blog/infinite-scroll-with-angularjs-and-rails/59
+   */
+  marketplaceModule.directive('whenScrolled', function() {
+    return function(scope, element, attrs) {
+      $(window).scroll(function() {
+        var win = $(this);
+        if (win.scrollTop() + win.height() == $(document).height()) {
+          console.log("at the bottom!");
+        }
+      });
+    };
+  });
 
   return {
     go: function () {
@@ -14,11 +59,12 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min"], function (E
        * settings may not be applicable and give a confusing set of results.
        **/
 
-     window.Controller = Controller;
-     
-     angular.element(document).ready(function() {
-      angular.bootstrap(document);
-     });
+      window.MarketplaceCtrl = marketplaceCtrl;
+
+      angular.element(document).ready(function() {
+        angular.bootstrap(document, ['marketplace']);
+      });
+
 
      $(document).ready(function() {
         /**
