@@ -14,24 +14,28 @@
 @import views.frontend.Utils
 @import models.frontend.egraphs._
 @import play.api.libs.json._
+@import models.frontend.marketplace.MarketplaceConversions._
 @**
   Page for displaying marketplace results. 
   Vertical buttons are currently hidden. Will be used in the future, when we have multiple verticals.
 **@
 @init = {
-@*** 
+  @*** 
 
-Translates a map of categories and their categoryvalues into a JsonObject that can be easily converted to a URL query arguments using $.param(Egraphs.page.categories)
-***@
- Egraphs.page.categories = @Html(
-  Json.toJson(categoryViewModels.foldLeft[Map[String, JsValue]](Map())(
-    (a, b) => a ++ b.asActiveMap
-  )).toString
- );
- Egraphs.page.queryUrl = "@marketplaceRoute";
- Egraphs.page.query = "@query";
- Egraphs.page.sort = "@sortOptions.filter(v => v.active).headOption.map(v => v.name)";
- Egraphs.page.view = @if(viewAsList){"list"} else {""};
+  Translates a map of categories and their categoryvalues into a JsonObject that can be easily converted to a URL query arguments using $.param(Egraphs.page.categories)
+  ***@
+  Egraphs.page.categories = @Html(
+    Json.toJson(categoryViewModels.foldLeft[Map[String, JsValue]](Map())(
+      (a, b) => a ++ b.asActiveMap
+    )).toString
+   );
+  Egraphs.page.queryUrl = "@marketplaceRoute";
+  Egraphs.page.query = "@query";
+  Egraphs.page.sort = "@sortOptions.filter(v => v.active).headOption.map(v => v.name)";
+  Egraphs.page.view = @if(viewAsList){"list"} else {""};
+  Egraphs.page.results = @Html(
+    JsArray(results.map(result => Json.toJson(result)).toSeq).toString
+  )  
 }
 
 @baseBody = {

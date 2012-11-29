@@ -1,4 +1,9 @@
-define(["libs/chosen/chosen.jquery.min"], function (Egraphs) {
+define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min"], function (Egraphs) {
+  
+  var Controller = function ($scope) {
+    $scope.results = angular.copy(Egraphs.page.results);
+  };
+
   return {
     go: function () {
       /**
@@ -8,6 +13,13 @@ define(["libs/chosen/chosen.jquery.min"], function (Egraphs) {
        * The same idea applies to removing a filter or any other changes, with the exception of the search box, since the previous
        * settings may not be applicable and give a confusing set of results.
        **/
+
+     window.Controller = Controller;
+     
+     angular.element(document).ready(function() {
+      angular.bootstrap(document);
+     });
+
      $(document).ready(function() {
         /**
          * Reconstructs url from any changes to data model.
