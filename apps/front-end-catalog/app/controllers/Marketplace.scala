@@ -78,7 +78,7 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
         publicName = "Herp Derpson",
         photoUrl = EgraphsAssets.at("images/660x350.gif").url,
         storefrontUrl = "#",
-        soldout = coinflip.nextBoolean,
+        inventoryRemaining = coinflip.nextInt(20),
         minPrice = 45,
         maxPrice = 90,
         secondaryText = "Boston Red Sox")

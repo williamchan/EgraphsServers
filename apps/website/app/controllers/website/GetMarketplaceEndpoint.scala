@@ -96,10 +96,10 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         categoryValue <- categoryValues
       } yield { categoryValue }}.toSet
 
-      val (subtitle, celebrities) = dbSession.connected(TransactionSerializable) {
+      val (subtitle, unsortedCelebrities) = dbSession.connected(TransactionSerializable) {
         queryOption match {
           case Some(query) =>
-            val results = celebrityStore.marketplaceSearch(queryOption, categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostRelevant))
+            val results = celebrityStore.marketplaceSearch(queryOption, categoryAndCategoryValues)
             val text = results.size match {
               case 1 => "Showing 1 Result for \"" + query + "\"..."
               case _ => "Showing " + results.size + " Results for \"" + query + "\"..."
@@ -107,21 +107,31 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
             (text, results)
           case _ =>
             if (!activeCategoryValues.isEmpty) {
-              ("Results", celebrityStore.marketplaceSearch(queryOption, categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostRelevant)))
+              ("Results", celebrityStore.marketplaceSearch(queryOption, categoryAndCategoryValues))
             } else {
-              //TODO when refinements are implemented we can do this using tags instead.  
+              //TODO when refinements are implemented we can do this using tags instead.
               ("Featured Stars", catalogStarsQuery().filter(star => star.isFeatured).map(c =>
                 MarketplaceCelebrity(
                   id = c.id,
                   publicName = c.name,
                   photoUrl = c.marketplaceImageUrl,
                   storefrontUrl = c.storefrontUrl,
-                  soldout = !c.hasInventoryRemaining,
+                  inventoryRemaining = c.inventoryRemaining,
                   minPrice = c.minPrice,
                   maxPrice = c.maxPrice,
-                  secondaryText = c.secondaryText.getOrElse(""))))
+                  secondaryText = c.secondaryText)))
             }
         }
+      }
+
+      // Sort results
+      import CelebritySortingTypes._
+      val celebrities = maybeSortType.getOrElse(CelebritySortingTypes.MostRelevant) match {
+        case MostRelevant => unsortedCelebrities
+        case PriceAscending => unsortedCelebrities.toList.sortWith((a,b) => a.minPrice < b.minPrice)
+        case PriceDecending => unsortedCelebrities.toList.sortWith((a,b) => a.maxPrice < b.maxPrice)
+        case Alphabetical => unsortedCelebrities.toList.sortWith((a,b) => a.publicName < b.publicName)
+        case _ => unsortedCelebrities
       }
 
       val viewAsList = viewOption == Some("list") // "list" should be a part of an Enum
