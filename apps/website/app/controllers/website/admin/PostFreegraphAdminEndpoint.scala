@@ -13,6 +13,7 @@ import play.api.data.validation.Constraints._
 import play.api.data.validation.Constraint
 import play.api.data.validation.Valid
 import play.api.data.validation.Invalid
+import enums.OrderType
 
 trait PostFreegraphAdminEndpoint {
   this: Controller =>
@@ -28,7 +29,9 @@ trait PostFreegraphAdminEndpoint {
       productId: Long, 
       inventoryBatchId: Long, 
       messageToCelebrity: String, 
-      requestedMessage: String)
+      requestedMessage: String,
+      isPromotional: Boolean
+    )
   
   /**
    * For updating an existing Account.
@@ -44,7 +47,8 @@ trait PostFreegraphAdminEndpoint {
             "productId" -> longNumber,
             "inventoryBatchId" -> longNumber,
             "messageToCelebrity" -> text.verifying(nonEmpty),
-            "requestedMessage" -> text.verifying(nonEmpty)
+            "requestedMessage" -> text.verifying(nonEmpty),
+            "isPromotional" -> boolean
           )(PostFreegraphForm.apply)(PostFreegraphForm.unapply))
         
         freegraphForm.bindFromRequest.fold(
@@ -52,7 +56,9 @@ trait PostFreegraphAdminEndpoint {
             Redirect(controllers.routes.WebsiteControllers.getCreateFreegraphAdmin).flashing("errors" -> formWithErrors.errors.head.message.toString())
           },
           validForm => {
-            
+            val orderType = 
+              if (validForm.isPromotional) OrderType.Promotional
+	          else OrderType.Normal
             val customer = customerStore.findOrCreateByEmail(email = validForm.recipientEmail, name = validForm.recipientName)
             val order = Order(
               recipientId = customer.id,
@@ -61,7 +67,8 @@ trait PostFreegraphAdminEndpoint {
               productId = validForm.productId,
               inventoryBatchId = validForm.inventoryBatchId,
               messageToCelebrity = Some(validForm.messageToCelebrity),
-              requestedMessage = Some(validForm.requestedMessage)
+              requestedMessage = Some(validForm.requestedMessage),
+              _orderType = orderType.name 
             ).save()
             Redirect(controllers.routes.WebsiteControllers.getOrderAdmin(order.id))
           }

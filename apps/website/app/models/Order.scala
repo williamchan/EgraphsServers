@@ -57,7 +57,8 @@ case class Order(
   expectedDate: Option[Date] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
-  services: OrderServices = AppConfig.instance[OrderServices]
+  services: OrderServices = AppConfig.instance[OrderServices],
+  _orderType: String = OrderType.Normal.name
 ) extends KeyedCaseClass[Long]
   with HasCreatedUpdated
   with HasPrivacyStatus[Order]
