@@ -103,13 +103,13 @@ class CelebrityStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
   }
 
   it should "find celebs of a certain category through refinements" in {
-        val category = TestData.newSavedCategory
+    val category = TestData.newSavedCategory
     val categoryValueA = TestData.newSavedCategoryValue(category.id)
     val celeb = newSearchableCeleb
     celeb.categoryValues.associate(categoryValueA)
 
     instanceUnderTest.rebuildSearchIndex
-    val results1 = instanceUnderTest.celebritiesSearch(maybeQuery = None, refinements = Map (category.id -> Set(categoryValueA.id)))
+    val results1 = instanceUnderTest.celebritiesSearch(maybeQuery = None, refinements = List(Set(categoryValueA.id)))
     results1.isEmpty should be(false)
   }
 
@@ -125,7 +125,7 @@ class CelebrityStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
     celebB.categoryValues.associate(categoryValueB)
 
     instanceUnderTest.rebuildSearchIndex
-    val results1 = instanceUnderTest.celebritiesSearch(maybeQuery = None, refinements = Map (category.id -> Set(categoryValueA.id, categoryValueB.id)))
+    val results1 = instanceUnderTest.celebritiesSearch(maybeQuery = None, refinements = List(Set(categoryValueA.id, categoryValueB.id)))
     results1.size should be(2)
   }
 
@@ -144,8 +144,8 @@ class CelebrityStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
 
     instanceUnderTest.rebuildSearchIndex
     val results = instanceUnderTest.celebritiesSearch(maybeQuery = None, refinements = 
-      Map (categoryA.id -> Set(categoryValueA.id), 
-           categoryB.id -> Set(categoryValueB.id)
+      List(Set(categoryValueA.id), 
+           Set(categoryValueB.id)
       ))
     results.size should be(1)
   }

@@ -58,22 +58,13 @@ trait PostCelebrityCategoryValueAdminEndpoint {
         }
 
         celebrityStore.findById(celebrityId) match {
-        case Some(celebrity) => {
-              celebrityStore.updateCategoryValues(celebrity = celebrity, categoryValueIds = categoryValueIds) 
+            case Some(celebrity) => {
+              celebrityStore.updateCategoryValues(celebrity = celebrity, categoryValueIds = categoryValueIds)
               Redirect(controllers.routes.WebsiteControllers.getCelebrityAdmin(celebrity.id).url, FOUND)
             }
-            case _ => Redirect(controllers.routes.WebsiteControllers.getCelebritiesAdmin.url, SEE_OTHER)   
+            case _ => Redirect(controllers.routes.WebsiteControllers.getCelebritiesAdmin.url, SEE_OTHER)
           }
       }
     }  
-  }
-
-  private def isValidCategoryValueId: Constraint[CelebrityCategoryValueForm] = {
-    Constraint { form: CelebrityCategoryValueForm => 
-      categoryValueStore.findById(form.categoryValueId) match {
-        case Some(categoryValue) => Valid
-        case _ => Invalid("Category Value ID is incorrect ")
-      }
-    }    
   }
 }

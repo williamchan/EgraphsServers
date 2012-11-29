@@ -37,6 +37,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
   protected def categoryValueStore: CategoryValueStore
   protected def catalogStarsQuery: CatalogStarsQuery
   protected def dbSession: DBSession
+  protected def featured: Featured
   
   import CelebrityViewConversions._
   import SafePlayParams.Conversions._
@@ -54,6 +55,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         active = (Some(sortingType) == selectedSortingType))
     }
   }
+
   /**
    * Serves up marketplace results page. If there are no query arguments, featured celebs are served. 
    **/
@@ -80,34 +82,62 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         case _ => None
       }
 
-      val categoryAndCategoryValues = 
-        for((key, set) <- request.queryString; categoryRegex(id) <- categoryRegex findFirstIn key) yield {
-          (id.toLong, set.map( arg => 
-            try { 
-              arg.toLong 
+      val categoryAndCategoryValues =
+        for {
+          (key, set) <- request.queryString
+          categoryRegex(id) <- categoryRegex findFirstIn key
+        } yield {
+          val categoryValueId = set.map(arg =>
+            try {
+              arg.toLong
             } catch {
-              case _ => throw new Exception("Invalid category arguments passed.")
-            }
-          ))
+              case e => throw new Exception("Invalid category value argument passed.", e)
+            })
+          (id.toLong, categoryValueId)
         }
-      
-      val activeCategoryValues = {for{
-        (category, categoryValues) <- categoryAndCategoryValues
-        categoryValue <- categoryValues
-      } yield { categoryValue }}.toSet
 
+      val categoryValuesRefinements = if (categoryAndCategoryValues.isEmpty && queryOption.isEmpty) {
+        // use featured stars if no search type is used
+        val featuredCategoryValue = featured.ensureCategoryValueIsCreated()
+        List(List(featuredCategoryValue.id))
+      } else {
+        for {
+          (category, categoryValues) <- categoryAndCategoryValues
+        } yield { categoryValues }
+      }
+
+      //TODO: UNCOMMENT AFTER MAKING FEATURED INTO CATEGORY VALUES
+  //      val unsortedCelebrities = dbSession.connected(TransactionSerializable) {
+  //        celebrityStore.marketplaceSearch(queryOption, categoryValuesRefinements)
+  //      }
+  //
+  //      val subtitle = queryOption match {
+  //        case Some(query) =>
+  //          unsortedCelebrities.size match {
+  //            case 1 => "Showing 1 Result for \"" + query + "\"..."
+  //            case _ => "Showing " + unsortedCelebrities.size + " Results for \"" + query + "\"..."
+  //          }
+  //        case None =>
+  //          if (!categoryValuesRefinements.isEmpty) {
+  //            "Results"
+  //          } else {
+  //            "Featured Stars"
+  //          }
+  //      }
+
+      //TODO: REMOVE AFTER MAKING FEATURED INTO CATEGORY VALUES
       val (subtitle, unsortedCelebrities) = dbSession.connected(TransactionSerializable) {
         queryOption match {
           case Some(query) =>
-            val results = celebrityStore.marketplaceSearch(queryOption, categoryAndCategoryValues)
+            val results = celebrityStore.marketplaceSearch(queryOption, categoryValuesRefinements)
             val text = results.size match {
               case 1 => "Showing 1 Result for \"" + query + "\"..."
               case _ => "Showing " + results.size + " Results for \"" + query + "\"..."
             }
             (text, results)
           case _ =>
-            if (!activeCategoryValues.isEmpty) {
-              ("Results", celebrityStore.marketplaceSearch(queryOption, categoryAndCategoryValues))
+            if (!categoryValuesRefinements.isEmpty) {
+              ("Results", celebrityStore.marketplaceSearch(queryOption, categoryValuesRefinements))
             } else {
               //TODO when refinements are implemented we can do this using tags instead.
               ("Featured Stars", catalogStarsQuery().filter(star => star.isFeatured).map(c =>
@@ -123,6 +153,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
             }
         }
       }
+      //TODO: END
 
       // Sort results
       import CelebritySortingTypes._
@@ -135,7 +166,12 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       }
 
       val viewAsList = viewOption == Some("list") // "list" should be a part of an Enum
-      
+
+      val activeCategoryValues = {for{
+        (category, categoryValues) <- categoryAndCategoryValues
+        categoryValue <- categoryValues
+      } yield { categoryValue }}.toSet
+
       //HACK As long as no CategoryValues have children Categories, this call can be used to display
       // only baseball categories. This NEEDS to be fixed if we want to support multiple verticals.
       val categoryViewModels = for {

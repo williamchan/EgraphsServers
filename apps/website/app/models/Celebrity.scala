@@ -379,7 +379,12 @@ object Celebrity {
   }
 }
 
-class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession, catalogStarsQuery: CatalogStarsQuery) extends SavesWithLongKey[Celebrity] with SavesCreatedUpdated[Long,Celebrity] {
+class CelebrityStore @Inject() (
+  schema: Schema,
+  dbSession: DBSession,
+  catalogStarsQuery: CatalogStarsQuery,
+  featured: Featured) extends SavesWithLongKey[Celebrity] with SavesCreatedUpdated[Long, Celebrity] {
+
   import org.squeryl.PrimitiveTypeMode._
   import CelebrityViewConversions._
   //
@@ -580,7 +585,7 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession, catalogSta
     }
   }
 
-  def celebritiesSearch(maybeQuery: Option[String] = None, refinements: Map[Long, Iterable[Long]] = Map[Long, Iterable[Long]]())
+  def celebritiesSearch(maybeQuery: Option[String] = None, refinements: Iterable[Iterable[Long]] = Iterable[Iterable[Long]]())
   : Iterable[Long] = {
     // Note we could make this fast probably.  We should see how performance is affected if we don't have to
     // join across all celebrities since we can filter some with the text search first.
@@ -599,7 +604,7 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession, catalogSta
     val queryTextMatching = """ mv.to_tsvector @@ plainto_tsquery('english', {textQuery}) """
 
     val queryRefinementsParts = for {
-      (_, refinementList) <- refinements
+      refinementList <- refinements
     } yield {
       """ EXISTS ( SELECT c.id FROM celebritycategoryvalue ccv WHERE ccv.categoryvalueid IN """ +
       refinementList.mkString("(", ",", ")") + """ AND ccv.celebrityid = c.id ) """
@@ -611,7 +616,7 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession, catalogSta
 
     def isDefined(condition: AnyRef): Boolean = {
       condition match {
-        case map: Map[_, _] => !map.isEmpty
+        case iterable: Iterable[_] => !iterable.isEmpty
         case Some(something) => true
         case _ => false
       }
@@ -649,7 +654,7 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession, catalogSta
    * 
    *  (pitcher or 2nd baseman) and (red sox or yankees)
    */
-  def marketplaceSearch(maybeQuery: Option[String] = None, refinements: Map[Long, Iterable[Long]] = Map[Long, Iterable[Long]]())
+  def marketplaceSearch(maybeQuery: Option[String] = None, refinements: Iterable[Iterable[Long]] = Iterable[Iterable[Long]]())
   : Iterable[MarketplaceCelebrity] = {
 
     val catalogStars = catalogStarsQuery()
@@ -725,7 +730,9 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession, catalogSta
     for (celeb <- schema.celebrities) yield celeb
   }
 
+  //TODO: Remove this completely after a deploy and using this to featured stars to use category values 
   def updateFeaturedCelebrities(newFeaturedCelebIds: Iterable[Long]) {
+    //TODO: Myyk- REMOVE THESE TWO
     // First update those gentlemen that are no longer featured
     update(schema.celebrities)(c =>
       where(c.isFeatured === true and (c.id notIn newFeaturedCelebIds))
@@ -737,19 +744,19 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession, catalogSta
       where(c.id in newFeaturedCelebIds)
         set (c.isFeatured := true)
     )
+
+    featured.updateFeaturedCelebrities(newFeaturedCelebIds)
   }
 
   /**
    * Update a celebrity's associated filter values
    **/
-
   def updateCategoryValues(celebrity: Celebrity, categoryValueIds: Iterable[Long]) {
     //remove old records
     celebrity.categoryValues.dissociateAll
 
     // Add records for the new values
-    val newCelebrityCategoryValues  = for (categoryValueId <- categoryValueIds) yield 
-    { 
+    val newCelebrityCategoryValues = for (categoryValueId <- categoryValueIds) yield {
       CelebrityCategoryValue(celebrityId = celebrity.id, categoryValueId = categoryValueId)
     }
 

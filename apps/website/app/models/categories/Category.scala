@@ -9,7 +9,6 @@ import models._
 import org.squeryl.Query
 import org.squeryl.dsl.ManyToMany
 
-
 case class CategoryServices @Inject() (
   celebrityCategoryValueStore: CelebrityCategoryValueStore,
   categoryStore: CategoryStore,
@@ -61,8 +60,7 @@ case class Category(
 }
 
 class CategoryStore @Inject() (
-  schema: Schema,
-  categoryServices: Provider[CategoryServices]
+  schema: Schema
 ) extends SavesWithLongKey[Category]
   with SavesCreatedUpdated[Long,Category]
 {
@@ -93,7 +91,7 @@ class CategoryStore @Inject() (
       	select(category)
       ).headOption
   }
- 
+
   //
   // SavesWithLongKey[Category] methods
   //
