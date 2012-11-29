@@ -14,7 +14,7 @@ import java.awt.RenderingHints
  */
 object StandaloneCertificatePrint {
   // This number must version any time there is a breaking change to the images.
-  val currentVersion = 1
+  val currentVersion = 2
 }
 
 case class StandaloneCertificatePrint() extends HasCertOfAuthenticity {
