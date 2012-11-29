@@ -9,7 +9,7 @@ import services.ImageUtil
 
 object LandscapeFramedPrint {
   // This number must version any time there is a breaking change to the images.
-  val currentVersion = 2
+  val currentVersion = 3
 
   val targetEgraphWidth = 2150
 }
