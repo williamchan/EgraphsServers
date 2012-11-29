@@ -110,7 +110,6 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
               ("Results", celebrityStore.marketplaceSearch(queryOption, categoryAndCategoryValues))
             } else {
               //TODO when refinements are implemented we can do this using tags instead.
-              //TODO we are missing sorting here
               ("Featured Stars", catalogStarsQuery().filter(star => star.isFeatured).map(c =>
                 MarketplaceCelebrity(
                   id = c.id,
