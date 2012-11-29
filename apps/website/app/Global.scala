@@ -75,7 +75,9 @@ object Global extends GlobalSettings with Logging {
         UpdateCatalogStarsActor.init()
 
         // Schedule search index rebuilding
-        RebuildSearchIndexActor.init()
+        if (configProxy.adminToolsEnabled == "full") {
+          RebuildSearchIndexActor.init()
+        }
       }
       log("Finished bootstrapping application in " + secondsToBootstrap + "s")
     }

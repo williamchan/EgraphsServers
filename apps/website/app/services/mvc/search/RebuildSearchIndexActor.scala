@@ -4,7 +4,6 @@ import scala.util.Random
 
 import com.google.inject.Inject
 
-import RebuildSearchIndexActor.RebuildSearchIndex
 import akka.actor.Actor
 import akka.actor.Props
 import akka.util.Timeout.durationToTimeout
@@ -61,7 +60,7 @@ object RebuildSearchIndexActor extends Logging {
     val random = new Random()
     val delayJitter = random.nextInt() % 1 minute // this should make the update schedule a little more random, and if we are unlucky that all hosts update at once, they won't the next time.
     val jitteredUpdatePeriod = updatePeriod + delayJitter
-    log("Scheduling landing page celebrity update for every " + jitteredUpdatePeriod.toSeconds + " seconds.")
+    log("Scheduling rebuild of search index for every " + jitteredUpdatePeriod.toSeconds + " seconds.")
     Akka.system.scheduler.schedule(
       jitteredUpdatePeriod,
       jitteredUpdatePeriod,
