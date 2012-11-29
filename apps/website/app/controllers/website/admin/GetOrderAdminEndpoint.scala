@@ -33,7 +33,7 @@ private[controllers] trait GetOrderAdminEndpoint extends ImplicitHeaderAndFooter
                 case "messageToCelebrity" => order.messageToCelebrity.getOrElse("")
                 case "requestedMessage" => order.requestedMessage.getOrElse("")
                 case "newRecipientEmail" => recipientAccount.email
-                case "newBuyerEmail" => recipientAccount.email
+                case "newBuyerEmail" => buyer.account.email
                 case "newProductId" => order.productId.toString    
               }
             }
