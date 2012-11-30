@@ -29,19 +29,11 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
     Ok(views.html.frontend.marketplace_results(
       query = "exampleQuery",
       viewAsList = true,
-      marketplaceRoute = controllers.routes.Marketplace.mlb.url,
+      marketplaceRoute = controllers.routes.Marketplace.results.url,
       verticalSet,
       resultSet,
       categoryViewModels,
       sortOptions))
-  }
-
-  def index() = Action {
-    Ok(views.html.frontend.marketplace_landing("derp", "exampleQuery", verticalSet, resultSet, categoryViewModels, sortOptions))
-  }
-
-  def mlb() = Action {
-    Ok(views.html.frontend.marketplace_mlb())
   }
 
   def categorySet: Iterable[CategoryViewModel] = {
