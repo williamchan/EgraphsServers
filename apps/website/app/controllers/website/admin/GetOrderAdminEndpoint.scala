@@ -22,15 +22,19 @@ private[controllers] trait GetOrderAdminEndpoint extends ImplicitHeaderAndFooter
           case Some(order) => {
             val buyer = order.buyer
             val recipient = if (order.buyerId == order.recipientId) buyer else order.recipient
+            val recipientAccount = recipient.account
             val fulfillingEgraph: Option[Egraph] = orderStore.findFulfilledWithId(orderId).map(f => f.egraph)
             val product = order.product
             val celebrityName = product.celebrity.publicName
             
             val fieldDefaults: (String => String) = {
               (paramName: String) => paramName match {
-              	case "recipientName" => StringEscapeUtils.escapeHtml4(order.recipientName)
-              	case "messageToCelebrity" => StringEscapeUtils.escapeHtml4(order.messageToCelebrity.getOrElse(""))
-              	case "requestedMessage" => StringEscapeUtils.escapeHtml4(order.requestedMessage.getOrElse(""))
+                case "recipientName" => order.recipientName
+                case "messageToCelebrity" => order.messageToCelebrity.getOrElse("")
+                case "requestedMessage" => order.requestedMessage.getOrElse("")
+                case "newRecipientEmail" => recipientAccount.email
+                case "newBuyerEmail" => buyer.account.email
+                case "newProductId" => order.productId.toString    
               }
             }
 
@@ -40,7 +44,7 @@ private[controllers] trait GetOrderAdminEndpoint extends ImplicitHeaderAndFooter
                 buyer = buyer,
                 buyerEmail = buyer.account.email,
                 recipient = recipient,
-                recipientEmail = recipient.account.email,
+                recipientEmail = recipientAccount.email,
                 celebrityName = celebrityName,
                 fulfillingEgraph = fulfillingEgraph,
                 fields = fieldDefaults))

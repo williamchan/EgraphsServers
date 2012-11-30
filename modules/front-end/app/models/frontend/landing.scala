@@ -8,18 +8,21 @@ package models.frontend.landing
  * @param secondaryText pithy explanatory text, e.g. "Pitcher, Boston Red Sox"
  * @param imageUrl URL to the thumbnail image.
  * @param storefrontUrl URL to the celebrity's storefront.
- * @param hasInventoryRemaining true that the celebrity still has egraphs available to buy
+ * @param inventoryRemaining inventory left to buy
  * @param isFeatured true that the celebrity should appear under "Featured Stars"
  */
 case class CatalogStar(
   id: Long, 
   name: String,
-  secondaryText: Option[String],
+  secondaryText: String,
+  organization: String,
   imageUrl: String,
   marketplaceImageUrl: String,
   storefrontUrl: String,
-  hasInventoryRemaining: Boolean,
+  inventoryRemaining: Int,
   isFeatured: Boolean,
   minPrice: Int,
   maxPrice: Int
-)
+) {
+  def hasInventoryRemaining: Boolean = (inventoryRemaining > 0)
+}

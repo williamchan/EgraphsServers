@@ -16,12 +16,15 @@ import play.api.data.validation.Constraint
 import play.api.data.validation.Valid
 import play.api.data.validation.Invalid
 import services.print.{ PrintManufacturingInfo, LandscapeFramedPrint }
+import play.api.templates.Html
 
 trait PostOrderAdminEndpoint { this: Controller =>
 
   protected def postController: POSTControllerMethod
   protected def httpFilters: HttpFilters
   protected def orderStore: OrderStore
+  protected def accountStore: AccountStore
+  protected def productStore: ProductStore
   protected def egraphStore: EgraphStore
   protected def egraphQueryFilters: EgraphQueryFilters
 
@@ -67,9 +70,67 @@ trait PostOrderAdminEndpoint { this: Controller =>
                     val csv = PrintManufacturingInfo.toCSVLine(buyerEmail = order.buyer.account.email,
                       shippingAddress = "",
                       partnerPhotoFile = egraph.framedPrintFilename)
-                    Ok(views.html.Application.admin.admin_printinfo(framedPrintImageUrl, PrintManufacturingInfo.headerCSVLine, csv, Some(pngUrl)))
+                    Ok(views.html.Application.admin.admin_printinfo(
+                      framedPrintImageUrl,
+                      PrintManufacturingInfo.headerCSVLine,
+                      csv,
+                      Some(pngUrl),
+                      Some(egraph.getStandaloneCertificateUrl)
+                    ))
                   }
                 }
+              }
+              case "changeRecipient" => {
+                Form(single("newRecipientEmail" -> email)).bindFromRequest().fold(
+                  errors => BadRequest(Html("<html><body>Invalid email. Double check the email you provided.</body></html>")),
+                  newRecipientEmail => {
+                    val maybeOk = for (
+                      account <- accountStore.findByEmail(newRecipientEmail);
+                      newRecipientId <- account.customerId
+                    ) yield {
+                      order.copy(recipientId=newRecipientId).save()
+                      Redirect(GetOrderAdminEndpoint.url(orderId))
+                    }
+
+                    maybeOk.getOrElse(BadRequest(
+                      Html("<html><body>Provided email " + newRecipientEmail + " doesn't correspond to a customer account.</body></html>")
+                    ))
+                  }
+                )
+              }
+              case "changeBuyer" => {
+                Form(single("newBuyerEmail" -> email)).bindFromRequest().fold(
+                  errors => BadRequest(Html("<html><body>Invalid email. Double check the email you provided.</body></html>")),
+                  newBuyerEmail => {
+                    val maybeOk = for (
+                      account <- accountStore.findByEmail(newBuyerEmail);
+                      newBuyerId <- account.customerId
+                    ) yield {
+                      order.copy(buyerId=newBuyerId).save()
+                      Redirect(GetOrderAdminEndpoint.url(orderId))
+                    }
+                    maybeOk.getOrElse(BadRequest(
+                      Html("<html><body>Provided email " + newBuyerEmail + " doesn't correspond to a customer account.</body></html>")
+                    ))
+                  }
+                )
+              }
+              case "changeProduct" => {
+                Form(single("newProductId" -> number)).bindFromRequest().fold(
+                  errors => BadRequest(Html("<html><body> Incorrect Product Id </body></html>")),
+                  newProductId => {
+                    val maybeOk = for(
+                      product <- productStore.findById(newProductId)  
+                    ) yield {
+                      order.copy(productId = product.id).save()
+                      Redirect(GetOrderAdminEndpoint.url(orderId))  
+                    }
+                    maybeOk.getOrElse(
+                      BadRequest(Html("<html><body> Incorrect product id </body></html>"))
+                    )
+
+                  }
+                )
               }
               case _ => Forbidden("Unsupported operation")
             }

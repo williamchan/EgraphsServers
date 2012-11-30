@@ -1,46 +1,42 @@
 package services.print
 
-import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
 import java.util.Date
+import javax.imageio.ImageIO
+import play.api.Play._
 import java.awt.RenderingHints
-import play.api.Play.current
-import services.ImageUtil
 
-object LandscapeFramedPrint {
+/**
+ * For holidays 2012, we introduced a 3-part print that we could produce quickly at Costco rather than blocking on a
+ * printing partner. This printable image is a standalone certificate of authenticity.
+ *
+ * See SER-535 for more information.
+ */
+object StandaloneCertificatePrint {
   // This number must version any time there is a breaking change to the images.
-  val currentVersion = 3
-
-  val targetEgraphWidth = 2150
+  val currentVersion = 2
 }
 
-case class LandscapeFramedPrint() extends HasCertOfAuthenticity {
-
-  val width = 3600
-  val height = 2400
-  val sideMargin = 188
-  val egraphX = sideMargin
-  val widthBetweenEgraphAndCert = 150
+case class StandaloneCertificatePrint() extends HasCertOfAuthenticity {
 
   // Definitions for HasCertOfAuthenticity
   protected def certW: Int = 924
-  protected def certH: Int = 1361
+  protected def certH: Int = 1294
   protected def certBannerWidth: Int = 114
   protected def targetLogoWidth: Int = 60
   protected def celebFullNameYOffset: Int = 375
   protected def recipientNameYOffset: Int = 535
   protected def createdByTextYOffset: Int = 300
   protected def forTextYOffset: Int = 450
-  protected def dateYOffset: Int = 625
-  protected def qrCodeYOffset: Int = 680
-  protected def egraphNumberYOffset: Int = 950
-  protected def imageNameYOffset: Int = 1025
-  protected def instructionTextYOffset: Int = 1125
-  protected def logoYOffset: Int = 1267
-  protected def certBackground: BufferedImage = ImageIO.read(current.resourceAsStream("images/landscape-framed-print-cert.png").get)
+  protected def dateYOffset: Int = 600
+  protected def qrCodeYOffset: Int = 630
+  protected def egraphNumberYOffset: Int = 875
+  protected def imageNameYOffset: Int = 935
+  protected def instructionTextYOffset: Int = 1050
+  protected def logoYOffset: Int = 1200
+  protected def certBackground: BufferedImage = ImageIO.read(current.resourceAsStream("images/cert-5x7.png").get)
 
   def assemble(orderNumber: String,
-               egraphImage: BufferedImage,
                teamLogoImage: BufferedImage,
                recipientName: String,
                celebFullName: String,
@@ -49,13 +45,9 @@ case class LandscapeFramedPrint() extends HasCertOfAuthenticity {
                signedAtDate: Date,
                egraphUrl: String): BufferedImage = {
 
-    val canvas = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
+    val canvas = new BufferedImage(certW, certH, BufferedImage.TYPE_INT_RGB)
     val g2 = canvas.createGraphics
     g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
-
-    val scaledEgraphImage = ImageUtil.getScaledImage(img = egraphImage, targetWidth = LandscapeFramedPrint.targetEgraphWidth)
-    val egraphY = (height - scaledEgraphImage.getHeight) / 2
-    g2.drawImage(scaledEgraphImage, egraphX, egraphY, null)
 
     val data = CertificateData(orderNumber = orderNumber,
       teamLogoImage = teamLogoImage,
@@ -65,8 +57,8 @@ case class LandscapeFramedPrint() extends HasCertOfAuthenticity {
       productName = productName,
       signedAtDate = signedAtDate,
       egraphUrl = egraphUrl,
-      certX = egraphX + LandscapeFramedPrint.targetEgraphWidth + widthBetweenEgraphAndCert,
-      certY = egraphY
+      certX = 0,
+      certY = 0
     )
     drawCertificate(g2 = g2, data = data)
 

@@ -11,7 +11,7 @@
     <div class="container" id="celebrity-admin">	
       <h1> Test Video Uploader </h1>
 
-        @safeForm('id -> "upload-video-form", 'method -> "POST", 'action -> (routes.WebsiteControllers.postVideoAssetAdmin).url, 'enctype -> "multipart/form-data") {
+        @safeForm('id -> "upload-video-form", 'method -> "POST", 'action -> (routes.ApiControllers.postVideoAsset).url, 'enctype -> "multipart/form-data") {
 
           <fieldset>
             <input type="file" name="video" />

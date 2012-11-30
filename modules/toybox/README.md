@@ -1,29 +1,30 @@
-Egraphs ToyBox Module
-=====================
+# Egraphs ToyBox Module
 
-ToyBox provides a simple way to lock down Play 2.0 applications. It is for
-making an application private -- requiring log in to access. It is not for
-handling normal user authentication. 
+ToyBox provides a simple way to lock down Play 2.0 applications. It is for making an application private -- requiring log in to access. It is not for handling normal user authentication. 
 
-ToyBox is the bouncer to the party that is your Play application that is 
-most likely in beta or for internal use.
+ToyBox is the bouncer to the party that is your Play application, which is most likely in beta or for internal use.
+
+## Use:
 
 To use ToyBox in an application:
-  0) Make sure the Global object of your project, if it exists, is in a package
+1. Add Build dependency on ToyBoxBuild.main
 
-  1) Mix ToyBox into your Global object
-    1.5) Call super.onRouteRequest from your implementation of onRouteRequest
-         if it's been overridden
+2. Make sure the `Global` object of your project, if it exists, is in a package
 
-  2) Add routes to your Global.getLogin and Global.postLogin
+3. Mix ToyBox into your `Global` object. (Make sure to call `super.onRouteRequest` from your implementation of `onRouteRequest` if it's been overridden.)
 
-  3) Add abstract members of ToyBox to your Global object
+4. Add routes to your `Global.getLogin` and `Global.postLogin`
 
-  4) Configure through application.conf (see ToyBoxBase.scala for details)
+5. Add abstract members of ToyBox to your `Global` object
 
-
-For more infortmation, see 
-* [Design topic](https://egraphs.atlassian.net/wiki/pages/viewpage.action?pageId=15269913)
-* [Issue backlog](https://egraphs.atlassian.net/browse/SER-425)
+6. Configure through `application.conf` (see `ToyBoxBase.scala` for details) with the following keys within the toybox sub-configuration (e.g. toybox.[some key]=[some value]):
+  * `username` -- username credential for login; defaults to the empty string
+  * `password` -- password credential for login; required
+  * `is-private` -- boolean flag for application privacy; defaults to private (true)
+  * `initial-request-cookie` -- name for the cookie used to store the method and path of initial request for redirection upon log-in; defaults to "toybox-initial-request"
+  * `auth-cookie` -- name for authentication cookie; defaults to "toybox-authenticated"
+  * `auth-timeout` -- maximum age of authentication cookie before expiring in integer number of seconds; defaults to 40 minutes
+  * `auth-path` -- authentication cookie path; defaults to /
+  * `auth-domain` -- authentication cookie domain; defaults to null (is wrapped in Option type in app)
 
 Email kevin@egraphs.com for questions.

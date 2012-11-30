@@ -1,4 +1,4 @@
-@(postLogin: Call, loginForm: Form[(String, String)], previousUsername: String = "", 
+@(postLogin: Call, assets: String => Call, loginForm: Form[(String, String)], previousUsername: String = "", 
   errorMessage: String = "")
 @import helper._
 @import helper.twitterBootstrap._
@@ -9,8 +9,8 @@
 
 
   <head><title>ToyBox Log-In</title>
-    <link rel="stylesheet" media="screen" href="/assets/toybox-assets/stylesheets/bootstrap.css">
-    <link rel="stylesheet" media="screen" href="/assets/toybox-assets/stylesheets/main.css">
+    <link rel="stylesheet" media="screen" href="@assets("toybox-assets/stylesheets/bootstrap.css")">
+    <link rel="stylesheet" media="screen" href="@assets("toybox-assets/stylesheets/main.css")">
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
   </head>
 
@@ -51,10 +51,6 @@
           </div>
         </div>
       </div>
-
-      <footer>
-        <p>SexToyBox coming 2013...</p>
-      </footer>
 
     </div>
   </body>

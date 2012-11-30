@@ -7,7 +7,7 @@
 
 @**   Consumer landing page
 
-      stars - the list of all publicly-discoverable celebrities.
+      stars - the list of all featured stars celebrities.
 *@
 
 @import models.frontend.landing.CatalogStar
@@ -51,8 +51,6 @@
 }
 
 @baseBody = {
-  <h3 style="color:red;text-align:center;line-height:22px;margin-top:5px;margin-bottom:2px;">CYBER MONDAY SALE: 15% off all players! CODE: mlb</h3>
-
   @tags.landing.masthead_section(
     mastheadMessage=None,
     mastheadImageUrl=EgraphsAssets.at("images/landing-masthead.jpg").url,
@@ -67,7 +65,7 @@
 
         <footer id="landing-stars">
           <h3><a href="#featured-stars">Featured Stars <span>+</span></a></h3>
-          @starsBlock(stars.filter(star => star.isFeatured), clearFix=true)
+          @starsBlock(stars, clearFix=true)
         </footer> <!-- end #landing-stars -->
 
         @tags.landing.welcome_header()

@@ -1,23 +1,27 @@
 package services.mvc.celebrity
 
-import utils.{ClearsCacheAndBlobsAndValidationBefore, TestHelpers, EgraphsUnitTest}
-import services.db.DBSession
-import models.{Celebrity, CelebrityStore}
-import services.cache.{NamespacedCache, CacheFactory}
-import TestHelpers.withActorUnderTest
-import com.google.inject.Inject
-import services.AppConfig
-import akka.actor.ActorRef
-import models.frontend.landing.CatalogStar
-import org.specs2.mock.Mockito
-import services.mvc.celebrity.UpdateCatalogStarsActor.UpdateCatalogStars
-import services.mvc.celebrity.CatalogStarsActor.GetCatalogStars
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import akka.pattern.ask
+import org.specs2.mock.Mockito
+import com.google.inject.Inject
+import akka.actor.ActorRef
+import akka.agent.Agent
 import akka.dispatch.Await
+import akka.pattern.ask
 import akka.util.duration._
 import akka.util.Timeout
+import models.frontend.landing.CatalogStar
+import models.CelebrityStore
+import services.cache.CacheFactory
+import services.cache.NamespacedCache
+import services.db.DBSession
+import services.mvc.celebrity.UpdateCatalogStarsActor.UpdateCatalogStars
+import services.AppConfig
+import utils.TestHelpers.withActorUnderTest
+import utils.ClearsCacheAndBlobsAndValidationBefore
+import utils.EgraphsUnitTest
+import utils.TestHelpers
+import play.api.libs.concurrent.Akka
 
 @RunWith(classOf[JUnitRunner])
 class UpdateCatalogStarsActorTests extends EgraphsUnitTest {
@@ -50,7 +54,7 @@ class UpdateCatalogStarsActorTests extends EgraphsUnitTest {
     there was one(deps.cache).set(
       UpdateCatalogStarsActor.resultsCacheKey,
       mockCatalogStars,
-      UpdateCatalogStarsActor.updatePeriodSeconds
+      UpdateCatalogStarsActor.updatePeriod.toSeconds.toInt
     )
   }
 
@@ -62,10 +66,12 @@ class UpdateCatalogStarsActorTests extends EgraphsUnitTest {
     (implicit app: play.api.Application)
   {
     withUpdateCatalogStarsActorAndRecipient(deps) {
-      (actor, recipient) =>
-        Await.result(actor ask UpdateCatalogStars(recipient), 5 seconds)
+      (actor) =>
+        withAgent(Agent(IndexedSeq.empty[CatalogStar])(Akka.system)) { catalogStarsAgent =>
+          Await.result(actor ask UpdateCatalogStars(catalogStarsAgent), 5 seconds)
 
-        Await.result((recipient ask GetCatalogStars), 5 seconds) should be(Some(stars))
+          catalogStarsAgent.get should be(stars)
+        }
     }
   }
 
@@ -75,7 +81,7 @@ class UpdateCatalogStarsActorTests extends EgraphsUnitTest {
 
   private def withUpdateCatalogStarsActorAndRecipient[ResultT]
   (deps: Dependencies = newDeps)
-  (operation: (ActorRef, ActorRef) => ResultT)
+  (operation: (ActorRef) => ResultT)
   (implicit app: play.api.Application)
   : ResultT = {
     lazy val actorInstance = new UpdateCatalogStarsActor(
@@ -83,9 +89,7 @@ class UpdateCatalogStarsActorTests extends EgraphsUnitTest {
     )
 
     withActorUnderTest(actorInstance) { actor =>
-      withActorUnderTest(AppConfig.instance[CatalogStarsActor]) { recipient =>
-          operation(actor, recipient)
-      }
+      operation(actor)
     }
   }
 }

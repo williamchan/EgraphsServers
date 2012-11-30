@@ -1,15 +1,11 @@
 package services
 
-import javax.imageio.ImageIO
+import javax.imageio.{ImageWriteParam, ImageIO}
 import java.awt.image.BufferedImage
-import java.io.File
-import play.api.Play
-import utils.EgraphsUnitTest
+import models.ImageAsset
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-
-import play.api.test._
-import play.api.test.Helpers._
+import utils.EgraphsUnitTest
 
 @RunWith(classOf[JUnitRunner])
 class ImageUtilTests extends EgraphsUnitTest {
@@ -74,10 +70,16 @@ class ImageUtilTests extends EgraphsUnitTest {
     combinedImageFile.length should be(138807)
   }
   */
-  it should "resize PNG images correctly" in new EgraphsTestApplication {
+  "getScaledInstance" should "resize PNG images correctly" in new EgraphsTestApplication {
     val image = ImageIO.read(resourceFile("image.jpg"))
     val scaled = imageUtil.getScaledInstance(image, 100, 100)
     (scaled.getWidth, scaled.getHeight) should be((100, 100))
+  }
+
+  "getScaledImage" should "resize images with same aspect ratio when target height is omitted" in new EgraphsTestApplication {
+    val image = ImageIO.read(resourceFile("image.jpg"))
+    val scaled = imageUtil.getScaledImage(image, 614)
+    (scaled.getWidth, scaled.getHeight) should be((614, 598))
   }
 
   "getDimensions" should "return width and height of image" in new EgraphsTestApplication {
@@ -102,6 +104,12 @@ class ImageUtilTests extends EgraphsUnitTest {
     val cropped = ImageUtil.crop(originalImage, Dimensions(50, 50))
 
     cropped.getType should be(BufferedImage.TYPE_INT_ARGB)
+  }
+
+  "imageToBytes" should "translate image to byte array" in new EgraphsTestApplication {
+    val image = ImageIO.read(resourceFile("image.jpg"))
+    val bytes: Array[Byte] = ImageUtil.getBytes(image, ImageAsset.Jpeg, ImageWriteParam.MODE_EXPLICIT, 1.0f)
+    bytes.length should be(28898)
   }
 
   "isLandscape" should "return true if landscape and false otherwise" in {
