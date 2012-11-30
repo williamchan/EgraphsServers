@@ -35,10 +35,11 @@ class Featured @Inject() (
     }
   }
 
-  // cost = 3 queries
+  // cost = 5 queries
   def updateFeaturedCelebrities(newFeaturedCelebIds: Iterable[Long]) {
     val featuredCategoryValue = ensureCategoryValueIsCreated()
 
+    // cost = 3 queries
     categoryValueStore.updateCelebrities(featuredCategoryValue, newFeaturedCelebIds)
   }
 }

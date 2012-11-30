@@ -2,7 +2,7 @@ package models.categories
 
 import java.sql.Timestamp
 import services.{AppConfig, Time}
-import services.db.{SavesWithLongKey, Schema, KeyedCaseClass}
+import services.db.{SavesWithLongKey, Schema, KeyedCaseClass, Deletes}
 import com.google.inject.{Inject, Provider}
 import models.{Celebrity, HasCreatedUpdated, SavesCreatedUpdated}
 import org.squeryl.Query
@@ -52,6 +52,7 @@ class CategoryValueStore @Inject() (
   schema: Schema
 ) extends SavesWithLongKey[CategoryValue]
   with SavesCreatedUpdated[Long, CategoryValue]
+  with Deletes[Long, CategoryValue]
 {
   import org.squeryl.PrimitiveTypeMode._
 
@@ -146,7 +147,7 @@ class CategoryValueStore @Inject() (
     }
 
     schema.celebrityCategoryValues.insert(
-       newCelebrityCategoryValues
+      newCelebrityCategoryValues
     )
   }
 

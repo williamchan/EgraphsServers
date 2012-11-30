@@ -14,10 +14,9 @@ import com.google.inject.{Provider, Inject}
  * @param categoryValueId
  * @param services
  */
-
 case class CelebrityCategoryValue (
   id: Long = 0L,
-  celebrityId: Long = 0l,
+  celebrityId: Long = 0L,
   categoryValueId: Long = 0L,
   services: CategoryServices = AppConfig.instance[CategoryServices]
 ) extends KeyedCaseClass[Long]

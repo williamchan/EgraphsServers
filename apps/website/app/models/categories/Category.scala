@@ -2,7 +2,7 @@ package models.categories
 
 import services._
 import com.google.inject.{Provider, Inject}
-import db.{Schema, KeyedCaseClass, SavesWithLongKey}
+import db.{Schema, KeyedCaseClass, SavesWithLongKey, Deletes}
 import java.sql.Timestamp
 import services.Time
 import models._
@@ -61,7 +61,7 @@ case class Category(
 
 class CategoryStore @Inject() (
   schema: Schema
-) extends SavesWithLongKey[Category]
+) extends SavesWithLongKey[Category] with Deletes[Long, Category]
   with SavesCreatedUpdated[Long,Category]
 {
   import org.squeryl.PrimitiveTypeMode._
