@@ -103,6 +103,10 @@ case class Order(
     privacyStatus == PrivacyStatus.Public
   }
 
+  def isPromotional = {
+    _orderType == OrderType.Promotional.name
+  }
+
   def redactedRecipientName: String = {
     val nameParts = recipientName.trim.split("( )|(-)").toList
 

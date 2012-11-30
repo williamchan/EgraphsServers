@@ -42,7 +42,17 @@
 
               @formField(id="messageToCelebrity", label="Message to Celebrity", inputType="text", width="span12", fields=fields)
               @formField(id="requestedMessage", label="Requested Message", inputType="text", width="span12", fields=fields)
-              @formField(id="isPromotional", label="is Pregraph?", inputType="checkbox", width="checkbox", fields=fields)
+              
+              <div class="clearfix">
+                <label for="isPromotional">Order Type</label>
+                <div class="input">
+                  <input type="checkbox" name="isPromotional" id="isPromotional" value="true">
+                    Pregraph
+                  </input>
+                </div>
+              </div>
+              <br>
+              
               <div class="actions">
                 <button type="submit" id="submit-button" class="btn primary fade in">Create</button>
                 <button type="reset" id="reset-button" class="btn primary fade in">Reset</button>

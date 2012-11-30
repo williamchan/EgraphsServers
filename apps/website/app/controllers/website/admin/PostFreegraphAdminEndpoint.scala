@@ -56,9 +56,11 @@ trait PostFreegraphAdminEndpoint {
             Redirect(controllers.routes.WebsiteControllers.getCreateFreegraphAdmin).flashing("errors" -> formWithErrors.errors.head.message.toString())
           },
           validForm => {
-            val orderType = 
-              if (validForm.isPromotional) OrderType.Promotional
-	          else OrderType.Normal
+            val orderType = if (validForm.isPromotional) OrderType.Promotional 
+              else OrderType.Normal
+
+            println("order type: " + orderType)
+              
             val customer = customerStore.findOrCreateByEmail(email = validForm.recipientEmail, name = validForm.recipientName)
             val order = Order(
               recipientId = customer.id,

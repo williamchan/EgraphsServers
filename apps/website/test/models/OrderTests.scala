@@ -95,6 +95,27 @@ class OrderTests extends EgraphsUnitTest
     rendered.contains("product") should be(true)
   }
 
+  /** test that _orderType is being persisted correctly */
+  "orders" should "be of the right OrderType" in new EgraphsTestApplication {
+    val savedNormalOrder = newEntity.save()
+    val Some(restoredNormalOrder) = restoreEntity(savedNormalOrder.id)
+    savedNormalOrder should not be ('Promotional)
+    restoredNormalOrder should not be ('Promotional)
+
+    val (customer, product) = newCustomerAndProduct
+    val savedPromoOrder = new Order(
+        recipientId = customer.id,
+        recipientName = "Rafalca",
+        buyerId = customer.id,
+        productId = product.id,
+        inventoryBatchId = TestData.newSavedInventoryBatch(product).id,
+        _orderType = OrderType.Promotional.name
+      ).save()
+    val Some(restoredPromoOdrder) = restoreEntity(savedPromoOrder.id)
+    savedPromoOrder should be ('Promotional)
+    restoredPromoOdrder should be ('Promotional)
+  }
+
   "approveByAdmin" should "change reviewStatus to ApprovedByAdmin" in new EgraphsTestApplication {
     val order = newEntity.save()
     order.reviewStatus should be (OrderReviewStatus.PendingAdminReview)
