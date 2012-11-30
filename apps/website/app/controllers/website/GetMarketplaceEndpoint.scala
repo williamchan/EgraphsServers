@@ -165,6 +165,16 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         case _ => unsortedCelebrities
       }
 
+      // Sort results
+      import CelebritySortingTypes._
+      val celebrities = maybeSortType.getOrElse(CelebritySortingTypes.MostRelevant) match {
+        case MostRelevant => unsortedCelebrities
+        case PriceAscending => unsortedCelebrities.toList.sortWith((a,b) => a.minPrice < b.minPrice)
+        case PriceDecending => unsortedCelebrities.toList.sortWith((a,b) => a.maxPrice < b.maxPrice)
+        case Alphabetical => unsortedCelebrities.toList.sortWith((a,b) => a.publicName < b.publicName)
+        case _ => unsortedCelebrities
+      }
+
       val viewAsList = viewOption == Some("list") // "list" should be a part of an Enum
 
       val activeCategoryValues = {for{
