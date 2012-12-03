@@ -7,7 +7,8 @@ object Featured {
 }
 
 /**
- * Tools to find and assign featured to entities.
+ * Tools to find and assign the "internal -> featured" category value
+ * to entities.
  */
 class Featured @Inject() (
   internal: Internal,

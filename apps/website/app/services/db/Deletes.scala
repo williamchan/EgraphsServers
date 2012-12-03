@@ -17,7 +17,7 @@ trait Deletes[KeyT, T <: KeyedEntity[KeyT]] {
    *
    * @param toDelete the object to delete
    */
-  def delete(toDelete: T): Unit = {
+  def delete (toDelete: T) {
     table.delete(toDelete.id)
   }
 }

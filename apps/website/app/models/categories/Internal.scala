@@ -8,10 +8,9 @@ object Internal {
 
 /**
  * Helper to setup the Internal category. This category is meant to
- * house miscellaneous internal categories values.
+ * house miscellaneous internal categories values (e.g. [[models.categories.Featured]])
  */
-class Internal @Inject() (
-  categoryStore: CategoryStore) {
+class Internal @Inject() (categoryStore: CategoryStore) {
 
   // cost = 1 queries
   def ensureCategoryIsCreated(): Category = {

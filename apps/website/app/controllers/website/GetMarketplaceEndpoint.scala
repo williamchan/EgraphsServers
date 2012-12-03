@@ -64,46 +64,35 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       // Determine what search options, if any, have been appended
       val marketplaceResultPageForm = Form(
         tuple(
-          "vertical" -> optional(nonEmptyText),
           "query" -> optional(nonEmptyText),
           "sort" -> optional(nonEmptyText),
-          "view" -> optional(nonEmptyText))
+          "view" -> optional(nonEmptyText)
         )
+      )
 
-      val (verticalIdOption, queryOption, sortOption, viewOption) = marketplaceResultPageForm.bindFromRequest.fold(
-        formWithErrors => throw new Exception("This shouldn't be possible")
-        ,{
-          case (verticalIdOption, queryOption, sortOption, viewOption) =>
-            (verticalIdOption, queryOption, sortOption, viewOption)
-        })
+      val (queryOption, sortOption, viewOption) = marketplaceResultPageForm.bindFromRequest.get
 
-      val maybeSortType = sortOption match {
-        case Some(sort) => CelebritySortingTypes(sort)
-        case _ => None
+      val maybeSortType = sortOption.flatMap(sort => CelebritySortingTypes(sort))
+
+      val categoryAndCategoryValues = for {
+        (key, set) <- request.queryString
+        categoryRegex(id) <- categoryRegex findFirstIn key
+      } yield {
+        val categoryValueId = set.map(arg =>
+          try {
+            arg.toLong
+          } catch {
+            case e => throw new Exception("Invalid category value argument passed.", e)
+          })
+        (id.toLong, categoryValueId)
       }
-
-      val categoryAndCategoryValues =
-        for {
-          (key, set) <- request.queryString
-          categoryRegex(id) <- categoryRegex findFirstIn key
-        } yield {
-          val categoryValueId = set.map(arg =>
-            try {
-              arg.toLong
-            } catch {
-              case e => throw new Exception("Invalid category value argument passed.", e)
-            })
-          (id.toLong, categoryValueId)
-        }
 
       val categoryValuesRefinements = if (categoryAndCategoryValues.isEmpty && queryOption.isEmpty) {
         // use featured stars if no search type is used
         val featuredCategoryValue = featured.ensureCategoryValueIsCreated()
         List(List(featuredCategoryValue.id))
       } else {
-        for {
-          (category, categoryValues) <- categoryAndCategoryValues
-        } yield { categoryValues }
+        for ((category, categoryValues) <- categoryAndCategoryValues) yield categoryValues
       }
 
       //TODO: UNCOMMENT AFTER MAKING FEATURED INTO CATEGORY VALUES
