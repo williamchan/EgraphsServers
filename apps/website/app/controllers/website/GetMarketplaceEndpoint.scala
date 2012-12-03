@@ -141,7 +141,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
               id = cv.id,
               active = activeCategoryValues.contains(cv.id)
             )
-          )
+          ).toList
         )
       }
 

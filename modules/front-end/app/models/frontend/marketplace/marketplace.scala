@@ -85,7 +85,7 @@ object MarketplaceConversions {
 case class CategoryViewModel(
   id: Long = 0,
   publicName: String,
-  categoryValues: Iterable[CategoryValueViewModel]
+  categoryValues: List[CategoryValueViewModel]
 ) {
   /**
    * Turn this representation into a convenient JSON representation for our front end code. 
@@ -95,7 +95,7 @@ case class CategoryViewModel(
          "c" + id.toString -> 
           Json.toJson(categoryValues.filter(cv => cv.active).map( fv => 
             Json.toJson(fv.id)  
-          ).toSeq)
+          ))
       )
   }
   /**
@@ -108,11 +108,16 @@ case class CategoryViewModel(
  /**
   *  Represents a CategoryValue (for ex: Boston Red Sox)
   **/
-case class CategoryValueViewModel(
-  id: Long= 0,
+case class CategoryValueViewModel (
+  id: Long = 0,
   publicName: String, 
   active: Boolean
-) 
+) extends Ordered[CategoryValueViewModel] {
+  override def compare(that: CategoryValueViewModel) = {
+    this.publicName.compareTo(that.publicName)
+  }
+}
+
 /**
  * Representation of sorting options like Price ascending or Alphabetical
  **/

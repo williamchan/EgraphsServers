@@ -83,7 +83,7 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
     }
   }
 
-  def categoryViewModels: Iterable[CategoryViewModel] = {
+  def categoryViewModels: List[CategoryViewModel] = {
     List(
       CategoryViewModel(
         id = 1,
