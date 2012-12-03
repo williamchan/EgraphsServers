@@ -4,22 +4,22 @@
 
 # Home page
 GET     /                           controllers.Application.index
-GET	    /website					          controllers.Application.websiteAvailability
-GET     /db							            controllers.Application.dbAvailability
-GET     /cache						          controllers.Application.cacheAvailability
+GET     /website                    controllers.Application.websiteAvailability
+GET     /db                         controllers.Application.dbAvailability
+GET     /cache                      controllers.Application.cacheAvailability
 
 # JSON objects
-GET     /metrics/website			      controllers.Application.websiteMetrics
-GET     /metrics/db					        controllers.Application.dbMetrics
-GET     /metrics/cache				      controllers.Application.cacheMetrics
+GET     /metrics/website            controllers.Application.websiteMetrics
+GET     /metrics/db                 controllers.Application.dbMetrics
+GET     /metrics/cache              controllers.Application.cacheMetrics
 
 # SNS Alarm update
 GET     /alarms                     controllers.Application.alarms
 POST    /phoneUpdate                controllers.Application.phoneUpdate
 
 # ToyBox routes
-GET	/login		controllers.Global.getLogin
-POST	/login		controllers.Global.postLogin
+GET     /login                      controllers.Global.getLogin
+POST    /login                      controllers.Global.postLogin
 
 
 # Map static resources from the /public folder to the /assets URL path
