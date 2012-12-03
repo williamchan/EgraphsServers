@@ -1,0 +1,14 @@
+h1 {
+    padding: 10px 30px;
+    background: #CAE7EC;
+    font-size: 20px;
+}
+
+td {
+	padding: 0px 20px 10px;
+}
+
+table.animals {
+  width: 100%;
+}
+

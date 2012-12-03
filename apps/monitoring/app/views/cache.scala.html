@@ -1,0 +1,13 @@
+@(titleString: String)
+
+@main(title = titleString) {
+  
+   <script type="text/javascript">
+   $(function () {
+ 		Egraphs.displayPage("Number of client connections to cache ", "/metrics/cache");
+ 	});
+  </script>
+  
+  <input class="redirect" type="button" value="Home" onclick=redirect("")>
+
+}
