@@ -1,0 +1,23 @@
+@(titleString: String)
+
+@main(title = titleString) {
+  
+  <h1> Egraphs Monitoring Services </h1>
+  
+  <table class="animals">
+    <tr>
+      <td class="buttons">
+        <img src='@routes.Assets.at("images/kitten.jpeg")' alt="kitten" height=300, width=300>
+        <input class="redirect" type="button" value="Site Availability" onclick=redirect("website")>
+      </td>
+      <td class = "buttons">
+        <img src='@routes.Assets.at("images/puppy.jpeg")' alt="puppy" height=300, width=350>
+        <input class="redirect" type="button" value="Database Availability" onclick=redirect("db")>
+      </td>
+      <td class = "buttons">
+        <img src='@routes.Assets.at("images/hamster.jpeg")' alt="hamster" height=300, width=350>
+        <input class="redirect" type="button" value="Cache Availability" onclick=redirect("cache")>
+      </td>
+    </tr>
+  </table>
+}

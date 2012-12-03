@@ -1,0 +1,12 @@
+@(titleString: String)
+
+@main(title = titleString) {
+ 
+  <script type="text/javascript">
+  $(function () {
+		Egraphs.displayPage("Recent GET requests to ", "/metrics/website");
+	});
+ </script> 
+ 
+ <input class="redirect" type="button" value="Home" onclick=redirect("")> 
+}
