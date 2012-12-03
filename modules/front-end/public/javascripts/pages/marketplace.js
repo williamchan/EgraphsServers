@@ -1,14 +1,47 @@
-define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min"], function (Egraphs) {
+define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoints.min"], function (Egraphs) {
   /**
    * Define controller for marketplace
    * @param $scope Global Angular Scope
    */
   var marketplaceCtrl = function ($scope) {
     $scope.results = angular.copy(Egraphs.page.results);
+    $scope.total = $scope.results.celebrities.length;
+    var count = 0;
+    var countIncrement;
 
+    /**
+     * Depending on the screensize, set increment.
+     * Desktop displays rows of 3, iPad-like rows of 2, and phone is 1.
+     * Buffer two rows to keep scrolling smooth.
+    **/
+    if($(window).width() < 720) {
+      countIncrement = 4;
+    } else {
+      countIncrement = 6;
+    }
+
+    $scope.celebrities = [];
+
+    /**
+     *  Function for loading celebrities.
+     *  Hides the see-more button when out of celebrities.
+     *  Button serves as a manual override for when scroll events behave strangely.
+     **/
     $scope.loadCelebrities = function() {
       //load data
+      if(count < $scope.total -1) {
+        $scope.celebrities = $scope.celebrities.concat($scope.results.celebrities.slice(count,count + countIncrement));
+        count +=countIncrement;
+        atBottom = false;
+        if(count >= $scope.total) {
+          $(".see-more").addClass("hidden");
+        }
+      }
     };
+
+    $scope.loadCelebrities();
+    $scope.loadCelebrities();
+
   };
 
   /**
@@ -20,7 +53,7 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min"], function (E
    * Filter for producing a price range string from a celebrity object.
    * $45-90 if two different prices (non-zero)
    * $90 if minimum price is zero
-   * "" if the prices are both zero
+   * <empty-string> if the prices are both zero
    */
   marketplaceModule.filter('priceRange', function() {
     return function(celebrity) {
@@ -38,14 +71,18 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min"], function (E
    * Inspired by
    * http://specificidea.com/collection_items/blog/infinite-scroll-with-angularjs-and-rails/59
    */
+
+  var atBottom = false;
+
   marketplaceModule.directive('whenScrolled', function() {
     return function(scope, element, attrs) {
-      $(window).scroll(function() {
-        var win = $(this);
-        if (win.scrollTop() + win.height() == $(document).height()) {
-          console.log("at the bottom!");
+      $(".celebrity-result").last().waypoint(function(){
+        if(atBottom === false && !scope.$$phase){
+          atBottom = true;
+          scope.$apply(attrs.whenScrolled);
+          $(this).waypoint();
         }
-      });
+      }, {offset: 'bottom-in-view', continuous: false, triggerOnce : false});
     };
   });
 

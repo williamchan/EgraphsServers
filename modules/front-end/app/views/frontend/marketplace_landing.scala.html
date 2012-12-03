@@ -1,7 +1,7 @@
 @(queryUrl : String, 
   marketplaceRoute: String,
   verticalViewModels: Iterable[models.frontend.marketplace.VerticalViewModel],
-  results: Iterable[models.frontend.marketplace.ResultSetViewModel],
+  results: models.frontend.marketplace.ResultSetViewModel,
   categoryViewModels: Iterable[models.frontend.marketplace.CategoryViewModel] = List[models.frontend.marketplace.CategoryViewModel](),
   sortOptions: Iterable[models.frontend.marketplace.SortOptionViewModel]   
 )(
@@ -79,7 +79,7 @@ Translates a map of categories and their categoryvalues into a JsonObject that c
           </aside> <!-- end .mobile-nav -->
           @** TODO redo view as list stuff. *@
           @tags.marketplace.view_options(sortOptions, false)
-          @tags.marketplace.result_set(results)
+          @tags.marketplace.result_set()
 
         </div>
        

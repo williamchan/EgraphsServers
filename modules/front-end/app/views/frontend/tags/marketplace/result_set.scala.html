@@ -1,29 +1,31 @@
-@(results: Iterable[models.frontend.marketplace.ResultSetViewModel])
+@()
 
 <div class="verticals">
   <section class="clearfix" ng-cloak ng-controller="MarketplaceCtrl">
-    <section ng-repeat="result in results">
-      <h1><span>{{result.subtitle}}</span></h1>
+    <section>
+      <h1><span>{{results.subtitle}}</span></h1>
       <div class="clearfix">
-        <article ng-repeat="celebrity in result.celebrities" when-scrolled="loadCelebrities()">
+        <article ng-repeat="celebrity in celebrities" when-scrolled="loadCelebrities()" class="celebrity-result">
           <figure>
               <a ng-show=celebrity.soldout href="#" class="ribbon"><em>Sold Out</em></a>
               <a href="{{celebrity.storefrontUrl}}"><img src="{{celebrity.photoUrl}}" alt="FPO image"></a>
           </figure>
-
           <hgroup>
             <h2><a href="{{celebrity.storefrontUrl}}" title="View celeb: {{celebrity.publicName}}">{{celebrity.publicName}}</a></h2>
             <h3>{{celebrity.secondaryText}}</h3>
           </hgroup>
-
           <p>
             <a href="{{celebrity.storefrontUrl}}">
               {{ celebrity | priceRange }}
             </a>
           </p>
-
         </article>
       </div>
+      <p class="see-more" ng-click="loadCelebrities()">
+        <em>
+          <a class="clearfix"><b>Load More</b> <i><span>&darr;</span></i></a>
+        </em>
+      </p>
     </section>
   </section>
 </div>

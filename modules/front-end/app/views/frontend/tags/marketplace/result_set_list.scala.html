@@ -1,4 +1,4 @@
-@(results: Iterable[models.frontend.marketplace.ResultSetViewModel])
+@(results: models.frontend.marketplace.ResultSetViewModel)
 
 <div class="verticals list">
 
@@ -14,8 +14,7 @@
     </thead>
   
     <tbody>
-    @for(resultSet <- results) {    
-      @for(celebrity <- resultSet.celebrities) {  
+      @for(celebrity <- results.celebrities) {
         <tr>
           <td><strong><a href="@celebrity.storefrontUrl">@celebrity.publicName &raquo;</a></strong></td>
           <td>
@@ -42,8 +41,7 @@
             @celebrity.secondaryText
           </td>
         </tr>
-      }  
-    }  
+      }
     </tbody>
   </table>
 </div> <!-- end .verticals.list -->

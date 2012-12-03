@@ -150,7 +150,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         viewAsList = viewAsList,
         marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage.url,
         verticalViewModels = getVerticals(activeCategoryValues),
-        results = List(ResultSetViewModel(subtitle = Option(subtitle), celebrities)),
+        results = ResultSetViewModel(subtitle = Option(subtitle), celebrities),
         categoryViewModels = categoryViewModels,
         sortOptions = sortOptionViewModels(maybeSortType)))
     }
