@@ -1,19 +1,24 @@
 package services.mvc.celebrity
 
-import akka.actor.{ActorRef, Actor}
-import com.google.inject.Inject
-import services.AppConfig
-import java.util.concurrent.TimeUnit
 import java.util.Random
-import services.logging.Logging
-import services.db.{TransactionSerializable, DBSession}
-import services.cache.CacheFactory
-import play.api.Play.current
+import com.google.inject.Inject
+import akka.actor.Actor
+import akka.actor.ActorRef
 import akka.actor.Props
-import play.api.libs.concurrent.Akka
+import akka.agent.Agent
+import akka.dispatch.Await
 import akka.util.duration._
-import org.joda.time.DateTimeConstants
-import models.{CelebrityStore, ProductStore}
+import akka.util.Timeout
+import akka.pattern.ask
+import models.CelebrityStore
+import models.frontend.landing.CatalogStar
+import play.api.Play.current
+import play.api.libs.concurrent.Akka
+import services.cache.CacheFactory
+import services.db.DBSession
+import services.db.TransactionSerializable
+import services.logging.Logging
+import services.AppConfig
 
 /**
  * You are probably looking for [[services.mvc.celebrity.CatalogStarsQuery]] instead of this.
@@ -36,14 +41,14 @@ private[celebrity] class UpdateCatalogStarsActor @Inject()(
 ) extends Actor with Logging {
 
   import viewConverting._
-  import UpdateCatalogStarsActor.{UpdateCatalogStars, updatePeriodSeconds, resultsCacheKey}
+  import UpdateCatalogStarsActor.{UpdateCatalogStars, updatePeriod, resultsCacheKey}
 
   protected def receive = {
-    case UpdateCatalogStars(recipientActor) => {
+    case UpdateCatalogStars(catalogStarsAgent) => {
       // Get the stars from the cache preferentially. This reduces round-trips to the database in multi-instance
       // deployments because one instance can share the results from another.
       val cache = cacheFactory.applicationCache
-      val tempCatalogStars = cache.cacheing(resultsCacheKey, updatePeriodSeconds) {
+      val tempCatalogStars = cache.cacheing(resultsCacheKey, updatePeriod.toSeconds.toInt) {
         // Due to cache miss, this instance must update from the database. Get all the stars and
         // their sold-out info.
         db.connected(isolation = TransactionSerializable, readOnly = true) {
@@ -61,17 +66,18 @@ private[celebrity] class UpdateCatalogStarsActor @Inject()(
       // Send the celebs to an actor that will be in charge of serving them to
       // the landing page.
       
-      log("Transmitting " + catalogStars.length + " stars to the serving actor " + recipientActor)
-      recipientActor ! CatalogStarsActor.SetCatalogStars(catalogStars)
+      log("Transmitting " + catalogStars.length + " stars to the agent.")
+      catalogStarsAgent send catalogStars
+      catalogStarsAgent.await(10 seconds)
 
       // Send back completion. This is mostly so that the tests won't sit there waiting forever
       // for a response.
-      sender ! "Done"
+      sender ! catalogStarsAgent.get
     }
   }
 }
 
-private[mvc] object UpdateCatalogStarsActor extends Logging {
+object UpdateCatalogStarsActor extends Logging {
 
   def init() = {
     scheduleJob()
@@ -81,24 +87,30 @@ private[mvc] object UpdateCatalogStarsActor extends Logging {
   // Package members
   //
   private[celebrity] val singleton = {
-    Akka.system.actorOf(Props(AppConfig.instance[UpdateCatalogStarsActor])) 
+    Akka.system.actorOf(Props(AppConfig.instance[UpdateCatalogStarsActor]))
   }
-  private[celebrity] val updatePeriodSeconds = 10 * DateTimeConstants.SECONDS_PER_MINUTE
+  private[celebrity] val updatePeriod = 2 minutes
   private[celebrity] val resultsCacheKey = "catalog-stars"
-  private[celebrity] case class UpdateCatalogStars(recipientActor: ActorRef)
+  private[celebrity] case class UpdateCatalogStars(catalogStarsAgent: Agent[IndexedSeq[CatalogStar]])
+
+  implicit val timeout: Timeout = 2 minutes
 
   //
   // Private members
   //
   private def scheduleJob() = {
+    //run once then schedule    
+    Await.result(this.singleton ask UpdateCatalogStars(CatalogStarsAgent.singleton), 2 minutes)
+
     val random = new Random()
-    val delayJitter = random.nextInt() % 10 // this should make the update schedule a little more random, and if we are unlucky that all hosts update at once, they won't the next time.
-    log("Scheduling landing page celebrity update for every " + updatePeriodSeconds + "s")
+    val delayJitter = random.nextInt() % 10 seconds // this should make the update schedule a little more random, and if we are unlucky that all hosts update at once, they won't the next time.
+    val jitteredUpdatePeriod = updatePeriod + delayJitter
+    log("Scheduling landing page celebrity update for every " + jitteredUpdatePeriod.toSeconds + " seconds.")
     Akka.system.scheduler.schedule(
-      10 seconds,
-      updatePeriodSeconds seconds,
+      jitteredUpdatePeriod,
+      jitteredUpdatePeriod,
       this.singleton,
-      UpdateCatalogStars(CatalogStarsActor.singleton)
+      UpdateCatalogStars(CatalogStarsAgent.singleton)
     )
   }
 }

@@ -1,0 +1,59 @@
+@(postLogin: Call, assets: String => Call, loginForm: Form[(String, String)], previousUsername: String = "", 
+  errorMessage: String = "")
+@import helper._
+@import helper.twitterBootstrap._
+
+<!DOCTYPE html>
+
+<html>
+
+
+  <head><title>ToyBox Log-In</title>
+    <link rel="stylesheet" media="screen" href="@assets("toybox-assets/stylesheets/bootstrap.css")">
+    <link rel="stylesheet" media="screen" href="@assets("toybox-assets/stylesheets/main.css")">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+  </head>
+
+  <body>
+    <div class="topbar">
+      <div class="fill">
+        <div class="container">
+        
+          <a class="brand">ToyBoxed Application</a>
+        
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="content">
+        <div class="page-header">
+
+          <h1>ToyBox Log-In <small>Please sign in to continue</small></h1>
+        
+        </div>
+
+        <div class="row">
+          <div class="span14">
+
+            @form(postLogin) {
+              <fieldset>
+                <legend>@errorMessage</legend>
+                @inputText(loginForm("username"), '_label -> "Username")
+                @inputPassword(loginForm("password"), '_label -> "Password", 
+                  'value -> previousUsername)
+              </fieldset>
+
+              <div class="actions">
+                <input type="submit" class="btn primary" value="Log In">
+              </div>
+            }
+        
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </body>
+
+
+</html>

@@ -1,4 +1,4 @@
-@(framedPrintImageUrl: String, csvHeaders: String, csvLine: String, pngUrl: Option[String] = None)
+@(framedPrintImageUrl: String, csvHeaders: String, csvLine: String, pngUrl: Option[String] = None, certUrl: Option[String] = None)
 
 <html>
   <body>
@@ -8,5 +8,8 @@
     <p><a href=@framedPrintImageUrl target="_blank">@framedPrintImageUrl</a></p>
     <p>@csvHeaders</p>
     <p>@csvLine</p>
+    @certUrl.map {url =>
+      <p><a href=@url target="_blank">Certificate url</a></p>
+    }
   <body>
 <html>

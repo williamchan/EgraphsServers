@@ -25,12 +25,13 @@ case class MarketplaceCelebrity(
     publicName: String,
     photoUrl: String,
     storefrontUrl: String,
-    soldout: Boolean,
+    inventoryRemaining: Int,
     minPrice: Int,
     maxPrice: Int, 
-    secondaryText: String
-)
-
+    secondaryText: String)
+{
+  def soldout: Boolean = (inventoryRemaining <= 0)
+}
 
 /**
  * Represents a collection of results from a query. 
@@ -48,7 +49,7 @@ object MarketplaceConversions {
       (json \ "publicName").as[String],
       (json \ "photoUrl").as[String],
       (json \ "storefrontUrl").as[String],
-      (json \ "soldout").as[Boolean],
+      (json \ "inventoryRemaining").as[Int],
       (json \ "minPrice").as[Int],
       (json \ "maxPrice").as[Int],
       (json \ "secondaryText").as[String]
@@ -59,6 +60,7 @@ object MarketplaceConversions {
       "publicName" -> JsString(c.publicName),
       "photoUrl" -> JsString(c.photoUrl),
       "storefrontUrl" -> JsString(c.storefrontUrl),
+      "inventoryRemaining" -> JsNumber(c.inventoryRemaining),
       "soldout" -> JsBoolean(c.soldout),
       "minPrice" -> JsNumber(c.minPrice),
       "maxPrice" -> JsNumber(c.maxPrice),

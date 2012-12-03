@@ -3,6 +3,15 @@ package models
 import enums.{PublishedStatus, EnrollmentStatus}
 import utils.{DBTransactionPerTest, TestData, EgraphsUnitTest}
 import services.AppConfig
+import services.mvc.celebrity.CatalogStarsQuery
+import services.db.DBSession
+import services.db.Schema
+import models.frontend.landing.CatalogStar
+import akka.agent.Agent
+import play.api.libs.concurrent.Akka
+import services.mvc.celebrity.UpdateCatalogStarsActor
+import services.cache.CacheFactory
+import services.mvc.celebrity.CelebrityViewConverting
 
 class CelebrityStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
   "getPublishedCelebrities" should "get any celebrities that are published and none that are unpublished" in {
@@ -22,7 +31,7 @@ class CelebrityStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
     results.map(result => result.id) should be (IndexedSeq(published.id))
   }
 
-  "getPublishedCelebrities" should "return the celebrities in alphabetical order on roleDescription" in {
+  it should "return the celebrities in alphabetical order on roleDescription" in {
     // Create and persist a list of celebs whose roleDescriptions are "c", "Ac", and "ab",
     // in that order. We'll be testing if they query out in the reverse order, which is what they should do if
     // properly sorting on lower-cased roleDescription.
@@ -42,10 +51,11 @@ class CelebrityStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
   }
 
   // This test ensures that queries return results but makes no guarantees on the quality of search results
-  "search" should "return celebrities matching the text query" in {
+  "celebritiesSearch" should "return celebrities matching the text query" in {
     val celeb = newSearchableCeleb
     instanceUnderTest.rebuildSearchIndex
-    val results = instanceUnderTest.marketplaceSearch(Some(celeb.publicName))
+    val results = instanceUnderTest.celebritiesSearch(Some(celeb.publicName))
+
     results.isEmpty should be(false)
   }
 
@@ -53,18 +63,18 @@ class CelebrityStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
   it should "return 0 celebrities matching the empty string" in {
     val celeb = newSearchableCeleb
     instanceUnderTest.rebuildSearchIndex
-    val results = instanceUnderTest.marketplaceSearch(Some(""))
+    val results = instanceUnderTest.celebritiesSearch(Some(""))
 
     results.isEmpty should be(true)
   }
 
   it should "actually rebuild the search index" in {
     val celeb = newSearchableCeleb
-    val results = instanceUnderTest.marketplaceSearch(Some(celeb.publicName))
+    val results = instanceUnderTest.celebritiesSearch(Some(celeb.publicName))
     results.isEmpty should be(true)
 
     instanceUnderTest.rebuildSearchIndex
-    val results1 = instanceUnderTest.marketplaceSearch(Some(celeb.publicName))
+    val results1 = instanceUnderTest.celebritiesSearch(Some(celeb.publicName))
     results1.isEmpty should be(false)
   }
   
@@ -75,7 +85,7 @@ class CelebrityStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
     celeb.categoryValues.associate(categoryValueA)
 
     instanceUnderTest.rebuildSearchIndex
-    val results1 = instanceUnderTest.marketplaceSearch(Some(categoryValueA.publicName))
+    val results1 = instanceUnderTest.celebritiesSearch(Some(categoryValueA.publicName))
     results1.isEmpty should be(false)
   }
 
@@ -88,7 +98,7 @@ class CelebrityStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
     celeb.categoryValues.associate(categoryValueB)
 
     instanceUnderTest.rebuildSearchIndex
-    val results1 = instanceUnderTest.marketplaceSearch(Some(categoryValueA.publicName + " " + categoryValueB.publicName))
+    val results1 = instanceUnderTest.celebritiesSearch(Some(categoryValueA.publicName + " " + categoryValueB.publicName))
     results1.isEmpty should be(false)
   }
 
@@ -99,7 +109,7 @@ class CelebrityStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
     celeb.categoryValues.associate(categoryValueA)
 
     instanceUnderTest.rebuildSearchIndex
-    val results1 = instanceUnderTest.marketplaceSearch(maybeQuery = None, refinements = Map (category.id -> Set(categoryValueA.id)))
+    val results1 = instanceUnderTest.celebritiesSearch(maybeQuery = None, refinements = Map (category.id -> Set(categoryValueA.id)))
     results1.isEmpty should be(false)
   }
 
@@ -115,14 +125,14 @@ class CelebrityStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
     celebB.categoryValues.associate(categoryValueB)
 
     instanceUnderTest.rebuildSearchIndex
-    val results1 = instanceUnderTest.marketplaceSearch(maybeQuery = None, refinements = Map (category.id -> Set(categoryValueA.id, categoryValueB.id)))
+    val results1 = instanceUnderTest.celebritiesSearch(maybeQuery = None, refinements = Map (category.id -> Set(categoryValueA.id, categoryValueB.id)))
     results1.size should be(2)
   }
 
   it should "find celebs of a certain category through multiple refinements in different categories (AND search)" in {
-    val category = TestData.newSavedCategory
+    val categoryA = TestData.newSavedCategory
     
-    val categoryValueA = TestData.newSavedCategoryValue(category.id)
+    val categoryValueA = TestData.newSavedCategoryValue(categoryA.id)
     val celebA = newSearchableCeleb
     celebA.categoryValues.associate(categoryValueA)
 
@@ -133,11 +143,11 @@ class CelebrityStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
     celebAB.categoryValues.associate(categoryValueA)
 
     instanceUnderTest.rebuildSearchIndex
-    val results1 = instanceUnderTest.marketplaceSearch(maybeQuery = None, refinements = 
-      Map (category.id -> Set(categoryValueA.id), 
+    val results = instanceUnderTest.celebritiesSearch(maybeQuery = None, refinements = 
+      Map (categoryA.id -> Set(categoryValueA.id), 
            categoryB.id -> Set(categoryValueB.id)
       ))
-    results1.size should be(1)
+    results.size should be(1)
   }
 
   "find by category value" should "return celebrities associated with a particular CategoryValue" in new EgraphsTestApplication {
@@ -167,7 +177,7 @@ class CelebrityStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
     // Returns the set associated with the filter
     retrievedCategoryValuesA.map(celeb => celebsTaggedWithA should contain(celeb))
     
-   retrievedCategoryValuesB.map(celeb => celebsTaggedWithB should contain(celeb))
+    retrievedCategoryValuesB.map(celeb => celebsTaggedWithB should contain(celeb))
 
     // And the set is exclusive of the other filter
     retrievedCategoryValuesA.map(celeb => celebsTaggedWithB.exists(c => celeb.id == c.id) should be(false))

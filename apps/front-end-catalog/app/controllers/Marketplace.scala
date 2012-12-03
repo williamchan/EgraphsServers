@@ -8,7 +8,7 @@ import helpers.DefaultImplicitTemplateParameters
 import scala.util.Random
 import models.frontend.marketplace.CelebritySortingTypes
 
-/**
+/**                                                            ma
  * Marketplace controller
  */
 object Marketplace extends Controller with DefaultImplicitTemplateParameters {
@@ -29,19 +29,11 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
     Ok(views.html.frontend.marketplace_results(
       query = "",
       viewAsList = true,
-      marketplaceRoute = controllers.routes.Marketplace.mlb.url,
+      marketplaceRoute = controllers.routes.Marketplace.results.url,
       verticalSet,
       resultSet,
       categoryViewModels,
       sortOptions))
-  }
-
-  def index() = Action {
-    Ok(views.html.frontend.marketplace_landing("derp", "exampleQuery", verticalSet, resultSet, categoryViewModels, sortOptions))
-  }
-
-  def mlb() = Action {
-    Ok(views.html.frontend.marketplace_mlb())
   }
 
   def categorySet: Iterable[CategoryViewModel] = {
@@ -76,7 +68,7 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
         publicName = "Herp Derpson",
         photoUrl = EgraphsAssets.at("images/660x350.gif").url,
         storefrontUrl = "#",
-        soldout = coinflip.nextBoolean,
+        inventoryRemaining = coinflip.nextInt(20),
         minPrice = 45,
         maxPrice = 90,
         secondaryText = "Boston Red Sox")

@@ -67,19 +67,49 @@
           <button type="submit" id="editMessages-button" class="btn primary fade in">Edit Messages</button>
         </div>
       }
+      @safeForm('id -> "changeBuyer-form", 'method -> "POST", 'action -> postOrder.url) {
+        <input name="orderId" type="hidden" value="@order.id">
+        <input name="action" type="hidden" value="changeBuyer">
+        <div class="actions">
+          <h3>Change buyer</h3>
+          @formField(
+            id="newBuyerEmail",
+            label="New Buyer Email (must correspond to an existing customer)",
+            inputType="text",
+            width="span4",
+            fields=fields
+          )
+          <button type="submit" class="btn primary fade in">Change Buyer</button>
+        </div>
+      }
       @safeForm('id -> "changeRecipient-form", 'method -> "POST", 'action -> postOrder.url) {
         <input name="orderId" type="hidden" value="@order.id">
         <input name="action" type="hidden" value="changeRecipient">
         <div class="actions">
           <h3>Change recipient</h3>
           @formField(
-            id="newRecipientEmail",
-            label="New Recipient Email (must correspond to an existing customer)",
+          id="newRecipientEmail",
+          label="New Recipient Email (must correspond to an existing customer)",
+          inputType="text",
+          width="span4",
+          fields=fields
+          )
+          <button type="submit" class="btn primary fade in">Change Recipient</button>
+        </div>
+      }
+      @safeForm('id -> "changeProduct-form", 'method -> "POST", 'action -> postOrder.url) {
+        <input name="orderId" type="hidden" value="@order.id">
+        <input name="action" type="hidden" value="changeProduct">
+        <div class="actions">
+          <h3>Change product</h3>
+          @formField(
+            id="newProductId",
+            label="New Product Id",
             inputType="text",
             width="span4",
             fields=fields
           )
-          <button type="submit" id="editMessages-button" class="btn primary fade in">Change Recipient</button>
+          <button type="submit" class="btn primary fade in">Change Product</button>
         </div>
       }
     }
