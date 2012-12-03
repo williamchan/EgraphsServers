@@ -649,10 +649,17 @@ class CelebrityStore @Inject() (
    * useful admin text search. 
    * 
    * Currently the view conversion is doing another DB query to fill in that data for each celebrity, would be great if we could do it all in one trip. 
-   * Set[Categoryid, Iterable[CategoryValueId]]
-   * in each set (OR CategoryValueIds) And (OR CategoryValueIds)
-   * 
-   *  (pitcher or 2nd baseman) and (red sox or yankees)
+   *
+   * @param maybeQuery the text to search for. This will be tested against the celebrity's name, category values,
+   *                   descriptions, and a few other sources.
+   * @param refinements this kind of sucks, but it's a way of communicating AND and OR combinations of different
+   *                    category values for the queried celebrities. Elements of the nested Iterable[Long]s will be interpreted
+   *                    as OR relationships, and each outer element will be compared to its siblings with AND
+   *                    relationships. For example, imagine you wanted to search for PITCHERS(categoryvalueid=1) named
+   *                    "Derpson" on the Yankees(cvid=2) or the Mets(cvid=3), the conceptual query
+   *                    you want is the set of celebrities named Derpson with "PITCHERS and (METS or YANKEES)".
+   *                    You would phrase the query against marketplaceSearch as:
+   *                    marketplaceSearch(Some("Derpson"), List(List(1), List(2, 3))
    */
   def marketplaceSearch(maybeQuery: Option[String] = None, refinements: Iterable[Iterable[Long]] = Iterable[Iterable[Long]]())
   : Iterable[MarketplaceCelebrity] = {
