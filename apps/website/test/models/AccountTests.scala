@@ -205,7 +205,7 @@ class AccountStoreTests extends EgraphsUnitTest
     val customer = TestData.newSavedCustomer()
     val account = customer.account
     accountStore.findByCustomerId(customer.id) should be (Some(account))
-    accountStore.findByCustomerId(customer.id + 1) should be (None)
+    accountStore.findByCustomerId(Long.MaxValue) should be (None)
   }
 
   it should "should persist fine with no celebrity/customer/admin IDs" in new EgraphsTestApplication {
@@ -214,21 +214,21 @@ class AccountStoreTests extends EgraphsUnitTest
 
   it should "fail to persist with non-null, non-existent celebrity ID" in new EgraphsTestApplication {
     val thrown = evaluating {
-                              accountStore.save(Account(celebrityId = Some(1L)))
+                              accountStore.save(Account(celebrityId = Some(Long.MaxValue)))
                             } should produce[RuntimeException]
     thrown.getMessage.toUpperCase should include("CELEBRITYID")
   }
 
   it should "fail to persist with non-null, non-existent customer ID" in new EgraphsTestApplication {
     val thrown = evaluating {
-                              accountStore.save(Account(customerId = Some(1L)))
+                              accountStore.save(Account(customerId = Some(Long.MaxValue)))
                             } should produce[RuntimeException]
     thrown.getMessage.toUpperCase should include("CUSTOMERID")
   }
 
   it should "fail to persist with non-null, non-existent administrator ID" in new EgraphsTestApplication {
     val thrown = evaluating {
-                              accountStore.save(Account(administratorId = Some(1L)))
+                              accountStore.save(Account(administratorId = Some(Long.MaxValue)))
                             } should produce[RuntimeException]
     thrown.getMessage.toUpperCase should include("ADMINISTRATORID")
   }

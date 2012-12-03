@@ -49,31 +49,22 @@ trait PostCelebrityCategoryValueAdminEndpoint {
       Action { implicit request =>
         
         val categoryValueIds = request.body.asFormUrlEncoded match {
-          case Some(params) if(params.contains("categoryValueIds")) => {
+          case Some(params) if(params.contains("categoryValueIds")) =>
             for(categoryValueId <- params("categoryValueIds")) yield {
               categoryValueId.toLong
             }
-          }
+
           case _ => List[Long]()
         }
 
         celebrityStore.findById(celebrityId) match {
-        case Some(celebrity) => {
-              celebrityStore.updateCategoryValues(celebrity = celebrity, categoryValueIds = categoryValueIds) 
+            case Some(celebrity) =>
+              celebrityStore.updateCategoryValues(celebrity = celebrity, categoryValueIds = categoryValueIds)
               Redirect(controllers.routes.WebsiteControllers.getCelebrityAdmin(celebrity.id).url, FOUND)
-            }
-            case _ => Redirect(controllers.routes.WebsiteControllers.getCelebritiesAdmin.url, SEE_OTHER)   
+
+            case None => Redirect(controllers.routes.WebsiteControllers.getCelebritiesAdmin.url, SEE_OTHER)
           }
       }
     }  
-  }
-
-  private def isValidCategoryValueId: Constraint[CelebrityCategoryValueForm] = {
-    Constraint { form: CelebrityCategoryValueForm => 
-      categoryValueStore.findById(form.categoryValueId) match {
-        case Some(categoryValue) => Valid
-        case _ => Invalid("Category Value ID is incorrect ")
-      }
-    }    
   }
 }

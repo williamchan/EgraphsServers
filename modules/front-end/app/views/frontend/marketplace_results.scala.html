@@ -14,6 +14,7 @@
 @import views.frontend.Utils
 @import models.frontend.egraphs._
 @import play.api.libs.json._
+
 @**
   Page for displaying marketplace results. 
   Vertical buttons are currently hidden. Will be used in the future, when we have multiple verticals.
@@ -30,7 +31,7 @@ Translates a map of categories and their categoryvalues into a JsonObject that c
  );
  Egraphs.page.queryUrl = "@marketplaceRoute";
  Egraphs.page.query = "@query";
- Egraphs.page.sort = "@sortOptions.filter(v => v.active).headOption.map(v => v.name)";
+ Egraphs.page.sort = "@sortOptions.find(v => v.active).map(v => v.name)";
  Egraphs.page.view = @if(viewAsList){"list"} else {""};
 }
 
@@ -46,6 +47,7 @@ Translates a map of categories and their categoryvalues into a JsonObject that c
       
         <form action="@marketplaceRoute" method="get">
             <input name="query" id="celebrity-searchbox" type="search" placeholder="Find Your Star" value="@query" autofocus>
+            <input type="hidden" name="sort" value="@sortOptions.find(v => v.active).map(v => v.name)">
         </form>
       
         <img src='@EgraphsAssets.at("images/contact-us.jpg")'/>
