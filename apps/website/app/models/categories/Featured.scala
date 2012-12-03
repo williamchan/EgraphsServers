@@ -3,35 +3,25 @@ package models.categories
 import com.google.inject.Inject
 
 object Featured {
-  val categoryName = "Featured"
-  val categoryValueName = "IsFeatured"
+  val categoryValueName = "Featured"
 }
 
 /**
  * Tools to find and assign featured to entities.
  */
 class Featured @Inject() (
-  categoryStore: CategoryStore,
+  internal: Internal,
   categoryValueStore: CategoryValueStore) {
 
   // cost = 2 queries
   def ensureCategoryValueIsCreated(): CategoryValue = {
     val maybeFeaturedCategoryValue = categoryValueStore.findByName(Featured.categoryValueName)
     maybeFeaturedCategoryValue.getOrElse {
-      val featuredCategory = ensureCategoryIsCreated()
+      val featuredCategory = internal.ensureCategoryIsCreated()
       CategoryValue(
         categoryId = featuredCategory.id,
         name = Featured.categoryValueName,
         publicName = Featured.categoryValueName).save()
-    }
-  }
-
-  // cost = 1 queries
-  def ensureCategoryIsCreated(): Category = {
-    categoryStore.findByName(Featured.categoryName).getOrElse {
-      Category(
-        name = Featured.categoryName,
-        publicName = Featured.categoryName).save()
     }
   }
 

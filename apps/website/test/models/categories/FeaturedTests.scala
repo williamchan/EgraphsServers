@@ -8,32 +8,9 @@ import services.AppConfig
 @RunWith(classOf[JUnitRunner])
 class FeaturedTests extends EgraphsUnitTest with DBTransactionPerTest {
 
-  "ensureCategoryIsCreated" should "create a featured category if not there already" in new EgraphsTestApplication {
-    deleteFeaturedCategory()
-
-    val featured = featuredToTest
-    val category = featured.ensureCategoryIsCreated()
-
-    val featuredCategory = categoryStore.findByName(Featured.categoryName)
-    val defined = 'defined
-    featuredCategory should be(defined)
-    featuredCategory.get.name should be(Featured.categoryName)
-    featuredCategory.get.publicName should be(Featured.categoryName)
-    Some(category) should be(featuredCategory)
-  }
-
-  it should "return a featured category if it is there already" in new EgraphsTestApplication {
-    val featured = featuredToTest
-    featured.ensureCategoryIsCreated() // this should make sure one already exists in the next call
-    val category = featured.ensureCategoryIsCreated()
-
-    category.name should be(Featured.categoryName)
-    category.publicName should be(Featured.categoryName)
-  }
-
-  "ensureCategoryValueIsCreated" should "create a featured category value and category are not already there" in new EgraphsTestApplication {
+  "ensureCategoryValueIsCreated" should "create a featured category value and internal category are not already there" in new EgraphsTestApplication {
     deleteFeaturedCategoryValue()
-    deleteFeaturedCategory()
+    deleteInternalCategory()
 
     val featured = featuredToTest
     val categoryValue = featured.ensureCategoryValueIsCreated()
@@ -55,8 +32,8 @@ class FeaturedTests extends EgraphsUnitTest with DBTransactionPerTest {
     categoryValue.publicName should be(Featured.categoryValueName)
   }
 
-  def deleteFeaturedCategory(): Unit = {
-    val maybeCategory = categoryStore.findByName(Featured.categoryName)
+  def deleteInternalCategory(): Unit = {
+    val maybeCategory = categoryStore.findByName(Internal.categoryName)
     maybeCategory match {
       case Some(category) => categoryStore.delete(category)
       case None => // it's not there no need to delete
@@ -76,5 +53,9 @@ class FeaturedTests extends EgraphsUnitTest with DBTransactionPerTest {
 
   def featuredToTest = {
     AppConfig.instance[Featured]
+  }
+
+  def internal = {
+    AppConfig.instance[Internal]
   }
 }
