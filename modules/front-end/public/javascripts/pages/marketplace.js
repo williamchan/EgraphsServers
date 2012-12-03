@@ -6,8 +6,9 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoi
   var marketplaceCtrl = function ($scope) {
     $scope.results = angular.copy(Egraphs.page.results);
     $scope.total = $scope.results.celebrities.length;
+    $scope.celebrities = [];
     var count = 0;
-    var countIncrement;
+    var countIncrement = 0;
 
     /**
      * Depending on the screensize, set increment.
@@ -19,8 +20,6 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoi
     } else {
       countIncrement = 6;
     }
-
-    $scope.celebrities = [];
 
     /**
      *  Function for loading celebrities.
@@ -66,12 +65,14 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoi
       }
     };
   });
+
   /**
    * Directive for binding an element to scroll event.
-   * Inspired by
+   * Inspired by:
    * http://specificidea.com/collection_items/blog/infinite-scroll-with-angularjs-and-rails/59
+   * Depends on waypoint library:
+   * http://imakewebthings.com/jquery-waypoints/
    */
-
   var atBottom = false;
 
   marketplaceModule.directive('whenScrolled', function() {
@@ -96,8 +97,8 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoi
        * settings may not be applicable and give a confusing set of results.
        **/
 
+      // Angular Setup
       window.MarketplaceCtrl = marketplaceCtrl;
-
       angular.element(document).ready(function() {
         angular.bootstrap(document, ['marketplace']);
       });
@@ -221,5 +222,3 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoi
     }
   };
 });
-     
-
