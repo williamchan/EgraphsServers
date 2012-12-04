@@ -38,7 +38,7 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
           
           // TODO: Replace this OK with a Redirect to a GET.
           Ok(
-            views.html.frontend.simple_confirmation(header = "Success", body ="Instructions for recovering your account have been sent to your email address.")
+            views.html.frontend.simple_message(header = "Success", body ="Instructions for recovering your account have been sent to your email address.")
           ).flashing("email" -> flashEmail)
         }
       }

@@ -1,19 +1,15 @@
 package controllers.website
 
-import play.api._
 import play.api.mvc._
 import play.api.data.Forms.{tuple, text, optional}
 import play.api.data.Form
 import services.http.ControllerMethod
-import services.Utils
 import models.{Account, AccountStore}
 import models.frontend.forms.{FormError, Field}
 import models.frontend.account.{AccountPasswordResetForm => AccountPasswordResetFormView}
-import services.http.SafePlayParams.Conversions._
 import services.mvc.ImplicitHeaderAndFooterData
 import services.http.forms.AccountPasswordResetFormFactory
 import services.http.forms.AccountPasswordResetForm.Fields
-import services.http.filters.RequireAccountEmail
 import services.http.filters.HttpFilters
 
 private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
@@ -38,7 +34,11 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
           if (account.verifyResetPasswordKey(form.secretKey.value.getOrElse("")) == true) {
             Ok(views.html.frontend.account_password_reset(form=form, displayableErrors=displayableErrors))
           } else {
-            Forbidden("The password reset URL you used is either out of date or invalid.")
+            Forbidden(views.html.frontend.simple_message("Account not verified",
+              "<p>Aww shucks! The password reset URL you used is invalid.</p>" +
+              "<p>Sorry for this inconvenience, but it's for your own security.</p>" +
+              "<p>Can you make sure that you're using the latest password reset email you received from us?</p>"
+            ))
         }
       }
     }
@@ -51,9 +51,10 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
       Action { implicit request =>
         if (account.verifyResetPasswordKey(resetKey)) {
           account.emailVerify().save()
-          Ok(views.html.frontend.simple_confirmation("Account Verified", "Your account has been successfully verified."))
+          Ok(views.html.frontend.simple_message("Account Verified", "Your account has been successfully verified."))
         } else {
-          Forbidden("The password reset URL you used is either out of date or invalid.")
+          Forbidden(views.html.frontend.simple_message("Account not verified",
+            "Oh darn! The password reset URL you used is either out of date or invalid."))
         }
       }
     }
