@@ -2,12 +2,12 @@
 )(implicit authToken: egraphs.authtoken.AuthenticityToken,
   headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData)
-)
 
 @import controllers.WebsiteControllers
 @import egraphs.authtoken.AuthenticityToken.safeForm
 @import views.html.Application.tags.errorMessage
 @import views.html.Application.tags.formField
+@import views.html.Application.tags.formOption
 @import views.html.frontend.tags
 @import views.html.frontend.tags.ng
 @import views.html.frontend.base_template
@@ -43,15 +43,12 @@
               @formField(id="messageToCelebrity", label="Message to Celebrity", inputType="text", width="span12", fields=fields)
               @formField(id="requestedMessage", label="Requested Message", inputType="text", width="span12", fields=fields)
               
-              <div class="clearfix">
-                <label for="isPromotional">Order Type</label>
-                <div class="input">
-                  <input type="checkbox" name="isPromotional" id="isPromotional" value="true">
-                    Pregraph
-                  </input>
-                </div>
-              </div>
-              <br>
+              @formOption(
+                name="orderTypeString",
+                label="Order Type",
+                selected=models.enums.OrderType.Normal.name,
+                optionList=models.enums.OrderType.asStrList
+              )
               
               <div class="actions">
                 <button type="submit" id="submit-button" class="btn primary fade in">Create</button>

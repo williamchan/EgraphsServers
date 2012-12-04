@@ -55,10 +55,10 @@ case class Order(
   messageToCelebrity: Option[String] = None,
   requestedMessage: Option[String] = None,
   expectedDate: Option[Date] = None,
+  _orderType: String = OrderType.Normal.name,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
-  services: OrderServices = AppConfig.instance[OrderServices],
-  _orderType: String = OrderType.Normal.name
+  services: OrderServices = AppConfig.instance[OrderServices]
 ) extends KeyedCaseClass[Long]
   with HasCreatedUpdated
   with HasPrivacyStatus[Order]
@@ -66,12 +66,14 @@ case class Order(
   with HasOrderReviewStatus[Order]
   with HasWrittenMessageRequest[Order]
 {
+  
   //
   // Public methods
   //
   /** Persists by conveniently delegating to companion object's save method. */
   def save(): Order = {
     require(!recipientName.isEmpty, "Order: recipientName must be specified")
+
     services.store.save(this)
   }
 
