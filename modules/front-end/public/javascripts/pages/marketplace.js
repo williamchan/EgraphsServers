@@ -27,11 +27,10 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoi
      *  Hides the see-more button when out of celebrities.
      *  Button serves as a manual override for when scroll events behave strangely.
      **/
-    $scope.loadCelebrities = function() {
-      //load data
+    var loadCelebrities = function(incr) {
       if(count < $scope.total - 1) {
-        $scope.celebrities = $scope.celebrities.concat($scope.results.celebrities.slice(count, count + countIncrement));
-        count += countIncrement;
+        $scope.celebrities = $scope.celebrities.concat($scope.results.celebrities.slice(count, count + incr));
+        count += incr;
         atBottom = false;
         if(count >= $scope.total) {
           $(".see-more").addClass("hidden");
@@ -39,8 +38,15 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoi
       }
     };
 
-    $scope.loadCelebrities();
-    $scope.loadCelebrities();
+    /**
+     * Creates a controller function with a fixed increment
+    **/
+    $scope.loadCelebrities = function() {
+      loadCelebrities(countIncrement);
+    };
+
+    // Page in two sets of results.
+    //loadCelebrities(countIncrement*2);
 
   };
 
