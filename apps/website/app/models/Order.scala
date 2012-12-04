@@ -192,7 +192,7 @@ case class Order(
       email.addCc(buyingCustomer.account.email)
     }
 
-    email.addReplyTo("noreply@egraphs.com")
+    email.addReplyTo("webserver@egraphs.com")
     email.setSubject("I just finished signing your Egraph")
     val viewEgraphUrl = services.consumerApp.absoluteUrl(GetEgraphEndpoint.url(id))
     val htmlMsg = views.html.frontend.email_view_egraph(

@@ -289,7 +289,7 @@ case class Celebrity(id: Long = 0,
   def sendWelcomeEmail(toAddress: String, bccEmail: Option[String] = None) {
     val email = new HtmlEmail()
 
-    email.setFrom("noreply@egraphs.com", "Egraphs")
+    email.setFrom("webserver@egraphs.com", "Egraphs")
     email.addTo(toAddress, publicName)
     bccEmail.map(bcc => email.addBcc(bcc))
     email.setSubject("Welcome to Egraphs")

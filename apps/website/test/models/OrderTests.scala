@@ -181,7 +181,7 @@ class OrderTests extends EgraphsUnitTest
     implicit val request = FakeRequest()
     val (email, _, _) = order.prepareEgraphSignedEmail
     email.getFromAddress.getAddress should not be (celebrity.account.email)
-    email.getReplyToAddresses.get(0).asInstanceOf[InternetAddress].getAddress should be("noreply@egraphs.com")
+    email.getReplyToAddresses.get(0).asInstanceOf[InternetAddress].getAddress should be("webserver@egraphs.com")
   }
 
   "isBuyerOrRecipient" should "return true if customer is either buy or recipient" in new EgraphsTestApplication {
