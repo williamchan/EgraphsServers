@@ -44,7 +44,7 @@ case class ResultSetViewModel(
 
 object MarketplaceConversions {
   implicit object MarketplaceCelebrityFormat extends Format[MarketplaceCelebrity] {
-    def reads(json: JsValue)  : MarketplaceCelebrity = MarketplaceCelebrity (
+    def reads(json: JsValue) = MarketplaceCelebrity (
       (json \ "id").as[Long],
       (json \ "publicName").as[String],
       (json \ "photoUrl").as[String],
@@ -73,6 +73,7 @@ object MarketplaceConversions {
       (json \ "subtitle").asOpt[String],
       (json \ "celebrities").as[List[MarketplaceCelebrity]]
     )}
+
     def writes(r: ResultSetViewModel) : JsValue =  JsObject(List(
       "subtitle" -> JsString(r.subtitle.getOrElse("")),
       "celebrities" -> JsArray(r.celebrities.map (c => Json.toJson(c)).toSeq)

@@ -8,7 +8,7 @@ import helpers.DefaultImplicitTemplateParameters
 import scala.util.Random
 import models.frontend.marketplace.CelebritySortingTypes
 
-/**                                                            ma
+/**
  * Marketplace controller
  */
 object Marketplace extends Controller with DefaultImplicitTemplateParameters {
