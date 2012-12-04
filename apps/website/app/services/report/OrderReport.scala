@@ -20,23 +20,24 @@ class OrderReport @Inject()(schema: Schema) extends Report {
     )
 
     val headerLine = tsvLine(
-      "orderid",
+      "orderId",
       "amount",
-      "paymentstatus",
-      "reviewstatus",
+      "paymentStatus",
+      "reviewStatus",
       "ordertimePST",
       "orderdatePST",
       "expectedDate",
-      "productid",
-      "celebrityid",
+      "productId",
+      "celebrityId",
       "celebrityName",
-      "buyerid",
-      "buyername",
-      "buyeremail",
-      "recipientid",
-      "recipientname",
-      "candidateegraphid",
-      "candidateegraphstate"
+      "buyerId",
+      "buyerName",
+      "buyerEmail",
+      "recipientId",
+      "recipientName",
+      "candidateEgraphid",
+      "candidateEgraphState",
+      "candidateEgraphSignedAtPST"
     )
 
     val tsv = new StringBuilder(headerLine)
@@ -65,7 +66,8 @@ class OrderReport @Inject()(schema: Schema) extends Report {
         recipient.id,
         recipient.name,
         candidateEgraph.map(_.id).getOrElse(""),
-        candidateEgraph.map(_._egraphState).getOrElse("")
+        candidateEgraph.map(_._egraphState).getOrElse(""),
+        candidateEgraph.map(egraph => formatDate(egraph.getSignedAt, "PST")).getOrElse("")
       ))
     }
     tsvFile(tsv)
