@@ -185,6 +185,7 @@
           @valueRow(label="Written Message Type", value=order._writtenMessageRequest)
           @valueRow(label="Privacy Status",       value=order.privacyStatus)
           @valueRow(label="Rejection Reason",     value=order.rejectionReason.getOrElse(""))
+          @valueRow(label="Order Type",           value=order._orderType)
           @valueRow(label="Created",              value=order.created)
           @valueRow(label="Updated",              value=order.updated)
           <hr/>
