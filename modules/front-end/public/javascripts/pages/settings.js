@@ -35,7 +35,6 @@ define(["Egraphs", "libs/angular", "services/forms"], function (Egraphs) {
       parent.addClass('none');
       parent.prev().removeClass('none');
       $scope.resetVal(modelString);
-      e.preventDefault();
     };
   };
 
