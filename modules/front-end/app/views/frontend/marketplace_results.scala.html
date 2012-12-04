@@ -33,6 +33,7 @@
  Egraphs.page.query = "@query";
  Egraphs.page.sort = "@sortOptions.find(v => v.active).map(v => v.name)";
  Egraphs.page.view = @if(viewAsList){"list"} else {""};
+ Egraphs.page.results = @Html(Json.toJson(results).toString);
 }
 
 @baseBody = {
@@ -76,7 +77,6 @@
             @tags.marketplace.navigation_pills(categoryViewModels, query)
           }
           
-
           @if(viewAsList) {
             @tags.marketplace.result_set_list(results)
           } else {

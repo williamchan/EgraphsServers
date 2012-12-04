@@ -46,7 +46,7 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoi
     };
 
     // Page in two sets of results.
-    //loadCelebrities(countIncrement*2);
+    loadCelebrities(countIncrement*2);
 
   };
 
