@@ -1,10 +1,8 @@
 package controllers.website.admin
 
-import controllers.WebsiteControllers
 import controllers.website.GetEgraphEndpoint
-import models.EgraphStore
+import models.{PrintOrderStore, EgraphStore}
 import play.api.mvc.{Action, Controller}
-import play.api.mvc.Results.Redirect
 import services.ConsumerApplication
 import services.http.ControllerMethod
 import services.http.filters.HttpFilters
@@ -15,6 +13,7 @@ private[controllers] trait GetEgraphAdminEndpoint extends ImplicitHeaderAndFoote
   protected def controllerMethod: ControllerMethod
   protected def httpFilters: HttpFilters
   protected def egraphStore: EgraphStore
+  protected def printOrderStore: PrintOrderStore
   protected def consumerApp: ConsumerApplication
 
   def getEgraphAdmin(egraphId: Long, action: Option[String] = None) = controllerMethod.withForm() { implicit authToken =>
@@ -25,7 +24,21 @@ private[controllers] trait GetEgraphAdminEndpoint extends ImplicitHeaderAndFoote
           if (request.queryString.get("action").getOrElse("").toString.contains("preview")) {
             Ok(GetEgraphEndpoint.html(egraph = egraph, order = egraph.order, consumerApp = consumerApp))
           } else {
-            Ok(views.html.Application.admin.admin_egraph(egraph = egraph, signatureResult = egraph.signatureResult, voiceResult = egraph.voiceResult))
+            val order = egraph.order
+            val buyer = order.buyer
+            val recipient = if (order.buyerId == order.recipientId) buyer else order.recipient
+            val recipientAccount = recipient.account
+            Ok(views.html.Application.admin.admin_egraph(
+              egraph = egraph,
+              signatureResult = egraph.signatureResult,
+              voiceResult = egraph.voiceResult,
+              order = order,
+              buyer = buyer,
+              buyerEmail = buyer.account.email,
+              recipient = recipient,
+              recipientEmail = recipientAccount.email,
+              maybePrintOrder = printOrderStore.findByOrderId(egraph.orderId).headOption
+            ))
           }
       	}
       }

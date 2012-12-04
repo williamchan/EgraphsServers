@@ -1,12 +1,9 @@
 package controllers.website.admin
 
 import play.api.mvc.{Action, Controller}
-import play.api.mvc.Results.Redirect
 import services.http.ControllerMethod
-import controllers.WebsiteControllers
 import services.http.filters.HttpFilters
-import models.{Egraph, OrderStore}
-import org.apache.commons.lang3.StringEscapeUtils
+import models.{PrintOrderStore, Egraph, OrderStore}
 import services.mvc.ImplicitHeaderAndFooterData
 
 private[controllers] trait GetOrderAdminEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
@@ -14,6 +11,7 @@ private[controllers] trait GetOrderAdminEndpoint extends ImplicitHeaderAndFooter
   protected def controllerMethod: ControllerMethod
   protected def httpFilters: HttpFilters
   protected def orderStore: OrderStore
+  protected def printOrderStore: PrintOrderStore
 
   def getOrderAdmin(orderId: Long) = controllerMethod.withForm() { implicit authToken =>
     httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
@@ -26,7 +24,7 @@ private[controllers] trait GetOrderAdminEndpoint extends ImplicitHeaderAndFooter
             val fulfillingEgraph: Option[Egraph] = orderStore.findFulfilledWithId(orderId).map(f => f.egraph)
             val product = order.product
             val celebrityName = product.celebrity.publicName
-            
+
             val fieldDefaults: (String => String) = {
               (paramName: String) => paramName match {
                 case "recipientName" => order.recipientName
@@ -47,6 +45,7 @@ private[controllers] trait GetOrderAdminEndpoint extends ImplicitHeaderAndFooter
                 recipientEmail = recipientAccount.email,
                 celebrityName = celebrityName,
                 fulfillingEgraph = fulfillingEgraph,
+                maybePrintOrder = printOrderStore.findByOrderId(orderId).headOption,
                 fields = fieldDefaults))
           }
           case None => NotFound("Order with id " + orderId.toString + " not found")
