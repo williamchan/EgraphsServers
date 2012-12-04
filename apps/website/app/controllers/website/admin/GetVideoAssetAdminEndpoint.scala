@@ -15,6 +15,11 @@ import models.VideoAssetStore
 import models.VideoAssetCelebrityStore
 import models.CelebrityStore
 import models.Celebrity
+import models.enums.PublishedStatus
+import models.Account
+import utils.TestData
+import play.api.libs.iteratee.Enumerator
+import services.blobs.Blobs
 
 private[controllers] trait GetVideoAssetAdminEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
@@ -24,12 +29,15 @@ private[controllers] trait GetVideoAssetAdminEndpoint extends ImplicitHeaderAndF
   protected def schema: Schema
   protected def videoAssetStore: VideoAssetStore
   protected def videoAssetCelebrityStore: VideoAssetCelebrityStore
+  protected def blobs: Blobs
 
   def getVideoAssetAdmin = controllerMethod.withForm() { implicit authToken =>
     httpFilters.requireAdministratorLogin.inSession() {
       case (admin, adminAccount) =>
         Action { implicit request =>
+
           Ok(views.html.Application.admin.admin_videoasset())
+
         }
     }
   }
@@ -46,7 +54,20 @@ private[controllers] trait GetVideoAssetAdminEndpoint extends ImplicitHeaderAndF
               case Some(maybeVideoStatus) => {
                 val videos = videoAssetStore.getVideosWithStatus(maybeVideoStatus)
 
+                // query string authentication
+//                val authenticatedVideos = videos.map {
+//                  case video => {
+//                    println("oldUrl is " + video.url)
+//                    val newUrl = blobs.getStaticResourceUrl(video.url)
+//                    println("newUrl is " + newUrl)
+//                    video.withVideoUrl(newUrl)
+//                  }
+//                }
+
                 val maybeVideosAndPublicNames: List[(VideoAsset, Option[String])] = for (video <- videos) yield {
+                  
+                  println("videoUrl is " + video.url)
+                  
                   val maybeCelebrity: Option[Celebrity] = videoAssetCelebrityStore.getCelebrityByVideoId(video.id)
                   val maybePublicName = maybeCelebrity.map(_.publicName)
                   (video, maybePublicName)

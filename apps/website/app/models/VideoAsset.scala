@@ -49,7 +49,10 @@ case class VideoAsset(
   override def withVideoStatus(status: VideoStatus.EnumVal) = {
     this.copy(_videoStatus = status.name)
   }
-
+  
+  def withVideoUrl(newUrl: String) = {
+    this.copy(url = newUrl)
+  }
 }
 
 class VideoAssetStore @Inject() (schema: Schema)

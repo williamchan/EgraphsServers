@@ -68,6 +68,9 @@ class Blobs @Inject() (
     val expires = System.currentTimeMillis() / 1000 + expirationSeconds    
     val baseUrl = s3.context.getSigner.signGetBlob(staticResourceBlobstoreNamespace, key).getEndpoint
     val signature = s3.sign(namespace = staticResourceBlobstoreNamespace, key = key, expires = expires)
+    
+    println("baseUrl is " + baseUrl)
+    
     baseUrl + "?" + "AWSAccessKeyId=" + s3.s3id + "&Expires=" + expires + "&Signature=" + signature
   }
 
