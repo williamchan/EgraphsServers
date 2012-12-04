@@ -94,7 +94,7 @@
       @valueRow(label="Amount",               value=printOrder.amountPaid.formatSimply)
       <hr/>
       <h2>Order Details</h2>
-      @valueRow(label="Id",                   value=order.id)
+      @valueRow(label="Id",                   value=order.id, href="/admin/orders/"+order.id)
       @valueRow(label="Order Review Status",  value=order.reviewStatus)
       @valueRow(label="RecipientName",        value=order.recipientName)
       @valueRow(label="Message To Celebrity", value=order.messageToCelebrity)

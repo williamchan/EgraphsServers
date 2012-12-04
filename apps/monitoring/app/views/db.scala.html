@@ -1,0 +1,12 @@
+@(titleString: String)
+
+@main(title = titleString) {
+ 
+  <script type="text/javascript">
+  $(function () {
+		Egraphs.displayPage("Number of connections to database ", "/metrics/db");
+	});
+ </script>  
+ 
+ <input class="redirect" type="button" value="Home" onclick=redirect("")> 
+}

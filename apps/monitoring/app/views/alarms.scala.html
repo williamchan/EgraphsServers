@@ -1,0 +1,15 @@
+@(titleString: String)
+
+@main(title = titleString) {
+  
+    <h1> Sheriff SNS Alarms Service </h1>
+    <img src='@routes.Assets.at("images/super.jpeg")' alt="super" />
+    <p> Please enter your phone number here, without dashes or spaces. <br>
+        (Be sure to include the country code and area code, as in: 12223334444) </p>
+    
+    @helper.form(action = routes.Application.phoneUpdate) {
+
+      <input type="text" name="phone" />
+      <input type="submit" name="submit" />
+    }
+}
