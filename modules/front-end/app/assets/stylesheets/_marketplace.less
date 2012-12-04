@@ -9,8 +9,10 @@
 	  .masthead {
 	  
 	    position: relative;
-	    background: @grayDarker;
+      background: @grayDarker;
 	    margin-bottom: 30px;
+      height: 120px;
+
 	
 	    form {
 	    
@@ -20,15 +22,13 @@
 	        width: 45.410156%; // 465 / 1024      
 	        margin: 0;
 	        height: 58px;
-	        margin-top: -29px;
+	        margin-top: -15px;
 	        
 	        input[type=search] {
 	          
 	          .inline-block;
 	          vertical-align: middle;
-	          font-size: 30px;
-	          line-height: 1.75em;
-	          padding: 16px 2%;
+	          font-size: 20px;
 	          width: 96%;
 	          color: @orange;
 	          margin: 0;
@@ -50,14 +50,14 @@
 	        
 	    }
 	
-	    img {
-	      max-width: 100%;
-	    }
+      img {
+        height: 120px;
+      }
 	    
 	  } // end .masthead
 	  
 	  .content {
-	    
+
 	    .nav {
 
   	    h2 {
@@ -88,12 +88,7 @@
               &.category {
                 font-weight: 800;
               }
-              
-              //&.active {
-              //  font-weight: 800;
-              //  color: @orange;
-              //}
-              
+
             }
 
             a.clear-all {
@@ -646,6 +641,7 @@
 	            float: left;
 	            width: 31.333333%;
 	            margin: 0 2% 10px 0;   
+              .glowborder-link-container();
 	            
 	            figure {
 	            
@@ -721,19 +717,17 @@
             em {
               
               display: block;
-              width: 133px;
+              width: 143px;
               margin: 0 auto;
               color: @grayLight;
               text-shadow: 0 1px 0 @white;
               font-style: normal;
               font-size: .8125em;
               background: @offWhite;
-              padding: 0 15px;
                           
-              a {
-              
+              a {   
                 display: block;
-                width: 133px;
+                width: 143px;
                 margin: 0 auto;
                 color: @grayLight;
                 
@@ -743,7 +737,7 @@
                   font-weight: 400;
                   display: block;
                   float: left;
-                  width: 60px;
+                  width: 70px;
                   padding: 0 20px;                 
                   .gradientBar(#efefef, #ccc);
                   .border-radius(10px 0 0 10px);
@@ -801,7 +795,7 @@
 	    }
 	  
 	    .to-top {
-  	    margin-right: 40px;
+          margin-right: 40px;
 	    }
 	  
 	  } // end .content
@@ -871,6 +865,24 @@
 
 }
 
+@media (min-width: 720px) {
+  
+  #content.marketplace {
+  
+    #main {
+    
+      .masthead {
+
+        min-width: 1020px;    
+      
+      }
+
+    }
+
+  } 
+
+}
+
 @media (max-width: 720px) {
 	
 	#content.marketplace {
@@ -878,7 +890,7 @@
 		#main {
 		
 			.masthead {
-			
+
 			 background: transparent;
 			 padding: 25px 20px 20px 20px;
 			 margin-bottom: 0;
