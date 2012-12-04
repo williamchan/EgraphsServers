@@ -11,10 +11,10 @@ function(forms, Egraphs) {
       	uncheckedLabel: 'NO'
       });
 
-      $('.iPhoneCheckHandleCenter').click(function() {
+      $('.iPhoneCheckContainer').click(function() {
         if (!alertedRegardingHolidayPrintDelivery && $('#order-print')[0].checked === true) {
           alertedRegardingHolidayPrintDelivery = true;
-          alert("Framed prints ordered now will NOT arrive by December 24.");
+          alert("Just making sure you know that this will not arrive by December 24. \n\nStill want the framed print? \n\n:-)");
         }
       });
 
