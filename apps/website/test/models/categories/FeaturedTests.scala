@@ -10,6 +10,7 @@ import services.AppConfig
 class FeaturedTests extends EgraphsUnitTest with DBTransactionPerTest {
 
   "ensureCategoryValueIsCreated" should "create a featured category value and internal category are not already there" in new EgraphsTestApplication {
+    deleteFeaturedCategoryValueRelationships()
     deleteFeaturedCategoryValue()
     deleteInternalCategory()
 
@@ -42,15 +43,29 @@ class FeaturedTests extends EgraphsUnitTest with DBTransactionPerTest {
   }
 
   def deleteFeaturedCategoryValue(): Unit = {
-    val maybeCategory = categoryValueStore.findByName(Featured.categoryValueName)
-    maybeCategory match {
+    val maybeCategoryValue = categoryValueStore.findByName(Featured.categoryValueName)
+    maybeCategoryValue match {
       case Some(categoryValue) => categoryValueStore.delete(categoryValue)
       case None => // it's not there no need to delete
     }
   }
 
+  def deleteFeaturedCategoryValueRelationships(): Unit = {
+    val maybeCategoryValue = categoryValueStore.findByName(Featured.categoryValueName)
+    maybeCategoryValue match {
+      case Some(categoryValue) =>
+        val relationships = categoryValueRelationshipStore.findByCategoryValueId(categoryValue.id).toList
+        for(relationship <- relationships) {
+          categoryValueRelationshipStore.delete(relationship)
+        }
+        
+      case None =>
+    }
+  }
+
   def categoryStore = AppConfig.instance[CategoryStore]
   def categoryValueStore = AppConfig.instance[CategoryValueStore]
+  def categoryValueRelationshipStore = AppConfig.instance[CategoryValueRelationshipStore]
 
   def featuredToTest = {
     AppConfig.instance[Featured]
