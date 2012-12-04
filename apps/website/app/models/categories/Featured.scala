@@ -14,11 +14,10 @@ class Featured @Inject() (
   internal: Internal,
   categoryValueStore: CategoryValueStore) {
 
-  // cost = 2 queries
-  def ensureCategoryValueIsCreated(): CategoryValue = {
+  lazy val categoryValue: CategoryValue = {
     val maybeFeaturedCategoryValue = categoryValueStore.findByName(Featured.categoryValueName)
     maybeFeaturedCategoryValue.getOrElse {
-      val featuredCategory = internal.ensureCategoryIsCreated()
+      val featuredCategory = internal.category
       CategoryValue(
         categoryId = featuredCategory.id,
         name = Featured.categoryValueName,
@@ -26,9 +25,8 @@ class Featured @Inject() (
     }
   }
 
-  // cost = 5 queries
   def updateFeaturedCelebrities(newFeaturedCelebIds: Iterable[Long]) {
-    val featuredCategoryValue = ensureCategoryValueIsCreated()
+    val featuredCategoryValue = categoryValue
 
     // cost = 3 queries
     categoryValueStore.updateCelebrities(featuredCategoryValue, newFeaturedCelebIds)

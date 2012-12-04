@@ -1,11 +1,16 @@
 package models.categories
 
-import services.{Time, AppConfig}
-import services.db.{Schema, SavesWithLongKey, KeyedCaseClass}
-import models.{SavesCreatedUpdated, HasCreatedUpdated}
-import java.sql.Timestamp
-import com.google.inject.{Provider, Inject}
+import org.squeryl.PrimitiveTypeMode.from
+import org.squeryl.PrimitiveTypeMode.long2ScalarLong
+import org.squeryl.PrimitiveTypeMode.where
 import org.squeryl.Query
+import com.google.inject.Inject
+import com.google.inject.Provider
+import services.db.Deletes
+import services.db.KeyedCaseClass
+import services.db.SavesWithLongKey
+import services.db.Schema
+import services.AppConfig
 
 /**
  * Represents relationships between a categoryValue and a category
@@ -46,8 +51,24 @@ class CategoryValueRelationshipStore @Inject() (
   schema: Schema,
   categoryServices: Provider[CategoryServices]
 ) extends SavesWithLongKey[CategoryValueRelationship]
+  with Deletes[Long, CategoryValueRelationship]
 {
   import org.squeryl.PrimitiveTypeMode._
+
+  /**
+   * Return CategoryValueRelationships that are are relationships of the specified category
+   * value.
+   * 
+   * @param categoryValueId
+   * @return 
+   */
+  def findByCategoryValueId(categoryValueId: Long) : Query[CategoryValueRelationship] = {
+    from(schema.categoryValueRelationships)(
+      (categoryValueRelationship) =>
+       where(categoryValueRelationship.categoryValueId === categoryValueId)
+       select(categoryValueRelationship)
+    )
+  }
 
   //
   // SavesWithLongKey[CategoryValueRelationship] methods

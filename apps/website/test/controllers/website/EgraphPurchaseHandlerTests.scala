@@ -35,7 +35,7 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheAndBlob
   private val buyerName = "My Buyer"
   private val buyerEmail = TestData.generateEmail(prefix = "buyer")
 
-  "An EgraphPurchaseHAndler" should "create Order and CashTransaction for a digital-only purchase" in new EgraphsTestApplication {
+  "An EgraphPurchaseHandler" should "create Order and CashTransaction for a digital-only purchase" in new EgraphsTestApplication {
     val Right(orderFromHandler) = executePurchaseHandler()
     db.connected(TransactionSerializable) {
       val order = orderStore.get(orderFromHandler.id)
