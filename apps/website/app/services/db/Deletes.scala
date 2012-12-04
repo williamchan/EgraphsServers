@@ -7,6 +7,10 @@ import org.squeryl.Table
 /**
  * Gives an object the ability to delete instances of the associated type, eg Person.delete(personInstance).
  * Similar usage to Saves, see that for more info.
+ *
+ * VIRTUALLY NO MODELS SHOULD USE THIS. Exceptions are made for tags. Reasons why we do not typically delete
+ * database records include it is easy to ruin referential integrity in a relational database. A thorough
+ * discussion is available at http://serverfault.com/questions/31455/should-i-ever-delete-sql-and-db-anything
  */
 trait Deletes[KeyT, T <: KeyedEntity[KeyT]] {
   /**The table that manages this entity in services.db.Schema  */
