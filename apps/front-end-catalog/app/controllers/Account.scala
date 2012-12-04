@@ -63,7 +63,7 @@ object Account extends Controller with DefaultImplicitTemplateParameters {
 
   def postRecovery() = Action { request =>
     printPostRequestData(request)
-    Ok(views.html.frontend.simple_confirmation(
+    Ok(views.html.frontend.simple_message(
       "Password Recovery",
       """
       <p>
@@ -84,7 +84,7 @@ object Account extends Controller with DefaultImplicitTemplateParameters {
 
   def postVerify() = Action { request =>
     printPostRequestData(request)
-    Ok(views.html.frontend.simple_confirmation(
+    Ok(views.html.frontend.simple_message(
       "Account Verified",
       """
       <p>

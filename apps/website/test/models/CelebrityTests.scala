@@ -106,11 +106,11 @@ class CelebrityTests extends EgraphsUnitTest
     featuredStateOfCelebWhen(celebWasFeatured=true, includeCelebInNewFeaturedCelebs=false) should be (false)
   }
 
-  "updateFeaturedCelebrities" should "keep featured celebs" in new EgraphsTestApplication {
+  it should "keep featured celebs" in new EgraphsTestApplication {
     featuredStateOfCelebWhen(celebWasFeatured=true, includeCelebInNewFeaturedCelebs=true) should be (true)
   }
 
-  "updateFeaturedCelebrities" should "set newly featured celebs" in new EgraphsTestApplication {
+  it should "set newly featured celebs" in new EgraphsTestApplication {
     featuredStateOfCelebWhen(celebWasFeatured=false, includeCelebInNewFeaturedCelebs=true) should be (true)
   }
   
@@ -189,7 +189,7 @@ class CelebrityTests extends EgraphsUnitTest
     val newFeaturedCelebs = if(includeCelebInNewFeaturedCelebs) {
       List(celeb.id)
     } else {
-      List(0L) // a list of celebrity ids that can't be this celebrity
+      List(TestData.newSavedCelebrity().id) // a list of celebrity ids that can't be this celebrity
     }
 
     store.updateFeaturedCelebrities(newFeaturedCelebs)

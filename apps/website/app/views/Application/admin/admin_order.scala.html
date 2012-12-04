@@ -6,6 +6,7 @@
   recipientEmail: String,
   celebrityName: String,
   fulfillingEgraph: Option[models.Egraph],
+  maybePrintOrder: Option[models.PrintOrder],
   fields: (String) => String
 )(implicit authToken: egraphs.authtoken.AuthenticityToken, 
   headerData: models.frontend.header.HeaderData,
@@ -186,6 +187,12 @@
           @valueRow(label="Rejection Reason",     value=order.rejectionReason.getOrElse(""))
           @valueRow(label="Created",              value=order.created)
           @valueRow(label="Updated",              value=order.updated)
+          <hr/>
+          <h2>Print Order Details</h2>
+          @{maybePrintOrder match {
+            case Some(printOrder) => valueRow(label="Print Order Id", value=printOrder.id, href="/admin/printorders/"+printOrder.id)
+            case _ => valueRow(label="Print Order Id", value="None")
+          }}
           <hr/>
           <h2>Payment Details</h2>
           @valueRow(label="Payment Status",       value=order.paymentStatus)

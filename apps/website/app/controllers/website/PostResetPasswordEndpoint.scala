@@ -59,7 +59,7 @@ private[controllers] trait PostResetPasswordEndpoint extends ImplicitHeaderAndFo
               
               validationOrAccount.right.get.emailVerify().save()
               Ok(
-                views.html.frontend.simple_confirmation(
+                views.html.frontend.simple_message(
                   header = "Password Reset",
                   body = "You have successfully changed your password!"
                 )

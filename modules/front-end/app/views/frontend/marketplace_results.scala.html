@@ -15,25 +15,24 @@
 @import models.frontend.egraphs._
 @import play.api.libs.json._
 @import models.frontend.marketplace.MarketplaceConversions._
+
 @**
   Page for displaying marketplace results. 
   Vertical buttons are currently hidden. Will be used in the future, when we have multiple verticals.
 **@
 @init = {
-  @*** 
-
+@*** 
   Translates a map of categories and their categoryvalues into a JsonObject that can be easily converted to a URL query arguments using $.param(Egraphs.page.categories)
-  ***@
-  Egraphs.page.categories = @Html(
-    Json.toJson(categoryViewModels.foldLeft[Map[String, JsValue]](Map())(
-      (a, b) => a ++ b.asActiveMap
-    )).toString
-   );
-  Egraphs.page.queryUrl = "@marketplaceRoute";
-  Egraphs.page.query = "@query";
-  Egraphs.page.sort = "@sortOptions.filter(v => v.active).headOption.map(v => v.name)";
-  Egraphs.page.view = @if(viewAsList){"list"} else {""};
-  Egraphs.page.results = @Html(Json.toJson(results).toString);
+***@
+ Egraphs.page.categories = @Html(
+  Json.toJson(categoryViewModels.foldLeft[Map[String, JsValue]](Map())(
+    (a, b) => a ++ b.asActiveMap
+  )).toString
+ );
+ Egraphs.page.queryUrl = "@marketplaceRoute";
+ Egraphs.page.query = "@query";
+ Egraphs.page.sort = "@sortOptions.find(v => v.active).map(v => v.name)";
+ Egraphs.page.view = @if(viewAsList){"list"} else {""};
 }
 
 @baseBody = {
@@ -49,6 +48,7 @@
         <form action="@marketplaceRoute" method="get">
             <input name="query" id="celebrity-searchbox" type="search" placeholder="Find Your Star" value="@query" @if(query.length == 0 && !categoryViewModels.exists(c => c.active)) {autofocus}>
             <input name="view" type="hidden" value="@if(viewAsList){list}"> </input>
+            <input type="hidden" name="sort" value="@sortOptions.find(v => v.active).map(v => v.name)">
         </form>
       
         <img src='@EgraphsAssets.at("images/marketplace-masthead.jpg")'/>

@@ -1,4 +1,12 @@
-@(egraph: models.Egraph, voiceResult: Option[models.vbg.VBGVerifySample], signatureResult: Option[models.xyzmo.XyzmoVerifyUser]
+@(egraph: models.Egraph,
+  voiceResult: Option[models.vbg.VBGVerifySample],
+  signatureResult: Option[models.xyzmo.XyzmoVerifyUser],
+  order: models.Order,
+  buyer: models.Customer,
+  buyerEmail: String,
+  recipient: models.Customer,
+  recipientEmail: String,
+  maybePrintOrder: Option[models.PrintOrder]
 )(implicit authToken: egraphs.authtoken.AuthenticityToken, 
   headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData)
@@ -11,8 +19,6 @@
 @import views.html.frontend.tags
 @import views.html.frontend.tags.ng
 @import views.html.frontend.base_template
-
-@order = @{egraph.order}
 
 @postEgraph = @{
   routes.WebsiteControllers.postEgraphAdmin(egraphId = egraph.id)
@@ -78,16 +84,27 @@
       @valueRow(label="Voice Code",           value=voiceResult.map(v => v.errorCode).headOption)
       <hr/>
       <h2>Order Details</h2>
-      @valueRow(label="RecipientName",        value=order.recipientName)
+      @valueRow(label="Order",                value=egraph.orderId, href="/admin/orders/"+egraph.orderId)
+      @valueRow(label="BuyerId",              value=buyer.id)
+      @valueRow(label="Buyer name",           value=buyer.name)
+      @valueRow(label="Buyer email",          value=buyerEmail)
+      @valueRow(label="RecipientId",          value=recipient.id)
+      @valueRow(label="Recipient name",       value=recipient.name)
+      @valueRow(label="Recipient email",      value=recipientEmail)
       @valueRow(label="Message To Celebrity", value=order.messageToCelebrity)
       @valueRow(label="Requested Message",    value=order.requestedMessage)
-      @valueRow(label="Order",                value=egraph.orderId)
       <hr/>
       <h2>Egraph Details</h2>
       @valueRow(label="Id",                   value=egraph.id)
       @valueRow(label="Signed At",            value=egraph.getSignedAt)
       @valueRow(label="Created",              value=egraph.created)
       @valueRow(label="Updated",              value=egraph.updated)
+      <hr/>
+      <h2>Print Order Details</h2>
+      @{maybePrintOrder match {
+        case Some(printOrder) => valueRow(label="Print Order Id", value=printOrder.id, href="/admin/printorders/"+printOrder.id)
+        case _ => valueRow(label="Print Order Id", value="None")
+      }}
     </div>
   </div>
 </section>    
