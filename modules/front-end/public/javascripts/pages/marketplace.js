@@ -11,10 +11,11 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoi
     var countIncrement = 0;
 
     /**
-     * Depending on the screensize, set increment.
+     * Depending on the screensize, set increment for infinite scroll
+     * of celebrity result sets.
      * Desktop displays rows of 3, iPad-like rows of 2, and phone is 1.
      * Buffer two rows to keep scrolling smooth.
-    **/
+     **/
     if($(window).width() < 720) {
       countIncrement = 4;
     } else {
@@ -28,9 +29,9 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoi
      **/
     $scope.loadCelebrities = function() {
       //load data
-      if(count < $scope.total -1) {
-        $scope.celebrities = $scope.celebrities.concat($scope.results.celebrities.slice(count,count + countIncrement));
-        count +=countIncrement;
+      if(count < $scope.total - 1) {
+        $scope.celebrities = $scope.celebrities.concat($scope.results.celebrities.slice(count, count + countIncrement));
+        count += countIncrement;
         atBottom = false;
         if(count >= $scope.total) {
           $(".see-more").addClass("hidden");
