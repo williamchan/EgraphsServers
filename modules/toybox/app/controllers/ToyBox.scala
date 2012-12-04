@@ -92,14 +92,34 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
    *  a signed cookie that needs to be renewed periodically.
    */
   override def onRouteRequest(request: RequestHeader): Option[Handler] = {
-    val forPublicResource = isPublicResourceRequest(request)
-    val authorized = isAuthorized(request)
-
-    if (forPublicResource) normalRouteRequestHandler(request)
-    else if (authorized)   handleAuthorized(request)
-    else                   redirectToLogin(request)
+    if (isLoginRequest(request))
+      defaultLoginHandler(request)
+    
+    else if (isPublicResourceRequest(request)) 
+      normalRouteRequestHandler(request)
+    
+    else if (isAuthorized(request)) 
+      handleAuthorized(request)
+    
+    else
+      redirectToLogin(request)
   }
 
+  protected def isLoginRequest(request: RequestHeader) = { 
+    val forLoginPath = request.method match {
+      case "GET" => request.path == getLoginRoute.url
+      case "POST" => request.path == postLoginRoute.url
+      case _ => false 
+    } 
+    forLoginPath && isPrivate
+  }
+
+  protected def defaultLoginHandler(request: RequestHeader): Option[Handler] = {
+    if (request.method == "GET") 
+      Some(getLogin)
+    else
+      Some(postLogin) 
+  }
 
   /** Method pointing to the parent's onRouteRequtest method. Used to make testing easier. */
   protected def normalRouteRequestHandler: RequestHeader => Option[Handler] = super.onRouteRequest
@@ -194,19 +214,16 @@ trait DefaultTBAuthenticator extends ToyBoxAuthenticator { this: ToyBoxBase =>
   /** Checks if a request is authorized to access protected resources */
   def isAuthorized(request: RequestHeader) = {
     // Checks for signed authentication Cookie in a request
-    val hasAuthCookie = 
-      request.cookies.get(authCookieName) match {
-        case Some(Cookie(_, signature, _, _, _, _, _)) =>
-          signature == Crypto.sign(request.remoteAddress)
-        case _ => false
-      }
-
-    !isPrivate || hasAuthCookie
+    request.cookies.get(authCookieName) match {
+      case Some(Cookie(_, signature, _, _, _, _, _)) =>
+        signature == Crypto.sign(request.remoteAddress)
+      case _ => false
+    }
   }
 
   /** Checks if a request is for a public resource */
   def isPublicResourceRequest(request: RequestHeader) = {
-    publicAccessConditions.exists(_.apply(request))
+    !isPrivate || publicAccessConditions.exists(_.apply(request))
   }
 
 
