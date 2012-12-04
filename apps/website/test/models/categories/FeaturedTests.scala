@@ -9,7 +9,7 @@ import services.AppConfig
 @RunWith(classOf[JUnitRunner])
 class FeaturedTests extends EgraphsUnitTest with DBTransactionPerTest {
 
-  "ensureCategoryValueIsCreated" should "create a featured category value and internal category are not already there" in new EgraphsTestApplication {
+  "categoryValue" should "create a featured category value and internal category are not already there" in new EgraphsTestApplication {
     deleteFeaturedCategoryValueRelationships()
     deleteFeaturedCategoryValue()
     deleteInternalCategory()
