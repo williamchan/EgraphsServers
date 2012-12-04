@@ -1,4 +1,5 @@
 package models.categories
+
 import org.junit.runner.RunWith
 import utils.EgraphsUnitTest
 import org.scalatest.junit.JUnitRunner
@@ -13,7 +14,7 @@ class FeaturedTests extends EgraphsUnitTest with DBTransactionPerTest {
     deleteInternalCategory()
 
     val featured = featuredToTest
-    val categoryValue = featured.ensureCategoryValueIsCreated()
+    val categoryValue = featured.categoryValue
 
     val featuredCategoryValue = categoryValueStore.findByName(Featured.categoryValueName)
     val defined = 'defined
@@ -25,8 +26,8 @@ class FeaturedTests extends EgraphsUnitTest with DBTransactionPerTest {
 
   it should "return a featured category value if it is there already" in new EgraphsTestApplication {
     val featured = featuredToTest
-    featured.ensureCategoryValueIsCreated() // this should make sure one already exists in the next call
-    val categoryValue = featured.ensureCategoryValueIsCreated()
+    featured.categoryValue // this should make sure one already exists in the next call
+    val categoryValue = featured.categoryValue
 
     categoryValue.name should be(Featured.categoryValueName)
     categoryValue.publicName should be(Featured.categoryValueName)

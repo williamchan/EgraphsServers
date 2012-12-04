@@ -89,7 +89,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
 
       val categoryValuesRefinements = if (categoryAndCategoryValues.isEmpty && queryOption.isEmpty) {
         // use featured stars if no search type is used
-        val featuredCategoryValue = featured.ensureCategoryValueIsCreated()
+        val featuredCategoryValue = featured.categoryValue
         List(List(featuredCategoryValue.id))
       } else {
         for ((category, categoryValues) <- categoryAndCategoryValues) yield categoryValues
