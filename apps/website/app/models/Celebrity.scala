@@ -115,40 +115,6 @@ case class Celebrity(id: Long = 0,
     services.productStore.findActiveProductsByCelebrity(id).toSeq
   }
 
-  @deprecated("This is still here because SER-86 does not work yet.", "")
-  def getActiveProductsWithInventoryRemaining(): Seq[(Product, Int)] = {
-    // 1) query for active InventoryBatches
-    val activeIBs = services.inventoryBatchStore.findByCelebrity(id, services.inventoryBatchQueryFilters.activeOnly)
-    val inventoryBatches = Utils.toMap(activeIBs, key=(theIB: InventoryBatch) => theIB.id)
-    val inventoryBatchIds = inventoryBatches.keys.toList
-
-    // 2) calculate quantity remaining for each InventoryBatch
-    val inventoryBatchIdsAndOrderCounts: Map[Long, Int] =
-      Map(services.orderStore.countOrdersByInventoryBatch(inventoryBatchIds): _*)
-
-    val inventoryBatchIdsAndNumRemaining : Map[Long, Int] = inventoryBatchIds.map{ id =>
-      (id, inventoryBatches.get(id).get.numInventory - inventoryBatchIdsAndOrderCounts.get(id).getOrElse(0))
-    }.toMap
-
-    // 3) query for products and inventoryBatchProducts on inventoryBatchIds
-    val productsAndBatchAssociations: Query[(Product, Long)] =
-      services.productStore.getProductAndInventoryBatchAssociations(inventoryBatchIds)
-
-    val productsAndBatchIds = productsAndBatchAssociations.toMap.keySet.map(product =>
-    {
-      val ids =  for((p, id) <- productsAndBatchAssociations if p.id == product.id) yield Set(id)
-      (product, ids.reduceLeft((s1, s2) => s1 | s2 ))
-    }
-    ).toMap
-
-    // 4) for each product, sum quantity remaining for each associated batch
-    val productsWithInventoryRemaining: Map[Product, Int] = productsAndBatchIds.map(b => {
-      val totalNumRemainingForProduct = (for (batchId <- b._2) yield inventoryBatchIdsAndNumRemaining.get(batchId).getOrElse(0)).sum
-      (b._1, totalNumRemainingForProduct)
-    })
-    productsWithInventoryRemaining.toSeq
-  }
-
   /**
    * The orders sorted by most recently fulfilled.
    */
@@ -164,7 +130,6 @@ case class Celebrity(id: Long = 0,
     Map("id" -> id, "enrollmentStatus" -> enrollmentStatus.name,  "publicName" -> publicName,
       "urlSlug" -> urlSlug) ++
       renderCreatedUpdatedForApi
-
   }
 
   /**
