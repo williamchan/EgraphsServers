@@ -6,8 +6,6 @@ ToyBox is the bouncer to the party that is your Play application, which is most 
 
 ## Use:
 
-To use ToyBox in an application:
-
 1. Add Build dependency on ToyBoxBuild.main
 
 2. Mix ToyBox into your `Global` object (by default, `object Global` in the default package). Make sure to call `super.onRouteRequest` from your implementation of `onRouteRequest` if it's been overridden.
