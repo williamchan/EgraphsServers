@@ -45,13 +45,13 @@
     <div class="row-fluid">
     
       <div class="span12 masthead" role="masthead">
-      
+
         <form action="@marketplaceRoute" method="get">
             <input name="query" id="celebrity-searchbox" type="search" placeholder="Find Your Star" value="@query" @if(query.length == 0 && !categoryViewModels.exists(c => c.active)) {autofocus}>
             <input name="view" type="hidden" value="@if(viewAsList){list}"> </input>
             <input type="hidden" name="sort" value="@sortOptions.find(v => v.active).map(v => v.name)">
         </form>
-      
+
         <img src='@EgraphsAssets.at("images/marketplace-masthead.jpg")'/>
       
       </div>

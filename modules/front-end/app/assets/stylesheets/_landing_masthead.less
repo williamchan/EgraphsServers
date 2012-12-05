@@ -29,7 +29,11 @@
     margin-top: 25px;
     margin-bottom: 10px; 
   }
-  
+
+  form {
+    width: 85%;
+    .celebrity-searchbox-container();
+  }
 }
 
 // Past 1340 pixels width we turn on the radial gradient that obscures the
@@ -79,6 +83,10 @@
   #masthead-home {    
     min-height: 300px;
 
+    form {
+      width: 45%;
+    }
+
     h1 {
       max-width:45%;
     }
@@ -91,7 +99,11 @@
 
 @media (max-width:480px) {
   #masthead-home {
-    min-height: 173px;
+    min-height: 195px;
+
+    form {
+      width : 100%;
+    }
 
     h1 {
       font-size:25px;
