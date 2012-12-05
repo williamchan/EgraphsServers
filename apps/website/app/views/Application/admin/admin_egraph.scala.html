@@ -84,6 +84,7 @@
       @valueRow(label="Voice Code",           value=voiceResult.map(v => v.errorCode).headOption)
       <hr/>
       <h2>Order Details</h2>
+      @valueRow(label="Recipient name on plaque", value=order.recipientName)
       @valueRow(label="Order",                value=egraph.orderId, href="/admin/orders/"+egraph.orderId)
       @valueRow(label="BuyerId",              value=buyer.id)
       @valueRow(label="Buyer name",           value=buyer.name)

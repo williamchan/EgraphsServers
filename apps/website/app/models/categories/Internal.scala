@@ -12,8 +12,8 @@ object Internal {
  */
 class Internal @Inject() (categoryStore: CategoryStore) {
 
-  // cost = 1 queries
-  def ensureCategoryIsCreated(): Category = {
+  // this has a side effect of creating the category if it isn't there
+  lazy val category: Category = {
     categoryStore.findByName(Internal.categoryName).getOrElse {
       Category(
         name = Internal.categoryName,

@@ -11,7 +11,7 @@ class InternalTests extends EgraphsUnitTest with DBTransactionPerTest {
   "ensureCategoryIsCreated" should "create a internal category if not there already" in new EgraphsTestApplication {
     deleteInternalCategory()
 
-    val category = internal.ensureCategoryIsCreated()
+    val category = internal.category
 
     val featuredCategory = categoryStore.findByName(Internal.categoryName)
     val defined = 'defined
@@ -22,8 +22,8 @@ class InternalTests extends EgraphsUnitTest with DBTransactionPerTest {
   }
 
   it should "return a internal category if it is there already" in new EgraphsTestApplication {
-    internal.ensureCategoryIsCreated() // this should make sure one already exists in the next call
-    val category = internal.ensureCategoryIsCreated()
+    internal.category // this should make sure one already exists in the next call
+    val category = internal.category
 
     category.name should be(Internal.categoryName)
     category.publicName should be(Internal.categoryName)

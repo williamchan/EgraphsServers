@@ -30,7 +30,7 @@ case class OrderConfirmationEmail(
 
   def send() {
     val mail = new HtmlEmail()
-    mail.setFrom("noreply@egraphs.com", "Egraphs")
+    mail.setFrom("webserver@egraphs.com", "Egraphs")
     mail.addTo(buyerEmail, buyerName)
     mail.setSubject("Order Confirmation")
 
