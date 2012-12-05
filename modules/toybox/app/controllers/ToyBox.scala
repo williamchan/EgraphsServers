@@ -80,7 +80,7 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
   // Cookie configuration
   lazy val initialRequestCookieName = config.getString(initRequestKey).getOrElse("toybox-initial-request")
   lazy val authCookieName = config.getString(authCookieKey).getOrElse("toybox-authenticated")
-  lazy val authTimeoutInSeconds = config.getInt(authTimeoutInSecondsKey).getOrElse(40*60)  // 40 minute default
+  lazy val authTimeoutInSeconds = config.getInt(authTimeoutInSecondsKey).getOrElse(24*60*60)  // 24 hour default
   lazy val authPath = config.getString(authPathKey).getOrElse("/")
   lazy val authDomain = config.getString(authDomainKey)
 
