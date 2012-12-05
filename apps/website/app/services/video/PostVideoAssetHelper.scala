@@ -1,4 +1,4 @@
-package controllers.utils
+package services.video
 
 import java.io.File
 
@@ -15,16 +15,21 @@ import services.http.filters.HttpFilters
 import play.api.mvc.Action
 import play.api.mvc.BodyParsers.parse
 import play.api.mvc.Result
+import play.api.mvc.Results.{ Ok, InternalServerError, BadRequest }
 import play.api.mvc.Controller
+import play.api.mvc.MultipartFormData
+import play.api.libs.Files.TemporaryFile
 
-trait PostVideoAssetHelper { this: Controller =>
+trait PostVideoAssetHelper {
   protected def httpFilters: HttpFilters
   protected def blobs: Blobs
+  
+  private val characterEncoding = "ISO-8859-1"
 
   protected def putFile(celebrity: Celebrity, filename: String, file: File): Option[String] = {
 
     val videoKey = "videos/" + celebrity.id + "/" + filename
-    val source = Source.fromFile(file, "ISO-8859-1")
+    val source = Source.fromFile(file, characterEncoding)
     val byteArray = source.map(_.toByte).toArray
     source.close()
 
@@ -53,7 +58,7 @@ trait PostVideoAssetHelper { this: Controller =>
     videoAssetCelebrity.save()
   }
 
-  protected def postVideoAssetBase = {
+  protected def postVideoAssetBase: Action[MultipartFormData[TemporaryFile]] = {
 
     httpFilters.requireCelebrityId.inRequest(parse.multipartFormData) { celebrity =>
       Action(parse.multipartFormData) { request =>
@@ -65,7 +70,7 @@ trait PostVideoAssetHelper { this: Controller =>
 
           resource.ref.moveTo(tempFile, true)
 
-          val maybeFileLocation = putFile(celebrity, filename, tempFile)
+          val maybeFileLocation = putFile(celebrity, filename, tempFile)      
           maybeFileLocation match {
             case Some(maybeFileLocation) => {
               persist(celebrity, maybeFileLocation)

@@ -25,7 +25,7 @@ private[controllers] trait GetCelebrityMobileAppInfoEndpoint { this: Controller 
         Action {
           val iPadBuildVersion = config.ipadBuildVersion
           val s3Key = "ipad/Egraphs_" + iPadBuildVersion + ".ipa"
-          val ipaUrl = blobs.getStaticResourceUrl(s3Key, 10.minutes)
+          val ipaUrl = blobs.getStaticResourceUrl(s3Key, 10 minutes)
           val iPadAppInfo = Map("version" -> iPadBuildVersion, "ipaURL" -> ipaUrl)
           val mobileAppInfo = Map("ipad" -> iPadAppInfo)
           Ok(Serializer.SJSON.toJSON(mobileAppInfo))

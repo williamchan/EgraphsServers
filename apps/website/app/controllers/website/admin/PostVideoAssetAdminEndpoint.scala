@@ -1,10 +1,10 @@
 package controllers.website.admin
 
-import controllers.utils.PostVideoAssetHelper
 import play.api.mvc.Controller
 import play.api.mvc.Action
 import services.http.POSTControllerMethod
 import services.TempFile
+import services.video.PostVideoAssetHelper
 
 trait PostVideoAssetAdminEndpoint extends PostVideoAssetHelper { this: Controller =>
 
