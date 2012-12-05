@@ -18,24 +18,24 @@ object TBFakes {
   val correctPassword = "bar"
   val incorrectPassword = "bArRr"
 
+  val iPadHeader = "iPad-header"
+  val iPadSecret = "iPad-secret"
+
   val fakeApp = new FakeApplication(
     additionalConfiguration = Map(
       userKey -> correctUsername,
       passwordKey -> correctPassword,
       initRequestKey -> "toybox-initialRequest",
       authCookieKey -> "toybox-authenticated",
-      authTimeoutInSecondsKey -> (19*60 toString)
+      iPadHeaderKey -> iPadHeader,
+      iPadSecretKey -> iPadSecret
     )
   )
 
-
   // Fake ToyBox
   object FakeToyBox extends ToyBox {
-    val maybeGetLoginRoute  = Some(new Call("GET", loginPath))
-    val maybePostLoginRoute = Some(new Call("POST", loginPath))
-    val maybeAssetsRoute = Some( { file: String =>
-      new Call("GET", assetsPath + file)
-    })
+    val loginPath = "/path/to/login"
+    def assetsRoute = { file: String => new Call("GET", assetsPath + file) }
 
     // fakeing up a subconfiguration is tedious, overriding config base/root is 
     // virtually the same since there are no other unexpected configurations present 
@@ -48,6 +48,8 @@ object TBFakes {
     def authCookie(req: RequestHeader)        = makeAuthCookie(req)
     def initRequestCookie(req: RequestHeader) = makeInitialRequestCookie(req)
   }
+
+  object FakeToyBoy
 
 
   // Fake requests
@@ -67,6 +69,8 @@ object TBFakes {
     "username" -> incorrectUsername, 
     "password" -> incorrectPassword
   )
+
+  val iPadRequest = FakeRequest("GET", "/").withHeaders(iPadHeader -> iPadSecret)
 
 
   // Fake cookies
