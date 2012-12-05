@@ -9,23 +9,23 @@ import org.squeryl.PrimitiveTypeMode._
 /**
  * Services for gift certificates and associated line items. Use like this:
  * {{{
- * import models.checkout.GiftCertificateComponent
+ *   import models.checkout.GiftCertificateComponent
  *
- * trait MyEndpoint { this: Controller with GiftCertificateComponent =>
- *   // import the implicit conversions that enhance the otherwise plain
- *   // gift certificate classes
- *   import GiftCertificateServices.Conversions._
+ *   trait MyEndpoint { this: Controller with GiftCertificateComponent =>
+ *     // import the implicit conversions that enhance the otherwise plain
+ *     // gift certificate classes
+ *     import GiftCertificateServices.Conversions._
  *
- *   def doSomething = Action {
- *     // Get the LineItemType from the store
- *     val lineItemType = GiftCertificateLineItemType.getWithAmount(Money.parse("$50"))
+ *      def doSomething = Action {
+ *        // Get the LineItemType from the store
+ *        val lineItemType = GiftCertificateLineItemType.getWithAmount(Money.parse("$50"))
  *
- *     // Save it if you want
- *     lineItemType.update()
+ *        // Save it if you want
+ *        lineItemType.update()
  *
- *     Ok
+ *         Ok
+ *      }
  *   }
- * }
  * }}}
  */
 trait GiftCertificateComponent { this: LineItemTypeEntityComponent =>
@@ -33,18 +33,27 @@ trait GiftCertificateComponent { this: LineItemTypeEntityComponent =>
 
   object GiftCertificateServices extends SavesAsLineItemTypeEntity[GiftCertificateLineItemType]
   {
+    /**
+     * Query DSL that pimps the companion object with DB querying functionality,
+     * e.g. `GiftCertificateLineItemType.getWithAmount(Money.parse("$50")`, and model
+     * instances with saving functionality.
+     */
     object Conversions extends EntitySavingConversions {
 
-      // Query DSL that pimps the companion object with DB functionality
-      implicit def companionToQueryDsl(companion: GiftCertificateLineItemType.type) = QueryDSL
+      implicit def companionToQueryDsl(companion: GiftCertificateLineItemType.type) = {
+        QueryDSL
+      }
 
       object QueryDSL {
         private val seedEntity = {
-          LineItemTypeEntity(desc = "Gift Certificate").withNature(LineItemNature.Product)
+          LineItemTypeEntity(
+            desc = "Gift Certificate",
+            codeType = "GiftCertificateLineItemType"
+          ).withNature(LineItemNature.Product)
         }
 
         def getWithAmount(amount: Money): GiftCertificateLineItemType = {
-          val entity = table.where(_.desc === seedEntity.desc).headOption.getOrElse {
+          val entity = table.where(_.codeType === seedEntity.codeType).headOption.getOrElse {
             table.insert(seedEntity)
           }
           GiftCertificateLineItemType(entity, amount)
@@ -92,4 +101,3 @@ object GiftCertificateLineItemType {
     )
   }
 }
-

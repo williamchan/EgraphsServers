@@ -42,6 +42,7 @@ case class LineItemTypeEntity (
   id: Long = 0L,
   desc: String = "",
   _nature: String = LineItemNature.Product.name,
+  codeType: String = "",
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp
 ) extends KeyedEntity[Long]
@@ -99,18 +100,42 @@ trait LineItemTypeEntityComponent {
 }
 
 
+/**
+ * Gives entity-delegated accessors to LineItemTypes that use LineItemTypeEntity for persistence.
+ * Generally you should mix alongside [[models.checkout.LineItemTypeEntityGetters]] and/or
+ * [[models.checkout.LineItemTypeEntitySetters]], which automatically generate `description`
+ * and `nature` members / mutators for you.
+ */
 trait LineItemTypeEntityLenses[T <: LineItemType[_]] { this: T =>
   import MemberLens.Conversions._
 
+  /**
+   * Specifies how to get and set the entity into your object. For example:
+   *
+   * {{{
+   *   import scalaz.Lens
+   *   case class TaxLineItemType(_entity: EntityLineItemType)
+   *     extends LineItemTypeEntityLenses[TaxLineItemType]
+   *   {
+   *     override protected lazy val entityLens = Lens[TaxLineItemType, LineItemTypeEntity](
+   *       get = tax => tax._entity,
+   *       set = (tax, newEntity) => tax.copy(_entity=entity)
+   *     )
+   *   }
+   * }}}
+   *
+   */
   protected def entityLens: Lens[T, LineItemTypeEntity]
+
+  //
+  // Private members
+  //
   private def entity = entityLens.asMember(this)
 
   private[checkout] lazy val descField = entityField(get = _.desc)(set = desc => entity().copy(desc=desc))
   private[checkout] lazy val natureField = entityField(get = _.nature)(set = nature => entity().withNature(nature))
 
-  //
-  // Private members
-  //
+
   private def entityField[PropT](get: LineItemTypeEntity => PropT)(set: PropT => LineItemTypeEntity)
   : MemberLens[T, PropT] =
   {

@@ -8,6 +8,9 @@ trait SavesAsEntity[ModelT, EntityT <: KeyedEntity[_]] {
 
    protected def table: Table[EntityT]
 
+  /**
+   * Pimps out domain models with create and update functionality.
+   */
    trait EntitySavingConversions {
      implicit def toSavingDsl(toConvert: ModelT): SavingDSL = {
        new SavingDSL(toConvert: ModelT, modelToEntity(toConvert))
