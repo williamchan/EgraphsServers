@@ -31,8 +31,12 @@ import services.Utils
 import services.mvc.celebrity.CatalogStarsAgent
 import services.mvc.search.RebuildSearchIndexActor
 
-object Global extends GlobalSettings with Logging {
-  
+object Global extends controllers.ToyBox with Logging {
+  // for ToyBox; see .conf file in use for further configuration
+  val loginPath = "/toybox/login"
+  val assetsRoute = controllers.routes.EgraphsAssets.at(_)
+
+
   override def onStart(app: Application) {
     SSLConfig.enableCustomTrustore()
     

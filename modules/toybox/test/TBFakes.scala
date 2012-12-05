@@ -31,11 +31,8 @@ object TBFakes {
 
   // Fake ToyBox
   object FakeToyBox extends ToyBox {
-    val maybeGetLoginRoute  = Some(new Call("GET", loginPath))
-    val maybePostLoginRoute = Some(new Call("POST", loginPath))
-    val maybeAssetsRoute = Some( { file: String =>
-      new Call("GET", assetsPath + file)
-    })
+    val loginPath = "/path/to/login"
+    def assetsRoute = { file: String => new Call("GET", assetsPath + file) }
 
     // fakeing up a subconfiguration is tedious, overriding config base/root is 
     // virtually the same since there are no other unexpected configurations present 

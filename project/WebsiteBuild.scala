@@ -106,5 +106,5 @@ object WebsiteBuild extends Build {
 
       CloudBees.deployParams := Map("jvmPermSize" -> "200")
     )
-    .dependsOn(FrontendBuild.main, AuthenticityTokenBuild.main, PlayUtilsBuild.main)
+    .dependsOn(FrontendBuild.main, AuthenticityTokenBuild.main, PlayUtilsBuild.main, ToyBoxBuild.main)
 }
