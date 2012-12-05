@@ -18,16 +18,19 @@ object TBFakes {
   val correctPassword = "bar"
   val incorrectPassword = "bArRr"
 
+  val iPadHeader = "iPad-header"
+  val iPadSecret = "iPad-secret"
+
   val fakeApp = new FakeApplication(
     additionalConfiguration = Map(
       userKey -> correctUsername,
       passwordKey -> correctPassword,
       initRequestKey -> "toybox-initialRequest",
       authCookieKey -> "toybox-authenticated",
-      authTimeoutInSecondsKey -> (19*60 toString)
+      iPadHeaderKey -> iPadHeader,
+      iPadSecretKey -> iPadSecret
     )
   )
-
 
   // Fake ToyBox
   object FakeToyBox extends ToyBox {
@@ -45,6 +48,8 @@ object TBFakes {
     def authCookie(req: RequestHeader)        = makeAuthCookie(req)
     def initRequestCookie(req: RequestHeader) = makeInitialRequestCookie(req)
   }
+
+  object FakeToyBoy
 
 
   // Fake requests
@@ -64,6 +69,8 @@ object TBFakes {
     "username" -> incorrectUsername, 
     "password" -> incorrectPassword
   )
+
+  val iPadRequest = FakeRequest("GET", "/").withHeaders(iPadHeader -> iPadSecret)
 
 
   // Fake cookies

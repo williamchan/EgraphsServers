@@ -44,8 +44,8 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
   lazy val isPrivate    = config.getBoolean(privateKey).getOrElse(true) 
 
   // iPad authorization configuration
-  lazy val ipadHeader: Option[String] = config.getString(ipadHeaderKey)
-  lazy val ipadSecret: Option[String] = config.getString(ipadSecretKey)
+  lazy val iPadHeader: Option[String] = config.getString(iPadHeaderKey)
+  lazy val iPadSecret: Option[String] = config.getString(iPadSecretKey)
 
 
   /** Paths to public assets and pages. Could also pull more paths from config or replace
@@ -68,9 +68,9 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
       // iPad authentication
       { (request: RequestHeader) =>
         { for (
-            headerName <- ipadHeader;
+            headerName <- iPadHeader;
             headerVal <- request.headers.get(headerName);
-            secret <- ipadSecret
+            secret <- iPadSecret
           ) yield { secret == headerVal }
         }.getOrElse(false)
       }
@@ -284,7 +284,7 @@ object ToyBoxConfigKeys {
   /** Key to authentication cookie domain */
   val authDomainKey = "auth-domain"
 
-  /** Keys for ipad head and secret (for ipad authentication) */
-  val ipadHeaderKey = "ipad-header"
-  val ipadSecretKey = "ipad-secret"
+  /** Keys for iPad head and secret (for iPad authentication) */
+  val iPadHeaderKey = "ipad-header"
+  val iPadSecretKey = "ipad-secret"
 }
