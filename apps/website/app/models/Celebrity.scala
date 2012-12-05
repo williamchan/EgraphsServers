@@ -30,6 +30,8 @@ import services.db.DBSession
 import services.db.TransactionSerializable
 import org.joda.time.DateTimeConstants
 import models.frontend.landing.CatalogStar
+import services.mvc.celebrity.CatalogStarsAgent
+import services.mvc.celebrity.CatalogStarsQuery
 
 /**
  * Services used by each celebrity instance
@@ -113,40 +115,6 @@ case class Celebrity(id: Long = 0,
     services.productStore.findActiveProductsByCelebrity(id).toSeq
   }
 
-  @deprecated("This is still here because SER-86 does not work yet.", "")
-  def getActiveProductsWithInventoryRemaining(): Seq[(Product, Int)] = {
-    // 1) query for active InventoryBatches
-    val activeIBs = services.inventoryBatchStore.findByCelebrity(id, services.inventoryBatchQueryFilters.activeOnly)
-    val inventoryBatches = Utils.toMap(activeIBs, key=(theIB: InventoryBatch) => theIB.id)
-    val inventoryBatchIds = inventoryBatches.keys.toList
-
-    // 2) calculate quantity remaining for each InventoryBatch
-    val inventoryBatchIdsAndOrderCounts: Map[Long, Int] =
-      Map(services.orderStore.countOrdersByInventoryBatch(inventoryBatchIds): _*)
-
-    val inventoryBatchIdsAndNumRemaining : Map[Long, Int] = inventoryBatchIds.map{ id =>
-      (id, inventoryBatches.get(id).get.numInventory - inventoryBatchIdsAndOrderCounts.get(id).getOrElse(0))
-    }.toMap
-
-    // 3) query for products and inventoryBatchProducts on inventoryBatchIds
-    val productsAndBatchAssociations: Query[(Product, Long)] =
-      services.productStore.getProductAndInventoryBatchAssociations(inventoryBatchIds)
-
-    val productsAndBatchIds = productsAndBatchAssociations.toMap.keySet.map(product =>
-    {
-      val ids =  for((p, id) <- productsAndBatchAssociations if p.id == product.id) yield Set(id)
-      (product, ids.reduceLeft((s1, s2) => s1 | s2 ))
-    }
-    ).toMap
-
-    // 4) for each product, sum quantity remaining for each associated batch
-    val productsWithInventoryRemaining: Map[Product, Int] = productsAndBatchIds.map(b => {
-      val totalNumRemainingForProduct = (for (batchId <- b._2) yield inventoryBatchIdsAndNumRemaining.get(batchId).getOrElse(0)).sum
-      (b._1, totalNumRemainingForProduct)
-    })
-    productsWithInventoryRemaining.toSeq
-  }
-
   /**
    * The orders sorted by most recently fulfilled.
    */
@@ -162,7 +130,6 @@ case class Celebrity(id: Long = 0,
     Map("id" -> id, "enrollmentStatus" -> enrollmentStatus.name,  "publicName" -> publicName,
       "urlSlug" -> urlSlug) ++
       renderCreatedUpdatedForApi
-
   }
 
   /**
@@ -287,7 +254,7 @@ case class Celebrity(id: Long = 0,
   def sendWelcomeEmail(toAddress: String, bccEmail: Option[String] = None) {
     val email = new HtmlEmail()
 
-    email.setFrom("noreply@egraphs.com", "Egraphs")
+    email.setFrom("webserver@egraphs.com", "Egraphs")
     email.addTo(toAddress, publicName)
     bccEmail.map(bcc => email.addBcc(bcc))
     email.setSubject("Welcome to Egraphs")
@@ -295,8 +262,8 @@ case class Celebrity(id: Long = 0,
     val appDownloadLink = services.consumerApp.getIOSClient(redirectToItmsLink=true).url
     services.transactionalMail.send(
       email, 
-      text=Some(celebrity_welcome_email_text(publicName, account.email).toString), 
-      html=Some(celebrity_welcome_email(publicName, account.email, appDownloadLink)) 
+      text=Some(celebrity_welcome_email_text(publicName, account.email, appDownloadLink).toString),
+      html=Some(celebrity_welcome_email(publicName, account.email, appDownloadLink))
     )
   }
 
@@ -377,7 +344,12 @@ object Celebrity {
   }
 }
 
-class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends SavesWithLongKey[Celebrity] with SavesCreatedUpdated[Long,Celebrity] {
+class CelebrityStore @Inject() (
+  schema: Schema,
+  dbSession: DBSession,
+  catalogStarsQuery: CatalogStarsQuery,
+  featured: Featured) extends SavesWithLongKey[Celebrity] with SavesCreatedUpdated[Long, Celebrity] {
+
   import org.squeryl.PrimitiveTypeMode._
   import CelebrityViewConversions._
   //
@@ -500,10 +472,8 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends Sa
 
   private case class CelebrityProductSummary(inventoryAvailable: Int, minProductPrice: Int, maxProductPrice: Int)
 
-  private def publishedSearch(maybeQuery: Option[String] = None, refinements: Map[Long, Iterable[Long]] = Map[Long, Iterable[Long]](), sortType: CelebritySortingTypes.EnumVal = CelebritySortingTypes.MostRelevant)
+  private def publishedSearch()
   : Iterable[(Celebrity, CelebrityProductSummary)] = {
-    // Note we could make this fast probably.  We should see how performance is affected if we don't have to
-    // join across all celebrities since we can filter some with the text search first.
     val queryString = """
     SELECT
      stuff2.celebrityid,
@@ -547,30 +517,12 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends Sa
     FROM
      celebrity c INNER JOIN product p ON (p.celebrityid = c.id)
                  INNER JOIN inventorybatch ib ON (ib.celebrityid = c.id)
-    """ +
-     (
-       if(maybeQuery.isDefined)
-"""             INNER JOIN celebrity_categories_mv mv ON (mv.id = c.id) """
-       else " "
-     ) + 
-    """
                  LEFT OUTER JOIN orders o ON (o.inventorybatchid = ib.id AND ib.startdate < now() AND ib.enddate > now() AND
                                               o.productid = p.id)
     WHERE
      c._enrollmentStatus = 'Enrolled' AND
      c._publishedStatus = 'Published' AND
      p._publishedStatus = 'Published'
-  """
-  
-  val queryTextMatching = """ AND mv.to_tsvector @@ plainto_tsquery('english', {textQuery}) """
-  //TODO make this OR duh
-  val queryRefinements =  refinements.foldLeft("")((query, refinement) => {
-      query + """ AND EXISTS ( SELECT c.id FROM celebritycategoryvalue ccv WHERE ccv.categoryvalueid IN """ + 
-      "(" + refinement._2.foldLeft("")((acc, id) => if(id != refinement._2.head) {acc + "," + id.toString} else { id.toString}) + ")" +
-      """ AND ccv.celebrityid = c.id ) """
-    }) 
-
-  val queryGrouping = """ 
     ORDER BY is_order ASC
     ) AS stuff
       GROUP BY celeb_id, celeb_publicname, celeb_roledescription, celeb_landingpageImageKey, celeb_isfeatured, inventorybatch_id, inventory_total
@@ -578,38 +530,7 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends Sa
     GROUP BY celebrityid, publicname, roledescription, _landingpageImageKey, isfeatured
     """
 
-    import CelebritySortingTypes._
-
-    val queryResultOrdering = {
-      sortType match {
-      // case RecentlyAdded => 
-      // this may not be 100% accurate, but gives a gauge of when then have been added to our systems,
-      // to do better would have to include their publish date along with when their products were published to
-      // figure this out, and we don't have all that in our database now.
-      // "ORDER BY celebrityid DESC"
-      // case MostPopular => "ORDER BY inventory_sold DESC"
-        case PriceAscending => "ORDER BY minProductPrice ASC"
-        case PriceDecending => "ORDER BY maxProductPrice DESC"
-        case Alphabetical => "ORDER BY publicname ASC"
-        // case ReverseAlphabetical => "ORDER BY publicname DESC"
-        case MostRelevant =>  ""
-      }
-    } + ";"
-
-    val finalQuery = maybeQuery match {
-      case Some(query) => {
-        SQL(
-          queryString + queryTextMatching + queryRefinements + queryGrouping + queryResultOrdering
-        ).on("textQuery" -> query)
-      }
-      case None => { 
-        SQL(
-          queryString + queryRefinements + queryGrouping + queryResultOrdering
-        )
-      }
-    }
-
-    val rowStream = finalQuery.apply()(connection = schema.getTxnConnectionFactory)
+    val rowStream = SQL(queryString).apply()(connection = schema.getTxnConnectionFactory)
     for (row <- rowStream) yield {
       import java.math.BigDecimal
       val celebrity = Celebrity(
@@ -629,27 +550,103 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends Sa
     }
   }
 
+  def celebritiesSearch(maybeQuery: Option[String] = None, refinements: Iterable[Iterable[Long]] = Iterable[Iterable[Long]]())
+  : Iterable[Long] = {
+    // Note we could make this fast probably.  We should see how performance is affected if we don't have to
+    // join across all celebrities since we can filter some with the text search first.
+    val queryString = """
+    SELECT
+     c.id AS celebrityid
+    FROM
+     celebrity c 
+    """ +
+     (
+       if(maybeQuery.isDefined)
+"""             INNER JOIN celebrity_categories_mv mv ON (mv.id = c.id) """
+       else " "
+     )
+
+    val queryTextMatching = """ mv.to_tsvector @@ plainto_tsquery('english', {textQuery}) """
+
+    val queryRefinementsParts = for {
+      refinementList <- refinements
+    } yield {
+      """ EXISTS ( SELECT c.id FROM celebritycategoryvalue ccv WHERE ccv.categoryvalueid IN """ +
+      refinementList.mkString("(", ",", ")") + """ AND ccv.celebrityid = c.id ) """
+    }
+
+    val queryRefinements = queryRefinementsParts.mkString(" AND ")
+
+    val unfilteredWhereParts = (maybeQuery, queryTextMatching) :: (refinements, queryRefinements) :: Nil
+
+    def isDefined(condition: AnyRef): Boolean = {
+      condition match {
+        case iterable: Iterable[_] => !iterable.isEmpty
+        case Some(something) => true
+        case _ => false
+      }
+    }
+
+    val whereParts = for {
+      (condition, wherePart) <- unfilteredWhereParts
+      if (isDefined(condition))
+    } yield {
+      wherePart
+    }
+
+    val queryWhere = " WHERE " + (if (whereParts.isEmpty) {
+      " 1 = 1 "
+    } else {
+      whereParts.mkString(" AND ")
+    })
+
+    val unboundQuery = SQL(queryString + queryWhere)
+    val finalQuery = maybeQuery match {
+      case None => unboundQuery
+      case Some(query) => unboundQuery.on("textQuery" -> query)
+    }
+
+    finalQuery.apply()(connection = schema.getTxnConnectionFactory).map(row => row[Long]("celebrityid")).toIndexedSeq
+  }
+
   /**
    * This function is a dupe of the above function. We will probably want to think of a good way to abstract the search if we want to retain a
    * useful admin text search. 
    * 
    * Currently the view conversion is doing another DB query to fill in that data for each celebrity, would be great if we could do it all in one trip. 
-   * Set[Categoryid, Iterable[CategoryValueId]]
-   * in each set (OR CategoryValueIds) And (OR CategoryValueIds)
-   * 
-   *  (pitcher or 2nd baseman) and (red sox or yankees)
+   *
+   * @param maybeQuery the text to search for. This will be tested against the celebrity's name, category values,
+   *                   descriptions, and a few other sources.
+   * @param refinements this kind of sucks, but it's a way of communicating AND and OR combinations of different
+   *                    category values for the queried celebrities. Elements of the nested Iterable[Long]s will be interpreted
+   *                    as OR relationships, and each outer element will be compared to its siblings with AND
+   *                    relationships. For example, imagine you wanted to search for PITCHERS(categoryvalueid=1) named
+   *                    "Derpson" on the Yankees(cvid=2) or the Mets(cvid=3), the conceptual query
+   *                    you want is the set of celebrities named Derpson with "PITCHERS and (METS or YANKEES)".
+   *                    You would phrase the query against marketplaceSearch as:
+   *                    marketplaceSearch(Some("Derpson"), List(List(1), List(2, 3))
    */
-  def marketplaceSearch(maybeQuery: Option[String] = None, refinements: Map[Long, Iterable[Long]] = Map[Long, Iterable[Long]](), sortType: CelebritySortingTypes.EnumVal = CelebritySortingTypes.MostRelevant)
+  def marketplaceSearch(maybeQuery: Option[String] = None, refinements: Iterable[Iterable[Long]] = Iterable[Iterable[Long]]())
   : Iterable[MarketplaceCelebrity] = {
 
-    val celebrityAndSummaries = publishedSearch(maybeQuery, refinements, sortType)
-    for (celebrityAndSummary <- celebrityAndSummaries) yield {
-      val (celebrity, summary) = celebrityAndSummary
-      import java.math.BigDecimal
-      celebrity.asMarketplaceCelebrity(
-        soldout = summary.inventoryAvailable <= 0,
-        minPrice = summary.minProductPrice,
-        maxPrice = summary.maxProductPrice
+    val catalogStars = catalogStarsQuery()
+    val catalogStarsById = catalogStars.groupBy(star => star.id)
+
+    for {
+      celebrityId <- celebritiesSearch(maybeQuery, refinements)
+      if(catalogStarsById.contains(celebrityId))
+    } yield {
+      val star = catalogStarsById(celebrityId).head
+
+      MarketplaceCelebrity(
+        id = celebrityId,
+        publicName = star.name,
+        photoUrl = star.marketplaceImageUrl,
+        storefrontUrl = star.storefrontUrl,
+        inventoryRemaining = star.inventoryRemaining,
+        minPrice = star.minPrice,
+        maxPrice = star.maxPrice,
+        secondaryText = star.secondaryText
       )
     }
   }
@@ -660,9 +657,10 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends Sa
       Akka.future {
         val (celebrity, summary) = celebrityAndSummary
         celebrity.asCatalogStar(
-          soldout = summary.inventoryAvailable <= 0,
+          inventoryRemaining = summary.inventoryAvailable,
           minPrice = summary.minProductPrice,
-          maxPrice = summary.maxProductPrice)
+          maxPrice = summary.maxProductPrice
+        )
       }
     }
 
@@ -704,7 +702,9 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends Sa
     for (celeb <- schema.celebrities) yield celeb
   }
 
+  //TODO: Remove this completely after a deploy and using this to featured stars to use category values 
   def updateFeaturedCelebrities(newFeaturedCelebIds: Iterable[Long]) {
+    //TODO: Myyk- REMOVE THESE TWO
     // First update those gentlemen that are no longer featured
     update(schema.celebrities)(c =>
       where(c.isFeatured === true and (c.id notIn newFeaturedCelebIds))
@@ -716,19 +716,19 @@ class CelebrityStore @Inject() (schema: Schema, dbSession: DBSession) extends Sa
       where(c.id in newFeaturedCelebIds)
         set (c.isFeatured := true)
     )
+
+    featured.updateFeaturedCelebrities(newFeaturedCelebIds)
   }
 
   /**
    * Update a celebrity's associated filter values
    **/
-
   def updateCategoryValues(celebrity: Celebrity, categoryValueIds: Iterable[Long]) {
     //remove old records
     celebrity.categoryValues.dissociateAll
 
     // Add records for the new values
-    val newCelebrityCategoryValues  = for (categoryValueId <- categoryValueIds) yield 
-    { 
+    val newCelebrityCategoryValues = for (categoryValueId <- categoryValueIds) yield {
       CelebrityCategoryValue(celebrityId = celebrity.id, categoryValueId = categoryValueId)
     }
 

@@ -12,8 +12,6 @@ import services.AppConfig
 import controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled
 import com.google.inject.{Provider, Inject}
 
-
-
 /**
  * Converts Celebrities into various view models defined in the front-end module
  *
@@ -51,8 +49,8 @@ class CelebrityViewConversions(celeb: Celebrity) {
     )
   }
   
-  def asMarketplaceCelebrity(minPrice: Int, maxPrice: Int, soldout: Boolean) : MarketplaceCelebrity = {
-    val photoUrl = catalogStarsQuery().filter(c => c.id == celeb.id).headOption match {
+  def asMarketplaceCelebrity(minPrice: Int, maxPrice: Int, inventoryRemaining: Int) : MarketplaceCelebrity = {
+    val photoUrl = catalogStarsQuery().find(c => c.id == celeb.id) match {
       case Some(celeb) => celeb.marketplaceImageUrl
       case None => ""
     }
@@ -61,7 +59,7 @@ class CelebrityViewConversions(celeb: Celebrity) {
       publicName = celeb.publicName,
       photoUrl = photoUrl,
       storefrontUrl = controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled(celebrityUrlSlug = celeb.urlSlug).url,
-      soldout = soldout,
+      inventoryRemaining = inventoryRemaining,
       minPrice = minPrice,
       maxPrice = maxPrice,
       secondaryText = celeb.roleDescription
@@ -72,7 +70,7 @@ class CelebrityViewConversions(celeb: Celebrity) {
    * The celebrity as a CatalogStar. If some necessary data for the CatalogStar
    * were not available (e.g. publicName, storeFrontUrl) then it returns None.
    */
-  def asCatalogStar(minPrice: Int, maxPrice: Int, soldout: Boolean): CatalogStar = {
+  def asCatalogStar(minPrice: Int, maxPrice: Int, inventoryRemaining: Int): CatalogStar = {
     val mastheadImageUrl = celeb
       .landingPageImage
       .withImageType(ImageAsset.Jpeg)
@@ -90,11 +88,12 @@ class CelebrityViewConversions(celeb: Celebrity) {
     CatalogStar(
       id = celeb.id,
       name = celeb.publicName,
-      secondaryText = Option(celeb.roleDescription),
+      secondaryText = celeb.roleDescription,
+      organization = celeb.organization,
       imageUrl = mastheadImageUrl,
       marketplaceImageUrl = marketplaceImageUrl,
       storefrontUrl = choosePhotoUrl,
-      hasInventoryRemaining = !soldout,
+      inventoryRemaining = inventoryRemaining,
       isFeatured = celeb.isFeatured,
       minPrice = minPrice,
       maxPrice = maxPrice

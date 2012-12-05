@@ -41,7 +41,7 @@ class PrintOrderTests extends EgraphsUnitTest
 
     egraph = egraph.withEgraphState(EgraphState.ApprovedByAdmin).save()
     val pngUrl: Option[String] = printOrder.getPngUrl
-    pngUrl.get should endWith("blob/files/egraphs/" + egraph.id + "/image/signing-origin-offset-0x0_global-width-" + 
+    pngUrl.get should endWith("blob/files/egraphs/" + egraph.id + "/image/signing-origin-offset-0x0_global-width-" +
         LandscapeFramedPrint.targetEgraphWidth  + "px-v1.png")
     TestHelpers.getBlobFromTestBlobUrl(pngUrl.get).get.asByteArray.length should be(13737)
   }
@@ -55,6 +55,18 @@ class PrintOrderTests extends EgraphsUnitTest
     egraph = egraph.withEgraphState(EgraphState.ApprovedByAdmin).save()
     val imageUrl = printOrder.getFramedPrintImageData.get._1
     imageUrl should endWith(egraph.framedPrintFilename)
+    TestHelpers.getBlobFromTestBlobUrl(imageUrl).get.asByteArray.length should be > (500000)
+  }
+
+  "getStandaloneCertificateUrl" should "return URL that points to stand alone certificate image" in new EgraphsTestApplication {
+    var egraph = TestData.newSavedEgraph()
+    val order = egraph.order
+    val product = order.product.copy(name = "Limited Edition: That's What's Up - 2012 World Series Win").save()
+    val printOrder = PrintOrder(orderId = order.id).save()
+
+    egraph = egraph.withEgraphState(EgraphState.ApprovedByAdmin).save()
+    val imageUrl = printOrder.getStandaloneCertificateUrl.get
+    imageUrl should endWith(egraph.standaloneCertPrintFilename)
     TestHelpers.getBlobFromTestBlobUrl(imageUrl).get.asByteArray.length should be > (500000)
   }
 }

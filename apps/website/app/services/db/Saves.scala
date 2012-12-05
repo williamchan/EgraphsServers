@@ -49,7 +49,6 @@ import sun.security.krb5.internal.ktab.KeyTab
  * }
  * }}}
  */
-
 trait SavesWithLongKey[T <: KeyedEntity[Long]] extends Saves[Long, T] {
   override protected final def keysEqual(id: Long, otherId: Long): LogicalBoolean = {
     id === otherId

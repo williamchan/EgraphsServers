@@ -307,6 +307,7 @@ trait VBGBiometricServicesBase {
   final protected[voice] def convertAudioInputStreamToByteArray(audioInputStream: AudioInputStream): Array[Byte] = {
     val bas: ByteArrayOutputStream = new ByteArrayOutputStream()
     AudioSystem.write(audioInputStream, javax.sound.sampled.AudioFileFormat.Type.WAVE, bas)
+    bas.close()
     bas.toByteArray
   }
 
@@ -424,6 +425,7 @@ private class VBGRequest {
     }
     parseXMLResponse(sb.toString())
     //    httpConn.disconnect()
+    os.close()
 
     this
   }

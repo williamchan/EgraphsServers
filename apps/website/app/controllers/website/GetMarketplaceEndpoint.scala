@@ -37,6 +37,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
   protected def categoryValueStore: CategoryValueStore
   protected def catalogStarsQuery: CatalogStarsQuery
   protected def dbSession: DBSession
+  protected def featured: Featured
   
   import CelebrityViewConversions._
   import SafePlayParams.Conversions._
@@ -54,6 +55,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         active = (Some(sortingType) == selectedSortingType))
     }
   }
+
   /**
    * Serves up marketplace results page. If there are no query arguments, featured celebs are served. 
    **/
@@ -62,70 +64,105 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       // Determine what search options, if any, have been appended
       val marketplaceResultPageForm = Form(
         tuple(
-          "vertical" -> optional(nonEmptyText),
           "query" -> optional(nonEmptyText),
           "sort" -> optional(nonEmptyText),
-          "view" -> optional(nonEmptyText))
+          "view" -> optional(nonEmptyText)
         )
+      )
 
-      val (verticalIdOption, queryOption, sortOption, viewOption) = marketplaceResultPageForm.bindFromRequest.fold(
-        formWithErrors => throw new Exception("This shouldn't be possible")
-        ,{
-          case (verticalIdOption, queryOption, sortOption, viewOption) =>
-            (verticalIdOption, queryOption, sortOption, viewOption)
-        })
+      val (queryOption, sortOption, viewOption) = marketplaceResultPageForm.bindFromRequest.get
 
-      val maybeSortType = sortOption match {
-        case Some(sort) => CelebritySortingTypes(sort)
-        case _ => None
+      val maybeSortType = sortOption.flatMap(sort => CelebritySortingTypes(sort))
+
+      val categoryAndCategoryValues = for {
+        (key, set) <- request.queryString
+        categoryRegex(id) <- categoryRegex findFirstIn key
+      } yield {
+        val categoryValueId = set.map(arg =>
+          try {
+            arg.toLong
+          } catch {
+            case e => throw new Exception("Invalid category value argument passed.", e)
+          })
+        (id.toLong, categoryValueId)
       }
 
-      val categoryAndCategoryValues = 
-        for((key, set) <- request.queryString; categoryRegex(id) <- categoryRegex findFirstIn key) yield {
-          (id.toLong, set.map( arg => 
-            try { 
-              arg.toLong 
-            } catch {
-              case _ => throw new Exception("Invalid category arguments passed.")
-            }
-          ))
-        }
-      
-      val activeCategoryValues = {for{
-        (category, categoryValues) <- categoryAndCategoryValues
-        categoryValue <- categoryValues
-      } yield { categoryValue }}.toSet
+      val categoryValuesRefinements = if (categoryAndCategoryValues.isEmpty && queryOption.isEmpty) {
+        // use featured stars if no search type is used
+        val featuredCategoryValue = featured.categoryValue
+        List(List(featuredCategoryValue.id))
+      } else {
+        for ((category, categoryValues) <- categoryAndCategoryValues) yield categoryValues
+      }
 
-      val (subtitle, celebrities) = dbSession.connected(TransactionSerializable) {
+      //TODO: UNCOMMENT AFTER MAKING FEATURED INTO CATEGORY VALUES
+  //      val unsortedCelebrities = dbSession.connected(TransactionSerializable) {
+  //        celebrityStore.marketplaceSearch(queryOption, categoryValuesRefinements)
+  //      }
+  //
+  //      val subtitle = queryOption match {
+  //        case Some(query) =>
+  //          unsortedCelebrities.size match {
+  //            case 1 => "Showing 1 Result for \"" + query + "\"..."
+  //            case _ => "Showing " + unsortedCelebrities.size + " Results for \"" + query + "\"..."
+  //          }
+  //        case None =>
+  //          if (!categoryValuesRefinements.isEmpty) {
+  //            "Results"
+  //          } else {
+  //            "Featured Stars"
+  //          }
+  //      }
+
+      //TODO: REMOVE AFTER MAKING FEATURED INTO CATEGORY VALUES
+      val (subtitle, unsortedCelebrities) = dbSession.connected(TransactionSerializable) {
         queryOption match {
           case Some(query) =>
-            val results = celebrityStore.marketplaceSearch(queryOption, categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostRelevant))
+            val results = celebrityStore.marketplaceSearch(queryOption, categoryValuesRefinements)
             val text = results.size match {
               case 1 => "Showing 1 Result for \"" + query + "\"..."
               case _ => "Showing " + results.size + " Results for \"" + query + "\"..."
             }
             (text, results)
           case _ =>
-            if (!activeCategoryValues.isEmpty) {
-              ("Results", celebrityStore.marketplaceSearch(queryOption, categoryAndCategoryValues, maybeSortType.getOrElse(CelebritySortingTypes.MostRelevant)))
+            if (!categoryValuesRefinements.isEmpty) {
+              ("Results", celebrityStore.marketplaceSearch(queryOption, categoryValuesRefinements))
             } else {
-              //TODO when refinements are implemented we can do this using tags instead.  
+              //TODO when refinements are implemented we can do this using tags instead.
               ("Featured Stars", catalogStarsQuery().filter(star => star.isFeatured).map(c =>
                 MarketplaceCelebrity(
                   id = c.id,
                   publicName = c.name,
                   photoUrl = c.marketplaceImageUrl,
                   storefrontUrl = c.storefrontUrl,
-                  soldout = !c.hasInventoryRemaining,
+                  inventoryRemaining = c.inventoryRemaining,
                   minPrice = c.minPrice,
                   maxPrice = c.maxPrice,
-                  secondaryText = c.secondaryText.getOrElse(""))))
+                  secondaryText = c.secondaryText)))
             }
         }
       }
+      //TODO: END
+
+      // Sort results
+      import CelebritySortingTypes._
+      val celebrities = maybeSortType.getOrElse(CelebritySortingTypes.MostRelevant) match {
+        case MostRelevant => unsortedCelebrities
+        case PriceAscending => unsortedCelebrities.toList.sortWith((a,b) => a.minPrice < b.minPrice)
+        case PriceDecending => unsortedCelebrities.toList.sortWith((a,b) => a.maxPrice < b.maxPrice)
+        case Alphabetical => unsortedCelebrities.toList.sortWith((a,b) => a.publicName < b.publicName)
+        case _ => unsortedCelebrities
+      }
 
       val viewAsList = viewOption == Some("list") // "list" should be a part of an Enum
-      
+
+      val activeCategoryValues = {
+        for {
+          (category, categoryValues) <- categoryAndCategoryValues
+          categoryValue <- categoryValues
+        } yield { categoryValue }
+      }.toSet
+
       //HACK As long as no CategoryValues have children Categories, this call can be used to display
       // only baseball categories. This NEEDS to be fixed if we want to support multiple verticals.
       val categoryViewModels = for {
@@ -141,7 +178,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
               id = cv.id,
               active = activeCategoryValues.contains(cv.id)
             )
-          )
+          ).toList
         )
       }
 
@@ -150,7 +187,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         viewAsList = viewAsList,
         marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage.url,
         verticalViewModels = getVerticals(activeCategoryValues),
-        results = List(ResultSetViewModel(subtitle = Option(subtitle), celebrities)),
+        results = ResultSetViewModel(subtitle = Option(subtitle), celebrities),
         categoryViewModels = categoryViewModels,
         sortOptions = sortOptionViewModels(maybeSortType)))
     }

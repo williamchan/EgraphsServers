@@ -55,6 +55,7 @@ case class Order(
   messageToCelebrity: Option[String] = None,
   requestedMessage: Option[String] = None,
   expectedDate: Option[Date] = None,
+  _orderType: String = OrderType.Normal.name,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: OrderServices = AppConfig.instance[OrderServices]
@@ -65,12 +66,14 @@ case class Order(
   with HasOrderReviewStatus[Order]
   with HasWrittenMessageRequest[Order]
 {
+  
   //
   // Public methods
   //
   /** Persists by conveniently delegating to companion object's save method. */
   def save(): Order = {
     require(!recipientName.isEmpty, "Order: recipientName must be specified")
+
     services.store.save(this)
   }
 
@@ -100,6 +103,10 @@ case class Order(
 
   def isPublic = {
     privacyStatus == PrivacyStatus.Public
+  }
+
+  def isPromotional = {
+    _orderType == OrderType.Promotional.name
   }
 
   def redactedRecipientName: String = {
@@ -192,7 +199,7 @@ case class Order(
       email.addCc(buyingCustomer.account.email)
     }
 
-    email.addReplyTo("noreply@egraphs.com")
+    email.addReplyTo("webserver@egraphs.com")
     email.setSubject("I just finished signing your Egraph")
     val viewEgraphUrl = services.consumerApp.absoluteUrl(GetEgraphEndpoint.url(id))
     val htmlMsg = views.html.frontend.email_view_egraph(

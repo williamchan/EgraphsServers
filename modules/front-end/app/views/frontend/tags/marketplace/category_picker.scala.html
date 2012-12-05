@@ -1,4 +1,4 @@
-@(categoryViewModels: Iterable[models.frontend.marketplace.CategoryViewModel])
+@(categoryViewModels: List[models.frontend.marketplace.CategoryViewModel])
 <h2>Major League Baseball</h2>
           
 <ol>
@@ -7,17 +7,14 @@
      <a class="category" data-category="@category.id">@category.publicName</a> 
       @if(category.active){<a data-category="@category.id" class="clear-all">(Clear All)</a>}
         <ol>
-        @for((categoryValue, idx) <- category.categoryValues.zipWithIndex) {
-          <li>
-            <a class="cv-link @if(categoryValue.active){active} else{ @if(idx > 7){condensed}} " title="" data-category="@category.id" data-categoryvalue="@categoryValue.id">
-            @if(categoryValue.active){<i>&times;</i> <span>@categoryValue.publicName</span> } else {
-              @categoryValue.publicName    
-            }
-            </a>
-          </li>
-          }
-          @if(category.categoryValues.size > 10){
-          <li><a class="show-all">Show all&hellip;</a></li>
+          @for((categoryValue, idx) <- category.categoryValues.sorted.zipWithIndex) {
+            <li>
+              <a class="cv-link @if(categoryValue.active){active}" title="" data-category="@category.id" data-categoryvalue="@categoryValue.id">
+              @if(categoryValue.active){<i>&times;</i> <span>@categoryValue.publicName</span> } else {
+                @categoryValue.publicName    
+              }
+              </a>
+            </li>
           }
         </ol>  
     </li>

@@ -274,8 +274,8 @@ class Scenarios extends DeclaresScenarios {
   """Sends account confirmation email to will@egraphs.com using the configured SMTP server""", {
     () =>
       val email = new HtmlEmail()
-      email.setFrom("noreply@egraphs.com")
-      email.addReplyTo("noreply@egraphs.com")
+      email.setFrom("webserver@egraphs.com")
+      email.addReplyTo("webserver@egraphs.com")
       email.addTo("will@egraphs.com")
       email.setSubject("Welcome to Egraphs!")
       val verifyPasswordUrl = "https://www.google.com"
@@ -293,7 +293,7 @@ class Scenarios extends DeclaresScenarios {
   """Sends order confirmation email to will@egraphs.com using the configured SMTP server""", {
     () =>
       val email = new HtmlEmail()
-      email.setFrom("noreply@egraphs.com", "Egraphs")
+      email.setFrom("webserver@egraphs.com", "Egraphs")
       email.addTo("will@egraphs.com")
       email.setSubject("Order Confirmation")
       val html = views.html.frontend.email_order_confirmation(
@@ -336,7 +336,7 @@ class Scenarios extends DeclaresScenarios {
       val email = new HtmlEmail()
       email.setFrom("celebrity@egraphs.com", "Celebrity Jane")
       email.addTo("will@egraphs.com")
-      email.addReplyTo("noreply@egraphs.com")
+      email.addReplyTo("webserver@egraphs.com")
       email.setSubject("I just finished signing your Egraph")
       val viewEgraphUrl = "http://www.google.com"
       val html = views.html.frontend.email_view_egraph(

@@ -39,7 +39,12 @@ trait PostPrintOrderAdminEndpoint { this: Controller =>
               }
               case "generateFramedPrintImage" => {
                 val framedPrintImageData = printOrder.getFramedPrintImageData.getOrElse(("", ""))
-                Ok(views.html.Application.admin.admin_printinfo(framedPrintImageData._1, PrintManufacturingInfo.headerCSVLine, framedPrintImageData._2))
+                Ok(views.html.Application.admin.admin_printinfo(
+                  framedPrintImageData._1,
+                  PrintManufacturingInfo.headerCSVLine,
+                  framedPrintImageData._2,
+                  printOrder.getStandaloneCertificateUrl
+                ))
               }
               case "editAddress" => {
                 val shippingAddress = Form(single("shippingAddress" -> text)).bindFromRequest.apply("shippingAddress").value.get

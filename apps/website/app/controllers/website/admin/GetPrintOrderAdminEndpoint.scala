@@ -30,7 +30,7 @@ private[controllers] trait GetPrintOrderAdminEndpoint extends ImplicitHeaderAndF
 
             val fieldDefaults: (String => String) = {
               (paramName: String) => paramName match {
-                case "shippingAddress" => StringEscapeUtils.escapeHtml4(printOrder.shippingAddress)
+                case "shippingAddress" => printOrder.shippingAddress
               }
             }
 

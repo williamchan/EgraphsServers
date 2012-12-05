@@ -13,6 +13,7 @@ import play.api.data.validation.Constraints._
 import play.api.data.validation.Constraint
 import play.api.data.validation.Valid
 import play.api.data.validation.Invalid
+import enums.OrderType
 
 trait PostFreegraphAdminEndpoint {
   this: Controller =>
@@ -28,7 +29,9 @@ trait PostFreegraphAdminEndpoint {
       productId: Long, 
       inventoryBatchId: Long, 
       messageToCelebrity: String, 
-      requestedMessage: String)
+      requestedMessage: String,
+      orderTypeString: String
+    )
   
   /**
    * For updating an existing Account.
@@ -38,13 +41,14 @@ trait PostFreegraphAdminEndpoint {
       Action { implicit request =>
         val freegraphForm = Form(
           mapping(
-            "recipientName" -> text.verifying(nonEmpty),
+            "recipientName" -> nonEmptyText,
             "recipientEmail" -> email.verifying(nonEmpty),
             "buyerId" -> longNumber,
             "productId" -> longNumber,
             "inventoryBatchId" -> longNumber,
-            "messageToCelebrity" -> text.verifying(nonEmpty),
-            "requestedMessage" -> text.verifying(nonEmpty)
+            "messageToCelebrity" -> nonEmptyText,
+            "requestedMessage" -> nonEmptyText,
+            "orderTypeString" -> nonEmptyText.verifying(isOrderType)
           )(PostFreegraphForm.apply)(PostFreegraphForm.unapply))
         
         freegraphForm.bindFromRequest.fold(
@@ -52,7 +56,6 @@ trait PostFreegraphAdminEndpoint {
             Redirect(controllers.routes.WebsiteControllers.getCreateFreegraphAdmin).flashing("errors" -> formWithErrors.errors.head.message.toString())
           },
           validForm => {
-            
             val customer = customerStore.findOrCreateByEmail(email = validForm.recipientEmail, name = validForm.recipientName)
             val order = Order(
               recipientId = customer.id,
@@ -61,11 +64,21 @@ trait PostFreegraphAdminEndpoint {
               productId = validForm.productId,
               inventoryBatchId = validForm.inventoryBatchId,
               messageToCelebrity = Some(validForm.messageToCelebrity),
-              requestedMessage = Some(validForm.requestedMessage)
+              requestedMessage = Some(validForm.requestedMessage),
+              _orderType = validForm.orderTypeString
             ).save()
             Redirect(controllers.routes.WebsiteControllers.getOrderAdmin(order.id))
           }
         )
+      }
+    }
+  }
+  
+  private def isOrderType: Constraint[String] = {
+    Constraint { s: String =>
+      OrderType(s) match {
+        case Some(provedType) => Valid
+        case None => Invalid("Error setting freegraphs order type, please contact support")
       }
     }
   }

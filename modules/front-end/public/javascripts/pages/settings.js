@@ -3,7 +3,7 @@ define(["Egraphs", "libs/angular", "services/forms"], function (Egraphs) {
   //Controller class for Angular app
   var Controller = function ($scope) {
     //Plugin default values here
-    $scope.master = angular.copy(Egraphs.page.user)
+    $scope.master = angular.copy(Egraphs.page.user);
 
     $scope.update = function (user) {
       $scope.master = angular.copy(user);
@@ -11,7 +11,7 @@ define(["Egraphs", "libs/angular", "services/forms"], function (Egraphs) {
 
     $scope.reset = function () {
       $scope.user = angular.copy($scope.master);
-    }
+    };
 
     //Resets an individual value in a form by doing a lookup for the model reference.
     $scope.resetVal = function (val) {
@@ -26,7 +26,7 @@ define(["Egraphs", "libs/angular", "services/forms"], function (Egraphs) {
       }
 
       userObj[splitpath[splitpath.length - 1]] = angular.copy(master[splitpath[splitpath.length - 1]]);
-    }
+    };
 
     $scope.reset();
 
@@ -35,9 +35,8 @@ define(["Egraphs", "libs/angular", "services/forms"], function (Egraphs) {
       parent.addClass('none');
       parent.prev().removeClass('none');
       $scope.resetVal(modelString);
-      e.preventDefault();
-    }
-  }
+    };
+  };
 
   return {
     /**
@@ -75,4 +74,5 @@ define(["Egraphs", "libs/angular", "services/forms"], function (Egraphs) {
 
       });
     }
-}});
+  };
+});

@@ -8,8 +8,8 @@ class CatalogStarsQuery extends CatalogStarsQuerying {
   //
   // CatalogStarsQuerying members
   //
-  override protected def catalogStarActor = {
-    CatalogStarsActor.singleton
+  override protected def catalogStarAgent = {
+    CatalogStarsAgent.singleton
   }
 
   override protected def catalogStarUpdateActor = {

@@ -19,16 +19,67 @@ import play.api.libs.json._
  *  secondaryText = "Boston Red Sox"
  * ) 
  **/
+
 case class MarketplaceCelebrity(
     id: Long  = 0,
     publicName: String,
     photoUrl: String,
     storefrontUrl: String,
-    soldout: Boolean,
+    inventoryRemaining: Int,
     minPrice: Int,
     maxPrice: Int, 
-    secondaryText: String
-  ) 
+    secondaryText: String)
+{
+  def soldout: Boolean = (inventoryRemaining <= 0)
+}
+
+/**
+ * Represents a collection of results from a query. 
+ * Subtitle is usually something like "Showing 10 results for 'derp'"
+ **/
+case class ResultSetViewModel(
+    subtitle: Option[String],
+    celebrities: Iterable[MarketplaceCelebrity] = List()
+)
+
+object MarketplaceConversions {
+  implicit object MarketplaceCelebrityFormat extends Format[MarketplaceCelebrity] {
+    def reads(json: JsValue) = MarketplaceCelebrity (
+      (json \ "id").as[Long],
+      (json \ "publicName").as[String],
+      (json \ "photoUrl").as[String],
+      (json \ "storefrontUrl").as[String],
+      (json \ "inventoryRemaining").as[Int],
+      (json \ "minPrice").as[Int],
+      (json \ "maxPrice").as[Int],
+      (json \ "secondaryText").as[String]
+    )
+
+    def writes(c: MarketplaceCelebrity) : JsValue = JsObject(List(
+      "id" -> JsNumber(c.id),
+      "publicName" -> JsString(c.publicName),
+      "photoUrl" -> JsString(c.photoUrl),
+      "storefrontUrl" -> JsString(c.storefrontUrl),
+      "inventoryRemaining" -> JsNumber(c.inventoryRemaining),
+      "soldout" -> JsBoolean(c.soldout),
+      "minPrice" -> JsNumber(c.minPrice),
+      "maxPrice" -> JsNumber(c.maxPrice),
+      "secondaryText" -> JsString(c.secondaryText)
+    ))
+  }
+
+  implicit object ResultSetViewModelFormat extends Format[ResultSetViewModel] {
+    def reads(json: JsValue) : ResultSetViewModel = { ResultSetViewModel(
+      (json \ "subtitle").asOpt[String],
+      (json \ "celebrities").as[List[MarketplaceCelebrity]]
+    )}
+
+    def writes(r: ResultSetViewModel) : JsValue =  JsObject(List(
+      "subtitle" -> JsString(r.subtitle.getOrElse("")),
+      "celebrities" -> JsArray(r.celebrities.map (c => Json.toJson(c)).toSeq)
+    ))
+  }
+}
 
 /**
  * Represents a category and the values that are user-selectable for filtering.
@@ -37,7 +88,7 @@ case class MarketplaceCelebrity(
 case class CategoryViewModel(
   id: Long = 0,
   publicName: String,
-  categoryValues: Iterable[CategoryValueViewModel]
+  categoryValues: List[CategoryValueViewModel]
 ) {
   /**
    * Turn this representation into a convenient JSON representation for our front end code. 
@@ -47,7 +98,7 @@ case class CategoryViewModel(
          "c" + id.toString -> 
           Json.toJson(categoryValues.filter(cv => cv.active).map( fv => 
             Json.toJson(fv.id)  
-          ).toSeq)
+          ))
       )
   }
   /**
@@ -60,11 +111,16 @@ case class CategoryViewModel(
  /**
   *  Represents a CategoryValue (for ex: Boston Red Sox)
   **/
-case class CategoryValueViewModel(
-  id: Long= 0,
+case class CategoryValueViewModel (
+  id: Long = 0,
   publicName: String, 
   active: Boolean
-) 
+) extends Ordered[CategoryValueViewModel] {
+  override def compare(that: CategoryValueViewModel) = {
+    this.publicName.compareTo(that.publicName)
+  }
+}
+
 /**
  * Representation of sorting options like Price ascending or Alphabetical
  **/
@@ -87,11 +143,3 @@ case class VerticalViewModel(
   id: Long
 )
 
-/**
- * Represents a collection of results from a query. 
- * Subtitle is usually something like "Showing 10 results for 'derp'"
- **/
-case class ResultSetViewModel(
-    subtitle: Option[String],
-    celebrities: Iterable[MarketplaceCelebrity] = List()
-)

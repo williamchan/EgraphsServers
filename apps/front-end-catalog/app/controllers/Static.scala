@@ -10,8 +10,8 @@ import helpers.DefaultImplicitTemplateParameters
  */
 
 object Static extends Controller with DefaultImplicitTemplateParameters {
-  def simple_confirmation() = Action {
-    Ok(views.html.frontend.simple_confirmation("Account Verified",
+  def simple_message() = Action {
+    Ok(views.html.frontend.simple_message("Account Verified",
       """
       Your account is now verified. Continue on to the rest of the <a href="/">Egraph's</a> website.
       <br>

@@ -6,6 +6,7 @@
   recipientEmail: String,
   celebrityName: String,
   fulfillingEgraph: Option[models.Egraph],
+  maybePrintOrder: Option[models.PrintOrder],
   fields: (String) => String
 )(implicit authToken: egraphs.authtoken.AuthenticityToken, 
   headerData: models.frontend.header.HeaderData,
@@ -67,26 +68,71 @@
           <button type="submit" id="editMessages-button" class="btn primary fade in">Edit Messages</button>
         </div>
       }
+      @safeForm('id -> "changeBuyer-form", 'method -> "POST", 'action -> postOrder.url) {
+        <input name="orderId" type="hidden" value="@order.id">
+        <input name="action" type="hidden" value="changeBuyer">
+        <div class="actions">
+          <h3>Change buyer</h3>
+          @formField(
+            id="newBuyerEmail",
+            label="New Buyer Email (must correspond to an existing customer)",
+            inputType="text",
+            width="span4",
+            fields=fields
+          )
+          <button type="submit" class="btn primary fade in">Change Buyer</button>
+        </div>
+      }
+      @safeForm('id -> "changeRecipient-form", 'method -> "POST", 'action -> postOrder.url) {
+        <input name="orderId" type="hidden" value="@order.id">
+        <input name="action" type="hidden" value="changeRecipient">
+        <div class="actions">
+          <h3>Change recipient</h3>
+          @formField(
+          id="newRecipientEmail",
+          label="New Recipient Email (must correspond to an existing customer)",
+          inputType="text",
+          width="span4",
+          fields=fields
+          )
+          <button type="submit" class="btn primary fade in">Change Recipient</button>
+        </div>
+      }
+      @safeForm('id -> "changeProduct-form", 'method -> "POST", 'action -> postOrder.url) {
+        <input name="orderId" type="hidden" value="@order.id">
+        <input name="action" type="hidden" value="changeProduct">
+        <div class="actions">
+          <h3>Change product</h3>
+          @formField(
+            id="newProductId",
+            label="New Product Id",
+            inputType="text",
+            width="span4",
+            fields=fields
+          )
+          <button type="submit" class="btn primary fade in">Change Product</button>
+        </div>
+      }
     }
     @if(order.reviewStatus != models.enums.OrderReviewStatus.PendingAdminReview) {
-    @safeForm('id -> "pending-form", 'method -> "POST", 'action -> postOrder.url) {
-      <div class="actions">
-        <h3>Revert back to PendingAdminReview?</h3>
-        <input name="orderId" type="hidden" value="@order.id">
-        <input name="action" type="hidden" value="pending">
-        <button type="submit" id="pending-button" class="btn primary fade in">Revert</button>
-      </div>
-    }
+      @safeForm('id -> "pending-form", 'method -> "POST", 'action -> postOrder.url) {
+        <div class="actions">
+          <h3>Revert back to PendingAdminReview?</h3>
+          <input name="orderId" type="hidden" value="@order.id">
+          <input name="action" type="hidden" value="pending">
+          <button type="submit" id="pending-button" class="btn primary fade in">Revert</button>
+        </div>
+      }
     }
     @if(order.reviewStatus == models.enums.OrderReviewStatus.ApprovedByAdmin) {
-    @safeForm('id -> "generateImages-form", 'method -> "POST", 'action -> postOrder.url) {
-      <div class="actions">
-        <h3>Generate framed print JPG (and also PNG)</h3>
-        <input name="orderId" type="hidden" value="@order.id">
-        <input name="action" type="hidden" value="generateImages">
-        <button type="submit" id="generateImages-button" class="btn primary fade in">Generate JPG and PNG</button>
-      </div>
-    }
+      @safeForm('id -> "generateImages-form", 'method -> "POST", 'action -> postOrder.url) {
+        <div class="actions">
+          <h3>Generate framed print JPG (and also PNG)</h3>
+          <input name="orderId" type="hidden" value="@order.id">
+          <input name="action" type="hidden" value="generateImages">
+          <button type="submit" id="generateImages-button" class="btn primary fade in">Generate JPG and PNG</button>
+        </div>
+      }
     }
     @if(order.paymentStatus == models.enums.PaymentStatus.Charged) {
       @safeForm('id -> "refund-form", 'method -> "POST", 'action -> postOrder.url) {
@@ -139,8 +185,15 @@
           @valueRow(label="Written Message Type", value=order._writtenMessageRequest)
           @valueRow(label="Privacy Status",       value=order.privacyStatus)
           @valueRow(label="Rejection Reason",     value=order.rejectionReason.getOrElse(""))
+          @valueRow(label="Order Type",           value=order._orderType)
           @valueRow(label="Created",              value=order.created)
           @valueRow(label="Updated",              value=order.updated)
+          <hr/>
+          <h2>Print Order Details</h2>
+          @{maybePrintOrder match {
+            case Some(printOrder) => valueRow(label="Print Order Id", value=printOrder.id, href="/admin/printorders/"+printOrder.id)
+            case _ => valueRow(label="Print Order Id", value="None")
+          }}
           <hr/>
           <h2>Payment Details</h2>
           @valueRow(label="Payment Status",       value=order.paymentStatus)

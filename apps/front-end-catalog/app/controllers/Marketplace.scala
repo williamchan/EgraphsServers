@@ -16,7 +16,7 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
 
   def results() = Action {
     Ok(views.html.frontend.marketplace_results(
-      query = "exampleQuery",
+      query = "",
       viewAsList = false,
       marketplaceRoute = controllers.routes.Marketplace.results.url,
       verticalSet,
@@ -27,21 +27,13 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
 
   def results_list() = Action {
     Ok(views.html.frontend.marketplace_results(
-      query = "exampleQuery",
+      query = "",
       viewAsList = true,
-      marketplaceRoute = controllers.routes.Marketplace.mlb.url,
+      marketplaceRoute = controllers.routes.Marketplace.results.url,
       verticalSet,
       resultSet,
       categoryViewModels,
       sortOptions))
-  }
-
-  def index() = Action {
-    Ok(views.html.frontend.marketplace_landing("derp", "exampleQuery", verticalSet, resultSet, categoryViewModels, sortOptions))
-  }
-
-  def mlb() = Action {
-    Ok(views.html.frontend.marketplace_mlb())
   }
 
   def categorySet: Iterable[CategoryViewModel] = {
@@ -65,10 +57,8 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
       VerticalViewModel(id = 3, verticalName = "mj", publicName = "Monster Jam", shortName = "Monster Jam", iconUrl = "images/icon-logo-monster-jam.png")).toSet
   }
 
-  def resultSet: Iterable[ResultSetViewModel] = {
-    List(ResultSetViewModel(subtitle = Option("Herpson"), celebrities = celebViewModels(3)),
-      ResultSetViewModel(subtitle = Option("Derpson"), celebrities = celebViewModels(5)),
-      ResultSetViewModel(subtitle = Option("Perpson"), celebrities = celebViewModels(9)))
+  def resultSet: ResultSetViewModel = {
+      ResultSetViewModel(subtitle = Option("Derpson"), celebrities = celebViewModels(36))
   }
 
   def celebViewModels(quantity: Int): Iterable[MarketplaceCelebrity] = {
@@ -78,20 +68,35 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
         publicName = "Herp Derpson",
         photoUrl = EgraphsAssets.at("images/660x350.gif").url,
         storefrontUrl = "#",
-        soldout = coinflip.nextBoolean,
+        inventoryRemaining = coinflip.nextInt(20),
         minPrice = 45,
         maxPrice = 90,
         secondaryText = "Boston Red Sox")
     }
   }
 
-  def categoryViewModels: Iterable[CategoryViewModel] = {
+  def categoryViewModels: List[CategoryViewModel] = {
     List(
       CategoryViewModel(
         id = 1,
         publicName = "Team",
         categoryValues = List(
           CategoryValueViewModel(id = 2, publicName = "Boston Red Sox", active = true),
+          CategoryValueViewModel(id = 3, publicName = "Miami Marlins", active = false),
+          CategoryValueViewModel(id = 4, publicName = "New York Yankees", active = false),
+          CategoryValueViewModel(id = 2, publicName = "Boston Red Sox", active = true),
+          CategoryValueViewModel(id = 3, publicName = "Miami Marlins", active = false),
+          CategoryValueViewModel(id = 4, publicName = "New York Yankees", active = false),
+          CategoryValueViewModel(id = 2, publicName = "Boston Red Sox", active = true),
+          CategoryValueViewModel(id = 3, publicName = "Miami Marlins", active = false),
+          CategoryValueViewModel(id = 4, publicName = "New York Yankees", active = false),
+          CategoryValueViewModel(id = 2, publicName = "Boston Red Sox", active = false),
+          CategoryValueViewModel(id = 3, publicName = "Miami Marlins", active = false),
+          CategoryValueViewModel(id = 4, publicName = "New York Yankees", active = false),
+          CategoryValueViewModel(id = 2, publicName = "Boston Red Sox", active = false),
+          CategoryValueViewModel(id = 3, publicName = "Miami Marlins", active = false),
+          CategoryValueViewModel(id = 4, publicName = "New York Yankees", active = false),
+          CategoryValueViewModel(id = 2, publicName = "Boston Red Sox", active = false),
           CategoryValueViewModel(id = 3, publicName = "Miami Marlins", active = false),
           CategoryValueViewModel(id = 4, publicName = "New York Yankees", active = false)
         )
@@ -102,6 +107,12 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
         categoryValues = List(
           CategoryValueViewModel(id = 5, publicName = "Pitcher", active = false),
           CategoryValueViewModel(id = 6, publicName = "Shortstop", active = true),
+          CategoryValueViewModel(id = 7, publicName = "Catcher", active = false),
+          CategoryValueViewModel(id = 5, publicName = "Pitcher", active = false),
+          CategoryValueViewModel(id = 6, publicName = "Shortstop", active = false),
+          CategoryValueViewModel(id = 7, publicName = "Catcher", active = false),
+          CategoryValueViewModel(id = 5, publicName = "Pitcher", active = false),
+          CategoryValueViewModel(id = 6, publicName = "Shortstop", active = false),
           CategoryValueViewModel(id = 7, publicName = "Catcher", active = false)
         )
       )

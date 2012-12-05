@@ -2,13 +2,12 @@ package models.categories
 
 import services._
 import com.google.inject.{Provider, Inject}
-import db.{Schema, KeyedCaseClass, SavesWithLongKey}
+import db.{Schema, KeyedCaseClass, SavesWithLongKey, Deletes}
 import java.sql.Timestamp
 import services.Time
 import models._
 import org.squeryl.Query
 import org.squeryl.dsl.ManyToMany
-
 
 case class CategoryServices @Inject() (
   celebrityCategoryValueStore: CelebrityCategoryValueStore,
@@ -61,9 +60,8 @@ case class Category(
 }
 
 class CategoryStore @Inject() (
-  schema: Schema,
-  categoryServices: Provider[CategoryServices]
-) extends SavesWithLongKey[Category]
+  schema: Schema
+) extends SavesWithLongKey[Category] with Deletes[Long, Category]
   with SavesCreatedUpdated[Long,Category]
 {
   import org.squeryl.PrimitiveTypeMode._
@@ -93,7 +91,7 @@ class CategoryStore @Inject() (
       	select(category)
       ).headOption
   }
- 
+
   //
   // SavesWithLongKey[Category] methods
   //

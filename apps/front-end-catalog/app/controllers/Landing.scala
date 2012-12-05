@@ -23,12 +23,12 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
   }
 
   def signupOn = Action {
-    val stars = sampleStars.map(star => star.copy(hasInventoryRemaining = false))
+    val stars = sampleStars.map(star => star.copy(inventoryRemaining = 0))
     Ok(views.html.frontend.landing(stars, signup=true))
   }
 
   def featuredStarsWithNoInventory() = Action {
-    val stars = sampleStars.map(star => star.copy(hasInventoryRemaining = false))
+    val stars = sampleStars.map(star => star.copy(inventoryRemaining = 0))
     Ok(views.html.frontend.landing(stars))
   }
 
@@ -48,11 +48,12 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
     CatalogStar(
       id,
       name,
-      secondaryText,
+      secondaryText.getOrElse(""),
+      organization = "",
       sampleImageUrl,
       sampleMarketplaceImageUrl,
       "/" + name,
-      hasInventoryRemaining = true,
+      inventoryRemaining = 10,
       isFeatured = false,
       35,
       100
