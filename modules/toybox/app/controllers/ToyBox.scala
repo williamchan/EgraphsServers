@@ -10,6 +10,7 @@ import play.api.libs.Crypto
 import play.api.data.Forms._
 import play.api.data.{Form, Forms}
 import play.api.data.format.Formats._
+import org.joda.time.DateTimeConstants._
 
 import ToyBoxConfigKeys._
 
@@ -80,7 +81,7 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
   // Cookie configuration
   lazy val initialRequestCookieName = config.getString(initRequestKey).getOrElse("toybox-initial-request")
   lazy val authCookieName = config.getString(authCookieKey).getOrElse("toybox-authenticated")
-  lazy val authTimeoutInSeconds = config.getInt(authTimeoutInSecondsKey).getOrElse(24*60*60)  // 24 hour default
+  lazy val authTimeoutInSeconds = config.getInt(authTimeoutInSecondsKey).getOrElse(SECONDS_PER_DAY)
   lazy val authPath = config.getString(authPathKey).getOrElse("/")
   lazy val authDomain = config.getString(authDomainKey)
 
@@ -100,17 +101,19 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
    *  a signed cookie that needs to be renewed periodically.
    */
   override def onRouteRequest(request: RequestHeader): Option[Handler] = {
-    if (isLoginRequest(request))
-      loginHandler(request)
+
+    if (isLoginRequest(request)) {
+      Some(loginHandler(request))
     
-    else if (isPublicResourceRequest(request)) 
+    } else if (isPublicResourceRequest(request)) {
       normalRouteRequestHandler(request)
     
-    else if (isAuthorized(request)) 
+    } else if (isAuthorized(request)) {
       handleAuthorized(request)
     
-    else
-      redirectToLogin(request)
+    } else {
+      Some(redirectToLogin(request))
+    }
   }
 
   protected def isLoginRequest(request: RequestHeader) = { 
@@ -122,11 +125,11 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
     forLoginPath && isPrivate
   }
 
-  protected def loginHandler(request: RequestHeader): Option[Handler] = {
+  protected def loginHandler(request: RequestHeader): Handler = {
     if (request.method == "GET") 
-      Some(getLogin)
+      getLogin
     else
-      Some(postLogin) 
+      postLogin
   }
 
   /** Method pointing to the parent's onRouteRequtest method. Used to make testing easier. */
@@ -147,14 +150,13 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
   /** Generates a redirect to the log-in page and sets a Cookie containing the method
    *  and path of the request received for later redirection, if none already exists.
    */
-  protected def redirectToLogin(request: RequestHeader): Option[Handler] = Some( 
-    Action {
-      request.cookies.get(initialRequestCookieName) match {
-      case Some(cookie: Cookie) => Redirect(getLoginRoute)
-      case None => Redirect(getLoginRoute).withCookies( 
-          makeInitialRequestCookie(request)) 
-      }
-    })
+  protected def redirectToLogin(request: RequestHeader): Handler = Action {
+    request.cookies.get(initialRequestCookieName) match {
+    case Some(cookie: Cookie) => Redirect(getLoginRoute)
+    case None => Redirect(getLoginRoute).withCookies( 
+        makeInitialRequestCookie(request)) 
+    }
+  }
 
   /** Creates a Cookie holding the method and path of the given request */
   protected def makeInitialRequestCookie(request: RequestHeader): Cookie = {

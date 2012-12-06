@@ -49,8 +49,6 @@ object TBFakes {
     def initRequestCookie(req: RequestHeader) = makeInitialRequestCookie(req)
   }
 
-  object FakeToyBoy
-
 
   // Fake requests
   val requestedPath    = "/foobar"
