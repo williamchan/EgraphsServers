@@ -15,7 +15,7 @@
       <div class="clearfix">
         <article ng-repeat="celebrity in celebrities" when-scrolled="loadCelebrities()" class="celebrity-result">
           <figure>
-              <a ng-show=celebrity.soldout href="#" class="ribbon"><em>Sold Out</em></a>
+              <a ng-show="celebrity.soldout" href="{{celebrity.storefrontUrl}}" class="ribbon"><em>Sold Out</em></a>
               <a class="glowborder" href="{{celebrity.storefrontUrl}}"><img ng-cloak src={{celebrity.photoUrl}} alt="FPO image"></a>
           </figure>
           <hgroup>
