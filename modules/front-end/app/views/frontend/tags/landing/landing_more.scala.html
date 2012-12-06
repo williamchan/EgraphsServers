@@ -1,5 +1,7 @@
 @(celebrityPublicName: Option[String] = None, getStartedUrl: Option[String] = None)
 
+@import views.html.frontend.tags
+
 <section id="landing-more">
 
   <header>
@@ -12,8 +14,14 @@
         }
       }
     </h1>
-
-    @getStartedUrl.map { url => <p><a href="@url" class="button"><strong>Get Started</strong> <span>&raquo;</span></a></p> }
+    @getStartedUrl.map{ url =>
+      @{
+        celebrityPublicName match {
+          case None => tags.landing.searchbox(url)
+          case Some(name) => tags.landing.get_started(url)
+        }
+      }
+    }
 
   </header>
 

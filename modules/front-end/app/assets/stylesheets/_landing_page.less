@@ -227,7 +227,7 @@
 
 #landing-more {
 
-	margin-bottom: 40px;
+  margin-bottom: 40px;
 
 	header {
 		
@@ -239,7 +239,13 @@
 		}
 		
 		p { margin-bottom: 0; }
-		
+
+      form {
+        #celebrity-searchbox {
+          width: 45%;
+        }
+        .celebrity-searchbox-container();
+      }
 	}
 
 	.actions {
@@ -664,5 +670,16 @@
 		}
 	
 	}
+
+
+    #landing-more {
+        header {
+            form {
+              #celebrity-searchbox {
+                  width: 100%;
+                }
+            }
+        }
+    }
 
 }

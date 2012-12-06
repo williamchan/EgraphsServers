@@ -1,14 +1,22 @@
-@()
+@(availableOnly: Boolean = false)
 
 <div class="verticals">
   <section class="clearfix" ng-cloak ng-controller="MarketplaceCtrl">
     <section>
-      <h1><span>{{results.subtitle}}</span></h1>
+      <div class="clearfix">
+        <h1><span>{{results.subtitle}}</span></h1> 
+        <div class="available-only">
+            <ol>
+              <li><a data-value="false" @if(!availableOnly){class="active"}>All Stars</a></li>
+              <li><a data-value="true" @if(availableOnly){class="active"})>Only Available Stars</a></li>
+            </ol>
+        </div>    
+      </div>
       <div class="clearfix">
         <article ng-repeat="celebrity in celebrities" when-scrolled="loadCelebrities()" class="celebrity-result">
           <figure>
               <a ng-show=celebrity.soldout href="#" class="ribbon"><em>Sold Out</em></a>
-              <a class="glowborder" href="{{celebrity.storefrontUrl}}"><img src="{{celebrity.photoUrl}}" alt="FPO image"></a>
+              <a class="glowborder" href="{{celebrity.storefrontUrl}}"><img ng-cloak src={{celebrity.photoUrl}} alt="FPO image"></a>
           </figure>
           <hgroup>
             <h2><a href="{{celebrity.storefrontUrl}}" title="View star: {{celebrity.publicName}}">{{celebrity.publicName}}</a></h2>

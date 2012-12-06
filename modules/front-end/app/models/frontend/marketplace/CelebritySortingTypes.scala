@@ -23,8 +23,8 @@ object CelebritySortingTypes extends Enum {
     val name = "PriceAscending"
     val displayName ="Price (Low to High)"
   }
-  val PriceDecending = new EnumVal {
-    val name = "PriceDecending"
+  val PriceDescending = new EnumVal {
+    val name = "PriceDescending"
     val displayName ="Price (High to Low)"
   }
   val Alphabetical = new EnumVal {
