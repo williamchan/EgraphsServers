@@ -122,7 +122,7 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoi
             $.param({ "query" : window.Egraphs.page.query,
                       "sort" : window.Egraphs.page.sort,
                       "view" : window.Egraphs.page.view,
-                      "soldoutOnly" : window.Egraphs.page.soldoutOnly}) +
+                      "availableOnly" : window.Egraphs.page.availableOnly}) +
             "&" + $.param(window.Egraphs.page.categories);
         };
         
@@ -172,7 +172,7 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoi
          * Filter sold out stars
          **/
          $(".soldout-only a").click(function(e) {
-           window.Egraphs.page.soldoutOnly = $(this).attr("data-value");
+           window.Egraphs.page.availableOnly = $(this).attr("data-value");
            reloadPage();
          });
 

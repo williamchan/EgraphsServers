@@ -5,7 +5,7 @@
   results: models.frontend.marketplace.ResultSetViewModel,
   categoryViewModels: List[models.frontend.marketplace.CategoryViewModel] = List[models.frontend.marketplace.CategoryViewModel](),
   sortOptions: Iterable[models.frontend.marketplace.SortOptionViewModel],
-  soldoutOnly: Boolean = false
+  availableOnly: Boolean = false
   )(
   implicit
   headerData: models.frontend.header.HeaderData,
@@ -36,7 +36,7 @@
  Egraphs.page.sort = "@sortOptions.find(v => v.active).map(v => v.name)";
  Egraphs.page.view = @if(viewAsList){"list"} else {""};
  Egraphs.page.results = @Html(Json.toJson(results).toString);
- Egraphs.page.soldoutOnly = @soldoutOnly;
+ Egraphs.page.availableOnly = @availableOnly;
 
 }
 
@@ -84,7 +84,7 @@
           @if(viewAsList) {
             @tags.marketplace.result_set_list(results)
           } else {
-            @tags.marketplace.result_set(soldoutOnly)
+            @tags.marketplace.result_set(availableOnly)
           }
         </div>
       </div>

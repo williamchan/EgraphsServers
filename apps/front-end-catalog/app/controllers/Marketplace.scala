@@ -23,7 +23,7 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
       resultSet,
       categoryViewModels,
       sortOptions,
-      soldoutOnly = false))
+      availableOnly = false))
   }
 
   def results_list() = Action {
@@ -35,7 +35,7 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
       resultSet,
       categoryViewModels,
       sortOptions,
-      soldoutOnly = coinflip.nextBoolean))
+      availableOnly = coinflip.nextBoolean))
   }
 
   def categorySet: Iterable[CategoryViewModel] = {

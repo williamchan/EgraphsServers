@@ -67,14 +67,14 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
           "query" -> optional(nonEmptyText),
           "sort" -> optional(nonEmptyText),
           "view" -> optional(nonEmptyText),
-          "soldoutOnly" -> optional(boolean)
+          "availableOnly" -> optional(boolean)
         )
       )
 
-      val (queryOption, sortOption, viewOption, soldoutOnlyOption) = marketplaceResultPageForm.bindFromRequest.get
+      val (queryOption, sortOption, viewOption, availableOnlyOption) = marketplaceResultPageForm.bindFromRequest.get
 
       val maybeSortType = sortOption.flatMap(sort => CelebritySortingTypes(sort))
-      val soldoutOnly = soldoutOnlyOption.getOrElse(false)
+      val availableOnly = availableOnlyOption.getOrElse(false)
 
       val categoryAndCategoryValues = for {
         (key, set) <- request.queryString
@@ -156,7 +156,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         case _ => unsortedCelebrities
       }
 
-      val celebrities = if(soldoutOnly){
+      val celebrities = if(availableOnly){
           sortedCelebrities.filter(c => c.inventoryRemaining > 0)
         } else {
           sortedCelebrities
@@ -198,7 +198,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         results = ResultSetViewModel(subtitle = Option(subtitle), celebrities),
         categoryViewModels = categoryViewModels,
         sortOptions = sortOptionViewModels(maybeSortType),
-        soldoutOnly = soldoutOnly)
+        availableOnly = availableOnly)
       )
     }
   }
