@@ -1,18 +1,19 @@
 package models.categories
 
 import org.junit.runner.RunWith
-import utils.EgraphsUnitTest
 import org.scalatest.junit.JUnitRunner
-import utils.DBTransactionPerTest
+import models.CelebrityStore
 import services.AppConfig
+import utils.DBTransactionPerTest
+import utils.EgraphsUnitTest
+import utils.TestData
+import models.enums.PublishedStatus
 
 @RunWith(classOf[JUnitRunner])
 class FeaturedTests extends EgraphsUnitTest with DBTransactionPerTest {
 
   "categoryValue" should "create a featured category value and internal category are not already there" in new EgraphsTestApplication {
-    deleteFeaturedCategoryValueRelationships()
     deleteFeaturedCategoryValue()
-    deleteInternalCategory()
 
     val featured = featuredToTest
     val categoryValue = featured.categoryValue
@@ -34,15 +35,72 @@ class FeaturedTests extends EgraphsUnitTest with DBTransactionPerTest {
     categoryValue.publicName should be(Featured.categoryValueName)
   }
 
-  def deleteInternalCategory(): Unit = {
-    val maybeCategory = categoryStore.findByName(Internal.categoryName)
-    maybeCategory match {
-      case Some(category) => categoryStore.delete(category)
-      case None => // it's not there no need to delete
+  "updateFeaturedCelebrities" should "remove celebs that weren't in the updated featured list" in new EgraphsTestApplication {
+    featuredStateOfCelebWhen(celebWasFeatured = true, includeCelebInNewFeaturedCelebs = false) should be(false)
+  }
+
+  it should "keep featured celebs" in new EgraphsTestApplication {
+    featuredStateOfCelebWhen(celebWasFeatured = true, includeCelebInNewFeaturedCelebs = true) should be(true)
+  }
+
+  it should "set newly featured celebs" in new EgraphsTestApplication {
+    featuredStateOfCelebWhen(celebWasFeatured = false, includeCelebInNewFeaturedCelebs = true) should be(true)
+  }
+
+  "featuredPublishedCelebrities" should "only return published celebrities that are featured" in new EgraphsTestApplication {
+    import PublishedStatus.{ Published, Unpublished }
+
+    // Set up
+    val featuredPublishedShouldBeInResults = Vector(
+      (true, Published, true),
+      (true, Unpublished, false),
+      (false, Published, false),
+      (false, Unpublished, false))
+
+    val celebs = for ((featured, published, _) <- featuredPublishedShouldBeInResults) yield {
+      TestData.newSavedCelebrity()
+        .withPublishedStatus(published)
+        .save()
+    }
+ 
+    val celebsWithInputData = celebs.zip(featuredPublishedShouldBeInResults)
+    val featuredCelebs = for {
+      (celeb, (featured, _, _)) <- celebsWithInputData if featured
+    } yield {celeb.id}
+
+    featuredToTest.updateFeaturedCelebrities(featuredCelebs)
+
+    // Execute the test on the data table featuredPublishedShouldBeInResults
+    val results = featuredToTest.featuredPublishedCelebrities.toList
+    for ((celeb, (_, _, shouldBeInResults)) <- celebsWithInputData) {
+      if (shouldBeInResults)
+        results should contain(celeb)
+      else results should not contain (celeb)
     }
   }
 
-  def deleteFeaturedCategoryValue(): Unit = {
+  private def featuredStateOfCelebWhen(
+    celebWasFeatured: Boolean,
+    includeCelebInNewFeaturedCelebs: Boolean): Boolean = {
+
+    val featuredCelebrity = TestData.newSavedCelebrity()
+
+    if (celebWasFeatured) {
+      featuredToTest.updateFeaturedCelebrities(List(featuredCelebrity.id))
+    }
+
+    val newFeaturedCelebs = if (includeCelebInNewFeaturedCelebs) {
+      List(featuredCelebrity.id)
+    } else {
+      List(TestData.newSavedCelebrity().id) // a list of celebrity ids that can't be this celebrity
+    }
+
+    featuredToTest.updateFeaturedCelebrities(newFeaturedCelebs)
+
+    featuredToTest.featuredPublishedCelebrities exists (celebrity => celebrity.id == featuredCelebrity.id)
+  }
+
+  private def deleteFeaturedCategoryValue(): Unit = {
     val maybeCategoryValue = categoryValueStore.findByName(Featured.categoryValueName)
     maybeCategoryValue match {
       case Some(categoryValue) => categoryValueStore.delete(categoryValue)
@@ -50,28 +108,8 @@ class FeaturedTests extends EgraphsUnitTest with DBTransactionPerTest {
     }
   }
 
-  def deleteFeaturedCategoryValueRelationships(): Unit = {
-    val maybeCategoryValue = categoryValueStore.findByName(Featured.categoryValueName)
-    maybeCategoryValue match {
-      case Some(categoryValue) =>
-        val relationships = categoryValueRelationshipStore.findByCategoryValueId(categoryValue.id).toList
-        for(relationship <- relationships) {
-          categoryValueRelationshipStore.delete(relationship)
-        }
-        
-      case None =>
-    }
-  }
+  private def celebrityStore = AppConfig.instance[CelebrityStore]
+  private def categoryValueStore = AppConfig.instance[CategoryValueStore]
 
-  def categoryStore = AppConfig.instance[CategoryStore]
-  def categoryValueStore = AppConfig.instance[CategoryValueStore]
-  def categoryValueRelationshipStore = AppConfig.instance[CategoryValueRelationshipStore]
-
-  def featuredToTest = {
-    AppConfig.instance[Featured]
-  }
-
-  def internal = {
-    AppConfig.instance[Internal]
-  }
+  private def featuredToTest = AppConfig.instance[Featured]
 }

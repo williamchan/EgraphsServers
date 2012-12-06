@@ -7,6 +7,7 @@ import play.api.mvc.Controller
 import services.http.POSTControllerMethod
 import services.http.filters.HttpFilters
 import play.api.mvc.Action
+import categories.Featured
 
 trait PostFeaturedCelebritiesAdminEndpoint {
   this: Controller =>
@@ -14,6 +15,7 @@ trait PostFeaturedCelebritiesAdminEndpoint {
   protected def postController: POSTControllerMethod
   protected def httpFilters: HttpFilters
   protected def celebrityStore: CelebrityStore
+  protected def featured: Featured
 
   /**
    * POSTs a new list of celebrity IDs to be featured.
@@ -30,9 +32,9 @@ trait PostFeaturedCelebritiesAdminEndpoint {
               celebId.toLong
             }
           }
-          case _ => List[Long]()
+          case None => List[Long]()
         }
-        celebrityStore.updateFeaturedCelebrities(celebIds)
+        featured.updateFeaturedCelebrities(celebIds)
         Redirect(GetCelebritiesAdminEndpoint.location)
       }
     }

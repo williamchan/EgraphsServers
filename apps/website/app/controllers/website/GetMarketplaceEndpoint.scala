@@ -30,7 +30,6 @@ import celebrity.CatalogStarsQuery
 /**
  * Controller for serving the celebrity marketplace
  */
-
 private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
   protected def controllerMethod : ControllerMethod
   protected def celebrityStore : CelebrityStore  
@@ -97,54 +96,23 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         for ((category, categoryValues) <- categoryAndCategoryValues) yield categoryValues
       }
 
-      //TODO: UNCOMMENT AFTER MAKING FEATURED INTO CATEGORY VALUES
-  //      val unsortedCelebrities = dbSession.connected(TransactionSerializable) {
-  //        celebrityStore.marketplaceSearch(queryOption, categoryValuesRefinements)
-  //      }
-  //
-  //      val subtitle = queryOption match {
-  //        case Some(query) =>
-  //          unsortedCelebrities.size match {
-  //            case 1 => "Showing 1 Result for \"" + query + "\"..."
-  //            case _ => "Showing " + unsortedCelebrities.size + " Results for \"" + query + "\"..."
-  //          }
-  //        case None =>
-  //          if (!categoryValuesRefinements.isEmpty) {
-  //            "Results"
-  //          } else {
-  //            "Featured Stars"
-  //          }
-  //      }
-
-      //TODO: REMOVE AFTER MAKING FEATURED INTO CATEGORY VALUES
-      val (subtitle, unsortedCelebrities) = dbSession.connected(TransactionSerializable) {
-        queryOption match {
-          case Some(query) =>
-            val results = celebrityStore.marketplaceSearch(queryOption, categoryValuesRefinements)
-            val text = results.size match {
-              case 1 => "Showing 1 Result for \"" + query + "\"..."
-              case _ => "Showing " + results.size + " Results for \"" + query + "\"..."
-            }
-            (text, results)
-          case _ =>
-            if (!categoryValuesRefinements.isEmpty) {
-              ("Results", celebrityStore.marketplaceSearch(queryOption, categoryValuesRefinements))
-            } else {
-              //TODO when refinements are implemented we can do this using tags instead.
-              ("Featured Stars", catalogStarsQuery().filter(star => star.isFeatured).map(c =>
-                MarketplaceCelebrity(
-                  id = c.id,
-                  publicName = c.name,
-                  photoUrl = c.marketplaceImageUrl,
-                  storefrontUrl = c.storefrontUrl,
-                  inventoryRemaining = c.inventoryRemaining,
-                  minPrice = c.minPrice,
-                  maxPrice = c.maxPrice,
-                  secondaryText = c.secondaryText)))
-            }
-        }
+      val unsortedCelebrities = dbSession.connected(TransactionSerializable) {
+        celebrityStore.marketplaceSearch(queryOption, categoryValuesRefinements)
       }
-      //TODO: END
+
+      val subtitle = queryOption match {
+        case Some(query) =>
+          unsortedCelebrities.size match {
+            case 1 => "Showing 1 Result for \"" + query + "\"..."
+            case _ => "Showing " + unsortedCelebrities.size + " Results for \"" + query + "\"..."
+          }
+        case None =>
+          if (!categoryValuesRefinements.isEmpty) {
+            "Results"
+          } else {
+            "Featured Stars"
+          }
+      }
 
       // Sort results
       import CelebritySortingTypes._

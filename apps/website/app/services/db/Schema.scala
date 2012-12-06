@@ -161,10 +161,14 @@ class Schema @Inject() (
 
   val categoryValueRelationships =
     manyToManyRelation(categoryValues, categories).via[CategoryValueRelationship]((cv, c, cvr) => (cvr.categoryValueId === cv.id, cvr.categoryId === c.id))
+  categoryValueRelationships.leftForeignKeyDeclaration.constrainReference(onDelete cascade)
+  categoryValueRelationships.rightForeignKeyDeclaration.constrainReference(onDelete cascade)
 
   val celebrityCategoryValues =
     manyToManyRelation(celebrities, categoryValues).via[CelebrityCategoryValue]((c, cv, ccv) =>
       (ccv.celebrityId === c.id, ccv.categoryValueId === cv.id))
+  celebrityCategoryValues.leftForeignKeyDeclaration.constrainReference(onDelete cascade)
+  celebrityCategoryValues.rightForeignKeyDeclaration.constrainReference(onDelete cascade)
 
   val inventoryBatchProducts = manyToManyRelation(inventoryBatches, products)
     .via[InventoryBatchProduct]((inventoryBatch, product, join) => (join.inventoryBatchId === inventoryBatch.id, join.productId === product.id))
@@ -189,7 +193,10 @@ class Schema @Inject() (
     .via((account, address) => account.id === address.accountId)
   val accountToTransaction = oneToManyRelation(accounts, cashTransactions)
     .via((account, cashTransaction) => account.id === cashTransaction.accountId)
-    
+
+  val categoryToCategoryValue = oneToManyRelation(categories, categoryValues)
+    .via((category, categoryValue) => category.id === categoryValue.categoryId)
+
   val celebrityToEnrollmentBatches = oneToManyRelation(celebrities, enrollmentBatches)
     .via((celebrity, enrollmentBatch) => celebrity.id === enrollmentBatch.celebrityId)
   celebrityToEnrollmentBatches.foreignKeyDeclaration.constrainReference(onDelete cascade)

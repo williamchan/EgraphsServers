@@ -348,7 +348,8 @@ class CelebrityStore @Inject() (
   schema: Schema,
   dbSession: DBSession,
   catalogStarsQuery: CatalogStarsQuery,
-  featured: Featured) extends SavesWithLongKey[Celebrity] with SavesCreatedUpdated[Long, Celebrity] {
+  celebrityCategoryValueStore: CelebrityCategoryValueStore
+) extends SavesWithLongKey[Celebrity] with SavesCreatedUpdated[Long, Celebrity] {
 
   import org.squeryl.PrimitiveTypeMode._
   import CelebrityViewConversions._
@@ -399,6 +400,7 @@ class CelebrityStore @Inject() (
  
   /**
    * Find celebrities tagged with a particular filterValue by id.
+   * Note: if you have a CategoryValue you can just use .celebrities to do the same.
    */
   def findByCategoryValueId(categoryValueId : Long) : Query[Celebrity] = {
    from(schema.celebrityCategoryValues, schema.celebrities)(
@@ -677,13 +679,6 @@ class CelebrityStore @Inject() (
     celebrityAccounts
   }
 
-  def getFeaturedPublishedCelebrities: Iterable[Celebrity] = {
-    from(schema.celebrities)( c =>
-      where(c.isFeatured === true and c._publishedStatus === PublishedStatus.Published.name)
-      select (c)
-    )
-  }
-
   /**
    * Returns all celebrities that should be discoverable by visitors on the website, and no
    * celebrities that should not be discoverable.
@@ -700,24 +695,6 @@ class CelebrityStore @Inject() (
 
   def getAll: Iterable[Celebrity] = {
     for (celeb <- schema.celebrities) yield celeb
-  }
-
-  //TODO: Remove this completely after a deploy and using this to featured stars to use category values 
-  def updateFeaturedCelebrities(newFeaturedCelebIds: Iterable[Long]) {
-    //TODO: Myyk- REMOVE THESE TWO
-    // First update those gentlemen that are no longer featured
-    update(schema.celebrities)(c =>
-      where(c.isFeatured === true and (c.id notIn newFeaturedCelebIds))
-        set (c.isFeatured := false)
-    )
-
-    // Now lets feature the real stars here!
-    update(schema.celebrities)(c =>
-      where(c.id in newFeaturedCelebIds)
-        set (c.isFeatured := true)
-    )
-
-    featured.updateFeaturedCelebrities(newFeaturedCelebIds)
   }
 
   /**
