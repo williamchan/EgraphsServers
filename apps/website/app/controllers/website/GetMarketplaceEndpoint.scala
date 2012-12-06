@@ -151,13 +151,13 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       val sortedCelebrities = maybeSortType.getOrElse(CelebritySortingTypes.MostRelevant) match {
         case MostRelevant => unsortedCelebrities
         case PriceAscending => unsortedCelebrities.toList.sortWith((a,b) => a.minPrice < b.minPrice)
-        case PriceDecending => unsortedCelebrities.toList.sortWith((a,b) => a.maxPrice < b.maxPrice)
+        case PriceDescending => unsortedCelebrities.toList.sortWith((a,b) => a.maxPrice < b.maxPrice)
         case Alphabetical => unsortedCelebrities.toList.sortWith((a,b) => a.publicName < b.publicName)
         case _ => unsortedCelebrities
       }
 
       val celebrities = if(availableOnly){
-        sortedCelebrities.filter(c => !c.soldOut)
+        sortedCelebrities.filter(c => !c.soldout)
       } else {
         sortedCelebrities
       }

@@ -171,7 +171,7 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoi
         /**
          * Filter sold out stars
          **/
-         $(".soldout-only a").click(function(e) {
+         $(".available-only a").click(function(e) {
            window.Egraphs.page.availableOnly = $(this).attr("data-value");
            reloadPage();
          });
