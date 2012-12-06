@@ -47,38 +47,6 @@ class FeaturedTests extends EgraphsUnitTest with DBTransactionPerTest {
     featuredStateOfCelebWhen(celebWasFeatured = false, includeCelebInNewFeaturedCelebs = true) should be(true)
   }
 
-  "featuredPublishedCelebrities" should "only return published celebrities that are featured" in new EgraphsTestApplication {
-    import PublishedStatus.{ Published, Unpublished }
-
-    // Set up
-    val featuredPublishedShouldBeInResults = Vector(
-      (true, Published, true),
-      (true, Unpublished, false),
-      (false, Published, false),
-      (false, Unpublished, false))
-
-    val celebs = for ((featured, published, _) <- featuredPublishedShouldBeInResults) yield {
-      TestData.newSavedCelebrity()
-        .withPublishedStatus(published)
-        .save()
-    }
- 
-    val celebsWithInputData = celebs.zip(featuredPublishedShouldBeInResults)
-    val featuredCelebs = for {
-      (celeb, (featured, _, _)) <- celebsWithInputData if featured
-    } yield {celeb.id}
-
-    featuredToTest.updateFeaturedCelebrities(featuredCelebs)
-
-    // Execute the test on the data table featuredPublishedShouldBeInResults
-    val results = featuredToTest.featuredPublishedCelebrities.toList
-    for ((celeb, (_, _, shouldBeInResults)) <- celebsWithInputData) {
-      if (shouldBeInResults)
-        results should contain(celeb)
-      else results should not contain (celeb)
-    }
-  }
-
   private def featuredStateOfCelebWhen(
     celebWasFeatured: Boolean,
     includeCelebInNewFeaturedCelebs: Boolean): Boolean = {
@@ -97,7 +65,7 @@ class FeaturedTests extends EgraphsUnitTest with DBTransactionPerTest {
 
     featuredToTest.updateFeaturedCelebrities(newFeaturedCelebs)
 
-    featuredToTest.featuredPublishedCelebrities exists (celebrity => celebrity.id == featuredCelebrity.id)
+    featuredToTest.categoryValue.celebrities exists (celebrity => celebrity.id == featuredCelebrity.id)
   }
 
   private def deleteFeaturedCategoryValue(): Unit = {
