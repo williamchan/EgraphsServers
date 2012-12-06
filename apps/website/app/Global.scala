@@ -1,34 +1,20 @@
-import java.io.File
-import java.io.PrintWriter
+import java.io.{File, PrintWriter}
 import java.sql.Connection
-import scala.io.Source
-import org.squeryl.Session
-import org.squeryl.SessionFactory
-import models.Account
-import models.AccountStore
-import models.Administrator
-import play.api.Play.current
+import org.squeryl.{Session, SessionFactory}
+import models.{Account, AccountStore, Administrator}
+import play.api.{Application, Play}
 import play.api.mvc.Results._
-import play.api.mvc.RequestHeader
-import play.api.mvc.Result
-import play.api.Application
-import play.api.GlobalSettings
-import play.api.Play
+import play.api.mvc.{RequestHeader, Result}
+import play.api.Play.current
+import scala.io.Source
+import services.{AppConfig, TempFile, Time, Utils}
 import services.blobs.Blobs
 import services.config.ConfigFileProxy
-import services.db.DBSession
-import services.db.Schema
-import services.db.TransactionSerializable
+import services.db.{DBSession, Schema, TransactionSerializable}
 import services.http.SSLConfig
-import services.logging.Logging
-import services.logging.LoggingContext
-import services.mvc.celebrity.UpdateCatalogStarsActor
+import services.logging.{Logging, LoggingContext}
+import services.mvc.celebrity.{CatalogStarsAgent, UpdateCatalogStarsActor}
 import services.payment.Payment
-import services.AppConfig
-import services.TempFile
-import services.Time
-import services.Utils
-import services.mvc.celebrity.CatalogStarsAgent
 import services.mvc.search.RebuildSearchIndexActor
 
 object Global extends controllers.ToyBox with Logging {

@@ -60,7 +60,7 @@ private[controllers] trait PostVideoAssetApiEndpoint { this: Controller =>
     val byteArray = source.map(_.toByte).toArray
     source.close()
 
-    blobs.put(key = videoKey, bytes = byteArray, access = AccessPolicy.Public)
+    blobs.put(key = videoKey, bytes = byteArray, access = AccessPolicy.Private)
     blobs.getUrlOption(key = videoKey)
   }
 

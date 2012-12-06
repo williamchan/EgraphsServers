@@ -73,6 +73,43 @@ class OrderTests extends EgraphsUnitTest
   it should "update payment state correctly" in new EgraphsTestApplication {
     Order().withPaymentStatus(PaymentStatus.Charged).paymentStatus should be (PaymentStatus.Charged)
   }
+  
+  it should "be non-promotional by default when purchased" in new EgraphsTestApplication {
+    val (customer, product) = newCustomerAndProduct
+    
+    // _orderType not explicitly set so it will take its default value,  
+    // which should not be promotional 
+    val savedNormalOrder = new Order(
+        recipientId = customer.id,
+        recipientName = "Rafalca",
+        buyerId = customer.id,
+        productId = product.id,
+        inventoryBatchId = TestData.newSavedInventoryBatch(product).id
+      ).save()
+    val Some(restoredNormalOrder) = restoreEntity(savedNormalOrder.id)
+    
+    savedNormalOrder should not be ('Promotional)
+    restoredNormalOrder should not be ('Promotional)
+  }
+  
+  it should "save promotional orders as such" in new EgraphsTestApplication {
+    val (customer, product) = newCustomerAndProduct
+    
+    // _orderType set explicitly to promotional
+    val savedPromoOrder = new Order(
+        recipientId = customer.id,
+        recipientName = "Rafalca",
+        buyerId = customer.id,
+        productId = product.id,
+        inventoryBatchId = TestData.newSavedInventoryBatch(product).id,
+        _orderType = OrderType.Promotional.name
+      ).save()
+    val Some(restoredPromoOrder) = restoreEntity(savedPromoOrder.id)
+    
+    savedPromoOrder should be ('Promotional)
+    restoredPromoOrder should be ('Promotional)
+  }
+  
 
   "renderedForApi" should "serialize the correct Map for the API" in new EgraphsTestApplication {
     val order = newEntity.copy(requestedMessage = Some("requestedMessage"), messageToCelebrity = Some("messageToCelebrity")).save()
@@ -181,7 +218,7 @@ class OrderTests extends EgraphsUnitTest
     implicit val request = FakeRequest()
     val (email, _, _) = order.prepareEgraphSignedEmail
     email.getFromAddress.getAddress should not be (celebrity.account.email)
-    email.getReplyToAddresses.get(0).asInstanceOf[InternetAddress].getAddress should be("noreply@egraphs.com")
+    email.getReplyToAddresses.get(0).asInstanceOf[InternetAddress].getAddress should be("webserver@egraphs.com")
   }
 
   "isBuyerOrRecipient" should "return true if customer is either buy or recipient" in new EgraphsTestApplication {

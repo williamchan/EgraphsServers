@@ -18,7 +18,7 @@ ToyBox is the bouncer to the party that is your Play application, which is most 
   * `is-private` -- boolean flag for application privacy; defaults to private (true)
   * `initial-request-cookie` -- name for the cookie used to store the method and path of initial request for redirection upon log-in; defaults to "toybox-initial-request"
   * `auth-cookie` -- name for authentication cookie; defaults to "toybox-authenticated"
-  * `auth-timeout` -- maximum age of authentication cookie before expiring in integer number of seconds; defaults to 40 minutes
+  * `auth-timeout` -- maximum age of authentication cookie before expiring in integer number of seconds; defaults to 24 hours
   * `auth-path` -- authentication cookie path; defaults to /
   * `auth-domain` -- authentication cookie domain; defaults to null (is wrapped in Option type in app)
   * `ipad-header` -- header under which to store ipad secret for ipad authorization

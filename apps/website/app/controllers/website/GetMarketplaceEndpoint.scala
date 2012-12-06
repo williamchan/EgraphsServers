@@ -89,7 +89,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
 
       val categoryValuesRefinements = if (categoryAndCategoryValues.isEmpty && queryOption.isEmpty) {
         // use featured stars if no search type is used
-        val featuredCategoryValue = featured.ensureCategoryValueIsCreated()
+        val featuredCategoryValue = featured.categoryValue
         List(List(featuredCategoryValue.id))
       } else {
         for ((category, categoryValues) <- categoryAndCategoryValues) yield categoryValues
@@ -178,7 +178,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
               id = cv.id,
               active = activeCategoryValues.contains(cv.id)
             )
-          )
+          ).toList
         )
       }
 
@@ -187,7 +187,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         viewAsList = viewAsList,
         marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage.url,
         verticalViewModels = getVerticals(activeCategoryValues),
-        results = List(ResultSetViewModel(subtitle = Option(subtitle), celebrities)),
+        results = ResultSetViewModel(subtitle = Option(subtitle), celebrities),
         categoryViewModels = categoryViewModels,
         sortOptions = sortOptionViewModels(maybeSortType)))
     }
