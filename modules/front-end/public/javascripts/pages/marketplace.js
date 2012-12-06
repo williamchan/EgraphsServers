@@ -119,8 +119,11 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoi
         var reloadPage = function() {
           window.location.href =
             window.Egraphs.page.queryUrl + "?" +
-            $.param({ "query" : window.Egraphs.page.query, "sort" : window.Egraphs.page.sort, "view" : window.Egraphs.page.view}) + "&" +
-            $.param(window.Egraphs.page.categories);
+            $.param({ "query" : window.Egraphs.page.query,
+                      "sort" : window.Egraphs.page.sort,
+                      "view" : window.Egraphs.page.view,
+                      "soldoutOnly" : window.Egraphs.page.soldoutOnly}) +
+            "&" + $.param(window.Egraphs.page.categories);
         };
         
         $("#remove-query").click( function(e) {
@@ -164,6 +167,14 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoi
           window.Egraphs.page.view = "";
           reloadPage();
         });
+
+        /**
+         * Filter sold out stars
+         **/
+         $(".soldout-only a").click(function(e) {
+           window.Egraphs.page.soldoutOnly = $(this).attr("data-value");
+           reloadPage();
+         });
 
         /**
          * Helper for updating the currently selected CategoryValues
