@@ -1,4 +1,4 @@
-jpackage egraphs.toybox.tests
+package egraphs.toybox.tests
 
 import play.api.Plugin
 import play.api.mvc._

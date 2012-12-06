@@ -102,7 +102,7 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
   override def onRouteRequest(request: RequestHeader): Option[Handler] = {
 
     if (isLoginRequest(request)) {
-      loginHandler(request)
+      Some(loginHandler(request))
     
     } else if (isPublicResourceRequest(request)) {
       normalRouteRequestHandler(request)
@@ -111,7 +111,7 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
       handleAuthorized(request)
     
     } else {
-      redirectToLogin(request)
+      Some(redirectToLogin(request))
     }
   }
 
@@ -124,11 +124,11 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
     forLoginPath && isPrivate
   }
 
-  protected def loginHandler(request: RequestHeader): Option[Handler] = {
+  protected def loginHandler(request: RequestHeader): Handler = {
     if (request.method == "GET") 
-      Some(getLogin)
+      getLogin
     else
-      Some(postLogin) 
+      postLogin
   }
 
   /** Method pointing to the parent's onRouteRequtest method. Used to make testing easier. */
@@ -149,14 +149,13 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
   /** Generates a redirect to the log-in page and sets a Cookie containing the method
    *  and path of the request received for later redirection, if none already exists.
    */
-  protected def redirectToLogin(request: RequestHeader): Option[Handler] = Some( 
-    Action {
-      request.cookies.get(initialRequestCookieName) match {
-      case Some(cookie: Cookie) => Redirect(getLoginRoute)
-      case None => Redirect(getLoginRoute).withCookies( 
-          makeInitialRequestCookie(request)) 
-      }
-    })
+  protected def redirectToLogin(request: RequestHeader): Handler = Action {
+    request.cookies.get(initialRequestCookieName) match {
+    case Some(cookie: Cookie) => Redirect(getLoginRoute)
+    case None => Redirect(getLoginRoute).withCookies( 
+        makeInitialRequestCookie(request)) 
+    }
+  }
 
   /** Creates a Cookie holding the method and path of the given request */
   protected def makeInitialRequestCookie(request: RequestHeader): Cookie = {
