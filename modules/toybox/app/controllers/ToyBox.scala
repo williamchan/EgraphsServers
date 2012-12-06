@@ -100,17 +100,19 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
    *  a signed cookie that needs to be renewed periodically.
    */
   override def onRouteRequest(request: RequestHeader): Option[Handler] = {
-    if (isLoginRequest(request))
+
+    if (isLoginRequest(request)) {
       loginHandler(request)
     
-    else if (isPublicResourceRequest(request)) 
+    } else if (isPublicResourceRequest(request)) {
       normalRouteRequestHandler(request)
     
-    else if (isAuthorized(request)) 
+    } else if (isAuthorized(request)) {
       handleAuthorized(request)
     
-    else
+    } else {
       redirectToLogin(request)
+    }
   }
 
   protected def isLoginRequest(request: RequestHeader) = { 

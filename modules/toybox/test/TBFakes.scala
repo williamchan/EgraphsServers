@@ -1,4 +1,4 @@
-package egraphs.toybox.tests
+jpackage egraphs.toybox.tests
 
 import play.api.Plugin
 import play.api.mvc._
@@ -48,8 +48,6 @@ object TBFakes {
     def authCookie(req: RequestHeader)        = makeAuthCookie(req)
     def initRequestCookie(req: RequestHeader) = makeInitialRequestCookie(req)
   }
-
-  object FakeToyBoy
 
 
   // Fake requests
