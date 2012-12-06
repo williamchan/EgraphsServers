@@ -140,7 +140,8 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
    *  Cookie to keep it from expiring while the user is active.
    */
   protected def handleAuthorized(request: RequestHeader): Option[Handler] = {
-    (request.contentType, normalRouteRequestHandler(request)) match {
+    val handler: Option[Handler] = normalRouteRequestHandler(request)
+    (request.contentType, handler) match {
       case (Some("multipart/form-data"), _) => {
         /**
          * We need to handle this as a special case otherwise the subsequent line will try to cast
