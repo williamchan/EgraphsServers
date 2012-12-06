@@ -28,7 +28,7 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoi
      *  Button serves as a manual override for when scroll events behave strangely.
      **/
     var loadCelebrities = function(incr) {
-      if(count < $scope.total - 1) {
+      if(count <= $scope.total - 1) {
         $scope.celebrities = $scope.celebrities.concat($scope.results.celebrities.slice(count, count + incr));
         count += incr;
         atBottom = false;

@@ -7,9 +7,11 @@ import play.api.data.Form
 /** Defines configuration options for ToyBox */
 trait ToyBoxBase { this: GlobalSettings =>
   // Routes for log-in end points
-  def getLoginRoute:  Call
+  def loginPath: String
+  def getLoginRoute: Call
   def postLoginRoute: Call
   def assetsRoute: String => Call
+
 
   // Configuration helpers
   def authUsername: String
