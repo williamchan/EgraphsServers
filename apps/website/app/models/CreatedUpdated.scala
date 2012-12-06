@@ -2,7 +2,7 @@ package models
 
 import java.util.Date
 import java.sql.Timestamp
-import services.db.{Saves, KeyedCaseClass, SavesWithLongKey}
+import services.db.{InsertAndUpdateHooks, Saves, KeyedCaseClass, SavesWithLongKey}
 import services.Time
 
 /**
@@ -32,8 +32,9 @@ trait HasCreatedUpdated {
  *
  * See [[models.Account]] for an example.
  */
+// TODO(SER-499): Remove KeyT. It's not necessary now that we separated Saves into InsertAndUpdateHooks[T]
 trait SavesCreatedUpdated[KeyT, T <: KeyedCaseClass[KeyT] with HasCreatedUpdated] {
-  this: Saves[KeyT, T] =>
+  this: InsertAndUpdateHooks[T] =>
 
   //
   // Abstract members

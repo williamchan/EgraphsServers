@@ -725,6 +725,27 @@ class CelebrityStore @Inject() (
     for (celeb <- schema.celebrities) yield celeb
   }
 
+<<<<<<< HEAD
+=======
+  //TODO: Remove this completely after a deploy and using this to featured stars to use category values 
+  def updateFeaturedCelebrities(newFeaturedCelebIds: Iterable[Long]) {
+    //TODO: Myyk- REMOVE THESE TWO
+    // First update those gentlemen that are no longer featured
+    PrimitiveTypeMode.update(schema.celebrities)(c =>
+      where(c.isFeatured === true and (c.id notIn newFeaturedCelebIds))
+        set (c.isFeatured := false)
+    )
+
+    // Now lets feature the real stars here!
+    PrimitiveTypeMode.update(schema.celebrities)(c =>
+      where(c.id in newFeaturedCelebIds)
+        set (c.isFeatured := true)
+    )
+
+    featured.updateFeaturedCelebrities(newFeaturedCelebIds)
+  }
+
+>>>>>>> SER-499. Refactors persistence to no longer require defineUpdate and updateIs. Breaks up Saves[T] into smaller parts.
   /**
    * Update a celebrity's associated filter values
    **/

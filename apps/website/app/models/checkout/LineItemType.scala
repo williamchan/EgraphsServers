@@ -41,7 +41,7 @@ trait LineItemType[+TransactedT] {
  */
 case class LineItemTypeEntity (
   id: Long = 0L,
-  desc: String = "",
+  _desc: String = "",
   _nature: String = LineItemNature.Product.name,
   codeType: String = "",
   created: Timestamp = Time.defaultTimestamp,
@@ -133,7 +133,7 @@ trait LineItemTypeEntityLenses[T <: LineItemType[_]] { this: T =>
   //
   private def entity = entityLens.asMember(this)
 
-  private[checkout] lazy val descField = entityField(get = _.desc)(set = desc => entity().copy(desc=desc))
+  private[checkout] lazy val descField = entityField(get = _._desc)(set = desc => entity().copy(_desc=desc))
   private[checkout] lazy val natureField = entityField(get = _.nature)(set = nature => entity().withNature(nature))
 
 

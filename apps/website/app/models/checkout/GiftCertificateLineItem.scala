@@ -7,7 +7,7 @@ import scalaz.Lens
 import org.squeryl.PrimitiveTypeMode._
 
 /**
- * Services for gift certificates and associated line items. Use like this:
+ * Services for gift certificates and associated [[models.checkout.GiftCertificateLineItemType]]s items. Use like this:
  * {{{
  *   import models.checkout.GiftCertificateComponent
  *
@@ -47,7 +47,7 @@ trait GiftCertificateComponent { this: LineItemTypeEntityComponent =>
       object QueryDSL {
         private val seedEntity = {
           LineItemTypeEntity(
-            desc = "Gift Certificate",
+            _desc = "Gift Certificate",
             codeType = "GiftCertificateLineItemType"
           ).withNature(LineItemNature.Product)
         }
