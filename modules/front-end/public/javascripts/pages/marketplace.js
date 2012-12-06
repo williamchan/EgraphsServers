@@ -28,7 +28,7 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoi
      *  Button serves as a manual override for when scroll events behave strangely.
      **/
     var loadCelebrities = function(incr) {
-      if(count < $scope.total - 1) {
+      if(count < $scope.total) {
         $scope.celebrities = $scope.celebrities.concat($scope.results.celebrities.slice(count, count + incr));
         count += incr;
         atBottom = false;
@@ -218,6 +218,10 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoi
             var link = $(this);
             var category = window.Egraphs.page.categories["c" + link.attr("data-category")];
             var catVal = parseInt(link.attr("data-categoryvalue"), 10);
+            // Special use scenario...user searches, gets zero results, clicking on a category resets their search.
+            if(window.Egraphs.page.results.celebrities.length === 0 && window.Egraphs.page.categorySelected === false){
+              window.Egraphs.page.query = "";
+            }
             updateCategories(catVal, category);
             reloadPage();
           }
