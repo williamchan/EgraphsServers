@@ -132,17 +132,35 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
       postLogin
   }
 
-  /** Method pointing to the parent's onRouteRequtest method. Used to make testing easier. */
-  protected def normalRouteRequestHandler: RequestHeader => Option[Handler] = super.onRouteRequest
+  /** Method pointing to the parent's onRouteRequest method. Used to make testing easier. */
+  protected def normalRouteRequestHandler: (RequestHeader => Option[Handler]) = super.onRouteRequest
 
 
   /** Handler for authorized requests to private resources. Sets a new authentication
    *  Cookie to keep it from expiring while the user is active.
    */
   protected def handleAuthorized(request: RequestHeader): Option[Handler] = {
-    normalRouteRequestHandler(request) match {
-      case Some(action: Action[AnyContent]) => Some(authenticate(action))
-      case other => other
+    val handler: Option[Handler] = normalRouteRequestHandler(request)
+    (request.contentType, handler) match {
+      case (Some("multipart/form-data"), _) => {
+        /**
+         * We need to handle this as a special case otherwise the subsequent line will try to cast
+         * multipart form POSTs to AnyContent, and we get the following exception message:
+         * ClassCastException: play.api.mvc.AnyContentAsMultipartFormData cannot be cast to play.api.mvc.MultipartFormData.
+         *
+         * This exception can be reproduced by deleting this case and attempting a multipart form POST.
+         * Checking the contentType of the request allows us to identify multipart form POSTs without triggering
+         * a ClassCastException.
+         *
+         * The issue stems from that the type parameter of the action is erased by the JVM at runtime, so we cannot
+         * pattern match on type parameters. We also considered using a scala.reflect.Manifest, which is a class
+         * that represents Scala types, but decided against that since this is the only instance of this issue.
+         * http://stackoverflow.com/questions/1094173/how-do-i-get-around-type-erasure-on-scala-or-why-cant-i-get-the-type-paramete
+         */
+        handler
+      }
+      case (_, Some(action: Action[AnyContent])) => Some(authenticate(action))
+      case (_, other) => other
     }
   }
 
