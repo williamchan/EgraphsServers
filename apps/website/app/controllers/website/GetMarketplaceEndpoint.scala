@@ -52,7 +52,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       SortOptionViewModel(
         name = sortingType.name,
         display = sortingType.displayName,
-        active = (Some(sortingType) == selectedSortingType))
+        active = (sortingType == selectedSortingType.getOrElse(CelebritySortingTypes.MostRelevant)))
     }
   }
 
