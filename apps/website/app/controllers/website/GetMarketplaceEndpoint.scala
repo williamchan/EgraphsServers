@@ -157,10 +157,10 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       }
 
       val celebrities = if(availableOnly){
-          sortedCelebrities.filter(c => c.inventoryRemaining > 0)
-        } else {
-          sortedCelebrities
-        }
+        sortedCelebrities.filter(c => !c.soldOut)
+      } else {
+        sortedCelebrities
+      }
 
       val viewAsList = viewOption == Some("list") // "list" should be a part of an Enum
 
