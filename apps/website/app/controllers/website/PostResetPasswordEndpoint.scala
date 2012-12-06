@@ -1,24 +1,19 @@
 package controllers.website
 
-import play.api._
-import play.api.data._
 import play.api.data.Forms._
 import play.api.mvc._
-import play.api.mvc.Results.{Forbidden, Redirect, Ok}
 import models.AccountStore
-import services.http.{SafePlayParams, POSTControllerMethod}
+import services.http.POSTControllerMethod
 import services.http.forms.{AccountPasswordResetFormFactory, Form}
 import services.mvc.ImplicitHeaderAndFooterData
-import services.Utils
 import services.http.filters.HttpFilters
 import services.http.forms.AccountPasswordResetForm.Fields
 import controllers.routes.WebsiteControllers.getResetPassword
 import egraphs.authtoken.AuthenticityToken
+import Form.Conversions._
 
 private[controllers] trait PostResetPasswordEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
 
-  import Form.Conversions._
-  import SafePlayParams.Conversions._
 
   protected def postController: POSTControllerMethod
   protected def httpFilters: HttpFilters
@@ -30,7 +25,6 @@ private[controllers] trait PostResetPasswordEndpoint extends ImplicitHeaderAndFo
     AuthenticityToken.makeAvailable() { implicit authToken =>
       httpFilters.requireAccountEmail.inRequest() { account =>
         Action { implicit request =>
-          val params = request.queryString
           val nonValidatedForm = accountPasswordResetForms(request.asFormReadable, account)
     
           nonValidatedForm.errorsOrValidatedForm match {
