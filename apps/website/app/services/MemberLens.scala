@@ -33,7 +33,7 @@ object MemberLens {
        *
        *   object MemberLensExample {
        *     case class Address(street: String, city: String)
-       *     case class Person(name: String, address: String) {
+       *     case class Person(name: String, address: Address) {
        *       val city = Lens[Person, String](
        *         get= (person) => person.address.city,
        *         set= (city, person) => person.copy(address=person.address.copy(city=city)

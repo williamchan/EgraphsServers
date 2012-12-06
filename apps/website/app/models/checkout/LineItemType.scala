@@ -35,6 +35,7 @@ trait LineItemType[+TransactedT] {
  }
 
 
+
 /**
  * A row in the LineItemType table
  */
