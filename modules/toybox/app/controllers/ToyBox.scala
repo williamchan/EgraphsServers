@@ -26,31 +26,26 @@ trait ToyBox extends DefaultTBBase with DefaultTBController with DefaultTBAuthen
 trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
   this: ToyBoxController with ToyBoxAuthenticator =>
 
-  // Delegate this to the actual ToyBox object so they can choose whether to default
-  // the routes to defaultLoginPath nicely by setting to None
-  def maybeGetLoginRoute: Option[Call]
-  def maybePostLoginRoute: Option[Call]
-  def maybeAssetsRoute: Option[String => Call]
-
   // Routes
-  val defaultLoginPath = "/toybox/login"
-  val defaultAssetsPath = "/assets/"
+  lazy val getLoginRoute = new Call("GET", loginPath)
+  lazy val postLoginRoute = new Call("POST", loginPath)
   val toyboxAssetsDirectory = "toybox-assets/"
-  lazy val getLoginRoute  = maybeGetLoginRoute.getOrElse(new Call("GET", defaultLoginPath))
-  lazy val postLoginRoute = maybePostLoginRoute.getOrElse(new Call("POST", defaultLoginPath))
-  lazy val assetsRoute = maybeAssetsRoute.getOrElse({ (file: String) => 
-    new Call("GET", defaultAssetsPath + implicitly[PathBindable[String]].unbind("file", file))
-  })
-
 
   // General ToyBox configuration
   lazy val config = Play.current.configuration.getConfig("toybox").getOrElse(
     throw new IllegalStateException("ToyBox subconfiguration not present."))
+  
   lazy val authPassword = config.getString(passwordKey).getOrElse(
-    throw new IllegalStateException("No password configured."))
+    if (isPrivate) throw new IllegalStateException("No password configured.")
+    else ""
+  )
 
   lazy val authUsername = config.getString(userKey).getOrElse("")
   lazy val isPrivate    = config.getBoolean(privateKey).getOrElse(true) 
+
+  // iPad authorization configuration
+  lazy val iPadHeader: Option[String] = config.getString(iPadHeaderKey)
+  lazy val iPadSecret: Option[String] = config.getString(iPadSecretKey)
 
 
   /** Paths to public assets and pages. Could also pull more paths from config or replace
@@ -58,21 +53,34 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
    */
   lazy val publicAccessConditions: Seq[RequestHeader => Boolean] = 
     Seq( 
+      // GET login
       { (request: RequestHeader) => request.method.toLowerCase == "get" && 
           request.path.startsWith(getLoginRoute.url) }, 
 
+      // POST login
       { (request: RequestHeader) => request.method.toLowerCase == "post" && 
           request.path.startsWith(postLoginRoute.url) }, 
 
+      // ToyBox assets
       { (request: RequestHeader) => 
-        request.path.startsWith(assetsRoute(toyboxAssetsDirectory).url) }
+        request.path.startsWith(assetsRoute(toyboxAssetsDirectory).url) },
+
+      // iPad authentication
+      { (request: RequestHeader) =>
+        { for (
+            headerName <- iPadHeader;
+            headerVal <- request.headers.get(headerName);
+            secret <- iPadSecret
+          ) yield { secret == headerVal }
+        }.getOrElse(false)
+      }
     )
 
   
   // Cookie configuration
   lazy val initialRequestCookieName = config.getString(initRequestKey).getOrElse("toybox-initial-request")
   lazy val authCookieName = config.getString(authCookieKey).getOrElse("toybox-authenticated")
-  lazy val authTimeoutInSeconds = config.getInt(authTimeoutInSecondsKey).getOrElse(40*60)  // 40 minute default
+  lazy val authTimeoutInSeconds = config.getInt(authTimeoutInSecondsKey).getOrElse(24*60*60)  // 24 hour default
   lazy val authPath = config.getString(authPathKey).getOrElse("/")
   lazy val authDomain = config.getString(authDomainKey)
 
@@ -92,14 +100,34 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
    *  a signed cookie that needs to be renewed periodically.
    */
   override def onRouteRequest(request: RequestHeader): Option[Handler] = {
-    val forPublicResource = isPublicResourceRequest(request)
-    val authorized = isAuthorized(request)
-
-    if (forPublicResource) normalRouteRequestHandler(request)
-    else if (authorized)   handleAuthorized(request)
-    else                   redirectToLogin(request)
+    if (isLoginRequest(request))
+      loginHandler(request)
+    
+    else if (isPublicResourceRequest(request)) 
+      normalRouteRequestHandler(request)
+    
+    else if (isAuthorized(request)) 
+      handleAuthorized(request)
+    
+    else
+      redirectToLogin(request)
   }
 
+  protected def isLoginRequest(request: RequestHeader) = { 
+    val forLoginPath = request.method match {
+      case "GET" => request.path == getLoginRoute.url
+      case "POST" => request.path == postLoginRoute.url
+      case _ => false 
+    } 
+    forLoginPath && isPrivate
+  }
+
+  protected def loginHandler(request: RequestHeader): Option[Handler] = {
+    if (request.method == "GET") 
+      Some(getLogin)
+    else
+      Some(postLogin) 
+  }
 
   /** Method pointing to the parent's onRouteRequtest method. Used to make testing easier. */
   protected def normalRouteRequestHandler: RequestHeader => Option[Handler] = super.onRouteRequest
@@ -194,19 +222,16 @@ trait DefaultTBAuthenticator extends ToyBoxAuthenticator { this: ToyBoxBase =>
   /** Checks if a request is authorized to access protected resources */
   def isAuthorized(request: RequestHeader) = {
     // Checks for signed authentication Cookie in a request
-    val hasAuthCookie = 
-      request.cookies.get(authCookieName) match {
-        case Some(Cookie(_, signature, _, _, _, _, _)) =>
-          signature == Crypto.sign(request.remoteAddress)
-        case _ => false
-      }
-
-    !isPrivate || hasAuthCookie
+    request.cookies.get(authCookieName) match {
+      case Some(Cookie(_, signature, _, _, _, _, _)) =>
+        signature == Crypto.sign(request.remoteAddress)
+      case _ => false
+    }
   }
 
   /** Checks if a request is for a public resource */
   def isPublicResourceRequest(request: RequestHeader) = {
-    publicAccessConditions.exists(_.apply(request))
+    !isPrivate || publicAccessConditions.exists(_.apply(request))
   }
 
 
@@ -258,4 +283,8 @@ object ToyBoxConfigKeys {
 
   /** Key to authentication cookie domain */
   val authDomainKey = "auth-domain"
+
+  /** Keys for iPad head and secret (for iPad authentication) */
+  val iPadHeaderKey = "ipad-header"
+  val iPadSecretKey = "ipad-secret"
 }
