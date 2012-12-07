@@ -27,6 +27,10 @@ object Static extends Controller with DefaultImplicitTemplateParameters {
     Ok(views.html.frontend.about_us("/inside-an-egraph"))
   }
 
+  def affiliates() = Action {
+    Ok(views.html.frontend.affiliates())
+  }
+
   def inside() = Action {
     val tableOfContents =
     List(

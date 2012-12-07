@@ -1,0 +1,65 @@
+@()(
+implicit authToken: egraphs.authtoken.AuthenticityToken,
+headerData: models.frontend.header.HeaderData,
+footerData: models.frontend.footer.FooterData
+)
+@import views.frontend.Utils
+@import models.frontend.egraphs._
+@import controllers._
+
+@baseBody = {
+
+<section id="content" role="main">
+  <div id="main" class="about-us statics">
+    <div class="row-fluid">
+      <div class="span12 masthead-static">
+        <img src='@EgraphsAssets.at("images/david-ortiz.jpg")'/>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row-fluid">
+        <div class="span12">
+          <h1>Egraphs Affiliate Program</h1>
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span12">
+          <p>
+            Do you have a website or blog geared towards sports, entertainment, collectables, or celebrity news? Are you
+            passionate about the world of sports & entertainment? If so, you can earn money by spreading the word about
+            Egraphs. Our next-generation autograph allows fans to connect with their favorite stars through a personal
+            written and voice message.
+          </p>
+          <h3>Why Join?</h3>
+          <p>
+            It's completely free to join the Egraphs affiliate program! Our product is unlike any other on the market.
+            Fans love its authentic and personal nature, so take advantage of our unique product that no other company
+            can deliver. Not to mention, we’re <b>Parasite, Adware and Loyaltyware Resistant</b>. Simply place an
+            approved Egraph text link or banner on your site and for every sale you generate, you earn!
+          </p>
+          <h3>Getting Started</h3>
+          <p>
+            To sign-up for our affiliate program on the <i>ShareASale Affiliate Network</i>,
+            <a href="http://www.shareasale.com/out-viewmerchant.cfm?merchantID=43754">click here</a>.
+          </p>
+          <p>
+            If you have any questions, e-mail our <b>dedicated Affiliate Program Management Team</b> at
+            <a href="mailto:affiliates@@egraphs.com">affiliates@@egraphs.com</a>. And look out for our monthly
+            Newsletters with program updates.
+          </p>
+          <p>
+            We look forward to having you as our partner!
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+}
+@base_template(
+title="Affiliates",
+jsMain="",
+body=baseBody
+)
