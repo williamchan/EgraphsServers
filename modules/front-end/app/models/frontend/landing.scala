@@ -20,7 +20,6 @@ case class CatalogStar(
   marketplaceImageUrl: String,
   storefrontUrl: String,
   inventoryRemaining: Int,
-  isFeatured: Boolean,
   minPrice: Int,
   maxPrice: Int
 ) {

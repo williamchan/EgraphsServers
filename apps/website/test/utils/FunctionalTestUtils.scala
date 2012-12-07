@@ -21,11 +21,9 @@ import play.api.mvc.MultipartFormData
 import play.api.libs.Files.TemporaryFile
 import play.api.test._
 import play.api.http.HeaderNames
+import models._
+import scenario.RepeatableScenarios
 
-//import java.util.Properties
-//import models.Account
-//import play.api.mvc.Http.Request
-//import play.api.test.FunctionalTest
 //
 /**
  * Common functionality required when writing functional tests against
@@ -38,14 +36,13 @@ object FunctionalTestUtils {
   //  def willChanAccount: Account = {
   //    Account(email = "wchan83@egraphs.com").withPassword(TestData.defaultPassword).right.get
   //  }
-  //
-  //  /**
-  //   * Makes an API request verified by the credentials from `willChanAccount`
-  //   */
-  def willChanRequest: FakeRequest[AnyContent] = {
-    val auth = BasicAuth.Credentials("wchan83@egraphs.com", TestData.defaultPassword)
 
-    FakeRequest().withHeaders(auth.toHeader)
+  /**
+   * Makes an API request verified by the credentials from `willChanAccount`
+   */
+  @deprecated("This is bad because it is tied to a specific account.", "Use requestWithCredentials(user: String, password: String) instead.")
+  def willChanRequest: FakeRequest[AnyContent] = {
+    requestWithCredentials("wchan83@egraphs.com", TestData.defaultPassword)
   }
 
   def requestWithCustomerId(id: Long): FakeRequest[AnyContent] = {
@@ -54,6 +51,10 @@ object FunctionalTestUtils {
 
   def requestWithAdminId(id: Long): FakeRequest[AnyContent] = {
     FakeRequest().withSession(EgraphsSession.Key.AdminId.name -> id.toString)
+  }
+
+  def requestWithCredentials(account: Account, password: String = TestData.defaultPassword): FakeRequest[AnyContent] = {
+    requestWithCredentials(account.email, password)
   }
 
   def requestWithCredentials(user: String, password: String): FakeRequest[AnyContent] = {
@@ -82,8 +83,9 @@ object FunctionalTestUtils {
     }
   }
 
+  @deprecated("We should not clear the database.", "Use runScenarios(names: String*) instead")
   def runFreshScenarios(names: String*) {
-    runScenario("clear")
+//    runScenario("clear") //TODO: this will not play nice with other tests in parallel
     runScenarios(names: _*)
   }
 
@@ -94,6 +96,22 @@ object FunctionalTestUtils {
     }
   }
 
+  /**
+   * This method is designed to be a more thread safe version of runWillChanScenariosThroughOrder()
+   */
+  def runCustomerBuysProductsScenerio(): (Customer, Celebrity, Iterable[Product], Iterable[Order]) = {
+    val celebrity = RepeatableScenarios.createCelebrity(isFeatured = true)
+    val products = RepeatableScenarios.celebrityHasProducts(celebrity, numberOfProducts = 2)
+    val customer = TestData.newSavedCustomer()
+    val unapprovedOrders = 
+      RepeatableScenarios.customerBuysEveryProductOfCelebrity(customer, celebrity) ++ RepeatableScenarios.customerBuysEveryProductOfCelebrity(customer, celebrity)
+    val orders = RepeatableScenarios.deliverOrdersToCelebrity(unapprovedOrders)
+
+    (customer, celebrity, products.toList, orders.toList)
+  }
+
+  @deprecated("These hardcode many values making it not easily parallelizable or repeatable.",
+    "Use runCustomerBuysProductsScenerio() instead which will return to you everything you need to replace this.")
   def runWillChanScenariosThroughOrder() {
     runFreshScenarios(
       "Will-Chan-is-a-celebrity",
@@ -101,6 +119,10 @@ object FunctionalTestUtils {
       "Erem-is-a-customer",
       "Erem-buys-Wills-two-products-twice-each",
       "Deliver-All-Orders-to-Celebrities")
+  }
+
+  def createCelebrity2ProductsAndCustomerBuyingEachProductTwiceSendOrdersToCelebrity() = {
+    
   }
 
   /**

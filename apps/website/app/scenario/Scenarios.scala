@@ -22,6 +22,7 @@ import models.Order
 import play.api.Play
 import play.api.Play.current
 import utils.{TestData, TestConstants}
+import categories.Featured
 
 /**
  * All scenarios supported by the API.
@@ -39,6 +40,7 @@ class Scenarios extends DeclaresScenarios {
 
   private val schema = AppConfig.instance[Schema]
   private val mail = AppConfig.instance[services.mail.TransactionalMail]
+  private val featured = AppConfig.instance[Featured]
 
   private lazy val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
   private lazy val today = DateTime.now().toLocalDate.toDate
@@ -119,14 +121,14 @@ class Scenarios extends DeclaresScenarios {
       val celebrity = Celebrity(
         publicName = "Wizzle",
         bio = "Love my fans from New York to Tokyo, from Seoul to the Sudetenland. And for all you haters out there -- don't mess around. I sleep with one eye closed, the other fixed on my Vespene gas supply.",
-        organization = "Major League Baseball",
-        isFeatured = true
+        organization = "Major League Baseball"
       ).withPublishedStatus(PublishedStatus.Published).save()
       Account(email = "wchan83@egraphs.com",
         celebrityId = Some(celebrity.id)
       ).withPassword(TestData.defaultPassword).right.get.save()
       celebrity.saveWithProfilePhoto(Play.getFile("test/resources/will_chan_celebrity_profile.jpg"))
       celebrity.withLandingPageImage(Play.getFile("test/resources/ortiz_masthead.jpg")).save()
+      featured.updateFeaturedCelebrities(List(celebrity.id))
   }
   )
 
@@ -158,7 +160,7 @@ class Scenarios extends DeclaresScenarios {
         description = "In classic form, Wizzle dominated the competition and left mouths agape.",
         priceInCurrency = 70,
         storyTitle = "The story and the glory",
-        image = Some(Product().defaultPhoto.renderFromMaster),
+        image = photoImage,
         icon = iconImage,
         storyText = """
            {signer_link}{signer_name}{end_link} was born on top. On {date_signed}

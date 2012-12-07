@@ -68,7 +68,6 @@ class Schema @Inject() (
   on(celebrities)(celebrity =>
     declare(
       celebrity.urlSlug is unique,
-      celebrity.isFeatured is indexed,
       celebrity.bio is dbType("text")))
   
   val coupons = table[Coupon]

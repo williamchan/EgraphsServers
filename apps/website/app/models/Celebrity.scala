@@ -66,7 +66,6 @@ case class Celebrity(id: Long = 0,
                      twitterUsername: Option[String] = None,
                      profilePhotoUpdated: Option[String] = None, // todo: rename to _profilePhotoKey
                      _enrollmentStatus: String = EnrollmentStatus.NotEnrolled.name,
-                     isFeatured: Boolean = false,
                      _publishedStatus: String = PublishedStatus.Unpublished.name,
                      _landingPageImageKey: Option[String] = None,
                      _logoImageKey: Option[String] = None,
@@ -482,7 +481,6 @@ class CelebrityStore @Inject() (
      stuff2.publicname,
      stuff2.roledescription,
      stuff2._landingpageImageKey,
-     stuff2.isfeatured,
      min(stuff2.minProductPrice) AS minProductPrice,
      max(stuff2.maxProductPrice) AS maxProductPrice,
      sum(stuff2.inventory_sold) AS inventory_sold,
@@ -494,7 +492,6 @@ class CelebrityStore @Inject() (
      stuff.celeb_publicname AS publicname,
      stuff.celeb_roledescription AS roledescription,
      stuff.celeb_landingpageImageKey AS _landingpageImageKey,
-     stuff.celeb_isfeatured AS isfeatured,
      min(stuff.product_priceincurrency) AS minProductPrice,
      max(stuff.product_priceincurrency) AS maxProductPrice,
      stuff.inventorybatch_id,
@@ -508,7 +505,6 @@ class CelebrityStore @Inject() (
      c.publicname AS celeb_publicname,
      c.roledescription AS celeb_roledescription,
      c._landingpageImageKey AS celeb_landingpageImageKey,
-     c.isfeatured AS celeb_isfeatured,
      p.id AS product_id,
      p.priceincurrency AS product_priceincurrency,
      ib.id AS inventorybatch_id,
@@ -527,9 +523,9 @@ class CelebrityStore @Inject() (
      p._publishedStatus = 'Published'
     ORDER BY is_order ASC
     ) AS stuff
-      GROUP BY celeb_id, celeb_publicname, celeb_roledescription, celeb_landingpageImageKey, celeb_isfeatured, inventorybatch_id, inventory_total
+      GROUP BY celeb_id, celeb_publicname, celeb_roledescription, celeb_landingpageImageKey, inventorybatch_id, inventory_total
     ) AS stuff2
-    GROUP BY celebrityid, publicname, roledescription, _landingpageImageKey, isfeatured
+    GROUP BY celebrityid, publicname, roledescription, _landingpageImageKey
     """
 
     val rowStream = SQL(queryString).apply()(connection = schema.getTxnConnectionFactory)
@@ -541,8 +537,7 @@ class CelebrityStore @Inject() (
         roleDescription = row[String]("roledescription"),
         _enrollmentStatus = EnrollmentStatus.Enrolled.name,
         _publishedStatus = PublishedStatus.Published.name,
-        _landingPageImageKey = row[Option[String]]("_landingpageImageKey"),
-        isFeatured = row[Boolean]("isfeatured") // This should go away
+        _landingPageImageKey = row[Option[String]]("_landingpageImageKey")
       )
       val productSummary = CelebrityProductSummary(
         row[BigDecimal]("inventoryAvailable").intValue(),
@@ -631,17 +626,11 @@ class CelebrityStore @Inject() (
   def marketplaceSearch(maybeQuery: Option[String] = None, refinements: Iterable[Iterable[Long]] = Iterable[Iterable[Long]]())
   : Iterable[MarketplaceCelebrity] = {
 
-    val catalogStars = catalogStarsQuery()
-    val catalogStarsById = catalogStars.groupBy(star => star.id)
-
     for {
-      celebrityId <- celebritiesSearch(maybeQuery, refinements)
-      if(catalogStarsById.contains(celebrityId))
+      star <- catalogStarsSearch(maybeQuery, refinements)
     } yield {
-      val star = catalogStarsById(celebrityId).head
-
       MarketplaceCelebrity(
-        id = celebrityId,
+        id = star.id,
         publicName = star.name,
         photoUrl = star.marketplaceImageUrl,
         storefrontUrl = star.storefrontUrl,
@@ -650,6 +639,20 @@ class CelebrityStore @Inject() (
         maxPrice = star.maxPrice,
         secondaryText = star.secondaryText
       )
+    }
+  }
+
+  def catalogStarsSearch(maybeQuery: Option[String] = None, refinements: Iterable[Iterable[Long]] = Iterable[Iterable[Long]]())
+  : Iterable[CatalogStar] = {
+
+    val catalogStars = catalogStarsQuery()
+    val catalogStarsById = catalogStars.groupBy(star => star.id)
+
+    for {
+      celebrityId <- celebritiesSearch(maybeQuery, refinements)
+      if(catalogStarsById.contains(celebrityId))
+    } yield {
+      catalogStarsById(celebrityId).head
     }
   }
 
@@ -724,7 +727,6 @@ class CelebrityStore @Inject() (
       theOld.apiKey := theNew.apiKey,
       theOld.bio := theNew.bio,
       theOld.casualName := theNew.casualName,
-      theOld.isFeatured := theNew.isFeatured,
       theOld.organization := theNew.organization,
       theOld.profilePhotoUpdated := theNew.profilePhotoUpdated,
       theOld.publicName := theNew.publicName,
