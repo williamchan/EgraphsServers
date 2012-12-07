@@ -28,61 +28,9 @@ a, a:link, a:visited {
 	.tooltip-inner {
 		color:@orange;
 		background-color:white;
-		font-weight:400;		
+		font-weight:400;
 	}
 }
-
-// A type of link appropriate for presenting a captioned image.
-// Mix this in on the highest parent container that wishes to have its
-// hover trigger the glowed around contained a.glowborder
-.glowborder-link-container() {
-	a.glowborder {
-		display: block;
-		padding: 4px;
-		border: 1px solid lighten(@orange, 10%);		
-		@transition: border .2s linear, box-shadow .2s linear;
-		.transition(@transition);
-		
-		img {
-			display: block;
-		}
-  }
-
-  a { color: @orange; }
-
-	&:hover a.glowborder {
-		.box-shadow(0px 0px 6px @orange);
-		border-color: @orange;
-	}
-
-}
-
-/* !Celebrity Search Box */
-.celebrity-searchbox-container() {
-  input[type=search] {
-    .inline-block;
-    vertical-align: middle;
-    font-size: 20px;
-    width: 96%;
-    color: @orange;
-    margin: 0;
-    background: @white url(../images/bg-icon-magnify.png) no-repeat 95% 50%;
-
-    &::-webkit-input-placeholder {
-      color: @orange;
-    }
-
-    &::-moz-placeholder {
-      color: @orange;
-    }
-
-    &::-ms-placeholder {
-      color: @orange;
-    }
-
-  }
-}
-
 /* !Ribbons */
 div.ribbon {	
 	position: absolute;
