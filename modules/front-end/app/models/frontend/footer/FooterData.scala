@@ -5,6 +5,7 @@ package models.frontend.footer
  *
  * @param aboutUsLink link to the "about us" page
  * @param faqLink link to the "faq" page
+ * @param affiliatesLink link to the "affiliates" page
  * @param termsOfUseLink link to the "terms of use" page
  * @param privacyPolicyLink link to the "privacy policy" page
  * @param careersPolicyLink link to the "careers" page
@@ -14,6 +15,7 @@ package models.frontend.footer
 case class FooterData(
   aboutUsLink: String="/about",
   faqLink: String="/faq",
+  affiliatesLink: String="/affiliates",
   termsOfUseLink: String="/terms",
   privacyPolicyLink: String="/privacy",
   careersPolicyLink: String="/careers",

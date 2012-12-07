@@ -1,6 +1,5 @@
 package controllers.website
 
-import play.api._
 import play.api.mvc._
 import services.http.ControllerMethod
 import services.mvc.ImplicitHeaderAndFooterData
@@ -12,6 +11,12 @@ private[controllers] trait GetStaticEndpoint extends ImplicitHeaderAndFooterData
   def getAbout = controllerMethod.withForm() { implicit authToken =>
     Action { implicit request =>
       Ok(views.html.frontend.about_us(learnMoreUrl = controllers.routes.WebsiteControllers.getInsideEgraph().url))
+    }
+  }
+
+  def getAffiliates = controllerMethod.withForm() { implicit authToken =>
+    Action { implicit request =>
+      Ok(views.html.frontend.affiliates())
     }
   }
 
@@ -38,19 +43,19 @@ private[controllers] trait GetStaticEndpoint extends ImplicitHeaderAndFooterData
         )
       Ok(views.html.frontend.inside_egraph(tableOfContents))
     }
-  }  
+  }
 
   def getPrivacy = controllerMethod.withForm() { implicit authToken =>
     Action { implicit request =>
       Ok(views.html.frontend.privacy())
     }
-  }  
+  }
 
   def getInsiderSweepstakes = controllerMethod.withForm() { implicit authToken =>
     Action { implicit request =>
       Ok(views.html.frontend.sweepstakes_insider())
     }
-  }  
+  }
 
   def getTerms = controllerMethod.withForm() {implicit authToken =>
     Action { implicit request =>
