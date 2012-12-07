@@ -189,7 +189,7 @@ class Scenarios extends DeclaresScenarios {
   )
 
   toScenarios add Scenario(
-  "Erem buys Wills two products twice each",
+  "Erem buys Wills two products twice each", // WARNING: actually this only buys once each
   apiCategory,
   """Creates two unfulfilled orders, one each ordered against Will's two products.""", {
     () =>
