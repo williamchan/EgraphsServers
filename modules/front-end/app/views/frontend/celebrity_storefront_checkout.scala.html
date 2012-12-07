@@ -86,7 +86,7 @@
                         <div class="input select control-group @shipping.state.ifError {error}">
                           <select data-placeholder="Choose a state..." id="@shipping.state.name" name="@shipping.state.name" class="chsn-select">
                             <option value></option>
-                            @tags.geo.usstates(selected=shipping.state.value.getOrElse(""))
+                            @tags.geo.usstates(selected=shipping.state.value.getOrElse("AL"))
                           </select>
                           @for(error <- shipping.city.error) {
                             <div class="alert alert-error @shipping.state.ifError {error}">
