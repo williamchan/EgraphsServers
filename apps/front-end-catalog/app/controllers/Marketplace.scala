@@ -16,24 +16,22 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
 
   def results() = Action {
     Ok(views.html.frontend.marketplace_results(
-      query = "",
-      viewAsList = false,
-      marketplaceRoute = controllers.routes.Marketplace.results.url,
+      "",
+      false,
+      controllers.routes.Marketplace.results.url,
       verticalSet,
       resultSet,
-      categoryViewModels,
       sortOptions,
       availableOnly = false))
   }
 
   def results_list() = Action {
     Ok(views.html.frontend.marketplace_results(
-      query = "",
-      viewAsList = true,
-      marketplaceRoute = controllers.routes.Marketplace.results.url,
+      "",
+      true,
+      controllers.routes.Marketplace.results.url,
       verticalSet,
       resultSet,
-      categoryViewModels,
       sortOptions,
       availableOnly = coinflip.nextBoolean))
   }
@@ -52,11 +50,11 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
     }
   }
 
-  def verticalSet: Iterable[VerticalViewModel] = {
+  def verticalSet: List[VerticalViewModel] = {
     List(
-      VerticalViewModel(id = 1, verticalName = "mlb", publicName = "Major League Baseball", shortName = "MLB", iconUrl = "images/icon-logo-mlb.png", active = true),
-      VerticalViewModel(id = 2, verticalName = "nba", publicName = "National Basketball Association", shortName = "NBA", iconUrl = "images/icon-logo-nba.png"),
-      VerticalViewModel(id = 3, verticalName = "mj", publicName = "Monster Jam", shortName = "Monster Jam", iconUrl = "images/icon-logo-monster-jam.png")).toSet
+      VerticalViewModel(id = 1, verticalName = "mlb", publicName = "Major League Baseball", shortName = "MLB", iconUrl = "images/icon-logo-mlb.png", active = true, categoryViewModels = mlbCategories),
+      VerticalViewModel(id = 2, verticalName = "nba", publicName = "National Basketball Association", shortName = "NBA", iconUrl = "images/icon-logo-nba.png", categoryViewModels = nbaCategories)
+    )
   }
 
   def resultSet: ResultSetViewModel = {
@@ -77,7 +75,7 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
     }
   }
 
-  def categoryViewModels: List[CategoryViewModel] = {
+  val mlbCategories: List[CategoryViewModel] = {
     List(
       CategoryViewModel(
         id = 1,
@@ -86,21 +84,9 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
           CategoryValueViewModel(id = 2, publicName = "Boston Red Sox", active = true),
           CategoryValueViewModel(id = 3, publicName = "Miami Marlins", active = false),
           CategoryValueViewModel(id = 4, publicName = "New York Yankees", active = false),
-          CategoryValueViewModel(id = 2, publicName = "Boston Red Sox", active = true),
-          CategoryValueViewModel(id = 3, publicName = "Miami Marlins", active = false),
-          CategoryValueViewModel(id = 4, publicName = "New York Yankees", active = false),
-          CategoryValueViewModel(id = 2, publicName = "Boston Red Sox", active = true),
-          CategoryValueViewModel(id = 3, publicName = "Miami Marlins", active = false),
-          CategoryValueViewModel(id = 4, publicName = "New York Yankees", active = false),
-          CategoryValueViewModel(id = 2, publicName = "Boston Red Sox", active = false),
-          CategoryValueViewModel(id = 3, publicName = "Miami Marlins", active = false),
-          CategoryValueViewModel(id = 4, publicName = "New York Yankees", active = false),
-          CategoryValueViewModel(id = 2, publicName = "Boston Red Sox", active = false),
-          CategoryValueViewModel(id = 3, publicName = "Miami Marlins", active = false),
-          CategoryValueViewModel(id = 4, publicName = "New York Yankees", active = false),
-          CategoryValueViewModel(id = 2, publicName = "Boston Red Sox", active = false),
-          CategoryValueViewModel(id = 3, publicName = "Miami Marlins", active = false),
-          CategoryValueViewModel(id = 4, publicName = "New York Yankees", active = false)
+          CategoryValueViewModel(id = 5, publicName = "Tampa Bay Rays", active = true),
+          CategoryValueViewModel(id = 6, publicName = "Oakland Athletics", active = false),
+          CategoryValueViewModel(id = 7, publicName = "San Francisco Giants", active = false)
         )
       ),
       CategoryViewModel(
@@ -110,12 +96,37 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
           CategoryValueViewModel(id = 5, publicName = "Pitcher", active = false),
           CategoryValueViewModel(id = 6, publicName = "Shortstop", active = true),
           CategoryValueViewModel(id = 7, publicName = "Catcher", active = false),
-          CategoryValueViewModel(id = 5, publicName = "Pitcher", active = false),
-          CategoryValueViewModel(id = 6, publicName = "Shortstop", active = false),
-          CategoryValueViewModel(id = 7, publicName = "Catcher", active = false),
-          CategoryValueViewModel(id = 5, publicName = "Pitcher", active = false),
-          CategoryValueViewModel(id = 6, publicName = "Shortstop", active = false),
-          CategoryValueViewModel(id = 7, publicName = "Catcher", active = false)
+          CategoryValueViewModel(id = 8, publicName = "1st Baseman", active = false),
+          CategoryValueViewModel(id = 9, publicName = "2nd Baseman", active = true),
+          CategoryValueViewModel(id = 10, publicName = "3rd Baseman", active = false)
+        )
+      )
+    )
+  }
+
+  val nbaCategories: List[CategoryViewModel] = {
+    List(
+      CategoryViewModel(
+        id = 3,
+        publicName = "Team",
+        categoryValues = List(
+          CategoryValueViewModel(id = 2, publicName = "Boston Celtics", active = true),
+          CategoryValueViewModel(id = 3, publicName = "Miami Heat", active = false),
+          CategoryValueViewModel(id = 4, publicName = "San Antonio Spurs", active = false),
+          CategoryValueViewModel(id = 5, publicName = "Los Angeles Clippers", active = true),
+          CategoryValueViewModel(id = 6, publicName = "Golden State Warriors", active = false),
+          CategoryValueViewModel(id = 7, publicName = "New York Knicks", active = false)
+        )
+      ),
+      CategoryViewModel(
+        id = 4,
+        publicName = "Position",
+        categoryValues = List(
+          CategoryValueViewModel(id = 5, publicName = "Center", active = false),
+          CategoryValueViewModel(id = 6, publicName = "Point Guard", active = true),
+          CategoryValueViewModel(id = 7, publicName = "Power Forward", active = false),
+          CategoryValueViewModel(id = 8, publicName = "Small Forward", active = false),
+          CategoryValueViewModel(id = 9, publicName = "Shooting Guard", active = true)
         )
       )
     )

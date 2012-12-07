@@ -57,7 +57,6 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       )
 
       val (queryOption, sortOption, viewOption, availableOnlyOption) = marketplaceResultPageForm.bindFromRequest.get
-
       val maybeSortType = sortOption.flatMap(sort => CelebritySortingTypes(sort))
       val availableOnly = availableOnlyOption.getOrElse(false)
 
@@ -73,7 +72,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
           })
         (id.toLong, categoryValueId)
       }
-
+      //TODO replace with all celebs
       val categoryValuesRefinements = if (categoryAndCategoryValues.isEmpty && queryOption.isEmpty) {
         // use featured stars if no search type is used
         val featuredCategoryValue = featured.categoryValue
@@ -147,7 +146,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         sortedCelebrities
       }
 
-      val viewAsList = viewOption == Some("list") // "list" should be a part of an Enum
+      val viewAsList = viewOption == Some("list") //TODO "list" should be a part of an Enum
 
       val activeCategoryValues = {
         for {
@@ -156,48 +155,44 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         } yield { categoryValue }
       }.toSet
 
-      //HACK As long as no CategoryValues have children Categories, this call can be used to display
-      // only baseball categories. This NEEDS to be fixed if we want to support multiple verticals.
-      val categoryViewModels = for {
-        vertical <- verticalStore.verticals;
-        category <- vertical.categoryValue.categories
-      } yield {
-        CategoryViewModel(
-          id = category.id,
-          publicName = category.publicName,
-          categoryValues = category.categoryValues.map( cv =>
-            CategoryValueViewModel(
+
+      val verticalViewModels = verticalStore.verticals.map { v =>
+        val categories = for {
+            category <- v.categoryValue.categories
+          } yield {
+            CategoryViewModel(
+              id = category.id,
+              publicName = category.publicName,
+              categoryValues = category.categoryValues.map( cv =>
+              CategoryValueViewModel(
               publicName = cv.publicName,
               id = cv.id,
               active = activeCategoryValues.contains(cv.id)
             )
-          ).toList
+          ).toList)
+        }
+
+        VerticalViewModel(
+          verticalName = v.categoryValue.name,
+          publicName = v.categoryValue.publicName,
+          shortName = v.shortName,
+          iconUrl = v.iconUrl,
+          active = false,
+          id = v.categoryValue.id,
+          categoryViewModels = categories
         )
       }
+
 
       Ok(views.html.frontend.marketplace_results(
         query = queryOption.getOrElse(""),
         viewAsList = viewAsList,
         marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage("").url,
-        verticalViewModels = getVerticals(activeCategoryValues),
+        verticalViewModels = verticalViewModels.toList,
         results = ResultSetViewModel(subtitle = Option(subtitle), celebrities),
-        categoryViewModels = categoryViewModels.toList,
         sortOptions = sortOptionViewModels(maybeSortType),
         availableOnly = availableOnly)
       )
     }
-  }
-  
-  private def getVerticals(activeCategoryValues: Set[Long] = Set()) : List[VerticalViewModel] = {
-    verticalStore.verticals.map{ v =>
-      VerticalViewModel(
-        verticalName = v.categoryValue.name,
-        publicName = v.categoryValue.publicName,
-        shortName =  v.shortName,
-        iconUrl =  v.iconUrl,
-        active = false,
-        id = v.categoryValue.id
-      )
-    }.toList
   }
 }

@@ -1,9 +1,8 @@
 @(query : String,
   viewAsList: Boolean = false,
   marketplaceRoute: String,
-  verticalViewModels: Iterable[models.frontend.marketplace.VerticalViewModel], 
+  verticalViewModels: List[models.frontend.marketplace.VerticalViewModel],
   results: models.frontend.marketplace.ResultSetViewModel,
-  categoryViewModels: List[models.frontend.marketplace.CategoryViewModel] = List[models.frontend.marketplace.CategoryViewModel](),
   sortOptions: Iterable[models.frontend.marketplace.SortOptionViewModel],
   availableOnly: Boolean = false
   )(
@@ -12,6 +11,7 @@
   footerData: models.frontend.footer.FooterData,
   authToken: egraphs.authtoken.AuthenticityToken
 )
+@import org.hibernate.validator.constraints.SafeHtml
 @import views.frontend.Utils
 @import models.frontend.egraphs._
 @import play.api.libs.json._
@@ -25,19 +25,19 @@
 @*** 
   Translates a map of categories and their categoryvalues into a JsonObject that can be easily converted to a URL query arguments using $.param(Egraphs.page.categories)
 ***@
- Egraphs.page.categories = @Html(
-  Json.toJson(categoryViewModels.foldLeft[Map[String, JsValue]](Map())(
-    (a, b) => a ++ b.asActiveMap
-  )).toString
- );
- Egraphs.page.categorySelected = @categoryViewModels.exists(c => c.active);
- Egraphs.page.queryUrl = "@marketplaceRoute";
- Egraphs.page.query = "@query";
- Egraphs.page.sort = "@sortOptions.find(v => v.active).map(v => v.name)";
- Egraphs.page.view = @if(viewAsList){"list"} else {""};
- Egraphs.page.results = @Html(Json.toJson(results).toString);
- Egraphs.page.availableOnly = @availableOnly;
 
+  Egraphs.page.categories =  @Html(
+      Json.toJson(verticalViewModels.flatMap{v =>
+        v.categoryViewModels.foldLeft[Map[String, JsValue]](Map())(
+          (a, b) => a ++ b.asActiveMap)
+      }.toMap).toString());
+  Egraphs.page.categorySelected = @verticalViewModels.exists(v => v.categoryViewModels.exists(c => c.active));
+  Egraphs.page.queryUrl = "@marketplaceRoute";
+  Egraphs.page.query = "@query";
+  Egraphs.page.sort = "@sortOptions.find(v => v.active).map(v => v.name)";
+  Egraphs.page.view = @if(viewAsList){"list"} else {""};
+  Egraphs.page.results = @Html(Json.toJson(results).toString);
+  Egraphs.page.availableOnly = @availableOnly;
 }
 
 @baseBody = {
@@ -51,7 +51,7 @@
       <div class="span12 masthead" role="masthead">
 
         <form action="@marketplaceRoute" method="get">
-            <input name="query" id="celebrity-searchbox" type="search" placeholder="Find Your Star" value="@query" @if(query.length == 0 && !categoryViewModels.exists(c => c.active)) {autofocus}>
+            <input name="query" id="celebrity-searchbox" type="search" placeholder="Find Your Star" value="@query" @if(query.length == 0 && !verticalViewModels.exists(v => v.categoryViewModels.exists(c => c.active))){autofocus}>
             <input name="view" type="hidden" value="@if(viewAsList){list}"> </input>
             <input type="hidden" name="sort" value="@sortOptions.find(v => v.active).map(v => v.name)">
         </form>
@@ -67,18 +67,18 @@
       <div class="row-fluid">
 
         <aside class="nav span3">
-          @tags.marketplace.category_picker(categoryViewModels)
+          @tags.marketplace.category_picker(verticalViewModels)
         
         </aside>
 
         <div class="main span9">
 
           @tags.marketplace.vertical_buttons(verticalViewModels)
-          @tags.marketplace.category_picker_mobile(categoryViewModels) 
+          @tags.marketplace.category_picker_mobile(verticalViewModels)
         
           @tags.marketplace.view_options(sortOptions, viewAsList)
-          @if(categoryViewModels.exists(c => c.active == true) || query.length > 0){
-            @tags.marketplace.navigation_pills(categoryViewModels, query)
+          @if(verticalViewModels.exists(v => v.categoryViewModels.exists(c => c.active)) || query.length > 0){
+            @tags.marketplace.navigation_pills(verticalViewModels, query)
           }
           
           @if(viewAsList) {

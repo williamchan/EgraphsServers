@@ -140,6 +140,7 @@ case class VerticalViewModel(
   shortName: String,
   iconUrl: String,
   active: Boolean = false,
-  id: Long
+  id: Long,
+  categoryViewModels : Iterable[CategoryViewModel]
 )
 
