@@ -57,7 +57,7 @@ GET      /admin/accounts/$accountId<[0-9]+>                               contro
 GET      /admin/celebrities                                               controllers.WebsiteControllers.getCelebritiesAdmin
 POST     /admin/celebrities                                               controllers.WebsiteControllers.postCreateCelebrityAdmin
 GET      /admin/celebrities/search                                        controllers.WebsiteControllers.getCelebritiesBySearchAdmin
-POST      /admin/celebrities/search/rebuild                               controllers.WebsiteControllers.postRebuildSearchIndex
+POST     /admin/celebrities/search/rebuild                                controllers.WebsiteControllers.postRebuildSearchIndex
 GET      /admin/celebrities/create                                        controllers.WebsiteControllers.getCreateCelebrityAdmin
 POST     /admin/celebrities/featured                                      controllers.WebsiteControllers.postFeaturedCelebrities
 GET      /admin/celebrities/$celebrityId<[0-9]+>                          controllers.WebsiteControllers.getCelebrityAdmin(celebrityId: Long)
@@ -130,8 +130,8 @@ GET     /login                                                      controllers.
 POST    /login                                                      controllers.WebsiteControllers.postLogin
 GET     /logout                                                     controllers.WebsiteControllers.getLogout
 POST    /logout                                                     controllers.WebsiteControllers.postLogout
-GET     /stars                                                      controllers.WebsiteControllers.getMarketplaceResultPage
-##GET     /celebrities/:verticalname                                  controllers.WebsiteControllers.getMarketplaceVerticalPage(verticalname: String)
+GET     /stars                                                      controllers.WebsiteControllers.getMarketplaceResultPage(vertical = "")
+GET     /stars/:vertical                                            controllers.WebsiteControllers.getMarketplaceResultPage(vertical)
 GET     /orders/$orderId<[0-9]+>/confirm                            controllers.WebsiteControllers.getOrderConfirmation(orderId: Long)
 POST    /orders/$orderId<[0-9]+>/configure                          controllers.WebsiteControllers.postOrderPrivacy(orderId: Long)
 GET     /privacy                                                    controllers.WebsiteControllers.getPrivacy

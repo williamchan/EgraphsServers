@@ -1,28 +1,15 @@
 package controllers.website.consumer
 
-import play.api._
 import play.api.mvc.Action
 import play.api.mvc.Controller
-import play.api.Play.current
 import models._
-import models.frontend.marketplace._
 import play.api.data._
 import play.api.data.Forms._
-import controllers.WebsiteControllers
-import enums.{PrivacyStatus, EgraphState}
-import models.frontend.egraphs._
 import models.categories._
 import services.mvc.{celebrity, ImplicitHeaderAndFooterData}
-import models.GalleryOrderFactory
-import services.ConsumerApplication
 import services.http.{SafePlayParams, ControllerMethod}
-import services.http.EgraphsSession.Conversions._
-import services.http.filters._
-import egraphs.authtoken.AuthenticityToken
-import services.mvc.celebrity.CelebrityViewConversions
 import models.frontend.marketplace._
 import models.frontend.marketplace.CelebritySortingTypes
-import play.api.libs.concurrent.Akka
 import services.db.TransactionSerializable
 import services.db.DBSession
 import celebrity.CatalogStarsQuery
@@ -38,13 +25,11 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
   protected def catalogStarsQuery: CatalogStarsQuery
   protected def dbSession: DBSession
   protected def featured: Featured
-  
-  import CelebrityViewConversions._
-  import SafePlayParams.Conversions._
+  protected def verticalStore: VerticalStore
 
-  val queryUrl = controllers.routes.WebsiteControllers.getMarketplaceResultPage.url
+  val queryUrl = controllers.routes.WebsiteControllers.getMarketplaceResultPage("").url
   val categoryRegex = new scala.util.matching.Regex("""c([0-9]+)""", "id")
-  
+
   private def sortOptionViewModels(selectedSortingType: Option[CelebritySortingTypes.EnumVal] = None) : Iterable[SortOptionViewModel] = {
     for {
       sortingType <- CelebritySortingTypes.values
@@ -59,7 +44,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
   /**
    * Serves up marketplace results page. If there are no query arguments, featured celebs are served. 
    **/
-  def getMarketplaceResultPage = controllerMethod.withForm() { implicit AuthToken => 
+  def getMarketplaceResultPage(vertical : String = "") = controllerMethod.withForm() { implicit AuthToken =>
     Action { implicit request =>
       // Determine what search options, if any, have been appended
       val marketplaceResultPageForm = Form(
@@ -174,8 +159,8 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       //HACK As long as no CategoryValues have children Categories, this call can be used to display
       // only baseball categories. This NEEDS to be fixed if we want to support multiple verticals.
       val categoryViewModels = for {
-        categoryValue <- categoryValueStore.all().toList
-        category <- categoryValue.categories
+        vertical <- verticalStore.verticals;
+        category <- vertical.categoryValue.categories
       } yield {
         CategoryViewModel(
           id = category.id,
@@ -193,10 +178,10 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       Ok(views.html.frontend.marketplace_results(
         query = queryOption.getOrElse(""),
         viewAsList = viewAsList,
-        marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage.url,
+        marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage("").url,
         verticalViewModels = getVerticals(activeCategoryValues),
         results = ResultSetViewModel(subtitle = Option(subtitle), celebrities),
-        categoryViewModels = categoryViewModels,
+        categoryViewModels = categoryViewModels.toList,
         sortOptions = sortOptionViewModels(maybeSortType),
         availableOnly = availableOnly)
       )
@@ -204,10 +189,15 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
   }
   
   private def getVerticals(activeCategoryValues: Set[Long] = Set()) : List[VerticalViewModel] = {
-    val categoryValues = categoryValueStore.all().toList
-// TODO manage these verticals properly.     
-    List()
+    verticalStore.verticals.map{ v =>
+      VerticalViewModel(
+        verticalName = v.categoryValue.name,
+        publicName = v.categoryValue.publicName,
+        shortName =  v.shortName,
+        iconUrl =  v.iconUrl,
+        active = false,
+        id = v.categoryValue.id
+      )
+    }.toList
   }
-  // TODO implement landing pages for verticals. 
-  // def getMarketplaceVerticalPage(verticalname: String) 
 }
