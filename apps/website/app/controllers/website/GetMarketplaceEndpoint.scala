@@ -59,6 +59,8 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       val (queryOption, sortOption, viewOption, availableOnlyOption) = marketplaceResultPageForm.bindFromRequest.get
       val maybeSortType = sortOption.flatMap(sort => CelebritySortingTypes(sort))
       val availableOnly = availableOnlyOption.getOrElse(false)
+      val maybeSelectedVertical =  verticalStore.verticals.filter(v => v.urlSlug == vertical).headOption
+
 
       val categoryAndCategoryValues = for {
         (key, set) <- request.queryString
@@ -171,13 +173,13 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
             )
           ).toList)
         }
-
         VerticalViewModel(
           verticalName = v.categoryValue.name,
           publicName = v.categoryValue.publicName,
           shortName = v.shortName,
+          urlSlug = v.urlSlug,
           iconUrl = v.iconUrl,
-          active = false,
+          active = v.urlSlug == maybeSelectedVertical.map(_.urlSlug).getOrElse(""),
           id = v.categoryValue.id,
           categoryViewModels = categories
         )

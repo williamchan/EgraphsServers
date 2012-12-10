@@ -38,11 +38,12 @@
   Egraphs.page.view = @if(viewAsList){"list"} else {""};
   Egraphs.page.results = @Html(Json.toJson(results).toString);
   Egraphs.page.availableOnly = @availableOnly;
+  Egraphs.page.verticalSlug = "@verticalViewModels.find( v => v.active).map(v => "/" + v.urlSlug).getOrElse("")";
 }
 
 @baseBody = {
 
-<section id="content" class="marketplace mlb" role="main">
+<section id="content" class="marketplace" ng-cloak role="main">
   
   <div id="main">
   

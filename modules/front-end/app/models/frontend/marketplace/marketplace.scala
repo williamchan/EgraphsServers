@@ -138,6 +138,7 @@ case class VerticalViewModel(
   verticalName: String, 
   publicName: String,
   shortName: String,
+  urlSlug: String,
   iconUrl: String,
   active: Boolean = false,
   id: Long,
