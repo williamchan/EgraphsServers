@@ -26,7 +26,7 @@ case class VideoAsset(
   id: Long = 0,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
-  url: String = "",
+  url: Option[String] = None,
   urlKey: String = "",
   _videoStatus: String = VideoStatus.Unprocessed.name,
   services: VideoAssetServices = AppConfig.instance[VideoAssetServices])
@@ -35,7 +35,9 @@ case class VideoAsset(
   with HasVideoStatus[VideoAsset] {
 
   // blobkey pattern
-  private lazy val blobKeyBase = "videoassets/" + id + "/" // whyyyyyyyyyyyyyy!?
+  // (throws ERROR: null value in column "blobkeybase" violates not-null constraint
+  //     if this is defined as a lazy val)
+  private def blobKeyBase = "videoassets/" + id + "/"
 
   //
   // Public members

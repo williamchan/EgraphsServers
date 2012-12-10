@@ -56,7 +56,6 @@ private[controllers] trait GetVideoAssetAdminEndpoint extends ImplicitHeaderAndF
                   newVideoUrl <- video.getSecureTemporaryUrl
                   publicName <- videoAssetCelebrityStore.getCelebrityByVideoId(video.id).map(_.publicName)
                 } yield {
-                  println("new video url is " + newVideoUrl)
                   VideoAssetViewModel(videoUrl = newVideoUrl, videoId = video.id, celebrityPublicName = publicName)
                 }
 

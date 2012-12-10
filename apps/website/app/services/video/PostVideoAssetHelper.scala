@@ -1,27 +1,29 @@
 package services.video
 
 import java.io.File
-import scala.io.Source
+
 import models.Celebrity
 import models.VideoAsset
 import models.VideoAssetCelebrity
+import play.api.Play.current
+import play.api.libs.Files.TemporaryFile
+import play.api.libs.concurrent.Promise
+import play.api.libs.concurrent.Akka
 import play.api.libs.json.Json
+import play.api.mvc.BodyParsers.parse
+import play.api.mvc.Results.Async
+import play.api.mvc.Results.BadRequest
+import play.api.mvc.Results.NotFound
+import play.api.mvc.Results.Ok
+import play.api.mvc.MultipartFormData
+import play.api.mvc.Request
+import play.api.mvc.Result
 import services.blobs.AccessPolicy
 import services.blobs.Blobs
-import services.TempFile
-import services.http.filters.HttpFilters
-import play.api.mvc.Action
-import play.api.mvc.BodyParsers.parse
-import play.api.mvc.Result
-import play.api.mvc.Results.{ Ok, BadRequest, NotFound, Async }
-import play.api.mvc.Controller
-import play.api.mvc.MultipartFormData
-import play.api.libs.Files.TemporaryFile
-import play.api.libs.concurrent.Akka
-import play.api.Play.current
-import play.api.libs.concurrent.Promise
 import services.db.DBSession
 import services.db.TransactionSerializable
+import services.http.filters.HttpFilters
+import services.TempFile
 
 trait PostVideoAssetHelper {
   protected def httpFilters: HttpFilters
@@ -29,9 +31,6 @@ trait PostVideoAssetHelper {
   protected def dbSession: DBSession
 
   protected def putFile(blobKey: String, filename: String, file: File): Option[String] = {
-    
-    println("blobKey is " + blobKey)
-    
     val byteArray = Blobs.Conversions.fileToByteArray(file)
     blobs.put(key = blobKey, bytes = byteArray, access = AccessPolicy.Private)
     blobs.getUrlOption(key = blobKey)
@@ -59,31 +58,45 @@ trait PostVideoAssetHelper {
     blobKey
   }
 
-  protected def postSaveVideoAssetToS3AndDBAction: Action[MultipartFormData[TemporaryFile]] = {
+  protected def postSaveVideoAssetToS3AndDBAction(
+    implicit request: Request[MultipartFormData[TemporaryFile]]): Result = {
 
-    httpFilters.requireCelebrityId.inRequest(parse.multipartFormData) { celebrity =>
-      Action(parse.multipartFormData) { request =>
-
-        request.body.file("video").map { resource =>
-
-          val filename = resource.filename
-          val tempFile = TempFile.named(filename)
-
-          resource.ref.moveTo(tempFile, true)
-          val blobKey = persist(celebrity, filename)
-          val maybeFileLocation = putFile(blobKey, filename, tempFile)
-
-          maybeFileLocation match {
-            case None => NotFound("The video " + filename + " was not found")
-            case Some(fileLocation) => {
-              val responseJson = getJson(celebrity, tempFile, fileLocation)
-              Ok(responseJson)
-            }
-          }
-        }.getOrElse {
-          BadRequest("Something went wrong with your request. Please try again.")
-        }
-      }
+    val errorOrCelebrity = dbSession.connected(TransactionSerializable) {
+      httpFilters.requireCelebrityId.filterInRequest(parse.multipartFormData)
     }
+
+    errorOrCelebrity.fold(
+      error => error, {
+        case celebrity =>
+
+          request.body.file("video").map { resource =>
+
+            val filename = resource.filename
+            val tempFile = TempFile.named(filename)
+
+            val blobKey = dbSession.connected(TransactionSerializable) {
+              persist(celebrity, filename)
+            }
+
+            val promiseOfMaybeFileLocation: Promise[Option[String]] = Akka.future {
+              resource.ref.moveTo(tempFile, true)
+              putFile(blobKey, filename, tempFile)
+            }
+
+            Async {
+              promiseOfMaybeFileLocation.map { maybeFileLocation =>
+                maybeFileLocation match {
+                  case None => NotFound("The video " + filename + " was not found")
+                  case Some(fileLocation) => {
+                    val responseJson = getJson(celebrity, tempFile, fileLocation)
+                    Ok(responseJson)
+                  }
+                }
+              }
+            }
+          }.getOrElse {
+            BadRequest("Something went wrong with your request. Please try again.")
+          }
+      })
   }
 }
