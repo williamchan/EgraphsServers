@@ -1,7 +1,7 @@
 @(availableOnly: Boolean = false)
 
 <div class="verticals">
-  <section class="clearfix" ng-controller="MarketplaceCtrl">
+  <section class="clearfix" ng-cloak ng-controller="MarketplaceCtrl">
     <section>
       <div class="clearfix">
         <h1><span>{{results.subtitle}}</span></h1> 
@@ -16,7 +16,7 @@
         <article ng-repeat="celebrity in celebrities" when-scrolled="loadCelebrities()" class="celebrity-result">
           <figure>
               <a ng-show="celebrity.soldout" href="{{celebrity.storefrontUrl}}" class="ribbon"><em>Sold Out</em></a>
-              <a class="glowborder" href="{{celebrity.storefrontUrl}}"><img ng-cloak src={{celebrity.photoUrl}} alt="FPO image"></a>
+              <a class="glowborder" href="{{celebrity.storefrontUrl}}"><img ng-src={{celebrity.photoUrl}} alt="FPO image"></a>
           </figure>
           <hgroup>
             <h2><a href="{{celebrity.storefrontUrl}}" title="View star: {{celebrity.publicName}}">{{celebrity.publicName}}</a></h2>

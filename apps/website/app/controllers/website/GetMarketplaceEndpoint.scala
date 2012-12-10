@@ -75,12 +75,11 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         (id.toLong, categoryValueId)
       }
       //TODO replace with all celebs
-      val categoryValuesRefinements = if (categoryAndCategoryValues.isEmpty && queryOption.isEmpty) {
-        // use featured stars if no search type is used
-        val featuredCategoryValue = featured.categoryValue
-        List(List(featuredCategoryValue.id))
-      } else {
-        for ((category, categoryValues) <- categoryAndCategoryValues) yield categoryValues
+      val categoryValuesRefinements = for ((category, categoryValues) <- categoryAndCategoryValues) yield categoryValues
+
+      val verticalAndCategoryValues = maybeSelectedVertical match {
+        case Some(vertical) => categoryValuesRefinements ++ List(Seq(vertical.categoryValue.id))
+        case None => categoryValuesRefinements
       }
 
       //TODO: UNCOMMENT AFTER MAKING FEATURED INTO CATEGORY VALUES
@@ -106,18 +105,18 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       val (subtitle, unsortedCelebrities) = dbSession.connected(TransactionSerializable) {
         queryOption match {
           case Some(query) =>
-            val results = celebrityStore.marketplaceSearch(queryOption, categoryValuesRefinements)
+            val results = celebrityStore.marketplaceSearch(queryOption, verticalAndCategoryValues)
             val text = results.size match {
               case 1 => "Showing 1 Result for \"" + query + "\"..."
               case _ => "Showing " + results.size + " Results for \"" + query + "\"..."
             }
             (text, results)
           case _ =>
-            if (!categoryValuesRefinements.isEmpty) {
-              ("Results", celebrityStore.marketplaceSearch(queryOption, categoryValuesRefinements))
+            if (!verticalAndCategoryValues.isEmpty) {
+              ("Results", celebrityStore.marketplaceSearch(queryOption, verticalAndCategoryValues))
             } else {
               //TODO when refinements are implemented we can do this using tags instead.
-              ("Featured Stars", catalogStarsQuery().filter(star => star.isFeatured).map(c =>
+              ("All Stars", catalogStarsQuery().map(c =>
                 MarketplaceCelebrity(
                   id = c.id,
                   publicName = c.name,
