@@ -21,11 +21,12 @@ import enums.EgraphState
 import utils.TestData
 import services.db.TransactionSerializable
 import scenario.RepeatableScenarios
+import play.api.mvc.Result
 
 class GetCelebrityOrdersApiEndpointTests
-  extends EgraphsUnitTest //TODO: (myyk) Re-enable these before checking
-  //  with ProtectedCelebrityResourceTests
-  {
+  extends EgraphsUnitTest
+  with ProtectedCelebrityResourceTests
+{
   protected def routeUnderTest = getCelebrityOrders()
   private def orderStore = AppConfig.instance[OrderStore]
   private def db = AppConfig.instance[DBSession]
@@ -36,12 +37,8 @@ class GetCelebrityOrdersApiEndpointTests
       (celebrity.account, orders)
     }
 
-    // Assemble the request
-    val url = getCelebrityOrders(signerActionable = Some(true)).url
-    val req = requestWithCredentials(celebrityAccount).copy(method = GET, uri = url)
-
     // Execute the request
-    val Some(result) = routeAndCall(req)
+    val result = routeAndCallGetCelebrityOrders(celebrityAccount)
 
     status(result) should be(OK)
 
@@ -59,9 +56,7 @@ class GetCelebrityOrdersApiEndpointTests
       RepeatableScenarios.createCelebrity(isFeatured = true).account
     }
 
-    val url = getCelebrityOrders(signerActionable = None).url
-    val req = requestWithCredentials(celebrityAccount).copy(method = GET, uri = url)
-    val Some(result) = routeAndCall(req)
+    val result = routeAndCallGetCelebrityOrders(celebrityAccount, signerActionable = None)
 
     status(result) should be(BAD_REQUEST)
   }
@@ -73,51 +68,57 @@ class GetCelebrityOrdersApiEndpointTests
       // make the first order be awaiting verification
       Egraph(orderId = orders.head.id).withEgraphState(EgraphState.AwaitingVerification).save()
 
-      println(orders.map(_.id))
       (celebrity.account, orders)
     }
 
-    val url = getCelebrityOrders(signerActionable = Some(true)).url
-    val req = requestWithCredentials(celebrityAccount).copy(method = GET, uri = url)
-    val Some(result) = routeAndCall(req)
+    val result = routeAndCallGetCelebrityOrders(celebrityAccount)
     status(result) should be(OK)
 
     val json = Serializer.SJSON.in[List[Map[String, Any]]](contentAsString(result))
-    println(json)
     json.length should be(3) // 4 - 1 (the one we made awaiting verification)
   }
 
-  //  it should "filter out orders with Egraphs that have already been published" in {
-  //    runWillChanScenariosThroughOrder()
-  //
-  //    db.connected(TransactionSerializable) {
-  //      val celebrityId = Scenarios.getWillCelebrityAccount.id
-  //      val allCelebOrders = orderStore.findByCelebrity(celebrityId)
-  //      Egraph(orderId = allCelebOrders.toSeq.head.id).withEgraphState(EgraphState.Published).save()
-  //    }
-  //
-  //    val url = getCelebrityOrders(signerActionable=Some(true)).url
-  //    val Some(result) = routeAndCall(willChanRequest.copy(method=GET, uri=url))
-  //    status(result) should be (OK)
-  //
-  //    val json = Serializer.SJSON.in[List[Map[String, Any]]](contentAsString(result))
-  //    json.length should be (1)
-  //  }
-  //
-  //  it should "include orders with with egraphs that were rejected" in {
-  //    runWillChanScenariosThroughOrder()
-  //
-  //    db.connected(TransactionSerializable) {
-  //      val celebrityId = Scenarios.getWillCelebrityAccount.id
-  //      val allCelebOrders = orderStore.findByCelebrity(celebrityId)
-  //      Egraph(orderId = allCelebOrders.toSeq.head.id).withEgraphState(EgraphState.RejectedByAdmin).save()
-  //    }
-  //
-  //    val url = getCelebrityOrders(signerActionable=Some(true)).url
-  //    val Some(result) = routeAndCall(willChanRequest.copy(method=GET, uri=url))
-  //    status(result) should be (OK)
-  //
-  //    val json = Serializer.SJSON.in[List[Map[String, Any]]](contentAsString(result))
-  //    json.length should be (2)
-  //  }
+  it should "filter out orders with Egraphs that have already been published" in {
+    val (celebrityAccount, orders) = db.connected(TransactionSerializable) {
+      val (_, celebrity, _, orders) = runCustomerBuysProductsScenerio()
+
+      // make the first order be published
+      Egraph(orderId = orders.head.id).withEgraphState(EgraphState.Published).save()
+
+      (celebrity.account, orders)
+    }
+
+    val result = routeAndCallGetCelebrityOrders(celebrityAccount)
+    status(result) should be(OK)
+
+    val json = Serializer.SJSON.in[List[Map[String, Any]]](contentAsString(result))
+    json.length should be(3) // 4 - 1 (the one we made published)
+  }
+
+  it should "include orders with with egraphs that were rejected" in {
+    val (celebrityAccount, orders) = db.connected(TransactionSerializable) {
+      val (_, celebrity, _, orders) = runCustomerBuysProductsScenerio()
+
+      // make the first order be rejected
+      Egraph(orderId = orders.head.id).withEgraphState(EgraphState.RejectedByAdmin).save()
+
+      (celebrity.account, orders)
+    }
+
+    val result = routeAndCallGetCelebrityOrders(celebrityAccount)
+    status(result) should be(OK)
+
+    val json = Serializer.SJSON.in[List[Map[String, Any]]](contentAsString(result))
+    json.length should be(4)
+  }
+
+  /**
+   * Assemble the request and get the result.
+   */
+  private def routeAndCallGetCelebrityOrders(celebrityAccount: Account, signerActionable: Option[Boolean] = Some(true)): Result = {
+    val url = getCelebrityOrders(signerActionable = signerActionable).url
+    val req = requestWithCredentials(celebrityAccount).copy(method = GET, uri = url)
+    val Some(result) = routeAndCall(req)
+    result
+  }
 }

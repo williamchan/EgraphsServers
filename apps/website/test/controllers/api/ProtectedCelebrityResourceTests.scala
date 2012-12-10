@@ -8,20 +8,27 @@ import play.api.test.FakeRequest
 import services.AppConfig
 import services.http.BasicAuth
 import services.db.{DBSession, TransactionSerializable}
+import scenario.RepeatableScenarios
+import models.Account
+import org.apache.commons.lang3.RandomStringUtils
 
 trait ProtectedCelebrityResourceTests { this: EgraphsUnitTest =>
   protected def routeUnderTest: Call
   protected def validRequestBodyAndQueryString: Option[FakeRequest[AnyContent]] = None
-
+  private def db = AppConfig.instance[DBSession]
+  
   aBasicAuthProtectedCelebApiResource should "forbid requests with the wrong password for a valid celebrity account" in new EgraphsTestApplication {
-    runFreshScenarios("Will-Chan-is-a-celebrity")
+    val celebrityAccount = db.connected(TransactionSerializable) {
+      val celebrity = RepeatableScenarios.createCelebrity(isFeatured = true)
+      celebrity.account
+    }
 
     // Assemble the request
-    executingRequestWithCredentials("wchan83@egraphs.com", "wrong") should be (FORBIDDEN)
+    executingRequestWithCredentials(celebrityAccount, "wrong") should be (FORBIDDEN)
   }
 
   it should "forbid requests with the correct password for non-celebrity account" in new EgraphsTestApplication {
-    val password = "herp derp derpson"
+    val password = RandomStringUtils.random(12)
     val dbSession = AppConfig.instance[DBSession]
 
     val account = dbSession.connected(TransactionSerializable) {
@@ -30,11 +37,11 @@ trait ProtectedCelebrityResourceTests { this: EgraphsUnitTest =>
       customer.account.withPassword(password).right.get.save()
     }
 
-    executingRequestWithCredentials(account.email, password) should be (FORBIDDEN)
+    executingRequestWithCredentials(account, password) should be (FORBIDDEN)
   }
 
-  private def executingRequestWithCredentials(username: String, password: String): Int = {
-    val auth = BasicAuth.Credentials(username, password)
+  private def executingRequestWithCredentials(account: Account, password: String): Int = {
+    val auth = BasicAuth.Credentials(account.email, password)
 
     val requestBodyAndQuery = validRequestBodyAndQueryString.getOrElse(FakeRequest())
 
