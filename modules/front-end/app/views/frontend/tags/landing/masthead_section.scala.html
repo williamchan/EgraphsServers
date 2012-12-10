@@ -22,7 +22,7 @@
           @getStartedUrl.map{ url =>
             @{
               celebrityPublicName match {
-                case None => tags.landing.searchbox(url)
+                case None => tags.landing.searchbox(url, autofocus=true)
                 case Some(name) => tags.landing.get_started(url)
               }
             }
