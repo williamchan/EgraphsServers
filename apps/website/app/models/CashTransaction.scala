@@ -73,7 +73,7 @@ case class CashTransaction(
   }
 }
 
-class CashTransactionStore @Inject() (schema: Schema) extends SavesWithLongKey[CashTransaction] with SavesCreatedUpdated[Long,CashTransaction] {
+class CashTransactionStore @Inject() (schema: Schema) extends SavesWithLongKey[CashTransaction] with SavesCreatedUpdated[CashTransaction] {
 
   def findByOrderId(orderId: Long): List[CashTransaction] = {
     from(schema.cashTransactions)(txn =>
@@ -90,7 +90,7 @@ class CashTransactionStore @Inject() (schema: Schema) extends SavesWithLongKey[C
   }
 
   //
-  // SavesCreatedUpdated[Long,CashTransaction] members
+  // SavesCreatedUpdated[CashTransaction] members
   //
   override protected def withCreatedUpdated(toUpdate: CashTransaction, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)
@@ -101,19 +101,4 @@ class CashTransactionStore @Inject() (schema: Schema) extends SavesWithLongKey[C
   //
   protected def table = schema.cashTransactions
 
-  def defineUpdate(theOld: CashTransaction, theNew: CashTransaction) = {
-
-    updateIs(
-      theOld.accountId := theNew.accountId,
-      theOld.orderId := theNew.orderId,
-      theOld.printOrderId := theNew.printOrderId,
-      theOld.amountInCurrency := theNew.amountInCurrency,
-      theOld.billingPostalCode := theNew.billingPostalCode,
-      theOld.currencyCode := theNew.currencyCode,
-      theOld._cashTransactionType := theNew._cashTransactionType,
-      theOld.stripeCardTokenId := theNew.stripeCardTokenId,
-      theOld.stripeChargeId := theNew.stripeChargeId,
-      theOld.updated := theNew.updated
-    )
-  }
 }

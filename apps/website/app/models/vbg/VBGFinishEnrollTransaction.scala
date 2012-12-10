@@ -41,25 +41,17 @@ case class VBGFinishEnrollTransaction(id: Long = 0,
 
 }
 
-class VBGFinishEnrollTransactionStore @Inject()(schema: Schema) extends SavesWithLongKey[VBGFinishEnrollTransaction] with SavesCreatedUpdated[Long,VBGFinishEnrollTransaction] {
+class VBGFinishEnrollTransactionStore @Inject()(schema: Schema) extends SavesWithLongKey[VBGFinishEnrollTransaction] with SavesCreatedUpdated[VBGFinishEnrollTransaction] {
 
   //
   // SavesWithLongKey[VBGFinishEnrollTransaction] methods
   //
   override val table = schema.vbgFinishEnrollTransactionTable
 
-  override def defineUpdate(theOld: VBGFinishEnrollTransaction, theNew: VBGFinishEnrollTransaction) = {
-    updateIs(
-      theOld.enrollmentBatchId := theNew.enrollmentBatchId,
-      theOld.errorCode := theNew.errorCode,
-      theOld.vbgTransactionId := theNew.vbgTransactionId,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated
-    )
-  }
+
 
   //
-  // SavesCreatedUpdated[Long,VBGFinishEnrollTransaction] methods
+  // SavesCreatedUpdated[VBGFinishEnrollTransaction] methods
   //
   override def withCreatedUpdated(toUpdate: VBGFinishEnrollTransaction, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

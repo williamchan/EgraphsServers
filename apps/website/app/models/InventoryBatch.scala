@@ -57,7 +57,7 @@ case class InventoryBatch(
 
 }
 
-class InventoryBatchStore @Inject()(schema: Schema, orderStore: OrderStore, inventoryBatchQueryFilters: InventoryBatchQueryFilters) extends SavesWithLongKey[InventoryBatch] with SavesCreatedUpdated[Long,InventoryBatch] {
+class InventoryBatchStore @Inject()(schema: Schema, orderStore: OrderStore, inventoryBatchQueryFilters: InventoryBatchQueryFilters) extends SavesWithLongKey[InventoryBatch] with SavesCreatedUpdated[InventoryBatch] {
 
   def findByCelebrity(celebrityId: Long, filters: FilterOneTable[InventoryBatch]*): Query[InventoryBatch] = {
     from(schema.inventoryBatches)((inventoryBatch) =>
@@ -130,16 +130,7 @@ class InventoryBatchStore @Inject()(schema: Schema, orderStore: OrderStore, inve
   //
   def table = schema.inventoryBatches
 
-  override def defineUpdate(theOld: InventoryBatch, theNew: InventoryBatch) = {
-    updateIs(
-      theOld.celebrityId := theNew.celebrityId,
-      theOld.numInventory := theNew.numInventory,
-      theOld.startDate := theNew.startDate,
-      theOld.endDate := theNew.endDate,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated
-    )
-  }
+
 
   //
   // SavesCreatedUpdated methods

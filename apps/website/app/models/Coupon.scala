@@ -116,7 +116,7 @@ class CouponStore @Inject()(schema: Schema,
     couponQueryFilters: CouponQueryFilters, 
     cashTransactionStore: CashTransactionStore) 
   extends SavesWithLongKey[Coupon] 
-  with SavesCreatedUpdated[Long,Coupon] 
+  with SavesCreatedUpdated[Coupon]
 {
   import org.squeryl.PrimitiveTypeMode._
 
@@ -155,22 +155,7 @@ class CouponStore @Inject()(schema: Schema,
   //
   override val table = schema.coupons
 
-  override def defineUpdate(theOld: Coupon, theNew: Coupon) = {
-    updateIs(
-      theOld.name := theNew.name,
-      theOld.code := theNew.code,
-      theOld.startDate := theNew.startDate,
-      theOld.endDate := theNew.endDate,
-      theOld.discountAmount := theNew.discountAmount,
-      theOld._discountType := theNew._discountType,
-      theOld._usageType := theNew._usageType,
-      theOld._couponType := theNew._couponType,
-      theOld.isActive := theNew.isActive,
-      theOld.restrictions := theNew.restrictions,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated
-    )
-  }
+
   
   beforeInsertOrUpdate(withCodeInLowerCase)
 
@@ -179,7 +164,7 @@ class CouponStore @Inject()(schema: Schema,
   }
 
   //
-  // SavesCreatedUpdated[Long,Coupon] methods
+  // SavesCreatedUpdated[Coupon] methods
   //
   override def withCreatedUpdated(toUpdate: Coupon, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

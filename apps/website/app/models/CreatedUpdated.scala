@@ -32,8 +32,7 @@ trait HasCreatedUpdated {
  *
  * See [[models.Account]] for an example.
  */
-// TODO(SER-499): Remove KeyT. It's not necessary now that we separated Saves into InsertAndUpdateHooks[T]
-trait SavesCreatedUpdated[KeyT, T <: KeyedCaseClass[KeyT] with HasCreatedUpdated] {
+trait SavesCreatedUpdated[T <: KeyedCaseClass[_] with HasCreatedUpdated] {
   this: InsertAndUpdateHooks[T] =>
 
   //

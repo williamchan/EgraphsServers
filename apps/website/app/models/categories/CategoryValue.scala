@@ -51,7 +51,7 @@ case class CategoryValue(
 class CategoryValueStore @Inject() (
   schema: Schema
 ) extends SavesWithLongKey[CategoryValue]
-  with SavesCreatedUpdated[Long, CategoryValue]
+  with SavesCreatedUpdated[ CategoryValue]
   with Deletes[Long, CategoryValue]
 {
   import org.squeryl.PrimitiveTypeMode._
@@ -156,18 +156,10 @@ class CategoryValueStore @Inject() (
   //
   override val table = schema.categoryValues
 
-  override def defineUpdate(theOld: CategoryValue, theNew: CategoryValue) = {
-    updateIs(
-      theOld.publicName := theNew.publicName,
-      theOld.name := theNew.name,
-      theOld.categoryId := theNew.categoryId,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated
-    )
-  }
+
 
   //
-  // SavesCreatedUpdated[Long,CategoryValue] methods
+  // SavesCreatedUpdated[CategoryValue] methods
   //
   override def withCreatedUpdated(toUpdate: CategoryValue, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

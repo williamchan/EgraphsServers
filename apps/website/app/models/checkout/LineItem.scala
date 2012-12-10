@@ -3,6 +3,7 @@ package models.checkout
 import org.joda.money.Money
 import org.squeryl.KeyedEntity
 import java.sql.Timestamp
+import services.Time
 
 trait LineItem[+TransactedT] {
   def itemType: LineItemType[TransactedT]
@@ -22,6 +23,6 @@ case class LineItemEntity(
   itemTypeId: Long = 0L,
   _amountInCurrency: BigDecimal = BigDecimal(0),
   notes: String,
-  created: Timestamp,
-  updated: Timestamp
+  created: Timestamp = Time.defaultTimestamp,
+  updated: Timestamp = Time.defaultTimestamp
 ) extends KeyedEntity[Long]

@@ -5,6 +5,7 @@ import org.squeryl.dsl.ast.{LogicalBoolean, EqualityExpression, UpdateAssignment
 import org.squeryl.PrimitiveTypeMode._
 import sun.security.krb5.internal.ktab.KeyTab
 
+// TODO(SER-499): Is this usage up to date? Check others as well.
 /**
  * Gives an object the ability to save instances of the associated type, eg Person.save(personInstance).
  * Also, provides hooks to transform the entity before saving it.
@@ -18,12 +19,6 @@ import sun.security.krb5.internal.ktab.KeyTab
  *
  *    object Person extends SavesWithLongKey[Person] {
  *       override val table = MySquerylDb.people
- *
- *       override def defineUpdate (theOld: person, theNew: person) = {
- *         updateIs(
- *           theOld.name := theNew.name
- *         )
- * }
  * }
  *
  *    // Later on in application code...
@@ -33,10 +28,6 @@ import sun.security.krb5.internal.ktab.KeyTab
  *
  */
 trait SavesWithLongKey[T <: KeyedEntity[Long]] extends Saves[Long, T] {
-  override protected final def keysEqual(id: Long, otherId: Long): LogicalBoolean = {
-    id === otherId
-  }
-
   override final def save(toSave: T): T = {
     toSave.id match {
       case n if n <= 0 =>
@@ -49,10 +40,6 @@ trait SavesWithLongKey[T <: KeyedEntity[Long]] extends Saves[Long, T] {
 }
 
 trait SavesWithStringKey[T <: KeyedEntity[String]] extends Saves[String, T] {
-  override protected final def keysEqual(id: String, otherId: String): LogicalBoolean = {
-    id === otherId
-  }
-
   override final def save(toSave: T): T = {
     val maybeSaved = findById(toSave.id)
 
@@ -73,47 +60,6 @@ trait Saves[KeyT, T <: KeyedEntity[KeyT]]
 {
 
   //
-  // Abstract members
-  //
-
-  /**
-   * Defines how to update an old row in the database with the new one, using the syntax
-   * that usually appears in a Squeryl set() clause. Usually this will be just a matter of taking
-   * all the persisted properties and setting them.
-   *
-   * For example:
-   * {{{
-   *   case class Fruit(id: Long, name: String) Keyed[Long]
-   *
-   *   object Fruit extends SavesWithLongKey[Fruit] {
-   *     override def defineUpdate(theOld: Fruit, theNew: Fruit) = {
-   *        import org.squeryl.PrimitiveTypeMode._
-   *        updateIs(
-   *          theOld.name := theNew.name
-   *        )
-   * }
-   * }
-   * }}}
-   *
-   * @see <a href=http://squeryl.org/inserts-updates-delete.html>Squeryl query documentation</a>
-   */
-  // TODO(SER-499): Delete this method as it is no longer necessary
-  def defineUpdate(theOld: T, theNew: T): List[UpdateAssignment]
-
-  //
-  // Protected API
-  //
-  /**
-   * Convenience for making a list out of update assignments.
-   *
-   * @see #defineUpdate
-   */
-  // TODO(SER-499): Delete this method as it is no longer necessary
-  protected final def updateIs(assignments: UpdateAssignment*): List[UpdateAssignment] = {
-    assignments.toList
-  }
-
-  //
   // Public API
   //
   /**
@@ -127,8 +73,6 @@ trait Saves[KeyT, T <: KeyedEntity[KeyT]]
    */
   def save(toSave: T): T
 
-  // TODO(SER-499): Delete this method as it is no longer necessary
-  protected def keysEqual(id: KeyT, otherId: KeyT): LogicalBoolean
 
   //
   // Private API

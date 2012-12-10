@@ -3,7 +3,7 @@ package services.db
 import org.squeryl.PrimitiveTypeMode._
 import org.squeryl.{ KeyedEntity, Table }
 import models._
-import checkout.LineItemTypeEntity
+import checkout.{LineItemEntity, LineItemTypeEntity}
 import models.categories._
 import models.vbg._
 import models.xyzmo._
@@ -109,6 +109,9 @@ class Schema @Inject() (
     declare(
       columns(inventoryBatch.startDate, inventoryBatch.endDate) are indexed,
       columns(inventoryBatch.celebrityId, inventoryBatch.startDate, inventoryBatch.endDate) are indexed))
+
+  val lineItems = table[LineItemEntity]
+  // TODO(SER-499): Index declarations
 
   val lineItemTypes = table[LineItemTypeEntity]
   // TODO(SER-499): Index declarations

@@ -657,7 +657,7 @@ trait EgraphAssets {
   def save(signature: String, message: Option[String], audio: Array[Byte])
 }
 
-class EgraphStore @Inject() (schema: Schema) extends SavesWithLongKey[Egraph] with SavesCreatedUpdated[Long,Egraph] {
+class EgraphStore @Inject() (schema: Schema) extends SavesWithLongKey[Egraph] with SavesCreatedUpdated[Egraph] {
   import org.squeryl.PrimitiveTypeMode._
 
   def getEgraphsAndResults(filters: FilterOneTable[Egraph]*): Query[(Egraph, Celebrity, Option[VBGVerifySample], Option[XyzmoVerifyUser])] = {
@@ -700,20 +700,10 @@ class EgraphStore @Inject() (schema: Schema) extends SavesWithLongKey[Egraph] wi
   //
   override val table = schema.egraphs
 
-  override def defineUpdate(theOld: Egraph, theNew: Egraph) = {
-    updateIs(
-      theOld.orderId := theNew.orderId,
-      theOld._egraphState := theNew._egraphState,
-      theOld.latitude := theNew.latitude,
-      theOld.longitude := theNew.longitude,
-      theOld.signedAt := theNew.signedAt,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated
-    )
-  }
+
 
   //
-  // SavesCreatedUpdated[Long,Egraph] methods
+  // SavesCreatedUpdated[Egraph] methods
   //
   override def withCreatedUpdated(toUpdate: Egraph, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)

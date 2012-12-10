@@ -9,6 +9,10 @@ object CouponType extends Enum {
   val Promotion = new EnumVal {
     val name = "Promotion"
   }
+
+  val GiftCertificate = new EnumVal {
+    def name: String = "GiftCertificate"
+  }
 //  val Prepaid = new EnumVal {
 //    val name = "Prepaid"
 //  }
