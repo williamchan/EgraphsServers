@@ -16,7 +16,7 @@ trait PostVideoAssetAdminEndpoint extends PostVideoAssetHelper { this: Controlle
    */
   def postVideoAssetAdmin = postController() {
     httpFilters.requireAdministratorLogin.inSession(parse.multipartFormData) { case (admin, adminAccount) =>
-        postVideoAssetBase
+      postSaveVideoAssetToS3AndDBAction
     }
   }
 }

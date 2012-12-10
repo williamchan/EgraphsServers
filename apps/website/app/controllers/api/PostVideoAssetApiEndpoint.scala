@@ -15,7 +15,7 @@ private[controllers] trait PostVideoAssetApiEndpoint extends PostVideoAssetHelpe
    */
   def postVideoAsset = postApiController() {
     httpFilters.requireAuthenticatedAccount.inRequest(parse.multipartFormData) { account =>
-      postVideoAssetBase
+      postSaveVideoAssetToS3AndDBAction
     }
   }
 }

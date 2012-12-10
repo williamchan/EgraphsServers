@@ -17,19 +17,25 @@ import services.{ AppConfig, Time }
 import services.db.KeyedCaseClass
 import services.db.SavesWithLongKey
 import services.db.Schema
+import services.blobs.Blobs
+import services.Time.IntsToSeconds.intsToSecondDurations
 
-case class VideoAssetServices @Inject() (store: VideoAssetStore)
+case class VideoAssetServices @Inject() (store: VideoAssetStore, blobs: Blobs)
 
 case class VideoAsset(
   id: Long = 0,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   url: String = "",
+  urlKey: String = "",
   _videoStatus: String = VideoStatus.Unprocessed.name,
   services: VideoAssetServices = AppConfig.instance[VideoAssetServices])
   extends KeyedCaseClass[Long]
   with HasCreatedUpdated
   with HasVideoStatus[VideoAsset] {
+
+  // blobkey pattern
+  private lazy val blobKeyBase = "videoassets/" + id + "/" // whyyyyyyyyyyyyyy!?
 
   //
   // Public members
@@ -49,9 +55,20 @@ case class VideoAsset(
   override def withVideoStatus(status: VideoStatus.EnumVal) = {
     this.copy(_videoStatus = status.name)
   }
-  
-  def withVideoUrl(newUrl: String) = {
-    this.copy(url = newUrl)
+
+  def getSecureTemporaryUrl: Option[String] = {
+    val maybeSecureUrl = services.blobs.getSecureUrlOption(this.urlKey, 60 minutes)
+    maybeSecureUrl match {
+      case None => play.Logger.info("No video asset found with urlKey: " + this.urlKey)
+      case Some(newUrl) => play.Logger.info("This video asset's URL: " + newUrl)
+    }
+    maybeSecureUrl
+  }
+
+  def setVideoUrlKey(filename: String): String = {
+    val blobKey = blobKeyBase + filename
+    this.copy(urlKey = blobKey).save()
+    blobKey
   }
 }
 
@@ -80,6 +97,7 @@ class VideoAssetStore @Inject() (schema: Schema)
       theOld.created := theNew.created,
       theOld.updated := theNew.updated,
       theOld.url := theNew.url,
+      theOld.urlKey := theNew.urlKey,
       theOld._videoStatus := theNew._videoStatus)
   }
 

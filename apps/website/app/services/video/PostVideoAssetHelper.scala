@@ -1,9 +1,7 @@
 package services.video
 
 import java.io.File
-
 import scala.io.Source
-
 import models.Celebrity
 import models.VideoAsset
 import models.VideoAssetCelebrity
@@ -15,26 +13,28 @@ import services.http.filters.HttpFilters
 import play.api.mvc.Action
 import play.api.mvc.BodyParsers.parse
 import play.api.mvc.Result
-import play.api.mvc.Results.{ Ok, InternalServerError, BadRequest }
+import play.api.mvc.Results.{ Ok, BadRequest, NotFound, Async }
 import play.api.mvc.Controller
 import play.api.mvc.MultipartFormData
 import play.api.libs.Files.TemporaryFile
+import play.api.libs.concurrent.Akka
+import play.api.Play.current
+import play.api.libs.concurrent.Promise
+import services.db.DBSession
+import services.db.TransactionSerializable
 
 trait PostVideoAssetHelper {
   protected def httpFilters: HttpFilters
   protected def blobs: Blobs
-  
-  private val characterEncoding = "ISO-8859-1"
+  protected def dbSession: DBSession
 
-  protected def putFile(celebrity: Celebrity, filename: String, file: File): Option[String] = {
-
-    val videoKey = "videos/" + celebrity.id + "/" + filename
-    val source = Source.fromFile(file, characterEncoding)
-    val byteArray = source.map(_.toByte).toArray
-    source.close()
-
-    blobs.put(key = videoKey, bytes = byteArray, access = AccessPolicy.Private)
-    blobs.getUrlOption(key = videoKey)
+  protected def putFile(blobKey: String, filename: String, file: File): Option[String] = {
+    
+    println("blobKey is " + blobKey)
+    
+    val byteArray = Blobs.Conversions.fileToByteArray(file)
+    blobs.put(key = blobKey, bytes = byteArray, access = AccessPolicy.Private)
+    blobs.getUrlOption(key = blobKey)
   }
 
   protected def getJson(celebrity: Celebrity, tempFile: java.io.File, maybeFileLocation: String) = {
@@ -46,19 +46,20 @@ trait PostVideoAssetHelper {
     Json.toJson(Map("video" -> jsonIterable))
   }
 
-  protected def persist(celebrity: Celebrity, fileLocation: String) = {
+  protected def persist(celebrity: Celebrity, filename: String): String = {
     // add row to videoAssets table
-    val videoAsset = VideoAsset(url = fileLocation).save()
-    val videoId = videoAsset.id
+    val videoAsset = VideoAsset().save()
+    val blobKey = videoAsset.setVideoUrlKey(filename)
 
     // add row to videoAssetsCelebrity table
-    val videoAssetCelebrity = VideoAssetCelebrity(
+    VideoAssetCelebrity(
       celebrityId = celebrity.id,
-      videoId = videoId)
-    videoAssetCelebrity.save()
+      videoId = videoAsset.id).save()
+
+    blobKey
   }
 
-  protected def postVideoAssetBase: Action[MultipartFormData[TemporaryFile]] = {
+  protected def postSaveVideoAssetToS3AndDBAction: Action[MultipartFormData[TemporaryFile]] = {
 
     httpFilters.requireCelebrityId.inRequest(parse.multipartFormData) { celebrity =>
       Action(parse.multipartFormData) { request =>
@@ -69,17 +70,16 @@ trait PostVideoAssetHelper {
           val tempFile = TempFile.named(filename)
 
           resource.ref.moveTo(tempFile, true)
+          val blobKey = persist(celebrity, filename)
+          val maybeFileLocation = putFile(blobKey, filename, tempFile)
 
-          val maybeFileLocation = putFile(celebrity, filename, tempFile)      
           maybeFileLocation match {
-            case Some(maybeFileLocation) => {
-              persist(celebrity, maybeFileLocation)
-              val responseJson = getJson(celebrity, tempFile, maybeFileLocation)
+            case None => NotFound("The video " + filename + " was not found")
+            case Some(fileLocation) => {
+              val responseJson = getJson(celebrity, tempFile, fileLocation)
               Ok(responseJson)
             }
-            case None => InternalServerError("The video was not found")
           }
-
         }.getOrElse {
           BadRequest("Something went wrong with your request. Please try again.")
         }

@@ -1,6 +1,6 @@
 package services.blobs
 
-import org.jclouds.blobstore.{ BlobStoreContext, BlobStore }
+import org.jclouds.blobstore.{BlobStoreContext, BlobStore}
 import org.jclouds.io.Payload
 import java.io._
 import com.google.inject.Inject
@@ -112,8 +112,8 @@ class Blobs @Inject() (
     val applicationMode = config.applicationMode
     log("Checking application.mode before scrubbing blobstore. Must be in dev mode. Mode is: " + applicationMode)
     if (applicationMode != "dev" ||
-      config.applicationId != "test" ||
-      config.blobstoreVendor != "filesystem") {
+        config.applicationId != "test" ||
+        config.blobstoreVendor != "filesystem") {
       throw new IllegalStateException("Cannot scrub blobstore unless in dev mode, application is test, and blobstore is filesystem")
     }
 

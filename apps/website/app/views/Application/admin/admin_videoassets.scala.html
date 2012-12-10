@@ -1,4 +1,4 @@
-@(videosAndPublicNames: List[(VideoAsset, String)], status: String)(
+@(videoAssetViewModels: List[models.website.video.VideoAssetViewModel], status: String)(
   implicit authToken: egraphs.authtoken.AuthenticityToken,
   headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData)
@@ -7,6 +7,7 @@
 @import views.html.frontend.base_template
 @import models.enums.VideoStatus  
 @import controllers.WebsiteControllers
+@import models.website.video.VideoAssetViewModel
 
 @body = {
 <section id="content" class="top" role="main">
@@ -56,14 +57,14 @@
       <h1> @status Videos </h1>
 
       <div class="videos">
-          @videosAndPublicNames.map { case (video, publicName) =>
+          @videoAssetViewModels.map { case VideoAssetViewModel(videoUrl, videoId, celebrityPublicName) =>
 	
 	          <div class="video" style="margin: 20px; float: left;">
 	          
-	            <p> @publicName </p>
+	            <p> @celebrityPublicName </p>
 
                 <video width="540" height="340" controls>
-                  <source src='@video.url' type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
+                  <source src='@videoUrl' type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
                 </video>
                             
                 <table>
@@ -71,7 +72,7 @@
                     <td>
                       @safeForm('id -> "approve-video-form", 'method -> "POST", 'action -> (
                           routes.WebsiteControllers.postProcessVideoAdmin(
-                          action = VideoStatus.Approved.name, id = video.id)).url) {
+                          action = VideoStatus.Approved.name, id = videoId)).url) {
                         
                         <fieldset>
                           <div class="actions">
@@ -84,7 +85,7 @@
                     <td>
                       @safeForm('id -> "reject-video-form", 'method -> "POST", 'action -> (
                           routes.WebsiteControllers.postProcessVideoAdmin(
-                          action = VideoStatus.Rejected.name, id = video.id)).url) {
+                          action = VideoStatus.Rejected.name, id = videoId)).url) {
                         
                         <fieldset>
                           <div class="actions">

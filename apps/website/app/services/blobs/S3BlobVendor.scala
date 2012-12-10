@@ -12,9 +12,10 @@ import egraphs.playutils.Encodings.{ Base64, URL }
 import services.config.ConfigFileProxy
 import com.google.inject.Inject
 import services.Time.IntsToSeconds._
+import org.joda.time.DateTimeConstants
 
 /** [[services.blobs.Blobs.BlobProvider]] implementation backed by Amazon S3 */
-case class S3BlobVendor @Inject() (
+private[blobs] case class S3BlobVendor @Inject() (
   config: ConfigFileProxy,
   httpContent: HttpContentService) extends BlobVendor with Logging {
   val s3id = config.s3Id
@@ -37,7 +38,7 @@ case class S3BlobVendor @Inject() (
   }
 
   override def secureUrlOption(namespace: String, key: String, expirationSeconds: Int = 5 minutes): Option[String] = {
-    val expires = System.currentTimeMillis() / 1000 + expirationSeconds
+    val expires = System.currentTimeMillis() / DateTimeConstants.MILLIS_PER_SECOND  + expirationSeconds
     val baseUrl = this.context.getSigner.signGetBlob(namespace, key).getEndpoint
     val signature = this.sign(namespace = namespace, key = key, expires = expires)
 

@@ -20,7 +20,7 @@ case class VideoAssetCelebrity(
   videoId: Long = 0,
   services: VideoAssetCelebrityServices = AppConfig.instance[VideoAssetCelebrityServices])
   extends KeyedCaseClass[Long] {
-
+  
   //
   // Public members
   //

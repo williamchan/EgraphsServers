@@ -45,7 +45,7 @@ GET     /api/1.0/celebrities/me/orders                          controllers.ApiC
 POST    /api/1.0/celebrities/me/enrollmentsamples               controllers.ApiControllers.postEnrollmentSample
 POST    /api/1.0/celebrities/me/orders/$orderId<[0-9]+>         controllers.ApiControllers.postCelebrityOrder(orderId:Long)
 POST    /api/1.0/celebrities/me/orders/$orderId<[0-9]+>/egraphs controllers.ApiControllers.postEgraph(orderId:Long)
-POST    /api/1.0/celebrities/me/videoasset                      controllers.ApiControllers.postVideoAsset                 
+POST    /api/1.0/celebrities/me/videoasset                      controllers.ApiControllers.postVideoAsset
 
 ##
 ## Admin
