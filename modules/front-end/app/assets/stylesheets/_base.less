@@ -369,8 +369,6 @@ section[role=banner] {
 		background: linear-gradient(top,  rgba(239,239,239,1) 0%,rgba(255,255,255,1) 100%); /* W3C */
 		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#efefef', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */	
 
-		border-top: 8px solid @white;
-		padding-top: 40px;
 		padding-bottom: 40px;			
 		position: relative;		
 	
@@ -402,7 +400,6 @@ section[role=banner] {
 
 /* !Media Queries */
 
-
 @media (min-width: 1080px) {
 
 	#content {
@@ -411,9 +408,12 @@ section[role=banner] {
 		margin-bottom: 0;
 		
 		#main {
-
 			max-width: 1020px;			
 			top: -48px;
+  		border-top: 8px solid @white;
+  		padding-top: 40px;
+
+
 			margin-left: auto;
 			margin-right: auto;
 		
@@ -422,7 +422,3 @@ section[role=banner] {
 	}	
 
 }
-
-
-
-
