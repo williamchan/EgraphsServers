@@ -11,7 +11,6 @@ import utils.FunctionalTestUtils.{
 import utils.TestConstants
 import play.api.test.Helpers._
 import utils.EgraphsUnitTest
-import controllers.routes.ApiControllers.getCelebrityOrders
 import services.Utils
 import services.AppConfig
 import services.config.ConfigFileProxy
@@ -27,7 +26,7 @@ class GetCelebrityOrdersApiEndpointTests
   extends EgraphsUnitTest
   with ProtectedCelebrityResourceTests
 {
-  protected def routeUnderTest = getCelebrityOrders()
+  protected def routeUnderTest = controllers.routes.ApiControllers.getCelebrityOrders()
   private def orderStore = AppConfig.instance[OrderStore]
   private def db = AppConfig.instance[DBSession]
 
@@ -116,7 +115,7 @@ class GetCelebrityOrdersApiEndpointTests
    * Assemble the request and get the result.
    */
   private def routeAndCallGetCelebrityOrders(celebrityAccount: Account, signerActionable: Option[Boolean] = Some(true)): Result = {
-    val url = getCelebrityOrders(signerActionable = signerActionable).url
+    val url = controllers.routes.ApiControllers.getCelebrityOrders(signerActionable = signerActionable).url
     val req = requestWithCredentials(celebrityAccount).copy(method = GET, uri = url)
     val Some(result) = routeAndCall(req)
     result
