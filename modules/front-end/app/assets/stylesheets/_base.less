@@ -57,6 +57,32 @@ a, a:link, a:visited {
 
 }
 
+/* !Celebrity Search Box */
+.celebrity-searchbox-container() {
+  input[type=search] {
+    .inline-block;
+    vertical-align: middle;
+    font-size: 20px;
+    width: 96%;
+    color: @orange;
+    margin: 0;
+    background: @white url(../images/bg-icon-magnify.png) no-repeat 95% 50%;
+
+    &::-webkit-input-placeholder {
+      color: @orange;
+    }
+
+    &::-moz-placeholder {
+      color: @orange;
+    }
+
+    &::-ms-placeholder {
+      color: @orange;
+    }
+
+  }
+}
+
 /* !Ribbons */
 div.ribbon {	
 	position: absolute;

@@ -121,6 +121,7 @@ POST    /account/reset                                              controllers.
 GET     /account/verify                                             controllers.WebsiteControllers.getVerifyAccount(email: String, resetKey: String)
 GET     /account/:galleryCustomerId/gallery                         controllers.WebsiteControllers.getCustomerGalleryById(galleryCustomerId: Long)
 GET     /account/:username                                          controllers.WebsiteControllers.getCustomerGalleryByUsername(username: String)
+GET     /affiliates                                                 controllers.WebsiteControllers.getAffiliates
 #GET     /careers                                                    controllers.WebsiteControllers.getCareers
 GET     /egraph/$orderId<[0-9]+>                                    controllers.WebsiteControllers.getEgraphRedirect(orderId: Long)
 GET     /$orderId<[0-9]+>                                           controllers.WebsiteControllers.getEgraph(orderId: Long)

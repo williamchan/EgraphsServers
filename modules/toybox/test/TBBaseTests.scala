@@ -2,6 +2,7 @@ package egraphs.toybox.tests
 
 import egraphs.toybox.tests.TBFakes._
 import controllers._
+import controllers.ToyBoxConfigKeys._
 
 import play.api.mvc._
 import play.api.mvc.Results._
@@ -55,6 +56,10 @@ class DefaultTBBaseTests extends FlatSpec with ShouldMatchers {
     it should "renew authentication cookie for authenticated requests" in {
       assert(resultSetsCookie(authResult, FakeToyBox.authCookieName),
         "Result for authenticated request does not renew cookie.")
+    }
+
+    it should "allow requests that contain ipad header and secret" in {
+      status(routeRequestToSimpleResult(iPadRequest)) should be (OK)
     }
   }
 }

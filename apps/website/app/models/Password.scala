@@ -28,8 +28,8 @@ object Password {
     override val message = "Non-empty password is required"
   }
   
-  case class PasswordTooLong(attempted: String) extends PasswordError {
-    override val message = "Password must be at least " + Account.minPasswordLength + "characters"
+  case class PasswordTooShort(attempted: String) extends PasswordError {
+    override val message = "Password must be at least " + Account.minPasswordLength + " characters"
   } 
   
   /**
@@ -58,7 +58,7 @@ object Password {
       if (password.length() >= Account.minPasswordLength) {
         Right(password)
       } else {
-        Left(PasswordTooLong(password))
+        Left(PasswordTooShort(password))
       }
     } else {
       Left(PasswordRequired)

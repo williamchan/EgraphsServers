@@ -52,7 +52,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       SortOptionViewModel(
         name = sortingType.name,
         display = sortingType.displayName,
-        active = (Some(sortingType) == selectedSortingType))
+        active = (sortingType == selectedSortingType.getOrElse(CelebritySortingTypes.MostRelevant)))
     }
   }
 
@@ -66,13 +66,15 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         tuple(
           "query" -> optional(nonEmptyText),
           "sort" -> optional(nonEmptyText),
-          "view" -> optional(nonEmptyText)
+          "view" -> optional(nonEmptyText),
+          "availableOnly" -> optional(boolean)
         )
       )
 
-      val (queryOption, sortOption, viewOption) = marketplaceResultPageForm.bindFromRequest.get
+      val (queryOption, sortOption, viewOption, availableOnlyOption) = marketplaceResultPageForm.bindFromRequest.get
 
       val maybeSortType = sortOption.flatMap(sort => CelebritySortingTypes(sort))
+      val availableOnly = availableOnlyOption.getOrElse(false)
 
       val categoryAndCategoryValues = for {
         (key, set) <- request.queryString
@@ -146,12 +148,18 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
 
       // Sort results
       import CelebritySortingTypes._
-      val celebrities = maybeSortType.getOrElse(CelebritySortingTypes.MostRelevant) match {
+      val sortedCelebrities = maybeSortType.getOrElse(CelebritySortingTypes.MostRelevant) match {
         case MostRelevant => unsortedCelebrities
         case PriceAscending => unsortedCelebrities.toList.sortWith((a,b) => a.minPrice < b.minPrice)
-        case PriceDecending => unsortedCelebrities.toList.sortWith((a,b) => a.maxPrice < b.maxPrice)
+        case PriceDescending => unsortedCelebrities.toList.sortWith((a,b) => a.maxPrice < b.maxPrice)
         case Alphabetical => unsortedCelebrities.toList.sortWith((a,b) => a.publicName < b.publicName)
         case _ => unsortedCelebrities
+      }
+
+      val celebrities = if(availableOnly){
+        sortedCelebrities.filter(c => !c.soldout)
+      } else {
+        sortedCelebrities
       }
 
       val viewAsList = viewOption == Some("list") // "list" should be a part of an Enum
@@ -189,7 +197,9 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         verticalViewModels = getVerticals(activeCategoryValues),
         results = ResultSetViewModel(subtitle = Option(subtitle), celebrities),
         categoryViewModels = categoryViewModels,
-        sortOptions = sortOptionViewModels(maybeSortType)))
+        sortOptions = sortOptionViewModels(maybeSortType),
+        availableOnly = availableOnly)
+      )
     }
   }
   

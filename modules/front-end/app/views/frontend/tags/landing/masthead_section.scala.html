@@ -1,9 +1,11 @@
-@(mastheadMessage: Option[String] = None,
+@(celebrityPublicName: Option[String] = None,
+  mastheadMessage: Option[String] = None,
   mastheadImageUrl: String, 
   getStartedUrl: Option[String] = None
 )
 
 @import controllers._
+@import views.html.frontend.tags
 
 <section id="masthead-home" role="banner" style="background-image: url(@mastheadImageUrl);">
 
@@ -17,12 +19,13 @@
 
           <h1>@mastheadMessage.getOrElse("Give the gift of an MLB star this holiday season.")</h1>
 
-          @getStartedUrl.map { url =>
-            <p>
-              <a id="get-started-button" href="@url" class="button get-started">
-                <strong>Get Started</strong><span>&raquo;</span>
-              </a>
-            </p>
+          @getStartedUrl.map{ url =>
+            @{
+              celebrityPublicName match {
+                case None => tags.landing.searchbox(url)
+                case Some(name) => tags.landing.get_started(url)
+              }
+            }
           }
 
         </div>

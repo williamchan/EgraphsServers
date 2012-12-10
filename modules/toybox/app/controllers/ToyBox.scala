@@ -10,6 +10,7 @@ import play.api.libs.Crypto
 import play.api.data.Forms._
 import play.api.data.{Form, Forms}
 import play.api.data.format.Formats._
+import org.joda.time.DateTimeConstants._
 
 import ToyBoxConfigKeys._
 
@@ -26,31 +27,26 @@ trait ToyBox extends DefaultTBBase with DefaultTBController with DefaultTBAuthen
 trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
   this: ToyBoxController with ToyBoxAuthenticator =>
 
-  // Delegate this to the actual ToyBox object so they can choose whether to default
-  // the routes to defaultLoginPath nicely by setting to None
-  def maybeGetLoginRoute: Option[Call]
-  def maybePostLoginRoute: Option[Call]
-  def maybeAssetsRoute: Option[String => Call]
-
   // Routes
-  val defaultLoginPath = "/toybox/login"
-  val defaultAssetsPath = "/assets/"
+  lazy val getLoginRoute = new Call("GET", loginPath)
+  lazy val postLoginRoute = new Call("POST", loginPath)
   val toyboxAssetsDirectory = "toybox-assets/"
-  lazy val getLoginRoute  = maybeGetLoginRoute.getOrElse(new Call("GET", defaultLoginPath))
-  lazy val postLoginRoute = maybePostLoginRoute.getOrElse(new Call("POST", defaultLoginPath))
-  lazy val assetsRoute = maybeAssetsRoute.getOrElse({ (file: String) => 
-    new Call("GET", defaultAssetsPath + implicitly[PathBindable[String]].unbind("file", file))
-  })
-
 
   // General ToyBox configuration
   lazy val config = Play.current.configuration.getConfig("toybox").getOrElse(
     throw new IllegalStateException("ToyBox subconfiguration not present."))
+  
   lazy val authPassword = config.getString(passwordKey).getOrElse(
-    throw new IllegalStateException("No password configured."))
+    if (isPrivate) throw new IllegalStateException("No password configured.")
+    else ""
+  )
 
   lazy val authUsername = config.getString(userKey).getOrElse("")
   lazy val isPrivate    = config.getBoolean(privateKey).getOrElse(true) 
+
+  // iPad authorization configuration
+  lazy val iPadHeader: Option[String] = config.getString(iPadHeaderKey)
+  lazy val iPadSecret: Option[String] = config.getString(iPadSecretKey)
 
 
   /** Paths to public assets and pages. Could also pull more paths from config or replace
@@ -58,21 +54,34 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
    */
   lazy val publicAccessConditions: Seq[RequestHeader => Boolean] = 
     Seq( 
+      // GET login
       { (request: RequestHeader) => request.method.toLowerCase == "get" && 
           request.path.startsWith(getLoginRoute.url) }, 
 
+      // POST login
       { (request: RequestHeader) => request.method.toLowerCase == "post" && 
           request.path.startsWith(postLoginRoute.url) }, 
 
+      // ToyBox assets
       { (request: RequestHeader) => 
-        request.path.startsWith(assetsRoute(toyboxAssetsDirectory).url) }
+        request.path.startsWith(assetsRoute(toyboxAssetsDirectory).url) },
+
+      // iPad authentication
+      { (request: RequestHeader) =>
+        { for (
+            headerName <- iPadHeader;
+            headerVal <- request.headers.get(headerName);
+            secret <- iPadSecret
+          ) yield { secret == headerVal }
+        }.getOrElse(false)
+      }
     )
 
   
   // Cookie configuration
   lazy val initialRequestCookieName = config.getString(initRequestKey).getOrElse("toybox-initial-request")
   lazy val authCookieName = config.getString(authCookieKey).getOrElse("toybox-authenticated")
-  lazy val authTimeoutInSeconds = config.getInt(authTimeoutInSecondsKey).getOrElse(40*60)  // 40 minute default
+  lazy val authTimeoutInSeconds = config.getInt(authTimeoutInSecondsKey).getOrElse(SECONDS_PER_DAY)
   lazy val authPath = config.getString(authPathKey).getOrElse("/")
   lazy val authDomain = config.getString(authDomainKey)
 
@@ -92,26 +101,66 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
    *  a signed cookie that needs to be renewed periodically.
    */
   override def onRouteRequest(request: RequestHeader): Option[Handler] = {
-    val forPublicResource = isPublicResourceRequest(request)
-    val authorized = isAuthorized(request)
 
-    if (forPublicResource) normalRouteRequestHandler(request)
-    else if (authorized)   handleAuthorized(request)
-    else                   redirectToLogin(request)
+    if (isLoginRequest(request)) {
+      Some(loginHandler(request))
+    
+    } else if (isPublicResourceRequest(request)) {
+      normalRouteRequestHandler(request)
+    
+    } else if (isAuthorized(request)) {
+      handleAuthorized(request)
+    
+    } else {
+      Some(redirectToLogin(request))
+    }
   }
 
+  protected def isLoginRequest(request: RequestHeader) = { 
+    val forLoginPath = request.method match {
+      case "GET" => request.path == getLoginRoute.url
+      case "POST" => request.path == postLoginRoute.url
+      case _ => false 
+    } 
+    forLoginPath && isPrivate
+  }
 
-  /** Method pointing to the parent's onRouteRequtest method. Used to make testing easier. */
-  protected def normalRouteRequestHandler: RequestHeader => Option[Handler] = super.onRouteRequest
+  protected def loginHandler(request: RequestHeader): Handler = {
+    if (request.method == "GET") 
+      getLogin
+    else
+      postLogin
+  }
+
+  /** Method pointing to the parent's onRouteRequest method. Used to make testing easier. */
+  protected def normalRouteRequestHandler: (RequestHeader => Option[Handler]) = super.onRouteRequest
 
 
   /** Handler for authorized requests to private resources. Sets a new authentication
    *  Cookie to keep it from expiring while the user is active.
    */
   protected def handleAuthorized(request: RequestHeader): Option[Handler] = {
-    normalRouteRequestHandler(request) match {
-      case Some(action: Action[AnyContent]) => Some(authenticate(action))
-      case other => other
+    val handler: Option[Handler] = normalRouteRequestHandler(request)
+    (request.contentType, handler) match {
+      case (Some("multipart/form-data"), _) => {
+        /**
+         * We need to handle this as a special case otherwise the subsequent line will try to cast
+         * multipart form POSTs to AnyContent, and we get the following exception message:
+         * ClassCastException: play.api.mvc.AnyContentAsMultipartFormData cannot be cast to play.api.mvc.MultipartFormData.
+         *
+         * This exception can be reproduced by deleting this case and attempting a multipart form POST.
+         * Checking the contentType of the request allows us to identify multipart form POSTs without triggering
+         * a ClassCastException.
+         *
+         * The issue stems from that the type parameter of the action is erased by the JVM at runtime, so we cannot
+         * pattern match on type parameters. We also considered using a scala.reflect.Manifest, which is a class
+         * that represents Scala types, but decided against that since this is the only instance of this issue.
+         * http://stackoverflow.com/questions/1094173/how-do-i-get-around-type-erasure-on-scala-or-why-cant-i-get-the-type-paramete
+         */
+        handler
+      }
+      case (_, Some(action: Action[AnyContent])) => Some(authenticate(action))
+      case (_, other) => other
     }
   }
 
@@ -119,14 +168,13 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
   /** Generates a redirect to the log-in page and sets a Cookie containing the method
    *  and path of the request received for later redirection, if none already exists.
    */
-  protected def redirectToLogin(request: RequestHeader): Option[Handler] = Some( 
-    Action {
-      request.cookies.get(initialRequestCookieName) match {
-      case Some(cookie: Cookie) => Redirect(getLoginRoute)
-      case None => Redirect(getLoginRoute).withCookies( 
-          makeInitialRequestCookie(request)) 
-      }
-    })
+  protected def redirectToLogin(request: RequestHeader): Handler = Action {
+    request.cookies.get(initialRequestCookieName) match {
+    case Some(cookie: Cookie) => Redirect(getLoginRoute)
+    case None => Redirect(getLoginRoute).withCookies( 
+        makeInitialRequestCookie(request)) 
+    }
+  }
 
   /** Creates a Cookie holding the method and path of the given request */
   protected def makeInitialRequestCookie(request: RequestHeader): Cookie = {
@@ -194,19 +242,16 @@ trait DefaultTBAuthenticator extends ToyBoxAuthenticator { this: ToyBoxBase =>
   /** Checks if a request is authorized to access protected resources */
   def isAuthorized(request: RequestHeader) = {
     // Checks for signed authentication Cookie in a request
-    val hasAuthCookie = 
-      request.cookies.get(authCookieName) match {
-        case Some(Cookie(_, signature, _, _, _, _, _)) =>
-          signature == Crypto.sign(request.remoteAddress)
-        case _ => false
-      }
-
-    !isPrivate || hasAuthCookie
+    request.cookies.get(authCookieName) match {
+      case Some(Cookie(_, signature, _, _, _, _, _)) =>
+        signature == Crypto.sign(request.remoteAddress)
+      case _ => false
+    }
   }
 
   /** Checks if a request is for a public resource */
   def isPublicResourceRequest(request: RequestHeader) = {
-    publicAccessConditions.exists(_.apply(request))
+    !isPrivate || publicAccessConditions.exists(_.apply(request))
   }
 
 
@@ -258,4 +303,8 @@ object ToyBoxConfigKeys {
 
   /** Key to authentication cookie domain */
   val authDomainKey = "auth-domain"
+
+  /** Keys for iPad head and secret (for iPad authentication) */
+  val iPadHeaderKey = "ipad-header"
+  val iPadSecretKey = "ipad-secret"
 }

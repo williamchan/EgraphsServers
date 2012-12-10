@@ -4,7 +4,8 @@
   verticalViewModels: Iterable[models.frontend.marketplace.VerticalViewModel], 
   results: models.frontend.marketplace.ResultSetViewModel,
   categoryViewModels: List[models.frontend.marketplace.CategoryViewModel] = List[models.frontend.marketplace.CategoryViewModel](),
-  sortOptions: Iterable[models.frontend.marketplace.SortOptionViewModel]
+  sortOptions: Iterable[models.frontend.marketplace.SortOptionViewModel],
+  availableOnly: Boolean = false
   )(
   implicit
   headerData: models.frontend.header.HeaderData,
@@ -29,11 +30,14 @@
     (a, b) => a ++ b.asActiveMap
   )).toString
  );
+ Egraphs.page.categorySelected = @categoryViewModels.exists(c => c.active);
  Egraphs.page.queryUrl = "@marketplaceRoute";
  Egraphs.page.query = "@query";
  Egraphs.page.sort = "@sortOptions.find(v => v.active).map(v => v.name)";
  Egraphs.page.view = @if(viewAsList){"list"} else {""};
  Egraphs.page.results = @Html(Json.toJson(results).toString);
+ Egraphs.page.availableOnly = @availableOnly;
+
 }
 
 @baseBody = {
@@ -45,13 +49,13 @@
     <div class="row-fluid">
     
       <div class="span12 masthead" role="masthead">
-      
+
         <form action="@marketplaceRoute" method="get">
             <input name="query" id="celebrity-searchbox" type="search" placeholder="Find Your Star" value="@query" @if(query.length == 0 && !categoryViewModels.exists(c => c.active)) {autofocus}>
             <input name="view" type="hidden" value="@if(viewAsList){list}"> </input>
             <input type="hidden" name="sort" value="@sortOptions.find(v => v.active).map(v => v.name)">
         </form>
-      
+
         <img src='@EgraphsAssets.at("images/marketplace-masthead.jpg")'/>
       
       </div>
@@ -80,7 +84,7 @@
           @if(viewAsList) {
             @tags.marketplace.result_set_list(results)
           } else {
-            @tags.marketplace.result_set()
+            @tags.marketplace.result_set(availableOnly)
           }
         </div>
       </div>

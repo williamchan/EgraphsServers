@@ -8,6 +8,7 @@ import models.xyzmo._
 import org.apache.axis2.transport.http.{HTTPConstants, HttpTransportProperties}
 import org.slf4j.Logger
 import models.{EnrollmentSample, Egraph, EnrollmentBatch}
+import org.apache.axis2.AxisFault
 
 trait XyzmoBiometricServicesBase {
 
@@ -41,10 +42,18 @@ trait XyzmoBiometricServicesBase {
   def verify(egraph: Egraph): Either[SignatureBiometricsError, XyzmoVerifyUser] = {
     val signatureJson: String = egraph.assets.signature
 
-    val sdc = getSignatureDataContainerFromJSON(signatureJson)
-    val xyzmoVerifyUser: XyzmoVerifyUser = verifyUser(egraph = egraph, sdc)
-    xyzmoVerifyUser.save()
-    Right(xyzmoVerifyUser)
+    try {
+      val sdc = getSignatureDataContainerFromJSON(signatureJson)
+      Right(verifyUser(egraph = egraph, sdc).save())
+    } catch {
+      case e: AxisFault if (e.getCause.getClass.getCanonicalName == "com.ctc.wstx.exc.WstxLazyException") => {
+        /**
+         * SER-560: The Xyzmo client jar would throw this exception if the signature json were really short.
+         * We want those signatures to fail verification, so we catch this exception and return an error.
+         */
+        Left(new SignatureBiometricsError())
+      }
+    }
   }
 
   protected[signature] def addUser(enrollmentBatch: EnrollmentBatch): XyzmoAddUser = {
