@@ -4,7 +4,7 @@
   section {
     border-top: 1px solid @white;
     border-bottom: 1px solid lighten(@gray, 50%);
-    padding-top:15px;
+    padding-top:5px;
     padding-bottom:15px;
 
     &.first {
@@ -17,6 +17,12 @@
     text-transform: uppercase;
     font-size:16px;
     font-weight:600;
+  }
+
+  .hint {
+    color:#808080;
+    font-size:14px;
+    font-weight:300;
   }
 
 
@@ -41,49 +47,85 @@
   }
 
   #choose-amount {
-    button.btn {
-      border-radius:0px;
-      position:relative;      
-      .buttonBackground(lighten(@gray, 60%), lighten(@gray, 45%));
-      color: #333;
-      height:70px;
-      width:100%;
-      text-transform:uppercase;
-      font-weight:300;
-      font-size:36px;
+    .amount-option {
+      position:relative;
 
-      .dollah {
+      button.btn {
+        border-radius:0px;
         position:relative;
-        vertical-align:super;
-        top:3px;
-        font-size:22px;
+        .buttonBackground(lighten(@gray, 60%), lighten(@gray, 45%));
+        color: #333;
+        height:70px;
+        width:100%;
+        text-transform:uppercase;
+        font-weight:300;
+        font-size:36px;
+
+        .dollah {
+          position:relative;
+          vertical-align:super;
+          top:3px;
+          font-size:22px;
+        }
+
+        &:hover {
+          .gradientBar(lighten(@orange, 30%), lighten(@orange, 40%));
+          *background-color: @orange;        
+          border:1px solid lighten(@orange, 25%);
+        }
+
+        &.active, &:active {
+          .gradientBar(@orange, lighten(@orange, 10%));
+          *background-color: @orange;
+          .reset-filter();
+          // font-weight:600;
+          color:white;
+          text-shadow: 0px -1px 0px black;
+        }
+      } // End button.btn
+
+      &.own-amount {
+        button.btn {
+          font-size:20px;
+        }
+
+        #amount-field {
+          position:relative;
+          display:inline-block;
+          float:right;
+          margin-top:15px;
+
+          .dollah {
+            position:relative;
+            top:-2px;
+            color:#333;
+            font-size:20px;
+            padding-right:7px;
+          }
+
+          input {
+            max-width:70px;
+          }
+        }
       }
+    } // End .amount-option
 
-
-      &:hover {
-        @lightBorder: 1px solid lighten(@orange, 30%);
-        @darkBorder: 1px solid lighten(@orange, 25%);
-        .gradientBar(lighten(@orange, 30%), lighten(@orange, 40%));
-        border:@darkBorder;
-        //border-bottom: @darkBorder;
-        //border-left:@lightBorder;
-        //border-top:@lightBorder;
-        //border-right:@lightBorder;
-      }
-
-      &.active, &:active {
-        .gradientBar(@orange, lighten(@orange, 10%));
-        *background-color: @orange;
-        .reset-filter();
-        // font-weight:600;
-        color:white;
-        text-shadow: 0px -1px 0px black;
-      }
-
+    .hint {
+      padding-top:4px;
+      text-align:center;
+      line-height:normal;
     }
 
-    .own-amount button.btn {
-      font-size:20px;
+  } // End .choose-amount
+} // End #content
+
+@media (max-width:767px) {
+  #content.gift-certificate-checkout {  
+    #choose-amount {
+      .amount-option {
+        // Space out the buttons once they snap to vertical alignment
+        margin-bottom: 15px;
+      }
     }
   }
 }
