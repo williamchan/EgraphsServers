@@ -131,21 +131,23 @@
   }
 
   #billing-review-column {
-    border-right:@separatorColor;
-    .box-shadow(1px 1px 0px white);
-
     #card_exp_year_chzn {
       width:50px;
     }
+
+    fieldset {
+      max-width:380px;
+    }
+  }
+
+  #review {
+    display: none;
   }
 
   input#card-cvc, input#postal-code {
     max-width:50px;
   }
 
-  .price-summary {
-    border-top:1px solid white;
-  }
 } // End #content
 
 @media (max-width:767px) { #content.gift-certificate-checkout {  
@@ -169,9 +171,5 @@
   #billing-review-column {
     border-right:none;
     .box-shadow(none);
-  }
-
-  aside.price-summary {
-    display:none;
   }
 }}
