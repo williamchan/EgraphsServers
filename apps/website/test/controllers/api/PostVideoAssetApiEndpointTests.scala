@@ -35,7 +35,7 @@ class PostVideoAssetApiEndpointTests extends EgraphsUnitTest with ProtectedCeleb
    * This test currently fails. Play currently doesn't allow for the necessary manipulation of AsyncResult required to adequately 
    * test an asynchronous POST request. Look forward to Play 2.1 for improvements.
    */
-  ignore should "accept multipartFormData, respond with OK, and verify file creation in the blobstore" in new EgraphsTestApplication {
+  it should "accept multipartFormData, respond with OK, and verify file creation in the blobstore" in new EgraphsTestApplication {
 
     val password = "bubble toes"
 
@@ -65,7 +65,9 @@ class PostVideoAssetApiEndpointTests extends EgraphsUnitTest with ProtectedCeleb
     val blob: Blobs = AppConfig.instance[Blobs]
     val videoAssetCelebrityStore: VideoAssetCelebrityStore = AppConfig.instance[VideoAssetCelebrityStore]
 
-    val maybeVideoAsset = videoAssetCelebrityStore.getVideoAssetByCelebrityId(celebrityId)
+    val maybeVideoAsset = db.connected(TransactionSerializable) {
+      videoAssetCelebrityStore.getVideoAssetByCelebrityId(celebrityId)
+    }
 
     maybeVideoAsset match {
       case None => fail("There is no video asset associated with celebrityId " + celebrityId)
@@ -80,8 +82,8 @@ class PostVideoAssetApiEndpointTests extends EgraphsUnitTest with ProtectedCeleb
   private def myStatus(result: Result): Int = {
     println(result)
     result match {
-      case plainResult: PlainResult => status(plainResult)
       case asyncResult: AsyncResult => myStatus(asyncResult.result.await(30 * DateTimeConstants.MILLIS_PER_SECOND).get)
+      case anythingElse => status(result)  
     }
   }
 }

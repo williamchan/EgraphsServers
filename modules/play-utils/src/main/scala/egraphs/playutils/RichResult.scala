@@ -47,9 +47,9 @@ class RichResult(result: Result) {
   }
 
   private def withSession(result: Result, session: Session): Result = {
-    this.result match {
+    result match {
       case plainResult: PlainResult => plainResult.withSession(session)
-      case asyncResult: AsyncResult => AsyncResult(asyncResult.result.map( result => this.withSession(result, session)))
+      case asyncResult: AsyncResult => AsyncResult(asyncResult.result.map( result => withSession(result, session)))
       case otherResult => throw new IllegalStateException("Result type without withSession, idk what to do with result = " + otherResult)
     }
   }
