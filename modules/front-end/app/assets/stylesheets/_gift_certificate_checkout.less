@@ -1,9 +1,10 @@
 // Styles for the gift certificate checkout page
 
 #content.gift-certificate-checkout {
+  @separatorColor: 1px solid lighten(@gray, 50%);
   section {
-    border-top: 1px solid @white;
-    border-bottom: 1px solid lighten(@gray, 50%);
+    border-bottom:@separatorColor;
+    .box-shadow(0px 1px 0px white);
     padding-top:7px;
     padding-bottom:15px;
 
@@ -99,7 +100,7 @@
 
           .dollah {
             position:relative;
-            top:-2px;
+            top:-1px;
             color:#333;
             font-size:20px;
             padding-right:7px;
@@ -118,13 +119,23 @@
     }
   } // End .choose-amount
 
-  #recipient {
-    .herp {
-      padding-right:3px;
-    }
+  #personalize {
     input {
       width:100%;
     }
+
+    .input.gifter-name {
+      margin-top:15px;
+    }
+  }
+
+  #billing-review-column {
+    border-right:@separatorColor;
+    .box-shadow(1px 1px 0px white);
+  }
+
+  .price-summary {
+    border-top:1px solid white;
   }
 } // End #content
 
@@ -136,7 +147,7 @@
     }
   }
 
-  #recipient {
+  #personalize {
     div.input {
       padding-right:10px;
 
@@ -144,5 +155,14 @@
         width: 100%;
       }
     }
+  }
+
+  #billing-review-column {
+    border-right:none;
+    .box-shadow(1px 0px 0px white);
+  }
+
+  aside.price-summary {
+    display:none;
   }
 }}

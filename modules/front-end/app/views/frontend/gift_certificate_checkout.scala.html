@@ -56,108 +56,118 @@
           </div>
         </section>
         
-        <section id="recipient">
-          <h2>Recipient's Name:</h2>
+        <section id="personalize">
+          <h2>Personalize:</h2>
           <div class="row-fluid">
-            <div class="span6 input">
-              <input id="recipient-name"
-                     type="text"
-                     name="recipient-name">
+            <div class="span6 input recipient-name">
+              <label class="instructions" for="recipient-name">Recipient name:</label>            
+              <input id="recipient-name" type="text" name="recipient-name">
               <div class="hint">
-                The PDF will have the recipient's name on it. You can print it out and give it to him/her or just forward the email you receive after this purchase.
+                The certificate PDF you receive will contain both your name and the recipient's .
               </div>
             </div>
           </div>
-        </section>
-        <aside class="price-summary">
-          <table>
-            <tr>
-              <th>Subtotal</th>
-              <td>$75.00</td>
-            </tr>
-            <tr>
-              <th>Tax</th>
-              <td>$0.00</td>
-            </tr>
-            <tr id="total">
-              <th>Total</th>
-              <td>$0.00</td>
-            </tr>
-          </table>
-        </aside>
-        <section id="billing">
-          <h2>Billing information:</h2>
-          <fieldset>
-            @tags.bootstrap_text_input_field("Card number:", Field.empty("card-number"))
-            <div class="field" >
-              <div class="clearfix">
-                <label class="instructions" for="card-exp-month">Exp. Date:</label>
-                <div class="input select card-expiry">
-                  <select id="card-exp-month" class="inline chsn-select" data-placeholder="Month">
-                    <option value></option>
-                    <option value="01">January</option>
-                    <option value="02">February</option>
-                    <option value="03">March</option>
-                    <option value="04">April</option>
-                    <option value="05">May</option>
-                    <option value="06">June</option>
-                    <option value="07">July</option>
-                    <option value="08">August</option>
-                    <option value="09">September</option>
-                    <option value="10">October</option>
-                    <option value="11">November</option>
-                    <option value="12">December</option>
-                  </select>
-                  <select id="card-exp-year" name="card-exp-year" class="inline chsn-select" data-placeholder="Year">
-                    <option value></option>
-                    @for(year <- 2012 to 2020) {
-                      <option value="@year">@year</option>
-                    }
-                  </select>
-                  <div class="alert alert-error hidden">
-                    <button type="button" class="close" data-dismiss="alert">&times;</button>
-                    <span class="error-message">Expiry date error</span>
-                  </div>
-                </div>            
-              </div>
-            </div> <!-- end .field -->  
-            <div class="field">
-              <div class="clearfix">
-                <label class="instructions" for="card-cvc">Security Code:</label>
-                <div class="input card-cvc">
-                  <p>
-                    <input id="card-cvc" type="text" name="card-cvc" class="inline" size="4">
-                    @**   <small><a href="#" class="tip">What's this?</a></small> *@
-                    <div class="alert alert-error hidden">
-                      <button type="button" class="close" data-dismiss="alert">&times;</button>
-                      <span class="error-message"></span>
-                    </div>
-                  </p>
-                </div>
-              </div>
-            </div> <!-- end .field -->          
-            @tags.bootstrap_text_input_field("Full name:", Field.empty("full-name"))
-            @tags.bootstrap_text_input_field("Email:", Field.empty("e-mail"))
-          </fieldset>
-        </section>
-        <section id="review">
-          <h2>Review order:</h2>
-          <div class="purchaser-summary">
-            <div class="amount-recipient">
-              <h3>Amount:</h3>
-              <div class="summary-item">$75.00</div>
-              <h3>Recipient's Name:</h3>
-              <div class="summary-item">Andy Johnson</div>
+          <div class="row-fluid">
+            <div class="span6 input gifter-name">
+            <label class="instructions" for="gifter-name">Gift giver's name:</label>
+            <input id="gifter-name" type="text" name="gifter-name">
             </div>
-            <div class="billing">
-              <h3>Billing information:</h3>
-              <div class="summary-item">
-                <p>Joshua Johnson</p>
-                <p class="card-number-placeholder">Visa XXXXXXXXXXXX4021</p>
-              </div>
-            </div> <!-- End .billing -->
-          </div> <!-- End .purchaser-summary -->
-          <div class="price-summary">
+          </div>          
+        </section>
+        <div class="row-fluid">
+          <div id="billing-review-column" class="span7">
+            <section id="billing">
+              <h2>Billing information:</h2>
+              <fieldset>
+                @tags.bootstrap_text_input_field("Card number:", Field.empty("card-number"))
+                <div class="field" >
+                  <div class="clearfix">
+                    <label class="instructions" for="card-exp-month">Exp. Date:</label>
+                    <div class="input select card-expiry">
+                      <select id="card-exp-month" class="inline chsn-select" data-placeholder="Month">
+                        <option value></option>
+                        <option value="01">January</option>
+                        <option value="02">February</option>
+                        <option value="03">March</option>
+                        <option value="04">April</option>
+                        <option value="05">May</option>
+                        <option value="06">June</option>
+                        <option value="07">July</option>
+                        <option value="08">August</option>
+                        <option value="09">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                      </select>
+                      <select id="card-exp-year" name="card-exp-year" class="inline chsn-select" data-placeholder="Year">
+                        <option value></option>
+                        @for(year <- 2012 to 2020) {
+                          <option value="@year">@year</option>
+                        }
+                      </select>
+                      <div class="alert alert-error hidden">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        <span class="error-message">Expiry date error</span>
+                      </div>
+                    </div>            
+                  </div>
+                </div> <!-- end .field -->  
+                <div class="field">
+                  <div class="clearfix">
+                    <label class="instructions" for="card-cvc">Security Code:</label>
+                    <div class="input card-cvc">
+                      <p>
+                        <input id="card-cvc" type="text" name="card-cvc" class="inline" size="4">
+                        @**   <small><a href="#" class="tip">What's this?</a></small> *@
+                        <div class="alert alert-error hidden">
+                          <button type="button" class="close" data-dismiss="alert">&times;</button>
+                          <span class="error-message"></span>
+                        </div>
+                      </p>
+                    </div>
+                  </div>
+                </div> <!-- end .field -->          
+                @tags.bootstrap_text_input_field("Full name:", Field.empty("full-name"))
+                @tags.bootstrap_text_input_field("Postal code:", Field.empty("postal-code"))
+                @tags.bootstrap_text_input_field("Email:", Field.empty("e-mail"))
+              </fieldset>
+            </section>
+            <section id="review">
+              <h2>Review order:</h2>
+              <div class="purchaser-summary">
+                <div class="amount-recipient">
+                  <h3>Amount:</h3>
+                  <div class="summary-item">$75.00</div>
+                  <h3>Recipient's Name:</h3>
+                  <div class="summary-item">Andy Johnson</div>
+                </div>
+                <div class="billing">
+                  <h3>Billing information:</h3>
+                  <div class="summary-item">
+                    <p>Joshua Johnson</p>
+                    <p class="card-number-placeholder">Visa XXXXXXXXXXXX4021</p>
+                  </div>
+                </div> <!-- End .billing -->
+              </div> <!-- End .purchaser-summary -->
+              <div class="price-summary">
+                <table>
+                  <tr>
+                    <th>Subtotal</th>
+                    <td>$75.00</td>
+                  </tr>
+                  <tr>
+                    <th>Tax</th>
+                    <td>$0.00</td>
+                  </tr>
+                  <tr id="total">
+                    <th>Total</th>
+                    <td>$0.00</td>
+                  </tr>
+                </table>
+              </div> <!-- End .price-summary -->
+            </section>
+          </div>
+          <aside class="span5 price-summary">
             <table>
               <tr>
                 <th>Subtotal</th>
@@ -172,8 +182,8 @@
                 <td>$0.00</td>
               </tr>
             </table>
-          </div> <!-- End .price-summary -->
-        </section>
+          </aside>
+        </div>
       </div>
     </div>
   </div>
