@@ -75,9 +75,7 @@
         }
 
         &:hover {
-          .gradientBar(lighten(@orange, 30%), lighten(@orange, 40%));
-          *background-color: @orange;        
-          border:1px solid lighten(@orange, 25%);
+          border:1px solid @orange;
         }
 
         &.active, &:active {
@@ -119,6 +117,7 @@
       padding-top:4px;
       text-align:center;
     }
+
   } // End .choose-amount
 
   #personalize {
@@ -169,7 +168,7 @@
 
   #billing-review-column {
     border-right:none;
-    .box-shadow(1px 0px 0px white);
+    .box-shadow(none);
   }
 
   aside.price-summary {
