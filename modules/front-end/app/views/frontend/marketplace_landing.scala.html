@@ -1,0 +1,86 @@
+@(marketplaceRoute: String,
+  verticalViewModels: List[models.frontend.marketplace.VerticalViewModel],
+  resultSets: List[models.frontend.marketplace.ResultSetViewModel]
+  )(
+  implicit
+  headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData,
+  authToken: egraphs.authtoken.AuthenticityToken
+)
+@import org.hibernate.validator.constraints.SafeHtml
+@import views.frontend.Utils
+@import models.frontend.egraphs._
+@import play.api.libs.json._
+@import models.frontend.marketplace.MarketplaceConversions._
+
+@**
+  Page for displaying marketplace results. 
+  Vertical buttons are currently hidden. Will be used in the future, when we have multiple verticals.
+**@
+@init = {
+@*** 
+  Translates a map of categories and their categoryvalues into a JsonObject that can be easily converted to a URL query arguments using $.param(Egraphs.page.categories)
+***@
+
+  Egraphs.page.categories =  @Html(
+      Json.toJson(verticalViewModels.flatMap{v =>
+        v.categoryViewModels.foldLeft[Map[String, JsValue]](Map())(
+          (a, b) => a ++ b.asActiveMap)
+      }.toMap).toString());
+  Egraphs.page.categorySelected = @verticalViewModels.exists(v => v.categoryViewModels.exists(c => c.active));
+  Egraphs.page.queryUrl = "@marketplaceRoute";
+  Egraphs.page.query = "";
+  Egraphs.page.sort = "";
+  Egraphs.page.view = "";
+  Egraphs.page.results = {};
+  Egraphs.page.availableOnly = false;
+  Egraphs.page.verticalSlug = "@verticalViewModels.find( v => v.active).map(v => "/" + v.urlSlug).getOrElse("")";
+}
+
+@baseBody = {
+
+<section id="content" class="marketplace" role="main">
+  
+  <div id="main">
+  
+    <div class="row-fluid">
+    
+      <div class="span12 masthead" role="masthead">
+
+        <form action="@marketplaceRoute" method="get">
+            <input name="query" id="celebrity-searchbox" type="search" placeholder="Find Your Star" autofocus>
+        </form>
+
+        <img src='@EgraphsAssets.at("images/marketplace-masthead.jpg")'/>
+      
+      </div>
+      
+    </div>
+
+    <div class="content container clearfix">
+    
+      <div class="row-fluid">
+
+        <aside class="nav span3">
+          @tags.marketplace.category_picker(verticalViewModels)
+        
+        </aside>
+
+        <div class="main span9">
+          @tags.marketplace.vertical_buttons(verticalViewModels)
+          @tags.marketplace.category_picker_mobile(verticalViewModels)        
+          @tags.marketplace.result_set_landing(resultSets, marketplaceRoute)
+        </div>
+      </div>
+    
+      <p class="to-top"><a href="#top">Back to Top</a></p>
+        
+    </div> <!-- end .content -->
+        
+  </div> <!-- end #main -->
+  
+</section>
+
+}
+
+@base_template(title="Stars", jsMain = "pages/marketplace-landing", headJs = init, body=baseBody)

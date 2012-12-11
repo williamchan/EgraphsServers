@@ -39,6 +39,7 @@ case class MarketplaceCelebrity(
  **/
 case class ResultSetViewModel(
     subtitle: Option[String],
+    verticalUrl: Option[String] = None,
     celebrities: Iterable[MarketplaceCelebrity] = List()
 )
 
@@ -71,6 +72,7 @@ object MarketplaceConversions {
   implicit object ResultSetViewModelFormat extends Format[ResultSetViewModel] {
     def reads(json: JsValue) : ResultSetViewModel = { ResultSetViewModel(
       (json \ "subtitle").asOpt[String],
+      (json \ "verticalUrl").as[Option[String]],  
       (json \ "celebrities").as[List[MarketplaceCelebrity]]
     )}
 
