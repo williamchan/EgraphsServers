@@ -84,7 +84,6 @@
           .gradientBar(@orange, lighten(@orange, 10%));
           *background-color: @orange;
           .reset-filter();
-          // font-weight:600;
           color:white;
           text-shadow: 0px -1px 0px black;
         }
@@ -128,7 +127,6 @@
     }
 
     .hint {
-      // #grid.fluid.span(7);
       margin-bottom: 12px;
     }
   }
@@ -136,6 +134,14 @@
   #billing-review-column {
     border-right:@separatorColor;
     .box-shadow(1px 1px 0px white);
+
+    #card_exp_year_chzn {
+      width:50px;
+    }
+  }
+
+  input#card-cvc, input#postal-code {
+    max-width:50px;
   }
 
   .price-summary {
@@ -144,6 +150,16 @@
 } // End #content
 
 @media (max-width:767px) { #content.gift-certificate-checkout {  
+  .controls {
+    // Eliminate artifactual input expansion outside of grid due to spanning at
+    // 100%
+    margin-right:10px;
+
+    input[type="text"] {
+      width:100%;
+    }
+  }
+
   #choose-amount {
     .amount-option {
       // Space out the buttons once they snap to vertical alignment

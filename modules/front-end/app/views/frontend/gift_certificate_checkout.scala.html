@@ -20,7 +20,7 @@
             <div class="span6">
               <h1>An Egraphs gift certificate is perfect for the holidays.</h1>
               <ul>
-                <li>Gift certificates can be used to purchase any product on the site</li>
+                <li>Gift certificates can be used to connect with any star on the site</li>
                 <li>they can be used over multiple purchases</li>
                 <li>they never expire</li>
                 @** TODO(SER-600): Move this to near the purchase button <li>You will receive an e-mail containing the printable certificate as a PDF</li> *@
@@ -64,30 +64,51 @@
 
           <form class="form-horizontal">
             <div class="control-group recipient-name">
-              <label class="control-label" for="recipient-name">Recipient name:</label>            
+              <label class="control-label" for="recipient-name">Recipient name:</label>
               <div class="controls">
-                <input id="recipient-name" type="text" name="recipient-name" placeholder="Tiny Tim">
+                <input id="recipient-name" type="text" name="recipient-name" placeholder="Tiny Tim" />
               </div>
             </div> <!-- End .recipient-name.controls -->
             <div class="control-group gifter-name">
               <label class="control-label" for="gifter-name">Your name:</label>
               <div class="controls">
-                <input id="gifter-name" type="text" name="gifter-name" placeholder="Santa">
+                <input id="gifter-name" type="text" name="gifter-name" placeholder="Santa" />
               </div>
-            </div>
+            </div> <!-- End .gifter-name.controls -->
           </form>
         </section>
         <div class="row-fluid">
           <div id="billing-review-column" class="span7">
             <section id="billing">
               <h2>Billing information:</h2>
-              <fieldset>
-                @tags.bootstrap_text_input_field("Card number:", Field.empty("card-number"))
-                <div class="field" >
-                  <div class="clearfix">
-                    <label class="instructions" for="card-exp-month">Exp. Date:</label>
-                    <div class="input select card-expiry">
-                      <select id="card-exp-month" class="inline chsn-select" data-placeholder="Month">
+              <form class="form-horizontal">
+                <fieldset>
+                  <div class="control-group card-name">
+                    <label class="control-label" for="card-name">Full name:</label>
+                    <div class="controls">
+                      <input id="card-name" type="text" name="card-name" />
+                    </div>
+                  </div> <!-- End .card-name.controls -->
+
+                  <div class="control-group email">
+                    <label class="control-label" for="email">Email:</label>
+                    <div class="controls">
+                      <input id="email" type="email" name="email" />
+                    </div>
+                  </div> <!-- End .email.controls -->
+
+                  <div class="control-group card-number">
+                    <label class="control-label" for="card-number">Card number:</label>
+                    <div class="controls">
+                      <input id="card-number" type="text" name="card-number" />
+                    </div>
+                  </div> <!-- End .card-number.controls -->
+
+                  @** in-line styles in this section leave a bad taste in my mouth, but necessary here to override chosen.js pretty selectors *@
+                  <div class="control-group card-exp" >
+                    <label class="control-label" for="card-exp-month">Exp. Date:</label>
+                    <div class="controls select card-expiry">
+                      <select id="card-exp-month" class="inline chsn-select" data-placeholder="Month" style="width: 130px">
                         <option value></option>
                         <option value="01">January</option>
                         <option value="02">February</option>
@@ -102,7 +123,7 @@
                         <option value="11">November</option>
                         <option value="12">December</option>
                       </select>
-                      <select id="card-exp-year" name="card-exp-year" class="inline chsn-select" data-placeholder="Year">
+                      <select id="card-exp-year" name="card-exp-year" class="inline chsn-select" data-placeholder="Year" style="width:86px"> 
                         <option value></option>
                         @for(year <- 2012 to 2020) {
                           <option value="@year">@year</option>
@@ -112,28 +133,25 @@
                         <button type="button" class="close" data-dismiss="alert">&times;</button>
                         <span class="error-message">Expiry date error</span>
                       </div>
-                    </div>            
-                  </div>
-                </div> <!-- end .field -->  
-                <div class="field">
-                  <div class="clearfix">
-                    <label class="instructions" for="card-cvc">Security Code:</label>
-                    <div class="input card-cvc">
-                      <p>
-                        <input id="card-cvc" type="text" name="card-cvc" class="inline" size="4">
-                        @**   <small><a href="#" class="tip">What's this?</a></small> *@
-                        <div class="alert alert-error hidden">
-                          <button type="button" class="close" data-dismiss="alert">&times;</button>
-                          <span class="error-message"></span>
-                        </div>
-                      </p>
                     </div>
-                  </div>
-                </div> <!-- end .field -->          
-                @tags.bootstrap_text_input_field("Full name:", Field.empty("full-name"))
-                @tags.bootstrap_text_input_field("Postal code:", Field.empty("postal-code"))
-                @tags.bootstrap_text_input_field("Email:", Field.empty("e-mail"))
-              </fieldset>
+                  </div> <!-- end .control-group -->  
+
+                  <div class="control-group card-cvc">
+                    <label class="control-label" for="card-cvc">Security Code:</label>
+                    <div class="controls">
+                      <input id="card-cvc" type="text" name="card-cvc" />
+                    </div>
+                  </div> <!-- End .card-cvc.controls -->
+
+                  <div class="control-group postal-code">
+                    <label class="control-label" for="postal-code">Postal code:</label>
+                    <div class="controls">
+                      <input id="postal-code" type="text" name="postal-code" />
+                    </div>
+                  </div> <!-- End .postal-code.controls -->
+
+                </fieldset>
+              </form>
             </section>
             <section id="review">
               <h2>Review order:</h2>
