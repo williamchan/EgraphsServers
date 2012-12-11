@@ -34,7 +34,7 @@ trait PostInventoryBatchAdminEndpoint extends Logging {
               "numInventory" -> number, // TODO: verify this is non-negative
               "startDate" -> date,
               "endDate" -> date
-          )(PostInventoryBatchForm.apply)(PostInventoryBatchForm.unapply))
+          )(PostInventoryBatch.apply)(PostInventoryBatch.unapply))
           
           form.bindFromRequest.fold(formWithErrors => {
             val data = formWithErrors.data
@@ -70,7 +70,7 @@ trait PostInventoryBatchAdminEndpoint extends Logging {
               "numInventory" -> number, // TODO: verify this is non-negative
               "startDate" -> date,
               "endDate" -> date
-          )(PostInventoryBatchForm.apply)(PostInventoryBatchForm.unapply))  
+          )(PostInventoryBatch.apply)(PostInventoryBatch.unapply))  
           
           form.bindFromRequest.fold(formWithErrors => {
             val data = formWithErrors.data
@@ -101,7 +101,7 @@ trait PostInventoryBatchAdminEndpoint extends Logging {
     }
   }
   
-  private case class PostInventoryBatchForm(numInventory: Int, startDate: Date, endDate: Date)
+  private case class PostInventoryBatch(numInventory: Int, startDate: Date, endDate: Date)
   
   private def getSelectedProducts(celebrity: Celebrity, rawFormData: Map[String, Seq[String]]): List[Product] = {
     val products = celebrity.products().toList
