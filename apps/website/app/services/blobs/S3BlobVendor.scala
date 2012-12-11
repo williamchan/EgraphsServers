@@ -8,7 +8,7 @@ import services.config.ConfigFileProxy
 import services.http.HttpContentService
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
-import egraphs.playutils.Encodings.{ Base64, URL }
+import egraphs.playutils.Encodings.{Base64, URL}
 import services.config.ConfigFileProxy
 import com.google.inject.Inject
 import services.Time.IntsToSeconds._
@@ -17,7 +17,8 @@ import org.joda.time.DateTimeConstants
 /** [[services.blobs.Blobs.BlobProvider]] implementation backed by Amazon S3 */
 private[blobs] case class S3BlobVendor @Inject() (
   config: ConfigFileProxy,
-  httpContent: HttpContentService) extends BlobVendor with Logging {
+  httpContent: HttpContentService
+) extends BlobVendor with Logging {
   val s3id = config.s3Id
   val s3secret = config.s3Secret
   val cacheControlValue = "max-age" + config.immutableAssetsCacheControlInSeconds
@@ -78,12 +79,14 @@ private[blobs] case class S3BlobVendor @Inject() (
       s3id != null,
       """
       application.conf: An "s3.id" configuration must be provided.
-      """)
+      """
+    )
     require(
       s3secret != null,
       """
       application.conf: An "s3.secret" configuration must be provided.
-      """)
+      """
+    )
   }
 
   /**

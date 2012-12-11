@@ -29,7 +29,6 @@ private[blobs] class FileSystemBlobVendor @Inject() (consumerApp: ConsumerApplic
 
   override def urlOption(namespace: String, key: String): Option[String] = {
     val blobStore = context.getBlobStore
-    
     if (!blobStore.blobExists(namespace, key)) {
       None
     }

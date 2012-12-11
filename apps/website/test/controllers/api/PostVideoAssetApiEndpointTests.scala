@@ -31,10 +31,6 @@ class PostVideoAssetApiEndpointTests extends EgraphsUnitTest with ProtectedCeleb
   protected override def routeUnderTest = postVideoAsset
   protected def db = AppConfig.instance[DBSession]
 
-  /**
-   * This test currently fails. Play currently doesn't allow for the necessary manipulation of AsyncResult required to adequately 
-   * test an asynchronous POST request. Look forward to Play 2.1 for improvements.
-   */
   it should "accept multipartFormData, respond with OK, and verify file creation in the blobstore" in new EgraphsTestApplication {
 
     val password = "bubble toes"

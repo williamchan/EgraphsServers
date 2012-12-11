@@ -26,7 +26,9 @@ import services.config.ConfigFileProxy
 class Blobs @Inject() (
   blobVendor: BlobVendor,
   blobVendorProvider: BlobVendorProvider,
-  config: ConfigFileProxy) extends Logging {
+  config: ConfigFileProxy
+) extends Logging 
+{
   import Blobs._
 
   /**
@@ -48,7 +50,7 @@ class Blobs @Inject() (
 
   /**
    * Retrieve the Blob at a given key from the static resources blobstore. Always attempts to access Amazon S3.
-   * Only use this method if you intend on using the bytes here on the server. Otherwise, for example if you intend
+   * Only use this method if you intend on using the bytes here on the server. Otherwise, for example if you intend 
    * a browser to be downloading the file, use getStaticResourceUrl.
    */
   def getStaticResource(key: String): Option[Blob] = {
@@ -96,7 +98,7 @@ class Blobs @Inject() (
    * @param access the Blobstore access policy for this object. This will only be enforced
    *   against Amazon S3.
    */
-  def put(key: String, bytes: Array[Byte], access: AccessPolicy = AccessPolicy.Private) {
+  def put(key: String, bytes: Array[Byte], access: AccessPolicy=AccessPolicy.Private) {
     blobVendor.put(blobstoreNamespace, key, bytes, access)
   }
 
@@ -122,7 +124,8 @@ class Blobs @Inject() (
     } else {
       throw new IllegalStateException(
         """I'm not going to scrub the blobstore unless "blobstore.allowscrub"
-        is set to "yes" in application.conf""")
+        is set to "yes" in application.conf"""
+      )
     }
   }
 
@@ -164,14 +167,16 @@ class Blobs @Inject() (
       """
       application.conf: A "blobstore" configuration value of either "s3" or
       "filesystem" is required
-      """)
+      """
+    )
 
     require(
       blobstoreNamespace != null,
       """
       application.conf: A "blobstore.namespace" value is required. On s3 this
       is the bucket name.
-      """)
+      """
+    )
 
     blobVendor.checkConfiguration()
   }

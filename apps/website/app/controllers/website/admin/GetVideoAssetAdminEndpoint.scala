@@ -30,9 +30,7 @@ private[controllers] trait GetVideoAssetAdminEndpoint extends ImplicitHeaderAndF
     httpFilters.requireAdministratorLogin.inSession() {
       case (admin, adminAccount) =>
         Action { implicit request =>
-
           Ok(views.html.Application.admin.admin_videoasset())
-
         }
     }
   }
