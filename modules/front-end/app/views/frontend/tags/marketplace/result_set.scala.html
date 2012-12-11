@@ -7,8 +7,13 @@
         <h1><span>{{results.subtitle}}</span></h1> 
         <div class="available-only">
             <ol>
-              <li><a data-value="false" @if(!availableOnly){class="active"}>All Stars</a></li>
-              <li><a data-value="true" @if(availableOnly){class="active"})>Only Available Stars</a></li>
+              <li>
+              @if(!availableOnly){
+                <a data-value="true">Hide Sold Out Stars</a>
+              } else {
+                <a data-value="false"> Show Sold Out Stars</a>
+              }
+              </li>
             </ol>
         </div>    
       </div>
