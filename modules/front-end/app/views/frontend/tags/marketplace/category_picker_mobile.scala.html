@@ -1,12 +1,13 @@
-@(verticalViewModels: Iterable[models.frontend.marketplace.VerticalViewModel])
+@(verticalViewModels: List[models.frontend.marketplace.VerticalViewModel], multiple: Boolean = true)
+@displayVerticals(verticals: List[models.frontend.marketplace.VerticalViewModel]) = {
  <aside class="mobile-nav">
   <h2>Filter By:</h2>
-  <select id="category-select" multiple>
-  @for(vertical <- verticalViewModels;
+  <select id="category-select" @if(multiple){multiple}>
+  @for(vertical <- verticals;
        category <- vertical.categoryViewModels) {
     <optgroup multiple label="@vertical.shortName - @category.publicName">
     @for(categoryValue <- category.categoryValues) {
-      <option @if(categoryValue.active){selected}  data-category="@category.id" value="@categoryValue.id">@categoryValue.publicName</option>
+      <option @if(categoryValue.active){selected}  data-vertical="@vertical.urlSlug" data-category="@category.id" value="@categoryValue.id">@categoryValue.publicName</option>
     }
     </optgroup>
   }
@@ -14,4 +15,11 @@
   <br>
   <a id="apply-filters">Apply Filters</a>
 </aside> <!-- end .mobile-nav -->
+}
 
+@{val verticalsFilteredOption = verticalViewModels.filter(v => v.active).headOption
+  displayVerticals(verticalsFilteredOption match {
+    case None => verticalViewModels
+    case Some(vertical) => List(vertical)
+  })
+}

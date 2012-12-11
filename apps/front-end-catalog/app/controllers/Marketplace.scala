@@ -38,13 +38,9 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
 
   def landing() = Action {
     Ok(views.html.frontend.marketplace_landing(
-      "",
-      false,
       controllers.routes.Marketplace.results.url,
       landingVerticalSet,
-      landingResults,
-      sortOptions,
-      availableOnly = false)
+      landingResults)
     )
   }
 

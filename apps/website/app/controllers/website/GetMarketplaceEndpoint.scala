@@ -122,19 +122,6 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
           celebrityStore.marketplaceSearch(queryOption, verticalAndCategoryValues)
         }
 
-        val subtitle = queryOption match {
-          case None => unsortedCelebrities.size match {
-            case 1 => "Showing 1 Result"
-            case _ => "Showing " + unsortedCelebrities.size + " Results"
-          }
-          case Some(query) => {
-            unsortedCelebrities.size match {
-              case 1 => "Showing 1 Result for \"" + query + "\"..."
-              case _ => "Showing " + unsortedCelebrities.size + " Results for \"" + query + "\"..."
-            }
-          }
-        }
-
         // Sort results
         val sortedCelebrities = maybeSortType.getOrElse(CelebritySortingTypes.MostRelevant) match {
           case MostRelevant => unsortedCelebrities
@@ -150,8 +137,20 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
           sortedCelebrities
         }
 
-        val viewAsList = viewOption == Some("list") //TODO "list" should be a part of an Enum
+        val subtitle = queryOption match {
+          case None => sortedCelebrities.size match {
+            case 1 => "Showing 1 Result"
+            case _ => "Showing " + sortedCelebrities.size + " Results"
+          }
+          case Some(query) => {
+            sortedCelebrities.size match {
+              case 1 => "Showing 1 Result for \"" + query + "\"..."
+              case _ => "Showing " + sortedCelebrities.size + " Results for \"" + query + "\"..."
+            }
+          }
+        }
 
+        val viewAsList = viewOption == Some("list") //TODO "list" should be a part of an Enum
 
         Ok(views.html.frontend.marketplace_results(
           query = queryOption.getOrElse(""),
@@ -162,7 +161,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
           sortOptions = sortOptionViewModels(maybeSortType),
           availableOnly = availableOnly
         ))
-      }else {
+      } else {
         val resultSets = for(vertical <- verticalStore.verticals) yield {
           val categoryValue = vertical.categoryValue
           val results = celebrityStore.marketplaceSearch(queryOption, List(Seq(categoryValue.id)))
