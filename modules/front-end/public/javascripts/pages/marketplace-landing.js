@@ -18,63 +18,10 @@ define(["Egraphs", "libs/chosen/chosen.jquery.min"], function (Egraphs) {
         var reloadPage = function() {
           window.location.href =
             window.Egraphs.page.queryUrl + window.Egraphs.page.verticalSlug + "?" +
-            $.param({ "query" : window.Egraphs.page.query,
-                      "sort" : window.Egraphs.page.sort,
-                      "view" : window.Egraphs.page.view,
-                      "availableOnly" : window.Egraphs.page.availableOnly}) +
+            $.param({ "query" : window.Egraphs.page.query}) +
             "&" + $.param(window.Egraphs.page.categories);
         };
         
-        $("#remove-query").click( function(e) {
-          window.Egraphs.page.query = "";
-          reloadPage();
-        });
-
-        /**
-         * Binding for selecting different sort orders for results from the mobile selector
-         **/
-        $("#sort-select").change(function(e) {
-          window.Egraphs.page.sort = $(this).val();
-          reloadPage();
-        });
-
-        /**
-         * Same as above but for large, link-based view
-         **/
-        $(".sort-link").click(function(e) {
-          var selectedValue = $(this).attr("data-value");
-          if(selectedValue !== window.Egraphs.page.sort) {
-            window.Egraphs.page.sort = selectedValue;
-          } else {
-            window.Egraphs.page.sort = "";
-          }
-          reloadPage();
-        });
-
-        /**
-         * Switch to list view
-         **/
-        $("#list-view-link").click(function(e) {
-          window.Egraphs.page.view = "list";
-          reloadPage();
-        });
-
-        /**
-         * Switch to grid view
-         **/
-        $("#grid-view-link").click(function(e) {
-          window.Egraphs.page.view = "";
-          reloadPage();
-        });
-
-        /**
-         * Filter sold out stars
-         **/
-         $(".available-only a").click(function(e) {
-           window.Egraphs.page.availableOnly = $(this).attr("data-value");
-           reloadPage();
-         });
-
        /**
         * Vertical button select functionality.
         *
@@ -139,19 +86,12 @@ define(["Egraphs", "libs/chosen/chosen.jquery.min"], function (Egraphs) {
           }
         );
 
-        $(".clear-all").click(function(e) {
-          var category = window.Egraphs.page.categories["c" + $(this).attr("data-category")];
-          category.length = 0;
-          reloadPage();
-        }
-        );
         $(".show-all").click(function(e){
           $(this).parent().siblings().children().each(function() {
             $(this).removeClass("condensed");
           });
           $(this).addClass("condensed");
         });
-
       });
     }
   };

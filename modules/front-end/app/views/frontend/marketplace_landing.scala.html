@@ -29,9 +29,6 @@
       }.toMap).toString());
   Egraphs.page.categorySelected = @verticalViewModels.exists(v => v.categoryViewModels.exists(c => c.active));
   Egraphs.page.queryUrl = "@marketplaceRoute";
-  Egraphs.page.query = "";
-  Egraphs.page.sort = "";
-  Egraphs.page.view = "";
   Egraphs.page.results = {};
   Egraphs.page.availableOnly = false;
   Egraphs.page.verticalSlug = "@verticalViewModels.find( v => v.active).map(v => "/" + v.urlSlug).getOrElse("")";
