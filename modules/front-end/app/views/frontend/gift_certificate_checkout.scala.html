@@ -21,8 +21,8 @@
               <h1>An Egraphs gift certificate is perfect for the holidays.</h1>
               <ul>
                 <li>Gift certificates can be used to connect with any star on the site</li>
-                <li>they can be used over multiple purchases</li>
-                <li>they never expire</li>
+                <li>They can be used over multiple purchases</li>
+                <li>They never expire</li>
                 @** TODO(SER-600): Move this to near the purchase button <li>You will receive an e-mail containing the printable certificate as a PDF</li> *@
               </ul>
             </div>
@@ -150,60 +150,57 @@
                     </div>
                   </div> <!-- End .postal-code.controls -->
 
+                  <div class="control-group">
+                    @tags.arrow_button(
+                      caption="Review Order",
+                      classes="button right review"
+                    )
+                  </div>
+
                 </fieldset>
               </form>
             </section>
-            <section id="review">
-              <h2>Review order:</h2>
-              <div class="purchaser-summary">
-                <div class="amount-recipient">
-                  <h3>Amount:</h3>
-                  <div class="summary-item">$75.00</div>
-                  <h3>Recipient's Name:</h3>
-                  <div class="summary-item">Andy Johnson</div>
-                </div>
-                <div class="billing">
-                  <h3>Billing information:</h3>
-                  <div class="summary-item">
-                    <p>Joshua Johnson</p>
-                    <p class="card-number-placeholder">Visa XXXXXXXXXXXX4021</p>
+            <a href="#review" role="button" class="btn" data-toggle="modal">Review dat shiz</a>
+            <section id="review" class="modal hide fade">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3>Review order</h3>
+              </div>
+              <div class="modal-body">
+                <div class="purchaser-summary">
+                  <div class="amount-recipient">
+                    <h3>Amount:</h3>
+                    <div class="summary-item">$75.00</div>
+                    <h3>Recipient's Name:</h3>
+                    <div class="summary-item">Andy Johnson</div>
                   </div>
-                </div> <!-- End .billing -->
-              </div> <!-- End .purchaser-summary -->
-              <div class="price-summary">
-                <table>
-                  <tr>
-                    <th>Subtotal</th>
-                    <td>$75.00</td>
-                  </tr>
-                  <tr>
-                    <th>Tax</th>
-                    <td>$0.00</td>
-                  </tr>
-                  <tr id="total">
-                    <th>Total</th>
-                    <td>$0.00</td>
-                  </tr>
-                </table>
-              </div> <!-- End .price-summary -->
+                  <div class="billing">
+                    <h3>Billing information:</h3>
+                    <div class="summary-item">
+                      <p>Joshua Johnson</p>
+                      <p class="card-number-placeholder">Visa XXXXXXXXXXXX4021</p>
+                    </div>
+                  </div> <!-- End .billing -->
+                </div> <!-- End .purchaser-summary -->
+                <div class="price-summary">
+                  <table>
+                    <tr>
+                      <th>Subtotal</th>
+                      <td>$75.00</td>
+                    </tr>
+                    <tr>
+                      <th>Tax</th>
+                      <td>$0.00</td>
+                    </tr>
+                    <tr id="total">
+                      <th>Total</th>
+                      <td>$0.00</td>
+                    </tr>
+                  </table>
+                </div> <!-- End .price-summary -->
+              </div>
             </section>
           </div>
-          <aside class="span5 price-summary">
-            <table>
-              <tr>
-                <th>Subtotal</th>
-                <td>$75.00</td>
-              </tr>
-              <tr>
-                <th>Tax</th>
-                <td>$0.00</td>
-              </tr>
-              <tr id="total">
-                <th>Total</th>
-                <td>$0.00</td>
-              </tr>
-            </table>
-          </aside>
         </div>
       </div>
     </div>
