@@ -138,14 +138,14 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         }
 
         val subtitle = queryOption match {
-          case None => sortedCelebrities.size match {
+          case None => celebrities.size match {
             case 1 => "Showing 1 Result"
-            case _ => "Showing " + sortedCelebrities.size + " Results"
+            case _ => "Showing " + celebrities.size + " Results"
           }
           case Some(query) => {
-            sortedCelebrities.size match {
+            celebrities.size match {
               case 1 => "Showing 1 Result for \"" + query + "\"..."
-              case _ => "Showing " + sortedCelebrities.size + " Results for \"" + query + "\"..."
+              case _ => "Showing " + celebrities.size + " Results for \"" + query + "\"..."
             }
           }
         }
