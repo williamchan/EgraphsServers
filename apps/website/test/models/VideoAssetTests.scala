@@ -31,7 +31,7 @@ class VideoAssetTests extends EgraphsUnitTest
 
   override def transformEntity(toTransform: VideoAsset) = {
     toTransform.copy(
-      url = "http://www.testUrlTransformed.com")
+      urlKey = "videoassets/fakeId/fakeVideo.mp4")
   }
 
   //

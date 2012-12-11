@@ -6,6 +6,9 @@ import play.api.mvc.AsyncResult
 import play.api.mvc.RequestHeader
 import play.api.mvc.CookieBaker
 import play.api.mvc.Flash
+import play.api.mvc.AsyncResult
+import org.joda.time.DateTimeConstants
+import play.api.mvc.SimpleResult
 
 /**
  * "Pimp-my-library" of Play's PlainResult type. Gives direct access to
@@ -32,7 +35,7 @@ class RichResult(result: Result) {
    * Throws an exception if this was not a PlainResult.
    */
   lazy val session: Option[Session] = {
-    bakeCookieFromPlainResult(this.plainResult, baker=Session)
+    bakeCookieFromResult(this.result, baker=Session)
   }
 
   /**
@@ -40,7 +43,15 @@ class RichResult(result: Result) {
    * into it. Otherwise throws an exception.
    */
   def withSession(session: Session): Result = {
-    this.plainResult.withSession(session)
+    withSession(this.result, session)
+  }
+
+  private def withSession(result: Result, session: Session): Result = {
+    this.result match {
+      case plainResult: PlainResult => plainResult.withSession(session)
+      case asyncResult: AsyncResult => AsyncResult(asyncResult.result.map( result => this.withSession(result, session)))
+      case otherResult => throw new IllegalStateException("Result type without withSession, idk what to do with result = " + otherResult)
+    }
   }
   
   /**
@@ -50,7 +61,7 @@ class RichResult(result: Result) {
    * Throws an exception if this was not a PlainResult.
    */
   lazy val flash: Option[Flash] = {
-    bakeCookieFromPlainResult(this.plainResult, baker=Flash)
+    bakeCookieFromResult(this.result, baker=Flash)
   }
 
   /**
@@ -78,13 +89,17 @@ class RichResult(result: Result) {
       baker.decodeFromCookie(Some(cookie))
     }
   }
-  
-  private lazy val plainResult:PlainResult = {
+
+  private def bakeCookieFromResult[T <: AnyRef](result: Result, baker: CookieBaker[T]): Option[T] = {
     result match {
-      case plainResult: PlainResult => plainResult
-      case other => throw new RuntimeException("Can not access flash of a non-PlainResult.")
+      case plainResult: PlainResult => bakeCookieFromPlainResult(plainResult, baker)
+      //TODO: Play 2.1 Use something that doesn't have to await if possible
+      case asyncResult: AsyncResult => asyncResult.result.map { promisedResult =>
+        bakeCookieFromResult(promisedResult, baker)
+      }.await(30 * DateTimeConstants.MILLIS_PER_SECOND).get
+      case otherResult => throw new IllegalStateException("Result type without withSession, idk what to do with result = " + otherResult)
     }
-  } 
+  }
 }
 
 object RichResult {

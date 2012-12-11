@@ -64,7 +64,7 @@ trait PostVideoAssetHelper {
     val errorOrCelebrity = dbSession.connected(TransactionSerializable) {
       httpFilters.requireCelebrityId.filterInRequest(parse.multipartFormData)
     }
-
+    
     errorOrCelebrity.fold(
       error => error, {
         case celebrity =>
