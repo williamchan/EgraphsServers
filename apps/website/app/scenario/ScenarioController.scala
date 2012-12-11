@@ -92,12 +92,7 @@ object ScenarioController extends Controller {
                 case aResult: Result =>
                   aResult
                 case _ =>
-                  Ok(Html(
-                    "Scenario <pre>"
-                      + urlSlug
-                      + "</pre> successfully replayed.<br/><br/>"
-                      + existingScenario.description
-                  ))
+                  Ok(views.html.nonproduction.scenario_success(urlSlug, existingScenario.description))
               }
             }
     

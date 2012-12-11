@@ -392,6 +392,24 @@ class OrderStore @Inject() (schema: Schema) extends SavesWithLongKey[Order] with
         on(order.id === egraph.map(_.orderId))
     )
   }
+  
+  /**
+   * Retrieves the list of Orders and Egraphs that are candidates for presentation on the
+   * user's gallery page AS GIFTS. These are any orders that have not been rejected by an admin
+   * and their adjoining egraphs (regardless of the adjoining egraph state)
+   */
+  def galleryGiftOrdersWithEgraphs(buyerId: Long) : Query[(Order, Option[Egraph])] = {
+    join(schema.orders, schema.egraphs.leftOuter) (
+      (order, egraph) =>
+        where(
+          (order.buyerId === buyerId)
+          and not (order.recipientId === buyerId)
+          and not (order._reviewStatus === OrderReviewStatus.RejectedByAdmin.name)
+        )
+        select(order, egraph)
+        on(order.id === egraph.map(_.orderId))
+    )
+  }
 
   def findByCustomerId(customerId: Long, filters: FilterOneTable[Order]*): Query[Order] = {
     import schema.orders
@@ -599,6 +617,7 @@ object GalleryOrderFactory {
         val twitterShareLink = Twitter.getEgraphShareLink(celebrity = celebrity, viewEgraphUrl = viewEgraphUrl)
 
         new FulfilledEgraphViewModel(
+          buyerId = order.buyerId,
           facebookShareLink = facebookShareLink,
           twitterShareLink = twitterShareLink,
           orderId = order.id,
@@ -607,6 +626,8 @@ object GalleryOrderFactory {
           productPublicName = product.celebrity.publicName,
           productTitle = product.storyTitle,
           productDescription = product.description,
+          recipientId = order.recipientId,
+          recipientName = order.recipientName,
           thumbnailUrl = thumbnailUrl,
           viewEgraphUrl = viewEgraphUrl,
           publicStatus = order.privacyStatus.name,
@@ -623,12 +644,15 @@ object GalleryOrderFactory {
       val celebrity = product.celebrity
       val imageUrl = product.photo.resizedWidth(product.frame.pendingWidthPixels).getSaved(AccessPolicy.Public).url
       PendingEgraphViewModel(
+        buyerId = order.buyerId,
         orderId = order.id,
         orientation = product.frame.name.toLowerCase,
         productUrl = StorefrontChoosePhotoConsumerEndpoints.url(celebrity, product).url,
         productTitle = product.storyTitle,
         productPublicName = celebrity.publicName,
         productDescription = product.description,
+        recipientId = order.recipientId,
+        recipientName = order.recipientName,
         thumbnailUrl = imageUrl,
         orderStatus = order.reviewStatus.name,
         orderDetails = new OrderDetails(

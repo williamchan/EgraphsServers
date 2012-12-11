@@ -79,23 +79,37 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
     //Pop off control with highest precedence
     val galleryControl = galleryControlPrecedence.flatten.head
 
-
-    //get orders
+    //get orders (my pending orders and my gift orders to both be displayed)
     val ordersAndEgraphs = orderStore.galleryOrdersWithEgraphs(galleryCustomerId).toList
+    val giftOrdersAndEgraphs = orderStore.galleryGiftOrdersWithEgraphs(galleryCustomerId).toList
 
     val pendingOrders = GalleryOrderFactory.filterPendingOrders(ordersAndEgraphs)
-
-    val fulfilledOrders = for (
-      orderAndMaybeEgraph <- ordersAndEgraphs;
-      publishedEgraph <- orderAndMaybeEgraph._2 if publishedEgraph.egraphState == EgraphState.Published
-    ) yield {
-      orderAndMaybeEgraph
-    }
-
-    val orders:List[EgraphViewModel] = galleryControl match {
-      case AdminGalleryControl | OwnerGalleryControl =>
+    val pendingGiftOrders = GalleryOrderFactory.filterPendingOrders(giftOrdersAndEgraphs)
+    
+    val fulfilledOrders = getFulfilledOrders(ordersAndEgraphs)
+    val fulfilledGiftOrders = getFulfilledOrders(giftOrdersAndEgraphs)
+    
+    val orders = getOrders(pendingOrders, fulfilledOrders, galleryControl, customer)
+    val giftOrders = getOrders(pendingGiftOrders, fulfilledGiftOrders, galleryControl, customer)
+    
+    Ok(views.html.frontend.account_gallery(customer.username, orders, giftOrders, galleryControl))
+  }
+  
+  /**
+   * Creates and returns a list of EgraphViewModels, which can then be used to properly
+   * display the Egraph and related information on the user's gallery page.
+   */
+  private def getOrders
+    (pendingOrders: List[(Order, Option[Egraph])], fulfilledOrders: List[(Order, Option[Egraph])], 
+       galleryControl: GalleryControlRenderer, customer: Customer)
+    (implicit request: RequestHeader, authToken: AuthenticityToken)
+  : List[EgraphViewModel] = 
+  {
+    galleryControl match {
+      case AdminGalleryControl | OwnerGalleryControl => {
         GalleryOrderFactory.makePendingEgraphViewModel(pendingOrders).toList ++
-          GalleryOrderFactory.makeFulfilledEgraphViewModel(fulfilledOrders, facebookAppId, consumerApp).flatten.toList
+          GalleryOrderFactory.makeFulfilledEgraphViewModel(fulfilledOrders, facebookAppId, consumerApp).flatten.toList          
+      }
       case _ =>
         if (customer.isGalleryVisible){
           GalleryOrderFactory.makeFulfilledEgraphViewModel(fulfilledOrders.filter(
@@ -106,10 +120,18 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
           List()
         }
     }
-
-    Ok(views.html.frontend.account_gallery(customer.username, orders, galleryControl))
   }
-
+  
+  /**
+   * Filters the list of possible orders and Egraphs, returning only those which are
+   * already fulfilled.
+   */
+  private def getFulfilledOrders(ordersAndEgraphs: List[(Order, Option[Egraph])]): List[(Order, Option[Egraph])] = {
+    for (
+      orderAndMaybeEgraph <- ordersAndEgraphs;
+      publishedEgraph <- orderAndMaybeEgraph._2 if publishedEgraph.egraphState == EgraphState.Published
+    ) yield {
+      orderAndMaybeEgraph
+    }      
+  }
 }
-
-

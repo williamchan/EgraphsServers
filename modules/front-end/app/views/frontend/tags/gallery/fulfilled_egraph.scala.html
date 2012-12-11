@@ -1,0 +1,58 @@
+@(egraph: models.frontend.egraphs.FulfilledEgraphViewModel, index: Int, controlRenderer: models.frontend.egraphs.GalleryControlRenderer)
+
+@import models.frontend.egraphs._
+@import views.html.frontend.tags
+  
+  <div class="row-fluid row-egraph">
+    <div class="span12">
+      <div class="number">@(index+1)</div><br class="number-br">
+      <span>
+        <h3>@egraph.productPublicName: @egraph.productTitle</h3>
+      </span>
+    </div>
+    <div class="row-fluid">
+      <div class="span7">
+        <div class="@egraph.orientation">
+          <a href="@egraph.viewEgraphUrl"><img src="@egraph.thumbnailUrl" alt="Egraph preview"></img></a>
+        </div>
+      </div>
+      <div class="span5 right">
+        <div>
+          <a href="@egraph.productUrl">View original product in store</a><br>
+          Signed @egraph.signedTimestamp
+        </div>
+        <div>
+          <p>@egraph.productDescription</p>
+        </div>
+        <div class="padding-fix">
+          <div class="social">
+            <ul class="clearfix">
+              <li><span class="social-label">Share this</span></li>
+              <li>
+                <a href="@egraph.facebookShareLink" class="facebook" target="_blank">Facebook</a>
+              </li>
+              <li>
+                <a href="@egraph.twitterShareLink" class="twitter" target="_blank">Twitter</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        @if(!egraph.isGift) {
+          <div class="controls">
+            @if(controlRenderer == OwnerGalleryControl){
+              @tags.toggle(styleclass="private",
+                name="privacy",
+                id=egraph.orderId.toString,
+                checked = (egraph.publicStatus == "Public"))
+            }
+            @Html(controlRenderer.render(egraph.orderId, egraph.publicStatus).toString())
+          </div>
+        } else {
+          <div>
+            <p>Gift Recipient: @egraph.recipientName</p>
+            @Html(controlRenderer.render(egraph.orderId, egraph.publicStatus).toString())
+          </div>
+        }
+      </div>
+    </div>
+  </div>

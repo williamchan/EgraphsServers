@@ -185,6 +185,20 @@ class Scenarios extends DeclaresScenarios {
       customer.account.withPassword(TestData.defaultPassword).right.get.save()
   }
   )
+  
+  toScenarios add Scenario(
+  "Myyk is another customer",
+  apiCategory,
+  """
+    Creates a customer named Myyk Badass-Seok.
+    [note: He does not have any associated Account thus far...but we can create one
+     programmatically later on if we want to log in as him]
+  """, {
+    () =>
+      val customer = TestData.newSavedCustomer().copy(name = "Myyk Badass-Seok").save()
+      customer.account.withPassword(TestData.defaultPassword).right.get.save()
+  }
+  )
 
   toScenarios add Scenario(
   "Erem buys Wills two products twice each",
@@ -197,6 +211,40 @@ class Scenarios extends DeclaresScenarios {
       erem.buy(kingOfPweensCompetition, recipientName = "Erem Boto", requestedMessage = Some("Happy Pweenday, Don!"), messageToCelebrity = Some("Don loves everything you do!")).save()
   }
   )
+  
+  toScenarios add Scenario(
+  "Erem buys one of Will's products as a gift for Myyk",
+  apiCategory,
+  """Creates one unfulfilled order (starcraftChampionship), which will be a gift for Erem.""", {
+    () =>
+      val erem = Scenarios.getEremCustomerAccount
+      val myyk = Scenarios.getMyykCustomerAccount
+      val (starcraftChampionship, _) = Scenarios.getWillsTwoProducts
+      erem.buy(starcraftChampionship, recipient = myyk, recipientName = "Myyk Badass-Seok", requestedMessage = Some("Happy 13th birthday, Myyk!"), messageToCelebrity = Some("My buddy Myyk is your biggest fan!")).save()
+  }
+  )
+  
+  toScenarios add Scenario(
+  "Will fulfills Erem's gift order for Myyk",
+  apiCategory,
+  """Will fulfills Erem's gift order for Myyk""", {
+    () =>
+      val (starcraftChampionship, _) = Scenarios.getWillsTwoProducts
+      val order = from(schema.orders)(order =>
+        where(order.recipientName === "Myyk Badass-Seok")
+          select (order)
+      ).headOption.get
+      order
+        .withPaymentStatus(PaymentStatus.Charged).save()
+        .newEgraph
+        .withAssets(TestConstants.signingAreaSignatureStr, Some(TestConstants.signingAreaMessageStr), Base64.decode(TestConstants.voiceStr()))
+        .save()
+        .withYesMaamBiometricServices
+        .verifyBiometrics
+        .withEgraphState(EgraphState.Published)
+        .save()
+  }
+  )  
 
   toScenarios add Scenario(
   "Will fulfills one of Erem's product orders",
@@ -489,6 +537,10 @@ object Scenarios {
 
   def getEremCustomerAccount: Customer = {
     customerStore.get(1L)
+  }
+  
+  def getMyykCustomerAccount: Customer = {
+    customerStore.get(2L)
   }
 
   def createAdmin() {

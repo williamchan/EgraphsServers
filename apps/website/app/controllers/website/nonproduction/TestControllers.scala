@@ -7,9 +7,12 @@ import services.http.ControllerMethod
 import services.logging.Logging
 import play.api.mvc.Controller
 import services.http.filters.HttpFilters
+import models.AccountStore
+import utils.TestData
 
 object TestControllers extends Controller with Logging {
   val controllerMethod = AppConfig.instance[ControllerMethod]
+  val accountStore = AppConfig.instance[AccountStore]
   private val filters = AppConfig.instance[HttpFilters]
 
   def logStuffThenThrowException() = filters.requireApplicationId.test {
@@ -37,6 +40,18 @@ object TestControllers extends Controller with Logging {
           case "403" => Forbidden("")
           case "404" => NotFound("")
           case _ => throw new Exception("blargh")
+        }
+      }
+    }
+  }
+  
+  def getTestAccountDetails(customerId: Long) = filters.requireApplicationId.test {
+    controllerMethod() {
+      Action {
+        val maybeAccount = accountStore.findByCustomerId(customerId) 
+        maybeAccount match {
+          case None => InternalServerError("There are no accounts currently created")
+          case Some(account) => Ok("Username and Password: " + account.email + " : " + TestData.defaultPassword)
         }
       }
     }
