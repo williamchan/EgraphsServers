@@ -1,4 +1,6 @@
-@(inventoryBatches: Iterable[models.InventoryBatch], celebrity: models.Celebrity
+@(inventoryBatches: Iterable[models.InventoryBatch],
+  celebrity: models.Celebrity,
+  inventoryRemaining: Int
 )(implicit paginationInfo: controllers.PaginationInfo,
   authToken: egraphs.authtoken.AuthenticityToken,
   headerData: models.frontend.header.HeaderData,
@@ -29,6 +31,7 @@
       <form method="link" action="@getCreateCelebrityInventoryBatch">
         <input class="btn primary fade in" type="submit" value="New Inventory Batch"/>
       </form>
+      <h2>Remaining Inventory: @inventoryRemaining</h2>
       <div>
         <h2>Filters:</h2>
         <ul class="span16">

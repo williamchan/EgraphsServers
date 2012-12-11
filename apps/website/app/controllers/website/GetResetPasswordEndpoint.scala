@@ -22,30 +22,30 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
   protected def accountStore: AccountStore
   protected def accountPasswordResetForms: AccountPasswordResetFormFactory
 
-  def getResetPassword(email: String, secretKey: String) = controllerMethod.withForm() 
+  def getResetPassword(email: String, secretKey: String) = controllerMethod.withForm()
   { implicit authToken =>
     httpFilters.requireAccountEmail.inFlashOrRequest() { account =>
       Action { implicit request =>
         val form = makeFormView(account)
-  
+
         val displayableErrors = List(form.newPassword.error, form.passwordConfirm.error, form.email.error)
           .asInstanceOf[List[Option[FormError]]].filter(e => e.isDefined).map(e => e.get.description)
-  
-          if (account.verifyResetPasswordKey(form.secretKey.value.getOrElse("")) == true) {
-            Ok(views.html.frontend.account_password_reset(form=form, displayableErrors=displayableErrors))
-          } else {
-            Forbidden(views.html.frontend.simple_message("Account not verified",
-              "<p>Aww shucks! The password reset URL you used is invalid.</p>" +
+
+        if (account.verifyResetPasswordKey(secretKey) == true) {
+          Ok(views.html.frontend.account_password_reset(form = form, displayableErrors = displayableErrors))
+        } else {
+          Forbidden(views.html.frontend.simple_message("Account not verified",
+            "<p>Aww shucks! The password reset URL you used is invalid.</p>" +
               "<p>Sorry for this inconvenience, but it's for your own security.</p>" +
               "<p>Can you make sure that you're using the latest password reset email you received from us?</p>"
-            ))
+          ))
         }
       }
     }
   }
 
   // TODO
-  def getVerifyAccount(email: String, resetKey: String) = controllerMethod.withForm() 
+  def getVerifyAccount(email: String, resetKey: String) = controllerMethod.withForm()
   { implicit authToken =>
     httpFilters.requireAccountEmail(email) { account =>
       Action { implicit request =>

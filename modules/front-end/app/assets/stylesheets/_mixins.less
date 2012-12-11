@@ -49,6 +49,69 @@
 	transition: @arguments;
 }
 
+// Surrounds the element with a 1px border, default egraphs orange,
+// that glows upon hover or focus.
+.glowborder(@color: @orange) {
+  border: 1px solid lighten(@color, 10%);    
+  .box-shadow(0px 0px 0px @color);
+  @transition: border .2s linear, box-shadow .2s linear;
+  .transition(@transition);
+
+  &:hover {
+    .box-shadow(0px 0px 6px @color);
+    border: 1px solid @color;
+  }
+
+  &:focus {
+    border: 1px solid @color;
+    .box-shadow(0px 0px 6px @color);
+  }  
+}
+
+// A type of glowborder appropriate for presenting a captioned image.
+// Mix this in on the highest parent container that wishes to have its
+// hover trigger the glowed around contained a.glowborder
+.glowborder-link-container() {
+  a.glowborder {
+    display: block;
+    padding: 4px;
+    .glowborder();
+    
+    img {
+      display: block;
+    }
+  }
+
+  a { color: @orange; }
+}
+
+/* !Celebrity Search Box */
+.celebrity-searchbox-container() {
+  input[type=search] {
+    .inline-block;
+    vertical-align: middle;
+    font-size: 20px;
+    width: 96%;
+    color: @orange;
+    margin: 0;
+    background: @white url(../images/bg-icon-magnify.png) no-repeat 95% 50%;
+    .glowborder();
+
+    &::-webkit-input-placeholder {
+      color: @orange;
+    }
+
+    &::-moz-placeholder {
+      color: @orange;
+    }
+
+    &::-ms-placeholder {
+      color: @orange;
+    }
+
+  }
+}
+
 //
 // Renders correctly-scaled social buttons as a sprite represented by bg-sprite-social-icons.png.
 //

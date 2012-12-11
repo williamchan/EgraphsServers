@@ -88,6 +88,7 @@ GET     /Review/portrait                                          controllers.Re
 GET     /Review/withPrint                                         controllers.Review.withPrint
 
 GET     /Static/about                                             controllers.Static.about
+GET     /Static/affiliates                                        controllers.Static.affiliates
 GET     /Static/careers                                           controllers.Static.careers
 GET     /Static/inside                                            controllers.Static.inside
 GET     /Static/faq                                               controllers.Static.faq

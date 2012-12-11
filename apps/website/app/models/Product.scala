@@ -253,6 +253,7 @@ case class Product(
     services.celebStore.get(celebrityId)
   }
 
+  //TODO: Create Jira and link here. This should be improved to be 1 query.
   /**
    * Returns the remaining inventory of this Product and the active InventoryBatches for this Product.
    *
