@@ -56,152 +56,150 @@
           </div>
         </section>
         
-        <section id="personalize">
-          <h2>Personalize:</h2>
-          <div class="hint">
-            The certificate PDF you receive will contain your name and the recipient's.
-          </div>
-
-          <form class="form-horizontal">
-            <div class="control-group recipient-name">
-              <label class="control-label" for="recipient-name">Recipient name:</label>
-              <div class="controls">
-                <input id="recipient-name" type="text" name="recipient-name" placeholder="Tiny Tim" />
-              </div>
-            </div> <!-- End .recipient-name.controls -->
-            <div class="control-group gifter-name">
-              <label class="control-label" for="gifter-name">Your name:</label>
-              <div class="controls">
-                <input id="gifter-name" type="text" name="gifter-name" placeholder="Santa Claus" />
-              </div>
-            </div> <!-- End .gifter-name.controls -->
-          </form>
-        </section>
         <div class="row-fluid">
-          <div id="billing-review-column" class="span7">
-            <section id="billing">
-              <h2>Billing information:</h2>
-              <form class="form-horizontal">
-                <fieldset>
-                  <div class="control-group card-name">
-                    <label class="control-label" for="card-name">Full name:</label>
-                    <div class="controls">
-                      <input id="card-name" type="text" name="card-name" />
-                    </div>
-                  </div> <!-- End .card-name.controls -->
+          <section id="personalize" class="span6">
+            <h2>Personalize:</h2>
+            <div class="hint">
+              The certificate PDF you receive will contain your name and the recipient's.
+            </div>
 
-                  <div class="control-group email">
-                    <label class="control-label" for="email">Email:</label>
-                    <div class="controls">
-                      <input id="email" type="text" name="email" />
-                    </div>
-                  </div> <!-- End .email.controls -->
-
-                  <div class="control-group card-number">
-                    <label class="control-label" for="card-number">Card number:</label>
-                    <div class="controls">
-                      <input id="card-number" type="text" name="card-number" />
-                    </div>
-                  </div> <!-- End .card-number.controls -->
-
-                  @** in-line styles in this section leave a bad taste in my mouth, but necessary here to override chosen.js pretty selectors *@
-                  <div class="control-group card-exp" >
-                    <label class="control-label" for="card-exp-month">Exp. Date:</label>
-                    <div class="controls select card-expiry">
-                      <select id="card-exp-month" class="inline chsn-select" data-placeholder="Month" style="width: 130px">
-                        <option value></option>
-                        <option value="01">January</option>
-                        <option value="02">February</option>
-                        <option value="03">March</option>
-                        <option value="04">April</option>
-                        <option value="05">May</option>
-                        <option value="06">June</option>
-                        <option value="07">July</option>
-                        <option value="08">August</option>
-                        <option value="09">September</option>
-                        <option value="10">October</option>
-                        <option value="11">November</option>
-                        <option value="12">December</option>
-                      </select>
-                      <select id="card-exp-year" name="card-exp-year" class="inline chsn-select" data-placeholder="Year" style="width:86px"> 
-                        <option value></option>
-                        @for(year <- 2012 to 2020) {
-                          <option value="@year">@year</option>
-                        }
-                      </select>
-                      <div class="alert alert-error hidden">
-                        <button type="button" class="close" data-dismiss="alert">&times;</button>
-                        <span class="error-message">Expiry date error</span>
-                      </div>
-                    </div>
-                  </div> <!-- end .control-group -->  
-
-                  <div class="control-group card-cvc">
-                    <label class="control-label" for="card-cvc">Security Code:</label>
-                    <div class="controls">
-                      <input id="card-cvc" type="text" name="card-cvc" />
-                    </div>
-                  </div> <!-- End .card-cvc.controls -->
-
-                  <div class="control-group postal-code">
-                    <label class="control-label" for="postal-code">Postal code:</label>
-                    <div class="controls">
-                      <input id="postal-code" type="text" name="postal-code" />
-                    </div>
-                  </div> <!-- End .postal-code.controls -->
-
-                  <div class="control-group">
-                    @tags.arrow_button(
-                      caption="Review Order",
-                      classes="button right review"
-                    )
+            <form class="form-horizontal">
+              <div class="control-group recipient-name">
+                <label class="control-label" for="recipient-name">Recipient name:</label>
+                <div class="controls">
+                  <input id="recipient-name" type="text" name="recipient-name" placeholder="Tiny Tim" />
+                </div>
+              </div> <!-- End .recipient-name.controls -->
+              <div class="control-group gifter-name">
+                <label class="control-label" for="gifter-name">Your name:</label>
+                <div class="controls">
+                  <input id="gifter-name" type="text" name="gifter-name" placeholder="Santa Claus" />
+                </div>
+              </div> <!-- End .gifter-name.controls -->
+            </form>
+          </section>
+          <section id="billing" class="span6">
+            <h2>Pay:</h2>
+            <form class="form-horizontal">
+              <fieldset>
+                <div class="control-group card-name">
+                  <label class="control-label" for="card-name">Full name:</label>
+                  <div class="controls">
+                    <input id="card-name" type="text" name="card-name" />
                   </div>
+                </div> <!-- End .card-name.controls -->
 
-                </fieldset>
-              </form>
-            </section>
-            <a href="#review" role="button" class="btn" data-toggle="modal">Review dat shiz</a>
-            <section id="review" class="modal hide fade">
-              <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h3>Review order</h3>
-              </div>
-              <div class="modal-body">
-                <div class="purchaser-summary">
-                  <div class="amount-recipient">
-                    <h3>Amount:</h3>
-                    <div class="summary-item">$75.00</div>
-                    <h3>Recipient's Name:</h3>
-                    <div class="summary-item">Andy Johnson</div>
+                <div class="control-group email">
+                  <label class="control-label" for="email">Email:</label>
+                  <div class="controls">
+                    <input id="email" type="text" name="email" />
                   </div>
-                  <div class="billing">
-                    <h3>Billing information:</h3>
-                    <div class="summary-item">
-                      <p>Joshua Johnson</p>
-                      <p class="card-number-placeholder">Visa XXXXXXXXXXXX4021</p>
+                </div> <!-- End .email.controls -->
+
+                <div class="control-group card-number">
+                  <label class="control-label" for="card-number">Card number:</label>
+                  <div class="controls">
+                    <input id="card-number" type="text" name="card-number" />
+                  </div>
+                </div> <!-- End .card-number.controls -->
+
+                @** in-line styles in this section leave a bad taste in my mouth, but necessary here to override chosen.js pretty selectors *@
+                <div class="control-group card-exp" >
+                  <label class="control-label" for="card-exp-month">Exp. Date:</label>
+                  <div class="controls select card-expiry">
+                    <select id="card-exp-month" class="inline chsn-select" data-placeholder="Month" style="width: 96px">
+                      <option value></option>
+                      <option value="01">January</option>
+                      <option value="02">February</option>
+                      <option value="03">March</option>
+                      <option value="04">April</option>
+                      <option value="05">May</option>
+                      <option value="06">June</option>
+                      <option value="07">July</option>
+                      <option value="08">August</option>
+                      <option value="09">September</option>
+                      <option value="10">October</option>
+                      <option value="11">November</option>
+                      <option value="12">December</option>
+                    </select>
+                    <select id="card-exp-year" name="card-exp-year" class="inline chsn-select" data-placeholder="Year" style="width:65px">
+                      <option value></option>
+                      @for(year <- 2012 to 2020) {
+                        <option value="@year">@year</option>
+                      }
+                    </select>
+                    <div class="alert alert-error hidden">
+                      <button type="button" class="close" data-dismiss="alert">&times;</button>
+                      <span class="error-message">Expiry date error</span>
                     </div>
-                  </div> <!-- End .billing -->
-                </div> <!-- End .purchaser-summary -->
-                <div class="price-summary">
-                  <table>
-                    <tr>
-                      <th>Subtotal</th>
-                      <td>$75.00</td>
-                    </tr>
-                    <tr>
-                      <th>Tax</th>
-                      <td>$0.00</td>
-                    </tr>
-                    <tr id="total">
-                      <th>Total</th>
-                      <td>$0.00</td>
-                    </tr>
-                  </table>
-                </div> <!-- End .price-summary -->
-              </div>
-            </section>
-          </div>
+                  </div>
+                </div> <!-- end .control-group -->  
+
+                <div class="control-group card-cvc">
+                  <label class="control-label" for="card-cvc">Security Code:</label>
+                  <div class="controls">
+                    <input id="card-cvc" type="text" name="card-cvc" />
+                  </div>
+                </div> <!-- End .card-cvc.controls -->
+
+                <div class="control-group postal-code">
+                  <label class="control-label" for="postal-code">Postal code:</label>
+                  <div class="controls">
+                    <input id="postal-code" type="text" name="postal-code" />
+                  </div>
+                </div> <!-- End .postal-code.controls -->
+
+                <div class="control-group">
+                  @tags.arrow_button(
+                    caption="Review Order",
+                    classes="button right review"
+                  )
+                </div>
+
+              </fieldset>
+            </form>
+            @**<a href="#review" role="button" class="btn" data-toggle="modal">Review dat shiz</a>              *@
+          </section>
         </div>
+        <section id="review" class="modal hide fade">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h3>Review order</h3>
+          </div>
+          <div class="modal-body">
+            <div class="purchaser-summary">
+              <div class="amount-recipient">
+                <h3>Amount:</h3>
+                <div class="summary-item">$75.00</div>
+                <h3>Recipient's Name:</h3>
+                <div class="summary-item">Andy Johnson</div>
+              </div>
+              <div class="billing">
+                <h3>Billing information:</h3>
+                <div class="summary-item">
+                  <p>Joshua Johnson</p>
+                  <p class="card-number-placeholder">Visa XXXXXXXXXXXX4021</p>
+                </div>
+              </div> <!-- End .billing -->
+            </div> <!-- End .purchaser-summary -->
+            <div class="price-summary">
+              <table>
+                <tr>
+                  <th>Subtotal</th>
+                  <td>$75.00</td>
+                </tr>
+                <tr>
+                  <th>Tax</th>
+                  <td>$0.00</td>
+                </tr>
+                <tr id="total">
+                  <th>Total</th>
+                  <td>$0.00</td>
+                </tr>
+              </table>
+            </div> <!-- End .price-summary -->
+          </div>
+        </section>
       </div>
     </div>
   </div>

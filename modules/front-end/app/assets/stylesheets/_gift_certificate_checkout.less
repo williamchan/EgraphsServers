@@ -1,9 +1,11 @@
 // Styles for the gift certificate checkout page
 
+@sectionSeparator: 1px solid lighten(@gray, 50%);
+
 #content.gift-certificate-checkout {
-  @separatorColor: 1px solid lighten(@gray, 50%);
+  @sectionSeparator: 1px solid lighten(@gray, 50%);
   section {
-    border-bottom:@separatorColor;
+    border-bottom:@sectionSeparator;
     .box-shadow(0px 1px 0px white);
     padding-top:7px;
     padding-bottom:15px;
@@ -121,27 +123,43 @@
   } // End .choose-amount
 
   #personalize {
+    border-bottom:0px;
+    .box-shadow(none);
+
     h2 {
       margin-bottom:0px;
     }
+
+    .control-group {
+      margin-right:10px;
+      input {
+        width:100%;
+      }
+    }
+
 
     .hint {
       margin-bottom: 12px;
     }
   }
 
-  #billing-review-column {
-    #card_exp_year_chzn {
-      width:50px;
+  #billing {
+    padding-left:@fluidGridGutterWidth;
+    border-bottom:none;
+    border-left: @sectionSeparator;
+    .box-shadow(1px 0px 0px white inset);
+
+    .control-group {
+      margin-right:10px;
     }
 
-    fieldset {
-      max-width:380px;
+    input {
+      width:100%;
     }
   }
 
-  #review {
-    display: none;
+  button.review {
+    margin-top:20px;
   }
 
   input#card-cvc, input#postal-code {
@@ -151,6 +169,7 @@
 } // End #content
 
 @media (max-width:767px) { #content.gift-certificate-checkout {  
+  @sectionSeparator: 1px solid lighten(@gray, 50%);
   .controls {
     // Eliminate artifactual input expansion outside of grid due to spanning at
     // 100%
@@ -168,8 +187,14 @@
     }
   }
 
-  #billing-review-column {
-    border-right:none;
+  #personalize {
+    border-bottom:@sectionSeparator;
+    .box-shadow(0px 1px 0px white);
+  }
+
+  #billing {
+    padding-left: none;
+    border-left: none;
     .box-shadow(none);
   }
 }}
