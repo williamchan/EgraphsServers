@@ -3,6 +3,33 @@
 @sectionSeparator: 1px solid lighten(@gray, 50%);
 
 #content.gift-certificate-checkout {
+  .checkout-step-count {
+    // .box-shadow(0px 1px 0px #333);
+    position:relative;
+    margin-right:7px;
+    padding-top:0px;
+    padding-bottom:0px;
+    padding-left:7px;
+    padding-right:7px;
+    border-radius:100px;
+    background-color:@orange;
+    // text-shadow: 0px 1px 0px black;
+    color:@white;
+    
+    font-size:16px;
+    font-weight:600;
+
+    &.two {
+      padding-left:6px;
+      padding-right:5px;
+    }
+
+    &.three {
+      padding-left:6px;
+      padding-right:6px;
+    }
+  }
+
   @sectionSeparator: 1px solid lighten(@gray, 50%);
   section {
     border-bottom:@sectionSeparator;
