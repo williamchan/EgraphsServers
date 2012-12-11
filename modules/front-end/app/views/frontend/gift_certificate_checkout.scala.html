@@ -31,7 +31,7 @@
         </section>
         
         <section id="choose-amount">
-          <h2>Choose an amount</h2>
+          <h2>Choose an amount:</h2>
           <div class="amount-options row-fluid">
             <div class="amount-option dollar-amount span2">
               <button class="btn"><span class="dollah">$</span>25</button>
@@ -42,7 +42,7 @@
             <div class="amount-option dollar-amount span2">
               <button class="btn active"><span class="dollah">$</span>75</button>
               <div class="hint">
-                Most popular
+                Most popular price point
               </div>
             </div>
             <div class="amount-option dollar-amount span2">
@@ -50,12 +50,15 @@
             </div>
             <div class="amount-option own-amount span4">
               <button class="btn">Set my own amount</button>
+              <div id="amount-field">
+                <span class="dollah">$</span><input type="text" name="amount-field" value="75" >
+              </div>
             </div>
           </div>
         </section>
         
         <section id="recipient">
-          <h2>Recipient's Name</h2>
+          <h2>Recipient's Name:</h2>
           @tags.bootstrap_input_field(Field.empty("recipientName")) {
             <input id="your-name"
                    type="text"
@@ -63,7 +66,7 @@
           }
           <div class="hint">
             The PDF will have the recipient's name on it. You can print it out and give it to him/her or just forward the email you receive after this purchase.
-          </div>
+          </div>                      
         </section>
         <aside class="price-summary">
           <table>
@@ -82,7 +85,7 @@
           </table>
         </aside>
         <section id="billing">
-          <h2>Billing information</h2>
+          <h2>Billing information:</h2>
           <fieldset>
             @tags.bootstrap_text_input_field("Card number:", Field.empty("card-number"))
             <div class="field" >
