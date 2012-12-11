@@ -22,8 +22,8 @@
               <ul>
                 <li>Gift certificates can be used to purchase any product on the site</li>
                 <li>they can be used over multiple purchases</li>
-                <li>they do not expire</li>
-                <li>You will receive an e-mail with a printable PDF certificate and code</li>
+                <li>they never expire</li>
+                @** TODO(SER-600): Move this to near the purchase button <li>You will receive an e-mail containing the printable certificate as a PDF</li> *@
               </ul>
             </div>
           </div>
@@ -58,21 +58,24 @@
         
         <section id="personalize">
           <h2>Personalize:</h2>
-          <div class="row-fluid">
-            <div class="span6 input recipient-name">
-              <label class="instructions" for="recipient-name">Recipient name:</label>            
-              <input id="recipient-name" type="text" name="recipient-name">
-              <div class="hint">
-                The certificate PDF you receive will contain both your name and the recipient's .
+          <div class="hint">
+            The certificate PDF you receive will contain your name and the recipient's.
+          </div>
+
+          <form class="form-horizontal">
+            <div class="control-group recipient-name">
+              <label class="control-label" for="recipient-name">Recipient name:</label>            
+              <div class="controls">
+                <input id="recipient-name" type="text" name="recipient-name" placeholder="Tiny Tim">
+              </div>
+            </div> <!-- End .recipient-name.controls -->
+            <div class="control-group gifter-name">
+              <label class="control-label" for="gifter-name">Your name:</label>
+              <div class="controls">
+                <input id="gifter-name" type="text" name="gifter-name" placeholder="Santa">
               </div>
             </div>
-          </div>
-          <div class="row-fluid">
-            <div class="span6 input gifter-name">
-            <label class="instructions" for="gifter-name">Gift giver's name:</label>
-            <input id="gifter-name" type="text" name="gifter-name">
-            </div>
-          </div>          
+          </form>
         </section>
         <div class="row-fluid">
           <div id="billing-review-column" class="span7">

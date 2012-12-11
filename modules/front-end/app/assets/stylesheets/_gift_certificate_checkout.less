@@ -11,6 +11,10 @@
     &.first {
       border-top: none;
     }
+
+    .control-label {
+      text-align: left;
+    }
   }
 
   h2 {
@@ -27,7 +31,6 @@
     font-weight:300;
     line-height:normal;
   }
-
 
   #masthead {
     h1 {
@@ -120,12 +123,13 @@
   } // End .choose-amount
 
   #personalize {
-    input {
-      width:100%;
+    h2 {
+      margin-bottom:0px;
     }
 
-    .input.gifter-name {
-      margin-top:15px;
+    .hint {
+      // #grid.fluid.span(7);
+      margin-bottom: 12px;
     }
   }
 
@@ -144,16 +148,6 @@
     .amount-option {
       // Space out the buttons once they snap to vertical alignment
       margin-bottom: 15px;
-    }
-  }
-
-  #personalize {
-    div.input {
-      padding-right:10px;
-
-      input {
-        width: 100%;
-      }
     }
   }
 
