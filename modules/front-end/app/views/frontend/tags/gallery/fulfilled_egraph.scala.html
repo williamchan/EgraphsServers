@@ -24,20 +24,21 @@
         <div>
           <p>@egraph.productDescription</p>
         </div>
-        <div class="padding-fix">
-          <div class="social">
-            <ul class="clearfix">
-              <li><span class="social-label">Share this</span></li>
-              <li>
-                <a href="@egraph.facebookShareLink" class="facebook" target="_blank">Facebook</a>
-              </li>
-              <li>
-                <a href="@egraph.twitterShareLink" class="twitter" target="_blank">Twitter</a>
-              </li>
-            </ul>
-          </div>
-        </div>
+        
         @if(!egraph.isGift) {
+          <div class="padding-fix">
+            <div class="social">
+              <ul class="clearfix">
+                <li><span class="social-label">Share this</span></li>
+                <li>
+                  <a href="@egraph.facebookShareLink" class="facebook" target="_blank">Facebook</a>
+                </li>
+                <li>
+                  <a href="@egraph.twitterShareLink" class="twitter" target="_blank">Twitter</a>
+                </li>
+              </ul>
+            </div>
+          </div>
           <div class="controls">
             @if(controlRenderer == OwnerGalleryControl){
               @tags.toggle(styleclass="private",

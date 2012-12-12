@@ -32,7 +32,7 @@ case class PendingEgraphViewModel(
   recipientName: String,
   thumbnailUrl: String) extends EgraphViewModel {
   
-  def isGift = {
+  def isGift: Boolean = {
     buyerId != recipientId
   }
 }
@@ -54,7 +54,7 @@ case class FulfilledEgraphViewModel(
   twitterShareLink: String,
   viewEgraphUrl: String) extends EgraphViewModel {
   
-  def isGift = {
+  def isGift: Boolean = {
     buyerId != recipientId
   }
 }

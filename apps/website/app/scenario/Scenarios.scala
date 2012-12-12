@@ -215,7 +215,7 @@ class Scenarios extends DeclaresScenarios {
   toScenarios add Scenario(
   "Erem buys one of Will's products as a gift for Myyk",
   apiCategory,
-  """Creates one unfulfilled order (starcraftChampionship), which will be a gift for Erem.""", {
+  """Creates one unfulfilled order (starcraftChampionship), which will be a gift for Myyk.""", {
     () =>
       val erem = Scenarios.getEremCustomerAccount
       val myyk = Scenarios.getMyykCustomerAccount
