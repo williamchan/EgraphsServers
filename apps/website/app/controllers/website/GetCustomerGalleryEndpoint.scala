@@ -59,7 +59,6 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
     (implicit request: RequestHeader, authToken: AuthenticityToken)
   : Result = 
   {    
-    val galleryCustomerId = customer.id
     //If admin is true admin
     val session = request.session
     val adminGalleryControlOption = for{
@@ -68,7 +67,7 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
     //if customerId is the same as the gallery requested
     val sessionGalleryControlOption = for{
       sessionCustomerId <- session.customerId
-      if (sessionCustomerId == galleryCustomerId)} yield OwnerGalleryControl
+      if (sessionCustomerId == customer.id)} yield OwnerGalleryControl
 
     //In priority order
     val galleryControlPrecedence = List(
@@ -80,8 +79,8 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
     val galleryControl = galleryControlPrecedence.flatten.head
 
     //get orders (my pending orders and my gift orders to both be displayed)
-    val ordersAndEgraphs = orderStore.galleryOrdersWithEgraphs(galleryCustomerId)
-    val giftOrdersAndEgraphs = orderStore.galleryGiftOrdersWithEgraphs(galleryCustomerId)
+    val ordersAndEgraphs = orderStore.galleryOrdersWithEgraphs(customer.id)
+    val giftOrdersAndEgraphs = orderStore.galleryGiftOrdersWithEgraphs(customer.id)
 
     val pendingOrders = GalleryOrderFactory.filterPendingOrders(ordersAndEgraphs)
     val pendingGiftOrders = GalleryOrderFactory.filterPendingOrders(giftOrdersAndEgraphs)
@@ -92,7 +91,7 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
     val orders = getOrders(pendingOrders, fulfilledOrders, galleryControl, customer)
     val giftOrders = getOrders(pendingGiftOrders, fulfilledGiftOrders, galleryControl, customer)
     
-    Ok(views.html.frontend.account_gallery(customer.username, orders, giftOrders, galleryControl, galleryCustomerId))
+    Ok(views.html.frontend.account_gallery(customer.username, orders, giftOrders, galleryControl, customer.id))
   }
   
   /**
