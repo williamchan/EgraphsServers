@@ -1,39 +1,41 @@
-@(egraph: models.frontend.egraphs.PendingEgraphViewModel, orderDetails: models.frontend.egraphs.OrderDetails, index: Int)
+@(egraph: models.frontend.egraphs.PendingEgraphViewModel, orderDetails: models.frontend.egraphs.OrderDetails, index: Int, galleryCustomerId: Long)
   
-  <div class="row-fluid row-egraph">
-    <div class="span12">
-      <div class="number">@(index+1)</div>
-      <br class="number-br">
-      <span>
-        <h3>@egraph.productPublicName: @egraph.productTitle</h3><span class="order-line"> &nbsp;Pending Order</span>
-      </span>
-    </div>
-  </div>
-  <div class="row-fluid">
-    <div class="span3">
-      <div class="pending-@egraph.orientation">
-        <img src="@egraph.thumbnailUrl">
-        </img>
+  @if(galleryCustomerId == egraph.buyerId) {
+    <div class="row-fluid row-egraph">
+      <div class="span12">
+        <div class="number">@(index+1)</div>
+        <br class="number-br">
+        <span>
+          <h3>@egraph.productPublicName: @egraph.productTitle</h3><span class="order-line"> &nbsp;Pending Order</span>
+        </span>
       </div>
     </div>
-    <div class="span6">
-      @if(egraph.isGift) {
-        <div class="order-row">
-          <span class="order-label">Recipient Name</span><span class="order-detail"> @egraph.recipientName</span>
+    <div class="row-fluid">
+      <div class="span3">
+        <div class="pending-@egraph.orientation">
+          <img src="@egraph.thumbnailUrl">
+          </img>
         </div>
-      }
-      <div class="order-row">
-        <span class="order-label">Order Date</span><span class="order-detail"> @orderDetails.orderDate</span>
       </div>
-      <div class="order-row">
-        <span class="order-label">Order Number</span><span class="order-detail"> @orderDetails.orderNumber</span>
+      <div class="span6">
+        @if(egraph.isGift) {
+          <div class="order-row">
+            <span class="order-label">Recipient Name</span><span class="order-detail"> @egraph.recipientName</span>
+          </div>
+        }
+        <div class="order-row">
+          <span class="order-label">Order Date</span><span class="order-detail"> @orderDetails.orderDate</span>
+        </div>
+        <div class="order-row">
+          <span class="order-label">Order Number</span><span class="order-detail"> @orderDetails.orderNumber</span>
+        </div>
+      </div>
+      <div class="span3 shipping-details">
+        <span>Status: </span>@orderDetails.statusText<br>
+        @**  
+          <span>Shipping: </span>@orderDetails.shippingMethod<br>
+          <span>UPS Tracking Number: </span>@orderDetails.UPSNumber<br>
+        *@
       </div>
     </div>
-    <div class="span3 shipping-details">
-      <span>Status: </span>@orderDetails.statusText<br>
-      @**  
-        <span>Shipping: </span>@orderDetails.shippingMethod<br>
-        <span>UPS Tracking Number: </span>@orderDetails.UPSNumber<br>
-      *@
-    </div>
-  </div>
+  }

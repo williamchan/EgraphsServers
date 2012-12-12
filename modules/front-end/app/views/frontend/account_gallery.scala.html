@@ -1,6 +1,7 @@
 @(username: String, egraphs: List[models.frontend.egraphs.EgraphViewModel],
   giftEgraphs: List[models.frontend.egraphs.EgraphViewModel], 
-  controlRenderer: models.frontend.egraphs.GalleryControlRenderer
+  controlRenderer: models.frontend.egraphs.GalleryControlRenderer,
+  galleryCustomerId: Long
 )(implicit authToken: _root_.egraphs.authtoken.AuthenticityToken,
   headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData
@@ -43,7 +44,7 @@
         <section class="galleryrows">
         @for((egraph,index) <- egraphs.zipWithIndex){
           @{egraph match {
-            case e: models.frontend.egraphs.PendingEgraphViewModel => tags.gallery.pending_egraph(e, e.orderDetails, index)
+            case e: models.frontend.egraphs.PendingEgraphViewModel => tags.gallery.pending_egraph(e, e.orderDetails, index, galleryCustomerId)
             case e: models.frontend.egraphs.FulfilledEgraphViewModel => tags.gallery.fulfilled_egraph(e, index, controlRenderer)
             case _ => ""
             }
@@ -70,7 +71,7 @@
           <section class="galleryrows">
           @for((giftEgraph,index) <- giftEgraphs.zipWithIndex){
             @{giftEgraph match {
-              case e: models.frontend.egraphs.PendingEgraphViewModel => tags.gallery.pending_egraph(e, e.orderDetails, index)
+              case e: models.frontend.egraphs.PendingEgraphViewModel => tags.gallery.pending_egraph(e, e.orderDetails, index, galleryCustomerId)
               case e: models.frontend.egraphs.FulfilledEgraphViewModel => tags.gallery.fulfilled_egraph(e, index, controlRenderer)
               case _ => ""
               }

@@ -63,11 +63,11 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
     //If admin is true admin
     val session = request.session
     val adminGalleryControlOption = for(
-      sessionAdminId <- session.adminId.map(adminId => adminId.toLong);
+      sessionAdminId <- session.adminId.map(adminId => adminId);
       adminOption   <- administratorStore.findById(sessionAdminId)) yield AdminGalleryControl
     //if customerId is the same as the gallery requested
     val sessionGalleryControlOption = for(
-      sessionCustomerId <- session.customerId.map(customerId => customerId.toLong);
+      sessionCustomerId <- session.customerId.map(customerId => customerId);
       if (sessionCustomerId == galleryCustomerId)) yield OwnerGalleryControl
 
     //In priority order
@@ -92,7 +92,7 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
     val orders = getOrders(pendingOrders, fulfilledOrders, galleryControl, customer)
     val giftOrders = getOrders(pendingGiftOrders, fulfilledGiftOrders, galleryControl, customer)
     
-    Ok(views.html.frontend.account_gallery(customer.username, orders, giftOrders, galleryControl))
+    Ok(views.html.frontend.account_gallery(customer.username, orders, giftOrders, galleryControl, galleryCustomerId))
   }
   
   /**
