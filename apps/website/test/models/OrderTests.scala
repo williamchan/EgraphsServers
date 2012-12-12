@@ -292,7 +292,10 @@ class OrderTests extends EgraphsUnitTest
 
     val egraph = order.newEgraph.save()
 
-    TestData.newSavedEgraph(Some(order)).withEgraphState(EgraphState.FailedBiometrics).save()
+    //Failing biometrics does not currently mean that an Egraph should not be displayed
+    // (in the future, with an improved biometrics solution, this may change)
+    //TestData.newSavedEgraph(Some(order)).withEgraphState(EgraphState.FailedBiometrics).save()
+    
     TestData.newSavedEgraph(Some(order)).withEgraphState(EgraphState.RejectedByAdmin).save()
     TestData.newSavedEgraph(Some(order)).withEgraphState(EgraphState.Published).save()
 
