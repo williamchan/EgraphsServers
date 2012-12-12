@@ -1,92 +1,12 @@
 // Styles for the gift certificate checkout page
 
-@sectionSeparator: 1px solid lighten(@gray, 50%);
-
-#content.gift-certificate-checkout {
-  .checkout-step-count {
-    // .box-shadow(0px 1px 0px #333);
-    position:relative;
-    margin-right:7px;
-    padding-top:0px;
-    padding-bottom:0px;
-    padding-left:7px;
-    padding-right:7px;
-    border-radius:100px;
-    background-color:@orange;
-    // text-shadow: 0px 1px 0px black;
-    color:@white;
-    
-    font-size:16px;
-    font-weight:600;
-
-    &.two {
-      padding-left:5px;
-      padding-right:5px;
-    }
-
-    &.three {
-      padding-left:5px;
-      padding-right:5px;
-    }
-  }
-
-  @sectionSeparator: 1px solid lighten(@gray, 50%);
-  section {
-    border-bottom:@sectionSeparator;
-    .box-shadow(0px 1px 0px white);
-    padding-top:7px;
-    padding-bottom:15px;
-
-    &.first {
-      border-top: none;
-    }
-
-    .control-label {
-      text-align: left;
-    }
-  }
-
-  h2 {
-    color:#4d4d4d;
-    text-transform: uppercase;
-    font-size:16px;
-    font-weight:600;
-    margin-bottom:15px;
-  }
-
-  .hint {
-    color:#808080;
-    font-size:14px;
-    font-weight:300;
-    line-height:normal;
-  }
-
-  #masthead {
-    margin-top:40px;
-
-    h1 {
-      text-align:top;
-      font-size:40px;
-      font-weight:100;
-    }
-
-    ul {
-      color:#808080;
-      padding-top:30px;
-      font-size:14px;
-      font-weight:300;
-      
-      li {
-        line-height:18px;
-        list-style-type:circle;
-      }
-    }
-
+.giftCertificates() {
+  .certificatePreviews(@imageWidth) {
     .previews {
       position:relative;
 
       .preview {
-        width:200px;
+        width:@imageWidth;
         background-color:white;
         .box-shadow(1px 1px 6px lighten(black, 60%));
 
@@ -97,155 +17,256 @@
 
         &.background {
           position:absolute;
-          top:-13px;
-          left:155px;
+          top: -.0526 * @imageWidth;
+          left: .7368 * @imageWidth;
           .rotate(3deg);
         }
+
+        embed {
+          // We stupidly have to concretely specify height because Safari 
+          // doesn't scale the svg's height properly.
+          width: 100%;
+          height: 1.2947 * @imageWidth;
+        }
       }
+
+      position:relative;
     }
   }
 
-  #choose-amount {
-    .amount-option {
+  @sectionSeparator: 1px solid lighten(@gray, 50%);
+
+  #content.gift-certificate-checkout {
+    .checkout-step-count {
       position:relative;
+      margin-right:7px;
+      padding-top:0px;
+      padding-bottom:0px;
+      padding-left:7px;
+      padding-right:7px;
+      border-radius:100px;
+      background-color:@orange;
+      color:@white;
+      
+      font-size:16px;
+      font-weight:600;
 
-      button.btn {
-        border-radius:0px;
-        position:relative;
-        .buttonBackground(lighten(@gray, 60%), lighten(@gray, 45%));
-        color: #333;
-        height:70px;
-        width:100%;
-        text-transform:uppercase;
+      &.two {
+        padding-left:5px;
+        padding-right:5px;
+      }
+
+      &.three {
+        padding-left:5px;
+        padding-right:5px;
+      }
+    }
+
+    @sectionSeparator: 1px solid lighten(@gray, 50%);
+    section {
+      border-bottom:@sectionSeparator;
+      .box-shadow(0px 1px 0px white);
+      padding-top:7px;
+      padding-bottom:15px;
+
+      &.first {
+        border-top: none;
+      }
+
+      .control-label {
+        text-align: left;
+      }
+    }
+
+    h2 {
+      color:#4d4d4d;
+      text-transform: uppercase;
+      font-size:16px;
+      font-weight:600;
+      margin-bottom:15px;
+    }
+
+    .hint {
+      color:#808080;
+      font-size:14px;
+      font-weight:300;
+      line-height:normal;
+    }
+
+    #masthead {
+      margin-top:40px;
+
+      h1 {
+        text-align:top;
+        font-size:40px;
+        font-weight:100;
+      }
+
+      ul {
+        color:#808080;
+        padding-top:30px;
+        font-size:14px;
         font-weight:300;
-        font-size:36px;
-
-        .dollah {
-          position:relative;
-          vertical-align:super;
-          top:3px;
-          font-size:22px;
+        
+        li {
+          line-height:18px;
+          list-style-type:circle;
         }
+      }
 
-        &:hover {
-          border:1px solid @orange;
-        }
+      .certificatePreviews(190px);
 
-        &.active, &:active {
-          .gradientBar(@orange, lighten(@orange, 10%));
-          *background-color: @orange;
-          .reset-filter();
-          color:white;
-          text-shadow: 0px -1px 0px black;
-        }
-      } // End button.btn
+    }
 
-      &.own-amount {
+    #choose-amount {
+      .amount-option {
+        position:relative;
+
         button.btn {
-          font-size:20px;
-        }
-
-        #amount-field {
+          border-radius:0px;
           position:relative;
-          display:inline-block;
-          float:right;
-          margin-top:15px;
+          .buttonBackground(lighten(@gray, 60%), lighten(@gray, 45%));
+          color: #333;
+          height:70px;
+          width:100%;
+          text-transform:uppercase;
+          font-weight:300;
+          font-size:36px;
 
           .dollah {
             position:relative;
-            top:-1px;
-            color:#333;
-            font-size:20px;
-            padding-right:7px;
+            vertical-align:super;
+            top:3px;
+            font-size:22px;
           }
 
-          input {
-            max-width:70px;
+          &:hover {
+            border:1px solid @orange;
+          }
+
+          &.active, &:active {
+            .gradientBar(@orange, lighten(@orange, 10%));
+            *background-color: @orange;
+            .reset-filter();
+            color:white;
+            text-shadow: 0px -1px 0px black;
+          }
+        } // End button.btn
+
+        &.own-amount {
+          button.btn {
+            font-size:20px;
+          }
+
+          #amount-field {
+            position:relative;
+            display:inline-block;
+            float:right;
+            margin-top:15px;
+
+            .dollah {
+              position:relative;
+              top:-1px;
+              color:#333;
+              font-size:20px;
+              padding-right:7px;
+            }
+
+            input {
+              max-width:70px;
+            }
           }
         }
+      } // End .amount-option
+
+      .hint {
+        padding-top:4px;
+        text-align:center;
       }
-    } // End .amount-option
 
-    .hint {
-      padding-top:4px;
-      text-align:center;
+    } // End .choose-amount
+
+    #personalize {
+      border-bottom:0px;
+      .box-shadow(none);
+
+      h2 {
+        margin-bottom:0px;
+      }
+
+      .control-group {
+        margin-right:10px;
+        input {
+          width:100%;
+        }
+      }
+
+
+      .hint {
+        margin-bottom: 12px;
+      }
     }
 
-  } // End .choose-amount
+    #billing {
+      padding-left:@fluidGridGutterWidth;
+      border-bottom:none;
+      border-left: @sectionSeparator;
+      .box-shadow(1px 0px 0px white inset);
 
-  #personalize {
-    border-bottom:0px;
-    .box-shadow(none);
+      .control-group {
+        margin-right:10px;
+      }
 
-    h2 {
-      margin-bottom:0px;
-    }
-
-    .control-group {
-      margin-right:10px;
       input {
         width:100%;
       }
     }
 
-
-    .hint {
-      margin-bottom: 12px;
+    button.review {
+      margin-top:20px;
     }
-  }
 
-  #billing {
-    padding-left:@fluidGridGutterWidth;
-    border-bottom:none;
-    border-left: @sectionSeparator;
-    .box-shadow(1px 0px 0px white inset);
+    input#card-cvc, input#postal-code {
+      max-width:50px;
+    }
 
-    .control-group {
+  } // End #content
+
+  @media (max-width:767px) { #content.gift-certificate-checkout {
+    .controls {
+      // Eliminate artifactual input expansion outside of grid due to spanning at
+      // 100%
       margin-right:10px;
+
+      input[type="text"] {
+        width:100%;
+      }
     }
 
-    input {
-      width:100%;
+    #choose-amount {
+      .amount-option {
+        // Space out the buttons once they snap to vertical alignment
+        margin-bottom: 15px;
+      }
     }
-  }
 
-  button.review {
-    margin-top:20px;
-  }
-
-  input#card-cvc, input#postal-code {
-    max-width:50px;
-  }
-
-} // End #content
-
-@media (max-width:767px) { #content.gift-certificate-checkout {  
-  @sectionSeparator: 1px solid lighten(@gray, 50%);
-  .controls {
-    // Eliminate artifactual input expansion outside of grid due to spanning at
-    // 100%
-    margin-right:10px;
-
-    input[type="text"] {
-      width:100%;
+    #personalize {
+      border-bottom:@sectionSeparator;
+      .box-shadow(0px 1px 0px white);
     }
-  }
 
-  #choose-amount {
-    .amount-option {
-      // Space out the buttons once they snap to vertical alignment
-      margin-bottom: 15px;
+    #billing {
+      padding-left: 0px;
+      border-left: none;
+      .box-shadow(none);
     }
-  }
+  }}
 
-  #personalize {
-    border-bottom:@sectionSeparator;
-    .box-shadow(0px 1px 0px white);
-  }
+  @media (max-width:480px) { #content.gift-certificate-checkout {
+    #masthead {
+      .certificatePreviews(160px);
+    }
+  }}
+} // End .giftCertificates()
 
-  #billing {
-    padding-left: 0px;
-    border-left: none;
-    .box-shadow(none);
-  }
-}}
+.giftCertificates();
