@@ -50,7 +50,7 @@ object TestControllers extends Controller with Logging {
       Action {
         val maybeAccount = accountStore.findByCustomerId(customerId) 
         maybeAccount match {
-          case None => InternalServerError("There are no accounts currently created")
+          case None => InternalServerError("There is no account associated with the given customer ID")
           case Some(account) => Ok("Username and Password: " + account.email + " : " + TestData.defaultPassword)
         }
       }
