@@ -121,36 +121,30 @@ trait PostOrderAdminEndpoint { this: Controller =>
                 Form(single("newProductId" -> number)).bindFromRequest().fold(
                   errors => BadRequest(Html("<html><body> Incorrect Product Id </body></html>")),
                   newProductId => {
-                    val maybeOk = for(
+                    val maybeOk = for{
                       product <- productStore.findById(newProductId)
-                    ) yield {
-                      val maybeInventoryBatch = product.inventoryBatches.filter(batch => batch.isActive).headOption
-                      maybeInventoryBatch match {
-                        case None => BadRequest(Html("<html><body> No inventory batch available for product id = " + newProductId + " </body></html>"))
-                        case Some(inventoryBatch) =>
-                          // create a new order
-                          val newOrder = order
-                            .withReviewStatus(OrderReviewStatus.PendingAdminReview)
-                            .copy(
-                              id = 0,
-                              productId = newProductId,
-                              rejectionReason = None,
-                              inventoryBatchId = inventoryBatch.id)
-                            .save()
-                          // mark old product invalid
-                          order.withReviewStatus(OrderReviewStatus.RejectedByAdmin).copy(rejectionReason = Some("Changed product to " + newProductId + " with new order " + newOrder.id)).save()
-                          // update other objects that care about the old order, since they shouldn't anymore
-                          cashTransactionStore.findByOrderId(order.id).foreach(transaction => transaction.copy(orderId = Some(newOrder.id)).save())
-                          printOrderStore.findByOrderId(order.id).foreach(printOrder => printOrder.copy(orderId = newOrder.id).save())
-
-                          // send the admin to the new page, where they can edit the message, etc
-                          Redirect(GetOrderAdminEndpoint.url(newOrder.id))
-                      }  
+                      inventoryBatch <- product.inventoryBatches.filter(batch => batch.isActive).headOption
+                    } yield {
+                      // create a new order
+                      val newOrder = order
+                        .withReviewStatus(OrderReviewStatus.PendingAdminReview)
+                        .copy(
+                          id = 0,
+                          productId = newProductId,
+                          rejectionReason = None,
+                          inventoryBatchId = inventoryBatch.id)
+                        .save()
+                      // mark old product invalid
+                      order.withReviewStatus(OrderReviewStatus.RejectedByAdmin).copy(rejectionReason = Some("Changed product to " + newProductId + " with new order " + newOrder.id)).save()
+                      // update other objects that care about the old order, since they shouldn't anymore
+                      cashTransactionStore.findByOrderId(order.id).foreach(transaction => transaction.copy(orderId = Some(newOrder.id)).save())
+                      printOrderStore.findByOrderId(order.id).foreach(printOrder => printOrder.copy(orderId = newOrder.id).save())
+                      // send the admin to the new page, where they can edit the message, etc
+                      Redirect(GetOrderAdminEndpoint.url(newOrder.id))  
                     }
                     maybeOk.getOrElse(
-                      BadRequest(Html("<html><body> Incorrect product id = " + newProductId + " </body></html>"))
+                      BadRequest(Html("<html><body> Incorrect product id or no inventory batch for = " + newProductId + " </body></html>"))
                     )
-
                   }
                 )
               }
