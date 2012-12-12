@@ -95,7 +95,13 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
           CategoryValueViewModel(id = 4, publicName = "New York Yankees", active = active.getOrElse(coinflip.nextBoolean)),
           CategoryValueViewModel(id = 5, publicName = "Tampa Bay Rays", active = active.getOrElse(coinflip.nextBoolean)),
           CategoryValueViewModel(id = 6, publicName = "Oakland Athletics", active = active.getOrElse(coinflip.nextBoolean)),
-          CategoryValueViewModel(id = 7, publicName = "San Francisco Giants", active = active.getOrElse(coinflip.nextBoolean))
+          CategoryValueViewModel(id = 7, publicName = "San Francisco Giants", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(id = 8, publicName = "New York Mets", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(id = 9, publicName = "Atlanta Braves", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(id = 10, publicName = "Texas Rangers", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(id = 11, publicName = "Houston Astros", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(id = 12, publicName = "Seattle Mariners", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(id = 13, publicName = "Washington Nationals", active = active.getOrElse(coinflip.nextBoolean))
         )
       ),
       CategoryViewModel(

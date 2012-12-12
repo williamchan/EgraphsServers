@@ -187,6 +187,7 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoi
             window.Egraphs.page.categories = {};
           } else {
             window.Egraphs.page.verticalSlug  = selectedVerticalSlug;
+            window.Egraphs.page.categories = {};
           }
           reloadPage();
        });

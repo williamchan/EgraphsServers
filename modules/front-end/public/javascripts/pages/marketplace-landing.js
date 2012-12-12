@@ -32,7 +32,8 @@ define(["Egraphs", "libs/chosen/chosen.jquery.min"], function (Egraphs) {
             window.Egraphs.page.verticalSlug = "";
             window.Egraphs.page.categories = {};
           } else {
-            window.Egraphs.page.verticalSlug  = selectedVerticalSlug;
+            window.Egraphs.page.verticalSlug = selectedVerticalSlug;
+            window.Egraphs.page.categories = {};
           }
           reloadPage();
        });

@@ -40,9 +40,7 @@
   Egraphs.page.availableOnly = @availableOnly;
   Egraphs.page.verticalSlug = "@verticalViewModels.find( v => v.active).map(v => "/" + v.urlSlug).getOrElse("")";
 }
-@queryRoute = {
-  @marketplaceRoute@verticalViewModels.find( v => v.active).map(v => "/" + v.urlSlug).getOrElse("")
-}
+
 @baseBody = {
 
 <section id="content" class="marketplace" role="main">
@@ -53,7 +51,7 @@
     
       <div class="span12 masthead" role="masthead">
 
-        <form action="@queryRoute" method="get">
+        <form action="@marketplaceRoute" method="get">
             <input name="query" id="celebrity-searchbox" type="search" placeholder="Find Your Star" value="@query" @if(query.length == 0 && !verticalViewModels.exists(v => v.categoryViewModels.exists(c => c.active))){autofocus}>
             <input name="view" type="hidden" value="@if(viewAsList){list}"> </input>
             <input type="hidden" name="sort" value="@sortOptions.find(v => v.active).map(v => v.name)">
