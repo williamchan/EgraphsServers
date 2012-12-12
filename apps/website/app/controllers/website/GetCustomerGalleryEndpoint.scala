@@ -62,13 +62,13 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
     val galleryCustomerId = customer.id
     //If admin is true admin
     val session = request.session
-    val adminGalleryControlOption = for(
-      sessionAdminId <- session.adminId.map(adminId => adminId);
-      adminOption   <- administratorStore.findById(sessionAdminId)) yield AdminGalleryControl
+    val adminGalleryControlOption = for{
+      sessionAdminId <- session.adminId
+      adminOption <- administratorStore.findById(sessionAdminId)} yield AdminGalleryControl
     //if customerId is the same as the gallery requested
-    val sessionGalleryControlOption = for(
-      sessionCustomerId <- session.customerId.map(customerId => customerId);
-      if (sessionCustomerId == galleryCustomerId)) yield OwnerGalleryControl
+    val sessionGalleryControlOption = for{
+      sessionCustomerId <- session.customerId
+      if (sessionCustomerId == galleryCustomerId)} yield OwnerGalleryControl
 
     //In priority order
     val galleryControlPrecedence = List(
@@ -100,7 +100,7 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
    * display the Egraph and related information on the user's gallery page.
    */
   private def getOrders
-    (pendingOrders: List[(Order, Option[Egraph])], fulfilledOrders: List[(Order, Option[Egraph])], 
+    (pendingOrders: List[(Order, Option[Egraph])], fulfilledOrders: List[(Order, Egraph)], 
        galleryControl: GalleryControlRenderer, customer: Customer)
     (implicit request: RequestHeader, authToken: AuthenticityToken)
   : List[EgraphViewModel] = 
@@ -108,14 +108,14 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
     galleryControl match {
       case AdminGalleryControl | OwnerGalleryControl => {
         GalleryOrderFactory.makePendingEgraphViewModel(pendingOrders).toList ++
-          GalleryOrderFactory.makeFulfilledEgraphViewModel(fulfilledOrders, facebookAppId, consumerApp).flatten.toList          
+          GalleryOrderFactory.makeFulfilledEgraphViewModel(fulfilledOrders, facebookAppId, consumerApp).toList          
       }
       case _ =>
         if (customer.isGalleryVisible){
-          GalleryOrderFactory.makeFulfilledEgraphViewModel(fulfilledOrders.filter(
-            orderAndOption => {orderAndOption._1.privacyStatus == PrivacyStatus.Public}), 
+          GalleryOrderFactory.makeFulfilledEgraphViewModel(fulfilledOrders.filter{
+            case (order, _) => {order.privacyStatus == PrivacyStatus.Public}}, 
             facebookAppId,
-            consumerApp).flatten.toList
+            consumerApp).toList
         } else {
           List()
         }
@@ -126,12 +126,12 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
    * Filters the list of possible orders and Egraphs, returning only those which are
    * already fulfilled.
    */
-  private def getFulfilledOrders(ordersAndEgraphs: List[(Order, Option[Egraph])]): List[(Order, Option[Egraph])] = {
-    for (
-      orderAndMaybeEgraph <- ordersAndEgraphs;
-      publishedEgraph <- orderAndMaybeEgraph._2 if publishedEgraph.egraphState == EgraphState.Published
-    ) yield {
-      orderAndMaybeEgraph
+  private def getFulfilledOrders(ordersAndEgraphs: List[(Order, Option[Egraph])]): List[(Order, Egraph)] = {
+    for {
+      (order, maybeEgraph) <- ordersAndEgraphs
+      publishedEgraph <- maybeEgraph if publishedEgraph.egraphState == EgraphState.Published
+    } yield {
+      (order, publishedEgraph)
     }      
   }
 }

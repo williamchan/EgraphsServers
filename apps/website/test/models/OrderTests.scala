@@ -252,6 +252,26 @@ class OrderTests extends EgraphsUnitTest
     orderIds should contain (order2.id)
   }
 
+  it should "create FulfilledEgraphViewModels from orders" in new EgraphsTestApplication {
+    val (buyer, recipient, celebrity, product) = TestData.newSavedOrderStack()
+    val admin = Administrator().save()
+    celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
+
+    val order1 = buyer.buy(product, recipient=recipient).save()
+    val order2 = buyer.buy(product, recipient=recipient).save()
+    val egraph1 = TestData.newSavedEgraph()
+    val egraph2 = TestData.newSavedEgraph()
+
+    val results = List((order1, egraph1), (order2, egraph2))
+
+    implicit val request = FakeRequest()
+    val fulfilledViews = GalleryOrderFactory.makeFulfilledEgraphViewModel(results, "fakeappid", consumerApp)(request)
+
+    fulfilledViews.size should be (2)
+    fulfilledViews.toList(0).orderId should be (order1.id)
+    fulfilledViews.toList(1).orderId should be (order2.id)
+  }
+
   "redactedName" should "redact properly" in new EgraphsTestApplication {
     Order(recipientName="Herp Derpson-Schiller").redactedRecipientName should be ("Herp D.S.")
     Order(recipientName="Herp").redactedRecipientName should be ("Herp")
@@ -261,28 +281,6 @@ class OrderTests extends EgraphsUnitTest
     for (herpDerpson <- List("Herp D", "Herp Derpson", "Herp Derpson ", " Herp Derpson", "Herp  Derpson")) {
       Order(recipientName=herpDerpson).redactedRecipientName should be ("Herp D.")
     }
-  }
-
-
-  "GalleryOrderFactory" should "create FulfilledEgraphViewModels from orders" in new EgraphsTestApplication {
-    val (buyer, recipient, celebrity, product) = TestData.newSavedOrderStack()
-    val admin = Administrator().save()
-    celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
-
-    val order = buyer.buy(product, recipient=recipient).save()
-    val order1 = buyer.buy(product, recipient=recipient).save()
-    val egraph = TestData.newSavedEgraph()
-
-    val results = List((order, Option(egraph)), (order, None))
-
-    implicit val request = FakeRequest()
-    val fulfilledViews = GalleryOrderFactory.makeFulfilledEgraphViewModel(results, "fakeappid", consumerApp)(request)
-    //create an egraph
-
-    fulfilledViews.size should be (2)
-    fulfilledViews.toList(0).get.orderId should be (order.id)
-    //unfulfilled egraph should not have created a view model
-    fulfilledViews.toList(1).isEmpty should be (true)
   }
   
   "filterPendingOrders" should "return filtered results with user displayable egraphs" in new EgraphsTestApplication {

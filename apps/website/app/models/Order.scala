@@ -592,48 +592,45 @@ object GalleryOrderFactory {
   }
 
   def makeFulfilledEgraphViewModel[A](
-      orders: Iterable[(Order, Option[Egraph])], 
+      orders: Iterable[(Order, Egraph)], 
       fbAppId: String,
       consumerApp: ConsumerApplication
-      )(implicit request: RequestHeader): Iterable[Option[FulfilledEgraphViewModel]] = 
+      )(implicit request: RequestHeader): Iterable[FulfilledEgraphViewModel] = 
   {
-    for (orderAndEgraphOption <- orders) yield {
-      val (order, optionEgraph) = orderAndEgraphOption
-      optionEgraph.map( egraph => {
-        val product = order.product
-        val celebrity = product.celebrity
-        // TODO SER-170 this code is quite similar to that in GetEgraphEndpoint.
-        // Refactor together and put withSigningOriginOffset inside EgraphImage.
-        val rawImage = egraph.image(product.photoImage).rasterized
-          .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
-          .scaledToWidth(product.frame.thumbnailWidthPixels)
-        val thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Public)
-        val viewEgraphUrl = consumerApp.absoluteUrl(GetEgraphEndpoint.url(order.id))
+    for ((order, egraph) <- orders) yield {
+      val product = order.product
+      val celebrity = product.celebrity
+      // TODO SER-170 this code is quite similar to that in GetEgraphEndpoint.
+      // Refactor together and put withSigningOriginOffset inside EgraphImage.
+      val rawImage = egraph.image(product.photoImage).rasterized
+        .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
+        .scaledToWidth(product.frame.thumbnailWidthPixels)
+      val thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Public)
+      val viewEgraphUrl = consumerApp.absoluteUrl(GetEgraphEndpoint.url(order.id))
 
-        val facebookShareLink = Facebook.getEgraphShareLink(fbAppId = fbAppId,
-          fulfilledOrder = FulfilledOrder(order = order, egraph = egraph),
-          thumbnailUrl = thumbnailUrl,
-          viewEgraphUrl = viewEgraphUrl)
-        val twitterShareLink = Twitter.getEgraphShareLink(celebrity = celebrity, viewEgraphUrl = viewEgraphUrl)
+      val facebookShareLink = Facebook.getEgraphShareLink(fbAppId = fbAppId,
+        fulfilledOrder = FulfilledOrder(order = order, egraph = egraph),
+        thumbnailUrl = thumbnailUrl,
+        viewEgraphUrl = viewEgraphUrl)
+      val twitterShareLink = Twitter.getEgraphShareLink(celebrity = celebrity, viewEgraphUrl = viewEgraphUrl)
 
-        new FulfilledEgraphViewModel(
-          buyerId = order.buyerId,
-          facebookShareLink = facebookShareLink,
-          twitterShareLink = twitterShareLink,
-          orderId = order.id,
-          orientation = product.frame.name.toLowerCase,
-          productUrl = StorefrontChoosePhotoConsumerEndpoints.url(celebrity, product).url,
-          productPublicName = product.celebrity.publicName,
-          productTitle = product.storyTitle,
-          productDescription = product.description,
-          recipientId = order.recipientId,
-          recipientName = order.recipientName,
-          thumbnailUrl = thumbnailUrl,
-          viewEgraphUrl = viewEgraphUrl,
-          publicStatus = order.privacyStatus.name,
-          signedTimestamp = dateFormat.format(egraph.created)
-        )
-      })
+      new FulfilledEgraphViewModel(
+        buyerId = order.buyerId,
+        facebookShareLink = facebookShareLink,
+        twitterShareLink = twitterShareLink,
+        orderId = order.id,
+        orientation = product.frame.name.toLowerCase,
+        productUrl = StorefrontChoosePhotoConsumerEndpoints.url(celebrity, product).url,
+        productPublicName = product.celebrity.publicName,
+        productTitle = product.storyTitle,
+        productDescription = product.description,
+        recipientId = order.recipientId,
+        recipientName = order.recipientName,
+        thumbnailUrl = thumbnailUrl,
+        viewEgraphUrl = viewEgraphUrl,
+        publicStatus = order.privacyStatus.name,
+        signedTimestamp = dateFormat.format(egraph.created)
+      )
     }
   }
 
