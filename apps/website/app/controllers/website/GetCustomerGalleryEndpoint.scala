@@ -80,8 +80,8 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
     val galleryControl = galleryControlPrecedence.flatten.head
 
     //get orders (my pending orders and my gift orders to both be displayed)
-    val ordersAndEgraphs = orderStore.galleryOrdersWithEgraphs(galleryCustomerId).toList
-    val giftOrdersAndEgraphs = orderStore.galleryGiftOrdersWithEgraphs(galleryCustomerId).toList
+    val ordersAndEgraphs = orderStore.galleryOrdersWithEgraphs(galleryCustomerId)
+    val giftOrdersAndEgraphs = orderStore.galleryGiftOrdersWithEgraphs(galleryCustomerId)
 
     val pendingOrders = GalleryOrderFactory.filterPendingOrders(ordersAndEgraphs)
     val pendingGiftOrders = GalleryOrderFactory.filterPendingOrders(giftOrdersAndEgraphs)
@@ -100,7 +100,7 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
    * display the Egraph and related information on the user's gallery page.
    */
   private def getOrders
-    (pendingOrders: List[(Order, Option[Egraph])], fulfilledOrders: List[(Order, Egraph)], 
+    (pendingOrders: Iterable[(Order, Option[Egraph])], fulfilledOrders: Iterable[(Order, Egraph)], 
        galleryControl: GalleryControlRenderer, customer: Customer)
     (implicit request: RequestHeader, authToken: AuthenticityToken)
   : List[EgraphViewModel] = 
@@ -126,7 +126,7 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
    * Filters the list of possible orders and Egraphs, returning only those which are
    * already fulfilled.
    */
-  private def getFulfilledOrders(ordersAndEgraphs: List[(Order, Option[Egraph])]): List[(Order, Egraph)] = {
+  private def getFulfilledOrders(ordersAndEgraphs: Iterable[(Order, Option[Egraph])]): Iterable[(Order, Egraph)] = {
     for {
       (order, maybeEgraph) <- ordersAndEgraphs
       publishedEgraph <- maybeEgraph if publishedEgraph.egraphState == EgraphState.Published

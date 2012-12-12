@@ -579,7 +579,7 @@ object GalleryOrderFactory {
    * @return list of orders and egraphs that can be considered pending to a user. There can be more than one
    * egraph associated with a particular order.
    */
-  def filterPendingOrders(ordersAndEgraphs: List[(Order, Option[Egraph])]): List[(Order, Option[Egraph])] =
+  def filterPendingOrders(ordersAndEgraphs: Iterable[(Order, Option[Egraph])]): Iterable[(Order, Option[Egraph])] =
   {
     ordersAndEgraphs.filter(orderEgraph => {
       val maybeEgraph = orderEgraph._2
