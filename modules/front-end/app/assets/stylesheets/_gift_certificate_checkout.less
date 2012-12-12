@@ -62,10 +62,12 @@
   }
 
   #masthead {
+    margin-top:40px;
+
     h1 {
+      text-align:top;
       font-size:40px;
       font-weight:100;
-      margin-top:20px;
     }
 
     ul {
@@ -77,6 +79,28 @@
       li {
         line-height:18px;
         list-style-type:circle;
+      }
+    }
+
+    .previews {
+      position:relative;
+
+      .preview {
+        width:200px;
+        background-color:white;
+        .box-shadow(1px 1px 6px lighten(black, 60%));
+
+        &.foreground {
+          position:relative;
+          z-index: 1;
+        }
+
+        &.background {
+          position:absolute;
+          top:-13px;
+          left:155px;
+          .rotate(3deg);
+        }
       }
     }
   }
