@@ -48,8 +48,8 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
    */
   def getStorefrontChoosePhotoTiled(celebrityUrlSlug: String) = controllerMethod.withForm() 
   { implicit authToken =>
-    httpFilters.requireCelebrityUrlSlug(celebrityUrlSlug) { maybeUnpublishedcelebrity =>
-      httpFilters.requireAdministratorLogin.inSessionOrUseOtherFilter(maybeUnpublishedcelebrity)(otherFilter = httpFilters.requireCelebrityPublished.filter(maybeUnpublishedcelebrity)) { celebrity =>
+    httpFilters.requireCelebrityUrlSlug(celebrityUrlSlug) { maybeUnpublishedCelebrity =>
+      httpFilters.requireAdministratorLogin.inSessionOrUseOtherFilter(maybeUnpublishedCelebrity)(otherFilter = httpFilters.requireCelebrityPublished.filter(maybeUnpublishedCelebrity)) { celebrity =>
 
         Action { implicit request =>
           val celebrityUrlSlug = celebrity.urlSlug
