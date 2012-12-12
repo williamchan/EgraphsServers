@@ -2,8 +2,10 @@
 
 .giftCertificates() {
   .certificatePreviews(@imageWidth) {
+    @previewOverlap: .7368;
     .previews {
       position:relative;
+      width: @imageWidth * 2 - @previewOverlap;
 
       .preview {
         width:@imageWidth;
@@ -18,7 +20,7 @@
         &.background {
           position:absolute;
           top: -.0526 * @imageWidth;
-          left: .7368 * @imageWidth;
+          left: @previewOverlap * @imageWidth;
           .rotate(3deg);
         }
 
@@ -243,6 +245,14 @@
       }
     }
 
+    #masthead {
+      .previews {
+        margin-left:auto;
+        margin-right:auto;
+      }
+
+    }
+
     #choose-amount {
       .amount-option {
         // Space out the buttons once they snap to vertical alignment
@@ -264,7 +274,7 @@
 
   @media (max-width:480px) { #content.gift-certificate-checkout {
     #masthead {
-      .certificatePreviews(160px);
+      .certificatePreviews(150px);
     }
   }}
 } // End .giftCertificates()
