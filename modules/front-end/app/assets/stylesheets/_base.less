@@ -360,13 +360,17 @@ section[role=banner] {
 
 		.box-shadow(0px 0px 8px rgba(0, 0, 0, .5));
 
-		background: rgb(239,239,239); /* Old browsers */
-		background: -moz-linear-gradient(top,  rgba(239,239,239,1) 0%, rgba(255,255,255,1) 100%); /* FF3.6+ */
-		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(239,239,239,1)), color-stop(100%,rgba(255,255,255,1))); /* Chrome,Safari4+ */
-		background: -webkit-linear-gradient(top,  rgba(239,239,239,1) 0%,rgba(255,255,255,1) 100%); /* Chrome10+,Safari5.1+ */
-		background: -o-linear-gradient(top,  rgba(239,239,239,1) 0%,rgba(255,255,255,1) 100%); /* Opera 11.10+ */
-		background: -ms-linear-gradient(top,  rgba(239,239,239,1) 0%,rgba(255,255,255,1) 100%); /* IE10+ */
-		background: linear-gradient(top,  rgba(239,239,239,1) 0%,rgba(255,255,255,1) 100%); /* W3C */
+		@bgGradientStartColor: rgba(245,245,245,1);
+		@bgGradientEndColor: rgba(255,255,255,1);
+		@bgGradientEndPixel: 160px;
+
+		background: @bgGradientEndColor; /* Old browsers */
+		background: -moz-linear-gradient(top,  @bgGradientStartColor 0px, @bgGradientEndColor @bgGradientEndPixel); /* FF3.6+ */
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0px,@bgGradientStartColor), color-stop(@bgGradientEndPixel,@bgGradientEndColor)); /* Chrome,Safari4+ */
+		background: -webkit-linear-gradient(top,  @bgGradientStartColor 0px,@bgGradientEndColor @bgGradientEndPixel); /* Chrome10+,Safari5.1+ */
+		background: -o-linear-gradient(top,  @bgGradientStartColor 0px,@bgGradientEndColor @bgGradientEndPixel); /* Opera 11.10+ */
+		background: -ms-linear-gradient(top,  @bgGradientStartColor 0px,@bgGradientEndColor @bgGradientEndPixel); /* IE10+ */
+		background: linear-gradient(top,  @bgGradientStartColor 0px,@bgGradientEndColor @bgGradientEndPixel); /* W3C */
 		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#efefef', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */	
 
 		padding-bottom: 40px;			
