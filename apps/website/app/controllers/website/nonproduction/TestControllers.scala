@@ -44,16 +44,4 @@ object TestControllers extends Controller with Logging {
       }
     }
   }
-  
-  def getTestAccountDetails(customerId: Long) = filters.requireApplicationId.test {
-    controllerMethod() {
-      Action {
-        val maybeAccount = accountStore.findByCustomerId(customerId) 
-        maybeAccount match {
-          case None => InternalServerError("There is no account associated with the given customer ID")
-          case Some(account) => Ok("Username and Password: " + account.email + " : " + TestData.defaultPassword)
-        }
-      }
-    }
-  }
 }
