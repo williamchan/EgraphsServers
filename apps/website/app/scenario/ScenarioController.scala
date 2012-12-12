@@ -91,8 +91,8 @@ object ScenarioController extends Controller {
               existingScenario.play() match {
                 case aResult: Result =>
                   aResult
-                case _ =>
-                  Ok(views.html.nonproduction.scenario_success(urlSlug, existingScenario.description))
+                case instructionResponse =>
+                  Ok(views.html.nonproduction.scenario_success(urlSlug, existingScenario.description, instructionResponse))
               }
             }
     

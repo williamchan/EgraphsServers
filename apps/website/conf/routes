@@ -64,7 +64,7 @@ GET      /admin/categoryvalues/$categoryValueId<[0-9]+>                   contro
 GET      /admin/celebrities                                               controllers.WebsiteControllers.getCelebritiesAdmin
 POST     /admin/celebrities                                               controllers.WebsiteControllers.postCreateCelebrityAdmin
 GET      /admin/celebrities/search                                        controllers.WebsiteControllers.getCelebritiesBySearchAdmin
-POST     /admin/celebrities/search/rebuild                               controllers.WebsiteControllers.postRebuildSearchIndex
+POST     /admin/celebrities/search/rebuild                                controllers.WebsiteControllers.postRebuildSearchIndex
 GET      /admin/celebrities/create                                        controllers.WebsiteControllers.getCreateCelebrityAdmin
 POST     /admin/celebrities/featured                                      controllers.WebsiteControllers.postFeaturedCelebrities
 GET      /admin/celebrities/$celebrityId<[0-9]+>                          controllers.WebsiteControllers.getCelebrityAdmin(celebrityId: Long)
@@ -98,8 +98,8 @@ GET      /admin/orders/$orderId<[0-9]+>                                   contro
 POST     /admin/orders/$orderId<[0-9]+>                                   controllers.WebsiteControllers.postOrderAdmin(orderId: Long)
 GET      /admin/products/$productId<[0-9]+>                               controllers.WebsiteControllers.getProductAdmin(productId: Long)
 POST     /admin/products/$productId<[0-9]+>                               controllers.WebsiteControllers.postProductAdmin(productId: Long)
-GET      /admin/reports                                            				controllers.WebsiteControllers.getReportsAdmin
-GET      /admin/tools                                              				controllers.WebsiteControllers.getToolsAdmin
+GET      /admin/reports                                                   controllers.WebsiteControllers.getReportsAdmin
+GET      /admin/tools                                                     controllers.WebsiteControllers.getToolsAdmin
 GET      /admin/videoasset                                                controllers.WebsiteControllers.getVideoAssetAdmin
 GET      /admin/videoassets                                               controllers.WebsiteControllers.getVideoAssetsAdmin
 GET      /admin/videoassets/:status                                       controllers.WebsiteControllers.getVideoAssetsWithStatusAdmin(status: String)

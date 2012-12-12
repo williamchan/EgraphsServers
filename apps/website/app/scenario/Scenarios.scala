@@ -109,10 +109,9 @@ class Scenarios extends DeclaresScenarios {
   toScenarios add Scenario(
   "Will Chan is a celebrity",
   apiCategory,
-  """
-    Creates a celebrity named William 'Wizzle' Chan. His login/password are
-    wchan83@egraphs.com/derp. He has a profile photo.
-  """, {
+  "Creates a celebrity named William 'Wizzle' Chan. His login/password are" +
+    Scenarios.willsEmail + "/" + TestData.defaultPassword + ". He has a profile photo."
+  , {
     () =>
       Scenarios.createAdmin()
       import Blobs.Conversions._
@@ -122,7 +121,7 @@ class Scenarios extends DeclaresScenarios {
         organization = "Major League Baseball",
         isFeatured = true
       ).withPublishedStatus(PublishedStatus.Published).save()
-      Account(email = "wchan83@egraphs.com",
+      Account(email = Scenarios.willsEmail,
         celebrityId = Some(celebrity.id)
       ).withPassword(TestData.defaultPassword).right.get.save()
       celebrity.saveWithProfilePhoto(Play.getFile("test/resources/will_chan_celebrity_profile.jpg"))
@@ -177,26 +176,22 @@ class Scenarios extends DeclaresScenarios {
   apiCategory,
   """
     Creates a customer named Erem Boto.
-    [note: He does not have any associated Account thus far...but we can create one
-     programmatically later on if we want to log in as him]
   """, {
     () =>
-      val customer = TestData.newSavedCustomer().copy(name = "Erem Boto").save()
-      customer.account.withPassword(TestData.defaultPassword).right.get.save()
+      val erem = Scenarios.getEremCustomerAccount
+      "Name = " + erem.name + ", username/password = " + erem.username + "/" + TestData.defaultPassword
   }
   )
-  
+
   toScenarios add Scenario(
   "Myyk is another customer",
   apiCategory,
   """
     Creates a customer named Myyk Badass-Seok.
-    [note: He does not have any associated Account thus far...but we can create one
-     programmatically later on if we want to log in as him]
   """, {
     () =>
-      val customer = TestData.newSavedCustomer().copy(name = "Myyk Badass-Seok").save()
-      customer.account.withPassword(TestData.defaultPassword).right.get.save()
+      val myyk = Scenarios.getMyykCustomerAccount
+      "Name = " + myyk.name + ", username/password = " + myyk.username + "/" + TestData.defaultPassword 
   }
   )
 
@@ -233,7 +228,7 @@ class Scenarios extends DeclaresScenarios {
       val order = from(schema.orders)(order =>
         where(order.recipientName === "Myyk Badass-Seok")
           select (order)
-      ).headOption.get
+      ).head
       order
         .withPaymentStatus(PaymentStatus.Charged).save()
         .newEgraph
@@ -523,8 +518,13 @@ object Scenarios {
   private val productStore = instance[ProductStore]
   private val customerStore = instance[CustomerStore]
 
+  private val adminEmail = "admin@egraphs.com"
+  private val myyksEmail = "myyk666_69_for_life@egraphs.com"
+  private val willsEmail = "wchan83@egraphs.com"
+  private val eremEmail = "erem_mere@egraphs.com"
+
   def getWillAccount: Account = {
-    accountStore.findByEmail("wchan83@egraphs.com").get
+    accountStore.findByEmail(willsEmail).get
   }
 
   def getWillCelebrityAccount: Celebrity = {
@@ -536,15 +536,22 @@ object Scenarios {
   }
 
   def getEremCustomerAccount: Customer = {
-    customerStore.get(1L)
+    ensureCustomerAccountExists("Erem Boto", eremEmail)
   }
-  
+
   def getMyykCustomerAccount: Customer = {
-    customerStore.get(2L)
+    ensureCustomerAccountExists("Myyk Badass-Seok", myyksEmail)
+  }
+
+  private def ensureCustomerAccountExists(name: String, email: String): Customer = {
+    val account = accountStore.findByEmail(email).getOrElse(TestData.newSavedAccount(email = Some(email)))
+    account.customerId match {
+      case None => TestData.newSavedCustomer(maybeAccount = Some(account)).copy(name = name)
+      case Some(customerId) => customerStore.findById(customerId).head
+    }
   }
 
   def createAdmin() {
-    val adminEmail = "admin@egraphs.com"
     if (accountStore.findByEmail(adminEmail).isEmpty) {
       val administrator = Administrator().save()
       Account(email = adminEmail, administratorId = Some(administrator.id)).withPassword("egraphsa").right.get.save()
