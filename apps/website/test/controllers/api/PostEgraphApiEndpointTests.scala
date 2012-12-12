@@ -28,6 +28,10 @@ class PostEgraphApiEndpointTests extends EgraphsUnitTest with ProtectedCelebrity
   private def db = AppConfig.instance[DBSession]
   private def egraphStore = AppConfig.instance[EgraphStore]
 
+  private val latitude = 37.7821120598956
+  private val longitude = -122.400612831116
+  private val signedAt = "2012-07-12 15:11:22.987"
+
   protected override def routeUnderTest = controllers.routes.ApiControllers.postEgraph(1L)
   protected override def validRequestBodyAndQueryString = {
     // TODO: Once we're on Play 2.1 then get rid of this necessary indirection to satisfy
@@ -35,9 +39,9 @@ class PostEgraphApiEndpointTests extends EgraphsUnitTest with ProtectedCelebrity
     val formRequest = FakeRequest().withFormUrlEncodedBody(
       "signature" -> TestConstants.shortWritingStr,
       "audio" -> TestConstants.voiceStr_8khz(),
-      "latitude" -> "37.7821120598956",
-      "longitude" -> "-122.400612831116",
-      "signedAt" -> "2012-07-12 15:11:22.987"
+      "latitude" -> latitude.toString,
+      "longitude" -> longitude.toString,
+      "signedAt" -> signedAt
     )
 
     val anyContentRequest = formRequest.copy(body = (formRequest.body: AnyContent))
@@ -46,11 +50,6 @@ class PostEgraphApiEndpointTests extends EgraphsUnitTest with ProtectedCelebrity
   }
 
   "postEgraph" should "accept a well-formed egraph as its first submission" in new EgraphsTestApplication {
-    //TODO: myyk - IDK what this egraph has to do with anything.
-    val egraph = db.connected(TransactionSerializable) {
-      TestData.newSavedEgraph()
-    }
-
     val (celebrityAccount, orders) = db.connected(TransactionSerializable) {
       val (_, celebrity, _, orders) = runCustomerBuysProductsScenerio()
       (celebrity.account, orders)
@@ -61,13 +60,16 @@ class PostEgraphApiEndpointTests extends EgraphsUnitTest with ProtectedCelebrity
     val (code, Some(egraphId)) = performEgraphPost(celebrityAccount, order.id)(
       "signature" -> TestConstants.shortWritingStr,
       "audio" -> TestConstants.voiceStr_8khz(),
-      "latitude" -> "37.7821120598956",
-      "longitude" -> "-122.400612831116",
-      "signedAt" -> "2012-07-12 15:11:22.987"
+      "latitude" -> latitude.toString,
+      "longitude" -> longitude.toString,
+      "signedAt" -> signedAt
     )
     
     code should be (OK)
 
+    val egraph = db.connected(TransactionSerializable) {
+      egraphStore.findByOrder(order.id).single
+    }
     egraphId should be (egraph.id)
 
     val signatureBlob = blobs.get("egraphs/" + egraphId + "/signature.json").get.asString
@@ -75,36 +77,36 @@ class PostEgraphApiEndpointTests extends EgraphsUnitTest with ProtectedCelebrity
 
     db.connected(TransactionSerializable) {
       val foundEgraph = egraphStore.get(egraphId)
-      foundEgraph.latitude should be (Some(37.7821120598956))
-      foundEgraph.longitude should be (Some(-122.400612831116))
-      foundEgraph.signedAt should be (Time.timestamp("2012-07-12 15:11:22.987", Time.ipadDateFormat))
+      foundEgraph.latitude should be (Some(latitude))
+      foundEgraph.longitude should be (Some(longitude))
+      foundEgraph.signedAt should be (Time.timestamp(signedAt, Time.ipadDateFormat))
       foundEgraph.assets.signature should be (TestConstants.shortWritingStr)
       foundEgraph.assets.message should be (None)
     }
   }
 
-//  it should "accept an optional written message in addition to the signature" in new EgraphsTestApplication {
-//    runWillChanScenariosThroughOrder()
-//
-//    val signatureStr = TestConstants.shortWritingStr
-//    val audioStr = TestConstants.voiceStr_8khz
-//    val message = TestConstants.shortWritingStr
-//
-//    val (code, Some(egraphId)) = performEgraphPost()(
-//      "message" -> message, 
-//      "signature" -> signatureStr, 
-//      "audio" -> audioStr,
-//      "signedAt" -> "2012-07-12 15:11:22.987"
-//    )
-//
-//    code should be (OK)
-//    
-//    db.connected(TransactionSerializable) {
-//      val egraph = egraphStore.get(egraphId)
-//      egraph.assets.message should be (Some(TestConstants.shortWritingStr))
-//    }
-//  }
-//
+  it should "accept an optional written message in addition to the signature" in new EgraphsTestApplication {
+    runWillChanScenariosThroughOrder()
+
+    val signatureStr = TestConstants.shortWritingStr
+    val audioStr = TestConstants.voiceStr_8khz
+    val message = TestConstants.shortWritingStr
+
+    val (code, Some(egraphId)) = performEgraphPost()(
+      "message" -> message, 
+      "signature" -> signatureStr, 
+      "audio" -> audioStr,
+      "signedAt" -> "2012-07-12 15:11:22.987"
+    )
+
+    code should be (OK)
+    
+    db.connected(TransactionSerializable) {
+      val egraph = egraphStore.get(egraphId)
+      egraph.assets.message should be (Some(TestConstants.shortWritingStr))
+    }
+  }
+
 //  it should "accept an empty message parameter" in new EgraphsTestApplication {
 //    runWillChanScenariosThroughOrder()
 //
