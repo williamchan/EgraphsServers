@@ -47,6 +47,12 @@ case class Checkout(lineItemTypes: IndexedSeq[LineItemType[_]]) {
     for (lineItem <- lineItems; flattened <- lineItem.flatten) yield flattened
   }
 
+
+
+  // TODO(SER-499): totals and json-ify
   // def subtotal: Money
   // def total: Money
+  // def toJson: String
+
+
 }

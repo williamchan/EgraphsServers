@@ -1,4 +1,4 @@
-package models.checkout
+package models.enums
 
 import egraphs.playutils.Enum
 
@@ -12,6 +12,10 @@ object LineItemNature extends Enum {
   val Tax = new EnumVal("Tax"){}
   val Fee = new EnumVal("Fee"){}
   val Summary = new EnumVal("Summary") {}
+
+  // TODO(SER-499): change to Charge to match domain terminology
   val Payment = new EnumVal("Payment"){}
+
+
   val Refund = new EnumVal("Refund") {}
 }

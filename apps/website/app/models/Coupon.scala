@@ -38,9 +38,11 @@ case class Coupon(id: Long = 0,
   /**
    * Marks this coupon as used. Does nothing if this coupon is unlimited-use.
    */
-  def use(): Coupon = {
+  def use(amount: Money = Money.zero(CurrencyUnit.USD)): Coupon = {
     usageType match {
       case CouponUsageType.Unlimited => this
+      case CouponUsageType.Prepaid if ((discountAmount - amount.getAmount) >= 0.01) =>
+        copy(discountAmount = discountAmount - amount.getAmount)
       case _ => copy(isActive = false)
       // TODO: another case for prepaid to issue new coupon for remaining balance
     }

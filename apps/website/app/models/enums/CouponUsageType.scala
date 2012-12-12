@@ -12,6 +12,11 @@ object CouponUsageType extends Enum {
   val Unlimited = new EnumVal {
     val name = "Unlimited"
   }
+
+  /** prepaid amount; e.g. a gift certificate  */
+  val Prepaid = new EnumVal {
+    val name = "Prepaid"
+  }
 }
 
 trait HasCouponUsageType[T] {

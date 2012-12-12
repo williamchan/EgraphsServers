@@ -140,9 +140,9 @@ trait StorefrontPersonalizeConsumerEndpoints
   
           // Form had to be valid, or redirect back to the form page.
           validated <- form.errorsOrValidatedForm.left.map { error =>
-                         val url = reverseGetStorefrontPersonalize(celebrityUrlSlug, productUrlSlug).url
-                         form.redirectThroughFlash(url)
-                       }.right
+            val url = reverseGetStorefrontPersonalize(celebrityUrlSlug, productUrlSlug).url
+            form.redirectThroughFlash(url)
+          }.right
         ) yield {
           // Everything looked good. Save the form into the cache and move on with life.
           purchaseForms.withForm(form).save()

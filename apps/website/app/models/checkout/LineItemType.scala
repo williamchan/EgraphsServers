@@ -6,6 +6,9 @@ import org.squeryl.KeyedEntity
 import services.db.{SavesAsEntity, Schema}
 import scalaz.Lens
 
+import models.enums.{CodeType, LineItemNature}
+
+// TODO(SER-499): TransactedT should be of some persistable typeclass, perhaps?
 trait LineItemType[+TransactedT] {
    def description: String
 
@@ -43,13 +46,16 @@ case class LineItemTypeEntity (
   id: Long = 0L,
   _desc: String = "",
   _nature: String = LineItemNature.Product.name,
-  codeType: String = "",
+  _codeType: String = "",
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp
 ) extends KeyedEntity[Long]
 {
   def nature = LineItemNature(_nature).get
   def withNature(newNature: LineItemNature) = this.copy(_nature=newNature.name)
+
+  def codeType = CodeType(_codeType).get
+  def withCodeType(newCodeType: CodeType) = this.copy(_codeType=newCodeType.name)
 }
 
 

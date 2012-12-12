@@ -1,7 +1,7 @@
 package models.checkout
 
 import models.Coupon
-import models.enums.{CouponType, CouponDiscountType, CouponUsageType}
+import models.enums.{CodeType, LineItemNature, CouponType, CouponDiscountType, CouponUsageType}
 import org.joda.money.Money
 import services.db.Schema
 import scalaz.Lens
@@ -19,7 +19,7 @@ import org.squeryl.PrimitiveTypeMode._
  *
  *      def doSomething = Action {
  *        // Get the LineItemType from the store
- *        val lineItemType = GiftCertificateLineItemType.getWithAmount(Money.parse("$50"))
+ *        val lineItemType = GiftCertificateLineItemType.getWithRecipientAndAmount("Joe", Money.parse("$50"))
  *
  *        // Save it if you want
  *        lineItemType.update()
@@ -46,18 +46,14 @@ trait GiftCertificateComponent { this: LineItemTypeEntityComponent =>
       }
 
       object QueryDSL {
-        private val seedEntity = {
-          LineItemTypeEntity(
-            _desc = "Gift Certificate",
-            codeType = "GiftCertificateLineItemType"
-          ).withNature(LineItemNature.Product)
-        }
+        private lazy val seedEntity = GiftCertificateLineItemType.defaultEntity
 
-        def getWithAmount(amount: Money): GiftCertificateLineItemType = {
-          val entity = table.where(_.codeType === seedEntity.codeType).headOption.getOrElse {
+        // TODO(SER-499): this is the complete opposite of how entities should be used for gift cert's
+        def getWithRecipientAndAmount(recipient: String, amount: Money): GiftCertificateLineItemType = {
+          val entity = table.where(_.codeType.name === seedEntity.codeType.name).headOption.getOrElse {
             table.insert(seedEntity)
           }
-          GiftCertificateLineItemType(entity, amount)
+          GiftCertificateLineItemType(entity, recipient, amount)
         }
       }
     }
@@ -74,21 +70,18 @@ trait GiftCertificateComponent { this: LineItemTypeEntityComponent =>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-case class GiftCertificateLineItemType (_entity: LineItemTypeEntity, amountToBuy: Money)
-  extends LineItemType[Coupon]
+case class GiftCertificateLineItemType (
+  _entity: LineItemTypeEntity,
+  recipient: String,
+  amountToBuy: Money
+
+) extends LineItemType[Coupon]
   with LineItemTypeEntityLenses[GiftCertificateLineItemType]
   with LineItemTypeEntityGetters[GiftCertificateLineItemType]
 {
 
   def lineItems(resolvedItems: IndexedSeq[LineItem[_]], pendingResolution: IndexedSeq[LineItemType[_]]) = {
-
-    // TODO(SER-499): add description, perhaps use some helpers vs. constructors?
-    Some( IndexedSeq( new GiftCertificateLineItem(
-      // TODO(SER-499): what should notes be?
-      _entity = new LineItemEntity(_amountInCurrency = amountToBuy.getAmount(), notes = ""),
-      itemType = this
-    )))
-
+    Some( IndexedSeq( new GiftCertificateLineItem( itemType = this )))
   }
 
   //
@@ -105,12 +98,19 @@ object GiftCertificateLineItemType {
     set = (cert, entity) => cert.copy(entity)
   )
 
-  def apply(amountToBuy: Money): GiftCertificateLineItemType = {
+  def apply(recipient: String, amountToBuy: Money): GiftCertificateLineItemType = {
     GiftCertificateLineItemType(
-      LineItemTypeEntity().withNature(LineItemNature.Product),
+      LineItemTypeEntity()
+        .withNature(LineItemNature.Product)
+        .withCodeType(CodeType.GiftCertificateLineItemType),
+      recipient,
       amountToBuy
     )
   }
+
+  lazy val defaultEntity = LineItemTypeEntity(_desc = "Gift Certificate")
+    .withNature(LineItemNature.Product)
+    .withCodeType(CodeType.GiftCertificateLineItemType)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -122,34 +122,24 @@ object GiftCertificateLineItemType {
  * -...
  * -convenience methods?
  *
- * TODO(SER-499): tend to constructor parameter uncertainties
  *
  *
- * @param _entity - representation of database entry in LineItems table
  * @param itemType - line item type corresponding to this gift certificate
  * @param subItems - items that depend upon or relate strongly to this gift certificate
  */
 case class GiftCertificateLineItem (
-  _entity: LineItemEntity,                          // would a default make sense for this?
-  itemType: GiftCertificateLineItemType,            // should this be a LineItemType instead?
-  subItems: IndexedSeq[LineItem[_]] = IndexedSeq()  // should these be generated or set?
+  _entity: LineItemEntity = new LineItemEntity(),
+  itemType: GiftCertificateLineItemType,
+  maybeDescription: Option[String] = None,
+  subItems: IndexedSeq[LineItem[_]] = IndexedSeq()
 
 ) extends LineItem[Coupon] {
 
-  override def description = itemType.description
+  // TODO(SER-499): may want to pull this out into a conf or something
+  protected val couponNameFormatString = "A gift certificate for %s"
+
+  override def description = maybeDescription.getOrElse(itemType.description)
   override def amount = itemType.amountToBuy
-
-
-  /**
-   * TODO(SER-499): should we strip subItems from flattened items? I think convention says no.
-   *
-   * @return flat sequence of this gift certificate and its sub items, with the sub items of
-   *         each item remaining in place.
-   */
-  override def flatten: IndexedSeq[LineItem[_]] = {
-    val flatSubItemSeqSeq = for(subItem <- subItems) yield subItem.flatten
-    IndexedSeq(this) ++ flatSubItemSeqSeq.flatten
-  }
 
 
   /**
@@ -159,7 +149,7 @@ case class GiftCertificateLineItem (
   override def transact: Coupon = {
     // TODO(SER-499): probably want to perform some validation on this before saving
     new Coupon(
-      name = toName,
+      name = couponName,
       discountAmount = amount.getAmount,
       _couponType = CouponType.GiftCertificate.name,
       _discountType = CouponDiscountType.Flat.name,
@@ -168,9 +158,9 @@ case class GiftCertificateLineItem (
     ).save()
   }
 
+
   /** helper for creating a coupon name */
-  protected def toName: String = {
-    // TODO(SER-499): probably want to pull this out into a conf or something
-    "Gift certificate for the amount of " + amount
+  protected def couponName: String = {
+    couponNameFormatString.format(itemType.recipient)
   }
 }
