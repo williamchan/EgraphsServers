@@ -114,10 +114,21 @@
           line-height:18px;
           list-style-type:circle;
         }
+
+        strong {
+          font-weight:normal;
+          font-style:italic;
+          color:@orange;
+        }
       }
 
       .certificatePreviews(190px);
 
+      .responsive-previews {
+        display:none;
+
+        margin-top:15px;
+      }
     }
 
     #choose-amount {
@@ -246,9 +257,19 @@
     }
 
     #masthead {
+      margin-top:20px;
+
       .previews {
         margin-left:auto;
         margin-right:auto;
+      }
+
+      .desktop-previews {
+        display:none;
+      }
+
+      .responsive-previews {
+        display:block;
       }
 
     }

@@ -11,6 +11,17 @@
   
 }
 
+@previews = {
+  <div class="previews">
+    <div class="preview foreground">
+      <embed src='@EgraphsAssets.at("/images/gift-certificate-preview.svg")' type="image/svg+xml"></embed>
+    </div>
+    <div class="preview background">
+      <embed src='@EgraphsAssets.at("/images/gift-certificate-preview.svg")' type="image/svg+xml" ></embed>
+    </div>
+  </div>  
+}
+
 @baseBody = {
   <div id="content" class="gift-certificate-checkout content" role="main">
     <div id="main">
@@ -19,23 +30,16 @@
           <div class="row-fluid">
             <div class="span6">
               <h1>An Egraphs gift certificate is perfect for the holidays.</h1>
+              <div class="responsive-previews">@previews</div>
               <ul>
                 <li>Gift certificates can be used to connect with any star on the site</li>
                 <li>They can be used over multiple purchases</li>
                 <li>They never expire</li>
+                <li><strong>Buy one in three easy steps:</strong></li>
                 @** TODO(SER-600): Move this to near the purchase button <li>You will receive an e-mail containing the printable certificate as a PDF</li> *@
               </ul>
             </div>
-            <div class="span6">
-              <div class="previews">
-                <div class="preview foreground">
-                  <embed src='@EgraphsAssets.at("/images/gift-certificate-preview.svg")' type="image/svg+xml"></embed>
-                </div>
-                <div class="preview background">
-                  <embed src='@EgraphsAssets.at("/images/gift-certificate-preview.svg")' type="image/svg+xml" ></embed>
-                </div>
-              </div<
-            </div>
+            <div class="desktop-previews span6">@previews</div>
           </div>
         </section>
         
@@ -77,13 +81,13 @@
               <div class="control-group recipient-name">
                 <label class="control-label" for="recipient-name">Recipient name:</label>
                 <div class="controls">
-                  <input id="recipient-name" type="text" name="recipient-name" placeholder="Tiny Tim" />
+                  <input id="recipient-name" type="text" name="recipient-name" placeholder="e.g. Tiny Tim" />
                 </div>
               </div> <!-- End .recipient-name.controls -->
               <div class="control-group gifter-name">
                 <label class="control-label" for="gifter-name">Your name:</label>
                 <div class="controls">
-                  <input id="gifter-name" type="text" name="gifter-name" placeholder="Santa Claus" />
+                  <input id="gifter-name" type="text" name="gifter-name" placeholder="e.g. Santa Claus" />
                 </div>
               </div> <!-- End .gifter-name.controls -->
             </form>
