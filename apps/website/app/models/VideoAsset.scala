@@ -1,16 +1,7 @@
 package models
 
-import java.sql.Timestamp
-
-import org.squeryl.PrimitiveTypeMode.from
-import org.squeryl.PrimitiveTypeMode.long2ScalarLong
-import org.squeryl.PrimitiveTypeMode.string2ScalarString
-import org.squeryl.PrimitiveTypeMode.timestamp2ScalarTimestamp
-import org.squeryl.PrimitiveTypeMode.where
-
 import com.google.inject.Inject
-
-import enums.HasVideoStatus
+import java.sql.Timestamp
 import models.enums.HasVideoStatus
 import models.enums.VideoStatus
 import services.{ AppConfig, Time }
@@ -24,10 +15,10 @@ case class VideoAssetServices @Inject() (store: VideoAssetStore, blobs: Blobs)
 
 case class VideoAsset(
   id: Long = 0,
-  created: Timestamp = Time.defaultTimestamp,
-  updated: Timestamp = Time.defaultTimestamp,
   _urlKey: String = "",
   _videoStatus: String = VideoStatus.Unprocessed.name,
+  created: Timestamp = Time.defaultTimestamp,
+  updated: Timestamp = Time.defaultTimestamp,
   services: VideoAssetServices = AppConfig.instance[VideoAssetServices])
   extends KeyedCaseClass[Long]
   with HasCreatedUpdated
