@@ -186,7 +186,7 @@ object TestData {
   }
 
   def newSavedVideoAsset(): VideoAsset = {
-    VideoAsset(url = "http://www.testUrl.com", _videoStatus = VideoStatus.Unprocessed.name).save()
+    VideoAsset(_urlKey = "videoassets/fakeId/fakeVideo.mp4", _videoStatus = VideoStatus.Unprocessed.name).save()
   }
   
   // delete this if it never gets called
