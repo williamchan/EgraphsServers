@@ -26,8 +26,7 @@ case class VideoAsset(
   id: Long = 0,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
-  url: Option[String] = None,
-  urlKey: String = "",
+  _urlKey: String = "",
   _videoStatus: String = VideoStatus.Unprocessed.name,
   services: VideoAssetServices = AppConfig.instance[VideoAssetServices])
   extends KeyedCaseClass[Long]
@@ -59,9 +58,9 @@ case class VideoAsset(
   }
 
   def getSecureTemporaryUrl: Option[String] = {
-    val maybeSecureUrl = services.blobs.getSecureUrlOption(this.urlKey, 60 minutes)
+    val maybeSecureUrl = services.blobs.getSecureUrlOption(_urlKey, 60 minutes)
     maybeSecureUrl match {
-      case None => play.Logger.info("No video asset found with urlKey: " + this.urlKey)
+      case None => play.Logger.info("No video asset found with _urlKey: " + _urlKey)
       case Some(newUrl) => play.Logger.info("This video asset's URL: " + newUrl)
     }
     maybeSecureUrl
@@ -69,7 +68,7 @@ case class VideoAsset(
 
   def setVideoUrlKey(filename: String): String = {
     val blobKey = blobKeyBase + filename
-    this.copy(urlKey = blobKey).save()
+    this.copy(_urlKey = blobKey).save()
     blobKey
   }
 }
@@ -95,12 +94,11 @@ class VideoAssetStore @Inject() (schema: Schema)
 
   override def defineUpdate(theOld: VideoAsset, theNew: VideoAsset) = {
     updateIs(
-      theOld.id := theNew.id,
+      theOld._urlKey := theNew._urlKey,
+      theOld._videoStatus := theNew._videoStatus,
       theOld.created := theNew.created,
-      theOld.updated := theNew.updated,
-      theOld.url := theNew.url,
-      theOld.urlKey := theNew.urlKey,
-      theOld._videoStatus := theNew._videoStatus)
+      theOld.updated := theNew.updated
+    )
   }
 
   //
