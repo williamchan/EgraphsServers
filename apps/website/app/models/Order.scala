@@ -160,6 +160,41 @@ case class Order(
     (refundedOrder, refundedCharge)
   }
 
+  /**
+   * Saves a copy of this order with everything the same except id.
+   */
+  private def createSavedCopy(): Order = {
+    // this is the minimum amount to create save a new order.
+    val newOrderId = Order(
+      productId = this.productId,
+      inventoryBatchId = this.inventoryBatchId,
+      buyerId = this.buyerId,
+      recipientId = this.recipientId,
+      recipientName = this.recipientName).save().id
+
+    this.copy(id = newOrderId).save()
+  }
+
+  /**
+   * Rejects this order and creates a new order that is a copy to take it's place.
+   * The copy has a new product and inventory batch.
+   */
+  def rejectAndCreateNewOrderWithNewProduct(newProduct: Product, newInventoryBatch: InventoryBatch): Order = {
+    // create a new order only need to fill in mandatory fields now, just to get a new id.
+    val newOrder = createSavedCopy().withReviewStatus(OrderReviewStatus.PendingAdminReview)
+      .copy(
+        productId = newProduct.id,
+        rejectionReason = None,
+        inventoryBatchId = newInventoryBatch.id)
+      .save()
+    // mark old order invalid
+    this.withReviewStatus(OrderReviewStatus.RejectedByAdmin).copy(rejectionReason = Some("Changed product to " + newProduct.id + " with new order " + newOrder.id)).save()
+    // update other objects that care about the old order, since they shouldn't anymore
+    services.cashTransactionStore.findByOrderId(this.id).foreach(transaction => transaction.copy(orderId = Some(newOrder.id)).save())
+    services.printOrderStore.findByOrderId(this.id).foreach(printOrder => printOrder.copy(orderId = newOrder.id).save())
+    newOrder
+  }
+
   def approveByAdmin(admin: Administrator): Order = {
     require(admin != null, "Must be approved by an Administrator")
     require(reviewStatus == OrderReviewStatus.PendingAdminReview, "Must be PendingAdminReview before approving by admin")

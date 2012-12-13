@@ -126,20 +126,7 @@ trait PostOrderAdminEndpoint { this: Controller =>
                       inventoryBatch <- product.inventoryBatches.filter(batch => batch.isActive).headOption
                     } yield {
                       // create a new order
-                      val newOrder = order
-                        .withReviewStatus(OrderReviewStatus.PendingAdminReview)
-                        .copy(
-                          id = 0,
-                          productId = newProductId,
-                          rejectionReason = None,
-                          inventoryBatchId = inventoryBatch.id)
-                        .save()
-                      // mark old product invalid
-                      order.withReviewStatus(OrderReviewStatus.RejectedByAdmin).copy(rejectionReason = Some("Changed product to " + newProductId + " with new order " + newOrder.id)).save()
-                      // update other objects that care about the old order, since they shouldn't anymore
-                      cashTransactionStore.findByOrderId(order.id).foreach(transaction => transaction.copy(orderId = Some(newOrder.id)).save())
-                      printOrderStore.findByOrderId(order.id).foreach(printOrder => printOrder.copy(orderId = newOrder.id).save())
-                      // send the admin to the new page, where they can edit the message, etc
+                      val newOrder = order.rejectAndCreateNewOrderWithNewProduct(product, inventoryBatch)
                       Redirect(GetOrderAdminEndpoint.url(newOrder.id))  
                     }
                     maybeOk.getOrElse(
