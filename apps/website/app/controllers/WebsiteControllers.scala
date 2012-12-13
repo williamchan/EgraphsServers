@@ -58,7 +58,6 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
 
   override protected val accountStore = instance[AccountStore]
   override protected val administratorStore = instance[AdministratorStore]
-  override protected val cashTransactionStore = instance[CashTransactionStore]
   override protected def categoryStore = instance[CategoryStore]
   override protected def categoryValueStore = instance[CategoryValueStore]
   override protected val celebrityStore = instance[CelebrityStore]

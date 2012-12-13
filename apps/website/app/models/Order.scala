@@ -21,6 +21,7 @@ import social.{Twitter, Facebook}
 import controllers.website.GetEgraphEndpoint
 import play.api.mvc.RequestHeader
 import play.api.templates.Html
+import db.Deletes
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -188,10 +189,18 @@ case class Order(
         inventoryBatchId = newInventoryBatch.id)
       .save()
     // mark old order invalid
-    this.withReviewStatus(OrderReviewStatus.RejectedByAdmin).copy(rejectionReason = Some("Changed product to " + newProduct.id + " with new order " + newOrder.id)).save()
+    val oldOrder = this.withReviewStatus(OrderReviewStatus.RejectedByAdmin).copy(rejectionReason = Some("Changed product to " + newProduct.id + " with new order " + newOrder.id)).save()
     // update other objects that care about the old order, since they shouldn't anymore
-    services.cashTransactionStore.findByOrderId(this.id).foreach(transaction => transaction.copy(orderId = Some(newOrder.id)).save())
-    services.printOrderStore.findByOrderId(this.id).foreach(printOrder => printOrder.copy(orderId = newOrder.id).save())
+    services.cashTransactionStore.findByOrderId(oldOrder.id).foreach(transaction => transaction.copy(orderId = Some(newOrder.id)).save())
+    services.printOrderStore.findByOrderId(oldOrder.id).foreach(printOrder => printOrder.copy(orderId = newOrder.id).save())
+
+    // if we can delete the old one, that means there are no dangling foreign keys.  otherwise we have a problem and should roll back.
+    // we don't actually want to delete the old order though, so we will save it after we delete it.
+//    services.store.delete(oldOrder)
+//    val updatedOldOrder = oldOrder.save()
+//    println(this)
+//    println(updatedOldOrder)
+
     newOrder
   }
 
@@ -350,7 +359,12 @@ case class FulfilledOrder(order: Order, egraph: Egraph)
 /** Thin semantic wrapper around a tuple for product order and egraph */
 case class FulfilledProductOrder(product: Product, order:Order, egraph: Egraph)
 
-class OrderStore @Inject() (schema: Schema) extends SavesWithLongKey[Order] with SavesCreatedUpdated[Long,Order] {
+class OrderStore @Inject() (
+  schema: Schema
+) extends SavesWithLongKey[Order]
+  with SavesCreatedUpdated[Long,Order]
+  with Deletes[Long, Order]
+{
   import org.squeryl.PrimitiveTypeMode._
   //
   // Public methods

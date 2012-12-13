@@ -22,7 +22,6 @@ trait PostOrderAdminEndpoint { this: Controller =>
 
   protected def postController: POSTControllerMethod
   protected def httpFilters: HttpFilters
-  protected def cashTransactionStore: CashTransactionStore
   protected def orderStore: OrderStore
   protected def printOrderStore: PrintOrderStore
   protected def accountStore: AccountStore
