@@ -39,6 +39,7 @@ class Scenarios extends DeclaresScenarios {
 
   private val schema = AppConfig.instance[Schema]
   private val mail = AppConfig.instance[services.mail.TransactionalMail]
+  private val orderStore = AppConfig.instance[OrderStore]
 
   private lazy val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
   private lazy val today = DateTime.now().toLocalDate.toDate
@@ -215,7 +216,7 @@ class Scenarios extends DeclaresScenarios {
       val erem = Scenarios.getEremCustomerAccount
       val myyk = Scenarios.getMyykCustomerAccount
       val (starcraftChampionship, _) = Scenarios.getWillsTwoProducts
-      erem.buy(starcraftChampionship, recipient = myyk, recipientName = "Myyk Badass-Seok", requestedMessage = Some("Happy 13th birthday, Myyk!"), messageToCelebrity = Some("My buddy Myyk is your biggest fan!")).save()
+      erem.buy(starcraftChampionship, recipient = myyk, recipientName = myyk.name, requestedMessage = Some("Happy 13th birthday, Myyk!"), messageToCelebrity = Some("My buddy Myyk is your biggest fan!")).save()
   }
   )
   
@@ -225,10 +226,7 @@ class Scenarios extends DeclaresScenarios {
   """Will fulfills Erem's gift order for Myyk""", {
     () =>
       val (starcraftChampionship, _) = Scenarios.getWillsTwoProducts
-      val order = from(schema.orders)(order =>
-        where(order.recipientName === "Myyk Badass-Seok")
-          select (order)
-      ).head
+      val order = orderStore.findByCustomerId(Scenarios.getEremCustomerAccount.id).filter { order => order.recipient == Scenarios.getMyykCustomerAccount }.head
       order
         .withPaymentStatus(PaymentStatus.Charged).save()
         .newEgraph

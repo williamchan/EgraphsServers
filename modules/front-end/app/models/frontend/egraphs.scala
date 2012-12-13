@@ -16,6 +16,7 @@ trait EgraphViewModel {
   def recipientId: Long
   def recipientName: String
   def thumbnailUrl: String
+  def isPending: Boolean
 }
 
 case class PendingEgraphViewModel(
@@ -31,7 +32,9 @@ case class PendingEgraphViewModel(
   recipientId: Long,
   recipientName: String,
   thumbnailUrl: String) extends EgraphViewModel {
-  
+
+  val isPending = true
+
   def isGift: Boolean = {
     buyerId != recipientId
   }
@@ -53,7 +56,9 @@ case class FulfilledEgraphViewModel(
   thumbnailUrl: String,
   twitterShareLink: String,
   viewEgraphUrl: String) extends EgraphViewModel {
-  
+
+  val isPending = false
+
   def isGift: Boolean = {
     buyerId != recipientId
   }

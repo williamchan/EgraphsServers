@@ -29,8 +29,8 @@
               } else {
                 <strong>@egraphs.length Egraphs</strong> /
               }
-              <strong>@{egraphs.filter(egraph => egraph.isInstanceOf[models.frontend.egraphs.PendingEgraphViewModel]).length}</strong>
-              Pending, <strong>@{egraphs.filter(egraph => egraph.isInstanceOf[models.frontend.egraphs.FulfilledEgraphViewModel]).length}</strong>
+              <strong>@{egraphs.filter(egraph => egraph.isPending).length}</strong>
+              Pending, <strong>@{egraphs.filter(egraph => !egraph.isPending).length}</strong>
               Finished</span>
           </div>
         </header>
@@ -53,7 +53,7 @@
         </section>
         
         @** Gifts given section: Only display if the user has given gifts *@
-        @if(giftEgraphs.length != 0) {
+        @if(!giftEgraphs.isEmpty) {
           <header class="gallerytop">
             <div class="row-fluid">
               <span class="span8 username">Gifts Given</span>
@@ -63,8 +63,8 @@
                 } else {
                   <strong>@giftEgraphs.length Egraphs</strong> /
                 }
-                <strong>@{giftEgraphs.filter(giftEgraph => giftEgraph.isInstanceOf[models.frontend.egraphs.PendingEgraphViewModel]).length}</strong>
-                Pending, <strong>@{giftEgraphs.filter(giftEgraph => giftEgraph.isInstanceOf[models.frontend.egraphs.FulfilledEgraphViewModel]).length}</strong>
+                <strong>@{giftEgraphs.filter(giftEgraph => giftEgraph.isPending).length}</strong>
+                Pending, <strong>@{giftEgraphs.filter(giftEgraph => !giftEgraph.isPending).length}</strong>
                 Finished</span>
             </div>
           </header>
