@@ -1,6 +1,15 @@
 // Styles for the gift certificate checkout page
 
 .giftCertificates() {
+  //
+  // Variables
+  //
+  @sectionSeparator: 1px solid lighten(@gray, 50%);
+  @headerColor: #4d4d4d;
+
+  //
+  // Mixins
+  //
   .certificatePreviews(@imageWidth) {
     @previewOverlap: .7368;
     .previews {
@@ -36,16 +45,17 @@
     }
   }
 
-  @sectionSeparator: 1px solid lighten(@gray, 50%);
-
-  #content.gift-certificate-checkout {
+  //
+  // Rules
+  //
+  #content.gift-certificate-checkout, .gift-certificate-modal {
     .checkout-step-count {
       position:relative;
       margin-right:7px;
       padding-top:0px;
       padding-bottom:0px;
-      padding-left:7px;
-      padding-right:7px;
+      padding-left:5px;
+      padding-right:5px;
       border-radius:100px;
       background-color:@orange;
       color:@white;
@@ -53,18 +63,12 @@
       font-size:16px;
       font-weight:600;
 
-      &.two {
-        padding-left:5px;
-        padding-right:5px;
-      }
-
-      &.three {
-        padding-left:5px;
-        padding-right:5px;
+      &.one {
+        padding-left:7px;
+        padding-right:7px;
       }
     }
 
-    @sectionSeparator: 1px solid lighten(@gray, 50%);
     section {
       border-bottom:@sectionSeparator;
       .box-shadow(0px 1px 0px white);
@@ -81,7 +85,7 @@
     }
 
     h2 {
-      color:#4d4d4d;
+      color:@headerColor;
       text-transform: uppercase;
       font-size:16px;
       font-weight:600;
@@ -220,7 +224,7 @@
       }
     }
 
-    #billing {
+    #pay {
       padding-left:@fluidGridGutterWidth;
       border-bottom:none;
       border-left: @sectionSeparator;
@@ -233,19 +237,96 @@
       input {
         width:100%;
       }
+
+      input#card-cvc, input#postal-code {
+        max-width:50px;
+      }
     }
 
     button.review {
       margin-top:20px;
     }
 
-    input#card-cvc, input#postal-code {
-      max-width:50px;
+    &#review {
+      .box-shadow(0px 0px 8px rgba(0,0,0,0.3));
+      border:1px solid #AAA;
+      border-radius: 0px;
+      color: @grayLight;
+      font-size:14px;
+      line-height:normal;
+
+      h2, h3 {
+        color:@headerColor;
+      }
+
+      h2 {
+        margin-bottom:0px;
+        line-height:29px;
+      }
+
+      .modal-header {
+        border-bottom:@sectionSeparator;
+      }
+
+      .summary-item {
+        font-weight:600;
+      }
+
+      .purchaser-summary {
+
+        h3 {
+          text-transform:uppercase;
+          font-size:14px;
+          font-weight:600;
+          line-height:normal;
+        }
+
+        .card-number-placeholder {
+          font-weight:normal;
+        }
+
+        .amount-recipient {
+          float:left;
+        }
+
+        .billing {
+          float:right;
+        }
+      }
+
+      .price-summary {
+        margin-top:20px;
+        max-width:300px;
+
+        table {
+          width: 100%;
+
+          th {
+            text-align:left;
+            width:50%;
+          }
+
+          td {
+            text-align:right;
+            width:50%;
+          }
+
+          .last td, .last th {
+            padding-bottom:5px;
+          }
+
+          #total td, #total th {
+            padding-top:5px;
+            border-top: @sectionSeparator;
+          }
+        }
+      }
     }
 
   } // End #content
 
-  @media (max-width:767px) { #content.gift-certificate-checkout {
+
+  @media (max-width:767px) { #content.gift-certificate-checkout, .gift-certificate-modal  {
     .controls {
       // Eliminate artifactual input expansion outside of grid due to spanning at
       // 100%
@@ -277,7 +358,7 @@
     #choose-amount {
       .amount-option {
         // Space out the buttons once they snap to vertical alignment
-        margin-bottom: 15px;
+        margin-bottom: 10px;
       }
     }
 
@@ -285,19 +366,20 @@
       border-bottom:@sectionSeparator;
       .box-shadow(0px 1px 0px white);
     }
+  }} // End 767px Media
 
-    #billing {
-      padding-left: 0px;
-      border-left: none;
-      .box-shadow(none);
-    }
-  }}
-
-  @media (max-width:480px) { #content.gift-certificate-checkout {
+  @media (max-width:480px) { #content.gift-certificate-checkout, .gift-certificate-modal {
     #masthead {
       .certificatePreviews(150px);
     }
-  }}
+
+    &#review {
+      .purchaser-summary .billing {
+        margin-top:15px;
+        float:left;
+      }
+    }
+  }} // End 480px Media
 } // End .giftCertificates()
 
 .giftCertificates();
