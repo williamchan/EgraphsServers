@@ -53,7 +53,7 @@ class Blobs @Inject() (
    * Only use this method if you intend on using the bytes here on the server. Otherwise, for example if you intend 
    * a browser to be downloading the file, use getStaticResourceUrl.
    */
-  def getStaticResource(key: String) : Option[Blob] = {
+  def getStaticResource(key: String): Option[Blob] = {
     val store = s3.context.getBlobStore
     Option(store.getBlob(staticResourceBlobstoreNamespace, key))
   }
@@ -64,11 +64,8 @@ class Blobs @Inject() (
    * http://s3.amazonaws.com/doc/s3-developer-guide/RESTAuthentication.html. Note that a URL will be returned even if
    * the key does not point to any resource, ie passing in "IDoNotExist" as the key will still return a signed URL.
    */
-  def getStaticResourceUrl(key: String, expirationSeconds: Int = 5.minutes): String = {
-    val expires = System.currentTimeMillis() / 1000 + expirationSeconds    
-    val baseUrl = s3.context.getSigner.signGetBlob(staticResourceBlobstoreNamespace, key).getEndpoint
-    val signature = s3.sign(namespace = staticResourceBlobstoreNamespace, key = key, expires = expires)
-    baseUrl + "?" + "AWSAccessKeyId=" + s3.s3id + "&Expires=" + expires + "&Signature=" + signature
+  def getStaticResourceUrl(key: String, expirationSeconds: Int = 5 minutes): String = {
+    s3.secureUrlOption(staticResourceBlobstoreNamespace, key, expirationSeconds).get
   }
 
   /**
@@ -84,6 +81,13 @@ class Blobs @Inject() (
    */
   def getUrlOption(key: String): Option[String] = {
     blobVendor.urlOption(blobstoreNamespace, key)
+  }
+
+  /**
+   * Returns the secure URL for the Blob.
+   */
+  def getSecureUrlOption(key: String, expirationSeconds: Int = 5 minutes): Option[String] = {
+    blobVendor.secureUrlOption(blobstoreNamespace, key, expirationSeconds)
   }
 
   /**
@@ -115,8 +119,8 @@ class Blobs @Inject() (
       throw new IllegalStateException("Cannot scrub blobstore unless in dev mode, application is test, and blobstore is filesystem")
     }
 
-    if(config.blobstoreAllowScrub) {
-      blobStore.clearContainer(blobstoreNamespace)      
+    if (config.blobstoreAllowScrub) {
+      blobStore.clearContainer(blobstoreNamespace)
     } else {
       throw new IllegalStateException(
         """I'm not going to scrub the blobstore unless "blobstore.allowscrub"
@@ -176,7 +180,7 @@ class Blobs @Inject() (
 
     blobVendor.checkConfiguration()
   }
-  
+
   //
   // Private members
   //
@@ -184,7 +188,6 @@ class Blobs @Inject() (
     blobVendorProvider.s3
   }
 }
-
 
 /**
  * Provides the active BlobVendor to Guice, which is dictated by the "blobstore" value in

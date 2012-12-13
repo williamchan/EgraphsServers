@@ -2,6 +2,7 @@ package services.blobs
 
 import org.jclouds.blobstore.domain.Blob
 import org.jclouds.blobstore.BlobStoreContext
+import services.Time.IntsToSeconds._
 
 /**
  * Class that enables easy composition of BlobVendors.
@@ -42,6 +43,10 @@ private[blobs] trait BlobVendorComposition extends BlobVendor {
   }
 
   def urlOption(namespace: String, key: String) = {
+    blobVendorDelegate.urlOption(namespace, key)
+  }
+  
+  override def secureUrlOption(namespace: String, key: String, expirationSeconds: Int = 5 minutes): Option[String] = {
     blobVendorDelegate.urlOption(namespace, key)
   }
 }
