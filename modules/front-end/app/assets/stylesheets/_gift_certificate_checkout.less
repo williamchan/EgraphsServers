@@ -243,10 +243,6 @@
       }
     }
 
-    button.review {
-      margin-top:20px;
-    }
-
     &#review {
       .box-shadow(0px 0px 8px rgba(0,0,0,0.3));
       border:1px solid #AAA;
@@ -264,8 +260,20 @@
         line-height:29px;
       }
 
+      h3 {
+        text-transform:uppercase;
+        font-size:14px;
+        font-weight:600;
+        line-height:normal;
+      }
+
       .modal-header {
         border-bottom:@sectionSeparator;
+      }
+
+      .modal-body {
+        border-top:1px solid white;
+        background: rgba(250,250,250,1);
       }
 
       .summary-item {
@@ -273,33 +281,25 @@
       }
 
       .purchaser-summary {
-
-        h3 {
-          text-transform:uppercase;
-          font-size:14px;
-          font-weight:600;
-          line-height:normal;
-        }
-
         .card-number-placeholder {
           font-weight:normal;
         }
 
-        .amount-recipient {
-          float:left;
-        }
-
         .billing {
-          float:right;
+          margin-top:10px;
         }
       }
 
       .price-summary {
-        margin-top:20px;
-        max-width:300px;
+        margin-top:10px;
 
         table {
           width: 100%;
+
+          th, td {
+            font-weight:600;
+            text-transform:uppercase;
+          }
 
           th {
             text-align:left;
@@ -312,14 +312,23 @@
           }
 
           .last td, .last th {
-            padding-bottom:5px;
+            
           }
 
           #total td, #total th {
-            padding-top:5px;
-            border-top: @sectionSeparator;
+            color:@headerColor;
           }
         }
+      }
+
+      .modal-body-separator {
+        border-top:@sectionSeparator;
+        .box-shadow(0px 1px 0px white);
+        position:relative;
+        width:300px;
+        left:-15px;
+        margin-top:12px;
+        margin-bottom:12px;
       }
     }
 
@@ -371,13 +380,6 @@
   @media (max-width:480px) { #content.gift-certificate-checkout, .gift-certificate-modal {
     #masthead {
       .certificatePreviews(150px);
-    }
-
-    &#review {
-      .purchaser-summary .billing {
-        margin-top:15px;
-        float:left;
-      }
     }
   }} // End 480px Media
 } // End .giftCertificates()
