@@ -164,7 +164,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       } else {
         val resultSets = for(vertical <- verticalStore.verticals) yield {
           val categoryValue = vertical.categoryValue
-          val results = celebrityStore.marketplaceSearch(queryOption, List(Seq(categoryValue.id)))
+          val results = celebrityStore.marketplaceSearch(Option(vertical.featuredQuery), List(Seq(categoryValue.id)))
           ResultSetViewModel(subtitle = Option(categoryValue.publicName),
                              verticalUrl = Option(vertical.urlSlug),
                              celebrities = results.slice(0,3))
