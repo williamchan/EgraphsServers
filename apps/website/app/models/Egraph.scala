@@ -336,7 +336,7 @@ case class Egraph(
   }
 
   def isRejectable: Boolean = {
-    List(PassedBiometrics, FailedBiometrics, ApprovedByAdmin).contains(egraphState)
+    List(PassedBiometrics, FailedBiometrics, ApprovedByAdmin, Published).contains(egraphState)
   }
 
   def approve(admin: Administrator): Egraph = {

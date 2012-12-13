@@ -36,6 +36,7 @@
     </div>
   }
   }
+  @if(egraph.isRejectable) {
   @safeForm('id -> "reject-form", 'method -> "POST", 'action -> postEgraph.url) {
     <input name="egraphId" type="hidden" value="@egraph.id">
     <input name="egraphState" type="hidden" value="@models.enums.EgraphState.RejectedByAdmin">
@@ -43,9 +44,12 @@
       <h3>Reject due to questionable content or authenticity.</h3>
       @if(egraph.isPublished) {
         <h4 style="color:#FF0000">Warning: Rejecting an Approved Egraph then approving it again will result in an extra email to the customer</h4>
+        <button type="submit" id="reject-button" class="btn primary fade in">Unpublish and Reject Egraph</button>
+      } else {
+        <button type="submit" id="reject-button" class="btn primary fade in">Reject Egraph</button>
       }
-      <button type="submit" id="reject-button" class="btn primary fade in">Reject Egraph</button>
     </div>
+  }
   }
 </div>
 }
