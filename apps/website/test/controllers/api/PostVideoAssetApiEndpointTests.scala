@@ -1,7 +1,6 @@
 package controllers.api
 
 import java.io.File
-
 import controllers.routes.ApiControllers.postVideoAsset
 import play.api.http.HeaderNames
 import play.api.libs.Files.TemporaryFile
@@ -21,6 +20,12 @@ import services.AppConfig
 import utils.FunctionalTestUtils.{ runFreshScenarios, willChanRequest }
 import utils.EgraphsUnitTest
 import utils.TestData
+import play.api.mvc.SimpleResult
+import play.api.mvc.Result
+import play.api.mvc.AsyncResult
+import play.api.mvc.PlainResult
+import org.joda.time.DateTimeConstants
+import models.VideoAssetCelebrityStore
 
 class PostVideoAssetApiEndpointTests extends EgraphsUnitTest with ProtectedCelebrityResourceTests {
   protected override def routeUnderTest = postVideoAsset
@@ -48,15 +53,34 @@ class PostVideoAssetApiEndpointTests extends EgraphsUnitTest with ProtectedCeleb
     val fakeVideoFile = Seq(fakeVideoPart)
     val postBody = MultipartFormData[TemporaryFile](nonFiles, fakeVideoFile, Seq(), Seq())
 
-    val Some(result) = routeAndCall(FakeRequest(POST, "/api/1.0/celebrities/me/videoasset",
+    val Some(result) = routeAndCall(FakeRequest(POST, controllers.routes.ApiControllers.postVideoAsset.url,
       FakeHeaders(Map(HeaderNames.CONTENT_TYPE -> Seq("multipart/form-data"))), postBody).withHeaders(auth.toHeader))
 
-    status(result) should be(OK)
+    myStatus(result) should be(OK)
 
     val blob: Blobs = AppConfig.instance[Blobs]
-    val videoKey = "videos/" + celebrityId + "/" + filename
-    val maybeFileLocation = blob.getUrlOption(key = videoKey)
+    val videoAssetCelebrityStore: VideoAssetCelebrityStore = AppConfig.instance[VideoAssetCelebrityStore]
 
-    maybeFileLocation.isDefined should be(true)
+    val maybeVideoAsset = db.connected(TransactionSerializable) {
+      videoAssetCelebrityStore.getVideoAssetByCelebrityId(celebrityId)
+    }
+    
+    println("maybe video asset is " + maybeVideoAsset)
+
+    maybeVideoAsset match {
+      case None => fail("There is no video asset associated with celebrityId " + celebrityId)
+      case Some(videoAsset) => {
+        val videoKey = "videoassets/" + videoAsset.id + "/" + filename
+        val maybeFileLocation = blob.getUrlOption(key = videoKey)
+        maybeFileLocation.isDefined should be(true)
+      }
+    }
+  }
+
+  private def myStatus(result: Result): Int = {
+    result match {
+      case asyncResult: AsyncResult => myStatus(asyncResult.result.await(30 * DateTimeConstants.MILLIS_PER_SECOND).get)
+      case anythingElse => status(result)  
+    }
   }
 }

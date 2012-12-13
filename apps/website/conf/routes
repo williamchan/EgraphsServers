@@ -45,7 +45,7 @@ GET     /api/1.0/celebrities/me/orders                          controllers.ApiC
 POST    /api/1.0/celebrities/me/enrollmentsamples               controllers.ApiControllers.postEnrollmentSample
 POST    /api/1.0/celebrities/me/orders/$orderId<[0-9]+>         controllers.ApiControllers.postCelebrityOrder(orderId:Long)
 POST    /api/1.0/celebrities/me/orders/$orderId<[0-9]+>/egraphs controllers.ApiControllers.postEgraph(orderId:Long)
-POST    /api/1.0/celebrities/me/videoasset                      controllers.ApiControllers.postVideoAsset                   
+POST    /api/1.0/celebrities/me/videoasset                      controllers.ApiControllers.postVideoAsset
 
 ##
 ## Admin
@@ -101,6 +101,7 @@ POST     /admin/products/$productId<[0-9]+>                               contro
 GET      /admin/reports                                            				controllers.WebsiteControllers.getReportsAdmin
 GET      /admin/tools                                              				controllers.WebsiteControllers.getToolsAdmin
 GET      /admin/videoasset                                                controllers.WebsiteControllers.getVideoAssetAdmin
+POST     /admin/videoasset                                                controllers.WebsiteControllers.postVideoAssetAdmin
 GET      /admin/videoassets                                               controllers.WebsiteControllers.getVideoAssetsAdmin
 GET      /admin/videoassets/:status                                       controllers.WebsiteControllers.getVideoAssetsWithStatusAdmin(status: String)
 POST     /admin/videoassets/$id<[0-9]+>                                   controllers.WebsiteControllers.postProcessVideoAdmin(action: String, id: Long)											

@@ -46,8 +46,8 @@ class BlobsTests extends EgraphsUnitTest
   }
 
   "getStaticResourceUrl" should "return short-term signed URL to static S3 resource" in new EgraphsTestApplication {
-    val expirationSeconds = 5.minutes
-    val signedUrl = blobs.getStaticResourceUrl(key = "derp", expirationSeconds = 5.minutes)
+    val expirationSeconds = 5 minutes
+    val signedUrl = blobs.getStaticResourceUrl(key = "derp", expirationSeconds = 5 minutes)
     val expires = System.currentTimeMillis() / 1000 + expirationSeconds
 
     val urlAndQueryParams = TestHelpers.splitUrl(signedUrl)
