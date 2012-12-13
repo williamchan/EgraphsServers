@@ -7,11 +7,12 @@ import utils.EgraphsUnitTest
 @RunWith(classOf[JUnitRunner])
 class GiftCertificatePdfTests extends EgraphsUnitTest {
 
-    "it" should "run" in new EgraphsTestApplication {
-      GiftCertificatePdf.execute(recipientName = "Joshua Robinson",
-        buyerName = "Jason Shaw",
-        amount = 75,
-        code = "123456789012")
-    }
+  "generate" should "create a gift certificate pdf" in new EgraphsTestApplication {
+    val result = GiftCertificatePdf.generate(recipientName = "Joshua Robinson has a really long name",
+      buyerName = "Alexander Kehlenbeck",
+      amount = 75,
+      code = "12345678901234567890")
+    result.toByteArray.length should be(232961)
+  }
 
 }
