@@ -250,6 +250,9 @@
       color: @grayLight;
       font-size:14px;
       line-height:normal;
+      top:50%;
+      left:50%;
+
 
       h2, h3 {
         color:@headerColor;
@@ -374,6 +377,13 @@
     #personalize {
       border-bottom:@sectionSeparator;
       .box-shadow(0px 1px 0px white);
+    }
+
+    #pay {
+      // Remove gutter from span6 class
+      border-left: none;
+      padding-left:0px;
+      .box-shadow(none);
     }
   }} // End 767px Media
 

@@ -40,7 +40,7 @@
                 <li>Gift certificates can be used to connect with any star on the site</li>
                 <li>They can be used over multiple purchases</li>
                 <li>They never expire</li>
-                <li><strong>Buy one in four easy steps:</strong></li>
+                <li><strong>Buy a gift certificate in four easy steps:</strong></li>
                 @** TODO(SER-600): Move this to near the purchase button <li>You will receive an e-mail containing the printable certificate as a PDF</li> *@
               </ul>
             </div>
@@ -170,10 +170,8 @@
                 </div> <!-- End .postal-code.controls -->
 
                 <div class="control-group">
-                  @tags.arrow_button(
-                    caption="Review Order",
-                    classes="button right review"
-                  )
+                  <button id="review-button" data-toggle="modal" href="#review" class="button right review"><strong><em>Review Order</em></strong><span>&raquo;</span>
+                  </button>
                 </div>
 
               </fieldset>

@@ -124,9 +124,13 @@
 }
 
 @media (max-width: 979px) {
-	.modal, 
-	.modal.container,
-	.modal.modal-overflow 	{
+	/* Egraphs edit (Erem) -- added "-responsive" to selector. Do that if you want modals 
+	   that take up exactly full viewport width. We didn't want that on gift cert purchase
+	   page because it's only 300px.
+	*/
+	.modal-responsive, 
+	.modal-responsive.container,
+	.modal-responsive.modal-overflow, 	{
 		top: 1%;
 		right: 1%;
 		left: 1%;
@@ -137,9 +141,9 @@
 		padding: 0 !important;
 	}
 	
-	.modal.fade.in, 
-	.modal.container.fade.in,
-	.modal.modal-overflow.fade.in {
+	.modal-responsive.fade.in, 
+	.modal-responsive.container.fade.in,
+	.modal-responsive.modal-overflow.fade.in {
 		top: 1%;
 		bottom: auto;
 	}
