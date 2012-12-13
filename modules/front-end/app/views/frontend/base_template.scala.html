@@ -1,4 +1,9 @@
-@(title: String, jsMain: String = "", headJs: => Html = Html.empty, body: => Html, head: => Html = Html.empty)(
+@(title: String,
+  jsMain: String = "",
+  headJs: => Html = Html.empty,
+  body: => Html,
+  cssFiles: Seq[String] = Seq()
+)(
   implicit headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData,
   authToken: egraphs.authtoken.AuthenticityToken
@@ -21,11 +26,15 @@
 
     body - the HTML that should be rendered as the body of the page.
 
+    cssFiles - a list of CSS asset URLs to be added after other CSS files are loaded.
+
     headerData - extra implicit data necessary for the base template to render
         the header. This is logged-in information, links to other parts of the site that
         reside in the base template.
 
     footerData - extra implicit data necessary to render the footer.
+
+    authToken - an authenticity token that protects forms against CSRF attack.
 *@
 
 @import egraphs.authtoken.AuthenticityToken.safeForm
@@ -58,13 +67,15 @@
     <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png"> -->
     <link rel="shortcut icon" type="image/png" href='@EgraphsAssets.at("images/favicon.png")'>
     <link href='@EgraphsAssets.at("stylesheets/main.min.css")' rel="stylesheet">
+    @for(cssFile <- cssFiles) {
+      <link rel="stylesheet" href="@cssFile">
+    }
 
     <!-- Front-load scripting assets that are necessary for attractive display -->
     <script src='@EgraphsAssets.at("javascripts/libs/modernizr.custom.js")'></script>
     <script src="https://use.typekit.com/ztt6ynw.js"></script>
     <script>try{Typekit.load();}catch(e){}</script>
     <script src='@EgraphsAssets.at("javascripts/libs/angular.js")'></script>
-    @head
 
     <!-- Configure egraphs scripting main classes (these will automatically be loaded by main.js -->
     <script>

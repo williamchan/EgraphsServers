@@ -7,13 +7,6 @@
 
 @import models.frontend.forms.Field
 
-@head = {
-  <link rel="stylesheet" href='@EgraphsAssets.at("bootstrap-modal/css/bootstrap-modal.css")' >
-}
-
-@headJs = {
-  
-}
 
 @** SVG previews of the gift certificate *@
 @previews = {
@@ -170,13 +163,12 @@
                 </div> <!-- End .postal-code.controls -->
 
                 <div class="control-group">
-                  <button id="review-button" data-toggle="modal" href="#review" class="button right review"><strong><em>Review Order</em></strong><span>&raquo;</span>
+                  <button id="review-button" class="button right review" type="button" ><strong><em>Review Order</em></strong><span>&raquo;</span>
                   </button>
                 </div>
 
               </fieldset>
             </form>
-            @**<a href="#review" role="button" class="btn" data-toggle="modal">Review dat shiz</a>              *@
           </section>
         </div>
         <section id="review" class="modal hide fade gift-certificate-modal" data-width="300">
@@ -233,7 +225,6 @@
 @base_template(
   title="Gift Certificates",
   jsMain = "pages/gift_certificates",
-  headJs = headJs,
-  body=baseBody,
-  head = head
+  cssFiles = Seq(EgraphsAssets.at("bootstrap-modal/css/bootstrap-modal.css").url),  
+  body=baseBody
 )
