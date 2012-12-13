@@ -73,7 +73,7 @@ POST     /admin/celebrities/$celebrityId<[0-9]+>/products                 contro
 GET      /admin/celebrities/$celebrityId<[0-9]+>/products/create          controllers.WebsiteControllers.getCreateCelebrityProductAdmin(celebrityId: Long)
 POST     /admin/celebrities/$celebrityId<[0-9]+>/sendEmail                controllers.WebsiteControllers.postSendCelebrityWelcomeEmailAdmin(celebrityId: Long)
 GET      /admin/egraphs                                                   controllers.WebsiteControllers.getEgraphsAdmin
-GET      /admin/egraphs/$egraphId<[0-9]+>                                 controllers.WebsiteControllers.getEgraphAdmin(egraphId: Long)
+GET      /admin/egraphs/$egraphId<[0-9]+>                                 controllers.WebsiteControllers.getEgraphAdmin(egraphId: Long, action: String ?= "")
 POST     /admin/egraphs/$egraphId<[0-9]+>                                 controllers.WebsiteControllers.postEgraphAdmin(egraphId: Long)
 GET      /admin/freegraphs/create                                         controllers.WebsiteControllers.getCreateFreegraphAdmin
 POST     /admin/freegraphs/create                                         controllers.WebsiteControllers.postFreegraphAdmin

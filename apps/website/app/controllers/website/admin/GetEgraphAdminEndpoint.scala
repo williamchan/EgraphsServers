@@ -16,12 +16,11 @@ private[controllers] trait GetEgraphAdminEndpoint extends ImplicitHeaderAndFoote
   protected def printOrderStore: PrintOrderStore
   protected def consumerApp: ConsumerApplication
 
-  def getEgraphAdmin(egraphId: Long, action: Option[String] = None) = controllerMethod.withForm() { implicit authToken =>
+  def getEgraphAdmin(egraphId: Long, action: String = "") = controllerMethod.withForm() { implicit authToken =>
     httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
       httpFilters.requireEgraphId(egraphId) { egraph =>
       	Action { implicit request =>
-      	  // TODO(play2): I had a hard time getting url parameter and query parameters working together. Will figure out later.
-          if (request.queryString.get("action").getOrElse("").toString.contains("preview")) {
+      	  if (action == "preview") {
             Ok(GetEgraphEndpoint.html(egraph = egraph, order = egraph.order, consumerApp = consumerApp))
           } else {
             val order = egraph.order
