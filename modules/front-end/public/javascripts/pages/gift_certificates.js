@@ -10,9 +10,15 @@ function(forms, payment, Egraphs) {
   return {
     go: function() {
       $(".chsn-select").chosen({no_results_text: "No results matched"});
+      $("#review").modal("toggle");
       $("#review-button").click(function() {
+        
+      });
+
+      $("#modify-order").click(function() {
         $("#review").modal("toggle");
       });
+
     }
   };
 });
