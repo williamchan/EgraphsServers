@@ -7,10 +7,15 @@
 
 @import models.frontend.forms.Field
 
+@head = {
+  <link rel="stylesheet" href='@EgraphsAssets.at("bootstrap-modal/css/bootstrap-modal.css")' >
+}
+
 @headJs = {
   
 }
 
+@** SVG previews of the gift certificate *@
 @previews = {
   <div class="previews">
     <div class="preview foreground">
@@ -35,7 +40,7 @@
                 <li>Gift certificates can be used to connect with any star on the site</li>
                 <li>They can be used over multiple purchases</li>
                 <li>They never expire</li>
-                <li><strong>Buy one in three easy steps:</strong></li>
+                <li><strong>Buy one in four easy steps:</strong></li>
                 @** TODO(SER-600): Move this to near the purchase button <li>You will receive an e-mail containing the printable certificate as a PDF</li> *@
               </ul>
             </div>
@@ -44,7 +49,7 @@
         </section>
         
         <section id="choose-amount">
-          <h2><span class="checkout-step-count">1</span>Choose an amount:</h2>
+          <h2><span class="checkout-step-count one">1</span>Choose an amount:</h2>
           <div class="amount-options row-fluid">
             <div class="amount-option dollar-amount span2">
               <button class="btn"><span class="dollah">$</span>25</button>
@@ -72,7 +77,7 @@
         
         <div class="row-fluid">
           <section id="personalize" class="span6">
-            <h2><span class="checkout-step-count two">2</span>Personalize:</h2>
+            <h2><span class="checkout-step-count">2</span>Personalize:</h2>
             <div class="hint">
               The certificate PDF you receive will contain your name and the recipient's.
             </div>
@@ -92,8 +97,8 @@
               </div> <!-- End .gifter-name.controls -->
             </form>
           </section>
-          <section id="billing" class="span6">
-            <h2><span class="checkout-step-count three">3</span>Pay:</h2>
+          <section id="pay" class="span6">
+            <h2><span class="checkout-step-count">3</span>Pay:</h2>
             <form class="form-horizontal">
               <fieldset>
                 <div class="control-group card-name">
@@ -117,7 +122,8 @@
                   </div>
                 </div> <!-- End .card-number.controls -->
 
-                @** in-line styles in this section leave a bad taste in my mouth, but necessary here to override chosen.js pretty selectors *@
+                @** in-line styles in this section leave a bad taste in my mouth,
+                but necessary here to override chosen.js pretty selectors *@
                 <div class="control-group card-exp" >
                   <label class="control-label" for="card-exp-month">Exp. Date:</label>
                   <div class="controls select card-expiry">
@@ -175,24 +181,22 @@
             @**<a href="#review" role="button" class="btn" data-toggle="modal">Review dat shiz</a>              *@
           </section>
         </div>
-        <section id="review" class="modal hide fade">
+        <section id="review" class="modal hide fade gift-certificate-modal">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h3>Review order</h3>
+            <h2><span class="checkout-step-count">4</span>Review order:</h2>
           </div>
           <div class="modal-body">
-            <div class="purchaser-summary">
+            <div class="purchaser-summary clearfix">
               <div class="amount-recipient">
-                <h3>Amount:</h3>
-                <div class="summary-item">$75.00</div>
-                <h3>Recipient's Name:</h3>
-                <div class="summary-item">Andy Johnson</div>
+                <h3 id="recipient-header" >Gift Details:</h3>
+                <div class="summary-item">$75.00 for Bruce Banner from Joshua Johnson</div>
               </div>
               <div class="billing">
                 <h3>Billing information:</h3>
                 <div class="summary-item">
-                  <p>Joshua Johnson</p>
-                  <p class="card-number-placeholder">Visa XXXXXXXXXXXX4021</p>
+                  <div>Joshua Johnson</div>
+                  <div class="card-number-placeholder">Visa XXXXXXXXXXXX4021</div>
                 </div>
               </div> <!-- End .billing -->
             </div> <!-- End .purchaser-summary -->
@@ -202,15 +206,22 @@
                   <th>Subtotal</th>
                   <td>$75.00</td>
                 </tr>
-                <tr>
+                <tr class="last">
                   <th>Tax</th>
                   <td>$0.00</td>
                 </tr>
                 <tr id="total">
                   <th>Total</th>
-                  <td>$0.00</td>
+                  <td>$75.00</td>
                 </tr>
               </table>
+              <div class="control-group">
+                @tags.arrow_button(
+                  caption="Buy now",
+                  classes="button right review"
+                )
+              </div>
+
             </div> <!-- End .price-summary -->
           </div>
         </section>
@@ -219,4 +230,10 @@
   </div>
 }
 
-@base_template(title="Gift Certificates", jsMain = "pages/gift_certificates", headJs = headJs, body=baseBody)
+@base_template(
+  title="Gift Certificates",
+  jsMain = "pages/gift_certificates",
+  headJs = headJs,
+  body=baseBody,
+  head = head
+)

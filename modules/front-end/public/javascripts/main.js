@@ -3,7 +3,8 @@
 require.config({
   baseUrl: "/assets/javascripts",
   paths: {
-    bootstrap: '/assets/bootstrap/js'
+    "bootstrap": '/assets/bootstrap/js',
+    "bootstrap-modal": '/assets/bootstrap-modal/js'
   }
 });
 

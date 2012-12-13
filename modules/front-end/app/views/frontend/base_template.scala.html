@@ -1,4 +1,4 @@
-@(title: String, jsMain: String = "", headJs: => Html = Html.empty, body: => Html)(
+@(title: String, jsMain: String = "", headJs: => Html = Html.empty, body: => Html, head: => Html = Html.empty)(
   implicit headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData,
   authToken: egraphs.authtoken.AuthenticityToken
@@ -64,6 +64,7 @@
     <script src="https://use.typekit.com/ztt6ynw.js"></script>
     <script>try{Typekit.load();}catch(e){}</script>
     <script src='@EgraphsAssets.at("javascripts/libs/angular.js")'></script>
+    @head
 
     <!-- Configure egraphs scripting main classes (these will automatically be loaded by main.js -->
     <script>
