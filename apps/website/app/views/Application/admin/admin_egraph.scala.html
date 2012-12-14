@@ -41,8 +41,13 @@
     <input name="egraphId" type="hidden" value="@egraph.id">
     <input name="egraphState" type="hidden" value="@models.enums.EgraphState.RejectedByAdmin">
     <div class="actions">
-      <h3>Reject due to questionable content or authenticity</h3>
-      <button type="submit" id="reject-button" class="btn primary fade in">Reject Egraph</button>
+      <h3>Reject due to questionable content or authenticity.</h3>
+      @if(egraph.isPublished) {
+        <h4 style="color:#FF0000">Warning: Rejecting a published egraph and publishing it again will result in an extra email to the customer</h4>
+        <button type="submit" id="reject-button" class="btn primary fade in">Unpublish and Reject Egraph</button>
+      } else {
+        <button type="submit" id="reject-button" class="btn primary fade in">Reject Egraph</button>
+      }
     </div>
   }
   }
