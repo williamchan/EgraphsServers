@@ -7,9 +7,9 @@ import assetproviders.{SvgzAssetSupport, RemoteAssets, FingerprintedAssets, Play
 /** Collects all asset transformations into a single trait for use in our website app */
 trait EgraphsAssetPipeline
   extends PlayAssets
-    with RemoteAssets
-    with FingerprintedAssets
-    with SvgzAssetSupport { this: Controller => }
+     with RemoteAssets
+     with FingerprintedAssets
+     with SvgzAssetSupport { this: Controller => }
 
 /** The concrete asset implementation for our website app */
 object EgraphsAssets extends Controller with EgraphsAssetPipeline {

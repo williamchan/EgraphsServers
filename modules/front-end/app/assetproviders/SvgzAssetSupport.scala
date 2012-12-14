@@ -12,6 +12,8 @@ import play.api.mvc.AnyContent
  * Content-Type: "image/svg+xml"
  * Content-Encoding: gzip
  * }}}
+ *
+ * See [[http://kaioa.com/node/45 this link for more info]].
  */
 trait SvgzAssetSupport extends AssetProvider { this: Controller =>
   abstract override def at(path: String, file: String): Action[AnyContent] = {
