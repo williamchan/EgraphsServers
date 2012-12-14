@@ -4,21 +4,19 @@ define([
   "services/payment",
   "Egraphs",
   "libs/chosen/chosen.jquery.min",
-  "bootstrap-modal/bootstrap-modalmanager",
-  "bootstrap-modal/bootstrap-modal"],
+  "services/responsive-modal"],
 function(forms, payment, Egraphs) {
   return {
     go: function() {
       $(".chsn-select").chosen({no_results_text: "No results matched"});
-      $("#review").modal("toggle");
+
       $("#review-button").click(function() {
-        
+        $("#review").responsivemodal("toggle");
       });
 
       $("#modify-order").click(function() {
-        $("#review").modal("toggle");
+        $("#review").responsivemodal("toggle");
       });
-
     }
   };
 });

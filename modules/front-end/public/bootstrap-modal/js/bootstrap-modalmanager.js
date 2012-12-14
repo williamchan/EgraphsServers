@@ -39,7 +39,7 @@
 		},
 
 		createModal: function (element, options) {
-			$(element).modal($.extend({ manager: this }, options));
+			$(element).responsivemodal($.extend({ manager: this }, options));
 		},
 
 		appendModal: function (modal) {
@@ -201,11 +201,11 @@
 				.appendTo(this.$element);
 
 			if (modal && modal.options.backdrop != 'static') {
-				$container.on('click.modal', targetIsSelf(function (e) {
+				$container.on('click.responsivemodal', targetIsSelf(function (e) {
 					modal.hide();
 				}));
 			} else if (modal) {
-				$container.on('click.modal', targetIsSelf(function (e) {
+				$container.on('click.responsivemodal', targetIsSelf(function (e) {
 					modal.attention();
 				}));
 			}
