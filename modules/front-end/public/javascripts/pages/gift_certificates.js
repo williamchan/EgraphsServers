@@ -14,7 +14,7 @@ function(forms, payment, Egraphs) {
         $("#review").responsivemodal("toggle");
       });
 
-      $("#modify-order").click(function() {
+      $(".modify-order").click(function() {
         $("#review").responsivemodal("toggle");
       });
     }
