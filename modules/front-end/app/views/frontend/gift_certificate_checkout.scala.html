@@ -5,6 +5,11 @@
   authToken: egraphs.authtoken.AuthenticityToken
 )
 
+@**
+ * Template for the gift certificate checkout page. See base_template.scala.html for description
+ * of implicit params.
+ *@
+
 @import models.frontend.forms.Field
 
 
@@ -34,12 +39,11 @@
                 <li>They can be used over multiple purchases</li>
                 <li>They never expire</li>
                 <li><strong>Buy a gift certificate in four easy steps:</strong></li>
-                @** TODO(SER-600): Move this to near the purchase button <li>You will receive an e-mail containing the printable certificate as a PDF</li> *@
               </ul>
             </div>
             <div class="desktop-previews span6">@previews</div>
           </div>
-        </section>
+        </section> <!-- End #masthead -->
         
         <section id="choose-amount">
           <h2><span class="checkout-step-count one">1</span>Choose an amount:</h2>
@@ -66,7 +70,7 @@
               </div>
             </div>
           </div>
-        </section>
+        </section> <!-- End #choose-amount -->
         
         <div class="row-fluid">
           <section id="personalize" class="span6">
@@ -89,7 +93,8 @@
                 </div>
               </div> <!-- End .gifter-name.controls -->
             </form>
-          </section>
+          </section> <!-- End #personalize -->
+
           <section id="pay" class="span6">
             <h2><span class="checkout-step-count">3</span>Pay:</h2>
             <form class="form-horizontal">
@@ -174,7 +179,7 @@
 
               </fieldset>
             </form>
-          </section>
+          </section> <!-- End #pay -->
         </div>
         <section id="review" class="modal hide fade gift-certificate-modal" data-width="300">
           <div class="modal-header">
@@ -222,7 +227,7 @@
               )
             </div>
           </div> <!-- End .modal-body -->
-        </section>
+        </section> <!-- End #review -->
       </div>
     </div>
   </div>

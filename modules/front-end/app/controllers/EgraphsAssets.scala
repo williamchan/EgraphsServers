@@ -15,7 +15,7 @@ trait EgraphsAssetPipeline
 object EgraphsAssets extends Controller with EgraphsAssetPipeline {
   override def assetReverseRoute(file: String) = controllers.routes.EgraphsAssets.at(file)
 
-  val defaultPath = "/public"
+  override val defaultPath = "/public"
 
   override val remoteContentUrl = {
     val cfg = current.configuration
@@ -28,7 +28,7 @@ object EgraphsAssets extends Controller with EgraphsAssetPipeline {
     }
   }
 
-  val cacheControlMaxAgeInSeconds = {
+  override val cacheControlMaxAgeInSeconds = {
     val cfg = current.configuration
 
     cfg.getInt("assets.immutable.cacheControlInSeconds").getOrElse(31536000) // default 1 metric year

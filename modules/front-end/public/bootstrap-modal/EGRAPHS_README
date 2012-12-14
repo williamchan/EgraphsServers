@@ -1,6 +1,7 @@
 This is Jordan Schroter's bootstrap-responsive project at GIT version 32802b66ec8a90487941b07a2110c6540bf32896.
 
-We have made a few notable changes to the code that should persist should we choose to update this library:
+We have made a few notable changes to the code that should persist should we choose to update this library
+to a more recent version:
 
 * Changed $.fn.modal to $.fn.responsivemodal. This was necessary in order to stop a heisenbug
   that caused the original bootstrap $.fn.modal implementation to override this library's version.

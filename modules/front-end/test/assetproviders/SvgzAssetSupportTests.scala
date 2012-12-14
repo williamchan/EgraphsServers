@@ -33,7 +33,7 @@ class SvgzAssetSupportTests extends FlatSpec with ShouldMatchers {
     }
   }
 
-  object TestSvgzAssetSupport extends Controller with PlayAssets with SvgzAssetSupport {
+  private object TestSvgzAssetSupport extends Controller with PlayAssets with SvgzAssetSupport {
     override def assetReverseRoute(file: String) = controllers.routes.EgraphsAssets.at(file)
   }
 }
