@@ -8,7 +8,7 @@
   footerData: models.frontend.footer.FooterData
 )
 
-@import views.frontend.Utils.{egraphOrEgraphs, areAllPendingGifts}
+@import views.frontend.Utils.{egraphOrEgraphs}
 @import views.html.frontend.tags
 @import models.frontend.egraphs._
 
@@ -55,7 +55,7 @@
             </section>
           }
         }      
-        @galleryRows(egraphs)
+        @galleryRows(displayableEgraphs(egraphs, galleryCustomerId))
         
         @** Gifts given section: Only display if the user has given gifts *@
         @if(!giftEgraphs.isEmpty) {
