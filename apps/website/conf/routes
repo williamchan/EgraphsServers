@@ -85,7 +85,7 @@ GET      /admin/coupons/create                                            contro
 GET      /admin/coupons/$couponId<[0-9]+>                                 controllers.WebsiteControllers.getCouponAdmin(couponId: Long)
 POST     /admin/coupons/$couponId<[0-9]+>                                 controllers.WebsiteControllers.postCouponAdmin(couponId: Long)
 GET      /admin/egraphs                                                   controllers.WebsiteControllers.getEgraphsAdmin
-GET      /admin/egraphs/$egraphId<[0-9]+>                                 controllers.WebsiteControllers.getEgraphAdmin(egraphId: Long)
+GET      /admin/egraphs/$egraphId<[0-9]+>                                 controllers.WebsiteControllers.getEgraphAdmin(egraphId: Long, action: String ?= "")
 POST     /admin/egraphs/$egraphId<[0-9]+>                                 controllers.WebsiteControllers.postEgraphAdmin(egraphId: Long)
 GET      /admin/freegraphs/create                                         controllers.WebsiteControllers.getCreateFreegraphAdmin
 POST     /admin/freegraphs/create                                         controllers.WebsiteControllers.postFreegraphAdmin
