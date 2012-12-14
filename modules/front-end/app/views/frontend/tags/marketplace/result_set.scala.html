@@ -24,14 +24,15 @@
               <a class="glowborder" href="{{celebrity.storefrontUrl}}"><img ng-src={{celebrity.photoUrl}} alt="FPO image"></a>
           </figure>
           <hgroup>
+            <p>
+              <a href="{{celebrity.storefrontUrl}}">
+                {{ celebrity | priceRange }}
+              </a>
+            </p>
             <h2><a href="{{celebrity.storefrontUrl}}" title="View star: {{celebrity.publicName}}">{{celebrity.publicName}}</a></h2>
             <h3>{{celebrity.secondaryText}}</h3>
           </hgroup>
-          <p>
-            <a href="{{celebrity.storefrontUrl}}">
-              {{ celebrity | priceRange }}
-            </a>
-          </p>
+
         </article>
       </div>
       <p class="see-more" ng-show="total > 0" ng-click="loadCelebrities()">
