@@ -78,15 +78,15 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
     //Pop off control with highest precedence
     val galleryControl = galleryControlPrecedence.flatten.head
 
-    //get orders (my pending orders and my gift orders to both be displayed)
+    //get orders (my orders and my gifts given orders to both be displayed)
     val ordersAndEgraphs = orderStore.galleryOrdersWithEgraphs(customer.id)
-    val giftOrdersAndEgraphs = orderStore.galleryGiftOrdersWithEgraphs(customer.id)
+    val giftsGivenOrdersAndEgraphs = orderStore.galleryGiftsGivenOrdersWithEgraphs(customer.id)
 
     val pendingOrders = GalleryOrderFactory.filterPendingOrders(ordersAndEgraphs)
-    val pendingGiftOrders = GalleryOrderFactory.filterPendingOrders(giftOrdersAndEgraphs)
+    val pendingGiftOrders = GalleryOrderFactory.filterPendingOrders(giftsGivenOrdersAndEgraphs)
     
     val fulfilledOrders = getFulfilledOrders(ordersAndEgraphs)
-    val fulfilledGiftOrders = getFulfilledOrders(giftOrdersAndEgraphs)
+    val fulfilledGiftOrders = getFulfilledOrders(giftsGivenOrdersAndEgraphs)
     
     val orders = getOrders(pendingOrders, fulfilledOrders, galleryControl, customer)
     val giftOrders = getOrders(pendingGiftOrders, fulfilledGiftOrders, galleryControl, customer)

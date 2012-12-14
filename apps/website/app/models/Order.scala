@@ -398,7 +398,7 @@ class OrderStore @Inject() (schema: Schema) extends SavesWithLongKey[Order] with
    * user's gallery page AS GIFTS. These are any orders that have not been rejected by an admin
    * and their adjoining egraphs (regardless of the adjoining egraph state)
    */
-  def galleryGiftOrdersWithEgraphs(buyerId: Long) : Query[(Order, Option[Egraph])] = {
+  def galleryGiftsGivenOrdersWithEgraphs(buyerId: Long) : Query[(Order, Option[Egraph])] = {
     join(schema.orders, schema.egraphs.leftOuter) (
       (order, egraph) =>
         where(
