@@ -302,11 +302,11 @@
 	/* MODAL PLUGIN DEFINITION
 	* ======================= */
 
-	$.fn.modal = function (option) {
+	$.fn.responsivemodal = function (option) {
 		return this.each(function () {
 			var $this = $(this), 
 				data = $this.data('modal'), 
-				options = $.extend({}, $.fn.modal.defaults, $this.data(), typeof option == 'object' && option);
+				options = $.extend({}, $.fn.responsivemodal.defaults, $this.data(), typeof option == 'object' && option);
 
 			if (!data) $this.data('modal', (data = new Modal(this, options)))
 			if (typeof option == 'string') data[option]()
@@ -314,7 +314,7 @@
 		})
 	}
 
-	$.fn.modal.defaults = {
+	$.fn.responsivemodal.defaults = {
 		keyboard: true, 
 		backdrop: true,
 		loading: false,
@@ -330,8 +330,7 @@
 		spinner: '<div class="loading-spinner" style="width: 200px; margin-left: -100px;"><div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div></div>'
 	}
 
-	$.fn.modal.Constructor = Modal
-
+	$.fn.responsivemodal.Constructor = Modal
 
 	/* MODAL DATA-API
 	* ============== */
