@@ -43,17 +43,21 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
   }
 
   /**
-   * Serves up marketplace results page. If there are no query arguments, featured celebs are served. 
-   **/
+   * This controller serves up the marketplace.
+   * When no state is passed (query args or a vertical name) the landing page is served.
+   * Otherwise, this page distills various arguments into a query and prepares results to be served.
+   * @param vertical The slug of a marketplace search if it is scoped by vertical
+   * @return A results page or landing page.
+   */
   def getMarketplaceResultPage(vertical : String = "") = controllerMethod.withForm() { implicit AuthToken =>
     Action { implicit request =>
       // Determine what search options, if any, have been appended
       val marketplaceResultPageForm = Form(
         tuple(
-          "query" -> optional(nonEmptyText),
-          "sort" -> optional(nonEmptyText),
-          "view" -> optional(nonEmptyText),
-          "availableOnly" -> optional(boolean)
+          "query" -> optional(nonEmptyText), // User submitted search
+          "sort" -> optional(nonEmptyText),  // Ordering of results
+          "view" -> optional(nonEmptyText),  // Grid view or list view
+          "availableOnly" -> optional(boolean) // If true, only serve stars that are NOT sold out
         )
       )
 
@@ -61,7 +65,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       val (queryOption, sortOption, viewOption, availableOnlyOption) = marketplaceResultPageForm.bindFromRequest.get
       val maybeSortType = sortOption.flatMap(sort => CelebritySortingTypes(sort))
       val availableOnly = availableOnlyOption.getOrElse(false)
-
+      // Set of categories and category values passed in as url parameters
       val categoryAndCategoryValues = for {
         (key, set) <- request.queryString
         categoryRegex(id) <- categoryRegex findFirstIn key
@@ -74,14 +78,14 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
           })
         (id.toLong, categoryValueId)
       }
-
+      // Refinements to pass to the search function
       val categoryValuesRefinements = for ((category, categoryValues) <- categoryAndCategoryValues) yield categoryValues
-
+      // If the search is scoped to a vertical, include the vertical as a category value
       val verticalAndCategoryValues = maybeSelectedVertical match {
         case Some(vertical) => categoryValuesRefinements ++ List(Seq(vertical.categoryValue.id))
         case None => categoryValuesRefinements
       }
-
+      // Yield a list of selected category values
       val activeCategoryValues = {
         for {
           (category, categoryValues) <- categoryAndCategoryValues
@@ -118,11 +122,11 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
 
       // Check if any search options have been defined
       if(queryOption.isDefined || !verticalAndCategoryValues.isEmpty) {
+        // Serve results according to the query
         val unsortedCelebrities = dbSession.connected(TransactionSerializable) {
           celebrityStore.marketplaceSearch(queryOption, verticalAndCategoryValues)
         }
 
-        // Sort results
         val sortedCelebrities = maybeSortType.getOrElse(CelebritySortingTypes.MostRelevant) match {
           case MostRelevant => unsortedCelebrities
           case PriceAscending => unsortedCelebrities.toList.sortWith((a,b) => a.minPrice < b.minPrice)
@@ -162,6 +166,8 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
           availableOnly = availableOnly
         ))
       } else {
+        // No search options so serve the landing page. Every vertical has a category value which decides what to
+        // display here. Limit to three results to keep both verticals above the fold. What is a newspaper?
         val resultSets = for(vertical <- verticalStore.verticals) yield {
           val categoryValue = vertical.categoryValue
           val results = celebrityStore.marketplaceSearch(Option(vertical.featuredQuery), List(Seq(categoryValue.id)))
