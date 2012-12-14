@@ -31,6 +31,8 @@
           top: -.0526 * @imageWidth;
           left: @previewOverlap * @imageWidth;
           .rotate(3deg);
+          // Chrome-specific fix for graphical aliasing on rotated images
+          -webkit-transform: rotate(3deg) translate3d(0,0,0);
         }
 
         object {
