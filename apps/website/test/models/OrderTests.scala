@@ -19,8 +19,10 @@ class OrderTests extends EgraphsUnitTest
 {
   private def orderStore = AppConfig.instance[OrderStore]
   private def orderQueryFilters = AppConfig.instance[OrderQueryFilters]
+  private def printOrderStore = AppConfig.instance[PrintOrderStore]
   private def cashTransactionStore = AppConfig.instance[CashTransactionStore]
   private def consumerApp = AppConfig.instance[ConsumerApplication]
+  private def db = AppConfig.instance[DBSession]
 
   //
   // SavingEntityTests[Order] methods
@@ -169,27 +171,30 @@ class OrderTests extends EgraphsUnitTest
   }
 
   "rejectAndCreateNewOrderWithNewProduct" should "create a new order but leave the old one in the db in a rejected status" in new EgraphsTestApplication {
-    def db = AppConfig.instance[DBSession]
-    val oldOrder = db.connected(TransactionSerializable) {
+    val (oldOrder, oldPrintOrder) = db.connected(TransactionSerializable) {
       val (buyer, _, _, product) = TestData.newSavedOrderStack()
       val oldOrder = buyer.buy(product).withPaymentStatus(PaymentStatus.Charged).save()
-      val printOrder = PrintOrder(orderId = oldOrder.id).save()
+      val oldPrintOrder = PrintOrder(orderId = oldOrder.id).save()
 
-      oldOrder
+      (oldOrder, oldPrintOrder)
     }
 
-    val (newOrder, updatedOldOrder) = db.connected(TransactionSerializable) {
+    val (newOrder, newProduct, updatedOldOrder, updatedPrintOrder) = db.connected(TransactionSerializable) {
       val newProduct = TestData.newSavedProduct()
       val newOrder = oldOrder.rejectAndCreateNewOrderWithNewProduct(newProduct, newProduct.inventoryBatches.head)
       val updatedOldOrder =  orderStore.findById(oldOrder.id).get
-      (newOrder, updatedOldOrder)
+      val updatedPrintOrder = printOrderStore.findById(oldPrintOrder.id).get
+      (newOrder, newProduct, updatedOldOrder, updatedPrintOrder)
     }
 
     newOrder.id should not be (oldOrder.id)
     newOrder.reviewStatus should be (OrderReviewStatus.PendingAdminReview)
+    newOrder.amountPaidInCurrency should be (newProduct.priceInCurrency)
 
     updatedOldOrder.id should be (oldOrder.id)
     updatedOldOrder.reviewStatus should be (OrderReviewStatus.RejectedByAdmin)
+
+    updatedPrintOrder.orderId should be (newOrder.id)
   }
 
   "withChargeInfo" should "set the PaymentStatus, store stripe info, and create an associated CashTransaction" in new EgraphsTestApplication {

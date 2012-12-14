@@ -22,12 +22,13 @@ trait PostOrderAdminEndpoint { this: Controller =>
 
   protected def postController: POSTControllerMethod
   protected def httpFilters: HttpFilters
-  protected def orderStore: OrderStore
-  protected def printOrderStore: PrintOrderStore
   protected def accountStore: AccountStore
-  protected def productStore: ProductStore
   protected def egraphStore: EgraphStore
   protected def egraphQueryFilters: EgraphQueryFilters
+  protected def inventoryBatchStore: InventoryBatchStore
+  protected def orderStore: OrderStore
+  protected def printOrderStore: PrintOrderStore
+  protected def productStore: ProductStore
 
   def postOrderAdmin(orderId: Long) = postController() {
     httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
@@ -122,7 +123,7 @@ trait PostOrderAdminEndpoint { this: Controller =>
                   newProductId => {
                     val maybeOk = for{
                       product <- productStore.findById(newProductId)
-                      inventoryBatch <- product.inventoryBatches.filter(batch => batch.isActive).headOption
+                      inventoryBatch <- inventoryBatchStore.getActiveInventoryBatches(product).filter(batch => batch.hasInventory).headOption
                     } yield {
                       // create a new order
                       val newOrder = order.rejectAndCreateNewOrderWithNewProduct(product, inventoryBatch)

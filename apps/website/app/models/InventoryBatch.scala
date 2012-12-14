@@ -47,15 +47,6 @@ case class InventoryBatch(
     getRemainingInventory > 0
   }
 
-  def expiredByDate: Boolean = {
-    val now = new Date()
-    !(startDate.before(now) && endDate.after(now))
-  }
-
-  def isActive: Boolean = {
-    !expiredByDate && hasInventory
-  } 
-
   //
   // Public members
   //
