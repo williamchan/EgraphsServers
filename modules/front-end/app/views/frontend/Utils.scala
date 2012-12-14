@@ -3,6 +3,7 @@ import play.Play
 import java.io.File
 import controllers.Assets
 import scala.annotation.tailrec
+import models.frontend.egraphs.EgraphViewModel
 
 /**
  * Front-end utilities that otherwise had no home.
@@ -43,6 +44,11 @@ object Utils {
       case (false, true) => "Her"
     }
   }
+  
+  def egraphOrEgraphs(numberOfEgraphs: Int): String = {
+    if (numberOfEgraphs == 1) "Egraph"
+    else "Egraphs"
+  }
 
   def getFacebookShareLink(appId: String,
                            picUrl: String,
@@ -66,5 +72,15 @@ object Utils {
     "https://twitter.com/intent/tweet?" +
       "url=" + link +
       "&text=" + text
+  }
+  
+  // Should only display on MY gallery page those egraphs that either I purchased myself
+  // or that are published (i.e. don't spoil the gift-giving surprise)
+  def displayableEgraphs(egraphs: List[EgraphViewModel], galleryCustomerId: Long) = {
+    egraphs.filter(egraph => !egraph.isGift || (egraph.isGift && !egraph.isPending))
+  }
+  
+  def areAllPendingGifts(egraphs: List[EgraphViewModel]) = {
+    egraphs.forall(egraph => egraph.isPending && egraph.isGift)
   }
 }

@@ -17,6 +17,7 @@ trait EgraphViewModel {
   def recipientName: String
   def thumbnailUrl: String
   def isPending: Boolean
+  def isGift: Boolean
 }
 
 case class PendingEgraphViewModel(

@@ -180,7 +180,7 @@ class Scenarios extends DeclaresScenarios {
   """, {
     () =>
       val erem = Scenarios.getEremCustomerAccount
-      "Name = " + erem.name + ", username/password = " + erem.username + "/" + TestData.defaultPassword
+      "Name = " + erem.name + ", username/password = " + erem.username + "@egraphs.com/" + TestData.defaultPassword
   }
   )
 
@@ -192,19 +192,31 @@ class Scenarios extends DeclaresScenarios {
   """, {
     () =>
       val myyk = Scenarios.getMyykCustomerAccount
-      "Name = " + myyk.name + ", username/password = " + myyk.username + "/" + TestData.defaultPassword 
+      "Name = " + myyk.name + ", username/password = " + myyk.username + "@egraphs.com/" + TestData.defaultPassword
   }
   )
 
   toScenarios add Scenario(
-  "Erem buys Wills two products twice each",
+  "Erem buys Will's two products",
   apiCategory,
   """Creates two unfulfilled orders, one each ordered against Will's two products.""", {
     () =>
       val erem = Scenarios.getEremCustomerAccount
       val (starcraftChampionship, kingOfPweensCompetition) = Scenarios.getWillsTwoProducts
-      erem.buy(starcraftChampionship, recipientName = "Erem Boto", requestedMessage = Some("Happy 13th birthday, Don!"), messageToCelebrity = Some("My buddy Don is your biggest fan!")).save()
-      erem.buy(kingOfPweensCompetition, recipientName = "Erem Boto", requestedMessage = Some("Happy Pweenday, Don!"), messageToCelebrity = Some("Don loves everything you do!")).save()
+      erem.buy(starcraftChampionship, recipientName = erem.name, requestedMessage = Some("Happy 13th birthday, Don!"), messageToCelebrity = Some("My buddy Don is your biggest fan!")).save()
+      erem.buy(kingOfPweensCompetition, recipientName = erem.name, requestedMessage = Some("Happy Pweenday, Don!"), messageToCelebrity = Some("Don loves everything you do!")).save()
+  }
+  )
+  
+  toScenarios add Scenario(
+  "Myyk buys Will's two products",
+  apiCategory,
+  """Creates two unfulfilled orders, one each ordered against Will's two products.""", {
+    () =>
+      val myyk = Scenarios.getMyykCustomerAccount
+      val (starcraftChampionship, kingOfPweensCompetition) = Scenarios.getWillsTwoProducts
+      myyk.buy(starcraftChampionship, recipientName = myyk.name, requestedMessage = Some("Happy 13th birthday, Don!"), messageToCelebrity = Some("My buddy Don is your biggest fan!")).save()
+      myyk.buy(kingOfPweensCompetition, recipientName = myyk.name, requestedMessage = Some("Happy Pweenday, Don!"), messageToCelebrity = Some("Don loves everything you do!")).save()
   }
   )
   
@@ -221,12 +233,24 @@ class Scenarios extends DeclaresScenarios {
   )
   
   toScenarios add Scenario(
+  "Myyk buys one of Will's products as a gift for Erem",
+  apiCategory,
+  """Creates one unfulfilled order (kingOfPweensCompetition), which will be a gift for Myyk.""", {
+    () =>
+      val myyk = Scenarios.getMyykCustomerAccount
+      val erem = Scenarios.getEremCustomerAccount
+      val (_, kingOfPweensCompetition) = Scenarios.getWillsTwoProducts
+      myyk.buy(kingOfPweensCompetition, recipient = erem, recipientName = erem.name, requestedMessage = Some("Happy 13th birthday, Erem!"), messageToCelebrity = Some("My buddy Erem is your biggest fan!")).save()
+  }
+  )
+
+  toScenarios add Scenario(
   "Will fulfills Erem's gift order for Myyk",
   apiCategory,
   """Will fulfills Erem's gift order for Myyk""", {
     () =>
       val (starcraftChampionship, _) = Scenarios.getWillsTwoProducts
-      val order = orderStore.findByCustomerId(Scenarios.getEremCustomerAccount.id).filter { order => order.recipient == Scenarios.getMyykCustomerAccount }.head
+      val order = orderStore.findByBuyerCustomerId(Scenarios.getEremCustomerAccount.id).filter { order => order.recipient == Scenarios.getMyykCustomerAccount }.head
       order
         .withPaymentStatus(PaymentStatus.Charged).save()
         .newEgraph
@@ -237,7 +261,7 @@ class Scenarios extends DeclaresScenarios {
         .withEgraphState(EgraphState.Published)
         .save()
   }
-  )  
+  )
 
   toScenarios add Scenario(
   "Will fulfills one of Erem's product orders",
@@ -544,7 +568,7 @@ object Scenarios {
   private def ensureCustomerAccountExists(name: String, email: String): Customer = {
     val account = accountStore.findByEmail(email).getOrElse(TestData.newSavedAccount(email = Some(email)))
     account.customerId match {
-      case None => TestData.newSavedCustomer(maybeAccount = Some(account)).copy(name = name)
+      case None => TestData.newSavedCustomer(maybeAccount = Some(account)).copy(name = name).save()
       case Some(customerId) => customerStore.findById(customerId).head
     }
   }

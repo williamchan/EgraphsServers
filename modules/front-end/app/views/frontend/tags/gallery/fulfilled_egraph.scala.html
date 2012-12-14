@@ -1,4 +1,7 @@
-@(egraph: models.frontend.egraphs.FulfilledEgraphViewModel, index: Int, controlRenderer: models.frontend.egraphs.GalleryControlRenderer)
+@(egraph: models.frontend.egraphs.FulfilledEgraphViewModel, 
+  index: Int, 
+  controlRenderer: models.frontend.egraphs.GalleryControlRenderer,
+  galleryCustomerId: Long)
 
 @import models.frontend.egraphs._
 @import views.html.frontend.tags
@@ -25,7 +28,7 @@
           <p>@egraph.productDescription</p>
         </div>
         
-        @if(!egraph.isGift) {
+        @if(!egraph.isGift || egraph.recipientId == galleryCustomerId) {
           <div class="padding-fix">
             <div class="social">
               <ul class="clearfix">

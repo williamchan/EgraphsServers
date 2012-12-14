@@ -411,7 +411,20 @@ class OrderStore @Inject() (schema: Schema) extends SavesWithLongKey[Order] with
     )
   }
 
-  def findByCustomerId(customerId: Long, filters: FilterOneTable[Order]*): Query[Order] = {
+  def findByBuyerCustomerId(customerId: Long, filters: FilterOneTable[Order]*): Query[Order] = {
+    import schema.orders
+
+    from(orders)(order =>
+      where(
+          order.buyerId === customerId and
+          FilterOneTable.reduceFilters(filters, order)
+      )
+        select (order)
+        orderBy (order.id asc)
+    )
+  }
+  
+  def findByRecipientCustomerId(customerId: Long, filters: FilterOneTable[Order]*): Query[Order] = {
     import schema.orders
 
     from(orders)(order =>
@@ -423,7 +436,7 @@ class OrderStore @Inject() (schema: Schema) extends SavesWithLongKey[Order] with
         orderBy (order.id asc)
     )
   }
-
+  
   def findByFilter(filters: FilterOneTable[Order]*): Query[Order] = {
     import schema.orders
 

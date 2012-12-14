@@ -57,7 +57,7 @@ object TestData {
   }
 
   def newSavedAccount(email: Option[String] = None): Account = {
-    Account(email = email.getOrElse(generateEmail(prefix = "acct-"))).save()
+    Account(email = email.getOrElse(generateEmail(prefix = "acct-"))).withPassword(defaultPassword).right.get.save()
   }
 
   def newSavedAdministrator(_account: Option[Account] = None): Administrator = {
@@ -75,7 +75,7 @@ object TestData {
   lazy val defaultPassword = "egraphsa"
 
   def newSavedCustomer(maybeAccount: Option[Account] = None): Customer = {
-    val account = maybeAccount.getOrElse(Account(email = generateEmail(prefix = "customer-")).withPassword(defaultPassword).right.get.save())
+    val account = maybeAccount.getOrElse(newSavedAccount())
     val customer = account.createCustomer(name = "Test Customer").save()
     account.createUsername().copy(customerId = customer.id).save()
     account.copy(customerId = Some(customer.id)).save()

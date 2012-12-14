@@ -1,4 +1,7 @@
-@(egraph: models.frontend.egraphs.PendingEgraphViewModel, orderDetails: models.frontend.egraphs.OrderDetails, index: Int, galleryCustomerId: Long)
+@(egraph: models.frontend.egraphs.PendingEgraphViewModel, 
+  orderDetails: models.frontend.egraphs.OrderDetails, 
+  index: Int, 
+  galleryCustomerId: Long)
   
   @if(galleryCustomerId == egraph.buyerId) {
     <div class="row-fluid row-egraph">

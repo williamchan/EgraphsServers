@@ -1,4 +1,5 @@
-@(username: String, egraphs: List[models.frontend.egraphs.EgraphViewModel],
+@(username: String, 
+  egraphs: List[models.frontend.egraphs.EgraphViewModel],
   giftEgraphs: List[models.frontend.egraphs.EgraphViewModel], 
   controlRenderer: models.frontend.egraphs.GalleryControlRenderer,
   galleryCustomerId: Long
@@ -7,7 +8,7 @@
   footerData: models.frontend.footer.FooterData
 )
 
-@import views.frontend.Utils
+@import views.frontend.Utils.{egraphOrEgraphs, displayableEgraphs, areAllPendingGifts}
 @import views.html.frontend.tags
 @import models.frontend.egraphs._
 
@@ -15,69 +16,51 @@
   Egraphs.page.authenticityToken = "@authToken.value";
 }
 
+@galleryTop(egraphs: List[EgraphViewModel], title: String) = {
+  <header class="gallerytop">
+    <div class="row-fluid">
+      <span class="span8 username">@username's @title</span>
+      <span class="span4 count">
+        <strong>@egraphs.length @egraphOrEgraphs(egraphs.length)</strong> /
+        <strong>@{egraphs.filter(egraph => egraph.isPending).length}</strong>
+        Pending, <strong>@{egraphs.filter(egraph => !egraph.isPending).length}</strong>
+        Finished</span>
+    </div>
+  </header>
+}
+
+@galleryRows(egraphs: List[EgraphViewModel]) = {
+<section class="galleryrows">
+  @for((egraph,index) <- egraphs.zipWithIndex){
+    @{egraph match {
+      case e: models.frontend.egraphs.PendingEgraphViewModel => tags.gallery.pending_egraph(e, e.orderDetails, index, galleryCustomerId)
+      case e: models.frontend.egraphs.FulfilledEgraphViewModel => tags.gallery.fulfilled_egraph(e, index, controlRenderer, galleryCustomerId)
+      case _ => ""
+      }
+    }
+  }
+</section>
+}
+
 @baseBody = {
   <script>@init</script>
   <section id="content">
     <div id="main">
       <div class="container">
-        <header class="gallerytop">
-          <div class="row-fluid">
-            <span class="span8 username">@username's Egraphs</span>
-            <span class="span4 count">
-              @if(egraphs.length == 1) {
-                <strong>@egraphs.length Egraph</strong> /
-              } else {
-                <strong>@egraphs.length Egraphs</strong> /
-              }
-              <strong>@{egraphs.filter(egraph => egraph.isPending).length}</strong>
-              Pending, <strong>@{egraphs.filter(egraph => !egraph.isPending).length}</strong>
-              Finished</span>
-          </div>
-        </header>
-        @if(egraphs.length == 0) {
-          <section>
-            <h1>
-              @username does not have any egraphs yet...
-            </h1>
-          </section>
-        }
-        <section class="galleryrows">
-        @for((egraph,index) <- egraphs.zipWithIndex){
-          @{egraph match {
-            case e: models.frontend.egraphs.PendingEgraphViewModel => tags.gallery.pending_egraph(e, e.orderDetails, index, galleryCustomerId)
-            case e: models.frontend.egraphs.FulfilledEgraphViewModel => tags.gallery.fulfilled_egraph(e, index, controlRenderer)
-            case _ => ""
-            }
+        @if(giftEgraphs.isEmpty || !areAllPendingGifts(egraphs)) {
+          @galleryTop(displayableEgraphs(egraphs, galleryCustomerId), "Egraphs")
+          @if(egraphs.length == 0 || areAllPendingGifts(egraphs)) {
+            <section>
+              <h1>@username does not have any egraphs yet...</h1>
+            </section>
           }
-        }
-        </section>
+        }      
+        @galleryRows(egraphs)
         
         @** Gifts given section: Only display if the user has given gifts *@
         @if(!giftEgraphs.isEmpty) {
-          <header class="gallerytop">
-            <div class="row-fluid">
-              <span class="span8 username">Gifts Given</span>
-              <span class="span4 count">
-                @if(giftEgraphs.length == 1) {
-                  <strong>@giftEgraphs.length Egraph</strong> /
-                } else {
-                  <strong>@giftEgraphs.length Egraphs</strong> /
-                }
-                <strong>@{giftEgraphs.filter(giftEgraph => giftEgraph.isPending).length}</strong>
-                Pending, <strong>@{giftEgraphs.filter(giftEgraph => !giftEgraph.isPending).length}</strong>
-                Finished</span>
-            </div>
-          </header>
-          <section class="galleryrows">
-          @for((giftEgraph,index) <- giftEgraphs.zipWithIndex){
-            @{giftEgraph match {
-              case e: models.frontend.egraphs.PendingEgraphViewModel => tags.gallery.pending_egraph(e, e.orderDetails, index, galleryCustomerId)
-              case e: models.frontend.egraphs.FulfilledEgraphViewModel => tags.gallery.fulfilled_egraph(e, index, controlRenderer)
-              case _ => ""
-              }
-            }
-          }
-          </section>
+          @galleryTop(giftEgraphs, "Gifts Given")
+          @galleryRows(giftEgraphs)
         }
       </div>
     </div>
