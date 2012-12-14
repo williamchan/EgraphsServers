@@ -8,7 +8,7 @@
   footerData: models.frontend.footer.FooterData
 )
 
-@import views.frontend.Utils.{egraphOrEgraphs, displayableEgraphs, areAllPendingGifts}
+@import views.frontend.Utils.{egraphOrEgraphs, areAllPendingGifts}
 @import views.html.frontend.tags
 @import models.frontend.egraphs._
 
@@ -31,7 +31,7 @@
 
 @galleryRows(egraphs: List[EgraphViewModel]) = {
 <section class="galleryrows">
-  @for((egraph,index) <- egraphs.zipWithIndex){
+  @for((egraph, index) <- egraphs.zipWithIndex){
     @{egraph match {
       case e: models.frontend.egraphs.PendingEgraphViewModel => tags.gallery.pending_egraph(e, e.orderDetails, index, galleryCustomerId)
       case e: models.frontend.egraphs.FulfilledEgraphViewModel => tags.gallery.fulfilled_egraph(e, index, controlRenderer, galleryCustomerId)
@@ -72,3 +72,15 @@
   jsMain="pages/account-gallery",
   body=baseBody
 )
+
+@** Util functions *@
+
+@** Should only display on MY gallery page those egraphs that either I purchased myself
+    or that are published (i.e. don't spoil the gift-giving surprise) *@
+@displayableEgraphs(egraphs: List[EgraphViewModel], galleryCustomerId: Long) = @{
+  egraphs.filter(egraph => !egraph.isGift || (egraph.isGift && !egraph.isPending))
+}
+
+@areAllPendingGifts(egraphs: List[EgraphViewModel]) = @{
+  egraphs.forall(egraph => egraph.isPending && egraph.isGift)
+}

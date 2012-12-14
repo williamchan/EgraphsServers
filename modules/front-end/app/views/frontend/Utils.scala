@@ -73,14 +73,4 @@ object Utils {
       "url=" + link +
       "&text=" + text
   }
-  
-  // Should only display on MY gallery page those egraphs that either I purchased myself
-  // or that are published (i.e. don't spoil the gift-giving surprise)
-  def displayableEgraphs(egraphs: List[EgraphViewModel], galleryCustomerId: Long) = {
-    egraphs.filter(egraph => !egraph.isGift || (egraph.isGift && !egraph.isPending))
-  }
-  
-  def areAllPendingGifts(egraphs: List[EgraphViewModel]) = {
-    egraphs.forall(egraph => egraph.isPending && egraph.isGift)
-  }
 }
