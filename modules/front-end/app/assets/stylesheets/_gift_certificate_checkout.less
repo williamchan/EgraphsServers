@@ -2,7 +2,7 @@
 
 .giftCertificates() {
   //
-  // Variables
+  // Values
   //
   @sectionSeparator: 1px solid lighten(@gray, 50%);
   @headerColor: #4d4d4d;
@@ -48,8 +48,10 @@
   //
   // Rules
   //
-  #content.gift-certificate-checkout, .gift-certificate-modal {
-    .checkout-step-count {
+  #content.gift-certificate-checkout, .gift-certificate-modal {    
+    
+    // The orange numbered circles before each step of the checkout 
+    .checkout-step-count {      
       position:relative;
       margin-right:7px;
       padding-top:0px;
@@ -58,16 +60,19 @@
       padding-right:5px;
       border-radius:100px;
       background-color:@orange;
+      cursor:default;
       color:@white;
       
       font-size:16px;
       font-weight:600;
 
+      // The first numbered circle
       &.one {
         padding-left:7px;
         padding-right:7px;
       }
 
+      // The circle that appears inside the "Review Order" button
       &.in-button {
         text-indent:0px;
         letter-spacing:normal;
@@ -83,13 +88,14 @@
         margin-top: 5px;
         margin-right:10px;
         .box-shadow(0px 1px 1px #333 inset);
-        text-shadow:0px 1px 1px #333;
+        text-shadow:0px 1px 0px #333;
       }
     }
 
+    // All sections: #masthead, #personalize, #pay, #review.
     section {
       border-bottom:@sectionSeparator;
-      .box-shadow(0px 1px 0px white);
+      .box-shadow(0px 1px 0px white); // easy way to achieve 3d sense on border
       padding-top:7px;
       padding-bottom:15px;
 
@@ -97,11 +103,13 @@
         border-top: none;
       }
 
+      // Labels for all text inputs
       .control-label {
         text-align: left;
       }
     }
 
+    // All section headers, eg "PERSONALIZE:"
     h2 {
       color:@headerColor;
       text-transform: uppercase;
@@ -144,11 +152,15 @@
         }
       }
 
+      // We don't render these responsively as %s because SVGs go apeshit on safari
+      // if not specified absolutely.
       .certificatePreviews(190px);
 
+      // Tricky tricky; the previews are rendered twice in the DOM; once for small
+      // devices once for larger. We toggle visibility on one vs the other at different
+      // sizes
       .responsive-previews {
         display:none;
-
         margin-top:15px;
       }
     }
@@ -157,6 +169,7 @@
       .amount-option {
         position:relative;
 
+        // The big fatty buttons: $25, $50, etc;
         button.btn {
           border-radius:0px;
           position:relative;
@@ -168,6 +181,7 @@
           font-weight:300;
           font-size:36px;
 
+          // Make the dollar sign offset attractively from the text
           .dollah {
             position:relative;
             vertical-align:super;
@@ -188,6 +202,7 @@
           }
         } // End button.btn
 
+        // Special styling for "SET MY OWN AMOUNT"
         &.own-amount {
           button.btn {
             font-size:20px;
@@ -231,6 +246,7 @@
 
       .control-group {
         margin-right:10px;
+        
         input {
           width:100%;
         }
@@ -245,6 +261,9 @@
     #pay {
       padding-left:@fluidGridGutterWidth;
       border-bottom:none;
+      
+      // Left border goes here rather than personalize because it is the
+      // vertically longer of the two.
       border-left: @sectionSeparator;
       .box-shadow(1px 0px 0px white inset);
 
@@ -270,6 +289,7 @@
       }
     }
 
+    // Styling for the "Review Order" modal.
     &#review {
       .box-shadow(0px 0px 8px rgba(0,0,0,0.3));
       border:1px solid #AAA;
@@ -283,12 +303,10 @@
       top:50%;
       left:50%;
       right:50%;
-      width:300px;
-      height:inherit;
-
 
       h2, h3 {
         color:@headerColor;
+        text-transform:uppercase;        
       }
 
       h2 {
@@ -297,7 +315,6 @@
       }
 
       h3 {
-        text-transform:uppercase;
         font-size:14px;
         font-weight:600;
         line-height:normal;
@@ -357,6 +374,7 @@
         }
       }
 
+      // Shenanigans to get those nice full-width separators in the modal
       .modal-body-separator {
         border-top:@sectionSeparator;
         .box-shadow(0px 1px 0px white);
@@ -367,6 +385,7 @@
         margin-bottom:12px;
       }
 
+      // Link to dismiss modal and modify order
       #modify-order {
         color:@orange;
         line-height:35px;
@@ -383,8 +402,7 @@
 
   @media (max-width:767px) { #content.gift-certificate-checkout, .gift-certificate-modal  {
     .controls {
-      // Eliminate artifactual input expansion outside of grid due to spanning at
-      // 100%
+      // Eliminate artifactual input expansion outside of grid due to 100% width setting
       margin-right:10px;
 
       input[type="text"] {
@@ -423,7 +441,8 @@
     }
 
     #pay {
-      // Remove gutter from span6 class
+      // Now that sections are vertical, remove previous separation between this section
+      // and #personalize.
       border-left: none;
       padding-left:0px;
       .box-shadow(none);
