@@ -7,6 +7,8 @@ import org.joda.money.CurrencyUnit
 import services.payment.{Charge, NiceCharge}
 import javax.mail.internet.InternetAddress
 import play.api.test.FakeRequest
+import services.db.DBSession
+import services.db.TransactionSerializable
 
 class OrderTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
@@ -167,17 +169,25 @@ class OrderTests extends EgraphsUnitTest
   }
 
   "rejectAndCreateNewOrderWithNewProduct" should "create a new order but leave the old one in the db in a rejected status" in new EgraphsTestApplication {
-    val (buyer, _, _, product) = TestData.newSavedOrderStack()
-    val oldOrder = buyer.buy(product).withPaymentStatus(PaymentStatus.Charged).save()
-    val printOrder = PrintOrder(orderId = oldOrder.id).save()
+    def db = AppConfig.instance[DBSession]
+    val oldOrder = db.connected(TransactionSerializable) {
+      val (buyer, _, _, product) = TestData.newSavedOrderStack()
+      val oldOrder = buyer.buy(product).withPaymentStatus(PaymentStatus.Charged).save()
+      val printOrder = PrintOrder(orderId = oldOrder.id).save()
 
-    val newProduct = TestData.newSavedProduct()
-    val newOrder = oldOrder.rejectAndCreateNewOrderWithNewProduct(newProduct, newProduct.inventoryBatches.head)
+      oldOrder
+    }
+
+    val (newOrder, updatedOldOrder) = db.connected(TransactionSerializable) {
+      val newProduct = TestData.newSavedProduct()
+      val newOrder = oldOrder.rejectAndCreateNewOrderWithNewProduct(newProduct, newProduct.inventoryBatches.head)
+      val updatedOldOrder =  orderStore.findById(oldOrder.id).get
+      (newOrder, updatedOldOrder)
+    }
 
     newOrder.id should not be (oldOrder.id)
     newOrder.reviewStatus should be (OrderReviewStatus.PendingAdminReview)
 
-    val updatedOldOrder = orderStore.findById(oldOrder.id).get
     updatedOldOrder.id should be (oldOrder.id)
     updatedOldOrder.reviewStatus should be (OrderReviewStatus.RejectedByAdmin)
   }

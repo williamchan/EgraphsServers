@@ -22,6 +22,9 @@ import controllers.website.GetEgraphEndpoint
 import play.api.mvc.RequestHeader
 import play.api.templates.Html
 import db.Deletes
+import services.db.TransactionSerializable
+import java.sql.Connection
+import services.db.CurrentTransaction
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -34,7 +37,8 @@ case class OrderServices @Inject() (
   mail: TransactionalMail,
   cashTransactionStore: CashTransactionStore,
   egraphServices: Provider[EgraphServices],
-  consumerApp: ConsumerApplication
+  consumerApp: ConsumerApplication,
+  @CurrentTransaction connectionFactory: () => Connection
 )
 
 /**
@@ -178,7 +182,7 @@ case class Order(
 
   /**
    * Rejects this order and creates a new order that is a copy to take it's place.
-   * The copy has a new product and inventory batch.
+   * The copy has a new product and inventory batch and reflects the new price.
    */
   def rejectAndCreateNewOrderWithNewProduct(newProduct: Product, newInventoryBatch: InventoryBatch): Order = {
     // create a new order only need to fill in mandatory fields now, just to get a new id.
@@ -186,20 +190,22 @@ case class Order(
       .copy(
         productId = newProduct.id,
         rejectionReason = None,
-        inventoryBatchId = newInventoryBatch.id)
-      .save()
+        inventoryBatchId = newInventoryBatch.id,
+        amountPaidInCurrency = newProduct.priceInCurrency
+      ).save()
     // mark old order invalid
     val oldOrder = this.withReviewStatus(OrderReviewStatus.RejectedByAdmin).copy(rejectionReason = Some("Changed product to " + newProduct.id + " with new order " + newOrder.id)).save()
     // update other objects that care about the old order, since they shouldn't anymore
     services.cashTransactionStore.findByOrderId(oldOrder.id).foreach(transaction => transaction.copy(orderId = Some(newOrder.id)).save())
+    // NOTE: if print order prices become different for each product, this will need to reflect that, but isn't now.
     services.printOrderStore.findByOrderId(oldOrder.id).foreach(printOrder => printOrder.copy(orderId = newOrder.id).save())
 
     // if we can delete the old one, that means there are no dangling foreign keys.  otherwise we have a problem and should roll back.
     // we don't actually want to delete the old order though, so we will save it after we delete it.
-//    services.store.delete(oldOrder)
-//    val updatedOldOrder = oldOrder.save()
-//    println(this)
-//    println(updatedOldOrder)
+    val connection = services.connectionFactory()
+    val savepoint = connection.setSavepoint
+    services.store.delete(oldOrder)
+    connection.rollback(savepoint)
 
     newOrder
   }
