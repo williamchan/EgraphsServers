@@ -1,4 +1,4 @@
-package controllers.website.consumer
+package controllers.website
 
 import play.api.mvc.Action
 import play.api.mvc.Controller
@@ -7,7 +7,7 @@ import play.api.data._
 import play.api.data.Forms._
 import models.categories._
 import services.mvc.{celebrity, ImplicitHeaderAndFooterData}
-import services.http.{SafePlayParams, ControllerMethod}
+import services.http.ControllerMethod
 import models.frontend.marketplace._
 import models.frontend.marketplace.CelebritySortingTypes
 import services.db.TransactionSerializable
@@ -74,7 +74,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
           try {
             arg.toLong
           } catch {
-            case e => throw new Exception("Invalid category value argument passed.", e)
+            case e: Exception => throw new Exception("Invalid category value argument passed.", e)
           })
         (id.toLong, categoryValueId)
       }
