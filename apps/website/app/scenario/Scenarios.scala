@@ -180,7 +180,7 @@ class Scenarios extends DeclaresScenarios {
   """, {
     () =>
       val erem = Scenarios.getEremCustomerAccount
-      "Name = " + erem.name + ", username/password = " + erem.username + "@egraphs.com/" + TestData.defaultPassword
+      "Name = " + erem.name + ", username/password = " + erem.account.email + "/" + TestData.defaultPassword
   }
   )
 
@@ -192,7 +192,7 @@ class Scenarios extends DeclaresScenarios {
   """, {
     () =>
       val myyk = Scenarios.getMyykCustomerAccount
-      "Name = " + myyk.name + ", username/password = " + myyk.username + "@egraphs.com/" + TestData.defaultPassword
+      "Name = " + myyk.name + ", username/password = " + myyk.account.email + "@egraphs.com/" + TestData.defaultPassword
   }
   )
 

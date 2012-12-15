@@ -49,7 +49,7 @@
       <div class="container">
         @if(giftEgraphs.isEmpty || !areAllPendingGifts(egraphs)) {
           @galleryTop(displayableEgraphs(egraphs, galleryCustomerId), "Egraphs")
-          @if(egraphs.length == 0 || areAllPendingGifts(egraphs)) {
+          @if(egraphs.isEmpty || areAllPendingGifts(egraphs)) {
             <section>
               <h1>@username does not have any egraphs yet...</h1>
             </section>
