@@ -36,7 +36,7 @@ class VerticalStore @Inject() (categoryStore: CategoryStore) {
         case "MLB" => Vertical(categoryValue = cv, shortName = "MLB", urlSlug = "major-league-baseball",
           iconUrl = "images/icon-logo-mlb.png", featuredQuery ="mlb-featured")
         case "NBA" => Vertical(categoryValue = cv, shortName = "NBA", urlSlug = "national-basketball-association",
-          iconUrl = "images/icon-logo-nba.png", featuredQuery="nba-featured")
+          iconUrl = "images/icon-logo-nba.png", featuredQuery ="nba-featured")
       }
     }
   }
