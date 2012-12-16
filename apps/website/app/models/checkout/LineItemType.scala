@@ -11,7 +11,7 @@ import models.enums.{CodeType, LineItemNature}
 
 
 trait LineItemType[+TransactedT] extends HasLineItemTypeEntity {
-
+  def id = _entity.id
   def toJson: String
 
   /**
@@ -106,12 +106,12 @@ trait LineItemTypeEntityLenses[T <: LineItemType[_]] { this: T =>
 
   private[checkout] lazy val descField =
     entityField(get = _._desc)(set = desc => entity().copy(_desc=desc))
-  private[checkout] lazy val natureField = entityField
-    (get = LineItemNature(_._nature).get)
-    (set = (nature: LineItemNature) => entity().copy(_nature=nature.name))
-  private[checkout] lazy val codeTypeField = entityField
-    (get = CodeType(_._codeType).get)
-    (set = (codeType: CodeType) => entity().copy(_codeType=codeType.name))
+  private[checkout] lazy val natureField = entityField(
+    get = (entity: LineItemTypeEntity) => entity.nature)(
+    set = (nature: LineItemNature) => entity().copy(_nature=nature.name))
+  private[checkout] lazy val codeTypeField = entityField(
+    get = (entity: LineItemTypeEntity) => entity.codeType)(
+    set = (codeType: CodeType) => entity().copy(_codeType=codeType.name))
 
 
   private def entityField[PropT](get: LineItemTypeEntity => PropT)(set: PropT => LineItemTypeEntity)

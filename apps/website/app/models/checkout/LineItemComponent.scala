@@ -1,6 +1,6 @@
 package models.checkout
 
-import services.db.Schema
+import services.db.{SavesAsEntity, Schema}
 
 trait HasEntity[T] { def _entity: T}
 trait HasLineItemEntity extends HasEntity[LineItemEntity]

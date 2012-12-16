@@ -8,17 +8,25 @@ import services.{MemberLens, Time}
 import scalaz.Lens
 
 trait LineItem[+TransactedT] extends HasLineItemEntity {
+  def id = _entity.id
+  def amount: Money = Money.of(CurrencyUnit.USD, _entity._amountInCurrency.bigDecimal)
   def itemType: LineItemType[TransactedT]
-  def amount: Money
-  def subItems: Seq[LineItem[_]]  // NOTE: Seq > IndexedSeq bc of monadic use
-
-  def checkoutId: Long
+  def subItems: Seq[LineItem[_]]
+  def toJson: String                    // TODO(SER-499): Use Json type
+  def domainObject: TransactedT
   def _domainEntityId: Long
 
-  // new, 12/13/12
-  def toJson: String // TODO(SER-499): Use Json type
-  def domainObject: TransactedT
-
+  /**
+   * TODO(SER-499): should transact operate on flattened LineItems or not?
+   * Persists line item and its fields (line item type, domain object, etc) as necessary.
+   * Requires that checkoutId is set.
+   *
+   * Note that a summary line item might not choose to actually persist itself, so this
+   * definition should allow such implementation.
+   *
+   * @return persisted line item
+   */
+  def transact: LineItem[TransactedT]
 
   /** @return flat sequence of this LineItem and its sub-LineItems */
   def flatten: IndexedSeq[LineItem[_]] = {
@@ -26,16 +34,7 @@ trait LineItem[+TransactedT] extends HasLineItemEntity {
     IndexedSeq(this) ++ seqOfFlatSubItemSeqs.flatten
   }
 
-  /**
-   * TODO(SER-499): should transact operate on flattened LineItems or not?
-   * Persists line item and its fields (line item type, domain object, etc) as necessary.
-   * Note that a summary line item might not choose to actually persist itself, so this
-   * definition should allow such implementation.
-   *
-   * @param newCheckoutId - id of the checkout being transacted as a part of
-   * @return persisted line item
-   */
-  def transact(newCheckoutId: Long): LineItem[TransactedT]
+  def withCheckoutId(newCheckoutId: Long): LineItem[TransactedT]
 }
 
 case class LineItemEntity(
@@ -81,10 +80,11 @@ trait LineItemEntityLenses[T <: LineItem[_]] { this: T =>
     entityField(get = _._checkoutId)(set = id => entity().copy(_checkoutId=id))
   private[checkout] lazy val itemTypeIdField =
     entityField(get = _._itemTypeId)(set = id => entity().copy(_itemTypeId=id))
-  private[checkout] lazy val amountInCurrencyField = entityField
-    (get = Money.of(CurrencyUnit.USD, _._amountInCurrency))
-    (set = (amount: Money) => entity().copy(
-      _amountInCurrency=amount.withCurrencyUnit(CurrencyUnit.USD).getAmount)
+  private[checkout] lazy val amountInCurrencyField = entityField(
+    get = (entity: LineItemEntity) =>
+      Money.of(CurrencyUnit.USD, entity._amountInCurrency.bigDecimal))(
+    set = (amount: Money) => entity().copy(
+      _amountInCurrency = amount.withCurrencyUnit(CurrencyUnit.USD).getAmount)
     )
 
 
@@ -98,7 +98,7 @@ trait LineItemEntityLenses[T <: LineItem[_]] { this: T =>
 
 trait LineItemEntityGetters[T <: LineItem[_]] { this: T with LineItemEntityLenses[T] =>
   lazy val checkoutId = checkoutIdField()
-  lazy val itemTypeIdField = itemTypeIdField()
+  lazy val itemTypeId = itemTypeIdField()
   lazy val amountInCurrency = amountInCurrencyField()
 }
 

@@ -25,6 +25,7 @@ case class Coupon(id: Long = 0,
                   _usageType: String = CouponUsageType.OneUse.name,
                   isActive: Boolean = true,
                   restrictions: String = "{}", // SER-508
+                  lineItemTypeId: Long = 0,
                   created: Timestamp = Time.defaultTimestamp,
                   updated: Timestamp = Time.defaultTimestamp,
                   services: CouponServices = AppConfig.instance[CouponServices])

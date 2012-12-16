@@ -15,7 +15,7 @@ case class Checkout(lineItemTypes: Seq[LineItemType[_]] = Nil) {
     }
   }
 
-  // TODO(SER-499): consider implementing with Map, keyed by Natures
+  // TODO(SER-499): create and append subtotal, tax, total to this Seq
   lazy val lineItems: Seq[LineItem[_]] = {
     // TODO(SER-499): add subtotal, tax, fees, total before processing
 
@@ -60,9 +60,9 @@ case class Checkout(lineItemTypes: Seq[LineItemType[_]] = Nil) {
     for (lineItem <- lineItems; flattened <- lineItem.flatten) yield flattened
   }
 
-
+  // TODO(SER-499): use SubtotalLineItem
   /** @return sum of all products in checkout */
-  def subtotal: Money = {
+  private def calculateSubtotal: Money = {
     // TODO(SER-499): this is super awkward, would be nice to refactor
     def isProduct(item: LineItem[_]) = item.itemType._entity._nature == LineItemNature.Product.name
 
@@ -72,11 +72,21 @@ case class Checkout(lineItemTypes: Seq[LineItemType[_]] = Nil) {
     }
   }
 
-  // def total: Money
+  // TODO(SER-499): tax and total, should grab from lineItems
+  // lazy val tax: TaxLineItem
+  // lazy val total: TotalLineItem
+
+  // private def calculateTax
+  // private def calculateTotal
+
   // def lineItemsToJson: String
   // def lineItemTypesToJson: String
 
-
+  def transact: Checkout = {
+    // transact checkout entity
+    // for(lineItem <- lineItems) yield lineItem.withCheckoutId(id).transact
+    this
+  }
 }
 
 object Checkout {
@@ -91,4 +101,6 @@ object Checkout {
   def getWithId(id: Long): Option[Checkout]= {
     None
   }
+
+
 }
