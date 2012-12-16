@@ -33,7 +33,7 @@ case class Coupon(id: Long = 0,
   with HasCouponType[Coupon]
   with HasCouponDiscountType[Coupon]
   with HasCouponUsageType[Coupon]
-  {
+{
   
   /**
    * Marks this coupon as used. Does nothing if this coupon is unlimited-use.
@@ -102,11 +102,11 @@ case class Coupon(id: Long = 0,
 
   override def unapplied = Coupon.unapply(this)
   
-  override def withCouponType(value: CouponType.EnumVal) = this.copy(_couponType = value.name)
+  override def withCouponType(value: CouponType) = this.copy(_couponType = value.name)
   
-  override def withDiscountType(value: CouponDiscountType.EnumVal) = this.copy(_discountType = value.name)
+  override def withDiscountType(value: CouponDiscountType) = this.copy(_discountType = value.name)
   
-  override def withUsageType(value: CouponUsageType.EnumVal) = this.copy(_usageType = value.name)
+  override def withUsageType(value: CouponUsageType) = this.copy(_usageType = value.name)
 }
 
 object Coupon {

@@ -1,18 +1,29 @@
 package models.checkout
 
+import org.joda.money.{CurrencyUnit, Money}
+import models.enums.LineItemNature
 
-case class Checkout(lineItemTypes: IndexedSeq[LineItemType[_]]) {
+/**
+ * @param lineItemTypes -- intermediate form of contents of checkout
+ */
+case class Checkout(lineItemTypes: Seq[LineItemType[_]] = Nil) {
 
-  def add(lineItemType: LineItemType[_]): Checkout = {
-    this.copy(lineItemTypes = lineItemTypes :+ lineItemType)
+  def add(additionalTypes: Seq[LineItemType[_]]): Checkout = {
+    additionalTypes match {
+      case Nil => this
+      case _ => this.copy(lineItemTypes = lineItemTypes ++ additionalTypes)
+    }
   }
 
-  lazy val lineItems: IndexedSeq[LineItem[_]] = {
-    case class ResolutionPass(items: IndexedSeq[LineItem[_]], unresolved: IndexedSeq[LineItemType[_]]) {
+  // TODO(SER-499): consider implementing with Map, keyed by Natures
+  lazy val lineItems: Seq[LineItem[_]] = {
+    // TODO(SER-499): add subtotal, tax, fees, total before processing
+
+    case class ResolutionPass(items: Seq[LineItem[_]], unresolved: Seq[LineItemType[_]]) {
       def isComplete: Boolean = unresolved.isEmpty
     }
 
-    def executePass(passToResolve: ResolutionPass): IndexedSeq[LineItem[_]] = {
+    def executePass(passToResolve: ResolutionPass): Seq[LineItem[_]] = {
       if (passToResolve.isComplete) {
         passToResolve.items
       } else {
@@ -20,8 +31,9 @@ case class Checkout(lineItemTypes: IndexedSeq[LineItemType[_]]) {
           val itemTypesSansCurrent = oldPass.unresolved.filter(_ != nextItemType)
 
           nextItemType.lineItems(oldPass.items, itemTypesSansCurrent) match {
-            case Some(newLineItems) => oldPass.copy(newLineItems, itemTypesSansCurrent)
-            case None => oldPass
+            case Nil => oldPass
+            case newLineItems: Seq[LineItem[_]] => oldPass.copy(newLineItems, itemTypesSansCurrent)
+
           }
         }
 
@@ -43,16 +55,40 @@ case class Checkout(lineItemTypes: IndexedSeq[LineItemType[_]]) {
     executePass(initialPass)
   }
 
-  lazy val flattenedLineItems: IndexedSeq[LineItem[_]] = {
+
+  lazy val flattenedLineItems: Seq[LineItem[_]] = {
     for (lineItem <- lineItems; flattened <- lineItem.flatten) yield flattened
   }
 
 
+  /** @return sum of all products in checkout */
+  def subtotal: Money = {
+    // TODO(SER-499): this is super awkward, would be nice to refactor
+    def isProduct(item: LineItem[_]) = item.itemType._entity._nature == LineItemNature.Product.name
 
-  // TODO(SER-499): totals and json-ify
-  // def subtotal: Money
+    lineItems.foldLeft (Money.zero(CurrencyUnit.USD)) {
+      (acc: Money, nextItem: LineItem[_]) =>
+        if (isProduct(nextItem)) acc plus nextItem.amount else acc
+    }
+  }
+
   // def total: Money
-  // def toJson: String
+  // def lineItemsToJson: String
+  // def lineItemTypesToJson: String
 
 
+}
+
+object Checkout {
+  /**
+   * @param json -- serialized LineItemTypes
+   * @return Option of restored Checkout if deserializing succeeds; otherwise, None.
+   */
+  def restore(json: String): Option[Checkout] = {
+    None
+  }
+
+  def getWithId(id: Long): Option[Checkout]= {
+    None
+  }
 }

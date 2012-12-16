@@ -8,15 +8,15 @@ import services.http.ControllerMethod
 import services.http.POSTControllerMethod
 import services.mvc.ImplicitHeaderAndFooterData
 
-import models.checkout.{StripeChargeLineItemType, Checkout, GiftCertificateComponent, GiftCertificateLineItemType}
+import models.checkout.{/*StripeChargeLineItemType,*/ Checkout, GiftCertificateLineItemTypeServices, GiftCertificateLineItemType}
 
 
 /**
  */
 private[consumer] trait GiftCertificateEndpoints
   extends ImplicitHeaderAndFooterData {
-  this: Controller with GiftCertificateComponent =>
-  import GiftCertificateServices.Conversions._
+  this: Controller =>
+  import GiftCertificateLineItemTypeServices.Conversions._
 
   protected def controllerMethod: ControllerMethod
   protected def postController: POSTControllerMethod

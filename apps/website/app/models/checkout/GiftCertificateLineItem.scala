@@ -3,6 +3,7 @@ package models.checkout
 import models.Coupon
 import models.enums.{CodeType, LineItemNature, CouponType, CouponDiscountType, CouponUsageType}
 import org.joda.money.Money
+import services.AppConfig
 import services.db.Schema
 import scalaz.Lens
 import org.squeryl.PrimitiveTypeMode._
@@ -10,9 +11,9 @@ import org.squeryl.PrimitiveTypeMode._
 /**
  * Services for gift certificates and associated [[models.checkout.GiftCertificateLineItemType]]s items. Use like this:
  * {{{
- *   import models.checkout.GiftCertificateComponent
+ *   import models.checkout.GiftCertificateLineItemTypeComponent
  *
- *   trait MyEndpoint { this: Controller with GiftCertificateComponent =>
+ *   trait MyEndpoint { this: Controller with GiftCertificateLineItemTypeComponent =>
  *     // import the implicit conversions that enhance the otherwise plain
  *     // gift certificate classes
  *     import GiftCertificateServices.Conversions._
@@ -29,40 +30,63 @@ import org.squeryl.PrimitiveTypeMode._
  *   }
  * }}}
  */
-trait GiftCertificateComponent { this: LineItemTypeEntityComponent =>
-  protected def schema: Schema
+protected object GiftCertificateComponent extends LineItemComponent {
+  /* NOTE(SER-499): this could be broke out for arbitrary injection with an abstract class
+   * {{{
+   *   abstract class GiftCertificateComponent(protected val schema: Schema) extends // ...
+   *   // ...
+   *   object GiftCertificateHelper extends GiftCertificateComponent(mySchema)
+   *   import GiftCertificateHelper.GiftCertificateLineItemTypeServices.Conversions._
+   * }}}
+   */
+  protected val schema: Schema = AppConfig.instance[Schema]
+}
 
-  object GiftCertificateServices extends SavesAsLineItemTypeEntity[GiftCertificateLineItemType]
-  {
-    /**
-     * Query DSL that pimps the companion object with DB querying functionality,
-     * e.g. `GiftCertificateLineItemType.getWithAmount(Money.parse("$50")`, and model
-     * instances with saving functionality.
-     */
-    object Conversions extends EntitySavingConversions {
+object GiftCertificateLineItemServices
+  extends GiftCertificateComponent.SavesAsLineItemEntity[GiftCertificateLineItem]
+{
 
-      implicit def companionToQueryDsl(companion: GiftCertificateLineItemType.type) = {
-        QueryDSL
-      }
+  object Conversions extends EntitySavingConversions {
+    // pimp things out in here
+    implicit def itemToSavingDsl(lineItem: GiftCertificateLineItem): SavingDSL = {
+      new SavingDSL(lineItem, lineItem._entity)
+    }
+  }
 
-      object QueryDSL {
-        private lazy val seedEntity = GiftCertificateLineItemType.defaultEntity
+  def modelWithNewEntity(certificateItem: GiftCertificateLineItem, entity: LineItemEntity) = {
+    certificateItem.copy(_entity = entity)
+  }
+}
 
-        // TODO(SER-499): this is the complete opposite of how entities should be used for gift cert's
-        def getWithRecipientAndAmount(recipient: String, amount: Money): GiftCertificateLineItemType = {
-          val entity = table.where(_.codeType.name === seedEntity.codeType.name).headOption.getOrElse {
-            table.insert(seedEntity)
-          }
-          GiftCertificateLineItemType(entity, recipient, amount)
-        }
-      }
+object GiftCertificateLineItemTypeServices
+  extends GiftCertificateComponent.SavesAsLineItemTypeEntity[GiftCertificateLineItemType]
+{
+
+  override protected def modelWithNewEntity(certificateType: GiftCertificateLineItemType, entity: LineItemTypeEntity) = {
+    certificateType.copy(_entity=entity)
+  }
+
+  /**
+   * Query DSL that pimps the companion object with DB querying functionality,
+   * e.g. `GiftCertificateLineItemType.getWithAmount(Money.parse("$50")`, and model
+   * instances with saving functionality.
+   */
+  object Conversions extends EntitySavingConversions {
+    implicit def typeToSavingDsl(lineItemType: GiftCertificateLineItemType): SavingDSL = {
+      new SavingDSL(lineItemType, lineItemType._entity)
     }
 
-    //
-    // SavesAsLineItemTypeEntity members
-    //
-    override protected def modelWithNewEntity(certificate: GiftCertificateLineItemType, entity: LineItemTypeEntity) = {
-      certificate.copy(_entity=entity)
+    implicit def companionToQueryDsl(companion: GiftCertificateLineItemType.type) = {
+      QueryDSL
+    }
+
+    object QueryDSL {
+      private lazy val seedEntity = GiftCertificateLineItemType.entityWithDescription()
+
+      /** @return unpersisted Gift Certificate for given amount to given recipient */
+      def getWithRecipientAndAmount(recipient: String, amount: Money): GiftCertificateLineItemType = {
+        GiftCertificateLineItemType(recipient, amount)
+      }
     }
   }
 }
@@ -75,13 +99,14 @@ case class GiftCertificateLineItemType (
   recipient: String,
   amountToBuy: Money
 
-) extends LineItemType[Coupon]
+) extends LineItemType[Coupon] with HasLineItemTypeEntity
   with LineItemTypeEntityLenses[GiftCertificateLineItemType]
   with LineItemTypeEntityGetters[GiftCertificateLineItemType]
 {
-
-  def lineItems(resolvedItems: IndexedSeq[LineItem[_]], pendingResolution: IndexedSeq[LineItemType[_]]) = {
-    Some( IndexedSeq( new GiftCertificateLineItem( itemType = this )))
+  // TODO(SER-499): implement
+  override def toJson: String = ""
+  override def lineItems(resolvedItems: Seq[LineItem[_]], pendingResolution: Seq[LineItemType[_]]) = {
+    Nil
   }
 
   //
@@ -93,73 +118,95 @@ case class GiftCertificateLineItemType (
 // / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / /
 
 object GiftCertificateLineItemType {
+  // for convenience
+  val nature = LineItemNature.Discount
+  val codeType = CodeType.GiftCertificate
+
   val entityLens = Lens[GiftCertificateLineItemType, LineItemTypeEntity] (
     get = cert => cert._entity,
     set = (cert, entity) => cert.copy(entity)
   )
 
   def apply(recipient: String, amountToBuy: Money): GiftCertificateLineItemType = {
-    GiftCertificateLineItemType(
-      LineItemTypeEntity()
-        .withNature(LineItemNature.Product)
-        .withCodeType(CodeType.GiftCertificateLineItemType),
+    new GiftCertificateLineItemType(
+      entityWithDescription(description(recipient, amountToBuy)),
       recipient,
       amountToBuy
     )
   }
 
-  lazy val defaultEntity = LineItemTypeEntity(_desc = "Gift Certificate")
-    .withNature(LineItemNature.Product)
-    .withCodeType(CodeType.GiftCertificateLineItemType)
+  def description(recip: String, amount: Money) = "Gift certificate for " + amount + " to " + recip
+  def entityWithDescription(desc: String = "Gift certificate") =
+    new LineItemTypeEntity(0, desc, nature, codeType)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
 /**
- * Want to be able to:
- * -represent checkout/cart contents
- * -generate the model that we're representing
- * -...
- * -convenience methods?
  *
- *
- *
+ * @param _entity
  * @param itemType - line item type corresponding to this gift certificate
+ * @param amount
  * @param subItems - items that depend upon or relate strongly to this gift certificate
+ * @param checkoutId
+ * @param _domainEntityId
  */
 case class GiftCertificateLineItem (
   _entity: LineItemEntity = new LineItemEntity(),
   itemType: GiftCertificateLineItemType,
-  maybeDescription: Option[String] = None,
-  subItems: IndexedSeq[LineItem[_]] = IndexedSeq()
+  amount: Money,
+  subItems: Seq[LineItem[_]] = Nil,
+  checkoutId: Long = 0,
+  _domainEntityId: Long = 0
+) extends LineItem[Coupon] with HasLineItemEntity {
 
-) extends LineItem[Coupon] {
+  // TODO(ser-499): implement once api nailed down
+  override def toJson: String = ""
 
-  // TODO(SER-499): may want to pull this out into a conf or something
-  protected val couponNameFormatString = "A gift certificate for %s"
+  override def domainObject: Coupon = {
+    if (_domainEntityId > 0) {
+      // TODO(SER-499): query db for coupon
+      null // to be a query
 
-  override def description = maybeDescription.getOrElse(itemType.description)
-  override def amount = itemType.amountToBuy
-
-
-  /**
-   * Persist Gift Certificate as a Coupon
-   * @return generated coupon
-   */
-  override def transact: Coupon = {
-    // TODO(SER-499): probably want to perform some validation on this before saving
-    new Coupon(
-      name = couponName,
-      discountAmount = amount.getAmount,
-      _couponType = CouponType.GiftCertificate.name,
-      _discountType = CouponDiscountType.Flat.name,
-      _usageType = CouponUsageType.OneUse.name,
-      isActive = true
-    ).save()
+    } else {
+      new Coupon(name = couponName, discountAmount = amount.getAmount)
+        .withCouponType(CouponType.GiftCertificate)
+        .withDiscountType(CouponDiscountType.Flat)
+        .withUsageType(CouponUsageType.Prepaid)
+    }
   }
 
+  // TODO(SER-499): this may be better if implemented with lenses
+  def withTypeAndCheckoutId(newType: GiftCertificateLineItemType, newId: Long) = this.copy(
+    _entity = _entity.copy(_checkoutId = newId),
+    checkoutId = newId,
+    itemType = newType
+  )
 
-  /** helper for creating a coupon name */
+
+  // TODO(SER-499): needs LineItemComponent
+  override def transact(newCheckoutId: Long = 0): GiftCertificateLineItem = {
+    import GiftCertificateLineItemServices.Conversions._
+    import GiftCertificateLineItemTypeServices.Conversions._
+
+    // save line item type entity
+    val savedType: GiftCertificateLineItemType = null
+
+    // save this entity
+    val itemWithSavedEntity = withTypeAndCheckoutId(savedType, newCheckoutId).create()
+
+    // save this domain entity
+    val savedCoupon = itemWithSavedEntity.domainObject.save()
+
+    // return new item with its new type
+    GiftCertificateLineItem(itemWithSavedEntity._entity, savedType, amount, subItems, newCheckoutId, savedCoupon.id)
+  }
+
+  //
+  // Coupon helpers
+  //
+  protected val couponNameFormatString = "A gift certificate for %s"
   protected def couponName: String = {
     couponNameFormatString.format(itemType.recipient)
   }

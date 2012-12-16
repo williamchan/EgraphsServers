@@ -10,8 +10,8 @@ import org.squeryl.PrimitiveTypeMode._
 
 
 
-
-trait StripeChargeComponent { this: LineItemTypeEntityComponent =>
+/*
+trait StripeChargeComponent { this: LineItemTypeComponent =>
   protected def schema: Schema
 
   object StripeChargeServices extends SavesAsLineItemTypeEntity[StripeChargeLineItemType] {
@@ -54,9 +54,9 @@ case class StripeChargeLineItemType(
   with LineItemTypeEntityLenses[StripeChargeLineItemType]
   with LineItemTypeEntityGetters[StripeChargeLineItemType]
 {
-  def lineItems(resolvedItems: IndexedSeq[LineItem[_]], pendingResolution: IndexedSeq[LineItemType[_]]) = {
+  def lineItems(resolvedItems: Seq[LineItem[_]], pendingResolution: Seq[LineItemType[_]]) = {
     // TODO(SER-499): resolve this thang
-    None
+    Nil
   }
 
   //
@@ -76,8 +76,8 @@ object StripeChargeLineItemType {
   }
 
   lazy val defaultEntity = LineItemTypeEntity(_desc = "Stripe Charge")
-    .withNature(LineItemNature.Payment)
-    .withCodeType(CodeType.StripeChargeLineItemType)
+    .withNature(LineItemNature.Charge)
+    .withCodeType(CodeType.StripeCharge)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,7 +86,7 @@ case class StripeChargeLineItem(
   _entity: LineItemEntity,
   itemType: StripeChargeLineItemType,
   maybeDescription: Option[String] = None,
-  subItems: IndexedSeq[LineItem[_]] = IndexedSeq()
+  subItems: Seq[LineItem[_]] = IndexedSeq()
 
 ) extends LineItem[StripeCharge] {
 
@@ -98,4 +98,4 @@ case class StripeChargeLineItem(
     // TODO(SER-499): use actual StripePayment to charge
     null  //:(
   }
-}
+}*/

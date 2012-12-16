@@ -7,15 +7,11 @@ sealed abstract class LineItemNature(val name: String)
 object LineItemNature extends Enum {
   sealed abstract class EnumVal(name: String) extends LineItemNature(name) with Value
 
-  val Product = new EnumVal("Purchase"){}
-  val Discount = new EnumVal("Discount"){}
-  val Tax = new EnumVal("Tax"){}
-  val Fee = new EnumVal("Fee"){}
+  val Product = new EnumVal("Product") {}
+  val Discount = new EnumVal("Discount") {}
+  val Tax = new EnumVal("Tax") {}
+  val Fee = new EnumVal("Fee") {}
   val Summary = new EnumVal("Summary") {}
-
-  // TODO(SER-499): change to Charge to match domain terminology
-  val Payment = new EnumVal("Payment"){}
-
-
+  val Charge = new EnumVal("Charge") {}
   val Refund = new EnumVal("Refund") {}
 }
