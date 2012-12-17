@@ -1,5 +1,6 @@
 package models.checkout
 
+
 object TaxLineItemServices extends LineItemComponent.SavesAsLineItemEntity[TaxLineItem] {
   object Conversions extends LineItemSavingConversions
 

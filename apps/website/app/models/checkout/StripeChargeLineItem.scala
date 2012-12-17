@@ -8,7 +8,7 @@ case class StripeChargeLineItem(
   _entity: LineItemEntity,
   itemType: StripeChargeLineItemType,
   subItems: Seq[LineItem[_]] = Nil,
-  _domainEntityId: Long = checkout.UnsavedEntity
+  _domainEntityId: Long = 0
 ) extends LineItem[StripeCharge] with HasLineItemEntity
   with LineItemEntityLenses[StripeChargeLineItem]
   with LineItemEntityGetters[StripeChargeLineItem]

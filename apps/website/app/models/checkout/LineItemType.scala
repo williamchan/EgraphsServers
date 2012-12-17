@@ -59,7 +59,7 @@ case class LineItemTypeEntity private (
     desc: String = "",
     nature: LineItemNature,
     codeType: CodeType,
-    id: Long = checkout.UnsavedEntity,
+    id: Long = 0,
     created: Timestamp = Time.defaultTimestamp,
     updated: Timestamp = Time.defaultTimestamp
   ) = this(id, desc, nature.name, codeType.name, created, updated)

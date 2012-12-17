@@ -3,7 +3,7 @@ package services.db
 import org.squeryl.PrimitiveTypeMode._
 import org.squeryl.{ KeyedEntity, Table }
 import models._
-import checkout.{LineItemEntity, LineItemTypeEntity}
+import checkout.{LineItemEntity, LineItemTypeEntity, CheckoutEntity}
 import models.categories._
 import models.vbg._
 import models.xyzmo._
@@ -80,7 +80,10 @@ class Schema @Inject() (
     declare(
       celebrity.urlSlug is unique,
       celebrity.bio is dbType("text")))
-  
+
+  val checkouts = table[CheckoutEntity]
+  // TODO(SER-499): Index declarations
+
   val coupons = table[Coupon]
   on(coupons)(coupon => 
     declare(

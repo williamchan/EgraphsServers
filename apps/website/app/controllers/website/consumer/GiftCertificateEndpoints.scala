@@ -77,7 +77,7 @@ private[consumer] trait GiftCertificateEndpoints
 
     ) yield {
       val giftCertificate = GiftCertificateLineItemType.getWithRecipientAndAmount(recipient, amount)
-      new Checkout(IndexedSeq(giftCertificate))
+      Checkout(IndexedSeq(giftCertificate))
     }
     checkout.headOption
   }

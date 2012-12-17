@@ -60,6 +60,7 @@ trait HasLineItemTypeEntity extends HasEntity[LineItemTypeEntity] {
  *   }
  * }}}
  */
+abstract case class Whatever(schema: Schema = AppConfig.instance[Schema])
 object LineItemComponent {
   protected val schema: Schema = AppConfig.instance[Schema]
 
@@ -73,7 +74,7 @@ object LineItemComponent {
   trait SavesAsLineItemEntity[ModelT <: HasLineItemEntity]
     extends SavesAsEntity[ModelT, LineItemEntity]
   {
-    override protected def table = schema.lineItems
+    override protected val table = schema.lineItems
     val Conversions: LineItemSavingConversions
 
     trait LineItemSavingConversions extends EntitySavingConversions {
@@ -84,11 +85,20 @@ object LineItemComponent {
   trait SavesAsLineItemTypeEntity[ModelT <: HasLineItemTypeEntity]
     extends SavesAsEntity[ModelT, LineItemTypeEntity]
   {
-    override protected def table = schema.lineItemTypes
+    override protected val table = schema.lineItemTypes
     val Conversions: LineItemTypeSavingConversions
 
     trait LineItemTypeSavingConversions extends EntitySavingConversions {
       implicit def typeToSavingDsl(itemType: ModelT) = new SavingDSL(itemType)
+    }
+  }
+
+  trait SavesAsCheckoutEntity extends SavesAsEntity[Checkout, CheckoutEntity] {
+    override protected val table = schema.checkouts
+    val Conversions: CheckoutSavingConversions
+
+    trait CheckoutSavingConversions extends EntitySavingConversions {
+      implicit def checkoutToSavingDsl(checkout: Checkout) = new SavingDSL(checkout)
     }
   }
 }

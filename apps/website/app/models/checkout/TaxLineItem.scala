@@ -30,7 +30,7 @@ case class TaxLineItem private (
   override def transact: LineItem[Money] = {
     require(checkoutId > 0, "Cannot transact without setting checkoutId.")
 
-    if (id == checkout.UnsavedEntity) {
+    if (id <= 0) {
       import TaxLineItemTypeServices.Conversions._
       import TaxLineItemServices.Conversions._
 

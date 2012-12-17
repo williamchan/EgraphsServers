@@ -23,7 +23,7 @@ case class GiftCertificateLineItem private (
   _entity: LineItemEntity = new LineItemEntity(),
   itemType: GiftCertificateLineItemType,
   subItems: Seq[LineItem[_]] = Nil,
-  _domainEntityId: Long = checkout.UnsavedEntity
+  _domainEntityId: Long = 0
 ) extends LineItem[Coupon] with HasLineItemEntity
   with LineItemEntityLenses[GiftCertificateLineItem]
   with LineItemEntityGetters[GiftCertificateLineItem]
@@ -36,7 +36,7 @@ case class GiftCertificateLineItem private (
 
 
   override def domainObject: Coupon = {
-    if (_domainEntityId == checkout.UnsavedEntity) {
+    if (_domainEntityId == 0) {
       new Coupon(
         name = GiftCertificateLineItem.couponName(itemType),
         discountAmount = amount.getAmount,
@@ -55,10 +55,10 @@ case class GiftCertificateLineItem private (
    * Presumes that checkoutId is set; persists unsaved instances
    * @return persisted line item
    */
-  override def transact: GiftCertificateLineItem = {
+  override def transact(): GiftCertificateLineItem = {
     require(checkoutId > 0, "Cannot transact without setting checkoutId.")
 
-    if (id == checkout.UnsavedEntity) {
+    if (id <= 0) {
       import GiftCertificateLineItemTypeServices.Conversions._
       import GiftCertificateLineItemServices.Conversions._
 

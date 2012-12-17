@@ -26,7 +26,7 @@ trait LineItem[+TransactedT] {
    *
    * @return persisted line item
    */
-  def transact: LineItem[TransactedT]
+  def transact(): LineItem[TransactedT]
 
   /** @return flat sequence of this LineItem and its sub-LineItems */
   def flatten: IndexedSeq[LineItem[_]] = {
@@ -40,9 +40,9 @@ trait LineItem[+TransactedT] {
 case class LineItemEntity(
   _amountInCurrency: BigDecimal = BigDecimal(0),
   notes: String = "",
-  id: Long = checkout.UnsavedEntity,
-  _checkoutId: Long = checkout.UnsavedEntity,
-  _itemTypeId: Long = checkout.UnsavedEntity,
+  id: Long = 0,
+  _checkoutId: Long = 0,
+  _itemTypeId: Long = 0,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp
 ) extends KeyedEntity[Long] {
