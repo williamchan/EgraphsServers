@@ -1,0 +1,461 @@
+// Styles for the gift certificate checkout page
+
+.giftCertificates() {
+  //
+  // Values
+  //
+  @sectionSeparator: 1px solid lighten(@gray, 50%);
+  @headerColor: #4d4d4d;
+
+  //
+  // Mixins
+  //
+  .certificatePreviews(@imageWidth) {
+    @previewOverlap: .7368;
+    .previews {
+      position:relative;
+      width: @imageWidth * 2 - @previewOverlap;
+
+      .preview {
+        width:@imageWidth;
+        background-color:white;
+        .box-shadow(1px 1px 6px lighten(black, 60%));
+
+        &.foreground {
+          position:relative;
+          z-index: 1;
+        }
+
+        &.background {
+          position:absolute;
+          top: -.0526 * @imageWidth;
+          left: @previewOverlap * @imageWidth;
+          .rotate(3deg);
+          // Chrome-specific fix for graphical aliasing on rotated images
+          -webkit-transform: rotate(3deg) translate3d(0,0,0);
+        }
+
+        object {
+          // We stupidly have to concretely specify height because Safari 
+          // doesn't scale the svg's height properly.
+          width: 100%;
+          height: 1.2947 * @imageWidth;
+        }
+      }
+
+      position:relative;
+    }
+  }
+
+  //
+  // Rules
+  //
+  #content.gift-certificate-checkout, .gift-certificate-modal {    
+    
+    // The orange numbered circles before each step of the checkout 
+    .checkout-step-count {      
+      position:relative;
+      margin-right:7px;
+      padding-top:0px;
+      padding-bottom:0px;
+      padding-left:5px;
+      padding-right:5px;
+      border-radius:100px;
+      background-color:@orange;
+      cursor:default;
+      color:@white;
+      
+      font-size:16px;
+      font-weight:600;
+
+      // The first numbered circle
+      &.one {
+        padding-left:7px;
+        padding-right:7px;
+      }
+
+      // The circle that appears inside the "Review Order" button
+      &.in-button {
+        text-indent:0px;
+        letter-spacing:normal;
+        background-image: none;
+        background-color: white;
+        color:darken(@orange, 5%);
+        padding-top:1px;
+        padding-bottom:1px;
+        padding-left:3px;
+        padding-right:4px;
+        line-height: 19px;
+        height: auto;
+        margin-top: 5px;
+        margin-right:10px;
+        .box-shadow(0px 1px 1px #333 inset);
+        text-shadow:0px 1px 0px #333;
+      }
+    }
+
+    // All sections: #masthead, #personalize, #pay, #review.
+    section {
+      border-bottom:@sectionSeparator;
+      .box-shadow(0px 1px 0px white); // easy way to achieve 3d sense on border
+      padding-top:7px;
+      padding-bottom:15px;
+
+      &.first {
+        border-top: none;
+      }
+
+      // Labels for all text inputs
+      .control-label {
+        text-align: left;
+      }
+    }
+
+    // All section headers, eg "PERSONALIZE:"
+    h2 {
+      color:@headerColor;
+      text-transform: uppercase;
+      font-size:16px;
+      font-weight:600;
+      margin-bottom:15px;
+    }
+
+    .hint {
+      color:#808080;
+      font-size:14px;
+      font-weight:300;
+      line-height:normal;
+    }
+
+    #masthead {
+      margin-top:40px;
+
+      h1 {
+        text-align:top;
+        font-size:40px;
+        font-weight:100;
+      }
+
+      ul {
+        color:#808080;
+        padding-top:30px;
+        font-size:14px;
+        font-weight:300;
+        
+        li {
+          line-height:18px;
+          list-style-type:circle;
+        }
+
+        strong {
+          font-weight:normal;
+          font-style:italic;
+          color:@orange;
+        }
+      }
+
+      // We don't render these responsively as %s because SVGs go apeshit on safari
+      // if not specified absolutely.
+      .certificatePreviews(190px);
+
+      // Tricky tricky; the previews are rendered twice in the DOM; once for small
+      // devices once for larger. We toggle visibility on one vs the other at different
+      // sizes
+      .responsive-previews {
+        display:none;
+        margin-top:15px;
+      }
+    }
+
+    #choose-amount {
+      .amount-option {
+        position:relative;
+
+        // The big fatty buttons: $25, $50, etc;
+        button.btn {
+          border-radius:0px;
+          position:relative;
+          .buttonBackground(lighten(@gray, 60%), lighten(@gray, 45%));
+          color: #333;
+          height:70px;
+          width:100%;
+          text-transform:uppercase;
+          font-weight:300;
+          font-size:36px;
+
+          // Make the dollar sign offset attractively from the text
+          .dollah {
+            position:relative;
+            vertical-align:super;
+            top:3px;
+            font-size:22px;
+          }
+
+          &:hover {
+            border:1px solid @orange;
+          }
+
+          &.active, &:active {
+            .gradientBar(@orange, lighten(@orange, 10%));
+            *background-color: @orange;
+            .reset-filter();
+            color:white;
+            text-shadow: 0px -1px 0px black;
+          }
+        } // End button.btn
+
+        // Special styling for "SET MY OWN AMOUNT"
+        &.own-amount {
+          button.btn {
+            font-size:20px;
+          }
+
+          #amount-field {
+            position:relative;
+            display:inline-block;
+            float:right;
+            margin-top:15px;
+
+            .dollah {
+              position:relative;
+              top:-1px;
+              color:#333;
+              font-size:20px;
+              padding-right:7px;
+            }
+
+            input {
+              max-width:70px;
+            }
+          }
+        }
+      } // End .amount-option
+
+      .hint {
+        padding-top:4px;
+        text-align:center;
+      }
+
+    } // End .choose-amount
+
+    #personalize {
+      border-bottom:0px;
+      .box-shadow(none);
+
+      h2 {
+        margin-bottom:0px;
+      }
+
+      .control-group {
+        margin-right:10px;
+        
+        input {
+          width:100%;
+        }
+      }
+
+
+      .hint {
+        margin-bottom: 12px;
+      }
+    }
+
+    #pay {
+      padding-left:@fluidGridGutterWidth;
+      border-bottom:none;
+      
+      // Left border goes here rather than personalize because it is the
+      // vertically longer of the two.
+      border-left: @sectionSeparator;
+      .box-shadow(1px 0px 0px white inset);
+
+      .control-group {
+        margin-right:10px;
+      }
+
+      input {
+        width:100%;
+      }
+
+      input#card-cvc, input#postal-code {
+        max-width:50px;
+      }
+    }
+
+    #review-button {
+      margin-top:15px;
+
+      strong {
+        padding-left:15px;
+        padding-right:15px;
+      }
+    }
+
+    // Styling for the "Review Order" modal.
+    &#review {
+      .box-shadow(0px 0px 8px rgba(0,0,0,0.3));
+      border:1px solid #AAA;
+      border-radius: 0px;
+      color: @grayLight;
+      font-size:14px;
+      line-height:normal;
+      
+      // Override inappropriate responsive CSS from
+      // assets/bootstrap-modal/css/bootstrap-modal.css
+      top:50%;
+      left:50%;
+      right:50%;
+
+      h2, h3 {
+        color:@headerColor;
+        text-transform:uppercase;        
+      }
+
+      h2 {
+        margin-bottom:0px;
+        line-height:29px;
+      }
+
+      h3 {
+        font-size:14px;
+        font-weight:600;
+        line-height:normal;
+      }
+
+      .modal-header {
+        border-bottom:@sectionSeparator;
+      }
+
+      .modal-body {
+        border-top:1px solid white;
+        background: rgba(250,250,250,1);
+      }
+
+      .summary-item {
+        font-weight:600;
+      }
+
+      .purchaser-summary {
+        .card-number-placeholder {
+          font-weight:normal;
+        }
+
+        .billing {
+          margin-top:10px;
+        }
+      }
+
+      .price-summary {
+        margin-top:10px;
+
+        table {
+          width: 100%;
+
+          th, td {
+            font-weight:600;
+            text-transform:uppercase;
+          }
+
+          th {
+            text-align:left;
+            width:50%;
+          }
+
+          td {
+            text-align:right;
+            width:50%;
+          }
+
+          .last td, .last th {
+            
+          }
+
+          #total td, #total th {
+            color:@headerColor;
+          }
+        }
+      }
+
+      // Shenanigans to get those nice full-width separators in the modal
+      .modal-body-separator {
+        border-top:@sectionSeparator;
+        .box-shadow(0px 1px 0px white);
+        position:relative;
+        width:300px;
+        left:-15px;
+        margin-top:12px;
+        margin-bottom:12px;
+      }
+
+      // Link to dismiss modal and modify order
+      #modify-order {
+        color:@orange;
+        line-height:35px;
+        border-radius:3px;
+        padding-left:5px;
+        padding-right:5px;
+        text-decoration:underline;
+        cursor:pointer;
+      }
+    }
+
+  } // End #content
+
+
+  @media (max-width:767px) { #content.gift-certificate-checkout, .gift-certificate-modal  {
+    .controls {
+      // Eliminate artifactual input expansion outside of grid due to 100% width setting
+      margin-right:10px;
+
+      input[type="text"] {
+        width:100%;
+      }
+    }
+
+    #masthead {
+      margin-top:20px;
+
+      .previews {
+        margin-left:auto;
+        margin-right:auto;
+      }
+
+      .desktop-previews {
+        display:none;
+      }
+
+      .responsive-previews {
+        display:block;
+      }
+
+    }
+
+    #choose-amount {
+      .amount-option {
+        // Space out the buttons once they snap to vertical alignment
+        margin-bottom: 10px;
+      }
+    }
+
+    #personalize {
+      border-bottom:@sectionSeparator;
+      .box-shadow(0px 1px 0px white);
+    }
+
+    #pay {
+      // Now that sections are vertical, remove previous separation between this section
+      // and #personalize.
+      border-left: none;
+      padding-left:0px;
+      .box-shadow(none);
+    }
+  }} // End 767px Media
+
+  @media (max-width:480px) { #content.gift-certificate-checkout, .gift-certificate-modal {
+    #masthead {
+      .certificatePreviews(150px);
+    }
+  }} // End 480px Media
+} // End .giftCertificates()
+
+.giftCertificates();
