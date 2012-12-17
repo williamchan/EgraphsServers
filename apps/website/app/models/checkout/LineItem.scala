@@ -7,12 +7,12 @@ import services.db.{SavesAsEntity, Schema}
 import services.{MemberLens, Time}
 import scalaz.Lens
 
-trait LineItem[+TransactedT] extends HasLineItemEntity {
-  def id = _entity.id
-  def amount: Money = Money.of(CurrencyUnit.USD, _entity._amountInCurrency.bigDecimal)
+trait LineItem[+TransactedT] {
+  def id: Long
+  def amount: Money
   def itemType: LineItemType[TransactedT]
   def subItems: Seq[LineItem[_]]
-  def toJson: String                    // TODO(SER-499): Use Json type
+  def toJson: String                    // TODO(SER-499): Use Json type, maybe even Option
   def domainObject: TransactedT
   def _domainEntityId: Long
 
@@ -38,19 +38,21 @@ trait LineItem[+TransactedT] extends HasLineItemEntity {
 }
 
 case class LineItemEntity(
-  id: Long = 0L,
-  _checkoutId: Long = 0L,
-  _itemTypeId: Long = 0L,
   _amountInCurrency: BigDecimal = BigDecimal(0),
   notes: String = "",
+  id: Long = checkout.UnsavedEntity,
+  _checkoutId: Long = checkout.UnsavedEntity,
+  _itemTypeId: Long = checkout.UnsavedEntity,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp
-) extends KeyedEntity[Long]
+) extends KeyedEntity[Long] {
+  def this(amount: Money) = this(amount.getAmount)
+}
 
 
 
 
-trait LineItemEntityLenses[T <: LineItem[_]] { this: T =>
+trait LineItemEntityLenses[T <: LineItem[_]] { this: T with HasLineItemEntity =>
   import MemberLens.Conversions._
 
   /**
@@ -104,7 +106,7 @@ trait LineItemEntityGetters[T <: LineItem[_]] { this: T with LineItemEntityLense
 
 
 trait LineItemEntitySetters[T <: LineItem[_]] { this: T with LineItemEntityLenses[T] =>
-  lazy val withCheckoutId = checkoutIdField.set _
+  override def withCheckoutId(newId: Long) = checkoutIdField.set(newId)
   lazy val withItemTypeId = itemTypeIdField.set _
   lazy val withAmountInCurrency = amountInCurrencyField.set _
 }

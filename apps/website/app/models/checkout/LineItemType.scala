@@ -10,8 +10,11 @@ import scalaz.Lens
 import models.enums.{CodeType, LineItemNature}
 
 
-trait LineItemType[+TransactedT] extends HasLineItemTypeEntity {
-  def id = _entity.id
+trait LineItemType[+TransactedT] {
+  def id: Long
+  def description: String
+  def nature: LineItemNature
+  def codeType: CodeType
   def toJson: String
 
   /**
@@ -31,11 +34,11 @@ trait LineItemType[+TransactedT] extends HasLineItemTypeEntity {
    *   NOTE: IndexedSeq is an optimization for random access, which isn't really the use case here;
    *         Using a Seq here would allow us to use the list monad instead of option + list
    *
-   * @return Some(new sequence of line items) if the line item type was successfully applied.
+   * @return Seq(new line items) if the line item type was successfully applied.
    *   Otherwise None, to signal that the checkout will try to resolve it again on the next round.
    */
    def lineItems(
-     resolvedItems: Seq[LineItem[_]] = IndexedSeq(),
+     resolvedItems: Seq[LineItem[_]],
      pendingResolution: Seq[LineItemType[_]]
    ): Seq[LineItem[TransactedT]]
  }
@@ -53,10 +56,10 @@ case class LineItemTypeEntity private (
 ) extends KeyedEntity[Long] {
 
   def this(
-    id: Long = 0,
     desc: String = "",
     nature: LineItemNature,
     codeType: CodeType,
+    id: Long = checkout.UnsavedEntity,
     created: Timestamp = Time.defaultTimestamp,
     updated: Timestamp = Time.defaultTimestamp
   ) = this(id, desc, nature.name, codeType.name, created, updated)
@@ -66,9 +69,6 @@ case class LineItemTypeEntity private (
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-//
-// this stuff is cool but worry about it later
-//
 
 
 
@@ -78,7 +78,7 @@ case class LineItemTypeEntity private (
  * [[models.checkout.LineItemTypeEntitySetters]], which automatically generate `description`
  * and `nature` members / mutators for you.
  */
-trait LineItemTypeEntityLenses[T <: LineItemType[_]] { this: T =>
+trait LineItemTypeEntityLenses[T <: LineItemType[_]] { this: T with HasLineItemTypeEntity =>
   import MemberLens.Conversions._
 
   /**
@@ -123,12 +123,9 @@ trait LineItemTypeEntityLenses[T <: LineItemType[_]] { this: T =>
 
 
 trait LineItemTypeEntityGetters[T <: LineItemType[_]] { this: T with LineItemTypeEntityLenses[T] =>
-  //override
-  lazy val description = descField()
-  //override
-  lazy val nature = natureField()
-  //override
-  lazy val codeType = codeTypeField()
+  override lazy val description = descField()
+  override lazy val nature = natureField()
+  override lazy val codeType = codeTypeField()
 }
 
 

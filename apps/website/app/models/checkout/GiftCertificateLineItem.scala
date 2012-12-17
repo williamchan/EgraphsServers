@@ -19,22 +19,24 @@ import org.squeryl.PrimitiveTypeMode._
  * @param subItems - items that depend upon or relate strongly to this gift certificate
  * @param _domainEntityId
  */
-case class GiftCertificateLineItem (
+case class GiftCertificateLineItem private (
   _entity: LineItemEntity = new LineItemEntity(),
-  itemType: GiftCertificateLineItemType = GiftCertificateLineItemType.Unset,
+  itemType: GiftCertificateLineItemType,
   subItems: Seq[LineItem[_]] = Nil,
-  _domainEntityId: Long = GiftCertificateLineItem.Unpersisted
+  _domainEntityId: Long = checkout.UnsavedEntity
 ) extends LineItem[Coupon] with HasLineItemEntity
   with LineItemEntityLenses[GiftCertificateLineItem]
   with LineItemEntityGetters[GiftCertificateLineItem]
   with LineItemEntitySetters[GiftCertificateLineItem]
 {
+  override def toJson: String = {
+    // TODO(SER-499): implement once api nailed down
+    ""
+  }
 
-  // TODO(SER-499): implement once api nailed down
-  override def toJson: String = ""
 
   override def domainObject: Coupon = {
-    if (_domainEntityId == GiftCertificateLineItem.Unpersisted) {
+    if (_domainEntityId == checkout.UnsavedEntity) {
       new Coupon(
         name = GiftCertificateLineItem.couponName(itemType),
         discountAmount = amount.getAmount,
@@ -48,6 +50,7 @@ case class GiftCertificateLineItem (
     }
   }
 
+
   /**
    * Presumes that checkoutId is set; persists unsaved instances
    * @return persisted line item
@@ -55,7 +58,7 @@ case class GiftCertificateLineItem (
   override def transact: GiftCertificateLineItem = {
     require(checkoutId > 0, "Cannot transact without setting checkoutId.")
 
-    if (_domainEntityId == GiftCertificateLineItem.Unpersisted) {
+    if (id == checkout.UnsavedEntity) {
       import GiftCertificateLineItemTypeServices.Conversions._
       import GiftCertificateLineItemServices.Conversions._
 
@@ -77,18 +80,15 @@ case class GiftCertificateLineItem (
   }
 
 
-  override protected def entityLens = Lens[GiftCertificateLineItem, LineItemEntity](
-    get = cert => cert._entity,
-    set = (cert, entity) => cert.copy(entity)
-  )
-
-  override def withCheckoutId(newCheckoutId: Long): GiftCertificateLineItem = {
-    this.withCheckoutId(newCheckoutId)
-  }
-
   def withItemType(newType: GiftCertificateLineItemType) = {
     this.copy(itemType = newType).withItemTypeId(newType.id)
   }
+
+
+  override protected lazy val entityLens = Lens[GiftCertificateLineItem, LineItemEntity](
+    get = cert => cert._entity,
+    set = (cert, entity) => cert.copy(entity)
+  )
 }
 
 object GiftCertificateLineItem {
@@ -103,8 +103,6 @@ object GiftCertificateLineItem {
     )
   }
 
-  // constant for unpersisted domain entities' ids
-  protected val Unpersisted = 0
 
   //
   // Coupon helpers

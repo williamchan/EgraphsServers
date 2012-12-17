@@ -2,6 +2,18 @@ package models.checkout
 
 import org.joda.money.{CurrencyUnit, Money}
 import models.enums.LineItemNature
+import org.squeryl.KeyedEntity
+
+package object checkout {
+  /** For _domainEntityId if domain object doesn't get persisted; ex: Tax */
+  val UnusedDomainEntity: Long = -1
+
+  /** For id's of line items and line item types that don't get persisted; ex: Subtotal */
+  val Unpersisted: Long = -2
+
+
+  val UnsavedEntity = 0
+}
 
 /**
  * @param lineItemTypes -- intermediate form of contents of checkout
@@ -15,7 +27,8 @@ case class Checkout(lineItemTypes: Seq[LineItemType[_]] = Nil) {
     }
   }
 
-  // TODO(SER-499): create and append subtotal, tax, total to this Seq
+
+  // TODO(SER-499): append subtotal, tax, total to this Seq
   lazy val lineItems: Seq[LineItem[_]] = {
     // TODO(SER-499): add subtotal, tax, fees, total before processing
 
@@ -60,33 +73,21 @@ case class Checkout(lineItemTypes: Seq[LineItemType[_]] = Nil) {
     for (lineItem <- lineItems; flattened <- lineItem.flatten) yield flattened
   }
 
-  // TODO(SER-499): use SubtotalLineItem
-  /** @return sum of all products in checkout */
-  private def calculateSubtotal: Money = {
-    // TODO(SER-499): this is super awkward, would be nice to refactor
-    def isProduct(item: LineItem[_]) = item.itemType._entity._nature == LineItemNature.Product.name
 
-    lineItems.foldLeft (Money.zero(CurrencyUnit.USD)) {
-      (acc: Money, nextItem: LineItem[_]) =>
-        if (isProduct(nextItem)) acc plus nextItem.amount else acc
-    }
-  }
+  // TODO(SER-499): make helpers for getting by nature, codeType
 
-  // TODO(SER-499): tax and total, should grab from lineItems
-  // lazy val tax: TaxLineItem
-  // lazy val total: TotalLineItem
-
-  // private def calculateTax
-  // private def calculateTotal
-
-  // def lineItemsToJson: String
-  // def lineItemTypesToJson: String
 
   def transact: Checkout = {
+    // TODO(SER-499): implement this
     // transact checkout entity
     // for(lineItem <- lineItems) yield lineItem.withCheckoutId(id).transact
     this
   }
+
+
+  // TODO(SER-499): checkout serialization
+  // def lineItemsToJson: String
+  // def lineItemTypesToJson: String
 }
 
 object Checkout {

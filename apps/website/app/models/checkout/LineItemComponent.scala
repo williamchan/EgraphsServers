@@ -1,10 +1,21 @@
 package models.checkout
 
-import services.db.{SavesAsEntity, Schema}
+import services.db.{HasEntity, SavesAsEntity, Schema}
+import org.joda.money.{CurrencyUnit, Money}
+import org.squeryl.KeyedEntity
+import services.AppConfig
 
-trait HasEntity[T] { def _entity: T}
-trait HasLineItemEntity extends HasEntity[LineItemEntity]
-trait HasLineItemTypeEntity extends HasEntity[LineItemTypeEntity]
+// TODO(SER-499): compare implementing setters here vs. in lenses
+trait HasLineItemEntity extends HasEntity[LineItemEntity] {
+  this: LineItem[_] =>
+  def amount: Money = Money.of(CurrencyUnit.USD, _entity._amountInCurrency.bigDecimal)
+  def id = _entity.id
+}
+
+trait HasLineItemTypeEntity extends HasEntity[LineItemTypeEntity] {
+  this: LineItemType[_] =>
+  def id = _entity.id
+}
 // Could define more specific traits with entity helper
 
 /**
@@ -49,18 +60,35 @@ trait HasLineItemTypeEntity extends HasEntity[LineItemTypeEntity]
  *   }
  * }}}
  */
-trait LineItemComponent {
-  protected def schema: Schema
+object LineItemComponent {
+  protected val schema: Schema = AppConfig.instance[Schema]
+
+  /**
+   * There must be at least two traits -- for LineItem and LineItemType, as far as I can tell at the
+   * moment -- because the implicit conversions they each implement need to have different names in
+   * order not to shadow each other, which would make it impossible to use both conversions in the
+   * same context (leads to annoying work arounds).
+   */
 
   trait SavesAsLineItemEntity[ModelT <: HasLineItemEntity]
     extends SavesAsEntity[ModelT, LineItemEntity]
   {
     override protected def table = schema.lineItems
+    val Conversions: LineItemSavingConversions
+
+    trait LineItemSavingConversions extends EntitySavingConversions {
+      implicit def itemToSavingDsl(item: ModelT) = new SavingDSL(item)
+    }
   }
 
   trait SavesAsLineItemTypeEntity[ModelT <: HasLineItemTypeEntity]
     extends SavesAsEntity[ModelT, LineItemTypeEntity]
   {
     override protected def table = schema.lineItemTypes
+    val Conversions: LineItemTypeSavingConversions
+
+    trait LineItemTypeSavingConversions extends EntitySavingConversions {
+      implicit def typeToSavingDsl(itemType: ModelT) = new SavingDSL(itemType)
+    }
   }
 }
