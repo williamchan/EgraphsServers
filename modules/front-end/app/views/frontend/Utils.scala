@@ -3,6 +3,7 @@ import play.Play
 import java.io.File
 import controllers.Assets
 import scala.annotation.tailrec
+import models.frontend.egraphs.EgraphViewModel
 
 /**
  * Front-end utilities that otherwise had no home.
@@ -42,6 +43,11 @@ object Utils {
       case (false, false) => "her"
       case (false, true) => "Her"
     }
+  }
+  
+  def egraphOrEgraphs(numberOfEgraphs: Int): String = {
+    if (numberOfEgraphs == 1) "Egraph"
+    else "Egraphs"
   }
 
   def getFacebookShareLink(appId: String,

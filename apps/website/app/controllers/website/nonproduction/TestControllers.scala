@@ -7,9 +7,12 @@ import services.http.ControllerMethod
 import services.logging.Logging
 import play.api.mvc.Controller
 import services.http.filters.HttpFilters
+import models.AccountStore
+import utils.TestData
 
 object TestControllers extends Controller with Logging {
   val controllerMethod = AppConfig.instance[ControllerMethod]
+  val accountStore = AppConfig.instance[AccountStore]
   private val filters = AppConfig.instance[HttpFilters]
 
   def logStuffThenThrowException() = filters.requireApplicationId.test {

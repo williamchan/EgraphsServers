@@ -8,7 +8,7 @@ import play.api.test.FakeRequest
 import _root_.utils.EgraphsUnitTest
 import _root_.utils.TestHelpers
 import _root_.utils.FunctionalTestUtils.{routeName, NonProductionEndpointTests}
-import _root_.controllers.routes.WebsiteControllers.getBlob
+import controllers.routes.WebsiteControllers.getBlob
 import play.api.mvc.ChunkedResult
 import play.api.libs.iteratee.Iteratee
 import play.api.libs.concurrent.Promise

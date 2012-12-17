@@ -252,6 +252,26 @@ class OrderTests extends EgraphsUnitTest
     orderIds should contain (order2.id)
   }
 
+  it should "create FulfilledEgraphViewModels from orders" in new EgraphsTestApplication {
+    val (buyer, recipient, celebrity, product) = TestData.newSavedOrderStack()
+    val admin = Administrator().save()
+    celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
+
+    val order1 = buyer.buy(product, recipient=recipient).save()
+    val order2 = buyer.buy(product, recipient=recipient).save()
+    val egraph1 = TestData.newSavedEgraph()
+    val egraph2 = TestData.newSavedEgraph()
+
+    val results = List((order1, egraph1), (order2, egraph2))
+
+    implicit val request = FakeRequest()
+    val fulfilledViews = GalleryOrderFactory.makeFulfilledEgraphViewModel(results, "fakeappid", consumerApp)(request)
+
+    fulfilledViews.size should be (2)
+    fulfilledViews.toList(0).orderId should be (order1.id)
+    fulfilledViews.toList(1).orderId should be (order2.id)
+  }
+
   "redactedName" should "redact properly" in new EgraphsTestApplication {
     Order(recipientName="Herp Derpson-Schiller").redactedRecipientName should be ("Herp D.S.")
     Order(recipientName="Herp").redactedRecipientName should be ("Herp")
@@ -262,48 +282,44 @@ class OrderTests extends EgraphsUnitTest
       Order(recipientName=herpDerpson).redactedRecipientName should be ("Herp D.")
     }
   }
-
-
-  "GalleryOrderFactory" should "create FulfilledEgraphViewModels from orders" in new EgraphsTestApplication {
-    val (buyer, recipient, celebrity, product) = TestData.newSavedOrderStack()
-    val admin = Administrator().save()
-    celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
-
-    val order = buyer.buy(product, recipient=recipient).save()
-    val order1 = buyer.buy(product, recipient=recipient).save()
-    val egraph = TestData.newSavedEgraph()
-
-    val results = List((order, Option(egraph)), (order, None))
-
-    implicit val request = FakeRequest()
-    val fulfilledViews = GalleryOrderFactory.makeFulfilledEgraphViewModel(results, "fakeappid", consumerApp)(request)
-    //create an egraph
-
-    fulfilledViews.size should be (2)
-    fulfilledViews.toList(0).get.orderId should be (order.id)
-    //unfulfilled egraph should not have created a view model
-    fulfilledViews.toList(1).isEmpty should be (true)
-  }
   
-  "filterPendingOrders" should "return filtered results with user displayable egraphs" in new EgraphsTestApplication {
-    val (buyer, recipient, celebrity, product) = TestData.newSavedOrderStack()
-    val admin = Administrator().save()
-    celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
+  "filterPendingOrders" should "include egraphs that have failed biometrics" in new EgraphsTestApplication {
+    val (order, recipient) = newOrderAndRecipient
 
-    val order = buyer.buy(product, recipient=recipient).save()
-
-    val egraph = order.newEgraph.save()
-
-    TestData.newSavedEgraph(Some(order)).withEgraphState(EgraphState.FailedBiometrics).save()
-    TestData.newSavedEgraph(Some(order)).withEgraphState(EgraphState.RejectedByAdmin).save()
-    TestData.newSavedEgraph(Some(order)).withEgraphState(EgraphState.Published).save()
+    // failing biometrics does not currently mean that an Egraph should not be displayed
+    // (in the future, with an improved biometrics solution, this may change)
+    newSavedEgraphsWithStates(order, EgraphState.FailedBiometrics)
 
     val results = GalleryOrderFactory.filterPendingOrders(orderStore.galleryOrdersWithEgraphs(recipient.id).toList)
-
     results.size should be (1)
+  }
 
+  "filterPendingOrders" should "include egraphs that are awaiting verification, that have passed " +
+  		"biometrics, or that are approved by admin" in new EgraphsTestApplication {
+    
+    val (order, recipient) = newOrderAndRecipient
+    newSavedEgraphsWithStates(order, EgraphState.AwaitingVerification, EgraphState.PassedBiometrics, EgraphState.ApprovedByAdmin)
+
+    val results = GalleryOrderFactory.filterPendingOrders(orderStore.galleryOrdersWithEgraphs(recipient.id).toList)
+    results.size should be (3)
+  }
+  
+  "filterPendingOrders" should "not include an Egraph that's rejected by admin or that's already published" in new EgraphsTestApplication {
+    val (order, recipient) = newOrderAndRecipient
+    
+    // neither of these Egraphs should affect the gallery size
+    newSavedEgraphsWithStates(order, EgraphState.RejectedByAdmin, EgraphState.Published)
+    
+    val results = GalleryOrderFactory.filterPendingOrders(orderStore.galleryOrdersWithEgraphs(recipient.id).toList)
+    results.size should be (0)
+  }
+  
+  "filterPendingOrders" should "contain the Egraph we expect" in new EgraphsTestApplication {
+    val (order, recipient) = newOrderAndRecipient
+    val egraph = order.newEgraph.save()
+    
+    val results = GalleryOrderFactory.filterPendingOrders(orderStore.galleryOrdersWithEgraphs(recipient.id).toList)
     val queriedEgraph = results.head._2.get
-
     queriedEgraph.id should be (egraph.id)
   }
 
@@ -312,5 +328,20 @@ class OrderTests extends EgraphsUnitTest
   //
   private def newCustomerAndProduct: (Customer, Product) = {
     (TestData.newSavedCustomer(), TestData.newSavedProduct())
+  }
+  
+  private def newOrderAndRecipient: (Order, Customer) = {
+    val (buyer, recipient, celebrity, product) = TestData.newSavedOrderStack()
+    val admin = Administrator().save()
+    celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
+    val order = buyer.buy(product, recipient=recipient).save()
+    
+    (order, recipient)
+  }
+  
+  private def newSavedEgraphsWithStates(order: Order, states: EgraphState.EnumVal*) = {
+    for (state <- states) {
+      TestData.newSavedEgraph(Some(order)).withEgraphState(state).save()
+    }
   }
 }
