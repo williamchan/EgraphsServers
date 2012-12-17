@@ -27,13 +27,18 @@ class Schema @Inject() (
   @CurrentTransaction currentTxnConnectionFactory: () => Connection) extends org.squeryl.Schema with Logging {
 
   import uk.me.lings.scalaguice.InjectorExtensions._
-  
 
   // Putting this here because Celebrity.findByTextQuery needs it, but this feels wrong.
   def getTxnConnectionFactory = {
     currentTxnConnectionFactory()
   }
 
+  /**
+   * This is the default behavior for all foreign keys created.  They can be overridden where they
+   * are declared.
+   *
+   * Docs: http://squeryl.org/relations.html
+   */
   override def applyDefaultForeignKeyPolicy(foreignKeyDeclaration: ForeignKeyDeclaration) = {
     foreignKeyDeclaration.constrainReference
   }
