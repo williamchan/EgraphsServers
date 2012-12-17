@@ -202,6 +202,9 @@ class Schema @Inject() (
   val accountToTransaction = oneToManyRelation(accounts, cashTransactions)
     .via((account, cashTransaction) => account.id === cashTransaction.accountId)
 
+  val categoryToCategoryValue = oneToManyRelation(categories, categoryValues)	
+    .via((category, categoryValue) => category.id === categoryValue.categoryId)
+
   val celebrityToEnrollmentBatches = oneToManyRelation(celebrities, enrollmentBatches)
     .via((celebrity, enrollmentBatch) => celebrity.id === enrollmentBatch.celebrityId)
   val celebrityToProduct = oneToManyRelation(celebrities, products)
