@@ -16,15 +16,11 @@ alter table VBGFinishVerifyTransaction drop constraint VBGFinishVerifyTransactio
 alter table VBGStartEnrollment drop constraint VBGStartEnrollmentFK15;
 alter table VBGStartVerification drop constraint VBGStartVerificationFK17;
 alter table VBGVerifySample drop constraint VBGVerifySampleFK18;
-alter table XyzmoAddProfile drop constraint XyzmodropProfileFK21;
-alter table XyzmoAddUser drop constraint XyzmodropUserFK20;
+alter table XyzmoAddProfile drop constraint XyzmoAddProfileFK21;
+alter table XyzmoAddUser drop constraint XyzmoAddUserFK20;
 alter table XyzmoDeleteUser drop constraint XyzmoDeleteUserFK19;
 alter table XyzmoEnrollDynamicProfile drop constraint XyzmoEnrollDynamicProfileFK22;
 alter table XyzmoVerifyUser drop constraint XyzmoVerifyUserFK23;
-alter table CategoryValueRelationship drop constraint CategoryValueRelationshipFK1;
-alter table CategoryValueRelationship drop constraint CategoryValueRelationshipFK2;
-alter table CelebrityCategoryValue drop constraint CelebrityCategoryValueFK3;
-alter table CelebrityCategoryValue drop constraint CelebrityCategoryValueFK4;
 
 -- Add new constaints without delete cascade
 alter table EnrollmentBatch add constraint EnrollmentBatchFK15 foreign key (celebrityId) references Celebrity(id);
@@ -54,13 +50,16 @@ alter table XyzmoVerifyUser add constraint XyzmoVerifyUserFK39 foreign key (egra
 alter table CategoryValue add constraint CategoryValueFK14 foreign key (categoryId) references Category(id);
 
 -- Deletions of a Category or CategoryValue should delete a join value if it is there.
+alter table CategoryValueRelationship drop constraint CategoryValueRelationshipFK1;
+alter table CategoryValueRelationship drop constraint CategoryValueRelationshipFK2;
 alter table CategoryValueRelationship add constraint CategoryValueRelationshipFK1 foreign key (categoryValueId) references CategoryValue(id) on delete cascade;
 alter table CategoryValueRelationship add constraint CategoryValueRelationshipFK2 foreign key (categoryId) references Category(id) on delete cascade;
 
 -- Deletions of a Celebrity or CategoryValue should delete a join value if it is there.
+alter table CelebrityCategoryValue drop constraint CelebrityCategoryValueFK3;
+alter table CelebrityCategoryValue drop constraint CelebrityCategoryValueFK4;
 alter table CelebrityCategoryValue add constraint CelebrityCategoryValueFK3 foreign key (celebrityId) references Celebrity(id) on delete cascade;
 alter table CelebrityCategoryValue add constraint CelebrityCategoryValueFK4 foreign key (categoryValueId) references CategoryValue(id) on delete cascade;
-
 
 # --- !Downs
 
@@ -89,10 +88,37 @@ alter table XyzmoEnrollDynamicProfile drop constraint XyzmoEnrollDynamicProfileF
 alter table XyzmoVerifyUser drop constraint XyzmoVerifyUserFK39;
 
 -- Add all the old constraints.
+alter table EnrollmentBatch add constraint EnrollmentBatchFK10 foreign key (celebrityId) references Celebrity(id) on delete cascade;
+alter table Usernames add constraint UsernamesFK11 foreign key (customerId) references Customer(id) on delete cascade;
+alter table Orders add constraint OrdersFK7 foreign key (buyerId) references Customer(id) on delete cascade;
+alter table Orders add constraint OrdersFK8 foreign key (recipientId) references Customer(id) on delete cascade;
+alter table EnrollmentSample add constraint EnrollmentSampleFK11 foreign key (enrollmentBatchId) references EnrollmentBatch(id) on delete cascade;
+alter table Egraph add constraint EgraphFK9 foreign key (orderId) references Orders(id) on delete cascade;
+alter table PrintOrder add constraint PrintOrderFK10 foreign key (orderId) references Orders(id) on delete cascade;
+alter table Orders add constraint OrdersFK6 foreign key (productId) references Product(id) on delete cascade;
+alter table VBGAudioCheck add constraint VBGAudioCheckFK12 foreign key (enrollmentBatchId) references EnrollmentBatch(id) on delete cascade;
+alter table VBGEnrollUser add constraint VBGEnrollUserFK13 foreign key (enrollmentBatchId) references EnrollmentBatch(id) on delete cascade;
+alter table VBGFinishEnrollTransaction add constraint VBGFinishEnrollTransactionFK14 foreign key (enrollmentBatchId) references EnrollmentBatch(id) on delete cascade;
+alter table VBGFinishVerifyTransaction add constraint VBGFinishVerifyTransactionFK15 foreign key (egraphId) references Egraph(id) on delete cascade;
+alter table VBGStartEnrollment add constraint VBGStartEnrollmentFK15 foreign key (enrollmentBatchId) references EnrollmentBatch(id) on delete cascade;
+alter table VBGStartVerification add constraint VBGStartVerificationFK17 foreign key (egraphId) references Egraph(id) on delete cascade;
+alter table VBGVerifySample add constraint VBGVerifySampleFK18 foreign key (egraphId) references Egraph(id) on delete cascade;
+alter table XyzmoAddProfile add constraint XyzmoAddProfileFK21 foreign key (enrollmentBatchId) references EnrollmentBatch(id) on delete cascade;
+alter table XyzmoAddUser add constraint XyzmoAddUserFK20 foreign key (enrollmentBatchId) references EnrollmentBatch(id) on delete cascade;
+alter table XyzmoDeleteUser add constraint XyzmoDeleteUserFK19 foreign key (enrollmentBatchId) references EnrollmentBatch(id) on delete cascade;
+alter table XyzmoEnrollDynamicProfile add constraint XyzmoEnrollDynamicProfileFK22 foreign key (enrollmentBatchId) references EnrollmentBatch(id) on delete cascade;
+alter table XyzmoVerifyUser add constraint XyzmoVerifyUserFK23 foreign key (egraphId) references Egraph(id) on delete cascade;
+alter table CategoryValueRelationship add constraint CategoryValueRelationshipFK1 foreign key (categoryValueId) references CategoryValue(id);
 
--- Just remove the new constraints
-alter table CategoryValue drop constraint CategoryValueFK14;
+-- Remove the new constraints and add the old ones
 alter table CategoryValueRelationship drop constraint CategoryValueRelationshipFK1;
 alter table CategoryValueRelationship drop constraint CategoryValueRelationshipFK2;
+alter table CategoryValueRelationship add constraint CategoryValueRelationshipFK1 foreign key (categoryValueId) references CategoryValue(id);
+alter table CategoryValueRelationship add constraint CategoryValueRelationshipFK2 foreign key (categoryId) references Category(id);
 alter table CelebrityCategoryValue drop constraint CelebrityCategoryValueFK3;
 alter table CelebrityCategoryValue drop constraint CelebrityCategoryValueFK4;
+alter table CelebrityCategoryValue add constraint CelebrityCategoryValueFK3 foreign key (celebrityId) references Celebrity(id);
+alter table CelebrityCategoryValue add constraint CelebrityCategoryValueFK4 foreign key (categoryValueId) references CategoryValue(id);
+
+-- We can just remove this one since it wasn't there before
+alter table CategoryValue drop constraint CategoryValueFK14;
