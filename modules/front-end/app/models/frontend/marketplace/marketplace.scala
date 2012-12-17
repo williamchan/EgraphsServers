@@ -18,6 +18,9 @@ import play.api.libs.json._
  *  maxPrice = 10000, 
  *  secondaryText = "Boston Red Sox"
  * ) 
+ * The active state in these classes implies that the object is selected, or otherwise affecting the results 
+ * of the data that is being rendered. This ties in with our front end code that uses the "active" class to signify elements
+ * that are selected, toggled on, or otherwise activated to represent the data model. 
  **/
 
 case class MarketplaceCelebrity(

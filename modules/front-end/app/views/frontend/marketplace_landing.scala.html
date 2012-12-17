@@ -12,8 +12,8 @@
 @import models.frontend.marketplace.MarketplaceConversions._
 
 @**
-  Page for displaying marketplace results. 
-  Vertical buttons are currently hidden. Will be used in the future, when we have multiple verticals.
+  Default landing page for the marketplace. Supports displaying multiple sets of results w/o any special scrolling behavior. 
+  Categories on the left hand side are condensed, and category selection in the mobile view is not multiple select. 
 **@
 @init = {
 @*** 
@@ -25,7 +25,6 @@
         v.categoryViewModels.foldLeft[Map[String, JsValue]](Map())(
           (a, b) => a ++ b.asActiveMap)
       }.toMap).toString());
-  Egraphs.page.categorySelected = @verticalViewModels.exists(v => v.categoryViewModels.exists(c => c.active));
   Egraphs.page.queryUrl = "@marketplaceRoute";
   Egraphs.page.query = "";
   Egraphs.page.verticalSlug = "@verticalViewModels.find( v => v.active).map(v => "/" + v.urlSlug).getOrElse("")";

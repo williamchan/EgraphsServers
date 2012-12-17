@@ -26,7 +26,12 @@ case class Vertical(categoryValue: CategoryValue,
                     shortName: String,
                     urlSlug: String,
                     iconUrl: String,
-                    featuredQuery: String)
+                    featuredQuery: String) {
+  lazy val categories = {
+    categoryValue.categories
+  }
+
+}
 
 class VerticalStore @Inject() (categoryStore: CategoryStore) {
 
