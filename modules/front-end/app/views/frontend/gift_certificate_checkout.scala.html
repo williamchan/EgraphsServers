@@ -1,0 +1,241 @@
+@()(
+  implicit
+  headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData,
+  authToken: egraphs.authtoken.AuthenticityToken
+)
+
+@**
+ * Template for the gift certificate checkout page. See base_template.scala.html for description
+ * of implicit params.
+ *@
+
+@import models.frontend.forms.Field
+
+
+@** SVG previews of the gift certificate *@
+@previews = {
+  <div class="previews">
+    <div class="preview foreground">
+      <object data='@EgraphsAssets.at("images/gift-certificate-preview.svgz")' type="image/svg+xml"></object>
+    </div>
+    <div class="preview background">
+      <object data='@EgraphsAssets.at("images/gift-certificate-preview.svgz")' type="image/svg+xml" ></object>
+    </div>
+  </div>  
+}
+
+@baseBody = {
+  <div id="content" class="gift-certificate-checkout content" role="main">
+    <div id="main">
+      <div class="container">
+        <section id="masthead" class="first">
+          <div class="row-fluid">
+            <div class="span6">
+              <h1>An Egraphs gift certificate is perfect for the holidays.</h1>
+              <div class="responsive-previews">@previews</div>
+              <ul>
+                <li>Gift certificates can be used to connect with any star on the site</li>
+                <li>They can be used over multiple purchases</li>
+                <li>They never expire</li>
+                <li><strong>Buy a gift certificate in four easy steps:</strong></li>
+              </ul>
+            </div>
+            <div class="desktop-previews span6">@previews</div>
+          </div>
+        </section> <!-- End #masthead -->
+        
+        <section id="choose-amount">
+          <h2><span class="checkout-step-count one">1</span>Choose an amount:</h2>
+          <div class="amount-options row-fluid">
+            <div class="amount-option dollar-amount span2">
+              <button class="btn"><span class="dollah">$</span>25</button>
+            </div>
+            <div class="amount-option dollar-amount span2">
+              <button class="btn"><span class="dollah">$</span>50</button>
+            </div>
+            <div class="amount-option dollar-amount span2">
+              <button class="btn active"><span class="dollah">$</span>75</button>
+              <div class="hint">
+                Most popular price point
+              </div>
+            </div>
+            <div class="amount-option dollar-amount span2">
+              <button class="btn"><span class="dollah">$</span>100</button>
+            </div>
+            <div class="amount-option own-amount span4">
+              <button class="btn">Set my own amount</button>
+              <div id="amount-field">
+                <span class="dollah">$</span><input type="text" name="amount-field" value="75" >
+              </div>
+            </div>
+          </div>
+        </section> <!-- End #choose-amount -->
+        
+        <div class="row-fluid">
+          <section id="personalize" class="span6">
+            <h2><span class="checkout-step-count">2</span>Personalize:</h2>
+            <div class="hint">
+              The certificate PDF you receive will contain your name and the recipient's.
+            </div>
+
+            <form class="form-horizontal">
+              <div class="control-group recipient-name">
+                <label class="control-label" for="recipient-name">Recipient name:</label>
+                <div class="controls">
+                  <input id="recipient-name" type="text" name="recipient-name" placeholder="e.g. Tiny Tim" />
+                </div>
+              </div> <!-- End .recipient-name.controls -->
+              <div class="control-group gifter-name">
+                <label class="control-label" for="gifter-name">Your name:</label>
+                <div class="controls">
+                  <input id="gifter-name" type="text" name="gifter-name" placeholder="e.g. Santa Claus" />
+                </div>
+              </div> <!-- End .gifter-name.controls -->
+            </form>
+          </section> <!-- End #personalize -->
+
+          <section id="pay" class="span6">
+            <h2><span class="checkout-step-count">3</span>Pay:</h2>
+            <form class="form-horizontal">
+              <fieldset>
+                <div class="control-group card-name">
+                  <label class="control-label" for="card-name">Full name:</label>
+                  <div class="controls">
+                    <input id="card-name" type="text" name="card-name" />
+                  </div>
+                </div> <!-- End .card-name.controls -->
+
+                <div class="control-group email">
+                  <label class="control-label" for="email">Email:</label>
+                  <div class="controls">
+                    <input id="email" type="text" name="email" />
+                  </div>
+                </div> <!-- End .email.controls -->
+
+                <div class="control-group card-number">
+                  <label class="control-label" for="card-number">Card number:</label>
+                  <div class="controls">
+                    <input id="card-number" type="text" name="card-number" />
+                  </div>
+                </div> <!-- End .card-number.controls -->
+
+                @** in-line styles in this section leave a bad taste in my mouth,
+                but necessary here to override chosen.js pretty selectors *@
+                <div class="control-group card-exp" >
+                  <label class="control-label" for="card-exp-month">Exp. Date:</label>
+                  <div class="controls select card-expiry">
+                    <select id="card-exp-month" class="inline chsn-select" data-placeholder="Month" style="width: 96px">
+                      <option value></option>
+                      <option value="01">January</option>
+                      <option value="02">February</option>
+                      <option value="03">March</option>
+                      <option value="04">April</option>
+                      <option value="05">May</option>
+                      <option value="06">June</option>
+                      <option value="07">July</option>
+                      <option value="08">August</option>
+                      <option value="09">September</option>
+                      <option value="10">October</option>
+                      <option value="11">November</option>
+                      <option value="12">December</option>
+                    </select>
+                    <select id="card-exp-year" name="card-exp-year" class="inline chsn-select" data-placeholder="Year" style="width:65px">
+                      <option value></option>
+                      @for(year <- 2012 to 2020) {
+                        <option value="@year">@year</option>
+                      }
+                    </select>
+                    <div class="alert alert-error hidden">
+                      <button type="button" class="close" data-dismiss="alert">&times;</button>
+                      <span class="error-message">Expiry date error</span>
+                    </div>
+                  </div>
+                </div> <!-- end .control-group -->  
+
+                <div class="control-group card-cvc">
+                  <label class="control-label" for="card-cvc">Security Code:</label>
+                  <div class="controls">
+                    <input id="card-cvc" type="text" name="card-cvc" />
+                  </div>
+                </div> <!-- End .card-cvc.controls -->
+
+                <div class="control-group postal-code">
+                  <label class="control-label" for="postal-code">Postal code:</label>
+                  <div class="controls">
+                    <input id="postal-code" type="text" name="postal-code" />
+                  </div>
+                </div> <!-- End .postal-code.controls -->
+
+                <div class="control-group">
+                  <button id="review-button" class="button right review" type="button" >
+                  <strong>
+                    <span class="checkout-step-count in-button">4</span>
+                    <em>Review Order</em>
+                  </strong>
+                  <span>&raquo;</span>
+                  </button>
+                </div>
+
+              </fieldset>
+            </form>
+          </section> <!-- End #pay -->
+        </div>
+        <section id="review" class="modal hide fade gift-certificate-modal" data-width="300">
+          <div class="modal-header">
+            <button type="button" class="close modify-order" aria-hidden="true">&times;</button>
+            <h2><span class="checkout-step-count">4</span>Review order</h2>
+          </div>
+          <div class="modal-body">
+            <div class="purchaser-summary clearfix">
+              <div class="amount-recipient">
+                <h3 id="recipient-header" >Gift Details:</h3>
+                <div class="summary-item">$75.00 for Bruce Banner from Joshua Johnson</div>
+              </div>
+              <div class="modal-body-separator"></div>
+              <div class="billing">
+                <h3>Billing info:</h3>
+                <div class="summary-item">
+                  <div>Joshua Johnson</div>
+                  <div class="card-number-placeholder">Visa XXXXXXXXXXXX4021</div>
+                </div>
+              </div> <!-- End .billing -->              
+            </div> <!-- End .purchaser-summary -->
+            <div class="modal-body-separator"></div>
+            <div class="price-summary">
+              <table>
+                <tr>
+                  <th>Subtotal</th>
+                  <td>$75.00</td>
+                </tr>
+                <tr class="last">
+                  <th>Tax</th>
+                  <td>$0.00</td>
+                </tr>
+                <tr id="total">
+                  <th>Total</th>
+                  <td>$75.00</td>
+                </tr>
+              </table>
+            </div> <!-- End .price-summary -->
+            <div class="modal-body-separator"></div>
+            <div class="purchase-container clearfix">
+              <span id="modify-order" class="modify-order" >Modify order</a></span>
+              @tags.arrow_button(
+                caption="Buy now",
+                classes="button right review"
+              )
+            </div>
+          </div> <!-- End .modal-body -->
+        </section> <!-- End #review -->
+      </div>
+    </div>
+  </div>
+}
+
+@base_template(
+  title="Gift Certificates",
+  jsMain = "pages/gift_certificates",
+  cssFiles = Seq(EgraphsAssets.at("bootstrap-modal/css/bootstrap-modal.css").url),  
+  body=baseBody
+)

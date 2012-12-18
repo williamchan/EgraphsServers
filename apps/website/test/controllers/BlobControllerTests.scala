@@ -5,9 +5,9 @@ import play.api.mvc.Request
 import play.api.mvc.Controller
 import play.api.test.Helpers._
 import play.api.test.FakeRequest
-import utils.EgraphsUnitTest
-import utils.TestHelpers
-import utils.FunctionalTestUtils.{routeName, NonProductionEndpointTests}
+import _root_.utils.EgraphsUnitTest
+import _root_.utils.TestHelpers
+import _root_.utils.FunctionalTestUtils.{routeName, NonProductionEndpointTests}
 import controllers.routes.WebsiteControllers.getBlob
 import play.api.mvc.ChunkedResult
 import play.api.libs.iteratee.Iteratee

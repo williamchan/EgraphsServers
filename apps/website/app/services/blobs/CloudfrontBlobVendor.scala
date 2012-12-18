@@ -2,6 +2,7 @@ package services.blobs
 
 import com.google.inject.Inject
 import java.net.URL
+import services.Time.IntsToSeconds._
 
 /**
  * BlobVendor decorator for providing urls that map to the Amazon Cloudfront Content Distribution Network (CDN)
@@ -22,5 +23,8 @@ class CloudfrontBlobVendor @Inject()(domain: String, override protected val blob
       "https://" + domain + url.getPath
     }
   }
-
+  
+  override def secureUrlOption(namespace: String, key: String, expirationSeconds: Int = 5 minutes): Option[String] = {
+    blobVendorDelegate.secureUrlOption(namespace, key, expirationSeconds)
+  }  
 }

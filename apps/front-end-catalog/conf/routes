@@ -65,6 +65,8 @@ GET     /Failed/purchase_error                                    controllers.Fa
 GET     /Finalize/index                                           controllers.Finalize.index
 GET     /Finalize/portrait                                        controllers.Finalize.portrait
 
+GET     /GiftCertificateCheckout/index                            controllers.GiftCertificateCheckout.index
+
 GET     /Landing/featuredStars                                    controllers.Landing.featuredStars(count:Int)
 GET     /Landing/featuredStarsWithNoInventory                     controllers.Landing.featuredStarsWithNoInventory
 GET     /Landing/signupOn                                         controllers.Landing.signupOn

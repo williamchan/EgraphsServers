@@ -127,9 +127,7 @@ class Schema @Inject() (
       usernameHistory.customerId is indexed))
 
   val videoAssets = table[VideoAsset]
-  on(videoAssets)(videoAsset =>
-    declare(
-      videoAsset.url is dbType("varchar(255)")))
+  on(videoAssets)(videoAsset => declare(videoAsset._urlKey is dbType("varchar(255)")))
 
   // ugh, why did I make so many biometrics tables?
   val vbgAudioCheckTable = table[VBGAudioCheck]

@@ -5,18 +5,23 @@ package models.frontend.egraphs
 
 import xml.Elem
 
-
 trait EgraphViewModel {
+  def buyerId: Long
   def orderId: Long
   def orientation: String
   def productUrl: String
   def productPublicName: String
   def productTitle: String
   def productDescription: String
+  def recipientId: Long
+  def recipientName: String
   def thumbnailUrl: String
+  def isPending: Boolean
+  def isGift: Boolean
 }
 
 case class PendingEgraphViewModel(
+  buyerId: Long,
   orderStatus: String,
   orderDetails: OrderDetails,
   orderId: Long,
@@ -25,21 +30,40 @@ case class PendingEgraphViewModel(
   productPublicName: String,
   productTitle: String,
   productDescription: String,
-  thumbnailUrl: String) extends EgraphViewModel
+  recipientId: Long,
+  recipientName: String,
+  thumbnailUrl: String) extends EgraphViewModel {
+
+  val isPending = true
+
+  def isGift: Boolean = {
+    buyerId != recipientId
+  }
+}
 
 case class FulfilledEgraphViewModel(
-  viewEgraphUrl: String,
-  publicStatus: String,
-  signedTimestamp: String,
+  buyerId: Long,
   facebookShareLink: String,
-  twitterShareLink: String,
   orderId: Long,
   orientation: String,
   productUrl: String,
   productPublicName: String,
   productTitle: String,
   productDescription: String,
-  thumbnailUrl: String) extends EgraphViewModel
+  publicStatus: String,
+  recipientId: Long,
+  recipientName: String,
+  signedTimestamp: String,
+  thumbnailUrl: String,
+  twitterShareLink: String,
+  viewEgraphUrl: String) extends EgraphViewModel {
+
+  val isPending = false
+
+  def isGift: Boolean = {
+    buyerId != recipientId
+  }
+}
 
 case class OrderDetails(
   orderDate: String,

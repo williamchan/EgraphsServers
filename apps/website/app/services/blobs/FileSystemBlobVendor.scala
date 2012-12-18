@@ -6,6 +6,7 @@ import org.jclouds.filesystem.reference.FilesystemConstants
 import org.jclouds.blobstore.BlobStoreContextFactory
 import play.api.mvc.Request
 import services._
+import services.Time.IntsToSeconds._
 
 /**
  * [[services.blobs.BlobVendor]] implementation on the local system.
@@ -28,7 +29,6 @@ private[blobs] class FileSystemBlobVendor @Inject() (consumerApp: ConsumerApplic
 
   override def urlOption(namespace: String, key: String): Option[String] = {
     val blobStore = context.getBlobStore
-
     if (!blobStore.blobExists(namespace, key)) {
       None
     }

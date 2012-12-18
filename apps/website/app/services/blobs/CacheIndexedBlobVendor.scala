@@ -5,6 +5,7 @@ import services.cache.CacheFactory
 import services.{Utils, Time}
 import services.logging.Logging
 import redis.clients.jedis.exceptions.JedisException
+import services.Time.IntsToSeconds._
 
 class CacheIndexedBlobVendor @Inject()(cacheFactory: CacheFactory, override protected val blobVendorDelegate: BlobVendor)
   extends BlobVendorComposition
@@ -53,9 +54,13 @@ class CacheIndexedBlobVendor @Inject()(cacheFactory: CacheFactory, override prot
       // just handed to us.
       delegateResponse.map(url => safelyCacheKeyAndUrl(namespace, key, url))
 
-      // Return the delegate's reponse
+      // Return the delegate's response
       delegateResponse
     }
+  }
+  
+  override def secureUrlOption(namespace: String, key: String, expirationSeconds: Int = 5 minutes): Option[String] = {
+    blobVendorDelegate.secureUrlOption(namespace, key, expirationSeconds)
   }
 
   // Caches the blob URL that maps to a namespace/key pair
