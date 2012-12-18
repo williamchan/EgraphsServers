@@ -1,7 +1,7 @@
 package services.report
 
-import java.io.{FileOutputStream, File}
-import services.Time
+import java.io.File
+import services.{Utils, Time}
 import java.text.SimpleDateFormat
 import java.util.TimeZone
 import java.util.Date
@@ -35,17 +35,7 @@ trait Report {
   }
 
   protected def tsvFile(tsv: StringBuilder, reportName: String = reportName): File = {
-    val file = File.createTempFile(reportName + "-" + Time.toBlobstoreFormat(Time.today), ".tsv")
-    file.deleteOnExit()
-    //TODO: checkout automatic resource management: http://stackoverflow.com/questions/2207425/what-automatic-resource-management-alternatives-exists-for-scala
-    val out = new FileOutputStream(file)
-    try {
-      out.write(tsv.toString().getBytes)
-    } catch {
-      case _ => out.close()
-    }
-
-    file
+    Utils.bytesToFile(tsv.toString().getBytes, reportName + "-" + Time.toBlobstoreFormat(Time.today), ".tsv")
   }
 
 }

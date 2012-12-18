@@ -32,7 +32,8 @@ case class PendingEgraphViewModel(
   productDescription: String,
   recipientId: Long,
   recipientName: String,
-  thumbnailUrl: String) extends EgraphViewModel {
+  thumbnailUrl: String,
+  egraphExplanationUrl: String = "") extends EgraphViewModel {
 
   val isPending = true
 
