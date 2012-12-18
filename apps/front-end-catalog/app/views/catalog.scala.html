@@ -3,12 +3,15 @@
 @** Catalogs the permutations of every page we render. *@
 
 @catalogEntry(href: String, description: String) = {<li><a href="@href">@description</a></li>}
-@galleryEntry(href: String) = {
-  <li>@href as
-    <a href="@href&role=other">other</a>
-    <a href="@href&role=admin">admin</a>
-    <a href="@href&role=owner">owner</a>
-  </li>}
+
+@galleryEntry(countFulfilled: Int, countPending: Int, countFulfilledGifts: Int, countPendingGifts: Int) = {
+  <li>(@countFulfilled fulfilled, @countPending pending, @countFulfilledGifts fulfilled gifts, @countPendingGifts pending gifts) as
+    <a href="Account/gallery?user=leeroyjenkins&countFulfilled=@countFulfilled&countPending=@countPending&countFulfilledGifts=@countFulfilledGifts&countPendingGifts=@countPendingGifts&role=other">other</a>
+    <a href="Account/gallery?user=leeroyjenkins&countFulfilled=@countFulfilled&countPending=@countPending&countFulfilledGifts=@countFulfilledGifts&countPendingGifts=@countPendingGifts&role=admin">admin</a>
+    <a href="Account/gallery?user=leeroyjenkins&countFulfilled=@countFulfilled&countPending=@countPending&countFulfilledGifts=@countFulfilledGifts&countPendingGifts=@countPendingGifts&role=owner">owner</a>
+  </li>
+}
+
 <!doctype html>
 <html>
   <head>
@@ -49,9 +52,10 @@
     </ol>
     <h2>Account gallery</h2>
     <ol>
-      @for(number <- 0 until 6) {
-        @galleryEntry("Account/gallery?user=leeroyjenkins&count=" + number)
-      }
+      @galleryEntry(1, 0, 0, 1)
+      @galleryEntry(0, 4, 0, 0)
+      @galleryEntry(0, 0, 2, 2)
+      @galleryEntry(1, 1, 1, 1)
     </ol>
     <h2>Account Verification</h2>
     <ol>

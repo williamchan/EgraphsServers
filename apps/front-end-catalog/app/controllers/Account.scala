@@ -108,16 +108,20 @@ object Account extends Controller with DefaultImplicitTemplateParameters {
     ))
   }
 
-  def gallery(user: String, count: Int, role: String, pending: Int) = Action {
-    val completed = makeEgraphs(user)
-    val pending = makePendingEgraphs(user)
+  def gallery(user: String, role: String, countFulfilled: Int, countPending: Int, countFulfilledGifts: Int, countPendingGifts: Int) = Action {
+    val completed = makeFulfilledEgraphs(user, countFulfilled)
+    val pending = makePendingEgraphs(user, countPending)
+    
+    val giftsCompleted = makeFulfilledGiftEgraphs(user, countFulfilledGifts)
+    val giftsPending = makePendingGiftEgraphs(user, countPendingGifts)
 
     val egraphs = pending ::: completed
+    val giftEgraphs = giftsPending ::: giftsCompleted
 
     Ok(views.html.frontend.account_gallery(
       username = user,  
       egraphs = egraphs,
-      giftEgraphs = egraphs, 
+      giftEgraphs = giftEgraphs, 
       controlRenderer = roles(role),
       galleryCustomerId = 1l
     ))
@@ -134,32 +138,8 @@ object Account extends Controller with DefaultImplicitTemplateParameters {
     request.body.asFormUrlEncoded.foreach(map => map.foreach(println))
   }
 
-  private def makePendingEgraphs(user: String) : List[PendingEgraphViewModel] = {
-    List(
-      PendingEgraphViewModel(
-        buyerId = 1,
-        recipientId = 2,
-        recipientName = "Herp Derpson",
-        orderStatus = "pending",
-        orderDetails = new OrderDetails(
-          orderNumber = 1,
-          price = "$50.00",
-          orderDate = "Nov 19th 2011 @ 2:30PM",
-          statusText = "In progress",
-          shippingMethod = "UPS",
-          UPSNumber = "45Z343YHYU3343322J"),
-        orderId = 1,
-        orientation = "portrait",
-        productUrl="egr.aphs/" + user +"/1",
-        productTitle = "Telling Jokes",
-        productPublicName = "Jimmy Fallon",
-        productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
-          "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
-          " quam. In hac habitasse platea dictumst. Etiam at lectus at nisi blandit lobort" +
-          "is. Donec viverra rhoncus iaculis. In a nibh tellus. Phasellus dignissim egesta" +
-          "s erat nec vestibulum. Proin blandit pellentesque massa, vitae venenatis mauris" +
-          " volutpat at.",
-        thumbnailUrl = pendingThumbnails("portrait")),
+  private def makePendingEgraphs(user: String, count: Int) : List[PendingEgraphViewModel] = {
+    List.fill(count) {
       PendingEgraphViewModel(
         buyerId = 1,
         recipientId = 1,
@@ -172,7 +152,7 @@ object Account extends Controller with DefaultImplicitTemplateParameters {
           statusText = "In progress",
           shippingMethod = "UPS",
           UPSNumber = "45Z343YHYU3343322J"),
-        orderId = 2,
+        orderId = scala.util.Random.nextInt(1000),
         orientation = "landscape",
         productUrl="egr.aphs/" + user +"/1",
         productTitle = "You In Reverse",
@@ -183,14 +163,45 @@ object Account extends Controller with DefaultImplicitTemplateParameters {
           "is. Donec viverra rhoncus iaculis. In a nibh tellus. Phasellus dignissim egesta" +
           "s erat nec vestibulum. Proin blandit pellentesque massa, vitae venenatis mauris" +
           " volutpat at.",
-        thumbnailUrl = pendingThumbnails("landscape"))
-    )
+        thumbnailUrl = pendingThumbnails("landscape")
+      )
+    }
   }
-  private def makeEgraphs(user: String): List[FulfilledEgraphViewModel]  = {
-    List(
-      FulfilledEgraphViewModel(
+  
+  private def makePendingGiftEgraphs(user: String, count: Int) : List[PendingEgraphViewModel] = {
+    List.fill(count) {
+      PendingEgraphViewModel(
         buyerId = 1,
         recipientId = 2,
+        recipientName = "Herp Derpson",
+        orderStatus = "pending",
+        orderDetails = new OrderDetails(
+          orderNumber = 1,
+          price = "$50.00",
+          orderDate = "Nov 19th 2011 @ 2:30PM",
+          statusText = "In progress",
+          shippingMethod = "UPS",
+          UPSNumber = "45Z343YHYU3343322J"),
+        orderId = scala.util.Random.nextInt(1000),
+        orientation = "portrait",
+        productUrl="egr.aphs/" + user +"/1",
+        productTitle = "Telling Jokes",
+        productPublicName = "Jimmy Fallon",
+        productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
+          "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
+          " quam. In hac habitasse platea dictumst. Etiam at lectus at nisi blandit lobort" +
+          "is. Donec viverra rhoncus iaculis. In a nibh tellus. Phasellus dignissim egesta" +
+          "s erat nec vestibulum. Proin blandit pellentesque massa, vitae venenatis mauris" +
+          " volutpat at.",
+        thumbnailUrl = pendingThumbnails("portrait"))
+    }
+  }
+  
+  private def makeFulfilledEgraphs(user: String, count: Int): List[FulfilledEgraphViewModel]  = {
+    List.fill(count) {
+      FulfilledEgraphViewModel(
+        buyerId = 1,
+        recipientId = 1,
         recipientName = "Herp Derpson",
         viewEgraphUrl="www.egraphs.com/egraph/" + user + "1",
         publicStatus = "public",
@@ -205,7 +216,7 @@ object Account extends Controller with DefaultImplicitTemplateParameters {
         ),
         twitterShareLink = views.frontend.Utils.getTwitterShareLink("http://www.egraphs.com/egraphs/1/",
           "Chris bosh gave me an eGraph!"),
-        orderId = 3,
+        orderId = scala.util.Random.nextInt(1000),
         orientation = "landscape",
         productUrl="egr.aphs/" + user +"/1",
         productTitle = "Man or Velociraptor?",
@@ -214,26 +225,12 @@ object Account extends Controller with DefaultImplicitTemplateParameters {
           "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
           " quam. In hac habitasse platea dictumst.",
         thumbnailUrl = landscapePNG
-      ),
-      FulfilledEgraphViewModel(
-        buyerId = 1,
-        recipientId = 2,
-        recipientName = "Herp Derpson",
-        viewEgraphUrl="egr.aphs/" + user + "2",
-        publicStatus = "public",
-        signedTimestamp = "Nov 12th 2012 @ 4:30 PM",
-        facebookShareLink = "http://www.facebook.com",
-        twitterShareLink = "http://www.twitter.com",
-        orderId = 4,
-        orientation = "portrait",
-        productUrl="egr.aphs/" + user +"/2",
-        productTitle = "King James",
-        productPublicName = "Lebron-bron",
-        productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
-          "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
-          " quam. In hac habitasse platea dictumst.",
-        thumbnailUrl = portraitPNG
-      ),
+      )
+    }
+  }
+  
+  private def makeFulfilledGiftEgraphs(user: String, count: Int): List[FulfilledEgraphViewModel]  = {
+    List.fill(count) {
       FulfilledEgraphViewModel(
         buyerId = 1,
         recipientId = 2,
@@ -243,7 +240,7 @@ object Account extends Controller with DefaultImplicitTemplateParameters {
         signedTimestamp = "Nov 12th 2012 @ 4:30 PM",
         facebookShareLink = "www.facebook.com",
         twitterShareLink = "www.twitter.com",
-        orderId = 5,
+        orderId = scala.util.Random.nextInt(1000),
         orientation = "landscape",
         productUrl="egr.aphs/" + user +"/2",
         productTitle = "A cool bro",
@@ -253,8 +250,8 @@ object Account extends Controller with DefaultImplicitTemplateParameters {
           " quam. In hac habitasse platea dictumst.",
         thumbnailUrl = landscapePNG
       )
-    )
-  }
+    }
+  }  
 }
 
 object AccountSettingsFormFactory {
