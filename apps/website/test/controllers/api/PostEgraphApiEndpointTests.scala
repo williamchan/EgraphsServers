@@ -171,10 +171,10 @@ class PostEgraphApiEndpointTests extends EgraphsUnitTest with ProtectedCelebrity
       (celebrity.account, orders)
     }
 
-    for (order <- orders) {
-      getCelebrityOrders(celebrity).length should be (numOrdersMade - i)
+    for ((order, i) <- orders.zipWithIndex) {
+      getCelebrityOrders(celebrityAccount).length should be (orders.size - i)
       
-      val (code, Some(egraphId)) = performEgraphPost(order("id").toString.toLong)(
+      val (code, Some(egraphId)) = performEgraphPost(celebrityAccount, order.id)(
         "signature" -> TestConstants.shortWritingStr,
         "audio" -> TestConstants.voiceStr_8khz(),
         "signedAt" -> "2012-07-12 15:11:22.987"
@@ -182,14 +182,14 @@ class PostEgraphApiEndpointTests extends EgraphsUnitTest with ProtectedCelebrity
       code should be (OK)
     }
 
-    getWillChanOrdersJson.length should be (0)
+    getCelebrityOrders(celebrityAccount).length should be (0)
   }
 
   /** Gets the list of orders needed to be completed by the celebrity and returns their json map */
   private def getCelebrityOrders(celebrityAccount: Account):List[Map[String, Any]] = {
     val url = controllers.routes.ApiControllers.getCelebrityOrders(Some(true)).url
     val Some(ordersResult) = routeAndCall(
-      requestWithCredentials(celebrityAccount).copy(POST, url).withFormUrlEncodedBody(body:_*)
+      requestWithCredentials(celebrityAccount).copy(GET, url)
     )
     status(ordersResult) should be (OK)
     Serializer.SJSON.in[List[Map[String, Any]]](contentAsString(ordersResult))
