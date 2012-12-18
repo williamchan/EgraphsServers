@@ -9,7 +9,7 @@ import play.api.Play
 import utils._
 
 class CelebrityTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with SavingEntityIdLongTests[Celebrity]
   with CreatedUpdatedEntityTests[Long, Celebrity]
   with DateShouldMatchers

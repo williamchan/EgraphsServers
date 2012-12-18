@@ -13,13 +13,13 @@ import services.AppConfig
 import services.Time
 import utils.FunctionalTestUtils.requestWithCredentials
 import utils.FunctionalTestUtils.routeName
-import utils.ClearsCacheAndBlobsAndValidationBefore
+import utils.ClearsCacheBefore
 import utils.EgraphsUnitTest
 import utils.TestData
 
 class GetCelebrityApiEndpointTests 
   extends EgraphsUnitTest 
-  with ClearsCacheAndBlobsAndValidationBefore 
+  with ClearsCacheBefore 
   with ProtectedCelebrityResourceTests
 {
   override protected def routeUnderTest = controllers.routes.ApiControllers.getCelebrity

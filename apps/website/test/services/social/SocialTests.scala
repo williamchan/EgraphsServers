@@ -1,6 +1,6 @@
 package services.social
 
-import utils.{DBTransactionPerTest, ClearsCacheAndBlobsAndValidationBefore, TestData, EgraphsUnitTest}
+import utils.{DBTransactionPerTest, ClearsCacheBefore, TestData, EgraphsUnitTest}
 import models.FulfilledOrder
 import models.enums.EgraphState
 import org.junit.runner.RunWith
@@ -8,7 +8,7 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class SocialTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with DBTransactionPerTest
 {
 

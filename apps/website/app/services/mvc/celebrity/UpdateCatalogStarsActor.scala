@@ -93,7 +93,8 @@ object UpdateCatalogStarsActor extends Logging {
   private[celebrity] val resultsCacheKey = "catalog-stars"
   private[celebrity] case class UpdateCatalogStars(catalogStarsAgent: Agent[IndexedSeq[CatalogStar]])
 
-  implicit val timeout: Timeout = 2 minutes
+  //TODO: DO NOT LET CHECKIN WITH CHANGE, SHOULD BE 2 MINTUES
+  implicit val timeout: Timeout = 10 seconds //2 minutes
 
   //
   // Private members

@@ -1,7 +1,7 @@
 package services.db
 
 import models.{AccountStore, Account}
-import utils.{TestData, ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest}
+import utils.{TestData, ClearsCacheBefore, EgraphsUnitTest}
 import org.squeryl.Session
 import akka.actor.Actor
 import akka.dispatch.Dispatchers
@@ -14,7 +14,7 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class DBSessionTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with Logging
 {
   private def underTest: (DBSession, Connection) = {

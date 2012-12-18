@@ -1,12 +1,12 @@
 package services.blobs
 
-import utils.{ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest}
+import utils.{ClearsCacheBefore, EgraphsUnitTest}
 import services.cache.CacheFactory
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class CacheIndexedBlobVendorTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValidationBefore {
+class CacheIndexedBlobVendorTests extends EgraphsUnitTest with ClearsCacheBefore {
 
   "put" should "not cache if url is not available" in {
     val namespace = "testnamespace"

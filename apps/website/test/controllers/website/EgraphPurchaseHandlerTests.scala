@@ -12,9 +12,9 @@ import services.payment.StripeTestPayment
 import models.FailedPurchaseDataStore
 import services.http.EgraphsSession
 import services.http.forms.purchase.CheckoutShippingForm
-import utils.{ClearsCacheAndBlobsAndValidationBefore, TestData, EgraphsUnitTest}
+import utils.{ClearsCacheBefore, TestData, EgraphsUnitTest}
 
-class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValidationBefore {
+class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheBefore {
 
   private def db = AppConfig.instance[DBSession]
   private def orderStore = AppConfig.instance[OrderStore]

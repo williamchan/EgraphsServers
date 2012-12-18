@@ -9,7 +9,7 @@ import utils.FunctionalTestUtils.routeName
 import models._
 import enums.EnrollmentStatus
 import services.http.BasicAuth
-import utils.{ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest, MockControllerMethod, TestConstants}
+import utils.{ClearsCacheBefore, EgraphsUnitTest, MockControllerMethod, TestConstants}
 import play.api.test.FakeRequest
 import controllers.routes.ApiControllers.getIOSClient
 import utils.FunctionalTestUtils

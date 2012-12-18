@@ -1,7 +1,7 @@
 package controllers.api
 
 import sjson.json.Serializer
-import utils.{ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest, TestConstants, FunctionalTestUtils}
+import utils.{ClearsCacheBefore, EgraphsUnitTest, TestConstants, FunctionalTestUtils}
 import utils.FunctionalTestUtils.{requestWithCredentials, routeName}
 import controllers.routes.ApiControllers.getCelebrityProducts
 import utils.TestData
@@ -11,7 +11,7 @@ import services.db.TransactionSerializable
 
 class GetCelebrityProductsApiEndpointTests 
   extends EgraphsUnitTest 
-  with ClearsCacheAndBlobsAndValidationBefore 
+  with ClearsCacheBefore 
   with ProtectedCelebrityResourceTests
 {
   protected def routeUnderTest = getCelebrityProducts

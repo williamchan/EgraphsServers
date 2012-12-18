@@ -1,6 +1,6 @@
 package services.blobs
 
-import utils.{TestHelpers, ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest, DBTransactionPerTest}
+import utils.{TestHelpers, ClearsCacheBefore, EgraphsUnitTest, DBTransactionPerTest}
 import services.AppConfig
 import services.Time
 import Time.IntsToSeconds._
@@ -10,7 +10,7 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class BlobsTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with DBTransactionPerTest
 {
   import Blobs.Conversions._

@@ -8,7 +8,7 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class VBGAudioCheckTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with SavingEntityIdLongTests[VBGAudioCheck]
   with CreatedUpdatedEntityTests[Long, VBGAudioCheck]
   with DateShouldMatchers
