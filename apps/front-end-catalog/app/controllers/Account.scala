@@ -114,7 +114,13 @@ object Account extends Controller with DefaultImplicitTemplateParameters {
 
     val egraphs = pending ::: completed
 
-    Ok(views.html.frontend.account_gallery(user, egraphs, roles(role)))
+    Ok(views.html.frontend.account_gallery(
+      username = user,  
+      egraphs = egraphs,
+      giftEgraphs = egraphs, 
+      controlRenderer = roles(role),
+      galleryCustomerId = 1l
+    ))
   }
 
   //Basic controller for testing privacy toggles on the gallery pages
@@ -131,6 +137,9 @@ object Account extends Controller with DefaultImplicitTemplateParameters {
   private def makePendingEgraphs(user: String) : List[PendingEgraphViewModel] = {
     List(
       PendingEgraphViewModel(
+        buyerId = 1,
+        recipientId = 2,
+        recipientName = "Herp Derpson",
         orderStatus = "pending",
         orderDetails = new OrderDetails(
           orderNumber = 1,
@@ -152,6 +161,9 @@ object Account extends Controller with DefaultImplicitTemplateParameters {
           " volutpat at.",
         thumbnailUrl = pendingThumbnails("portrait")),
       PendingEgraphViewModel(
+        buyerId = 1,
+        recipientId = 1,
+        recipientName = "Derp Herpson",
         orderStatus = "pending",
         orderDetails = new OrderDetails(
           orderNumber = 1,
@@ -177,6 +189,9 @@ object Account extends Controller with DefaultImplicitTemplateParameters {
   private def makeEgraphs(user: String): List[FulfilledEgraphViewModel]  = {
     List(
       FulfilledEgraphViewModel(
+        buyerId = 1,
+        recipientId = 2,
+        recipientName = "Herp Derpson",
         viewEgraphUrl="www.egraphs.com/egraph/" + user + "1",
         publicStatus = "public",
         signedTimestamp = "Nov 12th 2012 @ 4:30 PM",
@@ -201,6 +216,9 @@ object Account extends Controller with DefaultImplicitTemplateParameters {
         thumbnailUrl = landscapePNG
       ),
       FulfilledEgraphViewModel(
+        buyerId = 1,
+        recipientId = 2,
+        recipientName = "Herp Derpson",
         viewEgraphUrl="egr.aphs/" + user + "2",
         publicStatus = "public",
         signedTimestamp = "Nov 12th 2012 @ 4:30 PM",
@@ -217,6 +235,9 @@ object Account extends Controller with DefaultImplicitTemplateParameters {
         thumbnailUrl = portraitPNG
       ),
       FulfilledEgraphViewModel(
+        buyerId = 1,
+        recipientId = 2,
+        recipientName = "Herp Derpson",
         viewEgraphUrl="egr.aphs/" + user + "2",
         publicStatus = "public",
         signedTimestamp = "Nov 12th 2012 @ 4:30 PM",

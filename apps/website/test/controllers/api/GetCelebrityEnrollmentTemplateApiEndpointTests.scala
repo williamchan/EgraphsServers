@@ -7,6 +7,7 @@ import models.EnrollmentBatch
 import play.api.test.Helpers._
 import utils.EgraphsUnitTest
 import controllers.routes.ApiControllers.getCelebrityEnrollmentTemplate
+import scenario.RepeatableScenarios
 
 class GetCelebrityEnrollmentTemplateApiEndpointTests 
   extends EgraphsUnitTest
@@ -18,7 +19,7 @@ class GetCelebrityEnrollmentTemplateApiEndpointTests
     val _enrollmentPhrases: String = GetCelebrityEnrollmentTemplateApiEndpoint._enrollmentPhrases
     val _text: String = GetCelebrityEnrollmentTemplateApiEndpoint._text
 
-    runFreshScenarios("Will-Chan-is-a-celebrity")
+    val celebrity = RepeatableScenarios.createCelebrity()
 
     val Some(result) = routeAndCall(willChanRequest.copy(method=GET, uri=routeUnderTest.url))
     

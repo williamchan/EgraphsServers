@@ -518,7 +518,6 @@ class CelebrityStore @Inject() (
                  LEFT OUTER JOIN orders o ON (o.inventorybatchid = ib.id AND ib.startdate < now() AND ib.enddate > now() AND
                                               o.productid = p.id)
     WHERE
-     c._enrollmentStatus = 'Enrolled' AND
      c._publishedStatus = 'Published' AND
      p._publishedStatus = 'Published'
     ORDER BY is_order ASC
