@@ -212,19 +212,4 @@ class PostEgraphApiEndpointTests extends EgraphsUnitTest with ProtectedCelebrity
     
     (code, maybeEgraphId)
   }
-
-//  /**
-//   * Assemble the request and get the result.
-//   */
-//  private def routeAndCallPostEnrollmentSample(celebrityAccount: Account,
-//    signatureStr: String = TestConstants.shortWritingStr,
-//    voiceStr: String = TestConstants.voiceStr_8khz): Result = {
-//
-//    val url = controllers.routes.ApiControllers.postEnrollmentSample.url
-//    val req = requestWithCredentials(celebrityAccount).copy(method = POST, uri = url).withFormUrlEncodedBody(
-//      "signature" -> signatureStr,
-//      "audio" -> voiceStr)
-//    val Some(result) = routeAndCall(req)
-//    result
-//  }
 }
