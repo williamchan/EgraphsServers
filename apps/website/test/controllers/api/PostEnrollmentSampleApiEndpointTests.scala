@@ -3,9 +3,7 @@ package controllers.api
 import sjson.json.Serializer
 import utils.FunctionalTestUtils.{
   requestWithCredentials,
-  runFreshScenarios,
-  routeName,
-  runWillChanScenariosThroughOrder
+  routeName
 }
 import play.api.mvc.{ AnyContent, AnyContentAsFormUrlEncoded }
 import utils.TestConstants
@@ -21,9 +19,9 @@ import services.db.{ DBSession, TransactionSerializable }
 import Blobs.Conversions._
 import models.EgraphStore
 import models._
-import scenario.RepeatableScenarios
 import controllers.WebsiteControllers
 import controllers.ApiControllers
+import utils.TestData
 
 class PostEnrollmentSampleApiEndpointTests
   extends EgraphsUnitTest
@@ -46,8 +44,8 @@ class PostEnrollmentSampleApiEndpointTests
   }
 
   routeName(routeUnderTest) should "accept a well-formed enrollment sample" in new EgraphsTestApplication {
-    val (celebrity, celebrityAccount) = db.connected(TransactionSerializable) {
-      val celebrity = RepeatableScenarios.createCelebrity(isFeatured = true)
+    val (celebrity, celebrityAccount) = db.connected(TransactionSerializable) {      
+      val celebrity = TestData.newSavedCelebrity()
       (celebrity, celebrity.account)
     }
 
@@ -66,7 +64,7 @@ class PostEnrollmentSampleApiEndpointTests
 
   it should "complete an enrollment batch when the last requireGd sample is submitted" in new EgraphsTestApplication {
     val (celebrity, celebrityAccount) = db.connected(TransactionSerializable) {
-      val celebrity = RepeatableScenarios.createCelebrity(isFeatured = true)
+      val celebrity = TestData.newSavedCelebrity()
       (celebrity, celebrity.account)
     }
 

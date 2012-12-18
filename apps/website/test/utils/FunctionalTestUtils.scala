@@ -1,5 +1,3 @@
-// TODO: PLAY20 MIGRATION: myyk - I think that we will mostly delete this file (or wholly) since this doesn't seem to be how you hook into 
-//   Play2 in tests.
 package utils
 
 import play.api.test.FakeRequest
@@ -24,26 +22,11 @@ import play.api.http.HeaderNames
 import models._
 import scenario.RepeatableScenarios
 
-//
 /**
  * Common functionality required when writing functional tests against
  * controller methods.
  */
 object FunctionalTestUtils {
-  //  /**
-  //   * Makes an account identified by wchan83@egraphs.com/derp
-  //   */
-  //  def willChanAccount: Account = {
-  //    Account(email = "wchan83@egraphs.com").withPassword(TestData.defaultPassword).right.get
-  //  }
-
-  /**
-   * Makes an API request verified by the credentials from `willChanAccount`
-   */
-  @deprecated("This is bad because it is tied to a specific account.", "Use requestWithCredentials(user: String, password: String) instead.")
-  def willChanRequest: FakeRequest[AnyContent] = {
-    requestWithCredentials("wchan83@egraphs.com", TestData.defaultPassword)
-  }
 
   def requestWithCustomerId(id: Long): FakeRequest[AnyContent] = {
     FakeRequest().withSession(EgraphsSession.Key.CustomerId.name -> id.toString)
@@ -53,6 +36,9 @@ object FunctionalTestUtils {
     FakeRequest().withSession(EgraphsSession.Key.AdminId.name -> id.toString)
   }
 
+  /**
+   * Makes an API request verified by the credentials from provided account
+   */
   def requestWithCredentials(account: Account, password: String = TestData.defaultPassword): FakeRequest[AnyContent] = {
     requestWithCredentials(account.email, password)
   }
@@ -61,39 +47,6 @@ object FunctionalTestUtils {
     val auth = BasicAuth.Credentials(user, password)
 
     FakeRequest().withHeaders(auth.toHeader)
-  }
-  //
-  //  def createRequest(host: String = "www.egraphs.com", url: String = "/", secure: Boolean = false): Request = {
-  //    val request = FunctionalTest.newRequest()
-  //    request.host = host
-  //    request.url = url
-  //    request.secure = secure
-  //    request
-  //  }
-  //
-  //  def createProperties(propName: String, propValue: String): Properties = {
-  //    val playConfig = new Properties
-  //    playConfig.setProperty(propName, propValue)
-  //    playConfig
-  //  }
-  //
-  def runScenarios(names: String*) {
-    names.foreach { name =>
-      runScenario(name)
-    }
-  }
-
-  @deprecated("We should not clear the database.", "Use runScenarios(names: String*) instead")
-  def runFreshScenarios(names: String*) {
-//    runScenario("clear") //TODO: this will not play nice with other tests in parallel
-    runScenarios(names: _*)
-  }
-
-  def runScenario(name: String) {
-    val result = routeAndCall(FakeRequest(GET, "/test/scenarios/" + name)).get
-    if (status(result) != OK) {
-      throw new IllegalArgumentException("Unknown scenario name " + name)
-    }
   }
 
   /**
@@ -108,21 +61,6 @@ object FunctionalTestUtils {
     val orders = RepeatableScenarios.deliverOrdersToCelebrity(unapprovedOrders)
 
     (customer, celebrity, products.toList, orders.toList)
-  }
-
-  @deprecated("These hardcode many values making it not easily parallelizable or repeatable.",
-    "Use runCustomerBuysProductsScenerio() instead which will return to you everything you need to replace this.")
-  def runWillChanScenariosThroughOrder() {
-    runFreshScenarios(
-      "Will-Chan-is-a-celebrity",
-      "Will-has-two-products",
-      "Erem-is-a-customer",
-      "Erem-buys-Wills-two-products",
-      "Deliver-All-Orders-to-Celebrities")
-  }
-
-  def createCelebrity2ProductsAndCustomerBuyingEachProductTwiceSendOrdersToCelebrity() = {
-    
   }
 
   /**

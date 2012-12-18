@@ -2,7 +2,7 @@ package controllers.api
 
 import sjson.json.Serializer
 import utils.{ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest, TestConstants, FunctionalTestUtils}
-import utils.FunctionalTestUtils.{runFreshScenarios, requestWithCredentials, routeName}
+import utils.FunctionalTestUtils.{requestWithCredentials, routeName}
 import controllers.routes.ApiControllers.getCelebrityProducts
 import utils.TestData
 import services.AppConfig

@@ -3,7 +3,6 @@ package controllers.api
 import sjson.json.Serializer
 import scenario.Scenarios
 import utils.FunctionalTestUtils.{
-  runFreshScenarios,
   routeName,
   requestWithCredentials,
   runCustomerBuysProductsScenerio
@@ -19,7 +18,6 @@ import models._
 import enums.EgraphState
 import utils.TestData
 import services.db.TransactionSerializable
-import scenario.RepeatableScenarios
 import play.api.mvc.Result
 
 class GetCelebrityOrdersApiEndpointTests
@@ -52,7 +50,8 @@ class GetCelebrityOrdersApiEndpointTests
 
   it should "require the signerActionable query parameter" in new EgraphsTestApplication {
     val (celebrityAccount) = db.connected(TransactionSerializable) {
-      RepeatableScenarios.createCelebrity(isFeatured = true).account
+      val celebrity = TestData.newSavedCelebrity()
+      celebrity.account
     }
 
     val result = routeAndCallGetCelebrityOrders(celebrityAccount, signerActionable = None)

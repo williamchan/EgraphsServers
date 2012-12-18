@@ -3,12 +3,11 @@ package controllers.api
 import utils.{EgraphsUnitTest, TestConstants, TestData}
 import play.api.test.Helpers._
 import play.api.mvc.{AnyContent, Call}
-import utils.FunctionalTestUtils.{runFreshScenarios, routeName, requestWithCredentials}
+import utils.FunctionalTestUtils.{routeName, requestWithCredentials}
 import play.api.test.FakeRequest
 import services.AppConfig
 import services.http.BasicAuth
 import services.db.{DBSession, TransactionSerializable}
-import scenario.RepeatableScenarios
 import models.Account
 import org.apache.commons.lang3.RandomStringUtils
 
@@ -19,7 +18,7 @@ trait ProtectedCelebrityResourceTests { this: EgraphsUnitTest =>
   
   aBasicAuthProtectedCelebApiResource should "forbid requests with the wrong password for a valid celebrity account" in new EgraphsTestApplication {
     val celebrityAccount = db.connected(TransactionSerializable) {
-      val celebrity = RepeatableScenarios.createCelebrity(isFeatured = true)
+      val celebrity = TestData.newSavedCelebrity()
       celebrity.account
     }
 

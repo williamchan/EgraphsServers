@@ -1,12 +1,12 @@
 package controllers.api
 
+import play.api.test.Helpers._
 import sjson.json.Serializer
+import utils.EgraphsUnitTest
 import utils.FunctionalTestUtils.{requestWithCredentials, routeName}
 import utils.TestConstants
+import utils.TestData
 import models.EnrollmentBatch
-import play.api.test.Helpers._
-import utils.EgraphsUnitTest
-import scenario.RepeatableScenarios
 import services.AppConfig
 import services.db.DBSession
 import services.db.TransactionSerializable
@@ -23,7 +23,7 @@ class GetCelebrityEnrollmentTemplateApiEndpointTests
     val _text: String = GetCelebrityEnrollmentTemplateApiEndpoint._text
 
     val (celebrity, celebrityAccount) = db.connected(TransactionSerializable) {
-      val celebrity = RepeatableScenarios.createCelebrity()
+      val celebrity = TestData.newSavedCelebrity()
       (celebrity, celebrity.account)
     }
 

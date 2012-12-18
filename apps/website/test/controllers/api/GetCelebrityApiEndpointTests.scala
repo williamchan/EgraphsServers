@@ -1,34 +1,34 @@
 package controllers.api
 
-import play.api.mvc.Request
-import play.api.mvc.Controller
 import play.api.test.Helpers._
-import services.Time
 import sjson.json.Serializer
-import utils.FunctionalTestUtils.{runFreshScenarios, requestWithCredentials, routeName}
 import models._
-import enums.EnrollmentStatus
-import services.http.BasicAuth
-import utils.{ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest, MockControllerMethod, TestConstants}
+import play.api.mvc.Controller
+import play.api.mvc.Request
+import play.api.test.Helpers._
 import play.api.test.FakeRequest
-import controllers.routes.ApiControllers.getCelebrity
 import services.db.DBSession
-import services.AppConfig
 import services.db.TransactionSerializable
-import scenario.RepeatableScenarios
+import services.AppConfig
+import services.Time
+import utils.FunctionalTestUtils.requestWithCredentials
+import utils.FunctionalTestUtils.routeName
+import utils.ClearsCacheAndBlobsAndValidationBefore
+import utils.EgraphsUnitTest
+import utils.TestData
 
 class GetCelebrityApiEndpointTests 
   extends EgraphsUnitTest 
   with ClearsCacheAndBlobsAndValidationBefore 
   with ProtectedCelebrityResourceTests
 {
-  override protected def routeUnderTest = getCelebrity
+  override protected def routeUnderTest = controllers.routes.ApiControllers.getCelebrity
   private def db = AppConfig.instance[DBSession]
 
   routeName(routeUnderTest) should "get a Celebrity" in new EgraphsTestApplication {
     // Set up the scenario
     val (celebrity, celebrityAccount) = db.connected(TransactionSerializable) {
-      val celebrity = RepeatableScenarios.createCelebrity(isFeatured = true)
+      val celebrity = TestData.newSavedCelebrity()
       (celebrity, celebrity.account)
     }
 

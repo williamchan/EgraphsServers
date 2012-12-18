@@ -3,7 +3,6 @@ package controllers.api
 import sjson.json.Serializer
 import utils.FunctionalTestUtils.{
   requestWithCredentials, 
-  runFreshScenarios, 
   routeName, 
   runCustomerBuysProductsScenerio
 }
