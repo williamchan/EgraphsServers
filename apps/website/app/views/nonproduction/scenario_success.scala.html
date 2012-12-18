@@ -1,0 +1,14 @@
+@(urlSlug: String, description: String, instructionResponse: Any)
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Scenario Success!</title>
+  </head>
+  <body>
+    <h3> Scenario @urlSlug successfully replayed! </h3>
+    <p> @description </p>
+    <p> Response @instructionResponse.toString </p>
+    <input class="redirect" type="button" value="Back to Scenarios" onclick="window.location = '/test/scenarios'">
+  </body>
+</html>

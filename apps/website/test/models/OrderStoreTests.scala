@@ -18,15 +18,15 @@ class OrderStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
 
     val order = recipient.buy(TestData.newSavedProduct(), recipient=recipient).save()
 
-    orderStore.findByCustomerId(recipient.id).size should be (1)
+    orderStore.findByRecipientCustomerId(recipient.id).size should be (1)
 
     val order2 = recipient.buy(TestData.newSavedProduct(), recipient=recipient).save()
 
-    orderStore.findByCustomerId(recipient.id).size should be (2)
+    orderStore.findByRecipientCustomerId(recipient.id).size should be (2)
 
     val order3 = buyer.buy(TestData.newSavedProduct(), recipient=recipient).save()
 
-    orderStore.findByCustomerId(recipient.id).size should be (3)
+    orderStore.findByRecipientCustomerId(recipient.id).size should be (3)
 
   }
 
