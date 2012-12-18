@@ -25,7 +25,7 @@ private[celebrity] trait CatalogStarsQuerying extends Logging {
    * Grabs the current set of CatalogStars out of the cache actor, and updates
    * the cache actor if no stars were found.
    *
-   * @param numUpdateAttempts number of times to attempt updating the cache in the
+   * @param numUpdateAttemptsLeft number of times to attempt updating the cache in the
    *   case that no results are found before giving up and throwing an exception.
    *
    * @return the current set of stars for rendering in the celebrity catalog.
