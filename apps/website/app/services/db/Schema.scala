@@ -203,6 +203,7 @@ class Schema @Inject() (
 
   val categoryToCategoryValue = oneToManyRelation(categories, categoryValues)
     .via((category, categoryValue) => category.id === categoryValue.categoryId)
+  categoryToCategoryValue.foreignKeyDeclaration.constrainReference(onDelete cascade)
 
   val celebrityToEnrollmentBatches = oneToManyRelation(celebrities, enrollmentBatches)
     .via((celebrity, enrollmentBatch) => celebrity.id === enrollmentBatch.celebrityId)
