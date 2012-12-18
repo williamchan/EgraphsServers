@@ -39,7 +39,6 @@ class BulkMailListTests extends EgraphsUnitTest {
     future.await(10, TimeUnit.SECONDS)
 
     val response = mailList.members
-    println("Response = " + response) 
 
     //cleanup
     mailList.removeMember(email)

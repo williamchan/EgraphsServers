@@ -43,6 +43,10 @@ case class InventoryBatch(
     numInventory - services.orderStore.countOrders(List(id))
   }
 
+  def hasInventory: Boolean = {
+    getRemainingInventory > 0
+  }
+
   //
   // Public members
   //
