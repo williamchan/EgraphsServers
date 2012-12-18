@@ -22,6 +22,7 @@ import Blobs.Conversions._
 import models.EgraphStore
 import utils.TestData
 import models.Account
+import models.Celebrity
 
 class PostEgraphApiEndpointTests extends EgraphsUnitTest with ProtectedCelebrityResourceTests {
   private def blobs = AppConfig.instance[Blobs]
@@ -86,105 +87,113 @@ class PostEgraphApiEndpointTests extends EgraphsUnitTest with ProtectedCelebrity
   }
 
   it should "accept an optional written message in addition to the signature" in new EgraphsTestApplication {
-    runWillChanScenariosThroughOrder()
+    val (celebrityAccount, order) = db.connected(TransactionSerializable) {
+      val (_, celebrity, _, orders) = runCustomerBuysProductsScenerio()
+      (celebrity.account, orders.head)
+    }
 
-    val signatureStr = TestConstants.shortWritingStr
-    val audioStr = TestConstants.voiceStr_8khz
     val message = TestConstants.shortWritingStr
 
-    val (code, Some(egraphId)) = performEgraphPost()(
-      "message" -> message, 
-      "signature" -> signatureStr, 
-      "audio" -> audioStr,
-      "signedAt" -> "2012-07-12 15:11:22.987"
+    val (code, Some(egraphId)) = performEgraphPost(celebrityAccount, order.id)(
+      "message" -> message,
+      "signature" -> TestConstants.shortWritingStr,
+      "audio" -> TestConstants.voiceStr_8khz(),
+      "signedAt" -> signedAt
     )
 
     code should be (OK)
     
     db.connected(TransactionSerializable) {
       val egraph = egraphStore.get(egraphId)
-      egraph.assets.message should be (Some(TestConstants.shortWritingStr))
+      egraph.assets.message should be (Some(message))
     }
   }
 
-//  it should "accept an empty message parameter" in new EgraphsTestApplication {
-//    runWillChanScenariosThroughOrder()
-//
-//    val signatureStr = TestConstants.shortWritingStr
-//    val audioStr = TestConstants.voiceStr_8khz()
-//
-//    val (code, Some(egraphId)) = performEgraphPost()(
-//      "signature" -> TestConstants.shortWritingStr,
-//      "audio" -> TestConstants.voiceStr_8khz(),
-//      "signedAt" -> "2012-07-12 15:11:22.987",
-//      "message" -> ""
-//    )
-//
-//    code should be (OK)
-//
-//    db.connected(TransactionSerializable) {
-//      egraphStore.get(egraphId).assets.message should be (None)
-//    }
-//  }
-//
-//  it should "reject empty signature and audio" in new EgraphsTestApplication {
-//    runWillChanScenariosThroughOrder()
-//
-//    val emptyStringSignatureResponse = performEgraphPost()(
-//      "signature" -> "",
-//      "audio" -> TestConstants.voiceStr_8khz(),
-//      "signedAt" -> "2012-07-12 15:11:22.987"
-//    )
-//    val noSignatureParameterResponse = performEgraphPost()(
-//      "audio" -> TestConstants.voiceStr_8khz(),
-//      "signedAt" -> "2012-07-12 15:11:22.987"
-//    )
-//
-//    val emptyStringAudioResponse = performEgraphPost()(
-//      "signature" -> TestConstants.shortWritingStr,
-//      "audio" -> "",
-//      "signedAt" -> "2012-07-12 15:11:22.987"
-//    )
-//
-//    val noAudioParameterResponse = performEgraphPost()(
-//      "signature" -> TestConstants.shortWritingStr,
-//      "signedAt" -> "2012-07-12 15:11:22.987"
-//    )
-//
-//    val malformedEgraphResult = (HttpCodes.MalformedEgraph, None)
-//
-//    emptyStringSignatureResponse should be (malformedEgraphResult)
-//    noSignatureParameterResponse should be (malformedEgraphResult)
-//    emptyStringAudioResponse should be (malformedEgraphResult)
-//    noAudioParameterResponse should be (malformedEgraphResult)
-//  }
-//
-//  it should "drain the orders queue when an order is fulfilled with a valid egraph" in new EgraphsTestApplication {
-//    runWillChanScenariosThroughOrder()
-//
-//    val numOrdersMade = 2
-//    
-//    for ((order, i) <- getWillChanOrdersJson.zipWithIndex) {
-//      getWillChanOrdersJson.length should be (numOrdersMade - i)
-//      
-//      val (code, Some(egraphId)) = performEgraphPost(order("id").toString.toLong)(
-//        "signature" -> TestConstants.shortWritingStr,
-//        "audio" -> TestConstants.voiceStr_8khz(),
-//        "signedAt" -> "2012-07-12 15:11:22.987"
-//      )
-//      code should be (OK)
-//    }
-//
-//    getWillChanOrdersJson.length should be (0)
-//  }
+  it should "accept an empty message parameter" in new EgraphsTestApplication {
+    val (celebrityAccount, order) = db.connected(TransactionSerializable) {
+      val (_, celebrity, _, orders) = runCustomerBuysProductsScenerio()
+      (celebrity.account, orders.head)
+    }
 
-//  /** Gets the list of will chan orders and returns their json map */
-//  private def getWillChanOrdersJson:List[Map[String, Any]] = {
-//    val url = controllers.routes.ApiControllers.getCelebrityOrders(Some(true)).url
-//    val Some(ordersResult) = routeAndCall(willChanRequest.copy(GET, url))
-//    status(ordersResult) should be (OK)
-//    Serializer.SJSON.in[List[Map[String, Any]]](contentAsString(ordersResult))
-//  }
+    val (code, Some(egraphId)) = performEgraphPost(celebrityAccount, order.id)(
+      "message" -> "",
+      "signature" -> TestConstants.shortWritingStr,
+      "audio" -> TestConstants.voiceStr_8khz(),
+      "signedAt" -> signedAt
+    )
+
+    code should be (OK)
+
+    db.connected(TransactionSerializable) {
+      egraphStore.get(egraphId).assets.message should be (None)
+    }
+  }
+
+  it should "reject empty signature and audio" in new EgraphsTestApplication {
+    val (celebrityAccount, order) = db.connected(TransactionSerializable) {
+      val (_, celebrity, _, orders) = runCustomerBuysProductsScenerio()
+      (celebrity.account, orders.head)
+    }
+
+    val emptyStringSignatureResponse = performEgraphPost(celebrityAccount, order.id)(
+      "signature" -> "",
+      "audio" -> TestConstants.voiceStr_8khz(),
+      "signedAt" -> signedAt
+    )
+
+    val noSignatureParameterResponse = performEgraphPost(celebrityAccount, order.id)(
+      "audio" -> TestConstants.voiceStr_8khz(),
+      "signedAt" -> signedAt
+    )
+
+    val emptyStringAudioResponse = performEgraphPost(celebrityAccount, order.id)(
+      "signature" -> TestConstants.shortWritingStr,
+      "audio" -> "",
+      "signedAt" -> signedAt
+    )
+
+    val noAudioParameterResponse = performEgraphPost(celebrityAccount, order.id)(
+      "signature" -> TestConstants.shortWritingStr,
+      "signedAt" -> signedAt
+    )
+
+    val malformedEgraphResult = (HttpCodes.MalformedEgraph, None)
+
+    emptyStringSignatureResponse should be (malformedEgraphResult)
+    noSignatureParameterResponse should be (malformedEgraphResult)
+    emptyStringAudioResponse should be (malformedEgraphResult)
+    noAudioParameterResponse should be (malformedEgraphResult)
+  }
+
+  it should "drain the orders queue when an order is fulfilled with a valid egraph" in new EgraphsTestApplication {
+    val (celebrityAccount, orders) = db.connected(TransactionSerializable) {
+      val (_, celebrity, _, orders) = runCustomerBuysProductsScenerio()
+      (celebrity.account, orders)
+    }
+
+    for (order <- orders) {
+      getCelebrityOrders(celebrity).length should be (numOrdersMade - i)
+      
+      val (code, Some(egraphId)) = performEgraphPost(order("id").toString.toLong)(
+        "signature" -> TestConstants.shortWritingStr,
+        "audio" -> TestConstants.voiceStr_8khz(),
+        "signedAt" -> "2012-07-12 15:11:22.987"
+      )
+      code should be (OK)
+    }
+
+    getWillChanOrdersJson.length should be (0)
+  }
+
+  /** Gets the list of orders needed to be completed by the celebrity and returns their json map */
+  private def getCelebrityOrders(celebrityAccount: Account):List[Map[String, Any]] = {
+    val url = controllers.routes.ApiControllers.getCelebrityOrders(Some(true)).url
+    val Some(ordersResult) = routeAndCall(
+      requestWithCredentials(celebrityAccount).copy(POST, url).withFormUrlEncodedBody(body:_*)
+    )
+    status(ordersResult) should be (OK)
+    Serializer.SJSON.in[List[Map[String, Any]]](contentAsString(ordersResult))
+  }
 
   /** Posts the egraph and returns the result status on the left and egraphId on the right */
   private def performEgraphPost(celebrityAccount: Account, orderId: Long)(body: (String, String)*): (Int, Option[Long]) = {
