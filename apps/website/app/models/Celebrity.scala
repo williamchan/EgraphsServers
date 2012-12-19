@@ -71,6 +71,7 @@ case class Celebrity(id: Long = 0,
                      _logoImageKey: Option[String] = None,
                      created: Timestamp = Time.defaultTimestamp,
                      updated: Timestamp = Time.defaultTimestamp,
+                     isFeatured: Boolean = false, //TODO: SER-580 - Remove after successful deployment.
                      services: CelebrityServices = AppConfig.instance[CelebrityServices]
 ) extends KeyedCaseClass[Long]
   with HasCreatedUpdated
