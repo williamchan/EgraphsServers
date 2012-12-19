@@ -36,11 +36,11 @@ function(forms, payment, Egraphs) {
 
     $scope.selectOption = function(certificateOption) {
       // Toggle selected state
-      certificateOption.select(true);
-
-      if ($scope.selectedOption) $scope.selectedOption.select(false);
-
-      $scope.selectedOption = certificateOption;
+      if ($scope.selectedOption !== certificateOption) {
+        certificateOption.select(true);
+        if ($scope.selectedOption) $scope.selectedOption.select(false);
+        $scope.selectedOption = certificateOption;
+      }
     };
 
     // Select the default option
