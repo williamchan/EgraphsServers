@@ -60,7 +60,7 @@
       <div class="linkz">
         <div class="navbar-item our-stars">
           
-          <p><a class="separator-after" href="@headerData.ourStarsLink">Find your star</a></p>
+          <p><a class="separator-after" href="@headerData.ourStarsLink">Enter our store</a></p>
           
         </div> <!-- end .our-stars -->
               
@@ -69,6 +69,13 @@
           <p><a class="separator-after" href="@headerData.insideAnEgraphLink">Inside an egraph</a></p>
           
         </div> <!-- end .explore -->
+        @headerData.giftCertificateLink.map{ url =>
+          <div class="navbar-item gift-certificates">
+            
+            <p><a class="separator-after" href="@url"><span>Gift Certificates</span></a></p>
+            
+          </div> <!-- end .gift-certificates -->
+        }    
         <div class="navbar-item mobile-only">
           
           <p><span class="separator-after"><a href="@headerData.egraphsFacebookLink" class="responsive-social-sprite facebook">f</a></span></p>
