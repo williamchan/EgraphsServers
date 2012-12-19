@@ -9,7 +9,6 @@ package models.frontend.landing
  * @param imageUrl URL to the thumbnail image.
  * @param storefrontUrl URL to the celebrity's storefront.
  * @param inventoryRemaining inventory left to buy
- * @param isFeatured true that the celebrity should appear under "Featured Stars"
  */
 case class CatalogStar(
   id: Long, 
