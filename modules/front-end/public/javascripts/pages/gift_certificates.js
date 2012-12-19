@@ -5,7 +5,6 @@ define([
   "services/forms",
   "services/payment",
   "Egraphs",
-  "libs/chosen/chosen.jquery.min",
   "services/responsive-modal"],
 function(forms, payment, Egraphs) {
   var GiftCertificateOption = function(data) {
@@ -31,8 +30,12 @@ function(forms, payment, Egraphs) {
     certificateOptions.push(new GiftCertificateOption(option));
   });
 
+  var module = angular.module('giftCertificatePurchaseApp', []);
+
   var GiftCertificatePurchaseController = function ($scope) {
     $scope.certificateOptions = certificateOptions;
+    $scope.months = Egraphs.page.months;
+    $scope.years = Egraphs.page.years;
 
     $scope.selectOption = function(certificateOption) {
       // Toggle selected state
@@ -41,6 +44,10 @@ function(forms, payment, Egraphs) {
         if ($scope.selectedOption) $scope.selectedOption.select(false);
         $scope.selectedOption = certificateOption;
       }
+    };
+
+    $scope.submitForReview = function() {
+      console.log($scope);
     };
 
     // Select the default option
@@ -53,8 +60,6 @@ function(forms, payment, Egraphs) {
     go: function() {
       window.GiftCertificatePurchaseController = GiftCertificatePurchaseController;
 
-
-
       $("#review-button").click(function() {
         $("#review").responsivemodal("toggle");
       });
@@ -64,12 +69,7 @@ function(forms, payment, Egraphs) {
       });
 
       angular.element(document).ready(function() {
-        angular.bootstrap(document);
-        
-        // Enable the chosen selector AFTER bootstrapping angular because its javascript
-        // needs to read real screen layout widths and heights in order to render
-        // properly, and this page is invisible until angular is invoked.
-        $(".chsn-select").chosen({no_results_text: "No results matched"});
+        angular.bootstrap(document, ['giftCertificatePurchaseApp']);
       });
     }
   };
