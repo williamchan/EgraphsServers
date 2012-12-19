@@ -13,10 +13,8 @@ import models.checkout.{/*StripeChargeLineItemType,*/ Checkout, GiftCertificateL
 
 /**
  */
-private[consumer] trait GiftCertificateEndpoints
-  extends ImplicitHeaderAndFooterData {
+private[consumer] trait GiftCertificateEndpoints extends ImplicitHeaderAndFooterData {
   this: Controller =>
-  import GiftCertificateLineItemTypeServices.Conversions._
 
   protected def controllerMethod: ControllerMethod
   protected def postController: POSTControllerMethod
@@ -76,7 +74,7 @@ private[consumer] trait GiftCertificateEndpoints
       stripeId <- form.stripeId
 
     ) yield {
-      val giftCertificate = GiftCertificateLineItemType.getWithRecipientAndAmount(recipient, amount)
+      val giftCertificate = GiftCertificateLineItemType(recipient, amount)
       Checkout(IndexedSeq(giftCertificate))
     }
     checkout.headOption

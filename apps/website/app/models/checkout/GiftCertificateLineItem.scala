@@ -4,9 +4,10 @@ import models.Coupon
 import models.enums.{CodeType, LineItemNature, CouponType, CouponDiscountType, CouponUsageType}
 import org.joda.money.Money
 import services.AppConfig
-import services.db.Schema
+import services.db.{CanInsertAndUpdateAsThroughServices, Schema}
 import scalaz.Lens
 import org.squeryl.PrimitiveTypeMode._
+import com.google.inject.Inject
 
 
 /**
@@ -23,11 +24,11 @@ case class GiftCertificateLineItem private (
   _entity: LineItemEntity = new LineItemEntity(),
   itemType: GiftCertificateLineItemType,
   subItems: Seq[LineItem[_]] = Nil,
-  _domainEntityId: Long = 0
+  _domainEntityId: Long = 0,
+  services: GiftCertificateLineItemServices = AppConfig.instance[GiftCertificateLineItemServices]
 ) extends LineItem[Coupon] with HasLineItemEntity
-  with LineItemEntityLenses[GiftCertificateLineItem]
-  with LineItemEntityGetters[GiftCertificateLineItem]
-  with LineItemEntitySetters[GiftCertificateLineItem]
+  with LineItemEntityGettersAndSetters[GiftCertificateLineItem]
+  with CanInsertAndUpdateAsThroughServices[GiftCertificateLineItem, LineItemEntity]
 {
   override def toJson: String = {
     // TODO(SER-499): implement once api nailed down
@@ -56,19 +57,16 @@ case class GiftCertificateLineItem private (
    * @return persisted line item
    */
   override def transact(): GiftCertificateLineItem = {
-    require(checkoutId > 0, "Cannot transact without setting checkoutId.")
-
     if (id <= 0) {
-      import GiftCertificateLineItemTypeServices.Conversions._
-      import GiftCertificateLineItemServices.Conversions._
+      require(checkoutId > 0, "Cannot transact without setting checkoutId.")
 
       /**
        * Save itemType first because it depends neither on a line item or domain object.
        * Then, save line item with the resulting itemType.
        * Finally, save the resulting line item's domain object.
        */
-      val savedType = itemType.create()
-      val savedItem = withItemType(savedType).create()
+      val savedType = itemType.insert()
+      val savedItem = withItemType(savedType).insert()
       val savedCoupon = savedItem.domainObject.save()
 
       // return the saved item with its coupon's id stored
@@ -110,5 +108,25 @@ object GiftCertificateLineItem {
   protected val couponNameFormatString = "A gift certificate for %s"
   protected def couponName(itemType: GiftCertificateLineItemType): String = {
     couponNameFormatString.format(itemType.recipient)
+  }
+}
+
+
+
+
+
+
+
+case class GiftCertificateLineItemServices @Inject() (schema: Schema)
+  extends SavesAsLineItemEntity[GiftCertificateLineItem]
+{
+  // TODO(SER-499): query helpers
+
+
+  //
+  // SaveAsLineItemEntity members
+  //
+  override protected def modelWithNewEntity(certificate: GiftCertificateLineItem, entity: LineItemEntity) = {
+    certificate.copy(_entity=entity)
   }
 }

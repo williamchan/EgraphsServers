@@ -3,7 +3,11 @@ package models.checkout
 import org.joda.money.{CurrencyUnit, Money}
 import models.enums.LineItemNature
 import org.squeryl.KeyedEntity
-import services.db.HasEntity
+import java.sql.Timestamp
+import services.{AppConfig, Time}
+import services.db._
+import models.{HasCreatedUpdated, SavesCreatedUpdated}
+import com.google.inject.Inject
 
 package object checkout {
   /** For _domainEntityId if domain object doesn't get persisted; ex: Tax */
@@ -24,8 +28,11 @@ package object checkout {
 case class Checkout private(
   _entity: CheckoutEntity,
   lineItemTypes: Seq[LineItemType[_]] = Nil,
-  _lineItems: Seq[LineItem[_]] = Nil
-) extends HasEntity[CheckoutEntity] {
+  _lineItems: Seq[LineItem[_]] = Nil,
+  services: CheckoutServices = AppConfig.instance[CheckoutServices]
+) extends HasEntity[CheckoutEntity]
+  with CanInsertAndUpdateAsThroughServices[Checkout, CheckoutEntity]
+{
 
 
 
@@ -91,8 +98,8 @@ case class Checkout private(
     // transact checkout entity
     // for(lineItem <- lineItems) yield lineItem.withCheckoutId(id).transact
     if (id <= 0) {
-      import CheckoutServices.Conversions._
-      this.create().transact()
+      this.insert().transact()
+
     } else {
       // _entity is persisted, so now persist line items
 
@@ -141,15 +148,33 @@ object Checkout {
 
 case class CheckoutEntity(
   id: Long = 0,
-  customerId: Long = 0
-) extends KeyedEntity[Long]
+  customerId: Long = 0,
+  created: Timestamp = Time.defaultTimestamp,
+  updated: Timestamp = Time.defaultTimestamp
+) extends KeyedCaseClass[Long] with HasCreatedUpdated {
+  override lazy val unapplied = CheckoutEntity.unapply(this)
+}
 
 
-object CheckoutServices extends LineItemComponent.SavesAsCheckoutEntity {
 
-  object Conversions extends CheckoutSavingConversions
+
+case class CheckoutServices @Inject() (
+  schema: Schema
+) extends SavesAsCheckoutEntity {
 
   def modelWithNewEntity(checkout: Checkout, entity: CheckoutEntity) = {
     checkout.copy(_entity = entity)
+  }
+}
+
+
+trait SavesAsCheckoutEntity extends InsertsAndUpdatesAsEntity[Checkout, CheckoutEntity]
+  with SavesCreatedUpdated[CheckoutEntity]
+{
+  protected def schema: Schema
+  override protected val table = schema.checkouts
+
+  override protected def withCreatedUpdated(toUpdate: CheckoutEntity, created: Timestamp, updated: Timestamp) = {
+    toUpdate.copy(created=created, updated=updated)
   }
 }

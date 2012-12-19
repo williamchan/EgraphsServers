@@ -4,10 +4,11 @@ import java.sql.Timestamp
 import services.{MemberLens, Time}
 import org.squeryl.KeyedEntity
 import org.squeryl.dsl.ast.LogicalBoolean
-import services.db.{SavesAsEntity, Schema}
+import services.db.{KeyedCaseClass, InsertsAndUpdatesAsEntity, HasEntity, Schema}
 import scalaz.Lens
 
 import models.enums.{CodeType, LineItemNature}
+import models.{HasCreatedUpdated, SavesCreatedUpdated}
 
 
 trait LineItemType[+TransactedT] {
@@ -53,7 +54,7 @@ case class LineItemTypeEntity private (
   _codeType: String,
   created: Timestamp,
   updated: Timestamp
-) extends KeyedEntity[Long] {
+) extends KeyedCaseClass[Long] with HasCreatedUpdated {
 
   def this(
     desc: String = "",
@@ -64,8 +65,33 @@ case class LineItemTypeEntity private (
     updated: Timestamp = Time.defaultTimestamp
   ) = this(id, desc, nature.name, codeType.name, created, updated)
 
+  override lazy val unapplied = LineItemTypeEntity.unapply(this)
+
   def nature = LineItemNature(_nature).get
   def codeType = CodeType(_codeType).get
+}
+
+
+
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+trait HasLineItemTypeEntity extends HasEntity[LineItemTypeEntity] { this: LineItemType[_] =>
+  def id = _entity.id
+}
+
+trait SavesAsLineItemTypeEntity[ModelT <: HasLineItemTypeEntity]
+  extends InsertsAndUpdatesAsEntity[ModelT, LineItemTypeEntity]
+  with SavesCreatedUpdated[LineItemTypeEntity]
+  //extends SavesAsEntity[ModelT, LineItemTypeEntity]
+{
+  protected def schema: Schema
+  override protected val table = schema.lineItemTypes
+
+  override protected def withCreatedUpdated(toUpdate: LineItemTypeEntity, created: Timestamp, updated: Timestamp) = {
+    toUpdate.copy(created=created, updated=updated)
+  }
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -134,3 +160,8 @@ trait LineItemTypeEntitySetters[T <: LineItemType[_]] { this: T with LineItemTyp
   lazy val withNature = natureField.set _
   lazy val withCodeType = codeTypeField.set _
 }
+
+trait LineItemTypeEntityGettersAndSetters[T <: LineItemType[_]]
+  extends LineItemTypeEntityLenses[T]
+  with LineItemTypeEntityGetters[T]
+  with LineItemTypeEntitySetters[T] { this: T with HasLineItemTypeEntity => }

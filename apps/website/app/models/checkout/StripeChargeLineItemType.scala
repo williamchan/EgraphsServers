@@ -3,18 +3,20 @@ package models.checkout
 import models.enums.{CodeType, LineItemNature}
 import org.joda.money.Money
 import scalaz.Lens
-import services.db.Schema
+import services.db.{CanInsertAndUpdateAsThroughServices, Schema}
 import services.payment.StripeCharge
 import org.squeryl.PrimitiveTypeMode._
+import services.AppConfig
+import com.google.inject.Inject
 
 
 case class StripeChargeLineItemType(
   _entity: LineItemTypeEntity,
-  stripeToken: String
+  stripeToken: String,
+  services: StripeChargeLineItemTypeServices = AppConfig.instance[StripeChargeLineItemTypeServices]
 ) extends LineItemType[StripeCharge] with HasLineItemTypeEntity
-  with LineItemTypeEntityLenses[StripeChargeLineItemType]
-  with LineItemTypeEntityGetters[StripeChargeLineItemType]
-  with LineItemTypeEntitySetters[StripeChargeLineItemType]
+  with LineItemTypeEntityGettersAndSetters[StripeChargeLineItemType]
+  with CanInsertAndUpdateAsThroughServices[StripeChargeLineItemType, LineItemTypeEntity]
 {
   override def toJson: String = {
     // TODO(SER-499): more json
@@ -46,3 +48,17 @@ object StripeChargeLineItemType {
   }
 }
 
+
+
+
+
+case class StripeChargeLineItemTypeServices @Inject() (
+  schema: Schema
+) extends SavesAsLineItemTypeEntity[StripeChargeLineItemType] {
+
+  // TODO(SER-499): determine what additional services are needed
+
+  override protected def modelWithNewEntity(charge: StripeChargeLineItemType, entity: LineItemTypeEntity) = {
+    charge.copy(_entity = entity)
+  }
+}

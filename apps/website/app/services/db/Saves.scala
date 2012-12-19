@@ -54,7 +54,7 @@ trait SavesWithStringKey[T <: KeyedEntity[String]] extends Saves[String, T] {
 }
 
 trait Saves[KeyT, T <: KeyedEntity[KeyT]]
-  extends InsertsAndUpdates[KeyT, T]
+  extends InsertsAndUpdates[T]
   with Queries[KeyT, T]
   with InsertAndUpdateHooks[T]
 {

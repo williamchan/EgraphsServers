@@ -3,14 +3,17 @@ package models.checkout
 import org.joda.money.Money
 import models.enums.{CodeType, LineItemNature}
 import scalaz.Lens
+import com.google.inject.Inject
+import services.db.{CanInsertAndUpdateAsThroughServices, Schema}
+import services.AppConfig
 
 case class TaxLineItem private (
   _entity: LineItemEntity,
-  itemType: TaxLineItemType
+  itemType: TaxLineItemType,
+  services: TaxLineItemServices = AppConfig.instance[TaxLineItemServices]
 ) extends LineItem[Money] with HasLineItemEntity
-  with LineItemEntityLenses[TaxLineItem]
-  with LineItemEntityGetters[TaxLineItem]
-  with LineItemEntitySetters[TaxLineItem]
+  with LineItemEntityGettersAndSetters[TaxLineItem]
+  with CanInsertAndUpdateAsThroughServices[TaxLineItem, LineItemEntity]
 {
   require(amount.isPositiveOrZero)
 
@@ -28,17 +31,14 @@ case class TaxLineItem private (
 
 
   override def transact: LineItem[Money] = {
-    require(checkoutId > 0, "Cannot transact without setting checkoutId.")
-
     if (id <= 0) {
-      import TaxLineItemTypeServices.Conversions._
-      import TaxLineItemServices.Conversions._
+      require(checkoutId > 0, "Cannot transact without setting checkoutId.")
 
       /**
        * TODO(SER-499): remove type saving if not keeping item type for each tax item; is there
        * reason to persist the tax type when it doesn't relate a tax table to the line items table?
        */
-      withItemType(itemType.create()).create()
+      withItemType(itemType.insert()).insert()
     } else {
       this
     }
@@ -66,7 +66,18 @@ object TaxLineItem {
       itemType
     )
   }
-
-
 }
 
+
+
+
+
+
+
+case class TaxLineItemServices @Inject() (schema: Schema)
+  extends SavesAsLineItemEntity[TaxLineItem]
+{
+  override protected def modelWithNewEntity(tax: TaxLineItem, entity: LineItemEntity) = {
+    tax.copy(_entity=entity)
+  }
+}

@@ -23,7 +23,7 @@ case class CategoryServices @Inject() (
  *
  * @param id
  * @param name Unique name to simplify management for Administrators
- * @param publicname Publicly facing name displayed in the marketplace to users
+ * @param publicName Publicly facing name displayed in the marketplace to users
  * @param created
  * @param updated
  * @param services

@@ -2,18 +2,22 @@ package models.checkout
 
 import org.joda.money.{CurrencyUnit, Money}
 import models.enums.{CodeType, LineItemNature}
+import java.sql.Timestamp
 import scalaz.Lens
+import services.db.{Schema, CanInsertAndUpdateAsThroughServices}
+import com.google.inject.Inject
+import services.{AppConfig, Time}
 
-case class TaxLineItemType (
+case class TaxLineItemType private (
   _entity: LineItemTypeEntity,
-  zipCode: String // or Int?
-) extends LineItemType[Money] with HasLineItemTypeEntity
-  with LineItemTypeEntityLenses[TaxLineItemType]
-  with LineItemTypeEntityGetters[TaxLineItemType]
-  with LineItemTypeEntitySetters[TaxLineItemType]
+  zipCode: String,
+  services: TaxLineItemTypeServices = AppConfig.instance[TaxLineItemTypeServices]
+) extends LineItemType[Money] with HasLineItemTypeEntity  // TODO(SER-499): is this necessary?
+  with LineItemTypeEntityGettersAndSetters[TaxLineItemType]
+  with CanInsertAndUpdateAsThroughServices[TaxLineItemType, LineItemTypeEntity]
 {
 
-  override val toJson = {
+  override def toJson: String = {
     // TODO(SER-499): implement
     ""
   }
@@ -65,15 +69,32 @@ case class TaxLineItemType (
   }
 }
 
+
+
 object TaxLineItemType {
+  val description = "Tax"
+  val nature = LineItemNature.Tax
+  val codeType = CodeType.Tax
+
   def apply(zip: String) = {
     new TaxLineItemType(
       new LineItemTypeEntity(description, nature, codeType),
       zip
     )
   }
+}
 
-  val description = "Tax"
-  val nature = LineItemNature.Tax
-  val codeType = CodeType.Tax
+
+
+
+
+
+
+
+case class TaxLineItemTypeServices @Inject() (schema: Schema)
+  extends SavesAsLineItemTypeEntity[TaxLineItemType]
+{
+  override protected def modelWithNewEntity(tax: TaxLineItemType, entity: LineItemTypeEntity) = {
+    tax.copy(_entity=entity)
+  }
 }

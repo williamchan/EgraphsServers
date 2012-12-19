@@ -23,10 +23,9 @@ import org.squeryl.{Table, KeyedEntity}
  *   }
  * }}}
  *
- * @tparam KeyT the entity's key type
  * @tparam T the entity's type
  */
-trait InsertsAndUpdates[KeyT, T <: KeyedEntity[KeyT]] extends InsertAndUpdateHooks[T] {
+trait InsertsAndUpdates[T <: KeyedEntity[_]] extends InsertAndUpdateHooks[T] {
   /** Insert an instance into the table after processing registered pre-insert hooks */
   def insert(toInsert: T): T = {
     table.insert(performPreInsertHooks(toInsert))
@@ -46,4 +45,28 @@ trait InsertsAndUpdates[KeyT, T <: KeyedEntity[KeyT]] extends InsertAndUpdateHoo
   //
   /**The table that manages this entity in services.db.Schema  */
   protected def table: Table[T]
+}
+
+@deprecated(
+  "SER-499",
+  """Remove after merging SER-499. This is only here for backwards-compatibility with all model
+     classes that used to unnecessarily specify both KeyT and T."""
+)
+trait InsertsAndUpdatesWithKey[KeyT, T <: KeyedEntity[KeyT]] extends InsertsAndUpdates[T]
+
+
+trait CanInsertAndUpdateThroughServices[T <: KeyedEntity[_]] { this: T =>
+  def services: InsertsAndUpdates[T]
+
+  def insert(): T = services.insert(this)
+  def update(): T = services.update(this)
+}
+
+
+trait CanInsertAndUpdateAsThroughServices[ModelT <: HasEntity[EntityT], EntityT <: KeyedCaseClass[_]] {
+  this: ModelT =>
+
+  def services: InsertsAndUpdatesAsEntity[ModelT, EntityT]
+  def insert(): ModelT = services.insert(this)
+  def update(): ModelT = services.update(this)
 }
