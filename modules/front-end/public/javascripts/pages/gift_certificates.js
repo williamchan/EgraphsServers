@@ -14,6 +14,7 @@ function(forms, payment, Egraphs) {
     this.isMostPopular = data.isMostPopular;
     this.isConcrete = data.type === "concrete";
     this.isCustom = data.type === "custom";
+    this.isDefault = data.isDefault;
     this.buttonSpanSize = this.isConcrete? "span2": "span4";
 
     this.select(false);
@@ -42,9 +43,9 @@ function(forms, payment, Egraphs) {
       $scope.selectedOption = certificateOption;
     };
 
-    
+    // Select the default option
     angular.forEach(certificateOptions, function(option) {
-      if (option.isMostPopular) $scope.selectOption(option);
+      if (option.isDefault) $scope.selectOption(option);
     });
   };
 
