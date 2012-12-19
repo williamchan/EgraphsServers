@@ -442,7 +442,7 @@ class Scenarios extends DeclaresScenarios {
         "Will-Chan-is-a-celebrity",
         "Will-has-two-products",
         "Erem-is-a-customer",
-        "Erem-buys-Wills-two-products-twice-each",
+        "Erem-buys-Wills-two-products",
         "Deliver-All-Orders-to-Celebrities",
         "Will-fulfills-one-of-Erems-product-orders"
       )
@@ -463,7 +463,7 @@ class Scenarios extends DeclaresScenarios {
         "Will-Chan-is-a-celebrity",
         "Will-has-two-products",
         "Erem-is-a-customer",
-        "Erem-buys-Wills-two-products-twice-each",
+        "Erem-buys-Wills-two-products",
         "Deliver-All-Orders-to-Celebrities",
         "Will-fulfills-one-of-Erems-product-orders"
       )
@@ -481,7 +481,7 @@ class Scenarios extends DeclaresScenarios {
         "Will-Chan-is-a-celebrity",
         "Will-has-two-products",
         "Erem-is-a-customer",
-        "Erem-buys-Wills-two-products-twice-each",
+        "Erem-buys-Wills-two-products",
         "Deliver-All-Orders-to-Celebrities",
         "Will-fulfills-one-of-Erems-product-orders",
         "Will-fulfills-Erems-second-product-order"
