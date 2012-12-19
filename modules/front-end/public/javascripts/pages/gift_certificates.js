@@ -53,7 +53,7 @@ function(forms, payment, Egraphs) {
     go: function() {
       window.GiftCertificatePurchaseController = GiftCertificatePurchaseController;
 
-      $(".chsn-select").chosen({no_results_text: "No results matched"});
+
 
       $("#review-button").click(function() {
         $("#review").responsivemodal("toggle");
@@ -65,6 +65,11 @@ function(forms, payment, Egraphs) {
 
       angular.element(document).ready(function() {
         angular.bootstrap(document);
+        
+        // Enable the chosen selector AFTER bootstrapping angular because its javascript
+        // needs to read real screen layout widths and heights in order to render
+        // properly, and this page is invisible until angular is invoked.
+        $(".chsn-select").chosen({no_results_text: "No results matched"});
       });
     }
   };
