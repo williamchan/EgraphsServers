@@ -6,9 +6,9 @@
 
 @galleryEntry(countFulfilled: Int, countPending: Int, countFulfilledGifts: Int, countPendingGifts: Int) = {
   <li>(@countFulfilled fulfilled, @countPending pending, @countFulfilledGifts fulfilled gifts, @countPendingGifts pending gifts) as
-    <a href="Account/gallery?user=leeroyjenkins&countFulfilled=@countFulfilled&countPending=@countPending&countFulfilledGifts=@countFulfilledGifts&countPendingGifts=@countPendingGifts&role=other">other</a>
-    <a href="Account/gallery?user=leeroyjenkins&countFulfilled=@countFulfilled&countPending=@countPending&countFulfilledGifts=@countFulfilledGifts&countPendingGifts=@countPendingGifts&role=admin">admin</a>
-    <a href="Account/gallery?user=leeroyjenkins&countFulfilled=@countFulfilled&countPending=@countPending&countFulfilledGifts=@countFulfilledGifts&countPendingGifts=@countPendingGifts&role=owner">owner</a>
+    <a href="@routes.Account.gallery("leeroyjenkins", "other", countFulfilled, countPending, countFulfilledGifts, countPendingGifts).url">other</a>
+    <a href="@routes.Account.gallery("leeroyjenkins", "admin", countFulfilled, countPending, countFulfilledGifts, countPendingGifts).url">admin</a>
+    <a href="@routes.Account.gallery("leeroyjenkins", "owner", countFulfilled, countPending, countFulfilledGifts, countPendingGifts).url">owner</a>        
   </li>
 }
 
