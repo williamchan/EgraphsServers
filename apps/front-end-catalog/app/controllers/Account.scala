@@ -139,11 +139,11 @@ object Account extends Controller with DefaultImplicitTemplateParameters {
   }
 
   private def makePendingEgraphs(user: String, count: Int) : List[PendingEgraphViewModel] = {
-    List.fill(count)(getPendingEgraphViewModel(1, 1, "Herp Derpson", user))
+    List.fill(count)(getPendingEgraphViewModel(buyerId = 1, recipientId = 1, recipientName = "Herp Derpson", user = user))
   }
   
   private def makePendingGiftEgraphs(user: String, count: Int) : List[PendingEgraphViewModel] = {
-    List.fill(count)(getPendingEgraphViewModel(1, 2, "Derp Herpson", user))
+    List.fill(count)(getPendingEgraphViewModel(buyerId = 1, recipientId = 2, recipientName = "Derp Herpson", user = user))
   }
   
   private def getPendingEgraphViewModel(buyerId: Int, recipientId: Int, recipientName: String, user: String): PendingEgraphViewModel = {
@@ -179,11 +179,11 @@ object Account extends Controller with DefaultImplicitTemplateParameters {
   }  
   
   private def makeFulfilledEgraphs(user: String, count: Int): List[FulfilledEgraphViewModel]  = {
-    List.fill(count)(getFulfilledEgraphViewModel(1, 1, "Herp Derpson", user))
+    List.fill(count)(getFulfilledEgraphViewModel(buyerId = 1, recipientId = 1, recipientName = "Herp Derpson", user = user))
   }
   
   private def makeFulfilledGiftEgraphs(user: String, count: Int): List[FulfilledEgraphViewModel]  = {
-    List.fill(count)(getFulfilledEgraphViewModel(1, 2, "Derp Herpson", user))
+    List.fill(count)(getFulfilledEgraphViewModel(buyerId = 1, recipientId = 2, recipientName = "Derp Herpson", user = user))
   }
   
   private def getFulfilledEgraphViewModel(buyerId: Int, recipientId: Int, recipientName: String, user: String): FulfilledEgraphViewModel = {
