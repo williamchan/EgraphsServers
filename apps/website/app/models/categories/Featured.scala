@@ -30,13 +30,6 @@ class Featured @Inject() (
 
   def updateFeaturedCelebrities(newFeaturedCelebIds: Iterable[Long]) {
     // cost = 3 queries
-    try {
-      categoryValueStore.updateCelebrities(categoryValue, newFeaturedCelebIds)
-    } catch {
-      case e: java.sql.BatchUpdateException =>
-        println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-        println("ex.nextException = " + e.getNextException())
-        throw e
-    }
+    categoryValueStore.updateCelebrities(categoryValue, newFeaturedCelebIds)
   }
 }
