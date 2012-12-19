@@ -13,6 +13,16 @@
 @import models.frontend.forms.Field
 
 
+@headJs = {
+  Egraphs.page.certificateOptions = [
+    {type:"concrete", price:25},
+    {type:"concrete", price:50},
+    {type:"concrete", price:75, isMostPopular:true},
+    {type:"concrete", price:100},
+    {type:"custom", price:75}
+  ];
+}
+
 @** SVG previews of the gift certificate *@
 @previews = {
   <div class="previews">
@@ -26,8 +36,12 @@
 }
 
 @baseBody = {
-  <div id="content" class="gift-certificate-checkout content" role="main">
-    <div id="main">
+  <div id="content" 
+       class="gift-certificate-checkout content" 
+       role="main"
+       ng-cloak
+       ng-controller="GiftCertificatePurchaseController">
+    <div id="main" >
       <div class="container">
         <section id="masthead" class="first">
           <div class="row-fluid">
@@ -48,25 +62,20 @@
         <section id="choose-amount">
           <h2><span class="checkout-step-count one">1</span>Choose an amount:</h2>
           <div class="amount-options row-fluid">
-            <div class="amount-option dollar-amount span2">
-              <button class="btn"><span class="dollah">$</span>25</button>
-            </div>
-            <div class="amount-option dollar-amount span2">
-              <button class="btn"><span class="dollah">$</span>50</button>
-            </div>
-            <div class="amount-option dollar-amount span2">
-              <button class="btn active"><span class="dollah">$</span>75</button>
-              <div class="hint">
-                Most popular price point
+            <div ng-repeat="option in certificateOptions" ng-class="option.buttonSpanSize">
+              <div class="amount-option dollar-amount" ng-show="option.isConcrete">
+                <button class="btn" ng-class="option.buttonClass" ng-click="selectOption(option)">
+                  <span class="dollah">$</span>{{option.price}}
+                </button>
+                <div class="hint" ng-show="option.isMostPopular">
+                  Most popular price point
+                </div>
               </div>
-            </div>
-            <div class="amount-option dollar-amount span2">
-              <button class="btn"><span class="dollah">$</span>100</button>
-            </div>
-            <div class="amount-option own-amount span4">
-              <button class="btn">Set my own amount</button>
-              <div id="amount-field">
-                <span class="dollah">$</span><input type="text" name="amount-field" value="75" >
+              <div class="amount-option own-amount" ng-show="option.isCustom">
+                <button class="btn" ng-class="option.buttonClass" ng-click="selectOption(option)">Set my own amount</button>
+                <div id="amount-field" ng-class="option.amountFieldClass">
+                  <span class="dollah">$</span><input type="text" name="amount-field" value="75" >
+                </div>
               </div>
             </div>
           </div>
@@ -235,6 +244,7 @@
 
 @base_template(
   title="Gift Certificates",
+  headJs = headJs,
   jsMain = "pages/gift_certificates",
   cssFiles = Seq(EgraphsAssets.at("bootstrap-modal/css/bootstrap-modal.css").url),  
   body=baseBody

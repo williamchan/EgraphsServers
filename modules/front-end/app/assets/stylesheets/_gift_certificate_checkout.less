@@ -207,14 +207,26 @@
         // Special styling for "SET MY OWN AMOUNT"
         &.own-amount {
           button.btn {
+            position:relative;
+            z-index:2;
             font-size:20px;
           }
 
           #amount-field {
+            .transition(margin-top .5s ease-in-out);
             position:relative;
+            z-index:1;
             display:inline-block;
             float:right;
             margin-top:15px;
+
+            &.scrolled-in {
+              margin-top:-50px;
+            }
+
+            &.scrolled-out {
+              margin-top:15px;
+            }
 
             .dollah {
               position:relative;
