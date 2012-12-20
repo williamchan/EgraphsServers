@@ -165,8 +165,11 @@ class Utils @Inject() {
   def saveToFile(bytes: Array[Byte], file: File) {
     file.getParentFile.mkdirs()
     val out = new FileOutputStream(file)
-    out.write(bytes)
-    out.close()
+    try {
+      out.write(bytes)
+    } finally {
+      out.close()
+    }
   }
 }
 
