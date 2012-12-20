@@ -7,7 +7,7 @@ import services.{Dimensions, Time, AppConfig}
 import java.awt.image.BufferedImage
 
 class EgraphTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with SavingEntityIdLongTests[Egraph]
   with CreatedUpdatedEntityTests[Long, Egraph]
   with DateShouldMatchers

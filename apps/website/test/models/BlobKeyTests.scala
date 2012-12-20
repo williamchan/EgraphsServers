@@ -5,7 +5,7 @@ import utils._
 import org.apache.commons.lang.RandomStringUtils
 
 class BlobKeyTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with SavingEntityIdLongTests[BlobKey]
   with CreatedUpdatedEntityTests[Long, BlobKey]
   with DateShouldMatchers

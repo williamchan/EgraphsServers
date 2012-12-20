@@ -4,7 +4,7 @@ import akka.actor.Actor
 import Actor._
 import services.db.{DBSession, TransactionSerializable}
 import services.AppConfig
-import utils.{TestData, ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest}
+import utils.{TestData, ClearsCacheBefore, EgraphsUnitTest}
 import actors.{ProcessEnrollmentBatchMessage, EnrollmentBatchActor}
 import models._
 import enums.EnrollmentStatus
@@ -22,7 +22,7 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class EnrollmentBatchActorTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
 {
   implicit val timeout: Timeout = 1 second 
 

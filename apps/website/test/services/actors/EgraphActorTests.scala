@@ -6,7 +6,7 @@ import Actor._
 import services.db.{DBSession, TransactionSerializable}
 import services.{Utils, AppConfig}
 import models.EgraphStore
-import utils.{ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest, TestData}
+import utils.{ClearsCacheBefore, EgraphsUnitTest, TestData}
 import models.enums.EgraphState
 import org.scalatest.BeforeAndAfterAll
 import play.api.Application
@@ -25,7 +25,7 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class EgraphActorTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with BeforeAndAfterAll {
 
   implicit val timeout: Timeout = 10 second

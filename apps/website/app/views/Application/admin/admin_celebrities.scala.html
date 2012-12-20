@@ -1,5 +1,5 @@
 @(celebrityAccounts: Iterable[(models.Celebrity, models.Account)],
-  allCelebrities: Iterable[models.Celebrity]
+  allCelebrities: Iterable[models.frontend.admin.CelebrityAdminViewModel]
 )(implicit authToken: egraphs.authtoken.AuthenticityToken,
   paginationInfo: controllers.PaginationInfo, 
   headerData: models.frontend.header.HeaderData,

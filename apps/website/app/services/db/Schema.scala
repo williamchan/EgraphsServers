@@ -78,7 +78,7 @@ class Schema @Inject() (
   on(celebrities)(celebrity =>
     declare(
       celebrity.urlSlug is unique,
-      celebrity.isFeatured is indexed,
+      celebrity.isFeatured is indexed, //TODO: SER-580 - Remove after successful deployment. Evolution can be found in history.
       celebrity.bio is dbType("text")))
   
   val coupons = table[Coupon]
@@ -202,7 +202,7 @@ class Schema @Inject() (
   val accountToTransaction = oneToManyRelation(accounts, cashTransactions)
     .via((account, cashTransaction) => account.id === cashTransaction.accountId)
 
-  val categoryToCategoryValue = oneToManyRelation(categories, categoryValues)	
+  val categoryToCategoryValue = oneToManyRelation(categories, categoryValues)
     .via((category, categoryValue) => category.id === categoryValue.categoryId)
 
   val celebrityToEnrollmentBatches = oneToManyRelation(celebrities, enrollmentBatches)

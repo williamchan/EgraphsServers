@@ -5,7 +5,7 @@ import services.AppConfig
 import models.Egraph
 
 class VBGStartVerificationTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with SavingEntityIdLongTests[VBGStartVerification]
   with CreatedUpdatedEntityTests[Long, VBGStartVerification]
   with DateShouldMatchers

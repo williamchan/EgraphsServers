@@ -6,7 +6,7 @@ import com.xyzmo.wwww.biometricserver.WebServiceBiometricPartStub
 import models.{EnrollmentBatch, Celebrity}
 
 class XyzmoEnrollDynamicProfileTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with SavingEntityIdLongTests[XyzmoEnrollDynamicProfile]
   with CreatedUpdatedEntityTests[Long, XyzmoEnrollDynamicProfile]
   with DateShouldMatchers

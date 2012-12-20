@@ -8,7 +8,7 @@ import services.print.LandscapeFramedPrint
 import Blobs.Conversions._
 
 class PrintOrderTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with SavingEntityIdLongTests[PrintOrder]
   with CreatedUpdatedEntityTests[Long, PrintOrder]
   with DateShouldMatchers

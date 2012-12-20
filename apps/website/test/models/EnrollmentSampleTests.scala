@@ -8,7 +8,7 @@ import Blobs.Conversions._
 import play.api.Play
 
 class EnrollmentSampleTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with SavingEntityIdLongTests[EnrollmentSample]
   with CreatedUpdatedEntityTests[Long, EnrollmentSample]
   with DateShouldMatchers
