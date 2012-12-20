@@ -80,7 +80,7 @@
                 <button class="btn" ng-class="option.buttonClass" ng-click="selectOption(option)">Set my own amount</button>
                 <div id="amount-field" ng-class="option.amountFieldClass">
                   <span class="dollah">$</span>
-                  <input type="text" name="amount-field" ng-model="option.price">
+                  <input type="text" name="amount-field" ng-model="option.price" class="inset-shade">
                 </div>
               </div>
             </div>
@@ -94,7 +94,7 @@
               The certificate PDF you receive will contain your name and the recipient's.
             </div>
 
-            <form class="form-horizontal">
+            <form class="form-horizontal" name="personalize" >
               <div class="control-group recipient-name">
                 <label class="control-label" for="recipient-name">Recipient name:</label>
                 <div class="controls">
@@ -102,8 +102,9 @@
                          type="text"
                          required
                          name="recipient-name"
+                         class="inset-shade"
                          placeholder="e.g. Tiny Tim" 
-                         ng-model="order.recipientName" />
+                         ng-model="order.recipientName" >
                 </div>
               </div> <!-- End .recipient-name.controls -->
               <div class="control-group gifter-name">
@@ -112,6 +113,7 @@
                   <input id="gifter-name"
                          type="text"
                          required
+                         class="inset-shade"
                          name="gifter-name"
                          placeholder="e.g. Santa Claus" 
                          ng-model="order.gifterName" />
@@ -122,13 +124,14 @@
 
           <section id="pay" class="span6">
             <h2><span class="checkout-step-count">3</span>Pay:</h2>
-            <form class="form-horizontal">
+            <form class="form-horizontal" name="pay">
               <fieldset>
                 <div class="control-group card-name">
                   <label class="control-label" for="card-name">Full name:</label>
                   <div class="controls">
                     <input id="card-name"
                            type="text"
+                           class="inset-shade"
                            required                           
                            name="card-name" 
                            ng-model="order.card.name" />
@@ -138,7 +141,7 @@
                 <div class="control-group email">
                   <label class="control-label" for="email">Email:</label>
                   <div class="controls">
-                    <input id="email" type="text" required name="email" ng-model="order.email" />
+                    <input id="email" class="inset-shade" type="email" required name="email" ng-model="order.email" />
                   </div>
                 </div> <!-- End .email.controls -->
 
@@ -148,6 +151,7 @@
                     <input id="card-number"
                            required
                            type="text"
+                           class="inset-shade"
                            name="card-number" 
                            ng-model="order.card.number" />
                   </div>
@@ -187,7 +191,7 @@
                 <div class="control-group card-cvc">
                   <label class="control-label" for="card-cvc">Security Code:</label>
                   <div class="controls">
-                    <input id="card-cvc" type="text" required name="card-cvc" ng-model="order.card.cvc" />
+                    <input id="card-cvc" class="inset-shade" type="text" required name="card-cvc" ng-model="order.card.cvc" />
                   </div>
                 </div> <!-- End .card-cvc.controls -->
 
@@ -198,6 +202,7 @@
                            type="text"
                            required
                            name="postal-code"
+                           class="inset-shade"
                            ng-model="order.card.postalCode" />
                   </div>
                 </div> <!-- End .postal-code.controls -->
