@@ -13,7 +13,7 @@ object Egraph extends Controller with DefaultImplicitTemplateParameters {
   //
   // Public members
   //
-  def landscape = Action {
+  def landscape(isPromotional: Boolean = false) = Action {
     val frame = LandscapeEgraphFrameViewModel
 
     Ok(views.html.frontend.egraph(
@@ -34,11 +34,12 @@ object Egraph extends Controller with DefaultImplicitTemplateParameters {
       EgraphsAssets.at("images/sample_landscape_egraph.svg").url,
       "May 10, 1983",
       shareOnFacebookLink="/shareOnFacebookLink",
-      shareOnTwitterLink= "This is my test egraph"
+      shareOnTwitterLink= "This is my test egraph",
+      isPromotional = isPromotional
     ))
   }
 
-  def portrait = Action  {
+  def portrait(isPromotional: Boolean = false) = Action  {
     val frame = PortraitEgraphFrameViewModel
 
     Ok(views.html.frontend.egraph(
@@ -59,7 +60,8 @@ object Egraph extends Controller with DefaultImplicitTemplateParameters {
       EgraphsAssets.at("images/sample_portrait_egraph.svg").url,
       "May 10, 1983",
       shareOnFacebookLink="/shareOnFacebookLink",
-      shareOnTwitterLink= "This is my test egraph!"
+      shareOnTwitterLink= "This is my test egraph!",
+      isPromotional = isPromotional
     ))
   }
 }

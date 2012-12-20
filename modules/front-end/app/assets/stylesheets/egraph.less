@@ -63,7 +63,7 @@
   src:url('/assets/typefaces/BebasNeue.otf')
 }
 
-html.egraph-page {
+body.egraph-page {
   @bgGradientStart: 5px;
   
   @step1Color: lighten(@darkestBackground, 10%);
@@ -99,11 +99,7 @@ html.egraph-page {
 
   // Make sure the gradient is always visible no matter page size. This is mostly
   // due to warping that happens with the SoundManager <embed>
-  background-size:auto 200%; 
-
-  body {
-    background:none;
-  }
+  background-size:auto 200%;
 
   .container {
     // Change the usual 940px width to 1000px for the egraph page
