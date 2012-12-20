@@ -108,13 +108,23 @@ object Account extends Controller with DefaultImplicitTemplateParameters {
     ))
   }
 
-  def gallery(user: String, count: Int, role: String, pending: Int) = Action {
-    val completed = makeEgraphs(user)
-    val pending = makePendingEgraphs(user)
+  def gallery(user: String, role: String, countFulfilled: Int, countPending: Int, countFulfilledGifts: Int, countPendingGifts: Int) = Action {
+    val completed = makeFulfilledEgraphs(user, countFulfilled)
+    val pending = makePendingEgraphs(user, countPending)
+    
+    val giftsCompleted = makeFulfilledGiftEgraphs(user, countFulfilledGifts)
+    val giftsPending = makePendingGiftEgraphs(user, countPendingGifts)
 
     val egraphs = pending ::: completed
+    val giftEgraphs = giftsPending ::: giftsCompleted
 
-    Ok(views.html.frontend.account_gallery(user, egraphs, roles(role)))
+    Ok(views.html.frontend.account_gallery(
+      username = user,  
+      egraphs = egraphs,
+      giftEgraphs = giftEgraphs, 
+      controlRenderer = roles(role),
+      galleryCustomerId = 1l
+    ))
   }
 
   //Basic controller for testing privacy toggles on the gallery pages
@@ -128,111 +138,82 @@ object Account extends Controller with DefaultImplicitTemplateParameters {
     request.body.asFormUrlEncoded.foreach(map => map.foreach(println))
   }
 
-  private def makePendingEgraphs(user: String) : List[PendingEgraphViewModel] = {
-    List(
-      PendingEgraphViewModel(
-        orderStatus = "pending",
-        orderDetails = new OrderDetails(
-          orderNumber = 1,
-          price = "$50.00",
-          orderDate = "Nov 19th 2011 @ 2:30PM",
-          statusText = "In progress",
-          shippingMethod = "UPS",
-          UPSNumber = "45Z343YHYU3343322J"),
-        orderId = 1,
-        orientation = "portrait",
-        productUrl="egr.aphs/" + user +"/1",
-        productTitle = "Telling Jokes",
-        productPublicName = "Jimmy Fallon",
-        productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
-          "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
-          " quam. In hac habitasse platea dictumst. Etiam at lectus at nisi blandit lobort" +
-          "is. Donec viverra rhoncus iaculis. In a nibh tellus. Phasellus dignissim egesta" +
-          "s erat nec vestibulum. Proin blandit pellentesque massa, vitae venenatis mauris" +
-          " volutpat at.",
-        thumbnailUrl = pendingThumbnails("portrait")),
-      PendingEgraphViewModel(
-        orderStatus = "pending",
-        orderDetails = new OrderDetails(
-          orderNumber = 1,
-          price = "$50.00",
-          orderDate = "Jan 31st, 2012 @ 11:59PM",
-          statusText = "In progress",
-          shippingMethod = "UPS",
-          UPSNumber = "45Z343YHYU3343322J"),
-        orderId = 2,
-        orientation = "landscape",
-        productUrl="egr.aphs/" + user +"/1",
-        productTitle = "You In Reverse",
-        productPublicName = "Built To Spill",
-        productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
-          "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
-          " quam. In hac habitasse platea dictumst. Etiam at lectus at nisi blandit lobort" +
-          "is. Donec viverra rhoncus iaculis. In a nibh tellus. Phasellus dignissim egesta" +
-          "s erat nec vestibulum. Proin blandit pellentesque massa, vitae venenatis mauris" +
-          " volutpat at.",
-        thumbnailUrl = pendingThumbnails("landscape"))
+  private def makePendingEgraphs(user: String, count: Int) : List[PendingEgraphViewModel] = {
+    List.fill(count)(getPendingEgraphViewModel(buyerId = 1, recipientId = 1, recipientName = "Herp Derpson", user = user))
+  }
+  
+  private def makePendingGiftEgraphs(user: String, count: Int) : List[PendingEgraphViewModel] = {
+    List.fill(count)(getPendingEgraphViewModel(buyerId = 1, recipientId = 2, recipientName = "Derp Herpson", user = user))
+  }
+  
+  private def getPendingEgraphViewModel(buyerId: Int, recipientId: Int, recipientName: String, user: String): PendingEgraphViewModel = {
+    PendingEgraphViewModel(
+      buyerId = buyerId,
+      recipientId = recipientId,
+      recipientName = recipientName,
+      orderStatus = "pending",
+      orderDetails = new OrderDetails(
+        orderNumber = 1,
+        price = "$50.00",
+        orderDate = "Nov 19th 2011 @ 2:30PM",
+        statusText = "In progress",
+        shippingMethod = "UPS",
+        UPSNumber = "45Z343YHYU3343322J"),
+      orderId = newOrderId,
+      orientation = "portrait",
+      productUrl="egr.aphs/" + user +"/1",
+      productTitle = "Telling Jokes",
+      productPublicName = "Jimmy Fallon",
+      productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
+        "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
+        " quam. In hac habitasse platea dictumst. Etiam at lectus at nisi blandit lobort" +
+        "is. Donec viverra rhoncus iaculis. In a nibh tellus. Phasellus dignissim egesta" +
+        "s erat nec vestibulum. Proin blandit pellentesque massa, vitae venenatis mauris" +
+        " volutpat at.",
+      thumbnailUrl = pendingThumbnails("portrait")
     )
   }
-  private def makeEgraphs(user: String): List[FulfilledEgraphViewModel]  = {
-    List(
-      FulfilledEgraphViewModel(
-        viewEgraphUrl="www.egraphs.com/egraph/" + user + "1",
-        publicStatus = "public",
-        signedTimestamp = "Nov 12th 2012 @ 4:30 PM",
-        facebookShareLink = views.frontend.Utils.getFacebookShareLink(
-          appId=fbAppId,
-          picUrl = EgraphsAssets.at("/images/logo.png").url,
-          name = "Chris Bosh",
-          caption = "Winning the finals",
-          description = "The story of this photo",
-          link = "http://www.egraphs.com"
-        ),
-        twitterShareLink = views.frontend.Utils.getTwitterShareLink("http://www.egraphs.com/egraphs/1/",
-          "Chris bosh gave me an eGraph!"),
-        orderId = 3,
-        orientation = "landscape",
-        productUrl="egr.aphs/" + user +"/1",
-        productTitle = "Man or Velociraptor?",
-        productPublicName = "Chris Bosh",
-        productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
-          "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
-          " quam. In hac habitasse platea dictumst.",
-        thumbnailUrl = landscapePNG
+  
+  private def newOrderId: Int = {
+    scala.util.Random.nextInt(1000000)
+  }  
+  
+  private def makeFulfilledEgraphs(user: String, count: Int): List[FulfilledEgraphViewModel]  = {
+    List.fill(count)(getFulfilledEgraphViewModel(buyerId = 1, recipientId = 1, recipientName = "Herp Derpson", user = user))
+  }
+  
+  private def makeFulfilledGiftEgraphs(user: String, count: Int): List[FulfilledEgraphViewModel]  = {
+    List.fill(count)(getFulfilledEgraphViewModel(buyerId = 1, recipientId = 2, recipientName = "Derp Herpson", user = user))
+  }
+  
+  private def getFulfilledEgraphViewModel(buyerId: Int, recipientId: Int, recipientName: String, user: String): FulfilledEgraphViewModel = {
+    FulfilledEgraphViewModel(
+      buyerId = buyerId,
+      recipientId = recipientId,
+      recipientName = recipientName,
+      viewEgraphUrl="www.egraphs.com/egraph/" + user + "1",
+      publicStatus = "public",
+      signedTimestamp = "Nov 12th 2012 @ 4:30 PM",
+      facebookShareLink = views.frontend.Utils.getFacebookShareLink(
+        appId=fbAppId,
+        picUrl = EgraphsAssets.at("/images/logo.png").url,
+        name = "Chris Bosh",
+        caption = "Winning the finals",
+        description = "The story of this photo",
+        link = "http://www.egraphs.com"
       ),
-      FulfilledEgraphViewModel(
-        viewEgraphUrl="egr.aphs/" + user + "2",
-        publicStatus = "public",
-        signedTimestamp = "Nov 12th 2012 @ 4:30 PM",
-        facebookShareLink = "http://www.facebook.com",
-        twitterShareLink = "http://www.twitter.com",
-        orderId = 4,
-        orientation = "portrait",
-        productUrl="egr.aphs/" + user +"/2",
-        productTitle = "King James",
-        productPublicName = "Lebron-bron",
-        productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
-          "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
-          " quam. In hac habitasse platea dictumst.",
-        thumbnailUrl = portraitPNG
-      ),
-      FulfilledEgraphViewModel(
-        viewEgraphUrl="egr.aphs/" + user + "2",
-        publicStatus = "public",
-        signedTimestamp = "Nov 12th 2012 @ 4:30 PM",
-        facebookShareLink = "www.facebook.com",
-        twitterShareLink = "www.twitter.com",
-        orderId = 5,
-        orientation = "landscape",
-        productUrl="egr.aphs/" + user +"/2",
-        productTitle = "A cool bro",
-        productPublicName = "Dwyane Wade",
-        productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
-          "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
-          " quam. In hac habitasse platea dictumst.",
-        thumbnailUrl = landscapePNG
-      )
-    )
+      twitterShareLink = views.frontend.Utils.getTwitterShareLink("http://www.egraphs.com/egraphs/1/",
+        "Chris bosh gave me an eGraph!"),
+      orderId = newOrderId,
+      orientation = "landscape",
+      productUrl="egr.aphs/" + user +"/1",
+      productTitle = "Man or Velociraptor?",
+      productPublicName = "Chris Bosh",
+      productDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
+        "Praesent blandit mollis dui, sed venenatis neque sodales nec. Aliquam ut semper" +
+        " quam. In hac habitasse platea dictumst.",
+      thumbnailUrl = landscapePNG
+    )  
   }
 }
 

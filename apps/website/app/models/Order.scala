@@ -21,6 +21,10 @@ import social.{Twitter, Facebook}
 import controllers.website.GetEgraphEndpoint
 import play.api.mvc.RequestHeader
 import play.api.templates.Html
+import db.Deletes
+import services.db.TransactionSerializable
+import java.sql.Connection
+import services.db.CurrentTransaction
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -33,7 +37,8 @@ case class OrderServices @Inject() (
   mail: TransactionalMail,
   cashTransactionStore: CashTransactionStore,
   egraphServices: Provider[EgraphServices],
-  consumerApp: ConsumerApplication
+  consumerApp: ConsumerApplication,
+  @CurrentTransaction connectionFactory: () => Connection
 )
 
 /**
@@ -158,6 +163,38 @@ case class Order(
       .save()
     val refundedOrder = withPaymentStatus(PaymentStatus.Refunded).save()
     (refundedOrder, refundedCharge)
+  }
+
+  /**
+   * Rejects this order and creates a new order that is a copy to take it's place.
+   * The copy has a new product and inventory batch and reflects the new price.
+   */
+  def rejectAndCreateNewOrderWithNewProduct(newProduct: Product, newInventoryBatch: InventoryBatch): Order = {
+    // create a new order only need to fill in mandatory fields now, just to get a new id.
+    val newOrderUnsaved = withReviewStatus(OrderReviewStatus.PendingAdminReview)
+      .copy(
+        productId = newProduct.id,
+        rejectionReason = None,
+        inventoryBatchId = newInventoryBatch.id,
+        amountPaidInCurrency = newProduct.priceInCurrency
+      )
+    val newOrder = services.store.create(newOrderUnsaved)
+
+    // mark old order invalid
+    val oldOrder = this.withReviewStatus(OrderReviewStatus.RejectedByAdmin).copy(rejectionReason = Some("Changed product to " + newProduct.id + " with new order " + newOrder.id)).save()
+    // update other objects that care about the old order, since they shouldn't anymore
+    services.cashTransactionStore.findByOrderId(oldOrder.id).foreach(transaction => transaction.copy(orderId = Some(newOrder.id)).save())
+    // NOTE: if print order prices become different for each product, this will need to reflect that, but isn't now.
+    services.printOrderStore.findByOrderId(oldOrder.id).foreach(printOrder => printOrder.copy(orderId = newOrder.id).save())
+
+    // if we can delete the old one, that means there are no dangling foreign keys.  otherwise we have a problem and should roll back.
+    // we don't actually want to delete the old order though, so we will save it after we delete it.
+    val connection = services.connectionFactory()
+    val savepoint = connection.setSavepoint
+    services.store.delete(oldOrder)
+    connection.rollback(savepoint)
+
+    newOrder
   }
 
   def approveByAdmin(admin: Administrator): Order = {
@@ -315,7 +352,12 @@ case class FulfilledOrder(order: Order, egraph: Egraph)
 /** Thin semantic wrapper around a tuple for product order and egraph */
 case class FulfilledProductOrder(product: Product, order:Order, egraph: Egraph)
 
-class OrderStore @Inject() (schema: Schema) extends SavesWithLongKey[Order] with SavesCreatedUpdated[Long,Order] {
+class OrderStore @Inject() (
+  schema: Schema
+) extends SavesWithLongKey[Order]
+  with SavesCreatedUpdated[Long,Order]
+  with Deletes[Long, Order]
+{
   import org.squeryl.PrimitiveTypeMode._
   //
   // Public methods
@@ -392,8 +434,39 @@ class OrderStore @Inject() (schema: Schema) extends SavesWithLongKey[Order] with
         on(order.id === egraph.map(_.orderId))
     )
   }
+  
+  /**
+   * Retrieves the list of Orders and Egraphs that are candidates for presentation on the
+   * user's gallery page AS GIFTS. These are any orders that have not been rejected by an admin
+   * and their adjoining egraphs (regardless of the adjoining egraph state)
+   */
+  def galleryGiftsGivenOrdersWithEgraphs(buyerId: Long) : Query[(Order, Option[Egraph])] = {
+    join(schema.orders, schema.egraphs.leftOuter) (
+      (order, egraph) =>
+        where(
+          (order.buyerId === buyerId)
+          and not (order.recipientId === buyerId)
+          and not (order._reviewStatus === OrderReviewStatus.RejectedByAdmin.name)
+        )
+        select(order, egraph)
+        on(order.id === egraph.map(_.orderId))
+    )
+  }
 
-  def findByCustomerId(customerId: Long, filters: FilterOneTable[Order]*): Query[Order] = {
+  def findByBuyerCustomerId(customerId: Long, filters: FilterOneTable[Order]*): Query[Order] = {
+    import schema.orders
+
+    from(orders)(order =>
+      where(
+          order.buyerId === customerId and
+          FilterOneTable.reduceFilters(filters, order)
+      )
+        select (order)
+        orderBy (order.id asc)
+    )
+  }
+  
+  def findByRecipientCustomerId(customerId: Long, filters: FilterOneTable[Order]*): Query[Order] = {
     import schema.orders
 
     from(orders)(order =>
@@ -405,7 +478,7 @@ class OrderStore @Inject() (schema: Schema) extends SavesWithLongKey[Order] with
         orderBy (order.id asc)
     )
   }
-
+  
   def findByFilter(filters: FilterOneTable[Order]*): Query[Order] = {
     import schema.orders
 
@@ -561,7 +634,7 @@ object GalleryOrderFactory {
    * @return list of orders and egraphs that can be considered pending to a user. There can be more than one
    * egraph associated with a particular order.
    */
-  def filterPendingOrders(ordersAndEgraphs: List[(Order, Option[Egraph])]): List[(Order, Option[Egraph])] =
+  def filterPendingOrders(ordersAndEgraphs: Iterable[(Order, Option[Egraph])]): Iterable[(Order, Option[Egraph])] =
   {
     ordersAndEgraphs.filter(orderEgraph => {
       val maybeEgraph = orderEgraph._2
@@ -574,45 +647,45 @@ object GalleryOrderFactory {
   }
 
   def makeFulfilledEgraphViewModel[A](
-      orders: Iterable[(Order, Option[Egraph])], 
+      orders: Iterable[(Order, Egraph)], 
       fbAppId: String,
       consumerApp: ConsumerApplication
-      )(implicit request: RequestHeader): Iterable[Option[FulfilledEgraphViewModel]] = 
+      )(implicit request: RequestHeader): Iterable[FulfilledEgraphViewModel] = 
   {
-    for (orderAndEgraphOption <- orders) yield {
-      val (order, optionEgraph) = orderAndEgraphOption
-      optionEgraph.map( egraph => {
-        val product = order.product
-        val celebrity = product.celebrity
-        // TODO SER-170 this code is quite similar to that in GetEgraphEndpoint.
-        // Refactor together and put withSigningOriginOffset inside EgraphImage.
-        val rawImage = egraph.image(product.photoImage).rasterized
-          .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
-          .scaledToWidth(product.frame.thumbnailWidthPixels)
-        val thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Public)
-        val viewEgraphUrl = consumerApp.absoluteUrl(GetEgraphEndpoint.url(order.id))
+    for ((order, egraph) <- orders) yield {
+      val product = order.product
+      val celebrity = product.celebrity
+      // TODO SER-170 this code is quite similar to that in GetEgraphEndpoint.
+      // Refactor together and put withSigningOriginOffset inside EgraphImage.
+      val rawImage = egraph.image(product.photoImage).rasterized
+        .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
+        .scaledToWidth(product.frame.thumbnailWidthPixels)
+      val thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Public)
+      val viewEgraphUrl = consumerApp.absoluteUrl(GetEgraphEndpoint.url(order.id))
 
-        val facebookShareLink = Facebook.getEgraphShareLink(fbAppId = fbAppId,
-          fulfilledOrder = FulfilledOrder(order = order, egraph = egraph),
-          thumbnailUrl = thumbnailUrl,
-          viewEgraphUrl = viewEgraphUrl)
-        val twitterShareLink = Twitter.getEgraphShareLink(celebrity = celebrity, viewEgraphUrl = viewEgraphUrl)
+      val facebookShareLink = Facebook.getEgraphShareLink(fbAppId = fbAppId,
+        fulfilledOrder = FulfilledOrder(order = order, egraph = egraph),
+        thumbnailUrl = thumbnailUrl,
+        viewEgraphUrl = viewEgraphUrl)
+      val twitterShareLink = Twitter.getEgraphShareLink(celebrity = celebrity, viewEgraphUrl = viewEgraphUrl)
 
-        new FulfilledEgraphViewModel(
-          facebookShareLink = facebookShareLink,
-          twitterShareLink = twitterShareLink,
-          orderId = order.id,
-          orientation = product.frame.name.toLowerCase,
-          productUrl = StorefrontChoosePhotoConsumerEndpoints.url(celebrity, product).url,
-          productPublicName = product.celebrity.publicName,
-          productTitle = product.storyTitle,
-          productDescription = product.description,
-          thumbnailUrl = thumbnailUrl,
-          viewEgraphUrl = viewEgraphUrl,
-          publicStatus = order.privacyStatus.name,
-          signedTimestamp = dateFormat.format(egraph.created)
-        )
-      })
+      new FulfilledEgraphViewModel(
+        buyerId = order.buyerId,
+        facebookShareLink = facebookShareLink,
+        twitterShareLink = twitterShareLink,
+        orderId = order.id,
+        orientation = product.frame.name.toLowerCase,
+        productUrl = StorefrontChoosePhotoConsumerEndpoints.url(celebrity, product).url,
+        productPublicName = product.celebrity.publicName,
+        productTitle = product.storyTitle,
+        productDescription = product.description,
+        recipientId = order.recipientId,
+        recipientName = order.recipientName,
+        thumbnailUrl = thumbnailUrl,
+        viewEgraphUrl = viewEgraphUrl,
+        publicStatus = order.privacyStatus.name,
+        signedTimestamp = dateFormat.format(egraph.created)
+      )
     }
   }
 
@@ -623,12 +696,15 @@ object GalleryOrderFactory {
       val celebrity = product.celebrity
       val imageUrl = product.photo.resizedWidth(product.frame.pendingWidthPixels).getSaved(AccessPolicy.Public).url
       PendingEgraphViewModel(
+        buyerId = order.buyerId,
         orderId = order.id,
         orientation = product.frame.name.toLowerCase,
         productUrl = StorefrontChoosePhotoConsumerEndpoints.url(celebrity, product).url,
         productTitle = product.storyTitle,
         productPublicName = celebrity.publicName,
         productDescription = product.description,
+        recipientId = order.recipientId,
+        recipientName = order.recipientName,
         thumbnailUrl = imageUrl,
         orderStatus = order.reviewStatus.name,
         orderDetails = new OrderDetails(

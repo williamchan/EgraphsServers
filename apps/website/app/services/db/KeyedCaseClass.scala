@@ -20,7 +20,6 @@ trait KeyedCaseClass[T] extends KeyedEntity[T] {
   /** Returns the result of the case class companion object's unapply method */
   def unapplied: AnyRef
 
-
   //
   // Private implementation
   //

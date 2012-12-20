@@ -5,7 +5,7 @@ import services.AppConfig
 import models.enums.VideoStatus
 
 class VideoAssetTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with SavingEntityIdLongTests[VideoAsset]
   with CreatedUpdatedEntityTests[Long, VideoAsset]
   with DateShouldMatchers
@@ -17,8 +17,7 @@ class VideoAssetTests extends EgraphsUnitTest
   // SavingEntityTests[VideoAsset] methods
   //
   override def newEntity = {
-    val videoAsset = TestData.newSavedVideoAsset()
-    VideoAsset(url = videoAsset.url)
+    VideoAsset()
   }
 
   override def saveEntity(toSave: VideoAsset) = {
@@ -31,16 +30,15 @@ class VideoAssetTests extends EgraphsUnitTest
 
   override def transformEntity(toTransform: VideoAsset) = {
     toTransform.copy(
-      url = "http://www.testUrlTransformed.com")
+      _urlKey = "videoassets/fakeId/fakeVideo.mp4")
   }
 
   //
   // Test cases
   //
-  "A VideoAsset" should "return its associated url" in {
-    val videoAsset = TestData.newSavedVideoAsset()
-    val myVideoAsset = VideoAsset(url = videoAsset.url).save()
-    myVideoAsset.url should be(videoAsset.url)
+  "A VideoAsset" should "store its associated _urlKey" in {
+    val myVideoAsset = VideoAsset(_urlKey = "hiiiiiiii").save()
+    myVideoAsset._urlKey should be("hiiiiiiii")
   }
   
   "A VideoAsset" should "update its status" in {

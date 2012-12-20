@@ -141,6 +141,17 @@ trait Saves[KeyT, T <: KeyedEntity[KeyT]] {
   def save(toSave: T): T
 
   /**
+   * Persist an object by inserting it.  Note: This is replaced by SER-499.
+   *
+   * @param toSave the object to save
+   *
+   * @return the final object that was saved, after all transforms
+   */
+  def create(toSave: T): T = {
+    insert(toSave)
+  }
+
+  /**
    * Locates an object by its id.
    *
    * @param id the id of the object to locate

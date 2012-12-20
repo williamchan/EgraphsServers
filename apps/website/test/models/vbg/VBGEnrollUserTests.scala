@@ -8,7 +8,7 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class VBGEnrollUserTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with SavingEntityIdLongTests[VBGEnrollUser]
   with CreatedUpdatedEntityTests[Long, VBGEnrollUser]
   with DateShouldMatchers

@@ -8,7 +8,7 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class VBGFinishEnrollTransactionTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with SavingEntityIdLongTests[VBGFinishEnrollTransaction]
   with CreatedUpdatedEntityTests[Long, VBGFinishEnrollTransaction]
   with DateShouldMatchers

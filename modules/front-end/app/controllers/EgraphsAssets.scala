@@ -2,13 +2,14 @@ package controllers
 
 import play.api.Play.current
 import play.api.mvc.Controller
-import assetproviders.RemoteAssets
-import assetproviders.FingerprintedAssets
-import assetproviders.PlayAssets
+import assetproviders.{SvgzAssetSupport, RemoteAssets, FingerprintedAssets, PlayAssets}
 
 /** Collects all asset transformations into a single trait for use in our website app */
 trait EgraphsAssetPipeline
-  extends PlayAssets with RemoteAssets with FingerprintedAssets { this: Controller => }
+  extends PlayAssets
+     with RemoteAssets
+     with FingerprintedAssets
+     with SvgzAssetSupport { this: Controller => }
 
 /** The concrete asset implementation for our website app */
 object EgraphsAssets extends Controller with EgraphsAssetPipeline {

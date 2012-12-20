@@ -12,6 +12,7 @@ import com.google.inject.{ Inject, Injector }
 import java.sql.Connection
 import services.logging.Logging
 import services.config.ConfigFileProxy
+import org.squeryl.ForeignKeyDeclaration
 
 /**
  * Egraphs Database schema
@@ -26,11 +27,20 @@ class Schema @Inject() (
   @CurrentTransaction currentTxnConnectionFactory: () => Connection) extends org.squeryl.Schema with Logging {
 
   import uk.me.lings.scalaguice.InjectorExtensions._
-  
 
   // Putting this here because Celebrity.findByTextQuery needs it, but this feels wrong.
   def getTxnConnectionFactory = {
     currentTxnConnectionFactory()
+  }
+
+  /**
+   * This is the default behavior for all foreign keys created.  They can be overridden where they
+   * are declared.
+   *
+   * Docs: http://squeryl.org/relations.html
+   */
+  override def applyDefaultForeignKeyPolicy(foreignKeyDeclaration: ForeignKeyDeclaration) = {
+    foreignKeyDeclaration.constrainReference
   }
 
   //
@@ -68,7 +78,7 @@ class Schema @Inject() (
   on(celebrities)(celebrity =>
     declare(
       celebrity.urlSlug is unique,
-      celebrity.isFeatured is indexed,
+      celebrity.isFeatured is indexed, //TODO: SER-580 - Remove after successful deployment. Evolution can be found in history.
       celebrity.bio is dbType("text")))
   
   val coupons = table[Coupon]
@@ -128,9 +138,7 @@ class Schema @Inject() (
       usernameHistory.customerId is indexed))
 
   val videoAssets = table[VideoAsset]
-  on(videoAssets)(videoAsset =>
-    declare(
-      videoAsset.url is dbType("varchar(255)")))
+  on(videoAssets)(videoAsset => declare(videoAsset._urlKey is dbType("varchar(255)")))
 
   // ugh, why did I make so many biometrics tables?
   val vbgAudioCheckTable = table[VBGAudioCheck]
@@ -161,10 +169,14 @@ class Schema @Inject() (
 
   val categoryValueRelationships =
     manyToManyRelation(categoryValues, categories).via[CategoryValueRelationship]((cv, c, cvr) => (cvr.categoryValueId === cv.id, cvr.categoryId === c.id))
+  categoryValueRelationships.leftForeignKeyDeclaration.constrainReference(onDelete cascade)
+  categoryValueRelationships.rightForeignKeyDeclaration.constrainReference(onDelete cascade)
 
   val celebrityCategoryValues =
     manyToManyRelation(celebrities, categoryValues).via[CelebrityCategoryValue]((c, cv, ccv) =>
       (ccv.celebrityId === c.id, ccv.categoryValueId === cv.id))
+  celebrityCategoryValues.leftForeignKeyDeclaration.constrainReference(onDelete cascade)
+  celebrityCategoryValues.rightForeignKeyDeclaration.constrainReference(onDelete cascade)
 
   val inventoryBatchProducts = manyToManyRelation(inventoryBatches, products)
     .via[InventoryBatchProduct]((inventoryBatch, product, join) => (join.inventoryBatchId === inventoryBatch.id, join.productId === product.id))
@@ -189,10 +201,12 @@ class Schema @Inject() (
     .via((account, address) => account.id === address.accountId)
   val accountToTransaction = oneToManyRelation(accounts, cashTransactions)
     .via((account, cashTransaction) => account.id === cashTransaction.accountId)
-    
+
+  val categoryToCategoryValue = oneToManyRelation(categories, categoryValues)
+    .via((category, categoryValue) => category.id === categoryValue.categoryId)
+
   val celebrityToEnrollmentBatches = oneToManyRelation(celebrities, enrollmentBatches)
     .via((celebrity, enrollmentBatch) => celebrity.id === enrollmentBatch.celebrityId)
-  celebrityToEnrollmentBatches.foreignKeyDeclaration.constrainReference(onDelete cascade)
   val celebrityToProduct = oneToManyRelation(celebrities, products)
     .via((celebrity, product) => celebrity.id === product.celebrityId)
   val celebrityToInventoryBatches = oneToManyRelation(celebrities, inventoryBatches)
@@ -200,72 +214,57 @@ class Schema @Inject() (
 
   val customerToUsernameHistory = oneToManyRelation(customers, usernameHistories)
     .via((customer, usernameHistory) => customer.id === usernameHistory.customerId)
-  customerToUsernameHistory.foreignKeyDeclaration.constrainReference(onDelete cascade)
 
   val buyingCustomerToOrders = oneToManyRelation(customers, orders)
     .via((customer, order) => customer.id === order.buyerId)
-  buyingCustomerToOrders.foreignKeyDeclaration.constrainReference(onDelete cascade)
   val recipientCustomerToOrders = oneToManyRelation(customers, orders)
     .via((customer, order) => customer.id === order.recipientId)
-  recipientCustomerToOrders.foreignKeyDeclaration.constrainReference(onDelete cascade)
 
   val enrollmentBatchToEnrollmentSamples = oneToManyRelation(enrollmentBatches, enrollmentSamples)
     .via((enrollmentBatch, enrollmentSample) => enrollmentBatch.id === enrollmentSample.enrollmentBatchId)
-  enrollmentBatchToEnrollmentSamples.foreignKeyDeclaration.constrainReference(onDelete cascade)
 
   val inventoryBatchToOrders = oneToManyRelation(inventoryBatches, orders)
     .via((inventoryBatch, order) => inventoryBatch.id === order.inventoryBatchId)
 
   val orderToEgraphs = oneToManyRelation(orders, egraphs)
     .via((order, egraph) => order.id === egraph.orderId)
-  orderToEgraphs.foreignKeyDeclaration.constrainReference(onDelete cascade)
-
   val orderToPrintOrders = oneToManyRelation(orders, printOrders)
     .via((order, printOrder) => order.id === printOrder.orderId)
-  orderToPrintOrders.foreignKeyDeclaration.constrainReference(onDelete cascade)
+  val orderToTransaction = oneToManyRelation(orders, cashTransactions)
+    .via((order, cashTransaction) => order.id === cashTransaction.orderId)
+
+  val printOrderToTransaction = oneToManyRelation(printOrders, cashTransactions)
+    .via((printOrder, cashTransaction) => printOrder.id === cashTransaction.printOrderId)
 
   val productToOrders = oneToManyRelation(products, orders)
     .via((product, order) => product.id === order.productId)
-  productToOrders.foreignKeyDeclaration.constrainReference(onDelete cascade)
 
   // ugh, why did I make so many biometrics tables?
   val enrollmentBatchToVBGAudioCheckTable = oneToManyRelation(enrollmentBatches, vbgAudioCheckTable)
     .via((enrollmentBatch, vbgAudioCheck) => enrollmentBatch.id === vbgAudioCheck.enrollmentBatchId)
-  enrollmentBatchToVBGAudioCheckTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
   val enrollmentBatchToVBGEnrollUserTable = oneToManyRelation(enrollmentBatches, vbgEnrollUserTable)
     .via((enrollmentBatch, vbgEnrollUser) => enrollmentBatch.id === vbgEnrollUser.enrollmentBatchId)
-  enrollmentBatchToVBGEnrollUserTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
   val enrollmentBatchToVBGFinishEnrollTransactionTable = oneToManyRelation(enrollmentBatches, vbgFinishEnrollTransactionTable)
     .via((enrollmentBatch, vbgFinishEnrollTransaction) => enrollmentBatch.id === vbgFinishEnrollTransaction.enrollmentBatchId)
-  enrollmentBatchToVBGFinishEnrollTransactionTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
   val egraphToVBGFinishVerifyTransactionTable = oneToManyRelation(egraphs, vbgFinishVerifyTransactionTable)
     .via((egraph, vbgFinishVerifyTransaction) => egraph.id === vbgFinishVerifyTransaction.egraphId)
-  egraphToVBGFinishVerifyTransactionTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
   val enrollmentBatchToVBGStartEnrollmentTable = oneToManyRelation(enrollmentBatches, vbgStartEnrollmentTable)
     .via((enrollmentBatch, vbgStartEnrollment) => enrollmentBatch.id === vbgStartEnrollment.enrollmentBatchId)
-  enrollmentBatchToVBGStartEnrollmentTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
   val egraphToVBGStartVerificationTable = oneToManyRelation(egraphs, vbgStartVerificationTable)
     .via((egraph, vbgStartVerification) => egraph.id === vbgStartVerification.egraphId)
-  egraphToVBGStartVerificationTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
   val egraphToVBGVerifySampleTable = oneToManyRelation(egraphs, vbgVerifySampleTable)
     .via((egraph, vbgVerifySample) => egraph.id === vbgVerifySample.egraphId)
-  egraphToVBGVerifySampleTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
 
   val enrollmentBatchToXyzmoAddProfileTable = oneToManyRelation(enrollmentBatches, xyzmoAddProfileTable)
     .via((enrollmentBatch, xyzmoAddProfile) => enrollmentBatch.id === xyzmoAddProfile.enrollmentBatchId)
-  enrollmentBatchToXyzmoAddProfileTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
   val enrollmentBatchToXyzmoAddUserTable = oneToManyRelation(enrollmentBatches, xyzmoAddUserTable)
     .via((enrollmentBatch, xyzmoAddUser) => enrollmentBatch.id === xyzmoAddUser.enrollmentBatchId)
-  enrollmentBatchToXyzmoAddUserTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
   val enrollmentBatchToXyzmoDeleteUserTable = oneToManyRelation(enrollmentBatches, xyzmoDeleteUserTable)
     .via((enrollmentBatch, xyzmoDeleteUser) => enrollmentBatch.id === xyzmoDeleteUser.enrollmentBatchId)
-  enrollmentBatchToXyzmoDeleteUserTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
   val enrollmentBatchToXyzmoEnrollDynamicProfileTable = oneToManyRelation(enrollmentBatches, xyzmoEnrollDynamicProfileTable)
     .via((enrollmentBatch, xyzmoEnrollDynamicProfile) => enrollmentBatch.id === xyzmoEnrollDynamicProfile.enrollmentBatchId)
-  enrollmentBatchToXyzmoEnrollDynamicProfileTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
   val egraphToXyzmoVerifyUserTable = oneToManyRelation(egraphs, xyzmoVerifyUserTable)
     .via((egraph, xyzmoVerifyUser) => egraph.id === xyzmoVerifyUser.egraphId)
-  egraphToXyzmoVerifyUserTable.foreignKeyDeclaration.constrainReference(onDelete cascade)
 
   //
   // Public methods

@@ -36,6 +36,8 @@ object FrontendBuild extends Build {
     //resolvers += "Crionics Github Repository" at "http://orefalo.github.com/m2repo/releases/",
     organization := "egraphs",
 
+    testOptions in Test := Nil,    
+
     lessEntryPoints <<= baseDirectory(customLessEntryPoints),
 
     // exclude anything created by the routes file from going into the jar so it doesn't conflict with the packages

@@ -313,18 +313,23 @@ case class Egraph(
   }
 
   /**
-   * Egraphs that are published, rejected, or failed biometric testing are not pending; they will not be
-   * delivered to the user
+   * Egraphs that are published or rejected are not pending; they will not be
+   * delivered to the user. HOWEVER, Egraphs that fail biometric testing should 
+   * still be shown to the user. According to Kate, a LOT of Egraphs currently
+   * fail biometrics, but are published anyway. We want those Egraphs to still
+   * be considered pending. In other words, the Customer should have no way of 
+   * knowing whether their Egraph passed or failed biometrics.
+   * 
    * @return Whether an egraph is on its way to a user
    */
   def isPendingEgraph: Boolean = {
     egraphState match {
       case EgraphState.Published |
-           EgraphState.RejectedByAdmin |
-           EgraphState.FailedBiometrics => false
+           EgraphState.RejectedByAdmin => false
 
       case EgraphState.AwaitingVerification |
            EgraphState.PassedBiometrics |
+           EgraphState.FailedBiometrics |
            EgraphState.ApprovedByAdmin => true
 
       case badValue => throw new Exception("Unexpected enum value: " + badValue)
@@ -336,7 +341,7 @@ case class Egraph(
   }
 
   def isRejectable: Boolean = {
-    List(PassedBiometrics, FailedBiometrics, ApprovedByAdmin).contains(egraphState)
+    List(PassedBiometrics, FailedBiometrics, ApprovedByAdmin, Published).contains(egraphState)
   }
 
   def approve(admin: Administrator): Egraph = {

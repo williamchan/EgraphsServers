@@ -10,6 +10,8 @@ import controllers.PaginationInfoFactory
 import play.api.data._
 import play.api.data.Forms._
 import services.mvc.{celebrity, ImplicitHeaderAndFooterData}
+import models.categories.Featured
+import models.frontend.admin.CelebrityAdminViewModel
 
 private[controllers] trait GetCelebritiesAdminEndpoint extends ImplicitHeaderAndFooterData  {
   this: Controller =>
@@ -17,6 +19,7 @@ private[controllers] trait GetCelebritiesAdminEndpoint extends ImplicitHeaderAnd
   protected def httpFilters: HttpFilters
   protected def celebrityStore: CelebrityStore
   protected def controllerMethod: ControllerMethod
+  protected def featured: Featured
 
   def getCelebritiesAdmin = controllerMethod.withForm() { implicit authToken =>
     httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
@@ -27,9 +30,19 @@ private[controllers] trait GetCelebritiesAdminEndpoint extends ImplicitHeaderAnd
         val query = celebrityStore.getCelebrityAccounts
         val pagedQuery: (Iterable[(Celebrity, Account)], Int, Option[Int]) = services.Utils.pagedQuery(select = query, page = page)
         implicit val paginationInfo = PaginationInfoFactory.create(pagedQuery = pagedQuery, baseUrl = GetCelebritiesAdminEndpoint.location)
+
+        // get all celebrities and mark the featured ones
+        val featuredCelebrities = celebrityStore.marketplaceSearch(refinements = List(List(featured.categoryValue.id))).toList
+        val featuredMap = featuredCelebrities.groupBy(celebrity => celebrity.id) // should only have one for each group
+        val celebrities = celebrityStore.getAll.map(celebrity =>
+          CelebrityAdminViewModel(
+            id = celebrity.id,
+            publicName = celebrity.publicName,
+            isFeatured = featuredMap.contains(celebrity.id))
+        )
         Ok(views.html.Application.admin.admin_celebrities(
           celebrityAccounts = pagedQuery._1,
-          celebrityStore.getAll // for the Featured Stars chooser
+          allCelebrities = celebrities // for the Featured Stars chooser
         ))
       }
     }

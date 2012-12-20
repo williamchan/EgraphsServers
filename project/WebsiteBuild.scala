@@ -32,6 +32,7 @@ object WebsiteBuild extends Build {
       "org.antlr" % "stringtemplate" % "4.0.2",
       "org.apache.commons" % "commons-email" % "1.2",
       "org.apache.commons" % "commons-lang3" % "3.1",
+      "org.apache.pdfbox" % "pdfbox" % "1.7.1",
 //      "org.jclouds.api" % "filesystem" % "1.5.1" excludeAll(
 //          ExclusionRule(organization = "org.clojure")
 //      ),

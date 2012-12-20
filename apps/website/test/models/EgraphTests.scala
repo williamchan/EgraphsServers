@@ -7,7 +7,7 @@ import services.{Dimensions, Time, AppConfig}
 import java.awt.image.BufferedImage
 
 class EgraphTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with SavingEntityIdLongTests[Egraph]
   with CreatedUpdatedEntityTests[Long, Egraph]
   with DateShouldMatchers
@@ -46,6 +46,20 @@ class EgraphTests extends EgraphsUnitTest
     egraph.egraphState should be (EgraphState.FailedBiometrics)
   }
 
+  it should "save and recover signature and audio data from the blobstore" in new EgraphsTestApplication {
+    val egraph = TestData.newSavedOrder()
+      .newEgraph
+      .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.fakeAudio)
+      .save()
+
+    egraph.assets.signature should be (TestConstants.shortWritingStr)
+    egraph.assets.audioWav.asByteArray should be (TestConstants.fakeAudio)
+  }
+
+  it should "throw an exception if assets are accessed on an unsaved Egraph" in new EgraphsTestApplication {
+    evaluating { TestData.newSavedOrder().newEgraph.assets } should produce [IllegalArgumentException]
+  }
+
   "approve" should "change state to ApprovedByAdmin" in new EgraphsTestApplication {
     val admin = Administrator().save()
     Egraph().withEgraphState(EgraphState.PassedBiometrics).approve(admin).egraphState should be(EgraphState.ApprovedByAdmin)
@@ -60,9 +74,9 @@ class EgraphTests extends EgraphsUnitTest
     val admin = Administrator().save()
     Egraph().withEgraphState(EgraphState.PassedBiometrics).reject(admin).egraphState should be(EgraphState.RejectedByAdmin)
     Egraph().withEgraphState(EgraphState.FailedBiometrics).reject(admin).egraphState should be(EgraphState.RejectedByAdmin)
+    Egraph().withEgraphState(EgraphState.Published).reject(admin).egraphState should be(EgraphState.RejectedByAdmin)
     intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.PassedBiometrics).reject(null)}
     intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.AwaitingVerification).reject(admin)}
-    intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.Published).reject(admin)}
     intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.RejectedByAdmin).reject(admin)}
   }
 
@@ -76,7 +90,7 @@ class EgraphTests extends EgraphsUnitTest
     intercept[IllegalArgumentException] {TestData.newSavedEgraph().withEgraphState(EgraphState.PassedBiometrics).publish(admin)}
   }
 
-  "publish" should "fail if there is another non-rejected Egraph" in new EgraphsTestApplication {
+  it should "fail if there is another non-rejected Egraph" in new EgraphsTestApplication {
     val admin = Administrator().save()
     val order = TestData.newSavedOrder()
     Egraph().copy(orderId = order.id).save()
@@ -103,16 +117,6 @@ class EgraphTests extends EgraphsUnitTest
     ingredientFactory.signingOriginY should be(0)
   }
 
-  "An Egraph" should "save and recover signature and audio data from the blobstore" in new EgraphsTestApplication {
-    val egraph = TestData.newSavedOrder()
-      .newEgraph
-      .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), TestConstants.fakeAudio)
-      .save()
-
-    egraph.assets.signature should be (TestConstants.shortWritingStr)
-    egraph.assets.audioWav.asByteArray should be (TestConstants.fakeAudio)
-  }
-
   "generateAndSaveMp3" should "store mp3 asset" in new EgraphsTestApplication {
     val egraph = TestData.newSavedEgraphWithRealAudio()
     intercept[NoSuchElementException] { egraph.assets.audioMp3 }
@@ -125,10 +129,6 @@ class EgraphTests extends EgraphsUnitTest
     intercept[NoSuchElementException] { egraph.assets.audioMp3 }
     egraph.assets.audioMp3Url.endsWith("audio.mp3") should be(true)
     egraph.assets.audioMp3.asByteArray.length should be > (0)
-  }
-
-  "An Egraph" should "throw an exception if assets are accessed on an unsaved Egraph" in new EgraphsTestApplication {
-    evaluating { TestData.newSavedOrder().newEgraph.assets } should produce [IllegalArgumentException]
   }
 
   "An Egraph Story" should "render all values correctly in the title" in new EgraphsTestApplication {

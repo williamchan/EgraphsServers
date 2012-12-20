@@ -54,7 +54,6 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
       sampleMarketplaceImageUrl,
       "/" + name,
       inventoryRemaining = 10,
-      isFeatured = false,
       35,
       100
     )

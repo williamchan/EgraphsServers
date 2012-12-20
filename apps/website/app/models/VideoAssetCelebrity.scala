@@ -20,7 +20,7 @@ case class VideoAssetCelebrity(
   videoId: Long = 0,
   services: VideoAssetCelebrityServices = AppConfig.instance[VideoAssetCelebrityServices])
   extends KeyedCaseClass[Long] {
-
+  
   //
   // Public members
   //
@@ -46,6 +46,18 @@ class VideoAssetCelebrityStore @Inject() (schema: Schema) extends SavesWithLongK
     from(schema.celebrities)(celebrity =>
       where(celebrity.id === celebrityId)
         select (celebrity)).headOption
+  }
+  
+  // assumes there is only 1 video asset per celebrity
+  // (if that is ever not the case, this should be modified)
+  def getVideoAssetByCelebrityId(celebrityId: Long): Option[VideoAsset] = {
+    val videoAssetId = from(schema.videoAssetsCelebrity)(videoAssetCelebrity =>
+      where(videoAssetCelebrity.celebrityId === celebrityId)
+        select (videoAssetCelebrity.videoId)).headOption
+        
+    from(schema.videoAssets)(videoAsset =>
+      where(videoAsset.id === videoAssetId)
+        select (videoAsset)).headOption
   }
 
   //

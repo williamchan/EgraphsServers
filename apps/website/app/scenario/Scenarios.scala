@@ -22,6 +22,7 @@ import models.Order
 import play.api.Play
 import play.api.Play.current
 import utils.{TestData, TestConstants}
+import categories.Featured
 
 /**
  * All scenarios supported by the API.
@@ -39,6 +40,8 @@ class Scenarios extends DeclaresScenarios {
 
   private val schema = AppConfig.instance[Schema]
   private val mail = AppConfig.instance[services.mail.TransactionalMail]
+  private val featured = AppConfig.instance[Featured]
+  private val orderStore = AppConfig.instance[OrderStore]
 
   private lazy val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
   private lazy val today = DateTime.now().toLocalDate.toDate
@@ -109,24 +112,23 @@ class Scenarios extends DeclaresScenarios {
   toScenarios add Scenario(
   "Will Chan is a celebrity",
   apiCategory,
-  """
-    Creates a celebrity named William 'Wizzle' Chan. His login/password are
-    wchan83@egraphs.com/derp. He has a profile photo.
-  """, {
+  "Creates a celebrity named William 'Wizzle' Chan. His login/password are" +
+    Scenarios.willsEmail + "/" + TestData.defaultPassword + ". He has a profile photo."
+  , {
     () =>
       Scenarios.createAdmin()
       import Blobs.Conversions._
       val celebrity = Celebrity(
         publicName = "Wizzle",
         bio = "Love my fans from New York to Tokyo, from Seoul to the Sudetenland. And for all you haters out there -- don't mess around. I sleep with one eye closed, the other fixed on my Vespene gas supply.",
-        organization = "Major League Baseball",
-        isFeatured = true
+        organization = "Major League Baseball"
       ).withPublishedStatus(PublishedStatus.Published).save()
-      Account(email = "wchan83@egraphs.com",
+      Account(email = Scenarios.willsEmail,
         celebrityId = Some(celebrity.id)
       ).withPassword(TestData.defaultPassword).right.get.save()
       celebrity.saveWithProfilePhoto(Play.getFile("test/resources/will_chan_celebrity_profile.jpg"))
       celebrity.withLandingPageImage(Play.getFile("test/resources/ortiz_masthead.jpg")).save()
+      featured.updateFeaturedCelebrities(List(celebrity.id))
   }
   )
 
@@ -158,7 +160,7 @@ class Scenarios extends DeclaresScenarios {
         description = "In classic form, Wizzle dominated the competition and left mouths agape.",
         priceInCurrency = 70,
         storyTitle = "The story and the glory",
-        image = Some(Product().defaultPhoto.renderFromMaster),
+        image = photoImage,
         icon = iconImage,
         storyText = """
            {signer_link}{signer_name}{end_link} was born on top. On {date_signed}
@@ -177,24 +179,89 @@ class Scenarios extends DeclaresScenarios {
   apiCategory,
   """
     Creates a customer named Erem Boto.
-    [note: He does not have any associated Account thus far...but we can create one
-     programmatically later on if we want to log in as him]
   """, {
     () =>
-      val customer = TestData.newSavedCustomer().copy(name = "Erem Boto").save()
-      customer.account.withPassword(TestData.defaultPassword).right.get.save()
+      val erem = Scenarios.getEremCustomerAccount
+      "Name = " + erem.name + ", username/password = " + erem.account.email + "/" + TestData.defaultPassword
   }
   )
 
   toScenarios add Scenario(
-  "Erem buys Wills two products twice each",
+  "Myyk is another customer",
+  apiCategory,
+  """
+    Creates a customer named Myyk Badass-Seok.
+  """, {
+    () =>
+      val myyk = Scenarios.getMyykCustomerAccount
+      "Name = " + myyk.name + ", username/password = " + myyk.account.email + "@egraphs.com/" + TestData.defaultPassword
+  }
+  )
+
+  toScenarios add Scenario(
+  "Erem buys Will's two products",
   apiCategory,
   """Creates two unfulfilled orders, one each ordered against Will's two products.""", {
     () =>
       val erem = Scenarios.getEremCustomerAccount
       val (starcraftChampionship, kingOfPweensCompetition) = Scenarios.getWillsTwoProducts
-      erem.buy(starcraftChampionship, recipientName = "Erem Boto", requestedMessage = Some("Happy 13th birthday, Don!"), messageToCelebrity = Some("My buddy Don is your biggest fan!")).save()
-      erem.buy(kingOfPweensCompetition, recipientName = "Erem Boto", requestedMessage = Some("Happy Pweenday, Don!"), messageToCelebrity = Some("Don loves everything you do!")).save()
+      erem.buy(starcraftChampionship, recipientName = erem.name, requestedMessage = Some("Happy 13th birthday, Don!"), messageToCelebrity = Some("My buddy Don is your biggest fan!")).save()
+      erem.buy(kingOfPweensCompetition, recipientName = erem.name, requestedMessage = Some("Happy Pweenday, Don!"), messageToCelebrity = Some("Don loves everything you do!")).save()
+  }
+  )
+  
+  toScenarios add Scenario(
+  "Myyk buys Will's two products",
+  apiCategory,
+  """Creates two unfulfilled orders, one each ordered against Will's two products.""", {
+    () =>
+      val myyk = Scenarios.getMyykCustomerAccount
+      val (starcraftChampionship, kingOfPweensCompetition) = Scenarios.getWillsTwoProducts
+      myyk.buy(starcraftChampionship, recipientName = myyk.name, requestedMessage = Some("Happy 13th birthday, Don!"), messageToCelebrity = Some("My buddy Don is your biggest fan!")).save()
+      myyk.buy(kingOfPweensCompetition, recipientName = myyk.name, requestedMessage = Some("Happy Pweenday, Don!"), messageToCelebrity = Some("Don loves everything you do!")).save()
+  }
+  )
+  
+  toScenarios add Scenario(
+  "Erem buys one of Will's products as a gift for Myyk",
+  apiCategory,
+  """Creates one unfulfilled order (starcraftChampionship), which will be a gift for Myyk.""", {
+    () =>
+      val erem = Scenarios.getEremCustomerAccount
+      val myyk = Scenarios.getMyykCustomerAccount
+      val (starcraftChampionship, _) = Scenarios.getWillsTwoProducts
+      erem.buy(starcraftChampionship, recipient = myyk, recipientName = myyk.name, requestedMessage = Some("Happy 13th birthday, Myyk!"), messageToCelebrity = Some("My buddy Myyk is your biggest fan!")).save()
+  }
+  )
+  
+  toScenarios add Scenario(
+  "Myyk buys one of Will's products as a gift for Erem",
+  apiCategory,
+  """Creates one unfulfilled order (kingOfPweensCompetition), which will be a gift for Myyk.""", {
+    () =>
+      val myyk = Scenarios.getMyykCustomerAccount
+      val erem = Scenarios.getEremCustomerAccount
+      val (_, kingOfPweensCompetition) = Scenarios.getWillsTwoProducts
+      myyk.buy(kingOfPweensCompetition, recipient = erem, recipientName = erem.name, requestedMessage = Some("Happy 13th birthday, Erem!"), messageToCelebrity = Some("My buddy Erem is your biggest fan!")).save()
+  }
+  )
+
+  toScenarios add Scenario(
+  "Will fulfills Erem's gift order for Myyk",
+  apiCategory,
+  """Will fulfills Erem's gift order for Myyk""", {
+    () =>
+      val (starcraftChampionship, _) = Scenarios.getWillsTwoProducts
+      val order = orderStore.findByBuyerCustomerId(Scenarios.getEremCustomerAccount.id).filter { order => order.recipient == Scenarios.getMyykCustomerAccount }.head
+      order
+        .withPaymentStatus(PaymentStatus.Charged).save()
+        .newEgraph
+        .withAssets(TestConstants.signingAreaSignatureStr, Some(TestConstants.signingAreaMessageStr), Base64.decode(TestConstants.voiceStr()))
+        .save()
+        .withYesMaamBiometricServices
+        .verifyBiometrics
+        .withEgraphState(EgraphState.Published)
+        .save()
   }
   )
 
@@ -377,7 +444,7 @@ class Scenarios extends DeclaresScenarios {
         "Will-Chan-is-a-celebrity",
         "Will-has-two-products",
         "Erem-is-a-customer",
-        "Erem-buys-Wills-two-products-twice-each",
+        "Erem-buys-Wills-two-products",
         "Deliver-All-Orders-to-Celebrities",
         "Will-fulfills-one-of-Erems-product-orders"
       )
@@ -398,7 +465,7 @@ class Scenarios extends DeclaresScenarios {
         "Will-Chan-is-a-celebrity",
         "Will-has-two-products",
         "Erem-is-a-customer",
-        "Erem-buys-Wills-two-products-twice-each",
+        "Erem-buys-Wills-two-products",
         "Deliver-All-Orders-to-Celebrities",
         "Will-fulfills-one-of-Erems-product-orders"
       )
@@ -416,7 +483,7 @@ class Scenarios extends DeclaresScenarios {
         "Will-Chan-is-a-celebrity",
         "Will-has-two-products",
         "Erem-is-a-customer",
-        "Erem-buys-Wills-two-products-twice-each",
+        "Erem-buys-Wills-two-products",
         "Deliver-All-Orders-to-Celebrities",
         "Will-fulfills-one-of-Erems-product-orders",
         "Will-fulfills-Erems-second-product-order"
@@ -475,8 +542,13 @@ object Scenarios {
   private val productStore = instance[ProductStore]
   private val customerStore = instance[CustomerStore]
 
+  private val adminEmail = "admin@egraphs.com"
+  private val myyksEmail = "myyk666_69_for_life@egraphs.com"
+  private val willsEmail = "wchan83@egraphs.com"
+  private val eremEmail = "erem_mere@egraphs.com"
+
   def getWillAccount: Account = {
-    accountStore.findByEmail("wchan83@egraphs.com").get
+    accountStore.findByEmail(willsEmail).get
   }
 
   def getWillCelebrityAccount: Celebrity = {
@@ -488,11 +560,22 @@ object Scenarios {
   }
 
   def getEremCustomerAccount: Customer = {
-    customerStore.get(1L)
+    ensureCustomerAccountExists("Erem Boto", eremEmail)
+  }
+
+  def getMyykCustomerAccount: Customer = {
+    ensureCustomerAccountExists("Myyk Badass-Seok", myyksEmail)
+  }
+
+  private def ensureCustomerAccountExists(name: String, email: String): Customer = {
+    val account = accountStore.findByEmail(email).getOrElse(TestData.newSavedAccount(email = Some(email)))
+    account.customerId match {
+      case None => TestData.newSavedCustomer(maybeAccount = Some(account)).copy(name = name).save()
+      case Some(customerId) => customerStore.findById(customerId).head
+    }
   }
 
   def createAdmin() {
-    val adminEmail = "admin@egraphs.com"
     if (accountStore.findByEmail(adminEmail).isEmpty) {
       val administrator = Administrator().save()
       Account(email = adminEmail, administratorId = Some(administrator.id)).withPassword("egraphsa").right.get.save()

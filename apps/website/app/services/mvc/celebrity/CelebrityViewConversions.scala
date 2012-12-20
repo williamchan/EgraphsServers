@@ -94,7 +94,6 @@ class CelebrityViewConversions(celeb: Celebrity) {
       marketplaceImageUrl = marketplaceImageUrl,
       storefrontUrl = choosePhotoUrl,
       inventoryRemaining = inventoryRemaining,
-      isFeatured = celeb.isFeatured,
       minPrice = minPrice,
       maxPrice = maxPrice
     )

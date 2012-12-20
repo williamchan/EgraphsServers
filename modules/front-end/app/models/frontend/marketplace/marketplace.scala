@@ -34,6 +34,7 @@ case class MarketplaceCelebrity(
     secondaryText: String)
 {
   def soldout: Boolean = (inventoryRemaining <= 0)
+  def hasInventoryRemaining: Boolean = !soldout
 }
 
 /**

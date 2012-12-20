@@ -31,6 +31,15 @@ class CelebrityStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
     results.map(result => result.id) should be (IndexedSeq(published.id))
   }
 
+  it should "include published celebrities of all enrollment statuses" in {
+    EnrollmentStatus.values.foreach{ status =>
+      val searchableId = newSearchableCeleb.withEnrollmentStatus(status).id
+      val results = getPublishedCelebritiesWithIds(List(searchableId))
+
+      results.map(result => result.id) should be (List(searchableId))
+    }
+  }
+
   it should "return the celebrities in alphabetical order on roleDescription" in {
     // Create and persist a list of celebs whose roleDescriptions are "c", "Ac", and "ab",
     // in that order. We'll be testing if they query out in the reverse order, which is what they should do if

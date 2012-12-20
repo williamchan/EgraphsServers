@@ -20,7 +20,6 @@ import play.api.mvc.Request
 /**
  * Controller for serving the celebrity marketplace
  */
-
 private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
   protected def controllerMethod : ControllerMethod
   protected def celebrityStore : CelebrityStore  

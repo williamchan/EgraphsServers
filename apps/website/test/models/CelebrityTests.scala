@@ -9,7 +9,7 @@ import play.api.Play
 import utils._
 
 class CelebrityTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with SavingEntityIdLongTests[Celebrity]
   with CreatedUpdatedEntityTests[Long, Celebrity]
   with DateShouldMatchers
@@ -75,45 +75,6 @@ class CelebrityTests extends EgraphsUnitTest
     celebrity.productsInActiveInventoryBatches().toSet should be(Set(product1, product2))
   }
 
-  "getFeaturedPublishedCelebrities" should "only return published celebrities that are featured" in new EgraphsTestApplication {
-    import PublishedStatus.{Published, Unpublished}
-
-    // Set up
-    val featuredPublishedShouldBeInResults = Vector(
-      (true, Published, true),
-      (true, Unpublished, false),
-      (false, Published, false),
-      (false, Unpublished, false)
-    )
-
-    val celebs = for ((featured, published, _) <- featuredPublishedShouldBeInResults) yield {
-      TestData.newSavedCelebrity()
-        .copy(isFeatured=featured)
-        .withPublishedStatus(published)
-        .save()
-    }
-
-    val results = store.getFeaturedPublishedCelebrities.toList
-
-    // Execute the test on the data table featuredPublishedShouldBeInResults
-    for ((celeb, i) <- celebs.zipWithIndex) {
-      val shouldBeInResults = featuredPublishedShouldBeInResults(i)._3
-      if (shouldBeInResults) results should contain (celeb) else results should not contain (celeb)
-    }
-  }
-
-  "updateFeaturedCelebrities" should "remove celebs that weren't in the updated featured list" in new EgraphsTestApplication {
-    featuredStateOfCelebWhen(celebWasFeatured=true, includeCelebInNewFeaturedCelebs=false) should be (false)
-  }
-
-  it should "keep featured celebs" in new EgraphsTestApplication {
-    featuredStateOfCelebWhen(celebWasFeatured=true, includeCelebInNewFeaturedCelebs=true) should be (true)
-  }
-
-  it should "set newly featured celebs" in new EgraphsTestApplication {
-    featuredStateOfCelebWhen(celebWasFeatured=false, includeCelebInNewFeaturedCelebs=true) should be (true)
-  }
-  
   "find pairs of categories and CategoryValues" should "return the pairs associated with the celeb" in {
     val categoryA = TestData.newSavedCategory
     val categoryValueA = TestData.newSavedCategoryValue(categoryA.id)
@@ -156,7 +117,6 @@ class CelebrityTests extends EgraphsUnitTest
     toTransform.copy(
       apiKey = Some("apiKey"),
       publicName = TestData.generateFullname(),
-      isFeatured = true,
       roleDescription = "Pitcher, Tampa Bay Rays",
       profilePhotoUpdated = Some(Time.toBlobstoreFormat(Time.now))
     ).withPublishedStatus(PublishedStatus.Published)
@@ -176,24 +136,4 @@ class CelebrityTests extends EgraphsUnitTest
     celeb.categoryValues.exists(cv => cv.id == categoryValue1.id) should be (true)
     celeb.categoryValues.exists(cv => cv.id == categoryValue2.id) should be (true)
   }
-
-  //
-  // Private methods
-  //
-
-  private def featuredStateOfCelebWhen(
-    celebWasFeatured: Boolean,
-    includeCelebInNewFeaturedCelebs: Boolean): Boolean =
-  {
-    val celeb = TestData.newSavedCelebrity().copy(isFeatured=celebWasFeatured).save()
-    val newFeaturedCelebs = if(includeCelebInNewFeaturedCelebs) {
-      List(celeb.id)
-    } else {
-      List(TestData.newSavedCelebrity().id) // a list of celebrity ids that can't be this celebrity
-    }
-
-    store.updateFeaturedCelebrities(newFeaturedCelebs)
-    store.get(celeb.id).isFeatured
-  }
-
 }

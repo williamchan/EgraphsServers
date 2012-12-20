@@ -10,7 +10,7 @@ GET     /simple_example                                           controllers.Ap
 
 #GET     /build                                                    controllers.Build.index
 
-GET     /Account/gallery                                          controllers.Account.gallery(user: String ?= "userdude", count: Int ?=  1, role: String ?= "other", pending: Int ?= 0)
+GET     /Account/gallery                                          controllers.Account.gallery(user: String, role: String, countFulfilled: Int, countPending: Int, countFulfilledGifts: Int, countPendingGifts: Int)
 GET     /Account/errors                                           controllers.Account.errors
 POST    /orders/:orderId/:status/configure                        controllers.Account.privacy(orderId: Long, status: String)
 GET     /Account/privacy                                          controllers.Account.privacy(orderId: Long, status: String)
@@ -64,6 +64,8 @@ GET     /Failed/purchase_error                                    controllers.Fa
 
 GET     /Finalize/index                                           controllers.Finalize.index
 GET     /Finalize/portrait                                        controllers.Finalize.portrait
+
+GET     /GiftCertificateCheckout/index                            controllers.GiftCertificateCheckout.index
 
 GET     /Landing/featuredStars                                    controllers.Landing.featuredStars(count:Int)
 GET     /Landing/featuredStarsWithNoInventory                     controllers.Landing.featuredStarsWithNoInventory

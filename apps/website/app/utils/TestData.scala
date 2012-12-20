@@ -56,8 +56,8 @@ object TestData {
     ).save()
   }
 
-  def newSavedAccount(): Account = {
-    Account(email = generateEmail(prefix = "acct-")).save()
+  def newSavedAccount(email: Option[String] = None): Account = {
+    Account(email = email.getOrElse(generateEmail(prefix = "acct-"))).withPassword(defaultPassword).right.get.save()
   }
 
   def newSavedAdministrator(_account: Option[Account] = None): Administrator = {
@@ -74,8 +74,8 @@ object TestData {
   
   lazy val defaultPassword = "egraphsa"
 
-  def newSavedCustomer(): Customer = {
-    val account = Account(email = generateEmail(prefix = "customer-")).withPassword(defaultPassword).right.get.save()
+  def newSavedCustomer(maybeAccount: Option[Account] = None): Customer = {
+    val account = maybeAccount.getOrElse(newSavedAccount())
     val customer = account.createCustomer(name = "Test Customer").save()
     account.createUsername().copy(customerId = customer.id).save()
     account.copy(customerId = Some(customer.id)).save()
@@ -85,7 +85,7 @@ object TestData {
   def newSavedCelebrity(): Celebrity = {
     val fullName = generateFullname()
     val email = generateEmail(fullName.replaceAll(" ", "."))
-    val acct = Account(email = email).save()
+    val acct = Account(email = email).withPassword(defaultPassword).right.get.save()
     val celeb = Celebrity(publicName = fullName)
     	.withPublishedStatus(PublishedStatus.Published)
     	.withEnrollmentStatus(EnrollmentStatus.Enrolled)
@@ -186,7 +186,7 @@ object TestData {
   }
 
   def newSavedVideoAsset(): VideoAsset = {
-    VideoAsset(url = "http://www.testUrl.com", _videoStatus = VideoStatus.Unprocessed.name).save()
+    VideoAsset(_urlKey = "videoassets/fakeId/fakeVideo.mp4", _videoStatus = VideoStatus.Unprocessed.name).save()
   }
   
   // delete this if it never gets called
