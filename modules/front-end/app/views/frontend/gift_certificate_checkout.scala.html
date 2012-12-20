@@ -192,7 +192,13 @@
                 <div class="control-group card-cvc">
                   <label class="control-label" for="card-cvc">Security Code:</label>
                   <div class="controls">
-                    <input id="card-cvc" class="inset-shade" type="text" required name="card-cvc" ng-model="order.card.cvc" />
+                    <input id="card-cvc" 
+                           class="inset-shade"
+                           type="text"
+                           required
+                           credit-card-cvc
+                           name="card-cvc"
+                           ng-model="order.card.cvc" />
                   </div>
                 </div> <!-- End .card-cvc.controls -->
 

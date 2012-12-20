@@ -121,14 +121,14 @@
           .box-shadow(~"inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(82,168,236,.6)");
         }
 
-        &.ng-valid.ng-dirty {
-          .glowborder(lighten(@green, 20%));
+        &.ng-valid.ng-dirty:not(:focus) {
+          border-color:lighten(@green, 20%);
         }
 
         // Any unfocused, previously entered inputs that are invalid should be
         // called out.
         &.ng-invalid.ng-dirty:not(:focus) {
-          border-color: red;
+          border-color: darken(red, 10%);
         }
       }
     }

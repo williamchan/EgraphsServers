@@ -4,7 +4,7 @@
 define([
   "services/forms",
   "services/payment",
-  "services/ng-payment",
+  "services/ng/payment",
   "page",
   "services/responsive-modal"],
 function(forms, payment, ngPayment, page) {

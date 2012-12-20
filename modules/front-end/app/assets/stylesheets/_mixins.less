@@ -50,26 +50,34 @@
 }
 
 // Surrounds the element with a 1px border, default egraphs orange,
-// that glows upon hover or focus.
+// that glows upon hover or focus. If applying to a text input also make
+// sure to add the "input-shade" class onto the element
 .glowborder(@color: @orange) {
   border: 1px solid lighten(@color, 10%);    
   .box-shadow(0px 0px 0px @color);
   @transition: border .2s linear, box-shadow .2s linear;
   .transition(@transition);
 
+  @glowShadow: 0px 0px 8px @color;
+
   &:hover {
-    .box-shadow(0px 0px 6px @color);
+    .box-shadow(@glowShadow);
     border: 1px solid @color;
   }
 
   &:focus {
-    .box-shadow(0px 0px 8px @color);
+    .box-shadow(@glowShadow);
     border: 1px solid @color;    
   }
 
-  &.inset-shade:focus {
-    @boxShadow: inset 0 1px 1px rgba(0,0,0,.075), 0px 0px 8px @color;
-    .box-shadow(@boxShadow);
+  &.inset-shade {
+    @insetShadow: inset 0 1px 1px rgba(0,0,0,.075);
+    .box-shadow(@insetShadow);
+
+    &:focus {
+      @boxShadow: @insetShadow, @glowShadow;
+      .box-shadow(@boxShadow);
+    }
   }
 }
 
