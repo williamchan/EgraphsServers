@@ -5,7 +5,7 @@ import services.AppConfig
 import models.enums.VideoStatus
 
 class VideoAssetCelebrityTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with SavingEntityIdLongTests[VideoAssetCelebrity]
   with DateShouldMatchers
   with DBTransactionPerTest {

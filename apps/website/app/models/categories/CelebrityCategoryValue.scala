@@ -1,10 +1,11 @@
 package models.categories
 
 import services.{Time, AppConfig}
-import services.db.{Schema, SavesWithLongKey, KeyedCaseClass}
+import services.db.{Deletes, Schema, SavesWithLongKey, KeyedCaseClass}
 import models.{SavesCreatedUpdated, HasCreatedUpdated}
 import java.sql.Timestamp
 import com.google.inject.{Provider, Inject}
+import org.squeryl.Query
 
 /**
  * Mapping between celebrities and their tagged categoryvalues
@@ -38,9 +39,16 @@ case class CelebrityCategoryValue (
 class CelebrityCategoryValueStore @Inject() (
   schema: Schema,
   categoryServices: Provider[CategoryServices]
-) extends SavesWithLongKey[CelebrityCategoryValue]
+) extends SavesWithLongKey[CelebrityCategoryValue] with Deletes[Long, CelebrityCategoryValue]
 {
   import org.squeryl.PrimitiveTypeMode._
+
+  def findByCategoryValueId(categoryValueId: Long): Query[CelebrityCategoryValue] = {
+    from(schema.celebrityCategoryValues)( ccv =>
+      where(ccv.categoryValueId === categoryValueId)
+      select(ccv)
+    )
+  }
 
   //
   // SavesWithLongKey[CategoryValue] methods

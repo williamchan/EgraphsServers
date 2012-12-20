@@ -6,7 +6,7 @@ import com.xyzmo.wwww.biometricserver.WebServiceBiometricPartStub
 import models.Egraph
 
 class XyzmoVerifyUserTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with SavingEntityIdLongTests[XyzmoVerifyUser]
   with CreatedUpdatedEntityTests[Long, XyzmoVerifyUser]
   with DateShouldMatchers

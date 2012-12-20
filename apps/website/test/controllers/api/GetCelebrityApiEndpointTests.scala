@@ -1,41 +1,51 @@
 package controllers.api
 
-import play.api.mvc.Request
-import play.api.mvc.Controller
 import play.api.test.Helpers._
-import services.Time
 import sjson.json.Serializer
-import utils.FunctionalTestUtils.{runFreshScenarios, willChanRequest, routeName}
 import models._
-import enums.EnrollmentStatus
-import services.http.BasicAuth
-import utils.{ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest, MockControllerMethod, TestConstants}
+import play.api.mvc.Controller
+import play.api.mvc.Request
+import play.api.test.Helpers._
 import play.api.test.FakeRequest
-import controllers.routes.ApiControllers.getCelebrity
+import services.db.DBSession
+import services.db.TransactionSerializable
+import services.AppConfig
+import services.Time
+import utils.FunctionalTestUtils.requestWithCredentials
+import utils.FunctionalTestUtils.routeName
+import utils.ClearsCacheBefore
+import utils.EgraphsUnitTest
+import utils.TestData
 
 class GetCelebrityApiEndpointTests 
   extends EgraphsUnitTest 
-  with ClearsCacheAndBlobsAndValidationBefore 
+  with ClearsCacheBefore 
   with ProtectedCelebrityResourceTests
 {
-  override protected def routeUnderTest = getCelebrity
+  override protected def routeUnderTest = controllers.routes.ApiControllers.getCelebrity
+  private def db = AppConfig.instance[DBSession]
 
   routeName(routeUnderTest) should "get a Celebrity" in new EgraphsTestApplication {
     // Set up the scenario
-    runFreshScenarios("Will-Chan-is-a-celebrity")
+    val (celebrity, celebrityAccount) = db.connected(TransactionSerializable) {
+      val celebrity = TestData.newSavedCelebrity()
+      (celebrity, celebrity.account)
+    }
 
     // Execute the request
-    val Some(result) = routeAndCall(willChanRequest.copy(method=GET, uri=TestConstants.ApiRoot + "/celebrities/me"))
+    val url = controllers.routes.ApiControllers.getCelebrity.url
+    val req = requestWithCredentials(celebrityAccount).copy(method = GET, uri = url)
+    val Some(result) = routeAndCall(req)
 
     // Test expectations
     status(result) should be (OK)
 
     val json = Serializer.SJSON.in[Map[String, AnyRef]](contentAsString(result))
 
-    json("id") should not be (null)
-    json("publicName") should be ("Wizzle")
-    json("urlSlug") should be ("Wizzle")
-    json("enrollmentStatus") should be (EnrollmentStatus.NotEnrolled.name)
+    json("id") should be (celebrity.id)
+    json("publicName") should be (celebrity.publicName)
+    json("urlSlug") should be (celebrity.urlSlug)
+    json("enrollmentStatus") should be (celebrity.enrollmentStatus.name)
 
     // These conversions will fail if they're not Longs
     Time.fromApiFormat(json("created").toString)

@@ -5,7 +5,7 @@ import services.AppConfig
 import models.{EnrollmentBatch, Celebrity}
 
 class VBGStartEnrollmentTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with SavingEntityIdLongTests[VBGStartEnrollment]
   with CreatedUpdatedEntityTests[Long, VBGStartEnrollment]
   with DateShouldMatchers

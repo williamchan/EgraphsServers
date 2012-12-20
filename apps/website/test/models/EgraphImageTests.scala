@@ -6,7 +6,7 @@ import Blobs.Conversions._
 import utils._
 
 class EgraphImageTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with DBTransactionPerTest
 {
 

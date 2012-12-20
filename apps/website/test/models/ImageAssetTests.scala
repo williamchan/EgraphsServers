@@ -1,29 +1,31 @@
 package models
 
-import utils.{ClearsCacheAndBlobsAndValidationBefore, DBTransactionPerTest, EgraphsUnitTest}
+import utils.{ClearsCacheBefore, DBTransactionPerTest, EgraphsUnitTest}
 import java.io.FileOutputStream
 import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
 import play.api.Play
 import services.{ImageUtil, TempFile, AppConfig}
 import services.blobs.AccessPolicy.Private
+import org.apache.commons.lang3.RandomStringUtils
 
 class ImageAssetTests extends EgraphsUnitTest
   with DBTransactionPerTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
 {
   private def assetServices = AppConfig.instance[ImageAssetServices]
 
   import ImageUtil.Conversions._
 
-  val keyBase = "egraph/1234"
   val assetName = "profile"
 
-  "An ImageAsset" should "have the correct master data" in new EgraphsTestApplication {
-    val image = imageFromDisk
-    val imageBytes = image.asByteArray(ImageAsset.Png)
+  lazy val imageBytes: Array[Byte] = {
+    val image = ImageIO.read(EgraphsUnitTest.resourceFile("image.jpg"))
+    image.asByteArray(ImageAsset.Png)
+  }
 
-    val asset = ImageAsset(imageBytes, keyBase, assetName, ImageAsset.Png, assetServices)
+  "An ImageAsset" should "have the correct master data" in new EgraphsTestApplication {
+    val asset = newImageAsset()
 
     new FileOutputStream(TempFile.named("img_orig.png")).write(imageBytes)
     ImageIO.write(asset.renderFromMaster, "png", TempFile.named("img_rendered.png"))
@@ -32,15 +34,15 @@ class ImageAssetTests extends EgraphsUnitTest
   }
 
   it should "have the right key, both for master and permutations" in new EgraphsTestApplication {
-    val asset = ImageAsset(Array.empty[Byte], keyBase, assetName, ImageAsset.Png, assetServices)
+    val (asset, keyBase) = newImageAssetAndKeyBase(Array.empty[Byte])
 
-    asset.key should be ("egraph/1234/profile/master.png")
-    asset.resized(100, 100).key should be ("egraph/1234/profile/100x100.png")
+    asset.key should be (keyBase + "/profile/master.png")
+    asset.resized(100, 100).key should be (keyBase + "/profile/100x100.png")
   }
 
   it should "only dereference the master data once when called from transforms first" in new EgraphsTestApplication {
     var dereferenceCount = 0
-    val asset = makeAsset({dereferenceCount += 1; imageFromDisk.asByteArray(ImageAsset.Png)})
+    val asset = newImageAsset({dereferenceCount += 1; imageBytes})
     dereferenceCount should be (0)
 
     val asset_100x100 = asset.resized(100, 100)
@@ -60,7 +62,7 @@ class ImageAssetTests extends EgraphsUnitTest
   it should "only dereference the master data once when called from master first" in new EgraphsTestApplication {
     // No matter how many transforms we do we should only grab the master data from source once.
     var dereferenceCount = 0
-    val asset = makeAsset({dereferenceCount += 1; imageFromDisk.asByteArray(ImageAsset.Png)})
+    val asset = newImageAsset({dereferenceCount += 1; imageBytes})
 
     asset.renderFromMaster
     dereferenceCount should be (1)
@@ -72,14 +74,14 @@ class ImageAssetTests extends EgraphsUnitTest
   }
 
   it should "generate a properly resized image" in new EgraphsTestApplication {
-    val asset_100x100 = makeAsset(imageFromDisk.asByteArray(ImageAsset.Png)).resized(100, 100)
+    val asset_100x100 = newImageAsset().resized(100, 100)
     val image = asset_100x100.renderFromMaster
 
     (image.getWidth, image.getHeight) should be ((100, 100))
   }
 
   it should "properly save and restore the master copy" in new EgraphsTestApplication {
-    val asset = makeAsset(imageFromDisk.asByteArray(ImageAsset.Png))
+    val asset = newImageAsset()
     val assetPngData = asset.renderFromMaster.asByteArray(ImageAsset.Png)
 
     asset.fetchImage should be (None)
@@ -92,7 +94,7 @@ class ImageAssetTests extends EgraphsUnitTest
   }
 
   it should "source from a stored master copy in blobstore when instantiated without data from companion object" in new EgraphsTestApplication {
-    val storedAsset = makeAsset(imageFromDisk.asByteArray(ImageAsset.Png))
+    val (storedAsset, keyBase) = newImageAssetAndKeyBase()
     val storedBytes = storedAsset.renderFromMaster.asByteArray(ImageAsset.Png)
     storedAsset.save()
 
@@ -103,12 +105,13 @@ class ImageAssetTests extends EgraphsUnitTest
   }
 
   it should "throw an IllegalStateException when trying to source from a master blob that doesn't exist" in new EgraphsTestApplication {
-    val restoredAsset = ImageAsset(keyBase, assetName, ImageAsset.Png, assetServices)
+    val keyBase = RandomStringUtils.random(10)
+    val restoredAsset = ImageAsset(keyBase, assetName, ImageAsset.Png, assetServices) // important that it doesn't have master data parameter defined
     evaluating { restoredAsset.renderFromMaster } should produce [IllegalStateException]
   }
 
   it should "correctly store and fetch permutations as {name}/{width}x{height}" in new EgraphsTestApplication {
-    val asset = makeAsset(imageFromDisk.asByteArray(ImageAsset.Png))
+    val asset = newImageAsset()
 
     val resized = asset.resized(100, 100)
     val resizedBytes = resized.renderFromMaster.asByteArray(ImageAsset.Png)
@@ -121,24 +124,25 @@ class ImageAssetTests extends EgraphsUnitTest
   }
 
   it should "return the correct url" in new EgraphsTestApplication {
-    val asset = makeAsset(imageFromDisk.asByteArray(ImageAsset.Png))
+    val asset = newImageAsset()
     asset.save(Private)
     asset.url should include (asset.key)
   }
 
   it should "only provide a urlOption if the data are available" in new EgraphsTestApplication {
-    val asset = makeAsset(imageFromDisk.asByteArray(ImageAsset.Png))
+    val asset = newImageAsset()
 
     asset.urlOption should be (None)
-
     asset.save().urlOption should be (Some(asset.url))
   }
-    
-  def imageFromDisk(implicit app: play.api.Application): BufferedImage = {
-    ImageIO.read(EgraphsUnitTest.resourceFile("image.jpg"))
-  }
 
-  def makeAsset(bytes: => Array[Byte]) = {
-    ImageAsset(bytes, keyBase, assetName, ImageAsset.Png, assetServices)
+  def newImageAssetAndKeyBase(bytes: => Array[Byte] = imageBytes): (ImageAsset, String) = {
+    val keyBase = RandomStringUtils.random(10)
+    (ImageAsset(bytes, keyBase, assetName, ImageAsset.Png, assetServices), keyBase)
+  }
+  
+  def newImageAsset(bytes: => Array[Byte] = imageBytes): ImageAsset = {
+    val (imageAsset, _) = newImageAssetAndKeyBase(bytes)
+    imageAsset
   }
 }

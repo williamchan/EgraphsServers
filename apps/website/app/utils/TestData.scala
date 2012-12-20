@@ -85,7 +85,7 @@ object TestData {
   def newSavedCelebrity(): Celebrity = {
     val fullName = generateFullname()
     val email = generateEmail(fullName.replaceAll(" ", "."))
-    val acct = Account(email = email).save()
+    val acct = Account(email = email).withPassword(defaultPassword).right.get.save()
     val celeb = Celebrity(publicName = fullName)
     	.withPublishedStatus(PublishedStatus.Published)
     	.withEnrollmentStatus(EnrollmentStatus.Enrolled)

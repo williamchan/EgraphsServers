@@ -1,7 +1,7 @@
 package controllers.website
 
 import models.AccountStore
-import utils.ClearsCacheAndBlobsAndValidationBefore
+import utils.ClearsCacheBefore
 import utils.EgraphsUnitTest
 import services.http.forms.Form
 import services.http.forms.Form.Conversions._
@@ -32,7 +32,7 @@ import utils.CsrfProtectedResourceTests
 
 
 @RunWith(classOf[JUnitRunner])
-class LoginTests extends EgraphsUnitTest with ClearsCacheAndBlobsAndValidationBefore with CsrfProtectedResourceTests {
+class LoginTests extends EgraphsUnitTest with ClearsCacheBefore with CsrfProtectedResourceTests {
   import Form.Conversions._
   private def db = AppConfig.instance[DBSession]
   
