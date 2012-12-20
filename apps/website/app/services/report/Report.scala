@@ -1,7 +1,7 @@
 package services.report
 
 import java.io.File
-import services.{Utils, Time}
+import services.{TempFile, Utils, Time}
 import java.text.SimpleDateFormat
 import java.util.TimeZone
 import java.util.Date
@@ -35,7 +35,9 @@ trait Report {
   }
 
   protected def tsvFile(tsv: StringBuilder, reportName: String = reportName): File = {
-    Utils.bytesToFile(tsv.toString().getBytes, reportName + "-" + Time.toBlobstoreFormat(Time.today), ".tsv")
+    val file = TempFile.named(reportName + "-" + Time.toBlobstoreFormat(Time.today) + ".tsv")
+    Utils.saveToFile(tsv.toString().getBytes, file)
+    file
   }
 
 }

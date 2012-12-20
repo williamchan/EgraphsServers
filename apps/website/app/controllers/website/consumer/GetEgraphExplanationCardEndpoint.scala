@@ -6,7 +6,7 @@ import services.http.ControllerMethod
 import services.http.filters.HttpFilters
 import services.mvc.ImplicitHeaderAndFooterData
 import services.pdf.EgraphExplanationPdf
-import services.Utils
+import services.{TempFile, Utils}
 
 private[controllers] trait GetEgraphExplanationCardEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
 
@@ -24,7 +24,8 @@ private[controllers] trait GetEgraphExplanationCardEndpoint extends ImplicitHead
             val pdfByteStream = EgraphExplanationPdf.generate(recipientName = order.recipientName,
               buyerName = order.buyer.name,
               celebrityName = order.product.celebrity.publicName)
-            val pdfFile = Utils.bytesToFile(pdfByteStream.toByteArray, "Egraph-gift", ".pdf")
+            val pdfFile = TempFile.named("Egraph-gift-" + orderId + ".pdf")
+            Utils.saveToFile(pdfByteStream.toByteArray, pdfFile)
             Ok.sendFile(pdfFile, inline = true)
 
           }

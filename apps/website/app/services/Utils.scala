@@ -165,29 +165,11 @@ class Utils @Inject() {
   def saveToFile(bytes: Array[Byte], file: File) {
     file.getParentFile.mkdirs()
     val out = new FileOutputStream(file)
-    out.write(bytes)
-    out.close()
-  }
-
-  /**
-   * Returns the bytes data as a file. The file is not persisted to disk.
-   *
-   * @param bytes data to save.
-   * @param filename name of temp file. May be relevant to recipient of file.
-   * @param fileExtension extension of temp file. May be relevant to recipient of file.
-   * @return A file containing the saved bytes
-   */
-  def bytesToFile(bytes: Array[Byte], filename: String, fileExtension: String): File = {
-    val file = File.createTempFile(filename, fileExtension)
-    file.deleteOnExit()
-    val out = new FileOutputStream(file)
     try {
       out.write(bytes)
+    } finally {
       out.close()
-    } catch {
-      case e: Exception => out.close()
     }
-    file
   }
 }
 

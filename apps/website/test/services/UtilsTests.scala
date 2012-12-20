@@ -61,11 +61,6 @@ class UtilsTests extends EgraphsUnitTest
     }
   }
 
-  "bytesToFile" should "save bytes parameter to an in-memory file" in {
-    val file = Utils.bytesToFile("hello world".getBytes, "helloworld", ".txt")
-    TestHelpers.getStringFromFile(file) should be("hello world")
-  }
-
   "pageQuery" should "return paged Query and total number of results if specified" in (pending)
 // This test adds value as a pure unit test, but while talking to a real DB it is stupid since it isn't able to play well with other tests.
 //  {

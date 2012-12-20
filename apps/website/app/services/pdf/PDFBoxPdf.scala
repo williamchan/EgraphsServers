@@ -16,6 +16,7 @@ trait PDFBoxPdf {
   protected val pageWidth = PDPage.PAGE_SIZE_LETTER.getWidth.toInt
   protected val pageCenter = (pageWidth / 2)
   protected val pageHeight = PDPage.PAGE_SIZE_LETTER.getHeight.toInt
+  private val minFontSize = 4
 
   /**
    * /**
@@ -36,7 +37,7 @@ trait PDFBoxPdf {
                                  radius: Int = pageCenter - 80)(implicit contentStream: PDPageContentStream) {
 
     // Recursively down-size font until the text fits within the specified radius.
-    val fontSize = (1 to maxFontSize reverse).find(s => textWidth(font, s, text) <= (radius * 2)).getOrElse(8)
+    val fontSize = (minFontSize to maxFontSize reverse).find(s => textWidth(font, s, text) <= (radius * 2)).getOrElse(minFontSize)
     // The text y-location should be moved up if the font was down-sized. Why quotient of "4"? Because it just seems to work.
     val actualY = y + (textHeight(font, maxFontSize - fontSize) / 4)
 
