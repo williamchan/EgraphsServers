@@ -100,6 +100,7 @@
                 <div class="controls">
                   <input id="recipient-name"
                          type="text"
+                         required
                          name="recipient-name"
                          placeholder="e.g. Tiny Tim" 
                          ng-model="order.recipientName" />
@@ -110,6 +111,7 @@
                 <div class="controls">
                   <input id="gifter-name"
                          type="text"
+                         required
                          name="gifter-name"
                          placeholder="e.g. Santa Claus" 
                          ng-model="order.gifterName" />
@@ -127,6 +129,7 @@
                   <div class="controls">
                     <input id="card-name"
                            type="text"
+                           required                           
                            name="card-name" 
                            ng-model="order.card.name" />
                   </div>
@@ -135,7 +138,7 @@
                 <div class="control-group email">
                   <label class="control-label" for="email">Email:</label>
                   <div class="controls">
-                    <input id="email" type="text" name="email" ng-model="order.email" />
+                    <input id="email" type="text" required name="email" ng-model="order.email" />
                   </div>
                 </div> <!-- End .email.controls -->
 
@@ -143,6 +146,7 @@
                   <label class="control-label" for="card-number">Card number:</label>
                   <div class="controls">
                     <input id="card-number"
+                           required
                            type="text"
                            name="card-number" 
                            ng-model="order.card.number" />
@@ -156,6 +160,7 @@
                   <div class="controls select card-expiry">
                     <select id="card-exp-month"
                             placeholder="Month"
+                            required
                             class="inline"
                             ng-model="order.card.expMonth"
                             chosen
@@ -166,6 +171,7 @@
                             name="card-exp-year"
                             class="inline"
                             data-placeholder="Year"
+                            required
                             chosen
                             ng-model="order.card.expYear",
                             ng-options="year for year in years">
@@ -181,7 +187,7 @@
                 <div class="control-group card-cvc">
                   <label class="control-label" for="card-cvc">Security Code:</label>
                   <div class="controls">
-                    <input id="card-cvc" type="text" name="card-cvc" ng-model="order.card.cvc" />
+                    <input id="card-cvc" type="text" required name="card-cvc" ng-model="order.card.cvc" />
                   </div>
                 </div> <!-- End .card-cvc.controls -->
 
@@ -190,6 +196,7 @@
                   <div class="controls">
                     <input id="postal-code"
                            type="text"
+                           required
                            name="postal-code"
                            ng-model="order.card.postalCode" />
                   </div>
