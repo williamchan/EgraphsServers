@@ -31,11 +31,12 @@
 
 @headJs = {
   Egraphs.page.checkout = {
-    paymentJsModule: "@paymentJsModule",
     paymentApiKey: "@paymentPublicKey",
     buyerPostalCodeFieldName: "@form.billing.postalCode.name",
     totalAmount: @summary.total.getAmount
   }
+
+  Egraphs.page.paymentJsModule = "@paymentJsModule";
 }
 
 @baseBody = {

@@ -1,8 +1,10 @@
 /* Module provides different payment service implementations for usage in production and testing
  */
-define(["libs/stripe-v1"],
-function() {
-  /** A bald-faced mock implementation of stripe.js. See https://stripe.com/docs/stripe.js */
+define(["page", "libs/stripe-v1"],
+function(page) {
+  var stripePayment = window.Stripe;
+
+  /** A bald-faced stub implementation of stripe.js. See https://stripe.com/docs/stripe.js */
   var yesMaamPayment = {
     setPublishableKey: function(lol) {
       // I don't cryptographically secure anything. I'm about as safe
@@ -19,11 +21,27 @@ function() {
       // Just a copy-paste of a sample stripe token
       var fakeStripeToken = {"amount":0,"created":1341466397,"currency":"usd","id":"tok_fsVvVZQxxtbXEl","livemode":false,"object":"token","used":false,"card":{"country":"US","exp_month":4,"exp_year":2015,"fingerprint":"jaW3rHjVmI2YwHq9","last4":"4242","object":"card","type":"Visa"}};
       callback(200, fakeStripeToken);
+    },
+
+    validateCVC: function(cvc) {
+      return true;
+    },
+
+    validateExpiry: function(month, year) {
+      return true;
+    },
+
+    validateCardNumber: function(number) {
+      return true;
     }
   };
 
-  return {
-    "stripe-payment": window.Stripe,
-    "yes-maam-payment": yesMaamPayment
-  };
+  // Allow the page to set payment implementation if it wants
+  if (page.paymentJsModule === "stripe-payment") {
+    return stripePayment;
+  } else if (page.paymentJsModule === "yes-maam-payment") {
+    return yesMaamPayment;
+  } else {
+    return stripePayment;
+  }
 });

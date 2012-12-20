@@ -1,9 +1,8 @@
 /* Scripting for the checkout page */
-define(["services/forms", "services/payment", "Egraphs", "libs/chosen/chosen.jquery.min"],
-function(forms, payment, Egraphs) {
+define(["services/forms", "services/payment", "page", "libs/chosen/chosen.jquery.min"],
+function(forms, paymentModule, page) {
   // Get information from the page
-  var checkout = Egraphs.page.checkout;
-  var paymentModule = payment[checkout.paymentJsModule];
+  var checkout = page.checkout;
 
   /** Retrieves the DIV that holds nondescript errors. */
   var $generalErrorsInputDiv = function() {

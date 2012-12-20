@@ -16,6 +16,7 @@ Egraphs.page = Egraphs.page || {};
 
 // Provide the Egraphs scope as a module to any future require() calls
 define("Egraphs", [], function() { return Egraphs; });
+define("page", [], function() { return Egraphs.page; });
 
 require(Egraphs.page.jsMain, function() {
   var mainModules = arguments,

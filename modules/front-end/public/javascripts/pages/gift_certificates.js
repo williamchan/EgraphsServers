@@ -4,9 +4,10 @@
 define([
   "services/forms",
   "services/payment",
-  "Egraphs",
+  "services/ng-payment",
+  "page",
   "services/responsive-modal"],
-function(forms, payment, Egraphs) {
+function(forms, payment, ngPayment, page) {
   var GiftCertificateOption = function(data) {
     this.price = data.price;
     this.type = data.type;
@@ -26,16 +27,17 @@ function(forms, payment, Egraphs) {
   };
 
   var certificateOptions = [];
-  angular.forEach(Egraphs.page.certificateOptions, function(option) {
+  angular.forEach(page.certificateOptions, function(option) {
     certificateOptions.push(new GiftCertificateOption(option));
   });
 
   var module = angular.module('giftCertificatePurchaseApp', []);
+  ngPayment.applyDirectives(module);
 
   var GiftCertificatePurchaseController = function ($scope) {
     $scope.certificateOptions = certificateOptions;
-    $scope.months = Egraphs.page.months;
-    $scope.years = Egraphs.page.years;
+    $scope.months = page.months;
+    $scope.years = page.years;
 
     $scope.selectOption = function(certificateOption) {
       // Toggle selected state
