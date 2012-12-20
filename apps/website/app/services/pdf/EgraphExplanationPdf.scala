@@ -6,7 +6,7 @@ import org.apache.pdfbox.pdmodel.edit.PDPageContentStream
 import org.apache.pdfbox.pdmodel.font.PDType1Font
 import play.api.Play._
 
-object EgraphExplanationPdf extends PDFBoxPdf {
+case class EgraphExplanationPdf() extends PDFBoxPdf {
 
   private val helvetica = PDType1Font.HELVETICA
   private val helveticaBold = PDType1Font.HELVETICA_BOLD

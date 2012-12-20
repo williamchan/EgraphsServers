@@ -21,7 +21,7 @@ private[controllers] trait GetEgraphExplanationCardEndpoint extends ImplicitHead
         Action { implicit request =>
 
           if (order.isBuyerOrRecipient(Some(customer.id))) {
-            val pdfByteStream = EgraphExplanationPdf.generate(recipientName = order.recipientName,
+            val pdfByteStream = EgraphExplanationPdf().generate(recipientName = order.recipientName,
               buyerName = order.buyer.name,
               celebrityName = order.product.celebrity.publicName)
             val pdfFile = TempFile.named("Egraph-gift-" + orderId + ".pdf")

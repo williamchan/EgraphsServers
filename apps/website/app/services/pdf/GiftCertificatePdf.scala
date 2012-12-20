@@ -6,7 +6,7 @@ import org.apache.pdfbox.pdmodel.edit.PDPageContentStream
 import org.apache.pdfbox.pdmodel.font.PDType1Font
 import play.api.Play._
 
-object GiftCertificatePdf extends PDFBoxPdf {
+case class GiftCertificatePdf() extends PDFBoxPdf {
 
   private val helvetica = PDType1Font.HELVETICA
 
