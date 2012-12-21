@@ -3,13 +3,13 @@ define(["services/payment", "services/ng/validation-directive"],
 function(payment, validationDirective) {
   var creditCardNumberDirective = function(ngModule) {
     validationDirective(ngModule, "creditCardNumber", function(viewValue) {
-      payment.validateCardNumber(viewValue);
+      return payment.validateCardNumber(viewValue);
     });
   };
 
   var creditCardCvcDirective = function(ngModule) {
     validationDirective(ngModule, "creditCardCvc", function(viewValue) {
-      payment.validateCVC(viewValue);
+      return payment.validateCVC(viewValue);
     });
   };
 
