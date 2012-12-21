@@ -3,6 +3,10 @@
 define(["page", "libs/stripe-v1"],
 function(page) {
   var stripePayment = window.Stripe;
+  var paymentConfig = page.paymentConfig;
+  var apiKey;
+  var moduleName;  
+  var configuredModule;
 
   /** A bald-faced stub implementation of stripe.js. See https://stripe.com/docs/stripe.js */
   var yesMaamPayment = {
@@ -37,11 +41,22 @@ function(page) {
   };
 
   // Allow the page to set payment implementation if it wants
-  if (page.paymentJsModule === "stripe-payment") {
-    return stripePayment;
-  } else if (page.paymentJsModule === "yes-maam-payment") {
-    return yesMaamPayment;
+  if (paymentConfig) {
+    moduleName = paymentConfig.jsModule;
+    apiKey = paymentConfig.apiKey;
+
+    if (moduleName === "stripe-payment") {
+      configuredModule = stripePayment;
+    } else if (moduleName === "yes-maam-payment") {
+      configuredModule = yesMaamPayment;
+    } else {
+      configuredModule = stripePayment;
+    }
+
+    configuredModule.setPublishableKey(apiKey);
+
+    return configuredModule;
   } else {
-    return stripePayment;
+    throw "No payment configuration provided by page. Egraphs.page.paymentConfig.jsModule and .apiKey are required";
   }
 });

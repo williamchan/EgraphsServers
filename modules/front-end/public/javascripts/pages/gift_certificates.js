@@ -34,10 +34,32 @@ function(forms, payment, ngPayment, page) {
   var module = angular.module('giftCertificatePurchaseApp', []);
   ngPayment.applyDirectives(module);
 
+  var sampleData = {
+    order: {
+      recipientName: "Herp Derpson",
+      gifterName: "Derp Herpson",
+      email: "derpson@egraphs.com",
+      card: {
+        name: "Herp Derpson Sr",
+        number: "4242424242424242",
+        expMonth: "01",
+        expYear: "2015",
+        cvc: "123",
+        postalCode: "12345"
+      }
+    }
+  };
+
   var GiftCertificatePurchaseController = function ($scope) {
-    $scope.certificateOptions = certificateOptions;
-    $scope.months = page.months;
-    $scope.years = page.years;
+    var config = page.config;
+
+    angular.extend($scope, {
+      certificateOptions: certificateOptions,
+      months: page.months,
+      years: page.years
+    });
+
+    if (config.useSampleData) angular.extend($scope, sampleData);
 
     $scope.selectOption = function(certificateOption) {
       // Toggle selected state
@@ -49,10 +71,23 @@ function(forms, payment, ngPayment, page) {
     };
 
     $scope.submitForReview = function() {
-      if (formsInvalid) {
+      if (config.validateClientSide && formsInvalid()) {
         dirtyUserControls();
       } else {
-        $("#review").responsivemodal("toggle");
+        var paymentParams = {
+          number: $scope.order.card.number,
+          cvc: $scope.order.card.cvc,
+          exp_month: parseInt($scope.order.card.expMonth, 10),
+          exp_year: parseInt($scope.order.card.expYear, 10)
+        };
+
+        payment.createToken(paymentParams, function(status, message) {
+          console.log("Created token");
+          console.log(message);
+
+          $("#review").responsivemodal("loading");
+          $("#review").responsivemodal("toggle");
+        });
       }
     };
 

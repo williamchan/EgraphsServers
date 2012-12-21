@@ -30,13 +30,18 @@
 @import views.html.frontend.tags
 
 @headJs = {
-  Egraphs.page.checkout = {
-    paymentApiKey: "@paymentPublicKey",
-    buyerPostalCodeFieldName: "@form.billing.postalCode.name",
-    totalAmount: @summary.total.getAmount
-  }
+  Egraphs.page = {
+    checkout: {
+      paymentApiKey: "@paymentPublicKey",
+      buyerPostalCodeFieldName: "@form.billing.postalCode.name",
+      totalAmount: @summary.total.getAmount
+    },
 
-  Egraphs.page.paymentJsModule = "@paymentJsModule";
+    paymentConfig: {
+      jsModule: "@paymentJsModule",
+      apiKey: "@paymentPublicKey"
+    }
+  }
 }
 
 @baseBody = {

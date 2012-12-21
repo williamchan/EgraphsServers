@@ -15,17 +15,29 @@
 
 
 @headJs = {
-  Egraphs.page.certificateOptions = [
-    {type:"concrete", price:25},
-    {type:"concrete", price:50},
-    {type:"concrete", price:75, isMostPopular:true, isDefault:true},
-    {type:"concrete", price:100},
-    {type:"custom", price:75}
-  ];
+  angular.extend(Egraphs.page, {
+    certificateOptions: [
+      {type:"concrete", price:25},
+      {type:"concrete", price:50},
+      {type:"concrete", price:75, isMostPopular:true, isDefault:true},
+      {type:"concrete", price:100},
+      {type:"custom", price:75}
+    ],
 
-  Egraphs.page.months = @Html({ (1 to 12).map("\"%02d\"".format(_)).mkString("[", ",", "]") })
+    config: {
+      validateClientSide: true,
+      useSampleData: true
+    },
 
-  Egraphs.page.years = @Html({ (2012 to 2020).map("\"%d\"".format(_)).mkString("[", ",", "]") })
+    paymentConfig: {
+      jsModule: "yes-maam-payment",
+      apiKey: "im gonna be needing this"
+    },
+    
+    months: @Html({ (1 to 12).map("\"%02d\"".format(_)).mkString("[", ",", "]") }),
+
+    years: @Html({ (2012 to 2020).map("\"%d\"".format(_)).mkString("[", ",", "]") })
+  });
 }
 
 @** SVG previews of the gift certificate *@
