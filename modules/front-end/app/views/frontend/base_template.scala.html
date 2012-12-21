@@ -84,7 +84,6 @@
     <script src="https://use.typekit.com/ztt6ynw.js"></script>
     <script>try{Typekit.load();}catch(e){}</script>
     <script src='@EgraphsAssets.at("javascripts/libs/angular.js")'></script>
-    @headHtml
 
     <!-- Configure egraphs scripting main classes (these will automatically be loaded by main.js -->
     <script>
@@ -94,6 +93,7 @@
       @headJs
     </script>
     @tags.analytics()
+    @headHtml
   </head>
 
   <body class="@bodyClasses.mkString(" ")">
