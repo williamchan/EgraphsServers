@@ -13,14 +13,18 @@
 <section id="masthead-home" role="banner" style="background-image: url(@mastheadImageUrl);">
 @giftCertificateUrl match { 
   case Some(url) => {
-    <div id="gift-message">
-      Not sure which star to pick? An <span> egraphs gift certificate</span> is perfect for the holidays. <a href="@url">Shop Now &rsaquo;</a>
-    </div> 
+    <section id="gift-message">
+      <div class="gift-container">
+        Not sure which star to pick? An <span> egraphs gift certificate</span> is perfect for the holidays. <a href="@url">Shop Now &rsaquo;</a>
+      </div>
+    </section> 
   }
   case None => {
-  <div id="gift-message">
-    Egraphs purchased after Dec 10 may not arrive by Dec 24. <span>Gift certificates coming soon.</span>
-  </div>
+    <section id="gift-message">
+      <div class="gift-container">
+        Egraphs purchased after Dec 10 may not arrive by Dec 24. <span>Gift certificates coming soon.</span>
+      </div>
+    </section>  
   }
 }
   <div class="banner-gradient">
