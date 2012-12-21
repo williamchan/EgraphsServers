@@ -49,7 +49,39 @@ function(forms, payment, ngPayment, page) {
     };
 
     $scope.submitForReview = function() {
-      console.log($scope);
+      if (formsInvalid) {
+        dirtyUserControls();
+      } else {
+        $("#review").responsivemodal("toggle");
+      }
+    };
+
+    var formsInvalid = function() {
+      return $scope.ownAmount.$invalid || $scope.pay.$invalid || $scope.personalize.invalid;
+    };
+
+    var dirtyUserControls = function() {
+      angular.forEach(userControls(), function(control) {
+        // Hackily set dirty flag on all user controls to
+        // enable error styling even on previously un-touched
+        // inputs.
+        control.$setViewValue(control.$viewValue);
+      });
+    };
+
+    var userControls = function() {
+      return [
+        $scope.ownAmount.amount,
+        $scope.personalize.recipientName,
+        $scope.personalize.gifterName,
+        $scope.pay.cardName,
+        $scope.pay.email,
+        $scope.pay.cardNumber,
+        $scope.pay.cardExpMonth,
+        $scope.pay.cardExpYear,
+        $scope.pay.cardCvc,
+        $scope.pay.postalCode
+      ];
     };
 
     // Select the default option
@@ -61,10 +93,6 @@ function(forms, payment, ngPayment, page) {
   return {
     go: function() {
       window.GiftCertificatePurchaseController = GiftCertificatePurchaseController;
-
-      $("#review-button").click(function() {
-        $("#review").responsivemodal("toggle");
-      });
 
       $(".modify-order").click(function() {
         $("#review").responsivemodal("toggle");
