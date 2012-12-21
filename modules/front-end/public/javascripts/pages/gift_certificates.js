@@ -93,8 +93,7 @@ function(forms, payment, ngPayment, page) {
           } else {
             paymentToken = response.id;
 
-            // We'll have to pass the buck here too
-            // $("#review").responsivemodal("loading");
+            console.log("Now make remote calls against egraphs api");
           }
         });
       }
@@ -152,7 +151,6 @@ function(forms, payment, ngPayment, page) {
         $scope.ownAmount.amount,
         $scope.personalize.recipientName,
         $scope.personalize.gifterName,
-        $scope.pay.cardName,
         $scope.pay.email,
         $scope.pay.cardNumber,
         $scope.pay.cardExpMonth,

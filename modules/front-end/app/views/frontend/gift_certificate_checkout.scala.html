@@ -13,7 +13,6 @@
 
 @import models.frontend.forms.Field
 
-
 @headJs = {
   angular.extend(Egraphs.page, {
     certificateOptions: [
@@ -123,8 +122,15 @@
                          class="inset-shade"
                          ng-model="order.recipientName" 
                          required />
+                  <div class="errors" ng-show="personalize.recipientName.$invalid">
+                    <div class="alert alert-error"
+                         ng-show="personalize.recipientName.$error.required" >
+                      <strong>Sorry,</strong> I can't make the certificate without a name!
+                    </div>
+                  </div>
+
                 </div>
-              </div> <!-- End .recipient-name.controls -->
+              </div> <!-- End .recipient-name.control-group -->
               <div class="control-group gifter-name">
                 <label class="control-label" for="gifter-name">Your name:</label>
                 <div class="controls">
@@ -135,8 +141,33 @@
                          class="inset-shade"
                          ng-model="order.gifterName"
                          required />
+                  <div class="errors" ng-show="personalize.gifterName.$invalid">
+                    <div class="alert alert-error"
+                         ng-show="personalize.gifterName.$error.required" >
+                      <strong>Sorry,</strong> I can't make the certificate you deserve without your name!
+                    </div>
+                  </div>
                 </div>
               </div> <!-- End .gifter-name.controls -->
+              <div class="control-group email">
+                <label class="control-label" for="email">Your Email:</label>
+                <div class="controls">
+                  <input id="email"
+                         name="email" 
+                         type="email"
+                         class="inset-shade"
+                         ng-model="order.email"
+                         required />
+                  <div class="errors" ng-show="personalize.email.$invalid">
+                    <div class="alert alert-error"
+                         ng-show="personalize.email.$error.required" >
+                      <strong>Sorry,</strong> I won't know where to send your certificate without your address!
+                    </div>
+                  </div>
+
+                </div>
+              </div> <!-- End .email.controls -->
+
             </form>
           </section> <!-- End #personalize -->
 
@@ -144,30 +175,6 @@
             <h2><span class="checkout-step-count">3</span>Pay:</h2>
             <form class="form-horizontal" name="pay" novalidate>
               <fieldset>
-                <div class="control-group card-name">
-                  <label class="control-label" for="card-name">Full name:</label>
-                  <div class="controls">
-                    <input id="card-name"
-                           name="cardName"
-                           type="text"
-                           class="inset-shade"
-                           ng-model="order.card.name"                            
-                           required />
-                  </div>
-                </div> <!-- End .card-name.controls -->
-
-                <div class="control-group email">
-                  <label class="control-label" for="email">Email:</label>
-                  <div class="controls">
-                    <input id="email"
-                           name="email" 
-                           type="email"
-                           class="inset-shade"
-                           ng-model="order.email"
-                           required />
-                  </div>
-                </div> <!-- End .email.controls -->
-
                 <div class="control-group card-number">
                   <label class="control-label" for="card-number">Card number:</label>
                   <div class="controls">
@@ -178,6 +185,13 @@
                            ng-model="order.card.number"
                            required
                            credit-card-number />
+                    <div class="errors" ng-show="pay.cardNumber.$invalid">
+                      <div class="alert alert-error"
+                           ng-show="pay.cardNumber.$error.required" >
+                        <strong>Sorry,</strong> but if I don't get this from you my boss will kill me.
+                      </div>
+                    </div>
+
                   </div>
                 </div> <!-- End .card-number.controls -->
 
@@ -202,9 +216,10 @@
                             required >
                       <option value>YYYY</option>
                     </select>
-                    <div class="alert alert-error hidden">
-                      <button type="button" class="close" data-dismiss="alert">&times;</button>
-                      <span class="error-message">Expiry date error</span>
+                    <div class="errors" ng-show="pay.cardExpMonth.$invalid || pay.cardExpYear.$invalid">
+                      <div class="alert alert-error">
+                        <strong>Oops!</strong> Mind double checking this one?
+                      </div>
                     </div>
                   </div>
                 </div> <!-- end .control-group -->  
@@ -219,6 +234,11 @@
                            ng-model="order.card.cvc" 
                            required
                            credit-card-cvc />
+                    <div class="errors" ng-show="pay.cardCvc.$invalid">
+                      <div class="alert alert-error" ng-show="pay.cardCvc.$error.required">
+                        <strong>Sorry,</strong> but if I don't get this form you my boss will kill me.
+                      </div>
+                    </div>
                   </div>
                 </div> <!-- End .card-cvc.controls -->
 
@@ -231,6 +251,11 @@
                            class="inset-shade"
                            ng-model="order.card.postalCode"
                            required />
+                    <div class="errors" ng-show="pay.postalCode.$invalid">
+                      <div class="alert alert-error" ng-show="pay.postalCode.$error.required">
+                        <strong>Sorry,</strong> but I need this to charge your card.
+                      </div>
+                    </div>                           
                   </div>
                 </div> <!-- End .postal-code.controls -->
 
