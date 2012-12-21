@@ -31,7 +31,8 @@
 
     paymentConfig: {
       jsModule: "yes-maam-payment",
-      apiKey: "im gonna be needing this"
+      apiKey: "im gonna be needing this",
+      errorCode: "invalid_number"
     },
     
     months: @Html({ (1 to 12).map("\"%02d\"".format(_)).mkString("[", ",", "]") }),

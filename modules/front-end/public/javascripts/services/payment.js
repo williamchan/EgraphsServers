@@ -5,7 +5,7 @@ function(page) {
   var stripePayment = window.Stripe;
   var paymentConfig = page.paymentConfig;
   var apiKey;
-  var moduleName;  
+  var moduleName;
   var configuredModule;
 
   /** A bald-faced stub implementation of stripe.js. See https://stripe.com/docs/stripe.js */
@@ -18,7 +18,18 @@ function(page) {
     createToken: function(configObj, handler) {
       // My payment implementation on the server doesn't care what I
       // generate here; it'll always response "Yes ma'am".
-      handler(200, {id:"A Token...not that it matters"});
+      var error;
+
+      if (paymentConfig.errorCode) {
+        error = {
+          code: paymentConfig.errorCode
+        };
+      }
+
+      window.setTimeout(
+        function(){ handler(200, {id:"A Token...not that it matters", error: error});},
+        100
+      );
     },
 
     getToken: function(tokenId, callback) {

@@ -52,6 +52,7 @@ function(forms, payment, ngPayment, page) {
 
   var GiftCertificatePurchaseController = function ($scope) {
     var config = page.config;
+    var paymentToken;
 
     angular.extend($scope, {
       certificateOptions: certificateOptions,
@@ -71,9 +72,9 @@ function(forms, payment, ngPayment, page) {
     };
 
     $scope.submitForReview = function() {
-      if (config.validateClientSide && formsInvalid()) {
-        dirtyUserControls();
-      } else {
+      clearRemoteErrors();
+      dirtyUserControls();
+      if (!config.validateClientSide || formsValid()) {
         var paymentParams = {
           number: $scope.order.card.number,
           cvc: $scope.order.card.cvc,
@@ -81,18 +82,60 @@ function(forms, payment, ngPayment, page) {
           exp_year: parseInt($scope.order.card.expYear, 10)
         };
 
-        payment.createToken(paymentParams, function(status, message) {
-          console.log("Created token");
-          console.log(message);
+        payment.createToken(paymentParams, function(status, response) {
+          // Do some more validation on stripe response and then call against OUR apis.
+          if (response.error) {
+            var errorCode = response.error.code;
+            var control = stripeErrorCodesToControls()[errorCode];
+            control.$setValidity("remote-stripe-" + errorCode, false);
+            // $("#review").responsivemodal("loading");
+            // $("#review").responsivemodal("toggle");
+          } else {
+            paymentToken = response.id;
 
-          $("#review").responsivemodal("loading");
-          $("#review").responsivemodal("toggle");
+            // We'll have to pass the buck here too
+            // $("#review").responsivemodal("loading");
+          }
         });
       }
     };
 
-    var formsInvalid = function() {
-      return $scope.ownAmount.$invalid || $scope.pay.$invalid || $scope.personalize.invalid;
+    /**
+     * Iterates through all errors of all forms, and removes any that began with "remote-"
+     * from the controls to which they applied.
+     */
+    var clearRemoteErrors = function() {
+      angular.forEach(forms(), function(form) {
+        angular.forEach(form.$error, function(controlsWithErrors, errorName) {
+          if (errorName.search("remote-") === 0) {
+            angular.forEach(controlsWithErrors, function(controlWithErrors) {
+              controlWithErrors.$setValidity(errorName, true);
+            });
+          }
+        });
+      });
+    };
+
+    /**
+     * Returns an object that maps stripe error codes to the respective
+     * controls to which the error would apply.
+     */
+    var stripeErrorCodesToControls = function() {
+      return {
+        "invalid_number": $scope.pay.cardNumber,
+        "incorrect_number": $scope.pay.cardNumber,
+        "card_declined": $scope.pay.cardNumber,
+        "expired_card": $scope.pay.cardNumber,
+        "processing_error": $scope.pay.cardNumber,
+        "invalid_cvc": $scope.pay.cardCvc,
+        "incorrect_cvc": $scope.pay.cardCvc,
+        "invalid_expiry_month": $scope.pay.expMonth,
+        "invalid_expiry_year": $scope.pay.expYear
+      };
+    };
+
+    var formsValid = function() {
+      return !($scope.ownAmount.$invalid || $scope.pay.$invalid || $scope.personalize.$invalid);
     };
 
     var dirtyUserControls = function() {
@@ -118,6 +161,10 @@ function(forms, payment, ngPayment, page) {
         $scope.pay.postalCode
       ];
     };
+
+    var forms = function() {
+      return [$scope.ownAmount, $scope.personalize, $scope.pay];
+    }
 
     // Select the default option
     angular.forEach(certificateOptions, function(option) {
