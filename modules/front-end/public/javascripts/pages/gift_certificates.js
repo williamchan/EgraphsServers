@@ -72,6 +72,7 @@ function(forms, payment, ngPayment, page) {
     };
 
     $scope.submitForReview = function() {
+      console.log($scope.pay);
       clearRemoteErrors();
       dirtyUserControls();
       if (!config.validateClientSide || formsValid()) {
@@ -86,8 +87,11 @@ function(forms, payment, ngPayment, page) {
           // Do some more validation on stripe response and then call against OUR apis.
           if (response.error) {
             var errorCode = response.error.code;
-            var control = stripeErrorCodesToControls()[errorCode];
-            control.$setValidity("remote-stripe-" + errorCode, false);
+            var model = stripeErrorCodesToModels()[errorCode];
+            model["remote_stripe_" + errorCode] = "herp";
+            console.log("remote_stripe_" + errorCode);
+            console.log(model["remote_stripe_" + errorCode]);
+
             // $("#review").responsivemodal("loading");
             // $("#review").responsivemodal("toggle");
           } else {
@@ -106,7 +110,7 @@ function(forms, payment, ngPayment, page) {
     var clearRemoteErrors = function() {
       angular.forEach(forms(), function(form) {
         angular.forEach(form.$error, function(controlsWithErrors, errorName) {
-          if (errorName.search("remote-") === 0) {
+          if (errorName.search("remote_") === 0) {
             angular.forEach(controlsWithErrors, function(controlWithErrors) {
               controlWithErrors.$setValidity(errorName, true);
             });
@@ -119,17 +123,17 @@ function(forms, payment, ngPayment, page) {
      * Returns an object that maps stripe error codes to the respective
      * controls to which the error would apply.
      */
-    var stripeErrorCodesToControls = function() {
+    var stripeErrorCodesToModels = function() {
       return {
-        "invalid_number": $scope.pay.cardNumber,
-        "incorrect_number": $scope.pay.cardNumber,
-        "card_declined": $scope.pay.cardNumber,
-        "expired_card": $scope.pay.cardNumber,
-        "processing_error": $scope.pay.cardNumber,
-        "invalid_cvc": $scope.pay.cardCvc,
-        "incorrect_cvc": $scope.pay.cardCvc,
-        "invalid_expiry_month": $scope.pay.expMonth,
-        "invalid_expiry_year": $scope.pay.expYear
+        "invalid_number": $scope.order.card.number,
+        "incorrect_number": $scope.order.card.number,
+        "card_declined": $scope.order.card.number,
+        "expired_card": $scope.order.card.number,
+        "processing_error": $scope.order.card.number,
+        "invalid_cvc": $scope.order.card.cvc,
+        "incorrect_cvc": $scope.order.card.cvc,
+        "invalid_expiry_month": $scope.order.card.expMonth,
+        "invalid_expiry_year": $scope.order.card.expYear
       };
     };
 
@@ -151,7 +155,7 @@ function(forms, payment, ngPayment, page) {
         $scope.ownAmount.amount,
         $scope.personalize.recipientName,
         $scope.personalize.gifterName,
-        $scope.pay.email,
+        $scope.personalize.email,
         $scope.pay.cardNumber,
         $scope.pay.cardExpMonth,
         $scope.pay.cardExpYear,
@@ -162,7 +166,7 @@ function(forms, payment, ngPayment, page) {
 
     var forms = function() {
       return [$scope.ownAmount, $scope.personalize, $scope.pay];
-    }
+    };
 
     // Select the default option
     angular.forEach(certificateOptions, function(option) {
