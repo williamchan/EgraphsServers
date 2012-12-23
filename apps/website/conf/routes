@@ -136,6 +136,7 @@ GET     /stars                                                      controllers.
 GET     /stars/:vertical                                            controllers.WebsiteControllers.getMarketplaceResultPage(vertical)
 GET     /orders/$orderId<[0-9]+>/confirm                            controllers.WebsiteControllers.getOrderConfirmation(orderId: Long)
 POST    /orders/$orderId<[0-9]+>/configure                          controllers.WebsiteControllers.postOrderPrivacy(orderId: Long)
+GET     /orders/$orderId<[0-9]+>/egraph-gift-explanation            controllers.WebsiteControllers.getEgraphExplanationCard(orderId: Long)
 GET     /privacy                                                    controllers.WebsiteControllers.getPrivacy
 POST    /register                                                   controllers.WebsiteControllers.postRegisterConsumerEndpoint
 POST    /subscribe                                                  controllers.WebsiteControllers.postSubscribeEmail

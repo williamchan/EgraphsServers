@@ -12,7 +12,7 @@ import play.api.mvc.Request
 import play.api.mvc.Result
 
 /**
- * Filter only where there is an print id that is known.
+ * Filter only where there is an print order id that is known.
  */
 class RequirePrintOrderId @Inject() (printOrderStore: PrintOrderStore) extends Filter[Long, PrintOrder] with RequestFilter[Long, PrintOrder] {
   override protected def formFailedResult[A, S >: Source](formWithErrors: Form[Long], source: S)(implicit request: Request[A]): Result = {

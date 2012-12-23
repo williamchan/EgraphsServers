@@ -170,7 +170,8 @@ object Account extends Controller with DefaultImplicitTemplateParameters {
         "is. Donec viverra rhoncus iaculis. In a nibh tellus. Phasellus dignissim egesta" +
         "s erat nec vestibulum. Proin blandit pellentesque massa, vitae venenatis mauris" +
         " volutpat at.",
-      thumbnailUrl = pendingThumbnails("portrait")
+      thumbnailUrl = pendingThumbnails("portrait"),
+      egraphExplanationUrl = "#"
     )
   }
   
