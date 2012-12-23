@@ -24,26 +24,28 @@ class GetEgraphExplanationCardEndpointTests extends EgraphsUnitTest {
     contentAsBytes(response).length should be > (800000)
   }
 
-  it should "be accessible only to buyer or recipient of order" in new EgraphsTestApplication {
-    val (orderId, buyer, recipient, anotherCustomer) = db.connected(TransactionSerializable) {
+  it should "be inaccessible to random visitors" in new EgraphsTestApplication {
+    val (orderId, buyer, recipient, anotherCustomer, admin) = db.connected(TransactionSerializable) {
       val buyer = TestData.newSavedCustomer()
       val recipient = TestData.newSavedCustomer()
       val anotherCustomer = TestData.newSavedCustomer()
       val order = buyer.buy(TestData.newSavedProduct(), recipient = recipient).save()
-      (order.id, buyer, recipient, anotherCustomer)
+      val admin = TestData.newSavedAdministrator()
+      (order.id, buyer, recipient, anotherCustomer, admin)
     }
 
     val requestAsCustomer: Option[Long] => Result = getEgraphExplanationCardRequestAsCustomer(orderId, _)
 
     // random customers are forbidden
     status(requestAsCustomer(Some(anotherCustomer.id))) should be(FORBIDDEN)
+    status(requestAsCustomer(None)) should be(FORBIDDEN)
 
-    // buyer and recipient are permitted
+    // buyer and recipient and admins are permitted
     status(requestAsCustomer(Some(buyer.id))) should be(OK)
     status(requestAsCustomer(Some(recipient.id))) should be(OK)
-
-    // random customers are redirected away
-    status(requestAsCustomer(None)) should be(SEE_OTHER)
+    
+    val adminReq = FakeRequest(GET, getEgraphExplanationCard(orderId).url).withAdmin(admin.id)
+    status(routeAndCall(adminReq).get) should be (OK)
   }
 
   private def getEgraphExplanationCardRequestAsCustomer(orderId: Long, customerId: Option[Long]): Result = {
