@@ -1,28 +1,15 @@
 package controllers.website.consumer
 
-import play.api._
 import play.api.mvc.Action
 import play.api.mvc.Controller
-import play.api.Play.current
 import models._
-import models.frontend.marketplace._
 import play.api.data._
 import play.api.data.Forms._
-import controllers.WebsiteControllers
-import enums.{PrivacyStatus, EgraphState}
-import models.frontend.egraphs._
 import models.categories._
 import services.mvc.{celebrity, ImplicitHeaderAndFooterData}
-import models.GalleryOrderFactory
-import services.ConsumerApplication
-import services.http.{SafePlayParams, ControllerMethod}
-import services.http.EgraphsSession.Conversions._
-import services.http.filters._
-import egraphs.authtoken.AuthenticityToken
-import services.mvc.celebrity.CelebrityViewConversions
+import services.http.ControllerMethod
 import models.frontend.marketplace._
 import models.frontend.marketplace.CelebritySortingTypes
-import play.api.libs.concurrent.Akka
 import services.db.TransactionSerializable
 import services.db.DBSession
 import celebrity.CatalogStarsQuery
@@ -38,9 +25,6 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
   protected def dbSession: DBSession
   protected def featured: Featured
   
-  import CelebrityViewConversions._
-  import SafePlayParams.Conversions._
-
   val queryUrl = controllers.routes.WebsiteControllers.getMarketplaceResultPage.url
   val categoryRegex = new scala.util.matching.Regex("""c([0-9]+)""", "id")
   

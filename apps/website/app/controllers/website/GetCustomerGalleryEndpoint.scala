@@ -1,15 +1,13 @@
 package controllers.website
 
-import play.api._
 import play.api.mvc._
 import models._
-import controllers.WebsiteControllers
 import enums.{PrivacyStatus, EgraphState}
 import models.frontend.egraphs._
 import services.mvc.ImplicitHeaderAndFooterData
 import models.GalleryOrderFactory
 import services.ConsumerApplication
-import services.http.{SafePlayParams, ControllerMethod}
+import services.http.ControllerMethod
 import services.http.EgraphsSession.Conversions._
 import services.http.filters._
 import egraphs.authtoken.AuthenticityToken
@@ -34,9 +32,7 @@ private[controllers] trait GetCustomerGalleryEndpoint extends ImplicitHeaderAndF
   protected def facebookAppId: String
   protected def consumerApp: ConsumerApplication
 
-  import SafePlayParams.Conversions._
-
-  def getCustomerGalleryByUsername(username: String) = controllerMethod.withForm() 
+  def getCustomerGalleryByUsername(username: String) = controllerMethod.withForm()
   { implicit authToken =>
     httpFilters.requireCustomerUsername(username) { customer =>
       Action { implicit request =>

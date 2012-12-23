@@ -1,8 +1,6 @@
 package controllers.website
 
-import play.api._
 import play.api.mvc._
-
 import models._
 import services.http.ControllerMethod
 import services.mvc.{OrderCompleteViewModelFactory, ImplicitHeaderAndFooterData}
@@ -29,8 +27,7 @@ private[controllers] trait GetOrderConfirmationEndpoint extends ImplicitHeaderAn
       // Get order ID from flash scope -- it's OK to just read it
       // because it can only have been provided by our own code (in this case
       // probably PostBuyProductEndpoint)
-      import services.http.SafePlayParams.Conversions._
-  
+
       val flash = request.flash
       val maybeOrderIdFromFlash = flash.get("orderId").map(orderId => orderId.toLong)
   
