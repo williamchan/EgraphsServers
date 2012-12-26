@@ -50,9 +50,6 @@ case class TaxLineItem private (
   }
 
 
-  override def _domainEntityId: Long = checkout.UnusedDomainEntity // NOTE(SER-499): unused
-
-
   override protected lazy val entityLens = Lens[TaxLineItem, LineItemEntity] (
     get = tax => tax._entity,
     set = (tax, entity) => tax.copy(entity)
@@ -60,11 +57,20 @@ case class TaxLineItem private (
 }
 
 object TaxLineItem {
-  def apply(itemType: TaxLineItemType, amount: Money) = {
+  def apply(itemType: TaxLineItemType, amount: Money, maybeZip: Option[String]) = {
     new TaxLineItem(
-      new LineItemEntity(amount.getAmount),
+      LineItemEntity(amount, maybeZip.getOrElse(TaxLineItemType.noZipcode)),
       itemType
     )
+  }
+
+  def apply(entity: LineItemEntity, typeEntity: LineItemTypeEntity) = {
+    val itemType = TaxLineItemType(BigDecimal(0.0), None)
+//      services.lineItemTypeStore.entitiesToType[TaxLineItemType](typeEntity,entity).getOrElse(
+//        throw new IllegalArgumentException("Could not create a TaxLineItemType from the given entity.")
+//      )
+
+    new TaxLineItem(entity, itemType)
   }
 }
 
@@ -74,9 +80,10 @@ object TaxLineItem {
 
 
 
-case class TaxLineItemServices @Inject() (schema: Schema)
-  extends SavesAsLineItemEntity[TaxLineItem]
-{
+case class TaxLineItemServices @Inject() (
+  schema: Schema,
+  lineItemTypeStore: LineItemTypeStore
+) extends SavesAsLineItemEntity[TaxLineItem] {
   override protected def modelWithNewEntity(tax: TaxLineItem, entity: LineItemEntity) = {
     tax.copy(_entity=entity)
   }

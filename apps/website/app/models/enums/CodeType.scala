@@ -1,11 +1,22 @@
 package models.enums
 
 import egraphs.playutils.Enum
+import models.checkout._
+import org.joda.money.{CurrencyUnit, Money}
 
 sealed abstract class CodeType(val name: String)
 
+trait CodeTypeFactory[TypeT <: LineItemType[_], ItemT <: LineItem[_]] {
+  // take both entities because they're both easily available when restoring
+  // and both have important data
+  def itemInstance(itemEntity: LineItemEntity, typeEntity: LineItemTypeEntity): ItemT
+}
+
 object CodeType extends Enum {
-  sealed abstract class EnumVal(name: String) extends CodeType(name) with Value
+
+  sealed abstract class EnumVal(name: String) extends CodeType(name) with Value {
+    this: CodeTypeFactory[_, _] =>
+  }
 
   //
   // Products
@@ -14,21 +25,52 @@ object CodeType extends Enum {
   //
   // Discounts
   //
-  val GiftCertificate = new EnumVal("GiftCertificateLineItemType"){}
+  val GiftCertificate = new EnumVal("GiftCertificateLineItemType")
+    with CodeTypeFactory[GiftCertificateLineItemType, GiftCertificateLineItem]
+  {
+    override def itemInstance(itemEntity: LineItemEntity, typeEntity: LineItemTypeEntity) = {
+      GiftCertificateLineItem(itemEntity, typeEntity)
+    }
+  }
 
   //
   // Charges
   //
-  val StripeCharge = new EnumVal("StripeChargeLineItemType"){}
+  val StripeCharge = new EnumVal("StripeChargeLineItemType")
+    with CodeTypeFactory[StripeChargeLineItemType, StripeChargeLineItem]
+  {
+    override def itemInstance(itemEntity: LineItemEntity, typeEntity: LineItemTypeEntity) = {
+      StripeChargeLineItem(itemEntity, typeEntity)
+    }
+  }
 
   //
   // Summaries
   //
-  val Subtotal = new EnumVal("SubtotalLineItemType"){}
-  val Total = new EnumVal("TotalLineItemType"){}
+  val Subtotal = new EnumVal("SubtotalLineItemType") with CodeTypeFactory[SubtotalLineItemType, SubtotalLineItem] {
+    override def itemInstance(itemEntity: LineItemEntity, typeEntity: LineItemTypeEntity) = {
+      SubtotalLineItem( Money.of(
+        CurrencyUnit.USD,
+        itemEntity._amountInCurrency.bigDecimal
+      ))
+    }
+  }
+
+  val Total = new EnumVal("TotalLineItemType") with CodeTypeFactory[TotalLineItemType, TotalLineItem] {
+    override def itemInstance(itemEntity: LineItemEntity, typeEntity: LineItemTypeEntity) = {
+      TotalLineItem( Money.of(
+        CurrencyUnit.USD,
+        itemEntity._amountInCurrency.bigDecimal
+      ))
+    }
+  }
 
   //
   // Taxes
   //
-  val Tax = new EnumVal("TaxLineItemType"){}
+  val Tax = new EnumVal("TaxLineItemType") with CodeTypeFactory[TaxLineItemType, TaxLineItem] {
+    override def itemInstance(itemEntity: LineItemEntity, typeEntity: LineItemTypeEntity) = {
+      TaxLineItem(itemEntity, typeEntity)
+    }
+  }
 }

@@ -10,7 +10,7 @@ import services.{AppConfig, Time}
 
 case class TaxLineItemType private (
   _entity: LineItemTypeEntity,
-  zipCode: String,
+  rate: BigDecimal,
   services: TaxLineItemTypeServices = AppConfig.instance[TaxLineItemTypeServices]
 ) extends LineItemType[Money] with HasLineItemTypeEntity  // TODO(SER-499): is this necessary?
   with LineItemTypeEntityGettersAndSetters[TaxLineItemType]
@@ -33,7 +33,10 @@ case class TaxLineItemType private (
     def isDiscountType(itemType: LineItemType[_]) = itemType.nature == LineItemNature.Discount
     def isSubtotalItem(item: LineItem[_]) = item.itemType.codeType == CodeType.Subtotal
 
-    (resolvedItems.find(isSubtotalItem(_)), pendingResolution.find(isDiscountType(_))) match {
+    val maybeResolvedSubtotal = resolvedItems.find(isSubtotalItem(_))
+    val maybePendingDiscount = pendingResolution.find(isDiscountType(_))
+
+    (maybeResolvedSubtotal, maybePendingDiscount) match {
       // Want to have the subtotal and no pending discounts
       case (Some(subtotal: SubtotalLineItem), None) =>
 
@@ -42,10 +45,9 @@ case class TaxLineItemType private (
           if (isDiscountType(next.itemType)) acc plus next.amount else acc
         }
 
-        val subtotalLessDiscounts = subtotal.amount minus totalDiscount
-        val totalTax = subtotalLessDiscounts multipliedBy (taxRates.sum.bigDecimal, java.math.RoundingMode.UP)
-
-        Seq(TaxLineItem(this, totalTax))
+        // (subtotal - discounts) * tax rate
+        val taxAmount = (subtotal.amount minus totalDiscount) multipliedBy (rate.bigDecimal, java.math.RoundingMode.UP)
+        Seq(TaxLineItem(this, taxAmount, None))
 
       case _ => Nil
     }
@@ -56,32 +58,63 @@ case class TaxLineItemType private (
     get = tax => tax._entity,
     set = (tax, entity) => tax.copy(entity)
   )
-
-  // TODO: add more cases as needed, verify WA tax rate
-  protected val taxByZip: Map[String, BigDecimal] = Map(
-    /** Washington zipcodes: 980XX - 994XX; State-wide sales tax of 6.5% */
-    "9[8-9][0-4][0-9][0-9]" -> BigDecimal(0.065)
-  )
-
-  /** Get applicable taxes based on zip */
-  protected def taxRates: Seq[BigDecimal] = {
-    taxByZip.filter(zipCode matches _._1).values.toSeq
-  }
 }
 
 
 
 object TaxLineItemType {
-  val description = "Tax"
+  val basicDescription = "Tax"
   val nature = LineItemNature.Tax
   val codeType = CodeType.Tax
+  val noZipcode = ""
 
-  def apply(zip: String) = {
-    new TaxLineItemType(
-      new LineItemTypeEntity(description, nature, codeType),
-      zip
+  /**
+   * Makes a single TaxLineItemType
+   * @param taxRate
+   * @param maybeDescription - should describe the type of tax (ex: sales tax)
+   * @return TaxLineItemType of given rate with given description
+   */
+  def apply(taxRate: BigDecimal, maybeDescription: Option[String]): TaxLineItemType = {
+    TaxLineItemType(
+      LineItemTypeEntity(
+        maybeDescription.getOrElse(basicDescription),
+        nature,
+        codeType),
+      taxRate
     )
   }
+
+  def apply(entity: LineItemTypeEntity, itemEntity: LineItemEntity): TaxLineItemType = {
+    def rate = BigDecimal(itemEntity.notes.stripSuffix("%").toDouble/100)
+    def isValidRate = 0.0 <= rate && rate <= 1.0
+    require(isValidRate, "Invalid rate parsed from entity.")
+
+    TaxLineItemType(entity, rate)
+  }
+
+
+  /**
+   * Here we are only concerned with possible taxes; the ones that apply or not by product
+   * (ex: digital product taxes vs. general sales tax) are determined in lineItems method.
+   *
+   * @param zipcode of customer
+   * @return Sequence of TaxLineItemTypes for taxes that apply in the given zipcode are
+   */
+  def getTaxesByZip(zipcode: String): Seq[TaxLineItemType] = {
+    for ((pattern, (rate, desc)) <- zipToTaxMap if zipcode matches pattern) yield {
+      val description = if (desc isEmpty) basicDescription else desc
+      TaxLineItemType(rate, Some(description))
+    }
+  }.toSeq
+
+
+  /** Map of zipcode pattern to tuple of tax rate and description */
+  protected val zipToTaxMap: Map[String, (BigDecimal, String)] = Map(
+    TaxLineItemType.noZipcode -> (BigDecimal(0), ""),
+
+    /** Washington zipcodes: 980XX - 994XX; State-wide sales tax of 6.5% */
+    "9[8-9][0-4][0-9][0-9]" -> (BigDecimal(0.065), "WA Sales Tax")
+  )
 }
 
 

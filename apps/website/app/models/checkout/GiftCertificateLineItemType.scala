@@ -10,7 +10,7 @@ import org.squeryl.PrimitiveTypeMode._
 import com.google.inject.Inject
 
 
-case class GiftCertificateLineItemType private (
+case class GiftCertificateLineItemType (
   _entity: LineItemTypeEntity,
   recipient: String = "",
   amountToBuy: Money = Money.zero(CurrencyUnit.USD),
@@ -26,9 +26,18 @@ case class GiftCertificateLineItemType private (
   }
 
   override def lineItems(resolvedItems: Seq[LineItem[_]], pendingResolution: Seq[LineItemType[_]]) = {
-    Seq(GiftCertificateLineItem.fromItemType(this))
+    val coupon = new Coupon(
+      name = GiftCertificateLineItemType.couponName(this),  // TODO(SER-499): clean couponName use up
+      discountAmount = amountToBuy.getAmount,
+      lineItemTypeId = id)
+    .withCouponType( CouponType.GiftCertificate )
+    .withDiscountType( CouponDiscountType.Flat )
+    .withUsageType( CouponUsageType.Prepaid )
+
+    Seq(GiftCertificateLineItem(this, coupon))
   }
 
+  override def id = _entity.id
 
   override protected lazy val entityLens = Lens[GiftCertificateLineItemType, LineItemTypeEntity] (
     get = cert => cert._entity,
@@ -41,13 +50,42 @@ object GiftCertificateLineItemType {
   val nature = LineItemNature.Discount
   val codeType = CodeType.GiftCertificate
 
-  def apply(recipient: String, amountToBuy: Money): GiftCertificateLineItemType = {
-    new GiftCertificateLineItemType(seedEntity(Some(recipient), Some(amountToBuy)), recipient, amountToBuy)
+  def apply(
+    recipient: String,
+    amountToBuy: Money
+  ): GiftCertificateLineItemType = {
+    new GiftCertificateLineItemType(
+      seedEntity(Some(recipient), Some(amountToBuy)),
+      recipient, amountToBuy)
   }
 
-  private[checkout] def seedEntity(maybeRecip: Option[String] = None, maybeAmount: Option[Money] = None) = {
-    val desc = "Gift certificate" + maybeAmount.map(" for " + _).getOrElse("") + maybeRecip.map(" to " + _).getOrElse("")
-    new LineItemTypeEntity(desc, nature, codeType)
+  def apply(entity: LineItemTypeEntity, itemEntity: LineItemEntity) = {
+    new GiftCertificateLineItemType(
+      _entity = entity,
+      // skipping recipient because it's not handled well...
+      amountToBuy = Money.of(CurrencyUnit.USD, itemEntity._amountInCurrency.bigDecimal)
+    )
+  }
+
+  private val basicDescription = "Gift certificate"
+
+  private[checkout] def seedEntity(implicit maybeRecipient: Option[String] = None, maybeAmount: Option[Money] = None) = {
+    val desc = description(maybeRecipient, maybeAmount)
+    LineItemTypeEntity(desc, nature, codeType)
+  }
+
+  private def description(implicit maybeRecipient: Option[String] = None, maybeAmount: Option[Money] = None) = {
+    basicDescription ++
+      maybeAmount.map(amount => " for " ++ amount.toString).getOrElse("") ++
+      maybeRecipient.map(recip => " to " ++ recip).getOrElse("")
+  }
+
+  //
+  // Coupon helpers
+  //
+  protected val couponNameFormatString = "A gift certificate for %s"
+  protected def couponName(itemType: GiftCertificateLineItemType): String = {
+    couponNameFormatString.format(itemType.recipient)
   }
 }
 

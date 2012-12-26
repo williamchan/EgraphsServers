@@ -1,8 +1,9 @@
 package models.checkout
 
 import org.joda.money.{CurrencyUnit, Money}
-import models.enums.LineItemNature
+import models.enums._
 import org.squeryl.KeyedEntity
+import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
 import services.{AppConfig, Time}
 import services.db._
@@ -18,41 +19,107 @@ package object checkout {
 
 
   val UnsavedEntity = 0
+
+  type LineItems = Seq[LineItem[_]]
+  type LineItemTypes = Seq[LineItemType[_]]
 }
 
-/**
- *
- * @param _entity
- * @param lineItemTypes - intermediate form of contents of checkout
- */
-case class Checkout private(
-  _entity: CheckoutEntity,
-  lineItemTypes: Seq[LineItemType[_]] = Nil,
-  _lineItems: Seq[LineItem[_]] = Nil,
-  services: CheckoutServices = AppConfig.instance[CheckoutServices]
-) extends HasEntity[CheckoutEntity]
-  with CanInsertAndUpdateAsThroughServices[Checkout, CheckoutEntity]
-{
+import checkout._
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* Want to reuse as much existing code as possible, but:
+*  -Entity operations
+*  -Persistence
+*  -Updated/created
+*
+* Follow existing patterns:
+*  -Stores
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+sealed trait Checkout {
+  // entity for persistence
+  def _entity: CheckoutEntity
 
+  // uses LineItems and LineItemTypes
+  def lineItems: LineItems
+  def lineItemTypes: LineItemTypes
 
-  def add(additionalTypes: Seq[LineItemType[_]]): Checkout = {
-    additionalTypes match {
-      case Nil => this
-      case _ => this.copy(lineItemTypes = lineItemTypes ++ additionalTypes)
-    }
+  // uses services, but subclasses should only access certain methods
+  def services: CheckoutServices
+
+  // utility members
+  def id = _entity.id
+  def subtotal: SubtotalLineItem = lineItemsOfCodeType(CodeType.Subtotal).head
+  def total: TotalLineItem = lineItemsOfCodeType(CodeType.Total).head
+
+  def flattenLineItems: LineItems = {
+    for (lineItem <- lineItems; flattened <- lineItem.flatten) yield flattened
   }
 
+  def lineItemsOfCodeType[LIT <: LineItemType[_], LI <: LineItem[_]](codeType: CodeTypeFactory[LIT, LI]): Seq[LI] = {
+    for (item <- lineItems if item.codeType == codeType) yield {
+      item.asInstanceOf[LI]
+    }
 
-  // TODO(SER-499): append subtotal, tax, total to this Seq; get _lineItems first
-  lazy val lineItems: Seq[LineItem[_]] = {
-    // TODO(SER-499): add subtotal, tax, fees, total before processing
+  }
+}
 
-    case class ResolutionPass(items: Seq[LineItem[_]], unresolved: Seq[LineItemType[_]]) {
+case class CheckoutEntity(
+  id: Long = 0,
+  customerId: Long = 0,
+  created: Timestamp,
+  updated: Timestamp
+) extends KeyedCaseClass[Long] with HasCreatedUpdated {
+  override def unapplied = CheckoutEntity.unapply(this)
+}
+
+
+case class CheckoutServices @Inject() (
+  checkoutStore: CheckoutStore
+)
+
+
+//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* Created:
+*  -can save, not update
+*  -takes types, generates items
+*  -needs zipcode to be created for tax purposes
+*
+* Restored:
+*  -cannot save or update itself
+*  -takes items, extracts types
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+/** For creating */
+case class UnpersistedCheckout (
+  _entity: CheckoutEntity,
+  _lineItemTypes: LineItemTypes,
+  maybeZipcode: Option[String],
+  services: CheckoutServices
+) extends Checkout {
+
+  //
+  // Checkout Members
+  //
+  /**
+   * Appends taxes, fees, and summaries to _lineItemTypes
+   * @return
+   */
+  override def lineItemTypes: LineItemTypes = {
+    _lineItemTypes ++ taxesAndSummariesByZip(maybeZipcode)
+  }
+
+  /**
+   * Generate lineItems from lineItemTypes
+   * @return
+   */
+  override lazy val lineItems: LineItems = {
+    case class ResolutionPass(items: LineItems, unresolved: LineItemTypes) {
       def isComplete: Boolean = unresolved.isEmpty
     }
 
-    def executePass(passToResolve: ResolutionPass): Seq[LineItem[_]] = {
+    def executePass(passToResolve: ResolutionPass): LineItems = {
       if (passToResolve.isComplete) {
         passToResolve.items
       } else {
@@ -61,7 +128,7 @@ case class Checkout private(
 
           nextItemType.lineItems(oldPass.items, itemTypesSansCurrent) match {
             case Nil => oldPass
-            case newLineItems: Seq[LineItem[_]] => oldPass.copy(newLineItems, itemTypesSansCurrent)
+            case newLineItems: LineItems => oldPass.copy(newLineItems, itemTypesSansCurrent)
 
           }
         }
@@ -84,97 +151,124 @@ case class Checkout private(
     executePass(initialPass)
   }
 
-
-  lazy val flattenedLineItems: Seq[LineItem[_]] = {
-    for (lineItem <- lineItems; flattened <- lineItem.flatten) yield flattened
+  //
+  // UnpersistedCheckout methods
+  //
+  /**
+   * Adds extra types to this checkout
+   * @param additionalTypes
+   * @return new UnpersistedCheckout with additional lineItemTypes
+   */
+  def add(additionalTypes: LineItemTypes): UnpersistedCheckout = {
+    this.copy(_lineItemTypes = _lineItemTypes ++ additionalTypes)
   }
-
-
-  // TODO(SER-499): make helpers for getting by nature, codeType
-
-
-  def transact(): Checkout = {
-    // TODO(SER-499): implement this
-    // transact checkout entity
-    // for(lineItem <- lineItems) yield lineItem.withCheckoutId(id).transact
-    if (id <= 0) {
-      this.insert().transact()
-
-    } else {
-      // _entity is persisted, so now persist line items
-
-      // NOTE(SER-499): a fresh checkouts lineItems are directly derived from the lineItemTypes, but after transacting, lineItems and lineItemTypes could become out of sync; would be great to make it easy to know what state we're in (perhaps monadicly).
-      val (savedLineItems, savedItemTypes) = (for(item <- flattenedLineItems) yield {
-        val savedItem = item.withCheckoutId(id).transact()
-        (savedItem, savedItem.itemType)
-      }).unzip
-
-      this.copy(lineItemTypes = savedItemTypes, _lineItems = savedLineItems)
-
-    }
-
-    this
-  }
-
-
-  // TODO(SER-499): checkout serialization
-  // def lineItemsToJson: String
-  // def lineItemTypesToJson: String
-
-
-  // convenience methods
-  protected def id = _entity.id
-}
-
-object Checkout {
-  def apply(lineItemTypes: Seq[LineItemType[_]]): Checkout =
-    Checkout(CheckoutEntity(), lineItemTypes)
 
   /**
-   * @param json -- serialized LineItemTypes
-   * @return Option of restored Checkout if deserializing succeeds; otherwise, None.
+   * Persists this checkout, its types, and its items
+   * @return PersistedCheckout of the transacted checkout
    */
-  def restore(json: String): Option[Checkout] = {
-    None
+  def transact(): PersistedCheckout = {
+    // save _entity, lineItemTypes, and lineItems
+    services.checkoutStore.create(this)
   }
 
-  def getWithId(id: Long): Option[Checkout]= {
-    None
-  }
-}
 
-
-
-
-case class CheckoutEntity(
-  id: Long = 0,
-  customerId: Long = 0,
-  created: Timestamp = Time.defaultTimestamp,
-  updated: Timestamp = Time.defaultTimestamp
-) extends KeyedCaseClass[Long] with HasCreatedUpdated {
-  override lazy val unapplied = CheckoutEntity.unapply(this)
-}
-
-
-
-
-case class CheckoutServices @Inject() (
-  schema: Schema
-) extends SavesAsCheckoutEntity {
-
-  def modelWithNewEntity(checkout: Checkout, entity: CheckoutEntity) = {
-    checkout.copy(_entity = entity)
+  //
+  // Helper methods
+  //
+  /**
+   * Helper for generating taxes and summaries.
+   * TODO: add fees, such as shipping, later.
+   *
+   * @param maybeZipcode - None defaults to no taxes
+   * @return Sequence of subtotal, taxes, and total (in that order)
+   */
+  protected def taxesAndSummariesByZip(maybeZipcode: Option[String]): LineItemTypes = {
+    Seq(SubtotalLineItemType) ++
+      TaxLineItemType.getTaxesByZip(maybeZipcode.getOrElse(TaxLineItemType.noZipcode)) ++
+      Seq(TotalLineItemType)
   }
 }
 
 
-trait SavesAsCheckoutEntity extends InsertsAndUpdatesAsEntity[Checkout, CheckoutEntity]
-  with SavesCreatedUpdated[CheckoutEntity]
-{
-  protected def schema: Schema
-  override protected val table = schema.checkouts
+/** After creating/for updating */
+case class PersistedCheckout (
+  _entity: CheckoutEntity,
+  lineItems: LineItems,
+  services: CheckoutServices = AppConfig.instance[CheckoutServices]
+) extends Checkout {
 
-  override protected def withCreatedUpdated(toUpdate: CheckoutEntity, created: Timestamp, updated: Timestamp) = {
+  //
+  // Checkout members
+  //
+  override def lineItemTypes: LineItemTypes = {
+    // extract lineItemTypes from lineItems
+    lineItems.map(item => item.itemType)
+  }
+
+  //
+  // PersistedCheckout methods
+  //
+  def update(): PersistedCheckout = {
+    // add new items, summaries, charges, etc to lineitems
+
+    // update checkout entity's updated field
+    services.checkoutStore.update(this)
+  }
+}
+
+
+//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* Store must:
+*  -give persistence to UnpersistedCheckout
+*  -give update (of updated field) to PersistedCheckout
+*  -give helper queries for getting checkouts
+*    -needs schema, lineItemStore, and lineItemTypeStore
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+class CheckoutStore @Inject() (
+  schema: Schema,
+  lineItemStore: LineItemStore,
+  lineItemTypeStore: LineItemTypeStore
+) extends InsertsAndUpdates[CheckoutEntity] with SavesCreatedUpdated[CheckoutEntity] {
+
+  override protected def table = schema.checkouts
+
+  override def withCreatedUpdated(toUpdate: CheckoutEntity, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)
   }
+
+  // only Unpersisted can save itself (create a checkout)
+  def create(checkout: UnpersistedCheckout): PersistedCheckout = {
+    val savedEntity = insert(checkout._entity)
+    val savedItems  =
+      for (item <- checkout.lineItems) yield {
+        item.withCheckoutId(savedEntity.id).transact()
+      }
+
+    new PersistedCheckout( savedEntity, savedItems )
+  }
+
+  // only updates updated column of checkout
+  def update(checkout: PersistedCheckout): PersistedCheckout = {
+    checkout.copy(
+      _entity = update(checkout._entity)
+    )
+  }
+
+  // helper queries
+  def getCheckoutById(id: Long): Option[PersistedCheckout] = {
+    // val entity = //table.where()
+    // val lineItems = lineItemStore.getItemsByCheckoutId(id)
+    None
+  }
+
+  def getCheckoutsByCustomerId(id: Long): Seq[PersistedCheckout] = {
+    Nil
+  }
 }
+
+//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
+
+

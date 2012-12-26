@@ -1,8 +1,8 @@
 package models.checkout
 
-import models.Coupon
+import models.{CouponStore, Coupon}
 import models.enums.{CodeType, LineItemNature, CouponType, CouponDiscountType, CouponUsageType}
-import org.joda.money.Money
+import org.joda.money.{CurrencyUnit, Money}
 import services.AppConfig
 import services.db.{CanInsertAndUpdateAsThroughServices, Schema}
 import scalaz.Lens
@@ -14,22 +14,27 @@ import com.google.inject.Inject
  * NOTE(SER-499): as it stands, a line item's state is rather different depending on whether it is unpersisted (_domainEntityId = 0), persisted, or restored (itemType = unset). This is a sign of deficiencies in the design and may lead to errors since it's difficult to think of each possible state when writing these line items. Would really like to make this easier to reason about/treat each state uniformly.
  *
  * TODO(SER-499): possibly make itemType an option, since it would be convenient to leave it as None when restoring (unless restoring is so infrequent it just creates noise for little benefit?)
- *
- * @param _entity
- * @param itemType - line item type corresponding to this gift certificate
- * @param subItems - items that depend upon or relate strongly to this gift certificate
- * @param _domainEntityId
  */
-case class GiftCertificateLineItem private (
-  _entity: LineItemEntity = new LineItemEntity(),
-  itemType: GiftCertificateLineItemType,
-  subItems: Seq[LineItem[_]] = Nil,
-  _domainEntityId: Long = 0,
+case class GiftCertificateLineItem (
+  _entity: LineItemEntity,
+  _typeOrEntity: Either[GiftCertificateLineItemType, LineItemTypeEntity],
+  _maybeCoupon: Option[Coupon] = None,
   services: GiftCertificateLineItemServices = AppConfig.instance[GiftCertificateLineItemServices]
 ) extends LineItem[Coupon] with HasLineItemEntity
   with LineItemEntityGettersAndSetters[GiftCertificateLineItem]
   with CanInsertAndUpdateAsThroughServices[GiftCertificateLineItem, LineItemEntity]
 {
+
+  override def itemType: GiftCertificateLineItemType = _typeOrEntity match {
+    case Left(itemType: GiftCertificateLineItemType) => itemType
+    case Right(typeEntity: LineItemTypeEntity) => GiftCertificateLineItemType(
+      _entity = typeEntity,
+      amountToBuy = Money.of(CurrencyUnit.USD, _entity._amountInCurrency.bigDecimal)
+    )
+  }
+
+  override def subItems: Seq[LineItem[_]] = Nil
+
   override def toJson: String = {
     // TODO(SER-499): implement once api nailed down
     ""
@@ -37,17 +42,10 @@ case class GiftCertificateLineItem private (
 
 
   override def domainObject: Coupon = {
-    if (_domainEntityId == 0) {
-      new Coupon(
-        name = GiftCertificateLineItem.couponName(itemType),
-        discountAmount = amount.getAmount,
-        lineItemTypeId = itemType.id
-      ).withCouponType( CouponType.GiftCertificate
-      ).withDiscountType( CouponDiscountType.Flat
-      ).withUsageType( CouponUsageType.Prepaid )
-    } else {
-      // TODO(SER-499): query db for coupon
-      null // to be a query
+    _maybeCoupon.getOrElse {
+      services.couponStore.findByLineItemTypeId(itemType.id).headOption.getOrElse {
+        throw new IllegalArgumentException("No associated Coupon exists for this Gift Certificate.")
+      }
     }
   }
 
@@ -62,15 +60,17 @@ case class GiftCertificateLineItem private (
 
       /**
        * Save itemType first because it depends neither on a line item or domain object.
-       * Then, save line item with the resulting itemType.
-       * Finally, save the resulting line item's domain object.
+       * Then, save coupon, which only depends on itemType.
+       * Finally, save the line item with the .
        */
       val savedType = itemType.insert()
-      val savedItem = withItemType(savedType).insert()
-      val savedCoupon = savedItem.domainObject.save()
+      val savedCoupon = domainObject.copy(lineItemTypeId = savedType.id).save()
+      val savedItem = withItemTypeId(savedType.id)
+        .withDomainEntityId(savedCoupon.id)
+        .insert()
 
       // return the saved item with its coupon's id stored
-      savedItem.copy(_domainEntityId = savedCoupon.id)
+      savedItem.copy(_maybeCoupon = Some(savedCoupon))
 
     } else {
       this
@@ -79,7 +79,7 @@ case class GiftCertificateLineItem private (
 
 
   def withItemType(newType: GiftCertificateLineItemType) = {
-    this.copy(itemType = newType).withItemTypeId(newType.id)
+    this.copy(_typeOrEntity = Left(newType)).withItemTypeId(newType.id)
   }
 
 
@@ -90,24 +90,19 @@ case class GiftCertificateLineItem private (
 }
 
 object GiftCertificateLineItem {
-  def fromItemType(itemType: GiftCertificateLineItemType) = {
+  def apply(itemType: GiftCertificateLineItemType, coupon: Coupon) = {
     new GiftCertificateLineItem(
       new LineItemEntity(
         _itemTypeId = itemType.id,
-        _amountInCurrency = itemType.amountToBuy.getAmount,
-        notes = couponName(itemType)
+        _amountInCurrency = itemType.amountToBuy.getAmount
       ),
-      itemType
+      Left(itemType),
+      Some(coupon)
     )
   }
 
-
-  //
-  // Coupon helpers
-  //
-  protected val couponNameFormatString = "A gift certificate for %s"
-  protected def couponName(itemType: GiftCertificateLineItemType): String = {
-    couponNameFormatString.format(itemType.recipient)
+  def apply(entity: LineItemEntity, typeEntity: LineItemTypeEntity) = {
+    new GiftCertificateLineItem(entity, Right(typeEntity))
   }
 }
 
@@ -117,15 +112,13 @@ object GiftCertificateLineItem {
 
 
 
-case class GiftCertificateLineItemServices @Inject() (schema: Schema)
-  extends SavesAsLineItemEntity[GiftCertificateLineItem]
-{
-  // TODO(SER-499): query helpers
-
-
-  //
+case class GiftCertificateLineItemServices @Inject() (
+  schema: Schema,
+  lineItemStore: LineItemStore,
+  lineItemTypeStore: LineItemTypeStore,
+  couponStore: CouponStore
+) extends SavesAsLineItemEntity[GiftCertificateLineItem] {
   // SaveAsLineItemEntity members
-  //
   override protected def modelWithNewEntity(certificate: GiftCertificateLineItem, entity: LineItemEntity) = {
     certificate.copy(_entity=entity)
   }

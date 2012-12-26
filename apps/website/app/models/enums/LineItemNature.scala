@@ -14,4 +14,5 @@ object LineItemNature extends Enum {
   val Summary = new EnumVal("Summary") {}
   val Charge = new EnumVal("Charge") {}
   val Refund = new EnumVal("Refund") {}
+
 }

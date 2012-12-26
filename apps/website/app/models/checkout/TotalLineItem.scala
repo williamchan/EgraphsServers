@@ -18,12 +18,13 @@ case class TotalLineItem (
   // NOTE(SER-499): unused
   override val id: Long = checkout.Unpersisted
   override def domainObject = amount
-  override val _domainEntityId: Long = checkout.UnusedDomainEntity
   override def transact = this
   override def withCheckoutId(newCheckoutId: Long) = this
 }
 
-object TotalLineItemType extends LineItemType[Money] {
+
+abstract class TotalLineItemType extends LineItemType[Money]
+object TotalLineItemType extends TotalLineItemType {
   override val id = checkout.Unpersisted
   override val description = "Total"
   override val nature = LineItemNature.Summary

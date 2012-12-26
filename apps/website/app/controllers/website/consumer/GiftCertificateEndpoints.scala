@@ -13,6 +13,7 @@ import models.checkout.{/*StripeChargeLineItemType,*/ Checkout, GiftCertificateL
 
 /**
  */
+/*
 private[consumer] trait GiftCertificateEndpoints extends ImplicitHeaderAndFooterData {
   this: Controller =>
 
@@ -66,17 +67,19 @@ private[consumer] trait GiftCertificateEndpoints extends ImplicitHeaderAndFooter
       def amount: Option[Money] = Some(Money.parse("$50"))
       def recipientName: Option[String] = Some("Johnny Boy")
       def stripeId: Option[String] = Some("934texas")
+      def zipcode: Option[String] = Some("12345")
     }
 
-    val checkout = for (
+    for (
       amount <- form.amount;
       recipient <- form.recipientName;
-      stripeId <- form.stripeId
+      stripeId <- form.stripeId;
+      zipcode <- form.zipcode
 
     ) yield {
       val giftCertificate = GiftCertificateLineItemType(recipient, amount)
-      Checkout(IndexedSeq(giftCertificate))
+      //Checkout(zipcode, IndexedSeq(giftCertificate))
     }
-    checkout.headOption
+    None
   }
-}
+}*/

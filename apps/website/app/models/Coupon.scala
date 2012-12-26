@@ -39,7 +39,7 @@ case class Coupon(id: Long = 0,
   /**
    * Marks this coupon as used. Does nothing if this coupon is unlimited-use.
    */
-  def use(amount: Money = Money.zero(CurrencyUnit.USD)): Coupon = {
+  def use(implicit amount: Money = Money.zero(CurrencyUnit.USD)): Coupon = {
     usageType match {
       case CouponUsageType.Unlimited => this
       case CouponUsageType.Prepaid if ((discountAmount - amount.getAmount) >= 0.01) =>
@@ -152,7 +152,16 @@ class CouponStore @Inject()(schema: Schema,
       }
     }
   }
-  
+
+  def findByLineItemTypeId(id: Long): Query[Coupon] = {
+    from(schema.coupons)(coupon =>
+      where(coupon.lineItemTypeId === id)
+      select(coupon)
+      orderBy(coupon.updated desc)
+    )
+  }
+
+
   //
   // SavesWithLongKey[Coupon] methods
   //

@@ -81,7 +81,7 @@ class Schema @Inject() (
       celebrity.urlSlug is unique,
       celebrity.bio is dbType("text")))
 
-  val checkouts = table[CheckoutEntity]
+  val checkouts = table[CheckoutEntity]("Checkout")
   // TODO(SER-499): Index declarations
 
   val coupons = table[Coupon]
@@ -113,10 +113,10 @@ class Schema @Inject() (
       columns(inventoryBatch.startDate, inventoryBatch.endDate) are indexed,
       columns(inventoryBatch.celebrityId, inventoryBatch.startDate, inventoryBatch.endDate) are indexed))
 
-  val lineItems = table[LineItemEntity]
+  val lineItems = table[LineItemEntity]("LineItem")
   // TODO(SER-499): Index declarations
 
-  val lineItemTypes = table[LineItemTypeEntity]
+  val lineItemTypes = table[LineItemTypeEntity]("LineItemType")
   // TODO(SER-499): Index declarations
 
   val orders = table[Order]("Orders")

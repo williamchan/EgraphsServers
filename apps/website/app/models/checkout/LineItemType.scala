@@ -2,20 +2,27 @@ package models.checkout
 
 import java.sql.Timestamp
 import services.{MemberLens, Time}
-import org.squeryl.KeyedEntity
+import org.squeryl.{Query, KeyedEntity}
+import org.squeryl.PrimitiveTypeMode._
 import org.squeryl.dsl.ast.LogicalBoolean
 import services.db.{KeyedCaseClass, InsertsAndUpdatesAsEntity, HasEntity, Schema}
 import scalaz.Lens
 
-import models.enums.{CodeType, LineItemNature}
+import models.enums.{CodeTypeFactory, CodeType, LineItemNature}
 import models.{HasCreatedUpdated, SavesCreatedUpdated}
+import org.squeryl.annotations.Transient
+import com.google.inject.Inject
 
 
 trait LineItemType[+TransactedT] {
   def id: Long
+
+  // Convenience entity-member accessors
   def description: String
   def nature: LineItemNature
   def codeType: CodeType
+
+  // Serialization
   def toJson: String
 
   /**
@@ -38,41 +45,35 @@ trait LineItemType[+TransactedT] {
    * @return Seq(new line items) if the line item type was successfully applied.
    *   Otherwise None, to signal that the checkout will try to resolve it again on the next round.
    */
-   def lineItems(
-     resolvedItems: Seq[LineItem[_]],
-     pendingResolution: Seq[LineItemType[_]]
-   ): Seq[LineItem[TransactedT]]
- }
-
-/**
- * A row in the LineItemType table
- */
-case class LineItemTypeEntity private (
-  id: Long,
-  _desc: String,
-  _nature: String,
-  _codeType: String,
-  created: Timestamp,
-  updated: Timestamp
-) extends KeyedCaseClass[Long] with HasCreatedUpdated {
-
-  def this(
-    desc: String = "",
-    nature: LineItemNature,
-    codeType: CodeType,
-    id: Long = 0,
-    created: Timestamp = Time.defaultTimestamp,
-    updated: Timestamp = Time.defaultTimestamp
-  ) = this(id, desc, nature.name, codeType.name, created, updated)
-
-  override lazy val unapplied = LineItemTypeEntity.unapply(this)
-
-  def nature = LineItemNature(_nature).get
-  def codeType = CodeType(_codeType).get
+  def lineItems(
+    resolvedItems: Seq[LineItem[_]],
+    pendingResolution: Seq[LineItemType[_]]
+  ): Seq[LineItem[TransactedT]]
 }
 
 
+/**
+ * Provide helper queries for getting LineItemType's; persistence is provided by LineItemType implementations.
+ * @param schema
+ */
+class LineItemTypeStore @Inject() (schema: Schema) {
+  protected def table = schema.lineItemTypes
 
+  // TODO(SER-499): helper queries
+  // use CodeType to create LineItemTypes as correct type
+  def getById(id: Long) = {
+    table.where(itemType => itemType.id === id).headOption
+  }
+
+
+// TODO(SER-499): remove this when sure it's not being used
+//  def entitiesToType[T <: LineItemType[_]](entity: LineItemTypeEntity, itemEntity: LineItemEntity): Option[T] = {
+//    CodeType(entity._codeType) match {
+//      case Some(codeType: CodeTypeFactory[T, _]) => Some(codeType.typeInstance(entity, itemEntity))
+//      case None => None
+//    }
+//  }
+}
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

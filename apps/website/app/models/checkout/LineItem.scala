@@ -7,27 +7,24 @@ import services.db.{KeyedCaseClass, InsertsAndUpdatesAsEntity, HasEntity, Schema
 import services.{MemberLens, Time}
 import scalaz.Lens
 import models.{HasCreatedUpdated, SavesCreatedUpdated}
+import org.squeryl.annotations.Transient
+import com.google.inject.Inject
+import models.enums.{LineItemNature, CodeType}
 
-trait LineItem[+TransactedT] {
+trait LineItem[+TransactedT] extends Transactable[LineItem[TransactedT]] {
   def id: Long
   def amount: Money
+
+  // def _typeEntity: LineItemTypeEntity
+  // def _maybeType: Option[LineItemType[TransactedT]]
   def itemType: LineItemType[TransactedT]
   def subItems: Seq[LineItem[_]]
   def toJson: String                    // TODO(SER-499): Use Json type, maybe even Option
   def domainObject: TransactedT
-  def _domainEntityId: Long
 
-  /**
-   * TODO(SER-499): should transact operate on flattened LineItems or not?
-   * Persists line item and its fields (line item type, domain object, etc) as necessary.
-   * Requires that checkoutId is set.
-   *
-   * Note that a summary line item might not choose to actually persist itself, so this
-   * definition should allow such implementation.
-   *
-   * @return persisted line item
-   */
-  def transact(): LineItem[TransactedT]
+  //def _domainEntityId: Long // getting rid of this in favor of taking domain object as argument
+
+
 
   /** @return flat sequence of this LineItem and its sub-LineItems */
   def flatten: IndexedSeq[LineItem[_]] = {
@@ -36,21 +33,25 @@ trait LineItem[+TransactedT] {
   }
 
   def withCheckoutId(newCheckoutId: Long): LineItem[TransactedT]
+
+  // Convenience LineItemType member accessors
+  def codeType: CodeType = itemType.codeType
+  def nature: LineItemNature = itemType.nature
 }
 
-case class LineItemEntity(
-  _amountInCurrency: BigDecimal = BigDecimal(0),
-  notes: String = "",
-  id: Long = 0,
-  _checkoutId: Long = 0,
-  _itemTypeId: Long = 0,
-  created: Timestamp = Time.defaultTimestamp,
-  updated: Timestamp = Time.defaultTimestamp
-) extends KeyedCaseClass[Long] with HasCreatedUpdated {
-  def this(amount: Money) = this(amount.getAmount)
 
-  override lazy val unapplied = LineItemEntity.unapply(this)
+/**
+ * Provide helper queries for getting LineItem's; persistence is provided by LineItem implementations.
+ * @param schema
+ */
+class LineItemStore @Inject() (schema: Schema) {
+  protected def table = schema.lineItems
+
+  // TODO(SER-499): helper queries
+  // use CodeType of LineItemType to create LineItem's of the correct type
 }
+
+
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -71,12 +72,11 @@ trait SavesAsLineItemEntity[ModelT <: HasLineItemEntity]
   }
 }
 
+
+
+
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-
-
-
-
 
 trait LineItemEntityLenses[T <: LineItem[_]] { this: T with HasLineItemEntity =>
   import MemberLens.Conversions._
@@ -104,10 +104,18 @@ trait LineItemEntityLenses[T <: LineItem[_]] { this: T with HasLineItemEntity =>
   //
   private def entity = entityLens.asMember(this)
 
-  private[checkout] lazy val checkoutIdField =
-    entityField(get = _._checkoutId)(set = id => entity().copy(_checkoutId=id))
-  private[checkout] lazy val itemTypeIdField =
-    entityField(get = _._itemTypeId)(set = id => entity().copy(_itemTypeId=id))
+  private[checkout] lazy val checkoutIdField = entityField(
+    get = _._checkoutId)(
+    set = id => entity().copy(_checkoutId=id)
+  )
+  private[checkout] lazy val domainEntityIdField = entityField(
+    get = _._domainEntityId)(
+    set = entityId => entity().copy(_domainEntityId = entityId)
+  )
+  private[checkout] lazy val itemTypeIdField = entityField(
+    get = _._itemTypeId)(
+    set = id => entity().copy(_itemTypeId=id)
+  )
   private[checkout] lazy val amountField = entityField(
     get = (entity: LineItemEntity) =>
       Money.of(CurrencyUnit.USD, entity._amountInCurrency.bigDecimal))(
@@ -126,6 +134,7 @@ trait LineItemEntityLenses[T <: LineItem[_]] { this: T with HasLineItemEntity =>
 
 trait LineItemEntityGetters[T <: LineItem[_]] { this: T with LineItemEntityLenses[T] =>
   lazy val checkoutId = checkoutIdField()
+  lazy val domainEntityId = domainEntityIdField()
   lazy val itemTypeId = itemTypeIdField()
   override lazy val amount = amountField()
 }
@@ -133,6 +142,7 @@ trait LineItemEntityGetters[T <: LineItem[_]] { this: T with LineItemEntityLense
 
 trait LineItemEntitySetters[T <: LineItem[_]] { this: T with LineItemEntityLenses[T] =>
   override def withCheckoutId(newId: Long) = checkoutIdField.set(newId)
+  lazy val withDomainEntityId = domainEntityIdField.set _
   lazy val withItemTypeId = itemTypeIdField.set _
   lazy val withAmount = amountField.set _
 }

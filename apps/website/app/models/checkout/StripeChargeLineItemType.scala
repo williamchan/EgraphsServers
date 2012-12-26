@@ -12,7 +12,7 @@ import com.google.inject.Inject
 
 case class StripeChargeLineItemType(
   _entity: LineItemTypeEntity,
-  stripeToken: String,
+  maybeStripeToken: Option[String],
   services: StripeChargeLineItemTypeServices = AppConfig.instance[StripeChargeLineItemTypeServices]
 ) extends LineItemType[StripeCharge] with HasLineItemTypeEntity
   with LineItemTypeEntityGettersAndSetters[StripeChargeLineItemType]
@@ -42,9 +42,14 @@ object StripeChargeLineItemType {
 
   def apply(stripeToken: String): StripeChargeLineItemType = {
     StripeChargeLineItemType(
-      new LineItemTypeEntity("Stripe Charge", nature, codeType),
-      stripeToken
+      LineItemTypeEntity("Stripe Charge", nature, codeType),
+      Some(stripeToken)
     )
+  }
+
+  // TODO(SER-499): StripeToken is None because it's not readily available; is the same StripeToken used for refunds?
+  def apply(entity: LineItemTypeEntity, itemEntity: LineItemEntity): StripeChargeLineItemType = {
+    StripeChargeLineItemType(entity, None)
   }
 }
 
