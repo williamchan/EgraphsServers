@@ -29,15 +29,15 @@ private[controllers] trait GetOrdersAdminEndpoint extends ImplicitHeaderAndFoote
         val filter: String = Form("filter" -> text).bindFromRequest.fold(formWithErrors => "pendingAdminReview", validForm => validForm)
         
         val query = filter match {
-          case "rejectedByAdmin" => orderStore.findByFilter(orderQueryFilters.rejectedByAdmin)
-          case "rejectedByCelebrity" => orderStore.findByFilter(orderQueryFilters.rejectedByCelebrity)
-          case "signerActionable" => orderStore.findByFilter(orderQueryFilters.actionableOnly: _*)
-          case "all" => orderStore.findByFilter()
-          case _ => orderStore.findByFilter(orderQueryFilters.pendingAdminReview)
+          case "rejectedByAdmin" => orderStore.getOrderResults(orderQueryFilters.rejectedByAdmin)
+          case "rejectedByCelebrity" => orderStore.getOrderResults(orderQueryFilters.rejectedByCelebrity)
+          case "signerActionable" => orderStore.getOrderResults(orderQueryFilters.actionableOnly: _*)
+          case "all" => orderStore.getOrderResults()
+          case _ => orderStore.getOrderResults(orderQueryFilters.pendingAdminReview)
         }
-        val pagedQuery: (Iterable[Order], Int, Option[Int]) = services.Utils.pagedQuery(select = query, page = page)
+        val pagedQuery: (Iterable[(Order, Celebrity)], Int, Option[Int]) = services.Utils.pagedQuery(select = query, page = page)
         implicit val paginationInfo = PaginationInfoFactory.create(pagedQuery = pagedQuery, baseUrl = GetOrdersAdminEndpoint.url, filter = Option(filter))
-        Ok(views.html.Application.admin.admin_orders(orders = pagedQuery._1))
+        Ok(views.html.Application.admin.admin_orders(orderResults = pagedQuery._1))
       }
     }
   }

@@ -1,4 +1,4 @@
-@(egraphAndResults: Iterable[(models.Egraph, Option[models.vbg.VBGVerifySample], Option[models.xyzmo.XyzmoVerifyUser])], celebrity: Option[models.Celebrity] = None
+@(egraphsAndResults: Iterable[(models.Egraph, models.Celebrity, Option[models.vbg.VBGVerifySample], Option[models.xyzmo.XyzmoVerifyUser])], celebrity: Option[models.Celebrity] = None
 )(implicit authToken: egraphs.authtoken.AuthenticityToken,
   paginationInfo: controllers.PaginationInfo, 
   headerData: models.frontend.header.HeaderData,
@@ -41,15 +41,14 @@
           <tr>
             <th></th>
             <th>Id</th>
+            <th>Celebrity</th>
             <th>State</th>
             <th>Order Id</th>
             <th>Signature Result</th>
             <th>Voice Result</th>
-            <th>Voice Code</th>
-            <th>Voice TxnId</th>
           </tr>
         </thead>
-        @egraphAndResults.map { case (egraph, vbgVerifySample, xyzmoVerifyUser) =>
+        @egraphsAndResults.map { case (egraph, celebrity, vbgVerifySample, xyzmoVerifyUser) =>
         <tr>
           <td>
             <a class="preview-link" href="/admin/egraphs/@egraph.id">
@@ -57,12 +56,11 @@
             </a>
           </td>
           <td>@egraph.id</td>
+          <td>@celebrity.publicName</td>
           <td>@egraph.egraphState</td>
           <td>@egraph.orderId</td>
           <td>@if(xyzmoVerifyUser.isDefined) {@xyzmoVerifyUser.get.resultStr} else {}</td>
           <td>@if(vbgVerifySample.isDefined) {@vbgVerifySample.get.resultStr} else {}</td>
-          <td>@if(vbgVerifySample.isDefined) {@vbgVerifySample.get.errorCode} else {}</td>
-          <td>@if(vbgVerifySample.isDefined) {@vbgVerifySample.get.vbgTransactionId} else {}</td>
         </tr>
         }
       </table>
