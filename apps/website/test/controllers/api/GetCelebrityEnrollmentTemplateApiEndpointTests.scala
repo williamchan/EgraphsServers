@@ -1,26 +1,36 @@
 package controllers.api
 
-import sjson.json.Serializer
-import utils.FunctionalTestUtils.{willChanRequest, runFreshScenarios, routeName}
-import utils.TestConstants
-import models.EnrollmentBatch
 import play.api.test.Helpers._
+import sjson.json.Serializer
 import utils.EgraphsUnitTest
-import controllers.routes.ApiControllers.getCelebrityEnrollmentTemplate
+import utils.FunctionalTestUtils.{requestWithCredentials, routeName}
+import utils.TestConstants
+import utils.TestData
+import models.EnrollmentBatch
+import services.AppConfig
+import services.db.DBSession
+import services.db.TransactionSerializable
 
 class GetCelebrityEnrollmentTemplateApiEndpointTests 
   extends EgraphsUnitTest
   with ProtectedCelebrityResourceTests
 {
-  protected override def routeUnderTest = getCelebrityEnrollmentTemplate
+  private def db = AppConfig.instance[DBSession]
+  protected override def routeUnderTest = controllers.routes.ApiControllers.getCelebrityEnrollmentTemplate
 
   routeName(routeUnderTest) should "return the correct enrollment json" in {
     val _enrollmentPhrases: String = GetCelebrityEnrollmentTemplateApiEndpoint._enrollmentPhrases
     val _text: String = GetCelebrityEnrollmentTemplateApiEndpoint._text
 
-    runFreshScenarios("Will-Chan-is-a-celebrity")
+    val (celebrity, celebrityAccount) = db.connected(TransactionSerializable) {
+      val celebrity = TestData.newSavedCelebrity()
+      (celebrity, celebrity.account)
+    }
 
-    val Some(result) = routeAndCall(willChanRequest.copy(method=GET, uri=routeUnderTest.url))
+    val url = controllers.routes.ApiControllers.getCelebrityEnrollmentTemplate.url
+    val Some(result) = routeAndCall(
+      requestWithCredentials(celebrityAccount).copy(GET, url)
+    )
     
     status(result) should be (OK)
 
@@ -30,7 +40,7 @@ class GetCelebrityEnrollmentTemplateApiEndpointTests
     val enrollmentPhrases: List[Map[String, String]] = json(_enrollmentPhrases)
     
     enrollmentPhrases.size should be (EnrollmentBatch.batchSize)
-    "My name is Wizzle" should be (enrollmentPhrases(0)(_text))
+    "My name is " + celebrity.publicName should be (enrollmentPhrases(0)(_text))
     "One, two, three, four, five" should be (enrollmentPhrases(1)(_text))
     "Stop each car if it's little" should be (enrollmentPhrases(2)(_text))
     "Play in the street up ahead" should be (enrollmentPhrases(3)(_text))
@@ -49,6 +59,6 @@ class GetCelebrityEnrollmentTemplateApiEndpointTests
     "Joe books very few judges" should be (enrollmentPhrases(16)(_text))
     "Here I was in Miami and Illinois" should be (enrollmentPhrases(17)(_text))
     "Six, seven, eight, nine, ten" should be (enrollmentPhrases(18)(_text))
-    "My name is Wizzle" should be (enrollmentPhrases(19)(_text))
+    "My name is " + celebrity.publicName should be (enrollmentPhrases(19)(_text))
   }
 }

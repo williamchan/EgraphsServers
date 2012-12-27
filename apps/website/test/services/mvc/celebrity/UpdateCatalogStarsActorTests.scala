@@ -18,7 +18,7 @@ import services.db.DBSession
 import services.mvc.celebrity.UpdateCatalogStarsActor.UpdateCatalogStars
 import services.AppConfig
 import utils.TestHelpers.withActorUnderTest
-import utils.ClearsCacheAndBlobsAndValidationBefore
+import utils.ClearsCacheBefore
 import utils.EgraphsUnitTest
 import utils.TestHelpers
 import play.api.libs.concurrent.Akka

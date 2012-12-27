@@ -1,6 +1,6 @@
 package services
 
-import play.api.mvc.Results.{Redirect}
+import play.api.mvc.Results.Redirect
 import play.api.Play
 import play.api.Play.current
 import com.google.inject.Inject
@@ -122,10 +122,9 @@ class Utils @Inject() {
    * the URL in the argument.
    */
   def redirectToClientProvidedTarget(urlIfNoTarget: String)(implicit request: Request[_]): Result = {
-    import services.http.SafePlayParams.Conversions._
     import play.api.data._
     import play.api.data.Forms._
-    
+
     val targetUrlForm = Form(single("targetUrl" -> text))
     val redirectUrl = targetUrlForm.fold(noTargetUrl => urlIfNoTarget, targetUrl => targetUrl)
     
@@ -165,8 +164,11 @@ class Utils @Inject() {
   def saveToFile(bytes: Array[Byte], file: File) {
     file.getParentFile.mkdirs()
     val out = new FileOutputStream(file)
-    out.write(bytes)
-    out.close()
+    try {
+      out.write(bytes)
+    } finally {
+      out.close()
+    }
   }
 }
 

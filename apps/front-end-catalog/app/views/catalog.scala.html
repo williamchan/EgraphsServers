@@ -3,12 +3,15 @@
 @** Catalogs the permutations of every page we render. *@
 
 @catalogEntry(href: String, description: String) = {<li><a href="@href">@description</a></li>}
-@galleryEntry(href: String) = {
-  <li>@href as
-    <a href="@href&role=other">other</a>
-    <a href="@href&role=admin">admin</a>
-    <a href="@href&role=owner">owner</a>
-  </li>}
+
+@galleryEntry(countFulfilled: Int, countPending: Int, countFulfilledGifts: Int, countPendingGifts: Int) = {
+  <li>(@countFulfilled fulfilled, @countPending pending, @countFulfilledGifts fulfilled gifts, @countPendingGifts pending gifts) as
+    <a href="@routes.Account.gallery("leeroyjenkins", "other", countFulfilled, countPending, countFulfilledGifts, countPendingGifts).url">other</a>
+    <a href="@routes.Account.gallery("leeroyjenkins", "admin", countFulfilled, countPending, countFulfilledGifts, countPendingGifts).url">admin</a>
+    <a href="@routes.Account.gallery("leeroyjenkins", "owner", countFulfilled, countPending, countFulfilledGifts, countPendingGifts).url">owner</a>        
+  </li>
+}
+
 <!doctype html>
 <html>
   <head>
@@ -50,9 +53,16 @@
     </ol>
     <h2>Account gallery</h2>
     <ol>
-      @for(number <- 0 until 6) {
-        @galleryEntry("Account/gallery?user=leeroyjenkins&count=" + number)
-      }
+      @galleryEntry(countFulfilled = 0, countPending = 0, countFulfilledGifts = 0, countPendingGifts = 0)
+      @galleryEntry(countFulfilled = 1, countPending = 0, countFulfilledGifts = 0, countPendingGifts = 0)   
+      @galleryEntry(countFulfilled = 0, countPending = 2, countFulfilledGifts = 0, countPendingGifts = 0)
+      @galleryEntry(countFulfilled = 0, countPending = 0, countFulfilledGifts = 3, countPendingGifts = 0)
+      @galleryEntry(countFulfilled = 0, countPending = 0, countFulfilledGifts = 0, countPendingGifts = 4)
+      @galleryEntry(countFulfilled = 1, countPending = 1, countFulfilledGifts = 1, countPendingGifts = 1)
+      @galleryEntry(countFulfilled = 2, countPending = 0, countFulfilledGifts = 2, countPendingGifts = 0)
+      @galleryEntry(countFulfilled = 0, countPending = 2, countFulfilledGifts = 0, countPendingGifts = 2)
+      @galleryEntry(countFulfilled = 1, countPending = 1, countFulfilledGifts = 0, countPendingGifts = 0)
+      @galleryEntry(countFulfilled = 0, countPending = 0, countFulfilledGifts = 1, countPendingGifts = 1)                        
     </ol>
     <h2>Account Verification</h2>
     <ol>

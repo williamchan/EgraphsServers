@@ -9,7 +9,7 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class AccountTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with DBTransactionPerTest
   with AccountTestHelpers
 {
@@ -142,7 +142,7 @@ class AccountTests extends EgraphsUnitTest
 }
 
 class AccountStoreTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with SavingEntityIdLongTests[Account]
   with CreatedUpdatedEntityTests[Long, Account]
   with DateShouldMatchers

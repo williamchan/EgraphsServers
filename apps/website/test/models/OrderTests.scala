@@ -11,7 +11,7 @@ import services.db.DBSession
 import services.db.TransactionSerializable
 
 class OrderTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with SavingEntityIdLongTests[Order]
   with CreatedUpdatedEntityTests[Long, Order]
   with DateShouldMatchers

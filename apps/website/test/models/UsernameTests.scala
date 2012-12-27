@@ -8,7 +8,7 @@ import org.scalatest.matchers.ShouldMatchers
 import scala.None
 
 class UsernameTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with SavingEntityIdStringTests[Username]
   with CreatedUpdatedEntityTests[String, Username]
   with DateShouldMatchers

@@ -2,31 +2,23 @@ package controllers.website.admin
 
 import models._
 import enums.PublishedStatus
-import controllers.WebsiteControllers
 import play.api.mvc.Controller
 import services.http.POSTControllerMethod
 import services.http.filters.HttpFilters
-import services.http.SafePlayParams.Conversions._
-import services.logging.Logging
 import play.api.mvc.Action
 import play.api.data._
 import play.api.data.Forms._
-import play.api.data.format.Formats._
 import play.api.data.validation.Constraints._
 import play.api.data.validation.Constraint
 import play.api.data.validation.Valid
 import play.api.data.validation.Invalid
 import java.io.File
-import services.logging.Logging
-import java.text.SimpleDateFormat
-import services.http.SafePlayParams.Conversions._
 import play.api.mvc.MultipartFormData
 import java.awt.image.BufferedImage
-import services.{Dimensions, ImageUtil, Utils}
+import services.{ImageUtil, Utils}
 import services.mail.TransactionalMail
 import services.blobs.Blobs.Conversions._
 import controllers.routes.WebsiteControllers.{getCreateCelebrityAdmin, getCelebrityAdmin}
-import org.apache.commons.mail.HtmlEmail
 
 trait PostCelebrityAdminEndpoint {
   this: Controller =>

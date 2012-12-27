@@ -1,12 +1,11 @@
 package controllers.website.consumer
 
-import services.http.{SafePlayParams, POSTControllerMethod, ControllerMethod, WithoutDBConnection}
+import services.http.{POSTControllerMethod, ControllerMethod, WithoutDBConnection}
 import services.http.filters.HttpFilters
 import play.api.mvc.Controller
 import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
 import services.http.forms.purchase._
 import models.enums.PrintingOption
-import controllers.WebsiteControllers
 import controllers.routes.WebsiteControllers.{getStorefrontCheckout, getStorefrontPersonalize}
 import models.frontend.storefront._
 import services.payment.Payment
@@ -17,7 +16,7 @@ import models.frontend.storefront.FinalizeShippingViewModel
 import controllers.website.EgraphPurchaseHandler
 import services.db.{TransactionSerializable, DBSession}
 import services.http.forms.purchase.PurchaseForms.AllPurchaseForms
-import models.{Celebrity, CouponStore}
+import models.CouponStore
 import services.blobs.AccessPolicy
 import play.api.mvc.Action
 

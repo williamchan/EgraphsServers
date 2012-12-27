@@ -1,18 +1,15 @@
 package controllers.website.consumer
 
-import services.http.{SafePlayParams, POSTControllerMethod, ControllerMethod}
+import services.http.{POSTControllerMethod, ControllerMethod}
 import play.api.mvc.Controller
 import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
-import play.api.mvc.Results.Redirect
 import services.http.forms.purchase._
 import play.api.data.Form
 import play.api.data.Forms.{text, single, optional}
-import models.enums.{PrintingOption, WrittenMessageRequest}
+import models.enums.PrintingOption
 import PrintingOption.HighQualityPrint
 import PrintOptionForm.Params
-import controllers.WebsiteControllers
-import controllers.routes.WebsiteControllers.{getStorefrontPersonalize, getStorefrontCheckout}
-import SafePlayParams.Conversions._
+import controllers.routes.WebsiteControllers.getStorefrontCheckout
 import services.Utils
 import services.blobs.AccessPolicy
 import services.http.filters.HttpFilters

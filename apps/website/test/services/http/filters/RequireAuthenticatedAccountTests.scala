@@ -2,7 +2,7 @@ package services.http.filters
 
 import models.{Account, AccountStore}
 import models.AccountAuthenticationError.{AccountNotFoundError, AccountPasswordNotSetError, AccountCredentialsError}
-import utils.{ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest}
+import utils.{ClearsCacheBefore, EgraphsUnitTest}
 import play.api.test.FakeRequest
 import org.apache.commons.lang3.RandomStringUtils
 import play.api.mvc.Action

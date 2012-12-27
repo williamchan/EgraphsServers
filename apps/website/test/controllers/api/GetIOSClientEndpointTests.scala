@@ -5,11 +5,11 @@ import play.api.mvc.Controller
 import play.api.test.Helpers._
 import services.Time
 import sjson.json.Serializer
-import utils.FunctionalTestUtils.{runFreshScenarios, willChanRequest, routeName}
+import utils.FunctionalTestUtils.routeName
 import models._
 import enums.EnrollmentStatus
 import services.http.BasicAuth
-import utils.{ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest, MockControllerMethod, TestConstants}
+import utils.{ClearsCacheBefore, EgraphsUnitTest, MockControllerMethod, TestConstants}
 import play.api.test.FakeRequest
 import controllers.routes.ApiControllers.getIOSClient
 import utils.FunctionalTestUtils
@@ -25,7 +25,6 @@ class GetIOSClientEndpointTests extends EgraphsUnitTest {
 
     // Test expectations
     status(result) should be (SEE_OTHER)
-    println(redirectLocation(result))
     redirectLocation(result).get should include ("itms-services://?action=download-manifest") 
     redirectLocation(result).get should include (getIOSClient(redirectToItmsLink=false).url) 
   }

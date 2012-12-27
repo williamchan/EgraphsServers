@@ -4,7 +4,7 @@ import utils._
 import services.AppConfig
 
 class AddressTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with SavingEntityIdLongTests[Address]
   with CreatedUpdatedEntityTests[Long, Address]
   with DateShouldMatchers

@@ -1,5 +1,3 @@
-// TODO: PLAY20 MIGRATION: myyk - I think that we will mostly delete this file (or wholly) since this doesn't seem to be how you hook into 
-//   Play2 in tests.
 package utils
 
 import play.api.test.FakeRequest
@@ -21,32 +19,14 @@ import play.api.mvc.MultipartFormData
 import play.api.libs.Files.TemporaryFile
 import play.api.test._
 import play.api.http.HeaderNames
+import models._
+import scenario.RepeatableScenarios
 
-//import java.util.Properties
-//import models.Account
-//import play.api.mvc.Http.Request
-//import play.api.test.FunctionalTest
-//
 /**
  * Common functionality required when writing functional tests against
  * controller methods.
  */
 object FunctionalTestUtils {
-  //  /**
-  //   * Makes an account identified by wchan83@egraphs.com/derp
-  //   */
-  //  def willChanAccount: Account = {
-  //    Account(email = "wchan83@egraphs.com").withPassword(TestData.defaultPassword).right.get
-  //  }
-  //
-  //  /**
-  //   * Makes an API request verified by the credentials from `willChanAccount`
-  //   */
-  def willChanRequest: FakeRequest[AnyContent] = {
-    val auth = BasicAuth.Credentials("wchan83@egraphs.com", TestData.defaultPassword)
-
-    FakeRequest().withHeaders(auth.toHeader)
-  }
 
   def requestWithCustomerId(id: Long): FakeRequest[AnyContent] = {
     FakeRequest().withSession(EgraphsSession.Key.CustomerId.name -> id.toString)
@@ -56,51 +36,31 @@ object FunctionalTestUtils {
     FakeRequest().withSession(EgraphsSession.Key.AdminId.name -> id.toString)
   }
 
+  /**
+   * Makes an API request verified by the credentials from provided account
+   */
+  def requestWithCredentials(account: Account, password: String = TestData.defaultPassword): FakeRequest[AnyContent] = {
+    requestWithCredentials(account.email, password)
+  }
+
   def requestWithCredentials(user: String, password: String): FakeRequest[AnyContent] = {
     val auth = BasicAuth.Credentials(user, password)
 
     FakeRequest().withHeaders(auth.toHeader)
   }
-  //
-  //  def createRequest(host: String = "www.egraphs.com", url: String = "/", secure: Boolean = false): Request = {
-  //    val request = FunctionalTest.newRequest()
-  //    request.host = host
-  //    request.url = url
-  //    request.secure = secure
-  //    request
-  //  }
-  //
-  //  def createProperties(propName: String, propValue: String): Properties = {
-  //    val playConfig = new Properties
-  //    playConfig.setProperty(propName, propValue)
-  //    playConfig
-  //  }
-  //
-  def runScenarios(names: String*) {
-    names.foreach { name =>
-      runScenario(name)
-    }
-  }
 
-  def runFreshScenarios(names: String*) {
-    runScenario("clear")
-    runScenarios(names: _*)
-  }
+  /**
+   * This method is designed to be a more thread safe version of runWillChanScenariosThroughOrder()
+   */
+  def runCustomerBuysProductsScenerio(): (Customer, Celebrity, Iterable[Product], Iterable[Order]) = {
+    val celebrity = RepeatableScenarios.createCelebrity(isFeatured = true)
+    val products = RepeatableScenarios.celebrityHasProducts(celebrity, numberOfProducts = 2)
+    val customer = TestData.newSavedCustomer()
+    val unapprovedOrders = 
+      RepeatableScenarios.customerBuysEveryProductOfCelebrity(customer, celebrity) ++ RepeatableScenarios.customerBuysEveryProductOfCelebrity(customer, celebrity)
+    val orders = RepeatableScenarios.deliverOrdersToCelebrity(unapprovedOrders)
 
-  def runScenario(name: String) {
-    val result = routeAndCall(FakeRequest(GET, "/test/scenarios/" + name)).get
-    if (status(result) != OK) {
-      throw new IllegalArgumentException("Unknown scenario name " + name)
-    }
-  }
-
-  def runWillChanScenariosThroughOrder() {
-    runFreshScenarios(
-      "Will-Chan-is-a-celebrity",
-      "Will-has-two-products",
-      "Erem-is-a-customer",
-      "Erem-buys-Wills-two-products",
-      "Deliver-All-Orders-to-Celebrities")
+    (customer, celebrity, products.toList, orders.toList)
   }
 
   /**

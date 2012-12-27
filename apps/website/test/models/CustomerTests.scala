@@ -6,7 +6,7 @@ import enums.OrderReviewStatus
 import exception.InsufficientInventoryException
 import services.config.ConfigFileProxy
 import services.AppConfig
-import utils.ClearsCacheAndBlobsAndValidationBefore
+import utils.ClearsCacheBefore
 import utils.CreatedUpdatedEntityTests
 import utils.DBTransactionPerTest
 import utils.DateShouldMatchers
@@ -16,7 +16,7 @@ import utils.TestData
 
 @RunWith(classOf[JUnitRunner])
 class CustomerTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with SavingEntityIdLongTests[Customer]
   with CreatedUpdatedEntityTests[Long, Customer]
   with DateShouldMatchers

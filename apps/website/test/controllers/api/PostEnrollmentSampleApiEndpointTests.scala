@@ -2,106 +2,128 @@ package controllers.api
 
 import sjson.json.Serializer
 import utils.FunctionalTestUtils.{
-  willChanRequest, 
-  runFreshScenarios, 
-  routeName, 
-  runWillChanScenariosThroughOrder
+  requestWithCredentials,
+  routeName
 }
-import play.api.mvc.{AnyContent, AnyContentAsFormUrlEncoded}
+import play.api.mvc.{ AnyContent, AnyContentAsFormUrlEncoded }
 import utils.TestConstants
 import models.EnrollmentBatch
 import play.api.test.Helpers._
 import utils.EgraphsUnitTest
-import controllers.routes.ApiControllers.postEnrollmentSample
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import services.blobs.Blobs
-import services.{Time, AppConfig}
+import services.{ Time, AppConfig }
 import services.http.HttpCodes
-import services.db.{DBSession, TransactionSerializable}
+import services.db.{ DBSession, TransactionSerializable }
 import Blobs.Conversions._
 import models.EgraphStore
-
 import models._
+import controllers.WebsiteControllers
+import controllers.ApiControllers
+import utils.TestData
 
-class PostEnrollmentSampleApiEndpointTests 
-  extends EgraphsUnitTest 
-  with ProtectedCelebrityResourceTests 
+class PostEnrollmentSampleApiEndpointTests
+  extends EgraphsUnitTest
+  with ProtectedCelebrityResourceTests
 {
-  protected override def routeUnderTest = postEnrollmentSample
-
-  routeName(routeUnderTest) should "accept a well-formed enrollment sample" in new EgraphsTestApplication {
-    runFreshScenarios("Will-Chan-is-a-celebrity")
-
-    assertPostEnrollmentSample(
-      signatureStr = TestConstants.shortWritingStr,
-      voiceStr = TestConstants.voiceStr_8khz(),
-      isBatchComplete = false,
-      numEnrollmentSamplesInBatch = 1
-    )
-  }
+  protected override def routeUnderTest = controllers.routes.ApiControllers.postEnrollmentSample
+  private def db = AppConfig.instance[DBSession]
+  private def enrollmentBatchStore = AppConfig.instance[EnrollmentBatchStore]
 
   protected override def validRequestBodyAndQueryString = {
     // TODO: Once we're on Play 2.1 then get rid of this necessary indirection to satisfy
     //   invariance of FakeRequest[A], which should be FakeRequest[+A]    
     val formRequest = FakeRequest().withFormUrlEncodedBody(
       "signature" -> TestConstants.shortWritingStr,
-      "audio" -> TestConstants.voiceStr_8khz()
-    )
+      "audio" -> TestConstants.voiceStr_8khz())
 
-    val anyContentRequest = formRequest.copy(body=(formRequest.body: AnyContent))
+    val anyContentRequest = formRequest.copy(body = (formRequest.body: AnyContent))
 
     Some(anyContentRequest)
   }
 
-
-  it should "complete an enrollment batch when the last required sample is submitted" in new EgraphsTestApplication { 
-    runFreshScenarios("Will-Chan-is-a-celebrity")
-
-    val enrollmentBatchId = assertPostEnrollmentSample(signatureStr = TestConstants.shortWritingStr,
-      voiceStr = TestConstants.voiceStr_8khz(),
-      isBatchComplete = false,
-      numEnrollmentSamplesInBatch = 1)
-    for (i <- 1 until EnrollmentBatch.batchSize - 1) {
-      assertPostEnrollmentSample(signatureStr = TestConstants.shortWritingStr,
-        voiceStr = TestConstants.voiceStr_8khz(),
-        isBatchComplete = false,
-        numEnrollmentSamplesInBatch = i + 1,
-        Some(enrollmentBatchId)
-      )
+  routeName(routeUnderTest) should "accept a well-formed enrollment sample" in new EgraphsTestApplication {
+    val (celebrity, celebrityAccount) = db.connected(TransactionSerializable) {      
+      val celebrity = TestData.newSavedCelebrity()
+      (celebrity, celebrity.account)
     }
-    assertPostEnrollmentSample(signatureStr = TestConstants.shortWritingStr,
-      voiceStr = TestConstants.voiceStr_8khz(),
-      isBatchComplete = true,
-      numEnrollmentSamplesInBatch = 20,
-      Some(enrollmentBatchId))
+
+    val result = routeAndCallPostEnrollmentSample(celebrityAccount)
+
+    val enrollmentBatch = db.connected(TransactionSerializable) {
+      enrollmentBatchStore.getOpenEnrollmentBatch(celebrity).get // should be one after we post a sample
+    }
+
+    assertPostEnrollmentSample(
+      result,
+      isBatchComplete = false,
+      numEnrollmentSamplesInBatch = 1,
+      enrollmentBatch.id)
   }
 
-  private def assertPostEnrollmentSample(signatureStr: String,
-                                         voiceStr: String,
-                                         isBatchComplete: Boolean,
-                                         numEnrollmentSamplesInBatch: Int,
-                                         enrollmentBatchId: Option[Long] = None): Long = {
-    val Some(result) = routeAndCall(
-      willChanRequest
-      .copy(POST, postEnrollmentSample.url)
-      .withFormUrlEncodedBody(
-        "signature" -> signatureStr,
-        "audio" -> voiceStr
-      )
-    )
-    
-    
-    status(result) should be (OK)
+  it should "complete an enrollment batch when the last requireGd sample is submitted" in new EgraphsTestApplication {
+    val (celebrity, celebrityAccount) = db.connected(TransactionSerializable) {
+      val celebrity = TestData.newSavedCelebrity()
+      (celebrity, celebrity.account)
+    }
+
+    val result = routeAndCallPostEnrollmentSample(celebrityAccount)
+
+    val enrollmentBatch = db.connected(TransactionSerializable) {
+      enrollmentBatchStore.getOpenEnrollmentBatch(celebrity).get // should be one after we post a sample
+    }
+
+    // This has a pretty hacky pattern of getting the enrollmentBatchId from the data first run.
+    val enrollmentBatchId = assertPostEnrollmentSample(
+      result,
+      isBatchComplete = false,
+      numEnrollmentSamplesInBatch = 1,
+      enrollmentBatch.id)
+
+    for (i <- 1 until EnrollmentBatch.batchSize - 1) {
+      val result = routeAndCallPostEnrollmentSample(celebrityAccount)
+      assertPostEnrollmentSample(
+        result,
+        isBatchComplete = false,
+        numEnrollmentSamplesInBatch = i + 1,
+        enrollmentBatch.id)
+    }
+    val lastSampleResult = routeAndCallPostEnrollmentSample(celebrityAccount)
+    assertPostEnrollmentSample(
+      lastSampleResult,
+      isBatchComplete = true,
+      numEnrollmentSamplesInBatch = 20,
+      enrollmentBatch.id)
+  }
+
+  private def assertPostEnrollmentSample(result: Result,
+    isBatchComplete: Boolean,
+    numEnrollmentSamplesInBatch: Int,
+    enrollmentBatchId: Long) {
+
+    status(result) should be(OK)
     val json = Serializer.SJSON.in[Map[String, Any]](contentAsString(result))
     json("id") == null should not be (true)
-    json("batch_complete").toString.toBoolean should be (isBatchComplete)
+    json("batch_complete").toString.toBoolean should be(isBatchComplete)
 
-    json("numEnrollmentSamplesInBatch").asInstanceOf[BigDecimal].intValue() should be (numEnrollmentSamplesInBatch)
-    json("enrollmentBatchSize").asInstanceOf[BigDecimal].intValue() should be (EnrollmentBatch.batchSize)
-    if (enrollmentBatchId.isDefined) json("enrollmentBatchId").asInstanceOf[BigDecimal].longValue() should be (enrollmentBatchId.get)
-    else json("enrollmentBatchId") == null should not be (true)
+    json("numEnrollmentSamplesInBatch").asInstanceOf[BigDecimal].intValue() should be(numEnrollmentSamplesInBatch)
+    json("enrollmentBatchSize").asInstanceOf[BigDecimal].intValue() should be(EnrollmentBatch.batchSize)
+    json("enrollmentBatchId").asInstanceOf[BigDecimal].longValue() should be(enrollmentBatchId)
+  }
 
-    json("enrollmentBatchId").asInstanceOf[BigDecimal].longValue()
+  /**
+   * Assemble the request and get the result.
+   */
+  private def routeAndCallPostEnrollmentSample(celebrityAccount: Account,
+    signatureStr: String = TestConstants.shortWritingStr,
+    voiceStr: String = TestConstants.voiceStr_8khz): Result = {
+
+    val url = controllers.routes.ApiControllers.postEnrollmentSample.url
+    val req = requestWithCredentials(celebrityAccount).copy(method = POST, uri = url).withFormUrlEncodedBody(
+      "signature" -> signatureStr,
+      "audio" -> voiceStr)
+    val Some(result) = routeAndCall(req)
+    result
   }
 }

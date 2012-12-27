@@ -6,7 +6,7 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 class CategoryValueTests  extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
+  with ClearsCacheBefore
   with SavingEntityIdLongTests[CategoryValue]
   with CreatedUpdatedEntityTests[Long, CategoryValue]
   with DateShouldMatchers

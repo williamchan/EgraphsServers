@@ -17,7 +17,6 @@ import services.db.DBSession
 import services.db.TransactionSerializable
 import services.http.BasicAuth
 import services.AppConfig
-import utils.FunctionalTestUtils.{ runFreshScenarios, willChanRequest }
 import utils.EgraphsUnitTest
 import utils.TestData
 import play.api.mvc.SimpleResult

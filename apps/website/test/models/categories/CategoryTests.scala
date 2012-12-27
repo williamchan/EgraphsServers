@@ -7,7 +7,7 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class CategoryTests extends EgraphsUnitTest
- with ClearsCacheAndBlobsAndValidationBefore
+ with ClearsCacheBefore
   with SavingEntityIdLongTests[Category]
   with CreatedUpdatedEntityTests[Long, Category]
   with DateShouldMatchers
@@ -46,19 +46,19 @@ class CategoryTests extends EgraphsUnitTest
     exception.getLocalizedMessage should include("Category: name must be specified")
   }
 
-  "Category" should "require a publicName" in new EgraphsTestApplication {
+  it should "require a publicName" in new EgraphsTestApplication {
     val exception = intercept[IllegalArgumentException] {Category(name = "herp").save()}
     exception.getLocalizedMessage should include("Category: publicName must be specified")
   }
 
-  "Category" should "return an associated value" in new EgraphsTestApplication {
+  it should "return an associated value" in new EgraphsTestApplication {
     val category = TestData.newSavedCategory
     val categoryValue = TestData.newSavedCategoryValue(category.id)
     val categoryValues = category.categoryValues
     categoryValues.exists(fv => fv.id == categoryValue.id) should be (true)
   }
 
-  "Category" should "return all associated values" in new EgraphsTestApplication {
+  it should "return all associated values" in new EgraphsTestApplication {
     val category = TestData.newSavedCategory
     val newCategoryValues = for ( i <- 0 until 10) yield TestData.newSavedCategoryValue(category.id)
     val retrievedCategoryValues = category.categoryValues
@@ -69,10 +69,20 @@ class CategoryTests extends EgraphsUnitTest
       retrievedCategoryValues.exists(rfv => rfv.id == fv.id) should be (true)
     )
   }
-  
+
   "CategoryStore" should "return by name" in new EgraphsTestApplication {
     val category = TestData.newSavedCategory
     val retrieved = categoryStore.findByName(category.name).headOption.get
     retrieved.id should be (category.id)
+  }
+
+  it should "not delete category if there are category values of that category" in new EgraphsTestApplication {
+    val category = TestData.newSavedCategory
+    val categoryValue = TestData.newSavedCategoryValue(category.id)
+
+    val exception = intercept[RuntimeException] {
+      categoryStore.delete(category)
+    }
+    exception.getLocalizedMessage should include (" violates foreign key constraint \"categoryvalue")
   }
 }

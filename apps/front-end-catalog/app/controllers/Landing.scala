@@ -16,11 +16,7 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
    * 0 <= n <= sampleStars.length
    **/
   def featuredStars(count: Int) = Action {
-    val stars = sampleStars.zipWithIndex.map { case (star, index) =>
-      star.copy(isFeatured = index < count)
-    }
-
-    Ok(views.html.frontend.landing(stars))
+    Ok(views.html.frontend.landing(sampleStars.slice(0, count)))
   }
 
   /**
@@ -68,7 +64,6 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
       sampleMarketplaceImageUrl,
       "/" + name,
       inventoryRemaining = 10,
-      isFeatured = false,
       35,
       100
     )
