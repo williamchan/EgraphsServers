@@ -1,3 +1,4 @@
+/*global angular console */
 define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoints.min"], function (Egraphs) {
   /**
    * Define controller for marketplace
@@ -195,17 +196,21 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoi
         $("#apply-filters").click(function(e) {
           // Clear out previous category values
           var categories = window.Egraphs.page.categories;
-          $.each(categories, function(cat) {
-            cat.length = 0;
+          $.each(categories, function(catId, selectedValues) {
+            selectedValues.length = 0;
           });
+
           // Apply new selections
-          $("option:selected", "#category-select").each(
+          $("#category-select").find(":selected").each(
             function(index) {
-              var category = categories["c" + $(this).attr("data-category")];
-              var catVal = $(this).val();
-              updateCategories(catVal, category);
+              var categoryId = $(this).attr("data-category");
+              var categoryValues = categories["c" + categoryId];
+              var catVal = parseInt($(this).val(), 10);
+
+              updateCategories(catVal, categoryValues);
             }
           );
+          
           reloadPage();
         });
 
