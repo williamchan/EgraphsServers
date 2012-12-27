@@ -25,11 +25,8 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
 
    def giftMessaging = Action {
     implicit val headerData = HeaderData(giftCertificateLink = Some("/gift"))
-    val stars = sampleStars.zipWithIndex.map { case (star, index) =>
-      star.copy(isFeatured = index < 8)
-    }
 
-    Ok(views.html.frontend.landing(stars)(headerData, defaultFooterData, authenticityToken)) 
+    Ok(views.html.frontend.landing(sampleStars)(headerData, defaultFooterData, authenticityToken)) 
    }
 
   def signupOn = Action {
