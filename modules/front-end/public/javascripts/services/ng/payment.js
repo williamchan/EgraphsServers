@@ -77,12 +77,18 @@ function(payment, validationDirective, logging, module) {
           };
 
           $scope.paymentValidationError = {};
-          $scope.success = $attrs['success'];
           $scope.submitted = false;
-          
-          $scope.submitCardInfo = function(onSuccess) {
+
+          $scope.creditCardFormSubmit = function(onSuccess) {
             log("Submitting card information form");
             $scope.onSuccess = onSuccess;
+
+            // Hackily set the payment controls dirty just in case they were clean before;
+            // error messages won't appear on controls that aren't dirty.
+            forEach(self.paymentControls, function(control) {
+              if (!control.$dirty) control.$setViewValue(control.$viewValue);
+            });
+
             $scope.submitted = true;
             self.resetFormComponentsValidity();
           };
@@ -90,6 +96,10 @@ function(payment, validationDirective, logging, module) {
         },
 
         'link': function(scope, element, attrs, formCtrl) {
+          // Surface the underlying FormController for access by the page's outer controller;
+          // otherwise this directive's controller would have hidden it.
+          scope.$parent[attrs['name']] = scope[attrs['name']];
+
           scope.$watch('submitted', function(submitted) {
             if (!submitted) {
               return;

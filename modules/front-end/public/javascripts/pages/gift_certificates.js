@@ -85,38 +85,6 @@ function(forms, payment, ngPayment, page, logging, requireModule) {
       log($scope);
     };
 
-    $scope.submitForReview = function() {
-      clearRemoteErrors();
-      dirtyUserControls();
-      if (!config.validateClientSide || formsValid()) {
-        var paymentParams = {
-          number: $scope.order.card.number,
-          cvc: $scope.order.card.cvc,
-          exp_month: parseInt($scope.order.card.expMonth, 10),
-          exp_year: parseInt($scope.order.card.expYear, 10)
-        };
-
-        payment.createToken(paymentParams, function(status, response) {
-          // Do some more validation on stripe response and then call against OUR apis.
-          if (response.error) {
-            var errorCode = response.error.code;
-            log("error code: " + errorCode);
-            var model = stripeErrorCodesToModels()[errorCode];
-            log(model);
-            log("remote_stripe_" + errorCode);
-            log(model["remote_stripe_" + errorCode]);
-
-            // $("#review").responsivemodal("loading");
-            // $("#review").responsivemodal("toggle");
-          } else {
-            paymentToken = response.id;
-
-            log("Now make remote calls against egraphs api");
-          }
-        });
-      }
-    };
-
     /**
      * Iterates through all errors of all forms, and removes any that began with "remote-"
      * from the controls to which they applied.
@@ -131,24 +99,6 @@ function(forms, payment, ngPayment, page, logging, requireModule) {
           }
         });
       });
-    };
-
-    /**
-     * Returns an object that maps stripe error codes to the respective
-     * controls to which the error would apply.
-     */
-    var stripeErrorCodesToModels = function() {
-      return {
-        "invalid_number": $scope.order.card.number,
-        "incorrect_number": $scope.order.card.number,
-        "card_declined": $scope.order.card.number,
-        "expired_card": $scope.order.card.number,
-        "processing_error": $scope.order.card.number,
-        "invalid_cvc": $scope.order.card.cvc,
-        "incorrect_cvc": $scope.order.card.cvc,
-        "invalid_expiry_month": $scope.order.card.expMonth,
-        "invalid_expiry_year": $scope.order.card.expYear
-      };
     };
 
     var formsValid = function() {
@@ -170,10 +120,6 @@ function(forms, payment, ngPayment, page, logging, requireModule) {
         $scope.personalize.recipientName,
         $scope.personalize.gifterName,
         $scope.personalize.email,
-        $scope.pay.cardNumber,
-        $scope.pay.cardExpMonth,
-        $scope.pay.cardExpYear,
-        $scope.pay.cardCvc,
         $scope.pay.postalCode
       ];
     };

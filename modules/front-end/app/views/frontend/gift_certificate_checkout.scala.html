@@ -31,7 +31,7 @@
     paymentConfig: {
       jsModule: "yes-maam-payment",
       apiKey: "pk_qIGUDirehUxj2GTFwgeRBkOfHIWdX",
-      // errorCode: "invalid_number"
+      // errorCode: "incorrect_cvc"
     },
     
     months: @Html({ (1 to 12).map("\"%02d\"".format(_)).mkString("[", ",", "]") }),
@@ -277,7 +277,7 @@
                   <button id="review-button" 
                           type="button"
                           class="button right review"
-                          ng-click="submitCardInfo(onCardInfoValidated)" >
+                          ng-click="creditCardFormSubmit(onCardInfoValidated)" >
                   <strong>
                     <span class="checkout-step-count in-button">4</span>
                     <em>Review Order</em>
