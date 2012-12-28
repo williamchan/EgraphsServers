@@ -148,6 +148,19 @@
         </div>
       }
     }
+    <div class="row-fluid">
+      <div class="span12">
+      @safeForm('id -> "privacy-form", 'method -> "POST", 'action ->postOrder.url) {
+        <input name="orderId" type="hidden" value="@order.id">
+        <input name="action" type="hidden" value="privacy">
+        <input name="privacyStatus" id="privacyStatus" type="hidden" value="@order._privacyStatus">
+        <legend>Privacy Status</legend>
+        <button class="btn toggle" data-toggle="toggle" id="privacy-button" type="button">@order._privacyStatus</button>
+        <button type="submit" id="save-button" class="btn primary fade in">Save</button>
+      }
+      
+      </div>
+    </div>
   </div>
 
 }
@@ -182,10 +195,10 @@
           @valueRow(label="Recipient name",       value=recipient.name)
           @valueRow(label="Recipient email",      value=recipientEmail)
           @valueRow(label="Expected Date",        value=order.expectedDate)
-          @valueRow(label="Written Message Type", value=order._writtenMessageRequest)
+          @valueRow(label="Written Message Type", value=order.writtenMessageRequest)
           @valueRow(label="Privacy Status",       value=order.privacyStatus)
           @valueRow(label="Rejection Reason",     value=order.rejectionReason.getOrElse(""))
-          @valueRow(label="Order Type",           value=order._orderType)
+          @valueRow(label="Order Type",           value=order.orderType)
           @valueRow(label="Created",              value=order.created)
           @valueRow(label="Updated",              value=order.updated)
           <hr/>
@@ -206,4 +219,4 @@
 }
 
 
-@base_template(title="Admin - Order", body=body)
+@base_template(title="Admin - Order", body=body, jsMain="pages/admin/order-detail")

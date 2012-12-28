@@ -68,6 +68,7 @@ case class Order(
   with HasPrivacyStatus[Order]
   with HasPaymentStatus[Order]
   with HasOrderReviewStatus[Order]
+  with HasOrderType[Order]
   with HasWrittenMessageRequest[Order]
 {
   
@@ -312,6 +313,10 @@ case class Order(
   // KeyedCaseClass[Long] methods
   //
   override def unapplied = Order.unapply(this)
+
+  override def withOrderType(status: OrderType.EnumVal) = {
+    this.copy(_orderType = status.name)
+  }
 
   override def withPrivacyStatus(status: PrivacyStatus.EnumVal) = {
     this.copy(_privacyStatus = status.name)
