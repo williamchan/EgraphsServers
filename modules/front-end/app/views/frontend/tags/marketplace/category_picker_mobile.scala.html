@@ -3,6 +3,11 @@
   <h2>Filter By:</h2>
   <select id="category-select" multiple>
   @for(category <- categoryViewModels) {
+    @** 
+      Using an <option disabled> for category headers because there is a bug in iOS 6 Safari when using optgroups. 
+      Bug is documented here: http://www.thecssninja.com/html/optgroup-ios6
+      Should be reverted when the bug is fixed because this is non-standard usage. 
+    **@
     <option disabled value="0" multiple label="@category.publicName">
     @for(categoryValue <- category.categoryValues) {
       <option @if(categoryValue.active){selected}  data-category="@category.id" value="@categoryValue.id">@categoryValue.publicName</option>
