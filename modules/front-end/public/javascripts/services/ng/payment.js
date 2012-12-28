@@ -103,9 +103,9 @@ function(payment, validationDirective, logging, module) {
                 var errorControlName = errorControl.$name;
 
                 log(errorControl);
-                log("Card information failed remote validation: \"" +
-                  errorCode + "\". Applying angular validation error class " + errorClass +
-                  " to control named " + errorControlName);
+                log("\"" + errorCode + "\": Card information failed remote validation." +
+                  " Applying angular.js validation error \"" + errorClass +
+                  "\" to UI control named \"" + errorControlName + "\"");
 
                 errorControl.$setValidity(errorClass, false);
 
