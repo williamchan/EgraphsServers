@@ -6,8 +6,13 @@ define([
   "services/payment",
   "services/ng/payment",
   "page",
-  "services/responsive-modal"],
-function(forms, payment, ngPayment, page) {
+  "services/logging",
+  "module",
+  "services/responsive-modal"
+],
+function(forms, payment, ngPayment, page, logging, requireModule) {
+  var log = logging.namespace(requireModule.id);
+
   var GiftCertificateOption = function(data) {
     this.price = data.price;
     this.type = data.type;
@@ -71,8 +76,16 @@ function(forms, payment, ngPayment, page) {
       }
     };
 
+    $scope.paymentSucceeded = function(token) {
+      log("Woot! success");
+      log($scope);
+    };
+
+    $scope.printScope = function() {
+      log($scope);
+    };
+
     $scope.submitForReview = function() {
-      console.log($scope.pay);
       clearRemoteErrors();
       dirtyUserControls();
       if (!config.validateClientSide || formsValid()) {
@@ -87,17 +100,18 @@ function(forms, payment, ngPayment, page) {
           // Do some more validation on stripe response and then call against OUR apis.
           if (response.error) {
             var errorCode = response.error.code;
+            log("error code: " + errorCode);
             var model = stripeErrorCodesToModels()[errorCode];
-            model["remote_stripe_" + errorCode] = "herp";
-            console.log("remote_stripe_" + errorCode);
-            console.log(model["remote_stripe_" + errorCode]);
+            log(model);
+            log("remote_stripe_" + errorCode);
+            log(model["remote_stripe_" + errorCode]);
 
             // $("#review").responsivemodal("loading");
             // $("#review").responsivemodal("toggle");
           } else {
             paymentToken = response.id;
 
-            console.log("Now make remote calls against egraphs api");
+            log("Now make remote calls against egraphs api");
           }
         });
       }

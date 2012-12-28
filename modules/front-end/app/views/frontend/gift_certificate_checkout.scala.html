@@ -29,8 +29,8 @@
     },
 
     paymentConfig: {
-      jsModule: "stripe-payment",
-      apiKey: "im gonna be needing this",
+      jsModule: "yes-maam-payment",
+      apiKey: "pk_qIGUDirehUxj2GTFwgeRBkOfHIWdX",
       errorCode: "invalid_number"
     },
     
@@ -122,7 +122,7 @@
                          class="inset-shade"
                          ng-model="order.recipientName" 
                          required />
-                  <div class="errors" ng-show="personalize.recipientName.$invalid">
+                  <div class="errors" ng-show="personalize.recipientName.$dirty && personalize.recipientName.$invalid">
                     <div class="alert alert-error"
                          ng-show="personalize.recipientName.$error.required" >
                       <strong>Sorry!</strong> I can't make the certificate without a name...
@@ -141,7 +141,7 @@
                          class="inset-shade"
                          ng-model="order.gifterName"
                          required />
-                  <div class="errors" ng-show="personalize.gifterName.$invalid">
+                  <div class="errors" ng-show="personalize.gifterName.$dirty && personalize.gifterName.$invalid">
                     <div class="alert alert-error"
                          ng-show="personalize.gifterName.$error.required" >
                       <strong>Sorry!</strong> I can't make the certificate you deserve without your name...
@@ -158,7 +158,7 @@
                          class="inset-shade"
                          ng-model="order.email"
                          required />
-                  <div class="errors" ng-show="personalize.email.$invalid">
+                  <div class="errors" ng-show="personalize.email.$dirty && personalize.email.$invalid">
                     <div class="alert alert-error"
                          ng-show="personalize.email.$error.required" >
                       <strong>Sorry!</strong> I won't know where to send the certificate without your address...
@@ -173,7 +173,7 @@
 
           <section id="pay" class="span6">
             <h2><span class="checkout-step-count">3</span>Pay:</h2>
-            <form class="form-horizontal" name="pay" novalidate>
+            <form payment-form class="form-horizontal" name="pay" novalidate>
               <fieldset>
                 <div class="control-group card-number">
                   <label class="control-label" for="card-number">Card number:</label>
@@ -184,16 +184,18 @@
                            class="inset-shade"
                            ng-model="order.card.number"
                            required
+                           ng-click="printScope()"
                            credit-card-number />
-                    <div class="errors" ng-show="pay.cardNumber.$invalid">
+                    <div class="errors" ng-show="pay.cardNumber.$dirty && pay.cardNumber.$invalid">
                       <div class="alert alert-error"
-                           ng-show="pay.cardNumber.$error.required">
+                           ng-show="pay.cardNumber.$error.required"
+                           >
                         <strong>Sorry!</strong> My boss will kill me if I don't get this from you.
                       </div>                                
                       <div class="alert alert-error"
-                           ng-show="pay.cardNumber.$error.remote_stripe_invalid_number || pay.cardNumber.$error.creditCardNumber" >
+                           ng-show="pay.cardNumber.$error.remote_payment_invalid_number" >
                         <strong>Sorry!</strong> This card number is invalid. Try another?
-                      </div>            
+                      </div>
                     </div>
 
                   </div>
@@ -205,6 +207,7 @@
                   <label class="control-label" for="card-exp-month">Exp. Date:</label>
                   <div class="controls select card-expiry">
                     <select id="card-exp-month"
+                            credit-card-expiry-month
                             name="cardExpMonth"
                             class="inline"
                             ng-model="order.card.expMonth"
@@ -213,6 +216,7 @@
                       <option value>MM</option>
                     </select>
                     <select id="card-exp-year"
+                            credit-card-expiry-year
                             name="cardExpYear"
                             class="inline"
                             ng-model="order.card.expYear"
@@ -220,7 +224,7 @@
                             required >
                       <option value>YYYY</option>
                     </select>
-                    <div class="errors" ng-show="pay.cardExpMonth.$invalid || pay.cardExpYear.$invalid">
+                    <div class="errors" ng-show="(pay.cardExpMonth.$dirty && pay.cardExpMonth.$invalid) || (pay.cardExpYear.$dirty && pay.cardExpYear.$invalid)">
                       <div class="alert alert-error">
                         <strong>Oops!</strong> Mind double checking this one?
                       </div>
@@ -238,7 +242,7 @@
                            ng-model="order.card.cvc" 
                            required
                            credit-card-cvc />
-                    <div class="errors" ng-show="pay.cardCvc.$invalid">
+                    <div class="errors" ng-show="pay.cardCvc.$dirty && pay.cardCvc.$invalid">
                       <div class="alert alert-error" ng-show="pay.cardCvc.$error.required">
                         <strong>Sorry!</strong> If I don't get this from you my boss will kill me.
                       </div>                                  
@@ -258,7 +262,7 @@
                            class="inset-shade"
                            ng-model="order.card.postalCode"
                            required />
-                    <div class="errors" ng-show="pay.postalCode.$invalid">
+                    <div class="errors" ng-show="pay.postalCode.$dirty && pay.postalCode.$invalid">
                       <div class="alert alert-error" ng-show="pay.postalCode.$error.required">
                         <strong>Sorry,</strong> but I need this to charge your card.
                       </div>
@@ -270,7 +274,7 @@
                   <button id="review-button" 
                           type="button"
                           class="button right review"
-                          ng-click="submitForReview()" >
+                          ng-click="submitCardInfo(paymentSucceeded)" >
                   <strong>
                     <span class="checkout-step-count in-button">4</span>
                     <em>Review Order</em>
