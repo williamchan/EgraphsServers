@@ -31,7 +31,7 @@
     paymentConfig: {
       jsModule: "yes-maam-payment",
       apiKey: "pk_qIGUDirehUxj2GTFwgeRBkOfHIWdX",
-      errorCode: "invalid_number"
+      // errorCode: "invalid_number"
     },
     
     months: @Html({ (1 to 12).map("\"%02d\"".format(_)).mkString("[", ",", "]") }),
@@ -192,8 +192,12 @@
                         <strong>Sorry!</strong> My boss will kill me if I don't get this from you.
                       </div>                                
                       <div class="alert alert-error"
-                           ng-show="pay.cardNumber.$error.remote_payment_invalid_number" >
+                           ng-show="pay.cardNumber.$error.remote_payment_invalid_number || pay.cardNumber.$error.remote_payment_incorrect_number" >
                         <strong>Sorry!</strong> This card number is invalid. Try another?
+                      </div>
+                      <div class="alert alert-error"
+                           ng-show="pay.cardNumber.$error.remote_payment_expired_card" >
+                        <strong>Sorry!</strong> This card has expired. Try another?
                       </div>
                     </div>
 
@@ -245,9 +249,9 @@
                       <div class="alert alert-error" ng-show="pay.cardCvc.$error.required">
                         <strong>Sorry!</strong> If I don't get this from you my boss will kill me.
                       </div>                                  
-                      <div class="alert alert-error" ng-show="pay.cardCvc.$error.creditCardCvc">
-                        <strong>Sorry!</strong> This card CVC isn't valid. Double-check the back of your card?
-                      </div>                      
+                      <div class="alert alert-error" ng-show="pay.cardCvc.$error.creditCardCvc || pay.cardCvc.$error.remote_payment_invalid_cvc || pay.cardCvc.$error.remote_payment_incorrect_cvc">
+                        <strong>Sorry!</strong> This security code isn't valid. Double-check the back of your card?
+                      </div>
                     </div>
                   </div>
                 </div> <!-- End .card-cvc.controls -->
