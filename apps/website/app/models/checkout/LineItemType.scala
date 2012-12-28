@@ -52,30 +52,6 @@ trait LineItemType[+TransactedT] {
 }
 
 
-/**
- * Provide helper queries for getting LineItemType's; persistence is provided by LineItemType implementations.
- * @param schema
- */
-class LineItemTypeStore @Inject() (schema: Schema) {
-  protected def table = schema.lineItemTypes
-
-  // TODO(SER-499): helper queries
-  // use CodeType to create LineItemTypes as correct type
-  def getById(id: Long) = {
-    table.where(itemType => itemType.id === id).headOption
-  }
-
-
-// TODO(SER-499): remove this when sure it's not being used
-//  def entitiesToType[T <: LineItemType[_]](entity: LineItemTypeEntity, itemEntity: LineItemEntity): Option[T] = {
-//    CodeType(entity._codeType) match {
-//      case Some(codeType: CodeTypeFactory[T, _]) => Some(codeType.typeInstance(entity, itemEntity))
-//      case None => None
-//    }
-//  }
-}
-
-
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 trait HasLineItemTypeEntity extends HasEntity[LineItemTypeEntity] { this: LineItemType[_] =>

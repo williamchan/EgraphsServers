@@ -18,7 +18,7 @@ case class TotalLineItem (
   // NOTE(SER-499): unused
   override val id: Long = checkout.Unpersisted
   override def domainObject = amount
-  override def transact = this
+  override def transact(checkoutId: Long) = this
   override def withCheckoutId(newCheckoutId: Long) = this
 }
 

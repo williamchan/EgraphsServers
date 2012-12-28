@@ -32,8 +32,7 @@ trait HasCreatedUpdated {
  *
  * See [[models.Account]] for an example.
  */
-trait
-SavesCreatedUpdated[T <: KeyedCaseClass[_] with HasCreatedUpdated] {
+trait SavesCreatedUpdated[T <: KeyedCaseClass[_] with HasCreatedUpdated] {
   this: InsertAndUpdateHooks[T] =>
 
   //

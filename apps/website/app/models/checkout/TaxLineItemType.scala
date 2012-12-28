@@ -7,6 +7,7 @@ import scalaz.Lens
 import services.db.{Schema, CanInsertAndUpdateAsThroughServices}
 import com.google.inject.Inject
 import services.{AppConfig, Time}
+import play.api.libs.json.Json
 
 case class TaxLineItemType private (
   _entity: LineItemTypeEntity,
@@ -47,7 +48,7 @@ case class TaxLineItemType private (
 
         // (subtotal - discounts) * tax rate
         val taxAmount = (subtotal.amount minus totalDiscount) multipliedBy (rate.bigDecimal, java.math.RoundingMode.UP)
-        Seq(TaxLineItem(this, taxAmount, None))
+        Seq(TaxLineItem(this, taxAmount))
 
       case _ => Nil
     }
@@ -63,7 +64,7 @@ case class TaxLineItemType private (
 
 
 object TaxLineItemType {
-  val basicDescription = "Tax"
+  val basicTaxName = "Tax"
   val nature = LineItemNature.Tax
   val codeType = CodeType.Tax
   val noZipcode = ""
@@ -71,25 +72,28 @@ object TaxLineItemType {
   /**
    * Makes a single TaxLineItemType
    * @param taxRate
-   * @param maybeDescription - should describe the type of tax (ex: sales tax)
+   * @param maybeTaxName - should describe the type of tax (ex: sales tax)
    * @return TaxLineItemType of given rate with given description
    */
-  def apply(taxRate: BigDecimal, maybeDescription: Option[String]): TaxLineItemType = {
+  def apply(zipcode: String, taxRate: BigDecimal, maybeTaxName: Option[String]): TaxLineItemType = {
+    val taxName = maybeTaxName.getOrElse(basicTaxName)
     TaxLineItemType(
       LineItemTypeEntity(
-        maybeDescription.getOrElse(basicDescription),
-        nature,
-        codeType),
+          entityDescription(zipcode, taxRate, taxName),
+          nature,
+          codeType
+        ),
       taxRate
     )
   }
 
   def apply(entity: LineItemTypeEntity, itemEntity: LineItemEntity): TaxLineItemType = {
-    def rate = BigDecimal(itemEntity.notes.stripSuffix("%").toDouble/100)
-    def isValidRate = 0.0 <= rate && rate <= 1.0
-    require(isValidRate, "Invalid rate parsed from entity.")
+    def isValid(rate: BigDecimal) = 0.0 <= rate && rate <= 1.0
+    def taxRate = taxRateOptionFromEntity(entity)
+      .getOrElse(throw new IllegalArgumentException("Tax rate could not be parsed from entity."))
 
-    TaxLineItemType(entity, rate)
+    require(isValid(taxRate), "Invalid rate parsed from entity.")
+    TaxLineItemType(entity, taxRate)
   }
 
 
@@ -101,9 +105,9 @@ object TaxLineItemType {
    * @return Sequence of TaxLineItemTypes for taxes that apply in the given zipcode are
    */
   def getTaxesByZip(zipcode: String): Seq[TaxLineItemType] = {
-    for ((pattern, (rate, desc)) <- zipToTaxMap if zipcode matches pattern) yield {
-      val description = if (desc isEmpty) basicDescription else desc
-      TaxLineItemType(rate, Some(description))
+    for ((pattern, (rate, name)) <- zipToTaxMap if zipcode matches pattern) yield {
+      val maybeTaxName = if (name.isEmpty) None else Some(name)
+      TaxLineItemType(zipcode, rate, maybeTaxName)
     }
   }.toSeq
 
@@ -115,6 +119,33 @@ object TaxLineItemType {
     /** Washington zipcodes: 980XX - 994XX; State-wide sales tax of 6.5% */
     "9[8-9][0-4][0-9][0-9]" -> (BigDecimal(0.065), "WA Sales Tax")
   )
+
+
+  protected val jsonZipKey = "Zipcode"
+  protected val jsonRateKey = "TaxRate"
+  protected val jsonNameKey = "TaxName"
+
+  def zipcodeOptionFromEntity(entity: LineItemTypeEntity): Option[String] = {
+    (Json.parse(entity._desc) \ jsonZipKey).asOpt[String]
+  }
+
+  def taxNameOptionFromEntity(entity: LineItemTypeEntity): Option[String] = {
+    (Json.parse(entity._desc) \ jsonNameKey).asOpt[String]
+  }
+
+  def taxRateOptionFromEntity(entity: LineItemTypeEntity): Option[BigDecimal] = {
+    (Json.parse(entity._desc) \ jsonRateKey).asOpt[Double].map(BigDecimal(_))
+  }
+
+  protected def entityDescription(zipcode: String, taxRate: BigDecimal, taxName: String): String = {
+    Json.stringify {
+      Json.toJson( Map (
+        jsonZipKey -> Json.toJson(zipcode),
+        jsonNameKey -> Json.toJson(taxName),
+        jsonRateKey -> Json.toJson(taxRate.doubleValue)
+      ))
+    }
+  }
 }
 
 

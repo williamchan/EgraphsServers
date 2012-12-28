@@ -229,8 +229,7 @@ case class PersistedCheckout (
 
 class CheckoutStore @Inject() (
   schema: Schema,
-  lineItemStore: LineItemStore,
-  lineItemTypeStore: LineItemTypeStore
+  lineItemStore: LineItemStore
 ) extends InsertsAndUpdates[CheckoutEntity] with SavesCreatedUpdated[CheckoutEntity] {
 
   override protected def table = schema.checkouts
@@ -240,11 +239,12 @@ class CheckoutStore @Inject() (
   }
 
   // only Unpersisted can save itself (create a checkout)
+  // TODO(SER-499): re-evaluate this, see about moving saving into checkout
   def create(checkout: UnpersistedCheckout): PersistedCheckout = {
     val savedEntity = insert(checkout._entity)
     val savedItems  =
       for (item <- checkout.lineItems) yield {
-        item.withCheckoutId(savedEntity.id).transact()
+        item.withCheckoutId(savedEntity.id).transact(checkout.id)
       }
 
     new PersistedCheckout( savedEntity, savedItems )

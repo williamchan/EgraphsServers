@@ -33,7 +33,7 @@ case class StripeChargeLineItem(
   }
 
 
-  override def transact: StripeChargeLineItem = {
+  override def transact(newCheckoutId: Long): StripeChargeLineItem = {
     // TODO(SER-499): use actual StripePayment to charge, see payment handler
     this
   }
@@ -65,7 +65,6 @@ object StripeChargeLineItem {
 
 case class StripeChargeLineItemServices @Inject() (
   schema: Schema,
-  lineItemTypeStore: LineItemTypeStore,
   cashTransactionStore: CashTransactionStore
 ) extends SavesAsLineItemEntity[StripeChargeLineItem] {
   // TODO(SER-499): determine what additional services are needed

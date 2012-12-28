@@ -17,20 +17,17 @@ import com.google.inject.Inject
  */
 case class GiftCertificateLineItem (
   _entity: LineItemEntity,
-  _typeOrEntity: Either[GiftCertificateLineItemType, LineItemTypeEntity],
+  _typeEntity: LineItemTypeEntity,
   _maybeCoupon: Option[Coupon] = None,
   services: GiftCertificateLineItemServices = AppConfig.instance[GiftCertificateLineItemServices]
 ) extends LineItem[Coupon] with HasLineItemEntity
   with LineItemEntityGettersAndSetters[GiftCertificateLineItem]
   with CanInsertAndUpdateAsThroughServices[GiftCertificateLineItem, LineItemEntity]
 {
+  require(_maybeCoupon.isDefined || _entity._domainEntityId > 0)
 
-  override def itemType: GiftCertificateLineItemType = _typeOrEntity match {
-    case Left(itemType: GiftCertificateLineItemType) => itemType
-    case Right(typeEntity: LineItemTypeEntity) => GiftCertificateLineItemType(
-      _entity = typeEntity,
-      amountToBuy = Money.of(CurrencyUnit.USD, _entity._amountInCurrency.bigDecimal)
-    )
+  override def itemType: GiftCertificateLineItemType = {
+    GiftCertificateLineItemType(_typeEntity, amount)
   }
 
   override def subItems: Seq[LineItem[_]] = Nil
@@ -54,32 +51,31 @@ case class GiftCertificateLineItem (
    * Presumes that checkoutId is set; persists unsaved instances
    * @return persisted line item
    */
-  override def transact(): GiftCertificateLineItem = {
+  override def transact(newCheckoutId: Long): GiftCertificateLineItem = {
     if (id <= 0) {
-      require(checkoutId > 0, "Cannot transact without setting checkoutId.")
-
       /**
        * Save itemType first because it depends neither on a line item or domain object.
        * Then, save coupon, which only depends on itemType.
-       * Finally, save the line item with the .
+       * Finally, save the line item with the saved coupon and type.
        */
       val savedType = itemType.insert()
       val savedCoupon = domainObject.copy(lineItemTypeId = savedType.id).save()
-      val savedItem = withItemTypeId(savedType.id)
-        .withDomainEntityId(savedCoupon.id)
+      this.withCheckoutId(newCheckoutId)
+        .withItemType(savedType)
+        .withCoupon(savedCoupon)
         .insert()
-
-      // return the saved item with its coupon's id stored
-      savedItem.copy(_maybeCoupon = Some(savedCoupon))
 
     } else {
       this
     }
   }
 
+  def withCoupon(coupon: Coupon) = {
+    this.withDomainEntityId(coupon.id).copy(_maybeCoupon = Some(coupon))
+  }
 
   def withItemType(newType: GiftCertificateLineItemType) = {
-    this.copy(_typeOrEntity = Left(newType)).withItemTypeId(newType.id)
+    this.withItemTypeId(newType.id).copy(_typeEntity = newType._entity)
   }
 
 
@@ -90,19 +86,21 @@ case class GiftCertificateLineItem (
 }
 
 object GiftCertificateLineItem {
+  // Creating
   def apply(itemType: GiftCertificateLineItemType, coupon: Coupon) = {
     new GiftCertificateLineItem(
-      new LineItemEntity(
-        _itemTypeId = itemType.id,
-        _amountInCurrency = itemType.amountToBuy.getAmount
-      ),
-      Left(itemType),
-      Some(coupon)
+      _entity = new LineItemEntity(
+          _itemTypeId = itemType.id,
+          _amountInCurrency = itemType.amount.getAmount
+        ),
+      _typeEntity = itemType._entity,
+      _maybeCoupon = Some(coupon)
     )
   }
 
+  // Restoring
   def apply(entity: LineItemEntity, typeEntity: LineItemTypeEntity) = {
-    new GiftCertificateLineItem(entity, Right(typeEntity))
+    new GiftCertificateLineItem(entity, typeEntity, None)
   }
 }
 
@@ -115,7 +113,6 @@ object GiftCertificateLineItem {
 case class GiftCertificateLineItemServices @Inject() (
   schema: Schema,
   lineItemStore: LineItemStore,
-  lineItemTypeStore: LineItemTypeStore,
   couponStore: CouponStore
 ) extends SavesAsLineItemEntity[GiftCertificateLineItem] {
   // SaveAsLineItemEntity members

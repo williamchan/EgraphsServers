@@ -8,12 +8,12 @@ import services.db.{CanInsertAndUpdateAsThroughServices, Schema}
 import scalaz.Lens
 import org.squeryl.PrimitiveTypeMode._
 import com.google.inject.Inject
+import play.api.libs.json.Json
 
 
 case class GiftCertificateLineItemType (
   _entity: LineItemTypeEntity,
-  recipient: String = "",
-  amountToBuy: Money = Money.zero(CurrencyUnit.USD),
+  amount: Money,
   services: GiftCertificateLineItemTypeServices = AppConfig.instance[GiftCertificateLineItemTypeServices]
 ) extends LineItemType[Coupon] with HasLineItemTypeEntity
   with LineItemTypeEntityGettersAndSetters[GiftCertificateLineItemType]
@@ -27,13 +27,12 @@ case class GiftCertificateLineItemType (
 
   override def lineItems(resolvedItems: Seq[LineItem[_]], pendingResolution: Seq[LineItemType[_]]) = {
     val coupon = new Coupon(
-      name = GiftCertificateLineItemType.couponName(this),  // TODO(SER-499): clean couponName use up
-      discountAmount = amountToBuy.getAmount,
-      lineItemTypeId = id)
-    .withCouponType( CouponType.GiftCertificate )
-    .withDiscountType( CouponDiscountType.Flat )
-    .withUsageType( CouponUsageType.Prepaid )
-
+      name = GiftCertificateLineItemType.couponName(_entity),
+      discountAmount = amount.getAmount
+    )
+      .withCouponType(CouponType.GiftCertificate)
+      .withDiscountType(CouponDiscountType.Flat)
+      .withUsageType(CouponUsageType.Prepaid)
     Seq(GiftCertificateLineItem(this, coupon))
   }
 
@@ -49,43 +48,47 @@ case class GiftCertificateLineItemType (
 object GiftCertificateLineItemType {
   val nature = LineItemNature.Discount
   val codeType = CodeType.GiftCertificate
+  val jsonAmountKey = "Amount"
+  val jsonRecipientKey = "Recipient"
 
-  def apply(
-    recipient: String,
-    amountToBuy: Money
-  ): GiftCertificateLineItemType = {
-    new GiftCertificateLineItemType(
-      seedEntity(Some(recipient), Some(amountToBuy)),
-      recipient, amountToBuy)
+  // Create new LineItemType
+  def apply(recipient: String, amountToBuy: Money): GiftCertificateLineItemType = {
+    val entityDesc = entityDescriptionAsJsonString(amountToBuy, recipient)
+    val entity = LineItemTypeEntity(entityDesc, nature, codeType)
+    new GiftCertificateLineItemType(entity, amountToBuy)
   }
 
+  // Restore a LineItemType
   def apply(entity: LineItemTypeEntity, itemEntity: LineItemEntity) = {
     new GiftCertificateLineItemType(
       _entity = entity,
-      // skipping recipient because it's not handled well...
-      amountToBuy = Money.of(CurrencyUnit.USD, itemEntity._amountInCurrency.bigDecimal)
+      amount = Money.of(CurrencyUnit.USD, itemEntity._amountInCurrency.bigDecimal)
     )
   }
 
-  private val basicDescription = "Gift certificate"
-
-  private[checkout] def seedEntity(implicit maybeRecipient: Option[String] = None, maybeAmount: Option[Money] = None) = {
-    val desc = description(maybeRecipient, maybeAmount)
-    LineItemTypeEntity(desc, nature, codeType)
+  private def entityDescriptionAsJsonString(amount: Money, recipient: String) = {
+    val jsonDescriptionObject = Json.toJson( Map(
+      // NOTE(SER-499): may need to wrap toJson in Seq
+      jsonAmountKey -> Json.toJson(amount.getAmount.doubleValue),
+      jsonRecipientKey -> Json.toJson(recipient)
+    ))
+    Json.stringify(jsonDescriptionObject)
   }
 
-  private def description(implicit maybeRecipient: Option[String] = None, maybeAmount: Option[Money] = None) = {
-    basicDescription ++
-      maybeAmount.map(amount => " for " ++ amount.toString).getOrElse("") ++
-      maybeRecipient.map(recip => " to " ++ recip).getOrElse("")
+  def amountOptionFromEntity(entity: LineItemTypeEntity): Option[BigDecimal] = {
+    (Json.parse(entity._desc) \ jsonAmountKey).asOpt[Double].map(BigDecimal(_))
+  }
+  def recipientOptionFromEntity(entity: LineItemTypeEntity): Option[String] = {
+    (Json.parse(entity._desc) \ jsonRecipientKey).asOpt[String]
   }
 
-  //
-  // Coupon helpers
-  //
-  protected val couponNameFormatString = "A gift certificate for %s"
-  protected def couponName(itemType: GiftCertificateLineItemType): String = {
-    couponNameFormatString.format(itemType.recipient)
+  // get recipient from JSON in entity description
+  private val couponNameFormatString = "A gift certificate for %s"
+  private def couponName(entity: LineItemTypeEntity): String = {
+    val maybeRecipient = recipientOptionFromEntity(entity)
+    couponNameFormatString.format(maybeRecipient.getOrElse {
+      throw new IllegalArgumentException("Recipient could not be parsed from entity.")
+    })
   }
 }
 

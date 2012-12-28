@@ -9,7 +9,7 @@ import services.AppConfig
 
 case class TaxLineItem private (
   _entity: LineItemEntity,
-  itemType: TaxLineItemType,
+  _typeEntity: LineItemTypeEntity,
   services: TaxLineItemServices = AppConfig.instance[TaxLineItemServices]
 ) extends LineItem[Money] with HasLineItemEntity
   with LineItemEntityGettersAndSetters[TaxLineItem]
@@ -17,8 +17,9 @@ case class TaxLineItem private (
 {
   require(amount.isPositiveOrZero)
 
+  override def itemType: TaxLineItemType = TaxLineItemType(_typeEntity, _entity)
   override def domainObject: Money = amount
-
+  override def subItems: Seq[LineItem[_]] = Nil
 
   override def toJson: String = {
     // TODO(SER-499): Use Json type, maybe even Option
@@ -26,19 +27,20 @@ case class TaxLineItem private (
   }
 
 
-  // NOTE(SER-499): will probably want to use subItems for non-trivial tax scenarios
-  override def subItems: Seq[LineItem[_]] = Nil
 
 
-  override def transact: LineItem[Money] = {
+
+  override def transact(newCheckoutId: Long): TaxLineItem = {
     if (id <= 0) {
-      require(checkoutId > 0, "Cannot transact without setting checkoutId.")
 
       /**
        * TODO(SER-499): remove type saving if not keeping item type for each tax item; is there
        * reason to persist the tax type when it doesn't relate a tax table to the line items table?
        */
-      withItemType(itemType.insert()).insert()
+      this.withItemType( itemType.insert() )
+        .withCheckoutId( newCheckoutId )
+        .insert()
+
     } else {
       this
     }
@@ -46,7 +48,7 @@ case class TaxLineItem private (
 
   // TODO(SER-499): this is repeated a lot, try to refactor into trait
   def withItemType(newType: TaxLineItemType) = {
-    this.copy(itemType = newType).withItemTypeId(newType.id)
+    this.withItemTypeId(newType.id).copy(_typeEntity = newType._entity)
   }
 
 
@@ -57,20 +59,15 @@ case class TaxLineItem private (
 }
 
 object TaxLineItem {
-  def apply(itemType: TaxLineItemType, amount: Money, maybeZip: Option[String]) = {
+  def apply(itemType: TaxLineItemType, amount: Money) = {
     new TaxLineItem(
-      LineItemEntity(amount, maybeZip.getOrElse(TaxLineItemType.noZipcode)),
-      itemType
+      LineItemEntity(_amountInCurrency = amount.getAmount),
+      itemType._entity
     )
   }
 
   def apply(entity: LineItemEntity, typeEntity: LineItemTypeEntity) = {
-    val itemType = TaxLineItemType(BigDecimal(0.0), None)
-//      services.lineItemTypeStore.entitiesToType[TaxLineItemType](typeEntity,entity).getOrElse(
-//        throw new IllegalArgumentException("Could not create a TaxLineItemType from the given entity.")
-//      )
-
-    new TaxLineItem(entity, itemType)
+    new TaxLineItem(entity, typeEntity)
   }
 }
 
@@ -81,8 +78,7 @@ object TaxLineItem {
 
 
 case class TaxLineItemServices @Inject() (
-  schema: Schema,
-  lineItemTypeStore: LineItemTypeStore
+  schema: Schema
 ) extends SavesAsLineItemEntity[TaxLineItem] {
   override protected def modelWithNewEntity(tax: TaxLineItem, entity: LineItemEntity) = {
     tax.copy(_entity=entity)
