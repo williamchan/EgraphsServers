@@ -76,7 +76,7 @@ function(forms, payment, ngPayment, page, logging, requireModule) {
       }
     };
 
-    $scope.paymentSucceeded = function(token) {
+    $scope.onCardInfoValidated = function(cardToken) {
       log("Woot! success");
       log($scope);
     };

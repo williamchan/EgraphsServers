@@ -173,7 +173,7 @@
 
           <section id="pay" class="span6">
             <h2><span class="checkout-step-count">3</span>Pay:</h2>
-            <form payment-form class="form-horizontal" name="pay" novalidate>
+            <form credit-card-form class="form-horizontal" name="pay" novalidate>
               <fieldset>
                 <div class="control-group card-number">
                   <label class="control-label" for="card-number">Card number:</label>
@@ -184,7 +184,6 @@
                            class="inset-shade"
                            ng-model="order.card.number"
                            required
-                           ng-click="printScope()"
                            credit-card-number />
                     <div class="errors" ng-show="pay.cardNumber.$dirty && pay.cardNumber.$invalid">
                       <div class="alert alert-error"
@@ -274,7 +273,7 @@
                   <button id="review-button" 
                           type="button"
                           class="button right review"
-                          ng-click="submitCardInfo(paymentSucceeded)" >
+                          ng-click="submitCardInfo(cardInfoAccepted)" >
                   <strong>
                     <span class="checkout-step-count in-button">4</span>
                     <em>Review Order</em>

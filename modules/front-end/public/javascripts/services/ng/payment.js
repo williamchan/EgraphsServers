@@ -11,8 +11,8 @@ function(payment, validationDirective, logging, module) {
     expiryYear: "creditCardExpiryYear"
   };
 
-  var paymentFormDirective = function(ngModule) {
-    ngModule.directive('paymentForm', function($rootScope) {
+  var creditCardFormDirective = function(ngModule) {
+    ngModule.directive('creditCardForm', function($rootScope) {
       var forEach = angular.forEach;
       var noop = angular.noop;
 
@@ -131,7 +131,7 @@ function(payment, validationDirective, logging, module) {
       return {
         'restrict': 'A',
 
-        'require': ['^paymentForm', 'ngModel'],
+        'require': ['^creditCardForm', 'ngModel'],
 
         'link': function(scope, element, attrs, ctrls) {
           var formCtrl = ctrls[0];
@@ -181,7 +181,7 @@ function(payment, validationDirective, logging, module) {
   return {
     /** Apply to an ng.module to make payment directives available to associated page */
     applyDirectives: function(ngModule) {
-      paymentFormDirective(ngModule);
+      creditCardFormDirective(ngModule);
       creditCardNumberDirective(ngModule);
       creditCardCvcDirective(ngModule);
       creditCardExpiryDirectives(ngModule);
