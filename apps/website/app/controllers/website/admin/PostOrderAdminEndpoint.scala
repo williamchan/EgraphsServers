@@ -2,6 +2,7 @@ package controllers.website.admin
 
 import models._
 import enums.OrderReviewStatus
+import enums.PrivacyStatus
 import play.api.mvc.Controller
 import services.http.POSTControllerMethod
 import services.http.filters.HttpFilters
@@ -127,6 +128,16 @@ trait PostOrderAdminEndpoint { this: Controller =>
                     )
                   }
                 )
+              }
+              case "privacy" => {
+                val privacyStatusString = Form("privacyStatus" -> text).bindFromRequest.fold(formWithErrors => "", validForm => validForm)
+                PrivacyStatus(privacyStatusString) match {
+                  case Some(privacyEnum) => {
+                    order.withPrivacyStatus(privacyEnum).save()
+                    Redirect(GetOrderAdminEndpoint.url(order.id))
+                  }
+                  case None => BadRequest(Html("<html><body>Malformed privacy status</body></html>"))
+                }
               }
               case _ => Forbidden("Unsupported operation")
             }

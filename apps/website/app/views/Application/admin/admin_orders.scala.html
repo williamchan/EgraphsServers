@@ -1,4 +1,4 @@
-@(orders: Iterable[models.Order], celebrity: Option[models.Celebrity] = None
+@(orderResults: Iterable[(models.Order, models.Celebrity)], celebrity: Option[models.Celebrity] = None
 )(implicit authToken: egraphs.authtoken.AuthenticityToken,
   paginationInfo: controllers.PaginationInfo, 
   headerData: models.frontend.header.HeaderData,
@@ -45,16 +45,15 @@
               <tr>
                 <th></th>
                 <th>Id</th>
-                <th>Product</th>
+                <th>Celebrity</th>
                 <th>Recipient</th>
                 <th>Review Status</th>
-                <th>Payment State</th>
                 <th>Expected Date</th>
                 <th>Msg to Celebrity</th>
                 <th>Requested Msg</th>
               </tr>
             </thead>  
-            @orders.map { (order) =>
+            @orderResults.map { case (order, celebrity) =>
             <tr>
               <td>
                 <a class="preview-link" href="/admin/orders/@order.id">
@@ -62,10 +61,9 @@
                 </a>
               </td>
               <td>@order.id</td>
-              <td>@order.productId</td>
+              <td>@celebrity.publicName</td>
               <td>@order.recipientName</td>
               <td>@order.reviewStatus</td>
-              <td>@order.paymentStatus</td>
               <td>@order.expectedDate</td>
               <td>@order.messageToCelebrity.getOrElse("")</td>
               <td>@order.requestedMessage.getOrElse("")</td>

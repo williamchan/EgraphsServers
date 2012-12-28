@@ -39,9 +39,9 @@ private[controllers] trait GetEgraphsAdminEndpoint extends ImplicitHeaderAndFoot
           case "all" => egraphStore.getEgraphsAndResults()
           case _ => egraphStore.getEgraphsAndResults(egraphQueryFilters.pendingAdminReview)
         }
-        val pagedQuery: (Iterable[(Egraph, Option[VBGVerifySample], Option[XyzmoVerifyUser])], Int, Option[Int]) = services.Utils.pagedQuery(select = query, page = page)
+        val pagedQuery: (Iterable[(Egraph, Celebrity, Option[VBGVerifySample], Option[XyzmoVerifyUser])], Int, Option[Int]) = services.Utils.pagedQuery(select = query, page = page)
         implicit val paginationInfo = PaginationInfoFactory.create(pagedQuery = pagedQuery, baseUrl = GetEgraphsAdminEndpoint.url, filter = Option(filter))
-        Ok(views.html.Application.admin.admin_egraphs(egraphAndResults = pagedQuery._1))
+        Ok(views.html.Application.admin.admin_egraphs(egraphsAndResults = pagedQuery._1))
       }
     }
   }

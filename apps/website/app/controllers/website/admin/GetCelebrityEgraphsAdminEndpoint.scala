@@ -41,10 +41,10 @@ private[controllers] trait GetCelebrityEgraphsAdminEndpoint extends ImplicitHead
             case "all" => egraphStore.getCelebrityEgraphsAndResults(celebrity)
             case _ => egraphStore.getCelebrityEgraphsAndResults(celebrity, egraphQueryFilters.pendingAdminReview)
           }
-            val pagedQuery: (Iterable[(Egraph, Option[VBGVerifySample], Option[XyzmoVerifyUser])], Int, Option[Int]) = services.Utils.pagedQuery(select = query, page = page)
+            val pagedQuery: (Iterable[(Egraph, Celebrity, Option[VBGVerifySample], Option[XyzmoVerifyUser])], Int, Option[Int]) = services.Utils.pagedQuery(select = query, page = page)
             implicit val paginationInfo = PaginationInfoFactory.create(pagedQuery = pagedQuery, baseUrl = GetCelebrityEgraphsAdminEndpoint.url(celebrity), filter = Option(filter))
-            Ok(views.html.Application.admin.admin_egraphs(egraphAndResults = pagedQuery._1, celebrity = Some(celebrity)))
-            }
+            Ok(views.html.Application.admin.admin_egraphs(egraphsAndResults = pagedQuery._1, celebrity = Some(celebrity)))
+          }
       }
     }
   }

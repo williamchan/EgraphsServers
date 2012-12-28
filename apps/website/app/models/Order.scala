@@ -68,6 +68,7 @@ case class Order(
   with HasPrivacyStatus[Order]
   with HasPaymentStatus[Order]
   with HasOrderReviewStatus[Order]
+  with HasOrderType[Order]
   with HasWrittenMessageRequest[Order]
 {
   
@@ -313,6 +314,10 @@ case class Order(
   //
   override def unapplied = Order.unapply(this)
 
+  override def withOrderType(status: OrderType.EnumVal) = {
+    this.copy(_orderType = status.name)
+  }
+
   override def withPrivacyStatus(status: PrivacyStatus.EnumVal) = {
     this.copy(_privacyStatus = status.name)
   }
@@ -477,16 +482,25 @@ class OrderStore @Inject() (
         orderBy (order.id asc)
     )
   }
-  
-  def findByFilter(filters: FilterOneTable[Order]*): Query[Order] = {
-    import schema.orders
 
-    from(orders)((order) =>
-      where(
-        FilterOneTable.reduceFilters(filters, order)
-      )
-        select (order)
-        orderBy (order.id asc)
+  def getOrderResults(filters: FilterOneTable[Order]*): Query[(Order, Celebrity)] = {
+    join(schema.orders, schema.products, schema.celebrities)(
+      (order, product, celebrity) =>
+        where(FilterOneTable.reduceFilters(filters, order))
+          select(order, celebrity)
+          orderBy (order.id desc)
+          on(order.productId === product.id, product.celebrityId === celebrity.id)
+    )
+  }
+
+  def getCelebrityOrderResults(celebrity: Celebrity, filters: FilterOneTable[Order]*): Query[(Order, Celebrity)] = {
+    val celebrityId = celebrity.id
+    join(schema.orders, schema.products, schema.celebrities)(
+      (order, product, celebrity) =>
+        where(FilterOneTable.reduceFilters(filters, order) and celebrity.id === celebrityId)
+          select(order, celebrity)
+          orderBy (order.id desc)
+          on(order.productId === product.id, product.celebrityId === celebrity.id)
     )
   }
 

@@ -51,6 +51,16 @@
 }
 
 @baseBody = {
+
+  @if(headerData.giftCertificateLink.isDefined) {
+    <section id="announcement-bar">
+      <div class="announcement-container">
+        Not sure which star to pick? An <strong>Egraphs gift certificate</strong> makes the perfect gift. <a href="@headerData.giftCertificateLink">Shop Now &rsaquo;</a>
+      </div>
+    </section>
+    <div class="announcement-translucent-separator"></div>
+  }
+
   @tags.landing.masthead_section(
     celebrityPublicName=None,
     mastheadMessage=None,

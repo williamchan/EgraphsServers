@@ -7,19 +7,15 @@
 @import controllers._
 @import views.html.frontend.tags
 
-<h4 style="color:red;text-align:center;line-height:20px;margin-top:5px;margin-bottom:2px;">Egraphs purchased after Dec 10 may not arrive by Dec 24. Gift certificates coming soon.</h4>
-
 <section id="masthead-home" role="banner" style="background-image: url(@mastheadImageUrl);">
-
   <div class="banner-gradient">
-
     <div class="container">
 
       <div class="row">
 
         <div class="span6 header-parent">
 
-          <h1>@mastheadMessage.getOrElse("Give the gift of an MLB star this holiday season.")</h1>
+          <h1>Share the New Year with @celebrityPublicName.getOrElse("your favorite star")</h1>
 
           @getStartedUrl.map{ url =>
             @{

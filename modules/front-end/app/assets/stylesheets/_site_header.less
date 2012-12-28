@@ -32,6 +32,14 @@
       padding-left: 15px;
       padding-right: 15px;
     }
+
+    &.gift-certificates a span{
+      background: @orange;
+      color: @white;
+      text-shadow: none;
+      padding: 4px 8px;
+      .box-shadow(inset 0px 0px 1px 0px @gray); 
+    }
   }
 
   // Some elements only become visible at smaller screen sizes
@@ -217,13 +225,29 @@
   #top {
     .social {
       > ul {
-        padding-left: 20px;     
+        padding-left: 10px;     
       }
     }
-    
+    // Bring down the padding to handle more than two links up #top   
     .account > ul {
-      padding-left: 20px;
-      padding-right: 20px;
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+
+    .navbar-item {   
+      &.gift-certificates a span{
+        padding: 4px 4px;
+      }
+    }
+
+    .container {
+      width: 100%;
+    }
+    .logo a {
+      margin-left: 5px;
+    }
+    .social {
+     margin-right: 5px;
     }
   } // end #top
 }
@@ -254,7 +278,9 @@
     }
 
     .linkz {
-      margin-left:20px;
+      margin-left: 10%;
+      margin-right: 10%;
+      width: 80%;
       padding-top:8px;
       padding-bottom:5px;
       text-align:center;
@@ -353,6 +379,8 @@
     .linkz {
       float: none;
       margin-left: 0px;
+      margin-right: 0px;
+      width: 100%;
       padding-top: 0px;
     }
   }
@@ -360,9 +388,10 @@
 
 
 //
-// For super-small screens condense the linkz even more.
+// For super-small screens condense the linkz even more. This breakpoint has increased to 
+// iPhone width to accomodate more than two links in the top bar.
 //
-@media (max-width: 320px) {
+@media (max-width: 480px) {
   #top {
     .linkz {
       .navbar-item {
