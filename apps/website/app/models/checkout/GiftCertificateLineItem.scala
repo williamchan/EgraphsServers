@@ -27,7 +27,7 @@ case class GiftCertificateLineItem (
   require(_maybeCoupon.isDefined || _entity._domainEntityId > 0)
 
   override def itemType: GiftCertificateLineItemType = {
-    GiftCertificateLineItemType(_typeEntity, amount)
+    GiftCertificateLineItemType(_typeEntity, _entity)
   }
 
   override def subItems: Seq[LineItem[_]] = Nil

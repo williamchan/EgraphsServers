@@ -9,9 +9,11 @@ import com.google.inject.Inject
 import services.{AppConfig, Time}
 import play.api.libs.json.Json
 
-case class TaxLineItemType private (
+case class TaxLineItemType protected (
   _entity: LineItemTypeEntity,
-  rate: BigDecimal,
+  zipcode: String,
+  taxName: String,
+  taxRate: BigDecimal,
   services: TaxLineItemTypeServices = AppConfig.instance[TaxLineItemTypeServices]
 ) extends LineItemType[Money] with HasLineItemTypeEntity  // TODO(SER-499): is this necessary?
   with LineItemTypeEntityGettersAndSetters[TaxLineItemType]
@@ -32,7 +34,7 @@ case class TaxLineItemType private (
    */
   override def lineItems(resolvedItems: Seq[LineItem[_]], pendingResolution: Seq[LineItemType[_]]) = {
     def isDiscountType(itemType: LineItemType[_]) = itemType.nature == LineItemNature.Discount
-    def isSubtotalItem(item: LineItem[_]) = item.itemType.codeType == CodeType.Subtotal
+    def isSubtotalItem(item: LineItem[_]) = item.codeType == CodeType.Subtotal
 
     val maybeResolvedSubtotal = resolvedItems.find(isSubtotalItem(_))
     val maybePendingDiscount = pendingResolution.find(isDiscountType(_))
@@ -47,7 +49,7 @@ case class TaxLineItemType private (
         }
 
         // (subtotal - discounts) * tax rate
-        val taxAmount = (subtotal.amount minus totalDiscount) multipliedBy (rate.bigDecimal, java.math.RoundingMode.UP)
+        val taxAmount = (subtotal.amount minus totalDiscount) multipliedBy (taxRate.bigDecimal, java.math.RoundingMode.UP)
         Seq(TaxLineItem(this, taxAmount))
 
       case _ => Nil
@@ -77,26 +79,30 @@ object TaxLineItemType {
    */
   def apply(zipcode: String, taxRate: BigDecimal, maybeTaxName: Option[String]): TaxLineItemType = {
     val taxName = maybeTaxName.getOrElse(basicTaxName)
-    TaxLineItemType(
-      LineItemTypeEntity(
-          entityDescription(zipcode, taxRate, taxName),
-          nature,
-          codeType
-        ),
-      taxRate
-    )
+    val desc = entityDescriptionAsJsonString(zipcode, taxRate, taxName)
+    val entity = LineItemTypeEntity(desc, nature, codeType)
+
+    new TaxLineItemType(entity, zipcode, taxName, taxRate)
   }
 
   def apply(entity: LineItemTypeEntity, itemEntity: LineItemEntity): TaxLineItemType = {
     def isValid(rate: BigDecimal) = 0.0 <= rate && rate <= 1.0
+    def zipcode = zipcodeOptionFromEntity(entity)
+      .getOrElse(throw new IllegalArgumentException("Zipcode could not be parsed from entity."))
+    def taxName = taxNameOptionFromEntity(entity)
+      .getOrElse(throw new IllegalArgumentException("Tax name could not be parsed from entity."))
     def taxRate = taxRateOptionFromEntity(entity)
       .getOrElse(throw new IllegalArgumentException("Tax rate could not be parsed from entity."))
 
     require(isValid(taxRate), "Invalid rate parsed from entity.")
-    TaxLineItemType(entity, taxRate)
+    new TaxLineItemType(entity, zipcode, taxName, taxRate)
   }
 
 
+  //
+  // TODO(SER-499): Taxes should be one-to-many; need an easy way to get existing tax types by zip
+  // Currently thinking it may have to suffice to store zip in description (using Json) and
+  // search on that
   /**
    * Here we are only concerned with possible taxes; the ones that apply or not by product
    * (ex: digital product taxes vs. general sales tax) are determined in lineItems method.
@@ -114,7 +120,7 @@ object TaxLineItemType {
 
   /** Map of zipcode pattern to tuple of tax rate and description */
   protected val zipToTaxMap: Map[String, (BigDecimal, String)] = Map(
-    TaxLineItemType.noZipcode -> (BigDecimal(0), ""),
+    noZipcode -> (BigDecimal(0), ""),
 
     /** Washington zipcodes: 980XX - 994XX; State-wide sales tax of 6.5% */
     "9[8-9][0-4][0-9][0-9]" -> (BigDecimal(0.065), "WA Sales Tax")
@@ -137,7 +143,7 @@ object TaxLineItemType {
     (Json.parse(entity._desc) \ jsonRateKey).asOpt[Double].map(BigDecimal(_))
   }
 
-  protected def entityDescription(zipcode: String, taxRate: BigDecimal, taxName: String): String = {
+  protected def entityDescriptionAsJsonString(zipcode: String, taxRate: BigDecimal, taxName: String): String = {
     Json.stringify {
       Json.toJson( Map (
         jsonZipKey -> Json.toJson(zipcode),

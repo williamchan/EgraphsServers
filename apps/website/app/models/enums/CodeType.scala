@@ -36,11 +36,11 @@ object CodeType extends Enum {
   //
   // Charges
   //
-  val StripeCharge = new EnumVal("StripeChargeLineItemType")
-    with CodeTypeFactory[StripeChargeLineItemType, StripeChargeLineItem]
+  val CashTransaction = new EnumVal("CashTransactionLineItemType")
+    with CodeTypeFactory[CashTransactionLineItemType, CashTransactionLineItem]
   {
     override def itemInstance(itemEntity: LineItemEntity, typeEntity: LineItemTypeEntity) = {
-      StripeChargeLineItem(itemEntity, typeEntity)
+      CashTransactionLineItem(itemEntity, typeEntity)
     }
   }
 

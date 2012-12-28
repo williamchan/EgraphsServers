@@ -17,7 +17,6 @@ package object checkout {
   /** For id's of line items and line item types that don't get persisted; ex: Subtotal */
   val Unpersisted: Long = -2
 
-
   val UnsavedEntity = 0
 
   type LineItems = Seq[LineItem[_]]
@@ -258,7 +257,7 @@ class CheckoutStore @Inject() (
   }
 
   // helper queries
-  def getCheckoutById(id: Long): Option[PersistedCheckout] = {
+  def findById(id: Long): Option[PersistedCheckout] = {
     // val entity = //table.where()
     // val lineItems = lineItemStore.getItemsByCheckoutId(id)
     None
