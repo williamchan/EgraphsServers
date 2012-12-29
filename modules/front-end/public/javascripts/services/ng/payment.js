@@ -1,9 +1,48 @@
-/** Provides angular bindings to payment services */
+/**
+ * Angular directives for creating forms for submitting credit card information
+ * to our payment partners. Complements the existing angular forms API. To use, call
+ * this module's applyDirectives method upon your angular module.
+ *
+ * See the form named "pay" in gift_certificate_checkout.scala.html for example usage.
+ * The basic structure is:
+ *
+ *   <!-- Create a form with the directive, and give it a name. -->
+ *   <form credit-card-form name="ccForm">
+ *     <!-- Create necesary form inputs for card: number, cvc, expiry month, expiry year
+ *          The form inputs will automatically use payment.js's client-side validation methods.
+ *          You can name them whatever you want, but they do need a name. -->
+ *     <input credit-card-number name="cardNumber" type="text" />
+ *
+ *     <!-- Hook into errors using angular's nice declarative syntax-->
+ *     <div class="errors" ng-show="pay.cardNumber.$invalid" >
+ *       <div ng-show="pay.cardNumber.$error.remote_payment_invalid_number || pay.cardNumber.$error.invalid_number" >
+ *         Card number is invalid yo
+ *       </div>
+ *       <div ng-show="pay.cardNumber.$error.remote_payment_incorrect_number" >
+ *         Card number is incorrect yo...whatever that means.
+ *       </div>
+ *     </div>
+ *
+ *     <input credit-card-cvc name="cardCvc" type="text" />
+ *     <input credit-card-expiry-month name="cardExpMonth" type="text" />
+ *     <input credit-card-expiry-year name="cardExpYear" type="text" />
+ *     <!-- Submission on ng-click. This example presupposes your controller defined a handler named
+ *            $scope.onCardInfoValidated, which takes the tokenId as its only parameter. That's where
+ *            all your work happens, and it'll only happen if the CC info was valid!
+ *
+ *            If the CC info was invalid, then the error boxes we specified above will appear up in
+ *            your form -->
+ *     <button type="button" ng-click="creditCardFormSubmit(onCardInfoValidated)" >
+ *   </form>
+ */
 /*global angular*/
 define(["services/payment", "services/ng/validation-directive", "services/logging", "module"],
 function(payment, validationDirective, logging, module) {
   var log = logging.namespace(module.id);
+  var forEach = angular.forEach;
+  var noop = angular.noop;
 
+  /** Name of all the form field directives */
   var directiveNames = {
     number: "creditCardNumber",
     cvc: "creditCardCvc",
@@ -13,8 +52,6 @@ function(payment, validationDirective, logging, module) {
 
   var creditCardFormDirective = function(ngModule) {
     ngModule.directive('creditCardForm', function($rootScope) {
-      var forEach = angular.forEach;
-      var noop = angular.noop;
 
       return {
         'restrict': 'A',
@@ -134,7 +171,8 @@ function(payment, validationDirective, logging, module) {
     });
   };
 
-  var paymentFieldDirective = function(ngModule, name, validate) {
+  // Helper for creating the input field directives that follow
+  var ccFieldDirective = function(ngModule, name, validate) {
     validate = validate || function() { return true; };
 
     ngModule.directive(name, function() {
@@ -164,7 +202,7 @@ function(payment, validationDirective, logging, module) {
   };
 
   var creditCardNumberDirective = function(ngModule) {
-    paymentFieldDirective(ngModule, directiveNames.number, function(viewValue) {
+    ccFieldDirective(ngModule, directiveNames.number, function(viewValue) {
       if (viewValue) {
         return payment.validateCardNumber(viewValue);
       } else {
@@ -174,7 +212,7 @@ function(payment, validationDirective, logging, module) {
   };
 
   var creditCardCvcDirective = function(ngModule) {
-    paymentFieldDirective(ngModule, directiveNames.cvc, function(viewValue) {
+    ccFieldDirective(ngModule, directiveNames.cvc, function(viewValue) {
       if (viewValue) {
         return payment.validateCVC(viewValue);
       } else {
@@ -184,8 +222,8 @@ function(payment, validationDirective, logging, module) {
   };
 
   var creditCardExpiryDirectives = function(ngModule) {
-    paymentFieldDirective(ngModule, directiveNames.expiryMonth);
-    paymentFieldDirective(ngModule, directiveNames.expiryYear);
+    ccFieldDirective(ngModule, directiveNames.expiryMonth);
+    ccFieldDirective(ngModule, directiveNames.expiryYear);
   };
 
   return {
@@ -195,7 +233,6 @@ function(payment, validationDirective, logging, module) {
       creditCardNumberDirective(ngModule);
       creditCardCvcDirective(ngModule);
       creditCardExpiryDirectives(ngModule);
-
     }
 
   };

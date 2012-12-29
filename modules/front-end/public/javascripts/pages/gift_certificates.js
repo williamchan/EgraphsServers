@@ -6,12 +6,14 @@ define([
   "services/payment",
   "services/ng/payment",
   "page",
+  "window",
   "services/logging",
   "module",
   "services/responsive-modal"
 ],
-function(forms, payment, ngPayment, page, logging, requireModule) {
+function(forms, payment, ngPayment, page, window, logging, requireModule) {
   var log = logging.namespace(requireModule.id);
+  var forEach = angular.forEach;
 
   var GiftCertificateOption = function(data) {
     this.price = data.price;
@@ -32,7 +34,7 @@ function(forms, payment, ngPayment, page, logging, requireModule) {
   };
 
   var certificateOptions = [];
-  angular.forEach(page.certificateOptions, function(option) {
+  forEach(page.certificateOptions, function(option) {
     certificateOptions.push(new GiftCertificateOption(option));
   });
 
@@ -90,10 +92,10 @@ function(forms, payment, ngPayment, page, logging, requireModule) {
      * from the controls to which they applied.
      */
     var clearRemoteErrors = function() {
-      angular.forEach(forms(), function(form) {
-        angular.forEach(form.$error, function(controlsWithErrors, errorName) {
+      forEach(forms(), function(form) {
+        forEach(form.$error, function(controlsWithErrors, errorName) {
           if (errorName.search("remote_") === 0) {
-            angular.forEach(controlsWithErrors, function(controlWithErrors) {
+            forEach(controlsWithErrors, function(controlWithErrors) {
               controlWithErrors.$setValidity(errorName, true);
             });
           }
@@ -106,7 +108,7 @@ function(forms, payment, ngPayment, page, logging, requireModule) {
     };
 
     var dirtyUserControls = function() {
-      angular.forEach(userControls(), function(control) {
+      forEach(userControls(), function(control) {
         // Hackily set dirty flag on all user controls to
         // enable error styling even on previously un-touched
         // inputs.
@@ -129,7 +131,7 @@ function(forms, payment, ngPayment, page, logging, requireModule) {
     };
 
     // Select the default option
-    angular.forEach(certificateOptions, function(option) {
+    forEach(certificateOptions, function(option) {
       if (option.isDefault) $scope.selectOption(option);
     });
   };

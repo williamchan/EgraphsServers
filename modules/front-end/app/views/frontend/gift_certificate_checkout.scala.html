@@ -28,10 +28,9 @@
       useSampleData: true
     },
 
-    paymentConfig: {
+    payment: {
       jsModule: "yes-maam-payment",
-      apiKey: "pk_qIGUDirehUxj2GTFwgeRBkOfHIWdX",
-      // errorCode: "incorrect_cvc"
+      apiKey: "pk_qIGUDirehUxj2GTFwgeRBkOfHIWdX"
     },
     
     months: @Html({ (1 to 12).map("\"%02d\"".format(_)).mkString("[", ",", "]") }),

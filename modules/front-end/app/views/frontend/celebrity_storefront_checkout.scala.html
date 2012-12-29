@@ -30,18 +30,18 @@
 @import views.html.frontend.tags
 
 @headJs = {
-  Egraphs.page = {
+  angular.extend(Egraphs.page, {
     checkout: {
       paymentApiKey: "@paymentPublicKey",
       buyerPostalCodeFieldName: "@form.billing.postalCode.name",
       totalAmount: @summary.total.getAmount
     },
 
-    paymentConfig: {
+    payment: {
       jsModule: "@paymentJsModule",
       apiKey: "@paymentPublicKey"
     }
-  }
+  });
 }
 
 @baseBody = {

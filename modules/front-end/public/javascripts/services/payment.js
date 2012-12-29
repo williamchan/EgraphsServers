@@ -1,9 +1,25 @@
-/* Module provides different payment service implementations for usage in production and testing
+/**
+ * Configurable payment service implementations for usage in production and testing.
+ * The module follows the interface described in the stripe documentation:
+ * https://stripe.com/docs/stripe.js.
+ *
+ * The serving page must configure this module by adding the following configurations to
+ * window.Egraphs.page:
+ *
+ *   angular.extend(Egraphs.page, {
+ *     payment: {
+ *       apiKey: "jq_98139813", // REQUIRED. Public API Key for payment partner (stripe).
+ *       jsModule: "stripe-payment" // Optional. "stripe-payment" (default), "yes-maam-payment".
+ *       errorCode: "incorrect_cvc" // Optional. If running "yes-maam-payment", calls to createToken
+ *                                  // will respond with this error as per the stripe.js
+ *                                  // documentation.
+ *     }
+ *   });
  */
-define(["page", "libs/stripe-v1"],
-function(page) {
+define(["page", "window", "libs/stripe-v1"],
+function(page, window) {
   var stripePayment = window.Stripe;
-  var paymentConfig = page.paymentConfig;
+  var config = page.payment;
   var apiKey;
   var moduleName;
   var configuredModule;
@@ -20,9 +36,9 @@ function(page) {
       // generate here; it'll always response "Yes ma'am".
       var error;
 
-      if (paymentConfig.errorCode) {
+      if (config.errorCode) {
         error = {
-          code: paymentConfig.errorCode
+          code: config.errorCode
         };
       }
 
@@ -52,9 +68,9 @@ function(page) {
   };
 
   // Allow the page to set payment implementation if it wants
-  if (paymentConfig) {
-    moduleName = paymentConfig.jsModule;
-    apiKey = paymentConfig.apiKey;
+  if (config) {
+    moduleName = config.jsModule;
+    apiKey = config.apiKey;
 
     if (moduleName === "stripe-payment") {
       configuredModule = stripePayment;
@@ -68,6 +84,6 @@ function(page) {
 
     return configuredModule;
   } else {
-    throw "No payment configuration provided by page. Egraphs.page.paymentConfig.jsModule and .apiKey are required";
+    throw "No payment configuration provided by page. Egraphs.page.payment.apiKey is required";
   }
 });
