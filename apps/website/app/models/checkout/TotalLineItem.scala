@@ -7,8 +7,8 @@ case class TotalLineItem (
   amount: Money
 ) extends LineItem[Money] {
 
-  override def subItems = Nil
-  override val itemType = TotalLineItemType
+  override def itemType = TotalLineItemType
+  override def withAmount(newAmount: Money) = this.copy(newAmount)
 
   override def toJson = {
     // TODO(SER-499): implement
@@ -19,7 +19,10 @@ case class TotalLineItem (
   override val id: Long = checkout.Unpersisted
   override def domainObject = amount
   override def transact(checkoutId: Long) = this
+  override def checkoutId = checkout.Unpersisted
   override def withCheckoutId(newCheckoutId: Long) = this
+  override def subItems = Nil
+
 }
 
 
@@ -30,6 +33,7 @@ object TotalLineItemType extends TotalLineItemType {
   override val nature = LineItemNature.Summary
   override val codeType = CodeType.Total
   override val toJson = ""
+
 
   /**
    * Sums the taxes, fees
@@ -43,10 +47,7 @@ object TotalLineItemType extends TotalLineItemType {
     pendingResolution: Seq[LineItemType[_]]
   ): Seq[TotalLineItem] = {
     def isNeededItem(item: LineItem[_]) = isNeededType(item.itemType)
-    def isNeededType(itemType: LineItemType[_]) =  {
-      import LineItemNature._
-      Seq(Summary, Discount, Tax, Fee).contains(itemType.nature)
-    }
+    def isNeededType(itemType: LineItemType[_]) = itemType.nature != LineItemNature.Summary
 
     pendingResolution.find(isNeededType) match {
       case None =>

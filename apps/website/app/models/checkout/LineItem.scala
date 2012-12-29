@@ -13,7 +13,12 @@ import models.enums.{LineItemNature, CodeType}
 
 trait LineItem[+TransactedT] extends Transactable[LineItem[TransactedT]] {
   def id: Long
+
   def amount: Money
+  def withAmount(newAmount: Money): LineItem[TransactedT]
+
+  def checkoutId: Long
+  def withCheckoutId(newCheckoutId: Long): LineItem[TransactedT]
 
   // def _typeEntity: LineItemTypeEntity
   // def _maybeType: Option[LineItemType[TransactedT]]
@@ -31,8 +36,6 @@ trait LineItem[+TransactedT] extends Transactable[LineItem[TransactedT]] {
     val seqOfFlatSubItemSeqs = for(subItem <- subItems) yield subItem.flatten
     IndexedSeq(this) ++ seqOfFlatSubItemSeqs.flatten
   }
-
-  def withCheckoutId(newCheckoutId: Long): LineItem[TransactedT]
 
   // Convenience LineItemType member accessors
   def codeType: CodeType = itemType.codeType
@@ -133,18 +136,18 @@ trait LineItemEntityLenses[T <: LineItem[_]] { this: T with HasLineItemEntity =>
 
 
 trait LineItemEntityGetters[T <: LineItem[_]] { this: T with LineItemEntityLenses[T] =>
-  lazy val checkoutId = checkoutIdField()
+  override lazy val checkoutId = checkoutIdField()
+  override lazy val amount = amountField()
   lazy val domainEntityId = domainEntityIdField()
   lazy val itemTypeId = itemTypeIdField()
-  override lazy val amount = amountField()
 }
 
 
 trait LineItemEntitySetters[T <: LineItem[_]] { this: T with LineItemEntityLenses[T] =>
   override def withCheckoutId(newId: Long) = checkoutIdField.set(newId)
+  override def withAmount(newAmount: Money) = amountField.set(newAmount)
   lazy val withDomainEntityId = domainEntityIdField.set _
   lazy val withItemTypeId = itemTypeIdField.set _
-  lazy val withAmount = amountField.set _
 }
 
 trait LineItemEntityGettersAndSetters[T <: LineItem[_]]

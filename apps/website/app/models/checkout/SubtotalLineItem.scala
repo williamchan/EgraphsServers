@@ -7,7 +7,8 @@ case class SubtotalLineItem (
   amount: Money
 ) extends LineItem[Money] {
 
-  override def subItems = Nil
+  override def withAmount(newAmount: Money) = this.copy(newAmount)
+
   override val itemType = SubtotalLineItemType
 
   override def toJson = {
@@ -20,7 +21,9 @@ case class SubtotalLineItem (
   override val id: Long = checkout.Unpersisted
   override def domainObject = amount
   override def transact(checkoutId: Long) = this
+  override def checkoutId = checkout.Unpersisted
   override def withCheckoutId(newCheckoutId: Long) = this
+  override def subItems = Nil
 }
 
 abstract class SubtotalLineItemType extends LineItemType[Money]

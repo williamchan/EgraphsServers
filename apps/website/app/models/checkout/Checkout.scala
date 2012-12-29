@@ -25,25 +25,83 @@ package object checkout {
 
 import checkout._
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-* Want to reuse as much existing code as possible, but:
-*  -Entity operations
-*  -Persistence
-*  -Updated/created
-*
-* Follow existing patterns:
-*  -Stores
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-sealed trait Checkout {
-  // entity for persistence
-  def _entity: CheckoutEntity
+case class CheckoutEntity(
+  id: Long = 0,
+  customerId: Long = 0,
+  created: Timestamp = Time.defaultTimestamp,
+  updated: Timestamp = Time.defaultTimestamp
+) extends KeyedCaseClass[Long] with HasCreatedUpdated {
+  override def unapplied = CheckoutEntity.unapply(this)
+}
+
+case class CheckoutServices @Inject() (checkoutStore: CheckoutStore)
+
+
+
+
+case class Checkout (
+  _entity: CheckoutEntity,
+  _typesOrItems: Either[LineItemTypes, LineItems],
+  services: CheckoutServices = AppConfig.instance[CheckoutServices]
+) {
 
   // uses LineItems and LineItemTypes
-  def lineItems: LineItems
-  def lineItemTypes: LineItemTypes
+  def lineItems: LineItems =  _typesOrItems match {
+    case Right(items: LineItems) => items
+    case Left(types: LineItemTypes) => {
+      // TODO(SER-499): clean this bessy up
+      case class ResolutionPass(items: LineItems, unresolved: LineItemTypes) {
+        def isComplete: Boolean = unresolved.isEmpty
+      }
 
-  // uses services, but subclasses should only access certain methods
-  def services: CheckoutServices
+      def executePass(passToResolve: ResolutionPass): LineItems = {
+        if (passToResolve.isComplete) {
+          passToResolve.items
+        } else {
+          val resolvedPass = passToResolve.unresolved.foldLeft(passToResolve) { (oldPass, nextItemType) =>
+            val itemTypesSansCurrent = oldPass.unresolved.filter(_ != nextItemType)
+
+            nextItemType.lineItems(oldPass.items, itemTypesSansCurrent) match {
+              case Nil => oldPass
+              case newLineItems: LineItems => oldPass.copy(newLineItems, itemTypesSansCurrent)
+            }
+          }
+
+          // TODO(SER-499): are assertions disabled in prod?
+          // Check to make sure we're not in a circular dependency loop
+          assert(
+            resolvedPass.unresolved.length != passToResolve.unresolved.length,
+            "Attempt to resolve LineItemTypes to LineItems failed to resolve even one: " +
+              passToResolve.items +
+              "\n\n" +
+              passToResolve.unresolved
+          )
+
+          executePass(resolvedPass)
+        }
+      }
+
+      val initialPass = ResolutionPass(IndexedSeq(), lineItemTypes)
+      executePass(initialPass)
+    }
+  }
+
+  def lineItemTypes: LineItemTypes = _typesOrItems match {
+    case Left(types: LineItemTypes) => types
+    case Right(items: LineItems) => items.map(_.itemType)
+  }
+
+
+  /**
+   * Persists this checkout, its types, and its items
+   * @return PersistedCheckout of the transacted checkout
+   */
+  def transact(): Checkout = {
+    // TODO(SER-499): not happy with this
+    // save _entity, lineItemTypes, and lineItems
+    services.checkoutStore.create(this)
+  }
+
 
   // utility members
   def id = _entity.id
@@ -62,119 +120,24 @@ sealed trait Checkout {
   }
 }
 
-case class CheckoutEntity(
-  id: Long = 0,
-  customerId: Long = 0,
-  created: Timestamp,
-  updated: Timestamp
-) extends KeyedCaseClass[Long] with HasCreatedUpdated {
-  override def unapplied = CheckoutEntity.unapply(this)
-}
+object Checkout {
+  import checkout._
 
+  // Create
+  def apply(types: LineItemTypes, zipcode: String) = {
+    val maybeZipcode = if (zipcode.isEmpty) None else Some(zipcode)
+    val typesWithTaxes = types ++ taxesAndSummariesByZip(maybeZipcode)
 
-case class CheckoutServices @Inject() (
-  checkoutStore: CheckoutStore
-)
-
-
-//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-* Created:
-*  -can save, not update
-*  -takes types, generates items
-*  -needs zipcode to be created for tax purposes
-*
-* Restored:
-*  -cannot save or update itself
-*  -takes items, extracts types
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-/** For creating */
-case class UnpersistedCheckout (
-  _entity: CheckoutEntity,
-  _lineItemTypes: LineItemTypes,
-  maybeZipcode: Option[String],
-  services: CheckoutServices
-) extends Checkout {
-
-  //
-  // Checkout Members
-  //
-  /**
-   * Appends taxes, fees, and summaries to _lineItemTypes
-   * @return
-   */
-  override def lineItemTypes: LineItemTypes = {
-    _lineItemTypes ++ taxesAndSummariesByZip(maybeZipcode)
+    new Checkout(CheckoutEntity(), Left(typesWithTaxes))
   }
 
-  /**
-   * Generate lineItems from lineItemTypes
-   * @return
-   */
-  override lazy val lineItems: LineItems = {
-    case class ResolutionPass(items: LineItems, unresolved: LineItemTypes) {
-      def isComplete: Boolean = unresolved.isEmpty
-    }
-
-    def executePass(passToResolve: ResolutionPass): LineItems = {
-      if (passToResolve.isComplete) {
-        passToResolve.items
-      } else {
-        val resolvedPass = passToResolve.unresolved.foldLeft(passToResolve) { (oldPass, nextItemType) =>
-          val itemTypesSansCurrent = oldPass.unresolved.filter(_ != nextItemType)
-
-          nextItemType.lineItems(oldPass.items, itemTypesSansCurrent) match {
-            case Nil => oldPass
-            case newLineItems: LineItems => oldPass.copy(newLineItems, itemTypesSansCurrent)
-
-          }
-        }
-
-        // Check to make sure we're not in a circular dependency loop
-        assert(
-          resolvedPass.unresolved.length != passToResolve.unresolved.length,
-          "Attempt to resolve LineItemTypes to LineItems failed to resolve even one: " +
-            passToResolve.items +
-            "\n\n" +
-            passToResolve.unresolved
-        )
-
-        executePass(resolvedPass)
-      }
-    }
-
-    val initialPass = ResolutionPass(IndexedSeq(), lineItemTypes)
-
-    executePass(initialPass)
-  }
-
-  //
-  // UnpersistedCheckout methods
-  //
-  /**
-   * Adds extra types to this checkout
-   * @param additionalTypes
-   * @return new UnpersistedCheckout with additional lineItemTypes
-   */
-  def add(additionalTypes: LineItemTypes): UnpersistedCheckout = {
-    this.copy(_lineItemTypes = _lineItemTypes ++ additionalTypes)
-  }
-
-  /**
-   * Persists this checkout, its types, and its items
-   * @return PersistedCheckout of the transacted checkout
-   */
-  def transact(): PersistedCheckout = {
-    // save _entity, lineItemTypes, and lineItems
-    services.checkoutStore.create(this)
+  // Restore
+  def apply(entity: CheckoutEntity, items: LineItems) = {
+    assert(!items.exists(item => item.checkoutId != entity.id))
+    new Checkout(entity, Right(itemsWithSummaries(items)))
   }
 
 
-  //
-  // Helper methods
-  //
   /**
    * Helper for generating taxes and summaries.
    * TODO: add fees, such as shipping, later.
@@ -187,34 +150,20 @@ case class UnpersistedCheckout (
       TaxLineItemType.getTaxesByZip(maybeZipcode.getOrElse(TaxLineItemType.noZipcode)) ++
       Seq(TotalLineItemType)
   }
-}
 
+  protected def itemsWithSummaries(items: LineItems): LineItems = {
+    val nonSummaries = items.filter (item => item.nature != LineItemNature.Summary )
 
-/** After creating/for updating */
-case class PersistedCheckout (
-  _entity: CheckoutEntity,
-  lineItems: LineItems,
-  services: CheckoutServices = AppConfig.instance[CheckoutServices]
-) extends Checkout {
+    val subtotal = items.find( item => item.codeType == CodeType.Subtotal )
+      .getOrElse(SubtotalLineItemType.lineItems(nonSummaries, Seq()).head)
 
-  //
-  // Checkout members
-  //
-  override def lineItemTypes: LineItemTypes = {
-    // extract lineItemTypes from lineItems
-    lineItems.map(item => item.itemType)
-  }
+    val total = items.find( item => item.codeType == CodeType.Total )
+      .getOrElse(TotalLineItemType.lineItems(nonSummaries, Seq()).head)
 
-  //
-  // PersistedCheckout methods
-  //
-  def update(): PersistedCheckout = {
-    // add new items, summaries, charges, etc to lineitems
-
-    // update checkout entity's updated field
-    services.checkoutStore.update(this)
+    subtotal +: (total +: nonSummaries)
   }
 }
+
 
 
 //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
@@ -239,31 +188,31 @@ class CheckoutStore @Inject() (
 
   // only Unpersisted can save itself (create a checkout)
   // TODO(SER-499): re-evaluate this, see about moving saving into checkout
-  def create(checkout: UnpersistedCheckout): PersistedCheckout = {
+  def create(checkout: Checkout): Checkout = {
     val savedEntity = insert(checkout._entity)
     val savedItems  =
       for (item <- checkout.lineItems) yield {
         item.withCheckoutId(savedEntity.id).transact(checkout.id)
       }
 
-    new PersistedCheckout( savedEntity, savedItems )
+    Checkout( savedEntity, savedItems )
   }
 
   // only updates updated column of checkout
-  def update(checkout: PersistedCheckout): PersistedCheckout = {
+  def update(checkout: Checkout): Checkout = {
     checkout.copy(
       _entity = update(checkout._entity)
     )
   }
 
   // helper queries
-  def findById(id: Long): Option[PersistedCheckout] = {
+  def findById(id: Long): Option[Checkout] = {
     // val entity = //table.where()
     // val lineItems = lineItemStore.getItemsByCheckoutId(id)
     None
   }
 
-  def getCheckoutsByCustomerId(id: Long): Seq[PersistedCheckout] = {
+  def getCheckoutsByCustomerId(id: Long): Seq[Checkout] = {
     Nil
   }
 }
