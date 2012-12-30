@@ -13,7 +13,6 @@ case class LineItemEntity(
   _checkoutId: Long = 0,
   _itemTypeId: Long = 0,
   _amountInCurrency: BigDecimal = BigDecimal(0),
-  _domainEntityId: Long = 0,
   notes: String = "",
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp

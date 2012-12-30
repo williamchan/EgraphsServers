@@ -48,10 +48,18 @@ trait LineItem[+TransactedT] extends Transactable[LineItem[TransactedT]] {
  * @param schema
  */
 class LineItemStore @Inject() (schema: Schema) {
+  import org.squeryl.PrimitiveTypeMode._
+
   protected def table = schema.lineItems
 
   // TODO(SER-499): helper queries
   // use CodeType of LineItemType to create LineItem's of the correct type
+
+  def findEntityById(id: Long): Option[LineItemEntity] = {
+    from(table)( entity =>
+      where(entity.id === id) select(entity)
+    ).headOption
+  }
 }
 
 
@@ -111,10 +119,6 @@ trait LineItemEntityLenses[T <: LineItem[_]] { this: T with HasLineItemEntity =>
     get = _._checkoutId)(
     set = id => entity().copy(_checkoutId=id)
   )
-  private[checkout] lazy val domainEntityIdField = entityField(
-    get = _._domainEntityId)(
-    set = entityId => entity().copy(_domainEntityId = entityId)
-  )
   private[checkout] lazy val itemTypeIdField = entityField(
     get = _._itemTypeId)(
     set = id => entity().copy(_itemTypeId=id)
@@ -138,7 +142,6 @@ trait LineItemEntityLenses[T <: LineItem[_]] { this: T with HasLineItemEntity =>
 trait LineItemEntityGetters[T <: LineItem[_]] { this: T with LineItemEntityLenses[T] =>
   override lazy val checkoutId = checkoutIdField()
   override lazy val amount = amountField()
-  lazy val domainEntityId = domainEntityIdField()
   lazy val itemTypeId = itemTypeIdField()
 }
 
@@ -146,7 +149,6 @@ trait LineItemEntityGetters[T <: LineItem[_]] { this: T with LineItemEntityLense
 trait LineItemEntitySetters[T <: LineItem[_]] { this: T with LineItemEntityLenses[T] =>
   override def withCheckoutId(newId: Long) = checkoutIdField.set(newId)
   override def withAmount(newAmount: Money) = amountField.set(newAmount)
-  lazy val withDomainEntityId = domainEntityIdField.set _
   lazy val withItemTypeId = itemTypeIdField.set _
 }
 

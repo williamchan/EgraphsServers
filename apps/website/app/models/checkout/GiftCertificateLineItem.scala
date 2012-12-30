@@ -1,6 +1,6 @@
 package models.checkout
 
-import models.{CouponStore, Coupon}
+import models.{GiftCertificateStore, GiftCertificate}
 import models.enums.{CodeType, LineItemNature, CouponType, CouponDiscountType, CouponUsageType}
 import org.joda.money.{CurrencyUnit, Money}
 import services.AppConfig
@@ -18,17 +18,15 @@ import com.google.inject.Inject
 case class GiftCertificateLineItem (
   _entity: LineItemEntity,
   _typeEntity: LineItemTypeEntity,
-  _maybeCoupon: Option[Coupon] = None,
+  _maybeGiftCertificate: Option[GiftCertificate] = None,
   services: GiftCertificateLineItemServices = AppConfig.instance[GiftCertificateLineItemServices]
-) extends LineItem[Coupon] with HasLineItemEntity
+) extends LineItem[GiftCertificate] with HasLineItemEntity
   with LineItemEntityGettersAndSetters[GiftCertificateLineItem]
   with CanInsertAndUpdateAsThroughServices[GiftCertificateLineItem, LineItemEntity]
 {
-  require(_maybeCoupon.isDefined || _entity._domainEntityId > 0)
+//  require(_maybeGiftCertificate.isDefined || _entity._domainEntityId > 0)
 
-  override def itemType: GiftCertificateLineItemType = {
-    GiftCertificateLineItemType(_typeEntity, _entity)
-  }
+  override def itemType = GiftCertificateLineItemType(this)
 
   override def subItems: Seq[LineItem[_]] = Nil
 
@@ -38,10 +36,10 @@ case class GiftCertificateLineItem (
   }
 
 
-  override def domainObject: Coupon = {
-    _maybeCoupon.getOrElse {
-      services.couponStore.findByLineItemTypeId(itemType.id).headOption.getOrElse {
-        throw new IllegalArgumentException("No associated Coupon exists for this Gift Certificate.")
+  override def domainObject: GiftCertificate = {
+    _maybeGiftCertificate.getOrElse {
+      services.giftCertificateStore.findByLineItemId(id).headOption.getOrElse {
+        throw new IllegalArgumentException("No associated GiftCertificate exists for this Gift Certificate.")
       }
     }
   }
@@ -55,14 +53,14 @@ case class GiftCertificateLineItem (
     if (id <= 0) {
       /**
        * Save itemType first because it depends neither on a line item or domain object.
-       * Then, save coupon, which only depends on itemType.
-       * Finally, save the line item with the saved coupon and type.
+       * Then, save giftCertificate, which only depends on itemType.
+       * Finally, save the line item with the saved giftCertificate and type.
        */
       val savedType = itemType.insert()
-      val savedCoupon = domainObject.copy(lineItemTypeId = savedType.id).save()
+      val savedGiftCertificate = domainObject.itemId.set(savedType.id).save()
       this.withCheckoutId(newCheckoutId)
         .withItemType(savedType)
-        .withCoupon(savedCoupon)
+        .withGiftCertificate(savedGiftCertificate)
         .insert()
 
     } else {
@@ -70,9 +68,11 @@ case class GiftCertificateLineItem (
     }
   }
 
-  def withCoupon(coupon: Coupon) = {
-    this.withDomainEntityId(coupon.id).copy(_maybeCoupon = Some(coupon))
+  def withGiftCertificate(giftCertificate: GiftCertificate) = {
+    // TODO(SER-499): copy lineitemid into giftCertificate (which will be a gift certificate soon...) ...
+    this.copy(_maybeGiftCertificate = Some(giftCertificate))
   }
+
 
   def withItemType(newType: GiftCertificateLineItemType) = {
     this.withItemTypeId(newType.id).copy(_typeEntity = newType._entity)
@@ -87,14 +87,14 @@ case class GiftCertificateLineItem (
 
 object GiftCertificateLineItem {
   // Creating
-  def apply(itemType: GiftCertificateLineItemType, coupon: Coupon) = {
+  def apply(itemType: GiftCertificateLineItemType, giftCertificate: GiftCertificate) = {
     new GiftCertificateLineItem(
       _entity = new LineItemEntity(
           _itemTypeId = itemType.id,
           _amountInCurrency = itemType.amount.getAmount
         ),
       _typeEntity = itemType._entity,
-      _maybeCoupon = Some(coupon)
+      _maybeGiftCertificate = Some(giftCertificate)
     )
   }
 
@@ -113,7 +113,7 @@ object GiftCertificateLineItem {
 case class GiftCertificateLineItemServices @Inject() (
   schema: Schema,
   lineItemStore: LineItemStore,
-  couponStore: CouponStore
+  giftCertificateStore: GiftCertificateStore
 ) extends SavesAsLineItemEntity[GiftCertificateLineItem] {
   // SaveAsLineItemEntity members
   override protected def modelWithNewEntity(certificate: GiftCertificateLineItem, entity: LineItemEntity) = {

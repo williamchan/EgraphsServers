@@ -1,6 +1,6 @@
 package models.checkout
 
-import models.Coupon
+import models.GiftCertificate
 import models.enums.{CodeType, LineItemNature, CouponType, CouponDiscountType, CouponUsageType}
 import org.joda.money.{CurrencyUnit, Money}
 import services.AppConfig
@@ -16,7 +16,7 @@ case class GiftCertificateLineItemType (
   recipient: String,
   amount: Money,
   services: GiftCertificateLineItemTypeServices = AppConfig.instance[GiftCertificateLineItemTypeServices]
-) extends LineItemType[Coupon] with HasLineItemTypeEntity
+) extends LineItemType[GiftCertificate] with HasLineItemTypeEntity
   with LineItemTypeEntityGettersAndSetters[GiftCertificateLineItemType]
   with CanInsertAndUpdateAsThroughServices[GiftCertificateLineItemType, LineItemTypeEntity]
 {
@@ -27,11 +27,9 @@ case class GiftCertificateLineItemType (
   }
 
   override def lineItems(resolvedItems: Seq[LineItem[_]], pendingResolution: Seq[LineItemType[_]]) = {
-    val coupon = new Coupon(name = couponName, discountAmount = amount.getAmount)
-      .withDiscountType(CouponDiscountType.Flat)
-      .withCouponType(CouponType.GiftCertificate)
-      .withUsageType(CouponUsageType.Prepaid)
-    Seq(GiftCertificateLineItem(this, coupon))
+    val giftCertificate = GiftCertificate(recipient, amount)
+
+    Seq(GiftCertificateLineItem(this, giftCertificate))
   }
 
   override def id = _entity.id
@@ -40,50 +38,40 @@ case class GiftCertificateLineItemType (
     get = cert => cert._entity,
     set = (cert, entity) => cert.copy(entity)
   )
-
-  // get recipient from JSON in entity description
-  private val couponNameFormatString = "A gift certificate for %s"
-  private def couponName: String = couponNameFormatString.format(recipient)
 }
 
 
 object GiftCertificateLineItemType {
-  val nature = LineItemNature.Discount
+  /**
+   * GiftCertificateLineItemType is for purchasing gift certificates. Using a gift certificate
+   * is actually just using the coupon produced by the gift certificate line item. Hence, this
+   * has a "Product" nature, rather than a discount nature.
+   */
+  val nature = LineItemNature.Product
   val codeType = CodeType.GiftCertificate
-  val jsonAmountKey = "Amount"
-  val jsonRecipientKey = "Recipient"
 
   // Create new LineItemType
   def apply(recipient: String, amountToBuy: Money): GiftCertificateLineItemType = {
-    val entityDesc = entityDescriptionAsJsonString(amountToBuy, recipient)
+    val entityDesc = entityDescription(recipient, amountToBuy)
     val entity = LineItemTypeEntity(entityDesc, nature, codeType)
     new GiftCertificateLineItemType(entity, recipient, amountToBuy)
   }
 
   // Restore a LineItemType
-  def apply(entity: LineItemTypeEntity, itemEntity: LineItemEntity) = {
+  def apply(lineItem: GiftCertificateLineItem) = {
     new GiftCertificateLineItemType(
-      _entity = entity,
-      recipient = recipientOptionFromEntity(entity)
-        .getOrElse(throw new IllegalArgumentException("Could not parse recipient from entity.")),
-      amount = Money.of(CurrencyUnit.USD, itemEntity._amountInCurrency.bigDecimal)
+      _entity = lineItem._typeEntity,
+      recipient = lineItem.domainObject.recipient,
+      amount = lineItem.amount
     )
   }
 
-//  def amountOptionFromEntity(entity: LineItemTypeEntity): Option[BigDecimal] = {
-//    (Json.parse(entity._desc) \ jsonAmountKey).asOpt[Double].map(BigDecimal(_))
-//  }
-  def recipientOptionFromEntity(entity: LineItemTypeEntity): Option[String] = {
-    (Json.parse(entity._desc) \ jsonRecipientKey).asOpt[String]
-  }
-
-  private def entityDescriptionAsJsonString(amount: Money, recipient: String) = {
-    val jsonDescriptionObject = Json.toJson( Map(
-      // NOTE(SER-499): may need to wrap toJson in Seq
-//      jsonAmountKey -> Json.toJson(amount.getAmount.doubleValue),
-      jsonRecipientKey -> Json.toJson(recipient)
-    ))
-    Json.stringify(jsonDescriptionObject)
+  private val entityDescBase = ""
+  private def entityDescription(recipient: String, amount: Money) = {
+    "Gift certificate for " ++ amount.toString ++ {
+      if(recipient.isEmpty) ""
+      else (" to " ++ recipient)
+    }
   }
 }
 
@@ -99,6 +87,7 @@ case class GiftCertificateLineItemTypeServices @Inject() (schema: Schema)
 {
 
   // TODO(SER-499): query helpers
+
 
   //
   // SavesAsLineItemTypeEntity members

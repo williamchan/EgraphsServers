@@ -25,6 +25,9 @@ package object checkout {
 
 import checkout._
 
+
+
+
 case class CheckoutEntity(
   id: Long = 0,
   customerId: Long = 0,
@@ -34,7 +37,16 @@ case class CheckoutEntity(
   override def unapplied = CheckoutEntity.unapply(this)
 }
 
-case class CheckoutServices @Inject() (checkoutStore: CheckoutStore)
+
+
+case class CheckoutServices @Inject() (schema: Schema, checkoutStore: CheckoutStore)
+  extends InsertsAndUpdatesAsEntity[Checkout, CheckoutEntity] {
+  override def table = schema.checkouts
+
+  override def modelWithNewEntity(checkout: Checkout, entity: CheckoutEntity) = {
+    checkout.copy(entity)
+  }
+}
 
 
 
@@ -43,7 +55,9 @@ case class Checkout (
   _entity: CheckoutEntity,
   _typesOrItems: Either[LineItemTypes, LineItems],
   services: CheckoutServices = AppConfig.instance[CheckoutServices]
-) {
+) extends HasEntity[CheckoutEntity]
+  with CanInsertAndUpdateAsThroughServices[Checkout, CheckoutEntity]
+{
 
   // uses LineItems and LineItemTypes
   def lineItems: LineItems =  _typesOrItems match {

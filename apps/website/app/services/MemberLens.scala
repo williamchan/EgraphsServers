@@ -10,6 +10,11 @@ class MemberLens[A, B](private val self: A, private val lens: Lens[A, B]) {
 }
 
 object MemberLens {
+
+  def apply[A, B](self: A)(getter: A => B, setter: (A,B) => A) = new MemberLens[A,B](self,
+    new Lens[A,B]( getter, setter )
+  )
+
   object Conversions {
     implicit def lensToMemberLensConversion[A, B](lens: Lens[A, B]): MemberLensConversion[A, B] = {
       new MemberLensConversion(lens)

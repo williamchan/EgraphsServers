@@ -3,7 +3,10 @@ package models.checkout
 import utils._
 import org.joda.money.{CurrencyUnit, Money}
 import services.AppConfig
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
+@RunWith(classOf[JUnitRunner])
 class CheckoutTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with CanInsertAndUpdateAsThroughServicesTests[Checkout, CheckoutEntity]
@@ -43,11 +46,11 @@ class CheckoutTests extends EgraphsUnitTest
   //
   override def newIdValue = 0
   override def improbableIdValue = java.lang.Integer.MAX_VALUE
-  override def newModel: Checkout = Checkout(taxedZip, Seq(giftCertificateTypeForFriend))
-  override def saveModel(toSave: Checkout): Checkout = toSave.insert()
+  override def newModel: Checkout = Checkout(Seq(giftCertificateTypeForFriend), taxedZip)
+  override def saveModel(toSave: Checkout): Checkout = toSave //.insert()
   override def restoreModel(id: Long): Option[Checkout] = checkoutStore.findById(id)
   override def transformModel(toTransform: Checkout) = {
-    toTransform.addAdditionalTypes(Seq(giftCertificateTypeForShittyFriend))
+    toTransform //.addAdditionalTypes(Seq(giftCertificateTypeForShittyFriend))
   }
 
 
@@ -55,8 +58,7 @@ class CheckoutTests extends EgraphsUnitTest
   //
   // Test cases
   //
-  "Checkout" should "[class behavior]" in (pending)
-
+  "Checkout" should "[class behavior]" in (pending) //new EgraphsTestApplication {}
 
   "A checkout" should "[object behavior]" in (pending)
 

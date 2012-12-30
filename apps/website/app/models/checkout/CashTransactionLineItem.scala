@@ -63,7 +63,8 @@ object CashTransactionLineItem {
 
   def apply(entity: LineItemEntity, typeEntity: LineItemTypeEntity) = {
     val makeCashTransaction = { (services: CashTransactionLineItemServices) =>
-      services.cashTransactionStore.findById(entity._domainEntityId)
+      // TODO(SER-499): join cashtransaction with line item, select blah blah blah
+      None
     }
     new CashTransactionLineItem( entity, typeEntity, makeCashTransaction )
   }
