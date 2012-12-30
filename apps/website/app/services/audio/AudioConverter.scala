@@ -3,6 +3,8 @@ package services.audio
 import services.{SampleRateConverter, Utils, TempFile}
 import com.xuggle.mediatool.ToolFactory
 import services.blobs.Blobs
+import java.io.File
+import javax.sound.sampled.{AudioSystem, AudioFormat}
 
 object AudioConverter {
 
@@ -33,9 +35,27 @@ object AudioConverter {
     audioAsMp3
   }
 
+  def convertToAAC(sourceAudio: Array[Byte], tempFilesId: String): Array[Byte] = {
+    // save sourceAudio to temp file
+    val sourceTempFile = TempFile.named(tempFilesId + "/audio.mp3")
+    val targetTempFile = TempFile.named(tempFilesId + "/audio.aac")
+    Utils.saveToFile(sourceAudio, sourceTempFile)
+
+    convertToMp3(sourceTempFile.getPath, targetTempFile.getPath)
+    val audioAsAAC = Blobs.Conversions.fileToByteArray(targetTempFile)
+
+    sourceTempFile.delete()
+    targetTempFile.delete()
+    audioAsAAC
+  }
+
+  def getDurationOfWav(file: File): Int = {
+    val format: AudioFormat = AudioSystem.getAudioInputStream(/*also accepts inputStream*/ file).getFormat
+    (file.length / format.getSampleRate / format.getFrameSize / format.getChannels + 1).toInt
+  }
+
   /**
-   * Code taken from http://wiki.xuggle.com/MediaTool_Introduction. We should explore ways to convert to mp3 without
-   * the use of files, which are required by ToolFactory.makeReader and ToolFactory.makeWriter.
+   * Code taken from http://wiki.xuggle.com/MediaTool_Introduction.
    *
    * @param sourceTempFileLoc file location that contains the source audio
    * @param targetTempFileLoc target file location to store the converted mp3 data
