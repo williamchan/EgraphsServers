@@ -5,6 +5,7 @@ import models.{BlobKey, BlobKeyStore}
 import services.logging.Logging
 import services._
 import org.jclouds.blobstore.domain.Blob
+import org.apache.commons.lang.NotImplementedException
 
 /**
  * BlobVendor implementation that caches key urls in the database to avoid expensive
@@ -34,6 +35,10 @@ class DBIndexedBlobVendor @Inject()(
       case None => BlobKey(key = key, url = url).save()
       case Some(blobKey) => blobKey.copy(url = url).save()
     }
+  }
+
+  override def delete(namespace: String, key: String) {
+	throw new NotImplementedException("This feature has not be implemented")
   }
 
   override def exists(namespace: String, key: String) = {

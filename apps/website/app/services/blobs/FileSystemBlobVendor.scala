@@ -45,7 +45,13 @@ private[blobs] class FileSystemBlobVendor @Inject() (consumerApp: ConsumerApplic
       blobStore.blobBuilder(key).payload(bytes).build()
     )
   }
-  
+
+  override def delete(namespace: String, key: String) {
+    val blobStore = context.getBlobStore
+    
+    blobStore.removeBlob(namespace, key)
+  }
+
   override def checkConfiguration() {
     // No configuration necessary to use the file system as a blob store
   }

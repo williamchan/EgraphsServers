@@ -34,6 +34,10 @@ private[blobs] trait BlobVendorComposition extends BlobVendor {
     blobVendorDelegate.context
   }
 
+  def delete(namespace: String, key: String) {
+    blobVendorDelegate.delete(namespace, key)
+  }
+
   def put(namespace: String, key: String, data: Array[Byte], access: AccessPolicy) {
     blobVendorDelegate.put(namespace, key, data, access)
   }

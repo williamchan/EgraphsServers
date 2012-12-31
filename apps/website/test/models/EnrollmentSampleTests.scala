@@ -18,6 +18,7 @@ class EnrollmentSampleTests extends EgraphsUnitTest
   //
 
   private def store = AppConfig.instance[EnrollmentSampleStore]
+  private def blobs = AppConfig.instance[Blobs]
 
   def newEntity = {
     val celebrity = TestData.newSavedCelebrity()
@@ -52,6 +53,8 @@ class EnrollmentSampleTests extends EgraphsUnitTest
   
   "getSignatureJson and getWav" should "handle edge cases gracefully" in new EgraphsTestApplication {
     val saved = newEntity.save()
+    clearOldBlobData(saved)
+
     saved.getSignatureJson should be("")
     saved.getWav should be (new Array[Byte](0))
   }
@@ -60,7 +63,17 @@ class EnrollmentSampleTests extends EgraphsUnitTest
     val xyzmoSignatureDataContainer = TestHelpers.getStringFromFile(resourceFile("xyzmo_signature1.xml"))
 
     val saved = newEntity.save()
+    clearOldBlobData(saved)
+    
     saved.putSignatureXml(xyzmoSignatureDataContainer = xyzmoSignatureDataContainer)
     saved.services.blobs.get(EnrollmentSample.getSignatureXmlUrl(saved.id)).get.asString should be (xyzmoSignatureDataContainer)
+  }
+
+  /**
+   * Just delete the old blob data before using sample in a test since it may have data from a previous run that wasn't cleared.
+   */
+  def clearOldBlobData(sample: EnrollmentSample) {
+    blobs.delete(EnrollmentSample.getSignatureJsonUrl(sample.id))
+    blobs.delete(EnrollmentSample.getWavUrl(sample.id))
   }
 }
