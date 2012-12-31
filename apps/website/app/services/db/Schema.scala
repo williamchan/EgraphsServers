@@ -78,7 +78,6 @@ class Schema @Inject() (
   on(celebrities)(celebrity =>
     declare(
       celebrity.urlSlug is unique,
-      celebrity.isFeatured is indexed, //TODO: SER-580 - Remove after successful deployment. Evolution can be found in history.
       celebrity.bio is dbType("text")))
   
   val coupons = table[Coupon]
