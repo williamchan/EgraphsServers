@@ -50,6 +50,9 @@ case class GiftCertificateLineItem (
    * @return persisted line item
    */
   override def transact(newCheckoutId: Long): GiftCertificateLineItem = {
+    // DEBUG
+    println("In GiftCertificateLineItem.transact with checkoutId: " + newCheckoutId)
+
     if (id <= 0) {
       /**
        * Save itemType first because it depends neither on a line item or domain object.

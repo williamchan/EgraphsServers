@@ -9,7 +9,7 @@ import scalaz.Lens
 import models.{HasCreatedUpdated, SavesCreatedUpdated}
 import org.squeryl.annotations.Transient
 import com.google.inject.Inject
-import models.enums.{LineItemNature, CodeType}
+import models.enums.{CodeTypeFactory, LineItemNature, CodeType}
 
 trait LineItem[+TransactedT] extends Transactable[LineItem[TransactedT]] {
   def id: Long
@@ -45,7 +45,6 @@ trait LineItem[+TransactedT] extends Transactable[LineItem[TransactedT]] {
 
 /**
  * Provide helper queries for getting LineItem's; persistence is provided by LineItem implementations.
- * @param schema
  */
 class LineItemStore @Inject() (schema: Schema) {
   import org.squeryl.PrimitiveTypeMode._
@@ -54,6 +53,25 @@ class LineItemStore @Inject() (schema: Schema) {
 
   // TODO(SER-499): helper queries
   // use CodeType of LineItemType to create LineItem's of the correct type
+
+  def getItemsByCheckoutId(id: Long): Seq[LineItem[_]] = {
+    join( schema.lineItems, schema.lineItemTypes ) ( (li, lit) =>
+      select(li, lit) on (li._itemTypeId === lit.id and li._checkoutId === id)
+    ).toSeq.flatMap { entityTuple =>
+
+      val (itemEntity, itemTypeEntity) = entityTuple
+
+      CodeType(itemTypeEntity._codeType) match {
+        case Some(codeType: CodeTypeFactory[LineItemType[_], LineItem[_]]) =>
+          println("codeType: " + codeType.name)
+          Some(codeType.itemInstance(itemEntity, itemTypeEntity))
+
+        // TODO(SER-499): add logging
+        case Some(_) => None
+        case None => None
+      }
+    }
+  }
 
   def findEntityById(id: Long): Option[LineItemEntity] = {
     from(table)( entity =>
@@ -90,6 +108,7 @@ trait SavesAsLineItemEntity[ModelT <: HasLineItemEntity]
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 trait LineItemEntityLenses[T <: LineItem[_]] { this: T with HasLineItemEntity =>
+  import services.Finance.TypeConversions._
   import MemberLens.Conversions._
 
   /**
@@ -124,11 +143,9 @@ trait LineItemEntityLenses[T <: LineItem[_]] { this: T with HasLineItemEntity =>
     set = id => entity().copy(_itemTypeId=id)
   )
   private[checkout] lazy val amountField = entityField(
-    get = (entity: LineItemEntity) =>
-      Money.of(CurrencyUnit.USD, entity._amountInCurrency.bigDecimal))(
-    set = (amount: Money) => entity().copy(
-      _amountInCurrency = amount.withCurrencyUnit(CurrencyUnit.USD).getAmount)
-    )
+    get = _._amountInCurrency.toMoney())(
+    set = (amount: Money) => entity().copy(_amountInCurrency = amount.withCurrencyUnit(CurrencyUnit.USD).getAmount)
+  )
 
 
   private def entityField[PropT](get: LineItemEntity => PropT)(set: PropT => LineItemEntity)

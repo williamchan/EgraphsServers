@@ -14,15 +14,11 @@ trait CanInsertAndUpdateAsThroughServicesTests[
   private implicit def modelToIdDsl(model: ModelT) = IdDSL(model)
   private case class IdDSL(model: ModelT) { def id: Long = model._entity.id }
 
-  // TODO(SER-499): these might be a bit strict for the statefulness of purchase flow types, either adapt to test consistency in state or remove state from purchase flow types
-
   def newIdValue: Long
   def improbableIdValue: Long
   def newModel: ModelT
   def saveModel(toSave: ModelT): ModelT
   def restoreModel(id: Long): Option[ModelT]
-
-  // TODO(SER-499): which of these do we need?
   def transformModel(toTransform: ModelT): ModelT
 
 
@@ -33,7 +29,7 @@ trait CanInsertAndUpdateAsThroughServicesTests[
     newModel.id should be === (newIdValue)
   }
 
-  "A restore model instance" should "be equivalent to the originally saved on" in {
+  "A restore model instance" should "be equivalent to the originally saved model" in {
     val saved = saveModel(newModel)
     val maybeRestored = restoreModel(saved.id)
 
@@ -50,6 +46,7 @@ trait CanInsertAndUpdateAsThroughServicesTests[
     val updated = saveModel(transformModel(inserted))
     val updatedRestored = restoreModel(updated.id).get
 
+    updated.id should be (inserted.id)
     updated should not be (inserted)
     updatedRestored should be (updated)
     updatedRestored should not be (inserted)

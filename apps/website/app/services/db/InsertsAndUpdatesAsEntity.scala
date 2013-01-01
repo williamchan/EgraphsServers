@@ -10,7 +10,7 @@ trait HasEntity[T <: KeyedEntity[_]] { def _entity: T }
 trait InsertsAndUpdatesAsEntity[ModelT <: HasEntity[EntityT], EntityT <: KeyedEntity[_]]
   extends InsertsAndUpdates[EntityT]
 {
-  // NOTE(SER-499): this can be removed if HasEntity has "def withEntity: HasEntity[T]"
+  // NOTE(SER-499): this can be removed if HasEntity has "def withEntity: HasEntity[T]", might be cleaner
   protected def modelWithNewEntity(domainModel: ModelT, entity: EntityT): ModelT
 
   protected def table: Table[EntityT]

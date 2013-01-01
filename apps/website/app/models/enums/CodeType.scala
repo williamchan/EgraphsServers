@@ -7,6 +7,7 @@ import org.joda.money.{CurrencyUnit, Money}
 sealed abstract class CodeType(val name: String)
 
 trait CodeTypeFactory[TypeT <: LineItemType[_], ItemT <: LineItem[_]] {
+  this: CodeType =>
   // take both entities because they're both easily available when restoring
   // and both have important data
   def itemInstance(itemEntity: LineItemEntity, typeEntity: LineItemTypeEntity): ItemT

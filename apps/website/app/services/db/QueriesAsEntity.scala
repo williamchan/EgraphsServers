@@ -3,6 +3,15 @@ package services.db
 import org.squeryl.{Table, KeyedEntity}
 import org.squeryl.PrimitiveTypeMode._
 
+
+/**
+ * NOTE(SER-499): this is untestable, like the SavesAsEntity trait
+ *
+ *
+ * @tparam ModelT
+ * @tparam EntityT
+ * @tparam KeyT
+ */
 trait QueriesAsEntity[ModelT, EntityT <: KeyedEntity[KeyT], KeyT] {
   protected type Companion
 
