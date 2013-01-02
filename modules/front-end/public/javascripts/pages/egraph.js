@@ -3,15 +3,17 @@ define(["Egraphs", "libs/guiders"], function (Egraphs, guiders) {
 	return {
     go: function () {
       guiders.createGuider({
-        attachTo: ".sm2-360btn",
+        attachTo: "#360player",
         buttons: [{name: "Close", onclick: guiders.hideAll}],
         classString: "egraph-guider",
-        description: "Hello World!",
+        closeOnEscape: true,
+        description: "Click the play button to hear a special audio greeting!",
         id: "first",
         overlay: true,
-        position: 6,
-        title: "You can also advance guiders from custom event handlers.",
-        width: 450
+        position: 9,
+        title: "",
+        width: 150,
+        xButton: true
       }).show();
     }
   };
