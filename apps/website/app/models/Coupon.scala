@@ -14,22 +14,23 @@ import util.Random
 
 case class CouponServices @Inject()(store: CouponStore)
 
-case class Coupon(id: Long = 0,
-                  name: String = "",
-                  code: String = Coupon.generateCode,
-                  startDate: Timestamp = new Timestamp(new DateMidnight().getMillis),
-                  endDate: Timestamp = new Timestamp(new DateMidnight().plusYears(10).getMillis),
-                  discountAmount: BigDecimal = 5,
-                  _couponType: String = CouponType.Promotion.name,
-                  _discountType: String = CouponDiscountType.Flat.name,
-                  _usageType: String = CouponUsageType.OneUse.name,
-                  isActive: Boolean = true,
-                  restrictions: String = "{}", // SER-508
-                  lineItemTypeId: Long = 0,
-                  created: Timestamp = Time.defaultTimestamp,
-                  updated: Timestamp = Time.defaultTimestamp,
-                  services: CouponServices = AppConfig.instance[CouponServices])
-  extends KeyedCaseClass[Long]
+case class Coupon(
+  id: Long = 0,
+  name: String = "",
+  code: String = Coupon.generateCode,
+  startDate: Timestamp = new Timestamp(new DateMidnight().getMillis),
+  endDate: Timestamp = new Timestamp(new DateMidnight().plusYears(10).getMillis),
+  discountAmount: BigDecimal = 5,
+  _couponType: String = CouponType.Promotion.name,
+  _discountType: String = CouponDiscountType.Flat.name,
+  _usageType: String = CouponUsageType.OneUse.name,
+  isActive: Boolean = true,
+  restrictions: String = "{}", // SER-508
+  lineItemTypeId: Long = 0,
+  created: Timestamp = Time.defaultTimestamp,
+  updated: Timestamp = Time.defaultTimestamp,
+  services: CouponServices = AppConfig.instance[CouponServices]
+) extends KeyedCaseClass[Long]
   with HasCreatedUpdated 
   with HasCouponType[Coupon]
   with HasCouponDiscountType[Coupon]

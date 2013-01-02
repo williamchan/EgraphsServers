@@ -50,9 +50,6 @@ case class GiftCertificateLineItem (
    * @return persisted line item
    */
   override def transact(newCheckoutId: Long): GiftCertificateLineItem = {
-    // DEBUG
-    println("In GiftCertificateLineItem.transact with checkoutId: " + newCheckoutId)
-
     if (id <= 0) {
       /**
        * Save itemType first because it depends neither on a line item or domain object.
@@ -60,12 +57,12 @@ case class GiftCertificateLineItem (
        * Finally, save the line item with the saved giftCertificate and type.
        */
       val savedType = itemType.insert()
-      val savedGiftCertificate = domainObject.itemId.set(savedType.id).save()
-      this.withCheckoutId(newCheckoutId)
+      val savedItem = this.withCheckoutId(newCheckoutId)
         .withItemType(savedType)
-        .withGiftCertificate(savedGiftCertificate)
         .insert()
+      val savedGiftCertificate = domainObject.saveFromLineItem(savedItem)
 
+      savedItem.withGiftCertificate(savedGiftCertificate)
     } else {
       this
     }

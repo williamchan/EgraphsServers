@@ -4,13 +4,16 @@ import org.squeryl.{KeyedEntity, Table}
 
 
 
-trait HasEntity[T <: KeyedEntity[_]] { def _entity: T }
+trait HasEntity[T <: KeyedEntity[KeyT], KeyT] {
+  def _entity: T
+  def id: KeyT = _entity.id
+}
 
 
-trait InsertsAndUpdatesAsEntity[ModelT <: HasEntity[EntityT], EntityT <: KeyedEntity[_]]
+trait InsertsAndUpdatesAsEntity[ModelT <: HasEntity[EntityT, _], EntityT <: KeyedEntity[_]]
   extends InsertsAndUpdates[EntityT]
 {
-  // NOTE(SER-499): this can be removed if HasEntity has "def withEntity: HasEntity[T]", might be cleaner
+  // NOTE(SER-499): could be moved into HasEntity as "def withEntity: HasEntity[T, KeyT]" if cleaner
   protected def modelWithNewEntity(domainModel: ModelT, entity: EntityT): ModelT
 
   protected def table: Table[EntityT]

@@ -3,13 +3,14 @@ package models.checkout
 import utils._
 import org.joda.money.{CurrencyUnit, Money}
 import services.AppConfig
+import services.Finance.TypeConversions._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
-@RunWith(classOf[JUnitRunner])
+
 class CheckoutTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with CanInsertAndUpdateAsThroughServicesTests[Checkout, CheckoutEntity]
+  with CanInsertAndUpdateAsThroughServicesTests[Checkout, CheckoutEntity, Long]
   with DateShouldMatchers
   with DBTransactionPerTest
 {
@@ -17,10 +18,9 @@ class CheckoutTests extends EgraphsUnitTest
   //
   // Helpers
   //
-  implicit def numberToDollars(amount: Double) = new { def dollars = Money.of(CurrencyUnit.USD, amount) }
   def checkoutServices = AppConfig.instance[CheckoutServices]
-  def giftCertificateTypeForFriend = GiftCertificateLineItemType("My friend", 75 dollars)
-  def giftCertificateTypeForShittyFriend = GiftCertificateLineItemType("My shittier friend", 25 dollars)
+  def giftCertificateTypeForFriend = GiftCertificateLineItemType("My friend", BigDecimal(75).toMoney())
+  def giftCertificateTypeForShittyFriend = GiftCertificateLineItemType("My shittier friend", BigDecimal(25).toMoney())
 
   val taxedZip = "98111" // Washington
   val untaxedZip = "12345"  // not Washington

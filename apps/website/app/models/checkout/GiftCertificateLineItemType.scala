@@ -28,10 +28,6 @@ case class GiftCertificateLineItemType (
 
   override def lineItems(resolvedItems: Seq[LineItem[_]], pendingResolution: Seq[LineItemType[_]]) = {
     val giftCertificate = GiftCertificate(recipient, amount)
-
-    // DEBUG
-    println("GiftCertificateLineItemType.lineItems: " + giftCertificate)
-
     Seq(GiftCertificateLineItem(this, giftCertificate))
   }
 

@@ -54,9 +54,7 @@ trait LineItemType[+TransactedT] {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-trait HasLineItemTypeEntity extends HasEntity[LineItemTypeEntity] { this: LineItemType[_] =>
-  def id = _entity.id
-}
+trait HasLineItemTypeEntity extends HasEntity[LineItemTypeEntity, Long] { this: LineItemType[_] => }
 
 trait SavesAsLineItemTypeEntity[ModelT <: HasLineItemTypeEntity]
   extends InsertsAndUpdatesAsEntity[ModelT, LineItemTypeEntity]

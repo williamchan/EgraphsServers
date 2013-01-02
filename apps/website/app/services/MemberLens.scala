@@ -11,11 +11,17 @@ class MemberLens[A, B](private val self: A, private val lens: Lens[A, B]) {
 
 object MemberLens {
 
-  def apply[A, B](self: A)(getter: A => B, setter: (A,B) => A) = new MemberLens[A,B](self,
-    new Lens[A,B]( getter, setter )
-  )
+  /** For building member lenses with less boiler plate by including self in get/set closures */
+  def apply[A, B](self: A)(getter: => B, setter: (B) => A) = {
+    new MemberLens[A,B](self,
+      new Lens[A,B]( a => getter, (a,b) => setter(b) )
+    )
+  }
+
 
   object Conversions {
+    implicit def parenLessApply[A,B](memberLens: MemberLens[A,B]): B = memberLens()
+
     implicit def lensToMemberLensConversion[A, B](lens: Lens[A, B]): MemberLensConversion[A, B] = {
       new MemberLensConversion(lens)
     }

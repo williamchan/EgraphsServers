@@ -62,7 +62,7 @@ trait CanInsertAndUpdateThroughServices[T <: KeyedEntity[_]] { this: T =>
   def update(): T = services.update(this)
 }
 
-trait CanInsertAndUpdateAsThroughServices[ModelT <: HasEntity[EntityT], EntityT <: KeyedCaseClass[_]]{
+trait CanInsertAndUpdateAsThroughServices[ModelT <: HasEntity[EntityT, _], EntityT <: KeyedCaseClass[_]]{
   this: ModelT =>
 
   def services: InsertsAndUpdatesAsEntity[ModelT, EntityT]

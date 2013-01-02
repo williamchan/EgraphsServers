@@ -41,26 +41,36 @@ case class CheckoutEntity(
 case class Checkout (
   _entity: CheckoutEntity,
   _typesOrItems: Either[LineItemTypes, LineItems],
+  _additionalTypes: LineItemTypes = Nil,
   services: CheckoutServices = AppConfig.instance[CheckoutServices]
-) extends HasEntity[CheckoutEntity] with KeyedCaseClass[Long]
+) extends HasEntity[CheckoutEntity, Long] with KeyedCaseClass[Long]
   with CanInsertAndUpdateAsThroughServices[Checkout, CheckoutEntity]
 {
 
   // uses LineItems and LineItemTypes
-  def lineItems: LineItems =  _typesOrItems match {
-    case Right(items: LineItems) => items
+  lazy val lineItems: LineItems =  _typesOrItems match {
+    case Right(items: LineItems) => resolveTypes(_additionalTypes, items)
     case Left(types: LineItemTypes) => resolveTypes(types)
   }
 
-  def lineItemTypes: LineItemTypes = _typesOrItems match {
+  lazy val lineItemTypes: LineItemTypes = _typesOrItems match {
     case Left(types: LineItemTypes) => types
-    case Right(items: LineItems) => items.map(_.itemType)
+    case Right(items: LineItems) => _additionalTypes ++ items.map(_.itemType)
   }
 
+
+  /**
+   * To be used for adding any line item types (products, discounts, refunds, etc)
+   * @param additionalTypes -- to be added to this checkout
+   * @return If transacted, checkout with additionalTypes in _additionalTypes; otherwise, checkout
+   *         with _additionalTypes added to lineItemTypes.
+   */
   def withAdditionalTypes(additionalTypes: LineItemTypes) = {
-    this.copy(
-      _typesOrItems = Left(additionalTypes ++ lineItemTypes)
-    )
+    if (id > 0) {
+      this.copy(_additionalTypes = additionalTypes ++ _additionalTypes)
+    } else {
+      this.copy(_typesOrItems = Left(additionalTypes ++ lineItemTypes))
+    }
   }
 
   /**
@@ -70,18 +80,31 @@ case class Checkout (
   def transact(): Checkout = {
     // TODO(SER-499): require payment/sum of [products, fees, taxes]/total and charges to be zero.
     // TODO(SER-499): make transact take checkout context
+    if (id > 0) {
 
-    val savedCheckout = services.insert(this)
-    val savedItems = savedCheckout.lineItems.map( item => { //item.transact(savedCheckout.id) )
-      // DEBUG
-      println("before saving, item.checkoutId: " + item.checkoutId)
-      val savedItem = item.transact(savedCheckout.id)
-      println("after  saving, item.checkoutId: " + savedItem.checkoutId)
-      savedItem
+      // calculate new total
+      // require charge of difference between previous total and current total
+      // Has all tax, fee, & summary types, will apply them to entire checkout
+      //   -should they be applied only to additional types somehow? conflicts with refunds
+      //   -new taxes/fees otherwise need to be matched to old ones to calculate differences
+      val tempCheckout = new Checkout(CheckoutEntity(), Left(lineItemTypes))
+      val newTotal = tempCheckout.total
 
-    })
+      // transact new types' items
+      //   -filter items that aren't transacted
+      // transact new fees, taxes, and charge
+      // TODO(SER-499): make sure summaries don't assume there's only one tax items
 
-    this.copy(savedCheckout._entity, Right(savedItems))
+
+      this
+
+    } else {
+      // Completely untransacted
+      val savedCheckout = services.insert(this)
+      val savedItems = savedCheckout.lineItems.map( item => item.transact(savedCheckout.id) )
+
+      this.copy(savedCheckout._entity, Right(savedItems))
+    }
   }
 
 
@@ -89,7 +112,7 @@ case class Checkout (
   // KeyedCaseClass members
   //
   override def id = _entity.id
-  override def unapplied = ( _entity, lineItemTypes.toSet )
+  override def unapplied = ( _entity, lineItems.toSet )
 
 
   //
@@ -108,9 +131,9 @@ case class Checkout (
     for (item <- lineItems if item.codeType == codeType) yield item.asInstanceOf[LI]
   }
 
-  protected def resolveTypes(types: LineItemTypes) = {
+  protected def resolveTypes(types: LineItemTypes, preexistingItems: LineItems = Seq()) = {
 
-    case class ResolutionPass(resolved: LineItems, unresolved: LineItemTypes) {
+    case class ResolutionPass(resolved: LineItems = preexistingItems, unresolved: LineItemTypes) {
       def execute: ResolutionPass = {
         /**
          * Iterates over unresolved in linear time on average (only counting iteration time)
@@ -132,26 +155,27 @@ case class Checkout (
           case (next :: rest, res) => iterate(res ++ acc)( before, next, rest)
         }
 
-        if (unresolved.isEmpty) this
-        else iterate()()
+        if (unresolved.isEmpty) this  // no additional to resolve
+        else iterate()()              // iterate over unresolved
+      }
+
+      override def equals(that: Any) = that match {
+        case ResolutionPass(thoseResolved, thoseUnresolved) =>
+          (resolved.length, unresolved.length) == (thoseResolved.length, thoseUnresolved.length)
+        case _ => false
       }
     }
 
-    def resolve(pass: ResolutionPass): LineItems = pass.execute match {
-      // TODO(SER-499): add detail to exception
-      case ResolutionPass(pass.resolved, _) => throw new Exception("Circular dependency found in LineItemTypes")
-      case ResolutionPass(allItems, Nil) => allItems
-      case intermediatePass => resolve(intermediatePass)
+    def resolve(pass: ResolutionPass): LineItems = {
+      pass.execute match {
+        case ResolutionPass(allItems, Nil) => allItems
+        case unchangedPass if (unchangedPass == pass) =>
+          throw new Exception("Failed to resolve line items, circular dependency detected.")
+        case intermediatePass => resolve(intermediatePass)
+      }
     }
 
-    val initialPass = ResolutionPass(Seq(), types)
-    //resolve(initialPass)
-
-    // DEBUG
-    val items = resolve(initialPass)
-    println("Checkout.lineItems: " + items.mkString(", "))
-    println("Checkout.lineItemTypes: " + lineItemTypes.mkString(", "))
-    items
+    resolve(ResolutionPass(unresolved = types))
   }
 }
 
@@ -168,12 +192,6 @@ object Checkout {
 
   // Restore
   def apply(entity: CheckoutEntity, items: LineItems) = {
-    // DEBUG
-    println("***Checkout.apply(entity: CheckoutEntity, items: LineItems)***")
-    println("entity.id: " + entity.id)
-    println("item.checkoutId: " + items.map(_.checkoutId).mkString(" "))
-
-
     assert(!items.exists(item => item.checkoutId != entity.id))
     new Checkout(entity, Right(itemsWithSummaries(items)))
   }

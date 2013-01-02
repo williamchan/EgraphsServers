@@ -6,19 +6,17 @@ import services.db.{HasEntity, CanInsertAndUpdateAsThroughServices, KeyedCaseCla
 
 
 trait CanInsertAndUpdateAsThroughServicesTests[
-  ModelT <: CanInsertAndUpdateAsThroughServices[ModelT,  EntityT] with HasEntity[EntityT],
-  EntityT <: KeyedCaseClass[Long]
+  ModelT <: CanInsertAndUpdateAsThroughServices[ModelT,  EntityT] with HasEntity[EntityT, KeyT],
+  EntityT <: KeyedCaseClass[KeyT],
+  KeyT
 ] /*extends SavingEntityIdLongTests[EntityT]*/ {
   this: FlatSpec with ShouldMatchers =>
 
-  private implicit def modelToIdDsl(model: ModelT) = IdDSL(model)
-  private case class IdDSL(model: ModelT) { def id: Long = model._entity.id }
-
-  def newIdValue: Long
-  def improbableIdValue: Long
+  def newIdValue: KeyT
+  def improbableIdValue: KeyT
   def newModel: ModelT
   def saveModel(toSave: ModelT): ModelT
-  def restoreModel(id: Long): Option[ModelT]
+  def restoreModel(id: KeyT): Option[ModelT]
   def transformModel(toTransform: ModelT): ModelT
 
 

@@ -27,6 +27,7 @@ object ModelModule extends AbstractModule with ScalaModule {
     bind[EnrollmentBatchServices].in[Singleton]
     bind[EnrollmentSampleServices].in[Singleton]
     bind[FailedPurchaseDataServices].in[Singleton]
+    bind[GiftCertificateServices].in[Singleton]
     bind[GiftCertificateLineItemServices].in[Singleton]
     bind[GiftCertificateLineItemTypeServices].in[Singleton]
     bind[ImageAssetServices].in[Singleton]

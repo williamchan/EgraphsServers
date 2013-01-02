@@ -11,8 +11,7 @@ import org.squeryl.annotations.Transient
 import com.google.inject.Inject
 import models.enums.{CodeTypeFactory, LineItemNature, CodeType}
 
-trait LineItem[+TransactedT] extends Transactable[LineItem[TransactedT]] {
-  def id: Long
+trait LineItem[+TransactedT] extends Transactable[LineItem[TransactedT]] with KeyedCaseClass[Long] {
 
   def amount: Money
   def withAmount(newAmount: Money): LineItem[TransactedT]
@@ -20,15 +19,10 @@ trait LineItem[+TransactedT] extends Transactable[LineItem[TransactedT]] {
   def checkoutId: Long
   def withCheckoutId(newCheckoutId: Long): LineItem[TransactedT]
 
-  // def _typeEntity: LineItemTypeEntity
-  // def _maybeType: Option[LineItemType[TransactedT]]
   def itemType: LineItemType[TransactedT]
   def subItems: Seq[LineItem[_]]
   def toJson: String                    // TODO(SER-499): Use Json type, maybe even Option
   def domainObject: TransactedT
-
-  //def _domainEntityId: Long // getting rid of this in favor of taking domain object as argument
-
 
 
   /** @return flat sequence of this LineItem and its sub-LineItems */
@@ -40,6 +34,10 @@ trait LineItem[+TransactedT] extends Transactable[LineItem[TransactedT]] {
   // Convenience LineItemType member accessors
   def codeType: CodeType = itemType.codeType
   def nature: LineItemNature = itemType.nature
+
+  // KeyedCaseClass
+  override def unapplied = (id, amount, checkoutId, domainObject, itemType.id, codeType, nature)
+
 }
 
 
@@ -85,9 +83,7 @@ class LineItemStore @Inject() (schema: Schema) {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-trait HasLineItemEntity extends HasEntity[LineItemEntity] { this: LineItem[_] =>
-  def id = _entity.id
-}
+trait HasLineItemEntity extends HasEntity[LineItemEntity, Long] { this: LineItem[_] => }
 
 trait SavesAsLineItemEntity[ModelT <: HasLineItemEntity]
   extends InsertsAndUpdatesAsEntity[ModelT, LineItemEntity]
