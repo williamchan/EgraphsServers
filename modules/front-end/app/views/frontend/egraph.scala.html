@@ -46,8 +46,7 @@
 }
 
 @styles = @{
-  Seq(EgraphsAssets.at("stylesheets/egraph.min.css").url,
-      EgraphsAssets.at("soundmanager/360-player/360player.css").url,
+  Seq(EgraphsAssets.at("soundmanager/360-player/360player.css").url,
       EgraphsAssets.at("soundmanager/360-player/360player-visualization.css").url
   )
 }
@@ -72,7 +71,7 @@
                 <div class="plaque">
                   <img src='@EgraphsAssets.at("images/egraph_plaque.png")' alt="plaque" >
                   <div class="plaque-content">
-                    <div class="player" >
+                    <div class="player" id="360player">
                       <div class="ui360 ui360-vis player-widget"><a href="@audioUrl"></a></div>
                     </div>
                     <div class="plaque-separator"></div>
