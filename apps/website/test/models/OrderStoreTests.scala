@@ -89,14 +89,14 @@ class OrderStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
 
   "findByFilter" should "restrict by filter but not by celebrity" in new EgraphsTestApplication {
     //This test will not be able to be run in parallel with other tests as written.
-    val numfound = orderStore.findByFilter().toSeq.length
+    val numfound = orderStore.getOrderResults().toSeq.length
 
     val (customer0, product0) = newCustomerAndProduct
     val order0 = customer0.buy(product0).save()
     val (customer1, product1) = newCustomerAndProduct
     val order1 = customer1.buy(product1).save()
 
-    val foundAfter = orderStore.findByFilter().toSeq.length
+    val foundAfter = orderStore.getOrderResults().toSeq.length
     val newOrders = (foundAfter - numfound)
     newOrders should be(2)
   }

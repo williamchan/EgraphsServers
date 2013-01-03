@@ -29,15 +29,15 @@ private[controllers] trait GetCelebrityOrdersAdminEndpoint extends ImplicitHeade
           val filter: String = Form("filter" -> text).bindFromRequest.fold(formWithErrors => "pendingAdminReview", validForm => validForm)
           
           val query = filter match {
-          	case "rejectedByAdmin" => orderStore.findByCelebrity(celebrityId = celebrity.id, orderQueryFilters.rejectedByAdmin)
-          	case "rejectedByCelebrity" => orderStore.findByCelebrity(celebrityId = celebrity.id, orderQueryFilters.rejectedByCelebrity)
-          	case "signerActionable" => orderStore.findByCelebrity(celebrityId = celebrity.id, orderQueryFilters.actionableOnly: _*)
-          	case "all" => orderStore.findByCelebrity(celebrityId = celebrity.id)
-          	case _ => orderStore.findByCelebrity(celebrityId = celebrity.id, orderQueryFilters.pendingAdminReview)
+          	case "rejectedByAdmin" => orderStore.getCelebrityOrderResults(celebrity, orderQueryFilters.rejectedByAdmin)
+          	case "rejectedByCelebrity" => orderStore.getCelebrityOrderResults(celebrity, orderQueryFilters.rejectedByCelebrity)
+          	case "signerActionable" => orderStore.getCelebrityOrderResults(celebrity, orderQueryFilters.actionableOnly: _*)
+          	case "all" => orderStore.getCelebrityOrderResults(celebrity)
+          	case _ => orderStore.getCelebrityOrderResults(celebrity, orderQueryFilters.pendingAdminReview)
           }
-          val pagedQuery: (Iterable[Order], Int, Option[Int]) = services.Utils.pagedQuery(select = query, page = page)
+          val pagedQuery: (Iterable[(Order, Celebrity)], Int, Option[Int]) = services.Utils.pagedQuery(select = query, page = page)
           implicit val paginationInfo = PaginationInfoFactory.create(pagedQuery = pagedQuery, baseUrl = GetCelebrityOrdersAdminEndpoint.url(celebrity), filter = Option(filter))
-          Ok(views.html.Application.admin.admin_orders(orders = pagedQuery._1, celebrity = Some(celebrity)))
+          Ok(views.html.Application.admin.admin_orders(orderResults = pagedQuery._1, celebrity = Some(celebrity)))
       	}
       }
     }

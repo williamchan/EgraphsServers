@@ -4,6 +4,7 @@ import play.api._
 import play.api.mvc._
 import models.frontend.landing.CatalogStar
 import helpers.DefaultImplicitTemplateParameters
+import models.frontend.header.HeaderData
 
 /**
  * Permutations of the landing page
@@ -17,6 +18,16 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
   def featuredStars(count: Int) = Action {
     Ok(views.html.frontend.landing(sampleStars.slice(0, count)))
   }
+
+  /**
+   * Displays a permutation of the page with gift certificate messaging up top. 
+   **/
+
+   def giftMessaging = Action {
+    implicit val headerData = HeaderData(giftCertificateLink = Some("/gift"))
+
+    Ok(views.html.frontend.landing(sampleStars)(headerData, defaultFooterData, authenticityToken)) 
+   }
 
   def signupOn = Action {
     val stars = sampleStars.map(star => star.copy(inventoryRemaining = 0))

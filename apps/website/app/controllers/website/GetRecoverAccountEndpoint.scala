@@ -1,8 +1,6 @@
 package controllers.website
 
-import play.api._
 import play.api.mvc._
-import services.Utils
 import services.http.ControllerMethod
 
 import services.mvc.ImplicitHeaderAndFooterData
@@ -10,8 +8,6 @@ import models.frontend.forms.Field
 import models.frontend.account.{AccountRecoverForm => AccountRecoverFormView}
 import services.http.forms.AccountRecoverFormFactory
 import services.http.forms.AccountRecoverForm.Fields
-import services.http.SafePlayParams.Conversions._
-import controllers.WebsiteControllers
 
 private[controllers] trait GetRecoverAccountEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>

@@ -7,7 +7,7 @@ function () {
       $(".soldout-tooltip").tooltip({placement:"top"});
 
       // Mixpanel events
-      mixpanel.track('Home page viewed', {'query': window.location.search })
+      mixpanel.track('Home page viewed', {'query': window.location.search });
       mixpanel.track_links('#get-started-button', 'Get Started clicked');
       $(".celebrities figure>a").click(function() {
         mixpanel.track("Celebrity clicked");
@@ -23,9 +23,9 @@ function () {
       //landing_celebrities.hide().css('opacity', '0');
 
       landing_celebrities_btn.hover(function(){
-        $(this).parent().animate({ top: '-80px' }, 200);
+        $(this).parent().animate({ top: '-70px' }, 200);
       }, function() {
-        $(this).parent().animate({ top: '-75px' }, 200);
+        $(this).parent().animate({ top: '-65px' }, 200);
       });
 
       if (screen.width > 480) {

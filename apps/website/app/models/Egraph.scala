@@ -665,24 +665,28 @@ trait EgraphAssets {
 class EgraphStore @Inject() (schema: Schema) extends SavesWithLongKey[Egraph] with SavesCreatedUpdated[Long,Egraph] {
   import org.squeryl.PrimitiveTypeMode._
 
-  def getEgraphsAndResults(filters: FilterOneTable[Egraph]*): Query[(Egraph, Option[VBGVerifySample], Option[XyzmoVerifyUser])] = {
-    join(schema.egraphs, schema.vbgVerifySampleTable.leftOuter, schema.xyzmoVerifyUserTable.leftOuter)(
-      (egraph, vbgVerifySample, xyzmoVerifyUser) =>
+  def getEgraphsAndResults(filters: FilterOneTable[Egraph]*): Query[(Egraph, Celebrity, Option[VBGVerifySample], Option[XyzmoVerifyUser])] = {
+    join(schema.egraphs, schema.vbgVerifySampleTable.leftOuter, schema.xyzmoVerifyUserTable.leftOuter,
+      schema.orders, schema.products, schema.celebrities)(
+      (egraph, vbgVerifySample, xyzmoVerifyUser, order, product, celebrity) =>
         where(FilterOneTable.reduceFilters(filters, egraph))
-          select(egraph, vbgVerifySample, xyzmoVerifyUser)
+          select(egraph, celebrity, vbgVerifySample, xyzmoVerifyUser)
           orderBy (egraph.id desc)
-          on(egraph.id === vbgVerifySample.map(_.egraphId), egraph.id === xyzmoVerifyUser.map(_.egraphId))
+          on(egraph.id === vbgVerifySample.map(_.egraphId), egraph.id === xyzmoVerifyUser.map(_.egraphId),
+          egraph.orderId === order.id, order.productId === product.id, product.celebrityId === celebrity.id)
     )
   }
 
-  def getCelebrityEgraphsAndResults(celebrity: Celebrity, filters: FilterOneTable[Egraph]*): Query[(Egraph, Option[VBGVerifySample], Option[XyzmoVerifyUser])] = {
+  def getCelebrityEgraphsAndResults(celebrity: Celebrity, filters: FilterOneTable[Egraph]*): Query[(Egraph, Celebrity, Option[VBGVerifySample], Option[XyzmoVerifyUser])] = {
     val celebrityId = celebrity.id
-    join(schema.egraphs, schema.vbgVerifySampleTable.leftOuter, schema.xyzmoVerifyUserTable.leftOuter, schema.orders, schema.products)(
-      (egraph, vbgVerifySample, xyzmoVerifyUser, order, product) =>
-        where(FilterOneTable.reduceFilters(filters, egraph) and product.celebrityId === celebrityId)
-          select(egraph, vbgVerifySample, xyzmoVerifyUser)
+    join(schema.egraphs, schema.vbgVerifySampleTable.leftOuter, schema.xyzmoVerifyUserTable.leftOuter,
+      schema.orders, schema.products, schema.celebrities)(
+      (egraph, vbgVerifySample, xyzmoVerifyUser, order, product, celebrity) =>
+        where(FilterOneTable.reduceFilters(filters, egraph) and celebrity.id === celebrityId)
+          select(egraph, celebrity, vbgVerifySample, xyzmoVerifyUser)
           orderBy (egraph.id desc)
-          on(egraph.id === vbgVerifySample.map(_.egraphId), egraph.id === xyzmoVerifyUser.map(_.egraphId), egraph.orderId === order.id, order.productId === product.id)
+          on(egraph.id === vbgVerifySample.map(_.egraphId), egraph.id === xyzmoVerifyUser.map(_.egraphId),
+          egraph.orderId === order.id, order.productId === product.id, product.celebrityId === celebrity.id)
     )
   }
 

@@ -1,21 +1,16 @@
 package controllers.website.admin
 
-import controllers.WebsiteControllers
 import java.sql.Timestamp
 import java.text.{ParseException, SimpleDateFormat}
-import java.util.TimeZone
 import models._
 import models.enums.{CouponType, CouponDiscountType, CouponUsageType}
-import play.api.mvc.Results.{Ok, Redirect}
 import play.api.mvc.Controller
 import services.http.POSTControllerMethod
 import services.http.filters.HttpFilters
-import services.http.SafePlayParams.Conversions._
 import services.logging.Logging
-import play.api.mvc.{Action, Call, Result}
+import play.api.mvc.Action
 import play.api.data._
 import play.api.data.Forms._
-import play.api.data.validation.Constraints._
 import play.api.data.validation.Constraint
 import play.api.data.validation.Valid
 import play.api.data.validation.Invalid

@@ -9,7 +9,6 @@ import services.http.filters.HttpFilters
 import org.squeryl.Query
 import org.squeryl.PrimitiveTypeMode._
 import services.db.Schema
-import services.http.SafePlayParams.Conversions._
 import play.api.data._
 import play.api.data.Forms._
 import services.mvc.ImplicitHeaderAndFooterData
@@ -118,7 +117,6 @@ private[controllers] trait GetToolsAdminEndpoint extends ImplicitHeaderAndFooter
           //
 
 //          case "generate-large-egraph" =>
-//            import services.http.SafePlayParams.Conversions._
 //            val orderStore = AppConfig.instance[OrderStore]
 //            val errorOrBlobUrl = for (
 //              orderId <- params.getLongOption("orderId").toRight("orderId param required").right;

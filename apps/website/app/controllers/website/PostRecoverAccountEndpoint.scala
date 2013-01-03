@@ -1,12 +1,11 @@
 package controllers.website
 
-import play.api._
 import play.api.mvc._
 import services.db.{DBSession, TransactionSerializable}
-import models.{Customer, Account, CustomerStore, AccountStore}
+import models.{Account, CustomerStore, AccountStore}
 import services.mail.TransactionalMail
 import org.apache.commons.mail.HtmlEmail
-import services.http.{SafePlayParams, POSTControllerMethod}
+import services.http.POSTControllerMethod
 import services.mvc.ImplicitHeaderAndFooterData
 import services.{ConsumerApplication, Utils}
 import services.http.filters.HttpFilters
@@ -15,7 +14,6 @@ import egraphs.authtoken.AuthenticityToken
 
 private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
-  import SafePlayParams.Conversions._
 
   protected def dbSession: DBSession
   protected def postController: POSTControllerMethod

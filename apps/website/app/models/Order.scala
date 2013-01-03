@@ -12,7 +12,7 @@ import com.google.inject._
 import mail.TransactionalMail
 import payment.{Charge, Payment}
 import org.squeryl.Query
-import org.apache.commons.mail.{Email, HtmlEmail}
+import org.apache.commons.mail.HtmlEmail
 import java.util.Date
 import com.google.inject.Inject
 import java.text.SimpleDateFormat
@@ -22,7 +22,6 @@ import controllers.website.GetEgraphEndpoint
 import play.api.mvc.RequestHeader
 import play.api.templates.Html
 import db.Deletes
-import services.db.TransactionSerializable
 import java.sql.Connection
 import services.db.CurrentTransaction
 
@@ -69,6 +68,7 @@ case class Order(
   with HasPrivacyStatus[Order]
   with HasPaymentStatus[Order]
   with HasOrderReviewStatus[Order]
+  with HasOrderType[Order]
   with HasWrittenMessageRequest[Order]
 {
   
@@ -190,7 +190,7 @@ case class Order(
     // if we can delete the old one, that means there are no dangling foreign keys.  otherwise we have a problem and should roll back.
     // we don't actually want to delete the old order though, so we will save it after we delete it.
     val connection = services.connectionFactory()
-    val savepoint = connection.setSavepoint
+    val savepoint = connection.setSavepoint()
     services.store.delete(oldOrder)
     connection.rollback(savepoint)
 
@@ -313,6 +313,10 @@ case class Order(
   // KeyedCaseClass[Long] methods
   //
   override def unapplied = Order.unapply(this)
+
+  override def withOrderType(status: OrderType.EnumVal) = {
+    this.copy(_orderType = status.name)
+  }
 
   override def withPrivacyStatus(status: PrivacyStatus.EnumVal) = {
     this.copy(_privacyStatus = status.name)
@@ -478,16 +482,25 @@ class OrderStore @Inject() (
         orderBy (order.id asc)
     )
   }
-  
-  def findByFilter(filters: FilterOneTable[Order]*): Query[Order] = {
-    import schema.orders
 
-    from(orders)((order) =>
-      where(
-        FilterOneTable.reduceFilters(filters, order)
-      )
-        select (order)
-        orderBy (order.id asc)
+  def getOrderResults(filters: FilterOneTable[Order]*): Query[(Order, Celebrity)] = {
+    join(schema.orders, schema.products, schema.celebrities)(
+      (order, product, celebrity) =>
+        where(FilterOneTable.reduceFilters(filters, order))
+          select(order, celebrity)
+          orderBy (order.id desc)
+          on(order.productId === product.id, product.celebrityId === celebrity.id)
+    )
+  }
+
+  def getCelebrityOrderResults(celebrity: Celebrity, filters: FilterOneTable[Order]*): Query[(Order, Celebrity)] = {
+    val celebrityId = celebrity.id
+    join(schema.orders, schema.products, schema.celebrities)(
+      (order, product, celebrity) =>
+        where(FilterOneTable.reduceFilters(filters, order) and celebrity.id === celebrityId)
+          select(order, celebrity)
+          orderBy (order.id desc)
+          on(order.productId === product.id, product.celebrityId === celebrity.id)
     )
   }
 
@@ -691,10 +704,11 @@ object GalleryOrderFactory {
 
   def makePendingEgraphViewModel(orders: Iterable[(Order, Option[Egraph])]) : Iterable[PendingEgraphViewModel] = {
     for (orderAndEgraphOption <- orders) yield {
-      val (order, optionEgraph) = orderAndEgraphOption
+      val (order, _) = orderAndEgraphOption
       val product = order.product
       val celebrity = product.celebrity
       val imageUrl = product.photo.resizedWidth(product.frame.pendingWidthPixels).getSaved(AccessPolicy.Public).url
+      val egraphExplanationUrl = controllers.routes.WebsiteControllers.getEgraphExplanationCard(order.id).url
       PendingEgraphViewModel(
         buyerId = order.buyerId,
         orderId = order.id,
@@ -706,11 +720,12 @@ object GalleryOrderFactory {
         recipientId = order.recipientId,
         recipientName = order.recipientName,
         thumbnailUrl = imageUrl,
+        egraphExplanationUrl = egraphExplanationUrl,
         orderStatus = order.reviewStatus.name,
         orderDetails = new OrderDetails(
           orderDate = dateFormat.format(order.created),
           orderNumber = order.id,
-          price = order.amountPaid.toString(),
+          price = order.amountPaid.toString,
           statusText = "Pending",
           shippingMethod = "",
           UPSNumber = ""
