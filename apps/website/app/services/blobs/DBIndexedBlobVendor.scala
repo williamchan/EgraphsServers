@@ -38,7 +38,7 @@ class DBIndexedBlobVendor @Inject()(
   }
 
   override def delete(namespace: String, key: String) {
-	throw new NotImplementedException("This feature has not be implemented")
+	throw new NotImplementedException("This feature has not been implemented")
   }
 
   override def exists(namespace: String, key: String) = {

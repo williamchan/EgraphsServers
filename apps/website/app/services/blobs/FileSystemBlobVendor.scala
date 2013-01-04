@@ -47,9 +47,7 @@ private[blobs] class FileSystemBlobVendor @Inject() (consumerApp: ConsumerApplic
   }
 
   override def delete(namespace: String, key: String) {
-    val blobStore = context.getBlobStore
-    
-    blobStore.removeBlob(namespace, key)
+    context.getBlobStore.removeBlob(namespace, key)
   }
 
   override def checkConfiguration() {

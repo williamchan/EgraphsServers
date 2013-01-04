@@ -76,7 +76,7 @@ private[blobs] case class S3BlobVendor @Inject() (
   }
 
   override def delete(namespace: String, key: String) {
-	throw new NotImplementedException("This feature has not be implemented")
+    throw new NotImplementedException("This feature has not been implemented")
   }
 
   override def checkConfiguration() {

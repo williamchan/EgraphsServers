@@ -99,9 +99,7 @@ class Blobs @Inject() (
    *   against Amazon S3.
    */
   def put(key: String, bytes: Array[Byte], access: AccessPolicy=AccessPolicy.Private) {
-    if(bytes == null || bytes.isEmpty) {
-      delete(key)
-    }
+    require(!bytes.isEmpty, "Cannot put 0-byte array into a bucket. Ever heard of 'delete'?")
 
     blobVendor.put(blobstoreNamespace, key, bytes, access)
   }
