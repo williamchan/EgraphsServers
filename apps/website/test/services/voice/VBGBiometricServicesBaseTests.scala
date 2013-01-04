@@ -33,8 +33,7 @@ class VBGBiometricServicesBaseTests extends EgraphsUnitTest
   "enroll" should "call saveCombinedWavToBlobStore" in new EgraphsTestApplication {
     val celebrity = TestData.newSavedCelebrity()
     val enrollmentBatch = EnrollmentBatch(celebrityId = celebrity.id).save()
-    val voiceStr = TestConstants.voiceStr()
-    new EnrollmentSample(enrollmentBatchId = enrollmentBatch.id).save("", voiceStr = voiceStr)
+    new EnrollmentSample(enrollmentBatchId = enrollmentBatch.id).save(signatureStr = TestConstants.signatureStr, voiceStr = TestConstants.voiceStr)
     MockVBGBiometricServices.enroll(enrollmentBatch)
     (enrollmentBatch.services.blobs.get(EnrollmentBatch.getCombinedWavUrl(enrollmentBatch.id)).get.asByteArray.length > 0) should be(true)
   }
@@ -45,7 +44,7 @@ class VBGBiometricServicesBaseTests extends EgraphsUnitTest
     wav_8kHz_base64 should be(TestConstants.voiceStr_8khz())
   }
 
-  "convertWavTo8kHzBase64" should "handle zero case" in {
+  it should "handle zero case" in {
     MockVBGBiometricServices.convertWavTo8kHzBase64(new Array[Byte](0)) should be("")
   }
 
@@ -59,7 +58,7 @@ class VBGBiometricServicesBaseTests extends EgraphsUnitTest
     resourceFile(targetFile).length() should be(921166)
   }
 
-  "stitchWAVs" should "handle base cases" in new EgraphsTestApplication {
+  it should "handle base cases" in new EgraphsTestApplication {
     MockVBGBiometricServices.stitchWAVs(List()) should be(None)
 
     val filename = "44khz.wav"
@@ -78,9 +77,10 @@ class VBGBiometricServicesBaseTests extends EgraphsUnitTest
   }
 
   // TODO: PLAY20 migration. This test now fails. Wizzle, can you take a look at it?
-  "VBGDevFreeSpeechBiometricServices" should "test end-to-end" in (pending) /*{
+  //  "VBGDevFreeSpeechBiometricServices"
+  ignore should "test end-to-end" in {
     testVBGEnrollAndVerify(VBGDevFreeSpeechBiometricServices)
-  }*/
+  }
 
   /**
    * This test costs $0.40 per run.  We shouldn't run this test regularly.
