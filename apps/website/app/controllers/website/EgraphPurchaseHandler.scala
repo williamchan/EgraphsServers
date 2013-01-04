@@ -177,7 +177,7 @@ case class EgraphPurchaseHandler(
       product.name,
       order.id,
       order.created,
-      order.expectedDate.get,
+      order.expectedDate,
       totalAmountPaid,
       services.consumerApp.absoluteUrl(getFAQ().url + "#how-long"),
       maybePrintOrder.isDefined,

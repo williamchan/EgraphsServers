@@ -13,6 +13,7 @@ import controllers.routes.WebsiteControllers.getVerifyAccount
 import play.api.templates.Html
 import services.ConsumerApplication
 import services.config.ConfigFileProxy
+import org.joda.time.DateTimeConstants
 
 /** Services used by each instance of Customer */
 case class CustomerServices @Inject() (
@@ -72,21 +73,21 @@ case class Customer(
     if (remainingInventory <= 0 || activeInventoryBatches.headOption.isEmpty) throw new InsufficientInventoryException("Must have available inventory to purchase product " + product.id)
 
     val batchToOrderAgainst = services.inventoryBatchStore.selectAvailableInventoryBatch(activeInventoryBatches)
-    val (inventoryBatchId, expectedDate) = batchToOrderAgainst match {
-      case Some(b) => (b.id, Option(b.getExpectedDate))
-      case _ => (0L, None) // todo(wchan): Do we want to permit the order to go through?
+    val inventoryBatchId = batchToOrderAgainst match {
+      case Some(b) => b.id
+      case _ => 0L //TODO: No, let's return an Either[Exception, Order]
     }
 
     val order = Order(
-      buyerId=id,
-      recipientId=recipient.id,
-      productId=product.id,
-      amountPaidInCurrency=BigDecimal(product.price.getAmount),
+      buyerId = id,
+      recipientId = recipient.id,
+      productId = product.id,
+      amountPaidInCurrency = BigDecimal(product.price.getAmount),
       recipientName = recipientName,
       messageToCelebrity = messageToCelebrity,
       requestedMessage = requestedMessage,
       inventoryBatchId = inventoryBatchId,
-      expectedDate = expectedDate
+      expectedDate = Order.expectedDateFromDelay(product.celebrity.expectedOrderDelayInMinutes * DateTimeConstants.MILLIS_PER_MINUTE)
     )
 
     // If admin review is turned off (eg to expedite demos), create the Order already approved
@@ -96,6 +97,19 @@ case class Customer(
       order
     }
   }
+
+  /**
+   * This is more intended to be used by test code.  Production code should use buy() instead.
+   */
+  //TODO: Finish me.  Follow TODO in buy to complete this.
+  def buyUnsafe(product: Product,
+          recipient: Customer = this,
+          recipientName: String = this.name,
+          messageToCelebrity: Option[String] = None,
+          requestedMessage: Option[String] = None): Order = {
+    buy(product, recipient, recipientName, messageToCelebrity, requestedMessage) //.right
+  }
+
 
   //
   // KeyedCaseClass[Long] methods

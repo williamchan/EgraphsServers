@@ -130,12 +130,12 @@ class OrderStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
   
   "findByCelebrity" should "find all of a Celebrity's orders by default" in new EgraphsTestApplication {
 
-    val (will, _, celebrity, product) = TestData.newSavedOrderStack()
+    val (customer, _, celebrity, product) = TestData.newSavedOrderStack()
 
     val (firstOrder, secondOrder, thirdOrder) = (
-      will.buy(product).save(),
-      will.buy(product).save(),
-      will.buy(product).save()
+      customer.buy(product).save(),
+      customer.buy(product).save(),
+      customer.buy(product).save()
     )
 
     // Orders of celebrity's products
