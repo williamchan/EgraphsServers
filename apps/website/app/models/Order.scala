@@ -46,9 +46,25 @@ case class OrderServices @Inject() (
 object Order {
   val defaultExpectedDelay: Long = 30 * DateTimeConstants.MILLIS_PER_DAY
   def defaultExpectedDate: Date = expectedDateFromDelay(defaultExpectedDelay)
+
+  /**
+   * Gets the Date with delay applied to the current day, rounded up to the nearest day.
+   */
   def expectedDateFromDelay(delayInMillis: Long): Date = {
-    val expectedDateTime = new Date(System.currentTimeMillis + delayInMillis)
-    DateUtils.round(expectedDateTime, Calendar.DATE)
+    addMillisecondsAndRoundUpToNextDay(new Date(), delayInMillis.toInt)
+  }
+
+  def addMillisecondsAndRoundUpToNextDay(date: Date, millisToAdd: Int): Date = {
+    val dateSum = DateUtils.addMilliseconds(date, millisToAdd)
+
+    // Make sure to round up to nearest day
+    val truncatedDate = DateUtils.truncate(dateSum, Calendar.DATE)
+    if(DateUtils.isSameInstant(truncatedDate, dateSum)) {
+      truncatedDate
+    } else {
+      //round up
+      DateUtils.addDays(truncatedDate, 1)
+    }
   }
 }
 

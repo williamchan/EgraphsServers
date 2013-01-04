@@ -732,6 +732,7 @@ class CelebrityStore @Inject() (
       theOld.roleDescription := theNew.roleDescription,
       theOld.twitterUsername := theNew.twitterUsername,
       theOld.urlSlug := theNew.urlSlug,
+      theOld.expectedOrderDelayInMinutes := theNew.expectedOrderDelayInMinutes,
       theOld._enrollmentStatus := theNew._enrollmentStatus,
       theOld._publishedStatus := theNew._publishedStatus,
       theOld._landingPageImageKey := theNew._landingPageImageKey,

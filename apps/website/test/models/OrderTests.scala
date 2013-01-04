@@ -9,6 +9,10 @@ import javax.mail.internet.InternetAddress
 import play.api.test.FakeRequest
 import services.db.DBSession
 import services.db.TransactionSerializable
+import org.apache.commons.lang3.time.DateUtils
+import java.util.Date
+import java.util.Calendar
+import org.joda.time.DateTimeConstants
 
 class OrderTests extends EgraphsUnitTest
   with ClearsCacheBefore
@@ -325,7 +329,7 @@ class OrderTests extends EgraphsUnitTest
     results.size should be (1)
   }
 
-  "filterPendingOrders" should "include egraphs that are awaiting verification, that have passed " +
+  it should "include egraphs that are awaiting verification, that have passed " +
   		"biometrics, or that are approved by admin" in new EgraphsTestApplication {
     
     val (order, recipient) = newOrderAndRecipient
@@ -334,8 +338,8 @@ class OrderTests extends EgraphsUnitTest
     val results = GalleryOrderFactory.filterPendingOrders(orderStore.galleryOrdersWithEgraphs(recipient.id).toList)
     results.size should be (3)
   }
-  
-  "filterPendingOrders" should "not include an Egraph that's rejected by admin or that's already published" in new EgraphsTestApplication {
+
+  it should "not include an Egraph that's rejected by admin or that's already published" in new EgraphsTestApplication {
     val (order, recipient) = newOrderAndRecipient
     
     // neither of these Egraphs should affect the gallery size
@@ -344,14 +348,31 @@ class OrderTests extends EgraphsUnitTest
     val results = GalleryOrderFactory.filterPendingOrders(orderStore.galleryOrdersWithEgraphs(recipient.id).toList)
     results.size should be (0)
   }
-  
-  "filterPendingOrders" should "contain the Egraph we expect" in new EgraphsTestApplication {
+
+  it should "contain the Egraph we expect" in new EgraphsTestApplication {
     val (order, recipient) = newOrderAndRecipient
     val egraph = order.newEgraph.save()
     
     val results = GalleryOrderFactory.filterPendingOrders(orderStore.galleryOrdersWithEgraphs(recipient.id).toList)
     val queriedEgraph = results.head._2.get
     queriedEgraph.id should be (egraph.id)
+  }
+
+  val dayInMillis = DateTimeConstants.MILLIS_PER_DAY
+  val today = DateUtils.truncate(new Date(), Calendar.DATE)
+  val tomorrow = DateUtils.truncate(new Date(System.currentTimeMillis + dayInMillis), Calendar.DATE)
+  
+  "addMillisecondsAndRoundUpToNextDay" should "not round up on the boundry condition of a day" in {
+    val answer = Order.addMillisecondsAndRoundUpToNextDay(today, dayInMillis)
+
+    answer.getTime should be (tomorrow.getTime)
+  }
+
+  it should "round up when it is not on the boundry" in {
+    val oneMillisecond = 1
+    val answer = Order.addMillisecondsAndRoundUpToNextDay(today, oneMillisecond)
+
+    answer.getTime should be (tomorrow.getTime)
   }
 
   //
