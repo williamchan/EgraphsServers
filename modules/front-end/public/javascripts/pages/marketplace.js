@@ -67,7 +67,11 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoi
       if(celebrity.minPrice === celebrity.maxPrice && celebrity.minPrice > 0) {
         return "$" + celebrity.minPrice;
       } else if(celebrity.minPrice != celebrity.maxPrice) {
-        return "$" + celebrity.minPrice + "-" + celebrity.maxPrice;
+        if(celebrity.minPrice > 0 ) {
+          return "$" + celebrity.minPrice + "-" + celebrity.maxPrice;
+        } else {
+          return "$" + celebrity.maxPrice;
+        }
       } else {
         return "";
       }
