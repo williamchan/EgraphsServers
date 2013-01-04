@@ -99,14 +99,14 @@ class Blobs @Inject() (
    *   against Amazon S3.
    */
   def put(key: String, bytes: Array[Byte], access: AccessPolicy=AccessPolicy.Private) {
+    require(!bytes.isEmpty, "Cannot put 0-byte array into a bucket. Ever heard of 'delete'?")
+
     blobVendor.put(blobstoreNamespace, key, bytes, access)
   }
 
   /** Delete the data at a certain key. */
   def delete(key: String) {
-    // wchan: We don't need a delete method... Hopefully, we don't ever have to delete assets. But if we do, this method
-    // should use blobVendor and not blobStore directly.
-    blobStore.removeBlob(blobstoreNamespace, key)
+    blobVendor.delete(blobstoreNamespace, key)
   }
 
   /** Clears the entire Blobstore. For God's sake don't do this in production. */

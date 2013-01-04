@@ -13,6 +13,7 @@ import services.config.ConfigFileProxy
 import com.google.inject.Inject
 import services.Time.IntsToSeconds._
 import org.joda.time.DateTimeConstants
+import org.apache.commons.lang.NotImplementedException
 
 /** [[services.blobs.Blobs.BlobProvider]] implementation backed by Amazon S3 */
 private[blobs] case class S3BlobVendor @Inject() (
@@ -72,6 +73,10 @@ private[blobs] case class S3BlobVendor @Inject() (
 
     // Ship it off
     s3.putObject(namespace, s3Object, withAcl(s3ConstantForAccessPolicy(access)))
+  }
+
+  override def delete(namespace: String, key: String) {
+    throw new NotImplementedException("This feature has not been implemented")
   }
 
   override def checkConfiguration() {

@@ -45,7 +45,8 @@ private[controllers] trait GetVideoAssetAdminEndpoint extends ImplicitHeaderAndF
             maybeVideoStatus match {
               case None => BadRequest("Unknown status: " + status)
               case Some(maybeVideoStatus) => {
-                val videos = videoAssetStore.getVideosWithStatus(maybeVideoStatus)
+                val unsortedVideos = videoAssetStore.getVideosWithStatus(maybeVideoStatus)
+                val videos = unsortedVideos.sortBy(_.created.getTime).reverse
 
                 // create a view model for each video, which contains: the secure video URL,
                 // the video ID and the associated celebrity's public name
@@ -54,7 +55,12 @@ private[controllers] trait GetVideoAssetAdminEndpoint extends ImplicitHeaderAndF
                   newVideoUrl <- video.getSecureTemporaryUrl
                   publicName <- videoAssetCelebrityStore.getCelebrityByVideoId(video.id).map(_.publicName)
                 } yield {
-                  VideoAssetViewModel(videoUrl = newVideoUrl, videoId = video.id, celebrityPublicName = publicName)
+                  VideoAssetViewModel(
+                    videoUrl = newVideoUrl,
+                    videoId = video.id,
+                    celebrityPublicName = publicName,
+                    created=video.created
+                  )
                 }
 
                 // if above tasks failed for any video, InternalServerError

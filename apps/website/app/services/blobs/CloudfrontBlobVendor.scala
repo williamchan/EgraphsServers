@@ -26,5 +26,5 @@ class CloudfrontBlobVendor @Inject()(domain: String, override protected val blob
   
   override def secureUrlOption(namespace: String, key: String, expirationSeconds: Int = 5 minutes): Option[String] = {
     blobVendorDelegate.secureUrlOption(namespace, key, expirationSeconds)
-  }  
+  }
 }

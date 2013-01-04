@@ -22,6 +22,15 @@ private[blobs] trait BlobVendor {
   }
 
   /**
+   * Deletes an object with the particular namespace and key.
+   * 
+   * @param namespace the key namespace -- equivalent to an Amazon S3 bucket or a file-system folder.
+   *
+   * @param key the unique key name against which the object is stored.
+   */
+  def delete(namespace: String, key: String)
+
+  /**
    * Puts an object into a key with a particular namespace.
    *
    * @param namespace the key namespace -- equivalent to an Amazon S3 bucket or a file-system folder.
