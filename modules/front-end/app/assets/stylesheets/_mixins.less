@@ -86,7 +86,7 @@
 }
 
 /* !Celebrity Search Box */
-.celebrity-searchbox-container() {
+.celebrity-searchbox-container(@margin-override: 1px) {
 
 
   position: relative;
@@ -122,7 +122,7 @@
     vertical-align: middle;
     right: 10%;
     -webkit-appearance: none;
-    margin-top: 4%;
+    margin-top: @margin-override;
     .box-shadow(none);
   }
 }
